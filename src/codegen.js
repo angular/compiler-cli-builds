@@ -105,7 +105,10 @@ var CodeGenerator = (function () {
             })
                 .catch(function (e) { console.error(e.stack); });
         };
-        return Promise.all(this.program.getRootFileNames().filter(function (f) { return !GENERATED_FILES.test(f); }).map(generateOneFile));
+        return Promise.all(this.program.getSourceFiles()
+            .map(function (sf) { return sf.fileName; })
+            .filter(function (f) { return !GENERATED_FILES.test(f); })
+            .map(generateOneFile));
     };
     CodeGenerator.create = function (ngOptions, program, options, compilerHost) {
         var xhr = { get: function (s) { return Promise.resolve(compilerHost.readFile(s)); } };

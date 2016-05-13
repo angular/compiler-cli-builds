@@ -271,8 +271,13 @@ var StaticReflector = (function () {
                         case "new":
                         case "call":
                             var target = expression['expression'];
-                            staticSymbol =
-                                _this.host.findDeclaration(target['module'], target['name'], context.filePath);
+                            if (target['module']) {
+                                staticSymbol =
+                                    _this.host.findDeclaration(target['module'], target['name'], context.filePath);
+                            }
+                            else {
+                                staticSymbol = _this.host.getStaticSymbol(context.filePath, target['name']);
+                            }
                             var converter = _this.conversionMap.get(staticSymbol);
                             if (converter) {
                                 var args = expression['arguments'];
