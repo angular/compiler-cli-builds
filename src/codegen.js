@@ -25,10 +25,16 @@ var CodeGenerator = (function () {
         var normalize = function (metadata) {
             var directiveType = metadata.type.runtime;
             var directives = _this.resolver.getViewDirectivesMetadata(directiveType);
-            var pipes = _this.resolver.getViewPipesMetadata(directiveType);
-            return new compiler.NormalizedComponentWithViewDirectives(metadata, directives, pipes);
+            return Promise.all(directives.map(function (d) { return _this.compiler.normalizeDirectiveMetadata(d); }))
+                .then(function (normalizedDirectives) {
+                var pipes = _this.resolver.getViewPipesMetadata(directiveType);
+                return new compiler.NormalizedComponentWithViewDirectives(metadata, normalizedDirectives, pipes);
+            });
         };
-        return this.compiler.compileTemplates(metadatas.map(normalize));
+        return Promise.all(metadatas.map(normalize))
+            .then(function (normalizedCompWithDirectives) {
+            return _this.compiler.compileTemplates(normalizedCompWithDirectives);
+        });
     };
     CodeGenerator.prototype.readComponents = function (absSourcePath) {
         var result = [];
@@ -82,13 +88,13 @@ var CodeGenerator = (function () {
     CodeGenerator.prototype.codegen = function () {
         var _this = this;
         platform_server_1.Parse5DomAdapter.makeCurrent();
+        var stylesheetPromises = [];
         var generateOneFile = function (absSourcePath) {
             return Promise.all(_this.readComponents(absSourcePath))
                 .then(function (metadatas) {
                 if (!metadatas || !metadatas.length) {
                     return;
                 }
-                var stylesheetPromises = [];
                 metadatas.forEach(function (metadata) {
                     var stylesheetPaths = metadata && metadata.template && metadata.template.styleUrls;
                     if (stylesheetPaths) {
@@ -97,18 +103,22 @@ var CodeGenerator = (function () {
                         });
                     }
                 });
-                var generated = _this.generateSource(metadatas);
-                var sourceFile = _this.program.getSourceFile(absSourcePath);
-                var emitPath = _this.calculateEmitPath(generated.moduleUrl);
-                _this.host.writeFile(emitPath, PREAMBLE + generated.source, false, function () { }, [sourceFile]);
-                return Promise.all(stylesheetPromises);
+                return _this.generateSource(metadatas);
+            })
+                .then(function (generated) {
+                if (generated) {
+                    var sourceFile = _this.program.getSourceFile(absSourcePath);
+                    var emitPath = _this.calculateEmitPath(generated.moduleUrl);
+                    _this.host.writeFile(emitPath, PREAMBLE + generated.source, false, function () { }, [sourceFile]);
+                }
             })
                 .catch(function (e) { console.error(e.stack); });
         };
-        return Promise.all(this.program.getSourceFiles()
+        var compPromises = this.program.getSourceFiles()
             .map(function (sf) { return sf.fileName; })
             .filter(function (f) { return !GENERATED_FILES.test(f); })
-            .map(generateOneFile));
+            .map(generateOneFile);
+        return Promise.all(stylesheetPromises.concat(compPromises));
     };
     CodeGenerator.create = function (ngOptions, program, options, compilerHost) {
         var xhr = { get: function (s) { return Promise.resolve(compilerHost.readFile(s)); } };
