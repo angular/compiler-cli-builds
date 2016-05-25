@@ -3,3 +3,4 @@ export declare type ReflectorReader = t.ReflectorReader;
 export declare var ReflectorReader: typeof t.ReflectorReader;
 export declare type ReflectionCapabilities = t.ReflectionCapabilities;
 export declare var ReflectionCapabilities: typeof t.ReflectionCapabilities;
+export declare var reflector: typeof t.reflector;

@@ -1,5 +1,4 @@
 "use strict";
-var core_1 = require('@angular/core');
 var core_private_1 = require('./core_private');
 var StaticAndDynamicReflectionCapabilities = (function () {
     function StaticAndDynamicReflectionCapabilities(staticDelegate) {
@@ -7,7 +6,7 @@ var StaticAndDynamicReflectionCapabilities = (function () {
         this.dynamicDelegate = new core_private_1.ReflectionCapabilities();
     }
     StaticAndDynamicReflectionCapabilities.install = function (staticDelegate) {
-        core_1.reflector.updateCapabilities(new StaticAndDynamicReflectionCapabilities(staticDelegate));
+        core_private_1.reflector.updateCapabilities(new StaticAndDynamicReflectionCapabilities(staticDelegate));
     };
     StaticAndDynamicReflectionCapabilities.prototype.isReflectionEnabled = function () { return true; };
     StaticAndDynamicReflectionCapabilities.prototype.factory = function (type) { return this.dynamicDelegate.factory(type); };
