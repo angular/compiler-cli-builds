@@ -1,15 +1,13 @@
 import { StaticReflectorHost, StaticSymbol } from './static_reflector';
 import * as ts from 'typescript';
-import { ModuleMetadata } from 'ts-metadata-collector';
-import { AngularCompilerOptions } from './codegen';
+import { AngularCompilerOptions, ModuleMetadata } from 'tsc-wrapped';
 import { ImportGenerator } from './compiler_private';
 export declare class NodeReflectorHost implements StaticReflectorHost, ImportGenerator {
     private program;
     private compilerHost;
     private options;
-    private ngOptions;
     private metadataCollector;
-    constructor(program: ts.Program, compilerHost: ts.CompilerHost, options: ts.CompilerOptions, ngOptions: AngularCompilerOptions);
+    constructor(program: ts.Program, compilerHost: ts.CompilerHost, options: AngularCompilerOptions);
     angularImportLocations(): {
         coreDecorators: string;
         diDecorators: string;
@@ -38,5 +36,4 @@ export declare class NodeReflectorHost implements StaticReflectorHost, ImportGen
     getStaticSymbol(declarationFile: string, name: string): StaticSymbol;
     getMetadataFor(filePath: string): ModuleMetadata;
     readMetadata(filePath: string): any;
-    writeMetadata(emitFilePath: string, sourceFile: ts.SourceFile): void;
 }

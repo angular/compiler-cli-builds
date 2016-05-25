@@ -1,38 +1,27 @@
 "use strict";
 var static_reflector_1 = require('./static_reflector');
 var ts = require('typescript');
-var ts_metadata_collector_1 = require('ts-metadata-collector');
+var tsc_wrapped_1 = require('tsc-wrapped');
 var fs = require('fs');
 var path = require('path');
 var compiler_private_1 = require('./compiler_private');
 var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 var DTS = /\.d\.ts$/;
 var NodeReflectorHost = (function () {
-    function NodeReflectorHost(program, compilerHost, options, ngOptions) {
+    function NodeReflectorHost(program, compilerHost, options) {
         this.program = program;
         this.compilerHost = compilerHost;
         this.options = options;
-        this.ngOptions = ngOptions;
-        this.metadataCollector = new ts_metadata_collector_1.MetadataCollector();
+        this.metadataCollector = new tsc_wrapped_1.MetadataCollector();
         this.typeCache = new Map();
     }
     NodeReflectorHost.prototype.angularImportLocations = function () {
-        if (this.ngOptions.legacyPackageLayout) {
-            return {
-                coreDecorators: 'angular2/src/core/metadata',
-                diDecorators: 'angular2/src/core/di/decorators',
-                diMetadata: 'angular2/src/core/di/metadata',
-                provider: 'angular2/src/core/di/provider'
-            };
-        }
-        else {
-            return {
-                coreDecorators: '@angular/core/src/metadata',
-                diDecorators: '@angular/core/src/di/decorators',
-                diMetadata: '@angular/core/src/di/metadata',
-                provider: '@angular/core/src/di/provider'
-            };
-        }
+        return {
+            coreDecorators: '@angular/core/src/metadata',
+            diDecorators: '@angular/core/src/di/decorators',
+            diMetadata: '@angular/core/src/di/metadata',
+            provider: '@angular/core/src/di/provider'
+        };
     };
     NodeReflectorHost.prototype.resolve = function (m, containingFile) {
         var resolved = ts.resolveModuleName(m, containingFile, this.options, this.compilerHost).resolvedModule;
@@ -62,7 +51,7 @@ var NodeReflectorHost = (function () {
         // TODO(tbosch): if a file does not yet exist (because we compile it later),
         // we still need to create it so that the `resolve` method works!
         if (!this.compilerHost.fileExists(importedFile)) {
-            if (this.ngOptions.trace) {
+            if (this.options.trace) {
                 console.log("Generating empty file " + importedFile + " to allow resolution of import");
             }
             this.compilerHost.writeFile(importedFile, '', false);
@@ -86,7 +75,7 @@ var NodeReflectorHost = (function () {
                 throw new Error("Resolution of relative paths requires a containing file.");
             }
             // Any containing file gives the same result for absolute imports
-            containingFile = path.join(this.ngOptions.basePath, 'index.ts');
+            containingFile = path.join(this.options.basePath, 'index.ts');
         }
         try {
             var assetUrl = this.normalizeAssetUrl(module);
@@ -158,18 +147,6 @@ var NodeReflectorHost = (function () {
         catch (e) {
             console.error("Failed to read JSON file " + filePath);
             throw e;
-        }
-    };
-    NodeReflectorHost.prototype.writeMetadata = function (emitFilePath, sourceFile) {
-        // TODO: replace with DTS filePath when https://github.com/Microsoft/TypeScript/pull/8412 is
-        // released
-        if (/\.js$/.test(emitFilePath)) {
-            var path_1 = emitFilePath.replace(/*DTS*/ /\.js$/, '.metadata.json');
-            var metadata = this.metadataCollector.getMetadata(sourceFile, this.program.getTypeChecker());
-            if (metadata && metadata.metadata) {
-                var metadataText = JSON.stringify(metadata);
-                fs.writeFileSync(path_1, metadataText, { encoding: 'utf-8' });
-            }
         }
     };
     return NodeReflectorHost;
