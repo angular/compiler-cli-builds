@@ -126,8 +126,8 @@ var CodeGenerator = (function () {
         var staticReflector = new static_reflector_1.StaticReflector(reflectorHost);
         static_reflection_capabilities_1.StaticAndDynamicReflectionCapabilities.install(staticReflector);
         var htmlParser = new compiler_private_1.HtmlParser();
-        var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser);
         var config = new compiler.CompilerConfig(true, true, true);
+        var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
         var parser = new compiler_private_1.Parser(new compiler_private_1.Lexer(), config);
         var tmplParser = new compiler_private_1.TemplateParser(parser, new compiler_private_1.DomElementSchemaRegistry(), htmlParser, 
         /*console*/ null, []);
