@@ -1,7 +1,5 @@
 "use strict";
-var core_1 = require('@angular/core');
-var core_2 = require('@angular/core');
-var core_3 = require("@angular/core");
+var core_1 = require("@angular/core");
 /**
  * A token representing the a reference to a static type.
  *
@@ -135,13 +133,13 @@ var StaticReflector = (function () {
     };
     StaticReflector.prototype.initializeConversionMap = function () {
         var _a = this.host.angularImportLocations(), coreDecorators = _a.coreDecorators, diDecorators = _a.diDecorators, diMetadata = _a.diMetadata, provider = _a.provider;
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(provider, 'Provider'), core_2.Provider);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Host'), core_3.HostMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Injectable'), core_3.InjectableMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Self'), core_3.SelfMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'SkipSelf'), core_3.SkipSelfMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Inject'), core_3.InjectMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Optional'), core_3.OptionalMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(provider, 'Provider'), core_1.Provider);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Host'), core_1.HostMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Injectable'), core_1.InjectableMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Self'), core_1.SelfMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'SkipSelf'), core_1.SkipSelfMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Inject'), core_1.InjectMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Optional'), core_1.OptionalMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Attribute'), core_1.AttributeMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Query'), core_1.QueryMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'ViewQuery'), core_1.ViewQueryMetadata);
@@ -157,10 +155,10 @@ var StaticReflector = (function () {
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Directive'), core_1.DirectiveMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Component'), core_1.ComponentMetadata);
         // Note: Some metadata classes can be used directly with Provider.deps.
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'HostMetadata'), core_3.HostMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'SelfMetadata'), core_3.SelfMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'SkipSelfMetadata'), core_3.SkipSelfMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'OptionalMetadata'), core_3.OptionalMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'HostMetadata'), core_1.HostMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'SelfMetadata'), core_1.SelfMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'SkipSelfMetadata'), core_1.SkipSelfMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'OptionalMetadata'), core_1.OptionalMetadata);
     };
     /** @internal */
     StaticReflector.prototype.simplify = function (context, value) {
