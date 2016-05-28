@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 "use strict";
 require('reflect-metadata');
-var tsc = require('tsc-wrapped');
+var tsc = require('@angular/tsc-wrapped');
 var codegen_1 = require('./codegen');
 function codegen(ngOptions, program, host) {
     return codegen_1.CodeGenerator.create(ngOptions, program, host).codegen();

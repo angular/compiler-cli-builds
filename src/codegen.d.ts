@@ -3,7 +3,7 @@
  * Intended to be used in a build step.
  */
 import * as ts from 'typescript';
-import { AngularCompilerOptions } from 'tsc-wrapped';
+import { AngularCompilerOptions } from '@angular/tsc-wrapped';
 import * as compiler from '@angular/compiler';
 import { StaticReflector } from './static_reflector';
 import { CompileMetadataResolver } from './compiler_private';

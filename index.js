@@ -6,5 +6,5 @@ var codegen_1 = require('./src/codegen');
 exports.CodeGenerator = codegen_1.CodeGenerator;
 var reflector_host_1 = require('./src/reflector_host');
 exports.NodeReflectorHost = reflector_host_1.NodeReflectorHost;
-__export(require('tsc-wrapped'));
+__export(require('@angular/tsc-wrapped'));
 //# sourceMappingURL=index.js.map

@@ -1,7 +1,7 @@
 "use strict";
 var static_reflector_1 = require('./static_reflector');
 var ts = require('typescript');
-var tsc_wrapped_1 = require('tsc-wrapped');
+var tsc_wrapped_1 = require('@angular/tsc-wrapped');
 var fs = require('fs');
 var path = require('path');
 var compiler_private_1 = require('./compiler_private');

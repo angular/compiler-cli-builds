@@ -1,6 +1,6 @@
 import { StaticReflectorHost, StaticSymbol } from './static_reflector';
 import * as ts from 'typescript';
-import { AngularCompilerOptions, ModuleMetadata } from 'tsc-wrapped';
+import { AngularCompilerOptions, ModuleMetadata } from '@angular/tsc-wrapped';
 import { ImportGenerator } from './compiler_private';
 export declare class NodeReflectorHost implements StaticReflectorHost, ImportGenerator {
     private program;
