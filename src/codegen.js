@@ -128,10 +128,10 @@ var CodeGenerator = (function () {
         var htmlParser = new compiler_private_1.HtmlParser();
         var config = new compiler.CompilerConfig(true, true, true);
         var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
-        var parser = new compiler_private_1.Parser(new compiler_private_1.Lexer(), config);
+        var parser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
         var tmplParser = new compiler_private_1.TemplateParser(parser, new compiler_private_1.DomElementSchemaRegistry(), htmlParser, 
         /*console*/ null, []);
-        var offlineCompiler = new compiler.OfflineCompiler(normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.TypeScriptEmitter(reflectorHost), xhr);
+        var offlineCompiler = new compiler.OfflineCompiler(normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(new compiler.CompilerConfig(true, true, true)), new compiler_private_1.TypeScriptEmitter(reflectorHost), xhr);
         var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), null, null, staticReflector);
         return new CodeGenerator(options, program, compilerHost, staticReflector, resolver, offlineCompiler, reflectorHost);
     };
