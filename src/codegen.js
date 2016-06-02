@@ -37,17 +37,22 @@ var CodeGenerator = (function () {
     };
     CodeGenerator.prototype.readComponents = function (absSourcePath) {
         var result = [];
-        var metadata = this.staticReflector.getModuleMetadata(absSourcePath);
-        if (!metadata) {
+        var moduleMetadata = this.staticReflector.getModuleMetadata(absSourcePath);
+        if (!moduleMetadata) {
             console.log("WARNING: no metadata found for " + absSourcePath);
             return result;
         }
-        var symbols = Object.keys(metadata['metadata']);
+        var metadata = moduleMetadata['metadata'];
+        var symbols = metadata && Object.keys(metadata);
         if (!symbols || !symbols.length) {
             return result;
         }
         for (var _i = 0, symbols_1 = symbols; _i < symbols_1.length; _i++) {
             var symbol = symbols_1[_i];
+            if (metadata[symbol] && metadata[symbol].__symbolic == 'error') {
+                // Ignore symbols that are only included to record error information.
+                continue;
+            }
             var staticType = this.reflectorHost.findDeclaration(absSourcePath, symbol, absSourcePath);
             var directive = void 0;
             directive = this.resolver.maybeGetDirectiveMetadata(staticType);

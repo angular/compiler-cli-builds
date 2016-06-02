@@ -287,6 +287,8 @@ var StaticReflector = (function () {
                             else {
                                 return context;
                             }
+                        case "error":
+                            throw new Error(expression['message']);
                     }
                     return null;
                 }

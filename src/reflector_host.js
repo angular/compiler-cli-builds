@@ -136,7 +136,7 @@ var NodeReflectorHost = (function () {
         if (!sf) {
             throw new Error("Source file " + filePath + " not present in program.");
         }
-        var metadata = this.metadataCollector.getMetadata(sf, this.program.getTypeChecker());
+        var metadata = this.metadataCollector.getMetadata(sf);
         return metadata;
     };
     NodeReflectorHost.prototype.readMetadata = function (filePath) {
