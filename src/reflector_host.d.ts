@@ -12,6 +12,7 @@ export declare class NodeReflectorHost implements StaticReflectorHost, ImportGen
         coreDecorators: string;
         diDecorators: string;
         diMetadata: string;
+        animationMetadata: string;
         provider: string;
     };
     private resolve(m, containingFile);

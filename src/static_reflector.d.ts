@@ -26,6 +26,7 @@ export interface StaticReflectorHost {
         coreDecorators: string;
         diDecorators: string;
         diMetadata: string;
+        animationMetadata: string;
         provider: string;
     };
 }
@@ -59,6 +60,7 @@ export declare class StaticReflector implements ReflectorReader {
     parameters(type: StaticSymbol): any[];
     hasLifecycleHook(type: any, lcInterface: any, lcProperty: string): boolean;
     private registerDecoratorOrConstructor(type, ctor);
+    private registerFunction(type, fn);
     private initializeConversionMap();
     /** @internal */
     simplify(context: StaticSymbol, value: any): any;

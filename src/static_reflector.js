@@ -132,8 +132,19 @@ var StaticReflector = (function () {
             return metadata;
         });
     };
+    StaticReflector.prototype.registerFunction = function (type, fn) {
+        var _this = this;
+        this.conversionMap.set(type, function (context, args) {
+            var argValues = [];
+            args.forEach(function (arg, index) {
+                var argValue = _this.simplify(context, arg);
+                argValues.push(argValue);
+            });
+            return fn.apply(null, argValues);
+        });
+    };
     StaticReflector.prototype.initializeConversionMap = function () {
-        var _a = this.host.angularImportLocations(), coreDecorators = _a.coreDecorators, diDecorators = _a.diDecorators, diMetadata = _a.diMetadata, provider = _a.provider;
+        var _a = this.host.angularImportLocations(), coreDecorators = _a.coreDecorators, diDecorators = _a.diDecorators, diMetadata = _a.diMetadata, animationMetadata = _a.animationMetadata, provider = _a.provider;
         this.registerDecoratorOrConstructor(this.host.findDeclaration(provider, 'Provider'), core_1.Provider);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Host'), core_1.HostMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Injectable'), core_1.InjectableMetadata);
@@ -160,6 +171,14 @@ var StaticReflector = (function () {
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'SelfMetadata'), core_1.SelfMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'SkipSelfMetadata'), core_1.SkipSelfMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'OptionalMetadata'), core_1.OptionalMetadata);
+        this.registerFunction(this.host.findDeclaration(animationMetadata, 'trigger'), core_1.trigger);
+        this.registerFunction(this.host.findDeclaration(animationMetadata, 'state'), core_1.state);
+        this.registerFunction(this.host.findDeclaration(animationMetadata, 'transition'), core_1.transition);
+        this.registerFunction(this.host.findDeclaration(animationMetadata, 'style'), core_1.style);
+        this.registerFunction(this.host.findDeclaration(animationMetadata, 'animate'), core_1.animate);
+        this.registerFunction(this.host.findDeclaration(animationMetadata, 'keyframes'), core_1.keyframes);
+        this.registerFunction(this.host.findDeclaration(animationMetadata, 'sequence'), core_1.sequence);
+        this.registerFunction(this.host.findDeclaration(animationMetadata, 'group'), core_1.group);
     };
     /** @internal */
     StaticReflector.prototype.simplify = function (context, value) {
