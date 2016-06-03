@@ -57,15 +57,21 @@ var NodeReflectorHost = (function () {
             this.compilerHost.writeFile(importedFile, '', false);
             fs.writeFileSync(importedFile, '');
         }
-        var parts = importedFile.replace(EXT, '').split(path.sep).filter(function (p) { return !!p; });
+        var importModuleName = importedFile.replace(EXT, '');
+        var parts = importModuleName.split(path.sep).filter(function (p) { return !!p; });
         for (var index = parts.length - 1; index >= 0; index--) {
-            var candidate = parts.slice(index, parts.length).join(path.sep);
-            if (this.resolve('.' + path.sep + candidate, containingFile) === importedFile) {
-                return "./" + candidate;
+            var candidate_1 = parts.slice(index, parts.length).join(path.sep);
+            if (this.resolve('.' + path.sep + candidate_1, containingFile) === importedFile) {
+                return "./" + candidate_1;
             }
-            if (this.resolve(candidate, containingFile) === importedFile) {
-                return candidate;
+            if (this.resolve(candidate_1, containingFile) === importedFile) {
+                return candidate_1;
             }
+        }
+        // Try a relative import
+        var candidate = path.relative(path.dirname(containingFile), importModuleName);
+        if (this.resolve(candidate, containingFile) === importedFile) {
+            return candidate;
         }
         throw new Error("Unable to find any resolvable import for " + importedFile + " relative to " + containingFile);
     };
