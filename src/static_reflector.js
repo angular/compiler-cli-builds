@@ -1,5 +1,6 @@
 "use strict";
 var core_1 = require("@angular/core");
+var SUPPORTED_SCHEMA_VERSION = 1;
 /**
  * A token representing the a reference to a static type.
  *
@@ -305,8 +306,14 @@ var StaticReflector = (function () {
         var moduleMetadata = this.metadataCache.get(module);
         if (!moduleMetadata) {
             moduleMetadata = this.host.getMetadataFor(module);
+            if (Array.isArray(moduleMetadata)) {
+                moduleMetadata = moduleMetadata.find(function (element) { return element.version === SUPPORTED_SCHEMA_VERSION; }) || moduleMetadata[0];
+            }
             if (!moduleMetadata) {
-                moduleMetadata = { __symbolic: "module", module: module, metadata: {} };
+                moduleMetadata = { __symbolic: "module", version: SUPPORTED_SCHEMA_VERSION, module: module, metadata: {} };
+            }
+            if (moduleMetadata['version'] != SUPPORTED_SCHEMA_VERSION) {
+                throw new Error("Metadata version mismatch for module " + module + ", found version " + moduleMetadata['version'] + ", expected " + SUPPORTED_SCHEMA_VERSION);
             }
             this.metadataCache.set(module, moduleMetadata);
         }
