@@ -308,7 +308,11 @@ var StaticReflector = (function () {
                                 return context;
                             }
                         case "error":
-                            throw new Error(expression['message']);
+                            var message = produceErrorMessage(expression);
+                            if (expression['line']) {
+                                message = message + " (position " + expression['line'] + ":" + expression['character'] + " in the original .ts file)";
+                            }
+                            throw new Error(message);
                     }
                     return null;
                 }
@@ -316,7 +320,12 @@ var StaticReflector = (function () {
             }
             return null;
         }
-        return simplify(value);
+        try {
+            return simplify(value);
+        }
+        catch (e) {
+            throw new Error(e.message + ", resolving symbol " + context.name + " in " + context.filePath);
+        }
     };
     /**
      * @param module an absolute path to a module file.
@@ -349,6 +358,30 @@ var StaticReflector = (function () {
     return StaticReflector;
 }());
 exports.StaticReflector = StaticReflector;
+function expandedMessage(error) {
+    switch (error.message) {
+        case 'Reference to non-exported class':
+            if (error.context && error.context.className) {
+                return "Reference to a non-exported class " + error.context.className;
+            }
+            break;
+        case 'Variable not initialized':
+            return 'Only initialized variables and constants can be referenced';
+        case 'Destructuring not supported':
+            return 'Referencing an exported destructured variable or constant is not supported';
+        case 'Could not resolve type':
+            if (error.context && error.context.typeName) {
+                return "Could not resolve type " + error.context.typeName;
+            }
+            break;
+        case 'Function call not supported':
+            return 'Function calls are not supported. Consider replacing the function or lambda with a reference to an exported function';
+    }
+    return error.message;
+}
+function produceErrorMessage(error) {
+    return "Error encountered resolving symbol values statically. " + expandedMessage(error);
+}
 function mapStringMap(input, transform) {
     if (!input)
         return {};
