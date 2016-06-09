@@ -124,10 +124,10 @@ var CodeGenerator = (function () {
             .map(generateOneFile);
         return Promise.all(stylesheetPromises.concat(compPromises));
     };
-    CodeGenerator.create = function (options, program, compilerHost) {
+    CodeGenerator.create = function (options, program, compilerHost, reflectorHostContext) {
         var xhr = { get: function (s) { return Promise.resolve(compilerHost.readFile(s)); } };
         var urlResolver = compiler.createOfflineCompileUrlResolver();
-        var reflectorHost = new reflector_host_1.NodeReflectorHost(program, compilerHost, options);
+        var reflectorHost = new reflector_host_1.ReflectorHost(program, compilerHost, options, reflectorHostContext);
         var staticReflector = new static_reflector_1.StaticReflector(reflectorHost);
         static_reflection_capabilities_1.StaticAndDynamicReflectionCapabilities.install(staticReflector);
         var htmlParser = new compiler_private_1.HtmlParser();

@@ -7,7 +7,7 @@ import { AngularCompilerOptions } from '@angular/tsc-wrapped';
 import * as compiler from '@angular/compiler';
 import { StaticReflector } from './static_reflector';
 import { CompileMetadataResolver } from './compiler_private';
-import { NodeReflectorHost } from './reflector_host';
+import { ReflectorHost, ReflectorHostContext } from './reflector_host';
 export declare class CodeGenerator {
     private options;
     private program;
@@ -16,11 +16,11 @@ export declare class CodeGenerator {
     private resolver;
     private compiler;
     private reflectorHost;
-    constructor(options: AngularCompilerOptions, program: ts.Program, host: ts.CompilerHost, staticReflector: StaticReflector, resolver: CompileMetadataResolver, compiler: compiler.OfflineCompiler, reflectorHost: NodeReflectorHost);
+    constructor(options: AngularCompilerOptions, program: ts.Program, host: ts.CompilerHost, staticReflector: StaticReflector, resolver: CompileMetadataResolver, compiler: compiler.OfflineCompiler, reflectorHost: ReflectorHost);
     private generateSource(metadatas);
     private readComponents(absSourcePath);
     private calculateEmitPath(filePath);
     private generateStylesheet(filepath, shim);
     codegen(): Promise<any>;
-    static create(options: AngularCompilerOptions, program: ts.Program, compilerHost: ts.CompilerHost): CodeGenerator;
+    static create(options: AngularCompilerOptions, program: ts.Program, compilerHost: ts.CompilerHost, reflectorHostContext?: ReflectorHostContext): CodeGenerator;
 }

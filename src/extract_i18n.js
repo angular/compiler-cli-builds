@@ -110,7 +110,7 @@ var Extractor = (function () {
     Extractor.create = function (options, program, compilerHost) {
         var xhr = { get: function (s) { return Promise.resolve(compilerHost.readFile(s)); } };
         var urlResolver = compiler.createOfflineCompileUrlResolver();
-        var reflectorHost = new reflector_host_1.NodeReflectorHost(program, compilerHost, options);
+        var reflectorHost = new reflector_host_1.ReflectorHost(program, compilerHost, options);
         var staticReflector = new static_reflector_1.StaticReflector(reflectorHost);
         static_reflection_capabilities_1.StaticAndDynamicReflectionCapabilities.install(staticReflector);
         var htmlParser = new compiler_private_1.HtmlParser();

@@ -2,12 +2,18 @@ import { StaticReflectorHost, StaticSymbol } from './static_reflector';
 import * as ts from 'typescript';
 import { AngularCompilerOptions, ModuleMetadata } from '@angular/tsc-wrapped';
 import { ImportGenerator } from './compiler_private';
-export declare class NodeReflectorHost implements StaticReflectorHost, ImportGenerator {
+export interface ReflectorHostContext {
+    exists(fileName: string): boolean;
+    read(fileName: string): string;
+    write(fileName: string, data: string): void;
+}
+export declare class ReflectorHost implements StaticReflectorHost, ImportGenerator {
     private program;
     private compilerHost;
     private options;
     private metadataCollector;
-    constructor(program: ts.Program, compilerHost: ts.CompilerHost, options: AngularCompilerOptions);
+    private context;
+    constructor(program: ts.Program, compilerHost: ts.CompilerHost, options: AngularCompilerOptions, context?: ReflectorHostContext);
     angularImportLocations(): {
         coreDecorators: string;
         diDecorators: string;
@@ -37,4 +43,9 @@ export declare class NodeReflectorHost implements StaticReflectorHost, ImportGen
     getStaticSymbol(declarationFile: string, name: string): StaticSymbol;
     getMetadataFor(filePath: string): ModuleMetadata;
     readMetadata(filePath: string): any;
+}
+export declare class NodeReflectorHostContext implements ReflectorHostContext {
+    exists(fileName: string): boolean;
+    read(fileName: string): string;
+    write(fileName: string, data: string): void;
 }
