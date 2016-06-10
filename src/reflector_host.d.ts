@@ -1,7 +1,7 @@
-import { StaticReflectorHost, StaticSymbol } from './static_reflector';
-import * as ts from 'typescript';
 import { AngularCompilerOptions, ModuleMetadata } from '@angular/tsc-wrapped';
+import * as ts from 'typescript';
 import { ImportGenerator } from './compiler_private';
+import { StaticReflectorHost, StaticSymbol } from './static_reflector';
 export interface ReflectorHostContext {
     exists(fileName: string): boolean;
     read(fileName: string): string;

@@ -2,12 +2,12 @@
  * Transform template html and css into executable code.
  * Intended to be used in a build step.
  */
-import * as ts from 'typescript';
-import { AngularCompilerOptions } from '@angular/tsc-wrapped';
 import * as compiler from '@angular/compiler';
-import { StaticReflector } from './static_reflector';
+import { AngularCompilerOptions } from '@angular/tsc-wrapped';
+import * as ts from 'typescript';
 import { CompileMetadataResolver } from './compiler_private';
 import { ReflectorHost, ReflectorHostContext } from './reflector_host';
+import { StaticReflector } from './static_reflector';
 export declare class CodeGenerator {
     private options;
     private program;

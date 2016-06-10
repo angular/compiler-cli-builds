@@ -1,10 +1,10 @@
 "use strict";
-var static_reflector_1 = require('./static_reflector');
-var ts = require('typescript');
 var tsc_wrapped_1 = require('@angular/tsc-wrapped');
 var fs = require('fs');
 var path = require('path');
+var ts = require('typescript');
 var compiler_private_1 = require('./compiler_private');
+var static_reflector_1 = require('./static_reflector');
 var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 var DTS = /\.d\.ts$/;
 var ReflectorHost = (function () {
@@ -79,8 +79,8 @@ var ReflectorHost = (function () {
     };
     ReflectorHost.prototype.findDeclaration = function (module, symbolName, containingFile, containingModule) {
         if (!containingFile || !containingFile.length) {
-            if (module.indexOf(".") === 0) {
-                throw new Error("Resolution of relative paths requires a containing file.");
+            if (module.indexOf('.') === 0) {
+                throw new Error('Resolution of relative paths requires a containing file.');
             }
             // Any containing file gives the same result for absolute imports
             containingFile = path.join(this.options.basePath, 'index.ts');
@@ -171,15 +171,9 @@ exports.ReflectorHost = ReflectorHost;
 var NodeReflectorHostContext = (function () {
     function NodeReflectorHostContext() {
     }
-    NodeReflectorHostContext.prototype.exists = function (fileName) {
-        return fs.existsSync(fileName);
-    };
-    NodeReflectorHostContext.prototype.read = function (fileName) {
-        return fs.readFileSync(fileName, 'utf8');
-    };
-    NodeReflectorHostContext.prototype.write = function (fileName, data) {
-        fs.writeFileSync(fileName, data, 'utf8');
-    };
+    NodeReflectorHostContext.prototype.exists = function (fileName) { return fs.existsSync(fileName); };
+    NodeReflectorHostContext.prototype.read = function (fileName) { return fs.readFileSync(fileName, 'utf8'); };
+    NodeReflectorHostContext.prototype.write = function (fileName, data) { fs.writeFileSync(fileName, data, 'utf8'); };
     return NodeReflectorHostContext;
 }());
 exports.NodeReflectorHostContext = NodeReflectorHostContext;

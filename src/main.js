@@ -13,7 +13,7 @@ if (require.main === module) {
         .then(function (exitCode) { return process.exit(exitCode); })
         .catch(function (e) {
         console.error(e.stack);
-        console.error("Compilation failed");
+        console.error('Compilation failed');
         process.exit(1);
     });
 }

@@ -38,14 +38,13 @@ var Extractor = (function () {
                 return new compiler.NormalizedComponentWithViewDirectives(metadata, normalizedDirectives, pipes);
             });
         };
-        return Promise
-            .all(metadatas.map(normalize))
+        return Promise.all(metadatas.map(normalize))
             .then(function (cmps) {
             var messages = [];
             var errors = [];
             cmps.forEach(function (cmp) {
                 // TODO(vicb): url
-                var result = _this._extractor.extract(cmp.component.template.template, "url");
+                var result = _this._extractor.extract(cmp.component.template.template, 'url');
                 errors = errors.concat(result.errors);
                 messages = messages.concat(result.messages);
             });
@@ -83,18 +82,14 @@ var Extractor = (function () {
             .map(function (sf) { return sf.fileName; })
             .filter(function (f) { return !GENERATED_FILES.test(f); })
             .map(function (absSourcePath) {
-            return Promise
-                .all(_this.readComponents(absSourcePath))
+            return Promise.all(_this.readComponents(absSourcePath))
                 .then(function (metadatas) { return _this.extractCmpMessages(metadatas); })
                 .catch(function (e) { return console.error(e.stack); });
         });
         var messages = [];
         var errors = [];
-        return Promise.all(promises)
-            .then(function (extractionResults) {
-            extractionResults
-                .filter(function (result) { return !!result; })
-                .forEach(function (result) {
+        return Promise.all(promises).then(function (extractionResults) {
+            extractionResults.filter(function (result) { return !!result; }).forEach(function (result) {
                 messages = messages.concat(result.messages);
                 errors = errors.concat(result.errors);
             });
@@ -134,7 +129,7 @@ if (require.main === module) {
         .then(function (exitCode) { return process.exit(exitCode); })
         .catch(function (e) {
         console.error(e.stack);
-        console.error("Compilation failed");
+        console.error('Compilation failed');
         process.exit(1);
     });
 }

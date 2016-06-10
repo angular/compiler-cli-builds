@@ -1,5 +1,5 @@
 "use strict";
-var core_1 = require("@angular/core");
+var core_1 = require('@angular/core');
 var SUPPORTED_SCHEMA_VERSION = 1;
 /**
  * A token representing the a reference to a static type.
@@ -199,7 +199,7 @@ var StaticReflector = (function () {
                 if (expression['__symbolic']) {
                     var staticSymbol = void 0;
                     switch (expression['__symbolic']) {
-                        case "binop":
+                        case 'binop':
                             var left = simplify(expression['left']);
                             var right = simplify(expression['right']);
                             switch (expression['operator']) {
@@ -245,7 +245,7 @@ var StaticReflector = (function () {
                                     return left % right;
                             }
                             return null;
-                        case "pre":
+                        case 'pre':
                             var operand = simplify(expression['operand']);
                             switch (expression['operator']) {
                                 case '+':
@@ -258,19 +258,19 @@ var StaticReflector = (function () {
                                     return ~operand;
                             }
                             return null;
-                        case "index":
+                        case 'index':
                             var indexTarget = simplify(expression['expression']);
                             var index = simplify(expression['index']);
                             if (indexTarget && isPrimitive(index))
                                 return indexTarget[index];
                             return null;
-                        case "select":
+                        case 'select':
                             var selectTarget = simplify(expression['expression']);
                             var member = simplify(expression['member']);
                             if (selectTarget && isPrimitive(member))
                                 return selectTarget[member];
                             return null;
-                        case "reference":
+                        case 'reference':
                             if (expression['module']) {
                                 staticSymbol = _this.host.findDeclaration(expression['module'], expression['name'], context.filePath);
                             }
@@ -284,10 +284,10 @@ var StaticReflector = (function () {
                                 result = _this.simplify(staticSymbol, declarationValue);
                             }
                             return result;
-                        case "class":
+                        case 'class':
                             return context;
-                        case "new":
-                        case "call":
+                        case 'new':
+                        case 'call':
                             var target = expression['expression'];
                             if (target['module']) {
                                 staticSymbol =
@@ -307,10 +307,11 @@ var StaticReflector = (function () {
                             else {
                                 return context;
                             }
-                        case "error":
+                        case 'error':
                             var message = produceErrorMessage(expression);
                             if (expression['line']) {
-                                message = message + " (position " + expression['line'] + ":" + expression['character'] + " in the original .ts file)";
+                                message =
+                                    message + " (position " + expression['line'] + ":" + expression['character'] + " in the original .ts file)";
                             }
                             throw new Error(message);
                     }
@@ -335,10 +336,13 @@ var StaticReflector = (function () {
         if (!moduleMetadata) {
             moduleMetadata = this.host.getMetadataFor(module);
             if (Array.isArray(moduleMetadata)) {
-                moduleMetadata = moduleMetadata.find(function (element) { return element.version === SUPPORTED_SCHEMA_VERSION; }) || moduleMetadata[0];
+                moduleMetadata = moduleMetadata
+                    .find(function (element) { return element.version === SUPPORTED_SCHEMA_VERSION; }) ||
+                    moduleMetadata[0];
             }
             if (!moduleMetadata) {
-                moduleMetadata = { __symbolic: "module", version: SUPPORTED_SCHEMA_VERSION, module: module, metadata: {} };
+                moduleMetadata =
+                    { __symbolic: 'module', version: SUPPORTED_SCHEMA_VERSION, module: module, metadata: {} };
             }
             if (moduleMetadata['version'] != SUPPORTED_SCHEMA_VERSION) {
                 throw new Error("Metadata version mismatch for module " + module + ", found version " + moduleMetadata['version'] + ", expected " + SUPPORTED_SCHEMA_VERSION);
@@ -351,7 +355,7 @@ var StaticReflector = (function () {
         var moduleMetadata = this.getModuleMetadata(type.filePath);
         var result = moduleMetadata['metadata'][type.name];
         if (!result) {
-            result = { __symbolic: "class" };
+            result = { __symbolic: 'class' };
         }
         return result;
     };
@@ -390,6 +394,6 @@ function mapStringMap(input, transform) {
     return result;
 }
 function isPrimitive(o) {
-    return o === null || (typeof o !== "function" && typeof o !== "object");
+    return o === null || (typeof o !== 'function' && typeof o !== 'object');
 }
 //# sourceMappingURL=static_reflector.js.map
