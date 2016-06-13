@@ -18,6 +18,7 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
         coreDecorators: string;
         diDecorators: string;
         diMetadata: string;
+        diOpaqueToken: string;
         animationMetadata: string;
         provider: string;
     };

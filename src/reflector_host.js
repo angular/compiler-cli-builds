@@ -21,6 +21,7 @@ var ReflectorHost = (function () {
             coreDecorators: '@angular/core/src/metadata',
             diDecorators: '@angular/core/src/di/decorators',
             diMetadata: '@angular/core/src/di/metadata',
+            diOpaqueToken: '@angular/core/src/di/opaque_token',
             animationMetadata: '@angular/core/src/animation/metadata',
             provider: '@angular/core/src/di/provider'
         };

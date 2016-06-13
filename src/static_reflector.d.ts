@@ -26,6 +26,7 @@ export interface StaticReflectorHost {
         coreDecorators: string;
         diDecorators: string;
         diMetadata: string;
+        diOpaqueToken: string;
         animationMetadata: string;
         provider: string;
     };
@@ -51,6 +52,7 @@ export declare class StaticReflector implements ReflectorReader {
     private parameterCache;
     private metadataCache;
     private conversionMap;
+    private opaqueToken;
     constructor(host: StaticReflectorHost);
     importUri(typeOrFunc: StaticSymbol): string;
     annotations(type: StaticSymbol): any[];

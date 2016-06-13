@@ -1,4 +1,9 @@
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var core_1 = require('@angular/core');
 var SUPPORTED_SCHEMA_VERSION = 1;
 /**
@@ -144,7 +149,8 @@ var StaticReflector = (function () {
         });
     };
     StaticReflector.prototype.initializeConversionMap = function () {
-        var _a = this.host.angularImportLocations(), coreDecorators = _a.coreDecorators, diDecorators = _a.diDecorators, diMetadata = _a.diMetadata, animationMetadata = _a.animationMetadata, provider = _a.provider;
+        var _a = this.host.angularImportLocations(), coreDecorators = _a.coreDecorators, diDecorators = _a.diDecorators, diMetadata = _a.diMetadata, diOpaqueToken = _a.diOpaqueToken, animationMetadata = _a.animationMetadata, provider = _a.provider;
+        this.opaqueToken = this.host.findDeclaration(diOpaqueToken, 'OpaqueToken');
         this.registerDecoratorOrConstructor(this.host.findDeclaration(provider, 'Provider'), core_1.Provider);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Host'), core_1.HostMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Injectable'), core_1.InjectableMetadata);
@@ -183,150 +189,227 @@ var StaticReflector = (function () {
     /** @internal */
     StaticReflector.prototype.simplify = function (context, value) {
         var _this = this;
-        function simplify(expression) {
-            if (isPrimitive(expression)) {
-                return expression;
-            }
-            if (expression instanceof Array) {
-                var result = [];
-                for (var _i = 0, _a = expression; _i < _a.length; _i++) {
-                    var item = _a[_i];
-                    result.push(simplify(item));
+        var scope = BindingScope.empty;
+        var calling = new Map();
+        function simplifyInContext(context, value) {
+            function resolveReference(expression) {
+                var staticSymbol;
+                if (expression['module']) {
+                    staticSymbol = _this.host.findDeclaration(expression['module'], expression['name'], context.filePath);
                 }
-                return result;
+                else {
+                    staticSymbol = _this.host.getStaticSymbol(context.filePath, expression['name']);
+                }
+                return staticSymbol;
             }
-            if (expression) {
-                if (expression['__symbolic']) {
-                    var staticSymbol = void 0;
-                    switch (expression['__symbolic']) {
-                        case 'binop':
-                            var left = simplify(expression['left']);
-                            var right = simplify(expression['right']);
-                            switch (expression['operator']) {
-                                case '&&':
-                                    return left && right;
-                                case '||':
-                                    return left || right;
-                                case '|':
-                                    return left | right;
-                                case '^':
-                                    return left ^ right;
-                                case '&':
-                                    return left & right;
-                                case '==':
-                                    return left == right;
-                                case '!=':
-                                    return left != right;
-                                case '===':
-                                    return left === right;
-                                case '!==':
-                                    return left !== right;
-                                case '<':
-                                    return left < right;
-                                case '>':
-                                    return left > right;
-                                case '<=':
-                                    return left <= right;
-                                case '>=':
-                                    return left >= right;
-                                case '<<':
-                                    return left << right;
-                                case '>>':
-                                    return left >> right;
-                                case '+':
-                                    return left + right;
-                                case '-':
-                                    return left - right;
-                                case '*':
-                                    return left * right;
-                                case '/':
-                                    return left / right;
-                                case '%':
-                                    return left % right;
+            function isOpaqueToken(value) {
+                if (value && value.__symbolic === 'new' && value.expression) {
+                    var target = value.expression;
+                    if (target.__symbolic == 'reference') {
+                        return sameSymbol(resolveReference(target), _this.opaqueToken);
+                    }
+                }
+                return false;
+            }
+            function simplifyCall(expression) {
+                if (expression['__symbolic'] == 'call') {
+                    var target = expression['expression'];
+                    var targetFunction = simplify(target);
+                    if (targetFunction['__symbolic'] == 'function') {
+                        if (calling.get(targetFunction)) {
+                            throw new Error('Recursion not supported');
+                        }
+                        calling.set(targetFunction, true);
+                        var value_1 = targetFunction['value'];
+                        if (value_1) {
+                            // Determine the arguments
+                            var args = (expression['arguments'] || []).map(function (arg) { return simplify(arg); });
+                            var parameters = targetFunction['parameters'];
+                            var functionScope = BindingScope.build();
+                            for (var i = 0; i < parameters.length; i++) {
+                                functionScope.define(parameters[i], args[i]);
                             }
-                            return null;
-                        case 'pre':
-                            var operand = simplify(expression['operand']);
-                            switch (expression['operator']) {
-                                case '+':
-                                    return operand;
-                                case '-':
-                                    return -operand;
-                                case '!':
-                                    return !operand;
-                                case '~':
-                                    return ~operand;
+                            var oldScope = scope;
+                            var result = void 0;
+                            try {
+                                scope = functionScope.done();
+                                result = simplify(value_1);
                             }
-                            return null;
-                        case 'index':
-                            var indexTarget = simplify(expression['expression']);
-                            var index = simplify(expression['index']);
-                            if (indexTarget && isPrimitive(index))
-                                return indexTarget[index];
-                            return null;
-                        case 'select':
-                            var selectTarget = simplify(expression['expression']);
-                            var member = simplify(expression['member']);
-                            if (selectTarget && isPrimitive(member))
-                                return selectTarget[member];
-                            return null;
-                        case 'reference':
-                            if (expression['module']) {
-                                staticSymbol = _this.host.findDeclaration(expression['module'], expression['name'], context.filePath);
-                            }
-                            else {
-                                staticSymbol = _this.host.getStaticSymbol(context.filePath, expression['name']);
-                            }
-                            var result = staticSymbol;
-                            var moduleMetadata = _this.getModuleMetadata(staticSymbol.filePath);
-                            var declarationValue = moduleMetadata ? moduleMetadata['metadata'][staticSymbol.name] : null;
-                            if (declarationValue) {
-                                result = _this.simplify(staticSymbol, declarationValue);
+                            finally {
+                                scope = oldScope;
                             }
                             return result;
-                        case 'class':
-                            return context;
-                        case 'new':
-                        case 'call':
-                            var target = expression['expression'];
-                            if (target['module']) {
-                                staticSymbol =
-                                    _this.host.findDeclaration(target['module'], target['name'], context.filePath);
-                            }
-                            else {
-                                staticSymbol = _this.host.getStaticSymbol(context.filePath, target['name']);
-                            }
-                            var converter = _this.conversionMap.get(staticSymbol);
-                            if (converter) {
-                                var args = expression['arguments'];
-                                if (!args) {
-                                    args = [];
-                                }
-                                return converter(context, args);
-                            }
-                            else {
-                                return context;
-                            }
-                        case 'error':
-                            var message = produceErrorMessage(expression);
-                            if (expression['line']) {
-                                message =
-                                    message + " (position " + expression['line'] + ":" + expression['character'] + " in the original .ts file)";
-                            }
-                            throw new Error(message);
+                        }
+                        calling.delete(targetFunction);
                     }
-                    return null;
                 }
-                return mapStringMap(expression, function (value, name) { return simplify(value); });
+                return simplify({ __symbolic: 'error', message: 'Function call not supported' });
             }
-            return null;
+            function simplify(expression) {
+                if (isPrimitive(expression)) {
+                    return expression;
+                }
+                if (expression instanceof Array) {
+                    var result = [];
+                    for (var _i = 0, _a = expression; _i < _a.length; _i++) {
+                        var item = _a[_i];
+                        // Check for a spread expression
+                        if (item && item.__symbolic === 'spread') {
+                            var spreadArray = simplify(item.expression);
+                            if (Array.isArray(spreadArray)) {
+                                for (var _b = 0, spreadArray_1 = spreadArray; _b < spreadArray_1.length; _b++) {
+                                    var spreadItem = spreadArray_1[_b];
+                                    result.push(spreadItem);
+                                }
+                                continue;
+                            }
+                        }
+                        result.push(simplify(item));
+                    }
+                    return result;
+                }
+                if (expression) {
+                    if (expression['__symbolic']) {
+                        var staticSymbol = void 0;
+                        switch (expression['__symbolic']) {
+                            case 'binop':
+                                var left = simplify(expression['left']);
+                                var right = simplify(expression['right']);
+                                switch (expression['operator']) {
+                                    case '&&':
+                                        return left && right;
+                                    case '||':
+                                        return left || right;
+                                    case '|':
+                                        return left | right;
+                                    case '^':
+                                        return left ^ right;
+                                    case '&':
+                                        return left & right;
+                                    case '==':
+                                        return left == right;
+                                    case '!=':
+                                        return left != right;
+                                    case '===':
+                                        return left === right;
+                                    case '!==':
+                                        return left !== right;
+                                    case '<':
+                                        return left < right;
+                                    case '>':
+                                        return left > right;
+                                    case '<=':
+                                        return left <= right;
+                                    case '>=':
+                                        return left >= right;
+                                    case '<<':
+                                        return left << right;
+                                    case '>>':
+                                        return left >> right;
+                                    case '+':
+                                        return left + right;
+                                    case '-':
+                                        return left - right;
+                                    case '*':
+                                        return left * right;
+                                    case '/':
+                                        return left / right;
+                                    case '%':
+                                        return left % right;
+                                }
+                                return null;
+                            case 'pre':
+                                var operand = simplify(expression['operand']);
+                                switch (expression['operator']) {
+                                    case '+':
+                                        return operand;
+                                    case '-':
+                                        return -operand;
+                                    case '!':
+                                        return !operand;
+                                    case '~':
+                                        return ~operand;
+                                }
+                                return null;
+                            case 'index':
+                                var indexTarget = simplify(expression['expression']);
+                                var index = simplify(expression['index']);
+                                if (indexTarget && isPrimitive(index))
+                                    return indexTarget[index];
+                                return null;
+                            case 'select':
+                                var selectTarget = simplify(expression['expression']);
+                                var member = simplify(expression['member']);
+                                if (selectTarget && isPrimitive(member))
+                                    return selectTarget[member];
+                                return null;
+                            case 'reference':
+                                if (!expression.module) {
+                                    var name_1 = expression['name'];
+                                    var localValue = scope.resolve(name_1);
+                                    if (localValue != BindingScope.missing) {
+                                        return localValue;
+                                    }
+                                }
+                                staticSymbol = resolveReference(expression);
+                                var result = staticSymbol;
+                                var moduleMetadata = _this.getModuleMetadata(staticSymbol.filePath);
+                                var declarationValue = moduleMetadata ? moduleMetadata['metadata'][staticSymbol.name] : null;
+                                if (declarationValue) {
+                                    if (isOpaqueToken(declarationValue)) {
+                                        // If the referenced symbol is initalized by a new OpaqueToken we can keep the
+                                        // reference to the symbol.
+                                        return staticSymbol;
+                                    }
+                                    result = simplifyInContext(staticSymbol, declarationValue);
+                                }
+                                return result;
+                            case 'class':
+                                return context;
+                            case 'function':
+                                return expression;
+                            case 'new':
+                            case 'call':
+                                // Determine if the function is a built-in conversion
+                                var target = expression['expression'];
+                                if (target['module']) {
+                                    staticSymbol = _this.host.findDeclaration(target['module'], target['name'], context.filePath);
+                                }
+                                else {
+                                    staticSymbol = _this.host.getStaticSymbol(context.filePath, target['name']);
+                                }
+                                var converter = _this.conversionMap.get(staticSymbol);
+                                if (converter) {
+                                    var args = expression['arguments'];
+                                    if (!args) {
+                                        args = [];
+                                    }
+                                    return converter(context, args);
+                                }
+                                // Determine if the function is one we can simplify.
+                                return simplifyCall(expression);
+                            case 'error':
+                                var message = produceErrorMessage(expression);
+                                if (expression['line']) {
+                                    message =
+                                        message + " (position " + expression['line'] + ":" + expression['character'] + " in the original .ts file)";
+                                }
+                                throw new Error(message);
+                        }
+                        return null;
+                    }
+                    return mapStringMap(expression, function (value, name) { return simplify(value); });
+                }
+                return null;
+            }
+            try {
+                return simplify(value);
+            }
+            catch (e) {
+                throw new Error(e.message + ", resolving symbol " + context.name + " in " + context.filePath);
+            }
         }
-        try {
-            return simplify(value);
-        }
-        catch (e) {
-            throw new Error(e.message + ", resolving symbol " + context.name + " in " + context.filePath);
-        }
+        return simplifyInContext(context, value);
     };
     /**
      * @param module an absolute path to a module file.
@@ -395,5 +478,39 @@ function mapStringMap(input, transform) {
 }
 function isPrimitive(o) {
     return o === null || (typeof o !== 'function' && typeof o !== 'object');
+}
+var BindingScope = (function () {
+    function BindingScope() {
+    }
+    BindingScope.build = function () {
+        var current = new Map();
+        var parent = undefined;
+        return {
+            define: function (name, value) {
+                current.set(name, value);
+                return this;
+            },
+            done: function () {
+                return current.size > 0 ? new PopulatedScope(current) : BindingScope.empty;
+            }
+        };
+    };
+    BindingScope.missing = {};
+    BindingScope.empty = { resolve: function (name) { return BindingScope.missing; } };
+    return BindingScope;
+}());
+var PopulatedScope = (function (_super) {
+    __extends(PopulatedScope, _super);
+    function PopulatedScope(bindings) {
+        _super.call(this);
+        this.bindings = bindings;
+    }
+    PopulatedScope.prototype.resolve = function (name) {
+        return this.bindings.has(name) ? this.bindings.get(name) : BindingScope.missing;
+    };
+    return PopulatedScope;
+}(BindingScope));
+function sameSymbol(a, b) {
+    return a === b || (a.name == b.name && a.filePath == b.filePath);
 }
 //# sourceMappingURL=static_reflector.js.map
