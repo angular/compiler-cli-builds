@@ -4,6 +4,7 @@ require('reflect-metadata');
 var tsc = require('@angular/tsc-wrapped');
 var path = require('path');
 var compiler = require('@angular/compiler');
+var core_1 = require('@angular/core');
 var static_reflector_1 = require('./static_reflector');
 var compiler_private_1 = require('./compiler_private');
 var platform_server_1 = require('@angular/platform-server');
@@ -109,13 +110,20 @@ var Extractor = (function () {
         var staticReflector = new static_reflector_1.StaticReflector(reflectorHost);
         static_reflection_capabilities_1.StaticAndDynamicReflectionCapabilities.install(staticReflector);
         var htmlParser = new compiler_private_1.HtmlParser();
-        var config = new compiler.CompilerConfig(true, true, true);
+        var config = new compiler.CompilerConfig({
+            genDebugInfo: true,
+            defaultEncapsulation: core_1.ViewEncapsulation.Emulated,
+            logBindingUpdate: false,
+            useJit: false,
+            platformDirectives: [],
+            platformPipes: []
+        });
         var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
         var parser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
         var tmplParser = new compiler_private_1.TemplateParser(parser, new compiler_private_1.DomElementSchemaRegistry(), htmlParser, 
         /*console*/ null, []);
         var offlineCompiler = new compiler.OfflineCompiler(normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.TypeScriptEmitter(reflectorHost), xhr);
-        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), null, null, staticReflector);
+        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, staticReflector);
         // TODO(vicb): handle implicit
         var extractor = new compiler_private_1.MessageExtractor(htmlParser, parser, [], {});
         return new Extractor(options, program, compilerHost, staticReflector, resolver, offlineCompiler, reflectorHost, extractor);
