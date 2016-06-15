@@ -5,6 +5,7 @@
  */
 var compiler = require('@angular/compiler');
 var core_1 = require('@angular/core');
+var platform_server_1 = require('@angular/platform-server');
 var path = require('path');
 var compiler_private_1 = require('./compiler_private');
 var reflector_host_1 = require('./reflector_host');
@@ -94,6 +95,7 @@ var CodeGenerator = (function () {
     };
     CodeGenerator.prototype.codegen = function () {
         var _this = this;
+        platform_server_1.Parse5DomAdapter.makeCurrent();
         var stylesheetPromises = [];
         var generateOneFile = function (absSourcePath) {
             return Promise.all(_this.readComponents(absSourcePath))
