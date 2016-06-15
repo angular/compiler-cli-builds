@@ -12,29 +12,30 @@ var static_reflection_capabilities_1 = require('./static_reflection_capabilities
 function extract(ngOptions, program, host) {
     return Extractor.create(ngOptions, program, host).extract();
 }
-var GENERATED_FILES = /\.ngfactory\.ts$|\.css\.ts$|\.css\.shim\.ts$/;
+var _dirPaths = new Map();
+var _GENERATED_FILES = /\.ngfactory\.ts$|\.css\.ts$|\.css\.shim\.ts$/;
 var Extractor = (function () {
-    function Extractor(options, program, host, staticReflector, resolver, compiler, reflectorHost, _extractor) {
-        this.options = options;
-        this.program = program;
+    function Extractor(_options, _program, host, staticReflector, _resolver, _compiler, _reflectorHost, _extractor) {
+        this._options = _options;
+        this._program = _program;
         this.host = host;
         this.staticReflector = staticReflector;
-        this.resolver = resolver;
-        this.compiler = compiler;
-        this.reflectorHost = reflectorHost;
+        this._resolver = _resolver;
+        this._compiler = _compiler;
+        this._reflectorHost = _reflectorHost;
         this._extractor = _extractor;
     }
-    Extractor.prototype.extractCmpMessages = function (metadatas) {
+    Extractor.prototype._extractCmpMessages = function (metadatas) {
         var _this = this;
         if (!metadatas || !metadatas.length) {
             return null;
         }
         var normalize = function (metadata) {
             var directiveType = metadata.type.runtime;
-            var directives = _this.resolver.getViewDirectivesMetadata(directiveType);
-            return Promise.all(directives.map(function (d) { return _this.compiler.normalizeDirectiveMetadata(d); }))
+            var directives = _this._resolver.getViewDirectivesMetadata(directiveType);
+            return Promise.all(directives.map(function (d) { return _this._compiler.normalizeDirectiveMetadata(d); }))
                 .then(function (normalizedDirectives) {
-                var pipes = _this.resolver.getViewPipesMetadata(directiveType);
+                var pipes = _this._resolver.getViewPipesMetadata(directiveType);
                 return new compiler.NormalizedComponentWithViewDirectives(metadata, normalizedDirectives, pipes);
             });
         };
@@ -43,8 +44,8 @@ var Extractor = (function () {
             var messages = [];
             var errors = [];
             cmps.forEach(function (cmp) {
-                // TODO(vicb): url
-                var result = _this._extractor.extract(cmp.component.template.template, 'url');
+                var url = _dirPaths.get(cmp.component);
+                var result = _this._extractor.extract(cmp.component.template.template, url);
                 errors = errors.concat(result.errors);
                 messages = messages.concat(result.messages);
             });
@@ -52,7 +53,7 @@ var Extractor = (function () {
             return new compiler_private_1.ExtractionResult(messages, errors);
         });
     };
-    Extractor.prototype.readComponents = function (absSourcePath) {
+    Extractor.prototype._readComponents = function (absSourcePath) {
         var result = [];
         var metadata = this.staticReflector.getModuleMetadata(absSourcePath);
         if (!metadata) {
@@ -65,24 +66,26 @@ var Extractor = (function () {
         }
         for (var _i = 0, symbols_1 = symbols; _i < symbols_1.length; _i++) {
             var symbol = symbols_1[_i];
-            var staticType = this.reflectorHost.findDeclaration(absSourcePath, symbol, absSourcePath);
+            var staticType = this._reflectorHost.findDeclaration(absSourcePath, symbol, absSourcePath);
             var directive = void 0;
-            directive = this.resolver.maybeGetDirectiveMetadata(staticType);
-            if (!directive || !directive.isComponent) {
-                continue;
+            directive = this._resolver.maybeGetDirectiveMetadata(staticType);
+            if (directive && directive.isComponent) {
+                var promise = this._compiler.normalizeDirectiveMetadata(directive);
+                promise.then(function (md) { return _dirPaths.set(md, absSourcePath); });
+                result.push(promise);
             }
-            result.push(this.compiler.normalizeDirectiveMetadata(directive));
         }
         return result;
     };
     Extractor.prototype.extract = function () {
         var _this = this;
-        var promises = this.program.getSourceFiles()
+        _dirPaths.clear();
+        var promises = this._program.getSourceFiles()
             .map(function (sf) { return sf.fileName; })
-            .filter(function (f) { return !GENERATED_FILES.test(f); })
+            .filter(function (f) { return !_GENERATED_FILES.test(f); })
             .map(function (absSourcePath) {
-            return Promise.all(_this.readComponents(absSourcePath))
-                .then(function (metadatas) { return _this.extractCmpMessages(metadatas); })
+            return Promise.all(_this._readComponents(absSourcePath))
+                .then(function (metadatas) { return _this._extractCmpMessages(metadatas); })
                 .catch(function (e) { return console.error(e.stack); });
         });
         var messages = [];
@@ -93,10 +96,10 @@ var Extractor = (function () {
                 errors = errors.concat(result.errors);
             });
             if (errors.length) {
-                throw errors;
+                throw new Error(errors.map(function (e) { return e.toString(); }).join('\n'));
             }
             messages = compiler_private_1.removeDuplicates(messages);
-            var genPath = path.join(_this.options.genDir, 'messages.xmb');
+            var genPath = path.join(_this._options.genDir, 'messages.xmb');
             var msgBundle = compiler_private_1.serializeXmb(messages);
             _this.host.writeFile(genPath, msgBundle, false);
         });
