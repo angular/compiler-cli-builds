@@ -136,7 +136,7 @@ var CodeGenerator = (function () {
         static_reflection_capabilities_1.StaticAndDynamicReflectionCapabilities.install(staticReflector);
         var htmlParser = new compiler_private_1.HtmlParser();
         var config = new compiler.CompilerConfig({
-            genDebugInfo: true,
+            genDebugInfo: options.debug === true,
             defaultEncapsulation: core_1.ViewEncapsulation.Emulated,
             logBindingUpdate: false,
             useJit: false,
