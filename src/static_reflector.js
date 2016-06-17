@@ -119,34 +119,14 @@ var StaticReflector = (function () {
         return member ? member.some(function (a) { return a['__symbolic'] == 'method'; }) : false;
     };
     StaticReflector.prototype.registerDecoratorOrConstructor = function (type, ctor) {
-        var _this = this;
         this.conversionMap.set(type, function (context, args) {
-            var argValues = [];
-            args.forEach(function (arg, index) {
-                var argValue;
-                if (typeof arg === 'object' && !arg['__symbolic']) {
-                    argValue = mapStringMap(arg, function (value, key) { return _this.simplify(context, value); });
-                }
-                else {
-                    argValue = _this.simplify(context, arg);
-                }
-                argValues.push(argValue);
-            });
             var metadata = Object.create(ctor.prototype);
-            ctor.apply(metadata, argValues);
+            ctor.apply(metadata, args);
             return metadata;
         });
     };
     StaticReflector.prototype.registerFunction = function (type, fn) {
-        var _this = this;
-        this.conversionMap.set(type, function (context, args) {
-            var argValues = [];
-            args.forEach(function (arg, index) {
-                var argValue = _this.simplify(context, arg);
-                argValues.push(argValue);
-            });
-            return fn.apply(null, argValues);
-        });
+        this.conversionMap.set(type, function (context, args) { return fn.apply(undefined, args); });
     };
     StaticReflector.prototype.initializeConversionMap = function () {
         var _a = this.host.angularImportLocations(), coreDecorators = _a.coreDecorators, diDecorators = _a.diDecorators, diMetadata = _a.diMetadata, diOpaqueToken = _a.diOpaqueToken, animationMetadata = _a.animationMetadata, provider = _a.provider;
@@ -191,7 +171,7 @@ var StaticReflector = (function () {
         var _this = this;
         var scope = BindingScope.empty;
         var calling = new Map();
-        function simplifyInContext(context, value) {
+        function simplifyInContext(context, value, depth) {
             function resolveReference(expression) {
                 var staticSymbol;
                 if (expression['module']) {
@@ -212,8 +192,12 @@ var StaticReflector = (function () {
                 return false;
             }
             function simplifyCall(expression) {
+                var context = undefined;
                 if (expression['__symbolic'] == 'call') {
                     var target = expression['expression'];
+                    if (target && target.__symbolic === 'reference') {
+                        context = { name: target.name };
+                    }
                     var targetFunction = simplify(target);
                     if (targetFunction['__symbolic'] == 'function') {
                         if (calling.get(targetFunction)) {
@@ -230,27 +214,33 @@ var StaticReflector = (function () {
                                 functionScope.define(parameters[i], args[i]);
                             }
                             var oldScope = scope;
-                            var result = void 0;
+                            var result_1;
                             try {
                                 scope = functionScope.done();
-                                result = simplify(value_1);
+                                result_1 = simplify(value_1);
                             }
                             finally {
                                 scope = oldScope;
                             }
-                            return result;
+                            return result_1;
                         }
                         calling.delete(targetFunction);
                     }
                 }
-                return simplify({ __symbolic: 'error', message: 'Function call not supported' });
+                if (depth === 0) {
+                    // If depth is 0 we are evaluating the top level expression that is describing element
+                    // decorator. In this case, it is a decorator we don't understand, such as a custom
+                    // non-angular decorator, and we should just ignore it.
+                    return { __symbolic: 'ignore' };
+                }
+                return simplify({ __symbolic: 'error', message: 'Function call not supported', context: context });
             }
             function simplify(expression) {
                 if (isPrimitive(expression)) {
                     return expression;
                 }
                 if (expression instanceof Array) {
-                    var result = [];
+                    var result_2 = [];
                     for (var _i = 0, _a = expression; _i < _a.length; _i++) {
                         var item = _a[_i];
                         // Check for a spread expression
@@ -259,14 +249,18 @@ var StaticReflector = (function () {
                             if (Array.isArray(spreadArray)) {
                                 for (var _b = 0, spreadArray_1 = spreadArray; _b < spreadArray_1.length; _b++) {
                                     var spreadItem = spreadArray_1[_b];
-                                    result.push(spreadItem);
+                                    result_2.push(spreadItem);
                                 }
                                 continue;
                             }
                         }
-                        result.push(simplify(item));
+                        var value_2 = simplify(item);
+                        if (shouldIgnore(value_2)) {
+                            continue;
+                        }
+                        result_2.push(value_2);
                     }
-                    return result;
+                    return result_2;
                 }
                 if (expression) {
                     if (expression['__symbolic']) {
@@ -274,7 +268,11 @@ var StaticReflector = (function () {
                         switch (expression['__symbolic']) {
                             case 'binop':
                                 var left = simplify(expression['left']);
+                                if (shouldIgnore(left))
+                                    return left;
                                 var right = simplify(expression['right']);
+                                if (shouldIgnore(right))
+                                    return right;
                                 switch (expression['operator']) {
                                     case '&&':
                                         return left && right;
@@ -320,6 +318,8 @@ var StaticReflector = (function () {
                                 return null;
                             case 'pre':
                                 var operand = simplify(expression['operand']);
+                                if (shouldIgnore(operand))
+                                    return operand;
                                 switch (expression['operator']) {
                                     case '+':
                                         return operand;
@@ -352,7 +352,7 @@ var StaticReflector = (function () {
                                     }
                                 }
                                 staticSymbol = resolveReference(expression);
-                                var result = staticSymbol;
+                                var result_3 = staticSymbol;
                                 var moduleMetadata = _this.getModuleMetadata(staticSymbol.filePath);
                                 var declarationValue = moduleMetadata ? moduleMetadata['metadata'][staticSymbol.name] : null;
                                 if (declarationValue) {
@@ -361,9 +361,9 @@ var StaticReflector = (function () {
                                         // reference to the symbol.
                                         return staticSymbol;
                                     }
-                                    result = simplifyInContext(staticSymbol, declarationValue);
+                                    result_3 = simplifyInContext(staticSymbol, declarationValue, depth + 1);
                                 }
-                                return result;
+                                return result_3;
                             case 'class':
                                 return context;
                             case 'function':
@@ -384,7 +384,7 @@ var StaticReflector = (function () {
                                     if (!args) {
                                         args = [];
                                     }
-                                    return converter(context, args);
+                                    return converter(context, args.map(function (arg) { return simplifyInContext(context, arg, depth + 1); }));
                                 }
                                 // Determine if the function is one we can simplify.
                                 return simplifyCall(expression);
@@ -409,7 +409,11 @@ var StaticReflector = (function () {
                 throw new Error(e.message + ", resolving symbol " + context.name + " in " + context.filePath);
             }
         }
-        return simplifyInContext(context, value);
+        var result = simplifyInContext(context, value, 0);
+        if (shouldIgnore(result)) {
+            return undefined;
+        }
+        return result;
     };
     /**
      * @param module an absolute path to a module file.
@@ -462,7 +466,9 @@ function expandedMessage(error) {
             }
             break;
         case 'Function call not supported':
-            return 'Function calls are not supported. Consider replacing the function or lambda with a reference to an exported function';
+            var prefix = error.context && error.context.name ? "Calling function '" + error.context.name + "', f" : 'F';
+            return prefix +
+                'unction calls are not supported. Consider replacing the function or lambda with a reference to an exported function';
     }
     return error.message;
 }
@@ -473,7 +479,12 @@ function mapStringMap(input, transform) {
     if (!input)
         return {};
     var result = {};
-    Object.keys(input).forEach(function (key) { result[key] = transform(input[key], key); });
+    Object.keys(input).forEach(function (key) {
+        var value = transform(input[key], key);
+        if (!shouldIgnore(value)) {
+            result[key] = value;
+        }
+    });
     return result;
 }
 function isPrimitive(o) {
@@ -512,5 +523,8 @@ var PopulatedScope = (function (_super) {
 }(BindingScope));
 function sameSymbol(a, b) {
     return a === b || (a.name == b.name && a.filePath == b.filePath);
+}
+function shouldIgnore(value) {
+    return value && value.__symbolic == 'ignore';
 }
 //# sourceMappingURL=static_reflector.js.map
