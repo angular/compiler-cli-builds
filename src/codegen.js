@@ -22,6 +22,7 @@ var CodeGenerator = (function () {
         this.resolver = resolver;
         this.compiler = compiler;
         this.reflectorHost = reflectorHost;
+        core_1.lockRunMode();
     }
     CodeGenerator.prototype.generateSource = function (metadatas) {
         var _this = this;

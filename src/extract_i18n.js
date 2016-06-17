@@ -25,6 +25,7 @@ var Extractor = (function () {
         this._compiler = _compiler;
         this._reflectorHost = _reflectorHost;
         this._extractor = _extractor;
+        core_1.lockRunMode();
     }
     Extractor.prototype._extractCmpMessages = function (metadatas) {
         var _this = this;
