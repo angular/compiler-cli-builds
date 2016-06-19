@@ -7,7 +7,6 @@ var compiler = require('@angular/compiler');
 var core_1 = require('@angular/core');
 var static_reflector_1 = require('./static_reflector');
 var compiler_private_1 = require('./compiler_private');
-var platform_server_1 = require('@angular/platform-server');
 var reflector_host_1 = require('./reflector_host');
 var static_reflection_capabilities_1 = require('./static_reflection_capabilities');
 function extract(ngOptions, program, host) {
@@ -81,7 +80,6 @@ var Extractor = (function () {
     };
     Extractor.prototype.extract = function () {
         var _this = this;
-        platform_server_1.Parse5DomAdapter.makeCurrent();
         _dirPaths.clear();
         var promises = this._program.getSourceFiles()
             .map(function (sf) { return sf.fileName; })
