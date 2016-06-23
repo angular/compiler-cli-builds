@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 "use strict";
 var compiler_1 = require('@angular/compiler');
 exports.AssetUrl = compiler_1.__compiler_private__.AssetUrl;
