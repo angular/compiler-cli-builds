@@ -124,7 +124,7 @@ var Extractor = (function () {
         var parser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
         var tmplParser = new compiler_private_1.TemplateParser(parser, new compiler_private_1.DomElementSchemaRegistry(), htmlParser, 
         /*console*/ null, []);
-        var offlineCompiler = new compiler.OfflineCompiler(normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.TypeScriptEmitter(reflectorHost), xhr);
+        var offlineCompiler = new compiler.OfflineCompiler(normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.TypeScriptEmitter(reflectorHost));
         var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, staticReflector);
         // TODO(vicb): handle implicit
         var extractor = new compiler_private_1.MessageExtractor(htmlParser, parser, [], {});

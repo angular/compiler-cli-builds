@@ -27,7 +27,6 @@ export declare class CodeGenerator {
     private generateSource(metadatas);
     private readComponents(absSourcePath);
     private calculateEmitPath(filePath);
-    private generateStylesheet(filepath, shim);
     codegen(): Promise<any>;
     static create(options: AngularCompilerOptions, program: ts.Program, compilerHost: ts.CompilerHost, reflectorHostContext?: ReflectorHostContext): CodeGenerator;
 }

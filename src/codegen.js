@@ -88,42 +88,23 @@ var CodeGenerator = (function () {
         }
         return path.join(this.options.genDir, path.relative(root, filePath));
     };
-    // TODO(tbosch): add a cache for shared css files
-    // TODO(tbosch): detect cycles!
-    CodeGenerator.prototype.generateStylesheet = function (filepath, shim) {
-        var _this = this;
-        return this.compiler.loadAndCompileStylesheet(filepath, shim, '.ts')
-            .then(function (sourceWithImports) {
-            var emitPath = _this.calculateEmitPath(sourceWithImports.source.moduleUrl);
-            // TODO(alexeagle): should include the sourceFile to the WriteFileCallback
-            _this.host.writeFile(emitPath, PREAMBLE + sourceWithImports.source.source, false);
-            return Promise.all(sourceWithImports.importedUrls.map(function (url) { return _this.generateStylesheet(url, shim); }));
-        });
-    };
     CodeGenerator.prototype.codegen = function () {
         var _this = this;
-        var stylesheetPromises = [];
         var generateOneFile = function (absSourcePath) {
             return Promise.all(_this.readComponents(absSourcePath))
                 .then(function (metadatas) {
                 if (!metadatas || !metadatas.length) {
                     return;
                 }
-                metadatas.forEach(function (metadata) {
-                    var stylesheetPaths = metadata && metadata.template && metadata.template.styleUrls;
-                    if (stylesheetPaths) {
-                        stylesheetPaths.forEach(function (path) {
-                            stylesheetPromises.push(_this.generateStylesheet(path, metadata.template.encapsulation === core_1.ViewEncapsulation.Emulated));
-                        });
-                    }
-                });
                 return _this.generateSource(metadatas);
             })
-                .then(function (generated) {
-                if (generated) {
-                    var sourceFile = _this.program.getSourceFile(absSourcePath);
-                    var emitPath = _this.calculateEmitPath(generated.moduleUrl);
-                    _this.host.writeFile(emitPath, PREAMBLE + generated.source, false, function () { }, [sourceFile]);
+                .then(function (generatedModules) {
+                if (generatedModules) {
+                    generatedModules.forEach(function (generatedModule) {
+                        var sourceFile = _this.program.getSourceFile(absSourcePath);
+                        var emitPath = _this.calculateEmitPath(generatedModule.moduleUrl);
+                        _this.host.writeFile(emitPath, PREAMBLE + generatedModule.source, false, function () { }, [sourceFile]);
+                    });
                 }
             })
                 .catch(function (e) { console.error(e.stack); });
@@ -132,7 +113,7 @@ var CodeGenerator = (function () {
             .map(function (sf) { return sf.fileName; })
             .filter(function (f) { return !GENERATED_FILES.test(f); })
             .map(generateOneFile);
-        return Promise.all(stylesheetPromises.concat(compPromises));
+        return Promise.all(compPromises);
     };
     CodeGenerator.create = function (options, program, compilerHost, reflectorHostContext) {
         var xhr = { get: function (s) { return Promise.resolve(compilerHost.readFile(s)); } };
@@ -153,7 +134,7 @@ var CodeGenerator = (function () {
         var parser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
         var tmplParser = new compiler_private_1.TemplateParser(parser, new compiler_private_1.DomElementSchemaRegistry(), htmlParser, 
         /*console*/ null, []);
-        var offlineCompiler = new compiler.OfflineCompiler(normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.TypeScriptEmitter(reflectorHost), xhr);
+        var offlineCompiler = new compiler.OfflineCompiler(normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.TypeScriptEmitter(reflectorHost));
         var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, staticReflector);
         return new CodeGenerator(options, program, compilerHost, staticReflector, resolver, offlineCompiler, reflectorHost);
     };
