@@ -106,7 +106,15 @@ var Extractor = (function () {
         });
     };
     Extractor.create = function (options, program, compilerHost) {
-        var xhr = { get: function (s) { return Promise.resolve(compilerHost.readFile(s)); } };
+        var xhr = {
+            get: function (s) {
+                if (!compilerHost.fileExists(s)) {
+                    // TODO: We should really have a test for error cases like this!
+                    throw new Error("Compilation failed. Resource file not found: " + s);
+                }
+                return Promise.resolve(compilerHost.readFile(s));
+            }
+        };
         var urlResolver = compiler.createOfflineCompileUrlResolver();
         var reflectorHost = new reflector_host_1.ReflectorHost(program, compilerHost, options);
         var staticReflector = new static_reflector_1.StaticReflector(reflectorHost);
