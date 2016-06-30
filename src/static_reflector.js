@@ -159,6 +159,7 @@ var StaticReflector = (function () {
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'HostListener'), core_1.HostListenerMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Directive'), core_1.DirectiveMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Component'), core_1.ComponentMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'AppModule'), core_1.AppModuleMetadata);
         // Note: Some metadata classes can be used directly with Provider.deps.
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'HostMetadata'), core_1.HostMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'SelfMetadata'), core_1.SelfMetadata);

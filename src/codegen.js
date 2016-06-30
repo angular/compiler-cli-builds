@@ -30,25 +30,9 @@ var CodeGenerator = (function () {
         this.reflectorHost = reflectorHost;
         core_1.lockRunMode();
     }
-    CodeGenerator.prototype.generateSource = function (metadatas) {
-        var _this = this;
-        var normalize = function (metadata) {
-            var directiveType = metadata.type.runtime;
-            var directives = _this.resolver.getViewDirectivesMetadata(directiveType);
-            return Promise.all(directives.map(function (d) { return _this.compiler.normalizeDirectiveMetadata(d); }))
-                .then(function (normalizedDirectives) {
-                var pipes = _this.resolver.getViewPipesMetadata(directiveType);
-                return new compiler.NormalizedComponentWithViewDirectives(metadata, normalizedDirectives, pipes);
-            });
-        };
-        return Promise.all(metadatas.map(normalize))
-            .then(function (normalizedCompWithDirectives) {
-            return _this.compiler.compileTemplates(normalizedCompWithDirectives);
-        });
-    };
-    CodeGenerator.prototype.readComponents = function (absSourcePath) {
-        var result = [];
+    CodeGenerator.prototype.readFileMetadata = function (absSourcePath) {
         var moduleMetadata = this.staticReflector.getModuleMetadata(absSourcePath);
+        var result = { components: [], appModules: [], fileUrl: absSourcePath };
         if (!moduleMetadata) {
             console.log("WARNING: no metadata found for " + absSourcePath);
             return result;
@@ -58,19 +42,26 @@ var CodeGenerator = (function () {
         if (!symbols || !symbols.length) {
             return result;
         }
-        for (var _i = 0, symbols_1 = symbols; _i < symbols_1.length; _i++) {
-            var symbol = symbols_1[_i];
+        var _loop_1 = function(symbol) {
             if (metadata[symbol] && metadata[symbol].__symbolic == 'error') {
                 // Ignore symbols that are only included to record error information.
-                continue;
+                return "continue";
             }
-            var staticType = this.reflectorHost.findDeclaration(absSourcePath, symbol, absSourcePath);
-            var directive = void 0;
-            directive = this.resolver.maybeGetDirectiveMetadata(staticType);
-            if (!directive || !directive.isComponent) {
-                continue;
-            }
-            result.push(this.compiler.normalizeDirectiveMetadata(directive));
+            var staticType = this_1.reflectorHost.findDeclaration(absSourcePath, symbol, absSourcePath);
+            var annotations = this_1.staticReflector.annotations(staticType);
+            annotations.forEach(function (annotation) {
+                if (annotation instanceof core_1.AppModuleMetadata) {
+                    result.appModules.push(staticType);
+                }
+                else if (annotation instanceof core_1.ComponentMetadata) {
+                    result.components.push(staticType);
+                }
+            });
+        };
+        var this_1 = this;
+        for (var _i = 0, symbols_1 = symbols; _i < symbols_1.length; _i++) {
+            var symbol = symbols_1[_i];
+            _loop_1(symbol);
         }
         return result;
     };
@@ -90,30 +81,24 @@ var CodeGenerator = (function () {
     };
     CodeGenerator.prototype.codegen = function () {
         var _this = this;
-        var generateOneFile = function (absSourcePath) {
-            return Promise.all(_this.readComponents(absSourcePath))
-                .then(function (metadatas) {
-                if (!metadatas || !metadatas.length) {
-                    return;
-                }
-                return _this.generateSource(metadatas);
-            })
-                .then(function (generatedModules) {
-                if (generatedModules) {
-                    generatedModules.forEach(function (generatedModule) {
-                        var sourceFile = _this.program.getSourceFile(absSourcePath);
-                        var emitPath = _this.calculateEmitPath(generatedModule.moduleUrl);
-                        _this.host.writeFile(emitPath, PREAMBLE + generatedModule.source, false, function () { }, [sourceFile]);
-                    });
-                }
-            })
-                .catch(function (e) { console.error(e.stack); });
-        };
-        var compPromises = this.program.getSourceFiles()
-            .map(function (sf) { return sf.fileName; })
-            .filter(function (f) { return !GENERATED_FILES.test(f); })
-            .map(generateOneFile);
-        return Promise.all(compPromises);
+        var filePaths = this.program.getSourceFiles().map(function (sf) { return sf.fileName; }).filter(function (f) { return !GENERATED_FILES.test(f); });
+        var fileMetas = filePaths.map(function (filePath) { return _this.readFileMetadata(filePath); });
+        var appModules = fileMetas.reduce(function (appModules, fileMeta) {
+            appModules.push.apply(appModules, fileMeta.appModules);
+            return appModules;
+        }, []);
+        var analyzedAppModules = this.compiler.analyzeModules(appModules);
+        return Promise
+            .all(fileMetas.map(function (fileMeta) { return _this.compiler
+            .compile(fileMeta.fileUrl, analyzedAppModules, fileMeta.components, fileMeta.appModules)
+            .then(function (generatedModules) {
+            generatedModules.forEach(function (generatedModule) {
+                var sourceFile = _this.program.getSourceFile(fileMeta.fileUrl);
+                var emitPath = _this.calculateEmitPath(generatedModule.moduleUrl);
+                _this.host.writeFile(emitPath, PREAMBLE + generatedModule.source, false, function () { }, [sourceFile]);
+            });
+        }); }))
+            .catch(function (e) { console.error(e.stack); });
     };
     CodeGenerator.create = function (options, program, compilerHost, reflectorHostContext) {
         var xhr = {
@@ -142,8 +127,8 @@ var CodeGenerator = (function () {
         var parser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
         var tmplParser = new compiler_private_1.TemplateParser(parser, new compiler_private_1.DomElementSchemaRegistry(), htmlParser, 
         /*console*/ null, []);
-        var offlineCompiler = new compiler.OfflineCompiler(normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.TypeScriptEmitter(reflectorHost));
         var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, staticReflector);
+        var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.AppModuleCompiler(), new compiler_private_1.TypeScriptEmitter(reflectorHost));
         return new CodeGenerator(options, program, compilerHost, staticReflector, resolver, offlineCompiler, reflectorHost);
     };
     return CodeGenerator;

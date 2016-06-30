@@ -15,44 +15,32 @@ function extract(ngOptions, program, host) {
 var _dirPaths = new Map();
 var _GENERATED_FILES = /\.ngfactory\.ts$|\.css\.ts$|\.css\.shim\.ts$/;
 var Extractor = (function () {
-    function Extractor(_options, _program, host, staticReflector, _resolver, _compiler, _reflectorHost, _extractor) {
+    function Extractor(_options, _program, host, staticReflector, _resolver, _normalizer, _reflectorHost, _extractor) {
         this._options = _options;
         this._program = _program;
         this.host = host;
         this.staticReflector = staticReflector;
         this._resolver = _resolver;
-        this._compiler = _compiler;
+        this._normalizer = _normalizer;
         this._reflectorHost = _reflectorHost;
         this._extractor = _extractor;
         core_1.lockRunMode();
     }
-    Extractor.prototype._extractCmpMessages = function (metadatas) {
+    Extractor.prototype._extractCmpMessages = function (components) {
         var _this = this;
-        if (!metadatas || !metadatas.length) {
+        if (!components || !components.length) {
             return null;
         }
-        var normalize = function (metadata) {
-            var directiveType = metadata.type.runtime;
-            var directives = _this._resolver.getViewDirectivesMetadata(directiveType);
-            return Promise.all(directives.map(function (d) { return _this._compiler.normalizeDirectiveMetadata(d); }))
-                .then(function (normalizedDirectives) {
-                var pipes = _this._resolver.getViewPipesMetadata(directiveType);
-                return new compiler.NormalizedComponentWithViewDirectives(metadata, normalizedDirectives, pipes);
-            });
-        };
-        return Promise.all(metadatas.map(normalize))
-            .then(function (cmps) {
-            var messages = [];
-            var errors = [];
-            cmps.forEach(function (cmp) {
-                var url = _dirPaths.get(cmp.component);
-                var result = _this._extractor.extract(cmp.component.template.template, url);
-                errors = errors.concat(result.errors);
-                messages = messages.concat(result.messages);
-            });
-            // Extraction Result might contain duplicate messages at this point
-            return new compiler_private_1.ExtractionResult(messages, errors);
+        var messages = [];
+        var errors = [];
+        components.forEach(function (metadata) {
+            var url = _dirPaths.get(metadata);
+            var result = _this._extractor.extract(metadata.template.template, url);
+            errors = errors.concat(result.errors);
+            messages = messages.concat(result.messages);
         });
+        // Extraction Result might contain duplicate messages at this point
+        return new compiler_private_1.ExtractionResult(messages, errors);
     };
     Extractor.prototype._readComponents = function (absSourcePath) {
         var result = [];
@@ -71,7 +59,7 @@ var Extractor = (function () {
             var directive = void 0;
             directive = this._resolver.maybeGetDirectiveMetadata(staticType);
             if (directive && directive.isComponent) {
-                var promise = this._compiler.normalizeDirectiveMetadata(directive);
+                var promise = this._normalizer.normalizeDirective(directive).asyncResult;
                 promise.then(function (md) { return _dirPaths.set(md, absSourcePath); });
                 result.push(promise);
             }
@@ -130,13 +118,10 @@ var Extractor = (function () {
         });
         var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
         var parser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
-        var tmplParser = new compiler_private_1.TemplateParser(parser, new compiler_private_1.DomElementSchemaRegistry(), htmlParser, 
-        /*console*/ null, []);
-        var offlineCompiler = new compiler.OfflineCompiler(normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.TypeScriptEmitter(reflectorHost));
         var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, staticReflector);
         // TODO(vicb): handle implicit
         var extractor = new compiler_private_1.MessageExtractor(htmlParser, parser, [], {});
-        return new Extractor(options, program, compilerHost, staticReflector, resolver, offlineCompiler, reflectorHost, extractor);
+        return new Extractor(options, program, compilerHost, staticReflector, resolver, normalizer, reflectorHost, extractor);
     };
     return Extractor;
 }());

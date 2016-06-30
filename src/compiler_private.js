@@ -26,5 +26,6 @@ exports.TemplateParser = compiler_1.__compiler_private__.TemplateParser;
 exports.DomElementSchemaRegistry = compiler_1.__compiler_private__.DomElementSchemaRegistry;
 exports.StyleCompiler = compiler_1.__compiler_private__.StyleCompiler;
 exports.ViewCompiler = compiler_1.__compiler_private__.ViewCompiler;
+exports.AppModuleCompiler = compiler_1.__compiler_private__.AppModuleCompiler;
 exports.TypeScriptEmitter = compiler_1.__compiler_private__.TypeScriptEmitter;
 //# sourceMappingURL=compiler_private.js.map
