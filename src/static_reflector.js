@@ -180,7 +180,7 @@ var StaticReflector = (function () {
         var scope = BindingScope.empty;
         var calling = new Map();
         function simplifyInContext(context, value, depth) {
-            function resolveReference(expression) {
+            function resolveReference(context, expression) {
                 var staticSymbol;
                 if (expression['module']) {
                     staticSymbol = _this.host.findDeclaration(expression['module'], expression['name'], context.filePath);
@@ -190,24 +190,31 @@ var StaticReflector = (function () {
                 }
                 return staticSymbol;
             }
-            function isOpaqueToken(value) {
+            function resolveReferenceValue(staticSymbol) {
+                var result = staticSymbol;
+                var moduleMetadata = _this.getModuleMetadata(staticSymbol.filePath);
+                var declarationValue = moduleMetadata ? moduleMetadata['metadata'][staticSymbol.name] : null;
+                return declarationValue;
+            }
+            function isOpaqueToken(context, value) {
                 if (value && value.__symbolic === 'new' && value.expression) {
                     var target = value.expression;
                     if (target.__symbolic == 'reference') {
-                        return sameSymbol(resolveReference(target), _this.opaqueToken);
+                        return sameSymbol(resolveReference(context, target), _this.opaqueToken);
                     }
                 }
                 return false;
             }
             function simplifyCall(expression) {
-                var context = undefined;
+                var callContext = undefined;
                 if (expression['__symbolic'] == 'call') {
                     var target = expression['expression'];
+                    var targetFunction = void 0;
                     if (target && target.__symbolic === 'reference') {
-                        context = { name: target.name };
+                        callContext = { name: target.name };
+                        targetFunction = resolveReferenceValue(resolveReference(context, target));
                     }
-                    var targetFunction = simplify(target);
-                    if (targetFunction['__symbolic'] == 'function') {
+                    if (targetFunction && targetFunction['__symbolic'] == 'function') {
                         if (calling.get(targetFunction)) {
                             throw new Error('Recursion not supported');
                         }
@@ -241,7 +248,7 @@ var StaticReflector = (function () {
                     // non-angular decorator, and we should just ignore it.
                     return { __symbolic: 'ignore' };
                 }
-                return simplify({ __symbolic: 'error', message: 'Function call not supported', context: context });
+                return simplify({ __symbolic: 'error', message: 'Function call not supported', context: callContext });
             }
             function simplify(expression) {
                 if (isPrimitive(expression)) {
@@ -359,12 +366,11 @@ var StaticReflector = (function () {
                                         return localValue;
                                     }
                                 }
-                                staticSymbol = resolveReference(expression);
+                                staticSymbol = resolveReference(context, expression);
                                 var result_3 = staticSymbol;
-                                var moduleMetadata = _this.getModuleMetadata(staticSymbol.filePath);
-                                var declarationValue = moduleMetadata ? moduleMetadata['metadata'][staticSymbol.name] : null;
+                                var declarationValue = resolveReferenceValue(result_3);
                                 if (declarationValue) {
-                                    if (isOpaqueToken(declarationValue)) {
+                                    if (isOpaqueToken(staticSymbol, declarationValue)) {
                                         // If the referenced symbol is initalized by a new OpaqueToken we can keep the
                                         // reference to the symbol.
                                         return staticSymbol;
@@ -375,7 +381,7 @@ var StaticReflector = (function () {
                             case 'class':
                                 return context;
                             case 'function':
-                                return expression;
+                                return context;
                             case 'new':
                             case 'call':
                                 // Determine if the function is a built-in conversion
