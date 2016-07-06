@@ -156,12 +156,13 @@ var ReflectorHost = (function () {
                 return this.readMetadata(metadataPath);
             }
         }
-        var sf = this.program.getSourceFile(filePath);
-        if (!sf) {
-            throw new Error("Source file " + filePath + " not present in program.");
+        else {
+            var sf = this.program.getSourceFile(filePath);
+            if (!sf) {
+                throw new Error("Source file " + filePath + " not present in program.");
+            }
+            return this.metadataCollector.getMetadata(sf);
         }
-        var metadata = this.metadataCollector.getMetadata(sf);
-        return metadata;
     };
     ReflectorHost.prototype.readMetadata = function (filePath) {
         try {
