@@ -24,7 +24,6 @@ var Extractor = (function () {
         this._normalizer = _normalizer;
         this._reflectorHost = _reflectorHost;
         this._extractor = _extractor;
-        core_1.lockRunMode();
     }
     Extractor.prototype._extractCmpMessages = function (components) {
         var _this = this;

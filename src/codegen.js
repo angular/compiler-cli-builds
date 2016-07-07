@@ -28,7 +28,6 @@ var CodeGenerator = (function () {
         this.resolver = resolver;
         this.compiler = compiler;
         this.reflectorHost = reflectorHost;
-        core_1.lockRunMode();
     }
     CodeGenerator.prototype.readFileMetadata = function (absSourcePath) {
         var moduleMetadata = this.staticReflector.getModuleMetadata(absSourcePath);
