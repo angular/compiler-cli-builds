@@ -118,9 +118,7 @@ var CodeGenerator = (function () {
             genDebugInfo: options.debug === true,
             defaultEncapsulation: core_1.ViewEncapsulation.Emulated,
             logBindingUpdate: false,
-            useJit: false,
-            platformDirectives: [],
-            platformPipes: []
+            useJit: false
         });
         var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
         var parser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
