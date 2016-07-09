@@ -12,7 +12,6 @@
 import * as compiler from '@angular/compiler';
 import { AngularCompilerOptions } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
-import { CompileMetadataResolver } from './compiler_private';
 import { ReflectorHost, ReflectorHostContext } from './reflector_host';
 import { StaticReflector } from './static_reflector';
 export declare class CodeGenerator {
@@ -20,10 +19,9 @@ export declare class CodeGenerator {
     private program;
     host: ts.CompilerHost;
     private staticReflector;
-    private resolver;
     private compiler;
     private reflectorHost;
-    constructor(options: AngularCompilerOptions, program: ts.Program, host: ts.CompilerHost, staticReflector: StaticReflector, resolver: CompileMetadataResolver, compiler: compiler.OfflineCompiler, reflectorHost: ReflectorHost);
+    constructor(options: AngularCompilerOptions, program: ts.Program, host: ts.CompilerHost, staticReflector: StaticReflector, compiler: compiler.OfflineCompiler, reflectorHost: ReflectorHost);
     private readFileMetadata(absSourcePath);
     private calculateEmitPath(filePath);
     codegen(): Promise<any>;
