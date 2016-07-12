@@ -100,7 +100,10 @@ var ReflectorHost = (function () {
             }
             var filePath = this.resolve(module, containingFile);
             if (!filePath) {
-                throw new Error("Could not resolve module " + module + " relative to " + containingFile);
+                // If the file cannot be found the module is probably referencing a declared module
+                // for which there is no disambiguating file and we also don't need to track
+                // re-exports. Just use the module name.
+                return this.getStaticSymbol(module, symbolName);
             }
             var tc = this.program.getTypeChecker();
             var sf = this.program.getSourceFile(filePath);
@@ -145,10 +148,12 @@ var ReflectorHost = (function () {
         }
         return result;
     };
-    // TODO(alexeagle): take a statictype
     ReflectorHost.prototype.getMetadataFor = function (filePath) {
         if (!this.context.exists(filePath)) {
-            throw new Error("No such file '" + filePath + "'");
+            // If the file doesn't exists then we cannot return metadata for the file.
+            // This will occur if the user refernced a declared module for which no file
+            // exists for the module (i.e. jQuery or angularjs).
+            return;
         }
         if (DTS.test(filePath)) {
             var metadataPath = filePath.replace(DTS, '.metadata.json');
