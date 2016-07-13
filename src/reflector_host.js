@@ -34,7 +34,7 @@ var ReflectorHost = (function () {
         };
     };
     ReflectorHost.prototype.resolve = function (m, containingFile) {
-        var resolved = ts.resolveModuleName(m, containingFile, this.options, this.compilerHost).resolvedModule;
+        var resolved = ts.resolveModuleName(m, containingFile, this.options, this.context).resolvedModule;
         return resolved ? resolved.resolvedFileName : null;
     };
     ;
@@ -64,8 +64,7 @@ var ReflectorHost = (function () {
             if (this.options.trace) {
                 console.log("Generating empty file " + importedFile + " to allow resolution of import");
             }
-            this.compilerHost.writeFile(importedFile, '', false);
-            this.context.write(importedFile, '');
+            this.context.assumeFileExists(importedFile);
         }
         var importModuleName = importedFile.replace(EXT, '');
         var parts = importModuleName.split(path.sep).filter(function (p) { return !!p; });
@@ -149,7 +148,7 @@ var ReflectorHost = (function () {
         return result;
     };
     ReflectorHost.prototype.getMetadataFor = function (filePath) {
-        if (!this.context.exists(filePath)) {
+        if (!this.context.fileExists(filePath)) {
             // If the file doesn't exists then we cannot return metadata for the file.
             // This will occur if the user refernced a declared module for which no file
             // exists for the module (i.e. jQuery or angularjs).
@@ -157,7 +156,7 @@ var ReflectorHost = (function () {
         }
         if (DTS.test(filePath)) {
             var metadataPath = filePath.replace(DTS, '.metadata.json');
-            if (this.context.exists(metadataPath)) {
+            if (this.context.fileExists(metadataPath)) {
                 return this.readMetadata(metadataPath);
             }
         }
@@ -171,7 +170,7 @@ var ReflectorHost = (function () {
     };
     ReflectorHost.prototype.readMetadata = function (filePath) {
         try {
-            var result = JSON.parse(this.context.read(filePath));
+            var result = JSON.parse(this.context.readFile(filePath));
             return result;
         }
         catch (e) {
@@ -184,10 +183,21 @@ var ReflectorHost = (function () {
 exports.ReflectorHost = ReflectorHost;
 var NodeReflectorHostContext = (function () {
     function NodeReflectorHostContext() {
+        this.assumedExists = {};
     }
-    NodeReflectorHostContext.prototype.exists = function (fileName) { return fs.existsSync(fileName); };
-    NodeReflectorHostContext.prototype.read = function (fileName) { return fs.readFileSync(fileName, 'utf8'); };
-    NodeReflectorHostContext.prototype.write = function (fileName, data) { fs.writeFileSync(fileName, data, 'utf8'); };
+    NodeReflectorHostContext.prototype.fileExists = function (fileName) {
+        return this.assumedExists[fileName] || fs.existsSync(fileName);
+    };
+    NodeReflectorHostContext.prototype.directoryExists = function (directoryName) {
+        try {
+            return fs.statSync(directoryName).isDirectory();
+        }
+        catch (e) {
+            return false;
+        }
+    };
+    NodeReflectorHostContext.prototype.readFile = function (fileName) { return fs.readFileSync(fileName, 'utf8'); };
+    NodeReflectorHostContext.prototype.assumeFileExists = function (fileName) { this.assumedExists[fileName] = true; };
     return NodeReflectorHostContext;
 }());
 exports.NodeReflectorHostContext = NodeReflectorHostContext;

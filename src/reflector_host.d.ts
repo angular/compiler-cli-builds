@@ -10,9 +10,10 @@ import * as ts from 'typescript';
 import { ImportGenerator } from './compiler_private';
 import { StaticReflectorHost, StaticSymbol } from './static_reflector';
 export interface ReflectorHostContext {
-    exists(fileName: string): boolean;
-    read(fileName: string): string;
-    write(fileName: string, data: string): void;
+    fileExists(fileName: string): boolean;
+    directoryExists(directoryName: string): boolean;
+    readFile(fileName: string): string;
+    assumeFileExists(fileName: string): void;
 }
 export declare class ReflectorHost implements StaticReflectorHost, ImportGenerator {
     private program;
@@ -53,7 +54,9 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
     readMetadata(filePath: string): any;
 }
 export declare class NodeReflectorHostContext implements ReflectorHostContext {
-    exists(fileName: string): boolean;
-    read(fileName: string): string;
-    write(fileName: string, data: string): void;
+    private assumedExists;
+    fileExists(fileName: string): boolean;
+    directoryExists(directoryName: string): boolean;
+    readFile(fileName: string): string;
+    assumeFileExists(fileName: string): void;
 }
