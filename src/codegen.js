@@ -120,8 +120,8 @@ var CodeGenerator = (function () {
             useJit: false
         });
         var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
-        var parser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
-        var tmplParser = new compiler_private_1.TemplateParser(parser, new compiler_private_1.DomElementSchemaRegistry(), htmlParser, 
+        var expressionParser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
+        var tmplParser = new compiler_private_1.TemplateParser(expressionParser, new compiler_private_1.DomElementSchemaRegistry(), htmlParser, 
         /*console*/ null, []);
         var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, staticReflector);
         var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.AppModuleCompiler(), new compiler_private_1.TypeScriptEmitter(reflectorHost));

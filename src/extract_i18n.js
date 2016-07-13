@@ -114,10 +114,10 @@ var Extractor = (function () {
             useJit: false
         });
         var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
-        var parser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
+        var expressionParser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
         var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, staticReflector);
         // TODO(vicb): handle implicit
-        var extractor = new compiler_private_1.MessageExtractor(htmlParser, parser, [], {});
+        var extractor = new compiler_private_1.MessageExtractor(htmlParser, expressionParser, [], {});
         return new Extractor(options, program, compilerHost, staticReflector, resolver, normalizer, reflectorHost, extractor);
     };
     return Extractor;
