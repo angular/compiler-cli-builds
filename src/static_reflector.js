@@ -211,10 +211,25 @@ var StaticReflector = (function () {
                     var target = expression['expression'];
                     var functionSymbol = void 0;
                     var targetFunction = void 0;
-                    if (target && target.__symbolic === 'reference') {
-                        callContext = { name: target.name };
-                        functionSymbol = resolveReference(context, target);
-                        targetFunction = resolveReferenceValue(functionSymbol);
+                    if (target) {
+                        switch (target.__symbolic) {
+                            case 'reference':
+                                // Find the function to call.
+                                callContext = { name: target.name };
+                                functionSymbol = resolveReference(context, target);
+                                targetFunction = resolveReferenceValue(functionSymbol);
+                                break;
+                            case 'select':
+                                // Find the static method to call
+                                if (target.expression.__symbolic == 'reference') {
+                                    functionSymbol = resolveReference(context, target.expression);
+                                    var classData = resolveReferenceValue(functionSymbol);
+                                    if (classData && classData.statics) {
+                                        targetFunction = classData.statics[target.member];
+                                    }
+                                }
+                                break;
+                        }
                     }
                     if (targetFunction && targetFunction['__symbolic'] == 'function') {
                         if (calling.get(functionSymbol)) {
@@ -222,7 +237,7 @@ var StaticReflector = (function () {
                         }
                         calling.set(functionSymbol, true);
                         var value_1 = targetFunction['value'];
-                        if (value_1) {
+                        if (value_1 && (depth != 0 || value_1.__symbolic != 'error')) {
                             // Determine the arguments
                             var args = (expression['arguments'] || []).map(function (arg) { return simplify(arg); });
                             var parameters = targetFunction['parameters'];
