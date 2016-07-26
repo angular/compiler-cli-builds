@@ -209,16 +209,18 @@ var StaticReflector = (function () {
                 var callContext = undefined;
                 if (expression['__symbolic'] == 'call') {
                     var target = expression['expression'];
+                    var functionSymbol = void 0;
                     var targetFunction = void 0;
                     if (target && target.__symbolic === 'reference') {
                         callContext = { name: target.name };
-                        targetFunction = resolveReferenceValue(resolveReference(context, target));
+                        functionSymbol = resolveReference(context, target);
+                        targetFunction = resolveReferenceValue(functionSymbol);
                     }
                     if (targetFunction && targetFunction['__symbolic'] == 'function') {
-                        if (calling.get(targetFunction)) {
+                        if (calling.get(functionSymbol)) {
                             throw new Error('Recursion not supported');
                         }
-                        calling.set(targetFunction, true);
+                        calling.set(functionSymbol, true);
                         var value_1 = targetFunction['value'];
                         if (value_1) {
                             // Determine the arguments
@@ -232,14 +234,14 @@ var StaticReflector = (function () {
                             var result_1;
                             try {
                                 scope = functionScope.done();
-                                result_1 = simplify(value_1);
+                                result_1 = simplifyInContext(functionSymbol, value_1, depth + 1);
                             }
                             finally {
                                 scope = oldScope;
                             }
                             return result_1;
                         }
-                        calling.delete(targetFunction);
+                        calling.delete(functionSymbol);
                     }
                 }
                 if (depth === 0) {
