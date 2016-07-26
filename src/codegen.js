@@ -30,7 +30,7 @@ var CodeGenerator = (function () {
     }
     CodeGenerator.prototype.readFileMetadata = function (absSourcePath) {
         var moduleMetadata = this.staticReflector.getModuleMetadata(absSourcePath);
-        var result = { components: [], appModules: [], fileUrl: absSourcePath };
+        var result = { components: [], ngModules: [], fileUrl: absSourcePath };
         if (!moduleMetadata) {
             console.log("WARNING: no metadata found for " + absSourcePath);
             return result;
@@ -48,8 +48,8 @@ var CodeGenerator = (function () {
             var staticType = this_1.reflectorHost.findDeclaration(absSourcePath, symbol, absSourcePath);
             var annotations = this_1.staticReflector.annotations(staticType);
             annotations.forEach(function (annotation) {
-                if (annotation instanceof core_1.AppModuleMetadata) {
-                    result.appModules.push(staticType);
+                if (annotation instanceof core_1.NgModuleMetadata) {
+                    result.ngModules.push(staticType);
                 }
                 else if (annotation instanceof core_1.ComponentMetadata) {
                     result.components.push(staticType);
@@ -81,14 +81,14 @@ var CodeGenerator = (function () {
         var _this = this;
         var filePaths = this.program.getSourceFiles().map(function (sf) { return sf.fileName; }).filter(function (f) { return !GENERATED_FILES.test(f); });
         var fileMetas = filePaths.map(function (filePath) { return _this.readFileMetadata(filePath); });
-        var appModules = fileMetas.reduce(function (appModules, fileMeta) {
-            appModules.push.apply(appModules, fileMeta.appModules);
-            return appModules;
+        var ngModules = fileMetas.reduce(function (ngModules, fileMeta) {
+            ngModules.push.apply(ngModules, fileMeta.ngModules);
+            return ngModules;
         }, []);
-        var analyzedAppModules = this.compiler.analyzeModules(appModules);
+        var analyzedNgModules = this.compiler.analyzeModules(ngModules);
         return Promise
             .all(fileMetas.map(function (fileMeta) { return _this.compiler
-            .compile(fileMeta.fileUrl, analyzedAppModules, fileMeta.components, fileMeta.appModules)
+            .compile(fileMeta.fileUrl, analyzedNgModules, fileMeta.components, fileMeta.ngModules)
             .then(function (generatedModules) {
             generatedModules.forEach(function (generatedModule) {
                 var sourceFile = _this.program.getSourceFile(fileMeta.fileUrl);
@@ -123,8 +123,8 @@ var CodeGenerator = (function () {
         var expressionParser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
         var tmplParser = new compiler_private_1.TemplateParser(expressionParser, new compiler_private_1.DomElementSchemaRegistry(), htmlParser, 
         /*console*/ null, []);
-        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, staticReflector);
-        var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.AppModuleCompiler(), new compiler_private_1.TypeScriptEmitter(reflectorHost));
+        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, /*console*/ null, staticReflector);
+        var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.NgModuleCompiler(), new compiler_private_1.TypeScriptEmitter(reflectorHost));
         return new CodeGenerator(options, program, compilerHost, staticReflector, offlineCompiler, reflectorHost);
     };
     return CodeGenerator;

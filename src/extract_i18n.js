@@ -56,7 +56,7 @@ var Extractor = (function () {
             var symbol = symbols_1[_i];
             var staticType = this._reflectorHost.findDeclaration(absSourcePath, symbol, absSourcePath);
             var directive = void 0;
-            directive = this._resolver.maybeGetDirectiveMetadata(staticType);
+            directive = this._resolver.getDirectiveMetadata(staticType, false);
             if (directive && directive.isComponent) {
                 var promise = this._normalizer.normalizeDirective(directive).asyncResult;
                 promise.then(function (md) { return _dirPaths.set(md, absSourcePath); });
@@ -115,7 +115,7 @@ var Extractor = (function () {
         });
         var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
         var expressionParser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
-        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, staticReflector);
+        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, /*console*/ null, staticReflector);
         // TODO(vicb): handle implicit
         var extractor = new compiler_private_1.MessageExtractor(htmlParser, expressionParser, [], {});
         return new Extractor(options, program, compilerHost, staticReflector, resolver, normalizer, reflectorHost, extractor);
