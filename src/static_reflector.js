@@ -65,7 +65,8 @@ var StaticReflector = (function () {
             var classMetadata = this.getTypeMetadata(type);
             var members = classMetadata ? classMetadata['members'] : {};
             propMetadata = mapStringMap(members, function (propData, propName) {
-                var prop = propData.find(function (a) { return a['__symbolic'] == 'property'; });
+                var prop = propData
+                    .find(function (a) { return a['__symbolic'] == 'property' || a['__symbolic'] == 'method'; });
                 if (prop && prop['decorators']) {
                     return _this.simplify(type, prop['decorators']);
                 }
