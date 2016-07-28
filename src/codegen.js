@@ -14,6 +14,7 @@ var compiler = require('@angular/compiler');
 var core_1 = require('@angular/core');
 var path = require('path');
 var compiler_private_1 = require('./compiler_private');
+var core_private_1 = require('./core_private');
 var reflector_host_1 = require('./reflector_host');
 var static_reflection_capabilities_1 = require('./static_reflection_capabilities');
 var static_reflector_1 = require('./static_reflector');
@@ -121,9 +122,10 @@ var CodeGenerator = (function () {
         });
         var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
         var expressionParser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
-        var tmplParser = new compiler_private_1.TemplateParser(expressionParser, new compiler_private_1.DomElementSchemaRegistry(), htmlParser, 
-        /*console*/ null, []);
-        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, /*console*/ null, staticReflector);
+        var elementSchemaRegistry = new compiler_private_1.DomElementSchemaRegistry();
+        var console = new core_private_1.Console();
+        var tmplParser = new compiler_private_1.TemplateParser(expressionParser, elementSchemaRegistry, htmlParser, console, []);
+        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, console, elementSchemaRegistry, staticReflector);
         var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.NgModuleCompiler(), new compiler_private_1.TypeScriptEmitter(reflectorHost));
         return new CodeGenerator(options, program, compilerHost, staticReflector, offlineCompiler, reflectorHost);
     };

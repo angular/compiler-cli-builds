@@ -7,6 +7,7 @@ var compiler = require('@angular/compiler');
 var core_1 = require('@angular/core');
 var static_reflector_1 = require('./static_reflector');
 var compiler_private_1 = require('./compiler_private');
+var core_private_1 = require('./core_private');
 var reflector_host_1 = require('./reflector_host');
 var static_reflection_capabilities_1 = require('./static_reflection_capabilities');
 function extract(ngOptions, program, host) {
@@ -115,7 +116,9 @@ var Extractor = (function () {
         });
         var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
         var expressionParser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
-        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, /*console*/ null, staticReflector);
+        var elementSchemaRegistry = new compiler_private_1.DomElementSchemaRegistry();
+        var console = new core_private_1.Console();
+        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, console, elementSchemaRegistry, staticReflector);
         // TODO(vicb): handle implicit
         var extractor = new compiler_private_1.MessageExtractor(htmlParser, expressionParser, [], {});
         return new Extractor(options, program, compilerHost, staticReflector, resolver, normalizer, reflectorHost, extractor);
