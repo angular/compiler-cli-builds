@@ -372,9 +372,19 @@ var StaticReflector = (function () {
                                 return null;
                             case 'select':
                                 var selectTarget = simplify(expression['expression']);
+                                if (selectTarget instanceof StaticSymbol) {
+                                    // Access to a static instance variable
+                                    var declarationValue_1 = resolveReferenceValue(selectTarget);
+                                    if (declarationValue_1 && declarationValue_1.statics) {
+                                        selectTarget = declarationValue_1.statics;
+                                    }
+                                    else {
+                                        return null;
+                                    }
+                                }
                                 var member = simplify(expression['member']);
                                 if (selectTarget && isPrimitive(member))
-                                    return selectTarget[member];
+                                    return simplify(selectTarget[member]);
                                 return null;
                             case 'reference':
                                 if (!expression.module) {
