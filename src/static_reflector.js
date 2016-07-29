@@ -237,27 +237,31 @@ var StaticReflector = (function () {
                             throw new Error('Recursion not supported');
                         }
                         calling.set(functionSymbol, true);
-                        var value_1 = targetFunction['value'];
-                        if (value_1 && (depth != 0 || value_1.__symbolic != 'error')) {
-                            // Determine the arguments
-                            var args = (expression['arguments'] || []).map(function (arg) { return simplify(arg); });
-                            var parameters = targetFunction['parameters'];
-                            var functionScope = BindingScope.build();
-                            for (var i = 0; i < parameters.length; i++) {
-                                functionScope.define(parameters[i], args[i]);
+                        try {
+                            var value_1 = targetFunction['value'];
+                            if (value_1 && (depth != 0 || value_1.__symbolic != 'error')) {
+                                // Determine the arguments
+                                var args = (expression['arguments'] || []).map(function (arg) { return simplify(arg); });
+                                var parameters = targetFunction['parameters'];
+                                var functionScope = BindingScope.build();
+                                for (var i = 0; i < parameters.length; i++) {
+                                    functionScope.define(parameters[i], args[i]);
+                                }
+                                var oldScope = scope;
+                                var result_1;
+                                try {
+                                    scope = functionScope.done();
+                                    result_1 = simplifyInContext(functionSymbol, value_1, depth + 1);
+                                }
+                                finally {
+                                    scope = oldScope;
+                                }
+                                return result_1;
                             }
-                            var oldScope = scope;
-                            var result_1;
-                            try {
-                                scope = functionScope.done();
-                                result_1 = simplifyInContext(functionSymbol, value_1, depth + 1);
-                            }
-                            finally {
-                                scope = oldScope;
-                            }
-                            return result_1;
                         }
-                        calling.delete(functionSymbol);
+                        finally {
+                            calling.delete(functionSymbol);
+                        }
                     }
                 }
                 if (depth === 0) {
@@ -349,6 +353,10 @@ var StaticReflector = (function () {
                                         return left % right;
                                 }
                                 return null;
+                            case 'if':
+                                var condition = simplify(expression['condition']);
+                                return condition ? simplify(expression['thenExpression']) :
+                                    simplify(expression['elseExpression']);
                             case 'pre':
                                 var operand = simplify(expression['operand']);
                                 if (shouldIgnore(operand))
