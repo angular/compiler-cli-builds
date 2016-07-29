@@ -243,6 +243,10 @@ var StaticReflector = (function () {
                                 // Determine the arguments
                                 var args = (expression['arguments'] || []).map(function (arg) { return simplify(arg); });
                                 var parameters = targetFunction['parameters'];
+                                var defaults = targetFunction.defaults;
+                                if (defaults && defaults.length > args.length) {
+                                    args.push.apply(args, defaults.slice(args.length).map(function (value) { return simplify(value); }));
+                                }
                                 var functionScope = BindingScope.build();
                                 for (var i = 0; i < parameters.length; i++) {
                                     functionScope.define(parameters[i], args[i]);
