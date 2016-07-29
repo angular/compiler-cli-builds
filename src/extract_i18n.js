@@ -118,7 +118,7 @@ var Extractor = (function () {
         var expressionParser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
         var elementSchemaRegistry = new compiler_private_1.DomElementSchemaRegistry();
         var console = new core_private_1.Console();
-        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), new compiler.ViewResolver(staticReflector), config, console, elementSchemaRegistry, staticReflector);
+        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), config, console, elementSchemaRegistry, staticReflector);
         // TODO(vicb): handle implicit
         var extractor = new compiler_private_1.MessageExtractor(htmlParser, expressionParser, [], {});
         return new Extractor(options, program, compilerHost, staticReflector, resolver, normalizer, reflectorHost, extractor);
