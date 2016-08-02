@@ -42,6 +42,7 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
     getImportPath(containingFile: string, importedFile: string): string;
     findDeclaration(module: string, symbolName: string, containingFile: string, containingModule?: string): StaticSymbol;
     private typeCache;
+    private resolverCache;
     /**
      * getStaticSymbol produces a Type whose metadata is known but whose implementation is not loaded.
      * All types passed to the StaticResolver should be pseudo-types returned by this method.
@@ -52,6 +53,8 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
     getStaticSymbol(declarationFile: string, name: string): StaticSymbol;
     getMetadataFor(filePath: string): ModuleMetadata;
     readMetadata(filePath: string): any;
+    private getResolverMetadata(filePath);
+    private resolveExportedSymbol(filePath, symbolName);
 }
 export declare class NodeReflectorHostContext implements ReflectorHostContext {
     private assumedExists;
