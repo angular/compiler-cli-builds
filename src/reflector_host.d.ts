@@ -22,6 +22,8 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
     private metadataCollector;
     private context;
     private isGenDirChildOfRootDir;
+    private basePath;
+    private genDir;
     constructor(program: ts.Program, compilerHost: ts.CompilerHost, options: AngularCompilerOptions, context?: ReflectorHostContext);
     angularImportLocations(): {
         coreDecorators: string;
