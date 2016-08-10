@@ -200,7 +200,8 @@ var ReflectorHost = (function () {
         if (DTS.test(filePath)) {
             var metadataPath = filePath.replace(DTS, '.metadata.json');
             if (this.context.fileExists(metadataPath)) {
-                return this.readMetadata(metadataPath);
+                var metadata = this.readMetadata(metadataPath);
+                return (Array.isArray(metadata) && metadata.length == 0) ? undefined : metadata;
             }
         }
         else {
