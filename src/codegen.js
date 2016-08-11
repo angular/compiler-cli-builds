@@ -105,8 +105,8 @@ var CodeGenerator = (function () {
         }); }))
             .catch(function (e) { console.error(e.stack); });
     };
-    CodeGenerator.create = function (options, program, compilerHost, reflectorHostContext) {
-        var xhr = {
+    CodeGenerator.create = function (options, program, compilerHost, reflectorHostContext, xhr) {
+        xhr = xhr || {
             get: function (s) {
                 if (!compilerHost.fileExists(s)) {
                     // TODO: We should really have a test for error cases like this!
