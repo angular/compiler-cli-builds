@@ -105,8 +105,8 @@ var CodeGenerator = (function () {
         }); }))
             .catch(function (e) { console.error(e.stack); });
     };
-    CodeGenerator.create = function (options, program, compilerHost, reflectorHostContext, xhr) {
-        xhr = xhr || {
+    CodeGenerator.create = function (options, program, compilerHost, reflectorHostContext) {
+        var xhr = {
             get: function (s) {
                 if (!compilerHost.fileExists(s)) {
                     // TODO: We should really have a test for error cases like this!
@@ -119,7 +119,7 @@ var CodeGenerator = (function () {
         var reflectorHost = new reflector_host_1.ReflectorHost(program, compilerHost, options, reflectorHostContext);
         var staticReflector = new static_reflector_1.StaticReflector(reflectorHost);
         static_reflection_capabilities_1.StaticAndDynamicReflectionCapabilities.install(staticReflector);
-        var htmlParser = new compiler.i18n.HtmlParser(new compiler_private_1.HtmlParser());
+        var htmlParser = new compiler_private_1.HtmlParser();
         var config = new compiler.CompilerConfig({
             genDebugInfo: options.debug === true,
             defaultEncapsulation: core_1.ViewEncapsulation.Emulated,
