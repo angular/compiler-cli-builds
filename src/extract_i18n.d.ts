@@ -17,5 +17,5 @@ export declare class Extractor {
     constructor(program: ts.Program, host: ts.CompilerHost, staticReflector: StaticReflector, messageBundle: compiler.i18n.MessageBundle, reflectorHost: ReflectorHost, metadataResolver: CompileMetadataResolver, directiveNormalizer: DirectiveNormalizer, compiler: compiler.OfflineCompiler);
     private readFileMetadata(absSourcePath);
     extract(): Promise<compiler.i18n.MessageBundle>;
-    static create(options: tsc.AngularCompilerOptions, program: ts.Program, compilerHost: ts.CompilerHost, reflectorHostContext?: ReflectorHostContext): Extractor;
+    static create(options: tsc.AngularCompilerOptions, translationsFormat: string, program: ts.Program, compilerHost: ts.CompilerHost, reflectorHostContext?: ReflectorHostContext): Extractor;
 }
