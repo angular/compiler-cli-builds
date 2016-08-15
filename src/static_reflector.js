@@ -147,8 +147,6 @@ var StaticReflector = (function () {
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Inject'), core_1.InjectMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Optional'), core_1.OptionalMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Attribute'), core_1.AttributeMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Query'), core_1.QueryMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'ViewQuery'), core_1.ViewQueryMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'ContentChild'), core_1.ContentChildMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'ContentChildren'), core_1.ContentChildrenMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'ViewChild'), core_1.ViewChildMetadata);
