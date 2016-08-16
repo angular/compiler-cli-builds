@@ -65,7 +65,8 @@ var StaticReflector = (function () {
             var classMetadata = this.getTypeMetadata(type);
             var members = classMetadata ? classMetadata['members'] : {};
             propMetadata = mapStringMap(members, function (propData, propName) {
-                var prop = propData.find(function (a) { return a['__symbolic'] == 'property'; });
+                var prop = propData
+                    .find(function (a) { return a['__symbolic'] == 'property' || a['__symbolic'] == 'method'; });
                 if (prop && prop['decorators']) {
                     return _this.simplify(type, prop['decorators']);
                 }
@@ -138,7 +139,6 @@ var StaticReflector = (function () {
     StaticReflector.prototype.initializeConversionMap = function () {
         var _a = this.host.angularImportLocations(), coreDecorators = _a.coreDecorators, diDecorators = _a.diDecorators, diMetadata = _a.diMetadata, diOpaqueToken = _a.diOpaqueToken, animationMetadata = _a.animationMetadata, provider = _a.provider;
         this.opaqueToken = this.host.findDeclaration(diOpaqueToken, 'OpaqueToken');
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(provider, 'Provider'), core_1.Provider);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Host'), core_1.HostMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Injectable'), core_1.InjectableMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Self'), core_1.SelfMetadata);
@@ -146,8 +146,6 @@ var StaticReflector = (function () {
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Inject'), core_1.InjectMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Optional'), core_1.OptionalMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Attribute'), core_1.AttributeMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Query'), core_1.QueryMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'ViewQuery'), core_1.ViewQueryMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'ContentChild'), core_1.ContentChildMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'ContentChildren'), core_1.ContentChildrenMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'ViewChild'), core_1.ViewChildMetadata);
@@ -159,7 +157,7 @@ var StaticReflector = (function () {
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'HostListener'), core_1.HostListenerMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Directive'), core_1.DirectiveMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'Component'), core_1.ComponentMetadata);
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'AppModule'), core_1.AppModuleMetadata);
+        this.registerDecoratorOrConstructor(this.host.findDeclaration(coreDecorators, 'NgModule'), core_1.NgModuleMetadata);
         // Note: Some metadata classes can be used directly with Provider.deps.
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'HostMetadata'), core_1.HostMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diMetadata, 'SelfMetadata'), core_1.SelfMetadata);
@@ -209,37 +207,62 @@ var StaticReflector = (function () {
                 var callContext = undefined;
                 if (expression['__symbolic'] == 'call') {
                     var target = expression['expression'];
+                    var functionSymbol = void 0;
                     var targetFunction = void 0;
-                    if (target && target.__symbolic === 'reference') {
-                        callContext = { name: target.name };
-                        targetFunction = resolveReferenceValue(resolveReference(context, target));
+                    if (target) {
+                        switch (target.__symbolic) {
+                            case 'reference':
+                                // Find the function to call.
+                                callContext = { name: target.name };
+                                functionSymbol = resolveReference(context, target);
+                                targetFunction = resolveReferenceValue(functionSymbol);
+                                break;
+                            case 'select':
+                                // Find the static method to call
+                                if (target.expression.__symbolic == 'reference') {
+                                    functionSymbol = resolveReference(context, target.expression);
+                                    var classData = resolveReferenceValue(functionSymbol);
+                                    if (classData && classData.statics) {
+                                        targetFunction = classData.statics[target.member];
+                                    }
+                                }
+                                break;
+                        }
                     }
                     if (targetFunction && targetFunction['__symbolic'] == 'function') {
-                        if (calling.get(targetFunction)) {
+                        if (calling.get(functionSymbol)) {
                             throw new Error('Recursion not supported');
                         }
-                        calling.set(targetFunction, true);
-                        var value_1 = targetFunction['value'];
-                        if (value_1) {
-                            // Determine the arguments
-                            var args = (expression['arguments'] || []).map(function (arg) { return simplify(arg); });
-                            var parameters = targetFunction['parameters'];
-                            var functionScope = BindingScope.build();
-                            for (var i = 0; i < parameters.length; i++) {
-                                functionScope.define(parameters[i], args[i]);
+                        calling.set(functionSymbol, true);
+                        try {
+                            var value_1 = targetFunction['value'];
+                            if (value_1 && (depth != 0 || value_1.__symbolic != 'error')) {
+                                // Determine the arguments
+                                var args = (expression['arguments'] || []).map(function (arg) { return simplify(arg); });
+                                var parameters = targetFunction['parameters'];
+                                var defaults = targetFunction.defaults;
+                                if (defaults && defaults.length > args.length) {
+                                    args.push.apply(args, defaults.slice(args.length).map(function (value) { return simplify(value); }));
+                                }
+                                var functionScope = BindingScope.build();
+                                for (var i = 0; i < parameters.length; i++) {
+                                    functionScope.define(parameters[i], args[i]);
+                                }
+                                var oldScope = scope;
+                                var result_1;
+                                try {
+                                    scope = functionScope.done();
+                                    result_1 = simplifyInContext(functionSymbol, value_1, depth + 1);
+                                }
+                                finally {
+                                    scope = oldScope;
+                                }
+                                return result_1;
                             }
-                            var oldScope = scope;
-                            var result_1;
-                            try {
-                                scope = functionScope.done();
-                                result_1 = simplify(value_1);
-                            }
-                            finally {
-                                scope = oldScope;
-                            }
-                            return result_1;
                         }
-                        calling.delete(targetFunction);
+                        finally {
+                            calling.delete(functionSymbol);
+                        }
                     }
                 }
                 if (depth === 0) {
@@ -331,6 +354,10 @@ var StaticReflector = (function () {
                                         return left % right;
                                 }
                                 return null;
+                            case 'if':
+                                var condition = simplify(expression['condition']);
+                                return condition ? simplify(expression['thenExpression']) :
+                                    simplify(expression['elseExpression']);
                             case 'pre':
                                 var operand = simplify(expression['operand']);
                                 if (shouldIgnore(operand))
@@ -354,9 +381,19 @@ var StaticReflector = (function () {
                                 return null;
                             case 'select':
                                 var selectTarget = simplify(expression['expression']);
+                                if (selectTarget instanceof StaticSymbol) {
+                                    // Access to a static instance variable
+                                    var declarationValue_1 = resolveReferenceValue(selectTarget);
+                                    if (declarationValue_1 && declarationValue_1.statics) {
+                                        selectTarget = declarationValue_1.statics;
+                                    }
+                                    else {
+                                        return null;
+                                    }
+                                }
                                 var member = simplify(expression['member']);
                                 if (selectTarget && isPrimitive(member))
-                                    return selectTarget[member];
+                                    return simplify(selectTarget[member]);
                                 return null;
                             case 'reference':
                                 if (!expression.module) {
@@ -483,6 +520,10 @@ function expandedMessage(error) {
             var prefix = error.context && error.context.name ? "Calling function '" + error.context.name + "', f" : 'F';
             return prefix +
                 'unction calls are not supported. Consider replacing the function or lambda with a reference to an exported function';
+        case 'Reference to a local symbol':
+            if (error.context && error.context.name) {
+                return "Reference to a local (non-exported) symbol '" + error.context.name + "'. Consider exporting the symbol";
+            }
     }
     return error.message;
 }
