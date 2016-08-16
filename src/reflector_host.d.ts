@@ -9,6 +9,7 @@ import { AngularCompilerOptions, ModuleMetadata } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
 import { ImportGenerator } from './compiler_private';
 import { StaticReflectorHost, StaticSymbol } from './static_reflector';
+export declare const GENERATED_FILES: RegExp;
 export interface ReflectorHostContext {
     fileExists(fileName: string): boolean;
     directoryExists(directoryName: string): boolean;
@@ -41,8 +42,8 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
      * These need to be in a form that system.js can load, so absolute file paths don't work.
      *
      * The `containingFile` is always in the `genDir`, where as the `importedFile` can be in
-     * `genDir`, `node_module` or `basePath`.  The `importedFile` is either a generated file or
-     * existing file.
+     * `genDir`, `node_module` or `rootDir`/`rootDirs`.
+     * The `importedFile` is either a generated file or an existing file.
      *
      *               | genDir   | node_module |  rootDir
      * --------------+----------+-------------+----------
@@ -52,11 +53,8 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
      * NOTE: (*) the relative path is computed depending on `isGenDirChildOfRootDir`.
      */
     getImportPath(containingFile: string, importedFile: string): string;
+    private fixupGendirRelativePath(containingFile, importedFile);
     private dotRelative(from, to);
-    /**
-     * Moves the path into `genDir` folder while preserving the `node_modules` directory.
-     */
-    private rewriteGenDirPath(filepath);
     findDeclaration(module: string, symbolName: string, containingFile: string, containingModule?: string): StaticSymbol;
     private typeCache;
     private resolverCache;
