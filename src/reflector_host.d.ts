@@ -21,9 +21,6 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
     private options;
     private metadataCollector;
     private context;
-    private isGenDirChildOfRootDir;
-    private basePath;
-    private genDir;
     constructor(program: ts.Program, compilerHost: ts.CompilerHost, options: AngularCompilerOptions, context?: ReflectorHostContext);
     angularImportLocations(): {
         coreDecorators: string;
@@ -39,27 +36,12 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
     /**
      * We want a moduleId that will appear in import statements in the generated code.
      * These need to be in a form that system.js can load, so absolute file paths don't work.
-     *
-     * The `containingFile` is always in the `genDir`, where as the `importedFile` can be in
-     * `genDir`, `node_module` or `basePath`.  The `importedFile` is either a generated file or
-     * existing file.
-     *
-     *               | genDir   | node_module |  rootDir
-     * --------------+----------+-------------+----------
-     * generated     | relative |   relative  |   n/a
-     * existing file |   n/a    |   absolute  |  relative(*)
-     *
-     * NOTE: (*) the relative path is computed depending on `isGenDirChildOfRootDir`.
+     * Relativize the paths by checking candidate prefixes of the absolute path, to see if
+     * they are resolvable by the moduleResolution strategy from the CompilerHost.
      */
     getImportPath(containingFile: string, importedFile: string): string;
-    private dotRelative(from, to);
-    /**
-     * Moves the path into `genDir` folder while preserving the `node_modules` directory.
-     */
-    private rewriteGenDirPath(filepath);
     findDeclaration(module: string, symbolName: string, containingFile: string, containingModule?: string): StaticSymbol;
     private typeCache;
-    private resolverCache;
     /**
      * getStaticSymbol produces a Type whose metadata is known but whose implementation is not loaded.
      * All types passed to the StaticResolver should be pseudo-types returned by this method.
@@ -70,8 +52,6 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
     getStaticSymbol(declarationFile: string, name: string): StaticSymbol;
     getMetadataFor(filePath: string): ModuleMetadata;
     readMetadata(filePath: string): any;
-    private getResolverMetadata(filePath);
-    private resolveExportedSymbol(filePath, symbolName);
 }
 export declare class NodeReflectorHostContext implements ReflectorHostContext {
     private assumedExists;
