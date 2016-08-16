@@ -11,11 +11,26 @@ var reflector_host_1 = require('./reflector_host');
 var static_reflection_capabilities_1 = require('./static_reflection_capabilities');
 var static_reflector_1 = require('./static_reflector');
 function extract(ngOptions, cliOptions, program, host) {
-    var extractor = Extractor.create(ngOptions, cliOptions.i18nFormat, program, host);
+    var htmlParser = new compiler.i18n.HtmlParser(new compiler_private_1.HtmlParser());
+    var extractor = Extractor.create(ngOptions, cliOptions.i18nFormat, program, host, htmlParser);
     var bundlePromise = extractor.extract();
     return (bundlePromise).then(function (messageBundle) {
-        var serializer = new compiler.i18n.Xmb();
-        var dstPath = path.join(ngOptions.genDir, 'messages.xmb');
+        var ext;
+        var serializer;
+        var format = (cliOptions.i18nFormat || 'xlf').toLowerCase();
+        switch (format) {
+            case 'xmb':
+                ext = 'xmb';
+                serializer = new compiler.i18n.Xmb();
+                break;
+            case 'xliff':
+            case 'xlf':
+            default:
+                ext = 'xlf';
+                serializer = new compiler.i18n.Xliff(htmlParser, compiler.DEFAULT_INTERPOLATION_CONFIG);
+                break;
+        }
+        var dstPath = path.join(ngOptions.genDir, "messages." + ext);
         host.writeFile(dstPath, messageBundle.write(serializer), false);
     });
 }
@@ -104,7 +119,7 @@ var Extractor = (function () {
         }
         return bundlePromise;
     };
-    Extractor.create = function (options, translationsFormat, program, compilerHost, reflectorHostContext) {
+    Extractor.create = function (options, translationsFormat, program, compilerHost, htmlParser, reflectorHostContext) {
         var xhr = {
             get: function (s) {
                 if (!compilerHost.fileExists(s)) {
@@ -118,7 +133,6 @@ var Extractor = (function () {
         var reflectorHost = new reflector_host_1.ReflectorHost(program, compilerHost, options, reflectorHostContext);
         var staticReflector = new static_reflector_1.StaticReflector(reflectorHost);
         static_reflection_capabilities_1.StaticAndDynamicReflectionCapabilities.install(staticReflector);
-        var htmlParser = new compiler.i18n.HtmlParser(new compiler_private_1.HtmlParser());
         var config = new compiler.CompilerConfig({
             genDebugInfo: options.debug === true,
             defaultEncapsulation: core_1.ViewEncapsulation.Emulated,

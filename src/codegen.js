@@ -127,7 +127,7 @@ var CodeGenerator = (function () {
         var reflectorHost = new reflector_host_1.ReflectorHost(program, compilerHost, options, reflectorHostContext);
         var staticReflector = new static_reflector_1.StaticReflector(reflectorHost);
         static_reflection_capabilities_1.StaticAndDynamicReflectionCapabilities.install(staticReflector);
-        var htmlParser = new compiler.i18n.HtmlParser(new compiler_private_1.HtmlParser(), transContent);
+        var htmlParser = new compiler.i18n.HtmlParser(new compiler_private_1.HtmlParser(), transContent, cliOptions.i18nFormat);
         var config = new compiler.CompilerConfig({
             genDebugInfo: options.debug === true,
             defaultEncapsulation: core_1.ViewEncapsulation.Emulated,
@@ -140,6 +140,7 @@ var CodeGenerator = (function () {
         var console = new core_private_1.Console();
         var tmplParser = new compiler_private_1.TemplateParser(expressionParser, elementSchemaRegistry, htmlParser, console, []);
         var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), config, console, elementSchemaRegistry, staticReflector);
+        // TODO(vicb): do not pass cliOptions.i18nFormat here
         var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.NgModuleCompiler(), new compiler_private_1.TypeScriptEmitter(reflectorHost), cliOptions.locale, cliOptions.i18nFormat);
         return new CodeGenerator(options, program, compilerHost, staticReflector, offlineCompiler, reflectorHost);
     };
