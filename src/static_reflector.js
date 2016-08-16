@@ -139,7 +139,6 @@ var StaticReflector = (function () {
     StaticReflector.prototype.initializeConversionMap = function () {
         var _a = this.host.angularImportLocations(), coreDecorators = _a.coreDecorators, diDecorators = _a.diDecorators, diMetadata = _a.diMetadata, diOpaqueToken = _a.diOpaqueToken, animationMetadata = _a.animationMetadata, provider = _a.provider;
         this.opaqueToken = this.host.findDeclaration(diOpaqueToken, 'OpaqueToken');
-        this.registerDecoratorOrConstructor(this.host.findDeclaration(provider, 'Provider'), core_1.Provider);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Host'), core_1.HostMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Injectable'), core_1.InjectableMetadata);
         this.registerDecoratorOrConstructor(this.host.findDeclaration(diDecorators, 'Self'), core_1.SelfMetadata);
