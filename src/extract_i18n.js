@@ -120,7 +120,7 @@ var Extractor = (function () {
         return bundlePromise;
     };
     Extractor.create = function (options, translationsFormat, program, compilerHost, htmlParser, reflectorHostContext) {
-        var xhr = {
+        var resourceLoader = {
             get: function (s) {
                 if (!compilerHost.fileExists(s)) {
                     // TODO: We should really have a test for error cases like this!
@@ -139,7 +139,7 @@ var Extractor = (function () {
             logBindingUpdate: false,
             useJit: false
         });
-        var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
+        var normalizer = new compiler_private_1.DirectiveNormalizer(resourceLoader, urlResolver, htmlParser, config);
         var expressionParser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
         var elementSchemaRegistry = new compiler_private_1.DomElementSchemaRegistry();
         var console = new core_private_1.Console();
