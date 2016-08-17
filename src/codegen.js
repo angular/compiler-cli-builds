@@ -107,8 +107,8 @@ var CodeGenerator = (function () {
         }); }))
             .catch(function (e) { console.error(e.stack); });
     };
-    CodeGenerator.create = function (options, cliOptions, program, compilerHost, reflectorHostContext, xhr) {
-        xhr = xhr || {
+    CodeGenerator.create = function (options, cliOptions, program, compilerHost, reflectorHostContext, resourceLoader) {
+        resourceLoader = resourceLoader || {
             get: function (s) {
                 if (!compilerHost.fileExists(s)) {
                     // TODO: We should really have a test for error cases like this!
@@ -134,7 +134,7 @@ var CodeGenerator = (function () {
             logBindingUpdate: false,
             useJit: false
         });
-        var normalizer = new compiler_private_1.DirectiveNormalizer(xhr, urlResolver, htmlParser, config);
+        var normalizer = new compiler_private_1.DirectiveNormalizer(resourceLoader, urlResolver, htmlParser, config);
         var expressionParser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
         var elementSchemaRegistry = new compiler_private_1.DomElementSchemaRegistry();
         var console = new core_private_1.Console();
