@@ -41,6 +41,8 @@ var ReflectorHost = (function () {
             provider: '@angular/core/src/di/provider'
         };
     };
+    // We use absolute paths on disk as canonical.
+    ReflectorHost.prototype.getCanonicalFileName = function (fileName) { return fileName; };
     ReflectorHost.prototype.resolve = function (m, containingFile) {
         var resolved = ts.resolveModuleName(m, containingFile, this.options, this.context).resolvedModule;
         return resolved ? resolved.resolvedFileName : null;
@@ -48,12 +50,13 @@ var ReflectorHost = (function () {
     ;
     ReflectorHost.prototype.normalizeAssetUrl = function (url) {
         var assetUrl = compiler_private_1.AssetUrl.parse(url);
-        return assetUrl ? assetUrl.packageName + "/" + assetUrl.modulePath : null;
+        var path = assetUrl ? assetUrl.packageName + "/" + assetUrl.modulePath : null;
+        return this.getCanonicalFileName(path);
     };
     ReflectorHost.prototype.resolveAssetUrl = function (url, containingFile) {
         var assetUrl = this.normalizeAssetUrl(url);
         if (assetUrl) {
-            return this.resolve(assetUrl, containingFile);
+            return this.getCanonicalFileName(this.resolve(assetUrl, containingFile));
         }
         return url;
     };
@@ -172,7 +175,7 @@ var ReflectorHost = (function () {
                 symbol = tc.getAliasedSymbol(symbol);
             }
             var declaration = symbol.getDeclarations()[0];
-            var declarationFile = declaration.getSourceFile().fileName;
+            var declarationFile = this.getCanonicalFileName(declaration.getSourceFile().fileName);
             return this.getStaticSymbol(declarationFile, symbol.getName());
         }
         catch (e) {
@@ -238,7 +241,7 @@ var ReflectorHost = (function () {
     ReflectorHost.prototype.resolveExportedSymbol = function (filePath, symbolName) {
         var _this = this;
         var resolveModule = function (moduleName) {
-            var resolvedModulePath = _this.resolve(moduleName, filePath);
+            var resolvedModulePath = _this.getCanonicalFileName(_this.resolve(moduleName, filePath));
             if (!resolvedModulePath) {
                 throw new Error("Could not resolve module '" + moduleName + "' relative to file " + filePath);
             }

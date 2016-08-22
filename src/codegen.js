@@ -15,6 +15,7 @@ var core_1 = require('@angular/core');
 var path = require('path');
 var compiler_private_1 = require('./compiler_private');
 var core_private_1 = require('./core_private');
+var path_mapped_reflector_host_1 = require('./path_mapped_reflector_host');
 var reflector_host_1 = require('./reflector_host');
 var static_reflection_capabilities_1 = require('./static_reflection_capabilities');
 var static_reflector_1 = require('./static_reflector');
@@ -88,7 +89,9 @@ var CodeGenerator = (function () {
     };
     CodeGenerator.prototype.codegen = function () {
         var _this = this;
-        var filePaths = this.program.getSourceFiles().map(function (sf) { return sf.fileName; }).filter(function (f) { return !GENERATED_FILES.test(f); });
+        var filePaths = this.program.getSourceFiles()
+            .map(function (sf) { return _this.reflectorHost.getCanonicalFileName(sf.fileName); })
+            .filter(function (f) { return !GENERATED_FILES.test(f); });
         var fileMetas = filePaths.map(function (filePath) { return _this.readFileMetadata(filePath); });
         var ngModules = fileMetas.reduce(function (ngModules, fileMeta) {
             ngModules.push.apply(ngModules, fileMeta.ngModules);
@@ -124,7 +127,10 @@ var CodeGenerator = (function () {
             transContent = nodeFs.readFileSync(transFile, 'utf8');
         }
         var urlResolver = compiler.createOfflineCompileUrlResolver();
-        var reflectorHost = new reflector_host_1.ReflectorHost(program, compilerHost, options, reflectorHostContext);
+        var usePathMapping = !!options.rootDirs && options.rootDirs.length > 0;
+        var reflectorHost = usePathMapping ?
+            new path_mapped_reflector_host_1.PathMappedReflectorHost(program, compilerHost, options, reflectorHostContext) :
+            new reflector_host_1.ReflectorHost(program, compilerHost, options, reflectorHostContext);
         var staticReflector = new static_reflector_1.StaticReflector(reflectorHost);
         static_reflection_capabilities_1.StaticAndDynamicReflectionCapabilities.install(staticReflector);
         var htmlParser = new compiler.i18n.HtmlParser(new compiler_private_1.HtmlParser(), transContent, cliOptions.i18nFormat);
