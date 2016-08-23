@@ -68,7 +68,7 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
      * @param declarationFile the absolute path of the file where the symbol is declared
      * @param name the name of the type.
      */
-    getStaticSymbol(declarationFile: string, name: string): StaticSymbol;
+    getStaticSymbol(declarationFile: string, name: string, members?: string[]): StaticSymbol;
     getMetadataFor(filePath: string): ModuleMetadata;
     readMetadata(filePath: string): any;
     private getResolverMetadata(filePath);
