@@ -144,7 +144,7 @@ var Extractor = (function () {
         var elementSchemaRegistry = new compiler_private_1.DomElementSchemaRegistry();
         var console = new core_private_1.Console();
         var tmplParser = new compiler_private_1.TemplateParser(expressionParser, elementSchemaRegistry, htmlParser, console, []);
-        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), config, console, elementSchemaRegistry, staticReflector);
+        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), elementSchemaRegistry, staticReflector);
         var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.NgModuleCompiler(), new compiler_private_1.TypeScriptEmitter(reflectorHost), null, null);
         // TODO(vicb): implicit tags & attributes
         var messageBundle = new compiler.i18n.MessageBundle(htmlParser, [], {});
