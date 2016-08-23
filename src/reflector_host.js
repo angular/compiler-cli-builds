@@ -190,12 +190,11 @@ var ReflectorHost = (function () {
      * @param declarationFile the absolute path of the file where the symbol is declared
      * @param name the name of the type.
      */
-    ReflectorHost.prototype.getStaticSymbol = function (declarationFile, name, members) {
-        var memberSuffix = members ? "." + members.join('.') : '';
-        var key = "\"" + declarationFile + "\"." + name + memberSuffix;
+    ReflectorHost.prototype.getStaticSymbol = function (declarationFile, name) {
+        var key = "\"" + declarationFile + "\"." + name;
         var result = this.typeCache.get(key);
         if (!result) {
-            result = new static_reflector_1.StaticSymbol(declarationFile, name, members);
+            result = new static_reflector_1.StaticSymbol(declarationFile, name);
             this.typeCache.set(key, result);
         }
         return result;

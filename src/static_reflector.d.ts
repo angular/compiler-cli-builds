@@ -21,7 +21,7 @@ export interface StaticReflectorHost {
      * @param containingFile for relative imports, the path of the file containing the import
      */
     findDeclaration(modulePath: string, symbolName: string, containingFile?: string): StaticSymbol;
-    getStaticSymbol(declarationFile: string, name: string, members?: string[]): StaticSymbol;
+    getStaticSymbol(declarationFile: string, name: string): StaticSymbol;
     angularImportLocations(): {
         coreDecorators: string;
         diDecorators: string;
@@ -39,8 +39,7 @@ export interface StaticReflectorHost {
 export declare class StaticSymbol {
     filePath: string;
     name: string;
-    members: string[];
-    constructor(filePath: string, name: string, members?: string[]);
+    constructor(filePath: string, name: string);
 }
 /**
  * A static reflector implements enough of the Reflector API that is necessary to compile

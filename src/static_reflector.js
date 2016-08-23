@@ -19,10 +19,9 @@ var SUPPORTED_SCHEMA_VERSION = 1;
  * This token is unique for a filePath and name and can be used as a hash table key.
  */
 var StaticSymbol = (function () {
-    function StaticSymbol(filePath, name, members) {
+    function StaticSymbol(filePath, name) {
         this.filePath = filePath;
         this.name = name;
-        this.members = members;
     }
     return StaticSymbol;
 }());
@@ -389,11 +388,7 @@ var StaticReflector = (function () {
                                         selectTarget = declarationValue_1.statics;
                                     }
                                     else {
-                                        var member_1 = expression['member'];
-                                        var members = selectTarget.members ?
-                                            selectTarget.members.concat(member_1) :
-                                            [member_1];
-                                        return _this.host.getStaticSymbol(selectTarget.filePath, selectTarget.name, members);
+                                        return null;
                                     }
                                 }
                                 var member = simplify(expression['member']);
