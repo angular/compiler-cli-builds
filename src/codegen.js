@@ -128,7 +128,10 @@ var CodeGenerator = (function () {
         var transFile = cliOptions.i18nFile;
         var locale = cliOptions.locale;
         var transContent = '';
-        if (transFile && locale) {
+        if (transFile) {
+            if (!locale) {
+                throw new Error("The translation file (" + transFile + ") locale must be provided. Use the --locale option.");
+            }
             transContent = nodeFs.readFileSync(transFile, 'utf8');
         }
         var urlResolver = compiler.createOfflineCompileUrlResolver();
