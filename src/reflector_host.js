@@ -14,7 +14,7 @@ var compiler_private_1 = require('./compiler_private');
 var static_reflector_1 = require('./static_reflector');
 var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 var DTS = /\.d\.ts$/;
-var NODE_MODULES = '/node_modules/';
+var NODE_MODULES = path.sep + 'node_modules' + path.sep;
 var IS_GENERATED = /\.(ngfactory|css(\.shim)?)$/;
 var ReflectorHost = (function () {
     function ReflectorHost(program, compilerHost, options, context) {
@@ -25,8 +25,8 @@ var ReflectorHost = (function () {
         this.typeCache = new Map();
         this.resolverCache = new Map();
         // normalize the path so that it never ends with '/'.
-        this.basePath = path.normalize(path.join(this.options.basePath, '.')).replace(/\\/g, '/');
-        this.genDir = path.normalize(path.join(this.options.genDir, '.')).replace(/\\/g, '/');
+        this.basePath = path.normalize(path.join(this.options.basePath, '.'));
+        this.genDir = path.normalize(path.join(this.options.genDir, '.'));
         this.context = context || new NodeReflectorHostContext();
         var genPath = path.relative(this.basePath, this.genDir);
         this.isGenDirChildOfRootDir = genPath === '' || !genPath.startsWith('..');
@@ -44,8 +44,7 @@ var ReflectorHost = (function () {
     // We use absolute paths on disk as canonical.
     ReflectorHost.prototype.getCanonicalFileName = function (fileName) { return fileName; };
     ReflectorHost.prototype.resolve = function (m, containingFile) {
-        var resolved = ts.resolveModuleName(m, containingFile.replace(/\\/g, '/'), this.options, this.context)
-            .resolvedModule;
+        var resolved = ts.resolveModuleName(m, containingFile, this.options, this.context).resolvedModule;
         return resolved ? resolved.resolvedFileName : null;
     };
     ;
@@ -120,7 +119,7 @@ var ReflectorHost = (function () {
         }
     };
     ReflectorHost.prototype.dotRelative = function (from, to) {
-        var rPath = path.relative(from, to).replace(/\\/g, '/');
+        var rPath = path.relative(from, to);
         return rPath.startsWith('.') ? rPath : './' + rPath;
     };
     /**
