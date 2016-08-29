@@ -39,6 +39,17 @@ var StaticAndDynamicReflectionCapabilities = (function () {
     StaticAndDynamicReflectionCapabilities.prototype.setter = function (name) { return this.dynamicDelegate.setter(name); };
     StaticAndDynamicReflectionCapabilities.prototype.method = function (name) { return this.dynamicDelegate.method(name); };
     StaticAndDynamicReflectionCapabilities.prototype.importUri = function (type) { return this.staticDelegate.importUri(type); };
+    StaticAndDynamicReflectionCapabilities.prototype.resolveIdentifier = function (name, moduleUrl, runtime) {
+        return this.staticDelegate.resolveIdentifier(name, moduleUrl, runtime);
+    };
+    StaticAndDynamicReflectionCapabilities.prototype.resolveEnum = function (enumIdentifier, name) {
+        if (isStaticType(enumIdentifier)) {
+            return this.staticDelegate.resolveEnum(enumIdentifier, name);
+        }
+        else {
+            return null;
+        }
+    };
     return StaticAndDynamicReflectionCapabilities;
 }());
 exports.StaticAndDynamicReflectionCapabilities = StaticAndDynamicReflectionCapabilities;

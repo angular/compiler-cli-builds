@@ -56,6 +56,8 @@ export declare class StaticReflector implements ReflectorReader {
     private opaqueToken;
     constructor(host: StaticReflectorHost);
     importUri(typeOrFunc: StaticSymbol): string;
+    resolveIdentifier(name: string, moduleUrl: string, runtime: any): any;
+    resolveEnum(enumIdentifier: any, name: string): any;
     annotations(type: StaticSymbol): any[];
     propMetadata(type: StaticSymbol): {
         [key: string]: any;

@@ -17,4 +17,6 @@ export declare class StaticAndDynamicReflectionCapabilities {
     setter(name: string): (obj: any, value: any) => void;
     method(name: string): (obj: any, args: any[]) => any;
     importUri(type: any): string;
+    resolveIdentifier(name: string, moduleUrl: string, runtime: any): any;
+    resolveEnum(enumIdentifier: any, name: string): any;
 }

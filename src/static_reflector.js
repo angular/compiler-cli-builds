@@ -45,6 +45,14 @@ var StaticReflector = (function () {
         var staticSymbol = this.host.findDeclaration(typeOrFunc.filePath, typeOrFunc.name, '');
         return staticSymbol ? staticSymbol.filePath : null;
     };
+    StaticReflector.prototype.resolveIdentifier = function (name, moduleUrl, runtime) {
+        var result = this.host.findDeclaration(moduleUrl, name, '');
+        return result;
+    };
+    StaticReflector.prototype.resolveEnum = function (enumIdentifier, name) {
+        var staticSymbol = enumIdentifier;
+        return this.host.getStaticSymbol(staticSymbol.filePath, staticSymbol.name, [name]);
+    };
     StaticReflector.prototype.annotations = function (type) {
         var annotations = this.annotationCache.get(type);
         if (!annotations) {
