@@ -13,9 +13,9 @@
 var compiler = require('@angular/compiler');
 var core_1 = require('@angular/core');
 var path = require('path');
-var compiler_private_1 = require('./compiler_private');
-var core_private_1 = require('./core_private');
 var path_mapped_reflector_host_1 = require('./path_mapped_reflector_host');
+var private_import_compiler_1 = require('./private_import_compiler');
+var private_import_core_1 = require('./private_import_core');
 var reflector_host_1 = require('./reflector_host');
 var static_reflection_capabilities_1 = require('./static_reflection_capabilities');
 var static_reflector_1 = require('./static_reflector');
@@ -141,21 +141,21 @@ var CodeGenerator = (function () {
             new reflector_host_1.ReflectorHost(program, compilerHost, options, reflectorHostContext);
         var staticReflector = new static_reflector_1.StaticReflector(reflectorHost);
         static_reflection_capabilities_1.StaticAndDynamicReflectionCapabilities.install(staticReflector);
-        var htmlParser = new compiler.i18n.HtmlParser(new compiler_private_1.HtmlParser(), transContent, cliOptions.i18nFormat);
+        var htmlParser = new compiler.I18NHtmlParser(new private_import_compiler_1.HtmlParser(), transContent, cliOptions.i18nFormat);
         var config = new compiler.CompilerConfig({
             genDebugInfo: options.debug === true,
             defaultEncapsulation: core_1.ViewEncapsulation.Emulated,
             logBindingUpdate: false,
             useJit: false
         });
-        var normalizer = new compiler_private_1.DirectiveNormalizer(resourceLoader, urlResolver, htmlParser, config);
-        var expressionParser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
-        var elementSchemaRegistry = new compiler_private_1.DomElementSchemaRegistry();
-        var console = new core_private_1.Console();
-        var tmplParser = new compiler_private_1.TemplateParser(expressionParser, elementSchemaRegistry, htmlParser, console, []);
-        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), elementSchemaRegistry, staticReflector);
+        var normalizer = new private_import_compiler_1.DirectiveNormalizer(resourceLoader, urlResolver, htmlParser, config);
+        var expressionParser = new private_import_compiler_1.Parser(new private_import_compiler_1.Lexer());
+        var elementSchemaRegistry = new private_import_compiler_1.DomElementSchemaRegistry();
+        var console = new private_import_core_1.Console();
+        var tmplParser = new private_import_compiler_1.TemplateParser(expressionParser, elementSchemaRegistry, htmlParser, console, []);
+        var resolver = new private_import_compiler_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), elementSchemaRegistry, staticReflector);
         // TODO(vicb): do not pass cliOptions.i18nFormat here
-        var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.NgModuleCompiler(), new compiler_private_1.TypeScriptEmitter(reflectorHost), cliOptions.locale, cliOptions.i18nFormat);
+        var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new private_import_compiler_1.StyleCompiler(urlResolver), new private_import_compiler_1.ViewCompiler(config), new private_import_compiler_1.NgModuleCompiler(), new private_import_compiler_1.TypeScriptEmitter(reflectorHost), cliOptions.locale, cliOptions.i18nFormat);
         return new CodeGenerator(options, program, compilerHost, staticReflector, offlineCompiler, reflectorHost);
     };
     return CodeGenerator;

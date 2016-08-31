@@ -5,13 +5,13 @@ var compiler = require('@angular/compiler');
 var core_1 = require('@angular/core');
 var path = require('path');
 var tsc = require('@angular/tsc-wrapped');
-var compiler_private_1 = require('./compiler_private');
-var core_private_1 = require('./core_private');
+var private_import_compiler_1 = require('./private_import_compiler');
+var private_import_core_1 = require('./private_import_core');
 var reflector_host_1 = require('./reflector_host');
 var static_reflection_capabilities_1 = require('./static_reflection_capabilities');
 var static_reflector_1 = require('./static_reflector');
 function extract(ngOptions, cliOptions, program, host) {
-    var htmlParser = new compiler.i18n.HtmlParser(new compiler_private_1.HtmlParser());
+    var htmlParser = new compiler.I18NHtmlParser(new private_import_compiler_1.HtmlParser());
     var extractor = Extractor.create(ngOptions, cliOptions.i18nFormat, program, host, htmlParser);
     var bundlePromise = extractor.extract();
     return (bundlePromise).then(function (messageBundle) {
@@ -21,13 +21,13 @@ function extract(ngOptions, cliOptions, program, host) {
         switch (format) {
             case 'xmb':
                 ext = 'xmb';
-                serializer = new compiler.i18n.Xmb();
+                serializer = new compiler.Xmb();
                 break;
             case 'xliff':
             case 'xlf':
             default:
                 ext = 'xlf';
-                serializer = new compiler.i18n.Xliff(htmlParser, compiler.DEFAULT_INTERPOLATION_CONFIG);
+                serializer = new compiler.Xliff(htmlParser, compiler.DEFAULT_INTERPOLATION_CONFIG);
                 break;
         }
         var dstPath = path.join(ngOptions.genDir, "messages." + ext);
@@ -139,15 +139,15 @@ var Extractor = (function () {
             logBindingUpdate: false,
             useJit: false
         });
-        var normalizer = new compiler_private_1.DirectiveNormalizer(resourceLoader, urlResolver, htmlParser, config);
-        var expressionParser = new compiler_private_1.Parser(new compiler_private_1.Lexer());
-        var elementSchemaRegistry = new compiler_private_1.DomElementSchemaRegistry();
-        var console = new core_private_1.Console();
-        var tmplParser = new compiler_private_1.TemplateParser(expressionParser, elementSchemaRegistry, htmlParser, console, []);
-        var resolver = new compiler_private_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), elementSchemaRegistry, staticReflector);
-        var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler_private_1.StyleCompiler(urlResolver), new compiler_private_1.ViewCompiler(config), new compiler_private_1.NgModuleCompiler(), new compiler_private_1.TypeScriptEmitter(reflectorHost), null, null);
+        var normalizer = new private_import_compiler_1.DirectiveNormalizer(resourceLoader, urlResolver, htmlParser, config);
+        var expressionParser = new private_import_compiler_1.Parser(new private_import_compiler_1.Lexer());
+        var elementSchemaRegistry = new private_import_compiler_1.DomElementSchemaRegistry();
+        var console = new private_import_core_1.Console();
+        var tmplParser = new private_import_compiler_1.TemplateParser(expressionParser, elementSchemaRegistry, htmlParser, console, []);
+        var resolver = new private_import_compiler_1.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), elementSchemaRegistry, staticReflector);
+        var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new private_import_compiler_1.StyleCompiler(urlResolver), new private_import_compiler_1.ViewCompiler(config), new private_import_compiler_1.NgModuleCompiler(), new private_import_compiler_1.TypeScriptEmitter(reflectorHost), null, null);
         // TODO(vicb): implicit tags & attributes
-        var messageBundle = new compiler.i18n.MessageBundle(htmlParser, [], {});
+        var messageBundle = new compiler.MessageBundle(htmlParser, [], {});
         return new Extractor(program, compilerHost, staticReflector, messageBundle, reflectorHost, resolver, normalizer, offlineCompiler);
     };
     return Extractor;

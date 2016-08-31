@@ -10,7 +10,7 @@ var tsc_wrapped_1 = require('@angular/tsc-wrapped');
 var fs = require('fs');
 var path = require('path');
 var ts = require('typescript');
-var compiler_private_1 = require('./compiler_private');
+var private_import_compiler_1 = require('./private_import_compiler');
 var static_reflector_1 = require('./static_reflector');
 var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 var DTS = /\.d\.ts$/;
@@ -44,13 +44,14 @@ var ReflectorHost = (function () {
     // We use absolute paths on disk as canonical.
     ReflectorHost.prototype.getCanonicalFileName = function (fileName) { return fileName; };
     ReflectorHost.prototype.resolve = function (m, containingFile) {
+        m = m.replace(EXT, '');
         var resolved = ts.resolveModuleName(m, containingFile.replace(/\\/g, '/'), this.options, this.context)
             .resolvedModule;
         return resolved ? resolved.resolvedFileName : null;
     };
     ;
     ReflectorHost.prototype.normalizeAssetUrl = function (url) {
-        var assetUrl = compiler_private_1.AssetUrl.parse(url);
+        var assetUrl = private_import_compiler_1.AssetUrl.parse(url);
         var path = assetUrl ? assetUrl.packageName + "/" + assetUrl.modulePath : null;
         return this.getCanonicalFileName(path);
     };

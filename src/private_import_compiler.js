@@ -22,4 +22,4 @@ exports.StyleCompiler = compiler_1.__compiler_private__.StyleCompiler;
 exports.ViewCompiler = compiler_1.__compiler_private__.ViewCompiler;
 exports.NgModuleCompiler = compiler_1.__compiler_private__.NgModuleCompiler;
 exports.TypeScriptEmitter = compiler_1.__compiler_private__.TypeScriptEmitter;
-//# sourceMappingURL=compiler_private.js.map
+//# sourceMappingURL=private_import_compiler.js.map

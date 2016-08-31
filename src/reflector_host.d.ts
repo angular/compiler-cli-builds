@@ -7,7 +7,7 @@
  */
 import { AngularCompilerOptions, MetadataCollector, ModuleMetadata } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
-import { ImportGenerator } from './compiler_private';
+import { ImportGenerator } from './private_import_compiler';
 import { StaticReflectorHost, StaticSymbol } from './static_reflector';
 export interface ReflectorHostContext {
     fileExists(fileName: string): boolean;

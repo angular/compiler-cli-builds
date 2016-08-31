@@ -1,4 +1,4 @@
-import { ReflectorReader } from './core_private';
+import { ReflectorReader } from './private_import_core';
 /**
  * The host of the static resolver is expected to be able to provide module metadata in the form of
  * ModuleMetadata. Angular 2 CLI will produce this metadata for a module whenever a .d.ts files is
