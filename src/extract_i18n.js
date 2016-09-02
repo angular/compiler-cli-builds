@@ -112,8 +112,7 @@ var Extractor = (function () {
                 });
             }));
         }))
-            .then(function (_) { return _this.messageBundle; })
-            .catch(function (e) { console.error(e.stack); });
+            .then(function (_) { return _this.messageBundle; });
         if (errors.length) {
             throw new Error(errors.map(function (e) { return e.toString(); }).join('\n'));
         }
