@@ -27,7 +27,7 @@ var ReflectorHost = (function () {
         // normalize the path so that it never ends with '/'.
         this.basePath = path.normalize(path.join(this.options.basePath, '.')).replace(/\\/g, '/');
         this.genDir = path.normalize(path.join(this.options.genDir, '.')).replace(/\\/g, '/');
-        this.context = context || new NodeReflectorHostContext();
+        this.context = context || new NodeReflectorHostContext(compilerHost);
         var genPath = path.relative(this.basePath, this.genDir);
         this.isGenDirChildOfRootDir = genPath === '' || !genPath.startsWith('..');
     }
@@ -297,11 +297,12 @@ var ReflectorHost = (function () {
 }());
 exports.ReflectorHost = ReflectorHost;
 var NodeReflectorHostContext = (function () {
-    function NodeReflectorHostContext() {
+    function NodeReflectorHostContext(host) {
+        this.host = host;
         this.assumedExists = {};
     }
     NodeReflectorHostContext.prototype.fileExists = function (fileName) {
-        return this.assumedExists[fileName] || fs.existsSync(fileName);
+        return this.assumedExists[fileName] || this.host.fileExists(fileName);
     };
     NodeReflectorHostContext.prototype.directoryExists = function (directoryName) {
         try {

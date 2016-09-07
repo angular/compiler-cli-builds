@@ -75,6 +75,8 @@ export declare class ReflectorHost implements StaticReflectorHost, ImportGenerat
     protected resolveExportedSymbol(filePath: string, symbolName: string): StaticSymbol;
 }
 export declare class NodeReflectorHostContext implements ReflectorHostContext {
+    private host;
+    constructor(host: ts.CompilerHost);
     private assumedExists;
     fileExists(fileName: string): boolean;
     directoryExists(directoryName: string): boolean;
