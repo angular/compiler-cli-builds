@@ -52,10 +52,10 @@ var CodeGenerator = (function () {
             var staticType = this_1.reflectorHost.findDeclaration(absSourcePath, symbol, absSourcePath);
             var annotations = this_1.staticReflector.annotations(staticType);
             annotations.forEach(function (annotation) {
-                if (annotation instanceof core_1.NgModuleMetadata) {
+                if (annotation instanceof core_1.NgModule) {
                     result.ngModules.push(staticType);
                 }
-                else if (annotation instanceof core_1.ComponentMetadata) {
+                else if (annotation instanceof core_1.Component) {
                     result.components.push(staticType);
                 }
             });

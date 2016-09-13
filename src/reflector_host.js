@@ -34,7 +34,7 @@ var ReflectorHost = (function () {
     ReflectorHost.prototype.angularImportLocations = function () {
         return {
             coreDecorators: '@angular/core/src/metadata',
-            diDecorators: '@angular/core/src/di/decorators',
+            diDecorators: '@angular/core/src/di/metadata',
             diMetadata: '@angular/core/src/di/metadata',
             diOpaqueToken: '@angular/core/src/di/opaque_token',
             animationMetadata: '@angular/core/src/animation/metadata',
