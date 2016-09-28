@@ -115,7 +115,7 @@ var CodeGenerator = (function () {
             });
         }));
     };
-    CodeGenerator.create = function (options, cliOptions, program, compilerHost, reflectorHostContext, resourceLoader) {
+    CodeGenerator.create = function (options, cliOptions, program, compilerHost, reflectorHostContext, resourceLoader, reflectorHost) {
         resourceLoader = resourceLoader || {
             get: function (s) {
                 if (!compilerHost.fileExists(s)) {
@@ -135,10 +135,12 @@ var CodeGenerator = (function () {
             transContent = nodeFs.readFileSync(transFile, 'utf8');
         }
         var urlResolver = compiler.createOfflineCompileUrlResolver();
-        var usePathMapping = !!options.rootDirs && options.rootDirs.length > 0;
-        var reflectorHost = usePathMapping ?
-            new path_mapped_reflector_host_1.PathMappedReflectorHost(program, compilerHost, options, reflectorHostContext) :
-            new reflector_host_1.ReflectorHost(program, compilerHost, options, reflectorHostContext);
+        if (!reflectorHost) {
+            var usePathMapping = !!options.rootDirs && options.rootDirs.length > 0;
+            reflectorHost = usePathMapping ?
+                new path_mapped_reflector_host_1.PathMappedReflectorHost(program, compilerHost, options, reflectorHostContext) :
+                new reflector_host_1.ReflectorHost(program, compilerHost, options, reflectorHostContext);
+        }
         var staticReflector = new static_reflector_1.StaticReflector(reflectorHost);
         static_reflection_capabilities_1.StaticAndDynamicReflectionCapabilities.install(staticReflector);
         var htmlParser = new compiler.I18NHtmlParser(new private_import_compiler_1.HtmlParser(), transContent, cliOptions.i18nFormat);

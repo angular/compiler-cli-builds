@@ -25,5 +25,5 @@ export declare class CodeGenerator {
     private readFileMetadata(absSourcePath);
     private calculateEmitPath(filePath);
     codegen(): Promise<any>;
-    static create(options: AngularCompilerOptions, cliOptions: NgcCliOptions, program: ts.Program, compilerHost: ts.CompilerHost, reflectorHostContext?: ReflectorHostContext, resourceLoader?: compiler.ResourceLoader): CodeGenerator;
+    static create(options: AngularCompilerOptions, cliOptions: NgcCliOptions, program: ts.Program, compilerHost: ts.CompilerHost, reflectorHostContext?: ReflectorHostContext, resourceLoader?: compiler.ResourceLoader, reflectorHost?: ReflectorHost): CodeGenerator;
 }
