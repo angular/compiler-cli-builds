@@ -30,7 +30,6 @@ export interface StaticReflectorHost {
         animationMetadata: string;
         provider: string;
     };
-    getCanonicalFileName(fileName: string): string;
 }
 /**
  * A token representing the a reference to a static type.
