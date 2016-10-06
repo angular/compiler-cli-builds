@@ -11,13 +11,11 @@
   "dependencies": {
     "@angular/tsc-wrapped": "^0.3.0",
     "reflect-metadata": "^0.1.2",
-    "parse5": "^2.2.1",
     "minimist": "^1.2.0"
   },
   "peerDependencies": {
     "typescript": "^2.0.2",
     "@angular/compiler": "0.0.0-PLACEHOLDER",
-    "@angular/platform-server": "0.0.0-PLACEHOLDER",
     "@angular/core": "0.0.0-PLACEHOLDER"
   },
   "repository": {
