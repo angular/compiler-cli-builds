@@ -305,6 +305,9 @@ var StaticReflector = (function () {
                     }
                     return result_2;
                 }
+                if (expression instanceof StaticSymbol) {
+                    return expression;
+                }
                 if (expression) {
                     if (expression['__symbolic']) {
                         var staticSymbol = void 0;
