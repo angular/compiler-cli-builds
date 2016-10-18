@@ -14,8 +14,7 @@ export declare class StaticAndDynamicReflectionCapabilities {
     constructor(staticDelegate: StaticReflector);
     isReflectionEnabled(): boolean;
     factory(type: any): Function;
-    interfaces(type: any): any[];
-    hasLifecycleHook(type: any, lcInterface: any, lcProperty: string): boolean;
+    hasLifecycleHook(type: any, lcProperty: string): boolean;
     parameters(type: any): any[][];
     annotations(type: any): any[];
     propMetadata(typeOrFunc: any): {
