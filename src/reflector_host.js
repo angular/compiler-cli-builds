@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 "use strict";
+var compiler_1 = require('@angular/compiler');
 var tsc_wrapped_1 = require('@angular/tsc-wrapped');
 var fs = require('fs');
 var path = require('path');
 var ts = require('typescript');
-var private_import_compiler_1 = require('./private_import_compiler');
 var static_reflector_1 = require('./static_reflector');
 var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 var DTS = /\.d\.ts$/;
@@ -51,7 +51,7 @@ var ReflectorHost = (function () {
     };
     ;
     ReflectorHost.prototype.normalizeAssetUrl = function (url) {
-        var assetUrl = private_import_compiler_1.AssetUrl.parse(url);
+        var assetUrl = compiler_1.AssetUrl.parse(url);
         var path = assetUrl ? assetUrl.packageName + "/" + assetUrl.modulePath : null;
         return this.getCanonicalFileName(path);
     };
