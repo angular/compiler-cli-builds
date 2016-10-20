@@ -41,6 +41,6 @@ export declare class CodeGenerator {
 }
 export interface FileMetadata {
     fileUrl: string;
-    components: StaticSymbol[];
+    directives: StaticSymbol[];
     ngModules: StaticSymbol[];
 }

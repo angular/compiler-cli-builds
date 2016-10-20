@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { ImportGenerator } from '@angular/compiler';
 import { AngularCompilerOptions, MetadataCollector, ModuleMetadata } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
-import { ImportGenerator } from './private_import_compiler';
 import { StaticReflectorHost, StaticSymbol } from './static_reflector';
 export interface ReflectorHostContext {
     fileExists(fileName: string): boolean;
