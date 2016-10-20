@@ -126,13 +126,13 @@ var StaticReflector = (function () {
             throw e;
         }
     };
-    StaticReflector.prototype.hasLifecycleHook = function (type, lcProperty) {
+    StaticReflector.prototype.hasLifecycleHook = function (type, lcInterface, lcProperty) {
         if (!(type instanceof StaticSymbol)) {
             throw new Error("hasLifecycleHook received " + JSON.stringify(type) + " which is not a StaticSymbol");
         }
         var classMetadata = this.getTypeMetadata(type);
         var members = classMetadata ? classMetadata['members'] : null;
-        var member = members && members.hasOwnProperty(lcProperty) ? members[lcProperty] : null;
+        var member = members ? members[lcProperty] : null;
         return member ? member.some(function (a) { return a['__symbolic'] == 'method'; }) : false;
     };
     StaticReflector.prototype.registerDecoratorOrConstructor = function (type, ctor) {

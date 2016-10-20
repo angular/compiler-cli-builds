@@ -64,7 +64,7 @@ export declare class StaticReflector implements ReflectorReader {
         [key: string]: any;
     };
     parameters(type: StaticSymbol): any[];
-    hasLifecycleHook(type: any, lcProperty: string): boolean;
+    hasLifecycleHook(type: any, lcInterface: any, lcProperty: string): boolean;
     private registerDecoratorOrConstructor(type, ctor);
     private registerFunction(type, fn);
     private initializeConversionMap();
