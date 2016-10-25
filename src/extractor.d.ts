@@ -26,7 +26,7 @@ export declare class Extractor {
     private metadataResolver;
     private directiveNormalizer;
     constructor(options: tsc.AngularCompilerOptions, program: ts.Program, host: ts.CompilerHost, staticReflector: StaticReflector, messageBundle: compiler.MessageBundle, reflectorHost: ReflectorHost, metadataResolver: compiler.CompileMetadataResolver, directiveNormalizer: compiler.DirectiveNormalizer);
-    private readModuleSymbols(absSourcePath);
+    private readFileMetadata(absSourcePath);
     extract(): Promise<compiler.MessageBundle>;
     static create(options: tsc.AngularCompilerOptions, translationsFormat: string, program: ts.Program, compilerHost: ts.CompilerHost, resourceLoader: compiler.ResourceLoader, reflectorHost?: ReflectorHost): Extractor;
 }

@@ -29,44 +29,56 @@ var CodeGeneratorModuleCollector = (function () {
         this.program = program;
         this.options = options;
     }
-    CodeGeneratorModuleCollector.prototype.getModuleSymbols = function () {
+    CodeGeneratorModuleCollector.prototype.getModuleSymbols = function (program) {
         var _this = this;
         // Compare with false since the default should be true
-        var skipFileNames = this.options.generateCodeForLibraries === false ? GENERATED_OR_DTS_FILES : GENERATED_FILES;
-        var ngModules = [];
-        this.program.getSourceFiles()
-            .filter(function (sourceFile) { return !skipFileNames.test(sourceFile.fileName); })
-            .forEach(function (sourceFile) {
-            var absSrcPath = _this.reflectorHost.getCanonicalFileName(sourceFile.fileName);
-            var moduleMetadata = _this.staticReflector.getModuleMetadata(absSrcPath);
-            if (!moduleMetadata) {
-                console.log("WARNING: no metadata found for " + absSrcPath);
-                return;
+        var skipFileNames = (this.options.generateCodeForLibraries === false) ?
+            GENERATED_OR_DTS_FILES :
+            GENERATED_FILES;
+        var filePaths = this.program.getSourceFiles()
+            .filter(function (sf) { return !skipFileNames.test(sf.fileName); })
+            .map(function (sf) { return _this.reflectorHost.getCanonicalFileName(sf.fileName); });
+        var fileMetas = filePaths.map(function (filePath) { return _this.readFileMetadata(filePath); });
+        var ngModules = fileMetas.reduce(function (ngModules, fileMeta) {
+            ngModules.push.apply(ngModules, fileMeta.ngModules);
+            return ngModules;
+        }, []);
+        return { fileMetas: fileMetas, ngModules: ngModules };
+    };
+    CodeGeneratorModuleCollector.prototype.readFileMetadata = function (absSourcePath) {
+        var moduleMetadata = this.staticReflector.getModuleMetadata(absSourcePath);
+        var result = { directives: [], ngModules: [], fileUrl: absSourcePath };
+        if (!moduleMetadata) {
+            console.log("WARNING: no metadata found for " + absSourcePath);
+            return result;
+        }
+        var metadata = moduleMetadata['metadata'];
+        var symbols = metadata && Object.keys(metadata);
+        if (!symbols || !symbols.length) {
+            return result;
+        }
+        var _loop_1 = function(symbol) {
+            if (metadata[symbol] && metadata[symbol].__symbolic == 'error') {
+                // Ignore symbols that are only included to record error information.
+                return "continue";
             }
-            var metadata = moduleMetadata['metadata'];
-            if (!metadata) {
-                return;
-            }
-            var _loop_1 = function(symbol) {
-                if (metadata[symbol] && metadata[symbol].__symbolic == 'error') {
-                    // Ignore symbols that are only included to record error information.
-                    return "continue";
+            var staticType = this_1.reflectorHost.findDeclaration(absSourcePath, symbol, absSourcePath);
+            var annotations = this_1.staticReflector.annotations(staticType);
+            annotations.forEach(function (annotation) {
+                if (annotation instanceof core_1.NgModule) {
+                    result.ngModules.push(staticType);
                 }
-                var staticType = _this.reflectorHost.findDeclaration(absSrcPath, symbol, absSrcPath);
-                var annotations = _this.staticReflector.annotations(staticType);
-                annotations.some(function (annotation) {
-                    if (annotation instanceof core_1.NgModule) {
-                        ngModules.push(staticType);
-                        return true;
-                    }
-                });
-            };
-            for (var _i = 0, _a = Object.keys(metadata); _i < _a.length; _i++) {
-                var symbol = _a[_i];
-                _loop_1(symbol);
-            }
-        });
-        return ngModules;
+                else if (annotation instanceof core_1.Directive) {
+                    result.directives.push(staticType);
+                }
+            });
+        };
+        var this_1 = this;
+        for (var _i = 0, symbols_1 = symbols; _i < symbols_1.length; _i++) {
+            var symbol = symbols_1[_i];
+            _loop_1(symbol);
+        }
+        return result;
     };
     return CodeGeneratorModuleCollector;
 }());
@@ -105,14 +117,19 @@ var CodeGenerator = (function () {
     };
     CodeGenerator.prototype.codegen = function () {
         var _this = this;
-        var ngModules = this.moduleCollector.getModuleSymbols();
-        return this.compiler.compileModules(ngModules).then(function (generatedModules) {
-            generatedModules.forEach(function (generatedModule) {
-                var sourceFile = _this.program.getSourceFile(generatedModule.fileUrl);
-                var emitPath = _this.calculateEmitPath(generatedModule.moduleUrl);
-                _this.host.writeFile(emitPath, PREAMBLE + generatedModule.source, false, function () { }, [sourceFile]);
+        var _a = this.moduleCollector.getModuleSymbols(this.program), fileMetas = _a.fileMetas, ngModules = _a.ngModules;
+        var analyzedNgModules = this.compiler.analyzeModules(ngModules);
+        return Promise.all(fileMetas.map(function (fileMeta) {
+            return _this.compiler
+                .compile(fileMeta.fileUrl, analyzedNgModules, fileMeta.directives, fileMeta.ngModules)
+                .then(function (generatedModules) {
+                generatedModules.forEach(function (generatedModule) {
+                    var sourceFile = _this.program.getSourceFile(fileMeta.fileUrl);
+                    var emitPath = _this.calculateEmitPath(generatedModule.moduleUrl);
+                    _this.host.writeFile(emitPath, PREAMBLE + generatedModule.source, false, function () { }, [sourceFile]);
+                });
             });
-        });
+        }));
     };
     CodeGenerator.create = function (options, cliOptions, program, compilerHost, reflectorHostContext, resourceLoader, reflectorHost) {
         resourceLoader = resourceLoader || {

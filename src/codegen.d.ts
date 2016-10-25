@@ -20,7 +20,11 @@ export declare class CodeGeneratorModuleCollector {
     private program;
     private options;
     constructor(staticReflector: StaticReflector, reflectorHost: StaticReflectorHost, program: ts.Program, options: AngularCompilerOptions);
-    getModuleSymbols(): StaticSymbol[];
+    getModuleSymbols(program: ts.Program): {
+        fileMetas: FileMetadata[];
+        ngModules: StaticSymbol[];
+    };
+    private readFileMetadata(absSourcePath);
 }
 export declare class CodeGenerator {
     private options;
@@ -34,4 +38,9 @@ export declare class CodeGenerator {
     private calculateEmitPath(filePath);
     codegen(): Promise<any>;
     static create(options: AngularCompilerOptions, cliOptions: NgcCliOptions, program: ts.Program, compilerHost: ts.CompilerHost, reflectorHostContext?: ReflectorHostContext, resourceLoader?: compiler.ResourceLoader, reflectorHost?: ReflectorHost): CodeGenerator;
+}
+export interface FileMetadata {
+    fileUrl: string;
+    directives: StaticSymbol[];
+    ngModules: StaticSymbol[];
 }
