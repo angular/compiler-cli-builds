@@ -105,7 +105,7 @@ var CodeGenerator = (function () {
         var tmplParser = new compiler.TemplateParser(expressionParser, elementSchemaRegistry, htmlParser, console, []);
         var resolver = new compiler.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), elementSchemaRegistry, staticReflector);
         // TODO(vicb): do not pass cliOptions.i18nFormat here
-        var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler.StyleCompiler(urlResolver), new compiler.ViewCompiler(config), new compiler.DirectiveWrapperCompiler(config), new compiler.NgModuleCompiler(), new compiler.TypeScriptEmitter(reflectorHost), cliOptions.locale, cliOptions.i18nFormat);
+        var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler.StyleCompiler(urlResolver), new compiler.ViewCompiler(config, elementSchemaRegistry), new compiler.DirectiveWrapperCompiler(config, expressionParser, elementSchemaRegistry, console), new compiler.NgModuleCompiler(), new compiler.TypeScriptEmitter(reflectorHost), cliOptions.locale, cliOptions.i18nFormat);
         return new CodeGenerator(options, program, compilerHost, staticReflector, offlineCompiler, reflectorHost);
     };
     return CodeGenerator;
