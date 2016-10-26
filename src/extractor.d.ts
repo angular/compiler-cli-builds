@@ -7,8 +7,6 @@
  */
 /**
  * Extract i18n messages from source code
- *
- * TODO(vicb): factorize code with the CodeGenerator
  */
 import 'reflect-metadata';
 import * as compiler from '@angular/compiler';
@@ -26,7 +24,6 @@ export declare class Extractor {
     private metadataResolver;
     private directiveNormalizer;
     constructor(options: tsc.AngularCompilerOptions, program: ts.Program, host: ts.CompilerHost, staticReflector: StaticReflector, messageBundle: compiler.MessageBundle, reflectorHost: ReflectorHost, metadataResolver: compiler.CompileMetadataResolver, directiveNormalizer: compiler.DirectiveNormalizer);
-    private readFileMetadata(absSourcePath);
     extract(): Promise<compiler.MessageBundle>;
     static create(options: tsc.AngularCompilerOptions, translationsFormat: string, program: ts.Program, compilerHost: ts.CompilerHost, resourceLoader: compiler.ResourceLoader, reflectorHost?: ReflectorHost): Extractor;
 }
