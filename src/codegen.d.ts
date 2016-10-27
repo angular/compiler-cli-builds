@@ -14,6 +14,18 @@ import { AngularCompilerOptions, NgcCliOptions } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
 import { ReflectorHost, ReflectorHostContext } from './reflector_host';
 import { StaticReflector, StaticReflectorHost, StaticSymbol } from './static_reflector';
+export declare class CodeGeneratorModuleCollector {
+    private staticReflector;
+    private reflectorHost;
+    private program;
+    private options;
+    constructor(staticReflector: StaticReflector, reflectorHost: StaticReflectorHost, program: ts.Program, options: AngularCompilerOptions);
+    getModuleSymbols(program: ts.Program): {
+        fileMetas: FileMetadata[];
+        ngModules: StaticSymbol[];
+    };
+    private readFileMetadata(absSourcePath);
+}
 export declare class CodeGenerator {
     private options;
     private program;
@@ -21,11 +33,14 @@ export declare class CodeGenerator {
     private staticReflector;
     private compiler;
     private reflectorHost;
+    private moduleCollector;
     constructor(options: AngularCompilerOptions, program: ts.Program, host: ts.CompilerHost, staticReflector: StaticReflector, compiler: compiler.OfflineCompiler, reflectorHost: StaticReflectorHost);
     private calculateEmitPath(filePath);
-    codegen(options: {
-        transitiveModules: boolean;
-    }): Promise<any>;
+    codegen(): Promise<any>;
     static create(options: AngularCompilerOptions, cliOptions: NgcCliOptions, program: ts.Program, compilerHost: ts.CompilerHost, reflectorHostContext?: ReflectorHostContext, resourceLoader?: compiler.ResourceLoader, reflectorHost?: ReflectorHost): CodeGenerator;
 }
-export declare function extractProgramSymbols(program: ts.Program, staticReflector: StaticReflector, reflectorHost: StaticReflectorHost, options: AngularCompilerOptions): StaticSymbol[];
+export interface FileMetadata {
+    fileUrl: string;
+    directives: StaticSymbol[];
+    ngModules: StaticSymbol[];
+}
