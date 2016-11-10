@@ -454,7 +454,6 @@ var StaticReflector = (function () {
                                 if (expression['line']) {
                                     message =
                                         message + " (position " + (expression['line'] + 1) + ":" + (expression['character'] + 1) + " in the original .ts file)";
-                                    throw positionalError(message, context.filePath, expression['line'], expression['character']);
                                 }
                                 throw new Error(message);
                         }
@@ -468,11 +467,7 @@ var StaticReflector = (function () {
                 return simplify(value);
             }
             catch (e) {
-                var message = e.message + ", resolving symbol " + context.name + " in " + context.filePath;
-                if (e.fileName) {
-                    throw positionalError(message, e.fileName, e.line, e.column);
-                }
-                throw new Error(message);
+                throw new Error(e.message + ", resolving symbol " + context.name + " in " + context.filePath);
             }
         }
         var result = simplifyInContext(context, value, 0);
@@ -590,12 +585,5 @@ function sameSymbol(a, b) {
 }
 function shouldIgnore(value) {
     return value && value.__symbolic == 'ignore';
-}
-function positionalError(message, fileName, line, column) {
-    var result = new Error(message);
-    result.fileName = fileName;
-    result.line = line;
-    result.column = column;
-    return result;
 }
 //# sourceMappingURL=static_reflector.js.map
