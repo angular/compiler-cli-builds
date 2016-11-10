@@ -103,9 +103,9 @@ var CodeGenerator = (function () {
         var elementSchemaRegistry = new compiler.DomElementSchemaRegistry();
         var console = new private_import_core_1.Console();
         var tmplParser = new compiler.TemplateParser(expressionParser, elementSchemaRegistry, htmlParser, console, []);
-        var resolver = new compiler.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), elementSchemaRegistry, staticReflector);
+        var resolver = new compiler.CompileMetadataResolver(new compiler.NgModuleResolver(staticReflector), new compiler.DirectiveResolver(staticReflector), new compiler.PipeResolver(staticReflector), elementSchemaRegistry, normalizer, staticReflector);
         // TODO(vicb): do not pass cliOptions.i18nFormat here
-        var offlineCompiler = new compiler.OfflineCompiler(resolver, normalizer, tmplParser, new compiler.StyleCompiler(urlResolver), new compiler.ViewCompiler(config, elementSchemaRegistry), new compiler.DirectiveWrapperCompiler(config, expressionParser, elementSchemaRegistry, console), new compiler.NgModuleCompiler(), new compiler.TypeScriptEmitter(reflectorHost), cliOptions.locale, cliOptions.i18nFormat, new compiler.AnimationParser(elementSchemaRegistry));
+        var offlineCompiler = new compiler.OfflineCompiler(resolver, tmplParser, new compiler.StyleCompiler(urlResolver), new compiler.ViewCompiler(config, elementSchemaRegistry), new compiler.DirectiveWrapperCompiler(config, expressionParser, elementSchemaRegistry, console), new compiler.NgModuleCompiler(), new compiler.TypeScriptEmitter(reflectorHost), cliOptions.locale, cliOptions.i18nFormat, new compiler.AnimationParser(elementSchemaRegistry));
         return new CodeGenerator(options, program, compilerHost, staticReflector, offlineCompiler, reflectorHost);
     };
     return CodeGenerator;
