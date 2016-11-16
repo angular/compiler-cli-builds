@@ -30,10 +30,8 @@ var Extractor = (function () {
     Extractor.prototype.extract = function () {
         var _this = this;
         var programSymbols = codegen_1.extractProgramSymbols(this.program, this.staticReflector, this.reflectorHost, this.options);
-        return compiler
-            .analyzeNgModules(programSymbols, { transitiveModules: true }, this.metadataResolver)
-            .then(function (_a) {
-            var files = _a.files;
+        var _a = compiler.analyzeAndValidateNgModules(programSymbols, { transitiveModules: true }, this.metadataResolver), ngModules = _a.ngModules, files = _a.files;
+        return compiler.loadNgModuleDirectives(ngModules).then(function () {
             var errors = [];
             files.forEach(function (file) {
                 var compMetas = [];
