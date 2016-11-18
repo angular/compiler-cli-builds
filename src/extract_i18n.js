@@ -6,16 +6,7 @@ var tsc = require('@angular/tsc-wrapped');
 var path = require('path');
 var extractor_1 = require('./extractor');
 function extract(ngOptions, cliOptions, program, host) {
-    var resourceLoader = {
-        get: function (s) {
-            if (!host.fileExists(s)) {
-                // TODO: We should really have a test for error cases like this!
-                throw new Error("Compilation failed. Resource file not found: " + s);
-            }
-            return Promise.resolve(host.readFile(s));
-        }
-    };
-    var extractor = extractor_1.Extractor.create(ngOptions, cliOptions.i18nFormat, program, host, resourceLoader);
+    var extractor = extractor_1.Extractor.create(ngOptions, cliOptions.i18nFormat, program, host);
     var bundlePromise = extractor.extract();
     return (bundlePromise).then(function (messageBundle) {
         var ext;
