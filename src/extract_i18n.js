@@ -20,8 +20,9 @@ function extract(ngOptions, cliOptions, program, host) {
             case 'xliff':
             case 'xlf':
             default:
+                var htmlParser = new compiler.I18NHtmlParser(new compiler.HtmlParser());
                 ext = 'xlf';
-                serializer = new compiler.Xliff();
+                serializer = new compiler.Xliff(htmlParser, compiler.DEFAULT_INTERPOLATION_CONFIG);
                 break;
         }
         var dstPath = path.join(ngOptions.genDir, "messages." + ext);
