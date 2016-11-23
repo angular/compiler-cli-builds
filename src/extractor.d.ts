@@ -12,12 +12,17 @@ import 'reflect-metadata';
 import * as compiler from '@angular/compiler';
 import * as tsc from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
-import { CompilerHost } from './compiler_host';
+import { ReflectorHost } from './reflector_host';
+import { StaticReflector } from './static_reflector';
 export declare class Extractor {
-    private ngExtractor;
-    private ngCompilerHost;
+    private options;
     private program;
-    constructor(ngExtractor: compiler.Extractor, ngCompilerHost: CompilerHost, program: ts.Program);
+    host: ts.CompilerHost;
+    private staticReflector;
+    private messageBundle;
+    private reflectorHost;
+    private metadataResolver;
+    constructor(options: tsc.AngularCompilerOptions, program: ts.Program, host: ts.CompilerHost, staticReflector: StaticReflector, messageBundle: compiler.MessageBundle, reflectorHost: ReflectorHost, metadataResolver: compiler.CompileMetadataResolver);
     extract(): Promise<compiler.MessageBundle>;
-    static create(options: tsc.AngularCompilerOptions, translationsFormat: string, program: ts.Program, tsCompilerHost: ts.CompilerHost, ngCompilerHost?: CompilerHost): Extractor;
+    static create(options: tsc.AngularCompilerOptions, translationsFormat: string, program: ts.Program, compilerHost: ts.CompilerHost, resourceLoader: compiler.ResourceLoader, reflectorHost?: ReflectorHost): Extractor;
 }

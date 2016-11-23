@@ -13,22 +13,22 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var path = require('path');
 var ts = require('typescript');
-var compiler_host_1 = require('./compiler_host');
+var reflector_host_1 = require('./reflector_host');
 var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 var DTS = /\.d\.ts$/;
 /**
- * This version of the AotCompilerHost expects that the program will be compiled
+ * This version of the reflector host expects that the program will be compiled
  * and executed with a "path mapped" directory structure, where generated files
  * are in a parallel tree with the sources, and imported using a `./` relative
  * import. This requires using TS `rootDirs` option and also teaching the module
  * loader what to do.
  */
-var PathMappedCompilerHost = (function (_super) {
-    __extends(PathMappedCompilerHost, _super);
-    function PathMappedCompilerHost(program, compilerHost, options, context) {
+var PathMappedReflectorHost = (function (_super) {
+    __extends(PathMappedReflectorHost, _super);
+    function PathMappedReflectorHost(program, compilerHost, options, context) {
         _super.call(this, program, compilerHost, options, context);
     }
-    PathMappedCompilerHost.prototype.getCanonicalFileName = function (fileName) {
+    PathMappedReflectorHost.prototype.getCanonicalFileName = function (fileName) {
         if (!fileName)
             return fileName;
         // NB: the rootDirs should have been sorted longest-first
@@ -40,14 +40,7 @@ var PathMappedCompilerHost = (function (_super) {
         }
         return fileName;
     };
-    PathMappedCompilerHost.prototype.moduleNameToFileName = function (m, containingFile) {
-        if (!containingFile || !containingFile.length) {
-            if (m.indexOf('.') === 0) {
-                throw new Error('Resolution of relative paths requires a containing file.');
-            }
-            // Any containing file gives the same result for absolute imports
-            containingFile = this.getCanonicalFileName(path.join(this.basePath, 'index.ts'));
-        }
+    PathMappedReflectorHost.prototype.resolve = function (m, containingFile) {
         for (var _i = 0, _a = this.options.rootDirs || ['']; _i < _a.length; _i++) {
             var root = _a[_i];
             var rootedContainingFile = path.join(root, containingFile);
@@ -56,7 +49,7 @@ var PathMappedCompilerHost = (function (_super) {
                 if (this.options.traceResolution) {
                     console.log('resolve', m, containingFile, '=>', resolved.resolvedFileName);
                 }
-                return this.getCanonicalFileName(resolved.resolvedFileName);
+                return resolved.resolvedFileName;
             }
         }
     };
@@ -66,8 +59,10 @@ var PathMappedCompilerHost = (function (_super) {
      * Relativize the paths by checking candidate prefixes of the absolute path, to see if
      * they are resolvable by the moduleResolution strategy from the CompilerHost.
      */
-    PathMappedCompilerHost.prototype.fileNameToModuleName = function (importedFile, containingFile) {
+    PathMappedReflectorHost.prototype.getImportPath = function (containingFile, importedFile) {
         var _this = this;
+        importedFile = this.resolveAssetUrl(importedFile, containingFile);
+        containingFile = this.resolveAssetUrl(containingFile, '');
         if (this.options.traceResolution) {
             console.log('getImportPath from containingFile', containingFile, 'to importedFile', importedFile);
         }
@@ -82,7 +77,7 @@ var PathMappedCompilerHost = (function (_super) {
             }
         }
         var resolvable = function (candidate) {
-            var resolved = _this.moduleNameToFileName(candidate, importedFile);
+            var resolved = _this.getCanonicalFileName(_this.resolve(candidate, importedFile));
             return resolved && resolved.replace(EXT, '') === importedFile.replace(EXT, '');
         };
         var importModuleName = importedFile.replace(EXT, '');
@@ -107,7 +102,7 @@ var PathMappedCompilerHost = (function (_super) {
         }
         throw new Error("Unable to find any resolvable import for " + importedFile + " relative to " + containingFile);
     };
-    PathMappedCompilerHost.prototype.getMetadataFor = function (filePath) {
+    PathMappedReflectorHost.prototype.getMetadataFor = function (filePath) {
         for (var _i = 0, _a = this.options.rootDirs || []; _i < _a.length; _i++) {
             var root = _a[_i];
             var rootedPath = path.join(root, filePath);
@@ -120,18 +115,21 @@ var PathMappedCompilerHost = (function (_super) {
             if (DTS.test(rootedPath)) {
                 var metadataPath = rootedPath.replace(DTS, '.metadata.json');
                 if (this.context.fileExists(metadataPath)) {
-                    return this.readMetadata(metadataPath, rootedPath);
+                    var metadata = this.readMetadata(metadataPath);
+                    return (Array.isArray(metadata) && metadata.length == 0) ? undefined : metadata;
                 }
             }
             else {
-                var sf = this.getSourceFile(rootedPath);
-                sf.fileName = sf.fileName;
-                var metadata = this.metadataCollector.getMetadata(sf);
-                return metadata ? [metadata] : [];
+                var sf = this.program.getSourceFile(rootedPath);
+                if (!sf) {
+                    throw new Error("Source file " + rootedPath + " not present in program.");
+                }
+                sf.fileName = this.getCanonicalFileName(sf.fileName);
+                return this.metadataCollector.getMetadata(sf);
             }
         }
     };
-    return PathMappedCompilerHost;
-}(compiler_host_1.CompilerHost));
-exports.PathMappedCompilerHost = PathMappedCompilerHost;
-//# sourceMappingURL=path_mapped_compiler_host.js.map
+    return PathMappedReflectorHost;
+}(reflector_host_1.ReflectorHost));
+exports.PathMappedReflectorHost = PathMappedReflectorHost;
+//# sourceMappingURL=path_mapped_reflector_host.js.map
