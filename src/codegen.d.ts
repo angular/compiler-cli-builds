@@ -12,16 +12,20 @@
 import * as compiler from '@angular/compiler';
 import { AngularCompilerOptions, NgcCliOptions } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
-import { CompilerHost, CompilerHostContext } from './compiler_host';
+import { ReflectorHost, ReflectorHostContext } from './reflector_host';
+import { StaticReflector, StaticReflectorHost, StaticSymbol } from './static_reflector';
 export declare class CodeGenerator {
     private options;
     private program;
     host: ts.CompilerHost;
+    private staticReflector;
     private compiler;
-    private ngCompilerHost;
-    constructor(options: AngularCompilerOptions, program: ts.Program, host: ts.CompilerHost, compiler: compiler.AotCompiler, ngCompilerHost: CompilerHost);
+    private reflectorHost;
+    constructor(options: AngularCompilerOptions, program: ts.Program, host: ts.CompilerHost, staticReflector: StaticReflector, compiler: compiler.OfflineCompiler, reflectorHost: StaticReflectorHost);
     private calculateEmitPath(filePath);
-    codegen(): Promise<any>;
-    static create(options: AngularCompilerOptions, cliOptions: NgcCliOptions, program: ts.Program, tsCompilerHost: ts.CompilerHost, compilerHostContext?: CompilerHostContext, ngCompilerHost?: CompilerHost): CodeGenerator;
+    codegen(options: {
+        transitiveModules: boolean;
+    }): Promise<any>;
+    static create(options: AngularCompilerOptions, cliOptions: NgcCliOptions, program: ts.Program, compilerHost: ts.CompilerHost, reflectorHostContext?: ReflectorHostContext, resourceLoader?: compiler.ResourceLoader, reflectorHost?: ReflectorHost): CodeGenerator;
 }
-export declare function excludeFilePattern(options: AngularCompilerOptions): RegExp;
+export declare function extractProgramSymbols(program: ts.Program, staticReflector: StaticReflector, reflectorHost: StaticReflectorHost, options: AngularCompilerOptions): StaticSymbol[];
