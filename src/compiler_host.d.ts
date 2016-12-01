@@ -8,24 +8,20 @@
 import { AotCompilerHost } from '@angular/compiler';
 import { AngularCompilerOptions, MetadataCollector, ModuleMetadata } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
-export interface CompilerHostContext {
-    fileExists(fileName: string): boolean;
-    directoryExists(directoryName: string): boolean;
-    readFile(fileName: string): string;
+export interface CompilerHostContext extends ts.ModuleResolutionHost {
     readResource(fileName: string): Promise<string>;
     assumeFileExists(fileName: string): void;
 }
 export declare class CompilerHost implements AotCompilerHost {
     protected program: ts.Program;
-    protected compilerHost: ts.CompilerHost;
     protected options: AngularCompilerOptions;
-    protected metadataCollector: MetadataCollector;
     protected context: CompilerHostContext;
+    protected metadataCollector: MetadataCollector;
     private isGenDirChildOfRootDir;
     protected basePath: string;
     private genDir;
     private resolverCache;
-    constructor(program: ts.Program, compilerHost: ts.CompilerHost, options: AngularCompilerOptions, context?: CompilerHostContext);
+    constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext);
     getCanonicalFileName(fileName: string): string;
     moduleNameToFileName(m: string, containingFile: string): string;
     /**
@@ -54,13 +50,23 @@ export declare class CompilerHost implements AotCompilerHost {
     readMetadata(filePath: string, dtsFilePath: string): ModuleMetadata[];
     loadResource(filePath: string): Promise<string>;
 }
-export declare class NodeCompilerHostContext implements CompilerHostContext {
+export declare class CompilerHostContextAdapter {
+    protected assumedExists: {
+        [fileName: string]: boolean;
+    };
+    assumeFileExists(fileName: string): void;
+}
+export declare class ModuleResolutionHostAdapter extends CompilerHostContextAdapter implements CompilerHostContext {
     private host;
-    constructor(host: ts.CompilerHost);
-    private assumedExists;
+    directoryExists: ((directoryName: string) => boolean) | undefined;
+    constructor(host: ts.ModuleResolutionHost);
+    fileExists(fileName: string): boolean;
+    readFile(fileName: string): string;
+    readResource(s: string): Promise<string>;
+}
+export declare class NodeCompilerHostContext extends CompilerHostContextAdapter implements CompilerHostContext {
     fileExists(fileName: string): boolean;
     directoryExists(directoryName: string): boolean;
     readFile(fileName: string): string;
     readResource(s: string): Promise<string>;
-    assumeFileExists(fileName: string): void;
 }

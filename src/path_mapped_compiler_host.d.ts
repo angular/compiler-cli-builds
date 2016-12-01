@@ -9,7 +9,7 @@ import { CompilerHost, CompilerHostContext } from './compiler_host';
  * loader what to do.
  */
 export declare class PathMappedCompilerHost extends CompilerHost {
-    constructor(program: ts.Program, compilerHost: ts.CompilerHost, options: AngularCompilerOptions, context?: CompilerHostContext);
+    constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext);
     getCanonicalFileName(fileName: string): string;
     moduleNameToFileName(m: string, containingFile: string): string;
     /**

@@ -62,9 +62,9 @@ var CodeGenerator = (function () {
     CodeGenerator.create = function (options, cliOptions, program, tsCompilerHost, compilerHostContext, ngCompilerHost) {
         if (!ngCompilerHost) {
             var usePathMapping = !!options.rootDirs && options.rootDirs.length > 0;
-            ngCompilerHost = usePathMapping ?
-                new path_mapped_compiler_host_1.PathMappedCompilerHost(program, tsCompilerHost, options, compilerHostContext) :
-                new compiler_host_1.CompilerHost(program, tsCompilerHost, options, compilerHostContext);
+            var context = compilerHostContext || new compiler_host_1.ModuleResolutionHostAdapter(tsCompilerHost);
+            ngCompilerHost = usePathMapping ? new path_mapped_compiler_host_1.PathMappedCompilerHost(program, options, context) :
+                new compiler_host_1.CompilerHost(program, options, context);
         }
         var transFile = cliOptions.i18nFile;
         var locale = cliOptions.locale;

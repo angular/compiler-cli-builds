@@ -6,6 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var tsc_wrapped_1 = require('@angular/tsc-wrapped');
 var fs = require('fs');
 var path = require('path');
@@ -15,16 +20,15 @@ var DTS = /\.d\.ts$/;
 var NODE_MODULES = '/node_modules/';
 var IS_GENERATED = /\.(ngfactory|css(\.shim)?)$/;
 var CompilerHost = (function () {
-    function CompilerHost(program, compilerHost, options, context) {
+    function CompilerHost(program, options, context) {
         this.program = program;
-        this.compilerHost = compilerHost;
         this.options = options;
+        this.context = context;
         this.metadataCollector = new tsc_wrapped_1.MetadataCollector();
         this.resolverCache = new Map();
         // normalize the path so that it never ends with '/'.
         this.basePath = path.normalize(path.join(this.options.basePath, '.')).replace(/\\/g, '/');
         this.genDir = path.normalize(path.join(this.options.genDir, '.')).replace(/\\/g, '/');
-        this.context = context || new NodeCompilerHostContext(compilerHost);
         var genPath = path.relative(this.basePath, this.genDir);
         this.isGenDirChildOfRootDir = genPath === '' || !genPath.startsWith('..');
     }
@@ -62,7 +66,7 @@ var CompilerHost = (function () {
     CompilerHost.prototype.fileNameToModuleName = function (importedFile, containingFile) {
         // If a file does not yet exist (because we compile it later), we still need to
         // assume it exists it so that the `resolve` method works!
-        if (!this.compilerHost.fileExists(importedFile)) {
+        if (!this.context.fileExists(importedFile)) {
             this.context.assumeFileExists(importedFile);
         }
         containingFile = this.rewriteGenDirPath(containingFile);
@@ -195,13 +199,44 @@ var CompilerHost = (function () {
     return CompilerHost;
 }());
 exports.CompilerHost = CompilerHost;
-var NodeCompilerHostContext = (function () {
-    function NodeCompilerHostContext(host) {
-        this.host = host;
+var CompilerHostContextAdapter = (function () {
+    function CompilerHostContextAdapter() {
         this.assumedExists = {};
     }
-    NodeCompilerHostContext.prototype.fileExists = function (fileName) {
+    CompilerHostContextAdapter.prototype.assumeFileExists = function (fileName) { this.assumedExists[fileName] = true; };
+    return CompilerHostContextAdapter;
+}());
+exports.CompilerHostContextAdapter = CompilerHostContextAdapter;
+var ModuleResolutionHostAdapter = (function (_super) {
+    __extends(ModuleResolutionHostAdapter, _super);
+    function ModuleResolutionHostAdapter(host) {
+        _super.call(this);
+        this.host = host;
+        if (host.directoryExists) {
+            this.directoryExists = function (directoryName) { return host.directoryExists(directoryName); };
+        }
+    }
+    ModuleResolutionHostAdapter.prototype.fileExists = function (fileName) {
         return this.assumedExists[fileName] || this.host.fileExists(fileName);
+    };
+    ModuleResolutionHostAdapter.prototype.readFile = function (fileName) { return this.host.readFile(fileName); };
+    ModuleResolutionHostAdapter.prototype.readResource = function (s) {
+        if (!this.host.fileExists(s)) {
+            // TODO: We should really have a test for error cases like this!
+            throw new Error("Compilation failed. Resource file not found: " + s);
+        }
+        return Promise.resolve(this.host.readFile(s));
+    };
+    return ModuleResolutionHostAdapter;
+}(CompilerHostContextAdapter));
+exports.ModuleResolutionHostAdapter = ModuleResolutionHostAdapter;
+var NodeCompilerHostContext = (function (_super) {
+    __extends(NodeCompilerHostContext, _super);
+    function NodeCompilerHostContext() {
+        _super.apply(this, arguments);
+    }
+    NodeCompilerHostContext.prototype.fileExists = function (fileName) {
+        return this.assumedExists[fileName] || fs.existsSync(fileName);
     };
     NodeCompilerHostContext.prototype.directoryExists = function (directoryName) {
         try {
@@ -213,14 +248,13 @@ var NodeCompilerHostContext = (function () {
     };
     NodeCompilerHostContext.prototype.readFile = function (fileName) { return fs.readFileSync(fileName, 'utf8'); };
     NodeCompilerHostContext.prototype.readResource = function (s) {
-        if (!this.host.fileExists(s)) {
+        if (!this.fileExists(s)) {
             // TODO: We should really have a test for error cases like this!
             throw new Error("Compilation failed. Resource file not found: " + s);
         }
-        return Promise.resolve(this.host.readFile(s));
+        return Promise.resolve(this.readFile(s));
     };
-    NodeCompilerHostContext.prototype.assumeFileExists = function (fileName) { this.assumedExists[fileName] = true; };
     return NodeCompilerHostContext;
-}());
+}(CompilerHostContextAdapter));
 exports.NodeCompilerHostContext = NodeCompilerHostContext;
 //# sourceMappingURL=compiler_host.js.map

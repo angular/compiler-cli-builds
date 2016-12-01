@@ -16,6 +16,7 @@ var codegen_1 = require('./src/codegen');
 exports.CodeGenerator = codegen_1.CodeGenerator;
 var compiler_host_1 = require('./src/compiler_host');
 exports.CompilerHost = compiler_host_1.CompilerHost;
+exports.ModuleResolutionHostAdapter = compiler_host_1.ModuleResolutionHostAdapter;
 exports.NodeCompilerHostContext = compiler_host_1.NodeCompilerHostContext;
 var extractor_1 = require('./src/extractor');
 exports.Extractor = extractor_1.Extractor;
@@ -24,5 +25,5 @@ var core_1 = require('@angular/core');
 /**
  * @stable
  */
-exports.VERSION = new core_1.Version('2.3.0-rc.0-5908b66');
+exports.VERSION = new core_1.Version('2.3.0-rc.0-25a6da2');
 //# sourceMappingURL=index.js.map

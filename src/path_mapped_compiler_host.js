@@ -25,8 +25,8 @@ var DTS = /\.d\.ts$/;
  */
 var PathMappedCompilerHost = (function (_super) {
     __extends(PathMappedCompilerHost, _super);
-    function PathMappedCompilerHost(program, compilerHost, options, context) {
-        _super.call(this, program, compilerHost, options, context);
+    function PathMappedCompilerHost(program, options, context) {
+        _super.call(this, program, options, context);
     }
     PathMappedCompilerHost.prototype.getCanonicalFileName = function (fileName) {
         if (!fileName)
@@ -111,7 +111,7 @@ var PathMappedCompilerHost = (function (_super) {
         for (var _i = 0, _a = this.options.rootDirs || []; _i < _a.length; _i++) {
             var root = _a[_i];
             var rootedPath = path.join(root, filePath);
-            if (!this.compilerHost.fileExists(rootedPath)) {
+            if (!this.context.fileExists(rootedPath)) {
                 // If the file doesn't exists then we cannot return metadata for the file.
                 // This will occur if the user refernced a declared module for which no file
                 // exists for the module (i.e. jQuery or angularjs).

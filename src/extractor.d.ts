@@ -19,5 +19,5 @@ export declare class Extractor {
     private program;
     constructor(ngExtractor: compiler.Extractor, ngCompilerHost: CompilerHost, program: ts.Program);
     extract(): Promise<compiler.MessageBundle>;
-    static create(options: tsc.AngularCompilerOptions, translationsFormat: string, program: ts.Program, tsCompilerHost: ts.CompilerHost, ngCompilerHost?: CompilerHost): Extractor;
+    static create(options: tsc.AngularCompilerOptions, translationsFormat: string, program: ts.Program, moduleResolverHost: ts.ModuleResolutionHost, ngCompilerHost?: CompilerHost): Extractor;
 }

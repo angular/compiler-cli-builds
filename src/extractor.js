@@ -24,9 +24,10 @@ var Extractor = (function () {
         var _this = this;
         return this.ngExtractor.extract(this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); }));
     };
-    Extractor.create = function (options, translationsFormat, program, tsCompilerHost, ngCompilerHost) {
+    Extractor.create = function (options, translationsFormat, program, moduleResolverHost, ngCompilerHost) {
         if (!ngCompilerHost)
-            ngCompilerHost = new compiler_host_1.CompilerHost(program, tsCompilerHost, options);
+            ngCompilerHost =
+                new compiler_host_1.CompilerHost(program, options, new compiler_host_1.ModuleResolutionHostAdapter(moduleResolverHost));
         var ngExtractor = compiler.Extractor.create(ngCompilerHost, { excludeFilePattern: codegen_1.excludeFilePattern(options) }).extractor;
         return new Extractor(ngExtractor, ngCompilerHost, program);
     };
