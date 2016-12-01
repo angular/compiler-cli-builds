@@ -49,6 +49,8 @@ export declare class CompilerHost implements AotCompilerHost {
     getMetadataFor(filePath: string): ModuleMetadata[];
     readMetadata(filePath: string, dtsFilePath: string): ModuleMetadata[];
     loadResource(filePath: string): Promise<string>;
+    loadSummary(filePath: string): string;
+    getOutputFileName(sourceFilePath: string): string;
 }
 export declare class CompilerHostContextAdapter {
     protected assumedExists: {

@@ -196,6 +196,10 @@ var CompilerHost = (function () {
         }
     };
     CompilerHost.prototype.loadResource = function (filePath) { return this.context.readResource(filePath); };
+    CompilerHost.prototype.loadSummary = function (filePath) { return this.context.readFile(filePath); };
+    CompilerHost.prototype.getOutputFileName = function (sourceFilePath) {
+        return sourceFilePath.replace(EXT, '') + '.d.ts';
+    };
     return CompilerHost;
 }());
 exports.CompilerHost = CompilerHost;
