@@ -10,8 +10,4 @@ export { CodeGenerator } from './src/codegen';
 export { CompilerHost, CompilerHostContext, ModuleResolutionHostAdapter, NodeCompilerHostContext } from './src/compiler_host';
 export { Extractor } from './src/extractor';
 export * from '@angular/tsc-wrapped';
-import { Version } from '@angular/core';
-/**
- * @stable
- */
-export declare const VERSION: Version;
+export { VERSION } from './src/version';

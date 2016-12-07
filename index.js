@@ -21,9 +21,6 @@ exports.NodeCompilerHostContext = compiler_host_1.NodeCompilerHostContext;
 var extractor_1 = require('./src/extractor');
 exports.Extractor = extractor_1.Extractor;
 __export(require('@angular/tsc-wrapped'));
-var core_1 = require('@angular/core');
-/**
- * @stable
- */
-exports.VERSION = new core_1.Version('2.3.0-rc.0-986abbe');
+var version_1 = require('./src/version');
+exports.VERSION = version_1.VERSION;
 //# sourceMappingURL=index.js.map
