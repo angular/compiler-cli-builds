@@ -176,13 +176,15 @@ var CompilerHost = (function () {
                 for (var prop in v1Metadata.metadata) {
                     v2Metadata.metadata[prop] = v1Metadata.metadata[prop];
                 }
-                var sourceText = this.context.readFile(dtsFilePath);
                 var exports_1 = this.metadataCollector.getMetadata(this.getSourceFile(dtsFilePath));
                 if (exports_1) {
                     for (var prop in exports_1.metadata) {
                         if (!v2Metadata.metadata[prop]) {
                             v2Metadata.metadata[prop] = exports_1.metadata[prop];
                         }
+                    }
+                    if (exports_1.exports) {
+                        v2Metadata.exports = exports_1.exports;
                     }
                 }
                 metadatas_1.push(v2Metadata);
