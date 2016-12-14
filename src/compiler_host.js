@@ -18,7 +18,7 @@ var ts = require('typescript');
 var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 var DTS = /\.d\.ts$/;
 var NODE_MODULES = '/node_modules/';
-var IS_GENERATED = /\.(ngfactory|css(\.shim)?)$/;
+var IS_GENERATED = /\.(ngfactory|ngstyle)$/;
 var CompilerHost = (function () {
     function CompilerHost(program, options, context) {
         this.program = program;
