@@ -11,4 +11,3 @@ export { CompilerHost, CompilerHostContext, ModuleResolutionHostAdapter, NodeCom
 export { Extractor } from './src/extractor';
 export * from '@angular/tsc-wrapped';
 export { VERSION } from './src/version';
-export { NgTools_InternalApi_NG_2 as __NGTOOLS_PRIVATE_API_2 } from './src/ngtools_api';
