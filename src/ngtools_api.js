@@ -70,7 +70,10 @@ var NgTools_InternalApi_NG_2 = (function () {
         var ngCompilerHost = usePathMapping ?
             new path_mapped_compiler_host_1.PathMappedCompilerHost(program, angularCompilerOptions, moduleResolutionHost) :
             new compiler_host_1.CompilerHost(program, angularCompilerOptions, moduleResolutionHost);
-        var staticReflector = new compiler_1.StaticReflector(ngCompilerHost);
+        var symbolCache = new compiler_1.StaticSymbolCache();
+        var summaryResolver = new compiler_1.AotSummaryResolver(ngCompilerHost, symbolCache);
+        var symbolResolver = new compiler_1.StaticSymbolResolver(ngCompilerHost, symbolCache, summaryResolver);
+        var staticReflector = new compiler_1.StaticReflector(symbolResolver);
         var routeMap = ngtools_impl_1.listLazyRoutesOfModule(options.entryModule, ngCompilerHost, staticReflector);
         return Object.keys(routeMap).reduce(function (acc, route) {
             acc[route] = routeMap[route].absoluteFilePath;

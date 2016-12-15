@@ -19,8 +19,11 @@ var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 var DTS = /\.d\.ts$/;
 var NODE_MODULES = '/node_modules/';
 var IS_GENERATED = /\.(ngfactory|ngstyle)$/;
+var GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$/;
+var GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$/;
 var CompilerHost = (function () {
     function CompilerHost(program, options, context) {
+        var _this = this;
         this.program = program;
         this.options = options;
         this.context = context;
@@ -31,6 +34,24 @@ var CompilerHost = (function () {
         this.genDir = path.normalize(path.join(this.options.genDir, '.')).replace(/\\/g, '/');
         var genPath = path.relative(this.basePath, this.genDir);
         this.isGenDirChildOfRootDir = genPath === '' || !genPath.startsWith('..');
+        this.resolveModuleNameHost = Object.create(this.context);
+        // When calling ts.resolveModuleName,
+        // additional allow checks for .d.ts files to be done based on
+        // checks for .ngsummary.json files,
+        // so that our codegen depends on fewer inputs and requires to be called
+        // less often.
+        // This is needed as we use ts.resolveModuleName in reflector_host
+        // and it should be able to resolve summary file names.
+        this.resolveModuleNameHost.fileExists = function (fileName) {
+            if (_this.context.fileExists(fileName)) {
+                return true;
+            }
+            if (DTS.test(fileName)) {
+                var base = fileName.substring(0, fileName.length - 5);
+                return _this.context.fileExists(base + '.ngsummary.json');
+            }
+            return false;
+        };
     }
     // We use absolute paths on disk as canonical.
     CompilerHost.prototype.getCanonicalFileName = function (fileName) { return fileName; };
@@ -43,7 +64,7 @@ var CompilerHost = (function () {
             containingFile = this.getCanonicalFileName(path.join(this.basePath, 'index.ts'));
         }
         m = m.replace(EXT, '');
-        var resolved = ts.resolveModuleName(m, containingFile.replace(/\\/g, '/'), this.options, this.context)
+        var resolved = ts.resolveModuleName(m, containingFile.replace(/\\/g, '/'), this.options, this.resolveModuleNameHost)
             .resolvedModule;
         return resolved ? this.getCanonicalFileName(resolved.resolvedFileName) : null;
     };
@@ -198,9 +219,17 @@ var CompilerHost = (function () {
         }
     };
     CompilerHost.prototype.loadResource = function (filePath) { return this.context.readResource(filePath); };
-    CompilerHost.prototype.loadSummary = function (filePath) { return this.context.readFile(filePath); };
+    CompilerHost.prototype.loadSummary = function (filePath) {
+        if (this.context.fileExists(filePath)) {
+            return this.context.readFile(filePath);
+        }
+    };
     CompilerHost.prototype.getOutputFileName = function (sourceFilePath) {
         return sourceFilePath.replace(EXT, '') + '.d.ts';
+    };
+    CompilerHost.prototype.isSourceFile = function (filePath) {
+        var excludeRegex = this.options.generateCodeForLibraries === false ? GENERATED_OR_DTS_FILES : GENERATED_FILES;
+        return !excludeRegex.test(filePath);
     };
     return CompilerHost;
 }());

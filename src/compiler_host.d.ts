@@ -21,9 +21,10 @@ export declare class CompilerHost implements AotCompilerHost {
     protected basePath: string;
     private genDir;
     private resolverCache;
+    protected resolveModuleNameHost: CompilerHostContext;
     constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext);
     getCanonicalFileName(fileName: string): string;
-    moduleNameToFileName(m: string, containingFile: string): string;
+    moduleNameToFileName(m: string, containingFile: string): string | null;
     /**
      * We want a moduleId that will appear in import statements in the generated code.
      * These need to be in a form that system.js can load, so absolute file paths don't work.
@@ -49,8 +50,9 @@ export declare class CompilerHost implements AotCompilerHost {
     getMetadataFor(filePath: string): ModuleMetadata[];
     readMetadata(filePath: string, dtsFilePath: string): ModuleMetadata[];
     loadResource(filePath: string): Promise<string>;
-    loadSummary(filePath: string): string;
+    loadSummary(filePath: string): string | null;
     getOutputFileName(sourceFilePath: string): string;
+    isSourceFile(filePath: string): boolean;
 }
 export declare class CompilerHostContextAdapter {
     protected assumedExists: {

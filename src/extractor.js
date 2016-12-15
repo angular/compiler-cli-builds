@@ -12,7 +12,6 @@
 // Must be imported first, because angular2 decorators throws on load.
 require('reflect-metadata');
 var compiler = require('@angular/compiler');
-var codegen_1 = require('./codegen');
 var compiler_host_1 = require('./compiler_host');
 var Extractor = (function () {
     function Extractor(ngExtractor, ngCompilerHost, program) {
@@ -28,7 +27,7 @@ var Extractor = (function () {
         if (!ngCompilerHost)
             ngCompilerHost =
                 new compiler_host_1.CompilerHost(program, options, new compiler_host_1.ModuleResolutionHostAdapter(moduleResolverHost));
-        var ngExtractor = compiler.Extractor.create(ngCompilerHost, { excludeFilePattern: codegen_1.excludeFilePattern(options) }).extractor;
+        var ngExtractor = compiler.Extractor.create(ngCompilerHost).extractor;
         return new Extractor(ngExtractor, ngCompilerHost, program);
     };
     return Extractor;
