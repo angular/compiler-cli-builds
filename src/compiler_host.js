@@ -167,6 +167,12 @@ var CompilerHost = (function () {
             if (this.context.fileExists(metadataPath)) {
                 return this.readMetadata(metadataPath, filePath);
             }
+            else {
+                // If there is a .d.ts file but no metadata file we need to produce a
+                // v3 metadata from the .d.ts file as v3 includes the exports we need
+                // to resolve symbols.
+                return [this.upgradeVersion1Metadata({ '__symbolic': 'module', 'version': 1, 'metadata': {} }, filePath)];
+            }
         }
         else {
             var sf = this.getSourceFile(filePath);
@@ -184,31 +190,10 @@ var CompilerHost = (function () {
             var metadatas_1 = metadataOrMetadatas ?
                 (Array.isArray(metadataOrMetadatas) ? metadataOrMetadatas : [metadataOrMetadatas]) :
                 [];
-            var v1Metadata = metadatas_1.find(function (m) { return m['version'] === 1; });
-            var v3Metadata = metadatas_1.find(function (m) { return m['version'] === 3; });
+            var v1Metadata = metadatas_1.find(function (m) { return m.version === 1; });
+            var v3Metadata = metadatas_1.find(function (m) { return m.version === 3; });
             if (!v3Metadata && v1Metadata) {
-                // patch up v1 to v3 by merging the metadata with metadata collected from the d.ts file
-                // as the only difference between the versions is whether all exports are contained in
-                // the metadata and the `extends` clause.
-                v3Metadata = { '__symbolic': 'module', 'version': 3, 'metadata': {} };
-                if (v1Metadata.exports) {
-                    v3Metadata.exports = v1Metadata.exports;
-                }
-                for (var prop in v1Metadata.metadata) {
-                    v3Metadata.metadata[prop] = v1Metadata.metadata[prop];
-                }
-                var exports_1 = this.metadataCollector.getMetadata(this.getSourceFile(dtsFilePath));
-                if (exports_1) {
-                    for (var prop in exports_1.metadata) {
-                        if (!v3Metadata.metadata[prop]) {
-                            v3Metadata.metadata[prop] = exports_1.metadata[prop];
-                        }
-                    }
-                    if (exports_1.exports) {
-                        v3Metadata.exports = exports_1.exports;
-                    }
-                }
-                metadatas_1.push(v3Metadata);
+                metadatas_1.push(this.upgradeVersion1Metadata(v1Metadata, dtsFilePath));
             }
             this.resolverCache.set(filePath, metadatas_1);
             return metadatas_1;
@@ -217,6 +202,30 @@ var CompilerHost = (function () {
             console.error("Failed to read JSON file " + filePath);
             throw e;
         }
+    };
+    CompilerHost.prototype.upgradeVersion1Metadata = function (v1Metadata, dtsFilePath) {
+        // patch up v1 to v3 by merging the metadata with metadata collected from the d.ts file
+        // as the only difference between the versions is whether all exports are contained in
+        // the metadata and the `extends` clause.
+        var v3Metadata = { '__symbolic': 'module', 'version': 3, 'metadata': {} };
+        if (v1Metadata.exports) {
+            v3Metadata.exports = v1Metadata.exports;
+        }
+        for (var prop in v1Metadata.metadata) {
+            v3Metadata.metadata[prop] = v1Metadata.metadata[prop];
+        }
+        var exports = this.metadataCollector.getMetadata(this.getSourceFile(dtsFilePath));
+        if (exports) {
+            for (var prop in exports.metadata) {
+                if (!v3Metadata.metadata[prop]) {
+                    v3Metadata.metadata[prop] = exports.metadata[prop];
+                }
+            }
+            if (exports.exports) {
+                v3Metadata.exports = exports.exports;
+            }
+        }
+        return v3Metadata;
     };
     CompilerHost.prototype.loadResource = function (filePath) { return this.context.readResource(filePath); };
     CompilerHost.prototype.loadSummary = function (filePath) {

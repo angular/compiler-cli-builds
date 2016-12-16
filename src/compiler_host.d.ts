@@ -49,6 +49,7 @@ export declare class CompilerHost implements AotCompilerHost {
     protected getSourceFile(filePath: string): ts.SourceFile;
     getMetadataFor(filePath: string): ModuleMetadata[];
     readMetadata(filePath: string, dtsFilePath: string): ModuleMetadata[];
+    private upgradeVersion1Metadata(v1Metadata, dtsFilePath);
     loadResource(filePath: string): Promise<string>;
     loadSummary(filePath: string): string | null;
     getOutputFileName(sourceFilePath: string): string;
