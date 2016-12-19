@@ -20,6 +20,15 @@ export interface NgTools_InternalApi_NG2_ListLazyRoutes_Options {
 export interface NgTools_InternalApi_NG_2_LazyRouteMap {
     [route: string]: string;
 }
+export interface NgTools_InternalApi_NG2_ExtractI18n_Options {
+    basePath: string;
+    compilerOptions: ts.CompilerOptions;
+    program: ts.Program;
+    host: ts.CompilerHost;
+    angularCompilerOptions: AngularCompilerOptions;
+    i18nFormat: string;
+    readResource: (fileName: string) => Promise<string>;
+}
 /**
  * @internal
  * @private
@@ -35,4 +44,9 @@ export declare class NgTools_InternalApi_NG_2 {
      * @private
      */
     static listLazyRoutes(options: NgTools_InternalApi_NG2_ListLazyRoutes_Options): NgTools_InternalApi_NG_2_LazyRouteMap;
+    /**
+     * @internal
+     * @private
+     */
+    static extractI18n(options: NgTools_InternalApi_NG2_ExtractI18n_Options): Promise<void>;
 }

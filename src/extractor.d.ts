@@ -12,12 +12,16 @@ import 'reflect-metadata';
 import * as compiler from '@angular/compiler';
 import * as tsc from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
-import { CompilerHost } from './compiler_host';
+import { CompilerHost, CompilerHostContext } from './compiler_host';
 export declare class Extractor {
+    private options;
     private ngExtractor;
+    host: ts.CompilerHost;
     private ngCompilerHost;
     private program;
-    constructor(ngExtractor: compiler.Extractor, ngCompilerHost: CompilerHost, program: ts.Program);
-    extract(): Promise<compiler.MessageBundle>;
-    static create(options: tsc.AngularCompilerOptions, translationsFormat: string, program: ts.Program, moduleResolverHost: ts.ModuleResolutionHost, ngCompilerHost?: CompilerHost): Extractor;
+    constructor(options: tsc.AngularCompilerOptions, ngExtractor: compiler.Extractor, host: ts.CompilerHost, ngCompilerHost: CompilerHost, program: ts.Program);
+    extract(formatName: string): Promise<void>;
+    serialize(bundle: compiler.MessageBundle, ext: string): string;
+    getExtension(formatName: string): string;
+    static create(options: tsc.AngularCompilerOptions, program: ts.Program, tsCompilerHost: ts.CompilerHost, compilerHostContext?: CompilerHostContext, ngCompilerHost?: CompilerHost): Extractor;
 }
