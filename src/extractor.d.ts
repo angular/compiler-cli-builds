@@ -21,6 +21,7 @@ export declare class Extractor {
     private program;
     constructor(options: tsc.AngularCompilerOptions, ngExtractor: compiler.Extractor, host: ts.CompilerHost, ngCompilerHost: CompilerHost, program: ts.Program);
     extract(formatName: string): Promise<void>;
+    extractBundle(): Promise<compiler.MessageBundle>;
     serialize(bundle: compiler.MessageBundle, ext: string): string;
     getExtension(formatName: string): string;
     static create(options: tsc.AngularCompilerOptions, program: ts.Program, tsCompilerHost: ts.CompilerHost, compilerHostContext?: CompilerHostContext, ngCompilerHost?: CompilerHost): Extractor;

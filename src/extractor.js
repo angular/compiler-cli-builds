@@ -27,13 +27,17 @@ var Extractor = (function () {
         var _this = this;
         // Checks the format and returns the extension
         var ext = this.getExtension(formatName);
-        var files = this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); });
-        var promiseBundle = this.ngExtractor.extract(files);
+        var promiseBundle = this.extractBundle();
         return promiseBundle.then(function (bundle) {
             var content = _this.serialize(bundle, ext);
             var dstPath = path.join(_this.options.genDir, "messages." + ext);
             _this.host.writeFile(dstPath, content, false);
         });
+    };
+    Extractor.prototype.extractBundle = function () {
+        var _this = this;
+        var files = this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); });
+        return this.ngExtractor.extract(files);
     };
     Extractor.prototype.serialize = function (bundle, ext) {
         var serializer;
