@@ -24,3 +24,4 @@ export declare class CodeGenerator {
     codegen(): Promise<any>;
     static create(options: AngularCompilerOptions, cliOptions: NgcCliOptions, program: ts.Program, tsCompilerHost: ts.CompilerHost, compilerHostContext?: CompilerHostContext, ngCompilerHost?: CompilerHost): CodeGenerator;
 }
+export declare function excludeFilePattern(options: AngularCompilerOptions): RegExp;
