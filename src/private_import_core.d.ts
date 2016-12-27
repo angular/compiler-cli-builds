@@ -7,8 +7,8 @@
  */
 import { __core_private__ as r } from '@angular/core';
 export declare type ReflectorReader = typeof r._ReflectorReader;
-export declare var ReflectorReader: typeof r.ReflectorReader;
+export declare const ReflectorReader: typeof r.ReflectorReader;
 export declare type ReflectionCapabilities = typeof r._ReflectionCapabilities;
-export declare var ReflectionCapabilities: typeof r.ReflectionCapabilities;
+export declare const ReflectionCapabilities: typeof r.ReflectionCapabilities;
 export declare type Console = typeof r._Console;
-export declare var Console: typeof r.Console;
+export declare const Console: typeof r.Console;
