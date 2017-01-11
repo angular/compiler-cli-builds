@@ -152,7 +152,7 @@ function _collectRoutes(providers, reflector, ROUTES) {
  */
 function _collectLoadChildren(routes) {
     return routes.reduce(function (m, r) {
-        if (r.loadChildren) {
+        if (r.loadChildren && typeof r.loadChildren === 'string') {
             return m.concat(r.loadChildren);
         }
         else if (Array.isArray(r)) {
