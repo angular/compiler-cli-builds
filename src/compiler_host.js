@@ -6,24 +6,18 @@
  * found in the LICENSE file at https://angular.io/license
  */
 "use strict";
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
-var tsc_wrapped_1 = require('@angular/tsc-wrapped');
-var fs = require('fs');
-var path = require('path');
-var ts = require('typescript');
-var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
-var DTS = /\.d\.ts$/;
-var NODE_MODULES = '/node_modules/';
-var IS_GENERATED = /\.(ngfactory|ngstyle)$/;
-var GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$/;
-var GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$/;
-var CompilerHost = (function () {
-    function CompilerHost(program, options, context) {
-        var _this = this;
+const tsc_wrapped_1 = require('@angular/tsc-wrapped');
+const fs = require('fs');
+const path = require('path');
+const ts = require('typescript');
+const EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
+const DTS = /\.d\.ts$/;
+const NODE_MODULES = '/node_modules/';
+const IS_GENERATED = /\.(ngfactory|ngstyle)$/;
+const GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$/;
+const GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$/;
+class CompilerHost {
+    constructor(program, options, context) {
         this.program = program;
         this.options = options;
         this.context = context;
@@ -32,7 +26,7 @@ var CompilerHost = (function () {
         // normalize the path so that it never ends with '/'.
         this.basePath = path.normalize(path.join(this.options.basePath, '.')).replace(/\\/g, '/');
         this.genDir = path.normalize(path.join(this.options.genDir, '.')).replace(/\\/g, '/');
-        var genPath = path.relative(this.basePath, this.genDir);
+        const genPath = path.relative(this.basePath, this.genDir);
         this.isGenDirChildOfRootDir = genPath === '' || !genPath.startsWith('..');
         this.resolveModuleNameHost = Object.create(this.context);
         // When calling ts.resolveModuleName,
@@ -42,20 +36,20 @@ var CompilerHost = (function () {
         // less often.
         // This is needed as we use ts.resolveModuleName in reflector_host
         // and it should be able to resolve summary file names.
-        this.resolveModuleNameHost.fileExists = function (fileName) {
-            if (_this.context.fileExists(fileName)) {
+        this.resolveModuleNameHost.fileExists = (fileName) => {
+            if (this.context.fileExists(fileName)) {
                 return true;
             }
             if (DTS.test(fileName)) {
-                var base = fileName.substring(0, fileName.length - 5);
-                return _this.context.fileExists(base + '.ngsummary.json');
+                const base = fileName.substring(0, fileName.length - 5);
+                return this.context.fileExists(base + '.ngsummary.json');
             }
             return false;
         };
     }
     // We use absolute paths on disk as canonical.
-    CompilerHost.prototype.getCanonicalFileName = function (fileName) { return fileName; };
-    CompilerHost.prototype.moduleNameToFileName = function (m, containingFile) {
+    getCanonicalFileName(fileName) { return fileName; }
+    moduleNameToFileName(m, containingFile) {
         if (!containingFile || !containingFile.length) {
             if (m.indexOf('.') === 0) {
                 throw new Error('Resolution of relative paths requires a containing file.');
@@ -64,10 +58,10 @@ var CompilerHost = (function () {
             containingFile = this.getCanonicalFileName(path.join(this.basePath, 'index.ts'));
         }
         m = m.replace(EXT, '');
-        var resolved = ts.resolveModuleName(m, containingFile.replace(/\\/g, '/'), this.options, this.resolveModuleNameHost)
+        const resolved = ts.resolveModuleName(m, containingFile.replace(/\\/g, '/'), this.options, this.resolveModuleNameHost)
             .resolvedModule;
         return resolved ? this.getCanonicalFileName(resolved.resolvedFileName) : null;
-    };
+    }
     ;
     /**
      * We want a moduleId that will appear in import statements in the generated code.
@@ -84,21 +78,21 @@ var CompilerHost = (function () {
      *
      * NOTE: (*) the relative path is computed depending on `isGenDirChildOfRootDir`.
      */
-    CompilerHost.prototype.fileNameToModuleName = function (importedFile, containingFile) {
+    fileNameToModuleName(importedFile, containingFile) {
         // If a file does not yet exist (because we compile it later), we still need to
         // assume it exists it so that the `resolve` method works!
         if (!this.context.fileExists(importedFile)) {
             this.context.assumeFileExists(importedFile);
         }
         containingFile = this.rewriteGenDirPath(containingFile);
-        var containingDir = path.dirname(containingFile);
+        const containingDir = path.dirname(containingFile);
         // drop extension
         importedFile = importedFile.replace(EXT, '');
-        var nodeModulesIndex = importedFile.indexOf(NODE_MODULES);
-        var importModule = nodeModulesIndex === -1 ?
+        const nodeModulesIndex = importedFile.indexOf(NODE_MODULES);
+        const importModule = nodeModulesIndex === -1 ?
             null :
             importedFile.substring(nodeModulesIndex + NODE_MODULES.length);
-        var isGeneratedFile = IS_GENERATED.test(importedFile);
+        const isGeneratedFile = IS_GENERATED.test(importedFile);
         if (isGeneratedFile) {
             // rewrite to genDir path
             if (importModule) {
@@ -124,16 +118,16 @@ var CompilerHost = (function () {
                 return this.dotRelative(containingDir, importedFile);
             }
         }
-    };
-    CompilerHost.prototype.dotRelative = function (from, to) {
-        var rPath = path.relative(from, to).replace(/\\/g, '/');
+    }
+    dotRelative(from, to) {
+        const rPath = path.relative(from, to).replace(/\\/g, '/');
         return rPath.startsWith('.') ? rPath : './' + rPath;
-    };
+    }
     /**
      * Moves the path into `genDir` folder while preserving the `node_modules` directory.
      */
-    CompilerHost.prototype.rewriteGenDirPath = function (filepath) {
-        var nodeModulesIndex = filepath.indexOf(NODE_MODULES);
+    rewriteGenDirPath(filepath) {
+        const nodeModulesIndex = filepath.indexOf(NODE_MODULES);
         if (nodeModulesIndex !== -1) {
             // If we are in node_modulse, transplant them into `genDir`.
             return path.join(this.genDir, filepath.substring(nodeModulesIndex));
@@ -143,19 +137,19 @@ var CompilerHost = (function () {
             // we apply the `genDir` => `rootDir` delta through `rootDirPrefix` later.
             return filepath.replace(this.basePath, this.genDir);
         }
-    };
-    CompilerHost.prototype.getSourceFile = function (filePath) {
-        var sf = this.program.getSourceFile(filePath);
+    }
+    getSourceFile(filePath) {
+        const sf = this.program.getSourceFile(filePath);
         if (!sf) {
             if (this.context.fileExists(filePath)) {
-                var sourceText = this.context.readFile(filePath);
+                const sourceText = this.context.readFile(filePath);
                 return ts.createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true);
             }
-            throw new Error("Source file " + filePath + " not present in program.");
+            throw new Error(`Source file ${filePath} not present in program.`);
         }
         return sf;
-    };
-    CompilerHost.prototype.getMetadataFor = function (filePath) {
+    }
+    getMetadataFor(filePath) {
         if (!this.context.fileExists(filePath)) {
             // If the file doesn't exists then we cannot return metadata for the file.
             // This will occur if the user refernced a declared module for which no file
@@ -163,7 +157,7 @@ var CompilerHost = (function () {
             return;
         }
         if (DTS.test(filePath)) {
-            var metadataPath = filePath.replace(DTS, '.metadata.json');
+            const metadataPath = filePath.replace(DTS, '.metadata.json');
             if (this.context.fileExists(metadataPath)) {
                 return this.readMetadata(metadataPath, filePath);
             }
@@ -175,48 +169,48 @@ var CompilerHost = (function () {
             }
         }
         else {
-            var sf = this.getSourceFile(filePath);
-            var metadata = this.metadataCollector.getMetadata(sf);
+            const sf = this.getSourceFile(filePath);
+            const metadata = this.metadataCollector.getMetadata(sf);
             return metadata ? [metadata] : [];
         }
-    };
-    CompilerHost.prototype.readMetadata = function (filePath, dtsFilePath) {
-        var metadatas = this.resolverCache.get(filePath);
+    }
+    readMetadata(filePath, dtsFilePath) {
+        let metadatas = this.resolverCache.get(filePath);
         if (metadatas) {
             return metadatas;
         }
         try {
-            var metadataOrMetadatas = JSON.parse(this.context.readFile(filePath));
-            var metadatas_1 = metadataOrMetadatas ?
+            const metadataOrMetadatas = JSON.parse(this.context.readFile(filePath));
+            const metadatas = metadataOrMetadatas ?
                 (Array.isArray(metadataOrMetadatas) ? metadataOrMetadatas : [metadataOrMetadatas]) :
                 [];
-            var v1Metadata = metadatas_1.find(function (m) { return m.version === 1; });
-            var v3Metadata = metadatas_1.find(function (m) { return m.version === 3; });
+            const v1Metadata = metadatas.find(m => m.version === 1);
+            let v3Metadata = metadatas.find(m => m.version === 3);
             if (!v3Metadata && v1Metadata) {
-                metadatas_1.push(this.upgradeVersion1Metadata(v1Metadata, dtsFilePath));
+                metadatas.push(this.upgradeVersion1Metadata(v1Metadata, dtsFilePath));
             }
-            this.resolverCache.set(filePath, metadatas_1);
-            return metadatas_1;
+            this.resolverCache.set(filePath, metadatas);
+            return metadatas;
         }
         catch (e) {
-            console.error("Failed to read JSON file " + filePath);
+            console.error(`Failed to read JSON file ${filePath}`);
             throw e;
         }
-    };
-    CompilerHost.prototype.upgradeVersion1Metadata = function (v1Metadata, dtsFilePath) {
+    }
+    upgradeVersion1Metadata(v1Metadata, dtsFilePath) {
         // patch up v1 to v3 by merging the metadata with metadata collected from the d.ts file
         // as the only difference between the versions is whether all exports are contained in
         // the metadata and the `extends` clause.
-        var v3Metadata = { '__symbolic': 'module', 'version': 3, 'metadata': {} };
+        let v3Metadata = { '__symbolic': 'module', 'version': 3, 'metadata': {} };
         if (v1Metadata.exports) {
             v3Metadata.exports = v1Metadata.exports;
         }
-        for (var prop in v1Metadata.metadata) {
+        for (let prop in v1Metadata.metadata) {
             v3Metadata.metadata[prop] = v1Metadata.metadata[prop];
         }
-        var exports = this.metadataCollector.getMetadata(this.getSourceFile(dtsFilePath));
+        const exports = this.metadataCollector.getMetadata(this.getSourceFile(dtsFilePath));
         if (exports) {
-            for (var prop in exports.metadata) {
+            for (let prop in exports.metadata) {
                 if (!v3Metadata.metadata[prop]) {
                     v3Metadata.metadata[prop] = exports.metadata[prop];
                 }
@@ -226,100 +220,90 @@ var CompilerHost = (function () {
             }
         }
         return v3Metadata;
-    };
-    CompilerHost.prototype.loadResource = function (filePath) { return this.context.readResource(filePath); };
-    CompilerHost.prototype.loadSummary = function (filePath) {
+    }
+    loadResource(filePath) { return this.context.readResource(filePath); }
+    loadSummary(filePath) {
         if (this.context.fileExists(filePath)) {
             return this.context.readFile(filePath);
         }
-    };
-    CompilerHost.prototype.getOutputFileName = function (sourceFilePath) {
+    }
+    getOutputFileName(sourceFilePath) {
         return sourceFilePath.replace(EXT, '') + '.d.ts';
-    };
-    CompilerHost.prototype.isSourceFile = function (filePath) {
-        var excludeRegex = this.options.generateCodeForLibraries === false ? GENERATED_OR_DTS_FILES : GENERATED_FILES;
+    }
+    isSourceFile(filePath) {
+        const excludeRegex = this.options.generateCodeForLibraries === false ? GENERATED_OR_DTS_FILES : GENERATED_FILES;
         return !excludeRegex.test(filePath);
-    };
-    CompilerHost.prototype.calculateEmitPath = function (filePath) {
+    }
+    calculateEmitPath(filePath) {
         // Write codegen in a directory structure matching the sources.
-        var root = this.options.basePath;
-        for (var _i = 0, _a = this.options.rootDirs || []; _i < _a.length; _i++) {
-            var eachRootDir = _a[_i];
+        let root = this.options.basePath;
+        for (const eachRootDir of this.options.rootDirs || []) {
             if (this.options.trace) {
-                console.error("Check if " + filePath + " is under rootDirs element " + eachRootDir);
+                console.error(`Check if ${filePath} is under rootDirs element ${eachRootDir}`);
             }
             if (path.relative(eachRootDir, filePath).indexOf('.') !== 0) {
                 root = eachRootDir;
             }
         }
         // transplant the codegen path to be inside the `genDir`
-        var relativePath = path.relative(root, filePath);
+        let relativePath = path.relative(root, filePath);
         while (relativePath.startsWith('..' + path.sep)) {
             // Strip out any `..` path such as: `../node_modules/@foo` as we want to put everything
             // into `genDir`.
             relativePath = relativePath.substr(3);
         }
         return path.join(this.options.genDir, relativePath);
-    };
-    return CompilerHost;
-}());
+    }
+}
 exports.CompilerHost = CompilerHost;
-var CompilerHostContextAdapter = (function () {
-    function CompilerHostContextAdapter() {
+class CompilerHostContextAdapter {
+    constructor() {
         this.assumedExists = {};
     }
-    CompilerHostContextAdapter.prototype.assumeFileExists = function (fileName) { this.assumedExists[fileName] = true; };
-    return CompilerHostContextAdapter;
-}());
+    assumeFileExists(fileName) { this.assumedExists[fileName] = true; }
+}
 exports.CompilerHostContextAdapter = CompilerHostContextAdapter;
-var ModuleResolutionHostAdapter = (function (_super) {
-    __extends(ModuleResolutionHostAdapter, _super);
-    function ModuleResolutionHostAdapter(host) {
-        _super.call(this);
+class ModuleResolutionHostAdapter extends CompilerHostContextAdapter {
+    constructor(host) {
+        super();
         this.host = host;
         if (host.directoryExists) {
-            this.directoryExists = function (directoryName) { return host.directoryExists(directoryName); };
+            this.directoryExists = (directoryName) => host.directoryExists(directoryName);
         }
     }
-    ModuleResolutionHostAdapter.prototype.fileExists = function (fileName) {
+    fileExists(fileName) {
         return this.assumedExists[fileName] || this.host.fileExists(fileName);
-    };
-    ModuleResolutionHostAdapter.prototype.readFile = function (fileName) { return this.host.readFile(fileName); };
-    ModuleResolutionHostAdapter.prototype.readResource = function (s) {
+    }
+    readFile(fileName) { return this.host.readFile(fileName); }
+    readResource(s) {
         if (!this.host.fileExists(s)) {
             // TODO: We should really have a test for error cases like this!
-            throw new Error("Compilation failed. Resource file not found: " + s);
+            throw new Error(`Compilation failed. Resource file not found: ${s}`);
         }
         return Promise.resolve(this.host.readFile(s));
-    };
-    return ModuleResolutionHostAdapter;
-}(CompilerHostContextAdapter));
-exports.ModuleResolutionHostAdapter = ModuleResolutionHostAdapter;
-var NodeCompilerHostContext = (function (_super) {
-    __extends(NodeCompilerHostContext, _super);
-    function NodeCompilerHostContext() {
-        _super.apply(this, arguments);
     }
-    NodeCompilerHostContext.prototype.fileExists = function (fileName) {
+}
+exports.ModuleResolutionHostAdapter = ModuleResolutionHostAdapter;
+class NodeCompilerHostContext extends CompilerHostContextAdapter {
+    fileExists(fileName) {
         return this.assumedExists[fileName] || fs.existsSync(fileName);
-    };
-    NodeCompilerHostContext.prototype.directoryExists = function (directoryName) {
+    }
+    directoryExists(directoryName) {
         try {
             return fs.statSync(directoryName).isDirectory();
         }
         catch (e) {
             return false;
         }
-    };
-    NodeCompilerHostContext.prototype.readFile = function (fileName) { return fs.readFileSync(fileName, 'utf8'); };
-    NodeCompilerHostContext.prototype.readResource = function (s) {
+    }
+    readFile(fileName) { return fs.readFileSync(fileName, 'utf8'); }
+    readResource(s) {
         if (!this.fileExists(s)) {
             // TODO: We should really have a test for error cases like this!
-            throw new Error("Compilation failed. Resource file not found: " + s);
+            throw new Error(`Compilation failed. Resource file not found: ${s}`);
         }
         return Promise.resolve(this.readFile(s));
-    };
-    return NodeCompilerHostContext;
-}(CompilerHostContextAdapter));
+    }
+}
 exports.NodeCompilerHostContext = NodeCompilerHostContext;
 //# sourceMappingURL=compiler_host.js.map
