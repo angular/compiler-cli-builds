@@ -12,7 +12,6 @@
  */
 var compiler = require('@angular/compiler');
 var fs_1 = require('fs');
-var path = require('path');
 var compiler_host_1 = require('./compiler_host');
 var path_mapped_compiler_host_1 = require('./path_mapped_compiler_host');
 var GENERATED_META_FILES = /\.json$/;
@@ -25,27 +24,6 @@ var CodeGenerator = (function () {
         this.compiler = compiler;
         this.ngCompilerHost = ngCompilerHost;
     }
-    // Write codegen in a directory structure matching the sources.
-    CodeGenerator.prototype.calculateEmitPath = function (filePath) {
-        var root = this.options.basePath;
-        for (var _i = 0, _a = this.options.rootDirs || []; _i < _a.length; _i++) {
-            var eachRootDir = _a[_i];
-            if (this.options.trace) {
-                console.error("Check if " + filePath + " is under rootDirs element " + eachRootDir);
-            }
-            if (path.relative(eachRootDir, filePath).indexOf('.') !== 0) {
-                root = eachRootDir;
-            }
-        }
-        // transplant the codegen path to be inside the `genDir`
-        var relativePath = path.relative(root, filePath);
-        while (relativePath.startsWith('..' + path.sep)) {
-            // Strip out any `..` path such as: `../node_modules/@foo` as we want to put everything
-            // into `genDir`.
-            relativePath = relativePath.substr(3);
-        }
-        return path.join(this.options.genDir, relativePath);
-    };
     CodeGenerator.prototype.codegen = function () {
         var _this = this;
         return this.compiler
@@ -53,7 +31,7 @@ var CodeGenerator = (function () {
             .then(function (generatedModules) {
             generatedModules.forEach(function (generatedModule) {
                 var sourceFile = _this.program.getSourceFile(generatedModule.srcFileUrl);
-                var emitPath = _this.calculateEmitPath(generatedModule.genFileUrl);
+                var emitPath = _this.ngCompilerHost.calculateEmitPath(generatedModule.genFileUrl);
                 var source = GENERATED_META_FILES.test(emitPath) ? generatedModule.source :
                     PREAMBLE + generatedModule.source;
                 _this.host.writeFile(emitPath, source, false, function () { }, [sourceFile]);

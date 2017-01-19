@@ -54,6 +54,7 @@ export declare class CompilerHost implements AotCompilerHost {
     loadSummary(filePath: string): string | null;
     getOutputFileName(sourceFilePath: string): string;
     isSourceFile(filePath: string): boolean;
+    calculateEmitPath(filePath: string): string;
 }
 export declare class CompilerHostContextAdapter {
     protected assumedExists: {
