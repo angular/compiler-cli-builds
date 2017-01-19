@@ -11,9 +11,9 @@
  * @description
  * Entry point for all public APIs of the common package.
  */
-const core_1 = require('@angular/core');
+var core_1 = require('@angular/core');
 /**
  * @stable
  */
-exports.VERSION = new core_1.Version('0.0.0-PLACEHOLDER');
+exports.VERSION = new core_1.Version('4.0.0-beta.4-9d8c467');
 //# sourceMappingURL=version.js.map

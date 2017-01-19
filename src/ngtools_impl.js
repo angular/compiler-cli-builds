@@ -12,27 +12,29 @@
  * This API should be stable for NG 2. It can be removed in NG 4..., but should be replaced by
  * something else.
  */
-const compiler_1 = require('@angular/compiler');
-const core_1 = require('@angular/core');
-const ROUTER_MODULE_PATH = '@angular/router/src/router_config_loader';
-const ROUTER_ROUTES_SYMBOL_NAME = 'ROUTES';
+var compiler_1 = require('@angular/compiler');
+var core_1 = require('@angular/core');
+var ROUTER_MODULE_PATH = '@angular/router/src/router_config_loader';
+var ROUTER_ROUTES_SYMBOL_NAME = 'ROUTES';
 // A route definition. Normally the short form 'path/to/module#ModuleClassName' is used by
 // the user, and this is a helper class to extract information from it.
-class RouteDef {
-    constructor(path, className = null) {
+var RouteDef = (function () {
+    function RouteDef(path, className) {
+        if (className === void 0) { className = null; }
         this.path = path;
         this.className = className;
     }
-    toString() {
+    RouteDef.prototype.toString = function () {
         return (this.className === null || this.className == 'default') ?
             this.path :
-            `${this.path}#${this.className}`;
-    }
-    static fromString(entry) {
-        const split = entry.split('#');
+            this.path + "#" + this.className;
+    };
+    RouteDef.fromString = function (entry) {
+        var split = entry.split('#');
         return new RouteDef(split[0], split[1] || null);
-    }
-}
+    };
+    return RouteDef;
+}());
 exports.RouteDef = RouteDef;
 /**
  *
@@ -40,16 +42,16 @@ exports.RouteDef = RouteDef;
  * @private
  */
 function listLazyRoutesOfModule(entryModule, host, reflector) {
-    const entryRouteDef = RouteDef.fromString(entryModule);
-    const containingFile = _resolveModule(entryRouteDef.path, entryRouteDef.path, host);
-    const modulePath = `./${containingFile.replace(/^(.*)\//, '')}`;
-    const className = entryRouteDef.className;
+    var entryRouteDef = RouteDef.fromString(entryModule);
+    var containingFile = _resolveModule(entryRouteDef.path, entryRouteDef.path, host);
+    var modulePath = "./" + containingFile.replace(/^(.*)\//, '');
+    var className = entryRouteDef.className;
     // List loadChildren of this single module.
-    const appStaticSymbol = reflector.findDeclaration(modulePath, className, containingFile);
-    const ROUTES = reflector.findDeclaration(ROUTER_MODULE_PATH, ROUTER_ROUTES_SYMBOL_NAME);
-    const lazyRoutes = _extractLazyRoutesFromStaticModule(appStaticSymbol, reflector, host, ROUTES);
-    const allLazyRoutes = lazyRoutes.reduce(function includeLazyRouteAndSubRoutes(allRoutes, lazyRoute) {
-        const route = lazyRoute.routeDef.toString();
+    var appStaticSymbol = reflector.findDeclaration(modulePath, className, containingFile);
+    var ROUTES = reflector.findDeclaration(ROUTER_MODULE_PATH, ROUTER_ROUTES_SYMBOL_NAME);
+    var lazyRoutes = _extractLazyRoutesFromStaticModule(appStaticSymbol, reflector, host, ROUTES);
+    var allLazyRoutes = lazyRoutes.reduce(function includeLazyRouteAndSubRoutes(allRoutes, lazyRoute) {
+        var route = lazyRoute.routeDef.toString();
         _assertRoute(allRoutes, lazyRoute);
         allRoutes[route] = lazyRoute;
         // StaticReflector does not support discovering annotations like `NgModule` on default
@@ -59,8 +61,8 @@ function listLazyRoutesOfModule(entryModule, host, reflector) {
         if (!lazyRoute.routeDef.className) {
             return allRoutes;
         }
-        const lazyModuleSymbol = reflector.findDeclaration(lazyRoute.absoluteFilePath, lazyRoute.routeDef.className || 'default');
-        const subRoutes = _extractLazyRoutesFromStaticModule(lazyModuleSymbol, reflector, host, ROUTES);
+        var lazyModuleSymbol = reflector.findDeclaration(lazyRoute.absoluteFilePath, lazyRoute.routeDef.className || 'default');
+        var subRoutes = _extractLazyRoutesFromStaticModule(lazyModuleSymbol, reflector, host, ROUTES);
         return subRoutes.reduce(includeLazyRouteAndSubRoutes, allRoutes);
     }, {});
     return allLazyRoutes;
@@ -71,9 +73,9 @@ exports.listLazyRoutesOfModule = listLazyRoutesOfModule;
  * @private
  */
 function _resolveModule(modulePath, containingFile, host) {
-    const result = host.moduleNameToFileName(modulePath, containingFile);
+    var result = host.moduleNameToFileName(modulePath, containingFile);
     if (!result) {
-        throw new Error(`Could not resolve "${modulePath}" from "${containingFile}".`);
+        throw new Error("Could not resolve \"" + modulePath + "\" from \"" + containingFile + "\".");
     }
     return result;
 }
@@ -82,11 +84,11 @@ function _resolveModule(modulePath, containingFile, host) {
  * @private
  */
 function _assertRoute(map, route) {
-    const r = route.routeDef.toString();
+    var r = route.routeDef.toString();
     if (map[r] && map[r].absoluteFilePath != route.absoluteFilePath) {
-        throw new Error(`Duplicated path in loadChildren detected: "${r}" is used in 2 loadChildren, ` +
-            `but they point to different modules "(${map[r].absoluteFilePath} and ` +
-            `"${route.absoluteFilePath}"). Webpack cannot distinguish on context and would fail to ` +
+        throw new Error(("Duplicated path in loadChildren detected: \"" + r + "\" is used in 2 loadChildren, ") +
+            ("but they point to different modules \"(" + map[r].absoluteFilePath + " and ") +
+            ("\"" + route.absoluteFilePath + "\"). Webpack cannot distinguish on context and would fail to ") +
             'load the proper one.');
     }
 }
@@ -96,22 +98,22 @@ function _assertRoute(map, route) {
  * @private
  */
 function _extractLazyRoutesFromStaticModule(staticSymbol, reflector, host, ROUTES) {
-    const moduleMetadata = _getNgModuleMetadata(staticSymbol, reflector);
-    const allRoutes = (moduleMetadata.imports || [])
-        .filter(i => 'providers' in i)
-        .reduce((mem, m) => {
+    var moduleMetadata = _getNgModuleMetadata(staticSymbol, reflector);
+    var allRoutes = (moduleMetadata.imports || [])
+        .filter(function (i) { return 'providers' in i; })
+        .reduce(function (mem, m) {
         return mem.concat(_collectRoutes(m.providers || [], reflector, ROUTES));
     }, _collectRoutes(moduleMetadata.providers || [], reflector, ROUTES));
-    const lazyRoutes = _collectLoadChildren(allRoutes).reduce((acc, route) => {
-        const routeDef = RouteDef.fromString(route);
-        const absoluteFilePath = _resolveModule(routeDef.path, staticSymbol.filePath, host);
-        acc.push({ routeDef, absoluteFilePath });
+    var lazyRoutes = _collectLoadChildren(allRoutes).reduce(function (acc, route) {
+        var routeDef = RouteDef.fromString(route);
+        var absoluteFilePath = _resolveModule(routeDef.path, staticSymbol.filePath, host);
+        acc.push({ routeDef: routeDef, absoluteFilePath: absoluteFilePath });
         return acc;
     }, []);
-    const importedSymbols = (moduleMetadata.imports || [])
-        .filter(i => i instanceof compiler_1.StaticSymbol);
+    var importedSymbols = (moduleMetadata.imports || [])
+        .filter(function (i) { return i instanceof compiler_1.StaticSymbol; });
     return importedSymbols
-        .reduce((acc, i) => {
+        .reduce(function (acc, i) {
         return acc.concat(_extractLazyRoutesFromStaticModule(i, reflector, host, ROUTES));
     }, [])
         .concat(lazyRoutes);
@@ -121,9 +123,9 @@ function _extractLazyRoutesFromStaticModule(staticSymbol, reflector, host, ROUTE
  * @private
  */
 function _getNgModuleMetadata(staticSymbol, reflector) {
-    const ngModules = reflector.annotations(staticSymbol).filter((s) => s instanceof core_1.NgModule);
+    var ngModules = reflector.annotations(staticSymbol).filter(function (s) { return s instanceof core_1.NgModule; });
     if (ngModules.length === 0) {
-        throw new Error(`${staticSymbol.name} is not an NgModule`);
+        throw new Error(staticSymbol.name + " is not an NgModule");
     }
     return ngModules[0];
 }
@@ -132,7 +134,7 @@ function _getNgModuleMetadata(staticSymbol, reflector) {
  * @private
  */
 function _collectRoutes(providers, reflector, ROUTES) {
-    return providers.reduce((routeList, p) => {
+    return providers.reduce(function (routeList, p) {
         if (p.provide === ROUTES) {
             return routeList.concat(p.useValue);
         }
@@ -149,7 +151,7 @@ function _collectRoutes(providers, reflector, ROUTES) {
  * @private
  */
 function _collectLoadChildren(routes) {
-    return routes.reduce((m, r) => {
+    return routes.reduce(function (m, r) {
         if (r.loadChildren && typeof r.loadChildren === 'string') {
             return m.concat(r.loadChildren);
         }

@@ -6,11 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 "use strict";
-const path = require('path');
-const ts = require('typescript');
-const compiler_host_1 = require('./compiler_host');
-const EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
-const DTS = /\.d\.ts$/;
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
+var path = require('path');
+var ts = require('typescript');
+var compiler_host_1 = require('./compiler_host');
+var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
+var DTS = /\.d\.ts$/;
 /**
  * This version of the AotCompilerHost expects that the program will be compiled
  * and executed with a "path mapped" directory structure, where generated files
@@ -18,22 +23,24 @@ const DTS = /\.d\.ts$/;
  * import. This requires using TS `rootDirs` option and also teaching the module
  * loader what to do.
  */
-class PathMappedCompilerHost extends compiler_host_1.CompilerHost {
-    constructor(program, options, context) {
-        super(program, options, context);
+var PathMappedCompilerHost = (function (_super) {
+    __extends(PathMappedCompilerHost, _super);
+    function PathMappedCompilerHost(program, options, context) {
+        _super.call(this, program, options, context);
     }
-    getCanonicalFileName(fileName) {
+    PathMappedCompilerHost.prototype.getCanonicalFileName = function (fileName) {
         if (!fileName)
             return fileName;
         // NB: the rootDirs should have been sorted longest-first
-        for (const dir of this.options.rootDirs || []) {
+        for (var _i = 0, _a = this.options.rootDirs || []; _i < _a.length; _i++) {
+            var dir = _a[_i];
             if (fileName.indexOf(dir) === 0) {
                 fileName = fileName.substring(dir.length);
             }
         }
         return fileName;
-    }
-    moduleNameToFileName(m, containingFile) {
+    };
+    PathMappedCompilerHost.prototype.moduleNameToFileName = function (m, containingFile) {
         if (!containingFile || !containingFile.length) {
             if (m.indexOf('.') === 0) {
                 throw new Error('Resolution of relative paths requires a containing file.');
@@ -41,9 +48,10 @@ class PathMappedCompilerHost extends compiler_host_1.CompilerHost {
             // Any containing file gives the same result for absolute imports
             containingFile = this.getCanonicalFileName(path.join(this.basePath, 'index.ts'));
         }
-        for (const root of this.options.rootDirs || ['']) {
-            const rootedContainingFile = path.join(root, containingFile);
-            const resolved = ts.resolveModuleName(m, rootedContainingFile, this.options, this.context).resolvedModule;
+        for (var _i = 0, _a = this.options.rootDirs || ['']; _i < _a.length; _i++) {
+            var root = _a[_i];
+            var rootedContainingFile = path.join(root, containingFile);
+            var resolved = ts.resolveModuleName(m, rootedContainingFile, this.options, this.context).resolvedModule;
             if (resolved) {
                 if (this.options.traceResolution) {
                     console.error('resolve', m, containingFile, '=>', resolved.resolvedFileName);
@@ -51,14 +59,15 @@ class PathMappedCompilerHost extends compiler_host_1.CompilerHost {
                 return this.getCanonicalFileName(resolved.resolvedFileName);
             }
         }
-    }
+    };
     /**
      * We want a moduleId that will appear in import statements in the generated code.
      * These need to be in a form that system.js can load, so absolute file paths don't work.
      * Relativize the paths by checking candidate prefixes of the absolute path, to see if
      * they are resolvable by the moduleResolution strategy from the CompilerHost.
      */
-    fileNameToModuleName(importedFile, containingFile) {
+    PathMappedCompilerHost.prototype.fileNameToModuleName = function (importedFile, containingFile) {
+        var _this = this;
         if (this.options.traceResolution) {
             console.error('getImportPath from containingFile', containingFile, 'to importedFile', importedFile);
         }
@@ -72,35 +81,36 @@ class PathMappedCompilerHost extends compiler_host_1.CompilerHost {
                 this.context.assumeFileExists(importedFile);
             }
         }
-        const resolvable = (candidate) => {
-            const resolved = this.moduleNameToFileName(candidate, importedFile);
+        var resolvable = function (candidate) {
+            var resolved = _this.moduleNameToFileName(candidate, importedFile);
             return resolved && resolved.replace(EXT, '') === importedFile.replace(EXT, '');
         };
-        const importModuleName = importedFile.replace(EXT, '');
-        const parts = importModuleName.split(path.sep).filter(p => !!p);
-        let foundRelativeImport;
-        for (let index = parts.length - 1; index >= 0; index--) {
-            let candidate = parts.slice(index, parts.length).join(path.sep);
-            if (resolvable(candidate)) {
-                return candidate;
+        var importModuleName = importedFile.replace(EXT, '');
+        var parts = importModuleName.split(path.sep).filter(function (p) { return !!p; });
+        var foundRelativeImport;
+        for (var index = parts.length - 1; index >= 0; index--) {
+            var candidate_1 = parts.slice(index, parts.length).join(path.sep);
+            if (resolvable(candidate_1)) {
+                return candidate_1;
             }
-            candidate = '.' + path.sep + candidate;
-            if (resolvable(candidate)) {
-                foundRelativeImport = candidate;
+            candidate_1 = '.' + path.sep + candidate_1;
+            if (resolvable(candidate_1)) {
+                foundRelativeImport = candidate_1;
             }
         }
         if (foundRelativeImport)
             return foundRelativeImport;
         // Try a relative import
-        const candidate = path.relative(path.dirname(containingFile), importModuleName);
+        var candidate = path.relative(path.dirname(containingFile), importModuleName);
         if (resolvable(candidate)) {
             return candidate;
         }
-        throw new Error(`Unable to find any resolvable import for ${importedFile} relative to ${containingFile}`);
-    }
-    getMetadataFor(filePath) {
-        for (const root of this.options.rootDirs || []) {
-            const rootedPath = path.join(root, filePath);
+        throw new Error("Unable to find any resolvable import for " + importedFile + " relative to " + containingFile);
+    };
+    PathMappedCompilerHost.prototype.getMetadataFor = function (filePath) {
+        for (var _i = 0, _a = this.options.rootDirs || []; _i < _a.length; _i++) {
+            var root = _a[_i];
+            var rootedPath = path.join(root, filePath);
             if (!this.context.fileExists(rootedPath)) {
                 // If the file doesn't exists then we cannot return metadata for the file.
                 // This will occur if the user refernced a declared module for which no file
@@ -108,19 +118,20 @@ class PathMappedCompilerHost extends compiler_host_1.CompilerHost {
                 continue;
             }
             if (DTS.test(rootedPath)) {
-                const metadataPath = rootedPath.replace(DTS, '.metadata.json');
+                var metadataPath = rootedPath.replace(DTS, '.metadata.json');
                 if (this.context.fileExists(metadataPath)) {
                     return this.readMetadata(metadataPath, rootedPath);
                 }
             }
             else {
-                const sf = this.getSourceFile(rootedPath);
+                var sf = this.getSourceFile(rootedPath);
                 sf.fileName = sf.fileName;
-                const metadata = this.metadataCollector.getMetadata(sf);
+                var metadata = this.metadataCollector.getMetadata(sf);
                 return metadata ? [metadata] : [];
             }
         }
-    }
-}
+    };
+    return PathMappedCompilerHost;
+}(compiler_host_1.CompilerHost));
 exports.PathMappedCompilerHost = PathMappedCompilerHost;
 //# sourceMappingURL=path_mapped_compiler_host.js.map
