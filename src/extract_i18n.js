@@ -11,7 +11,7 @@ if (require.main === module) {
     var args = require('minimist')(process.argv.slice(2));
     var project = args.p || args.project || '.';
     var cliOptions = new tsc.I18nExtractionCliOptions(args);
-    tsc.main(project, cliOptions, extract)
+    tsc.main(project, cliOptions, extract, { noEmit: true })
         .then(function (exitCode) { return process.exit(exitCode); })
         .catch(function (e) {
         console.error(e.stack);
