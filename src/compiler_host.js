@@ -11,10 +11,10 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-var tsc_wrapped_1 = require('@angular/tsc-wrapped');
-var fs = require('fs');
-var path = require('path');
-var ts = require('typescript');
+var tsc_wrapped_1 = require("@angular/tsc-wrapped");
+var fs = require("fs");
+var path = require("path");
+var ts = require("typescript");
 var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 var DTS = /\.d\.ts$/;
 var NODE_MODULES = '/node_modules/';
@@ -275,11 +275,12 @@ exports.CompilerHostContextAdapter = CompilerHostContextAdapter;
 var ModuleResolutionHostAdapter = (function (_super) {
     __extends(ModuleResolutionHostAdapter, _super);
     function ModuleResolutionHostAdapter(host) {
-        _super.call(this);
-        this.host = host;
+        var _this = _super.call(this) || this;
+        _this.host = host;
         if (host.directoryExists) {
-            this.directoryExists = function (directoryName) { return host.directoryExists(directoryName); };
+            _this.directoryExists = function (directoryName) { return host.directoryExists(directoryName); };
         }
+        return _this;
     }
     ModuleResolutionHostAdapter.prototype.fileExists = function (fileName) {
         return this.assumedExists[fileName] || this.host.fileExists(fileName);
@@ -298,7 +299,7 @@ exports.ModuleResolutionHostAdapter = ModuleResolutionHostAdapter;
 var NodeCompilerHostContext = (function (_super) {
     __extends(NodeCompilerHostContext, _super);
     function NodeCompilerHostContext() {
-        _super.apply(this, arguments);
+        return _super !== null && _super.apply(this, arguments) || this;
     }
     NodeCompilerHostContext.prototype.fileExists = function (fileName) {
         return this.assumedExists[fileName] || fs.existsSync(fileName);
