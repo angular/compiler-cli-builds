@@ -11,7 +11,7 @@ function main(args, consoleError = console.error) {
     const project = args.p || args.project || '.';
     const cliOptions = new tsc.NgcCliOptions(args);
     return tsc.main(project, cliOptions, codegen).then(() => 0).catch(e => {
-        if (e instanceof tsc.UserError || e instanceof compiler_1.SyntaxError) {
+        if (e instanceof tsc.UserError || compiler_1.isSyntaxError(e)) {
             consoleError(e.message);
             return Promise.resolve(1);
         }
