@@ -12,7 +12,7 @@ function main(args, consoleError) {
     var project = args.p || args.project || '.';
     var cliOptions = new tsc.NgcCliOptions(args);
     return tsc.main(project, cliOptions, codegen).then(function () { return 0; }).catch(function (e) {
-        if (e instanceof tsc.UserError || e instanceof compiler_1.SyntaxError) {
+        if (e instanceof tsc.UserError || compiler_1.isSyntaxError(e)) {
             consoleError(e.message);
             return Promise.resolve(1);
         }
