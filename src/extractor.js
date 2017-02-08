@@ -10,11 +10,11 @@
  * Extract i18n messages from source code
  */
 // Must be imported first, because angular2 decorators throws on load.
-require('reflect-metadata');
-const compiler = require('@angular/compiler');
-const path = require('path');
-const compiler_host_1 = require('./compiler_host');
-const path_mapped_compiler_host_1 = require('./path_mapped_compiler_host');
+require("reflect-metadata");
+const compiler = require("@angular/compiler");
+const path = require("path");
+const compiler_host_1 = require("./compiler_host");
+const path_mapped_compiler_host_1 = require("./path_mapped_compiler_host");
 class Extractor {
     constructor(options, ngExtractor, host, ngCompilerHost, program) {
         this.options = options;

@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 "use strict";
-require('reflect-metadata');
-const tsc = require('@angular/tsc-wrapped');
-const extractor_1 = require('./extractor');
+require("reflect-metadata");
+const tsc = require("@angular/tsc-wrapped");
+const extractor_1 = require("./extractor");
 function extract(ngOptions, cliOptions, program, host) {
     return extractor_1.Extractor.create(ngOptions, program, host).extract(cliOptions.i18nFormat);
 }

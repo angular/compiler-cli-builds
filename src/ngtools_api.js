@@ -12,12 +12,12 @@
  * This API should be stable for NG 2. It can be removed in NG 4..., but should be replaced by
  * something else.
  */
-const compiler_1 = require('@angular/compiler');
-const codegen_1 = require('./codegen');
-const compiler_host_1 = require('./compiler_host');
-const extractor_1 = require('./extractor');
-const ngtools_impl_1 = require('./ngtools_impl');
-const path_mapped_compiler_host_1 = require('./path_mapped_compiler_host');
+const compiler_1 = require("@angular/compiler");
+const codegen_1 = require("./codegen");
+const compiler_host_1 = require("./compiler_host");
+const extractor_1 = require("./extractor");
+const ngtools_impl_1 = require("./ngtools_impl");
+const path_mapped_compiler_host_1 = require("./path_mapped_compiler_host");
 /**
  * A ModuleResolutionHostAdapter that overrides the readResource() method with the one
  * passed in the interface.

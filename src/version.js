@@ -11,7 +11,7 @@
  * @description
  * Entry point for all public APIs of the common package.
  */
-const core_1 = require('@angular/core');
+const core_1 = require("@angular/core");
 /**
  * @stable
  */

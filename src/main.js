@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 "use strict";
-require('reflect-metadata');
-const tsc = require('@angular/tsc-wrapped');
-const compiler_1 = require('@angular/compiler');
-const codegen_1 = require('./codegen');
+require("reflect-metadata");
+const tsc = require("@angular/tsc-wrapped");
+const compiler_1 = require("@angular/compiler");
+const codegen_1 = require("./codegen");
 function codegen(ngOptions, cliOptions, program, host) {
     return codegen_1.CodeGenerator.create(ngOptions, cliOptions, program, host).codegen();
 }

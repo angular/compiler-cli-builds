@@ -12,8 +12,8 @@
  * This API should be stable for NG 2. It can be removed in NG 4..., but should be replaced by
  * something else.
  */
-const compiler_1 = require('@angular/compiler');
-const core_1 = require('@angular/core');
+const compiler_1 = require("@angular/compiler");
+const core_1 = require("@angular/core");
 const ROUTER_MODULE_PATH = '@angular/router/src/router_config_loader';
 const ROUTER_ROUTES_SYMBOL_NAME = 'ROUTES';
 // A route definition. Normally the short form 'path/to/module#ModuleClassName' is used by

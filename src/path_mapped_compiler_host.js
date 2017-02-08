@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 "use strict";
-const path = require('path');
-const ts = require('typescript');
-const compiler_host_1 = require('./compiler_host');
+const path = require("path");
+const ts = require("typescript");
+const compiler_host_1 = require("./compiler_host");
 const EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 const DTS = /\.d\.ts$/;
 /**

@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 "use strict";
-const tsc_wrapped_1 = require('@angular/tsc-wrapped');
-const fs = require('fs');
-const path = require('path');
-const ts = require('typescript');
+const tsc_wrapped_1 = require("@angular/tsc-wrapped");
+const fs = require("fs");
+const path = require("path");
+const ts = require("typescript");
 const EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 const DTS = /\.d\.ts$/;
 const NODE_MODULES = '/node_modules/';
