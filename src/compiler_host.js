@@ -16,6 +16,7 @@ const NODE_MODULES = '/node_modules/';
 const IS_GENERATED = /\.(ngfactory|ngstyle)$/;
 const GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$/;
 const GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$/;
+const SHALLOW_IMPORT = /^(\w+|(\@\w+\/\w+))$/;
 class CompilerHost {
     constructor(program, options, context) {
         this.program = program;
@@ -114,6 +115,9 @@ class CompilerHost {
                 if (!this.isGenDirChildOfRootDir) {
                     // assume that they are on top of each other.
                     importedFile = importedFile.replace(this.basePath, this.genDir);
+                }
+                if (SHALLOW_IMPORT.test(importedFile)) {
+                    return importedFile;
                 }
                 return this.dotRelative(containingDir, importedFile);
             }
