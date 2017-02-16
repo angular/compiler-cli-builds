@@ -14,7 +14,7 @@
  */
 const compiler_1 = require("@angular/compiler");
 const core_1 = require("@angular/core");
-const ROUTER_MODULE_PATH = '@angular/router/src/router_config_loader';
+const ROUTER_MODULE_PATH = '@angular/router';
 const ROUTER_ROUTES_SYMBOL_NAME = 'ROUTES';
 // A route definition. Normally the short form 'path/to/module#ModuleClassName' is used by
 // the user, and this is a helper class to extract information from it.
