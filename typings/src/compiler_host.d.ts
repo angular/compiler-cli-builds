@@ -21,6 +21,8 @@ export declare class CompilerHost implements AotCompilerHost {
     protected basePath: string;
     private genDir;
     private resolverCache;
+    private bundleIndexCache;
+    private bundleIndexNames;
     protected resolveModuleNameHost: CompilerHostContext;
     constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext);
     getCanonicalFileName(fileName: string): string;
@@ -55,6 +57,7 @@ export declare class CompilerHost implements AotCompilerHost {
     getOutputFileName(sourceFilePath: string): string;
     isSourceFile(filePath: string): boolean;
     calculateEmitPath(filePath: string): string;
+    private hasBundleIndex(filePath);
 }
 export declare class CompilerHostContextAdapter {
     protected assumedExists: {

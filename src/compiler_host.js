@@ -21,7 +21,7 @@ var NODE_MODULES = '/node_modules/';
 var IS_GENERATED = /\.(ngfactory|ngstyle)$/;
 var GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$/;
 var GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$/;
-var SHALLOW_IMPORT = /^(\w+|(\@\w+\/\w+))$/;
+var SHALLOW_IMPORT = /^((\w|-)+|(@(\w|-)+\/(\w|-)+))$/;
 var CompilerHost = (function () {
     function CompilerHost(program, options, context) {
         var _this = this;
@@ -30,6 +30,8 @@ var CompilerHost = (function () {
         this.context = context;
         this.metadataCollector = new tsc_wrapped_1.MetadataCollector();
         this.resolverCache = new Map();
+        this.bundleIndexCache = new Map();
+        this.bundleIndexNames = new Set();
         // normalize the path so that it never ends with '/'.
         this.basePath = path.normalize(path.join(this.options.basePath, '.')).replace(/\\/g, '/');
         this.genDir = path.normalize(path.join(this.options.genDir, '.')).replace(/\\/g, '/');
@@ -242,7 +244,16 @@ var CompilerHost = (function () {
     };
     CompilerHost.prototype.isSourceFile = function (filePath) {
         var excludeRegex = this.options.generateCodeForLibraries === false ? GENERATED_OR_DTS_FILES : GENERATED_FILES;
-        return !excludeRegex.test(filePath);
+        if (excludeRegex.test(filePath)) {
+            return false;
+        }
+        if (DTS.test(filePath)) {
+            // Check for a bundle index.
+            if (this.hasBundleIndex(filePath)) {
+                return this.bundleIndexNames.has(filePath);
+            }
+        }
+        return true;
     };
     CompilerHost.prototype.calculateEmitPath = function (filePath) {
         // Write codegen in a directory structure matching the sources.
@@ -264,6 +275,60 @@ var CompilerHost = (function () {
             relativePath = relativePath.substr(3);
         }
         return path.join(this.options.genDir, relativePath);
+    };
+    CompilerHost.prototype.hasBundleIndex = function (filePath) {
+        var _this = this;
+        var checkBundleIndex = function (directory) {
+            var result = _this.bundleIndexCache.get(directory);
+            if (result == null) {
+                if (path.basename(directory) == 'node_module') {
+                    // Don't look outside the node_modules this package is installed in.
+                    result = false;
+                }
+                else {
+                    // A bundle index exists if the typings .d.ts file has a metadata.json that has an
+                    // importAs.
+                    try {
+                        var packageFile = path.join(directory, 'package.json');
+                        if (_this.context.fileExists(packageFile)) {
+                            // Once we see a package.json file, assume false until it we find the bundle index.
+                            result = false;
+                            var packageContent = JSON.parse(_this.context.readFile(packageFile));
+                            if (packageContent.typings) {
+                                var typings = path.normalize(path.join(directory, packageContent.typings));
+                                if (DTS.test(typings)) {
+                                    var metadataFile = typings.replace(DTS, '.metadata.json');
+                                    if (_this.context.fileExists(metadataFile)) {
+                                        var metadata = JSON.parse(_this.context.readFile(metadataFile));
+                                        if (metadata.importAs) {
+                                            _this.bundleIndexNames.add(typings);
+                                            result = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            var parent_1 = path.dirname(directory);
+                            if (parent_1 != directory) {
+                                // Try the parent directory.
+                                result = checkBundleIndex(parent_1);
+                            }
+                            else {
+                                result = false;
+                            }
+                        }
+                    }
+                    catch (e) {
+                        // If we encounter any errors assume we this isn't a bundle index.
+                        result = false;
+                    }
+                }
+                _this.bundleIndexCache.set(directory, result);
+            }
+            return result;
+        };
+        return checkBundleIndex(path.dirname(filePath));
     };
     return CompilerHost;
 }());
