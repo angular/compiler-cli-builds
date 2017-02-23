@@ -21,7 +21,7 @@ var NODE_MODULES = '/node_modules/';
 var IS_GENERATED = /\.(ngfactory|ngstyle)$/;
 var GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$/;
 var GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$/;
-var SHALLOW_IMPORT = /^((\w|-)+|(@(\w|-)+\/(\w|-)+))$/;
+var SHALLOW_IMPORT = /^((\w|-)+|(@(\w|-)+(\/(\w|-)+)+))$/;
 var CompilerHost = (function () {
     function CompilerHost(program, options, context) {
         var _this = this;
