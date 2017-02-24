@@ -250,7 +250,8 @@ var CompilerHost = (function () {
         if (DTS.test(filePath)) {
             // Check for a bundle index.
             if (this.hasBundleIndex(filePath)) {
-                return this.bundleIndexNames.has(filePath);
+                var normalFilePath = path.normalize(filePath);
+                return this.bundleIndexNames.has(normalFilePath);
             }
         }
         return true;
