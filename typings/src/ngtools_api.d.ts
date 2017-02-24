@@ -28,6 +28,8 @@ export interface NgTools_InternalApi_NG2_ExtractI18n_Options {
     angularCompilerOptions: AngularCompilerOptions;
     i18nFormat: string;
     readResource: (fileName: string) => Promise<string>;
+    locale?: string;
+    outFile?: string;
 }
 /**
  * @internal

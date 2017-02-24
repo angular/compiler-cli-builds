@@ -4,7 +4,8 @@ require("reflect-metadata");
 var tsc = require("@angular/tsc-wrapped");
 var extractor_1 = require("./extractor");
 function extract(ngOptions, cliOptions, program, host) {
-    return extractor_1.Extractor.create(ngOptions, program, host).extract(cliOptions.i18nFormat);
+    return extractor_1.Extractor.create(ngOptions, program, host, cliOptions.locale)
+        .extract(cliOptions.i18nFormat, cliOptions.outFile);
 }
 // Entry point
 if (require.main === module) {

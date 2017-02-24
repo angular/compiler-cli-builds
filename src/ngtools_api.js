@@ -89,8 +89,9 @@ var NgTools_InternalApi_NG_2 = (function () {
     NgTools_InternalApi_NG_2.extractI18n = function (options) {
         var hostContext = new CustomLoaderModuleResolutionHostAdapter(options.readResource, options.host);
         // Create the i18n extractor.
-        var extractor = extractor_1.Extractor.create(options.angularCompilerOptions, options.program, options.host, hostContext);
-        return extractor.extract(options.i18nFormat);
+        var locale = options.locale || null;
+        var extractor = extractor_1.Extractor.create(options.angularCompilerOptions, options.program, options.host, locale, hostContext);
+        return extractor.extract(options.i18nFormat, options.outFile || null);
     };
     return NgTools_InternalApi_NG_2;
 }());
