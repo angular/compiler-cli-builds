@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { AotCompilerHost } from '@angular/compiler';
-import { AngularCompilerOptions, MetadataCollector, ModuleMetadata } from '@angular/tsc-wrapped';
+import { AngularCompilerOptions, CollectorOptions, MetadataCollector, ModuleMetadata } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
 export interface CompilerHostContext extends ts.ModuleResolutionHost {
     readResource(fileName: string): Promise<string>;
@@ -24,7 +24,7 @@ export declare class CompilerHost implements AotCompilerHost {
     private bundleIndexCache;
     private bundleIndexNames;
     protected resolveModuleNameHost: CompilerHostContext;
-    constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext);
+    constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext, collectorOptions?: CollectorOptions);
     getCanonicalFileName(fileName: string): string;
     moduleNameToFileName(m: string, containingFile: string): string | null;
     /**

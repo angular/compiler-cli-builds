@@ -23,7 +23,7 @@ var GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$/;
 var GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$/;
 var SHALLOW_IMPORT = /^((\w|-)+|(@(\w|-)+(\/(\w|-)+)+))$/;
 var CompilerHost = (function () {
-    function CompilerHost(program, options, context) {
+    function CompilerHost(program, options, context, collectorOptions) {
         var _this = this;
         this.program = program;
         this.options = options;
