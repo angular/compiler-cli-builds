@@ -55,7 +55,6 @@ var CodeGenerator = (function () {
             transContent = fs_1.readFileSync(transFile, 'utf8');
         }
         var aotCompiler = compiler.createAotCompiler(ngCompilerHost, {
-            debug: options.debug === true,
             translations: transContent,
             i18nFormat: cliOptions.i18nFormat,
             locale: cliOptions.locale,
