@@ -33,7 +33,7 @@ var CodeGenerator = (function () {
                 var sourceFile = _this.program.getSourceFile(generatedModule.srcFileUrl);
                 var emitPath = _this.ngCompilerHost.calculateEmitPath(generatedModule.genFileUrl);
                 var source = GENERATED_META_FILES.test(emitPath) ? generatedModule.source :
-                    PREAMBLE + generatedModule.source;
+                    generatedModule.source;
                 _this.host.writeFile(emitPath, source, false, function () { }, [sourceFile]);
             });
         });
@@ -59,6 +59,7 @@ var CodeGenerator = (function () {
             i18nFormat: cliOptions.i18nFormat,
             locale: cliOptions.locale,
             enableLegacyTemplate: options.enableLegacyTemplate !== false,
+            genFilePreamble: PREAMBLE,
         }).compiler;
         return new CodeGenerator(options, program, tsCompilerHost, aotCompiler, ngCompilerHost);
     };
