@@ -193,6 +193,10 @@ var CompilerHost = (function () {
         }
         try {
             var metadataOrMetadatas = JSON.parse(this.context.readFile(filePath));
+            while (metadataOrMetadatas && metadataOrMetadatas.alias) {
+                filePath = path.join(path.dirname(filePath), metadataOrMetadatas.alias);
+                metadataOrMetadatas = JSON.parse(this.context.readFile(filePath));
+            }
             var metadatas_1 = metadataOrMetadatas ?
                 (Array.isArray(metadataOrMetadatas) ? metadataOrMetadatas : [metadataOrMetadatas]) :
                 [];
