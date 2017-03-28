@@ -32,7 +32,6 @@ var CompilerHost = (function () {
         this.resolverCache = new Map();
         this.bundleIndexCache = new Map();
         this.bundleIndexNames = new Set();
-        this.moduleFileNames = new Map();
         // normalize the path so that it never ends with '/'.
         this.basePath = path.normalize(path.join(this.options.basePath, '.')).replace(/\\/g, '/');
         this.genDir = path.normalize(path.join(this.options.genDir, '.')).replace(/\\/g, '/');
@@ -60,23 +59,17 @@ var CompilerHost = (function () {
     // We use absolute paths on disk as canonical.
     CompilerHost.prototype.getCanonicalFileName = function (fileName) { return fileName; };
     CompilerHost.prototype.moduleNameToFileName = function (m, containingFile) {
-        var key = m + ':' + (containingFile || '');
-        var result = this.moduleFileNames.get(key);
-        if (!result) {
-            if (!containingFile || !containingFile.length) {
-                if (m.indexOf('.') === 0) {
-                    throw new Error('Resolution of relative paths requires a containing file.');
-                }
-                // Any containing file gives the same result for absolute imports
-                containingFile = this.getCanonicalFileName(path.join(this.basePath, 'index.ts'));
+        if (!containingFile || !containingFile.length) {
+            if (m.indexOf('.') === 0) {
+                throw new Error('Resolution of relative paths requires a containing file.');
             }
-            m = m.replace(EXT, '');
-            var resolved = ts.resolveModuleName(m, containingFile.replace(/\\/g, '/'), this.options, this.resolveModuleNameHost)
-                .resolvedModule;
-            result = resolved ? this.getCanonicalFileName(resolved.resolvedFileName) : null;
-            this.moduleFileNames.set(key, result);
+            // Any containing file gives the same result for absolute imports
+            containingFile = this.getCanonicalFileName(path.join(this.basePath, 'index.ts'));
         }
-        return result;
+        m = m.replace(EXT, '');
+        var resolved = ts.resolveModuleName(m, containingFile.replace(/\\/g, '/'), this.options, this.resolveModuleNameHost)
+            .resolvedModule;
+        return resolved ? this.getCanonicalFileName(resolved.resolvedFileName) : null;
     };
     ;
     /**
