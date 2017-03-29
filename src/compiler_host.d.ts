@@ -23,6 +23,7 @@ export declare class CompilerHost implements AotCompilerHost {
     private resolverCache;
     private bundleIndexCache;
     private bundleIndexNames;
+    private moduleFileNames;
     protected resolveModuleNameHost: CompilerHostContext;
     constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext, collectorOptions?: CollectorOptions);
     getCanonicalFileName(fileName: string): string;
