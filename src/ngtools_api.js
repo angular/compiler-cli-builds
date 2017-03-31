@@ -75,7 +75,7 @@ var NgTools_InternalApi_NG_2 = (function () {
         var symbolCache = new compiler_1.StaticSymbolCache();
         var summaryResolver = new compiler_1.AotSummaryResolver(ngCompilerHost, symbolCache);
         var symbolResolver = new compiler_1.StaticSymbolResolver(ngCompilerHost, symbolCache, summaryResolver);
-        var staticReflector = new compiler_1.StaticReflector(symbolResolver);
+        var staticReflector = new compiler_1.StaticReflector(summaryResolver, symbolResolver);
         var routeMap = ngtools_impl_1.listLazyRoutesOfModule(options.entryModule, ngCompilerHost, staticReflector);
         return Object.keys(routeMap).reduce(function (acc, route) {
             acc[route] = routeMap[route].absoluteFilePath;
