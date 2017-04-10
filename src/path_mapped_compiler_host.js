@@ -59,6 +59,7 @@ var PathMappedCompilerHost = (function (_super) {
                 return this.getCanonicalFileName(resolved.resolvedFileName);
             }
         }
+        return null;
     };
     /**
      * We want a moduleId that will appear in import statements in the generated code.
@@ -87,7 +88,7 @@ var PathMappedCompilerHost = (function (_super) {
         };
         var importModuleName = importedFile.replace(EXT, '');
         var parts = importModuleName.split(path.sep).filter(function (p) { return !!p; });
-        var foundRelativeImport;
+        var foundRelativeImport = undefined;
         for (var index = parts.length - 1; index >= 0; index--) {
             var candidate_1 = parts.slice(index, parts.length).join(path.sep);
             if (resolvable(candidate_1)) {
@@ -130,6 +131,7 @@ var PathMappedCompilerHost = (function (_super) {
                 return metadata ? [metadata] : [];
             }
         }
+        return null;
     };
     return PathMappedCompilerHost;
 }(compiler_host_1.CompilerHost));
