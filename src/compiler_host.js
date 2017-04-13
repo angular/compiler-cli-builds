@@ -61,7 +61,7 @@ var CompilerHost = (function () {
     CompilerHost.prototype.getCanonicalFileName = function (fileName) { return fileName; };
     CompilerHost.prototype.moduleNameToFileName = function (m, containingFile) {
         var key = m + ':' + (containingFile || '');
-        var result = this.moduleFileNames.get(key);
+        var result = this.moduleFileNames.get(key) || null;
         if (!result) {
             if (!containingFile || !containingFile.length) {
                 if (m.indexOf('.') === 0) {
@@ -245,6 +245,7 @@ var CompilerHost = (function () {
         if (this.context.fileExists(filePath)) {
             return this.context.readFile(filePath);
         }
+        return null;
     };
     CompilerHost.prototype.getOutputFileName = function (sourceFilePath) {
         return sourceFilePath.replace(EXT, '') + '.d.ts';

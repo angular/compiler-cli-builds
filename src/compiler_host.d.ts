@@ -50,7 +50,7 @@ export declare class CompilerHost implements AotCompilerHost {
      */
     private rewriteGenDirPath(filepath);
     protected getSourceFile(filePath: string): ts.SourceFile;
-    getMetadataFor(filePath: string): ModuleMetadata[];
+    getMetadataFor(filePath: string): ModuleMetadata[] | undefined;
     readMetadata(filePath: string, dtsFilePath: string): ModuleMetadata[];
     private upgradeVersion1Metadata(v1Metadata, dtsFilePath);
     loadResource(filePath: string): Promise<string>;
