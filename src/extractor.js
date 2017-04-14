@@ -29,7 +29,7 @@ var Extractor = (function () {
         var ext = this.getExtension(formatName);
         var promiseBundle = this.extractBundle();
         return promiseBundle.then(function (bundle) {
-            var content = _this.serialize(bundle, ext);
+            var content = _this.serialize(bundle, formatName);
             var dstFile = outFile || "messages." + ext;
             var dstPath = path.join(_this.options.genDir, dstFile);
             _this.host.writeFile(dstPath, content, false);
@@ -40,25 +40,38 @@ var Extractor = (function () {
         var files = this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); });
         return this.ngExtractor.extract(files);
     };
-    Extractor.prototype.serialize = function (bundle, ext) {
+    Extractor.prototype.serialize = function (bundle, formatName) {
+        var _this = this;
+        var format = formatName.toLowerCase();
         var serializer;
-        switch (ext) {
+        switch (format) {
             case 'xmb':
                 serializer = new compiler.Xmb();
                 break;
+            case 'xliff2':
+            case 'xlf2':
+                serializer = new compiler.Xliff2();
+                break;
             case 'xlf':
+            case 'xliff':
             default:
                 serializer = new compiler.Xliff();
         }
-        return bundle.write(serializer);
+        return bundle.write(serializer, function (sourcePath) { return sourcePath.replace(path.join(_this.options.basePath, '/'), ''); });
     };
     Extractor.prototype.getExtension = function (formatName) {
         var format = (formatName || 'xlf').toLowerCase();
-        if (format === 'xmb')
-            return 'xmb';
-        if (format === 'xlf' || format === 'xlif' || format === 'xliff')
-            return 'xlf';
-        throw new Error('Unsupported format "${formatName}"');
+        switch (format) {
+            case 'xmb':
+                return 'xmb';
+            case 'xlf':
+            case 'xlif':
+            case 'xliff':
+            case 'xlf2':
+            case 'xliff2':
+                return 'xlf';
+        }
+        throw new Error("Unsupported format \"" + formatName + "\"");
     };
     Extractor.create = function (options, program, tsCompilerHost, locale, compilerHostContext, ngCompilerHost) {
         if (!ngCompilerHost) {
