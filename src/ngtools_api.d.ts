@@ -9,6 +9,7 @@ export interface NgTools_InternalApi_NG2_CodeGen_Options {
     i18nFormat?: string;
     i18nFile?: string;
     locale?: string;
+    missingTranslation?: string;
     readResource: (fileName: string) => Promise<string>;
 }
 export interface NgTools_InternalApi_NG2_ListLazyRoutes_Options {
