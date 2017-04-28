@@ -11,6 +11,7 @@
  * Intended to be used in a build step.
  */
 var compiler = require("@angular/compiler");
+var core_1 = require("@angular/core");
 var fs_1 = require("fs");
 var compiler_host_1 = require("./compiler_host");
 var path_mapped_compiler_host_1 = require("./path_mapped_compiler_host");
@@ -45,19 +46,33 @@ var CodeGenerator = (function () {
             ngCompilerHost = usePathMapping ? new path_mapped_compiler_host_1.PathMappedCompilerHost(program, options, context) :
                 new compiler_host_1.CompilerHost(program, options, context);
         }
-        var transFile = cliOptions.i18nFile;
-        var locale = cliOptions.locale;
         var transContent = '';
-        if (transFile) {
-            if (!locale) {
-                throw new Error("The translation file (" + transFile + ") locale must be provided. Use the --locale option.");
+        if (cliOptions.i18nFile) {
+            if (!cliOptions.locale) {
+                throw new Error("The translation file (" + cliOptions.i18nFile + ") locale must be provided. Use the --locale option.");
             }
-            transContent = fs_1.readFileSync(transFile, 'utf8');
+            transContent = fs_1.readFileSync(cliOptions.i18nFile, 'utf8');
+        }
+        var missingTranslation = core_1.MissingTranslationStrategy.Warning;
+        if (cliOptions.missingTranslation) {
+            switch (cliOptions.missingTranslation) {
+                case 'error':
+                    missingTranslation = core_1.MissingTranslationStrategy.Error;
+                    break;
+                case 'warning':
+                    missingTranslation = core_1.MissingTranslationStrategy.Warning;
+                    break;
+                case 'ignore':
+                    missingTranslation = core_1.MissingTranslationStrategy.Ignore;
+                    break;
+                default:
+                    throw new Error("Unknown option for missingTranslation (" + cliOptions.missingTranslation + "). Use either error, warning or ignore.");
+            }
         }
         var aotCompiler = compiler.createAotCompiler(ngCompilerHost, {
             translations: transContent,
             i18nFormat: cliOptions.i18nFormat,
-            locale: cliOptions.locale,
+            locale: cliOptions.locale, missingTranslation: missingTranslation,
             enableLegacyTemplate: options.enableLegacyTemplate !== false,
             genFilePreamble: PREAMBLE,
         }).compiler;
