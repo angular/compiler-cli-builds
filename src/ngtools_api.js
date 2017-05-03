@@ -54,6 +54,7 @@ var NgTools_InternalApi_NG_2 = (function () {
             i18nFormat: options.i18nFormat,
             i18nFile: options.i18nFile,
             locale: options.locale,
+            missingTranslation: options.missingTranslation,
             basePath: options.basePath
         };
         // Create the Code Generator.
