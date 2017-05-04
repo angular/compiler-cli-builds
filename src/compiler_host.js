@@ -18,9 +18,9 @@ var ts = require("typescript");
 var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 var DTS = /\.d\.ts$/;
 var NODE_MODULES = '/node_modules/';
-var IS_GENERATED = /\.(ngfactory|ngstyle)$/;
-var GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$/;
-var GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$/;
+var IS_GENERATED = /\.(ngfactory|ngstyle|ngsummary)$/;
+var GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$|\.ngsummary\.ts$/;
+var GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$|\.ngsummary\.ts$/;
 var SHALLOW_IMPORT = /^((\w|-)+|(@(\w|-)+(\/(\w|-)+)+))$/;
 var CompilerHost = (function () {
     function CompilerHost(program, options, context, collectorOptions) {
