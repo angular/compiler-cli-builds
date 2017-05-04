@@ -15,5 +15,5 @@ var core_1 = require("@angular/core");
 /**
  * @stable
  */
-exports.VERSION = new core_1.Version('4.1.0-83d9533');
+exports.VERSION = new core_1.Version('4.1.0-478d2ce');
 //# sourceMappingURL=version.js.map
