@@ -270,6 +270,10 @@ var AstType = (function () {
         // The type of a prefix ! is always boolean.
         return this.query.getBuiltinType(symbols_1.BuiltinType.Boolean);
     };
+    AstType.prototype.visitNonNullAssert = function (ast) {
+        var expressionType = this.getType(ast.expression);
+        return this.query.getNonNullableType(expressionType);
+    };
     AstType.prototype.visitPropertyRead = function (ast) {
         return this.resolvePropertyRead(this.getType(ast.receiver), ast);
     };
