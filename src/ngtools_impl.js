@@ -111,7 +111,12 @@ function _extractLazyRoutesFromStaticModule(staticSymbol, reflector, host, ROUTE
         return acc;
     }, []);
     var importedSymbols = (moduleMetadata.imports || [])
-        .filter(function (i) { return i instanceof compiler_1.StaticSymbol; });
+        .filter(function (i) { return i instanceof compiler_1.StaticSymbol || i.ngModule instanceof compiler_1.StaticSymbol; })
+        .map(function (i) {
+        if (i instanceof compiler_1.StaticSymbol)
+            return i;
+        return i.ngModule;
+    });
     return importedSymbols
         .reduce(function (acc, i) {
         return acc.concat(_extractLazyRoutesFromStaticModule(i, reflector, host, ROUTES));
