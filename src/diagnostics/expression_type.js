@@ -40,6 +40,7 @@ var AstType = (function () {
         return this.diagnostics;
     };
     AstType.prototype.visitBinary = function (ast) {
+        var _this = this;
         // Treat undefined and null as other.
         function normalize(kind, other) {
             switch (kind) {
@@ -49,8 +50,28 @@ var AstType = (function () {
             }
             return kind;
         }
-        var leftType = this.getType(ast.left);
-        var rightType = this.getType(ast.right);
+        var getType = function (ast, operation) {
+            var type = _this.getType(ast);
+            if (type.nullable) {
+                switch (operation) {
+                    case '&&':
+                    case '||':
+                    case '==':
+                    case '!=':
+                    case '===':
+                    case '!==':
+                        // Nullable allowed.
+                        break;
+                    default:
+                        _this.reportError("The expression might be null", ast);
+                        break;
+                }
+                return _this.query.getNonNullableType(type);
+            }
+            return type;
+        };
+        var leftType = getType(ast.left, ast.operation);
+        var rightType = getType(ast.right, ast.operation);
         var leftRawKind = this.query.getTypeKind(leftType);
         var rightRawKind = this.query.getTypeKind(rightType);
         var leftKind = normalize(leftRawKind, rightRawKind);
@@ -160,6 +181,9 @@ var AstType = (function () {
     };
     AstType.prototype.visitConditional = function (ast) {
         // The type of a conditional is the union of the true and false conditions.
+        if (this.diagnostics) {
+            compiler_1.visitAstChildren(ast, this);
+        }
         return this.query.getTypeUnion(this.getType(ast.trueExp), this.getType(ast.falseExp));
     };
     AstType.prototype.visitFunctionCall = function (ast) {
