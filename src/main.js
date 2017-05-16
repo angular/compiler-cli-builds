@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 var tsc = require("@angular/tsc-wrapped");
 var compiler_1 = require("@angular/compiler");
