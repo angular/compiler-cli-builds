@@ -29,13 +29,12 @@ var CodeGenerator = (function () {
     CodeGenerator.prototype.codegen = function () {
         var _this = this;
         return this.compiler
-            .compileAll(this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); }))
+            .compileAllAsync(this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); }))
             .then(function (generatedModules) {
             generatedModules.forEach(function (generatedModule) {
                 var sourceFile = _this.program.getSourceFile(generatedModule.srcFileUrl);
                 var emitPath = _this.ngCompilerHost.calculateEmitPath(generatedModule.genFileUrl);
-                var source = GENERATED_META_FILES.test(emitPath) ? generatedModule.source :
-                    generatedModule.source;
+                var source = generatedModule.source || compiler.toTypeScript(generatedModule, PREAMBLE);
                 _this.host.writeFile(emitPath, source, false, function () { }, [sourceFile]);
             });
         });
@@ -75,7 +74,6 @@ var CodeGenerator = (function () {
             i18nFormat: cliOptions.i18nFormat,
             locale: cliOptions.locale, missingTranslation: missingTranslation,
             enableLegacyTemplate: options.enableLegacyTemplate !== false,
-            genFilePreamble: PREAMBLE,
         }).compiler;
         return new CodeGenerator(options, program, tsCompilerHost, aotCompiler, ngCompilerHost);
     };
