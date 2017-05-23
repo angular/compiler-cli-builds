@@ -29,7 +29,8 @@ var CodeGenerator = (function () {
     CodeGenerator.prototype.codegen = function () {
         var _this = this;
         return this.compiler
-            .compileAllAsync(this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); }))
+            .analyzeModulesAsync(this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); }))
+            .then(function (analyzedModules) { return _this.compiler.emitAllImpls(analyzedModules); })
             .then(function (generatedModules) {
             generatedModules.forEach(function (generatedModule) {
                 var sourceFile = _this.program.getSourceFile(generatedModule.srcFileUrl);
