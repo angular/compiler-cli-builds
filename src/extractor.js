@@ -34,6 +34,7 @@ var Extractor = (function () {
             var dstFile = outFile || "messages." + ext;
             var dstPath = path.join(_this.options.genDir, dstFile);
             _this.host.writeFile(dstPath, content, false);
+            return [dstPath];
         });
     };
     Extractor.prototype.extractBundle = function () {

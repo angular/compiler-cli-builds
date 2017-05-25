@@ -38,6 +38,7 @@ var CompilerHost = (function () {
         this.resolverCache = new Map();
         this.bundleIndexCache = new Map();
         this.bundleIndexNames = new Set();
+        this.bundleRedirectNames = new Set();
         this.moduleFileNames = new Map();
         // normalize the path so that it never ends with '/'.
         this.basePath = path.normalize(path.join(this.options.basePath, '.')).replace(/\\/g, '/');
@@ -265,7 +266,8 @@ var CompilerHost = (function () {
             // Check for a bundle index.
             if (this.hasBundleIndex(filePath)) {
                 var normalFilePath = path.normalize(filePath);
-                return this.bundleIndexNames.has(normalFilePath);
+                return this.bundleIndexNames.has(normalFilePath) ||
+                    this.bundleRedirectNames.has(normalFilePath);
             }
         }
         return true;
@@ -315,7 +317,14 @@ var CompilerHost = (function () {
                                     var metadataFile = typings.replace(DTS, '.metadata.json');
                                     if (_this.context.fileExists(metadataFile)) {
                                         var metadata = JSON.parse(_this.context.readFile(metadataFile));
-                                        if (metadata.importAs) {
+                                        if (metadata.bundleRedirect) {
+                                            _this.bundleRedirectNames.add(typings);
+                                            // Note: don't set result = true,
+                                            // as this would mark this folder
+                                            // as having a bundleIndex too early without
+                                            // filling the bundleIndexNames.
+                                        }
+                                        else if (metadata.importAs) {
                                             _this.bundleIndexNames.add(typings);
                                             result = true;
                                         }
