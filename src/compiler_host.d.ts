@@ -21,9 +21,9 @@ export declare class CompilerHost implements AotCompilerHost {
     protected basePath: string;
     private genDir;
     private resolverCache;
-    private flatModuleIndexCache;
-    private flatModuleIndexNames;
-    private flatModuleIndexRedirectNames;
+    private bundleIndexCache;
+    private bundleIndexNames;
+    private bundleRedirectNames;
     private moduleFileNames;
     protected resolveModuleNameHost: CompilerHostContext;
     constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext, collectorOptions?: CollectorOptions);

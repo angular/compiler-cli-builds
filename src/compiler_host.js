@@ -36,9 +36,9 @@ var CompilerHost = (function () {
         this.context = context;
         this.metadataCollector = new tsc_wrapped_1.MetadataCollector();
         this.resolverCache = new Map();
-        this.flatModuleIndexCache = new Map();
-        this.flatModuleIndexNames = new Set();
-        this.flatModuleIndexRedirectNames = new Set();
+        this.bundleIndexCache = new Map();
+        this.bundleIndexNames = new Set();
+        this.bundleRedirectNames = new Set();
         this.moduleFileNames = new Map();
         // normalize the path so that it never ends with '/'.
         this.basePath = path.normalize(path.join(this.options.basePath, '.')).replace(/\\/g, '/');
@@ -266,8 +266,8 @@ var CompilerHost = (function () {
             // Check for a bundle index.
             if (this.hasBundleIndex(filePath)) {
                 var normalFilePath = path.normalize(filePath);
-                return this.flatModuleIndexNames.has(normalFilePath) ||
-                    this.flatModuleIndexRedirectNames.has(normalFilePath);
+                return this.bundleIndexNames.has(normalFilePath) ||
+                    this.bundleRedirectNames.has(normalFilePath);
             }
         }
         return true;
@@ -296,7 +296,7 @@ var CompilerHost = (function () {
     CompilerHost.prototype.hasBundleIndex = function (filePath) {
         var _this = this;
         var checkBundleIndex = function (directory) {
-            var result = _this.flatModuleIndexCache.get(directory);
+            var result = _this.bundleIndexCache.get(directory);
             if (result == null) {
                 if (path.basename(directory) == 'node_module') {
                     // Don't look outside the node_modules this package is installed in.
@@ -317,15 +317,15 @@ var CompilerHost = (function () {
                                     var metadataFile = typings.replace(DTS, '.metadata.json');
                                     if (_this.context.fileExists(metadataFile)) {
                                         var metadata = JSON.parse(_this.context.readFile(metadataFile));
-                                        if (metadata.flatModuleIndexRedirect) {
-                                            _this.flatModuleIndexRedirectNames.add(typings);
+                                        if (metadata.bundleRedirect) {
+                                            _this.bundleRedirectNames.add(typings);
                                             // Note: don't set result = true,
                                             // as this would mark this folder
                                             // as having a bundleIndex too early without
                                             // filling the bundleIndexNames.
                                         }
                                         else if (metadata.importAs) {
-                                            _this.flatModuleIndexNames.add(typings);
+                                            _this.bundleIndexNames.add(typings);
                                             result = true;
                                         }
                                     }
@@ -348,7 +348,7 @@ var CompilerHost = (function () {
                         result = false;
                     }
                 }
-                _this.flatModuleIndexCache.set(directory, result);
+                _this.bundleIndexCache.set(directory, result);
             }
             return result;
         };
