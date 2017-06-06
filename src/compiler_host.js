@@ -247,7 +247,9 @@ var CompilerHost = (function () {
         }
         return v3Metadata;
     };
-    CompilerHost.prototype.loadResource = function (filePath) { return this.context.readResource(filePath); };
+    CompilerHost.prototype.loadResource = function (filePath) {
+        return this.context.readResource(filePath);
+    };
     CompilerHost.prototype.loadSummary = function (filePath) {
         if (this.context.fileExists(filePath)) {
             return this.context.readFile(filePath);

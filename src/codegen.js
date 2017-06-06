@@ -30,15 +30,22 @@ var CodeGenerator = (function () {
         var _this = this;
         return this.compiler
             .analyzeModulesAsync(this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); }))
-            .then(function (analyzedModules) { return _this.compiler.emitAllImpls(analyzedModules); })
-            .then(function (generatedModules) {
-            return generatedModules.map(function (generatedModule) {
-                var sourceFile = _this.program.getSourceFile(generatedModule.srcFileUrl);
-                var emitPath = _this.ngCompilerHost.calculateEmitPath(generatedModule.genFileUrl);
-                var source = generatedModule.source || compiler.toTypeScript(generatedModule, PREAMBLE);
-                _this.host.writeFile(emitPath, source, false, function () { }, [sourceFile]);
-                return emitPath;
-            });
+            .then(function (analyzedModules) { return _this.emit(analyzedModules); });
+    };
+    CodeGenerator.prototype.codegenSync = function () {
+        var _this = this;
+        var analyzed = this.compiler.analyzeModulesSync(this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); }));
+        return this.emit(analyzed);
+    };
+    CodeGenerator.prototype.emit = function (analyzedModules) {
+        var _this = this;
+        var generatedModules = this.compiler.emitAllImpls(analyzedModules);
+        return generatedModules.map(function (generatedModule) {
+            var sourceFile = _this.program.getSourceFile(generatedModule.srcFileUrl);
+            var emitPath = _this.ngCompilerHost.calculateEmitPath(generatedModule.genFileUrl);
+            var source = generatedModule.source || compiler.toTypeScript(generatedModule, PREAMBLE);
+            _this.host.writeFile(emitPath, source, false, function () { }, [sourceFile]);
+            return emitPath;
         });
     };
     CodeGenerator.create = function (options, cliOptions, program, tsCompilerHost, compilerHostContext, ngCompilerHost) {
