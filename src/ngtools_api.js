@@ -63,8 +63,13 @@ var NgTools_InternalApi_NG_2 = (function () {
             missingTranslation: options.missingTranslation,
             basePath: options.basePath
         };
+        var ngOptions = options.angularCompilerOptions;
+        if (ngOptions.enableSummariesForJit === undefined) {
+            // default to false
+            ngOptions.enableSummariesForJit = false;
+        }
         // Create the Code Generator.
-        var codeGenerator = codegen_1.CodeGenerator.create(options.angularCompilerOptions, cliOptions, options.program, options.host, hostContext);
+        var codeGenerator = codegen_1.CodeGenerator.create(ngOptions, cliOptions, options.program, options.host, hostContext);
         return codeGenerator.codegen();
     };
     /**

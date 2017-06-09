@@ -83,6 +83,7 @@ var CodeGenerator = (function () {
             i18nFormat: cliOptions.i18nFormat,
             locale: cliOptions.locale, missingTranslation: missingTranslation,
             enableLegacyTemplate: options.enableLegacyTemplate !== false,
+            enableSummariesForJit: options.enableSummariesForJit !== false,
         }).compiler;
         return new CodeGenerator(options, program, tsCompilerHost, aotCompiler, ngCompilerHost);
     };

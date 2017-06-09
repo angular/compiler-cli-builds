@@ -6,6 +6,10 @@ var tsc = require("@angular/tsc-wrapped");
 var compiler_1 = require("@angular/compiler");
 var codegen_1 = require("./codegen");
 function codegen(ngOptions, cliOptions, program, host) {
+    if (ngOptions.enableSummariesForJit === undefined) {
+        // default to false
+        ngOptions.enableSummariesForJit = false;
+    }
     return codegen_1.CodeGenerator.create(ngOptions, cliOptions, program, host).codegen();
 }
 function main(args, consoleError) {
