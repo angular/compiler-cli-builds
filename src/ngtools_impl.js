@@ -93,6 +93,13 @@ function _assertRoute(map, route) {
             'load the proper one.');
     }
 }
+function flatten(list) {
+    return list.reduce(function (flat, item) {
+        var flatItem = Array.isArray(item) ? flatten(item) : item;
+        return flat.concat(flatItem);
+    }, []);
+}
+exports.flatten = flatten;
 /**
  * Extract all the LazyRoutes from a module. This extracts all `loadChildren` keys from this
  * module and all statically referred modules.
@@ -100,9 +107,8 @@ function _assertRoute(map, route) {
  */
 function _extractLazyRoutesFromStaticModule(staticSymbol, reflector, host, ROUTES) {
     var moduleMetadata = _getNgModuleMetadata(staticSymbol, reflector);
-    var allRoutes = (moduleMetadata.imports || [])
-        .filter(function (i) { return 'providers' in i; })
-        .reduce(function (mem, m) {
+    var imports = flatten(moduleMetadata.imports || []);
+    var allRoutes = imports.filter(function (i) { return 'providers' in i; }).reduce(function (mem, m) {
         return mem.concat(_collectRoutes(m.providers || [], reflector, ROUTES));
     }, _collectRoutes(moduleMetadata.providers || [], reflector, ROUTES));
     var lazyRoutes = _collectLoadChildren(allRoutes).reduce(function (acc, route) {
@@ -111,7 +117,7 @@ function _extractLazyRoutesFromStaticModule(staticSymbol, reflector, host, ROUTE
         acc.push({ routeDef: routeDef, absoluteFilePath: absoluteFilePath });
         return acc;
     }, []);
-    var importedSymbols = (moduleMetadata.imports || [])
+    var importedSymbols = imports
         .filter(function (i) { return i instanceof compiler_1.StaticSymbol || i.ngModule instanceof compiler_1.StaticSymbol; })
         .map(function (i) {
         if (i instanceof compiler_1.StaticSymbol)

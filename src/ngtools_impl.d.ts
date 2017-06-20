@@ -32,3 +32,4 @@ export declare class RouteDef {
  * @private
  */
 export declare function listLazyRoutesOfModule(entryModule: string, host: AotCompilerHost, reflector: StaticReflector): LazyRouteMap;
+export declare function flatten<T>(list: Array<T | T[]>): T[];
