@@ -144,8 +144,8 @@ function refinedVariableType(type, info, templateElement) {
             }
         }
     }
-    // We can't do better, just return the original type.
-    return type;
+    // We can't do better, return any
+    return info.query.getBuiltinType(symbols_1.BuiltinType.Any);
 }
 function getEventDeclaration(info, includeEvent) {
     var result = [];
