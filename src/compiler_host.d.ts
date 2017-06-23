@@ -9,7 +9,7 @@ import { AotCompilerHost } from '@angular/compiler';
 import { AngularCompilerOptions, CollectorOptions, MetadataCollector, ModuleMetadata } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
 export interface CompilerHostContext extends ts.ModuleResolutionHost {
-    readResource(fileName: string): Promise<string>;
+    readResource?(fileName: string): Promise<string> | string;
     assumeFileExists(fileName: string): void;
 }
 export declare class CompilerHost implements AotCompilerHost {

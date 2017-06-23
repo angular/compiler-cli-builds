@@ -35,6 +35,10 @@ exports.getPipesTable = typescript_symbols_1.getPipesTable;
 exports.getSymbolQuery = typescript_symbols_1.getSymbolQuery;
 var symbols_1 = require("./src/diagnostics/symbols");
 exports.BuiltinType = symbols_1.BuiltinType;
+__export(require("./src/transformers/api"));
+__export(require("./src/transformers/entry_points"));
+var ngc_1 = require("./src/ngc");
+exports.ngc = ngc_1.main;
 // TODO(hansl): moving to Angular 4 need to update this API.
 var ngtools_api_1 = require("./src/ngtools_api");
 exports.__NGTOOLS_PRIVATE_API_2 = ngtools_api_1.NgTools_InternalApi_NG_2;
