@@ -178,7 +178,7 @@ var CompilerHost = (function () {
     CompilerHost.prototype.getMetadataFor = function (filePath) {
         if (!this.context.fileExists(filePath)) {
             // If the file doesn't exists then we cannot return metadata for the file.
-            // This will occur if the user referenced a declared module for which no file
+            // This will occur if the user refernced a declared module for which no file
             // exists for the module (i.e. jQuery or angularjs).
             return;
         }
@@ -194,9 +194,11 @@ var CompilerHost = (function () {
                 return [this.upgradeVersion1Metadata({ '__symbolic': 'module', 'version': 1, 'metadata': {} }, filePath)];
             }
         }
-        var sf = this.getSourceFile(filePath);
-        var metadata = this.metadataCollector.getMetadata(sf);
-        return metadata ? [metadata] : [];
+        else {
+            var sf = this.getSourceFile(filePath);
+            var metadata = this.metadataCollector.getMetadata(sf);
+            return metadata ? [metadata] : [];
+        }
     };
     CompilerHost.prototype.readMetadata = function (filePath, dtsFilePath) {
         var metadatas = this.resolverCache.get(filePath);
@@ -246,9 +248,7 @@ var CompilerHost = (function () {
         return v3Metadata;
     };
     CompilerHost.prototype.loadResource = function (filePath) {
-        if (this.context.readResource)
-            return this.context.readResource(filePath);
-        return this.context.readFile(filePath);
+        return this.context.readResource(filePath);
     };
     CompilerHost.prototype.loadSummary = function (filePath) {
         if (this.context.fileExists(filePath)) {
