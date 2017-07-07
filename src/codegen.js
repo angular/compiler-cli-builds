@@ -78,9 +78,6 @@ var CodeGenerator = (function () {
                     throw new Error("Unknown option for missingTranslation (" + cliOptions.missingTranslation + "). Use either error, warning or ignore.");
             }
         }
-        if (!transContent) {
-            missingTranslation = core_1.MissingTranslationStrategy.Ignore;
-        }
         var aotCompiler = compiler.createAotCompiler(ngCompilerHost, {
             translations: transContent,
             i18nFormat: cliOptions.i18nFormat,

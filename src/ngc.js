@@ -6,14 +6,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 // Must be imported first, because Angular decorators throw on load.
 require("reflect-metadata");
@@ -34,7 +26,7 @@ function formatDiagnostics(cwd, diags) {
             return ts.formatDiagnostics(diags, {
                 getCurrentDirectory: function () { return cwd; },
                 getCanonicalFileName: function (fileName) { return fileName; },
-                getNewLine: function () { return ts.sys.newLine; }
+                getNewLine: function () { return '\n'; }
             });
         }
         else {
@@ -104,48 +96,25 @@ function readConfiguration(project, basePath, existingOptions) {
     var ngOptions = config.angularCompilerOptions || {};
     // Ignore the genDir option
     ngOptions.genDir = basePath;
+    for (var _i = 0, _b = Object.keys(parsed.options); _i < _b.length; _i++) {
+        var key = _b[_i];
+        ngOptions[key] = parsed.options[key];
+    }
     return { parsed: parsed, ngOptions: ngOptions };
 }
 exports.readConfiguration = readConfiguration;
-function getProjectDirectory(project) {
-    var isFile;
-    try {
-        isFile = fs.lstatSync(project).isFile();
-    }
-    catch (e) {
-        // Project doesn't exist. Assume it is a file has an extension. This case happens
-        // when the project file is passed to set basePath but no tsconfig.json file exists.
-        // It is used in tests to ensure that the options can be passed in without there being
-        // an actual config file.
-        isFile = path.extname(project) !== '';
-    }
-    // If project refers to a file, the project directory is the file's parent directory
-    // otherwise project is the project directory.
-    return isFile ? path.dirname(project) : project;
-}
-function main(args, consoleError, files, options, ngOptions) {
+function main(args, consoleError) {
     if (consoleError === void 0) { consoleError = console.error; }
     try {
         var parsedArgs = require('minimist')(args);
         var project = parsedArgs.p || parsedArgs.project || '.';
-        var projectDir = getProjectDirectory(project);
+        var projectDir = fs.lstatSync(project).isFile() ? path.dirname(project) : project;
         // file names in tsconfig are resolved relative to this absolute path
         var basePath_1 = path.resolve(process.cwd(), projectDir);
-        if (!files || !options || !ngOptions) {
-            var _a = readConfiguration(project, basePath_1), parsed = _a.parsed, readNgOptions = _a.ngOptions;
-            if (!files)
-                files = parsed.fileNames;
-            if (!options)
-                options = parsed.options;
-            if (!ngOptions)
-                ngOptions = readNgOptions;
-        }
-        // Ignore what the tsconfig.json for baseDir and genDir
+        var _a = readConfiguration(project, basePath_1), parsed = _a.parsed, ngOptions = _a.ngOptions;
         ngOptions.basePath = basePath_1;
-        ngOptions.genDir = basePath_1;
-        var host = ts.createCompilerHost(options, true);
-        host.realpath = function (p) { return p; };
-        var rootFileNames_1 = files.map(function (f) { return path.normalize(f); });
+        var host = ts.createCompilerHost(parsed.options, true);
+        var rootFileNames_1 = parsed.fileNames.slice(0);
         var addGeneratedFileName = function (fileName) {
             if (fileName.startsWith(basePath_1) && TS_EXT.exec(fileName)) {
                 rootFileNames_1.push(fileName);
@@ -159,9 +128,8 @@ function main(args, consoleError, files, options, ngOptions) {
                 addGeneratedFileName(indexName);
             host = bundleHost;
         }
-        var ngHostOptions = __assign({}, options, ngOptions);
-        var ngHost = ng.createHost({ tsHost: host, options: ngHostOptions });
-        var ngProgram = ng.createProgram({ rootNames: rootFileNames_1, host: ngHost, options: ngHostOptions });
+        var ngHost = ng.createHost({ tsHost: host, options: ngOptions });
+        var ngProgram = ng.createProgram({ rootNames: rootFileNames_1, host: ngHost, options: ngOptions });
         // Check parameter diagnostics
         check(basePath_1, ngProgram.getTsOptionDiagnostics(), ngProgram.getNgOptionDiagnostics());
         // Check syntactic diagnostics

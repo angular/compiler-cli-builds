@@ -303,7 +303,6 @@ function createProgramWithStubsHost(generatedFiles, originalProgram, originalHos
             this.getCanonicalFileName = function (fileName) { return originalHost.getCanonicalFileName(fileName); };
             this.useCaseSensitiveFileNames = function () { return originalHost.useCaseSensitiveFileNames(); };
             this.getNewLine = function () { return originalHost.getNewLine(); };
-            this.realPath = function (p) { return p; };
             this.fileExists = function (fileName) {
                 return _this.generatedFiles.has(fileName) || originalHost.fileExists(fileName);
             };

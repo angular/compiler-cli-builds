@@ -11,4 +11,4 @@ export declare function readConfiguration(project: string, basePath: string, exi
     parsed: ts.ParsedCommandLine;
     ngOptions: any;
 };
-export declare function main(args: string[], consoleError?: (s: string) => void, files?: string[], options?: ts.CompilerOptions, ngOptions?: any): number;
+export declare function main(args: string[], consoleError?: (s: string) => void): number;
