@@ -59,7 +59,9 @@ var Extractor = (function () {
             default:
                 serializer = new compiler.Xliff();
         }
-        return bundle.write(serializer, function (sourcePath) { return sourcePath.replace(path.join(_this.options.basePath, '/'), ''); });
+        return bundle.write(serializer, function (sourcePath) { return _this.options.basePath ?
+            path.relative(_this.options.basePath, sourcePath) :
+            sourcePath; });
     };
     Extractor.prototype.getExtension = function (formatName) {
         var format = (formatName || 'xlf').toLowerCase();
