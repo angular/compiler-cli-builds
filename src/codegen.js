@@ -13,6 +13,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 var compiler = require("@angular/compiler");
 var core_1 = require("@angular/core");
+var fs_1 = require("fs");
 var compiler_host_1 = require("./compiler_host");
 var path_mapped_compiler_host_1 = require("./path_mapped_compiler_host");
 var GENERATED_META_FILES = /\.json$/;
@@ -59,7 +60,7 @@ var CodeGenerator = (function () {
             if (!cliOptions.locale) {
                 throw new Error("The translation file (" + cliOptions.i18nFile + ") locale must be provided. Use the --locale option.");
             }
-            transContent = tsCompilerHost.readFile(cliOptions.i18nFile);
+            transContent = fs_1.readFileSync(cliOptions.i18nFile, 'utf8');
         }
         var missingTranslation = core_1.MissingTranslationStrategy.Warning;
         if (cliOptions.missingTranslation) {
@@ -76,6 +77,9 @@ var CodeGenerator = (function () {
                 default:
                     throw new Error("Unknown option for missingTranslation (" + cliOptions.missingTranslation + "). Use either error, warning or ignore.");
             }
+        }
+        if (!transContent) {
+            missingTranslation = core_1.MissingTranslationStrategy.Ignore;
         }
         var aotCompiler = compiler.createAotCompiler(ngCompilerHost, {
             translations: transContent,
