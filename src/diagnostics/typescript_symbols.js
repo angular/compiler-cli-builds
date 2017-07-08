@@ -139,7 +139,7 @@ var TypeScriptSymbolQuery = (function () {
     TypeScriptSymbolQuery.prototype.getTypeSymbol = function (type) {
         var context = { node: this.source, program: this.program, checker: this.checker };
         var typeSymbol = findClassSymbolInContext(type, context);
-        return new SymbolWrapper(typeSymbol, context);
+        return typeSymbol && new SymbolWrapper(typeSymbol, context);
     };
     TypeScriptSymbolQuery.prototype.createSymbolTable = function (symbols) {
         var result = new MapSymbolTable();
