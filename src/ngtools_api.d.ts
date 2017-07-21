@@ -34,22 +34,18 @@ export interface NgTools_InternalApi_NG2_ExtractI18n_Options {
 }
 /**
  * @internal
- * @private
  */
 export declare class NgTools_InternalApi_NG_2 {
     /**
      * @internal
-     * @private
      */
     static codeGen(options: NgTools_InternalApi_NG2_CodeGen_Options): Promise<any>;
     /**
      * @internal
-     * @private
      */
     static listLazyRoutes(options: NgTools_InternalApi_NG2_ListLazyRoutes_Options): NgTools_InternalApi_NG_2_LazyRouteMap;
     /**
      * @internal
-     * @private
      */
     static extractI18n(options: NgTools_InternalApi_NG2_ExtractI18n_Options): Promise<any>;
 }

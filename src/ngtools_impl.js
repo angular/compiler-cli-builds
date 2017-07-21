@@ -37,11 +37,6 @@ var RouteDef = (function () {
     return RouteDef;
 }());
 exports.RouteDef = RouteDef;
-/**
- *
- * @returns {LazyRouteMap}
- * @private
- */
 function listLazyRoutesOfModule(entryModule, host, reflector) {
     var entryRouteDef = RouteDef.fromString(entryModule);
     var containingFile = _resolveModule(entryRouteDef.path, entryRouteDef.path, host);
@@ -82,7 +77,6 @@ function _resolveModule(modulePath, containingFile, host) {
 }
 /**
  * Throw an exception if a route is in a route map, but does not point to the same module.
- * @private
  */
 function _assertRoute(map, route) {
     var r = route.routeDef.toString();
@@ -132,7 +126,6 @@ function _extractLazyRoutesFromStaticModule(staticSymbol, reflector, host, ROUTE
 }
 /**
  * Get the NgModule Metadata of a symbol.
- * @private
  */
 function _getNgModuleMetadata(staticSymbol, reflector) {
     var ngModules = reflector.annotations(staticSymbol).filter(function (s) { return s instanceof core_1.NgModule; });
@@ -160,7 +153,6 @@ function _collectRoutes(providers, reflector, ROUTES) {
 }
 /**
  * Return the loadChildren values of a list of Route.
- * @private
  */
 function _collectLoadChildren(routes) {
     return routes.reduce(function (m, r) {

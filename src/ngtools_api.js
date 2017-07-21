@@ -45,14 +45,12 @@ var CustomLoaderModuleResolutionHostAdapter = (function (_super) {
 }(compiler_host_1.ModuleResolutionHostAdapter));
 /**
  * @internal
- * @private
  */
 var NgTools_InternalApi_NG_2 = (function () {
     function NgTools_InternalApi_NG_2() {
     }
     /**
      * @internal
-     * @private
      */
     NgTools_InternalApi_NG_2.codeGen = function (options) {
         var hostContext = new CustomLoaderModuleResolutionHostAdapter(options.readResource, options.host);
@@ -74,7 +72,6 @@ var NgTools_InternalApi_NG_2 = (function () {
     };
     /**
      * @internal
-     * @private
      */
     NgTools_InternalApi_NG_2.listLazyRoutes = function (options) {
         var angularCompilerOptions = options.angularCompilerOptions;
@@ -96,7 +93,6 @@ var NgTools_InternalApi_NG_2 = (function () {
     };
     /**
      * @internal
-     * @private
      */
     NgTools_InternalApi_NG_2.extractI18n = function (options) {
         var hostContext = new CustomLoaderModuleResolutionHostAdapter(options.readResource, options.host);
