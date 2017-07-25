@@ -123,38 +123,23 @@ function getProjectDirectory(project) {
     // otherwise project is the project directory.
     return isFile ? path.dirname(project) : project;
 }
-function main(args, consoleError, files, options, ngOptions) {
+function performCompilation(basePath, files, options, ngOptions, consoleError, tsCompilerHost) {
     if (consoleError === void 0) { consoleError = console.error; }
     try {
-        var parsedArgs = require('minimist')(args);
-        var project = parsedArgs.p || parsedArgs.project || '.';
-        var projectDir = getProjectDirectory(project);
-        // file names in tsconfig are resolved relative to this absolute path
-        var basePath_1 = path.resolve(process.cwd(), projectDir);
-        if (!files || !options || !ngOptions) {
-            var _a = readConfiguration(project, basePath_1), parsed = _a.parsed, readNgOptions = _a.ngOptions;
-            if (!files)
-                files = parsed.fileNames;
-            if (!options)
-                options = parsed.options;
-            if (!ngOptions)
-                ngOptions = readNgOptions;
-        }
-        // Ignore what the tsconfig.json for baseDir and genDir
-        ngOptions.basePath = basePath_1;
-        ngOptions.genDir = basePath_1;
-        var host = ts.createCompilerHost(options, true);
+        ngOptions.basePath = basePath;
+        ngOptions.genDir = basePath;
+        var host = tsCompilerHost || ts.createCompilerHost(options, true);
         host.realpath = function (p) { return p; };
         var rootFileNames_1 = files.map(function (f) { return path.normalize(f); });
         var addGeneratedFileName = function (fileName) {
-            if (fileName.startsWith(basePath_1) && TS_EXT.exec(fileName)) {
+            if (fileName.startsWith(basePath) && TS_EXT.exec(fileName)) {
                 rootFileNames_1.push(fileName);
             }
         };
         if (ngOptions.flatModuleOutFile && !ngOptions.skipMetadataEmit) {
-            var _b = tsc_wrapped_1.createBundleIndexHost(ngOptions, rootFileNames_1, host), bundleHost = _b.host, indexName = _b.indexName, errors = _b.errors;
+            var _a = tsc_wrapped_1.createBundleIndexHost(ngOptions, rootFileNames_1, host), bundleHost = _a.host, indexName = _a.indexName, errors = _a.errors;
             if (errors)
-                check(basePath_1, errors);
+                check(basePath, errors);
             if (indexName)
                 addGeneratedFileName(indexName);
             host = bundleHost;
@@ -163,13 +148,13 @@ function main(args, consoleError, files, options, ngOptions) {
         var ngHost = ng.createHost({ tsHost: host, options: ngHostOptions });
         var ngProgram = ng.createProgram({ rootNames: rootFileNames_1, host: ngHost, options: ngHostOptions });
         // Check parameter diagnostics
-        check(basePath_1, ngProgram.getTsOptionDiagnostics(), ngProgram.getNgOptionDiagnostics());
+        check(basePath, ngProgram.getTsOptionDiagnostics(), ngProgram.getNgOptionDiagnostics());
         // Check syntactic diagnostics
-        check(basePath_1, ngProgram.getTsSyntacticDiagnostics());
+        check(basePath, ngProgram.getTsSyntacticDiagnostics());
         // Check TypeScript semantic and Angular structure diagnostics
-        check(basePath_1, ngProgram.getTsSemanticDiagnostics(), ngProgram.getNgStructuralDiagnostics());
+        check(basePath, ngProgram.getTsSemanticDiagnostics(), ngProgram.getNgStructuralDiagnostics());
         // Check Angular semantic diagnostics
-        check(basePath_1, ngProgram.getNgSemanticDiagnostics());
+        check(basePath, ngProgram.getNgSemanticDiagnostics());
         ngProgram.emit({
             emitFlags: api.EmitFlags.Default |
                 ((ngOptions.skipMetadataEmit || ngOptions.flatModuleOutFile) ? 0 : api.EmitFlags.Metadata)
@@ -177,16 +162,30 @@ function main(args, consoleError, files, options, ngOptions) {
     }
     catch (e) {
         if (compiler_1.isSyntaxError(e)) {
+            console.error(e.message);
             consoleError(e.message);
             return 1;
         }
-        else {
-            consoleError(e.stack);
-            consoleError('Compilation failed');
-            return 2;
-        }
     }
     return 0;
+}
+exports.performCompilation = performCompilation;
+function main(args, consoleError) {
+    if (consoleError === void 0) { consoleError = console.error; }
+    try {
+        var parsedArgs = require('minimist')(args);
+        var project = parsedArgs.p || parsedArgs.project || '.';
+        var projectDir = fs.lstatSync(project).isFile() ? path.dirname(project) : project;
+        // file names in tsconfig are resolved relative to this absolute path
+        var basePath = path.resolve(process.cwd(), projectDir);
+        var _a = readConfiguration(project, basePath), parsed = _a.parsed, ngOptions = _a.ngOptions;
+        return performCompilation(basePath, parsed.fileNames, parsed.options, ngOptions, consoleError);
+    }
+    catch (e) {
+        consoleError(e.stack);
+        consoleError('Compilation failed');
+        return 2;
+    }
 }
 exports.main = main;
 // CLI entry point
