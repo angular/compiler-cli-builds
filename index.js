@@ -39,6 +39,8 @@ __export(require("./src/transformers/api"));
 __export(require("./src/transformers/entry_points"));
 var ngc_1 = require("./src/ngc");
 exports.ngc = ngc_1.main;
+var ngc_2 = require("./src/ngc");
+exports.performCompilation = ngc_2.performCompilation;
 // TODO(hansl): moving to Angular 4 need to update this API.
 var ngtools_api_1 = require("./src/ngtools_api");
 exports.__NGTOOLS_PRIVATE_API_2 = ngtools_api_1.NgTools_InternalApi_NG_2;
