@@ -84,13 +84,14 @@ function syntheticError(message) {
         code: 0
     };
 }
-function readConfiguration(project, basePath, existingOptions) {
+function readConfiguration(project, basePath, checkFunc, existingOptions) {
+    if (checkFunc === void 0) { checkFunc = check; }
     // Allow a directory containing tsconfig.json as the project value
     // Note, TS@next returns an empty array, while earlier versions throw
     var projectFile = fs.lstatSync(project).isDirectory() ? path.join(project, 'tsconfig.json') : project;
     var _a = ts.readConfigFile(projectFile, ts.sys.readFile), config = _a.config, error = _a.error;
     if (error)
-        check(basePath, [error]);
+        checkFunc(basePath, [error]);
     var parseConfigHost = {
         useCaseSensitiveFileNames: true,
         fileExists: fs.existsSync,
@@ -98,7 +99,7 @@ function readConfiguration(project, basePath, existingOptions) {
         readFile: ts.sys.readFile
     };
     var parsed = ts.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingOptions);
-    check(basePath, parsed.errors);
+    checkFunc(basePath, parsed.errors);
     // Default codegen goes to the current directory
     // Parsed options are already converted to absolute paths
     var ngOptions = config.angularCompilerOptions || {};
@@ -123,8 +124,9 @@ function getProjectDirectory(project) {
     // otherwise project is the project directory.
     return isFile ? path.dirname(project) : project;
 }
-function performCompilation(basePath, files, options, ngOptions, consoleError, tsCompilerHost) {
+function performCompilation(basePath, files, options, ngOptions, consoleError, checkFunc, tsCompilerHost) {
     if (consoleError === void 0) { consoleError = console.error; }
+    if (checkFunc === void 0) { checkFunc = check; }
     try {
         ngOptions.basePath = basePath;
         ngOptions.genDir = basePath;
@@ -139,7 +141,7 @@ function performCompilation(basePath, files, options, ngOptions, consoleError, t
         if (ngOptions.flatModuleOutFile && !ngOptions.skipMetadataEmit) {
             var _a = tsc_wrapped_1.createBundleIndexHost(ngOptions, rootFileNames_1, host), bundleHost = _a.host, indexName = _a.indexName, errors = _a.errors;
             if (errors)
-                check(basePath, errors);
+                checkFunc(basePath, errors);
             if (indexName)
                 addGeneratedFileName(indexName);
             host = bundleHost;
@@ -148,13 +150,13 @@ function performCompilation(basePath, files, options, ngOptions, consoleError, t
         var ngHost = ng.createHost({ tsHost: host, options: ngHostOptions });
         var ngProgram = ng.createProgram({ rootNames: rootFileNames_1, host: ngHost, options: ngHostOptions });
         // Check parameter diagnostics
-        check(basePath, ngProgram.getTsOptionDiagnostics(), ngProgram.getNgOptionDiagnostics());
+        checkFunc(basePath, ngProgram.getTsOptionDiagnostics(), ngProgram.getNgOptionDiagnostics());
         // Check syntactic diagnostics
-        check(basePath, ngProgram.getTsSyntacticDiagnostics());
+        checkFunc(basePath, ngProgram.getTsSyntacticDiagnostics());
         // Check TypeScript semantic and Angular structure diagnostics
-        check(basePath, ngProgram.getTsSemanticDiagnostics(), ngProgram.getNgStructuralDiagnostics());
+        checkFunc(basePath, ngProgram.getTsSemanticDiagnostics(), ngProgram.getNgStructuralDiagnostics());
         // Check Angular semantic diagnostics
-        check(basePath, ngProgram.getNgSemanticDiagnostics());
+        checkFunc(basePath, ngProgram.getNgSemanticDiagnostics());
         ngProgram.emit({
             emitFlags: api.EmitFlags.Default |
                 ((ngOptions.skipMetadataEmit || ngOptions.flatModuleOutFile) ? 0 : api.EmitFlags.Metadata)
@@ -170,16 +172,17 @@ function performCompilation(basePath, files, options, ngOptions, consoleError, t
     return 0;
 }
 exports.performCompilation = performCompilation;
-function main(args, consoleError) {
+function main(args, consoleError, checkFunc) {
     if (consoleError === void 0) { consoleError = console.error; }
+    if (checkFunc === void 0) { checkFunc = check; }
     try {
         var parsedArgs = require('minimist')(args);
         var project = parsedArgs.p || parsedArgs.project || '.';
         var projectDir = fs.lstatSync(project).isFile() ? path.dirname(project) : project;
         // file names in tsconfig are resolved relative to this absolute path
         var basePath = path.resolve(process.cwd(), projectDir);
-        var _a = readConfiguration(project, basePath), parsed = _a.parsed, ngOptions = _a.ngOptions;
-        return performCompilation(basePath, parsed.fileNames, parsed.options, ngOptions, consoleError);
+        var _a = readConfiguration(project, basePath, checkFunc), parsed = _a.parsed, ngOptions = _a.ngOptions;
+        return performCompilation(basePath, parsed.fileNames, parsed.options, ngOptions, consoleError, checkFunc);
     }
     catch (e) {
         consoleError(e.stack);
