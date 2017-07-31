@@ -30,6 +30,7 @@ export interface CompilerOptions extends ts.CompilerOptions {
     annotationsAs?: 'decorators' | 'static fields';
     trace?: boolean;
     enableLegacyTemplate?: boolean;
+    disableExpressionLowering?: boolean;
 }
 export interface ModuleFilenameResolver {
     /**

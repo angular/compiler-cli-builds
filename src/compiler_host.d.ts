@@ -6,17 +6,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { AotCompilerHost } from '@angular/compiler';
-import { AngularCompilerOptions, CollectorOptions, MetadataCollector, ModuleMetadata } from '@angular/tsc-wrapped';
+import { AngularCompilerOptions, CollectorOptions, ModuleMetadata } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
 export interface CompilerHostContext extends ts.ModuleResolutionHost {
     readResource?(fileName: string): Promise<string> | string;
     assumeFileExists(fileName: string): void;
 }
+export interface MetadataProvider {
+    getMetadata(source: ts.SourceFile): ModuleMetadata | undefined;
+}
 export declare class CompilerHost implements AotCompilerHost {
     protected program: ts.Program;
     protected options: AngularCompilerOptions;
     protected context: CompilerHostContext;
-    protected metadataCollector: MetadataCollector;
+    protected metadataProvider: MetadataProvider;
     private isGenDirChildOfRootDir;
     protected basePath: string;
     private genDir;
@@ -26,7 +29,7 @@ export declare class CompilerHost implements AotCompilerHost {
     private flatModuleIndexRedirectNames;
     private moduleFileNames;
     protected resolveModuleNameHost: CompilerHostContext;
-    constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext, collectorOptions?: CollectorOptions);
+    constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext, collectorOptions?: CollectorOptions, metadataProvider?: MetadataProvider);
     getCanonicalFileName(fileName: string): string;
     moduleNameToFileName(m: string, containingFile: string): string | null;
     /**

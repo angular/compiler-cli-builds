@@ -8,7 +8,6 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
-var tsc_wrapped_1 = require("@angular/tsc-wrapped");
 var fs_1 = require("fs");
 var path = require("path");
 var ts = require("typescript");
@@ -16,6 +15,7 @@ var compiler_host_1 = require("../compiler_host");
 var check_types_1 = require("../diagnostics/check_types");
 var api_1 = require("./api");
 var api_2 = require("./api");
+var lower_expressions_1 = require("./lower_expressions");
 var node_emitter_transform_1 = require("./node_emitter_transform");
 var GENERATED_FILES = /\.ngfactory\.js$|\.ngstyle\.js$|\.ngsummary\.js$/;
 var SUMMARY_JSON_FILES = /\.ngsummary.json$/;
@@ -34,13 +34,13 @@ var AngularCompilerProgram = (function () {
         this.oldTsProgram = oldProgram ? oldProgram.getTsProgram() : undefined;
         this.tsProgram = ts.createProgram(rootNames, options, host, this.oldTsProgram);
         this.srcNames = this.tsProgram.getSourceFiles().map(function (sf) { return sf.fileName; });
-        this.aotCompilerHost = new compiler_host_1.CompilerHost(this.tsProgram, options, host);
+        this.metadataCache = new lower_expressions_1.LowerMetadataCache({ quotedNames: true }, !!options.strictMetadataEmit);
+        this.aotCompilerHost = new compiler_host_1.CompilerHost(this.tsProgram, options, host, /* collectorOptions */ undefined, this.metadataCache);
         if (host.readResource) {
             this.aotCompilerHost.loadResource = host.readResource.bind(host);
         }
         var compiler = compiler_1.createAotCompiler(this.aotCompilerHost, options).compiler;
         this.compiler = compiler;
-        this.collector = new tsc_wrapped_1.MetadataCollector({ quotedNames: true });
     }
     // Program implementation
     AngularCompilerProgram.prototype.getTsProgram = function () { return this.programWithStubs; };
@@ -84,9 +84,7 @@ var AngularCompilerProgram = (function () {
         var _b = _a.emitFlags, emitFlags = _b === void 0 ? api_2.EmitFlags.Default : _b, cancellationToken = _a.cancellationToken;
         var emitMap = new Map();
         var result = this.programWithStubs.emit(
-        /* targetSourceFile */ undefined, createWriteFileCallback(emitFlags, this.host, this.collector, this.options, emitMap), cancellationToken, (emitFlags & (api_2.EmitFlags.DTS | api_2.EmitFlags.JS)) == api_2.EmitFlags.DTS, {
-            after: this.options.skipTemplateCodegen ? [] : [node_emitter_transform_1.getAngularEmitterTransformFactory(this.generatedFiles)]
-        });
+        /* targetSourceFile */ undefined, createWriteFileCallback(emitFlags, this.host, this.metadataCache, emitMap), cancellationToken, (emitFlags & (api_2.EmitFlags.DTS | api_2.EmitFlags.JS)) == api_2.EmitFlags.DTS, this.calculateTransforms());
         this.generatedFiles.forEach(function (file) {
             if (file.source && file.source.length && SUMMARY_JSON_FILES.test(file.genFileUrl)) {
                 // If we have emitted the ngsummary.ts file, ensure the ngsummary.json file is emitted to
@@ -172,6 +170,22 @@ var AngularCompilerProgram = (function () {
         enumerable: true,
         configurable: true
     });
+    AngularCompilerProgram.prototype.calculateTransforms = function () {
+        var before = [];
+        var after = [];
+        if (!this.options.disableExpressionLowering) {
+            before.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.metadataCache));
+        }
+        if (!this.options.skipTemplateCodegen) {
+            after.push(node_emitter_transform_1.getAngularEmitterTransformFactory(this.generatedFiles));
+        }
+        var result = {};
+        if (before.length)
+            result.before = before;
+        if (after.length)
+            result.after = after;
+        return result;
+    };
     AngularCompilerProgram.prototype.catchAnalysisError = function (e) {
         if (compiler_1.isSyntaxError(e)) {
             var parserErrors = compiler_1.getParseErrors(e);
@@ -237,7 +251,7 @@ function createProgram(_a) {
     return new AngularCompilerProgram(rootNames, options, host, oldProgram);
 }
 exports.createProgram = createProgram;
-function writeMetadata(emitFilePath, sourceFile, collector, ngOptions) {
+function writeMetadata(emitFilePath, sourceFile, metadataCache) {
     if (/\.js$/.test(emitFilePath)) {
         var path_1 = emitFilePath.replace(/\.js$/, '.metadata.json');
         // Beginning with 2.1, TypeScript transforms the source tree before emitting it.
@@ -248,14 +262,14 @@ function writeMetadata(emitFilePath, sourceFile, collector, ngOptions) {
         while (collectableFile.original) {
             collectableFile = collectableFile.original;
         }
-        var metadata = collector.getMetadata(collectableFile, !!ngOptions.strictMetadataEmit);
+        var metadata = metadataCache.getMetadata(collectableFile);
         if (metadata) {
             var metadataText = JSON.stringify([metadata]);
             fs_1.writeFileSync(path_1, metadataText, { encoding: 'utf-8' });
         }
     }
 }
-function createWriteFileCallback(emitFlags, host, collector, ngOptions, emitMap) {
+function createWriteFileCallback(emitFlags, host, metadataCache, emitMap) {
     var withMetadata = function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
         var generatedFile = GENERATED_FILES.test(fileName);
         if (!generatedFile || data != '') {
@@ -263,7 +277,7 @@ function createWriteFileCallback(emitFlags, host, collector, ngOptions, emitMap)
         }
         if (!generatedFile && sourceFiles && sourceFiles.length == 1) {
             emitMap.set(sourceFiles[0].fileName, fileName);
-            writeMetadata(fileName, sourceFiles[0], collector, ngOptions);
+            writeMetadata(fileName, sourceFiles[0], metadataCache);
         }
     };
     var withoutMetadata = function (fileName, data, writeByteOrderMark, onError, sourceFiles) {

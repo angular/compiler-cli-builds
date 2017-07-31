@@ -29,12 +29,13 @@ var GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$|\.ngsummary\.ts$/;
 var GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$|\.ngsummary\.ts$/;
 var SHALLOW_IMPORT = /^((\w|-)+|(@(\w|-)+(\/(\w|-)+)+))$/;
 var CompilerHost = (function () {
-    function CompilerHost(program, options, context, collectorOptions) {
+    function CompilerHost(program, options, context, collectorOptions, metadataProvider) {
+        if (metadataProvider === void 0) { metadataProvider = new tsc_wrapped_1.MetadataCollector(); }
         var _this = this;
         this.program = program;
         this.options = options;
         this.context = context;
-        this.metadataCollector = new tsc_wrapped_1.MetadataCollector();
+        this.metadataProvider = metadataProvider;
         this.resolverCache = new Map();
         this.flatModuleIndexCache = new Map();
         this.flatModuleIndexNames = new Set();
@@ -195,7 +196,7 @@ var CompilerHost = (function () {
             }
         }
         var sf = this.getSourceFile(filePath);
-        var metadata = this.metadataCollector.getMetadata(sf);
+        var metadata = this.metadataProvider.getMetadata(sf);
         return metadata ? [metadata] : [];
     };
     CompilerHost.prototype.readMetadata = function (filePath, dtsFilePath) {
@@ -232,7 +233,7 @@ var CompilerHost = (function () {
         for (var prop in v1Metadata.metadata) {
             v3Metadata.metadata[prop] = v1Metadata.metadata[prop];
         }
-        var exports = this.metadataCollector.getMetadata(this.getSourceFile(dtsFilePath));
+        var exports = this.metadataProvider.getMetadata(this.getSourceFile(dtsFilePath));
         if (exports) {
             for (var prop in exports.metadata) {
                 if (!v3Metadata.metadata[prop]) {
