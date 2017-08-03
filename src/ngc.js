@@ -168,6 +168,7 @@ function performCompilation(basePath, files, options, ngOptions, consoleError, c
             consoleError(e.message);
             return 1;
         }
+        throw e;
     }
     return 0;
 }
