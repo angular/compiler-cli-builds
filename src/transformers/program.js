@@ -173,8 +173,7 @@ var AngularCompilerProgram = (function () {
         var before = [];
         var after = [];
         if (!this.options.disableExpressionLowering) {
-            // TODO(chuckj): fix and re-enable + tests - see https://github.com/angular/angular/pull/18388
-            // before.push(getExpressionLoweringTransformFactory(this.metadataCache));
+            before.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.metadataCache));
         }
         if (!this.options.skipTemplateCodegen) {
             after.push(node_emitter_transform_1.getAngularEmitterTransformFactory(this.generatedFiles));

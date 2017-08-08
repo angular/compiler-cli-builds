@@ -12,6 +12,23 @@ var ts = require("typescript");
 function toMap(items, select) {
     return new Map(items.map(function (i) { return [select(i), i]; }));
 }
+// We will never lower expressions in a nested lexical scope so avoid entering them.
+// This also avoids a bug in TypeScript 2.3 where the lexical scopes get out of sync
+// when using visitEachChild.
+function isLexicalScope(node) {
+    switch (node.kind) {
+        case ts.SyntaxKind.ArrowFunction:
+        case ts.SyntaxKind.FunctionExpression:
+        case ts.SyntaxKind.FunctionDeclaration:
+        case ts.SyntaxKind.ClassExpression:
+        case ts.SyntaxKind.ClassDeclaration:
+        case ts.SyntaxKind.FunctionType:
+        case ts.SyntaxKind.TypeLiteral:
+        case ts.SyntaxKind.ArrayType:
+            return true;
+    }
+    return false;
+}
 function transformSourceFile(sourceFile, requests, context) {
     var inserts = [];
     // Calculate the range of intersting locations. The transform will only visit nodes in this
@@ -31,11 +48,13 @@ function transformSourceFile(sourceFile, requests, context) {
                     declarations.push({ name: name_1, node: node });
                     return ts.createIdentifier(name_1);
                 }
-                if (node.pos <= max && node.end >= min)
-                    return ts.visitEachChild(node, visitNode, context);
-                return node;
+                var result = node;
+                if (node.pos <= max && node.end >= min && !isLexicalScope(node)) {
+                    result = ts.visitEachChild(node, visitNode, context);
+                }
+                return result;
             }
-            var result = ts.visitEachChild(node, visitNode, context);
+            var result = (node.pos <= max && node.end >= min) ? ts.visitEachChild(node, visitNode, context) : node;
             if (declarations.length) {
                 inserts.push({ priorTo: result, declarations: declarations });
             }
@@ -80,6 +99,28 @@ function getExpressionLoweringTransformFactory(requestsMap) {
     }; };
 }
 exports.getExpressionLoweringTransformFactory = getExpressionLoweringTransformFactory;
+function shouldLower(node) {
+    if (node) {
+        switch (node.kind) {
+            case ts.SyntaxKind.SourceFile:
+            case ts.SyntaxKind.Decorator:
+                // Lower expressions that are local to the module scope or
+                // in a decorator.
+                return true;
+            case ts.SyntaxKind.ClassDeclaration:
+            case ts.SyntaxKind.InterfaceDeclaration:
+            case ts.SyntaxKind.EnumDeclaration:
+            case ts.SyntaxKind.FunctionDeclaration:
+                // Don't lower expressions in a declaration.
+                return false;
+            case ts.SyntaxKind.VariableDeclaration:
+                // Avoid lowering expressions already in an exported variable declaration
+                return (ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) == 0;
+        }
+        return shouldLower(node.parent);
+    }
+    return true;
+}
 var LowerMetadataCache = (function () {
     function LowerMetadataCache(options, strict) {
         this.strict = strict;
@@ -110,8 +151,9 @@ var LowerMetadataCache = (function () {
             return { __symbolic: 'reference', name: name };
         };
         var substituteExpression = function (value, node) {
-            if (node.kind === ts.SyntaxKind.ArrowFunction ||
-                node.kind === ts.SyntaxKind.FunctionExpression) {
+            if ((node.kind === ts.SyntaxKind.ArrowFunction ||
+                node.kind === ts.SyntaxKind.FunctionExpression) &&
+                shouldLower(node)) {
                 return replaceNode(node);
             }
             return value;
