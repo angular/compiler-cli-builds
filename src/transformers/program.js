@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
 var core_1 = require("@angular/core");
+var tsc_wrapped_1 = require("@angular/tsc-wrapped");
 var fs = require("fs");
 var path = require("path");
 var tsickle = require("tsickle");
@@ -32,8 +33,21 @@ var AngularCompilerProgram = (function () {
         this.host = host;
         this.oldProgram = oldProgram;
         this._structuralDiagnostics = [];
-        this.oldTsProgram = oldProgram ? oldProgram.getTsProgram() : undefined;
-        this.tsProgram = ts.createProgram(rootNames, options, host, this.oldTsProgram);
+        this._optionsDiagnostics = [];
+        if (options.flatModuleOutFile && !options.skipMetadataEmit) {
+            var _a = tsc_wrapped_1.createBundleIndexHost(options, rootNames, host), bundleHost = _a.host, indexName = _a.indexName, errors = _a.errors;
+            if (errors) {
+                // TODO(tbosch): once we move MetadataBundler from tsc_wrapped into compiler_cli,
+                // directly create ng.Diagnostic instead of using ts.Diagnostic here.
+                (_b = this._optionsDiagnostics).push.apply(_b, errors.map(function (e) { return ({ category: e.category, message: e.messageText }); }));
+            }
+            else {
+                rootNames.push(indexName);
+                this.host = host = bundleHost;
+            }
+        }
+        var oldTsProgram = oldProgram ? oldProgram.getTsProgram() : undefined;
+        this.tsProgram = ts.createProgram(rootNames, options, host, oldTsProgram);
         this.srcNames =
             this.tsProgram.getSourceFiles()
                 .map(function (sf) { return sf.fileName; })
@@ -45,6 +59,7 @@ var AngularCompilerProgram = (function () {
         }
         var aotOptions = getAotCompilerOptions(options);
         this.compiler = compiler_1.createAotCompiler(this.aotCompilerHost, aotOptions).compiler;
+        var _b;
     }
     // Program implementation
     AngularCompilerProgram.prototype.getTsProgram = function () { return this.programWithStubs; };
@@ -52,7 +67,7 @@ var AngularCompilerProgram = (function () {
         return this.tsProgram.getOptionsDiagnostics(cancellationToken);
     };
     AngularCompilerProgram.prototype.getNgOptionDiagnostics = function (cancellationToken) {
-        return getNgOptionDiagnostics(this.options);
+        return this._optionsDiagnostics.concat(getNgOptionDiagnostics(this.options));
     };
     AngularCompilerProgram.prototype.getTsSyntacticDiagnostics = function (sourceFile, cancellationToken) {
         return this.tsProgram.getSyntacticDiagnostics(sourceFile, cancellationToken);
@@ -214,12 +229,12 @@ var AngularCompilerProgram = (function () {
                 this._structuralDiagnostics =
                     parserErrors.map(function (e) { return ({
                         message: e.contextualMessage(),
-                        category: api_1.DiagnosticCategory.Error,
+                        category: ts.DiagnosticCategory.Error,
                         span: e.span
                     }); });
             }
             else {
-                this._structuralDiagnostics = [{ message: e.message, category: api_1.DiagnosticCategory.Error }];
+                this._structuralDiagnostics = [{ message: e.message, category: ts.DiagnosticCategory.Error }];
             }
             this._analyzedModules = emptyModules;
             return emptyModules;
@@ -249,7 +264,8 @@ var AngularCompilerProgram = (function () {
         }
         catch (e) {
             if (compiler_1.isSyntaxError(e)) {
-                this._generatedFileDiagnostics = [{ message: e.message, category: api_1.DiagnosticCategory.Error }];
+                this._generatedFileDiagnostics =
+                    [{ message: e.message, category: ts.DiagnosticCategory.Error }];
                 return [];
             }
             throw e;
@@ -347,7 +363,7 @@ function getNgOptionDiagnostics(options) {
             default:
                 return [{
                         message: 'Angular compiler options "annotationsAs" only supports "static fields" and "decorators"',
-                        category: api_1.DiagnosticCategory.Error
+                        category: ts.DiagnosticCategory.Error
                     }];
         }
     }

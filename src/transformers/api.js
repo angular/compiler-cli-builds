@@ -7,12 +7,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var DiagnosticCategory;
-(function (DiagnosticCategory) {
-    DiagnosticCategory[DiagnosticCategory["Warning"] = 0] = "Warning";
-    DiagnosticCategory[DiagnosticCategory["Error"] = 1] = "Error";
-    DiagnosticCategory[DiagnosticCategory["Message"] = 2] = "Message";
-})(DiagnosticCategory = exports.DiagnosticCategory || (exports.DiagnosticCategory = {}));
 var EmitFlags;
 (function (EmitFlags) {
     EmitFlags[EmitFlags["DTS"] = 1] = "DTS";

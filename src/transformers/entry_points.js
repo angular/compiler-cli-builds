@@ -7,12 +7,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+var ts = require("typescript");
 var module_filename_resolver_1 = require("./module_filename_resolver");
 exports.createModuleFilenameResolver = module_filename_resolver_1.createModuleFilenameResolver;
 var program_1 = require("./program");
 exports.createProgram = program_1.createProgram;
-function createHost(_a) {
-    var tsHost = _a.tsHost, options = _a.options;
+function createNgCompilerHost(_a) {
+    var options = _a.options, _b = _a.tsHost, tsHost = _b === void 0 ? ts.createCompilerHost(options, true) : _b;
     var resolver = module_filename_resolver_1.createModuleFilenameResolver(tsHost, options);
     var host = Object.create(tsHost);
     host.moduleNameToFileName = resolver.moduleNameToFileName.bind(resolver);
@@ -24,5 +25,5 @@ function createHost(_a) {
     host.realpath = function (fileName) { return fileName; };
     return host;
 }
-exports.createHost = createHost;
+exports.createNgCompilerHost = createNgCompilerHost;
 //# sourceMappingURL=entry_points.js.map

@@ -153,7 +153,7 @@ var TypeChecker = (function () {
                     var diagnosticsList = diagnosticsFor(fileName);
                     diagnosticsList.push({
                         message: diagnosticMessageToString(diagnostic.messageText),
-                        category: diagnosticCategoryConverter(diagnostic.category), span: span
+                        category: diagnostic.category, span: span
                     });
                 }
             }
@@ -174,10 +174,6 @@ var TypeChecker = (function () {
 exports.TypeChecker = TypeChecker;
 function diagnosticMessageToString(message) {
     return ts.flattenDiagnosticMessageText(message, '\n');
-}
-function diagnosticCategoryConverter(kind) {
-    // The diagnostics kind matches ts.DiagnosticCategory. Review this code if this changes.
-    return kind;
 }
 function createFactoryInfo(emitter, file) {
     var _a = emitter.emitStatementsAndContext(file.srcFileUrl, file.genFileUrl, file.stmts), sourceText = _a.sourceText, context = _a.context;

@@ -39,6 +39,10 @@ __export(require("./src/transformers/api"));
 __export(require("./src/transformers/entry_points"));
 var perform_compile_1 = require("./src/perform-compile");
 exports.performCompilation = perform_compile_1.performCompilation;
+exports.readConfiguration = perform_compile_1.readConfiguration;
+exports.formatDiagnostics = perform_compile_1.formatDiagnostics;
+exports.calcProjectFileAndBasePath = perform_compile_1.calcProjectFileAndBasePath;
+exports.createNgCompilerOptions = perform_compile_1.createNgCompilerOptions;
 // TODO(hansl): moving to Angular 4 need to update this API.
 var ngtools_api_1 = require("./src/ngtools_api");
 exports.__NGTOOLS_PRIVATE_API_2 = ngtools_api_1.NgTools_InternalApi_NG_2;
