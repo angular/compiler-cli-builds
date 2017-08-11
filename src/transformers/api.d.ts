@@ -31,6 +31,14 @@ export interface CompilerOptions extends ts.CompilerOptions {
     trace?: boolean;
     enableLegacyTemplate?: boolean;
     disableExpressionLowering?: boolean;
+    expectedOut?: string[];
+    i18nOutLocale?: string;
+    i18nOutFormat?: string;
+    i18nOutFile?: string;
+    i18nInFormat?: string;
+    i18nInLocale?: string;
+    i18nInFile?: string;
+    i18nInMissingTranslations?: 'error' | 'warning' | 'ignore';
 }
 export interface ModuleFilenameResolver {
     /**
@@ -68,6 +76,15 @@ export declare enum EmitFlags {
     Default = 3,
     All = 31,
 }
+export interface EmitResult extends ts.EmitResult {
+    modulesManifest: {
+        modules: string[];
+        fileNames: string[];
+    };
+    externs: {
+        [fileName: string]: string;
+    };
+}
 export interface Program {
     /**
      * Retrieve the TypeScript program used to produce semantic diagnostics and emit the sources.
@@ -76,7 +93,7 @@ export interface Program {
      */
     getTsProgram(): ts.Program;
     /**
-     * Retreive options diagnostics for the TypeScript options used to create the program. This is
+     * Retrieve options diagnostics for the TypeScript options used to create the program. This is
      * faster than calling `getTsProgram().getOptionsDiagnostics()` since it does not need to
      * collect Angular structural information to produce the errors.
      */
@@ -86,7 +103,7 @@ export interface Program {
      */
     getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken): Diagnostic[];
     /**
-     * Retrive the syntax diagnostics from TypeScript. This is faster than calling
+     * Retrieve the syntax diagnostics from TypeScript. This is faster than calling
      * `getTsProgram().getSyntacticDiagnostics()` since it does not need to collect Angular structural
      * information to produce the errors.
      */
@@ -104,7 +121,7 @@ export interface Program {
      */
     getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken): Diagnostic[];
     /**
-     * Retreive the semantic diagnostics from TypeScript. This is equivilent to calling
+     * Retrieve the semantic diagnostics from TypeScript. This is equivilent to calling
      * `getTsProgram().getSemanticDiagnostics()` directly and is included for completeness.
      */
     getTsSemanticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
@@ -137,5 +154,5 @@ export interface Program {
     emit({emitFlags, cancellationToken}: {
         emitFlags: EmitFlags;
         cancellationToken?: ts.CancellationToken;
-    }): void;
+    }): EmitResult;
 }

@@ -8,8 +8,10 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
-var fs_1 = require("fs");
+var core_1 = require("@angular/core");
+var fs = require("fs");
 var path = require("path");
+var tsickle = require("tsickle");
 var ts = require("typescript");
 var compiler_host_1 = require("../compiler_host");
 var check_types_1 = require("../diagnostics/check_types");
@@ -32,14 +34,17 @@ var AngularCompilerProgram = (function () {
         this._structuralDiagnostics = [];
         this.oldTsProgram = oldProgram ? oldProgram.getTsProgram() : undefined;
         this.tsProgram = ts.createProgram(rootNames, options, host, this.oldTsProgram);
-        this.srcNames = this.tsProgram.getSourceFiles().map(function (sf) { return sf.fileName; });
+        this.srcNames =
+            this.tsProgram.getSourceFiles()
+                .map(function (sf) { return sf.fileName; })
+                .filter(function (f) { return !f.match(/\.ngfactory\.[\w.]+$|\.ngstyle\.[\w.]+$|\.ngsummary\.[\w.]+$/); });
         this.metadataCache = new lower_expressions_1.LowerMetadataCache({ quotedNames: true }, !!options.strictMetadataEmit);
         this.aotCompilerHost = new compiler_host_1.CompilerHost(this.tsProgram, options, host, /* collectorOptions */ undefined, this.metadataCache);
         if (host.readResource) {
             this.aotCompilerHost.loadResource = host.readResource.bind(host);
         }
-        var compiler = compiler_1.createAotCompiler(this.aotCompilerHost, options).compiler;
-        this.compiler = compiler;
+        var aotOptions = getAotCompilerOptions(options);
+        this.compiler = compiler_1.createAotCompiler(this.aotCompilerHost, aotOptions).compiler;
     }
     // Program implementation
     AngularCompilerProgram.prototype.getTsProgram = function () { return this.programWithStubs; };
@@ -82,19 +87,42 @@ var AngularCompilerProgram = (function () {
         var _this = this;
         var _b = _a.emitFlags, emitFlags = _b === void 0 ? api_1.EmitFlags.Default : _b, cancellationToken = _a.cancellationToken;
         var emitMap = new Map();
-        var result = this.programWithStubs.emit(
-        /* targetSourceFile */ undefined, createWriteFileCallback(emitFlags, this.host, this.metadataCache, emitMap), cancellationToken, (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS, this.calculateTransforms());
+        var tsickleCompilerHostOptions = {
+            googmodule: false,
+            untyped: true,
+            convertIndexImportShorthand: true,
+            transformDecorators: this.options.annotationsAs !== 'decorators',
+            transformTypesToClosure: this.options.annotateForClosureCompiler,
+        };
+        var tsickleHost = {
+            shouldSkipTsickleProcessing: function (fileName) { return /\.d\.ts$/.test(fileName); },
+            pathToModuleName: function (context, importPath) { return ''; },
+            shouldIgnoreWarningsForPath: function (filePath) { return false; },
+            fileNameToModuleId: function (fileName) { return fileName; },
+        };
+        var expectedOut = this.options.expectedOut ?
+            this.options.expectedOut.map(function (f) { return path.resolve(process.cwd(), f); }) :
+            undefined;
+        var result = tsickle.emitWithTsickle(this.programWithStubs, tsickleHost, tsickleCompilerHostOptions, this.host, this.options, 
+        /* targetSourceFile */ undefined, createWriteFileCallback(emitFlags, this.host, this.metadataCache, emitMap, expectedOut), cancellationToken, (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS, this.calculateTransforms());
         this.generatedFiles.forEach(function (file) {
+            // In order not to replicate the TS calculation of the out folder for files
+            // derive the out location for .json files from the out location of the .ts files
             if (file.source && file.source.length && SUMMARY_JSON_FILES.test(file.genFileUrl)) {
                 // If we have emitted the ngsummary.ts file, ensure the ngsummary.json file is emitted to
                 // the same location.
                 var emittedFile = emitMap.get(file.srcFileUrl);
-                var fileName = emittedFile ?
-                    path.join(path.dirname(emittedFile), path.basename(file.genFileUrl)) :
-                    file.genFileUrl;
-                _this.host.writeFile(fileName, file.source, false, function (error) { });
+                if (emittedFile) {
+                    var fileName = path.join(path.dirname(emittedFile), path.basename(file.genFileUrl));
+                    _this.host.writeFile(fileName, file.source, false, function (error) { });
+                }
             }
         });
+        // Ensure that expected output files exist.
+        for (var _i = 0, _c = expectedOut || []; _i < _c.length; _i++) {
+            var out = _c[_i];
+            fs.appendFileSync(out, '', 'utf8');
+        }
         return result;
     };
     Object.defineProperty(AngularCompilerProgram.prototype, "analyzedModules", {
@@ -170,20 +198,14 @@ var AngularCompilerProgram = (function () {
         configurable: true
     });
     AngularCompilerProgram.prototype.calculateTransforms = function () {
-        var before = [];
-        var after = [];
+        var beforeTs = [];
         if (!this.options.disableExpressionLowering) {
-            before.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.metadataCache));
+            beforeTs.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.metadataCache));
         }
         if (!this.options.skipTemplateCodegen) {
-            after.push(node_emitter_transform_1.getAngularEmitterTransformFactory(this.generatedFiles));
+            beforeTs.push(node_emitter_transform_1.getAngularEmitterTransformFactory(this.generatedFiles));
         }
-        var result = {};
-        if (before.length)
-            result.before = before;
-        if (after.length)
-            result.after = after;
-        return result;
+        return { beforeTs: beforeTs };
     };
     AngularCompilerProgram.prototype.catchAnalysisError = function (e) {
         if (compiler_1.isSyntaxError(e)) {
@@ -215,8 +237,8 @@ var AngularCompilerProgram = (function () {
     AngularCompilerProgram.prototype.generateStubs = function () {
         return this.options.skipTemplateCodegen ? [] :
             this.options.generateCodeForLibraries === false ?
-                this.compiler.emitAllStubs(this.analyzedModules) :
-                this.compiler.emitPartialStubs(this.analyzedModules);
+                this.compiler.emitPartialStubs(this.analyzedModules) :
+                this.compiler.emitAllStubs(this.analyzedModules);
     };
     AngularCompilerProgram.prototype.generateFiles = function () {
         try {
@@ -250,6 +272,36 @@ function createProgram(_a) {
     return new AngularCompilerProgram(rootNames, options, host, oldProgram);
 }
 exports.createProgram = createProgram;
+// Compute the AotCompiler options
+function getAotCompilerOptions(options) {
+    var missingTranslation = core_1.MissingTranslationStrategy.Warning;
+    switch (options.i18nInMissingTranslations) {
+        case 'ignore':
+            missingTranslation = core_1.MissingTranslationStrategy.Ignore;
+            break;
+        case 'error':
+            missingTranslation = core_1.MissingTranslationStrategy.Error;
+            break;
+    }
+    var translations = '';
+    if (options.i18nInFile) {
+        if (!options.locale) {
+            throw new Error("The translation file (" + options.i18nInFile + ") locale must be provided.");
+        }
+        translations = fs.readFileSync(options.i18nInFile, 'utf8');
+    }
+    else {
+        // No translations are provided, ignore any errors
+        // We still go through i18n to remove i18n attributes
+        missingTranslation = core_1.MissingTranslationStrategy.Ignore;
+    }
+    return {
+        locale: options.i18nInLocale,
+        i18nFormat: options.i18nInFormat || options.i18nOutFormat, translations: translations, missingTranslation: missingTranslation,
+        enableLegacyTemplate: options.enableLegacyTemplate,
+        enableSummariesForJit: true,
+    };
+}
 function writeMetadata(emitFilePath, sourceFile, metadataCache) {
     if (/\.js$/.test(emitFilePath)) {
         var path_1 = emitFilePath.replace(/\.js$/, '.metadata.json');
@@ -264,31 +316,27 @@ function writeMetadata(emitFilePath, sourceFile, metadataCache) {
         var metadata = metadataCache.getMetadata(collectableFile);
         if (metadata) {
             var metadataText = JSON.stringify([metadata]);
-            fs_1.writeFileSync(path_1, metadataText, { encoding: 'utf-8' });
+            fs.writeFileSync(path_1, metadataText, { encoding: 'utf-8' });
         }
     }
 }
-function createWriteFileCallback(emitFlags, host, metadataCache, emitMap) {
-    var withMetadata = function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
-        var generatedFile = GENERATED_FILES.test(fileName);
-        if (!generatedFile || data != '') {
-            host.writeFile(fileName, data, writeByteOrderMark, onError, sourceFiles);
+function createWriteFileCallback(emitFlags, host, metadataCache, emitMap, expectedOut) {
+    return function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
+        var srcFile;
+        if (sourceFiles && sourceFiles.length == 1) {
+            srcFile = sourceFiles[0];
+            emitMap.set(srcFile.fileName, fileName);
         }
-        if (!generatedFile && sourceFiles && sourceFiles.length == 1) {
-            emitMap.set(sourceFiles[0].fileName, fileName);
-            writeMetadata(fileName, sourceFiles[0], metadataCache);
+        var absFile = path.resolve(process.cwd(), fileName);
+        var generatedFile = GENERATED_FILES.test(fileName);
+        // Don't emit unexpected files nor empty generated files
+        if ((!expectedOut || expectedOut.indexOf(absFile) > -1) && (!generatedFile || data)) {
+            host.writeFile(fileName, data, writeByteOrderMark, onError, sourceFiles);
+            if (srcFile && !generatedFile && (emitFlags & api_1.EmitFlags.Metadata) != 0) {
+                writeMetadata(fileName, srcFile, metadataCache);
+            }
         }
     };
-    var withoutMetadata = function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
-        var generatedFile = GENERATED_FILES.test(fileName);
-        if (!generatedFile || data != '') {
-            host.writeFile(fileName, data, writeByteOrderMark, onError, sourceFiles);
-        }
-        if (!generatedFile && sourceFiles && sourceFiles.length == 1) {
-            emitMap.set(sourceFiles[0].fileName, fileName);
-        }
-    };
-    return (emitFlags & api_1.EmitFlags.Metadata) != 0 ? withMetadata : withoutMetadata;
 }
 function getNgOptionDiagnostics(options) {
     if (options.annotationsAs) {

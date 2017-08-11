@@ -80,16 +80,6 @@ function throwOnDiagnostics(cwd) {
     }
 }
 exports.throwOnDiagnostics = throwOnDiagnostics;
-function syntheticError(message) {
-    return {
-        file: null,
-        start: 0,
-        length: 0,
-        messageText: message,
-        category: ts.DiagnosticCategory.Error,
-        code: 0
-    };
-}
 function readConfiguration(project, basePath, checkFunc, existingOptions) {
     if (checkFunc === void 0) { checkFunc = throwOnDiagnostics; }
     // Allow a directory containing tsconfig.json as the project value
@@ -114,25 +104,18 @@ function readConfiguration(project, basePath, checkFunc, existingOptions) {
     return { parsed: parsed, ngOptions: ngOptions };
 }
 exports.readConfiguration = readConfiguration;
-function getProjectDirectory(project) {
-    var isFile;
-    try {
-        isFile = fs.lstatSync(project).isFile();
-    }
-    catch (e) {
-        // Project doesn't exist. Assume it is a file has an extension. This case happens
-        // when the project file is passed to set basePath but no tsconfig.json file exists.
-        // It is used in tests to ensure that the options can be passed in without there being
-        // an actual config file.
-        isFile = path.extname(project) !== '';
-    }
-    // If project refers to a file, the project directory is the file's parent directory
-    // otherwise project is the project directory.
-    return isFile ? path.dirname(project) : project;
-}
+/**
+ * Returns an object with two properties:
+ * - `errorCode` is 0 when the compilation was successful,
+ * - `result` is an `EmitResult` when the errorCode is 0, `undefined` otherwise.
+ */
 function performCompilation(basePath, files, options, ngOptions, consoleError, checkFunc, tsCompilerHost) {
     if (consoleError === void 0) { consoleError = console.error; }
     if (checkFunc === void 0) { checkFunc = throwOnDiagnostics; }
+    var _a = ts.version.split('.'), major = _a[0], minor = _a[1];
+    if (+major < 2 || (+major === 2 && +minor < 3)) {
+        throw new Error('Must use TypeScript > 2.3 to have transformer support');
+    }
     try {
         ngOptions.basePath = basePath;
         ngOptions.genDir = basePath;
@@ -145,7 +128,7 @@ function performCompilation(basePath, files, options, ngOptions, consoleError, c
             }
         };
         if (ngOptions.flatModuleOutFile && !ngOptions.skipMetadataEmit) {
-            var _a = tsc_wrapped_1.createBundleIndexHost(ngOptions, rootFileNames_1, host), bundleHost = _a.host, indexName = _a.indexName, errors = _a.errors;
+            var _b = tsc_wrapped_1.createBundleIndexHost(ngOptions, rootFileNames_1, host), bundleHost = _b.host, indexName = _b.indexName, errors = _b.errors;
             if (errors)
                 checkFunc(basePath, errors);
             if (indexName)
@@ -163,20 +146,20 @@ function performCompilation(basePath, files, options, ngOptions, consoleError, c
         checkFunc(basePath, ngProgram.getTsSemanticDiagnostics(), ngProgram.getNgStructuralDiagnostics());
         // Check Angular semantic diagnostics
         checkFunc(basePath, ngProgram.getNgSemanticDiagnostics());
-        ngProgram.emit({
+        var result = ngProgram.emit({
             emitFlags: api.EmitFlags.Default |
                 ((ngOptions.skipMetadataEmit || ngOptions.flatModuleOutFile) ? 0 : api.EmitFlags.Metadata)
         });
+        checkFunc(basePath, result.diagnostics);
+        return { errorCode: 0, result: result };
     }
     catch (e) {
         if (compiler_1.isSyntaxError(e)) {
-            console.error(e.message);
             consoleError(e.message);
-            return 1;
+            return { errorCode: 1 };
         }
         throw e;
     }
-    return 0;
 }
 exports.performCompilation = performCompilation;
 //# sourceMappingURL=perform-compile.js.map

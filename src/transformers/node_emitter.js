@@ -17,7 +17,9 @@ var TypeScriptNodeEmitter = (function () {
     }
     TypeScriptNodeEmitter.prototype.updateSourceFile = function (sourceFile, stmts, preamble) {
         var converter = new _NodeEmitterVisitor();
-        var statements = stmts.map(function (stmt) { return stmt.visitStatement(converter, null); }).filter(function (stmt) { return stmt != null; });
+        // [].concat flattens the result so that each `visit...` method can also return an array of
+        // stmts.
+        var statements = [].concat.apply([], stmts.map(function (stmt) { return stmt.visitStatement(converter, null); }).filter(function (stmt) { return stmt != null; }));
         var newSourceFile = ts.updateSourceFileNode(sourceFile, converter.getReexports().concat(converter.getImports(), statements));
         if (preamble) {
             if (preamble.startsWith('/*') && preamble.endsWith('*/')) {
@@ -110,13 +112,22 @@ var _NodeEmitterVisitor = (function () {
                 return null;
             }
         }
-        return this.record(stmt, ts.createVariableStatement(this.getModifiers(stmt), ts.createVariableDeclarationList([ts.createVariableDeclaration(ts.createIdentifier(stmt.name), 
-            /* type */ undefined, (stmt.value && stmt.value.visitExpression(this, null)) || undefined)])));
+        var varDeclList = ts.createVariableDeclarationList([ts.createVariableDeclaration(ts.createIdentifier(stmt.name), 
+            /* type */ undefined, (stmt.value && stmt.value.visitExpression(this, null)) || undefined)]);
+        if (stmt.hasModifier(compiler_1.StmtModifier.Exported)) {
+            // Note: We need to add an explicit variable and export declaration so that
+            // the variable can be referred in the same file as well.
+            var tsVarStmt = this.record(stmt, ts.createVariableStatement(/* modifiers */ [], varDeclList));
+            var exportStmt = this.record(stmt, ts.createExportDeclaration(
+            /*decorators*/ undefined, /*modifiers*/ undefined, ts.createNamedExports([ts.createExportSpecifier(stmt.name, stmt.name)])));
+            return [tsVarStmt, exportStmt];
+        }
+        return this.record(stmt, ts.createVariableStatement(this.getModifiers(stmt), varDeclList));
     };
     _NodeEmitterVisitor.prototype.visitDeclareFunctionStmt = function (stmt, context) {
         return this.record(stmt, ts.createFunctionDeclaration(
         /* decorators */ undefined, this.getModifiers(stmt), 
-        /* astrictToken */ undefined, stmt.name, /* typeParameters */ undefined, stmt.params.map(function (p) { return ts.createParameter(
+        /* asteriskToken */ undefined, stmt.name, /* typeParameters */ undefined, stmt.params.map(function (p) { return ts.createParameter(
         /* decorators */ undefined, /* modifiers */ undefined, 
         /* dotDotDotToken */ undefined, p.name); }), 
         /* type */ undefined, this._visitStatements(stmt.statements)));

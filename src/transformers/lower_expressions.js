@@ -31,17 +31,23 @@ function isLexicalScope(node) {
 }
 function transformSourceFile(sourceFile, requests, context) {
     var inserts = [];
-    // Calculate the range of intersting locations. The transform will only visit nodes in this
+    // Calculate the range of interesting locations. The transform will only visit nodes in this
     // range to improve the performance on large files.
     var locations = Array.from(requests.keys());
     var min = Math.min.apply(Math, locations);
     var max = Math.max.apply(Math, locations);
+    // Visit nodes matching the request and synthetic nodes added by tsickle
+    function shouldVisit(pos, end) {
+        return (pos <= max && end >= min) || pos == -1;
+    }
     function visitSourceFile(sourceFile) {
         function topLevelStatement(node) {
             var declarations = [];
             function visitNode(node) {
-                var nodeRequest = requests.get(node.pos);
-                if (nodeRequest && nodeRequest.kind == node.kind && nodeRequest.end == node.end) {
+                // Get the original node before tsickle
+                var _a = ts.getOriginalNode(node), pos = _a.pos, end = _a.end, kind = _a.kind;
+                var nodeRequest = requests.get(pos);
+                if (nodeRequest && nodeRequest.kind == kind && nodeRequest.end == end) {
                     // This node is requested to be rewritten as a reference to the exported name.
                     // Record that the node needs to be moved to an exported variable with the given name
                     var name_1 = nodeRequest.name;
@@ -49,12 +55,14 @@ function transformSourceFile(sourceFile, requests, context) {
                     return ts.createIdentifier(name_1);
                 }
                 var result = node;
-                if (node.pos <= max && node.end >= min && !isLexicalScope(node)) {
+                if (shouldVisit(pos, end) && !isLexicalScope(node)) {
                     result = ts.visitEachChild(node, visitNode, context);
                 }
                 return result;
             }
-            var result = (node.pos <= max && node.end >= min) ? ts.visitEachChild(node, visitNode, context) : node;
+            // Get the original node before tsickle
+            var _a = ts.getOriginalNode(node), pos = _a.pos, end = _a.end;
+            var result = shouldVisit(pos, end) ? ts.visitEachChild(node, visitNode, context) : node;
             if (declarations.length) {
                 inserts.push({ priorTo: result, declarations: declarations });
             }

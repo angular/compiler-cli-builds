@@ -13,4 +13,12 @@ export declare function readConfiguration(project: string, basePath: string, che
     parsed: ts.ParsedCommandLine;
     ngOptions: any;
 };
-export declare function performCompilation(basePath: string, files: string[], options: ts.CompilerOptions, ngOptions: any, consoleError?: (s: string) => void, checkFunc?: (cwd: string, ...args: any[]) => void, tsCompilerHost?: ts.CompilerHost): 0 | 1;
+/**
+ * Returns an object with two properties:
+ * - `errorCode` is 0 when the compilation was successful,
+ * - `result` is an `EmitResult` when the errorCode is 0, `undefined` otherwise.
+ */
+export declare function performCompilation(basePath: string, files: string[], options: ts.CompilerOptions, ngOptions: api.CompilerOptions, consoleError?: (s: string) => void, checkFunc?: (cwd: string, ...args: any[]) => void, tsCompilerHost?: ts.CompilerHost): {
+    errorCode: number;
+    result?: api.EmitResult;
+};
