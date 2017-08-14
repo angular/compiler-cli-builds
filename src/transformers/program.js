@@ -316,6 +316,7 @@ function getAotCompilerOptions(options) {
         i18nFormat: options.i18nInFormat || options.i18nOutFormat, translations: translations, missingTranslation: missingTranslation,
         enableLegacyTemplate: options.enableLegacyTemplate,
         enableSummariesForJit: true,
+        preserveWhitespaces: options.preserveWhitespaces,
     };
 }
 function writeMetadata(emitFilePath, sourceFile, metadataCache) {
