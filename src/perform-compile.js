@@ -114,7 +114,7 @@ function performCompilation(rootNames, options, host, oldProgram) {
     var emitResult;
     try {
         if (!host) {
-            host = ng.createNgCompilerHost({ options: options });
+            host = ng.createCompilerHost({ options: options });
         }
         program = ng.createProgram({ rootNames: rootNames, host: host, options: options, oldProgram: oldProgram });
         var shouldEmit = true;

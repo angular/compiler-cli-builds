@@ -36,30 +36,41 @@ export interface CompilerOptions extends ts.CompilerOptions {
     i18nInMissingTranslations?: 'error' | 'warning' | 'ignore';
     preserveWhitespaces?: boolean;
 }
-export interface ModuleFilenameResolver {
+export interface CompilerHost extends ts.CompilerHost {
     /**
      * Converts a module name that is used in an `import` to a file path.
      * I.e. `path/to/containingFile.ts` containing `import {...} from 'module-name'`.
      */
     moduleNameToFileName(moduleName: string, containingFile?: string): string | null;
     /**
-     * Converts a file path to a module name that can be used as an `import.
+     * Converts a file path to a module name that can be used as an `import ...`
      * I.e. `path/to/importedFile.ts` should be imported by `path/to/containingFile.ts`.
-     *
-     * See ImportResolver.
      */
     fileNameToModuleName(importedFilePath: string, containingFilePath: string): string | null;
-    getNgCanonicalFileName(fileName: string): string;
-    assumeFileExists(fileName: string): void;
-}
-export interface CompilerHost extends ts.CompilerHost, ModuleFilenameResolver {
+    /**
+     * Converts a file path for a resource that is used in a source file or another resource
+     * into a filepath.
+     */
+    resourceNameToFileName(resourceName: string, containingFilePath: string): string | null;
+    /**
+     * Converts a file name into a representation that should be stored in a summary file.
+     * This has to include changing the suffix as well.
+     * E.g.
+     * `some_file.ts` -> `some_file.d.ts`
+     *
+     * @param referringSrcFileName the soure file that refers to fileName
+     */
+    toSummaryFileName(fileName: string, referringSrcFileName: string): string;
+    /**
+     * Converts a fileName that was processed by `toSummaryFileName` back into a real fileName
+     * given the fileName of the library that is referrig to it.
+     */
+    fromSummaryFileName(fileName: string, referringLibFileName: string): string;
     /**
      * Load a referenced resource either statically or asynchronously. If the host returns a
      * `Promise<string>` it is assumed the user of the corresponding `Program` will call
      * `loadNgStructureAsync()`. Returing  `Promise<string>` outside `loadNgStructureAsync()` will
      * cause a diagnostics diagnostic error or an exception to be thrown.
-     *
-     * If `loadResource()` is not provided, `readFile()` will be called to load the resource.
      */
     readResource?(fileName: string): Promise<string> | string;
 }

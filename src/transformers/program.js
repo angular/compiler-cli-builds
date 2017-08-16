@@ -6,6 +6,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
 var core_1 = require("@angular/core");
@@ -53,10 +63,8 @@ var AngularCompilerProgram = (function () {
                 .map(function (sf) { return sf.fileName; })
                 .filter(function (f) { return !f.match(/\.ngfactory\.[\w.]+$|\.ngstyle\.[\w.]+$|\.ngsummary\.[\w.]+$/); });
         this.metadataCache = new lower_expressions_1.LowerMetadataCache({ quotedNames: true }, !!options.strictMetadataEmit);
-        this.aotCompilerHost = new compiler_host_1.CompilerHost(this.tsProgram, options, host, /* collectorOptions */ undefined, this.metadataCache);
-        if (host.readResource) {
-            this.aotCompilerHost.loadResource = host.readResource.bind(host);
-        }
+        this.aotCompilerHost =
+            new AotCompilerHostImpl(this.tsProgram, options, host, this.metadataCache);
         var aotOptions = getAotCompilerOptions(options);
         this.compiler = compiler_1.createAotCompiler(this.aotCompilerHost, aotOptions).compiler;
         var _b;
@@ -283,6 +291,28 @@ var AngularCompilerProgram = (function () {
     };
     return AngularCompilerProgram;
 }());
+var AotCompilerHostImpl = (function (_super) {
+    __extends(AotCompilerHostImpl, _super);
+    function AotCompilerHostImpl() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    AotCompilerHostImpl.prototype.moduleNameToFileName = function (m, containingFile) {
+        return this.context.moduleNameToFileName(m, containingFile);
+    };
+    AotCompilerHostImpl.prototype.fileNameToModuleName = function (importedFile, containingFile) {
+        return this.context.fileNameToModuleName(importedFile, containingFile);
+    };
+    AotCompilerHostImpl.prototype.resourceNameToFileName = function (resourceName, containingFile) {
+        return this.context.resourceNameToFileName(resourceName, containingFile);
+    };
+    AotCompilerHostImpl.prototype.toSummaryFileName = function (fileName, referringSrcFileName) {
+        return this.context.toSummaryFileName(fileName, referringSrcFileName);
+    };
+    AotCompilerHostImpl.prototype.fromSummaryFileName = function (fileName, referringLibFileName) {
+        return this.context.fromSummaryFileName(fileName, referringLibFileName);
+    };
+    return AotCompilerHostImpl;
+}(compiler_host_1.BaseAotCompilerHost));
 function createProgram(_a) {
     var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram;
     return new AngularCompilerProgram(rootNames, options, host, oldProgram);

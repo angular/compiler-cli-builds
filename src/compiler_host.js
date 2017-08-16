@@ -17,6 +17,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
+var compiler_1 = require("@angular/compiler");
 var tsc_wrapped_1 = require("@angular/tsc-wrapped");
 var fs = require("fs");
 var path = require("path");
@@ -28,10 +29,9 @@ var IS_GENERATED = /\.(ngfactory|ngstyle|ngsummary)$/;
 var GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$|\.ngsummary\.ts$/;
 var GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$|\.ngsummary\.ts$/;
 var SHALLOW_IMPORT = /^((\w|-)+|(@(\w|-)+(\/(\w|-)+)+))$/;
-var CompilerHost = (function () {
-    function CompilerHost(program, options, context, collectorOptions, metadataProvider) {
+var BaseAotCompilerHost = (function () {
+    function BaseAotCompilerHost(program, options, context, metadataProvider) {
         if (metadataProvider === void 0) { metadataProvider = new tsc_wrapped_1.MetadataCollector(); }
-        var _this = this;
         this.program = program;
         this.options = options;
         this.context = context;
@@ -40,13 +40,193 @@ var CompilerHost = (function () {
         this.flatModuleIndexCache = new Map();
         this.flatModuleIndexNames = new Set();
         this.flatModuleIndexRedirectNames = new Set();
-        this.moduleFileNames = new Map();
+    }
+    BaseAotCompilerHost.prototype.getSourceFile = function (filePath) {
+        var sf = this.program.getSourceFile(filePath);
+        if (!sf) {
+            if (this.context.fileExists(filePath)) {
+                var sourceText = this.context.readFile(filePath);
+                return ts.createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true);
+            }
+            throw new Error("Source file " + filePath + " not present in program.");
+        }
+        return sf;
+    };
+    BaseAotCompilerHost.prototype.getMetadataFor = function (filePath) {
+        if (!this.context.fileExists(filePath)) {
+            // If the file doesn't exists then we cannot return metadata for the file.
+            // This will occur if the user referenced a declared module for which no file
+            // exists for the module (i.e. jQuery or angularjs).
+            return;
+        }
+        if (DTS.test(filePath)) {
+            var metadataPath = filePath.replace(DTS, '.metadata.json');
+            if (this.context.fileExists(metadataPath)) {
+                return this.readMetadata(metadataPath, filePath);
+            }
+            else {
+                // If there is a .d.ts file but no metadata file we need to produce a
+                // v3 metadata from the .d.ts file as v3 includes the exports we need
+                // to resolve symbols.
+                return [this.upgradeVersion1Metadata({ '__symbolic': 'module', 'version': 1, 'metadata': {} }, filePath)];
+            }
+        }
+        var sf = this.getSourceFile(filePath);
+        var metadata = this.metadataProvider.getMetadata(sf);
+        return metadata ? [metadata] : [];
+    };
+    BaseAotCompilerHost.prototype.readMetadata = function (filePath, dtsFilePath) {
+        var metadatas = this.resolverCache.get(filePath);
+        if (metadatas) {
+            return metadatas;
+        }
+        try {
+            var metadataOrMetadatas = JSON.parse(this.context.readFile(filePath));
+            var metadatas_1 = metadataOrMetadatas ?
+                (Array.isArray(metadataOrMetadatas) ? metadataOrMetadatas : [metadataOrMetadatas]) :
+                [];
+            var v1Metadata = metadatas_1.find(function (m) { return m.version === 1; });
+            var v3Metadata = metadatas_1.find(function (m) { return m.version === 3; });
+            if (!v3Metadata && v1Metadata) {
+                metadatas_1.push(this.upgradeVersion1Metadata(v1Metadata, dtsFilePath));
+            }
+            this.resolverCache.set(filePath, metadatas_1);
+            return metadatas_1;
+        }
+        catch (e) {
+            console.error("Failed to read JSON file " + filePath);
+            throw e;
+        }
+    };
+    BaseAotCompilerHost.prototype.upgradeVersion1Metadata = function (v1Metadata, dtsFilePath) {
+        // patch up v1 to v3 by merging the metadata with metadata collected from the d.ts file
+        // as the only difference between the versions is whether all exports are contained in
+        // the metadata and the `extends` clause.
+        var v3Metadata = { '__symbolic': 'module', 'version': 3, 'metadata': {} };
+        if (v1Metadata.exports) {
+            v3Metadata.exports = v1Metadata.exports;
+        }
+        for (var prop in v1Metadata.metadata) {
+            v3Metadata.metadata[prop] = v1Metadata.metadata[prop];
+        }
+        var exports = this.metadataProvider.getMetadata(this.getSourceFile(dtsFilePath));
+        if (exports) {
+            for (var prop in exports.metadata) {
+                if (!v3Metadata.metadata[prop]) {
+                    v3Metadata.metadata[prop] = exports.metadata[prop];
+                }
+            }
+            if (exports.exports) {
+                v3Metadata.exports = exports.exports;
+            }
+        }
+        return v3Metadata;
+    };
+    BaseAotCompilerHost.prototype.loadResource = function (filePath) {
+        if (this.context.readResource)
+            return this.context.readResource(filePath);
+        if (!this.context.fileExists(filePath)) {
+            throw compiler_1.syntaxError("Error: Resource file not found: " + filePath);
+        }
+        return this.context.readFile(filePath);
+    };
+    BaseAotCompilerHost.prototype.loadSummary = function (filePath) {
+        if (this.context.fileExists(filePath)) {
+            return this.context.readFile(filePath);
+        }
+        return null;
+    };
+    BaseAotCompilerHost.prototype.isSourceFile = function (filePath) {
+        var excludeRegex = this.options.generateCodeForLibraries === false ? GENERATED_OR_DTS_FILES : GENERATED_FILES;
+        if (excludeRegex.test(filePath)) {
+            return false;
+        }
+        if (DTS.test(filePath)) {
+            // Check for a bundle index.
+            if (this.hasBundleIndex(filePath)) {
+                var normalFilePath = path.normalize(filePath);
+                return this.flatModuleIndexNames.has(normalFilePath) ||
+                    this.flatModuleIndexRedirectNames.has(normalFilePath);
+            }
+        }
+        return true;
+    };
+    BaseAotCompilerHost.prototype.hasBundleIndex = function (filePath) {
+        var _this = this;
+        var checkBundleIndex = function (directory) {
+            var result = _this.flatModuleIndexCache.get(directory);
+            if (result == null) {
+                if (path.basename(directory) == 'node_module') {
+                    // Don't look outside the node_modules this package is installed in.
+                    result = false;
+                }
+                else {
+                    // A bundle index exists if the typings .d.ts file has a metadata.json that has an
+                    // importAs.
+                    try {
+                        var packageFile = path.join(directory, 'package.json');
+                        if (_this.context.fileExists(packageFile)) {
+                            // Once we see a package.json file, assume false until it we find the bundle index.
+                            result = false;
+                            var packageContent = JSON.parse(_this.context.readFile(packageFile));
+                            if (packageContent.typings) {
+                                var typings = path.normalize(path.join(directory, packageContent.typings));
+                                if (DTS.test(typings)) {
+                                    var metadataFile = typings.replace(DTS, '.metadata.json');
+                                    if (_this.context.fileExists(metadataFile)) {
+                                        var metadata = JSON.parse(_this.context.readFile(metadataFile));
+                                        if (metadata.flatModuleIndexRedirect) {
+                                            _this.flatModuleIndexRedirectNames.add(typings);
+                                            // Note: don't set result = true,
+                                            // as this would mark this folder
+                                            // as having a bundleIndex too early without
+                                            // filling the bundleIndexNames.
+                                        }
+                                        else if (metadata.importAs) {
+                                            _this.flatModuleIndexNames.add(typings);
+                                            result = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else {
+                            var parent_1 = path.dirname(directory);
+                            if (parent_1 != directory) {
+                                // Try the parent directory.
+                                result = checkBundleIndex(parent_1);
+                            }
+                            else {
+                                result = false;
+                            }
+                        }
+                    }
+                    catch (e) {
+                        // If we encounter any errors assume we this isn't a bundle index.
+                        result = false;
+                    }
+                }
+                _this.flatModuleIndexCache.set(directory, result);
+            }
+            return result;
+        };
+        return checkBundleIndex(path.dirname(filePath));
+    };
+    return BaseAotCompilerHost;
+}());
+exports.BaseAotCompilerHost = BaseAotCompilerHost;
+var CompilerHost = (function (_super) {
+    __extends(CompilerHost, _super);
+    function CompilerHost(program, options, context, collectorOptions, metadataProvider) {
+        if (metadataProvider === void 0) { metadataProvider = new tsc_wrapped_1.MetadataCollector(collectorOptions); }
+        var _this = _super.call(this, program, options, context, metadataProvider) || this;
+        _this.moduleFileNames = new Map();
         // normalize the path so that it never ends with '/'.
-        this.basePath = path.normalize(path.join(this.options.basePath, '.')).replace(/\\/g, '/');
-        this.genDir = path.normalize(path.join(this.options.genDir, '.')).replace(/\\/g, '/');
-        var genPath = path.relative(this.basePath, this.genDir);
-        this.isGenDirChildOfRootDir = genPath === '' || !genPath.startsWith('..');
-        this.resolveModuleNameHost = Object.create(this.context);
+        _this.basePath = path.normalize(path.join(_this.options.basePath, '.')).replace(/\\/g, '/');
+        _this.genDir = path.normalize(path.join(_this.options.genDir, '.')).replace(/\\/g, '/');
+        var genPath = path.relative(_this.basePath, _this.genDir);
+        _this.isGenDirChildOfRootDir = genPath === '' || !genPath.startsWith('..');
+        _this.resolveModuleNameHost = Object.create(_this.context);
         // When calling ts.resolveModuleName,
         // additional allow checks for .d.ts files to be done based on
         // checks for .ngsummary.json files,
@@ -54,7 +234,7 @@ var CompilerHost = (function () {
         // less often.
         // This is needed as we use ts.resolveModuleName in reflector_host
         // and it should be able to resolve summary file names.
-        this.resolveModuleNameHost.fileExists = function (fileName) {
+        _this.resolveModuleNameHost.fileExists = function (fileName) {
             if (_this.context.fileExists(fileName)) {
                 return true;
             }
@@ -64,7 +244,34 @@ var CompilerHost = (function () {
             }
             return false;
         };
+        _this.urlResolver = compiler_1.createOfflineCompileUrlResolver();
+        return _this;
     }
+    CompilerHost.prototype.toSummaryFileName = function (fileName, referringSrcFileName) {
+        return fileName.replace(EXT, '') + '.d.ts';
+    };
+    CompilerHost.prototype.fromSummaryFileName = function (fileName, referringLibFileName) { return fileName; };
+    CompilerHost.prototype.calculateEmitPath = function (filePath) {
+        // Write codegen in a directory structure matching the sources.
+        var root = this.options.basePath;
+        for (var _i = 0, _a = this.options.rootDirs || []; _i < _a.length; _i++) {
+            var eachRootDir = _a[_i];
+            if (this.options.trace) {
+                console.error("Check if " + filePath + " is under rootDirs element " + eachRootDir);
+            }
+            if (path.relative(eachRootDir, filePath).indexOf('.') !== 0) {
+                root = eachRootDir;
+            }
+        }
+        // transplant the codegen path to be inside the `genDir`
+        var relativePath = path.relative(root, filePath);
+        while (relativePath.startsWith('..' + path.sep)) {
+            // Strip out any `..` path such as: `../node_modules/@foo` as we want to put everything
+            // into `genDir`.
+            relativePath = relativePath.substr(3);
+        }
+        return path.join(this.options.genDir, relativePath);
+    };
     // We use absolute paths on disk as canonical.
     CompilerHost.prototype.getCanonicalFileName = function (fileName) { return fileName; };
     CompilerHost.prototype.moduleNameToFileName = function (m, containingFile) {
@@ -146,9 +353,8 @@ var CompilerHost = (function () {
             }
         }
     };
-    CompilerHost.prototype.dotRelative = function (from, to) {
-        var rPath = path.relative(from, to).replace(/\\/g, '/');
-        return rPath.startsWith('.') ? rPath : './' + rPath;
+    CompilerHost.prototype.resourceNameToFileName = function (m, containingFile) {
+        return this.urlResolver.resolve(containingFile, m);
     };
     /**
      * Moves the path into `genDir` folder while preserving the `node_modules` directory.
@@ -165,200 +371,12 @@ var CompilerHost = (function () {
             return filepath.replace(this.basePath, this.genDir);
         }
     };
-    CompilerHost.prototype.getSourceFile = function (filePath) {
-        var sf = this.program.getSourceFile(filePath);
-        if (!sf) {
-            if (this.context.fileExists(filePath)) {
-                var sourceText = this.context.readFile(filePath);
-                return ts.createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true);
-            }
-            throw new Error("Source file " + filePath + " not present in program.");
-        }
-        return sf;
-    };
-    CompilerHost.prototype.getMetadataFor = function (filePath) {
-        if (!this.context.fileExists(filePath)) {
-            // If the file doesn't exists then we cannot return metadata for the file.
-            // This will occur if the user referenced a declared module for which no file
-            // exists for the module (i.e. jQuery or angularjs).
-            return;
-        }
-        if (DTS.test(filePath)) {
-            var metadataPath = filePath.replace(DTS, '.metadata.json');
-            if (this.context.fileExists(metadataPath)) {
-                return this.readMetadata(metadataPath, filePath);
-            }
-            else {
-                // If there is a .d.ts file but no metadata file we need to produce a
-                // v3 metadata from the .d.ts file as v3 includes the exports we need
-                // to resolve symbols.
-                return [this.upgradeVersion1Metadata({ '__symbolic': 'module', 'version': 1, 'metadata': {} }, filePath)];
-            }
-        }
-        var sf = this.getSourceFile(filePath);
-        var metadata = this.metadataProvider.getMetadata(sf);
-        return metadata ? [metadata] : [];
-    };
-    CompilerHost.prototype.readMetadata = function (filePath, dtsFilePath) {
-        var metadatas = this.resolverCache.get(filePath);
-        if (metadatas) {
-            return metadatas;
-        }
-        try {
-            var metadataOrMetadatas = JSON.parse(this.context.readFile(filePath));
-            var metadatas_1 = metadataOrMetadatas ?
-                (Array.isArray(metadataOrMetadatas) ? metadataOrMetadatas : [metadataOrMetadatas]) :
-                [];
-            var v1Metadata = metadatas_1.find(function (m) { return m.version === 1; });
-            var v3Metadata = metadatas_1.find(function (m) { return m.version === 3; });
-            if (!v3Metadata && v1Metadata) {
-                metadatas_1.push(this.upgradeVersion1Metadata(v1Metadata, dtsFilePath));
-            }
-            this.resolverCache.set(filePath, metadatas_1);
-            return metadatas_1;
-        }
-        catch (e) {
-            console.error("Failed to read JSON file " + filePath);
-            throw e;
-        }
-    };
-    CompilerHost.prototype.upgradeVersion1Metadata = function (v1Metadata, dtsFilePath) {
-        // patch up v1 to v3 by merging the metadata with metadata collected from the d.ts file
-        // as the only difference between the versions is whether all exports are contained in
-        // the metadata and the `extends` clause.
-        var v3Metadata = { '__symbolic': 'module', 'version': 3, 'metadata': {} };
-        if (v1Metadata.exports) {
-            v3Metadata.exports = v1Metadata.exports;
-        }
-        for (var prop in v1Metadata.metadata) {
-            v3Metadata.metadata[prop] = v1Metadata.metadata[prop];
-        }
-        var exports = this.metadataProvider.getMetadata(this.getSourceFile(dtsFilePath));
-        if (exports) {
-            for (var prop in exports.metadata) {
-                if (!v3Metadata.metadata[prop]) {
-                    v3Metadata.metadata[prop] = exports.metadata[prop];
-                }
-            }
-            if (exports.exports) {
-                v3Metadata.exports = exports.exports;
-            }
-        }
-        return v3Metadata;
-    };
-    CompilerHost.prototype.loadResource = function (filePath) {
-        if (this.context.readResource)
-            return this.context.readResource(filePath);
-        return this.context.readFile(filePath);
-    };
-    CompilerHost.prototype.loadSummary = function (filePath) {
-        if (this.context.fileExists(filePath)) {
-            return this.context.readFile(filePath);
-        }
-        return null;
-    };
-    CompilerHost.prototype.getOutputFileName = function (sourceFilePath) {
-        return sourceFilePath.replace(EXT, '') + '.d.ts';
-    };
-    CompilerHost.prototype.isSourceFile = function (filePath) {
-        var excludeRegex = this.options.generateCodeForLibraries === false ? GENERATED_OR_DTS_FILES : GENERATED_FILES;
-        if (excludeRegex.test(filePath)) {
-            return false;
-        }
-        if (DTS.test(filePath)) {
-            // Check for a bundle index.
-            if (this.hasBundleIndex(filePath)) {
-                var normalFilePath = path.normalize(filePath);
-                return this.flatModuleIndexNames.has(normalFilePath) ||
-                    this.flatModuleIndexRedirectNames.has(normalFilePath);
-            }
-        }
-        return true;
-    };
-    CompilerHost.prototype.calculateEmitPath = function (filePath) {
-        // Write codegen in a directory structure matching the sources.
-        var root = this.options.basePath;
-        for (var _i = 0, _a = this.options.rootDirs || []; _i < _a.length; _i++) {
-            var eachRootDir = _a[_i];
-            if (this.options.trace) {
-                console.error("Check if " + filePath + " is under rootDirs element " + eachRootDir);
-            }
-            if (path.relative(eachRootDir, filePath).indexOf('.') !== 0) {
-                root = eachRootDir;
-            }
-        }
-        // transplant the codegen path to be inside the `genDir`
-        var relativePath = path.relative(root, filePath);
-        while (relativePath.startsWith('..' + path.sep)) {
-            // Strip out any `..` path such as: `../node_modules/@foo` as we want to put everything
-            // into `genDir`.
-            relativePath = relativePath.substr(3);
-        }
-        return path.join(this.options.genDir, relativePath);
-    };
-    CompilerHost.prototype.hasBundleIndex = function (filePath) {
-        var _this = this;
-        var checkBundleIndex = function (directory) {
-            var result = _this.flatModuleIndexCache.get(directory);
-            if (result == null) {
-                if (path.basename(directory) == 'node_module') {
-                    // Don't look outside the node_modules this package is installed in.
-                    result = false;
-                }
-                else {
-                    // A bundle index exists if the typings .d.ts file has a metadata.json that has an
-                    // importAs.
-                    try {
-                        var packageFile = path.join(directory, 'package.json');
-                        if (_this.context.fileExists(packageFile)) {
-                            // Once we see a package.json file, assume false until it we find the bundle index.
-                            result = false;
-                            var packageContent = JSON.parse(_this.context.readFile(packageFile));
-                            if (packageContent.typings) {
-                                var typings = path.normalize(path.join(directory, packageContent.typings));
-                                if (DTS.test(typings)) {
-                                    var metadataFile = typings.replace(DTS, '.metadata.json');
-                                    if (_this.context.fileExists(metadataFile)) {
-                                        var metadata = JSON.parse(_this.context.readFile(metadataFile));
-                                        if (metadata.flatModuleIndexRedirect) {
-                                            _this.flatModuleIndexRedirectNames.add(typings);
-                                            // Note: don't set result = true,
-                                            // as this would mark this folder
-                                            // as having a bundleIndex too early without
-                                            // filling the bundleIndexNames.
-                                        }
-                                        else if (metadata.importAs) {
-                                            _this.flatModuleIndexNames.add(typings);
-                                            result = true;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        else {
-                            var parent_1 = path.dirname(directory);
-                            if (parent_1 != directory) {
-                                // Try the parent directory.
-                                result = checkBundleIndex(parent_1);
-                            }
-                            else {
-                                result = false;
-                            }
-                        }
-                    }
-                    catch (e) {
-                        // If we encounter any errors assume we this isn't a bundle index.
-                        result = false;
-                    }
-                }
-                _this.flatModuleIndexCache.set(directory, result);
-            }
-            return result;
-        };
-        return checkBundleIndex(path.dirname(filePath));
+    CompilerHost.prototype.dotRelative = function (from, to) {
+        var rPath = path.relative(from, to).replace(/\\/g, '/');
+        return rPath.startsWith('.') ? rPath : './' + rPath;
     };
     return CompilerHost;
-}());
+}(BaseAotCompilerHost));
 exports.CompilerHost = CompilerHost;
 var CompilerHostContextAdapter = (function () {
     function CompilerHostContextAdapter() {
