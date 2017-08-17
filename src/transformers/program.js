@@ -18,7 +18,6 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
-var core_1 = require("@angular/core");
 var tsc_wrapped_1 = require("@angular/tsc-wrapped");
 var fs = require("fs");
 var path = require("path");
@@ -320,13 +319,13 @@ function createProgram(_a) {
 exports.createProgram = createProgram;
 // Compute the AotCompiler options
 function getAotCompilerOptions(options) {
-    var missingTranslation = core_1.MissingTranslationStrategy.Warning;
+    var missingTranslation = compiler_1.core.MissingTranslationStrategy.Warning;
     switch (options.i18nInMissingTranslations) {
         case 'ignore':
-            missingTranslation = core_1.MissingTranslationStrategy.Ignore;
+            missingTranslation = compiler_1.core.MissingTranslationStrategy.Ignore;
             break;
         case 'error':
-            missingTranslation = core_1.MissingTranslationStrategy.Error;
+            missingTranslation = compiler_1.core.MissingTranslationStrategy.Error;
             break;
     }
     var translations = '';
@@ -339,7 +338,7 @@ function getAotCompilerOptions(options) {
     else {
         // No translations are provided, ignore any errors
         // We still go through i18n to remove i18n attributes
-        missingTranslation = core_1.MissingTranslationStrategy.Ignore;
+        missingTranslation = compiler_1.core.MissingTranslationStrategy.Ignore;
     }
     return {
         locale: options.i18nInLocale,

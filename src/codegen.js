@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Intended to be used in a build step.
  */
 var compiler = require("@angular/compiler");
-var core_1 = require("@angular/core");
 var fs_1 = require("fs");
 var compiler_host_1 = require("./compiler_host");
 var path_mapped_compiler_host_1 = require("./path_mapped_compiler_host");
@@ -62,24 +61,24 @@ var CodeGenerator = (function () {
             }
             transContent = fs_1.readFileSync(cliOptions.i18nFile, 'utf8');
         }
-        var missingTranslation = core_1.MissingTranslationStrategy.Warning;
+        var missingTranslation = compiler.core.MissingTranslationStrategy.Warning;
         if (cliOptions.missingTranslation) {
             switch (cliOptions.missingTranslation) {
                 case 'error':
-                    missingTranslation = core_1.MissingTranslationStrategy.Error;
+                    missingTranslation = compiler.core.MissingTranslationStrategy.Error;
                     break;
                 case 'warning':
-                    missingTranslation = core_1.MissingTranslationStrategy.Warning;
+                    missingTranslation = compiler.core.MissingTranslationStrategy.Warning;
                     break;
                 case 'ignore':
-                    missingTranslation = core_1.MissingTranslationStrategy.Ignore;
+                    missingTranslation = compiler.core.MissingTranslationStrategy.Ignore;
                     break;
                 default:
                     throw new Error("Unknown option for missingTranslation (" + cliOptions.missingTranslation + "). Use either error, warning or ignore.");
             }
         }
         if (!transContent) {
-            missingTranslation = core_1.MissingTranslationStrategy.Ignore;
+            missingTranslation = compiler.core.MissingTranslationStrategy.Ignore;
         }
         var aotCompiler = compiler.createAotCompiler(ngCompilerHost, {
             translations: transContent,
