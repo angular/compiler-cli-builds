@@ -14,7 +14,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * something else.
  */
 var compiler_1 = require("@angular/compiler");
-var core_1 = require("@angular/core");
 var ROUTER_MODULE_PATH = '@angular/router';
 var ROUTER_ROUTES_SYMBOL_NAME = 'ROUTES';
 // A route definition. Normally the short form 'path/to/module#ModuleClassName' is used by
@@ -128,7 +127,7 @@ function _extractLazyRoutesFromStaticModule(staticSymbol, reflector, host, ROUTE
  * Get the NgModule Metadata of a symbol.
  */
 function _getNgModuleMetadata(staticSymbol, reflector) {
-    var ngModules = reflector.annotations(staticSymbol).filter(function (s) { return s instanceof core_1.NgModule; });
+    var ngModules = reflector.annotations(staticSymbol).filter(function (s) { return compiler_1.core.createNgModule.isTypeOf(s); });
     if (ngModules.length === 0) {
         throw new Error(staticSymbol.name + " is not an NgModule");
     }

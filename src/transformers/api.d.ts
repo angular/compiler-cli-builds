@@ -83,14 +83,22 @@ export declare enum EmitFlags {
     Default = 3,
     All = 31,
 }
-export interface EmitResult extends ts.EmitResult {
-    modulesManifest: {
-        modules: string[];
-        fileNames: string[];
-    };
-    externs: {
-        [fileName: string]: string;
-    };
+export interface CustomTransformers {
+    beforeTs?: ts.TransformerFactory<ts.SourceFile>[];
+    afterTs?: ts.TransformerFactory<ts.SourceFile>[];
+}
+export interface TsEmitArguments {
+    program: ts.Program;
+    host: CompilerHost;
+    options: CompilerOptions;
+    targetSourceFile?: ts.SourceFile;
+    writeFile?: ts.WriteFileCallback;
+    cancellationToken?: ts.CancellationToken;
+    emitOnlyDtsFiles?: boolean;
+    customTransformers?: ts.CustomTransformers;
+}
+export interface TsEmitCallback {
+    (args: TsEmitArguments): ts.EmitResult;
 }
 export interface Program {
     /**
@@ -158,8 +166,10 @@ export interface Program {
      *
      * Angular structural information is required to emit files.
      */
-    emit({emitFlags, cancellationToken}: {
-        emitFlags: EmitFlags;
+    emit({emitFlags, cancellationToken, customTransformers, emitCallback}: {
+        emitFlags?: EmitFlags;
         cancellationToken?: ts.CancellationToken;
-    }): EmitResult;
+        customTransformers?: CustomTransformers;
+        emitCallback?: TsEmitCallback;
+    }): ts.EmitResult;
 }

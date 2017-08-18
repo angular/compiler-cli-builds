@@ -97,8 +97,9 @@ function readConfiguration(project, existingOptions) {
     }
 }
 exports.readConfiguration = readConfiguration;
-function performCompilation(rootNames, options, host, oldProgram) {
-    var _a = ts.version.split('.'), major = _a[0], minor = _a[1];
+function performCompilation(_a) {
+    var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram, emitCallback = _a.emitCallback, customTransformers = _a.customTransformers;
+    var _b = ts.version.split('.'), major = _b[0], minor = _b[1];
     if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 3)) {
         throw new Error('Must use TypeScript > 2.3 to have transformer support');
     }
@@ -129,11 +130,13 @@ function performCompilation(rootNames, options, host, oldProgram) {
         // Check Angular semantic diagnostics
         shouldEmit = shouldEmit && checkDiagnostics(program.getNgSemanticDiagnostics());
         if (shouldEmit) {
-            var emitResult_1 = program.emit({
+            emitResult = program.emit({
+                emitCallback: emitCallback,
+                customTransformers: customTransformers,
                 emitFlags: api.EmitFlags.Default |
                     ((options.skipMetadataEmit || options.flatModuleOutFile) ? 0 : api.EmitFlags.Metadata)
             });
-            allDiagnostics.push.apply(allDiagnostics, emitResult_1.diagnostics);
+            allDiagnostics.push.apply(allDiagnostics, emitResult.diagnostics);
         }
     }
     catch (e) {
