@@ -13,8 +13,15 @@ export declare function calcProjectFileAndBasePath(project: string): {
 };
 export declare function createNgCompilerOptions(basePath: string, config: any, tsOptions: ts.CompilerOptions): api.CompilerOptions;
 export declare function readConfiguration(project: string, existingOptions?: ts.CompilerOptions): ParsedConfiguration;
-export declare function performCompilation(rootNames: string[], options: api.CompilerOptions, host?: api.CompilerHost, oldProgram?: api.Program): {
+export declare function performCompilation({rootNames, options, host, oldProgram, emitCallback, customTransformers}: {
+    rootNames: string[];
+    options: api.CompilerOptions;
+    host?: api.CompilerHost;
+    oldProgram?: api.Program;
+    emitCallback?: api.TsEmitCallback;
+    customTransformers?: api.CustomTransformers;
+}): {
     program?: api.Program;
-    emitResult?: api.EmitResult;
+    emitResult?: ts.EmitResult;
     diagnostics: Diagnostics;
 };
