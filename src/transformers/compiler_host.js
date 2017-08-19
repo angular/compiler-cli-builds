@@ -48,7 +48,7 @@ var CompilerHostMixin = (function () {
             // Any containing file gives the same result for absolute imports
             containingFile = path.join(this.basePath, 'index.ts');
         }
-        var resolved = ts.resolveModuleName(m, containingFile, this.options, this.moduleResolutionHost, this.moduleResolutionCache)
+        var resolved = ts.resolveModuleName(m, containingFile.replace(/\\/g, '/'), this.options, this.moduleResolutionHost, this.moduleResolutionCache)
             .resolvedModule;
         if (resolved) {
             if (this.options.traceResolution) {
