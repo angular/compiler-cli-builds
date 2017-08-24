@@ -112,20 +112,12 @@ var AngularCompilerProgram = (function () {
         var _this = this;
         var _b = _a.emitFlags, emitFlags = _b === void 0 ? api_1.EmitFlags.Default : _b, cancellationToken = _a.cancellationToken, customTransformers = _a.customTransformers, _c = _a.emitCallback, emitCallback = _c === void 0 ? defaultEmitCallback : _c;
         var emitMap = new Map();
-        var expectedOut = this.options.expectedOut ?
-            this.options.expectedOut.map(function (f) { return path.resolve(process.cwd(), f); }) :
-            undefined;
-        // Ensure that expected output files exist.
-        for (var _i = 0, _d = expectedOut || []; _i < _d.length; _i++) {
-            var out = _d[_i];
-            this.host.writeFile(out, '', false);
-        }
         var emitResult = emitCallback({
             program: this.programWithStubs,
             host: this.host,
             options: this.options,
             targetSourceFile: undefined,
-            writeFile: createWriteFileCallback(emitFlags, this.host, this.metadataCache, emitMap, expectedOut),
+            writeFile: createWriteFileCallback(emitFlags, this.host, this.metadataCache, emitMap, this.generatedFiles),
             cancellationToken: cancellationToken,
             emitOnlyDtsFiles: (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS,
             customTransformers: this.calculateTransforms(customTransformers)
@@ -368,17 +360,20 @@ function writeMetadata(host, emitFilePath, sourceFile, metadataCache) {
         }
     }
 }
-function createWriteFileCallback(emitFlags, host, metadataCache, emitMap, expectedOut) {
+function createWriteFileCallback(emitFlags, host, metadataCache, emitMap, generatedFiles) {
+    var genFileToSrcFile = new Map();
+    generatedFiles.forEach(function (f) { return genFileToSrcFile.set(f.genFileUrl, f.srcFileUrl); });
     return function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
         var srcFile;
         if (sourceFiles && sourceFiles.length == 1) {
             srcFile = sourceFiles[0];
-            emitMap.set(srcFile.fileName, fileName);
+            var originalSrcFile = genFileToSrcFile.get(srcFile.fileName) || srcFile.fileName;
+            emitMap.set(originalSrcFile, fileName);
         }
         var absFile = path.resolve(process.cwd(), fileName);
         var generatedFile = GENERATED_FILES.test(fileName);
-        // Don't emit unexpected files nor empty generated files
-        if ((!expectedOut || expectedOut.indexOf(absFile) > -1) && (!generatedFile || data)) {
+        // Don't emit empty generated files
+        if (!generatedFile || data) {
             host.writeFile(fileName, data, writeByteOrderMark, onError, sourceFiles);
             if (srcFile && !generatedFile && (emitFlags & api_1.EmitFlags.Metadata) != 0) {
                 writeMetadata(host, fileName, srcFile, metadataCache);
