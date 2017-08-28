@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,13 +6,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Transform template html and css into executable code.
  * Intended to be used in a build step.
  */
 var compiler = require("@angular/compiler");
-var core_1 = require("@angular/core");
 var fs_1 = require("fs");
 var compiler_host_1 = require("./compiler_host");
 var path_mapped_compiler_host_1 = require("./path_mapped_compiler_host");
@@ -28,15 +28,23 @@ var CodeGenerator = (function () {
     CodeGenerator.prototype.codegen = function () {
         var _this = this;
         return this.compiler
-            .compileAll(this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); }))
-            .then(function (generatedModules) {
-            generatedModules.forEach(function (generatedModule) {
-                var sourceFile = _this.program.getSourceFile(generatedModule.srcFileUrl);
-                var emitPath = _this.ngCompilerHost.calculateEmitPath(generatedModule.genFileUrl);
-                var source = GENERATED_META_FILES.test(emitPath) ? generatedModule.source :
-                    generatedModule.source;
-                _this.host.writeFile(emitPath, source, false, function () { }, [sourceFile]);
-            });
+            .analyzeModulesAsync(this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); }))
+            .then(function (analyzedModules) { return _this.emit(analyzedModules); });
+    };
+    CodeGenerator.prototype.codegenSync = function () {
+        var _this = this;
+        var analyzed = this.compiler.analyzeModulesSync(this.program.getSourceFiles().map(function (sf) { return _this.ngCompilerHost.getCanonicalFileName(sf.fileName); }));
+        return this.emit(analyzed);
+    };
+    CodeGenerator.prototype.emit = function (analyzedModules) {
+        var _this = this;
+        var generatedModules = this.compiler.emitAllImpls(analyzedModules);
+        return generatedModules.map(function (generatedModule) {
+            var sourceFile = _this.program.getSourceFile(generatedModule.srcFileUrl);
+            var emitPath = _this.ngCompilerHost.calculateEmitPath(generatedModule.genFileUrl);
+            var source = generatedModule.source || compiler.toTypeScript(generatedModule, PREAMBLE);
+            _this.host.writeFile(emitPath, source, false, function () { }, [sourceFile]);
+            return emitPath;
         });
     };
     CodeGenerator.create = function (options, cliOptions, program, tsCompilerHost, compilerHostContext, ngCompilerHost) {
@@ -53,28 +61,32 @@ var CodeGenerator = (function () {
             }
             transContent = fs_1.readFileSync(cliOptions.i18nFile, 'utf8');
         }
-        var missingTranslation = core_1.MissingTranslationStrategy.Warning;
+        var missingTranslation = compiler.core.MissingTranslationStrategy.Warning;
         if (cliOptions.missingTranslation) {
             switch (cliOptions.missingTranslation) {
                 case 'error':
-                    missingTranslation = core_1.MissingTranslationStrategy.Error;
+                    missingTranslation = compiler.core.MissingTranslationStrategy.Error;
                     break;
                 case 'warning':
-                    missingTranslation = core_1.MissingTranslationStrategy.Warning;
+                    missingTranslation = compiler.core.MissingTranslationStrategy.Warning;
                     break;
                 case 'ignore':
-                    missingTranslation = core_1.MissingTranslationStrategy.Ignore;
+                    missingTranslation = compiler.core.MissingTranslationStrategy.Ignore;
                     break;
                 default:
                     throw new Error("Unknown option for missingTranslation (" + cliOptions.missingTranslation + "). Use either error, warning or ignore.");
             }
         }
+        if (!transContent) {
+            missingTranslation = compiler.core.MissingTranslationStrategy.Ignore;
+        }
         var aotCompiler = compiler.createAotCompiler(ngCompilerHost, {
             translations: transContent,
-            i18nFormat: cliOptions.i18nFormat,
-            locale: cliOptions.locale, missingTranslation: missingTranslation,
+            i18nFormat: cliOptions.i18nFormat || undefined,
+            locale: cliOptions.locale || undefined, missingTranslation: missingTranslation,
             enableLegacyTemplate: options.enableLegacyTemplate !== false,
-            genFilePreamble: PREAMBLE,
+            enableSummariesForJit: options.enableSummariesForJit !== false,
+            preserveWhitespaces: options.preserveWhitespaces,
         }).compiler;
         return new CodeGenerator(options, program, tsCompilerHost, aotCompiler, ngCompilerHost);
     };

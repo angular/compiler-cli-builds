@@ -1,3 +1,4 @@
+"use strict";
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Extract i18n messages from source code
  */
@@ -33,6 +34,7 @@ var Extractor = (function () {
             var dstFile = outFile || "messages." + ext;
             var dstPath = path.join(_this.options.genDir, dstFile);
             _this.host.writeFile(dstPath, content, false);
+            return [dstPath];
         });
     };
     Extractor.prototype.extractBundle = function () {
@@ -57,7 +59,9 @@ var Extractor = (function () {
             default:
                 serializer = new compiler.Xliff();
         }
-        return bundle.write(serializer, function (sourcePath) { return sourcePath.replace(path.join(_this.options.basePath, '/'), ''); });
+        return bundle.write(serializer, function (sourcePath) { return _this.options.basePath ?
+            path.relative(_this.options.basePath, sourcePath) :
+            sourcePath; });
     };
     Extractor.prototype.getExtension = function (formatName) {
         var format = (formatName || 'xlf').toLowerCase();
