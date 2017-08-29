@@ -12,6 +12,7 @@ var ts = require("typescript");
 var METHOD_THIS_NAME = 'this';
 var CATCH_ERROR_NAME = 'error';
 var CATCH_STACK_NAME = 'stack';
+var _VALID_IDENTIFIER_RE = /^[$A-Z_][0-9A-Z_$]*$/i;
 var TypeScriptNodeEmitter = (function () {
     function TypeScriptNodeEmitter() {
     }
@@ -313,7 +314,9 @@ var _NodeEmitterVisitor = (function () {
     };
     _NodeEmitterVisitor.prototype.visitLiteralMapExpr = function (expr) {
         var _this = this;
-        return this.record(expr, ts.createObjectLiteral(expr.entries.map(function (entry) { return ts.createPropertyAssignment(entry.quoted ? ts.createLiteral(entry.key) : entry.key, entry.value.visitExpression(_this, null)); })));
+        return this.record(expr, ts.createObjectLiteral(expr.entries.map(function (entry) { return ts.createPropertyAssignment(entry.quoted || !_VALID_IDENTIFIER_RE.test(entry.key) ?
+            ts.createLiteral(entry.key) :
+            entry.key, entry.value.visitExpression(_this, null)); })));
     };
     _NodeEmitterVisitor.prototype.visitCommaExpr = function (expr) {
         var _this = this;

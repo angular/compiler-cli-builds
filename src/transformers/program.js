@@ -20,15 +20,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
 var tsc_wrapped_1 = require("@angular/tsc-wrapped");
 var fs = require("fs");
-var path = require("path");
 var ts = require("typescript");
 var compiler_host_1 = require("../compiler_host");
 var check_types_1 = require("../diagnostics/check_types");
 var api_1 = require("./api");
 var lower_expressions_1 = require("./lower_expressions");
 var node_emitter_transform_1 = require("./node_emitter_transform");
-var GENERATED_FILES = /\.ngfactory\.js$|\.ngstyle\.js$|\.ngsummary\.js$/;
-var SUMMARY_JSON_FILES = /\.ngsummary.json$/;
+var GENERATED_FILES = /(.*?)\.(ngfactory|shim\.ngstyle|ngstyle|ngsummary)\.(js|d\.ts|ts)$/;
 var emptyModules = {
     ngModules: [],
     ngModuleByPipeOrDirective: new Map(),
@@ -109,33 +107,17 @@ var AngularCompilerProgram = (function () {
     };
     AngularCompilerProgram.prototype.getLazyRoutes = function (cancellationToken) { return {}; };
     AngularCompilerProgram.prototype.emit = function (_a) {
-        var _this = this;
         var _b = _a.emitFlags, emitFlags = _b === void 0 ? api_1.EmitFlags.Default : _b, cancellationToken = _a.cancellationToken, customTransformers = _a.customTransformers, _c = _a.emitCallback, emitCallback = _c === void 0 ? defaultEmitCallback : _c;
-        var emitMap = new Map();
-        var emitResult = emitCallback({
+        return emitCallback({
             program: this.programWithStubs,
             host: this.host,
             options: this.options,
             targetSourceFile: undefined,
-            writeFile: createWriteFileCallback(emitFlags, this.host, this.metadataCache, emitMap, this.generatedFiles),
+            writeFile: createWriteFileCallback(emitFlags, this.host, this.metadataCache, this.generatedFiles),
             cancellationToken: cancellationToken,
             emitOnlyDtsFiles: (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS,
             customTransformers: this.calculateTransforms(customTransformers)
         });
-        this.generatedFiles.forEach(function (file) {
-            // In order not to replicate the TS calculation of the out folder for files
-            // derive the out location for .json files from the out location of the .ts files
-            if (file.source && file.source.length && SUMMARY_JSON_FILES.test(file.genFileUrl)) {
-                // If we have emitted the ngsummary.ts file, ensure the ngsummary.json file is emitted to
-                // the same location.
-                var emittedFile = emitMap.get(file.srcFileUrl);
-                if (emittedFile) {
-                    var fileName = path.join(path.dirname(emittedFile), path.basename(file.genFileUrl));
-                    _this.host.writeFile(fileName, file.source, false, function (error) { });
-                }
-            }
-        });
-        return emitResult;
     };
     Object.defineProperty(AngularCompilerProgram.prototype, "analyzedModules", {
         // Private members
@@ -251,10 +233,7 @@ var AngularCompilerProgram = (function () {
         }
     };
     AngularCompilerProgram.prototype.generateStubs = function () {
-        return this.options.skipTemplateCodegen ? [] :
-            this.options.generateCodeForLibraries === false ?
-                this.compiler.emitPartialStubs(this.analyzedModules) :
-                this.compiler.emitAllStubs(this.analyzedModules);
+        return this.options.skipTemplateCodegen ? [] : this.compiler.emitAllStubs(this.analyzedModules);
     };
     AngularCompilerProgram.prototype.generateFiles = function () {
         try {
@@ -342,7 +321,7 @@ function getAotCompilerOptions(options) {
         preserveWhitespaces: options.preserveWhitespaces,
     };
 }
-function writeMetadata(host, emitFilePath, sourceFile, metadataCache) {
+function writeMetadata(host, emitFilePath, sourceFile, metadataCache, onError) {
     if (/\.js$/.test(emitFilePath)) {
         var path_1 = emitFilePath.replace(/\.js$/, '.metadata.json');
         // Beginning with 2.1, TypeScript transforms the source tree before emitting it.
@@ -356,29 +335,47 @@ function writeMetadata(host, emitFilePath, sourceFile, metadataCache) {
         var metadata = metadataCache.getMetadata(collectableFile);
         if (metadata) {
             var metadataText = JSON.stringify([metadata]);
-            host.writeFile(path_1, metadataText, false);
+            host.writeFile(path_1, metadataText, false, onError, [sourceFile]);
         }
     }
 }
-function createWriteFileCallback(emitFlags, host, metadataCache, emitMap, generatedFiles) {
-    var genFileToSrcFile = new Map();
-    generatedFiles.forEach(function (f) { return genFileToSrcFile.set(f.genFileUrl, f.srcFileUrl); });
-    return function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
-        var srcFile;
-        if (sourceFiles && sourceFiles.length == 1) {
-            srcFile = sourceFiles[0];
-            var originalSrcFile = genFileToSrcFile.get(srcFile.fileName) || srcFile.fileName;
-            emitMap.set(originalSrcFile, fileName);
+function writeNgSummaryJson(host, emitFilePath, sourceFile, generatedFilesByName, onError) {
+    // Note: some files have an empty .ngfactory.js/.d.ts file but still need
+    // .ngsummary.json files (e.g. directives / pipes).
+    // We write the ngSummary when we try to emit the .ngfactory.js files
+    // and not the regular .js files as the latter are not emitted when
+    // we generate code for a npm library which ships .js / .d.ts / .metadata.json files.
+    if (/\.ngfactory.js$/.test(emitFilePath)) {
+        var emitPath = emitFilePath.replace(/\.ngfactory\.js$/, '.ngsummary.json');
+        var genFilePath = sourceFile.fileName.replace(/\.ngfactory\.ts$/, '.ngsummary.json');
+        var genFile = generatedFilesByName.get(genFilePath);
+        if (genFile) {
+            host.writeFile(emitPath, genFile.source, false, onError, [sourceFile]);
         }
-        var absFile = path.resolve(process.cwd(), fileName);
-        var generatedFile = GENERATED_FILES.test(fileName);
-        // Don't emit empty generated files
-        if (!generatedFile || data) {
-            host.writeFile(fileName, data, writeByteOrderMark, onError, sourceFiles);
-            if (srcFile && !generatedFile && (emitFlags & api_1.EmitFlags.Metadata) != 0) {
-                writeMetadata(host, fileName, srcFile, metadataCache);
+    }
+}
+function createWriteFileCallback(emitFlags, host, metadataCache, generatedFiles) {
+    var generatedFilesByName = new Map();
+    generatedFiles.forEach(function (f) { return generatedFilesByName.set(f.genFileUrl, f); });
+    return function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
+        var sourceFile = sourceFiles && sourceFiles.length == 1 ? sourceFiles[0] : null;
+        if (sourceFile) {
+            var isGenerated = GENERATED_FILES.test(fileName);
+            if (isGenerated) {
+                writeNgSummaryJson(host, fileName, sourceFile, generatedFilesByName, onError);
+            }
+            if (!isGenerated && (emitFlags & api_1.EmitFlags.Metadata)) {
+                writeMetadata(host, fileName, sourceFile, metadataCache, onError);
+            }
+            if (isGenerated) {
+                var genFile = generatedFilesByName.get(sourceFile.fileName);
+                if (!genFile || !genFile.stmts || !genFile.stmts.length) {
+                    // Don't emit empty generated files
+                    return;
+                }
             }
         }
+        host.writeFile(fileName, data, writeByteOrderMark, onError, sourceFiles);
     };
 }
 function getNgOptionDiagnostics(options) {
