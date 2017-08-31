@@ -68,11 +68,10 @@ function transformSourceFile(sourceFile, requests, context) {
             }
             return result;
         }
-        var traversedSource = ts.visitEachChild(sourceFile, topLevelStatement, context);
+        var newStatements = sourceFile.statements.map(topLevelStatement);
         if (inserts.length) {
             // Insert the declarations before the rewritten statement that references them.
             var insertMap = toMap(inserts, function (i) { return i.priorTo; });
-            var newStatements = traversedSource.statements.slice();
             for (var i = newStatements.length; i >= 0; i--) {
                 var statement = newStatements[i];
                 var insert = insertMap.get(statement);
@@ -90,9 +89,16 @@ function transformSourceFile(sourceFile, requests, context) {
                 .reduce(function (accumulator, insert) { return accumulator.concat(insert.declarations); }, [])
                 .map(function (declaration) { return ts.createExportSpecifier(
             /* propertyName */ undefined, declaration.name); }))));
-            return ts.updateSourceFileNode(traversedSource, newStatements);
         }
-        return traversedSource;
+        // Note: We cannot use ts.updateSourcefile here as
+        // it does not work well with decorators.
+        // See https://github.com/Microsoft/TypeScript/issues/17384
+        var newSf = ts.getMutableClone(sourceFile);
+        if (!(sourceFile.flags & ts.NodeFlags.Synthesized)) {
+            newSf.flags &= ~ts.NodeFlags.Synthesized;
+        }
+        newSf.statements = ts.setTextRange(ts.createNodeArray(newStatements), sourceFile.statements);
+        return newSf;
     }
     return visitSourceFile(sourceFile);
 }

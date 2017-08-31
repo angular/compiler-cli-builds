@@ -121,7 +121,11 @@ var CompilerHostMixin = (function () {
     CompilerHostMixin.prototype.resourceNameToFileName = function (resourceName, containingFile) {
         // Note: we convert package paths into relative paths to be compatible with the the
         // previous implementation of UrlResolver.
-        if (resourceName && resourceName.charAt(0) !== '.' && !path.isAbsolute(resourceName)) {
+        var firstChar = resourceName[0];
+        if (firstChar === '/') {
+            resourceName = resourceName.slice(1);
+        }
+        else if (firstChar !== '.') {
             resourceName = "./" + resourceName;
         }
         var filePathWithNgResource = this.moduleNameToFileName(addNgResourceSuffix(resourceName), containingFile);

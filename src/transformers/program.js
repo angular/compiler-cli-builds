@@ -41,7 +41,6 @@ var AngularCompilerProgram = (function () {
         this.rootNames = rootNames;
         this.options = options;
         this.host = host;
-        this.oldProgram = oldProgram;
         this._structuralDiagnostics = [];
         this._optionsDiagnostics = [];
         if (options.flatModuleOutFile && !options.skipMetadataEmit) {
