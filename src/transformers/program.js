@@ -109,7 +109,6 @@ var AngularCompilerProgram = (function () {
             _this._analyzedModules = analyzedModules;
         });
     };
-    AngularCompilerProgram.prototype.getLazyRoutes = function (cancellationToken) { return {}; };
     AngularCompilerProgram.prototype.emit = function (_a) {
         var _b = _a.emitFlags, emitFlags = _b === void 0 ? api_1.EmitFlags.Default : _b, cancellationToken = _a.cancellationToken, customTransformers = _a.customTransformers, _c = _a.emitCallback, emitCallback = _c === void 0 ? defaultEmitCallback : _c;
         return emitCallback({
