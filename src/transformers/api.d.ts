@@ -7,10 +7,15 @@
  */
 import { ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
+export declare const DEFAULT_ERROR_CODE = 100;
+export declare const UNKNOWN_ERROR_CODE = 500;
+export declare const SOURCE: "angular";
 export interface Diagnostic {
-    message: string;
+    messageText: string;
     span?: ParseSourceSpan;
     category: ts.DiagnosticCategory;
+    code: number;
+    source: 'angular';
 }
 export interface CompilerOptions extends ts.CompilerOptions {
     genDir?: string;

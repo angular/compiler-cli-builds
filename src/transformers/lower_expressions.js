@@ -129,6 +129,25 @@ function shouldLower(node) {
     }
     return true;
 }
+var REWRITE_PREFIX = '\u0275';
+function isPrimitive(value) {
+    return Object(value) !== value;
+}
+function isRewritten(value) {
+    return tsc_wrapped_1.isMetadataGlobalReferenceExpression(value) && value.name.startsWith(REWRITE_PREFIX);
+}
+function isLiteralFieldNamed(node, names) {
+    if (node.parent && node.parent.kind == ts.SyntaxKind.PropertyAssignment) {
+        var property = node.parent;
+        if (property.parent && property.parent.kind == ts.SyntaxKind.ObjectLiteralExpression &&
+            property.name && property.name.kind == ts.SyntaxKind.Identifier) {
+            var propertyName = property.name;
+            return names.has(propertyName.text);
+        }
+    }
+    return false;
+}
+var LOWERABLE_FIELD_NAMES = new Set(['useValue', 'useFactory', 'data']);
 var LowerMetadataCache = (function () {
     function LowerMetadataCache(options, strict) {
         this.strict = strict;
@@ -151,18 +170,37 @@ var LowerMetadataCache = (function () {
     };
     LowerMetadataCache.prototype.getMetadataAndRequests = function (sourceFile) {
         var identNumber = 0;
-        var freshIdent = function () { return '\u0275' + identNumber++; };
+        var freshIdent = function () { return REWRITE_PREFIX + identNumber++; };
         var requests = new Map();
+        var isExportedSymbol = (function () {
+            var exportTable;
+            return function (node) {
+                if (node.kind == ts.SyntaxKind.Identifier) {
+                    var ident = node;
+                    if (!exportTable) {
+                        exportTable = createExportTableFor(sourceFile);
+                    }
+                    return exportTable.has(ident.text);
+                }
+                return false;
+            };
+        })();
         var replaceNode = function (node) {
             var name = freshIdent();
             requests.set(node.pos, { name: name, kind: node.kind, location: node.pos, end: node.end });
             return { __symbolic: 'reference', name: name };
         };
         var substituteExpression = function (value, node) {
-            if ((node.kind === ts.SyntaxKind.ArrowFunction ||
-                node.kind === ts.SyntaxKind.FunctionExpression) &&
-                shouldLower(node)) {
-                return replaceNode(node);
+            if (!isPrimitive(value) && !isRewritten(value)) {
+                if ((node.kind === ts.SyntaxKind.ArrowFunction ||
+                    node.kind === ts.SyntaxKind.FunctionExpression) &&
+                    shouldLower(node)) {
+                    return replaceNode(node);
+                }
+                if (isLiteralFieldNamed(node, LOWERABLE_FIELD_NAMES) && shouldLower(node) &&
+                    !isExportedSymbol(node)) {
+                    return replaceNode(node);
+                }
             }
             return value;
         };
@@ -172,4 +210,44 @@ var LowerMetadataCache = (function () {
     return LowerMetadataCache;
 }());
 exports.LowerMetadataCache = LowerMetadataCache;
+function createExportTableFor(sourceFile) {
+    var exportTable = new Set();
+    // Lazily collect all the exports from the source file
+    ts.forEachChild(sourceFile, function scan(node) {
+        switch (node.kind) {
+            case ts.SyntaxKind.ClassDeclaration:
+            case ts.SyntaxKind.FunctionDeclaration:
+            case ts.SyntaxKind.InterfaceDeclaration:
+                if ((ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0) {
+                    var classDeclaration = node;
+                    var name_2 = classDeclaration.name;
+                    if (name_2)
+                        exportTable.add(name_2.text);
+                }
+                break;
+            case ts.SyntaxKind.VariableStatement:
+                var variableStatement = node;
+                for (var _i = 0, _a = variableStatement.declarationList.declarations; _i < _a.length; _i++) {
+                    var declaration = _a[_i];
+                    scan(declaration);
+                }
+                break;
+            case ts.SyntaxKind.VariableDeclaration:
+                var variableDeclaration = node;
+                if ((ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0 &&
+                    variableDeclaration.name.kind == ts.SyntaxKind.Identifier) {
+                    var name_3 = variableDeclaration.name;
+                    exportTable.add(name_3.text);
+                }
+                break;
+            case ts.SyntaxKind.ExportDeclaration:
+                var exportDeclaration = node;
+                var moduleSpecifier = exportDeclaration.moduleSpecifier, exportClause = exportDeclaration.exportClause;
+                if (!moduleSpecifier && exportClause) {
+                    exportClause.elements.forEach(function (spec) { exportTable.add(spec.name.text); });
+                }
+        }
+    });
+    return exportTable;
+}
 //# sourceMappingURL=lower_expressions.js.map

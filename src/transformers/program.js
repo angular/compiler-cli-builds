@@ -49,7 +49,12 @@ var AngularCompilerProgram = (function () {
             if (errors) {
                 // TODO(tbosch): once we move MetadataBundler from tsc_wrapped into compiler_cli,
                 // directly create ng.Diagnostic instead of using ts.Diagnostic here.
-                (_b = this._optionsDiagnostics).push.apply(_b, errors.map(function (e) { return ({ category: e.category, message: e.messageText }); }));
+                (_b = this._optionsDiagnostics).push.apply(_b, errors.map(function (e) { return ({
+                    category: e.category,
+                    messageText: e.messageText,
+                    source: api_1.SOURCE,
+                    code: api_1.DEFAULT_ERROR_CODE
+                }); }));
             }
             else {
                 rootNames.push(indexName);
@@ -211,13 +216,20 @@ var AngularCompilerProgram = (function () {
             if (parserErrors && parserErrors.length) {
                 this._structuralDiagnostics =
                     parserErrors.map(function (e) { return ({
-                        message: e.contextualMessage(),
+                        messageText: e.contextualMessage(),
                         category: ts.DiagnosticCategory.Error,
-                        span: e.span
+                        span: e.span,
+                        source: api_1.SOURCE,
+                        code: api_1.DEFAULT_ERROR_CODE
                     }); });
             }
             else {
-                this._structuralDiagnostics = [{ message: e.message, category: ts.DiagnosticCategory.Error }];
+                this._structuralDiagnostics = [{
+                        messageText: e.message,
+                        category: ts.DiagnosticCategory.Error,
+                        source: api_1.SOURCE,
+                        code: api_1.DEFAULT_ERROR_CODE
+                    }];
             }
             this._analyzedModules = emptyModules;
             return emptyModules;
@@ -244,8 +256,12 @@ var AngularCompilerProgram = (function () {
         }
         catch (e) {
             if (compiler_1.isSyntaxError(e)) {
-                this._generatedFileDiagnostics =
-                    [{ message: e.message, category: ts.DiagnosticCategory.Error }];
+                this._generatedFileDiagnostics = [{
+                        messageText: e.message,
+                        category: ts.DiagnosticCategory.Error,
+                        source: api_1.SOURCE,
+                        code: api_1.DEFAULT_ERROR_CODE
+                    }];
                 return [];
             }
             throw e;
@@ -386,8 +402,10 @@ function getNgOptionDiagnostics(options) {
                 break;
             default:
                 return [{
-                        message: 'Angular compiler options "annotationsAs" only supports "static fields" and "decorators"',
-                        category: ts.DiagnosticCategory.Error
+                        messageText: 'Angular compiler options "annotationsAs" only supports "static fields" and "decorators"',
+                        category: ts.DiagnosticCategory.Error,
+                        source: api_1.SOURCE,
+                        code: api_1.DEFAULT_ERROR_CODE
                     }];
         }
     }

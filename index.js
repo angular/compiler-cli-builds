@@ -37,7 +37,7 @@ var symbols_1 = require("./src/diagnostics/symbols");
 exports.BuiltinType = symbols_1.BuiltinType;
 __export(require("./src/transformers/api"));
 __export(require("./src/transformers/entry_points"));
-var perform_compile_1 = require("./src/perform-compile");
+var perform_compile_1 = require("./src/perform_compile");
 exports.performCompilation = perform_compile_1.performCompilation;
 exports.readConfiguration = perform_compile_1.readConfiguration;
 exports.formatDiagnostics = perform_compile_1.formatDiagnostics;

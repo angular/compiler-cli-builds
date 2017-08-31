@@ -23,7 +23,7 @@ var api = require("./transformers/api");
 var ng = require("./transformers/entry_points");
 var TS_EXT = /\.ts$/;
 function isTsDiagnostic(diagnostic) {
-    return diagnostic && (diagnostic.file || diagnostic.messageText);
+    return diagnostic && diagnostic.source != 'angular';
 }
 function formatDiagnostics(options, diags) {
     if (diags && diags.length) {
@@ -44,10 +44,10 @@ function formatDiagnostics(options, diags) {
                         " at " + d.span.start.file.url + "(" + (d.span.start.line + 1) + "," + (d.span.start.col + 1) + ")";
                 }
                 if (d.span && d.span.details) {
-                    res += ": " + d.span.details + ", " + d.message + "\n";
+                    res += ": " + d.span.details + ", " + d.messageText + "\n";
                 }
                 else {
-                    res += ": " + d.message + "\n";
+                    res += ": " + d.messageText + "\n";
                 }
                 return res;
             }
@@ -75,7 +75,7 @@ function readConfiguration(project, existingOptions) {
         var _a = calcProjectFileAndBasePath(project), projectFile = _a.projectFile, basePath = _a.basePath;
         var _b = ts.readConfigFile(projectFile, ts.sys.readFile), config = _b.config, error = _b.error;
         if (error) {
-            return { errors: [error], rootNames: [], options: {} };
+            return { project: project, errors: [error], rootNames: [], options: {} };
         }
         var parseConfigHost = {
             useCaseSensitiveFileNames: true,
@@ -86,17 +86,34 @@ function readConfiguration(project, existingOptions) {
         var parsed = ts.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingOptions);
         var rootNames = parsed.fileNames.map(function (f) { return path.normalize(f); });
         var options = createNgCompilerOptions(basePath, config, parsed.options);
-        return { rootNames: rootNames, options: options, errors: parsed.errors };
+        return { project: projectFile, rootNames: rootNames, options: options, errors: parsed.errors };
     }
     catch (e) {
         var errors = [{
                 category: ts.DiagnosticCategory.Error,
-                message: e.stack,
+                messageText: e.stack,
+                source: api.SOURCE,
+                code: api.UNKNOWN_ERROR_CODE
             }];
-        return { errors: errors, rootNames: [], options: {} };
+        return { project: '', errors: errors, rootNames: [], options: {} };
     }
 }
 exports.readConfiguration = readConfiguration;
+function exitCodeFromResult(result) {
+    if (!result) {
+        // If we didn't get a result we should return failure.
+        return 1;
+    }
+    if (!result.diagnostics || result.diagnostics.length === 0) {
+        // If we have a result and didn't get any errors, we succeeded.
+        return 0;
+    }
+    // Return 2 if any of the errors were unknown.
+    return result.diagnostics.some(function (d) { return d.source === 'angular' && d.code === api.UNKNOWN_ERROR_CODE; }) ?
+        2 :
+        1;
+}
+exports.exitCodeFromResult = exitCodeFromResult;
 function performCompilation(_a) {
     var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram, emitCallback = _a.emitCallback, customTransformers = _a.customTransformers;
     var _b = ts.version.split('.'), major = _b[0], minor = _b[1];
@@ -137,23 +154,27 @@ function performCompilation(_a) {
                     ((options.skipMetadataEmit || options.flatModuleOutFile) ? 0 : api.EmitFlags.Metadata)
             });
             allDiagnostics.push.apply(allDiagnostics, emitResult.diagnostics);
+            return { diagnostics: allDiagnostics, program: program, emitResult: emitResult };
         }
+        return { diagnostics: allDiagnostics, program: program };
     }
     catch (e) {
         var errMsg = void 0;
+        var code = void 0;
         if (compiler_1.isSyntaxError(e)) {
             // don't report the stack for syntax errors as they are well known errors.
             errMsg = e.message;
+            code = api.DEFAULT_ERROR_CODE;
         }
         else {
             errMsg = e.stack;
+            // It is not a syntax error we might have a program with unknown state, discard it.
+            program = undefined;
+            code = api.UNKNOWN_ERROR_CODE;
         }
-        allDiagnostics.push({
-            category: ts.DiagnosticCategory.Error,
-            message: errMsg,
-        });
+        allDiagnostics.push({ category: ts.DiagnosticCategory.Error, messageText: errMsg, code: code, source: api.SOURCE });
+        return { diagnostics: allDiagnostics, program: program };
     }
-    return { program: program, emitResult: emitResult, diagnostics: allDiagnostics };
 }
 exports.performCompilation = performCompilation;
-//# sourceMappingURL=perform-compile.js.map
+//# sourceMappingURL=perform_compile.js.map

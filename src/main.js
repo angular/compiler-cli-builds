@@ -5,12 +5,17 @@ require("reflect-metadata");
 var ts = require("typescript");
 var tsc = require("@angular/tsc-wrapped");
 var tsickle = require("tsickle");
-var perform_compile_1 = require("./perform-compile");
+var perform_compile_1 = require("./perform_compile");
+var perform_watch_1 = require("./perform_watch");
 var compiler_1 = require("@angular/compiler");
 var codegen_1 = require("./codegen");
 function main(args, consoleError) {
     if (consoleError === void 0) { consoleError = console.error; }
     var parsedArgs = require('minimist')(args);
+    if (parsedArgs.w || parsedArgs.watch) {
+        var result = watchMode(parsedArgs, consoleError);
+        return Promise.resolve(perform_compile_1.exitCodeFromResult(result.firstCompileResult));
+    }
     var _a = readCommandLineAndConfiguration(parsedArgs), rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors;
     if (configErrors.length) {
         return Promise.resolve(reportErrorsAndExit(options, configErrors, consoleError));
@@ -55,12 +60,15 @@ function createEmitCallback(options) {
         });
     };
 }
+function projectOf(args) {
+    return (args && (args.p || args.project)) || '.';
+}
 function readCommandLineAndConfiguration(args) {
-    var project = args.p || args.project || '.';
+    var project = projectOf(args);
     var allDiagnostics = [];
     var config = perform_compile_1.readConfiguration(project);
     var options = mergeCommandLineParams(args, config.options);
-    return { rootNames: config.rootNames, options: options, errors: config.errors };
+    return { project: project, rootNames: config.rootNames, options: options, errors: config.errors };
 }
 function reportErrorsAndExit(options, allDiagnostics, consoleError) {
     if (consoleError === void 0) { consoleError = console.error; }
@@ -70,6 +78,15 @@ function reportErrorsAndExit(options, allDiagnostics, consoleError) {
     }
     return exitCode;
 }
+function watchMode(args, consoleError) {
+    var project = projectOf(args);
+    var _a = perform_compile_1.calcProjectFileAndBasePath(project), projectFile = _a.projectFile, basePath = _a.basePath;
+    var config = perform_compile_1.readConfiguration(project);
+    return perform_watch_1.performWatchCompilation(perform_watch_1.createPerformWatchHost(projectFile, function (diagnostics) {
+        consoleError(perform_compile_1.formatDiagnostics(config.options, diagnostics));
+    }, function (options) { return createEmitCallback(options); }));
+}
+exports.watchMode = watchMode;
 function mergeCommandLineParams(cliArgs, options) {
     // TODO: also merge in tsc command line parameters by calling
     // ts.readCommandLine.

@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
 var ts = require("typescript");
+var api_1 = require("../transformers/api");
 var stubCancellationToken = {
     isCancellationRequested: function () { return false; },
     throwIfCancellationRequested: function () { }
@@ -152,8 +153,10 @@ var TypeChecker = (function () {
                     var fileName = span.start.file.url;
                     var diagnosticsList = diagnosticsFor(fileName);
                     diagnosticsList.push({
-                        message: diagnosticMessageToString(diagnostic.messageText),
-                        category: diagnostic.category, span: span
+                        messageText: diagnosticMessageToString(diagnostic.messageText),
+                        category: diagnostic.category, span: span,
+                        source: api_1.SOURCE,
+                        code: api_1.DEFAULT_ERROR_CODE
                     });
                 }
             }
@@ -175,8 +178,11 @@ exports.TypeChecker = TypeChecker;
 function diagnosticMessageToString(message) {
     return ts.flattenDiagnosticMessageText(message, '\n');
 }
+var REWRITE_PREFIX = /^\u0275[0-9]+$/;
 function createFactoryInfo(emitter, file) {
-    var _a = emitter.emitStatementsAndContext(file.srcFileUrl, file.genFileUrl, file.stmts), sourceText = _a.sourceText, context = _a.context;
+    var _a = emitter.emitStatementsAndContext(file.srcFileUrl, file.genFileUrl, file.stmts, 
+    /* preamble */ undefined, /* emitSourceMaps */ undefined, 
+    /* referenceFilter */ function (reference) { return !!(reference.name && REWRITE_PREFIX.test(reference.name)); }), sourceText = _a.sourceText, context = _a.context;
     var source = ts.createSourceFile(file.genFileUrl, sourceText, ts.ScriptTarget.Latest, /* setParentNodes */ true);
     return { source: source, context: context };
 }
