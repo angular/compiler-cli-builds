@@ -68,6 +68,9 @@ function readCommandLineAndConfiguration(args) {
     var allDiagnostics = [];
     var config = perform_compile_1.readConfiguration(project);
     var options = mergeCommandLineParams(args, config.options);
+    if (options.locale) {
+        options.i18nInLocale = options.locale;
+    }
     return { project: project, rootNames: config.rootNames, options: options, errors: config.errors };
 }
 function reportErrorsAndExit(options, allDiagnostics, consoleError) {

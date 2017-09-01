@@ -317,7 +317,7 @@ function getAotCompilerOptions(options) {
     }
     var translations = '';
     if (options.i18nInFile) {
-        if (!options.locale) {
+        if (!options.i18nInLocale) {
             throw new Error("The translation file (" + options.i18nInFile + ") locale must be provided.");
         }
         translations = fs.readFileSync(options.i18nInFile, 'utf8');
