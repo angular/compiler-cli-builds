@@ -45,14 +45,30 @@ function transformSourceFile(sourceFile, requests, context) {
             var declarations = [];
             function visitNode(node) {
                 // Get the original node before tsickle
-                var _a = ts.getOriginalNode(node), pos = _a.pos, end = _a.end, kind = _a.kind;
+                var _a = ts.getOriginalNode(node), pos = _a.pos, end = _a.end, kind = _a.kind, originalParent = _a.parent;
                 var nodeRequest = requests.get(pos);
                 if (nodeRequest && nodeRequest.kind == kind && nodeRequest.end == end) {
                     // This node is requested to be rewritten as a reference to the exported name.
+                    if (originalParent && originalParent.kind === ts.SyntaxKind.VariableDeclaration) {
+                        // As the value represents the whole initializer of a variable declaration,
+                        // just refer to that variable. This e.g. helps to preserve closure comments
+                        // at the right place.
+                        var varParent = originalParent;
+                        if (varParent.name.kind === ts.SyntaxKind.Identifier) {
+                            var varName = varParent.name.text;
+                            var exportName_1 = nodeRequest.name;
+                            declarations.push({
+                                name: exportName_1,
+                                node: ts.createIdentifier(varName),
+                                order: 1 /* AfterStmt */
+                            });
+                            return node;
+                        }
+                    }
                     // Record that the node needs to be moved to an exported variable with the given name
-                    var name_1 = nodeRequest.name;
-                    declarations.push({ name: name_1, node: node });
-                    return ts.createIdentifier(name_1);
+                    var exportName = nodeRequest.name;
+                    declarations.push({ name: exportName, node: node, order: 0 /* BeforeStmt */ });
+                    return ts.createIdentifier(exportName);
                 }
                 var result = node;
                 if (shouldVisit(pos, end) && !isLexicalScope(node)) {
@@ -62,33 +78,48 @@ function transformSourceFile(sourceFile, requests, context) {
             }
             // Get the original node before tsickle
             var _a = ts.getOriginalNode(node), pos = _a.pos, end = _a.end;
-            var result = shouldVisit(pos, end) ? ts.visitEachChild(node, visitNode, context) : node;
-            if (declarations.length) {
-                inserts.push({ priorTo: result, declarations: declarations });
+            var resultStmt;
+            if (shouldVisit(pos, end)) {
+                resultStmt = ts.visitEachChild(node, visitNode, context);
             }
-            return result;
+            else {
+                resultStmt = node;
+            }
+            if (declarations.length) {
+                inserts.push({ relativeTo: resultStmt, declarations: declarations });
+            }
+            return resultStmt;
         }
         var newStatements = sourceFile.statements.map(topLevelStatement);
         if (inserts.length) {
-            // Insert the declarations before the rewritten statement that references them.
-            var insertMap = toMap(inserts, function (i) { return i.priorTo; });
-            for (var i = newStatements.length; i >= 0; i--) {
-                var statement = newStatements[i];
-                var insert = insertMap.get(statement);
+            // Insert the declarations relative to the rewritten statement that references them.
+            var insertMap_1 = toMap(inserts, function (i) { return i.relativeTo; });
+            var tmpStatements_1 = [];
+            newStatements.forEach(function (statement) {
+                var insert = insertMap_1.get(statement);
                 if (insert) {
-                    var declarations = insert.declarations.map(function (i) { return ts.createVariableDeclaration(i.name, /* type */ undefined, i.node); });
-                    var statement_1 = ts.createVariableStatement(
-                    /* modifiers */ undefined, ts.createVariableDeclarationList(declarations, ts.NodeFlags.Const));
-                    newStatements.splice(i, 0, statement_1);
+                    var before = insert.declarations.filter(function (d) { return d.order === 0 /* BeforeStmt */; });
+                    if (before.length) {
+                        tmpStatements_1.push(createVariableStatementForDeclarations(before));
+                    }
+                    tmpStatements_1.push(statement);
+                    var after = insert.declarations.filter(function (d) { return d.order === 1 /* AfterStmt */; });
+                    if (after.length) {
+                        tmpStatements_1.push(createVariableStatementForDeclarations(after));
+                    }
                 }
-            }
+                else {
+                    tmpStatements_1.push(statement);
+                }
+            });
             // Insert an exports clause to export the declarations
-            newStatements.push(ts.createExportDeclaration(
+            tmpStatements_1.push(ts.createExportDeclaration(
             /* decorators */ undefined, 
             /* modifiers */ undefined, ts.createNamedExports(inserts
                 .reduce(function (accumulator, insert) { return accumulator.concat(insert.declarations); }, [])
                 .map(function (declaration) { return ts.createExportSpecifier(
             /* propertyName */ undefined, declaration.name); }))));
+            newStatements = tmpStatements_1;
         }
         // Note: We cannot use ts.updateSourcefile here as
         // it does not work well with decorators.
@@ -101,6 +132,11 @@ function transformSourceFile(sourceFile, requests, context) {
         return newSf;
     }
     return visitSourceFile(sourceFile);
+}
+function createVariableStatementForDeclarations(declarations) {
+    var varDecls = declarations.map(function (i) { return ts.createVariableDeclaration(i.name, /* type */ undefined, i.node); });
+    return ts.createVariableStatement(
+    /* modifiers */ undefined, ts.createVariableDeclarationList(varDecls, ts.NodeFlags.Const));
 }
 function getExpressionLoweringTransformFactory(requestsMap) {
     // Return the factory
@@ -226,9 +262,9 @@ function createExportTableFor(sourceFile) {
             case ts.SyntaxKind.InterfaceDeclaration:
                 if ((ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0) {
                     var classDeclaration = node;
-                    var name_2 = classDeclaration.name;
-                    if (name_2)
-                        exportTable.add(name_2.text);
+                    var name_1 = classDeclaration.name;
+                    if (name_1)
+                        exportTable.add(name_1.text);
                 }
                 break;
             case ts.SyntaxKind.VariableStatement:
@@ -242,8 +278,8 @@ function createExportTableFor(sourceFile) {
                 var variableDeclaration = node;
                 if ((ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0 &&
                     variableDeclaration.name.kind == ts.SyntaxKind.Identifier) {
-                    var name_3 = variableDeclaration.name;
-                    exportTable.add(name_3.text);
+                    var name_2 = variableDeclaration.name;
+                    exportTable.add(name_2.text);
                 }
                 break;
             case ts.SyntaxKind.ExportDeclaration:
