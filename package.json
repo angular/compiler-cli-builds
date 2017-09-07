@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "4.0.0-rc.5-c5cc3be",
+  "version": "5.0.0-beta.6-f2945c6",
   "description": "Angular - the compiler CLI for Node.js",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -9,14 +9,15 @@
     "ng-xi18n": "./src/extract_i18n.js"
   },
   "dependencies": {
-    "@angular/tsc-wrapped": "4.0.0-rc.5",
+    "@angular/tsc-wrapped": "5.0.0-beta.6",
     "reflect-metadata": "^0.1.2",
-    "minimist": "^1.2.0"
+    "minimist": "^1.2.0",
+    "tsickle": "^0.23.6",
+    "chokidar": "^1.4.2"
   },
   "peerDependencies": {
     "typescript": "^2.0.2",
-    "@angular/compiler": "4.0.0-rc.5-c5cc3be",
-    "@angular/core": "4.0.0-rc.5-c5cc3be"
+    "@angular/compiler": "5.0.0-beta.6-f2945c6"
   },
   "repository": {
     "type": "git",
