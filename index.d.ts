@@ -17,5 +17,5 @@ export { getClassMembersFromDeclaration, getPipesTable, getSymbolQuery } from '.
 export { BuiltinType, DeclarationKind, Definition, PipeInfo, Pipes, Signature, Span, Symbol, SymbolDeclaration, SymbolQuery, SymbolTable } from './src/diagnostics/symbols';
 export * from './src/transformers/api';
 export * from './src/transformers/entry_points';
-export { performCompilation, readConfiguration, formatDiagnostics, calcProjectFileAndBasePath, createNgCompilerOptions } from './src/perform_compile';
+export * from './src/perform_compile';
 export { NgTools_InternalApi_NG_2 as __NGTOOLS_PRIVATE_API_2 } from './src/ngtools_api';

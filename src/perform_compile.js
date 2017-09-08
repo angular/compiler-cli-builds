@@ -115,38 +115,21 @@ function exitCodeFromResult(result) {
 }
 exports.exitCodeFromResult = exitCodeFromResult;
 function performCompilation(_a) {
-    var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram, emitCallback = _a.emitCallback, customTransformers = _a.customTransformers;
-    var _b = ts.version.split('.'), major = _b[0], minor = _b[1];
+    var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram, emitCallback = _a.emitCallback, _b = _a.gatherDiagnostics, gatherDiagnostics = _b === void 0 ? defaultGatherDiagnostics : _b, customTransformers = _a.customTransformers;
+    var _c = ts.version.split('.'), major = _c[0], minor = _c[1];
     if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 3)) {
         throw new Error('Must use TypeScript > 2.3 to have transformer support');
     }
-    var allDiagnostics = [];
-    function checkDiagnostics(diags) {
-        if (diags) {
-            allDiagnostics.push.apply(allDiagnostics, diags);
-            return diags.every(function (d) { return d.category !== ts.DiagnosticCategory.Error; });
-        }
-        return true;
-    }
     var program;
     var emitResult;
+    var allDiagnostics = [];
     try {
         if (!host) {
             host = ng.createCompilerHost({ options: options });
         }
         program = ng.createProgram({ rootNames: rootNames, host: host, options: options, oldProgram: oldProgram });
-        var shouldEmit = true;
-        // Check parameter diagnostics
-        shouldEmit = shouldEmit && checkDiagnostics(program.getTsOptionDiagnostics().concat(program.getNgOptionDiagnostics()));
-        // Check syntactic diagnostics
-        shouldEmit = shouldEmit && checkDiagnostics(program.getTsSyntacticDiagnostics());
-        // Check TypeScript semantic and Angular structure diagnostics
-        shouldEmit =
-            shouldEmit &&
-                checkDiagnostics(program.getTsSemanticDiagnostics().concat(program.getNgStructuralDiagnostics()));
-        // Check Angular semantic diagnostics
-        shouldEmit = shouldEmit && checkDiagnostics(program.getNgSemanticDiagnostics());
-        if (shouldEmit) {
+        allDiagnostics.push.apply(allDiagnostics, gatherDiagnostics(program));
+        if (!hasErrors(allDiagnostics)) {
             emitResult = program.emit({
                 emitCallback: emitCallback,
                 customTransformers: customTransformers,
@@ -177,4 +160,32 @@ function performCompilation(_a) {
     }
 }
 exports.performCompilation = performCompilation;
+function defaultGatherDiagnostics(program) {
+    var allDiagnostics = [];
+    function checkDiagnostics(diags) {
+        if (diags) {
+            allDiagnostics.push.apply(allDiagnostics, diags);
+            return !hasErrors(diags);
+        }
+        return true;
+    }
+    var checkOtherDiagnostics = true;
+    // Check parameter diagnostics
+    checkOtherDiagnostics = checkOtherDiagnostics &&
+        checkDiagnostics(program.getTsOptionDiagnostics().concat(program.getNgOptionDiagnostics()));
+    // Check syntactic diagnostics
+    checkOtherDiagnostics =
+        checkOtherDiagnostics && checkDiagnostics(program.getTsSyntacticDiagnostics());
+    // Check TypeScript semantic and Angular structure diagnostics
+    checkOtherDiagnostics =
+        checkOtherDiagnostics &&
+            checkDiagnostics(program.getTsSemanticDiagnostics().concat(program.getNgStructuralDiagnostics()));
+    // Check Angular semantic diagnostics
+    checkOtherDiagnostics =
+        checkOtherDiagnostics && checkDiagnostics(program.getNgSemanticDiagnostics());
+    return allDiagnostics;
+}
+function hasErrors(diags) {
+    return diags.some(function (d) { return d.category === ts.DiagnosticCategory.Error; });
+}
 //# sourceMappingURL=perform_compile.js.map

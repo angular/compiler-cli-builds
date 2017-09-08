@@ -20,11 +20,12 @@ export interface PerformCompilationResult {
     emitResult?: ts.EmitResult;
 }
 export declare function exitCodeFromResult(result: PerformCompilationResult | undefined): number;
-export declare function performCompilation({rootNames, options, host, oldProgram, emitCallback, customTransformers}: {
+export declare function performCompilation({rootNames, options, host, oldProgram, emitCallback, gatherDiagnostics, customTransformers}: {
     rootNames: string[];
     options: api.CompilerOptions;
     host?: api.CompilerHost;
     oldProgram?: api.Program;
     emitCallback?: api.TsEmitCallback;
+    gatherDiagnostics?: (program: api.Program) => Diagnostics;
     customTransformers?: api.CustomTransformers;
 }): PerformCompilationResult;

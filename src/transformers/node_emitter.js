@@ -21,16 +21,17 @@ var TypeScriptNodeEmitter = (function () {
         // [].concat flattens the result so that each `visit...` method can also return an array of
         // stmts.
         var statements = [].concat.apply([], stmts.map(function (stmt) { return stmt.visitStatement(converter, null); }).filter(function (stmt) { return stmt != null; }));
-        var newSourceFile = ts.updateSourceFileNode(sourceFile, converter.getReexports().concat(converter.getImports(), statements));
+        var preambleStmts = [];
         if (preamble) {
             if (preamble.startsWith('/*') && preamble.endsWith('*/')) {
                 preamble = preamble.substr(2, preamble.length - 4);
             }
-            if (!statements.length) {
-                statements.push(ts.createEmptyStatement());
-            }
-            statements[0] = ts.setSyntheticLeadingComments(statements[0], [{ kind: ts.SyntaxKind.MultiLineCommentTrivia, text: preamble, pos: -1, end: -1 }]);
+            var commentStmt = ts.createNotEmittedStatement(sourceFile);
+            ts.setSyntheticLeadingComments(commentStmt, [{ kind: ts.SyntaxKind.MultiLineCommentTrivia, text: preamble, pos: -1, end: -1 }]);
+            ts.setEmitFlags(commentStmt, ts.EmitFlags.CustomPrologue);
+            preambleStmts.push(commentStmt);
         }
+        var newSourceFile = ts.updateSourceFileNode(sourceFile, preambleStmts.concat(converter.getReexports(), converter.getImports(), statements));
         return [newSourceFile, converter.getNodeMap()];
     };
     return TypeScriptNodeEmitter;
