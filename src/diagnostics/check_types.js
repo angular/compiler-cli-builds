@@ -148,22 +148,24 @@ var TypeChecker = (function () {
             var sourceFile = program.getSourceFile(factoryName);
             for (var _b = 0, _c = this.diagnosticProgram.getSemanticDiagnostics(sourceFile); _b < _c.length; _b++) {
                 var diagnostic = _c[_b];
-                var span = this.sourceSpanOf(diagnostic.file, diagnostic.start, diagnostic.length);
-                if (span) {
-                    var fileName = span.start.file.url;
-                    var diagnosticsList = diagnosticsFor(fileName);
-                    diagnosticsList.push({
-                        messageText: diagnosticMessageToString(diagnostic.messageText),
-                        category: diagnostic.category, span: span,
-                        source: api_1.SOURCE,
-                        code: api_1.DEFAULT_ERROR_CODE
-                    });
+                if (diagnostic.file && diagnostic.start) {
+                    var span = this.sourceSpanOf(diagnostic.file, diagnostic.start);
+                    if (span) {
+                        var fileName = span.start.file.url;
+                        var diagnosticsList = diagnosticsFor(fileName);
+                        diagnosticsList.push({
+                            messageText: diagnosticMessageToString(diagnostic.messageText),
+                            category: diagnostic.category, span: span,
+                            source: api_1.SOURCE,
+                            code: api_1.DEFAULT_ERROR_CODE
+                        });
+                    }
                 }
             }
         }
         return result;
     };
-    TypeChecker.prototype.sourceSpanOf = function (source, start, length) {
+    TypeChecker.prototype.sourceSpanOf = function (source, start) {
         // Find the corresponding TypeScript node
         var info = this.factories.get(source.fileName);
         if (info) {

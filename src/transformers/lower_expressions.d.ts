@@ -22,7 +22,7 @@ export declare class LowerMetadataCache implements RequestsMap {
     private strict;
     private collector;
     private metadataCache;
-    constructor(options: CollectorOptions, strict?: boolean);
+    constructor(options: CollectorOptions, strict?: boolean | undefined);
     getMetadata(sourceFile: ts.SourceFile): ModuleMetadata | undefined;
     getRequests(sourceFile: ts.SourceFile): RequestLocationMap;
     private ensureMetadataAndRequests(sourceFile);

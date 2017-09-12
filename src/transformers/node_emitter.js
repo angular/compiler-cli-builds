@@ -160,7 +160,7 @@ var _NodeEmitterVisitor = (function () {
             [];
         // TODO {chuckj}: Determine what should be done for a method with a null name.
         var methods = stmt.methods.filter(function (method) { return method.name; })
-            .map(function (method) { return ts.createMethodDeclaration(
+            .map(function (method) { return ts.createMethod(
         /* decorators */ undefined, /* modifiers */ undefined, 
         /* astriskToken */ undefined, method.name /* guarded by filter */, 
         /* questionToken */ undefined, /* typeParameters */ undefined, method.params.map(function (p) { return ts.createParameter(

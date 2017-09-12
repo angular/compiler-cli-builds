@@ -117,8 +117,8 @@ exports.exitCodeFromResult = exitCodeFromResult;
 function performCompilation(_a) {
     var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram, emitCallback = _a.emitCallback, _b = _a.gatherDiagnostics, gatherDiagnostics = _b === void 0 ? defaultGatherDiagnostics : _b, customTransformers = _a.customTransformers;
     var _c = ts.version.split('.'), major = _c[0], minor = _c[1];
-    if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 3)) {
-        throw new Error('Must use TypeScript > 2.3 to have transformer support');
+    if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 4)) {
+        throw new Error('The Angular Compiler requires TypeScript >= 2.4.');
     }
     var program;
     var emitResult;

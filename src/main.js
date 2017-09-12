@@ -39,22 +39,20 @@ function mainSync(args, consoleError) {
 }
 exports.mainSync = mainSync;
 function createEmitCallback(options) {
-    var tsickleOptions = {
+    var tsickleHost = {
+        shouldSkipTsickleProcessing: function (fileName) { return /\.d\.ts$/.test(fileName); },
+        pathToModuleName: function (context, importPath) { return ''; },
+        shouldIgnoreWarningsForPath: function (filePath) { return false; },
+        fileNameToModuleId: function (fileName) { return fileName; },
         googmodule: false,
         untyped: true,
         convertIndexImportShorthand: true,
         transformDecorators: options.annotationsAs !== 'decorators',
         transformTypesToClosure: options.annotateForClosureCompiler,
     };
-    var tsickleHost = {
-        shouldSkipTsickleProcessing: function (fileName) { return /\.d\.ts$/.test(fileName); },
-        pathToModuleName: function (context, importPath) { return ''; },
-        shouldIgnoreWarningsForPath: function (filePath) { return false; },
-        fileNameToModuleId: function (fileName) { return fileName; },
-    };
     return function (_a) {
         var program = _a.program, targetSourceFile = _a.targetSourceFile, writeFile = _a.writeFile, cancellationToken = _a.cancellationToken, emitOnlyDtsFiles = _a.emitOnlyDtsFiles, _b = _a.customTransformers, customTransformers = _b === void 0 ? {} : _b, host = _a.host, options = _a.options;
-        return tsickle.emitWithTsickle(program, tsickleHost, tsickleOptions, host, options, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
+        return tsickle.emitWithTsickle(program, tsickleHost, host, options, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
             beforeTs: customTransformers.before,
             afterTs: customTransformers.after,
         });
