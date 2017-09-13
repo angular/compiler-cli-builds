@@ -12,7 +12,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Intended to be used in a build step.
  */
 var compiler = require("@angular/compiler");
-var core_1 = require("@angular/core");
 var fs_1 = require("fs");
 var compiler_host_1 = require("./compiler_host");
 var path_mapped_compiler_host_1 = require("./path_mapped_compiler_host");
@@ -48,7 +47,7 @@ var CodeGenerator = (function () {
             return emitPath;
         });
     };
-    CodeGenerator.create = function (options, cliOptions, program, tsCompilerHost, compilerHostContext, ngCompilerHost) {
+    CodeGenerator.create = function (options, i18nOptions, program, tsCompilerHost, compilerHostContext, ngCompilerHost) {
         if (!ngCompilerHost) {
             var usePathMapping = !!options.rootDirs && options.rootDirs.length > 0;
             var context = compilerHostContext || new compiler_host_1.ModuleResolutionHostAdapter(tsCompilerHost);
@@ -56,34 +55,38 @@ var CodeGenerator = (function () {
                 new compiler_host_1.CompilerHost(program, options, context);
         }
         var transContent = '';
-        if (cliOptions.i18nFile) {
-            if (!cliOptions.locale) {
-                throw new Error("The translation file (" + cliOptions.i18nFile + ") locale must be provided. Use the --locale option.");
+        if (i18nOptions.i18nFile) {
+            if (!i18nOptions.locale) {
+                throw new Error("The translation file (" + i18nOptions.i18nFile + ") locale must be provided. Use the --locale option.");
             }
-            transContent = fs_1.readFileSync(cliOptions.i18nFile, 'utf8');
+            transContent = fs_1.readFileSync(i18nOptions.i18nFile, 'utf8');
         }
-        var missingTranslation = core_1.MissingTranslationStrategy.Warning;
-        if (cliOptions.missingTranslation) {
-            switch (cliOptions.missingTranslation) {
+        var missingTranslation = compiler.core.MissingTranslationStrategy.Warning;
+        if (i18nOptions.missingTranslation) {
+            switch (i18nOptions.missingTranslation) {
                 case 'error':
-                    missingTranslation = core_1.MissingTranslationStrategy.Error;
+                    missingTranslation = compiler.core.MissingTranslationStrategy.Error;
                     break;
                 case 'warning':
-                    missingTranslation = core_1.MissingTranslationStrategy.Warning;
+                    missingTranslation = compiler.core.MissingTranslationStrategy.Warning;
                     break;
                 case 'ignore':
-                    missingTranslation = core_1.MissingTranslationStrategy.Ignore;
+                    missingTranslation = compiler.core.MissingTranslationStrategy.Ignore;
                     break;
                 default:
-                    throw new Error("Unknown option for missingTranslation (" + cliOptions.missingTranslation + "). Use either error, warning or ignore.");
+                    throw new Error("Unknown option for missingTranslation (" + i18nOptions.missingTranslation + "). Use either error, warning or ignore.");
             }
+        }
+        if (!transContent) {
+            missingTranslation = compiler.core.MissingTranslationStrategy.Ignore;
         }
         var aotCompiler = compiler.createAotCompiler(ngCompilerHost, {
             translations: transContent,
-            i18nFormat: cliOptions.i18nFormat,
-            locale: cliOptions.locale, missingTranslation: missingTranslation,
-            enableLegacyTemplate: options.enableLegacyTemplate !== false,
+            i18nFormat: i18nOptions.i18nFormat || undefined,
+            locale: i18nOptions.locale || undefined, missingTranslation: missingTranslation,
+            enableLegacyTemplate: options.enableLegacyTemplate === true,
             enableSummariesForJit: options.enableSummariesForJit !== false,
+            preserveWhitespaces: options.preserveWhitespaces,
         }).compiler;
         return new CodeGenerator(options, program, tsCompilerHost, aotCompiler, ngCompilerHost);
     };

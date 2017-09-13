@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
 var ts = require("typescript");
+var api_1 = require("../transformers/api");
 var stubCancellationToken = {
     isCancellationRequested: function () { return false; },
     throwIfCancellationRequested: function () { }
@@ -147,20 +148,24 @@ var TypeChecker = (function () {
             var sourceFile = program.getSourceFile(factoryName);
             for (var _b = 0, _c = this.diagnosticProgram.getSemanticDiagnostics(sourceFile); _b < _c.length; _b++) {
                 var diagnostic = _c[_b];
-                var span = this.sourceSpanOf(diagnostic.file, diagnostic.start, diagnostic.length);
-                if (span) {
-                    var fileName = span.start.file.url;
-                    var diagnosticsList = diagnosticsFor(fileName);
-                    diagnosticsList.push({
-                        message: diagnosticMessageToString(diagnostic.messageText),
-                        category: diagnosticCategoryConverter(diagnostic.category), span: span
-                    });
+                if (diagnostic.file && diagnostic.start) {
+                    var span = this.sourceSpanOf(diagnostic.file, diagnostic.start);
+                    if (span) {
+                        var fileName = span.start.file.url;
+                        var diagnosticsList = diagnosticsFor(fileName);
+                        diagnosticsList.push({
+                            messageText: diagnosticMessageToString(diagnostic.messageText),
+                            category: diagnostic.category, span: span,
+                            source: api_1.SOURCE,
+                            code: api_1.DEFAULT_ERROR_CODE
+                        });
+                    }
                 }
             }
         }
         return result;
     };
-    TypeChecker.prototype.sourceSpanOf = function (source, start, length) {
+    TypeChecker.prototype.sourceSpanOf = function (source, start) {
         // Find the corresponding TypeScript node
         var info = this.factories.get(source.fileName);
         if (info) {
@@ -175,12 +180,11 @@ exports.TypeChecker = TypeChecker;
 function diagnosticMessageToString(message) {
     return ts.flattenDiagnosticMessageText(message, '\n');
 }
-function diagnosticCategoryConverter(kind) {
-    // The diagnostics kind matches ts.DiagnosticCategory. Review this code if this changes.
-    return kind;
-}
+var REWRITE_PREFIX = /^\u0275[0-9]+$/;
 function createFactoryInfo(emitter, file) {
-    var _a = emitter.emitStatementsAndContext(file.srcFileUrl, file.genFileUrl, file.stmts), sourceText = _a.sourceText, context = _a.context;
+    var _a = emitter.emitStatementsAndContext(file.srcFileUrl, file.genFileUrl, file.stmts, 
+    /* preamble */ undefined, /* emitSourceMaps */ undefined, 
+    /* referenceFilter */ function (reference) { return !!(reference.name && REWRITE_PREFIX.test(reference.name)); }), sourceText = _a.sourceText, context = _a.context;
     var source = ts.createSourceFile(file.genFileUrl, sourceText, ts.ScriptTarget.Latest, /* setParentNodes */ true);
     return { source: source, context: context };
 }
@@ -205,9 +209,7 @@ var TypeCheckingHost = (function () {
     TypeCheckingHost.prototype.getDefaultLibFileName = function (options) {
         return this.host.getDefaultLibFileName(options);
     };
-    TypeCheckingHost.prototype.getCurrentDirectory = function () {
-        return this.host.getCurrentDirectory();
-    };
+    TypeCheckingHost.prototype.getCurrentDirectory = function () { return this.host.getCurrentDirectory(); };
     TypeCheckingHost.prototype.getDirectories = function (path) { return this.host.getDirectories(path); };
     TypeCheckingHost.prototype.getCanonicalFileName = function (fileName) {
         return this.host.getCanonicalFileName(fileName);

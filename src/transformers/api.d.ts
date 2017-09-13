@@ -7,15 +7,15 @@
  */
 import { ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
-export declare enum DiagnosticCategory {
-    Warning = 0,
-    Error = 1,
-    Message = 2,
-}
+export declare const DEFAULT_ERROR_CODE = 100;
+export declare const UNKNOWN_ERROR_CODE = 500;
+export declare const SOURCE: "angular";
 export interface Diagnostic {
-    message: string;
+    messageText: string;
     span?: ParseSourceSpan;
-    category: DiagnosticCategory;
+    category: ts.DiagnosticCategory;
+    code: number;
+    source: 'angular';
 }
 export interface CompilerOptions extends ts.CompilerOptions {
     genDir?: string;
@@ -30,31 +30,51 @@ export interface CompilerOptions extends ts.CompilerOptions {
     annotationsAs?: 'decorators' | 'static fields';
     trace?: boolean;
     enableLegacyTemplate?: boolean;
+    disableExpressionLowering?: boolean;
+    i18nOutLocale?: string;
+    i18nOutFormat?: string;
+    i18nOutFile?: string;
+    i18nInFormat?: string;
+    i18nInLocale?: string;
+    i18nInFile?: string;
+    i18nInMissingTranslations?: 'error' | 'warning' | 'ignore';
+    preserveWhitespaces?: boolean;
 }
-export interface ModuleFilenameResolver {
+export interface CompilerHost extends ts.CompilerHost {
     /**
      * Converts a module name that is used in an `import` to a file path.
      * I.e. `path/to/containingFile.ts` containing `import {...} from 'module-name'`.
      */
     moduleNameToFileName(moduleName: string, containingFile?: string): string | null;
     /**
-     * Converts a file path to a module name that can be used as an `import.
+     * Converts a file path to a module name that can be used as an `import ...`
      * I.e. `path/to/importedFile.ts` should be imported by `path/to/containingFile.ts`.
-     *
-     * See ImportResolver.
      */
     fileNameToModuleName(importedFilePath: string, containingFilePath: string): string | null;
-    getNgCanonicalFileName(fileName: string): string;
-    assumeFileExists(fileName: string): void;
-}
-export interface CompilerHost extends ts.CompilerHost, ModuleFilenameResolver {
+    /**
+     * Converts a file path for a resource that is used in a source file or another resource
+     * into a filepath.
+     */
+    resourceNameToFileName(resourceName: string, containingFilePath: string): string | null;
+    /**
+     * Converts a file name into a representation that should be stored in a summary file.
+     * This has to include changing the suffix as well.
+     * E.g.
+     * `some_file.ts` -> `some_file.d.ts`
+     *
+     * @param referringSrcFileName the soure file that refers to fileName
+     */
+    toSummaryFileName(fileName: string, referringSrcFileName: string): string;
+    /**
+     * Converts a fileName that was processed by `toSummaryFileName` back into a real fileName
+     * given the fileName of the library that is referrig to it.
+     */
+    fromSummaryFileName(fileName: string, referringLibFileName: string): string;
     /**
      * Load a referenced resource either statically or asynchronously. If the host returns a
      * `Promise<string>` it is assumed the user of the corresponding `Program` will call
      * `loadNgStructureAsync()`. Returing  `Promise<string>` outside `loadNgStructureAsync()` will
      * cause a diagnostics diagnostic error or an exception to be thrown.
-     *
-     * If `loadResource()` is not provided, `readFile()` will be called to load the resource.
      */
     readResource?(fileName: string): Promise<string> | string;
 }
@@ -67,6 +87,23 @@ export declare enum EmitFlags {
     Default = 3,
     All = 31,
 }
+export interface CustomTransformers {
+    beforeTs?: ts.TransformerFactory<ts.SourceFile>[];
+    afterTs?: ts.TransformerFactory<ts.SourceFile>[];
+}
+export interface TsEmitArguments {
+    program: ts.Program;
+    host: CompilerHost;
+    options: CompilerOptions;
+    targetSourceFile?: ts.SourceFile;
+    writeFile?: ts.WriteFileCallback;
+    cancellationToken?: ts.CancellationToken;
+    emitOnlyDtsFiles?: boolean;
+    customTransformers?: ts.CustomTransformers;
+}
+export interface TsEmitCallback {
+    (args: TsEmitArguments): ts.EmitResult;
+}
 export interface Program {
     /**
      * Retrieve the TypeScript program used to produce semantic diagnostics and emit the sources.
@@ -75,7 +112,7 @@ export interface Program {
      */
     getTsProgram(): ts.Program;
     /**
-     * Retreive options diagnostics for the TypeScript options used to create the program. This is
+     * Retrieve options diagnostics for the TypeScript options used to create the program. This is
      * faster than calling `getTsProgram().getOptionsDiagnostics()` since it does not need to
      * collect Angular structural information to produce the errors.
      */
@@ -85,7 +122,7 @@ export interface Program {
      */
     getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken): Diagnostic[];
     /**
-     * Retrive the syntax diagnostics from TypeScript. This is faster than calling
+     * Retrieve the syntax diagnostics from TypeScript. This is faster than calling
      * `getTsProgram().getSyntacticDiagnostics()` since it does not need to collect Angular structural
      * information to produce the errors.
      */
@@ -103,7 +140,7 @@ export interface Program {
      */
     getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken): Diagnostic[];
     /**
-     * Retreive the semantic diagnostics from TypeScript. This is equivilent to calling
+     * Retrieve the semantic diagnostics from TypeScript. This is equivilent to calling
      * `getTsProgram().getSemanticDiagnostics()` directly and is included for completeness.
      */
     getTsSemanticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
@@ -121,20 +158,14 @@ export interface Program {
      */
     loadNgStructureAsync(): Promise<void>;
     /**
-     * Retrieve the lazy route references in the program.
-     *
-     * Angular structural information is required to produce these routes.
-     */
-    getLazyRoutes(cancellationToken?: ts.CancellationToken): {
-        [route: string]: string;
-    };
-    /**
      * Emit the files requested by emitFlags implied by the program.
      *
      * Angular structural information is required to emit files.
      */
-    emit({emitFlags, cancellationToken}: {
-        emitFlags: EmitFlags;
+    emit({emitFlags, cancellationToken, customTransformers, emitCallback}: {
+        emitFlags?: EmitFlags;
         cancellationToken?: ts.CancellationToken;
-    }): void;
+        customTransformers?: CustomTransformers;
+        emitCallback?: TsEmitCallback;
+    }): ts.EmitResult;
 }

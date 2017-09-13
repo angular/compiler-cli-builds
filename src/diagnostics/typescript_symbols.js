@@ -139,7 +139,7 @@ var TypeScriptSymbolQuery = (function () {
     TypeScriptSymbolQuery.prototype.getTypeSymbol = function (type) {
         var context = { node: this.source, program: this.program, checker: this.checker };
         var typeSymbol = findClassSymbolInContext(type, context);
-        return new SymbolWrapper(typeSymbol, context);
+        return typeSymbol && new SymbolWrapper(typeSymbol, context);
     };
     TypeScriptSymbolQuery.prototype.createSymbolTable = function (symbols) {
         var result = new MapSymbolTable();
@@ -168,7 +168,7 @@ var TypeScriptSymbolQuery = (function () {
                 var type_1 = this.checker.getTypeAtLocation(parameter.type);
                 if (type_1.symbol.name == 'TemplateRef' && isReferenceType(type_1)) {
                     var typeReference = type_1;
-                    if (typeReference.typeArguments.length === 1) {
+                    if (typeReference.typeArguments && typeReference.typeArguments.length === 1) {
                         return typeReference.typeArguments[0].symbol;
                     }
                 }
@@ -257,7 +257,10 @@ var TypeWrapper = (function () {
         configurable: true
     });
     Object.defineProperty(TypeWrapper.prototype, "definition", {
-        get: function () { return definitionFromTsSymbol(this.tsType.getSymbol()); },
+        get: function () {
+            var symbol = this.tsType.getSymbol();
+            return symbol ? definitionFromTsSymbol(symbol) : undefined;
+        },
         enumerable: true,
         configurable: true
     });
@@ -619,7 +622,10 @@ var PipeSymbol = (function () {
         configurable: true
     });
     Object.defineProperty(PipeSymbol.prototype, "definition", {
-        get: function () { return definitionFromTsSymbol(this.tsType.getSymbol()); },
+        get: function () {
+            var symbol = this.tsType.getSymbol();
+            return symbol ? definitionFromTsSymbol(symbol) : undefined;
+        },
         enumerable: true,
         configurable: true
     });
@@ -706,9 +712,9 @@ var EmptyTable = (function () {
     EmptyTable.prototype.get = function (key) { return undefined; };
     EmptyTable.prototype.has = function (key) { return false; };
     EmptyTable.prototype.values = function () { return []; };
+    EmptyTable.instance = new EmptyTable();
     return EmptyTable;
 }());
-EmptyTable.instance = new EmptyTable();
 function findTsConfig(fileName) {
     var dir = path.dirname(fileName);
     while (fs.existsSync(dir)) {

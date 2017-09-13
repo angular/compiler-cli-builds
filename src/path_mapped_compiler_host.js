@@ -133,7 +133,7 @@ var PathMappedCompilerHost = (function (_super) {
             else {
                 var sf = this.getSourceFile(rootedPath);
                 sf.fileName = sf.fileName;
-                var metadata = this.metadataCollector.getMetadata(sf);
+                var metadata = this.metadataProvider.getMetadata(sf);
                 return metadata ? [metadata] : [];
             }
         }

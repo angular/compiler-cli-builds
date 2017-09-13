@@ -24,7 +24,7 @@ export declare class TypeChecker {
     private _diagnosticsByFile;
     private _currentCancellationToken;
     private _partial;
-    constructor(program: ts.Program, tsOptions: ts.CompilerOptions, compilerHost: ts.CompilerHost, aotCompilerHost: AotCompilerHost, aotOptions: AotCompilerOptions, _analyzedModules?: NgAnalyzedModules, _generatedFiles?: GeneratedFile[]);
+    constructor(program: ts.Program, tsOptions: ts.CompilerOptions, compilerHost: ts.CompilerHost, aotCompilerHost: AotCompilerHost, aotOptions: AotCompilerOptions, _analyzedModules?: NgAnalyzedModules | undefined, _generatedFiles?: GeneratedFile[] | undefined);
     getDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): Diagnostic[];
     readonly partialResults: boolean;
     private readonly analyzedModules;
@@ -39,5 +39,5 @@ export declare class TypeChecker {
     private createDiagnosticProgram();
     private createFactories();
     private createDiagnosticsByFile();
-    private sourceSpanOf(source, start, length);
+    private sourceSpanOf(source, start);
 }
