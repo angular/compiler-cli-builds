@@ -13,9 +13,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // Must be imported first, because Angular decorators throw on load.
 require("reflect-metadata");
 var compiler = require("@angular/compiler");
-var path = require("path");
 var compiler_host_1 = require("./compiler_host");
 var path_mapped_compiler_host_1 = require("./path_mapped_compiler_host");
+var program_1 = require("./transformers/program");
 var Extractor = (function () {
     function Extractor(options, ngExtractor, host, ngCompilerHost, program) {
         this.options = options;
@@ -26,16 +26,7 @@ var Extractor = (function () {
     }
     Extractor.prototype.extract = function (formatName, outFile) {
         var _this = this;
-        // Checks the format and returns the extension
-        var ext = this.getExtension(formatName);
-        var promiseBundle = this.extractBundle();
-        return promiseBundle.then(function (bundle) {
-            var content = _this.serialize(bundle, formatName);
-            var dstFile = outFile || "messages." + ext;
-            var dstPath = path.join(_this.options.genDir, dstFile);
-            _this.host.writeFile(dstPath, content, false);
-            return [dstPath];
-        });
+        return this.extractBundle().then(function (bundle) { return program_1.i18nExtract(formatName, outFile, _this.host, _this.options, bundle); });
     };
     Extractor.prototype.extractBundle = function () {
         var _this = this;
@@ -43,40 +34,9 @@ var Extractor = (function () {
         return this.ngExtractor.extract(files);
     };
     Extractor.prototype.serialize = function (bundle, formatName) {
-        var _this = this;
-        var format = formatName.toLowerCase();
-        var serializer;
-        switch (format) {
-            case 'xmb':
-                serializer = new compiler.Xmb();
-                break;
-            case 'xliff2':
-            case 'xlf2':
-                serializer = new compiler.Xliff2();
-                break;
-            case 'xlf':
-            case 'xliff':
-            default:
-                serializer = new compiler.Xliff();
-        }
-        return bundle.write(serializer, function (sourcePath) { return _this.options.basePath ?
-            path.relative(_this.options.basePath, sourcePath) :
-            sourcePath; });
+        return program_1.i18nSerialize(bundle, formatName, this.options);
     };
-    Extractor.prototype.getExtension = function (formatName) {
-        var format = (formatName || 'xlf').toLowerCase();
-        switch (format) {
-            case 'xmb':
-                return 'xmb';
-            case 'xlf':
-            case 'xlif':
-            case 'xliff':
-            case 'xlf2':
-            case 'xliff2':
-                return 'xlf';
-        }
-        throw new Error("Unsupported format \"" + formatName + "\"");
-    };
+    Extractor.prototype.getExtension = function (formatName) { return program_1.i18nGetExtension(formatName); };
     Extractor.create = function (options, program, tsCompilerHost, locale, compilerHostContext, ngCompilerHost) {
         if (!ngCompilerHost) {
             var usePathMapping = !!options.rootDirs && options.rootDirs.length > 0;

@@ -1,40 +1,52 @@
 #!/usr/bin/env node
 "use strict";
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 var ts = require("typescript");
 var tsc = require("@angular/tsc-wrapped");
 var tsickle = require("tsickle");
+var api = require("./transformers/api");
 var perform_compile_1 = require("./perform_compile");
 var perform_watch_1 = require("./perform_watch");
 var compiler_1 = require("@angular/compiler");
 var codegen_1 = require("./codegen");
+// TODO(tbosch): remove this old entrypoint once we drop `disableTransformerPipeline`.
 function main(args, consoleError) {
     if (consoleError === void 0) { consoleError = console.error; }
-    var parsedArgs = require('minimist')(args);
-    if (parsedArgs.w || parsedArgs.watch) {
-        var result = watchMode(parsedArgs, consoleError);
-        return Promise.resolve(perform_compile_1.exitCodeFromResult(result.firstCompileResult));
-    }
-    var _a = readCommandLineAndConfiguration(parsedArgs), rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors;
+    var _a = readNgcCommandLineAndConfiguration(args), project = _a.project, rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors, watch = _a.watch;
     if (configErrors.length) {
         return Promise.resolve(reportErrorsAndExit(options, configErrors, consoleError));
     }
+    if (watch) {
+        var result = watchMode(project, options, consoleError);
+        return Promise.resolve(reportErrorsAndExit({}, result.firstCompileResult, consoleError));
+    }
     if (options.disableTransformerPipeline) {
-        return disabledTransformerPipelineNgcMain(parsedArgs, consoleError);
+        return disabledTransformerPipelineNgcMain(args, consoleError);
     }
     var compileDiags = perform_compile_1.performCompilation({ rootNames: rootNames, options: options, emitCallback: createEmitCallback(options) }).diagnostics;
     return Promise.resolve(reportErrorsAndExit(options, compileDiags, consoleError));
 }
 exports.main = main;
-function mainSync(args, consoleError) {
+function mainSync(args, consoleError, config) {
     if (consoleError === void 0) { consoleError = console.error; }
-    var parsedArgs = require('minimist')(args);
-    var _a = readCommandLineAndConfiguration(parsedArgs), rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors;
+    var _a = config || readNgcCommandLineAndConfiguration(args), project = _a.project, rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors, watch = _a.watch, emitFlags = _a.emitFlags;
     if (configErrors.length) {
         return reportErrorsAndExit(options, configErrors, consoleError);
     }
-    var compileDiags = perform_compile_1.performCompilation({ rootNames: rootNames, options: options, emitCallback: createEmitCallback(options) }).diagnostics;
+    if (watch) {
+        var result = watchMode(project, options, consoleError);
+        return reportErrorsAndExit({}, result.firstCompileResult, consoleError);
+    }
+    var compileDiags = perform_compile_1.performCompilation({ rootNames: rootNames, options: options, emitFlags: emitFlags, emitCallback: createEmitCallback(options) }).diagnostics;
     return reportErrorsAndExit(options, compileDiags, consoleError);
 }
 exports.mainSync = mainSync;
@@ -58,55 +70,76 @@ function createEmitCallback(options) {
         });
     };
 }
-function projectOf(args) {
-    return (args && (args.p || args.project)) || '.';
-}
-function readCommandLineAndConfiguration(args) {
-    var project = projectOf(args);
-    var allDiagnostics = [];
-    var config = perform_compile_1.readConfiguration(project);
-    var options = mergeCommandLineParams(args, config.options);
-    if (options.locale) {
-        options.i18nInLocale = options.locale;
-    }
-    return { project: project, rootNames: config.rootNames, options: options, errors: config.errors };
-}
-function reportErrorsAndExit(options, allDiagnostics, consoleError) {
-    if (consoleError === void 0) { consoleError = console.error; }
-    var exitCode = allDiagnostics.some(function (d) { return d.category === ts.DiagnosticCategory.Error; }) ? 1 : 0;
-    if (allDiagnostics.length) {
-        consoleError(perform_compile_1.formatDiagnostics(options, allDiagnostics));
-    }
-    return exitCode;
-}
-function watchMode(args, consoleError) {
-    var project = projectOf(args);
-    var _a = perform_compile_1.calcProjectFileAndBasePath(project), projectFile = _a.projectFile, basePath = _a.basePath;
-    var config = perform_compile_1.readConfiguration(project);
-    return perform_watch_1.performWatchCompilation(perform_watch_1.createPerformWatchHost(projectFile, function (diagnostics) {
-        consoleError(perform_compile_1.formatDiagnostics(config.options, diagnostics));
-    }, function (options) { return createEmitCallback(options); }));
-}
-exports.watchMode = watchMode;
-function mergeCommandLineParams(cliArgs, options) {
-    // TODO: also merge in tsc command line parameters by calling
-    // ts.readCommandLine.
-    if (cliArgs.i18nFile)
-        options.i18nInFile = cliArgs.i18nFile;
-    if (cliArgs.i18nFormat)
-        options.i18nInFormat = cliArgs.i18nFormat;
-    if (cliArgs.locale)
-        options.i18nInLocale = cliArgs.locale;
-    var mt = cliArgs.missingTranslation;
+function readNgcCommandLineAndConfiguration(args) {
+    var options = {};
+    var parsedArgs = require('minimist')(args);
+    if (parsedArgs.i18nFile)
+        options.i18nInFile = parsedArgs.i18nFile;
+    if (parsedArgs.i18nFormat)
+        options.i18nInFormat = parsedArgs.i18nFormat;
+    if (parsedArgs.locale)
+        options.i18nInLocale = parsedArgs.locale;
+    var mt = parsedArgs.missingTranslation;
     if (mt === 'error' || mt === 'warning' || mt === 'ignore') {
         options.i18nInMissingTranslations = mt;
     }
-    return options;
+    var config = readCommandLineAndConfiguration(args, options, ['i18nFile', 'i18nFormat', 'locale', 'missingTranslation', 'watch']);
+    var watch = parsedArgs.w || parsedArgs.watch;
+    return __assign({}, config, { watch: watch });
 }
+function readCommandLineAndConfiguration(args, existingOptions, ngCmdLineOptions) {
+    if (existingOptions === void 0) { existingOptions = {}; }
+    if (ngCmdLineOptions === void 0) { ngCmdLineOptions = []; }
+    var cmdConfig = ts.parseCommandLine(args);
+    var project = cmdConfig.options.project || '.';
+    var cmdErrors = cmdConfig.errors.filter(function (e) {
+        if (typeof e.messageText === 'string') {
+            var msg_1 = e.messageText;
+            return !ngCmdLineOptions.some(function (o) { return msg_1.indexOf(o) >= 0; });
+        }
+        return true;
+    });
+    if (cmdErrors.length) {
+        return {
+            project: project,
+            rootNames: [],
+            options: cmdConfig.options,
+            errors: cmdErrors,
+            emitFlags: api.EmitFlags.Default
+        };
+    }
+    var allDiagnostics = [];
+    var config = perform_compile_1.readConfiguration(project, cmdConfig.options);
+    var options = __assign({}, config.options, existingOptions);
+    if (options.locale) {
+        options.i18nInLocale = options.locale;
+    }
+    return {
+        project: project,
+        rootNames: config.rootNames, options: options,
+        errors: config.errors,
+        emitFlags: config.emitFlags
+    };
+}
+exports.readCommandLineAndConfiguration = readCommandLineAndConfiguration;
+function reportErrorsAndExit(options, allDiagnostics, consoleError) {
+    if (consoleError === void 0) { consoleError = console.error; }
+    if (allDiagnostics.length) {
+        consoleError(perform_compile_1.formatDiagnostics(options, allDiagnostics));
+    }
+    return perform_compile_1.exitCodeFromResult(allDiagnostics);
+}
+function watchMode(project, options, consoleError) {
+    return perform_watch_1.performWatchCompilation(perform_watch_1.createPerformWatchHost(project, function (diagnostics) {
+        consoleError(perform_compile_1.formatDiagnostics(options, diagnostics));
+    }, options, function (options) { return createEmitCallback(options); }));
+}
+exports.watchMode = watchMode;
 function disabledTransformerPipelineNgcMain(args, consoleError) {
     if (consoleError === void 0) { consoleError = console.error; }
-    var cliOptions = new tsc.NgcCliOptions(args);
-    var project = args.p || args.project || '.';
+    var parsedArgs = require('minimist')(args);
+    var cliOptions = new tsc.NgcCliOptions(parsedArgs);
+    var project = parsedArgs.p || parsedArgs.project || '.';
     return tsc.main(project, cliOptions, disabledTransformerPipelineCodegen)
         .then(function () { return 0; })
         .catch(function (e) {
@@ -129,6 +162,6 @@ function disabledTransformerPipelineCodegen(ngOptions, cliOptions, program, host
 // CLI entry point
 if (require.main === module) {
     var args = process.argv.slice(2);
-    main(args).then(function (exitCode) { return process.exitCode = exitCode; });
+    process.exitCode = mainSync(args);
 }
 //# sourceMappingURL=main.js.map

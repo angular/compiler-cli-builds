@@ -20,6 +20,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
 var tsc_wrapped_1 = require("@angular/tsc-wrapped");
 var fs = require("fs");
+var path = require("path");
 var ts = require("typescript");
 var compiler_host_1 = require("../compiler_host");
 var check_types_1 = require("../diagnostics/check_types");
@@ -43,7 +44,7 @@ var AngularCompilerProgram = (function () {
         this.host = host;
         this._structuralDiagnostics = [];
         this._optionsDiagnostics = [];
-        if (options.flatModuleOutFile && !options.skipMetadataEmit) {
+        if (options.flatModuleOutFile) {
             var _a = tsc_wrapped_1.createBundleIndexHost(options, rootNames, host), bundleHost = _a.host, indexName = _a.indexName, errors = _a.errors;
             if (errors) {
                 // TODO(tbosch): once we move MetadataBundler from tsc_wrapped into compiler_cli,
@@ -111,16 +112,26 @@ var AngularCompilerProgram = (function () {
     };
     AngularCompilerProgram.prototype.emit = function (_a) {
         var _b = _a.emitFlags, emitFlags = _b === void 0 ? api_1.EmitFlags.Default : _b, cancellationToken = _a.cancellationToken, customTransformers = _a.customTransformers, _c = _a.emitCallback, emitCallback = _c === void 0 ? defaultEmitCallback : _c;
-        return emitCallback({
-            program: this.programWithStubs,
-            host: this.host,
-            options: this.options,
-            targetSourceFile: undefined,
-            writeFile: createWriteFileCallback(emitFlags, this.host, this.metadataCache, this.generatedFiles),
-            cancellationToken: cancellationToken,
-            emitOnlyDtsFiles: (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS,
-            customTransformers: this.calculateTransforms(customTransformers)
-        });
+        if (emitFlags & api_1.EmitFlags.I18nBundle) {
+            var locale = this.options.i18nOutLocale || null;
+            var file = this.options.i18nOutFile || null;
+            var format = this.options.i18nOutFormat || null;
+            var bundle = this.compiler.emitMessageBundle(this.analyzedModules, locale);
+            i18nExtract(format, file, this.host, this.options, bundle);
+        }
+        if (emitFlags & (api_1.EmitFlags.JS | api_1.EmitFlags.DTS | api_1.EmitFlags.Metadata | api_1.EmitFlags.Summary)) {
+            return emitCallback({
+                program: this.programWithStubs,
+                host: this.host,
+                options: this.options,
+                targetSourceFile: undefined,
+                writeFile: createWriteFileCallback(emitFlags, this.host, this.metadataCache, this.generatedFiles),
+                cancellationToken: cancellationToken,
+                emitOnlyDtsFiles: (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS,
+                customTransformers: this.calculateTransforms(customTransformers)
+            });
+        }
+        return { emitSkipped: true, diagnostics: [], emittedFiles: [] };
     };
     Object.defineProperty(AngularCompilerProgram.prototype, "analyzedModules", {
         // Private members
@@ -462,4 +473,51 @@ function createProgramWithStubsHost(generatedFiles, originalProgram, originalHos
         return class_1;
     }());
 }
+function i18nExtract(formatName, outFile, host, options, bundle) {
+    formatName = formatName || 'null';
+    // Checks the format and returns the extension
+    var ext = i18nGetExtension(formatName);
+    var content = i18nSerialize(bundle, formatName, options);
+    var dstFile = outFile || "messages." + ext;
+    var dstPath = path.resolve(options.outDir || options.basePath, dstFile);
+    host.writeFile(dstPath, content, false);
+    return [dstPath];
+}
+exports.i18nExtract = i18nExtract;
+function i18nSerialize(bundle, formatName, options) {
+    var format = formatName.toLowerCase();
+    var serializer;
+    switch (format) {
+        case 'xmb':
+            serializer = new compiler_1.Xmb();
+            break;
+        case 'xliff2':
+        case 'xlf2':
+            serializer = new compiler_1.Xliff2();
+            break;
+        case 'xlf':
+        case 'xliff':
+        default:
+            serializer = new compiler_1.Xliff();
+    }
+    return bundle.write(serializer, function (sourcePath) {
+        return options.basePath ? path.relative(options.basePath, sourcePath) : sourcePath;
+    });
+}
+exports.i18nSerialize = i18nSerialize;
+function i18nGetExtension(formatName) {
+    var format = (formatName || 'xlf').toLowerCase();
+    switch (format) {
+        case 'xmb':
+            return 'xmb';
+        case 'xlf':
+        case 'xlif':
+        case 'xliff':
+        case 'xlf2':
+        case 'xliff2':
+            return 'xlf';
+    }
+    throw new Error("Unsupported format \"" + formatName + "\"");
+}
+exports.i18nGetExtension = i18nGetExtension;
 //# sourceMappingURL=program.js.map

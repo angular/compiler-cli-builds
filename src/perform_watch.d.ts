@@ -1,4 +1,5 @@
-import { Diagnostics, ParsedConfiguration, PerformCompilationResult } from './perform_compile';
+import * as ts from 'typescript';
+import { Diagnostics, ParsedConfiguration } from './perform_compile';
 import * as api from './transformers/api';
 export declare enum FileChangeEvent {
     Change = 0,
@@ -16,12 +17,12 @@ export interface PerformWatchHost {
     setTimeout(callback: () => void, ms: number): any;
     clearTimeout(timeoutId: any): void;
 }
-export declare function createPerformWatchHost(configFileName: string, reportDiagnostics: (diagnostics: Diagnostics) => void, createEmitCallback?: (options: api.CompilerOptions) => api.TsEmitCallback): PerformWatchHost;
+export declare function createPerformWatchHost(configFileName: string, reportDiagnostics: (diagnostics: Diagnostics) => void, existingOptions?: ts.CompilerOptions, createEmitCallback?: (options: api.CompilerOptions) => api.TsEmitCallback): PerformWatchHost;
 /**
  * The logic in this function is adapted from `tsc.ts` from TypeScript.
  */
 export declare function performWatchCompilation(host: PerformWatchHost): {
     close: () => void;
     ready: (cb: () => void) => void;
-    firstCompileResult: PerformCompilationResult | undefined;
+    firstCompileResult: Diagnostics;
 };

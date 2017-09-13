@@ -6,6 +6,7 @@ export interface ParsedConfiguration {
     project: string;
     options: api.CompilerOptions;
     rootNames: string[];
+    emitFlags: api.EmitFlags;
     errors: Diagnostics;
 }
 export declare function calcProjectFileAndBasePath(project: string): {
@@ -19,8 +20,8 @@ export interface PerformCompilationResult {
     program?: api.Program;
     emitResult?: ts.EmitResult;
 }
-export declare function exitCodeFromResult(result: PerformCompilationResult | undefined): number;
-export declare function performCompilation({rootNames, options, host, oldProgram, emitCallback, gatherDiagnostics, customTransformers}: {
+export declare function exitCodeFromResult(diags: Diagnostics | undefined): number;
+export declare function performCompilation({rootNames, options, host, oldProgram, emitCallback, gatherDiagnostics, customTransformers, emitFlags}: {
     rootNames: string[];
     options: api.CompilerOptions;
     host?: api.CompilerHost;
@@ -28,4 +29,5 @@ export declare function performCompilation({rootNames, options, host, oldProgram
     emitCallback?: api.TsEmitCallback;
     gatherDiagnostics?: (program: api.Program) => Diagnostics;
     customTransformers?: api.CustomTransformers;
+    emitFlags?: api.EmitFlags;
 }): PerformCompilationResult;

@@ -54,12 +54,11 @@ var NgTools_InternalApi_NG_2 = (function () {
      */
     NgTools_InternalApi_NG_2.codeGen = function (options) {
         var hostContext = new CustomLoaderModuleResolutionHostAdapter(options.readResource, options.host);
-        var cliOptions = {
+        var i18nOptions = {
             i18nFormat: options.i18nFormat,
             i18nFile: options.i18nFile,
             locale: options.locale,
             missingTranslation: options.missingTranslation,
-            basePath: options.basePath
         };
         var ngOptions = options.angularCompilerOptions;
         if (ngOptions.enableSummariesForJit === undefined) {
@@ -67,7 +66,7 @@ var NgTools_InternalApi_NG_2 = (function () {
             ngOptions.enableSummariesForJit = false;
         }
         // Create the Code Generator.
-        var codeGenerator = codegen_1.CodeGenerator.create(ngOptions, cliOptions, options.program, options.host, hostContext);
+        var codeGenerator = codegen_1.CodeGenerator.create(ngOptions, i18nOptions, options.program, options.host, hostContext);
         return codeGenerator.codegen();
     };
     /**

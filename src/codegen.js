@@ -47,7 +47,7 @@ var CodeGenerator = (function () {
             return emitPath;
         });
     };
-    CodeGenerator.create = function (options, cliOptions, program, tsCompilerHost, compilerHostContext, ngCompilerHost) {
+    CodeGenerator.create = function (options, i18nOptions, program, tsCompilerHost, compilerHostContext, ngCompilerHost) {
         if (!ngCompilerHost) {
             var usePathMapping = !!options.rootDirs && options.rootDirs.length > 0;
             var context = compilerHostContext || new compiler_host_1.ModuleResolutionHostAdapter(tsCompilerHost);
@@ -55,15 +55,15 @@ var CodeGenerator = (function () {
                 new compiler_host_1.CompilerHost(program, options, context);
         }
         var transContent = '';
-        if (cliOptions.i18nFile) {
-            if (!cliOptions.locale) {
-                throw new Error("The translation file (" + cliOptions.i18nFile + ") locale must be provided. Use the --locale option.");
+        if (i18nOptions.i18nFile) {
+            if (!i18nOptions.locale) {
+                throw new Error("The translation file (" + i18nOptions.i18nFile + ") locale must be provided. Use the --locale option.");
             }
-            transContent = fs_1.readFileSync(cliOptions.i18nFile, 'utf8');
+            transContent = fs_1.readFileSync(i18nOptions.i18nFile, 'utf8');
         }
         var missingTranslation = compiler.core.MissingTranslationStrategy.Warning;
-        if (cliOptions.missingTranslation) {
-            switch (cliOptions.missingTranslation) {
+        if (i18nOptions.missingTranslation) {
+            switch (i18nOptions.missingTranslation) {
                 case 'error':
                     missingTranslation = compiler.core.MissingTranslationStrategy.Error;
                     break;
@@ -74,7 +74,7 @@ var CodeGenerator = (function () {
                     missingTranslation = compiler.core.MissingTranslationStrategy.Ignore;
                     break;
                 default:
-                    throw new Error("Unknown option for missingTranslation (" + cliOptions.missingTranslation + "). Use either error, warning or ignore.");
+                    throw new Error("Unknown option for missingTranslation (" + i18nOptions.missingTranslation + "). Use either error, warning or ignore.");
             }
         }
         if (!transContent) {
@@ -82,8 +82,8 @@ var CodeGenerator = (function () {
         }
         var aotCompiler = compiler.createAotCompiler(ngCompilerHost, {
             translations: transContent,
-            i18nFormat: cliOptions.i18nFormat || undefined,
-            locale: cliOptions.locale || undefined, missingTranslation: missingTranslation,
+            i18nFormat: i18nOptions.i18nFormat || undefined,
+            locale: i18nOptions.locale || undefined, missingTranslation: missingTranslation,
             enableLegacyTemplate: options.enableLegacyTemplate === true,
             enableSummariesForJit: options.enableSummariesForJit !== false,
             preserveWhitespaces: options.preserveWhitespaces,

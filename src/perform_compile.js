@@ -75,7 +75,13 @@ function readConfiguration(project, existingOptions) {
         var _a = calcProjectFileAndBasePath(project), projectFile = _a.projectFile, basePath = _a.basePath;
         var _b = ts.readConfigFile(projectFile, ts.sys.readFile), config = _b.config, error = _b.error;
         if (error) {
-            return { project: project, errors: [error], rootNames: [], options: {} };
+            return {
+                project: project,
+                errors: [error],
+                rootNames: [],
+                options: {},
+                emitFlags: api.EmitFlags.Default
+            };
         }
         var parseConfigHost = {
             useCaseSensitiveFileNames: true,
@@ -86,7 +92,11 @@ function readConfiguration(project, existingOptions) {
         var parsed = ts.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingOptions);
         var rootNames = parsed.fileNames.map(function (f) { return path.normalize(f); });
         var options = createNgCompilerOptions(basePath, config, parsed.options);
-        return { project: projectFile, rootNames: rootNames, options: options, errors: parsed.errors };
+        var emitFlags = api.EmitFlags.Default;
+        if (!(options.skipMetadataEmit || options.flatModuleOutFile)) {
+            emitFlags |= api.EmitFlags.Metadata;
+        }
+        return { project: projectFile, rootNames: rootNames, options: options, errors: parsed.errors, emitFlags: emitFlags };
     }
     catch (e) {
         var errors = [{
@@ -95,28 +105,22 @@ function readConfiguration(project, existingOptions) {
                 source: api.SOURCE,
                 code: api.UNKNOWN_ERROR_CODE
             }];
-        return { project: '', errors: errors, rootNames: [], options: {} };
+        return { project: '', errors: errors, rootNames: [], options: {}, emitFlags: api.EmitFlags.Default };
     }
 }
 exports.readConfiguration = readConfiguration;
-function exitCodeFromResult(result) {
-    if (!result) {
-        // If we didn't get a result we should return failure.
-        return 1;
-    }
-    if (!result.diagnostics || result.diagnostics.length === 0) {
+function exitCodeFromResult(diags) {
+    if (!diags || diags.length === 0) {
         // If we have a result and didn't get any errors, we succeeded.
         return 0;
     }
     // Return 2 if any of the errors were unknown.
-    return result.diagnostics.some(function (d) { return d.source === 'angular' && d.code === api.UNKNOWN_ERROR_CODE; }) ?
-        2 :
-        1;
+    return diags.some(function (d) { return d.source === 'angular' && d.code === api.UNKNOWN_ERROR_CODE; }) ? 2 : 1;
 }
 exports.exitCodeFromResult = exitCodeFromResult;
 function performCompilation(_a) {
-    var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram, emitCallback = _a.emitCallback, _b = _a.gatherDiagnostics, gatherDiagnostics = _b === void 0 ? defaultGatherDiagnostics : _b, customTransformers = _a.customTransformers;
-    var _c = ts.version.split('.'), major = _c[0], minor = _c[1];
+    var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram, emitCallback = _a.emitCallback, _b = _a.gatherDiagnostics, gatherDiagnostics = _b === void 0 ? defaultGatherDiagnostics : _b, customTransformers = _a.customTransformers, _c = _a.emitFlags, emitFlags = _c === void 0 ? api.EmitFlags.Default : _c;
+    var _d = ts.version.split('.'), major = _d[0], minor = _d[1];
     if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 4)) {
         throw new Error('The Angular Compiler requires TypeScript >= 2.4.');
     }
@@ -130,12 +134,7 @@ function performCompilation(_a) {
         program = ng.createProgram({ rootNames: rootNames, host: host, options: options, oldProgram: oldProgram });
         allDiagnostics.push.apply(allDiagnostics, gatherDiagnostics(program));
         if (!hasErrors(allDiagnostics)) {
-            emitResult = program.emit({
-                emitCallback: emitCallback,
-                customTransformers: customTransformers,
-                emitFlags: api.EmitFlags.Default |
-                    ((options.skipMetadataEmit || options.flatModuleOutFile) ? 0 : api.EmitFlags.Metadata)
-            });
+            emitResult = program.emit({ emitCallback: emitCallback, customTransformers: customTransformers, emitFlags: emitFlags });
             allDiagnostics.push.apply(allDiagnostics, emitResult.diagnostics);
             return { diagnostics: allDiagnostics, program: program, emitResult: emitResult };
         }

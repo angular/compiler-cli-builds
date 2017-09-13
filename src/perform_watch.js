@@ -38,14 +38,14 @@ var FileChangeEvent;
     FileChangeEvent[FileChangeEvent["Change"] = 0] = "Change";
     FileChangeEvent[FileChangeEvent["CreateDelete"] = 1] = "CreateDelete";
 })(FileChangeEvent = exports.FileChangeEvent || (exports.FileChangeEvent = {}));
-function createPerformWatchHost(configFileName, reportDiagnostics, createEmitCallback) {
+function createPerformWatchHost(configFileName, reportDiagnostics, existingOptions, createEmitCallback) {
     return {
         reportDiagnostics: reportDiagnostics,
         createCompilerHost: function (options) { return entry_points_1.createCompilerHost({ options: options }); },
-        readConfiguration: function () { return perform_compile_1.readConfiguration(configFileName); },
+        readConfiguration: function () { return perform_compile_1.readConfiguration(configFileName, existingOptions); },
         createEmitCallback: function (options) { return createEmitCallback ? createEmitCallback(options) : undefined; },
         onFileChange: function (listeners) {
-            var parsed = perform_compile_1.readConfiguration(configFileName);
+            var parsed = perform_compile_1.readConfiguration(configFileName, existingOptions);
             function stubReady(cb) { process.nextTick(cb); }
             if (parsed.errors && parsed.errors.length) {
                 reportDiagnostics(parsed.errors);
@@ -114,7 +114,7 @@ function performWatchCompilation(host) {
         }
         if (cachedOptions.errors && cachedOptions.errors.length) {
             host.reportDiagnostics(cachedOptions.errors);
-            return;
+            return cachedOptions.errors;
         }
         if (!cachedCompilerHost) {
             // TODO(chuckj): consider avoiding re-generating factories for libraries.
@@ -139,7 +139,7 @@ function performWatchCompilation(host) {
         if (compileResult.diagnostics.length) {
             host.reportDiagnostics(compileResult.diagnostics);
         }
-        var exitCode = perform_compile_1.exitCodeFromResult(compileResult);
+        var exitCode = perform_compile_1.exitCodeFromResult(compileResult.diagnostics);
         if (exitCode == 0) {
             cachedProgram = compileResult.program;
             host.reportDiagnostics([ChangeDiagnostics.Compilation_complete_Watching_for_file_changes]);
@@ -147,7 +147,7 @@ function performWatchCompilation(host) {
         else {
             host.reportDiagnostics([ChangeDiagnostics.Compilation_failed_Watching_for_file_changes]);
         }
-        return compileResult;
+        return compileResult.diagnostics;
     }
     function resetOptions() {
         cachedProgram = undefined;
