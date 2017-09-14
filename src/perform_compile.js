@@ -22,9 +22,6 @@ var ts = require("typescript");
 var api = require("./transformers/api");
 var ng = require("./transformers/entry_points");
 var TS_EXT = /\.ts$/;
-function isTsDiagnostic(diagnostic) {
-    return diagnostic && diagnostic.source != 'angular';
-}
 function formatDiagnostics(options, diags) {
     if (diags && diags.length) {
         var tsFormatHost_1 = {
@@ -34,7 +31,7 @@ function formatDiagnostics(options, diags) {
         };
         return diags
             .map(function (d) {
-            if (isTsDiagnostic(d)) {
+            if (api.isTsDiagnostic(d)) {
                 return ts.formatDiagnostics([d], tsFormatHost_1);
             }
             else {

@@ -17,6 +17,8 @@ export interface Diagnostic {
     code: number;
     source: 'angular';
 }
+export declare function isTsDiagnostic(diagnostic: any): diagnostic is ts.Diagnostic;
+export declare function isNgDiagnostic(diagnostic: any): diagnostic is Diagnostic;
 export interface CompilerOptions extends ts.CompilerOptions {
     genDir?: string;
     basePath?: string;
@@ -26,6 +28,7 @@ export interface CompilerOptions extends ts.CompilerOptions {
     flatModuleOutFile?: string;
     flatModuleId?: string;
     generateCodeForLibraries?: boolean;
+    fullTemplateTypeCheck?: boolean;
     annotateForClosureCompiler?: boolean;
     annotationsAs?: 'decorators' | 'static fields';
     trace?: boolean;

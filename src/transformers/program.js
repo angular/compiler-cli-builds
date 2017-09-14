@@ -22,12 +22,12 @@ var fs = require("fs");
 var path = require("path");
 var ts = require("typescript");
 var compiler_host_1 = require("../compiler_host");
-var check_types_1 = require("../diagnostics/check_types");
+var translate_diagnostics_1 = require("../diagnostics/translate_diagnostics");
 var index_1 = require("../metadata/index");
 var api_1 = require("./api");
 var lower_expressions_1 = require("./lower_expressions");
 var node_emitter_transform_1 = require("./node_emitter_transform");
-var GENERATED_FILES = /(.*?)\.(ngfactory|shim\.ngstyle|ngstyle|ngsummary)\.(js|d\.ts|ts)$/;
+var util_1 = require("./util");
 var emptyModules = {
     ngModules: [],
     ngModuleByPipeOrDirective: new Map(),
@@ -89,7 +89,7 @@ var AngularCompilerProgram = (function () {
         return this.structuralDiagnostics;
     };
     AngularCompilerProgram.prototype.getTsSemanticDiagnostics = function (sourceFile, cancellationToken) {
-        return this.programWithStubs.getSemanticDiagnostics(sourceFile, cancellationToken);
+        return this.semanticDiagnostics.ts;
     };
     AngularCompilerProgram.prototype.getNgSemanticDiagnostics = function (fileName, cancellationToken) {
         var compilerDiagnostics = this.generatedFileDiagnostics;
@@ -97,7 +97,7 @@ var AngularCompilerProgram = (function () {
         // it.
         if (compilerDiagnostics && compilerDiagnostics.length)
             return compilerDiagnostics;
-        return this.typeChecker.getDiagnostics(fileName, cancellationToken);
+        return this.semanticDiagnostics.ng;
     };
     AngularCompilerProgram.prototype.loadNgStructureAsync = function () {
         var _this = this;
@@ -189,18 +189,17 @@ var AngularCompilerProgram = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AngularCompilerProgram.prototype, "typeChecker", {
+    Object.defineProperty(AngularCompilerProgram.prototype, "generatedFileDiagnostics", {
         get: function () {
-            return (this._typeChecker && !this._typeChecker.partialResults) ?
-                this._typeChecker :
-                (this._typeChecker = this.createTypeChecker());
+            return this.generatedFiles && this._generatedFileDiagnostics;
         },
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AngularCompilerProgram.prototype, "generatedFileDiagnostics", {
+    Object.defineProperty(AngularCompilerProgram.prototype, "semanticDiagnostics", {
         get: function () {
-            return this.generatedFiles && this._generatedFileDiagnostics;
+            return this._semanticDiagnostics ||
+                (this._semanticDiagnostics = this.generateSemanticDiagnostics());
         },
         enumerable: true,
         configurable: true
@@ -276,15 +275,15 @@ var AngularCompilerProgram = (function () {
             throw e;
         }
     };
-    AngularCompilerProgram.prototype.createTypeChecker = function () {
-        return new check_types_1.TypeChecker(this.tsProgram, this.options, this.host, this.aotCompilerHost, this.options, this.analyzedModules, this.generatedFiles);
-    };
     AngularCompilerProgram.prototype.createProgramWithStubs = function () {
         // If we are skipping code generation just use the original program.
         // Otherwise, create a new program that includes the stub files.
         return this.options.skipTemplateCodegen ?
             this.tsProgram :
             ts.createProgram(this.rootNames.concat(this.stubFiles), this.options, this.programWithStubsHost);
+    };
+    AngularCompilerProgram.prototype.generateSemanticDiagnostics = function () {
+        return translate_diagnostics_1.translateDiagnostics(this.programWithStubsHost, this.programWithStubs.getSemanticDiagnostics());
     };
     return AngularCompilerProgram;
 }());
@@ -344,6 +343,7 @@ function getAotCompilerOptions(options) {
         enableLegacyTemplate: options.enableLegacyTemplate,
         enableSummariesForJit: true,
         preserveWhitespaces: options.preserveWhitespaces,
+        fullTemplateTypeCheck: options.fullTemplateTypeCheck,
     };
 }
 function writeMetadata(host, emitFilePath, sourceFile, metadataCache, onError) {
@@ -385,7 +385,7 @@ function createWriteFileCallback(emitFlags, host, metadataCache, generatedFiles)
     return function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
         var sourceFile = sourceFiles && sourceFiles.length == 1 ? sourceFiles[0] : null;
         if (sourceFile) {
-            var isGenerated = GENERATED_FILES.test(fileName);
+            var isGenerated = util_1.GENERATED_FILES.test(fileName);
             if (isGenerated) {
                 writeNgSummaryJson(host, fileName, sourceFile, generatedFilesByName, onError);
             }
@@ -424,6 +424,7 @@ function createProgramWithStubsHost(generatedFiles, originalProgram, originalHos
     return new (function () {
         function class_1() {
             var _this = this;
+            this.emitter = new compiler_1.TypeScriptEmitter();
             this.getDefaultLibFileName = function (options) {
                 return originalHost.getDefaultLibFileName(options);
             };
@@ -455,10 +456,24 @@ function createProgramWithStubsHost(generatedFiles, originalProgram, originalHos
                 this.trace = function (s) { return originalHost.trace(s); };
             }
         }
+        class_1.prototype.ngSpanOf = function (fileName, line, character) {
+            var data = this.generatedFiles.get(fileName);
+            if (data && data.emitCtx) {
+                return data.emitCtx.spanOf(line, character);
+            }
+            return null;
+        };
         class_1.prototype.getSourceFile = function (fileName, languageVersion, onError) {
             var data = this.generatedFiles.get(fileName);
             if (data) {
-                return data.s || (data.s = ts.createSourceFile(fileName, data.g.source || compiler_1.toTypeScript(data.g), languageVersion));
+                if (!data.s) {
+                    var _a = this.emitter.emitStatementsAndContext(data.g.srcFileUrl, data.g.genFileUrl, data.g.stmts, 
+                    /* preamble */ undefined, /* emitSourceMaps */ undefined, 
+                    /* referenceFilter */ undefined), sourceText = _a.sourceText, context = _a.context;
+                    data.emitCtx = context;
+                    data.s = ts.createSourceFile(fileName, sourceText, languageVersion);
+                }
+                return data.s;
             }
             return originalProgram.getSourceFile(fileName) ||
                 originalHost.getSourceFile(fileName, languageVersion, onError);

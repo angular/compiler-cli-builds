@@ -7,14 +7,5 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * @module
- * @description
- * Entry point for all public APIs of the common package.
- */
-var compiler_1 = require("@angular/compiler");
-/**
- * @stable
- */
-exports.VERSION = new compiler_1.Version('5.0.0-beta.7-b6431c6');
-//# sourceMappingURL=version.js.map
+exports.GENERATED_FILES = /(.*?)\.(ngfactory|shim\.ngstyle|ngstyle|ngsummary)\.(js|d\.ts|ts)$/;
+//# sourceMappingURL=util.js.map

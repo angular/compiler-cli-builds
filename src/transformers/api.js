@@ -10,6 +10,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DEFAULT_ERROR_CODE = 100;
 exports.UNKNOWN_ERROR_CODE = 500;
 exports.SOURCE = 'angular';
+function isTsDiagnostic(diagnostic) {
+    return diagnostic != null && diagnostic.source !== 'angular';
+}
+exports.isTsDiagnostic = isTsDiagnostic;
+function isNgDiagnostic(diagnostic) {
+    return diagnostic != null && diagnostic.source === 'angular';
+}
+exports.isNgDiagnostic = isNgDiagnostic;
 var EmitFlags;
 (function (EmitFlags) {
     EmitFlags[EmitFlags["DTS"] = 1] = "DTS";
