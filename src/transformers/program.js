@@ -18,12 +18,12 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
-var tsc_wrapped_1 = require("@angular/tsc-wrapped");
 var fs = require("fs");
 var path = require("path");
 var ts = require("typescript");
 var compiler_host_1 = require("../compiler_host");
 var check_types_1 = require("../diagnostics/check_types");
+var index_1 = require("../metadata/index");
 var api_1 = require("./api");
 var lower_expressions_1 = require("./lower_expressions");
 var node_emitter_transform_1 = require("./node_emitter_transform");
@@ -45,7 +45,7 @@ var AngularCompilerProgram = (function () {
         this._structuralDiagnostics = [];
         this._optionsDiagnostics = [];
         if (options.flatModuleOutFile) {
-            var _a = tsc_wrapped_1.createBundleIndexHost(options, rootNames, host), bundleHost = _a.host, indexName = _a.indexName, errors = _a.errors;
+            var _a = index_1.createBundleIndexHost(options, rootNames, host), bundleHost = _a.host, indexName = _a.indexName, errors = _a.errors;
             if (errors) {
                 // TODO(tbosch): once we move MetadataBundler from tsc_wrapped into compiler_cli,
                 // directly create ng.Diagnostic instead of using ts.Diagnostic here.

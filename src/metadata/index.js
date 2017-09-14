@@ -6,15 +6,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 Object.defineProperty(exports, "__esModule", { value: true });
-/**
- * @module
- * @description
- * Entry point for all public APIs of the common package.
- */
-var compiler_1 = require("@angular/compiler");
-/**
- * @stable
- */
-exports.VERSION = new compiler_1.Version('5.0.0-beta.7-4695c69');
-//# sourceMappingURL=version.js.map
+__export(require("./collector"));
+__export(require("./schema"));
+__export(require("./bundle_index_host"));
+//# sourceMappingURL=index.js.map

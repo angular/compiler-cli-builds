@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { AotCompilerHost } from '@angular/compiler';
-import { AngularCompilerOptions, CollectorOptions, ModuleMetadata } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
+import { CollectorOptions, ModuleMetadata } from './metadata/index';
+import { CompilerOptions } from './transformers/api';
 export interface MetadataProvider {
     getMetadata(source: ts.SourceFile): ModuleMetadata | undefined;
 }
@@ -16,14 +17,14 @@ export interface BaseAotCompilerHostContext extends ts.ModuleResolutionHost {
 }
 export declare abstract class BaseAotCompilerHost<C extends BaseAotCompilerHostContext> implements AotCompilerHost {
     protected program: ts.Program;
-    protected options: AngularCompilerOptions;
+    protected options: CompilerOptions;
     protected context: C;
     protected metadataProvider: MetadataProvider;
     private resolverCache;
     private flatModuleIndexCache;
     private flatModuleIndexNames;
     private flatModuleIndexRedirectNames;
-    constructor(program: ts.Program, options: AngularCompilerOptions, context: C, metadataProvider?: MetadataProvider);
+    constructor(program: ts.Program, options: CompilerOptions, context: C, metadataProvider?: MetadataProvider);
     abstract moduleNameToFileName(m: string, containingFile: string): string | null;
     abstract resourceNameToFileName(m: string, containingFile: string): string | null;
     abstract fileNameToModuleName(importedFile: string, containingFile: string): string | null;
@@ -49,7 +50,7 @@ export declare class CompilerHost extends BaseAotCompilerHost<CompilerHostContex
     private genDir;
     protected resolveModuleNameHost: CompilerHostContext;
     private urlResolver;
-    constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext, collectorOptions?: CollectorOptions, metadataProvider?: MetadataProvider);
+    constructor(program: ts.Program, options: CompilerOptions, context: CompilerHostContext, collectorOptions?: CollectorOptions, metadataProvider?: MetadataProvider);
     toSummaryFileName(fileName: string, referringSrcFileName: string): string;
     fromSummaryFileName(fileName: string, referringLibFileName: string): string;
     calculateEmitPath(filePath: string): string;

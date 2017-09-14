@@ -11,32 +11,11 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 var ts = require("typescript");
-var tsc = require("@angular/tsc-wrapped");
 var tsickle = require("tsickle");
 var api = require("./transformers/api");
 var perform_compile_1 = require("./perform_compile");
 var perform_watch_1 = require("./perform_watch");
-var compiler_1 = require("@angular/compiler");
-var codegen_1 = require("./codegen");
-// TODO(tbosch): remove this old entrypoint once we drop `disableTransformerPipeline`.
-function main(args, consoleError) {
-    if (consoleError === void 0) { consoleError = console.error; }
-    var _a = readNgcCommandLineAndConfiguration(args), project = _a.project, rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors, watch = _a.watch;
-    if (configErrors.length) {
-        return Promise.resolve(reportErrorsAndExit(options, configErrors, consoleError));
-    }
-    if (watch) {
-        var result = watchMode(project, options, consoleError);
-        return Promise.resolve(reportErrorsAndExit({}, result.firstCompileResult, consoleError));
-    }
-    if (options.disableTransformerPipeline) {
-        return disabledTransformerPipelineNgcMain(args, consoleError);
-    }
-    var compileDiags = perform_compile_1.performCompilation({ rootNames: rootNames, options: options, emitCallback: createEmitCallback(options) }).diagnostics;
-    return Promise.resolve(reportErrorsAndExit(options, compileDiags, consoleError));
-}
-exports.main = main;
-function mainSync(args, consoleError, config) {
+function main(args, consoleError, config) {
     if (consoleError === void 0) { consoleError = console.error; }
     var _a = config || readNgcCommandLineAndConfiguration(args), project = _a.project, rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors, watch = _a.watch, emitFlags = _a.emitFlags;
     if (configErrors.length) {
@@ -49,7 +28,7 @@ function mainSync(args, consoleError, config) {
     var compileDiags = perform_compile_1.performCompilation({ rootNames: rootNames, options: options, emitFlags: emitFlags, emitCallback: createEmitCallback(options) }).diagnostics;
     return reportErrorsAndExit(options, compileDiags, consoleError);
 }
-exports.mainSync = mainSync;
+exports.main = main;
 function createEmitCallback(options) {
     var tsickleHost = {
         shouldSkipTsickleProcessing: function (fileName) { return /\.d\.ts$/.test(fileName); },
@@ -135,33 +114,9 @@ function watchMode(project, options, consoleError) {
     }, options, function (options) { return createEmitCallback(options); }));
 }
 exports.watchMode = watchMode;
-function disabledTransformerPipelineNgcMain(args, consoleError) {
-    if (consoleError === void 0) { consoleError = console.error; }
-    var parsedArgs = require('minimist')(args);
-    var cliOptions = new tsc.NgcCliOptions(parsedArgs);
-    var project = parsedArgs.p || parsedArgs.project || '.';
-    return tsc.main(project, cliOptions, disabledTransformerPipelineCodegen)
-        .then(function () { return 0; })
-        .catch(function (e) {
-        if (e instanceof tsc.UserError || compiler_1.isSyntaxError(e)) {
-            consoleError(e.message);
-        }
-        else {
-            consoleError(e.stack);
-        }
-        return Promise.resolve(1);
-    });
-}
-function disabledTransformerPipelineCodegen(ngOptions, cliOptions, program, host) {
-    if (ngOptions.enableSummariesForJit === undefined) {
-        // default to false
-        ngOptions.enableSummariesForJit = false;
-    }
-    return codegen_1.CodeGenerator.create(ngOptions, cliOptions, program, host).codegen();
-}
 // CLI entry point
 if (require.main === module) {
     var args = process.argv.slice(2);
-    process.exitCode = mainSync(args);
+    process.exitCode = main(args);
 }
 //# sourceMappingURL=main.js.map

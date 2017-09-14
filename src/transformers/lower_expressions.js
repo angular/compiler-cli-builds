@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var tsc_wrapped_1 = require("@angular/tsc-wrapped");
 var ts = require("typescript");
+var index_1 = require("../metadata/index");
 function toMap(items, select) {
     return new Map(items.map(function (i) { return [select(i), i]; }));
 }
@@ -176,7 +176,7 @@ function isPrimitive(value) {
     return Object(value) !== value;
 }
 function isRewritten(value) {
-    return tsc_wrapped_1.isMetadataGlobalReferenceExpression(value) && value.name.startsWith(REWRITE_PREFIX);
+    return index_1.isMetadataGlobalReferenceExpression(value) && value.name.startsWith(REWRITE_PREFIX);
 }
 function isLiteralFieldNamed(node, names) {
     if (node.parent && node.parent.kind == ts.SyntaxKind.PropertyAssignment) {
@@ -194,7 +194,7 @@ var LowerMetadataCache = (function () {
     function LowerMetadataCache(options, strict) {
         this.strict = strict;
         this.metadataCache = new Map();
-        this.collector = new tsc_wrapped_1.MetadataCollector(options);
+        this.collector = new index_1.MetadataCollector(options);
     }
     LowerMetadataCache.prototype.getMetadata = function (sourceFile) {
         return this.ensureMetadataAndRequests(sourceFile).metadata;

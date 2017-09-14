@@ -18,10 +18,10 @@ var __extends = (this && this.__extends) || (function () {
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
-var tsc_wrapped_1 = require("@angular/tsc-wrapped");
 var fs = require("fs");
 var path = require("path");
 var ts = require("typescript");
+var index_1 = require("./metadata/index");
 var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 var DTS = /\.d\.ts$/;
 var NODE_MODULES = '/node_modules/';
@@ -31,7 +31,7 @@ var GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$|\.ngsumma
 var SHALLOW_IMPORT = /^((\w|-)+|(@(\w|-)+(\/(\w|-)+)+))$/;
 var BaseAotCompilerHost = (function () {
     function BaseAotCompilerHost(program, options, context, metadataProvider) {
-        if (metadataProvider === void 0) { metadataProvider = new tsc_wrapped_1.MetadataCollector(); }
+        if (metadataProvider === void 0) { metadataProvider = new index_1.MetadataCollector(); }
         this.program = program;
         this.options = options;
         this.context = context;
@@ -215,10 +215,11 @@ var BaseAotCompilerHost = (function () {
     return BaseAotCompilerHost;
 }());
 exports.BaseAotCompilerHost = BaseAotCompilerHost;
+// TODO(tbosch): remove this once G3 uses the transformer compiler!
 var CompilerHost = (function (_super) {
     __extends(CompilerHost, _super);
     function CompilerHost(program, options, context, collectorOptions, metadataProvider) {
-        if (metadataProvider === void 0) { metadataProvider = new tsc_wrapped_1.MetadataCollector(collectorOptions); }
+        if (metadataProvider === void 0) { metadataProvider = new index_1.MetadataCollector(collectorOptions); }
         var _this = _super.call(this, program, options, context, metadataProvider) || this;
         _this.moduleFileNames = new Map();
         // normalize the path so that it never ends with '/'.

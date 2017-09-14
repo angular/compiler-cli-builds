@@ -12,12 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 var api = require("./transformers/api");
 var main_1 = require("./main");
-function main(args, consoleError) {
+function mainXi18n(args, consoleError) {
     if (consoleError === void 0) { consoleError = console.error; }
     var config = readXi18nCommandLineAndConfiguration(args);
-    return main_1.mainSync(args, consoleError, config);
+    return main_1.main(args, consoleError, config);
 }
-exports.main = main;
+exports.mainXi18n = mainXi18n;
 function readXi18nCommandLineAndConfiguration(args) {
     var options = {};
     var parsedArgs = require('minimist')(args);
@@ -38,6 +38,6 @@ function readXi18nCommandLineAndConfiguration(args) {
 // Entry point
 if (require.main === module) {
     var args = process.argv.slice(2);
-    process.exitCode = main(args);
+    process.exitCode = mainXi18n(args);
 }
 //# sourceMappingURL=extract_i18n.js.map

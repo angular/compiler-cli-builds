@@ -7,6 +7,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+/*
+
+The API from compiler-cli that language-service can see.
+It is important that none the exported modules require anything other than
+Angular modules and Typescript as this will indirectly add a dependency
+to the language service.
+
+*/
 var compiler_host_1 = require("./compiler_host");
 exports.CompilerHost = compiler_host_1.CompilerHost;
 exports.ModuleResolutionHostAdapter = compiler_host_1.ModuleResolutionHostAdapter;

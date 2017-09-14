@@ -2,8 +2,7 @@ import 'reflect-metadata';
 import * as ts from 'typescript';
 import * as api from './transformers/api';
 import { ParsedConfiguration } from './perform_compile';
-export declare function main(args: string[], consoleError?: (s: string) => void): Promise<number>;
-export declare function mainSync(args: string[], consoleError?: (s: string) => void, config?: NgcParsedConfiguration): number;
+export declare function main(args: string[], consoleError?: (s: string) => void, config?: NgcParsedConfiguration): number;
 export interface NgcParsedConfiguration extends ParsedConfiguration {
     watch?: boolean;
 }

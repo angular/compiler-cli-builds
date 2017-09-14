@@ -10,9 +10,9 @@
  * Intended to be used in a build step.
  */
 import * as compiler from '@angular/compiler';
-import { AngularCompilerOptions } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
 import { CompilerHost, CompilerHostContext } from './compiler_host';
+import { CompilerOptions } from './transformers/api';
 export interface CodeGeneratorI18nOptions {
     i18nFormat: string | null;
     i18nFile: string | null;
@@ -25,9 +25,9 @@ export declare class CodeGenerator {
     host: ts.CompilerHost;
     private compiler;
     private ngCompilerHost;
-    constructor(options: AngularCompilerOptions, program: ts.Program, host: ts.CompilerHost, compiler: compiler.AotCompiler, ngCompilerHost: CompilerHost);
+    constructor(options: CompilerOptions, program: ts.Program, host: ts.CompilerHost, compiler: compiler.AotCompiler, ngCompilerHost: CompilerHost);
     codegen(): Promise<string[]>;
     codegenSync(): string[];
     private emit(analyzedModules);
-    static create(options: AngularCompilerOptions, i18nOptions: CodeGeneratorI18nOptions, program: ts.Program, tsCompilerHost: ts.CompilerHost, compilerHostContext?: CompilerHostContext, ngCompilerHost?: CompilerHost): CodeGenerator;
+    static create(options: CompilerOptions, i18nOptions: CodeGeneratorI18nOptions, program: ts.Program, tsCompilerHost: ts.CompilerHost, compilerHostContext?: CompilerHostContext, ngCompilerHost?: CompilerHost): CodeGenerator;
 }
