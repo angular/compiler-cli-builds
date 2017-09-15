@@ -15,8 +15,8 @@
   },
   "peerDependencies": {
     "typescript": "^2.0.2",
-    "@angular/compiler": "4.4.1-0c72f7d",
-    "@angular/core": "4.4.1-0c72f7d"
+    "@angular/compiler": "4.4.1-ff87294",
+    "@angular/core": "4.4.1-ff87294"
   },
   "repository": {
     "type": "git",
