@@ -40,7 +40,7 @@ function translateDiagnostics(host, untranslatedDiagnostics) {
 exports.translateDiagnostics = translateDiagnostics;
 function sourceSpanOf(host, source, start) {
     var _a = ts.getLineAndCharacterOfPosition(source, start), line = _a.line, character = _a.character;
-    return host.ngSpanOf(source.fileName, line, character);
+    return host.parseSourceSpanOf(source.fileName, line, character);
 }
 function diagnosticMessageToString(message) {
     return ts.flattenDiagnosticMessageText(message, '\n');

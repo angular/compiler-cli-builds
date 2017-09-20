@@ -93,6 +93,9 @@ function readConfiguration(project, existingOptions) {
         if (!(options.skipMetadataEmit || options.flatModuleOutFile)) {
             emitFlags |= api.EmitFlags.Metadata;
         }
+        if (options.skipTemplateCodegen) {
+            emitFlags = emitFlags & ~api.EmitFlags.Codegen;
+        }
         return { project: projectFile, rootNames: rootNames, options: options, errors: parsed.errors, emitFlags: emitFlags };
     }
     catch (e) {
@@ -117,10 +120,6 @@ function exitCodeFromResult(diags) {
 exports.exitCodeFromResult = exitCodeFromResult;
 function performCompilation(_a) {
     var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram, emitCallback = _a.emitCallback, _b = _a.gatherDiagnostics, gatherDiagnostics = _b === void 0 ? defaultGatherDiagnostics : _b, customTransformers = _a.customTransformers, _c = _a.emitFlags, emitFlags = _c === void 0 ? api.EmitFlags.Default : _c;
-    var _d = ts.version.split('.'), major = _d[0], minor = _d[1];
-    if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 4)) {
-        throw new Error('The Angular Compiler requires TypeScript >= 2.4.');
-    }
     var program;
     var emitResult;
     var allDiagnostics = [];

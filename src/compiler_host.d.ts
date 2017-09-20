@@ -7,30 +7,25 @@
  */
 import { AotCompilerHost } from '@angular/compiler';
 import * as ts from 'typescript';
-import { CollectorOptions, ModuleMetadata } from './metadata/index';
+import { CollectorOptions, MetadataCollector, ModuleMetadata } from './metadata/index';
 import { CompilerOptions } from './transformers/api';
-export interface MetadataProvider {
-    getMetadata(source: ts.SourceFile): ModuleMetadata | undefined;
-}
 export interface BaseAotCompilerHostContext extends ts.ModuleResolutionHost {
     readResource?(fileName: string): Promise<string> | string;
 }
 export declare abstract class BaseAotCompilerHost<C extends BaseAotCompilerHostContext> implements AotCompilerHost {
-    protected program: ts.Program;
     protected options: CompilerOptions;
     protected context: C;
-    protected metadataProvider: MetadataProvider;
     private resolverCache;
     private flatModuleIndexCache;
     private flatModuleIndexNames;
     private flatModuleIndexRedirectNames;
-    constructor(program: ts.Program, options: CompilerOptions, context: C, metadataProvider?: MetadataProvider);
+    constructor(options: CompilerOptions, context: C);
     abstract moduleNameToFileName(m: string, containingFile: string): string | null;
     abstract resourceNameToFileName(m: string, containingFile: string): string | null;
     abstract fileNameToModuleName(importedFile: string, containingFile: string): string | null;
     abstract toSummaryFileName(fileName: string, referringSrcFileName: string): string;
     abstract fromSummaryFileName(fileName: string, referringLibFileName: string): string;
-    protected getSourceFile(filePath: string): ts.SourceFile;
+    abstract getMetadataForSourceFile(filePath: string): ModuleMetadata | undefined;
     getMetadataFor(filePath: string): ModuleMetadata[] | undefined;
     readMetadata(filePath: string, dtsFilePath: string): ModuleMetadata[];
     private upgradeVersion1Metadata(v1Metadata, dtsFilePath);
@@ -44,13 +39,17 @@ export interface CompilerHostContext extends ts.ModuleResolutionHost {
     assumeFileExists(fileName: string): void;
 }
 export declare class CompilerHost extends BaseAotCompilerHost<CompilerHostContext> {
+    protected program: ts.Program;
+    protected metadataProvider: MetadataCollector;
     protected basePath: string;
     private moduleFileNames;
     private isGenDirChildOfRootDir;
     private genDir;
     protected resolveModuleNameHost: CompilerHostContext;
     private urlResolver;
-    constructor(program: ts.Program, options: CompilerOptions, context: CompilerHostContext, collectorOptions?: CollectorOptions, metadataProvider?: MetadataProvider);
+    constructor(program: ts.Program, options: CompilerOptions, context: CompilerHostContext, collectorOptions?: CollectorOptions);
+    protected getSourceFile(filePath: string): ts.SourceFile;
+    getMetadataForSourceFile(filePath: string): ModuleMetadata | undefined;
     toSummaryFileName(fileName: string, referringSrcFileName: string): string;
     fromSummaryFileName(fileName: string, referringLibFileName: string): string;
     calculateEmitPath(filePath: string): string;

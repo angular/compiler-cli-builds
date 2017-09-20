@@ -131,9 +131,7 @@ var PathMappedCompilerHost = (function (_super) {
                 }
             }
             else {
-                var sf = this.getSourceFile(rootedPath);
-                sf.fileName = sf.fileName;
-                var metadata = this.metadataProvider.getMetadata(sf);
+                var metadata = this.getMetadataForSourceFile(rootedPath);
                 return metadata ? [metadata] : [];
             }
         }

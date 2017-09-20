@@ -30,28 +30,14 @@ var GENERATED_FILES = /\.ngfactory\.ts$|\.ngstyle\.ts$|\.ngsummary\.ts$/;
 var GENERATED_OR_DTS_FILES = /\.d\.ts$|\.ngfactory\.ts$|\.ngstyle\.ts$|\.ngsummary\.ts$/;
 var SHALLOW_IMPORT = /^((\w|-)+|(@(\w|-)+(\/(\w|-)+)+))$/;
 var BaseAotCompilerHost = (function () {
-    function BaseAotCompilerHost(program, options, context, metadataProvider) {
-        if (metadataProvider === void 0) { metadataProvider = new index_1.MetadataCollector(); }
-        this.program = program;
+    function BaseAotCompilerHost(options, context) {
         this.options = options;
         this.context = context;
-        this.metadataProvider = metadataProvider;
         this.resolverCache = new Map();
         this.flatModuleIndexCache = new Map();
         this.flatModuleIndexNames = new Set();
         this.flatModuleIndexRedirectNames = new Set();
     }
-    BaseAotCompilerHost.prototype.getSourceFile = function (filePath) {
-        var sf = this.program.getSourceFile(filePath);
-        if (!sf) {
-            if (this.context.fileExists(filePath)) {
-                var sourceText = this.context.readFile(filePath);
-                return ts.createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true);
-            }
-            throw new Error("Source file " + filePath + " not present in program.");
-        }
-        return sf;
-    };
     BaseAotCompilerHost.prototype.getMetadataFor = function (filePath) {
         if (!this.context.fileExists(filePath)) {
             // If the file doesn't exists then we cannot return metadata for the file.
@@ -71,8 +57,7 @@ var BaseAotCompilerHost = (function () {
                 return [this.upgradeVersion1Metadata({ '__symbolic': 'module', 'version': 1, 'metadata': {} }, filePath)];
             }
         }
-        var sf = this.getSourceFile(filePath);
-        var metadata = this.metadataProvider.getMetadata(sf);
+        var metadata = this.getMetadataForSourceFile(filePath);
         return metadata ? [metadata] : [];
     };
     BaseAotCompilerHost.prototype.readMetadata = function (filePath, dtsFilePath) {
@@ -109,7 +94,7 @@ var BaseAotCompilerHost = (function () {
         for (var prop in v1Metadata.metadata) {
             v3Metadata.metadata[prop] = v1Metadata.metadata[prop];
         }
-        var exports = this.metadataProvider.getMetadata(this.getSourceFile(dtsFilePath));
+        var exports = this.getMetadataForSourceFile(dtsFilePath);
         if (exports) {
             for (var prop in exports.metadata) {
                 if (!v3Metadata.metadata[prop]) {
@@ -218,10 +203,11 @@ exports.BaseAotCompilerHost = BaseAotCompilerHost;
 // TODO(tbosch): remove this once G3 uses the transformer compiler!
 var CompilerHost = (function (_super) {
     __extends(CompilerHost, _super);
-    function CompilerHost(program, options, context, collectorOptions, metadataProvider) {
-        if (metadataProvider === void 0) { metadataProvider = new index_1.MetadataCollector(collectorOptions); }
-        var _this = _super.call(this, program, options, context, metadataProvider) || this;
+    function CompilerHost(program, options, context, collectorOptions) {
+        var _this = _super.call(this, options, context) || this;
+        _this.program = program;
         _this.moduleFileNames = new Map();
+        _this.metadataProvider = new index_1.MetadataCollector(collectorOptions);
         // normalize the path so that it never ends with '/'.
         _this.basePath = path.normalize(path.join(_this.options.basePath, '.')).replace(/\\/g, '/');
         _this.genDir = path.normalize(path.join(_this.options.genDir, '.')).replace(/\\/g, '/');
@@ -248,6 +234,22 @@ var CompilerHost = (function (_super) {
         _this.urlResolver = compiler_1.createOfflineCompileUrlResolver();
         return _this;
     }
+    CompilerHost.prototype.getSourceFile = function (filePath) {
+        var sf = this.program.getSourceFile(filePath);
+        if (!sf) {
+            if (this.context.fileExists(filePath)) {
+                var sourceText = this.context.readFile(filePath);
+                sf = ts.createSourceFile(filePath, sourceText, ts.ScriptTarget.Latest, true);
+            }
+            else {
+                throw new Error("Source file " + filePath + " not present in program.");
+            }
+        }
+        return sf;
+    };
+    CompilerHost.prototype.getMetadataForSourceFile = function (filePath) {
+        return this.metadataProvider.getMetadata(this.getSourceFile(filePath));
+    };
     CompilerHost.prototype.toSummaryFileName = function (fileName, referringSrcFileName) {
         return fileName.replace(EXT, '') + '.d.ts';
     };

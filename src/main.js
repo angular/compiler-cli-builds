@@ -13,6 +13,7 @@ require("reflect-metadata");
 var ts = require("typescript");
 var tsickle = require("tsickle");
 var api = require("./transformers/api");
+var util_1 = require("./transformers/util");
 var perform_compile_1 = require("./perform_compile");
 var perform_watch_1 = require("./perform_watch");
 function main(args, consoleError, config) {
@@ -30,16 +31,21 @@ function main(args, consoleError, config) {
 }
 exports.main = main;
 function createEmitCallback(options) {
+    var transformDecorators = options.annotationsAs !== 'decorators';
+    var transformTypesToClosure = options.annotateForClosureCompiler;
+    if (!transformDecorators && !transformTypesToClosure) {
+        return undefined;
+    }
     var tsickleHost = {
-        shouldSkipTsickleProcessing: function (fileName) { return /\.d\.ts$/.test(fileName); },
+        shouldSkipTsickleProcessing: function (fileName) {
+            return /\.d\.ts$/.test(fileName) || util_1.GENERATED_FILES.test(fileName);
+        },
         pathToModuleName: function (context, importPath) { return ''; },
         shouldIgnoreWarningsForPath: function (filePath) { return false; },
         fileNameToModuleId: function (fileName) { return fileName; },
         googmodule: false,
         untyped: true,
-        convertIndexImportShorthand: true,
-        transformDecorators: options.annotationsAs !== 'decorators',
-        transformTypesToClosure: options.annotateForClosureCompiler,
+        convertIndexImportShorthand: true, transformDecorators: transformDecorators, transformTypesToClosure: transformTypesToClosure,
     };
     return function (_a) {
         var program = _a.program, targetSourceFile = _a.targetSourceFile, writeFile = _a.writeFile, cancellationToken = _a.cancellationToken, emitOnlyDtsFiles = _a.emitOnlyDtsFiles, _b = _a.customTransformers, customTransformers = _b === void 0 ? {} : _b, host = _a.host, options = _a.options;

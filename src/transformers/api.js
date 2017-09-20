@@ -24,8 +24,8 @@ var EmitFlags;
     EmitFlags[EmitFlags["JS"] = 2] = "JS";
     EmitFlags[EmitFlags["Metadata"] = 4] = "Metadata";
     EmitFlags[EmitFlags["I18nBundle"] = 8] = "I18nBundle";
-    EmitFlags[EmitFlags["Summary"] = 16] = "Summary";
-    EmitFlags[EmitFlags["Default"] = 3] = "Default";
+    EmitFlags[EmitFlags["Codegen"] = 16] = "Codegen";
+    EmitFlags[EmitFlags["Default"] = 19] = "Default";
     EmitFlags[EmitFlags["All"] = 31] = "All";
 })(EmitFlags = exports.EmitFlags || (exports.EmitFlags = {}));
 //# sourceMappingURL=api.js.map

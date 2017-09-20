@@ -8,4 +8,9 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GENERATED_FILES = /(.*?)\.(ngfactory|shim\.ngstyle|ngstyle|ngsummary)\.(js|d\.ts|ts)$/;
+// Note: This is an internal property in TypeScript. Use it only for assertions and tests.
+function tsStructureIsReused(program) {
+    return program.structureIsReused;
+}
+exports.tsStructureIsReused = tsStructureIsReused;
 //# sourceMappingURL=util.js.map

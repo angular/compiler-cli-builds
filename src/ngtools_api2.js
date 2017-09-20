@@ -15,7 +15,8 @@ var EmitFlags;
 (function (EmitFlags) {
     EmitFlags[EmitFlags["DTS"] = 1] = "DTS";
     EmitFlags[EmitFlags["JS"] = 2] = "JS";
-    EmitFlags[EmitFlags["Default"] = 3] = "Default";
+    EmitFlags[EmitFlags["Codegen"] = 16] = "Codegen";
+    EmitFlags[EmitFlags["Default"] = 19] = "Default";
 })(EmitFlags = exports.EmitFlags || (exports.EmitFlags = {}));
 // Wrapper for createProgram.
 function createProgram(_a) {

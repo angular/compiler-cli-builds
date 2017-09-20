@@ -45,17 +45,18 @@ export interface CompilerOptions extends ts.CompilerOptions {
     preserveWhitespaces?: boolean;
 }
 export interface CompilerHost extends ts.CompilerHost {
-    moduleNameToFileName(moduleName: string, containingFile?: string): string | null;
-    fileNameToModuleName(importedFilePath: string, containingFilePath: string): string | null;
-    resourceNameToFileName(resourceName: string, containingFilePath: string): string | null;
-    toSummaryFileName(fileName: string, referringSrcFileName: string): string;
-    fromSummaryFileName(fileName: string, referringLibFileName: string): string;
+    moduleNameToFileName?(moduleName: string, containingFile?: string): string | null;
+    fileNameToModuleName?(importedFilePath: string, containingFilePath: string): string;
+    resourceNameToFileName?(resourceName: string, containingFilePath: string): string | null;
+    toSummaryFileName?(fileName: string, referringSrcFileName: string): string;
+    fromSummaryFileName?(fileName: string, referringLibFileName: string): string;
     readResource?(fileName: string): Promise<string> | string;
 }
 export declare enum EmitFlags {
     DTS = 1,
     JS = 2,
-    Default = 3,
+    Codegen = 16,
+    Default = 19,
 }
 export interface CustomTransformers {
     beforeTs?: ts.TransformerFactory<ts.SourceFile>[];
@@ -89,6 +90,10 @@ export interface Program {
         customTransformers?: CustomTransformers;
         emitCallback?: TsEmitCallback;
     }): ts.EmitResult;
+    getLibrarySummaries(): {
+        fileName: string;
+        content: string;
+    }[];
 }
 export declare function createProgram({rootNames, options, host, oldProgram}: {
     rootNames: string[];
