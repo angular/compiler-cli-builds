@@ -22,13 +22,9 @@ export declare type LazyRouteMap = {
 export declare class RouteDef {
     readonly path: string;
     readonly className: string | null;
-    private constructor(path, className?);
+    private constructor();
     toString(): string;
     static fromString(entry: string): RouteDef;
 }
-/**
- *
- * @returns {LazyRouteMap}
- * @private
- */
 export declare function listLazyRoutesOfModule(entryModule: string, host: AotCompilerHost, reflector: StaticReflector): LazyRouteMap;
+export declare function flatten<T>(list: Array<T | T[]>): T[];

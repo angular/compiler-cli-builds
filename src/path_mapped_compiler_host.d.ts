@@ -1,6 +1,7 @@
-import { AngularCompilerOptions, ModuleMetadata } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
 import { CompilerHost, CompilerHostContext } from './compiler_host';
+import { ModuleMetadata } from './metadata/index';
+import { CompilerOptions } from './transformers/api';
 /**
  * This version of the AotCompilerHost expects that the program will be compiled
  * and executed with a "path mapped" directory structure, where generated files
@@ -9,7 +10,7 @@ import { CompilerHost, CompilerHostContext } from './compiler_host';
  * loader what to do.
  */
 export declare class PathMappedCompilerHost extends CompilerHost {
-    constructor(program: ts.Program, options: AngularCompilerOptions, context: CompilerHostContext);
+    constructor(program: ts.Program, options: CompilerOptions, context: CompilerHostContext);
     getCanonicalFileName(fileName: string): string;
     moduleNameToFileName(m: string, containingFile: string): string | null;
     /**
