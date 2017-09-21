@@ -32,6 +32,7 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     private rootDirs;
     private moduleResolutionCache;
     private originalSourceFiles;
+    private originalFileExistsCache;
     private generatedSourceFiles;
     private generatedCodeFor;
     private emitter;
@@ -72,8 +73,9 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     private addGeneratedFile(genFile, externalReferences);
     private ensureCodeGeneratedFor(fileName);
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined): ts.SourceFile;
+    private originalFileExists(fileName);
     fileExists(fileName: string): boolean;
-    private _getBaseNamesForGeneratedFile(genFileName);
+    private _getBaseNameForGeneratedSourceFile(genFileName);
     loadSummary(filePath: string): string | null;
     isSourceFile(filePath: string): boolean;
     readFile: (fileName: string) => string;

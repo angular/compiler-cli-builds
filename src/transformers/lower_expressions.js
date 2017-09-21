@@ -227,6 +227,15 @@ var LowerMetadataCache = (function () {
                 return false;
             };
         })();
+        var isExportedPropertyAccess = function (node) {
+            if (node.kind === ts.SyntaxKind.PropertyAccessExpression) {
+                var pae = node;
+                if (isExportedSymbol(pae.expression)) {
+                    return true;
+                }
+            }
+            return false;
+        };
         var replaceNode = function (node) {
             var name = freshIdent();
             requests.set(node.pos, { name: name, kind: node.kind, location: node.pos, end: node.end });
@@ -240,13 +249,13 @@ var LowerMetadataCache = (function () {
                     return replaceNode(node);
                 }
                 if (isLiteralFieldNamed(node, LOWERABLE_FIELD_NAMES) && shouldLower(node) &&
-                    !isExportedSymbol(node)) {
+                    !isExportedSymbol(node) && !isExportedPropertyAccess(node)) {
                     return replaceNode(node);
                 }
             }
             return value;
         };
-        var metadata = this.collector.getMetadata(sourceFile, this.strict, substituteExpression);
+        var metadata = this.collector.getMetadata(sourceFile, this.strict, sourceFile.isDeclarationFile ? undefined : substituteExpression);
         return { metadata: metadata, requests: requests };
     };
     return LowerMetadataCache;

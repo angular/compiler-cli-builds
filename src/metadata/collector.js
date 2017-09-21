@@ -19,18 +19,7 @@ var ts = require("typescript");
 var evaluator_1 = require("./evaluator");
 var schema_1 = require("./schema");
 var symbols_1 = require("./symbols");
-// In TypeScript 2.1 these flags moved
-// These helpers work for both 2.0 and 2.1.
-var isExport = ts.ModifierFlags ?
-    (function (node) {
-        return !!(ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export);
-    }) :
-    (function (node) { return !!((node.flags & ts.NodeFlags.Export)); });
-var isStatic = ts.ModifierFlags ?
-    (function (node) {
-        return !!(ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Static);
-    }) :
-    (function (node) { return !!((node.flags & ts.NodeFlags.Static)); });
+var isStatic = function (node) { return ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Static; };
 /**
  * Collect decorator metadata from a TypeScript module.
  */
@@ -248,6 +237,9 @@ var MetadataCollector = (function () {
                     }
             }
         });
+        var isExport = function (node) {
+            return sourceFile.isDeclarationFile || ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export;
+        };
         var isExportedIdentifier = function (identifier) {
             return identifier && exportMap.has(identifier.text);
         };

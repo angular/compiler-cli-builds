@@ -47,7 +47,6 @@ var AngularCompilerProgram = (function () {
                 return _this.summariesFromPreviousCompilations.set(fileName, content);
             });
         }
-        this.rootNames = rootNames = rootNames.filter(function (r) { return !util_1.GENERATED_FILES.test(r); });
         if (options.flatModuleOutFile) {
             var _b = index_1.createBundleIndexHost(options, rootNames, host), bundleHost = _b.host, indexName = _b.indexName, errors = _b.errors;
             if (errors) {
@@ -107,14 +106,14 @@ var AngularCompilerProgram = (function () {
         if (this._analyzedModules) {
             throw new Error('Angular structure already loaded');
         }
-        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, analyzedFiles = _a.analyzedFiles, hostAdapter = _a.hostAdapter;
+        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, analyzedFiles = _a.analyzedFiles, hostAdapter = _a.hostAdapter, rootNames = _a.rootNames;
         return this._compiler.loadFilesAsync(analyzedFiles)
             .catch(this.catchAnalysisError.bind(this))
             .then(function (analyzedModules) {
             if (_this._analyzedModules) {
                 throw new Error('Angular structure loaded both synchronously and asynchronsly');
             }
-            _this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, hostAdapter);
+            _this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, hostAdapter, rootNames);
         });
     };
     AngularCompilerProgram.prototype.emit = function (_a) {
@@ -144,7 +143,7 @@ var AngularCompilerProgram = (function () {
             program: this.tsProgram,
             host: this.host,
             options: this.options,
-            writeFile: createWriteFileCallback(emitFlags, this.host, outSrcMapping),
+            writeFile: createWriteFileCallback(genFiles, this.host, outSrcMapping),
             emitOnlyDtsFiles: (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS,
             customTransformers: this.calculateTransforms(genFiles, customTransformers)
         });
@@ -269,7 +268,7 @@ var AngularCompilerProgram = (function () {
         if (this._analyzedModules) {
             return;
         }
-        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, analyzedFiles = _a.analyzedFiles, hostAdapter = _a.hostAdapter;
+        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, analyzedFiles = _a.analyzedFiles, hostAdapter = _a.hostAdapter, rootNames = _a.rootNames;
         var analyzedModules;
         try {
             analyzedModules = this._compiler.loadFilesSync(analyzedFiles);
@@ -277,7 +276,7 @@ var AngularCompilerProgram = (function () {
         catch (e) {
             analyzedModules = this.catchAnalysisError(e);
         }
-        this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, hostAdapter);
+        this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, hostAdapter, rootNames);
     };
     AngularCompilerProgram.prototype._createProgramWithBasicStubs = function () {
         var _this = this;
@@ -302,14 +301,25 @@ var AngularCompilerProgram = (function () {
         this._compiler = compiler_1.createAotCompiler(hostAdapter, aotOptions).compiler;
         this._typeCheckHost = hostAdapter;
         this._structuralDiagnostics = [];
-        var tmpProgram = ts.createProgram(this.rootNames, this.options, hostAdapter, oldTsProgram);
-        return { tmpProgram: tmpProgram, analyzedFiles: analyzedFiles, hostAdapter: hostAdapter };
+        var rootNames = this.rootNames.filter(function (fn) { return !util_1.GENERATED_FILES.test(fn) || !hostAdapter.isSourceFile(fn); });
+        if (this.options.noResolve) {
+            this.rootNames.forEach(function (rootName) {
+                var sf = hostAdapter.getSourceFile(rootName, _this.options.target || ts.ScriptTarget.Latest);
+                sf.referencedFiles.forEach(function (fileRef) {
+                    if (util_1.GENERATED_FILES.test(fileRef.fileName)) {
+                        rootNames.push(fileRef.fileName);
+                    }
+                });
+            });
+        }
+        var tmpProgram = ts.createProgram(rootNames, this.options, hostAdapter, oldTsProgram);
+        return { tmpProgram: tmpProgram, analyzedFiles: analyzedFiles, hostAdapter: hostAdapter, rootNames: rootNames };
     };
-    AngularCompilerProgram.prototype._updateProgramWithTypeCheckStubs = function (tmpProgram, analyzedModules, hostAdapter) {
+    AngularCompilerProgram.prototype._updateProgramWithTypeCheckStubs = function (tmpProgram, analyzedModules, hostAdapter, rootNames) {
         this._analyzedModules = analyzedModules;
         var genFiles = this._compiler.emitTypeCheckStubs(analyzedModules);
         genFiles.forEach(function (gf) { return hostAdapter.updateGeneratedFile(gf); });
-        this._tsProgram = ts.createProgram(this.rootNames, this.options, hostAdapter, tmpProgram);
+        this._tsProgram = ts.createProgram(rootNames, this.options, hostAdapter, tmpProgram);
         // Note: the new ts program should be completely reusable by TypeScript as:
         // - we cache all the files in the hostAdapter
         // - new new stubs use the exactly same imports/exports as the old once (we assert that in
@@ -413,15 +423,22 @@ function getAotCompilerOptions(options) {
         fullTemplateTypeCheck: options.fullTemplateTypeCheck,
     };
 }
-function createWriteFileCallback(emitFlags, host, outSrcMapping) {
+function createWriteFileCallback(generatedFiles, host, outSrcMapping) {
+    var genFileByFileName = new Map();
+    generatedFiles.forEach(function (genFile) { return genFileByFileName.set(genFile.genFileUrl, genFile); });
     return function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
         var sourceFile = sourceFiles && sourceFiles.length == 1 ? sourceFiles[0] : null;
-        var isGenerated = util_1.GENERATED_FILES.test(fileName);
         if (sourceFile) {
             outSrcMapping.push({ outFileName: fileName, sourceFile: sourceFile });
         }
-        if (isGenerated && !(emitFlags & api_1.EmitFlags.Codegen)) {
-            return;
+        var isGenerated = util_1.GENERATED_FILES.test(fileName);
+        if (isGenerated && sourceFile) {
+            // Filter out generated files for which we didn't generate code.
+            // This can happen as the stub caclulation is not completely exact.
+            var genFile = genFileByFileName.get(sourceFile.fileName);
+            if (!genFile || !genFile.stmts || genFile.stmts.length === 0) {
+                return;
+            }
         }
         host.writeFile(fileName, data, writeByteOrderMark, onError, sourceFiles);
     };
