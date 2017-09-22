@@ -296,7 +296,6 @@ var CompilerHost = (function (_super) {
         }
         return result;
     };
-    ;
     /**
      * We want a moduleId that will appear in import statements in the generated code.
      * These need to be in a form that system.js can load, so absolute file paths don't work.
@@ -365,7 +364,7 @@ var CompilerHost = (function (_super) {
     CompilerHost.prototype.rewriteGenDirPath = function (filepath) {
         var nodeModulesIndex = filepath.indexOf(NODE_MODULES);
         if (nodeModulesIndex !== -1) {
-            // If we are in node_modulse, transplant them into `genDir`.
+            // If we are in node_modules, transplant them into `genDir`.
             return path.join(this.genDir, filepath.substring(nodeModulesIndex));
         }
         else {
