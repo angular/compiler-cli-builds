@@ -139,14 +139,36 @@ var AngularCompilerProgram = (function () {
                 emittedFiles: [],
             };
         }
-        var emitResult = emitCallback({
-            program: this.tsProgram,
-            host: this.host,
-            options: this.options,
-            writeFile: createWriteFileCallback(genFiles, this.host, outSrcMapping),
-            emitOnlyDtsFiles: (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS,
-            customTransformers: this.calculateTransforms(genFiles, customTransformers)
-        });
+        // Restore the original references before we emit so TypeScript doesn't emit
+        // a reference to the .d.ts file.
+        var augmentedReferences = new Map();
+        for (var _i = 0, _f = this.tsProgram.getSourceFiles(); _i < _f.length; _i++) {
+            var sourceFile = _f[_i];
+            var originalReferences = compiler_host_1.getOriginalReferences(sourceFile);
+            if (originalReferences) {
+                augmentedReferences.set(sourceFile, sourceFile.referencedFiles);
+                sourceFile.referencedFiles = originalReferences;
+            }
+        }
+        var emitResult;
+        try {
+            emitResult = emitCallback({
+                program: this.tsProgram,
+                host: this.host,
+                options: this.options,
+                writeFile: createWriteFileCallback(genFiles, this.host, outSrcMapping),
+                emitOnlyDtsFiles: (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS,
+                customTransformers: this.calculateTransforms(genFiles, customTransformers)
+            });
+        }
+        finally {
+            // Restore the references back to the augmented value to ensure that the
+            // checks that TypeScript makes for project structure reuse will succeed.
+            for (var _g = 0, _h = Array.from(augmentedReferences); _g < _h.length; _g++) {
+                var _j = _h[_g], sourceFile = _j[0], references = _j[1];
+                sourceFile.referencedFiles = references;
+            }
+        }
         if (!outSrcMapping.length) {
             // if no files were emitted by TypeScript, also don't emit .json files
             return emitResult;
@@ -421,6 +443,7 @@ function getAotCompilerOptions(options) {
         enableSummariesForJit: true,
         preserveWhitespaces: options.preserveWhitespaces,
         fullTemplateTypeCheck: options.fullTemplateTypeCheck,
+        rootDir: options.rootDir,
     };
 }
 function createWriteFileCallback(generatedFiles, host, outSrcMapping) {

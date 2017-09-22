@@ -87,4 +87,5 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     realPath: (p: string) => string;
     writeFile: any;
 }
+export declare function getOriginalReferences(sourceFile: ts.SourceFile): ts.FileReference[] | undefined;
 export declare function relativeToRootDirs(filePath: string, rootDirs: string[]): string;

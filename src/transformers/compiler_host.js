@@ -382,6 +382,10 @@ function addReferencesToSourceFile(sf, genFileNames) {
     genFileNames.forEach(function (gf) { return newReferencedFiles.push({ fileName: gf, pos: 0, end: 0 }); });
     sf.referencedFiles = newReferencedFiles;
 }
+function getOriginalReferences(sourceFile) {
+    return sourceFile && sourceFile.originalReferencedFiles;
+}
+exports.getOriginalReferences = getOriginalReferences;
 function dotRelative(from, to) {
     var rPath = path.relative(from, to).replace(/\\/g, '/');
     return rPath.startsWith('.') ? rPath : './' + rPath;
