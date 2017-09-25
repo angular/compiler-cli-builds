@@ -22,12 +22,13 @@ export declare abstract class BaseAotCompilerHost<C extends BaseAotCompilerHostC
     constructor(options: CompilerOptions, context: C);
     abstract moduleNameToFileName(m: string, containingFile: string): string | null;
     abstract resourceNameToFileName(m: string, containingFile: string): string | null;
-    abstract fileNameToModuleName(importedFile: string, containingFile: string): string | null;
+    abstract fileNameToModuleName(importedFile: string, containingFile: string): string;
     abstract toSummaryFileName(fileName: string, referringSrcFileName: string): string;
     abstract fromSummaryFileName(fileName: string, referringLibFileName: string): string;
     abstract getMetadataForSourceFile(filePath: string): ModuleMetadata | undefined;
+    protected getImportAs(fileName: string): string | undefined;
     getMetadataFor(filePath: string): ModuleMetadata[] | undefined;
-    readMetadata(filePath: string, dtsFilePath: string): ModuleMetadata[];
+    protected readMetadata(dtsFilePath: string): ModuleMetadata[] | undefined;
     private upgradeVersion1Metadata(v1Metadata, dtsFilePath);
     loadResource(filePath: string): Promise<string> | string;
     loadSummary(filePath: string): string | null;

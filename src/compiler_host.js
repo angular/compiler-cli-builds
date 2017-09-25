@@ -38,6 +38,23 @@ var BaseAotCompilerHost = (function () {
         this.flatModuleIndexNames = new Set();
         this.flatModuleIndexRedirectNames = new Set();
     }
+    BaseAotCompilerHost.prototype.getImportAs = function (fileName) {
+        // Note: `importAs` can only be in .metadata.json files
+        // So it is enough to call this.readMetadata, and we get the
+        // benefit that this is cached.
+        if (DTS.test(fileName)) {
+            var metadatas = this.readMetadata(fileName);
+            if (metadatas) {
+                for (var _i = 0, metadatas_1 = metadatas; _i < metadatas_1.length; _i++) {
+                    var metadata = metadatas_1[_i];
+                    if (metadata.importAs) {
+                        return metadata.importAs;
+                    }
+                }
+            }
+        }
+        return undefined;
+    };
     BaseAotCompilerHost.prototype.getMetadataFor = function (filePath) {
         if (!this.context.fileExists(filePath)) {
             // If the file doesn't exists then we cannot return metadata for the file.
@@ -46,40 +63,44 @@ var BaseAotCompilerHost = (function () {
             return;
         }
         if (DTS.test(filePath)) {
-            var metadataPath = filePath.replace(DTS, '.metadata.json');
-            if (this.context.fileExists(metadataPath)) {
-                return this.readMetadata(metadataPath, filePath);
-            }
-            else {
+            var metadatas = this.readMetadata(filePath);
+            if (!metadatas) {
                 // If there is a .d.ts file but no metadata file we need to produce a
                 // v3 metadata from the .d.ts file as v3 includes the exports we need
                 // to resolve symbols.
-                return [this.upgradeVersion1Metadata({ '__symbolic': 'module', 'version': 1, 'metadata': {} }, filePath)];
+                metadatas = [this.upgradeVersion1Metadata({ '__symbolic': 'module', 'version': 1, 'metadata': {} }, filePath)];
             }
+            return metadatas;
         }
+        // Attention: don't cache this, so that e.g. the LanguageService
+        // can read in changes from source files in the metadata!
         var metadata = this.getMetadataForSourceFile(filePath);
         return metadata ? [metadata] : [];
     };
-    BaseAotCompilerHost.prototype.readMetadata = function (filePath, dtsFilePath) {
-        var metadatas = this.resolverCache.get(filePath);
+    BaseAotCompilerHost.prototype.readMetadata = function (dtsFilePath) {
+        var metadatas = this.resolverCache.get(dtsFilePath);
         if (metadatas) {
             return metadatas;
         }
+        var metadataPath = dtsFilePath.replace(DTS, '.metadata.json');
+        if (!this.context.fileExists(metadataPath)) {
+            return undefined;
+        }
         try {
-            var metadataOrMetadatas = JSON.parse(this.context.readFile(filePath));
-            var metadatas_1 = metadataOrMetadatas ?
+            var metadataOrMetadatas = JSON.parse(this.context.readFile(metadataPath));
+            var metadatas_2 = metadataOrMetadatas ?
                 (Array.isArray(metadataOrMetadatas) ? metadataOrMetadatas : [metadataOrMetadatas]) :
                 [];
-            var v1Metadata = metadatas_1.find(function (m) { return m.version === 1; });
-            var v3Metadata = metadatas_1.find(function (m) { return m.version === 3; });
+            var v1Metadata = metadatas_2.find(function (m) { return m.version === 1; });
+            var v3Metadata = metadatas_2.find(function (m) { return m.version === 3; });
             if (!v3Metadata && v1Metadata) {
-                metadatas_1.push(this.upgradeVersion1Metadata(v1Metadata, dtsFilePath));
+                metadatas_2.push(this.upgradeVersion1Metadata(v1Metadata, dtsFilePath));
             }
-            this.resolverCache.set(filePath, metadatas_1);
-            return metadatas_1;
+            this.resolverCache.set(dtsFilePath, metadatas_2);
+            return metadatas_2;
         }
         catch (e) {
-            console.error("Failed to read JSON file " + filePath);
+            console.error("Failed to read JSON file " + metadataPath);
             throw e;
         }
     };
@@ -312,6 +333,10 @@ var CompilerHost = (function (_super) {
      * NOTE: (*) the relative path is computed depending on `isGenDirChildOfRootDir`.
      */
     CompilerHost.prototype.fileNameToModuleName = function (importedFile, containingFile) {
+        var importAs = this.getImportAs(importedFile);
+        if (importAs) {
+            return importAs;
+        }
         // If a file does not yet exist (because we compile it later), we still need to
         // assume it exists it so that the `resolve` method works!
         if (importedFile !== containingFile && !this.context.fileExists(importedFile)) {

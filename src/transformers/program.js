@@ -29,12 +29,11 @@ var defaultEmitCallback = function (_a) {
 };
 var AngularCompilerProgram = (function () {
     function AngularCompilerProgram(rootNames, options, host, oldProgram) {
-        var _this = this;
         this.rootNames = rootNames;
         this.options = options;
         this.host = host;
         this.oldProgram = oldProgram;
-        this.summariesFromPreviousCompilations = new Map();
+        this.oldProgramLibrarySummaries = [];
         this._optionsDiagnostics = [];
         var _a = ts.version.split('.'), major = _a[0], minor = _a[1];
         if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 4)) {
@@ -42,10 +41,7 @@ var AngularCompilerProgram = (function () {
         }
         this.oldTsProgram = oldProgram ? oldProgram.getTsProgram() : undefined;
         if (oldProgram) {
-            oldProgram.getLibrarySummaries().forEach(function (_a) {
-                var content = _a.content, fileName = _a.fileName;
-                return _this.summariesFromPreviousCompilations.set(fileName, content);
-            });
+            this.oldProgramLibrarySummaries = oldProgram.getLibrarySummaries();
         }
         if (options.flatModuleOutFile) {
             var _b = index_1.createBundleIndexHost(options, rootNames, host), bundleHost = _b.host, indexName = _b.indexName, errors = _b.errors;
@@ -68,19 +64,11 @@ var AngularCompilerProgram = (function () {
         var _c;
     }
     AngularCompilerProgram.prototype.getLibrarySummaries = function () {
-        var emittedLibSummaries = [];
-        this.summariesFromPreviousCompilations.forEach(function (content, fileName) { return emittedLibSummaries.push({ fileName: fileName, content: content }); });
-        if (this._emittedGenFiles) {
-            this._emittedGenFiles.forEach(function (genFile) {
-                if (genFile.srcFileUrl.endsWith('.d.ts') &&
-                    genFile.genFileUrl.endsWith('.ngsummary.json')) {
-                    // Note: ! is ok here as ngsummary.json files are always plain text, so genFile.source
-                    // is filled.
-                    emittedLibSummaries.push({ fileName: genFile.genFileUrl, content: genFile.source });
-                }
-            });
+        var result = this.oldProgramLibrarySummaries.slice();
+        if (this.emittedLibrarySummaries) {
+            result.push.apply(result, this.emittedLibrarySummaries);
         }
-        return emittedLibSummaries;
+        return result;
     };
     AngularCompilerProgram.prototype.getTsProgram = function () { return this.tsProgram; };
     AngularCompilerProgram.prototype.getTsOptionDiagnostics = function (cancellationToken) {
@@ -106,8 +94,8 @@ var AngularCompilerProgram = (function () {
         if (this._analyzedModules) {
             throw new Error('Angular structure already loaded');
         }
-        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, analyzedFiles = _a.analyzedFiles, hostAdapter = _a.hostAdapter, rootNames = _a.rootNames;
-        return this._compiler.loadFilesAsync(analyzedFiles)
+        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, hostAdapter = _a.hostAdapter, rootNames = _a.rootNames;
+        return this._compiler.loadFilesAsync(sourceFiles)
             .catch(this.catchAnalysisError.bind(this))
             .then(function (analyzedModules) {
             if (_this._analyzedModules) {
@@ -126,7 +114,6 @@ var AngularCompilerProgram = (function () {
             var bundle = this.compiler.emitMessageBundle(this.analyzedModules, locale);
             i18nExtract(format, file, this.host, this.options, bundle);
         }
-        var outSrcMapping = [];
         if ((emitFlags & (api_1.EmitFlags.JS | api_1.EmitFlags.DTS | api_1.EmitFlags.Metadata | api_1.EmitFlags.Codegen)) ===
             0) {
             return { emitSkipped: true, diagnostics: [], emittedFiles: [] };
@@ -139,6 +126,19 @@ var AngularCompilerProgram = (function () {
                 emittedFiles: [],
             };
         }
+        var emittedLibrarySummaries = this.emittedLibrarySummaries = [];
+        var outSrcMapping = [];
+        var genFileByFileName = new Map();
+        genFiles.forEach(function (genFile) { return genFileByFileName.set(genFile.genFileUrl, genFile); });
+        var writeTsFile = function (outFileName, outData, writeByteOrderMark, onError, sourceFiles) {
+            var sourceFile = sourceFiles && sourceFiles.length == 1 ? sourceFiles[0] : null;
+            var genFile;
+            if (sourceFile) {
+                outSrcMapping.push({ outFileName: outFileName, sourceFile: sourceFile });
+                genFile = genFileByFileName.get(sourceFile.fileName);
+            }
+            _this.writeFile(outFileName, outData, writeByteOrderMark, onError, genFile, sourceFiles);
+        };
         // Restore the original references before we emit so TypeScript doesn't emit
         // a reference to the .d.ts file.
         var augmentedReferences = new Map();
@@ -156,7 +156,7 @@ var AngularCompilerProgram = (function () {
                 program: this.tsProgram,
                 host: this.host,
                 options: this.options,
-                writeFile: createWriteFileCallback(genFiles, this.host, outSrcMapping),
+                writeFile: writeTsFile,
                 emitOnlyDtsFiles: (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS,
                 customTransformers: this.calculateTransforms(genFiles, customTransformers)
             });
@@ -177,7 +177,8 @@ var AngularCompilerProgram = (function () {
         if (emitFlags & api_1.EmitFlags.Codegen) {
             genFiles.forEach(function (gf) {
                 if (gf.source) {
-                    _this.host.writeFile(srcToOutPath(gf.genFileUrl), gf.source, false);
+                    var outFileName = srcToOutPath(gf.genFileUrl);
+                    _this.writeFile(outFileName, gf.source, false, undefined, gf);
                 }
             });
         }
@@ -186,7 +187,8 @@ var AngularCompilerProgram = (function () {
                 if (!sf.isDeclarationFile && !util_1.GENERATED_FILES.test(sf.fileName)) {
                     var metadata = _this.metadataCache.getMetadata(sf);
                     var metadataText = JSON.stringify([metadata]);
-                    _this.host.writeFile(srcToOutPath(sf.fileName.replace(/\.ts$/, '.metadata.json')), metadataText, false);
+                    var outFileName = srcToOutPath(sf.fileName.replace(/\.ts$/, '.metadata.json'));
+                    _this.writeFile(outFileName, metadataText, false, undefined, undefined, [sf]);
                 }
             });
         }
@@ -290,10 +292,10 @@ var AngularCompilerProgram = (function () {
         if (this._analyzedModules) {
             return;
         }
-        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, analyzedFiles = _a.analyzedFiles, hostAdapter = _a.hostAdapter, rootNames = _a.rootNames;
+        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, hostAdapter = _a.hostAdapter, rootNames = _a.rootNames;
         var analyzedModules;
         try {
-            analyzedModules = this._compiler.loadFilesSync(analyzedFiles);
+            analyzedModules = this._compiler.loadFilesSync(sourceFiles);
         }
         catch (e) {
             analyzedModules = this.catchAnalysisError(e);
@@ -308,17 +310,13 @@ var AngularCompilerProgram = (function () {
         // Note: This is important to not produce a memory leak!
         var oldTsProgram = this.oldTsProgram;
         this.oldTsProgram = undefined;
-        var analyzedFiles = [];
-        var codegen = function (fileName) {
-            if (_this._analyzedModules) {
-                throw new Error("Internal Error: already initalized!");
-            }
-            var analyzedFile = _this._compiler.analyzeFile(fileName);
-            analyzedFiles.push(analyzedFile);
-            var debug = fileName.endsWith('application_ref.ts');
-            return _this._compiler.emitBasicStubs(analyzedFile);
+        var codegen = {
+            generateFile: function (genFileName, baseFileName) {
+                return _this._compiler.emitBasicStub(genFileName, baseFileName);
+            },
+            findGeneratedFileNames: function (fileName) { return _this._compiler.findGeneratedFileNames(fileName); },
         };
-        var hostAdapter = new compiler_host_1.TsCompilerAotCompilerTypeCheckHostAdapter(this.rootNames, this.options, this.host, this.metadataCache, codegen, this.summariesFromPreviousCompilations);
+        var hostAdapter = new compiler_host_1.TsCompilerAotCompilerTypeCheckHostAdapter(this.rootNames, this.options, this.host, this.metadataCache, codegen, this.oldProgramLibrarySummaries);
         var aotOptions = getAotCompilerOptions(this.options);
         this._compiler = compiler_1.createAotCompiler(hostAdapter, aotOptions).compiler;
         this._typeCheckHost = hostAdapter;
@@ -326,21 +324,38 @@ var AngularCompilerProgram = (function () {
         var rootNames = this.rootNames.filter(function (fn) { return !util_1.GENERATED_FILES.test(fn) || !hostAdapter.isSourceFile(fn); });
         if (this.options.noResolve) {
             this.rootNames.forEach(function (rootName) {
-                var sf = hostAdapter.getSourceFile(rootName, _this.options.target || ts.ScriptTarget.Latest);
-                sf.referencedFiles.forEach(function (fileRef) {
-                    if (util_1.GENERATED_FILES.test(fileRef.fileName)) {
-                        rootNames.push(fileRef.fileName);
-                    }
-                });
+                if (hostAdapter.shouldGenerateFilesFor(rootName)) {
+                    rootNames.push.apply(rootNames, _this._compiler.findGeneratedFileNames(rootName));
+                }
             });
         }
         var tmpProgram = ts.createProgram(rootNames, this.options, hostAdapter, oldTsProgram);
-        return { tmpProgram: tmpProgram, analyzedFiles: analyzedFiles, hostAdapter: hostAdapter, rootNames: rootNames };
+        var sourceFiles = [];
+        tmpProgram.getSourceFiles().forEach(function (sf) {
+            if (hostAdapter.isSourceFile(sf.fileName)) {
+                sourceFiles.push(sf.fileName);
+            }
+        });
+        return { tmpProgram: tmpProgram, sourceFiles: sourceFiles, hostAdapter: hostAdapter, rootNames: rootNames };
     };
     AngularCompilerProgram.prototype._updateProgramWithTypeCheckStubs = function (tmpProgram, analyzedModules, hostAdapter, rootNames) {
-        this._analyzedModules = analyzedModules;
-        var genFiles = this._compiler.emitTypeCheckStubs(analyzedModules);
-        genFiles.forEach(function (gf) { return hostAdapter.updateGeneratedFile(gf); });
+        var _this = this;
+        this._analyzedModules = analyzedModules || emptyModules;
+        if (analyzedModules) {
+            tmpProgram.getSourceFiles().forEach(function (sf) {
+                if (sf.fileName.endsWith('.ngfactory.ts')) {
+                    var _a = hostAdapter.shouldGenerateFile(sf.fileName), generate = _a.generate, baseFileName = _a.baseFileName;
+                    if (generate) {
+                        // Note: ! is ok as hostAdapter.shouldGenerateFile will always return a basefileName
+                        // for .ngfactory.ts files.
+                        var genFile = _this._compiler.emitTypeCheckStub(sf.fileName, baseFileName);
+                        if (genFile) {
+                            hostAdapter.updateGeneratedFile(genFile);
+                        }
+                    }
+                }
+            });
+        }
         this._tsProgram = ts.createProgram(rootNames, this.options, hostAdapter, tmpProgram);
         // Note: the new ts program should be completely reusable by TypeScript as:
         // - we cache all the files in the hostAdapter
@@ -371,7 +386,7 @@ var AngularCompilerProgram = (function () {
                         code: api_1.DEFAULT_ERROR_CODE
                     }];
             }
-            return emptyModules;
+            return null;
         }
         throw e;
     };
@@ -382,7 +397,7 @@ var AngularCompilerProgram = (function () {
             if (!(emitFlags & api_1.EmitFlags.Codegen)) {
                 return { genFiles: [], genDiags: [] };
             }
-            var genFiles = this._emittedGenFiles = this.compiler.emitAllImpls(this.analyzedModules);
+            var genFiles = this.compiler.emitAllImpls(this.analyzedModules);
             return { genFiles: genFiles, genDiags: [] };
         }
         catch (e) {
@@ -405,6 +420,50 @@ var AngularCompilerProgram = (function () {
     };
     AngularCompilerProgram.prototype.generateSemanticDiagnostics = function () {
         return translate_diagnostics_1.translateDiagnostics(this.typeCheckHost, this.tsProgram.getSemanticDiagnostics());
+    };
+    AngularCompilerProgram.prototype.writeFile = function (outFileName, outData, writeByteOrderMark, onError, genFile, sourceFiles) {
+        // collect emittedLibrarySummaries
+        var baseFile;
+        if (genFile) {
+            baseFile = this.tsProgram.getSourceFile(genFile.srcFileUrl);
+            if (baseFile) {
+                if (!this.emittedLibrarySummaries) {
+                    this.emittedLibrarySummaries = [];
+                }
+                if (genFile.genFileUrl.endsWith('.ngsummary.json') && baseFile.fileName.endsWith('.d.ts')) {
+                    this.emittedLibrarySummaries.push({
+                        fileName: baseFile.fileName,
+                        text: baseFile.text,
+                        sourceFile: baseFile,
+                    });
+                    this.emittedLibrarySummaries.push({ fileName: genFile.genFileUrl, text: outData });
+                }
+                else if (outFileName.endsWith('.d.ts') && baseFile.fileName.endsWith('.d.ts')) {
+                    var dtsSourceFilePath = genFile.genFileUrl.replace(/\.ts$/, '.d.ts');
+                    // Note: Don't use sourceFiles here as the created .d.ts has a path in the outDir,
+                    // but we need one that is next to the .ts file
+                    this.emittedLibrarySummaries.push({ fileName: dtsSourceFilePath, text: outData });
+                }
+            }
+        }
+        // Filter out generated files for which we didn't generate code.
+        // This can happen as the stub caclulation is not completely exact.
+        // Note: sourceFile refers to the .ngfactory.ts / .ngsummary.ts file
+        var isGenerated = util_1.GENERATED_FILES.test(outFileName);
+        if (isGenerated) {
+            if (!genFile || !genFile.stmts || genFile.stmts.length === 0) {
+                if (this.options.allowEmptyCodegenFiles) {
+                    outData = '';
+                }
+                else {
+                    return;
+                }
+            }
+        }
+        if (baseFile) {
+            sourceFiles = sourceFiles ? sourceFiles.concat([baseFile]) : [baseFile];
+        }
+        this.host.writeFile(outFileName, outData, writeByteOrderMark, onError, sourceFiles);
     };
     return AngularCompilerProgram;
 }());
@@ -443,27 +502,7 @@ function getAotCompilerOptions(options) {
         enableSummariesForJit: true,
         preserveWhitespaces: options.preserveWhitespaces,
         fullTemplateTypeCheck: options.fullTemplateTypeCheck,
-        rootDir: options.rootDir,
-    };
-}
-function createWriteFileCallback(generatedFiles, host, outSrcMapping) {
-    var genFileByFileName = new Map();
-    generatedFiles.forEach(function (genFile) { return genFileByFileName.set(genFile.genFileUrl, genFile); });
-    return function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
-        var sourceFile = sourceFiles && sourceFiles.length == 1 ? sourceFiles[0] : null;
-        if (sourceFile) {
-            outSrcMapping.push({ outFileName: fileName, sourceFile: sourceFile });
-        }
-        var isGenerated = util_1.GENERATED_FILES.test(fileName);
-        if (isGenerated && sourceFile) {
-            // Filter out generated files for which we didn't generate code.
-            // This can happen as the stub caclulation is not completely exact.
-            var genFile = genFileByFileName.get(sourceFile.fileName);
-            if (!genFile || !genFile.stmts || genFile.stmts.length === 0) {
-                return;
-            }
-        }
-        host.writeFile(fileName, data, writeByteOrderMark, onError, sourceFiles);
+        allowEmptyCodegenFiles: options.allowEmptyCodegenFiles,
     };
 }
 function getNgOptionDiagnostics(options) {

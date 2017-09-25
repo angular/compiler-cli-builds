@@ -125,12 +125,14 @@ var PathMappedCompilerHost = (function (_super) {
                 continue;
             }
             if (DTS.test(rootedPath)) {
-                var metadataPath = rootedPath.replace(DTS, '.metadata.json');
-                if (this.context.fileExists(metadataPath)) {
-                    return this.readMetadata(metadataPath, rootedPath);
+                var metadatas = this.readMetadata(rootedPath);
+                if (metadatas) {
+                    return metadatas;
                 }
             }
             else {
+                // Attention: don't cache this, so that e.g. the LanguageService
+                // can read in changes from source files in the metadata!
                 var metadata = this.getMetadataForSourceFile(rootedPath);
                 return metadata ? [metadata] : [];
             }

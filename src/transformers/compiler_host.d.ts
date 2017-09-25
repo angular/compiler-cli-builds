@@ -10,13 +10,17 @@ import * as ts from 'typescript';
 import { BaseAotCompilerHost } from '../compiler_host';
 import { TypeCheckHost } from '../diagnostics/translate_diagnostics';
 import { ModuleMetadata } from '../metadata/index';
-import { CompilerHost, CompilerOptions } from './api';
+import { CompilerHost, CompilerOptions, LibrarySummary } from './api';
 export declare function createCompilerHost({options, tsHost}: {
     options: CompilerOptions;
     tsHost?: ts.CompilerHost;
 }): CompilerHost;
 export interface MetadataProvider {
     getMetadata(sourceFile: ts.SourceFile): ModuleMetadata | undefined;
+}
+export interface CodeGenerator {
+    generateFile(genFileName: string, baseFileName?: string): GeneratedFile;
+    findGeneratedFileNames(fileName: string): string[];
 }
 /**
  * Implements the following hosts based on an api.CompilerHost:
@@ -28,7 +32,6 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     private rootFiles;
     private metadataProvider;
     private codeGenerator;
-    private summariesFromPreviousCompilations;
     private rootDirs;
     private moduleResolutionCache;
     private originalSourceFiles;
@@ -36,12 +39,13 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     private generatedSourceFiles;
     private generatedCodeFor;
     private emitter;
+    private librarySummaries;
     getCancellationToken: () => ts.CancellationToken;
     getDefaultLibLocation: () => string;
     trace: (s: string) => void;
     getDirectories: (path: string) => string[];
     directoryExists?: (directoryName: string) => boolean;
-    constructor(rootFiles: string[], options: CompilerOptions, context: CompilerHost, metadataProvider: MetadataProvider, codeGenerator: (fileName: string) => GeneratedFile[], summariesFromPreviousCompilations: Map<string, string>);
+    constructor(rootFiles: string[], options: CompilerOptions, context: CompilerHost, metadataProvider: MetadataProvider, codeGenerator: CodeGenerator, librarySummaries: LibrarySummary[]);
     private resolveModuleName(moduleName, containingFile);
     resolveModuleNames(moduleNames: string[], containingFile: string): ts.ResolvedModule[];
     moduleNameToFileName(m: string, containingFile?: string): string | null;
@@ -69,16 +73,20 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     parseSourceSpanOf(fileName: string, line: number, character: number): ParseSourceSpan | null;
     private getOriginalSourceFile(filePath, languageVersion?, onError?);
     getMetadataForSourceFile(filePath: string): ModuleMetadata | undefined;
-    updateGeneratedFile(genFile: GeneratedFile): ts.SourceFile | null;
+    updateGeneratedFile(genFile: GeneratedFile): ts.SourceFile;
     private addGeneratedFile(genFile, externalReferences);
-    private ensureCodeGeneratedFor(fileName);
+    shouldGenerateFile(fileName: string): {
+        generate: boolean;
+        baseFileName?: string;
+    };
+    shouldGenerateFilesFor(fileName: string): string | boolean | null;
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined): ts.SourceFile;
+    private getGeneratedFile(fileName);
     private originalFileExists(fileName);
     fileExists(fileName: string): boolean;
-    private _getBaseNameForGeneratedSourceFile(genFileName);
     loadSummary(filePath: string): string | null;
     isSourceFile(filePath: string): boolean;
-    readFile: (fileName: string) => string;
+    readFile(fileName: string): string;
     getDefaultLibFileName: (options: ts.CompilerOptions) => string;
     getCurrentDirectory: () => string;
     getCanonicalFileName: (fileName: string) => string;

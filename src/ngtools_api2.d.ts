@@ -78,6 +78,11 @@ export interface TsEmitArguments {
 export interface TsEmitCallback {
     (args: TsEmitArguments): ts.EmitResult;
 }
+export interface LibrarySummary {
+    fileName: string;
+    text: string;
+    sourceFile?: ts.SourceFile;
+}
 export interface Program {
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
@@ -93,10 +98,7 @@ export interface Program {
         customTransformers?: CustomTransformers;
         emitCallback?: TsEmitCallback;
     }): ts.EmitResult;
-    getLibrarySummaries(): {
-        fileName: string;
-        content: string;
-    }[];
+    getLibrarySummaries(): LibrarySummary[];
 }
 export declare function createProgram({rootNames, options, host, oldProgram}: {
     rootNames: string[];

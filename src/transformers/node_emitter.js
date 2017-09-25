@@ -229,8 +229,8 @@ var _NodeEmitterVisitor = (function () {
         return this.record(expr, this._visitIdentifier(expr.value));
     };
     _NodeEmitterVisitor.prototype.visitConditionalExpr = function (expr) {
-        // TODO {chuckj}: Review use of ! on flaseCase. Should it be non-nullable?
-        return this.record(expr, ts.createConditional(expr.condition.visitExpression(this, null), expr.trueCase.visitExpression(this, null), expr.falseCase.visitExpression(this, null)));
+        // TODO {chuckj}: Review use of ! on falseCase. Should it be non-nullable?
+        return this.record(expr, ts.createParen(ts.createConditional(expr.condition.visitExpression(this, null), expr.trueCase.visitExpression(this, null), expr.falseCase.visitExpression(this, null))));
     };
     _NodeEmitterVisitor.prototype.visitNotExpr = function (expr) {
         return this.record(expr, ts.createPrefix(ts.SyntaxKind.ExclamationToken, expr.condition.visitExpression(this, null)));
@@ -300,7 +300,7 @@ var _NodeEmitterVisitor = (function () {
             default:
                 throw new Error("Unknown operator: " + expr.operator);
         }
-        return this.record(expr, ts.createBinary(expr.lhs.visitExpression(this, null), binaryOperator, expr.rhs.visitExpression(this, null)));
+        return this.record(expr, ts.createParen(ts.createBinary(expr.lhs.visitExpression(this, null), binaryOperator, expr.rhs.visitExpression(this, null))));
     };
     _NodeEmitterVisitor.prototype.visitReadPropExpr = function (expr) {
         return this.record(expr, ts.createPropertyAccess(expr.receiver.visitExpression(this, null), expr.name));
