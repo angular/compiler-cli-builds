@@ -255,11 +255,7 @@ var LowerMetadataCache = (function () {
             }
             return value;
         };
-        // Do not validate or lower metadata in a declaration file. Declaration files are requested
-        // when we need to update the version of the metadata to add informatoin that might be missing
-        // in the out-of-date version that can be recovered from the .d.ts file.
-        var declarationFile = sourceFile.isDeclarationFile;
-        var metadata = this.collector.getMetadata(sourceFile, this.strict && !declarationFile, declarationFile ? undefined : substituteExpression);
+        var metadata = this.collector.getMetadata(sourceFile, this.strict, sourceFile.isDeclarationFile ? undefined : substituteExpression);
         return { metadata: metadata, requests: requests };
     };
     return LowerMetadataCache;
