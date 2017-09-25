@@ -15,8 +15,11 @@ var EmitFlags;
 (function (EmitFlags) {
     EmitFlags[EmitFlags["DTS"] = 1] = "DTS";
     EmitFlags[EmitFlags["JS"] = 2] = "JS";
+    EmitFlags[EmitFlags["Metadata"] = 4] = "Metadata";
+    EmitFlags[EmitFlags["I18nBundle"] = 8] = "I18nBundle";
     EmitFlags[EmitFlags["Codegen"] = 16] = "Codegen";
     EmitFlags[EmitFlags["Default"] = 19] = "Default";
+    EmitFlags[EmitFlags["All"] = 31] = "All";
 })(EmitFlags = exports.EmitFlags || (exports.EmitFlags = {}));
 // Wrapper for createProgram.
 function createProgram(_a) {
