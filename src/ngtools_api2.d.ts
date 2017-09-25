@@ -55,11 +55,8 @@ export interface CompilerHost extends ts.CompilerHost {
 export declare enum EmitFlags {
     DTS = 1,
     JS = 2,
-    Metadata = 4,
-    I18nBundle = 8,
     Codegen = 16,
     Default = 19,
-    All = 31,
 }
 export interface CustomTransformers {
     beforeTs?: ts.TransformerFactory<ts.SourceFile>[];
