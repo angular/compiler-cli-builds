@@ -47,7 +47,7 @@ var MetadataBundler = (function () {
         return {
             metadata: {
                 __symbolic: 'module',
-                version: schema_1.VERSION,
+                version: schema_1.METADATA_VERSION,
                 exports: exports.length ? exports : undefined, metadata: metadata, origins: origins,
                 importAs: this.importAs
             },

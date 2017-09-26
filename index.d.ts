@@ -14,6 +14,7 @@ export { BuiltinType, DeclarationKind, Definition, PipeInfo, Pipes, Signature, S
 export { getClassMembersFromDeclaration, getPipesTable, getSymbolQuery } from './src/diagnostics/typescript_symbols';
 export { Extractor } from './src/extractor';
 export { VERSION } from './src/version';
+export * from './src/metadata';
 export * from './src/transformers/api';
 export * from './src/transformers/entry_points';
 export * from './src/perform_compile';

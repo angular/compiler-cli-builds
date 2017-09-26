@@ -29,7 +29,7 @@ export declare abstract class BaseAotCompilerHost<C extends BaseAotCompilerHostC
     protected getImportAs(fileName: string): string | undefined;
     getMetadataFor(filePath: string): ModuleMetadata[] | undefined;
     protected readMetadata(dtsFilePath: string): ModuleMetadata[] | undefined;
-    private upgradeVersion1Metadata(v1Metadata, dtsFilePath);
+    private upgradeMetadataWithDtsData(oldMetadata, dtsFilePath);
     loadResource(filePath: string): Promise<string> | string;
     loadSummary(filePath: string): string | null;
     isSourceFile(filePath: string): boolean;

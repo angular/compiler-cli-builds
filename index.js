@@ -34,6 +34,7 @@ var extractor_1 = require("./src/extractor");
 exports.Extractor = extractor_1.Extractor;
 var version_1 = require("./src/version");
 exports.VERSION = version_1.VERSION;
+__export(require("./src/metadata"));
 __export(require("./src/transformers/api"));
 __export(require("./src/transformers/entry_points"));
 __export(require("./src/perform_compile"));

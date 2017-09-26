@@ -509,7 +509,7 @@ var MetadataCollector = (function () {
             }
             var result = {
                 __symbolic: 'module',
-                version: this.options.version || schema_1.VERSION, metadata: metadata
+                version: this.options.version || schema_1.METADATA_VERSION, metadata: metadata
             };
             if (exports)
                 result.exports = exports;
