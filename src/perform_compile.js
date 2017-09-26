@@ -49,7 +49,7 @@ function formatDiagnostics(options, diags) {
                 return res;
             }
         })
-            .join();
+            .join('');
     }
     else
         return '';
