@@ -26,6 +26,7 @@ export interface CompilerOptions extends ts.CompilerOptions {
     skipMetadataEmit?: boolean;
     strictMetadataEmit?: boolean;
     skipTemplateCodegen?: boolean;
+    strictInjectionParameters?: boolean;
     flatModuleOutFile?: string;
     flatModuleId?: string;
     generateCodeForLibraries?: boolean;
