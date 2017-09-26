@@ -54,8 +54,10 @@ function createLiteral(value) {
 var _NodeEmitterVisitor = (function () {
     function _NodeEmitterVisitor() {
         this._nodeMap = new Map();
+        this._mapped = new Set();
         this._importsWithPrefixes = new Map();
         this._reexports = new Map();
+        this._templateSources = new Map();
     }
     _NodeEmitterVisitor.prototype.getReexports = function () {
         return Array.from(this._reexports.entries())
@@ -87,9 +89,31 @@ var _NodeEmitterVisitor = (function () {
         var _this = this;
         if (tsNode && !this._nodeMap.has(tsNode)) {
             this._nodeMap.set(tsNode, ngNode);
+            if (!this._mapped.has(ngNode)) {
+                this._mapped.add(ngNode);
+                var range = this.sourceRangeOf(ngNode);
+                if (range) {
+                    ts.setSourceMapRange(tsNode, range);
+                }
+            }
             ts.forEachChild(tsNode, function (child) { return _this.record(ngNode, tsNode); });
         }
         return tsNode;
+    };
+    _NodeEmitterVisitor.prototype.sourceRangeOf = function (node) {
+        if (node.sourceSpan) {
+            var span = node.sourceSpan;
+            if (span.start.file == span.end.file) {
+                var file = span.start.file;
+                var source = this._templateSources.get(file);
+                if (!source) {
+                    source = ts.createSourceMapSource(file.url, file.content, function (pos) { return pos; });
+                    this._templateSources.set(file, source);
+                }
+                return { pos: span.start.offset, end: span.end.offset, source: source };
+            }
+        }
+        return null;
     };
     _NodeEmitterVisitor.prototype.getModifiers = function (stmt) {
         var modifiers = [];
