@@ -45,7 +45,7 @@ function createEmitCallback(options) {
         fileNameToModuleId: function (fileName) { return fileName; },
         googmodule: false,
         untyped: true,
-        convertIndexImportShorthand: true, transformDecorators: transformDecorators, transformTypesToClosure: transformTypesToClosure,
+        convertIndexImportShorthand: false, transformDecorators: transformDecorators, transformTypesToClosure: transformTypesToClosure,
     };
     return function (_a) {
         var program = _a.program, targetSourceFile = _a.targetSourceFile, writeFile = _a.writeFile, cancellationToken = _a.cancellationToken, emitOnlyDtsFiles = _a.emitOnlyDtsFiles, _b = _a.customTransformers, customTransformers = _b === void 0 ? {} : _b, host = _a.host, options = _a.options;
