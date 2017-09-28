@@ -14,6 +14,17 @@ export declare function createProgram({rootNames, options, host, oldProgram}: {
     host: CompilerHost;
     oldProgram?: Program;
 }): Program;
+/**
+ * Returns a function that can adjust a path from source path to out path,
+ * based on an existing mapping from source to out path.
+ *
+ * TODO(tbosch): talk to the TypeScript team to expose their logic for calculating the `rootDir`
+ * if none was specified.
+ *
+ * @param outDir
+ * @param outSrcMappings
+ */
+export declare function createSrcToOutPathMapper(outDir: string | undefined, sampleSrcFileName: string | undefined, sampleOutFileName: string | undefined): (srcFileName: string) => string;
 export declare function i18nExtract(formatName: string | null, outFile: string | null, host: ts.CompilerHost, options: CompilerOptions, bundle: MessageBundle): string[];
 export declare function i18nSerialize(bundle: MessageBundle, formatName: string, options: CompilerOptions): string;
 export declare function i18nGetExtension(formatName: string): string;

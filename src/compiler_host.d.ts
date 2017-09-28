@@ -26,7 +26,6 @@ export declare abstract class BaseAotCompilerHost<C extends BaseAotCompilerHostC
     abstract toSummaryFileName(fileName: string, referringSrcFileName: string): string;
     abstract fromSummaryFileName(fileName: string, referringLibFileName: string): string;
     abstract getMetadataForSourceFile(filePath: string): ModuleMetadata | undefined;
-    protected getImportAs(fileName: string): string | undefined;
     getMetadataFor(filePath: string): ModuleMetadata[] | undefined;
     protected readMetadata(dtsFilePath: string): ModuleMetadata[] | undefined;
     private upgradeMetadataWithDtsData(oldMetadata, dtsFilePath);

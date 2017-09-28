@@ -173,7 +173,13 @@ var AngularCompilerProgram = (function () {
             // if no files were emitted by TypeScript, also don't emit .json files
             return emitResult;
         }
-        var srcToOutPath = this.createSrcToOutPathMapper(outSrcMapping);
+        var sampleSrcFileName;
+        var sampleOutFileName;
+        if (outSrcMapping.length) {
+            sampleSrcFileName = outSrcMapping[0].sourceFile.fileName;
+            sampleOutFileName = outSrcMapping[0].outFileName;
+        }
+        var srcToOutPath = createSrcToOutPathMapper(this.options.outDir, sampleSrcFileName, sampleOutFileName);
         if (emitFlags & api_1.EmitFlags.Codegen) {
             genFiles.forEach(function (gf) {
                 if (gf.source) {
@@ -264,29 +270,6 @@ var AngularCompilerProgram = (function () {
         }
         var afterTs = customTransformers ? customTransformers.afterTs : undefined;
         return { before: beforeTs, after: afterTs };
-    };
-    AngularCompilerProgram.prototype.createSrcToOutPathMapper = function (outSrcMappings) {
-        var _this = this;
-        var srcToOutPath;
-        if (this.options.outDir) {
-            // TODO(tbosch): talk to TypeScript team to expose their logic for calculating the `rootDir`
-            // if none was specified.
-            if (outSrcMappings.length === 0) {
-                throw new Error("Can't calculate the rootDir without at least one outSrcMapping. ");
-            }
-            var firstEntry = outSrcMappings[0];
-            var entrySrcDir = path.dirname(firstEntry.sourceFile.fileName);
-            var entryOutDir = path.dirname(firstEntry.outFileName);
-            var commonSuffix = longestCommonSuffix(entrySrcDir, entryOutDir);
-            var rootDir_1 = entrySrcDir.substring(0, entrySrcDir.length - commonSuffix.length);
-            srcToOutPath = function (srcFileName) {
-                return path.resolve(_this.options.outDir, path.relative(rootDir_1, srcFileName));
-            };
-        }
-        else {
-            srcToOutPath = function (srcFileName) { return srcFileName; };
-        }
-        return srcToOutPath;
     };
     AngularCompilerProgram.prototype.initSync = function () {
         if (this._analyzedModules) {
@@ -437,6 +420,12 @@ var AngularCompilerProgram = (function () {
                         sourceFile: baseFile,
                     });
                     this.emittedLibrarySummaries.push({ fileName: genFile.genFileUrl, text: outData });
+                    if (!this.options.declaration) {
+                        // If we don't emit declarations, still record an empty .ngfactory.d.ts file,
+                        // as we might need it lateron for resolving module names from summaries.
+                        var ngFactoryDts = genFile.genFileUrl.substring(0, genFile.genFileUrl.length - 15) + '.ngfactory.d.ts';
+                        this.emittedLibrarySummaries.push({ fileName: ngFactoryDts, text: '' });
+                    }
                 }
                 else if (outFileName.endsWith('.d.ts') && baseFile.fileName.endsWith('.d.ts')) {
                     var dtsSourceFilePath = genFile.genFileUrl.replace(/\.ts$/, '.d.ts');
@@ -522,13 +511,43 @@ function getNgOptionDiagnostics(options) {
     }
     return [];
 }
-function longestCommonSuffix(a, b) {
-    var len = 0;
-    while (a.charCodeAt(a.length - 1 - len) === b.charCodeAt(b.length - 1 - len)) {
-        len++;
+/**
+ * Returns a function that can adjust a path from source path to out path,
+ * based on an existing mapping from source to out path.
+ *
+ * TODO(tbosch): talk to the TypeScript team to expose their logic for calculating the `rootDir`
+ * if none was specified.
+ *
+ * @param outDir
+ * @param outSrcMappings
+ */
+function createSrcToOutPathMapper(outDir, sampleSrcFileName, sampleOutFileName) {
+    var srcToOutPath;
+    if (outDir) {
+        if (sampleSrcFileName == null || sampleOutFileName == null) {
+            throw new Error("Can't calculate the rootDir without a sample srcFileName / outFileName. ");
+        }
+        var srcFileDir = path.dirname(sampleSrcFileName);
+        var outFileDir = path.dirname(sampleOutFileName);
+        if (srcFileDir === outFileDir) {
+            return function (srcFileName) { return srcFileName; };
+        }
+        var srcDirParts = srcFileDir.split(path.sep);
+        var outDirParts = outFileDir.split(path.sep);
+        // calculate the common suffix
+        var i = 0;
+        while (i < Math.min(srcDirParts.length, outDirParts.length) &&
+            srcDirParts[srcDirParts.length - 1 - i] === outDirParts[outDirParts.length - 1 - i])
+            i++;
+        var rootDir_1 = srcDirParts.slice(0, srcDirParts.length - i).join(path.sep);
+        srcToOutPath = function (srcFileName) { return path.resolve(outDir, path.relative(rootDir_1, srcFileName)); };
     }
-    return a.substring(a.length - len);
+    else {
+        srcToOutPath = function (srcFileName) { return srcFileName; };
+    }
+    return srcToOutPath;
 }
+exports.createSrcToOutPathMapper = createSrcToOutPathMapper;
 function i18nExtract(formatName, outFile, host, options, bundle) {
     formatName = formatName || 'null';
     // Checks the format and returns the extension

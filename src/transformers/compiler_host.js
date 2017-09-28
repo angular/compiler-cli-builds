@@ -156,10 +156,6 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function (_super) {
         if (this.options.traceResolution) {
             console.error('fileNameToModuleName from containingFile', containingFile, 'to importedFile', importedFile);
         }
-        var importAs = this.getImportAs(importedFile);
-        if (importAs) {
-            return importAs;
-        }
         // drop extension
         importedFile = importedFile.replace(EXT, '');
         var importedFilePackagName = getPackageName(importedFile);
