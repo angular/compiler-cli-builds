@@ -32,6 +32,7 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     private rootFiles;
     private metadataProvider;
     private codeGenerator;
+    private librarySummaries;
     private rootDirs;
     private moduleResolutionCache;
     private originalSourceFiles;
@@ -39,13 +40,12 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     private generatedSourceFiles;
     private generatedCodeFor;
     private emitter;
-    private librarySummaries;
     getCancellationToken: () => ts.CancellationToken;
     getDefaultLibLocation: () => string;
     trace: (s: string) => void;
     getDirectories: (path: string) => string[];
     directoryExists?: (directoryName: string) => boolean;
-    constructor(rootFiles: string[], options: CompilerOptions, context: CompilerHost, metadataProvider: MetadataProvider, codeGenerator: CodeGenerator, librarySummaries: LibrarySummary[]);
+    constructor(rootFiles: string[], options: CompilerOptions, context: CompilerHost, metadataProvider: MetadataProvider, codeGenerator: CodeGenerator, librarySummaries?: Map<string, LibrarySummary>);
     private resolveModuleName(moduleName, containingFile);
     resolveModuleNames(moduleNames: string[], containingFile: string): ts.ResolvedModule[];
     moduleNameToFileName(m: string, containingFile?: string): string | null;

@@ -21,7 +21,12 @@ var path = require("path");
 var ts = require("typescript");
 var api = require("./transformers/api");
 var ng = require("./transformers/entry_points");
+var util_1 = require("./transformers/util");
 var TS_EXT = /\.ts$/;
+function filterErrorsAndWarnings(diagnostics) {
+    return diagnostics.filter(function (d) { return d.category !== ts.DiagnosticCategory.Message; });
+}
+exports.filterErrorsAndWarnings = filterErrorsAndWarnings;
 function formatDiagnostics(options, diags) {
     if (diags && diags.length) {
         var tsFormatHost_1 = {
@@ -110,7 +115,7 @@ function readConfiguration(project, existingOptions) {
 }
 exports.readConfiguration = readConfiguration;
 function exitCodeFromResult(diags) {
-    if (!diags || diags.length === 0) {
+    if (!diags || filterErrorsAndWarnings(diags).length === 0) {
         // If we have a result and didn't get any errors, we succeeded.
         return 0;
     }
@@ -128,7 +133,12 @@ function performCompilation(_a) {
             host = ng.createCompilerHost({ options: options });
         }
         program = ng.createProgram({ rootNames: rootNames, host: host, options: options, oldProgram: oldProgram });
+        var beforeDiags = Date.now();
         allDiagnostics.push.apply(allDiagnostics, gatherDiagnostics(program));
+        if (options.diagnostics) {
+            var afterDiags = Date.now();
+            allDiagnostics.push(util_1.createMessageDiagnostic("Time for diagnostics: " + (afterDiags - beforeDiags) + "ms."));
+        }
         if (!hasErrors(allDiagnostics)) {
             emitResult = program.emit({ emitCallback: emitCallback, customTransformers: customTransformers, emitFlags: emitFlags });
             allDiagnostics.push.apply(allDiagnostics, emitResult.diagnostics);

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
+import { Diagnostic } from './api';
 export declare const GENERATED_FILES: RegExp;
 export declare const enum StructureIsReused {
     Not = 0,
@@ -13,3 +14,4 @@ export declare const enum StructureIsReused {
     Completely = 2,
 }
 export declare function tsStructureIsReused(program: ts.Program): StructureIsReused;
+export declare function createMessageDiagnostic(messageText: string): ts.Diagnostic & Diagnostic;

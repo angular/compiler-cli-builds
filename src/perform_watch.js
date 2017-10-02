@@ -13,26 +13,7 @@ var ts = require("typescript");
 var perform_compile_1 = require("./perform_compile");
 var api = require("./transformers/api");
 var entry_points_1 = require("./transformers/entry_points");
-var ChangeDiagnostics = {
-    Compilation_complete_Watching_for_file_changes: {
-        category: ts.DiagnosticCategory.Message,
-        messageText: 'Compilation complete. Watching for file changes.',
-        code: api.DEFAULT_ERROR_CODE,
-        source: api.SOURCE
-    },
-    Compilation_failed_Watching_for_file_changes: {
-        category: ts.DiagnosticCategory.Message,
-        messageText: 'Compilation failed. Watching for file changes.',
-        code: api.DEFAULT_ERROR_CODE,
-        source: api.SOURCE
-    },
-    File_change_detected_Starting_incremental_compilation: {
-        category: ts.DiagnosticCategory.Message,
-        messageText: 'File change detected. Starting incremental compilation.',
-        code: api.DEFAULT_ERROR_CODE,
-        source: api.SOURCE
-    },
-};
+var util_1 = require("./transformers/util");
 function totalCompilationTimeDiagnostic(timeInMillis) {
     var duration;
     if (timeInMillis > 1000) {
@@ -194,10 +175,10 @@ function performWatchCompilation(host) {
         var exitCode = perform_compile_1.exitCodeFromResult(compileResult.diagnostics);
         if (exitCode == 0) {
             cachedProgram = compileResult.program;
-            host.reportDiagnostics([ChangeDiagnostics.Compilation_complete_Watching_for_file_changes]);
+            host.reportDiagnostics([util_1.createMessageDiagnostic('Compilation complete. Watching for file changes.')]);
         }
         else {
-            host.reportDiagnostics([ChangeDiagnostics.Compilation_failed_Watching_for_file_changes]);
+            host.reportDiagnostics([util_1.createMessageDiagnostic('Compilation failed. Watching for file changes.')]);
         }
         return compileResult.diagnostics;
     }
@@ -242,7 +223,7 @@ function performWatchCompilation(host) {
     }
     function recompile() {
         timerHandleForRecompilation = undefined;
-        host.reportDiagnostics([ChangeDiagnostics.File_change_detected_Starting_incremental_compilation]);
+        host.reportDiagnostics([util_1.createMessageDiagnostic('File change detected. Starting incremental compilation.')]);
         doCompilation();
     }
 }

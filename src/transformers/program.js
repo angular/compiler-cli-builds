@@ -18,6 +18,11 @@ var compiler_host_1 = require("./compiler_host");
 var lower_expressions_1 = require("./lower_expressions");
 var node_emitter_transform_1 = require("./node_emitter_transform");
 var util_1 = require("./util");
+/**
+ * Maximum number of files that are emitable via calling ts.Program.emit
+ * passing individual targetSourceFiles.
+ */
+var MAX_FILE_COUNT_FOR_SINGLE_FILE_EMIT = 20;
 var emptyModules = {
     ngModules: [],
     ngModuleByPipeOrDirective: new Map(),
@@ -33,7 +38,6 @@ var AngularCompilerProgram = (function () {
         this.options = options;
         this.host = host;
         this.oldProgram = oldProgram;
-        this.oldProgramLibrarySummaries = [];
         this._optionsDiagnostics = [];
         var _a = ts.version.split('.'), major = _a[0], minor = _a[1];
         if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 4)) {
@@ -42,6 +46,7 @@ var AngularCompilerProgram = (function () {
         this.oldTsProgram = oldProgram ? oldProgram.getTsProgram() : undefined;
         if (oldProgram) {
             this.oldProgramLibrarySummaries = oldProgram.getLibrarySummaries();
+            this.oldProgramEmittedGeneratedFiles = oldProgram.getEmittedGeneratedFiles();
         }
         if (options.flatModuleOutFile) {
             var _b = index_1.createBundleIndexHost(options, rootNames, host), bundleHost = _b.host, indexName = _b.indexName, errors = _b.errors;
@@ -64,9 +69,22 @@ var AngularCompilerProgram = (function () {
         var _c;
     }
     AngularCompilerProgram.prototype.getLibrarySummaries = function () {
-        var result = this.oldProgramLibrarySummaries.slice();
+        var result = new Map();
+        if (this.oldProgramLibrarySummaries) {
+            this.oldProgramLibrarySummaries.forEach(function (summary, fileName) { return result.set(fileName, summary); });
+        }
         if (this.emittedLibrarySummaries) {
-            result.push.apply(result, this.emittedLibrarySummaries);
+            this.emittedLibrarySummaries.forEach(function (summary, fileName) { return result.set(summary.fileName, summary); });
+        }
+        return result;
+    };
+    AngularCompilerProgram.prototype.getEmittedGeneratedFiles = function () {
+        var result = new Map();
+        if (this.oldProgramEmittedGeneratedFiles) {
+            this.oldProgramEmittedGeneratedFiles.forEach(function (genFile, fileName) { return result.set(fileName, genFile); });
+        }
+        if (this.emittedGeneratedFiles) {
+            this.emittedGeneratedFiles.forEach(function (genFile) { return result.set(genFile.genFileUrl, genFile); });
         }
         return result;
     };
@@ -107,6 +125,7 @@ var AngularCompilerProgram = (function () {
     AngularCompilerProgram.prototype.emit = function (_a) {
         var _this = this;
         var _b = _a === void 0 ? {} : _a, _c = _b.emitFlags, emitFlags = _c === void 0 ? api_1.EmitFlags.Default : _c, cancellationToken = _b.cancellationToken, customTransformers = _b.customTransformers, _d = _b.emitCallback, emitCallback = _d === void 0 ? defaultEmitCallback : _d;
+        var emitStart = Date.now();
         if (emitFlags & api_1.EmitFlags.I18nBundle) {
             var locale = this.options.i18nOutLocale || null;
             var file = this.options.i18nOutFile || null;
@@ -126,10 +145,11 @@ var AngularCompilerProgram = (function () {
                 emittedFiles: [],
             };
         }
-        var emittedLibrarySummaries = this.emittedLibrarySummaries = [];
+        this.emittedGeneratedFiles = genFiles;
         var outSrcMapping = [];
         var genFileByFileName = new Map();
         genFiles.forEach(function (genFile) { return genFileByFileName.set(genFile.genFileUrl, genFile); });
+        this.emittedLibrarySummaries = [];
         var writeTsFile = function (outFileName, outData, writeByteOrderMark, onError, sourceFiles) {
             var sourceFile = sourceFiles && sourceFiles.length == 1 ? sourceFiles[0] : null;
             var genFile;
@@ -139,6 +159,8 @@ var AngularCompilerProgram = (function () {
             }
             _this.writeFile(outFileName, outData, writeByteOrderMark, onError, genFile, sourceFiles);
         };
+        var tsCustomTansformers = this.calculateTransforms(genFileByFileName, customTransformers);
+        var emitOnlyDtsFiles = (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS;
         // Restore the original references before we emit so TypeScript doesn't emit
         // a reference to the .d.ts file.
         var augmentedReferences = new Map();
@@ -150,16 +172,43 @@ var AngularCompilerProgram = (function () {
                 sourceFile.referencedFiles = originalReferences;
             }
         }
+        var genTsFiles = [];
+        var genJsonFiles = [];
+        genFiles.forEach(function (gf) {
+            if (gf.stmts) {
+                genTsFiles.push(gf);
+            }
+            if (gf.source) {
+                genJsonFiles.push(gf);
+            }
+        });
         var emitResult;
+        var emittedUserTsCount;
         try {
-            emitResult = emitCallback({
-                program: this.tsProgram,
-                host: this.host,
-                options: this.options,
-                writeFile: writeTsFile,
-                emitOnlyDtsFiles: (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS,
-                customTransformers: this.calculateTransforms(genFiles, customTransformers)
-            });
+            var emitChangedFilesOnly = this._changedNonGenFileNames &&
+                this._changedNonGenFileNames.length < MAX_FILE_COUNT_FOR_SINGLE_FILE_EMIT;
+            if (emitChangedFilesOnly) {
+                var fileNamesToEmit = this._changedNonGenFileNames.concat(genTsFiles.map(function (gf) { return gf.genFileUrl; }));
+                emitResult = mergeEmitResults(fileNamesToEmit.map(function (fileName) { return emitResult = emitCallback({
+                    program: _this.tsProgram,
+                    host: _this.host,
+                    options: _this.options,
+                    writeFile: writeTsFile, emitOnlyDtsFiles: emitOnlyDtsFiles,
+                    customTransformers: tsCustomTansformers,
+                    targetSourceFile: _this.tsProgram.getSourceFile(fileName),
+                }); }));
+                emittedUserTsCount = this._changedNonGenFileNames.length;
+            }
+            else {
+                emitResult = emitCallback({
+                    program: this.tsProgram,
+                    host: this.host,
+                    options: this.options,
+                    writeFile: writeTsFile, emitOnlyDtsFiles: emitOnlyDtsFiles,
+                    customTransformers: tsCustomTansformers
+                });
+                emittedUserTsCount = this.tsProgram.getSourceFiles().length - genTsFiles.length;
+            }
         }
         finally {
             // Restore the references back to the augmented value to ensure that the
@@ -171,6 +220,7 @@ var AngularCompilerProgram = (function () {
         }
         if (!outSrcMapping.length) {
             // if no files were emitted by TypeScript, also don't emit .json files
+            emitResult.diagnostics.push(util_1.createMessageDiagnostic("Emitted no files."));
             return emitResult;
         }
         var sampleSrcFileName;
@@ -181,22 +231,31 @@ var AngularCompilerProgram = (function () {
         }
         var srcToOutPath = createSrcToOutPathMapper(this.options.outDir, sampleSrcFileName, sampleOutFileName);
         if (emitFlags & api_1.EmitFlags.Codegen) {
-            genFiles.forEach(function (gf) {
-                if (gf.source) {
-                    var outFileName = srcToOutPath(gf.genFileUrl);
-                    _this.writeFile(outFileName, gf.source, false, undefined, gf);
-                }
+            genJsonFiles.forEach(function (gf) {
+                var outFileName = srcToOutPath(gf.genFileUrl);
+                _this.writeFile(outFileName, gf.source, false, undefined, gf);
             });
         }
+        var metadataJsonCount = 0;
         if (emitFlags & api_1.EmitFlags.Metadata) {
             this.tsProgram.getSourceFiles().forEach(function (sf) {
                 if (!sf.isDeclarationFile && !util_1.GENERATED_FILES.test(sf.fileName)) {
+                    metadataJsonCount++;
                     var metadata = _this.metadataCache.getMetadata(sf);
                     var metadataText = JSON.stringify([metadata]);
                     var outFileName = srcToOutPath(sf.fileName.replace(/\.ts$/, '.metadata.json'));
                     _this.writeFile(outFileName, metadataText, false, undefined, undefined, [sf]);
                 }
             });
+        }
+        var emitEnd = Date.now();
+        if (this.options.diagnostics) {
+            emitResult.diagnostics.push(util_1.createMessageDiagnostic([
+                "Emitted in " + (emitEnd - emitStart) + "ms",
+                "- " + emittedUserTsCount + " user ts files",
+                "- " + genTsFiles.length + " generated ts files",
+                "- " + (genJsonFiles.length + metadataJsonCount) + " generated json files",
+            ].join('\n')));
         }
         return emitResult;
     };
@@ -319,6 +378,16 @@ var AngularCompilerProgram = (function () {
                 sourceFiles.push(sf.fileName);
             }
         });
+        if (oldTsProgram) {
+            // TODO(tbosch): if one of the files contains a `const enum`
+            // always emit all files!
+            var changedNonGenFileNames_1 = this._changedNonGenFileNames = [];
+            tmpProgram.getSourceFiles().forEach(function (sf) {
+                if (!util_1.GENERATED_FILES.test(sf.fileName) && oldTsProgram.getSourceFile(sf.fileName) !== sf) {
+                    changedNonGenFileNames_1.push(sf.fileName);
+                }
+            });
+        }
         return { tmpProgram: tmpProgram, sourceFiles: sourceFiles, hostAdapter: hostAdapter, rootNames: rootNames };
     };
     AngularCompilerProgram.prototype._updateProgramWithTypeCheckStubs = function (tmpProgram, analyzedModules, hostAdapter, rootNames) {
@@ -381,6 +450,13 @@ var AngularCompilerProgram = (function () {
                 return { genFiles: [], genDiags: [] };
             }
             var genFiles = this.compiler.emitAllImpls(this.analyzedModules);
+            if (this.oldProgramEmittedGeneratedFiles) {
+                var oldProgramEmittedGeneratedFiles_1 = this.oldProgramEmittedGeneratedFiles;
+                genFiles = genFiles.filter(function (genFile) {
+                    var oldGenFile = oldProgramEmittedGeneratedFiles_1.get(genFile.genFileUrl);
+                    return !oldGenFile || !genFile.isEquivalent(oldGenFile);
+                });
+            }
             return { genFiles: genFiles, genDiags: [] };
         }
         catch (e) {
@@ -488,7 +564,7 @@ function getAotCompilerOptions(options) {
         locale: options.i18nInLocale,
         i18nFormat: options.i18nInFormat || options.i18nOutFormat, translations: translations, missingTranslation: missingTranslation,
         enableLegacyTemplate: options.enableLegacyTemplate,
-        enableSummariesForJit: true,
+        enableSummariesForJit: options.enableSummariesForJit,
         preserveWhitespaces: options.preserveWhitespaces,
         fullTemplateTypeCheck: options.fullTemplateTypeCheck,
         allowEmptyCodegenFiles: options.allowEmptyCodegenFiles,
@@ -595,4 +671,16 @@ function i18nGetExtension(formatName) {
     throw new Error("Unsupported format \"" + formatName + "\"");
 }
 exports.i18nGetExtension = i18nGetExtension;
+function mergeEmitResults(emitResults) {
+    var diagnostics = [];
+    var emitSkipped = true;
+    var emittedFiles = [];
+    for (var _i = 0, emitResults_1 = emitResults; _i < emitResults_1.length; _i++) {
+        var er = emitResults_1[_i];
+        diagnostics.push.apply(diagnostics, er.diagnostics);
+        emitSkipped = emitSkipped || er.emitSkipped;
+        emittedFiles.push.apply(emittedFiles, er.emittedFiles);
+    }
+    return { diagnostics: diagnostics, emitSkipped: emitSkipped, emittedFiles: emittedFiles };
+}
 //# sourceMappingURL=program.js.map

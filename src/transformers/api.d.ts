@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ParseSourceSpan } from '@angular/compiler';
+import { GeneratedFile, ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
 export declare const DEFAULT_ERROR_CODE = 100;
 export declare const UNKNOWN_ERROR_CODE = 500;
@@ -46,6 +46,11 @@ export interface CompilerOptions extends ts.CompilerOptions {
     preserveWhitespaces?: boolean;
     /** generate all possible generated files  */
     allowEmptyCodegenFiles?: boolean;
+    /**
+     * Whether to generate .ngsummary.ts files that allow to use AOTed artifacts
+     * in JIT mode. This is off by default.
+     */
+    enableSummariesForJit?: boolean;
 }
 export interface CompilerHost extends ts.CompilerHost {
     /**
@@ -111,6 +116,9 @@ export interface TsEmitArguments {
 export interface TsEmitCallback {
     (args: TsEmitArguments): ts.EmitResult;
 }
+/**
+ * @internal
+ */
 export interface LibrarySummary {
     fileName: string;
     text: string;
@@ -184,6 +192,12 @@ export interface Program {
      * Returns the .d.ts / .ngsummary.json / .ngfactory.d.ts files of libraries that have been emitted
      * in this program or previous programs with paths that emulate the fact that these libraries
      * have been compiled before with no outDir.
+     *
+     * @internal
      */
-    getLibrarySummaries(): LibrarySummary[];
+    getLibrarySummaries(): Map<string, LibrarySummary>;
+    /**
+     * @internal
+     */
+    getEmittedGeneratedFiles(): Map<string, GeneratedFile>;
 }

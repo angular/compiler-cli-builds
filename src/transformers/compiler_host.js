@@ -39,16 +39,17 @@ exports.createCompilerHost = createCompilerHost;
 var TsCompilerAotCompilerTypeCheckHostAdapter = (function (_super) {
     __extends(TsCompilerAotCompilerTypeCheckHostAdapter, _super);
     function TsCompilerAotCompilerTypeCheckHostAdapter(rootFiles, options, context, metadataProvider, codeGenerator, librarySummaries) {
+        if (librarySummaries === void 0) { librarySummaries = new Map(); }
         var _this = _super.call(this, options, context) || this;
         _this.rootFiles = rootFiles;
         _this.metadataProvider = metadataProvider;
         _this.codeGenerator = codeGenerator;
+        _this.librarySummaries = librarySummaries;
         _this.originalSourceFiles = new Map();
         _this.originalFileExistsCache = new Map();
         _this.generatedSourceFiles = new Map();
         _this.generatedCodeFor = new Map();
         _this.emitter = new compiler_1.TypeScriptEmitter();
-        _this.librarySummaries = new Map();
         _this.getDefaultLibFileName = function (options) {
             return _this.context.getDefaultLibFileName(options);
         };
@@ -60,7 +61,6 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function (_super) {
         // https://github.com/Microsoft/TypeScript/issues/9552
         _this.realPath = function (p) { return p; };
         _this.writeFile = _this.context.writeFile.bind(_this.context);
-        librarySummaries.forEach(function (summary) { return _this.librarySummaries.set(summary.fileName, summary); });
         _this.moduleResolutionCache = ts.createModuleResolutionCache(_this.context.getCurrentDirectory(), _this.context.getCanonicalFileName.bind(_this.context));
         var basePath = _this.options.basePath;
         _this.rootDirs =

@@ -109,8 +109,9 @@ function readCommandLineAndConfiguration(args, existingOptions, ngCmdLineOptions
 exports.readCommandLineAndConfiguration = readCommandLineAndConfiguration;
 function reportErrorsAndExit(options, allDiagnostics, consoleError) {
     if (consoleError === void 0) { consoleError = console.error; }
-    if (allDiagnostics.length) {
-        consoleError(perform_compile_1.formatDiagnostics(options, allDiagnostics));
+    var errorsAndWarnings = perform_compile_1.filterErrorsAndWarnings(allDiagnostics);
+    if (errorsAndWarnings.length) {
+        consoleError(perform_compile_1.formatDiagnostics(options, errorsAndWarnings));
     }
     return perform_compile_1.exitCodeFromResult(allDiagnostics);
 }

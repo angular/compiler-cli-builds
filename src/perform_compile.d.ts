@@ -1,6 +1,7 @@
 import * as ts from 'typescript';
 import * as api from './transformers/api';
 export declare type Diagnostics = Array<ts.Diagnostic | api.Diagnostic>;
+export declare function filterErrorsAndWarnings(diagnostics: Diagnostics): Diagnostics;
 export declare function formatDiagnostics(options: api.CompilerOptions, diags: Diagnostics): string;
 export interface ParsedConfiguration {
     project: string;
