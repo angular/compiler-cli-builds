@@ -185,9 +185,10 @@ var AngularCompilerProgram = (function () {
         var emitResult;
         var emittedUserTsCount;
         try {
-            var emitChangedFilesOnly = this._changedNonGenFileNames &&
-                this._changedNonGenFileNames.length < MAX_FILE_COUNT_FOR_SINGLE_FILE_EMIT;
-            if (emitChangedFilesOnly) {
+            var useSingleFileEmit = this._changedNonGenFileNames &&
+                (this._changedNonGenFileNames.length + genTsFiles.length) <
+                    MAX_FILE_COUNT_FOR_SINGLE_FILE_EMIT;
+            if (useSingleFileEmit) {
                 var fileNamesToEmit = this._changedNonGenFileNames.concat(genTsFiles.map(function (gf) { return gf.genFileUrl; }));
                 emitResult = mergeEmitResults(fileNamesToEmit.map(function (fileName) { return emitResult = emitCallback({
                     program: _this.tsProgram,
@@ -673,7 +674,7 @@ function i18nGetExtension(formatName) {
 exports.i18nGetExtension = i18nGetExtension;
 function mergeEmitResults(emitResults) {
     var diagnostics = [];
-    var emitSkipped = true;
+    var emitSkipped = false;
     var emittedFiles = [];
     for (var _i = 0, emitResults_1 = emitResults; _i < emitResults_1.length; _i++) {
         var er = emitResults_1[_i];
