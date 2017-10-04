@@ -254,7 +254,7 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function (_super) {
         if (!genFile.stmts) {
             throw new Error("Invalid Argument: Expected a GenerateFile with statements. " + genFile.genFileUrl);
         }
-        var _a = this.emitter.emitStatementsAndContext(genFile.srcFileUrl, genFile.genFileUrl, genFile.stmts, /* preamble */ '', 
+        var _a = this.emitter.emitStatementsAndContext(genFile.genFileUrl, genFile.stmts, /* preamble */ '', 
         /* emitSourceMaps */ false), sourceText = _a.sourceText, context = _a.context;
         var sf = ts.createSourceFile(genFile.genFileUrl, sourceText, this.options.target || ts.ScriptTarget.Latest);
         this.generatedSourceFiles.set(genFile.genFileUrl, {
