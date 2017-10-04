@@ -97,7 +97,7 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function (_super) {
         return _this;
     }
     TsCompilerAotCompilerTypeCheckHostAdapter.prototype.resolveModuleName = function (moduleName, containingFile) {
-        var rm = ts.resolveModuleName(moduleName, containingFile, this.options, this, this.moduleResolutionCache)
+        var rm = ts.resolveModuleName(moduleName, containingFile.replace(/\\/g, '/'), this.options, this, this.moduleResolutionCache)
             .resolvedModule;
         if (rm && this.isSourceFile(rm.resolvedFileName)) {
             // Case: generateCodeForLibraries = true and moduleName is
