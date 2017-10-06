@@ -113,10 +113,28 @@ var AngularCompilerProgram = (function () {
         return this.structuralDiagnostics;
     };
     AngularCompilerProgram.prototype.getTsSemanticDiagnostics = function (sourceFile, cancellationToken) {
-        return this.semanticDiagnostics.ts;
+        var _this = this;
+        if (sourceFile) {
+            return this.tsProgram.getSemanticDiagnostics(sourceFile, cancellationToken);
+        }
+        var diags = [];
+        this.tsProgram.getSourceFiles().forEach(function (sf) {
+            if (!util_1.GENERATED_FILES.test(sf.fileName)) {
+                diags.push.apply(diags, _this.tsProgram.getSemanticDiagnostics(sf, cancellationToken));
+            }
+        });
+        return diags;
     };
     AngularCompilerProgram.prototype.getNgSemanticDiagnostics = function (fileName, cancellationToken) {
-        return this.semanticDiagnostics.ng;
+        var _this = this;
+        var diags = [];
+        this.tsProgram.getSourceFiles().forEach(function (sf) {
+            if (util_1.GENERATED_FILES.test(sf.fileName) && !sf.isDeclarationFile) {
+                diags.push.apply(diags, _this.tsProgram.getSemanticDiagnostics(sf, cancellationToken));
+            }
+        });
+        var ng = translate_diagnostics_1.translateDiagnostics(this.typeCheckHost, diags).ng;
+        return ng;
     };
     AngularCompilerProgram.prototype.loadNgStructureAsync = function () {
         var _this = this;
@@ -327,14 +345,6 @@ var AngularCompilerProgram = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AngularCompilerProgram.prototype, "semanticDiagnostics", {
-        get: function () {
-            return this._semanticDiagnostics ||
-                (this._semanticDiagnostics = this.generateSemanticDiagnostics());
-        },
-        enumerable: true,
-        configurable: true
-    });
     AngularCompilerProgram.prototype.calculateTransforms = function (genFiles, customTransformers) {
         var beforeTs = [];
         if (!this.options.disableExpressionLowering) {
@@ -499,9 +509,6 @@ var AngularCompilerProgram = (function () {
             });
         }
         return sourceFilesToEmit;
-    };
-    AngularCompilerProgram.prototype.generateSemanticDiagnostics = function () {
-        return translate_diagnostics_1.translateDiagnostics(this.typeCheckHost, this.tsProgram.getSemanticDiagnostics());
     };
     AngularCompilerProgram.prototype.writeFile = function (outFileName, outData, writeByteOrderMark, onError, genFile, sourceFiles) {
         // collect emittedLibrarySummaries

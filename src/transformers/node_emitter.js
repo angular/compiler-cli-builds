@@ -31,7 +31,9 @@ var TypeScriptNodeEmitter = (function () {
             ts.setEmitFlags(commentStmt, ts.EmitFlags.CustomPrologue);
             preambleStmts.push(commentStmt);
         }
-        var newSourceFile = ts.updateSourceFileNode(sourceFile, preambleStmts.concat(converter.getReexports(), converter.getImports(), statements));
+        var sourceStatments = preambleStmts.concat(converter.getReexports(), converter.getImports(), statements);
+        converter.updateSourceMap(sourceStatments);
+        var newSourceFile = ts.updateSourceFileNode(sourceFile, sourceStatments);
         return [newSourceFile, converter.getNodeMap()];
     };
     return TypeScriptNodeEmitter;
@@ -54,7 +56,6 @@ function createLiteral(value) {
 var _NodeEmitterVisitor = (function () {
     function _NodeEmitterVisitor() {
         this._nodeMap = new Map();
-        this._mapped = new Set();
         this._importsWithPrefixes = new Map();
         this._reexports = new Map();
         this._templateSources = new Map();
@@ -85,18 +86,48 @@ var _NodeEmitterVisitor = (function () {
         });
     };
     _NodeEmitterVisitor.prototype.getNodeMap = function () { return this._nodeMap; };
-    _NodeEmitterVisitor.prototype.record = function (ngNode, tsNode) {
+    _NodeEmitterVisitor.prototype.updateSourceMap = function (statements) {
         var _this = this;
-        if (tsNode && !this._nodeMap.has(tsNode)) {
-            this._nodeMap.set(tsNode, ngNode);
-            if (!this._mapped.has(ngNode)) {
-                this._mapped.add(ngNode);
-                var range = this.sourceRangeOf(ngNode);
-                if (range) {
-                    ts.setSourceMapRange(tsNode, range);
+        var lastRangeStartNode = undefined;
+        var lastRangeEndNode = undefined;
+        var lastRange = undefined;
+        var recordLastSourceRange = function () {
+            if (lastRange && lastRangeStartNode && lastRangeEndNode) {
+                if (lastRangeStartNode == lastRangeEndNode) {
+                    ts.setSourceMapRange(lastRangeEndNode, lastRange);
+                }
+                else {
+                    ts.setSourceMapRange(lastRangeStartNode, lastRange);
+                    // Only emit the pos for the first node emitted in the range.
+                    ts.setEmitFlags(lastRangeStartNode, ts.EmitFlags.NoTrailingSourceMap);
+                    ts.setSourceMapRange(lastRangeEndNode, lastRange);
+                    // Only emit emit end for the last node emitted in the range.
+                    ts.setEmitFlags(lastRangeEndNode, ts.EmitFlags.NoLeadingSourceMap);
                 }
             }
-            ts.forEachChild(tsNode, function (child) { return _this.record(ngNode, tsNode); });
+        };
+        var visitNode = function (tsNode) {
+            var ngNode = _this._nodeMap.get(tsNode);
+            if (ngNode) {
+                var range = _this.sourceRangeOf(ngNode);
+                if (range) {
+                    if (!lastRange || range.source != lastRange.source || range.pos != lastRange.pos ||
+                        range.end != lastRange.end) {
+                        recordLastSourceRange();
+                        lastRangeStartNode = tsNode;
+                        lastRange = range;
+                    }
+                    lastRangeEndNode = tsNode;
+                }
+            }
+            ts.forEachChild(tsNode, visitNode);
+        };
+        statements.forEach(visitNode);
+        recordLastSourceRange();
+    };
+    _NodeEmitterVisitor.prototype.record = function (ngNode, tsNode) {
+        if (tsNode && !this._nodeMap.has(tsNode)) {
+            this._nodeMap.set(tsNode, ngNode);
         }
         return tsNode;
     };
