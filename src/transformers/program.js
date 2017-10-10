@@ -624,29 +624,32 @@ function getNgOptionDiagnostics(options) {
  * TODO(tbosch): talk to the TypeScript team to expose their logic for calculating the `rootDir`
  * if none was specified.
  *
+ * Note: This function works on normalized paths from typescript.
+ *
  * @param outDir
  * @param outSrcMappings
  */
-function createSrcToOutPathMapper(outDir, sampleSrcFileName, sampleOutFileName) {
+function createSrcToOutPathMapper(outDir, sampleSrcFileName, sampleOutFileName, host) {
+    if (host === void 0) { host = path; }
     var srcToOutPath;
     if (outDir) {
         if (sampleSrcFileName == null || sampleOutFileName == null) {
             throw new Error("Can't calculate the rootDir without a sample srcFileName / outFileName. ");
         }
-        var srcFileDir = path.dirname(sampleSrcFileName);
-        var outFileDir = path.dirname(sampleOutFileName);
+        var srcFileDir = host.dirname(sampleSrcFileName).replace(/\\/g, '/');
+        var outFileDir = host.dirname(sampleOutFileName).replace(/\\/g, '/');
         if (srcFileDir === outFileDir) {
             return function (srcFileName) { return srcFileName; };
         }
-        var srcDirParts = srcFileDir.split(path.sep);
-        var outDirParts = outFileDir.split(path.sep);
+        var srcDirParts = srcFileDir.split('/');
+        var outDirParts = outFileDir.split('/');
         // calculate the common suffix
         var i = 0;
         while (i < Math.min(srcDirParts.length, outDirParts.length) &&
             srcDirParts[srcDirParts.length - 1 - i] === outDirParts[outDirParts.length - 1 - i])
             i++;
-        var rootDir_1 = srcDirParts.slice(0, srcDirParts.length - i).join(path.sep);
-        srcToOutPath = function (srcFileName) { return path.resolve(outDir, path.relative(rootDir_1, srcFileName)); };
+        var rootDir_1 = srcDirParts.slice(0, srcDirParts.length - i).join('/');
+        srcToOutPath = function (srcFileName) { return host.resolve(outDir, host.relative(rootDir_1, srcFileName)); };
     }
     else {
         srcToOutPath = function (srcFileName) { return srcFileName; };
