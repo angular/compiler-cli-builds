@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { GeneratedFile, ParseSourceSpan } from '@angular/compiler';
+import { GeneratedFile as GeneratedFileImpl, ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
 export declare const DEFAULT_ERROR_CODE = 100;
 export declare const UNKNOWN_ERROR_CODE = 500;
@@ -103,18 +103,31 @@ export interface CustomTransformers {
     beforeTs?: ts.TransformerFactory<ts.SourceFile>[];
     afterTs?: ts.TransformerFactory<ts.SourceFile>[];
 }
-export interface TsEmitArguments {
+export interface EmitArguments {
     program: ts.Program;
     host: CompilerHost;
     options: CompilerOptions;
-    targetSourceFile?: ts.SourceFile;
+    targetSourceFiles?: ts.SourceFile[];
     writeFile?: ts.WriteFileCallback;
     cancellationToken?: ts.CancellationToken;
     emitOnlyDtsFiles?: boolean;
     customTransformers?: ts.CustomTransformers;
 }
-export interface TsEmitCallback {
-    (args: TsEmitArguments): ts.EmitResult;
+export interface EmitCallback {
+    (args: EmitArguments): ts.EmitResult;
+}
+/**
+ * Represents a generated file that has not yet been emitted.
+ */
+export interface GeneratedFile {
+    /**
+     * The file name of the sourceFile from which this file was generated.
+     */
+    srcFileName: string;
+    /**
+     * The file name of the generated but not yet emitted file.
+     */
+    genFileName: string;
 }
 /**
  * @internal
@@ -169,7 +182,7 @@ export interface Program {
      *
      * Angular structural information is required to produce these diagnostics.
      */
-    getNgSemanticDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): Diagnostic[];
+    getNgSemanticDiagnostics(genFile?: GeneratedFile, cancellationToken?: ts.CancellationToken): Diagnostic[];
     /**
      * Load Angular structural information asynchronously. If this method is not called then the
      * Angular structural information, including referenced HTML and CSS files, are loaded
@@ -178,15 +191,29 @@ export interface Program {
      */
     loadNgStructureAsync(): Promise<void>;
     /**
+     * Retrieves the GeneratedFile with the given fileName.
+     */
+    getGeneratedFile(genFileName: string): GeneratedFile | undefined;
+    /**
+     * Retriesves all GeneratedFiles.
+     */
+    getGeneratedFiles(): GeneratedFile[];
+    /**
+     * Calculates whether the given file has changed since the `oldProgram` that was passed
+     * to `createProgram`.
+     */
+    hasChanged(fileName: string): boolean;
+    /**
      * Emit the files requested by emitFlags implied by the program.
      *
      * Angular structural information is required to emit files.
      */
-    emit({emitFlags, cancellationToken, customTransformers, emitCallback}?: {
+    emit({targetFileNames, emitFlags, cancellationToken, customTransformers, emitCallback}?: {
+        targetFileNames?: string[];
         emitFlags?: EmitFlags;
         cancellationToken?: ts.CancellationToken;
         customTransformers?: CustomTransformers;
-        emitCallback?: TsEmitCallback;
+        emitCallback?: EmitCallback;
     }): ts.EmitResult;
     /**
      * Returns the .d.ts / .ngsummary.json / .ngfactory.d.ts files of libraries that have been emitted
@@ -199,9 +226,22 @@ export interface Program {
     /**
      * @internal
      */
-    getEmittedGeneratedFiles(): Map<string, GeneratedFile>;
+    getEmittedGeneratedFiles(): Map<string, GeneratedFileImpl>;
     /**
      * @internal
      */
     getEmittedSourceFiles(): Map<string, ts.SourceFile>;
+}
+export declare type OldProgram = Program | CachedFiles;
+export interface CachedFiles {
+    getSourceFile(fileName: string): ts.SourceFile | undefined;
+    getGeneratedFile(srcFileName: string, genFileName: string): GeneratedFile | undefined;
+}
+export interface CreateProgram {
+    ({rootNames, options, host, oldProgram}: {
+        rootNames: string[];
+        options: CompilerOptions;
+        host: CompilerHost;
+        oldProgram?: OldProgram;
+    }): Program;
 }

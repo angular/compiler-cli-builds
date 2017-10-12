@@ -41,8 +41,8 @@ var CodeGenerator = (function () {
         var _this = this;
         var generatedModules = this.compiler.emitAllImpls(analyzedModules);
         return generatedModules.map(function (generatedModule) {
-            var sourceFile = _this.program.getSourceFile(generatedModule.srcFileUrl);
-            var emitPath = _this.ngCompilerHost.calculateEmitPath(generatedModule.genFileUrl);
+            var sourceFile = _this.program.getSourceFile(generatedModule.srcFileName);
+            var emitPath = _this.ngCompilerHost.calculateEmitPath(generatedModule.genFileName);
             var source = generatedModule.source || compiler.toTypeScript(generatedModule, PREAMBLE);
             _this.host.writeFile(emitPath, source, false, function () { }, [sourceFile]);
             return emitPath;

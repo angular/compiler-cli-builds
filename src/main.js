@@ -48,8 +48,14 @@ function createEmitCallback(options) {
         convertIndexImportShorthand: false, transformDecorators: transformDecorators, transformTypesToClosure: transformTypesToClosure,
     };
     return function (_a) {
-        var program = _a.program, targetSourceFile = _a.targetSourceFile, writeFile = _a.writeFile, cancellationToken = _a.cancellationToken, emitOnlyDtsFiles = _a.emitOnlyDtsFiles, _b = _a.customTransformers, customTransformers = _b === void 0 ? {} : _b, host = _a.host, options = _a.options;
-        return tsickle.emitWithTsickle(program, tsickleHost, host, options, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
+        var program = _a.program, targetSourceFiles = _a.targetSourceFiles, writeFile = _a.writeFile, cancellationToken = _a.cancellationToken, emitOnlyDtsFiles = _a.emitOnlyDtsFiles, _b = _a.customTransformers, customTransformers = _b === void 0 ? {} : _b, host = _a.host, options = _a.options;
+        if (targetSourceFiles) {
+            return tsickle.mergeEmitResults(targetSourceFiles.map(function (targetSourceFile) { return tsickle.emitWithTsickle(program, tsickleHost, host, options, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
+                beforeTs: customTransformers.before,
+                afterTs: customTransformers.after,
+            }); }));
+        }
+        return tsickle.emitWithTsickle(program, tsickleHost, host, options, /*targetSourceFile*/ undefined, writeFile, cancellationToken, emitOnlyDtsFiles, {
             beforeTs: customTransformers.before,
             afterTs: customTransformers.after,
         });

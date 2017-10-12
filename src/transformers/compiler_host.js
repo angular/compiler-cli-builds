@@ -24,7 +24,6 @@ var compiler_host_1 = require("../compiler_host");
 var util_1 = require("./util");
 var NODE_MODULES_PACKAGE_NAME = /node_modules\/((\w|-)+|(@(\w|-)+\/(\w|-)+))/;
 var DTS = /\.d\.ts$/;
-var EXT = /(\.ts|\.d\.ts|\.js|\.jsx|\.tsx)$/;
 function createCompilerHost(_a) {
     var options = _a.options, _b = _a.tsHost, tsHost = _b === void 0 ? ts.createCompilerHost(options, true) : _b;
     return tsHost;
@@ -157,7 +156,7 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function (_super) {
             console.error('fileNameToModuleName from containingFile', containingFile, 'to importedFile', importedFile);
         }
         // drop extension
-        importedFile = importedFile.replace(EXT, '');
+        importedFile = importedFile.replace(util_1.EXT, '');
         var importedFilePackagName = getPackageName(importedFile);
         var containingFilePackageName = getPackageName(containingFile);
         var moduleName;
@@ -233,11 +232,11 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function (_super) {
     };
     TsCompilerAotCompilerTypeCheckHostAdapter.prototype.updateGeneratedFile = function (genFile) {
         if (!genFile.stmts) {
-            throw new Error("Invalid Argument: Expected a GenerateFile with statements. " + genFile.genFileUrl);
+            throw new Error("Invalid Argument: Expected a GenerateFile with statements. " + genFile.genFileName);
         }
-        var oldGenFile = this.generatedSourceFiles.get(genFile.genFileUrl);
+        var oldGenFile = this.generatedSourceFiles.get(genFile.genFileName);
         if (!oldGenFile) {
-            throw new Error("Illegal State: previous GeneratedFile not found for " + genFile.genFileUrl + ".");
+            throw new Error("Illegal State: previous GeneratedFile not found for " + genFile.genFileName + ".");
         }
         var newRefs = genFileExternalReferences(genFile);
         var oldRefs = oldGenFile.externalReferences;
@@ -246,18 +245,18 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function (_super) {
             newRefs.forEach(function (r) { return refsAreEqual = refsAreEqual && oldRefs.has(r); });
         }
         if (!refsAreEqual) {
-            throw new Error("Illegal State: external references changed in " + genFile.genFileUrl + ".\nOld: " + Array.from(oldRefs) + ".\nNew: " + Array.from(newRefs));
+            throw new Error("Illegal State: external references changed in " + genFile.genFileName + ".\nOld: " + Array.from(oldRefs) + ".\nNew: " + Array.from(newRefs));
         }
         return this.addGeneratedFile(genFile, newRefs);
     };
     TsCompilerAotCompilerTypeCheckHostAdapter.prototype.addGeneratedFile = function (genFile, externalReferences) {
         if (!genFile.stmts) {
-            throw new Error("Invalid Argument: Expected a GenerateFile with statements. " + genFile.genFileUrl);
+            throw new Error("Invalid Argument: Expected a GenerateFile with statements. " + genFile.genFileName);
         }
-        var _a = this.emitter.emitStatementsAndContext(genFile.genFileUrl, genFile.stmts, /* preamble */ '', 
+        var _a = this.emitter.emitStatementsAndContext(genFile.genFileName, genFile.stmts, /* preamble */ '', 
         /* emitSourceMaps */ false), sourceText = _a.sourceText, context = _a.context;
-        var sf = ts.createSourceFile(genFile.genFileUrl, sourceText, this.options.target || ts.ScriptTarget.Latest);
-        this.generatedSourceFiles.set(genFile.genFileUrl, {
+        var sf = ts.createSourceFile(genFile.genFileName, sourceText, this.options.target || ts.ScriptTarget.Latest);
+        this.generatedSourceFiles.set(genFile.genFileName, {
             sourceFile: sf,
             emitCtx: context, externalReferences: externalReferences,
         });

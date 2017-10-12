@@ -8,6 +8,7 @@
 import * as ts from 'typescript';
 import { Diagnostic } from './api';
 export declare const GENERATED_FILES: RegExp;
+export declare const EXT: RegExp;
 export declare const enum StructureIsReused {
     Not = 0,
     SafeModules = 1,
@@ -15,3 +16,4 @@ export declare const enum StructureIsReused {
 }
 export declare function tsStructureIsReused(program: ts.Program): StructureIsReused;
 export declare function createMessageDiagnostic(messageText: string): ts.Diagnostic & Diagnostic;
+export declare function isGeneratedFile(fileName: string): boolean;
