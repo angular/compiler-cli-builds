@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "4.4.5-912068e",
+  "version": "4.4.5-32a814b",
   "description": "Angular - the compiler CLI for Node.js",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -9,14 +9,14 @@
     "ng-xi18n": "./src/extract_i18n.js"
   },
   "dependencies": {
-    "@angular/tsc-wrapped": "4.4.5-912068e",
+    "@angular/tsc-wrapped": "4.4.5-32a814b",
     "reflect-metadata": "^0.1.2",
     "minimist": "^1.2.0"
   },
   "peerDependencies": {
     "typescript": "^2.0.2",
-    "@angular/compiler": "4.4.5-912068e",
-    "@angular/core": "4.4.5-912068e"
+    "@angular/compiler": "4.4.5-32a814b",
+    "@angular/core": "4.4.5-32a814b"
   },
   "repository": {
     "type": "git",
