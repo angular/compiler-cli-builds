@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { GeneratedFile } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Program } from './api';
-export declare function getAngularEmitterTransformFactory(program: Program): () => (sourceFile: ts.SourceFile) => ts.SourceFile;
+export declare function getAngularEmitterTransformFactory(generatedFiles: Map<string, GeneratedFile>): () => (sourceFile: ts.SourceFile) => ts.SourceFile;
