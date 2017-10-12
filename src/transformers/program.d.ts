@@ -8,8 +8,13 @@
 import { MessageBundle } from '@angular/compiler';
 import * as path from 'path';
 import * as ts from 'typescript';
-import { CompilerOptions, CreateProgram } from './api';
-export declare const createProgram: CreateProgram;
+import { CompilerHost, CompilerOptions, Program } from './api';
+export declare function createProgram({rootNames, options, host, oldProgram}: {
+    rootNames: string[];
+    options: CompilerOptions;
+    host: CompilerHost;
+    oldProgram?: Program;
+}): Program;
 /**
  * Returns a function that can adjust a path from source path to out path,
  * based on an existing mapping from source to out path.

@@ -27,7 +27,7 @@ export declare function performCompilation({rootNames, options, host, oldProgram
     options: api.CompilerOptions;
     host?: api.CompilerHost;
     oldProgram?: api.Program;
-    emitCallback?: api.EmitCallback;
+    emitCallback?: api.TsEmitCallback;
     gatherDiagnostics?: (program: api.Program) => Diagnostics;
     customTransformers?: api.CustomTransformers;
     emitFlags?: api.EmitFlags;
