@@ -105,4 +105,4 @@ export declare function createCompilerHost({options, tsHost}: {
     tsHost?: ts.CompilerHost;
 }): CompilerHost;
 export declare type Diagnostics = Array<ts.Diagnostic | Diagnostic>;
-export declare function formatDiagnostics(options: CompilerOptions, diags: Diagnostics): string;
+export declare function formatDiagnostics(diags: Diagnostics): string;

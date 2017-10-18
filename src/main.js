@@ -20,14 +20,14 @@ function main(args, consoleError, config) {
     if (consoleError === void 0) { consoleError = console.error; }
     var _a = config || readNgcCommandLineAndConfiguration(args), project = _a.project, rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors, watch = _a.watch, emitFlags = _a.emitFlags;
     if (configErrors.length) {
-        return reportErrorsAndExit(options, configErrors, consoleError);
+        return reportErrorsAndExit(configErrors, consoleError);
     }
     if (watch) {
         var result = watchMode(project, options, consoleError);
-        return reportErrorsAndExit({}, result.firstCompileResult, consoleError);
+        return reportErrorsAndExit(result.firstCompileResult, consoleError);
     }
     var compileDiags = perform_compile_1.performCompilation({ rootNames: rootNames, options: options, emitFlags: emitFlags, emitCallback: createEmitCallback(options) }).diagnostics;
-    return reportErrorsAndExit(options, compileDiags, consoleError);
+    return reportErrorsAndExit(compileDiags, consoleError);
 }
 exports.main = main;
 function createEmitCallback(options) {
@@ -107,17 +107,17 @@ function readCommandLineAndConfiguration(args, existingOptions, ngCmdLineOptions
     };
 }
 exports.readCommandLineAndConfiguration = readCommandLineAndConfiguration;
-function reportErrorsAndExit(options, allDiagnostics, consoleError) {
+function reportErrorsAndExit(allDiagnostics, consoleError) {
     if (consoleError === void 0) { consoleError = console.error; }
     var errorsAndWarnings = perform_compile_1.filterErrorsAndWarnings(allDiagnostics);
     if (errorsAndWarnings.length) {
-        consoleError(perform_compile_1.formatDiagnostics(options, errorsAndWarnings));
+        consoleError(perform_compile_1.formatDiagnostics(errorsAndWarnings));
     }
     return perform_compile_1.exitCodeFromResult(allDiagnostics);
 }
 function watchMode(project, options, consoleError) {
     return perform_watch_1.performWatchCompilation(perform_watch_1.createPerformWatchHost(project, function (diagnostics) {
-        consoleError(perform_compile_1.formatDiagnostics(options, diagnostics));
+        consoleError(perform_compile_1.formatDiagnostics(diagnostics));
     }, options, function (options) { return createEmitCallback(options); }));
 }
 exports.watchMode = watchMode;

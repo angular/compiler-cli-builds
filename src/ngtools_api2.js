@@ -33,8 +33,8 @@ function createCompilerHost(_a) {
     return compiler_host_1.createCompilerHost({ options: options, tsHost: tsHost });
 }
 exports.createCompilerHost = createCompilerHost;
-function formatDiagnostics(options, diags) {
-    return perform_compile_1.formatDiagnostics(options, diags);
+function formatDiagnostics(diags) {
+    return perform_compile_1.formatDiagnostics(diags);
 }
 exports.formatDiagnostics = formatDiagnostics;
 //# sourceMappingURL=ngtools_api2.js.map

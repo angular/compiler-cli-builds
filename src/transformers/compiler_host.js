@@ -303,6 +303,7 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function (_super) {
             (!this.options.rootDir || pathStartsWithPrefix(this.options.rootDir, fileName));
     };
     TsCompilerAotCompilerTypeCheckHostAdapter.prototype.getSourceFile = function (fileName, languageVersion, onError) {
+        var _this = this;
         // Note: Don't exit early in this method to make sure
         // we always have up to date references on the file!
         var genFileNames = [];
@@ -325,7 +326,7 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function (_super) {
             }
             else {
                 if (!this.options.noResolve && this.shouldGenerateFilesFor(fileName)) {
-                    genFileNames = this.codeGenerator.findGeneratedFileNames(fileName);
+                    genFileNames = this.codeGenerator.findGeneratedFileNames(fileName).filter(function (fileName) { return _this.shouldGenerateFile(fileName).generate; });
                 }
                 this.generatedCodeFor.set(fileName, genFileNames);
             }

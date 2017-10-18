@@ -27,17 +27,18 @@ function filterErrorsAndWarnings(diagnostics) {
     return diagnostics.filter(function (d) { return d.category !== ts.DiagnosticCategory.Message; });
 }
 exports.filterErrorsAndWarnings = filterErrorsAndWarnings;
-function formatDiagnostics(options, diags) {
+var defaultFormatHost = {
+    getCurrentDirectory: function () { return ts.sys.getCurrentDirectory(); },
+    getCanonicalFileName: function (fileName) { return fileName; },
+    getNewLine: function () { return ts.sys.newLine; }
+};
+function formatDiagnostics(diags, tsFormatHost) {
+    if (tsFormatHost === void 0) { tsFormatHost = defaultFormatHost; }
     if (diags && diags.length) {
-        var tsFormatHost_1 = {
-            getCurrentDirectory: function () { return options.basePath || process.cwd(); },
-            getCanonicalFileName: function (fileName) { return fileName; },
-            getNewLine: function () { return ts.sys.newLine; }
-        };
         return diags
             .map(function (d) {
             if (api.isTsDiagnostic(d)) {
-                return ts.formatDiagnostics([d], tsFormatHost_1);
+                return ts.formatDiagnostics([d], tsFormatHost);
             }
             else {
                 var res = ts.DiagnosticCategory[d.category];
