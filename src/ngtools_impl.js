@@ -13,11 +13,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * This API should be stable for NG 2. It can be removed in NG 4..., but should be replaced by
  * something else.
  */
-/**
- *********************************************************************
- * Changes to this file need to be approved by the Angular CLI team. *
- *********************************************************************
- */
 var compiler_1 = require("@angular/compiler");
 var ROUTER_MODULE_PATH = '@angular/router';
 var ROUTER_ROUTES_SYMBOL_NAME = 'ROUTES';
