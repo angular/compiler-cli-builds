@@ -133,7 +133,7 @@ var AngularCompilerProgram = (function () {
                 diags.push.apply(diags, _this.tsProgram.getSemanticDiagnostics(sf, cancellationToken));
             }
         });
-        var ng = translate_diagnostics_1.translateDiagnostics(this.typeCheckHost, diags).ng;
+        var ng = translate_diagnostics_1.translateDiagnostics(this.hostAdapter, diags).ng;
         return ng;
     };
     AngularCompilerProgram.prototype.loadNgStructureAsync = function () {
@@ -141,15 +141,20 @@ var AngularCompilerProgram = (function () {
         if (this._analyzedModules) {
             throw new Error('Angular structure already loaded');
         }
-        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, hostAdapter = _a.hostAdapter, rootNames = _a.rootNames;
-        return this._compiler.loadFilesAsync(sourceFiles)
+        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, rootNames = _a.rootNames;
+        return this.compiler.loadFilesAsync(sourceFiles)
             .catch(this.catchAnalysisError.bind(this))
             .then(function (analyzedModules) {
             if (_this._analyzedModules) {
                 throw new Error('Angular structure loaded both synchronously and asynchronsly');
             }
-            _this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, hostAdapter, rootNames);
+            _this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, rootNames);
         });
+    };
+    AngularCompilerProgram.prototype.listLazyRoutes = function (route) {
+        // Note: Don't analyzedModules if a route is given
+        // to be fast enough.
+        return this.compiler.listLazyRoutes(route, route ? undefined : this.analyzedModules);
     };
     AngularCompilerProgram.prototype.emit = function (_a) {
         var _this = this;
@@ -298,9 +303,19 @@ var AngularCompilerProgram = (function () {
         // Private members
         get: function () {
             if (!this._compiler) {
-                this.initSync();
+                this._createCompiler();
             }
             return this._compiler;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(AngularCompilerProgram.prototype, "hostAdapter", {
+        get: function () {
+            if (!this._hostAdapter) {
+                this._createCompiler();
+            }
+            return this._hostAdapter;
         },
         enumerable: true,
         configurable: true
@@ -335,16 +350,6 @@ var AngularCompilerProgram = (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(AngularCompilerProgram.prototype, "typeCheckHost", {
-        get: function () {
-            if (!this._typeCheckHost) {
-                this.initSync();
-            }
-            return this._typeCheckHost;
-        },
-        enumerable: true,
-        configurable: true
-    });
     AngularCompilerProgram.prototype.calculateTransforms = function (genFiles, customTransformers) {
         var beforeTs = [];
         if (!this.options.disableExpressionLowering) {
@@ -361,15 +366,36 @@ var AngularCompilerProgram = (function () {
         if (this._analyzedModules) {
             return;
         }
-        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, hostAdapter = _a.hostAdapter, rootNames = _a.rootNames;
+        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, rootNames = _a.rootNames;
         var analyzedModules;
         try {
-            analyzedModules = this._compiler.loadFilesSync(sourceFiles);
+            analyzedModules = this.compiler.loadFilesSync(sourceFiles);
         }
         catch (e) {
             analyzedModules = this.catchAnalysisError(e);
         }
-        this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, hostAdapter, rootNames);
+        this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, rootNames);
+    };
+    AngularCompilerProgram.prototype._createCompiler = function () {
+        var _this = this;
+        var codegen = {
+            generateFile: function (genFileName, baseFileName) {
+                return _this._compiler.emitBasicStub(genFileName, baseFileName);
+            },
+            findGeneratedFileNames: function (fileName) { return _this._compiler.findGeneratedFileNames(fileName); },
+        };
+        this._hostAdapter = new compiler_host_1.TsCompilerAotCompilerTypeCheckHostAdapter(this.rootNames, this.options, this.host, this.metadataCache, codegen, this.oldProgramLibrarySummaries);
+        var aotOptions = getAotCompilerOptions(this.options);
+        this._structuralDiagnostics = [];
+        var errorCollector = function (err) {
+            _this._structuralDiagnostics.push({
+                messageText: err.toString(),
+                category: ts.DiagnosticCategory.Error,
+                source: api_1.SOURCE,
+                code: api_1.DEFAULT_ERROR_CODE
+            });
+        };
+        this._compiler = compiler_1.createAotCompiler(this._hostAdapter, aotOptions, errorCollector).compiler;
     };
     AngularCompilerProgram.prototype._createProgramWithBasicStubs = function () {
         var _this = this;
@@ -381,51 +407,53 @@ var AngularCompilerProgram = (function () {
         this.oldTsProgram = undefined;
         var codegen = {
             generateFile: function (genFileName, baseFileName) {
-                return _this._compiler.emitBasicStub(genFileName, baseFileName);
+                return _this.compiler.emitBasicStub(genFileName, baseFileName);
             },
-            findGeneratedFileNames: function (fileName) { return _this._compiler.findGeneratedFileNames(fileName); },
+            findGeneratedFileNames: function (fileName) { return _this.compiler.findGeneratedFileNames(fileName); },
         };
-        var hostAdapter = new compiler_host_1.TsCompilerAotCompilerTypeCheckHostAdapter(this.rootNames, this.options, this.host, this.metadataCache, codegen, this.oldProgramLibrarySummaries);
-        var aotOptions = getAotCompilerOptions(this.options);
-        this._compiler = compiler_1.createAotCompiler(hostAdapter, aotOptions).compiler;
-        this._typeCheckHost = hostAdapter;
-        this._structuralDiagnostics = [];
-        var rootNames = this.rootNames.filter(function (fn) { return !util_1.GENERATED_FILES.test(fn) || !hostAdapter.isSourceFile(fn); });
+        var rootNames = this.rootNames;
+        if (this.options.generateCodeForLibraries !== false) {
+            // if we should generateCodeForLibraries, enver include
+            // generated files in the program as otherwise we will
+            // ovewrite them and typescript will report the error
+            // TS5055: Cannot write file ... because it would overwrite input file.
+            rootNames = this.rootNames.filter(function (fn) { return !util_1.GENERATED_FILES.test(fn); });
+        }
         if (this.options.noResolve) {
             this.rootNames.forEach(function (rootName) {
-                if (hostAdapter.shouldGenerateFilesFor(rootName)) {
-                    rootNames.push.apply(rootNames, _this._compiler.findGeneratedFileNames(rootName));
+                if (_this.hostAdapter.shouldGenerateFilesFor(rootName)) {
+                    rootNames.push.apply(rootNames, _this.compiler.findGeneratedFileNames(rootName));
                 }
             });
         }
-        var tmpProgram = ts.createProgram(rootNames, this.options, hostAdapter, oldTsProgram);
+        var tmpProgram = ts.createProgram(rootNames, this.options, this.hostAdapter, oldTsProgram);
         var sourceFiles = [];
         tmpProgram.getSourceFiles().forEach(function (sf) {
-            if (hostAdapter.isSourceFile(sf.fileName)) {
+            if (_this.hostAdapter.isSourceFile(sf.fileName)) {
                 sourceFiles.push(sf.fileName);
             }
         });
-        return { tmpProgram: tmpProgram, sourceFiles: sourceFiles, hostAdapter: hostAdapter, rootNames: rootNames };
+        return { tmpProgram: tmpProgram, sourceFiles: sourceFiles, rootNames: rootNames };
     };
-    AngularCompilerProgram.prototype._updateProgramWithTypeCheckStubs = function (tmpProgram, analyzedModules, hostAdapter, rootNames) {
+    AngularCompilerProgram.prototype._updateProgramWithTypeCheckStubs = function (tmpProgram, analyzedModules, rootNames) {
         var _this = this;
         this._analyzedModules = analyzedModules || emptyModules;
         if (analyzedModules) {
             tmpProgram.getSourceFiles().forEach(function (sf) {
                 if (sf.fileName.endsWith('.ngfactory.ts')) {
-                    var _a = hostAdapter.shouldGenerateFile(sf.fileName), generate = _a.generate, baseFileName = _a.baseFileName;
+                    var _a = _this.hostAdapter.shouldGenerateFile(sf.fileName), generate = _a.generate, baseFileName = _a.baseFileName;
                     if (generate) {
                         // Note: ! is ok as hostAdapter.shouldGenerateFile will always return a basefileName
                         // for .ngfactory.ts files.
-                        var genFile = _this._compiler.emitTypeCheckStub(sf.fileName, baseFileName);
+                        var genFile = _this.compiler.emitTypeCheckStub(sf.fileName, baseFileName);
                         if (genFile) {
-                            hostAdapter.updateGeneratedFile(genFile);
+                            _this.hostAdapter.updateGeneratedFile(genFile);
                         }
                     }
                 }
             });
         }
-        this._tsProgram = ts.createProgram(rootNames, this.options, hostAdapter, tmpProgram);
+        this._tsProgram = ts.createProgram(rootNames, this.options, this.hostAdapter, tmpProgram);
         // Note: the new ts program should be completely reusable by TypeScript as:
         // - we cache all the files in the hostAdapter
         // - new new stubs use the exactly same imports/exports as the old once (we assert that in
@@ -462,11 +490,15 @@ var AngularCompilerProgram = (function () {
     // Note: this returns a ts.Diagnostic so that we
     // can return errors in a ts.EmitResult
     AngularCompilerProgram.prototype.generateFilesForEmit = function (emitFlags) {
+        var _this = this;
         try {
             if (!(emitFlags & api_1.EmitFlags.Codegen)) {
                 return { genFiles: [], genDiags: [] };
             }
-            var genFiles = this.compiler.emitAllImpls(this.analyzedModules);
+            // TODO(tbosch): allow generating files that are not in the rootDir
+            // See https://github.com/angular/angular/issues/19337
+            var genFiles = this.compiler.emitAllImpls(this.analyzedModules)
+                .filter(function (genFile) { return util_1.isInRootDir(genFile.genFileUrl, _this.options); });
             if (this.oldProgramEmittedGeneratedFiles) {
                 var oldProgramEmittedGeneratedFiles_1 = this.oldProgramEmittedGeneratedFiles;
                 genFiles = genFiles.filter(function (genFile) {
@@ -641,9 +673,10 @@ function createSrcToOutPathMapper(outDir, sampleSrcFileName, sampleOutFileName, 
         if (srcFileDir === outFileDir) {
             return function (srcFileName) { return srcFileName; };
         }
+        // calculate the common suffix, stopping
+        // at `outDir`.
         var srcDirParts = srcFileDir.split('/');
-        var outDirParts = outFileDir.split('/');
-        // calculate the common suffix
+        var outDirParts = path.relative(outDir, outFileDir).split('/');
         var i = 0;
         while (i < Math.min(srcDirParts.length, outDirParts.length) &&
             srcDirParts[srcDirParts.length - 1 - i] === outDirParts[outDirParts.length - 1 - i])

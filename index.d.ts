@@ -6,13 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export { AotCompilerHost, AotCompilerHost as StaticReflectorHost, StaticReflector, StaticSymbol } from '@angular/compiler';
-export { CodeGenerator } from './src/codegen';
-export { CompilerHost, CompilerHostContext, ModuleResolutionHostAdapter, NodeCompilerHostContext } from './src/compiler_host';
 export { DiagnosticTemplateInfo, getExpressionScope, getTemplateExpressionDiagnostics } from './src/diagnostics/expression_diagnostics';
 export { AstType, ExpressionDiagnosticsContext } from './src/diagnostics/expression_type';
 export { BuiltinType, DeclarationKind, Definition, PipeInfo, Pipes, Signature, Span, Symbol, SymbolDeclaration, SymbolQuery, SymbolTable } from './src/diagnostics/symbols';
 export { getClassMembersFromDeclaration, getPipesTable, getSymbolQuery } from './src/diagnostics/typescript_symbols';
-export { Extractor } from './src/extractor';
 export { VERSION } from './src/version';
 export * from './src/metadata';
 export * from './src/transformers/api';
