@@ -14,7 +14,7 @@ export interface LoweringRequest {
     name: string;
 }
 export declare type RequestLocationMap = Map<number, LoweringRequest>;
-export declare function getExpressionLoweringTransformFactory(requestsMap: RequestsMap): (context: ts.TransformationContext) => (sourceFile: ts.SourceFile) => ts.SourceFile;
+export declare function getExpressionLoweringTransformFactory(requestsMap: RequestsMap, program: ts.Program): (context: ts.TransformationContext) => (sourceFile: ts.SourceFile) => ts.SourceFile;
 export interface RequestsMap {
     getRequests(sourceFile: ts.SourceFile): RequestLocationMap;
 }

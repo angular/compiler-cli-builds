@@ -353,7 +353,7 @@ var AngularCompilerProgram = (function () {
     AngularCompilerProgram.prototype.calculateTransforms = function (genFiles, customTransformers) {
         var beforeTs = [];
         if (!this.options.disableExpressionLowering) {
-            beforeTs.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.metadataCache));
+            beforeTs.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.metadataCache, this.tsProgram));
         }
         beforeTs.push(node_emitter_transform_1.getAngularEmitterTransformFactory(genFiles));
         if (customTransformers && customTransformers.beforeTs) {
@@ -387,14 +387,14 @@ var AngularCompilerProgram = (function () {
         this._hostAdapter = new compiler_host_1.TsCompilerAotCompilerTypeCheckHostAdapter(this.rootNames, this.options, this.host, this.metadataCache, codegen, this.oldProgramLibrarySummaries);
         var aotOptions = getAotCompilerOptions(this.options);
         this._structuralDiagnostics = [];
-        var errorCollector = function (err) {
+        var errorCollector = (this.options.collectAllErrors || this.options.fullTemplateTypeCheck) ? function (err) {
             _this._structuralDiagnostics.push({
                 messageText: err.toString(),
                 category: ts.DiagnosticCategory.Error,
                 source: api_1.SOURCE,
                 code: api_1.DEFAULT_ERROR_CODE
             });
-        };
+        } : undefined;
         this._compiler = compiler_1.createAotCompiler(this._hostAdapter, aotOptions, errorCollector).compiler;
     };
     AngularCompilerProgram.prototype._createProgramWithBasicStubs = function () {
@@ -650,6 +650,9 @@ function getNgOptionDiagnostics(options) {
     }
     return [];
 }
+function normalizeSeparators(path) {
+    return path.replace(/\\/g, '/');
+}
 /**
  * Returns a function that can adjust a path from source path to out path,
  * based on an existing mapping from source to out path.
@@ -666,18 +669,19 @@ function createSrcToOutPathMapper(outDir, sampleSrcFileName, sampleOutFileName, 
     if (host === void 0) { host = path; }
     var srcToOutPath;
     if (outDir) {
+        var path_1 = {}; // Ensure we error if we use `path` instead of `host`.
         if (sampleSrcFileName == null || sampleOutFileName == null) {
             throw new Error("Can't calculate the rootDir without a sample srcFileName / outFileName. ");
         }
-        var srcFileDir = host.dirname(sampleSrcFileName).replace(/\\/g, '/');
-        var outFileDir = host.dirname(sampleOutFileName).replace(/\\/g, '/');
+        var srcFileDir = normalizeSeparators(host.dirname(sampleSrcFileName));
+        var outFileDir = normalizeSeparators(host.dirname(sampleOutFileName));
         if (srcFileDir === outFileDir) {
             return function (srcFileName) { return srcFileName; };
         }
         // calculate the common suffix, stopping
         // at `outDir`.
         var srcDirParts = srcFileDir.split('/');
-        var outDirParts = path.relative(outDir, outFileDir).split('/');
+        var outDirParts = normalizeSeparators(host.relative(outDir, outFileDir)).split('/');
         var i = 0;
         while (i < Math.min(srcDirParts.length, outDirParts.length) &&
             srcDirParts[srcDirParts.length - 1 - i] === outDirParts[outDirParts.length - 1 - i])
@@ -692,7 +696,7 @@ function createSrcToOutPathMapper(outDir, sampleSrcFileName, sampleOutFileName, 
 }
 exports.createSrcToOutPathMapper = createSrcToOutPathMapper;
 function i18nExtract(formatName, outFile, host, options, bundle) {
-    formatName = formatName || 'null';
+    formatName = formatName || 'xlf';
     // Checks the format and returns the extension
     var ext = i18nGetExtension(formatName);
     var content = i18nSerialize(bundle, formatName, options);
@@ -724,7 +728,7 @@ function i18nSerialize(bundle, formatName, options) {
 }
 exports.i18nSerialize = i18nSerialize;
 function i18nGetExtension(formatName) {
-    var format = (formatName || 'xlf').toLowerCase();
+    var format = formatName.toLowerCase();
     switch (format) {
         case 'xmb':
             return 'xmb';
