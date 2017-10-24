@@ -466,22 +466,23 @@ var AngularCompilerProgram = (function () {
         if (compiler_1.isSyntaxError(e)) {
             var parserErrors = compiler_1.getParseErrors(e);
             if (parserErrors && parserErrors.length) {
-                this._structuralDiagnostics =
-                    parserErrors.map(function (e) { return ({
-                        messageText: e.contextualMessage(),
-                        category: ts.DiagnosticCategory.Error,
-                        span: e.span,
-                        source: api_1.SOURCE,
-                        code: api_1.DEFAULT_ERROR_CODE
-                    }); });
+                this._structuralDiagnostics = (this._structuralDiagnostics || []).concat(parserErrors.map(function (e) { return ({
+                    messageText: e.contextualMessage(),
+                    category: ts.DiagnosticCategory.Error,
+                    span: e.span,
+                    source: api_1.SOURCE,
+                    code: api_1.DEFAULT_ERROR_CODE
+                }); }));
             }
             else {
-                this._structuralDiagnostics = [{
+                this._structuralDiagnostics = (this._structuralDiagnostics || []).concat([
+                    {
                         messageText: e.message,
                         category: ts.DiagnosticCategory.Error,
                         source: api_1.SOURCE,
                         code: api_1.DEFAULT_ERROR_CODE
-                    }];
+                    }
+                ]);
             }
             return null;
         }
