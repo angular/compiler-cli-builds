@@ -650,6 +650,9 @@ function getNgOptionDiagnostics(options) {
     }
     return [];
 }
+function normalizeSeparators(path) {
+    return path.replace(/\\/g, '/');
+}
 /**
  * Returns a function that can adjust a path from source path to out path,
  * based on an existing mapping from source to out path.
@@ -666,18 +669,19 @@ function createSrcToOutPathMapper(outDir, sampleSrcFileName, sampleOutFileName, 
     if (host === void 0) { host = path; }
     var srcToOutPath;
     if (outDir) {
+        var path_1 = {}; // Ensure we error if we use `path` instead of `host`.
         if (sampleSrcFileName == null || sampleOutFileName == null) {
             throw new Error("Can't calculate the rootDir without a sample srcFileName / outFileName. ");
         }
-        var srcFileDir = host.dirname(sampleSrcFileName).replace(/\\/g, '/');
-        var outFileDir = host.dirname(sampleOutFileName).replace(/\\/g, '/');
+        var srcFileDir = normalizeSeparators(host.dirname(sampleSrcFileName));
+        var outFileDir = normalizeSeparators(host.dirname(sampleOutFileName));
         if (srcFileDir === outFileDir) {
             return function (srcFileName) { return srcFileName; };
         }
         // calculate the common suffix, stopping
         // at `outDir`.
         var srcDirParts = srcFileDir.split('/');
-        var outDirParts = path.relative(outDir, outFileDir).split('/');
+        var outDirParts = normalizeSeparators(host.relative(outDir, outFileDir)).split('/');
         var i = 0;
         while (i < Math.min(srcDirParts.length, outDirParts.length) &&
             srcDirParts[srcDirParts.length - 1 - i] === outDirParts[outDirParts.length - 1 - i])
