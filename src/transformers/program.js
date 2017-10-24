@@ -353,7 +353,7 @@ var AngularCompilerProgram = (function () {
     AngularCompilerProgram.prototype.calculateTransforms = function (genFiles, customTransformers) {
         var beforeTs = [];
         if (!this.options.disableExpressionLowering) {
-            beforeTs.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.metadataCache));
+            beforeTs.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.metadataCache, this.tsProgram));
         }
         beforeTs.push(node_emitter_transform_1.getAngularEmitterTransformFactory(genFiles));
         if (customTransformers && customTransformers.beforeTs) {
@@ -387,14 +387,14 @@ var AngularCompilerProgram = (function () {
         this._hostAdapter = new compiler_host_1.TsCompilerAotCompilerTypeCheckHostAdapter(this.rootNames, this.options, this.host, this.metadataCache, codegen, this.oldProgramLibrarySummaries);
         var aotOptions = getAotCompilerOptions(this.options);
         this._structuralDiagnostics = [];
-        var errorCollector = function (err) {
+        var errorCollector = (this.options.collectAllErrors || this.options.fullTemplateTypeCheck) ? function (err) {
             _this._structuralDiagnostics.push({
                 messageText: err.toString(),
                 category: ts.DiagnosticCategory.Error,
                 source: api_1.SOURCE,
                 code: api_1.DEFAULT_ERROR_CODE
             });
-        };
+        } : undefined;
         this._compiler = compiler_1.createAotCompiler(this._hostAdapter, aotOptions, errorCollector).compiler;
     };
     AngularCompilerProgram.prototype._createProgramWithBasicStubs = function () {
@@ -692,7 +692,7 @@ function createSrcToOutPathMapper(outDir, sampleSrcFileName, sampleOutFileName, 
 }
 exports.createSrcToOutPathMapper = createSrcToOutPathMapper;
 function i18nExtract(formatName, outFile, host, options, bundle) {
-    formatName = formatName || 'null';
+    formatName = formatName || 'xlf';
     // Checks the format and returns the extension
     var ext = i18nGetExtension(formatName);
     var content = i18nSerialize(bundle, formatName, options);
@@ -724,7 +724,7 @@ function i18nSerialize(bundle, formatName, options) {
 }
 exports.i18nSerialize = i18nSerialize;
 function i18nGetExtension(formatName) {
-    var format = (formatName || 'xlf').toLowerCase();
+    var format = formatName.toLowerCase();
     switch (format) {
         case 'xmb':
             return 'xmb';
