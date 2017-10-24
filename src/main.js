@@ -20,14 +20,14 @@ function main(args, consoleError, config) {
     if (consoleError === void 0) { consoleError = console.error; }
     var _a = config || readNgcCommandLineAndConfiguration(args), project = _a.project, rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors, watch = _a.watch, emitFlags = _a.emitFlags;
     if (configErrors.length) {
-        return reportErrorsAndExit(configErrors, consoleError);
+        return reportErrorsAndExit(configErrors, /*options*/ undefined, consoleError);
     }
     if (watch) {
         var result = watchMode(project, options, consoleError);
-        return reportErrorsAndExit(result.firstCompileResult, consoleError);
+        return reportErrorsAndExit(result.firstCompileResult, options, consoleError);
     }
     var compileDiags = perform_compile_1.performCompilation({ rootNames: rootNames, options: options, emitFlags: emitFlags, emitCallback: createEmitCallback(options) }).diagnostics;
-    return reportErrorsAndExit(compileDiags, consoleError);
+    return reportErrorsAndExit(compileDiags, options, consoleError);
 }
 exports.main = main;
 function createEmitCallback(options) {
@@ -107,11 +107,17 @@ function readCommandLineAndConfiguration(args, existingOptions, ngCmdLineOptions
     };
 }
 exports.readCommandLineAndConfiguration = readCommandLineAndConfiguration;
-function reportErrorsAndExit(allDiagnostics, consoleError) {
+function reportErrorsAndExit(allDiagnostics, options, consoleError) {
     if (consoleError === void 0) { consoleError = console.error; }
     var errorsAndWarnings = perform_compile_1.filterErrorsAndWarnings(allDiagnostics);
     if (errorsAndWarnings.length) {
-        consoleError(perform_compile_1.formatDiagnostics(errorsAndWarnings));
+        var currentDir_1 = options ? options.basePath : undefined;
+        var formatHost = {
+            getCurrentDirectory: function () { return currentDir_1 || ts.sys.getCurrentDirectory(); },
+            getCanonicalFileName: function (fileName) { return fileName; },
+            getNewLine: function () { return ts.sys.newLine; }
+        };
+        consoleError(perform_compile_1.formatDiagnostics(errorsAndWarnings, formatHost));
     }
     return perform_compile_1.exitCodeFromResult(allDiagnostics);
 }

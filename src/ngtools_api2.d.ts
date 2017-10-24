@@ -13,6 +13,11 @@
  *
  * Once the ngc api is public and stable, this can be removed.
  */
+/**
+ *********************************************************************
+ * Changes to this file need to be approved by the Angular CLI team. *
+ *********************************************************************
+ */
 import { ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
 export interface Diagnostic {
@@ -78,6 +83,17 @@ export interface TsEmitArguments {
 export interface TsEmitCallback {
     (args: TsEmitArguments): ts.EmitResult;
 }
+export interface LazyRoute {
+    module: {
+        name: string;
+        filePath: string;
+    };
+    route: string;
+    referencedModule: {
+        name: string;
+        filePath: string;
+    };
+}
 export interface Program {
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
@@ -87,6 +103,7 @@ export interface Program {
     getTsSemanticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
     getNgSemanticDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): Diagnostic[];
     loadNgStructureAsync(): Promise<void>;
+    listLazyRoutes(entryRoute?: string): LazyRoute[];
     emit({emitFlags, cancellationToken, customTransformers, emitCallback}: {
         emitFlags?: EmitFlags;
         cancellationToken?: ts.CancellationToken;

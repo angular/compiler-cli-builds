@@ -5,9 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { GeneratedFile, ParseSourceSpan } from '@angular/compiler';
+import { AotCompilerHost, GeneratedFile, ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
-import { BaseAotCompilerHost } from '../compiler_host';
 import { TypeCheckHost } from '../diagnostics/translate_diagnostics';
 import { ModuleMetadata } from '../metadata/index';
 import { CompilerHost, CompilerOptions, LibrarySummary } from './api';
@@ -28,11 +27,17 @@ export interface CodeGenerator {
  * - AotCompilerHost for @angular/compiler
  * - TypeCheckHost for mapping ts errors to ng errors (via translateDiagnostics)
  */
-export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCompilerHost<CompilerHost> implements ts.CompilerHost, TypeCheckHost {
+export declare class TsCompilerAotCompilerTypeCheckHostAdapter implements ts.CompilerHost, AotCompilerHost, TypeCheckHost {
     private rootFiles;
+    private options;
+    private context;
     private metadataProvider;
     private codeGenerator;
     private librarySummaries;
+    private metadataReaderCache;
+    private flatModuleIndexCache;
+    private flatModuleIndexNames;
+    private flatModuleIndexRedirectNames;
     private rootDirs;
     private moduleResolutionCache;
     private originalSourceFiles;
@@ -40,6 +45,7 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     private generatedSourceFiles;
     private generatedCodeFor;
     private emitter;
+    private metadataReaderHost;
     getCancellationToken: () => ts.CancellationToken;
     getDefaultLibLocation: () => string;
     trace: (s: string) => void;
@@ -72,7 +78,6 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     fromSummaryFileName(fileName: string, referringLibFileName: string): string;
     parseSourceSpanOf(fileName: string, line: number, character: number): ParseSourceSpan | null;
     private getOriginalSourceFile(filePath, languageVersion?, onError?);
-    getMetadataForSourceFile(filePath: string): ModuleMetadata | undefined;
     updateGeneratedFile(genFile: GeneratedFile): ts.SourceFile;
     private addGeneratedFile(genFile, externalReferences);
     shouldGenerateFile(fileName: string): {
@@ -87,6 +92,9 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     loadSummary(filePath: string): string | null;
     isSourceFile(filePath: string): boolean;
     readFile(fileName: string): string;
+    getMetadataFor(filePath: string): ModuleMetadata[] | undefined;
+    loadResource(filePath: string): Promise<string> | string;
+    private hasBundleIndex(filePath);
     getDefaultLibFileName: (options: ts.CompilerOptions) => string;
     getCurrentDirectory: () => string;
     getCanonicalFileName: (fileName: string) => string;
@@ -96,4 +104,3 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter extends BaseAotCo
     writeFile: any;
 }
 export declare function getOriginalReferences(sourceFile: ts.SourceFile): ts.FileReference[] | undefined;
-export declare function relativeToRootDirs(filePath: string, rootDirs: string[]): string;
