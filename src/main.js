@@ -36,6 +36,12 @@ function createEmitCallback(options) {
     if (!transformDecorators && !transformTypesToClosure) {
         return undefined;
     }
+    if (transformDecorators) {
+        // This is needed as a workaround for https://github.com/angular/tsickle/issues/635
+        // Otherwise tsickle might emit references to non imported values
+        // as TypeScript elided the import.
+        options.emitDecoratorMetadata = true;
+    }
     var tsickleHost = {
         shouldSkipTsickleProcessing: function (fileName) {
             return /\.d\.ts$/.test(fileName) || util_1.GENERATED_FILES.test(fileName);
