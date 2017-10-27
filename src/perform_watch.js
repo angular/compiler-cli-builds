@@ -100,6 +100,7 @@ function performWatchCompilation(host) {
     var fileWatcher = host.onFileChange(cachedOptions.options, watchedFileChanged, resolveReadyPromise);
     return { close: close, ready: function (cb) { return readyPromise.then(cb); }, firstCompileResult: firstCompileResult };
     function cacheEntry(fileName) {
+        fileName = path.normalize(fileName);
         var entry = fileCache.get(fileName);
         if (!entry) {
             entry = {};
@@ -157,6 +158,10 @@ function performWatchCompilation(host) {
             };
         }
         ingoreFilesForWatch.clear();
+        var oldProgram = cachedProgram;
+        // We clear out the `cachedProgram` here as a
+        // program can only be used as `oldProgram` 1x
+        cachedProgram = undefined;
         var compileResult = perform_compile_1.performCompilation({
             rootNames: cachedOptions.rootNames,
             options: cachedOptions.options,
@@ -205,7 +210,7 @@ function performWatchCompilation(host) {
             fileCache.clear();
         }
         else {
-            fileCache.delete(fileName);
+            fileCache.delete(path.normalize(fileName));
         }
         if (!ingoreFilesForWatch.has(path.normalize(fileName))) {
             // Ignore the file if the file is one that was written by the compiler.

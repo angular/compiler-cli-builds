@@ -49,4 +49,30 @@ function pathStartsWithPrefix(prefix, fullPath) {
     var rel = path.relative(prefix, fullPath);
     return rel.startsWith('..') ? null : rel;
 }
+/**
+ * Converts a ng.Diagnostic into a ts.Diagnostic.
+ * This looses some information, and also uses an incomplete object as `file`.
+ *
+ * I.e. only use this where the API allows only a ts.Diagnostic.
+ */
+function ngToTsDiagnostic(ng) {
+    var file;
+    var start;
+    var length;
+    if (ng.span) {
+        // Note: We can't use a real ts.SourceFile,
+        // but we can at least mirror the properties `fileName` and `text`, which
+        // are mostly used for error reporting.
+        file = { fileName: ng.span.start.file.url, text: ng.span.start.file.content };
+        start = ng.span.start.offset;
+        length = ng.span.end.offset - start;
+    }
+    return {
+        file: file,
+        messageText: ng.messageText,
+        category: ng.category,
+        code: ng.code, start: start, length: length,
+    };
+}
+exports.ngToTsDiagnostic = ngToTsDiagnostic;
 //# sourceMappingURL=util.js.map

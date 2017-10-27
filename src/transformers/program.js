@@ -114,11 +114,9 @@ var AngularCompilerProgram = (function () {
     };
     AngularCompilerProgram.prototype.getTsSemanticDiagnostics = function (sourceFile, cancellationToken) {
         var _this = this;
-        if (sourceFile) {
-            return this.tsProgram.getSemanticDiagnostics(sourceFile, cancellationToken);
-        }
+        var sourceFiles = sourceFile ? [sourceFile] : this.tsProgram.getSourceFiles();
         var diags = [];
-        this.tsProgram.getSourceFiles().forEach(function (sf) {
+        sourceFiles.forEach(function (sf) {
             if (!util_1.GENERATED_FILES.test(sf.fileName)) {
                 diags.push.apply(diags, _this.tsProgram.getSemanticDiagnostics(sf, cancellationToken));
             }
@@ -141,15 +139,17 @@ var AngularCompilerProgram = (function () {
         if (this._analyzedModules) {
             throw new Error('Angular structure already loaded');
         }
-        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, rootNames = _a.rootNames;
-        return this.compiler.loadFilesAsync(sourceFiles)
-            .catch(this.catchAnalysisError.bind(this))
-            .then(function (analyzedModules) {
-            if (_this._analyzedModules) {
-                throw new Error('Angular structure loaded both synchronously and asynchronsly');
-            }
-            _this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, rootNames);
-        });
+        return Promise.resolve()
+            .then(function () {
+            var _a = _this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, rootNames = _a.rootNames;
+            return _this.compiler.loadFilesAsync(sourceFiles).then(function (analyzedModules) {
+                if (_this._analyzedModules) {
+                    throw new Error('Angular structure loaded both synchronously and asynchronsly');
+                }
+                _this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, rootNames);
+            });
+        })
+            .catch(function (e) { return _this._createProgramOnError(e); });
     };
     AngularCompilerProgram.prototype.listLazyRoutes = function (route) {
         // Note: Don't analyzedModules if a route is given
@@ -258,6 +258,9 @@ var AngularCompilerProgram = (function () {
             }
         }
         this.emittedSourceFiles = emittedSourceFiles;
+        // translate the diagnostics in the emitResult as well.
+        var translatedEmitDiags = translate_diagnostics_1.translateDiagnostics(this.hostAdapter, emitResult.diagnostics);
+        emitResult.diagnostics = translatedEmitDiags.ts.concat(this.structuralDiagnostics.concat(translatedEmitDiags.ng).map(util_1.ngToTsDiagnostic));
         if (!outSrcMapping.length) {
             // if no files were emitted by TypeScript, also don't emit .json files
             emitResult.diagnostics.push(util_1.createMessageDiagnostic("Emitted no files."));
@@ -366,15 +369,14 @@ var AngularCompilerProgram = (function () {
         if (this._analyzedModules) {
             return;
         }
-        var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, rootNames = _a.rootNames;
-        var analyzedModules;
         try {
-            analyzedModules = this.compiler.loadFilesSync(sourceFiles);
+            var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, rootNames = _a.rootNames;
+            var analyzedModules = this.compiler.loadFilesSync(sourceFiles);
+            this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, rootNames);
         }
         catch (e) {
-            analyzedModules = this.catchAnalysisError(e);
+            this._createProgramOnError(e);
         }
-        this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, rootNames);
     };
     AngularCompilerProgram.prototype._createCompiler = function () {
         var _this = this;
@@ -413,7 +415,7 @@ var AngularCompilerProgram = (function () {
         };
         var rootNames = this.rootNames;
         if (this.options.generateCodeForLibraries !== false) {
-            // if we should generateCodeForLibraries, enver include
+            // if we should generateCodeForLibraries, never include
             // generated files in the program as otherwise we will
             // ovewrite them and typescript will report the error
             // TS5055: Cannot write file ... because it would overwrite input file.
@@ -437,22 +439,20 @@ var AngularCompilerProgram = (function () {
     };
     AngularCompilerProgram.prototype._updateProgramWithTypeCheckStubs = function (tmpProgram, analyzedModules, rootNames) {
         var _this = this;
-        this._analyzedModules = analyzedModules || emptyModules;
-        if (analyzedModules) {
-            tmpProgram.getSourceFiles().forEach(function (sf) {
-                if (sf.fileName.endsWith('.ngfactory.ts')) {
-                    var _a = _this.hostAdapter.shouldGenerateFile(sf.fileName), generate = _a.generate, baseFileName = _a.baseFileName;
-                    if (generate) {
-                        // Note: ! is ok as hostAdapter.shouldGenerateFile will always return a basefileName
-                        // for .ngfactory.ts files.
-                        var genFile = _this.compiler.emitTypeCheckStub(sf.fileName, baseFileName);
-                        if (genFile) {
-                            _this.hostAdapter.updateGeneratedFile(genFile);
-                        }
+        this._analyzedModules = analyzedModules;
+        tmpProgram.getSourceFiles().forEach(function (sf) {
+            if (sf.fileName.endsWith('.ngfactory.ts')) {
+                var _a = _this.hostAdapter.shouldGenerateFile(sf.fileName), generate = _a.generate, baseFileName = _a.baseFileName;
+                if (generate) {
+                    // Note: ! is ok as hostAdapter.shouldGenerateFile will always return a basefileName
+                    // for .ngfactory.ts files.
+                    var genFile = _this.compiler.emitTypeCheckStub(sf.fileName, baseFileName);
+                    if (genFile) {
+                        _this.hostAdapter.updateGeneratedFile(genFile);
                     }
                 }
-            });
-        }
+            }
+        });
         this._tsProgram = ts.createProgram(rootNames, this.options, this.hostAdapter, tmpProgram);
         // Note: the new ts program should be completely reusable by TypeScript as:
         // - we cache all the files in the hostAdapter
@@ -462,7 +462,13 @@ var AngularCompilerProgram = (function () {
             throw new Error("Internal Error: The structure of the program changed during codegen.");
         }
     };
-    AngularCompilerProgram.prototype.catchAnalysisError = function (e) {
+    AngularCompilerProgram.prototype._createProgramOnError = function (e) {
+        // Still fill the analyzedModules and the tsProgram
+        // so that we don't cause other errors for users who e.g. want to emit the ngProgram.
+        this._analyzedModules = emptyModules;
+        this.oldTsProgram = undefined;
+        this._hostAdapter.isSourceFile = function () { return false; };
+        this._tsProgram = ts.createProgram(this.rootNames, this.options, this.hostAdapter);
         if (compiler_1.isSyntaxError(e)) {
             var parserErrors = compiler_1.getParseErrors(e);
             if (parserErrors && parserErrors.length) {
@@ -484,7 +490,7 @@ var AngularCompilerProgram = (function () {
                     }
                 ]);
             }
-            return null;
+            return;
         }
         throw e;
     };
