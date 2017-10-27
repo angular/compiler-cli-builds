@@ -30,10 +30,11 @@ function translateDiagnostics(host, untranslatedDiagnostics) {
                     source: api_1.SOURCE,
                     code: api_1.DEFAULT_ERROR_CODE
                 });
-                return;
             }
         }
-        ts.push(diagnostic);
+        else {
+            ts.push(diagnostic);
+        }
     });
     return { ts: ts, ng: ng };
 }
