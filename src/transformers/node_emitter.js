@@ -136,12 +136,14 @@ var _NodeEmitterVisitor = (function () {
             var span = node.sourceSpan;
             if (span.start.file == span.end.file) {
                 var file = span.start.file;
-                var source = this._templateSources.get(file);
-                if (!source) {
-                    source = ts.createSourceMapSource(file.url, file.content, function (pos) { return pos; });
-                    this._templateSources.set(file, source);
+                if (file.url) {
+                    var source = this._templateSources.get(file);
+                    if (!source) {
+                        source = ts.createSourceMapSource(file.url, file.content, function (pos) { return pos; });
+                        this._templateSources.set(file, source);
+                    }
+                    return { pos: span.start.offset, end: span.end.offset, source: source };
                 }
-                return { pos: span.start.offset, end: span.end.offset, source: source };
             }
         }
         return null;
