@@ -413,13 +413,13 @@ var AngularCompilerProgram = (function () {
             },
             findGeneratedFileNames: function (fileName) { return _this.compiler.findGeneratedFileNames(fileName); },
         };
-        var rootNames = this.rootNames;
+        var rootNames = this.rootNames.slice();
         if (this.options.generateCodeForLibraries !== false) {
             // if we should generateCodeForLibraries, never include
             // generated files in the program as otherwise we will
             // ovewrite them and typescript will report the error
             // TS5055: Cannot write file ... because it would overwrite input file.
-            rootNames = this.rootNames.filter(function (fn) { return !util_1.GENERATED_FILES.test(fn); });
+            rootNames = rootNames.filter(function (fn) { return !util_1.GENERATED_FILES.test(fn); });
         }
         if (this.options.noResolve) {
             this.rootNames.forEach(function (rootName) {
