@@ -163,7 +163,8 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function () {
         var importedFilePackagName = getPackageName(importedFile);
         var containingFilePackageName = getPackageName(containingFile);
         var moduleName;
-        if (importedFilePackagName === containingFilePackageName) {
+        if (importedFilePackagName === containingFilePackageName ||
+            util_1.GENERATED_FILES.test(originalImportedFile)) {
             var rootedContainingFile = util_1.relativeToRootDirs(containingFile, this.rootDirs);
             var rootedImportedFile = util_1.relativeToRootDirs(importedFile, this.rootDirs);
             if (rootedContainingFile !== containingFile && rootedImportedFile !== importedFile) {
