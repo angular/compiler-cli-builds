@@ -597,6 +597,7 @@ var AngularCompilerProgram = (function () {
         if (baseFile) {
             sourceFiles = sourceFiles ? sourceFiles.concat([baseFile]) : [baseFile];
         }
+        // TODO: remove any when TS 2.4 support is removed.
         this.host.writeFile(outFileName, outData, writeByteOrderMark, onError, sourceFiles);
     };
     return AngularCompilerProgram;
