@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+var compiler_1 = require("@angular/compiler");
 var ts = require("typescript");
 var index_1 = require("../metadata/index");
 function toMap(items, select) {
@@ -172,12 +173,11 @@ function shouldLower(node) {
     }
     return true;
 }
-var REWRITE_PREFIX = '\u0275';
 function isPrimitive(value) {
     return Object(value) !== value;
 }
 function isRewritten(value) {
-    return index_1.isMetadataGlobalReferenceExpression(value) && value.name.startsWith(REWRITE_PREFIX);
+    return index_1.isMetadataGlobalReferenceExpression(value) && compiler_1.isLoweredSymbol(value.name);
 }
 function isLiteralFieldNamed(node, names) {
     if (node.parent && node.parent.kind == ts.SyntaxKind.PropertyAssignment) {
@@ -213,7 +213,7 @@ var LowerMetadataCache = (function () {
     };
     LowerMetadataCache.prototype.getMetadataAndRequests = function (sourceFile) {
         var identNumber = 0;
-        var freshIdent = function () { return REWRITE_PREFIX + identNumber++; };
+        var freshIdent = function () { return compiler_1.createLoweredSymbol(identNumber++); };
         var requests = new Map();
         var isExportedSymbol = (function () {
             var exportTable;
