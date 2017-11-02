@@ -258,9 +258,14 @@ var AngularCompilerProgram = (function () {
             }
         }
         this.emittedSourceFiles = emittedSourceFiles;
-        // translate the diagnostics in the emitResult as well.
-        var translatedEmitDiags = translate_diagnostics_1.translateDiagnostics(this.hostAdapter, emitResult.diagnostics);
-        emitResult.diagnostics = translatedEmitDiags.ts.concat(this.structuralDiagnostics.concat(translatedEmitDiags.ng).map(util_1.ngToTsDiagnostic));
+        // Match behavior of tsc: only produce emit diagnostics if it would block
+        // emit. If noEmitOnError is false, the emit will happen in spite of any
+        // errors, so we should not report them.
+        if (this.options.noEmitOnError === true) {
+            // translate the diagnostics in the emitResult as well.
+            var translatedEmitDiags = translate_diagnostics_1.translateDiagnostics(this.hostAdapter, emitResult.diagnostics);
+            emitResult.diagnostics = translatedEmitDiags.ts.concat(this.structuralDiagnostics.concat(translatedEmitDiags.ng).map(util_1.ngToTsDiagnostic));
+        }
         if (!outSrcMapping.length) {
             // if no files were emitted by TypeScript, also don't emit .json files
             emitResult.diagnostics.push(util_1.createMessageDiagnostic("Emitted no files."));
