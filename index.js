@@ -32,4 +32,6 @@ __export(require("./src/transformers/entry_points"));
 __export(require("./src/perform_compile"));
 var ngtools_api_1 = require("./src/ngtools_api");
 exports.__NGTOOLS_PRIVATE_API_2 = ngtools_api_1.NgTools_InternalApi_NG_2;
+var util_1 = require("./src/transformers/util");
+exports.ngToTsDiagnostic = util_1.ngToTsDiagnostic;
 //# sourceMappingURL=index.js.map
