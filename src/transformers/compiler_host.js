@@ -19,13 +19,19 @@ function createCompilerHost(_a) {
     return tsHost;
 }
 exports.createCompilerHost = createCompilerHost;
+function assert(condition) {
+    if (!condition) {
+        // TODO(chuckjaz): do the right thing
+    }
+    return condition;
+}
 /**
  * Implements the following hosts based on an api.CompilerHost:
  * - ts.CompilerHost to be consumed by a ts.Program
  * - AotCompilerHost for @angular/compiler
  * - TypeCheckHost for mapping ts errors to ng errors (via translateDiagnostics)
  */
-var TsCompilerAotCompilerTypeCheckHostAdapter = (function () {
+var TsCompilerAotCompilerTypeCheckHostAdapter = /** @class */ (function () {
     function TsCompilerAotCompilerTypeCheckHostAdapter(rootFiles, options, context, metadataProvider, codeGenerator, librarySummaries) {
         if (librarySummaries === void 0) { librarySummaries = new Map(); }
         var _this = this;
@@ -95,7 +101,7 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function () {
                 return sf ? _this.metadataProvider.getMetadata(sf) : undefined;
             },
             fileExists: function (filePath) { return _this.originalFileExists(filePath); },
-            readFile: function (filePath) { return _this.context.readFile(filePath); },
+            readFile: function (filePath) { return assert(_this.context.readFile(filePath)); },
         };
     }
     TsCompilerAotCompilerTypeCheckHostAdapter.prototype.resolveModuleName = function (moduleName, containingFile) {
@@ -370,7 +376,7 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function () {
             return summary.text;
         }
         if (this.originalFileExists(filePath)) {
-            return this.context.readFile(filePath);
+            return assert(this.context.readFile(filePath));
         }
         return null;
     };
@@ -418,7 +424,7 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function () {
         if (!this.originalFileExists(filePath)) {
             throw compiler_1.syntaxError("Error: Resource file not found: " + filePath);
         }
-        return this.context.readFile(filePath);
+        return assert(this.context.readFile(filePath));
     };
     TsCompilerAotCompilerTypeCheckHostAdapter.prototype.hasBundleIndex = function (filePath) {
         var _this = this;
@@ -437,13 +443,13 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = (function () {
                         if (_this.originalFileExists(packageFile)) {
                             // Once we see a package.json file, assume false until it we find the bundle index.
                             result = false;
-                            var packageContent = JSON.parse(_this.context.readFile(packageFile));
+                            var packageContent = JSON.parse(assert(_this.context.readFile(packageFile)));
                             if (packageContent.typings) {
                                 var typings = path.normalize(path.join(directory, packageContent.typings));
                                 if (util_1.DTS.test(typings)) {
                                     var metadataFile = typings.replace(util_1.DTS, '.metadata.json');
                                     if (_this.originalFileExists(metadataFile)) {
-                                        var metadata = JSON.parse(_this.context.readFile(metadataFile));
+                                        var metadata = JSON.parse(assert(_this.context.readFile(metadataFile)));
                                         if (metadata.flatModuleIndexRedirect) {
                                             _this.flatModuleIndexRedirectNames.add(typings);
                                             // Note: don't set result = true,

@@ -13,7 +13,7 @@ var METHOD_THIS_NAME = 'this';
 var CATCH_ERROR_NAME = 'error';
 var CATCH_STACK_NAME = 'stack';
 var _VALID_IDENTIFIER_RE = /^[$A-Z_][0-9A-Z_$]*$/i;
-var TypeScriptNodeEmitter = (function () {
+var TypeScriptNodeEmitter = /** @class */ (function () {
     function TypeScriptNodeEmitter() {
     }
     TypeScriptNodeEmitter.prototype.updateSourceFile = function (sourceFile, stmts, preamble) {
@@ -53,7 +53,7 @@ function createLiteral(value) {
 /**
  * Visits an output ast and produces the corresponding TypeScript synthetic nodes.
  */
-var _NodeEmitterVisitor = (function () {
+var _NodeEmitterVisitor = /** @class */ (function () {
     function _NodeEmitterVisitor() {
         this._nodeMap = new Map();
         this._importsWithPrefixes = new Map();

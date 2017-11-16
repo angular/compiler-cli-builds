@@ -32,7 +32,7 @@ var defaultEmitCallback = function (_a) {
     var program = _a.program, targetSourceFile = _a.targetSourceFile, writeFile = _a.writeFile, cancellationToken = _a.cancellationToken, emitOnlyDtsFiles = _a.emitOnlyDtsFiles, customTransformers = _a.customTransformers;
     return program.emit(targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, customTransformers);
 };
-var AngularCompilerProgram = (function () {
+var AngularCompilerProgram = /** @class */ (function () {
     function AngularCompilerProgram(rootNames, options, host, oldProgram) {
         this.rootNames = rootNames;
         this.options = options;

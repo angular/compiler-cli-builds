@@ -91,7 +91,7 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter implements ts.Com
     fileExists(fileName: string): boolean;
     loadSummary(filePath: string): string | null;
     isSourceFile(filePath: string): boolean;
-    readFile(fileName: string): string;
+    readFile(fileName: string): string | undefined;
     getMetadataFor(filePath: string): ModuleMetadata[] | undefined;
     loadResource(filePath: string): Promise<string> | string;
     private hasBundleIndex(filePath);

@@ -18,7 +18,7 @@ function translateDiagnostics(host, untranslatedDiagnostics) {
             // We need to filter out diagnostics about unused functions as
             // they are in fact referenced by nobody and only serve to surface
             // type check errors.
-            if (diagnostic.code === 6133) {
+            if (diagnostic.code === /* ... is declared but never used */ 6133) {
                 return;
             }
             var span = sourceSpanOf(host, diagnostic.file, diagnostic.start);

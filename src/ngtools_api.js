@@ -21,7 +21,7 @@ var entry_points_1 = require("./transformers/entry_points");
  * @internal
  * @deprecatd Use ngtools_api2 instead!
  */
-var NgTools_InternalApi_NG_2 = (function () {
+var NgTools_InternalApi_NG_2 = /** @class */ (function () {
     function NgTools_InternalApi_NG_2() {
     }
     /**

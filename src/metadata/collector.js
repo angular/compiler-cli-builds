@@ -23,7 +23,7 @@ var isStatic = function (node) { return ts.getCombinedModifierFlags(node) & ts.M
 /**
  * Collect decorator metadata from a TypeScript module.
  */
-var MetadataCollector = (function () {
+var MetadataCollector = /** @class */ (function () {
     function MetadataCollector(options) {
         if (options === void 0) { options = {}; }
         this.options = options;

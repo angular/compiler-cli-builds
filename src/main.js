@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 var ts = require("typescript");
-var tsickle = require("tsickle");
+var tsickle = require("tsickle/src/tsickle");
 var api = require("./transformers/api");
 var util_1 = require("./transformers/util");
 var perform_compile_1 = require("./perform_compile");

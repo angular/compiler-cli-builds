@@ -55,7 +55,7 @@ function getReferences(info) {
             _loop_1(reference);
         }
     }
-    var visitor = new (function (_super) {
+    var visitor = new /** @class */ (function (_super) {
         __extends(class_1, _super);
         function class_1() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -170,7 +170,7 @@ function getExpressionScope(info, path, includeEvent) {
     return result;
 }
 exports.getExpressionScope = getExpressionScope;
-var ExpressionDiagnosticsVisitor = (function (_super) {
+var ExpressionDiagnosticsVisitor = /** @class */ (function (_super) {
     __extends(ExpressionDiagnosticsVisitor, _super);
     function ExpressionDiagnosticsVisitor(info, getExpressionScope) {
         var _this = _super.call(this) || this;

@@ -191,7 +191,7 @@ function isLiteralFieldNamed(node, names) {
     return false;
 }
 var LOWERABLE_FIELD_NAMES = new Set(['useValue', 'useFactory', 'data']);
-var LowerMetadataCache = (function () {
+var LowerMetadataCache = /** @class */ (function () {
     function LowerMetadataCache(options, strict) {
         this.strict = strict;
         this.metadataCache = new Map();

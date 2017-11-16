@@ -74,7 +74,7 @@ exports.errorSymbol = errorSymbol;
  * Produce a symbolic representation of an expression folding values into their final value when
  * possible.
  */
-var Evaluator = (function () {
+var Evaluator = /** @class */ (function () {
     function Evaluator(symbols, nodeMap, options, recordExport) {
         if (options === void 0) { options = {}; }
         this.symbols = symbols;
