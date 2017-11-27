@@ -734,11 +734,16 @@ function i18nSerialize(bundle, formatName, options) {
         default:
             serializer = new compiler_1.Xliff();
     }
-    return bundle.write(serializer, function (sourcePath) {
-        return options.basePath ? path.relative(options.basePath, sourcePath) : sourcePath;
-    });
+    return bundle.write(serializer, getPathNormalizer(options.basePath));
 }
 exports.i18nSerialize = i18nSerialize;
+function getPathNormalizer(basePath) {
+    // normalize sourcepaths by removing the base path and always using "/" as a separator
+    return function (sourcePath) {
+        sourcePath = basePath ? path.relative(basePath, sourcePath) : sourcePath;
+        return sourcePath.split(path.sep).join('/');
+    };
+}
 function i18nGetExtension(formatName) {
     var format = formatName.toLowerCase();
     switch (format) {
