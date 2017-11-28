@@ -32,33 +32,80 @@ var defaultFormatHost = {
     getCanonicalFileName: function (fileName) { return fileName; },
     getNewLine: function () { return ts.sys.newLine; }
 };
-function formatDiagnostics(diags, tsFormatHost) {
-    if (tsFormatHost === void 0) { tsFormatHost = defaultFormatHost; }
+function displayFileName(fileName, host) {
+    return path.relative(host.getCurrentDirectory(), host.getCanonicalFileName(fileName));
+}
+function formatDiagnosticPosition(position, host) {
+    if (host === void 0) { host = defaultFormatHost; }
+    return displayFileName(position.fileName, host) + "(" + (position.line + 1) + "," + (position.column + 1) + ")";
+}
+exports.formatDiagnosticPosition = formatDiagnosticPosition;
+function flattenDiagnosticMessageChain(chain, host) {
+    if (host === void 0) { host = defaultFormatHost; }
+    var result = chain.messageText;
+    var indent = 1;
+    var current = chain.next;
+    var newLine = host.getNewLine();
+    while (current) {
+        result += newLine;
+        for (var i = 0; i < indent; i++) {
+            result += '  ';
+        }
+        result += current.messageText;
+        var position = current.position;
+        if (position) {
+            result += " at " + formatDiagnosticPosition(position, host);
+        }
+        current = current.next;
+        indent++;
+    }
+    return result;
+}
+exports.flattenDiagnosticMessageChain = flattenDiagnosticMessageChain;
+function formatDiagnostic(diagnostic, host) {
+    if (host === void 0) { host = defaultFormatHost; }
+    var result = '';
+    var newLine = host.getNewLine();
+    var span = diagnostic.span;
+    if (span) {
+        result += formatDiagnosticPosition({
+            fileName: span.start.file.url,
+            line: span.start.line,
+            column: span.start.col
+        }, host) + ": ";
+    }
+    else if (diagnostic.position) {
+        result += formatDiagnosticPosition(diagnostic.position, host) + ": ";
+    }
+    if (diagnostic.span && diagnostic.span.details) {
+        result += ": " + diagnostic.span.details + ", " + diagnostic.messageText + newLine;
+    }
+    else if (diagnostic.chain) {
+        result += flattenDiagnosticMessageChain(diagnostic.chain, host) + "." + newLine;
+    }
+    else {
+        result += ": " + diagnostic.messageText + newLine;
+    }
+    return result;
+}
+exports.formatDiagnostic = formatDiagnostic;
+function formatDiagnostics(diags, host) {
+    if (host === void 0) { host = defaultFormatHost; }
     if (diags && diags.length) {
         return diags
-            .map(function (d) {
-            if (api.isTsDiagnostic(d)) {
-                return ts.formatDiagnostics([d], tsFormatHost);
+            .map(function (diagnostic) {
+            if (api.isTsDiagnostic(diagnostic)) {
+                return ts.formatDiagnostics([diagnostic], host);
             }
             else {
-                var res = ts.DiagnosticCategory[d.category];
-                if (d.span) {
-                    res +=
-                        " at " + d.span.start.file.url + "(" + (d.span.start.line + 1) + "," + (d.span.start.col + 1) + ")";
-                }
-                if (d.span && d.span.details) {
-                    res += ": " + d.span.details + ", " + d.messageText + "\n";
-                }
-                else {
-                    res += ": " + d.messageText + "\n";
-                }
-                return res;
+                return formatDiagnostic(diagnostic, host);
             }
         })
             .join('');
     }
-    else
+    else {
         return '';
+    }
 }
 exports.formatDiagnostics = formatDiagnostics;
 function calcProjectFileAndBasePath(project) {

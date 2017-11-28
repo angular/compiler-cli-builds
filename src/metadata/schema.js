@@ -103,7 +103,7 @@ function isMetadataImportedSymbolReferenceExpression(value) {
 }
 exports.isMetadataImportedSymbolReferenceExpression = isMetadataImportedSymbolReferenceExpression;
 function isMetadataImportDefaultReference(value) {
-    return value.module && value.default && isMetadataSymbolicReferenceExpression(value);
+    return value && value.module && value.default && isMetadataSymbolicReferenceExpression(value);
 }
 exports.isMetadataImportDefaultReference = isMetadataImportDefaultReference;
 function isMetadataSymbolicReferenceExpression(value) {

@@ -340,10 +340,12 @@ var AngularCompilerProgram = /** @class */ (function () {
     });
     Object.defineProperty(AngularCompilerProgram.prototype, "structuralDiagnostics", {
         get: function () {
-            if (!this._structuralDiagnostics) {
+            var diagnostics = this._structuralDiagnostics;
+            if (!diagnostics) {
                 this.initSync();
+                diagnostics = (this._structuralDiagnostics = this._structuralDiagnostics || []);
             }
-            return this._structuralDiagnostics;
+            return diagnostics;
         },
         enumerable: true,
         configurable: true
@@ -393,15 +395,9 @@ var AngularCompilerProgram = /** @class */ (function () {
         };
         this._hostAdapter = new compiler_host_1.TsCompilerAotCompilerTypeCheckHostAdapter(this.rootNames, this.options, this.host, this.metadataCache, codegen, this.oldProgramLibrarySummaries);
         var aotOptions = getAotCompilerOptions(this.options);
-        this._structuralDiagnostics = [];
-        var errorCollector = (this.options.collectAllErrors || this.options.fullTemplateTypeCheck) ? function (err) {
-            _this._structuralDiagnostics.push({
-                messageText: err.toString(),
-                category: ts.DiagnosticCategory.Error,
-                source: api_1.SOURCE,
-                code: api_1.DEFAULT_ERROR_CODE
-            });
-        } : undefined;
+        var errorCollector = (this.options.collectAllErrors || this.options.fullTemplateTypeCheck) ?
+            function (err) { return _this._addStructuralDiagnostics(err); } :
+            undefined;
         this._compiler = compiler_1.createAotCompiler(this._hostAdapter, aotOptions, errorCollector).compiler;
     };
     AngularCompilerProgram.prototype._createProgramWithBasicStubs = function () {
@@ -475,29 +471,24 @@ var AngularCompilerProgram = /** @class */ (function () {
         this._hostAdapter.isSourceFile = function () { return false; };
         this._tsProgram = ts.createProgram(this.rootNames, this.options, this.hostAdapter);
         if (compiler_1.isSyntaxError(e)) {
-            var parserErrors = compiler_1.getParseErrors(e);
-            if (parserErrors && parserErrors.length) {
-                this._structuralDiagnostics = (this._structuralDiagnostics || []).concat(parserErrors.map(function (e) { return ({
-                    messageText: e.contextualMessage(),
-                    category: ts.DiagnosticCategory.Error,
-                    span: e.span,
-                    source: api_1.SOURCE,
-                    code: api_1.DEFAULT_ERROR_CODE
-                }); }));
-            }
-            else {
-                this._structuralDiagnostics = (this._structuralDiagnostics || []).concat([
-                    {
-                        messageText: e.message,
-                        category: ts.DiagnosticCategory.Error,
-                        source: api_1.SOURCE,
-                        code: api_1.DEFAULT_ERROR_CODE
-                    }
-                ]);
-            }
+            this._addStructuralDiagnostics(e);
             return;
         }
         throw e;
+    };
+    AngularCompilerProgram.prototype._addStructuralDiagnostics = function (error) {
+        var diagnostics = this._structuralDiagnostics || (this._structuralDiagnostics = []);
+        if (compiler_1.isSyntaxError(error)) {
+            diagnostics.push.apply(diagnostics, syntaxErrorToDiagnostics(error));
+        }
+        else {
+            diagnostics.push({
+                messageText: error.toString(),
+                category: ts.DiagnosticCategory.Error,
+                source: api_1.SOURCE,
+                code: api_1.DEFAULT_ERROR_CODE
+            });
+        }
     };
     // Note: this returns a ts.Diagnostic so that we
     // can return errors in a ts.EmitResult
@@ -770,5 +761,53 @@ function mergeEmitResults(emitResults) {
         emittedFiles.push.apply(emittedFiles, er.emittedFiles);
     }
     return { diagnostics: diagnostics, emitSkipped: emitSkipped, emittedFiles: emittedFiles };
+}
+function diagnosticSourceOfSpan(span) {
+    // For diagnostics, TypeScript only uses the fileName and text properties.
+    // The redundant '()' are here is to avoid having clang-format breaking the line incorrectly.
+    return { fileName: span.start.file.url, text: span.start.file.content };
+}
+function diagnosticSourceOfFileName(fileName, program) {
+    var sourceFile = program.getSourceFile(fileName);
+    if (sourceFile)
+        return sourceFile;
+    // If we are reporting diagnostics for a source file that is not in the project then we need
+    // to fake a source file so the diagnostic formatting routines can emit the file name.
+    // The redundant '()' are here is to avoid having clang-format breaking the line incorrectly.
+    return { fileName: fileName, text: '' };
+}
+function diagnosticChainFromFormattedDiagnosticChain(chain) {
+    return {
+        messageText: chain.message,
+        next: chain.next && diagnosticChainFromFormattedDiagnosticChain(chain.next),
+        position: chain.position
+    };
+}
+function syntaxErrorToDiagnostics(error) {
+    var parserErrors = compiler_1.getParseErrors(error);
+    if (parserErrors && parserErrors.length) {
+        return parserErrors.map(function (e) { return ({
+            messageText: e.contextualMessage(),
+            file: diagnosticSourceOfSpan(e.span),
+            start: e.span.start.offset,
+            length: e.span.end.offset - e.span.start.offset,
+            category: ts.DiagnosticCategory.Error,
+            source: api_1.SOURCE,
+            code: api_1.DEFAULT_ERROR_CODE
+        }); });
+    }
+    else {
+        if (compiler_1.isFormattedError(error)) {
+            return [{
+                    messageText: error.message,
+                    chain: error.chain && diagnosticChainFromFormattedDiagnosticChain(error.chain),
+                    category: ts.DiagnosticCategory.Error,
+                    source: api_1.SOURCE,
+                    code: api_1.DEFAULT_ERROR_CODE,
+                    position: error.position
+                }];
+        }
+    }
+    return [];
 }
 //# sourceMappingURL=program.js.map

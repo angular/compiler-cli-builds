@@ -259,6 +259,12 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = /** @class */ (function () {
         var _a = this.emitter.emitStatementsAndContext(genFile.genFileUrl, genFile.stmts, /* preamble */ '', 
         /* emitSourceMaps */ false), sourceText = _a.sourceText, context = _a.context;
         var sf = ts.createSourceFile(genFile.genFileUrl, sourceText, this.options.target || ts.ScriptTarget.Latest);
+        if ((this.options.module === ts.ModuleKind.AMD || this.options.module === ts.ModuleKind.UMD) &&
+            this.context.amdModuleName) {
+            var moduleName = this.context.amdModuleName(sf);
+            if (moduleName)
+                sf.moduleName = moduleName;
+        }
         this.generatedSourceFiles.set(genFile.genFileUrl, {
             sourceFile: sf,
             emitCtx: context, externalReferences: externalReferences,

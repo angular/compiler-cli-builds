@@ -110,25 +110,35 @@ export interface MetadataSymbolicIfExpression extends MetadataSymbolicExpression
     elseExpression: MetadataValue;
 }
 export declare function isMetadataSymbolicIfExpression(value: any): value is MetadataSymbolicIfExpression;
-export interface MetadataGlobalReferenceExpression extends MetadataSymbolicExpression {
+export interface MetadataSourceLocationInfo {
+    /**
+     * The line number of the error in the .ts file the metadata was created for.
+     */
+    line?: number;
+    /**
+     * The number of utf8 code-units from the beginning of the file of the error.
+     */
+    character?: number;
+}
+export interface MetadataGlobalReferenceExpression extends MetadataSymbolicExpression, MetadataSourceLocationInfo {
     __symbolic: 'reference';
     name: string;
     arguments?: MetadataValue[];
 }
 export declare function isMetadataGlobalReferenceExpression(value: any): value is MetadataGlobalReferenceExpression;
-export interface MetadataModuleReferenceExpression extends MetadataSymbolicExpression {
+export interface MetadataModuleReferenceExpression extends MetadataSymbolicExpression, MetadataSourceLocationInfo {
     __symbolic: 'reference';
     module: string;
 }
 export declare function isMetadataModuleReferenceExpression(value: any): value is MetadataModuleReferenceExpression;
-export interface MetadataImportedSymbolReferenceExpression extends MetadataSymbolicExpression {
+export interface MetadataImportedSymbolReferenceExpression extends MetadataSymbolicExpression, MetadataSourceLocationInfo {
     __symbolic: 'reference';
     module: string;
     name: string;
     arguments?: MetadataValue[];
 }
 export declare function isMetadataImportedSymbolReferenceExpression(value: any): value is MetadataImportedSymbolReferenceExpression;
-export interface MetadataImportedDefaultReferenceExpression extends MetadataSymbolicExpression {
+export interface MetadataImportedDefaultReferenceExpression extends MetadataSymbolicExpression, MetadataSourceLocationInfo {
     __symbolic: 'reference';
     module: string;
     default: boolean;
@@ -148,7 +158,7 @@ export interface MetadataSymbolicSpreadExpression extends MetadataSymbolicExpres
     expression: MetadataValue;
 }
 export declare function isMetadataSymbolicSpreadExpression(value: any): value is MetadataSymbolicSpreadExpression;
-export interface MetadataError {
+export interface MetadataError extends MetadataSourceLocationInfo {
     __symbolic: 'error';
     /**
      * This message should be short and relatively discriptive and should be fixed once it is created.
@@ -157,14 +167,6 @@ export interface MetadataError {
      * descriptive and/or localized.
      */
     message: string;
-    /**
-     * The line number of the error in the .ts file the metadata was created for.
-     */
-    line?: number;
-    /**
-     * The number of utf8 code-units from the beginning of the file of the error.
-     */
-    character?: number;
     /**
      * The module of the error (only used in bundled metadata)
      */
