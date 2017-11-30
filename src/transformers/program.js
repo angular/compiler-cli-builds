@@ -37,7 +37,6 @@ var AngularCompilerProgram = (function () {
         this.rootNames = rootNames;
         this.options = options;
         this.host = host;
-        this.oldProgram = oldProgram;
         this._optionsDiagnostics = [];
         var _a = ts.version.split('.'), major = _a[0], minor = _a[1];
         if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 4)) {
