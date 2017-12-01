@@ -511,6 +511,8 @@ var MetadataCollector = (function () {
                 __symbolic: 'module',
                 version: this.options.version || schema_1.METADATA_VERSION, metadata: metadata
             };
+            if (sourceFile.moduleName)
+                result.importAs = sourceFile.moduleName;
             if (exports)
                 result.exports = exports;
             return result;
