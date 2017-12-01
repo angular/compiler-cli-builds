@@ -98,6 +98,8 @@ function upgradeMetadataWithDtsData(host, oldMetadata, dtsFilePath) {
                 newMetadata.metadata[prop] = dtsMetadata.metadata[prop];
             }
         }
+        if (dtsMetadata['importAs'])
+            newMetadata['importAs'] = dtsMetadata['importAs'];
         // Only copy exports from exports from metadata prior to version 3.
         // Starting with version 3 the collector began collecting exports and
         // this should be redundant. Also, with bundler will rewrite the exports
