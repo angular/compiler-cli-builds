@@ -795,18 +795,22 @@ function syntaxErrorToDiagnostics(error) {
             code: api_1.DEFAULT_ERROR_CODE
         }); });
     }
-    else {
-        if (compiler_1.isFormattedError(error)) {
-            return [{
-                    messageText: error.message,
-                    chain: error.chain && diagnosticChainFromFormattedDiagnosticChain(error.chain),
-                    category: ts.DiagnosticCategory.Error,
-                    source: api_1.SOURCE,
-                    code: api_1.DEFAULT_ERROR_CODE,
-                    position: error.position
-                }];
-        }
+    else if (compiler_1.isFormattedError(error)) {
+        return [{
+                messageText: error.message,
+                chain: error.chain && diagnosticChainFromFormattedDiagnosticChain(error.chain),
+                category: ts.DiagnosticCategory.Error,
+                source: api_1.SOURCE,
+                code: api_1.DEFAULT_ERROR_CODE,
+                position: error.position
+            }];
     }
-    return [];
+    // Produce a Diagnostic anyway since we know for sure `error` is a SyntaxError
+    return [{
+            messageText: error.message,
+            category: ts.DiagnosticCategory.Error,
+            code: api_1.DEFAULT_ERROR_CODE,
+            source: api_1.SOURCE,
+        }];
 }
 //# sourceMappingURL=program.js.map
