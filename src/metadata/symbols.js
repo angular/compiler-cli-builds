@@ -8,7 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 var ts = require("typescript");
-var Symbols = (function () {
+var Symbols = /** @class */ (function () {
     function Symbols(sourceFile) {
         this.sourceFile = sourceFile;
         this.references = new Map();

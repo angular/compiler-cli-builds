@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+var compiler_1 = require("@angular/compiler");
 var ts = require("typescript");
 var index_1 = require("../metadata/index");
 function toMap(items, select) {
@@ -138,10 +139,11 @@ function createVariableStatementForDeclarations(declarations) {
     return ts.createVariableStatement(
     /* modifiers */ undefined, ts.createVariableDeclarationList(varDecls, ts.NodeFlags.Const));
 }
-function getExpressionLoweringTransformFactory(requestsMap) {
+function getExpressionLoweringTransformFactory(requestsMap, program) {
     // Return the factory
     return function (context) { return function (sourceFile) {
-        var requests = requestsMap.getRequests(sourceFile);
+        // We need to use the original SourceFile for reading metadata, and not the transformed one.
+        var requests = requestsMap.getRequests(program.getSourceFile(sourceFile.fileName));
         if (requests && requests.size) {
             return transformSourceFile(sourceFile, requests, context);
         }
@@ -171,12 +173,11 @@ function shouldLower(node) {
     }
     return true;
 }
-var REWRITE_PREFIX = '\u0275';
 function isPrimitive(value) {
     return Object(value) !== value;
 }
 function isRewritten(value) {
-    return index_1.isMetadataGlobalReferenceExpression(value) && value.name.startsWith(REWRITE_PREFIX);
+    return index_1.isMetadataGlobalReferenceExpression(value) && compiler_1.isLoweredSymbol(value.name);
 }
 function isLiteralFieldNamed(node, names) {
     if (node.parent && node.parent.kind == ts.SyntaxKind.PropertyAssignment) {
@@ -190,7 +191,7 @@ function isLiteralFieldNamed(node, names) {
     return false;
 }
 var LOWERABLE_FIELD_NAMES = new Set(['useValue', 'useFactory', 'data']);
-var LowerMetadataCache = (function () {
+var LowerMetadataCache = /** @class */ (function () {
     function LowerMetadataCache(options, strict) {
         this.strict = strict;
         this.metadataCache = new Map();
@@ -212,7 +213,7 @@ var LowerMetadataCache = (function () {
     };
     LowerMetadataCache.prototype.getMetadataAndRequests = function (sourceFile) {
         var identNumber = 0;
-        var freshIdent = function () { return REWRITE_PREFIX + identNumber++; };
+        var freshIdent = function () { return compiler_1.createLoweredSymbol(identNumber++); };
         var requests = new Map();
         var isExportedSymbol = (function () {
             var exportTable;
@@ -227,6 +228,15 @@ var LowerMetadataCache = (function () {
                 return false;
             };
         })();
+        var isExportedPropertyAccess = function (node) {
+            if (node.kind === ts.SyntaxKind.PropertyAccessExpression) {
+                var pae = node;
+                if (isExportedSymbol(pae.expression)) {
+                    return true;
+                }
+            }
+            return false;
+        };
         var replaceNode = function (node) {
             var name = freshIdent();
             requests.set(node.pos, { name: name, kind: node.kind, location: node.pos, end: node.end });
@@ -240,13 +250,17 @@ var LowerMetadataCache = (function () {
                     return replaceNode(node);
                 }
                 if (isLiteralFieldNamed(node, LOWERABLE_FIELD_NAMES) && shouldLower(node) &&
-                    !isExportedSymbol(node)) {
+                    !isExportedSymbol(node) && !isExportedPropertyAccess(node)) {
                     return replaceNode(node);
                 }
             }
             return value;
         };
-        var metadata = this.collector.getMetadata(sourceFile, this.strict, substituteExpression);
+        // Do not validate or lower metadata in a declaration file. Declaration files are requested
+        // when we need to update the version of the metadata to add informatoin that might be missing
+        // in the out-of-date version that can be recovered from the .d.ts file.
+        var declarationFile = sourceFile.isDeclarationFile;
+        var metadata = this.collector.getMetadata(sourceFile, this.strict && !declarationFile, declarationFile ? undefined : substituteExpression);
         return { metadata: metadata, requests: requests };
     };
     return LowerMetadataCache;

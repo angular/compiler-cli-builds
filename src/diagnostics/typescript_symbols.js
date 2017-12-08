@@ -61,7 +61,7 @@ function getPipesTable(source, program, checker, pipes) {
     return new PipesTable(pipes, { program: program, checker: checker, node: source });
 }
 exports.getPipesTable = getPipesTable;
-var TypeScriptSymbolQuery = (function () {
+var TypeScriptSymbolQuery = /** @class */ (function () {
     function TypeScriptSymbolQuery(program, checker, source, fetchPipes) {
         this.program = program;
         this.checker = checker;
@@ -203,7 +203,7 @@ function selectSignature(type, context, types) {
     var signatures = type.getCallSignatures();
     return signatures.length ? new SignatureWrapper(signatures[0], context) : undefined;
 }
-var TypeWrapper = (function () {
+var TypeWrapper = /** @class */ (function () {
     function TypeWrapper(tsType, context) {
         this.tsType = tsType;
         this.context = context;
@@ -254,7 +254,7 @@ var TypeWrapper = (function () {
     TypeWrapper.prototype.indexed = function (argument) { return undefined; };
     return TypeWrapper;
 }());
-var SymbolWrapper = (function () {
+var SymbolWrapper = /** @class */ (function () {
     function SymbolWrapper(symbol, context) {
         this.context = context;
         this.nullable = false;
@@ -333,7 +333,7 @@ var SymbolWrapper = (function () {
     });
     return SymbolWrapper;
 }());
-var DeclaredSymbol = (function () {
+var DeclaredSymbol = /** @class */ (function () {
     function DeclaredSymbol(declaration) {
         this.declaration = declaration;
         this.language = 'ng-template';
@@ -378,7 +378,7 @@ var DeclaredSymbol = (function () {
     DeclaredSymbol.prototype.indexed = function (argument) { return undefined; };
     return DeclaredSymbol;
 }());
-var SignatureWrapper = (function () {
+var SignatureWrapper = /** @class */ (function () {
     function SignatureWrapper(signature, context) {
         this.signature = signature;
         this.context = context;
@@ -397,7 +397,7 @@ var SignatureWrapper = (function () {
     });
     return SignatureWrapper;
 }());
-var SignatureResultOverride = (function () {
+var SignatureResultOverride = /** @class */ (function () {
     function SignatureResultOverride(signature, resultType) {
         this.signature = signature;
         this.resultType = resultType;
@@ -449,7 +449,7 @@ function toSymbols(symbolTable) {
     }
     return result;
 }
-var SymbolTableWrapper = (function () {
+var SymbolTableWrapper = /** @class */ (function () {
     function SymbolTableWrapper(symbols, context) {
         this.context = context;
         symbols = symbols || [];
@@ -481,7 +481,7 @@ var SymbolTableWrapper = (function () {
     };
     return SymbolTableWrapper;
 }());
-var MapSymbolTable = (function () {
+var MapSymbolTable = /** @class */ (function () {
     function MapSymbolTable() {
         this.map = new Map();
         this._values = [];
@@ -513,7 +513,7 @@ var MapSymbolTable = (function () {
     };
     return MapSymbolTable;
 }());
-var PipesTable = (function () {
+var PipesTable = /** @class */ (function () {
     function PipesTable(pipes, context) {
         this.pipes = pipes;
         this.context = context;
@@ -536,7 +536,7 @@ var PipesTable = (function () {
     };
     return PipesTable;
 }());
-var PipeSymbol = (function () {
+var PipeSymbol = /** @class */ (function () {
     function PipeSymbol(pipe, context) {
         this.pipe = pipe;
         this.context = context;
@@ -637,7 +637,7 @@ function findClassSymbolInContext(type, context) {
         return (exports_1 || []).find(function (symbol) { return symbol.name == type.name; });
     }
 }
-var EmptyTable = (function () {
+var EmptyTable = /** @class */ (function () {
     function EmptyTable() {
         this.size = 0;
     }

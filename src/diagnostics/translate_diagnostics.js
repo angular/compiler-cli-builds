@@ -18,7 +18,7 @@ function translateDiagnostics(host, untranslatedDiagnostics) {
             // We need to filter out diagnostics about unused functions as
             // they are in fact referenced by nobody and only serve to surface
             // type check errors.
-            if (diagnostic.code === 6133) {
+            if (diagnostic.code === /* ... is declared but never used */ 6133) {
                 return;
             }
             var span = sourceSpanOf(host, diagnostic.file, diagnostic.start);
@@ -30,17 +30,18 @@ function translateDiagnostics(host, untranslatedDiagnostics) {
                     source: api_1.SOURCE,
                     code: api_1.DEFAULT_ERROR_CODE
                 });
-                return;
             }
         }
-        ts.push(diagnostic);
+        else {
+            ts.push(diagnostic);
+        }
     });
     return { ts: ts, ng: ng };
 }
 exports.translateDiagnostics = translateDiagnostics;
 function sourceSpanOf(host, source, start) {
     var _a = ts.getLineAndCharacterOfPosition(source, start), line = _a.line, character = _a.character;
-    return host.ngSpanOf(source.fileName, line, character);
+    return host.parseSourceSpanOf(source.fileName, line, character);
 }
 function diagnosticMessageToString(message) {
     return ts.flattenDiagnosticMessageText(message, '\n');

@@ -13,7 +13,7 @@ var collector_1 = require("../metadata/collector");
 var schema_1 = require("../metadata/schema");
 // The character set used to produce private names.
 var PRIVATE_NAME_CHARS = 'abcdefghijklmnopqrstuvwxyz';
-var MetadataBundler = (function () {
+var MetadataBundler = /** @class */ (function () {
     function MetadataBundler(root, importAs, host) {
         this.root = root;
         this.importAs = importAs;
@@ -47,7 +47,7 @@ var MetadataBundler = (function () {
         return {
             metadata: {
                 __symbolic: 'module',
-                version: schema_1.VERSION,
+                version: schema_1.METADATA_VERSION,
                 exports: exports.length ? exports : undefined, metadata: metadata, origins: origins,
                 importAs: this.importAs
             },
@@ -491,7 +491,7 @@ var MetadataBundler = (function () {
     return MetadataBundler;
 }());
 exports.MetadataBundler = MetadataBundler;
-var CompilerHostAdapter = (function () {
+var CompilerHostAdapter = /** @class */ (function () {
     function CompilerHostAdapter(host) {
         this.host = host;
         this.collector = new collector_1.MetadataCollector();

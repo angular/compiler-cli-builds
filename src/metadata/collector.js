@@ -19,22 +19,11 @@ var ts = require("typescript");
 var evaluator_1 = require("./evaluator");
 var schema_1 = require("./schema");
 var symbols_1 = require("./symbols");
-// In TypeScript 2.1 these flags moved
-// These helpers work for both 2.0 and 2.1.
-var isExport = ts.ModifierFlags ?
-    (function (node) {
-        return !!(ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export);
-    }) :
-    (function (node) { return !!((node.flags & ts.NodeFlags.Export)); });
-var isStatic = ts.ModifierFlags ?
-    (function (node) {
-        return !!(ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Static);
-    }) :
-    (function (node) { return !!((node.flags & ts.NodeFlags.Static)); });
+var isStatic = function (node) { return ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Static; };
 /**
  * Collect decorator metadata from a TypeScript module.
  */
-var MetadataCollector = (function () {
+var MetadataCollector = /** @class */ (function () {
     function MetadataCollector(options) {
         if (options === void 0) { options = {}; }
         this.options = options;
@@ -66,8 +55,7 @@ var MetadataCollector = (function () {
             return evaluator.evaluateNode(decoratorNode.expression);
         }
         function recordEntry(entry, node) {
-            nodeMap.set(entry, node);
-            return entry;
+            return evaluator_1.recordMapEntry(entry, node, nodeMap, sourceFile);
         }
         function errorSym(message, node, context) {
             return evaluator_1.errorSymbol(message, node, context, sourceFile);
@@ -248,6 +236,9 @@ var MetadataCollector = (function () {
                     }
             }
         });
+        var isExport = function (node) {
+            return sourceFile.isDeclarationFile || ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export;
+        };
         var isExportedIdentifier = function (identifier) {
             return identifier && exportMap.has(identifier.text);
         };
@@ -517,8 +508,10 @@ var MetadataCollector = (function () {
             }
             var result = {
                 __symbolic: 'module',
-                version: this.options.version || schema_1.VERSION, metadata: metadata
+                version: this.options.version || schema_1.METADATA_VERSION, metadata: metadata
             };
+            if (sourceFile.moduleName)
+                result.importAs = sourceFile.moduleName;
             if (exports)
                 result.exports = exports;
             return result;

@@ -1,10 +1,3 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 import * as ts from 'typescript';
 import { CollectorOptions, ModuleMetadata } from '../metadata/index';
 export interface LoweringRequest {
@@ -14,7 +7,7 @@ export interface LoweringRequest {
     name: string;
 }
 export declare type RequestLocationMap = Map<number, LoweringRequest>;
-export declare function getExpressionLoweringTransformFactory(requestsMap: RequestsMap): (context: ts.TransformationContext) => (sourceFile: ts.SourceFile) => ts.SourceFile;
+export declare function getExpressionLoweringTransformFactory(requestsMap: RequestsMap, program: ts.Program): (context: ts.TransformationContext) => (sourceFile: ts.SourceFile) => ts.SourceFile;
 export interface RequestsMap {
     getRequests(sourceFile: ts.SourceFile): RequestLocationMap;
 }

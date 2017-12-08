@@ -15,7 +15,11 @@ var EmitFlags;
 (function (EmitFlags) {
     EmitFlags[EmitFlags["DTS"] = 1] = "DTS";
     EmitFlags[EmitFlags["JS"] = 2] = "JS";
-    EmitFlags[EmitFlags["Default"] = 3] = "Default";
+    EmitFlags[EmitFlags["Metadata"] = 4] = "Metadata";
+    EmitFlags[EmitFlags["I18nBundle"] = 8] = "I18nBundle";
+    EmitFlags[EmitFlags["Codegen"] = 16] = "Codegen";
+    EmitFlags[EmitFlags["Default"] = 19] = "Default";
+    EmitFlags[EmitFlags["All"] = 31] = "All";
 })(EmitFlags = exports.EmitFlags || (exports.EmitFlags = {}));
 // Wrapper for createProgram.
 function createProgram(_a) {
@@ -29,8 +33,8 @@ function createCompilerHost(_a) {
     return compiler_host_1.createCompilerHost({ options: options, tsHost: tsHost });
 }
 exports.createCompilerHost = createCompilerHost;
-function formatDiagnostics(options, diags) {
-    return perform_compile_1.formatDiagnostics(options, diags);
+function formatDiagnostics(diags) {
+    return perform_compile_1.formatDiagnostics(diags);
 }
 exports.formatDiagnostics = formatDiagnostics;
 //# sourceMappingURL=ngtools_api2.js.map

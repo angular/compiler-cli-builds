@@ -11,35 +11,47 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
 var ts = require("typescript");
-var tsickle = require("tsickle");
+var tsickle = require("tsickle/src/tsickle");
 var api = require("./transformers/api");
+var util_1 = require("./transformers/util");
 var perform_compile_1 = require("./perform_compile");
 var perform_watch_1 = require("./perform_watch");
 function main(args, consoleError, config) {
     if (consoleError === void 0) { consoleError = console.error; }
     var _a = config || readNgcCommandLineAndConfiguration(args), project = _a.project, rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors, watch = _a.watch, emitFlags = _a.emitFlags;
     if (configErrors.length) {
-        return reportErrorsAndExit(options, configErrors, consoleError);
+        return reportErrorsAndExit(configErrors, /*options*/ undefined, consoleError);
     }
     if (watch) {
         var result = watchMode(project, options, consoleError);
-        return reportErrorsAndExit({}, result.firstCompileResult, consoleError);
+        return reportErrorsAndExit(result.firstCompileResult, options, consoleError);
     }
     var compileDiags = perform_compile_1.performCompilation({ rootNames: rootNames, options: options, emitFlags: emitFlags, emitCallback: createEmitCallback(options) }).diagnostics;
-    return reportErrorsAndExit(options, compileDiags, consoleError);
+    return reportErrorsAndExit(compileDiags, options, consoleError);
 }
 exports.main = main;
 function createEmitCallback(options) {
+    var transformDecorators = options.annotationsAs !== 'decorators';
+    var transformTypesToClosure = options.annotateForClosureCompiler;
+    if (!transformDecorators && !transformTypesToClosure) {
+        return undefined;
+    }
+    if (transformDecorators) {
+        // This is needed as a workaround for https://github.com/angular/tsickle/issues/635
+        // Otherwise tsickle might emit references to non imported values
+        // as TypeScript elided the import.
+        options.emitDecoratorMetadata = true;
+    }
     var tsickleHost = {
-        shouldSkipTsickleProcessing: function (fileName) { return /\.d\.ts$/.test(fileName); },
+        shouldSkipTsickleProcessing: function (fileName) {
+            return /\.d\.ts$/.test(fileName) || util_1.GENERATED_FILES.test(fileName);
+        },
         pathToModuleName: function (context, importPath) { return ''; },
         shouldIgnoreWarningsForPath: function (filePath) { return false; },
         fileNameToModuleId: function (fileName) { return fileName; },
         googmodule: false,
         untyped: true,
-        convertIndexImportShorthand: true,
-        transformDecorators: options.annotationsAs !== 'decorators',
-        transformTypesToClosure: options.annotateForClosureCompiler,
+        convertIndexImportShorthand: false, transformDecorators: transformDecorators, transformTypesToClosure: transformTypesToClosure,
     };
     return function (_a) {
         var program = _a.program, targetSourceFile = _a.targetSourceFile, writeFile = _a.writeFile, cancellationToken = _a.cancellationToken, emitOnlyDtsFiles = _a.emitOnlyDtsFiles, _b = _a.customTransformers, customTransformers = _b === void 0 ? {} : _b, host = _a.host, options = _a.options;
@@ -101,16 +113,23 @@ function readCommandLineAndConfiguration(args, existingOptions, ngCmdLineOptions
     };
 }
 exports.readCommandLineAndConfiguration = readCommandLineAndConfiguration;
-function reportErrorsAndExit(options, allDiagnostics, consoleError) {
+function reportErrorsAndExit(allDiagnostics, options, consoleError) {
     if (consoleError === void 0) { consoleError = console.error; }
-    if (allDiagnostics.length) {
-        consoleError(perform_compile_1.formatDiagnostics(options, allDiagnostics));
+    var errorsAndWarnings = perform_compile_1.filterErrorsAndWarnings(allDiagnostics);
+    if (errorsAndWarnings.length) {
+        var currentDir_1 = options ? options.basePath : undefined;
+        var formatHost = {
+            getCurrentDirectory: function () { return currentDir_1 || ts.sys.getCurrentDirectory(); },
+            getCanonicalFileName: function (fileName) { return fileName; },
+            getNewLine: function () { return ts.sys.newLine; }
+        };
+        consoleError(perform_compile_1.formatDiagnostics(errorsAndWarnings, formatHost));
     }
     return perform_compile_1.exitCodeFromResult(allDiagnostics);
 }
 function watchMode(project, options, consoleError) {
     return perform_watch_1.performWatchCompilation(perform_watch_1.createPerformWatchHost(project, function (diagnostics) {
-        consoleError(perform_compile_1.formatDiagnostics(options, diagnostics));
+        consoleError(perform_compile_1.formatDiagnostics(diagnostics));
     }, options, function (options) { return createEmitCallback(options); }));
 }
 exports.watchMode = watchMode;

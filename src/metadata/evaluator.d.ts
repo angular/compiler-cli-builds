@@ -7,8 +7,9 @@
  */
 import * as ts from 'typescript';
 import { CollectorOptions } from './collector';
-import { MetadataEntry, MetadataError, MetadataValue } from './schema';
+import { ClassMetadata, FunctionMetadata, InterfaceMetadata, MetadataEntry, MetadataError, MetadataSourceLocationInfo, MetadataValue } from './schema';
 import { Symbols } from './symbols';
+export declare function recordMapEntry<T extends MetadataEntry>(entry: T, node: ts.Node, nodeMap: Map<MetadataValue | ClassMetadata | InterfaceMetadata | FunctionMetadata, ts.Node>, sourceFile?: ts.SourceFile): T;
 export declare function isPrimitive(value: any): boolean;
 export interface ImportSpecifierMetadata {
     name: string;
@@ -20,6 +21,7 @@ export interface ImportMetadata {
     namedImports?: ImportSpecifierMetadata[];
     from: string;
 }
+export declare function sourceInfo(node: ts.Node | undefined, sourceFile: ts.SourceFile | undefined): MetadataSourceLocationInfo;
 export declare function errorSymbol(message: string, node?: ts.Node, context?: {
     [name: string]: string;
 }, sourceFile?: ts.SourceFile): MetadataError;

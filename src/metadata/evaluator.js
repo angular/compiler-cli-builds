@@ -6,6 +6,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var __assign = (this && this.__assign) || Object.assign || function(t) {
+    for (var s, i = 1, n = arguments.length; i < n; i++) {
+        s = arguments[i];
+        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+            t[p] = s[p];
+    }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 var ts = require("typescript");
 var schema_1 = require("./schema");
@@ -30,6 +38,23 @@ function isCallOf(callExpression, ident) {
     }
     return false;
 }
+/* @internal */
+function recordMapEntry(entry, node, nodeMap, sourceFile) {
+    if (!nodeMap.has(entry)) {
+        nodeMap.set(entry, node);
+        if (node && (schema_1.isMetadataImportedSymbolReferenceExpression(entry) ||
+            schema_1.isMetadataImportDefaultReference(entry)) &&
+            entry.line == null) {
+            var info = sourceInfo(node, sourceFile);
+            if (info.line != null)
+                entry.line = info.line;
+            if (info.character != null)
+                entry.character = info.character;
+        }
+    }
+    return entry;
+}
+exports.recordMapEntry = recordMapEntry;
 /**
  * ts.forEachChild stops iterating children when the callback return a truthy value.
  * This method inverts this to implement an `every` style iterator. It will return
@@ -52,18 +77,19 @@ function getSourceFileOfNode(node) {
     return node;
 }
 /* @internal */
-function errorSymbol(message, node, context, sourceFile) {
-    var result = undefined;
+function sourceInfo(node, sourceFile) {
     if (node) {
         sourceFile = sourceFile || getSourceFileOfNode(node);
         if (sourceFile) {
-            var _a = ts.getLineAndCharacterOfPosition(sourceFile, node.getStart(sourceFile)), line = _a.line, character = _a.character;
-            result = { __symbolic: 'error', message: message, line: line, character: character };
+            return ts.getLineAndCharacterOfPosition(sourceFile, node.getStart(sourceFile));
         }
     }
-    if (!result) {
-        result = { __symbolic: 'error', message: message };
-    }
+    return {};
+}
+exports.sourceInfo = sourceInfo;
+/* @internal */
+function errorSymbol(message, node, context, sourceFile) {
+    var result = __assign({ __symbolic: 'error', message: message }, sourceInfo(node, sourceFile));
     if (context) {
         result.context = context;
     }
@@ -74,7 +100,7 @@ exports.errorSymbol = errorSymbol;
  * Produce a symbolic representation of an expression folding values into their final value when
  * possible.
  */
-var Evaluator = (function () {
+var Evaluator = /** @class */ (function () {
     function Evaluator(symbols, nodeMap, options, recordExport) {
         if (options === void 0) { options = {}; }
         this.symbols = symbols;
@@ -212,8 +238,7 @@ var Evaluator = (function () {
                 }
                 entry = newEntry;
             }
-            t.nodeMap.set(entry, node);
-            return entry;
+            return recordMapEntry(entry, node, t.nodeMap);
         }
         function isFoldableError(value) {
             return !t.options.verboseInvalidExpression && schema_1.isMetadataError(value);
@@ -223,6 +248,9 @@ var Evaluator = (function () {
             if (reference === undefined) {
                 // Encode as a global reference. StaticReflector will check the reference.
                 return recordEntry({ __symbolic: 'reference', name: name }, node);
+            }
+            if (reference && schema_1.isMetadataSymbolicReferenceExpression(reference)) {
+                return recordEntry(__assign({}, reference), node);
             }
             return reference;
         };
@@ -588,7 +616,7 @@ var Evaluator = (function () {
                 return recordEntry({ __symbolic: 'if', condition: condition, thenExpression: thenExpression, elseExpression: elseExpression }, node);
             case ts.SyntaxKind.FunctionExpression:
             case ts.SyntaxKind.ArrowFunction:
-                return recordEntry(errorSymbol('Function call not supported', node), node);
+                return recordEntry(errorSymbol('Lambda not supported', node), node);
             case ts.SyntaxKind.TaggedTemplateExpression:
                 return recordEntry(errorSymbol('Tagged template expressions are not supported in metadata', node), node);
             case ts.SyntaxKind.TemplateExpression:

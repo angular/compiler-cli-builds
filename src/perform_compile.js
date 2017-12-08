@@ -21,38 +21,91 @@ var path = require("path");
 var ts = require("typescript");
 var api = require("./transformers/api");
 var ng = require("./transformers/entry_points");
+var util_1 = require("./transformers/util");
 var TS_EXT = /\.ts$/;
-function formatDiagnostics(options, diags) {
+function filterErrorsAndWarnings(diagnostics) {
+    return diagnostics.filter(function (d) { return d.category !== ts.DiagnosticCategory.Message; });
+}
+exports.filterErrorsAndWarnings = filterErrorsAndWarnings;
+var defaultFormatHost = {
+    getCurrentDirectory: function () { return ts.sys.getCurrentDirectory(); },
+    getCanonicalFileName: function (fileName) { return fileName; },
+    getNewLine: function () { return ts.sys.newLine; }
+};
+function displayFileName(fileName, host) {
+    return path.relative(host.getCurrentDirectory(), host.getCanonicalFileName(fileName));
+}
+function formatDiagnosticPosition(position, host) {
+    if (host === void 0) { host = defaultFormatHost; }
+    return displayFileName(position.fileName, host) + "(" + (position.line + 1) + "," + (position.column + 1) + ")";
+}
+exports.formatDiagnosticPosition = formatDiagnosticPosition;
+function flattenDiagnosticMessageChain(chain, host) {
+    if (host === void 0) { host = defaultFormatHost; }
+    var result = chain.messageText;
+    var indent = 1;
+    var current = chain.next;
+    var newLine = host.getNewLine();
+    while (current) {
+        result += newLine;
+        for (var i = 0; i < indent; i++) {
+            result += '  ';
+        }
+        result += current.messageText;
+        var position = current.position;
+        if (position) {
+            result += " at " + formatDiagnosticPosition(position, host);
+        }
+        current = current.next;
+        indent++;
+    }
+    return result;
+}
+exports.flattenDiagnosticMessageChain = flattenDiagnosticMessageChain;
+function formatDiagnostic(diagnostic, host) {
+    if (host === void 0) { host = defaultFormatHost; }
+    var result = '';
+    var newLine = host.getNewLine();
+    var span = diagnostic.span;
+    if (span) {
+        result += formatDiagnosticPosition({
+            fileName: span.start.file.url,
+            line: span.start.line,
+            column: span.start.col
+        }, host) + ": ";
+    }
+    else if (diagnostic.position) {
+        result += formatDiagnosticPosition(diagnostic.position, host) + ": ";
+    }
+    if (diagnostic.span && diagnostic.span.details) {
+        result += ": " + diagnostic.span.details + ", " + diagnostic.messageText + newLine;
+    }
+    else if (diagnostic.chain) {
+        result += flattenDiagnosticMessageChain(diagnostic.chain, host) + "." + newLine;
+    }
+    else {
+        result += ": " + diagnostic.messageText + newLine;
+    }
+    return result;
+}
+exports.formatDiagnostic = formatDiagnostic;
+function formatDiagnostics(diags, host) {
+    if (host === void 0) { host = defaultFormatHost; }
     if (diags && diags.length) {
-        var tsFormatHost_1 = {
-            getCurrentDirectory: function () { return options.basePath || process.cwd(); },
-            getCanonicalFileName: function (fileName) { return fileName; },
-            getNewLine: function () { return ts.sys.newLine; }
-        };
         return diags
-            .map(function (d) {
-            if (api.isTsDiagnostic(d)) {
-                return ts.formatDiagnostics([d], tsFormatHost_1);
+            .map(function (diagnostic) {
+            if (api.isTsDiagnostic(diagnostic)) {
+                return ts.formatDiagnostics([diagnostic], host);
             }
             else {
-                var res = ts.DiagnosticCategory[d.category];
-                if (d.span) {
-                    res +=
-                        " at " + d.span.start.file.url + "(" + (d.span.start.line + 1) + "," + (d.span.start.col + 1) + ")";
-                }
-                if (d.span && d.span.details) {
-                    res += ": " + d.span.details + ", " + d.messageText + "\n";
-                }
-                else {
-                    res += ": " + d.messageText + "\n";
-                }
-                return res;
+                return formatDiagnostic(diagnostic, host);
             }
         })
-            .join();
+            .join('');
     }
-    else
+    else {
         return '';
+    }
 }
 exports.formatDiagnostics = formatDiagnostics;
 function calcProjectFileAndBasePath(project) {
@@ -93,6 +146,9 @@ function readConfiguration(project, existingOptions) {
         if (!(options.skipMetadataEmit || options.flatModuleOutFile)) {
             emitFlags |= api.EmitFlags.Metadata;
         }
+        if (options.skipTemplateCodegen) {
+            emitFlags = emitFlags & ~api.EmitFlags.Codegen;
+        }
         return { project: projectFile, rootNames: rootNames, options: options, errors: parsed.errors, emitFlags: emitFlags };
     }
     catch (e) {
@@ -107,7 +163,7 @@ function readConfiguration(project, existingOptions) {
 }
 exports.readConfiguration = readConfiguration;
 function exitCodeFromResult(diags) {
-    if (!diags || diags.length === 0) {
+    if (!diags || filterErrorsAndWarnings(diags).length === 0) {
         // If we have a result and didn't get any errors, we succeeded.
         return 0;
     }
@@ -117,10 +173,6 @@ function exitCodeFromResult(diags) {
 exports.exitCodeFromResult = exitCodeFromResult;
 function performCompilation(_a) {
     var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram, emitCallback = _a.emitCallback, _b = _a.gatherDiagnostics, gatherDiagnostics = _b === void 0 ? defaultGatherDiagnostics : _b, customTransformers = _a.customTransformers, _c = _a.emitFlags, emitFlags = _c === void 0 ? api.EmitFlags.Default : _c;
-    var _d = ts.version.split('.'), major = _d[0], minor = _d[1];
-    if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 4)) {
-        throw new Error('The Angular Compiler requires TypeScript >= 2.4.');
-    }
     var program;
     var emitResult;
     var allDiagnostics = [];
@@ -129,7 +181,12 @@ function performCompilation(_a) {
             host = ng.createCompilerHost({ options: options });
         }
         program = ng.createProgram({ rootNames: rootNames, host: host, options: options, oldProgram: oldProgram });
+        var beforeDiags = Date.now();
         allDiagnostics.push.apply(allDiagnostics, gatherDiagnostics(program));
+        if (options.diagnostics) {
+            var afterDiags = Date.now();
+            allDiagnostics.push(util_1.createMessageDiagnostic("Time for diagnostics: " + (afterDiags - beforeDiags) + "ms."));
+        }
         if (!hasErrors(allDiagnostics)) {
             emitResult = program.emit({ emitCallback: emitCallback, customTransformers: customTransformers, emitFlags: emitFlags });
             allDiagnostics.push.apply(allDiagnostics, emitResult.diagnostics);

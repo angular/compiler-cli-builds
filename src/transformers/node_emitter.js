@@ -13,7 +13,7 @@ var METHOD_THIS_NAME = 'this';
 var CATCH_ERROR_NAME = 'error';
 var CATCH_STACK_NAME = 'stack';
 var _VALID_IDENTIFIER_RE = /^[$A-Z_][0-9A-Z_$]*$/i;
-var TypeScriptNodeEmitter = (function () {
+var TypeScriptNodeEmitter = /** @class */ (function () {
     function TypeScriptNodeEmitter() {
     }
     TypeScriptNodeEmitter.prototype.updateSourceFile = function (sourceFile, stmts, preamble) {
@@ -31,7 +31,9 @@ var TypeScriptNodeEmitter = (function () {
             ts.setEmitFlags(commentStmt, ts.EmitFlags.CustomPrologue);
             preambleStmts.push(commentStmt);
         }
-        var newSourceFile = ts.updateSourceFileNode(sourceFile, preambleStmts.concat(converter.getReexports(), converter.getImports(), statements));
+        var sourceStatments = preambleStmts.concat(converter.getReexports(), converter.getImports(), statements);
+        converter.updateSourceMap(sourceStatments);
+        var newSourceFile = ts.updateSourceFileNode(sourceFile, sourceStatments);
         return [newSourceFile, converter.getNodeMap()];
     };
     return TypeScriptNodeEmitter;
@@ -51,11 +53,12 @@ function createLiteral(value) {
 /**
  * Visits an output ast and produces the corresponding TypeScript synthetic nodes.
  */
-var _NodeEmitterVisitor = (function () {
+var _NodeEmitterVisitor = /** @class */ (function () {
     function _NodeEmitterVisitor() {
         this._nodeMap = new Map();
         this._importsWithPrefixes = new Map();
         this._reexports = new Map();
+        this._templateSources = new Map();
     }
     _NodeEmitterVisitor.prototype.getReexports = function () {
         return Array.from(this._reexports.entries())
@@ -83,13 +86,67 @@ var _NodeEmitterVisitor = (function () {
         });
     };
     _NodeEmitterVisitor.prototype.getNodeMap = function () { return this._nodeMap; };
-    _NodeEmitterVisitor.prototype.record = function (ngNode, tsNode) {
+    _NodeEmitterVisitor.prototype.updateSourceMap = function (statements) {
         var _this = this;
+        var lastRangeStartNode = undefined;
+        var lastRangeEndNode = undefined;
+        var lastRange = undefined;
+        var recordLastSourceRange = function () {
+            if (lastRange && lastRangeStartNode && lastRangeEndNode) {
+                if (lastRangeStartNode == lastRangeEndNode) {
+                    ts.setSourceMapRange(lastRangeEndNode, lastRange);
+                }
+                else {
+                    ts.setSourceMapRange(lastRangeStartNode, lastRange);
+                    // Only emit the pos for the first node emitted in the range.
+                    ts.setEmitFlags(lastRangeStartNode, ts.EmitFlags.NoTrailingSourceMap);
+                    ts.setSourceMapRange(lastRangeEndNode, lastRange);
+                    // Only emit emit end for the last node emitted in the range.
+                    ts.setEmitFlags(lastRangeEndNode, ts.EmitFlags.NoLeadingSourceMap);
+                }
+            }
+        };
+        var visitNode = function (tsNode) {
+            var ngNode = _this._nodeMap.get(tsNode);
+            if (ngNode) {
+                var range = _this.sourceRangeOf(ngNode);
+                if (range) {
+                    if (!lastRange || range.source != lastRange.source || range.pos != lastRange.pos ||
+                        range.end != lastRange.end) {
+                        recordLastSourceRange();
+                        lastRangeStartNode = tsNode;
+                        lastRange = range;
+                    }
+                    lastRangeEndNode = tsNode;
+                }
+            }
+            ts.forEachChild(tsNode, visitNode);
+        };
+        statements.forEach(visitNode);
+        recordLastSourceRange();
+    };
+    _NodeEmitterVisitor.prototype.record = function (ngNode, tsNode) {
         if (tsNode && !this._nodeMap.has(tsNode)) {
             this._nodeMap.set(tsNode, ngNode);
-            ts.forEachChild(tsNode, function (child) { return _this.record(ngNode, tsNode); });
         }
         return tsNode;
+    };
+    _NodeEmitterVisitor.prototype.sourceRangeOf = function (node) {
+        if (node.sourceSpan) {
+            var span = node.sourceSpan;
+            if (span.start.file == span.end.file) {
+                var file = span.start.file;
+                if (file.url) {
+                    var source = this._templateSources.get(file);
+                    if (!source) {
+                        source = ts.createSourceMapSource(file.url, file.content, function (pos) { return pos; });
+                        this._templateSources.set(file, source);
+                    }
+                    return { pos: span.start.offset, end: span.end.offset, source: source };
+                }
+            }
+        }
+        return null;
     };
     _NodeEmitterVisitor.prototype.getModifiers = function (stmt) {
         var modifiers = [];
@@ -229,9 +286,8 @@ var _NodeEmitterVisitor = (function () {
         return this.record(expr, this._visitIdentifier(expr.value));
     };
     _NodeEmitterVisitor.prototype.visitConditionalExpr = function (expr) {
-        // TODO {chuckj}: Review use of ! on flaseCase. Should it be non-nullable?
-        return this.record(expr, ts.createConditional(expr.condition.visitExpression(this, null), expr.trueCase.visitExpression(this, null), expr.falseCase.visitExpression(this, null)));
-        ;
+        // TODO {chuckj}: Review use of ! on falseCase. Should it be non-nullable?
+        return this.record(expr, ts.createParen(ts.createConditional(expr.condition.visitExpression(this, null), expr.trueCase.visitExpression(this, null), expr.falseCase.visitExpression(this, null))));
     };
     _NodeEmitterVisitor.prototype.visitNotExpr = function (expr) {
         return this.record(expr, ts.createPrefix(ts.SyntaxKind.ExclamationToken, expr.condition.visitExpression(this, null)));
@@ -301,7 +357,7 @@ var _NodeEmitterVisitor = (function () {
             default:
                 throw new Error("Unknown operator: " + expr.operator);
         }
-        return this.record(expr, ts.createBinary(expr.lhs.visitExpression(this, null), binaryOperator, expr.rhs.visitExpression(this, null)));
+        return this.record(expr, ts.createParen(ts.createBinary(expr.lhs.visitExpression(this, null), binaryOperator, expr.rhs.visitExpression(this, null))));
     };
     _NodeEmitterVisitor.prototype.visitReadPropExpr = function (expr) {
         return this.record(expr, ts.createPropertyAccess(expr.receiver.visitExpression(this, null), expr.name));

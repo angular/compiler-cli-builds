@@ -8,12 +8,13 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 // Metadata Schema
-// If you make a backwards incompatible change to the schema, increment the VERSION number.
+// If you make a backwards incompatible change to the schema, increment the METADTA_VERSION number.
 // If you make a backwards compatible change to the metadata (such as adding an option field) then
-// leave VERSION the same. If possible, as many versions of the metadata that can represent the
-// semantics of the file in an array. For example, when generating a version 2 file, if version 1
-// can accurately represent the metadata, generate both version 1 and version 2 in an array.
-exports.VERSION = 3;
+// leave METADATA_VERSION the same. If possible, supply as many versions of the metadata that can
+// represent the semantics of the file in an array. For example, when generating a version 2 file,
+// if version 1 can accurately represent the metadata, generate both version 1 and version 2 in
+// an array.
+exports.METADATA_VERSION = 4;
 function isModuleMetadata(value) {
     return value && value.__symbolic === 'module';
 }
@@ -102,7 +103,7 @@ function isMetadataImportedSymbolReferenceExpression(value) {
 }
 exports.isMetadataImportedSymbolReferenceExpression = isMetadataImportedSymbolReferenceExpression;
 function isMetadataImportDefaultReference(value) {
-    return value.module && value.default && isMetadataSymbolicReferenceExpression(value);
+    return value && value.module && value.default && isMetadataSymbolicReferenceExpression(value);
 }
 exports.isMetadataImportDefaultReference = isMetadataImportDefaultReference;
 function isMetadataSymbolicReferenceExpression(value) {
