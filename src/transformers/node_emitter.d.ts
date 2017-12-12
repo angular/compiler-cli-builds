@@ -12,4 +12,6 @@ export interface Node {
 }
 export declare class TypeScriptNodeEmitter {
     updateSourceFile(sourceFile: ts.SourceFile, stmts: Statement[], preamble?: string): [ts.SourceFile, Map<ts.Node, Node>];
+    /** Creates a not emitted statement containing the given comment. */
+    createCommentStatement(sourceFile: ts.SourceFile, comment: string): ts.Statement;
 }
