@@ -16,5 +16,5 @@ var compiler_1 = require("@angular/compiler");
 /**
  * @stable
  */
-exports.VERSION = new compiler_1.Version('5.2.0-beta.0-d3dbb9d');
+exports.VERSION = new compiler_1.Version('5.2.0-beta.0-541a391');
 //# sourceMappingURL=version.js.map
