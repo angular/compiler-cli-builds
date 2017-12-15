@@ -283,7 +283,7 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = /** @class */ (function () {
             return { generate: false };
         }
         var base = genMatch[1], genSuffix = genMatch[2], suffix = genMatch[3];
-        if (suffix !== 'ts' && suffix !== 'tsx') {
+        if (suffix !== 'ts') {
             return { generate: false };
         }
         var baseFileName;
@@ -295,9 +295,9 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = /** @class */ (function () {
         }
         else {
             // Note: on-the-fly generated files always have a `.ts` suffix,
-            // but the file from which we generated it can be a `.ts`/ `.tsx`/ `.d.ts`
+            // but the file from which we generated it can be a `.ts`/ `.d.ts`
             // (see options.generateCodeForLibraries).
-            baseFileName = [base + ".ts", base + ".tsx", base + ".d.ts"].find(function (baseFileName) { return _this.isSourceFile(baseFileName) && _this.originalFileExists(baseFileName); });
+            baseFileName = [base + ".ts", base + ".d.ts"].find(function (baseFileName) { return _this.isSourceFile(baseFileName) && _this.originalFileExists(baseFileName); });
             if (!baseFileName) {
                 return { generate: false };
             }
