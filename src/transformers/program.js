@@ -289,9 +289,11 @@ var AngularCompilerProgram = /** @class */ (function () {
                 if (!sf.isDeclarationFile && !util_1.GENERATED_FILES.test(sf.fileName)) {
                     metadataJsonCount++;
                     var metadata = _this.metadataCache.getMetadata(sf);
-                    var metadataText = JSON.stringify([metadata]);
-                    var outFileName = srcToOutPath(sf.fileName.replace(/\.tsx?$/, '.metadata.json'));
-                    _this.writeFile(outFileName, metadataText, false, undefined, undefined, [sf]);
+                    if (metadata) {
+                        var metadataText = JSON.stringify([metadata]);
+                        var outFileName = srcToOutPath(sf.fileName.replace(/\.tsx?$/, '.metadata.json'));
+                        _this.writeFile(outFileName, metadataText, false, undefined, undefined, [sf]);
+                    }
                 }
             });
         }
