@@ -55,7 +55,7 @@ function createEmitCallback(options) {
     };
     return function (_a) {
         var program = _a.program, targetSourceFile = _a.targetSourceFile, writeFile = _a.writeFile, cancellationToken = _a.cancellationToken, emitOnlyDtsFiles = _a.emitOnlyDtsFiles, _b = _a.customTransformers, customTransformers = _b === void 0 ? {} : _b, host = _a.host, options = _a.options;
-        return tsickle.emitWithTsickle(program, tsickleHost, host, options, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
+        return tsickle.emitWithTsickle(program, __assign({}, tsickleHost, { options: options, host: host }), host, options, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
             beforeTs: customTransformers.before,
             afterTs: customTransformers.after,
         });

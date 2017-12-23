@@ -34,10 +34,10 @@ var defaultEmitCallback = function (_a) {
 };
 var AngularCompilerProgram = /** @class */ (function () {
     function AngularCompilerProgram(rootNames, options, host, oldProgram) {
-        this.rootNames = rootNames;
         this.options = options;
         this.host = host;
         this._optionsDiagnostics = [];
+        this.rootNames = rootNames.slice();
         var _a = ts.version.split('.'), major = _a[0], minor = _a[1];
         if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 4)) {
             throw new Error('The Angular Compiler requires TypeScript >= 2.4.');
@@ -49,7 +49,7 @@ var AngularCompilerProgram = /** @class */ (function () {
             this.oldProgramEmittedSourceFiles = oldProgram.getEmittedSourceFiles();
         }
         if (options.flatModuleOutFile) {
-            var _b = index_1.createBundleIndexHost(options, rootNames, host), bundleHost = _b.host, indexName = _b.indexName, errors = _b.errors;
+            var _b = index_1.createBundleIndexHost(options, this.rootNames, host), bundleHost = _b.host, indexName = _b.indexName, errors = _b.errors;
             if (errors) {
                 // TODO(tbosch): once we move MetadataBundler from tsc_wrapped into compiler_cli,
                 // directly create ng.Diagnostic instead of using ts.Diagnostic here.
@@ -61,7 +61,7 @@ var AngularCompilerProgram = /** @class */ (function () {
                 }); }));
             }
             else {
-                rootNames.push(indexName);
+                this.rootNames.push(indexName);
                 this.host = bundleHost;
             }
         }
@@ -253,6 +253,7 @@ var AngularCompilerProgram = /** @class */ (function () {
             // checks that TypeScript makes for project structure reuse will succeed.
             for (var _g = 0, _h = Array.from(augmentedReferences); _g < _h.length; _g++) {
                 var _j = _h[_g], sourceFile = _j[0], references = _j[1];
+                // TODO(chuckj): Remove any cast after updating build to 2.6
                 sourceFile.referencedFiles = references;
             }
         }
@@ -267,7 +268,8 @@ var AngularCompilerProgram = /** @class */ (function () {
         }
         if (!outSrcMapping.length) {
             // if no files were emitted by TypeScript, also don't emit .json files
-            emitResult.diagnostics.push(util_1.createMessageDiagnostic("Emitted no files."));
+            emitResult.diagnostics =
+                emitResult.diagnostics.concat([util_1.createMessageDiagnostic("Emitted no files.")]);
             return emitResult;
         }
         var sampleSrcFileName;
@@ -299,12 +301,12 @@ var AngularCompilerProgram = /** @class */ (function () {
         }
         var emitEnd = Date.now();
         if (this.options.diagnostics) {
-            emitResult.diagnostics.push(util_1.createMessageDiagnostic([
-                "Emitted in " + (emitEnd - emitStart) + "ms",
-                "- " + emittedUserTsCount + " user ts files",
-                "- " + genTsFiles.length + " generated ts files",
-                "- " + (genJsonFiles.length + metadataJsonCount) + " generated json files",
-            ].join('\n')));
+            emitResult.diagnostics = emitResult.diagnostics.concat([util_1.createMessageDiagnostic([
+                    "Emitted in " + (emitEnd - emitStart) + "ms",
+                    "- " + emittedUserTsCount + " user ts files",
+                    "- " + genTsFiles.length + " generated ts files",
+                    "- " + (genJsonFiles.length + metadataJsonCount) + " generated json files",
+                ].join('\n'))]);
         }
         return emitResult;
     };
@@ -702,7 +704,7 @@ function i18nExtract(formatName, outFile, host, options, bundle) {
     var content = i18nSerialize(bundle, formatName, options);
     var dstFile = outFile || "messages." + ext;
     var dstPath = path.resolve(options.outDir || options.basePath, dstFile);
-    host.writeFile(dstPath, content, false);
+    host.writeFile(dstPath, content, false, undefined, []);
     return [dstPath];
 }
 exports.i18nExtract = i18nExtract;
