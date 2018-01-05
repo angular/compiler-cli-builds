@@ -14,7 +14,7 @@ var DiagnosticKind;
     DiagnosticKind[DiagnosticKind["Error"] = 0] = "Error";
     DiagnosticKind[DiagnosticKind["Warning"] = 1] = "Warning";
 })(DiagnosticKind = exports.DiagnosticKind || (exports.DiagnosticKind = {}));
-var TypeDiagnostic = (function () {
+var TypeDiagnostic = /** @class */ (function () {
     function TypeDiagnostic(kind, message, ast) {
         this.kind = kind;
         this.message = message;
@@ -24,7 +24,7 @@ var TypeDiagnostic = (function () {
 }());
 exports.TypeDiagnostic = TypeDiagnostic;
 // AstType calculatetype of the ast given AST element.
-var AstType = (function () {
+var AstType = /** @class */ (function () {
     function AstType(scope, query, context) {
         this.scope = scope;
         this.query = query;
