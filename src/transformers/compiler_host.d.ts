@@ -51,7 +51,7 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter implements ts.Com
     trace: (s: string) => void;
     getDirectories: (path: string) => string[];
     directoryExists?: (directoryName: string) => boolean;
-    constructor(rootFiles: string[], options: CompilerOptions, context: CompilerHost, metadataProvider: MetadataProvider, codeGenerator: CodeGenerator, librarySummaries?: Map<string, LibrarySummary>);
+    constructor(rootFiles: ReadonlyArray<string>, options: CompilerOptions, context: CompilerHost, metadataProvider: MetadataProvider, codeGenerator: CodeGenerator, librarySummaries?: Map<string, LibrarySummary>);
     private resolveModuleName(moduleName, containingFile);
     resolveModuleNames(moduleNames: string[], containingFile: string): ts.ResolvedModule[];
     moduleNameToFileName(m: string, containingFile?: string): string | null;

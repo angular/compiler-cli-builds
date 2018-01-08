@@ -129,6 +129,7 @@ function performWatchCompilation(host) {
             cachedCompilerHost = host.createCompilerHost(cachedOptions.options);
             var originalWriteFileCallback_1 = cachedCompilerHost.writeFile;
             cachedCompilerHost.writeFile = function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
+                if (sourceFiles === void 0) { sourceFiles = []; }
                 ingoreFilesForWatch.add(path.normalize(fileName));
                 return originalWriteFileCallback_1(fileName, data, writeByteOrderMark, onError, sourceFiles);
             };

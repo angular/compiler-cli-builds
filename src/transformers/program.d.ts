@@ -10,7 +10,7 @@ import * as path from 'path';
 import * as ts from 'typescript';
 import { CompilerHost, CompilerOptions, Program } from './api';
 export declare function createProgram({rootNames, options, host, oldProgram}: {
-    rootNames: string[];
+    rootNames: ReadonlyArray<string>;
     options: CompilerOptions;
     host: CompilerHost;
     oldProgram?: Program;

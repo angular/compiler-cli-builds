@@ -11,7 +11,7 @@ import { Diagnostic } from '../transformers/api';
 export interface TypeCheckHost {
     parseSourceSpanOf(fileName: string, line: number, character: number): ParseSourceSpan | null;
 }
-export declare function translateDiagnostics(host: TypeCheckHost, untranslatedDiagnostics: ts.Diagnostic[]): {
+export declare function translateDiagnostics(host: TypeCheckHost, untranslatedDiagnostics: ReadonlyArray<ts.Diagnostic>): {
     ts: ts.Diagnostic[];
     ng: Diagnostic[];
 };

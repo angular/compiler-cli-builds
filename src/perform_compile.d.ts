@@ -8,7 +8,7 @@
 import { Position } from '@angular/compiler';
 import * as ts from 'typescript';
 import * as api from './transformers/api';
-export declare type Diagnostics = Array<ts.Diagnostic | api.Diagnostic>;
+export declare type Diagnostics = ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
 export declare function filterErrorsAndWarnings(diagnostics: Diagnostics): Diagnostics;
 export declare function formatDiagnosticPosition(position: Position, host?: ts.FormatDiagnosticsHost): string;
 export declare function flattenDiagnosticMessageChain(chain: api.DiagnosticMessageChain, host?: ts.FormatDiagnosticsHost): string;
