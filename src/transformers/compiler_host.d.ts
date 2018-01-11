@@ -94,6 +94,7 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter implements ts.Com
     readFile(fileName: string): string | undefined;
     getMetadataFor(filePath: string): ModuleMetadata[] | undefined;
     loadResource(filePath: string): Promise<string> | string;
+    getOutputName(filePath: string): string;
     private hasBundleIndex(filePath);
     getDefaultLibFileName: (options: ts.CompilerOptions) => string;
     getCurrentDirectory: () => string;
