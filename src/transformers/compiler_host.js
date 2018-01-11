@@ -432,6 +432,9 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = /** @class */ (function () {
         }
         return assert(this.context.readFile(filePath));
     };
+    TsCompilerAotCompilerTypeCheckHostAdapter.prototype.getOutputName = function (filePath) {
+        return path.relative(this.getCurrentDirectory(), filePath);
+    };
     TsCompilerAotCompilerTypeCheckHostAdapter.prototype.hasBundleIndex = function (filePath) {
         var _this = this;
         var checkBundleIndex = function (directory) {
