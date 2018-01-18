@@ -47,7 +47,7 @@ function getReferences(info) {
                 name: reference.name,
                 kind: 'reference',
                 type: type || info.query.getBuiltinType(symbols_1.BuiltinType.Any),
-                get definition() { return getDefintionOf(info, reference); }
+                get definition() { return getDefinitionOf(info, reference); }
             });
         };
         for (var _i = 0, references_1 = references; _i < references_1.length; _i++) {
@@ -55,7 +55,7 @@ function getReferences(info) {
             _loop_1(reference);
         }
     }
-    var visitor = new (function (_super) {
+    var visitor = new /** @class */ (function (_super) {
         __extends(class_1, _super);
         function class_1() {
             return _super !== null && _super.apply(this, arguments) || this;
@@ -73,7 +73,7 @@ function getReferences(info) {
     compiler_1.templateVisitAll(visitor, info.templateAst);
     return result;
 }
-function getDefintionOf(info, ast) {
+function getDefinitionOf(info, ast) {
     if (info.fileName) {
         var templateOffset = info.offset;
         return [{
@@ -114,7 +114,7 @@ function getVarDeclarations(info, path) {
                 }
                 result.push({
                     name: name_1,
-                    kind: 'variable', type: type, get definition() { return getDefintionOf(info, variable); }
+                    kind: 'variable', type: type, get definition() { return getDefinitionOf(info, variable); }
                 });
             };
             for (var _i = 0, _a = current.variables; _i < _a.length; _i++) {
@@ -144,8 +144,8 @@ function refinedVariableType(type, info, templateElement) {
             }
         }
     }
-    // We can't do better, just return the original type.
-    return type;
+    // We can't do better, return any
+    return info.query.getBuiltinType(symbols_1.BuiltinType.Any);
 }
 function getEventDeclaration(info, includeEvent) {
     var result = [];
@@ -170,7 +170,7 @@ function getExpressionScope(info, path, includeEvent) {
     return result;
 }
 exports.getExpressionScope = getExpressionScope;
-var ExpressionDiagnosticsVisitor = (function (_super) {
+var ExpressionDiagnosticsVisitor = /** @class */ (function (_super) {
     __extends(ExpressionDiagnosticsVisitor, _super);
     function ExpressionDiagnosticsVisitor(info, getExpressionScope) {
         var _this = _super.call(this) || this;
