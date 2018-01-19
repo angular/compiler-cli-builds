@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "5.9.9-6-beta.0-1104d17",
+  "version": "5.9.9-6-beta.0-21e37e4",
   "description": "Angular - the compiler CLI for Node.js",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -16,7 +16,7 @@
   },
   "peerDependencies": {
     "typescript": ">=2.4.2 <2.7",
-    "@angular/compiler": "5.9.9-6-beta.0-1104d17"
+    "@angular/compiler": "5.9.9-6-beta.0-21e37e4"
   },
   "repository": {
     "type": "git",
