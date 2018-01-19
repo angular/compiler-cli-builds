@@ -17,6 +17,7 @@ var api_1 = require("./api");
 var compiler_host_1 = require("./compiler_host");
 var lower_expressions_1 = require("./lower_expressions");
 var node_emitter_transform_1 = require("./node_emitter_transform");
+var r3_transform_1 = require("./r3_transform");
 var util_1 = require("./util");
 /**
  * Maximum number of files that are emitable via calling ts.Program.emit
@@ -39,9 +40,8 @@ var AngularCompilerProgram = /** @class */ (function () {
         this._optionsDiagnostics = [];
         this.rootNames = rootNames.slice();
         var _a = ts.version.split('.'), major = _a[0], minor = _a[1];
-        if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 4)) {
-            throw new Error('The Angular Compiler requires TypeScript >= 2.4.');
-        }
+        Number(major) > 2 || (Number(major) === 2 && Number(minor) >= 4) ||
+            util_1.userError('The Angular Compiler requires TypeScript >= 2.4.');
         this.oldTsProgram = oldProgram ? oldProgram.getTsProgram() : undefined;
         if (oldProgram) {
             this.oldProgramLibrarySummaries = oldProgram.getLibrarySummaries();
@@ -51,8 +51,6 @@ var AngularCompilerProgram = /** @class */ (function () {
         if (options.flatModuleOutFile) {
             var _b = index_1.createBundleIndexHost(options, this.rootNames, host), bundleHost = _b.host, indexName = _b.indexName, errors = _b.errors;
             if (errors) {
-                // TODO(tbosch): once we move MetadataBundler from tsc_wrapped into compiler_cli,
-                // directly create ng.Diagnostic instead of using ts.Diagnostic here.
                 (_c = this._optionsDiagnostics).push.apply(_c, errors.map(function (e) { return ({
                     category: e.category,
                     messageText: e.messageText,
@@ -155,7 +153,38 @@ var AngularCompilerProgram = /** @class */ (function () {
         // to be fast enough.
         return this.compiler.listLazyRoutes(route, route ? undefined : this.analyzedModules);
     };
-    AngularCompilerProgram.prototype.emit = function (_a) {
+    AngularCompilerProgram.prototype.emit = function (parameters) {
+        if (parameters === void 0) { parameters = {}; }
+        return this.options.enableIvy === true ? this._emitRender3(parameters) :
+            this._emitRender2(parameters);
+    };
+    AngularCompilerProgram.prototype._emitRender3 = function (_a) {
+        var _this = this;
+        var _b = _a === void 0 ? {} : _a, _c = _b.emitFlags, emitFlags = _c === void 0 ? api_1.EmitFlags.Default : _c, cancellationToken = _b.cancellationToken, customTransformers = _b.customTransformers, _d = _b.emitCallback, emitCallback = _d === void 0 ? defaultEmitCallback : _d;
+        var emitStart = Date.now();
+        if ((emitFlags & (api_1.EmitFlags.JS | api_1.EmitFlags.DTS | api_1.EmitFlags.Metadata | api_1.EmitFlags.Codegen)) ===
+            0) {
+            return { emitSkipped: true, diagnostics: [], emittedFiles: [] };
+        }
+        var modules = this.compiler.emitAllPartialModules(this.analyzedModules);
+        var writeTsFile = function (outFileName, outData, writeByteOrderMark, onError, sourceFiles) {
+            var sourceFile = sourceFiles && sourceFiles.length == 1 ? sourceFiles[0] : null;
+            var genFile;
+            _this.writeFile(outFileName, outData, writeByteOrderMark, onError, undefined, sourceFiles);
+        };
+        var emitOnlyDtsFiles = (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS;
+        var tsCustomTansformers = this.calculateTransforms(
+        /* genFiles */ undefined, /* partialModules */ modules, customTransformers);
+        var emitResult = emitCallback({
+            program: this.tsProgram,
+            host: this.host,
+            options: this.options,
+            writeFile: writeTsFile, emitOnlyDtsFiles: emitOnlyDtsFiles,
+            customTransformers: tsCustomTansformers
+        });
+        return emitResult;
+    };
+    AngularCompilerProgram.prototype._emitRender2 = function (_a) {
         var _this = this;
         var _b = _a === void 0 ? {} : _a, _c = _b.emitFlags, emitFlags = _c === void 0 ? api_1.EmitFlags.Default : _c, cancellationToken = _b.cancellationToken, customTransformers = _b.customTransformers, _d = _b.emitCallback, emitCallback = _d === void 0 ? defaultEmitCallback : _d;
         var emitStart = Date.now();
@@ -197,7 +226,7 @@ var AngularCompilerProgram = /** @class */ (function () {
             }
             _this.writeFile(outFileName, outData, writeByteOrderMark, onError, genFile, sourceFiles);
         };
-        var tsCustomTansformers = this.calculateTransforms(genFileByFileName, customTransformers);
+        var tsCustomTansformers = this.calculateTransforms(genFileByFileName, /* partialModules */ undefined, customTransformers);
         var emitOnlyDtsFiles = (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS;
         // Restore the original references before we emit so TypeScript doesn't emit
         // a reference to the .d.ts file.
@@ -363,12 +392,17 @@ var AngularCompilerProgram = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    AngularCompilerProgram.prototype.calculateTransforms = function (genFiles, customTransformers) {
+    AngularCompilerProgram.prototype.calculateTransforms = function (genFiles, partialModules, customTransformers) {
         var beforeTs = [];
         if (!this.options.disableExpressionLowering) {
             beforeTs.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.metadataCache, this.tsProgram));
         }
-        beforeTs.push(node_emitter_transform_1.getAngularEmitterTransformFactory(genFiles, this.getTsProgram()));
+        if (genFiles) {
+            beforeTs.push(node_emitter_transform_1.getAngularEmitterTransformFactory(genFiles, this.getTsProgram()));
+        }
+        if (partialModules) {
+            beforeTs.push(r3_transform_1.getAngularClassTransformerFactory(partialModules));
+        }
         if (customTransformers && customTransformers.beforeTs) {
             beforeTs.push.apply(beforeTs, customTransformers.beforeTs);
         }

@@ -8,6 +8,8 @@ export declare const enum StructureIsReused {
     Completely = 2,
 }
 export declare function tsStructureIsReused(program: ts.Program): StructureIsReused;
+export declare function error(msg: string): never;
+export declare function userError(msg: string): never;
 export declare function createMessageDiagnostic(messageText: string): ts.Diagnostic & Diagnostic;
 export declare function isInRootDir(fileName: string, options: CompilerOptions): string | true | null;
 export declare function relativeToRootDirs(filePath: string, rootDirs: string[]): string;

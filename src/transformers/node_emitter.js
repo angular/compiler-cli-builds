@@ -9,6 +9,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var compiler_1 = require("@angular/compiler");
 var ts = require("typescript");
+var util_1 = require("./util");
 var METHOD_THIS_NAME = 'this';
 var CATCH_ERROR_NAME = 'error';
 var CATCH_STACK_NAME = 'stack';
@@ -44,6 +45,83 @@ var TypeScriptNodeEmitter = /** @class */ (function () {
     return TypeScriptNodeEmitter;
 }());
 exports.TypeScriptNodeEmitter = TypeScriptNodeEmitter;
+/**
+ * Update the given source file to include the changes specified in module.
+ *
+ * The module parameter is treated as a partial module meaning that the statements are added to
+ * the module instead of replacing the module. Also, any classes are treated as partial classes
+ * and the included members are added to the class with the same name instead of a new class
+ * being created.
+ */
+function updateSourceFile(sourceFile, module, context) {
+    var converter = new _NodeEmitterVisitor();
+    var prefixStatements = module.statements.filter(function (statement) { return !(statement instanceof compiler_1.ClassStmt); });
+    var classes = module.statements.filter(function (statement) { return statement instanceof compiler_1.ClassStmt; });
+    var classMap = new Map(classes.map(function (classStatement) { return [classStatement.name, classStatement]; }));
+    var classNames = new Set(classes.map(function (classStatement) { return classStatement.name; }));
+    var prefix = prefixStatements.map(function (statement) { return statement.visitStatement(converter, null); });
+    // Add static methods to all the classes referenced in module.
+    var newStatements = sourceFile.statements.map(function (node) {
+        if (node.kind == ts.SyntaxKind.ClassDeclaration) {
+            var classDeclaration = node;
+            var name_1 = classDeclaration.name;
+            if (name_1) {
+                var classStatement = classMap.get(name_1.text);
+                if (classStatement) {
+                    classNames.delete(name_1.text);
+                    var classMemberHolder = converter.visitDeclareClassStmt(classStatement);
+                    var newMethods = classMemberHolder.members.filter(function (member) { return member.kind !== ts.SyntaxKind.Constructor; });
+                    var newMembers = classDeclaration.members.concat(newMethods);
+                    return ts.updateClassDeclaration(classDeclaration, 
+                    /* decorators */ classDeclaration.decorators, 
+                    /* modifiers */ classDeclaration.modifiers, 
+                    /* name */ classDeclaration.name, 
+                    /* typeParameters */ classDeclaration.typeParameters, 
+                    /* heritageClauses */ classDeclaration.heritageClauses || [], 
+                    /* members */ newMembers);
+                }
+            }
+        }
+        return node;
+    });
+    // Validate that all the classes have been generated
+    classNames.size == 0 ||
+        util_1.error((classNames.size == 1 ? 'Class' : 'Classes') + " \"" + Array.from(classNames.keys()).join(', ') + "\" not generated");
+    // Add imports to the module required by the new methods
+    var imports = converter.getImports();
+    if (imports && imports.length) {
+        // Find where the new imports should go
+        var index = firstAfter(newStatements, function (statement) { return statement.kind === ts.SyntaxKind.ImportDeclaration ||
+            statement.kind === ts.SyntaxKind.ImportEqualsDeclaration; });
+        newStatements = newStatements.slice(0, index).concat(imports, prefix, newStatements.slice(index));
+    }
+    else {
+        newStatements = prefix.concat(newStatements);
+    }
+    converter.updateSourceMap(newStatements);
+    var newSourceFile = ts.updateSourceFileNode(sourceFile, newStatements);
+    return [newSourceFile, converter.getNodeMap()];
+}
+exports.updateSourceFile = updateSourceFile;
+// Return the index after the first value in `a` that doesn't match the predicate after a value that
+// does or 0 if no values match.
+function firstAfter(a, predicate) {
+    var index = 0;
+    var len = a.length;
+    for (; index < len; index++) {
+        var value = a[index];
+        if (predicate(value))
+            break;
+    }
+    if (index >= len)
+        return 0;
+    for (; index < len; index++) {
+        var value = a[index];
+        if (!predicate(value))
+            break;
+    }
+    return index;
+}
 function createLiteral(value) {
     if (value === null) {
         return ts.createNull();
@@ -165,14 +243,14 @@ var _NodeEmitterVisitor = /** @class */ (function () {
         if (stmt.hasModifier(compiler_1.StmtModifier.Exported) && stmt.value instanceof compiler_1.ExternalExpr &&
             !stmt.type) {
             // check for a reexport
-            var _a = stmt.value.value, name_1 = _a.name, moduleName = _a.moduleName;
+            var _a = stmt.value.value, name_2 = _a.name, moduleName = _a.moduleName;
             if (moduleName) {
                 var reexports = this._reexports.get(moduleName);
                 if (!reexports) {
                     reexports = [];
                     this._reexports.set(moduleName, reexports);
                 }
-                reexports.push({ name: name_1, as: stmt.name });
+                reexports.push({ name: name_2, as: stmt.name });
                 return null;
             }
         }
@@ -206,9 +284,10 @@ var _NodeEmitterVisitor = /** @class */ (function () {
         var _this = this;
         var modifiers = this.getModifiers(stmt);
         var fields = stmt.fields.map(function (field) { return ts.createProperty(
-        /* decorators */ undefined, /* modifiers */ undefined, field.name, 
+        /* decorators */ undefined, /* modifiers */ translateModifiers(field.modifiers), field.name, 
         /* questionToken */ undefined, 
-        /* type */ undefined, ts.createNull()); });
+        /* type */ undefined, field.initializer == null ? ts.createNull() :
+            field.initializer.visitExpression(_this, null)); });
         var getters = stmt.getters.map(function (getter) { return ts.createGetAccessor(
         /* decorators */ undefined, /* modifiers */ undefined, getter.name, /* parameters */ [], 
         /* type */ undefined, _this._visitStatements(getter.body)); });
@@ -223,7 +302,8 @@ var _NodeEmitterVisitor = /** @class */ (function () {
         // TODO {chuckj}: Determine what should be done for a method with a null name.
         var methods = stmt.methods.filter(function (method) { return method.name; })
             .map(function (method) { return ts.createMethod(
-        /* decorators */ undefined, /* modifiers */ undefined, 
+        /* decorators */ undefined, 
+        /* modifiers */ translateModifiers(method.modifiers), 
         /* astriskToken */ undefined, method.name /* guarded by filter */, 
         /* questionToken */ undefined, /* typeParameters */ undefined, method.params.map(function (p) { return ts.createParameter(
         /* decorators */ undefined, /* modifiers */ undefined, 
@@ -426,5 +506,21 @@ function getMethodName(methodRef) {
         }
     }
     throw new Error('Unexpected method reference form');
+}
+function modifierFromModifier(modifier) {
+    switch (modifier) {
+        case compiler_1.StmtModifier.Exported:
+            return ts.createToken(ts.SyntaxKind.ExportKeyword);
+        case compiler_1.StmtModifier.Final:
+            return ts.createToken(ts.SyntaxKind.ConstKeyword);
+        case compiler_1.StmtModifier.Private:
+            return ts.createToken(ts.SyntaxKind.PrivateKeyword);
+        case compiler_1.StmtModifier.Static:
+            return ts.createToken(ts.SyntaxKind.StaticKeyword);
+    }
+    return util_1.error("unknown statement modifier");
+}
+function translateModifiers(modifiers) {
+    return modifiers == null ? undefined : modifiers.map(modifierFromModifier);
 }
 //# sourceMappingURL=node_emitter.js.map

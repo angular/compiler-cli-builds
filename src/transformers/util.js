@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+var compiler_1 = require("@angular/compiler");
 var path = require("path");
 var ts = require("typescript");
 var api_1 = require("./api");
@@ -17,6 +18,14 @@ function tsStructureIsReused(program) {
     return program.structureIsReused;
 }
 exports.tsStructureIsReused = tsStructureIsReused;
+function error(msg) {
+    throw new Error("Internal error: " + msg);
+}
+exports.error = error;
+function userError(msg) {
+    throw compiler_1.syntaxError(msg);
+}
+exports.userError = userError;
 function createMessageDiagnostic(messageText) {
     return {
         file: undefined,
