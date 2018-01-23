@@ -330,9 +330,6 @@ var Evaluator = /** @class */ (function () {
                     }
                 }
                 var args = arrayOrEmpty(callExpression.arguments).map(function (arg) { return _this.evaluateNode(arg); });
-                if (!this.options.verboseInvalidExpression && args.some(schema_1.isMetadataError)) {
-                    return args.find(schema_1.isMetadataError);
-                }
                 if (this.isFoldable(callExpression)) {
                     if (isMethodCallOf(callExpression, 'concat')) {
                         var arrayValue = this.evaluateNode(callExpression.expression.expression);

@@ -27,9 +27,9 @@ var TypeScriptNodeEmitter = /** @class */ (function () {
             var commentStmt = this.createCommentStatement(sourceFile, preamble);
             preambleStmts.push(commentStmt);
         }
-        var sourceStatments = preambleStmts.concat(converter.getReexports(), converter.getImports(), statements);
-        converter.updateSourceMap(sourceStatments);
-        var newSourceFile = ts.updateSourceFileNode(sourceFile, sourceStatments);
+        var sourceStatements = preambleStmts.concat(converter.getReexports(), converter.getImports(), statements);
+        converter.updateSourceMap(sourceStatements);
+        var newSourceFile = ts.updateSourceFileNode(sourceFile, sourceStatements);
         return [newSourceFile, converter.getNodeMap()];
     };
     /** Creates a not emitted statement containing the given comment. */
@@ -385,7 +385,8 @@ var _NodeEmitterVisitor = /** @class */ (function () {
     };
     _NodeEmitterVisitor.prototype.visitFunctionExpr = function (expr) {
         return this.record(expr, ts.createFunctionExpression(
-        /* modifiers */ undefined, /* astriskToken */ undefined, /* name */ undefined, 
+        /* modifiers */ undefined, /* astriskToken */ undefined, 
+        /* name */ expr.name || undefined, 
         /* typeParameters */ undefined, expr.params.map(function (p) { return ts.createParameter(
         /* decorators */ undefined, /* modifiers */ undefined, 
         /* dotDotDotToken */ undefined, p.name); }), 
