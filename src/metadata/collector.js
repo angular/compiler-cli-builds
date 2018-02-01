@@ -55,6 +55,9 @@ var MetadataCollector = /** @class */ (function () {
             return evaluator.evaluateNode(decoratorNode.expression);
         }
         function recordEntry(entry, node) {
+            if (composedSubstituter) {
+                entry = composedSubstituter(entry, node);
+            }
             return evaluator_1.recordMapEntry(entry, node, nodeMap, sourceFile);
         }
         function errorSym(message, node, context) {

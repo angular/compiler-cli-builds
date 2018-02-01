@@ -16,7 +16,9 @@ var index_1 = require("../metadata/index");
 var api_1 = require("./api");
 var compiler_host_1 = require("./compiler_host");
 var lower_expressions_1 = require("./lower_expressions");
+var metadata_cache_1 = require("./metadata_cache");
 var node_emitter_transform_1 = require("./node_emitter_transform");
+var r3_metadata_transform_1 = require("./r3_metadata_transform");
 var r3_transform_1 = require("./r3_transform");
 var util_1 = require("./util");
 /**
@@ -63,9 +65,13 @@ var AngularCompilerProgram = /** @class */ (function () {
                 this.host = bundleHost;
             }
         }
-        this.metadataCache = new lower_expressions_1.LowerMetadataCache({ quotedNames: true }, !!options.strictMetadataEmit);
+        this.loweringMetadataTransform = new lower_expressions_1.LowerMetadataTransform();
+        this.metadataCache = this.createMetadataCache([this.loweringMetadataTransform]);
         var _c;
     }
+    AngularCompilerProgram.prototype.createMetadataCache = function (transformers) {
+        return new metadata_cache_1.MetadataCache(new index_1.MetadataCollector({ quotedNames: true }), !!this.options.strictMetadataEmit, transformers);
+    };
     AngularCompilerProgram.prototype.getLibrarySummaries = function () {
         var result = new Map();
         if (this.oldProgramLibrarySummaries) {
@@ -141,7 +147,7 @@ var AngularCompilerProgram = /** @class */ (function () {
             var _a = _this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, rootNames = _a.rootNames;
             return _this.compiler.loadFilesAsync(sourceFiles).then(function (analyzedModules) {
                 if (_this._analyzedModules) {
-                    throw new Error('Angular structure loaded both synchronously and asynchronsly');
+                    throw new Error('Angular structure loaded both synchronously and asynchronously');
                 }
                 _this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, rootNames);
             });
@@ -173,14 +179,14 @@ var AngularCompilerProgram = /** @class */ (function () {
             _this.writeFile(outFileName, outData, writeByteOrderMark, onError, undefined, sourceFiles);
         };
         var emitOnlyDtsFiles = (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS;
-        var tsCustomTansformers = this.calculateTransforms(
+        var tsCustomTransformers = this.calculateTransforms(
         /* genFiles */ undefined, /* partialModules */ modules, customTransformers);
         var emitResult = emitCallback({
             program: this.tsProgram,
             host: this.host,
             options: this.options,
             writeFile: writeTsFile, emitOnlyDtsFiles: emitOnlyDtsFiles,
-            customTransformers: tsCustomTansformers
+            customTransformers: tsCustomTransformers
         });
         return emitResult;
     };
@@ -226,7 +232,7 @@ var AngularCompilerProgram = /** @class */ (function () {
             }
             _this.writeFile(outFileName, outData, writeByteOrderMark, onError, genFile, sourceFiles);
         };
-        var tsCustomTansformers = this.calculateTransforms(genFileByFileName, /* partialModules */ undefined, customTransformers);
+        var tsCustomTransformers = this.calculateTransforms(genFileByFileName, /* partialModules */ undefined, customTransformers);
         var emitOnlyDtsFiles = (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS;
         // Restore the original references before we emit so TypeScript doesn't emit
         // a reference to the .d.ts file.
@@ -261,7 +267,7 @@ var AngularCompilerProgram = /** @class */ (function () {
                     host: _this.host,
                     options: _this.options,
                     writeFile: writeTsFile, emitOnlyDtsFiles: emitOnlyDtsFiles,
-                    customTransformers: tsCustomTansformers,
+                    customTransformers: tsCustomTransformers,
                     targetSourceFile: _this.tsProgram.getSourceFile(fileName),
                 }); }));
                 emittedUserTsCount = sourceFilesToEmit.length;
@@ -272,7 +278,7 @@ var AngularCompilerProgram = /** @class */ (function () {
                     host: this.host,
                     options: this.options,
                     writeFile: writeTsFile, emitOnlyDtsFiles: emitOnlyDtsFiles,
-                    customTransformers: tsCustomTansformers
+                    customTransformers: tsCustomTransformers
                 });
                 emittedUserTsCount = this.tsProgram.getSourceFiles().length - genTsFiles.length;
             }
@@ -395,13 +401,16 @@ var AngularCompilerProgram = /** @class */ (function () {
     AngularCompilerProgram.prototype.calculateTransforms = function (genFiles, partialModules, customTransformers) {
         var beforeTs = [];
         if (!this.options.disableExpressionLowering) {
-            beforeTs.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.metadataCache, this.tsProgram));
+            beforeTs.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.loweringMetadataTransform, this.tsProgram));
         }
         if (genFiles) {
             beforeTs.push(node_emitter_transform_1.getAngularEmitterTransformFactory(genFiles, this.getTsProgram()));
         }
         if (partialModules) {
             beforeTs.push(r3_transform_1.getAngularClassTransformerFactory(partialModules));
+            // If we have partial modules, the cached metadata might be incorrect as it doesn't reflect
+            // the partial module transforms.
+            this.metadataCache = this.createMetadataCache([this.loweringMetadataTransform, new r3_metadata_transform_1.PartialModuleMetadataTransformer(partialModules)]);
         }
         if (customTransformers && customTransformers.beforeTs) {
             beforeTs.push.apply(beforeTs, customTransformers.beforeTs);
@@ -440,7 +449,7 @@ var AngularCompilerProgram = /** @class */ (function () {
     AngularCompilerProgram.prototype._createProgramWithBasicStubs = function () {
         var _this = this;
         if (this._analyzedModules) {
-            throw new Error("Internal Error: already initalized!");
+            throw new Error("Internal Error: already initialized!");
         }
         // Note: This is important to not produce a memory leak!
         var oldTsProgram = this.oldTsProgram;
@@ -455,7 +464,7 @@ var AngularCompilerProgram = /** @class */ (function () {
         if (this.options.generateCodeForLibraries !== false) {
             // if we should generateCodeForLibraries, never include
             // generated files in the program as otherwise we will
-            // ovewrite them and typescript will report the error
+            // overwrite them and typescript will report the error
             // TS5055: Cannot write file ... because it would overwrite input file.
             rootNames = rootNames.filter(function (fn) { return !util_1.GENERATED_FILES.test(fn); });
         }
@@ -482,7 +491,7 @@ var AngularCompilerProgram = /** @class */ (function () {
             if (sf.fileName.endsWith('.ngfactory.ts')) {
                 var _a = _this.hostAdapter.shouldGenerateFile(sf.fileName), generate = _a.generate, baseFileName = _a.baseFileName;
                 if (generate) {
-                    // Note: ! is ok as hostAdapter.shouldGenerateFile will always return a basefileName
+                    // Note: ! is ok as hostAdapter.shouldGenerateFile will always return a baseFileName
                     // for .ngfactory.ts files.
                     var genFile = _this.compiler.emitTypeCheckStub(sf.fileName, baseFileName);
                     if (genFile) {
@@ -600,7 +609,7 @@ var AngularCompilerProgram = /** @class */ (function () {
                     this.emittedLibrarySummaries.push({ fileName: genFile.genFileUrl, text: outData });
                     if (!this.options.declaration) {
                         // If we don't emit declarations, still record an empty .ngfactory.d.ts file,
-                        // as we might need it lateron for resolving module names from summaries.
+                        // as we might need it later on for resolving module names from summaries.
                         var ngFactoryDts = genFile.genFileUrl.substring(0, genFile.genFileUrl.length - 15) + '.ngfactory.d.ts';
                         this.emittedLibrarySummaries.push({ fileName: ngFactoryDts, text: '' });
                     }
@@ -614,7 +623,7 @@ var AngularCompilerProgram = /** @class */ (function () {
             }
         }
         // Filter out generated files for which we didn't generate code.
-        // This can happen as the stub caclulation is not completely exact.
+        // This can happen as the stub calculation is not completely exact.
         // Note: sourceFile refers to the .ngfactory.ts / .ngsummary.ts file
         // node_emitter_transform already set the file contents to be empty,
         //  so this code only needs to skip the file if !allowEmptyCodegenFiles.
@@ -762,7 +771,7 @@ function i18nSerialize(bundle, formatName, options) {
 }
 exports.i18nSerialize = i18nSerialize;
 function getPathNormalizer(basePath) {
-    // normalize sourcepaths by removing the base path and always using "/" as a separator
+    // normalize source paths by removing the base path and always using "/" as a separator
     return function (sourcePath) {
         sourcePath = basePath ? path.relative(basePath, sourcePath) : sourcePath;
         return sourcePath.split(path.sep).join('/');
