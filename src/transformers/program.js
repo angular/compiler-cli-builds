@@ -144,12 +144,14 @@ var AngularCompilerProgram = /** @class */ (function () {
         }
         return Promise.resolve()
             .then(function () {
-            var _a = _this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, rootNames = _a.rootNames;
-            return _this.compiler.loadFilesAsync(sourceFiles).then(function (analyzedModules) {
+            var _a = _this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, tsFiles = _a.tsFiles, rootNames = _a.rootNames;
+            return _this.compiler.loadFilesAsync(sourceFiles, tsFiles)
+                .then(function (_a) {
+                var analyzedModules = _a.analyzedModules, analyzedInjectables = _a.analyzedInjectables;
                 if (_this._analyzedModules) {
                     throw new Error('Angular structure loaded both synchronously and asynchronously');
                 }
-                _this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, rootNames);
+                _this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, analyzedInjectables, rootNames);
             });
         })
             .catch(function (e) { return _this._createProgramOnError(e); });
@@ -232,7 +234,9 @@ var AngularCompilerProgram = /** @class */ (function () {
             }
             _this.writeFile(outFileName, outData, writeByteOrderMark, onError, genFile, sourceFiles);
         };
-        var tsCustomTransformers = this.calculateTransforms(genFileByFileName, /* partialModules */ undefined, customTransformers);
+        var modules = this._analyzedInjectables &&
+            this.compiler.emitAllPartialModules2(this._analyzedInjectables);
+        var tsCustomTransformers = this.calculateTransforms(genFileByFileName, modules, customTransformers);
         var emitOnlyDtsFiles = (emitFlags & (api_1.EmitFlags.DTS | api_1.EmitFlags.JS)) == api_1.EmitFlags.DTS;
         // Restore the original references before we emit so TypeScript doesn't emit
         // a reference to the .d.ts file.
@@ -423,9 +427,9 @@ var AngularCompilerProgram = /** @class */ (function () {
             return;
         }
         try {
-            var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, rootNames = _a.rootNames;
-            var analyzedModules = this.compiler.loadFilesSync(sourceFiles);
-            this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, rootNames);
+            var _a = this._createProgramWithBasicStubs(), tmpProgram = _a.tmpProgram, sourceFiles = _a.sourceFiles, tsFiles = _a.tsFiles, rootNames = _a.rootNames;
+            var _b = this.compiler.loadFilesSync(sourceFiles, tsFiles), analyzedModules = _b.analyzedModules, analyzedInjectables = _b.analyzedInjectables;
+            this._updateProgramWithTypeCheckStubs(tmpProgram, analyzedModules, analyzedInjectables, rootNames);
         }
         catch (e) {
             this._createProgramOnError(e);
@@ -477,16 +481,21 @@ var AngularCompilerProgram = /** @class */ (function () {
         }
         var tmpProgram = ts.createProgram(rootNames, this.options, this.hostAdapter, oldTsProgram);
         var sourceFiles = [];
+        var tsFiles = [];
         tmpProgram.getSourceFiles().forEach(function (sf) {
             if (_this.hostAdapter.isSourceFile(sf.fileName)) {
                 sourceFiles.push(sf.fileName);
             }
+            if (util_1.TS.test(sf.fileName) && !util_1.DTS.test(sf.fileName)) {
+                tsFiles.push(sf.fileName);
+            }
         });
-        return { tmpProgram: tmpProgram, sourceFiles: sourceFiles, rootNames: rootNames };
+        return { tmpProgram: tmpProgram, sourceFiles: sourceFiles, tsFiles: tsFiles, rootNames: rootNames };
     };
-    AngularCompilerProgram.prototype._updateProgramWithTypeCheckStubs = function (tmpProgram, analyzedModules, rootNames) {
+    AngularCompilerProgram.prototype._updateProgramWithTypeCheckStubs = function (tmpProgram, analyzedModules, analyzedInjectables, rootNames) {
         var _this = this;
         this._analyzedModules = analyzedModules;
+        this._analyzedInjectables = analyzedInjectables;
         tmpProgram.getSourceFiles().forEach(function (sf) {
             if (sf.fileName.endsWith('.ngfactory.ts')) {
                 var _a = _this.hostAdapter.shouldGenerateFile(sf.fileName), generate = _a.generate, baseFileName = _a.baseFileName;

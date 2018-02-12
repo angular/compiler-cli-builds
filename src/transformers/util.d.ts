@@ -2,6 +2,7 @@ import * as ts from 'typescript';
 import { CompilerOptions, Diagnostic } from './api';
 export declare const GENERATED_FILES: RegExp;
 export declare const DTS: RegExp;
+export declare const TS: RegExp;
 export declare const enum StructureIsReused {
     Not = 0,
     SafeModules = 1,

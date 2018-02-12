@@ -13,6 +13,7 @@ var ts = require("typescript");
 var api_1 = require("./api");
 exports.GENERATED_FILES = /(.*?)\.(ngfactory|shim\.ngstyle|ngstyle|ngsummary)\.(js|d\.ts|ts)$/;
 exports.DTS = /\.d\.ts$/;
+exports.TS = /^(?!.*\.d\.ts$).*\.ts$/;
 // Note: This is an internal property in TypeScript. Use it only for assertions and tests.
 function tsStructureIsReused(program) {
     return program.structureIsReused;

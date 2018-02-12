@@ -20,7 +20,7 @@ function getAngularClassTransformerFactory(modules) {
     return function (context) {
         return function (sourceFile) {
             var module = moduleMap.get(sourceFile.fileName);
-            if (module) {
+            if (module && module.statements.length > 0) {
                 var newSourceFile = node_emitter_1.updateSourceFile(sourceFile, module, context)[0];
                 return newSourceFile;
             }
