@@ -355,9 +355,6 @@ var Evaluator = /** @class */ (function () {
             case ts.SyntaxKind.NewExpression:
                 var newExpression = node;
                 var newArgs = arrayOrEmpty(newExpression.arguments).map(function (arg) { return _this.evaluateNode(arg); });
-                if (!this.options.verboseInvalidExpression && newArgs.some(schema_1.isMetadataError)) {
-                    return recordEntry(newArgs.find(schema_1.isMetadataError), node);
-                }
                 var newTarget = this.evaluateNode(newExpression.expression);
                 if (schema_1.isMetadataError(newTarget)) {
                     return recordEntry(newTarget, node);
