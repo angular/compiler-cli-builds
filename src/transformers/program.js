@@ -41,9 +41,9 @@ var AngularCompilerProgram = /** @class */ (function () {
         this.host = host;
         this._optionsDiagnostics = [];
         this.rootNames = rootNames.slice();
-        var _a = ts.version.split('.'), major = _a[0], minor = _a[1];
-        Number(major) > 2 || (Number(major) === 2 && Number(minor) >= 4) ||
-            util_1.userError('The Angular Compiler requires TypeScript >= 2.4.');
+        if (ts.version < '2.4.2' || (ts.version >= '2.7.0' && !options.disableTypeScriptVersionCheck)) {
+            throw new Error("The Angular Compiler requires TypeScript >=2.4.2 and <2.7 but " + ts.version + " was found instead.");
+        }
         this.oldTsProgram = oldProgram ? oldProgram.getTsProgram() : undefined;
         if (oldProgram) {
             this.oldProgramLibrarySummaries = oldProgram.getLibrarySummaries();
@@ -51,9 +51,9 @@ var AngularCompilerProgram = /** @class */ (function () {
             this.oldProgramEmittedSourceFiles = oldProgram.getEmittedSourceFiles();
         }
         if (options.flatModuleOutFile) {
-            var _b = index_1.createBundleIndexHost(options, this.rootNames, host), bundleHost = _b.host, indexName = _b.indexName, errors = _b.errors;
+            var _a = index_1.createBundleIndexHost(options, this.rootNames, host), bundleHost = _a.host, indexName = _a.indexName, errors = _a.errors;
             if (errors) {
-                (_c = this._optionsDiagnostics).push.apply(_c, errors.map(function (e) { return ({
+                (_b = this._optionsDiagnostics).push.apply(_b, errors.map(function (e) { return ({
                     category: e.category,
                     messageText: e.messageText,
                     source: api_1.SOURCE,
@@ -67,7 +67,7 @@ var AngularCompilerProgram = /** @class */ (function () {
         }
         this.loweringMetadataTransform = new lower_expressions_1.LowerMetadataTransform();
         this.metadataCache = this.createMetadataCache([this.loweringMetadataTransform]);
-        var _c;
+        var _b;
     }
     AngularCompilerProgram.prototype.createMetadataCache = function (transformers) {
         return new metadata_cache_1.MetadataCache(new index_1.MetadataCollector({ quotedNames: true }), !!this.options.strictMetadataEmit, transformers);

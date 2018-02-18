@@ -43,6 +43,7 @@ export interface CompilerOptions extends ts.CompilerOptions {
     trace?: boolean;
     enableLegacyTemplate?: boolean;
     disableExpressionLowering?: boolean;
+    disableTypeScriptVersionCheck?: boolean;
     i18nOutLocale?: string;
     i18nOutFormat?: string;
     i18nOutFile?: string;
