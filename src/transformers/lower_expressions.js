@@ -191,30 +191,35 @@ function isLiteralFieldNamed(node, names) {
     return false;
 }
 var LOWERABLE_FIELD_NAMES = new Set(['useValue', 'useFactory', 'data']);
-var LowerMetadataCache = /** @class */ (function () {
-    function LowerMetadataCache(options, strict) {
-        this.strict = strict;
-        this.metadataCache = new Map();
-        this.collector = new index_1.MetadataCollector(options);
+var LowerMetadataTransform = /** @class */ (function () {
+    function LowerMetadataTransform() {
+        this.requests = new Map();
     }
-    LowerMetadataCache.prototype.getMetadata = function (sourceFile) {
-        return this.ensureMetadataAndRequests(sourceFile).metadata;
-    };
-    LowerMetadataCache.prototype.getRequests = function (sourceFile) {
-        return this.ensureMetadataAndRequests(sourceFile).requests;
-    };
-    LowerMetadataCache.prototype.ensureMetadataAndRequests = function (sourceFile) {
-        var result = this.metadataCache.get(sourceFile.fileName);
+    // RequestMap
+    LowerMetadataTransform.prototype.getRequests = function (sourceFile) {
+        var result = this.requests.get(sourceFile.fileName);
         if (!result) {
-            result = this.getMetadataAndRequests(sourceFile);
-            this.metadataCache.set(sourceFile.fileName, result);
+            // Force the metadata for this source file to be collected which
+            // will recursively call start() populating the request map;
+            this.cache.getMetadata(sourceFile);
+            // If we still don't have the requested metadata, the file is not a module
+            // or is a declaration file so return an empty map.
+            result = this.requests.get(sourceFile.fileName) || new Map();
         }
         return result;
     };
-    LowerMetadataCache.prototype.getMetadataAndRequests = function (sourceFile) {
+    // MetadataTransformer
+    LowerMetadataTransform.prototype.connect = function (cache) { this.cache = cache; };
+    LowerMetadataTransform.prototype.start = function (sourceFile) {
         var identNumber = 0;
         var freshIdent = function () { return compiler_1.createLoweredSymbol(identNumber++); };
         var requests = new Map();
+        this.requests.set(sourceFile.fileName, requests);
+        var replaceNode = function (node) {
+            var name = freshIdent();
+            requests.set(node.pos, { name: name, kind: node.kind, location: node.pos, end: node.end });
+            return { __symbolic: 'reference', name: name };
+        };
         var isExportedSymbol = (function () {
             var exportTable;
             return function (node) {
@@ -237,12 +242,7 @@ var LowerMetadataCache = /** @class */ (function () {
             }
             return false;
         };
-        var replaceNode = function (node) {
-            var name = freshIdent();
-            requests.set(node.pos, { name: name, kind: node.kind, location: node.pos, end: node.end });
-            return { __symbolic: 'reference', name: name };
-        };
-        var substituteExpression = function (value, node) {
+        return function (value, node) {
             if (!isPrimitive(value) && !isRewritten(value)) {
                 if ((node.kind === ts.SyntaxKind.ArrowFunction ||
                     node.kind === ts.SyntaxKind.FunctionExpression) &&
@@ -256,16 +256,10 @@ var LowerMetadataCache = /** @class */ (function () {
             }
             return value;
         };
-        // Do not validate or lower metadata in a declaration file. Declaration files are requested
-        // when we need to update the version of the metadata to add informatoin that might be missing
-        // in the out-of-date version that can be recovered from the .d.ts file.
-        var declarationFile = sourceFile.isDeclarationFile;
-        var metadata = this.collector.getMetadata(sourceFile, this.strict && !declarationFile, declarationFile ? undefined : substituteExpression);
-        return { metadata: metadata, requests: requests };
     };
-    return LowerMetadataCache;
+    return LowerMetadataTransform;
 }());
-exports.LowerMetadataCache = LowerMetadataCache;
+exports.LowerMetadataTransform = LowerMetadataTransform;
 function createExportTableFor(sourceFile) {
     var exportTable = new Set();
     // Lazily collect all the exports from the source file

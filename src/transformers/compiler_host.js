@@ -199,7 +199,12 @@ var TsCompilerAotCompilerTypeCheckHostAdapter = /** @class */ (function () {
             resourceName = "./" + resourceName;
         }
         var filePathWithNgResource = this.moduleNameToFileName(addNgResourceSuffix(resourceName), containingFile);
-        return filePathWithNgResource ? stripNgResourceSuffix(filePathWithNgResource) : null;
+        var result = filePathWithNgResource ? stripNgResourceSuffix(filePathWithNgResource) : null;
+        // Used under Bazel to report more specific error with remediation advice
+        if (!result && this.context.reportMissingResource) {
+            this.context.reportMissingResource(resourceName);
+        }
+        return result;
     };
     TsCompilerAotCompilerTypeCheckHostAdapter.prototype.toSummaryFileName = function (fileName, referringSrcFileName) {
         return this.fileNameToModuleName(fileName, referringSrcFileName);

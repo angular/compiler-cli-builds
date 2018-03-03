@@ -55,6 +55,9 @@ var MetadataCollector = /** @class */ (function () {
             return evaluator.evaluateNode(decoratorNode.expression);
         }
         function recordEntry(entry, node) {
+            if (composedSubstituter) {
+                entry = composedSubstituter(entry, node);
+            }
             return evaluator_1.recordMapEntry(entry, node, nodeMap, sourceFile);
         }
         function errorSym(message, node, context) {
@@ -249,7 +252,7 @@ var MetadataCollector = /** @class */ (function () {
             return identifier && (exportMap.get(identifier.text) || identifier.text);
         };
         var exportedName = function (node) { return exportedIdentifierName(node.name); };
-        // Predeclare classes and functions
+        // Pre-declare classes and functions
         ts.forEachChild(sourceFile, function (node) {
             switch (node.kind) {
                 case ts.SyntaxKind.ClassDeclaration:
@@ -410,7 +413,7 @@ var MetadataCollector = /** @class */ (function () {
                             }
                             else {
                                 nextDefaultValue =
-                                    recordEntry(errorSym('Unsuppported enum member name', member.name), node);
+                                    recordEntry(errorSym('Unsupported enum member name', member.name), node);
                             }
                         }
                         if (writtenMembers) {

@@ -7,16 +7,26 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
+var compiler_1 = require("@angular/compiler");
 var path = require("path");
 var ts = require("typescript");
 var api_1 = require("./api");
 exports.GENERATED_FILES = /(.*?)\.(ngfactory|shim\.ngstyle|ngstyle|ngsummary)\.(js|d\.ts|ts)$/;
 exports.DTS = /\.d\.ts$/;
+exports.TS = /^(?!.*\.d\.ts$).*\.ts$/;
 // Note: This is an internal property in TypeScript. Use it only for assertions and tests.
 function tsStructureIsReused(program) {
     return program.structureIsReused;
 }
 exports.tsStructureIsReused = tsStructureIsReused;
+function error(msg) {
+    throw new Error("Internal error: " + msg);
+}
+exports.error = error;
+function userError(msg) {
+    throw compiler_1.syntaxError(msg);
+}
+exports.userError = userError;
 function createMessageDiagnostic(messageText) {
     return {
         file: undefined,
