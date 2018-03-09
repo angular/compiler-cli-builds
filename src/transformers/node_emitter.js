@@ -55,6 +55,7 @@ exports.TypeScriptNodeEmitter = TypeScriptNodeEmitter;
  */
 function updateSourceFile(sourceFile, module, context) {
     var converter = new _NodeEmitterVisitor();
+    converter.loadExportedVariableIdentifiers(sourceFile);
     var prefixStatements = module.statements.filter(function (statement) { return !(statement instanceof compiler_1.ClassStmt); });
     var classes = module.statements.filter(function (statement) { return statement instanceof compiler_1.ClassStmt; });
     var classMap = new Map(classes.map(function (classStatement) { return [classStatement.name, classStatement]; }));
@@ -133,6 +134,10 @@ function createLiteral(value) {
         return ts.createLiteral(value);
     }
 }
+function isExportTypeStatement(statement) {
+    return !!statement.modifiers &&
+        statement.modifiers.some(function (mod) { return mod.kind === ts.SyntaxKind.ExportKeyword; });
+}
 /**
  * Visits an output ast and produces the corresponding TypeScript synthetic nodes.
  */
@@ -142,7 +147,27 @@ var _NodeEmitterVisitor = /** @class */ (function () {
         this._importsWithPrefixes = new Map();
         this._reexports = new Map();
         this._templateSources = new Map();
+        this._exportedVariableIdentifiers = new Map();
     }
+    /**
+     * Process the source file and collect exported identifiers that refer to variables.
+     *
+     * Only variables are collected because exported classes still exist in the module scope in
+     * CommonJS, whereas variables have their declarations moved onto the `exports` object, and all
+     * references are updated accordingly.
+     */
+    _NodeEmitterVisitor.prototype.loadExportedVariableIdentifiers = function (sourceFile) {
+        var _this = this;
+        sourceFile.statements.forEach(function (statement) {
+            if (ts.isVariableStatement(statement) && isExportTypeStatement(statement)) {
+                statement.declarationList.declarations.forEach(function (declaration) {
+                    if (ts.isIdentifier(declaration.name)) {
+                        _this._exportedVariableIdentifiers.set(declaration.name.text, declaration.name);
+                    }
+                });
+            }
+        });
+    };
     _NodeEmitterVisitor.prototype.getReexports = function () {
         return Array.from(this._reexports.entries())
             .map(function (_a) {
@@ -476,7 +501,8 @@ var _NodeEmitterVisitor = /** @class */ (function () {
         return ts.createBlock(prefix.concat(statements.map(function (stmt) { return stmt.visitStatement(_this, null); }).filter(function (f) { return f != null; })));
     };
     _NodeEmitterVisitor.prototype._visitIdentifier = function (value) {
-        var name = value.name, moduleName = value.moduleName;
+        // name can only be null during JIT which never executes this code.
+        var moduleName = value.moduleName, name = value.name;
         var prefixIdent = null;
         if (moduleName) {
             var prefix = this._importsWithPrefixes.get(moduleName);
@@ -486,9 +512,18 @@ var _NodeEmitterVisitor = /** @class */ (function () {
             }
             prefixIdent = ts.createIdentifier(prefix);
         }
-        // name can only be null during JIT which never executes this code.
-        var result = prefixIdent ? ts.createPropertyAccess(prefixIdent, name) : ts.createIdentifier(name);
-        return result;
+        if (prefixIdent) {
+            return ts.createPropertyAccess(prefixIdent, name);
+        }
+        else {
+            var id = ts.createIdentifier(name);
+            if (this._exportedVariableIdentifiers.has(name)) {
+                // In order for this new identifier node to be properly rewritten in CommonJS output,
+                // it must have its original node set to a parsed instance of the same identifier.
+                ts.setOriginalNode(id, this._exportedVariableIdentifiers.get(name));
+            }
+            return id;
+        }
     };
     return _NodeEmitterVisitor;
 }());
