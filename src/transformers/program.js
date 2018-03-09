@@ -15,6 +15,7 @@ var translate_diagnostics_1 = require("../diagnostics/translate_diagnostics");
 var index_1 = require("../metadata/index");
 var api_1 = require("./api");
 var compiler_host_1 = require("./compiler_host");
+var inline_resources_1 = require("./inline_resources");
 var lower_expressions_1 = require("./lower_expressions");
 var metadata_cache_1 = require("./metadata_cache");
 var node_emitter_transform_1 = require("./node_emitter_transform");
@@ -404,8 +405,14 @@ var AngularCompilerProgram = /** @class */ (function () {
     });
     AngularCompilerProgram.prototype.calculateTransforms = function (genFiles, partialModules, customTransformers) {
         var beforeTs = [];
+        var metadataTransforms = [];
+        if (this.options.enableResourceInlining) {
+            beforeTs.push(inline_resources_1.getInlineResourcesTransformFactory(this.tsProgram, this.hostAdapter));
+            metadataTransforms.push(new inline_resources_1.InlineResourcesMetadataTransformer(this.hostAdapter));
+        }
         if (!this.options.disableExpressionLowering) {
             beforeTs.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.loweringMetadataTransform, this.tsProgram));
+            metadataTransforms.push(this.loweringMetadataTransform);
         }
         if (genFiles) {
             beforeTs.push(node_emitter_transform_1.getAngularEmitterTransformFactory(genFiles, this.getTsProgram()));
@@ -414,10 +421,13 @@ var AngularCompilerProgram = /** @class */ (function () {
             beforeTs.push(r3_transform_1.getAngularClassTransformerFactory(partialModules));
             // If we have partial modules, the cached metadata might be incorrect as it doesn't reflect
             // the partial module transforms.
-            this.metadataCache = this.createMetadataCache([this.loweringMetadataTransform, new r3_metadata_transform_1.PartialModuleMetadataTransformer(partialModules)]);
+            metadataTransforms.push(new r3_metadata_transform_1.PartialModuleMetadataTransformer(partialModules));
         }
         if (customTransformers && customTransformers.beforeTs) {
             beforeTs.push.apply(beforeTs, customTransformers.beforeTs);
+        }
+        if (metadataTransforms.length > 0) {
+            this.metadataCache = this.createMetadataCache(metadataTransforms);
         }
         var afterTs = customTransformers ? customTransformers.afterTs : undefined;
         return { before: beforeTs, after: afterTs };
