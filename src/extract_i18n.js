@@ -2,23 +2,33 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
-var tsc = require("@angular/tsc-wrapped");
-var extractor_1 = require("./extractor");
-function extract(ngOptions, cliOptions, program, host) {
-    return extractor_1.Extractor.create(ngOptions, program, host, cliOptions.locale)
-        .extract(cliOptions.i18nFormat, cliOptions.outFile);
+const api = require("./transformers/api");
+const main_1 = require("./main");
+function mainXi18n(args, consoleError = console.error) {
+    const config = readXi18nCommandLineAndConfiguration(args);
+    return main_1.main(args, consoleError, config);
+}
+exports.mainXi18n = mainXi18n;
+function readXi18nCommandLineAndConfiguration(args) {
+    const options = {};
+    const parsedArgs = require('minimist')(args);
+    if (parsedArgs.outFile)
+        options.i18nOutFile = parsedArgs.outFile;
+    if (parsedArgs.i18nFormat)
+        options.i18nOutFormat = parsedArgs.i18nFormat;
+    if (parsedArgs.locale)
+        options.i18nOutLocale = parsedArgs.locale;
+    const config = main_1.readCommandLineAndConfiguration(args, options, [
+        'outFile',
+        'i18nFormat',
+        'locale',
+    ]);
+    // only emit the i18nBundle but nothing else.
+    return Object.assign({}, config, { emitFlags: api.EmitFlags.I18nBundle });
 }
 // Entry point
 if (require.main === module) {
-    var args = require('minimist')(process.argv.slice(2));
-    var project = args.p || args.project || '.';
-    var cliOptions = new tsc.I18nExtractionCliOptions(args);
-    tsc.main(project, cliOptions, extract, { noEmit: true })
-        .then(function (exitCode) { return process.exit(exitCode); })
-        .catch(function (e) {
-        console.error(e.stack);
-        console.error('Extraction failed');
-        process.exit(1);
-    });
+    const args = process.argv.slice(2);
+    process.exitCode = mainXi18n(args);
 }
 //# sourceMappingURL=extract_i18n.js.map

@@ -6,161 +6,184 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var compiler_1 = require("@angular/compiler");
-var fs = require("fs");
-var path = require("path");
-var ts = require("typescript");
-var api = require("./transformers/api");
-var ng = require("./transformers/entry_points");
-var TS_EXT = /\.ts$/;
-function isTsDiagnostic(diagnostic) {
-    return diagnostic && diagnostic.source != 'angular';
+const compiler_1 = require("@angular/compiler");
+const fs = require("fs");
+const path = require("path");
+const ts = require("typescript");
+const api = require("./transformers/api");
+const ng = require("./transformers/entry_points");
+const util_1 = require("./transformers/util");
+const TS_EXT = /\.ts$/;
+function filterErrorsAndWarnings(diagnostics) {
+    return diagnostics.filter(d => d.category !== ts.DiagnosticCategory.Message);
 }
-function formatDiagnostics(options, diags) {
+exports.filterErrorsAndWarnings = filterErrorsAndWarnings;
+const defaultFormatHost = {
+    getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
+    getCanonicalFileName: fileName => fileName,
+    getNewLine: () => ts.sys.newLine
+};
+function displayFileName(fileName, host) {
+    return path.relative(host.getCurrentDirectory(), host.getCanonicalFileName(fileName));
+}
+function formatDiagnosticPosition(position, host = defaultFormatHost) {
+    return `${displayFileName(position.fileName, host)}(${position.line + 1},${position.column + 1})`;
+}
+exports.formatDiagnosticPosition = formatDiagnosticPosition;
+function flattenDiagnosticMessageChain(chain, host = defaultFormatHost) {
+    let result = chain.messageText;
+    let indent = 1;
+    let current = chain.next;
+    const newLine = host.getNewLine();
+    while (current) {
+        result += newLine;
+        for (let i = 0; i < indent; i++) {
+            result += '  ';
+        }
+        result += current.messageText;
+        const position = current.position;
+        if (position) {
+            result += ` at ${formatDiagnosticPosition(position, host)}`;
+        }
+        current = current.next;
+        indent++;
+    }
+    return result;
+}
+exports.flattenDiagnosticMessageChain = flattenDiagnosticMessageChain;
+function formatDiagnostic(diagnostic, host = defaultFormatHost) {
+    let result = '';
+    const newLine = host.getNewLine();
+    const span = diagnostic.span;
+    if (span) {
+        result += `${formatDiagnosticPosition({
+            fileName: span.start.file.url,
+            line: span.start.line,
+            column: span.start.col
+        }, host)}: `;
+    }
+    else if (diagnostic.position) {
+        result += `${formatDiagnosticPosition(diagnostic.position, host)}: `;
+    }
+    if (diagnostic.span && diagnostic.span.details) {
+        result += `: ${diagnostic.span.details}, ${diagnostic.messageText}${newLine}`;
+    }
+    else if (diagnostic.chain) {
+        result += `${flattenDiagnosticMessageChain(diagnostic.chain, host)}.${newLine}`;
+    }
+    else {
+        result += `: ${diagnostic.messageText}${newLine}`;
+    }
+    return result;
+}
+exports.formatDiagnostic = formatDiagnostic;
+function formatDiagnostics(diags, host = defaultFormatHost) {
     if (diags && diags.length) {
-        var tsFormatHost_1 = {
-            getCurrentDirectory: function () { return options.basePath || process.cwd(); },
-            getCanonicalFileName: function (fileName) { return fileName; },
-            getNewLine: function () { return ts.sys.newLine; }
-        };
         return diags
-            .map(function (d) {
-            if (isTsDiagnostic(d)) {
-                return ts.formatDiagnostics([d], tsFormatHost_1);
+            .map(diagnostic => {
+            if (api.isTsDiagnostic(diagnostic)) {
+                return ts.formatDiagnostics([diagnostic], host);
             }
             else {
-                var res = ts.DiagnosticCategory[d.category];
-                if (d.span) {
-                    res +=
-                        " at " + d.span.start.file.url + "(" + (d.span.start.line + 1) + "," + (d.span.start.col + 1) + ")";
-                }
-                if (d.span && d.span.details) {
-                    res += ": " + d.span.details + ", " + d.messageText + "\n";
-                }
-                else {
-                    res += ": " + d.messageText + "\n";
-                }
-                return res;
+                return formatDiagnostic(diagnostic, host);
             }
         })
-            .join();
+            .join('');
     }
-    else
+    else {
         return '';
+    }
 }
 exports.formatDiagnostics = formatDiagnostics;
 function calcProjectFileAndBasePath(project) {
-    var projectIsDir = fs.lstatSync(project).isDirectory();
-    var projectFile = projectIsDir ? path.join(project, 'tsconfig.json') : project;
-    var projectDir = projectIsDir ? project : path.dirname(project);
-    var basePath = path.resolve(process.cwd(), projectDir);
-    return { projectFile: projectFile, basePath: basePath };
+    const projectIsDir = fs.lstatSync(project).isDirectory();
+    const projectFile = projectIsDir ? path.join(project, 'tsconfig.json') : project;
+    const projectDir = projectIsDir ? project : path.dirname(project);
+    const basePath = path.resolve(process.cwd(), projectDir);
+    return { projectFile, basePath };
 }
 exports.calcProjectFileAndBasePath = calcProjectFileAndBasePath;
 function createNgCompilerOptions(basePath, config, tsOptions) {
-    return __assign({}, tsOptions, config.angularCompilerOptions, { genDir: basePath, basePath: basePath });
+    return Object.assign({}, tsOptions, config.angularCompilerOptions, { genDir: basePath, basePath });
 }
 exports.createNgCompilerOptions = createNgCompilerOptions;
 function readConfiguration(project, existingOptions) {
     try {
-        var _a = calcProjectFileAndBasePath(project), projectFile = _a.projectFile, basePath = _a.basePath;
-        var _b = ts.readConfigFile(projectFile, ts.sys.readFile), config = _b.config, error = _b.error;
+        const { projectFile, basePath } = calcProjectFileAndBasePath(project);
+        let { config, error } = ts.readConfigFile(projectFile, ts.sys.readFile);
         if (error) {
-            return { project: project, errors: [error], rootNames: [], options: {} };
+            return {
+                project,
+                errors: [error],
+                rootNames: [],
+                options: {},
+                emitFlags: api.EmitFlags.Default
+            };
         }
-        var parseConfigHost = {
+        const parseConfigHost = {
             useCaseSensitiveFileNames: true,
             fileExists: fs.existsSync,
             readDirectory: ts.sys.readDirectory,
             readFile: ts.sys.readFile
         };
-        var parsed = ts.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingOptions);
-        var rootNames = parsed.fileNames.map(function (f) { return path.normalize(f); });
-        var options = createNgCompilerOptions(basePath, config, parsed.options);
-        return { project: projectFile, rootNames: rootNames, options: options, errors: parsed.errors };
+        const parsed = ts.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingOptions);
+        const rootNames = parsed.fileNames.map(f => path.normalize(f));
+        const options = createNgCompilerOptions(basePath, config, parsed.options);
+        let emitFlags = api.EmitFlags.Default;
+        if (!(options.skipMetadataEmit || options.flatModuleOutFile)) {
+            emitFlags |= api.EmitFlags.Metadata;
+        }
+        if (options.skipTemplateCodegen) {
+            emitFlags = emitFlags & ~api.EmitFlags.Codegen;
+        }
+        return { project: projectFile, rootNames, options, errors: parsed.errors, emitFlags };
     }
     catch (e) {
-        var errors = [{
+        const errors = [{
                 category: ts.DiagnosticCategory.Error,
                 messageText: e.stack,
                 source: api.SOURCE,
                 code: api.UNKNOWN_ERROR_CODE
             }];
-        return { project: '', errors: errors, rootNames: [], options: {} };
+        return { project: '', errors, rootNames: [], options: {}, emitFlags: api.EmitFlags.Default };
     }
 }
 exports.readConfiguration = readConfiguration;
-function exitCodeFromResult(result) {
-    if (!result) {
-        // If we didn't get a result we should return failure.
-        return 1;
-    }
-    if (!result.diagnostics || result.diagnostics.length === 0) {
+function exitCodeFromResult(diags) {
+    if (!diags || filterErrorsAndWarnings(diags).length === 0) {
         // If we have a result and didn't get any errors, we succeeded.
         return 0;
     }
     // Return 2 if any of the errors were unknown.
-    return result.diagnostics.some(function (d) { return d.source === 'angular' && d.code === api.UNKNOWN_ERROR_CODE; }) ?
-        2 :
-        1;
+    return diags.some(d => d.source === 'angular' && d.code === api.UNKNOWN_ERROR_CODE) ? 2 : 1;
 }
 exports.exitCodeFromResult = exitCodeFromResult;
-function performCompilation(_a) {
-    var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram, emitCallback = _a.emitCallback, customTransformers = _a.customTransformers;
-    var _b = ts.version.split('.'), major = _b[0], minor = _b[1];
-    if (Number(major) < 2 || (Number(major) === 2 && Number(minor) < 3)) {
-        throw new Error('Must use TypeScript > 2.3 to have transformer support');
-    }
-    var allDiagnostics = [];
-    function checkDiagnostics(diags) {
-        if (diags) {
-            allDiagnostics.push.apply(allDiagnostics, diags);
-            return diags.every(function (d) { return d.category !== ts.DiagnosticCategory.Error; });
-        }
-        return true;
-    }
-    var program;
-    var emitResult;
+function performCompilation({ rootNames, options, host, oldProgram, emitCallback, gatherDiagnostics = defaultGatherDiagnostics, customTransformers, emitFlags = api.EmitFlags.Default }) {
+    let program;
+    let emitResult;
+    let allDiagnostics = [];
     try {
         if (!host) {
-            host = ng.createCompilerHost({ options: options });
+            host = ng.createCompilerHost({ options });
         }
-        program = ng.createProgram({ rootNames: rootNames, host: host, options: options, oldProgram: oldProgram });
-        var shouldEmit = true;
-        // Check parameter diagnostics
-        shouldEmit = shouldEmit && checkDiagnostics(program.getTsOptionDiagnostics().concat(program.getNgOptionDiagnostics()));
-        // Check syntactic diagnostics
-        shouldEmit = shouldEmit && checkDiagnostics(program.getTsSyntacticDiagnostics());
-        // Check TypeScript semantic and Angular structure diagnostics
-        shouldEmit =
-            shouldEmit &&
-                checkDiagnostics(program.getTsSemanticDiagnostics().concat(program.getNgStructuralDiagnostics()));
-        // Check Angular semantic diagnostics
-        shouldEmit = shouldEmit && checkDiagnostics(program.getNgSemanticDiagnostics());
-        if (shouldEmit) {
-            emitResult = program.emit({
-                emitCallback: emitCallback,
-                customTransformers: customTransformers,
-                emitFlags: api.EmitFlags.Default |
-                    ((options.skipMetadataEmit || options.flatModuleOutFile) ? 0 : api.EmitFlags.Metadata)
-            });
-            allDiagnostics.push.apply(allDiagnostics, emitResult.diagnostics);
-            return { diagnostics: allDiagnostics, program: program, emitResult: emitResult };
+        program = ng.createProgram({ rootNames, host, options, oldProgram });
+        const beforeDiags = Date.now();
+        allDiagnostics.push(...gatherDiagnostics(program));
+        if (options.diagnostics) {
+            const afterDiags = Date.now();
+            allDiagnostics.push(util_1.createMessageDiagnostic(`Time for diagnostics: ${afterDiags - beforeDiags}ms.`));
         }
-        return { diagnostics: allDiagnostics, program: program };
+        if (!hasErrors(allDiagnostics)) {
+            emitResult = program.emit({ emitCallback, customTransformers, emitFlags });
+            allDiagnostics.push(...emitResult.diagnostics);
+            return { diagnostics: allDiagnostics, program, emitResult };
+        }
+        return { diagnostics: allDiagnostics, program };
     }
     catch (e) {
-        var errMsg = void 0;
-        var code = void 0;
+        let errMsg;
+        let code;
         if (compiler_1.isSyntaxError(e)) {
             // don't report the stack for syntax errors as they are well known errors.
             errMsg = e.message;
@@ -172,9 +195,37 @@ function performCompilation(_a) {
             program = undefined;
             code = api.UNKNOWN_ERROR_CODE;
         }
-        allDiagnostics.push({ category: ts.DiagnosticCategory.Error, messageText: errMsg, code: code, source: api.SOURCE });
-        return { diagnostics: allDiagnostics, program: program };
+        allDiagnostics.push({ category: ts.DiagnosticCategory.Error, messageText: errMsg, code, source: api.SOURCE });
+        return { diagnostics: allDiagnostics, program };
     }
 }
 exports.performCompilation = performCompilation;
+function defaultGatherDiagnostics(program) {
+    const allDiagnostics = [];
+    function checkDiagnostics(diags) {
+        if (diags) {
+            allDiagnostics.push(...diags);
+            return !hasErrors(diags);
+        }
+        return true;
+    }
+    let checkOtherDiagnostics = true;
+    // Check parameter diagnostics
+    checkOtherDiagnostics = checkOtherDiagnostics &&
+        checkDiagnostics([...program.getTsOptionDiagnostics(), ...program.getNgOptionDiagnostics()]);
+    // Check syntactic diagnostics
+    checkOtherDiagnostics =
+        checkOtherDiagnostics && checkDiagnostics(program.getTsSyntacticDiagnostics());
+    // Check TypeScript semantic and Angular structure diagnostics
+    checkOtherDiagnostics =
+        checkOtherDiagnostics &&
+            checkDiagnostics([...program.getTsSemanticDiagnostics(), ...program.getNgStructuralDiagnostics()]);
+    // Check Angular semantic diagnostics
+    checkOtherDiagnostics =
+        checkOtherDiagnostics && checkDiagnostics(program.getNgSemanticDiagnostics());
+    return allDiagnostics;
+}
+function hasErrors(diags) {
+    return diags.some(d => d.category === ts.DiagnosticCategory.Error);
+}
 //# sourceMappingURL=perform_compile.js.map

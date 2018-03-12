@@ -7,79 +7,74 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var chokidar = require("chokidar");
-var path = require("path");
-var ts = require("typescript");
-var perform_compile_1 = require("./perform_compile");
-var api = require("./transformers/api");
-var entry_points_1 = require("./transformers/entry_points");
-var ChangeDiagnostics = {
-    Compilation_complete_Watching_for_file_changes: {
+const chokidar = require("chokidar");
+const path = require("path");
+const ts = require("typescript");
+const perform_compile_1 = require("./perform_compile");
+const api = require("./transformers/api");
+const entry_points_1 = require("./transformers/entry_points");
+const util_1 = require("./transformers/util");
+function totalCompilationTimeDiagnostic(timeInMillis) {
+    let duration;
+    if (timeInMillis > 1000) {
+        duration = `${(timeInMillis / 1000).toPrecision(2)}s`;
+    }
+    else {
+        duration = `${timeInMillis}ms`;
+    }
+    return {
         category: ts.DiagnosticCategory.Message,
-        messageText: 'Compilation complete. Watching for file changes.',
+        messageText: `Total time: ${duration}`,
         code: api.DEFAULT_ERROR_CODE,
-        source: api.SOURCE
-    },
-    Compilation_failed_Watching_for_file_changes: {
-        category: ts.DiagnosticCategory.Message,
-        messageText: 'Compilation failed. Watching for file changes.',
-        code: api.DEFAULT_ERROR_CODE,
-        source: api.SOURCE
-    },
-    File_change_detected_Starting_incremental_compilation: {
-        category: ts.DiagnosticCategory.Message,
-        messageText: 'File change detected. Starting incremental compilation.',
-        code: api.DEFAULT_ERROR_CODE,
-        source: api.SOURCE
-    },
-};
+        source: api.SOURCE,
+    };
+}
 var FileChangeEvent;
 (function (FileChangeEvent) {
     FileChangeEvent[FileChangeEvent["Change"] = 0] = "Change";
     FileChangeEvent[FileChangeEvent["CreateDelete"] = 1] = "CreateDelete";
+    FileChangeEvent[FileChangeEvent["CreateDeleteDir"] = 2] = "CreateDeleteDir";
 })(FileChangeEvent = exports.FileChangeEvent || (exports.FileChangeEvent = {}));
-function createPerformWatchHost(configFileName, reportDiagnostics, createEmitCallback) {
+function createPerformWatchHost(configFileName, reportDiagnostics, existingOptions, createEmitCallback) {
     return {
         reportDiagnostics: reportDiagnostics,
-        createCompilerHost: function (options) { return entry_points_1.createCompilerHost({ options: options }); },
-        readConfiguration: function () { return perform_compile_1.readConfiguration(configFileName); },
-        createEmitCallback: function (options) { return createEmitCallback ? createEmitCallback(options) : undefined; },
-        onFileChange: function (listeners) {
-            var parsed = perform_compile_1.readConfiguration(configFileName);
-            function stubReady(cb) { process.nextTick(cb); }
-            if (parsed.errors && parsed.errors.length) {
-                reportDiagnostics(parsed.errors);
-                return { close: function () { }, ready: stubReady };
-            }
-            if (!parsed.options.basePath) {
+        createCompilerHost: options => entry_points_1.createCompilerHost({ options }),
+        readConfiguration: () => perform_compile_1.readConfiguration(configFileName, existingOptions),
+        createEmitCallback: options => createEmitCallback ? createEmitCallback(options) : undefined,
+        onFileChange: (options, listener, ready) => {
+            if (!options.basePath) {
                 reportDiagnostics([{
                         category: ts.DiagnosticCategory.Error,
                         messageText: 'Invalid configuration option. baseDir not specified',
                         source: api.SOURCE,
                         code: api.DEFAULT_ERROR_CODE
                     }]);
-                return { close: function () { }, ready: stubReady };
+                return { close: () => { } };
             }
-            var watcher = chokidar.watch(parsed.options.basePath, {
+            const watcher = chokidar.watch(options.basePath, {
                 // ignore .dotfiles, .js and .map files.
                 // can't ignore other files as we e.g. want to recompile if an `.html` file changes as well.
                 ignored: /((^[\/\\])\..)|(\.js$)|(\.map$)|(\.metadata\.json)/,
                 ignoreInitial: true,
                 persistent: true,
             });
-            watcher.on('all', function (event, path) {
+            watcher.on('all', (event, path) => {
                 switch (event) {
                     case 'change':
-                        listeners(FileChangeEvent.Change, path);
+                        listener(FileChangeEvent.Change, path);
                         break;
                     case 'unlink':
                     case 'add':
-                        listeners(FileChangeEvent.CreateDelete, path);
+                        listener(FileChangeEvent.CreateDelete, path);
+                        break;
+                    case 'unlinkDir':
+                    case 'addDir':
+                        listener(FileChangeEvent.CreateDeleteDir, path);
                         break;
                 }
             });
-            function ready(cb) { watcher.on('ready', cb); }
-            return { close: function () { return watcher.close(); }, ready: ready };
+            watcher.on('ready', ready);
+            return { close: () => watcher.close(), ready };
         },
         setTimeout: (ts.sys.clearTimeout && ts.sys.setTimeout) || setTimeout,
         clearTimeout: (ts.sys.setTimeout && ts.sys.clearTimeout) || clearTimeout,
@@ -90,16 +85,29 @@ exports.createPerformWatchHost = createPerformWatchHost;
  * The logic in this function is adapted from `tsc.ts` from TypeScript.
  */
 function performWatchCompilation(host) {
-    var cachedProgram; // Program cached from last compilation
-    var cachedCompilerHost; // CompilerHost cached from last compilation
-    var cachedOptions; // CompilerOptions cached from last compilation
-    var timerHandleForRecompilation; // Handle for 0.25s wait timer to trigger recompilation
+    let cachedProgram; // Program cached from last compilation
+    let cachedCompilerHost; // CompilerHost cached from last compilation
+    let cachedOptions; // CompilerOptions cached from last compilation
+    let timerHandleForRecompilation; // Handle for 0.25s wait timer to trigger recompilation
+    const ingoreFilesForWatch = new Set();
+    const fileCache = new Map();
+    const firstCompileResult = doCompilation();
     // Watch basePath, ignoring .dotfiles
-    var fileWatcher = host.onFileChange(watchedFileChanged);
-    var ingoreFilesForWatch = new Set();
-    var firstCompileResult = doCompilation();
-    var readyPromise = new Promise(function (resolve) { return fileWatcher.ready(resolve); });
-    return { close: close, ready: function (cb) { return readyPromise.then(cb); }, firstCompileResult: firstCompileResult };
+    let resolveReadyPromise;
+    const readyPromise = new Promise(resolve => resolveReadyPromise = resolve);
+    // Note: ! is ok as options are filled after the first compilation
+    // Note: ! is ok as resolvedReadyPromise is filled by the previous call
+    const fileWatcher = host.onFileChange(cachedOptions.options, watchedFileChanged, resolveReadyPromise);
+    return { close, ready: cb => readyPromise.then(cb), firstCompileResult };
+    function cacheEntry(fileName) {
+        fileName = path.normalize(fileName);
+        let entry = fileCache.get(fileName);
+        if (!entry) {
+            entry = {};
+            fileCache.set(fileName, entry);
+        }
+        return entry;
+    }
     function close() {
         fileWatcher.close();
         if (timerHandleForRecompilation) {
@@ -114,22 +122,47 @@ function performWatchCompilation(host) {
         }
         if (cachedOptions.errors && cachedOptions.errors.length) {
             host.reportDiagnostics(cachedOptions.errors);
-            return;
+            return cachedOptions.errors;
         }
+        const startTime = Date.now();
         if (!cachedCompilerHost) {
-            // TODO(chuckj): consider avoiding re-generating factories for libraries.
-            // Consider modifying the AotCompilerHost to be able to remember the summary files
-            // generated from previous compiliations and return false from isSourceFile for
-            // .d.ts files for which a summary file was already generated.å
             cachedCompilerHost = host.createCompilerHost(cachedOptions.options);
-            var originalWriteFileCallback_1 = cachedCompilerHost.writeFile;
-            cachedCompilerHost.writeFile = function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
+            const originalWriteFileCallback = cachedCompilerHost.writeFile;
+            cachedCompilerHost.writeFile = function (fileName, data, writeByteOrderMark, onError, sourceFiles = []) {
                 ingoreFilesForWatch.add(path.normalize(fileName));
-                return originalWriteFileCallback_1(fileName, data, writeByteOrderMark, onError, sourceFiles);
+                return originalWriteFileCallback(fileName, data, writeByteOrderMark, onError, sourceFiles);
+            };
+            const originalFileExists = cachedCompilerHost.fileExists;
+            cachedCompilerHost.fileExists = function (fileName) {
+                const ce = cacheEntry(fileName);
+                if (ce.exists == null) {
+                    ce.exists = originalFileExists.call(this, fileName);
+                }
+                return ce.exists;
+            };
+            const originalGetSourceFile = cachedCompilerHost.getSourceFile;
+            cachedCompilerHost.getSourceFile = function (fileName, languageVersion) {
+                const ce = cacheEntry(fileName);
+                if (!ce.sf) {
+                    ce.sf = originalGetSourceFile.call(this, fileName, languageVersion);
+                }
+                return ce.sf;
+            };
+            const originalReadFile = cachedCompilerHost.readFile;
+            cachedCompilerHost.readFile = function (fileName) {
+                const ce = cacheEntry(fileName);
+                if (ce.content == null) {
+                    ce.content = originalReadFile.call(this, fileName);
+                }
+                return ce.content;
             };
         }
         ingoreFilesForWatch.clear();
-        var compileResult = perform_compile_1.performCompilation({
+        const oldProgram = cachedProgram;
+        // We clear out the `cachedProgram` here as a
+        // program can only be used as `oldProgram` 1x
+        cachedProgram = undefined;
+        const compileResult = perform_compile_1.performCompilation({
             rootNames: cachedOptions.rootNames,
             options: cachedOptions.options,
             host: cachedCompilerHost,
@@ -139,15 +172,20 @@ function performWatchCompilation(host) {
         if (compileResult.diagnostics.length) {
             host.reportDiagnostics(compileResult.diagnostics);
         }
-        var exitCode = perform_compile_1.exitCodeFromResult(compileResult);
+        const endTime = Date.now();
+        if (cachedOptions.options.diagnostics) {
+            const totalTime = (endTime - startTime) / 1000;
+            host.reportDiagnostics([totalCompilationTimeDiagnostic(endTime - startTime)]);
+        }
+        const exitCode = perform_compile_1.exitCodeFromResult(compileResult.diagnostics);
         if (exitCode == 0) {
             cachedProgram = compileResult.program;
-            host.reportDiagnostics([ChangeDiagnostics.Compilation_complete_Watching_for_file_changes]);
+            host.reportDiagnostics([util_1.createMessageDiagnostic('Compilation complete. Watching for file changes.')]);
         }
         else {
-            host.reportDiagnostics([ChangeDiagnostics.Compilation_failed_Watching_for_file_changes]);
+            host.reportDiagnostics([util_1.createMessageDiagnostic('Compilation failed. Watching for file changes.')]);
         }
-        return compileResult;
+        return compileResult.diagnostics;
     }
     function resetOptions() {
         cachedProgram = undefined;
@@ -163,10 +201,16 @@ function performWatchCompilation(host) {
             // If the configuration file changes, forget everything and start the recompilation timer
             resetOptions();
         }
-        else if (event === FileChangeEvent.CreateDelete) {
+        else if (event === FileChangeEvent.CreateDelete || event === FileChangeEvent.CreateDeleteDir) {
             // If a file was added or removed, reread the configuration
             // to determine the new list of root files.
             cachedOptions = undefined;
+        }
+        if (event === FileChangeEvent.CreateDeleteDir) {
+            fileCache.clear();
+        }
+        else {
+            fileCache.delete(path.normalize(fileName));
         }
         if (!ingoreFilesForWatch.has(path.normalize(fileName))) {
             // Ignore the file if the file is one that was written by the compiler.
@@ -184,7 +228,7 @@ function performWatchCompilation(host) {
     }
     function recompile() {
         timerHandleForRecompilation = undefined;
-        host.reportDiagnostics([ChangeDiagnostics.File_change_detected_Starting_incremental_compilation]);
+        host.reportDiagnostics([util_1.createMessageDiagnostic('File change detected. Starting incremental compilation.')]);
         doCompilation();
     }
 }

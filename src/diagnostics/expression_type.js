@@ -7,40 +7,38 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var compiler_1 = require("@angular/compiler");
-var symbols_1 = require("./symbols");
+const compiler_1 = require("@angular/compiler");
+const symbols_1 = require("./symbols");
 var DiagnosticKind;
 (function (DiagnosticKind) {
     DiagnosticKind[DiagnosticKind["Error"] = 0] = "Error";
     DiagnosticKind[DiagnosticKind["Warning"] = 1] = "Warning";
 })(DiagnosticKind = exports.DiagnosticKind || (exports.DiagnosticKind = {}));
-var TypeDiagnostic = (function () {
-    function TypeDiagnostic(kind, message, ast) {
+class TypeDiagnostic {
+    constructor(kind, message, ast) {
         this.kind = kind;
         this.message = message;
         this.ast = ast;
     }
-    return TypeDiagnostic;
-}());
+}
 exports.TypeDiagnostic = TypeDiagnostic;
 // AstType calculatetype of the ast given AST element.
-var AstType = (function () {
-    function AstType(scope, query, context) {
+class AstType {
+    constructor(scope, query, context) {
         this.scope = scope;
         this.query = query;
         this.context = context;
     }
-    AstType.prototype.getType = function (ast) { return ast.visit(this); };
-    AstType.prototype.getDiagnostics = function (ast) {
+    getType(ast) { return ast.visit(this); }
+    getDiagnostics(ast) {
         this.diagnostics = [];
-        var type = ast.visit(this);
+        const type = ast.visit(this);
         if (this.context.event && type.callable) {
             this.reportWarning('Unexpected callable expression. Expected a method call', ast);
         }
         return this.diagnostics;
-    };
-    AstType.prototype.visitBinary = function (ast) {
-        var _this = this;
+    }
+    visitBinary(ast) {
         // Treat undefined and null as other.
         function normalize(kind, other) {
             switch (kind) {
@@ -50,8 +48,8 @@ var AstType = (function () {
             }
             return kind;
         }
-        var getType = function (ast, operation) {
-            var type = _this.getType(ast);
+        const getType = (ast, operation) => {
+            const type = this.getType(ast);
             if (type.nullable) {
                 switch (operation) {
                     case '&&':
@@ -63,23 +61,23 @@ var AstType = (function () {
                         // Nullable allowed.
                         break;
                     default:
-                        _this.reportError("The expression might be null", ast);
+                        this.reportError(`The expression might be null`, ast);
                         break;
                 }
-                return _this.query.getNonNullableType(type);
+                return this.query.getNonNullableType(type);
             }
             return type;
         };
-        var leftType = getType(ast.left, ast.operation);
-        var rightType = getType(ast.right, ast.operation);
-        var leftRawKind = this.query.getTypeKind(leftType);
-        var rightRawKind = this.query.getTypeKind(rightType);
-        var leftKind = normalize(leftRawKind, rightRawKind);
-        var rightKind = normalize(rightRawKind, leftRawKind);
+        const leftType = getType(ast.left, ast.operation);
+        const rightType = getType(ast.right, ast.operation);
+        const leftRawKind = this.query.getTypeKind(leftType);
+        const rightRawKind = this.query.getTypeKind(rightType);
+        const leftKind = normalize(leftRawKind, rightRawKind);
+        const rightKind = normalize(rightRawKind, leftRawKind);
         // The following swtich implements operator typing similar to the
         // type production tables in the TypeScript specification.
         // https://github.com/Microsoft/TypeScript/blob/v1.8.10/doc/spec.md#4.19
-        var operKind = leftKind << 8 | rightKind;
+        const operKind = leftKind << 8 | rightKind;
         switch (ast.operation) {
             case '*':
             case '/':
@@ -98,7 +96,7 @@ var AstType = (function () {
                     case symbols_1.BuiltinType.Number << 8 | symbols_1.BuiltinType.Number:
                         return this.query.getBuiltinType(symbols_1.BuiltinType.Number);
                     default:
-                        var errorAst = ast.left;
+                        let errorAst = ast.left;
                         switch (leftKind) {
                             case symbols_1.BuiltinType.Any:
                             case symbols_1.BuiltinType.Number:
@@ -169,41 +167,40 @@ var AstType = (function () {
             case '||':
                 return this.query.getTypeUnion(leftType, rightType);
         }
-        return this.reportError("Unrecognized operator " + ast.operation, ast);
-    };
-    AstType.prototype.visitChain = function (ast) {
+        return this.reportError(`Unrecognized operator ${ast.operation}`, ast);
+    }
+    visitChain(ast) {
         if (this.diagnostics) {
             // If we are producing diagnostics, visit the children
             compiler_1.visitAstChildren(ast, this);
         }
         // The type of a chain is always undefined.
         return this.query.getBuiltinType(symbols_1.BuiltinType.Undefined);
-    };
-    AstType.prototype.visitConditional = function (ast) {
+    }
+    visitConditional(ast) {
         // The type of a conditional is the union of the true and false conditions.
         if (this.diagnostics) {
             compiler_1.visitAstChildren(ast, this);
         }
         return this.query.getTypeUnion(this.getType(ast.trueExp), this.getType(ast.falseExp));
-    };
-    AstType.prototype.visitFunctionCall = function (ast) {
-        var _this = this;
+    }
+    visitFunctionCall(ast) {
         // The type of a function call is the return type of the selected signature.
         // The signature is selected based on the types of the arguments. Angular doesn't
         // support contextual typing of arguments so this is simpler than TypeScript's
         // version.
-        var args = ast.args.map(function (arg) { return _this.getType(arg); });
-        var target = this.getType(ast.target);
+        const args = ast.args.map(arg => this.getType(arg));
+        const target = this.getType(ast.target);
         if (!target || !target.callable)
             return this.reportError('Call target is not callable', ast);
-        var signature = target.selectSignature(args);
+        const signature = target.selectSignature(args);
         if (signature)
             return signature.result;
         // TODO: Consider a better error message here.
         return this.reportError('Unable no compatible signature found for call', ast);
-    };
-    AstType.prototype.visitImplicitReceiver = function (ast) {
-        var _this = this;
+    }
+    visitImplicitReceiver(ast) {
+        const _this = this;
         // Return a pseudo-symbol for the implicit receiver.
         // The members of the implicit receiver are what is defined by the
         // scope passed into this class.
@@ -217,44 +214,42 @@ var AstType = (function () {
             nullable: false,
             public: true,
             definition: undefined,
-            members: function () { return _this.scope; },
-            signatures: function () { return []; },
-            selectSignature: function (types) { return undefined; },
-            indexed: function (argument) { return undefined; }
+            members() { return _this.scope; },
+            signatures() { return []; },
+            selectSignature(types) { return undefined; },
+            indexed(argument) { return undefined; }
         };
-    };
-    AstType.prototype.visitInterpolation = function (ast) {
+    }
+    visitInterpolation(ast) {
         // If we are producing diagnostics, visit the children.
         if (this.diagnostics) {
             compiler_1.visitAstChildren(ast, this);
         }
         return this.undefinedType;
-    };
-    AstType.prototype.visitKeyedRead = function (ast) {
-        var targetType = this.getType(ast.obj);
-        var keyType = this.getType(ast.key);
-        var result = targetType.indexed(keyType);
+    }
+    visitKeyedRead(ast) {
+        const targetType = this.getType(ast.obj);
+        const keyType = this.getType(ast.key);
+        const result = targetType.indexed(keyType);
         return result || this.anyType;
-    };
-    AstType.prototype.visitKeyedWrite = function (ast) {
+    }
+    visitKeyedWrite(ast) {
         // The write of a type is the type of the value being written.
         return this.getType(ast.value);
-    };
-    AstType.prototype.visitLiteralArray = function (ast) {
-        var _this = this;
+    }
+    visitLiteralArray(ast) {
         // A type literal is an array type of the union of the elements
-        return this.query.getArrayType((_a = this.query).getTypeUnion.apply(_a, ast.expressions.map(function (element) { return _this.getType(element); })));
-        var _a;
-    };
-    AstType.prototype.visitLiteralMap = function (ast) {
+        return this.query.getArrayType(this.query.getTypeUnion(...ast.expressions.map(element => this.getType(element))));
+    }
+    visitLiteralMap(ast) {
         // If we are producing diagnostics, visit the children
         if (this.diagnostics) {
             compiler_1.visitAstChildren(ast, this);
         }
         // TODO: Return a composite type.
         return this.anyType;
-    };
-    AstType.prototype.visitLiteralPrimitive = function (ast) {
+    }
+    visitLiteralPrimitive(ast) {
         // The type of a literal primitive depends on the value of the literal.
         switch (ast.value) {
             case true:
@@ -274,137 +269,126 @@ var AstType = (function () {
                         return this.reportError('Unrecognized primitive', ast);
                 }
         }
-    };
-    AstType.prototype.visitMethodCall = function (ast) {
+    }
+    visitMethodCall(ast) {
         return this.resolveMethodCall(this.getType(ast.receiver), ast);
-    };
-    AstType.prototype.visitPipe = function (ast) {
-        var _this = this;
+    }
+    visitPipe(ast) {
         // The type of a pipe node is the return type of the pipe's transform method. The table returned
         // by getPipes() is expected to contain symbols with the corresponding transform method type.
-        var pipe = this.query.getPipes().get(ast.name);
+        const pipe = this.query.getPipes().get(ast.name);
         if (!pipe)
-            return this.reportError("No pipe by the name " + ast.name + " found", ast);
-        var expType = this.getType(ast.exp);
-        var signature = pipe.selectSignature([expType].concat(ast.args.map(function (arg) { return _this.getType(arg); })));
+            return this.reportError(`No pipe by the name ${ast.name} found`, ast);
+        const expType = this.getType(ast.exp);
+        const signature = pipe.selectSignature([expType].concat(ast.args.map(arg => this.getType(arg))));
         if (!signature)
             return this.reportError('Unable to resolve signature for pipe invocation', ast);
         return signature.result;
-    };
-    AstType.prototype.visitPrefixNot = function (ast) {
+    }
+    visitPrefixNot(ast) {
         // The type of a prefix ! is always boolean.
         return this.query.getBuiltinType(symbols_1.BuiltinType.Boolean);
-    };
-    AstType.prototype.visitNonNullAssert = function (ast) {
-        var expressionType = this.getType(ast.expression);
+    }
+    visitNonNullAssert(ast) {
+        const expressionType = this.getType(ast.expression);
         return this.query.getNonNullableType(expressionType);
-    };
-    AstType.prototype.visitPropertyRead = function (ast) {
+    }
+    visitPropertyRead(ast) {
         return this.resolvePropertyRead(this.getType(ast.receiver), ast);
-    };
-    AstType.prototype.visitPropertyWrite = function (ast) {
+    }
+    visitPropertyWrite(ast) {
         // The type of a write is the type of the value being written.
         return this.getType(ast.value);
-    };
-    AstType.prototype.visitQuote = function (ast) {
+    }
+    visitQuote(ast) {
         // The type of a quoted expression is any.
         return this.query.getBuiltinType(symbols_1.BuiltinType.Any);
-    };
-    AstType.prototype.visitSafeMethodCall = function (ast) {
+    }
+    visitSafeMethodCall(ast) {
         return this.resolveMethodCall(this.query.getNonNullableType(this.getType(ast.receiver)), ast);
-    };
-    AstType.prototype.visitSafePropertyRead = function (ast) {
+    }
+    visitSafePropertyRead(ast) {
         return this.resolvePropertyRead(this.query.getNonNullableType(this.getType(ast.receiver)), ast);
-    };
-    Object.defineProperty(AstType.prototype, "anyType", {
-        get: function () {
-            var result = this._anyType;
-            if (!result) {
-                result = this._anyType = this.query.getBuiltinType(symbols_1.BuiltinType.Any);
-            }
-            return result;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(AstType.prototype, "undefinedType", {
-        get: function () {
-            var result = this._undefinedType;
-            if (!result) {
-                result = this._undefinedType = this.query.getBuiltinType(symbols_1.BuiltinType.Undefined);
-            }
-            return result;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    AstType.prototype.resolveMethodCall = function (receiverType, ast) {
-        var _this = this;
+    }
+    get anyType() {
+        let result = this._anyType;
+        if (!result) {
+            result = this._anyType = this.query.getBuiltinType(symbols_1.BuiltinType.Any);
+        }
+        return result;
+    }
+    get undefinedType() {
+        let result = this._undefinedType;
+        if (!result) {
+            result = this._undefinedType = this.query.getBuiltinType(symbols_1.BuiltinType.Undefined);
+        }
+        return result;
+    }
+    resolveMethodCall(receiverType, ast) {
         if (this.isAny(receiverType)) {
             return this.anyType;
         }
         // The type of a method is the selected methods result type.
-        var method = receiverType.members().get(ast.name);
+        const method = receiverType.members().get(ast.name);
         if (!method)
-            return this.reportError("Unknown method '" + ast.name + "'", ast);
+            return this.reportError(`Unknown method '${ast.name}'`, ast);
         if (!method.type)
-            return this.reportError("Could not find a type for '" + ast.name + "'", ast);
+            return this.reportError(`Could not find a type for '${ast.name}'`, ast);
         if (!method.type.callable)
-            return this.reportError("Member '" + ast.name + "' is not callable", ast);
-        var signature = method.type.selectSignature(ast.args.map(function (arg) { return _this.getType(arg); }));
+            return this.reportError(`Member '${ast.name}' is not callable`, ast);
+        const signature = method.type.selectSignature(ast.args.map(arg => this.getType(arg)));
         if (!signature)
-            return this.reportError("Unable to resolve signature for call of method " + ast.name, ast);
+            return this.reportError(`Unable to resolve signature for call of method ${ast.name}`, ast);
         return signature.result;
-    };
-    AstType.prototype.resolvePropertyRead = function (receiverType, ast) {
+    }
+    resolvePropertyRead(receiverType, ast) {
         if (this.isAny(receiverType)) {
             return this.anyType;
         }
         // The type of a property read is the seelcted member's type.
-        var member = receiverType.members().get(ast.name);
+        const member = receiverType.members().get(ast.name);
         if (!member) {
-            var receiverInfo = receiverType.name;
+            let receiverInfo = receiverType.name;
             if (receiverInfo == '$implict') {
                 receiverInfo =
                     'The component declaration, template variable declarations, and element references do';
             }
             else if (receiverType.nullable) {
-                return this.reportError("The expression might be null", ast.receiver);
+                return this.reportError(`The expression might be null`, ast.receiver);
             }
             else {
-                receiverInfo = "'" + receiverInfo + "' does";
+                receiverInfo = `'${receiverInfo}' does`;
             }
-            return this.reportError("Identifier '" + ast.name + "' is not defined. " + receiverInfo + " not contain such a member", ast);
+            return this.reportError(`Identifier '${ast.name}' is not defined. ${receiverInfo} not contain such a member`, ast);
         }
         if (!member.public) {
-            var receiverInfo = receiverType.name;
+            let receiverInfo = receiverType.name;
             if (receiverInfo == '$implict') {
                 receiverInfo = 'the component';
             }
             else {
-                receiverInfo = "'" + receiverInfo + "'";
+                receiverInfo = `'${receiverInfo}'`;
             }
-            this.reportWarning("Identifier '" + ast.name + "' refers to a private member of " + receiverInfo, ast);
+            this.reportWarning(`Identifier '${ast.name}' refers to a private member of ${receiverInfo}`, ast);
         }
         return member.type;
-    };
-    AstType.prototype.reportError = function (message, ast) {
+    }
+    reportError(message, ast) {
         if (this.diagnostics) {
             this.diagnostics.push(new TypeDiagnostic(DiagnosticKind.Error, message, ast));
         }
         return this.anyType;
-    };
-    AstType.prototype.reportWarning = function (message, ast) {
+    }
+    reportWarning(message, ast) {
         if (this.diagnostics) {
             this.diagnostics.push(new TypeDiagnostic(DiagnosticKind.Warning, message, ast));
         }
         return this.anyType;
-    };
-    AstType.prototype.isAny = function (symbol) {
+    }
+    isAny(symbol) {
         return !symbol || this.query.getTypeKind(symbol) == symbols_1.BuiltinType.Any ||
             (!!symbol.type && this.isAny(symbol.type));
-    };
-    return AstType;
-}());
+    }
+}
 exports.AstType = AstType;
 //# sourceMappingURL=expression_type.js.map

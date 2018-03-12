@@ -6,40 +6,27 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 Object.defineProperty(exports, "__esModule", { value: true });
-var compiler_1 = require("@angular/compiler");
-var expression_type_1 = require("./expression_type");
-var symbols_1 = require("./symbols");
+const compiler_1 = require("@angular/compiler");
+const expression_type_1 = require("./expression_type");
+const symbols_1 = require("./symbols");
 function getTemplateExpressionDiagnostics(info) {
-    var visitor = new ExpressionDiagnosticsVisitor(info, function (path, includeEvent) {
-        return getExpressionScope(info, path, includeEvent);
-    });
+    const visitor = new ExpressionDiagnosticsVisitor(info, (path, includeEvent) => getExpressionScope(info, path, includeEvent));
     compiler_1.templateVisitAll(visitor, info.templateAst);
     return visitor.diagnostics;
 }
 exports.getTemplateExpressionDiagnostics = getTemplateExpressionDiagnostics;
-function getExpressionDiagnostics(scope, ast, query, context) {
-    if (context === void 0) { context = {}; }
-    var analyzer = new expression_type_1.AstType(scope, query, context);
+function getExpressionDiagnostics(scope, ast, query, context = {}) {
+    const analyzer = new expression_type_1.AstType(scope, query, context);
     analyzer.getDiagnostics(ast);
     return analyzer.diagnostics;
 }
 exports.getExpressionDiagnostics = getExpressionDiagnostics;
 function getReferences(info) {
-    var result = [];
+    const result = [];
     function processReferences(references) {
-        var _loop_1 = function (reference) {
-            var type = undefined;
+        for (const reference of references) {
+            let type = undefined;
             if (reference.value) {
                 type = info.query.getTypeSymbol(compiler_1.tokenReference(reference.value));
             }
@@ -49,33 +36,24 @@ function getReferences(info) {
                 type: type || info.query.getBuiltinType(symbols_1.BuiltinType.Any),
                 get definition() { return getDefinitionOf(info, reference); }
             });
-        };
-        for (var _i = 0, references_1 = references; _i < references_1.length; _i++) {
-            var reference = references_1[_i];
-            _loop_1(reference);
         }
     }
-    var visitor = new (function (_super) {
-        __extends(class_1, _super);
-        function class_1() {
-            return _super !== null && _super.apply(this, arguments) || this;
+    const visitor = new class extends compiler_1.RecursiveTemplateAstVisitor {
+        visitEmbeddedTemplate(ast, context) {
+            super.visitEmbeddedTemplate(ast, context);
+            processReferences(ast.references);
         }
-        class_1.prototype.visitEmbeddedTemplate = function (ast, context) {
-            _super.prototype.visitEmbeddedTemplate.call(this, ast, context);
+        visitElement(ast, context) {
+            super.visitElement(ast, context);
             processReferences(ast.references);
-        };
-        class_1.prototype.visitElement = function (ast, context) {
-            _super.prototype.visitElement.call(this, ast, context);
-            processReferences(ast.references);
-        };
-        return class_1;
-    }(compiler_1.RecursiveTemplateAstVisitor));
+        }
+    };
     compiler_1.templateVisitAll(visitor, info.templateAst);
     return result;
 }
 function getDefinitionOf(info, ast) {
     if (info.fileName) {
-        var templateOffset = info.offset;
+        const templateOffset = info.offset;
         return [{
                 fileName: info.fileName,
                 span: {
@@ -86,22 +64,22 @@ function getDefinitionOf(info, ast) {
     }
 }
 function getVarDeclarations(info, path) {
-    var result = [];
-    var current = path.tail;
+    const result = [];
+    let current = path.tail;
     while (current) {
         if (current instanceof compiler_1.EmbeddedTemplateAst) {
-            var _loop_2 = function (variable) {
-                var name_1 = variable.name;
+            for (const variable of current.variables) {
+                const name = variable.name;
                 // Find the first directive with a context.
-                var context = current.directives.map(function (d) { return info.query.getTemplateContext(d.directive.type.reference); })
-                    .find(function (c) { return !!c; });
+                const context = current.directives.map(d => info.query.getTemplateContext(d.directive.type.reference))
+                    .find(c => !!c);
                 // Determine the type of the context field referenced by variable.value.
-                var type = undefined;
+                let type = undefined;
                 if (context) {
-                    var value = context.get(variable.value);
+                    const value = context.get(variable.value);
                     if (value) {
                         type = value.type;
-                        var kind = info.query.getTypeKind(type);
+                        let kind = info.query.getTypeKind(type);
                         if (kind === symbols_1.BuiltinType.Any || kind == symbols_1.BuiltinType.Unbound) {
                             // The any type is not very useful here. For special cases, such as ngFor, we can do
                             // better.
@@ -113,13 +91,9 @@ function getVarDeclarations(info, path) {
                     type = info.query.getBuiltinType(symbols_1.BuiltinType.Any);
                 }
                 result.push({
-                    name: name_1,
-                    kind: 'variable', type: type, get definition() { return getDefinitionOf(info, variable); }
+                    name,
+                    kind: 'variable', type, get definition() { return getDefinitionOf(info, variable); }
                 });
-            };
-            for (var _i = 0, _a = current.variables; _i < _a.length; _i++) {
-                var variable = _a[_i];
-                _loop_2(variable);
             }
         }
         current = path.parentOf(current);
@@ -128,16 +102,16 @@ function getVarDeclarations(info, path) {
 }
 function refinedVariableType(type, info, templateElement) {
     // Special case the ngFor directive
-    var ngForDirective = templateElement.directives.find(function (d) {
-        var name = compiler_1.identifierName(d.directive.type);
+    const ngForDirective = templateElement.directives.find(d => {
+        const name = compiler_1.identifierName(d.directive.type);
         return name == 'NgFor' || name == 'NgForOf';
     });
     if (ngForDirective) {
-        var ngForOfBinding = ngForDirective.inputs.find(function (i) { return i.directiveName == 'ngForOf'; });
+        const ngForOfBinding = ngForDirective.inputs.find(i => i.directiveName == 'ngForOf');
         if (ngForOfBinding) {
-            var bindingType = new expression_type_1.AstType(info.members, info.query, {}).getType(ngForOfBinding.value);
+            const bindingType = new expression_type_1.AstType(info.members, info.query, {}).getType(ngForOfBinding.value);
             if (bindingType) {
-                var result = info.query.getElementType(bindingType);
+                const result = info.query.getElementType(bindingType);
                 if (result) {
                     return result;
                 }
@@ -148,7 +122,7 @@ function refinedVariableType(type, info, templateElement) {
     return info.query.getBuiltinType(symbols_1.BuiltinType.Any);
 }
 function getEventDeclaration(info, includeEvent) {
-    var result = [];
+    let result = [];
     if (includeEvent) {
         // TODO: Determine the type of the event parameter based on the Observable<T> or EventEmitter<T>
         // of the event.
@@ -157,122 +131,116 @@ function getEventDeclaration(info, includeEvent) {
     return result;
 }
 function getExpressionScope(info, path, includeEvent) {
-    var result = info.members;
-    var references = getReferences(info);
-    var variables = getVarDeclarations(info, path);
-    var events = getEventDeclaration(info, includeEvent);
+    let result = info.members;
+    const references = getReferences(info);
+    const variables = getVarDeclarations(info, path);
+    const events = getEventDeclaration(info, includeEvent);
     if (references.length || variables.length || events.length) {
-        var referenceTable = info.query.createSymbolTable(references);
-        var variableTable = info.query.createSymbolTable(variables);
-        var eventsTable = info.query.createSymbolTable(events);
+        const referenceTable = info.query.createSymbolTable(references);
+        const variableTable = info.query.createSymbolTable(variables);
+        const eventsTable = info.query.createSymbolTable(events);
         result = info.query.mergeSymbolTable([result, referenceTable, variableTable, eventsTable]);
     }
     return result;
 }
 exports.getExpressionScope = getExpressionScope;
-var ExpressionDiagnosticsVisitor = (function (_super) {
-    __extends(ExpressionDiagnosticsVisitor, _super);
-    function ExpressionDiagnosticsVisitor(info, getExpressionScope) {
-        var _this = _super.call(this) || this;
-        _this.info = info;
-        _this.getExpressionScope = getExpressionScope;
-        _this.diagnostics = [];
-        _this.path = new compiler_1.AstPath([]);
-        return _this;
+class ExpressionDiagnosticsVisitor extends compiler_1.RecursiveTemplateAstVisitor {
+    constructor(info, getExpressionScope) {
+        super();
+        this.info = info;
+        this.getExpressionScope = getExpressionScope;
+        this.diagnostics = [];
+        this.path = new compiler_1.AstPath([]);
     }
-    ExpressionDiagnosticsVisitor.prototype.visitDirective = function (ast, context) {
+    visitDirective(ast, context) {
         // Override the default child visitor to ignore the host properties of a directive.
         if (ast.inputs && ast.inputs.length) {
             compiler_1.templateVisitAll(this, ast.inputs, context);
         }
-    };
-    ExpressionDiagnosticsVisitor.prototype.visitBoundText = function (ast) {
+    }
+    visitBoundText(ast) {
         this.push(ast);
         this.diagnoseExpression(ast.value, ast.sourceSpan.start.offset, false);
         this.pop();
-    };
-    ExpressionDiagnosticsVisitor.prototype.visitDirectiveProperty = function (ast) {
+    }
+    visitDirectiveProperty(ast) {
         this.push(ast);
         this.diagnoseExpression(ast.value, this.attributeValueLocation(ast), false);
         this.pop();
-    };
-    ExpressionDiagnosticsVisitor.prototype.visitElementProperty = function (ast) {
+    }
+    visitElementProperty(ast) {
         this.push(ast);
         this.diagnoseExpression(ast.value, this.attributeValueLocation(ast), false);
         this.pop();
-    };
-    ExpressionDiagnosticsVisitor.prototype.visitEvent = function (ast) {
+    }
+    visitEvent(ast) {
         this.push(ast);
         this.diagnoseExpression(ast.handler, this.attributeValueLocation(ast), true);
         this.pop();
-    };
-    ExpressionDiagnosticsVisitor.prototype.visitVariable = function (ast) {
-        var directive = this.directiveSummary;
+    }
+    visitVariable(ast) {
+        const directive = this.directiveSummary;
         if (directive && ast.value) {
-            var context = this.info.query.getTemplateContext(directive.type.reference);
+            const context = this.info.query.getTemplateContext(directive.type.reference);
             if (context && !context.has(ast.value)) {
                 if (ast.value === '$implicit') {
                     this.reportError('The template context does not have an implicit value', spanOf(ast.sourceSpan));
                 }
                 else {
-                    this.reportError("The template context does not defined a member called '" + ast.value + "'", spanOf(ast.sourceSpan));
+                    this.reportError(`The template context does not defined a member called '${ast.value}'`, spanOf(ast.sourceSpan));
                 }
             }
         }
-    };
-    ExpressionDiagnosticsVisitor.prototype.visitElement = function (ast, context) {
+    }
+    visitElement(ast, context) {
         this.push(ast);
-        _super.prototype.visitElement.call(this, ast, context);
+        super.visitElement(ast, context);
         this.pop();
-    };
-    ExpressionDiagnosticsVisitor.prototype.visitEmbeddedTemplate = function (ast, context) {
-        var previousDirectiveSummary = this.directiveSummary;
+    }
+    visitEmbeddedTemplate(ast, context) {
+        const previousDirectiveSummary = this.directiveSummary;
         this.push(ast);
         // Find directive that refernces this template
         this.directiveSummary =
-            ast.directives.map(function (d) { return d.directive; }).find(function (d) { return hasTemplateReference(d.type); });
+            ast.directives.map(d => d.directive).find(d => hasTemplateReference(d.type));
         // Process children
-        _super.prototype.visitEmbeddedTemplate.call(this, ast, context);
+        super.visitEmbeddedTemplate(ast, context);
         this.pop();
         this.directiveSummary = previousDirectiveSummary;
-    };
-    ExpressionDiagnosticsVisitor.prototype.attributeValueLocation = function (ast) {
-        var path = compiler_1.findNode(this.info.htmlAst, ast.sourceSpan.start.offset);
-        var last = path.tail;
+    }
+    attributeValueLocation(ast) {
+        const path = compiler_1.findNode(this.info.htmlAst, ast.sourceSpan.start.offset);
+        const last = path.tail;
         if (last instanceof compiler_1.Attribute && last.valueSpan) {
             // Add 1 for the quote.
             return last.valueSpan.start.offset + 1;
         }
         return ast.sourceSpan.start.offset;
-    };
-    ExpressionDiagnosticsVisitor.prototype.diagnoseExpression = function (ast, offset, includeEvent) {
-        var _this = this;
-        var scope = this.getExpressionScope(this.path, includeEvent);
-        (_a = this.diagnostics).push.apply(_a, getExpressionDiagnostics(scope, ast, this.info.query, {
+    }
+    diagnoseExpression(ast, offset, includeEvent) {
+        const scope = this.getExpressionScope(this.path, includeEvent);
+        this.diagnostics.push(...getExpressionDiagnostics(scope, ast, this.info.query, {
             event: includeEvent
-        }).map(function (d) { return ({
-            span: offsetSpan(d.ast.span, offset + _this.info.offset),
+        }).map(d => ({
+            span: offsetSpan(d.ast.span, offset + this.info.offset),
             kind: d.kind,
             message: d.message
-        }); }));
-        var _a;
-    };
-    ExpressionDiagnosticsVisitor.prototype.push = function (ast) { this.path.push(ast); };
-    ExpressionDiagnosticsVisitor.prototype.pop = function () { this.path.pop(); };
-    ExpressionDiagnosticsVisitor.prototype.reportError = function (message, span) {
+        })));
+    }
+    push(ast) { this.path.push(ast); }
+    pop() { this.path.pop(); }
+    reportError(message, span) {
         if (span) {
-            this.diagnostics.push({ span: offsetSpan(span, this.info.offset), kind: expression_type_1.DiagnosticKind.Error, message: message });
+            this.diagnostics.push({ span: offsetSpan(span, this.info.offset), kind: expression_type_1.DiagnosticKind.Error, message });
         }
-    };
-    ExpressionDiagnosticsVisitor.prototype.reportWarning = function (message, span) {
-        this.diagnostics.push({ span: offsetSpan(span, this.info.offset), kind: expression_type_1.DiagnosticKind.Warning, message: message });
-    };
-    return ExpressionDiagnosticsVisitor;
-}(compiler_1.RecursiveTemplateAstVisitor));
+    }
+    reportWarning(message, span) {
+        this.diagnostics.push({ span: offsetSpan(span, this.info.offset), kind: expression_type_1.DiagnosticKind.Warning, message });
+    }
+}
 function hasTemplateReference(type) {
     if (type.diDeps) {
-        for (var _i = 0, _a = type.diDeps; _i < _a.length; _i++) {
-            var diDep = _a[_i];
+        for (let diDep of type.diDeps) {
             if (diDep.token && diDep.token.identifier &&
                 compiler_1.identifierName(diDep.token.identifier) == 'TemplateRef')
                 return true;

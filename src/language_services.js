@@ -7,12 +7,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var compiler_host_1 = require("./compiler_host");
-exports.CompilerHost = compiler_host_1.CompilerHost;
-exports.ModuleResolutionHostAdapter = compiler_host_1.ModuleResolutionHostAdapter;
-exports.NodeCompilerHostContext = compiler_host_1.NodeCompilerHostContext;
-var check_types_1 = require("./diagnostics/check_types");
-exports.TypeChecker = check_types_1.TypeChecker;
+/*
+
+The API from compiler-cli that language-service can see.
+It is important that none the exported modules require anything other than
+Angular modules and Typescript as this will indirectly add a dependency
+to the language service.
+
+*/
 var expression_diagnostics_1 = require("./diagnostics/expression_diagnostics");
 exports.getExpressionDiagnostics = expression_diagnostics_1.getExpressionDiagnostics;
 exports.getExpressionScope = expression_diagnostics_1.getExpressionScope;
@@ -29,4 +31,9 @@ exports.getClassMembers = typescript_symbols_1.getClassMembers;
 exports.getClassMembersFromDeclaration = typescript_symbols_1.getClassMembersFromDeclaration;
 exports.getPipesTable = typescript_symbols_1.getPipesTable;
 exports.getSymbolQuery = typescript_symbols_1.getSymbolQuery;
+var metadata_1 = require("./metadata");
+exports.MetadataCollector = metadata_1.MetadataCollector;
+var metadata_reader_1 = require("./transformers/metadata_reader");
+exports.createMetadataReaderCache = metadata_reader_1.createMetadataReaderCache;
+exports.readMetadata = metadata_reader_1.readMetadata;
 //# sourceMappingURL=language_services.js.map
