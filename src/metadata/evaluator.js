@@ -6,34 +6,26 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var ts = require("typescript");
-var schema_1 = require("./schema");
+const ts = require("typescript");
+const schema_1 = require("./schema");
 // In TypeScript 2.1 the spread element kind was renamed.
-var spreadElementSyntaxKind = ts.SyntaxKind.SpreadElement || ts.SyntaxKind.SpreadElementExpression;
+const spreadElementSyntaxKind = ts.SyntaxKind.SpreadElement || ts.SyntaxKind.SpreadElementExpression;
 function isMethodCallOf(callExpression, memberName) {
-    var expression = callExpression.expression;
+    const expression = callExpression.expression;
     if (expression.kind === ts.SyntaxKind.PropertyAccessExpression) {
-        var propertyAccessExpression = expression;
-        var name_1 = propertyAccessExpression.name;
-        if (name_1.kind == ts.SyntaxKind.Identifier) {
-            return name_1.text === memberName;
+        const propertyAccessExpression = expression;
+        const name = propertyAccessExpression.name;
+        if (name.kind == ts.SyntaxKind.Identifier) {
+            return name.text === memberName;
         }
     }
     return false;
 }
 function isCallOf(callExpression, ident) {
-    var expression = callExpression.expression;
+    const expression = callExpression.expression;
     if (expression.kind === ts.SyntaxKind.Identifier) {
-        var identifier = expression;
+        const identifier = expression;
         return identifier.text === ident;
     }
     return false;
@@ -45,7 +37,7 @@ function recordMapEntry(entry, node, nodeMap, sourceFile) {
         if (node && (schema_1.isMetadataImportedSymbolReferenceExpression(entry) ||
             schema_1.isMetadataImportDefaultReference(entry)) &&
             entry.line == null) {
-            var info = sourceInfo(node, sourceFile);
+            const info = sourceInfo(node, sourceFile);
             if (info.line != null)
                 entry.line = info.line;
             if (info.character != null)
@@ -61,7 +53,7 @@ exports.recordMapEntry = recordMapEntry;
  * true if every call to `cb` returns `true`.
  */
 function everyNodeChild(node, cb) {
-    return !ts.forEachChild(node, function (node) { return !cb(node); });
+    return !ts.forEachChild(node, node => !cb(node));
 }
 function isPrimitive(value) {
     return Object(value) !== value;
@@ -89,7 +81,7 @@ function sourceInfo(node, sourceFile) {
 exports.sourceInfo = sourceInfo;
 /* @internal */
 function errorSymbol(message, node, context, sourceFile) {
-    var result = __assign({ __symbolic: 'error', message: message }, sourceInfo(node, sourceFile));
+    const result = Object.assign({ __symbolic: 'error', message }, sourceInfo(node, sourceFile));
     if (context) {
         result.context = context;
     }
@@ -100,26 +92,25 @@ exports.errorSymbol = errorSymbol;
  * Produce a symbolic representation of an expression folding values into their final value when
  * possible.
  */
-var Evaluator = /** @class */ (function () {
-    function Evaluator(symbols, nodeMap, options, recordExport) {
-        if (options === void 0) { options = {}; }
+class Evaluator {
+    constructor(symbols, nodeMap, options = {}, recordExport) {
         this.symbols = symbols;
         this.nodeMap = nodeMap;
         this.options = options;
         this.recordExport = recordExport;
     }
-    Evaluator.prototype.nameOf = function (node) {
+    nameOf(node) {
         if (node && node.kind == ts.SyntaxKind.Identifier) {
             return node.text;
         }
-        var result = node && this.evaluateNode(node);
+        const result = node && this.evaluateNode(node);
         if (schema_1.isMetadataError(result) || typeof result === 'string') {
             return result;
         }
         else {
             return errorSymbol('Name expected', node, { received: (node && node.getText()) || '<missing>' });
         }
-    };
+    }
     /**
      * Returns true if the expression represented by `node` can be folded into a literal expression.
      *
@@ -136,33 +127,32 @@ var Evaluator = /** @class */ (function () {
      * - An identifier is foldable if a value can be found for its symbol in the evaluator symbol
      *   table.
      */
-    Evaluator.prototype.isFoldable = function (node) {
+    isFoldable(node) {
         return this.isFoldableWorker(node, new Map());
-    };
-    Evaluator.prototype.isFoldableWorker = function (node, folding) {
-        var _this = this;
+    }
+    isFoldableWorker(node, folding) {
         if (node) {
             switch (node.kind) {
                 case ts.SyntaxKind.ObjectLiteralExpression:
-                    return everyNodeChild(node, function (child) {
+                    return everyNodeChild(node, child => {
                         if (child.kind === ts.SyntaxKind.PropertyAssignment) {
-                            var propertyAssignment = child;
-                            return _this.isFoldableWorker(propertyAssignment.initializer, folding);
+                            const propertyAssignment = child;
+                            return this.isFoldableWorker(propertyAssignment.initializer, folding);
                         }
                         return false;
                     });
                 case ts.SyntaxKind.ArrayLiteralExpression:
-                    return everyNodeChild(node, function (child) { return _this.isFoldableWorker(child, folding); });
+                    return everyNodeChild(node, child => this.isFoldableWorker(child, folding));
                 case ts.SyntaxKind.CallExpression:
-                    var callExpression = node;
+                    const callExpression = node;
                     // We can fold a <array>.concat(<v>).
                     if (isMethodCallOf(callExpression, 'concat') &&
                         arrayOrEmpty(callExpression.arguments).length === 1) {
-                        var arrayNode = callExpression.expression.expression;
+                        const arrayNode = callExpression.expression.expression;
                         if (this.isFoldableWorker(arrayNode, folding) &&
                             this.isFoldableWorker(callExpression.arguments[0], folding)) {
                             // It needs to be an array.
-                            var arrayValue = this.evaluateNode(arrayNode);
+                            const arrayValue = this.evaluateNode(arrayNode);
                             if (arrayValue && Array.isArray(arrayValue)) {
                                 return true;
                             }
@@ -184,10 +174,10 @@ var Evaluator = /** @class */ (function () {
                 case ts.SyntaxKind.TemplateTail:
                     return true;
                 case ts.SyntaxKind.ParenthesizedExpression:
-                    var parenthesizedExpression = node;
+                    const parenthesizedExpression = node;
                     return this.isFoldableWorker(parenthesizedExpression.expression, folding);
                 case ts.SyntaxKind.BinaryExpression:
-                    var binaryExpression = node;
+                    const binaryExpression = node;
                     switch (binaryExpression.operatorToken.kind) {
                         case ts.SyntaxKind.PlusToken:
                         case ts.SyntaxKind.MinusToken:
@@ -202,37 +192,36 @@ var Evaluator = /** @class */ (function () {
                             return false;
                     }
                 case ts.SyntaxKind.PropertyAccessExpression:
-                    var propertyAccessExpression = node;
+                    const propertyAccessExpression = node;
                     return this.isFoldableWorker(propertyAccessExpression.expression, folding);
                 case ts.SyntaxKind.ElementAccessExpression:
-                    var elementAccessExpression = node;
+                    const elementAccessExpression = node;
                     return this.isFoldableWorker(elementAccessExpression.expression, folding) &&
                         this.isFoldableWorker(elementAccessExpression.argumentExpression, folding);
                 case ts.SyntaxKind.Identifier:
-                    var identifier = node;
-                    var reference = this.symbols.resolve(identifier.text);
+                    let identifier = node;
+                    let reference = this.symbols.resolve(identifier.text);
                     if (reference !== undefined && isPrimitive(reference)) {
                         return true;
                     }
                     break;
                 case ts.SyntaxKind.TemplateExpression:
-                    var templateExpression = node;
-                    return templateExpression.templateSpans.every(function (span) { return _this.isFoldableWorker(span.expression, folding); });
+                    const templateExpression = node;
+                    return templateExpression.templateSpans.every(span => this.isFoldableWorker(span.expression, folding));
             }
         }
         return false;
-    };
+    }
     /**
      * Produce a JSON serialiable object representing `node`. The foldable values in the expression
      * tree are folded. For example, a node representing `1 + 2` is folded into `3`.
      */
-    Evaluator.prototype.evaluateNode = function (node, preferReference) {
-        var _this = this;
-        var t = this;
-        var error;
+    evaluateNode(node, preferReference) {
+        const t = this;
+        let error;
         function recordEntry(entry, node) {
             if (t.options.substituteExpression) {
-                var newEntry = t.options.substituteExpression(entry, node);
+                const newEntry = t.options.substituteExpression(entry, node);
                 if (t.recordExport && newEntry != entry && schema_1.isMetadataGlobalReferenceExpression(newEntry)) {
                     t.recordExport(newEntry.name, entry);
                 }
@@ -243,44 +232,44 @@ var Evaluator = /** @class */ (function () {
         function isFoldableError(value) {
             return !t.options.verboseInvalidExpression && schema_1.isMetadataError(value);
         }
-        var resolveName = function (name, preferReference) {
-            var reference = _this.symbols.resolve(name, preferReference);
+        const resolveName = (name, preferReference) => {
+            const reference = this.symbols.resolve(name, preferReference);
             if (reference === undefined) {
                 // Encode as a global reference. StaticReflector will check the reference.
-                return recordEntry({ __symbolic: 'reference', name: name }, node);
+                return recordEntry({ __symbolic: 'reference', name }, node);
             }
             if (reference && schema_1.isMetadataSymbolicReferenceExpression(reference)) {
-                return recordEntry(__assign({}, reference), node);
+                return recordEntry(Object.assign({}, reference), node);
             }
             return reference;
         };
         switch (node.kind) {
             case ts.SyntaxKind.ObjectLiteralExpression:
-                var obj_1 = {};
-                var quoted_1 = [];
-                ts.forEachChild(node, function (child) {
+                let obj = {};
+                let quoted = [];
+                ts.forEachChild(node, child => {
                     switch (child.kind) {
                         case ts.SyntaxKind.ShorthandPropertyAssignment:
                         case ts.SyntaxKind.PropertyAssignment:
-                            var assignment = child;
+                            const assignment = child;
                             if (assignment.name.kind == ts.SyntaxKind.StringLiteral) {
-                                var name_2 = assignment.name.text;
-                                quoted_1.push(name_2);
+                                const name = assignment.name.text;
+                                quoted.push(name);
                             }
-                            var propertyName = _this.nameOf(assignment.name);
+                            const propertyName = this.nameOf(assignment.name);
                             if (isFoldableError(propertyName)) {
                                 error = propertyName;
                                 return true;
                             }
-                            var propertyValue = isPropertyAssignment(assignment) ?
-                                _this.evaluateNode(assignment.initializer, /* preferReference */ true) :
+                            const propertyValue = isPropertyAssignment(assignment) ?
+                                this.evaluateNode(assignment.initializer, /* preferReference */ true) :
                                 resolveName(propertyName, /* preferReference */ true);
                             if (isFoldableError(propertyValue)) {
                                 error = propertyValue;
                                 return true; // Stop the forEachChild.
                             }
                             else {
-                                obj_1[propertyName] = isPropertyAssignment(assignment) ?
+                                obj[propertyName] = isPropertyAssignment(assignment) ?
                                     recordEntry(propertyValue, assignment.initializer) :
                                     propertyValue;
                             }
@@ -288,14 +277,14 @@ var Evaluator = /** @class */ (function () {
                 });
                 if (error)
                     return error;
-                if (this.options.quotedNames && quoted_1.length) {
-                    obj_1['$quoted$'] = quoted_1;
+                if (this.options.quotedNames && quoted.length) {
+                    obj['$quoted$'] = quoted;
                 }
-                return recordEntry(obj_1, node);
+                return recordEntry(obj, node);
             case ts.SyntaxKind.ArrayLiteralExpression:
-                var arr_1 = [];
-                ts.forEachChild(node, function (child) {
-                    var value = _this.evaluateNode(child, /* preferReference */ true);
+                let arr = [];
+                ts.forEachChild(node, child => {
+                    const value = this.evaluateNode(child, /* preferReference */ true);
                     // Check for error
                     if (isFoldableError(value)) {
                         error = value;
@@ -304,35 +293,34 @@ var Evaluator = /** @class */ (function () {
                     // Handle spread expressions
                     if (schema_1.isMetadataSymbolicSpreadExpression(value)) {
                         if (Array.isArray(value.expression)) {
-                            for (var _i = 0, _a = value.expression; _i < _a.length; _i++) {
-                                var spreadValue = _a[_i];
-                                arr_1.push(spreadValue);
+                            for (const spreadValue of value.expression) {
+                                arr.push(spreadValue);
                             }
                             return;
                         }
                     }
-                    arr_1.push(value);
+                    arr.push(value);
                 });
                 if (error)
                     return error;
-                return recordEntry(arr_1, node);
+                return recordEntry(arr, node);
             case spreadElementSyntaxKind:
-                var spreadExpression = this.evaluateNode(node.expression);
+                let spreadExpression = this.evaluateNode(node.expression);
                 return recordEntry({ __symbolic: 'spread', expression: spreadExpression }, node);
             case ts.SyntaxKind.CallExpression:
-                var callExpression = node;
+                const callExpression = node;
                 if (isCallOf(callExpression, 'forwardRef') &&
                     arrayOrEmpty(callExpression.arguments).length === 1) {
-                    var firstArgument = callExpression.arguments[0];
+                    const firstArgument = callExpression.arguments[0];
                     if (firstArgument.kind == ts.SyntaxKind.ArrowFunction) {
-                        var arrowFunction = firstArgument;
+                        const arrowFunction = firstArgument;
                         return recordEntry(this.evaluateNode(arrowFunction.body), node);
                     }
                 }
-                var args = arrayOrEmpty(callExpression.arguments).map(function (arg) { return _this.evaluateNode(arg); });
+                const args = arrayOrEmpty(callExpression.arguments).map(arg => this.evaluateNode(arg));
                 if (this.isFoldable(callExpression)) {
                     if (isMethodCallOf(callExpression, 'concat')) {
-                        var arrayValue = this.evaluateNode(callExpression.expression.expression);
+                        const arrayValue = this.evaluateNode(callExpression.expression.expression);
                         if (isFoldableError(arrayValue))
                             return arrayValue;
                         return arrayValue.concat(args[0]);
@@ -343,118 +331,118 @@ var Evaluator = /** @class */ (function () {
                     arrayOrEmpty(callExpression.arguments).length === 1) {
                     return recordEntry(args[0], node);
                 }
-                var expression = this.evaluateNode(callExpression.expression);
+                const expression = this.evaluateNode(callExpression.expression);
                 if (isFoldableError(expression)) {
                     return recordEntry(expression, node);
                 }
-                var result = { __symbolic: 'call', expression: expression };
+                let result = { __symbolic: 'call', expression: expression };
                 if (args && args.length) {
                     result.arguments = args;
                 }
                 return recordEntry(result, node);
             case ts.SyntaxKind.NewExpression:
-                var newExpression = node;
-                var newArgs = arrayOrEmpty(newExpression.arguments).map(function (arg) { return _this.evaluateNode(arg); });
-                var newTarget = this.evaluateNode(newExpression.expression);
+                const newExpression = node;
+                const newArgs = arrayOrEmpty(newExpression.arguments).map(arg => this.evaluateNode(arg));
+                const newTarget = this.evaluateNode(newExpression.expression);
                 if (schema_1.isMetadataError(newTarget)) {
                     return recordEntry(newTarget, node);
                 }
-                var call = { __symbolic: 'new', expression: newTarget };
+                const call = { __symbolic: 'new', expression: newTarget };
                 if (newArgs.length) {
                     call.arguments = newArgs;
                 }
                 return recordEntry(call, node);
             case ts.SyntaxKind.PropertyAccessExpression: {
-                var propertyAccessExpression = node;
-                var expression_1 = this.evaluateNode(propertyAccessExpression.expression);
-                if (isFoldableError(expression_1)) {
-                    return recordEntry(expression_1, node);
+                const propertyAccessExpression = node;
+                const expression = this.evaluateNode(propertyAccessExpression.expression);
+                if (isFoldableError(expression)) {
+                    return recordEntry(expression, node);
                 }
-                var member = this.nameOf(propertyAccessExpression.name);
+                const member = this.nameOf(propertyAccessExpression.name);
                 if (isFoldableError(member)) {
                     return recordEntry(member, node);
                 }
-                if (expression_1 && this.isFoldable(propertyAccessExpression.expression))
-                    return expression_1[member];
-                if (schema_1.isMetadataModuleReferenceExpression(expression_1)) {
+                if (expression && this.isFoldable(propertyAccessExpression.expression))
+                    return expression[member];
+                if (schema_1.isMetadataModuleReferenceExpression(expression)) {
                     // A select into a module reference and be converted into a reference to the symbol
                     // in the module
-                    return recordEntry({ __symbolic: 'reference', module: expression_1.module, name: member }, node);
+                    return recordEntry({ __symbolic: 'reference', module: expression.module, name: member }, node);
                 }
-                return recordEntry({ __symbolic: 'select', expression: expression_1, member: member }, node);
+                return recordEntry({ __symbolic: 'select', expression, member }, node);
             }
             case ts.SyntaxKind.ElementAccessExpression: {
-                var elementAccessExpression = node;
-                var expression_2 = this.evaluateNode(elementAccessExpression.expression);
-                if (isFoldableError(expression_2)) {
-                    return recordEntry(expression_2, node);
+                const elementAccessExpression = node;
+                const expression = this.evaluateNode(elementAccessExpression.expression);
+                if (isFoldableError(expression)) {
+                    return recordEntry(expression, node);
                 }
                 if (!elementAccessExpression.argumentExpression) {
                     return recordEntry(errorSymbol('Expression form not supported', node), node);
                 }
-                var index = this.evaluateNode(elementAccessExpression.argumentExpression);
-                if (isFoldableError(expression_2)) {
-                    return recordEntry(expression_2, node);
+                const index = this.evaluateNode(elementAccessExpression.argumentExpression);
+                if (isFoldableError(expression)) {
+                    return recordEntry(expression, node);
                 }
                 if (this.isFoldable(elementAccessExpression.expression) &&
                     this.isFoldable(elementAccessExpression.argumentExpression))
-                    return expression_2[index];
-                return recordEntry({ __symbolic: 'index', expression: expression_2, index: index }, node);
+                    return expression[index];
+                return recordEntry({ __symbolic: 'index', expression, index }, node);
             }
             case ts.SyntaxKind.Identifier:
-                var identifier = node;
-                var name_3 = identifier.text;
-                return resolveName(name_3, preferReference);
+                const identifier = node;
+                const name = identifier.text;
+                return resolveName(name, preferReference);
             case ts.SyntaxKind.TypeReference:
-                var typeReferenceNode = node;
-                var typeNameNode_1 = typeReferenceNode.typeName;
-                var getReference = function (node) {
-                    if (typeNameNode_1.kind === ts.SyntaxKind.QualifiedName) {
-                        var qualifiedName = node;
-                        var left_1 = _this.evaluateNode(qualifiedName.left);
-                        if (schema_1.isMetadataModuleReferenceExpression(left_1)) {
+                const typeReferenceNode = node;
+                const typeNameNode = typeReferenceNode.typeName;
+                const getReference = node => {
+                    if (typeNameNode.kind === ts.SyntaxKind.QualifiedName) {
+                        const qualifiedName = node;
+                        const left = this.evaluateNode(qualifiedName.left);
+                        if (schema_1.isMetadataModuleReferenceExpression(left)) {
                             return recordEntry({
                                 __symbolic: 'reference',
-                                module: left_1.module,
+                                module: left.module,
                                 name: qualifiedName.right.text
                             }, node);
                         }
                         // Record a type reference to a declared type as a select.
-                        return { __symbolic: 'select', expression: left_1, member: qualifiedName.right.text };
+                        return { __symbolic: 'select', expression: left, member: qualifiedName.right.text };
                     }
                     else {
-                        var identifier_1 = typeNameNode_1;
-                        var symbol = _this.symbols.resolve(identifier_1.text);
+                        const identifier = typeNameNode;
+                        const symbol = this.symbols.resolve(identifier.text);
                         if (isFoldableError(symbol) || schema_1.isMetadataSymbolicReferenceExpression(symbol)) {
                             return recordEntry(symbol, node);
                         }
-                        return recordEntry(errorSymbol('Could not resolve type', node, { typeName: identifier_1.text }), node);
+                        return recordEntry(errorSymbol('Could not resolve type', node, { typeName: identifier.text }), node);
                     }
                 };
-                var typeReference = getReference(typeNameNode_1);
+                const typeReference = getReference(typeNameNode);
                 if (isFoldableError(typeReference)) {
                     return recordEntry(typeReference, node);
                 }
                 if (!schema_1.isMetadataModuleReferenceExpression(typeReference) &&
                     typeReferenceNode.typeArguments && typeReferenceNode.typeArguments.length) {
-                    var args_1 = typeReferenceNode.typeArguments.map(function (element) { return _this.evaluateNode(element); });
+                    const args = typeReferenceNode.typeArguments.map(element => this.evaluateNode(element));
                     // TODO: Remove typecast when upgraded to 2.0 as it will be corretly inferred.
                     // Some versions of 1.9 do not infer this correctly.
-                    typeReference.arguments = args_1;
+                    typeReference.arguments = args;
                 }
                 return recordEntry(typeReference, node);
             case ts.SyntaxKind.UnionType:
-                var unionType = node;
+                const unionType = node;
                 // Remove null and undefined from the list of unions.
-                var references = unionType.types
-                    .filter(function (n) { return n.kind != ts.SyntaxKind.NullKeyword &&
-                    n.kind != ts.SyntaxKind.UndefinedKeyword; })
-                    .map(function (n) { return _this.evaluateNode(n); });
+                const references = unionType.types
+                    .filter(n => n.kind != ts.SyntaxKind.NullKeyword &&
+                    n.kind != ts.SyntaxKind.UndefinedKeyword)
+                    .map(n => this.evaluateNode(n));
                 // The remmaining reference must be the same. If two have type arguments consider them
                 // different even if the type arguments are the same.
-                var candidate = null;
-                for (var i = 0; i < references.length; i++) {
-                    var reference = references[i];
+                let candidate = null;
+                for (let i = 0; i < references.length; i++) {
+                    const reference = references[i];
                     if (schema_1.isMetadataSymbolicReferenceExpression(reference)) {
                         if (candidate) {
                             if (reference.name == candidate.name &&
@@ -490,7 +478,7 @@ var Evaluator = /** @class */ (function () {
             case ts.SyntaxKind.BooleanKeyword:
                 return recordEntry({ __symbolic: 'reference', name: 'boolean' }, node);
             case ts.SyntaxKind.ArrayType:
-                var arrayTypeNode = node;
+                const arrayTypeNode = node;
                 return recordEntry({
                     __symbolic: 'reference',
                     name: 'Array',
@@ -503,14 +491,14 @@ var Evaluator = /** @class */ (function () {
             case ts.SyntaxKind.FalseKeyword:
                 return false;
             case ts.SyntaxKind.ParenthesizedExpression:
-                var parenthesizedExpression = node;
+                const parenthesizedExpression = node;
                 return this.evaluateNode(parenthesizedExpression.expression);
             case ts.SyntaxKind.TypeAssertionExpression:
-                var typeAssertion = node;
+                const typeAssertion = node;
                 return this.evaluateNode(typeAssertion.expression);
             case ts.SyntaxKind.PrefixUnaryExpression:
-                var prefixUnaryExpression = node;
-                var operand = this.evaluateNode(prefixUnaryExpression.operand);
+                const prefixUnaryExpression = node;
+                const operand = this.evaluateNode(prefixUnaryExpression.operand);
                 if (isDefined(operand) && isPrimitive(operand)) {
                     switch (prefixUnaryExpression.operator) {
                         case ts.SyntaxKind.PlusToken:
@@ -523,7 +511,7 @@ var Evaluator = /** @class */ (function () {
                             return !operand;
                     }
                 }
-                var operatorText = void 0;
+                let operatorText;
                 switch (prefixUnaryExpression.operator) {
                     case ts.SyntaxKind.PlusToken:
                         operatorText = '+';
@@ -542,9 +530,9 @@ var Evaluator = /** @class */ (function () {
                 }
                 return recordEntry({ __symbolic: 'pre', operator: operatorText, operand: operand }, node);
             case ts.SyntaxKind.BinaryExpression:
-                var binaryExpression = node;
-                var left = this.evaluateNode(binaryExpression.left);
-                var right = this.evaluateNode(binaryExpression.right);
+                const binaryExpression = node;
+                const left = this.evaluateNode(binaryExpression.left);
+                const right = this.evaluateNode(binaryExpression.right);
                 if (isDefined(left) && isDefined(right)) {
                     if (isPrimitive(left) && isPrimitive(right))
                         switch (binaryExpression.operatorToken.kind) {
@@ -600,29 +588,29 @@ var Evaluator = /** @class */ (function () {
                 }
                 break;
             case ts.SyntaxKind.ConditionalExpression:
-                var conditionalExpression = node;
-                var condition = this.evaluateNode(conditionalExpression.condition);
-                var thenExpression = this.evaluateNode(conditionalExpression.whenTrue);
-                var elseExpression = this.evaluateNode(conditionalExpression.whenFalse);
+                const conditionalExpression = node;
+                const condition = this.evaluateNode(conditionalExpression.condition);
+                const thenExpression = this.evaluateNode(conditionalExpression.whenTrue);
+                const elseExpression = this.evaluateNode(conditionalExpression.whenFalse);
                 if (isPrimitive(condition)) {
                     return condition ? thenExpression : elseExpression;
                 }
-                return recordEntry({ __symbolic: 'if', condition: condition, thenExpression: thenExpression, elseExpression: elseExpression }, node);
+                return recordEntry({ __symbolic: 'if', condition, thenExpression, elseExpression }, node);
             case ts.SyntaxKind.FunctionExpression:
             case ts.SyntaxKind.ArrowFunction:
                 return recordEntry(errorSymbol('Lambda not supported', node), node);
             case ts.SyntaxKind.TaggedTemplateExpression:
                 return recordEntry(errorSymbol('Tagged template expressions are not supported in metadata', node), node);
             case ts.SyntaxKind.TemplateExpression:
-                var templateExpression = node;
+                const templateExpression = node;
                 if (this.isFoldable(node)) {
-                    return templateExpression.templateSpans.reduce(function (previous, current) { return previous + _this.evaluateNode(current.expression) +
-                        _this.evaluateNode(current.literal); }, this.evaluateNode(templateExpression.head));
+                    return templateExpression.templateSpans.reduce((previous, current) => previous + this.evaluateNode(current.expression) +
+                        this.evaluateNode(current.literal), this.evaluateNode(templateExpression.head));
                 }
                 else {
-                    return templateExpression.templateSpans.reduce(function (previous, current) {
-                        var expr = _this.evaluateNode(current.expression);
-                        var literal = _this.evaluateNode(current.literal);
+                    return templateExpression.templateSpans.reduce((previous, current) => {
+                        const expr = this.evaluateNode(current.expression);
+                        const literal = this.evaluateNode(current.literal);
                         if (isFoldableError(expr))
                             return expr;
                         if (isFoldableError(literal))
@@ -631,7 +619,7 @@ var Evaluator = /** @class */ (function () {
                             typeof literal === 'string') {
                             return previous + expr + literal;
                         }
-                        var result = expr;
+                        let result = expr;
                         if (previous !== '') {
                             result = { __symbolic: 'binop', operator: '+', left: previous, right: expr };
                         }
@@ -642,20 +630,19 @@ var Evaluator = /** @class */ (function () {
                     }, this.evaluateNode(templateExpression.head));
                 }
             case ts.SyntaxKind.AsExpression:
-                var asExpression = node;
+                const asExpression = node;
                 return this.evaluateNode(asExpression.expression);
             case ts.SyntaxKind.ClassExpression:
                 return { __symbolic: 'class' };
         }
         return recordEntry(errorSymbol('Expression form not supported', node), node);
-    };
-    return Evaluator;
-}());
+    }
+}
 exports.Evaluator = Evaluator;
 function isPropertyAssignment(node) {
     return node.kind == ts.SyntaxKind.PropertyAssignment;
 }
-var empty = ts.createNodeArray();
+const empty = ts.createNodeArray();
 function arrayOrEmpty(v) {
     return v || empty;
 }

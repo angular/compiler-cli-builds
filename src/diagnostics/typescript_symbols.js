@@ -7,47 +7,45 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var fs = require("fs");
-var path = require("path");
-var ts = require("typescript");
-var symbols_1 = require("./symbols");
+const fs = require("fs");
+const path = require("path");
+const ts = require("typescript");
+const symbols_1 = require("./symbols");
 // In TypeScript 2.1 these flags moved
 // These helpers work for both 2.0 and 2.1.
-var isPrivate = ts.ModifierFlags ?
-    (function (node) {
-        return !!(ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Private);
-    }) :
-    (function (node) { return !!(node.flags & ts.NodeFlags.Private); });
-var isReferenceType = ts.ObjectFlags ?
-    (function (type) {
-        return !!(type.flags & ts.TypeFlags.Object &&
-            type.objectFlags & ts.ObjectFlags.Reference);
-    }) :
-    (function (type) { return !!(type.flags & ts.TypeFlags.Reference); });
+const isPrivate = ts.ModifierFlags ?
+    ((node) => !!(ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Private)) :
+    ((node) => !!(node.flags & ts.NodeFlags.Private));
+const isReferenceType = ts.ObjectFlags ?
+    ((type) => !!(type.flags & ts.TypeFlags.Object &&
+        type.objectFlags & ts.ObjectFlags.Reference)) :
+    ((type) => !!(type.flags & ts.TypeFlags.Reference));
 function getSymbolQuery(program, checker, source, fetchPipes) {
     return new TypeScriptSymbolQuery(program, checker, source, fetchPipes);
 }
 exports.getSymbolQuery = getSymbolQuery;
 function getClassMembers(program, checker, staticSymbol) {
-    var declaration = getClassFromStaticSymbol(program, staticSymbol);
+    const declaration = getClassFromStaticSymbol(program, staticSymbol);
     if (declaration) {
-        var type = checker.getTypeAtLocation(declaration);
-        var node = program.getSourceFile(staticSymbol.filePath);
-        return new TypeWrapper(type, { node: node, program: program, checker: checker }).members();
+        const type = checker.getTypeAtLocation(declaration);
+        const node = program.getSourceFile(staticSymbol.filePath);
+        if (node) {
+            return new TypeWrapper(type, { node, program, checker }).members();
+        }
     }
 }
 exports.getClassMembers = getClassMembers;
 function getClassMembersFromDeclaration(program, checker, source, declaration) {
-    var type = checker.getTypeAtLocation(declaration);
-    return new TypeWrapper(type, { node: source, program: program, checker: checker }).members();
+    const type = checker.getTypeAtLocation(declaration);
+    return new TypeWrapper(type, { node: source, program, checker }).members();
 }
 exports.getClassMembersFromDeclaration = getClassMembersFromDeclaration;
 function getClassFromStaticSymbol(program, type) {
-    var source = program.getSourceFile(type.filePath);
+    const source = program.getSourceFile(type.filePath);
     if (source) {
-        return ts.forEachChild(source, function (child) {
+        return ts.forEachChild(source, child => {
             if (child.kind === ts.SyntaxKind.ClassDeclaration) {
-                var classDeclaration = child;
+                const classDeclaration = child;
                 if (classDeclaration.name != null && classDeclaration.name.text === type.name) {
                     return classDeclaration;
                 }
@@ -58,38 +56,34 @@ function getClassFromStaticSymbol(program, type) {
 }
 exports.getClassFromStaticSymbol = getClassFromStaticSymbol;
 function getPipesTable(source, program, checker, pipes) {
-    return new PipesTable(pipes, { program: program, checker: checker, node: source });
+    return new PipesTable(pipes, { program, checker, node: source });
 }
 exports.getPipesTable = getPipesTable;
-var TypeScriptSymbolQuery = /** @class */ (function () {
-    function TypeScriptSymbolQuery(program, checker, source, fetchPipes) {
+class TypeScriptSymbolQuery {
+    constructor(program, checker, source, fetchPipes) {
         this.program = program;
         this.checker = checker;
         this.source = source;
         this.fetchPipes = fetchPipes;
         this.typeCache = new Map();
     }
-    TypeScriptSymbolQuery.prototype.getTypeKind = function (symbol) { return typeKindOf(this.getTsTypeOf(symbol)); };
-    TypeScriptSymbolQuery.prototype.getBuiltinType = function (kind) {
-        var result = this.typeCache.get(kind);
+    getTypeKind(symbol) { return typeKindOf(this.getTsTypeOf(symbol)); }
+    getBuiltinType(kind) {
+        let result = this.typeCache.get(kind);
         if (!result) {
-            var type = getBuiltinTypeFromTs(kind, { checker: this.checker, node: this.source, program: this.program });
+            const type = getBuiltinTypeFromTs(kind, { checker: this.checker, node: this.source, program: this.program });
             result =
                 new TypeWrapper(type, { program: this.program, checker: this.checker, node: this.source });
             this.typeCache.set(kind, result);
         }
         return result;
-    };
-    TypeScriptSymbolQuery.prototype.getTypeUnion = function () {
-        var types = [];
-        for (var _i = 0; _i < arguments.length; _i++) {
-            types[_i] = arguments[_i];
-        }
+    }
+    getTypeUnion(...types) {
         // No API exists so return any if the types are not all the same type.
-        var result = undefined;
+        let result = undefined;
         if (types.length) {
             result = types[0];
-            for (var i = 1; i < types.length; i++) {
+            for (let i = 1; i < types.length; i++) {
                 if (types[i] != result) {
                     result = undefined;
                     break;
@@ -97,20 +91,20 @@ var TypeScriptSymbolQuery = /** @class */ (function () {
             }
         }
         return result || this.getBuiltinType(symbols_1.BuiltinType.Any);
-    };
-    TypeScriptSymbolQuery.prototype.getArrayType = function (type) { return this.getBuiltinType(symbols_1.BuiltinType.Any); };
-    TypeScriptSymbolQuery.prototype.getElementType = function (type) {
+    }
+    getArrayType(type) { return this.getBuiltinType(symbols_1.BuiltinType.Any); }
+    getElementType(type) {
         if (type instanceof TypeWrapper) {
-            var elementType = getTypeParameterOf(type.tsType, 'Array');
+            const elementType = getTypeParameterOf(type.tsType, 'Array');
             if (elementType) {
                 return new TypeWrapper(elementType, type.context);
             }
         }
-    };
-    TypeScriptSymbolQuery.prototype.getNonNullableType = function (symbol) {
+    }
+    getNonNullableType(symbol) {
         if (symbol instanceof TypeWrapper && (typeof this.checker.getNonNullableType == 'function')) {
-            var tsType = symbol.tsType;
-            var nonNullableType = this.checker.getNonNullableType(tsType);
+            const tsType = symbol.tsType;
+            const nonNullableType = this.checker.getNonNullableType(tsType);
             if (nonNullableType != tsType) {
                 return new TypeWrapper(nonNullableType, symbol.context);
             }
@@ -119,68 +113,66 @@ var TypeScriptSymbolQuery = /** @class */ (function () {
             }
         }
         return this.getBuiltinType(symbols_1.BuiltinType.Any);
-    };
-    TypeScriptSymbolQuery.prototype.getPipes = function () {
-        var result = this.pipesCache;
+    }
+    getPipes() {
+        let result = this.pipesCache;
         if (!result) {
             result = this.pipesCache = this.fetchPipes();
         }
         return result;
-    };
-    TypeScriptSymbolQuery.prototype.getTemplateContext = function (type) {
-        var context = { node: this.source, program: this.program, checker: this.checker };
-        var typeSymbol = findClassSymbolInContext(type, context);
+    }
+    getTemplateContext(type) {
+        const context = { node: this.source, program: this.program, checker: this.checker };
+        const typeSymbol = findClassSymbolInContext(type, context);
         if (typeSymbol) {
-            var contextType = this.getTemplateRefContextType(typeSymbol);
+            const contextType = this.getTemplateRefContextType(typeSymbol);
             if (contextType)
                 return new SymbolWrapper(contextType, context).members();
         }
-    };
-    TypeScriptSymbolQuery.prototype.getTypeSymbol = function (type) {
-        var context = { node: this.source, program: this.program, checker: this.checker };
-        var typeSymbol = findClassSymbolInContext(type, context);
+    }
+    getTypeSymbol(type) {
+        const context = { node: this.source, program: this.program, checker: this.checker };
+        const typeSymbol = findClassSymbolInContext(type, context);
         return typeSymbol && new SymbolWrapper(typeSymbol, context);
-    };
-    TypeScriptSymbolQuery.prototype.createSymbolTable = function (symbols) {
-        var result = new MapSymbolTable();
-        result.addAll(symbols.map(function (s) { return new DeclaredSymbol(s); }));
+    }
+    createSymbolTable(symbols) {
+        const result = new MapSymbolTable();
+        result.addAll(symbols.map(s => new DeclaredSymbol(s)));
         return result;
-    };
-    TypeScriptSymbolQuery.prototype.mergeSymbolTable = function (symbolTables) {
-        var result = new MapSymbolTable();
-        for (var _i = 0, symbolTables_1 = symbolTables; _i < symbolTables_1.length; _i++) {
-            var symbolTable = symbolTables_1[_i];
+    }
+    mergeSymbolTable(symbolTables) {
+        const result = new MapSymbolTable();
+        for (const symbolTable of symbolTables) {
             result.addAll(symbolTable.values());
         }
         return result;
-    };
-    TypeScriptSymbolQuery.prototype.getSpanAt = function (line, column) {
+    }
+    getSpanAt(line, column) {
         return spanAt(this.source, line, column);
-    };
-    TypeScriptSymbolQuery.prototype.getTemplateRefContextType = function (typeSymbol) {
-        var type = this.checker.getTypeOfSymbolAtLocation(typeSymbol, this.source);
-        var constructor = type.symbol && type.symbol.members &&
+    }
+    getTemplateRefContextType(typeSymbol) {
+        const type = this.checker.getTypeOfSymbolAtLocation(typeSymbol, this.source);
+        const constructor = type.symbol && type.symbol.members &&
             getFromSymbolTable(type.symbol.members, '__constructor');
         if (constructor) {
-            var constructorDeclaration = constructor.declarations[0];
-            for (var _i = 0, _a = constructorDeclaration.parameters; _i < _a.length; _i++) {
-                var parameter = _a[_i];
-                var type_1 = this.checker.getTypeAtLocation(parameter.type);
-                if (type_1.symbol.name == 'TemplateRef' && isReferenceType(type_1)) {
-                    var typeReference = type_1;
+            const constructorDeclaration = constructor.declarations[0];
+            for (const parameter of constructorDeclaration.parameters) {
+                const type = this.checker.getTypeAtLocation(parameter.type);
+                if (type.symbol.name == 'TemplateRef' && isReferenceType(type)) {
+                    const typeReference = type;
                     if (typeReference.typeArguments && typeReference.typeArguments.length === 1) {
                         return typeReference.typeArguments[0].symbol;
                     }
                 }
             }
         }
-    };
-    TypeScriptSymbolQuery.prototype.getTsTypeOf = function (symbol) {
-        var type = this.getTypeWrapper(symbol);
+    }
+    getTsTypeOf(symbol) {
+        const type = this.getTypeWrapper(symbol);
         return type && type.tsType;
-    };
-    TypeScriptSymbolQuery.prototype.getTypeWrapper = function (symbol) {
-        var type = undefined;
+    }
+    getTypeWrapper(symbol) {
+        let type = undefined;
         if (symbol instanceof TypeWrapper) {
             type = symbol;
         }
@@ -188,23 +180,22 @@ var TypeScriptSymbolQuery = /** @class */ (function () {
             type = symbol.type;
         }
         return type;
-    };
-    return TypeScriptSymbolQuery;
-}());
+    }
+}
 function typeCallable(type) {
-    var signatures = type.getCallSignatures();
+    const signatures = type.getCallSignatures();
     return signatures && signatures.length != 0;
 }
 function signaturesOf(type, context) {
-    return type.getCallSignatures().map(function (s) { return new SignatureWrapper(s, context); });
+    return type.getCallSignatures().map(s => new SignatureWrapper(s, context));
 }
 function selectSignature(type, context, types) {
     // TODO: Do a better job of selecting the right signature.
-    var signatures = type.getCallSignatures();
+    const signatures = type.getCallSignatures();
     return signatures.length ? new SignatureWrapper(signatures[0], context) : undefined;
 }
-var TypeWrapper = /** @class */ (function () {
-    function TypeWrapper(tsType, context) {
+class TypeWrapper {
+    constructor(tsType, context) {
         this.tsType = tsType;
         this.context = context;
         this.kind = 'type';
@@ -216,46 +207,29 @@ var TypeWrapper = /** @class */ (function () {
             throw Error('Internal: null type');
         }
     }
-    Object.defineProperty(TypeWrapper.prototype, "name", {
-        get: function () {
-            var symbol = this.tsType.symbol;
-            return (symbol && symbol.name) || '<anonymous>';
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(TypeWrapper.prototype, "callable", {
-        get: function () { return typeCallable(this.tsType); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(TypeWrapper.prototype, "nullable", {
-        get: function () {
-            return this.context.checker.getNonNullableType(this.tsType) != this.tsType;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(TypeWrapper.prototype, "definition", {
-        get: function () {
-            var symbol = this.tsType.getSymbol();
-            return symbol ? definitionFromTsSymbol(symbol) : undefined;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    TypeWrapper.prototype.members = function () {
+    get name() {
+        const symbol = this.tsType.symbol;
+        return (symbol && symbol.name) || '<anonymous>';
+    }
+    get callable() { return typeCallable(this.tsType); }
+    get nullable() {
+        return this.context.checker.getNonNullableType(this.tsType) != this.tsType;
+    }
+    get definition() {
+        const symbol = this.tsType.getSymbol();
+        return symbol ? definitionFromTsSymbol(symbol) : undefined;
+    }
+    members() {
         return new SymbolTableWrapper(this.tsType.getProperties(), this.context);
-    };
-    TypeWrapper.prototype.signatures = function () { return signaturesOf(this.tsType, this.context); };
-    TypeWrapper.prototype.selectSignature = function (types) {
+    }
+    signatures() { return signaturesOf(this.tsType, this.context); }
+    selectSignature(types) {
         return selectSignature(this.tsType, this.context, types);
-    };
-    TypeWrapper.prototype.indexed = function (argument) { return undefined; };
-    return TypeWrapper;
-}());
-var SymbolWrapper = /** @class */ (function () {
-    function SymbolWrapper(symbol, context) {
+    }
+    indexed(argument) { return undefined; }
+}
+class SymbolWrapper {
+    constructor(symbol, context) {
         this.context = context;
         this.nullable = false;
         this.language = 'typescript';
@@ -263,49 +237,21 @@ var SymbolWrapper = /** @class */ (function () {
             context.checker.getAliasedSymbol(symbol) :
             symbol;
     }
-    Object.defineProperty(SymbolWrapper.prototype, "name", {
-        get: function () { return this.symbol.name; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SymbolWrapper.prototype, "kind", {
-        get: function () { return this.callable ? 'method' : 'property'; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SymbolWrapper.prototype, "type", {
-        get: function () { return new TypeWrapper(this.tsType, this.context); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SymbolWrapper.prototype, "container", {
-        get: function () { return getContainerOf(this.symbol, this.context); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SymbolWrapper.prototype, "public", {
-        get: function () {
-            // Symbols that are not explicitly made private are public.
-            return !isSymbolPrivate(this.symbol);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SymbolWrapper.prototype, "callable", {
-        get: function () { return typeCallable(this.tsType); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SymbolWrapper.prototype, "definition", {
-        get: function () { return definitionFromTsSymbol(this.symbol); },
-        enumerable: true,
-        configurable: true
-    });
-    SymbolWrapper.prototype.members = function () {
+    get name() { return this.symbol.name; }
+    get kind() { return this.callable ? 'method' : 'property'; }
+    get type() { return new TypeWrapper(this.tsType, this.context); }
+    get container() { return getContainerOf(this.symbol, this.context); }
+    get public() {
+        // Symbols that are not explicitly made private are public.
+        return !isSymbolPrivate(this.symbol);
+    }
+    get callable() { return typeCallable(this.tsType); }
+    get definition() { return definitionFromTsSymbol(this.symbol); }
+    members() {
         if (!this._members) {
             if ((this.symbol.flags & (ts.SymbolFlags.Class | ts.SymbolFlags.Interface)) != 0) {
-                var declaredType = this.context.checker.getDeclaredTypeOfSymbol(this.symbol);
-                var typeWrapper = new TypeWrapper(declaredType, this.context);
+                const declaredType = this.context.checker.getDeclaredTypeOfSymbol(this.symbol);
+                const typeWrapper = new TypeWrapper(declaredType, this.context);
                 this._members = typeWrapper.members();
             }
             else {
@@ -313,120 +259,70 @@ var SymbolWrapper = /** @class */ (function () {
             }
         }
         return this._members;
-    };
-    SymbolWrapper.prototype.signatures = function () { return signaturesOf(this.tsType, this.context); };
-    SymbolWrapper.prototype.selectSignature = function (types) {
+    }
+    signatures() { return signaturesOf(this.tsType, this.context); }
+    selectSignature(types) {
         return selectSignature(this.tsType, this.context, types);
-    };
-    SymbolWrapper.prototype.indexed = function (argument) { return undefined; };
-    Object.defineProperty(SymbolWrapper.prototype, "tsType", {
-        get: function () {
-            var type = this._tsType;
-            if (!type) {
-                type = this._tsType =
-                    this.context.checker.getTypeOfSymbolAtLocation(this.symbol, this.context.node);
-            }
-            return type;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    return SymbolWrapper;
-}());
-var DeclaredSymbol = /** @class */ (function () {
-    function DeclaredSymbol(declaration) {
+    }
+    indexed(argument) { return undefined; }
+    get tsType() {
+        let type = this._tsType;
+        if (!type) {
+            type = this._tsType =
+                this.context.checker.getTypeOfSymbolAtLocation(this.symbol, this.context.node);
+        }
+        return type;
+    }
+}
+class DeclaredSymbol {
+    constructor(declaration) {
         this.declaration = declaration;
         this.language = 'ng-template';
         this.nullable = false;
         this.public = true;
     }
-    Object.defineProperty(DeclaredSymbol.prototype, "name", {
-        get: function () { return this.declaration.name; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(DeclaredSymbol.prototype, "kind", {
-        get: function () { return this.declaration.kind; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(DeclaredSymbol.prototype, "container", {
-        get: function () { return undefined; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(DeclaredSymbol.prototype, "type", {
-        get: function () { return this.declaration.type; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(DeclaredSymbol.prototype, "callable", {
-        get: function () { return this.declaration.type.callable; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(DeclaredSymbol.prototype, "definition", {
-        get: function () { return this.declaration.definition; },
-        enumerable: true,
-        configurable: true
-    });
-    DeclaredSymbol.prototype.members = function () { return this.declaration.type.members(); };
-    DeclaredSymbol.prototype.signatures = function () { return this.declaration.type.signatures(); };
-    DeclaredSymbol.prototype.selectSignature = function (types) {
+    get name() { return this.declaration.name; }
+    get kind() { return this.declaration.kind; }
+    get container() { return undefined; }
+    get type() { return this.declaration.type; }
+    get callable() { return this.declaration.type.callable; }
+    get definition() { return this.declaration.definition; }
+    members() { return this.declaration.type.members(); }
+    signatures() { return this.declaration.type.signatures(); }
+    selectSignature(types) {
         return this.declaration.type.selectSignature(types);
-    };
-    DeclaredSymbol.prototype.indexed = function (argument) { return undefined; };
-    return DeclaredSymbol;
-}());
-var SignatureWrapper = /** @class */ (function () {
-    function SignatureWrapper(signature, context) {
+    }
+    indexed(argument) { return undefined; }
+}
+class SignatureWrapper {
+    constructor(signature, context) {
         this.signature = signature;
         this.context = context;
     }
-    Object.defineProperty(SignatureWrapper.prototype, "arguments", {
-        get: function () {
-            return new SymbolTableWrapper(this.signature.getParameters(), this.context);
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SignatureWrapper.prototype, "result", {
-        get: function () { return new TypeWrapper(this.signature.getReturnType(), this.context); },
-        enumerable: true,
-        configurable: true
-    });
-    return SignatureWrapper;
-}());
-var SignatureResultOverride = /** @class */ (function () {
-    function SignatureResultOverride(signature, resultType) {
+    get arguments() {
+        return new SymbolTableWrapper(this.signature.getParameters(), this.context);
+    }
+    get result() { return new TypeWrapper(this.signature.getReturnType(), this.context); }
+}
+class SignatureResultOverride {
+    constructor(signature, resultType) {
         this.signature = signature;
         this.resultType = resultType;
     }
-    Object.defineProperty(SignatureResultOverride.prototype, "arguments", {
-        get: function () { return this.signature.arguments; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(SignatureResultOverride.prototype, "result", {
-        get: function () { return this.resultType; },
-        enumerable: true,
-        configurable: true
-    });
-    return SignatureResultOverride;
-}());
-var toSymbolTable = isTypescriptVersion('2.2') ?
-    (function (symbols) {
-        var result = new Map();
-        for (var _i = 0, symbols_2 = symbols; _i < symbols_2.length; _i++) {
-            var symbol = symbols_2[_i];
+    get arguments() { return this.signature.arguments; }
+    get result() { return this.resultType; }
+}
+const toSymbolTable = isTypescriptVersion('2.2') ?
+    (symbols => {
+        const result = new Map();
+        for (const symbol of symbols) {
             result.set(symbol.name, symbol);
         }
         return result;
     }) :
-    (function (symbols) {
-        var result = {};
-        for (var _i = 0, symbols_3 = symbols; _i < symbols_3.length; _i++) {
-            var symbol = symbols_3[_i];
+    (symbols => {
+        const result = {};
+        for (const symbol of symbols) {
             result[symbol.name] = symbol;
         }
         return result;
@@ -434,23 +330,23 @@ var toSymbolTable = isTypescriptVersion('2.2') ?
 function toSymbols(symbolTable) {
     if (!symbolTable)
         return [];
-    var table = symbolTable;
+    const table = symbolTable;
     if (typeof table.values === 'function') {
         return Array.from(table.values());
     }
-    var result = [];
-    var own = typeof table.hasOwnProperty === 'function' ?
-        function (name) { return table.hasOwnProperty(name); } :
-        function (name) { return !!table[name]; };
-    for (var name_1 in table) {
-        if (own(name_1)) {
-            result.push(table[name_1]);
+    const result = [];
+    const own = typeof table.hasOwnProperty === 'function' ?
+        (name) => table.hasOwnProperty(name) :
+        (name) => !!table[name];
+    for (const name in table) {
+        if (own(name)) {
+            result.push(table[name]);
         }
     }
     return result;
 }
-var SymbolTableWrapper = /** @class */ (function () {
-    function SymbolTableWrapper(symbols, context) {
+class SymbolTableWrapper {
+    constructor(symbols, context) {
         this.context = context;
         symbols = symbols || [];
         if (Array.isArray(symbols)) {
@@ -462,82 +358,60 @@ var SymbolTableWrapper = /** @class */ (function () {
             this.symbolTable = symbols;
         }
     }
-    Object.defineProperty(SymbolTableWrapper.prototype, "size", {
-        get: function () { return this.symbols.length; },
-        enumerable: true,
-        configurable: true
-    });
-    SymbolTableWrapper.prototype.get = function (key) {
-        var symbol = getFromSymbolTable(this.symbolTable, key);
+    get size() { return this.symbols.length; }
+    get(key) {
+        const symbol = getFromSymbolTable(this.symbolTable, key);
         return symbol ? new SymbolWrapper(symbol, this.context) : undefined;
-    };
-    SymbolTableWrapper.prototype.has = function (key) {
-        var table = this.symbolTable;
+    }
+    has(key) {
+        const table = this.symbolTable;
         return (typeof table.has === 'function') ? table.has(key) : table[key] != null;
-    };
-    SymbolTableWrapper.prototype.values = function () {
-        var _this = this;
-        return this.symbols.map(function (s) { return new SymbolWrapper(s, _this.context); });
-    };
-    return SymbolTableWrapper;
-}());
-var MapSymbolTable = /** @class */ (function () {
-    function MapSymbolTable() {
+    }
+    values() { return this.symbols.map(s => new SymbolWrapper(s, this.context)); }
+}
+class MapSymbolTable {
+    constructor() {
         this.map = new Map();
         this._values = [];
     }
-    Object.defineProperty(MapSymbolTable.prototype, "size", {
-        get: function () { return this.map.size; },
-        enumerable: true,
-        configurable: true
-    });
-    MapSymbolTable.prototype.get = function (key) { return this.map.get(key); };
-    MapSymbolTable.prototype.add = function (symbol) {
+    get size() { return this.map.size; }
+    get(key) { return this.map.get(key); }
+    add(symbol) {
         if (this.map.has(symbol.name)) {
-            var previous = this.map.get(symbol.name);
+            const previous = this.map.get(symbol.name);
             this._values[this._values.indexOf(previous)] = symbol;
         }
         this.map.set(symbol.name, symbol);
         this._values.push(symbol);
-    };
-    MapSymbolTable.prototype.addAll = function (symbols) {
-        for (var _i = 0, symbols_4 = symbols; _i < symbols_4.length; _i++) {
-            var symbol = symbols_4[_i];
+    }
+    addAll(symbols) {
+        for (const symbol of symbols) {
             this.add(symbol);
         }
-    };
-    MapSymbolTable.prototype.has = function (key) { return this.map.has(key); };
-    MapSymbolTable.prototype.values = function () {
+    }
+    has(key) { return this.map.has(key); }
+    values() {
         // Switch to this.map.values once iterables are supported by the target language.
         return this._values;
-    };
-    return MapSymbolTable;
-}());
-var PipesTable = /** @class */ (function () {
-    function PipesTable(pipes, context) {
+    }
+}
+class PipesTable {
+    constructor(pipes, context) {
         this.pipes = pipes;
         this.context = context;
     }
-    Object.defineProperty(PipesTable.prototype, "size", {
-        get: function () { return this.pipes.length; },
-        enumerable: true,
-        configurable: true
-    });
-    PipesTable.prototype.get = function (key) {
-        var pipe = this.pipes.find(function (pipe) { return pipe.name == key; });
+    get size() { return this.pipes.length; }
+    get(key) {
+        const pipe = this.pipes.find(pipe => pipe.name == key);
         if (pipe) {
             return new PipeSymbol(pipe, this.context);
         }
-    };
-    PipesTable.prototype.has = function (key) { return this.pipes.find(function (pipe) { return pipe.name == key; }) != null; };
-    PipesTable.prototype.values = function () {
-        var _this = this;
-        return this.pipes.map(function (pipe) { return new PipeSymbol(pipe, _this.context); });
-    };
-    return PipesTable;
-}());
-var PipeSymbol = /** @class */ (function () {
-    function PipeSymbol(pipe, context) {
+    }
+    has(key) { return this.pipes.find(pipe => pipe.name == key) != null; }
+    values() { return this.pipes.map(pipe => new PipeSymbol(pipe, this.context)); }
+}
+class PipeSymbol {
+    constructor(pipe, context) {
         this.pipe = pipe;
         this.context = context;
         this.kind = 'pipe';
@@ -547,32 +421,20 @@ var PipeSymbol = /** @class */ (function () {
         this.nullable = false;
         this.public = true;
     }
-    Object.defineProperty(PipeSymbol.prototype, "name", {
-        get: function () { return this.pipe.name; },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(PipeSymbol.prototype, "type", {
-        get: function () { return new TypeWrapper(this.tsType, this.context); },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(PipeSymbol.prototype, "definition", {
-        get: function () {
-            var symbol = this.tsType.getSymbol();
-            return symbol ? definitionFromTsSymbol(symbol) : undefined;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    PipeSymbol.prototype.members = function () { return EmptyTable.instance; };
-    PipeSymbol.prototype.signatures = function () { return signaturesOf(this.tsType, this.context); };
-    PipeSymbol.prototype.selectSignature = function (types) {
-        var signature = selectSignature(this.tsType, this.context, types);
+    get name() { return this.pipe.name; }
+    get type() { return new TypeWrapper(this.tsType, this.context); }
+    get definition() {
+        const symbol = this.tsType.getSymbol();
+        return symbol ? definitionFromTsSymbol(symbol) : undefined;
+    }
+    members() { return EmptyTable.instance; }
+    signatures() { return signaturesOf(this.tsType, this.context); }
+    selectSignature(types) {
+        let signature = selectSignature(this.tsType, this.context, types);
         if (types.length == 1) {
-            var parameterType = types[0];
+            const parameterType = types[0];
             if (parameterType instanceof TypeWrapper) {
-                var resultType = undefined;
+                let resultType = undefined;
                 switch (this.name) {
                     case 'async':
                         switch (parameterType.name) {
@@ -596,64 +458,58 @@ var PipeSymbol = /** @class */ (function () {
             }
         }
         return signature;
-    };
-    PipeSymbol.prototype.indexed = function (argument) { return undefined; };
-    Object.defineProperty(PipeSymbol.prototype, "tsType", {
-        get: function () {
-            var type = this._tsType;
-            if (!type) {
-                var classSymbol = this.findClassSymbol(this.pipe.type.reference);
-                if (classSymbol) {
-                    type = this._tsType = this.findTransformMethodType(classSymbol);
-                }
-                if (!type) {
-                    type = this._tsType = getBuiltinTypeFromTs(symbols_1.BuiltinType.Any, this.context);
-                }
+    }
+    indexed(argument) { return undefined; }
+    get tsType() {
+        let type = this._tsType;
+        if (!type) {
+            const classSymbol = this.findClassSymbol(this.pipe.type.reference);
+            if (classSymbol) {
+                type = this._tsType = this.findTransformMethodType(classSymbol);
             }
-            return type;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    PipeSymbol.prototype.findClassSymbol = function (type) {
+            if (!type) {
+                type = this._tsType = getBuiltinTypeFromTs(symbols_1.BuiltinType.Any, this.context);
+            }
+        }
+        return type;
+    }
+    findClassSymbol(type) {
         return findClassSymbolInContext(type, this.context);
-    };
-    PipeSymbol.prototype.findTransformMethodType = function (classSymbol) {
-        var classType = this.context.checker.getDeclaredTypeOfSymbol(classSymbol);
+    }
+    findTransformMethodType(classSymbol) {
+        const classType = this.context.checker.getDeclaredTypeOfSymbol(classSymbol);
         if (classType) {
-            var transform = classType.getProperty('transform');
+            const transform = classType.getProperty('transform');
             if (transform) {
                 return this.context.checker.getTypeOfSymbolAtLocation(transform, this.context.node);
             }
         }
-    };
-    return PipeSymbol;
-}());
-function findClassSymbolInContext(type, context) {
-    var sourceFile = context.program.getSourceFile(type.filePath);
-    if (sourceFile) {
-        var moduleSymbol = sourceFile.module || sourceFile.symbol;
-        var exports_1 = context.checker.getExportsOfModule(moduleSymbol);
-        return (exports_1 || []).find(function (symbol) { return symbol.name == type.name; });
     }
 }
-var EmptyTable = /** @class */ (function () {
-    function EmptyTable() {
+function findClassSymbolInContext(type, context) {
+    const sourceFile = context.program.getSourceFile(type.filePath);
+    if (sourceFile) {
+        const moduleSymbol = sourceFile.module || sourceFile.symbol;
+        const exports = context.checker.getExportsOfModule(moduleSymbol);
+        return (exports || []).find(symbol => symbol.name == type.name);
+    }
+}
+class EmptyTable {
+    constructor() {
         this.size = 0;
     }
-    EmptyTable.prototype.get = function (key) { return undefined; };
-    EmptyTable.prototype.has = function (key) { return false; };
-    EmptyTable.prototype.values = function () { return []; };
-    EmptyTable.instance = new EmptyTable();
-    return EmptyTable;
-}());
+    get(key) { return undefined; }
+    has(key) { return false; }
+    values() { return []; }
+}
+EmptyTable.instance = new EmptyTable();
 function findTsConfig(fileName) {
-    var dir = path.dirname(fileName);
+    let dir = path.dirname(fileName);
     while (fs.existsSync(dir)) {
-        var candidate = path.join(dir, 'tsconfig.json');
+        const candidate = path.join(dir, 'tsconfig.json');
         if (fs.existsSync(candidate))
             return candidate;
-        var parentDir = path.dirname(dir);
+        const parentDir = path.dirname(dir);
         if (parentDir === dir)
             break;
         dir = parentDir;
@@ -671,7 +527,7 @@ function walkUpBindingElementsAndPatterns(node) {
 }
 function getCombinedNodeFlags(node) {
     node = walkUpBindingElementsAndPatterns(node);
-    var flags = node.flags;
+    let flags = node.flags;
     if (node.kind === ts.SyntaxKind.VariableDeclaration) {
         node = node.parent;
     }
@@ -688,9 +544,9 @@ function isSymbolPrivate(s) {
     return !!s.valueDeclaration && isPrivate(s.valueDeclaration);
 }
 function getBuiltinTypeFromTs(kind, context) {
-    var type;
-    var checker = context.checker;
-    var node = context.node;
+    let type;
+    const checker = context.checker;
+    const node = context.node;
     switch (kind) {
         case symbols_1.BuiltinType.Any:
             type = checker.getTypeAtLocation(setParents({
@@ -708,7 +564,7 @@ function getBuiltinTypeFromTs(kind, context) {
                 checker.getTypeAtLocation(setParents({ kind: ts.SyntaxKind.NullKeyword }, node));
             break;
         case symbols_1.BuiltinType.Number:
-            var numeric = { kind: ts.SyntaxKind.NumericLiteral };
+            const numeric = { kind: ts.SyntaxKind.NumericLiteral };
             setParents({ kind: ts.SyntaxKind.ExpressionStatement, expression: numeric }, node);
             type = checker.getTypeAtLocation(numeric);
             break;
@@ -722,13 +578,13 @@ function getBuiltinTypeFromTs(kind, context) {
             }, node));
             break;
         default:
-            throw new Error("Internal error, unhandled literal kind " + kind + ":" + symbols_1.BuiltinType[kind]);
+            throw new Error(`Internal error, unhandled literal kind ${kind}:${symbols_1.BuiltinType[kind]}`);
     }
     return type;
 }
 function setParents(node, parent) {
     node.parent = parent;
-    ts.forEachChild(node, function (child) { return setParents(child, node); });
+    ts.forEachChild(node, child => setParents(child, node));
     return node;
 }
 function spanOf(node) {
@@ -741,24 +597,24 @@ function shrink(span, offset) {
 }
 function spanAt(sourceFile, line, column) {
     if (line != null && column != null) {
-        var position_1 = ts.getPositionOfLineAndCharacter(sourceFile, line, column);
-        var findChild = function findChild(node) {
-            if (node.kind > ts.SyntaxKind.LastToken && node.pos <= position_1 && node.end > position_1) {
-                var betterNode = ts.forEachChild(node, findChild);
+        const position = ts.getPositionOfLineAndCharacter(sourceFile, line, column);
+        const findChild = function findChild(node) {
+            if (node.kind > ts.SyntaxKind.LastToken && node.pos <= position && node.end > position) {
+                const betterNode = ts.forEachChild(node, findChild);
                 return betterNode || node;
             }
         };
-        var node = ts.forEachChild(sourceFile, findChild);
+        const node = ts.forEachChild(sourceFile, findChild);
         if (node) {
             return { start: node.getStart(), end: node.getEnd() };
         }
     }
 }
 function definitionFromTsSymbol(symbol) {
-    var declarations = symbol.declarations;
+    const declarations = symbol.declarations;
     if (declarations) {
-        return declarations.map(function (declaration) {
-            var sourceFile = declaration.getSourceFile();
+        return declarations.map(declaration => {
+            const sourceFile = declaration.getSourceFile();
             return {
                 fileName: sourceFile.fileName,
                 span: { start: declaration.getStart(), end: declaration.getEnd() }
@@ -780,11 +636,10 @@ function parentDeclarationOf(node) {
 }
 function getContainerOf(symbol, context) {
     if (symbol.getFlags() & ts.SymbolFlags.ClassMember && symbol.declarations) {
-        for (var _i = 0, _a = symbol.declarations; _i < _a.length; _i++) {
-            var declaration = _a[_i];
-            var parent_1 = parentDeclarationOf(declaration);
-            if (parent_1) {
-                var type = context.checker.getTypeAtLocation(parent_1);
+        for (const declaration of symbol.declarations) {
+            const parent = parentDeclarationOf(declaration);
+            if (parent) {
+                const type = context.checker.getTypeAtLocation(parent);
                 if (type) {
                     return new TypeWrapper(type, context);
                 }
@@ -794,7 +649,7 @@ function getContainerOf(symbol, context) {
 }
 function getTypeParameterOf(type, name) {
     if (type && type.symbol && type.symbol.name == name) {
-        var typeArguments = type.typeArguments;
+        const typeArguments = type.typeArguments;
         if (typeArguments && typeArguments.length <= 1) {
             return typeArguments[0];
         }
@@ -819,12 +674,11 @@ function typeKindOf(type) {
         }
         else if (type.flags & ts.TypeFlags.Union) {
             // If all the constituent types of a union are the same kind, it is also that kind.
-            var candidate = null;
-            var unionType = type;
+            let candidate = null;
+            const unionType = type;
             if (unionType.types.length > 0) {
                 candidate = typeKindOf(unionType.types[0]);
-                for (var _i = 0, _a = unionType.types; _i < _a.length; _i++) {
-                    var subType = _a[_i];
+                for (const subType of unionType.types) {
                     if (candidate != typeKindOf(subType)) {
                         return symbols_1.BuiltinType.Other;
                     }
@@ -841,8 +695,8 @@ function typeKindOf(type) {
     return symbols_1.BuiltinType.Other;
 }
 function getFromSymbolTable(symbolTable, key) {
-    var table = symbolTable;
-    var symbol;
+    const table = symbolTable;
+    let symbol;
     if (typeof table.get === 'function') {
         // TS 2.2 uses a Map
         symbol = table.get(key);
@@ -854,10 +708,10 @@ function getFromSymbolTable(symbolTable, key) {
     return symbol;
 }
 function toNumbers(value) {
-    return value ? value.split('.').map(function (v) { return +v; }) : [];
+    return value ? value.split('.').map(v => +v) : [];
 }
 function compareNumbers(a, b) {
-    for (var i = 0; i < a.length && i < b.length; i++) {
+    for (let i = 0; i < a.length && i < b.length; i++) {
         if (a[i] > b[i])
             return 1;
         if (a[i] < b[i])
@@ -866,7 +720,7 @@ function compareNumbers(a, b) {
     return 0;
 }
 function isTypescriptVersion(low, high) {
-    var tsNumbers = toNumbers(ts.version);
+    const tsNumbers = toNumbers(ts.version);
     return compareNumbers(toNumbers(low), tsNumbers) <= 0 &&
         compareNumbers(toNumbers(high), tsNumbers) >= 0;
 }

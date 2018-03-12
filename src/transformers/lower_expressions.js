@@ -7,11 +7,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var compiler_1 = require("@angular/compiler");
-var ts = require("typescript");
-var index_1 = require("../metadata/index");
+const compiler_1 = require("@angular/compiler");
+const ts = require("typescript");
+const index_1 = require("../metadata/index");
 function toMap(items, select) {
-    return new Map(items.map(function (i) { return [select(i), i]; }));
+    return new Map(items.map(i => [select(i), i]));
 }
 // We will never lower expressions in a nested lexical scope so avoid entering them.
 // This also avoids a bug in TypeScript 2.3 where the lexical scopes get out of sync
@@ -31,35 +31,35 @@ function isLexicalScope(node) {
     return false;
 }
 function transformSourceFile(sourceFile, requests, context) {
-    var inserts = [];
+    const inserts = [];
     // Calculate the range of interesting locations. The transform will only visit nodes in this
     // range to improve the performance on large files.
-    var locations = Array.from(requests.keys());
-    var min = Math.min.apply(Math, locations);
-    var max = Math.max.apply(Math, locations);
+    const locations = Array.from(requests.keys());
+    const min = Math.min(...locations);
+    const max = Math.max(...locations);
     // Visit nodes matching the request and synthetic nodes added by tsickle
     function shouldVisit(pos, end) {
         return (pos <= max && end >= min) || pos == -1;
     }
     function visitSourceFile(sourceFile) {
         function topLevelStatement(node) {
-            var declarations = [];
+            const declarations = [];
             function visitNode(node) {
                 // Get the original node before tsickle
-                var _a = ts.getOriginalNode(node), pos = _a.pos, end = _a.end, kind = _a.kind, originalParent = _a.parent;
-                var nodeRequest = requests.get(pos);
+                const { pos, end, kind, parent: originalParent } = ts.getOriginalNode(node);
+                const nodeRequest = requests.get(pos);
                 if (nodeRequest && nodeRequest.kind == kind && nodeRequest.end == end) {
                     // This node is requested to be rewritten as a reference to the exported name.
                     if (originalParent && originalParent.kind === ts.SyntaxKind.VariableDeclaration) {
                         // As the value represents the whole initializer of a variable declaration,
                         // just refer to that variable. This e.g. helps to preserve closure comments
                         // at the right place.
-                        var varParent = originalParent;
+                        const varParent = originalParent;
                         if (varParent.name.kind === ts.SyntaxKind.Identifier) {
-                            var varName = varParent.name.text;
-                            var exportName_1 = nodeRequest.name;
+                            const varName = varParent.name.text;
+                            const exportName = nodeRequest.name;
                             declarations.push({
-                                name: exportName_1,
+                                name: exportName,
                                 node: ts.createIdentifier(varName),
                                 order: 1 /* AfterStmt */
                             });
@@ -67,19 +67,19 @@ function transformSourceFile(sourceFile, requests, context) {
                         }
                     }
                     // Record that the node needs to be moved to an exported variable with the given name
-                    var exportName = nodeRequest.name;
-                    declarations.push({ name: exportName, node: node, order: 0 /* BeforeStmt */ });
+                    const exportName = nodeRequest.name;
+                    declarations.push({ name: exportName, node, order: 0 /* BeforeStmt */ });
                     return ts.createIdentifier(exportName);
                 }
-                var result = node;
+                let result = node;
                 if (shouldVisit(pos, end) && !isLexicalScope(node)) {
                     result = ts.visitEachChild(node, visitNode, context);
                 }
                 return result;
             }
             // Get the original node before tsickle
-            var _a = ts.getOriginalNode(node), pos = _a.pos, end = _a.end;
-            var resultStmt;
+            const { pos, end } = ts.getOriginalNode(node);
+            let resultStmt;
             if (shouldVisit(pos, end)) {
                 resultStmt = ts.visitEachChild(node, visitNode, context);
             }
@@ -87,45 +87,45 @@ function transformSourceFile(sourceFile, requests, context) {
                 resultStmt = node;
             }
             if (declarations.length) {
-                inserts.push({ relativeTo: resultStmt, declarations: declarations });
+                inserts.push({ relativeTo: resultStmt, declarations });
             }
             return resultStmt;
         }
-        var newStatements = sourceFile.statements.map(topLevelStatement);
+        let newStatements = sourceFile.statements.map(topLevelStatement);
         if (inserts.length) {
             // Insert the declarations relative to the rewritten statement that references them.
-            var insertMap_1 = toMap(inserts, function (i) { return i.relativeTo; });
-            var tmpStatements_1 = [];
-            newStatements.forEach(function (statement) {
-                var insert = insertMap_1.get(statement);
+            const insertMap = toMap(inserts, i => i.relativeTo);
+            const tmpStatements = [];
+            newStatements.forEach(statement => {
+                const insert = insertMap.get(statement);
                 if (insert) {
-                    var before = insert.declarations.filter(function (d) { return d.order === 0 /* BeforeStmt */; });
+                    const before = insert.declarations.filter(d => d.order === 0 /* BeforeStmt */);
                     if (before.length) {
-                        tmpStatements_1.push(createVariableStatementForDeclarations(before));
+                        tmpStatements.push(createVariableStatementForDeclarations(before));
                     }
-                    tmpStatements_1.push(statement);
-                    var after = insert.declarations.filter(function (d) { return d.order === 1 /* AfterStmt */; });
+                    tmpStatements.push(statement);
+                    const after = insert.declarations.filter(d => d.order === 1 /* AfterStmt */);
                     if (after.length) {
-                        tmpStatements_1.push(createVariableStatementForDeclarations(after));
+                        tmpStatements.push(createVariableStatementForDeclarations(after));
                     }
                 }
                 else {
-                    tmpStatements_1.push(statement);
+                    tmpStatements.push(statement);
                 }
             });
             // Insert an exports clause to export the declarations
-            tmpStatements_1.push(ts.createExportDeclaration(
+            tmpStatements.push(ts.createExportDeclaration(
             /* decorators */ undefined, 
             /* modifiers */ undefined, ts.createNamedExports(inserts
-                .reduce(function (accumulator, insert) { return accumulator.concat(insert.declarations); }, [])
-                .map(function (declaration) { return ts.createExportSpecifier(
-            /* propertyName */ undefined, declaration.name); }))));
-            newStatements = tmpStatements_1;
+                .reduce((accumulator, insert) => [...accumulator, ...insert.declarations], [])
+                .map(declaration => ts.createExportSpecifier(
+            /* propertyName */ undefined, declaration.name)))));
+            newStatements = tmpStatements;
         }
         // Note: We cannot use ts.updateSourcefile here as
         // it does not work well with decorators.
         // See https://github.com/Microsoft/TypeScript/issues/17384
-        var newSf = ts.getMutableClone(sourceFile);
+        const newSf = ts.getMutableClone(sourceFile);
         if (!(sourceFile.flags & ts.NodeFlags.Synthesized)) {
             newSf.flags &= ~ts.NodeFlags.Synthesized;
         }
@@ -135,20 +135,23 @@ function transformSourceFile(sourceFile, requests, context) {
     return visitSourceFile(sourceFile);
 }
 function createVariableStatementForDeclarations(declarations) {
-    var varDecls = declarations.map(function (i) { return ts.createVariableDeclaration(i.name, /* type */ undefined, i.node); });
+    const varDecls = declarations.map(i => ts.createVariableDeclaration(i.name, /* type */ undefined, i.node));
     return ts.createVariableStatement(
     /* modifiers */ undefined, ts.createVariableDeclarationList(varDecls, ts.NodeFlags.Const));
 }
 function getExpressionLoweringTransformFactory(requestsMap, program) {
     // Return the factory
-    return function (context) { return function (sourceFile) {
+    return (context) => (sourceFile) => {
         // We need to use the original SourceFile for reading metadata, and not the transformed one.
-        var requests = requestsMap.getRequests(program.getSourceFile(sourceFile.fileName));
-        if (requests && requests.size) {
-            return transformSourceFile(sourceFile, requests, context);
+        const originalFile = program.getSourceFile(sourceFile.fileName);
+        if (originalFile) {
+            const requests = requestsMap.getRequests(originalFile);
+            if (requests && requests.size) {
+                return transformSourceFile(sourceFile, requests, context);
+            }
         }
         return sourceFile;
-    }; };
+    };
 }
 exports.getExpressionLoweringTransformFactory = getExpressionLoweringTransformFactory;
 function shouldLower(node) {
@@ -181,23 +184,23 @@ function isRewritten(value) {
 }
 function isLiteralFieldNamed(node, names) {
     if (node.parent && node.parent.kind == ts.SyntaxKind.PropertyAssignment) {
-        var property = node.parent;
+        const property = node.parent;
         if (property.parent && property.parent.kind == ts.SyntaxKind.ObjectLiteralExpression &&
             property.name && property.name.kind == ts.SyntaxKind.Identifier) {
-            var propertyName = property.name;
+            const propertyName = property.name;
             return names.has(propertyName.text);
         }
     }
     return false;
 }
-var LOWERABLE_FIELD_NAMES = new Set(['useValue', 'useFactory', 'data']);
-var LowerMetadataTransform = /** @class */ (function () {
-    function LowerMetadataTransform() {
+const LOWERABLE_FIELD_NAMES = new Set(['useValue', 'useFactory', 'data']);
+class LowerMetadataTransform {
+    constructor() {
         this.requests = new Map();
     }
     // RequestMap
-    LowerMetadataTransform.prototype.getRequests = function (sourceFile) {
-        var result = this.requests.get(sourceFile.fileName);
+    getRequests(sourceFile) {
+        let result = this.requests.get(sourceFile.fileName);
         if (!result) {
             // Force the metadata for this source file to be collected which
             // will recursively call start() populating the request map;
@@ -207,24 +210,24 @@ var LowerMetadataTransform = /** @class */ (function () {
             result = this.requests.get(sourceFile.fileName) || new Map();
         }
         return result;
-    };
+    }
     // MetadataTransformer
-    LowerMetadataTransform.prototype.connect = function (cache) { this.cache = cache; };
-    LowerMetadataTransform.prototype.start = function (sourceFile) {
-        var identNumber = 0;
-        var freshIdent = function () { return compiler_1.createLoweredSymbol(identNumber++); };
-        var requests = new Map();
+    connect(cache) { this.cache = cache; }
+    start(sourceFile) {
+        let identNumber = 0;
+        const freshIdent = () => compiler_1.createLoweredSymbol(identNumber++);
+        const requests = new Map();
         this.requests.set(sourceFile.fileName, requests);
-        var replaceNode = function (node) {
-            var name = freshIdent();
-            requests.set(node.pos, { name: name, kind: node.kind, location: node.pos, end: node.end });
-            return { __symbolic: 'reference', name: name };
+        const replaceNode = (node) => {
+            const name = freshIdent();
+            requests.set(node.pos, { name, kind: node.kind, location: node.pos, end: node.end });
+            return { __symbolic: 'reference', name };
         };
-        var isExportedSymbol = (function () {
-            var exportTable;
-            return function (node) {
+        const isExportedSymbol = (() => {
+            let exportTable;
+            return (node) => {
                 if (node.kind == ts.SyntaxKind.Identifier) {
-                    var ident = node;
+                    const ident = node;
                     if (!exportTable) {
                         exportTable = createExportTableFor(sourceFile);
                     }
@@ -233,16 +236,16 @@ var LowerMetadataTransform = /** @class */ (function () {
                 return false;
             };
         })();
-        var isExportedPropertyAccess = function (node) {
+        const isExportedPropertyAccess = (node) => {
             if (node.kind === ts.SyntaxKind.PropertyAccessExpression) {
-                var pae = node;
+                const pae = node;
                 if (isExportedSymbol(pae.expression)) {
                     return true;
                 }
             }
             return false;
         };
-        return function (value, node) {
+        return (value, node) => {
             if (!isPrimitive(value) && !isRewritten(value)) {
                 if ((node.kind === ts.SyntaxKind.ArrowFunction ||
                     node.kind === ts.SyntaxKind.FunctionExpression) &&
@@ -256,12 +259,11 @@ var LowerMetadataTransform = /** @class */ (function () {
             }
             return value;
         };
-    };
-    return LowerMetadataTransform;
-}());
+    }
+}
 exports.LowerMetadataTransform = LowerMetadataTransform;
 function createExportTableFor(sourceFile) {
-    var exportTable = new Set();
+    const exportTable = new Set();
     // Lazily collect all the exports from the source file
     ts.forEachChild(sourceFile, function scan(node) {
         switch (node.kind) {
@@ -269,32 +271,31 @@ function createExportTableFor(sourceFile) {
             case ts.SyntaxKind.FunctionDeclaration:
             case ts.SyntaxKind.InterfaceDeclaration:
                 if ((ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0) {
-                    var classDeclaration = node;
-                    var name_1 = classDeclaration.name;
-                    if (name_1)
-                        exportTable.add(name_1.text);
+                    const classDeclaration = node;
+                    const name = classDeclaration.name;
+                    if (name)
+                        exportTable.add(name.text);
                 }
                 break;
             case ts.SyntaxKind.VariableStatement:
-                var variableStatement = node;
-                for (var _i = 0, _a = variableStatement.declarationList.declarations; _i < _a.length; _i++) {
-                    var declaration = _a[_i];
+                const variableStatement = node;
+                for (const declaration of variableStatement.declarationList.declarations) {
                     scan(declaration);
                 }
                 break;
             case ts.SyntaxKind.VariableDeclaration:
-                var variableDeclaration = node;
+                const variableDeclaration = node;
                 if ((ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) != 0 &&
                     variableDeclaration.name.kind == ts.SyntaxKind.Identifier) {
-                    var name_2 = variableDeclaration.name;
-                    exportTable.add(name_2.text);
+                    const name = variableDeclaration.name;
+                    exportTable.add(name.text);
                 }
                 break;
             case ts.SyntaxKind.ExportDeclaration:
-                var exportDeclaration = node;
-                var moduleSpecifier = exportDeclaration.moduleSpecifier, exportClause = exportDeclaration.exportClause;
+                const exportDeclaration = node;
+                const { moduleSpecifier, exportClause } = exportDeclaration;
                 if (!moduleSpecifier && exportClause) {
-                    exportClause.elements.forEach(function (spec) { exportTable.add(spec.name.text); });
+                    exportClause.elements.forEach(spec => { exportTable.add(spec.name.text); });
                 }
         }
     });

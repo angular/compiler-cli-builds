@@ -7,10 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var ts = require("typescript");
-var perform_compile_1 = require("./perform_compile");
-var compiler_host_1 = require("./transformers/compiler_host");
-var program_1 = require("./transformers/program");
+const ts = require("typescript");
+const perform_compile_1 = require("./perform_compile");
+const compiler_host_1 = require("./transformers/compiler_host");
+const program_1 = require("./transformers/program");
 var EmitFlags;
 (function (EmitFlags) {
     EmitFlags[EmitFlags["DTS"] = 1] = "DTS";
@@ -22,15 +22,13 @@ var EmitFlags;
     EmitFlags[EmitFlags["All"] = 31] = "All";
 })(EmitFlags = exports.EmitFlags || (exports.EmitFlags = {}));
 // Wrapper for createProgram.
-function createProgram(_a) {
-    var rootNames = _a.rootNames, options = _a.options, host = _a.host, oldProgram = _a.oldProgram;
-    return program_1.createProgram({ rootNames: rootNames, options: options, host: host, oldProgram: oldProgram });
+function createProgram({ rootNames, options, host, oldProgram }) {
+    return program_1.createProgram({ rootNames, options, host, oldProgram: oldProgram });
 }
 exports.createProgram = createProgram;
 // Wrapper for createCompilerHost.
-function createCompilerHost(_a) {
-    var options = _a.options, _b = _a.tsHost, tsHost = _b === void 0 ? ts.createCompilerHost(options, true) : _b;
-    return compiler_host_1.createCompilerHost({ options: options, tsHost: tsHost });
+function createCompilerHost({ options, tsHost = ts.createCompilerHost(options, true) }) {
+    return compiler_host_1.createCompilerHost({ options, tsHost });
 }
 exports.createCompilerHost = createCompilerHost;
 function formatDiagnostics(diags) {

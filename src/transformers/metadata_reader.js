@@ -6,24 +6,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var metadata_1 = require("../metadata");
-var util_1 = require("./util");
+const metadata_1 = require("../metadata");
+const util_1 = require("./util");
 function createMetadataReaderCache() {
-    var data = new Map();
-    return { data: data };
+    const data = new Map();
+    return { data };
 }
 exports.createMetadataReaderCache = createMetadataReaderCache;
 function readMetadata(filePath, host, cache) {
-    var metadatas = cache && cache.data.get(filePath);
+    let metadatas = cache && cache.data.get(filePath);
     if (metadatas) {
         return metadatas;
     }
@@ -41,7 +33,7 @@ function readMetadata(filePath, host, cache) {
             }
         }
         else {
-            var metadata = host.getSourceFileMetadata(filePath);
+            const metadata = host.getSourceFileMetadata(filePath);
             metadatas = metadata ? [metadata] : [];
         }
     }
@@ -52,17 +44,17 @@ function readMetadata(filePath, host, cache) {
 }
 exports.readMetadata = readMetadata;
 function readMetadataFile(host, dtsFilePath) {
-    var metadataPath = dtsFilePath.replace(util_1.DTS, '.metadata.json');
+    const metadataPath = dtsFilePath.replace(util_1.DTS, '.metadata.json');
     if (!host.fileExists(metadataPath)) {
         return undefined;
     }
     try {
-        var metadataOrMetadatas = JSON.parse(host.readFile(metadataPath));
-        var metadatas = metadataOrMetadatas ?
+        const metadataOrMetadatas = JSON.parse(host.readFile(metadataPath));
+        const metadatas = metadataOrMetadatas ?
             (Array.isArray(metadataOrMetadatas) ? metadataOrMetadatas : [metadataOrMetadatas]) :
             [];
         if (metadatas.length) {
-            var maxMetadata = metadatas.reduce(function (p, c) { return p.version > c.version ? p : c; });
+            let maxMetadata = metadatas.reduce((p, c) => p.version > c.version ? p : c);
             if (maxMetadata.version < metadata_1.METADATA_VERSION) {
                 metadatas.push(upgradeMetadataWithDtsData(host, maxMetadata, dtsFilePath));
             }
@@ -70,17 +62,17 @@ function readMetadataFile(host, dtsFilePath) {
         return metadatas;
     }
     catch (e) {
-        console.error("Failed to read JSON file " + metadataPath);
+        console.error(`Failed to read JSON file ${metadataPath}`);
         throw e;
     }
 }
 function upgradeMetadataWithDtsData(host, oldMetadata, dtsFilePath) {
     // patch v1 to v3 by adding exports and the `extends` clause.
     // patch v3 to v4 by adding `interface` symbols for TypeAlias
-    var newMetadata = {
+    let newMetadata = {
         '__symbolic': 'module',
         'version': metadata_1.METADATA_VERSION,
-        'metadata': __assign({}, oldMetadata.metadata),
+        'metadata': Object.assign({}, oldMetadata.metadata),
     };
     if (oldMetadata.exports) {
         newMetadata.exports = oldMetadata.exports;
@@ -91,9 +83,9 @@ function upgradeMetadataWithDtsData(host, oldMetadata, dtsFilePath) {
     if (oldMetadata.origins) {
         newMetadata.origins = oldMetadata.origins;
     }
-    var dtsMetadata = host.getSourceFileMetadata(dtsFilePath);
+    const dtsMetadata = host.getSourceFileMetadata(dtsFilePath);
     if (dtsMetadata) {
-        for (var prop in dtsMetadata.metadata) {
+        for (let prop in dtsMetadata.metadata) {
             if (!newMetadata.metadata[prop]) {
                 newMetadata.metadata[prop] = dtsMetadata.metadata[prop];
             }

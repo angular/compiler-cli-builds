@@ -6,51 +6,38 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-var ts = require("typescript");
-var evaluator_1 = require("./evaluator");
-var schema_1 = require("./schema");
-var symbols_1 = require("./symbols");
-var isStatic = function (node) { return ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Static; };
+const ts = require("typescript");
+const evaluator_1 = require("./evaluator");
+const schema_1 = require("./schema");
+const symbols_1 = require("./symbols");
+const isStatic = (node) => ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Static;
 /**
  * Collect decorator metadata from a TypeScript module.
  */
-var MetadataCollector = /** @class */ (function () {
-    function MetadataCollector(options) {
-        if (options === void 0) { options = {}; }
+class MetadataCollector {
+    constructor(options = {}) {
         this.options = options;
     }
     /**
      * Returns a JSON.stringify friendly form describing the decorators of the exported classes from
      * the source file that is expected to correspond to a module.
      */
-    MetadataCollector.prototype.getMetadata = function (sourceFile, strict, substituteExpression) {
-        var _this = this;
-        if (strict === void 0) { strict = false; }
-        var locals = new symbols_1.Symbols(sourceFile);
-        var nodeMap = new Map();
-        var composedSubstituter = substituteExpression && this.options.substituteExpression ?
-            function (value, node) {
-                return _this.options.substituteExpression(substituteExpression(value, node), node);
-            } :
+    getMetadata(sourceFile, strict = false, substituteExpression) {
+        const locals = new symbols_1.Symbols(sourceFile);
+        const nodeMap = new Map();
+        const composedSubstituter = substituteExpression && this.options.substituteExpression ?
+            (value, node) => this.options.substituteExpression(substituteExpression(value, node), node) :
             substituteExpression;
-        var evaluatorOptions = substituteExpression ? __assign({}, this.options, { substituteExpression: composedSubstituter }) :
+        const evaluatorOptions = substituteExpression ? Object.assign({}, this.options, { substituteExpression: composedSubstituter }) :
             this.options;
-        var metadata;
-        var evaluator = new evaluator_1.Evaluator(locals, nodeMap, evaluatorOptions, function (name, value) {
+        let metadata;
+        const evaluator = new evaluator_1.Evaluator(locals, nodeMap, evaluatorOptions, (name, value) => {
             if (!metadata)
                 metadata = {};
             metadata[name] = value;
         });
-        var exports = undefined;
+        let exports = undefined;
         function objFromDecorator(decoratorNode) {
             return evaluator.evaluateNode(decoratorNode.expression);
         }
@@ -65,37 +52,37 @@ var MetadataCollector = /** @class */ (function () {
         }
         function maybeGetSimpleFunction(functionDeclaration) {
             if (functionDeclaration.name && functionDeclaration.name.kind == ts.SyntaxKind.Identifier) {
-                var nameNode = functionDeclaration.name;
-                var functionName = nameNode.text;
-                var functionBody = functionDeclaration.body;
+                const nameNode = functionDeclaration.name;
+                const functionName = nameNode.text;
+                const functionBody = functionDeclaration.body;
                 if (functionBody && functionBody.statements.length == 1) {
-                    var statement = functionBody.statements[0];
+                    const statement = functionBody.statements[0];
                     if (statement.kind === ts.SyntaxKind.ReturnStatement) {
-                        var returnStatement = statement;
+                        const returnStatement = statement;
                         if (returnStatement.expression) {
-                            var func = {
+                            const func = {
                                 __symbolic: 'function',
                                 parameters: namesOf(functionDeclaration.parameters),
                                 value: evaluator.evaluateNode(returnStatement.expression)
                             };
-                            if (functionDeclaration.parameters.some(function (p) { return p.initializer != null; })) {
-                                func.defaults = functionDeclaration.parameters.map(function (p) { return p.initializer && evaluator.evaluateNode(p.initializer); });
+                            if (functionDeclaration.parameters.some(p => p.initializer != null)) {
+                                func.defaults = functionDeclaration.parameters.map(p => p.initializer && evaluator.evaluateNode(p.initializer));
                             }
-                            return recordEntry({ func: func, name: functionName }, functionDeclaration);
+                            return recordEntry({ func, name: functionName }, functionDeclaration);
                         }
                     }
                 }
             }
         }
         function classMetadataOf(classDeclaration) {
-            var result = { __symbolic: 'class' };
+            const result = { __symbolic: 'class' };
             function getDecorators(decorators) {
                 if (decorators && decorators.length)
-                    return decorators.map(function (decorator) { return objFromDecorator(decorator); });
+                    return decorators.map(decorator => objFromDecorator(decorator));
                 return undefined;
             }
             function referenceFrom(node) {
-                var result = evaluator.evaluateNode(node);
+                const result = evaluator.evaluateNode(node);
                 if (schema_1.isMetadataError(result) || schema_1.isMetadataSymbolicReferenceExpression(result) ||
                     schema_1.isMetadataSymbolicSelectExpression(result)) {
                     return result;
@@ -106,14 +93,14 @@ var MetadataCollector = /** @class */ (function () {
             }
             // Add class parents
             if (classDeclaration.heritageClauses) {
-                classDeclaration.heritageClauses.forEach(function (hc) {
+                classDeclaration.heritageClauses.forEach((hc) => {
                     if (hc.token === ts.SyntaxKind.ExtendsKeyword && hc.types) {
-                        hc.types.forEach(function (type) { return result.extends = referenceFrom(type.expression); });
+                        hc.types.forEach(type => result.extends = referenceFrom(type.expression));
                     }
                 });
             }
             // Add arity if the type is generic
-            var typeParameters = classDeclaration.typeParameters;
+            const typeParameters = classDeclaration.typeParameters;
             if (typeParameters && typeParameters.length) {
                 result.arity = typeParameters.length;
             }
@@ -122,45 +109,43 @@ var MetadataCollector = /** @class */ (function () {
                 result.decorators = getDecorators(classDeclaration.decorators);
             }
             // member decorators
-            var members = null;
+            let members = null;
             function recordMember(name, metadata) {
                 if (!members)
                     members = {};
-                var data = members.hasOwnProperty(name) ? members[name] : [];
+                const data = members.hasOwnProperty(name) ? members[name] : [];
                 data.push(metadata);
                 members[name] = data;
             }
             // static member
-            var statics = null;
+            let statics = null;
             function recordStaticMember(name, value) {
                 if (!statics)
                     statics = {};
                 statics[name] = value;
             }
-            for (var _i = 0, _a = classDeclaration.members; _i < _a.length; _i++) {
-                var member = _a[_i];
-                var isConstructor = false;
+            for (const member of classDeclaration.members) {
+                let isConstructor = false;
                 switch (member.kind) {
                     case ts.SyntaxKind.Constructor:
                     case ts.SyntaxKind.MethodDeclaration:
                         isConstructor = member.kind === ts.SyntaxKind.Constructor;
-                        var method = member;
+                        const method = member;
                         if (isStatic(method)) {
-                            var maybeFunc = maybeGetSimpleFunction(method);
+                            const maybeFunc = maybeGetSimpleFunction(method);
                             if (maybeFunc) {
                                 recordStaticMember(maybeFunc.name, maybeFunc.func);
                             }
                             continue;
                         }
-                        var methodDecorators = getDecorators(method.decorators);
-                        var parameters = method.parameters;
-                        var parameterDecoratorData = [];
-                        var parametersData = [];
-                        var hasDecoratorData = false;
-                        var hasParameterData = false;
-                        for (var _b = 0, parameters_1 = parameters; _b < parameters_1.length; _b++) {
-                            var parameter = parameters_1[_b];
-                            var parameterData = getDecorators(parameter.decorators);
+                        const methodDecorators = getDecorators(method.decorators);
+                        const parameters = method.parameters;
+                        const parameterDecoratorData = [];
+                        const parametersData = [];
+                        let hasDecoratorData = false;
+                        let hasParameterData = false;
+                        for (const parameter of parameters) {
+                            const parameterData = getDecorators(parameter.decorators);
                             parameterDecoratorData.push(parameterData);
                             hasDecoratorData = hasDecoratorData || !!parameterData;
                             if (isConstructor) {
@@ -173,8 +158,8 @@ var MetadataCollector = /** @class */ (function () {
                                 hasParameterData = true;
                             }
                         }
-                        var data = { __symbolic: isConstructor ? 'constructor' : 'method' };
-                        var name_1 = isConstructor ? '__ctor__' : evaluator.nameOf(member.name);
+                        const data = { __symbolic: isConstructor ? 'constructor' : 'method' };
+                        const name = isConstructor ? '__ctor__' : evaluator.nameOf(member.name);
                         if (methodDecorators) {
                             data.decorators = methodDecorators;
                         }
@@ -184,31 +169,31 @@ var MetadataCollector = /** @class */ (function () {
                         if (hasParameterData) {
                             data.parameters = parametersData;
                         }
-                        if (!schema_1.isMetadataError(name_1)) {
-                            recordMember(name_1, data);
+                        if (!schema_1.isMetadataError(name)) {
+                            recordMember(name, data);
                         }
                         break;
                     case ts.SyntaxKind.PropertyDeclaration:
                     case ts.SyntaxKind.GetAccessor:
                     case ts.SyntaxKind.SetAccessor:
-                        var property = member;
+                        const property = member;
                         if (isStatic(property)) {
-                            var name_2 = evaluator.nameOf(property.name);
-                            if (!schema_1.isMetadataError(name_2)) {
+                            const name = evaluator.nameOf(property.name);
+                            if (!schema_1.isMetadataError(name)) {
                                 if (property.initializer) {
-                                    var value = evaluator.evaluateNode(property.initializer);
-                                    recordStaticMember(name_2, value);
+                                    const value = evaluator.evaluateNode(property.initializer);
+                                    recordStaticMember(name, value);
                                 }
                                 else {
-                                    recordStaticMember(name_2, errorSym('Variable not initialized', property.name));
+                                    recordStaticMember(name, errorSym('Variable not initialized', property.name));
                                 }
                             }
                         }
-                        var propertyDecorators = getDecorators(property.decorators);
+                        const propertyDecorators = getDecorators(property.decorators);
                         if (propertyDecorators) {
-                            var name_3 = evaluator.nameOf(property.name);
-                            if (!schema_1.isMetadataError(name_3)) {
-                                recordMember(name_3, { __symbolic: 'property', decorators: propertyDecorators });
+                            const name = evaluator.nameOf(property.name);
+                            if (!schema_1.isMetadataError(name)) {
+                                recordMember(name, { __symbolic: 'property', decorators: propertyDecorators });
                             }
                         }
                         break;
@@ -223,63 +208,55 @@ var MetadataCollector = /** @class */ (function () {
             return recordEntry(result, classDeclaration);
         }
         // Collect all exported symbols from an exports clause.
-        var exportMap = new Map();
-        ts.forEachChild(sourceFile, function (node) {
+        const exportMap = new Map();
+        ts.forEachChild(sourceFile, node => {
             switch (node.kind) {
                 case ts.SyntaxKind.ExportDeclaration:
-                    var exportDeclaration = node;
-                    var moduleSpecifier = exportDeclaration.moduleSpecifier, exportClause = exportDeclaration.exportClause;
+                    const exportDeclaration = node;
+                    const { moduleSpecifier, exportClause } = exportDeclaration;
                     if (!moduleSpecifier) {
                         // If there is a module specifier there is also an exportClause
-                        exportClause.elements.forEach(function (spec) {
-                            var exportedAs = spec.name.text;
-                            var name = (spec.propertyName || spec.name).text;
+                        exportClause.elements.forEach(spec => {
+                            const exportedAs = spec.name.text;
+                            const name = (spec.propertyName || spec.name).text;
                             exportMap.set(name, exportedAs);
                         });
                     }
             }
         });
-        var isExport = function (node) {
-            return sourceFile.isDeclarationFile || ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export;
-        };
-        var isExportedIdentifier = function (identifier) {
-            return identifier && exportMap.has(identifier.text);
-        };
-        var isExported = function (node) {
-            return isExport(node) || isExportedIdentifier(node.name);
-        };
-        var exportedIdentifierName = function (identifier) {
-            return identifier && (exportMap.get(identifier.text) || identifier.text);
-        };
-        var exportedName = function (node) { return exportedIdentifierName(node.name); };
+        const isExport = (node) => sourceFile.isDeclarationFile || ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export;
+        const isExportedIdentifier = (identifier) => identifier && exportMap.has(identifier.text);
+        const isExported = (node) => isExport(node) || isExportedIdentifier(node.name);
+        const exportedIdentifierName = (identifier) => identifier && (exportMap.get(identifier.text) || identifier.text);
+        const exportedName = (node) => exportedIdentifierName(node.name);
         // Pre-declare classes and functions
-        ts.forEachChild(sourceFile, function (node) {
+        ts.forEachChild(sourceFile, node => {
             switch (node.kind) {
                 case ts.SyntaxKind.ClassDeclaration:
-                    var classDeclaration = node;
+                    const classDeclaration = node;
                     if (classDeclaration.name) {
-                        var className = classDeclaration.name.text;
+                        const className = classDeclaration.name.text;
                         if (isExported(classDeclaration)) {
                             locals.define(className, { __symbolic: 'reference', name: exportedName(classDeclaration) });
                         }
                         else {
-                            locals.define(className, errorSym('Reference to non-exported class', node, { className: className }));
+                            locals.define(className, errorSym('Reference to non-exported class', node, { className }));
                         }
                     }
                     break;
                 case ts.SyntaxKind.InterfaceDeclaration:
-                    var interfaceDeclaration = node;
+                    const interfaceDeclaration = node;
                     if (interfaceDeclaration.name) {
-                        var interfaceName = interfaceDeclaration.name.text;
+                        const interfaceName = interfaceDeclaration.name.text;
                         // All references to interfaces should be converted to references to `any`.
                         locals.define(interfaceName, { __symbolic: 'reference', name: 'any' });
                     }
                     break;
                 case ts.SyntaxKind.FunctionDeclaration:
-                    var functionDeclaration = node;
+                    const functionDeclaration = node;
                     if (!isExported(functionDeclaration)) {
                         // Report references to this function as an error.
-                        var nameNode = functionDeclaration.name;
+                        const nameNode = functionDeclaration.name;
                         if (nameNode && nameNode.text) {
                             locals.define(nameNode.text, errorSym('Reference to a non-exported function', nameNode, { name: nameNode.text }));
                         }
@@ -287,22 +264,22 @@ var MetadataCollector = /** @class */ (function () {
                     break;
             }
         });
-        ts.forEachChild(sourceFile, function (node) {
+        ts.forEachChild(sourceFile, node => {
             switch (node.kind) {
                 case ts.SyntaxKind.ExportDeclaration:
                     // Record export declarations
-                    var exportDeclaration = node;
-                    var moduleSpecifier = exportDeclaration.moduleSpecifier, exportClause = exportDeclaration.exportClause;
+                    const exportDeclaration = node;
+                    const { moduleSpecifier, exportClause } = exportDeclaration;
                     if (!moduleSpecifier) {
                         // no module specifier -> export {propName as name};
                         if (exportClause) {
-                            exportClause.elements.forEach(function (spec) {
-                                var name = spec.name.text;
+                            exportClause.elements.forEach(spec => {
+                                const name = spec.name.text;
                                 // If the symbol was not already exported, export a reference since it is a
                                 // reference to an import
                                 if (!metadata || !metadata[name]) {
-                                    var propNode = spec.propertyName || spec.name;
-                                    var value = evaluator.evaluateNode(propNode);
+                                    const propNode = spec.propertyName || spec.name;
+                                    const value = evaluator.evaluateNode(propNode);
                                     if (!metadata)
                                         metadata = {};
                                     metadata[name] = recordEntry(value, node);
@@ -313,11 +290,11 @@ var MetadataCollector = /** @class */ (function () {
                     if (moduleSpecifier && moduleSpecifier.kind == ts.SyntaxKind.StringLiteral) {
                         // Ignore exports that don't have string literals as exports.
                         // This is allowed by the syntax but will be flagged as an error by the type checker.
-                        var from = moduleSpecifier.text;
-                        var moduleExport = { from: from };
+                        const from = moduleSpecifier.text;
+                        const moduleExport = { from };
                         if (exportClause) {
-                            moduleExport.export = exportClause.elements.map(function (spec) { return spec.propertyName ? { name: spec.propertyName.text, as: spec.name.text } :
-                                spec.name.text; });
+                            moduleExport.export = exportClause.elements.map(spec => spec.propertyName ? { name: spec.propertyName.text, as: spec.name.text } :
+                                spec.name.text);
                         }
                         if (!exports)
                             exports = [];
@@ -325,89 +302,88 @@ var MetadataCollector = /** @class */ (function () {
                     }
                     break;
                 case ts.SyntaxKind.ClassDeclaration:
-                    var classDeclaration = node;
+                    const classDeclaration = node;
                     if (classDeclaration.name) {
                         if (isExported(classDeclaration)) {
-                            var name_4 = exportedName(classDeclaration);
-                            if (name_4) {
+                            const name = exportedName(classDeclaration);
+                            if (name) {
                                 if (!metadata)
                                     metadata = {};
-                                metadata[name_4] = classMetadataOf(classDeclaration);
+                                metadata[name] = classMetadataOf(classDeclaration);
                             }
                         }
                     }
                     // Otherwise don't record metadata for the class.
                     break;
                 case ts.SyntaxKind.TypeAliasDeclaration:
-                    var typeDeclaration = node;
+                    const typeDeclaration = node;
                     if (typeDeclaration.name && isExported(typeDeclaration)) {
-                        var name_5 = exportedName(typeDeclaration);
-                        if (name_5) {
+                        const name = exportedName(typeDeclaration);
+                        if (name) {
                             if (!metadata)
                                 metadata = {};
-                            metadata[name_5] = { __symbolic: 'interface' };
+                            metadata[name] = { __symbolic: 'interface' };
                         }
                     }
                     break;
                 case ts.SyntaxKind.InterfaceDeclaration:
-                    var interfaceDeclaration = node;
+                    const interfaceDeclaration = node;
                     if (interfaceDeclaration.name && isExported(interfaceDeclaration)) {
-                        var name_6 = exportedName(interfaceDeclaration);
-                        if (name_6) {
+                        const name = exportedName(interfaceDeclaration);
+                        if (name) {
                             if (!metadata)
                                 metadata = {};
-                            metadata[name_6] = { __symbolic: 'interface' };
+                            metadata[name] = { __symbolic: 'interface' };
                         }
                     }
                     break;
                 case ts.SyntaxKind.FunctionDeclaration:
                     // Record functions that return a single value. Record the parameter
                     // names substitution will be performed by the StaticReflector.
-                    var functionDeclaration = node;
+                    const functionDeclaration = node;
                     if (isExported(functionDeclaration) && functionDeclaration.name) {
-                        var name_7 = exportedName(functionDeclaration);
-                        var maybeFunc = maybeGetSimpleFunction(functionDeclaration);
-                        if (name_7) {
+                        const name = exportedName(functionDeclaration);
+                        const maybeFunc = maybeGetSimpleFunction(functionDeclaration);
+                        if (name) {
                             if (!metadata)
                                 metadata = {};
-                            metadata[name_7] =
+                            metadata[name] =
                                 maybeFunc ? recordEntry(maybeFunc.func, node) : { __symbolic: 'function' };
                         }
                     }
                     break;
                 case ts.SyntaxKind.EnumDeclaration:
-                    var enumDeclaration = node;
+                    const enumDeclaration = node;
                     if (isExported(enumDeclaration)) {
-                        var enumValueHolder = {};
-                        var enumName = exportedName(enumDeclaration);
-                        var nextDefaultValue = 0;
-                        var writtenMembers = 0;
-                        for (var _i = 0, _a = enumDeclaration.members; _i < _a.length; _i++) {
-                            var member = _a[_i];
-                            var enumValue = void 0;
+                        const enumValueHolder = {};
+                        const enumName = exportedName(enumDeclaration);
+                        let nextDefaultValue = 0;
+                        let writtenMembers = 0;
+                        for (const member of enumDeclaration.members) {
+                            let enumValue;
                             if (!member.initializer) {
                                 enumValue = nextDefaultValue;
                             }
                             else {
                                 enumValue = evaluator.evaluateNode(member.initializer);
                             }
-                            var name_8 = undefined;
+                            let name = undefined;
                             if (member.name.kind == ts.SyntaxKind.Identifier) {
-                                var identifier = member.name;
-                                name_8 = identifier.text;
-                                enumValueHolder[name_8] = enumValue;
+                                const identifier = member.name;
+                                name = identifier.text;
+                                enumValueHolder[name] = enumValue;
                                 writtenMembers++;
                             }
                             if (typeof enumValue === 'number') {
                                 nextDefaultValue = enumValue + 1;
                             }
-                            else if (name_8) {
+                            else if (name) {
                                 nextDefaultValue = {
                                     __symbolic: 'binary',
                                     operator: '+',
                                     left: {
                                         __symbolic: 'select',
-                                        expression: recordEntry({ __symbolic: 'reference', name: enumName }, node), name: name_8
+                                        expression: recordEntry({ __symbolic: 'reference', name: enumName }, node), name
                                     }
                                 };
                             }
@@ -426,25 +402,25 @@ var MetadataCollector = /** @class */ (function () {
                     }
                     break;
                 case ts.SyntaxKind.VariableStatement:
-                    var variableStatement = node;
-                    var _loop_1 = function (variableDeclaration) {
+                    const variableStatement = node;
+                    for (const variableDeclaration of variableStatement.declarationList.declarations) {
                         if (variableDeclaration.name.kind == ts.SyntaxKind.Identifier) {
-                            var nameNode = variableDeclaration.name;
-                            var varValue = void 0;
+                            const nameNode = variableDeclaration.name;
+                            let varValue;
                             if (variableDeclaration.initializer) {
                                 varValue = evaluator.evaluateNode(variableDeclaration.initializer);
                             }
                             else {
                                 varValue = recordEntry(errorSym('Variable not initialized', nameNode), nameNode);
                             }
-                            var exported = false;
+                            let exported = false;
                             if (isExport(variableStatement) || isExport(variableDeclaration) ||
                                 isExportedIdentifier(nameNode)) {
-                                var name_9 = exportedIdentifierName(nameNode);
-                                if (name_9) {
+                                const name = exportedIdentifierName(nameNode);
+                                if (name) {
                                     if (!metadata)
                                         metadata = {};
-                                    metadata[name_9] = recordEntry(varValue, node);
+                                    metadata[name] = recordEntry(varValue, node);
                                 }
                                 exported = true;
                             }
@@ -470,35 +446,31 @@ var MetadataCollector = /** @class */ (function () {
                             //   or
                             // var [<identifier>[, <identifier}+] = <expression>;
                             // are not supported.
-                            var report_1 = function (nameNode) {
+                            const report = (nameNode) => {
                                 switch (nameNode.kind) {
                                     case ts.SyntaxKind.Identifier:
-                                        var name_10 = nameNode;
-                                        var varValue = errorSym('Destructuring not supported', name_10);
-                                        locals.define(name_10.text, varValue);
+                                        const name = nameNode;
+                                        const varValue = errorSym('Destructuring not supported', name);
+                                        locals.define(name.text, varValue);
                                         if (isExport(node)) {
                                             if (!metadata)
                                                 metadata = {};
-                                            metadata[name_10.text] = varValue;
+                                            metadata[name.text] = varValue;
                                         }
                                         break;
                                     case ts.SyntaxKind.BindingElement:
-                                        var bindingElement = nameNode;
-                                        report_1(bindingElement.name);
+                                        const bindingElement = nameNode;
+                                        report(bindingElement.name);
                                         break;
                                     case ts.SyntaxKind.ObjectBindingPattern:
                                     case ts.SyntaxKind.ArrayBindingPattern:
-                                        var bindings = nameNode;
-                                        bindings.elements.forEach(report_1);
+                                        const bindings = nameNode;
+                                        bindings.elements.forEach(report);
                                         break;
                                 }
                             };
-                            report_1(variableDeclaration.name);
+                            report(variableDeclaration.name);
                         }
-                    };
-                    for (var _b = 0, _c = variableStatement.declarationList.declarations; _b < _c.length; _b++) {
-                        var variableDeclaration = _c[_b];
-                        _loop_1(variableDeclaration);
                     }
                     break;
             }
@@ -509,9 +481,9 @@ var MetadataCollector = /** @class */ (function () {
             else if (strict) {
                 validateMetadata(sourceFile, nodeMap, metadata);
             }
-            var result = {
+            const result = {
                 __symbolic: 'module',
-                version: this.options.version || schema_1.METADATA_VERSION, metadata: metadata
+                version: this.options.version || schema_1.METADATA_VERSION, metadata
             };
             if (sourceFile.moduleName)
                 result.importAs = sourceFile.moduleName;
@@ -519,13 +491,12 @@ var MetadataCollector = /** @class */ (function () {
                 result.exports = exports;
             return result;
         }
-    };
-    return MetadataCollector;
-}());
+    }
+}
 exports.MetadataCollector = MetadataCollector;
 // This will throw if the metadata entry given contains an error node.
 function validateMetadata(sourceFile, nodeMap, metadata) {
-    var locals = new Set(['Array', 'Object', 'Set', 'Map', 'string', 'number', 'any']);
+    let locals = new Set(['Array', 'Object', 'Set', 'Map', 'string', 'number', 'any']);
     function validateExpression(expression) {
         if (!expression) {
             return;
@@ -534,14 +505,14 @@ function validateMetadata(sourceFile, nodeMap, metadata) {
             expression.forEach(validateExpression);
         }
         else if (typeof expression === 'object' && !expression.hasOwnProperty('__symbolic')) {
-            Object.getOwnPropertyNames(expression).forEach(function (v) { return validateExpression(expression[v]); });
+            Object.getOwnPropertyNames(expression).forEach(v => validateExpression(expression[v]));
         }
         else if (schema_1.isMetadataError(expression)) {
             reportError(expression);
         }
         else if (schema_1.isMetadataGlobalReferenceExpression(expression)) {
             if (!locals.has(expression.name)) {
-                var reference = metadata[expression.name];
+                const reference = metadata[expression.name];
                 if (reference) {
                     validateExpression(reference);
                 }
@@ -553,36 +524,36 @@ function validateMetadata(sourceFile, nodeMap, metadata) {
         else if (schema_1.isMetadataSymbolicExpression(expression)) {
             switch (expression.__symbolic) {
                 case 'binary':
-                    var binaryExpression = expression;
+                    const binaryExpression = expression;
                     validateExpression(binaryExpression.left);
                     validateExpression(binaryExpression.right);
                     break;
                 case 'call':
                 case 'new':
-                    var callExpression = expression;
+                    const callExpression = expression;
                     validateExpression(callExpression.expression);
                     if (callExpression.arguments)
                         callExpression.arguments.forEach(validateExpression);
                     break;
                 case 'index':
-                    var indexExpression = expression;
+                    const indexExpression = expression;
                     validateExpression(indexExpression.expression);
                     validateExpression(indexExpression.index);
                     break;
                 case 'pre':
-                    var prefixExpression = expression;
+                    const prefixExpression = expression;
                     validateExpression(prefixExpression.operand);
                     break;
                 case 'select':
-                    var selectExpression = expression;
+                    const selectExpression = expression;
                     validateExpression(selectExpression.expression);
                     break;
                 case 'spread':
-                    var spreadExpression = expression;
+                    const spreadExpression = expression;
                     validateExpression(spreadExpression.expression);
                     break;
                 case 'if':
-                    var ifExpression = expression;
+                    const ifExpression = expression;
                     validateExpression(ifExpression.condition);
                     validateExpression(ifExpression.elseExpression);
                     validateExpression(ifExpression.thenExpression);
@@ -608,11 +579,11 @@ function validateMetadata(sourceFile, nodeMap, metadata) {
         }
         if (classData.members) {
             Object.getOwnPropertyNames(classData.members)
-                .forEach(function (name) { return classData.members[name].forEach(function (m) { return validateMember(classData, m); }); });
+                .forEach(name => classData.members[name].forEach((m) => validateMember(classData, m)));
         }
         if (classData.statics) {
-            Object.getOwnPropertyNames(classData.statics).forEach(function (name) {
-                var staticMember = classData.statics[name];
+            Object.getOwnPropertyNames(classData.statics).forEach(name => {
+                const staticMember = classData.statics[name];
                 if (schema_1.isFunctionMetadata(staticMember)) {
                     validateExpression(staticMember.value);
                 }
@@ -624,11 +595,11 @@ function validateMetadata(sourceFile, nodeMap, metadata) {
     }
     function validateFunction(functionDeclaration) {
         if (functionDeclaration.value) {
-            var oldLocals = locals;
+            const oldLocals = locals;
             if (functionDeclaration.parameters) {
                 locals = new Set(oldLocals.values());
                 if (functionDeclaration.parameters)
-                    functionDeclaration.parameters.forEach(function (n) { return locals.add(n); });
+                    functionDeclaration.parameters.forEach(n => locals.add(n));
             }
             validateExpression(functionDeclaration.value);
             locals = oldLocals;
@@ -636,62 +607,60 @@ function validateMetadata(sourceFile, nodeMap, metadata) {
     }
     function shouldReportNode(node) {
         if (node) {
-            var nodeStart = node.getStart();
+            const nodeStart = node.getStart();
             return !(node.pos != nodeStart &&
                 sourceFile.text.substring(node.pos, nodeStart).indexOf('@dynamic') >= 0);
         }
         return true;
     }
     function reportError(error) {
-        var node = nodeMap.get(error);
+        const node = nodeMap.get(error);
         if (shouldReportNode(node)) {
-            var lineInfo = error.line != undefined ?
-                error.character != undefined ? ":" + (error.line + 1) + ":" + (error.character + 1) :
-                    ":" + (error.line + 1) :
+            const lineInfo = error.line != undefined ?
+                error.character != undefined ? `:${error.line + 1}:${error.character + 1}` :
+                    `:${error.line + 1}` :
                 '';
-            throw new Error("" + sourceFile.fileName + lineInfo + ": Metadata collected contains an error that will be reported at runtime: " + expandedMessage(error) + ".\n  " + JSON.stringify(error));
+            throw new Error(`${sourceFile.fileName}${lineInfo}: Metadata collected contains an error that will be reported at runtime: ${expandedMessage(error)}.\n  ${JSON.stringify(error)}`);
         }
     }
-    Object.getOwnPropertyNames(metadata).forEach(function (name) {
-        var entry = metadata[name];
+    Object.getOwnPropertyNames(metadata).forEach(name => {
+        const entry = metadata[name];
         try {
             if (schema_1.isClassMetadata(entry)) {
                 validateClass(entry);
             }
         }
         catch (e) {
-            var node = nodeMap.get(entry);
+            const node = nodeMap.get(entry);
             if (shouldReportNode(node)) {
                 if (node) {
-                    var _a = sourceFile.getLineAndCharacterOfPosition(node.getStart()), line = _a.line, character = _a.character;
-                    throw new Error(sourceFile.fileName + ":" + (line + 1) + ":" + (character + 1) + ": Error encountered in metadata generated for exported symbol '" + name + "': \n " + e.message);
+                    const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+                    throw new Error(`${sourceFile.fileName}:${line + 1}:${character + 1}: Error encountered in metadata generated for exported symbol '${name}': \n ${e.message}`);
                 }
-                throw new Error("Error encountered in metadata generated for exported symbol " + name + ": \n " + e.message);
+                throw new Error(`Error encountered in metadata generated for exported symbol ${name}: \n ${e.message}`);
             }
         }
     });
 }
 // Collect parameter names from a function.
 function namesOf(parameters) {
-    var result = [];
+    const result = [];
     function addNamesOf(name) {
         if (name.kind == ts.SyntaxKind.Identifier) {
-            var identifier = name;
+            const identifier = name;
             result.push(identifier.text);
         }
         else {
-            var bindingPattern = name;
-            for (var _i = 0, _a = bindingPattern.elements; _i < _a.length; _i++) {
-                var element = _a[_i];
-                var name_11 = element.name;
-                if (name_11) {
-                    addNamesOf(name_11);
+            const bindingPattern = name;
+            for (const element of bindingPattern.elements) {
+                const name = element.name;
+                if (name) {
+                    addNamesOf(name);
                 }
             }
         }
     }
-    for (var _i = 0, parameters_2 = parameters; _i < parameters_2.length; _i++) {
-        var parameter = parameters_2[_i];
+    for (const parameter of parameters) {
         addNamesOf(parameter.name);
     }
     return result;
@@ -700,7 +669,7 @@ function expandedMessage(error) {
     switch (error.message) {
         case 'Reference to non-exported class':
             if (error.context && error.context.className) {
-                return "Reference to a non-exported class " + error.context.className + ". Consider exporting the class";
+                return `Reference to a non-exported class ${error.context.className}. Consider exporting the class`;
             }
             break;
         case 'Variable not initialized':
@@ -709,16 +678,16 @@ function expandedMessage(error) {
             return 'Referencing an exported destructured variable or constant is not supported by the template compiler. Consider simplifying this to avoid destructuring';
         case 'Could not resolve type':
             if (error.context && error.context.typeName) {
-                return "Could not resolve type " + error.context.typeName;
+                return `Could not resolve type ${error.context.typeName}`;
             }
             break;
         case 'Function call not supported':
-            var prefix = error.context && error.context.name ? "Calling function '" + error.context.name + "', f" : 'F';
+            let prefix = error.context && error.context.name ? `Calling function '${error.context.name}', f` : 'F';
             return prefix +
                 'unction calls are not supported. Consider replacing the function or lambda with a reference to an exported function';
         case 'Reference to a local symbol':
             if (error.context && error.context.name) {
-                return "Reference to a local (non-exported) symbol '" + error.context.name + "'. Consider exporting the symbol";
+                return `Reference to a local (non-exported) symbol '${error.context.name}'. Consider exporting the symbol`;
             }
     }
     return error.message;

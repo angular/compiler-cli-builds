@@ -7,13 +7,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var ts = require("typescript");
-var api_1 = require("../transformers/api");
-var util_1 = require("../transformers/util");
+const ts = require("typescript");
+const api_1 = require("../transformers/api");
+const util_1 = require("../transformers/util");
 function translateDiagnostics(host, untranslatedDiagnostics) {
-    var ts = [];
-    var ng = [];
-    untranslatedDiagnostics.forEach(function (diagnostic) {
+    const ts = [];
+    const ng = [];
+    untranslatedDiagnostics.forEach((diagnostic) => {
         if (diagnostic.file && diagnostic.start && util_1.GENERATED_FILES.test(diagnostic.file.fileName)) {
             // We need to filter out diagnostics about unused functions as
             // they are in fact referenced by nobody and only serve to surface
@@ -21,12 +21,12 @@ function translateDiagnostics(host, untranslatedDiagnostics) {
             if (diagnostic.code === /* ... is declared but never used */ 6133) {
                 return;
             }
-            var span = sourceSpanOf(host, diagnostic.file, diagnostic.start);
+            const span = sourceSpanOf(host, diagnostic.file, diagnostic.start);
             if (span) {
-                var fileName = span.start.file.url;
+                const fileName = span.start.file.url;
                 ng.push({
                     messageText: diagnosticMessageToString(diagnostic.messageText),
-                    category: diagnostic.category, span: span,
+                    category: diagnostic.category, span,
                     source: api_1.SOURCE,
                     code: api_1.DEFAULT_ERROR_CODE
                 });
@@ -36,11 +36,11 @@ function translateDiagnostics(host, untranslatedDiagnostics) {
             ts.push(diagnostic);
         }
     });
-    return { ts: ts, ng: ng };
+    return { ts, ng };
 }
 exports.translateDiagnostics = translateDiagnostics;
 function sourceSpanOf(host, source, start) {
-    var _a = ts.getLineAndCharacterOfPosition(source, start), line = _a.line, character = _a.character;
+    const { line, character } = ts.getLineAndCharacterOfPosition(source, start);
     return host.parseSourceSpanOf(source.fileName, line, character);
 }
 function diagnosticMessageToString(message) {

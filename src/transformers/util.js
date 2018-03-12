@@ -7,10 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var compiler_1 = require("@angular/compiler");
-var path = require("path");
-var ts = require("typescript");
-var api_1 = require("./api");
+const compiler_1 = require("@angular/compiler");
+const path = require("path");
+const ts = require("typescript");
+const api_1 = require("./api");
 exports.GENERATED_FILES = /(.*?)\.(ngfactory|shim\.ngstyle|ngstyle|ngsummary)\.(js|d\.ts|ts)$/;
 exports.DTS = /\.d\.ts$/;
 exports.TS = /^(?!.*\.d\.ts$).*\.ts$/;
@@ -20,7 +20,7 @@ function tsStructureIsReused(program) {
 }
 exports.tsStructureIsReused = tsStructureIsReused;
 function error(msg) {
-    throw new Error("Internal error: " + msg);
+    throw new Error(`Internal error: ${msg}`);
 }
 exports.error = error;
 function userError(msg) {
@@ -32,7 +32,7 @@ function createMessageDiagnostic(messageText) {
         file: undefined,
         start: undefined,
         length: undefined,
-        category: ts.DiagnosticCategory.Message, messageText: messageText,
+        category: ts.DiagnosticCategory.Message, messageText,
         code: api_1.DEFAULT_ERROR_CODE,
         source: api_1.SOURCE,
     };
@@ -45,9 +45,8 @@ exports.isInRootDir = isInRootDir;
 function relativeToRootDirs(filePath, rootDirs) {
     if (!filePath)
         return filePath;
-    for (var _i = 0, _a = rootDirs || []; _i < _a.length; _i++) {
-        var dir = _a[_i];
-        var rel = pathStartsWithPrefix(dir, filePath);
+    for (const dir of rootDirs || []) {
+        const rel = pathStartsWithPrefix(dir, filePath);
         if (rel) {
             return rel;
         }
@@ -56,7 +55,7 @@ function relativeToRootDirs(filePath, rootDirs) {
 }
 exports.relativeToRootDirs = relativeToRootDirs;
 function pathStartsWithPrefix(prefix, fullPath) {
-    var rel = path.relative(prefix, fullPath);
+    const rel = path.relative(prefix, fullPath);
     return rel.startsWith('..') ? null : rel;
 }
 /**
@@ -66,9 +65,9 @@ function pathStartsWithPrefix(prefix, fullPath) {
  * I.e. only use this where the API allows only a ts.Diagnostic.
  */
 function ngToTsDiagnostic(ng) {
-    var file;
-    var start;
-    var length;
+    let file;
+    let start;
+    let length;
     if (ng.span) {
         // Note: We can't use a real ts.SourceFile,
         // but we can at least mirror the properties `fileName` and `text`, which
@@ -78,10 +77,10 @@ function ngToTsDiagnostic(ng) {
         length = ng.span.end.offset - start;
     }
     return {
-        file: file,
+        file,
         messageText: ng.messageText,
         category: ng.category,
-        code: ng.code, start: start, length: length,
+        code: ng.code, start, length,
     };
 }
 exports.ngToTsDiagnostic = ngToTsDiagnostic;
