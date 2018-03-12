@@ -8,14 +8,18 @@
 import * as ts from 'typescript';
 import { MetadataObject, MetadataValue } from '../metadata/index';
 import { MetadataTransformer, ValueTransform } from './metadata_cache';
-export declare type ResourceLoader = {
+/** A subset of members from AotCompilerHost */
+export declare type ResourcesHost = {
+    resourceNameToFileName(resourceName: string, containingFileName: string): string | null;
     loadResource(path: string): Promise<string> | string;
+};
+export declare type StaticResourceLoader = {
+    get(url: string | MetadataValue): string;
 };
 export declare class InlineResourcesMetadataTransformer implements MetadataTransformer {
     private host;
-    constructor(host: ResourceLoader);
+    constructor(host: ResourcesHost);
     start(sourceFile: ts.SourceFile): ValueTransform | undefined;
-    inlineResource(url: MetadataValue): string | undefined;
-    updateDecoratorMetadata(arg: MetadataObject): MetadataObject;
+    updateDecoratorMetadata(loader: StaticResourceLoader, arg: MetadataObject): MetadataObject;
 }
-export declare function getInlineResourcesTransformFactory(program: ts.Program, host: ResourceLoader): ts.TransformerFactory<ts.SourceFile>;
+export declare function getInlineResourcesTransformFactory(program: ts.Program, host: ResourcesHost): ts.TransformerFactory<ts.SourceFile>;
