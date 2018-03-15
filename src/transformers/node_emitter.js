@@ -57,7 +57,7 @@ function updateSourceFile(sourceFile, module, context) {
     const classes = module.statements.filter(statement => statement instanceof compiler_1.ClassStmt);
     const classMap = new Map(classes.map(classStatement => [classStatement.name, classStatement]));
     const classNames = new Set(classes.map(classStatement => classStatement.name));
-    const prefix = prefixStatements.map(statement => statement.visitStatement(converter, null));
+    const prefix = prefixStatements.map(statement => statement.visitStatement(converter, sourceFile));
     // Add static methods to all the classes referenced in module.
     let newStatements = sourceFile.statements.map(node => {
         if (node.kind == ts.SyntaxKind.ClassDeclaration) {
@@ -292,7 +292,7 @@ class _NodeEmitterVisitor {
         }
         return this.record(stmt, ts.createVariableStatement(this.getModifiers(stmt), varDeclList));
     }
-    visitDeclareFunctionStmt(stmt, context) {
+    visitDeclareFunctionStmt(stmt) {
         return this.record(stmt, ts.createFunctionDeclaration(
         /* decorators */ undefined, this.getModifiers(stmt), 
         /* asteriskToken */ undefined, stmt.name, /* typeParameters */ undefined, stmt.params.map(p => ts.createParameter(
@@ -350,7 +350,19 @@ class _NodeEmitterVisitor {
     visitThrowStmt(stmt) {
         return this.record(stmt, ts.createThrow(stmt.error.visitExpression(this, null)));
     }
-    visitCommentStmt(stmt) { return null; }
+    visitCommentStmt(stmt, sourceFile) {
+        const text = stmt.multiline ? ` ${stmt.comment} ` : ` ${stmt.comment}`;
+        return this.createCommentStmt(text, stmt.multiline, sourceFile);
+    }
+    visitJSDocCommentStmt(stmt, sourceFile) {
+        return this.createCommentStmt(stmt.toString(), true, sourceFile);
+    }
+    createCommentStmt(text, multiline, sourceFile) {
+        const commentStmt = ts.createNotEmittedStatement(sourceFile);
+        const kind = multiline ? ts.SyntaxKind.MultiLineCommentTrivia : ts.SyntaxKind.SingleLineCommentTrivia;
+        ts.setSyntheticLeadingComments(commentStmt, [{ kind, text, pos: -1, end: -1 }]);
+        return commentStmt;
+    }
     // ExpressionVisitor
     visitReadVarExpr(expr) {
         switch (expr.builtin) {
