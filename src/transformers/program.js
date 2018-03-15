@@ -682,7 +682,6 @@ function getAotCompilerOptions(options) {
     return {
         locale: options.i18nInLocale,
         i18nFormat: options.i18nInFormat || options.i18nOutFormat, translations, missingTranslation,
-        enableLegacyTemplate: options.enableLegacyTemplate,
         enableSummariesForJit: options.enableSummariesForJit,
         preserveWhitespaces: options.preserveWhitespaces,
         fullTemplateTypeCheck: options.fullTemplateTypeCheck,
