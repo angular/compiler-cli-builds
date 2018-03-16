@@ -14,6 +14,8 @@ export interface RequestsMap {
 export declare class LowerMetadataTransform implements RequestsMap, MetadataTransformer {
     private cache;
     private requests;
+    private lowerableFieldNames;
+    constructor(lowerableFieldNames: string[]);
     getRequests(sourceFile: ts.SourceFile): RequestLocationMap;
     connect(cache: MetadataCache): void;
     start(sourceFile: ts.SourceFile): ValueTransform | undefined;
