@@ -1,12 +1,5 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-import { CollectorOptions, ModuleMetadata } from '@angular/tsc-wrapped';
 import * as ts from 'typescript';
+import { MetadataCache, MetadataTransformer, ValueTransform } from './metadata_cache';
 export interface LoweringRequest {
     kind: ts.SyntaxKind;
     location: number;
@@ -14,17 +7,16 @@ export interface LoweringRequest {
     name: string;
 }
 export declare type RequestLocationMap = Map<number, LoweringRequest>;
-export declare function getExpressionLoweringTransformFactory(requestsMap: RequestsMap): (context: ts.TransformationContext) => (sourceFile: ts.SourceFile) => ts.SourceFile;
+export declare function getExpressionLoweringTransformFactory(requestsMap: RequestsMap, program: ts.Program): (context: ts.TransformationContext) => (sourceFile: ts.SourceFile) => ts.SourceFile;
 export interface RequestsMap {
     getRequests(sourceFile: ts.SourceFile): RequestLocationMap;
 }
-export declare class LowerMetadataCache implements RequestsMap {
-    private strict;
-    private collector;
-    private metadataCache;
-    constructor(options: CollectorOptions, strict?: boolean | undefined);
-    getMetadata(sourceFile: ts.SourceFile): ModuleMetadata | undefined;
+export declare class LowerMetadataTransform implements RequestsMap, MetadataTransformer {
+    private cache;
+    private requests;
+    private lowerableFieldNames;
+    constructor(lowerableFieldNames: string[]);
     getRequests(sourceFile: ts.SourceFile): RequestLocationMap;
-    private ensureMetadataAndRequests(sourceFile);
-    private getMetadataAndRequests(sourceFile);
+    connect(cache: MetadataCache): void;
+    start(sourceFile: ts.SourceFile): ValueTransform | undefined;
 }

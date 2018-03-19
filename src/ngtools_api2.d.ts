@@ -13,6 +13,11 @@
  *
  * Once the ngc api is public and stable, this can be removed.
  */
+/**
+ *********************************************************************
+ * Changes to this file need to be approved by the Angular CLI team. *
+ *********************************************************************
+ */
 import { ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
 export interface Diagnostic {
@@ -33,7 +38,6 @@ export interface CompilerOptions extends ts.CompilerOptions {
     annotateForClosureCompiler?: boolean;
     annotationsAs?: 'decorators' | 'static fields';
     trace?: boolean;
-    enableLegacyTemplate?: boolean;
     disableExpressionLowering?: boolean;
     i18nOutLocale?: string;
     i18nOutFormat?: string;
@@ -43,19 +47,24 @@ export interface CompilerOptions extends ts.CompilerOptions {
     i18nInFile?: string;
     i18nInMissingTranslations?: 'error' | 'warning' | 'ignore';
     preserveWhitespaces?: boolean;
+    disableTypeScriptVersionCheck?: boolean;
 }
 export interface CompilerHost extends ts.CompilerHost {
-    moduleNameToFileName(moduleName: string, containingFile?: string): string | null;
-    fileNameToModuleName(importedFilePath: string, containingFilePath: string): string | null;
-    resourceNameToFileName(resourceName: string, containingFilePath: string): string | null;
-    toSummaryFileName(fileName: string, referringSrcFileName: string): string;
-    fromSummaryFileName(fileName: string, referringLibFileName: string): string;
+    moduleNameToFileName?(moduleName: string, containingFile?: string): string | null;
+    fileNameToModuleName?(importedFilePath: string, containingFilePath: string): string;
+    resourceNameToFileName?(resourceName: string, containingFilePath: string): string | null;
+    toSummaryFileName?(fileName: string, referringSrcFileName: string): string;
+    fromSummaryFileName?(fileName: string, referringLibFileName: string): string;
     readResource?(fileName: string): Promise<string> | string;
 }
 export declare enum EmitFlags {
     DTS = 1,
     JS = 2,
-    Default = 3,
+    Metadata = 4,
+    I18nBundle = 8,
+    Codegen = 16,
+    Default = 19,
+    All = 31,
 }
 export interface CustomTransformers {
     beforeTs?: ts.TransformerFactory<ts.SourceFile>[];
@@ -74,15 +83,27 @@ export interface TsEmitArguments {
 export interface TsEmitCallback {
     (args: TsEmitArguments): ts.EmitResult;
 }
+export interface LazyRoute {
+    module: {
+        name: string;
+        filePath: string;
+    };
+    route: string;
+    referencedModule: {
+        name: string;
+        filePath: string;
+    };
+}
 export interface Program {
     getTsProgram(): ts.Program;
-    getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
-    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken): Diagnostic[];
-    getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
-    getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken): Diagnostic[];
-    getTsSemanticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
-    getNgSemanticDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): Diagnostic[];
+    getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic>;
+    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
+    getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic>;
+    getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
+    getTsSemanticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic>;
+    getNgSemanticDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
     loadNgStructureAsync(): Promise<void>;
+    listLazyRoutes(entryRoute?: string): LazyRoute[];
     emit({emitFlags, cancellationToken, customTransformers, emitCallback}: {
         emitFlags?: EmitFlags;
         cancellationToken?: ts.CancellationToken;
@@ -100,5 +121,5 @@ export declare function createCompilerHost({options, tsHost}: {
     options: CompilerOptions;
     tsHost?: ts.CompilerHost;
 }): CompilerHost;
-export declare type Diagnostics = Array<ts.Diagnostic | Diagnostic>;
-export declare function formatDiagnostics(options: CompilerOptions, diags: Diagnostics): string;
+export declare type Diagnostics = ReadonlyArray<ts.Diagnostic | Diagnostic>;
+export declare function formatDiagnostics(diags: Diagnostics): string;

@@ -1,167 +1,124 @@
 #!/usr/bin/env node
 "use strict";
-var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
-        s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-            t[p] = s[p];
-    }
-    return t;
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 require("reflect-metadata");
-var ts = require("typescript");
-var tsc = require("@angular/tsc-wrapped");
-var tsickle = require("tsickle");
-var api = require("./transformers/api");
-var perform_compile_1 = require("./perform_compile");
-var perform_watch_1 = require("./perform_watch");
-var compiler_1 = require("@angular/compiler");
-var codegen_1 = require("./codegen");
-// TODO(tbosch): remove this old entrypoint once we drop `disableTransformerPipeline`.
-function main(args, consoleError) {
-    if (consoleError === void 0) { consoleError = console.error; }
-    var _a = readNgcCommandLineAndConfiguration(args), project = _a.project, rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors, watch = _a.watch;
+const ts = require("typescript");
+const tsickle = require("tsickle/src/tsickle");
+const api = require("./transformers/api");
+const util_1 = require("./transformers/util");
+const perform_compile_1 = require("./perform_compile");
+const perform_watch_1 = require("./perform_watch");
+function main(args, consoleError = console.error, config) {
+    let { project, rootNames, options, errors: configErrors, watch, emitFlags } = config || readNgcCommandLineAndConfiguration(args);
     if (configErrors.length) {
-        return Promise.resolve(reportErrorsAndExit(options, configErrors, consoleError));
+        return reportErrorsAndExit(configErrors, /*options*/ undefined, consoleError);
     }
     if (watch) {
-        var result = watchMode(project, options, consoleError);
-        return Promise.resolve(reportErrorsAndExit({}, result.firstCompileResult, consoleError));
+        const result = watchMode(project, options, consoleError);
+        return reportErrorsAndExit(result.firstCompileResult, options, consoleError);
     }
-    if (options.disableTransformerPipeline) {
-        return disabledTransformerPipelineNgcMain(args, consoleError);
-    }
-    var compileDiags = perform_compile_1.performCompilation({ rootNames: rootNames, options: options, emitCallback: createEmitCallback(options) }).diagnostics;
-    return Promise.resolve(reportErrorsAndExit(options, compileDiags, consoleError));
+    const { diagnostics: compileDiags } = perform_compile_1.performCompilation({ rootNames, options, emitFlags, emitCallback: createEmitCallback(options) });
+    return reportErrorsAndExit(compileDiags, options, consoleError);
 }
 exports.main = main;
-function mainSync(args, consoleError, config) {
-    if (consoleError === void 0) { consoleError = console.error; }
-    var _a = config || readNgcCommandLineAndConfiguration(args), project = _a.project, rootNames = _a.rootNames, options = _a.options, configErrors = _a.errors, watch = _a.watch, emitFlags = _a.emitFlags;
-    if (configErrors.length) {
-        return reportErrorsAndExit(options, configErrors, consoleError);
-    }
-    if (watch) {
-        var result = watchMode(project, options, consoleError);
-        return reportErrorsAndExit({}, result.firstCompileResult, consoleError);
-    }
-    var compileDiags = perform_compile_1.performCompilation({ rootNames: rootNames, options: options, emitFlags: emitFlags, emitCallback: createEmitCallback(options) }).diagnostics;
-    return reportErrorsAndExit(options, compileDiags, consoleError);
-}
-exports.mainSync = mainSync;
 function createEmitCallback(options) {
-    var tsickleHost = {
-        shouldSkipTsickleProcessing: function (fileName) { return /\.d\.ts$/.test(fileName); },
-        pathToModuleName: function (context, importPath) { return ''; },
-        shouldIgnoreWarningsForPath: function (filePath) { return false; },
-        fileNameToModuleId: function (fileName) { return fileName; },
+    const transformDecorators = options.annotationsAs !== 'decorators';
+    const transformTypesToClosure = options.annotateForClosureCompiler;
+    if (!transformDecorators && !transformTypesToClosure) {
+        return undefined;
+    }
+    if (transformDecorators) {
+        // This is needed as a workaround for https://github.com/angular/tsickle/issues/635
+        // Otherwise tsickle might emit references to non imported values
+        // as TypeScript elided the import.
+        options.emitDecoratorMetadata = true;
+    }
+    const tsickleHost = {
+        shouldSkipTsickleProcessing: (fileName) => /\.d\.ts$/.test(fileName) || util_1.GENERATED_FILES.test(fileName),
+        pathToModuleName: (context, importPath) => '',
+        shouldIgnoreWarningsForPath: (filePath) => false,
+        fileNameToModuleId: (fileName) => fileName,
         googmodule: false,
         untyped: true,
-        convertIndexImportShorthand: true,
-        transformDecorators: options.annotationsAs !== 'decorators',
-        transformTypesToClosure: options.annotateForClosureCompiler,
+        convertIndexImportShorthand: false, transformDecorators, transformTypesToClosure,
     };
-    return function (_a) {
-        var program = _a.program, targetSourceFile = _a.targetSourceFile, writeFile = _a.writeFile, cancellationToken = _a.cancellationToken, emitOnlyDtsFiles = _a.emitOnlyDtsFiles, _b = _a.customTransformers, customTransformers = _b === void 0 ? {} : _b, host = _a.host, options = _a.options;
-        return tsickle.emitWithTsickle(program, tsickleHost, host, options, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
-            beforeTs: customTransformers.before,
-            afterTs: customTransformers.after,
-        });
-    };
+    return ({ program, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, customTransformers = {}, host, options }) => tsickle.emitWithTsickle(program, Object.assign({}, tsickleHost, { options, host }), host, options, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
+        beforeTs: customTransformers.before,
+        afterTs: customTransformers.after,
+    });
 }
 function readNgcCommandLineAndConfiguration(args) {
-    var options = {};
-    var parsedArgs = require('minimist')(args);
+    const options = {};
+    const parsedArgs = require('minimist')(args);
     if (parsedArgs.i18nFile)
         options.i18nInFile = parsedArgs.i18nFile;
     if (parsedArgs.i18nFormat)
         options.i18nInFormat = parsedArgs.i18nFormat;
     if (parsedArgs.locale)
         options.i18nInLocale = parsedArgs.locale;
-    var mt = parsedArgs.missingTranslation;
+    const mt = parsedArgs.missingTranslation;
     if (mt === 'error' || mt === 'warning' || mt === 'ignore') {
         options.i18nInMissingTranslations = mt;
     }
-    var config = readCommandLineAndConfiguration(args, options, ['i18nFile', 'i18nFormat', 'locale', 'missingTranslation', 'watch']);
-    var watch = parsedArgs.w || parsedArgs.watch;
-    return __assign({}, config, { watch: watch });
+    const config = readCommandLineAndConfiguration(args, options, ['i18nFile', 'i18nFormat', 'locale', 'missingTranslation', 'watch']);
+    const watch = parsedArgs.w || parsedArgs.watch;
+    return Object.assign({}, config, { watch });
 }
-function readCommandLineAndConfiguration(args, existingOptions, ngCmdLineOptions) {
-    if (existingOptions === void 0) { existingOptions = {}; }
-    if (ngCmdLineOptions === void 0) { ngCmdLineOptions = []; }
-    var cmdConfig = ts.parseCommandLine(args);
-    var project = cmdConfig.options.project || '.';
-    var cmdErrors = cmdConfig.errors.filter(function (e) {
+function readCommandLineAndConfiguration(args, existingOptions = {}, ngCmdLineOptions = []) {
+    let cmdConfig = ts.parseCommandLine(args);
+    const project = cmdConfig.options.project || '.';
+    const cmdErrors = cmdConfig.errors.filter(e => {
         if (typeof e.messageText === 'string') {
-            var msg_1 = e.messageText;
-            return !ngCmdLineOptions.some(function (o) { return msg_1.indexOf(o) >= 0; });
+            const msg = e.messageText;
+            return !ngCmdLineOptions.some(o => msg.indexOf(o) >= 0);
         }
         return true;
     });
     if (cmdErrors.length) {
         return {
-            project: project,
+            project,
             rootNames: [],
             options: cmdConfig.options,
             errors: cmdErrors,
             emitFlags: api.EmitFlags.Default
         };
     }
-    var allDiagnostics = [];
-    var config = perform_compile_1.readConfiguration(project, cmdConfig.options);
-    var options = __assign({}, config.options, existingOptions);
+    const allDiagnostics = [];
+    const config = perform_compile_1.readConfiguration(project, cmdConfig.options);
+    const options = Object.assign({}, config.options, existingOptions);
     if (options.locale) {
         options.i18nInLocale = options.locale;
     }
     return {
-        project: project,
-        rootNames: config.rootNames, options: options,
+        project,
+        rootNames: config.rootNames, options,
         errors: config.errors,
         emitFlags: config.emitFlags
     };
 }
 exports.readCommandLineAndConfiguration = readCommandLineAndConfiguration;
-function reportErrorsAndExit(options, allDiagnostics, consoleError) {
-    if (consoleError === void 0) { consoleError = console.error; }
-    if (allDiagnostics.length) {
-        consoleError(perform_compile_1.formatDiagnostics(options, allDiagnostics));
+function reportErrorsAndExit(allDiagnostics, options, consoleError = console.error) {
+    const errorsAndWarnings = perform_compile_1.filterErrorsAndWarnings(allDiagnostics);
+    if (errorsAndWarnings.length) {
+        let currentDir = options ? options.basePath : undefined;
+        const formatHost = {
+            getCurrentDirectory: () => currentDir || ts.sys.getCurrentDirectory(),
+            getCanonicalFileName: fileName => fileName,
+            getNewLine: () => ts.sys.newLine
+        };
+        consoleError(perform_compile_1.formatDiagnostics(errorsAndWarnings, formatHost));
     }
     return perform_compile_1.exitCodeFromResult(allDiagnostics);
 }
 function watchMode(project, options, consoleError) {
-    return perform_watch_1.performWatchCompilation(perform_watch_1.createPerformWatchHost(project, function (diagnostics) {
-        consoleError(perform_compile_1.formatDiagnostics(options, diagnostics));
-    }, options, function (options) { return createEmitCallback(options); }));
+    return perform_watch_1.performWatchCompilation(perform_watch_1.createPerformWatchHost(project, diagnostics => {
+        consoleError(perform_compile_1.formatDiagnostics(diagnostics));
+    }, options, options => createEmitCallback(options)));
 }
 exports.watchMode = watchMode;
-function disabledTransformerPipelineNgcMain(args, consoleError) {
-    if (consoleError === void 0) { consoleError = console.error; }
-    var parsedArgs = require('minimist')(args);
-    var cliOptions = new tsc.NgcCliOptions(parsedArgs);
-    var project = parsedArgs.p || parsedArgs.project || '.';
-    return tsc.main(project, cliOptions, disabledTransformerPipelineCodegen)
-        .then(function () { return 0; })
-        .catch(function (e) {
-        if (e instanceof tsc.UserError || compiler_1.isSyntaxError(e)) {
-            consoleError(e.message);
-        }
-        else {
-            consoleError(e.stack);
-        }
-        return Promise.resolve(1);
-    });
-}
-function disabledTransformerPipelineCodegen(ngOptions, cliOptions, program, host) {
-    if (ngOptions.enableSummariesForJit === undefined) {
-        // default to false
-        ngOptions.enableSummariesForJit = false;
-    }
-    return codegen_1.CodeGenerator.create(ngOptions, cliOptions, program, host).codegen();
-}
 // CLI entry point
 if (require.main === module) {
-    var args = process.argv.slice(2);
-    process.exitCode = mainSync(args);
+    const args = process.argv.slice(2);
+    process.exitCode = main(args);
 }
 //# sourceMappingURL=main.js.map
