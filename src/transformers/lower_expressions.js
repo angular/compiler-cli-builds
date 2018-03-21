@@ -154,7 +154,7 @@ function getExpressionLoweringTransformFactory(requestsMap, program) {
     };
 }
 exports.getExpressionLoweringTransformFactory = getExpressionLoweringTransformFactory;
-function shouldLower(node) {
+function isEligibleForLowering(node) {
     if (node) {
         switch (node.kind) {
             case ts.SyntaxKind.SourceFile:
@@ -172,7 +172,7 @@ function shouldLower(node) {
                 // Avoid lowering expressions already in an exported variable declaration
                 return (ts.getCombinedModifierFlags(node) & ts.ModifierFlags.Export) == 0;
         }
-        return shouldLower(node.parent);
+        return isEligibleForLowering(node.parent);
     }
     return true;
 }
@@ -193,10 +193,10 @@ function isLiteralFieldNamed(node, names) {
     }
     return false;
 }
-const LOWERABLE_FIELD_NAMES = new Set(['useValue', 'useFactory', 'data']);
 class LowerMetadataTransform {
-    constructor() {
+    constructor(lowerableFieldNames) {
         this.requests = new Map();
+        this.lowerableFieldNames = new Set(lowerableFieldNames);
     }
     // RequestMap
     getRequests(sourceFile) {
@@ -245,17 +245,41 @@ class LowerMetadataTransform {
             }
             return false;
         };
+        const hasLowerableParentCache = new Map();
+        const shouldBeLowered = (node) => {
+            if (node === undefined) {
+                return false;
+            }
+            let lowerable = false;
+            if ((node.kind === ts.SyntaxKind.ArrowFunction ||
+                node.kind === ts.SyntaxKind.FunctionExpression) &&
+                isEligibleForLowering(node)) {
+                lowerable = true;
+            }
+            else if (isLiteralFieldNamed(node, this.lowerableFieldNames) && isEligibleForLowering(node) &&
+                !isExportedSymbol(node) && !isExportedPropertyAccess(node)) {
+                lowerable = true;
+            }
+            return lowerable;
+        };
+        const hasLowerableParent = (node) => {
+            if (node === undefined) {
+                return false;
+            }
+            if (!hasLowerableParentCache.has(node)) {
+                hasLowerableParentCache.set(node, shouldBeLowered(node.parent) || hasLowerableParent(node.parent));
+            }
+            return hasLowerableParentCache.get(node);
+        };
+        const isLowerable = (node) => {
+            if (node === undefined) {
+                return false;
+            }
+            return shouldBeLowered(node) && !hasLowerableParent(node);
+        };
         return (value, node) => {
-            if (!isPrimitive(value) && !isRewritten(value)) {
-                if ((node.kind === ts.SyntaxKind.ArrowFunction ||
-                    node.kind === ts.SyntaxKind.FunctionExpression) &&
-                    shouldLower(node)) {
-                    return replaceNode(node);
-                }
-                if (isLiteralFieldNamed(node, LOWERABLE_FIELD_NAMES) && shouldLower(node) &&
-                    !isExportedSymbol(node) && !isExportedPropertyAccess(node)) {
-                    return replaceNode(node);
-                }
+            if (!isPrimitive(value) && !isRewritten(value) && isLowerable(node)) {
+                return replaceNode(node);
             }
             return value;
         };
