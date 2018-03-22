@@ -159,7 +159,7 @@ function exitCodeFromResult(diags) {
     return diags.some(d => d.source === 'angular' && d.code === api.UNKNOWN_ERROR_CODE) ? 2 : 1;
 }
 exports.exitCodeFromResult = exitCodeFromResult;
-function performCompilation({ rootNames, options, host, oldProgram, emitCallback, gatherDiagnostics = defaultGatherDiagnostics, customTransformers, emitFlags = api.EmitFlags.Default }) {
+function performCompilation({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics = defaultGatherDiagnostics, customTransformers, emitFlags = api.EmitFlags.Default }) {
     let program;
     let emitResult;
     let allDiagnostics = [];
@@ -175,7 +175,8 @@ function performCompilation({ rootNames, options, host, oldProgram, emitCallback
             allDiagnostics.push(util_1.createMessageDiagnostic(`Time for diagnostics: ${afterDiags - beforeDiags}ms.`));
         }
         if (!hasErrors(allDiagnostics)) {
-            emitResult = program.emit({ emitCallback, customTransformers, emitFlags });
+            emitResult =
+                program.emit({ emitCallback, mergeEmitResultsCallback, customTransformers, emitFlags });
             allDiagnostics.push(...emitResult.diagnostics);
             return { diagnostics: allDiagnostics, program, emitResult };
         }

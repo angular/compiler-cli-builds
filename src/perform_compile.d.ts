@@ -33,12 +33,13 @@ export interface PerformCompilationResult {
     emitResult?: ts.EmitResult;
 }
 export declare function exitCodeFromResult(diags: Diagnostics | undefined): number;
-export declare function performCompilation({rootNames, options, host, oldProgram, emitCallback, gatherDiagnostics, customTransformers, emitFlags}: {
+export declare function performCompilation({rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags}: {
     rootNames: string[];
     options: api.CompilerOptions;
     host?: api.CompilerHost;
     oldProgram?: api.Program;
     emitCallback?: api.TsEmitCallback;
+    mergeEmitResultsCallback?: api.TsMergeEmitResultsCallback;
     gatherDiagnostics?: (program: api.Program) => Diagnostics;
     customTransformers?: api.CustomTransformers;
     emitFlags?: api.EmitFlags;

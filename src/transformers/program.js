@@ -203,7 +203,7 @@ class AngularCompilerProgram {
     _annotateR3Properties(contents) {
         return contents.replace(R3_MATCH_DEFS, R3_NOCOLLAPSE_DEFS);
     }
-    _emitRender3({ emitFlags = api_1.EmitFlags.Default, cancellationToken, customTransformers, emitCallback = defaultEmitCallback } = {}) {
+    _emitRender3({ emitFlags = api_1.EmitFlags.Default, cancellationToken, customTransformers, emitCallback = defaultEmitCallback, mergeEmitResultsCallback = mergeEmitResults, } = {}) {
         const emitStart = Date.now();
         if ((emitFlags & (api_1.EmitFlags.JS | api_1.EmitFlags.DTS | api_1.EmitFlags.Metadata | api_1.EmitFlags.Codegen)) ===
             0) {
@@ -234,7 +234,7 @@ class AngularCompilerProgram {
         });
         return emitResult;
     }
-    _emitRender2({ emitFlags = api_1.EmitFlags.Default, cancellationToken, customTransformers, emitCallback = defaultEmitCallback } = {}) {
+    _emitRender2({ emitFlags = api_1.EmitFlags.Default, cancellationToken, customTransformers, emitCallback = defaultEmitCallback, mergeEmitResultsCallback = mergeEmitResults, } = {}) {
         const emitStart = Date.now();
         if (emitFlags & api_1.EmitFlags.I18nBundle) {
             const locale = this.options.i18nOutLocale || null;
@@ -311,7 +311,7 @@ class AngularCompilerProgram {
             if (sourceFilesToEmit &&
                 (sourceFilesToEmit.length + genTsFiles.length) < MAX_FILE_COUNT_FOR_SINGLE_FILE_EMIT) {
                 const fileNamesToEmit = [...sourceFilesToEmit.map(sf => sf.fileName), ...genTsFiles.map(gf => gf.genFileUrl)];
-                emitResult = mergeEmitResults(fileNamesToEmit.map((fileName) => emitResult = emitCallback({
+                emitResult = mergeEmitResultsCallback(fileNamesToEmit.map((fileName) => emitResult = emitCallback({
                     program: this.tsProgram,
                     host: this.host,
                     options: this.options,
@@ -626,11 +626,11 @@ class AngularCompilerProgram {
     getSourceFilesForEmit() {
         // TODO(tbosch): if one of the files contains a `const enum`
         // always emit all files -> return undefined!
-        let sourceFilesToEmit;
+        let sourceFilesToEmit = this.tsProgram.getSourceFiles().filter(sf => { return !sf.isDeclarationFile && !util_1.GENERATED_FILES.test(sf.fileName); });
         if (this.oldProgramEmittedSourceFiles) {
-            sourceFilesToEmit = this.tsProgram.getSourceFiles().filter(sf => {
+            sourceFilesToEmit = sourceFilesToEmit.filter(sf => {
                 const oldFile = this.oldProgramEmittedSourceFiles.get(sf.fileName);
-                return !sf.isDeclarationFile && !util_1.GENERATED_FILES.test(sf.fileName) && sf !== oldFile;
+                return sf !== oldFile;
             });
         }
         return sourceFilesToEmit;
@@ -840,7 +840,7 @@ function mergeEmitResults(emitResults) {
     for (const er of emitResults) {
         diagnostics.push(...er.diagnostics);
         emitSkipped = emitSkipped || er.emitSkipped;
-        emittedFiles.push(...er.emittedFiles);
+        emittedFiles.push(...(er.emittedFiles || []));
     }
     return { diagnostics, emitSkipped, emittedFiles };
 }
