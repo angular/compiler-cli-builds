@@ -14,7 +14,7 @@ const schema_1 = require("../metadata/schema");
 // The character set used to produce private names.
 const PRIVATE_NAME_CHARS = 'abcdefghijklmnopqrstuvwxyz';
 class MetadataBundler {
-    constructor(root, importAs, host) {
+    constructor(root, importAs, host, privateSymbolPrefix) {
         this.root = root;
         this.importAs = importAs;
         this.host = host;
@@ -22,6 +22,7 @@ class MetadataBundler {
         this.metadataCache = new Map();
         this.exports = new Map();
         this.rootModule = `./${path.basename(root)}`;
+        this.privateSymbolPrefix = (privateSymbolPrefix || '').replace(/\W/g, '_');
     }
     getMetadataBundle() {
         // Export the root module. This also collects the transitive closure of all values referenced by
@@ -164,7 +165,7 @@ class MetadataBundler {
         const result = {};
         const exportedNames = new Set(exportedSymbols.map(s => s.name));
         let privateName = 0;
-        function newPrivateName() {
+        function newPrivateName(prefix) {
             while (true) {
                 let digits = [];
                 let index = privateName++;
@@ -173,8 +174,7 @@ class MetadataBundler {
                     digits.unshift(base[index % base.length]);
                     index = Math.floor(index / base.length);
                 }
-                digits.unshift('\u0275');
-                const result = digits.join('');
+                const result = `\u0275${prefix}${digits.join('')}`;
                 if (!exportedNames.has(result))
                     return result;
             }
@@ -186,7 +186,7 @@ class MetadataBundler {
                 let name = symbol.name;
                 const identifier = `${symbol.declaration.module}:${symbol.declaration.name}`;
                 if (symbol.isPrivate && !symbol.privateName) {
-                    name = newPrivateName();
+                    name = newPrivateName(this.privateSymbolPrefix);
                     symbol.privateName = name;
                 }
                 if (symbolsMap.has(identifier)) {

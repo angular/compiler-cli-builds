@@ -62,7 +62,7 @@ function createBundleIndexHost(ngOptions, rootFiles, host) {
     }
     const file = files[0];
     const indexModule = file.replace(/\.ts$/, '');
-    const bundler = new bundler_1.MetadataBundler(indexModule, ngOptions.flatModuleId, new bundler_1.CompilerHostAdapter(host));
+    const bundler = new bundler_1.MetadataBundler(indexModule, ngOptions.flatModuleId, new bundler_1.CompilerHostAdapter(host), ngOptions.flatModulePrivateSymbolPrefix);
     const metadataBundle = bundler.getMetadataBundle();
     const metadata = JSON.stringify(metadataBundle.metadata);
     const name = path.join(path.dirname(indexModule), ngOptions.flatModuleOutFile.replace(JS_EXT, '.ts'));

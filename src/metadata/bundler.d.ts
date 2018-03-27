@@ -23,8 +23,9 @@ export declare class MetadataBundler {
     private metadataCache;
     private exports;
     private rootModule;
+    private privateSymbolPrefix;
     private exported;
-    constructor(root: string, importAs: string | undefined, host: MetadataBundlerHost);
+    constructor(root: string, importAs: string | undefined, host: MetadataBundlerHost, privateSymbolPrefix?: string);
     getMetadataBundle(): BundledModule;
     static resolveModule(importName: string, from: string): string;
     private getMetadata(moduleName);

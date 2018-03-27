@@ -36,6 +36,7 @@ export interface CompilerOptions extends ts.CompilerOptions {
     strictInjectionParameters?: boolean;
     flatModuleOutFile?: string;
     flatModuleId?: string;
+    flatModulePrivateSymbolPrefix?: string;
     generateCodeForLibraries?: boolean;
     fullTemplateTypeCheck?: boolean;
     annotateForClosureCompiler?: boolean;
