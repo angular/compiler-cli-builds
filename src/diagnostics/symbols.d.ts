@@ -134,7 +134,7 @@ export interface SymbolTable {
  */
 export interface Signature {
     /**
-     * The arguments of the signture. The order of `arguments.symbols()` must be in the order
+     * The arguments of the signture. The order of `argumetnts.symbols()` must be in the order
      * of argument declaration.
      */
     readonly arguments: SymbolTable;
@@ -183,7 +183,7 @@ export declare enum BuiltinType {
     Other = 7,
 }
 /**
- * The kinds of definition.
+ * The kinds of defintion.
  *
  * @experimental
  */

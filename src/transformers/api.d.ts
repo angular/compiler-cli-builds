@@ -114,7 +114,7 @@ export interface CompilerHost extends ts.CompilerHost {
     /**
      * Load a referenced resource either statically or asynchronously. If the host returns a
      * `Promise<string>` it is assumed the user of the corresponding `Program` will call
-     * `loadNgStructureAsync()`. Returning  `Promise<string>` outside `loadNgStructureAsync()` will
+     * `loadNgStructureAsync()`. Returing  `Promise<string>` outside `loadNgStructureAsync()` will
      * cause a diagnostics diagnostic error or an exception to be thrown.
      */
     readResource?(fileName: string): Promise<string> | string;
@@ -210,7 +210,7 @@ export interface Program {
      */
     getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
     /**
-     * Retrieve the semantic diagnostics from TypeScript. This is equivalent to calling
+     * Retrieve the semantic diagnostics from TypeScript. This is equivilent to calling
      * `getTsProgram().getSemanticDiagnostics()` directly and is included for completeness.
      */
     getTsSemanticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic>;

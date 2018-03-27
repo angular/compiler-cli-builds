@@ -200,7 +200,7 @@ class ExpressionDiagnosticsVisitor extends compiler_1.RecursiveTemplateAstVisito
     visitEmbeddedTemplate(ast, context) {
         const previousDirectiveSummary = this.directiveSummary;
         this.push(ast);
-        // Find directive that references this template
+        // Find directive that refernces this template
         this.directiveSummary =
             ast.directives.map(d => d.directive).find(d => hasTemplateReference(d.type));
         // Process children

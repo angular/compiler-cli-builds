@@ -426,7 +426,7 @@ class Evaluator {
                 if (!schema_1.isMetadataModuleReferenceExpression(typeReference) &&
                     typeReferenceNode.typeArguments && typeReferenceNode.typeArguments.length) {
                     const args = typeReferenceNode.typeArguments.map(element => this.evaluateNode(element));
-                    // TODO: Remove typecast when upgraded to 2.0 as it will be correctly inferred.
+                    // TODO: Remove typecast when upgraded to 2.0 as it will be corretly inferred.
                     // Some versions of 1.9 do not infer this correctly.
                     typeReference.arguments = args;
                 }
