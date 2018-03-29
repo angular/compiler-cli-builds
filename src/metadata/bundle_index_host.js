@@ -7,7 +7,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-const fs = require("fs");
 const path = require("path");
 const ts = require("typescript");
 const bundler_1 = require("./bundler");
@@ -29,7 +28,11 @@ function createSyntheticIndexHost(delegate, syntheticIndex) {
     newHost.getSourceFile =
         (fileName, languageVersion, onError) => {
             if (path.normalize(fileName) == normalSyntheticIndexName) {
-                return ts.createSourceFile(fileName, indexContent, languageVersion, true);
+                const sf = ts.createSourceFile(fileName, indexContent, languageVersion, true);
+                if (delegate.fileNameToModuleName) {
+                    sf.moduleName = delegate.fileNameToModuleName(fileName);
+                }
+                return sf;
             }
             return delegate.getSourceFile(fileName, languageVersion, onError);
         };
@@ -37,17 +40,31 @@ function createSyntheticIndexHost(delegate, syntheticIndex) {
         (fileName, data, writeByteOrderMark, onError, sourceFiles) => {
             delegate.writeFile(fileName, data, writeByteOrderMark, onError, sourceFiles);
             if (fileName.match(DTS) && sourceFiles && sourceFiles.length == 1 &&
-                path.normalize(sourceFiles[0].fileName) == normalSyntheticIndexName) {
+                path.normalize(sourceFiles[0].fileName) === normalSyntheticIndexName) {
                 // If we are writing the synthetic index, write the metadata along side.
                 const metadataName = fileName.replace(DTS, '.metadata.json');
-                fs.writeFileSync(metadataName, indexMetadata, { encoding: 'utf8' });
+                delegate.writeFile(metadataName, indexMetadata, writeByteOrderMark, onError, []);
             }
         };
     return newHost;
 }
 function createBundleIndexHost(ngOptions, rootFiles, host) {
     const files = rootFiles.filter(f => !DTS.test(f));
-    if (files.length != 1) {
+    let indexFile;
+    if (files.length === 1) {
+        indexFile = files[0];
+    }
+    else {
+        for (const f of files) {
+            // Assume the shortest file path called index.ts is the entry point
+            if (f.endsWith(path.sep + 'index.ts')) {
+                if (!indexFile || indexFile.length > f.length) {
+                    indexFile = f;
+                }
+            }
+        }
+    }
+    if (!indexFile) {
         return {
             host,
             errors: [{
@@ -60,8 +77,7 @@ function createBundleIndexHost(ngOptions, rootFiles, host) {
                 }]
         };
     }
-    const file = files[0];
-    const indexModule = file.replace(/\.ts$/, '');
+    const indexModule = indexFile.replace(/\.ts$/, '');
     const bundler = new bundler_1.MetadataBundler(indexModule, ngOptions.flatModuleId, new bundler_1.CompilerHostAdapter(host), ngOptions.flatModulePrivateSymbolPrefix);
     const metadataBundle = bundler.getMetadataBundle();
     const metadata = JSON.stringify(metadataBundle.metadata);
