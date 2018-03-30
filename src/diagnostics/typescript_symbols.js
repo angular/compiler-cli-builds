@@ -11,6 +11,7 @@ const fs = require("fs");
 const path = require("path");
 const ts = require("typescript");
 const symbols_1 = require("./symbols");
+const typescript_version_1 = require("./typescript_version");
 // In TypeScript 2.1 these flags moved
 // These helpers work for both 2.0 and 2.1.
 const isPrivate = ts.ModifierFlags ?
@@ -312,21 +313,31 @@ class SignatureResultOverride {
     get arguments() { return this.signature.arguments; }
     get result() { return this.resultType; }
 }
-const toSymbolTable = isTypescriptVersion('2.2') ?
-    (symbols => {
+/**
+ * Indicates the lower bound TypeScript version supporting `SymbolTable` as an ES6 `Map`.
+ * For lower versions, `SymbolTable` is implemented as a dictionary
+ */
+const MIN_TS_VERSION_SUPPORTING_MAP = '2.2';
+exports.toSymbolTableFactory = (tsVersion) => (symbols) => {
+    if (typescript_version_1.isVersionBetween(tsVersion, MIN_TS_VERSION_SUPPORTING_MAP)) {
+        // ∀ Typescript version >= 2.2, `SymbolTable` is implemented as an ES6 `Map`
         const result = new Map();
         for (const symbol of symbols) {
             result.set(symbol.name, symbol);
         }
+        // First, tell the compiler that `result` is of type `any`. Then, use a second type assertion
+        // to `ts.SymbolTable`.
+        // Otherwise, `Map<string, ts.Symbol>` and `ts.SymbolTable` will be considered as incompatible
+        // types by the compiler
         return result;
-    }) :
-    (symbols => {
-        const result = {};
-        for (const symbol of symbols) {
-            result[symbol.name] = symbol;
-        }
-        return result;
-    });
+    }
+    // ∀ Typescript version < 2.2, `SymbolTable` is implemented as a dictionary
+    const result = {};
+    for (const symbol of symbols) {
+        result[symbol.name] = symbol;
+    }
+    return result;
+};
 function toSymbols(symbolTable) {
     if (!symbolTable)
         return [];
@@ -351,6 +362,7 @@ class SymbolTableWrapper {
         symbols = symbols || [];
         if (Array.isArray(symbols)) {
             this.symbols = symbols;
+            const toSymbolTable = exports.toSymbolTableFactory(ts.version);
             this.symbolTable = toSymbolTable(symbols);
         }
         else {
@@ -719,22 +731,5 @@ function getFromSymbolTable(symbolTable, key) {
         symbol = table[key];
     }
     return symbol;
-}
-function toNumbers(value) {
-    return value ? value.split('.').map(v => +v) : [];
-}
-function compareNumbers(a, b) {
-    for (let i = 0; i < a.length && i < b.length; i++) {
-        if (a[i] > b[i])
-            return 1;
-        if (a[i] < b[i])
-            return -1;
-    }
-    return 0;
-}
-function isTypescriptVersion(low, high) {
-    const tsNumbers = toNumbers(ts.version);
-    return compareNumbers(toNumbers(low), tsNumbers) <= 0 &&
-        compareNumbers(toNumbers(high), tsNumbers) >= 0;
 }
 //# sourceMappingURL=typescript_symbols.js.map

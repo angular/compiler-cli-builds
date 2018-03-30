@@ -12,6 +12,7 @@ const fs = require("fs");
 const path = require("path");
 const ts = require("typescript");
 const translate_diagnostics_1 = require("../diagnostics/translate_diagnostics");
+const typescript_version_1 = require("../diagnostics/typescript_version");
 const index_1 = require("../metadata/index");
 const api_1 = require("./api");
 const compiler_host_1 = require("./compiler_host");
@@ -74,15 +75,24 @@ const emptyModules = {
     files: []
 };
 const defaultEmitCallback = ({ program, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, customTransformers }) => program.emit(targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, customTransformers);
+/**
+ * Minimum supported TypeScript version
+ * ∀ supported typescript version v, v >= MIN_TS_VERSION
+ */
+const MIN_TS_VERSION = '2.7.2';
+/**
+ * Supremum of supported TypeScript versions
+ * ∀ supported typescript version v, v < MAX_TS_VERSION
+ * MAX_TS_VERSION is not considered as a supported TypeScript version
+ */
+const MAX_TS_VERSION = '2.8.0';
 class AngularCompilerProgram {
     constructor(rootNames, options, host, oldProgram) {
         this.options = options;
         this.host = host;
         this._optionsDiagnostics = [];
         this.rootNames = [...rootNames];
-        if ((ts.version < '2.7.2' || ts.version >= '2.8.0') && !options.disableTypeScriptVersionCheck) {
-            throw new Error(`The Angular Compiler requires TypeScript >=2.7.2 and <2.8.0 but ${ts.version} was found instead.`);
-        }
+        checkVersion(ts.version, MIN_TS_VERSION, MAX_TS_VERSION, options.disableTypeScriptVersionCheck);
         this.oldTsProgram = oldProgram ? oldProgram.getTsProgram() : undefined;
         if (oldProgram) {
             this.oldProgramLibrarySummaries = oldProgram.getLibrarySummaries();
@@ -683,6 +693,31 @@ class AngularCompilerProgram {
         this.host.writeFile(outFileName, outData, writeByteOrderMark, onError, sourceFiles);
     }
 }
+/**
+ * Checks whether a given version ∈ [minVersion, maxVersion[
+ * An error will be thrown if the following statements are simultaneously true:
+ * - the given version ∉ [minVersion, maxVersion[,
+ * - the result of the version check is not meant to be bypassed (the parameter disableVersionCheck
+ * is false)
+ *
+ * @param version The version on which the check will be performed
+ * @param minVersion The lower bound version. A valid version needs to be greater than minVersion
+ * @param maxVersion The upper bound version. A valid version needs to be strictly less than
+ * maxVersion
+ * @param disableVersionCheck Indicates whether version check should be bypassed
+ *
+ * @throws Will throw an error if the following statements are simultaneously true:
+ * - the given version ∉ [minVersion, maxVersion[,
+ * - the result of the version check is not meant to be bypassed (the parameter disableVersionCheck
+ * is false)
+ */
+function checkVersion(version, minVersion, maxVersion, disableVersionCheck) {
+    if ((typescript_version_1.compareVersions(version, minVersion) < 0 || typescript_version_1.compareVersions(version, maxVersion) >= 0) &&
+        !disableVersionCheck) {
+        throw new Error(`The Angular Compiler requires TypeScript >=${minVersion} and <${maxVersion} but ${version} was found instead.`);
+    }
+}
+exports.checkVersion = checkVersion;
 function createProgram({ rootNames, options, host, oldProgram }) {
     return new AngularCompilerProgram(rootNames, options, host, oldProgram);
 }
