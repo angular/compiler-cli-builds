@@ -15,20 +15,18 @@ const DTS = /\.d\.ts$/;
 const JS_EXT = /(\.js|)$/;
 function createSyntheticIndexHost(delegate, syntheticIndex) {
     const normalSyntheticIndexName = path.normalize(syntheticIndex.name);
-    const indexContent = syntheticIndex.content;
-    const indexMetadata = syntheticIndex.metadata;
     const newHost = Object.create(delegate);
     newHost.fileExists = (fileName) => {
         return path.normalize(fileName) == normalSyntheticIndexName || delegate.fileExists(fileName);
     };
     newHost.readFile = (fileName) => {
-        return path.normalize(fileName) == normalSyntheticIndexName ? indexContent :
+        return path.normalize(fileName) == normalSyntheticIndexName ? syntheticIndex.content :
             delegate.readFile(fileName);
     };
     newHost.getSourceFile =
         (fileName, languageVersion, onError) => {
             if (path.normalize(fileName) == normalSyntheticIndexName) {
-                const sf = ts.createSourceFile(fileName, indexContent, languageVersion, true);
+                const sf = ts.createSourceFile(fileName, syntheticIndex.content, languageVersion, true);
                 if (delegate.fileNameToModuleName) {
                     sf.moduleName = delegate.fileNameToModuleName(fileName);
                 }
@@ -43,12 +41,13 @@ function createSyntheticIndexHost(delegate, syntheticIndex) {
                 path.normalize(sourceFiles[0].fileName) === normalSyntheticIndexName) {
                 // If we are writing the synthetic index, write the metadata along side.
                 const metadataName = fileName.replace(DTS, '.metadata.json');
+                const indexMetadata = syntheticIndex.getMetadata();
                 delegate.writeFile(metadataName, indexMetadata, writeByteOrderMark, onError, []);
             }
         };
     return newHost;
 }
-function createBundleIndexHost(ngOptions, rootFiles, host) {
+function createBundleIndexHost(ngOptions, rootFiles, host, getMetadataCache) {
     const files = rootFiles.filter(f => !DTS.test(f));
     let indexFile;
     if (files.length === 1) {
@@ -78,13 +77,31 @@ function createBundleIndexHost(ngOptions, rootFiles, host) {
         };
     }
     const indexModule = indexFile.replace(/\.ts$/, '');
-    const bundler = new bundler_1.MetadataBundler(indexModule, ngOptions.flatModuleId, new bundler_1.CompilerHostAdapter(host), ngOptions.flatModulePrivateSymbolPrefix);
-    const metadataBundle = bundler.getMetadataBundle();
-    const metadata = JSON.stringify(metadataBundle.metadata);
+    // The operation of producing a metadata bundle happens twice - once during setup and once during
+    // the emit phase. The first time, the bundle is produced without a metadata cache, to compute the
+    // contents of the flat module index. The bundle produced during emit does use the metadata cache
+    // with associated transforms, so the metadata will have lowered expressions, resource inlining,
+    // etc.
+    const getMetadataBundle = (cache) => {
+        const bundler = new bundler_1.MetadataBundler(indexModule, ngOptions.flatModuleId, new bundler_1.CompilerHostAdapter(host, cache), ngOptions.flatModulePrivateSymbolPrefix);
+        return bundler.getMetadataBundle();
+    };
+    // First, produce the bundle with no MetadataCache.
+    const metadataBundle = getMetadataBundle(/* MetadataCache */ null);
     const name = path.join(path.dirname(indexModule), ngOptions.flatModuleOutFile.replace(JS_EXT, '.ts'));
     const libraryIndex = `./${path.basename(indexModule)}`;
     const content = index_writer_1.privateEntriesToIndex(libraryIndex, metadataBundle.privates);
-    host = createSyntheticIndexHost(host, { name, content, metadata });
+    host = createSyntheticIndexHost(host, {
+        name,
+        content,
+        getMetadata: () => {
+            // The second metadata bundle production happens on-demand, and uses the getMetadataCache
+            // closure to retrieve an up-to-date MetadataCache which is configured with whatever metadata
+            // transforms were used to produce the JS output.
+            const metadataBundle = getMetadataBundle(getMetadataCache());
+            return JSON.stringify(metadataBundle.metadata);
+        }
+    });
     return { host, indexName: name };
 }
 exports.createBundleIndexHost = createBundleIndexHost;

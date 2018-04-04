@@ -1,5 +1,6 @@
 import * as ts from 'typescript';
 import { MetadataEntry, ModuleMetadata } from '../metadata/schema';
+import { MetadataCache } from '../transformers/metadata_cache';
 export interface BundleEntries {
     [name: string]: MetadataEntry;
 }
@@ -56,7 +57,8 @@ export declare class MetadataBundler {
 }
 export declare class CompilerHostAdapter implements MetadataBundlerHost {
     private host;
+    private cache;
     private collector;
-    constructor(host: ts.CompilerHost);
+    constructor(host: ts.CompilerHost, cache: MetadataCache | null);
     getMetadataFor(fileName: string): ModuleMetadata | undefined;
 }

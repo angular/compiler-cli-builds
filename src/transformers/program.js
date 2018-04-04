@@ -100,7 +100,7 @@ class AngularCompilerProgram {
             this.oldProgramEmittedSourceFiles = oldProgram.getEmittedSourceFiles();
         }
         if (options.flatModuleOutFile) {
-            const { host: bundleHost, indexName, errors } = index_1.createBundleIndexHost(options, this.rootNames, host);
+            const { host: bundleHost, indexName, errors } = index_1.createBundleIndexHost(options, this.rootNames, host, () => this.metadataCache);
             if (errors) {
                 this._optionsDiagnostics.push(...errors.map(e => ({
                     category: e.category,

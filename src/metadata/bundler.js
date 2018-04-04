@@ -479,15 +479,26 @@ class MetadataBundler {
 }
 exports.MetadataBundler = MetadataBundler;
 class CompilerHostAdapter {
-    constructor(host) {
+    constructor(host, cache) {
         this.host = host;
+        this.cache = cache;
         this.collector = new collector_1.MetadataCollector();
     }
     getMetadataFor(fileName) {
         if (!this.host.fileExists(fileName + '.ts'))
             return undefined;
         const sourceFile = this.host.getSourceFile(fileName + '.ts', ts.ScriptTarget.Latest);
-        return sourceFile && this.collector.getMetadata(sourceFile);
+        // If there is a metadata cache, use it to get the metadata for this source file. Otherwise,
+        // fall back on the locally created MetadataCollector.
+        if (!sourceFile) {
+            return undefined;
+        }
+        else if (this.cache) {
+            return this.cache.getMetadata(sourceFile);
+        }
+        else {
+            return this.collector.getMetadata(sourceFile);
+        }
     }
 }
 exports.CompilerHostAdapter = CompilerHostAdapter;
