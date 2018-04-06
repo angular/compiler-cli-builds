@@ -100,7 +100,7 @@ class AngularCompilerProgram {
             this.oldProgramEmittedSourceFiles = oldProgram.getEmittedSourceFiles();
         }
         if (options.flatModuleOutFile) {
-            const { host: bundleHost, indexName, errors } = index_1.createBundleIndexHost(options, this.rootNames, host, () => this.metadataCache);
+            const { host: bundleHost, indexName, errors } = index_1.createBundleIndexHost(options, this.rootNames, host, () => this.flatModuleMetadataCache);
             if (errors) {
                 this._optionsDiagnostics.push(...errors.map(e => ({
                     category: e.category,
@@ -446,9 +446,12 @@ class AngularCompilerProgram {
     calculateTransforms(genFiles, partialModules, stripDecorators, customTransformers) {
         const beforeTs = [];
         const metadataTransforms = [];
+        const flatModuleMetadataTransforms = [];
         if (this.options.enableResourceInlining) {
             beforeTs.push(inline_resources_1.getInlineResourcesTransformFactory(this.tsProgram, this.hostAdapter));
-            metadataTransforms.push(new inline_resources_1.InlineResourcesMetadataTransformer(this.hostAdapter));
+            const transformer = new inline_resources_1.InlineResourcesMetadataTransformer(this.hostAdapter);
+            metadataTransforms.push(transformer);
+            flatModuleMetadataTransforms.push(transformer);
         }
         if (!this.options.disableExpressionLowering) {
             beforeTs.push(lower_expressions_1.getExpressionLoweringTransformFactory(this.loweringMetadataTransform, this.tsProgram));
@@ -461,17 +464,24 @@ class AngularCompilerProgram {
             beforeTs.push(r3_transform_1.getAngularClassTransformerFactory(partialModules));
             // If we have partial modules, the cached metadata might be incorrect as it doesn't reflect
             // the partial module transforms.
-            metadataTransforms.push(new r3_metadata_transform_1.PartialModuleMetadataTransformer(partialModules));
+            const transformer = new r3_metadata_transform_1.PartialModuleMetadataTransformer(partialModules);
+            metadataTransforms.push(transformer);
+            flatModuleMetadataTransforms.push(transformer);
         }
         if (stripDecorators) {
             beforeTs.push(r3_strip_decorators_1.getDecoratorStripTransformerFactory(stripDecorators, this.compiler.reflector, this.getTsProgram().getTypeChecker()));
-            metadataTransforms.push(new r3_strip_decorators_1.StripDecoratorsMetadataTransformer(stripDecorators, this.compiler.reflector));
+            const transformer = new r3_strip_decorators_1.StripDecoratorsMetadataTransformer(stripDecorators, this.compiler.reflector);
+            metadataTransforms.push(transformer);
+            flatModuleMetadataTransforms.push(transformer);
         }
         if (customTransformers && customTransformers.beforeTs) {
             beforeTs.push(...customTransformers.beforeTs);
         }
         if (metadataTransforms.length > 0) {
             this.metadataCache = this.createMetadataCache(metadataTransforms);
+        }
+        if (flatModuleMetadataTransforms.length > 0) {
+            this.flatModuleMetadataCache = this.createMetadataCache(flatModuleMetadataTransforms);
         }
         const afterTs = customTransformers ? customTransformers.afterTs : undefined;
         return { before: beforeTs, after: afterTs };
