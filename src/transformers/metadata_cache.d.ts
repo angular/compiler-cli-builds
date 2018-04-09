@@ -18,7 +18,7 @@ export interface MetadataTransformer {
  */
 export declare class MetadataCache implements MetadataProvider {
     private collector;
-    private strict;
+    private readonly strict;
     private transformers;
     private metadataCache;
     constructor(collector: MetadataCollector, strict: boolean, transformers: MetadataTransformer[]);

@@ -8,6 +8,7 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const ts = require("typescript");
+const util_1 = require("./util");
 /**
  * Cache, and potentially transform, metadata as it is being collected.
  */
@@ -45,7 +46,8 @@ class MetadataCache {
                 }
             }
         }
-        const result = this.collector.getMetadata(sourceFile, this.strict, substitute);
+        const isTsFile = util_1.TS.test(sourceFile.fileName);
+        const result = this.collector.getMetadata(sourceFile, this.strict && isTsFile, substitute);
         this.metadataCache.set(sourceFile.fileName, result);
         return result;
     }
