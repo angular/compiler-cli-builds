@@ -1,8 +1,6 @@
 "use strict";
-function __export(m) {
-    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
-}
 Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -26,10 +24,10 @@ exports.getPipesTable = typescript_symbols_1.getPipesTable;
 exports.getSymbolQuery = typescript_symbols_1.getSymbolQuery;
 var version_1 = require("./src/version");
 exports.VERSION = version_1.VERSION;
-__export(require("./src/metadata"));
-__export(require("./src/transformers/api"));
-__export(require("./src/transformers/entry_points"));
-__export(require("./src/perform_compile"));
+tslib_1.__exportStar(require("./src/metadata"), exports);
+tslib_1.__exportStar(require("./src/transformers/api"), exports);
+tslib_1.__exportStar(require("./src/transformers/entry_points"), exports);
+tslib_1.__exportStar(require("./src/perform_compile"), exports);
 var ngtools_api_1 = require("./src/ngtools_api");
 exports.__NGTOOLS_PRIVATE_API_2 = ngtools_api_1.NgTools_InternalApi_NG_2;
 var util_1 = require("./src/transformers/util");

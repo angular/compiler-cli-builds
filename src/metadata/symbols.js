@@ -7,45 +7,40 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var ts = require("typescript");
-var Symbols = /** @class */ (function () {
-    function Symbols(sourceFile) {
+const ts = require("typescript");
+class Symbols {
+    constructor(sourceFile) {
         this.sourceFile = sourceFile;
         this.references = new Map();
     }
-    Symbols.prototype.resolve = function (name, preferReference) {
+    resolve(name, preferReference) {
         return (preferReference && this.references.get(name)) || this.symbols.get(name);
-    };
-    Symbols.prototype.define = function (name, value) { this.symbols.set(name, value); };
-    Symbols.prototype.defineReference = function (name, value) {
+    }
+    define(name, value) { this.symbols.set(name, value); }
+    defineReference(name, value) {
         this.references.set(name, value);
-    };
-    Symbols.prototype.has = function (name) { return this.symbols.has(name); };
-    Object.defineProperty(Symbols.prototype, "symbols", {
-        get: function () {
-            var result = this._symbols;
-            if (!result) {
-                result = this._symbols = new Map();
-                populateBuiltins(result);
-                this.buildImports();
-            }
-            return result;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Symbols.prototype.buildImports = function () {
-        var _this = this;
-        var symbols = this._symbols;
+    }
+    has(name) { return this.symbols.has(name); }
+    get symbols() {
+        let result = this._symbols;
+        if (!result) {
+            result = this._symbols = new Map();
+            populateBuiltins(result);
+            this.buildImports();
+        }
+        return result;
+    }
+    buildImports() {
+        const symbols = this._symbols;
         // Collect the imported symbols into this.symbols
-        var stripQuotes = function (s) { return s.replace(/^['"]|['"]$/g, ''); };
-        var visit = function (node) {
+        const stripQuotes = (s) => s.replace(/^['"]|['"]$/g, '');
+        const visit = (node) => {
             switch (node.kind) {
                 case ts.SyntaxKind.ImportEqualsDeclaration:
-                    var importEqualsDeclaration = node;
+                    const importEqualsDeclaration = node;
                     if (importEqualsDeclaration.moduleReference.kind ===
                         ts.SyntaxKind.ExternalModuleReference) {
-                        var externalReference = importEqualsDeclaration.moduleReference;
+                        const externalReference = importEqualsDeclaration.moduleReference;
                         if (externalReference.expression) {
                             // An `import <identifier> = require(<module-specifier>);
                             if (!externalReference.expression.parent) {
@@ -55,17 +50,17 @@ var Symbols = /** @class */ (function () {
                                 // in the parent chain). This doesn't damage the node as the binder unconditionally
                                 // sets the parent.
                                 externalReference.expression.parent = externalReference;
-                                externalReference.parent = _this.sourceFile;
+                                externalReference.parent = this.sourceFile;
                             }
-                            var from_1 = stripQuotes(externalReference.expression.getText());
-                            symbols.set(importEqualsDeclaration.name.text, { __symbolic: 'reference', module: from_1 });
+                            const from = stripQuotes(externalReference.expression.getText());
+                            symbols.set(importEqualsDeclaration.name.text, { __symbolic: 'reference', module: from });
                             break;
                         }
                     }
-                    symbols.set(importEqualsDeclaration.name.text, { __symbolic: 'error', message: "Unsupported import syntax" });
+                    symbols.set(importEqualsDeclaration.name.text, { __symbolic: 'error', message: `Unsupported import syntax` });
                     break;
                 case ts.SyntaxKind.ImportDeclaration:
-                    var importDecl = node;
+                    const importDecl = node;
                     if (!importDecl.importClause) {
                         // An `import <module-specifier>` clause which does not bring symbols into scope.
                         break;
@@ -73,20 +68,19 @@ var Symbols = /** @class */ (function () {
                     if (!importDecl.moduleSpecifier.parent) {
                         // See note above in the `ImportEqualDeclaration` case.
                         importDecl.moduleSpecifier.parent = importDecl;
-                        importDecl.parent = _this.sourceFile;
+                        importDecl.parent = this.sourceFile;
                     }
-                    var from = stripQuotes(importDecl.moduleSpecifier.getText());
+                    const from = stripQuotes(importDecl.moduleSpecifier.getText());
                     if (importDecl.importClause.name) {
-                        // An `import <identifier> form <module-specifier>` clause. Record the defualt symbol.
+                        // An `import <identifier> form <module-specifier>` clause. Record the default symbol.
                         symbols.set(importDecl.importClause.name.text, { __symbolic: 'reference', module: from, default: true });
                     }
-                    var bindings = importDecl.importClause.namedBindings;
+                    const bindings = importDecl.importClause.namedBindings;
                     if (bindings) {
                         switch (bindings.kind) {
                             case ts.SyntaxKind.NamedImports:
                                 // An `import { [<identifier> [, <identifier>] } from <module-specifier>` clause
-                                for (var _i = 0, _a = bindings.elements; _i < _a.length; _i++) {
-                                    var binding = _a[_i];
+                                for (const binding of bindings.elements) {
                                     symbols.set(binding.name.text, {
                                         __symbolic: 'reference',
                                         module: from,
@@ -107,9 +101,8 @@ var Symbols = /** @class */ (function () {
         if (this.sourceFile) {
             ts.forEachChild(this.sourceFile, visit);
         }
-    };
-    return Symbols;
-}());
+    }
+}
 exports.Symbols = Symbols;
 function populateBuiltins(symbols) {
     // From lib.core.d.ts (all "define const")
@@ -118,6 +111,6 @@ function populateBuiltins(symbols) {
         'TypeError', 'URIError', 'JSON', 'ArrayBuffer', 'DataView', 'Int8Array', 'Uint8Array',
         'Uint8ClampedArray', 'Uint16Array', 'Int16Array', 'Int32Array', 'Uint32Array', 'Float32Array',
         'Float64Array']
-        .forEach(function (name) { return symbols.set(name, { __symbolic: 'reference', name: name }); });
+        .forEach(name => symbols.set(name, { __symbolic: 'reference', name }));
 }
 //# sourceMappingURL=symbols.js.map

@@ -7,24 +7,24 @@
  * found in the LICENSE file at https://angular.io/license
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var chokidar = require("chokidar");
-var path = require("path");
-var ts = require("typescript");
-var perform_compile_1 = require("./perform_compile");
-var api = require("./transformers/api");
-var entry_points_1 = require("./transformers/entry_points");
-var util_1 = require("./transformers/util");
+const chokidar = require("chokidar");
+const path = require("path");
+const ts = require("typescript");
+const perform_compile_1 = require("./perform_compile");
+const api = require("./transformers/api");
+const entry_points_1 = require("./transformers/entry_points");
+const util_1 = require("./transformers/util");
 function totalCompilationTimeDiagnostic(timeInMillis) {
-    var duration;
+    let duration;
     if (timeInMillis > 1000) {
-        duration = (timeInMillis / 1000).toPrecision(2) + "s";
+        duration = `${(timeInMillis / 1000).toPrecision(2)}s`;
     }
     else {
-        duration = timeInMillis + "ms";
+        duration = `${timeInMillis}ms`;
     }
     return {
         category: ts.DiagnosticCategory.Message,
-        messageText: "Total time: " + duration,
+        messageText: `Total time: ${duration}`,
         code: api.DEFAULT_ERROR_CODE,
         source: api.SOURCE,
     };
@@ -38,10 +38,10 @@ var FileChangeEvent;
 function createPerformWatchHost(configFileName, reportDiagnostics, existingOptions, createEmitCallback) {
     return {
         reportDiagnostics: reportDiagnostics,
-        createCompilerHost: function (options) { return entry_points_1.createCompilerHost({ options: options }); },
-        readConfiguration: function () { return perform_compile_1.readConfiguration(configFileName, existingOptions); },
-        createEmitCallback: function (options) { return createEmitCallback ? createEmitCallback(options) : undefined; },
-        onFileChange: function (options, listener, ready) {
+        createCompilerHost: options => entry_points_1.createCompilerHost({ options }),
+        readConfiguration: () => perform_compile_1.readConfiguration(configFileName, existingOptions),
+        createEmitCallback: options => createEmitCallback ? createEmitCallback(options) : undefined,
+        onFileChange: (options, listener, ready) => {
             if (!options.basePath) {
                 reportDiagnostics([{
                         category: ts.DiagnosticCategory.Error,
@@ -49,16 +49,16 @@ function createPerformWatchHost(configFileName, reportDiagnostics, existingOptio
                         source: api.SOURCE,
                         code: api.DEFAULT_ERROR_CODE
                     }]);
-                return { close: function () { } };
+                return { close: () => { } };
             }
-            var watcher = chokidar.watch(options.basePath, {
+            const watcher = chokidar.watch(options.basePath, {
                 // ignore .dotfiles, .js and .map files.
                 // can't ignore other files as we e.g. want to recompile if an `.html` file changes as well.
                 ignored: /((^[\/\\])\..)|(\.js$)|(\.map$)|(\.metadata\.json)/,
                 ignoreInitial: true,
                 persistent: true,
             });
-            watcher.on('all', function (event, path) {
+            watcher.on('all', (event, path) => {
                 switch (event) {
                     case 'change':
                         listener(FileChangeEvent.Change, path);
@@ -74,7 +74,7 @@ function createPerformWatchHost(configFileName, reportDiagnostics, existingOptio
                 }
             });
             watcher.on('ready', ready);
-            return { close: function () { return watcher.close(); }, ready: ready };
+            return { close: () => watcher.close(), ready };
         },
         setTimeout: (ts.sys.clearTimeout && ts.sys.setTimeout) || setTimeout,
         clearTimeout: (ts.sys.setTimeout && ts.sys.clearTimeout) || clearTimeout,
@@ -85,23 +85,23 @@ exports.createPerformWatchHost = createPerformWatchHost;
  * The logic in this function is adapted from `tsc.ts` from TypeScript.
  */
 function performWatchCompilation(host) {
-    var cachedProgram; // Program cached from last compilation
-    var cachedCompilerHost; // CompilerHost cached from last compilation
-    var cachedOptions; // CompilerOptions cached from last compilation
-    var timerHandleForRecompilation; // Handle for 0.25s wait timer to trigger recompilation
-    var ingoreFilesForWatch = new Set();
-    var fileCache = new Map();
-    var firstCompileResult = doCompilation();
+    let cachedProgram; // Program cached from last compilation
+    let cachedCompilerHost; // CompilerHost cached from last compilation
+    let cachedOptions; // CompilerOptions cached from last compilation
+    let timerHandleForRecompilation; // Handle for 0.25s wait timer to trigger recompilation
+    const ingoreFilesForWatch = new Set();
+    const fileCache = new Map();
+    const firstCompileResult = doCompilation();
     // Watch basePath, ignoring .dotfiles
-    var resolveReadyPromise;
-    var readyPromise = new Promise(function (resolve) { return resolveReadyPromise = resolve; });
+    let resolveReadyPromise;
+    const readyPromise = new Promise(resolve => resolveReadyPromise = resolve);
     // Note: ! is ok as options are filled after the first compilation
     // Note: ! is ok as resolvedReadyPromise is filled by the previous call
-    var fileWatcher = host.onFileChange(cachedOptions.options, watchedFileChanged, resolveReadyPromise);
-    return { close: close, ready: function (cb) { return readyPromise.then(cb); }, firstCompileResult: firstCompileResult };
+    const fileWatcher = host.onFileChange(cachedOptions.options, watchedFileChanged, resolveReadyPromise);
+    return { close, ready: cb => readyPromise.then(cb), firstCompileResult };
     function cacheEntry(fileName) {
         fileName = path.normalize(fileName);
-        var entry = fileCache.get(fileName);
+        let entry = fileCache.get(fileName);
         if (!entry) {
             entry = {};
             fileCache.set(fileName, entry);
@@ -124,45 +124,45 @@ function performWatchCompilation(host) {
             host.reportDiagnostics(cachedOptions.errors);
             return cachedOptions.errors;
         }
-        var startTime = Date.now();
+        const startTime = Date.now();
         if (!cachedCompilerHost) {
             cachedCompilerHost = host.createCompilerHost(cachedOptions.options);
-            var originalWriteFileCallback_1 = cachedCompilerHost.writeFile;
-            cachedCompilerHost.writeFile = function (fileName, data, writeByteOrderMark, onError, sourceFiles) {
+            const originalWriteFileCallback = cachedCompilerHost.writeFile;
+            cachedCompilerHost.writeFile = function (fileName, data, writeByteOrderMark, onError, sourceFiles = []) {
                 ingoreFilesForWatch.add(path.normalize(fileName));
-                return originalWriteFileCallback_1(fileName, data, writeByteOrderMark, onError, sourceFiles);
+                return originalWriteFileCallback(fileName, data, writeByteOrderMark, onError, sourceFiles);
             };
-            var originalFileExists_1 = cachedCompilerHost.fileExists;
+            const originalFileExists = cachedCompilerHost.fileExists;
             cachedCompilerHost.fileExists = function (fileName) {
-                var ce = cacheEntry(fileName);
+                const ce = cacheEntry(fileName);
                 if (ce.exists == null) {
-                    ce.exists = originalFileExists_1.call(this, fileName);
+                    ce.exists = originalFileExists.call(this, fileName);
                 }
                 return ce.exists;
             };
-            var originalGetSourceFile_1 = cachedCompilerHost.getSourceFile;
+            const originalGetSourceFile = cachedCompilerHost.getSourceFile;
             cachedCompilerHost.getSourceFile = function (fileName, languageVersion) {
-                var ce = cacheEntry(fileName);
+                const ce = cacheEntry(fileName);
                 if (!ce.sf) {
-                    ce.sf = originalGetSourceFile_1.call(this, fileName, languageVersion);
+                    ce.sf = originalGetSourceFile.call(this, fileName, languageVersion);
                 }
                 return ce.sf;
             };
-            var originalReadFile_1 = cachedCompilerHost.readFile;
+            const originalReadFile = cachedCompilerHost.readFile;
             cachedCompilerHost.readFile = function (fileName) {
-                var ce = cacheEntry(fileName);
+                const ce = cacheEntry(fileName);
                 if (ce.content == null) {
-                    ce.content = originalReadFile_1.call(this, fileName);
+                    ce.content = originalReadFile.call(this, fileName);
                 }
                 return ce.content;
             };
         }
         ingoreFilesForWatch.clear();
-        var oldProgram = cachedProgram;
+        const oldProgram = cachedProgram;
         // We clear out the `cachedProgram` here as a
         // program can only be used as `oldProgram` 1x
         cachedProgram = undefined;
-        var compileResult = perform_compile_1.performCompilation({
+        const compileResult = perform_compile_1.performCompilation({
             rootNames: cachedOptions.rootNames,
             options: cachedOptions.options,
             host: cachedCompilerHost,
@@ -172,12 +172,12 @@ function performWatchCompilation(host) {
         if (compileResult.diagnostics.length) {
             host.reportDiagnostics(compileResult.diagnostics);
         }
-        var endTime = Date.now();
+        const endTime = Date.now();
         if (cachedOptions.options.diagnostics) {
-            var totalTime = (endTime - startTime) / 1000;
+            const totalTime = (endTime - startTime) / 1000;
             host.reportDiagnostics([totalCompilationTimeDiagnostic(endTime - startTime)]);
         }
-        var exitCode = perform_compile_1.exitCodeFromResult(compileResult.diagnostics);
+        const exitCode = perform_compile_1.exitCodeFromResult(compileResult.diagnostics);
         if (exitCode == 0) {
             cachedProgram = compileResult.program;
             host.reportDiagnostics([util_1.createMessageDiagnostic('Compilation complete. Watching for file changes.')]);

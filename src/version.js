@@ -12,9 +12,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * @description
  * Entry point for all public APIs of the common package.
  */
-var compiler_1 = require("@angular/compiler");
+const compiler_1 = require("@angular/compiler");
 /**
  * @stable
  */
-exports.VERSION = new compiler_1.Version('5.1.0-5a0076f');
+exports.VERSION = new compiler_1.Version('6.0.0-rc.3-5992fe6');
 //# sourceMappingURL=version.js.map
