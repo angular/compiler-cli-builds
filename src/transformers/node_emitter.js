@@ -432,6 +432,9 @@ class _NodeEmitterVisitor {
             case compiler_1.BinaryOperator.And:
                 binaryOperator = ts.SyntaxKind.AmpersandAmpersandToken;
                 break;
+            case compiler_1.BinaryOperator.BitwiseAnd:
+                binaryOperator = ts.SyntaxKind.AmpersandToken;
+                break;
             case compiler_1.BinaryOperator.Bigger:
                 binaryOperator = ts.SyntaxKind.GreaterThanToken;
                 break;
@@ -477,7 +480,8 @@ class _NodeEmitterVisitor {
             default:
                 throw new Error(`Unknown operator: ${expr.operator}`);
         }
-        return this.record(expr, ts.createParen(ts.createBinary(expr.lhs.visitExpression(this, null), binaryOperator, expr.rhs.visitExpression(this, null))));
+        const binary = ts.createBinary(expr.lhs.visitExpression(this, null), binaryOperator, expr.rhs.visitExpression(this, null));
+        return this.record(expr, expr.parens ? ts.createParen(binary) : binary);
     }
     visitReadPropExpr(expr) {
         return this.record(expr, ts.createPropertyAccess(expr.receiver.visitExpression(this, null), expr.name));
