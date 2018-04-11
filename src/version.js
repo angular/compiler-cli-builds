@@ -14,7 +14,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  */
 const compiler_1 = require("@angular/compiler");
 /**
- * @stable
+ *
  */
-exports.VERSION = new compiler_1.Version('6.0.0-rc.3-ee14579');
+exports.VERSION = new compiler_1.Version('6.0.0-rc.3-0cb4f12');
 //# sourceMappingURL=version.js.map
