@@ -16,5 +16,5 @@ const compiler_1 = require("@angular/compiler");
 /**
  *
  */
-exports.VERSION = new compiler_1.Version('6.0.0-rc.4-7e581da');
+exports.VERSION = new compiler_1.Version('6.0.0-rc.4-12f90ef');
 //# sourceMappingURL=version.js.map
