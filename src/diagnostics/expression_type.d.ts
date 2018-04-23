@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/diagnostics/expression_type" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

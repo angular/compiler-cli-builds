@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/transformers/node_emitter_transform" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

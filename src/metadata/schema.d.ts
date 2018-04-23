@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/metadata/schema" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
