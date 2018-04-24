@@ -1,20 +1,40 @@
-import { AngularCompilerOptions } from '@angular/tsc-wrapped';
+/// <amd-module name="@angular/compiler-cli/src/ngtools_api" />
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * This is a private API for the ngtools toolkit.
+ *
+ * This API should be stable for NG 2. It can be removed in NG 4..., but should be replaced by
+ * something else.
+ */
+/**
+ *********************************************************************
+ * Changes to this file need to be approved by the Angular CLI team. *
+ *********************************************************************
+ */
 import * as ts from 'typescript';
+import { CompilerOptions } from './transformers/api';
 export interface NgTools_InternalApi_NG2_CodeGen_Options {
     basePath: string;
     compilerOptions: ts.CompilerOptions;
     program: ts.Program;
     host: ts.CompilerHost;
-    angularCompilerOptions: AngularCompilerOptions;
-    i18nFormat: string;
-    i18nFile: string;
-    locale: string;
+    angularCompilerOptions: CompilerOptions;
+    i18nFormat?: string;
+    i18nFile?: string;
+    locale?: string;
+    missingTranslation?: string;
     readResource: (fileName: string) => Promise<string>;
 }
 export interface NgTools_InternalApi_NG2_ListLazyRoutes_Options {
     program: ts.Program;
     host: ts.CompilerHost;
-    angularCompilerOptions: AngularCompilerOptions;
+    angularCompilerOptions: CompilerOptions;
     entryModule: string;
 }
 export interface NgTools_InternalApi_NG_2_LazyRouteMap {
@@ -25,30 +45,9 @@ export interface NgTools_InternalApi_NG2_ExtractI18n_Options {
     compilerOptions: ts.CompilerOptions;
     program: ts.Program;
     host: ts.CompilerHost;
-    angularCompilerOptions: AngularCompilerOptions;
-    i18nFormat: string;
+    angularCompilerOptions: CompilerOptions;
+    i18nFormat?: string;
     readResource: (fileName: string) => Promise<string>;
     locale?: string;
     outFile?: string;
-}
-/**
- * @internal
- * @private
- */
-export declare class NgTools_InternalApi_NG_2 {
-    /**
-     * @internal
-     * @private
-     */
-    static codeGen(options: NgTools_InternalApi_NG2_CodeGen_Options): Promise<void>;
-    /**
-     * @internal
-     * @private
-     */
-    static listLazyRoutes(options: NgTools_InternalApi_NG2_ListLazyRoutes_Options): NgTools_InternalApi_NG_2_LazyRouteMap;
-    /**
-     * @internal
-     * @private
-     */
-    static extractI18n(options: NgTools_InternalApi_NG2_ExtractI18n_Options): Promise<void>;
 }
