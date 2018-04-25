@@ -77,7 +77,7 @@ export interface CompilerOptions extends ts.CompilerOptions {
      *
      * @experimental
      */
-    enableIvy?: boolean;
+    enableIvy?: boolean | 'ngtsc';
 }
 export interface CompilerHost extends ts.CompilerHost {
     /**
