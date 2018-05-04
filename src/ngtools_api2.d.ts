@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/ngtools_api2" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

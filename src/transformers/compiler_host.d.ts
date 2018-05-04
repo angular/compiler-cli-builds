@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/transformers/compiler_host" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

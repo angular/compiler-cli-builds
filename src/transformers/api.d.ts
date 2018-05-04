@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/transformers/api" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { GeneratedFile, ParseSourceSpan, Position } from '@angular/compiler';
+import { ParseSourceSpan, Position } from '@angular/compiler';
 import * as ts from 'typescript';
 export declare const DEFAULT_ERROR_CODE = 100;
 export declare const UNKNOWN_ERROR_CODE = 500;
@@ -27,7 +28,6 @@ export interface Diagnostic {
 export declare function isTsDiagnostic(diagnostic: any): diagnostic is ts.Diagnostic;
 export declare function isNgDiagnostic(diagnostic: any): diagnostic is Diagnostic;
 export interface CompilerOptions extends ts.CompilerOptions {
-    diagnostics?: boolean;
     genDir?: string;
     basePath?: string;
     skipMetadataEmit?: boolean;
@@ -78,8 +78,6 @@ export interface CompilerOptions extends ts.CompilerOptions {
      * @experimental
      */
     enableIvy?: boolean;
-    /** @internal */
-    collectAllErrors?: boolean;
 }
 export interface CompilerHost extends ts.CompilerHost {
     /**
@@ -249,12 +247,4 @@ export interface Program {
      * have been compiled before with no outDir.
      */
     getLibrarySummaries(): Map<string, LibrarySummary>;
-    /**
-     * @internal
-     */
-    getEmittedGeneratedFiles(): Map<string, GeneratedFile>;
-    /**
-     * @internal
-     */
-    getEmittedSourceFiles(): Map<string, ts.SourceFile>;
 }

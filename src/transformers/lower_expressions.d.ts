@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/transformers/lower_expressions" />
 import * as ts from 'typescript';
 import { MetadataCache, MetadataTransformer, ValueTransform } from './metadata_cache';
 export interface LoweringRequest {
