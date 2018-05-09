@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/metadata/index_writer" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

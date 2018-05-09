@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/version" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -12,6 +13,6 @@
  */
 import { Version } from '@angular/compiler';
 /**
- * @stable
+ *
  */
 export declare const VERSION: Version;

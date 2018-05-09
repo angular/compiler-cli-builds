@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/diagnostics/symbols" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -134,7 +135,7 @@ export interface SymbolTable {
  */
 export interface Signature {
     /**
-     * The arguments of the signture. The order of `argumetnts.symbols()` must be in the order
+     * The arguments of the signture. The order of `arguments.symbols()` must be in the order
      * of argument declaration.
      */
     readonly arguments: SymbolTable;
@@ -183,7 +184,7 @@ export declare enum BuiltinType {
     Other = 7,
 }
 /**
- * The kinds of defintion.
+ * The kinds of definition.
  *
  * @experimental
  */

@@ -1,5 +1,6 @@
+/// <amd-module name="@angular/compiler-cli/src/transformers/lower_expressions" />
 import * as ts from 'typescript';
-import { CollectorOptions, ModuleMetadata } from '../metadata/index';
+import { MetadataCache, MetadataTransformer, ValueTransform } from './metadata_cache';
 export interface LoweringRequest {
     kind: ts.SyntaxKind;
     location: number;
@@ -11,13 +12,12 @@ export declare function getExpressionLoweringTransformFactory(requestsMap: Reque
 export interface RequestsMap {
     getRequests(sourceFile: ts.SourceFile): RequestLocationMap;
 }
-export declare class LowerMetadataCache implements RequestsMap {
-    private strict;
-    private collector;
-    private metadataCache;
-    constructor(options: CollectorOptions, strict?: boolean | undefined);
-    getMetadata(sourceFile: ts.SourceFile): ModuleMetadata | undefined;
+export declare class LowerMetadataTransform implements RequestsMap, MetadataTransformer {
+    private cache;
+    private requests;
+    private lowerableFieldNames;
+    constructor(lowerableFieldNames: string[]);
     getRequests(sourceFile: ts.SourceFile): RequestLocationMap;
-    private ensureMetadataAndRequests(sourceFile);
-    private getMetadataAndRequests(sourceFile);
+    connect(cache: MetadataCache): void;
+    start(sourceFile: ts.SourceFile): ValueTransform | undefined;
 }
