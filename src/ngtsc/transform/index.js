@@ -11,7 +11,7 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define("@angular/compiler-cli/src/ngtsc/transform/index", ["require", "exports", "@angular/compiler-cli/src/ngtsc/transform/src/compilation", "@angular/compiler-cli/src/ngtsc/transform/src/injectable", "@angular/compiler-cli/src/ngtsc/transform/src/transform"], factory);
+        define("@angular/compiler-cli/src/ngtsc/transform", ["require", "exports", "@angular/compiler-cli/src/ngtsc/transform/src/compilation", "@angular/compiler-cli/src/ngtsc/transform/src/injectable", "@angular/compiler-cli/src/ngtsc/transform/src/transform"], factory);
     }
 })(function (require, exports) {
     "use strict";
