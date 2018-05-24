@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -17,3 +18,4 @@ export * from './src/transformers/entry_points';
 export * from './src/perform_compile';
 export { CompilerOptions as AngularCompilerOptions } from './src/transformers/api';
 export { NgTools_InternalApi_NG_2 as __NGTOOLS_PRIVATE_API_2 } from './src/ngtools_api';
+export { ngToTsDiagnostic } from './src/transformers/util';

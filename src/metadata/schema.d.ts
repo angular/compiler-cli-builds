@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/metadata/schema" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -67,96 +68,48 @@ export interface FunctionMetadata {
     value: MetadataValue;
 }
 export declare function isFunctionMetadata(value: any): value is FunctionMetadata;
-export declare type MetadataValue = string | number | boolean | undefined | null | MetadataObject | MetadataArray | MetadataSymbolicExpression | MetadataError;
+export declare type MetadataValue = string | number | boolean | undefined | null | MetadataObject | MetadataArray | MetadataSymbolicExpression | MetadataSymbolicReferenceExpression | MetadataSymbolicBinaryExpression | MetadataSymbolicIndexExpression | MetadataSymbolicCallExpression | MetadataSymbolicPrefixExpression | MetadataSymbolicIfExpression | MetadataSymbolicSpreadExpression | MetadataSymbolicSelectExpression | MetadataError;
 export interface MetadataObject {
     [name: string]: MetadataValue;
 }
 export interface MetadataArray {
     [name: number]: MetadataValue;
 }
-export interface MetadataSymbolicExpression {
-    __symbolic: 'binary' | 'call' | 'index' | 'new' | 'pre' | 'reference' | 'select' | 'spread' | 'if';
-}
+export declare type MetadataSymbolicExpression = MetadataSymbolicBinaryExpression | MetadataSymbolicIndexExpression | MetadataSymbolicIndexExpression | MetadataSymbolicCallExpression | MetadataSymbolicCallExpression | MetadataSymbolicPrefixExpression | MetadataSymbolicIfExpression | MetadataGlobalReferenceExpression | MetadataModuleReferenceExpression | MetadataImportedSymbolReferenceExpression | MetadataImportedDefaultReferenceExpression | MetadataSymbolicSelectExpression | MetadataSymbolicSpreadExpression;
 export declare function isMetadataSymbolicExpression(value: any): value is MetadataSymbolicExpression;
-export interface MetadataSymbolicBinaryExpression extends MetadataSymbolicExpression {
+export interface MetadataSymbolicBinaryExpression {
     __symbolic: 'binary';
     operator: '&&' | '||' | '|' | '^' | '&' | '==' | '!=' | '===' | '!==' | '<' | '>' | '<=' | '>=' | 'instanceof' | 'in' | 'as' | '<<' | '>>' | '>>>' | '+' | '-' | '*' | '/' | '%' | '**';
     left: MetadataValue;
     right: MetadataValue;
 }
 export declare function isMetadataSymbolicBinaryExpression(value: any): value is MetadataSymbolicBinaryExpression;
-export interface MetadataSymbolicIndexExpression extends MetadataSymbolicExpression {
+export interface MetadataSymbolicIndexExpression {
     __symbolic: 'index';
     expression: MetadataValue;
     index: MetadataValue;
 }
 export declare function isMetadataSymbolicIndexExpression(value: any): value is MetadataSymbolicIndexExpression;
-export interface MetadataSymbolicCallExpression extends MetadataSymbolicExpression {
+export interface MetadataSymbolicCallExpression {
     __symbolic: 'call' | 'new';
     expression: MetadataValue;
     arguments?: MetadataValue[];
 }
 export declare function isMetadataSymbolicCallExpression(value: any): value is MetadataSymbolicCallExpression;
-export interface MetadataSymbolicPrefixExpression extends MetadataSymbolicExpression {
+export interface MetadataSymbolicPrefixExpression {
     __symbolic: 'pre';
     operator: '+' | '-' | '~' | '!';
     operand: MetadataValue;
 }
 export declare function isMetadataSymbolicPrefixExpression(value: any): value is MetadataSymbolicPrefixExpression;
-export interface MetadataSymbolicIfExpression extends MetadataSymbolicExpression {
+export interface MetadataSymbolicIfExpression {
     __symbolic: 'if';
     condition: MetadataValue;
     thenExpression: MetadataValue;
     elseExpression: MetadataValue;
 }
 export declare function isMetadataSymbolicIfExpression(value: any): value is MetadataSymbolicIfExpression;
-export interface MetadataGlobalReferenceExpression extends MetadataSymbolicExpression {
-    __symbolic: 'reference';
-    name: string;
-    arguments?: MetadataValue[];
-}
-export declare function isMetadataGlobalReferenceExpression(value: any): value is MetadataGlobalReferenceExpression;
-export interface MetadataModuleReferenceExpression extends MetadataSymbolicExpression {
-    __symbolic: 'reference';
-    module: string;
-}
-export declare function isMetadataModuleReferenceExpression(value: any): value is MetadataModuleReferenceExpression;
-export interface MetadataImportedSymbolReferenceExpression extends MetadataSymbolicExpression {
-    __symbolic: 'reference';
-    module: string;
-    name: string;
-    arguments?: MetadataValue[];
-}
-export declare function isMetadataImportedSymbolReferenceExpression(value: any): value is MetadataImportedSymbolReferenceExpression;
-export interface MetadataImportedDefaultReferenceExpression extends MetadataSymbolicExpression {
-    __symbolic: 'reference';
-    module: string;
-    default: boolean;
-    arguments?: MetadataValue[];
-}
-export declare function isMetadataImportDefaultReference(value: any): value is MetadataImportedDefaultReferenceExpression;
-export declare type MetadataSymbolicReferenceExpression = MetadataGlobalReferenceExpression | MetadataModuleReferenceExpression | MetadataImportedSymbolReferenceExpression | MetadataImportedDefaultReferenceExpression;
-export declare function isMetadataSymbolicReferenceExpression(value: any): value is MetadataSymbolicReferenceExpression;
-export interface MetadataSymbolicSelectExpression extends MetadataSymbolicExpression {
-    __symbolic: 'select';
-    expression: MetadataValue;
-    name: string;
-}
-export declare function isMetadataSymbolicSelectExpression(value: any): value is MetadataSymbolicSelectExpression;
-export interface MetadataSymbolicSpreadExpression extends MetadataSymbolicExpression {
-    __symbolic: 'spread';
-    expression: MetadataValue;
-}
-export declare function isMetadataSymbolicSpreadExpression(value: any): value is MetadataSymbolicSpreadExpression;
-export interface MetadataError {
-    __symbolic: 'error';
-    /**
-     * This message should be short and relatively discriptive and should be fixed once it is created.
-     * If the reader doesn't recognize the message, it will display the message unmodified. If the
-     * reader recognizes the error message is it free to use substitute message the is more
-     * descriptive and/or localized.
-     */
-    message: string;
+export interface MetadataSourceLocationInfo {
     /**
      * The line number of the error in the .ts file the metadata was created for.
      */
@@ -165,6 +118,54 @@ export interface MetadataError {
      * The number of utf8 code-units from the beginning of the file of the error.
      */
     character?: number;
+}
+export interface MetadataGlobalReferenceExpression extends MetadataSourceLocationInfo {
+    __symbolic: 'reference';
+    name: string;
+    arguments?: MetadataValue[];
+}
+export declare function isMetadataGlobalReferenceExpression(value: any): value is MetadataGlobalReferenceExpression;
+export interface MetadataModuleReferenceExpression extends MetadataSourceLocationInfo {
+    __symbolic: 'reference';
+    module: string;
+}
+export declare function isMetadataModuleReferenceExpression(value: any): value is MetadataModuleReferenceExpression;
+export interface MetadataImportedSymbolReferenceExpression extends MetadataSourceLocationInfo {
+    __symbolic: 'reference';
+    module: string;
+    name: string;
+    arguments?: MetadataValue[];
+}
+export declare function isMetadataImportedSymbolReferenceExpression(value: any): value is MetadataImportedSymbolReferenceExpression;
+export interface MetadataImportedDefaultReferenceExpression extends MetadataSourceLocationInfo {
+    __symbolic: 'reference';
+    module: string;
+    default: boolean;
+    arguments?: MetadataValue[];
+}
+export declare function isMetadataImportDefaultReference(value: any): value is MetadataImportedDefaultReferenceExpression;
+export declare type MetadataSymbolicReferenceExpression = MetadataGlobalReferenceExpression | MetadataModuleReferenceExpression | MetadataImportedSymbolReferenceExpression | MetadataImportedDefaultReferenceExpression;
+export declare function isMetadataSymbolicReferenceExpression(value: any): value is MetadataSymbolicReferenceExpression;
+export interface MetadataSymbolicSelectExpression {
+    __symbolic: 'select';
+    expression: MetadataValue;
+    member: string;
+}
+export declare function isMetadataSymbolicSelectExpression(value: any): value is MetadataSymbolicSelectExpression;
+export interface MetadataSymbolicSpreadExpression {
+    __symbolic: 'spread';
+    expression: MetadataValue;
+}
+export declare function isMetadataSymbolicSpreadExpression(value: any): value is MetadataSymbolicSpreadExpression;
+export interface MetadataError extends MetadataSourceLocationInfo {
+    __symbolic: 'error';
+    /**
+     * This message should be short and relatively discriptive and should be fixed once it is created.
+     * If the reader doesn't recognize the message, it will display the message unmodified. If the
+     * reader recognizes the error message is it free to use substitute message the is more
+     * descriptive and/or localized.
+     */
+    message: string;
     /**
      * The module of the error (only used in bundled metadata)
      */

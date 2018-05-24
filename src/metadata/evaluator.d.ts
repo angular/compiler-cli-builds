@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/metadata/evaluator" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -20,9 +21,6 @@ export interface ImportMetadata {
     namedImports?: ImportSpecifierMetadata[];
     from: string;
 }
-export declare function errorSymbol(message: string, node?: ts.Node, context?: {
-    [name: string]: string;
-}, sourceFile?: ts.SourceFile): MetadataError;
 /**
  * Produce a symbolic representation of an expression folding values into their final value when
  * possible.

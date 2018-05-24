@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/metadata/symbols" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

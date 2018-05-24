@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/transformers/api" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,14 +6,21 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { GeneratedFile, ParseSourceSpan } from '@angular/compiler';
+import { ParseSourceSpan, Position } from '@angular/compiler';
 import * as ts from 'typescript';
 export declare const DEFAULT_ERROR_CODE = 100;
 export declare const UNKNOWN_ERROR_CODE = 500;
 export declare const SOURCE: "angular";
+export interface DiagnosticMessageChain {
+    messageText: string;
+    position?: Position;
+    next?: DiagnosticMessageChain;
+}
 export interface Diagnostic {
     messageText: string;
     span?: ParseSourceSpan;
+    position?: Position;
+    chain?: DiagnosticMessageChain;
     category: ts.DiagnosticCategory;
     code: number;
     source: 'angular';
@@ -20,7 +28,6 @@ export interface Diagnostic {
 export declare function isTsDiagnostic(diagnostic: any): diagnostic is ts.Diagnostic;
 export declare function isNgDiagnostic(diagnostic: any): diagnostic is Diagnostic;
 export interface CompilerOptions extends ts.CompilerOptions {
-    diagnostics?: boolean;
     genDir?: string;
     basePath?: string;
     skipMetadataEmit?: boolean;
@@ -29,13 +36,14 @@ export interface CompilerOptions extends ts.CompilerOptions {
     strictInjectionParameters?: boolean;
     flatModuleOutFile?: string;
     flatModuleId?: string;
+    flatModulePrivateSymbolPrefix?: string;
     generateCodeForLibraries?: boolean;
     fullTemplateTypeCheck?: boolean;
     annotateForClosureCompiler?: boolean;
     annotationsAs?: 'decorators' | 'static fields';
     trace?: boolean;
-    enableLegacyTemplate?: boolean;
     disableExpressionLowering?: boolean;
+    disableTypeScriptVersionCheck?: boolean;
     i18nOutLocale?: string;
     i18nOutFormat?: string;
     i18nOutFile?: string;
@@ -51,8 +59,25 @@ export interface CompilerOptions extends ts.CompilerOptions {
      * in JIT mode. This is off by default.
      */
     enableSummariesForJit?: boolean;
-    /** @internal */
-    collectAllErrors?: boolean;
+    /**
+     * Whether to replace the `templateUrl` and `styleUrls` property in all
+     * @Component decorators with inlined contents in `template` and `styles`
+     * properties.
+     * When enabled, the .js output of ngc will have no lazy-loaded `templateUrl`
+     * or `styleUrl`s. Note that this requires that resources be available to
+     * load statically at compile-time.
+     */
+    enableResourceInlining?: boolean;
+    /**
+     * Tells the compiler to generate definitions using the Render3 style code generation.
+     * This option defaults to `false`.
+     *
+     * Not all features are supported with this option enabled. It is only supported
+     * for experimentation and testing of Render3 style code generation.
+     *
+     * @experimental
+     */
+    enableIvy?: boolean | 'ngtsc';
 }
 export interface CompilerHost extends ts.CompilerHost {
     /**
@@ -87,10 +112,17 @@ export interface CompilerHost extends ts.CompilerHost {
     /**
      * Load a referenced resource either statically or asynchronously. If the host returns a
      * `Promise<string>` it is assumed the user of the corresponding `Program` will call
-     * `loadNgStructureAsync()`. Returing  `Promise<string>` outside `loadNgStructureAsync()` will
+     * `loadNgStructureAsync()`. Returning  `Promise<string>` outside `loadNgStructureAsync()` will
      * cause a diagnostics diagnostic error or an exception to be thrown.
      */
     readResource?(fileName: string): Promise<string> | string;
+    /**
+     * Produce an AMD module name for the source file. Used in Bazel.
+     *
+     * An AMD module can have an arbitrary name, so that it is require'd by name
+     * rather than by path. See http://requirejs.org/docs/whyamd.html#namedmodules
+     */
+    amdModuleName?(sf: ts.SourceFile): string | undefined;
 }
 export declare enum EmitFlags {
     DTS = 1,
@@ -118,9 +150,9 @@ export interface TsEmitArguments {
 export interface TsEmitCallback {
     (args: TsEmitArguments): ts.EmitResult;
 }
-/**
- * @internal
- */
+export interface TsMergeEmitResultsCallback {
+    (results: ts.EmitResult[]): ts.EmitResult;
+}
 export interface LibrarySummary {
     fileName: string;
     text: string;
@@ -149,17 +181,17 @@ export interface Program {
      * faster than calling `getTsProgram().getOptionsDiagnostics()` since it does not need to
      * collect Angular structural information to produce the errors.
      */
-    getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
+    getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic>;
     /**
      * Retrieve options diagnostics for the Angular options used to create the program.
      */
-    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken): Diagnostic[];
+    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
     /**
      * Retrieve the syntax diagnostics from TypeScript. This is faster than calling
      * `getTsProgram().getSyntacticDiagnostics()` since it does not need to collect Angular structural
      * information to produce the errors.
      */
-    getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
+    getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic>;
     /**
      * Retrieve the diagnostics for the structure of an Angular application is correctly formed.
      * This includes validating Angular annotations and the syntax of referenced and imbedded HTML
@@ -171,18 +203,18 @@ export interface Program {
      *
      * Angular structural information is required to produce these diagnostics.
      */
-    getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken): Diagnostic[];
+    getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
     /**
-     * Retrieve the semantic diagnostics from TypeScript. This is equivilent to calling
+     * Retrieve the semantic diagnostics from TypeScript. This is equivalent to calling
      * `getTsProgram().getSemanticDiagnostics()` directly and is included for completeness.
      */
-    getTsSemanticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
+    getTsSemanticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic>;
     /**
      * Retrieve the Angular semantic diagnostics.
      *
      * Angular structural information is required to produce these diagnostics.
      */
-    getNgSemanticDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): Diagnostic[];
+    getNgSemanticDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
     /**
      * Load Angular structural information asynchronously. If this method is not called then the
      * Angular structural information, including referenced HTML and CSS files, are loaded
@@ -202,26 +234,17 @@ export interface Program {
      *
      * Angular structural information is required to emit files.
      */
-    emit({emitFlags, cancellationToken, customTransformers, emitCallback}?: {
+    emit({emitFlags, cancellationToken, customTransformers, emitCallback, mergeEmitResultsCallback}?: {
         emitFlags?: EmitFlags;
         cancellationToken?: ts.CancellationToken;
         customTransformers?: CustomTransformers;
         emitCallback?: TsEmitCallback;
+        mergeEmitResultsCallback?: TsMergeEmitResultsCallback;
     }): ts.EmitResult;
     /**
      * Returns the .d.ts / .ngsummary.json / .ngfactory.d.ts files of libraries that have been emitted
      * in this program or previous programs with paths that emulate the fact that these libraries
      * have been compiled before with no outDir.
-     *
-     * @internal
      */
     getLibrarySummaries(): Map<string, LibrarySummary>;
-    /**
-     * @internal
-     */
-    getEmittedGeneratedFiles(): Map<string, GeneratedFile>;
-    /**
-     * @internal
-     */
-    getEmittedSourceFiles(): Map<string, ts.SourceFile>;
 }
