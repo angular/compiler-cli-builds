@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/transformers/metadata_reader" />
 import { ModuleMetadata } from '../metadata';
 export interface MetadataReaderHost {
     getSourceFileMetadata(filePath: string): ModuleMetadata | undefined;
@@ -6,10 +7,6 @@ export interface MetadataReaderHost {
     readFile(filePath: string): string;
 }
 export interface MetadataReaderCache {
-    /**
-     * @internal
-     */
-    data: Map<string, ModuleMetadata[] | undefined>;
 }
 export declare function createMetadataReaderCache(): MetadataReaderCache;
 export declare function readMetadata(filePath: string, host: MetadataReaderHost, cache?: MetadataReaderCache): ModuleMetadata[] | undefined;

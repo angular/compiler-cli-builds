@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "5.1.0-b20e271",
+  "version": "6.0.0-rc.5+285.sha-438547c",
   "description": "Angular - the compiler CLI for Node.js",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -11,12 +11,15 @@
   "dependencies": {
     "reflect-metadata": "^0.1.2",
     "minimist": "^1.2.0",
-    "tsickle": "^0.25.5",
+    "tsickle": "^0.27.2",
     "chokidar": "^1.4.2"
   },
   "peerDependencies": {
-    "typescript": ">=2.4.2 <2.6",
-    "@angular/compiler": "5.1.0-b20e271"
+    "typescript": ">=2.7.2 <2.9",
+    "@angular/compiler": "6.0.0-rc.5+285.sha-438547c"
+  },
+  "engines" : {
+    "node" : ">=8.0"
   },
   "repository": {
     "type": "git",
@@ -34,5 +37,27 @@
   "bugs": {
     "url": "https://github.com/angular/angular/issues"
   },
-  "homepage": "https://github.com/angular/angular/tree/master/packages/compiler-cli"
+  "homepage": "https://github.com/angular/angular/tree/master/packages/compiler-cli",
+  "ng-update": {
+    "packageGroup": [
+      "@angular/core",
+      "@angular/bazel",
+      "@angular/common",
+      "@angular/compiler",
+      "@angular/compiler-cli",
+      "@angular/animations",
+      "@angular/elements",
+      "@angular/platform-browser",
+      "@angular/platform-browser-dynamic",
+      "@angular/forms",
+      "@angular/http",
+      "@angular/platform-server",
+      "@angular/platform-webworker",
+      "@angular/platform-webworker-dynamic",
+      "@angular/upgrade",
+      "@angular/router",
+      "@angular/language-service",
+      "@angular/service-worker"
+    ]
+  }
 }

@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/ngtools_api2" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -38,7 +39,6 @@ export interface CompilerOptions extends ts.CompilerOptions {
     annotateForClosureCompiler?: boolean;
     annotationsAs?: 'decorators' | 'static fields';
     trace?: boolean;
-    enableLegacyTemplate?: boolean;
     disableExpressionLowering?: boolean;
     i18nOutLocale?: string;
     i18nOutFormat?: string;
@@ -48,6 +48,7 @@ export interface CompilerOptions extends ts.CompilerOptions {
     i18nInFile?: string;
     i18nInMissingTranslations?: 'error' | 'warning' | 'ignore';
     preserveWhitespaces?: boolean;
+    disableTypeScriptVersionCheck?: boolean;
 }
 export interface CompilerHost extends ts.CompilerHost {
     moduleNameToFileName?(moduleName: string, containingFile?: string): string | null;
@@ -96,12 +97,12 @@ export interface LazyRoute {
 }
 export interface Program {
     getTsProgram(): ts.Program;
-    getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
-    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken): Diagnostic[];
-    getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
-    getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken): Diagnostic[];
-    getTsSemanticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ts.Diagnostic[];
-    getNgSemanticDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): Diagnostic[];
+    getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic>;
+    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
+    getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic>;
+    getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
+    getTsSemanticDiagnostics(sourceFile?: ts.SourceFile, cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic>;
+    getNgSemanticDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
     loadNgStructureAsync(): Promise<void>;
     listLazyRoutes(entryRoute?: string): LazyRoute[];
     emit({emitFlags, cancellationToken, customTransformers, emitCallback}: {
@@ -121,5 +122,5 @@ export declare function createCompilerHost({options, tsHost}: {
     options: CompilerOptions;
     tsHost?: ts.CompilerHost;
 }): CompilerHost;
-export declare type Diagnostics = Array<ts.Diagnostic | Diagnostic>;
+export declare type Diagnostics = ReadonlyArray<ts.Diagnostic | Diagnostic>;
 export declare function formatDiagnostics(diags: Diagnostics): string;

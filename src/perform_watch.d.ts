@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/perform_watch" />
 import * as ts from 'typescript';
 import { Diagnostics, ParsedConfiguration } from './perform_compile';
 import * as api from './transformers/api';
