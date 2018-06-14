@@ -75,3 +75,14 @@ export declare function reflectImportedIdentifier(id: ts.Identifier, checker: ts
     name: string;
     from: string;
 } | null;
+export interface DecoratedNode<T extends ts.Node> {
+    element: T;
+    decorators: Decorator[];
+}
+export declare function getDecoratedClassElements(clazz: ts.ClassDeclaration, checker: ts.TypeChecker): DecoratedNode<ts.ClassElement>[];
+export declare function reflectStaticField(clazz: ts.ClassDeclaration, field: string): ts.PropertyDeclaration | null;
+export declare function reflectNonStaticField(clazz: ts.ClassDeclaration, field: string): ts.PropertyDeclaration | null;
+export declare function reflectTypeEntityToDeclaration(type: ts.EntityName, checker: ts.TypeChecker): {
+    node: ts.Declaration;
+    from: string | null;
+};
