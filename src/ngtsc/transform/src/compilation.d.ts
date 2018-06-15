@@ -1,6 +1,6 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/compilation" />
 import * as ts from 'typescript';
-import { AddStaticFieldInstruction, CompilerAdapter } from './api';
+import { CompileResult, DecoratorHandler } from './api';
 /**
  * Manages a compilation of Ivy decorators into static fields across an entire ts.Program.
  *
@@ -8,7 +8,7 @@ import { AddStaticFieldInstruction, CompilerAdapter } from './api';
  * to be performed during the transform/emit process are maintained internally.
  */
 export declare class IvyCompilation {
-    private adapters;
+    private handlers;
     private checker;
     /**
      * Tracks classes which have been analyzed and found to have an Ivy decorator, and the
@@ -19,7 +19,7 @@ export declare class IvyCompilation {
      * Tracks the `DtsFileTransformer`s for each TS file that needs .d.ts transformations.
      */
     private dtsMap;
-    constructor(adapters: CompilerAdapter<any>[], checker: ts.TypeChecker);
+    constructor(handlers: DecoratorHandler<any>[], checker: ts.TypeChecker);
     /**
      * Analyze a source file and produce diagnostics for it (if any).
      */
@@ -28,7 +28,7 @@ export declare class IvyCompilation {
      * Perform a compilation operation on the given class declaration and return instructions to an
      * AST transformer if any are available.
      */
-    compileIvyFieldFor(node: ts.ClassDeclaration): AddStaticFieldInstruction | undefined;
+    compileIvyFieldFor(node: ts.ClassDeclaration): CompileResult | undefined;
     /**
      * Lookup the `ts.Decorator` which triggered transformation of a particular class declaration.
      */
