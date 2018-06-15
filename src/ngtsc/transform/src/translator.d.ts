@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Type, TypeVisitor, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
+import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Statement, Type, TypeVisitor, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
 import * as ts from 'typescript';
 export declare class ImportManager {
     private moduleToIndex;
@@ -18,6 +18,7 @@ export declare class ImportManager {
     }[];
 }
 export declare function translateExpression(expression: Expression, imports: ImportManager): ts.Expression;
+export declare function translateStatement(statement: Statement, imports: ImportManager): ts.Statement;
 export declare function translateType(type: Type, imports: ImportManager): string;
 export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVisitor {
     private imports;
@@ -43,7 +44,7 @@ export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVis
     visitBinaryOperatorExpr(ast: BinaryOperatorExpr, context: any): void;
     visitReadPropExpr(ast: ReadPropExpr, context: any): void;
     visitReadKeyExpr(ast: ReadKeyExpr, context: any): void;
-    visitLiteralArrayExpr(ast: LiteralArrayExpr, context: any): void;
+    visitLiteralArrayExpr(ast: LiteralArrayExpr, context: any): string;
     visitLiteralMapExpr(ast: LiteralMapExpr, context: any): void;
     visitCommaExpr(ast: CommaExpr, context: any): void;
     visitWrappedNodeExpr(ast: WrappedNodeExpr<any>, context: any): string;
