@@ -8,13 +8,14 @@
  */
 import { R3DirectiveMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator } from '../../metadata';
+import { Decorator, ReflectionHost } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 import { SelectorScopeRegistry } from './selector_scope';
 export declare class DirectiveDecoratorHandler implements DecoratorHandler<R3DirectiveMetadata> {
     private checker;
+    private reflector;
     private scopeRegistry;
-    constructor(checker: ts.TypeChecker, scopeRegistry: SelectorScopeRegistry);
+    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry);
     detect(decorators: Decorator[]): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3DirectiveMetadata>;
     compile(node: ts.ClassDeclaration, analysis: R3DirectiveMetadata): CompileResult;
@@ -22,4 +23,4 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<R3Dir
 /**
  * Helper function to extract metadata from a `Directive` or `Component`.
  */
-export declare function extractDirectiveMetadata(clazz: ts.ClassDeclaration, decorator: Decorator, checker: ts.TypeChecker): R3DirectiveMetadata | undefined;
+export declare function extractDirectiveMetadata(clazz: ts.ClassDeclaration, decorator: Decorator, checker: ts.TypeChecker, reflector: ReflectionHost): R3DirectiveMetadata | undefined;
