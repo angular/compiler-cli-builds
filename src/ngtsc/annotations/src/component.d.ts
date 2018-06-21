@@ -8,7 +8,7 @@
  */
 import { R3ComponentMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator } from '../../metadata';
+import { Decorator, ReflectionHost } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 import { SelectorScopeRegistry } from './selector_scope';
 /**
@@ -16,8 +16,9 @@ import { SelectorScopeRegistry } from './selector_scope';
  */
 export declare class ComponentDecoratorHandler implements DecoratorHandler<R3ComponentMetadata> {
     private checker;
+    private reflector;
     private scopeRegistry;
-    constructor(checker: ts.TypeChecker, scopeRegistry: SelectorScopeRegistry);
+    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry);
     detect(decorators: Decorator[]): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3ComponentMetadata>;
     compile(node: ts.ClassDeclaration, analysis: R3ComponentMetadata): CompileResult;

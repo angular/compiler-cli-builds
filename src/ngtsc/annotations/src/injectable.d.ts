@@ -8,14 +8,14 @@
  */
 import { R3InjectableMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator } from '../../metadata';
-import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform/src/api';
+import { Decorator, ReflectionHost } from '../../host';
+import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 /**
  * Adapts the `compileIvyInjectable` compiler for `@Injectable` decorators to the Ivy compiler.
  */
 export declare class InjectableDecoratorHandler implements DecoratorHandler<R3InjectableMetadata> {
-    private checker;
-    constructor(checker: ts.TypeChecker);
+    private reflector;
+    constructor(reflector: ReflectionHost);
     detect(decorator: Decorator[]): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3InjectableMetadata>;
     compile(node: ts.ClassDeclaration, analysis: R3InjectableMetadata): CompileResult;

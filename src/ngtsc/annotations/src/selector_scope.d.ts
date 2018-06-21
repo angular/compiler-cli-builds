@@ -8,6 +8,7 @@
  */
 import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
+import { ReflectionHost } from '../../host';
 import { Reference } from '../../metadata';
 /**
  * Metadata extracted for a given NgModule that can be used to compute selector scopes.
@@ -33,6 +34,7 @@ export interface CompilationScope<T> {
  */
 export declare class SelectorScopeRegistry {
     private checker;
+    private reflector;
     /**
      *  Map of modules declared in the current compilation unit to their (local) metadata.
      */
@@ -53,24 +55,24 @@ export declare class SelectorScopeRegistry {
      * Map of components/directives/pipes to their module.
      */
     private _declararedTypeToModule;
-    constructor(checker: ts.TypeChecker);
+    constructor(checker: ts.TypeChecker, reflector: ReflectionHost);
     /**
      * Register a module's metadata with the registry.
      */
-    registerModule(node: ts.ClassDeclaration, data: ModuleData): void;
+    registerModule(node: ts.Declaration, data: ModuleData): void;
     /**
      * Register the selector of a component or directive with the registry.
      */
-    registerSelector(node: ts.ClassDeclaration, selector: string): void;
+    registerSelector(node: ts.Declaration, selector: string): void;
     /**
      * Register the name of a pipe with the registry.
      */
-    registerPipe(node: ts.ClassDeclaration, name: string): void;
+    registerPipe(node: ts.Declaration, name: string): void;
     /**
      * Produce the compilation scope of a component, which is determined by the module that declares
      * it.
      */
-    lookupCompilationScope(node: ts.ClassDeclaration): CompilationScope<Expression> | null;
+    lookupCompilationScope(node: ts.Declaration): CompilationScope<Expression> | null;
     /**
      * Lookup `SelectorScopes` for a given module.
      *

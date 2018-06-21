@@ -8,6 +8,8 @@
  */
 import { Expression, R3DependencyMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
+import { Decorator, ReflectionHost } from '../../host';
 import { Reference } from '../../metadata';
-export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, checker: ts.TypeChecker): R3DependencyMetadata[];
+export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost): R3DependencyMetadata[];
 export declare function referenceToExpression(ref: Reference, context: ts.SourceFile): Expression;
+export declare function isAngularCore(decorator: Decorator): boolean;
