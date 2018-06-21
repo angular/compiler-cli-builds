@@ -8,7 +8,7 @@
  */
 import { R3NgModuleMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator } from '../../metadata';
+import { Decorator } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 import { SelectorScopeRegistry } from './selector_scope';
 /**
