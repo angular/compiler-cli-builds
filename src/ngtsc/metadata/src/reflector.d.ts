@@ -7,82 +7,30 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
+import { ClassMember, Decorator, Import, Parameter, ReflectionHost } from '../../host';
 /**
  * reflector.ts implements static reflection of declarations using the TypeScript `ts.TypeChecker`.
  */
-/**
- * A reflected parameter of a function, method, or constructor, indicating the name, any
- * decorators, and an expression representing a reference to the value side of the parameter's
- * declared type, if applicable.
- */
-export interface Parameter {
-    /**
-     * Name of the parameter as a `ts.BindingName`, which allows the parameter name to be identified
-     * via sourcemaps.
-     */
-    name: ts.BindingName;
-    /**
-     * A `ts.Expression` which represents a reference to the value side of the parameter's type.
-     */
-    typeValueExpr: ts.Expression | null;
-    /**
-     * Array of decorators present on the parameter.
-     */
-    decorators: Decorator[];
+export declare class TypeScriptReflectionHost implements ReflectionHost {
+    protected checker: ts.TypeChecker;
+    constructor(checker: ts.TypeChecker);
+    getDecoratorsOfDeclaration(declaration: ts.Declaration): Decorator[] | null;
+    getMembersOfClass(declaration: ts.Declaration): ClassMember[];
+    getConstructorParameters(declaration: ts.Declaration): Parameter[] | null;
+    getImportOfIdentifier(id: ts.Identifier): Import | null;
+    isClass(node: ts.Node): node is ts.Declaration;
+    private _reflectDecorator(node);
+    private _reflectMember(node);
 }
-/**
- * A reflected decorator, indicating the name, where it was imported from, and any arguments if the
- * decorator is a call expression.
- */
-export interface Decorator {
-    /**
-     * Name of the decorator, extracted from the decoration expression.
-     */
-    name: string;
-    /**
-     * Import path (relative to the decorator's file) of the decorator itself.
-     */
-    from: string;
-    /**
-     * The decorator node itself (useful for printing sourcemap based references to the decorator).
-     */
-    node: ts.Decorator;
-    /**
-     * Any arguments of a call expression, if one is present. If the decorator was not a call
-     * expression, then this will be an empty array.
-     */
-    args: ts.Expression[];
-}
-/**
- * Reflect a `ts.ClassDeclaration` and determine the list of parameters.
- *
- * Note that this only reflects the referenced class and not any potential parent class - that must
- * be handled by the caller.
- *
- * @param node the `ts.ClassDeclaration` to reflect
- * @param checker a `ts.TypeChecker` used for reflection
- * @returns a `Parameter` instance for each argument of the constructor, or `null` if no constructor
- */
-export declare function reflectConstructorParameters(node: ts.ClassDeclaration, checker: ts.TypeChecker): Parameter[] | null;
-/**
- * Reflect a decorator and return a structure describing where it comes from and any arguments.
- *
- * Only imported decorators are considered, not locally defined decorators.
- */
-export declare function reflectDecorator(decorator: ts.Decorator, checker: ts.TypeChecker): Decorator | null;
-export declare function reflectObjectLiteral(node: ts.ObjectLiteralExpression): Map<string, ts.Expression>;
-export declare function reflectImportedIdentifier(id: ts.Identifier, checker: ts.TypeChecker): {
-    name: string;
-    from: string;
-} | null;
-export interface DecoratedNode<T extends ts.Node> {
-    element: T;
-    decorators: Decorator[];
-}
-export declare function getDecoratedClassElements(clazz: ts.ClassDeclaration, checker: ts.TypeChecker): DecoratedNode<ts.ClassElement>[];
-export declare function reflectStaticField(clazz: ts.ClassDeclaration, field: string): ts.PropertyDeclaration | null;
-export declare function reflectNonStaticField(clazz: ts.ClassDeclaration, field: string): ts.PropertyDeclaration | null;
+export declare function reflectNameOfDeclaration(decl: ts.Declaration): string | null;
+export declare function reflectIdentifierOfDeclaration(decl: ts.Declaration): ts.Identifier | null;
 export declare function reflectTypeEntityToDeclaration(type: ts.EntityName, checker: ts.TypeChecker): {
     node: ts.Declaration;
     from: string | null;
 };
+export declare function filterToMembersWithDecorator(members: ClassMember[], name: string, module?: string): {
+    member: ClassMember;
+    decorators: Decorator[];
+}[];
+export declare function findMember(members: ClassMember[], name: string, isStatic?: boolean): ClassMember | null;
+export declare function reflectObjectLiteral(node: ts.ObjectLiteralExpression): Map<string, ts.Expression>;
