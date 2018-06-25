@@ -7,48 +7,55 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { Decorator } from '../../../ngtsc/host';
-import { TypeScriptReflectionHost } from '../../../ngtsc/metadata/src/reflector';
+import { ClassMember, Decorator, Import, Parameter } from '../../../ngtsc/host';
 import { NgccReflectionHost } from './ngcc_host';
 /**
  * Esm2015 packages contain ECMAScript 2015 classes, etc.
- * Decorators are static properties on the class. For example:
+ * Decorators are defined via static properties on the class. For example:
  *
  * ```
- * class NgForOf {
+ * class SomeDirective {
  * }
- * NgForOf.decorators = [
- *     { type: Directive, args: [{ selector: '[ngFor][ngForOf]' },] }
+ * SomeDirective.decorators = [
+ *     { type: Directive, args: [{ selector: '[someDirective]' },] }
  * ];
- * NgForOf.ctorParameters = () => [
+ * SomeDirective.ctorParameters = () => [
  *   { type: ViewContainerRef, },
  *   { type: TemplateRef, },
- *   { type: IterableDiffers, },
+ *   { type: undefined, decorators: [{ type: Inject, args: [INJECTED_TOKEN,] },] },
  * ];
- * NgForOf.propDecorators = {
- *   "ngForOf": [{ type: Input },],
- *   "ngForTrackBy": [{ type: Input },],
- *   "ngForTemplate": [{ type: Input },],
+ * SomeDirective.propDecorators = {
+ *   "input1": [{ type: Input },],
+ *   "input2": [{ type: Input },],
  * };
  * ```
  *
- * Items are decorated if they have a static property called `decorators`.
- *
+ * * Classes are decorated if they have a static property called `decorators`.
+ * * Members are decorated if there is a matching key on a static property
+ *   called `propDecorators`.
+ * * Constructor parameters decorators are found on an object returned from
+ *   a static method called `ctrParameters`.
  */
-export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost implements NgccReflectionHost {
+export declare class Esm2015ReflectionHost implements NgccReflectionHost {
+    protected checker: ts.TypeChecker;
     constructor(checker: ts.TypeChecker);
-    /**
-     * Parse the declaration and find the decorators that were attached to it.
-     * @param declaration A declaration, whose decorators we want.
-     */
     getDecoratorsOfDeclaration(declaration: ts.Declaration): Decorator[] | null;
+    getMembersOfClass(clazz: ts.Declaration): ClassMember[];
+    getConstructorParameters(clazz: ts.Declaration): Parameter[] | null;
+    getImportOfIdentifier(id: ts.Identifier): Import | null;
     isClass(node: ts.Node): node is ts.Declaration;
-    getClassDecorators(classSymbol: ts.Symbol): Decorator[];
-    getMemberDecorators(classSymbol: ts.Symbol): Map<string, Decorator[]>;
     /**
-     * Parse the declaration and find the decorators that were attached to the constructor.
-     * @param declaration The declaration of the constructor, whose decorators we want.
+     * Member decorators are declared as static properties of the class in ES2015:
+     *
+     * ```
+     * SomeDirective.propDecorators = {
+     *   "ngForOf": [{ type: Input },],
+     *   "ngForTrackBy": [{ type: Input },],
+     *   "ngForTemplate": [{ type: Input },],
+     * };
+     * ```
      */
-    getConstructorParamDecorators(classSymbol: ts.Symbol): Map<string, Decorator[]>;
-    private getDecorators(decoratorsArray);
+    protected getMemberDecorators(classSymbol: ts.Symbol): Map<string, Decorator[]>;
+    protected getDecorators(decoratorsArray: ts.Expression): Decorator[];
+    protected getClassSymbol(declaration: ts.Declaration): ts.Symbol | undefined;
 }

@@ -22,6 +22,7 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     private _reflectDecorator(node);
     private _reflectMember(node);
 }
+export declare function getImportOfSymbol(symbol: ts.Symbol | undefined): Import | null;
 export declare function reflectNameOfDeclaration(decl: ts.Declaration): string | null;
 export declare function reflectIdentifierOfDeclaration(decl: ts.Declaration): ts.Identifier | null;
 export declare function reflectTypeEntityToDeclaration(type: ts.EntityName, checker: ts.TypeChecker): {
