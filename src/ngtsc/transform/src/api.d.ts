@@ -33,7 +33,7 @@ export interface DecoratorHandler<A> {
      * Generate a description of the field which should be added to the class, including any
      * initialization code to be generated.
      */
-    compile(node: ts.Declaration, analysis: A): CompileResult;
+    compile(node: ts.Declaration, analysis: A): CompileResult | CompileResult[];
 }
 /**
  * The output of an analysis operation, consisting of possibly an arbitrary analysis object (used as
@@ -49,7 +49,7 @@ export interface AnalysisOutput<A> {
  * and a type for the .d.ts file.
  */
 export interface CompileResult {
-    field: string;
+    name: string;
     initializer: Expression;
     statements: Statement[];
     type: Type;
