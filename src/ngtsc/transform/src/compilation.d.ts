@@ -30,7 +30,7 @@ export declare class IvyCompilation {
      * Perform a compilation operation on the given class declaration and return instructions to an
      * AST transformer if any are available.
      */
-    compileIvyFieldFor(node: ts.Declaration): CompileResult | undefined;
+    compileIvyFieldFor(node: ts.Declaration): CompileResult[] | undefined;
     /**
      * Lookup the `ts.Decorator` which triggered transformation of a particular class declaration.
      */
