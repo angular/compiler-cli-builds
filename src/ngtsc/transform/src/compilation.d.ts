@@ -12,6 +12,7 @@ export declare class IvyCompilation {
     private handlers;
     private checker;
     private reflector;
+    private coreImportsFrom;
     /**
      * Tracks classes which have been analyzed and found to have an Ivy decorator, and the
      * information recorded about them for later compilation.
@@ -21,7 +22,16 @@ export declare class IvyCompilation {
      * Tracks the `DtsFileTransformer`s for each TS file that needs .d.ts transformations.
      */
     private dtsMap;
-    constructor(handlers: DecoratorHandler<any>[], checker: ts.TypeChecker, reflector: ReflectionHost);
+    /**
+     * @param handlers array of `DecoratorHandler`s which will be executed against each class in the
+     * program
+     * @param checker TypeScript `TypeChecker` instance for the program
+     * @param reflector `ReflectionHost` through which all reflection operations will be performed
+     * @param coreImportsFrom a TypeScript `SourceFile` which exports symbols needed for Ivy imports
+     * when compiling @angular/core, or `null` if the current program is not @angular/core. This is
+     * `null` in most cases.
+     */
+    constructor(handlers: DecoratorHandler<any>[], checker: ts.TypeChecker, reflector: ReflectionHost, coreImportsFrom: ts.SourceFile | null);
     /**
      * Analyze a source file and produce diagnostics for it (if any).
      */
@@ -39,6 +49,6 @@ export declare class IvyCompilation {
      * Process a .d.ts source string and return a transformed version that incorporates the changes
      * made to the source file.
      */
-    transformedDtsFor(tsFileName: string, dtsOriginalSource: string): string;
+    transformedDtsFor(tsFileName: string, dtsOriginalSource: string, dtsPath: string): string;
     private getDtsTransformer(tsFileName);
 }
