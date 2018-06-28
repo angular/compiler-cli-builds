@@ -15,7 +15,8 @@ import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform
  */
 export declare class InjectableDecoratorHandler implements DecoratorHandler<R3InjectableMetadata> {
     private reflector;
-    constructor(reflector: ReflectionHost);
+    private isCore;
+    constructor(reflector: ReflectionHost, isCore: boolean);
     detect(decorator: Decorator[]): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3InjectableMetadata>;
     compile(node: ts.ClassDeclaration, analysis: R3InjectableMetadata): CompileResult;
