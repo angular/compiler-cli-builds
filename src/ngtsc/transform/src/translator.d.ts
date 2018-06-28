@@ -9,10 +9,12 @@
 import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Statement, Type, TypeVisitor, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
 import * as ts from 'typescript';
 export declare class ImportManager {
+    private isCore;
     private moduleToIndex;
     private nextIndex;
-    generateNamedImport(moduleName: string): string;
-    getAllImports(): {
+    constructor(isCore: boolean);
+    generateNamedImport(moduleName: string, symbol: string): string;
+    getAllImports(contextPath: string, rewriteCoreImportsTo: ts.SourceFile | null): {
         name: string;
         as: string;
     }[];
