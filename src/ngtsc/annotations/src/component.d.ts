@@ -18,7 +18,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<R3Com
     private checker;
     private reflector;
     private scopeRegistry;
-    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry);
+    private isCore;
+    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean);
     detect(decorators: Decorator[]): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3ComponentMetadata>;
     compile(node: ts.ClassDeclaration, analysis: R3ComponentMetadata): CompileResult;
