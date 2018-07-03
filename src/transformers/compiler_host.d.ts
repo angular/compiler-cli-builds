@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/transformers/compiler_host" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,13 +6,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/transformers/compiler_host" />
 import { AotCompilerHost, GeneratedFile, ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
 import { TypeCheckHost } from '../diagnostics/translate_diagnostics';
 import { ModuleMetadata } from '../metadata/index';
 import { CompilerHost, CompilerOptions, LibrarySummary } from './api';
-export declare function createCompilerHost({ options, tsHost }: {
+export declare function createCompilerHost({options, tsHost}: {
     options: CompilerOptions;
     tsHost?: ts.CompilerHost;
 }): CompilerHost;
@@ -54,7 +54,7 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter implements ts.Com
     getDirectories: (path: string) => string[];
     directoryExists?: (directoryName: string) => boolean;
     constructor(rootFiles: ReadonlyArray<string>, options: CompilerOptions, context: CompilerHost, metadataProvider: MetadataProvider, codeGenerator: CodeGenerator, librarySummaries?: Map<string, LibrarySummary>);
-    private resolveModuleName;
+    private resolveModuleName(moduleName, containingFile);
     resolveModuleNames(moduleNames: string[], containingFile: string): ts.ResolvedModule[];
     moduleNameToFileName(m: string, containingFile?: string): string | null;
     /**
@@ -79,17 +79,17 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter implements ts.Com
     toSummaryFileName(fileName: string, referringSrcFileName: string): string;
     fromSummaryFileName(fileName: string, referringLibFileName: string): string;
     parseSourceSpanOf(fileName: string, line: number, character: number): ParseSourceSpan | null;
-    private getOriginalSourceFile;
+    private getOriginalSourceFile(filePath, languageVersion?, onError?);
     updateGeneratedFile(genFile: GeneratedFile): ts.SourceFile;
-    private addGeneratedFile;
+    private addGeneratedFile(genFile, externalReferences);
     shouldGenerateFile(fileName: string): {
         generate: boolean;
         baseFileName?: string;
     };
     shouldGenerateFilesFor(fileName: string): string | boolean | null;
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined): ts.SourceFile;
-    private getGeneratedFile;
-    private originalFileExists;
+    private getGeneratedFile(fileName);
+    private originalFileExists(fileName);
     fileExists(fileName: string): boolean;
     loadSummary(filePath: string): string | null;
     isSourceFile(filePath: string): boolean;
@@ -97,7 +97,7 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter implements ts.Com
     getMetadataFor(filePath: string): ModuleMetadata[] | undefined;
     loadResource(filePath: string): Promise<string> | string;
     getOutputName(filePath: string): string;
-    private hasBundleIndex;
+    private hasBundleIndex(filePath);
     getDefaultLibFileName: (options: ts.CompilerOptions) => string;
     getCurrentDirectory: () => string;
     getCanonicalFileName: (fileName: string) => string;
