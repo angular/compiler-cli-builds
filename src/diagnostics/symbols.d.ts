@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/diagnostics/symbols" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/diagnostics/symbols" />
 import { StaticSymbol } from '@angular/compiler';
 /**
  * The range of a span of text in a source file.
@@ -181,7 +181,7 @@ export declare enum BuiltinType {
     /**
      * Not a built-in type.
      */
-    Other = 7,
+    Other = 7
 }
 /**
  * The kinds of definition.

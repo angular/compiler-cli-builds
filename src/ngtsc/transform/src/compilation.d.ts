@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/compilation" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/compilation" />
 import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../host';
 import { CompileResult, DecoratorHandler } from './api';
@@ -45,8 +45,7 @@ export declare class IvyCompilation {
     /**
      * Analyze a source file and produce diagnostics for it (if any).
      */
-    private analyze(sf, preanalyze);
-    private analyze(sf, preanalyze);
+    private analyze;
     /**
      * Perform a compilation operation on the given class declaration and return instructions to an
      * AST transformer if any are available.
@@ -62,5 +61,5 @@ export declare class IvyCompilation {
      */
     transformedDtsFor(tsFileName: string, dtsOriginalSource: string, dtsPath: string): string;
     readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
-    private getDtsTransformer(tsFileName);
+    private getDtsTransformer;
 }
