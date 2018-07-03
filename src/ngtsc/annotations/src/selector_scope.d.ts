@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/selector_scope" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/selector_scope" />
 import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ReflectionHost } from '../../host';
@@ -80,7 +80,7 @@ export declare class SelectorScopeRegistry {
      * (`ngModuleImportedFrom`) then all of its declarations are exported at that same path, as well
      * as imports and exports from other modules that are relatively imported.
      */
-    private lookupScopes(node, ngModuleImportedFrom);
+    private lookupScopes;
     /**
      * Lookup the selector of a component or directive class.
      *
@@ -88,8 +88,8 @@ export declare class SelectorScopeRegistry {
      * ngComponentDef/ngDirectiveDef. In this case, the type metadata of that definition is read
      * to determine the selector.
      */
-    private lookupDirectiveSelector(node);
-    private lookupPipeName(node);
+    private lookupDirectiveSelector;
+    private lookupPipeName;
     /**
      * Read the metadata from a class that has already been compiled somehow (either it's in a .d.ts
      * file, or in a .ts file with a handwritten definition).
@@ -98,12 +98,17 @@ export declare class SelectorScopeRegistry {
      * @param ngModuleImportedFrom module specifier of the import path to assume for all declarations
      * stemming from this module.
      */
-    private _readMetadataFromCompiledClass(clazz, ngModuleImportedFrom);
+    private _readMetadataFromCompiledClass;
     /**
      * Get the selector from type metadata for a class with a precompiled ngComponentDef or
      * ngDirectiveDef.
      */
-    private _readSelectorFromCompiledClass(clazz);
+    private _readSelectorFromCompiledClass;
+    /**
+     * Get the selector from type metadata for a class with a precompiled ngComponentDef or
+     * ngDirectiveDef.
+     */
+    private _readNameFromCompiledClass;
     /**
      * Process a `TypeNode` which is a tuple of references to other types, and return `Reference`s to
      * them.
@@ -111,5 +116,5 @@ export declare class SelectorScopeRegistry {
      * This operation assumes that these types should be imported from `ngModuleImportedFrom` unless
      * they themselves were imported from another absolute path.
      */
-    private _extractReferencesFromType(def, ngModuleImportedFrom);
+    private _extractReferencesFromType;
 }
