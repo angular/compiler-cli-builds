@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/compilation" />
 import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../host';
@@ -22,6 +29,7 @@ export declare class IvyCompilation {
      * Tracks the `DtsFileTransformer`s for each TS file that needs .d.ts transformations.
      */
     private dtsMap;
+    private _diagnostics;
     /**
      * @param handlers array of `DecoratorHandler`s which will be executed against each class in the
      * program
@@ -32,10 +40,12 @@ export declare class IvyCompilation {
      * `null` in most cases.
      */
     constructor(handlers: DecoratorHandler<any>[], checker: ts.TypeChecker, reflector: ReflectionHost, coreImportsFrom: ts.SourceFile | null);
+    analyzeSync(sf: ts.SourceFile): void;
+    analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     /**
      * Analyze a source file and produce diagnostics for it (if any).
      */
-    analyze(sf: ts.SourceFile): ts.Diagnostic[];
+    private analyze;
     /**
      * Perform a compilation operation on the given class declaration and return instructions to an
      * AST transformer if any are available.
@@ -50,5 +60,6 @@ export declare class IvyCompilation {
      * made to the source file.
      */
     transformedDtsFor(tsFileName: string, dtsOriginalSource: string, dtsPath: string): string;
-    private getDtsTransformer(tsFileName);
+    readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
+    private getDtsTransformer;
 }
