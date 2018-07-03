@@ -30,31 +30,31 @@ export declare class MetadataBundler {
     constructor(root: string, importAs: string | undefined, host: MetadataBundlerHost, privateSymbolPrefix?: string);
     getMetadataBundle(): BundledModule;
     static resolveModule(importName: string, from: string): string;
-    private getMetadata(moduleName);
-    private exportAll(moduleName);
+    private getMetadata;
+    private exportAll;
     /**
      * Fill in the canonicalSymbol which is the symbol that should be imported by factories.
      * The canonical symbol is the one exported by the index file for the bundle or definition
      * symbol for private symbols that are not exported by bundle index.
      */
-    private canonicalizeSymbols(exportedSymbols);
-    private canonicalizeSymbol(symbol);
-    private getEntries(exportedSymbols);
-    private getReExports(exportedSymbols);
-    private convertSymbol(symbol);
-    private convertEntry(moduleName, value);
-    private convertClass(moduleName, value);
-    private convertMembers(moduleName, members);
-    private convertMember(moduleName, member);
-    private convertStatics(moduleName, statics);
-    private convertFunction(moduleName, value);
-    private convertValue(moduleName, value);
-    private convertExpression(moduleName, value);
-    private convertError(module, value);
-    private convertReference(moduleName, value);
-    private convertExpressionNode(moduleName, value);
-    private symbolOf(module, name);
-    private canonicalSymbolOf(module, name);
+    private canonicalizeSymbols;
+    private canonicalizeSymbol;
+    private getEntries;
+    private getReExports;
+    private convertSymbol;
+    private convertEntry;
+    private convertClass;
+    private convertMembers;
+    private convertMember;
+    private convertStatics;
+    private convertFunction;
+    private convertValue;
+    private convertExpression;
+    private convertError;
+    private convertReference;
+    private convertExpressionNode;
+    private symbolOf;
+    private canonicalSymbolOf;
 }
 export declare class CompilerHostAdapter implements MetadataBundlerHost {
     private host;

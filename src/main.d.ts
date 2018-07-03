@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /// <amd-module name="@angular/compiler-cli/src/main" />
 import 'reflect-metadata';
 import * as ts from 'typescript';
