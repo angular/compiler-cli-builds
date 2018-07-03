@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/resolver" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,7 +6,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/resolver" />
 /**
  * resolver.ts implements partial computation of expressions, resolving expressions to static
  * values where possible and returning a `DynamicValue` signal when not.

@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/host/src/reflection" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,7 +6,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/host/src/reflection" />
 import * as ts from 'typescript';
 /**
  * Metadata extracted from an instance of a decorator on another declaration.
@@ -40,7 +40,7 @@ export declare enum ClassMemberKind {
     Getter = 1,
     Setter = 2,
     Property = 3,
-    Method = 4
+    Method = 4,
 }
 /**
  * A member of a class, such as a property, method, or constructor.

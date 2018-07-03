@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/language_services" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,7 +6,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/language_services" />
 export { DiagnosticTemplateInfo, ExpressionDiagnostic, getExpressionDiagnostics, getExpressionScope, getTemplateExpressionDiagnostics } from './diagnostics/expression_diagnostics';
 export { AstType, DiagnosticKind, ExpressionDiagnosticsContext, TypeDiagnostic } from './diagnostics/expression_type';
 export { BuiltinType, DeclarationKind, Definition, Location, PipeInfo, Pipes, Signature, Span, Symbol, SymbolDeclaration, SymbolQuery, SymbolTable } from './diagnostics/symbols';
