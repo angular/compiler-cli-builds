@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/metadata/evaluator" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/metadata/evaluator" />
 import * as ts from 'typescript';
 import { CollectorOptions } from './collector';
 import { MetadataEntry, MetadataError, MetadataValue } from './schema';
@@ -29,7 +29,7 @@ export declare class Evaluator {
     private symbols;
     private nodeMap;
     private options;
-    private recordExport;
+    private recordExport?;
     constructor(symbols: Symbols, nodeMap: Map<MetadataEntry, ts.Node>, options?: CollectorOptions, recordExport?: ((name: string, value: MetadataValue) => void) | undefined);
     nameOf(node: ts.Node | undefined): string | MetadataError;
     /**
@@ -49,7 +49,7 @@ export declare class Evaluator {
      *   table.
      */
     isFoldable(node: ts.Node): boolean;
-    private isFoldableWorker(node, folding);
+    private isFoldableWorker;
     /**
      * Produce a JSON serialiable object representing `node`. The foldable values in the expression
      * tree are folded. For example, a node representing `1 + 2` is folded into `3`.
