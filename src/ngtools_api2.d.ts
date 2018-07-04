@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtools_api2" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/ngtools_api2" />
 /**
  * This is a private API for @ngtools/webpack. This API should be stable for NG 5.
  *
@@ -65,7 +65,7 @@ export declare enum EmitFlags {
     I18nBundle = 8,
     Codegen = 16,
     Default = 19,
-    All = 31,
+    All = 31
 }
 export interface CustomTransformers {
     beforeTs?: ts.TransformerFactory<ts.SourceFile>[];
@@ -105,20 +105,20 @@ export interface Program {
     getNgSemanticDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
     loadNgStructureAsync(): Promise<void>;
     listLazyRoutes(entryRoute?: string): LazyRoute[];
-    emit({emitFlags, cancellationToken, customTransformers, emitCallback}: {
+    emit({ emitFlags, cancellationToken, customTransformers, emitCallback }: {
         emitFlags?: EmitFlags;
         cancellationToken?: ts.CancellationToken;
         customTransformers?: CustomTransformers;
         emitCallback?: TsEmitCallback;
     }): ts.EmitResult;
 }
-export declare function createProgram({rootNames, options, host, oldProgram}: {
+export declare function createProgram({ rootNames, options, host, oldProgram }: {
     rootNames: string[];
     options: CompilerOptions;
     host: CompilerHost;
     oldProgram?: Program;
 }): Program;
-export declare function createCompilerHost({options, tsHost}: {
+export declare function createCompilerHost({ options, tsHost }: {
     options: CompilerOptions;
     tsHost?: ts.CompilerHost;
 }): CompilerHost;

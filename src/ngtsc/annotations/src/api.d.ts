@@ -5,6 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/transformers/entry_points" />
-export { createCompilerHost } from './compiler_host';
-export { createProgram } from './program';
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/api" />
+export interface ResourceLoader {
+    preload?(url: string): Promise<void> | undefined;
+    load(url: string): string;
+}
