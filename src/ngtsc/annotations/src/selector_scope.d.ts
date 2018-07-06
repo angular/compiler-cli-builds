@@ -105,6 +105,11 @@ export declare class SelectorScopeRegistry {
      */
     private _readSelectorFromCompiledClass;
     /**
+     * Get the selector from type metadata for a class with a precompiled ngComponentDef or
+     * ngDirectiveDef.
+     */
+    private _readNameFromCompiledClass;
+    /**
      * Process a `TypeNode` which is a tuple of references to other types, and return `Reference`s to
      * them.
      *
