@@ -1,4 +1,4 @@
-/// <amd-module name="angular/packages/compiler-cli/src/ngcc/src/transforming/package_transformer" />
+/// <amd-module name="angular/packages/compiler-cli/src/ngcc/src/transform/package_transformer" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
