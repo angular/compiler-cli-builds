@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/transformers/api" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/transformers/api" />
 import { ParseSourceSpan, Position } from '@angular/compiler';
 import * as ts from 'typescript';
 export declare const DEFAULT_ERROR_CODE = 100;
@@ -139,7 +139,7 @@ export declare enum EmitFlags {
     I18nBundle = 8,
     Codegen = 16,
     Default = 19,
-    All = 31,
+    All = 31
 }
 export interface CustomTransformers {
     beforeTs?: ts.TransformerFactory<ts.SourceFile>[];
@@ -173,7 +173,7 @@ export interface LazyRoute {
         filePath: string;
     };
     referencedModule: {
-        name: string;
+        name?: string;
         filePath: string;
     };
 }
@@ -242,7 +242,7 @@ export interface Program {
      *
      * Angular structural information is required to emit files.
      */
-    emit({emitFlags, cancellationToken, customTransformers, emitCallback, mergeEmitResultsCallback}?: {
+    emit({ emitFlags, cancellationToken, customTransformers, emitCallback, mergeEmitResultsCallback }?: {
         emitFlags?: EmitFlags;
         cancellationToken?: ts.CancellationToken;
         customTransformers?: CustomTransformers;

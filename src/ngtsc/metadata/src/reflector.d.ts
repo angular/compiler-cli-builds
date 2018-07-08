@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/reflector" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/reflector" />
 import * as ts from 'typescript';
 import { ClassMember, Decorator, Import, Parameter, ReflectionHost } from '../../host';
 /**
@@ -19,8 +19,8 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     getConstructorParameters(declaration: ts.Declaration): Parameter[] | null;
     getImportOfIdentifier(id: ts.Identifier): Import | null;
     isClass(node: ts.Node): node is ts.Declaration;
-    private _reflectDecorator(node);
-    private _reflectMember(node);
+    private _reflectDecorator;
+    private _reflectMember;
 }
 export declare function getImportOfSymbol(symbol: ts.Symbol | undefined): Import | null;
 export declare function reflectNameOfDeclaration(decl: ts.Declaration): string | null;

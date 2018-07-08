@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/util/src/visitor" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/util/src/visitor" />
 import * as ts from 'typescript';
 /**
  * Result type of visiting a node that's typically an entry in a list, which allows specifying that
@@ -33,10 +33,10 @@ export declare abstract class Visitor {
      * nodes to insert before the declaration.
      */
     visitClassDeclaration(node: ts.ClassDeclaration): VisitListEntryResult<ts.Statement, ts.ClassDeclaration>;
-    private _visitListEntryNode<T>(node, visitor);
+    private _visitListEntryNode;
     /**
      * Visit types of nodes which don't have their own explicit visitor.
      */
     visitOtherNode<T extends ts.Node>(node: T): T;
-    private _maybeProcessStatements<T>(node);
+    private _maybeProcessStatements;
 }

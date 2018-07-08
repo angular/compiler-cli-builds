@@ -1,3 +1,10 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/compilation" />
 import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../host';
@@ -12,6 +19,7 @@ export declare class IvyCompilation {
     private handlers;
     private checker;
     private reflector;
+    private coreImportsFrom;
     /**
      * Tracks classes which have been analyzed and found to have an Ivy decorator, and the
      * information recorded about them for later compilation.
@@ -21,16 +29,28 @@ export declare class IvyCompilation {
      * Tracks the `DtsFileTransformer`s for each TS file that needs .d.ts transformations.
      */
     private dtsMap;
-    constructor(handlers: DecoratorHandler<any>[], checker: ts.TypeChecker, reflector: ReflectionHost);
+    private _diagnostics;
+    /**
+     * @param handlers array of `DecoratorHandler`s which will be executed against each class in the
+     * program
+     * @param checker TypeScript `TypeChecker` instance for the program
+     * @param reflector `ReflectionHost` through which all reflection operations will be performed
+     * @param coreImportsFrom a TypeScript `SourceFile` which exports symbols needed for Ivy imports
+     * when compiling @angular/core, or `null` if the current program is not @angular/core. This is
+     * `null` in most cases.
+     */
+    constructor(handlers: DecoratorHandler<any>[], checker: ts.TypeChecker, reflector: ReflectionHost, coreImportsFrom: ts.SourceFile | null);
+    analyzeSync(sf: ts.SourceFile): void;
+    analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     /**
      * Analyze a source file and produce diagnostics for it (if any).
      */
-    analyze(sf: ts.SourceFile): ts.Diagnostic[];
+    private analyze;
     /**
      * Perform a compilation operation on the given class declaration and return instructions to an
      * AST transformer if any are available.
      */
-    compileIvyFieldFor(node: ts.Declaration): CompileResult | undefined;
+    compileIvyFieldFor(node: ts.Declaration): CompileResult[] | undefined;
     /**
      * Lookup the `ts.Decorator` which triggered transformation of a particular class declaration.
      */
@@ -39,6 +59,7 @@ export declare class IvyCompilation {
      * Process a .d.ts source string and return a transformed version that incorporates the changes
      * made to the source file.
      */
-    transformedDtsFor(tsFileName: string, dtsOriginalSource: string): string;
-    private getDtsTransformer(tsFileName);
+    transformedDtsFor(tsFileName: string, dtsOriginalSource: string, dtsPath: string): string;
+    readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
+    private getDtsTransformer;
 }

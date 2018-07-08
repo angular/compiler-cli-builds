@@ -1,4 +1,3 @@
-/// <amd-module name="angular/packages/compiler-cli/src/ngcc/src/host/esm2015_host" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="angular/packages/compiler-cli/src/ngcc/src/host/esm2015_host" />
 import * as ts from 'typescript';
 import { ClassMember, Decorator, Import, Parameter } from '../../../ngtsc/host';
 import { NgccReflectionHost } from './ngcc_host';
@@ -17,7 +17,7 @@ import { NgccReflectionHost } from './ngcc_host';
  * class SomeDirective {
  * }
  * SomeDirective.decorators = [
- *     { type: Directive, args: [{ selector: '[someDirective]' },] }
+ *   { type: Directive, args: [{ selector: '[someDirective]' },] }
  * ];
  * SomeDirective.ctorParameters = () => [
  *   { type: ViewContainerRef, },
@@ -34,7 +34,7 @@ import { NgccReflectionHost } from './ngcc_host';
  * * Members are decorated if there is a matching key on a static property
  *   called `propDecorators`.
  * * Constructor parameters decorators are found on an object returned from
- *   a static method called `ctrParameters`.
+ *   a static method called `ctorParameters`.
  */
 export declare class Esm2015ReflectionHost implements NgccReflectionHost {
     protected checker: ts.TypeChecker;
@@ -43,7 +43,6 @@ export declare class Esm2015ReflectionHost implements NgccReflectionHost {
     getMembersOfClass(clazz: ts.Declaration): ClassMember[];
     getConstructorParameters(clazz: ts.Declaration): Parameter[] | null;
     getImportOfIdentifier(id: ts.Identifier): Import | null;
-    isClass(node: ts.Node): node is ts.Declaration;
     /**
      * Member decorators are declared as static properties of the class in ES2015:
      *
