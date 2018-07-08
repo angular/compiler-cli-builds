@@ -10,13 +10,17 @@ import * as ts from 'typescript';
 import MagicString from 'magic-string';
 import { AnalyzedClass, AnalyzedFile } from '../analyzer';
 import { Decorator } from '../../../ngtsc/host';
-export interface RenderedFile {
+export interface RenderResult {
     file: AnalyzedFile;
-    content: string;
-    map: string;
+    source: FileInfo;
+    map: FileInfo;
+}
+export interface FileInfo {
+    path: string;
+    contents: string;
 }
 export declare abstract class Renderer {
-    renderFile(file: AnalyzedFile): RenderedFile;
+    renderFile(file: AnalyzedFile, targetPath: string): RenderResult;
     abstract addImports(output: MagicString, imports: {
         name: string;
         as: string;
