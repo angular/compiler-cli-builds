@@ -57,4 +57,8 @@ export declare class Esm2015ReflectionHost implements NgccReflectionHost {
     protected getMemberDecorators(classSymbol: ts.Symbol): Map<string, Decorator[]>;
     protected getDecorators(decoratorsArray: ts.Expression): Decorator[];
     protected getClassSymbol(declaration: ts.Declaration): ts.Symbol | undefined;
+    /**
+     * Find the declarations of the constructor parameters of a class identified by its symbol.
+     */
+    protected getConstructorParameterDeclarations(classSymbol: ts.Symbol): ts.ParameterDeclaration[];
 }
