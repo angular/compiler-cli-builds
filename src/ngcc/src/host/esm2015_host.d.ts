@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="angular/packages/compiler-cli/src/ngcc/src/host/esm2015_host" />
+/// <amd-module name="@angular/compiler-cli/src/ngcc/src/host/esm2015_host" />
 import * as ts from 'typescript';
 import { ClassMember, Decorator, Import, Parameter } from '../../../ngtsc/host';
 import { NgccReflectionHost } from './ngcc_host';
@@ -56,7 +56,7 @@ export declare class Esm2015ReflectionHost implements NgccReflectionHost {
      */
     protected getMemberDecorators(classSymbol: ts.Symbol): Map<string, Decorator[]>;
     protected getDecorators(decoratorsArray: ts.Expression): Decorator[];
-    protected getClassSymbol(declaration: ts.Declaration): ts.Symbol | undefined;
+    getClassSymbol(declaration: ts.Declaration): ts.Symbol | undefined;
     /**
      * Find the declarations of the constructor parameters of a class identified by its symbol.
      */

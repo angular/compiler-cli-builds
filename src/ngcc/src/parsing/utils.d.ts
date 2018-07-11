@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="angular/packages/compiler-cli/src/ngcc/src/parsing/utils" />
+/// <amd-module name="@angular/compiler-cli/src/ngcc/src/parsing/utils" />
 /**
  * Search the `rootDirectory` and its subdirectories to find package.json files.
  * It ignores node dependencies, i.e. those under `node_modules` folders.

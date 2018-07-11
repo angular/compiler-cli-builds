@@ -1,4 +1,4 @@
-/// <amd-module name="angular/packages/compiler-cli/src/ngcc/src/rendering/renderer" />
+/// <amd-module name="@angular/compiler-cli/src/ngcc/src/rendering/renderer" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

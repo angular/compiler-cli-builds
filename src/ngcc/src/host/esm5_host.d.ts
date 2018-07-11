@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="angular/packages/compiler-cli/src/ngcc/src/host/esm5_host" />
+/// <amd-module name="@angular/compiler-cli/src/ngcc/src/host/esm5_host" />
 import * as ts from 'typescript';
 import { Esm2015ReflectionHost } from './esm2015_host';
 /**
@@ -32,7 +32,7 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      * So we need to dig around inside to get hold of the "class" symbol.
      * @param declaration the top level declaration that represents an exported class.
      */
-    protected getClassSymbol(declaration: ts.Declaration): ts.Symbol | undefined;
+    getClassSymbol(declaration: ts.Declaration): ts.Symbol | undefined;
     /**
      * Find the declarations of the constructor parameters of a class identified by its symbol.
      * In ESM5 there is no "class" so the constructor that we want is actually the declaration

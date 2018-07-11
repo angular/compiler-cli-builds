@@ -1,4 +1,4 @@
-/// <amd-module name="angular/packages/compiler-cli/src/ngcc/src/analyzer" />
+/// <amd-module name="@angular/compiler-cli/src/ngcc/src/analyzer" />
 import * as ts from 'typescript';
 import { ResourceLoader, SelectorScopeRegistry } from '../../ngtsc/annotations';
 import { Decorator } from '../../ngtsc/host';

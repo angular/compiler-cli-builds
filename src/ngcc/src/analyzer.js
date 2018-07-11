@@ -4,7 +4,7 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define("angular/packages/compiler-cli/src/ngcc/src/analyzer", ["require", "exports", "tslib", "fs", "@angular/compiler-cli/src/ngtsc/annotations"], factory);
+        define("@angular/compiler-cli/src/ngcc/src/analyzer", ["require", "exports", "tslib", "fs", "@angular/compiler-cli/src/ngtsc/annotations"], factory);
     }
 })(function (require, exports) {
     "use strict";
