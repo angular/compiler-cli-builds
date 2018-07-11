@@ -1,4 +1,4 @@
-/// <amd-module name="angular/packages/compiler-cli/src/ngcc/src/parsing/file_parser" />
+/// <amd-module name="@angular/compiler-cli/src/ngcc/src/parsing/file_parser" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.

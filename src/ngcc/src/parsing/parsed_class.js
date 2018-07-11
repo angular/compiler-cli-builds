@@ -11,7 +11,7 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define("angular/packages/compiler-cli/src/ngcc/src/parsing/parsed_class", ["require", "exports"], factory);
+        define("@angular/compiler-cli/src/ngcc/src/parsing/parsed_class", ["require", "exports"], factory);
     }
 })(function (require, exports) {
     "use strict";

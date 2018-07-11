@@ -1,4 +1,4 @@
-/// <amd-module name="angular/packages/compiler-cli/src/ngcc/src/rendering/esm2015_renderer" />
+/// <amd-module name="@angular/compiler-cli/src/ngcc/src/rendering/esm2015_renderer" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -8,14 +8,12 @@
  */
 import * as ts from 'typescript';
 import MagicString from 'magic-string';
-import { AnalyzedClass, AnalyzedFile } from '../analyzer';
+import { NgccReflectionHost } from '../host/ngcc_host';
+import { AnalyzedClass } from '../analyzer';
 import { Renderer } from './renderer';
-export interface RenderedFile {
-    file: AnalyzedFile;
-    content: string;
-    map: string;
-}
 export declare class Esm2015Renderer extends Renderer {
+    protected host: NgccReflectionHost;
+    constructor(host: NgccReflectionHost);
     addImports(output: MagicString, imports: {
         name: string;
         as: string;

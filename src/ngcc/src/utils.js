@@ -11,7 +11,7 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define("angular/packages/compiler-cli/src/ngcc/src/utils", ["require", "exports", "path", "shelljs"], factory);
+        define("@angular/compiler-cli/src/ngcc/src/utils", ["require", "exports", "path", "shelljs"], factory);
     }
 })(function (require, exports) {
     "use strict";
