@@ -15,7 +15,7 @@ export interface BundledModule {
     privates: BundlePrivateEntry[];
 }
 export interface MetadataBundlerHost {
-    getMetadataFor(moduleName: string): ModuleMetadata | undefined;
+    getMetadataFor(moduleName: string, containingFile: string): ModuleMetadata | undefined;
 }
 export declare class MetadataBundler {
     private root;
@@ -59,7 +59,8 @@ export declare class MetadataBundler {
 export declare class CompilerHostAdapter implements MetadataBundlerHost {
     private host;
     private cache;
+    private options;
     private collector;
-    constructor(host: ts.CompilerHost, cache: MetadataCache | null);
-    getMetadataFor(fileName: string): ModuleMetadata | undefined;
+    constructor(host: ts.CompilerHost, cache: MetadataCache | null, options: ts.CompilerOptions);
+    getMetadataFor(fileName: string, containingFile: string): ModuleMetadata | undefined;
 }
