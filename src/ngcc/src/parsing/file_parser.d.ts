@@ -20,7 +20,8 @@ import { ParsedFile } from './parsed_file';
  * - ES2015 files contain `class Xxxx {...}` style declarations
  * - ES5 files contain `var Xxxx = (function () { function Xxxx() { ... }; return Xxxx; })();` style
  *   declarations
- * - UMD have similar declarations to ES5 files but the whole thing is wrapped in IIFE module wrapper
+ * - UMD have similar declarations to ES5 files but the whole thing is wrapped in IIFE module
+ * wrapper
  *   function.
  */
 export interface FileParser {

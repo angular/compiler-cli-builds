@@ -117,12 +117,14 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     /**
      * Find the declarations of the constructor parameters of a class identified by its symbol.
      * @param classSymbol the class whose parameters we want to find.
-     * @returns an array of `ts.ParameterDeclaration` objects representing each of the parameters in the
+     * @returns an array of `ts.ParameterDeclaration` objects representing each of the parameters in
+     * the
      * class's constructor or null if there is no constructor.
      */
     protected getConstructorParameterDeclarations(classSymbol: ts.Symbol): ts.ParameterDeclaration[] | null;
     /**
-     * Constructors parameter decorators are declared in the body of static method of the class in ES2015:
+     * Constructors parameter decorators are declared in the body of static method of the class in
+     * ES2015:
      *
      * ```
      * SomeDirective.ctorParameters = () => [

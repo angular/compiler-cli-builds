@@ -60,7 +60,8 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
     protected getConstructorParameterDeclarations(classSymbol: ts.Symbol): ts.ParameterDeclaration[];
     /**
      * Constructors parameter decorators are declared in the body of static method of the constructor
-     * function in ES5. Note that unlike ESM2105 this is a function expression rather than an arrow function:
+     * function in ES5. Note that unlike ESM2105 this is a function expression rather than an arrow
+     * function:
      *
      * ```
      * SomeDirective.ctorParameters = function() { return [

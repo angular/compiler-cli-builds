@@ -8,8 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/parsing/esm5_parser" />
 import * as ts from 'typescript';
 import { NgccReflectionHost } from '../host/ngcc_host';
-import { ParsedFile } from './parsed_file';
 import { FileParser } from './file_parser';
+import { ParsedFile } from './parsed_file';
 /**
  * Parses ESM5 package files for decoratrs classes.
  * ESM5 "classes" are actually functions wrapped by and returned
