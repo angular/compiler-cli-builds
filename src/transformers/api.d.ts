@@ -173,7 +173,7 @@ export interface LazyRoute {
         filePath: string;
     };
     referencedModule: {
-        name?: string;
+        name: string;
         filePath: string;
     };
 }

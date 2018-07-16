@@ -10,9 +10,10 @@ import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, Co
 import * as ts from 'typescript';
 export declare class ImportManager {
     private isCore;
+    private prefix;
     private moduleToIndex;
     private nextIndex;
-    constructor(isCore: boolean);
+    constructor(isCore: boolean, prefix?: string);
     generateNamedImport(moduleName: string, symbol: string): string;
     getAllImports(contextPath: string, rewriteCoreImportsTo: ts.SourceFile | null): {
         name: string;

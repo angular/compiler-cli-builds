@@ -8,8 +8,16 @@
  */
 import * as ts from 'typescript';
 import MagicString from 'magic-string';
+import { SourceMapConverter } from 'convert-source-map';
+import { RawSourceMap } from 'source-map';
 import { AnalyzedClass, AnalyzedFile } from '../analyzer';
 import { Decorator } from '../../../ngtsc/host';
+import { ImportManager } from '../../../ngtsc/transform/src/translator';
+interface SourceMapInfo {
+    source: string;
+    map: SourceMapConverter | null;
+    isInline: boolean;
+}
 /**
  * The results of rendering an analyzed file.
  */
@@ -25,7 +33,7 @@ export interface RenderResult {
     /**
      * The rendered source map file.
      */
-    map: FileInfo;
+    map: FileInfo | null;
 }
 /**
  * Information about a file that has been rendered.
@@ -60,4 +68,16 @@ export declare abstract class Renderer {
     protected abstract addDefinitions(output: MagicString, analyzedClass: AnalyzedClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
     protected trackDecorators(decorators: Decorator[], decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
+    protected extractSourceMap(file: ts.SourceFile): SourceMapInfo;
+    protected renderSourceAndMap(file: AnalyzedFile, input: SourceMapInfo, output: MagicString, outputPath: string): RenderResult;
 }
+export declare function mergeSourceMaps(oldMap: RawSourceMap | null, newMap: RawSourceMap): SourceMapConverter;
+/**
+ * Render the definitions as source code for the given class.
+ * @param sourceFile The file containing the class to process.
+ * @param clazz The class whose definitions are to be rendered.
+ * @param compilation The results of analyzing the class - this is used to generate the rendered definitions.
+ * @param imports An object that tracks the imports that are needed by the rendered definitions.
+ */
+export declare function renderDefinitions(sourceFile: ts.SourceFile, analyzedClass: AnalyzedClass, imports: ImportManager): string;
+export {};
