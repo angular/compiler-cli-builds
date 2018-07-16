@@ -24,7 +24,7 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     /**
      * Resolve a `ts.Symbol` to its declaration, keeping track of the `viaModule` along the way.
      */
-    protected _getDeclarationOfSymbol(symbol: ts.Symbol): Declaration | null;
+    protected getDeclarationOfSymbol(symbol: ts.Symbol): Declaration | null;
     private _reflectDecorator;
     private _reflectMember;
 }
