@@ -1,17 +1,11 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/transform/package_transformer" />
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 import * as ts from 'typescript';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { FileParser } from '../parsing/file_parser';
 import { FileInfo, Renderer } from '../rendering/renderer';
 /**
- * A Package is stored in a directory on disk and that directory can contain one or more package formats - e.g. fesm2015, UMD, etc.
+ * A Package is stored in a directory on disk and that directory can contain one or more package
+ formats - e.g. fesm2015, UMD, etc.
  *
  * Each of these formats exposes one or more entry points, which are source files that need to be
  * parsed to identify the decorated exported classes that need to be analyzed and compiled by one or
