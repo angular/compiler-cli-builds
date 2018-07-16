@@ -1,11 +1,4 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/rendering/renderer" />
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 import * as ts from 'typescript';
 import MagicString from 'magic-string';
 import { SourceMapConverter } from 'convert-source-map';
@@ -76,7 +69,8 @@ export declare function mergeSourceMaps(oldMap: RawSourceMap | null, newMap: Raw
  * Render the definitions as source code for the given class.
  * @param sourceFile The file containing the class to process.
  * @param clazz The class whose definitions are to be rendered.
- * @param compilation The results of analyzing the class - this is used to generate the rendered definitions.
+ * @param compilation The results of analyzing the class - this is used to generate the rendered
+ * definitions.
  * @param imports An object that tracks the imports that are needed by the rendered definitions.
  */
 export declare function renderDefinitions(sourceFile: ts.SourceFile, analyzedClass: AnalyzedClass, imports: ImportManager): string;
