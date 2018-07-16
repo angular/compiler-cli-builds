@@ -12,6 +12,7 @@
  */
 import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
+import { ReflectionHost } from '../../host';
 /**
  * Represents a value which cannot be determined statically.
  *
@@ -115,4 +116,4 @@ export declare class AbsoluteReference extends Reference {
  * @param checker a `ts.TypeChecker` used to understand the expression
  * @returns a `ResolvedValue` representing the resolved value
  */
-export declare function staticallyResolve(node: ts.Expression, checker: ts.TypeChecker): ResolvedValue;
+export declare function staticallyResolve(node: ts.Expression, host: ReflectionHost, checker: ts.TypeChecker): ResolvedValue;
