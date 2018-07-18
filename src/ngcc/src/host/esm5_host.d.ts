@@ -30,19 +30,6 @@ import { Esm2015ReflectionHost } from './esm2015_host';
 export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
     constructor(checker: ts.TypeChecker);
     /**
-     * Examine a declaration which should be of a class, and return metadata about the members of the
-     * class.
-     *
-     * @param declaration a TypeScript `ts.Declaration` node representing the class over which to
-     * reflect. If the source is in ES6 format, this will be a `ts.ClassDeclaration` node. If the
-     * source is in ES5 format, this might be a `ts.VariableDeclaration` as classes in ES5 are
-     * represented as the result of an IIFE execution.
-     *
-     * @returns an array of `ClassMember` metadata representing the members of the class.
-     *
-     * @throws if `declaration` does not resolve to a class declaration.
-     */
-    /**
      * Check whether the given declaration node actually represents a class.
      */
     isClass(node: ts.Declaration): boolean;
