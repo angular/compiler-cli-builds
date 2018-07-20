@@ -6,8 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/translator" />
-import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Statement, Type, TypeVisitor, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
+import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Statement, Type, TypeVisitor, TypeofExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
 import * as ts from 'typescript';
+export declare class Context {
+    readonly isStatement: boolean;
+    constructor(isStatement: boolean);
+    readonly withExpressionMode: Context;
+    readonly withStatementMode: Context;
+}
 export declare class ImportManager {
     private isCore;
     private moduleToIndex;
@@ -25,29 +31,30 @@ export declare function translateType(type: Type, imports: ImportManager): strin
 export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVisitor {
     private imports;
     constructor(imports: ImportManager);
-    visitBuiltinType(type: BuiltinType, context: any): string;
-    visitExpressionType(type: ExpressionType, context: any): any;
-    visitArrayType(type: ArrayType, context: any): string;
-    visitMapType(type: MapType, context: any): string;
-    visitReadVarExpr(ast: ReadVarExpr, context: any): string;
-    visitWriteVarExpr(expr: WriteVarExpr, context: any): never;
-    visitWriteKeyExpr(expr: WriteKeyExpr, context: any): never;
-    visitWritePropExpr(expr: WritePropExpr, context: any): never;
-    visitInvokeMethodExpr(ast: InvokeMethodExpr, context: any): never;
-    visitInvokeFunctionExpr(ast: InvokeFunctionExpr, context: any): never;
-    visitInstantiateExpr(ast: InstantiateExpr, context: any): never;
-    visitLiteralExpr(ast: LiteralExpr, context: any): string;
-    visitExternalExpr(ast: ExternalExpr, context: any): string;
-    visitConditionalExpr(ast: ConditionalExpr, context: any): void;
-    visitNotExpr(ast: NotExpr, context: any): void;
-    visitAssertNotNullExpr(ast: AssertNotNull, context: any): void;
-    visitCastExpr(ast: CastExpr, context: any): void;
-    visitFunctionExpr(ast: FunctionExpr, context: any): void;
-    visitBinaryOperatorExpr(ast: BinaryOperatorExpr, context: any): void;
-    visitReadPropExpr(ast: ReadPropExpr, context: any): void;
-    visitReadKeyExpr(ast: ReadKeyExpr, context: any): void;
-    visitLiteralArrayExpr(ast: LiteralArrayExpr, context: any): string;
-    visitLiteralMapExpr(ast: LiteralMapExpr, context: any): void;
-    visitCommaExpr(ast: CommaExpr, context: any): void;
-    visitWrappedNodeExpr(ast: WrappedNodeExpr<any>, context: any): string;
+    visitBuiltinType(type: BuiltinType, context: Context): string;
+    visitExpressionType(type: ExpressionType, context: Context): string;
+    visitArrayType(type: ArrayType, context: Context): string;
+    visitMapType(type: MapType, context: Context): string;
+    visitReadVarExpr(ast: ReadVarExpr, context: Context): string;
+    visitWriteVarExpr(expr: WriteVarExpr, context: Context): never;
+    visitWriteKeyExpr(expr: WriteKeyExpr, context: Context): never;
+    visitWritePropExpr(expr: WritePropExpr, context: Context): never;
+    visitInvokeMethodExpr(ast: InvokeMethodExpr, context: Context): never;
+    visitInvokeFunctionExpr(ast: InvokeFunctionExpr, context: Context): never;
+    visitInstantiateExpr(ast: InstantiateExpr, context: Context): never;
+    visitLiteralExpr(ast: LiteralExpr, context: Context): string;
+    visitExternalExpr(ast: ExternalExpr, context: Context): string;
+    visitConditionalExpr(ast: ConditionalExpr, context: Context): void;
+    visitNotExpr(ast: NotExpr, context: Context): void;
+    visitAssertNotNullExpr(ast: AssertNotNull, context: Context): void;
+    visitCastExpr(ast: CastExpr, context: Context): void;
+    visitFunctionExpr(ast: FunctionExpr, context: Context): void;
+    visitBinaryOperatorExpr(ast: BinaryOperatorExpr, context: Context): void;
+    visitReadPropExpr(ast: ReadPropExpr, context: Context): void;
+    visitReadKeyExpr(ast: ReadKeyExpr, context: Context): void;
+    visitLiteralArrayExpr(ast: LiteralArrayExpr, context: Context): string;
+    visitLiteralMapExpr(ast: LiteralMapExpr, context: Context): void;
+    visitCommaExpr(ast: CommaExpr, context: Context): void;
+    visitWrappedNodeExpr(ast: WrappedNodeExpr<any>, context: Context): string;
+    visitTypeofExpr(ast: TypeofExpr, context: Context): string;
 }
