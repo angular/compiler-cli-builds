@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/directive" />
-import { R3DirectiveMetadata } from '@angular/compiler';
+import { R3DirectiveMetadata, R3QueryMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator, ReflectionHost } from '../../host';
+import { ClassMember, Decorator, ReflectionHost } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 import { SelectorScopeRegistry } from './selector_scope';
 export declare class DirectiveDecoratorHandler implements DecoratorHandler<R3DirectiveMetadata> {
@@ -24,4 +24,17 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<R3Dir
 /**
  * Helper function to extract metadata from a `Directive` or `Component`.
  */
-export declare function extractDirectiveMetadata(clazz: ts.ClassDeclaration, decorator: Decorator, checker: ts.TypeChecker, reflector: ReflectionHost, isCore: boolean): R3DirectiveMetadata | undefined;
+export declare function extractDirectiveMetadata(clazz: ts.ClassDeclaration, decorator: Decorator, checker: ts.TypeChecker, reflector: ReflectionHost, isCore: boolean): {
+    decorator: Map<string, ts.Expression>;
+    metadata: R3DirectiveMetadata;
+    decoratedElements: ClassMember[];
+} | undefined;
+export declare function extractQueryMetadata(name: string, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, checker: ts.TypeChecker): R3QueryMetadata;
+export declare function extractQueriesFromDecorator(queryData: ts.Expression, reflector: ReflectionHost, checker: ts.TypeChecker, isCore: boolean): {
+    content: R3QueryMetadata[];
+    view: R3QueryMetadata[];
+};
+export declare function queriesFromFields(fields: {
+    member: ClassMember;
+    decorators: Decorator[];
+}[], reflector: ReflectionHost, checker: ts.TypeChecker): R3QueryMetadata[];

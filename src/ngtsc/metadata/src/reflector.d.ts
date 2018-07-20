@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/reflector" />
 import * as ts from 'typescript';
-import { ClassMember, Decorator, Import, Parameter, ReflectionHost } from '../../host';
+import { ClassMember, Declaration, Decorator, Import, Parameter, ReflectionHost } from '../../host';
 /**
  * reflector.ts implements static reflection of declarations using the TypeScript `ts.TypeChecker`.
  */
@@ -18,7 +18,9 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     getMembersOfClass(declaration: ts.Declaration): ClassMember[];
     getConstructorParameters(declaration: ts.Declaration): Parameter[] | null;
     getImportOfIdentifier(id: ts.Identifier): Import | null;
-    isClass(node: ts.Node): node is ts.Declaration;
+    getExportsOfModule(node: ts.Node): Map<string, Declaration> | null;
+    isClass(node: ts.Declaration): node is ts.ClassDeclaration;
+    getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
     private _reflectDecorator;
     private _reflectMember;
 }
