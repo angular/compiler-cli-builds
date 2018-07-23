@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/node_emitter" />
-import { AssertNotNull, BinaryOperatorExpr, CastExpr, ClassStmt, CommaExpr, CommentStmt, ConditionalExpr, DeclareFunctionStmt, DeclareVarStmt, ExpressionStatement, ExpressionVisitor, ExternalExpr, FunctionExpr, IfStmt, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, JSDocCommentStmt, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, NotExpr, ParseSourceSpan, PartialModule, ReadKeyExpr, ReadPropExpr, ReadVarExpr, ReturnStatement, Statement, StatementVisitor, ThrowStmt, TryCatchStmt, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
+import { AssertNotNull, BinaryOperatorExpr, CastExpr, ClassStmt, CommaExpr, CommentStmt, ConditionalExpr, DeclareFunctionStmt, DeclareVarStmt, ExpressionStatement, ExpressionVisitor, ExternalExpr, FunctionExpr, IfStmt, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, JSDocCommentStmt, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, NotExpr, ParseSourceSpan, PartialModule, ReadKeyExpr, ReadPropExpr, ReadVarExpr, ReturnStatement, Statement, StatementVisitor, ThrowStmt, TryCatchStmt, TypeofExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
 import * as ts from 'typescript';
 export interface Node {
     sourceSpan: ParseSourceSpan | null;
@@ -70,6 +70,7 @@ export declare class NodeEmitterVisitor implements StatementVisitor, ExpressionV
     visitJSDocCommentStmt(stmt: JSDocCommentStmt, sourceFile: ts.SourceFile): ts.NotEmittedStatement;
     private createCommentStmt;
     visitWrappedNodeExpr(expr: WrappedNodeExpr<any>): any;
+    visitTypeofExpr(expr: TypeofExpr): RecordedNode<ts.TypeOfExpression>;
     visitReadVarExpr(expr: ReadVarExpr): (ts.Identifier & {
         __recorded: any;
     }) | (ts.SuperExpression & {

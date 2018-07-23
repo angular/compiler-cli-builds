@@ -21,10 +21,6 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     getExportsOfModule(node: ts.Node): Map<string, Declaration> | null;
     isClass(node: ts.Declaration): boolean;
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
-    /**
-     * Resolve a `ts.Symbol` to its declaration, keeping track of the `viaModule` along the way.
-     */
-    protected getDeclarationOfSymbol(symbol: ts.Symbol): Declaration | null;
     private _reflectDecorator;
     private _reflectMember;
 }
