@@ -29,4 +29,9 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModu
     detect(decorators: Decorator[]): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;
     compile(node: ts.ClassDeclaration, analysis: NgModuleAnalysis): CompileResult[];
+    /**
+     * Given a `FunctionDeclaration` or `MethodDeclaration`, check if it is typed as a
+     * `ModuleWithProviders` and return an expression referencing the module if available.
+     */
+    private _extractModuleFromModuleWithProvidersFn;
 }

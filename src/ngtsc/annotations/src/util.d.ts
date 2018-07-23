@@ -13,3 +13,10 @@ import { Reference } from '../../metadata';
 export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): R3DependencyMetadata[];
 export declare function referenceToExpression(ref: Reference, context: ts.SourceFile): Expression;
 export declare function isAngularCore(decorator: Decorator): boolean;
+/**
+ * Unwrap a `ts.Expression`, removing outer type-casts or parentheses until the expression is in its
+ * lowest level form.
+ *
+ * For example, the expression "(foo as Type)" unwraps to "foo".
+ */
+export declare function unwrapExpression(node: ts.Expression): ts.Expression;
