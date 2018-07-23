@@ -79,7 +79,7 @@ export interface ClassMember {
      */
     value: ts.Expression | null;
     /**
-     * TypeScript `ts.Declaration` which represents the declaration of the member.
+     * TypeScript `ts.Declaration` which represents the implementation of the member.
      *
      * In TypeScript code this is identical to the node, but in downleveled code this should always be
      * the Declaration which actually represents the member's runtime value.
@@ -112,7 +112,7 @@ export interface ClassMember {
      * ```
      *
      * In this example, for the property "property", the node would be the entire
-     * Object.defineProperty ExpressionStatement, but the declaration would be this
+     * Object.defineProperty ExpressionStatement, but the implementation would be this
      * FunctionDeclaration:
      *
      * ```
@@ -121,7 +121,7 @@ export interface ClassMember {
      * },
      * ```
      */
-    declaration: ts.Declaration | null;
+    implementation: ts.Declaration | null;
     /**
      * Whether the member is static or not.
      */
