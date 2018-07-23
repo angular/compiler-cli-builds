@@ -12,6 +12,7 @@
  */
 import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
+import { ReflectionHost } from '../../host';
 /**
  * Represents a value which cannot be determined statically.
  *
@@ -73,6 +74,7 @@ export declare abstract class Reference {
      * import if needed.
      */
     abstract toExpression(context: ts.SourceFile): Expression | null;
+    abstract withIdentifier(identifier: ts.Identifier): Reference;
 }
 /**
  * A reference to a node only, without any ability to get an `Expression` representing that node.
@@ -81,7 +83,10 @@ export declare abstract class Reference {
  * referenceable.
  */
 export declare class NodeReference extends Reference {
+    readonly moduleName: string | null;
+    constructor(node: ts.Node, moduleName: string | null);
     toExpression(context: ts.SourceFile): null;
+    withIdentifier(identifier: ts.Identifier): NodeReference;
 }
 /**
  * A reference to a node which has a `ts.Identifier` and can be resolved to an `Expression`.
@@ -93,6 +98,7 @@ export declare class ResolvedReference extends Reference {
     constructor(node: ts.Node, identifier: ts.Identifier);
     readonly expressable: boolean;
     toExpression(context: ts.SourceFile): Expression;
+    withIdentifier(identifier: ts.Identifier): ResolvedReference;
 }
 /**
  * A reference to a node which has a `ts.Identifer` and an expected absolute module name.
@@ -107,12 +113,19 @@ export declare class AbsoluteReference extends Reference {
     constructor(node: ts.Node, identifier: ts.Identifier, moduleName: string, symbolName: string);
     readonly expressable: boolean;
     toExpression(context: ts.SourceFile): Expression;
+    withIdentifier(identifier: ts.Identifier): AbsoluteReference;
 }
 /**
  * Statically resolve the given `ts.Expression` into a `ResolvedValue`.
  *
  * @param node the expression to statically resolve if possible
  * @param checker a `ts.TypeChecker` used to understand the expression
+ * @param foreignFunctionResolver a function which will be used whenever a "foreign function" is
+ * encountered. A foreign function is a function which has no body - usually the result of calling
+ * a function declared in another library's .d.ts file. In these cases, the foreignFunctionResolver
+ * will be called with the function's declaration, and can optionally return a `ts.Expression`
+ * (possibly extracted from the foreign function's type signature) which will be used as the result
+ * of the call.
  * @returns a `ResolvedValue` representing the resolved value
  */
-export declare function staticallyResolve(node: ts.Expression, checker: ts.TypeChecker): ResolvedValue;
+export declare function staticallyResolve(node: ts.Expression, host: ReflectionHost, checker: ts.TypeChecker, foreignFunctionResolver?: (node: ts.FunctionDeclaration | ts.MethodDeclaration) => ts.Expression | null): ResolvedValue;
