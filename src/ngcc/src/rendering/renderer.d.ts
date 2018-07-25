@@ -5,7 +5,7 @@ import { SourceMapConverter } from 'convert-source-map';
 import { RawSourceMap } from 'source-map';
 import { AnalyzedClass, AnalyzedFile } from '../analyzer';
 import { Decorator } from '../../../ngtsc/host';
-import { ImportManager } from '../../../ngtsc/transform/src/translator';
+import { ImportManager } from '../../../ngtsc/transform';
 interface SourceMapInfo {
     source: string;
     map: SourceMapConverter | null;
@@ -60,10 +60,36 @@ export declare abstract class Renderer {
     }[]): void;
     protected abstract addDefinitions(output: MagicString, analyzedClass: AnalyzedClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
+    /**
+     * Add the decorator nodes that are to be removed to a map
+     * So that we can tell if we should remove the entire decorator property
+     */
     protected trackDecorators(decorators: Decorator[], decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
+    /**
+     * Get the map from the source (note whether it is inline or external)
+     */
     protected extractSourceMap(file: ts.SourceFile): SourceMapInfo;
+    /**
+     * Merge the input and output source-maps, replacing the source-map comment in the output file
+     * with an appropriate source-map comment pointing to the merged source-map.
+     */
     protected renderSourceAndMap(file: AnalyzedFile, input: SourceMapInfo, output: MagicString, outputPath: string): RenderResult;
 }
+/**
+ * Merge the two specified source-maps into a single source-map that hides the intermediate
+ * source-map.
+ * E.g. Consider these mappings:
+ *
+ * ```
+ * OLD_SRC -> OLD_MAP -> INTERMEDIATE_SRC -> NEW_MAP -> NEW_SRC
+ * ```
+ *
+ * this will be replaced with:
+ *
+ * ```
+ * OLD_SRC -> MERGED_MAP -> NEW_SRC
+ * ```
+ */
 export declare function mergeSourceMaps(oldMap: RawSourceMap | null, newMap: RawSourceMap): SourceMapConverter;
 /**
  * Render the definitions as source code for the given class.
