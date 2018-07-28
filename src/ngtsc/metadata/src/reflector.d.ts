@@ -19,7 +19,7 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     getConstructorParameters(declaration: ts.Declaration): Parameter[] | null;
     getImportOfIdentifier(id: ts.Identifier): Import | null;
     getExportsOfModule(node: ts.Node): Map<string, Declaration> | null;
-    isClass(node: ts.Declaration): node is ts.ClassDeclaration;
+    isClass(node: ts.Declaration): boolean;
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
     private _reflectDecorator;
     private _reflectMember;
