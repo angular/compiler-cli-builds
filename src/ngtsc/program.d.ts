@@ -11,10 +11,12 @@ import * as ts from 'typescript';
 import * as api from '../transformers/api';
 export declare class NgtscProgram implements api.Program {
     private options;
-    private host;
     private tsProgram;
     private resourceLoader;
     private compilation;
+    private factoryToSourceInfo;
+    private sourceToFactorySymbols;
+    private host;
     private _coreImportsFrom;
     private _reflector;
     private _isCore;
