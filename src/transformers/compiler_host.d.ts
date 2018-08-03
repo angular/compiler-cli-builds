@@ -103,7 +103,7 @@ export declare class TsCompilerAotCompilerTypeCheckHostAdapter implements ts.Com
     getCanonicalFileName: (fileName: string) => string;
     useCaseSensitiveFileNames: () => boolean;
     getNewLine: () => string;
-    realPath: (p: string) => string;
+    realpath: (p: string) => string;
     writeFile: any;
 }
 export declare function getOriginalReferences(sourceFile: ts.SourceFile): ts.FileReference[] | undefined;
