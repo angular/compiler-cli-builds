@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/metadata/schema" />
 export declare const METADATA_VERSION = 4;
 export declare type MetadataEntry = ClassMetadata | InterfaceMetadata | FunctionMetadata | MetadataValue;
 export interface ModuleMetadata {

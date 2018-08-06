@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/diagnostics/symbols" />
 import { StaticSymbol } from '@angular/compiler';
 /**
  * The range of a span of text in a source file.
@@ -134,7 +135,7 @@ export interface SymbolTable {
  */
 export interface Signature {
     /**
-     * The arguments of the signture. The order of `argumetnts.symbols()` must be in the order
+     * The arguments of the signture. The order of `arguments.symbols()` must be in the order
      * of argument declaration.
      */
     readonly arguments: SymbolTable;
@@ -180,10 +181,10 @@ export declare enum BuiltinType {
     /**
      * Not a built-in type.
      */
-    Other = 7,
+    Other = 7
 }
 /**
- * The kinds of defintion.
+ * The kinds of definition.
  *
  * @experimental
  */

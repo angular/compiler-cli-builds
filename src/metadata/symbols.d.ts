@@ -5,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/metadata/symbols" />
 import * as ts from 'typescript';
 import { MetadataSymbolicReferenceExpression, MetadataValue } from './schema';
 export declare class Symbols {
@@ -17,5 +18,5 @@ export declare class Symbols {
     defineReference(name: string, value: MetadataSymbolicReferenceExpression): void;
     has(name: string): boolean;
     private readonly symbols;
-    private buildImports();
+    private buildImports;
 }

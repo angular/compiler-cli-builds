@@ -1,5 +1,7 @@
+/// <amd-module name="@angular/compiler-cli/src/metadata/bundler" />
 import * as ts from 'typescript';
 import { MetadataEntry, ModuleMetadata } from '../metadata/schema';
+import { MetadataCache } from '../transformers/metadata_cache';
 export interface BundleEntries {
     [name: string]: MetadataEntry;
 }
@@ -13,7 +15,7 @@ export interface BundledModule {
     privates: BundlePrivateEntry[];
 }
 export interface MetadataBundlerHost {
-    getMetadataFor(moduleName: string): ModuleMetadata | undefined;
+    getMetadataFor(moduleName: string, containingFile: string): ModuleMetadata | undefined;
 }
 export declare class MetadataBundler {
     private root;
@@ -23,39 +25,42 @@ export declare class MetadataBundler {
     private metadataCache;
     private exports;
     private rootModule;
+    private privateSymbolPrefix;
     private exported;
-    constructor(root: string, importAs: string | undefined, host: MetadataBundlerHost);
+    constructor(root: string, importAs: string | undefined, host: MetadataBundlerHost, privateSymbolPrefix?: string);
     getMetadataBundle(): BundledModule;
     static resolveModule(importName: string, from: string): string;
-    private getMetadata(moduleName);
-    private exportAll(moduleName);
+    private getMetadata;
+    private exportAll;
     /**
      * Fill in the canonicalSymbol which is the symbol that should be imported by factories.
      * The canonical symbol is the one exported by the index file for the bundle or definition
      * symbol for private symbols that are not exported by bundle index.
      */
-    private canonicalizeSymbols(exportedSymbols);
-    private canonicalizeSymbol(symbol);
-    private getEntries(exportedSymbols);
-    private getReExports(exportedSymbols);
-    private convertSymbol(symbol);
-    private convertEntry(moduleName, value);
-    private convertClass(moduleName, value);
-    private convertMembers(moduleName, members);
-    private convertMember(moduleName, member);
-    private convertStatics(moduleName, statics);
-    private convertFunction(moduleName, value);
-    private convertValue(moduleName, value);
-    private convertExpression(moduleName, value);
-    private convertError(module, value);
-    private convertReference(moduleName, value);
-    private convertExpressionNode(moduleName, value);
-    private symbolOf(module, name);
-    private canonicalSymbolOf(module, name);
+    private canonicalizeSymbols;
+    private canonicalizeSymbol;
+    private getEntries;
+    private getReExports;
+    private convertSymbol;
+    private convertEntry;
+    private convertClass;
+    private convertMembers;
+    private convertMember;
+    private convertStatics;
+    private convertFunction;
+    private convertValue;
+    private convertExpression;
+    private convertError;
+    private convertReference;
+    private convertExpressionNode;
+    private symbolOf;
+    private canonicalSymbolOf;
 }
 export declare class CompilerHostAdapter implements MetadataBundlerHost {
     private host;
+    private cache;
+    private options;
     private collector;
-    constructor(host: ts.CompilerHost);
-    getMetadataFor(fileName: string): ModuleMetadata | undefined;
+    constructor(host: ts.CompilerHost, cache: MetadataCache | null, options: ts.CompilerOptions);
+    getMetadataFor(fileName: string, containingFile: string): ModuleMetadata | undefined;
 }
