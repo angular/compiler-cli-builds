@@ -50,6 +50,7 @@ export interface DecoratorHandler<A> {
 export interface AnalysisOutput<A> {
     analysis?: A;
     diagnostics?: ts.Diagnostic[];
+    factorySymbolName?: string;
 }
 /**
  * A description of the static field to add to a class, including an initialization expression
