@@ -20,11 +20,15 @@ export declare class IvyCompilation {
     private checker;
     private reflector;
     private coreImportsFrom;
+    private sourceToFactorySymbols;
     /**
      * Tracks classes which have been analyzed and found to have an Ivy decorator, and the
      * information recorded about them for later compilation.
      */
     private analysis;
+    /**
+     * Tracks factory information which needs to be generated.
+     */
     /**
      * Tracks the `DtsFileTransformer`s for each TS file that needs .d.ts transformations.
      */
@@ -39,7 +43,7 @@ export declare class IvyCompilation {
      * when compiling @angular/core, or `null` if the current program is not @angular/core. This is
      * `null` in most cases.
      */
-    constructor(handlers: DecoratorHandler<any>[], checker: ts.TypeChecker, reflector: ReflectionHost, coreImportsFrom: ts.SourceFile | null);
+    constructor(handlers: DecoratorHandler<any>[], checker: ts.TypeChecker, reflector: ReflectionHost, coreImportsFrom: ts.SourceFile | null, sourceToFactorySymbols: Map<string, Set<string>> | null);
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     /**
