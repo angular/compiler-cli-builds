@@ -18,6 +18,7 @@ export declare class Esm2015Renderer extends Renderer {
         name: string;
         as: string;
     }[]): void;
+    addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
     /**
      * Add the definitions to each decorated class
      */

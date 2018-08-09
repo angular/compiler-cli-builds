@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/api" />
-import { Expression, Statement, Type } from '@angular/compiler';
+import { ConstantPool, Expression, Statement, Type } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Decorator } from '../../host';
 /**
@@ -40,7 +40,7 @@ export interface DecoratorHandler<A> {
      * Generate a description of the field which should be added to the class, including any
      * initialization code to be generated.
      */
-    compile(node: ts.Declaration, analysis: A): CompileResult | CompileResult[];
+    compile(node: ts.Declaration, analysis: A, constantPool: ConstantPool): CompileResult | CompileResult[];
 }
 /**
  * The output of an analysis operation, consisting of possibly an arbitrary analysis object (used as
@@ -50,6 +50,7 @@ export interface DecoratorHandler<A> {
 export interface AnalysisOutput<A> {
     analysis?: A;
     diagnostics?: ts.Diagnostic[];
+    factorySymbolName?: string;
 }
 /**
  * A description of the static field to add to a class, including an initialization expression

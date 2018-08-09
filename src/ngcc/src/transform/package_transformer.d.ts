@@ -25,7 +25,7 @@ import { FileInfo, Renderer } from '../rendering/renderer';
  * - Some formats may contain multiple "modules" in a single file.
  */
 export declare class PackageTransformer {
-    transform(packagePath: string, format: string): void;
+    transform(packagePath: string, format: string, targetPath?: string): void;
     getHost(format: string, program: ts.Program, dtsMapper: DtsMapper): NgccReflectionHost;
     getFileParser(format: string, program: ts.Program, host: NgccReflectionHost): FileParser;
     getRenderer(format: string, program: ts.Program, host: NgccReflectionHost): Renderer;

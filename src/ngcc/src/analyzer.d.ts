@@ -1,4 +1,12 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/analyzer" />
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ResourceLoader, SelectorScopeRegistry } from '../../ngtsc/annotations';
 import { Decorator } from '../../ngtsc/host';
@@ -15,6 +23,7 @@ export interface AnalyzedClass<T = any> extends ParsedClass {
 export interface AnalyzedFile {
     analyzedClasses: AnalyzedClass[];
     sourceFile: ts.SourceFile;
+    constantPool: ConstantPool;
 }
 export interface MatchingHandler<T> {
     handler: DecoratorHandler<T>;
@@ -39,5 +48,5 @@ export declare class Analyzer {
      * @param file The file to be analysed for decorated classes.
      */
     analyzeFile(file: ParsedFile): AnalyzedFile;
-    protected analyzeClass(clazz: ParsedClass): AnalyzedClass | undefined;
+    protected analyzeClass(file: ts.SourceFile, pool: ConstantPool, clazz: ParsedClass): AnalyzedClass | undefined;
 }

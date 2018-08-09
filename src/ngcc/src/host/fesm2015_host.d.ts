@@ -96,13 +96,6 @@ export declare class Fesm2015ReflectionHost extends TypeScriptReflectionHost imp
      */
     getClassSymbol(declaration: ts.Node): ts.Symbol | undefined;
     /**
-     * Get the number of generic type parameters of a given class.
-     *
-     * @returns the number of type parameters of the class, if known, or `null` if the declaration
-     * is not a class or has an unknown number of type parameters.
-     */
-    getGenericArityOfClass(clazz: ts.Declaration): number | null;
-    /**
      * Member decorators are declared as static properties of the class in ES2015:
      *
      * ```
