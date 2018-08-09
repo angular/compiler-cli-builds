@@ -25,6 +25,7 @@ export interface ModuleData {
 export interface CompilationScope<T> {
     directives: Map<string, T>;
     pipes: Map<string, T>;
+    containsForwardDecls?: boolean;
 }
 /**
  * Registry which records and correlates static analysis information of Angular types.
