@@ -3,6 +3,7 @@ import * as ts from 'typescript';
 import MagicString from 'magic-string';
 import { SourceMapConverter } from 'convert-source-map';
 import { RawSourceMap } from 'source-map';
+import { ConstantPool } from '@angular/compiler';
 import { AnalyzedClass, AnalyzedFile } from '../analyzer';
 import { Decorator } from '../../../ngtsc/host';
 import { ImportManager } from '../../../ngtsc/transform';
@@ -54,6 +55,7 @@ export declare abstract class Renderer {
      * @param targetPath The absolute path where the rendered file will be written.
      */
     renderFile(file: AnalyzedFile, targetPath: string): RenderResult;
+    protected abstract addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
     protected abstract addImports(output: MagicString, imports: {
         name: string;
         as: string;
@@ -91,6 +93,10 @@ export declare abstract class Renderer {
  * ```
  */
 export declare function mergeSourceMaps(oldMap: RawSourceMap | null, newMap: RawSourceMap): SourceMapConverter;
+/**
+ * Render the constant pool as source code for the given class.
+ */
+export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPool: ConstantPool, imports: ImportManager): string;
 /**
  * Render the definitions as source code for the given class.
  * @param sourceFile The file containing the class to process.

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
-import { R3ComponentMetadata } from '@angular/compiler';
+import { ConstantPool, R3ComponentMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
@@ -26,6 +26,6 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<R3Com
     detect(decorators: Decorator[]): Decorator | undefined;
     preanalyze(node: ts.ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3ComponentMetadata>;
-    compile(node: ts.ClassDeclaration, analysis: R3ComponentMetadata): CompileResult;
+    compile(node: ts.ClassDeclaration, analysis: R3ComponentMetadata, pool: ConstantPool): CompileResult;
     private _resolveLiteral;
 }
