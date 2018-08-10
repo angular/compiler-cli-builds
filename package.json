@@ -1,22 +1,26 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "6.0.0-rc.5+145.sha-741fa9e",
+  "version": "7.0.0-beta.1+25.sha-ca8c683",
   "description": "Angular - the compiler CLI for Node.js",
   "main": "index.js",
   "typings": "index.d.ts",
   "bin": {
+    "ivy-ngcc": "./src/ngcc/main-ngcc.js",
     "ngc": "./src/main.js",
     "ng-xi18n": "./src/extract_i18n.js"
   },
   "dependencies": {
     "reflect-metadata": "^0.1.2",
     "minimist": "^1.2.0",
-    "tsickle": "^0.27.2",
-    "chokidar": "^1.4.2"
+    "tsickle": "^0.32.1",
+    "chokidar": "^1.4.2",
+    "convert-source-map": "^1.5.1",
+    "magic-string": "^0.25.0",
+    "source-map": "^0.6.1"
   },
   "peerDependencies": {
-    "typescript": ">=2.7.2 <2.8",
-    "@angular/compiler": "6.0.0-rc.5+145.sha-741fa9e"
+    "typescript": ">=2.7.2 <2.10",
+    "@angular/compiler": "7.0.0-beta.1+25.sha-ca8c683"
   },
   "engines" : {
     "node" : ">=8.0"

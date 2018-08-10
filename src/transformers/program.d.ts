@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/transformers/program" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/transformers/program" />
 import { MessageBundle } from '@angular/compiler';
 import * as path from 'path';
 import * as ts from 'typescript';
@@ -29,7 +29,7 @@ import { CompilerHost, CompilerOptions, Program } from './api';
  * is false)
  */
 export declare function checkVersion(version: string, minVersion: string, maxVersion: string, disableVersionCheck: boolean | undefined): void;
-export declare function createProgram({rootNames, options, host, oldProgram}: {
+export declare function createProgram({ rootNames, options, host, oldProgram }: {
     rootNames: ReadonlyArray<string>;
     options: CompilerOptions;
     host: CompilerHost;

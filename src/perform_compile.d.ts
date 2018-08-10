@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/perform_compile" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/src/perform_compile" />
 import { Position } from '@angular/compiler';
 import * as ts from 'typescript';
 import * as api from './transformers/api';
@@ -34,7 +34,7 @@ export interface PerformCompilationResult {
     emitResult?: ts.EmitResult;
 }
 export declare function exitCodeFromResult(diags: Diagnostics | undefined): number;
-export declare function performCompilation({rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags}: {
+export declare function performCompilation({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags }: {
     rootNames: string[];
     options: api.CompilerOptions;
     host?: api.CompilerHost;
