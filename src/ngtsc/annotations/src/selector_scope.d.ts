@@ -74,6 +74,7 @@ export declare class SelectorScopeRegistry {
      * it.
      */
     lookupCompilationScope(node: ts.Declaration): CompilationScope<Expression> | null;
+    private lookupScopesOrDie;
     /**
      * Lookup `SelectorScopes` for a given module.
      *
