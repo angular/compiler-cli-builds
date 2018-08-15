@@ -15,7 +15,7 @@ import { SelectorScopeRegistry } from './selector_scope';
 /**
  * `DecoratorHandler` which handles the `@Component` annotation.
  */
-export declare class ComponentDecoratorHandler implements DecoratorHandler<R3ComponentMetadata> {
+export declare class ComponentDecoratorHandler implements DecoratorHandler<R3ComponentMetadata, Decorator> {
     private checker;
     private reflector;
     private scopeRegistry;
@@ -23,7 +23,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<R3Com
     private resourceLoader;
     constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader);
     private literalCache;
-    detect(decorators: Decorator[]): Decorator | undefined;
+    detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     preanalyze(node: ts.ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3ComponentMetadata>;
     compile(node: ts.ClassDeclaration, analysis: R3ComponentMetadata, pool: ConstantPool): CompileResult;
