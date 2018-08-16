@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/compilation" />
+import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../host';
 import { CompileResult, DecoratorHandler } from './api';
@@ -43,7 +44,7 @@ export declare class IvyCompilation {
      * when compiling @angular/core, or `null` if the current program is not @angular/core. This is
      * `null` in most cases.
      */
-    constructor(handlers: DecoratorHandler<any>[], checker: ts.TypeChecker, reflector: ReflectionHost, coreImportsFrom: ts.SourceFile | null, sourceToFactorySymbols: Map<string, Set<string>> | null);
+    constructor(handlers: DecoratorHandler<any, any>[], checker: ts.TypeChecker, reflector: ReflectionHost, coreImportsFrom: ts.SourceFile | null, sourceToFactorySymbols: Map<string, Set<string>> | null);
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     /**
@@ -54,7 +55,7 @@ export declare class IvyCompilation {
      * Perform a compilation operation on the given class declaration and return instructions to an
      * AST transformer if any are available.
      */
-    compileIvyFieldFor(node: ts.Declaration): CompileResult[] | undefined;
+    compileIvyFieldFor(node: ts.Declaration, constantPool: ConstantPool): CompileResult[] | undefined;
     /**
      * Lookup the `ts.Decorator` which triggered transformation of a particular class declaration.
      */

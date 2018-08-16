@@ -25,6 +25,7 @@ export interface ModuleData {
 export interface CompilationScope<T> {
     directives: Map<string, T>;
     pipes: Map<string, T>;
+    containsForwardDecls?: boolean;
 }
 /**
  * Registry which records and correlates static analysis information of Angular types.
@@ -73,6 +74,7 @@ export declare class SelectorScopeRegistry {
      * it.
      */
     lookupCompilationScope(node: ts.Declaration): CompilationScope<Expression> | null;
+    private lookupScopesOrDie;
     /**
      * Lookup `SelectorScopes` for a given module.
      *
