@@ -10,7 +10,7 @@ import { R3DependencyMetadata, R3Reference } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../host';
 import { Reference } from '../../metadata';
-export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): R3DependencyMetadata[];
+export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): R3DependencyMetadata[] | null;
 export declare function toR3Reference(ref: Reference, context: ts.SourceFile): R3Reference;
 export declare function isAngularCore(decorator: Decorator): boolean;
 /**
