@@ -11,13 +11,13 @@ import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 import { SelectorScopeRegistry } from './selector_scope';
-export declare class PipeDecoratorHandler implements DecoratorHandler<R3PipeMetadata> {
+export declare class PipeDecoratorHandler implements DecoratorHandler<R3PipeMetadata, Decorator> {
     private checker;
     private reflector;
     private scopeRegistry;
     private isCore;
     constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean);
-    detect(decorator: Decorator[]): Decorator | undefined;
+    detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     analyze(clazz: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3PipeMetadata>;
     compile(node: ts.ClassDeclaration, analysis: R3PipeMetadata): CompileResult;
 }

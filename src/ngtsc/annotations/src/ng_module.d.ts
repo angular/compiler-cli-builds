@@ -20,13 +20,13 @@ export interface NgModuleAnalysis {
  *
  * TODO(alxhub): handle injector side of things as well.
  */
-export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModuleAnalysis> {
+export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModuleAnalysis, Decorator> {
     private checker;
     private reflector;
     private scopeRegistry;
     private isCore;
     constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean);
-    detect(decorators: Decorator[]): Decorator | undefined;
+    detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;
     compile(node: ts.ClassDeclaration, analysis: NgModuleAnalysis): CompileResult[];
     /**
