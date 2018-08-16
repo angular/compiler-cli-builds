@@ -13,11 +13,11 @@ import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform
 /**
  * Adapts the `compileIvyInjectable` compiler for `@Injectable` decorators to the Ivy compiler.
  */
-export declare class InjectableDecoratorHandler implements DecoratorHandler<R3InjectableMetadata> {
+export declare class InjectableDecoratorHandler implements DecoratorHandler<R3InjectableMetadata, Decorator> {
     private reflector;
     private isCore;
     constructor(reflector: ReflectionHost, isCore: boolean);
-    detect(decorator: Decorator[]): Decorator | undefined;
+    detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3InjectableMetadata>;
     compile(node: ts.ClassDeclaration, analysis: R3InjectableMetadata): CompileResult;
 }

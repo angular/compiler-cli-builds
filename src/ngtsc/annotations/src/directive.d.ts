@@ -11,13 +11,13 @@ import * as ts from 'typescript';
 import { ClassMember, Decorator, ReflectionHost } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 import { SelectorScopeRegistry } from './selector_scope';
-export declare class DirectiveDecoratorHandler implements DecoratorHandler<R3DirectiveMetadata> {
+export declare class DirectiveDecoratorHandler implements DecoratorHandler<R3DirectiveMetadata, Decorator> {
     private checker;
     private reflector;
     private scopeRegistry;
     private isCore;
     constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean);
-    detect(decorators: Decorator[]): Decorator | undefined;
+    detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3DirectiveMetadata>;
     compile(node: ts.ClassDeclaration, analysis: R3DirectiveMetadata): CompileResult;
 }
