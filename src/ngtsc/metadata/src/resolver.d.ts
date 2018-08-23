@@ -37,7 +37,7 @@ export declare function isDynamicValue(value: any): value is DynamicValue;
  * non-primitive value, or a special `DynamicValue` type which indicates the value was not
  * available statically.
  */
-export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | ResolvedValueArray | ResolvedValueMap | DynamicValue;
+export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | DynamicValue;
 /**
  * An array of `ResolvedValue`s.
  *
@@ -53,6 +53,16 @@ export interface ResolvedValueArray extends Array<ResolvedValue> {
  * This is a reified type to allow the circular reference of `ResolvedValue` -> `ResolvedValueMap` ->
  * `ResolvedValue`.
  */ export interface ResolvedValueMap extends Map<string, ResolvedValue> {
+}
+/**
+ * A value member of an enumeration.
+ *
+ * Contains a `Reference` to the enumeration itself, and the name of the referenced member.
+ */
+export declare class EnumValue {
+    readonly enumRef: Reference<ts.EnumDeclaration>;
+    readonly name: string;
+    constructor(enumRef: Reference<ts.EnumDeclaration>, name: string);
 }
 export declare enum ImportMode {
     UseExistingImport = 0,
