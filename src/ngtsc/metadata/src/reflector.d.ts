@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/reflector" />
 import * as ts from 'typescript';
-import { ClassMember, Declaration, Decorator, Import, Parameter, ReflectionHost } from '../../host';
+import { ClassMember, CtorParameter, Declaration, Decorator, FunctionDefinition, Import, ReflectionHost } from '../../host';
 /**
  * reflector.ts implements static reflection of declarations using the TypeScript `ts.TypeChecker`.
  */
@@ -16,12 +16,14 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     constructor(checker: ts.TypeChecker);
     getDecoratorsOfDeclaration(declaration: ts.Declaration): Decorator[] | null;
     getMembersOfClass(declaration: ts.Declaration): ClassMember[];
-    getConstructorParameters(declaration: ts.Declaration): Parameter[] | null;
+    getConstructorParameters(declaration: ts.Declaration): CtorParameter[] | null;
     getImportOfIdentifier(id: ts.Identifier): Import | null;
     getExportsOfModule(node: ts.Node): Map<string, Declaration> | null;
-    isClass(node: ts.Declaration): boolean;
+    isClass(node: ts.Node): boolean;
     hasBaseClass(node: ts.Declaration): boolean;
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
+    getDefinitionOfFunction<T extends ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>(node: T): FunctionDefinition<T>;
+    getGenericArityOfClass(clazz: ts.Declaration): number | null;
     private _reflectDecorator;
     private _reflectMember;
 }
