@@ -7,8 +7,8 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/host/esm5_host" />
 import * as ts from 'typescript';
-import { ClassMember, Decorator } from '../../../ngtsc/host';
-import { Esm2015ReflectionHost } from './esm2015_host';
+import { ClassMember, Decorator, FunctionDefinition } from '../../../ngtsc/host';
+import { Fesm2015ReflectionHost } from './fesm2015_host';
 /**
  * ESM5 packages contain ECMAScript IIFE functions that act like classes. For example:
  *
@@ -26,18 +26,37 @@ import { Esm2015ReflectionHost } from './esm2015_host';
  *   a static method called `ctorParameters`.
  *
  */
-export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
+export declare class Esm5ReflectionHost extends Fesm2015ReflectionHost {
     constructor(checker: ts.TypeChecker);
     /**
-     * Check whether the given declaration node actually represents a class.
+     * Check whether the given node actually represents a class.
      */
-    isClass(node: ts.Declaration): boolean;
+    isClass(node: ts.Node): boolean;
     /**
-     * In ESM5 the implementation of a class is a function expression that is hidden inside an IIFE.
+     * Find a symbol for a node that we think is a class.
+     *
+     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE.
      * So we need to dig around inside to get hold of the "class" symbol.
-     * @param declaration the top level declaration that represents an exported class.
+     *
+     * `node` might be one of:
+     * - A class declaration (from a declaration file).
+     * - The declaration of the outer variable, which is assigned the result of the IIFE.
+     * - The function declaration inside the IIFE, which is eventually returned and assigned to the
+     *   outer variable.
+     *
+     * @param node The top level declaration that represents an exported class or the function
+     *     expression inside the IIFE.
+     * @returns The symbol for the node or `undefined` if it is not a "class" or has no symbol.
      */
-    getClassSymbol(declaration: ts.Declaration): ts.Symbol | undefined;
+    getClassSymbol(node: ts.Node): ts.Symbol | undefined;
+    /**
+     * Parse a function declaration to find the relevant metadata about it.
+     * In ESM5 we need to do special work with optional arguments to the function, since they get
+     * their own initializer statement that needs to be parsed and then not included in the "body"
+     * statements of the function.
+     * @param node the function declaration to parse.
+     */
+    getDefinitionOfFunction<T extends ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>(node: T): FunctionDefinition<T>;
     /**
      * Find the declarations of the constructor parameters of a class identified by its symbol.
      * In ESM5 there is no "class" so the constructor that we want is actually the declaration
