@@ -47,5 +47,5 @@ export declare class Analyzer {
      * @param file The file to be analysed for decorated classes.
      */
     analyzeFile(file: ParsedFile): AnalyzedFile;
-    protected analyzeClass(file: ts.SourceFile, pool: ConstantPool, clazz: ParsedClass): AnalyzedClass | undefined;
+    protected analyzeClass(pool: ConstantPool, clazz: ParsedClass): AnalyzedClass | undefined;
 }
