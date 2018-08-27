@@ -34,6 +34,7 @@ export declare function extractQueriesFromDecorator(queryData: ts.Expression, re
     content: R3QueryMetadata[];
     view: R3QueryMetadata[];
 };
+export declare function parseFieldArrayValue(directive: Map<string, ts.Expression>, field: string, reflector: ReflectionHost, checker: ts.TypeChecker): null | string[];
 export declare function queriesFromFields(fields: {
     member: ClassMember;
     decorators: Decorator[];
