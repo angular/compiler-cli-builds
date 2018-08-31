@@ -29,7 +29,7 @@ export declare function extractDirectiveMetadata(clazz: ts.ClassDeclaration, dec
     metadata: R3DirectiveMetadata;
     decoratedElements: ClassMember[];
 } | undefined;
-export declare function extractQueryMetadata(name: string, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, checker: ts.TypeChecker): R3QueryMetadata;
+export declare function extractQueryMetadata(exprNode: ts.Node, name: string, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, checker: ts.TypeChecker): R3QueryMetadata;
 export declare function extractQueriesFromDecorator(queryData: ts.Expression, reflector: ReflectionHost, checker: ts.TypeChecker, isCore: boolean): {
     content: R3QueryMetadata[];
     view: R3QueryMetadata[];
