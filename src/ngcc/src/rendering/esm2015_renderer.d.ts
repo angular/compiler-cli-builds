@@ -27,4 +27,5 @@ export declare class Esm2015Renderer extends Renderer {
      * Remove static decorator properties from classes
      */
     removeDecorators(output: MagicString, decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
+    rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile): void;
 }

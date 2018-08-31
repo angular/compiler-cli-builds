@@ -9,7 +9,7 @@
 import * as ts from 'typescript';
 import { ClassMember, CtorParameter, Decorator } from '../../../ngtsc/host';
 import { TypeScriptReflectionHost } from '../../../ngtsc/metadata';
-import { NgccReflectionHost } from './ngcc_host';
+import { NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
 export declare const DECORATORS: ts.__String;
 export declare const PROP_DECORATORS: ts.__String;
 export declare const CONSTRUCTOR: ts.__String;
@@ -95,6 +95,13 @@ export declare class Fesm2015ReflectionHost extends TypeScriptReflectionHost imp
      * @returns The symbol for the node or `undefined` if it is not a "class" or has no symbol.
      */
     getClassSymbol(declaration: ts.Node): ts.Symbol | undefined;
+    /**
+     * Search the given module for variable declarations in which the initializer
+     * is an identifier marked with the `PRE_NGCC_MARKER`.
+     * @param module The module in which to search for switchable declarations.
+     * @returns An array of variable declarations that match.
+     */
+    getSwitchableDeclarations(module: ts.Node): SwitchableVariableDeclaration[];
     /**
      * Member decorators are declared as static properties of the class in ES2015:
      *
