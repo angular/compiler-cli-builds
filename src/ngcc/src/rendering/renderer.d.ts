@@ -72,6 +72,7 @@ export declare abstract class Renderer {
     }[]): void;
     protected abstract addDefinitions(output: MagicString, analyzedClass: AnalyzedClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
+    protected abstract rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile): void;
     /**
      * Add the decorator nodes that are to be removed to a map
      * So that we can tell if we should remove the entire decorator property
