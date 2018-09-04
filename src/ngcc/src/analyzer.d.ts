@@ -37,10 +37,11 @@ export declare class FileResourceLoader implements ResourceLoader {
 export declare class Analyzer {
     private typeChecker;
     private host;
+    private rootDirs;
     resourceLoader: FileResourceLoader;
     scopeRegistry: SelectorScopeRegistry;
     handlers: DecoratorHandler<any, any>[];
-    constructor(typeChecker: ts.TypeChecker, host: NgccReflectionHost);
+    constructor(typeChecker: ts.TypeChecker, host: NgccReflectionHost, rootDirs: string[]);
     /**
      * Analyize a parsed file to generate the information about decorated classes that
      * should be converted to use ivy definitions.
