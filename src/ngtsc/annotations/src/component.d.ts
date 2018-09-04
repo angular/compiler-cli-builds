@@ -21,8 +21,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<R3Com
     private scopeRegistry;
     private isCore;
     private resourceLoader;
-    private rootDirs;
-    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[]);
+    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader);
     private literalCache;
     detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     preanalyze(node: ts.ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
