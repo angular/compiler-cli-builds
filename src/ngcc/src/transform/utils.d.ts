@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/transform/utils" />
+export declare const NGCC_VERSION = "7.0.0-beta.4+56.sha-d96e962";
 /**
  * Represents an entry point to a package or sub-package.
  *
@@ -14,6 +15,7 @@
  * files have the same directory layout).
  */
 export declare class EntryPoint {
+    packageRoot: string;
     entryFileName: string;
     entryRoot: string;
     dtsEntryRoot: string;
@@ -32,11 +34,13 @@ export declare class EntryPoint {
  */
 export declare function findAllPackageJsonFiles(rootDirectory: string): string[];
 /**
- * Identify the entry points of a package.
+ * Identify the entry points of a collection of package.json files.
  *
- * @param packageDirectory The absolute path to the root directory that contains the package.
+ * @param packageJsonPaths A collection of absolute paths to the package.json files.
  * @param format The format of the entry points to look for within the package.
  *
  * @returns A collection of `EntryPoint`s that correspond to entry points for the package.
  */
-export declare function getEntryPoints(packageDirectory: string, format: string): EntryPoint[];
+export declare function getEntryPoints(packageJsonPaths: string[], format: string): EntryPoint[];
+export declare function checkMarkerFile(packageJsonPath: string, format: string): boolean;
+export declare function writeMarkerFile(packageJsonPath: string, format: string): void;
