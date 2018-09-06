@@ -20,7 +20,7 @@
     var path_1 = require("path");
     var shelljs_1 = require("shelljs");
     var utils_1 = require("@angular/compiler-cli/src/ngcc/src/utils");
-    exports.NGCC_VERSION = '7.0.0-beta.5+1.sha-34ec924';
+    exports.NGCC_VERSION = '7.0.0-beta.5+4.sha-d6cd041';
     /**
      * Represents an entry point to a package or sub-package.
      *
