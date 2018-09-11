@@ -21,6 +21,7 @@ export declare class NgtscProgram implements api.Program {
     private _reflector;
     private _isCore;
     private rootDirs;
+    private closureCompilerEnabled;
     constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: api.Program);
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
