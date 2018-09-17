@@ -64,7 +64,7 @@ export declare class IvyCompilation {
      * Process a .d.ts source string and return a transformed version that incorporates the changes
      * made to the source file.
      */
-    transformedDtsFor(tsFileName: string, dtsOriginalSource: string, dtsPath: string): string;
+    transformedDtsFor(tsFileName: string, dtsOriginalSource: string): string;
     readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
     private getDtsTransformer;
 }

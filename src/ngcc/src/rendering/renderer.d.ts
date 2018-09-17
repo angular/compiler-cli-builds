@@ -1,12 +1,20 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/rendering/renderer" />
-import * as ts from 'typescript';
-import MagicString from 'magic-string';
-import { SourceMapConverter } from 'convert-source-map';
-import { RawSourceMap } from 'source-map';
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import { ConstantPool } from '@angular/compiler';
-import { AnalyzedClass, AnalyzedFile } from '../analyzer';
+import { SourceMapConverter } from 'convert-source-map';
+import MagicString from 'magic-string';
+import { RawSourceMap } from 'source-map';
+import * as ts from 'typescript';
 import { Decorator } from '../../../ngtsc/host';
 import { ImportManager } from '../../../ngtsc/transform';
+import { AnalyzedClass, AnalyzedFile } from '../analyzer';
+import { NgccReflectionHost } from '../host/ngcc_host';
 interface SourceMapInfo {
     source: string;
     map: SourceMapConverter | null;
@@ -43,12 +51,14 @@ export interface FileInfo {
     contents: string;
 }
 /**
- * A base-class for rendering an `AnalyzedClass`.
- * Package formats have output files that must be rendered differently,
- * Concrete sub-classes must implement the `addImports`, `addDefinitions` and
- * `removeDecorators` abstract methods.
+ * A base-class for rendering an `AnalyzedFile`.
+ *
+ * Package formats have output files that must be rendered differently. Concrete sub-classes must
+ * implement the `addImports`, `addDefinitions` and `removeDecorators` abstract methods.
  */
 export declare abstract class Renderer {
+    protected host: NgccReflectionHost;
+    constructor(host: NgccReflectionHost);
     /**
      * Render the source code and source-map for an Analyzed file.
      * @param file The analyzed file to render.
@@ -62,6 +72,7 @@ export declare abstract class Renderer {
     }[]): void;
     protected abstract addDefinitions(output: MagicString, analyzedClass: AnalyzedClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
+    protected abstract rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile): void;
     /**
      * Add the decorator nodes that are to be removed to a map
      * So that we can tell if we should remove the entire decorator property

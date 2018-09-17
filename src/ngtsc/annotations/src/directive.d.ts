@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/directive" />
-import { R3DirectiveMetadata, R3QueryMetadata } from '@angular/compiler';
+import { ConstantPool, R3DirectiveMetadata, R3QueryMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ClassMember, Decorator, ReflectionHost } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
@@ -19,7 +19,7 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<R3Dir
     constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean);
     detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3DirectiveMetadata>;
-    compile(node: ts.ClassDeclaration, analysis: R3DirectiveMetadata): CompileResult;
+    compile(node: ts.ClassDeclaration, analysis: R3DirectiveMetadata, pool: ConstantPool): CompileResult;
 }
 /**
  * Helper function to extract metadata from a `Directive` or `Component`.
@@ -29,11 +29,12 @@ export declare function extractDirectiveMetadata(clazz: ts.ClassDeclaration, dec
     metadata: R3DirectiveMetadata;
     decoratedElements: ClassMember[];
 } | undefined;
-export declare function extractQueryMetadata(name: string, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, checker: ts.TypeChecker): R3QueryMetadata;
+export declare function extractQueryMetadata(exprNode: ts.Node, name: string, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, checker: ts.TypeChecker): R3QueryMetadata;
 export declare function extractQueriesFromDecorator(queryData: ts.Expression, reflector: ReflectionHost, checker: ts.TypeChecker, isCore: boolean): {
     content: R3QueryMetadata[];
     view: R3QueryMetadata[];
 };
+export declare function parseFieldArrayValue(directive: Map<string, ts.Expression>, field: string, reflector: ReflectionHost, checker: ts.TypeChecker): null | string[];
 export declare function queriesFromFields(fields: {
     member: ClassMember;
     decorators: Decorator[];

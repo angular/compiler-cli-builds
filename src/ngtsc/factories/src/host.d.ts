@@ -16,6 +16,7 @@ export declare class GeneratedFactoryHostWrapper implements ts.CompilerHost {
     private generator;
     private factoryToSourceMap;
     constructor(delegate: ts.CompilerHost, generator: FactoryGenerator, factoryToSourceMap: Map<string, string>);
+    resolveTypeReferenceDirectives?: (names: string[], containingFile: string) => ts.ResolvedTypeReferenceDirective[];
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
     getDefaultLibFileName(options: ts.CompilerOptions): string;
     writeFile(fileName: string, data: string, writeByteOrderMark: boolean, onError: ((message: string) => void) | undefined, sourceFiles: ReadonlyArray<ts.SourceFile>): void;

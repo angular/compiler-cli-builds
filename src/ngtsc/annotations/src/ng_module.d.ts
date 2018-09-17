@@ -34,4 +34,8 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModu
      * `ModuleWithProviders` and return an expression referencing the module if available.
      */
     private _extractModuleFromModuleWithProvidersFn;
+    /**
+     * Compute a list of `Reference`s from a resolved metadata value.
+     */
+    private resolveTypeList;
 }
