@@ -20,6 +20,8 @@ export declare class NgtscProgram implements api.Program {
     private _coreImportsFrom;
     private _reflector;
     private _isCore;
+    private rootDirs;
+    private closureCompilerEnabled;
     constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: api.Program);
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
@@ -27,12 +29,13 @@ export declare class NgtscProgram implements api.Program {
     getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
     getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<api.Diagnostic>;
     getTsSemanticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
-    getNgSemanticDiagnostics(fileName?: string | undefined, cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<api.Diagnostic>;
+    getNgSemanticDiagnostics(fileName?: string | undefined, cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
     loadNgStructureAsync(): Promise<void>;
     listLazyRoutes(entryRoute?: string | undefined): api.LazyRoute[];
     getLibrarySummaries(): Map<string, api.LibrarySummary>;
     getEmittedGeneratedFiles(): Map<string, GeneratedFile>;
     getEmittedSourceFiles(): Map<string, ts.SourceFile>;
+    private ensureAnalyzed;
     emit(opts?: {
         emitFlags?: api.EmitFlags;
         cancellationToken?: ts.CancellationToken;
