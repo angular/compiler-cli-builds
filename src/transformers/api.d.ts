@@ -222,7 +222,7 @@ export interface Program {
      *
      * Angular structural information is required to produce these diagnostics.
      */
-    getNgSemanticDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
+    getNgSemanticDiagnostics(fileName?: string, cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic | Diagnostic>;
     /**
      * Load Angular structural information asynchronously. If this method is not called then the
      * Angular structural information, including referenced HTML and CSS files, are loaded
