@@ -1,10 +1,11 @@
-/// <amd-module name="@angular/compiler-cli/src/ngcc/src/transform/package_transformer" />
+/// <amd-module name="@angular/compiler-cli/src/ngcc/src/packages/transformer" />
 import * as ts from 'typescript';
 import { AnalyzedFile } from '../analyzer';
 import { DtsMapper } from '../host/dts_mapper';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { FileParser } from '../parsing/file_parser';
 import { FileInfo, Renderer } from '../rendering/renderer';
+import { EntryPoint, EntryPointFormat } from './entry_point';
 /**
  * A Package is stored in a directory on disk and that directory can contain one or more package
  * formats - e.g. fesm2015, UMD, etc. Additionally, each package provides typings (`.d.ts` files).
@@ -24,12 +25,14 @@ import { FileInfo, Renderer } from '../rendering/renderer';
  * - Other packages may re-export classes from other non-entry point files.
  * - Some formats may contain multiple "modules" in a single file.
  */
-export declare class PackageTransformer {
-    transform(packagePath: string, format: string, targetPath?: string): void;
+export declare class Transformer {
+    private sourcePath;
+    private targetPath;
+    constructor(sourcePath: string, targetPath: string);
+    transform(entryPoint: EntryPoint, format: EntryPointFormat): void;
     getHost(format: string, program: ts.Program, dtsMapper: DtsMapper): NgccReflectionHost;
     getFileParser(format: string, program: ts.Program, host: NgccReflectionHost): FileParser;
     getRenderer(format: string, program: ts.Program, host: NgccReflectionHost): Renderer;
-    findNodeModulesPath(src: string): string;
     transformDtsFiles(analyzedFiles: AnalyzedFile[], sourceNodeModules: string, targetNodeModules: string, dtsMapper: DtsMapper): FileInfo[];
     transformSourceFiles(analyzedFiles: AnalyzedFile[], sourceNodeModules: string, targetNodeModules: string, renderer: Renderer): FileInfo[];
     writeFile(file: FileInfo): void;
