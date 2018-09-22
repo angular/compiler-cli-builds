@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/transform/utils" />
-export declare const NGCC_VERSION = "7.0.0-beta.6+35.sha-82a14dc";
+export declare const NGCC_VERSION = "7.0.0-beta.6+37.sha-7f1cace";
 /**
  * Represents an entry point to a package or sub-package.
  *
