@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "6.1.8+34.sha-a730fc7",
+  "version": "6.1.8+36.sha-b907e5a",
   "description": "Angular - the compiler CLI for Node.js",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -16,7 +16,7 @@
   },
   "peerDependencies": {
     "typescript": ">=2.7.2 <2.10",
-    "@angular/compiler": "6.1.8+34.sha-a730fc7"
+    "@angular/compiler": "6.1.8+36.sha-b907e5a"
   },
   "engines" : {
     "node" : ">=8.0"
