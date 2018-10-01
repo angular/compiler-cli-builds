@@ -111,7 +111,7 @@ export declare class ResolvedReference<T extends ts.Node = ts.Node> extends Refe
     protected primaryIdentifier: ts.Identifier;
     protected identifiers: ts.Identifier[];
     constructor(node: T, primaryIdentifier: ts.Identifier);
-    readonly expressable: boolean;
+    readonly expressable = true;
     toExpression(context: ts.SourceFile, importMode?: ImportMode): Expression;
     addIdentifier(identifier: ts.Identifier): void;
 }
@@ -127,7 +127,7 @@ export declare class AbsoluteReference extends Reference {
     readonly symbolName: string;
     private identifiers;
     constructor(node: ts.Node, primaryIdentifier: ts.Identifier, moduleName: string, symbolName: string);
-    readonly expressable: boolean;
+    readonly expressable = true;
     toExpression(context: ts.SourceFile, importMode?: ImportMode): Expression;
     addIdentifier(identifier: ts.Identifier): void;
 }
