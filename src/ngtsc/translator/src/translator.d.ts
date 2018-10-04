@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/translator" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/translator/src/translator" />
 import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Statement, Type, TypeVisitor, TypeofExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
 import * as ts from 'typescript';
 export declare class Context {
@@ -54,7 +54,7 @@ export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVis
     visitReadPropExpr(ast: ReadPropExpr, context: Context): void;
     visitReadKeyExpr(ast: ReadKeyExpr, context: Context): void;
     visitLiteralArrayExpr(ast: LiteralArrayExpr, context: Context): string;
-    visitLiteralMapExpr(ast: LiteralMapExpr, context: Context): void;
+    visitLiteralMapExpr(ast: LiteralMapExpr, context: Context): string;
     visitCommaExpr(ast: CommaExpr, context: Context): void;
     visitWrappedNodeExpr(ast: WrappedNodeExpr<any>, context: Context): string;
     visitTypeofExpr(ast: TypeofExpr, context: Context): string;
