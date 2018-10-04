@@ -9,6 +9,7 @@
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../host';
+import { TypeCheckContext } from '../../typecheck';
 import { CompileResult, DecoratorHandler } from './api';
 /**
  * Manages a compilation of Ivy decorators into static fields across an entire ts.Program.
@@ -27,6 +28,7 @@ export declare class IvyCompilation {
      * information recorded about them for later compilation.
      */
     private analysis;
+    private typeCheckMap;
     /**
      * Tracks factory information which needs to be generated.
      */
@@ -51,6 +53,7 @@ export declare class IvyCompilation {
      * Analyze a source file and produce diagnostics for it (if any).
      */
     private analyze;
+    typeCheck(context: TypeCheckContext): void;
     /**
      * Perform a compilation operation on the given class declaration and return instructions to an
      * AST transformer if any are available.

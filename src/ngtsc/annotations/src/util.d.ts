@@ -38,3 +38,7 @@ export declare function unwrapForwardRef(node: ts.Expression, reflector: Reflect
  * @returns an unwrapped argument if `ref` pointed to forwardRef, or null otherwise
  */
 export declare function forwardRefResolver(ref: Reference<ts.FunctionDeclaration | ts.MethodDeclaration>, args: ts.Expression[]): ts.Expression | null;
+export declare function extractDirectiveGuards(node: ts.Declaration, reflector: ReflectionHost): {
+    ngTemplateGuards: string[];
+    hasNgTemplateContextGuard: boolean;
+};

@@ -43,6 +43,7 @@ export declare class NgtscProgram implements api.Program {
         emitCallback?: api.TsEmitCallback;
         mergeEmitResultsCallback?: api.TsMergeEmitResultsCallback;
     }): ts.EmitResult;
+    private compileTypeCheckProgram;
     private makeCompilation;
     private readonly reflector;
     private readonly coreImportsFrom;
