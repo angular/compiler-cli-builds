@@ -12,7 +12,7 @@ import MagicString from 'magic-string';
 import { RawSourceMap } from 'source-map';
 import * as ts from 'typescript';
 import { Decorator } from '../../../ngtsc/host';
-import { ImportManager } from '../../../ngtsc/transform';
+import { ImportManager } from '../../../ngtsc/translator';
 import { AnalyzedClass, AnalyzedFile } from '../analyzer';
 import { NgccReflectionHost } from '../host/ngcc_host';
 interface SourceMapInfo {
