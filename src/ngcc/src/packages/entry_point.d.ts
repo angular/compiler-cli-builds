@@ -21,6 +21,8 @@ export declare type EntryPointPaths = {
  * to each of the possible entry-point formats.
  */
 export declare type EntryPoint = EntryPointPaths & {
+    /** The name of the package (e.g. `@angular/core`). */
+    name: string;
     /** The path to the package that contains this entry-point. */
     package: string;
     /** The path to this entry point. */
