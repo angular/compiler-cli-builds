@@ -12,7 +12,7 @@ import MagicString from 'magic-string';
 import { RawSourceMap } from 'source-map';
 import * as ts from 'typescript';
 import { Decorator } from '../../../ngtsc/host';
-import { ImportManager } from '../../../ngtsc/translator';
+import { NgccImportManager } from './ngcc_import_manager';
 import { AnalyzedClass, AnalyzedFile } from '../analyzer';
 import { NgccReflectionHost } from '../host/ngcc_host';
 interface SourceMapInfo {
@@ -58,7 +58,9 @@ export interface FileInfo {
  */
 export declare abstract class Renderer {
     protected host: NgccReflectionHost;
-    constructor(host: NgccReflectionHost);
+    protected isCore: boolean;
+    protected rewriteCoreImportsTo: ts.SourceFile | null;
+    constructor(host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null);
     /**
      * Render the source code and source-map for an Analyzed file.
      * @param file The analyzed file to render.
@@ -107,7 +109,7 @@ export declare function mergeSourceMaps(oldMap: RawSourceMap | null, newMap: Raw
 /**
  * Render the constant pool as source code for the given class.
  */
-export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPool: ConstantPool, imports: ImportManager): string;
+export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPool: ConstantPool, imports: NgccImportManager): string;
 /**
  * Render the definitions as source code for the given class.
  * @param sourceFile The file containing the class to process.
@@ -116,5 +118,5 @@ export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPo
  * definitions.
  * @param imports An object that tracks the imports that are needed by the rendered definitions.
  */
-export declare function renderDefinitions(sourceFile: ts.SourceFile, analyzedClass: AnalyzedClass, imports: ImportManager): string;
+export declare function renderDefinitions(sourceFile: ts.SourceFile, analyzedClass: AnalyzedClass, imports: NgccImportManager): string;
 export {};
