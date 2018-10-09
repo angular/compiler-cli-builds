@@ -15,12 +15,12 @@ export declare class Context {
     readonly withStatementMode: Context;
 }
 export declare class ImportManager {
-    private isCore;
+    protected isCore: boolean;
     private prefix;
     private moduleToIndex;
     private nextIndex;
     constructor(isCore: boolean, prefix?: string);
-    generateNamedImport(moduleName: string, symbol: string): string;
+    generateNamedImport(moduleName: string, symbol: string): string | null;
     getAllImports(contextPath: string, rewriteCoreImportsTo: ts.SourceFile | null): {
         name: string;
         as: string;

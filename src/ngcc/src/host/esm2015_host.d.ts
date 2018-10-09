@@ -11,7 +11,7 @@ import { DtsMapper } from './dts_mapper';
 import { Fesm2015ReflectionHost } from './fesm2015_host';
 export declare class Esm2015ReflectionHost extends Fesm2015ReflectionHost {
     protected dtsMapper: DtsMapper;
-    constructor(checker: ts.TypeChecker, dtsMapper: DtsMapper);
+    constructor(isCore: boolean, checker: ts.TypeChecker, dtsMapper: DtsMapper);
     /**
      * Get the number of generic type parameters of a given class.
      *
