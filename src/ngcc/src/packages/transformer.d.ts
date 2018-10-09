@@ -30,10 +30,11 @@ export declare class Transformer {
     private targetPath;
     constructor(sourcePath: string, targetPath: string);
     transform(entryPoint: EntryPoint, format: EntryPointFormat): void;
-    getHost(format: string, program: ts.Program, dtsMapper: DtsMapper): NgccReflectionHost;
+    getHost(isCore: boolean, format: string, program: ts.Program, dtsMapper: DtsMapper): NgccReflectionHost;
     getFileParser(format: string, program: ts.Program, host: NgccReflectionHost): FileParser;
-    getRenderer(format: string, program: ts.Program, host: NgccReflectionHost): Renderer;
+    getRenderer(format: string, program: ts.Program, host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null): Renderer;
     transformDtsFiles(analyzedFiles: AnalyzedFile[], sourceNodeModules: string, targetNodeModules: string, dtsMapper: DtsMapper): FileInfo[];
     transformSourceFiles(analyzedFiles: AnalyzedFile[], sourceNodeModules: string, targetNodeModules: string, renderer: Renderer): FileInfo[];
     writeFile(file: FileInfo): void;
+    findR3SymbolsPath(directory: string): string | null;
 }

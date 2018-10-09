@@ -38,10 +38,11 @@ export declare class Analyzer {
     private typeChecker;
     private host;
     private rootDirs;
+    private isCore;
     resourceLoader: FileResourceLoader;
     scopeRegistry: SelectorScopeRegistry;
     handlers: DecoratorHandler<any, any>[];
-    constructor(typeChecker: ts.TypeChecker, host: NgccReflectionHost, rootDirs: string[]);
+    constructor(typeChecker: ts.TypeChecker, host: NgccReflectionHost, rootDirs: string[], isCore: boolean);
     /**
      * Analyize a parsed file to generate the information about decorated classes that
      * should be converted to use ivy definitions.

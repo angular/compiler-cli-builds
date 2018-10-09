@@ -24,6 +24,7 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
     getDefinitionOfFunction<T extends ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>(node: T): FunctionDefinition<T>;
     getGenericArityOfClass(clazz: ts.Declaration): number | null;
+    getVariableValue(declaration: ts.VariableDeclaration): ts.Expression | null;
     private _reflectDecorator;
     private _reflectMember;
 }
