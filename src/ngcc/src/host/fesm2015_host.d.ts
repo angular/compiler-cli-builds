@@ -9,6 +9,7 @@
 import * as ts from 'typescript';
 import { ClassMember, CtorParameter, Decorator, Import } from '../../../ngtsc/host';
 import { TypeScriptReflectionHost } from '../../../ngtsc/metadata';
+import { DecoratedFile } from './decorated_file';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
 export declare const DECORATORS: ts.__String;
 export declare const PROP_DECORATORS: ts.__String;
@@ -114,6 +115,7 @@ export declare class Fesm2015ReflectionHost extends TypeScriptReflectionHost imp
      * `null` if the identifier doesn't resolve to an import but instead is locally defined.
      */
     getImportOfIdentifier(id: ts.Identifier): Import | null;
+    findDecoratedFiles(entryPoint: ts.SourceFile): Map<ts.SourceFile, DecoratedFile>;
     /**
      * Walk the AST looking for an assignment to the specified symbol.
      * @param node The current node we are searching.
