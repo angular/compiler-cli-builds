@@ -13,8 +13,9 @@ import { RawSourceMap } from 'source-map';
 import * as ts from 'typescript';
 import { Decorator } from '../../../ngtsc/host';
 import { NgccImportManager } from './ngcc_import_manager';
-import { AnalyzedClass, AnalyzedFile } from '../analyzer';
-import { NgccReflectionHost } from '../host/ngcc_host';
+import { AnalyzedClass, DecorationAnalysis, DecorationAnalyses } from '../analysis/decoration_analyzer';
+import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
+import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
 interface SourceMapInfo {
     source: string;
     map: SourceMapConverter | null;
@@ -24,10 +25,6 @@ interface SourceMapInfo {
  * The results of rendering an analyzed file.
  */
 export interface RenderResult {
-    /**
-     * The file that has been rendered.
-     */
-    file: AnalyzedFile;
     /**
      * The rendered source file.
      */
@@ -60,13 +57,16 @@ export declare abstract class Renderer {
     protected host: NgccReflectionHost;
     protected isCore: boolean;
     protected rewriteCoreImportsTo: ts.SourceFile | null;
-    constructor(host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null);
+    protected sourcePath: string;
+    protected targetPath: string;
+    constructor(host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, sourcePath: string, targetPath: string);
+    renderProgram(program: ts.Program, decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses): FileInfo[];
     /**
      * Render the source code and source-map for an Analyzed file.
-     * @param file The analyzed file to render.
+     * @param decorationAnalysis The analyzed file to render.
      * @param targetPath The absolute path where the rendered file will be written.
      */
-    renderFile(file: AnalyzedFile, targetPath: string): RenderResult;
+    renderFile(sourceFile: ts.SourceFile, decorationAnalysis: DecorationAnalysis | undefined, switchMarkerAnalysis: SwitchMarkerAnalysis | undefined, targetPath: string): FileInfo[];
     protected abstract addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
     protected abstract addImports(output: MagicString, imports: {
         name: string;
@@ -74,7 +74,7 @@ export declare abstract class Renderer {
     }[]): void;
     protected abstract addDefinitions(output: MagicString, analyzedClass: AnalyzedClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
-    protected abstract rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile): void;
+    protected abstract rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile, declarations: SwitchableVariableDeclaration[]): void;
     /**
      * Add the decorator nodes that are to be removed to a map
      * So that we can tell if we should remove the entire decorator property
@@ -88,7 +88,7 @@ export declare abstract class Renderer {
      * Merge the input and output source-maps, replacing the source-map comment in the output file
      * with an appropriate source-map comment pointing to the merged source-map.
      */
-    protected renderSourceAndMap(file: AnalyzedFile, input: SourceMapInfo, output: MagicString, outputPath: string): RenderResult;
+    protected renderSourceAndMap(sourceFile: ts.SourceFile, input: SourceMapInfo, output: MagicString, outputPath: string): RenderResult;
 }
 /**
  * Merge the two specified source-maps into a single source-map that hides the intermediate
