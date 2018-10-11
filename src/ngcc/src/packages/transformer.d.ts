@@ -1,9 +1,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/packages/transformer" />
 import * as ts from 'typescript';
-import { AnalyzedFile } from '../analyzer';
 import { DtsMapper } from '../host/dts_mapper';
 import { NgccReflectionHost } from '../host/ngcc_host';
-import { FileParser } from '../parsing/file_parser';
 import { FileInfo, Renderer } from '../rendering/renderer';
 import { EntryPoint, EntryPointFormat } from './entry_point';
 /**
@@ -30,11 +28,13 @@ export declare class Transformer {
     private targetPath;
     constructor(sourcePath: string, targetPath: string);
     transform(entryPoint: EntryPoint, format: EntryPointFormat): void;
+    getRootDirs(host: ts.CompilerHost, options: ts.CompilerOptions): string[];
     getHost(isCore: boolean, format: string, program: ts.Program, dtsMapper: DtsMapper): NgccReflectionHost;
-    getFileParser(format: string, program: ts.Program, host: NgccReflectionHost): FileParser;
-    getRenderer(format: string, program: ts.Program, host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null): Renderer;
-    transformDtsFiles(analyzedFiles: AnalyzedFile[], sourceNodeModules: string, targetNodeModules: string, dtsMapper: DtsMapper): FileInfo[];
-    transformSourceFiles(analyzedFiles: AnalyzedFile[], sourceNodeModules: string, targetNodeModules: string, renderer: Renderer): FileInfo[];
+    getRenderer(format: string, program: ts.Program, host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, dtsMapper: DtsMapper): Renderer;
+    analyzeProgram(program: ts.Program, reflectionHost: NgccReflectionHost, rootDirs: string[], isCore: boolean): {
+        decorationAnalyses: Map<ts.SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/decoration_analyzer").DecorationAnalysis>;
+        switchMarkerAnalyses: Map<ts.SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/switch_marker_analyzer").SwitchMarkerAnalysis>;
+    };
     writeFile(file: FileInfo): void;
     findR3SymbolsPath(directory: string): string | null;
 }
