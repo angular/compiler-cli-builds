@@ -1,31 +1,18 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/rendering/esm2015_renderer" />
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 import * as ts from 'typescript';
-import MagicString from 'magic-string';
-import { AnalyzedClass } from '../analyzer';
-import { Renderer } from './renderer';
-export declare class Esm2015Renderer extends Renderer {
-    /**
-     *  Add the imports at the top of the file
-     */
-    addImports(output: MagicString, imports: {
-        name: string;
-        as: string;
-    }[]): void;
-    addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
-    /**
-     * Add the definitions to each decorated class
-     */
-    addDefinitions(output: MagicString, analyzedClass: AnalyzedClass, definitions: string): void;
-    /**
-     * Remove static decorator properties from classes
-     */
-    removeDecorators(output: MagicString, decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
-    rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile): void;
+import { DecorationAnalysis } from '../analysis/decoration_analyzer';
+import { SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
+import { DtsMapper } from '../host/dts_mapper';
+import { NgccReflectionHost } from '../host/ngcc_host';
+import { Fesm2015Renderer } from './fesm2015_renderer';
+import { FileInfo } from './renderer';
+export declare class Esm2015Renderer extends Fesm2015Renderer {
+    protected host: NgccReflectionHost;
+    protected isCore: boolean;
+    protected rewriteCoreImportsTo: ts.SourceFile | null;
+    protected sourcePath: string;
+    protected targetPath: string;
+    protected dtsMapper: DtsMapper;
+    constructor(host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, sourcePath: string, targetPath: string, dtsMapper: DtsMapper);
+    renderFile(sourceFile: ts.SourceFile, decorationAnalysis: DecorationAnalysis | undefined, switchMarkerAnalysis: SwitchMarkerAnalysis | undefined, targetPath: string): FileInfo[];
 }
