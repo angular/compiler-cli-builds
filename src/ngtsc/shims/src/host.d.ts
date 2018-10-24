@@ -5,17 +5,28 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/factories/src/host" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/shims/src/host" />
 import * as ts from 'typescript';
-import { FactoryGenerator } from './generator';
+export interface ShimGenerator {
+    /**
+     * Get the original source file for the given shim path, the contents of which determine the
+     * contents of the shim file.
+     *
+     * If this returns `null` then the given file was not a shim file handled by this generator.
+     */
+    getOriginalSourceOfShim(fileName: string): string | null;
+    /**
+     * Generate a shim's `ts.SourceFile` for the given original file.
+     */
+    generate(original: ts.SourceFile, genFileName: string): ts.SourceFile;
+}
 /**
  * A wrapper around a `ts.CompilerHost` which supports generated files.
  */
-export declare class GeneratedFactoryHostWrapper implements ts.CompilerHost {
+export declare class GeneratedShimsHostWrapper implements ts.CompilerHost {
     private delegate;
-    private generator;
-    private factoryToSourceMap;
-    constructor(delegate: ts.CompilerHost, generator: FactoryGenerator, factoryToSourceMap: Map<string, string>);
+    private shimGenerators;
+    constructor(delegate: ts.CompilerHost, shimGenerators: ShimGenerator[]);
     resolveTypeReferenceDirectives?: (names: string[], containingFile: string) => ts.ResolvedTypeReferenceDirective[];
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
     getDefaultLibFileName(options: ts.CompilerOptions): string;
