@@ -12,27 +12,15 @@ import MagicString from 'magic-string';
 import { RawSourceMap } from 'source-map';
 import * as ts from 'typescript';
 import { Decorator } from '../../../ngtsc/host';
+import { CompileResult } from '@angular/compiler-cli/src/ngtsc/transform';
 import { NgccImportManager } from './ngcc_import_manager';
-import { AnalyzedClass, DecorationAnalysis, DecorationAnalyses } from '../analysis/decoration_analyzer';
+import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/decoration_analyzer';
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
 interface SourceMapInfo {
     source: string;
     map: SourceMapConverter | null;
     isInline: boolean;
-}
-/**
- * The results of rendering an analyzed file.
- */
-export interface RenderResult {
-    /**
-     * The rendered source file.
-     */
-    source: FileInfo;
-    /**
-     * The rendered source map file.
-     */
-    map: FileInfo | null;
 }
 /**
  * Information about a file that has been rendered.
@@ -47,6 +35,10 @@ export interface FileInfo {
      */
     contents: string;
 }
+interface DtsClassInfo {
+    dtsDeclaration: ts.Declaration;
+    compilation: CompileResult[];
+}
 /**
  * A base-class for rendering an `AnalyzedFile`.
  *
@@ -59,20 +51,22 @@ export declare abstract class Renderer {
     protected rewriteCoreImportsTo: ts.SourceFile | null;
     protected sourcePath: string;
     protected targetPath: string;
-    constructor(host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, sourcePath: string, targetPath: string);
+    protected transformDts: boolean;
+    constructor(host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, sourcePath: string, targetPath: string, transformDts: boolean);
     renderProgram(program: ts.Program, decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses): FileInfo[];
     /**
      * Render the source code and source-map for an Analyzed file.
-     * @param decorationAnalysis The analyzed file to render.
+     * @param compiledFile The analyzed file to render.
      * @param targetPath The absolute path where the rendered file will be written.
      */
-    renderFile(sourceFile: ts.SourceFile, decorationAnalysis: DecorationAnalysis | undefined, switchMarkerAnalysis: SwitchMarkerAnalysis | undefined, targetPath: string): FileInfo[];
+    renderFile(sourceFile: ts.SourceFile, compiledFile: CompiledFile | undefined, switchMarkerAnalysis: SwitchMarkerAnalysis | undefined): FileInfo[];
+    renderDtsFile(dtsFile: ts.SourceFile, dtsClasses: DtsClassInfo[]): FileInfo[];
     protected abstract addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
     protected abstract addImports(output: MagicString, imports: {
         name: string;
         as: string;
     }[]): void;
-    protected abstract addDefinitions(output: MagicString, analyzedClass: AnalyzedClass, definitions: string): void;
+    protected abstract addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
     protected abstract rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile, declarations: SwitchableVariableDeclaration[]): void;
     /**
@@ -88,7 +82,8 @@ export declare abstract class Renderer {
      * Merge the input and output source-maps, replacing the source-map comment in the output file
      * with an appropriate source-map comment pointing to the merged source-map.
      */
-    protected renderSourceAndMap(sourceFile: ts.SourceFile, input: SourceMapInfo, output: MagicString, outputPath: string): RenderResult;
+    protected renderSourceAndMap(sourceFile: ts.SourceFile, input: SourceMapInfo, output: MagicString): FileInfo[];
+    protected getTypingsFilesToRender(analyses: DecorationAnalyses): Map<ts.SourceFile, DtsClassInfo[]>;
 }
 /**
  * Merge the two specified source-maps into a single source-map that hides the intermediate
@@ -118,5 +113,5 @@ export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPo
  * definitions.
  * @param imports An object that tracks the imports that are needed by the rendered definitions.
  */
-export declare function renderDefinitions(sourceFile: ts.SourceFile, analyzedClass: AnalyzedClass, imports: NgccImportManager): string;
+export declare function renderDefinitions(sourceFile: ts.SourceFile, compiledClass: CompiledClass, imports: NgccImportManager): string;
 export {};

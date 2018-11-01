@@ -8,8 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/host/esm5_host" />
 import * as ts from 'typescript';
 import { ClassMember, Decorator, FunctionDefinition } from '../../../ngtsc/host';
-import { DecoratedFile } from './decorated_file';
-import { Fesm2015ReflectionHost, ParamInfo } from './fesm2015_host';
+import { Esm2015ReflectionHost, ParamInfo } from './esm2015_host';
 /**
  * ESM5 packages contain ECMAScript IIFE functions that act like classes. For example:
  *
@@ -27,7 +26,7 @@ import { Fesm2015ReflectionHost, ParamInfo } from './fesm2015_host';
  *   a static method called `ctorParameters`.
  *
  */
-export declare class Esm5ReflectionHost extends Fesm2015ReflectionHost {
+export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
     constructor(isCore: boolean, checker: ts.TypeChecker);
     /**
      * Check whether the given node actually represents a class.
@@ -61,13 +60,6 @@ export declare class Esm5ReflectionHost extends Fesm2015ReflectionHost {
      * @returns an object containing the node, statements and parameters of the function.
      */
     getDefinitionOfFunction<T extends ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>(node: T): FunctionDefinition<T>;
-    /**
-       * Find all the files accessible via an entry-point, that contain decorated classes.
-       * @param entryPoint The starting point file for finding files that contain decorated classes.
-       * @returns A collection of files objects that hold info about the decorated classes and import
-       * information.
-       */
-    findDecoratedFiles(entryPoint: ts.SourceFile): Map<ts.SourceFile, DecoratedFile>;
     /**
      * Find the declarations of the constructor parameters of a class identified by its symbol.
      *
