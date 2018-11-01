@@ -8,9 +8,9 @@
  */
 import * as ts from 'typescript';
 import { ReflectionHost } from '../../../ngtsc/host';
-import { DecoratedFile } from './decorated_file';
-export declare const PRE_NGCC_MARKER = "__PRE_R3__";
-export declare const POST_NGCC_MARKER = "__POST_R3__";
+import { DecoratedClass } from './decorated_class';
+export declare const PRE_R3_MARKER = "__PRE_R3__";
+export declare const POST_R3_MARKER = "__POST_R3__";
 export declare type SwitchableVariableDeclaration = ts.VariableDeclaration & {
     initializer: ts.Identifier;
 };
@@ -28,16 +28,15 @@ export interface NgccReflectionHost extends ReflectionHost {
     getClassSymbol(node: ts.Node): ts.Symbol | undefined;
     /**
      * Search the given module for variable declarations in which the initializer
-     * is an identifier marked with the `PRE_NGCC_MARKER`.
+     * is an identifier marked with the `PRE_R3_MARKER`.
      * @param module The module in which to search for switchable declarations.
      * @returns An array of variable declarations that match.
      */
     getSwitchableDeclarations(module: ts.Node): SwitchableVariableDeclaration[];
     /**
-     * Find all the files accessible via an entry-point, that contain decorated classes.
-     * @param entryPoint The starting point file for finding files that contain decorated classes.
-     * @returns A collection of files objects that hold info about the decorated classes and import
-     * information.
+     * Find all the classes that contain decorations in a given file.
+     * @param sourceFile The source file to search for decorated classes.
+     * @returns An array of decorated classes.
      */
-    findDecoratedFiles(entryPoint: ts.SourceFile): Map<ts.SourceFile, DecoratedFile>;
+    findDecoratedClasses(sourceFile: ts.SourceFile): DecoratedClass[];
 }

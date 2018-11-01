@@ -11,20 +11,25 @@ import * as ts from 'typescript';
 import { ResourceLoader, SelectorScopeRegistry } from '../../../ngtsc/annotations';
 import { CompileResult, DecoratorHandler } from '../../../ngtsc/transform';
 import { DecoratedClass } from '../host/decorated_class';
-import { DecoratedFile } from '../host/decorated_file';
 import { NgccReflectionHost } from '../host/ngcc_host';
-export interface AnalyzedClass<A = any, M = any> extends DecoratedClass {
-    handler: DecoratorHandler<A, M>;
-    analysis: any;
+export interface AnalyzedFile {
+    sourceFile: ts.SourceFile;
+    analyzedClasses: AnalyzedClass[];
+}
+export interface AnalyzedClass extends DecoratedClass {
     diagnostics?: ts.Diagnostic[];
+    handler: DecoratorHandler<any, any>;
+    analysis: any;
+}
+export interface CompiledClass extends AnalyzedClass {
     compilation: CompileResult[];
 }
-export interface DecorationAnalysis {
-    analyzedClasses: AnalyzedClass[];
+export interface CompiledFile {
+    compiledClasses: CompiledClass[];
     sourceFile: ts.SourceFile;
     constantPool: ConstantPool;
 }
-export declare type DecorationAnalyses = Map<ts.SourceFile, DecorationAnalysis>;
+export declare type DecorationAnalyses = Map<ts.SourceFile, CompiledFile>;
 export declare const DecorationAnalyses: MapConstructor;
 export interface MatchingHandler<A, M> {
     handler: DecoratorHandler<A, M>;
@@ -54,12 +59,8 @@ export declare class DecorationAnalyzer {
      * @returns a map of the source files to the analysis for those files.
      */
     analyzeProgram(program: ts.Program): DecorationAnalyses;
-    /**
-     * Analyze a decorated file to generate the information about decorated classes that
-     * should be converted to use ivy definitions.
-     * @param file The file to be analysed for decorated classes.
-     * @returns the analysis of the file
-     */
-    protected analyzeFile(file: DecoratedFile): DecorationAnalysis;
-    protected analyzeClass(pool: ConstantPool, clazz: DecoratedClass): AnalyzedClass | undefined;
+    protected analyzeFile(sourceFile: ts.SourceFile): AnalyzedFile | undefined;
+    protected analyzeClass(clazz: DecoratedClass): AnalyzedClass | null;
+    protected compileFile(analyzedFile: AnalyzedFile): CompiledFile;
+    protected compileClass(clazz: AnalyzedClass, constantPool: ConstantPool): CompileResult[];
 }

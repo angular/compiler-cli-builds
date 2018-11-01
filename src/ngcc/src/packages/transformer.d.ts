@@ -1,6 +1,5 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/packages/transformer" />
 import * as ts from 'typescript';
-import { DtsMapper } from '../host/dts_mapper';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { FileInfo, Renderer } from '../rendering/renderer';
 import { EntryPoint, EntryPointFormat } from './entry_point';
@@ -27,12 +26,12 @@ export declare class Transformer {
     private sourcePath;
     private targetPath;
     constructor(sourcePath: string, targetPath: string);
-    transform(entryPoint: EntryPoint, format: EntryPointFormat): void;
+    transform(entryPoint: EntryPoint, format: EntryPointFormat, transformDts: boolean): void;
     getRootDirs(host: ts.CompilerHost, options: ts.CompilerOptions): string[];
-    getHost(isCore: boolean, format: string, program: ts.Program, dtsMapper: DtsMapper): NgccReflectionHost;
-    getRenderer(format: string, program: ts.Program, host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, dtsMapper: DtsMapper): Renderer;
+    getHost(isCore: boolean, format: string, program: ts.Program, dtsFilePath: string, dtsProgram: ts.Program | null): NgccReflectionHost;
+    getRenderer(format: string, program: ts.Program, host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, transformDts: boolean): Renderer;
     analyzeProgram(program: ts.Program, reflectionHost: NgccReflectionHost, rootDirs: string[], isCore: boolean): {
-        decorationAnalyses: Map<ts.SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/decoration_analyzer").DecorationAnalysis>;
+        decorationAnalyses: Map<ts.SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/decoration_analyzer").CompiledFile>;
         switchMarkerAnalyses: Map<ts.SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/switch_marker_analyzer").SwitchMarkerAnalysis>;
     };
     writeFile(file: FileInfo): void;
