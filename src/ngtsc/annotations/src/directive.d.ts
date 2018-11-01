@@ -6,20 +6,24 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/directive" />
-import { ConstantPool, R3DirectiveMetadata, R3QueryMetadata } from '@angular/compiler';
+import { ConstantPool, R3DirectiveMetadata, R3QueryMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ClassMember, Decorator, ReflectionHost } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 import { SelectorScopeRegistry } from './selector_scope';
-export declare class DirectiveDecoratorHandler implements DecoratorHandler<R3DirectiveMetadata, Decorator> {
+export interface DirectiveHandlerData {
+    meta: R3DirectiveMetadata;
+    metadataStmt: Statement | null;
+}
+export declare class DirectiveDecoratorHandler implements DecoratorHandler<DirectiveHandlerData, Decorator> {
     private checker;
     private reflector;
     private scopeRegistry;
     private isCore;
     constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean);
     detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
-    analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<R3DirectiveMetadata>;
-    compile(node: ts.ClassDeclaration, analysis: R3DirectiveMetadata, pool: ConstantPool): CompileResult;
+    analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<DirectiveHandlerData>;
+    compile(node: ts.ClassDeclaration, analysis: DirectiveHandlerData, pool: ConstantPool): CompileResult;
 }
 /**
  * Helper function to extract metadata from a `Directive` or `Component`.

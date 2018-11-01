@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
-import { ConstantPool, R3ComponentMetadata, TmplAstNode } from '@angular/compiler';
+import { ConstantPool, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
@@ -16,6 +16,7 @@ import { SelectorScopeRegistry } from './selector_scope';
 export interface ComponentHandlerData {
     meta: R3ComponentMetadata;
     parsedTemplate: TmplAstNode[];
+    metadataStmt: Statement | null;
 }
 /**
  * `DecoratorHandler` which handles the `@Component` annotation.

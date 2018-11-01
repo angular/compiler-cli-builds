@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
-import { R3InjectorMetadata, R3NgModuleMetadata } from '@angular/compiler';
+import { R3InjectorMetadata, R3NgModuleMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
@@ -14,6 +14,7 @@ import { SelectorScopeRegistry } from './selector_scope';
 export interface NgModuleAnalysis {
     ngModuleDef: R3NgModuleMetadata;
     ngInjectorDef: R3InjectorMetadata;
+    metadataStmt: Statement | null;
 }
 /**
  * Compiles @NgModule annotations to ngModuleDef fields.
