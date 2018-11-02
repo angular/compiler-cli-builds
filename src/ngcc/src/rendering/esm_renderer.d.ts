@@ -1,4 +1,4 @@
-/// <amd-module name="@angular/compiler-cli/src/ngcc/src/rendering/fesm2015_renderer" />
+/// <amd-module name="@angular/compiler-cli/src/ngcc/src/rendering/esm_renderer" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -9,15 +9,15 @@
 import * as ts from 'typescript';
 import MagicString from 'magic-string';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
-import { AnalyzedClass } from '../analysis/decoration_analyzer';
+import { CompiledClass } from '../analysis/decoration_analyzer';
 import { Renderer } from './renderer';
-export declare class Fesm2015Renderer extends Renderer {
+export declare class EsmRenderer extends Renderer {
     protected host: NgccReflectionHost;
     protected isCore: boolean;
     protected rewriteCoreImportsTo: ts.SourceFile | null;
     protected sourcePath: string;
     protected targetPath: string;
-    constructor(host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, sourcePath: string, targetPath: string);
+    constructor(host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, sourcePath: string, targetPath: string, transformDts: boolean);
     /**
      *  Add the imports at the top of the file
      */
@@ -29,7 +29,7 @@ export declare class Fesm2015Renderer extends Renderer {
     /**
      * Add the definitions to each decorated class
      */
-    addDefinitions(output: MagicString, analyzedClass: AnalyzedClass, definitions: string): void;
+    addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
     /**
      * Remove static decorator properties from classes
      */
