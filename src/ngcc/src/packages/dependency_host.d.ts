@@ -14,14 +14,14 @@ export declare class DependencyHost {
     /**
      * Get a list of the resolved paths to all the dependencies of this entry point.
      * @param from An absolute path to the file whose dependencies we want to get.
-     * @param resolved A set that will have the resolved dependencies added to it.
+     * @param resolved A set that will have the absolute paths of resolved entry points added to it.
      * @param missing A set that will have the dependencies that could not be found added to it.
+     * @param deepImports A set that will have the import paths that exist but cannot be mapped to
+     * entry-points, i.e. deep-imports.
      * @param internal A set that is used to track internal dependencies to prevent getting stuck in a
      * circular dependency loop.
-     * @returns an object containing an array of absolute paths to `resolved` depenendencies and an
-     * array of import specifiers for dependencies that were `missing`.
      */
-    computeDependencies(from: string, resolved: Set<string>, missing: Set<string>, internal?: Set<string>): void;
+    computeDependencies(from: string, resolved: Set<string>, missing: Set<string>, deepImports: Set<string>, internal?: Set<string>): void;
     /**
      * Resolve an internal module import.
      * @param from the absolute file path from where to start trying to resolve this module
@@ -46,7 +46,7 @@ export declare class DependencyHost {
      * @returns the resolved path to the entry point directory of the import or null
      * if it cannot be resolved.
      */
-    tryResolveExternal(from: string, to: string): string | null;
+    tryResolveEntryPoint(from: string, to: string): string | null;
     /**
      * Resolve the absolute path of a module from a particular starting point.
      *
