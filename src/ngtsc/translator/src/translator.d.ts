@@ -20,11 +20,7 @@ export declare class ImportManager {
     private moduleToIndex;
     private nextIndex;
     constructor(isCore: boolean, prefix?: string);
-    generateNamedImport(moduleName: string, symbol: string): {
-        moduleImport: string | null;
-        symbol: string;
-    };
-    protected rewriteSymbol(moduleName: string, symbol: string): string;
+    generateNamedImport(moduleName: string, symbol: string): string | null;
     getAllImports(contextPath: string, rewriteCoreImportsTo: ts.SourceFile | null): {
         name: string;
         as: string;

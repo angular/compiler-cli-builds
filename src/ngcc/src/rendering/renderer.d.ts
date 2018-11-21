@@ -16,7 +16,6 @@ import { CompileResult } from '@angular/compiler-cli/src/ngtsc/transform';
 import { NgccImportManager } from './ngcc_import_manager';
 import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/decoration_analyzer';
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
-import { BundleInfo } from '../packages/bundle';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
 interface SourceMapInfo {
     source: string;
@@ -48,11 +47,12 @@ interface DtsClassInfo {
  */
 export declare abstract class Renderer {
     protected host: NgccReflectionHost;
-    protected bundle: BundleInfo;
+    protected isCore: boolean;
+    protected rewriteCoreImportsTo: ts.SourceFile | null;
     protected sourcePath: string;
     protected targetPath: string;
     protected transformDts: boolean;
-    constructor(host: NgccReflectionHost, bundle: BundleInfo, sourcePath: string, targetPath: string, transformDts: boolean);
+    constructor(host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, sourcePath: string, targetPath: string, transformDts: boolean);
     renderProgram(program: ts.Program, decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses): FileInfo[];
     /**
      * Render the source code and source-map for an Analyzed file.
