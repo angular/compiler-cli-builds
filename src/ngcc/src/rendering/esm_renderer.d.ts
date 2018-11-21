@@ -10,14 +10,14 @@ import * as ts from 'typescript';
 import MagicString from 'magic-string';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
 import { CompiledClass } from '../analysis/decoration_analyzer';
-import { BundleInfo } from '../packages/bundle';
 import { Renderer } from './renderer';
 export declare class EsmRenderer extends Renderer {
     protected host: NgccReflectionHost;
-    protected bundle: BundleInfo;
+    protected isCore: boolean;
+    protected rewriteCoreImportsTo: ts.SourceFile | null;
     protected sourcePath: string;
     protected targetPath: string;
-    constructor(host: NgccReflectionHost, bundle: BundleInfo, sourcePath: string, targetPath: string, transformDts: boolean);
+    constructor(host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, sourcePath: string, targetPath: string, transformDts: boolean);
     /**
      *  Add the imports at the top of the file
      */
