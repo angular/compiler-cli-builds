@@ -2,6 +2,7 @@
 import * as ts from 'typescript';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { FileInfo, Renderer } from '../rendering/renderer';
+import { BundleInfo } from './bundle';
 import { EntryPoint, EntryPointFormat } from './entry_point';
 /**
  * A Package is stored in a directory on disk and that directory can contain one or more package
@@ -29,11 +30,11 @@ export declare class Transformer {
     transform(entryPoint: EntryPoint, format: EntryPointFormat, transformDts: boolean): void;
     getRootDirs(host: ts.CompilerHost, options: ts.CompilerOptions): string[];
     getHost(isCore: boolean, format: string, program: ts.Program, dtsFilePath: string, dtsProgram: ts.Program | null): NgccReflectionHost;
-    getRenderer(format: string, program: ts.Program, host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, transformDts: boolean): Renderer;
+    getRenderer(format: string, program: ts.Program, host: NgccReflectionHost, bundle: BundleInfo, transformDts: boolean): Renderer;
     analyzeProgram(program: ts.Program, reflectionHost: NgccReflectionHost, rootDirs: string[], isCore: boolean): {
         decorationAnalyses: Map<ts.SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/decoration_analyzer").CompiledFile>;
         switchMarkerAnalyses: Map<ts.SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/switch_marker_analyzer").SwitchMarkerAnalysis>;
     };
     writeFile(file: FileInfo): void;
-    findR3SymbolsPath(directory: string): string | null;
+    findR3SymbolsPath(directory: string, fileName: string): string | null;
 }
