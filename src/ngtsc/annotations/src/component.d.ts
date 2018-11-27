@@ -30,6 +30,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private rootDirs;
     constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[]);
     private literalCache;
+    private elementSchemaRegistry;
     detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     preanalyze(node: ts.ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<ComponentHandlerData>;

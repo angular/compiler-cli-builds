@@ -28,7 +28,7 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
 /**
  * Helper function to extract metadata from a `Directive` or `Component`.
  */
-export declare function extractDirectiveMetadata(clazz: ts.ClassDeclaration, decorator: Decorator, checker: ts.TypeChecker, reflector: ReflectionHost, isCore: boolean): {
+export declare function extractDirectiveMetadata(clazz: ts.ClassDeclaration, decorator: Decorator, checker: ts.TypeChecker, reflector: ReflectionHost, isCore: boolean, defaultSelector?: string | null): {
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;
     decoratedElements: ClassMember[];
