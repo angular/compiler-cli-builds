@@ -9,6 +9,7 @@
 import * as ts from 'typescript';
 import { ClassMember, CtorParameter, Decorator, Import } from '../../../ngtsc/host';
 import { TypeScriptReflectionHost } from '../../../ngtsc/metadata';
+import { BundleProgram } from '../packages/bundle_program';
 import { DecoratedClass } from './decorated_class';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
 export declare const DECORATORS: ts.__String;
@@ -45,7 +46,7 @@ export declare const CONSTRUCTOR_PARAMS: ts.__String;
 export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost implements NgccReflectionHost {
     protected isCore: boolean;
     protected dtsClassMap: Map<string, ts.ClassDeclaration> | null;
-    constructor(isCore: boolean, checker: ts.TypeChecker, dtsRootFileName?: string, dtsProgram?: ts.Program | null);
+    constructor(isCore: boolean, checker: ts.TypeChecker, dts?: BundleProgram | null);
     /**
      * Examine a declaration (for example, of a class or function) and return metadata about any
      * decorators present on the declaration.
@@ -326,7 +327,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      */
     protected getParamInfoFromStaticProperty(paramDecoratorsProperty: ts.Symbol): ParamInfo[] | null;
     /**
-     * Get the parmeter type and decorators for a class where the information is stored on
+     * Get the parameter type and decorators for a class where the information is stored on
      * in calls to `__decorate` helpers.
      *
      * Reflect over the helpers to find the decorators and types about each of
@@ -375,7 +376,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * Test whether a decorator was imported from `@angular/core`.
      *
      * Is the decorator:
-     * * externally imported from `@angulare/core`?
+     * * externally imported from `@angular/core`?
      * * the current hosted program is actually `@angular/core` and
      *   - relatively internally imported; or
      *   - not imported, from the current file.
@@ -383,6 +384,21 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param decorator the decorator to test.
      */
     protected isFromCore(decorator: Decorator): boolean;
+    /**
+     * Extract all the class declarations from the dtsTypings program, storing them in a map
+     * where the key is the declared name of the class and the value is the declaration itself.
+     *
+     * It is possible for there to be multiple class declarations with the same local name.
+     * Only the first declaration with a given name is added to the map; subsequent classes will be
+     * ignored.
+     *
+     * We are most interested in classes that are publicly exported from the entry point, so these are
+     * added to the map first, to ensure that they are not ignored.
+     *
+     * @param dtsRootFileName The filename of the entry-point to the `dtsTypings` program.
+     * @param dtsProgram The program containing all the typings files.
+     * @returns a map of class names to class declarations.
+     */
     protected computeDtsClassMap(dtsRootFileName: string, dtsProgram: ts.Program): Map<string, ts.ClassDeclaration>;
 }
 export declare type ParamInfo = {
