@@ -2,14 +2,10 @@
 import MagicString from 'magic-string';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { CompiledClass } from '../analysis/decoration_analyzer';
-import { BundleInfo } from '../packages/bundle';
 import { EsmRenderer } from './esm_renderer';
+import { EntryPointBundle } from '../packages/entry_point_bundle';
 export declare class Esm5Renderer extends EsmRenderer {
-    protected host: NgccReflectionHost;
-    protected bundle: BundleInfo;
-    protected sourcePath: string;
-    protected targetPath: string;
-    constructor(host: NgccReflectionHost, bundle: BundleInfo, sourcePath: string, targetPath: string, transformDts: boolean);
+    constructor(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string, targetPath: string);
     /**
      * Add the definitions to each decorated class
      */
