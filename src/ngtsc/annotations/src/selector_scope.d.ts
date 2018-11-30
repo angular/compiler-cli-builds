@@ -24,7 +24,10 @@ export interface ModuleData {
  * context of some module.
  */
 export interface CompilationScope<T> {
-    directives: Map<string, ScopeDirective<T>>;
+    directives: {
+        selector: string;
+        meta: ScopeDirective<T>;
+    }[];
     pipes: Map<string, T>;
     containsForwardDecls?: boolean;
 }
