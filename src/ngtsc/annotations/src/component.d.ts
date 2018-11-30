@@ -29,7 +29,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private resourceLoader;
     private rootDirs;
     private defaultPreserveWhitespaces;
-    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean);
+    private i18nUseExternalIds;
+    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean);
     private literalCache;
     private elementSchemaRegistry;
     detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
