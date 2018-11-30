@@ -8,7 +8,7 @@
  */
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
-import { ResourceLoader, SelectorScopeRegistry } from '../../../ngtsc/annotations';
+import { ReferencesRegistry, ResourceLoader, SelectorScopeRegistry } from '../../../ngtsc/annotations';
 import { CompileResult, DecoratorHandler } from '../../../ngtsc/transform';
 import { DecoratedClass } from '../host/decorated_class';
 import { NgccReflectionHost } from '../host/ngcc_host';
@@ -47,12 +47,13 @@ export declare class FileResourceLoader implements ResourceLoader {
 export declare class DecorationAnalyzer {
     private typeChecker;
     private host;
+    private referencesRegistry;
     private rootDirs;
     private isCore;
     resourceLoader: FileResourceLoader;
     scopeRegistry: SelectorScopeRegistry;
     handlers: DecoratorHandler<any, any>[];
-    constructor(typeChecker: ts.TypeChecker, host: NgccReflectionHost, rootDirs: string[], isCore: boolean);
+    constructor(typeChecker: ts.TypeChecker, host: NgccReflectionHost, referencesRegistry: ReferencesRegistry, rootDirs: string[], isCore: boolean);
     /**
      * Analyze a program to find all the decorated files should be transformed.
      * @param program The program whose files should be analysed.

@@ -15,9 +15,10 @@ import { Decorator } from '../../../ngtsc/host';
 import { CompileResult } from '@angular/compiler-cli/src/ngtsc/transform';
 import { NgccImportManager } from './ngcc_import_manager';
 import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/decoration_analyzer';
+import { PrivateDeclarationsAnalyses } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
-import { BundleInfo } from '../packages/bundle';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
+import { EntryPointBundle } from '../packages/entry_point_bundle';
 interface SourceMapInfo {
     source: string;
     map: SourceMapConverter | null;
@@ -48,23 +49,27 @@ interface DtsClassInfo {
  */
 export declare abstract class Renderer {
     protected host: NgccReflectionHost;
-    protected bundle: BundleInfo;
+    protected isCore: boolean;
+    protected bundle: EntryPointBundle;
     protected sourcePath: string;
     protected targetPath: string;
-    protected transformDts: boolean;
-    constructor(host: NgccReflectionHost, bundle: BundleInfo, sourcePath: string, targetPath: string, transformDts: boolean);
-    renderProgram(program: ts.Program, decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses): FileInfo[];
+    constructor(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string, targetPath: string);
+    renderProgram(decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileInfo[];
     /**
      * Render the source code and source-map for an Analyzed file.
      * @param compiledFile The analyzed file to render.
      * @param targetPath The absolute path where the rendered file will be written.
      */
-    renderFile(sourceFile: ts.SourceFile, compiledFile: CompiledFile | undefined, switchMarkerAnalysis: SwitchMarkerAnalysis | undefined): FileInfo[];
-    renderDtsFile(dtsFile: ts.SourceFile, dtsClasses: DtsClassInfo[]): FileInfo[];
+    renderFile(sourceFile: ts.SourceFile, compiledFile: CompiledFile | undefined, switchMarkerAnalysis: SwitchMarkerAnalysis | undefined, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileInfo[];
+    renderDtsFile(dtsFile: ts.SourceFile, dtsClasses: DtsClassInfo[], privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileInfo[];
     protected abstract addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
     protected abstract addImports(output: MagicString, imports: {
         name: string;
         as: string;
+    }[]): void;
+    protected abstract addExports(output: MagicString, entryPointBasePath: string, exports: {
+        identifier: string;
+        from: string;
     }[]): void;
     protected abstract addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
@@ -114,4 +119,5 @@ export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPo
  * @param imports An object that tracks the imports that are needed by the rendered definitions.
  */
 export declare function renderDefinitions(sourceFile: ts.SourceFile, compiledClass: CompiledClass, imports: NgccImportManager): string;
+export declare function stripExtension(filePath: string): string;
 export {};

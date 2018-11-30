@@ -10,6 +10,7 @@ import { R3InjectorMetadata, R3NgModuleMetadata, Statement } from '@angular/comp
 import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../host';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
+import { ReferencesRegistry } from './references_registry';
 import { SelectorScopeRegistry } from './selector_scope';
 export interface NgModuleAnalysis {
     ngModuleDef: R3NgModuleMetadata;
@@ -25,8 +26,9 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModu
     private checker;
     private reflector;
     private scopeRegistry;
+    private referencesRegistry;
     private isCore;
-    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean);
+    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean);
     detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;
     compile(node: ts.ClassDeclaration, analysis: NgModuleAnalysis): CompileResult[];
