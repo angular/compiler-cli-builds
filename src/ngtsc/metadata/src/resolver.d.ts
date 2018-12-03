@@ -37,7 +37,7 @@ export declare function isDynamicValue(value: any): value is DynamicValue;
  * non-primitive value, or a special `DynamicValue` type which indicates the value was not
  * available statically.
  */
-export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | DynamicValue;
+export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | BuiltinFn | DynamicValue;
 /**
  * An array of `ResolvedValue`s.
  *
@@ -63,6 +63,12 @@ export declare class EnumValue {
     readonly enumRef: Reference<ts.EnumDeclaration>;
     readonly name: string;
     constructor(enumRef: Reference<ts.EnumDeclaration>, name: string);
+}
+/**
+ * An implementation of a builtin function, such as `Array.prototype.slice`.
+ */
+export declare abstract class BuiltinFn {
+    abstract evaluate(args: ResolvedValueArray): ResolvedValue;
 }
 export declare enum ImportMode {
     UseExistingImport = 0,
