@@ -51,6 +51,7 @@ export interface CompilerOptions extends ts.CompilerOptions {
     i18nInLocale?: string;
     i18nInFile?: string;
     i18nInMissingTranslations?: 'error' | 'warning' | 'ignore';
+    i18nUseExternalIds?: boolean;
     preserveWhitespaces?: boolean;
     /** generate all possible generated files  */
     allowEmptyCodegenFiles?: boolean;

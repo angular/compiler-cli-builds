@@ -10,5 +10,8 @@ import { ImportManager } from '../../../ngtsc/translator';
 export declare class NgccImportManager extends ImportManager {
     private isFlat;
     constructor(isFlat: boolean, isCore: boolean, prefix?: string);
-    generateNamedImport(moduleName: string, symbol: string): string | null;
+    generateNamedImport(moduleName: string, symbol: string): {
+        moduleImport: string | null;
+        symbol: string;
+    };
 }

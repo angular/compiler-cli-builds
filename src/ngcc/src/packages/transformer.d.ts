@@ -1,8 +1,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/packages/transformer" />
-import * as ts from 'typescript';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { FileInfo, Renderer } from '../rendering/renderer';
-import { EntryPoint, EntryPointFormat } from './entry_point';
+import { EntryPoint } from './entry_point';
+import { EntryPointBundle } from './entry_point_bundle';
 /**
  * A Package is stored in a directory on disk and that directory can contain one or more package
  * formats - e.g. fesm2015, UMD, etc. Additionally, each package provides typings (`.d.ts` files).
@@ -11,9 +11,11 @@ import { EntryPoint, EntryPointFormat } from './entry_point';
  * parsed to identify the decorated exported classes that need to be analyzed and compiled by one or
  * more `DecoratorHandler` objects.
  *
- * Each entry point to a package is identified by a `SourceFile` that can be parsed and analyzed to
+ * Each entry point to a package is identified by a `package.json` which contains properties that
+ * indicate what formatted bundles are accessible via this end-point.
+ *
+ * Each bundle is identified by a root `SourceFile` that can be parsed and analyzed to
  * identify classes that need to be transformed; and then finally rendered and written to disk.
- * The actual file which needs to be transformed depends upon the package format.
  *
  * Along with the source files, the corresponding source maps (either inline or external) and
  * `.d.ts` files are transformed accordingly.
@@ -26,14 +28,17 @@ export declare class Transformer {
     private sourcePath;
     private targetPath;
     constructor(sourcePath: string, targetPath: string);
-    transform(entryPoint: EntryPoint, format: EntryPointFormat, transformDts: boolean): void;
-    getRootDirs(host: ts.CompilerHost, options: ts.CompilerOptions): string[];
-    getHost(isCore: boolean, format: string, program: ts.Program, dtsFilePath: string, dtsProgram: ts.Program | null): NgccReflectionHost;
-    getRenderer(format: string, program: ts.Program, host: NgccReflectionHost, isCore: boolean, rewriteCoreImportsTo: ts.SourceFile | null, transformDts: boolean): Renderer;
-    analyzeProgram(program: ts.Program, reflectionHost: NgccReflectionHost, rootDirs: string[], isCore: boolean): {
-        decorationAnalyses: Map<ts.SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/decoration_analyzer").CompiledFile>;
-        switchMarkerAnalyses: Map<ts.SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/switch_marker_analyzer").SwitchMarkerAnalysis>;
+    /**
+     * Transform the source (and typings) files of a bundle.
+     * @param bundle the bundle to transform.
+     */
+    transform(entryPoint: EntryPoint, isCore: boolean, bundle: EntryPointBundle): void;
+    getHost(isCore: boolean, bundle: EntryPointBundle): NgccReflectionHost;
+    getRenderer(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): Renderer;
+    analyzeProgram(reflectionHost: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): {
+        decorationAnalyses: Map<import("../../../../../../external/ngdeps/node_modules/typescript/lib/typescript").SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/decoration_analyzer").CompiledFile>;
+        switchMarkerAnalyses: Map<import("../../../../../../external/ngdeps/node_modules/typescript/lib/typescript").SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/switch_marker_analyzer").SwitchMarkerAnalysis>;
+        privateDeclarationsAnalyses: import("@angular/compiler-cli/src/ngcc/src/analysis/private_declarations_analyzer").ExportInfo[];
     };
     writeFile(file: FileInfo): void;
-    findR3SymbolsPath(directory: string): string | null;
 }

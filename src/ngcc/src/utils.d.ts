@@ -17,3 +17,11 @@ export declare function getNameText(name: ts.PropertyName | ts.BindingName): str
  * @returns a collection of nodes that satisfy the test.
  */
 export declare function findAll<T>(node: ts.Node, test: (node: ts.Node) => node is ts.Node & T): T[];
+/**
+ * Does the given declaration have a name which is an identifier?
+ * @param declaration The declaration to test.
+ * @returns true if the declaration has an identifer for a name.
+ */
+export declare function hasNameIdentifier(declaration: ts.Declaration): declaration is ts.Declaration & {
+    name: ts.Identifier;
+};

@@ -74,5 +74,5 @@ export declare class DependencyHost {
      * @returns false if there are definitely no import or re-export statements
      * in this file, true otherwise.
      */
-    hasImportOrReeportStatements(source: string): boolean;
+    hasImportOrReexportStatements(source: string): boolean;
 }
