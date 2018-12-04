@@ -39,7 +39,7 @@ export interface MatchingHandler<A, M> {
  * `ResourceLoader` which directly uses the filesystem to resolve resources synchronously.
  */
 export declare class FileResourceLoader implements ResourceLoader {
-    load(url: string): string;
+    load(url: string, containingFile: string): string;
 }
 /**
  * This Analyzer will analyze the files that have decorated classes that need to be transformed.
