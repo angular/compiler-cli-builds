@@ -39,4 +39,5 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     typeCheck(ctx: TypeCheckContext, node: ts.Declaration, meta: ComponentHandlerData): void;
     compile(node: ts.ClassDeclaration, analysis: ComponentHandlerData, pool: ConstantPool): CompileResult;
     private _resolveLiteral;
+    private _extractStyleUrls;
 }
