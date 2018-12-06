@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/packages/build_marker" />
 import { EntryPoint, EntryPointFormat } from './entry_point';
-export declare const NGCC_VERSION = "7.1.1+53.sha-d7c72fc";
+export declare const NGCC_VERSION = "7.1.1+56.sha-84f2928";
 /**
  * Check whether there is a build marker for the given entry point and format.
  * @param entryPoint the entry point to check for a marker.
