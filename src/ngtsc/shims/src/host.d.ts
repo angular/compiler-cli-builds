@@ -9,16 +9,18 @@
 import * as ts from 'typescript';
 export interface ShimGenerator {
     /**
-     * Get the original source file for the given shim path, the contents of which determine the
-     * contents of the shim file.
-     *
-     * If this returns `null` then the given file was not a shim file handled by this generator.
+     * Returns `true` if this generator is intended to handle the given file.
      */
-    getOriginalSourceOfShim(fileName: string): string | null;
+    recognize(fileName: string): boolean;
     /**
      * Generate a shim's `ts.SourceFile` for the given original file.
+     *
+     * `readFile` is a function which allows the generator to look up the contents of existing source
+     * files. It returns null if the requested file doesn't exist.
+     *
+     * If `generate` returns null, then the shim generator declines to generate the file after all.
      */
-    generate(original: ts.SourceFile, genFileName: string): ts.SourceFile;
+    generate(genFileName: string, readFile: (fileName: string) => ts.SourceFile | null): ts.SourceFile | null;
 }
 /**
  * A wrapper around a `ts.CompilerHost` which supports generated files.
