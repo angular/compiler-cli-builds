@@ -403,7 +403,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
 }
 export declare type ParamInfo = {
     decorators: Decorator[] | null;
-    type: ts.Expression | null;
+    typeExpression: ts.Expression | null;
 };
 /**
  * A statement node that represents an assignment.
