@@ -41,3 +41,4 @@ export declare function filterToMembersWithDecorator(members: ClassMember[], nam
 }[];
 export declare function findMember(members: ClassMember[], name: string, isStatic?: boolean): ClassMember | null;
 export declare function reflectObjectLiteral(node: ts.ObjectLiteralExpression): Map<string, ts.Expression>;
+export declare function typeNodeToValueExpr(node: ts.TypeNode): ts.Expression | null;
