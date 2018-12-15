@@ -3,7 +3,7 @@ import MagicString from 'magic-string';
 import * as ts from 'typescript';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
 import { CompiledClass } from '../analysis/decoration_analyzer';
-import { RedundantDecoratorMap, Renderer } from './renderer';
+import { Renderer } from './renderer';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
 export declare class EsmRenderer extends Renderer {
     constructor(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string, targetPath: string);
@@ -26,6 +26,6 @@ export declare class EsmRenderer extends Renderer {
     /**
      * Remove static decorator properties from classes
      */
-    removeDecorators(output: MagicString, decoratorsToRemove: RedundantDecoratorMap): void;
+    removeDecorators(output: MagicString, decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
     rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile, declarations: SwitchableVariableDeclaration[]): void;
 }
