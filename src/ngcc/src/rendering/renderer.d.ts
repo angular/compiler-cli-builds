@@ -11,6 +11,7 @@ import { SourceMapConverter } from 'convert-source-map';
 import MagicString from 'magic-string';
 import { RawSourceMap } from 'source-map';
 import * as ts from 'typescript';
+import { Decorator } from '../../../ngtsc/host';
 import { CompileResult } from '@angular/compiler-cli/src/ngtsc/transform';
 import { NgccImportManager } from './ngcc_import_manager';
 import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/decoration_analyzer';
@@ -40,13 +41,6 @@ interface DtsClassInfo {
     dtsDeclaration: ts.Declaration;
     compilation: CompileResult[];
 }
-/**
- * The collected decorators that have become redundant after the compilation
- * of Ivy static fields. The map is keyed by the container node, such that we
- * can tell if we should remove the entire decorator property
- */
-export declare type RedundantDecoratorMap = Map<ts.Node, ts.Node[]>;
-export declare const RedundantDecoratorMap: MapConstructor;
 /**
  * A base-class for rendering an `AnalyzedFile`.
  *
@@ -78,16 +72,13 @@ export declare abstract class Renderer {
         from: string;
     }[]): void;
     protected abstract addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
-    protected abstract removeDecorators(output: MagicString, decoratorsToRemove: RedundantDecoratorMap): void;
+    protected abstract removeDecorators(output: MagicString, decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
     protected abstract rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile, declarations: SwitchableVariableDeclaration[]): void;
     /**
-     * From the given list of classes, computes a map of decorators that should be removed.
-     * The decorators to remove are keyed by their container node, such that we can tell if
-     * we should remove the entire decorator property.
-     * @param classes The list of classes that may have decorators to remove.
-     * @returns A map of decorators to remove, keyed by their container node.
+     * Add the decorator nodes that are to be removed to a map
+     * So that we can tell if we should remove the entire decorator property
      */
-    protected computeDecoratorsToRemove(classes: CompiledClass[]): RedundantDecoratorMap;
+    protected trackDecorators(decorators: Decorator[], decoratorsToRemove: Map<ts.Node, ts.Node[]>): void;
     /**
      * Get the map from the source (note whether it is inline or external)
      */
