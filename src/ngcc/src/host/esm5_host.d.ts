@@ -31,7 +31,7 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
     /**
      * Check whether the given node actually represents a class.
      */
-    isClass(node: ts.Node): boolean;
+    isClass(node: ts.Node): node is ts.NamedDeclaration;
     /**
      * Find a symbol for a node that we think is a class.
      *
