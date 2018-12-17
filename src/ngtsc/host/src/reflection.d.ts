@@ -383,7 +383,7 @@ export interface ReflectionHost {
     /**
      * Check whether the given node actually represents a class.
      */
-    isClass(node: ts.Node): boolean;
+    isClass(node: ts.Node): node is ts.NamedDeclaration;
     hasBaseClass(node: ts.Declaration): boolean;
     /**
      * Get the number of generic type parameters of a given class.
