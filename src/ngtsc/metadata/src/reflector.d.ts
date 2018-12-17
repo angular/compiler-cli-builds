@@ -19,7 +19,7 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     getConstructorParameters(declaration: ts.Declaration): CtorParameter[] | null;
     getImportOfIdentifier(id: ts.Identifier): Import | null;
     getExportsOfModule(node: ts.Node): Map<string, Declaration> | null;
-    isClass(node: ts.Node): boolean;
+    isClass(node: ts.Node): node is ts.NamedDeclaration;
     hasBaseClass(node: ts.Declaration): boolean;
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
     getDefinitionOfFunction<T extends ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>(node: T): FunctionDefinition<T>;
@@ -41,3 +41,4 @@ export declare function filterToMembersWithDecorator(members: ClassMember[], nam
 }[];
 export declare function findMember(members: ClassMember[], name: string, isStatic?: boolean): ClassMember | null;
 export declare function reflectObjectLiteral(node: ts.ObjectLiteralExpression): Map<string, ts.Expression>;
+export declare function typeNodeToValueExpr(node: ts.TypeNode): ts.Expression | null;

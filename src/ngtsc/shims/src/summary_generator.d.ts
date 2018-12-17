@@ -12,7 +12,7 @@ export declare class SummaryGenerator implements ShimGenerator {
     private map;
     private constructor();
     getSummaryFileNames(): string[];
-    getOriginalSourceOfShim(fileName: string): string | null;
-    generate(original: ts.SourceFile, genFilePath: string): ts.SourceFile;
+    recognize(fileName: string): boolean;
+    generate(genFilePath: string, readFile: (fileName: string) => ts.SourceFile | null): ts.SourceFile | null;
     static forRootFiles(files: ReadonlyArray<string>): SummaryGenerator;
 }

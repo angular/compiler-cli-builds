@@ -154,12 +154,21 @@ export interface CtorParameter {
      */
     nameNode: ts.BindingName;
     /**
-     * TypeScript `ts.Expression` representing the type of the parameter, if the type is a simple
-     * expression type.
+     * TypeScript `ts.Expression` representing the type value of the parameter, if the type is a
+     * simple
+     * expression type that can be converted to a value.
      *
      * If the type is not present or cannot be represented as an expression, `type` is `null`.
      */
-    type: ts.Expression | null;
+    typeExpression: ts.Expression | null;
+    /**
+     * TypeScript `ts.TypeNode` representing the type node found in the type position.
+     *
+     * This field can be used for diagnostics reporting if `typeExpression` is `null`.
+     *
+     * Can be null, if the param has no type declared.
+     */
+    typeNode: ts.TypeNode | null;
     /**
      * Any `Decorator`s which are present on the parameter, or `null` if none are present.
      */
@@ -374,7 +383,7 @@ export interface ReflectionHost {
     /**
      * Check whether the given node actually represents a class.
      */
-    isClass(node: ts.Node): boolean;
+    isClass(node: ts.Node): node is ts.NamedDeclaration;
     hasBaseClass(node: ts.Declaration): boolean;
     /**
      * Get the number of generic type parameters of a given class.
