@@ -1,4 +1,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/packages/transformer" />
+import * as ts from 'typescript';
+import { CompiledFile } from '../analysis/decoration_analyzer';
+import { ExportInfo } from '../analysis/private_declarations_analyzer';
+import { SwitchMarkerAnalyses } from '../analysis/switch_marker_analyzer';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { FileInfo, Renderer } from '../rendering/renderer';
 import { EntryPoint } from './entry_point';
@@ -35,10 +39,12 @@ export declare class Transformer {
     transform(entryPoint: EntryPoint, isCore: boolean, bundle: EntryPointBundle): void;
     getHost(isCore: boolean, bundle: EntryPointBundle): NgccReflectionHost;
     getRenderer(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): Renderer;
-    analyzeProgram(reflectionHost: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): {
-        decorationAnalyses: Map<import("../../../../../../external/ngdeps/node_modules/typescript/lib/typescript").SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/decoration_analyzer").CompiledFile>;
-        switchMarkerAnalyses: Map<import("../../../../../../external/ngdeps/node_modules/typescript/lib/typescript").SourceFile, import("@angular/compiler-cli/src/ngcc/src/analysis/switch_marker_analyzer").SwitchMarkerAnalysis>;
-        privateDeclarationsAnalyses: import("@angular/compiler-cli/src/ngcc/src/analysis/private_declarations_analyzer").ExportInfo[];
-    };
+    analyzeProgram(reflectionHost: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): ProgramAnalyses;
     writeFile(file: FileInfo): void;
 }
+interface ProgramAnalyses {
+    decorationAnalyses: Map<ts.SourceFile, CompiledFile>;
+    switchMarkerAnalyses: SwitchMarkerAnalyses;
+    privateDeclarationsAnalyses: ExportInfo[];
+}
+export {};
