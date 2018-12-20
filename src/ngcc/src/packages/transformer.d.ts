@@ -1,6 +1,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/packages/transformer" />
 import * as ts from 'typescript';
 import { CompiledFile } from '../analysis/decoration_analyzer';
+import { ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses } from '../analysis/switch_marker_analyzer';
 import { NgccReflectionHost } from '../host/ngcc_host';
@@ -46,5 +47,6 @@ interface ProgramAnalyses {
     decorationAnalyses: Map<ts.SourceFile, CompiledFile>;
     switchMarkerAnalyses: SwitchMarkerAnalyses;
     privateDeclarationsAnalyses: ExportInfo[];
+    moduleWithProvidersAnalyses: ModuleWithProvidersAnalyses | null;
 }
 export {};
