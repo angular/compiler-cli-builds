@@ -11,7 +11,7 @@ import { ClassMember, CtorParameter, Decorator, Import } from '../../../ngtsc/ho
 import { TypeScriptReflectionHost } from '../../../ngtsc/metadata';
 import { BundleProgram } from '../packages/bundle_program';
 import { DecoratedClass } from './decorated_class';
-import { NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
+import { ModuleWithProvidersFunction, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
 export declare const DECORATORS: ts.__String;
 export declare const PROP_DECORATORS: ts.__String;
 export declare const CONSTRUCTOR: ts.__String;
@@ -45,7 +45,7 @@ export declare const CONSTRUCTOR_PARAMS: ts.__String;
  */
 export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost implements NgccReflectionHost {
     protected isCore: boolean;
-    protected dtsClassMap: Map<string, ts.ClassDeclaration> | null;
+    protected dtsDeclarationMap: Map<string, ts.Declaration> | null;
     constructor(isCore: boolean, checker: ts.TypeChecker, dts?: BundleProgram | null);
     /**
      * Examine a declaration (for example, of a class or function) and return metadata about any
@@ -131,7 +131,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      */
     getGenericArityOfClass(clazz: ts.Declaration): number | null;
     /**
-     * Take an exported declaration of a class (maybe downleveled to a variable) and look up the
+     * Take an exported declaration of a class (maybe down-leveled to a variable) and look up the
      * declaration of its type in a separate .d.ts tree.
      *
      * This function is allowed to return `null` if the current compilation unit does not have a
@@ -142,7 +142,15 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * Note that the `ts.ClassDeclaration` returned from this function may not be from the same
      * `ts.Program` as the input declaration.
      */
-    getDtsDeclarationOfClass(declaration: ts.Declaration): ts.ClassDeclaration | null;
+    getDtsDeclaration(declaration: ts.Declaration): ts.Declaration | null;
+    /**
+     * Search the given source file for exported functions and static class methods that return
+     * ModuleWithProviders objects.
+     * @param f The source file to search for these functions
+     * @returns An array of function declarations that look like they return ModuleWithProviders
+     * objects.
+     */
+    getModuleWithProvidersFunctions(f: ts.SourceFile): ModuleWithProvidersFunction[];
     protected getDecoratorsOfSymbol(symbol: ts.Symbol): Decorator[] | null;
     protected getDecoratedClassFromSymbol(symbol: ts.Symbol | undefined): DecoratedClass | null;
     /**
@@ -327,8 +335,8 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      */
     protected getParamInfoFromStaticProperty(paramDecoratorsProperty: ts.Symbol): ParamInfo[] | null;
     /**
-     * Get the parameter type and decorators for a class where the information is stored on
-     * in calls to `__decorate` helpers.
+     * Get the parameter type and decorators for a class where the information is stored via
+     * calls to `__decorate` helpers.
      *
      * Reflect over the helpers to find the decorators and types about each of
      * the class's constructor parameters.
@@ -399,7 +407,15 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param dtsProgram The program containing all the typings files.
      * @returns a map of class names to class declarations.
      */
-    protected computeDtsClassMap(dtsRootFileName: string, dtsProgram: ts.Program): Map<string, ts.ClassDeclaration>;
+    protected computeDtsDeclarationMap(dtsRootFileName: string, dtsProgram: ts.Program): Map<string, ts.Declaration>;
+    /**
+     * Parse the given node, to see if it is a function that returns a `ModuleWithProviders` object.
+     * @param node a node to check to see if it is a function that returns a `ModuleWithProviders`
+     * object.
+     * @returns info about the function if it does return a `ModuleWithProviders` object; `null`
+     * otherwise.
+     */
+    protected parseForModuleWithProviders(node: ts.Node | null): ModuleWithProvidersFunction | null;
 }
 export declare type ParamInfo = {
     decorators: Decorator[] | null;
