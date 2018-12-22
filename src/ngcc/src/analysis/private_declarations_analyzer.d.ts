@@ -12,7 +12,7 @@ import { NgccReflectionHost } from '../host/ngcc_host';
 export interface ExportInfo {
     identifier: string;
     from: string;
-    dtsFrom: string | null;
+    dtsFrom?: string | null;
 }
 export declare type PrivateDeclarationsAnalyses = ExportInfo[];
 /**
