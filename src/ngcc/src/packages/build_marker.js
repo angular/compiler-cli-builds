@@ -18,7 +18,7 @@
     Object.defineProperty(exports, "__esModule", { value: true });
     var canonical_path_1 = require("canonical-path");
     var fs_1 = require("fs");
-    exports.NGCC_VERSION = '7.2.0-rc.0+71.sha-eb3345b';
+    exports.NGCC_VERSION = '7.2.0-rc.0+74.sha-e5f5ad3';
     function getMarkerPath(entryPointPath, format) {
         return canonical_path_1.resolve(entryPointPath, "__modified_by_ngcc_for_" + format + "__");
     }
