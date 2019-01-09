@@ -8,8 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/analysis/ngcc_references_registry" />
 import * as ts from 'typescript';
 import { ReferencesRegistry } from '../../../ngtsc/annotations';
-import { Declaration, ReflectionHost } from '../../../ngtsc/host';
-import { Reference } from '../../../ngtsc/metadata';
+import { Reference } from '../../../ngtsc/imports';
+import { Declaration, ReflectionHost } from '../../../ngtsc/reflection';
 /**
  * This is a place for DecoratorHandlers to register references that they
  * find in their analysis of the code.
@@ -26,7 +26,7 @@ export declare class NgccReferencesRegistry implements ReferencesRegistry {
      * Only `ResolveReference` references are stored. Other types are ignored.
      * @param references A collection of references to register.
      */
-    add(...references: Reference<ts.Declaration>[]): void;
+    add(source: ts.Declaration, ...references: Reference<ts.Declaration>[]): void;
     /**
      * Create and return a mapping for the registered resolved references.
      * @returns A map of reference identifiers to reference declarations.

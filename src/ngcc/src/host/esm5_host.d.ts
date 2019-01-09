@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/host/esm5_host" />
 import * as ts from 'typescript';
-import { ClassMember, Decorator, FunctionDefinition } from '../../../ngtsc/host';
+import { ClassMember, Decorator, FunctionDefinition } from '../../../ngtsc/reflection';
 import { Esm2015ReflectionHost, ParamInfo } from './esm2015_host';
 /**
  * ESM5 packages contain ECMAScript IIFE functions that act like classes. For example:

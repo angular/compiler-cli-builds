@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { ReferencesRegistry } from '../../../ngtsc/annotations';
 import { NgccReflectionHost } from '../host/ngcc_host';
+import { NgccReferencesRegistry } from './ngcc_references_registry';
 export interface ExportInfo {
     identifier: string;
     from: string;
@@ -22,7 +22,7 @@ export declare type PrivateDeclarationsAnalyses = ExportInfo[];
 export declare class PrivateDeclarationsAnalyzer {
     private host;
     private referencesRegistry;
-    constructor(host: NgccReflectionHost, referencesRegistry: ReferencesRegistry);
+    constructor(host: NgccReflectionHost, referencesRegistry: NgccReferencesRegistry);
     analyzeProgram(program: ts.Program): PrivateDeclarationsAnalyses;
     private getRootFiles;
     private getPrivateDeclarations;

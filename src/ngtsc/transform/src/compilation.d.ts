@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/compilation" />
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator, ReflectionHost } from '../../host';
+import { Decorator, ReflectionHost } from '../../reflection';
 import { TypeCheckContext } from '../../typecheck';
 import { CompileResult, DecoratorHandler } from './api';
 /**
