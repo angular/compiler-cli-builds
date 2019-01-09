@@ -33,6 +33,12 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      */
     isClass(node: ts.Node): node is ts.NamedDeclaration;
     /**
+     * Determines whether the given declaration has a base class.
+     *
+     * In ES5, we need to determine if the IIFE wrapper takes a `_super` parameter .
+     */
+    hasBaseClass(node: ts.Declaration): boolean;
+    /**
      * Find a symbol for a node that we think is a class.
      *
      * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE.
@@ -70,7 +76,7 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      * @returns an array of `ts.ParameterDeclaration` objects representing each of the parameters in
      * the class's constructor or null if there is no constructor.
      */
-    protected getConstructorParameterDeclarations(classSymbol: ts.Symbol): ts.ParameterDeclaration[];
+    protected getConstructorParameterDeclarations(classSymbol: ts.Symbol): ts.ParameterDeclaration[] | null;
     /**
      * Get the parameter type and decorators for the constructor of a class,
      * where the information is stored on a static method of the class.
