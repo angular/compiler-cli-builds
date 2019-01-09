@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/injectable" />
 import { R3InjectableMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator, ReflectionHost } from '../../host';
+import { Decorator, ReflectionHost } from '../../reflection';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 export interface InjectableHandlerData {
     meta: R3InjectableMetadata;

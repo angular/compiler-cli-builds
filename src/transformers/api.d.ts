@@ -194,7 +194,7 @@ export interface Program {
     /**
      * Retrieve options diagnostics for the Angular options used to create the program.
      */
-    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<Diagnostic>;
+    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken): ReadonlyArray<ts.Diagnostic | Diagnostic>;
     /**
      * Retrieve the syntax diagnostics from TypeScript. This is faster than calling
      * `getTsProgram().getSyntacticDiagnostics()` since it does not need to collect Angular structural

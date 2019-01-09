@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/host/src/reflection" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/host" />
 import * as ts from 'typescript';
 /**
  * Metadata extracted from an instance of a decorator on another declaration.

@@ -5,5 +5,5 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/host" />
-export * from './src/reflection';
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/entry_point/src/logic" />
+export declare function findFlatIndexEntryPoint(rootFiles: ReadonlyArray<string>): string | null;

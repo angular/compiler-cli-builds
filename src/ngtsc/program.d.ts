@@ -9,6 +9,9 @@
 import { GeneratedFile } from '@angular/compiler';
 import * as ts from 'typescript';
 import * as api from '../transformers/api';
+import { ReferencesRegistry } from './annotations';
+import { ReferenceGraph } from './entry_point';
+import { Reference } from './imports';
 export declare class NgtscProgram implements api.Program {
     private options;
     private tsProgram;
@@ -22,10 +25,14 @@ export declare class NgtscProgram implements api.Program {
     private _isCore;
     private rootDirs;
     private closureCompilerEnabled;
+    private entryPoint;
+    private exportReferenceGraph;
+    private flatIndexGenerator;
+    private constructionDiagnostics;
     constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: api.Program);
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
-    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<api.Diagnostic>;
+    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
     getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
     getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<api.Diagnostic>;
     getTsSemanticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
@@ -48,4 +55,9 @@ export declare class NgtscProgram implements api.Program {
     private readonly reflector;
     private readonly coreImportsFrom;
     private readonly isCore;
+}
+export declare class ReferenceGraphAdapter implements ReferencesRegistry {
+    private graph;
+    constructor(graph: ReferenceGraph);
+    add(source: ts.Declaration, ...references: Reference<ts.Declaration>[]): void;
 }

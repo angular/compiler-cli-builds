@@ -7,6 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { ConstantPool } from '@angular/compiler';
+import { TsReferenceResolver } from '@angular/compiler-cli/src/ngtsc/imports';
+import { PartialEvaluator } from '@angular/compiler-cli/src/ngtsc/partial_evaluator';
 import * as ts from 'typescript';
 import { ReferencesRegistry, ResourceLoader, SelectorScopeRegistry } from '../../../ngtsc/annotations';
 import { CompileResult, DecoratorHandler } from '../../../ngtsc/transform';
@@ -45,21 +47,26 @@ export declare class FileResourceLoader implements ResourceLoader {
  * This Analyzer will analyze the files that have decorated classes that need to be transformed.
  */
 export declare class DecorationAnalyzer {
-    private typeChecker;
+    private program;
+    private options;
     private host;
+    private typeChecker;
+    private reflectionHost;
     private referencesRegistry;
     private rootDirs;
     private isCore;
     resourceLoader: FileResourceLoader;
+    resolver: TsReferenceResolver;
     scopeRegistry: SelectorScopeRegistry;
+    evaluator: PartialEvaluator;
     handlers: DecoratorHandler<any, any>[];
-    constructor(typeChecker: ts.TypeChecker, host: NgccReflectionHost, referencesRegistry: ReferencesRegistry, rootDirs: string[], isCore: boolean);
+    constructor(program: ts.Program, options: ts.CompilerOptions, host: ts.CompilerHost, typeChecker: ts.TypeChecker, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, rootDirs: string[], isCore: boolean);
     /**
      * Analyze a program to find all the decorated files should be transformed.
-     * @param program The program whose files should be analysed.
+     *
      * @returns a map of the source files to the analysis for those files.
      */
-    analyzeProgram(program: ts.Program): DecorationAnalyses;
+    analyzeProgram(): DecorationAnalyses;
     protected analyzeFile(sourceFile: ts.SourceFile): AnalyzedFile | undefined;
     protected analyzeClass(clazz: DecoratedClass): AnalyzedClass | null;
     protected compileFile(analyzedFile: AnalyzedFile): CompiledFile;
