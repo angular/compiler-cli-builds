@@ -384,6 +384,9 @@ export interface ReflectionHost {
      * Check whether the given node actually represents a class.
      */
     isClass(node: ts.Node): node is ts.NamedDeclaration;
+    /**
+     * Determines whether the given declaration has a base class.
+     */
     hasBaseClass(node: ts.Declaration): boolean;
     /**
      * Get the number of generic type parameters of a given class.
