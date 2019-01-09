@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/api" />
 import { ConstantPool, Expression, Statement, Type } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator } from '../../host';
+import { Decorator } from '../../reflection';
 import { TypeCheckContext } from '../../typecheck';
 /**
  * Provides the interface between a decorator compiler from @angular/compiler and the Typescript

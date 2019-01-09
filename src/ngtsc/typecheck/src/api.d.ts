@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/api" />
 import { BoundTarget, DirectiveMeta } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Reference } from '../../metadata';
+import { Reference } from '../../imports';
 /**
  * Extension of `DirectiveMeta` that includes additional information required to type-check the
  * usage of a particular directive.

@@ -8,8 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/selector_scope" />
 import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
-import { ReflectionHost } from '../../host';
-import { Reference } from '../../metadata';
+import { Reference, ReferenceResolver } from '../../imports';
+import { ReflectionHost } from '../../reflection';
 import { TypeCheckableDirectiveMeta } from '../../typecheck';
 /**
  * Metadata extracted for a given NgModule that can be used to compute selector scopes.
@@ -41,6 +41,7 @@ export interface ScopeDirective<T> extends TypeCheckableDirectiveMeta {
 export declare class SelectorScopeRegistry {
     private checker;
     private reflector;
+    private resolver;
     /**
      *  Map of modules declared in the current compilation unit to their (local) metadata.
      */
@@ -61,7 +62,7 @@ export declare class SelectorScopeRegistry {
      * Map of components/directives/pipes to their module.
      */
     private _declararedTypeToModule;
-    constructor(checker: ts.TypeChecker, reflector: ReflectionHost);
+    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, resolver: ReferenceResolver);
     /**
      * Register a module's metadata with the registry.
      */

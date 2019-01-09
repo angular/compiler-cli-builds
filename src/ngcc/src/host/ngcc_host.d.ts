@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { ReflectionHost } from '../../../ngtsc/host';
+import { ReflectionHost } from '../../../ngtsc/reflection';
 import { DecoratedClass } from './decorated_class';
 export declare const PRE_R3_MARKER = "__PRE_R3__";
 export declare const POST_R3_MARKER = "__POST_R3__";

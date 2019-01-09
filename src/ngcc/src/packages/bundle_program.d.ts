@@ -10,6 +10,8 @@ import * as ts from 'typescript';
 */
 export interface BundleProgram {
     program: ts.Program;
+    options: ts.CompilerOptions;
+    host: ts.CompilerHost;
     path: string;
     file: ts.SourceFile;
     r3SymbolsPath: string | null;

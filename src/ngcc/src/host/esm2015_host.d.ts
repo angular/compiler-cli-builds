@@ -7,8 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/host/esm2015_host" />
 import * as ts from 'typescript';
-import { ClassMember, CtorParameter, Decorator, Import } from '../../../ngtsc/host';
-import { TypeScriptReflectionHost } from '../../../ngtsc/metadata';
+import { ClassMember, CtorParameter, Decorator, Import, TypeScriptReflectionHost } from '../../../ngtsc/reflection';
 import { BundleProgram } from '../packages/bundle_program';
 import { DecoratedClass } from './decorated_class';
 import { ModuleWithProvidersFunction, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
