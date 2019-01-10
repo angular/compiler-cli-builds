@@ -13,6 +13,7 @@ import { Decorator, ReflectionHost } from '../../reflection';
 export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): R3DependencyMetadata[] | null;
 export declare function toR3Reference(valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile): R3Reference;
 export declare function isAngularCore(decorator: Decorator): boolean;
+export declare function isAngularCoreReference(reference: Reference, symbolName: string): boolean;
 /**
  * Unwrap a `ts.Expression`, removing outer type-casts or parentheses until the expression is in its
  * lowest level form.
