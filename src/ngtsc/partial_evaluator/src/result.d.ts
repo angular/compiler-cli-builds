@@ -62,7 +62,8 @@ export interface ResolvedValueArray extends Array<ResolvedValue> {
 export declare class EnumValue {
     readonly enumRef: Reference<ts.EnumDeclaration>;
     readonly name: string;
-    constructor(enumRef: Reference<ts.EnumDeclaration>, name: string);
+    readonly resolved: ResolvedValue;
+    constructor(enumRef: Reference<ts.EnumDeclaration>, name: string, resolved: ResolvedValue);
 }
 /**
  * An implementation of a builtin function, such as `Array.prototype.slice`.

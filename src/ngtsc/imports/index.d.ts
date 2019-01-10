@@ -6,5 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/imports" />
+export { ImportRewriter, NoopImportRewriter, R3SymbolsImportRewriter, validateAndRewriteCoreSymbol } from './src/core';
 export { AbsoluteReference, ImportMode, NodeReference, Reference, ResolvedReference } from './src/references';
 export { ReferenceResolver, TsReferenceResolver } from './src/resolver';
