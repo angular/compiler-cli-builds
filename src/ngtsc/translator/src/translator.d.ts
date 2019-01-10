@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/translator/src/translator" />
 import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Statement, Type, TypeVisitor, TypeofExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
 import * as ts from 'typescript';
+import { ImportRewriter } from '../../imports';
 export declare class Context {
     readonly isStatement: boolean;
     constructor(isStatement: boolean);
@@ -15,17 +16,17 @@ export declare class Context {
     readonly withStatementMode: Context;
 }
 export declare class ImportManager {
-    protected isCore: boolean;
+    protected rewriter: ImportRewriter;
     private prefix;
     private moduleToIndex;
+    private importedModules;
     private nextIndex;
-    constructor(isCore: boolean, prefix?: string);
-    generateNamedImport(moduleName: string, symbol: string): {
+    constructor(rewriter?: ImportRewriter, prefix?: string);
+    generateNamedImport(moduleName: string, originalSymbol: string): {
         moduleImport: string | null;
         symbol: string;
     };
-    protected rewriteSymbol(moduleName: string, symbol: string): string;
-    getAllImports(contextPath: string, rewriteCoreImportsTo: ts.SourceFile | null): {
+    getAllImports(contextPath: string): {
         name: string;
         as: string;
     }[];

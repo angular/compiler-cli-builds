@@ -11,11 +11,15 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define("@angular/compiler-cli/src/ngtsc/imports", ["require", "exports", "@angular/compiler-cli/src/ngtsc/imports/src/references", "@angular/compiler-cli/src/ngtsc/imports/src/resolver"], factory);
+        define("@angular/compiler-cli/src/ngtsc/imports", ["require", "exports", "@angular/compiler-cli/src/ngtsc/imports/src/core", "@angular/compiler-cli/src/ngtsc/imports/src/references", "@angular/compiler-cli/src/ngtsc/imports/src/resolver"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var core_1 = require("@angular/compiler-cli/src/ngtsc/imports/src/core");
+    exports.NoopImportRewriter = core_1.NoopImportRewriter;
+    exports.R3SymbolsImportRewriter = core_1.R3SymbolsImportRewriter;
+    exports.validateAndRewriteCoreSymbol = core_1.validateAndRewriteCoreSymbol;
     var references_1 = require("@angular/compiler-cli/src/ngtsc/imports/src/references");
     exports.AbsoluteReference = references_1.AbsoluteReference;
     exports.ImportMode = references_1.ImportMode;
@@ -25,4 +29,4 @@
     var resolver_1 = require("@angular/compiler-cli/src/ngtsc/imports/src/resolver");
     exports.TsReferenceResolver = resolver_1.TsReferenceResolver;
 });
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiLi4vLi4vLi4vLi4vLi4vIiwic291cmNlcyI6WyJwYWNrYWdlcy9jb21waWxlci1jbGkvc3JjL25ndHNjL2ltcG9ydHMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7OztHQU1HOzs7Ozs7Ozs7Ozs7SUFFSCxxRkFBNEc7SUFBcEcseUNBQUEsaUJBQWlCLENBQUE7SUFBRSxrQ0FBQSxVQUFVLENBQUE7SUFBRSxxQ0FBQSxhQUFhLENBQUE7SUFBRSxpQ0FBQSxTQUFTLENBQUE7SUFBRSx5Q0FBQSxpQkFBaUIsQ0FBQTtJQUNsRixpRkFBc0U7SUFBM0MseUNBQUEsbUJBQW1CLENBQUEiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBsaWNlbnNlXG4gKiBDb3B5cmlnaHQgR29vZ2xlIEluYy4gQWxsIFJpZ2h0cyBSZXNlcnZlZC5cbiAqXG4gKiBVc2Ugb2YgdGhpcyBzb3VyY2UgY29kZSBpcyBnb3Zlcm5lZCBieSBhbiBNSVQtc3R5bGUgbGljZW5zZSB0aGF0IGNhbiBiZVxuICogZm91bmQgaW4gdGhlIExJQ0VOU0UgZmlsZSBhdCBodHRwczovL2FuZ3VsYXIuaW8vbGljZW5zZVxuICovXG5cbmV4cG9ydCB7QWJzb2x1dGVSZWZlcmVuY2UsIEltcG9ydE1vZGUsIE5vZGVSZWZlcmVuY2UsIFJlZmVyZW5jZSwgUmVzb2x2ZWRSZWZlcmVuY2V9IGZyb20gJy4vc3JjL3JlZmVyZW5jZXMnO1xuZXhwb3J0IHtSZWZlcmVuY2VSZXNvbHZlciwgVHNSZWZlcmVuY2VSZXNvbHZlcn0gZnJvbSAnLi9zcmMvcmVzb2x2ZXInO1xuIl19
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiLi4vLi4vLi4vLi4vLi4vIiwic291cmNlcyI6WyJwYWNrYWdlcy9jb21waWxlci1jbGkvc3JjL25ndHNjL2ltcG9ydHMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7OztHQU1HOzs7Ozs7Ozs7Ozs7SUFFSCx5RUFBcUg7SUFBN0Ysb0NBQUEsa0JBQWtCLENBQUE7SUFBRSx5Q0FBQSx1QkFBdUIsQ0FBQTtJQUFFLDhDQUFBLDRCQUE0QixDQUFBO0lBQ2pHLHFGQUE0RztJQUFwRyx5Q0FBQSxpQkFBaUIsQ0FBQTtJQUFFLGtDQUFBLFVBQVUsQ0FBQTtJQUFFLHFDQUFBLGFBQWEsQ0FBQTtJQUFFLGlDQUFBLFNBQVMsQ0FBQTtJQUFFLHlDQUFBLGlCQUFpQixDQUFBO0lBQ2xGLGlGQUFzRTtJQUEzQyx5Q0FBQSxtQkFBbUIsQ0FBQSIsInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogQGxpY2Vuc2VcbiAqIENvcHlyaWdodCBHb29nbGUgSW5jLiBBbGwgUmlnaHRzIFJlc2VydmVkLlxuICpcbiAqIFVzZSBvZiB0aGlzIHNvdXJjZSBjb2RlIGlzIGdvdmVybmVkIGJ5IGFuIE1JVC1zdHlsZSBsaWNlbnNlIHRoYXQgY2FuIGJlXG4gKiBmb3VuZCBpbiB0aGUgTElDRU5TRSBmaWxlIGF0IGh0dHBzOi8vYW5ndWxhci5pby9saWNlbnNlXG4gKi9cblxuZXhwb3J0IHtJbXBvcnRSZXdyaXRlciwgTm9vcEltcG9ydFJld3JpdGVyLCBSM1N5bWJvbHNJbXBvcnRSZXdyaXRlciwgdmFsaWRhdGVBbmRSZXdyaXRlQ29yZVN5bWJvbH0gZnJvbSAnLi9zcmMvY29yZSc7XG5leHBvcnQge0Fic29sdXRlUmVmZXJlbmNlLCBJbXBvcnRNb2RlLCBOb2RlUmVmZXJlbmNlLCBSZWZlcmVuY2UsIFJlc29sdmVkUmVmZXJlbmNlfSBmcm9tICcuL3NyYy9yZWZlcmVuY2VzJztcbmV4cG9ydCB7UmVmZXJlbmNlUmVzb2x2ZXIsIFRzUmVmZXJlbmNlUmVzb2x2ZXJ9IGZyb20gJy4vc3JjL3Jlc29sdmVyJztcbiJdfQ==

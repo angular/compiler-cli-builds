@@ -21,6 +21,7 @@ export declare class NgtscProgram implements api.Program {
     private sourceToFactorySymbols;
     private host;
     private _coreImportsFrom;
+    private _importRewriter;
     private _reflector;
     private _isCore;
     private rootDirs;
@@ -55,6 +56,7 @@ export declare class NgtscProgram implements api.Program {
     private readonly reflector;
     private readonly coreImportsFrom;
     private readonly isCore;
+    private readonly importRewriter;
 }
 export declare class ReferenceGraphAdapter implements ReferencesRegistry {
     private graph;
