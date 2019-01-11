@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/reflector" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/typescript" />
 import * as ts from 'typescript';
-import { ClassMember, CtorParameter, Declaration, Decorator, FunctionDefinition, Import, ReflectionHost } from '../../host';
+import { ClassMember, CtorParameter, Declaration, Decorator, FunctionDefinition, Import, ReflectionHost } from './host';
 /**
  * reflector.ts implements static reflection of declarations using the TypeScript `ts.TypeChecker`.
  */

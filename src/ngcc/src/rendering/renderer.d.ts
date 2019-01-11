@@ -12,7 +12,7 @@ import MagicString from 'magic-string';
 import { RawSourceMap } from 'source-map';
 import * as ts from 'typescript';
 import { CompileResult } from '@angular/compiler-cli/src/ngtsc/transform';
-import { NgccImportManager } from './ngcc_import_manager';
+import { ImportManager } from '../../../ngtsc/translator';
 import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/decoration_analyzer';
 import { ModuleWithProvidersInfo, ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
 import { PrivateDeclarationsAnalyses, ExportInfo } from '../analysis/private_declarations_analyzer';
@@ -89,7 +89,7 @@ export declare abstract class Renderer {
      * This function only gets called on typings files, so it doesn't need different implementations
      * for each bundle format.
      */
-    protected addModuleWithProvidersParams(outputText: MagicString, moduleWithProviders: ModuleWithProvidersInfo[], importManager: NgccImportManager): void;
+    protected addModuleWithProvidersParams(outputText: MagicString, moduleWithProviders: ModuleWithProvidersInfo[], importManager: ImportManager): void;
     protected abstract addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
     protected abstract addImports(output: MagicString, imports: {
         name: string;
@@ -126,6 +126,7 @@ export declare abstract class Renderer {
      * @returns true if the type is the core Angular `ModuleWithProviders` interface.
      */
     private isCoreModuleWithProvidersType;
+    private getImportRewriter;
 }
 /**
  * Merge the two specified source-maps into a single source-map that hides the intermediate
@@ -146,7 +147,7 @@ export declare function mergeSourceMaps(oldMap: RawSourceMap | null, newMap: Raw
 /**
  * Render the constant pool as source code for the given class.
  */
-export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPool: ConstantPool, imports: NgccImportManager): string;
+export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPool: ConstantPool, imports: ImportManager): string;
 /**
  * Render the definitions as source code for the given class.
  * @param sourceFile The file containing the class to process.
@@ -155,6 +156,6 @@ export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPo
  * definitions.
  * @param imports An object that tracks the imports that are needed by the rendered definitions.
  */
-export declare function renderDefinitions(sourceFile: ts.SourceFile, compiledClass: CompiledClass, imports: NgccImportManager): string;
+export declare function renderDefinitions(sourceFile: ts.SourceFile, compiledClass: CompiledClass, imports: ImportManager): string;
 export declare function stripExtension(filePath: string): string;
 export {};

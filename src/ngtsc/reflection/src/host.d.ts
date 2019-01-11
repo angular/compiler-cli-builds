@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/host/src/reflection" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/host" />
 import * as ts from 'typescript';
 /**
  * Metadata extracted from an instance of a decorator on another declaration.
@@ -384,6 +384,9 @@ export interface ReflectionHost {
      * Check whether the given node actually represents a class.
      */
     isClass(node: ts.Node): node is ts.NamedDeclaration;
+    /**
+     * Determines whether the given declaration has a base class.
+     */
     hasBaseClass(node: ts.Declaration): boolean;
     /**
      * Get the number of generic type parameters of a given class.

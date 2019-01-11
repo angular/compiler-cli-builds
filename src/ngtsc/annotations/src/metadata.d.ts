@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/metadata" />
 import { Statement } from '@angular/compiler';
 import * as ts from 'typescript';
-import { ReflectionHost } from '../../host';
+import { ReflectionHost } from '../../reflection';
 /**
  * Given a class declaration, generate a call to `setClassMetadata` with the Angular metadata
  * present on the class or its member fields.

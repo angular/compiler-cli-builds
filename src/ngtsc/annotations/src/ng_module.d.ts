@@ -8,7 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
 import { R3InjectorMetadata, R3NgModuleMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator, ReflectionHost } from '../../host';
+import { PartialEvaluator } from '../../partial_evaluator';
+import { Decorator, ReflectionHost } from '../../reflection';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 import { ReferencesRegistry } from './references_registry';
 import { SelectorScopeRegistry } from './selector_scope';
@@ -23,12 +24,12 @@ export interface NgModuleAnalysis {
  * TODO(alxhub): handle injector side of things as well.
  */
 export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModuleAnalysis, Decorator> {
-    private checker;
     private reflector;
+    private evaluator;
     private scopeRegistry;
     private referencesRegistry;
     private isCore;
-    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean);
     detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;
     compile(node: ts.ClassDeclaration, analysis: NgModuleAnalysis): CompileResult[];

@@ -8,7 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/compilation" />
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator, ReflectionHost } from '../../host';
+import { ImportRewriter } from '../../imports';
+import { Decorator, ReflectionHost } from '../../reflection';
 import { TypeCheckContext } from '../../typecheck';
 import { CompileResult, DecoratorHandler } from './api';
 /**
@@ -21,7 +22,7 @@ export declare class IvyCompilation {
     private handlers;
     private checker;
     private reflector;
-    private coreImportsFrom;
+    private importRewriter;
     private sourceToFactorySymbols;
     /**
      * Tracks classes which have been analyzed and found to have an Ivy decorator, and the
@@ -46,7 +47,7 @@ export declare class IvyCompilation {
      * when compiling @angular/core, or `null` if the current program is not @angular/core. This is
      * `null` in most cases.
      */
-    constructor(handlers: DecoratorHandler<any, any>[], checker: ts.TypeChecker, reflector: ReflectionHost, coreImportsFrom: ts.SourceFile | null, sourceToFactorySymbols: Map<string, Set<string>> | null);
+    constructor(handlers: DecoratorHandler<any, any>[], checker: ts.TypeChecker, reflector: ReflectionHost, importRewriter: ImportRewriter, sourceToFactorySymbols: Map<string, Set<string>> | null);
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     /**

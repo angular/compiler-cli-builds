@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/host/decorated_class" />
 import * as ts from 'typescript';
-import { Decorator } from '../../../ngtsc/host';
+import { Decorator } from '../../../ngtsc/reflection';
 /**
  * A simple container that holds the details of a decorated class that has been
  * found in a `DecoratedFile`.

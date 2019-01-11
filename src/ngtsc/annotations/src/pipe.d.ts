@@ -8,7 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/pipe" />
 import { R3PipeMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator, ReflectionHost } from '../../host';
+import { PartialEvaluator } from '../../partial_evaluator';
+import { Decorator, ReflectionHost } from '../../reflection';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 import { SelectorScopeRegistry } from './selector_scope';
 export interface PipeHandlerData {
@@ -16,11 +17,11 @@ export interface PipeHandlerData {
     metadataStmt: Statement | null;
 }
 export declare class PipeDecoratorHandler implements DecoratorHandler<PipeHandlerData, Decorator> {
-    private checker;
     private reflector;
+    private evaluator;
     private scopeRegistry;
     private isCore;
-    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, scopeRegistry: SelectorScopeRegistry, isCore: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, isCore: boolean);
     detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     analyze(clazz: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<PipeHandlerData>;
     compile(node: ts.ClassDeclaration, analysis: PipeHandlerData): CompileResult;

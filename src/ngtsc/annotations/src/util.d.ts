@@ -8,11 +8,12 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/util" />
 import { R3DependencyMetadata, R3Reference } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Decorator, ReflectionHost } from '../../host';
-import { Reference } from '../../metadata';
+import { Reference } from '../../imports';
+import { Decorator, ReflectionHost } from '../../reflection';
 export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): R3DependencyMetadata[] | null;
 export declare function toR3Reference(valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile): R3Reference;
 export declare function isAngularCore(decorator: Decorator): boolean;
+export declare function isAngularCoreReference(reference: Reference, symbolName: string): boolean;
 /**
  * Unwrap a `ts.Expression`, removing outer type-casts or parentheses until the expression is in its
  * lowest level form.
