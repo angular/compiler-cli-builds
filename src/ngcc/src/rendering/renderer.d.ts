@@ -14,7 +14,8 @@ import * as ts from 'typescript';
 import { CompileResult } from '@angular/compiler-cli/src/ngtsc/transform';
 import { NgccImportManager } from './ngcc_import_manager';
 import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/decoration_analyzer';
-import { PrivateDeclarationsAnalyses } from '../analysis/private_declarations_analyzer';
+import { ModuleWithProvidersInfo, ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
+import { PrivateDeclarationsAnalyses, ExportInfo } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
@@ -41,6 +42,19 @@ interface DtsClassInfo {
     compilation: CompileResult[];
 }
 /**
+ * A structure that captures information about what needs to be rendered
+ * in a typings file.
+ *
+ * It is created as a result of processing the analysis passed to the renderer.
+ *
+ * The `renderDtsFile()` method consumes it when rendering a typings file.
+ */
+declare class DtsRenderInfo {
+    classInfo: DtsClassInfo[];
+    moduleWithProviders: ModuleWithProvidersInfo[];
+    privateExports: ExportInfo[];
+}
+/**
  * The collected decorators that have become redundant after the compilation
  * of Ivy static fields. The map is keyed by the container node, such that we
  * can tell if we should remove the entire decorator property
@@ -60,14 +74,22 @@ export declare abstract class Renderer {
     protected sourcePath: string;
     protected targetPath: string;
     constructor(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string, targetPath: string);
-    renderProgram(decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileInfo[];
+    renderProgram(decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses, moduleWithProvidersAnalyses: ModuleWithProvidersAnalyses | null): FileInfo[];
     /**
      * Render the source code and source-map for an Analyzed file.
      * @param compiledFile The analyzed file to render.
      * @param targetPath The absolute path where the rendered file will be written.
      */
     renderFile(sourceFile: ts.SourceFile, compiledFile: CompiledFile | undefined, switchMarkerAnalysis: SwitchMarkerAnalysis | undefined, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileInfo[];
-    renderDtsFile(dtsFile: ts.SourceFile, dtsClasses: DtsClassInfo[], privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileInfo[];
+    renderDtsFile(dtsFile: ts.SourceFile, renderInfo: DtsRenderInfo): FileInfo[];
+    /**
+     * Add the type parameters to the appropriate functions that return `ModuleWithProviders`
+     * structures.
+     *
+     * This function only gets called on typings files, so it doesn't need different implementations
+     * for each bundle format.
+     */
+    protected addModuleWithProvidersParams(outputText: MagicString, moduleWithProviders: ModuleWithProvidersInfo[], importManager: NgccImportManager): void;
     protected abstract addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
     protected abstract addImports(output: MagicString, imports: {
         name: string;
@@ -97,7 +119,13 @@ export declare abstract class Renderer {
      * with an appropriate source-map comment pointing to the merged source-map.
      */
     protected renderSourceAndMap(sourceFile: ts.SourceFile, input: SourceMapInfo, output: MagicString): FileInfo[];
-    protected getTypingsFilesToRender(analyses: DecorationAnalyses): Map<ts.SourceFile, DtsClassInfo[]>;
+    protected getTypingsFilesToRender(decorationAnalyses: DecorationAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses, moduleWithProvidersAnalyses: ModuleWithProvidersAnalyses | null): Map<ts.SourceFile, DtsRenderInfo>;
+    /**
+     * Check whether the given type is the core Angular `ModuleWithProviders` interface.
+     * @param typeName The type to check.
+     * @returns true if the type is the core Angular `ModuleWithProviders` interface.
+     */
+    private isCoreModuleWithProvidersType;
 }
 /**
  * Merge the two specified source-maps into a single source-map that hides the intermediate
