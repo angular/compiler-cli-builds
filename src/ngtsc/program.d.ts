@@ -15,7 +15,7 @@ import { Reference } from './imports';
 export declare class NgtscProgram implements api.Program {
     private options;
     private tsProgram;
-    private resourceLoader;
+    private resourceManager;
     private compilation;
     private factoryToSourceInfo;
     private sourceToFactorySymbols;
