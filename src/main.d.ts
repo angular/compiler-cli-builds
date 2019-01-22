@@ -9,6 +9,7 @@ export declare function mainDiagnosticsForTest(args: string[], config?: NgcParse
 export interface NgcParsedConfiguration extends ParsedConfiguration {
     watch?: boolean;
 }
+export declare function readNgcCommandLineAndConfiguration(args: string[]): NgcParsedConfiguration;
 export declare function readCommandLineAndConfiguration(args: string[], existingOptions?: api.CompilerOptions, ngCmdLineOptions?: string[]): ParsedConfiguration;
 export declare function watchMode(project: string, options: api.CompilerOptions, consoleError: (s: string) => void): {
     close: () => void;

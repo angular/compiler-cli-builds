@@ -10,6 +10,7 @@ import { R3InjectorMetadata, R3NgModuleMetadata, Statement } from '@angular/comp
 import * as ts from 'typescript';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { Decorator, ReflectionHost } from '../../reflection';
+import { NgModuleRouteAnalyzer } from '../../routing';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
 import { ReferencesRegistry } from './references_registry';
 import { SelectorScopeRegistry } from './selector_scope';
@@ -29,14 +30,15 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModu
     private scopeRegistry;
     private referencesRegistry;
     private isCore;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean);
+    private routeAnalyzer;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null);
     detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;
     compile(node: ts.ClassDeclaration, analysis: NgModuleAnalysis): CompileResult[];
     private _toR3Reference;
     /**
-     * Given a `FunctionDeclaration` or `MethodDeclaration`, check if it is typed as a
-     * `ModuleWithProviders` and return an expression referencing the module if available.
+     * Given a `FunctionDeclaration`, `MethodDeclaration` or `FunctionExpression`, check if it is
+     * typed as a `ModuleWithProviders` and return an expression referencing the module if available.
      */
     private _extractModuleFromModuleWithProvidersFn;
     /**

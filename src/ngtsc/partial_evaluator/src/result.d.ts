@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/result" />
 import * as ts from 'typescript';
 import { Reference } from '../../imports';
+import { DynamicValue } from './dynamic';
 /**
  * A value resulting from static resolution.
  *
@@ -15,29 +16,7 @@ import { Reference } from '../../imports';
  * non-primitive value, or a special `DynamicValue` type which indicates the value was not
  * available statically.
  */
-export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | BuiltinFn | DynamicValue;
-/**
- * Represents a value which cannot be determined statically.
- *
- * Use `isDynamicValue` to determine whether a `ResolvedValue` is a `DynamicValue`.
- */
-export declare class DynamicValue {
-    /**
-     * This is needed so the "is DynamicValue" assertion of `isDynamicValue` actually has meaning.
-     *
-     * Otherwise, "is DynamicValue" is akin to "is {}" which doesn't trigger narrowing.
-     */
-    private _isDynamic;
-}
-/**
- * An internal flyweight for `DynamicValue`. Eventually the dynamic value will carry information
- * on the location of the node that could not be statically computed.
- */
-export declare const DYNAMIC_VALUE: DynamicValue;
-/**
- * Used to test whether a `ResolvedValue` is a `DynamicValue`.
- */
-export declare function isDynamicValue(value: any): value is DynamicValue;
+export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | BuiltinFn | DynamicValue<{}>;
 /**
  * An array of `ResolvedValue`s.
  *

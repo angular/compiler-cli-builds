@@ -6,5 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator" />
+export { DynamicValue } from './src/dynamic';
 export { ForeignFunctionResolver, PartialEvaluator } from './src/interface';
-export { BuiltinFn, DynamicValue, EnumValue, ResolvedValue, ResolvedValueArray, ResolvedValueMap, isDynamicValue } from './src/result';
+export { BuiltinFn, EnumValue, ResolvedValue, ResolvedValueArray, ResolvedValueMap } from './src/result';
