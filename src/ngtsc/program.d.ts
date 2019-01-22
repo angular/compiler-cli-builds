@@ -29,7 +29,9 @@ export declare class NgtscProgram implements api.Program {
     private entryPoint;
     private exportReferenceGraph;
     private flatIndexGenerator;
+    private routeAnalyzer;
     private constructionDiagnostics;
+    private moduleResolver;
     constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: api.Program);
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;

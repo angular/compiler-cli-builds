@@ -6,9 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/builtin" />
+import * as ts from 'typescript';
 import { BuiltinFn, ResolvedValue, ResolvedValueArray } from './result';
 export declare class ArraySliceBuiltinFn extends BuiltinFn {
+    private node;
     private lhs;
-    constructor(lhs: ResolvedValueArray);
+    constructor(node: ts.Node, lhs: ResolvedValueArray);
     evaluate(args: ResolvedValueArray): ResolvedValue;
 }
