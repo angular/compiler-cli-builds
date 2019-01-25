@@ -5,7 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/tsc_plugin/synthetic_files_compiler_host" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/synthetic_files_compiler_host" />
+import { PluginCompilerHost } from '@bazel/typescript';
 import * as ts from 'typescript';
 /**
  * Extension of the TypeScript compiler host that supports files added to the Program which
@@ -16,9 +17,9 @@ import * as ts from 'typescript';
  *
  * They need to be program inputs because user code may import from these generated files.
  *
- * TODO(alxhub): remove this after all ts_library users have migrated to Ivy
+ * TODO(alxhub): remove this after all ng_module users have migrated to Ivy
  */
-export declare class SyntheticFilesCompilerHost implements ts.CompilerHost {
+export declare class SyntheticFilesCompilerHost implements PluginCompilerHost {
     private rootFiles;
     private delegate;
     /**
