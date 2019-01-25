@@ -7,10 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { ConstantPool } from '@angular/compiler';
-import { TsReferenceResolver } from '@angular/compiler-cli/src/ngtsc/imports';
-import { PartialEvaluator } from '@angular/compiler-cli/src/ngtsc/partial_evaluator';
 import * as ts from 'typescript';
 import { ReferencesRegistry, ResourceLoader, SelectorScopeRegistry } from '../../../ngtsc/annotations';
+import { TsReferenceResolver } from '../../../ngtsc/imports';
+import { PartialEvaluator } from '../../../ngtsc/partial_evaluator';
 import { CompileResult, DecoratorHandler } from '../../../ngtsc/transform';
 import { DecoratedClass } from '../host/decorated_class';
 import { NgccReflectionHost } from '../host/ngcc_host';
@@ -38,10 +38,13 @@ export interface MatchingHandler<A, M> {
     match: M;
 }
 /**
- * `ResourceLoader` which directly uses the filesystem to resolve resources synchronously.
+ * Simple class that resolves and loads files directly from the filesystem.
  */
-export declare class FileResourceLoader implements ResourceLoader {
-    load(url: string, containingFile: string): string;
+declare class NgccResourceLoader implements ResourceLoader {
+    canPreload: boolean;
+    preload(): undefined | Promise<void>;
+    load(url: string): string;
+    resolve(url: string, containingFile: string): string;
 }
 /**
  * This Analyzer will analyze the files that have decorated classes that need to be transformed.
@@ -55,7 +58,7 @@ export declare class DecorationAnalyzer {
     private referencesRegistry;
     private rootDirs;
     private isCore;
-    resourceLoader: FileResourceLoader;
+    resourceManager: NgccResourceLoader;
     resolver: TsReferenceResolver;
     scopeRegistry: SelectorScopeRegistry;
     evaluator: PartialEvaluator;
@@ -72,3 +75,4 @@ export declare class DecorationAnalyzer {
     protected compileFile(analyzedFile: AnalyzedFile): CompiledFile;
     protected compileClass(clazz: AnalyzedClass, constantPool: ConstantPool): CompileResult[];
 }
+export {};

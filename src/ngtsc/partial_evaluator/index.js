@@ -11,17 +11,17 @@
         if (v !== undefined) module.exports = v;
     }
     else if (typeof define === "function" && define.amd) {
-        define("@angular/compiler-cli/src/ngtsc/partial_evaluator", ["require", "exports", "@angular/compiler-cli/src/ngtsc/partial_evaluator/src/interface", "@angular/compiler-cli/src/ngtsc/partial_evaluator/src/result"], factory);
+        define("@angular/compiler-cli/src/ngtsc/partial_evaluator", ["require", "exports", "@angular/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic", "@angular/compiler-cli/src/ngtsc/partial_evaluator/src/interface", "@angular/compiler-cli/src/ngtsc/partial_evaluator/src/result"], factory);
     }
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    var dynamic_1 = require("@angular/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic");
+    exports.DynamicValue = dynamic_1.DynamicValue;
     var interface_1 = require("@angular/compiler-cli/src/ngtsc/partial_evaluator/src/interface");
     exports.PartialEvaluator = interface_1.PartialEvaluator;
     var result_1 = require("@angular/compiler-cli/src/ngtsc/partial_evaluator/src/result");
     exports.BuiltinFn = result_1.BuiltinFn;
-    exports.DynamicValue = result_1.DynamicValue;
     exports.EnumValue = result_1.EnumValue;
-    exports.isDynamicValue = result_1.isDynamicValue;
 });
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9wYWNrYWdlcy9jb21waWxlci1jbGkvc3JjL25ndHNjL3BhcnRpYWxfZXZhbHVhdG9yL2luZGV4LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOzs7Ozs7R0FNRzs7Ozs7Ozs7Ozs7O0lBRUgsNkZBQTBFO0lBQXpDLHVDQUFBLGdCQUFnQixDQUFBO0lBQ2pELHVGQUFxSTtJQUE3SCw2QkFBQSxTQUFTLENBQUE7SUFBRSxnQ0FBQSxZQUFZLENBQUE7SUFBRSw2QkFBQSxTQUFTLENBQUE7SUFBdUQsa0NBQUEsY0FBYyxDQUFBIiwic291cmNlc0NvbnRlbnQiOlsiLyoqXG4gKiBAbGljZW5zZVxuICogQ29weXJpZ2h0IEdvb2dsZSBJbmMuIEFsbCBSaWdodHMgUmVzZXJ2ZWQuXG4gKlxuICogVXNlIG9mIHRoaXMgc291cmNlIGNvZGUgaXMgZ292ZXJuZWQgYnkgYW4gTUlULXN0eWxlIGxpY2Vuc2UgdGhhdCBjYW4gYmVcbiAqIGZvdW5kIGluIHRoZSBMSUNFTlNFIGZpbGUgYXQgaHR0cHM6Ly9hbmd1bGFyLmlvL2xpY2Vuc2VcbiAqL1xuXG5leHBvcnQge0ZvcmVpZ25GdW5jdGlvblJlc29sdmVyLCBQYXJ0aWFsRXZhbHVhdG9yfSBmcm9tICcuL3NyYy9pbnRlcmZhY2UnO1xuZXhwb3J0IHtCdWlsdGluRm4sIER5bmFtaWNWYWx1ZSwgRW51bVZhbHVlLCBSZXNvbHZlZFZhbHVlLCBSZXNvbHZlZFZhbHVlQXJyYXksIFJlc29sdmVkVmFsdWVNYXAsIGlzRHluYW1pY1ZhbHVlfSBmcm9tICcuL3NyYy9yZXN1bHQnO1xuIl19
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9wYWNrYWdlcy9jb21waWxlci1jbGkvc3JjL25ndHNjL3BhcnRpYWxfZXZhbHVhdG9yL2luZGV4LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOzs7Ozs7R0FNRzs7Ozs7Ozs7Ozs7O0lBRUgseUZBQTJDO0lBQW5DLGlDQUFBLFlBQVksQ0FBQTtJQUNwQiw2RkFBMEU7SUFBekMsdUNBQUEsZ0JBQWdCLENBQUE7SUFDakQsdUZBQXVHO0lBQS9GLDZCQUFBLFNBQVMsQ0FBQTtJQUFFLDZCQUFBLFNBQVMsQ0FBQSIsInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogQGxpY2Vuc2VcbiAqIENvcHlyaWdodCBHb29nbGUgSW5jLiBBbGwgUmlnaHRzIFJlc2VydmVkLlxuICpcbiAqIFVzZSBvZiB0aGlzIHNvdXJjZSBjb2RlIGlzIGdvdmVybmVkIGJ5IGFuIE1JVC1zdHlsZSBsaWNlbnNlIHRoYXQgY2FuIGJlXG4gKiBmb3VuZCBpbiB0aGUgTElDRU5TRSBmaWxlIGF0IGh0dHBzOi8vYW5ndWxhci5pby9saWNlbnNlXG4gKi9cblxuZXhwb3J0IHtEeW5hbWljVmFsdWV9IGZyb20gJy4vc3JjL2R5bmFtaWMnO1xuZXhwb3J0IHtGb3JlaWduRnVuY3Rpb25SZXNvbHZlciwgUGFydGlhbEV2YWx1YXRvcn0gZnJvbSAnLi9zcmMvaW50ZXJmYWNlJztcbmV4cG9ydCB7QnVpbHRpbkZuLCBFbnVtVmFsdWUsIFJlc29sdmVkVmFsdWUsIFJlc29sdmVkVmFsdWVBcnJheSwgUmVzb2x2ZWRWYWx1ZU1hcH0gZnJvbSAnLi9zcmMvcmVzdWx0JztcbiJdfQ==

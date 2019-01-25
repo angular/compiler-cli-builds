@@ -7,8 +7,9 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/interpreter" />
 import * as ts from 'typescript';
-import { Reference, ReferenceResolver } from '../../imports';
+import { ReferenceResolver } from '../../imports';
 import { ReflectionHost } from '../../reflection';
+import { ForeignFunctionResolver } from './interface';
 import { ResolvedValue } from './result';
 /**
  * Tracks the scope of a function body, which includes `ResolvedValue`s for the parameters of that
@@ -26,7 +27,7 @@ interface Context {
      */
     resolutionContext: string;
     scope: Scope;
-    foreignFunctionResolver?(ref: Reference<ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>, args: ReadonlyArray<ts.Expression>): ts.Expression | null;
+    foreignFunctionResolver?: ForeignFunctionResolver;
 }
 export declare class StaticInterpreter {
     private host;
