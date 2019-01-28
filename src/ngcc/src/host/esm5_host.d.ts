@@ -103,12 +103,17 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
     /**
      * Reflect over a symbol and extract the member information, combining it with the
      * provided decorator information, and whether it is a static member.
+     *
+     * If a class member uses accessors (e.g getters and/or setters) then it gets downleveled
+     * in ES5 to a single `Object.defineProperty()` call. In that case we must parse this
+     * call to extract the one or two ClassMember objects that represent the accessors.
+     *
      * @param symbol the symbol for the member to reflect over.
      * @param decorators an array of decorators associated with the member.
      * @param isStatic true if this member is static, false if it is an instance property.
      * @returns the reflected member information, or null if the symbol is not a member.
      */
-    protected reflectMember(symbol: ts.Symbol, decorators?: Decorator[], isStatic?: boolean): ClassMember | null;
+    protected reflectMembers(symbol: ts.Symbol, decorators?: Decorator[], isStatic?: boolean): ClassMember[] | null;
     /**
      * Find statements related to the given class that may contain calls to a helper.
      *
