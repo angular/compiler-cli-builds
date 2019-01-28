@@ -59,6 +59,10 @@ export declare class SelectorScopeRegistry {
      */
     private _pipeToName;
     /**
+     * Components that require remote scoping.
+     */
+    private _requiresRemoteScope;
+    /**
      * Map of components/directives/pipes to their module.
      */
     private _declararedTypeToModule;
@@ -75,6 +79,15 @@ export declare class SelectorScopeRegistry {
      * Register the name of a pipe with the registry.
      */
     registerPipe(node: ts.Declaration, name: string): void;
+    /**
+     * Mark a component (identified by its `ts.Declaration`) as requiring its `directives` scope to be
+     * set remotely, from the file of the @NgModule which declares the component.
+     */
+    setComponentAsRequiringRemoteScoping(component: ts.Declaration): void;
+    /**
+     * Check whether the given component requires its `directives` scope to be set remotely.
+     */
+    requiresRemoteScope(component: ts.Declaration): boolean;
     lookupCompilationScopeAsRefs(node: ts.Declaration): CompilationScope<Reference> | null;
     /**
      * Produce the compilation scope of a component, which is determined by the module that declares

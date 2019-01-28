@@ -9,7 +9,8 @@
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ReferencesRegistry, ResourceLoader, SelectorScopeRegistry } from '../../../ngtsc/annotations';
-import { TsReferenceResolver } from '../../../ngtsc/imports';
+import { CycleAnalyzer, ImportGraph } from '../../../ngtsc/cycles';
+import { ModuleResolver, TsReferenceResolver } from '../../../ngtsc/imports';
 import { PartialEvaluator } from '../../../ngtsc/partial_evaluator';
 import { CompileResult, DecoratorHandler } from '../../../ngtsc/transform';
 import { DecoratedClass } from '../host/decorated_class';
@@ -62,6 +63,9 @@ export declare class DecorationAnalyzer {
     resolver: TsReferenceResolver;
     scopeRegistry: SelectorScopeRegistry;
     evaluator: PartialEvaluator;
+    moduleResolver: ModuleResolver;
+    importGraph: ImportGraph;
+    cycleAnalyzer: CycleAnalyzer;
     handlers: DecoratorHandler<any, any>[];
     constructor(program: ts.Program, options: ts.CompilerOptions, host: ts.CompilerHost, typeChecker: ts.TypeChecker, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, rootDirs: string[], isCore: boolean);
     /**

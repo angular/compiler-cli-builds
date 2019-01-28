@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
 import { R3InjectorMetadata, R3NgModuleMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
+import { Reference } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { Decorator, ReflectionHost } from '../../reflection';
 import { NgModuleRouteAnalyzer } from '../../routing';
@@ -18,6 +19,7 @@ export interface NgModuleAnalysis {
     ngModuleDef: R3NgModuleMetadata;
     ngInjectorDef: R3InjectorMetadata;
     metadataStmt: Statement | null;
+    declarations: Reference<ts.Declaration>[];
 }
 /**
  * Compiles @NgModule annotations to ngModuleDef fields.
