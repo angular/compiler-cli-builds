@@ -54,6 +54,7 @@ export declare class IvyCompilation {
      * Analyze a source file and produce diagnostics for it (if any).
      */
     private analyze;
+    resolve(): void;
     typeCheck(context: TypeCheckContext): void;
     /**
      * Perform a compilation operation on the given class declaration and return instructions to an

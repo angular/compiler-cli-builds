@@ -37,6 +37,14 @@ export interface DecoratorHandler<A, M> {
      * isn't valid.
      */
     analyze(node: ts.Declaration, metadata: M): AnalysisOutput<A>;
+    /**
+     * Perform resolution on the given decorator along with the result of analysis.
+     *
+     * The resolution phase happens after the entire `ts.Program` has been analyzed, and gives the
+     * `DecoratorHandler` a chance to leverage information from the whole compilation unit to enhance
+     * the `analysis` before the emit phase.
+     */
+    resolve?(node: ts.Declaration, analysis: A): void;
     typeCheck?(ctx: TypeCheckContext, node: ts.Declaration, metadata: A): void;
     /**
      * Generate a description of the field which should be added to the class, including any
