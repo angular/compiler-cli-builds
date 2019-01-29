@@ -33,14 +33,14 @@ export declare class ImportManager {
 }
 export declare function translateExpression(expression: Expression, imports: ImportManager): ts.Expression;
 export declare function translateStatement(statement: Statement, imports: ImportManager): ts.Statement;
-export declare function translateType(type: Type, imports: ImportManager): string;
+export declare function translateType(type: Type, imports: ImportManager): ts.TypeNode;
 export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVisitor {
     private imports;
     constructor(imports: ImportManager);
-    visitBuiltinType(type: BuiltinType, context: Context): string;
-    visitExpressionType(type: ExpressionType, context: Context): string;
-    visitArrayType(type: ArrayType, context: Context): string;
-    visitMapType(type: MapType, context: Context): string;
+    visitBuiltinType(type: BuiltinType, context: Context): ts.KeywordTypeNode;
+    visitExpressionType(type: ExpressionType, context: Context): ts.TypeReferenceType;
+    visitArrayType(type: ArrayType, context: Context): ts.ArrayTypeNode;
+    visitMapType(type: MapType, context: Context): ts.TypeLiteralNode;
     visitReadVarExpr(ast: ReadVarExpr, context: Context): string;
     visitWriteVarExpr(expr: WriteVarExpr, context: Context): never;
     visitWriteKeyExpr(expr: WriteKeyExpr, context: Context): never;
@@ -48,8 +48,8 @@ export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVis
     visitInvokeMethodExpr(ast: InvokeMethodExpr, context: Context): never;
     visitInvokeFunctionExpr(ast: InvokeFunctionExpr, context: Context): never;
     visitInstantiateExpr(ast: InstantiateExpr, context: Context): never;
-    visitLiteralExpr(ast: LiteralExpr, context: Context): string;
-    visitExternalExpr(ast: ExternalExpr, context: Context): string;
+    visitLiteralExpr(ast: LiteralExpr, context: Context): ts.LiteralExpression;
+    visitExternalExpr(ast: ExternalExpr, context: Context): ts.TypeNode;
     visitConditionalExpr(ast: ConditionalExpr, context: Context): void;
     visitNotExpr(ast: NotExpr, context: Context): void;
     visitAssertNotNullExpr(ast: AssertNotNull, context: Context): void;
@@ -58,9 +58,9 @@ export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVis
     visitBinaryOperatorExpr(ast: BinaryOperatorExpr, context: Context): void;
     visitReadPropExpr(ast: ReadPropExpr, context: Context): void;
     visitReadKeyExpr(ast: ReadKeyExpr, context: Context): void;
-    visitLiteralArrayExpr(ast: LiteralArrayExpr, context: Context): string;
-    visitLiteralMapExpr(ast: LiteralMapExpr, context: Context): string;
+    visitLiteralArrayExpr(ast: LiteralArrayExpr, context: Context): ts.TupleTypeNode;
+    visitLiteralMapExpr(ast: LiteralMapExpr, context: Context): ts.ObjectLiteralExpression;
     visitCommaExpr(ast: CommaExpr, context: Context): void;
-    visitWrappedNodeExpr(ast: WrappedNodeExpr<any>, context: Context): string;
-    visitTypeofExpr(ast: TypeofExpr, context: Context): string;
+    visitWrappedNodeExpr(ast: WrappedNodeExpr<any>, context: Context): ts.Identifier;
+    visitTypeofExpr(ast: TypeofExpr, context: Context): ts.TypeQueryNode;
 }
