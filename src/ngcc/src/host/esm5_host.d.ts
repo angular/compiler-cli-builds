@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/host/esm5_host" />
 import * as ts from 'typescript';
-import { ClassMember, Decorator, FunctionDefinition } from '../../../ngtsc/reflection';
+import { ClassMember, Declaration, Decorator, FunctionDefinition } from '../../../ngtsc/reflection';
 import { Esm2015ReflectionHost, ParamInfo } from './esm2015_host';
 /**
  * ESM5 packages contain ECMAScript IIFE functions that act like classes. For example:
@@ -42,7 +42,7 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      * Find a symbol for a node that we think is a class.
      *
      * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE.
-     * So we need to dig around inside to get hold of the "class" symbol.
+     * So we might need to dig around inside to get hold of the "class" symbol.
      *
      * `node` might be one of:
      * - A class declaration (from a declaration file).
@@ -55,6 +55,24 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
      */
     getClassSymbol(node: ts.Node): ts.Symbol | undefined;
+    /**
+     * Trace an identifier to its declaration, if possible.
+     *
+     * This method attempts to resolve the declaration of the given identifier, tracing back through
+     * imports and re-exports until the original declaration statement is found. A `Declaration`
+     * object is returned if the original declaration is found, or `null` is returned otherwise.
+     *
+     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE.
+     * If we are looking for the declaration of the identifier of the inner function expression, we
+     * will get hold of the outer "class" variable declaration and return its identifier instead. See
+     * `getClassDeclarationFromInnerFunctionDeclaration()` for more info.
+     *
+     * @param id a TypeScript `ts.Identifier` to trace back to a declaration.
+     *
+     * @returns metadata about the `Declaration` if the original declaration is found, or `null`
+     * otherwise.
+     */
+    getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
     /**
      * Parse a function declaration to find the relevant metadata about it.
      *
@@ -103,12 +121,17 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
     /**
      * Reflect over a symbol and extract the member information, combining it with the
      * provided decorator information, and whether it is a static member.
+     *
+     * If a class member uses accessors (e.g getters and/or setters) then it gets downleveled
+     * in ES5 to a single `Object.defineProperty()` call. In that case we must parse this
+     * call to extract the one or two ClassMember objects that represent the accessors.
+     *
      * @param symbol the symbol for the member to reflect over.
      * @param decorators an array of decorators associated with the member.
      * @param isStatic true if this member is static, false if it is an instance property.
      * @returns the reflected member information, or null if the symbol is not a member.
      */
-    protected reflectMember(symbol: ts.Symbol, decorators?: Decorator[], isStatic?: boolean): ClassMember | null;
+    protected reflectMembers(symbol: ts.Symbol, decorators?: Decorator[], isStatic?: boolean): ClassMember[] | null;
     /**
      * Find statements related to the given class that may contain calls to a helper.
      *

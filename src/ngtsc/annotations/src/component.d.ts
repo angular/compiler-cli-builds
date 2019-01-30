@@ -8,6 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
 import { ConstantPool, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
+import { CycleAnalyzer } from '../../cycles';
+import { ModuleResolver } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { Decorator, ReflectionHost } from '../../reflection';
 import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
@@ -31,15 +33,19 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private rootDirs;
     private defaultPreserveWhitespaces;
     private i18nUseExternalIds;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean);
+    private moduleResolver;
+    private cycleAnalyzer;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer);
     private literalCache;
     private elementSchemaRegistry;
     detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
     preanalyze(node: ts.ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<ComponentHandlerData>;
     typeCheck(ctx: TypeCheckContext, node: ts.Declaration, meta: ComponentHandlerData): void;
+    resolve(node: ts.ClassDeclaration, analysis: ComponentHandlerData): void;
     compile(node: ts.ClassDeclaration, analysis: ComponentHandlerData, pool: ConstantPool): CompileResult;
     private _resolveLiteral;
     private _resolveEnumValue;
     private _extractStyleUrls;
+    private _isCyclicImport;
 }

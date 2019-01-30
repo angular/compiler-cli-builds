@@ -54,6 +54,7 @@ export declare class IvyCompilation {
      * Analyze a source file and produce diagnostics for it (if any).
      */
     private analyze;
+    resolve(): void;
     typeCheck(context: TypeCheckContext): void;
     /**
      * Perform a compilation operation on the given class declaration and return instructions to an
@@ -65,10 +66,10 @@ export declare class IvyCompilation {
      */
     ivyDecoratorFor(node: ts.Declaration): Decorator | undefined;
     /**
-     * Process a .d.ts source string and return a transformed version that incorporates the changes
+     * Process a declaration file and return a transformed version that incorporates the changes
      * made to the source file.
      */
-    transformedDtsFor(tsFileName: string, dtsOriginalSource: string): string;
+    transformedDtsFor(file: ts.SourceFile, context: ts.TransformationContext): ts.SourceFile;
     readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
     private getDtsTransformer;
 }

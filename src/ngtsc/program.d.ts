@@ -32,6 +32,7 @@ export declare class NgtscProgram implements api.Program {
     private routeAnalyzer;
     private constructionDiagnostics;
     private moduleResolver;
+    private cycleAnalyzer;
     constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: api.Program);
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;

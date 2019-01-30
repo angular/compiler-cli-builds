@@ -19,6 +19,11 @@ export declare enum ErrorCode {
     PARAM_MISSING_TOKEN = 2003,
     SYMBOL_NOT_EXPORTED = 3001,
     SYMBOL_EXPORTED_UNDER_DIFFERENT_NAME = 3002,
-    CONFIG_FLAT_MODULE_NO_INDEX = 4001
+    CONFIG_FLAT_MODULE_NO_INDEX = 4001,
+    /**
+     * Raised when a host expression has a parse error, such as a host listener or host binding
+     * expression containing a pipe.
+     */
+    HOST_BINDING_PARSE_ERROR = 5001
 }
 export declare function ngErrorCode(code: ErrorCode): number;
