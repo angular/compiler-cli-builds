@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/synthetic_files_compiler_host" />
-import { PluginCompilerHost } from '@bazel/typescript/tsc_wrapped/plugin_api';
+import { PluginCompilerHost } from '@bazel/typescript/internal/tsc_wrapped/plugin_api';
 import * as ts from 'typescript';
 /**
  * Extension of the TypeScript compiler host that supports files added to the Program which
