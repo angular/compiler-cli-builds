@@ -12,7 +12,6 @@ export declare abstract class RouterEntryPoint {
     abstract readonly filePath: string;
     abstract readonly moduleName: string;
     abstract readonly name: string;
-    abstract toString(): string;
 }
 export declare class RouterEntryPointManager {
     private moduleResolver;
@@ -21,3 +20,4 @@ export declare class RouterEntryPointManager {
     resolveLoadChildrenIdentifier(loadChildrenIdentifier: string, context: ts.SourceFile): RouterEntryPoint | null;
     fromNgModule(sf: ts.SourceFile, moduleName: string): RouterEntryPoint;
 }
+export declare function entryPointKeyFor(filePath: string, moduleName: string): string;

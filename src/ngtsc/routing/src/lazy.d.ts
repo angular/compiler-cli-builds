@@ -15,4 +15,5 @@ export interface LazyRouteEntry {
     from: RouterEntryPoint;
     resolvedTo: RouterEntryPoint;
 }
+export declare function scanForCandidateTransitiveModules(expr: ts.Expression | null, evaluator: PartialEvaluator): string[];
 export declare function scanForRouteEntryPoints(ngModule: ts.SourceFile, moduleName: string, data: NgModuleRawRouteData, entryPointManager: RouterEntryPointManager, evaluator: PartialEvaluator): LazyRouteEntry[];
