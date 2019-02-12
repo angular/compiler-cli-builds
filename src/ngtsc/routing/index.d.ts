@@ -7,3 +7,4 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/routing" />
 export { LazyRoute, NgModuleRouteAnalyzer } from './src/analyzer';
+export { entryPointKeyFor } from './src/route';
