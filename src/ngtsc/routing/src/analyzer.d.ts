@@ -33,5 +33,5 @@ export declare class NgModuleRouteAnalyzer {
     private entryPointManager;
     constructor(moduleResolver: ModuleResolver, evaluator: PartialEvaluator);
     add(sourceFile: ts.SourceFile, moduleName: string, imports: ts.Expression | null, exports: ts.Expression | null, providers: ts.Expression | null): void;
-    listLazyRoutes(): LazyRoute[];
+    listLazyRoutes(entryModuleKey?: string | undefined): LazyRoute[];
 }
