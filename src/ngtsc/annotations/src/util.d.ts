@@ -8,10 +8,26 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/util" />
 import { R3DependencyMetadata, R3Reference } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Reference } from '../../imports';
-import { Decorator, ReflectionHost } from '../../reflection';
-export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): R3DependencyMetadata[] | null;
-export declare function toR3Reference(valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile): R3Reference;
+import { Reference, ReferenceEmitter } from '../../imports';
+import { CtorParameter, Decorator, ReflectionHost } from '../../reflection';
+export declare enum ConstructorDepErrorKind {
+    NO_SUITABLE_TOKEN = 0
+}
+export declare type ConstructorDeps = {
+    deps: R3DependencyMetadata[];
+} | {
+    deps: null;
+    errors: ConstructorDepError[];
+};
+export interface ConstructorDepError {
+    index: number;
+    param: CtorParameter;
+    kind: ConstructorDepErrorKind;
+}
+export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): ConstructorDeps | null;
+export declare function getValidConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): R3DependencyMetadata[] | null;
+export declare function validateConstructorDependencies(clazz: ts.ClassDeclaration, deps: ConstructorDeps | null): R3DependencyMetadata[] | null;
+export declare function toR3Reference(valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile, refEmitter: ReferenceEmitter): R3Reference;
 export declare function isAngularCore(decorator: Decorator): boolean;
 export declare function isAngularCoreReference(reference: Reference, symbolName: string): boolean;
 /**

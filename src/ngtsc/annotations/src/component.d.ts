@@ -12,7 +12,7 @@ import { CycleAnalyzer } from '../../cycles';
 import { ModuleResolver } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { Decorator, ReflectionHost } from '../../reflection';
-import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
+import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
 import { TypeCheckContext } from '../../typecheck';
 import { ResourceLoader } from './api';
 import { SelectorScopeRegistry } from './selector_scope';
@@ -38,7 +38,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer);
     private literalCache;
     private elementSchemaRegistry;
-    detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
+    readonly precedence = HandlerPrecedence.PRIMARY;
+    detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     preanalyze(node: ts.ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<ComponentHandlerData>;
     typeCheck(ctx: TypeCheckContext, node: ts.Declaration, meta: ComponentHandlerData): void;

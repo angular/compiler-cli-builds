@@ -8,11 +8,11 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
 import { R3InjectorMetadata, R3NgModuleMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Reference } from '../../imports';
+import { Reference, ReferenceEmitter } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { Decorator, ReflectionHost } from '../../reflection';
 import { NgModuleRouteAnalyzer } from '../../routing';
-import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
+import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
 import { ReferencesRegistry } from './references_registry';
 import { SelectorScopeRegistry } from './selector_scope';
 export interface NgModuleAnalysis {
@@ -33,8 +33,10 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModu
     private referencesRegistry;
     private isCore;
     private routeAnalyzer;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null);
-    detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
+    private refEmitter;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter);
+    readonly precedence = HandlerPrecedence.PRIMARY;
+    detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;
     compile(node: ts.ClassDeclaration, analysis: NgModuleAnalysis): CompileResult[];
     private _toR3Reference;

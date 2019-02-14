@@ -10,7 +10,7 @@ import { ConstantPool, R3DirectiveMetadata, R3QueryMetadata, Statement } from '@
 import * as ts from 'typescript';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassMember, Decorator, ReflectionHost } from '../../reflection';
-import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
+import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
 import { SelectorScopeRegistry } from './selector_scope';
 export interface DirectiveHandlerData {
     meta: R3DirectiveMetadata;
@@ -22,7 +22,8 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
     private scopeRegistry;
     private isCore;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, isCore: boolean);
-    detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
+    readonly precedence = HandlerPrecedence.PRIMARY;
+    detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<DirectiveHandlerData>;
     compile(node: ts.ClassDeclaration, analysis: DirectiveHandlerData, pool: ConstantPool): CompileResult;
 }

@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/context" />
 import { SelectorMatcher, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
+import { ReferenceEmitter } from '../../imports';
 import { TypeCheckableDirectiveMeta, TypeCtorMetadata } from './api';
 /**
  * A template type checking context for a program.
@@ -17,6 +18,8 @@ import { TypeCheckableDirectiveMeta, TypeCtorMetadata } from './api';
  * checking code.
  */
 export declare class TypeCheckContext {
+    private refEmitter;
+    constructor(refEmitter: ReferenceEmitter);
     /**
      * A `Set` of classes which will be used to generate type constructors.
      */

@@ -1,4 +1,5 @@
 /// <amd-module name="@angular/compiler-cli/src/ngcc/src/packages/entry_point_bundle" />
+import { AbsoluteFsPath } from '../../../ngtsc/path';
 import { BundleProgram } from './bundle_program';
 import { EntryPoint, EntryPointFormat } from './entry_point';
 /**
@@ -8,7 +9,7 @@ import { EntryPoint, EntryPointFormat } from './entry_point';
 export interface EntryPointBundle {
     format: EntryPointFormat;
     isFlat: boolean;
-    rootDirs: string[];
+    rootDirs: AbsoluteFsPath[];
     src: BundleProgram;
     dts: BundleProgram | null;
 }
