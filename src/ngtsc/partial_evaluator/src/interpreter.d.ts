@@ -7,7 +7,6 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/interpreter" />
 import * as ts from 'typescript';
-import { ReferenceResolver } from '../../imports';
 import { ReflectionHost } from '../../reflection';
 import { ForeignFunctionResolver } from './interface';
 import { ResolvedValue } from './result';
@@ -32,8 +31,7 @@ interface Context {
 export declare class StaticInterpreter {
     private host;
     private checker;
-    private refResolver;
-    constructor(host: ReflectionHost, checker: ts.TypeChecker, refResolver: ReferenceResolver);
+    constructor(host: ReflectionHost, checker: ts.TypeChecker);
     visit(node: ts.Expression, context: Context): ResolvedValue;
     private visitExpression;
     private visitArrayLiteralExpression;

@@ -24,15 +24,3 @@ export declare class ModuleResolver {
     constructor(program: ts.Program, compilerOptions: ts.CompilerOptions, host: ts.CompilerHost);
     resolveModuleName(module: string, containingFile: ts.SourceFile): ts.SourceFile | null;
 }
-export declare class TsReferenceResolver implements ReferenceResolver {
-    private program;
-    private checker;
-    private options;
-    private host;
-    private moduleExportsCache;
-    constructor(program: ts.Program, checker: ts.TypeChecker, options: ts.CompilerOptions, host: ts.CompilerHost);
-    resolve(decl: ts.Declaration, importFromHint: string | null, fromFile: string): Reference<ts.Declaration>;
-    private resolveImportName;
-    private getExportsOfModule;
-    private enumerateExportsOfModule;
-}

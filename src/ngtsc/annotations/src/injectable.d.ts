@@ -9,7 +9,7 @@
 import { R3InjectableMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../reflection';
-import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
+import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
 export interface InjectableHandlerData {
     meta: R3InjectableMetadata;
     metadataStmt: Statement | null;
@@ -20,8 +20,10 @@ export interface InjectableHandlerData {
 export declare class InjectableDecoratorHandler implements DecoratorHandler<InjectableHandlerData, Decorator> {
     private reflector;
     private isCore;
-    constructor(reflector: ReflectionHost, isCore: boolean);
-    detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
+    private strictCtorDeps;
+    constructor(reflector: ReflectionHost, isCore: boolean, strictCtorDeps: boolean);
+    readonly precedence = HandlerPrecedence.SHARED;
+    detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<InjectableHandlerData>;
     compile(node: ts.ClassDeclaration, analysis: InjectableHandlerData): CompileResult;
 }

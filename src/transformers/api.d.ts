@@ -39,6 +39,7 @@ export interface CompilerOptions extends ts.CompilerOptions {
     flatModulePrivateSymbolPrefix?: string;
     generateCodeForLibraries?: boolean;
     fullTemplateTypeCheck?: boolean;
+    _useHostForImportGeneration?: boolean;
     annotateForClosureCompiler?: boolean;
     annotationsAs?: 'decorators' | 'static fields';
     trace?: boolean;
