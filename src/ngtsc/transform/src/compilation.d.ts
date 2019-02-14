@@ -9,7 +9,7 @@
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ImportRewriter } from '../../imports';
-import { Decorator, ReflectionHost } from '../../reflection';
+import { ReflectionHost } from '../../reflection';
 import { TypeCheckContext } from '../../typecheck';
 import { CompileResult, DecoratorHandler } from './api';
 /**
@@ -28,8 +28,7 @@ export declare class IvyCompilation {
      * Tracks classes which have been analyzed and found to have an Ivy decorator, and the
      * information recorded about them for later compilation.
      */
-    private analysis;
-    private typeCheckMap;
+    private ivyClasses;
     /**
      * Tracks factory information which needs to be generated.
      */
@@ -50,6 +49,7 @@ export declare class IvyCompilation {
     constructor(handlers: DecoratorHandler<any, any>[], checker: ts.TypeChecker, reflector: ReflectionHost, importRewriter: ImportRewriter, sourceToFactorySymbols: Map<string, Set<string>> | null);
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
+    private detectHandlersForClass;
     /**
      * Analyze a source file and produce diagnostics for it (if any).
      */
@@ -64,7 +64,7 @@ export declare class IvyCompilation {
     /**
      * Lookup the `ts.Decorator` which triggered transformation of a particular class declaration.
      */
-    ivyDecoratorFor(node: ts.Declaration): Decorator | undefined;
+    ivyDecoratorsFor(node: ts.Declaration): ts.Decorator[];
     /**
      * Process a declaration file and return a transformed version that incorporates the changes
      * made to the source file.

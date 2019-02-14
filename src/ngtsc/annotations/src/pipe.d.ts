@@ -10,7 +10,7 @@ import { R3PipeMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { Decorator, ReflectionHost } from '../../reflection';
-import { AnalysisOutput, CompileResult, DecoratorHandler } from '../../transform';
+import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
 import { SelectorScopeRegistry } from './selector_scope';
 export interface PipeHandlerData {
     meta: R3PipeMetadata;
@@ -22,7 +22,8 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<PipeHandle
     private scopeRegistry;
     private isCore;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, isCore: boolean);
-    detect(node: ts.Declaration, decorators: Decorator[] | null): Decorator | undefined;
+    readonly precedence = HandlerPrecedence.PRIMARY;
+    detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(clazz: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<PipeHandlerData>;
     compile(node: ts.ClassDeclaration, analysis: PipeHandlerData): CompileResult;
 }

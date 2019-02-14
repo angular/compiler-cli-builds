@@ -10,8 +10,9 @@ import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ReferencesRegistry, ResourceLoader, SelectorScopeRegistry } from '../../../ngtsc/annotations';
 import { CycleAnalyzer, ImportGraph } from '../../../ngtsc/cycles';
-import { ModuleResolver, TsReferenceResolver } from '../../../ngtsc/imports';
+import { ModuleResolver, ReferenceEmitter } from '../../../ngtsc/imports';
 import { PartialEvaluator } from '../../../ngtsc/partial_evaluator';
+import { AbsoluteFsPath } from '../../../ngtsc/path';
 import { CompileResult, DecoratorHandler } from '../../../ngtsc/transform';
 import { DecoratedClass } from '../host/decorated_class';
 import { NgccReflectionHost } from '../host/ngcc_host';
@@ -21,8 +22,10 @@ export interface AnalyzedFile {
 }
 export interface AnalyzedClass extends DecoratedClass {
     diagnostics?: ts.Diagnostic[];
-    handler: DecoratorHandler<any, any>;
-    analysis: any;
+    matches: {
+        handler: DecoratorHandler<any, any>;
+        analysis: any;
+    }[];
 }
 export interface CompiledClass extends AnalyzedClass {
     compilation: CompileResult[];
@@ -36,7 +39,7 @@ export declare type DecorationAnalyses = Map<ts.SourceFile, CompiledFile>;
 export declare const DecorationAnalyses: MapConstructor;
 export interface MatchingHandler<A, M> {
     handler: DecoratorHandler<A, M>;
-    match: M;
+    detected: M;
 }
 /**
  * Simple class that resolves and loads files directly from the filesystem.
@@ -60,14 +63,14 @@ export declare class DecorationAnalyzer {
     private rootDirs;
     private isCore;
     resourceManager: NgccResourceLoader;
-    resolver: TsReferenceResolver;
+    refEmitter: ReferenceEmitter;
     scopeRegistry: SelectorScopeRegistry;
     evaluator: PartialEvaluator;
     moduleResolver: ModuleResolver;
     importGraph: ImportGraph;
     cycleAnalyzer: CycleAnalyzer;
     handlers: DecoratorHandler<any, any>[];
-    constructor(program: ts.Program, options: ts.CompilerOptions, host: ts.CompilerHost, typeChecker: ts.TypeChecker, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, rootDirs: string[], isCore: boolean);
+    constructor(program: ts.Program, options: ts.CompilerOptions, host: ts.CompilerHost, typeChecker: ts.TypeChecker, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, rootDirs: AbsoluteFsPath[], isCore: boolean);
     /**
      * Analyze a program to find all the decorated files should be transformed.
      *

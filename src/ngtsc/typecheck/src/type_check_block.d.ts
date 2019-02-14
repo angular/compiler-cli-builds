@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/type_check_block" />
 import * as ts from 'typescript';
+import { ReferenceEmitter } from '../../imports';
 import { ImportManager } from '../../translator';
 import { TypeCheckBlockMetadata } from './api';
 /**
@@ -20,4 +21,4 @@ import { TypeCheckBlockMetadata } from './api';
  * @param meta metadata about the component's template and the function being generated.
  * @param importManager an `ImportManager` for the file into which the TCB will be written.
  */
-export declare function generateTypeCheckBlock(node: ts.ClassDeclaration, meta: TypeCheckBlockMetadata, importManager: ImportManager): ts.FunctionDeclaration;
+export declare function generateTypeCheckBlock(node: ts.ClassDeclaration, meta: TypeCheckBlockMetadata, importManager: ImportManager, refEmitter: ReferenceEmitter): ts.FunctionDeclaration;
