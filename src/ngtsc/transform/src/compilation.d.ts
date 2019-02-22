@@ -36,6 +36,7 @@ export declare class IvyCompilation {
      * Tracks the `DtsFileTransformer`s for each TS file that needs .d.ts transformations.
      */
     private dtsMap;
+    private reexportMap;
     private _diagnostics;
     /**
      * @param handlers array of `DecoratorHandler`s which will be executed against each class in the
@@ -47,6 +48,7 @@ export declare class IvyCompilation {
      * `null` in most cases.
      */
     constructor(handlers: DecoratorHandler<any, any>[], checker: ts.TypeChecker, reflector: ReflectionHost, importRewriter: ImportRewriter, sourceToFactorySymbols: Map<string, Set<string>> | null);
+    readonly exportStatements: Map<string, Map<string, [string, string]>>;
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     private detectHandlersForClass;

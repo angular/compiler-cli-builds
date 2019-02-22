@@ -12,9 +12,9 @@ import { Reference, ReferenceEmitter } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { Decorator, ReflectionHost } from '../../reflection';
 import { NgModuleRouteAnalyzer } from '../../routing';
-import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
+import { LocalModuleScopeRegistry } from '../../scope';
+import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
 import { ReferencesRegistry } from './references_registry';
-import { SelectorScopeRegistry } from './selector_scope';
 export interface NgModuleAnalysis {
     ngModuleDef: R3NgModuleMetadata;
     ngInjectorDef: R3InjectorMetadata;
@@ -34,10 +34,11 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModu
     private isCore;
     private routeAnalyzer;
     private refEmitter;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter);
     readonly precedence = HandlerPrecedence.PRIMARY;
     detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;
+    resolve(node: ts.Declaration, analysis: NgModuleAnalysis): ResolveResult;
     compile(node: ts.ClassDeclaration, analysis: NgModuleAnalysis): CompileResult[];
     private _toR3Reference;
     /**

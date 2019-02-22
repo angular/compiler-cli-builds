@@ -6,7 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/imports" />
+export { AliasGenerator, AliasStrategy } from './src/alias';
 export { ImportRewriter, NoopImportRewriter, R3SymbolsImportRewriter, validateAndRewriteCoreSymbol } from './src/core';
 export { AbsoluteModuleStrategy, FileToModuleHost, FileToModuleStrategy, LocalIdentifierStrategy, LogicalProjectStrategy, ReferenceEmitStrategy, ReferenceEmitter } from './src/emitter';
+export { Reexport } from './src/reexport';
 export { ImportMode, OwningModule, Reference } from './src/references';
 export { ModuleResolver } from './src/resolver';
