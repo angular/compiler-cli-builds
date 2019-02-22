@@ -9,13 +9,13 @@
 import { ConstantPool, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
 import { CycleAnalyzer } from '../../cycles';
-import { ModuleResolver } from '../../imports';
+import { ModuleResolver, ReferenceEmitter } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { Decorator, ReflectionHost } from '../../reflection';
-import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
+import { LocalModuleScopeRegistry } from '../../scope';
+import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
 import { TypeCheckContext } from '../../typecheck';
 import { ResourceLoader } from './api';
-import { SelectorScopeRegistry } from './selector_scope';
 export interface ComponentHandlerData {
     meta: R3ComponentMetadata;
     parsedTemplate: TmplAstNode[];
@@ -35,7 +35,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private i18nUseExternalIds;
     private moduleResolver;
     private cycleAnalyzer;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: SelectorScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer);
+    private refEmitter;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter);
     private literalCache;
     private elementSchemaRegistry;
     readonly precedence = HandlerPrecedence.PRIMARY;
@@ -43,7 +44,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     preanalyze(node: ts.ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<ComponentHandlerData>;
     typeCheck(ctx: TypeCheckContext, node: ts.Declaration, meta: ComponentHandlerData): void;
-    resolve(node: ts.ClassDeclaration, analysis: ComponentHandlerData): void;
+    resolve(node: ts.ClassDeclaration, analysis: ComponentHandlerData): ResolveResult;
     compile(node: ts.ClassDeclaration, analysis: ComponentHandlerData, pool: ConstantPool): CompileResult;
     private _resolveLiteral;
     private _resolveEnumValue;

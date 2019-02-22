@@ -21,3 +21,4 @@ export declare function identifierOfNode(decl: ts.Node & {
 export declare function isDeclaration(node: ts.Node): node is ts.Declaration;
 export declare function isExported(node: ts.Declaration): boolean;
 export declare function getRootDirs(host: ts.CompilerHost, options: ts.CompilerOptions): AbsoluteFsPath[];
+export declare function nodeDebugInfo(node: ts.Node): string;

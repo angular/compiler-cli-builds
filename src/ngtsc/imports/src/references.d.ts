@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/imports/src/references" />
+import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
 export declare enum ImportMode {
     UseExistingImport = 0,
@@ -42,6 +43,7 @@ export declare class Reference<T extends ts.Node = ts.Node> {
      */
     readonly bestGuessOwningModule: OwningModule | null;
     private identifiers;
+    private _alias;
     constructor(node: T, bestGuessOwningModule?: OwningModule | null);
     /**
      * The best guess at which module specifier owns this particular reference, or `null` if there
@@ -61,6 +63,7 @@ export declare class Reference<T extends ts.Node = ts.Node> {
      * `ts.Identifier`s (see `getIdentityIn`).
      */
     readonly debugName: string | null;
+    readonly alias: Expression | null;
     /**
      * Record a `ts.Identifier` by which it's valid to refer to this node, within the context of this
      * `Reference`.
@@ -71,4 +74,6 @@ export declare class Reference<T extends ts.Node = ts.Node> {
      * given `ts.SourceFile`, if any.
      */
     getIdentityIn(context: ts.SourceFile): ts.Identifier | null;
+    cloneWithAlias(alias: Expression): Reference<T>;
+    cloneWithNoIdentifiers(): Reference<T>;
 }
