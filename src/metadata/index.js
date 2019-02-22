@@ -16,7 +16,7 @@
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    var tslib_1 = require("tslib");
+    const tslib_1 = require("tslib");
     tslib_1.__exportStar(require("@angular/compiler-cli/src/metadata/collector"), exports);
     tslib_1.__exportStar(require("@angular/compiler-cli/src/metadata/schema"), exports);
     tslib_1.__exportStar(require("@angular/compiler-cli/src/metadata/bundle_index_host"), exports);
