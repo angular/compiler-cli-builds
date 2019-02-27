@@ -11,6 +11,8 @@ import { AbsoluteFsPath, BrandedPath } from './types';
 /**
  * A path that's relative to the logical root of a TypeScript project (one of the project's
  * rootDirs).
+ *
+ * Paths in the type system use POSIX format.
  */
 export declare type LogicalProjectPath = BrandedPath<'LogicalProjectPath'>;
 export declare const LogicalProjectPath: {
