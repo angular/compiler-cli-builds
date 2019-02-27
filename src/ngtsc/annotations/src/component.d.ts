@@ -39,6 +39,12 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter);
     private literalCache;
     private elementSchemaRegistry;
+    /**
+     * During the asynchronous preanalyze phase, it's necessary to parse the template to extract
+     * any potential <link> tags which might need to be loaded. This cache ensures that work is not
+     * thrown away, and the parsed template is reused during the analyze phase.
+     */
+    private preanalyzeTemplateCache;
     readonly precedence = HandlerPrecedence.PRIMARY;
     detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     preanalyze(node: ts.ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
@@ -49,5 +55,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private _resolveLiteral;
     private _resolveEnumValue;
     private _extractStyleUrls;
+    private _preloadAndParseTemplate;
+    private _extractInlineTemplate;
+    private _parseTemplate;
     private _isCyclicImport;
 }
