@@ -7,10 +7,14 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/path/src/util" />
 /**
- * Convert Windows-style paths to POSIX paths.
+ * Convert Windows-style separators to POSIX separators.
  */
 export declare function normalizeSeparators(path: string): string;
 /**
  * Remove a .ts, .d.ts, or .js extension from a file name.
  */
 export declare function stripExtension(path: string): string;
+/**
+ * Returns true if the normalized path is an absolute path.
+ */
+export declare function isAbsolutePath(path: string): boolean;
