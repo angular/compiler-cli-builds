@@ -9,6 +9,7 @@
 import { R3DependencyMetadata, R3Reference } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../imports';
+import { ForeignFunctionResolver } from '../../partial_evaluator';
 import { CtorParameter, Decorator, ReflectionHost } from '../../reflection';
 export declare enum ConstructorDepErrorKind {
     NO_SUITABLE_TOKEN = 0
@@ -55,3 +56,8 @@ export declare function unwrapForwardRef(node: ts.Expression, reflector: Reflect
  * @returns an unwrapped argument if `ref` pointed to forwardRef, or null otherwise
  */
 export declare function forwardRefResolver(ref: Reference<ts.FunctionDeclaration | ts.MethodDeclaration>, args: ts.Expression[]): ts.Expression | null;
+/**
+ * Combines an array of resolver functions into a one.
+ * @param resolvers Resolvers to be combined.
+ */
+export declare function combineResolvers(resolvers: ForeignFunctionResolver[]): ForeignFunctionResolver;
