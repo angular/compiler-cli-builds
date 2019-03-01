@@ -16,7 +16,7 @@ import { DynamicValue } from './dynamic';
  * non-primitive value, or a special `DynamicValue` type which indicates the value was not
  * available statically.
  */
-export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | BuiltinFn | DynamicValue<{}>;
+export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | BuiltinFn | DynamicValue<unknown>;
 /**
  * An array of `ResolvedValue`s.
  *
