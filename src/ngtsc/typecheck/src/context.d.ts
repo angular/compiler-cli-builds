@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/context" />
-import { SelectorMatcher, TmplAstNode } from '@angular/compiler';
+import { BoundTarget } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ReferenceEmitter } from '../../imports';
 import { TypeCheckableDirectiveMeta, TypeCtorMetadata } from './api';
@@ -37,7 +37,7 @@ export declare class TypeCheckContext {
      * @param template AST nodes of the template being recorded.
      * @param matcher `SelectorMatcher` which tracks directives that are in scope for this template.
      */
-    addTemplate(node: ts.ClassDeclaration, template: TmplAstNode[], matcher: SelectorMatcher<TypeCheckableDirectiveMeta>): void;
+    addTemplate(node: ts.ClassDeclaration, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>): void;
     /**
      * Record a type constructor for the given `node` with the given `ctorMetadata`.
      */
