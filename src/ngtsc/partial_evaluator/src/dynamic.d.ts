@@ -40,14 +40,20 @@ export declare const enum DynamicValueReason {
      */
     UNKNOWN_IDENTIFIER = 4,
     /**
+     * A value could be resolved, but is not an acceptable type for the operation being performed.
+     *
+     * For example, attempting to call a non-callable expression.
+     */
+    INVALID_EXPRESSION_TYPE = 5,
+    /**
      * A value could not be determined statically for any reason other the above.
      */
-    UNKNOWN = 5
+    UNKNOWN = 6
 }
 /**
  * Represents a value which cannot be determined statically.
  */
-export declare class DynamicValue<R = {}> {
+export declare class DynamicValue<R = unknown> {
     readonly node: ts.Node;
     readonly reason: R;
     private code;
@@ -57,11 +63,13 @@ export declare class DynamicValue<R = {}> {
     static fromExternalReference(node: ts.Node, ref: Reference<ts.Declaration>): DynamicValue<Reference<ts.Declaration>>;
     static fromUnknownExpressionType(node: ts.Node): DynamicValue;
     static fromUnknownIdentifier(node: ts.Identifier): DynamicValue;
+    static fromInvalidExpressionType(node: ts.Node, value: unknown): DynamicValue<unknown>;
     static fromUnknown(node: ts.Node): DynamicValue;
     isFromDynamicInput(this: DynamicValue<R>): this is DynamicValue<DynamicValue>;
     isFromDynamicString(this: DynamicValue<R>): this is DynamicValue;
     isFromExternalReference(this: DynamicValue<R>): this is DynamicValue<Reference<ts.Declaration>>;
     isFromUnknownExpressionType(this: DynamicValue<R>): this is DynamicValue;
     isFromUnknownIdentifier(this: DynamicValue<R>): this is DynamicValue;
+    isFromInvalidExpressionType(this: DynamicValue<R>): this is DynamicValue<unknown>;
     isFromUnknown(this: DynamicValue<R>): this is DynamicValue;
 }
