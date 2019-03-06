@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/util" />
-import { R3DependencyMetadata, R3Reference } from '@angular/compiler';
+import { Expression, R3DependencyMetadata, R3Reference } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ForeignFunctionResolver } from '../../partial_evaluator';
-import { CtorParameter, Decorator, ReflectionHost } from '../../reflection';
+import { CtorParameter, Decorator, ReflectionHost, TypeValueReference } from '../../reflection';
 export declare enum ConstructorDepErrorKind {
     NO_SUITABLE_TOKEN = 0
 }
@@ -26,6 +26,16 @@ export interface ConstructorDepError {
     kind: ConstructorDepErrorKind;
 }
 export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): ConstructorDeps | null;
+/**
+ * Convert a `TypeValueReference` to an `Expression` which refers to the type as a value.
+ *
+ * Local references are converted to a `WrappedNodeExpr` of the TypeScript expression, and non-local
+ * references are converted to an `ExternalExpr`. Note that this is only valid in the context of the
+ * file in which the `TypeValueReference` originated.
+ */
+export declare function valueReferenceToExpression(valueRef: TypeValueReference): Expression;
+export declare function valueReferenceToExpression(valueRef: null): null;
+export declare function valueReferenceToExpression(valueRef: TypeValueReference | null): Expression | null;
 export declare function getValidConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): R3DependencyMetadata[] | null;
 export declare function validateConstructorDependencies(clazz: ts.ClassDeclaration, deps: ConstructorDeps | null): R3DependencyMetadata[] | null;
 export declare function toR3Reference(valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile, refEmitter: ReferenceEmitter): R3Reference;
