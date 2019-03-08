@@ -18,8 +18,8 @@ export declare class Context {
 export declare class ImportManager {
     protected rewriter: ImportRewriter;
     private prefix;
-    private moduleToIndex;
-    private importedModules;
+    private nonDefaultImports;
+    private defaultImports;
     private nextIndex;
     constructor(rewriter?: ImportRewriter, prefix?: string);
     generateNamedImport(moduleName: string, originalSymbol: string): {
@@ -27,8 +27,9 @@ export declare class ImportManager {
         symbol: string;
     };
     getAllImports(contextPath: string): {
-        name: string;
-        as: string;
+        specifier: string;
+        qualifier: string;
+        isDefault: boolean;
     }[];
 }
 export declare function translateExpression(expression: Expression, imports: ImportManager): ts.Expression;

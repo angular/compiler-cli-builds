@@ -92,8 +92,9 @@ export declare abstract class Renderer {
     protected addModuleWithProvidersParams(outputText: MagicString, moduleWithProviders: ModuleWithProvidersInfo[], importManager: ImportManager): void;
     protected abstract addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
     protected abstract addImports(output: MagicString, imports: {
-        name: string;
-        as: string;
+        specifier: string;
+        qualifier: string;
+        isDefault: boolean;
     }[]): void;
     protected abstract addExports(output: MagicString, entryPointBasePath: string, exports: {
         identifier: string;

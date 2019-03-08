@@ -11,8 +11,9 @@ export declare class EsmRenderer extends Renderer {
      *  Add the imports at the top of the file
      */
     addImports(output: MagicString, imports: {
-        name: string;
-        as: string;
+        specifier: string;
+        qualifier: string;
+        isDefault: boolean;
     }[]): void;
     addExports(output: MagicString, entryPointBasePath: string, exports: {
         identifier: string;
