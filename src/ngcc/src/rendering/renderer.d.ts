@@ -96,10 +96,7 @@ export declare abstract class Renderer {
         qualifier: string;
         isDefault: boolean;
     }[]): void;
-    protected abstract addExports(output: MagicString, entryPointBasePath: string, exports: {
-        identifier: string;
-        from: string;
-    }[]): void;
+    protected abstract addExports(output: MagicString, entryPointBasePath: string, exports: ExportInfo[]): void;
     protected abstract addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: RedundantDecoratorMap): void;
     protected abstract rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile, declarations: SwitchableVariableDeclaration[]): void;
