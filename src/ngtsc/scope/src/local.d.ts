@@ -34,6 +34,9 @@ export interface LocalModuleScope extends ExportScope {
  * `getScopeOfModule` or `getScopeForComponent` can be called, which traverses the NgModule graph
  * and applies the NgModule logic to generate a `LocalModuleScope`, the full scope for the given
  * module or component.
+ *
+ * The `LocalModuleScopeRegistry` is also capable of producing `ts.Diagnostic` errors when Angular
+ * semantics are violated.
  */
 export declare class LocalModuleScopeRegistry {
     private dependencyScopeReader;
@@ -67,6 +70,9 @@ export declare class LocalModuleScopeRegistry {
     private declarationToModule;
     /**
      * A cache of calculated `LocalModuleScope`s for each NgModule declared in the current program.
+     *
+     * A value of `undefined` indicates the scope was invalid and produced errors (therefore,
+     * diagnostics should exist in the `scopeErrors` map).
      */
     private cache;
     /**
@@ -78,6 +84,10 @@ export declare class LocalModuleScopeRegistry {
      * tracked here for convenience.
      */
     private remoteScoping;
+    /**
+     * Tracks errors accumulated in the processing of scopes for each module declaration.
+     */
+    private scopeErrors;
     constructor(dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasGenerator: AliasGenerator | null);
     /**
      * Add an NgModule's data to the registry.
@@ -90,9 +100,21 @@ export declare class LocalModuleScopeRegistry {
      * Collects registered data for a module and its directives/pipes and convert it into a full
      * `LocalModuleScope`.
      *
-     * This method implements the logic of NgModule imports and exports.
+     * This method implements the logic of NgModule imports and exports. It returns the
+     * `LocalModuleScope` for the given NgModule if one can be produced, and `null` if no scope is
+     * available or the scope contains errors.
      */
     getScopeOfModule(clazz: ts.Declaration): LocalModuleScope | null;
+    /**
+     * Retrieves any `ts.Diagnostic`s produced during the calculation of the `LocalModuleScope` for
+     * the given NgModule, or `null` if no errors were present.
+     */
+    getDiagnosticsOfModule(clazz: ts.Declaration): ts.Diagnostic[] | null;
+    /**
+     * Implementation of `getScopeOfModule` which differentiates between no scope being available
+     * (returns `null`) and a scope being produced with errors (returns `undefined`).
+     */
+    private getScopeOfModuleInternal;
     /**
      * Check whether a component requires remote scoping.
      */
@@ -106,6 +128,10 @@ export declare class LocalModuleScopeRegistry {
      *
      * The NgModule in question may be declared locally in the current ts.Program, or it may be
      * declared in a .d.ts file.
+     *
+     * This function will return `null` if no scope could be found, or `undefined` if an invalid scope
+     * was found. It can also contribute diagnostics of its own by adding to the given `diagnostics`
+     * array parameter.
      */
     private getExportedScope;
     private assertCollecting;

@@ -28,6 +28,23 @@ export declare enum ErrorCode {
      * Raised when a host expression has a parse error, such as a host listener or host binding
      * expression containing a pipe.
      */
-    HOST_BINDING_PARSE_ERROR = 5001
+    HOST_BINDING_PARSE_ERROR = 5001,
+    /**
+     * Raised when an NgModule contains an invalid reference in `declarations`.
+     */
+    NGMODULE_INVALID_DECLARATION = 6001,
+    /**
+     * Raised when an NgModule contains an invalid type in `imports`.
+     */
+    NGMODULE_INVALID_IMPORT = 6002,
+    /**
+     * Raised when an NgModule contains an invalid type in `exports`.
+     */
+    NGMODULE_INVALID_EXPORT = 6003,
+    /**
+     * Raised when an NgModule contains a type in `exports` which is neither in `declarations` nor
+     * otherwise imported.
+     */
+    NGMODULE_INVALID_REEXPORT = 6004
 }
 export declare function ngErrorCode(code: ErrorCode): number;
