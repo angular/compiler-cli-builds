@@ -14,7 +14,8 @@ import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerP
 export declare class BaseDefDecoratorHandler implements DecoratorHandler<R3BaseRefMetaData, R3BaseRefDecoratorDetection> {
     private reflector;
     private evaluator;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator);
+    private isCore;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean);
     readonly precedence = HandlerPrecedence.WEAK;
     detect(node: ts.ClassDeclaration, decorators: Decorator[] | null): DetectResult<R3BaseRefDecoratorDetection> | undefined;
     analyze(node: ts.ClassDeclaration, metadata: R3BaseRefDecoratorDetection): AnalysisOutput<R3BaseRefMetaData>;

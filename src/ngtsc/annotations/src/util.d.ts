@@ -10,7 +10,7 @@ import { Expression, R3DependencyMetadata, R3Reference } from '@angular/compiler
 import * as ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ForeignFunctionResolver } from '../../partial_evaluator';
-import { CtorParameter, Decorator, ReflectionHost, TypeValueReference } from '../../reflection';
+import { CtorParameter, Decorator, Import, ReflectionHost, TypeValueReference } from '../../reflection';
 export declare enum ConstructorDepErrorKind {
     NO_SUITABLE_TOKEN = 0
 }
@@ -39,8 +39,12 @@ export declare function valueReferenceToExpression(valueRef: TypeValueReference 
 export declare function getValidConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): R3DependencyMetadata[] | null;
 export declare function validateConstructorDependencies(clazz: ts.ClassDeclaration, deps: ConstructorDeps | null): R3DependencyMetadata[] | null;
 export declare function toR3Reference(valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile, refEmitter: ReferenceEmitter): R3Reference;
-export declare function isAngularCore(decorator: Decorator): boolean;
+export declare function isAngularCore(decorator: Decorator): decorator is Decorator & {
+    import: Import;
+};
 export declare function isAngularCoreReference(reference: Reference, symbolName: string): boolean;
+export declare function findAngularDecorator(decorators: Decorator[], name: string, isCore: boolean): Decorator | undefined;
+export declare function isAngularDecorator(decorator: Decorator, name: string, isCore: boolean): boolean;
 /**
  * Unwrap a `ts.Expression`, removing outer type-casts or parentheses until the expression is in its
  * lowest level form.
