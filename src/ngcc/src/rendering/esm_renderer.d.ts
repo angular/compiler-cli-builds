@@ -5,6 +5,7 @@ import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_
 import { CompiledClass } from '../analysis/decoration_analyzer';
 import { RedundantDecoratorMap, Renderer } from './renderer';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
+import { ExportInfo } from '../analysis/private_declarations_analyzer';
 export declare class EsmRenderer extends Renderer {
     constructor(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string, targetPath: string);
     /**
@@ -15,10 +16,7 @@ export declare class EsmRenderer extends Renderer {
         qualifier: string;
         isDefault: boolean;
     }[]): void;
-    addExports(output: MagicString, entryPointBasePath: string, exports: {
-        identifier: string;
-        from: string;
-    }[]): void;
+    addExports(output: MagicString, entryPointBasePath: string, exports: ExportInfo[]): void;
     addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
     /**
      * Add the definitions to each decorated class
