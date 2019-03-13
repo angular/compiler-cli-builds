@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/util" />
 import { Expression, R3DependencyMetadata, R3Reference } from '@angular/compiler';
 import * as ts from 'typescript';
-import { Reference, ReferenceEmitter } from '../../imports';
+import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { ForeignFunctionResolver } from '../../partial_evaluator';
 import { CtorParameter, Decorator, Import, ReflectionHost, TypeValueReference } from '../../reflection';
 export declare enum ConstructorDepErrorKind {
@@ -25,7 +25,7 @@ export interface ConstructorDepError {
     param: CtorParameter;
     kind: ConstructorDepErrorKind;
 }
-export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): ConstructorDeps | null;
+export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, defaultImportRecorder: DefaultImportRecorder, isCore: boolean): ConstructorDeps | null;
 /**
  * Convert a `TypeValueReference` to an `Expression` which refers to the type as a value.
  *
@@ -33,10 +33,10 @@ export declare function getConstructorDependencies(clazz: ts.ClassDeclaration, r
  * references are converted to an `ExternalExpr`. Note that this is only valid in the context of the
  * file in which the `TypeValueReference` originated.
  */
-export declare function valueReferenceToExpression(valueRef: TypeValueReference): Expression;
-export declare function valueReferenceToExpression(valueRef: null): null;
-export declare function valueReferenceToExpression(valueRef: TypeValueReference | null): Expression | null;
-export declare function getValidConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, isCore: boolean): R3DependencyMetadata[] | null;
+export declare function valueReferenceToExpression(valueRef: TypeValueReference, defaultImportRecorder: DefaultImportRecorder): Expression;
+export declare function valueReferenceToExpression(valueRef: null, defaultImportRecorder: DefaultImportRecorder): null;
+export declare function valueReferenceToExpression(valueRef: TypeValueReference | null, defaultImportRecorder: DefaultImportRecorder): Expression | null;
+export declare function getValidConstructorDependencies(clazz: ts.ClassDeclaration, reflector: ReflectionHost, defaultImportRecorder: DefaultImportRecorder, isCore: boolean): R3DependencyMetadata[] | null;
 export declare function validateConstructorDependencies(clazz: ts.ClassDeclaration, deps: ConstructorDeps | null): R3DependencyMetadata[] | null;
 export declare function toR3Reference(valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile, refEmitter: ReferenceEmitter): R3Reference;
 export declare function isAngularCore(decorator: Decorator): decorator is Decorator & {

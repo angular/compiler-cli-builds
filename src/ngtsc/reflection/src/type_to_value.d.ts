@@ -8,7 +8,6 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/type_to_value" />
 import * as ts from 'typescript';
 import { TypeValueReference } from './host';
-export declare const DEFAULT_EXPORT_NAME = "*";
 /**
  * Potentially convert a `ts.TypeNode` to a `TypeValueReference`, which indicates how to use the
  * type given in the `ts.TypeNode` in a value position.
