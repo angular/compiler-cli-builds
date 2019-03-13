@@ -14,7 +14,6 @@ export declare class EsmRenderer extends Renderer {
     addImports(output: MagicString, imports: {
         specifier: string;
         qualifier: string;
-        isDefault: boolean;
     }[]): void;
     addExports(output: MagicString, entryPointBasePath: string, exports: ExportInfo[]): void;
     addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;

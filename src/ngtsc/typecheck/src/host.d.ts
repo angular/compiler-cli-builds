@@ -31,7 +31,7 @@ export declare class TypeCheckProgramHost implements ts.CompilerHost {
     getDefaultLibFileName(options: ts.CompilerOptions): string;
     writeFile(fileName: string, data: string, writeByteOrderMark: boolean, onError: ((message: string) => void) | undefined, sourceFiles: ReadonlyArray<ts.SourceFile>): void;
     getCurrentDirectory(): string;
-    getDirectories(path: string): string[];
+    getDirectories?: (path: string) => string[];
     getCanonicalFileName(fileName: string): string;
     useCaseSensitiveFileNames(): boolean;
     getNewLine(): string;

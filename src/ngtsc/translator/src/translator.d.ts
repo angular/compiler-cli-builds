@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/translator/src/translator" />
 import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Statement, Type, TypeVisitor, TypeofExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
 import * as ts from 'typescript';
-import { ImportRewriter } from '../../imports';
+import { DefaultImportRecorder, ImportRewriter } from '../../imports';
 export declare class Context {
     readonly isStatement: boolean;
     constructor(isStatement: boolean);
@@ -18,8 +18,7 @@ export declare class Context {
 export declare class ImportManager {
     protected rewriter: ImportRewriter;
     private prefix;
-    private nonDefaultImports;
-    private defaultImports;
+    private specifierToIdentifier;
     private nextIndex;
     constructor(rewriter?: ImportRewriter, prefix?: string);
     generateNamedImport(moduleName: string, originalSymbol: string): {
@@ -29,11 +28,10 @@ export declare class ImportManager {
     getAllImports(contextPath: string): {
         specifier: string;
         qualifier: string;
-        isDefault: boolean;
     }[];
 }
-export declare function translateExpression(expression: Expression, imports: ImportManager): ts.Expression;
-export declare function translateStatement(statement: Statement, imports: ImportManager): ts.Statement;
+export declare function translateExpression(expression: Expression, imports: ImportManager, defaultImportRecorder: DefaultImportRecorder): ts.Expression;
+export declare function translateStatement(statement: Statement, imports: ImportManager, defaultImportRecorder: DefaultImportRecorder): ts.Statement;
 export declare function translateType(type: Type, imports: ImportManager): ts.TypeNode;
 export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVisitor {
     private imports;

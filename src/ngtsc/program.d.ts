@@ -35,6 +35,7 @@ export declare class NgtscProgram implements api.Program {
     private cycleAnalyzer;
     private refEmitter;
     private fileToModuleHost;
+    private defaultImportTracker;
     constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: api.Program);
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;

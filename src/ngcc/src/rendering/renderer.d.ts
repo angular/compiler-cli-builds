@@ -94,7 +94,6 @@ export declare abstract class Renderer {
     protected abstract addImports(output: MagicString, imports: {
         specifier: string;
         qualifier: string;
-        isDefault: boolean;
     }[]): void;
     protected abstract addExports(output: MagicString, entryPointBasePath: string, exports: ExportInfo[]): void;
     protected abstract addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;

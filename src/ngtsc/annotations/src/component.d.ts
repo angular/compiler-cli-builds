@@ -9,7 +9,7 @@
 import { ConstantPool, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
 import { CycleAnalyzer } from '../../cycles';
-import { ModuleResolver, ReferenceEmitter } from '../../imports';
+import { DefaultImportRecorder, ModuleResolver, ReferenceEmitter } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
@@ -36,7 +36,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private moduleResolver;
     private cycleAnalyzer;
     private refEmitter;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter);
+    private defaultImportRecorder;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder);
     private literalCache;
     private boundTemplateCache;
     private elementSchemaRegistry;
