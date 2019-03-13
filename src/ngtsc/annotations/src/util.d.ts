@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/util" />
-import { Expression, R3DependencyMetadata, R3Reference } from '@angular/compiler';
+import { Expression, R3DependencyMetadata, R3Reference, WrappedNodeExpr } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { ForeignFunctionResolver } from '../../partial_evaluator';
@@ -75,3 +75,5 @@ export declare function forwardRefResolver(ref: Reference<ts.FunctionDeclaration
  * @param resolvers Resolvers to be combined.
  */
 export declare function combineResolvers(resolvers: ForeignFunctionResolver[]): ForeignFunctionResolver;
+export declare function isExpressionForwardReference(expr: Expression, context: ts.Node, contextSource: ts.SourceFile): boolean;
+export declare function isWrappedTsNodeExpr(expr: Expression): expr is WrappedNodeExpr<ts.Node>;
