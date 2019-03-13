@@ -40,7 +40,7 @@ export declare class SyntheticFilesCompilerHost implements PluginCompilerHost {
     getCurrentDirectory(): string;
     useCaseSensitiveFileNames(): boolean;
     getNewLine(): string;
-    getDirectories(path: string): string[];
+    getDirectories?: (path: string) => string[];
     readFile(fileName: string): string | undefined;
     trace(s: string): void;
 }
