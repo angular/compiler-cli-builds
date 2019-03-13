@@ -153,6 +153,7 @@ export interface ClassMember {
 export declare type TypeValueReference = {
     local: true;
     expression: ts.Expression;
+    defaultImportStatement: ts.ImportDeclaration | null;
 } | {
     local: false;
     name: string;
