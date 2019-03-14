@@ -9,7 +9,7 @@
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    const tslib_1 = require("tslib");
+    var tslib_1 = require("tslib");
     /**
      * @license
      * Copyright Google Inc. All Rights Reserved.
