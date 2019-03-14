@@ -92,13 +92,10 @@ export declare abstract class Renderer {
     protected addModuleWithProvidersParams(outputText: MagicString, moduleWithProviders: ModuleWithProvidersInfo[], importManager: ImportManager): void;
     protected abstract addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
     protected abstract addImports(output: MagicString, imports: {
-        name: string;
-        as: string;
+        specifier: string;
+        qualifier: string;
     }[]): void;
-    protected abstract addExports(output: MagicString, entryPointBasePath: string, exports: {
-        identifier: string;
-        from: string;
-    }[]): void;
+    protected abstract addExports(output: MagicString, entryPointBasePath: string, exports: ExportInfo[]): void;
     protected abstract addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: RedundantDecoratorMap): void;
     protected abstract rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile, declarations: SwitchableVariableDeclaration[]): void;

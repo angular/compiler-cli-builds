@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/directive" />
 import { ConstantPool, R3DirectiveMetadata, R3QueryMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
+import { DefaultImportRecorder } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassMember, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope/src/local';
@@ -20,8 +21,9 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
     private reflector;
     private evaluator;
     private scopeRegistry;
+    private defaultImportRecorder;
     private isCore;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, defaultImportRecorder: DefaultImportRecorder, isCore: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<DirectiveHandlerData>;
@@ -30,7 +32,7 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
 /**
  * Helper function to extract metadata from a `Directive` or `Component`.
  */
-export declare function extractDirectiveMetadata(clazz: ts.ClassDeclaration, decorator: Decorator, reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean, defaultSelector?: string | null): {
+export declare function extractDirectiveMetadata(clazz: ts.ClassDeclaration, decorator: Decorator, reflector: ReflectionHost, evaluator: PartialEvaluator, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, defaultSelector?: string | null): {
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;
     decoratedElements: ClassMember[];

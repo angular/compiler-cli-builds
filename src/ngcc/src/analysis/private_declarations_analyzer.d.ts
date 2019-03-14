@@ -13,6 +13,7 @@ export interface ExportInfo {
     identifier: string;
     from: string;
     dtsFrom?: string | null;
+    alias?: string | null;
 }
 export declare type PrivateDeclarationsAnalyses = ExportInfo[];
 /**

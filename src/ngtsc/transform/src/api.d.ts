@@ -107,4 +107,5 @@ export interface CompileResult {
 }
 export interface ResolveResult {
     reexports?: Reexport[];
+    diagnostics?: ts.Diagnostic[];
 }

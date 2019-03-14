@@ -7,4 +7,5 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection" />
 export * from './src/host';
-export { TypeScriptReflectionHost, filterToMembersWithDecorator, reflectIdentifierOfDeclaration, reflectNameOfDeclaration, reflectObjectLiteral, reflectTypeEntityToDeclaration, typeNodeToValueExpr } from './src/typescript';
+export { typeNodeToValueExpr } from './src/type_to_value';
+export { TypeScriptReflectionHost, filterToMembersWithDecorator, reflectIdentifierOfDeclaration, reflectNameOfDeclaration, reflectObjectLiteral, reflectTypeEntityToDeclaration } from './src/typescript';
