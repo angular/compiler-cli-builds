@@ -46,8 +46,8 @@ export interface ReferenceEmitStrategy {
 /**
  * Generates `Expression`s which refer to `Reference`s in a given context.
  *
- * A `ReferenceEmitter` uses one or more `ReferenceEmitStrategy` implementations to produce a
- * an `Expression` which refers to a `Reference` in the context of a particular file.
+ * A `ReferenceEmitter` uses one or more `ReferenceEmitStrategy` implementations to produce an
+ * `Expression` which refers to a `Reference` in the context of a particular file.
  */
 export declare class ReferenceEmitter {
     private strategies;

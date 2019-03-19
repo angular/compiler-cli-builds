@@ -83,5 +83,6 @@ export declare class DecorationAnalyzer {
     protected analyzeClass(clazz: DecoratedClass): AnalyzedClass | null;
     protected compileFile(analyzedFile: AnalyzedFile): CompiledFile;
     protected compileClass(clazz: AnalyzedClass, constantPool: ConstantPool): CompileResult[];
+    protected resolveFile(analyzedFile: AnalyzedFile): void;
 }
 export {};
