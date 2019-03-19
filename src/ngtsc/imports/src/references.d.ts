@@ -43,6 +43,13 @@ export declare class Reference<T extends ts.Node = ts.Node> {
      */
     readonly bestGuessOwningModule: OwningModule | null;
     private identifiers;
+    /**
+     * Indicates that the Reference was created synthetically, not as a result of natural value
+     * resolution.
+     *
+     * This is used to avoid misinterpreting the Reference in certain contexts.
+     */
+    synthetic: boolean;
     private _alias;
     constructor(node: T, bestGuessOwningModule?: OwningModule | null);
     /**
