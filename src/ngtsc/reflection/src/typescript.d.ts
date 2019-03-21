@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/typescript" />
 import * as ts from 'typescript';
-import { ClassMember, CtorParameter, Declaration, Decorator, FunctionDefinition, Import, ReflectionHost } from './host';
+import { ClassDeclaration, ClassMember, CtorParameter, Declaration, Decorator, FunctionDefinition, Import, ReflectionHost } from './host';
 /**
  * reflector.ts implements static reflection of declarations using the TypeScript `ts.TypeChecker`.
  */
@@ -15,15 +15,15 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     protected checker: ts.TypeChecker;
     constructor(checker: ts.TypeChecker);
     getDecoratorsOfDeclaration(declaration: ts.Declaration): Decorator[] | null;
-    getMembersOfClass(declaration: ts.Declaration): ClassMember[];
-    getConstructorParameters(declaration: ts.Declaration): CtorParameter[] | null;
+    getMembersOfClass(clazz: ClassDeclaration): ClassMember[];
+    getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
     getImportOfIdentifier(id: ts.Identifier): Import | null;
     getExportsOfModule(node: ts.Node): Map<string, Declaration> | null;
-    isClass(node: ts.Node): node is ts.NamedDeclaration;
-    hasBaseClass(node: ts.Declaration): boolean;
+    isClass(node: ts.Node): node is ClassDeclaration;
+    hasBaseClass(clazz: ClassDeclaration): boolean;
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
     getDefinitionOfFunction<T extends ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>(node: T): FunctionDefinition<T>;
-    getGenericArityOfClass(clazz: ts.Declaration): number | null;
+    getGenericArityOfClass(clazz: ClassDeclaration): number | null;
     getVariableValue(declaration: ts.VariableDeclaration): ts.Expression | null;
     getDtsDeclaration(_: ts.Declaration): ts.Declaration | null;
     private _reflectDecorator;

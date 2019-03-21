@@ -8,14 +8,14 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/util" />
 import * as ts from 'typescript';
 import { Reference } from '../../imports';
-import { ReflectionHost } from '../../reflection';
-export declare function extractReferencesFromType(checker: ts.TypeChecker, def: ts.TypeNode, ngModuleImportedFrom: string | null, resolutionContext: string): Reference<ts.ClassDeclaration>[];
+import { ClassDeclaration, ReflectionHost } from '../../reflection';
+export declare function extractReferencesFromType(checker: ts.TypeChecker, def: ts.TypeNode, ngModuleImportedFrom: string | null, resolutionContext: string): Reference<ClassDeclaration>[];
 export declare function readStringType(type: ts.TypeNode): string | null;
 export declare function readStringMapType(type: ts.TypeNode): {
     [key: string]: string;
 };
 export declare function readStringArrayType(type: ts.TypeNode): string[];
-export declare function extractDirectiveGuards(node: ts.Declaration, reflector: ReflectionHost): {
+export declare function extractDirectiveGuards(node: ClassDeclaration, reflector: ReflectionHost): {
     ngTemplateGuards: string[];
     hasNgTemplateContextGuard: boolean;
 };

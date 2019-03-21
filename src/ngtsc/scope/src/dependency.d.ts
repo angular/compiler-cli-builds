@@ -8,10 +8,10 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/dependency" />
 import * as ts from 'typescript';
 import { AliasGenerator, Reference } from '../../imports';
-import { ReflectionHost } from '../../reflection';
+import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ExportScope } from './api';
 export interface DtsModuleScopeResolver {
-    resolve(ref: Reference<ts.ClassDeclaration>): ExportScope | null;
+    resolve(ref: Reference<ClassDeclaration>): ExportScope | null;
 }
 /**
  * Reads Angular metadata from classes declared in .d.ts files and computes an `ExportScope`.
@@ -20,7 +20,7 @@ export interface DtsModuleScopeResolver {
  * of all of the directives/pipes it exports. It does this by reading metadata off of Ivy static
  * fields on directives, components, pipes, and NgModules.
  */
-export declare class MetadataDtsModuleScopeResolver {
+export declare class MetadataDtsModuleScopeResolver implements DtsModuleScopeResolver {
     private checker;
     private reflector;
     private aliasGenerator;
@@ -36,7 +36,7 @@ export declare class MetadataDtsModuleScopeResolver {
      * This operation relies on a `Reference` instead of a direct TypeScrpt node as the `Reference`s
      * produced depend on how the original NgModule was imported.
      */
-    resolve(ref: Reference<ts.ClassDeclaration>): ExportScope | null;
+    resolve(ref: Reference<ClassDeclaration>): ExportScope | null;
     /**
      * Read the metadata from a class that has already been compiled somehow (either it's in a .d.ts
      * file, or in a .ts file with a handwritten definition).

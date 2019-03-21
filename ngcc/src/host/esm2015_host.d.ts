@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm2015_host" />
 import * as ts from 'typescript';
-import { ClassMember, ClassMemberKind, CtorParameter, Decorator, Import, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, ClassMember, ClassMemberKind, ClassSymbol, CtorParameter, Decorator, Import, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
 import { BundleProgram } from '../packages/bundle_program';
 import { DecoratedClass } from './decorated_class';
 import { ModuleWithProvidersFunction, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
@@ -47,6 +47,21 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     protected dtsDeclarationMap: Map<string, ts.Declaration> | null;
     constructor(isCore: boolean, checker: ts.TypeChecker, dts?: BundleProgram | null);
     /**
+     * Find the declaration of a node that we think is a class.
+     * Classes should have a `name` identifier, because they may need to be referenced in other parts
+     * of the program.
+     *
+     * @param node the node that represents the class whose declaration we are finding.
+     * @returns the declaration of the class or `undefined` if it is not a "class".
+     */
+    getClassDeclaration(node: ts.Node): ClassDeclaration | undefined;
+    /**
+     * Find a symbol for a node that we think is a class.
+     * @param node the node whose symbol we are finding.
+     * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
+     */
+    getClassSymbol(declaration: ts.Node): ClassSymbol | undefined;
+    /**
      * Examine a declaration (for example, of a class or function) and return metadata about any
      * decorators present on the declaration.
      *
@@ -64,26 +79,20 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * Examine a declaration which should be of a class, and return metadata about the members of the
      * class.
      *
-     * @param declaration a TypeScript `ts.Declaration` node representing the class over which to
-     * reflect. If the source is in ES6 format, this will be a `ts.ClassDeclaration` node. If the
-     * source is in ES5 format, this might be a `ts.VariableDeclaration` as classes in ES5 are
-     * represented as the result of an IIFE execution.
+     * @param clazz a `ClassDeclaration` representing the class over which to reflect.
      *
      * @returns an array of `ClassMember` metadata representing the members of the class.
      *
      * @throws if `declaration` does not resolve to a class declaration.
      */
-    getMembersOfClass(clazz: ts.Declaration): ClassMember[];
+    getMembersOfClass(clazz: ClassDeclaration): ClassMember[];
     /**
      * Reflect over the constructor of a class and return metadata about its parameters.
      *
      * This method only looks at the constructor of a class directly and not at any inherited
      * constructors.
      *
-     * @param declaration a TypeScript `ts.Declaration` node representing the class over which to
-     * reflect. If the source is in ES6 format, this will be a `ts.ClassDeclaration` node. If the
-     * source is in ES5 format, this might be a `ts.VariableDeclaration` as classes in ES5 are
-     * represented as the result of an IIFE execution.
+     * @param clazz a `ClassDeclaration` representing the class over which to reflect.
      *
      * @returns an array of `Parameter` metadata representing the parameters of the constructor, if
      * a constructor exists. If the constructor exists and has 0 parameters, this array will be empty.
@@ -91,13 +100,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      *
      * @throws if `declaration` does not resolve to a class declaration.
      */
-    getConstructorParameters(clazz: ts.Declaration): CtorParameter[] | null;
-    /**
-     * Find a symbol for a node that we think is a class.
-     * @param node the node whose symbol we are finding.
-     * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
-     */
-    getClassSymbol(declaration: ts.Node): ts.Symbol | undefined;
+    getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
     /**
      * Search the given module for variable declarations in which the initializer
      * is an identifier marked with the `PRE_R3_MARKER`.
@@ -125,10 +128,12 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     /**
      * Get the number of generic type parameters of a given class.
      *
+     * @param clazz a `ClassDeclaration` representing the class over which to reflect.
+     *
      * @returns the number of type parameters of the class, if known, or `null` if the declaration
      * is not a class or has an unknown number of type parameters.
      */
-    getGenericArityOfClass(clazz: ts.Declaration): number | null;
+    getGenericArityOfClass(clazz: ClassDeclaration): number | null;
     /**
      * Take an exported declaration of a class (maybe down-leveled to a variable) and look up the
      * declaration of its type in a separate .d.ts tree.
@@ -150,8 +155,8 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * objects.
      */
     getModuleWithProvidersFunctions(f: ts.SourceFile): ModuleWithProvidersFunction[];
-    protected getDecoratorsOfSymbol(symbol: ts.Symbol): Decorator[] | null;
-    protected getDecoratedClassFromSymbol(symbol: ts.Symbol | undefined): DecoratedClass | null;
+    protected getDecoratorsOfSymbol(symbol: ClassSymbol): Decorator[] | null;
+    protected getDecoratedClassFromSymbol(symbol: ClassSymbol | undefined): DecoratedClass | null;
     /**
      * Walk the AST looking for an assignment to the specified symbol.
      * @param node The current node we are searching.
@@ -165,7 +170,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param propertyName the name of static property.
      * @returns the symbol if it is found or `undefined` if not.
      */
-    protected getStaticProperty(symbol: ts.Symbol, propertyName: ts.__String): ts.Symbol | undefined;
+    protected getStaticProperty(symbol: ClassSymbol, propertyName: ts.__String): ts.Symbol | undefined;
     /**
      * Get all class decorators for the given class, where the decorators are declared
      * via a static property. For example:
@@ -195,14 +200,21 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param symbol the class whose decorators we want to get.
      * @returns an array of decorators or null if none where found.
      */
-    protected getClassDecoratorsFromHelperCall(symbol: ts.Symbol): Decorator[] | null;
+    protected getClassDecoratorsFromHelperCall(symbol: ClassSymbol): Decorator[] | null;
+    /**
+     * Examine a symbol which should be of a class, and return metadata about its members.
+     *
+     * @param symbol the `ClassSymbol` representing the class over which to reflect.
+     * @returns an array of `ClassMember` metadata representing the members of the class.
+     */
+    protected getMembersOfSymbol(symbol: ClassSymbol): ClassMember[];
     /**
      * Get all the member decorators for the given class.
      * @param classSymbol the class whose member decorators we are interested in.
      * @returns a map whose keys are the name of the members and whose values are collections of
      * decorators for the given member.
      */
-    protected getMemberDecorators(classSymbol: ts.Symbol): Map<string, Decorator[]>;
+    protected getMemberDecorators(classSymbol: ClassSymbol): Map<string, Decorator[]>;
     /**
      * Member decorators may be declared as static properties of the class:
      *
@@ -233,7 +245,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @returns a map whose keys are the name of the members and whose values are collections of
      * decorators for the given member.
      */
-    protected getMemberDecoratorsFromHelperCalls(classSymbol: ts.Symbol): Map<string, Decorator[]>;
+    protected getMemberDecoratorsFromHelperCalls(classSymbol: ClassSymbol): Map<string, Decorator[]>;
     /**
      * Extract decorator info from `__decorate` helper function calls.
      * @param helperCall the call to a helper that may contain decorator calls
@@ -327,7 +339,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @returns an array of `ts.ParameterDeclaration` objects representing each of the parameters in
      * the class's constructor or null if there is no constructor.
      */
-    protected getConstructorParameterDeclarations(classSymbol: ts.Symbol): ts.ParameterDeclaration[] | null;
+    protected getConstructorParameterDeclarations(classSymbol: ClassSymbol): ts.ParameterDeclaration[] | null;
     /**
      * Get the parameter decorators of a class constructor.
      *
@@ -335,7 +347,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param parameterNodes the array of TypeScript parameter nodes for this class's constructor.
      * @returns an array of constructor parameter info objects.
      */
-    protected getConstructorParamInfo(classSymbol: ts.Symbol, parameterNodes: ts.ParameterDeclaration[]): CtorParameter[];
+    protected getConstructorParamInfo(classSymbol: ClassSymbol, parameterNodes: ts.ParameterDeclaration[]): CtorParameter[];
     /**
      * Get the parameter type and decorators for the constructor of a class,
      * where the information is stored on a static method of the class.
@@ -366,7 +378,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param parameterNodes the array of TypeScript parameter nodes for this class's constructor.
      * @returns an array of objects containing the type and decorators for each parameter.
      */
-    protected getParamInfoFromHelperCall(classSymbol: ts.Symbol, parameterNodes: ts.ParameterDeclaration[]): ParamInfo[];
+    protected getParamInfoFromHelperCall(classSymbol: ClassSymbol, parameterNodes: ts.ParameterDeclaration[]): ParamInfo[];
     /**
      * Search statements related to the given class for calls to the specified helper.
      * @param classSymbol the class whose helper calls we are interested in.
@@ -374,7 +386,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * in.
      * @returns an array of CallExpression nodes for each matching helper call.
      */
-    protected getHelperCallsForClass(classSymbol: ts.Symbol, helperName: string): ts.CallExpression[];
+    protected getHelperCallsForClass(classSymbol: ClassSymbol, helperName: string): ts.CallExpression[];
     /**
      * Find statements related to the given class that may contain calls to a helper.
      *
@@ -384,7 +396,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param classSymbol the class whose helper calls we are interested in.
      * @returns an array of statements that may contain helper calls.
      */
-    protected getStatementsForClass(classSymbol: ts.Symbol): ts.Statement[];
+    protected getStatementsForClass(classSymbol: ClassSymbol): ts.Statement[];
     /**
      * Try to get the import info for this identifier as though it is a namespaced import.
      * For example, if the identifier is the `__metadata` part of a property access chain like:

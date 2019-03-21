@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { ReflectionHost } from '../../../src/ngtsc/reflection';
+import { ClassSymbol, ReflectionHost } from '../../../src/ngtsc/reflection';
 import { DecoratedClass } from './decorated_class';
 export declare const PRE_R3_MARKER = "__PRE_R3__";
 export declare const POST_R3_MARKER = "__POST_R3__";
@@ -47,7 +47,7 @@ export interface NgccReflectionHost extends ReflectionHost {
      * @returns the symbol for the declaration or `undefined` if it is not
      * a "class" or has no symbol.
      */
-    getClassSymbol(node: ts.Node): ts.Symbol | undefined;
+    getClassSymbol(node: ts.Node): ClassSymbol | undefined;
     /**
      * Search the given module for variable declarations in which the initializer
      * is an identifier marked with the `PRE_R3_MARKER`.
