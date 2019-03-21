@@ -33,7 +33,7 @@ export declare class GeneratedShimsHostWrapper implements ts.CompilerHost {
     directoryExists?: (directoryName: string) => boolean;
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
     getDefaultLibFileName(options: ts.CompilerOptions): string;
-    writeFile(fileName: string, data: string, writeByteOrderMark: boolean, onError: ((message: string) => void) | undefined, sourceFiles: ReadonlyArray<ts.SourceFile>): void;
+    writeFile(fileName: string, data: string, writeByteOrderMark: boolean, onError: ((message: string) => void) | undefined, sourceFiles: ReadonlyArray<ts.SourceFile> | undefined): void;
     getCurrentDirectory(): string;
     getDirectories?: (path: string) => string[];
     getCanonicalFileName(fileName: string): string;
