@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/api" />
-import * as ts from 'typescript';
 import { Reference } from '../../imports';
+import { ClassDeclaration } from '../../reflection';
 import { TypeCheckableDirectiveMeta } from '../../typecheck';
 /**
  * Data for one of a given NgModule's scopes (either compilation scope or export scopes).
@@ -45,6 +45,6 @@ export interface ScopeDirective extends TypeCheckableDirectiveMeta {
  * Metadata for a given pipe within an NgModule's scope.
  */
 export interface ScopePipe {
-    ref: Reference<ts.Declaration>;
+    ref: Reference<ClassDeclaration>;
     name: string;
 }

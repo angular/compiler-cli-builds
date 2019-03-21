@@ -10,7 +10,7 @@ import { ConstantPool, R3DirectiveMetadata, R3QueryMetadata, Statement } from '@
 import * as ts from 'typescript';
 import { DefaultImportRecorder } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
-import { ClassMember, Decorator, ReflectionHost } from '../../reflection';
+import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope/src/local';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
 export interface DirectiveHandlerData {
@@ -25,14 +25,14 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
     private isCore;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, defaultImportRecorder: DefaultImportRecorder, isCore: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
-    detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
-    analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<DirectiveHandlerData>;
-    compile(node: ts.ClassDeclaration, analysis: DirectiveHandlerData, pool: ConstantPool): CompileResult;
+    detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
+    analyze(node: ClassDeclaration, decorator: Decorator): AnalysisOutput<DirectiveHandlerData>;
+    compile(node: ClassDeclaration, analysis: DirectiveHandlerData, pool: ConstantPool): CompileResult;
 }
 /**
  * Helper function to extract metadata from a `Directive` or `Component`.
  */
-export declare function extractDirectiveMetadata(clazz: ts.ClassDeclaration, decorator: Decorator, reflector: ReflectionHost, evaluator: PartialEvaluator, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, defaultSelector?: string | null): {
+export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Decorator, reflector: ReflectionHost, evaluator: PartialEvaluator, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, defaultSelector?: string | null): {
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;
     decoratedElements: ClassMember[];

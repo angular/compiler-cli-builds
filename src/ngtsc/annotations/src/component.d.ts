@@ -7,11 +7,10 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
 import { ConstantPool, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
-import * as ts from 'typescript';
 import { CycleAnalyzer } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, ReferenceEmitter } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
-import { Decorator, ReflectionHost } from '../../reflection';
+import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
 import { TypeCheckContext } from '../../typecheck';
@@ -48,12 +47,12 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
      */
     private preanalyzeTemplateCache;
     readonly precedence = HandlerPrecedence.PRIMARY;
-    detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
-    preanalyze(node: ts.ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
-    analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<ComponentHandlerData>;
-    typeCheck(ctx: TypeCheckContext, node: ts.Declaration, meta: ComponentHandlerData): void;
-    resolve(node: ts.ClassDeclaration, analysis: ComponentHandlerData): ResolveResult;
-    compile(node: ts.ClassDeclaration, analysis: ComponentHandlerData, pool: ConstantPool): CompileResult;
+    detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
+    preanalyze(node: ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
+    analyze(node: ClassDeclaration, decorator: Decorator): AnalysisOutput<ComponentHandlerData>;
+    typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: ComponentHandlerData): void;
+    resolve(node: ClassDeclaration, analysis: ComponentHandlerData): ResolveResult;
+    compile(node: ClassDeclaration, analysis: ComponentHandlerData, pool: ConstantPool): CompileResult;
     private _resolveLiteral;
     private _resolveEnumValue;
     private _extractStyleUrls;

@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm5_host" />
 import * as ts from 'typescript';
-import { ClassMember, Declaration, Decorator, FunctionDefinition } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, ClassMember, ClassSymbol, Declaration, Decorator, FunctionDefinition } from '../../../src/ngtsc/reflection';
 import { Esm2015ReflectionHost, ParamInfo } from './esm2015_host';
 /**
  * ESM5 packages contain ECMAScript IIFE functions that act like classes. For example:
@@ -30,13 +30,15 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
     /**
      * Check whether the given node actually represents a class.
      */
-    isClass(node: ts.Node): node is ts.NamedDeclaration;
+    isClass(node: ts.Node): node is ClassDeclaration;
     /**
-     * Determines whether the given declaration has a base class.
+     * Determines whether the given declaration, which should be a "class", has a base "class".
      *
-     * In ES5, we need to determine if the IIFE wrapper takes a `_super` parameter .
+     * In ES5 code, we need to determine if the IIFE wrapper takes a `_super` parameter .
+     *
+     * @param clazz a `ClassDeclaration` representing the class over which to reflect.
      */
-    hasBaseClass(node: ts.Declaration): boolean;
+    hasBaseClass(clazz: ClassDeclaration): boolean;
     /**
      * Find a symbol for a node that we think is a class.
      *
@@ -53,7 +55,7 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      *     expression inside the IIFE.
      * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
      */
-    getClassSymbol(node: ts.Node): ts.Symbol | undefined;
+    getClassSymbol(node: ts.Node): ClassSymbol | undefined;
     /**
      * Trace an identifier to its declaration, if possible.
      *
@@ -93,7 +95,7 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      * @returns an array of `ts.ParameterDeclaration` objects representing each of the parameters in
      * the class's constructor or null if there is no constructor.
      */
-    protected getConstructorParameterDeclarations(classSymbol: ts.Symbol): ts.ParameterDeclaration[] | null;
+    protected getConstructorParameterDeclarations(classSymbol: ClassSymbol): ts.ParameterDeclaration[] | null;
     /**
      * Get the parameter type and decorators for the constructor of a class,
      * where the information is stored on a static method of the class.
@@ -140,5 +142,5 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      * to reference the inner identifier inside the IIFE.
      * @returns an array of statements that may contain helper calls.
      */
-    protected getStatementsForClass(classSymbol: ts.Symbol): ts.Statement[];
+    protected getStatementsForClass(classSymbol: ClassSymbol): ts.Statement[];
 }

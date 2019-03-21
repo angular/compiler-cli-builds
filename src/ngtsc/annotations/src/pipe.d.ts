@@ -7,10 +7,9 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/pipe" />
 import { R3PipeMetadata, Statement } from '@angular/compiler';
-import * as ts from 'typescript';
 import { DefaultImportRecorder } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
-import { Decorator, ReflectionHost } from '../../reflection';
+import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope/src/local';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
 export interface PipeHandlerData {
@@ -25,7 +24,7 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<PipeHandle
     private isCore;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, defaultImportRecorder: DefaultImportRecorder, isCore: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
-    detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
-    analyze(clazz: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<PipeHandlerData>;
-    compile(node: ts.ClassDeclaration, analysis: PipeHandlerData): CompileResult;
+    detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
+    analyze(clazz: ClassDeclaration, decorator: Decorator): AnalysisOutput<PipeHandlerData>;
+    compile(node: ClassDeclaration, analysis: PipeHandlerData): CompileResult;
 }
