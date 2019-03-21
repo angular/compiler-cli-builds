@@ -9,7 +9,7 @@
 import { ConstantPool, Expression, Statement, Type } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Reexport } from '../../imports';
-import { Decorator } from '../../reflection';
+import { ClassDeclaration, Decorator } from '../../reflection';
 import { TypeCheckContext } from '../../typecheck';
 export declare enum HandlerPrecedence {
     /**
@@ -51,20 +51,20 @@ export interface DecoratorHandler<A, M> {
      * Scan a set of reflected decorators and determine if this handler is responsible for compilation
      * of one of them.
      */
-    detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<M> | undefined;
+    detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<M> | undefined;
     /**
      * Asynchronously perform pre-analysis on the decorator/class combination.
      *
      * `preAnalyze` is optional and is not guaranteed to be called through all compilation flows. It
      * will only be called if asynchronicity is supported in the CompilerHost.
      */
-    preanalyze?(node: ts.Declaration, metadata: M): Promise<void> | undefined;
+    preanalyze?(node: ClassDeclaration, metadata: M): Promise<void> | undefined;
     /**
      * Perform analysis on the decorator/class combination, producing instructions for compilation
      * if successful, or an array of diagnostic messages if the analysis fails or the decorator
      * isn't valid.
      */
-    analyze(node: ts.Declaration, metadata: M): AnalysisOutput<A>;
+    analyze(node: ClassDeclaration, metadata: M): AnalysisOutput<A>;
     /**
      * Perform resolution on the given decorator along with the result of analysis.
      *
@@ -72,13 +72,13 @@ export interface DecoratorHandler<A, M> {
      * `DecoratorHandler` a chance to leverage information from the whole compilation unit to enhance
      * the `analysis` before the emit phase.
      */
-    resolve?(node: ts.Declaration, analysis: A): ResolveResult;
-    typeCheck?(ctx: TypeCheckContext, node: ts.Declaration, metadata: A): void;
+    resolve?(node: ClassDeclaration, analysis: A): ResolveResult;
+    typeCheck?(ctx: TypeCheckContext, node: ClassDeclaration, metadata: A): void;
     /**
      * Generate a description of the field which should be added to the class, including any
      * initialization code to be generated.
      */
-    compile(node: ts.Declaration, analysis: A, constantPool: ConstantPool): CompileResult | CompileResult[];
+    compile(node: ClassDeclaration, analysis: A, constantPool: ConstantPool): CompileResult | CompileResult[];
 }
 export interface DetectResult<M> {
     trigger: ts.Node | null;

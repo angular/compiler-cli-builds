@@ -7,10 +7,9 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
 import { R3InjectorMetadata, R3NgModuleMetadata, Statement } from '@angular/compiler';
-import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { PartialEvaluator } from '../../partial_evaluator';
-import { Decorator, ReflectionHost } from '../../reflection';
+import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { NgModuleRouteAnalyzer } from '../../routing';
 import { LocalModuleScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
@@ -19,7 +18,7 @@ export interface NgModuleAnalysis {
     ngModuleDef: R3NgModuleMetadata;
     ngInjectorDef: R3InjectorMetadata;
     metadataStmt: Statement | null;
-    declarations: Reference<ts.Declaration>[];
+    declarations: Reference<ClassDeclaration>[];
 }
 /**
  * Compiles @NgModule annotations to ngModuleDef fields.
@@ -37,10 +36,10 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModu
     private defaultImportRecorder;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder);
     readonly precedence = HandlerPrecedence.PRIMARY;
-    detect(node: ts.Declaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
-    analyze(node: ts.ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;
-    resolve(node: ts.Declaration, analysis: NgModuleAnalysis): ResolveResult;
-    compile(node: ts.ClassDeclaration, analysis: NgModuleAnalysis): CompileResult[];
+    detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
+    analyze(node: ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;
+    resolve(node: ClassDeclaration, analysis: NgModuleAnalysis): ResolveResult;
+    compile(node: ClassDeclaration, analysis: NgModuleAnalysis): CompileResult[];
     private _toR3Reference;
     /**
      * Given a `FunctionDeclaration`, `MethodDeclaration` or `FunctionExpression`, check if it is
@@ -61,6 +60,7 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModu
      * @returns the identifier of the NgModule type if found, or null otherwise.
      */
     private _reflectModuleFromLiteralType;
+    private isClassDeclarationReference;
     /**
      * Compute a list of `Reference`s from a resolved metadata value.
      */

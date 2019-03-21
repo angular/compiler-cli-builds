@@ -7,9 +7,8 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/base_def" />
 import { R3BaseRefMetaData } from '@angular/compiler';
-import * as ts from 'typescript';
 import { PartialEvaluator } from '../../partial_evaluator';
-import { ClassMember, Decorator, ReflectionHost } from '../../reflection';
+import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../reflection';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
 export declare class BaseDefDecoratorHandler implements DecoratorHandler<R3BaseRefMetaData, R3BaseRefDecoratorDetection> {
     private reflector;
@@ -17,9 +16,9 @@ export declare class BaseDefDecoratorHandler implements DecoratorHandler<R3BaseR
     private isCore;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean);
     readonly precedence = HandlerPrecedence.WEAK;
-    detect(node: ts.ClassDeclaration, decorators: Decorator[] | null): DetectResult<R3BaseRefDecoratorDetection> | undefined;
-    analyze(node: ts.ClassDeclaration, metadata: R3BaseRefDecoratorDetection): AnalysisOutput<R3BaseRefMetaData>;
-    compile(node: ts.Declaration, analysis: R3BaseRefMetaData): CompileResult[] | CompileResult;
+    detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<R3BaseRefDecoratorDetection> | undefined;
+    analyze(node: ClassDeclaration, metadata: R3BaseRefDecoratorDetection): AnalysisOutput<R3BaseRefMetaData>;
+    compile(node: ClassDeclaration, analysis: R3BaseRefMetaData): CompileResult[] | CompileResult;
 }
 export interface R3BaseRefDecoratorDetection {
     inputs?: Array<{

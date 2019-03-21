@@ -6,22 +6,24 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/decorated_class" />
-import * as ts from 'typescript';
-import { Decorator } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, Decorator } from '../../../src/ngtsc/reflection';
 /**
  * A simple container that holds the details of a decorated class that has been
  * found in a `DecoratedFile`.
  */
 export declare class DecoratedClass {
     name: string;
-    declaration: ts.Declaration;
+    declaration: ClassDeclaration;
     decorators: Decorator[];
     /**
      * Initialize a `DecoratedClass` that was found in a `DecoratedFile`.
      * @param name The name of the class that has been found. This is mostly used
      * for informational purposes.
-     * @param declaration The TypeScript AST node where this class is declared
+     * @param declaration The TypeScript AST node where this class is declared. In ES5 code, where a
+     * class can be represented by both a variable declaration and a function declaration (inside an
+     * IIFE), `declaration` will always refer to the outer variable declaration, which represents the
+     * class to the rest of the program.
      * @param decorators The collection of decorators that have been found on this class.
      */
-    constructor(name: string, declaration: ts.Declaration, decorators: Decorator[]);
+    constructor(name: string, declaration: ClassDeclaration, decorators: Decorator[]);
 }

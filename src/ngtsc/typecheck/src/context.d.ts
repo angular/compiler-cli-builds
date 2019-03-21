@@ -9,6 +9,7 @@
 import { BoundTarget } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ReferenceEmitter } from '../../imports';
+import { ClassDeclaration } from '../../reflection';
 import { TypeCheckableDirectiveMeta, TypeCtorMetadata } from './api';
 /**
  * A template type checking context for a program.
@@ -20,10 +21,6 @@ import { TypeCheckableDirectiveMeta, TypeCtorMetadata } from './api';
 export declare class TypeCheckContext {
     private refEmitter;
     constructor(refEmitter: ReferenceEmitter);
-    /**
-     * A `Set` of classes which will be used to generate type constructors.
-     */
-    private typeCtors;
     /**
      * A `Map` of `ts.SourceFile`s that the context has seen to the operations (additions of methods
      * or type-check blocks) that need to be eventually performed on that file.
@@ -37,11 +34,11 @@ export declare class TypeCheckContext {
      * @param template AST nodes of the template being recorded.
      * @param matcher `SelectorMatcher` which tracks directives that are in scope for this template.
      */
-    addTemplate(node: ts.ClassDeclaration, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>): void;
+    addTemplate(node: ClassDeclaration<ts.ClassDeclaration>, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>): void;
     /**
      * Record a type constructor for the given `node` with the given `ctorMetadata`.
      */
-    addTypeCtor(sf: ts.SourceFile, node: ts.ClassDeclaration, ctorMeta: TypeCtorMetadata): void;
+    addTypeCtor(sf: ts.SourceFile, node: ClassDeclaration<ts.ClassDeclaration>, ctorMeta: TypeCtorMetadata): void;
     /**
      * Transform a `ts.SourceFile` into a version that includes type checking code.
      *
@@ -51,9 +48,5 @@ export declare class TypeCheckContext {
      * added code has correct positional information associated with it.
      */
     transform(sf: ts.SourceFile): ts.SourceFile;
-    /**
-     * Whether the given `node` has a type constructor already.
-     */
-    private hasTypeCtor;
     private addTypeCheckBlock;
 }

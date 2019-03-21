@@ -8,12 +8,13 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/local" />
 import * as ts from 'typescript';
 import { AliasGenerator, Reexport, Reference, ReferenceEmitter } from '../../imports';
+import { ClassDeclaration } from '../../reflection';
 import { ExportScope, ScopeData, ScopeDirective, ScopePipe } from './api';
 import { DtsModuleScopeResolver } from './dependency';
 export interface LocalNgModuleData {
-    declarations: Reference<ts.Declaration>[];
-    imports: Reference<ts.Declaration>[];
-    exports: Reference<ts.Declaration>[];
+    declarations: Reference<ClassDeclaration>[];
+    imports: Reference<ClassDeclaration>[];
+    exports: Reference<ClassDeclaration>[];
 }
 export interface LocalModuleScope extends ExportScope {
     compilation: ScopeData;
@@ -92,10 +93,10 @@ export declare class LocalModuleScopeRegistry {
     /**
      * Add an NgModule's data to the registry.
      */
-    registerNgModule(clazz: ts.Declaration, data: LocalNgModuleData): void;
+    registerNgModule(clazz: ClassDeclaration, data: LocalNgModuleData): void;
     registerDirective(directive: ScopeDirective): void;
     registerPipe(pipe: ScopePipe): void;
-    getScopeForComponent(clazz: ts.ClassDeclaration): LocalModuleScope | null;
+    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
     /**
      * Collects registered data for a module and its directives/pipes and convert it into a full
      * `LocalModuleScope`.
@@ -104,12 +105,12 @@ export declare class LocalModuleScopeRegistry {
      * `LocalModuleScope` for the given NgModule if one can be produced, and `null` if no scope is
      * available or the scope contains errors.
      */
-    getScopeOfModule(clazz: ts.Declaration): LocalModuleScope | null;
+    getScopeOfModule(clazz: ClassDeclaration): LocalModuleScope | null;
     /**
      * Retrieves any `ts.Diagnostic`s produced during the calculation of the `LocalModuleScope` for
      * the given NgModule, or `null` if no errors were present.
      */
-    getDiagnosticsOfModule(clazz: ts.Declaration): ts.Diagnostic[] | null;
+    getDiagnosticsOfModule(clazz: ClassDeclaration): ts.Diagnostic[] | null;
     /**
      * Implementation of `getScopeOfModule` which differentiates between no scope being available
      * (returns `null`) and a scope being produced with errors (returns `undefined`).
@@ -118,11 +119,11 @@ export declare class LocalModuleScopeRegistry {
     /**
      * Check whether a component requires remote scoping.
      */
-    getRequiresRemoteScope(node: ts.Declaration): boolean;
+    getRequiresRemoteScope(node: ClassDeclaration): boolean;
     /**
      * Set a component as requiring remote scoping.
      */
-    setComponentAsRequiringRemoteScoping(node: ts.Declaration): void;
+    setComponentAsRequiringRemoteScoping(node: ClassDeclaration): void;
     /**
      * Look up the `ExportScope` of a given `Reference` to an NgModule.
      *

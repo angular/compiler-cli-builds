@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/type_constructor" />
 import * as ts from 'typescript';
+import { ClassDeclaration } from '../../reflection';
 import { TypeCtorMetadata } from './api';
 /**
  * Generate a type constructor for the given class and metadata.
@@ -27,8 +28,9 @@ import { TypeCtorMetadata } from './api';
  *
  * NgForOf.ngTypeCtor(init: {ngForOf: ['foo', 'bar']}); // Infers a type of NgForOf<string>.
  *
- * @param node the `ts.ClassDeclaration` for which a type constructor will be generated.
+ * @param node the `ClassDeclaration<ts.ClassDeclaration>` for which a type constructor will be
+ * generated.
  * @param meta additional metadata required to generate the type constructor.
  * @returns a `ts.MethodDeclaration` for the type constructor.
  */
-export declare function generateTypeCtor(node: ts.ClassDeclaration, meta: TypeCtorMetadata): ts.MethodDeclaration;
+export declare function generateTypeCtor(node: ClassDeclaration<ts.ClassDeclaration>, meta: TypeCtorMetadata): ts.MethodDeclaration;

@@ -7,14 +7,14 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/api" />
 import { BoundTarget, DirectiveMeta } from '@angular/compiler';
-import * as ts from 'typescript';
 import { Reference } from '../../imports';
+import { ClassDeclaration } from '../../reflection';
 /**
  * Extension of `DirectiveMeta` that includes additional information required to type-check the
  * usage of a particular directive.
  */
 export interface TypeCheckableDirectiveMeta extends DirectiveMeta {
-    ref: Reference<ts.ClassDeclaration>;
+    ref: Reference<ClassDeclaration>;
     queries: string[];
     ngTemplateGuards: string[];
     hasNgTemplateContextGuard: boolean;
