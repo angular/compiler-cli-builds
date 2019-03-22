@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm5_host" />
 import * as ts from 'typescript';
-import { ClassDeclaration, ClassMember, ClassSymbol, Declaration, Decorator, FunctionDefinition } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, ClassMember, ClassSymbol, CtorParameter, Declaration, Decorator, FunctionDefinition } from '../../../src/ngtsc/reflection';
 import { Esm2015ReflectionHost, ParamInfo } from './esm2015_host';
 /**
  * ESM5 packages contain ECMAScript IIFE functions that act like classes. For example:
@@ -40,22 +40,25 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      */
     hasBaseClass(clazz: ClassDeclaration): boolean;
     /**
-     * Find a symbol for a node that we think is a class.
+     * Find the declaration of a class given a node that we think represents the class.
      *
-     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE.
-     * So we might need to dig around inside to get hold of the "class" symbol.
+     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE,
+     * whose value is assigned to a variable (which represents the class to the rest of the program).
+     * So we might need to dig around to get hold of the "class" declaration.
      *
      * `node` might be one of:
-     * - A class declaration (from a declaration file).
+     * - A class declaration (from a typings file).
      * - The declaration of the outer variable, which is assigned the result of the IIFE.
      * - The function declaration inside the IIFE, which is eventually returned and assigned to the
      *   outer variable.
      *
-     * @param node the top level declaration that represents an exported class or the function
-     *     expression inside the IIFE.
-     * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
+     * The returned declaration is either the class declaration (from the typings file) or the outer
+     * variable declaration.
+     *
+     * @param node the node that represents the class whose declaration we are finding.
+     * @returns the declaration of the class or `undefined` if it is not a "class".
      */
-    getClassSymbol(node: ts.Node): ClassSymbol | undefined;
+    getClassDeclaration(node: ts.Node): ClassDeclaration | undefined;
     /**
      * Trace an identifier to its declaration, if possible.
      *
@@ -86,16 +89,70 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      */
     getDefinitionOfFunction<T extends ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>(node: T): FunctionDefinition<T>;
     /**
+     * Examine a declaration which should be of a class, and return metadata about the members of the
+     * class.
+     *
+     * @param declaration a TypeScript `ts.Declaration` node representing the class over which to
+     * reflect.
+     *
+     * @returns an array of `ClassMember` metadata representing the members of the class.
+     *
+     * @throws if `declaration` does not resolve to a class declaration.
+     */
+    getMembersOfClass(clazz: ClassDeclaration): ClassMember[];
+    /**
+     * Get the inner function declaration of an ES5-style class.
+     *
+     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE
+     * and returned to be assigned to a variable outside the IIFE, which is what the rest of the
+     * program interacts with.
+     *
+     * Given the outer variable declaration, we want to get to the inner function declaration.
+     *
+     * @param node a node that could be the variable expression outside an ES5 class IIFE.
+     * @param checker the TS program TypeChecker
+     * @returns the inner function declaration or `undefined` if it is not a "class".
+     */
+    protected getInnerFunctionDeclarationFromClassDeclaration(node: ts.Node): ts.FunctionDeclaration | undefined;
+    /**
+     * Get the identifier symbol of the inner function declaration of an ES5-style class.
+     *
+     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE
+     * and returned to be assigned to a variable outside the IIFE, which is what the rest of the
+     * program interacts with.
+     *
+     * Given the outer variable declaration, we want to get to the identifier symbol of the inner
+     * function declaration.
+     *
+     * @param clazz a node that could be the variable expression outside an ES5 class IIFE.
+     * @param checker the TS program TypeChecker
+     * @returns the inner function declaration identifier symbol or `undefined` if it is not a "class"
+     * or has no identifier.
+     */
+    protected getInnerFunctionSymbolFromClassDeclaration(clazz: ClassDeclaration): ClassSymbol | undefined;
+    /**
      * Find the declarations of the constructor parameters of a class identified by its symbol.
      *
-     * In ESM5 there is no "class" so the constructor that we want is actually the declaration
-     * function itself.
+     * In ESM5, there is no "class" so the constructor that we want is actually the inner function
+     * declaration inside the IIFE, whose return value is assigned to the outer variable declaration
+     * (that represents the class to the rest of the program).
      *
-     * @param classSymbol the class whose parameters we want to find.
+     * @param classSymbol the symbol of the class (i.e. the outer variable declaration) whose
+     * parameters we want to find.
      * @returns an array of `ts.ParameterDeclaration` objects representing each of the parameters in
-     * the class's constructor or null if there is no constructor.
+     * the class's constructor or `null` if there is no constructor.
      */
     protected getConstructorParameterDeclarations(classSymbol: ClassSymbol): ts.ParameterDeclaration[] | null;
+    /**
+     * Get the parameter decorators of a class constructor.
+     *
+     * @param classSymbol the symbol of the class (i.e. the outer variable declaration) whose
+     * parameter info we want to get.
+     * @param parameterNodes the array of TypeScript parameter nodes for this class's constructor.
+     * @returns an array of constructor parameter info objects.
+     */
+    protected getConstructorParamInfo(classSymbol: ClassSymbol, parameterNodes: ts.ParameterDeclaration[]): CtorParameter[];
+    protected getDecoratorsOfSymbol(symbol: ClassSymbol): Decorator[] | null;
     /**
      * Get the parameter type and decorators for the constructor of a class,
      * where the information is stored on a static method of the class.
@@ -144,3 +201,4 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      */
     protected getStatementsForClass(classSymbol: ClassSymbol): ts.Statement[];
 }
+export declare function getIifeBody(declaration: ts.Declaration): ts.Block | undefined;

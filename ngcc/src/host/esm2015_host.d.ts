@@ -47,6 +47,21 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     protected dtsDeclarationMap: Map<string, ts.Declaration> | null;
     constructor(isCore: boolean, checker: ts.TypeChecker, dts?: BundleProgram | null);
     /**
+     * Find the declaration of a node that we think is a class.
+     * Classes should have a `name` identifier, because they may need to be referenced in other parts
+     * of the program.
+     *
+     * @param node the node that represents the class whose declaration we are finding.
+     * @returns the declaration of the class or `undefined` if it is not a "class".
+     */
+    getClassDeclaration(node: ts.Node): ClassDeclaration | undefined;
+    /**
+     * Find a symbol for a node that we think is a class.
+     * @param node the node whose symbol we are finding.
+     * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
+     */
+    getClassSymbol(declaration: ts.Node): ClassSymbol | undefined;
+    /**
      * Examine a declaration (for example, of a class or function) and return metadata about any
      * decorators present on the declaration.
      *
@@ -86,12 +101,6 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @throws if `declaration` does not resolve to a class declaration.
      */
     getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
-    /**
-     * Find a symbol for a node that we think is a class.
-     * @param node the node whose symbol we are finding.
-     * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
-     */
-    getClassSymbol(declaration: ts.Node): ClassSymbol | undefined;
     /**
      * Search the given module for variable declarations in which the initializer
      * is an identifier marked with the `PRE_R3_MARKER`.
@@ -192,6 +201,13 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @returns an array of decorators or null if none where found.
      */
     protected getClassDecoratorsFromHelperCall(symbol: ClassSymbol): Decorator[] | null;
+    /**
+     * Examine a symbol which should be of a class, and return metadata about its members.
+     *
+     * @param symbol the `ClassSymbol` representing the class over which to reflect.
+     * @returns an array of `ClassMember` metadata representing the members of the class.
+     */
+    protected getMembersOfSymbol(symbol: ClassSymbol): ClassMember[];
     /**
      * Get all the member decorators for the given class.
      * @param classSymbol the class whose member decorators we are interested in.
