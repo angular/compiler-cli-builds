@@ -7,11 +7,12 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/shims/src/host" />
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../../path/src/types';
 export interface ShimGenerator {
     /**
      * Returns `true` if this generator is intended to handle the given file.
      */
-    recognize(fileName: string): boolean;
+    recognize(fileName: AbsoluteFsPath): boolean;
     /**
      * Generate a shim's `ts.SourceFile` for the given original file.
      *
@@ -20,7 +21,7 @@ export interface ShimGenerator {
      *
      * If `generate` returns null, then the shim generator declines to generate the file after all.
      */
-    generate(genFileName: string, readFile: (fileName: string) => ts.SourceFile | null): ts.SourceFile | null;
+    generate(genFileName: AbsoluteFsPath, readFile: (fileName: string) => ts.SourceFile | null): ts.SourceFile | null;
 }
 /**
  * A wrapper around a `ts.CompilerHost` which supports generated files.
