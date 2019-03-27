@@ -17,7 +17,7 @@
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var fs_1 = require("fs");
-    exports.NGCC_VERSION = '8.0.0-beta.10+27.sha-80161d5.with-local-changes';
+    exports.NGCC_VERSION = '8.0.0-beta.10+28.sha-aaa8a3a.with-local-changes';
     /**
      * Check whether ngcc has already processed a given entry-point format.
      *
