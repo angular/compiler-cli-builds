@@ -37,8 +37,7 @@ import { EntryPointBundle } from './entry_point_bundle';
  */
 export declare class Transformer {
     private sourcePath;
-    private targetPath;
-    constructor(sourcePath: string, targetPath: string);
+    constructor(sourcePath: string);
     /**
      * Transform the source (and typings) files of a bundle.
      * @param bundle the bundle to transform.
