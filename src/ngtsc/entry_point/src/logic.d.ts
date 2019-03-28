@@ -6,4 +6,5 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/entry_point/src/logic" />
-export declare function findFlatIndexEntryPoint(rootFiles: ReadonlyArray<string>): string | null;
+import { AbsoluteFsPath } from '../../path/src/types';
+export declare function findFlatIndexEntryPoint(rootFiles: ReadonlyArray<AbsoluteFsPath>): string | null;
