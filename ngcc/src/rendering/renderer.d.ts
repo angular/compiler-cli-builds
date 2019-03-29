@@ -72,8 +72,7 @@ export declare abstract class Renderer {
     protected isCore: boolean;
     protected bundle: EntryPointBundle;
     protected sourcePath: string;
-    protected targetPath: string;
-    constructor(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string, targetPath: string);
+    constructor(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string);
     renderProgram(decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses, moduleWithProvidersAnalyses: ModuleWithProvidersAnalyses | null): FileInfo[];
     /**
      * Render the source code and source-map for an Analyzed file.
