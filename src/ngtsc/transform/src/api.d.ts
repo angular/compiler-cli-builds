@@ -94,6 +94,7 @@ export interface AnalysisOutput<A> {
     diagnostics?: ts.Diagnostic[];
     factorySymbolName?: string;
     typeCheck?: boolean;
+    allowSkipAnalysisAndEmit?: boolean;
 }
 /**
  * A description of the static field to add to a class, including an initialization expression
