@@ -9,6 +9,8 @@
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ImportRewriter } from '../../imports';
+import { IncrementalState } from '../../incremental';
+import { PerfRecorder } from '../../perf';
 import { ReflectionHost } from '../../reflection';
 import { TypeCheckContext } from '../../typecheck';
 import { CompileResult, DecoratorHandler } from './api';
@@ -23,6 +25,8 @@ export declare class IvyCompilation {
     private checker;
     private reflector;
     private importRewriter;
+    private incrementalState;
+    private perf;
     private sourceToFactorySymbols;
     /**
      * Tracks classes which have been analyzed and found to have an Ivy decorator, and the
@@ -47,7 +51,7 @@ export declare class IvyCompilation {
      * when compiling @angular/core, or `null` if the current program is not @angular/core. This is
      * `null` in most cases.
      */
-    constructor(handlers: DecoratorHandler<any, any>[], checker: ts.TypeChecker, reflector: ReflectionHost, importRewriter: ImportRewriter, sourceToFactorySymbols: Map<string, Set<string>> | null);
+    constructor(handlers: DecoratorHandler<any, any>[], checker: ts.TypeChecker, reflector: ReflectionHost, importRewriter: ImportRewriter, incrementalState: IncrementalState, perf: PerfRecorder, sourceToFactorySymbols: Map<string, Set<string>> | null);
     readonly exportStatements: Map<string, Map<string, [string, string]>>;
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
