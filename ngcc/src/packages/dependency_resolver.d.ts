@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/dependency_resolver" />
+import { Logger } from '../logging/logger';
 import { DependencyHost } from './dependency_host';
 import { EntryPoint } from './entry_point';
 /**
@@ -56,8 +57,9 @@ export interface SortedEntryPointsInfo {
  * A class that resolves dependencies between entry-points.
  */
 export declare class DependencyResolver {
+    private logger;
     private host;
-    constructor(host: DependencyHost);
+    constructor(logger: Logger, host: DependencyHost);
     /**
      * Sort the array of entry points so that the dependant entry points always come later than
      * their dependencies in the array.

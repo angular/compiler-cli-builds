@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm2015_host" />
 import * as ts from 'typescript';
 import { ClassDeclaration, ClassMember, ClassMemberKind, ClassSymbol, CtorParameter, Decorator, Import, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
+import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
 import { DecoratedClass } from './decorated_class';
 import { ModuleWithProvidersFunction, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
@@ -43,9 +44,10 @@ export declare const CONSTRUCTOR_PARAMS: ts.__String;
  *   a static method called `ctorParameters`.
  */
 export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost implements NgccReflectionHost {
+    protected logger: Logger;
     protected isCore: boolean;
     protected dtsDeclarationMap: Map<string, ts.Declaration> | null;
-    constructor(isCore: boolean, checker: ts.TypeChecker, dts?: BundleProgram | null);
+    constructor(logger: Logger, isCore: boolean, checker: ts.TypeChecker, dts?: BundleProgram | null);
     /**
      * Find the declaration of a node that we think is a class.
      * Classes should have a `name` identifier, because they may need to be referenced in other parts

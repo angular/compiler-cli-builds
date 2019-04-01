@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point" />
 import { AbsoluteFsPath } from '../../../src/ngtsc/path';
+import { Logger } from '../logging/logger';
 /**
  * The possible values for the format of an entry-point.
  */
@@ -56,7 +57,7 @@ export declare const SUPPORTED_FORMAT_PROPERTIES: EntryPointJsonProperty[];
  * @param entryPointPath the absolute path to the potential entry-point.
  * @returns An entry-point if it is valid, `null` otherwise.
  */
-export declare function getEntryPointInfo(packagePath: AbsoluteFsPath, entryPointPath: AbsoluteFsPath): EntryPoint | null;
+export declare function getEntryPointInfo(logger: Logger, packagePath: AbsoluteFsPath, entryPointPath: AbsoluteFsPath): EntryPoint | null;
 /**
  * Convert a package.json property into an entry-point format.
  *

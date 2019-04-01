@@ -19,6 +19,7 @@ import { PrivateDeclarationsAnalyses, ExportInfo } from '../analysis/private_dec
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
+import { Logger } from '../logging/logger';
 interface SourceMapInfo {
     source: string;
     map: SourceMapConverter | null;
@@ -68,11 +69,12 @@ export declare const RedundantDecoratorMap: MapConstructor;
  * implement the `addImports`, `addDefinitions` and `removeDecorators` abstract methods.
  */
 export declare abstract class Renderer {
+    protected logger: Logger;
     protected host: NgccReflectionHost;
     protected isCore: boolean;
     protected bundle: EntryPointBundle;
     protected sourcePath: string;
-    constructor(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string);
+    constructor(logger: Logger, host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string);
     renderProgram(decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses, moduleWithProvidersAnalyses: ModuleWithProvidersAnalyses | null): FileInfo[];
     /**
      * Render the source code and source-map for an Analyzed file.
