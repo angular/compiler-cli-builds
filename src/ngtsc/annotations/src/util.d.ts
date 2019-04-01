@@ -69,7 +69,7 @@ export declare function unwrapForwardRef(node: ts.Expression, reflector: Reflect
  * @param args the arguments to the invocation of the forwardRef expression
  * @returns an unwrapped argument if `ref` pointed to forwardRef, or null otherwise
  */
-export declare function forwardRefResolver(ref: Reference<ts.FunctionDeclaration | ts.MethodDeclaration>, args: ts.Expression[]): ts.Expression | null;
+export declare function forwardRefResolver(ref: Reference<ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>, args: ReadonlyArray<ts.Expression>): ts.Expression | null;
 /**
  * Combines an array of resolver functions into a one.
  * @param resolvers Resolvers to be combined.

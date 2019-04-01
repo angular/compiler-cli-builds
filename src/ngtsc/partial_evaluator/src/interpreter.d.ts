@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/interpreter" />
 import * as ts from 'typescript';
 import { ReflectionHost } from '../../reflection';
-import { ForeignFunctionResolver } from './interface';
+import { ForeignFunctionResolver, VisitedFilesCallback } from './interface';
 import { ResolvedValue } from './result';
 /**
  * Tracks the scope of a function body, which includes `ResolvedValue`s for the parameters of that
@@ -31,7 +31,8 @@ interface Context {
 export declare class StaticInterpreter {
     private host;
     private checker;
-    constructor(host: ReflectionHost, checker: ts.TypeChecker);
+    private visitedFilesCb?;
+    constructor(host: ReflectionHost, checker: ts.TypeChecker, visitedFilesCb?: VisitedFilesCallback | undefined);
     visit(node: ts.Expression, context: Context): ResolvedValue;
     private visitExpression;
     private visitArrayLiteralExpression;
