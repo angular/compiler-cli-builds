@@ -6,8 +6,9 @@ import { CompiledClass } from '../analysis/decoration_analyzer';
 import { RedundantDecoratorMap, Renderer } from './renderer';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
+import { Logger } from '../logging/logger';
 export declare class EsmRenderer extends Renderer {
-    constructor(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string);
+    constructor(logger: Logger, host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string);
     /**
      *  Add the imports at the top of the file
      */

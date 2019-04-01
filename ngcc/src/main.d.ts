@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/main" />
+import { Logger } from './logging/logger';
 /**
  * The options to configure the ngcc compiler.
  */
@@ -33,6 +34,10 @@ export interface NgccOptions {
      * Whether to create new entry-points bundles rather than overwriting the original files.
      */
     createNewEntryPointFormats?: boolean;
+    /**
+     * Provide a logger that will be called with log messages.
+     */
+    logger?: Logger;
 }
 /**
  * This is the main entry-point into ngcc (aNGular Compatibility Compiler).
@@ -42,4 +47,4 @@ export interface NgccOptions {
  *
  * @param options The options telling ngcc what to compile and how.
  */
-export declare function mainNgcc({ basePath, targetEntryPointPath, propertiesToConsider, compileAllFormats, createNewEntryPointFormats }: NgccOptions): void;
+export declare function mainNgcc({ basePath, targetEntryPointPath, propertiesToConsider, compileAllFormats, createNewEntryPointFormats, logger }: NgccOptions): void;
