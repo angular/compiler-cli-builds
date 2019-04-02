@@ -11,9 +11,7 @@ import * as ts from 'typescript';
 import { TypeCheckHost } from '../diagnostics/translate_diagnostics';
 import { ModuleMetadata } from '../metadata/index';
 import { CompilerHost, CompilerOptions, LibrarySummary } from './api';
-export declare function setAugmentHostForTest(augmentation: {
-    [name: string]: Function;
-} | null): void;
+export declare function setWrapHostForTest(wrapFn: ((host: ts.CompilerHost) => ts.CompilerHost) | null): void;
 export declare function createCompilerHost({ options, tsHost }: {
     options: CompilerOptions;
     tsHost?: ts.CompilerHost;

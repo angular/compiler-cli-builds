@@ -26,6 +26,25 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     getGenericArityOfClass(clazz: ClassDeclaration): number | null;
     getVariableValue(declaration: ts.VariableDeclaration): ts.Expression | null;
     getDtsDeclaration(_: ts.Declaration): ts.Declaration | null;
+    protected getDirectImportOfIdentifier(id: ts.Identifier): Import | null;
+    /**
+     * Try to get the import info for this identifier as though it is a namespaced import.
+     * For example, if the identifier is the `Directive` part of a qualified type chain like:
+     *
+     * ```
+     * core.Directive
+     * ```
+     *
+     * then it might be that `core` is a namespace import such as:
+     *
+     * ```
+     * import * as core from 'tslib';
+     * ```
+     *
+     * @param id the TypeScript identifier to find the import info for.
+     * @returns The import info if this is a namespaced import or `null`.
+     */
+    protected getImportOfNamespacedIdentifier(id: ts.Identifier): Import | null;
     private _reflectDecorator;
     private _reflectMember;
 }
