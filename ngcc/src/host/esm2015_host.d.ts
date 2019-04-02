@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm2015_host" />
 import * as ts from 'typescript';
-import { ClassDeclaration, ClassMember, ClassMemberKind, ClassSymbol, CtorParameter, Decorator, Import, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, ClassMember, ClassMemberKind, ClassSymbol, CtorParameter, Declaration, Decorator, Import, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
 import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
 import { DecoratedClass } from './decorated_class';
@@ -47,11 +47,40 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     protected logger: Logger;
     protected isCore: boolean;
     protected dtsDeclarationMap: Map<string, ts.Declaration> | null;
+    /**
+     * The set of source files that have already been preprocessed.
+     */
+    protected preprocessedSourceFiles: Set<ts.SourceFile>;
+    /**
+     * In ES2015, class declarations may have been down-leveled into variable declarations,
+     * initialized using a class expression. In certain scenarios, an additional variable
+     * is introduced that represents the class so that results in code such as:
+     *
+     * ```
+     * let MyClass_1; let MyClass = MyClass_1 = class MyClass {};
+     * ```
+     *
+     * This map tracks those aliased variables to their original identifier, i.e. the key
+     * corresponds with the declaration of `MyClass_1` and its value becomes the `MyClass` identifier
+     * of the variable declaration.
+     *
+     * This map is populated during the preprocessing of each source file.
+     */
+    protected aliasedClassDeclarations: Map<ts.Declaration, ts.Identifier>;
     constructor(logger: Logger, isCore: boolean, checker: ts.TypeChecker, dts?: BundleProgram | null);
     /**
      * Find the declaration of a node that we think is a class.
      * Classes should have a `name` identifier, because they may need to be referenced in other parts
      * of the program.
+     *
+     * In ES2015, a class may be declared using a variable declaration of the following structure:
+     *
+     * ```
+     * var MyClass = MyClass_1 = class MyClass {};
+     * ```
+     *
+     * Here, the intermediate `MyClass_1` assignment is optional. In the above example, the
+     * `class MyClass {}` node is returned as declaration of `MyClass`.
      *
      * @param node the node that represents the class whose declaration we are finding.
      * @returns the declaration of the class or `undefined` if it is not a "class".
@@ -103,6 +132,28 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @throws if `declaration` does not resolve to a class declaration.
      */
     getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
+    hasBaseClass(clazz: ClassDeclaration): boolean;
+    /**
+     * Check whether the given node actually represents a class.
+     */
+    isClass(node: ts.Node): node is ClassDeclaration;
+    /**
+     * Trace an identifier to its declaration, if possible.
+     *
+     * This method attempts to resolve the declaration of the given identifier, tracing back through
+     * imports and re-exports until the original declaration statement is found. A `Declaration`
+     * object is returned if the original declaration is found, or `null` is returned otherwise.
+     *
+     * In ES2015, we need to account for identifiers that refer to aliased class declarations such as
+     * `MyClass_1`. Since such declarations are only available within the module itself, we need to
+     * find the original class declaration, e.g. `MyClass`, that is associated with the aliased one.
+     *
+     * @param id a TypeScript `ts.Identifier` to trace back to a declaration.
+     *
+     * @returns metadata about the `Declaration` if the original declaration is found, or `null`
+     * otherwise.
+     */
+    getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
     /**
      * Search the given module for variable declarations in which the initializer
      * is an identifier marked with the `PRE_R3_MARKER`.
@@ -157,6 +208,35 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * objects.
      */
     getModuleWithProvidersFunctions(f: ts.SourceFile): ModuleWithProvidersFunction[];
+    /**
+     * Finds the identifier of the actual class declaration for a potentially aliased declaration of a
+     * class.
+     *
+     * If the given declaration is for an alias of a class, this function will determine an identifier
+     * to the original declaration that represents this class.
+     *
+     * @param declaration The declaration to resolve.
+     * @returns The original identifier that the given class declaration resolves to, or `undefined`
+     * if the declaration does not represent an aliased class.
+     */
+    protected resolveAliasedClassIdentifier(declaration: ts.Declaration): ts.Identifier | null;
+    /**
+     * Ensures that the source file that `node` is part of has been preprocessed.
+     *
+     * During preprocessing, all statements in the source file will be visited such that certain
+     * processing steps can be done up-front and cached for subsequent usages.
+     *
+     * @param sourceFile The source file that needs to have gone through preprocessing.
+     */
+    protected ensurePreprocessed(sourceFile: ts.SourceFile): void;
+    /**
+     * Analyzes the given statement to see if it corresponds with a variable declaration like
+     * `let MyClass = MyClass_1 = class MyClass {};`. If so, the declaration of `MyClass_1`
+     * is associated with the `MyClass` identifier.
+     *
+     * @param statement The statement that needs to be preprocessed.
+     */
+    protected preprocessStatement(statement: ts.Statement): void;
     protected getDecoratorsOfSymbol(symbol: ClassSymbol): Decorator[] | null;
     protected getDecoratedClassFromSymbol(symbol: ClassSymbol | undefined): DecoratedClass | null;
     /**
@@ -474,7 +554,7 @@ export declare type AssignmentStatement = ts.ExpressionStatement & {
  * @param statement the statement to test.
  */
 export declare function isAssignmentStatement(statement: ts.Statement): statement is AssignmentStatement;
-export declare function isAssignment(expression: ts.Expression): expression is ts.AssignmentExpression<ts.EqualsToken>;
+export declare function isAssignment(node: ts.Node): node is ts.AssignmentExpression<ts.EqualsToken>;
 /**
  * The type of a function that can be used to filter out helpers based on their target.
  * This is used in `reflectDecoratorsFromHelperCall()`.
