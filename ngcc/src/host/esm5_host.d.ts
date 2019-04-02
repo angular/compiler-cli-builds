@@ -28,10 +28,6 @@ import { Esm2015ReflectionHost, ParamInfo } from './esm2015_host';
  */
 export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
     /**
-     * Check whether the given node actually represents a class.
-     */
-    isClass(node: ts.Node): node is ClassDeclaration;
-    /**
      * Determines whether the given declaration, which should be a "class", has a base "class".
      *
      * In ES5 code, we need to determine if the IIFE wrapper takes a `_super` parameter .
