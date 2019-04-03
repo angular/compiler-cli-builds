@@ -19,6 +19,7 @@ export interface NgModuleAnalysis {
     ngInjectorDef: R3InjectorMetadata;
     metadataStmt: Statement | null;
     declarations: Reference<ClassDeclaration>[];
+    exports: Reference<ClassDeclaration>[];
 }
 /**
  * Compiles @NgModule annotations to ngModuleDef fields.
