@@ -53,4 +53,5 @@ export declare class LogicalFileSystem {
      * of the TS project's root directories.
      */
     logicalPathOfFile(physicalFile: AbsoluteFsPath): LogicalProjectPath | null;
+    private createLogicalProjectPath;
 }
