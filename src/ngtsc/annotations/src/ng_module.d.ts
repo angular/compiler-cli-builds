@@ -35,8 +35,7 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModu
     private routeAnalyzer;
     private refEmitter;
     private defaultImportRecorder;
-    private localeId?;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, localeId?: string | undefined);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder);
     readonly precedence = HandlerPrecedence.PRIMARY;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;
