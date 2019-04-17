@@ -14,3 +14,9 @@ export declare class ArraySliceBuiltinFn extends BuiltinFn {
     constructor(node: ts.Node, lhs: ResolvedValueArray);
     evaluate(args: ResolvedValueArray): ResolvedValue;
 }
+export declare class ArrayConcatBuiltinFn extends BuiltinFn {
+    private node;
+    private lhs;
+    constructor(node: ts.Node, lhs: ResolvedValueArray);
+    evaluate(args: ResolvedValueArray): ResolvedValue;
+}
