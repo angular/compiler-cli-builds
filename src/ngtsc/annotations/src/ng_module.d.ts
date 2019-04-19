@@ -20,6 +20,7 @@ export interface NgModuleAnalysis {
     metadataStmt: Statement | null;
     declarations: Reference<ClassDeclaration>[];
     exports: Reference<ClassDeclaration>[];
+    id: string | null;
 }
 /**
  * Compiles @NgModule annotations to ngModuleDef fields.
