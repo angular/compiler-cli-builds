@@ -9,7 +9,7 @@
 import { Expression, R3DependencyMetadata, R3Reference, WrappedNodeExpr } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
-import { ForeignFunctionResolver } from '../../partial_evaluator';
+import { ForeignFunctionResolver, PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, CtorParameter, Decorator, Import, ReflectionHost, TypeValueReference } from '../../reflection';
 export declare enum ConstructorDepErrorKind {
     NO_SUITABLE_TOKEN = 0
@@ -77,3 +77,4 @@ export declare function forwardRefResolver(ref: Reference<ts.FunctionDeclaration
 export declare function combineResolvers(resolvers: ForeignFunctionResolver[]): ForeignFunctionResolver;
 export declare function isExpressionForwardReference(expr: Expression, context: ts.Node, contextSource: ts.SourceFile): boolean;
 export declare function isWrappedTsNodeExpr(expr: Expression): expr is WrappedNodeExpr<ts.Node>;
+export declare function readBaseClass(node: ClassDeclaration, reflector: ReflectionHost, evaluator: PartialEvaluator): Reference<ClassDeclaration> | 'dynamic' | null;

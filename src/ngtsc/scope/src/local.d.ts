@@ -8,8 +8,9 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/local" />
 import * as ts from 'typescript';
 import { AliasGenerator, Reexport, Reference, ReferenceEmitter } from '../../imports';
+import { DirectiveMeta, MetadataReader, MetadataRegistry, NgModuleMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
-import { ExportScope, ScopeData, ScopeDirective, ScopePipe } from './api';
+import { ExportScope, ScopeData } from './api';
 import { DtsModuleScopeResolver } from './dependency';
 export interface LocalNgModuleData {
     declarations: Reference<ClassDeclaration>[];
@@ -39,7 +40,8 @@ export interface LocalModuleScope extends ExportScope {
  * The `LocalModuleScopeRegistry` is also capable of producing `ts.Diagnostic` errors when Angular
  * semantics are violated.
  */
-export declare class LocalModuleScopeRegistry {
+export declare class LocalModuleScopeRegistry implements MetadataRegistry {
+    private localReader;
     private dependencyScopeReader;
     private refEmitter;
     private aliasGenerator;
@@ -50,18 +52,6 @@ export declare class LocalModuleScopeRegistry {
      */
     private sealed;
     /**
-     * Metadata for each local NgModule registered.
-     */
-    private ngModuleData;
-    /**
-     * Metadata for each local directive registered.
-     */
-    private directiveData;
-    /**
-     * Metadata for each local pipe registered.
-     */
-    private pipeData;
-    /**
      * A map of components from the current compilation unit to the NgModule which declared them.
      *
      * As components and directives are not distinguished at the NgModule level, this map may also
@@ -69,6 +59,7 @@ export declare class LocalModuleScopeRegistry {
      * a directive's compilation scope.
      */
     private declarationToModule;
+    private moduleToRef;
     /**
      * A cache of calculated `LocalModuleScope`s for each NgModule declared in the current program.
      *
@@ -89,13 +80,13 @@ export declare class LocalModuleScopeRegistry {
      * Tracks errors accumulated in the processing of scopes for each module declaration.
      */
     private scopeErrors;
-    constructor(dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasGenerator: AliasGenerator | null);
+    constructor(localReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasGenerator: AliasGenerator | null);
     /**
      * Add an NgModule's data to the registry.
      */
-    registerNgModule(clazz: ClassDeclaration, data: LocalNgModuleData): void;
-    registerDirective(directive: ScopeDirective): void;
-    registerPipe(pipe: ScopePipe): void;
+    registerNgModuleMetadata(data: NgModuleMeta): void;
+    registerDirectiveMetadata(directive: DirectiveMeta): void;
+    registerPipeMetadata(pipe: PipeMeta): void;
     getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
     /**
      * Collects registered data for a module and its directives/pipes and convert it into a full
