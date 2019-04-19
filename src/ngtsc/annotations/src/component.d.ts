@@ -9,6 +9,7 @@
 import { ConstantPool, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import { CycleAnalyzer } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, ReferenceEmitter } from '../../imports';
+import { MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
@@ -26,6 +27,8 @@ export interface ComponentHandlerData {
 export declare class ComponentDecoratorHandler implements DecoratorHandler<ComponentHandlerData, Decorator> {
     private reflector;
     private evaluator;
+    private metaRegistry;
+    private metaReader;
     private scopeRegistry;
     private isCore;
     private resourceLoader;
@@ -36,7 +39,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private cycleAnalyzer;
     private refEmitter;
     private defaultImportRecorder;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder);
     private literalCache;
     private boundTemplateCache;
     private elementSchemaRegistry;
