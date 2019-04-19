@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/api" />
 import { BoundTarget, DirectiveMeta } from '@angular/compiler';
+import * as ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
 /**
@@ -28,10 +29,7 @@ export interface TypeCheckBlockMetadata {
      * Semantic information about the template of the component.
      */
     boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
-    /**
-     * The name of the requested type check block function.
-     */
-    fnName: string;
+    pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>;
 }
 export interface TypeCtorMetadata {
     /**
@@ -50,4 +48,40 @@ export interface TypeCtorMetadata {
         outputs: string[];
         queries: string[];
     };
+}
+export interface TypeCheckingConfig {
+    /**
+     * Whether to check the left-hand side type of binding operations.
+     *
+     * For example, if this is `false` then the expression `[input]="expr"` will have `expr` type-
+     * checked, but not the assignment of the resulting type to the `input` property of whichever
+     * directive or component is receiving the binding. If set to `true`, both sides of the assignment
+     * are checked.
+     */
+    checkTypeOfBindings: boolean;
+    /**
+     * Whether to include type information from pipes in the type-checking operation.
+     *
+     * If this is `true`, then the pipe's type signature for `transform()` will be used to check the
+     * usage of the pipe. If this is `false`, then the result of applying a pipe will be `any`, and
+     * the types of the pipe's value and arguments will not be matched against the `transform()`
+     * method.
+     */
+    checkTypeOfPipes: boolean;
+    /**
+     * Whether to narrow the types of template contexts.
+     */
+    applyTemplateContextGuards: boolean;
+    /**
+     * Whether to use a strict type for null-safe navigation operations.
+     *
+     * If this is `false`, then the return type of `a?.b` or `a?()` will be `any`. If set to `true`,
+     * then the return type of `a?.b` for example will be the same as the type of the ternary
+     * expression `a != null ? a.b : a`.
+     */
+    strictSafeNavigationTypes: boolean;
+    /**
+     * Whether to descend into template bodies and check any bindings there.
+     */
+    checkTemplateBodies: boolean;
 }

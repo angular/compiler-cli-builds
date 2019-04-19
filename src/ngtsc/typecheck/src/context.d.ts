@@ -8,9 +8,10 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/context" />
 import { BoundTarget } from '@angular/compiler';
 import * as ts from 'typescript';
-import { ReferenceEmitter } from '../../imports';
+import { Reference, ReferenceEmitter } from '../../imports';
+import { AbsoluteFsPath } from '../../path';
 import { ClassDeclaration } from '../../reflection';
-import { TypeCheckableDirectiveMeta, TypeCtorMetadata } from './api';
+import { TypeCheckableDirectiveMeta, TypeCheckingConfig, TypeCtorMetadata } from './api';
 /**
  * A template type checking context for a program.
  *
@@ -19,13 +20,20 @@ import { TypeCheckableDirectiveMeta, TypeCtorMetadata } from './api';
  * checking code.
  */
 export declare class TypeCheckContext {
+    private config;
     private refEmitter;
-    constructor(refEmitter: ReferenceEmitter);
+    private typeCheckFile;
+    constructor(config: TypeCheckingConfig, refEmitter: ReferenceEmitter, typeCheckFilePath: AbsoluteFsPath);
     /**
      * A `Map` of `ts.SourceFile`s that the context has seen to the operations (additions of methods
      * or type-check blocks) that need to be eventually performed on that file.
      */
     private opMap;
+    /**
+     * Tracks when an a particular class has a pending type constructor patching operation already
+     * queued.
+     */
+    private typeCtorPending;
     /**
      * Record a template for the given component `node`, with a `SelectorMatcher` for directive
      * matching.
@@ -34,11 +42,11 @@ export declare class TypeCheckContext {
      * @param template AST nodes of the template being recorded.
      * @param matcher `SelectorMatcher` which tracks directives that are in scope for this template.
      */
-    addTemplate(node: ClassDeclaration<ts.ClassDeclaration>, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>): void;
+    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>): void;
     /**
      * Record a type constructor for the given `node` with the given `ctorMetadata`.
      */
-    addTypeCtor(sf: ts.SourceFile, node: ClassDeclaration<ts.ClassDeclaration>, ctorMeta: TypeCtorMetadata): void;
+    addInlineTypeCtor(sf: ts.SourceFile, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, ctorMeta: TypeCtorMetadata): void;
     /**
      * Transform a `ts.SourceFile` into a version that includes type checking code.
      *
@@ -48,5 +56,6 @@ export declare class TypeCheckContext {
      * added code has correct positional information associated with it.
      */
     transform(sf: ts.SourceFile): ts.SourceFile;
-    private addTypeCheckBlock;
+    calculateTemplateDiagnostics(originalProgram: ts.Program, originalHost: ts.CompilerHost, originalOptions: ts.CompilerOptions): ts.Diagnostic[];
+    private addInlineTypeCheckBlock;
 }
