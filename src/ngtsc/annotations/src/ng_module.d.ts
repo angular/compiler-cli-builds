@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
-import { R3InjectorMetadata, R3NgModuleMetadata, Statement } from '@angular/compiler';
+import { Expression, R3InjectorMetadata, R3NgModuleMetadata, Statement } from '@angular/compiler';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
@@ -21,7 +21,7 @@ export interface NgModuleAnalysis {
     metadataStmt: Statement | null;
     declarations: Reference<ClassDeclaration>[];
     exports: Reference<ClassDeclaration>[];
-    id: string | null;
+    id: Expression | null;
 }
 /**
  * Compiles @NgModule annotations to ngModuleDef fields.
