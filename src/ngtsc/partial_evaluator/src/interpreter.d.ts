@@ -51,6 +51,8 @@ export declare class StaticInterpreter {
     private visitPrefixUnaryExpression;
     private visitBinaryExpression;
     private visitParenthesizedExpression;
+    private evaluateFunctionArguments;
+    private visitSpreadElement;
     private stringNameFromPropertyName;
     private getReference;
 }

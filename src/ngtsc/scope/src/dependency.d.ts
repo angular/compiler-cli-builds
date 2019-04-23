@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/dependency" />
-import * as ts from 'typescript';
 import { AliasGenerator, Reference } from '../../imports';
-import { ClassDeclaration, ReflectionHost } from '../../reflection';
+import { MetadataReader } from '../../metadata';
+import { ClassDeclaration } from '../../reflection';
 import { ExportScope } from './api';
 export interface DtsModuleScopeResolver {
     resolve(ref: Reference<ClassDeclaration>): ExportScope | null;
@@ -21,14 +21,16 @@ export interface DtsModuleScopeResolver {
  * fields on directives, components, pipes, and NgModules.
  */
 export declare class MetadataDtsModuleScopeResolver implements DtsModuleScopeResolver {
-    private checker;
-    private reflector;
+    private dtsMetaReader;
     private aliasGenerator;
     /**
      * Cache which holds fully resolved scopes for NgModule classes from .d.ts files.
      */
     private cache;
-    constructor(checker: ts.TypeChecker, reflector: ReflectionHost, aliasGenerator: AliasGenerator | null);
+    /**
+     * @param dtsMetaReader a `MetadataReader` which can read metadata from `.d.ts` files.
+     */
+    constructor(dtsMetaReader: MetadataReader, aliasGenerator: AliasGenerator | null);
     /**
      * Resolve a `Reference`'d NgModule from a .d.ts file and produce a transitive `ExportScope`
      * listing the directives and pipes which that NgModule exports to others.
@@ -37,20 +39,5 @@ export declare class MetadataDtsModuleScopeResolver implements DtsModuleScopeRes
      * produced depend on how the original NgModule was imported.
      */
     resolve(ref: Reference<ClassDeclaration>): ExportScope | null;
-    /**
-     * Read the metadata from a class that has already been compiled somehow (either it's in a .d.ts
-     * file, or in a .ts file with a handwritten definition).
-     *
-     * @param ref `Reference` to the class of interest, with the context of how it was obtained.
-     */
-    private readModuleMetadataFromClass;
-    /**
-     * Read directive (or component) metadata from a referenced class in a .d.ts file.
-     */
-    private readScopeDirectiveFromClassWithDef;
-    /**
-     * Read pipe metadata from a referenced class in a .d.ts file.
-     */
-    private readScopePipeFromClassWithDef;
     private maybeAlias;
 }
