@@ -95,7 +95,7 @@ export declare abstract class Renderer {
     protected abstract addImports(output: MagicString, imports: {
         specifier: string;
         qualifier: string;
-    }[]): void;
+    }[], sf: ts.SourceFile): void;
     protected abstract addExports(output: MagicString, entryPointBasePath: string, exports: ExportInfo[]): void;
     protected abstract addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: RedundantDecoratorMap): void;
