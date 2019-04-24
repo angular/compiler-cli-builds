@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/base_def" />
-import { R3BaseRefMetaData } from '@angular/compiler';
+import { ConstantPool, R3BaseRefMetaData } from '@angular/compiler';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../reflection';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
@@ -18,7 +18,7 @@ export declare class BaseDefDecoratorHandler implements DecoratorHandler<R3BaseR
     readonly precedence = HandlerPrecedence.WEAK;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<R3BaseRefDecoratorDetection> | undefined;
     analyze(node: ClassDeclaration, metadata: R3BaseRefDecoratorDetection): AnalysisOutput<R3BaseRefMetaData>;
-    compile(node: ClassDeclaration, analysis: R3BaseRefMetaData): CompileResult[] | CompileResult;
+    compile(node: ClassDeclaration, analysis: R3BaseRefMetaData, pool: ConstantPool): CompileResult[] | CompileResult;
 }
 export interface R3BaseRefDecoratorDetection {
     inputs?: Array<{
@@ -29,4 +29,12 @@ export interface R3BaseRefDecoratorDetection {
         property: ClassMember;
         decorator: Decorator;
     }>;
+    viewQueries?: {
+        member: ClassMember;
+        decorators: Decorator[];
+    }[];
+    queries?: {
+        member: ClassMember;
+        decorators: Decorator[];
+    }[];
 }
