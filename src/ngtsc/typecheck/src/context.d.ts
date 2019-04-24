@@ -56,6 +56,9 @@ export declare class TypeCheckContext {
      * added code has correct positional information associated with it.
      */
     transform(sf: ts.SourceFile): ts.SourceFile;
-    calculateTemplateDiagnostics(originalProgram: ts.Program, originalHost: ts.CompilerHost, originalOptions: ts.CompilerOptions): ts.Diagnostic[];
+    calculateTemplateDiagnostics(originalProgram: ts.Program, originalHost: ts.CompilerHost, originalOptions: ts.CompilerOptions): {
+        diagnostics: ts.Diagnostic[];
+        program: ts.Program;
+    };
     private addInlineTypeCheckBlock;
 }
