@@ -15,6 +15,7 @@ import { Reference } from './imports';
 export declare class NgtscProgram implements api.Program {
     private options;
     private tsProgram;
+    private reuseTsProgram;
     private resourceManager;
     private compilation;
     private factoryToSourceInfo;
@@ -41,7 +42,7 @@ export declare class NgtscProgram implements api.Program {
     private perfTracker;
     private incrementalState;
     private typeCheckFilePath;
-    constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: api.Program);
+    constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: NgtscProgram);
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
     getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
