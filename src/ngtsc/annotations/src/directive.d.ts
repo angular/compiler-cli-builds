@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/directive" />
-import { ConstantPool, R3DirectiveMetadata, R3QueryMetadata, Statement } from '@angular/compiler';
+import { ConstantPool, ParsedHostBindings, R3DirectiveMetadata, R3QueryMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder } from '../../imports';
 import { MetadataRegistry } from '../../metadata';
@@ -47,3 +47,4 @@ export declare function queriesFromFields(fields: {
     member: ClassMember;
     decorators: Decorator[];
 }[], reflector: ReflectionHost, evaluator: PartialEvaluator): R3QueryMetadata[];
+export declare function extractHostBindings(members: ClassMember[], evaluator: PartialEvaluator, coreModule: string | undefined, metadata?: Map<string, ts.Expression>): ParsedHostBindings;
