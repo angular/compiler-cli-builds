@@ -21,14 +21,14 @@ export declare class BaseDefDecoratorHandler implements DecoratorHandler<R3BaseR
     compile(node: ClassDeclaration, analysis: R3BaseRefMetaData, pool: ConstantPool): CompileResult[] | CompileResult;
 }
 export interface R3BaseRefDecoratorDetection {
-    inputs?: Array<{
+    inputs?: {
         property: ClassMember;
         decorator: Decorator;
-    }>;
-    outputs?: Array<{
+    }[];
+    outputs?: {
         property: ClassMember;
         decorator: Decorator;
-    }>;
+    }[];
     viewQueries?: {
         member: ClassMember;
         decorators: Decorator[];
@@ -37,4 +37,5 @@ export interface R3BaseRefDecoratorDetection {
         member: ClassMember;
         decorators: Decorator[];
     }[];
+    host?: ClassMember[];
 }
