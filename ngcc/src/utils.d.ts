@@ -25,3 +25,15 @@ export declare function findAll<T>(node: ts.Node, test: (node: ts.Node) => node 
 export declare function hasNameIdentifier(declaration: ts.Declaration): declaration is ts.Declaration & {
     name: ts.Identifier;
 };
+export declare type PathMappings = {
+    baseUrl: string;
+    paths: {
+        [key: string]: string[];
+    };
+};
+/**
+ * Test whether a path is "relative".
+ *
+ * Relative paths start with `/`, `./` or `../`; or are simply `.` or `..`.
+ */
+export declare function isRelativePath(path: string): boolean;

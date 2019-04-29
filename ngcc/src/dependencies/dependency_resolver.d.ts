@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/dependency_resolver" />
+/// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/dependency_resolver" />
 import { Logger } from '../logging/logger';
+import { EntryPoint } from '../packages/entry_point';
 import { DependencyHost } from './dependency_host';
-import { EntryPoint } from './entry_point';
 /**
  * Holds information about entry points that are removed because
  * they have dependencies that are missing (directly or transitively).
@@ -39,6 +39,10 @@ export interface IgnoredDependency {
     entryPoint: EntryPoint;
     dependencyPath: string;
 }
+export interface DependencyDiagnostics {
+    invalidEntryPoints: InvalidEntryPoint[];
+    ignoredDependencies: IgnoredDependency[];
+}
 /**
  * A list of entry-points, sorted by their dependencies.
  *
@@ -48,10 +52,8 @@ export interface IgnoredDependency {
  * Some entry points or their dependencies may be have been ignored. These are captured for
  * diagnostic purposes in `invalidEntryPoints` and `ignoredDependencies` respectively.
  */
-export interface SortedEntryPointsInfo {
+export interface SortedEntryPointsInfo extends DependencyDiagnostics {
     entryPoints: EntryPoint[];
-    invalidEntryPoints: InvalidEntryPoint[];
-    ignoredDependencies: IgnoredDependency[];
 }
 /**
  * A class that resolves dependencies between entry-points.
@@ -74,5 +76,5 @@ export declare class DependencyResolver {
      * The graph only holds entry-points that ngcc cares about and whose dependencies
      * (direct and transitive) all exist.
      */
-    private createDependencyInfo;
+    private computeDependencyGraph;
 }
