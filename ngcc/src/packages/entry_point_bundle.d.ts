@@ -1,5 +1,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point_bundle" />
 import { AbsoluteFsPath } from '../../../src/ngtsc/path';
+import { FileSystem } from '../file_system/file_system';
+import { PathMappings } from '../utils';
 import { BundleProgram } from './bundle_program';
 import { EntryPointFormat, EntryPointJsonProperty } from './entry_point';
 /**
@@ -24,4 +26,4 @@ export interface EntryPointBundle {
  * @param format The underlying format of the bundle.
  * @param transformDts Whether to transform the typings along with this bundle.
  */
-export declare function makeEntryPointBundle(entryPointPath: string, formatPath: string, typingsPath: string, isCore: boolean, formatProperty: EntryPointJsonProperty, format: EntryPointFormat, transformDts: boolean): EntryPointBundle | null;
+export declare function makeEntryPointBundle(fs: FileSystem, entryPointPath: string, formatPath: string, typingsPath: string, isCore: boolean, formatProperty: EntryPointJsonProperty, format: EntryPointFormat, transformDts: boolean, pathMappings?: PathMappings): EntryPointBundle | null;

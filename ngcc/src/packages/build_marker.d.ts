@@ -7,8 +7,9 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/build_marker" />
 import { AbsoluteFsPath } from '../../../src/ngtsc/path';
+import { FileSystem } from '../file_system/file_system';
 import { EntryPointJsonProperty, EntryPointPackageJson } from './entry_point';
-export declare const NGCC_VERSION = "8.0.0-rc.0+11.sha-6c86ae7.with-local-changes";
+export declare const NGCC_VERSION = "8.0.0-rc.0+66.sha-68ff2cc.with-local-changes";
 /**
  * Check whether ngcc has already processed a given entry-point format.
  *
@@ -29,4 +30,4 @@ export declare function hasBeenProcessed(packageJson: EntryPointPackageJson, for
  * @param entryPoint the entry-point to write a marker.
  * @param format the property in the package.json of the format for which we are writing the marker.
  */
-export declare function markAsProcessed(packageJson: EntryPointPackageJson, packageJsonPath: AbsoluteFsPath, format: EntryPointJsonProperty): void;
+export declare function markAsProcessed(fs: FileSystem, packageJson: EntryPointPackageJson, packageJsonPath: AbsoluteFsPath, format: EntryPointJsonProperty): void;

@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,8 +6,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point" />
 import { AbsoluteFsPath } from '../../../src/ngtsc/path';
+import { FileSystem } from '../file_system/file_system';
 import { Logger } from '../logging/logger';
 /**
  * The possible values for the format of an entry-point.
@@ -27,6 +28,8 @@ export interface EntryPoint {
     path: AbsoluteFsPath;
     /** The path to a typings (.d.ts) file for this entry-point. */
     typings: AbsoluteFsPath;
+    /** Is this EntryPoint compiled with the Angular View Engine compiler? */
+    compiledByAngular: boolean;
 }
 interface PackageJsonFormatProperties {
     fesm2015?: string;
@@ -57,7 +60,7 @@ export declare const SUPPORTED_FORMAT_PROPERTIES: EntryPointJsonProperty[];
  * @param entryPointPath the absolute path to the potential entry-point.
  * @returns An entry-point if it is valid, `null` otherwise.
  */
-export declare function getEntryPointInfo(logger: Logger, packagePath: AbsoluteFsPath, entryPointPath: AbsoluteFsPath): EntryPoint | null;
+export declare function getEntryPointInfo(fs: FileSystem, logger: Logger, packagePath: AbsoluteFsPath, entryPointPath: AbsoluteFsPath): EntryPoint | null;
 /**
  * Convert a package.json property into an entry-point format.
  *

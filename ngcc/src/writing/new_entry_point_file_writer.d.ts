@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/ngcc/src/writing/new_entry_point_file_writer" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,7 +6,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/writing/new_entry_point_file_writer" />
 import { AbsoluteFsPath } from '../../../src/ngtsc/path';
 import { EntryPoint, EntryPointJsonProperty } from '../packages/entry_point';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
