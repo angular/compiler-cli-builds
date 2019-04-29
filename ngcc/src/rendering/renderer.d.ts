@@ -11,15 +11,17 @@ import { SourceMapConverter } from 'convert-source-map';
 import MagicString from 'magic-string';
 import { RawSourceMap } from 'source-map';
 import * as ts from 'typescript';
-import { CompileResult } from '@angular/compiler-cli/src/ngtsc/transform';
+import { AbsoluteFsPath } from '../../../src/ngtsc/path';
+import { CompileResult } from '../../../src/ngtsc/transform';
 import { ImportManager } from '../../../src/ngtsc/translator';
 import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/decoration_analyzer';
 import { ModuleWithProvidersInfo, ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
 import { PrivateDeclarationsAnalyses, ExportInfo } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
+import { FileSystem } from '../file_system/file_system';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
-import { EntryPointBundle } from '../packages/entry_point_bundle';
 import { Logger } from '../logging/logger';
+import { EntryPointBundle } from '../packages/entry_point_bundle';
 interface SourceMapInfo {
     source: string;
     map: SourceMapConverter | null;
@@ -32,7 +34,7 @@ export interface FileInfo {
     /**
      * Path to where the file should be written.
      */
-    path: string;
+    path: AbsoluteFsPath;
     /**
      * The contents of the file to be be written.
      */
@@ -69,12 +71,12 @@ export declare const RedundantDecoratorMap: MapConstructor;
  * implement the `addImports`, `addDefinitions` and `removeDecorators` abstract methods.
  */
 export declare abstract class Renderer {
+    protected fs: FileSystem;
     protected logger: Logger;
     protected host: NgccReflectionHost;
     protected isCore: boolean;
     protected bundle: EntryPointBundle;
-    protected sourcePath: string;
-    constructor(logger: Logger, host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle, sourcePath: string);
+    constructor(fs: FileSystem, logger: Logger, host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle);
     renderProgram(decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses, moduleWithProvidersAnalyses: ModuleWithProvidersAnalyses | null): FileInfo[];
     /**
      * Render the source code and source-map for an Analyzed file.
@@ -96,7 +98,7 @@ export declare abstract class Renderer {
         specifier: string;
         qualifier: string;
     }[], sf: ts.SourceFile): void;
-    protected abstract addExports(output: MagicString, entryPointBasePath: string, exports: ExportInfo[]): void;
+    protected abstract addExports(output: MagicString, entryPointBasePath: AbsoluteFsPath, exports: ExportInfo[]): void;
     protected abstract addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: RedundantDecoratorMap): void;
     protected abstract rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile, declarations: SwitchableVariableDeclaration[]): void;
@@ -155,5 +157,5 @@ export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPo
  * @param imports An object that tracks the imports that are needed by the rendered definitions.
  */
 export declare function renderDefinitions(sourceFile: ts.SourceFile, compiledClass: CompiledClass, imports: ImportManager): string;
-export declare function stripExtension(filePath: string): string;
+export declare function stripExtension<T extends string>(filePath: T): T;
 export {};

@@ -16,6 +16,7 @@ import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
 import { AbsoluteFsPath } from '../../../src/ngtsc/path';
 import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver } from '../../../src/ngtsc/scope';
 import { CompileResult, DecoratorHandler } from '../../../src/ngtsc/transform';
+import { FileSystem } from '../file_system/file_system';
 import { DecoratedClass } from '../host/decorated_class';
 import { NgccReflectionHost } from '../host/ngcc_host';
 export interface AnalyzedFile {
@@ -47,6 +48,8 @@ export interface MatchingHandler<A, M> {
  * Simple class that resolves and loads files directly from the filesystem.
  */
 declare class NgccResourceLoader implements ResourceLoader {
+    private fs;
+    constructor(fs: FileSystem);
     canPreload: boolean;
     preload(): undefined | Promise<void>;
     load(url: string): string;
@@ -56,6 +59,7 @@ declare class NgccResourceLoader implements ResourceLoader {
  * This Analyzer will analyze the files that have decorated classes that need to be transformed.
  */
 export declare class DecorationAnalyzer {
+    private fs;
     private program;
     private options;
     private host;
@@ -77,7 +81,7 @@ export declare class DecorationAnalyzer {
     importGraph: ImportGraph;
     cycleAnalyzer: CycleAnalyzer;
     handlers: DecoratorHandler<any, any>[];
-    constructor(program: ts.Program, options: ts.CompilerOptions, host: ts.CompilerHost, typeChecker: ts.TypeChecker, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, rootDirs: AbsoluteFsPath[], isCore: boolean);
+    constructor(fs: FileSystem, program: ts.Program, options: ts.CompilerOptions, host: ts.CompilerHost, typeChecker: ts.TypeChecker, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, rootDirs: AbsoluteFsPath[], isCore: boolean);
     /**
      * Analyze a program to find all the decorated files should be transformed.
      *

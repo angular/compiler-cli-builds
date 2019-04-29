@@ -1,10 +1,3 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/path/src/types" />
 import * as ts from 'typescript';
 /**
@@ -45,6 +38,18 @@ export declare const AbsoluteFsPath: {
      * their file path in absolute POSIX format.
      */
     fromSourceFile: (sf: ts.SourceFile) => BrandedPath<"AbsoluteFsPath">;
+    /**
+     * Wrapper around `path.dirname` that returns an absolute path.
+     */
+    dirname: (file: BrandedPath<"AbsoluteFsPath">) => BrandedPath<"AbsoluteFsPath">;
+    /**
+     * Wrapper around `path.join` that returns an absolute path.
+     */
+    join: (basePath: BrandedPath<"AbsoluteFsPath">, ...paths: string[]) => BrandedPath<"AbsoluteFsPath">;
+    /**
+     * Wrapper around `path.resolve` that returns an absolute paths.
+     */
+    resolve: (basePath: string, ...paths: string[]) => BrandedPath<"AbsoluteFsPath">;
 };
 /**
  * Contains utility functions for creating and manipulating `PathSegment`s.
@@ -58,4 +63,9 @@ export declare const PathSegment: {
      * Convert the path `str` to a `PathSegment`, while assuming that `str` is already normalized.
      */
     fromUnchecked: (str: string) => BrandedPath<"PathSegment">;
+    /**
+     * Wrapper around `path.relative` that returns a `PathSegment`.
+     */
+    relative: (from: BrandedPath<"AbsoluteFsPath">, to: BrandedPath<"AbsoluteFsPath">) => BrandedPath<"PathSegment">;
+    basename: (filePath: string, extension?: string | undefined) => BrandedPath<"PathSegment">;
 };

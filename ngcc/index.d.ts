@@ -9,4 +9,5 @@
 export { ConsoleLogger, LogLevel } from './src/logging/console_logger';
 export { Logger } from './src/logging/logger';
 export { NgccOptions, mainNgcc as process } from './src/main';
+export { PathMappings } from './src/utils';
 export declare function hasBeenProcessed(packageJson: object, format: string): boolean;

@@ -1,12 +1,6 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/main" />
 import { Logger } from './logging/logger';
+import { PathMappings } from './utils';
 /**
  * The options to configure the ngcc compiler.
  */
@@ -38,6 +32,11 @@ export interface NgccOptions {
      * Provide a logger that will be called with log messages.
      */
     logger?: Logger;
+    /**
+     * Paths mapping configuration (`paths` and `baseUrl`), as found in `ts.CompilerOptions`.
+     * These are used to resolve paths to locally built Angular libraries.
+     */
+    pathMappings?: PathMappings;
 }
 /**
  * This is the main entry-point into ngcc (aNGular Compatibility Compiler).
@@ -47,4 +46,4 @@ export interface NgccOptions {
  *
  * @param options The options telling ngcc what to compile and how.
  */
-export declare function mainNgcc({ basePath, targetEntryPointPath, propertiesToConsider, compileAllFormats, createNewEntryPointFormats, logger }: NgccOptions): void;
+export declare function mainNgcc({ basePath, targetEntryPointPath, propertiesToConsider, compileAllFormats, createNewEntryPointFormats, logger, pathMappings }: NgccOptions): void;

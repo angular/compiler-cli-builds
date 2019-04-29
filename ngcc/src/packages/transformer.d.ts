@@ -11,6 +11,7 @@ import { CompiledFile } from '../analysis/decoration_analyzer';
 import { ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses } from '../analysis/switch_marker_analyzer';
+import { FileSystem } from '../file_system/file_system';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { Logger } from '../logging/logger';
 import { FileInfo, Renderer } from '../rendering/renderer';
@@ -37,9 +38,9 @@ import { EntryPointBundle } from './entry_point_bundle';
  * - Some formats may contain multiple "modules" in a single file.
  */
 export declare class Transformer {
+    private fs;
     private logger;
-    private sourcePath;
-    constructor(logger: Logger, sourcePath: string);
+    constructor(fs: FileSystem, logger: Logger);
     /**
      * Transform the source (and typings) files of a bundle.
      * @param bundle the bundle to transform.

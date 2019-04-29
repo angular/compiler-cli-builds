@@ -1,5 +1,14 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/bundle_program" />
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../../../src/ngtsc/path';
+import { FileSystem } from '../file_system/file_system';
 /**
 * An entry point bundle contains one or two programs, e.g. `src` and `dts`,
 * that are compiled via TypeScript.
@@ -12,16 +21,16 @@ export interface BundleProgram {
     program: ts.Program;
     options: ts.CompilerOptions;
     host: ts.CompilerHost;
-    path: string;
+    path: AbsoluteFsPath;
     file: ts.SourceFile;
-    r3SymbolsPath: string | null;
+    r3SymbolsPath: AbsoluteFsPath | null;
     r3SymbolsFile: ts.SourceFile | null;
 }
 /**
  * Create a bundle program.
  */
-export declare function makeBundleProgram(isCore: boolean, path: string, r3FileName: string, options: ts.CompilerOptions, host: ts.CompilerHost): BundleProgram;
+export declare function makeBundleProgram(fs: FileSystem, isCore: boolean, path: AbsoluteFsPath, r3FileName: string, options: ts.CompilerOptions, host: ts.CompilerHost): BundleProgram;
 /**
  * Search the given directory hierarchy to find the path to the `r3_symbols` file.
  */
-export declare function findR3SymbolsPath(directory: string, filename: string): string | null;
+export declare function findR3SymbolsPath(fs: FileSystem, directory: AbsoluteFsPath, filename: string): AbsoluteFsPath | null;
