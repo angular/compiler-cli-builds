@@ -22,3 +22,10 @@ export declare function isDeclaration(node: ts.Node): node is ts.Declaration;
 export declare function isExported(node: ts.Declaration): boolean;
 export declare function getRootDirs(host: ts.CompilerHost, options: ts.CompilerOptions): AbsoluteFsPath[];
 export declare function nodeDebugInfo(node: ts.Node): string;
+/**
+ * Resolve the specified `moduleName` using the given `compilerOptions` and `compilerHost`.
+ *
+ * This helper will attempt to use the `CompilerHost.resolveModuleNames()` method if available.
+ * Otherwise it will fallback on the `ts.ResolveModuleName()` function.
+ */
+export declare function resolveModuleName(moduleName: string, containingFile: string, compilerOptions: ts.CompilerOptions, compilerHost: ts.CompilerHost): ts.ResolvedModule | undefined;
