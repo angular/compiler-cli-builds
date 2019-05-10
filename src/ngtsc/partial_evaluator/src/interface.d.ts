@@ -10,11 +10,18 @@ import * as ts from 'typescript';
 import { Reference } from '../../imports';
 import { ReflectionHost } from '../../reflection';
 import { ResolvedValue } from './result';
+/**
+ * Implement this interface to record dependency relations between
+ * source files.
+ */
+export interface DependencyTracker {
+    trackFileDependency(dep: ts.SourceFile, src: ts.SourceFile): void;
+}
 export declare type ForeignFunctionResolver = (node: Reference<ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>, args: ReadonlyArray<ts.Expression>) => ts.Expression | null;
-export declare type VisitedFilesCallback = (sf: ts.SourceFile) => void;
 export declare class PartialEvaluator {
     private host;
     private checker;
-    constructor(host: ReflectionHost, checker: ts.TypeChecker);
-    evaluate(expr: ts.Expression, foreignFunctionResolver?: ForeignFunctionResolver, visitedFilesCb?: VisitedFilesCallback): ResolvedValue;
+    private dependencyTracker?;
+    constructor(host: ReflectionHost, checker: ts.TypeChecker, dependencyTracker?: DependencyTracker | undefined);
+    evaluate(expr: ts.Expression, foreignFunctionResolver?: ForeignFunctionResolver): ResolvedValue;
 }
