@@ -12,6 +12,7 @@ import { ImportRewriter } from '../../imports';
 import { IncrementalState } from '../../incremental';
 import { PerfRecorder } from '../../perf';
 import { ReflectionHost } from '../../reflection';
+import { LocalModuleScopeRegistry } from '../../scope';
 import { TypeCheckContext } from '../../typecheck';
 import { CompileResult, DecoratorHandler } from './api';
 /**
@@ -22,12 +23,12 @@ import { CompileResult, DecoratorHandler } from './api';
  */
 export declare class IvyCompilation {
     private handlers;
-    private checker;
     private reflector;
     private importRewriter;
     private incrementalState;
     private perf;
     private sourceToFactorySymbols;
+    private scopeRegistry;
     /**
      * Tracks classes which have been analyzed and found to have an Ivy decorator, and the
      * information recorded about them for later compilation.
@@ -51,7 +52,7 @@ export declare class IvyCompilation {
      * when compiling @angular/core, or `null` if the current program is not @angular/core. This is
      * `null` in most cases.
      */
-    constructor(handlers: DecoratorHandler<any, any>[], checker: ts.TypeChecker, reflector: ReflectionHost, importRewriter: ImportRewriter, incrementalState: IncrementalState, perf: PerfRecorder, sourceToFactorySymbols: Map<string, Set<string>> | null);
+    constructor(handlers: DecoratorHandler<any, any>[], reflector: ReflectionHost, importRewriter: ImportRewriter, incrementalState: IncrementalState, perf: PerfRecorder, sourceToFactorySymbols: Map<string, Set<string>> | null, scopeRegistry: LocalModuleScopeRegistry);
     readonly exportStatements: Map<string, Map<string, [string, string]>>;
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
@@ -61,6 +62,7 @@ export declare class IvyCompilation {
      */
     private analyze;
     resolve(): void;
+    private recordNgModuleScopeDependencies;
     typeCheck(context: TypeCheckContext): void;
     /**
      * Perform a compilation operation on the given class declaration and return instructions to an

@@ -22,6 +22,15 @@ export interface LocalModuleScope extends ExportScope {
     reexports: Reexport[] | null;
 }
 /**
+ * Information about the compilation scope of a registered declaration.
+ */
+export interface CompilationScope extends ScopeData {
+    /** The declaration whose compilation scope is described here. */
+    declaration: ClassDeclaration;
+    /** The declaration of the NgModule that declares this `declaration`. */
+    ngModule: ClassDeclaration;
+}
+/**
  * A registry which collects information about NgModules, Directives, Components, and Pipes which
  * are local (declared in the ts.Program being compiled), and can produce `LocalModuleScope`s
  * which summarize the compilation scope of a component.
@@ -103,10 +112,17 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry {
      */
     getDiagnosticsOfModule(clazz: ClassDeclaration): ts.Diagnostic[] | null;
     /**
-     * Implementation of `getScopeOfModule` which differentiates between no scope being available
-     * (returns `null`) and a scope being produced with errors (returns `undefined`).
+     * Returns a collection of the compilation scope for each registered declaration.
      */
-    private getScopeOfModuleInternal;
+    getCompilationScopes(): CompilationScope[];
+    /**
+     * Implementation of `getScopeOfModule` which accepts a reference to a class and differentiates
+     * between:
+     *
+     * * no scope being available (returns `null`)
+     * * a scope being produced with errors (returns `undefined`).
+     */
+    private getScopeOfModuleReference;
     /**
      * Check whether a component requires remote scoping.
      */
@@ -121,8 +137,10 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry {
      * The NgModule in question may be declared locally in the current ts.Program, or it may be
      * declared in a .d.ts file.
      *
-     * This function will return `null` if no scope could be found, or `undefined` if an invalid scope
-     * was found. It can also contribute diagnostics of its own by adding to the given `diagnostics`
+     * @returns `null` if no scope could be found, or `undefined` if an invalid scope
+     * was found.
+     *
+     * May also contribute diagnostics of its own by adding to the given `diagnostics`
      * array parameter.
      */
     private getExportedScope;
