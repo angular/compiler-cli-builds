@@ -41,7 +41,6 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private defaultImportRecorder;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder);
     private literalCache;
-    private boundTemplateCache;
     private elementSchemaRegistry;
     /**
      * During the asynchronous preanalyze phase, it's necessary to parse the template to extract
