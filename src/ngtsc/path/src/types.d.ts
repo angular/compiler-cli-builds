@@ -50,6 +50,8 @@ export declare const AbsoluteFsPath: {
      * Wrapper around `path.resolve` that returns an absolute paths.
      */
     resolve: (basePath: string, ...paths: string[]) => BrandedPath<"AbsoluteFsPath">;
+    /** Returns true when the path provided is the root path. */
+    isRoot: (path: BrandedPath<"AbsoluteFsPath">) => boolean;
 };
 /**
  * Contains utility functions for creating and manipulating `PathSegment`s.
