@@ -15,20 +15,33 @@ export declare class Context {
     readonly withExpressionMode: Context;
     readonly withStatementMode: Context;
 }
+/**
+ * Information about an import that has been added to a module.
+ */
+export interface Import {
+    /** The name of the module that has been imported. */
+    specifier: string;
+    /** The alias of the imported module. */
+    qualifier: string;
+}
+/**
+ * The symbol name and import namespace of an imported symbol,
+ * which has been registered through the ImportManager.
+ */
+export interface NamedImport {
+    /** The import namespace containing this imported symbol. */
+    moduleImport: string | null;
+    /** The (possibly rewritten) name of the imported symbol. */
+    symbol: string;
+}
 export declare class ImportManager {
     protected rewriter: ImportRewriter;
     private prefix;
     private specifierToIdentifier;
     private nextIndex;
     constructor(rewriter?: ImportRewriter, prefix?: string);
-    generateNamedImport(moduleName: string, originalSymbol: string): {
-        moduleImport: string | null;
-        symbol: string;
-    };
-    getAllImports(contextPath: string): {
-        specifier: string;
-        qualifier: string;
-    }[];
+    generateNamedImport(moduleName: string, originalSymbol: string): NamedImport;
+    getAllImports(contextPath: string): Import[];
 }
 export declare function translateExpression(expression: Expression, imports: ImportManager, defaultImportRecorder: DefaultImportRecorder): ts.Expression;
 export declare function translateStatement(statement: Statement, imports: ImportManager, defaultImportRecorder: DefaultImportRecorder): ts.Statement;
