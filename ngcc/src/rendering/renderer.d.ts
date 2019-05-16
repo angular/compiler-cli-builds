@@ -13,7 +13,7 @@ import { RawSourceMap } from 'source-map';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../../src/ngtsc/path';
 import { CompileResult } from '../../../src/ngtsc/transform';
-import { ImportManager } from '../../../src/ngtsc/translator';
+import { Import, ImportManager } from '../../../src/ngtsc/translator';
 import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/decoration_analyzer';
 import { ModuleWithProvidersInfo, ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
 import { PrivateDeclarationsAnalyses, ExportInfo } from '../analysis/private_declarations_analyzer';
@@ -94,10 +94,7 @@ export declare abstract class Renderer {
      */
     protected addModuleWithProvidersParams(outputText: MagicString, moduleWithProviders: ModuleWithProvidersInfo[], importManager: ImportManager): void;
     protected abstract addConstants(output: MagicString, constants: string, file: ts.SourceFile): void;
-    protected abstract addImports(output: MagicString, imports: {
-        specifier: string;
-        qualifier: string;
-    }[], sf: ts.SourceFile): void;
+    protected abstract addImports(output: MagicString, imports: Import[], sf: ts.SourceFile): void;
     protected abstract addExports(output: MagicString, entryPointBasePath: AbsoluteFsPath, exports: ExportInfo[]): void;
     protected abstract addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
     protected abstract removeDecorators(output: MagicString, decoratorsToRemove: RedundantDecoratorMap): void;
