@@ -14,7 +14,8 @@ import { SwitchMarkerAnalyses } from '../analysis/switch_marker_analyzer';
 import { FileSystem } from '../file_system/file_system';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { Logger } from '../logging/logger';
-import { FileInfo, Renderer } from '../rendering/renderer';
+import { RenderingFormatter } from '../rendering/rendering_formatter';
+import { FileToWrite } from '../rendering/utils';
 import { EntryPointBundle } from './entry_point_bundle';
 /**
  * A Package is stored in a directory on disk and that directory can contain one or more package
@@ -46,9 +47,9 @@ export declare class Transformer {
      * @param bundle the bundle to transform.
      * @returns information about the files that were transformed.
      */
-    transform(bundle: EntryPointBundle): FileInfo[];
+    transform(bundle: EntryPointBundle): FileToWrite[];
     getHost(isCore: boolean, bundle: EntryPointBundle): NgccReflectionHost;
-    getRenderer(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): Renderer;
+    getRenderingFormatter(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): RenderingFormatter;
     analyzeProgram(reflectionHost: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): ProgramAnalyses;
 }
 interface ProgramAnalyses {
