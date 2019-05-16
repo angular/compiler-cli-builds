@@ -28,7 +28,8 @@ export declare const enum DynamicValueReason {
     DYNAMIC_STRING = 1,
     /**
      * An external reference could not be resolved to a value which can be evaluated.
-     * (E.g. a call expression for a function declared in `.d.ts`.)
+     * For example a call expression for a function declared in `.d.ts`, or accessing native globals
+     * such as `window`.
      */
     EXTERNAL_REFERENCE = 2,
     /**
