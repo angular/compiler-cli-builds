@@ -9,7 +9,7 @@
 import { AbsoluteFsPath } from '../../../src/ngtsc/path';
 import { EntryPoint, EntryPointJsonProperty } from '../packages/entry_point';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
-import { FileInfo } from '../rendering/renderer';
+import { FileToWrite } from '../rendering/utils';
 import { InPlaceFileWriter } from './in_place_file_writer';
 /**
  * This FileWriter creates a copy of the original entry-point, then writes the transformed
@@ -20,8 +20,8 @@ import { InPlaceFileWriter } from './in_place_file_writer';
  * `InPlaceFileWriter`).
  */
 export declare class NewEntryPointFileWriter extends InPlaceFileWriter {
-    writeBundle(entryPoint: EntryPoint, bundle: EntryPointBundle, transformedFiles: FileInfo[]): void;
+    writeBundle(entryPoint: EntryPoint, bundle: EntryPointBundle, transformedFiles: FileToWrite[]): void;
     protected copyBundle(bundle: EntryPointBundle, packagePath: AbsoluteFsPath, ngccFolder: AbsoluteFsPath): void;
-    protected writeFile(file: FileInfo, packagePath: AbsoluteFsPath, ngccFolder: AbsoluteFsPath): void;
+    protected writeFile(file: FileToWrite, packagePath: AbsoluteFsPath, ngccFolder: AbsoluteFsPath): void;
     protected updatePackageJson(entryPoint: EntryPoint, formatProperty: EntryPointJsonProperty, ngccFolder: AbsoluteFsPath): void;
 }
