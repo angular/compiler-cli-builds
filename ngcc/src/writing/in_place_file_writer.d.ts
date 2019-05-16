@@ -2,7 +2,7 @@
 import { FileSystem } from '../file_system/file_system';
 import { EntryPoint } from '../packages/entry_point';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
-import { FileToWrite } from '../rendering/utils';
+import { FileInfo } from '../rendering/renderer';
 import { FileWriter } from './file_writer';
 /**
  * This FileWriter overwrites the transformed file, in-place, while creating
@@ -11,6 +11,6 @@ import { FileWriter } from './file_writer';
 export declare class InPlaceFileWriter implements FileWriter {
     protected fs: FileSystem;
     constructor(fs: FileSystem);
-    writeBundle(_entryPoint: EntryPoint, _bundle: EntryPointBundle, transformedFiles: FileToWrite[]): void;
-    protected writeFileAndBackup(file: FileToWrite): void;
+    writeBundle(_entryPoint: EntryPoint, _bundle: EntryPointBundle, transformedFiles: FileInfo[]): void;
+    protected writeFileAndBackup(file: FileInfo): void;
 }

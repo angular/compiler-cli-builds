@@ -8,10 +8,10 @@
  */
 import { EntryPoint } from '../packages/entry_point';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
-import { FileToWrite } from '../rendering/utils';
+import { FileInfo } from '../rendering/renderer';
 /**
  * Responsible for writing out the transformed files to disk.
  */
 export interface FileWriter {
-    writeBundle(entryPoint: EntryPoint, bundle: EntryPointBundle, transformedFiles: FileToWrite[]): void;
+    writeBundle(entryPoint: EntryPoint, bundle: EntryPointBundle, transformedFiles: FileInfo[]): void;
 }

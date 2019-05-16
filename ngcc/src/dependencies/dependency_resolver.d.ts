@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/dependency_resolver" />
 import { Logger } from '../logging/logger';
-import { EntryPoint, EntryPointFormat } from '../packages/entry_point';
+import { EntryPoint } from '../packages/entry_point';
 import { DependencyHost } from './dependency_host';
 /**
  * Holds information about entry points that are removed because
@@ -60,8 +60,8 @@ export interface SortedEntryPointsInfo extends DependencyDiagnostics {
  */
 export declare class DependencyResolver {
     private logger;
-    private hosts;
-    constructor(logger: Logger, hosts: Partial<Record<EntryPointFormat, DependencyHost>>);
+    private host;
+    constructor(logger: Logger, host: DependencyHost);
     /**
      * Sort the array of entry points so that the dependant entry points always come later than
      * their dependencies in the array.

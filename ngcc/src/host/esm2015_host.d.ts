@@ -163,6 +163,16 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     getSwitchableDeclarations(module: ts.Node): SwitchableVariableDeclaration[];
     getVariableValue(declaration: ts.VariableDeclaration): ts.Expression | null;
     /**
+     * Determine if an identifier was imported from another module and return `Import` metadata
+     * describing its origin.
+     *
+     * @param id a TypeScript `ts.Identifer` to reflect.
+     *
+     * @returns metadata about the `Import` if the identifier was imported from another module, or
+     * `null` if the identifier doesn't resolve to an import but instead is locally defined.
+     */
+    getImportOfIdentifier(id: ts.Identifier): Import | null;
+    /**
      * Find all the classes that contain decorations in a given file.
      * @param sourceFile The source file to search for decorated classes.
      * @returns An array of decorated classes.
@@ -227,13 +237,6 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param statement The statement that needs to be preprocessed.
      */
     protected preprocessStatement(statement: ts.Statement): void;
-    /** Get the top level statements for a module.
-     *
-     * In ES5 and ES2015 this is just the top level statements of the file.
-     * @param sourceFile The module whose statements we want.
-     * @returns An array of top level statements for the given module.
-     */
-    protected getModuleStatements(sourceFile: ts.SourceFile): ts.Statement[];
     protected getDecoratorsOfSymbol(symbol: ClassSymbol): Decorator[] | null;
     protected getDecoratedClassFromSymbol(symbol: ClassSymbol | undefined): DecoratedClass | null;
     /**
@@ -532,7 +535,6 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * otherwise.
      */
     protected parseForModuleWithProviders(name: string, node: ts.Node | null, implementation?: ts.Node | null, container?: ts.Declaration | null): ModuleWithProvidersFunction | null;
-    protected getDeclarationOfExpression(expression: ts.Expression): Declaration | null;
 }
 export declare type ParamInfo = {
     decorators: Decorator[] | null;
