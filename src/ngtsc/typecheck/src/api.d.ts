@@ -9,6 +9,7 @@
 import { BoundTarget, DirectiveMeta } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Reference } from '../../imports';
+import { TemplateGuardMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 /**
  * Extension of `DirectiveMeta` that includes additional information required to type-check the
@@ -17,7 +18,7 @@ import { ClassDeclaration } from '../../reflection';
 export interface TypeCheckableDirectiveMeta extends DirectiveMeta {
     ref: Reference<ClassDeclaration>;
     queries: string[];
-    ngTemplateGuards: string[];
+    ngTemplateGuards: TemplateGuardMeta[];
     hasNgTemplateContextGuard: boolean;
 }
 /**

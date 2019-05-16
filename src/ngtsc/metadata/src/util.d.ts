@@ -9,7 +9,7 @@
 import * as ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { DirectiveMeta, MetadataReader, NgModuleMeta, PipeMeta } from './api';
+import { DirectiveMeta, MetadataReader, NgModuleMeta, PipeMeta, TemplateGuardMeta } from './api';
 export declare function extractReferencesFromType(checker: ts.TypeChecker, def: ts.TypeNode, ngModuleImportedFrom: string | null, resolutionContext: string): Reference<ClassDeclaration>[];
 export declare function readStringType(type: ts.TypeNode): string | null;
 export declare function readStringMapType(type: ts.TypeNode): {
@@ -17,7 +17,7 @@ export declare function readStringMapType(type: ts.TypeNode): {
 };
 export declare function readStringArrayType(type: ts.TypeNode): string[];
 export declare function extractDirectiveGuards(node: ClassDeclaration, reflector: ReflectionHost): {
-    ngTemplateGuards: string[];
+    ngTemplateGuards: TemplateGuardMeta[];
     hasNgTemplateContextGuard: boolean;
 };
 /**
