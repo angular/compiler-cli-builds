@@ -9,6 +9,7 @@
 import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
 import { LogicalFileSystem } from '../../path';
+import { ReflectionHost } from '../../reflection';
 import { ImportMode, Reference } from './references';
 /**
  * A host which supports an operation to convert a file name into a module name.
@@ -71,20 +72,21 @@ export declare class LocalIdentifierStrategy implements ReferenceEmitStrategy {
  * which maps back to the original directive, an error is thrown.
  */
 export declare class AbsoluteModuleStrategy implements ReferenceEmitStrategy {
-    private program;
-    private checker;
-    private options;
-    private host;
+    protected program: ts.Program;
+    protected checker: ts.TypeChecker;
+    protected options: ts.CompilerOptions;
+    protected host: ts.CompilerHost;
+    private reflectionHost;
     /**
      * A cache of the exports of specific modules, because resolving a module to its exports is a
      * costly operation.
      */
     private moduleExportsCache;
-    constructor(program: ts.Program, checker: ts.TypeChecker, options: ts.CompilerOptions, host: ts.CompilerHost);
+    constructor(program: ts.Program, checker: ts.TypeChecker, options: ts.CompilerOptions, host: ts.CompilerHost, reflectionHost: ReflectionHost);
     emit(ref: Reference<ts.Node>, context: ts.SourceFile, importMode: ImportMode): Expression | null;
     private resolveImportName;
     private getExportsOfModule;
-    private enumerateExportsOfModule;
+    protected enumerateExportsOfModule(specifier: string, fromFile: string): Map<ts.Declaration, string> | null;
 }
 /**
  * A `ReferenceEmitStrategy` which will refer to declarations via relative paths, provided they're
