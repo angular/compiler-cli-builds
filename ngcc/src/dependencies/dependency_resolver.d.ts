@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/dependency_resolver" />
-import { FileSystem } from '../file_system/file_system';
 import { Logger } from '../logging/logger';
 import { EntryPoint, EntryPointFormat } from '../packages/entry_point';
 import { DependencyHost } from './dependency_host';
@@ -60,10 +59,9 @@ export interface SortedEntryPointsInfo extends DependencyDiagnostics {
  * A class that resolves dependencies between entry-points.
  */
 export declare class DependencyResolver {
-    private fs;
     private logger;
     private hosts;
-    constructor(fs: FileSystem, logger: Logger, hosts: Partial<Record<EntryPointFormat, DependencyHost>>);
+    constructor(logger: Logger, hosts: Partial<Record<EntryPointFormat, DependencyHost>>);
     /**
      * Sort the array of entry points so that the dependant entry points always come later than
      * their dependencies in the array.
@@ -79,5 +77,4 @@ export declare class DependencyResolver {
      * (direct and transitive) all exist.
      */
     private computeDependencyGraph;
-    private getEntryPointFormatInfo;
 }

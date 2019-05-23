@@ -1,11 +1,18 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point" />
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import { AbsoluteFsPath } from '../../../src/ngtsc/path';
 import { FileSystem } from '../file_system/file_system';
 import { Logger } from '../logging/logger';
 /**
  * The possible values for the format of an entry-point.
  */
-export declare type EntryPointFormat = 'esm5' | 'esm2015' | 'umd' | 'commonjs';
+export declare type EntryPointFormat = 'esm5' | 'esm2015' | 'umd';
 /**
  * An object containing information about an entry-point, including paths
  * to each of the possible entry-point formats.
@@ -60,5 +67,5 @@ export declare function getEntryPointInfo(fs: FileSystem, logger: Logger, packag
  * @param property The property to convert to a format.
  * @returns An entry-point format or `undefined` if none match the given property.
  */
-export declare function getEntryPointFormat(fs: FileSystem, entryPoint: EntryPoint, property: string): EntryPointFormat | undefined;
+export declare function getEntryPointFormat(property: string): EntryPointFormat | undefined;
 export {};
