@@ -38,7 +38,8 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModu
     private routeAnalyzer;
     private refEmitter;
     private defaultImportRecorder;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder);
+    private localeId?;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, localeId?: string | undefined);
     readonly precedence = HandlerPrecedence.PRIMARY;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;
