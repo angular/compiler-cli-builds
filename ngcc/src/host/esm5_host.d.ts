@@ -83,7 +83,7 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      * @param node the function declaration to parse.
      * @returns an object containing the node, statements and parameters of the function.
      */
-    getDefinitionOfFunction<T extends ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>(node: T): FunctionDefinition<T>;
+    getDefinitionOfFunction(node: ts.Node): FunctionDefinition | null;
     /**
      * Examine a declaration which should be of a class, and return metadata about the members of the
      * class.
@@ -96,6 +96,8 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      * @throws if `declaration` does not resolve to a class declaration.
      */
     getMembersOfClass(clazz: ClassDeclaration): ClassMember[];
+    /** Gets all decorators of the given class symbol. */
+    getDecoratorsOfSymbol(symbol: ClassSymbol): Decorator[] | null;
     /**
      * Get the inner function declaration of an ES5-style class.
      *
@@ -148,7 +150,6 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      * @returns an array of constructor parameter info objects.
      */
     protected getConstructorParamInfo(classSymbol: ClassSymbol, parameterNodes: ts.ParameterDeclaration[]): CtorParameter[];
-    protected getDecoratorsOfSymbol(symbol: ClassSymbol): Decorator[] | null;
     /**
      * Get the parameter type and decorators for the constructor of a class,
      * where the information is stored on a static method of the class.

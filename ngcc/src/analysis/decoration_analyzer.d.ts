@@ -14,16 +14,19 @@ import { ModuleResolver, ReferenceEmitter } from '../../../src/ngtsc/imports';
 import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
 import { AbsoluteFsPath } from '../../../src/ngtsc/path';
+import { ClassDeclaration, ClassSymbol, Decorator } from '../../../src/ngtsc/reflection';
 import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver } from '../../../src/ngtsc/scope';
 import { CompileResult, DecoratorHandler } from '../../../src/ngtsc/transform';
 import { FileSystem } from '../file_system/file_system';
-import { DecoratedClass } from '../host/decorated_class';
 import { NgccReflectionHost } from '../host/ngcc_host';
 export interface AnalyzedFile {
     sourceFile: ts.SourceFile;
     analyzedClasses: AnalyzedClass[];
 }
-export interface AnalyzedClass extends DecoratedClass {
+export interface AnalyzedClass {
+    name: string;
+    decorators: Decorator[] | null;
+    declaration: ClassDeclaration;
     diagnostics?: ts.Diagnostic[];
     matches: {
         handler: DecoratorHandler<any, any>;
@@ -89,7 +92,7 @@ export declare class DecorationAnalyzer {
      */
     analyzeProgram(): DecorationAnalyses;
     protected analyzeFile(sourceFile: ts.SourceFile): AnalyzedFile | undefined;
-    protected analyzeClass(clazz: DecoratedClass): AnalyzedClass | null;
+    protected analyzeClass(symbol: ClassSymbol): AnalyzedClass | null;
     protected compileFile(analyzedFile: AnalyzedFile): CompiledFile;
     protected compileClass(clazz: AnalyzedClass, constantPool: ConstantPool): CompileResult[];
     protected resolveFile(analyzedFile: AnalyzedFile): void;

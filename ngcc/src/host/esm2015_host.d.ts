@@ -10,7 +10,6 @@ import * as ts from 'typescript';
 import { ClassDeclaration, ClassMember, ClassMemberKind, ClassSymbol, CtorParameter, Declaration, Decorator, Import, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
 import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
-import { DecoratedClass } from './decorated_class';
 import { ModuleWithProvidersFunction, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
 export declare const DECORATORS: ts.__String;
 export declare const PROP_DECORATORS: ts.__String;
@@ -154,6 +153,8 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * otherwise.
      */
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
+    /** Gets all decorators of the given class symbol. */
+    getDecoratorsOfSymbol(symbol: ClassSymbol): Decorator[] | null;
     /**
      * Search the given module for variable declarations in which the initializer
      * is an identifier marked with the `PRE_R3_MARKER`.
@@ -163,11 +164,11 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     getSwitchableDeclarations(module: ts.Node): SwitchableVariableDeclaration[];
     getVariableValue(declaration: ts.VariableDeclaration): ts.Expression | null;
     /**
-     * Find all the classes that contain decorations in a given file.
-     * @param sourceFile The source file to search for decorated classes.
-     * @returns An array of decorated classes.
+     * Find all top-level class symbols in the given file.
+     * @param sourceFile The source file to search for classes.
+     * @returns An array of class symbols.
      */
-    findDecoratedClasses(sourceFile: ts.SourceFile): DecoratedClass[];
+    findClassSymbols(sourceFile: ts.SourceFile): ClassSymbol[];
     /**
      * Get the number of generic type parameters of a given class.
      *
@@ -234,8 +235,6 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @returns An array of top level statements for the given module.
      */
     protected getModuleStatements(sourceFile: ts.SourceFile): ts.Statement[];
-    protected getDecoratorsOfSymbol(symbol: ClassSymbol): Decorator[] | null;
-    protected getDecoratedClassFromSymbol(symbol: ClassSymbol | undefined): DecoratedClass | null;
     /**
      * Walk the AST looking for an assignment to the specified symbol.
      * @param node The current node we are searching.
