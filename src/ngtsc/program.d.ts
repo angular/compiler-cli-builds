@@ -12,6 +12,7 @@ import * as api from '../transformers/api';
 import { ReferencesRegistry } from './annotations';
 import { ReferenceGraph } from './entry_point';
 import { Reference } from './imports';
+import { IndexedComponent } from './indexer';
 export declare class NgtscProgram implements api.Program {
     private options;
     private tsProgram;
@@ -52,6 +53,7 @@ export declare class NgtscProgram implements api.Program {
     getNgSemanticDiagnostics(fileName?: string | undefined, cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
     loadNgStructureAsync(): Promise<void>;
     listLazyRoutes(entryRoute?: string | undefined): api.LazyRoute[];
+    getIndexedComponents(): Map<ts.Declaration, IndexedComponent>;
     getLibrarySummaries(): Map<string, api.LibrarySummary>;
     getEmittedGeneratedFiles(): Map<string, GeneratedFile>;
     getEmittedSourceFiles(): Map<string, ts.SourceFile>;
