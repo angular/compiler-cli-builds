@@ -7,8 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { ClassDeclaration, ClassSymbol, Declaration, ReflectionHost } from '../../../src/ngtsc/reflection';
-import { DecoratedClass } from './decorated_class';
+import { ClassDeclaration, ClassSymbol, Declaration, Decorator, ReflectionHost } from '../../../src/ngtsc/reflection';
 export declare const PRE_R3_MARKER = "__PRE_R3__";
 export declare const POST_R3_MARKER = "__POST_R3__";
 export declare type SwitchableVariableDeclaration = ts.VariableDeclaration & {
@@ -57,11 +56,17 @@ export interface NgccReflectionHost extends ReflectionHost {
      */
     getSwitchableDeclarations(module: ts.Node): SwitchableVariableDeclaration[];
     /**
-     * Find all the classes that contain decorations in a given file.
-     * @param sourceFile The source file to search for decorated classes.
-     * @returns An array of decorated classes.
+     * Retrieves all decorators of a given class symbol.
+     * @param symbol Class symbol that can refer to a declaration which can hold decorators.
+     * @returns An array of decorators or null if none are declared.
      */
-    findDecoratedClasses(sourceFile: ts.SourceFile): DecoratedClass[];
+    getDecoratorsOfSymbol(symbol: ClassSymbol): Decorator[] | null;
+    /**
+     * Retrieves all class symbols of a given source file.
+     * @param sourceFile The source file to search for classes.
+     * @returns An array of found class symbols.
+     */
+    findClassSymbols(sourceFile: ts.SourceFile): ClassSymbol[];
     /**
      * Search the given source file for exported functions and static class methods that return
      * ModuleWithProviders objects.
