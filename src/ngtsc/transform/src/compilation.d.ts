@@ -10,6 +10,7 @@ import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ImportRewriter } from '../../imports';
 import { IncrementalState } from '../../incremental';
+import { IndexingContext } from '../../indexer';
 import { PerfRecorder } from '../../perf';
 import { ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
@@ -61,6 +62,10 @@ export declare class IvyCompilation {
      * Analyze a source file and produce diagnostics for it (if any).
      */
     private analyze;
+    /**
+     * Feeds components discovered in the compilation to a context for indexing.
+     */
+    index(context: IndexingContext): void;
     resolve(): void;
     private recordNgModuleScopeDependencies;
     typeCheck(context: TypeCheckContext): void;
