@@ -15,6 +15,7 @@ import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
 import { TypeCheckContext } from '../../typecheck';
+import { ResourceDependencyRecorder } from '../../util/src/resource_recorder';
 import { ResourceLoader } from './api';
 export interface ComponentHandlerData {
     meta: R3ComponentMetadata;
@@ -39,7 +40,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private cycleAnalyzer;
     private refEmitter;
     private defaultImportRecorder;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder);
+    private resourceDependencies;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, resourceDependencies?: ResourceDependencyRecorder);
     private literalCache;
     private elementSchemaRegistry;
     /**
