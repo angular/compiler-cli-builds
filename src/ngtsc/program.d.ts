@@ -15,13 +15,13 @@ import { Reference } from './imports';
 import { IndexedComponent } from './indexer';
 export declare class NgtscProgram implements api.Program {
     private options;
+    private host;
     private tsProgram;
     private reuseTsProgram;
     private resourceManager;
     private compilation;
     private factoryToSourceInfo;
     private sourceToFactorySymbols;
-    private host;
     private _coreImportsFrom;
     private _importRewriter;
     private _reflector;
@@ -43,6 +43,7 @@ export declare class NgtscProgram implements api.Program {
     private perfTracker;
     private incrementalState;
     private typeCheckFilePath;
+    private modifiedResourceFiles;
     constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: NgtscProgram);
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
