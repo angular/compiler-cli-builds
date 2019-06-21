@@ -34,7 +34,7 @@ export interface PerformCompilationResult {
     emitResult?: ts.EmitResult;
 }
 export declare function exitCodeFromResult(diags: Diagnostics | undefined): number;
-export declare function performCompilation({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags }: {
+export declare function performCompilation({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags, modifiedResourceFiles }: {
     rootNames: string[];
     options: api.CompilerOptions;
     host?: api.CompilerHost;
@@ -44,4 +44,5 @@ export declare function performCompilation({ rootNames, options, host, oldProgra
     gatherDiagnostics?: (program: api.Program) => Diagnostics;
     customTransformers?: api.CustomTransformers;
     emitFlags?: api.EmitFlags;
+    modifiedResourceFiles?: Set<string>;
 }): PerformCompilationResult;
