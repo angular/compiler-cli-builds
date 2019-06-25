@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/type_check_file" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,10 +6,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/type_check_file" />
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
-import { AbsoluteFsPath } from '../../path';
 import { ClassDeclaration } from '../../reflection';
 import { TypeCheckBlockMetadata, TypeCheckingConfig } from './api';
 import { Environment } from './environment';

@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/shims/src/factory_generator" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,10 +6,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/shims/src/factory_generator" />
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../../file_system';
 import { ImportRewriter } from '../../imports';
-import { AbsoluteFsPath } from '../../path/src/types';
 import { ShimGenerator } from './host';
 /**
  * Generates ts.SourceFiles which contain variable declarations for NgFactories for every exported

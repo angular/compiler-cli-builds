@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/dependency_resolver" />
-import { FileSystem } from '../file_system/file_system';
+import { FileSystem } from '../../../src/ngtsc/file_system';
 import { Logger } from '../logging/logger';
 import { EntryPoint, EntryPointFormat } from '../packages/entry_point';
 import { DependencyHost } from './dependency_host';

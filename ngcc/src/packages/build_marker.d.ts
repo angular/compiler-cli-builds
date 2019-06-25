@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/build_marker" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,11 +6,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/build_marker" />
-import { AbsoluteFsPath } from '../../../src/ngtsc/path';
-import { FileSystem } from '../file_system/file_system';
+import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { EntryPointJsonProperty, EntryPointPackageJson } from './entry_point';
-export declare const NGCC_VERSION = "8.1.0-next.3+82.sha-1e7e065.with-local-changes";
+export declare const NGCC_VERSION = "8.1.0-next.3+83.sha-7186f9c.with-local-changes";
 /**
  * Check whether ngcc has already processed a given entry-point format.
  *

@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { AbsoluteFsPath } from '../../../src/ngtsc/path';
+import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { NgccReferencesRegistry } from './ngcc_references_registry';
 export interface ExportInfo {

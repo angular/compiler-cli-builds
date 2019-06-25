@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/file_system/src/logical" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,7 +6,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/path/src/logical" />
 import * as ts from 'typescript';
 import { AbsoluteFsPath, BrandedPath } from './types';
 /**
@@ -43,7 +43,7 @@ export declare class LogicalFileSystem {
      * Get the logical path in the project of a `ts.SourceFile`.
      *
      * This method is provided as a convenient alternative to calling
-     * `logicalPathOfFile(AbsoluteFsPath.fromSourceFile(sf))`.
+     * `logicalPathOfFile(absoluteFromSourceFile(sf))`.
      */
     logicalPathOfSf(sf: ts.SourceFile): LogicalProjectPath | null;
     /**
