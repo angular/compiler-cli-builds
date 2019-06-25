@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/perform_compile" />
 import { Position } from '@angular/compiler';
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../src/ngtsc/file_system';
 import * as api from './transformers/api';
 export declare type Diagnostics = ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
 export declare function filterErrorsAndWarnings(diagnostics: Diagnostics): Diagnostics;
@@ -23,8 +24,8 @@ export interface ParsedConfiguration {
     errors: Diagnostics;
 }
 export declare function calcProjectFileAndBasePath(project: string): {
-    projectFile: string;
-    basePath: string;
+    projectFile: AbsoluteFsPath;
+    basePath: AbsoluteFsPath;
 };
 export declare function createNgCompilerOptions(basePath: string, config: any, tsOptions: ts.CompilerOptions): api.CompilerOptions;
 export declare function readConfiguration(project: string, existingOptions?: ts.CompilerOptions): ParsedConfiguration;

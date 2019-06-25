@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/module_resolver" />
-import { AbsoluteFsPath } from '../../../src/ngtsc/path';
-import { FileSystem } from '../file_system/file_system';
+import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { PathMappings } from '../utils';
 /**
  * This is a very cut-down implementation of the TypeScript module resolution strategy.

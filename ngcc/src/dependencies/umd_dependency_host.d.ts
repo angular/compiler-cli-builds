@@ -1,6 +1,5 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/umd_dependency_host" />
-import { AbsoluteFsPath } from '../../../src/ngtsc/path';
-import { FileSystem } from '../file_system/file_system';
+import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { DependencyHost, DependencyInfo } from './dependency_host';
 import { ModuleResolver } from './module_resolver';
 /**

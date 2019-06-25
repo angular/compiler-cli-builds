@@ -8,8 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/context" />
 import { BoundTarget } from '@angular/compiler';
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
-import { AbsoluteFsPath } from '../../path';
 import { ClassDeclaration } from '../../reflection';
 import { TypeCheckableDirectiveMeta, TypeCheckingConfig, TypeCtorMetadata } from './api';
 /**

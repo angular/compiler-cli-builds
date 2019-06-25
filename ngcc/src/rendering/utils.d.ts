@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { ImportRewriter } from '../../../src/ngtsc/imports';
-import { AbsoluteFsPath } from '../../../src/ngtsc/path';
 /**
  * Information about a file that has been rendered.
  */

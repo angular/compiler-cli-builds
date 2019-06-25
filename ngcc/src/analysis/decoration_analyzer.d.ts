@@ -10,14 +10,13 @@ import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ReferencesRegistry, ResourceLoader } from '../../../src/ngtsc/annotations';
 import { CycleAnalyzer, ImportGraph } from '../../../src/ngtsc/cycles';
+import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { ModuleResolver, ReferenceEmitter } from '../../../src/ngtsc/imports';
 import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
-import { AbsoluteFsPath } from '../../../src/ngtsc/path';
 import { ClassDeclaration, ClassSymbol, Decorator } from '../../../src/ngtsc/reflection';
 import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver } from '../../../src/ngtsc/scope';
 import { CompileResult, DecoratorHandler } from '../../../src/ngtsc/transform';
-import { FileSystem } from '../file_system/file_system';
 import { NgccReflectionHost } from '../host/ngcc_host';
 export interface AnalyzedFile {
     sourceFile: ts.SourceFile;

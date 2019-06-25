@@ -1,11 +1,4 @@
 /// <amd-module name="@angular/compiler-cli" />
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 export { AotCompilerHost, AotCompilerHost as StaticReflectorHost, StaticReflector, StaticSymbol } from '@angular/compiler';
 export { DiagnosticTemplateInfo, getExpressionScope, getTemplateExpressionDiagnostics } from './src/diagnostics/expression_diagnostics';
 export { AstType, ExpressionDiagnosticsContext } from './src/diagnostics/expression_type';

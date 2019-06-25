@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm2015_host" />
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { ClassDeclaration, ClassMember, ClassMemberKind, ClassSymbol, CtorParameter, Declaration, Decorator, Import, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
 import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
@@ -519,7 +520,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param dtsProgram The program containing all the typings files.
      * @returns a map of class names to class declarations.
      */
-    protected computeDtsDeclarationMap(dtsRootFileName: string, dtsProgram: ts.Program): Map<string, ts.Declaration>;
+    protected computeDtsDeclarationMap(dtsRootFileName: AbsoluteFsPath, dtsProgram: ts.Program): Map<string, ts.Declaration>;
     /**
      * Parse a function/method node (or its implementation), to see if it returns a
      * `ModuleWithProviders` object.

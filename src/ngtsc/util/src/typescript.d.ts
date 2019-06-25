@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/util/src/typescript" />
 import * as ts from 'typescript';
-import { AbsoluteFsPath } from '../../path';
+import { AbsoluteFsPath } from '../../file_system';
 export declare function isDtsPath(filePath: string): boolean;
 export declare function isNonDeclarationTsPath(filePath: string): boolean;
 export declare function isFromDtsFile(node: ts.Node): boolean;
@@ -15,6 +15,7 @@ export declare function nodeNameForError(node: ts.Node & {
     name?: ts.Node;
 }): string;
 export declare function getSourceFile(node: ts.Node): ts.SourceFile;
+export declare function getSourceFileOrNull(program: ts.Program, fileName: AbsoluteFsPath): ts.SourceFile | null;
 export declare function identifierOfNode(decl: ts.Node & {
     name?: ts.Node;
 }): ts.Identifier | null;
