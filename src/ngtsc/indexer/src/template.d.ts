@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/indexer/src/template" />
-import { BoundTarget, DirectiveMeta } from '@angular/compiler';
-import { TemplateIdentifier } from './api';
+import { TmplAstNode } from '@angular/compiler';
+import { RestoreTemplateOptions, TemplateIdentifier } from './api';
 /**
  * Traverses a template AST and builds identifiers discovered in it.
- *
- * @param boundTemplate bound template target, which can be used for querying expression targets.
+ * @param template template to extract indentifiers from
+ * @param options options for restoring the parsed template to a indexable state
  * @return identifiers in template
  */
-export declare function getTemplateIdentifiers(boundTemplate: BoundTarget<DirectiveMeta>): Set<TemplateIdentifier>;
+export declare function getTemplateIdentifiers(template: TmplAstNode[], options: RestoreTemplateOptions): Set<TemplateIdentifier>;
