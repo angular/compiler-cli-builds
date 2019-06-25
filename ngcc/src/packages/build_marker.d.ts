@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/build_marker" />
 import { AbsoluteFsPath } from '../../../src/ngtsc/path';
 import { EntryPointJsonProperty, EntryPointPackageJson } from './entry_point';
-export declare const NGCC_VERSION = "8.0.2+36.sha-8a1bd2c.with-local-changes";
+export declare const NGCC_VERSION = "8.0.2+34.sha-1d193df.with-local-changes";
 /**
  * Check whether ngcc has already processed a given entry-point format.
  *
