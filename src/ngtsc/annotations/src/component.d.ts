@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
-import { ConstantPool, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
+import { ConstantPool, InterpolationConfig, ParseError, ParseSourceFile, ParseTemplateOptions, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import { CycleAnalyzer } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, ReferenceEmitter } from '../../imports';
+import { IndexingContext } from '../../indexer';
 import { MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
@@ -21,6 +22,7 @@ export interface ComponentHandlerData {
     meta: R3ComponentMetadata;
     parsedTemplate: TmplAstNode[];
     metadataStmt: Statement | null;
+    parseTemplate: (options?: ParseTemplateOptions) => ParsedTemplate;
 }
 /**
  * `DecoratorHandler` which handles the `@Component` annotation.
@@ -54,6 +56,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     preanalyze(node: ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
     analyze(node: ClassDeclaration, decorator: Decorator): AnalysisOutput<ComponentHandlerData>;
+    index(context: IndexingContext, node: ClassDeclaration, analysis: ComponentHandlerData): void;
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: ComponentHandlerData): void;
     resolve(node: ClassDeclaration, analysis: ComponentHandlerData): ResolveResult;
     compile(node: ClassDeclaration, analysis: ComponentHandlerData, pool: ConstantPool): CompileResult;
@@ -67,3 +70,13 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private _isCyclicImport;
     private _recordSyntheticImport;
 }
+interface ParsedTemplate {
+    interpolation: InterpolationConfig;
+    errors?: ParseError[] | undefined;
+    nodes: TmplAstNode[];
+    styleUrls: string[];
+    styles: string[];
+    isInline: boolean;
+    file: ParseSourceFile;
+}
+export {};
