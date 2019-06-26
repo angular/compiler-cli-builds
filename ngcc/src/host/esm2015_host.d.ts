@@ -429,16 +429,28 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     protected getConstructorParamInfo(classSymbol: ClassSymbol, parameterNodes: ts.ParameterDeclaration[]): CtorParameter[];
     /**
      * Get the parameter type and decorators for the constructor of a class,
-     * where the information is stored on a static method of the class.
+     * where the information is stored on a static property of the class.
      *
-     * Note that in ESM2015, the method is defined by an arrow function that returns an array of
-     * decorator and type information.
+     * Note that in ESM2015, the property is defined an array, or by an arrow function that returns an
+     * array, of decorator and type information.
+     *
+     * For example,
      *
      * ```
      * SomeDirective.ctorParameters = () => [
-     *   { type: ViewContainerRef, },
-     *   { type: TemplateRef, },
-     *   { type: undefined, decorators: [{ type: Inject, args: [INJECTED_TOKEN,] },] },
+     *   {type: ViewContainerRef},
+     *   {type: TemplateRef},
+     *   {type: undefined, decorators: [{ type: Inject, args: [INJECTED_TOKEN]}]},
+     * ];
+     * ```
+     *
+     * or
+     *
+     * ```
+     * SomeDirective.ctorParameters = [
+     *   {type: ViewContainerRef},
+     *   {type: TemplateRef},
+     *   {type: undefined, decorators: [{type: Inject, args: [INJECTED_TOKEN]}]},
      * ];
      * ```
      *

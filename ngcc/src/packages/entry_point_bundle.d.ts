@@ -2,12 +2,13 @@
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { PathMappings } from '../utils';
 import { BundleProgram } from './bundle_program';
-import { EntryPointFormat, EntryPointJsonProperty } from './entry_point';
+import { EntryPoint, EntryPointFormat, EntryPointJsonProperty } from './entry_point';
 /**
  * A bundle of files and paths (and TS programs) that correspond to a particular
  * format of a package entry-point.
  */
 export interface EntryPointBundle {
+    entryPoint: EntryPoint;
     formatProperty: EntryPointJsonProperty;
     format: EntryPointFormat;
     isCore: boolean;
@@ -25,4 +26,4 @@ export interface EntryPointBundle {
  * @param format The underlying format of the bundle.
  * @param transformDts Whether to transform the typings along with this bundle.
  */
-export declare function makeEntryPointBundle(fs: FileSystem, entryPointPath: string, formatPath: string, typingsPath: string, isCore: boolean, formatProperty: EntryPointJsonProperty, format: EntryPointFormat, transformDts: boolean, pathMappings?: PathMappings): EntryPointBundle | null;
+export declare function makeEntryPointBundle(fs: FileSystem, entryPoint: EntryPoint, formatPath: string, isCore: boolean, formatProperty: EntryPointJsonProperty, format: EntryPointFormat, transformDts: boolean, pathMappings?: PathMappings): EntryPointBundle | null;

@@ -41,9 +41,8 @@ export declare class DtsRenderer {
     private fs;
     private logger;
     private host;
-    private isCore;
     private bundle;
-    constructor(dtsFormatter: RenderingFormatter, fs: FileSystem, logger: Logger, host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle);
+    constructor(dtsFormatter: RenderingFormatter, fs: FileSystem, logger: Logger, host: NgccReflectionHost, bundle: EntryPointBundle);
     renderProgram(decorationAnalyses: DecorationAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses, moduleWithProvidersAnalyses: ModuleWithProvidersAnalyses | null): FileToWrite[];
     renderDtsFile(dtsFile: ts.SourceFile, renderInfo: DtsRenderInfo): FileToWrite[];
     private getTypingsFilesToRender;
