@@ -1,6 +1,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point" />
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { Logger } from '../logging/logger';
+import { NgccConfiguration } from './configuration';
 /**
  * The possible values for the format of an entry-point.
  */
@@ -23,7 +24,7 @@ export interface EntryPoint {
     /** Is this EntryPoint compiled with the Angular View Engine compiler? */
     compiledByAngular: boolean;
 }
-interface PackageJsonFormatProperties {
+export interface PackageJsonFormatProperties {
     fesm2015?: string;
     fesm5?: string;
     es2015?: string;
@@ -52,7 +53,7 @@ export declare const SUPPORTED_FORMAT_PROPERTIES: EntryPointJsonProperty[];
  * @param entryPointPath the absolute path to the potential entry-point.
  * @returns An entry-point if it is valid, `null` otherwise.
  */
-export declare function getEntryPointInfo(fs: FileSystem, logger: Logger, packagePath: AbsoluteFsPath, entryPointPath: AbsoluteFsPath): EntryPoint | null;
+export declare function getEntryPointInfo(fs: FileSystem, config: NgccConfiguration, logger: Logger, packagePath: AbsoluteFsPath, entryPointPath: AbsoluteFsPath): EntryPoint | null;
 /**
  * Convert a package.json property into an entry-point format.
  *
@@ -60,4 +61,3 @@ export declare function getEntryPointInfo(fs: FileSystem, logger: Logger, packag
  * @returns An entry-point format or `undefined` if none match the given property.
  */
 export declare function getEntryPointFormat(fs: FileSystem, entryPoint: EntryPoint, property: string): EntryPointFormat | undefined;
-export {};

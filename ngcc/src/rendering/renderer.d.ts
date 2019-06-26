@@ -13,7 +13,6 @@ import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/dec
 import { PrivateDeclarationsAnalyses } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
 import { FileSystem } from '../../../src/ngtsc/file_system';
-import { NgccReflectionHost } from '../host/ngcc_host';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
 import { Logger } from '../logging/logger';
 import { FileToWrite } from './utils';
@@ -28,10 +27,8 @@ export declare class Renderer {
     private srcFormatter;
     private fs;
     private logger;
-    private host;
-    private isCore;
     private bundle;
-    constructor(srcFormatter: RenderingFormatter, fs: FileSystem, logger: Logger, host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle);
+    constructor(srcFormatter: RenderingFormatter, fs: FileSystem, logger: Logger, bundle: EntryPointBundle);
     renderProgram(decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileToWrite[];
     /**
      * Render the source code and source-map for an Analyzed file.

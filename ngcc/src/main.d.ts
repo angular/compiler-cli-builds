@@ -1,4 +1,12 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/main" />
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { FileSystem } from '../../src/ngtsc/file_system';
 import { Logger } from './logging/logger';
 import { PathMappings } from './utils';
 /**
@@ -38,6 +46,10 @@ export interface NgccOptions {
      * These are used to resolve paths to locally built Angular libraries.
      */
     pathMappings?: PathMappings;
+    /**
+     * Provide a file-system service that will be used by ngcc for all file interactions.
+     */
+    fileSystem?: FileSystem;
 }
 /**
  * This is the main entry-point into ngcc (aNGular Compatibility Compiler).
