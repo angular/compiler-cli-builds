@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/imports/src/emitter" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,10 +6,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/imports/src/emitter" />
 import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
-import { LogicalFileSystem } from '../../path';
+import { LogicalFileSystem } from '../../file_system';
 import { ReflectionHost } from '../../reflection';
 import { ImportMode, Reference } from './references';
 /**

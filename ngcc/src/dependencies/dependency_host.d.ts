@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/dependency_host" />
-import { AbsoluteFsPath, PathSegment } from '../../../src/ngtsc/path';
+import { AbsoluteFsPath, PathSegment } from '../../../src/ngtsc/file_system';
 export interface DependencyHost {
     findDependencies(entryPointPath: AbsoluteFsPath): DependencyInfo;
 }

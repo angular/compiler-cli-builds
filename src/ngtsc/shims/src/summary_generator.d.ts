@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/shims/src/summary_generator" />
 import * as ts from 'typescript';
-import { AbsoluteFsPath } from '../../path/src/types';
+import { AbsoluteFsPath } from '../../file_system';
 import { ShimGenerator } from './host';
 export declare class SummaryGenerator implements ShimGenerator {
     private map;

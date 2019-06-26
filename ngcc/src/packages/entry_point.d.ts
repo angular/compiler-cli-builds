@@ -1,6 +1,5 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point" />
-import { AbsoluteFsPath } from '../../../src/ngtsc/path';
-import { FileSystem } from '../file_system/file_system';
+import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { Logger } from '../logging/logger';
 /**
  * The possible values for the format of an entry-point.

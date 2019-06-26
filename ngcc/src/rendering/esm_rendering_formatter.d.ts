@@ -8,7 +8,7 @@
  */
 import MagicString from 'magic-string';
 import * as ts from 'typescript';
-import { AbsoluteFsPath } from '../../../src/ngtsc/path';
+import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { Import, ImportManager } from '../../../src/ngtsc/translator';
 import { CompiledClass } from '../analysis/decoration_analyzer';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';

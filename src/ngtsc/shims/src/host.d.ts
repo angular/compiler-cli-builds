@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/shims/src/host" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,9 +6,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/shims/src/host" />
 import * as ts from 'typescript';
-import { AbsoluteFsPath } from '../../path/src/types';
+import { AbsoluteFsPath } from '../../file_system';
 export interface ShimGenerator {
     /**
      * Returns `true` if this generator is intended to handle the given file.
