@@ -10,7 +10,7 @@ import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ReferencesRegistry, ResourceLoader } from '../../../src/ngtsc/annotations';
 import { CycleAnalyzer, ImportGraph } from '../../../src/ngtsc/cycles';
-import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
+import { FileSystem } from '../../../src/ngtsc/file_system';
 import { ModuleResolver, ReferenceEmitter } from '../../../src/ngtsc/imports';
 import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
@@ -18,6 +18,7 @@ import { ClassDeclaration, ClassSymbol, Decorator } from '../../../src/ngtsc/ref
 import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver } from '../../../src/ngtsc/scope';
 import { CompileResult, DecoratorHandler } from '../../../src/ngtsc/transform';
 import { NgccReflectionHost } from '../host/ngcc_host';
+import { EntryPointBundle } from '../packages/entry_point_bundle';
 export interface AnalyzedFile {
     sourceFile: ts.SourceFile;
     analyzedClasses: AnalyzedClass[];
@@ -62,13 +63,15 @@ declare class NgccResourceLoader implements ResourceLoader {
  */
 export declare class DecorationAnalyzer {
     private fs;
+    private bundle;
+    private reflectionHost;
+    private referencesRegistry;
     private program;
     private options;
     private host;
     private typeChecker;
-    private reflectionHost;
-    private referencesRegistry;
     private rootDirs;
+    private packagePath;
     private isCore;
     resourceManager: NgccResourceLoader;
     metaRegistry: LocalMetadataRegistry;
@@ -83,7 +86,7 @@ export declare class DecorationAnalyzer {
     importGraph: ImportGraph;
     cycleAnalyzer: CycleAnalyzer;
     handlers: DecoratorHandler<any, any>[];
-    constructor(fs: FileSystem, program: ts.Program, options: ts.CompilerOptions, host: ts.CompilerHost, typeChecker: ts.TypeChecker, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, rootDirs: AbsoluteFsPath[], isCore: boolean);
+    constructor(fs: FileSystem, bundle: EntryPointBundle, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry);
     /**
      * Analyze a program to find all the decorated files should be transformed.
      *

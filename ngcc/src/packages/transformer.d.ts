@@ -48,9 +48,9 @@ export declare class Transformer {
      * @returns information about the files that were transformed.
      */
     transform(bundle: EntryPointBundle): FileToWrite[];
-    getHost(isCore: boolean, bundle: EntryPointBundle): NgccReflectionHost;
-    getRenderingFormatter(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): RenderingFormatter;
-    analyzeProgram(reflectionHost: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): ProgramAnalyses;
+    getHost(bundle: EntryPointBundle): NgccReflectionHost;
+    getRenderingFormatter(host: NgccReflectionHost, bundle: EntryPointBundle): RenderingFormatter;
+    analyzeProgram(reflectionHost: NgccReflectionHost, bundle: EntryPointBundle): ProgramAnalyses;
 }
 interface ProgramAnalyses {
     decorationAnalyses: Map<ts.SourceFile, CompiledFile>;

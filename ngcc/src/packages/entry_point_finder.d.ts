@@ -10,11 +10,13 @@ import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { DependencyResolver, SortedEntryPointsInfo } from '../dependencies/dependency_resolver';
 import { Logger } from '../logging/logger';
 import { PathMappings } from '../utils';
+import { NgccConfiguration } from './configuration';
 export declare class EntryPointFinder {
     private fs;
+    private config;
     private logger;
     private resolver;
-    constructor(fs: FileSystem, logger: Logger, resolver: DependencyResolver);
+    constructor(fs: FileSystem, config: NgccConfiguration, logger: Logger, resolver: DependencyResolver);
     /**
      * Search the given directory, and sub-directories, for Angular package entry points.
      * @param sourceDirectory An absolute path to the directory to search for entry points.
