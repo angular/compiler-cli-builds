@@ -1,4 +1,4 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point_finder" />
+/// <amd-module name="@angular/compiler-cli/ngcc/src/entry_point_finder/directory_walker_entry_point_finder" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -9,39 +9,27 @@
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { DependencyResolver, SortedEntryPointsInfo } from '../dependencies/dependency_resolver';
 import { Logger } from '../logging/logger';
+import { NgccConfiguration } from '../packages/configuration';
 import { PathMappings } from '../utils';
-import { NgccConfiguration } from './configuration';
-export declare class EntryPointFinder {
+import { EntryPointFinder } from './interface';
+/**
+ * An EntryPointFinder that searches for all entry-points that can be found given a `basePath` and
+ * `pathMappings`.
+ */
+export declare class DirectoryWalkerEntryPointFinder implements EntryPointFinder {
     private fs;
     private config;
     private logger;
     private resolver;
-    constructor(fs: FileSystem, config: NgccConfiguration, logger: Logger, resolver: DependencyResolver);
+    private sourceDirectory;
+    private pathMappings;
+    private basePaths;
+    constructor(fs: FileSystem, config: NgccConfiguration, logger: Logger, resolver: DependencyResolver, sourceDirectory: AbsoluteFsPath, pathMappings: PathMappings | undefined);
     /**
-     * Search the given directory, and sub-directories, for Angular package entry points.
-     * @param sourceDirectory An absolute path to the directory to search for entry points.
+     * Search the `sourceDirectory`, and sub-directories, using `pathMappings` as necessary, to find
+     * all package entry-points.
      */
-    findEntryPoints(sourceDirectory: AbsoluteFsPath, targetEntryPointPath?: AbsoluteFsPath, pathMappings?: PathMappings): SortedEntryPointsInfo;
-    /**
-     * Extract all the base-paths that we need to search for entry-points.
-     *
-     * This always contains the standard base-path (`sourceDirectory`).
-     * But it also parses the `paths` mappings object to guess additional base-paths.
-     *
-     * For example:
-     *
-     * ```
-     * getBasePaths('/node_modules', {baseUrl: '/dist', paths: {'*': ['lib/*', 'lib/generated/*']}})
-     * > ['/node_modules', '/dist/lib']
-     * ```
-     *
-     * Notice that `'/dist'` is not included as there is no `'*'` path,
-     * and `'/dist/lib/generated'` is not included as it is covered by `'/dist/lib'`.
-     *
-     * @param sourceDirectory The standard base-path (e.g. node_modules).
-     * @param pathMappings Path mapping configuration, from which to extract additional base-paths.
-     */
-    private getBasePaths;
+    findEntryPoints(): SortedEntryPointsInfo;
     /**
      * Look for entry points that need to be compiled, starting at the source directory.
      * The function will recurse into directories that start with `@...`, e.g. `@angular/...`.
