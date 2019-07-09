@@ -19,11 +19,15 @@ export interface EntryPointBundle {
 }
 /**
  * Get an object that describes a formatted bundle for an entry-point.
- * @param entryPointPath The path to the entry-point that contains the bundle.
+ * @param fs The current file-system being used.
+ * @param entryPoint The entry-point that contains the bundle.
  * @param formatPath The path to the source files for this bundle.
- * @param typingsPath The path to the typings files if we should transform them with this bundle.
  * @param isCore This entry point is the Angular core package.
+ * @param formatProperty The property in the package.json that holds the formatPath.
  * @param format The underlying format of the bundle.
  * @param transformDts Whether to transform the typings along with this bundle.
+ * @param pathMappings An optional set of mappings to use when compiling files.
+ * @param mirrorDtsFromSrc If true then the `dts` program will contain additional files that
+ * were guessed by mapping the `src` files to `dts` files.
  */
-export declare function makeEntryPointBundle(fs: FileSystem, entryPoint: EntryPoint, formatPath: string, isCore: boolean, formatProperty: EntryPointJsonProperty, format: EntryPointFormat, transformDts: boolean, pathMappings?: PathMappings): EntryPointBundle | null;
+export declare function makeEntryPointBundle(fs: FileSystem, entryPoint: EntryPoint, formatPath: string, isCore: boolean, formatProperty: EntryPointJsonProperty, format: EntryPointFormat, transformDts: boolean, pathMappings?: PathMappings, mirrorDtsFromSrc?: boolean): EntryPointBundle | null;
