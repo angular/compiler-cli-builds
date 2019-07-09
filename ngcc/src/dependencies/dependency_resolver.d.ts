@@ -9,7 +9,7 @@
 import { FileSystem } from '../../../src/ngtsc/file_system';
 import { Logger } from '../logging/logger';
 import { EntryPoint, EntryPointFormat } from '../packages/entry_point';
-import { DependencyHost } from './dependency_host';
+import { DependencyHost, DependencyInfo } from './dependency_host';
 /**
  * Holds information about entry points that are removed because
  * they have dependencies that are missing (directly or transitively).
@@ -72,6 +72,7 @@ export declare class DependencyResolver {
      * @returns the result of sorting the entry points by dependency.
      */
     sortEntryPointsByDependency(entryPoints: EntryPoint[], target?: EntryPoint): SortedEntryPointsInfo;
+    getEntryPointDependencies(entryPoint: EntryPoint): DependencyInfo;
     /**
      * Computes a dependency graph of the given entry-points.
      *
