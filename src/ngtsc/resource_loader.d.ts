@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/resource_loader" />
 import * as ts from 'typescript';
 import { CompilerHost } from '../transformers/api';
-import { ResourceLoader } from './annotations';
+import { ResourceLoader } from './annotations/src/api';
 /**
  * `ResourceLoader` which delegates to a `CompilerHost` resource loading method.
  */
@@ -17,7 +17,6 @@ export declare class HostResourceLoader implements ResourceLoader {
     private options;
     private cache;
     private fetching;
-    private rootDirs;
     canPreload: boolean;
     constructor(host: CompilerHost, options: ts.CompilerOptions);
     /**
@@ -59,7 +58,6 @@ export declare class HostResourceLoader implements ResourceLoader {
      * option from the tsconfig. First, normalize the file name.
      */
     private fallbackResolve;
-    private getRootedCandidateLocations;
     /**
      * TypeScript provides utilities to resolve module names, but not resource files (which aren't
      * a part of the ts.Program). However, TypeScript's module resolution can be used creatively
@@ -67,5 +65,5 @@ export declare class HostResourceLoader implements ResourceLoader {
      * a list of file names that were considered, the loader can enumerate the possible locations
      * for the file by setting up a module resolution for it that will fail.
      */
-    private getResolvedCandidateLocations;
+    private getCandidateLocations;
 }
