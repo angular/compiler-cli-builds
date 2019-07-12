@@ -13,15 +13,9 @@ import * as ts from 'typescript';
  */
 export declare enum IdentifierKind {
     Property = 0,
-    Method = 1
-}
-/**
- * Describes the absolute byte offsets of a text anchor in a source code.
- */
-export declare class AbsoluteSourceSpan {
-    start: number;
-    end: number;
-    constructor(start: number, end: number);
+    Method = 1,
+    Element = 2,
+    Attribute = 3
 }
 /**
  * Describes a semantically-interesting identifier in a template, such as an interpolated variable
@@ -32,6 +26,43 @@ export interface TemplateIdentifier {
     span: AbsoluteSourceSpan;
     kind: IdentifierKind;
 }
+/** Describes a property accessed in a template. */
+export interface PropertyIdentifier extends TemplateIdentifier {
+    kind: IdentifierKind.Property;
+}
+/** Describes a method accessed in a template. */
+export interface MethodIdentifier extends TemplateIdentifier {
+    kind: IdentifierKind.Method;
+}
+/** Describes an element attribute in a template. */
+export interface AttributeIdentifier extends TemplateIdentifier {
+    kind: IdentifierKind.Attribute;
+}
+/**
+ * Describes an indexed element in a template. The name of an `ElementIdentifier` is the entire
+ * element tag, which can be parsed by an indexer to determine where used directives should be
+ * referenced.
+ */
+export interface ElementIdentifier extends TemplateIdentifier {
+    kind: IdentifierKind.Element;
+    /** Attributes on an element. */
+    attributes: Set<AttributeIdentifier>;
+    /** Directives applied to an element. */
+    usedDirectives: Set<ts.Declaration>;
+}
+/**
+ * Identifiers recorded at the top level of the template, without any context about the HTML nodes
+ * they were discovered in.
+ */
+export declare type TopLevelIdentifier = PropertyIdentifier | MethodIdentifier | ElementIdentifier;
+/**
+ * Describes the absolute byte offsets of a text anchor in a source code.
+ */
+export declare class AbsoluteSourceSpan {
+    start: number;
+    end: number;
+    constructor(start: number, end: number);
+}
 /**
  * Describes an analyzed, indexed component and its template.
  */
@@ -40,7 +71,7 @@ export interface IndexedComponent {
     selector: string | null;
     file: ParseSourceFile;
     template: {
-        identifiers: Set<TemplateIdentifier>;
+        identifiers: Set<TopLevelIdentifier>;
         usedComponents: Set<ts.Declaration>;
         isInline: boolean;
         file: ParseSourceFile;
