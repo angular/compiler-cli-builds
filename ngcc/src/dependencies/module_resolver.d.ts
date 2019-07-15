@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/module_resolver" />
 /**
  * @license
  * Copyright Google Inc. All Rights Reserved.
@@ -5,7 +6,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/module_resolver" />
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { PathMappings } from '../utils';
 /**
@@ -69,12 +69,6 @@ export declare class ModuleResolver {
      * "deep-import".
      */
     private resolveAsEntryPoint;
-    /**
-     * Attempt to resolve a `path` to a file by appending the provided `postFixes`
-     * to the `path` and checking if the file exists on disk.
-     * @returns An absolute path to the first matching existing file, or `null` if none exist.
-     */
-    private resolvePath;
     /**
      * Can we consider the given path as an entry-point to a package?
      *

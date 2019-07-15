@@ -1,22 +1,10 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/umd_dependency_host" />
-import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
-import { DependencyHost, DependencyInfo } from './dependency_host';
-import { ModuleResolver } from './module_resolver';
+import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
+import { DependencyHostBase } from './dependency_host';
 /**
  * Helper functions for computing dependencies.
  */
-export declare class UmdDependencyHost implements DependencyHost {
-    private fs;
-    private moduleResolver;
-    constructor(fs: FileSystem, moduleResolver: ModuleResolver);
-    /**
-     * Find all the dependencies for the entry-point at the given path.
-     *
-     * @param entryPointPath The absolute path to the JavaScript file that represents an entry-point.
-     * @returns Information about the dependencies of the entry-point, including those that were
-     * missing or deep imports into other entry-points.
-     */
-    findDependencies(entryPointPath: AbsoluteFsPath): DependencyInfo;
+export declare class UmdDependencyHost extends DependencyHostBase {
     /**
      * Compute the dependencies of the given file.
      *
@@ -27,10 +15,9 @@ export declare class UmdDependencyHost implements DependencyHost {
      * @param deepImports A set that will have the import paths that exist but cannot be mapped to
      * entry-points, i.e. deep-imports.
      * @param alreadySeen A set that is used to track internal dependencies to prevent getting stuck
-     * in a
-     * circular dependency loop.
+     * in a circular dependency loop.
      */
-    private recursivelyFindDependencies;
+    protected recursivelyFindDependencies(file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<string>, alreadySeen: Set<AbsoluteFsPath>): void;
     /**
      * Check whether a source file needs to be parsed for imports.
      * This is a performance short-circuit, which saves us from creating
@@ -41,5 +28,5 @@ export declare class UmdDependencyHost implements DependencyHost {
      * @returns false if there are definitely no require calls
      * in this file, true otherwise.
      */
-    hasRequireCalls(source: string): boolean;
+    private hasRequireCalls;
 }

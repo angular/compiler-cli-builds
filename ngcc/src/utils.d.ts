@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
+import { AbsoluteFsPath, FileSystem } from '../../src/ngtsc/file_system';
 export declare function getOriginalSymbol(checker: ts.TypeChecker): (symbol: ts.Symbol) => ts.Symbol;
 export declare function isDefined<T>(value: T | undefined | null): value is T;
 export declare function getNameText(name: ts.PropertyName | ts.BindingName): string;
@@ -37,3 +38,9 @@ export declare type PathMappings = {
  * Relative paths start with `/`, `./` or `../`; or are simply `.` or `..`.
  */
 export declare function isRelativePath(path: string): boolean;
+/**
+ * Attempt to resolve a `path` to a file by appending the provided `postFixes`
+ * to the `path` and checking if the file exists on disk.
+ * @returns An absolute path to the first matching existing file, or `null` if none exist.
+ */
+export declare function resolveFileWithPostfixes(fs: FileSystem, path: AbsoluteFsPath, postFixes: string[]): AbsoluteFsPath | null;
