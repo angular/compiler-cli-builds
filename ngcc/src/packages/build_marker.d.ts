@@ -8,7 +8,7 @@
  */
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { EntryPointJsonProperty, EntryPointPackageJson } from './entry_point';
-export declare const NGCC_VERSION = "8.1.0+52.sha-177cf26.with-local-changes";
+export declare const NGCC_VERSION = "8.1.0+53.sha-6692c5d.with-local-changes";
 /**
  * Check whether ngcc has already processed a given entry-point format.
  *
