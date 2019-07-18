@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm2015_host" />
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
-import { ClassDeclaration, ClassMember, ClassMemberKind, ClassSymbol, CtorParameter, Declaration, Decorator, Import, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, ClassMember, ClassMemberKind, ClassSymbol, CtorParameter, Declaration, Decorator, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
 import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
 import { ModuleWithProvidersFunction, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
@@ -488,23 +488,6 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @returns an array of statements that may contain helper calls.
      */
     protected getStatementsForClass(classSymbol: ClassSymbol): ts.Statement[];
-    /**
-     * Try to get the import info for this identifier as though it is a namespaced import.
-     * For example, if the identifier is the `__metadata` part of a property access chain like:
-     *
-     * ```
-     * tslib_1.__metadata
-     * ```
-     *
-     * then it might be that `tslib_1` is a namespace import such as:
-     *
-     * ```
-     * import * as tslib_1 from 'tslib';
-     * ```
-     * @param id the TypeScript identifier to find the import info for.
-     * @returns The import info if this is a namespaced import or `null`.
-     */
-    protected getImportOfNamespacedIdentifier(id: ts.Identifier): Import | null;
     /**
      * Test whether a decorator was imported from `@angular/core`.
      *
