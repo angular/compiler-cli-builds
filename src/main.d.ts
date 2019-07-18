@@ -13,7 +13,7 @@ import * as api from './transformers/api';
 import { ParsedConfiguration } from './perform_compile';
 export declare function main(args: string[], consoleError?: (s: string) => void, config?: NgcParsedConfiguration, customTransformers?: api.CustomTransformers, programReuse?: {
     program: api.Program | undefined;
-}, modifiedResourceFiles?: Set<string>): number;
+}, modifiedResourceFiles?: Set<string> | null): number;
 export declare function mainDiagnosticsForTest(args: string[], config?: NgcParsedConfiguration): ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
 export interface NgcParsedConfiguration extends ParsedConfiguration {
     watch?: boolean;
