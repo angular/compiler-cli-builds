@@ -19,9 +19,9 @@ export interface Decorator {
      */
     name: string;
     /**
-     * Identifier which refers to the decorator in source.
+     * Identifier which refers to the decorator in the user's code.
      */
-    identifier: ts.Identifier;
+    identifier: DecoratorIdentifier;
     /**
      * `Import` by which the decorator was brought into the module in which it was invoked, or `null`
      * if the decorator was declared in the same module and not imported.
@@ -36,6 +36,15 @@ export interface Decorator {
      */
     args: ts.Expression[] | null;
 }
+/**
+ * A decorator is identified by either a simple identifier (e.g. `Decorator`) or, in some cases,
+ * a namespaced property access (e.g. `core.Decorator`).
+ */
+export declare type DecoratorIdentifier = ts.Identifier | NamespacedIdentifier;
+export declare type NamespacedIdentifier = ts.PropertyAccessExpression & {
+    expression: ts.Identifier;
+};
+export declare function isDecoratorIdentifier(exp: ts.Expression): exp is DecoratorIdentifier;
 /**
  * The `ts.Declaration` of a "class".
  *
@@ -340,7 +349,7 @@ export interface ReflectionHost {
      * result of an IIFE execution.
      *
      * @returns an array of `Decorator` metadata if decorators are present on the declaration, or
-     * `null` if either no decorators were present or if the declaration is not of a decorable type.
+     * `null` if either no decorators were present or if the declaration is not of a decoratable type.
      */
     getDecoratorsOfDeclaration(declaration: ts.Declaration): Decorator[] | null;
     /**

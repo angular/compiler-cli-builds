@@ -29,6 +29,7 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     protected getDirectImportOfIdentifier(id: ts.Identifier): Import | null;
     /**
      * Try to get the import info for this identifier as though it is a namespaced import.
+     *
      * For example, if the identifier is the `Directive` part of a qualified type chain like:
      *
      * ```
@@ -44,7 +45,7 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
      * @param id the TypeScript identifier to find the import info for.
      * @returns The import info if this is a namespaced import or `null`.
      */
-    protected getImportOfNamespacedIdentifier(id: ts.Identifier): Import | null;
+    protected getImportOfNamespacedIdentifier(id: ts.Identifier, namespaceIdentifier: ts.Identifier | null): Import | null;
     private _reflectDecorator;
     private _reflectMember;
 }
