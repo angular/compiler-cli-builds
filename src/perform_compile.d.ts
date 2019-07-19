@@ -45,5 +45,5 @@ export declare function performCompilation({ rootNames, options, host, oldProgra
     gatherDiagnostics?: (program: api.Program) => Diagnostics;
     customTransformers?: api.CustomTransformers;
     emitFlags?: api.EmitFlags;
-    modifiedResourceFiles?: Set<string>;
+    modifiedResourceFiles?: Set<string> | null;
 }): PerformCompilationResult;
