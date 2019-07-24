@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/indexer/src/api" />
 import { ParseSourceFile } from '@angular/compiler';
 import * as ts from 'typescript';
+import { ClassDeclaration } from '../../reflection';
 /**
  * Describes the kind of identifier found in a template.
  */
@@ -38,6 +39,11 @@ export interface MethodIdentifier extends TemplateIdentifier {
 export interface AttributeIdentifier extends TemplateIdentifier {
     kind: IdentifierKind.Attribute;
 }
+/** A reference to a directive node and its selector. */
+interface DirectiveReference {
+    node: ClassDeclaration;
+    selector: string;
+}
 /**
  * Describes an indexed element in a template. The name of an `ElementIdentifier` is the entire
  * element tag, which can be parsed by an indexer to determine where used directives should be
@@ -48,7 +54,7 @@ export interface ElementIdentifier extends TemplateIdentifier {
     /** Attributes on an element. */
     attributes: Set<AttributeIdentifier>;
     /** Directives applied to an element. */
-    usedDirectives: Set<ts.Declaration>;
+    usedDirectives: Set<DirectiveReference>;
 }
 /**
  * Identifiers recorded at the top level of the template, without any context about the HTML nodes
@@ -77,3 +83,4 @@ export interface IndexedComponent {
         file: ParseSourceFile;
     };
 }
+export {};
