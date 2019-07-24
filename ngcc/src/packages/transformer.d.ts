@@ -8,10 +8,10 @@
  */
 import * as ts from 'typescript';
 import { FileSystem } from '../../../src/ngtsc/file_system';
-import { CompiledFile } from '../analysis/decoration_analyzer';
 import { ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses } from '../analysis/switch_marker_analyzer';
+import { CompiledFile } from '../analysis/types';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { Logger } from '../logging/logger';
 import { RenderingFormatter } from '../rendering/rendering_formatter';

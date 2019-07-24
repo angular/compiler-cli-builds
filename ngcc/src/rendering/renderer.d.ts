@@ -9,7 +9,7 @@
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ImportManager } from '../../../src/ngtsc/translator';
-import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/decoration_analyzer';
+import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/types';
 import { PrivateDeclarationsAnalyses } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
 import { FileSystem } from '../../../src/ngtsc/file_system';

@@ -2,7 +2,7 @@
 import * as ts from 'typescript';
 import { FileSystem } from '../../../src/ngtsc/file_system';
 import { CompileResult } from '../../../src/ngtsc/transform';
-import { DecorationAnalyses } from '../analysis/decoration_analyzer';
+import { DecorationAnalyses } from '../analysis/types';
 import { ModuleWithProvidersInfo, ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
 import { PrivateDeclarationsAnalyses, ExportInfo } from '../analysis/private_declarations_analyzer';
 import { NgccReflectionHost } from '../host/ngcc_host';

@@ -8,12 +8,6 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/util" />
 import * as ts from 'typescript';
 import { ClassDeclaration } from './host';
-export declare function isNamedClassDeclaration(node: ts.Node): node is ClassDeclaration<ts.ClassDeclaration> & {
-    name: ts.Identifier;
-};
-export declare function isNamedFunctionDeclaration(node: ts.Node): node is ClassDeclaration<ts.FunctionDeclaration> & {
-    name: ts.Identifier;
-};
-export declare function isNamedVariableDeclaration(node: ts.Node): node is ClassDeclaration<ts.VariableDeclaration> & {
-    name: ts.Identifier;
-};
+export declare function isNamedClassDeclaration(node: ts.Node): node is ClassDeclaration<ts.ClassDeclaration>;
+export declare function isNamedFunctionDeclaration(node: ts.Node): node is ClassDeclaration<ts.FunctionDeclaration>;
+export declare function isNamedVariableDeclaration(node: ts.Node): node is ClassDeclaration<ts.VariableDeclaration>;
