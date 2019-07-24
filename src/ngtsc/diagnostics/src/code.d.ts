@@ -45,6 +45,19 @@ export declare enum ErrorCode {
      * Raised when an NgModule contains a type in `exports` which is neither in `declarations` nor
      * otherwise imported.
      */
-    NGMODULE_INVALID_REEXPORT = 6004
+    NGMODULE_INVALID_REEXPORT = 6004,
+    /**
+     * Raised when ngcc tries to inject a synthetic decorator over one that already exists.
+     */
+    NGCC_MIGRATION_DECORATOR_INJECTION_ERROR = 7001,
+    /**
+     * Raised when ngcc tries to decorate a base class that was imported from outside the package.
+     */
+    NGCC_MIGRATION_EXTERNAL_BASE_CLASS = 7002,
+    /**
+     * Raised when ngcc tries to migrate a class that is extended from a dynamic base class
+     * expression.
+     */
+    NGCC_MIGRATION_DYNAMIC_BASE_CLASS = 7003
 }
 export declare function ngErrorCode(code: ErrorCode): number;

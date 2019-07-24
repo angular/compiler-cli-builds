@@ -133,6 +133,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      */
     getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
     hasBaseClass(clazz: ClassDeclaration): boolean;
+    getBaseClassExpression(clazz: ClassDeclaration): ts.Expression | null;
     /**
      * Check whether the given node actually represents a class.
      */

@@ -14,39 +14,13 @@ import { FileSystem } from '../../../src/ngtsc/file_system';
 import { ModuleResolver, ReferenceEmitter } from '../../../src/ngtsc/imports';
 import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
-import { ClassDeclaration, ClassSymbol, Decorator } from '../../../src/ngtsc/reflection';
+import { ClassSymbol } from '../../../src/ngtsc/reflection';
 import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver } from '../../../src/ngtsc/scope';
 import { CompileResult, DecoratorHandler } from '../../../src/ngtsc/transform';
 import { NgccReflectionHost } from '../host/ngcc_host';
+import { Migration, MigrationHost } from '../migrations/migration';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
-export interface AnalyzedFile {
-    sourceFile: ts.SourceFile;
-    analyzedClasses: AnalyzedClass[];
-}
-export interface AnalyzedClass {
-    name: string;
-    decorators: Decorator[] | null;
-    declaration: ClassDeclaration;
-    diagnostics?: ts.Diagnostic[];
-    matches: {
-        handler: DecoratorHandler<any, any>;
-        analysis: any;
-    }[];
-}
-export interface CompiledClass extends AnalyzedClass {
-    compilation: CompileResult[];
-}
-export interface CompiledFile {
-    compiledClasses: CompiledClass[];
-    sourceFile: ts.SourceFile;
-    constantPool: ConstantPool;
-}
-export declare type DecorationAnalyses = Map<ts.SourceFile, CompiledFile>;
-export declare const DecorationAnalyses: MapConstructor;
-export interface MatchingHandler<A, M> {
-    handler: DecoratorHandler<A, M>;
-    detected: M;
-}
+import { AnalyzedClass, AnalyzedFile, CompiledFile, DecorationAnalyses } from './types';
 /**
  * Simple class that resolves and loads files directly from the filesystem.
  */
@@ -66,6 +40,7 @@ export declare class DecorationAnalyzer {
     private bundle;
     private reflectionHost;
     private referencesRegistry;
+    private diagnosticHandler;
     private program;
     private options;
     private host;
@@ -86,7 +61,8 @@ export declare class DecorationAnalyzer {
     importGraph: ImportGraph;
     cycleAnalyzer: CycleAnalyzer;
     handlers: DecoratorHandler<any, any>[];
-    constructor(fs: FileSystem, bundle: EntryPointBundle, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry);
+    migrations: Migration[];
+    constructor(fs: FileSystem, bundle: EntryPointBundle, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, diagnosticHandler?: (error: ts.Diagnostic) => void);
     /**
      * Analyze a program to find all the decorated files should be transformed.
      *
@@ -95,6 +71,7 @@ export declare class DecorationAnalyzer {
     analyzeProgram(): DecorationAnalyses;
     protected analyzeFile(sourceFile: ts.SourceFile): AnalyzedFile | undefined;
     protected analyzeClass(symbol: ClassSymbol): AnalyzedClass | null;
+    protected migrateFile(migrationHost: MigrationHost, analyzedFile: AnalyzedFile): void;
     protected compileFile(analyzedFile: AnalyzedFile): CompiledFile;
     protected compileClass(clazz: AnalyzedClass, constantPool: ConstantPool): CompileResult[];
     protected resolveFile(analyzedFile: AnalyzedFile): void;
