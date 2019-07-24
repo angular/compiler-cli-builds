@@ -35,6 +35,7 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      * @param clazz a `ClassDeclaration` representing the class over which to reflect.
      */
     hasBaseClass(clazz: ClassDeclaration): boolean;
+    getBaseClassExpression(clazz: ClassDeclaration): ts.Expression | null;
     /**
      * Find the declaration of a class given a node that we think represents the class.
      *

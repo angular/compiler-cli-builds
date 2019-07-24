@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import MagicString from 'magic-string';
-import { CompiledClass } from '../analysis/decoration_analyzer';
+import { CompiledClass } from '../analysis/types';
 import { EsmRenderingFormatter } from './esm_rendering_formatter';
 /**
  * A RenderingFormatter that works with files that use ECMAScript Module `import` and `export`
