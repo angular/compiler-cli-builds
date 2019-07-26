@@ -20,7 +20,10 @@ import { ResourceDependencyRecorder } from '../../util/src/resource_recorder';
 import { ResourceLoader } from './api';
 export interface ComponentHandlerData {
     meta: R3ComponentMetadata;
-    parsedTemplate: TmplAstNode[];
+    parsedTemplate: {
+        nodes: TmplAstNode[];
+        file: ParseSourceFile;
+    };
     metadataStmt: Statement | null;
     parseTemplate: (options?: ParseTemplateOptions) => ParsedTemplate;
 }

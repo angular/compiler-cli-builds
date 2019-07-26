@@ -16,6 +16,7 @@ export declare function nodeNameForError(node: ts.Node & {
 }): string;
 export declare function getSourceFile(node: ts.Node): ts.SourceFile;
 export declare function getSourceFileOrNull(program: ts.Program, fileName: AbsoluteFsPath): ts.SourceFile | null;
+export declare function getTokenAtPosition(sf: ts.SourceFile, pos: number): ts.Node;
 export declare function identifierOfNode(decl: ts.Node & {
     name?: ts.Node;
 }): ts.Identifier | null;
