@@ -6,12 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/context" />
-import { BoundTarget } from '@angular/compiler';
+import { BoundTarget, ParseSourceFile } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
 import { TypeCheckableDirectiveMeta, TypeCheckingConfig, TypeCtorMetadata } from './api';
+import { Diagnostic } from './diagnostics';
 /**
  * A template type checking context for a program.
  *
@@ -35,6 +36,12 @@ export declare class TypeCheckContext {
      */
     private typeCtorPending;
     /**
+     * This map keeps track of all template sources that have been type-checked by the reference name
+     * that is attached to a TCB's function declaration as leading trivia. This enables translation
+     * of diagnostics produced for TCB code to their source location in the template.
+     */
+    private templateSources;
+    /**
      * Record a template for the given component `node`, with a `SelectorMatcher` for directive
      * matching.
      *
@@ -42,7 +49,7 @@ export declare class TypeCheckContext {
      * @param template AST nodes of the template being recorded.
      * @param matcher `SelectorMatcher` which tracks directives that are in scope for this template.
      */
-    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>): void;
+    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, file: ParseSourceFile): void;
     /**
      * Record a type constructor for the given `node` with the given `ctorMetadata`.
      */
@@ -57,7 +64,7 @@ export declare class TypeCheckContext {
      */
     transform(sf: ts.SourceFile): ts.SourceFile;
     calculateTemplateDiagnostics(originalProgram: ts.Program, originalHost: ts.CompilerHost, originalOptions: ts.CompilerOptions): {
-        diagnostics: ts.Diagnostic[];
+        diagnostics: Diagnostic[];
         program: ts.Program;
     };
     private addInlineTypeCheckBlock;
