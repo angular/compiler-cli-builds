@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "8.2.0-rc.0+11.sha-7290053.with-local-changes",
+  "version": "8.2.0-rc.0+13.sha-03e8a31.with-local-changes",
   "description": "Angular - the compiler CLI for Node.js",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -22,7 +22,7 @@
     "yargs": "13.1.0"
   },
   "peerDependencies": {
-    "@angular/compiler": "8.2.0-rc.0+11.sha-7290053.with-local-changes",
+    "@angular/compiler": "8.2.0-rc.0+13.sha-03e8a31.with-local-changes",
     "typescript": ">=3.4 <3.6"
   },
   "engines": {
