@@ -8,7 +8,7 @@
  */
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { EntryPointJsonProperty, EntryPointPackageJson } from './entry_point';
-export declare const NGCC_VERSION = "9.0.0-next.0+41.sha-fa699f6.with-local-changes";
+export declare const NGCC_VERSION = "9.0.0-next.0+52.sha-29d3b68.with-local-changes";
 /**
  * Check whether ngcc has already processed a given entry-point format.
  *
@@ -21,7 +21,7 @@ export declare const NGCC_VERSION = "9.0.0-next.0+41.sha-fa699f6.with-local-chan
  * @throws Error if the `packageJson` property is not an object.
  * @throws Error if the entry-point has already been processed with a different ngcc version.
  */
-export declare function hasBeenProcessed(packageJson: EntryPointPackageJson, format: EntryPointJsonProperty): boolean;
+export declare function hasBeenProcessed(packageJson: EntryPointPackageJson, format: EntryPointJsonProperty | 'typings'): boolean;
 /**
  * Write a build marker for the given entry-point and format properties, to indicate that they have
  * been compiled by this version of ngcc.
@@ -32,4 +32,4 @@ export declare function hasBeenProcessed(packageJson: EntryPointPackageJson, for
  * @param properties The properties in the `package.json` of the formats for which we are writing
  *                   the marker.
  */
-export declare function markAsProcessed(fs: FileSystem, packageJson: EntryPointPackageJson, packageJsonPath: AbsoluteFsPath, properties: EntryPointJsonProperty[]): void;
+export declare function markAsProcessed(fs: FileSystem, packageJson: EntryPointPackageJson, packageJsonPath: AbsoluteFsPath, properties: (EntryPointJsonProperty | 'typings')[]): void;

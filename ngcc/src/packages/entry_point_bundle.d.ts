@@ -2,14 +2,13 @@
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { PathMappings } from '../utils';
 import { BundleProgram } from './bundle_program';
-import { EntryPoint, EntryPointFormat, EntryPointJsonProperty } from './entry_point';
+import { EntryPoint, EntryPointFormat } from './entry_point';
 /**
  * A bundle of files and paths (and TS programs) that correspond to a particular
  * format of a package entry-point.
  */
 export interface EntryPointBundle {
     entryPoint: EntryPoint;
-    formatProperty: EntryPointJsonProperty;
     format: EntryPointFormat;
     isCore: boolean;
     isFlatCore: boolean;
@@ -23,11 +22,10 @@ export interface EntryPointBundle {
  * @param entryPoint The entry-point that contains the bundle.
  * @param formatPath The path to the source files for this bundle.
  * @param isCore This entry point is the Angular core package.
- * @param formatProperty The property in the package.json that holds the formatPath.
  * @param format The underlying format of the bundle.
  * @param transformDts Whether to transform the typings along with this bundle.
  * @param pathMappings An optional set of mappings to use when compiling files.
  * @param mirrorDtsFromSrc If true then the `dts` program will contain additional files that
  * were guessed by mapping the `src` files to `dts` files.
  */
-export declare function makeEntryPointBundle(fs: FileSystem, entryPoint: EntryPoint, formatPath: string, isCore: boolean, formatProperty: EntryPointJsonProperty, format: EntryPointFormat, transformDts: boolean, pathMappings?: PathMappings, mirrorDtsFromSrc?: boolean): EntryPointBundle | null;
+export declare function makeEntryPointBundle(fs: FileSystem, entryPoint: EntryPoint, formatPath: string, isCore: boolean, format: EntryPointFormat, transformDts: boolean, pathMappings?: PathMappings, mirrorDtsFromSrc?: boolean): EntryPointBundle;

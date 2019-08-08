@@ -20,8 +20,8 @@ import { InPlaceFileWriter } from './in_place_file_writer';
  * `InPlaceFileWriter`).
  */
 export declare class NewEntryPointFileWriter extends InPlaceFileWriter {
-    writeBundle(entryPoint: EntryPoint, bundle: EntryPointBundle, transformedFiles: FileToWrite[]): void;
+    writeBundle(bundle: EntryPointBundle, transformedFiles: FileToWrite[], formatProperties: EntryPointJsonProperty[]): void;
     protected copyBundle(bundle: EntryPointBundle, packagePath: AbsoluteFsPath, ngccFolder: AbsoluteFsPath): void;
     protected writeFile(file: FileToWrite, packagePath: AbsoluteFsPath, ngccFolder: AbsoluteFsPath): void;
-    protected updatePackageJson(entryPoint: EntryPoint, formatProperty: EntryPointJsonProperty, ngccFolder: AbsoluteFsPath): void;
+    protected updatePackageJson(entryPoint: EntryPoint, formatProperties: EntryPointJsonProperty[], ngccFolder: AbsoluteFsPath): void;
 }
