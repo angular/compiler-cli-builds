@@ -40,11 +40,10 @@ export interface PackageJsonFormatProperties {
  */
 export interface EntryPointPackageJson extends PackageJsonFormatProperties {
     name: string;
-    __processed_by_ivy_ngcc__?: {
-        [key: string]: string;
-    };
+    scripts?: Record<string, string>;
+    __processed_by_ivy_ngcc__?: Record<string, string>;
 }
-export declare type EntryPointJsonProperty = keyof (PackageJsonFormatProperties);
+export declare type EntryPointJsonProperty = Exclude<keyof PackageJsonFormatProperties, 'types' | 'typings'>;
 export declare const SUPPORTED_FORMAT_PROPERTIES: EntryPointJsonProperty[];
 /**
  * Try to create an entry-point from the given paths and properties.
@@ -60,4 +59,4 @@ export declare function getEntryPointInfo(fs: FileSystem, config: NgccConfigurat
  * @param property The property to convert to a format.
  * @returns An entry-point format or `undefined` if none match the given property.
  */
-export declare function getEntryPointFormat(fs: FileSystem, entryPoint: EntryPoint, property: string): EntryPointFormat | undefined;
+export declare function getEntryPointFormat(fs: FileSystem, entryPoint: EntryPoint, property: EntryPointJsonProperty): EntryPointFormat | undefined;
