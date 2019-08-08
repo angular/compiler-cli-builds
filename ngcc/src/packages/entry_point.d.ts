@@ -40,9 +40,8 @@ export interface PackageJsonFormatProperties {
  */
 export interface EntryPointPackageJson extends PackageJsonFormatProperties {
     name: string;
-    __processed_by_ivy_ngcc__?: {
-        [key: string]: string;
-    };
+    scripts?: Record<string, string>;
+    __processed_by_ivy_ngcc__?: Record<string, string>;
 }
 export declare type EntryPointJsonProperty = Exclude<keyof PackageJsonFormatProperties, 'types' | 'typings'>;
 export declare const SUPPORTED_FORMAT_PROPERTIES: EntryPointJsonProperty[];
