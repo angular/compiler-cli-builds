@@ -11,6 +11,7 @@ import { AliasGenerator, Reexport, Reference, ReferenceEmitter } from '../../imp
 import { DirectiveMeta, MetadataReader, MetadataRegistry, NgModuleMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 import { ExportScope, ScopeData } from './api';
+import { ComponentScopeReader, ComponentScopeRegistry } from './component_scope';
 import { DtsModuleScopeResolver } from './dependency';
 export interface LocalNgModuleData {
     declarations: Reference<ClassDeclaration>[];
@@ -49,11 +50,12 @@ export interface CompilationScope extends ScopeData {
  * The `LocalModuleScopeRegistry` is also capable of producing `ts.Diagnostic` errors when Angular
  * semantics are violated.
  */
-export declare class LocalModuleScopeRegistry implements MetadataRegistry {
+export declare class LocalModuleScopeRegistry implements MetadataRegistry, ComponentScopeReader {
     private localReader;
     private dependencyScopeReader;
     private refEmitter;
     private aliasGenerator;
+    private componentScopeRegistry;
     /**
      * Tracks whether the registry has been asked to produce scopes for a module or component. Once
      * this is true, the registry cannot accept registrations of new directives/pipes/modules as it
@@ -89,7 +91,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry {
      * Tracks errors accumulated in the processing of scopes for each module declaration.
      */
     private scopeErrors;
-    constructor(localReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasGenerator: AliasGenerator | null);
+    constructor(localReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasGenerator: AliasGenerator | null, componentScopeRegistry?: ComponentScopeRegistry);
     /**
      * Add an NgModule's data to the registry.
      */
