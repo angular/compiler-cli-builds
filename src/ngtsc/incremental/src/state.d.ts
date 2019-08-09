@@ -11,11 +11,12 @@ import { Reference } from '../../imports';
 import { DirectiveMeta, MetadataReader, MetadataRegistry, NgModuleMeta, PipeMeta } from '../../metadata';
 import { DependencyTracker } from '../../partial_evaluator';
 import { ClassDeclaration } from '../../reflection';
+import { ComponentScopeReader, ComponentScopeRegistry, LocalModuleScope } from '../../scope';
 import { ResourceDependencyRecorder } from '../../util/src/resource_recorder';
 /**
  * Accumulates state between compilations.
  */
-export declare class IncrementalState implements DependencyTracker, MetadataReader, MetadataRegistry, ResourceDependencyRecorder {
+export declare class IncrementalState implements DependencyTracker, MetadataReader, MetadataRegistry, ResourceDependencyRecorder, ComponentScopeRegistry, ComponentScopeReader {
     private unchangedFiles;
     private metadata;
     private modifiedResourceFiles;
@@ -32,6 +33,10 @@ export declare class IncrementalState implements DependencyTracker, MetadataRead
     getPipeMetadata(ref: Reference<ClassDeclaration>): PipeMeta | null;
     registerPipeMetadata(meta: PipeMeta): void;
     recordResourceDependency(file: ts.SourceFile, resourcePath: string): void;
+    registerComponentScope(clazz: ClassDeclaration, scope: LocalModuleScope): void;
+    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
+    setComponentAsRequiringRemoteScoping(clazz: ClassDeclaration): void;
+    getRequiresRemoteScope(clazz: ClassDeclaration): boolean | null;
     private ensureMetadata;
     private hasChangedResourceDependencies;
 }
