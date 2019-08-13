@@ -18,7 +18,7 @@
      * found in the LICENSE file at https://angular.io/license
      */
     var file_system_1 = require("@angular/compiler-cli/src/ngtsc/file_system");
-    exports.NGCC_VERSION = '9.0.0-next.1+24.sha-914900a.with-local-changes';
+    exports.NGCC_VERSION = '9.0.0-next.2+12.sha-e4d5102.with-local-changes';
     /**
      * Check whether ngcc has already processed a given entry-point format.
      *
