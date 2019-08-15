@@ -9,7 +9,7 @@
 import * as ts from 'typescript';
 import { ReferencesRegistry } from '../../../src/ngtsc/annotations';
 import { Reference } from '../../../src/ngtsc/imports';
-import { Declaration, ReflectionHost } from '../../../src/ngtsc/reflection';
+import { ConcreteDeclaration, ReflectionHost } from '../../../src/ngtsc/reflection';
 /**
  * This is a place for DecoratorHandlers to register references that they
  * find in their analysis of the code.
@@ -31,5 +31,5 @@ export declare class NgccReferencesRegistry implements ReferencesRegistry {
      * Create and return a mapping for the registered resolved references.
      * @returns A map of reference identifiers to reference declarations.
      */
-    getDeclarationMap(): Map<ts.Identifier, Declaration>;
+    getDeclarationMap(): Map<ts.Identifier, ConcreteDeclaration>;
 }
