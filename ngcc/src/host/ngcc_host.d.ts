@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { ClassDeclaration, ClassSymbol, Declaration, Decorator, ReflectionHost } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, ClassSymbol, ConcreteDeclaration, Decorator, ReflectionHost } from '../../../src/ngtsc/reflection';
 export declare const PRE_R3_MARKER = "__PRE_R3__";
 export declare const POST_R3_MARKER = "__POST_R3__";
 export declare type SwitchableVariableDeclaration = ts.VariableDeclaration & {
@@ -35,7 +35,7 @@ export interface ModuleWithProvidersFunction {
      * The declaration of the class that the `ngModule` property on the `ModuleWithProviders` object
      * refers to.
      */
-    ngModule: Declaration<ClassDeclaration>;
+    ngModule: ConcreteDeclaration<ClassDeclaration>;
 }
 /**
  * A reflection host that has extra methods for looking at non-Typescript package formats

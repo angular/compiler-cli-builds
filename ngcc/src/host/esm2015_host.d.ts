@@ -517,7 +517,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param dtsProgram The program containing all the typings files.
      * @returns a map of class names to class declarations.
      */
-    protected computeDtsDeclarationMap(dtsRootFileName: AbsoluteFsPath, dtsProgram: ts.Program): Map<string, ts.Declaration>;
+    protected computeDtsDeclarationMap(dtsRootFileName: AbsoluteFsPath, dtsProgram: ts.Program, dtsPackage: AbsoluteFsPath): Map<string, ts.Declaration>;
     /**
      * Parse a function/method node (or its implementation), to see if it returns a
      * `ModuleWithProviders` object.

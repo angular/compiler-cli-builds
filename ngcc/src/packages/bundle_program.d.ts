@@ -22,13 +22,14 @@ export interface BundleProgram {
     host: ts.CompilerHost;
     path: AbsoluteFsPath;
     file: ts.SourceFile;
+    package: AbsoluteFsPath;
     r3SymbolsPath: AbsoluteFsPath | null;
     r3SymbolsFile: ts.SourceFile | null;
 }
 /**
  * Create a bundle program.
  */
-export declare function makeBundleProgram(fs: FileSystem, isCore: boolean, path: AbsoluteFsPath, r3FileName: string, options: ts.CompilerOptions, host: ts.CompilerHost, additionalFiles?: AbsoluteFsPath[]): BundleProgram;
+export declare function makeBundleProgram(fs: FileSystem, isCore: boolean, pkg: AbsoluteFsPath, path: AbsoluteFsPath, r3FileName: string, options: ts.CompilerOptions, host: ts.CompilerHost, additionalFiles?: AbsoluteFsPath[]): BundleProgram;
 /**
  * Search the given directory hierarchy to find the path to the `r3_symbols` file.
  */
