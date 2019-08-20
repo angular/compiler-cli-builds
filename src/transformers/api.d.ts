@@ -72,21 +72,17 @@ export interface CompilerOptions extends ts.CompilerOptions {
     enableResourceInlining?: boolean;
     /**
      * Tells the compiler to generate definitions using the Render3 style code generation.
-     * This option defaults to `false`.
-     *
-     * Not all features are supported with this option enabled. It is only supported
-     * for experimentation and testing of Render3 style code generation.
+     * This option defaults to `true`.
      *
      * Acceptable values are as follows:
      *
      * `false` - run ngc normally
      * `true` - run the ngtsc compiler instead of the normal ngc compiler
      * `ngtsc` - alias for `true`
-     * `tsc` - behave like plain tsc as much as possible (used for testing JIT code)
      *
      * @publicApi
      */
-    enableIvy?: boolean | 'ngtsc' | 'tsc';
+    enableIvy?: boolean | 'ngtsc';
     /**
      * Whether NGC should generate re-exports for external symbols which are referenced
      * in Angular metadata (e.g. @Component, @Inject, @ViewChild). This can be enabled in
