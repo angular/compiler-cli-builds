@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
 import { Expression, R3InjectorMetadata, R3NgModuleMetadata, Statement } from '@angular/compiler';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
-import { MetadataRegistry } from '../../metadata';
+import { MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { NgModuleRouteAnalyzer } from '../../routing';
@@ -31,6 +31,7 @@ export interface NgModuleAnalysis {
 export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModuleAnalysis, Decorator> {
     private reflector;
     private evaluator;
+    private metaReader;
     private metaRegistry;
     private scopeRegistry;
     private referencesRegistry;
@@ -39,7 +40,7 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<NgModu
     private refEmitter;
     private defaultImportRecorder;
     private localeId?;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, localeId?: string | undefined);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, localeId?: string | undefined);
     readonly precedence = HandlerPrecedence.PRIMARY;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ClassDeclaration, decorator: Decorator): AnalysisOutput<NgModuleAnalysis>;

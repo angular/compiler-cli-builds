@@ -96,6 +96,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * Add an NgModule's data to the registry.
      */
     registerNgModuleMetadata(data: NgModuleMeta): void;
+    registerAbstractDirective(clazz: ClassDeclaration): void;
     registerDirectiveMetadata(directive: DirectiveMeta): void;
     registerPipeMetadata(pipe: PipeMeta): void;
     getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
