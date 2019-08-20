@@ -30,7 +30,10 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
     compile(node: ClassDeclaration, analysis: DirectiveHandlerData, pool: ConstantPool): CompileResult;
 }
 /**
- * Helper function to extract metadata from a `Directive` or `Component`.
+ * Helper function to extract metadata from a `Directive` or `Component`. `Directive`s without a
+ * selector are allowed to be used for abstract base classes. These abstract directives should not
+ * appear in the declarations of an `NgModule` and additional verification is done when processing
+ * the module.
  */
 export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Decorator, reflector: ReflectionHost, evaluator: PartialEvaluator, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, defaultSelector?: string | null): {
     decorator: Map<string, ts.Expression>;
