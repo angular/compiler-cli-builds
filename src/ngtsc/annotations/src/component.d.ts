@@ -15,15 +15,13 @@ import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
-import { TypeCheckContext } from '../../typecheck';
+import { TemplateSourceMapping, TypeCheckContext } from '../../typecheck';
 import { ResourceDependencyRecorder } from '../../util/src/resource_recorder';
 import { ResourceLoader } from './api';
 export interface ComponentHandlerData {
     meta: R3ComponentMetadata;
-    parsedTemplate: {
-        nodes: TmplAstNode[];
-        file: ParseSourceFile;
-    };
+    parsedTemplate: ParsedTemplate;
+    templateSourceMapping: TemplateSourceMapping;
     metadataStmt: Statement | null;
     parseTemplate: (options?: ParseTemplateOptions) => ParsedTemplate;
 }
@@ -74,13 +72,53 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private _isCyclicImport;
     private _recordSyntheticImport;
 }
-interface ParsedTemplate {
+/**
+ * Information about the template which was extracted during parsing.
+ *
+ * This contains the actual parsed template as well as any metadata collected during its parsing,
+ * some of which might be useful for re-parsing the template with different options.
+ */
+export interface ParsedTemplate {
+    /**
+     * The `InterpolationConfig` specified by the user.
+     */
     interpolation: InterpolationConfig;
+    /**
+     * A full path to the file which contains the template.
+     *
+     * This can be either the original .ts file if the template is inline, or the .html file if an
+     * external file was used.
+     */
+    templateUrl: string;
+    /**
+     * The string contents of the template.
+     *
+     * This is the "logical" template string, after expansion of any escaped characters (for inline
+     * templates). This may differ from the actual template bytes as they appear in the .ts file.
+     */
+    template: string;
+    /**
+     * Any errors from parsing the template the first time.
+     */
     errors?: ParseError[] | undefined;
+    /**
+     * The actual parsed template nodes.
+     */
     nodes: TmplAstNode[];
+    /**
+     * Any styleUrls extracted from the metadata.
+     */
     styleUrls: string[];
+    /**
+     * Any inline styles extracted from the metadata.
+     */
     styles: string[];
+    /**
+     * Whether the template was inline.
+     */
     isInline: boolean;
+    /**
+     * The `ParseSourceFile` for the template.
+     */
     file: ParseSourceFile;
 }
-export {};
