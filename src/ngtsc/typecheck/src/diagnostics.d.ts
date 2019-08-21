@@ -6,31 +6,28 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ParseSourceSpan, ParseSpan, Position } from '@angular/compiler';
+import { ParseSourceSpan, ParseSpan } from '@angular/compiler';
 import * as ts from 'typescript';
-import { ClassDeclaration } from '../../reflection';
-/**
- * FIXME: Taken from packages/compiler-cli/src/transformers/api.ts to prevent circular dep,
- *  modified to account for new span notation.
- */
-export interface DiagnosticMessageChain {
-    messageText: string;
-    position?: Position;
-    next?: DiagnosticMessageChain;
-}
-export interface Diagnostic {
-    messageText: string;
-    span?: ParseSourceSpan;
-    position?: Position;
-    chain?: DiagnosticMessageChain;
-    category: ts.DiagnosticCategory;
-    code: number;
-    source: 'angular';
-}
+import { TemplateSourceMapping } from './api';
 export interface SourceLocation {
-    sourceReference: string;
+    id: string;
     start: number;
     end: number;
+}
+/**
+ * Adapter interface which allows the template type-checking diagnostics code to interpret offsets
+ * in a TCB and map them back to original locations in the template.
+ */
+export interface TcbSourceResolver {
+    /**
+     * For the given template id, retrieve the original source mapping which describes how the offsets
+     * in the template should be interpreted.
+     */
+    getSourceMapping(id: string): TemplateSourceMapping;
+    /**
+     * Convert a location extracted from a TCB into a `ParseSourceSpan` if possible.
+     */
+    sourceLocationToSpan(location: SourceLocation): ParseSourceSpan | null;
 }
 /**
  * An `AbsoluteSpan` is the result of translating the `ParseSpan` of `AST` template expression nodes
@@ -67,8 +64,7 @@ export declare function addParseSpanInfo(node: ts.Node, span: AbsoluteSpan | Par
  * Adds a synthetic comment to the function declaration that contains the source location
  * of the class declaration.
  */
-export declare function addSourceReferenceName(tcb: ts.FunctionDeclaration, source: ClassDeclaration): void;
-export declare function getSourceReferenceName(source: ClassDeclaration): string;
+export declare function addSourceId(tcb: ts.FunctionDeclaration, id: string): void;
 /**
  * Determines if the diagnostic should be reported. Some diagnostics are produced because of the
  * way TCBs are generated; those diagnostics should not be reported as type check errors of the
@@ -83,4 +79,4 @@ export declare function shouldReportDiagnostic(diagnostic: ts.Diagnostic): boole
  * should not be reported at all. This prevents diagnostics from non-TCB code in a user's source
  * file from being reported as type-check errors.
  */
-export declare function translateDiagnostic(diagnostic: ts.Diagnostic, resolveParseSource: (sourceLocation: SourceLocation) => ParseSourceSpan | null): Diagnostic | null;
+export declare function translateDiagnostic(diagnostic: ts.Diagnostic, resolver: TcbSourceResolver): ts.Diagnostic | null;
