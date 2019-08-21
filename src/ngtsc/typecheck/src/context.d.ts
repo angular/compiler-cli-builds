@@ -11,7 +11,8 @@ import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
-import { TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckingConfig, TypeCtorMetadata } from './api';
+import { TypeCheckableDirectiveMeta, TypeCheckingConfig, TypeCtorMetadata } from './api';
+import { Diagnostic } from './diagnostics';
 /**
  * A template type checking context for a program.
  *
@@ -34,11 +35,10 @@ export declare class TypeCheckContext {
      * queued.
      */
     private typeCtorPending;
-    private nextTcbId;
     /**
-     * This map keeps track of all template sources that have been type-checked by the id that is
-     * attached to a TCB's function declaration as leading trivia. This enables translation of
-     * diagnostics produced for TCB code to their source location in the template.
+     * This map keeps track of all template sources that have been type-checked by the reference name
+     * that is attached to a TCB's function declaration as leading trivia. This enables translation
+     * of diagnostics produced for TCB code to their source location in the template.
      */
     private templateSources;
     /**
@@ -49,7 +49,7 @@ export declare class TypeCheckContext {
      * @param template AST nodes of the template being recorded.
      * @param matcher `SelectorMatcher` which tracks directives that are in scope for this template.
      */
-    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, sourceMapping: TemplateSourceMapping, file: ParseSourceFile): void;
+    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, file: ParseSourceFile): void;
     /**
      * Record a type constructor for the given `node` with the given `ctorMetadata`.
      */
@@ -64,7 +64,7 @@ export declare class TypeCheckContext {
      */
     transform(sf: ts.SourceFile): ts.SourceFile;
     calculateTemplateDiagnostics(originalProgram: ts.Program, originalHost: ts.CompilerHost, originalOptions: ts.CompilerOptions): {
-        diagnostics: ts.Diagnostic[];
+        diagnostics: Diagnostic[];
         program: ts.Program;
     };
     private addInlineTypeCheckBlock;
