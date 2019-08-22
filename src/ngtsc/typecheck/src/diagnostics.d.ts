@@ -80,3 +80,7 @@ export declare function shouldReportDiagnostic(diagnostic: ts.Diagnostic): boole
  * file from being reported as type-check errors.
  */
 export declare function translateDiagnostic(diagnostic: ts.Diagnostic, resolver: TcbSourceResolver): ts.Diagnostic | null;
+/**
+ * Constructs a `ts.Diagnostic` for a given `ParseSourceSpan` within a template.
+ */
+export declare function makeTemplateDiagnostic(mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: number, messageText: string | ts.DiagnosticMessageChain): ts.Diagnostic;
