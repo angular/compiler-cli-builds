@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/local" />
+import { SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AliasGenerator, Reexport, Reference, ReferenceEmitter } from '../../imports';
 import { DirectiveMeta, MetadataReader, MetadataRegistry, NgModuleMeta, PipeMeta } from '../../metadata';
@@ -21,6 +22,7 @@ export interface LocalNgModuleData {
 export interface LocalModuleScope extends ExportScope {
     compilation: ScopeData;
     reexports: Reexport[] | null;
+    schemas: SchemaMetadata[];
 }
 /**
  * Information about the compilation scope of a registered declaration.

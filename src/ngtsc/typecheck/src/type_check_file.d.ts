@@ -11,6 +11,7 @@ import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
 import { TypeCheckBlockMetadata, TypeCheckingConfig } from './api';
+import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
 /**
  * An `Environment` representing the single type-checking file into which most (if not all) Type
@@ -25,7 +26,7 @@ export declare class TypeCheckFile extends Environment {
     private nextTcbId;
     private tcbStatements;
     constructor(fileName: string, config: TypeCheckingConfig, refEmitter: ReferenceEmitter);
-    addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata): void;
+    addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker): void;
     render(): ts.SourceFile;
     getPreludeStatements(): ts.Statement[];
 }

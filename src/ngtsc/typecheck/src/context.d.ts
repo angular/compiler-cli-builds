@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/context" />
-import { BoundTarget, ParseSourceFile } from '@angular/compiler';
+import { BoundTarget, ParseSourceFile, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
@@ -34,13 +34,8 @@ export declare class TypeCheckContext {
      * queued.
      */
     private typeCtorPending;
-    private nextTcbId;
-    /**
-     * This map keeps track of all template sources that have been type-checked by the id that is
-     * attached to a TCB's function declaration as leading trivia. This enables translation of
-     * diagnostics produced for TCB code to their source location in the template.
-     */
-    private templateSources;
+    private sourceManager;
+    private domSchemaChecker;
     /**
      * Record a template for the given component `node`, with a `SelectorMatcher` for directive
      * matching.
@@ -49,7 +44,7 @@ export declare class TypeCheckContext {
      * @param template AST nodes of the template being recorded.
      * @param matcher `SelectorMatcher` which tracks directives that are in scope for this template.
      */
-    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, sourceMapping: TemplateSourceMapping, file: ParseSourceFile): void;
+    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[], sourceMapping: TemplateSourceMapping, file: ParseSourceFile): void;
     /**
      * Record a type constructor for the given `node` with the given `ctorMetadata`.
      */

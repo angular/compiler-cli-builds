@@ -6,11 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/type_check_block" />
-import { BoundTarget } from '@angular/compiler';
+import { BoundTarget, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
 import { TypeCheckBlockMetadata, TypeCheckableDirectiveMeta } from './api';
+import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
 /**
  * Given a `ts.ClassDeclaration` for a component, and metadata regarding that component, compose a
@@ -23,7 +24,7 @@ import { Environment } from './environment';
  * @param meta metadata about the component's template and the function being generated.
  * @param importManager an `ImportManager` for the file into which the TCB will be written.
  */
-export declare function generateTypeCheckBlock(env: Environment, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, name: ts.Identifier, meta: TypeCheckBlockMetadata): ts.FunctionDeclaration;
+export declare function generateTypeCheckBlock(env: Environment, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, name: ts.Identifier, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker): ts.FunctionDeclaration;
 /**
  * Overall generation context for the type check block.
  *
@@ -33,10 +34,13 @@ export declare function generateTypeCheckBlock(env: Environment, ref: Reference<
  */
 export declare class Context {
     readonly env: Environment;
+    readonly domSchemaChecker: DomSchemaChecker;
+    readonly id: string;
     readonly boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
     private pipes;
+    readonly schemas: SchemaMetadata[];
     private nextId;
-    constructor(env: Environment, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>);
+    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, id: string, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[]);
     /**
      * Allocate a new variable name for use within the `Context`.
      *
