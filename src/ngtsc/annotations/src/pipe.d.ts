@@ -26,5 +26,5 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<PipeHandle
     readonly precedence = HandlerPrecedence.PRIMARY;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(clazz: ClassDeclaration, decorator: Decorator): AnalysisOutput<PipeHandlerData>;
-    compile(node: ClassDeclaration, analysis: PipeHandlerData): CompileResult;
+    compile(node: ClassDeclaration, analysis: PipeHandlerData): CompileResult[];
 }
