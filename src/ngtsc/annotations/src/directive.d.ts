@@ -27,7 +27,7 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
     readonly precedence = HandlerPrecedence.PRIMARY;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ClassDeclaration, decorator: Decorator): AnalysisOutput<DirectiveHandlerData>;
-    compile(node: ClassDeclaration, analysis: DirectiveHandlerData, pool: ConstantPool): CompileResult;
+    compile(node: ClassDeclaration, analysis: DirectiveHandlerData, pool: ConstantPool): CompileResult[];
 }
 /**
  * Helper function to extract metadata from a `Directive` or `Component`. `Directive`s without a

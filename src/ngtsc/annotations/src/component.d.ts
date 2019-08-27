@@ -61,7 +61,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     index(context: IndexingContext, node: ClassDeclaration, analysis: ComponentHandlerData): void;
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: ComponentHandlerData): void;
     resolve(node: ClassDeclaration, analysis: ComponentHandlerData): ResolveResult;
-    compile(node: ClassDeclaration, analysis: ComponentHandlerData, pool: ConstantPool): CompileResult;
+    compile(node: ClassDeclaration, analysis: ComponentHandlerData, pool: ConstantPool): CompileResult[];
     private _resolveLiteral;
     private _resolveEnumValue;
     private _extractStyleUrls;
