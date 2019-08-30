@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/translator/src/translator" />
 import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Statement, Type, TypeVisitor, TypeofExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
+import { LocalizedString } from '@angular/compiler/src/output/output_ast';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, ImportRewriter } from '../../imports';
 export declare class Context {
@@ -61,6 +62,7 @@ export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVis
     visitInvokeFunctionExpr(ast: InvokeFunctionExpr, context: Context): never;
     visitInstantiateExpr(ast: InstantiateExpr, context: Context): never;
     visitLiteralExpr(ast: LiteralExpr, context: Context): ts.LiteralExpression;
+    visitLocalizedString(ast: LocalizedString, context: Context): ts.Expression;
     visitExternalExpr(ast: ExternalExpr, context: Context): ts.TypeNode;
     visitConditionalExpr(ast: ConditionalExpr, context: Context): void;
     visitNotExpr(ast: NotExpr, context: Context): void;
