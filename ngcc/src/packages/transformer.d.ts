@@ -17,6 +17,14 @@ import { Logger } from '../logging/logger';
 import { RenderingFormatter } from '../rendering/rendering_formatter';
 import { FileToWrite } from '../rendering/utils';
 import { EntryPointBundle } from './entry_point_bundle';
+export declare type TransformResult = {
+    success: true;
+    diagnostics: ts.Diagnostic[];
+    transformedFiles: FileToWrite[];
+} | {
+    success: false;
+    diagnostics: ts.Diagnostic[];
+};
 /**
  * A Package is stored in a directory on disk and that directory can contain one or more package
  * formats - e.g. fesm2015, UMD, etc. Additionally, each package provides typings (`.d.ts` files).
@@ -47,15 +55,17 @@ export declare class Transformer {
      * @param bundle the bundle to transform.
      * @returns information about the files that were transformed.
      */
-    transform(bundle: EntryPointBundle): FileToWrite[];
+    transform(bundle: EntryPointBundle): TransformResult;
     getHost(bundle: EntryPointBundle): NgccReflectionHost;
     getRenderingFormatter(host: NgccReflectionHost, bundle: EntryPointBundle): RenderingFormatter;
     analyzeProgram(reflectionHost: NgccReflectionHost, bundle: EntryPointBundle): ProgramAnalyses;
 }
+export declare function hasErrors(diagnostics: ts.Diagnostic[]): boolean;
 interface ProgramAnalyses {
     decorationAnalyses: Map<ts.SourceFile, CompiledFile>;
     switchMarkerAnalyses: SwitchMarkerAnalyses;
     privateDeclarationsAnalyses: ExportInfo[];
     moduleWithProvidersAnalyses: ModuleWithProvidersAnalyses | null;
+    diagnostics: ts.Diagnostic[];
 }
 export {};
