@@ -66,6 +66,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private _resolveEnumValue;
     private _extractStyleUrls;
     private _preloadAndParseTemplate;
+    private _extractExternalTemplate;
     private _extractInlineTemplate;
     private _parseTemplate;
     private _expressionToImportedFile;
