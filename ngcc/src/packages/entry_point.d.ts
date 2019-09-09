@@ -10,7 +10,7 @@ export declare type EntryPointFormat = 'esm5' | 'esm2015' | 'umd' | 'commonjs';
  * An object containing information about an entry-point, including paths
  * to each of the possible entry-point formats.
  */
-export interface EntryPoint {
+export interface EntryPoint extends JsonObject {
     /** The name of the package (e.g. `@angular/core`). */
     name: string;
     /** The parsed package.json file for this entry-point. */
@@ -24,7 +24,14 @@ export interface EntryPoint {
     /** Is this EntryPoint compiled with the Angular View Engine compiler? */
     compiledByAngular: boolean;
 }
-export interface PackageJsonFormatProperties {
+export declare type JsonPrimitive = string | number | boolean | null;
+export declare type JsonValue = JsonPrimitive | JsonArray | JsonObject | undefined;
+export interface JsonArray extends Array<JsonValue> {
+}
+export interface JsonObject {
+    [key: string]: JsonValue;
+}
+export interface PackageJsonFormatPropertiesMap {
     fesm2015?: string;
     fesm5?: string;
     es2015?: string;
@@ -35,15 +42,16 @@ export interface PackageJsonFormatProperties {
     types?: string;
     typings?: string;
 }
+export declare type PackageJsonFormatProperties = keyof PackageJsonFormatPropertiesMap;
 /**
  * The properties that may be loaded from the `package.json` file.
  */
-export interface EntryPointPackageJson extends PackageJsonFormatProperties {
+export interface EntryPointPackageJson extends JsonObject, PackageJsonFormatPropertiesMap {
     name: string;
     scripts?: Record<string, string>;
     __processed_by_ivy_ngcc__?: Record<string, string>;
 }
-export declare type EntryPointJsonProperty = Exclude<keyof PackageJsonFormatProperties, 'types' | 'typings'>;
+export declare type EntryPointJsonProperty = Exclude<PackageJsonFormatProperties, 'types' | 'typings'>;
 export declare const SUPPORTED_FORMAT_PROPERTIES: EntryPointJsonProperty[];
 /**
  * Try to create an entry-point from the given paths and properties.

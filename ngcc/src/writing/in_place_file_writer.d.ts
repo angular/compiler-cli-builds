@@ -13,7 +13,7 @@ import { FileToWrite } from '../rendering/utils';
 import { FileWriter } from './file_writer';
 /**
  * This FileWriter overwrites the transformed file, in-place, while creating
- * a back-up of the original file with an extra `.bak` extension.
+ * a back-up of the original file with an extra `.__ivy_ngcc_bak` extension.
  */
 export declare class InPlaceFileWriter implements FileWriter {
     protected fs: FileSystem;

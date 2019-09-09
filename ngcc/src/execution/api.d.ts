@@ -6,37 +6,42 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/execution/api" />
-import { EntryPoint, EntryPointJsonProperty } from '../packages/entry_point';
-/** The type of the function that analyzes entry-points and creates the list of tasks. */
-export declare type AnalyzeFn = () => {
-    processingMetadataPerEntryPoint: Map<string, EntryPointProcessingMetadata>;
-    tasks: Task[];
-};
+import { EntryPoint, EntryPointJsonProperty, JsonObject } from '../packages/entry_point';
+import { PartiallyOrderedList } from '../utils';
 /**
- * The type of the function that creates the `compile()` function, which in turn can be used to
- * process tasks.
+ * The type of the function that analyzes entry-points and creates the list of tasks.
+ *
+ * @return A list of tasks that need to be executed in order to process the necessary format
+ *         properties for all entry-points.
  */
-export declare type CreateCompileFn = (onTaskCompleted: (task: Task, outcome: TaskProcessingOutcome) => void) => (task: Task) => void;
+export declare type AnalyzeEntryPointsFn = () => TaskQueue;
+/** The type of the function that can process/compile a task. */
+export declare type CompileFn = (task: Task) => void;
+/** The type of the function that creates the `CompileFn` function used to process tasks. */
+export declare type CreateCompileFn = (onTaskCompleted: TaskCompletedCallback) => CompileFn;
 /**
- * The type of the function that orchestrates and executes the required work (i.e. analyzes the
- * entry-points, processes the resulting tasks, does book-keeping and validates the final outcome).
+ * A class that orchestrates and executes the required work (i.e. analyzes the entry-points,
+ * processes the resulting tasks, does book-keeping and validates the final outcome).
  */
-export declare type ExecuteFn = (analyzeFn: AnalyzeFn, createCompileFn: CreateCompileFn) => void;
-/** Represents metadata related to the processing of an entry-point. */
-export interface EntryPointProcessingMetadata {
-    /**
-     * Whether the typings for the entry-point have been successfully processed (or were already
-     * processed).
-     */
-    hasProcessedTypings: boolean;
-    /**
-     * Whether at least one format has been successfully processed (or was already processed) for the
-     * entry-point.
-     */
-    hasAnyProcessedFormat: boolean;
+export interface Executor {
+    execute(analyzeEntryPoints: AnalyzeEntryPointsFn, createCompileFn: CreateCompileFn): void | Promise<void>;
 }
+/**
+ * Represents a partially ordered list of tasks.
+ *
+ * The ordering/precedence of tasks is determined by the inter-dependencies between their associated
+ * entry-points. Specifically, the tasks' order/precedence is such that tasks associated to
+ * dependent entry-points always come after tasks associated with their dependencies.
+ *
+ * As result of this ordering, it is guaranteed that - by processing tasks in the order in which
+ * they appear in the list - a task's dependencies will always have been processed before processing
+ * the task itself.
+ *
+ * See `DependencyResolver#sortEntryPointsByDependency()`.
+ */
+export declare type PartiallyOrderedTasks = PartiallyOrderedList<Task>;
 /** Represents a unit of work: processing a specific format property of an entry-point. */
-export interface Task {
+export interface Task extends JsonObject {
     /** The `EntryPoint` which needs to be processed as part of the task. */
     entryPoint: EntryPoint;
     /**
@@ -53,10 +58,48 @@ export interface Task {
     /** Whether to also process typings for this entry-point as part of the task. */
     processDts: boolean;
 }
+/** A function to be called once a task has been processed. */
+export declare type TaskCompletedCallback = (task: Task, outcome: TaskProcessingOutcome) => void;
 /** Represents the outcome of processing a `Task`. */
 export declare const enum TaskProcessingOutcome {
     /** The target format property was already processed - didn't have to do anything. */
     AlreadyProcessed = 0,
     /** Successfully processed the target format property. */
     Processed = 1
+}
+/**
+ * A wrapper around a list of tasks and providing utility methods for getting the next task of
+ * interest and determining when all tasks have been completed.
+ *
+ * (This allows different implementations to impose different constraints on when a task's
+ * processing can start.)
+ */
+export interface TaskQueue {
+    /** Whether all tasks have been completed. */
+    allTasksCompleted: boolean;
+    /**
+     * Get the next task whose processing can start (if any).
+     *
+     * This implicitly marks the task as in-progress.
+     * (This information is used to determine whether all tasks have been completed.)
+     *
+     * @return The next task available for processing or `null`, if no task can be processed at the
+     *         moment (including if there are no more unprocessed tasks).
+     */
+    getNextTask(): Task | null;
+    /**
+     * Mark a task as completed.
+     *
+     * This removes the task from the internal list of in-progress tasks.
+     * (This information is used to determine whether all tasks have been completed.)
+     *
+     * @param task The task to mark as completed.
+     */
+    markTaskCompleted(task: Task): void;
+    /**
+     * Return a string representation of the task queue (for debugging purposes).
+     *
+     * @return A string representation of the task queue.
+     */
+    toString(): string;
 }

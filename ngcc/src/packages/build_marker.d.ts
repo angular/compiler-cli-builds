@@ -6,9 +6,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
-import { EntryPointJsonProperty, EntryPointPackageJson } from './entry_point';
-export declare const NGCC_VERSION = "9.0.0-next.5+29.sha-bf15d3e.with-local-changes";
+import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
+import { PackageJsonUpdater } from '../writing/package_json_updater';
+import { EntryPointPackageJson, PackageJsonFormatProperties } from './entry_point';
+export declare const NGCC_VERSION = "9.0.0-next.5+41.sha-8296f6b.with-local-changes";
 /**
  * Check whether ngcc has already processed a given entry-point format.
  *
@@ -21,15 +22,15 @@ export declare const NGCC_VERSION = "9.0.0-next.5+29.sha-bf15d3e.with-local-chan
  * @throws Error if the `packageJson` property is not an object.
  * @throws Error if the entry-point has already been processed with a different ngcc version.
  */
-export declare function hasBeenProcessed(packageJson: EntryPointPackageJson, format: EntryPointJsonProperty | 'typings', entryPointPath: AbsoluteFsPath): boolean;
+export declare function hasBeenProcessed(packageJson: EntryPointPackageJson, format: PackageJsonFormatProperties, entryPointPath: AbsoluteFsPath): boolean;
 /**
  * Write a build marker for the given entry-point and format properties, to indicate that they have
  * been compiled by this version of ngcc.
  *
- * @param fs The current file-system being used.
+ * @param pkgJsonUpdater The writer to use for updating `package.json`.
  * @param packageJson The parsed contents of the `package.json` file for the entry-point.
  * @param packageJsonPath The absolute path to the `package.json` file.
  * @param properties The properties in the `package.json` of the formats for which we are writing
  *                   the marker.
  */
-export declare function markAsProcessed(fs: FileSystem, packageJson: EntryPointPackageJson, packageJsonPath: AbsoluteFsPath, properties: (EntryPointJsonProperty | 'typings')[]): void;
+export declare function markAsProcessed(pkgJsonUpdater: PackageJsonUpdater, packageJson: EntryPointPackageJson, packageJsonPath: AbsoluteFsPath, formatProperties: PackageJsonFormatProperties[]): void;
