@@ -47,3 +47,4 @@ export declare function performCompilation({ rootNames, options, host, oldProgra
     emitFlags?: api.EmitFlags;
     modifiedResourceFiles?: Set<string> | null;
 }): PerformCompilationResult;
+export declare function defaultGatherDiagnostics(program: api.Program): Diagnostics;
