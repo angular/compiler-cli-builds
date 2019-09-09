@@ -7,8 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { FileSystem } from '../../../src/ngtsc/file_system';
-import { NgtscCompilerHost } from '../../../src/ngtsc/file_system/src/compiler_host';
+import { FileSystem, NgtscCompilerHost } from '../../../src/ngtsc/file_system';
 /**
  * Represents a compiler host that resolves a module import as a JavaScript source file if
  * available, instead of the .d.ts typings file that would have been resolved by TypeScript. This

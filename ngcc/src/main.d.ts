@@ -1,11 +1,18 @@
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/main" />
 import { FileSystem } from '../../src/ngtsc/file_system';
 import { Logger } from './logging/logger';
 import { PathMappings } from './utils';
 /**
- * The options to configure the ngcc compiler.
+ * The options to configure the ngcc compiler for synchronous execution.
  */
-export interface NgccOptions {
+export interface SyncNgccOptions {
     /** The absolute path to the `node_modules` folder that contains the packages to process. */
     basePath: string;
     /**
@@ -43,7 +50,24 @@ export interface NgccOptions {
      * Provide a file-system service that will be used by ngcc for all file interactions.
      */
     fileSystem?: FileSystem;
+    /**
+     * Whether the compilation should run and return asynchronously. Allowing asynchronous execution
+     * may speed up the compilation by utilizing multiple CPU cores (if available).
+     *
+     * Default: `false` (i.e. run synchronously)
+     */
+    async?: false;
 }
+/**
+ * The options to configure the ngcc compiler for asynchronous execution.
+ */
+export declare type AsyncNgccOptions = Omit<SyncNgccOptions, 'async'> & {
+    async: true;
+};
+/**
+ * The options to configure the ngcc compiler.
+ */
+export declare type NgccOptions = AsyncNgccOptions | SyncNgccOptions;
 /**
  * This is the main entry-point into ngcc (aNGular Compatibility Compiler).
  *
@@ -52,4 +76,5 @@ export interface NgccOptions {
  *
  * @param options The options telling ngcc what to compile and how.
  */
-export declare function mainNgcc({ basePath, targetEntryPointPath, propertiesToConsider, compileAllFormats, createNewEntryPointFormats, logger, pathMappings }: NgccOptions): void;
+export declare function mainNgcc(options: AsyncNgccOptions): Promise<void>;
+export declare function mainNgcc(options: SyncNgccOptions): void;
