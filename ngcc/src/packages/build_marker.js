@@ -10,7 +10,7 @@
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var tslib_1 = require("tslib");
-    exports.NGCC_VERSION = '9.0.0-next.5+74.sha-c84c27f.with-local-changes';
+    exports.NGCC_VERSION = '9.0.0-next.5+75.sha-43bbc40.with-local-changes';
     /**
      * Check whether ngcc has already processed a given entry-point format.
      *
