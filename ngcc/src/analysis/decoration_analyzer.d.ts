@@ -14,10 +14,9 @@ import { FileSystem } from '../../../src/ngtsc/file_system';
 import { ModuleResolver, ReferenceEmitter } from '../../../src/ngtsc/imports';
 import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
-import { ClassSymbol } from '../../../src/ngtsc/reflection';
 import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver } from '../../../src/ngtsc/scope';
 import { CompileResult, DecoratorHandler } from '../../../src/ngtsc/transform';
-import { NgccReflectionHost } from '../host/ngcc_host';
+import { NgccClassSymbol, NgccReflectionHost } from '../host/ngcc_host';
 import { Migration, MigrationHost } from '../migrations/migration';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
 import { AnalyzedClass, AnalyzedFile, CompiledFile, DecorationAnalyses } from './types';
@@ -70,7 +69,7 @@ export declare class DecorationAnalyzer {
      */
     analyzeProgram(): DecorationAnalyses;
     protected analyzeFile(sourceFile: ts.SourceFile): AnalyzedFile | undefined;
-    protected analyzeClass(symbol: ClassSymbol): AnalyzedClass | null;
+    protected analyzeClass(symbol: NgccClassSymbol): AnalyzedClass | null;
     protected migrateFile(migrationHost: MigrationHost, analyzedFile: AnalyzedFile): void;
     protected compileFile(analyzedFile: AnalyzedFile): CompiledFile;
     protected compileClass(clazz: AnalyzedClass, constantPool: ConstantPool): CompileResult[];

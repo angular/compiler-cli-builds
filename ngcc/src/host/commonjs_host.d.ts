@@ -7,10 +7,11 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/commonjs_host" />
 import * as ts from 'typescript';
-import { ClassSymbol, Declaration, Import } from '../../../src/ngtsc/reflection';
+import { Declaration, Import } from '../../../src/ngtsc/reflection';
 import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
 import { Esm5ReflectionHost } from './esm5_host';
+import { NgccClassSymbol } from './ngcc_host';
 export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
     protected program: ts.Program;
     protected compilerHost: ts.CompilerHost;
@@ -33,7 +34,7 @@ export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
      * @param helperName the name of the helper (e.g. `__decorate`) whose calls we are interested in.
      * @returns an array of nodes of calls to the helper with the given name.
      */
-    protected getHelperCallsForClass(classSymbol: ClassSymbol, helperName: string): ts.CallExpression[];
+    protected getHelperCallsForClass(classSymbol: NgccClassSymbol, helperName: string): ts.CallExpression[];
     /**
      * Find all the helper calls at the top level of a source file.
      *

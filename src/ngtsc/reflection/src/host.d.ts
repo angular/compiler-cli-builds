@@ -64,13 +64,6 @@ export declare type ClassDeclaration<T extends ts.Declaration = ts.Declaration> 
     name: ts.Identifier;
 };
 /**
- * The symbol corresponding to a "class" declaration. I.e. a `ts.Symbol` whose `valueDeclaration` is
- * a `ClassDeclaration`.
- */
-export declare type ClassSymbol = ts.Symbol & {
-    valueDeclaration: ClassDeclaration;
-};
-/**
  * An enumeration of possible kinds of class members.
  */
 export declare enum ClassMemberKind {
