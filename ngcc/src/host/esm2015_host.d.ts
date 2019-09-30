@@ -315,7 +315,11 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @returns All information on the decorators as extracted from static properties, or `null` if
      * none of the static properties exist.
      */
-    protected computeDecoratorInfoFromStaticProperties(classSymbol: NgccClassSymbol): DecoratorInfo | null;
+    protected computeDecoratorInfoFromStaticProperties(classSymbol: NgccClassSymbol): {
+        classDecorators: Decorator[] | null;
+        memberDecorators: Map<string, Decorator[]> | null;
+        constructorParamInfo: ParamInfo[] | null;
+    };
     /**
      * Get all class decorators for the given class, where the decorators are declared
      * via a static property. For example:
