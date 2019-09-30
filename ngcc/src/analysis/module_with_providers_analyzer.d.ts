@@ -31,4 +31,5 @@ export declare class ModuleWithProvidersAnalyzer {
     analyzeProgram(program: ts.Program): ModuleWithProvidersAnalyses;
     private getRootFiles;
     private getDtsDeclarationForFunction;
+    private resolveNgModuleReference;
 }
