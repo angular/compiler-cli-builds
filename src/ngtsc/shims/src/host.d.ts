@@ -30,7 +30,6 @@ export declare class GeneratedShimsHostWrapper implements ts.CompilerHost {
     private delegate;
     private shimGenerators;
     constructor(delegate: ts.CompilerHost, shimGenerators: ShimGenerator[]);
-    resolveModuleNames?: (moduleNames: string[], containingFile: string, reusedNames?: string[], redirectedReference?: ts.ResolvedProjectReference) => (ts.ResolvedModule | undefined)[];
     resolveTypeReferenceDirectives?: (names: string[], containingFile: string) => ts.ResolvedTypeReferenceDirective[];
     directoryExists?: (directoryName: string) => boolean;
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
