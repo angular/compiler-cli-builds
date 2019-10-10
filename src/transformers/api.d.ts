@@ -54,16 +54,17 @@ export interface CompilerOptions extends ts.CompilerOptions {
     i18nInMissingTranslations?: 'error' | 'warning' | 'ignore';
     i18nUseExternalIds?: boolean;
     /**
-     * Render `$localize` message ids with the legacy format (xlf, xlf2 or xmb) specified in
-     * `i18nInFormat`.
-     *
-     * This is only active if we are building with `enableIvy: true` and a valid
-     * `i18nInFormat` has been provided. The default value for now is `true`.
+     * Render `$localize` message ids with the specified legacy format (xlf, xlf2 or xmb).
      *
      * Use this option when use are using the `$localize` based localization messages but
      * have not migrated the translation files to use the new `$localize` message id format.
+     *
+     * @deprecated
+     * `i18nLegacyMessageIdFormat` should only be used while migrating from legacy message id
+     * formatted translation files and will be removed at the same time as ViewEngine support is
+     * removed.
      */
-    enableI18nLegacyMessageIdFormat?: boolean;
+    i18nLegacyMessageIdFormat?: string;
     preserveWhitespaces?: boolean;
     /** generate all possible generated files  */
     allowEmptyCodegenFiles?: boolean;

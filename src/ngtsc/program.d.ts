@@ -68,7 +68,6 @@ export declare class NgtscProgram implements api.Program {
     private getTemplateDiagnostics;
     getIndexedComponents(): Map<ts.Declaration, IndexedComponent>;
     private makeCompilation;
-    private getI18nLegacyMessageFormat;
     private readonly reflector;
     private readonly coreImportsFrom;
     private readonly isCore;
