@@ -84,7 +84,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * Tracks whether a given component requires "remote scoping".
      *
      * Remote scoping is when the set of directives which apply to a given component is set in the
-     * NgModule's file instead of directly on the ngComponentDef (which is sometimes needed to get
+     * NgModule's file instead of directly on the component def (which is sometimes needed to get
      * around cyclic import issues). This is not used in calculation of `LocalModuleScope`s, but is
      * tracked here for convenience.
      */
