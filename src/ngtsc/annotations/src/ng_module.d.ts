@@ -16,7 +16,7 @@ import { LocalModuleScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
 import { ReferencesRegistry } from './references_registry';
 export interface NgModuleAnalysis {
-    ngModuleDef: R3NgModuleMetadata;
+    ɵmod: R3NgModuleMetadata;
     ngInjectorDef: R3InjectorMetadata;
     metadataStmt: Statement | null;
     declarations: Reference<ClassDeclaration>[];
