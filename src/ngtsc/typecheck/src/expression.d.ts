@@ -10,6 +10,7 @@ import { AST, ParseSpan } from '@angular/compiler';
 import * as ts from 'typescript';
 import { TypeCheckingConfig } from './api';
 import { AbsoluteSpan } from './diagnostics';
+export declare const NULL_AS_ANY: ts.AsExpression;
 /**
  * Convert an `AST` to TypeScript code directly, without going through an intermediate `Expression`
  * AST.
