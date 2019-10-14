@@ -1,11 +1,12 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "9.0.0-next.10+47.sha-4acf0a0.with-local-changes",
+  "version": "9.0.0-next.10+49.sha-25af147.with-local-changes",
   "description": "Angular - the compiler CLI for Node.js",
   "main": "index.js",
   "typings": "index.d.ts",
   "bin": {
-    "ivy-ngcc": "./ngcc/main-ngcc.js",
+    "ivy-ngcc": "./ngcc/main-ivy-ngcc.js",
+    "ngcc": "./ngcc/main-ngcc.js",
     "ngc": "./src/main.js",
     "ng-xi18n": "./src/extract_i18n.js"
   },
@@ -23,7 +24,7 @@
     "yargs": "13.1.0"
   },
   "peerDependencies": {
-    "@angular/compiler": "9.0.0-next.10+47.sha-4acf0a0.with-local-changes",
+    "@angular/compiler": "9.0.0-next.10+49.sha-25af147.with-local-changes",
     "typescript": ">=3.4 <3.6"
   },
   "engines": {
