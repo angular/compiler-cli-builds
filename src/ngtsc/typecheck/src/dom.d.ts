@@ -50,7 +50,7 @@ export interface DomSchemaChecker {
  * Checks non-Angular elements and properties against the `DomElementSchemaRegistry`, a schema
  * maintained by the Angular team via extraction from a browser IDL.
  */
-export declare class RegistryDomSchemaChecker {
+export declare class RegistryDomSchemaChecker implements DomSchemaChecker {
     private resolver;
     private _diagnostics;
     readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
