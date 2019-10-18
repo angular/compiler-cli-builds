@@ -97,17 +97,17 @@ export declare class AbsoluteModuleStrategy implements ReferenceEmitStrategy {
  * Instead, `LogicalProjectPath`s are used.
  */
 export declare class LogicalProjectStrategy implements ReferenceEmitStrategy {
-    private checker;
+    private reflector;
     private logicalFs;
-    constructor(checker: ts.TypeChecker, logicalFs: LogicalFileSystem);
+    constructor(reflector: ReflectionHost, logicalFs: LogicalFileSystem);
     emit(ref: Reference<ts.Node>, context: ts.SourceFile): Expression | null;
 }
 /**
  * A `ReferenceEmitStrategy` which uses a `FileToModuleHost` to generate absolute import references.
  */
 export declare class FileToModuleStrategy implements ReferenceEmitStrategy {
-    private checker;
+    private reflector;
     private fileToModuleHost;
-    constructor(checker: ts.TypeChecker, fileToModuleHost: FileToModuleHost);
+    constructor(reflector: ReflectionHost, fileToModuleHost: FileToModuleHost);
     emit(ref: Reference<ts.Node>, context: ts.SourceFile): Expression | null;
 }

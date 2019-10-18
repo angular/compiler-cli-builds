@@ -7,7 +7,8 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/imports/src/find_export" />
 import * as ts from 'typescript';
+import { ReflectionHost } from '../../reflection';
 /**
  * Find the name, if any, by which a node is exported from a given file.
  */
-export declare function findExportedNameOfNode(target: ts.Node, file: ts.SourceFile, checker: ts.TypeChecker): string | null;
+export declare function findExportedNameOfNode(target: ts.Node, file: ts.SourceFile, reflector: ReflectionHost): string | null;
