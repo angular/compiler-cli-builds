@@ -19,7 +19,6 @@ export interface TypeCheckableDirectiveMeta extends DirectiveMeta {
     ref: Reference<ClassDeclaration>;
     queries: string[];
     ngTemplateGuards: TemplateGuardMeta[];
-    coercedInputs: Set<string>;
     hasNgTemplateContextGuard: boolean;
 }
 /**
