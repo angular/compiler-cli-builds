@@ -15,7 +15,6 @@ export declare class NodeJSFileSystem implements FileSystem {
     pwd(): AbsoluteFsPath;
     copyFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     moveFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
-    mkdir(path: AbsoluteFsPath): void;
     ensureDir(path: AbsoluteFsPath): void;
     isCaseSensitive(): boolean;
     resolve(...paths: string[]): AbsoluteFsPath;
@@ -29,4 +28,5 @@ export declare class NodeJSFileSystem implements FileSystem {
     realpath(path: AbsoluteFsPath): AbsoluteFsPath;
     getDefaultLibLocation(): AbsoluteFsPath;
     normalize<T extends string>(path: T): T;
+    private safeMkdir;
 }

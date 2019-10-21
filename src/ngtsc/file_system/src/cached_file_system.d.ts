@@ -25,7 +25,6 @@ export declare class CachedFileSystem implements FileSystem {
     symlink(target: AbsoluteFsPath, path: AbsoluteFsPath): void;
     copyFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     moveFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
-    mkdir(path: AbsoluteFsPath): void;
     ensureDir(path: AbsoluteFsPath): void;
     lstat(path: AbsoluteFsPath): FileStats;
     stat(path: AbsoluteFsPath): FileStats;
