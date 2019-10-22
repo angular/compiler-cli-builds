@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/local" />
 import { SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
-import { AliasGenerator, Reexport, Reference, ReferenceEmitter } from '../../imports';
+import { AliasingHost, Reexport, Reference, ReferenceEmitter } from '../../imports';
 import { DirectiveMeta, MetadataReader, MetadataRegistry, NgModuleMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 import { ExportScope, ScopeData } from './api';
@@ -56,7 +56,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
     private localReader;
     private dependencyScopeReader;
     private refEmitter;
-    private aliasGenerator;
+    private aliasingHost;
     private componentScopeRegistry;
     /**
      * Tracks whether the registry has been asked to produce scopes for a module or component. Once
@@ -93,7 +93,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * Tracks errors accumulated in the processing of scopes for each module declaration.
      */
     private scopeErrors;
-    constructor(localReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasGenerator: AliasGenerator | null, componentScopeRegistry?: ComponentScopeRegistry);
+    constructor(localReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasingHost: AliasingHost | null, componentScopeRegistry?: ComponentScopeRegistry);
     /**
      * Add an NgModule's data to the registry.
      */
@@ -149,5 +149,6 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * array parameter.
      */
     private getExportedScope;
+    private getReexports;
     private assertCollecting;
 }
