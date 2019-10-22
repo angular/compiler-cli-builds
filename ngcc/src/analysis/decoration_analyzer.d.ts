@@ -11,7 +11,7 @@ import * as ts from 'typescript';
 import { ReferencesRegistry, ResourceLoader } from '../../../src/ngtsc/annotations';
 import { CycleAnalyzer, ImportGraph } from '../../../src/ngtsc/cycles';
 import { FileSystem } from '../../../src/ngtsc/file_system';
-import { ModuleResolver, ReferenceEmitter } from '../../../src/ngtsc/imports';
+import { ModuleResolver, PrivateExportAliasingHost, ReferenceEmitter } from '../../../src/ngtsc/imports';
 import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
 import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver } from '../../../src/ngtsc/scope';
@@ -47,11 +47,16 @@ export declare class DecorationAnalyzer {
     private rootDirs;
     private packagePath;
     private isCore;
+    /**
+     * Map of NgModule declarations to the re-exports for that NgModule.
+     */
+    private reexportMap;
     resourceManager: NgccResourceLoader;
     metaRegistry: LocalMetadataRegistry;
     dtsMetaReader: DtsMetadataReader;
     fullMetaReader: CompoundMetadataReader;
     refEmitter: ReferenceEmitter;
+    aliasingHost: PrivateExportAliasingHost | null;
     dtsModuleScopeResolver: MetadataDtsModuleScopeResolver;
     scopeRegistry: LocalModuleScopeRegistry;
     fullRegistry: CompoundMetadataRegistry;
@@ -74,5 +79,7 @@ export declare class DecorationAnalyzer {
     protected compileFile(analyzedFile: AnalyzedFile): CompiledFile;
     protected compileClass(clazz: AnalyzedClass, constantPool: ConstantPool): CompileResult[];
     protected resolveFile(analyzedFile: AnalyzedFile): void;
+    private getReexportsForClass;
+    private addReexports;
 }
 export {};

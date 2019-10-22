@@ -5,6 +5,7 @@ import { Import, ImportManager } from '../../../src/ngtsc/translator';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { UmdReflectionHost } from '../host/umd_host';
 import { Esm5RenderingFormatter } from './esm5_rendering_formatter';
+import { Reexport } from '../../../src/ngtsc/imports';
 /**
  * A RenderingFormatter that works with UMD files, instead of `import` and `export` statements
  * the module is an IIFE with a factory function call with dependencies, which are defined in a
@@ -21,6 +22,7 @@ export declare class UmdRenderingFormatter extends Esm5RenderingFormatter {
      * Add the exports to the bottom of the UMD module factory function.
      */
     addExports(output: MagicString, entryPointBasePath: string, exports: ExportInfo[], importManager: ImportManager, file: ts.SourceFile): void;
+    addDirectExports(output: MagicString, exports: Reexport[], importManager: ImportManager, file: ts.SourceFile): void;
     /**
      * Add the constants to the top of the UMD factory function.
      */
