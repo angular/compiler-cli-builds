@@ -15,6 +15,7 @@ import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_
 import { ModuleWithProvidersInfo } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { RenderingFormatter, RedundantDecoratorMap } from './rendering_formatter';
+import { Reexport } from '../../../src/ngtsc/imports';
 /**
  * A RenderingFormatter that works with ECMAScript Module import and export statements.
  */
@@ -30,6 +31,13 @@ export declare class EsmRenderingFormatter implements RenderingFormatter {
      * Add the exports to the end of the file.
      */
     addExports(output: MagicString, entryPointBasePath: AbsoluteFsPath, exports: ExportInfo[], importManager: ImportManager, file: ts.SourceFile): void;
+    /**
+     * Add plain exports to the end of the file.
+     *
+     * Unlike `addExports`, direct exports go directly in a .js and .d.ts file and don't get added to
+     * an entrypoint.
+     */
+    addDirectExports(output: MagicString, exports: Reexport[], importManager: ImportManager, file: ts.SourceFile): void;
     /**
      * Add the constants directly after the imports.
      */

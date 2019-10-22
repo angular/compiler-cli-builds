@@ -14,7 +14,7 @@ export declare const SOURCE: "angular";
 export interface DiagnosticMessageChain {
     messageText: string;
     position?: Position;
-    next?: DiagnosticMessageChain;
+    next?: DiagnosticMessageChain[];
 }
 export interface Diagnostic {
     messageText: string;
@@ -82,6 +82,21 @@ export interface CompilerOptions extends ts.CompilerOptions {
      */
     enableResourceInlining?: boolean;
     /**
+     * Controls whether ngtsc will emit `.ngfactory.js` shims for each compiled `.ts` file.
+     *
+     * These shims support legacy imports from `ngfactory` files, by exporting a factory shim
+     * for each component or NgModule in the original `.ts` file.
+     */
+    generateNgFactoryShims?: boolean;
+    /**
+     * Controls whether ngtsc will emit `.ngsummary.js` shims for each compiled `.ts` file.
+     *
+     * These shims support legacy imports from `ngsummary` files, by exporting an empty object
+     * for each NgModule in the original `.ts` file. The only purpose of summaries is to feed them to
+     * `TestBed`, which is a no-op in Ivy.
+     */
+    generateNgSummaryShims?: boolean;
+    /**
      * Tells the compiler to generate definitions using the Render3 style code generation.
      * This option defaults to `true`.
      *
@@ -102,6 +117,36 @@ export interface CompilerOptions extends ts.CompilerOptions {
      * Read more about this here: https://github.com/angular/angular/issues/25644.
      */
     createExternalSymbolFactoryReexports?: boolean;
+    /**
+     * Enables the generation of alias re-exports of directives/pipes that are visible from an
+     * NgModule from that NgModule's file.
+     *
+     * This option should be disabled for application builds or for Angular Package Format libraries
+     * (where NgModules along with their directives/pipes are exported via a single entrypoint).
+     *
+     * For other library compilations which are intended to be path-mapped into an application build
+     * (or another library), enabling this option enables the resulting deep imports to work
+     * correctly.
+     *
+     * A consumer of such a path-mapped library will write an import like:
+     *
+     * ```typescript
+     * import {LibModule} from 'lib/deep/path/to/module';
+     * ```
+     *
+     * The compiler will attempt to generate imports of directives/pipes from that same module
+     * specifier (the compiler does not rewrite the user's given import path, unlike View Engine).
+     *
+     * ```typescript
+     * import {LibDir, LibCmp, LibPipe} from 'lib/deep/path/to/module';
+     * ```
+     *
+     * It would be burdensome for users to have to re-export all directives/pipes alongside each
+     * NgModule to support this import model. Enabling this option tells the compiler to generate
+     * private re-exports alongside the NgModule of all the directives/pipes it makes available, to
+     * support these future imports.
+     */
+    generateDeepReexports?: boolean;
 }
 export interface CompilerHost extends ts.CompilerHost {
     /**

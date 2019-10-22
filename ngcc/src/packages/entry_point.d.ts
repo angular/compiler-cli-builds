@@ -23,6 +23,10 @@ export interface EntryPoint extends JsonObject {
     typings: AbsoluteFsPath;
     /** Is this EntryPoint compiled with the Angular View Engine compiler? */
     compiledByAngular: boolean;
+    /** Should ngcc ignore missing dependencies and process this entrypoint anyway? */
+    ignoreMissingDependencies: boolean;
+    /** Should ngcc generate deep re-exports for this entrypoint? */
+    generateDeepReexports: boolean;
 }
 export declare type JsonPrimitive = string | number | boolean | null;
 export declare type JsonValue = JsonPrimitive | JsonArray | JsonObject | undefined;

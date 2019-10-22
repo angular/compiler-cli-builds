@@ -1,6 +1,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/rendering/dts_renderer" />
 import * as ts from 'typescript';
 import { FileSystem } from '../../../src/ngtsc/file_system';
+import { Reexport } from '../../../src/ngtsc/imports';
 import { CompileResult } from '../../../src/ngtsc/transform';
 import { DecorationAnalyses } from '../analysis/types';
 import { ModuleWithProvidersInfo, ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
@@ -22,6 +23,7 @@ declare class DtsRenderInfo {
     classInfo: DtsClassInfo[];
     moduleWithProviders: ModuleWithProvidersInfo[];
     privateExports: ExportInfo[];
+    reexports: Reexport[];
 }
 /**
  * Information about a class in a typings file.
