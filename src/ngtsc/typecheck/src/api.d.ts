@@ -19,6 +19,7 @@ export interface TypeCheckableDirectiveMeta extends DirectiveMeta {
     ref: Reference<ClassDeclaration>;
     queries: string[];
     ngTemplateGuards: TemplateGuardMeta[];
+    coercedInputFields: Set<string>;
     hasNgTemplateContextGuard: boolean;
 }
 /**
@@ -59,6 +60,10 @@ export interface TypeCtorMetadata {
         outputs: string[];
         queries: string[];
     };
+    /**
+     * `Set` of field names which have type coercion enabled.
+     */
+    coercedInputFields: Set<string>;
 }
 export interface TypeCheckingConfig {
     /**
