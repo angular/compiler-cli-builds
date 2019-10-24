@@ -31,7 +31,6 @@ export declare function extractDirectiveGuards(node: ClassDeclaration, reflector
 export declare class CompoundMetadataReader implements MetadataReader {
     private readers;
     constructor(readers: MetadataReader[]);
-    isAbstractDirective(node: Reference<ClassDeclaration>): boolean;
     getDirectiveMetadata(node: Reference<ClassDeclaration<ts.Declaration>>): DirectiveMeta | null;
     getNgModuleMetadata(node: Reference<ClassDeclaration<ts.Declaration>>): NgModuleMeta | null;
     getPipeMetadata(node: Reference<ClassDeclaration<ts.Declaration>>): PipeMeta | null;
