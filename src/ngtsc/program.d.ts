@@ -36,6 +36,7 @@ export declare class NgtscProgram implements api.Program {
     private moduleResolver;
     private cycleAnalyzer;
     private metaReader;
+    private aliasingHost;
     private refEmitter;
     private fileToModuleHost;
     private defaultImportTracker;

@@ -36,7 +36,21 @@ export declare function getConstructorDependencies(clazz: ClassDeclaration, refl
 export declare function valueReferenceToExpression(valueRef: TypeValueReference, defaultImportRecorder: DefaultImportRecorder): Expression;
 export declare function valueReferenceToExpression(valueRef: null, defaultImportRecorder: DefaultImportRecorder): null;
 export declare function valueReferenceToExpression(valueRef: TypeValueReference | null, defaultImportRecorder: DefaultImportRecorder): Expression | null;
+/**
+ * Convert `ConstructorDeps` into the `R3DependencyMetadata` array for those deps if they're valid,
+ * or into an `'invalid'` signal if they're not.
+ *
+ * This is a companion function to `validateConstructorDependencies` which accepts invalid deps.
+ */
+export declare function unwrapConstructorDependencies(deps: ConstructorDeps | null): R3DependencyMetadata[] | 'invalid' | null;
 export declare function getValidConstructorDependencies(clazz: ClassDeclaration, reflector: ReflectionHost, defaultImportRecorder: DefaultImportRecorder, isCore: boolean): R3DependencyMetadata[] | null;
+/**
+ * Validate that `ConstructorDeps` does not have any invalid dependencies and convert them into the
+ * `R3DependencyMetadata` array if so, or raise a diagnostic if some deps are invalid.
+ *
+ * This is a companion function to `unwrapConstructorDependencies` which does not accept invalid
+ * deps.
+ */
 export declare function validateConstructorDependencies(clazz: ClassDeclaration, deps: ConstructorDeps | null): R3DependencyMetadata[] | null;
 export declare function toR3Reference(valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile, refEmitter: ReferenceEmitter): R3Reference;
 export declare function isAngularCore(decorator: Decorator): decorator is Decorator & {

@@ -10,25 +10,6 @@ import { MessageBundle } from '@angular/compiler';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { CompilerHost, CompilerOptions, Program } from './api';
-/**
- * Checks whether a given version ∈ [minVersion, maxVersion[
- * An error will be thrown if the following statements are simultaneously true:
- * - the given version ∉ [minVersion, maxVersion[,
- * - the result of the version check is not meant to be bypassed (the parameter disableVersionCheck
- * is false)
- *
- * @param version The version on which the check will be performed
- * @param minVersion The lower bound version. A valid version needs to be greater than minVersion
- * @param maxVersion The upper bound version. A valid version needs to be strictly less than
- * maxVersion
- * @param disableVersionCheck Indicates whether version check should be bypassed
- *
- * @throws Will throw an error if the following statements are simultaneously true:
- * - the given version ∉ [minVersion, maxVersion[,
- * - the result of the version check is not meant to be bypassed (the parameter disableVersionCheck
- * is false)
- */
-export declare function checkVersion(version: string, minVersion: string, maxVersion: string, disableVersionCheck: boolean | undefined): void;
 export declare function createProgram({ rootNames, options, host, oldProgram }: {
     rootNames: ReadonlyArray<string>;
     options: CompilerOptions;

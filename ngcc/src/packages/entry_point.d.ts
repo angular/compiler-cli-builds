@@ -25,6 +25,8 @@ export interface EntryPoint extends JsonObject {
     compiledByAngular: boolean;
     /** Should ngcc ignore missing dependencies and process this entrypoint anyway? */
     ignoreMissingDependencies: boolean;
+    /** Should ngcc generate deep re-exports for this entrypoint? */
+    generateDeepReexports: boolean;
 }
 export declare type JsonPrimitive = string | number | boolean | null;
 export declare type JsonValue = JsonPrimitive | JsonArray | JsonObject | undefined;

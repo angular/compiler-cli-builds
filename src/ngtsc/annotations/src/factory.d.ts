@@ -6,6 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/factory" />
-import { R3FactoryDefMetadata } from '@angular/compiler';
+import { R3FactoryMetadata } from '@angular/compiler';
 import { CompileResult } from '../../transform';
-export declare function compileNgFactoryDefField(metadata: R3FactoryDefMetadata): CompileResult;
+export declare function compileNgFactoryDefField(metadata: R3FactoryMetadata): CompileResult;
