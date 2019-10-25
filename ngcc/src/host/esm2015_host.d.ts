@@ -200,7 +200,10 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * otherwise.
      */
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
-    /** Gets all decorators of the given class symbol. */
+    /**
+     * Gets all decorators of the given class symbol. Any decorator that have been synthetically
+     * injected by a migration will not be present in the returned collection.
+     */
     getDecoratorsOfSymbol(symbol: NgccClassSymbol): Decorator[] | null;
     /**
      * Search the given module for variable declarations in which the initializer
