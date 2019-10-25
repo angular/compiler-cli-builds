@@ -17,7 +17,7 @@ export interface DirectiveHandlerData {
     meta: R3DirectiveMetadata;
     metadataStmt: Statement | null;
 }
-export declare class DirectiveDecoratorHandler implements DecoratorHandler<DirectiveHandlerData, Decorator> {
+export declare class DirectiveDecoratorHandler implements DecoratorHandler<DirectiveHandlerData, Decorator | null> {
     private reflector;
     private evaluator;
     private metaRegistry;
@@ -25,8 +25,8 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
     private isCore;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, defaultImportRecorder: DefaultImportRecorder, isCore: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
-    detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
-    analyze(node: ClassDeclaration, decorator: Decorator, flags?: HandlerFlags): AnalysisOutput<DirectiveHandlerData>;
+    detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
+    analyze(node: ClassDeclaration, decorator: Decorator | null, flags?: HandlerFlags): AnalysisOutput<DirectiveHandlerData>;
     compile(node: ClassDeclaration, analysis: DirectiveHandlerData, pool: ConstantPool): CompileResult[];
 }
 /**
@@ -35,10 +35,9 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
  * appear in the declarations of an `NgModule` and additional verification is done when processing
  * the module.
  */
-export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Decorator, reflector: ReflectionHost, evaluator: PartialEvaluator, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, flags: HandlerFlags, defaultSelector?: string | null): {
+export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Decorator | null, reflector: ReflectionHost, evaluator: PartialEvaluator, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, flags: HandlerFlags, defaultSelector?: string | null): {
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;
-    decoratedElements: ClassMember[];
 } | undefined;
 export declare function extractQueryMetadata(exprNode: ts.Node, name: string, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, evaluator: PartialEvaluator): R3QueryMetadata;
 export declare function extractQueriesFromDecorator(queryData: ts.Expression, reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean): {
