@@ -13,6 +13,7 @@ import { ClassDeclaration } from '../../reflection';
 import { TypeCheckBlockMetadata, TypeCheckingConfig } from './api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
+import { OutOfBandDiagnosticRecorder } from './oob';
 /**
  * An `Environment` representing the single type-checking file into which most (if not all) Type
  * Check Blocks (TCBs) will be generated.
@@ -26,7 +27,7 @@ export declare class TypeCheckFile extends Environment {
     private nextTcbId;
     private tcbStatements;
     constructor(fileName: string, config: TypeCheckingConfig, refEmitter: ReferenceEmitter);
-    addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker): void;
+    addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder): void;
     render(): ts.SourceFile;
     getPreludeStatements(): ts.Statement[];
 }
