@@ -13,6 +13,7 @@ import { ClassDeclaration } from '../../reflection';
 import { TypeCheckBlockMetadata, TypeCheckableDirectiveMeta } from './api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
+import { OutOfBandDiagnosticRecorder } from './oob';
 /**
  * Given a `ts.ClassDeclaration` for a component, and metadata regarding that component, compose a
  * "type check block" function.
@@ -20,11 +21,22 @@ import { Environment } from './environment';
  * When passed through TypeScript's TypeChecker, type errors that arise within the type check block
  * function indicate issues in the template itself.
  *
- * @param node the TypeScript node for the component class.
+ * As a side effect of generating a TCB for the component, `ts.Diagnostic`s may also be produced
+ * directly for issues within the template which are identified during generation. These issues are
+ * recorded in either the `domSchemaChecker` (which checks usage of DOM elements and bindings) as
+ * well as the `oobRecorder` (which records errors when the type-checking code generator is unable
+ * to sufficiently understand a template).
+ *
+ * @param env an `Environment` into which type-checking code will be generated.
+ * @param ref a `Reference` to the component class which should be type-checked.
+ * @param name a `ts.Identifier` to use for the generated `ts.FunctionDeclaration`.
  * @param meta metadata about the component's template and the function being generated.
- * @param importManager an `ImportManager` for the file into which the TCB will be written.
+ * @param domSchemaChecker used to check and record errors regarding improper usage of DOM elements
+ * and bindings.
+ * @param oobRecorder used to record errors regarding template elements which could not be correctly
+ * translated into types during TCB generation.
  */
-export declare function generateTypeCheckBlock(env: Environment, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, name: ts.Identifier, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker): ts.FunctionDeclaration;
+export declare function generateTypeCheckBlock(env: Environment, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, name: ts.Identifier, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder): ts.FunctionDeclaration;
 /**
  * Overall generation context for the type check block.
  *
@@ -35,12 +47,13 @@ export declare function generateTypeCheckBlock(env: Environment, ref: Reference<
 export declare class Context {
     readonly env: Environment;
     readonly domSchemaChecker: DomSchemaChecker;
+    readonly oobRecorder: OutOfBandDiagnosticRecorder;
     readonly id: string;
     readonly boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
     private pipes;
     readonly schemas: SchemaMetadata[];
     private nextId;
-    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, id: string, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[]);
+    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: string, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[]);
     /**
      * Allocate a new variable name for use within the `Context`.
      *
@@ -48,6 +61,6 @@ export declare class Context {
      * might change depending on the type of data being stored.
      */
     allocateId(): ts.Identifier;
-    getPipeByName(name: string): ts.Expression;
+    getPipeByName(name: string): ts.Expression | null;
 }
 export declare function requiresInlineTypeCheckBlock(node: ClassDeclaration<ts.ClassDeclaration>): boolean;
