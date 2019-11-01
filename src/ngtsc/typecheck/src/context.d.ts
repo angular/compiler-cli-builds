@@ -36,6 +36,7 @@ export declare class TypeCheckContext {
     private typeCtorPending;
     private sourceManager;
     private domSchemaChecker;
+    private oobRecorder;
     /**
      * Record a template for the given component `node`, with a `SelectorMatcher` for directive
      * matching.

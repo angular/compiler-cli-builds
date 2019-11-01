@@ -68,6 +68,14 @@ export declare enum ErrorCode {
     /**
      * An element's attribute name failed validation against the DOM schema.
      */
-    SCHEMA_INVALID_ATTRIBUTE = 8002
+    SCHEMA_INVALID_ATTRIBUTE = 8002,
+    /**
+     * No matching directive was found for a `#ref="target"` expression.
+     */
+    MISSING_REFERENCE_TARGET = 8003,
+    /**
+     * No matching pipe was found for a
+     */
+    MISSING_PIPE = 8004
 }
 export declare function ngErrorCode(code: ErrorCode): number;

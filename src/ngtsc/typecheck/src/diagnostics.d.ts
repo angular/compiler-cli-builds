@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ParseSourceSpan, ParseSpan } from '@angular/compiler';
+import { AbsoluteSourceSpan, ParseSourceSpan, ParseSpan } from '@angular/compiler';
 import * as ts from 'typescript';
 import { TemplateSourceMapping } from './api';
 export interface SourceLocation {
@@ -44,6 +44,7 @@ export interface AbsoluteSpan {
  * the `ParseSourceSpan` represents.
  */
 export declare function toAbsoluteSpan(span: ParseSpan, sourceSpan: ParseSourceSpan): AbsoluteSpan;
+export declare function absoluteSourceSpanToSourceLocation(id: string, span: AbsoluteSourceSpan): SourceLocation;
 /**
  * Wraps the node in parenthesis such that inserted span comments become attached to the proper
  * node. This is an alias for `ts.createParen` with the benefit that it signifies that the
