@@ -27,6 +27,8 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     getGenericArityOfClass(clazz: ClassDeclaration): number | null;
     getVariableValue(declaration: ts.VariableDeclaration): ts.Expression | null;
     getDtsDeclaration(_: ts.Declaration): ts.Declaration | null;
+    getInternalNameOfClass(clazz: ClassDeclaration): ts.Identifier;
+    getAdjacentNameOfClass(clazz: ClassDeclaration): ts.Identifier;
     protected getDirectImportOfIdentifier(id: ts.Identifier): Import | null;
     /**
      * Try to get the import info for this identifier as though it is a namespaced import.
