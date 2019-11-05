@@ -9,7 +9,7 @@
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ImportManager } from '../../../src/ngtsc/translator';
-import { CompiledFile, DecorationAnalyses } from '../analysis/types';
+import { CompiledClass, CompiledFile, DecorationAnalyses } from '../analysis/types';
 import { PrivateDeclarationsAnalyses } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
 import { FileSystem } from '../../../src/ngtsc/file_system';
@@ -17,7 +17,6 @@ import { EntryPointBundle } from '../packages/entry_point_bundle';
 import { Logger } from '../logging/logger';
 import { FileToWrite } from './utils';
 import { RenderingFormatter } from './rendering_formatter';
-import { NgccReflectionHost } from '../host/ngcc_host';
 /**
  * A base-class for rendering an `AnalyzedFile`.
  *
@@ -25,12 +24,11 @@ import { NgccReflectionHost } from '../host/ngcc_host';
  * implement the `addImports`, `addDefinitions` and `removeDecorators` abstract methods.
  */
 export declare class Renderer {
-    private host;
     private srcFormatter;
     private fs;
     private logger;
     private bundle;
-    constructor(host: NgccReflectionHost, srcFormatter: RenderingFormatter, fs: FileSystem, logger: Logger, bundle: EntryPointBundle);
+    constructor(srcFormatter: RenderingFormatter, fs: FileSystem, logger: Logger, bundle: EntryPointBundle);
     renderProgram(decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileToWrite[];
     /**
      * Render the source code and source-map for an Analyzed file.
@@ -46,17 +44,17 @@ export declare class Renderer {
      * @returns A map of decorators to remove, keyed by their container node.
      */
     private computeDecoratorsToRemove;
-    /**
-   * Render the definitions as source code for the given class.
-   * @param sourceFile The file containing the class to process.
-   * @param clazz The class whose definitions are to be rendered.
-   * @param compilation The results of analyzing the class - this is used to generate the rendered
-   * definitions.
-   * @param imports An object that tracks the imports that are needed by the rendered definitions.
-   */
-    private renderDefinitions;
 }
 /**
  * Render the constant pool as source code for the given class.
  */
 export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPool: ConstantPool, imports: ImportManager): string;
+/**
+ * Render the definitions as source code for the given class.
+ * @param sourceFile The file containing the class to process.
+ * @param clazz The class whose definitions are to be rendered.
+ * @param compilation The results of analyzing the class - this is used to generate the rendered
+ * definitions.
+ * @param imports An object that tracks the imports that are needed by the rendered definitions.
+ */
+export declare function renderDefinitions(sourceFile: ts.SourceFile, compiledClass: CompiledClass, imports: ImportManager): string;
