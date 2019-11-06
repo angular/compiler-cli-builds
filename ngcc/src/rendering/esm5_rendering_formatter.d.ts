@@ -18,8 +18,4 @@ export declare class Esm5RenderingFormatter extends EsmRenderingFormatter {
      * Add the definitions inside the IIFE of each decorated class
      */
     addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
-    /**
-     * Add the adjacent statements inside the IIFE of each decorated class
-     */
-    addAdjacentStatements(output: MagicString, compiledClass: CompiledClass, statements: string): void;
 }
