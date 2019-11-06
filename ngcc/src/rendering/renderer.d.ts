@@ -47,24 +47,14 @@ export declare class Renderer {
      */
     private computeDecoratorsToRemove;
     /**
-     * Render the definitions as source code for the given class.
-     * @param sourceFile The file containing the class to process.
-     * @param clazz The class whose definitions are to be rendered.
-     * @param compilation The results of analyzing the class - this is used to generate the rendered
-     * definitions.
-     * @param imports An object that tracks the imports that are needed by the rendered definitions.
-     */
+   * Render the definitions as source code for the given class.
+   * @param sourceFile The file containing the class to process.
+   * @param clazz The class whose definitions are to be rendered.
+   * @param compilation The results of analyzing the class - this is used to generate the rendered
+   * definitions.
+   * @param imports An object that tracks the imports that are needed by the rendered definitions.
+   */
     private renderDefinitions;
-    /**
-     * Render the adjacent statements as source code for the given class.
-     * @param sourceFile The file containing the class to process.
-     * @param clazz The class whose statements are to be rendered.
-     * @param compilation The results of analyzing the class - this is used to generate the rendered
-     * definitions.
-     * @param imports An object that tracks the imports that are needed by the rendered definitions.
-     */
-    private renderAdjacentStatements;
-    private renderStatements;
 }
 /**
  * Render the constant pool as source code for the given class.

@@ -47,10 +47,6 @@ export declare class EsmRenderingFormatter implements RenderingFormatter {
      */
     addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
     /**
-     * Add the adjacent statements after all static properties of the class.
-     */
-    addAdjacentStatements(output: MagicString, compiledClass: CompiledClass, statements: string): void;
-    /**
      * Remove static decorator properties from classes.
      */
     removeDecorators(output: MagicString, decoratorsToRemove: RedundantDecoratorMap): void;
