@@ -297,7 +297,11 @@ export declare enum TsHelperFn {
     /**
      * Indicates the `__spread` function.
      */
-    Spread = 0
+    Spread = 0,
+    /**
+     * Indicates the `__spreadArrays` function.
+     */
+    SpreadArrays = 1
 }
 /**
  * A parameter to a function or method.
