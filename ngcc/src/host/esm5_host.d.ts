@@ -39,6 +39,7 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
     getBaseClassExpression(clazz: ClassDeclaration): ts.Expression | null;
     getInternalNameOfClass(clazz: ClassDeclaration): ts.Identifier;
     getAdjacentNameOfClass(clazz: ClassDeclaration): ts.Identifier;
+    getEndOfClass(classSymbol: NgccClassSymbol): ts.Node;
     /**
      * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE,
      * whose value is assigned to a variable (which represents the class to the rest of the program).
