@@ -25,6 +25,7 @@ export declare class IncrementalState implements DependencyTracker, MetadataRead
     static fresh(): IncrementalState;
     safeToSkip(sf: ts.SourceFile): boolean | Promise<boolean>;
     trackFileDependency(dep: ts.SourceFile, src: ts.SourceFile): void;
+    trackFileDependencies(deps: ts.SourceFile[], src: ts.SourceFile): void;
     getFileDependencies(file: ts.SourceFile): ts.SourceFile[];
     getNgModuleMetadata(ref: Reference<ClassDeclaration>): NgModuleMeta | null;
     registerNgModuleMetadata(meta: NgModuleMeta): void;
