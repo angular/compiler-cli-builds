@@ -18,7 +18,6 @@ export declare class DtsMetadataReader implements MetadataReader {
     private checker;
     private reflector;
     constructor(checker: ts.TypeChecker, reflector: ReflectionHost);
-    isAbstractDirective(ref: Reference<ClassDeclaration>): boolean;
     /**
      * Read the metadata from a class that has already been compiled somehow (either it's in a .d.ts
      * file, or in a .ts file with a handwritten definition).

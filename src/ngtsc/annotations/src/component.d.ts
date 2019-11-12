@@ -14,7 +14,7 @@ import { MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry } from '../../scope';
-import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
+import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence, ResolveResult } from '../../transform';
 import { TemplateSourceMapping, TypeCheckContext } from '../../typecheck';
 import { ResourceDependencyRecorder } from '../../util/src/resource_recorder';
 import { ResourceLoader } from './api';
@@ -58,7 +58,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     readonly precedence = HandlerPrecedence.PRIMARY;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     preanalyze(node: ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
-    analyze(node: ClassDeclaration, decorator: Decorator): AnalysisOutput<ComponentHandlerData>;
+    analyze(node: ClassDeclaration, decorator: Decorator, flags?: HandlerFlags): AnalysisOutput<ComponentHandlerData>;
     index(context: IndexingContext, node: ClassDeclaration, analysis: ComponentHandlerData): void;
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: ComponentHandlerData): void;
     resolve(node: ClassDeclaration, analysis: ComponentHandlerData): ResolveResult;

@@ -8,9 +8,11 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/host" />
 import * as ts from 'typescript';
 /**
- * Metadata extracted from an instance of a decorator on another declaration.
+ * Metadata extracted from an instance of a decorator on another declaration, or synthesized from
+ * other information about a class.
  */
-export interface Decorator {
+export declare type Decorator = ConcreteDecorator | SyntheticDecorator;
+export interface BaseDecorator {
     /**
      * Name by which the decorator was invoked in the user's code.
      *
@@ -21,21 +23,48 @@ export interface Decorator {
     /**
      * Identifier which refers to the decorator in the user's code.
      */
-    identifier: DecoratorIdentifier;
+    identifier: DecoratorIdentifier | null;
     /**
      * `Import` by which the decorator was brought into the module in which it was invoked, or `null`
      * if the decorator was declared in the same module and not imported.
      */
     import: Import | null;
     /**
-     * TypeScript reference to the decorator itself.
+     * TypeScript reference to the decorator itself, or `null` if the decorator is synthesized (e.g.
+     * in ngcc).
      */
-    node: ts.Node;
+    node: ts.Node | null;
     /**
-     * Arguments of the invocation of the decorator, if the decorator is invoked, or `null` otherwise.
+     * Arguments of the invocation of the decorator, if the decorator is invoked, or `null`
+     * otherwise.
      */
     args: ts.Expression[] | null;
 }
+/**
+ * Metadata extracted from an instance of a decorator on another declaration, which was actually
+ * present in a file.
+ *
+ * Concrete decorators always have an `identifier` and a `node`.
+ */
+export interface ConcreteDecorator extends BaseDecorator {
+    identifier: DecoratorIdentifier;
+    node: ts.Node;
+}
+/**
+ * Synthetic decorators never have an `identifier` or a `node`, but know the node for which they
+ * were synthesized.
+ */
+export interface SyntheticDecorator extends BaseDecorator {
+    identifier: null;
+    node: null;
+    /**
+     * The `ts.Node` for which this decorator was created.
+     */
+    synthesizedFor: ts.Node;
+}
+export declare const Decorator: {
+    nodeForError: (decorator: Decorator) => ts.Node;
+};
 /**
  * A decorator is identified by either a simple identifier (e.g. `Decorator`) or, in some cases,
  * a namespaced property access (e.g. `core.Decorator`).
@@ -268,7 +297,11 @@ export declare enum TsHelperFn {
     /**
      * Indicates the `__spread` function.
      */
-    Spread = 0
+    Spread = 0,
+    /**
+     * Indicates the `__spreadArrays` function.
+     */
+    SpreadArrays = 1
 }
 /**
  * A parameter to a function or method.
@@ -529,4 +562,22 @@ export interface ReflectionHost {
      * `ts.Program` as the input declaration.
      */
     getDtsDeclaration(declaration: ts.Declaration): ts.Declaration | null;
+    /**
+     * Get a `ts.Identifier` for a given `ClassDeclaration` which can be used to refer to the class
+     * within its definition (such as in static fields).
+     *
+     * This can differ from `clazz.name` when ngcc runs over ES5 code, since the class may have a
+     * different name within its IIFE wrapper than it does externally.
+     */
+    getInternalNameOfClass(clazz: ClassDeclaration): ts.Identifier;
+    /**
+     * Get a `ts.Identifier` for a given `ClassDeclaration` which can be used to refer to the class
+     * from statements that are "adjacent", and conceptually tightly bound, to the class but not
+     * actually inside it.
+     *
+     * Similar to `getInternalNameOfClass()`, this name can differ from `clazz.name` when ngcc runs
+     * over ES5 code, since these "adjacent" statements need to exist in the IIFE where the class may
+     * have a different name than it does externally.
+     */
+    getAdjacentNameOfClass(clazz: ClassDeclaration): ts.Identifier;
 }

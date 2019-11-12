@@ -34,7 +34,7 @@ export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
      * @param helperName the name of the helper (e.g. `__decorate`) whose calls we are interested in.
      * @returns an array of nodes of calls to the helper with the given name.
      */
-    protected getHelperCallsForClass(classSymbol: NgccClassSymbol, helperName: string): ts.CallExpression[];
+    protected getHelperCallsForClass(classSymbol: NgccClassSymbol, helperNames: string[]): ts.CallExpression[];
     /**
      * Find all the helper calls at the top level of a source file.
      *
@@ -42,7 +42,8 @@ export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
      * each class in a file.
      *
      * @param sourceFile the source who may contain helper calls.
-     * @param helperName the name of the helper (e.g. `__decorate`) whose calls we are interested in.
+     * @param helperNames the names of the helpers (e.g. `__decorate`) whose calls we are interested
+     * in.
      * @returns an array of nodes of calls to the helper with the given name.
      */
     private getTopLevelHelperCalls;

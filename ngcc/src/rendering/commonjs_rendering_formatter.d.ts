@@ -1,6 +1,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/rendering/commonjs_rendering_formatter" />
 import * as ts from 'typescript';
 import MagicString from 'magic-string';
+import { Reexport } from '../../../src/ngtsc/imports';
 import { Import, ImportManager } from '../../../src/ngtsc/translator';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { NgccReflectionHost } from '../host/ngcc_host';
@@ -21,5 +22,6 @@ export declare class CommonJsRenderingFormatter extends Esm5RenderingFormatter {
      * Add the exports to the bottom of the file.
      */
     addExports(output: MagicString, entryPointBasePath: string, exports: ExportInfo[], importManager: ImportManager, file: ts.SourceFile): void;
+    addDirectExports(output: MagicString, exports: Reexport[], importManager: ImportManager, file: ts.SourceFile): void;
     protected findEndOfImports(sf: ts.SourceFile): number;
 }

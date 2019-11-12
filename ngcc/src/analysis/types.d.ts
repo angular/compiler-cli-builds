@@ -8,6 +8,7 @@
  */
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
+import { Reexport } from '../../../src/ngtsc/imports';
 import { ClassDeclaration, Decorator } from '../../../src/ngtsc/reflection';
 import { CompileResult, DecoratorHandler } from '../../../src/ngtsc/transform';
 export interface AnalyzedFile {
@@ -26,6 +27,10 @@ export interface AnalyzedClass {
 }
 export interface CompiledClass extends AnalyzedClass {
     compilation: CompileResult[];
+    /**
+     * Any re-exports which should be added next to this class, both in .js and (if possible) .d.ts.
+     */
+    reexports: Reexport[];
 }
 export interface CompiledFile {
     compiledClasses: CompiledClass[];

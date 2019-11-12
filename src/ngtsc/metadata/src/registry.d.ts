@@ -14,15 +14,12 @@ import { DirectiveMeta, MetadataReader, MetadataRegistry, NgModuleMeta, PipeMeta
  * unit, which supports both reading and registering.
  */
 export declare class LocalMetadataRegistry implements MetadataRegistry, MetadataReader {
-    private abstractDirectives;
     private directives;
     private ngModules;
     private pipes;
-    isAbstractDirective(ref: Reference<ClassDeclaration>): boolean;
     getDirectiveMetadata(ref: Reference<ClassDeclaration>): DirectiveMeta | null;
     getNgModuleMetadata(ref: Reference<ClassDeclaration>): NgModuleMeta | null;
     getPipeMetadata(ref: Reference<ClassDeclaration>): PipeMeta | null;
-    registerAbstractDirective(clazz: ClassDeclaration): void;
     registerDirectiveMetadata(meta: DirectiveMeta): void;
     registerNgModuleMetadata(meta: NgModuleMeta): void;
     registerPipeMetadata(meta: PipeMeta): void;
@@ -33,7 +30,6 @@ export declare class LocalMetadataRegistry implements MetadataRegistry, Metadata
 export declare class CompoundMetadataRegistry implements MetadataRegistry {
     private registries;
     constructor(registries: MetadataRegistry[]);
-    registerAbstractDirective(clazz: ClassDeclaration): void;
     registerDirectiveMetadata(meta: DirectiveMeta): void;
     registerNgModuleMetadata(meta: NgModuleMeta): void;
     registerPipeMetadata(meta: PipeMeta): void;
