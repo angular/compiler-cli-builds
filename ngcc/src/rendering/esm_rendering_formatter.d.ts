@@ -6,22 +6,24 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { Statement } from '@angular/compiler';
 import MagicString from 'magic-string';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
+import { Reexport } from '../../../src/ngtsc/imports';
 import { Import, ImportManager } from '../../../src/ngtsc/translator';
 import { CompiledClass } from '../analysis/types';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
 import { ModuleWithProvidersInfo } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { RenderingFormatter, RedundantDecoratorMap } from './rendering_formatter';
-import { Reexport } from '../../../src/ngtsc/imports';
 /**
  * A RenderingFormatter that works with ECMAScript Module import and export statements.
  */
 export declare class EsmRenderingFormatter implements RenderingFormatter {
     protected host: NgccReflectionHost;
     protected isCore: boolean;
+    protected printer: ts.Printer;
     constructor(host: NgccReflectionHost, isCore: boolean);
     /**
      *  Add the imports at the top of the file, after any imports that are already there.
@@ -65,6 +67,17 @@ export declare class EsmRenderingFormatter implements RenderingFormatter {
      * This function will only get called on typings files.
      */
     addModuleWithProvidersParams(outputText: MagicString, moduleWithProviders: ModuleWithProvidersInfo[], importManager: ImportManager): void;
+    /**
+     * Convert a `Statement` to JavaScript code in a format suitable for rendering by this formatter.
+     *
+     * @param stmt The `Statement` to print.
+     * @param sourceFile A `ts.SourceFile` that provides context for the statement. See
+     *     `ts.Printer#printNode()` for more info.
+     * @param importManager The `ImportManager` to use for managing imports.
+     *
+     * @return The JavaScript code corresponding to `stmt` (in the appropriate format).
+     */
+    printStatement(stmt: Statement, sourceFile: ts.SourceFile, importManager: ImportManager): string;
     protected findEndOfImports(sf: ts.SourceFile): number;
     /**
      * Check whether the given type is the core Angular `ModuleWithProviders` interface.

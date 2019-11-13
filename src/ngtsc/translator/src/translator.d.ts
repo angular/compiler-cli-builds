@@ -44,8 +44,8 @@ export declare class ImportManager {
     generateNamedImport(moduleName: string, originalSymbol: string): NamedImport;
     getAllImports(contextPath: string): Import[];
 }
-export declare function translateExpression(expression: Expression, imports: ImportManager, defaultImportRecorder: DefaultImportRecorder): ts.Expression;
-export declare function translateStatement(statement: Statement, imports: ImportManager, defaultImportRecorder: DefaultImportRecorder): ts.Statement;
+export declare function translateExpression(expression: Expression, imports: ImportManager, defaultImportRecorder: DefaultImportRecorder, scriptTarget: Exclude<ts.ScriptTarget, ts.ScriptTarget.JSON>): ts.Expression;
+export declare function translateStatement(statement: Statement, imports: ImportManager, defaultImportRecorder: DefaultImportRecorder, scriptTarget: Exclude<ts.ScriptTarget, ts.ScriptTarget.JSON>): ts.Statement;
 export declare function translateType(type: Type, imports: ImportManager): ts.TypeNode;
 export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVisitor {
     private imports;

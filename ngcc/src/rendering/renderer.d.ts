@@ -13,11 +13,11 @@ import { CompiledFile, DecorationAnalyses } from '../analysis/types';
 import { PrivateDeclarationsAnalyses } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
 import { FileSystem } from '../../../src/ngtsc/file_system';
-import { EntryPointBundle } from '../packages/entry_point_bundle';
-import { Logger } from '../logging/logger';
-import { FileToWrite } from './utils';
-import { RenderingFormatter } from './rendering_formatter';
 import { NgccReflectionHost } from '../host/ngcc_host';
+import { Logger } from '../logging/logger';
+import { EntryPointBundle } from '../packages/entry_point_bundle';
+import { RenderingFormatter } from './rendering_formatter';
+import { FileToWrite } from './utils';
 /**
  * A base-class for rendering an `AnalyzedFile`.
  *
@@ -69,4 +69,4 @@ export declare class Renderer {
 /**
  * Render the constant pool as source code for the given class.
  */
-export declare function renderConstantPool(sourceFile: ts.SourceFile, constantPool: ConstantPool, imports: ImportManager): string;
+export declare function renderConstantPool(formatter: RenderingFormatter, sourceFile: ts.SourceFile, constantPool: ConstantPool, imports: ImportManager): string;
