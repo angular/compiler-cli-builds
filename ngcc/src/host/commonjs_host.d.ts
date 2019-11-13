@@ -66,5 +66,4 @@ export declare type RequireCall = ts.CallExpression & {
     arguments: [ts.StringLiteral];
 };
 export declare function isRequireCall(node: ts.Node): node is RequireCall;
-export declare function stripParentheses(node: ts.Node): ts.Node;
 export {};

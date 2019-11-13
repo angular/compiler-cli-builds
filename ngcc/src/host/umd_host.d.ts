@@ -47,5 +47,4 @@ interface UmdModule {
     wrapperFn: ts.FunctionExpression;
     factoryFn: ts.FunctionExpression;
 }
-export declare function stripParentheses(node: ts.Node): ts.Node;
 export {};
