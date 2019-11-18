@@ -664,9 +664,9 @@ export declare function isAssignment(node: ts.Node): node is ts.AssignmentExpres
  * ```
  *
  * @param call the call expression that is tested to represent a class decorator call.
- * @param className the name of the class that the call needs to correspond with.
+ * @param matches predicate function to test whether the call is associated with the desired class.
  */
-export declare function isClassDecorateCall(call: ts.CallExpression, className: string): call is ts.CallExpression & {
+export declare function isClassDecorateCall(call: ts.CallExpression, matches: (identifier: ts.Identifier) => boolean): call is ts.CallExpression & {
     arguments: [ts.ArrayLiteralExpression, ts.Expression];
 };
 /**
@@ -678,9 +678,9 @@ export declare function isClassDecorateCall(call: ts.CallExpression, className: 
  * ```
  *
  * @param call the call expression that is tested to represent a member decorator call.
- * @param className the name of the class that the call needs to correspond with.
+ * @param matches predicate function to test whether the call is associated with the desired class.
  */
-export declare function isMemberDecorateCall(call: ts.CallExpression, className: string): call is ts.CallExpression & {
+export declare function isMemberDecorateCall(call: ts.CallExpression, matches: (identifier: ts.Identifier) => boolean): call is ts.CallExpression & {
     arguments: [ts.ArrayLiteralExpression, ts.StringLiteral, ts.StringLiteral];
 };
 /**

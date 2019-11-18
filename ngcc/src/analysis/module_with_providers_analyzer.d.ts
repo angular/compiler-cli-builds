@@ -27,7 +27,8 @@ export declare const ModuleWithProvidersAnalyses: MapConstructor;
 export declare class ModuleWithProvidersAnalyzer {
     private host;
     private referencesRegistry;
-    constructor(host: NgccReflectionHost, referencesRegistry: ReferencesRegistry);
+    private processDts;
+    constructor(host: NgccReflectionHost, referencesRegistry: ReferencesRegistry, processDts: boolean);
     analyzeProgram(program: ts.Program): ModuleWithProvidersAnalyses;
     private getRootFiles;
     private getDtsDeclarationForFunction;
