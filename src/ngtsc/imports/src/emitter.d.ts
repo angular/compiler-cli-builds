@@ -103,6 +103,17 @@ export declare class LogicalProjectStrategy implements ReferenceEmitStrategy {
     emit(ref: Reference<ts.Node>, context: ts.SourceFile): Expression | null;
 }
 /**
+ * A `ReferenceEmitStrategy` which constructs relatives paths between `ts.SourceFile`s.
+ *
+ * This strategy can be used if there is no `rootDir`/`rootDirs` structure for the project which
+ * necessitates the stronger logic of `LogicalProjectStrategy`.
+ */
+export declare class RelativePathStrategy implements ReferenceEmitStrategy {
+    private reflector;
+    constructor(reflector: ReflectionHost);
+    emit(ref: Reference<ts.Node>, context: ts.SourceFile): Expression | null;
+}
+/**
  * A `ReferenceEmitStrategy` which uses a `FileToModuleHost` to generate absolute import references.
  */
 export declare class FileToModuleStrategy implements ReferenceEmitStrategy {
