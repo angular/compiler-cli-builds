@@ -30,6 +30,7 @@ export declare class CachedFileSystem implements FileSystem {
     stat(path: AbsoluteFsPath): FileStats;
     readdir(path: AbsoluteFsPath): PathSegment[];
     pwd(): AbsoluteFsPath;
+    chdir(path: AbsoluteFsPath): void;
     extname(path: AbsoluteFsPath | PathSegment): string;
     isCaseSensitive(): boolean;
     isRoot(path: AbsoluteFsPath): boolean;
