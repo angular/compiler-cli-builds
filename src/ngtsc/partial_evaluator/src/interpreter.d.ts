@@ -37,7 +37,7 @@ export declare class StaticInterpreter {
     visit(node: ts.Expression, context: Context): ResolvedValue;
     private visitExpression;
     private visitArrayLiteralExpression;
-    private visitObjectLiteralExpression;
+    protected visitObjectLiteralExpression(node: ts.ObjectLiteralExpression, context: Context): ResolvedValue;
     private visitTemplateExpression;
     private visitIdentifier;
     private visitDeclaration;
