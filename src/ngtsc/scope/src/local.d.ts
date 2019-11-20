@@ -12,7 +12,7 @@ import { AliasingHost, Reexport, Reference, ReferenceEmitter } from '../../impor
 import { DirectiveMeta, MetadataReader, MetadataRegistry, NgModuleMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 import { ExportScope, ScopeData } from './api';
-import { ComponentScopeReader, ComponentScopeRegistry } from './component_scope';
+import { ComponentScopeReader } from './component_scope';
 import { DtsModuleScopeResolver } from './dependency';
 export interface LocalNgModuleData {
     declarations: Reference<ClassDeclaration>[];
@@ -57,7 +57,6 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
     private dependencyScopeReader;
     private refEmitter;
     private aliasingHost;
-    private componentScopeRegistry;
     /**
      * Tracks whether the registry has been asked to produce scopes for a module or component. Once
      * this is true, the registry cannot accept registrations of new directives/pipes/modules as it
@@ -93,7 +92,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * Tracks errors accumulated in the processing of scopes for each module declaration.
      */
     private scopeErrors;
-    constructor(localReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasingHost: AliasingHost | null, componentScopeRegistry?: ComponentScopeRegistry);
+    constructor(localReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasingHost: AliasingHost | null);
     /**
      * Add an NgModule's data to the registry.
      */
