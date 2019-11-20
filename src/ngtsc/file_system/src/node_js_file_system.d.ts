@@ -13,6 +13,7 @@ export declare class NodeJSFileSystem implements FileSystem {
     lstat(path: AbsoluteFsPath): FileStats;
     stat(path: AbsoluteFsPath): FileStats;
     pwd(): AbsoluteFsPath;
+    chdir(dir: AbsoluteFsPath): void;
     copyFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     moveFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     ensureDir(path: AbsoluteFsPath): void;
