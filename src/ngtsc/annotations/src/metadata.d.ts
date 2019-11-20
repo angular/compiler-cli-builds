@@ -17,4 +17,4 @@ import { ReflectionHost } from '../../reflection';
  * If no such metadata is present, this function returns `null`. Otherwise, the call is returned
  * as a `Statement` for inclusion along with the class.
  */
-export declare function generateSetClassMetadataCall(clazz: ts.Declaration, reflection: ReflectionHost, defaultImportRecorder: DefaultImportRecorder, isCore: boolean): Statement | null;
+export declare function generateSetClassMetadataCall(clazz: ts.Declaration, reflection: ReflectionHost, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, annotateForClosureCompiler?: boolean): Statement | null;

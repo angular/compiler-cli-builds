@@ -23,7 +23,8 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
     private metaRegistry;
     private defaultImportRecorder;
     private isCore;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, defaultImportRecorder: DefaultImportRecorder, isCore: boolean);
+    private annotateForClosureCompiler;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, annotateForClosureCompiler: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
     analyze(node: ClassDeclaration, decorator: Decorator | null, flags?: HandlerFlags): AnalysisOutput<DirectiveHandlerData>;
@@ -35,7 +36,7 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
  * appear in the declarations of an `NgModule` and additional verification is done when processing
  * the module.
  */
-export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Decorator | null, reflector: ReflectionHost, evaluator: PartialEvaluator, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, flags: HandlerFlags, defaultSelector?: string | null): {
+export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Decorator | null, reflector: ReflectionHost, evaluator: PartialEvaluator, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, flags: HandlerFlags, annotateForClosureCompiler: boolean, defaultSelector?: string | null): {
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;
 } | undefined;
