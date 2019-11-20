@@ -7,6 +7,6 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope" />
 export { ExportScope, ScopeData } from './src/api';
-export { ComponentScopeReader, ComponentScopeRegistry, CompoundComponentScopeReader } from './src/component_scope';
+export { ComponentScopeReader, CompoundComponentScopeReader } from './src/component_scope';
 export { DtsModuleScopeResolver, MetadataDtsModuleScopeResolver } from './src/dependency';
 export { LocalModuleScope, LocalModuleScopeRegistry, LocalNgModuleData } from './src/local';
