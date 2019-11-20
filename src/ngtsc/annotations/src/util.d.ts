@@ -92,3 +92,13 @@ export declare function combineResolvers(resolvers: ForeignFunctionResolver[]): 
 export declare function isExpressionForwardReference(expr: Expression, context: ts.Node, contextSource: ts.SourceFile): boolean;
 export declare function isWrappedTsNodeExpr(expr: Expression): expr is WrappedNodeExpr<ts.Node>;
 export declare function readBaseClass(node: ClassDeclaration, reflector: ReflectionHost, evaluator: PartialEvaluator): Reference<ClassDeclaration> | 'dynamic' | null;
+/**
+ * Wraps all functions in a given expression in parentheses. This is needed to avoid problems
+ * where Tsickle annotations added between analyse and transform phases in Angular may trigger
+ * automatic semicolon insertion, e.g. if a function is the expression in a `return` statement. More
+ * info can be found in Tsickle source code here:
+ * https://github.com/angular/tsickle/blob/d7974262571c8a17d684e5ba07680e1b1993afdd/src/jsdoc_transformer.ts#L1021
+ *
+ * @param expression Expression where functions should be wrapped in parentheses
+ */
+export declare function wrapFunctionExpressionsInParens(expression: ts.Expression): ts.Expression;

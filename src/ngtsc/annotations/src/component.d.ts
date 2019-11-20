@@ -45,8 +45,9 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private cycleAnalyzer;
     private refEmitter;
     private defaultImportRecorder;
+    private annotateForClosureCompiler;
     private resourceDependencies;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, i18nLegacyMessageIdFormat: string, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, resourceDependencies?: ResourceDependencyRecorder);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, i18nLegacyMessageIdFormat: string, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, annotateForClosureCompiler: boolean, resourceDependencies?: ResourceDependencyRecorder);
     private literalCache;
     private elementSchemaRegistry;
     /**
