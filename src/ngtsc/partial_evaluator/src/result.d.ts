@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/result" />
 import * as ts from 'typescript';
 import { Reference } from '../../imports';
+import { Declaration } from '../../reflection';
 import { DynamicValue } from './dynamic';
 /**
  * A value resulting from static resolution.
@@ -16,22 +17,33 @@ import { DynamicValue } from './dynamic';
  * non-primitive value, or a special `DynamicValue` type which indicates the value was not
  * available statically.
  */
-export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | BuiltinFn | DynamicValue<unknown>;
+export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | ResolvedModule | BuiltinFn | DynamicValue<unknown>;
 /**
  * An array of `ResolvedValue`s.
  *
  * This is a reified type to allow the circular reference of `ResolvedValue` -> `ResolvedValueArray`
- * ->
- * `ResolvedValue`.
+ * -> `ResolvedValue`.
  */
 export interface ResolvedValueArray extends Array<ResolvedValue> {
 }
 /**
  * A map of strings to `ResolvedValue`s.
  *
- * This is a reified type to allow the circular reference of `ResolvedValue` -> `ResolvedValueMap` ->
- * `ResolvedValue`.
- */ export interface ResolvedValueMap extends Map<string, ResolvedValue> {
+ * This is a reified type to allow the circular reference of `ResolvedValue` -> `ResolvedValueMap`
+ * -> `ResolvedValue`.
+ */
+export interface ResolvedValueMap extends Map<string, ResolvedValue> {
+}
+/**
+ * A collection of publicly exported declarations from a module. Each declaration is evaluated
+ * lazily upon request.
+ */
+export declare class ResolvedModule {
+    private exports;
+    private evaluate;
+    constructor(exports: Map<string, Declaration>, evaluate: (decl: Declaration) => ResolvedValue);
+    getExport(name: string): ResolvedValue;
+    getExports(): ResolvedValueMap;
 }
 /**
  * A value member of an enumeration.
