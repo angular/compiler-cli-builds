@@ -6,4 +6,4 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental" />
-export { IncrementalDriver } from './src/state';
+export { IncrementalState } from './src/state';

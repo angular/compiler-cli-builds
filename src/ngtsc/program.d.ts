@@ -42,7 +42,7 @@ export declare class NgtscProgram implements api.Program {
     private defaultImportTracker;
     private perfRecorder;
     private perfTracker;
-    private incrementalDriver;
+    private incrementalState;
     private typeCheckFilePath;
     private modifiedResourceFiles;
     constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: NgtscProgram);
