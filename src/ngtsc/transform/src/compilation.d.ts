@@ -9,7 +9,7 @@
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ImportRewriter } from '../../imports';
-import { IncrementalState } from '../../incremental';
+import { IncrementalDriver } from '../../incremental';
 import { IndexingContext } from '../../indexer';
 import { PerfRecorder } from '../../perf';
 import { ReflectionHost } from '../../reflection';
@@ -26,7 +26,7 @@ export declare class IvyCompilation {
     private handlers;
     private reflector;
     private importRewriter;
-    private incrementalState;
+    private incrementalDriver;
     private perf;
     private sourceToFactorySymbols;
     private scopeRegistry;
@@ -53,7 +53,7 @@ export declare class IvyCompilation {
      * when compiling @angular/core, or `null` if the current program is not @angular/core. This is
      * `null` in most cases.
      */
-    constructor(handlers: DecoratorHandler<any, any>[], reflector: ReflectionHost, importRewriter: ImportRewriter, incrementalState: IncrementalState, perf: PerfRecorder, sourceToFactorySymbols: Map<string, Set<string>> | null, scopeRegistry: LocalModuleScopeRegistry);
+    constructor(handlers: DecoratorHandler<any, any>[], reflector: ReflectionHost, importRewriter: ImportRewriter, incrementalDriver: IncrementalDriver, perf: PerfRecorder, sourceToFactorySymbols: Map<string, Set<string>> | null, scopeRegistry: LocalModuleScopeRegistry);
     readonly exportStatements: Map<string, Map<string, [string, string]>>;
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
