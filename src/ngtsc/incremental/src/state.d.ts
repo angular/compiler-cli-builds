@@ -10,16 +10,33 @@ import * as ts from 'typescript';
 import { DependencyTracker } from '../../partial_evaluator';
 import { ResourceDependencyRecorder } from '../../util/src/resource_recorder';
 /**
- * Accumulates state between compilations.
+ * Drives an incremental build, by tracking changes and determining which files need to be emitted.
  */
-export declare class IncrementalState implements DependencyTracker, ResourceDependencyRecorder {
-    private unchangedFiles;
+export declare class IncrementalDriver implements DependencyTracker, ResourceDependencyRecorder {
+    private allTsFiles;
+    /**
+     * State of the current build.
+     *
+     * This transitions as the compilation progresses.
+     */
+    private state;
+    /**
+     * Tracks metadata related to each `ts.SourceFile` in the program.
+     */
     private metadata;
-    private modifiedResourceFiles;
     private constructor();
-    static reconcile(oldProgram: ts.Program, newProgram: ts.Program, modifiedResourceFiles: Set<string> | null): IncrementalState;
-    static fresh(): IncrementalState;
-    safeToSkip(sf: ts.SourceFile): boolean;
+    /**
+     * Construct an `IncrementalDriver` with a starting state that incorporates the results of a
+     * previous build.
+     *
+     * The previous build's `BuildState` is reconciled with the new program's changes, and the results
+     * are merged into the new build's `PendingBuildState`.
+     */
+    static reconcile(oldProgram: ts.Program, oldDriver: IncrementalDriver, newProgram: ts.Program, modifiedResourceFiles: Set<string> | null): IncrementalDriver;
+    static fresh(program: ts.Program): IncrementalDriver;
+    recordSuccessfulAnalysis(): void;
+    recordSuccessfulEmit(sf: ts.SourceFile): void;
+    safeToSkipEmit(sf: ts.SourceFile): boolean;
     trackFileDependency(dep: ts.SourceFile, src: ts.SourceFile): void;
     trackFileDependencies(deps: ts.SourceFile[], src: ts.SourceFile): void;
     getFileDependencies(file: ts.SourceFile): ts.SourceFile[];
