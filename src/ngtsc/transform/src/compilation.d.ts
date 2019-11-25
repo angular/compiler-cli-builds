@@ -30,6 +30,7 @@ export declare class IvyCompilation {
     private perf;
     private sourceToFactorySymbols;
     private scopeRegistry;
+    private compileNonExportedClasses;
     /**
      * Tracks classes which have been analyzed and found to have an Ivy decorator, and the
      * information recorded about them for later compilation.
@@ -53,7 +54,7 @@ export declare class IvyCompilation {
      * when compiling @angular/core, or `null` if the current program is not @angular/core. This is
      * `null` in most cases.
      */
-    constructor(handlers: DecoratorHandler<any, any>[], reflector: ReflectionHost, importRewriter: ImportRewriter, incrementalDriver: IncrementalDriver, perf: PerfRecorder, sourceToFactorySymbols: Map<string, Set<string>> | null, scopeRegistry: LocalModuleScopeRegistry);
+    constructor(handlers: DecoratorHandler<any, any>[], reflector: ReflectionHost, importRewriter: ImportRewriter, incrementalDriver: IncrementalDriver, perf: PerfRecorder, sourceToFactorySymbols: Map<string, Set<string>> | null, scopeRegistry: LocalModuleScopeRegistry, compileNonExportedClasses: boolean);
     readonly exportStatements: Map<string, Map<string, [string, string]>>;
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
