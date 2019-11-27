@@ -24,7 +24,21 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Inje
     private defaultImportRecorder;
     private isCore;
     private strictCtorDeps;
-    constructor(reflector: ReflectionHost, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, strictCtorDeps: boolean);
+    /**
+     * What to do if the injectable already contains a ɵprov property.
+     *
+     * If true then an error diagnostic is reported.
+     * If false then there is no error and a new ɵprov property is not added.
+     */
+    private errorOnDuplicateProv;
+    constructor(reflector: ReflectionHost, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, strictCtorDeps: boolean, 
+    /**
+     * What to do if the injectable already contains a ɵprov property.
+     *
+     * If true then an error diagnostic is reported.
+     * If false then there is no error and a new ɵprov property is not added.
+     */
+    errorOnDuplicateProv?: boolean);
     readonly precedence = HandlerPrecedence.SHARED;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ClassDeclaration, decorator: Decorator): AnalysisOutput<InjectableHandlerData>;
