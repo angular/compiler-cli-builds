@@ -15,6 +15,7 @@ export interface EntryPointBundle {
     rootDirs: AbsoluteFsPath[];
     src: BundleProgram;
     dts: BundleProgram | null;
+    enableI18nLegacyMessageIdFormat: boolean;
 }
 /**
  * Get an object that describes a formatted bundle for an entry-point.
@@ -27,5 +28,7 @@ export interface EntryPointBundle {
  * @param pathMappings An optional set of mappings to use when compiling files.
  * @param mirrorDtsFromSrc If true then the `dts` program will contain additional files that
  * were guessed by mapping the `src` files to `dts` files.
+ * @param enableI18nLegacyMessageIdFormat Whether to render legacy message ids for i18n messages in
+ * component templates.
  */
-export declare function makeEntryPointBundle(fs: FileSystem, entryPoint: EntryPoint, formatPath: string, isCore: boolean, format: EntryPointFormat, transformDts: boolean, pathMappings?: PathMappings, mirrorDtsFromSrc?: boolean): EntryPointBundle;
+export declare function makeEntryPointBundle(fs: FileSystem, entryPoint: EntryPoint, formatPath: string, isCore: boolean, format: EntryPointFormat, transformDts: boolean, pathMappings?: PathMappings, mirrorDtsFromSrc?: boolean, enableI18nLegacyMessageIdFormat?: boolean): EntryPointBundle;

@@ -57,6 +57,18 @@ export interface SyncNgccOptions {
      * Default: `false` (i.e. run synchronously)
      */
     async?: false;
+    /**
+     * Render `$localize` messages with legacy format ids.
+     *
+     * The default value is `true`. Only set this to `false` if you do not want legacy message ids to
+     * be rendered. For example, if you are not using legacy message ids in your translation files
+     * AND are not doing compile-time inlining of translations, in which case the extra message ids
+     * would add unwanted size to the final source bundle.
+     *
+     * It is safe to leave this set to true if you are doing compile-time inlining because the extra
+     * legacy message ids will all be stripped during translation.
+     */
+    enableI18nLegacyMessageIdFormat?: boolean;
 }
 /**
  * The options to configure the ngcc compiler for asynchronous execution.
