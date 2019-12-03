@@ -40,14 +40,14 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private rootDirs;
     private defaultPreserveWhitespaces;
     private i18nUseExternalIds;
-    private i18nLegacyMessageIdFormat;
+    private enableI18nLegacyMessageIdFormat;
     private moduleResolver;
     private cycleAnalyzer;
     private refEmitter;
     private defaultImportRecorder;
     private annotateForClosureCompiler;
     private resourceDependencies;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, i18nLegacyMessageIdFormat: string, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, annotateForClosureCompiler: boolean, resourceDependencies?: ResourceDependencyRecorder);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, annotateForClosureCompiler: boolean, resourceDependencies?: ResourceDependencyRecorder);
     private literalCache;
     private elementSchemaRegistry;
     /**
