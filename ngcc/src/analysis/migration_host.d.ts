@@ -1,4 +1,12 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/analysis/migration_host" />
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { MetadataReader } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
@@ -18,7 +26,8 @@ export declare class DefaultMigrationHost implements MigrationHost {
     private handlers;
     private entryPointPath;
     private analyzedFiles;
-    constructor(reflectionHost: NgccReflectionHost, metadata: MetadataReader, evaluator: PartialEvaluator, handlers: DecoratorHandler<any, any>[], entryPointPath: AbsoluteFsPath, analyzedFiles: AnalyzedFile[]);
+    private diagnosticHandler;
+    constructor(reflectionHost: NgccReflectionHost, metadata: MetadataReader, evaluator: PartialEvaluator, handlers: DecoratorHandler<any, any>[], entryPointPath: AbsoluteFsPath, analyzedFiles: AnalyzedFile[], diagnosticHandler: (error: ts.Diagnostic) => void);
     injectSyntheticDecorator(clazz: ClassDeclaration, decorator: Decorator, flags?: HandlerFlags): void;
     getAllDecorators(clazz: ClassDeclaration): Decorator[] | null;
     isInScope(clazz: ClassDeclaration): boolean;
