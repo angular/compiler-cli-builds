@@ -11,6 +11,7 @@ import * as ts from 'typescript';
 import { Reexport } from '../../imports';
 import { IndexingContext } from '../../indexer';
 import { ClassDeclaration, Decorator } from '../../reflection';
+import { ImportManager } from '../../translator';
 import { TypeCheckContext } from '../../typecheck';
 export declare enum HandlerPrecedence {
     /**
@@ -134,4 +135,9 @@ export interface CompileResult {
 export interface ResolveResult {
     reexports?: Reexport[];
     diagnostics?: ts.Diagnostic[];
+}
+export interface DtsTransform {
+    transformClassElement?(element: ts.ClassElement, imports: ImportManager): ts.ClassElement;
+    transformFunctionDeclaration?(element: ts.FunctionDeclaration, imports: ImportManager): ts.FunctionDeclaration;
+    transformClass?(clazz: ts.ClassDeclaration, elements: ReadonlyArray<ts.ClassElement>, imports: ImportManager): ts.ClassDeclaration;
 }

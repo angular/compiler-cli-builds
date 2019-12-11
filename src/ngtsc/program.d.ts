@@ -45,6 +45,8 @@ export declare class NgtscProgram implements api.Program {
     private incrementalDriver;
     private typeCheckFilePath;
     private modifiedResourceFiles;
+    private dtsTransforms;
+    private mwpScanner;
     constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: NgtscProgram);
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
