@@ -11,11 +11,13 @@ import * as ts from 'typescript';
 import { ImportRewriter } from '../../imports';
 import { IncrementalDriver } from '../../incremental';
 import { IndexingContext } from '../../indexer';
+import { ModuleWithProvidersScanner } from '../../modulewithproviders';
 import { PerfRecorder } from '../../perf';
 import { ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
 import { TypeCheckContext } from '../../typecheck';
 import { CompileResult, DecoratorHandler } from './api';
+import { DtsTransformRegistry } from './declaration';
 /**
  * Manages a compilation of Ivy decorators into static fields across an entire ts.Program.
  *
@@ -30,18 +32,14 @@ export declare class IvyCompilation {
     private perf;
     private sourceToFactorySymbols;
     private scopeRegistry;
+    private compileNonExportedClasses;
+    private dtsTransforms;
+    private mwpScanner;
     /**
      * Tracks classes which have been analyzed and found to have an Ivy decorator, and the
      * information recorded about them for later compilation.
      */
     private ivyClasses;
-    /**
-     * Tracks factory information which needs to be generated.
-     */
-    /**
-     * Tracks the `DtsFileTransformer`s for each TS file that needs .d.ts transformations.
-     */
-    private dtsMap;
     private reexportMap;
     private _diagnostics;
     /**
@@ -53,7 +51,7 @@ export declare class IvyCompilation {
      * when compiling @angular/core, or `null` if the current program is not @angular/core. This is
      * `null` in most cases.
      */
-    constructor(handlers: DecoratorHandler<any, any>[], reflector: ReflectionHost, importRewriter: ImportRewriter, incrementalDriver: IncrementalDriver, perf: PerfRecorder, sourceToFactorySymbols: Map<string, Set<string>> | null, scopeRegistry: LocalModuleScopeRegistry);
+    constructor(handlers: DecoratorHandler<any, any>[], reflector: ReflectionHost, importRewriter: ImportRewriter, incrementalDriver: IncrementalDriver, perf: PerfRecorder, sourceToFactorySymbols: Map<string, Set<string>> | null, scopeRegistry: LocalModuleScopeRegistry, compileNonExportedClasses: boolean, dtsTransforms: DtsTransformRegistry, mwpScanner: ModuleWithProvidersScanner);
     readonly exportStatements: Map<string, Map<string, [string, string]>>;
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
@@ -78,11 +76,5 @@ export declare class IvyCompilation {
      * Lookup the `ts.Decorator` which triggered transformation of a particular class declaration.
      */
     ivyDecoratorsFor(node: ts.Declaration): ts.Decorator[];
-    /**
-     * Process a declaration file and return a transformed version that incorporates the changes
-     * made to the source file.
-     */
-    transformedDtsFor(file: ts.SourceFile, context: ts.TransformationContext): ts.SourceFile;
     readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
-    private getDtsTransformer;
 }
