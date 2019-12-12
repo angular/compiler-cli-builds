@@ -51,6 +51,7 @@ export declare class DecorationAnalyzer {
      * Map of NgModule declarations to the re-exports for that NgModule.
      */
     private reexportMap;
+    moduleResolver: ModuleResolver;
     resourceManager: NgccResourceLoader;
     metaRegistry: LocalMetadataRegistry;
     dtsMetaReader: DtsMetadataReader;
@@ -61,7 +62,6 @@ export declare class DecorationAnalyzer {
     scopeRegistry: LocalModuleScopeRegistry;
     fullRegistry: CompoundMetadataRegistry;
     evaluator: PartialEvaluator;
-    moduleResolver: ModuleResolver;
     importGraph: ImportGraph;
     cycleAnalyzer: CycleAnalyzer;
     handlers: DecoratorHandler<unknown, unknown, unknown>[];
