@@ -84,4 +84,7 @@ export declare function translateDiagnostic(diagnostic: ts.Diagnostic, resolver:
 /**
  * Constructs a `ts.Diagnostic` for a given `ParseSourceSpan` within a template.
  */
-export declare function makeTemplateDiagnostic(mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: number, messageText: string | ts.DiagnosticMessageChain): ts.Diagnostic;
+export declare function makeTemplateDiagnostic(mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: number, messageText: string | ts.DiagnosticMessageChain, relatedMessage?: {
+    text: string;
+    span: ParseSourceSpan;
+}): ts.Diagnostic;

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/oob" />
-import { AbsoluteSourceSpan, BindingPipe, TmplAstReference } from '@angular/compiler';
+import { AbsoluteSourceSpan, BindingPipe, PropertyWrite, TmplAstReference, TmplAstVariable } from '@angular/compiler';
 import * as ts from 'typescript';
 import { TcbSourceResolver } from './diagnostics';
 /**
@@ -41,6 +41,7 @@ export interface OutOfBandDiagnosticRecorder {
      * plus span of the larger expression context.
      */
     missingPipe(templateId: string, ast: BindingPipe, sourceSpan: AbsoluteSourceSpan): void;
+    illegalAssignmentToTemplateVar(templateId: string, assignment: PropertyWrite, assignmentSpan: AbsoluteSourceSpan, target: TmplAstVariable): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -49,4 +50,5 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
     missingReferenceTarget(templateId: string, ref: TmplAstReference): void;
     missingPipe(templateId: string, ast: BindingPipe, absSpan: AbsoluteSourceSpan): void;
+    illegalAssignmentToTemplateVar(templateId: string, assignment: PropertyWrite, assignmentSpan: AbsoluteSourceSpan, target: TmplAstVariable): void;
 }
