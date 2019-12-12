@@ -19,7 +19,7 @@ export interface InjectableHandlerData {
 /**
  * Adapts the `compileIvyInjectable` compiler for `@Injectable` decorators to the Ivy compiler.
  */
-export declare class InjectableDecoratorHandler implements DecoratorHandler<InjectableHandlerData, Decorator> {
+export declare class InjectableDecoratorHandler implements DecoratorHandler<Decorator, InjectableHandlerData, unknown> {
     private reflector;
     private defaultImportRecorder;
     private isCore;
@@ -40,7 +40,8 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Inje
      */
     errorOnDuplicateProv?: boolean);
     readonly precedence = HandlerPrecedence.SHARED;
+    readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
-    analyze(node: ClassDeclaration, decorator: Decorator): AnalysisOutput<InjectableHandlerData>;
-    compile(node: ClassDeclaration, analysis: InjectableHandlerData): CompileResult[];
+    analyze(node: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<InjectableHandlerData>;
+    compile(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];
 }

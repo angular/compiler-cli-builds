@@ -20,8 +20,6 @@ export declare class NgtscProgram implements api.Program {
     private reuseTsProgram;
     private resourceManager;
     private compilation;
-    private factoryToSourceInfo;
-    private sourceToFactorySymbols;
     private _coreImportsFrom;
     private _importRewriter;
     private _reflector;
@@ -32,6 +30,7 @@ export declare class NgtscProgram implements api.Program {
     private exportReferenceGraph;
     private flatIndexGenerator;
     private routeAnalyzer;
+    private scopeRegistry;
     private constructionDiagnostics;
     private moduleResolver;
     private cycleAnalyzer;
@@ -44,6 +43,7 @@ export declare class NgtscProgram implements api.Program {
     private perfTracker;
     private incrementalDriver;
     private typeCheckFilePath;
+    private factoryTracker;
     private modifiedResourceFiles;
     private dtsTransforms;
     private mwpScanner;
@@ -60,7 +60,9 @@ export declare class NgtscProgram implements api.Program {
     getLibrarySummaries(): Map<string, api.LibrarySummary>;
     getEmittedGeneratedFiles(): Map<string, GeneratedFile>;
     getEmittedSourceFiles(): Map<string, ts.SourceFile>;
+    private scanForMwp;
     private ensureAnalyzed;
+    private resolveCompilation;
     emit(opts?: {
         emitFlags?: api.EmitFlags;
         cancellationToken?: ts.CancellationToken;
@@ -71,6 +73,11 @@ export declare class NgtscProgram implements api.Program {
     private getTemplateDiagnostics;
     getIndexedComponents(): Map<ts.Declaration, IndexedComponent>;
     private makeCompilation;
+    /**
+     * Reifies the inter-dependencies of NgModules and the components within their compilation scopes
+     * into the `IncrementalDriver`'s dependency graph.
+     */
+    private recordNgModuleScopeDependencies;
     private readonly reflector;
     private readonly coreImportsFrom;
     private readonly isCore;
