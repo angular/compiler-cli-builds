@@ -7,23 +7,22 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/src/state" />
 import * as ts from 'typescript';
-import { DependencyTracker } from '../../partial_evaluator';
-import { ResourceDependencyRecorder } from '../../util/src/resource_recorder';
+import { ClassRecord, TraitCompiler } from '../../transform';
+import { IncrementalBuild } from '../api';
+import { FileDependencyGraph } from './dependency_tracking';
 /**
  * Drives an incremental build, by tracking changes and determining which files need to be emitted.
  */
-export declare class IncrementalDriver implements DependencyTracker, ResourceDependencyRecorder {
+export declare class IncrementalDriver implements IncrementalBuild<ClassRecord> {
     private allTsFiles;
+    readonly depGraph: FileDependencyGraph;
+    private logicalChanges;
     /**
      * State of the current build.
      *
      * This transitions as the compilation progresses.
      */
     private state;
-    /**
-     * Tracks metadata related to each `ts.SourceFile` in the program.
-     */
-    private metadata;
     private constructor();
     /**
      * Construct an `IncrementalDriver` with a starting state that incorporates the results of a
@@ -34,13 +33,8 @@ export declare class IncrementalDriver implements DependencyTracker, ResourceDep
      */
     static reconcile(oldProgram: ts.Program, oldDriver: IncrementalDriver, newProgram: ts.Program, modifiedResourceFiles: Set<string> | null): IncrementalDriver;
     static fresh(program: ts.Program): IncrementalDriver;
-    recordSuccessfulAnalysis(): void;
+    recordSuccessfulAnalysis(traitCompiler: TraitCompiler): void;
     recordSuccessfulEmit(sf: ts.SourceFile): void;
     safeToSkipEmit(sf: ts.SourceFile): boolean;
-    trackFileDependency(dep: ts.SourceFile, src: ts.SourceFile): void;
-    trackFileDependencies(deps: ts.SourceFile[], src: ts.SourceFile): void;
-    getFileDependencies(file: ts.SourceFile): ts.SourceFile[];
-    recordResourceDependency(file: ts.SourceFile, resourcePath: string): void;
-    private ensureMetadata;
-    private hasChangedResourceDependencies;
+    priorWorkFor(sf: ts.SourceFile): ClassRecord[] | null;
 }

@@ -64,7 +64,7 @@ export declare class DecorationAnalyzer {
     moduleResolver: ModuleResolver;
     importGraph: ImportGraph;
     cycleAnalyzer: CycleAnalyzer;
-    handlers: DecoratorHandler<any, any>[];
+    handlers: DecoratorHandler<unknown, unknown, unknown>[];
     migrations: Migration[];
     constructor(fs: FileSystem, bundle: EntryPointBundle, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, diagnosticHandler?: (error: ts.Diagnostic) => void);
     /**
