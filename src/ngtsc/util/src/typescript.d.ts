@@ -31,3 +31,7 @@ export declare function nodeDebugInfo(node: ts.Node): string;
  * Otherwise it will fallback on the `ts.ResolveModuleName()` function.
  */
 export declare function resolveModuleName(moduleName: string, containingFile: string, compilerOptions: ts.CompilerOptions, compilerHost: ts.CompilerHost): ts.ResolvedModule | undefined;
+/**
+ * Asserts that the keys `K` form a subset of the keys of `T`.
+ */
+export declare type SubsetOfKeys<T, K extends keyof T> = K;

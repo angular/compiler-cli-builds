@@ -7,8 +7,9 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/interpreter" />
 import * as ts from 'typescript';
+import { DependencyTracker } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
-import { DependencyTracker, ForeignFunctionResolver } from './interface';
+import { ForeignFunctionResolver } from './interface';
 import { ResolvedValue } from './result';
 /**
  * Tracks the scope of a function body, which includes `ResolvedValue`s for the parameters of that
@@ -32,8 +33,8 @@ interface Context {
 export declare class StaticInterpreter {
     private host;
     private checker;
-    private dependencyTracker?;
-    constructor(host: ReflectionHost, checker: ts.TypeChecker, dependencyTracker?: DependencyTracker | undefined);
+    private dependencyTracker;
+    constructor(host: ReflectionHost, checker: ts.TypeChecker, dependencyTracker: DependencyTracker | null);
     visit(node: ts.Expression, context: Context): ResolvedValue;
     private visitExpression;
     private visitArrayLiteralExpression;

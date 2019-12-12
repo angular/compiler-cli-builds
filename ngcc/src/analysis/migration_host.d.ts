@@ -27,7 +27,7 @@ export declare class DefaultMigrationHost implements MigrationHost {
     private entryPointPath;
     private analyzedFiles;
     private diagnosticHandler;
-    constructor(reflectionHost: NgccReflectionHost, metadata: MetadataReader, evaluator: PartialEvaluator, handlers: DecoratorHandler<any, any>[], entryPointPath: AbsoluteFsPath, analyzedFiles: AnalyzedFile[], diagnosticHandler: (error: ts.Diagnostic) => void);
+    constructor(reflectionHost: NgccReflectionHost, metadata: MetadataReader, evaluator: PartialEvaluator, handlers: DecoratorHandler<unknown, unknown, unknown>[], entryPointPath: AbsoluteFsPath, analyzedFiles: AnalyzedFile[], diagnosticHandler: (error: ts.Diagnostic) => void);
     injectSyntheticDecorator(clazz: ClassDeclaration, decorator: Decorator, flags?: HandlerFlags): void;
     getAllDecorators(clazz: ClassDeclaration): Decorator[] | null;
     isInScope(clazz: ClassDeclaration): boolean;

@@ -8,27 +8,42 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
 import { ConstantPool, InterpolationConfig, ParseError, ParseSourceFile, ParseTemplateOptions, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import { CycleAnalyzer } from '../../cycles';
-import { DefaultImportRecorder, ModuleResolver, ReferenceEmitter } from '../../imports';
+import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
+import { DependencyTracker } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
-import { MetadataReader, MetadataRegistry } from '../../metadata';
+import { MetadataReader, MetadataRegistry, extractDirectiveGuards } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence, ResolveResult } from '../../transform';
 import { TemplateSourceMapping, TypeCheckContext } from '../../typecheck';
-import { ResourceDependencyRecorder } from '../../util/src/resource_recorder';
+import { SubsetOfKeys } from '../../util/src/typescript';
 import { ResourceLoader } from './api';
-export interface ComponentHandlerData {
-    meta: R3ComponentMetadata;
+/**
+ * These fields of `R3ComponentMetadata` are updated in the `resolve` phase.
+ *
+ * The `keyof R3ComponentMetadata &` condition ensures that only fields of `R3ComponentMetadata` can
+ * be included here.
+ */
+export declare type ComponentMetadataResolvedFields = SubsetOfKeys<R3ComponentMetadata, 'directives' | 'pipes' | 'wrapDirectivesAndPipesInClosure'>;
+export interface ComponentAnalysisData {
+    /**
+     * `meta` includes those fields of `R3ComponentMetadata` which are calculated at `analyze` time
+     * (not during resolve).
+     */
+    meta: Omit<R3ComponentMetadata, ComponentMetadataResolvedFields>;
+    baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
+    guards: ReturnType<typeof extractDirectiveGuards>;
     parsedTemplate: ParsedTemplate;
     templateSourceMapping: TemplateSourceMapping;
     metadataStmt: Statement | null;
     parseTemplate: (options?: ParseTemplateOptions) => ParsedTemplate;
 }
+export declare type ComponentResolutionData = Pick<R3ComponentMetadata, ComponentMetadataResolvedFields>;
 /**
  * `DecoratorHandler` which handles the `@Component` annotation.
  */
-export declare class ComponentDecoratorHandler implements DecoratorHandler<ComponentHandlerData, Decorator> {
+export declare class ComponentDecoratorHandler implements DecoratorHandler<Decorator, ComponentAnalysisData, ComponentResolutionData> {
     private reflector;
     private evaluator;
     private metaRegistry;
@@ -45,9 +60,9 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
     private cycleAnalyzer;
     private refEmitter;
     private defaultImportRecorder;
+    private depTracker;
     private annotateForClosureCompiler;
-    private resourceDependencies;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, annotateForClosureCompiler: boolean, resourceDependencies?: ResourceDependencyRecorder);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, annotateForClosureCompiler: boolean);
     private literalCache;
     private elementSchemaRegistry;
     /**
@@ -57,13 +72,15 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Compo
      */
     private preanalyzeTemplateCache;
     readonly precedence = HandlerPrecedence.PRIMARY;
+    readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
-    preanalyze(node: ClassDeclaration, decorator: Decorator): Promise<void> | undefined;
-    analyze(node: ClassDeclaration, decorator: Decorator, flags?: HandlerFlags): AnalysisOutput<ComponentHandlerData>;
-    index(context: IndexingContext, node: ClassDeclaration, analysis: ComponentHandlerData): void;
-    typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: ComponentHandlerData): void;
-    resolve(node: ClassDeclaration, analysis: ComponentHandlerData): ResolveResult;
-    compile(node: ClassDeclaration, analysis: ComponentHandlerData, pool: ConstantPool): CompileResult[];
+    preanalyze(node: ClassDeclaration, decorator: Readonly<Decorator>): Promise<void> | undefined;
+    analyze(node: ClassDeclaration, decorator: Readonly<Decorator>, flags?: HandlerFlags): AnalysisOutput<ComponentAnalysisData>;
+    register(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
+    index(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): void;
+    typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: Readonly<ComponentAnalysisData>): void;
+    resolve(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): ResolveResult<ComponentResolutionData>;
+    compile(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
     private _resolveLiteral;
     private _resolveEnumValue;
     private _extractStyleUrls;

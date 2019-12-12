@@ -16,7 +16,7 @@ export interface PipeHandlerData {
     meta: R3PipeMetadata;
     metadataStmt: Statement | null;
 }
-export declare class PipeDecoratorHandler implements DecoratorHandler<PipeHandlerData, Decorator> {
+export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator, PipeHandlerData, unknown> {
     private reflector;
     private evaluator;
     private metaRegistry;
@@ -24,7 +24,9 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<PipeHandle
     private isCore;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, defaultImportRecorder: DefaultImportRecorder, isCore: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
+    readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
-    analyze(clazz: ClassDeclaration, decorator: Decorator): AnalysisOutput<PipeHandlerData>;
-    compile(node: ClassDeclaration, analysis: PipeHandlerData): CompileResult[];
+    analyze(clazz: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<PipeHandlerData>;
+    register(node: ClassDeclaration, analysis: Readonly<PipeHandlerData>): void;
+    compile(node: ClassDeclaration, analysis: Readonly<PipeHandlerData>): CompileResult[];
 }

@@ -8,16 +8,19 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/directive" />
 import { ConstantPool, ParsedHostBindings, R3DirectiveMetadata, R3QueryMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
-import { DefaultImportRecorder } from '../../imports';
+import { DefaultImportRecorder, Reference } from '../../imports';
 import { MetadataRegistry } from '../../metadata';
+import { extractDirectiveGuards } from '../../metadata/src/util';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../reflection';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence } from '../../transform';
 export interface DirectiveHandlerData {
+    baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
+    guards: ReturnType<typeof extractDirectiveGuards>;
     meta: R3DirectiveMetadata;
     metadataStmt: Statement | null;
 }
-export declare class DirectiveDecoratorHandler implements DecoratorHandler<DirectiveHandlerData, Decorator | null> {
+export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decorator | null, DirectiveHandlerData, unknown> {
     private reflector;
     private evaluator;
     private metaRegistry;
@@ -26,9 +29,11 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
     private annotateForClosureCompiler;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, annotateForClosureCompiler: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
+    readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
-    analyze(node: ClassDeclaration, decorator: Decorator | null, flags?: HandlerFlags): AnalysisOutput<DirectiveHandlerData>;
-    compile(node: ClassDeclaration, analysis: DirectiveHandlerData, pool: ConstantPool): CompileResult[];
+    analyze(node: ClassDeclaration, decorator: Readonly<Decorator | null>, flags?: HandlerFlags): AnalysisOutput<DirectiveHandlerData>;
+    register(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>): void;
+    compile(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>, resolution: Readonly<unknown>, pool: ConstantPool): CompileResult[];
 }
 /**
  * Helper function to extract metadata from a `Directive` or `Component`. `Directive`s without a
@@ -36,7 +41,7 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Direc
  * appear in the declarations of an `NgModule` and additional verification is done when processing
  * the module.
  */
-export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Decorator | null, reflector: ReflectionHost, evaluator: PartialEvaluator, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, flags: HandlerFlags, annotateForClosureCompiler: boolean, defaultSelector?: string | null): {
+export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator | null>, reflector: ReflectionHost, evaluator: PartialEvaluator, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, flags: HandlerFlags, annotateForClosureCompiler: boolean, defaultSelector?: string | null): {
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;
 } | undefined;

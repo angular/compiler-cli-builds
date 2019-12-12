@@ -59,8 +59,13 @@ export declare enum HandlerFlags {
  * The decorator compilers in @angular/compiler do not depend on Typescript. The handler is
  * responsible for extracting the information required to perform compilation from the decorators
  * and Typescript source, invoking the decorator compiler, and returning the result.
+ *
+ * @param `D` The type of decorator metadata produced by `detect`.
+ * @param `A` The type of analysis metadata produced by `analyze`.
+ * @param `R` The type of resolution metadata produced by `resolve`.
  */
-export interface DecoratorHandler<A, M> {
+export interface DecoratorHandler<D, A, R> {
+    readonly name: string;
     /**
      * The precedence of a handler controls how it interacts with other handlers that match the same
      * class.
@@ -72,26 +77,41 @@ export interface DecoratorHandler<A, M> {
      * Scan a set of reflected decorators and determine if this handler is responsible for compilation
      * of one of them.
      */
-    detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<M> | undefined;
+    detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<D> | undefined;
     /**
      * Asynchronously perform pre-analysis on the decorator/class combination.
      *
-     * `preAnalyze` is optional and is not guaranteed to be called through all compilation flows. It
+     * `preanalyze` is optional and is not guaranteed to be called through all compilation flows. It
      * will only be called if asynchronicity is supported in the CompilerHost.
      */
-    preanalyze?(node: ClassDeclaration, metadata: M): Promise<void> | undefined;
+    preanalyze?(node: ClassDeclaration, metadata: Readonly<D>): Promise<void> | undefined;
     /**
-     * Perform analysis on the decorator/class combination, producing instructions for compilation
-     * if successful, or an array of diagnostic messages if the analysis fails or the decorator
-     * isn't valid.
+     * Perform analysis on the decorator/class combination, extracting information from the class
+     * required for compilation.
+     *
+     * Returns analyzed metadata if successful, or an array of diagnostic messages if the analysis
+     * fails or the decorator isn't valid.
+     *
+     * Analysis should always be a "pure" operation, with no side effects. This is because the
+     * detect/analysis steps might be skipped for files which have not changed during incremental
+     * builds. Any side effects required for compilation (e.g. registration of metadata) should happen
+     * in the `register` phase, which is guaranteed to run even for incremental builds.
      */
-    analyze(node: ClassDeclaration, metadata: M, handlerFlags?: HandlerFlags): AnalysisOutput<A>;
+    analyze(node: ClassDeclaration, metadata: Readonly<D>, handlerFlags?: HandlerFlags): AnalysisOutput<A>;
+    /**
+     * Post-process the analysis of a decorator/class combination and record any necessary information
+     * in the larger compilation.
+     *
+     * Registration always occurs for a given decorator/class, regardless of whether analysis was
+     * performed directly or whether the analysis results were reused from the previous program.
+     */
+    register?(node: ClassDeclaration, analysis: A): void;
     /**
      * Registers information about the decorator for the indexing phase in a
      * `IndexingContext`, which stores information about components discovered in the
      * program.
      */
-    index?(context: IndexingContext, node: ClassDeclaration, metadata: A): void;
+    index?(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<A>, resolution: Readonly<R>): void;
     /**
      * Perform resolution on the given decorator along with the result of analysis.
      *
@@ -99,17 +119,17 @@ export interface DecoratorHandler<A, M> {
      * `DecoratorHandler` a chance to leverage information from the whole compilation unit to enhance
      * the `analysis` before the emit phase.
      */
-    resolve?(node: ClassDeclaration, analysis: A): ResolveResult;
-    typeCheck?(ctx: TypeCheckContext, node: ClassDeclaration, metadata: A): void;
+    resolve?(node: ClassDeclaration, analysis: Readonly<A>): ResolveResult<R>;
+    typeCheck?(ctx: TypeCheckContext, node: ClassDeclaration, analysis: Readonly<A>, resolution: Readonly<R>): void;
     /**
      * Generate a description of the field which should be added to the class, including any
      * initialization code to be generated.
      */
-    compile(node: ClassDeclaration, analysis: A, constantPool: ConstantPool): CompileResult | CompileResult[];
+    compile(node: ClassDeclaration, analysis: Readonly<A>, resolution: Readonly<R>, constantPool: ConstantPool): CompileResult | CompileResult[];
 }
 export interface DetectResult<M> {
     trigger: ts.Node | null;
-    metadata: M;
+    metadata: Readonly<M>;
 }
 /**
  * The output of an analysis operation, consisting of possibly an arbitrary analysis object (used as
@@ -117,10 +137,8 @@ export interface DetectResult<M> {
  * analysis.
  */
 export interface AnalysisOutput<A> {
-    analysis?: A;
+    analysis?: Readonly<A>;
     diagnostics?: ts.Diagnostic[];
-    factorySymbolName?: string;
-    typeCheck?: boolean;
 }
 /**
  * A description of the static field to add to a class, including an initialization expression
@@ -132,9 +150,10 @@ export interface CompileResult {
     statements: Statement[];
     type: Type;
 }
-export interface ResolveResult {
+export interface ResolveResult<R> {
     reexports?: Reexport[];
     diagnostics?: ts.Diagnostic[];
+    data?: Readonly<R>;
 }
 export interface DtsTransform {
     transformClassElement?(element: ts.ClassElement, imports: ImportManager): ts.ClassElement;
