@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
-import { ConstantPool, InterpolationConfig, ParseError, ParseSourceFile, ParseTemplateOptions, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
+import { ConstantPool, InterpolationConfig, ParseError, ParseSourceFile, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import { CycleAnalyzer } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
@@ -34,10 +34,8 @@ export interface ComponentAnalysisData {
     meta: Omit<R3ComponentMetadata, ComponentMetadataResolvedFields>;
     baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
     guards: ReturnType<typeof extractDirectiveGuards>;
-    parsedTemplate: ParsedTemplate;
-    templateSourceMapping: TemplateSourceMapping;
+    template: ParsedTemplateWithSource;
     metadataStmt: Statement | null;
-    parseTemplate: (options?: ParseTemplateOptions) => ParsedTemplate;
 }
 export declare type ComponentResolutionData = Pick<R3ComponentMetadata, ComponentMetadataResolvedFields>;
 /**
@@ -122,9 +120,18 @@ export interface ParsedTemplate {
      */
     errors?: ParseError[] | undefined;
     /**
-     * The actual parsed template nodes.
+     * The template AST, parsed according to the user's specifications.
      */
-    nodes: TmplAstNode[];
+    emitNodes: TmplAstNode[];
+    /**
+     * The template AST, parsed in a manner which preserves source map information for diagnostics.
+     *
+     * Not useful for emit.
+     */
+    diagNodes: TmplAstNode[];
+    /**
+     *
+     */
     /**
      * Any styleUrls extracted from the metadata.
      */
@@ -141,4 +148,7 @@ export interface ParsedTemplate {
      * The `ParseSourceFile` for the template.
      */
     file: ParseSourceFile;
+}
+export interface ParsedTemplateWithSource extends ParsedTemplate {
+    sourceMapping: TemplateSourceMapping;
 }

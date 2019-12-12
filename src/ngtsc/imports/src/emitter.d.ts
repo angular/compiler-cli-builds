@@ -11,6 +11,7 @@ import * as ts from 'typescript';
 import { LogicalFileSystem } from '../../file_system';
 import { ReflectionHost } from '../../reflection';
 import { ImportMode, Reference } from './references';
+import { ModuleResolver } from './resolver';
 /**
  * A host which supports an operation to convert a file name into a module name.
  *
@@ -74,15 +75,14 @@ export declare class LocalIdentifierStrategy implements ReferenceEmitStrategy {
 export declare class AbsoluteModuleStrategy implements ReferenceEmitStrategy {
     protected program: ts.Program;
     protected checker: ts.TypeChecker;
-    protected options: ts.CompilerOptions;
-    protected host: ts.CompilerHost;
+    protected moduleResolver: ModuleResolver;
     private reflectionHost;
     /**
      * A cache of the exports of specific modules, because resolving a module to its exports is a
      * costly operation.
      */
     private moduleExportsCache;
-    constructor(program: ts.Program, checker: ts.TypeChecker, options: ts.CompilerOptions, host: ts.CompilerHost, reflectionHost: ReflectionHost);
+    constructor(program: ts.Program, checker: ts.TypeChecker, moduleResolver: ModuleResolver, reflectionHost: ReflectionHost);
     emit(ref: Reference<ts.Node>, context: ts.SourceFile, importMode: ImportMode): Expression | null;
     private resolveImportName;
     private getExportsOfModule;
