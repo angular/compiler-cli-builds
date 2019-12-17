@@ -81,6 +81,14 @@ export declare class Reference<T extends ts.Node = ts.Node> {
      * given `ts.SourceFile`, if any.
      */
     getIdentityIn(context: ts.SourceFile): ts.Identifier | null;
+    /**
+     * Get a `ts.Identifier` for this `Reference` that exists within the given expression.
+     *
+     * This is very useful for producing `ts.Diagnostic`s that reference `Reference`s that were
+     * extracted from some larger expression, as it can be used to pinpoint the `ts.Identifier` within
+     * the expression from which the `Reference` originated.
+     */
+    getIdentityInExpression(expr: ts.Expression): ts.Identifier | null;
     cloneWithAlias(alias: Expression): Reference<T>;
     cloneWithNoIdentifiers(): Reference<T>;
 }
