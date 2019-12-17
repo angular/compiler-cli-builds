@@ -13,7 +13,8 @@ import { MetadataRegistry } from '../../metadata';
 import { extractDirectiveGuards } from '../../metadata/src/util';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../reflection';
-import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence } from '../../transform';
+import { LocalModuleScopeRegistry } from '../../scope';
+import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence, ResolveResult } from '../../transform';
 export interface DirectiveHandlerData {
     baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
     guards: ReturnType<typeof extractDirectiveGuards>;
@@ -24,15 +25,17 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     private reflector;
     private evaluator;
     private metaRegistry;
+    private scopeRegistry;
     private defaultImportRecorder;
     private isCore;
     private annotateForClosureCompiler;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, annotateForClosureCompiler: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, annotateForClosureCompiler: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator | null>, flags?: HandlerFlags): AnalysisOutput<DirectiveHandlerData>;
     register(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>): void;
+    resolve(node: ClassDeclaration): ResolveResult<unknown>;
     compile(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>, resolution: Readonly<unknown>, pool: ConstantPool): CompileResult[];
 }
 /**

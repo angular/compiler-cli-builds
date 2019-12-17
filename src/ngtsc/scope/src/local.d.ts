@@ -71,6 +71,11 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * a directive's compilation scope.
      */
     private declarationToModule;
+    /**
+     * This maps from the directive/pipe class to a map of data for each NgModule that declares the
+     * directive/pipe. This data is needed to produce an error for the given class.
+     */
+    private duplicateDeclarations;
     private moduleToRef;
     /**
      * A cache of calculated `LocalModuleScope`s for each NgModule declared in the current program.
@@ -101,6 +106,14 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
     registerPipeMetadata(pipe: PipeMeta): void;
     getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
     /**
+     * If `node` is declared in more than one NgModule (duplicate declaration), then get the
+     * `DeclarationData` for each offending declaration.
+     *
+     * Ordinarily a class is only declared in one NgModule, in which case this function returns
+     * `null`.
+     */
+    getDuplicateDeclarations(node: ClassDeclaration): DeclarationData[] | null;
+    /**
      * Collects registered data for a module and its directives/pipes and convert it into a full
      * `LocalModuleScope`.
      *
@@ -118,6 +131,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * Returns a collection of the compilation scope for each registered declaration.
      */
     getCompilationScopes(): CompilationScope[];
+    private registerDeclarationOfModule;
     /**
      * Implementation of `getScopeOfModule` which accepts a reference to a class and differentiates
      * between:
@@ -149,4 +163,9 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
     private getExportedScope;
     private getReexports;
     private assertCollecting;
+}
+export interface DeclarationData {
+    ngModule: ClassDeclaration;
+    ref: Reference;
+    rawDeclarations: ts.Expression | null;
 }
