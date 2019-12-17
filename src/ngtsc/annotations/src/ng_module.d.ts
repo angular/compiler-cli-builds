@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
 import { Expression, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata, Statement } from '@angular/compiler';
+import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
@@ -21,6 +22,7 @@ export interface NgModuleAnalysis {
     inj: R3InjectorMetadata;
     metadataStmt: Statement | null;
     declarations: Reference<ClassDeclaration>[];
+    rawDeclarations: ts.Expression | null;
     schemas: SchemaMetadata[];
     imports: Reference<ClassDeclaration>[];
     exports: Reference<ClassDeclaration>[];

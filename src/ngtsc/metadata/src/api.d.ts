@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/api" />
 import { DirectiveMeta as T2DirectiveMeta, SchemaMetadata } from '@angular/compiler';
+import * as ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
 /**
@@ -18,6 +19,13 @@ export interface NgModuleMeta {
     imports: Reference<ClassDeclaration>[];
     exports: Reference<ClassDeclaration>[];
     schemas: SchemaMetadata[];
+    /**
+     * The raw `ts.Expression` which gave rise to `declarations`, if one exists.
+     *
+     * If this is `null`, then either no declarations exist, or no expression was available (likely
+     * because the module came from a .d.ts file).
+     */
+    rawDeclarations: ts.Expression | null;
 }
 /**
  * Metadata collected for a directive within an NgModule's scope.
