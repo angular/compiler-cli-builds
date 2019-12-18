@@ -13,11 +13,11 @@ import { BundleProgram } from '../packages/bundle_program';
 import { Esm5ReflectionHost } from './esm5_host';
 import { NgccClassSymbol } from './ngcc_host';
 export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
-    protected program: ts.Program;
-    protected compilerHost: ts.CompilerHost;
     protected commonJsExports: Map<ts.SourceFile, Map<string, Declaration<ts.Declaration>> | null>;
     protected topLevelHelperCalls: Map<string, Map<ts.SourceFile, ts.CallExpression[]>>;
-    constructor(logger: Logger, isCore: boolean, program: ts.Program, compilerHost: ts.CompilerHost, dts?: BundleProgram | null);
+    protected program: ts.Program;
+    protected compilerHost: ts.CompilerHost;
+    constructor(logger: Logger, isCore: boolean, src: BundleProgram, dts?: BundleProgram | null);
     getImportOfIdentifier(id: ts.Identifier): Import | null;
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
     getExportsOfModule(module: ts.Node): Map<string, Declaration> | null;
@@ -51,6 +51,7 @@ export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
     private extractCommonJsExportDeclaration;
     private extractCommonJsReexports;
     private findCommonJsImport;
+    private findRequireCallReference;
     private getCommonJsImportedDeclaration;
     private resolveModuleName;
 }

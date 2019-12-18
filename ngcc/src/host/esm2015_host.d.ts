@@ -7,7 +7,6 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm2015_host" />
 import * as ts from 'typescript';
-import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { ClassDeclaration, ClassMember, ClassMemberKind, CtorParameter, Declaration, Decorator, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
 import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
@@ -46,7 +45,24 @@ export declare const CONSTRUCTOR_PARAMS: ts.__String;
 export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost implements NgccReflectionHost {
     protected logger: Logger;
     protected isCore: boolean;
-    protected dtsDeclarationMap: Map<string, ts.Declaration> | null;
+    protected src: BundleProgram;
+    protected dts: BundleProgram | null;
+    /**
+     * A mapping from source declarations typings declarations, which are both publicly exported.
+     *
+     * There should be one entry for every public export visible from the root file of the source
+     * tree. Note that by definition the key and value declarations will not be in the same TS
+     * program.
+     */
+    protected publicDtsDeclarationMap: Map<ts.Declaration, ts.Declaration> | null;
+    /**
+     * A mapping from source declarations to typings declarations, which are not publicly exported.
+     *
+     * This mapping is a best guess between declarations that happen to be exported from their file by
+     * the same name in both the source and the dts file. Note that by definition the key and value
+     * declarations will not be in the same TS program.
+     */
+    protected privateDtsDeclarationMap: Map<ts.Declaration, ts.Declaration> | null;
     /**
      * The set of source files that have already been preprocessed.
      */
@@ -74,7 +90,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * This map is lazily populated during the first call to `acquireDecoratorInfo` for a given class.
      */
     protected decoratorCache: Map<ClassDeclaration<ts.Declaration>, DecoratorInfo>;
-    constructor(logger: Logger, isCore: boolean, checker: ts.TypeChecker, dts?: BundleProgram | null);
+    constructor(logger: Logger, isCore: boolean, src: BundleProgram, dts?: BundleProgram | null);
     /**
      * Find a symbol for a node that we think is a class.
      * Classes should have a `name` identifier, because they may need to be referenced in other parts
@@ -549,21 +565,35 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      */
     protected isFromCore(decorator: Decorator): boolean;
     /**
-     * Extract all the class declarations from the dtsTypings program, storing them in a map
-     * where the key is the declared name of the class and the value is the declaration itself.
+     * Create a mapping between the public exports in a src program and the public exports of a dts
+     * program.
      *
-     * It is possible for there to be multiple class declarations with the same local name.
-     * Only the first declaration with a given name is added to the map; subsequent classes will be
-     * ignored.
-     *
-     * We are most interested in classes that are publicly exported from the entry point, so these
-     * are added to the map first, to ensure that they are not ignored.
-     *
-     * @param dtsRootFileName The filename of the entry-point to the `dtsTypings` program.
-     * @param dtsProgram The program containing all the typings files.
-     * @returns a map of class names to class declarations.
+     * @param src the program bundle containing the source files.
+     * @param dts the program bundle containing the typings files.
+     * @returns a map of source declarations to typings declarations.
      */
-    protected computeDtsDeclarationMap(dtsRootFileName: AbsoluteFsPath, dtsProgram: ts.Program, dtsPackage: AbsoluteFsPath): Map<string, ts.Declaration>;
+    protected computePublicDtsDeclarationMap(src: BundleProgram, dts: BundleProgram): Map<ts.Declaration, ts.Declaration>;
+    /**
+     * Create a mapping between the "private" exports in a src program and the "private" exports of a
+     * dts program. These exports may be exported from individual files in the src or dts programs,
+     * but not exported from the root file (i.e publicly from the entry-point).
+     *
+     * This mapping is a "best guess" since we cannot guarantee that two declarations that happen to
+     * be exported from a file with the same name are actually equivalent. But this is a reasonable
+     * estimate for the purposes of ngcc.
+     *
+     * @param src the program bundle containing the source files.
+     * @param dts the program bundle containing the typings files.
+     * @returns a map of source declarations to typings declarations.
+     */
+    protected computePrivateDtsDeclarationMap(src: BundleProgram, dts: BundleProgram): Map<ts.Declaration, ts.Declaration>;
+    /**
+     * Collect mappings between names of exported declarations in a file and its actual declaration.
+     *
+     * Any new mappings are added to the `dtsDeclarationMap`.
+     */
+    protected collectDtsExportedDeclarations(dtsDeclarationMap: Map<string, ts.Declaration>, srcFile: ts.SourceFile, checker: ts.TypeChecker): void;
+    protected collectSrcExportedDeclarations(declarationMap: Map<ts.Declaration, ts.Declaration>, dtsDeclarationMap: Map<string, ts.Declaration>, srcFile: ts.SourceFile): void;
     /**
      * Parse a function/method node (or its implementation), to see if it returns a
      * `ModuleWithProviders` object.
