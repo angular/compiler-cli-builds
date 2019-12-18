@@ -8,5 +8,5 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata" />
 export * from './src/api';
 export { DtsMetadataReader } from './src/dts';
-export { CompoundMetadataRegistry, LocalMetadataRegistry } from './src/registry';
+export { CompoundMetadataRegistry, LocalMetadataRegistry, InjectableClassRegistry } from './src/registry';
 export { extractDirectiveGuards, CompoundMetadataReader } from './src/util';

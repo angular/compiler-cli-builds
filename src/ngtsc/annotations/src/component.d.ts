@@ -11,7 +11,7 @@ import { CycleAnalyzer } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
-import { MetadataReader, MetadataRegistry, extractDirectiveGuards } from '../../metadata';
+import { InjectableClassRegistry, MetadataReader, MetadataRegistry, extractDirectiveGuards } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry } from '../../scope';
@@ -36,6 +36,16 @@ export interface ComponentAnalysisData {
     guards: ReturnType<typeof extractDirectiveGuards>;
     template: ParsedTemplateWithSource;
     metadataStmt: Statement | null;
+    /**
+     * Providers extracted from the `providers` field of the component annotation which will require
+     * an Angular factory definition at runtime.
+     */
+    providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
+    /**
+     * Providers extracted from the `viewProviders` field of the component annotation which will
+     * require an Angular factory definition at runtime.
+     */
+    viewProvidersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
 }
 export declare type ComponentResolutionData = Pick<R3ComponentMetadata, ComponentMetadataResolvedFields>;
 /**
@@ -59,8 +69,9 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private refEmitter;
     private defaultImportRecorder;
     private depTracker;
+    private injectableRegistry;
     private annotateForClosureCompiler;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, annotateForClosureCompiler: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: string[], defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, annotateForClosureCompiler: boolean);
     private literalCache;
     private elementSchemaRegistry;
     /**
@@ -75,7 +86,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     preanalyze(node: ClassDeclaration, decorator: Readonly<Decorator>): Promise<void> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>, flags?: HandlerFlags): AnalysisOutput<ComponentAnalysisData>;
     register(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
-    index(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): void;
+    index(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): null | undefined;
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: Readonly<ComponentAnalysisData>): void;
     resolve(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): ResolveResult<ComponentResolutionData>;
     compile(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
