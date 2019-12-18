@@ -129,3 +129,10 @@ export declare function getReferenceOriginForDiagnostics(ref: Reference, contain
  * the directive/pipe exists in its `declarations` (if possible).
  */
 export declare function makeDuplicateDeclarationError(node: ClassDeclaration, data: DeclarationData[], kind: string): ts.Diagnostic;
+/**
+ * Create an R3Reference for a class.
+ *
+ * The `value` is the exported declaration of the class from its source file.
+ * The `type` is an expression that would be used by ngcc in the typings (.d.ts) files.
+ */
+export declare function wrapTypeReference(reflector: ReflectionHost, clazz: ClassDeclaration): R3Reference;

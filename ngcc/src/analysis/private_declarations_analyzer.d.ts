@@ -14,7 +14,6 @@ export interface ExportInfo {
     identifier: string;
     from: AbsoluteFsPath;
     dtsFrom?: AbsoluteFsPath | null;
-    alias?: string | null;
 }
 export declare type PrivateDeclarationsAnalyses = ExportInfo[];
 /**
