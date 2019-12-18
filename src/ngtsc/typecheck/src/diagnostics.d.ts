@@ -8,6 +8,7 @@
  */
 import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
+import { ErrorCode } from '../../diagnostics';
 import { TemplateId, TemplateSourceMapping } from './api';
 /**
  * Adapter interface which allows the template type-checking diagnostics code to interpret offsets
@@ -69,7 +70,7 @@ export declare function translateDiagnostic(diagnostic: ts.Diagnostic, resolver:
 /**
  * Constructs a `ts.Diagnostic` for a given `ParseSourceSpan` within a template.
  */
-export declare function makeTemplateDiagnostic(mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: number, messageText: string | ts.DiagnosticMessageChain, relatedMessage?: {
+export declare function makeTemplateDiagnostic(mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: ErrorCode, messageText: string | ts.DiagnosticMessageChain, relatedMessage?: {
     text: string;
     span: ParseSourceSpan;
 }): ts.Diagnostic;

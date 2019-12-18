@@ -9,7 +9,7 @@
 import { Expression, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
-import { MetadataReader, MetadataRegistry } from '../../metadata';
+import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { NgModuleRouteAnalyzer } from '../../routing';
@@ -28,6 +28,8 @@ export interface NgModuleAnalysis {
     exports: Reference<ClassDeclaration>[];
     id: Expression | null;
     factorySymbolName: string;
+    providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
+    providers: ts.Expression | null;
 }
 export interface NgModuleResolution {
     injectorImports: Expression[];
@@ -50,8 +52,9 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     private factoryTracker;
     private defaultImportRecorder;
     private annotateForClosureCompiler;
+    private injectableRegistry;
     private localeId?;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, defaultImportRecorder: DefaultImportRecorder, annotateForClosureCompiler: boolean, localeId?: string | undefined);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, defaultImportRecorder: DefaultImportRecorder, annotateForClosureCompiler: boolean, injectableRegistry: InjectableClassRegistry, localeId?: string | undefined);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;

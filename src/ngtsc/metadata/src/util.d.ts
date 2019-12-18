@@ -35,3 +35,5 @@ export declare class CompoundMetadataReader implements MetadataReader {
     getNgModuleMetadata(node: Reference<ClassDeclaration<ts.Declaration>>): NgModuleMeta | null;
     getPipeMetadata(node: Reference<ClassDeclaration<ts.Declaration>>): PipeMeta | null;
 }
+/** Returns whether a class declaration has the necessary class fields to make it injectable. */
+export declare function hasInjectableFields(clazz: ClassDeclaration, host: ReflectionHost): boolean;
