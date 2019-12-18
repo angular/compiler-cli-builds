@@ -10,7 +10,7 @@ import { BoundTarget, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
-import { TypeCheckBlockMetadata, TypeCheckableDirectiveMeta } from './api';
+import { TemplateId, TypeCheckBlockMetadata, TypeCheckableDirectiveMeta } from './api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
 import { OutOfBandDiagnosticRecorder } from './oob';
@@ -48,12 +48,12 @@ export declare class Context {
     readonly env: Environment;
     readonly domSchemaChecker: DomSchemaChecker;
     readonly oobRecorder: OutOfBandDiagnosticRecorder;
-    readonly id: string;
+    readonly id: TemplateId;
     readonly boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
     private pipes;
     readonly schemas: SchemaMetadata[];
     private nextId;
-    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: string, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[]);
+    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: TemplateId, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[]);
     /**
      * Allocate a new variable name for use within the `Context`.
      *
