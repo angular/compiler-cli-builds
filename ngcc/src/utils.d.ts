@@ -71,3 +71,4 @@ export declare function resolveFileWithPostfixes(fs: FileSystem, path: AbsoluteF
  * @returns The canonical representation of the value, without any suffix.
  */
 export declare function stripDollarSuffix(value: string): string;
+export declare function stripExtension(fileName: string): string;
