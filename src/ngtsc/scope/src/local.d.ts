@@ -97,6 +97,14 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * Tracks errors accumulated in the processing of scopes for each module declaration.
      */
     private scopeErrors;
+    /**
+     * Tracks which NgModules are unreliable due to errors within their declarations.
+     *
+     * This provides a unified view of which modules have errors, across all of the different
+     * diagnostic categories that can be produced. Theoretically this can be inferred from the other
+     * properties of this class, but is tracked explicitly to simplify the logic.
+     */
+    private taintedModules;
     constructor(localReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasingHost: AliasingHost | null);
     /**
      * Add an NgModule's data to the registry.
@@ -104,7 +112,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
     registerNgModuleMetadata(data: NgModuleMeta): void;
     registerDirectiveMetadata(directive: DirectiveMeta): void;
     registerPipeMetadata(pipe: PipeMeta): void;
-    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
+    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null | 'error';
     /**
      * If `node` is declared in more than one NgModule (duplicate declaration), then get the
      * `DeclarationData` for each offending declaration.
@@ -118,10 +126,10 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * `LocalModuleScope`.
      *
      * This method implements the logic of NgModule imports and exports. It returns the
-     * `LocalModuleScope` for the given NgModule if one can be produced, and `null` if no scope is
-     * available or the scope contains errors.
+     * `LocalModuleScope` for the given NgModule if one can be produced, `null` if no scope was ever
+     * defined, or the string `'error'` if the scope contained errors.
      */
-    getScopeOfModule(clazz: ClassDeclaration): LocalModuleScope | null;
+    getScopeOfModule(clazz: ClassDeclaration): LocalModuleScope | 'error' | null;
     /**
      * Retrieves any `ts.Diagnostic`s produced during the calculation of the `LocalModuleScope` for
      * the given NgModule, or `null` if no errors were present.

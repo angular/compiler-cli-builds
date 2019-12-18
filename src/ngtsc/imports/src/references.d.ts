@@ -89,6 +89,24 @@ export declare class Reference<T extends ts.Node = ts.Node> {
      * the expression from which the `Reference` originated.
      */
     getIdentityInExpression(expr: ts.Expression): ts.Identifier | null;
+    /**
+     * Given the 'container' expression from which this `Reference` was extracted, produce a
+     * `ts.Expression` to use in a diagnostic which best indicates the position within the container
+     * expression that generated the `Reference`.
+     *
+     * For example, given a `Reference` to the class 'Bar' and the containing expression:
+     * `[Foo, Bar, Baz]`, this function would attempt to return the `ts.Identifier` for `Bar` within
+     * the array. This could be used to produce a nice diagnostic context:
+     *
+     * ```text
+     * [Foo, Bar, Baz]
+     *       ~~~
+     * ```
+     *
+     * If no specific node can be found, then the `fallback` expression is used, which defaults to the
+     * entire containing expression.
+     */
+    getOriginForDiagnostics(container: ts.Expression, fallback?: ts.Expression): ts.Expression;
     cloneWithAlias(alias: Expression): Reference<T>;
     cloneWithNoIdentifiers(): Reference<T>;
 }

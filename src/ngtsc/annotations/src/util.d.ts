@@ -104,24 +104,6 @@ export declare function readBaseClass(node: ClassDeclaration, reflector: Reflect
  */
 export declare function wrapFunctionExpressionsInParens(expression: ts.Expression): ts.Expression;
 /**
- * Given a 'container' expression and a `Reference` extracted from that container, produce a
- * `ts.Expression` to use in a diagnostic which best indicates the position within the container
- * expression that generated the `Reference`.
- *
- * For example, given a `Reference` to the class 'Bar' and the containing expression:
- * `[Foo, Bar, Baz]`, this function would attempt to return the `ts.Identifier` for `Bar` within the
- * array. This could be used to produce a nice diagnostic context:
- *
- * ```text
- * [Foo, Bar, Baz]
- *       ~~~
- * ```
- *
- * If no specific node can be found, then the `fallback` expression is used, which defaults to the
- * entire containing expression.
- */
-export declare function getReferenceOriginForDiagnostics(ref: Reference, container: ts.Expression, fallback?: ts.Expression): ts.Expression;
-/**
  * Create a `ts.Diagnostic` which indicates the given class is part of the declarations of two or
  * more NgModules.
  *
@@ -129,6 +111,12 @@ export declare function getReferenceOriginForDiagnostics(ref: Reference, contain
  * the directive/pipe exists in its `declarations` (if possible).
  */
 export declare function makeDuplicateDeclarationError(node: ClassDeclaration, data: DeclarationData[], kind: string): ts.Diagnostic;
+/**
+ * Resolves the given `rawProviders` into `ClassDeclarations` and returns
+ * a set containing those that are known to require a factory definition.
+ * @param rawProviders Expression that declared the providers array in the source.
+ */
+export declare function resolveProvidersRequiringFactory(rawProviders: ts.Expression, reflector: ReflectionHost, evaluator: PartialEvaluator): Set<Reference<ClassDeclaration>>;
 /**
  * Create an R3Reference for a class.
  *

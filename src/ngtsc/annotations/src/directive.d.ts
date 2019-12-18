@@ -9,7 +9,7 @@
 import { ConstantPool, ParsedHostBindings, R3DirectiveMetadata, R3QueryMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference } from '../../imports';
-import { MetadataRegistry } from '../../metadata';
+import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { extractDirectiveGuards } from '../../metadata/src/util';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../reflection';
@@ -20,22 +20,25 @@ export interface DirectiveHandlerData {
     guards: ReturnType<typeof extractDirectiveGuards>;
     meta: R3DirectiveMetadata;
     metadataStmt: Statement | null;
+    providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
 }
 export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decorator | null, DirectiveHandlerData, unknown> {
     private reflector;
     private evaluator;
     private metaRegistry;
     private scopeRegistry;
+    private metaReader;
     private defaultImportRecorder;
+    private injectableRegistry;
     private isCore;
     private annotateForClosureCompiler;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, annotateForClosureCompiler: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, defaultImportRecorder: DefaultImportRecorder, injectableRegistry: InjectableClassRegistry, isCore: boolean, annotateForClosureCompiler: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator | null>, flags?: HandlerFlags): AnalysisOutput<DirectiveHandlerData>;
     register(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>): void;
-    resolve(node: ClassDeclaration): ResolveResult<unknown>;
+    resolve(node: ClassDeclaration, analysis: DirectiveHandlerData): ResolveResult<unknown>;
     compile(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>, resolution: Readonly<unknown>, pool: ConstantPool): CompileResult[];
 }
 /**

@@ -12,7 +12,7 @@ import { LocalModuleScope } from './local';
  * Read information about the compilation scope of components.
  */
 export interface ComponentScopeReader {
-    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
+    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null | 'error';
     getRequiresRemoteScope(clazz: ClassDeclaration): boolean | null;
 }
 /**
@@ -25,6 +25,6 @@ export interface ComponentScopeReader {
 export declare class CompoundComponentScopeReader implements ComponentScopeReader {
     private readers;
     constructor(readers: ComponentScopeReader[]);
-    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
+    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null | 'error';
     getRequiresRemoteScope(clazz: ClassDeclaration): boolean | null;
 }
