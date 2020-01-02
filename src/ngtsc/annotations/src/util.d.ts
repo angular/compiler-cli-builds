@@ -11,6 +11,7 @@ import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { ForeignFunctionResolver, PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, CtorParameter, Decorator, Import, ReflectionHost, TypeValueReference } from '../../reflection';
+import { DeclarationData } from '../../scope';
 export declare enum ConstructorDepErrorKind {
     NO_SUITABLE_TOKEN = 0
 }
@@ -102,3 +103,24 @@ export declare function readBaseClass(node: ClassDeclaration, reflector: Reflect
  * @param expression Expression where functions should be wrapped in parentheses
  */
 export declare function wrapFunctionExpressionsInParens(expression: ts.Expression): ts.Expression;
+/**
+ * Create a `ts.Diagnostic` which indicates the given class is part of the declarations of two or
+ * more NgModules.
+ *
+ * The resulting `ts.Diagnostic` will have a context entry for each NgModule showing the point where
+ * the directive/pipe exists in its `declarations` (if possible).
+ */
+export declare function makeDuplicateDeclarationError(node: ClassDeclaration, data: DeclarationData[], kind: string): ts.Diagnostic;
+/**
+ * Resolves the given `rawProviders` into `ClassDeclarations` and returns
+ * a set containing those that are known to require a factory definition.
+ * @param rawProviders Expression that declared the providers array in the source.
+ */
+export declare function resolveProvidersRequiringFactory(rawProviders: ts.Expression, reflector: ReflectionHost, evaluator: PartialEvaluator): Set<Reference<ClassDeclaration>>;
+/**
+ * Create an R3Reference for a class.
+ *
+ * The `value` is the exported declaration of the class from its source file.
+ * The `type` is an expression that would be used by ngcc in the typings (.d.ts) files.
+ */
+export declare function wrapTypeReference(reflector: ReflectionHost, clazz: ClassDeclaration): R3Reference;

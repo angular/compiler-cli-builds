@@ -12,7 +12,7 @@ import { ReferencesRegistry, ResourceLoader } from '../../../src/ngtsc/annotatio
 import { CycleAnalyzer, ImportGraph } from '../../../src/ngtsc/cycles';
 import { FileSystem } from '../../../src/ngtsc/file_system';
 import { ModuleResolver, PrivateExportAliasingHost, ReferenceEmitter } from '../../../src/ngtsc/imports';
-import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
+import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, InjectableClassRegistry, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
 import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver } from '../../../src/ngtsc/scope';
 import { CompileResult, DecoratorHandler } from '../../../src/ngtsc/transform';
@@ -51,6 +51,7 @@ export declare class DecorationAnalyzer {
      * Map of NgModule declarations to the re-exports for that NgModule.
      */
     private reexportMap;
+    moduleResolver: ModuleResolver;
     resourceManager: NgccResourceLoader;
     metaRegistry: LocalMetadataRegistry;
     dtsMetaReader: DtsMetadataReader;
@@ -61,10 +62,10 @@ export declare class DecorationAnalyzer {
     scopeRegistry: LocalModuleScopeRegistry;
     fullRegistry: CompoundMetadataRegistry;
     evaluator: PartialEvaluator;
-    moduleResolver: ModuleResolver;
     importGraph: ImportGraph;
     cycleAnalyzer: CycleAnalyzer;
-    handlers: DecoratorHandler<any, any>[];
+    injectableRegistry: InjectableClassRegistry;
+    handlers: DecoratorHandler<unknown, unknown, unknown>[];
     migrations: Migration[];
     constructor(fs: FileSystem, bundle: EntryPointBundle, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, diagnosticHandler?: (error: ts.Diagnostic) => void);
     /**

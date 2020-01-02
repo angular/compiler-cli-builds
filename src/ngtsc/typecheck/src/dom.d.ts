@@ -8,7 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/dom" />
 import { ParseSourceSpan, SchemaMetadata, TmplAstElement } from '@angular/compiler';
 import * as ts from 'typescript';
-import { TcbSourceResolver } from './diagnostics';
+import { TemplateId } from './api';
+import { TemplateSourceResolver } from './diagnostics';
 /**
  * Checks every non-Angular element/property processed in a template and potentially produces
  * `ts.Diagnostic`s related to improper usage.
@@ -54,7 +55,7 @@ export declare class RegistryDomSchemaChecker implements DomSchemaChecker {
     private resolver;
     private _diagnostics;
     readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
-    constructor(resolver: TcbSourceResolver);
-    checkElement(id: string, element: TmplAstElement, schemas: SchemaMetadata[]): void;
-    checkProperty(id: string, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[]): void;
+    constructor(resolver: TemplateSourceResolver);
+    checkElement(id: TemplateId, element: TmplAstElement, schemas: SchemaMetadata[]): void;
+    checkProperty(id: TemplateId, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[]): void;
 }

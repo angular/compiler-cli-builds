@@ -7,10 +7,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { Reference } from './references';
-export interface ReferenceResolver {
-    resolve(decl: ts.Declaration, importFromHint: string | null, fromFile: string): Reference<ts.Declaration>;
-}
 /**
  * Used by `RouterEntryPointManager` and `NgModuleRouteAnalyzer` (which is in turn is used by
  * `NgModuleDecoratorHandler`) for resolving the module source-files references in lazy-loaded
@@ -21,6 +17,7 @@ export declare class ModuleResolver {
     private program;
     private compilerOptions;
     private host;
-    constructor(program: ts.Program, compilerOptions: ts.CompilerOptions, host: ts.CompilerHost);
-    resolveModuleName(module: string, containingFile: ts.SourceFile): ts.SourceFile | null;
+    private moduleResolutionCache;
+    constructor(program: ts.Program, compilerOptions: ts.CompilerOptions, host: ts.CompilerHost, moduleResolutionCache: ts.ModuleResolutionCache | null);
+    resolveModule(moduleName: string, containingFile: string): ts.SourceFile | null;
 }

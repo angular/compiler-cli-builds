@@ -22,6 +22,9 @@ export interface TypeCheckableDirectiveMeta extends DirectiveMeta {
     coercedInputFields: Set<string>;
     hasNgTemplateContextGuard: boolean;
 }
+export declare type TemplateId = string & {
+    __brand: 'TemplateId';
+};
 /**
  * Metadata required in addition to a component class in order to generate a type check block (TCB)
  * for that component.
@@ -32,7 +35,7 @@ export interface TypeCheckBlockMetadata {
      *
      * This can be used to map errors back to the `ts.ClassDeclaration` for the component.
      */
-    id: string;
+    id: TemplateId;
     /**
      * Semantic information about the template of the component.
      */

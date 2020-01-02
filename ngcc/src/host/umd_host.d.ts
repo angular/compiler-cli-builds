@@ -12,12 +12,12 @@ import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
 import { Esm5ReflectionHost } from './esm5_host';
 export declare class UmdReflectionHost extends Esm5ReflectionHost {
-    protected program: ts.Program;
-    protected compilerHost: ts.CompilerHost;
     protected umdModules: Map<ts.SourceFile, UmdModule | null>;
     protected umdExports: Map<ts.SourceFile, Map<string, Declaration<ts.Declaration>> | null>;
     protected umdImportPaths: Map<ts.ParameterDeclaration, string | null>;
-    constructor(logger: Logger, isCore: boolean, program: ts.Program, compilerHost: ts.CompilerHost, dts?: BundleProgram | null);
+    protected program: ts.Program;
+    protected compilerHost: ts.CompilerHost;
+    constructor(logger: Logger, isCore: boolean, src: BundleProgram, dts?: BundleProgram | null);
     getImportOfIdentifier(id: ts.Identifier): Import | null;
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
     getExportsOfModule(module: ts.Node): Map<string, Declaration> | null;
@@ -34,6 +34,11 @@ export declare class UmdReflectionHost extends Esm5ReflectionHost {
     protected getModuleStatements(sourceFile: ts.SourceFile): ts.Statement[];
     private computeExportsOfUmdModule;
     private extractUmdExportDeclaration;
+    private extractUmdReexports;
+    /**
+     * Is the identifier a parameter on a UMD factory function, e.g. `function factory(this, core)`?
+     * If so then return its declaration.
+     */
     private findUmdImportParameter;
     private getUmdImportedDeclaration;
     private resolveModuleName;

@@ -8,82 +8,92 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/compilation" />
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
-import { ImportRewriter } from '../../imports';
-import { IncrementalDriver } from '../../incremental';
+import { IncrementalBuild } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
 import { PerfRecorder } from '../../perf';
-import { ReflectionHost } from '../../reflection';
-import { LocalModuleScopeRegistry } from '../../scope';
+import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { TypeCheckContext } from '../../typecheck';
 import { CompileResult, DecoratorHandler } from './api';
+import { DtsTransformRegistry } from './declaration';
+import { Trait } from './trait';
 /**
- * Manages a compilation of Ivy decorators into static fields across an entire ts.Program.
- *
- * The compilation is stateful - source files are analyzed and records of the operations that need
- * to be performed during the transform/emit process are maintained internally.
+ * Records information about a specific class that has matched traits.
  */
-export declare class IvyCompilation {
+export interface ClassRecord {
+    /**
+     * The `ClassDeclaration` of the class which has Angular traits applied.
+     */
+    node: ClassDeclaration;
+    /**
+     * All traits which matched on the class.
+     */
+    traits: Trait<unknown, unknown, unknown>[];
+    /**
+     * Meta-diagnostics about the class, which are usually related to whether certain combinations of
+     * Angular decorators are not permitted.
+     */
+    metaDiagnostics: ts.Diagnostic[] | null;
+    /**
+     * Whether `traits` contains traits matched from `DecoratorHandler`s marked as `WEAK`.
+     */
+    hasWeakHandlers: boolean;
+    /**
+     * Whether `traits` contains a trait from a `DecoratorHandler` matched as `PRIMARY`.
+     */
+    hasPrimaryHandler: boolean;
+}
+/**
+ * The heart of Angular compilation.
+ *
+ * The `TraitCompiler` is responsible for processing all classes in the program. Any time a
+ * `DecoratorHandler` matches a class, a "trait" is created to represent that Angular aspect of the
+ * class (such as the class having a component definition).
+ *
+ * The `TraitCompiler` transitions each trait through the various phases of compilation, culminating
+ * in the production of `CompileResult`s instructing the compiler to apply various mutations to the
+ * class (like adding fields or type declarations).
+ */
+export declare class TraitCompiler {
     private handlers;
     private reflector;
-    private importRewriter;
-    private incrementalDriver;
     private perf;
-    private sourceToFactorySymbols;
-    private scopeRegistry;
+    private incrementalBuild;
     private compileNonExportedClasses;
+    private dtsTransforms;
     /**
-     * Tracks classes which have been analyzed and found to have an Ivy decorator, and the
-     * information recorded about them for later compilation.
+     * Maps class declarations to their `ClassRecord`, which tracks the Ivy traits being applied to
+     * those classes.
      */
-    private ivyClasses;
+    private classes;
     /**
-     * Tracks factory information which needs to be generated.
+     * Maps source files to any class declaration(s) within them which have been discovered to contain
+     * Ivy traits.
      */
-    /**
-     * Tracks the `DtsFileTransformer`s for each TS file that needs .d.ts transformations.
-     */
-    private dtsMap;
+    private fileToClasses;
     private reexportMap;
-    private _diagnostics;
-    /**
-     * @param handlers array of `DecoratorHandler`s which will be executed against each class in the
-     * program
-     * @param checker TypeScript `TypeChecker` instance for the program
-     * @param reflector `ReflectionHost` through which all reflection operations will be performed
-     * @param coreImportsFrom a TypeScript `SourceFile` which exports symbols needed for Ivy imports
-     * when compiling @angular/core, or `null` if the current program is not @angular/core. This is
-     * `null` in most cases.
-     */
-    constructor(handlers: DecoratorHandler<any, any>[], reflector: ReflectionHost, importRewriter: ImportRewriter, incrementalDriver: IncrementalDriver, perf: PerfRecorder, sourceToFactorySymbols: Map<string, Set<string>> | null, scopeRegistry: LocalModuleScopeRegistry, compileNonExportedClasses: boolean);
-    readonly exportStatements: Map<string, Map<string, [string, string]>>;
+    private handlersByName;
+    constructor(handlers: DecoratorHandler<unknown, unknown, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord>, compileNonExportedClasses: boolean, dtsTransforms: DtsTransformRegistry);
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
-    private detectHandlersForClass;
-    /**
-     * Analyze a source file and produce diagnostics for it (if any).
-     */
     private analyze;
+    recordsFor(sf: ts.SourceFile): ClassRecord[] | null;
     /**
-     * Feeds components discovered in the compilation to a context for indexing.
+     * Import a `ClassRecord` from a previous compilation.
+     *
+     * Traits from the `ClassRecord` have accurate metadata, but the `handler` is from the old program
+     * and needs to be updated (matching is done by name). A new pending trait is created and then
+     * transitioned to analyzed using the previous analysis. If the trait is in the errored state,
+     * instead the errors are copied over.
      */
-    index(context: IndexingContext): void;
+    private adopt;
+    private scanClassForTraits;
+    private analyzeClass;
+    private analyzeTrait;
     resolve(): void;
-    private recordNgModuleScopeDependencies;
-    typeCheck(context: TypeCheckContext): void;
-    /**
-     * Perform a compilation operation on the given class declaration and return instructions to an
-     * AST transformer if any are available.
-     */
-    compileIvyFieldFor(node: ts.Declaration, constantPool: ConstantPool): CompileResult[] | undefined;
-    /**
-     * Lookup the `ts.Decorator` which triggered transformation of a particular class declaration.
-     */
-    ivyDecoratorsFor(node: ts.Declaration): ts.Decorator[];
-    /**
-     * Process a declaration file and return a transformed version that incorporates the changes
-     * made to the source file.
-     */
-    transformedDtsFor(file: ts.SourceFile, context: ts.TransformationContext): ts.SourceFile;
+    typeCheck(ctx: TypeCheckContext): void;
+    index(ctx: IndexingContext): void;
+    compile(clazz: ts.Declaration, constantPool: ConstantPool): CompileResult[] | null;
+    decoratorsFor(node: ts.Declaration): ts.Decorator[];
     readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
-    private getDtsTransformer;
+    readonly exportStatements: Map<string, Map<string, [string, string]>>;
 }

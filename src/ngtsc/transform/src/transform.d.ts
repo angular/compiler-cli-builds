@@ -9,5 +9,5 @@
 import * as ts from 'typescript';
 import { DefaultImportRecorder, ImportRewriter } from '../../imports';
 import { ReflectionHost } from '../../reflection';
-import { IvyCompilation } from './compilation';
-export declare function ivyTransformFactory(compilation: IvyCompilation, reflector: ReflectionHost, importRewriter: ImportRewriter, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, isClosureCompilerEnabled: boolean): ts.TransformerFactory<ts.SourceFile>;
+import { TraitCompiler } from './compilation';
+export declare function ivyTransformFactory(compilation: TraitCompiler, reflector: ReflectionHost, importRewriter: ImportRewriter, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, isClosureCompilerEnabled: boolean): ts.TransformerFactory<ts.SourceFile>;

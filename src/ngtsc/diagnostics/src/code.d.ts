@@ -22,6 +22,13 @@ export declare enum ErrorCode {
     PIPE_MISSING_NAME = 2002,
     PARAM_MISSING_TOKEN = 2003,
     DIRECTIVE_MISSING_SELECTOR = 2004,
+    /** Raised when an undecorated class is passed in as a provider to a module or a directive. */
+    UNDECORATED_PROVIDER = 2005,
+    /**
+     * Raised when a Directive inherits its constructor from a base class without an Angular
+     * decorator.
+     */
+    DIRECTIVE_INHERITS_UNDECORATED_CTOR = 2006,
     SYMBOL_NOT_EXPORTED = 3001,
     SYMBOL_EXPORTED_UNDER_DIFFERENT_NAME = 3002,
     CONFIG_FLAT_MODULE_NO_INDEX = 4001,
@@ -58,6 +65,10 @@ export declare enum ErrorCode {
      */
     NGMODULE_REEXPORT_NAME_COLLISION = 6006,
     /**
+     * Raised when a directive/pipe is part of the declarations of two or more NgModules.
+     */
+    NGMODULE_DECLARATION_NOT_UNIQUE = 6007,
+    /**
      * Raised when ngcc tries to inject a synthetic decorator over one that already exists.
      */
     NGCC_MIGRATION_DECORATOR_INJECTION_ERROR = 7001,
@@ -77,6 +88,19 @@ export declare enum ErrorCode {
      * No matching pipe was found for a
      */
     MISSING_PIPE = 8004,
+    /**
+     * The left-hand side of an assignment expression was a template variable. Effectively, the
+     * template looked like:
+     *
+     * ```
+     * <ng-template let-something>
+     *   <button (click)="something = ...">...</button>
+     * </ng-template>
+     * ```
+     *
+     * Template variables are read-only.
+     */
+    WRITE_TO_READ_ONLY_VARIABLE = 8005,
     /**
      * An injectable already has a `ɵprov` property.
      */
