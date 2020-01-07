@@ -9,7 +9,7 @@
 import { Type } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../imports';
-import { ClassDeclaration } from '../../reflection';
+import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
 import { TypeCheckableDirectiveMeta, TypeCheckingConfig } from './api';
 /**
@@ -27,6 +27,7 @@ export declare class Environment {
     readonly config: TypeCheckingConfig;
     protected importManager: ImportManager;
     private refEmitter;
+    private reflector;
     protected contextFile: ts.SourceFile;
     private nextIds;
     private typeCtors;
@@ -35,7 +36,7 @@ export declare class Environment {
     protected pipeInstStatements: ts.Statement[];
     private outputHelperIdent;
     protected helperStatements: ts.Statement[];
-    constructor(config: TypeCheckingConfig, importManager: ImportManager, refEmitter: ReferenceEmitter, contextFile: ts.SourceFile);
+    constructor(config: TypeCheckingConfig, importManager: ImportManager, refEmitter: ReferenceEmitter, reflector: ReflectionHost, contextFile: ts.SourceFile);
     /**
      * Get an expression referring to a type constructor for the given directive.
      *
@@ -62,7 +63,8 @@ export declare class Environment {
      *
      * This may involve importing the node into the file if it's not declared there already.
      */
-    referenceType(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): ts.TypeNode;
+    referenceType(ref: Reference): ts.TypeNode;
+    private emitTypeParameters;
     /**
      * Generate a `ts.TypeNode` that references a given type from the provided module.
      *

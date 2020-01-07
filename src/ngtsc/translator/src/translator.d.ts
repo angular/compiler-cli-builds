@@ -51,19 +51,19 @@ export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVis
     private imports;
     constructor(imports: ImportManager);
     visitBuiltinType(type: BuiltinType, context: Context): ts.KeywordTypeNode;
-    visitExpressionType(type: ExpressionType, context: Context): ts.TypeReferenceType;
+    visitExpressionType(type: ExpressionType, context: Context): ts.TypeNode;
     visitArrayType(type: ArrayType, context: Context): ts.ArrayTypeNode;
     visitMapType(type: MapType, context: Context): ts.TypeLiteralNode;
-    visitReadVarExpr(ast: ReadVarExpr, context: Context): string;
+    visitReadVarExpr(ast: ReadVarExpr, context: Context): ts.TypeQueryNode;
     visitWriteVarExpr(expr: WriteVarExpr, context: Context): never;
     visitWriteKeyExpr(expr: WriteKeyExpr, context: Context): never;
     visitWritePropExpr(expr: WritePropExpr, context: Context): never;
     visitInvokeMethodExpr(ast: InvokeMethodExpr, context: Context): never;
     visitInvokeFunctionExpr(ast: InvokeFunctionExpr, context: Context): never;
     visitInstantiateExpr(ast: InstantiateExpr, context: Context): never;
-    visitLiteralExpr(ast: LiteralExpr, context: Context): ts.LiteralExpression;
-    visitLocalizedString(ast: LocalizedString, context: Context): ts.Expression;
-    visitExternalExpr(ast: ExternalExpr, context: Context): ts.TypeNode;
+    visitLiteralExpr(ast: LiteralExpr, context: Context): ts.LiteralTypeNode;
+    visitLocalizedString(ast: LocalizedString, context: Context): never;
+    visitExternalExpr(ast: ExternalExpr, context: Context): ts.EntityName | ts.TypeReferenceNode;
     visitConditionalExpr(ast: ConditionalExpr, context: Context): void;
     visitNotExpr(ast: NotExpr, context: Context): void;
     visitAssertNotNullExpr(ast: AssertNotNull, context: Context): void;
@@ -73,8 +73,10 @@ export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVis
     visitReadPropExpr(ast: ReadPropExpr, context: Context): void;
     visitReadKeyExpr(ast: ReadKeyExpr, context: Context): void;
     visitLiteralArrayExpr(ast: LiteralArrayExpr, context: Context): ts.TupleTypeNode;
-    visitLiteralMapExpr(ast: LiteralMapExpr, context: Context): ts.ObjectLiteralExpression;
+    visitLiteralMapExpr(ast: LiteralMapExpr, context: Context): ts.TypeLiteralNode;
     visitCommaExpr(ast: CommaExpr, context: Context): void;
-    visitWrappedNodeExpr(ast: WrappedNodeExpr<any>, context: Context): ts.Identifier;
+    visitWrappedNodeExpr(ast: WrappedNodeExpr<any>, context: Context): ts.TypeNode;
     visitTypeofExpr(ast: TypeofExpr, context: Context): ts.TypeQueryNode;
+    private translateType;
+    private translateExpression;
 }

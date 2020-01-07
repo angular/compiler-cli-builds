@@ -75,7 +75,8 @@ export declare class DependencyResolver {
     private fs;
     private logger;
     private hosts;
-    constructor(fs: FileSystem, logger: Logger, hosts: Partial<Record<EntryPointFormat, DependencyHost>>);
+    private typingsHost;
+    constructor(fs: FileSystem, logger: Logger, hosts: Partial<Record<EntryPointFormat, DependencyHost>>, typingsHost: DependencyHost);
     /**
      * Sort the array of entry points so that the dependant entry points always come later than
      * their dependencies in the array.

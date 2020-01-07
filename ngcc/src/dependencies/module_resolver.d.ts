@@ -23,7 +23,7 @@ import { PathMappings } from '../utils';
  */
 export declare class ModuleResolver {
     private fs;
-    private relativeExtensions;
+    readonly relativeExtensions: string[];
     private pathMappings;
     constructor(fs: FileSystem, pathMappings?: PathMappings, relativeExtensions?: string[]);
     /**
