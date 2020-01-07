@@ -17,7 +17,7 @@ export declare class CommonJsDependencyHost extends DependencyHostBase {
      * @param alreadySeen A set that is used to track internal dependencies to prevent getting stuck
      * in a circular dependency loop.
      */
-    protected recursivelyFindDependencies(file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<AbsoluteFsPath>, alreadySeen: Set<AbsoluteFsPath>): void;
+    protected recursivelyCollectDependencies(file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<AbsoluteFsPath>, alreadySeen: Set<AbsoluteFsPath>): void;
     /**
      * Check whether a source file needs to be parsed for imports.
      * This is a performance short-circuit, which saves us from creating
