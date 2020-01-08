@@ -10,7 +10,7 @@ import { BoundTarget, ParseSourceFile, SchemaMetadata } from '@angular/compiler'
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
-import { ClassDeclaration } from '../../reflection';
+import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckingConfig, TypeCtorMetadata } from './api';
 /**
  * A template type checking context for a program.
@@ -22,8 +22,9 @@ import { TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckingConfig, 
 export declare class TypeCheckContext {
     private config;
     private refEmitter;
+    private reflector;
     private typeCheckFile;
-    constructor(config: TypeCheckingConfig, refEmitter: ReferenceEmitter, typeCheckFilePath: AbsoluteFsPath);
+    constructor(config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, typeCheckFilePath: AbsoluteFsPath);
     /**
      * A `Map` of `ts.SourceFile`s that the context has seen to the operations (additions of methods
      * or type-check blocks) that need to be eventually performed on that file.

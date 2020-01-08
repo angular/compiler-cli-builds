@@ -8,6 +8,7 @@
  */
 import * as ts from 'typescript';
 import { AbsoluteFsPath, FileSystem } from '../../src/ngtsc/file_system';
+import { EsmDependencyHost } from './dependencies/esm_dependency_host';
 /**
  * A list (`Array`) of partially ordered `T` items.
  *
@@ -72,3 +73,4 @@ export declare function resolveFileWithPostfixes(fs: FileSystem, path: AbsoluteF
  */
 export declare function stripDollarSuffix(value: string): string;
 export declare function stripExtension(fileName: string): string;
+export declare function createDtsDependencyHost(fileSystem: FileSystem, pathMappings?: PathMappings): EsmDependencyHost;

@@ -7,9 +7,9 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/type_constructor" />
 import * as ts from 'typescript';
-import { ClassDeclaration } from '../../reflection';
-import { TypeCheckingConfig, TypeCtorMetadata } from './api';
-export declare function generateTypeCtorDeclarationFn(node: ClassDeclaration<ts.ClassDeclaration>, meta: TypeCtorMetadata, nodeTypeRef: ts.Identifier | ts.QualifiedName, config: TypeCheckingConfig): ts.Statement;
+import { ClassDeclaration, ReflectionHost } from '../../reflection';
+import { TypeCtorMetadata } from './api';
+export declare function generateTypeCtorDeclarationFn(node: ClassDeclaration<ts.ClassDeclaration>, meta: TypeCtorMetadata, nodeTypeRef: ts.EntityName, typeParams: ts.TypeParameterDeclaration[] | undefined, reflector: ReflectionHost): ts.Statement;
 /**
  * Generate an inline type constructor for the given class and metadata.
  *
@@ -46,4 +46,4 @@ export declare function generateTypeCtorDeclarationFn(node: ClassDeclaration<ts.
  * @returns a `ts.MethodDeclaration` for the type constructor.
  */
 export declare function generateInlineTypeCtor(node: ClassDeclaration<ts.ClassDeclaration>, meta: TypeCtorMetadata): ts.MethodDeclaration;
-export declare function requiresInlineTypeCtor(node: ClassDeclaration<ts.ClassDeclaration>): boolean;
+export declare function requiresInlineTypeCtor(node: ClassDeclaration<ts.ClassDeclaration>, host: ReflectionHost): boolean;

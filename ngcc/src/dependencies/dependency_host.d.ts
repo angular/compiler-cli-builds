@@ -9,13 +9,14 @@
 import { AbsoluteFsPath, FileSystem, PathSegment } from '../../../src/ngtsc/file_system';
 import { ModuleResolver } from './module_resolver';
 export interface DependencyHost {
-    findDependencies(entryPointPath: AbsoluteFsPath): DependencyInfo;
+    collectDependencies(entryPointPath: AbsoluteFsPath, { dependencies, missing, deepImports }: DependencyInfo): void;
 }
 export interface DependencyInfo {
     dependencies: Set<AbsoluteFsPath>;
     missing: Set<AbsoluteFsPath | PathSegment>;
     deepImports: Set<AbsoluteFsPath>;
 }
+export declare function createDependencyInfo(): DependencyInfo;
 export declare abstract class DependencyHostBase implements DependencyHost {
     protected fs: FileSystem;
     protected moduleResolver: ModuleResolver;
@@ -24,10 +25,11 @@ export declare abstract class DependencyHostBase implements DependencyHost {
      * Find all the dependencies for the entry-point at the given path.
      *
      * @param entryPointPath The absolute path to the JavaScript file that represents an entry-point.
-     * @returns Information about the dependencies of the entry-point, including those that were
-     * missing or deep imports into other entry-points.
+     * @param dependencyInfo An object containing information about the dependencies of the
+     * entry-point, including those that were missing or deep imports into other entry-points. The
+     * sets in this object will be updated with new information about the entry-point's dependencies.
      */
-    findDependencies(entryPointPath: AbsoluteFsPath): DependencyInfo;
+    collectDependencies(entryPointPath: AbsoluteFsPath, { dependencies, missing, deepImports }: DependencyInfo): void;
     /**
      * Compute the dependencies of the given file.
      *
@@ -40,5 +42,5 @@ export declare abstract class DependencyHostBase implements DependencyHost {
      * @param alreadySeen A set that is used to track internal dependencies to prevent getting stuck
      * in a circular dependency loop.
      */
-    protected abstract recursivelyFindDependencies(file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<AbsoluteFsPath>, alreadySeen: Set<AbsoluteFsPath>): void;
+    protected abstract recursivelyCollectDependencies(file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<AbsoluteFsPath>, alreadySeen: Set<AbsoluteFsPath>): void;
 }

@@ -9,7 +9,7 @@
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
-import { ClassDeclaration } from '../../reflection';
+import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { TypeCheckBlockMetadata, TypeCheckingConfig } from './api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
@@ -26,7 +26,7 @@ export declare class TypeCheckFile extends Environment {
     private fileName;
     private nextTcbId;
     private tcbStatements;
-    constructor(fileName: string, config: TypeCheckingConfig, refEmitter: ReferenceEmitter);
+    constructor(fileName: string, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost);
     addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder): void;
     render(): ts.SourceFile;
     getPreludeStatements(): ts.Statement[];
