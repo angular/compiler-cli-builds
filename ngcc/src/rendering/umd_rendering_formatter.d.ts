@@ -15,7 +15,24 @@ export declare class UmdRenderingFormatter extends Esm5RenderingFormatter {
     protected umdHost: UmdReflectionHost;
     constructor(umdHost: UmdReflectionHost, isCore: boolean);
     /**
-     *  Add the imports to the UMD module IIFE.
+     * Add the imports to the UMD module IIFE.
+     *
+     * Note that imports at "prepended" to the start of the parameter list of the factory function,
+     * and so also to the arguments passed to it when it is called.
+     * This is because there are scenarios where the factory function does not accept as many
+     * parameters as are passed as argument in the call. For example:
+     *
+     * ```
+     * (function (global, factory) {
+     *     typeof exports === 'object' && typeof module !== 'undefined' ?
+     *         factory(exports,require('x'),require('z')) :
+     *     typeof define === 'function' && define.amd ?
+     *         define(['exports', 'x', 'z'], factory) :
+     *     (global = global || self, factory(global.myBundle = {}, global.x));
+     * }(this, (function (exports, x) { ... }
+     * ```
+     *
+     * (See that the `z` import is not being used by the factory function.)
      */
     addImports(output: MagicString, imports: Import[], file: ts.SourceFile): void;
     /**
