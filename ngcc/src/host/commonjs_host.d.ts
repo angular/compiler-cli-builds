@@ -10,18 +10,18 @@ import * as ts from 'typescript';
 import { Declaration, Import } from '../../../src/ngtsc/reflection';
 import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
+import { FactoryMap } from '../utils';
 import { Esm5ReflectionHost } from './esm5_host';
 import { NgccClassSymbol } from './ngcc_host';
 export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
-    protected commonJsExports: Map<ts.SourceFile, Map<string, Declaration<ts.Declaration>> | null>;
-    protected topLevelHelperCalls: Map<string, Map<ts.SourceFile, ts.CallExpression[]>>;
+    protected commonJsExports: FactoryMap<ts.SourceFile, Map<string, Declaration<ts.Declaration>> | null>;
+    protected topLevelHelperCalls: FactoryMap<string, FactoryMap<ts.SourceFile, ts.CallExpression[]>>;
     protected program: ts.Program;
     protected compilerHost: ts.CompilerHost;
     constructor(logger: Logger, isCore: boolean, src: BundleProgram, dts?: BundleProgram | null);
     getImportOfIdentifier(id: ts.Identifier): Import | null;
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
     getExportsOfModule(module: ts.Node): Map<string, Declaration> | null;
-    getCommonJsExports(sourceFile: ts.SourceFile): Map<string, Declaration> | null;
     /**
      * Search statements related to the given class for calls to the specified helper.
      *
@@ -31,7 +31,8 @@ export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
      * no helpers are found.
      *
      * @param classSymbol the class whose helper calls we are interested in.
-     * @param helperName the name of the helper (e.g. `__decorate`) whose calls we are interested in.
+     * @param helperNames the names of the helpers (e.g. `__decorate`) whose calls we are interested
+     * in.
      * @returns an array of nodes of calls to the helper with the given name.
      */
     protected getHelperCallsForClass(classSymbol: NgccClassSymbol, helperNames: string[]): ts.CallExpression[];
@@ -51,20 +52,6 @@ export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
     private extractCommonJsExportDeclaration;
     private extractCommonJsReexports;
     private findCommonJsImport;
-    private findRequireCallReference;
     private getCommonJsImportedDeclaration;
     private resolveModuleName;
 }
-declare type CommonJsExportStatement = ts.ExpressionStatement & {
-    expression: ts.BinaryExpression & {
-        left: ts.PropertyAccessExpression & {
-            expression: ts.Identifier;
-        };
-    };
-};
-export declare function isCommonJsExportStatement(s: ts.Statement): s is CommonJsExportStatement;
-export declare type RequireCall = ts.CallExpression & {
-    arguments: [ts.StringLiteral];
-};
-export declare function isRequireCall(node: ts.Node): node is RequireCall;
-export {};

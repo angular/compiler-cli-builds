@@ -8,7 +8,6 @@
  */
 import * as ts from 'typescript';
 import { AbsoluteFsPath, FileSystem } from '../../src/ngtsc/file_system';
-import { EsmDependencyHost } from './dependencies/esm_dependency_host';
 /**
  * A list (`Array`) of partially ordered `T` items.
  *
@@ -59,6 +58,19 @@ export declare type PathMappings = {
  */
 export declare function isRelativePath(path: string): boolean;
 /**
+ * A `Map`-like object that can compute and memoize a missing value for any key.
+ *
+ * The computed values are memoized, so the factory function is not called more than once per key.
+ * This is useful for storing values that are expensive to compute and may be used multiple times.
+ */
+export declare class FactoryMap<K, V> {
+    private factory;
+    private internalMap;
+    constructor(factory: (key: K) => V, entries?: readonly (readonly [K, V])[] | null);
+    get(key: K): V;
+    set(key: K, value: V): void;
+}
+/**
  * Attempt to resolve a `path` to a file by appending the provided `postFixes`
  * to the `path` and checking if the file exists on disk.
  * @returns An absolute path to the first matching existing file, or `null` if none exist.
@@ -73,4 +85,3 @@ export declare function resolveFileWithPostfixes(fs: FileSystem, path: AbsoluteF
  */
 export declare function stripDollarSuffix(value: string): string;
 export declare function stripExtension(fileName: string): string;
-export declare function createDtsDependencyHost(fileSystem: FileSystem, pathMappings?: PathMappings): EsmDependencyHost;
