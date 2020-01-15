@@ -54,7 +54,7 @@ export interface DomSchemaChecker {
 export declare class RegistryDomSchemaChecker implements DomSchemaChecker {
     private resolver;
     private _diagnostics;
-    readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
+    get diagnostics(): ReadonlyArray<ts.Diagnostic>;
     constructor(resolver: TemplateSourceResolver);
     checkElement(id: TemplateId, element: TmplAstElement, schemas: SchemaMetadata[]): void;
     checkProperty(id: TemplateId, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[]): void;
