@@ -56,21 +56,21 @@ export declare class Reference<T extends ts.Node = ts.Node> {
      * The best guess at which module specifier owns this particular reference, or `null` if there
      * isn't one.
      */
-    readonly ownedByModuleGuess: string | null;
+    get ownedByModuleGuess(): string | null;
     /**
      * Whether this reference has a potential owning module or not.
      *
      * See `bestGuessOwningModule`.
      */
-    readonly hasOwningModuleGuess: boolean;
+    get hasOwningModuleGuess(): boolean;
     /**
      * A name for the node, if one is available.
      *
      * This is only suited for debugging. Any actual references to this node should be made with
      * `ts.Identifier`s (see `getIdentityIn`).
      */
-    readonly debugName: string | null;
-    readonly alias: Expression | null;
+    get debugName(): string | null;
+    get alias(): Expression | null;
     /**
      * Record a `ts.Identifier` by which it's valid to refer to this node, within the context of this
      * `Reference`.

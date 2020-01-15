@@ -32,7 +32,7 @@ export declare class SyntheticFilesCompilerHost implements PluginCompilerHost {
     fileExists(filePath: string): boolean;
     /** Loads a source file from in-memory map, or delegates. */
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: (message: string) => void): ts.SourceFile | undefined;
-    readonly inputFiles: string[];
+    get inputFiles(): string[];
     fileNameToModuleId(fileName: string): string;
     getDefaultLibFileName(options: ts.CompilerOptions): string;
     writeFile(fileName: string, content: string, writeByteOrderMark: boolean, onError: ((message: string) => void) | undefined, sourceFiles: ReadonlyArray<ts.SourceFile> | undefined): void;

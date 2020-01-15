@@ -94,6 +94,6 @@ export declare class TraitCompiler {
     index(ctx: IndexingContext): void;
     compile(clazz: ts.Declaration, constantPool: ConstantPool): CompileResult[] | null;
     decoratorsFor(node: ts.Declaration): ts.Decorator[];
-    readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
-    readonly exportStatements: Map<string, Map<string, [string, string]>>;
+    get diagnostics(): ReadonlyArray<ts.Diagnostic>;
+    get exportStatements(): Map<string, Map<string, [string, string]>>;
 }
