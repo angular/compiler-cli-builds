@@ -13,8 +13,8 @@ import { DefaultImportRecorder, ImportRewriter } from '../../imports';
 export declare class Context {
     readonly isStatement: boolean;
     constructor(isStatement: boolean);
-    readonly withExpressionMode: Context;
-    readonly withStatementMode: Context;
+    get withExpressionMode(): Context;
+    get withStatementMode(): Context;
 }
 /**
  * Information about an import that has been added to a module.
