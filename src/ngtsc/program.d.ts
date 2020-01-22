@@ -78,10 +78,10 @@ export declare class NgtscProgram implements api.Program {
      * into the `IncrementalDriver`'s dependency graph.
      */
     private recordNgModuleScopeDependencies;
-    private readonly reflector;
-    private readonly coreImportsFrom;
-    private readonly isCore;
-    private readonly importRewriter;
+    private get reflector();
+    private get coreImportsFrom();
+    private get isCore();
+    private get importRewriter();
 }
 export declare class ReferenceGraphAdapter implements ReferencesRegistry {
     private graph;

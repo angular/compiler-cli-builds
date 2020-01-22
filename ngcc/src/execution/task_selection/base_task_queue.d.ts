@@ -12,7 +12,7 @@ import { PartiallyOrderedTasks, Task, TaskQueue } from '../api';
  */
 export declare abstract class BaseTaskQueue implements TaskQueue {
     protected tasks: PartiallyOrderedTasks;
-    readonly allTasksCompleted: boolean;
+    get allTasksCompleted(): boolean;
     protected inProgressTasks: Set<Task>;
     constructor(tasks: PartiallyOrderedTasks);
     abstract getNextTask(): Task | null;

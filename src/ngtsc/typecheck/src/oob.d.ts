@@ -45,7 +45,7 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     private resolver;
     private _diagnostics;
     constructor(resolver: TemplateSourceResolver);
-    readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
+    get diagnostics(): ReadonlyArray<ts.Diagnostic>;
     missingReferenceTarget(templateId: TemplateId, ref: TmplAstReference): void;
     missingPipe(templateId: TemplateId, ast: BindingPipe): void;
     illegalAssignmentToTemplateVar(templateId: TemplateId, assignment: PropertyWrite, target: TmplAstVariable): void;
