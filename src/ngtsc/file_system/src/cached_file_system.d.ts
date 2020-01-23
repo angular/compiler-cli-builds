@@ -21,7 +21,8 @@ export declare class CachedFileSystem implements FileSystem {
     constructor(delegate: FileSystem);
     exists(path: AbsoluteFsPath): boolean;
     readFile(path: AbsoluteFsPath): string;
-    writeFile(path: AbsoluteFsPath, data: string): void;
+    writeFile(path: AbsoluteFsPath, data: string, exclusive?: boolean): void;
+    removeFile(path: AbsoluteFsPath): void;
     symlink(target: AbsoluteFsPath, path: AbsoluteFsPath): void;
     copyFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     moveFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;

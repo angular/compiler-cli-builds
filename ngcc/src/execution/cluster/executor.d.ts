@@ -9,6 +9,7 @@
 import { Logger } from '../../logging/logger';
 import { PackageJsonUpdater } from '../../writing/package_json_updater';
 import { AnalyzeEntryPointsFn, CreateCompileFn, Executor } from '../api';
+import { LockFile } from '../lock_file';
 /**
  * An `Executor` that processes tasks in parallel (on multiple processes) and completes
  * asynchronously.
@@ -17,6 +18,7 @@ export declare class ClusterExecutor implements Executor {
     private workerCount;
     private logger;
     private pkgJsonUpdater;
-    constructor(workerCount: number, logger: Logger, pkgJsonUpdater: PackageJsonUpdater);
+    private lockFile;
+    constructor(workerCount: number, logger: Logger, pkgJsonUpdater: PackageJsonUpdater, lockFile: LockFile);
     execute(analyzeEntryPoints: AnalyzeEntryPointsFn, createCompileFn: CreateCompileFn): Promise<void>;
 }

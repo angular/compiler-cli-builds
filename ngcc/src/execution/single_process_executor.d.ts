@@ -9,13 +9,15 @@
 import { Logger } from '../logging/logger';
 import { PackageJsonUpdater } from '../writing/package_json_updater';
 import { AnalyzeEntryPointsFn, CreateCompileFn, Executor } from './api';
+import { LockFile } from './lock_file';
 /**
  * An `Executor` that processes all tasks serially and completes synchronously.
  */
 export declare class SingleProcessExecutor implements Executor {
     private logger;
     private pkgJsonUpdater;
-    constructor(logger: Logger, pkgJsonUpdater: PackageJsonUpdater);
+    private lockFile;
+    constructor(logger: Logger, pkgJsonUpdater: PackageJsonUpdater, lockFile: LockFile);
     execute(analyzeEntryPoints: AnalyzeEntryPointsFn, createCompileFn: CreateCompileFn): void;
 }
 /**
