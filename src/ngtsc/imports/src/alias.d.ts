@@ -9,8 +9,8 @@
 import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { FileToModuleHost, ReferenceEmitStrategy } from './emitter';
-import { ImportMode, Reference } from './references';
+import { FileToModuleHost, ImportFlags, ReferenceEmitStrategy } from './emitter';
+import { Reference } from './references';
 /**
  * A host for the aliasing system, which allows for alternative exports/imports of directives/pipes.
  *
@@ -135,5 +135,5 @@ export declare class PrivateExportAliasingHost implements AliasingHost {
  * directive or pipe, if it exists.
  */
 export declare class AliasStrategy implements ReferenceEmitStrategy {
-    emit(ref: Reference<ts.Node>, context: ts.SourceFile, importMode: ImportMode): Expression | null;
+    emit(ref: Reference<ts.Node>, context: ts.SourceFile, importMode: ImportFlags): Expression | null;
 }

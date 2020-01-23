@@ -136,6 +136,18 @@ export interface CompilerOptions extends ts.CompilerOptions {
      * Defaults to `false`, even if "fullTemplateTypeCheck" is set.
      */
     strictDomEventTypes?: boolean;
+    /**
+     * Whether to include the generic type of components when type-checking the template.
+     *
+     * If no component has generic type parameters, this setting has no effect.
+     *
+     * If a component has generic type parameters and this setting is `true`, those generic parameters
+     * will be included in the context type for the template. If `false`, any generic parameters will
+     * be set to `any` in the template context type.
+     *
+     * Defaults to `false`, even if "fullTemplateTypeCheck" is set.
+     */
+    strictContextGenerics?: boolean;
     _useHostForImportGeneration?: boolean;
     annotateForClosureCompiler?: boolean;
     annotationsAs?: 'decorators' | 'static fields';
