@@ -11,9 +11,9 @@ import * as ts from 'typescript';
 import { IncrementalBuild } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
 import { PerfRecorder } from '../../perf';
-import { ClassDeclaration, ReflectionHost } from '../../reflection';
+import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { TypeCheckContext } from '../../typecheck';
-import { CompileResult, DecoratorHandler } from './api';
+import { CompileResult, DecoratorHandler, HandlerFlags } from './api';
 import { DtsTransformRegistry } from './declaration';
 import { Trait } from './trait';
 /**
@@ -69,13 +69,14 @@ export declare class TraitCompiler {
      * Maps source files to any class declaration(s) within them which have been discovered to contain
      * Ivy traits.
      */
-    private fileToClasses;
+    protected fileToClasses: Map<ts.SourceFile, Set<ClassDeclaration<ts.Declaration>>>;
     private reexportMap;
     private handlersByName;
     constructor(handlers: DecoratorHandler<unknown, unknown, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord>, compileNonExportedClasses: boolean, dtsTransforms: DtsTransformRegistry);
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     private analyze;
+    recordFor(clazz: ClassDeclaration): ClassRecord | null;
     recordsFor(sf: ts.SourceFile): ClassRecord[] | null;
     /**
      * Import a `ClassRecord` from a previous compilation.
@@ -87,8 +88,9 @@ export declare class TraitCompiler {
      */
     private adopt;
     private scanClassForTraits;
-    private analyzeClass;
-    private analyzeTrait;
+    protected detectTraits(clazz: ClassDeclaration, decorators: Decorator[] | null): Trait<unknown, unknown, unknown>[] | null;
+    protected analyzeClass(clazz: ClassDeclaration, preanalyzeQueue: Promise<void>[] | null): void;
+    protected analyzeTrait(clazz: ClassDeclaration, trait: Trait<unknown, unknown, unknown>, flags?: HandlerFlags): void;
     resolve(): void;
     typeCheck(ctx: TypeCheckContext): void;
     index(ctx: IndexingContext): void;
