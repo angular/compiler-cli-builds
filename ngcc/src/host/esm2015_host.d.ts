@@ -606,6 +606,8 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      */
     protected parseForModuleWithProviders(name: string, node: ts.Node | null, implementation?: ts.Node | null, container?: ts.Declaration | null): ModuleWithProvidersFunction | null;
     protected getDeclarationOfExpression(expression: ts.Expression): Declaration | null;
+    /** Checks if the specified declaration resolves to the known JavaScript global `Object`. */
+    protected isJavaScriptObjectDeclaration(decl: Declaration): boolean;
 }
 export declare type ParamInfo = {
     decorators: Decorator[] | null;
