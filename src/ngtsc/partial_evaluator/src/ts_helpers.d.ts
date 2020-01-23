@@ -9,4 +9,4 @@
 import * as ts from 'typescript';
 import { TsHelperFn } from '../../reflection';
 import { ResolvedValue, ResolvedValueArray } from './result';
-export declare function evaluateTsHelperInline(helper: TsHelperFn, node: ts.Node, args: ResolvedValueArray): ResolvedValue;
+export declare function evaluateTsHelperInline(helper: TsHelperFn, node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
