@@ -17,6 +17,7 @@ export declare class TypeCheckProgramHost implements ts.CompilerHost {
      * Map of source file names to `ts.SourceFile` instances.
      */
     private sfMap;
+    readonly resolveModuleNames?: ts.CompilerHost['resolveModuleNames'];
     constructor(sfMap: Map<string, ts.SourceFile>, delegate: ts.CompilerHost);
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
     getDefaultLibFileName(options: ts.CompilerOptions): string;

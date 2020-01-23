@@ -9,14 +9,15 @@
 import * as ts from 'typescript';
 import { BuiltinFn, ResolvedValue, ResolvedValueArray } from './result';
 export declare class ArraySliceBuiltinFn extends BuiltinFn {
-    private node;
     private lhs;
-    constructor(node: ts.Node, lhs: ResolvedValueArray);
-    evaluate(args: ResolvedValueArray): ResolvedValue;
+    constructor(lhs: ResolvedValueArray);
+    evaluate(node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
 }
 export declare class ArrayConcatBuiltinFn extends BuiltinFn {
-    private node;
     private lhs;
-    constructor(node: ts.Node, lhs: ResolvedValueArray);
-    evaluate(args: ResolvedValueArray): ResolvedValue;
+    constructor(lhs: ResolvedValueArray);
+    evaluate(node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
+}
+export declare class ObjectAssignBuiltinFn extends BuiltinFn {
+    evaluate(node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
 }

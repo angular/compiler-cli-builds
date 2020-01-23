@@ -295,13 +295,26 @@ export interface FunctionDefinition {
  */
 export declare enum TsHelperFn {
     /**
+     * Indicates the `__assign` function.
+     */
+    Assign = 0,
+    /**
      * Indicates the `__spread` function.
      */
-    Spread = 0,
+    Spread = 1,
     /**
      * Indicates the `__spreadArrays` function.
      */
-    SpreadArrays = 1
+    SpreadArrays = 2
+}
+/**
+ * Possible declarations which are known.
+ */
+export declare enum KnownDeclaration {
+    /**
+     * Indicates the JavaScript global `Object` class.
+     */
+    JsGlobalObject = 0
 }
 /**
  * A parameter to a function or method.
@@ -350,6 +363,10 @@ export interface BaseDeclaration<T extends ts.Declaration = ts.Declaration> {
      * TypeScript reference to the declaration itself, if one exists.
      */
     node: T | null;
+    /**
+     * If set, describes the type of the known declaration this declaration resolves to.
+     */
+    known: KnownDeclaration | null;
 }
 /**
  * A declaration that has an associated TypeScript `ts.Declaration`.
