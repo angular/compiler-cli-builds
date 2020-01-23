@@ -48,7 +48,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     protected src: BundleProgram;
     protected dts: BundleProgram | null;
     /**
-     * A mapping from source declarations typings declarations, which are both publicly exported.
+     * A mapping from source declarations to typings declarations, which are both publicly exported.
      *
      * There should be one entry for every public export visible from the root file of the source
      * tree. Note that by definition the key and value declarations will not be in the same TS
