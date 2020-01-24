@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/resource_loader" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/resource/src/loader" />
 import * as ts from 'typescript';
-import { CompilerHost } from '../transformers/api';
-import { ResourceLoader } from './annotations';
+import { ResourceLoader } from '../../annotations';
+import { ExtendedTsCompilerHost } from '../../core/api';
 /**
  * `ResourceLoader` which delegates to a `CompilerHost` resource loading method.
  */
@@ -19,7 +19,7 @@ export declare class HostResourceLoader implements ResourceLoader {
     private fetching;
     private rootDirs;
     canPreload: boolean;
-    constructor(host: CompilerHost, options: ts.CompilerOptions);
+    constructor(host: ExtendedTsCompilerHost, options: ts.CompilerOptions);
     /**
      * Resolve the url of a resource relative to the file that contains the reference to it.
      * The return value of this method can be used in the `load()` and `preload()` methods.

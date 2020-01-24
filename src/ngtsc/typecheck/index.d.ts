@@ -8,5 +8,6 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck" />
 export * from './src/api';
 export { TypeCheckContext } from './src/context';
+export { TemplateDiagnostic, isTemplateDiagnostic } from './src/diagnostics';
 export { TypeCheckProgramHost } from './src/host';
 export { typeCheckFilePath } from './src/type_check_file';

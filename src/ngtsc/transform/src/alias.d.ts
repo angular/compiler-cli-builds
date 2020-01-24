@@ -7,4 +7,4 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/alias" />
 import * as ts from 'typescript';
-export declare function aliasTransformFactory(exportStatements: Map<string, Map<string, [string, string]>>): ts.TransformerFactory<ts.Bundle | ts.SourceFile>;
+export declare function aliasTransformFactory(exportStatements: Map<string, Map<string, [string, string]>>): ts.TransformerFactory<ts.SourceFile>;
