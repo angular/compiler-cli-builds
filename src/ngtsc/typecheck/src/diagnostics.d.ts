@@ -11,6 +11,16 @@ import * as ts from 'typescript';
 import { ErrorCode } from '../../diagnostics';
 import { TemplateId, TemplateSourceMapping } from './api';
 /**
+ * A `ts.Diagnostic` with additional information about the diagnostic related to template
+ * type-checking.
+ */
+export interface TemplateDiagnostic extends ts.Diagnostic {
+    /**
+     * The component with the template that resulted in this diagnostic.
+     */
+    componentFile: ts.SourceFile;
+}
+/**
  * Adapter interface which allows the template type-checking diagnostics code to interpret offsets
  * in a TCB and map them back to original locations in the template.
  */
@@ -73,4 +83,5 @@ export declare function translateDiagnostic(diagnostic: ts.Diagnostic, resolver:
 export declare function makeTemplateDiagnostic(mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: ErrorCode, messageText: string | ts.DiagnosticMessageChain, relatedMessage?: {
     text: string;
     span: ParseSourceSpan;
-}): ts.Diagnostic;
+}): TemplateDiagnostic;
+export declare function isTemplateDiagnostic(diagnostic: ts.Diagnostic): diagnostic is TemplateDiagnostic;
