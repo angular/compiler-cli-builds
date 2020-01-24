@@ -9,7 +9,7 @@
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ImportRewriter } from '../../imports';
-import { ShimGenerator } from './host';
+import { ShimGenerator } from './api';
 /**
  * Generates ts.SourceFiles which contain variable declarations for NgFactories for every exported
  * class of an input ts.SourceFile.
