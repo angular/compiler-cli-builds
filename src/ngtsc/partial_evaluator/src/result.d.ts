@@ -60,5 +60,5 @@ export declare class EnumValue {
  * An implementation of a builtin function, such as `Array.prototype.slice`.
  */
 export declare abstract class BuiltinFn {
-    abstract evaluate(args: ResolvedValueArray): ResolvedValue;
+    abstract evaluate(node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
 }

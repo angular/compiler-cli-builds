@@ -8,10 +8,6 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/imports/src/references" />
 import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
-export declare enum ImportMode {
-    UseExistingImport = 0,
-    ForceNewImport = 1
-}
 export interface OwningModule {
     specifier: string;
     resolutionContext: string;

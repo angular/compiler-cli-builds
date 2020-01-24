@@ -27,7 +27,7 @@ export declare class DtsTransformRegistry {
      */
     getAllTransforms(sf: ts.SourceFile): DtsTransform[] | null;
 }
-export declare function declarationTransformFactory(transformRegistry: DtsTransformRegistry, importRewriter: ImportRewriter, importPrefix?: string): ts.TransformerFactory<ts.Bundle | ts.SourceFile>;
+export declare function declarationTransformFactory(transformRegistry: DtsTransformRegistry, importRewriter: ImportRewriter, importPrefix?: string): ts.TransformerFactory<ts.SourceFile>;
 export interface IvyDeclarationField {
     name: string;
     type: Type;

@@ -8,3 +8,4 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/indexer" />
 export * from './src/api';
 export { IndexingContext } from './src/context';
+export { generateAnalysis } from './src/transform';
