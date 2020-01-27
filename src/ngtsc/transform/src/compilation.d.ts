@@ -15,7 +15,7 @@ import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { TypeCheckContext } from '../../typecheck';
 import { CompileResult, DecoratorHandler, HandlerFlags } from './api';
 import { DtsTransformRegistry } from './declaration';
-import { Trait } from './trait';
+import { PendingTrait, Trait } from './trait';
 /**
  * Records information about a specific class that has matched traits.
  */
@@ -88,7 +88,7 @@ export declare class TraitCompiler {
      */
     private adopt;
     private scanClassForTraits;
-    protected detectTraits(clazz: ClassDeclaration, decorators: Decorator[] | null): Trait<unknown, unknown, unknown>[] | null;
+    protected detectTraits(clazz: ClassDeclaration, decorators: Decorator[] | null): PendingTrait<unknown, unknown, unknown>[] | null;
     protected analyzeClass(clazz: ClassDeclaration, preanalyzeQueue: Promise<void>[] | null): void;
     protected analyzeTrait(clazz: ClassDeclaration, trait: Trait<unknown, unknown, unknown>, flags?: HandlerFlags): void;
     resolve(): void;
