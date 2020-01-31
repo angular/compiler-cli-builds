@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/diagnostics/src/error" />
 import * as ts from 'typescript';
-import { ErrorCode } from './code';
+import { ErrorCode } from './error_code';
 export declare class FatalDiagnosticError {
     readonly code: ErrorCode;
     readonly node: ts.Node;
