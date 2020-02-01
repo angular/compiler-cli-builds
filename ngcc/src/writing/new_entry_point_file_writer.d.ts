@@ -12,6 +12,8 @@ import { EntryPointBundle } from '../packages/entry_point_bundle';
 import { FileToWrite } from '../rendering/utils';
 import { InPlaceFileWriter } from './in_place_file_writer';
 import { PackageJsonUpdater } from './package_json_updater';
+export declare const NGCC_DIRECTORY = "__ivy_ngcc__";
+export declare const NGCC_PROPERTY_EXTENSION = "_ivy_ngcc";
 /**
  * This FileWriter creates a copy of the original entry-point, then writes the transformed
  * files onto the files in this copy, and finally updates the package.json with a new
