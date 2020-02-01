@@ -11,6 +11,7 @@ import { EntryPointJsonProperty } from '../packages/entry_point';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
 import { FileToWrite } from '../rendering/utils';
 import { FileWriter } from './file_writer';
+export declare const NGCC_BACKUP_EXTENSION = ".__ivy_ngcc_bak";
 /**
  * This FileWriter overwrites the transformed file, in-place, while creating
  * a back-up of the original file with an extra `.__ivy_ngcc_bak` extension.

@@ -30,6 +30,7 @@ export declare class InvalidFileSystem implements FileSystem {
     copyFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     moveFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     ensureDir(path: AbsoluteFsPath): void;
+    removeDeep(path: AbsoluteFsPath): void;
     isCaseSensitive(): boolean;
     resolve(...paths: string[]): AbsoluteFsPath;
     dirname<T extends PathString>(file: T): T;
