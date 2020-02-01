@@ -27,6 +27,7 @@ export declare class CachedFileSystem implements FileSystem {
     copyFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     moveFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     ensureDir(path: AbsoluteFsPath): void;
+    removeDeep(path: AbsoluteFsPath): void;
     lstat(path: AbsoluteFsPath): FileStats;
     stat(path: AbsoluteFsPath): FileStats;
     readdir(path: AbsoluteFsPath): PathSegment[];

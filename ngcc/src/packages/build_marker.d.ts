@@ -9,20 +9,29 @@
 import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { PackageJsonUpdater } from '../writing/package_json_updater';
 import { EntryPointPackageJson, PackageJsonFormatProperties } from './entry_point';
-export declare const NGCC_VERSION = "9.0.0-rc.1+888.sha-6d11a81";
+export declare const NGCC_VERSION = "9.0.0-rc.1+895.sha-f0b8f0c";
+/**
+ * Returns true if there is a format in this entry-point that was compiled with an outdated version
+ * of ngcc.
+ *
+ * @param packageJson The parsed contents of the package.json for the entry-point
+ */
+export declare function needsCleaning(packageJson: EntryPointPackageJson): boolean;
+/**
+ * Clean any build marker artifacts from the given `packageJson` object.
+ * @param packageJson The parsed contents of the package.json to modify
+ * @returns true if the package was modified during cleaning
+ */
+export declare function cleanPackageJson(packageJson: EntryPointPackageJson): boolean;
 /**
  * Check whether ngcc has already processed a given entry-point format.
  *
- * The entry-point is defined by the package.json contents provided.
- * The format is defined by the provided property name of the path to the bundle in the package.json
- *
  * @param packageJson The parsed contents of the package.json file for the entry-point.
  * @param format The entry-point format property in the package.json to check.
- * @returns true if the entry-point and format have already been processed with this ngcc version.
- * @throws Error if the `packageJson` property is not an object.
- * @throws Error if the entry-point has already been processed with a different ngcc version.
+ * @returns true if the `format` in the entry-point has already been processed by this ngcc version,
+ * false otherwise.
  */
-export declare function hasBeenProcessed(packageJson: EntryPointPackageJson, format: PackageJsonFormatProperties, entryPointPath: AbsoluteFsPath): boolean;
+export declare function hasBeenProcessed(packageJson: EntryPointPackageJson, format: PackageJsonFormatProperties): boolean;
 /**
  * Write a build marker for the given entry-point and format properties, to indicate that they have
  * been compiled by this version of ngcc.
