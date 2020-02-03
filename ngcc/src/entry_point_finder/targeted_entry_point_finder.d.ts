@@ -10,6 +10,7 @@ import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { DependencyResolver, SortedEntryPointsInfo } from '../dependencies/dependency_resolver';
 import { Logger } from '../logging/logger';
 import { NgccConfiguration } from '../packages/configuration';
+import { EntryPointJsonProperty } from '../packages/entry_point';
 import { PathMappings } from '../utils';
 import { EntryPointFinder } from './interface';
 /**
@@ -32,6 +33,7 @@ export declare class TargetedEntryPointFinder implements EntryPointFinder {
     private basePaths;
     constructor(fs: FileSystem, config: NgccConfiguration, logger: Logger, resolver: DependencyResolver, basePath: AbsoluteFsPath, targetPath: AbsoluteFsPath, pathMappings: PathMappings | undefined);
     findEntryPoints(): SortedEntryPointsInfo;
+    targetNeedsProcessingOrCleaning(propertiesToConsider: EntryPointJsonProperty[], compileAllFormats: boolean): boolean;
     private processNextPath;
     private getEntryPoint;
     /**
