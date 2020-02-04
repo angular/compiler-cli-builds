@@ -31,7 +31,15 @@ export declare enum ImportFlags {
      * This is sometimes required if emitting into a context where generated references will be fed
      * into TypeScript and type-checked (such as in template type-checking).
      */
-    NoAliasing = 2
+    NoAliasing = 2,
+    /**
+     * Indicates that an import to a type-only declaration is allowed.
+     *
+     * For references that occur in type-positions, the referred declaration may be a type-only
+     * declaration that is not retained during emit. Including this flag allows to emit references to
+     * type-only declarations as used in e.g. template type-checking.
+     */
+    AllowTypeImports = 4
 }
 /**
  * A particular strategy for generating an expression which refers to a `Reference`.
@@ -52,7 +60,7 @@ export interface ReferenceEmitStrategy {
      *
      * @param ref the `Reference` for which to generate an expression
      * @param context the source file in which the `Expression` must be valid
-     * @param importMode a flag which controls whether imports should be generated or not
+     * @param importFlags a flag which controls whether imports should be generated or not
      * @returns an `Expression` which refers to the `Reference`, or `null` if none can be generated
      */
     emit(ref: Reference, context: ts.SourceFile, importFlags: ImportFlags): Expression | null;
@@ -95,7 +103,7 @@ export declare class AbsoluteModuleStrategy implements ReferenceEmitStrategy {
      */
     private moduleExportsCache;
     constructor(program: ts.Program, checker: ts.TypeChecker, moduleResolver: ModuleResolver, reflectionHost: ReflectionHost);
-    emit(ref: Reference<ts.Node>, context: ts.SourceFile): Expression | null;
+    emit(ref: Reference<ts.Node>, context: ts.SourceFile, importFlags: ImportFlags): Expression | null;
     private resolveImportName;
     private getExportsOfModule;
     protected enumerateExportsOfModule(specifier: string, fromFile: string): Map<ts.Declaration, string> | null;

@@ -21,6 +21,8 @@ export declare function identifierOfNode(decl: ts.Node & {
     name?: ts.Node;
 }): ts.Identifier | null;
 export declare function isDeclaration(node: ts.Node): node is ts.Declaration;
+export declare function isValueDeclaration(node: ts.Node): node is ts.ClassDeclaration | ts.FunctionDeclaration | ts.VariableDeclaration;
+export declare function isTypeDeclaration(node: ts.Node): node is ts.EnumDeclaration | ts.TypeAliasDeclaration | ts.InterfaceDeclaration;
 export declare function isExported(node: ts.Declaration): boolean;
 export declare function getRootDirs(host: ts.CompilerHost, options: ts.CompilerOptions): AbsoluteFsPath[];
 export declare function nodeDebugInfo(node: ts.Node): string;
