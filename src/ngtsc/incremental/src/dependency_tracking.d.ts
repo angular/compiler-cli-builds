@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/src/dependency_tracking" />
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../../file_system';
 import { DependencyTracker } from '../api';
 /**
  * An implementation of the `DependencyTracker` dependency graph API.
@@ -25,10 +26,10 @@ export declare class FileDependencyGraph<T extends {
 } = ts.SourceFile> implements DependencyTracker<T> {
     private nodes;
     addDependency(from: T, on: T): void;
-    addResourceDependency(from: T, resource: string): void;
+    addResourceDependency(from: T, resource: AbsoluteFsPath): void;
     addTransitiveDependency(from: T, on: T): void;
     addTransitiveResources(from: T, resourcesOf: T): void;
-    isStale(sf: T, changedTsPaths: Set<string>, changedResources: Set<string>): boolean;
+    isStale(sf: T, changedTsPaths: Set<string>, changedResources: Set<AbsoluteFsPath>): boolean;
     /**
      * Update the current dependency graph from a previous one, incorporating a set of physical
      * changes.
@@ -50,6 +51,6 @@ export declare class FileDependencyGraph<T extends {
      * L(n) = the logically changed files from build n - 1 to build n.
      * P(n) = the physically changed files from build n - 1 to build n.
      */
-    updateWithPhysicalChanges(previous: FileDependencyGraph<T>, changedTsPaths: Set<string>, deletedTsPaths: Set<string>, changedResources: Set<string>): Set<string>;
+    updateWithPhysicalChanges(previous: FileDependencyGraph<T>, changedTsPaths: Set<string>, deletedTsPaths: Set<string>, changedResources: Set<AbsoluteFsPath>): Set<string>;
     private nodeFor;
 }

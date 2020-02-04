@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/api" />
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../file_system';
 /**
  * Interface of the incremental build engine.
  *
@@ -32,7 +33,7 @@ export interface DependencyTracker<T extends {
     /**
      * Record that the file `from` depends on the resource file `on`.
      */
-    addResourceDependency(from: T, on: string): void;
+    addResourceDependency(from: T, on: AbsoluteFsPath): void;
     /**
      * Record that the file `from` depends on the file `on` as well as `on`'s direct dependencies.
      *
