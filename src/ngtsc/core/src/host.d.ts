@@ -73,7 +73,9 @@ export declare class NgCompilerHost extends DelegatingCompilerHost implements Re
     readonly inputFiles: ReadonlyArray<string>;
     readonly rootDirs: ReadonlyArray<AbsoluteFsPath>;
     readonly typeCheckFile: AbsoluteFsPath;
-    constructor(delegate: ExtendedTsCompilerHost, inputFiles: ReadonlyArray<string>, rootDirs: ReadonlyArray<AbsoluteFsPath>, shims: ShimGenerator[], entryPoint: AbsoluteFsPath | null, typeCheckFile: AbsoluteFsPath, factoryTracker: FactoryTracker | null, diagnostics: ts.Diagnostic[]);
+    readonly factoryFiles: AbsoluteFsPath[];
+    readonly summaryFiles: AbsoluteFsPath[];
+    constructor(delegate: ExtendedTsCompilerHost, inputFiles: ReadonlyArray<string>, rootDirs: ReadonlyArray<AbsoluteFsPath>, shims: ShimGenerator[], entryPoint: AbsoluteFsPath | null, typeCheckFile: AbsoluteFsPath, factoryFiles: AbsoluteFsPath[], summaryFiles: AbsoluteFsPath[], factoryTracker: FactoryTracker | null, diagnostics: ts.Diagnostic[]);
     /**
      * Create an `NgCompilerHost` from a delegate host, an array of input filenames, and the full set
      * of TypeScript and Angular compiler options.
