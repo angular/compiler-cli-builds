@@ -12,7 +12,7 @@ import { ShimGenerator } from './api';
 export declare class SummaryGenerator implements ShimGenerator {
     private map;
     private constructor();
-    getSummaryFileNames(): string[];
+    getSummaryFileNames(): AbsoluteFsPath[];
     recognize(fileName: AbsoluteFsPath): boolean;
     generate(genFilePath: AbsoluteFsPath, readFile: (fileName: string) => ts.SourceFile | null): ts.SourceFile | null;
     static forRootFiles(files: ReadonlyArray<AbsoluteFsPath>): SummaryGenerator;

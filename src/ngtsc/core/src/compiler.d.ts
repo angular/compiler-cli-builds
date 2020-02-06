@@ -55,6 +55,8 @@ export declare class NgCompiler {
     private resourceManager;
     private cycleAnalyzer;
     readonly incrementalDriver: IncrementalDriver;
+    readonly ignoreForDiagnostics: Set<ts.SourceFile>;
+    readonly ignoreForEmit: Set<ts.SourceFile>;
     constructor(host: NgCompilerHost, options: NgCompilerOptions, tsProgram: ts.Program, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
     /**
      * Get all Angular-related diagnostics for this compilation.
@@ -98,7 +100,6 @@ export declare class NgCompiler {
      */
     prepareEmit(): {
         transformers: ts.CustomTransformers;
-        ignoreFiles: Set<ts.SourceFile>;
     };
     /**
      * Run the indexing process and return a `Map` of all indexed components.
