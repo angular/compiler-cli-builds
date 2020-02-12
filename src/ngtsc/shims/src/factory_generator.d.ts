@@ -17,7 +17,8 @@ import { ShimGenerator } from './api';
 export declare class FactoryGenerator implements ShimGenerator {
     private map;
     private constructor();
-    get factoryFileMap(): Map<string, string>;
+    get factoryFileMap(): Map<AbsoluteFsPath, AbsoluteFsPath>;
+    get factoryFileNames(): AbsoluteFsPath[];
     recognize(fileName: AbsoluteFsPath): boolean;
     generate(genFilePath: AbsoluteFsPath, readFile: (fileName: string) => ts.SourceFile | null): ts.SourceFile | null;
     static forRootFiles(files: ReadonlyArray<AbsoluteFsPath>): FactoryGenerator;
