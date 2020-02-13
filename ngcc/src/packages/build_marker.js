@@ -11,7 +11,7 @@
     Object.defineProperty(exports, "__esModule", { value: true });
     var tslib_1 = require("tslib");
     var new_entry_point_file_writer_1 = require("@angular/compiler-cli/ngcc/src/writing/new_entry_point_file_writer");
-    exports.NGCC_VERSION = '9.0.1+16.sha-84c9c6e';
+    exports.NGCC_VERSION = '9.0.1+17.sha-db693f4';
     /**
      * Returns true if there is a format in this entry-point that was compiled with an outdated version
      * of ngcc.
