@@ -20,6 +20,7 @@ export declare class CachedFileSystem implements FileSystem {
     private readFileCache;
     constructor(delegate: FileSystem);
     exists(path: AbsoluteFsPath): boolean;
+    invalidateCaches(path: AbsoluteFsPath): void;
     readFile(path: AbsoluteFsPath): string;
     writeFile(path: AbsoluteFsPath, data: string, exclusive?: boolean): void;
     removeFile(path: AbsoluteFsPath): void;
