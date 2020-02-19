@@ -9,26 +9,20 @@
 import { Logger } from '../logging/logger';
 import { PackageJsonUpdater } from '../writing/package_json_updater';
 import { AnalyzeEntryPointsFn, CreateCompileFn, Executor } from './api';
-import { LockFileAsync, LockFileSync } from './lock_file';
-export declare abstract class SingleProcessorExecutorBase {
-    private logger;
-    private pkgJsonUpdater;
-    constructor(logger: Logger, pkgJsonUpdater: PackageJsonUpdater);
-    doExecute(analyzeEntryPoints: AnalyzeEntryPointsFn, createCompileFn: CreateCompileFn): void | Promise<void>;
-}
+import { LockFile } from './lock_file';
 /**
  * An `Executor` that processes all tasks serially and completes synchronously.
  */
-export declare class SingleProcessExecutorSync extends SingleProcessorExecutorBase implements Executor {
-    private lockfile;
-    constructor(logger: Logger, pkgJsonUpdater: PackageJsonUpdater, lockfile: LockFileSync);
+export declare class SingleProcessExecutor implements Executor {
+    private logger;
+    private pkgJsonUpdater;
+    private lockFile;
+    constructor(logger: Logger, pkgJsonUpdater: PackageJsonUpdater, lockFile: LockFile);
     execute(analyzeEntryPoints: AnalyzeEntryPointsFn, createCompileFn: CreateCompileFn): void;
 }
 /**
  * An `Executor` that processes all tasks serially, but still completes asynchronously.
  */
-export declare class SingleProcessExecutorAsync extends SingleProcessorExecutorBase implements Executor {
-    private lockfile;
-    constructor(logger: Logger, pkgJsonUpdater: PackageJsonUpdater, lockfile: LockFileAsync);
-    execute(analyzeEntryPoints: AnalyzeEntryPointsFn, createCompileFn: CreateCompileFn): Promise<void>;
+export declare class AsyncSingleProcessExecutor extends SingleProcessExecutor {
+    execute(...args: Parameters<Executor['execute']>): Promise<void>;
 }
