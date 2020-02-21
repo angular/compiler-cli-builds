@@ -102,11 +102,11 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      *
      * Given the outer variable declaration, we want to get to the inner function declaration.
      *
-     * @param node a node that could be the variable expression outside an ES5 class IIFE.
+     * @param decl a declaration node that could be the variable expression outside an ES5 class IIFE.
      * @param checker the TS program TypeChecker
      * @returns the inner function declaration or `undefined` if it is not a "class".
      */
-    protected getInnerFunctionDeclarationFromClassDeclaration(node: ts.Node): ts.FunctionDeclaration | undefined;
+    protected getInnerFunctionDeclarationFromClassDeclaration(decl: ts.Declaration): ts.FunctionDeclaration | undefined;
     /**
      * Find the declarations of the constructor parameters of a class identified by its symbol.
      *
