@@ -254,6 +254,13 @@ export interface StrictTemplateOptions {
      * Defaults to `false`, even if "fullTemplateTypeCheck" is set.
      */
     strictContextGenerics?: boolean;
+    /**
+     * Whether object or array literals defined in templates use their inferred type, or are
+     * interpreted as `any`.
+     *
+     * Defaults to `false` unless `fullTemplateTypeCheck` or `strictTemplates` are set.
+     */
+    strictLiteralTypes?: boolean;
 }
 /**
  * Options which control behavior useful for "monorepo" build cases using Bazel (such as the
