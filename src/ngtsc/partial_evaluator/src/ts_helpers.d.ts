@@ -7,6 +7,10 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/ts_helpers" />
 import * as ts from 'typescript';
-import { TsHelperFn } from '../../reflection';
-import { ResolvedValue, ResolvedValueArray } from './result';
-export declare function evaluateTsHelperInline(helper: TsHelperFn, node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
+import { ObjectAssignBuiltinFn } from './builtin';
+import { KnownFn, ResolvedValueArray } from './result';
+export declare class AssignHelperFn extends ObjectAssignBuiltinFn {
+}
+export declare class SpreadHelperFn extends KnownFn {
+    evaluate(node: ts.Node, args: ResolvedValueArray): ResolvedValueArray;
+}

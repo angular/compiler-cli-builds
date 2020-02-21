@@ -17,7 +17,7 @@ import { DynamicValue } from './dynamic';
  * non-primitive value, or a special `DynamicValue` type which indicates the value was not
  * available statically.
  */
-export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | ResolvedModule | BuiltinFn | DynamicValue<unknown>;
+export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | ResolvedModule | KnownFn | DynamicValue<unknown>;
 /**
  * An array of `ResolvedValue`s.
  *
@@ -57,8 +57,10 @@ export declare class EnumValue {
     constructor(enumRef: Reference<ts.EnumDeclaration>, name: string, resolved: ResolvedValue);
 }
 /**
- * An implementation of a builtin function, such as `Array.prototype.slice`.
+ * An implementation of a known function that can be statically evaluated.
+ * It could be a built-in function or method (such as `Array.prototype.slice`) or a TypeScript
+ * helper (such as `__spread`).
  */
-export declare abstract class BuiltinFn {
+export declare abstract class KnownFn {
     abstract evaluate(node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
 }

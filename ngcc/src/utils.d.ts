@@ -8,6 +8,7 @@
  */
 import * as ts from 'typescript';
 import { AbsoluteFsPath, FileSystem } from '../../src/ngtsc/file_system';
+import { KnownDeclaration } from '../../src/ngtsc/reflection';
 /**
  * A list (`Array`) of partially ordered `T` items.
  *
@@ -76,6 +77,17 @@ export declare class FactoryMap<K, V> {
  * @returns An absolute path to the first matching existing file, or `null` if none exist.
  */
 export declare function resolveFileWithPostfixes(fs: FileSystem, path: AbsoluteFsPath, postFixes: string[]): AbsoluteFsPath | null;
+/**
+ * Determine whether a function declaration corresponds with a TypeScript helper function, returning
+ * its kind if so or null if the declaration does not seem to correspond with such a helper.
+ */
+export declare function getTsHelperFnFromDeclaration(decl: ts.Declaration): KnownDeclaration | null;
+/**
+ * Determine whether an identifier corresponds with a TypeScript helper function (based on its
+ * name), returning its kind if so or null if the identifier does not seem to correspond with such a
+ * helper.
+ */
+export declare function getTsHelperFnFromIdentifier(id: ts.Identifier): KnownDeclaration | null;
 /**
  * An identifier may become repeated when bundling multiple source files into a single bundle, so
  * bundlers have a strategy of suffixing non-unique identifiers with a suffix like $2. This function

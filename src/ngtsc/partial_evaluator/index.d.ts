@@ -8,4 +8,4 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator" />
 export { DynamicValue } from './src/dynamic';
 export { ForeignFunctionResolver, PartialEvaluator } from './src/interface';
-export { BuiltinFn, EnumValue, ResolvedValue, ResolvedValueArray, ResolvedValueMap } from './src/result';
+export { EnumValue, KnownFn, ResolvedValue, ResolvedValueArray, ResolvedValueMap } from './src/result';
