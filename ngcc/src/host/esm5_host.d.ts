@@ -94,6 +94,11 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      */
     getDefinitionOfFunction(node: ts.Node): FunctionDefinition | null;
     /**
+     * Resolve a `ts.Symbol` to its declaration and detect whether it corresponds with a known
+     * TypeScript helper function.
+     */
+    protected getDeclarationOfSymbol(symbol: ts.Symbol, originalId: ts.Identifier | null): Declaration | null;
+    /**
      * Get the inner function declaration of an ES5-style class.
      *
      * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE
