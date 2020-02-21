@@ -281,40 +281,30 @@ export interface FunctionDefinition {
      */
     body: ts.Statement[] | null;
     /**
-     * The type of tslib helper function, if the function is determined to represent a tslib helper
-     * function. Otherwise, this will be null.
-     */
-    helper: TsHelperFn | null;
-    /**
      * Metadata regarding the function's parameters, including possible default value expressions.
      */
     parameters: Parameter[];
 }
 /**
- * Possible functions from TypeScript's helper library.
- */
-export declare enum TsHelperFn {
-    /**
-     * Indicates the `__assign` function.
-     */
-    Assign = 0,
-    /**
-     * Indicates the `__spread` function.
-     */
-    Spread = 1,
-    /**
-     * Indicates the `__spreadArrays` function.
-     */
-    SpreadArrays = 2
-}
-/**
- * Possible declarations which are known.
+ * Possible declarations of known values, such as built-in objects/functions or TypeScript helpers.
  */
 export declare enum KnownDeclaration {
     /**
      * Indicates the JavaScript global `Object` class.
      */
-    JsGlobalObject = 0
+    JsGlobalObject = 0,
+    /**
+     * Indicates the `__assign` TypeScript helper function.
+     */
+    TsHelperAssign = 1,
+    /**
+     * Indicates the `__spread` TypeScript helper function.
+     */
+    TsHelperSpread = 2,
+    /**
+     * Indicates the `__spreadArrays` TypeScript helper function.
+     */
+    TsHelperSpreadArrays = 3
 }
 /**
  * A parameter to a function or method.

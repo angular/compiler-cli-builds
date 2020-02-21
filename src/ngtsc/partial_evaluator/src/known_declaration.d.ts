@@ -9,11 +9,11 @@
 import { KnownDeclaration } from '../../reflection/src/host';
 import { ObjectAssignBuiltinFn } from './builtin';
 import { ResolvedValue } from './result';
-/** Resolved value for the JavaScript global `Object` declaration .*/
+/** Resolved value for the JavaScript global `Object` declaration. */
 export declare const jsGlobalObjectValue: Map<string, ObjectAssignBuiltinFn>;
 /**
  * Resolves the specified known declaration to a resolved value. For example,
  * the known JavaScript global `Object` will resolve to a `Map` that provides the
- * `assign` method with a builtin function. This enables evaluation of `Object.assign`.
+ * `assign` method with a built-in function. This enables evaluation of `Object.assign`.
  */
 export declare function resolveKnownDeclaration(decl: KnownDeclaration): ResolvedValue;

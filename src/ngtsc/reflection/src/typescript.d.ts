@@ -49,6 +49,10 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
      * @returns The import info if this is a namespaced import or `null`.
      */
     protected getImportOfNamespacedIdentifier(id: ts.Identifier, namespaceIdentifier: ts.Identifier | null): Import | null;
+    /**
+     * Resolve a `ts.Symbol` to its declaration, keeping track of the `viaModule` along the way.
+     */
+    protected getDeclarationOfSymbol(symbol: ts.Symbol, originalId: ts.Identifier | null): Declaration | null;
     private _reflectDecorator;
     private _reflectMember;
 }
