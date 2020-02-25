@@ -34,7 +34,9 @@ interface TscPlugin {
     getDiagnostics(file?: ts.SourceFile): ts.Diagnostic[];
     getOptionDiagnostics(): ts.Diagnostic[];
     getNextProgram(): ts.Program;
-    createTransformers(): ts.CustomTransformers;
+    prepareEmit(): {
+        transformers: ts.CustomTransformers;
+    };
 }
 /**
  * A plugin for `tsc_wrapped` which allows Angular compilation from a plain `ts_library`.
@@ -55,6 +57,8 @@ export declare class NgTscPlugin implements TscPlugin {
     getDiagnostics(file?: ts.SourceFile): ts.Diagnostic[];
     getOptionDiagnostics(): ts.Diagnostic[];
     getNextProgram(): ts.Program;
-    createTransformers(): ts.CustomTransformers;
+    prepareEmit(): {
+        transformers: ts.CustomTransformers;
+    };
 }
 export {};
