@@ -9,6 +9,7 @@
 import { DepGraph } from 'dependency-graph';
 import { FileSystem } from '../../../src/ngtsc/file_system';
 import { Logger } from '../logging/logger';
+import { NgccConfiguration } from '../packages/configuration';
 import { EntryPoint, EntryPointFormat } from '../packages/entry_point';
 import { PartiallyOrderedList } from '../utils';
 import { DependencyHost, DependencyInfo } from './dependency_host';
@@ -74,9 +75,10 @@ export interface SortedEntryPointsInfo extends DependencyDiagnostics {
 export declare class DependencyResolver {
     private fs;
     private logger;
+    private config;
     private hosts;
     private typingsHost;
-    constructor(fs: FileSystem, logger: Logger, hosts: Partial<Record<EntryPointFormat, DependencyHost>>, typingsHost: DependencyHost);
+    constructor(fs: FileSystem, logger: Logger, config: NgccConfiguration, hosts: Partial<Record<EntryPointFormat, DependencyHost>>, typingsHost: DependencyHost);
     /**
      * Sort the array of entry points so that the dependant entry points always come later than
      * their dependencies in the array.
@@ -94,4 +96,8 @@ export declare class DependencyResolver {
      */
     private computeDependencyGraph;
     private getEntryPointFormatInfo;
+    /**
+     * Filter out the deepImports that can be ignored, according to this entryPoint's config.
+     */
+    private filterIgnorableDeepImports;
 }
