@@ -51,7 +51,7 @@ export interface Task extends JsonObject {
     formatProperty: EntryPointJsonProperty;
     /**
      * The list of all format properties (including `task.formatProperty`) that should be marked as
-     * processed once the taksk has been completed, because they point to the format-path that will be
+     * processed once the task has been completed, because they point to the format-path that will be
      * processed as part of the task.
      */
     formatPropertiesToMarkAsProcessed: EntryPointJsonProperty[];
@@ -62,10 +62,8 @@ export interface Task extends JsonObject {
 export declare type TaskCompletedCallback = (task: Task, outcome: TaskProcessingOutcome) => void;
 /** Represents the outcome of processing a `Task`. */
 export declare const enum TaskProcessingOutcome {
-    /** The target format property was already processed - didn't have to do anything. */
-    AlreadyProcessed = 0,
     /** Successfully processed the target format property. */
-    Processed = 1
+    Processed = 0
 }
 /**
  * A wrapper around a list of tasks and providing utility methods for getting the next task of
