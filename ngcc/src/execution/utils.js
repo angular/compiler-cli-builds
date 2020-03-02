@@ -22,7 +22,7 @@
     /** A helper function for handling a task's being completed. */
     exports.onTaskCompleted = function (pkgJsonUpdater, task, outcome) {
         var entryPoint = task.entryPoint, formatPropertiesToMarkAsProcessed = task.formatPropertiesToMarkAsProcessed, processDts = task.processDts;
-        if (outcome === 1 /* Processed */) {
+        if (outcome === 0 /* Processed */) {
             var packageJsonPath = file_system_1.resolve(entryPoint.path, 'package.json');
             var propsToMarkAsProcessed = tslib_1.__spread(formatPropertiesToMarkAsProcessed);
             if (processDts) {
