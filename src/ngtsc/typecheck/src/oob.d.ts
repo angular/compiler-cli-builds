@@ -40,6 +40,15 @@ export interface OutOfBandDiagnosticRecorder {
      */
     missingPipe(templateId: TemplateId, ast: BindingPipe): void;
     illegalAssignmentToTemplateVar(templateId: TemplateId, assignment: PropertyWrite, target: TmplAstVariable): void;
+    /**
+     * Reports a duplicate declaration of a template variable.
+     *
+     * @param templateId the template type-checking ID of the template which contains the duplicate
+     * declaration.
+     * @param variable the `TmplAstVariable` which duplicates a previously declared variable.
+     * @param firstDecl the first variable declaration which uses the same name as `variable`.
+     */
+    duplicateTemplateVar(templateId: TemplateId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -49,4 +58,5 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     missingReferenceTarget(templateId: TemplateId, ref: TmplAstReference): void;
     missingPipe(templateId: TemplateId, ast: BindingPipe): void;
     illegalAssignmentToTemplateVar(templateId: TemplateId, assignment: PropertyWrite, target: TmplAstVariable): void;
+    duplicateTemplateVar(templateId: TemplateId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
 }
