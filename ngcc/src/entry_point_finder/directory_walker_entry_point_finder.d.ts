@@ -10,7 +10,6 @@ import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { DependencyResolver, SortedEntryPointsInfo } from '../dependencies/dependency_resolver';
 import { Logger } from '../logging/logger';
 import { NgccConfiguration } from '../packages/configuration';
-import { EntryPoint } from '../packages/entry_point';
 import { PathMappings } from '../utils';
 import { EntryPointFinder } from './interface';
 /**
@@ -36,11 +35,11 @@ export declare class DirectoryWalkerEntryPointFinder implements EntryPointFinder
      * The function will recurse into directories that start with `@...`, e.g. `@angular/...`.
      * @param sourceDirectory An absolute path to the root directory where searching begins.
      */
-    walkDirectoryForEntryPoints(sourceDirectory: AbsoluteFsPath): EntryPoint[];
+    private walkDirectoryForEntryPoints;
     /**
      * Recurse the folder structure looking for all the entry points
      * @param packagePath The absolute path to an npm package that may contain entry points
-     * @returns An array of entry points that were discovered or null when it's not a valid entrypoint
+     * @returns An array of entry points that were discovered.
      */
     private getEntryPointsForPackage;
     /**
