@@ -6,16 +6,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Logger } from './logger';
+import { LogLevel, Logger } from './logger';
 export declare const DEBUG: string;
 export declare const WARN: string;
 export declare const ERROR: string;
-export declare enum LogLevel {
-    debug = 0,
-    info = 1,
-    warn = 2,
-    error = 3
-}
 /**
  * A simple logger that outputs directly to the Console.
  *
@@ -23,8 +17,8 @@ export declare enum LogLevel {
  * constructor parameter.
  */
 export declare class ConsoleLogger implements Logger {
-    private logLevel;
-    constructor(logLevel: LogLevel);
+    level: LogLevel;
+    constructor(level: LogLevel);
     debug(...args: string[]): void;
     info(...args: string[]): void;
     warn(...args: string[]): void;
