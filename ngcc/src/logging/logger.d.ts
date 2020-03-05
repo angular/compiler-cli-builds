@@ -11,8 +11,15 @@
  * output from the standard ConsoleLogger.
  */
 export interface Logger {
+    level: LogLevel;
     debug(...args: string[]): void;
     info(...args: string[]): void;
     warn(...args: string[]): void;
     error(...args: string[]): void;
+}
+export declare enum LogLevel {
+    debug = 0,
+    info = 1,
+    warn = 2,
+    error = 3
 }
