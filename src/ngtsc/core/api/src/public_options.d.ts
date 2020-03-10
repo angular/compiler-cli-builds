@@ -5,58 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/core/api" />
-import * as ts from 'typescript';
-/**
- * A host backed by a build system which has a unified view of the module namespace.
- *
- * Such a build system supports the `fileNameToModuleName` method provided by certain build system
- * integrations (such as the integration with Bazel). See the docs on `fileNameToModuleName` for
- * more details.
- */
-export interface UnifiedModulesHost {
-    /**
-     * Converts a file path to a module name that can be used as an `import ...`.
-     *
-     * For example, such a host might determine that `/absolute/path/to/monorepo/lib/importedFile.ts`
-     * should be imported using a module specifier of `monorepo/lib/importedFile`.
-     */
-    fileNameToModuleName(importedFilePath: string, containingFilePath: string): string;
-}
-/**
- * A host which additionally tracks and produces "resources" (HTML templates, CSS
- * files, etc).
- */
-export interface ResourceHost {
-    /**
-     * Converts a file path for a resource that is used in a source file or another resource
-     * into a filepath.
-     */
-    resourceNameToFileName(resourceName: string, containingFilePath: string): string | null;
-    /**
-     * Load a referenced resource either statically or asynchronously. If the host returns a
-     * `Promise<string>` it is assumed the user of the corresponding `Program` will call
-     * `loadNgStructureAsync()`. Returning  `Promise<string>` outside `loadNgStructureAsync()` will
-     * cause a diagnostics diagnostic error or an exception to be thrown.
-     */
-    readResource(fileName: string): Promise<string> | string;
-    /**
-     * Get the absolute paths to the changed files that triggered the current compilation
-     * or `undefined` if this is not an incremental build.
-     */
-    getModifiedResourceFiles?(): Set<string> | undefined;
-}
-/**
- * A `ts.CompilerHost` interface which supports some number of optional methods in addition to the
- * core interface.
- */
-export interface ExtendedTsCompilerHost extends ts.CompilerHost, Partial<ResourceHost>, Partial<UnifiedModulesHost> {
-}
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/core/api/src/public_options" />
 /**
  * Options supported by the legacy View Engine compiler, which are still consumed by the Angular Ivy
  * compiler for backwards compatibility.
  *
  * These are expected to be removed at some point in the future.
+ *
+ * @publicApi
  */
 export interface LegacyNgcOptions {
     /** generate all possible generated files  */
@@ -122,6 +78,8 @@ export interface LegacyNgcOptions {
  * existing View Engine applications.
  *
  * These are expected to be removed at some point in the future.
+ *
+ * @publicApi
  */
 export interface NgcCompatibilityOptions {
     /**
@@ -153,6 +111,8 @@ export interface NgcCompatibilityOptions {
 }
 /**
  * Options related to template type-checking and its strictness.
+ *
+ * @publicApi
  */
 export interface StrictTemplateOptions {
     /**
@@ -265,6 +225,8 @@ export interface StrictTemplateOptions {
 /**
  * Options which control behavior useful for "monorepo" build cases using Bazel (such as the
  * internal Google monorepo, g3).
+ *
+ * @publicApi
  */
 export interface BazelAndG3Options {
     /**
@@ -304,6 +266,8 @@ export interface BazelAndG3Options {
 }
 /**
  * Options related to i18n compilation support.
+ *
+ * @publicApi
  */
 export interface I18nOptions {
     /**
@@ -327,49 +291,18 @@ export interface I18nOptions {
     i18nUseExternalIds?: boolean;
 }
 /**
- * Non-public options which are useful during testing of the compiler.
- */
-export interface TestOnlyOptions {
-}
-/**
- * A merged interface of all of the various Angular compiler options, as well as the standard
- * `ts.CompilerOptions`.
+ * Miscellaneous options that don't fall into any other category
  *
- * Also includes a few miscellaneous options.
+ * @publicApi
  */
-export interface NgCompilerOptions extends ts.CompilerOptions, LegacyNgcOptions, BazelAndG3Options, NgcCompatibilityOptions, StrictTemplateOptions, TestOnlyOptions, I18nOptions {
+export interface MiscOptions {
     /**
      * Whether the compiler should avoid generating code for classes that haven't been exported.
      * This is only active when building with `enableIvy: true`. Defaults to `true`.
      */
     compileNonExportedClasses?: boolean;
     /**
-     * Whether to remove blank text nodes from compiled templates. It is `false` by default starting
-     * from Angular 6.
-     */
-    preserveWhitespaces?: boolean;
-    /**
      * Disable TypeScript Version Check.
      */
     disableTypeScriptVersionCheck?: boolean;
-    /** An option to enable ngtsc's internal performance tracing.
-     *
-     * This should be a path to a JSON file where trace information will be written. An optional 'ts:'
-     * prefix will cause the trace to be written via the TS host instead of directly to the filesystem
-     * (not all hosts support this mode of operation).
-     *
-     * This is currently not exposed to users as the trace format is still unstable.
-     */
-    tracePerformance?: string;
-}
-export interface LazyRoute {
-    route: string;
-    module: {
-        name: string;
-        filePath: string;
-    };
-    referencedModule: {
-        name: string;
-        filePath: string;
-    };
 }
