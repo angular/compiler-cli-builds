@@ -72,6 +72,7 @@ export declare const Decorator: {
 export declare type DecoratorIdentifier = ts.Identifier | NamespacedIdentifier;
 export declare type NamespacedIdentifier = ts.PropertyAccessExpression & {
     expression: ts.Identifier;
+    name: ts.Identifier;
 };
 export declare function isDecoratorIdentifier(exp: ts.Expression): exp is DecoratorIdentifier;
 /**
