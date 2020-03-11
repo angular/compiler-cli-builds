@@ -6,23 +6,29 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/execution/single_process_executor" />
+import { SyncLocker } from '../locking/sync_locker';
 import { Logger } from '../logging/logger';
 import { PackageJsonUpdater } from '../writing/package_json_updater';
 import { AnalyzeEntryPointsFn, CreateCompileFn, Executor } from './api';
-import { LockFile } from './lock_file';
+export declare abstract class SingleProcessorExecutorBase {
+    private logger;
+    private pkgJsonUpdater;
+    constructor(logger: Logger, pkgJsonUpdater: PackageJsonUpdater);
+    doExecute(analyzeEntryPoints: AnalyzeEntryPointsFn, createCompileFn: CreateCompileFn): void | Promise<void>;
+}
 /**
  * An `Executor` that processes all tasks serially and completes synchronously.
  */
-export declare class SingleProcessExecutor implements Executor {
-    private logger;
-    private pkgJsonUpdater;
+export declare class SingleProcessExecutorSync extends SingleProcessorExecutorBase implements Executor {
     private lockFile;
-    constructor(logger: Logger, pkgJsonUpdater: PackageJsonUpdater, lockFile: LockFile);
+    constructor(logger: Logger, pkgJsonUpdater: PackageJsonUpdater, lockFile: SyncLocker);
     execute(analyzeEntryPoints: AnalyzeEntryPointsFn, createCompileFn: CreateCompileFn): void;
 }
 /**
  * An `Executor` that processes all tasks serially, but still completes asynchronously.
  */
-export declare class AsyncSingleProcessExecutor extends SingleProcessExecutor {
-    execute(...args: Parameters<Executor['execute']>): Promise<void>;
+export declare class SingleProcessExecutorAsync extends SingleProcessorExecutorBase implements Executor {
+    private lockFile;
+    constructor(logger: Logger, pkgJsonUpdater: PackageJsonUpdater, lockFile: SyncLocker);
+    execute(analyzeEntryPoints: AnalyzeEntryPointsFn, createCompileFn: CreateCompileFn): Promise<void>;
 }
