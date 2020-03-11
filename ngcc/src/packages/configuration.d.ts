@@ -115,6 +115,7 @@ export declare class NgccConfiguration {
     private defaultConfig;
     private projectConfig;
     private cache;
+    readonly hash: string;
     constructor(fs: FileSystem, baseDir: AbsoluteFsPath);
     /**
      * Get a configuration for the given `version` of a package at `packagePath`.
@@ -130,5 +131,6 @@ export declare class NgccConfiguration {
     private evalSrcFile;
     private processEntryPoints;
     private splitPathAndVersion;
+    private computeHash;
 }
 export {};
