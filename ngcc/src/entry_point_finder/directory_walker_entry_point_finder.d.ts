@@ -11,6 +11,7 @@ import { DependencyResolver, SortedEntryPointsInfo } from '../dependencies/depen
 import { Logger } from '../logging/logger';
 import { NgccConfiguration } from '../packages/configuration';
 import { EntryPoint } from '../packages/entry_point';
+import { EntryPointManifest } from '../packages/entry_point_manifest';
 import { PathMappings } from '../utils';
 import { EntryPointFinder } from './interface';
 /**
@@ -22,10 +23,11 @@ export declare class DirectoryWalkerEntryPointFinder implements EntryPointFinder
     private config;
     private logger;
     private resolver;
+    private entryPointManifest;
     private sourceDirectory;
     private pathMappings;
     private basePaths;
-    constructor(fs: FileSystem, config: NgccConfiguration, logger: Logger, resolver: DependencyResolver, sourceDirectory: AbsoluteFsPath, pathMappings: PathMappings | undefined);
+    constructor(fs: FileSystem, config: NgccConfiguration, logger: Logger, resolver: DependencyResolver, entryPointManifest: EntryPointManifest, sourceDirectory: AbsoluteFsPath, pathMappings: PathMappings | undefined);
     /**
      * Search the `sourceDirectory`, and sub-directories, using `pathMappings` as necessary, to find
      * all package entry-points.

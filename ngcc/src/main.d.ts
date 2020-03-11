@@ -69,6 +69,14 @@ export interface SyncNgccOptions {
      * legacy message ids will all be stripped during translation.
      */
     enableI18nLegacyMessageIdFormat?: boolean;
+    /**
+     * Whether to invalidate any entry-point manifest file that is on disk. Instead, walk the
+     * directory tree looking for entry-points, and then write a new entry-point manifest, if
+     * possible.
+     *
+     * Default: `false` (i.e. the manifest will be used if available)
+     */
+    invalidateEntryPointManifest?: boolean;
 }
 /**
  * The options to configure the ngcc compiler for asynchronous execution.
