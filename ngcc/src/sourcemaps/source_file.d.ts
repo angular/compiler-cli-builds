@@ -22,7 +22,7 @@ export declare class SourceFile {
      * pure original source files).
      */
     readonly flattenedMappings: Mapping[];
-    readonly lineLengths: number[];
+    readonly startOfLinePositions: number[];
     constructor(
     /** The path to this source file. */
     sourcePath: AbsoluteFsPath, 
@@ -45,6 +45,18 @@ export declare class SourceFile {
     private flattenMappings;
 }
 /**
+ *
+ * @param mappings The collection of mappings whose segment-markers we are searching.
+ * @param marker The segment-marker to match against those of the given `mappings`.
+ * @param exclusive If exclusive then we must find a mapping with a segment-marker that is
+ * exclusively earlier than the given `marker`.
+ * If not exclusive then we can return the highest mappings with an equivalent segment-marker to the
+ * given `marker`.
+ * @param lowerIndex If provided, this is used as a hint that the marker we are searching for has an
+ * index that is no lower than this.
+ */
+export declare function findLastMappingIndexBefore(mappings: Mapping[], marker: SegmentMarker, exclusive: boolean, lowerIndex: number): number;
+/**
  * A Mapping consists of two segment markers: one in the generated source and one in the original
  * source, which indicate the start of each segment. The end of a segment is indicated by the first
  * segment marker of another mapping whose start is greater or equal to this one.
@@ -65,6 +77,21 @@ export declare function mergeMappings(generatedSource: SourceFile, ab: Mapping, 
  * Parse the `rawMappings` into an array of parsed mappings, which reference source-files provided
  * in the `sources` parameter.
  */
-export declare function parseMappings(rawMap: RawSourceMap | null, sources: (SourceFile | null)[]): Mapping[];
-export declare function extractOriginalSegments(mappings: Mapping[]): SegmentMarker[];
-export declare function computeLineLengths(str: string): number[];
+export declare function parseMappings(rawMap: RawSourceMap | null, sources: (SourceFile | null)[], generatedSourceStartOfLinePositions: number[]): Mapping[];
+/**
+ * Extract the segment markers from the original source files in each mapping of an array of
+ * `mappings`.
+ *
+ * @param mappings The mappings whose original segments we want to extract
+ * @returns Return a map from original source-files (referenced in the `mappings`) to arrays of
+ * segment-markers sorted by their order in their source file.
+ */
+export declare function extractOriginalSegments(mappings: Mapping[]): Map<SourceFile, SegmentMarker[]>;
+/**
+ * Update the original segments of each of the given `mappings` to include a link to the next
+ * segment in the source file.
+ *
+ * @param mappings the mappings whose segments should be updated
+ */
+export declare function ensureOriginalSegmentLinks(mappings: Mapping[]): void;
+export declare function computeStartOfLinePositions(str: string): number[];

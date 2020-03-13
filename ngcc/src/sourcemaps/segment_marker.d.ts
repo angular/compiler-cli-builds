@@ -15,6 +15,8 @@
 export interface SegmentMarker {
     readonly line: number;
     readonly column: number;
+    readonly position: number;
+    next: SegmentMarker | undefined;
 }
 /**
  * Compare two segment-markers, for use in a search or sorting algorithm.
@@ -24,21 +26,11 @@ export interface SegmentMarker {
  */
 export declare function compareSegments(a: SegmentMarker, b: SegmentMarker): number;
 /**
- * Compute the difference between two segment markers in a source file.
- *
- * @param lineLengths the lengths of each line of content of the source file where we are computing
- * the difference
- * @param a the start marker
- * @param b the end marker
- * @returns the number of characters between the two segments `a` and `b`
- */
-export declare function segmentDiff(lineLengths: number[], a: SegmentMarker, b: SegmentMarker): number;
-/**
  * Return a new segment-marker that is offset by the given number of characters.
  *
- * @param lineLengths The length of each line in the source file whose segment-marker we are
- * offsetting.
- * @param marker The segment to offset.
- * @param offset The number of character to offset by.
+ * @param startOfLinePositions the position of the start of each line of content of the source file
+ * whose segment-marker we are offsetting.
+ * @param marker the segment to offset.
+ * @param offset the number of character to offset by.
  */
-export declare function offsetSegment(lineLengths: number[], marker: SegmentMarker, offset: number): SegmentMarker;
+export declare function offsetSegment(startOfLinePositions: number[], marker: SegmentMarker, offset: number): SegmentMarker;
