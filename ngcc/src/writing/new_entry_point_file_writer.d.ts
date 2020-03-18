@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
+import { Logger } from '../logging/logger';
 import { EntryPoint, EntryPointJsonProperty } from '../packages/entry_point';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
 import { FileToWrite } from '../rendering/utils';
@@ -24,7 +25,7 @@ export declare const NGCC_PROPERTY_EXTENSION = "_ivy_ngcc";
  */
 export declare class NewEntryPointFileWriter extends InPlaceFileWriter {
     private pkgJsonUpdater;
-    constructor(fs: FileSystem, pkgJsonUpdater: PackageJsonUpdater);
+    constructor(fs: FileSystem, logger: Logger, errorOnFailedEntryPoint: boolean, pkgJsonUpdater: PackageJsonUpdater);
     writeBundle(bundle: EntryPointBundle, transformedFiles: FileToWrite[], formatProperties: EntryPointJsonProperty[]): void;
     protected copyBundle(bundle: EntryPointBundle, packagePath: AbsoluteFsPath, ngccFolder: AbsoluteFsPath): void;
     protected writeFile(file: FileToWrite, packagePath: AbsoluteFsPath, ngccFolder: AbsoluteFsPath): void;

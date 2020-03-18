@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/execution/task_selection/serial_task_queue" />
+/// <amd-module name="@angular/compiler-cli/ngcc/src/execution/tasks/queues/serial_task_queue" />
 import { Task } from '../api';
 import { BaseTaskQueue } from './base_task_queue';
 /**
@@ -13,5 +13,5 @@ import { BaseTaskQueue } from './base_task_queue';
  * before requesting the next one.
  */
 export declare class SerialTaskQueue extends BaseTaskQueue {
-    getNextTask(): Task | null;
+    computeNextTask(): Task | null;
 }
