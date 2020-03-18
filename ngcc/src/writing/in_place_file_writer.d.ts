@@ -7,6 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { FileSystem } from '../../../src/ngtsc/file_system';
+import { Logger } from '../logging/logger';
 import { EntryPointJsonProperty } from '../packages/entry_point';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
 import { FileToWrite } from '../rendering/utils';
@@ -18,7 +19,9 @@ export declare const NGCC_BACKUP_EXTENSION = ".__ivy_ngcc_bak";
  */
 export declare class InPlaceFileWriter implements FileWriter {
     protected fs: FileSystem;
-    constructor(fs: FileSystem);
+    protected logger: Logger;
+    protected errorOnFailedEntryPoint: boolean;
+    constructor(fs: FileSystem, logger: Logger, errorOnFailedEntryPoint: boolean);
     writeBundle(_bundle: EntryPointBundle, transformedFiles: FileToWrite[], _formatProperties?: EntryPointJsonProperty[]): void;
     protected writeFileAndBackup(file: FileToWrite): void;
 }
