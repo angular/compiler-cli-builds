@@ -9,7 +9,6 @@
 import { Logger } from '../../logging/logger';
 import { PackageJsonUpdater } from '../../writing/package_json_updater';
 import { AnalyzeEntryPointsFn } from '../api';
-import { CreateTaskCompletedCallback } from '../tasks/api';
 /**
  * The cluster master is responsible for analyzing all entry-points, planning the work that needs to
  * be done, distributing it to worker-processes and collecting/post-processing the results.
@@ -22,8 +21,7 @@ export declare class ClusterMaster {
     private processingStartTime;
     private taskAssignments;
     private taskQueue;
-    private onTaskCompleted;
-    constructor(workerCount: number, logger: Logger, pkgJsonUpdater: PackageJsonUpdater, analyzeEntryPoints: AnalyzeEntryPointsFn, createTaskCompletedCallback: CreateTaskCompletedCallback);
+    constructor(workerCount: number, logger: Logger, pkgJsonUpdater: PackageJsonUpdater, analyzeEntryPoints: AnalyzeEntryPointsFn);
     run(): Promise<void>;
     /** Try to find available (idle) workers and assign them available (non-blocked) tasks. */
     private maybeDistributeWork;
