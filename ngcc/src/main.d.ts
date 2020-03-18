@@ -20,6 +20,8 @@ export interface SyncNgccOptions {
      * `basePath`.
      *
      * All its dependencies will need to be processed too.
+     *
+     * If this property is provided then `errorOnFailedEntryPoint` is forced to true.
      */
     targetEntryPointPath?: string;
     /**
@@ -57,6 +59,17 @@ export interface SyncNgccOptions {
      * Default: `false` (i.e. run synchronously)
      */
     async?: false;
+    /**
+     * Set to true in order to terminate immediately with an error code if an entry-point fails to be
+     * processed.
+     *
+     * If `targetEntryPointPath` is provided then this property is always true and cannot be
+     * changed. Otherwise the default is false.
+     *
+     * When set to false, ngcc will continue to process entry-points after a failure. In which case it
+     * will log an error and resume processing other entry-points.
+     */
+    errorOnFailedEntryPoint?: boolean;
     /**
      * Render `$localize` messages with legacy format ids.
      *
