@@ -46,9 +46,6 @@ export interface SyncNgccOptions {
     /**
      * Paths mapping configuration (`paths` and `baseUrl`), as found in `ts.CompilerOptions`.
      * These are used to resolve paths to locally built Angular libraries.
-     *
-     * Note that `pathMappings` specified here take precedence over any `pathMappings` loaded from a
-     * TS config file.
      */
     pathMappings?: PathMappings;
     /**
@@ -93,17 +90,6 @@ export interface SyncNgccOptions {
      * Default: `false` (i.e. the manifest will be used if available)
      */
     invalidateEntryPointManifest?: boolean;
-    /**
-     * An absolute path to a TS config file (e.g. `tsconfig.json`) or a directory containing one, that
-     * will be used to configure module resolution with things like path mappings, if not specified
-     * explicitly via the `pathMappings` property to `mainNgcc`.
-     *
-     * If `undefined`, ngcc will attempt to load a `tsconfig.json` file from the directory above the
-     * `basePath`.
-     *
-     * If `null`, ngcc will not attempt to load any TS config file at all.
-     */
-    tsConfigPath?: string | null;
 }
 /**
  * The options to configure the ngcc compiler for asynchronous execution.
