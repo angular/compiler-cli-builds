@@ -96,7 +96,8 @@ export declare function readBaseClass(node: ClassDeclaration, reflector: Reflect
 /**
  * Wraps all functions in a given expression in parentheses. This is needed to avoid problems
  * where Tsickle annotations added between analyse and transform phases in Angular may trigger
- * automatic semicolon insertion, e.g. if a function is the expression in a `return` statement. More
+ * automatic semicolon insertion, e.g. if a function is the expression in a `return` statement.
+ * More
  * info can be found in Tsickle source code here:
  * https://github.com/angular/tsickle/blob/d7974262571c8a17d684e5ba07680e1b1993afdd/src/jsdoc_transformer.ts#L1021
  *
