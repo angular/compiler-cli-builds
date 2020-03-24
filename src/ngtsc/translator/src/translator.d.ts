@@ -61,7 +61,7 @@ export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVis
     visitInvokeMethodExpr(ast: InvokeMethodExpr, context: Context): never;
     visitInvokeFunctionExpr(ast: InvokeFunctionExpr, context: Context): never;
     visitInstantiateExpr(ast: InstantiateExpr, context: Context): never;
-    visitLiteralExpr(ast: LiteralExpr, context: Context): ts.LiteralTypeNode;
+    visitLiteralExpr(ast: LiteralExpr, context: Context): ts.TypeNode;
     visitLocalizedString(ast: LocalizedString, context: Context): never;
     visitExternalExpr(ast: ExternalExpr, context: Context): ts.EntityName | ts.TypeReferenceNode;
     visitConditionalExpr(ast: ConditionalExpr, context: Context): void;

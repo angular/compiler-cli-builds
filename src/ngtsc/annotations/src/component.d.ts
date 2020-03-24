@@ -152,6 +152,10 @@ export interface ParsedTemplate {
      */
     styles: string[];
     /**
+     * Any ng-content selectors extracted from the template.
+     */
+    ngContentSelectors: string[];
+    /**
      * Whether the template was inline.
      */
     isInline: boolean;
