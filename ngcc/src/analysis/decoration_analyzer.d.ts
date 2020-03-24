@@ -1,5 +1,6 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/analysis/decoration_analyzer" />
 import * as ts from 'typescript';
+import { ParsedConfiguration } from '../../..';
 import { ReferencesRegistry, ResourceLoader } from '../../../src/ngtsc/annotations';
 import { CycleAnalyzer, ImportGraph } from '../../../src/ngtsc/cycles';
 import { FileSystem } from '../../../src/ngtsc/file_system';
@@ -33,6 +34,7 @@ export declare class DecorationAnalyzer {
     private reflectionHost;
     private referencesRegistry;
     private diagnosticHandler;
+    private tsConfig;
     private program;
     private options;
     private host;
@@ -40,6 +42,7 @@ export declare class DecorationAnalyzer {
     private rootDirs;
     private packagePath;
     private isCore;
+    private compilerOptions;
     moduleResolver: ModuleResolver;
     resourceManager: NgccResourceLoader;
     metaRegistry: LocalMetadataRegistry;
@@ -57,7 +60,7 @@ export declare class DecorationAnalyzer {
     handlers: DecoratorHandler<unknown, unknown, unknown>[];
     compiler: NgccTraitCompiler;
     migrations: Migration[];
-    constructor(fs: FileSystem, bundle: EntryPointBundle, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, diagnosticHandler?: (error: ts.Diagnostic) => void);
+    constructor(fs: FileSystem, bundle: EntryPointBundle, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, diagnosticHandler?: (error: ts.Diagnostic) => void, tsConfig?: ParsedConfiguration | null);
     /**
      * Analyze a program to find all the decorated files should be transformed.
      *
