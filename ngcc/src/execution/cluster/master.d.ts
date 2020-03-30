@@ -15,7 +15,7 @@ import { CreateTaskCompletedCallback } from '../tasks/api';
  * be done, distributing it to worker-processes and collecting/post-processing the results.
  */
 export declare class ClusterMaster {
-    private workerCount;
+    private maxWorkerCount;
     private logger;
     private pkgJsonUpdater;
     private finishedDeferred;
@@ -23,7 +23,7 @@ export declare class ClusterMaster {
     private taskAssignments;
     private taskQueue;
     private onTaskCompleted;
-    constructor(workerCount: number, logger: Logger, pkgJsonUpdater: PackageJsonUpdater, analyzeEntryPoints: AnalyzeEntryPointsFn, createTaskCompletedCallback: CreateTaskCompletedCallback);
+    constructor(maxWorkerCount: number, logger: Logger, pkgJsonUpdater: PackageJsonUpdater, analyzeEntryPoints: AnalyzeEntryPointsFn, createTaskCompletedCallback: CreateTaskCompletedCallback);
     run(): Promise<void>;
     /** Try to find available (idle) workers and assign them available (non-blocked) tasks. */
     private maybeDistributeWork;
