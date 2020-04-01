@@ -16,4 +16,4 @@ import * as ts from 'typescript';
  * - updates generated files that are not in the given map of generatedFiles to have an empty
  *   list of statements as their body.
  */
-export declare function getAngularEmitterTransformFactory(generatedFiles: Map<string, GeneratedFile>, program: ts.Program): () => (sourceFile: ts.SourceFile) => ts.SourceFile;
+export declare function getAngularEmitterTransformFactory(generatedFiles: Map<string, GeneratedFile>, program: ts.Program, annotateForClosureCompiler: boolean): () => (sourceFile: ts.SourceFile) => ts.SourceFile;
