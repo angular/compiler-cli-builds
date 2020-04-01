@@ -34,22 +34,28 @@ export declare class DirectoryWalkerEntryPointFinder implements EntryPointFinder
      */
     findEntryPoints(): SortedEntryPointsInfo;
     /**
-     * Look for entry points that need to be compiled, starting at the source directory.
+     * Search the `basePath` for possible Angular packages and entry-points.
+     *
+     * @param basePath The path at which to start the search
+     * @returns an array of `EntryPoint`s that were found within `basePath`.
+     */
+    walkBasePathForPackages(basePath: AbsoluteFsPath): EntryPoint[];
+    /**
+     * Look for Angular packages that need to be compiled, starting at the source directory.
      * The function will recurse into directories that start with `@...`, e.g. `@angular/...`.
+     *
      * @param sourceDirectory An absolute path to the root directory where searching begins.
+     * @returns an array of `EntryPoint`s that were found within `sourceDirectory`.
      */
-    walkDirectoryForEntryPoints(sourceDirectory: AbsoluteFsPath): EntryPoint[];
+    walkDirectoryForPackages(sourceDirectory: AbsoluteFsPath): EntryPoint[];
     /**
-     * Recurse the folder structure looking for all the entry points
-     * @param packagePath The absolute path to an npm package that may contain entry points
-     * @returns An array of entry points that were discovered or null when it's not a valid entrypoint
+     * Search the `directory` looking for any secondary entry-points for a package, adding any that
+     * are found to the `entryPoints` array.
+     *
+     * @param entryPoints An array where we will add any entry-points found in this directory
+     * @param packagePath The absolute path to the package that may contain entry-points
+     * @param directory The current directory being searched
+     * @param paths The paths contained in the current `directory`.
      */
-    private getEntryPointsForPackage;
-    /**
-     * Recursively walk a directory and its sub-directories, applying a given
-     * function to each directory.
-     * @param dir the directory to recursively walk.
-     * @param fn the function to apply to each directory.
-     */
-    private walkDirectory;
+    private collectSecondaryEntryPoints;
 }
