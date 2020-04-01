@@ -13,6 +13,8 @@ export interface Node {
     sourceSpan: ParseSourceSpan | null;
 }
 export declare class TypeScriptNodeEmitter {
+    private annotateForClosureCompiler;
+    constructor(annotateForClosureCompiler: boolean);
     updateSourceFile(sourceFile: ts.SourceFile, stmts: Statement[], preamble?: string): [ts.SourceFile, Map<ts.Node, Node>];
     /** Creates a not emitted statement containing the given comment. */
     createCommentStatement(sourceFile: ts.SourceFile, comment: string): ts.Statement;
@@ -25,7 +27,7 @@ export declare class TypeScriptNodeEmitter {
  * and the included members are added to the class with the same name instead of a new class
  * being created.
  */
-export declare function updateSourceFile(sourceFile: ts.SourceFile, module: PartialModule, context: ts.TransformationContext): [ts.SourceFile, Map<ts.Node, Node>];
+export declare function updateSourceFile(sourceFile: ts.SourceFile, module: PartialModule, annotateForClosureCompiler: boolean): [ts.SourceFile, Map<ts.Node, Node>];
 export declare type RecordedNode<T extends ts.Node = ts.Node> = (T & {
     __recorded: any;
 }) | null;
@@ -33,11 +35,13 @@ export declare type RecordedNode<T extends ts.Node = ts.Node> = (T & {
  * Visits an output ast and produces the corresponding TypeScript synthetic nodes.
  */
 export declare class NodeEmitterVisitor implements StatementVisitor, ExpressionVisitor {
+    private annotateForClosureCompiler;
     private _nodeMap;
     private _importsWithPrefixes;
     private _reexports;
     private _templateSources;
     private _exportedVariableIdentifiers;
+    constructor(annotateForClosureCompiler: boolean);
     /**
      * Process the source file and collect exported identifiers that refer to variables.
      *
