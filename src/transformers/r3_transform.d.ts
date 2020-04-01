@@ -13,4 +13,4 @@ export declare type TransformerFactory = (context: ts.TransformationContext) => 
 /**
  * Returns a transformer that adds the requested static methods specified by modules.
  */
-export declare function getAngularClassTransformerFactory(modules: PartialModule[]): TransformerFactory;
+export declare function getAngularClassTransformerFactory(modules: PartialModule[], annotateForClosureCompiler: boolean): TransformerFactory;
