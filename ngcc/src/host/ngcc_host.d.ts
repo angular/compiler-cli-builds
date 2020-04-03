@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { ClassDeclaration, ConcreteDeclaration, Decorator, ReflectionHost } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, ConcreteDeclaration, Declaration, Decorator, ReflectionHost } from '../../../src/ngtsc/reflection';
 export declare const PRE_R3_MARKER = "__PRE_R3__";
 export declare const POST_R3_MARKER = "__POST_R3__";
 export declare type SwitchableVariableDeclaration = ts.VariableDeclaration & {
@@ -115,4 +115,12 @@ export interface NgccReflectionHost extends ReflectionHost {
      * @param classSymbol The class whose statements we want.
      */
     getEndOfClass(classSymbol: NgccClassSymbol): ts.Node;
+    /**
+     * Check whether a `Declaration` corresponds with a known declaration and set its `known` property
+     * to the appropriate `KnownDeclaration`.
+     *
+     * @param decl The `Declaration` to check or `null` if there is no declaration.
+     * @return The passed in `Declaration` (potentially enhanced with a `KnownDeclaration`).
+     */
+    detectKnownDeclaration<T extends Declaration>(decl: T | null): T | null;
 }

@@ -267,6 +267,21 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     getModuleWithProvidersFunctions(f: ts.SourceFile): ModuleWithProvidersFunction[];
     getEndOfClass(classSymbol: NgccClassSymbol): ts.Node;
     /**
+     * Check whether a `Declaration` corresponds with a known declaration, such as `Object`, and set
+     * its `known` property to the appropriate `KnownDeclaration`.
+     *
+     * @param decl The `Declaration` to check.
+     * @return The passed in `Declaration` (potentially enhanced with a `KnownDeclaration`).
+     */
+    detectKnownDeclaration(decl: null): null;
+    detectKnownDeclaration<T extends Declaration>(decl: T): T;
+    detectKnownDeclaration<T extends Declaration>(decl: T | null): T | null;
+    /**
+     * Resolve a `ts.Symbol` to its declaration and detect whether it corresponds with a known
+     * declaration.
+     */
+    protected getDeclarationOfSymbol(symbol: ts.Symbol, originalId: ts.Identifier | null): Declaration | null;
+    /**
      * Finds the identifier of the actual class declaration for a potentially aliased declaration of a
      * class.
      *
@@ -295,7 +310,8 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param statement The statement that needs to be preprocessed.
      */
     protected preprocessStatement(statement: ts.Statement): void;
-    /** Get the top level statements for a module.
+    /**
+     * Get the top level statements for a module.
      *
      * In ES5 and ES2015 this is just the top level statements of the file.
      * @param sourceFile The module whose statements we want.

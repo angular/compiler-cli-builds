@@ -94,10 +94,15 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      */
     getDefinitionOfFunction(node: ts.Node): FunctionDefinition | null;
     /**
-     * Resolve a `ts.Symbol` to its declaration and detect whether it corresponds with a known
-     * TypeScript helper function.
+     * Check whether a `Declaration` corresponds with a known declaration, such as a TypeScript helper
+     * function, and set its `known` property to the appropriate `KnownDeclaration`.
+     *
+     * @param decl The `Declaration` to check.
+     * @return The passed in `Declaration` (potentially enhanced with a `KnownDeclaration`).
      */
-    protected getDeclarationOfSymbol(symbol: ts.Symbol, originalId: ts.Identifier | null): Declaration | null;
+    detectKnownDeclaration(decl: null): null;
+    detectKnownDeclaration<T extends Declaration>(decl: T): T;
+    detectKnownDeclaration<T extends Declaration>(decl: T | null): T | null;
     /**
      * Get the inner function declaration of an ES5-style class.
      *
