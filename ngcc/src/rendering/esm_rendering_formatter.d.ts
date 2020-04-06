@@ -12,11 +12,11 @@ import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { Reexport } from '../../../src/ngtsc/imports';
 import { Import, ImportManager } from '../../../src/ngtsc/translator';
-import { CompiledClass } from '../analysis/types';
-import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
 import { ModuleWithProvidersInfo } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
-import { RenderingFormatter, RedundantDecoratorMap } from './rendering_formatter';
+import { CompiledClass } from '../analysis/types';
+import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
+import { RedundantDecoratorMap, RenderingFormatter } from './rendering_formatter';
 /**
  * A RenderingFormatter that works with ECMAScript Module import and export statements.
  */

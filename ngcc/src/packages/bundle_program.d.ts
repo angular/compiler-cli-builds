@@ -9,13 +9,13 @@
 import * as ts from 'typescript';
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 /**
-* An entry point bundle contains one or two programs, e.g. `src` and `dts`,
-* that are compiled via TypeScript.
-*
-* To aid with processing the program, this interface exposes the program itself,
-* as well as path and TS file of the entry-point to the program and the r3Symbols
-* file, if appropriate.
-*/
+ * An entry point bundle contains one or two programs, e.g. `src` and `dts`,
+ * that are compiled via TypeScript.
+ *
+ * To aid with processing the program, this interface exposes the program itself,
+ * as well as path and TS file of the entry-point to the program and the r3Symbols
+ * file, if appropriate.
+ */
 export interface BundleProgram {
     program: ts.Program;
     options: ts.CompilerOptions;

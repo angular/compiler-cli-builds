@@ -1,6 +1,6 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/rendering/commonjs_rendering_formatter" />
-import * as ts from 'typescript';
 import MagicString from 'magic-string';
+import * as ts from 'typescript';
 import { Reexport } from '../../../src/ngtsc/imports';
 import { Import, ImportManager } from '../../../src/ngtsc/translator';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
