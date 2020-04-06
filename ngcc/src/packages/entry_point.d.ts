@@ -36,6 +36,7 @@ export interface JsonObject {
     [key: string]: JsonValue;
 }
 export interface PackageJsonFormatPropertiesMap {
+    browser?: string;
     fesm2015?: string;
     fesm5?: string;
     es2015?: string;
