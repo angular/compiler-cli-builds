@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { LogLevel, Logger } from './logger';
+import { Logger, LogLevel } from './logger';
 export declare const DEBUG: string;
 export declare const WARN: string;
 export declare const ERROR: string;

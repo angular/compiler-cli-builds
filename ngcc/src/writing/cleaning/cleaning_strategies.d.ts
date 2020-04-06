@@ -8,8 +8,8 @@
  */
 import { AbsoluteFsPath, FileSystem, PathSegment } from '../../../../src/ngtsc/file_system';
 /**
-* Implement this interface to extend the cleaning strategies of the `PackageCleaner`.
-*/
+ * Implement this interface to extend the cleaning strategies of the `PackageCleaner`.
+ */
 export interface CleaningStrategy {
     canClean(path: AbsoluteFsPath, basename: PathSegment): boolean;
     clean(path: AbsoluteFsPath, basename: PathSegment): void;
