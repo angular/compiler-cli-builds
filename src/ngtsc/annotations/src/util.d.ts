@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/util" />
-import { Expression, R3DependencyMetadata, R3Reference, WrappedNodeExpr } from '@angular/compiler';
+import { Expression, ParseSourceSpan, R3DependencyMetadata, R3Reference, WrappedNodeExpr } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { ForeignFunctionResolver, PartialEvaluator } from '../../partial_evaluator';
@@ -125,3 +125,5 @@ export declare function resolveProvidersRequiringFactory(rawProviders: ts.Expres
  * The `type` is an expression that would be used by ngcc in the typings (.d.ts) files.
  */
 export declare function wrapTypeReference(reflector: ReflectionHost, clazz: ClassDeclaration): R3Reference;
+/** Creates a ParseSourceSpan for a TypeScript node. */
+export declare function createSourceSpan(node: ts.Node): ParseSourceSpan;

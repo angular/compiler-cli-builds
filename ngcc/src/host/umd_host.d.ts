@@ -24,7 +24,8 @@ export declare class UmdReflectionHost extends Esm5ReflectionHost {
     getExportsOfModule(module: ts.Node): Map<string, Declaration> | null;
     getUmdModule(sourceFile: ts.SourceFile): UmdModule | null;
     getUmdImportPath(importParameter: ts.ParameterDeclaration): string | null;
-    /** Get the top level statements for a module.
+    /**
+     * Get the top level statements for a module.
      *
      * In UMD modules these are the body of the UMD factory function.
      *

@@ -1,11 +1,11 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/rendering/umd_rendering_formatter" />
-import * as ts from 'typescript';
 import MagicString from 'magic-string';
+import * as ts from 'typescript';
+import { Reexport } from '../../../src/ngtsc/imports';
 import { Import, ImportManager } from '../../../src/ngtsc/translator';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { UmdReflectionHost } from '../host/umd_host';
 import { Esm5RenderingFormatter } from './esm5_rendering_formatter';
-import { Reexport } from '../../../src/ngtsc/imports';
 /**
  * A RenderingFormatter that works with UMD files, instead of `import` and `export` statements
  * the module is an IIFE with a factory function call with dependencies, which are defined in a

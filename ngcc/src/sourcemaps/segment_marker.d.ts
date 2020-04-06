@@ -7,11 +7,11 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/sourcemaps/segment_marker" />
 /**
-* A marker that indicates the start of a segment in a mapping.
-*
-* The end of a segment is indicated by the the first segment-marker of another mapping whose start
-* is greater or equal to this one.
-*/
+ * A marker that indicates the start of a segment in a mapping.
+ *
+ * The end of a segment is indicated by the the first segment-marker of another mapping whose start
+ * is greater or equal to this one.
+ */
 export interface SegmentMarker {
     readonly line: number;
     readonly column: number;
