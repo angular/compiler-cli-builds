@@ -55,7 +55,8 @@ export declare type PathMappings = {
 /**
  * Test whether a path is "relative".
  *
- * Relative paths start with `/`, `./` or `../`; or are simply `.` or `..`.
+ * Relative paths start with `/`, `./` or `../` (or the Windows equivalents); or are simply `.` or
+ * `..`.
  */
 export declare function isRelativePath(path: string): boolean;
 /**
