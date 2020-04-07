@@ -19,8 +19,8 @@ export declare function absoluteFrom(path: string): AbsoluteFsPath;
  */
 export declare function absoluteFromSourceFile(sf: ts.SourceFile): AbsoluteFsPath;
 /**
-* Convert the path `path` to a `PathSegment`, throwing an error if it's not a relative path.
-*/
+ * Convert the path `path` to a `PathSegment`, throwing an error if it's not a relative path.
+ */
 export declare function relativeFrom(path: string): PathSegment;
 /**
  * Static access to `dirname`.
@@ -36,6 +36,10 @@ export declare function join<T extends PathString>(basePath: T, ...paths: string
 export declare function resolve(basePath: string, ...paths: string[]): AbsoluteFsPath;
 /** Returns true when the path provided is the root path. */
 export declare function isRoot(path: AbsoluteFsPath): boolean;
+/**
+ * Static access to `isRooted`.
+ */
+export declare function isRooted(path: string): boolean;
 /**
  * Static access to `relative`.
  */
