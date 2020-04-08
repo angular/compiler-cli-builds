@@ -12,7 +12,8 @@ import { BazelAndG3Options, I18nOptions, LegacyNgcOptions, MiscOptions, NgcCompa
  * Non-public options which are useful during testing of the compiler.
  */
 export interface TestOnlyOptions {
-    /** An option to enable ngtsc's internal performance tracing.
+    /**
+     * An option to enable ngtsc's internal performance tracing.
      *
      * This should be a path to a JSON file where trace information will be written. An optional 'ts:'
      * prefix will cause the trace to be written via the TS host instead of directly to the filesystem
