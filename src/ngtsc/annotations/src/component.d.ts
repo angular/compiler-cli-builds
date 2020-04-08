@@ -11,7 +11,7 @@ import { CycleAnalyzer } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
-import { InjectableClassRegistry, MetadataReader, MetadataRegistry, extractDirectiveGuards } from '../../metadata';
+import { extractDirectiveGuards, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry } from '../../scope';
