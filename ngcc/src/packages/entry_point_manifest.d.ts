@@ -1,8 +1,8 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point_manifest" />
-import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
+import { AbsoluteFsPath, FileSystem, PathSegment } from '../../../src/ngtsc/file_system';
+import { EntryPointWithDependencies } from '../dependencies/dependency_host';
 import { Logger } from '../logging/logger';
 import { NgccConfiguration } from './configuration';
-import { EntryPoint } from './entry_point';
 /**
  * Manages reading and writing a manifest file that contains a list of all the entry-points that
  * were found below a given basePath.
@@ -31,7 +31,7 @@ export declare class EntryPointManifest {
      * @returns an array of entry-point information for all entry-points found below the given
      * `basePath` or `null` if the manifest was out of date.
      */
-    readEntryPointsUsingManifest(basePath: AbsoluteFsPath): EntryPoint[] | null;
+    readEntryPointsUsingManifest(basePath: AbsoluteFsPath): EntryPointWithDependencies[] | null;
     /**
      * Write a manifest file at the given `basePath`.
      *
@@ -42,7 +42,7 @@ export declare class EntryPointManifest {
      * @param basePath The path where the manifest file is to be written.
      * @param entryPoints A collection of entry-points to record in the manifest.
      */
-    writeEntryPointManifest(basePath: AbsoluteFsPath, entryPoints: EntryPoint[]): void;
+    writeEntryPointManifest(basePath: AbsoluteFsPath, entryPoints: EntryPointWithDependencies[]): void;
     private getEntryPointManifestPath;
     private computeLockFileHash;
 }
@@ -51,12 +51,13 @@ export declare class EntryPointManifest {
  * current manifest file.
  *
  * It always returns `null` from the `readEntryPointsUsingManifest()` method, which forces a new
- * manifest to be created, which will overwrite the current file when `writeEntryPointManifest()` is
- * called.
+ * manifest to be created, which will overwrite the current file when `writeEntryPointManifest()`
+ * is called.
  */
 export declare class InvalidatingEntryPointManifest extends EntryPointManifest {
-    readEntryPointsUsingManifest(basePath: AbsoluteFsPath): EntryPoint[] | null;
+    readEntryPointsUsingManifest(_basePath: AbsoluteFsPath): EntryPointWithDependencies[] | null;
 }
+export declare type EntryPointPaths = [string, string, Array<AbsoluteFsPath>?, Array<AbsoluteFsPath | PathSegment>?, Array<AbsoluteFsPath>?];
 /**
  * The JSON format of the manifest file that is written to disk.
  */
@@ -64,5 +65,5 @@ export interface EntryPointManifestFile {
     ngccVersion: string;
     configFileHash: string;
     lockFileHash: string;
-    entryPointPaths: Array<[AbsoluteFsPath, AbsoluteFsPath]>;
+    entryPointPaths: EntryPointPaths[];
 }

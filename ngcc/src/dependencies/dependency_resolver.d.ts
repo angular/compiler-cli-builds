@@ -12,7 +12,7 @@ import { Logger } from '../logging/logger';
 import { NgccConfiguration } from '../packages/configuration';
 import { EntryPoint, EntryPointFormat } from '../packages/entry_point';
 import { PartiallyOrderedList } from '../utils';
-import { DependencyHost, DependencyInfo } from './dependency_host';
+import { DependencyHost, EntryPointWithDependencies } from './dependency_host';
 /**
  * Holds information about entry points that are removed because
  * they have dependencies that are missing (directly or transitively).
@@ -86,8 +86,8 @@ export declare class DependencyResolver {
      * @param target If provided, only return entry-points depended on by this entry-point.
      * @returns the result of sorting the entry points by dependency.
      */
-    sortEntryPointsByDependency(entryPoints: EntryPoint[], target?: EntryPoint): SortedEntryPointsInfo;
-    getEntryPointDependencies(entryPoint: EntryPoint): DependencyInfo;
+    sortEntryPointsByDependency(entryPoints: EntryPointWithDependencies[], target?: EntryPoint): SortedEntryPointsInfo;
+    getEntryPointWithDependencies(entryPoint: EntryPoint): EntryPointWithDependencies;
     /**
      * Computes a dependency graph of the given entry-points.
      *
