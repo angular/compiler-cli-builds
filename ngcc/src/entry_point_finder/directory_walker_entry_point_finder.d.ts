@@ -7,10 +7,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
-import { EntryPointWithDependencies } from '../dependencies/dependency_host';
 import { DependencyResolver, SortedEntryPointsInfo } from '../dependencies/dependency_resolver';
 import { Logger } from '../logging/logger';
 import { NgccConfiguration } from '../packages/configuration';
+import { EntryPoint } from '../packages/entry_point';
 import { EntryPointManifest } from '../packages/entry_point_manifest';
 import { PathMappings } from '../utils';
 import { EntryPointFinder } from './interface';
@@ -39,7 +39,7 @@ export declare class DirectoryWalkerEntryPointFinder implements EntryPointFinder
      * @param basePath The path at which to start the search
      * @returns an array of `EntryPoint`s that were found within `basePath`.
      */
-    walkBasePathForPackages(basePath: AbsoluteFsPath): EntryPointWithDependencies[];
+    walkBasePathForPackages(basePath: AbsoluteFsPath): EntryPoint[];
     /**
      * Look for Angular packages that need to be compiled, starting at the source directory.
      * The function will recurse into directories that start with `@...`, e.g. `@angular/...`.
@@ -47,7 +47,7 @@ export declare class DirectoryWalkerEntryPointFinder implements EntryPointFinder
      * @param sourceDirectory An absolute path to the root directory where searching begins.
      * @returns an array of `EntryPoint`s that were found within `sourceDirectory`.
      */
-    walkDirectoryForPackages(sourceDirectory: AbsoluteFsPath): EntryPointWithDependencies[];
+    walkDirectoryForPackages(sourceDirectory: AbsoluteFsPath): EntryPoint[];
     /**
      * Search the `directory` looking for any secondary entry-points for a package, adding any that
      * are found to the `entryPoints` array.
