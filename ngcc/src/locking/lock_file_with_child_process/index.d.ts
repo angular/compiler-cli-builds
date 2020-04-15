@@ -37,5 +37,5 @@ export declare class LockFileWithChildProcess implements LockFile {
     write(): void;
     read(): string;
     remove(): void;
-    protected createUnlocker(path: AbsoluteFsPath): ChildProcess;
+    protected createUnlocker(path: AbsoluteFsPath): ChildProcess | null;
 }
