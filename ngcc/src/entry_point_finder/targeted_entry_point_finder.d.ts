@@ -9,9 +9,9 @@
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { DependencyResolver, SortedEntryPointsInfo } from '../dependencies/dependency_resolver';
 import { Logger } from '../logging/logger';
+import { PathMappings } from '../ngcc_options';
 import { NgccConfiguration } from '../packages/configuration';
 import { EntryPointJsonProperty } from '../packages/entry_point';
-import { PathMappings } from '../utils';
 import { EntryPointFinder } from './interface';
 /**
  * An EntryPointFinder that starts from a target entry-point and only finds

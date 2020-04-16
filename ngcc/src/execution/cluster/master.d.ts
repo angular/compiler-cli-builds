@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/execution/cluster/master" />
+import { FileSystem } from '../../../../src/ngtsc/file_system';
 import { Logger } from '../../logging/logger';
 import { PackageJsonUpdater } from '../../writing/package_json_updater';
 import { AnalyzeEntryPointsFn } from '../api';
@@ -16,6 +17,7 @@ import { CreateTaskCompletedCallback } from '../tasks/api';
  */
 export declare class ClusterMaster {
     private maxWorkerCount;
+    private fileSystem;
     private logger;
     private pkgJsonUpdater;
     private finishedDeferred;
@@ -23,7 +25,7 @@ export declare class ClusterMaster {
     private taskAssignments;
     private taskQueue;
     private onTaskCompleted;
-    constructor(maxWorkerCount: number, logger: Logger, pkgJsonUpdater: PackageJsonUpdater, analyzeEntryPoints: AnalyzeEntryPointsFn, createTaskCompletedCallback: CreateTaskCompletedCallback);
+    constructor(maxWorkerCount: number, fileSystem: FileSystem, logger: Logger, pkgJsonUpdater: PackageJsonUpdater, analyzeEntryPoints: AnalyzeEntryPointsFn, createTaskCompletedCallback: CreateTaskCompletedCallback);
     run(): Promise<void>;
     /** Try to find available (idle) workers and assign them available (non-blocked) tasks. */
     private maybeDistributeWork;
