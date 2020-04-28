@@ -51,10 +51,10 @@ export declare class ResolvedModule {
  * Contains a `Reference` to the enumeration itself, and the name of the referenced member.
  */
 export declare class EnumValue {
-    readonly enumRef: Reference<ts.EnumDeclaration>;
+    readonly enumRef: Reference<ts.Declaration>;
     readonly name: string;
     readonly resolved: ResolvedValue;
-    constructor(enumRef: Reference<ts.EnumDeclaration>, name: string, resolved: ResolvedValue);
+    constructor(enumRef: Reference<ts.Declaration>, name: string, resolved: ResolvedValue);
 }
 /**
  * An implementation of a known function that can be statically evaluated.

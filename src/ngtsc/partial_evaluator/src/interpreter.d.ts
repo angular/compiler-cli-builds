@@ -56,6 +56,7 @@ export declare class StaticInterpreter {
     private evaluateFunctionArguments;
     private visitSpreadElement;
     private stringNameFromPropertyName;
+    private getResolvedEnum;
     private getReference;
 }
 export {};
