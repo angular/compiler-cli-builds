@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm2015_host" />
 import * as ts from 'typescript';
-import { ClassDeclaration, ClassMember, ClassMemberKind, CtorParameter, Declaration, Decorator, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, ClassMember, ClassMemberKind, CtorParameter, Declaration, Decorator, EnumMember, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
 import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
 import { ModuleWithProvidersFunction, NgccClassSymbol, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
@@ -624,7 +624,55 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     protected getDeclarationOfExpression(expression: ts.Expression): Declaration | null;
     /** Checks if the specified declaration resolves to the known JavaScript global `Object`. */
     protected isJavaScriptObjectDeclaration(decl: Declaration): boolean;
+    /**
+     * In JavaScript, enum declarations are emitted as a regular variable declaration followed by an
+     * IIFE in which the enum members are assigned.
+     *
+     *   export var Enum;
+     *   (function (Enum) {
+     *     Enum["a"] = "A";
+     *     Enum["b"] = "B";
+     *   })(Enum || (Enum = {}));
+     *
+     * @param declaration A variable declaration that may represent an enum
+     * @returns An array of enum members if the variable declaration is followed by an IIFE that
+     * declares the enum members, or null otherwise.
+     */
+    protected resolveEnumMembers(declaration: ts.VariableDeclaration): EnumMember[] | null;
+    /**
+     * Attempts to extract all `EnumMember`s from a function that is according to the JavaScript emit
+     * format for enums:
+     *
+     *   function (Enum) {
+     *     Enum["MemberA"] = "a";
+     *     Enum["MemberB"] = "b";
+     *   }
+     *
+     * @param fn The function expression that is assumed to contain enum members.
+     * @returns All enum members if the function is according to the correct syntax, null otherwise.
+     */
+    private reflectEnumMembers;
+    /**
+     * Attempts to extract a single `EnumMember` from a statement in the following syntax:
+     *
+     *   Enum["MemberA"] = "a";
+     *
+     * or, for enum member with numeric values:
+     *
+     *   Enum[Enum["MemberA"] = 0] = "MemberA";
+     *
+     * @param enumName The identifier of the enum that the members should be set on.
+     * @param statement The statement to inspect.
+     * @returns An `EnumMember` if the statement is according to the expected syntax, null otherwise.
+     */
+    protected reflectEnumMember(enumName: ts.Identifier, statement: ts.Statement): EnumMember | null;
 }
+/**
+ * An enum member assignment that looks like `Enum[X] = Y;`.
+ */
+export declare type EnumMemberAssignment = ts.BinaryExpression & {
+    left: ts.ElementAccessExpression;
+};
 export declare type ParamInfo = {
     decorators: Decorator[] | null;
     typeExpression: ts.Expression | null;

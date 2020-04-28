@@ -353,6 +353,20 @@ export interface Import {
     from: string;
 }
 /**
+ * A single enum member extracted from JavaScript when no `ts.EnumDeclaration` is available.
+ */
+export interface EnumMember {
+    /**
+     * The name of the enum member.
+     */
+    name: ts.PropertyName;
+    /**
+     * The initializer expression of the enum member. Unlike in TypeScript, this is always available
+     * in emitted JavaScript.
+     */
+    initializer: ts.Expression;
+}
+/**
  * Base type for all `Declaration`s.
  */
 export interface BaseDeclaration<T extends ts.Declaration = ts.Declaration> {
@@ -378,6 +392,24 @@ export interface BaseDeclaration<T extends ts.Declaration = ts.Declaration> {
  */
 export interface ConcreteDeclaration<T extends ts.Declaration = ts.Declaration> extends BaseDeclaration<T> {
     node: T;
+    /**
+     * Optionally represents a special identity of the declaration, or `null` if the declaration
+     * does not have a special identity.
+     */
+    identity: SpecialDeclarationIdentity | null;
+}
+export declare type SpecialDeclarationIdentity = DownleveledEnum;
+export declare const enum SpecialDeclarationKind {
+    DownleveledEnum = 0
+}
+/**
+ * A special declaration identity that represents an enum. This is used in downleveled forms where
+ * a `ts.EnumDeclaration` is emitted in an alternative form, e.g. an IIFE call that declares all
+ * members.
+ */
+export interface DownleveledEnum {
+    kind: SpecialDeclarationKind.DownleveledEnum;
+    enumMembers: EnumMember[];
 }
 /**
  * A declaration that does not have an associated TypeScript `ts.Declaration`, only a
