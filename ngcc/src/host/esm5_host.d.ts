@@ -192,4 +192,3 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
     protected getStaticProperty(symbol: NgccClassSymbol, propertyName: ts.__String): ts.Symbol | undefined;
 }
 export declare function getIifeBody(declaration: ts.Declaration): ts.Block | undefined;
-export declare function stripParentheses(node: ts.Node): ts.Node;
