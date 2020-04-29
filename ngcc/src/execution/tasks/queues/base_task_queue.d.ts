@@ -24,8 +24,9 @@ export declare abstract class BaseTaskQueue implements TaskQueue {
     constructor(logger: Logger, tasks: PartiallyOrderedTasks, dependencies: TaskDependencies);
     protected abstract computeNextTask(): Task | null;
     getNextTask(): Task | null;
+    markAsCompleted(task: Task): void;
     markAsFailed(task: Task): void;
-    markTaskCompleted(task: Task): void;
+    markAsUnprocessed(task: Task): void;
     toString(): string;
     /**
      * Mark the given `task` as to be skipped, then recursive skip all its dependents.

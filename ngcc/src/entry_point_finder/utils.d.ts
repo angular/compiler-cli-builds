@@ -8,7 +8,7 @@
  */
 import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { Logger } from '../logging/logger';
-import { PathMappings } from '../ngcc_options';
+import { PathMappings } from '../path_mappings';
 /**
  * Extract all the base-paths that we need to search for entry-points.
  *

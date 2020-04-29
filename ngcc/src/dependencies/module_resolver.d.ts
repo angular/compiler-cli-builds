@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
-import { PathMappings } from '../ngcc_options';
+import { PathMappings } from '../path_mappings';
 /**
  * This is a very cut-down implementation of the TypeScript module resolution strategy.
  *

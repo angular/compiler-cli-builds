@@ -31,6 +31,11 @@ export interface TaskCompletedMessage extends JsonObject {
     outcome: TaskProcessingOutcome;
     message: string | null;
 }
+/** A message listing the paths to transformed files about to be written to disk. */
+export interface TransformedFilesMessage extends JsonObject {
+    type: 'transformed-files';
+    files: AbsoluteFsPath[];
+}
 /** A message requesting the update of a `package.json` file. */
 export interface UpdatePackageJsonMessage extends JsonObject {
     type: 'update-package-json';
@@ -38,6 +43,6 @@ export interface UpdatePackageJsonMessage extends JsonObject {
     changes: PackageJsonChange[];
 }
 /** The type of messages sent from cluster workers to the cluster master. */
-export declare type MessageFromWorker = ErrorMessage | TaskCompletedMessage | UpdatePackageJsonMessage;
+export declare type MessageFromWorker = ErrorMessage | TaskCompletedMessage | TransformedFilesMessage | UpdatePackageJsonMessage;
 /** The type of messages sent from the cluster master to cluster workers. */
 export declare type MessageToWorker = ProcessTaskMessage;
