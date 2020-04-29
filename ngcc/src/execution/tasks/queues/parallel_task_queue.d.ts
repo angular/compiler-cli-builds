@@ -22,7 +22,7 @@ export declare class ParallelTaskQueue extends BaseTaskQueue {
     private blockedTasks;
     constructor(logger: Logger, tasks: PartiallyOrderedTasks, dependencies: TaskDependencies);
     computeNextTask(): Task | null;
-    markTaskCompleted(task: Task): void;
+    markAsCompleted(task: Task): void;
     toString(): string;
     private stringifyBlockedTasks;
 }

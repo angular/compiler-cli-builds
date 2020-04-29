@@ -31,13 +31,15 @@ export declare class Deferred<T> {
  * (This function should be invoked from cluster workers only.)
  *
  * @param msg The message to send to the cluster master.
+ * @return A promise that is resolved once the message has been sent.
  */
-export declare const sendMessageToMaster: (msg: MessageFromWorker) => void;
+export declare const sendMessageToMaster: (msg: MessageFromWorker) => Promise<void>;
 /**
  * Send a message to a cluster worker.
  * (This function should be invoked from the cluster master only.)
  *
  * @param workerId The ID of the recipient worker.
  * @param msg The message to send to the worker.
+ * @return A promise that is resolved once the message has been sent.
  */
-export declare const sendMessageToWorker: (workerId: number, msg: import("@angular/compiler-cli/ngcc/src/execution/cluster/api").ProcessTaskMessage) => void;
+export declare const sendMessageToWorker: (workerId: number, msg: import("@angular/compiler-cli/ngcc/src/execution/cluster/api").ProcessTaskMessage) => Promise<void>;

@@ -10,9 +10,9 @@ import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { EntryPointWithDependencies } from '../dependencies/dependency_host';
 import { DependencyResolver, SortedEntryPointsInfo } from '../dependencies/dependency_resolver';
 import { Logger } from '../logging/logger';
-import { PathMappings } from '../ngcc_options';
 import { NgccConfiguration } from '../packages/configuration';
 import { EntryPointManifest } from '../packages/entry_point_manifest';
+import { PathMappings } from '../path_mappings';
 import { EntryPointFinder } from './interface';
 /**
  * An EntryPointFinder that searches for all entry-points that can be found given a `basePath` and
