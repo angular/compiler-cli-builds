@@ -9,6 +9,9 @@
 import { AbsoluteFsPath, FileSystem } from '../../src/ngtsc/file_system';
 import { ParsedConfiguration } from '../../src/perform_compile';
 import { Logger } from './logging/logger';
+import { PathMappings } from './path_mappings';
+import { FileWriter } from './writing/file_writer';
+import { PackageJsonUpdater } from './writing/package_json_updater';
 /**
  * The options to configure the ngcc compiler for synchronous execution.
  */
@@ -115,16 +118,6 @@ export declare type AsyncNgccOptions = Omit<SyncNgccOptions, 'async'> & {
  * The options to configure the ngcc compiler.
  */
 export declare type NgccOptions = AsyncNgccOptions | SyncNgccOptions;
-export declare type PathMappings = {
-    baseUrl: string;
-    paths: {
-        [key: string]: string[];
-    };
-};
-/**
- * If `pathMappings` is not provided directly, then try getting it from `tsConfig`, if available.
- */
-export declare function getPathMappingsFromTsConfig(tsConfig: ParsedConfiguration | null, projectPath: AbsoluteFsPath): PathMappings | undefined;
 export declare type OptionalNgccOptionKeys = 'targetEntryPointPath' | 'tsConfigPath' | 'pathMappings';
 export declare type RequiredNgccOptions = Required<Omit<NgccOptions, OptionalNgccOptionKeys>>;
 export declare type OptionalNgccOptions = Pick<NgccOptions, OptionalNgccOptionKeys>;
@@ -133,6 +126,7 @@ export declare type SharedSetup = {
     absBasePath: AbsoluteFsPath;
     projectPath: AbsoluteFsPath;
     tsConfig: ParsedConfiguration | null;
+    getFileWriter(pkgJsonUpdater: PackageJsonUpdater): FileWriter;
 };
 /**
  * Instantiate common utilities that are always used and fix up options with defaults, as necessary.

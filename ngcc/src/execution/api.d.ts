@@ -6,6 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { FileToWrite } from '../rendering/utils';
 import { Task, TaskCompletedCallback, TaskQueue } from './tasks/api';
 /**
  * The type of the function that analyzes entry-points and creates the list of tasks.
@@ -15,9 +16,9 @@ import { Task, TaskCompletedCallback, TaskQueue } from './tasks/api';
  */
 export declare type AnalyzeEntryPointsFn = () => TaskQueue;
 /** The type of the function that can process/compile a task. */
-export declare type CompileFn = (task: Task) => void;
+export declare type CompileFn<T> = (task: Task) => void | T;
 /** The type of the function that creates the `CompileFn` function used to process tasks. */
-export declare type CreateCompileFn = (onTaskCompleted: TaskCompletedCallback) => CompileFn;
+export declare type CreateCompileFn = <T extends void | Promise<void>>(beforeWritingFiles: (transformedFiles: FileToWrite[]) => T, onTaskCompleted: TaskCompletedCallback) => CompileFn<T>;
 /**
  * A class that orchestrates and executes the required work (i.e. analyzes the entry-points,
  * processes the resulting tasks, does book-keeping and validates the final outcome).

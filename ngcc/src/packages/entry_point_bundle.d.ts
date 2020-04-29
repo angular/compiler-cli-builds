@@ -1,6 +1,6 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point_bundle" />
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
-import { PathMappings } from '../ngcc_options';
+import { PathMappings } from '../path_mappings';
 import { BundleProgram } from './bundle_program';
 import { EntryPoint, EntryPointFormat } from './entry_point';
 /**

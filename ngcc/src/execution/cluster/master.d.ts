@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/execution/cluster/master" />
 import { FileSystem } from '../../../../src/ngtsc/file_system';
 import { Logger } from '../../logging/logger';
+import { FileWriter } from '../../writing/file_writer';
 import { PackageJsonUpdater } from '../../writing/package_json_updater';
 import { AnalyzeEntryPointsFn } from '../api';
 import { CreateTaskCompletedCallback } from '../tasks/api';
@@ -19,13 +20,15 @@ export declare class ClusterMaster {
     private maxWorkerCount;
     private fileSystem;
     private logger;
+    private fileWriter;
     private pkgJsonUpdater;
     private finishedDeferred;
     private processingStartTime;
     private taskAssignments;
     private taskQueue;
     private onTaskCompleted;
-    constructor(maxWorkerCount: number, fileSystem: FileSystem, logger: Logger, pkgJsonUpdater: PackageJsonUpdater, analyzeEntryPoints: AnalyzeEntryPointsFn, createTaskCompletedCallback: CreateTaskCompletedCallback);
+    private remainingRespawnAttempts;
+    constructor(maxWorkerCount: number, fileSystem: FileSystem, logger: Logger, fileWriter: FileWriter, pkgJsonUpdater: PackageJsonUpdater, analyzeEntryPoints: AnalyzeEntryPointsFn, createTaskCompletedCallback: CreateTaskCompletedCallback);
     run(): Promise<void>;
     /** Try to find available (idle) workers and assign them available (non-blocked) tasks. */
     private maybeDistributeWork;
@@ -37,6 +40,8 @@ export declare class ClusterMaster {
     private onWorkerOnline;
     /** Handle a worker's having completed their assigned task. */
     private onWorkerTaskCompleted;
+    /** Handle a worker's message regarding the files transformed while processing its task. */
+    private onWorkerTransformedFiles;
     /** Handle a worker's request to update a `package.json` file. */
     private onWorkerUpdatePackageJson;
     /** Stop all workers and stop listening on cluster events. */

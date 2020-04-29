@@ -9,6 +9,7 @@
 import { FileSystem } from '../../../../src/ngtsc/file_system';
 import { AsyncLocker } from '../../locking/async_locker';
 import { Logger } from '../../logging/logger';
+import { FileWriter } from '../../writing/file_writer';
 import { PackageJsonUpdater } from '../../writing/package_json_updater';
 import { AnalyzeEntryPointsFn, CreateCompileFn, Executor } from '../api';
 import { CreateTaskCompletedCallback } from '../tasks/api';
@@ -20,9 +21,10 @@ export declare class ClusterExecutor implements Executor {
     private workerCount;
     private fileSystem;
     private logger;
+    private fileWriter;
     private pkgJsonUpdater;
     private lockFile;
     private createTaskCompletedCallback;
-    constructor(workerCount: number, fileSystem: FileSystem, logger: Logger, pkgJsonUpdater: PackageJsonUpdater, lockFile: AsyncLocker, createTaskCompletedCallback: CreateTaskCompletedCallback);
+    constructor(workerCount: number, fileSystem: FileSystem, logger: Logger, fileWriter: FileWriter, pkgJsonUpdater: PackageJsonUpdater, lockFile: AsyncLocker, createTaskCompletedCallback: CreateTaskCompletedCallback);
     execute(analyzeEntryPoints: AnalyzeEntryPointsFn, _createCompileFn: CreateCompileFn): Promise<void>;
 }

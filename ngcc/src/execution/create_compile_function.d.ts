@@ -2,10 +2,10 @@
 import { FileSystem } from '../../../src/ngtsc/file_system';
 import { ParsedConfiguration } from '../../../src/perform_compile';
 import { Logger } from '../logging/logger';
-import { PathMappings } from '../ngcc_options';
-import { PackageJsonUpdater } from '../writing/package_json_updater';
+import { PathMappings } from '../path_mappings';
+import { FileWriter } from '../writing/file_writer';
 import { CreateCompileFn } from './api';
 /**
  * The function for creating the `compile()` function.
  */
-export declare function getCreateCompileFn(fileSystem: FileSystem, logger: Logger, pkgJsonUpdater: PackageJsonUpdater, createNewEntryPointFormats: boolean, errorOnFailedEntryPoint: boolean, enableI18nLegacyMessageIdFormat: boolean, tsConfig: ParsedConfiguration | null, pathMappings: PathMappings | undefined): CreateCompileFn;
+export declare function getCreateCompileFn(fileSystem: FileSystem, logger: Logger, fileWriter: FileWriter, enableI18nLegacyMessageIdFormat: boolean, tsConfig: ParsedConfiguration | null, pathMappings: PathMappings | undefined): CreateCompileFn;
