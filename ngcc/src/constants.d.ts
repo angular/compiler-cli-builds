@@ -7,3 +7,4 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/constants" />
 export declare const IMPORT_PREFIX = "\u0275ngcc";
+export declare const NGCC_TIMED_OUT_EXIT_CODE = 177;

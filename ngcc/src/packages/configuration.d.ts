@@ -8,9 +8,28 @@ export interface NgccProjectConfig<T = NgccPackageConfig> {
     /**
      * The packages that are configured by this project config.
      */
-    packages: {
+    packages?: {
         [packagePath: string]: T;
     };
+    /**
+     * Options that control how locking the process is handled.
+     */
+    locking?: ProcessLockingConfiguration;
+}
+/**
+ * Options that control how locking the process is handled.
+ */
+export interface ProcessLockingConfiguration {
+    /**
+     * The number of times the AsyncLocker will attempt to lock the process before failing.
+     * Defaults to 500.
+     */
+    retryAttempts?: number;
+    /**
+     * The number of milliseconds between attempts to lock the process.
+     * Defaults to 500ms.
+     * */
+    retryDelay?: number;
 }
 /**
  * The format of a package level configuration file.
@@ -118,13 +137,17 @@ export declare class NgccConfiguration {
     readonly hash: string;
     constructor(fs: FileSystem, baseDir: AbsoluteFsPath);
     /**
+     * Get the configuration options for locking the ngcc process.
+     */
+    getLockingConfig(): Required<ProcessLockingConfiguration>;
+    /**
      * Get a configuration for the given `version` of a package at `packagePath`.
      *
      * @param packagePath The path to the package whose config we want.
      * @param version The version of the package whose config we want, or `null` if the package's
      * package.json did not exist or was invalid.
      */
-    getConfig(packagePath: AbsoluteFsPath, version: string | null): VersionedPackageConfig;
+    getPackageConfig(packagePath: AbsoluteFsPath, version: string | null): VersionedPackageConfig;
     private processProjectConfig;
     private loadProjectConfig;
     private loadPackageConfig;
