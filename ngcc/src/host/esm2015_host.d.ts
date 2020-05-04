@@ -96,10 +96,16 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * Classes should have a `name` identifier, because they may need to be referenced in other parts
      * of the program.
      *
-     * In ES2015, a class may be declared using a variable declaration of the following structure:
+     * In ES2015, a class may be declared using a variable declaration of the following structures:
      *
      * ```
      * var MyClass = MyClass_1 = class MyClass {};
+     * ```
+     *
+     * or
+     *
+     * ```
+     * var MyClass = MyClass_1 = (() => { class MyClass {} ... return MyClass; })()
      * ```
      *
      * Here, the intermediate `MyClass_1` assignment is optional. In the above example, the
@@ -110,10 +116,16 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      */
     getClassSymbol(declaration: ts.Node): NgccClassSymbol | undefined;
     /**
-     * In ES2015, a class may be declared using a variable declaration of the following structure:
+     * In ES2015, a class may be declared using a variable declaration of the following structures:
      *
      * ```
      * var MyClass = MyClass_1 = class MyClass {};
+     * ```
+     *
+     * or
+     *
+     * ```
+     * var MyClass = MyClass_1 = (() => { class MyClass {} ... return MyClass; })()
      * ```
      *
      * This method extracts the `NgccClassSymbol` for `MyClass` when provided with the `var MyClass`
@@ -126,10 +138,16 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      */
     protected getClassSymbolFromOuterDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
     /**
-     * In ES2015, a class may be declared using a variable declaration of the following structure:
+     * In ES2015, a class may be declared using a variable declaration of the following structures:
      *
      * ```
      * var MyClass = MyClass_1 = class MyClass {};
+     * ```
+     *
+     * or
+     *
+     * ```
+     * var MyClass = MyClass_1 = (() => { class MyClass {} ... return MyClass; })()
      * ```
      *
      * This method extracts the `NgccClassSymbol` for `MyClass` when provided with the
@@ -327,6 +345,12 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
     protected findDecoratedVariableValue(node: ts.Node | undefined, symbol: ts.Symbol): ts.CallExpression | null;
     /**
      * Try to retrieve the symbol of a static property on a class.
+     *
+     * In some cases, a static property can either be set on the inner declaration inside the class'
+     * IIFE, or it can be set on the outer variable declaration. Therefore, the host checks both
+     * places, first looking up the property on the inner symbol, and if the property is not found it
+     * will fall back to looking up the property on the outer symbol.
+     *
      * @param symbol the class whose property we are interested in.
      * @param propertyName the name of static property.
      * @returns the symbol if it is found or `undefined` if not.
@@ -750,6 +774,25 @@ export declare type AssignmentStatement = ts.ExpressionStatement & {
  * @param statement the statement to test.
  */
 export declare function isAssignmentStatement(statement: ts.Statement): statement is AssignmentStatement;
+/**
+ * Parse the `expression` that is believed to be an IIFE and return the AST node that corresponds to
+ * the body of the IIFE.
+ *
+ * The expression may be wrapped in parentheses, which are stripped off.
+ *
+ * If the IIFE is an arrow function then its body could be a `ts.Expression` rather than a
+ * `ts.FunctionBody`.
+ *
+ * @param expression the expression to parse.
+ * @returns the `ts.Expression` or `ts.FunctionBody` that holds the body of the IIFE or `undefined`
+ *     if the `expression` did not have the correct shape.
+ */
+export declare function getIifeConciseBody(expression: ts.Expression): ts.ConciseBody | undefined;
+/**
+ * Returns true if the `node` is an assignment of the form `a = b`.
+ *
+ * @param node The AST node to check.
+ */
 export declare function isAssignment(node: ts.Node): node is ts.AssignmentExpression<ts.EqualsToken>;
 /**
  * Tests whether the provided call expression targets a class, by verifying its arguments are
