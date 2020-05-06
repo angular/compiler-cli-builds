@@ -7,13 +7,15 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/src/state" />
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../../file_system';
 import { ClassRecord, TraitCompiler } from '../../transform';
+import { FileTypeCheckingData } from '../../typecheck/src/context';
 import { IncrementalBuild } from '../api';
 import { FileDependencyGraph } from './dependency_tracking';
 /**
  * Drives an incremental build, by tracking changes and determining which files need to be emitted.
  */
-export declare class IncrementalDriver implements IncrementalBuild<ClassRecord> {
+export declare class IncrementalDriver implements IncrementalBuild<ClassRecord, FileTypeCheckingData> {
     private allTsFiles;
     readonly depGraph: FileDependencyGraph;
     private logicalChanges;
@@ -34,7 +36,9 @@ export declare class IncrementalDriver implements IncrementalBuild<ClassRecord> 
     static reconcile(oldProgram: ts.Program, oldDriver: IncrementalDriver, newProgram: ts.Program, modifiedResourceFiles: Set<string> | null): IncrementalDriver;
     static fresh(program: ts.Program): IncrementalDriver;
     recordSuccessfulAnalysis(traitCompiler: TraitCompiler): void;
+    recordSuccessfulTypeCheck(results: Map<AbsoluteFsPath, FileTypeCheckingData>): void;
     recordSuccessfulEmit(sf: ts.SourceFile): void;
     safeToSkipEmit(sf: ts.SourceFile): boolean;
     priorWorkFor(sf: ts.SourceFile): ClassRecord[] | null;
+    priorTypeCheckingResultsFor(sf: ts.SourceFile): FileTypeCheckingData | null;
 }

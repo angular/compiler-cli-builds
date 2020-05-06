@@ -7,4 +7,4 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/src/noop" />
 import { IncrementalBuild } from '../api';
-export declare const NOOP_INCREMENTAL_BUILD: IncrementalBuild<any>;
+export declare const NOOP_INCREMENTAL_BUILD: IncrementalBuild<any, any>;

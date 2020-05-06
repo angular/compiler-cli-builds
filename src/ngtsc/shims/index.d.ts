@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/shims" />
-export { ShimGenerator } from './src/api';
-export { FactoryGenerator, FactoryInfo, generatedFactoryTransform } from './src/factory_generator';
-export { FactoryTracker } from './src/factory_tracker';
+export { PerFileShimGenerator, TopLevelShimGenerator } from './api';
+export { ShimAdapter } from './src/adapter';
+export { copyFileShimData, isShim } from './src/expando';
+export { FactoryGenerator, FactoryInfo, FactoryTracker, generatedFactoryTransform } from './src/factory_generator';
+export { ShimReferenceTagger } from './src/reference_tagger';
 export { SummaryGenerator } from './src/summary_generator';
-export { TypeCheckShimGenerator } from './src/typecheck_shim';

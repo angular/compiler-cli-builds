@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/api" />
 import { DirectiveMeta, PipeMeta } from '../../metadata';
+import { ClassDeclaration } from '../../reflection';
 /**
  * Data for one of a given NgModule's scopes (either compilation scope or export scopes).
  */
@@ -19,6 +20,10 @@ export interface ScopeData {
      * Pipes in the exported scope of the module.
      */
     pipes: PipeMeta[];
+    /**
+     * NgModules which contributed to the scope of the module.
+     */
+    ngModules: ClassDeclaration[];
 }
 /**
  * An export scope of an NgModule, containing the directives/pipes it contributes to other NgModules

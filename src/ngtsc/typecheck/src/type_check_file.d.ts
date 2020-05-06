@@ -23,12 +23,12 @@ import { OutOfBandDiagnosticRecorder } from './oob';
  * hoists them to the top of the generated `ts.SourceFile`.
  */
 export declare class TypeCheckFile extends Environment {
-    private fileName;
+    readonly fileName: AbsoluteFsPath;
     private nextTcbId;
     private tcbStatements;
-    constructor(fileName: string, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost);
+    constructor(fileName: AbsoluteFsPath, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost);
     addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder): void;
-    render(): ts.SourceFile;
+    render(): string;
     getPreludeStatements(): ts.Statement[];
 }
 export declare function typeCheckFilePath(rootDirs: AbsoluteFsPath[]): AbsoluteFsPath;
