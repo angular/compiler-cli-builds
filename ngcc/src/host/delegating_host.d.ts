@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/delegating_host" />
 import * as ts from 'typescript';
 import { ClassDeclaration, ClassMember, CtorParameter, Declaration, Decorator, FunctionDefinition, Import, ReflectionHost } from '../../../src/ngtsc/reflection';
-import { ModuleWithProvidersFunction, NgccClassSymbol, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
+import { NgccClassSymbol, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
 /**
  * A reflection host implementation that delegates reflector queries depending on whether they
  * reflect on declaration files (for dependent libraries) or source files within the entry-point
@@ -38,7 +38,6 @@ export declare class DelegatingReflectionHost implements NgccReflectionHost {
     findClassSymbols(sourceFile: ts.SourceFile): NgccClassSymbol[];
     getClassSymbol(node: ts.Node): NgccClassSymbol | undefined;
     getDecoratorsOfSymbol(symbol: NgccClassSymbol): Decorator[] | null;
-    getModuleWithProvidersFunctions(sf: ts.SourceFile): ModuleWithProvidersFunction[];
     getSwitchableDeclarations(module: ts.Node): SwitchableVariableDeclaration[];
     getEndOfClass(classSymbol: NgccClassSymbol): ts.Node;
     detectKnownDeclaration(decl: null): null;
