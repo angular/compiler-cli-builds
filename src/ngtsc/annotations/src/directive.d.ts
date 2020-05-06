@@ -32,7 +32,8 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     private injectableRegistry;
     private isCore;
     private annotateForClosureCompiler;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, defaultImportRecorder: DefaultImportRecorder, injectableRegistry: InjectableClassRegistry, isCore: boolean, annotateForClosureCompiler: boolean);
+    private compileUndecoratedClassesWithAngularFeatures;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, defaultImportRecorder: DefaultImportRecorder, injectableRegistry: InjectableClassRegistry, isCore: boolean, annotateForClosureCompiler: boolean, compileUndecoratedClassesWithAngularFeatures: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
@@ -40,6 +41,13 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     register(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>): void;
     resolve(node: ClassDeclaration, analysis: DirectiveHandlerData): ResolveResult<unknown>;
     compile(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>, resolution: Readonly<unknown>, pool: ConstantPool): CompileResult[];
+    /**
+     * Checks if a given class uses Angular features and returns the TypeScript node
+     * that indicated the usage. Classes are considered using Angular features if they
+     * contain class members that are either decorated with a known Angular decorator,
+     * or if they correspond to a known Angular lifecycle hook.
+     */
+    private findClassFieldWithAngularFeatures;
 }
 /**
  * Helper function to extract metadata from a `Directive` or `Component`. `Directive`s without a

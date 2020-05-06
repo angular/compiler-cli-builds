@@ -32,6 +32,11 @@ export declare enum ErrorCode {
      * decorator.
      */
     DIRECTIVE_INHERITS_UNDECORATED_CTOR = 2006,
+    /**
+     * Raised when an undecorated class that is using Angular features
+     * has been discovered.
+     */
+    UNDECORATED_CLASS_USING_ANGULAR_FEATURES = 2007,
     SYMBOL_NOT_EXPORTED = 3001,
     SYMBOL_EXPORTED_UNDER_DIFFERENT_NAME = 3002,
     CONFIG_FLAT_MODULE_NO_INDEX = 4001,
