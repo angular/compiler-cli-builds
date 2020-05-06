@@ -20,4 +20,5 @@ import { LocalModuleScopeRegistry } from '../../scope';
  */
 export declare function getProviderDiagnostics(providerClasses: Set<Reference<ClassDeclaration>>, providersDeclaration: ts.Expression, registry: InjectableClassRegistry): ts.Diagnostic[];
 export declare function getDirectiveDiagnostics(node: ClassDeclaration, reader: MetadataReader, evaluator: PartialEvaluator, reflector: ReflectionHost, scopeRegistry: LocalModuleScopeRegistry, kind: string): ts.Diagnostic[] | null;
+export declare function getUndecoratedClassWithAngularFeaturesDiagnostic(node: ClassDeclaration): ts.Diagnostic;
 export declare function checkInheritanceOfDirective(node: ClassDeclaration, reader: MetadataReader, reflector: ReflectionHost, evaluator: PartialEvaluator): ts.Diagnostic | null;
