@@ -8,12 +8,9 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/shims/src/summary_generator" />
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
-import { ShimGenerator } from './api';
-export declare class SummaryGenerator implements ShimGenerator {
-    private map;
-    private constructor();
-    getSummaryFileNames(): AbsoluteFsPath[];
-    recognize(fileName: AbsoluteFsPath): boolean;
-    generate(genFilePath: AbsoluteFsPath, readFile: (fileName: string) => ts.SourceFile | null): ts.SourceFile | null;
-    static forRootFiles(files: ReadonlyArray<AbsoluteFsPath>): SummaryGenerator;
+import { PerFileShimGenerator } from '../api';
+export declare class SummaryGenerator implements PerFileShimGenerator {
+    readonly shouldEmit = true;
+    readonly extensionPrefix = "ngsummary";
+    generateShimForFile(sf: ts.SourceFile, genFilePath: AbsoluteFsPath): ts.SourceFile;
 }

@@ -10,6 +10,7 @@ import * as ts from 'typescript';
 import { IncrementalDriver } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
 import { PerfRecorder } from '../../perf';
+import { TypeCheckingProgramStrategy } from '../../typecheck';
 import { LazyRoute, NgCompilerOptions } from '../api';
 import { NgCompilerHost } from './host';
 /**
@@ -28,6 +29,7 @@ export declare class NgCompiler {
     private host;
     private options;
     private tsProgram;
+    private typeCheckingProgramStrategy;
     private perfRecorder;
     /**
      * Lazily evaluated state of the compilation.
@@ -48,7 +50,6 @@ export declare class NgCompiler {
      */
     private diagnostics;
     private closureCompilerEnabled;
-    private typeCheckFile;
     private nextProgram;
     private entryPoint;
     private moduleResolver;
@@ -57,7 +58,7 @@ export declare class NgCompiler {
     readonly incrementalDriver: IncrementalDriver;
     readonly ignoreForDiagnostics: Set<ts.SourceFile>;
     readonly ignoreForEmit: Set<ts.SourceFile>;
-    constructor(host: NgCompilerHost, options: NgCompilerOptions, tsProgram: ts.Program, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
+    constructor(host: NgCompilerHost, options: NgCompilerOptions, tsProgram: ts.Program, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
     /**
      * Get all Angular-related diagnostics for this compilation.
      *
@@ -110,6 +111,8 @@ export declare class NgCompiler {
     private ensureAnalyzed;
     private analyzeSync;
     private resolveCompilation;
+    private get fullTemplateTypeCheck();
+    private getTypeCheckingConfig;
     private getTemplateDiagnostics;
     /**
      * Reifies the inter-dependencies of NgModules and the components within their compilation scopes

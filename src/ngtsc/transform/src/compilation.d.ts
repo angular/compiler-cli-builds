@@ -12,7 +12,7 @@ import { IncrementalBuild } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
-import { TypeCheckContext } from '../../typecheck';
+import { ProgramTypeCheckAdapter, TypeCheckContext } from '../../typecheck';
 import { CompileResult, DecoratorHandler, HandlerFlags } from './api';
 import { DtsTransformRegistry } from './declaration';
 import { PendingTrait, Trait } from './trait';
@@ -53,7 +53,7 @@ export interface ClassRecord {
  * in the production of `CompileResult`s instructing the compiler to apply various mutations to the
  * class (like adding fields or type declarations).
  */
-export declare class TraitCompiler {
+export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     private handlers;
     private reflector;
     private perf;
@@ -72,7 +72,7 @@ export declare class TraitCompiler {
     protected fileToClasses: Map<ts.SourceFile, Set<ClassDeclaration<ts.Declaration>>>;
     private reexportMap;
     private handlersByName;
-    constructor(handlers: DecoratorHandler<unknown, unknown, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord>, compileNonExportedClasses: boolean, dtsTransforms: DtsTransformRegistry);
+    constructor(handlers: DecoratorHandler<unknown, unknown, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord, unknown>, compileNonExportedClasses: boolean, dtsTransforms: DtsTransformRegistry);
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     private analyze;
@@ -92,7 +92,11 @@ export declare class TraitCompiler {
     protected analyzeClass(clazz: ClassDeclaration, preanalyzeQueue: Promise<void>[] | null): void;
     protected analyzeTrait(clazz: ClassDeclaration, trait: Trait<unknown, unknown, unknown>, flags?: HandlerFlags): void;
     resolve(): void;
-    typeCheck(ctx: TypeCheckContext): void;
+    /**
+     * Generate type-checking code into the `TypeCheckContext` for any components within the given
+     * `ts.SourceFile`.
+     */
+    typeCheck(sf: ts.SourceFile, ctx: TypeCheckContext): void;
     index(ctx: IndexingContext): void;
     compile(clazz: ts.Declaration, constantPool: ConstantPool): CompileResult[] | null;
     decoratorsFor(node: ts.Declaration): ts.Decorator[];
