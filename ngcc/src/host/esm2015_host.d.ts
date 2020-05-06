@@ -10,7 +10,7 @@ import * as ts from 'typescript';
 import { ClassDeclaration, ClassMember, ClassMemberKind, CtorParameter, Declaration, Decorator, EnumMember, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
 import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
-import { ModuleWithProvidersFunction, NgccClassSymbol, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
+import { NgccClassSymbol, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
 export declare const DECORATORS: ts.__String;
 export declare const PROP_DECORATORS: ts.__String;
 export declare const CONSTRUCTOR: ts.__String;
@@ -275,14 +275,6 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * `ts.Program` as the input declaration.
      */
     getDtsDeclaration(declaration: ts.Declaration): ts.Declaration | null;
-    /**
-     * Search the given source file for exported functions and static class methods that return
-     * ModuleWithProviders objects.
-     * @param f The source file to search for these functions
-     * @returns An array of function declarations that look like they return ModuleWithProviders
-     * objects.
-     */
-    getModuleWithProvidersFunctions(f: ts.SourceFile): ModuleWithProvidersFunction[];
     getEndOfClass(classSymbol: NgccClassSymbol): ts.Node;
     /**
      * Check whether a `Declaration` corresponds with a known declaration, such as `Object`, and set
@@ -634,17 +626,6 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      */
     protected collectDtsExportedDeclarations(dtsDeclarationMap: Map<string, ts.Declaration>, srcFile: ts.SourceFile, checker: ts.TypeChecker): void;
     protected collectSrcExportedDeclarations(declarationMap: Map<ts.Declaration, ts.Declaration>, dtsDeclarationMap: Map<string, ts.Declaration>, srcFile: ts.SourceFile): void;
-    /**
-     * Parse a function/method node (or its implementation), to see if it returns a
-     * `ModuleWithProviders` object.
-     * @param name The name of the function.
-     * @param node the node to check - this could be a function, a method or a variable declaration.
-     * @param implementation the actual function expression if `node` is a variable declaration.
-     * @param container the class that contains the function, if it is a method.
-     * @returns info about the function if it does return a `ModuleWithProviders` object; `null`
-     * otherwise.
-     */
-    protected parseForModuleWithProviders(name: string, node: ts.Node | null, implementation?: ts.Node | null, container?: ts.Declaration | null): ModuleWithProvidersFunction | null;
     protected getDeclarationOfExpression(expression: ts.Expression): Declaration | null;
     /** Checks if the specified declaration resolves to the known JavaScript global `Object`. */
     protected isJavaScriptObjectDeclaration(decl: Declaration): boolean;
