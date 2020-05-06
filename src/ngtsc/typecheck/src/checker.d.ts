@@ -31,9 +31,10 @@ export declare class TemplateTypeChecker {
     private config;
     private refEmitter;
     private reflector;
+    private compilerHost;
     private priorBuild;
     private files;
-    constructor(originalProgram: ts.Program, typeCheckingStrategy: TypeCheckingProgramStrategy, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>);
+    constructor(originalProgram: ts.Program, typeCheckingStrategy: TypeCheckingProgramStrategy, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: ts.CompilerHost, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>);
     /**
      * Reset the internal type-checking program by generating type-checking code from the user's
      * program.

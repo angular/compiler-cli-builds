@@ -26,7 +26,7 @@ export declare class TypeCheckFile extends Environment {
     readonly fileName: AbsoluteFsPath;
     private nextTcbId;
     private tcbStatements;
-    constructor(fileName: AbsoluteFsPath, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost);
+    constructor(fileName: AbsoluteFsPath, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: ts.CompilerHost);
     addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder): void;
     render(): string;
     getPreludeStatements(): ts.Statement[];

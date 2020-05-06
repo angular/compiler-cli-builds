@@ -92,11 +92,11 @@ export interface PendingFileTypeCheckingData {
  */
 export declare class TypeCheckContext {
     private config;
-    private program;
+    private compilerHost;
     private refEmitter;
     private reflector;
     private fileMap;
-    constructor(config: TypeCheckingConfig, program: ts.Program, refEmitter: ReferenceEmitter, reflector: ReflectionHost);
+    constructor(config: TypeCheckingConfig, compilerHost: ts.CompilerHost, refEmitter: ReferenceEmitter, reflector: ReflectionHost);
     /**
      * A `Map` of `ts.SourceFile`s that the context has seen to the operations (additions of methods
      * or type-check blocks) that need to be eventually performed on that file.
