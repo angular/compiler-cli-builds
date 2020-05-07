@@ -29,6 +29,7 @@ export declare const LogicalProjectPath: {
  * TypeScript's logical file system, based on the root directories of the project.
  */
 export declare class LogicalFileSystem {
+    private compilerHost;
     /**
      * The root directories of the project, sorted with the longest path first.
      */
@@ -38,7 +39,7 @@ export declare class LogicalFileSystem {
      * expensive.
      */
     private cache;
-    constructor(rootDirs: AbsoluteFsPath[]);
+    constructor(rootDirs: AbsoluteFsPath[], compilerHost: ts.CompilerHost);
     /**
      * Get the logical path in the project of a `ts.SourceFile`.
      *
