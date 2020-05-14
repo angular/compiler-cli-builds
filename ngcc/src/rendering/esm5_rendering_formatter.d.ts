@@ -18,7 +18,8 @@ import { EsmRenderingFormatter } from './esm_rendering_formatter';
  */
 export declare class Esm5RenderingFormatter extends EsmRenderingFormatter {
     /**
-     * Add the definitions inside the IIFE of each decorated class
+     * Add the definitions, directly before the return statement, inside the IIFE of each decorated
+     * class.
      */
     addDefinitions(output: MagicString, compiledClass: CompiledClass, definitions: string): void;
     /**

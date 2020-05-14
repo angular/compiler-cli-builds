@@ -15,5 +15,4 @@ import { AsyncNgccOptions, SyncNgccOptions } from './ngcc_options';
  *
  * @param options The options telling ngcc what to compile and how.
  */
-export declare function mainNgcc(options: AsyncNgccOptions): Promise<void>;
-export declare function mainNgcc(options: SyncNgccOptions): void;
+export declare function mainNgcc<T extends AsyncNgccOptions | SyncNgccOptions>(options: T): T extends AsyncNgccOptions ? Promise<void> : void;

@@ -20,9 +20,11 @@ export interface ExportStatement extends ts.ExpressionStatement {
     };
 }
 /**
- * A CommonJS or UMD re-export statement.
+ * A CommonJS or UMD wildcard re-export statement.
  *
- * In CommonJS/UMD, re-export statements can have several forms (depending, for example, on whether
+ * The CommonJS or UMD version of `export * from 'blah';`.
+ *
+ * These statements can have several forms (depending, for example, on whether
  * the TypeScript helpers are imported or emitted inline). The expression can have one of the
  * following forms:
  * - `__export(firstArg)`
@@ -30,12 +32,26 @@ export interface ExportStatement extends ts.ExpressionStatement {
  * - `tslib.__export(firstArg, exports)`
  * - `tslib.__exportStar(firstArg, exports)`
  *
- * In all cases, we only care about `firstApp`, which is the first argument of the re-export call
+ * In all cases, we only care about `firstArg`, which is the first argument of the re-export call
  * expression and can be either a `require('...')` call or an identifier (initialized via a
  * `require('...')` call).
  */
-export interface ReexportStatement extends ts.ExpressionStatement {
+export interface WildcardReexportStatement extends ts.ExpressionStatement {
     expression: ts.CallExpression;
+}
+/**
+ * A CommonJS or UMD re-export statement using an `Object.defineProperty()` call.
+ * For example:
+ *
+ * ```
+ * Object.defineProperty(exports, "<exported-id>",
+ *     { enumerable: true, get: function () { return <imported-id>; } });
+ * ```
+ */
+export interface DefinePropertyReexportStatement extends ts.ExpressionStatement {
+    expression: ts.CallExpression & {
+        arguments: [ts.Identifier, ts.StringLiteral, ts.ObjectLiteralExpression];
+    };
 }
 export interface RequireCall extends ts.CallExpression {
     arguments: ts.CallExpression['arguments'] & [ts.StringLiteral];
@@ -54,20 +70,31 @@ export declare function findNamespaceOfIdentifier(id: ts.Identifier): ts.Identif
 export declare function findRequireCallReference(id: ts.Identifier, checker: ts.TypeChecker): RequireCall | null;
 /**
  * Check whether the specified `ts.Statement` is an export statement, i.e. an expression statement
- * of the form: `export.<foo> = <bar>`
+ * of the form: `exports.<foo> = <bar>`
  */
 export declare function isExportStatement(stmt: ts.Statement): stmt is ExportStatement;
 /**
- * Check whether the specified `ts.Statement` is a re-export statement, i.e. an expression statement
- * of one of the following forms:
+ * Check whether the specified `ts.Statement` is a wildcard re-export statement.
+ * I.E. an expression statement of one of the following forms:
  * - `__export(<foo>)`
  * - `__exportStar(<foo>)`
  * - `tslib.__export(<foo>, exports)`
  * - `tslib.__exportStar(<foo>, exports)`
  */
-export declare function isReexportStatement(stmt: ts.Statement): stmt is ReexportStatement;
+export declare function isWildcardReexportStatement(stmt: ts.Statement): stmt is WildcardReexportStatement;
+/**
+ * Check whether the statement is a re-export of the form:
+ *
+ * ```
+ * Object.defineProperty(exports, "<export-name>",
+ *     { enumerable: true, get: function () { return <import-name>; } });
+ * ```
+ */
+export declare function isDefinePropertyReexportStatement(stmt: ts.Statement): stmt is DefinePropertyReexportStatement;
+export declare function extractGetterFnExpression(statement: DefinePropertyReexportStatement): ts.Expression | null;
 /**
  * Check whether the specified `ts.Node` represents a `require()` call, i.e. an call expression of
  * the form: `require('<foo>')`
  */
 export declare function isRequireCall(node: ts.Node): node is RequireCall;
+export declare function isExternalImport(path: string): boolean;

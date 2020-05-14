@@ -19,18 +19,18 @@
     var tslib_1 = require("tslib");
     tslib_1.__exportStar(require("@angular/compiler-cli/src/ngtsc/transform/src/api"), exports);
     var alias_1 = require("@angular/compiler-cli/src/ngtsc/transform/src/alias");
-    exports.aliasTransformFactory = alias_1.aliasTransformFactory;
+    Object.defineProperty(exports, "aliasTransformFactory", { enumerable: true, get: function () { return alias_1.aliasTransformFactory; } });
     var compilation_1 = require("@angular/compiler-cli/src/ngtsc/transform/src/compilation");
-    exports.TraitCompiler = compilation_1.TraitCompiler;
+    Object.defineProperty(exports, "TraitCompiler", { enumerable: true, get: function () { return compilation_1.TraitCompiler; } });
     var declaration_1 = require("@angular/compiler-cli/src/ngtsc/transform/src/declaration");
-    exports.declarationTransformFactory = declaration_1.declarationTransformFactory;
-    exports.DtsTransformRegistry = declaration_1.DtsTransformRegistry;
-    exports.IvyDeclarationDtsTransform = declaration_1.IvyDeclarationDtsTransform;
-    exports.ReturnTypeTransform = declaration_1.ReturnTypeTransform;
+    Object.defineProperty(exports, "declarationTransformFactory", { enumerable: true, get: function () { return declaration_1.declarationTransformFactory; } });
+    Object.defineProperty(exports, "DtsTransformRegistry", { enumerable: true, get: function () { return declaration_1.DtsTransformRegistry; } });
+    Object.defineProperty(exports, "IvyDeclarationDtsTransform", { enumerable: true, get: function () { return declaration_1.IvyDeclarationDtsTransform; } });
+    Object.defineProperty(exports, "ReturnTypeTransform", { enumerable: true, get: function () { return declaration_1.ReturnTypeTransform; } });
     var trait_1 = require("@angular/compiler-cli/src/ngtsc/transform/src/trait");
-    exports.Trait = trait_1.Trait;
-    exports.TraitState = trait_1.TraitState;
+    Object.defineProperty(exports, "Trait", { enumerable: true, get: function () { return trait_1.Trait; } });
+    Object.defineProperty(exports, "TraitState", { enumerable: true, get: function () { return trait_1.TraitState; } });
     var transform_1 = require("@angular/compiler-cli/src/ngtsc/transform/src/transform");
-    exports.ivyTransformFactory = transform_1.ivyTransformFactory;
+    Object.defineProperty(exports, "ivyTransformFactory", { enumerable: true, get: function () { return transform_1.ivyTransformFactory; } });
 });
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9wYWNrYWdlcy9jb21waWxlci1jbGkvc3JjL25ndHNjL3RyYW5zZm9ybS9pbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7Ozs7O0dBTUc7Ozs7Ozs7Ozs7Ozs7SUFFSCw0RkFBMEI7SUFDMUIsNkVBQWtEO0lBQTFDLHdDQUFBLHFCQUFxQixDQUFBO0lBQzdCLHlGQUE2RDtJQUF4QyxzQ0FBQSxhQUFhLENBQUE7SUFDbEMseUZBQXFJO0lBQTdILG9EQUFBLDJCQUEyQixDQUFBO0lBQUUsNkNBQUEsb0JBQW9CLENBQUE7SUFBRSxtREFBQSwwQkFBMEIsQ0FBQTtJQUFFLDRDQUFBLG1CQUFtQixDQUFBO0lBQzFHLDZFQUFzSDtJQUF0Qyx3QkFBQSxLQUFLLENBQUE7SUFBRSw2QkFBQSxVQUFVLENBQUE7SUFDakcscUZBQW9EO0lBQTVDLDBDQUFBLG1CQUFtQixDQUFBIiwic291cmNlc0NvbnRlbnQiOlsiLyoqXG4gKiBAbGljZW5zZVxuICogQ29weXJpZ2h0IEdvb2dsZSBJbmMuIEFsbCBSaWdodHMgUmVzZXJ2ZWQuXG4gKlxuICogVXNlIG9mIHRoaXMgc291cmNlIGNvZGUgaXMgZ292ZXJuZWQgYnkgYW4gTUlULXN0eWxlIGxpY2Vuc2UgdGhhdCBjYW4gYmVcbiAqIGZvdW5kIGluIHRoZSBMSUNFTlNFIGZpbGUgYXQgaHR0cHM6Ly9hbmd1bGFyLmlvL2xpY2Vuc2VcbiAqL1xuXG5leHBvcnQgKiBmcm9tICcuL3NyYy9hcGknO1xuZXhwb3J0IHthbGlhc1RyYW5zZm9ybUZhY3Rvcnl9IGZyb20gJy4vc3JjL2FsaWFzJztcbmV4cG9ydCB7Q2xhc3NSZWNvcmQsIFRyYWl0Q29tcGlsZXJ9IGZyb20gJy4vc3JjL2NvbXBpbGF0aW9uJztcbmV4cG9ydCB7ZGVjbGFyYXRpb25UcmFuc2Zvcm1GYWN0b3J5LCBEdHNUcmFuc2Zvcm1SZWdpc3RyeSwgSXZ5RGVjbGFyYXRpb25EdHNUcmFuc2Zvcm0sIFJldHVyblR5cGVUcmFuc2Zvcm19IGZyb20gJy4vc3JjL2RlY2xhcmF0aW9uJztcbmV4cG9ydCB7QW5hbHl6ZWRUcmFpdCwgRXJyb3JlZFRyYWl0LCBQZW5kaW5nVHJhaXQsIFJlc29sdmVkVHJhaXQsIFNraXBwZWRUcmFpdCwgVHJhaXQsIFRyYWl0U3RhdGV9IGZyb20gJy4vc3JjL3RyYWl0JztcbmV4cG9ydCB7aXZ5VHJhbnNmb3JtRmFjdG9yeX0gZnJvbSAnLi9zcmMvdHJhbnNmb3JtJztcbiJdfQ==
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9wYWNrYWdlcy9jb21waWxlci1jbGkvc3JjL25ndHNjL3RyYW5zZm9ybS9pbmRleC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7Ozs7O0dBTUc7Ozs7Ozs7Ozs7Ozs7SUFFSCw0RkFBMEI7SUFDMUIsNkVBQWtEO0lBQTFDLDhHQUFBLHFCQUFxQixPQUFBO0lBQzdCLHlGQUE2RDtJQUF4Qyw0R0FBQSxhQUFhLE9BQUE7SUFDbEMseUZBQXFJO0lBQTdILDBIQUFBLDJCQUEyQixPQUFBO0lBQUUsbUhBQUEsb0JBQW9CLE9BQUE7SUFBRSx5SEFBQSwwQkFBMEIsT0FBQTtJQUFFLGtIQUFBLG1CQUFtQixPQUFBO0lBQzFHLDZFQUFzSDtJQUF0Qyw4RkFBQSxLQUFLLE9BQUE7SUFBRSxtR0FBQSxVQUFVLE9BQUE7SUFDakcscUZBQW9EO0lBQTVDLGdIQUFBLG1CQUFtQixPQUFBIiwic291cmNlc0NvbnRlbnQiOlsiLyoqXG4gKiBAbGljZW5zZVxuICogQ29weXJpZ2h0IEdvb2dsZSBJbmMuIEFsbCBSaWdodHMgUmVzZXJ2ZWQuXG4gKlxuICogVXNlIG9mIHRoaXMgc291cmNlIGNvZGUgaXMgZ292ZXJuZWQgYnkgYW4gTUlULXN0eWxlIGxpY2Vuc2UgdGhhdCBjYW4gYmVcbiAqIGZvdW5kIGluIHRoZSBMSUNFTlNFIGZpbGUgYXQgaHR0cHM6Ly9hbmd1bGFyLmlvL2xpY2Vuc2VcbiAqL1xuXG5leHBvcnQgKiBmcm9tICcuL3NyYy9hcGknO1xuZXhwb3J0IHthbGlhc1RyYW5zZm9ybUZhY3Rvcnl9IGZyb20gJy4vc3JjL2FsaWFzJztcbmV4cG9ydCB7Q2xhc3NSZWNvcmQsIFRyYWl0Q29tcGlsZXJ9IGZyb20gJy4vc3JjL2NvbXBpbGF0aW9uJztcbmV4cG9ydCB7ZGVjbGFyYXRpb25UcmFuc2Zvcm1GYWN0b3J5LCBEdHNUcmFuc2Zvcm1SZWdpc3RyeSwgSXZ5RGVjbGFyYXRpb25EdHNUcmFuc2Zvcm0sIFJldHVyblR5cGVUcmFuc2Zvcm19IGZyb20gJy4vc3JjL2RlY2xhcmF0aW9uJztcbmV4cG9ydCB7QW5hbHl6ZWRUcmFpdCwgRXJyb3JlZFRyYWl0LCBQZW5kaW5nVHJhaXQsIFJlc29sdmVkVHJhaXQsIFNraXBwZWRUcmFpdCwgVHJhaXQsIFRyYWl0U3RhdGV9IGZyb20gJy4vc3JjL3RyYWl0JztcbmV4cG9ydCB7aXZ5VHJhbnNmb3JtRmFjdG9yeX0gZnJvbSAnLi9zcmMvdHJhbnNmb3JtJztcbiJdfQ==

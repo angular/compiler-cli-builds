@@ -18,6 +18,7 @@ import { NgccClassSymbol } from './ngcc_host';
  *  function CommonModule() {
  *  }
  *  CommonModule.decorators = [ ... ];
+ *  return CommonModule;
  * ```
  *
  * * "Classes" are decorated if they have a static property called `decorators`.
@@ -28,42 +29,7 @@ import { NgccClassSymbol } from './ngcc_host';
  *
  */
 export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
-    /**
-     * Determines whether the given declaration, which should be a "class", has a base "class".
-     *
-     * In ES5 code, we need to determine if the IIFE wrapper takes a `_super` parameter .
-     *
-     * @param clazz a `ClassDeclaration` representing the class over which to reflect.
-     */
-    hasBaseClass(clazz: ClassDeclaration): boolean;
     getBaseClassExpression(clazz: ClassDeclaration): ts.Expression | null;
-    getInternalNameOfClass(clazz: ClassDeclaration): ts.Identifier;
-    getAdjacentNameOfClass(clazz: ClassDeclaration): ts.Identifier;
-    getEndOfClass(classSymbol: NgccClassSymbol): ts.Node;
-    /**
-     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE,
-     * whose value is assigned to a variable (which represents the class to the rest of the program).
-     * So we might need to dig around to get hold of the "class" declaration.
-     *
-     * This method extracts a `NgccClassSymbol` if `declaration` is the outer variable which is
-     * assigned the result of the IIFE. Otherwise, undefined is returned.
-     *
-     * @param declaration the declaration whose symbol we are finding.
-     * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
-     */
-    protected getClassSymbolFromOuterDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
-    /**
-     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE,
-     * whose value is assigned to a variable (which represents the class to the rest of the program).
-     * So we might need to dig around to get hold of the "class" declaration.
-     *
-     * This method extracts a `NgccClassSymbol` if `declaration` is the function declaration inside
-     * the IIFE. Otherwise, undefined is returned.
-     *
-     * @param declaration the declaration whose symbol we are finding.
-     * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
-     */
-    protected getClassSymbolFromInnerDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
     /**
      * Trace an identifier to its declaration, if possible.
      *
@@ -100,23 +66,19 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      * @param decl The `Declaration` to check.
      * @return The passed in `Declaration` (potentially enhanced with a `KnownDeclaration`).
      */
-    detectKnownDeclaration(decl: null): null;
     detectKnownDeclaration<T extends Declaration>(decl: T): T;
-    detectKnownDeclaration<T extends Declaration>(decl: T | null): T | null;
     /**
-     * Get the inner function declaration of an ES5-style class.
+     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE,
+     * whose value is assigned to a variable (which represents the class to the rest of the program).
+     * So we might need to dig around to get hold of the "class" declaration.
      *
-     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE
-     * and returned to be assigned to a variable outside the IIFE, which is what the rest of the
-     * program interacts with.
+     * This method extracts a `NgccClassSymbol` if `declaration` is the function declaration inside
+     * the IIFE. Otherwise, undefined is returned.
      *
-     * Given the outer variable declaration, we want to get to the inner function declaration.
-     *
-     * @param decl a declaration node that could be the variable expression outside an ES5 class IIFE.
-     * @param checker the TS program TypeChecker
-     * @returns the inner function declaration or `undefined` if it is not a "class".
+     * @param declaration the declaration whose symbol we are finding.
+     * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
      */
-    protected getInnerFunctionDeclarationFromClassDeclaration(decl: ts.Declaration): ts.FunctionDeclaration | undefined;
+    protected getClassSymbolFromInnerDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
     /**
      * Find the declarations of the constructor parameters of a class identified by its symbol.
      *
@@ -178,4 +140,3 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      */
     protected getStatementsForClass(classSymbol: NgccClassSymbol): ts.Statement[];
 }
-export declare function getIifeBody(declaration: ts.Declaration): ts.Block | undefined;

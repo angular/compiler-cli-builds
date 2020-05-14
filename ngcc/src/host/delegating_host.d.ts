@@ -40,7 +40,5 @@ export declare class DelegatingReflectionHost implements NgccReflectionHost {
     getDecoratorsOfSymbol(symbol: NgccClassSymbol): Decorator[] | null;
     getSwitchableDeclarations(module: ts.Node): SwitchableVariableDeclaration[];
     getEndOfClass(classSymbol: NgccClassSymbol): ts.Node;
-    detectKnownDeclaration(decl: null): null;
     detectKnownDeclaration<T extends Declaration>(decl: T): T;
-    detectKnownDeclaration<T extends Declaration>(decl: T | null): T | null;
 }

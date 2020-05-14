@@ -17,13 +17,13 @@
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
     var error_1 = require("@angular/compiler-cli/src/ngtsc/diagnostics/src/error");
-    exports.FatalDiagnosticError = error_1.FatalDiagnosticError;
-    exports.isFatalDiagnosticError = error_1.isFatalDiagnosticError;
-    exports.makeDiagnostic = error_1.makeDiagnostic;
+    Object.defineProperty(exports, "FatalDiagnosticError", { enumerable: true, get: function () { return error_1.FatalDiagnosticError; } });
+    Object.defineProperty(exports, "isFatalDiagnosticError", { enumerable: true, get: function () { return error_1.isFatalDiagnosticError; } });
+    Object.defineProperty(exports, "makeDiagnostic", { enumerable: true, get: function () { return error_1.makeDiagnostic; } });
     var error_code_1 = require("@angular/compiler-cli/src/ngtsc/diagnostics/src/error_code");
-    exports.ErrorCode = error_code_1.ErrorCode;
-    exports.ngErrorCode = error_code_1.ngErrorCode;
+    Object.defineProperty(exports, "ErrorCode", { enumerable: true, get: function () { return error_code_1.ErrorCode; } });
+    Object.defineProperty(exports, "ngErrorCode", { enumerable: true, get: function () { return error_code_1.ngErrorCode; } });
     var util_1 = require("@angular/compiler-cli/src/ngtsc/diagnostics/src/util");
-    exports.replaceTsWithNgInErrors = util_1.replaceTsWithNgInErrors;
+    Object.defineProperty(exports, "replaceTsWithNgInErrors", { enumerable: true, get: function () { return util_1.replaceTsWithNgInErrors; } });
 });
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9wYWNrYWdlcy9jb21waWxlci1jbGkvc3JjL25ndHNjL2RpYWdub3N0aWNzL2luZGV4LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOzs7Ozs7R0FNRzs7Ozs7Ozs7Ozs7O0lBRUgsK0VBQXlGO0lBQWpGLHVDQUFBLG9CQUFvQixDQUFBO0lBQUUseUNBQUEsc0JBQXNCLENBQUE7SUFBRSxpQ0FBQSxjQUFjLENBQUE7SUFDcEUseUZBQXdEO0lBQWhELGlDQUFBLFNBQVMsQ0FBQTtJQUFFLG1DQUFBLFdBQVcsQ0FBQTtJQUM5Qiw2RUFBbUQ7SUFBM0MseUNBQUEsdUJBQXVCLENBQUEiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBsaWNlbnNlXG4gKiBDb3B5cmlnaHQgR29vZ2xlIEluYy4gQWxsIFJpZ2h0cyBSZXNlcnZlZC5cbiAqXG4gKiBVc2Ugb2YgdGhpcyBzb3VyY2UgY29kZSBpcyBnb3Zlcm5lZCBieSBhbiBNSVQtc3R5bGUgbGljZW5zZSB0aGF0IGNhbiBiZVxuICogZm91bmQgaW4gdGhlIExJQ0VOU0UgZmlsZSBhdCBodHRwczovL2FuZ3VsYXIuaW8vbGljZW5zZVxuICovXG5cbmV4cG9ydCB7RmF0YWxEaWFnbm9zdGljRXJyb3IsIGlzRmF0YWxEaWFnbm9zdGljRXJyb3IsIG1ha2VEaWFnbm9zdGljfSBmcm9tICcuL3NyYy9lcnJvcic7XG5leHBvcnQge0Vycm9yQ29kZSwgbmdFcnJvckNvZGV9IGZyb20gJy4vc3JjL2Vycm9yX2NvZGUnO1xuZXhwb3J0IHtyZXBsYWNlVHNXaXRoTmdJbkVycm9yc30gZnJvbSAnLi9zcmMvdXRpbCc7XG4iXX0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9wYWNrYWdlcy9jb21waWxlci1jbGkvc3JjL25ndHNjL2RpYWdub3N0aWNzL2luZGV4LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOzs7Ozs7R0FNRzs7Ozs7Ozs7Ozs7O0lBRUgsK0VBQXlGO0lBQWpGLDZHQUFBLG9CQUFvQixPQUFBO0lBQUUsK0dBQUEsc0JBQXNCLE9BQUE7SUFBRSx1R0FBQSxjQUFjLE9BQUE7SUFDcEUseUZBQXdEO0lBQWhELHVHQUFBLFNBQVMsT0FBQTtJQUFFLHlHQUFBLFdBQVcsT0FBQTtJQUM5Qiw2RUFBbUQ7SUFBM0MsK0dBQUEsdUJBQXVCLE9BQUEiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBsaWNlbnNlXG4gKiBDb3B5cmlnaHQgR29vZ2xlIEluYy4gQWxsIFJpZ2h0cyBSZXNlcnZlZC5cbiAqXG4gKiBVc2Ugb2YgdGhpcyBzb3VyY2UgY29kZSBpcyBnb3Zlcm5lZCBieSBhbiBNSVQtc3R5bGUgbGljZW5zZSB0aGF0IGNhbiBiZVxuICogZm91bmQgaW4gdGhlIExJQ0VOU0UgZmlsZSBhdCBodHRwczovL2FuZ3VsYXIuaW8vbGljZW5zZVxuICovXG5cbmV4cG9ydCB7RmF0YWxEaWFnbm9zdGljRXJyb3IsIGlzRmF0YWxEaWFnbm9zdGljRXJyb3IsIG1ha2VEaWFnbm9zdGljfSBmcm9tICcuL3NyYy9lcnJvcic7XG5leHBvcnQge0Vycm9yQ29kZSwgbmdFcnJvckNvZGV9IGZyb20gJy4vc3JjL2Vycm9yX2NvZGUnO1xuZXhwb3J0IHtyZXBsYWNlVHNXaXRoTmdJbkVycm9yc30gZnJvbSAnLi9zcmMvdXRpbCc7XG4iXX0=

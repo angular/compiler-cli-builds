@@ -116,62 +116,6 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      */
     getClassSymbol(declaration: ts.Node): NgccClassSymbol | undefined;
     /**
-     * In ES2015, a class may be declared using a variable declaration of the following structures:
-     *
-     * ```
-     * var MyClass = MyClass_1 = class MyClass {};
-     * ```
-     *
-     * or
-     *
-     * ```
-     * var MyClass = MyClass_1 = (() => { class MyClass {} ... return MyClass; })()
-     * ```
-     *
-     * This method extracts the `NgccClassSymbol` for `MyClass` when provided with the `var MyClass`
-     * declaration node. When the `class MyClass {}` node or any other node is given, this method will
-     * return undefined instead.
-     *
-     * @param declaration the declaration whose symbol we are finding.
-     * @returns the symbol for the node or `undefined` if it does not represent an outer declaration
-     * of a class.
-     */
-    protected getClassSymbolFromOuterDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
-    /**
-     * In ES2015, a class may be declared using a variable declaration of the following structures:
-     *
-     * ```
-     * var MyClass = MyClass_1 = class MyClass {};
-     * ```
-     *
-     * or
-     *
-     * ```
-     * var MyClass = MyClass_1 = (() => { class MyClass {} ... return MyClass; })()
-     * ```
-     *
-     * This method extracts the `NgccClassSymbol` for `MyClass` when provided with the
-     * `class MyClass {}` declaration node. When the `var MyClass` node or any other node is given,
-     * this method will return undefined instead.
-     *
-     * @param declaration the declaration whose symbol we are finding.
-     * @returns the symbol for the node or `undefined` if it does not represent an inner declaration
-     * of a class.
-     */
-    protected getClassSymbolFromInnerDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
-    /**
-     * Creates an `NgccClassSymbol` from an outer and inner declaration. If a class only has an outer
-     * declaration, the "implementation" symbol of the created `NgccClassSymbol` will be set equal to
-     * the "declaration" symbol.
-     *
-     * @param outerDeclaration The outer declaration node of the class.
-     * @param innerDeclaration The inner declaration node of the class, or undefined if no inner
-     * declaration is present.
-     * @returns the `NgccClassSymbol` representing the class, or undefined if a `ts.Symbol` for any of
-     * the declarations could not be resolved.
-     */
-    protected createClassSymbol(outerDeclaration: ClassDeclaration, innerDeclaration: ClassDeclaration | null): NgccClassSymbol | undefined;
-    /**
      * Examine a declaration (for example, of a class or function) and return metadata about any
      * decorators present on the declaration.
      *
@@ -211,8 +155,10 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @throws if `declaration` does not resolve to a class declaration.
      */
     getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
-    hasBaseClass(clazz: ClassDeclaration): boolean;
     getBaseClassExpression(clazz: ClassDeclaration): ts.Expression | null;
+    getInternalNameOfClass(clazz: ClassDeclaration): ts.Identifier;
+    getAdjacentNameOfClass(clazz: ClassDeclaration): ts.Identifier;
+    private getNameFromClassSymbolDeclaration;
     /**
      * Check whether the given node actually represents a class.
      */
@@ -283,9 +229,88 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param decl The `Declaration` to check.
      * @return The passed in `Declaration` (potentially enhanced with a `KnownDeclaration`).
      */
-    detectKnownDeclaration(decl: null): null;
     detectKnownDeclaration<T extends Declaration>(decl: T): T;
-    detectKnownDeclaration<T extends Declaration>(decl: T | null): T | null;
+    /**
+     * A class may be declared as a top level class declaration:
+     *
+     * ```
+     * class OuterClass { ... }
+     * ```
+     *
+     * or in a variable declaration to a class expression:
+     *
+     * ```
+     * var OuterClass = ClassAlias = class InnerClass {};
+     * ```
+     *
+     * or in a variable declaration to an IIFE containing a class declaration
+     *
+     * ```
+     * var OuterClass = ClassAlias = (() => {
+     *   class InnerClass {}
+     *   ...
+     *   return InnerClass;
+     * })()
+     * ```
+     *
+     * or in a variable declaration to an IIFE containing a function declaration
+     *
+     * ```
+     * var OuterClass = ClassAlias = (() => {
+     *   function InnerClass() {}
+     *   ...
+     *   return InnerClass;
+     * })()
+     * ```
+     *
+     * This method returns an `NgccClassSymbol` when provided with one of these cases.
+     *
+     * @param declaration the declaration whose symbol we are finding.
+     * @returns the symbol for the class or `undefined` if `declaration` does not represent an outer
+     *     declaration of a class.
+     */
+    protected getClassSymbolFromOuterDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
+    /**
+     * In ES2015, a class may be declared using a variable declaration of the following structures:
+     *
+     * ```
+     * let MyClass = MyClass_1 = class MyClass {};
+     * ```
+     *
+     * or
+     *
+     * ```
+     * let MyClass = MyClass_1 = (() => { class MyClass {} ... return MyClass; })()
+     * ```
+     *
+     * or
+     *
+     * ```
+     * let MyClass = MyClass_1 = (() => { let MyClass = class MyClass {}; ... return MyClass; })()
+     * ```
+     *
+     * This method extracts the `NgccClassSymbol` for `MyClass` when provided with the
+     * `class MyClass {}` declaration node. When the `var MyClass` node or any other node is given,
+     * this method will return undefined instead.
+     *
+     * @param declaration the declaration whose symbol we are finding.
+     * @returns the symbol for the node or `undefined` if it does not represent an inner declaration
+     * of a class.
+     */
+    protected getClassSymbolFromInnerDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
+    /**
+     * Creates an `NgccClassSymbol` from an outer and inner declaration. If a class only has an outer
+     * declaration, the "implementation" symbol of the created `NgccClassSymbol` will be set equal to
+     * the "declaration" symbol.
+     *
+     * @param outerDeclaration The outer declaration node of the class.
+     * @param innerDeclaration The inner declaration node of the class, or undefined if no inner
+     * declaration is present.
+     * @returns the `NgccClassSymbol` representing the class, or undefined if a `ts.Symbol` for any of
+     * the declarations could not be resolved.
+     */
+    protected createClassSymbol(outerDeclaration: ClassDeclaration, innerDeclaration: ts.Node | null): NgccClassSymbol | undefined;
+    private getAdjacentSymbol;
     /**
      * Resolve a `ts.Symbol` to its declaration and detect whether it corresponds with a known
      * declaration.
@@ -768,7 +793,7 @@ export declare function isAssignmentStatement(statement: ts.Statement): statemen
  * @returns the `ts.Expression` or `ts.FunctionBody` that holds the body of the IIFE or `undefined`
  *     if the `expression` did not have the correct shape.
  */
-export declare function getIifeConciseBody(expression: ts.Expression): ts.ConciseBody | undefined;
+export declare function getIifeBody(expression: ts.Expression): ts.ConciseBody | undefined;
 /**
  * Returns true if the `node` is an assignment of the form `a = b`.
  *
@@ -808,4 +833,38 @@ export declare function isMemberDecorateCall(call: ts.CallExpression, matches: (
  * which is actually the symbol of the identifier of the property.
  */
 export declare function getPropertyValueFromSymbol(propSymbol: ts.Symbol): ts.Expression | undefined;
+declare type InitializedVariableClassDeclaration = ClassDeclaration<ts.VariableDeclaration> & {
+    initializer: ts.Expression;
+};
+/**
+ * Handle a variable declaration of the form
+ *
+ * ```
+ * var MyClass = alias1 = alias2 = <<declaration>>
+ * ```
+ *
+ * @node the LHS of a variable declaration.
+ * @returns the original AST node or the RHS of a series of assignments in a variable
+ *     declaration.
+ */
+export declare function skipClassAliases(node: InitializedVariableClassDeclaration): ts.Expression;
+/**
+ * Find the statement that contains the given node
+ * @param node a node whose containing statement we wish to find
+ */
+export declare function getContainingStatement(node: ts.Node): ts.Statement;
+/**
+ * Get the actual (outer) declaration of a class.
+ *
+ * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE and
+ * returned to be assigned to a variable outside the IIFE, which is what the rest of the program
+ * interacts with.
+ *
+ * Given the inner function declaration, we want to get to the declaration of the outer variable
+ * that represents the class.
+ *
+ * @param node a node that could be the function expression inside an ES5 class IIFE.
+ * @returns the outer variable declaration or `undefined` if it is not a "class".
+ */
+export declare function getClassDeclarationFromInnerDeclaration(node: ts.Node): ClassDeclaration<ts.VariableDeclaration> | null;
 export {};
