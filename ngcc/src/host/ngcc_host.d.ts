@@ -42,6 +42,11 @@ export interface NgccClassSymbol {
      * declaration.
      */
     implementation: ts.Symbol;
+    /**
+     * Represents the symbol corresponding to a variable within a class IIFE that may be used to
+     * attach static properties or decorated.
+     */
+    adjacent?: ts.Symbol;
 }
 /**
  * A reflection host that has extra methods for looking at non-Typescript package formats
@@ -88,8 +93,8 @@ export interface NgccReflectionHost extends ReflectionHost {
      * Check whether a `Declaration` corresponds with a known declaration and set its `known` property
      * to the appropriate `KnownDeclaration`.
      *
-     * @param decl The `Declaration` to check or `null` if there is no declaration.
+     * @param decl The `Declaration` to check.
      * @return The passed in `Declaration` (potentially enhanced with a `KnownDeclaration`).
      */
-    detectKnownDeclaration<T extends Declaration>(decl: T | null): T | null;
+    detectKnownDeclaration<T extends Declaration>(decl: T): T;
 }

@@ -49,9 +49,18 @@ export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
      */
     private getTopLevelHelperCalls;
     private computeExportsOfCommonJsModule;
-    private extractCommonJsExportDeclaration;
-    private extractCommonJsReexports;
+    private extractBasicCommonJsExportDeclaration;
+    private extractCommonJsWildcardReexports;
+    private extractCommonJsDefinePropertyExportDeclaration;
     private findCommonJsImport;
-    private getCommonJsImportedDeclaration;
+    private extractCommonJsExportDeclaration;
+    /**
+     * Handle the case where the identifier represents a reference to a whole CommonJS
+     * module, i.e. the result of a call to `require(...)`.
+     *
+     * @param id the identifier whose declaration we are looking for.
+     * @returns a declaration if `id` refers to a CommonJS module, or `null` otherwise.
+     */
+    private getCommonJsModuleDeclaration;
     private resolveModuleName;
 }

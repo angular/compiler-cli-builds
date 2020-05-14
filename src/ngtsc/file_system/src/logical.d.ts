@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { AbsoluteFsPath, BrandedPath } from './types';
+import { AbsoluteFsPath, BrandedPath, PathSegment } from './types';
 /**
  * A path that's relative to the logical root of a TypeScript project (one of the project's
  * rootDirs).
@@ -22,7 +22,7 @@ export declare const LogicalProjectPath: {
      * This will return a `PathSegment` which would be a valid module specifier to use in `from` when
      * importing from `to`.
      */
-    relativePathBetween: (from: BrandedPath<"LogicalProjectPath">, to: BrandedPath<"LogicalProjectPath">) => BrandedPath<"PathSegment">;
+    relativePathBetween: (from: LogicalProjectPath, to: LogicalProjectPath) => PathSegment;
 };
 /**
  * A utility class which can translate absolute paths to source files into logical paths in

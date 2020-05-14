@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/execution/cluster/utils" />
-import { MessageFromWorker } from './api';
+import { MessageFromWorker, MessageToWorker } from './api';
 /** Expose a `Promise` instance as well as APIs for resolving/rejecting it. */
 export declare class Deferred<T> {
     /**
@@ -42,4 +42,4 @@ export declare const sendMessageToMaster: (msg: MessageFromWorker) => Promise<vo
  * @param msg The message to send to the worker.
  * @return A promise that is resolved once the message has been sent.
  */
-export declare const sendMessageToWorker: (workerId: number, msg: import("@angular/compiler-cli/ngcc/src/execution/cluster/api").ProcessTaskMessage) => Promise<void>;
+export declare const sendMessageToWorker: (workerId: number, msg: MessageToWorker) => Promise<void>;

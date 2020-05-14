@@ -36,14 +36,19 @@ export declare class UmdReflectionHost extends Esm5ReflectionHost {
     private computeUmdModule;
     private computeExportsOfUmdModule;
     private computeImportPath;
+    private extractBasicUmdExportDeclaration;
+    private extractUmdWildcardReexports;
+    private extractUmdDefinePropertyExportDeclaration;
     private extractUmdExportDeclaration;
-    private extractUmdReexports;
     /**
      * Is the identifier a parameter on a UMD factory function, e.g. `function factory(this, core)`?
      * If so then return its declaration.
      */
     private findUmdImportParameter;
-    private getUmdImportedDeclaration;
+    private getUmdDeclaration;
+    private getUmdModuleDeclaration;
+    private getImportPathFromParameter;
+    private getImportPathFromRequireCall;
     private resolveModuleName;
 }
 export declare function parseStatementForUmdModule(statement: ts.Statement): UmdModule | null;
