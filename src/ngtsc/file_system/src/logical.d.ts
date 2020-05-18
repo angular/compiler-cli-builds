@@ -35,6 +35,11 @@ export declare class LogicalFileSystem {
      */
     private rootDirs;
     /**
+     * The same root directories as `rootDirs` but with each one converted to its
+     * canonical form for matching in case-insensitive file-systems.
+     */
+    private canonicalRootDirs;
+    /**
      * A cache of file paths to project paths, because computation of these paths is slightly
      * expensive.
      */
