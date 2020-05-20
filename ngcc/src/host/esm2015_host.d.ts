@@ -856,15 +856,15 @@ export declare function getContainingStatement(node: ts.Node): ts.Statement;
 /**
  * Get the actual (outer) declaration of a class.
  *
- * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE and
+ * Sometimes, the implementation of a class is an expression that is hidden inside an IIFE and
  * returned to be assigned to a variable outside the IIFE, which is what the rest of the program
  * interacts with.
  *
- * Given the inner function declaration, we want to get to the declaration of the outer variable
- * that represents the class.
+ * Given the inner declaration, we want to get to the declaration of the outer variable that
+ * represents the class.
  *
- * @param node a node that could be the function expression inside an ES5 class IIFE.
- * @returns the outer variable declaration or `undefined` if it is not a "class".
+ * @param node a node that could be the inner declaration inside an IIFE.
+ * @returns the outer variable declaration or `null` if it is not a "class".
  */
 export declare function getClassDeclarationFromInnerDeclaration(node: ts.Node): ClassDeclaration<ts.VariableDeclaration> | null;
 export {};
