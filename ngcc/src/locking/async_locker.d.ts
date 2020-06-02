@@ -25,6 +25,4 @@ export declare class AsyncLocker {
      */
     lock<T>(fn: () => Promise<T>): Promise<T>;
     protected create(): Promise<void>;
-    protected isProcessRunning(pid: string): boolean;
-    private lockFileMessage;
 }
