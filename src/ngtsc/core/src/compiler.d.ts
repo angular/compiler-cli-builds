@@ -11,8 +11,7 @@ import { IncrementalDriver } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
 import { PerfRecorder } from '../../perf';
 import { TypeCheckingProgramStrategy } from '../../typecheck';
-import { LazyRoute, NgCompilerOptions } from '../api';
-import { NgCompilerHost } from './host';
+import { LazyRoute, NgCompilerAdapter, NgCompilerOptions } from '../api';
 /**
  * The heart of the Angular Ivy compiler.
  *
@@ -26,7 +25,7 @@ import { NgCompilerHost } from './host';
  * See the README.md for more information.
  */
 export declare class NgCompiler {
-    private host;
+    private adapter;
     private options;
     private tsProgram;
     private typeCheckingProgramStrategy;
@@ -58,7 +57,7 @@ export declare class NgCompiler {
     readonly incrementalDriver: IncrementalDriver;
     readonly ignoreForDiagnostics: Set<ts.SourceFile>;
     readonly ignoreForEmit: Set<ts.SourceFile>;
-    constructor(host: NgCompilerHost, options: NgCompilerOptions, tsProgram: ts.Program, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
+    constructor(adapter: NgCompilerAdapter, options: NgCompilerOptions, tsProgram: ts.Program, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
     /**
      * Get all Angular-related diagnostics for this compilation.
      *

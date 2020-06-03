@@ -32,7 +32,7 @@ export declare function nodeDebugInfo(node: ts.Node): string;
  * This helper will attempt to use the `CompilerHost.resolveModuleNames()` method if available.
  * Otherwise it will fallback on the `ts.ResolveModuleName()` function.
  */
-export declare function resolveModuleName(moduleName: string, containingFile: string, compilerOptions: ts.CompilerOptions, compilerHost: ts.CompilerHost, moduleResolutionCache: ts.ModuleResolutionCache | null): ts.ResolvedModule | undefined;
+export declare function resolveModuleName(moduleName: string, containingFile: string, compilerOptions: ts.CompilerOptions, compilerHost: ts.ModuleResolutionHost & Pick<ts.CompilerHost, 'resolveModuleNames'>, moduleResolutionCache: ts.ModuleResolutionCache | null): ts.ResolvedModule | undefined;
 /**
  * Asserts that the keys `K` form a subset of the keys of `T`.
  */

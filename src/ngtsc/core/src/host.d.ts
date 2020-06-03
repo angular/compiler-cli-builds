@@ -8,8 +8,9 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/core/src/host" />
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
-import { FactoryTracker, ShimAdapter, ShimReferenceTagger } from '../../shims';
-import { ExtendedTsCompilerHost, NgCompilerOptions, UnifiedModulesHost } from '../api';
+import { ShimAdapter, ShimReferenceTagger } from '../../shims';
+import { FactoryTracker } from '../../shims/api';
+import { ExtendedTsCompilerHost, NgCompilerAdapter, NgCompilerOptions, UnifiedModulesHost } from '../api';
 /**
  * Represents the `ExtendedTsCompilerHost` interface, with a transformation applied that turns all
  * methods (even optional ones) into required fields (which may be `undefined`, if the method was
@@ -65,12 +66,12 @@ export declare class DelegatingCompilerHost implements Omit<RequiredCompilerHost
  * The interface implementations here ensure that `NgCompilerHost` fully delegates to
  * `ExtendedTsCompilerHost` methods whenever present.
  */
-export declare class NgCompilerHost extends DelegatingCompilerHost implements RequiredCompilerHostDelegations, ExtendedTsCompilerHost {
+export declare class NgCompilerHost extends DelegatingCompilerHost implements RequiredCompilerHostDelegations, ExtendedTsCompilerHost, NgCompilerAdapter {
     private shimAdapter;
     private shimTagger;
     readonly factoryTracker: FactoryTracker | null;
     readonly entryPoint: AbsoluteFsPath | null;
-    readonly diagnostics: ts.Diagnostic[];
+    readonly constructionDiagnostics: ts.Diagnostic[];
     readonly inputFiles: ReadonlyArray<string>;
     readonly rootDirs: ReadonlyArray<AbsoluteFsPath>;
     constructor(delegate: ExtendedTsCompilerHost, inputFiles: ReadonlyArray<string>, rootDirs: ReadonlyArray<AbsoluteFsPath>, shimAdapter: ShimAdapter, shimTagger: ShimReferenceTagger, entryPoint: AbsoluteFsPath | null, factoryTracker: FactoryTracker | null, diagnostics: ts.Diagnostic[]);

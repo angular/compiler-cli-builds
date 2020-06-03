@@ -8,18 +8,17 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/resource/src/loader" />
 import * as ts from 'typescript';
 import { ResourceLoader } from '../../annotations';
-import { ExtendedTsCompilerHost } from '../../core/api';
+import { NgCompilerAdapter } from '../../core/api';
 /**
- * `ResourceLoader` which delegates to a `CompilerHost` resource loading method.
+ * `ResourceLoader` which delegates to an `NgCompilerAdapter`'s resource loading methods.
  */
-export declare class HostResourceLoader implements ResourceLoader {
-    private host;
+export declare class AdapterResourceLoader implements ResourceLoader {
+    private adapter;
     private options;
     private cache;
     private fetching;
-    private rootDirs;
     canPreload: boolean;
-    constructor(host: ExtendedTsCompilerHost, options: ts.CompilerOptions);
+    constructor(adapter: NgCompilerAdapter, options: ts.CompilerOptions);
     /**
      * Resolve the url of a resource relative to the file that contains the reference to it.
      * The return value of this method can be used in the `load()` and `preload()` methods.

@@ -6,4 +6,4 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/resource" />
-export { HostResourceLoader } from './src/loader';
+export { AdapterResourceLoader } from './src/loader';
