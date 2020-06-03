@@ -49,6 +49,14 @@ export declare class StaticInterpreter {
     private visitSourceFile;
     private accessHelper;
     private visitCallExpression;
+    /**
+     * Visit an expression which was extracted from a foreign-function resolver.
+     *
+     * This will process the result and ensure it's correct for FFR-resolved values, including marking
+     * `Reference`s as synthetic.
+     */
+    private visitFfrExpression;
+    private visitFunctionBody;
     private visitConditionalExpression;
     private visitPrefixUnaryExpression;
     private visitBinaryExpression;
