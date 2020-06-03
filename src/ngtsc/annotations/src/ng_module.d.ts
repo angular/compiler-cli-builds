@@ -14,7 +14,7 @@ import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { NgModuleRouteAnalyzer } from '../../routing';
 import { LocalModuleScopeRegistry } from '../../scope';
-import { FactoryTracker } from '../../shims';
+import { FactoryTracker } from '../../shims/api';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
 import { ReferencesRegistry } from './references_registry';
 export interface NgModuleAnalysis {

@@ -44,7 +44,7 @@ export declare class LogicalFileSystem {
      * expensive.
      */
     private cache;
-    constructor(rootDirs: AbsoluteFsPath[], compilerHost: ts.CompilerHost);
+    constructor(rootDirs: AbsoluteFsPath[], compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>);
     /**
      * Get the logical path in the project of a `ts.SourceFile`.
      *

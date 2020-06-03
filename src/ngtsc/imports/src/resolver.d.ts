@@ -18,6 +18,6 @@ export declare class ModuleResolver {
     private compilerOptions;
     private host;
     private moduleResolutionCache;
-    constructor(program: ts.Program, compilerOptions: ts.CompilerOptions, host: ts.CompilerHost, moduleResolutionCache: ts.ModuleResolutionCache | null);
+    constructor(program: ts.Program, compilerOptions: ts.CompilerOptions, host: ts.ModuleResolutionHost & Pick<ts.CompilerHost, 'resolveModuleNames'>, moduleResolutionCache: ts.ModuleResolutionCache | null);
     resolveModule(moduleName: string, containingFile: string): ts.SourceFile | null;
 }
