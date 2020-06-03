@@ -96,7 +96,7 @@ export declare class TypeCheckContext {
     private refEmitter;
     private reflector;
     private fileMap;
-    constructor(config: TypeCheckingConfig, compilerHost: ts.CompilerHost, refEmitter: ReferenceEmitter, reflector: ReflectionHost);
+    constructor(config: TypeCheckingConfig, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, refEmitter: ReferenceEmitter, reflector: ReflectionHost);
     /**
      * A `Map` of `ts.SourceFile`s that the context has seen to the operations (additions of methods
      * or type-check blocks) that need to be eventually performed on that file.

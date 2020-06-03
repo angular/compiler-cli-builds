@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/entry_point/src/generator" />
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
-import { TopLevelShimGenerator } from '../../shims';
+import { TopLevelShimGenerator } from '../../shims/api';
 export declare class FlatIndexGenerator implements TopLevelShimGenerator {
     readonly entryPoint: AbsoluteFsPath;
     readonly moduleName: string | null;
