@@ -13,26 +13,46 @@ import { DependencyHostBase } from './dependency_host';
  * Helper functions for computing dependencies.
  */
 export declare class EsmDependencyHost extends DependencyHostBase {
+    private scanner;
+    protected canSkipFile(fileContents: string): boolean;
+    protected extractImports(file: AbsoluteFsPath, fileContents: string): Set<string>;
     /**
-     * Compute the dependencies of the given file.
+     * We have found an `import` token so now try to identify the import path.
      *
-     * @param file An absolute path to the file whose dependencies we want to get.
-     * @param dependencies A set that will have the absolute paths of resolved entry points added to
-     * it.
-     * @param missing A set that will have the dependencies that could not be found added to it.
-     * @param deepImports A set that will have the import paths that exist but cannot be mapped to
-     * entry-points, i.e. deep-imports.
-     * @param alreadySeen A set that is used to track internal dependencies to prevent getting stuck
-     * in a circular dependency loop.
+     * This method will use the current state of `this.scanner` to extract a string literal module
+     * specifier. It expects that the current state of the scanner is that an `import` token has just
+     * been scanned.
+     *
+     * The following forms of import are matched:
+     *
+     * * `import "module-specifier";`
+     * * `import("module-specifier")`
+     * * `import defaultBinding from "module-specifier";`
+     * * `import defaultBinding, * as identifier from "module-specifier";`
+     * * `import defaultBinding, {...} from "module-specifier";`
+     * * `import * as identifier from "module-specifier";`
+     * * `import {...} from "module-specifier";`
+     *
+     * @returns the import path or null if there is no import or it is not a string literal.
      */
-    protected recursivelyCollectDependencies(file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<string>, alreadySeen: Set<AbsoluteFsPath>): void;
+    protected extractImportPath(): string | null;
     /**
-     * Resolve the given `importPath` from `file` and add it to the appropriate set.
+     * We have found an `export` token so now try to identify a re-export path.
      *
-     * @returns `true` if the import was resolved (to an entry-point, a local import, or a
-     * deep-import).
+     * This method will use the current state of `this.scanner` to extract a string literal module
+     * specifier. It expects that the current state of the scanner is that an `export` token has
+     * just been scanned.
+     *
+     * There are three forms of re-export that are matched:
+     *
+     * * `export * from '...';
+     * * `export * as alias from '...';
+     * * `export {...} from '...';
      */
-    protected processImport(importPath: string, file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<string>, alreadySeen: Set<AbsoluteFsPath>): boolean;
+    protected extractReexportPath(): string | null;
+    protected skipNamespacedClause(): ts.SyntaxKind | null;
+    protected skipNamedClause(): ts.SyntaxKind;
+    protected tryStringLiteral(): string | null;
 }
 /**
  * Check whether a source file needs to be parsed for imports.

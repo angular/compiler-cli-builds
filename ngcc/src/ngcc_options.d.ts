@@ -107,6 +107,13 @@ export interface SyncNgccOptions {
      * If `null`, ngcc will not attempt to load any TS config file at all.
      */
     tsConfigPath?: string | null;
+    /**
+     * Use the program defined in the loaded tsconfig.json (if available - see
+     * `tsConfigPath` option) to identify the entry-points that should be processed.
+     * If this is set to `true` then only the entry-points reachable from the given
+     * program (and their dependencies) will be processed.
+     */
+    findEntryPointsFromTsConfigProgram?: boolean;
 }
 /**
  * The options to configure the ngcc compiler for asynchronous execution.
@@ -118,7 +125,7 @@ export declare type AsyncNgccOptions = Omit<SyncNgccOptions, 'async'> & {
  * The options to configure the ngcc compiler.
  */
 export declare type NgccOptions = AsyncNgccOptions | SyncNgccOptions;
-export declare type OptionalNgccOptionKeys = 'targetEntryPointPath' | 'tsConfigPath' | 'pathMappings';
+export declare type OptionalNgccOptionKeys = 'targetEntryPointPath' | 'tsConfigPath' | 'pathMappings' | 'findEntryPointsFromTsConfigProgram';
 export declare type RequiredNgccOptions = Required<Omit<NgccOptions, OptionalNgccOptionKeys>>;
 export declare type OptionalNgccOptions = Pick<NgccOptions, OptionalNgccOptionKeys>;
 export declare type SharedSetup = {
