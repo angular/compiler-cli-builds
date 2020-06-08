@@ -134,3 +134,4 @@ export declare type SharedSetup = {
  * NOTE: Avoid eagerly instantiating anything that might not be used when running sync/async.
  */
 export declare function getSharedSetup(options: NgccOptions): SharedSetup & RequiredNgccOptions & OptionalNgccOptions;
+export declare function clearTsConfigCache(): void;
