@@ -15,22 +15,6 @@ import { DependencyHostBase } from './dependency_host';
 export declare class EsmDependencyHost extends DependencyHostBase {
     private scanner;
     protected canSkipFile(fileContents: string): boolean;
-    /**
-     * Extract any import paths from imports found in the contents of this file.
-     *
-     * This implementation uses the TypeScript scanner, which tokenizes source code,
-     * to process the string. This is halfway between working with the string directly,
-     * which is too difficult due to corner cases, and parsing the string into a full
-     * TypeScript Abstract Syntax Tree (AST), which ends up doing more processing than
-     * is needed.
-     *
-     * The scanning is not trivial because we must hold state between each token since
-     * the context of the token affects how it should be scanned, and the scanner does
-     * not manage this for us.
-     *
-     * Specifically, backticked strings are particularly challenging since it is possible
-     * to recursively nest backticks and TypeScript expressions within each other.
-     */
     protected extractImports(file: AbsoluteFsPath, fileContents: string): Set<string>;
     /**
      * We have found an `import` token so now try to identify the import path.
