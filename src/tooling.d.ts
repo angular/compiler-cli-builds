@@ -12,6 +12,7 @@
  *
  * Any changes to this file should be discussed with the Angular CLI team.
  */
+import * as ts from 'typescript';
 /**
  * Known values for global variables in `@angular/core` that Terser should set using
  * https://github.com/terser-js/terser#conditional-compilation
@@ -25,3 +26,11 @@ export declare const GLOBAL_DEFS_FOR_TERSER_WITH_AOT: {
     ngDevMode: boolean;
     ngI18nClosureMode: boolean;
 };
+/**
+ * Transform for downleveling Angular decorators and Angular-decorated class constructor
+ * parameters for dependency injection. This transform can be used by the CLI for JIT-mode
+ * compilation where decorators should be preserved, but downleveled so that apps are not
+ * exposed to the ES2015 temporal dead zone limitation in TypeScript's metadata.
+ * See https://github.com/angular/angular-cli/pull/14473 for more details.
+ */
+export declare function decoratorDownlevelTransformerFactory(program: ts.Program): ts.TransformerFactory<ts.SourceFile>;
