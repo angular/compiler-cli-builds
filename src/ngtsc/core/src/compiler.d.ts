@@ -121,3 +121,7 @@ export declare class NgCompiler {
     private scanForMwp;
     private makeCompilation;
 }
+/**
+ * Determine if the given `Program` is @angular/core.
+ */
+export declare function isAngularCorePackage(program: ts.Program): boolean;
