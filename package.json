@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "10.0.0-rc.3+13.sha-6114cd2",
+  "version": "10.0.0-rc.3+14.sha-9d397eb",
   "description": "Angular - the compiler CLI for Node.js",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -26,7 +26,7 @@
     "yargs": "15.3.0"
   },
   "peerDependencies": {
-    "@angular/compiler": "10.0.0-rc.3+13.sha-6114cd2",
+    "@angular/compiler": "10.0.0-rc.3+14.sha-9d397eb",
     "typescript": ">=3.9 <4.0"
   },
   "engines": {
@@ -67,5 +67,8 @@
       "@angular/localize",
       "@angular/service-worker"
     ]
+  },
+  "publishConfig": {
+    "registry": "https://wombat-dressing-room.appspot.com"
   }
 }
