@@ -10,6 +10,7 @@ import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { FileSystem } from '../../../src/ngtsc/file_system';
 import { ImportManager } from '../../../src/ngtsc/translator';
+import { ParsedConfiguration } from '../../../src/perform_compile';
 import { PrivateDeclarationsAnalyses } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
 import { CompiledFile, DecorationAnalyses } from '../analysis/types';
@@ -30,7 +31,8 @@ export declare class Renderer {
     private fs;
     private logger;
     private bundle;
-    constructor(host: NgccReflectionHost, srcFormatter: RenderingFormatter, fs: FileSystem, logger: Logger, bundle: EntryPointBundle);
+    private tsConfig;
+    constructor(host: NgccReflectionHost, srcFormatter: RenderingFormatter, fs: FileSystem, logger: Logger, bundle: EntryPointBundle, tsConfig?: ParsedConfiguration | null);
     renderProgram(decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileToWrite[];
     /**
      * Render the source code and source-map for an Analyzed file.
