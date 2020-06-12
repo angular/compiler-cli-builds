@@ -4,12 +4,12 @@ import { PackageJsonFormatPropertiesMap } from './entry_point';
 /**
  * The format of a project level configuration file.
  */
-export interface NgccProjectConfig<T = NgccPackageConfig> {
+export interface NgccProjectConfig<T = RawNgccPackageConfig> {
     /**
      * The packages that are configured by this project config.
      */
     packages?: {
-        [packagePath: string]: T;
+        [packagePath: string]: T | undefined;
     };
     /**
      * Options that control how locking the process is handled.
@@ -32,17 +32,15 @@ export interface ProcessLockingConfiguration {
     retryDelay?: number;
 }
 /**
- * The format of a package level configuration file.
+ * The raw format of a package level configuration (as it appears in configuration files).
  */
-export interface NgccPackageConfig {
+export interface RawNgccPackageConfig {
     /**
      * The entry-points to configure for this package.
      *
-     * In the config file the keys can be paths relative to the package path;
-     * but when being read back from the `NgccConfiguration` service, these paths
-     * will be absolute.
+     * In the config file the keys are paths relative to the package path.
      */
-    entryPoints: {
+    entryPoints?: {
         [entryPointPath: string]: NgccEntryPointConfig;
     };
     /**
@@ -102,8 +100,30 @@ export interface NgccEntryPointConfig {
  * configurations, even if the project level configuration does not provide for a given entry-point.
  */
 export declare const DEFAULT_NGCC_CONFIG: NgccProjectConfig;
-interface VersionedPackageConfig extends NgccPackageConfig {
-    versionRange: string;
+/**
+ * The processed package level configuration as a result of processing a raw package level config.
+ */
+export declare class ProcessedNgccPackageConfig implements Omit<RawNgccPackageConfig, 'entryPoints'> {
+    /**
+     * The absolute path to this instance of the package.
+     * Note that there may be multiple instances of a package inside a project in nested
+     * `node_modules/`. For example, one at `<project-root>/node_modules/some-package/` and one at
+     * `<project-root>/node_modules/other-package/node_modules/some-package/`.
+     */
+    packagePath: AbsoluteFsPath;
+    /**
+     * The entry-points to configure for this package.
+     *
+     * In contrast to `RawNgccPackageConfig`, the paths are absolute and take the path of the specific
+     * instance of the package into account.
+     */
+    entryPoints: Map<AbsoluteFsPath, NgccEntryPointConfig>;
+    /**
+     * A collection of regexes that match deep imports to ignore, for this package, rather than
+     * displaying a warning.
+     */
+    ignorableDeepImportMatchers: RegExp[];
+    constructor(packagePath: AbsoluteFsPath, { entryPoints, ignorableDeepImportMatchers, }: RawNgccPackageConfig);
 }
 /**
  * Ngcc has a hierarchical configuration system that lets us "fix up" packages that do not
@@ -143,17 +163,17 @@ export declare class NgccConfiguration {
     /**
      * Get a configuration for the given `version` of a package at `packagePath`.
      *
+     * @param packageName The name of the package whose config we want.
      * @param packagePath The path to the package whose config we want.
      * @param version The version of the package whose config we want, or `null` if the package's
      * package.json did not exist or was invalid.
      */
-    getPackageConfig(packagePath: AbsoluteFsPath, version: string | null): VersionedPackageConfig;
+    getPackageConfig(packageName: string, packagePath: AbsoluteFsPath, version: string | null): ProcessedNgccPackageConfig;
+    private getRawPackageConfig;
     private processProjectConfig;
     private loadProjectConfig;
     private loadPackageConfig;
     private evalSrcFile;
-    private processEntryPoints;
-    private splitPathAndVersion;
+    private splitNameAndVersion;
     private computeHash;
 }
-export {};

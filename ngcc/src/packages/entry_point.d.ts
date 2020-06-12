@@ -11,14 +11,19 @@ export declare type EntryPointFormat = 'esm5' | 'esm2015' | 'umd' | 'commonjs';
  * to each of the possible entry-point formats.
  */
 export interface EntryPoint extends JsonObject {
-    /** The name of the package (e.g. `@angular/core`). */
+    /** The name of the entry-point (e.g. `@angular/core` or `@angular/common/http`). */
     name: string;
-    /** The parsed package.json file for this entry-point. */
-    packageJson: EntryPointPackageJson;
-    /** The path to the package that contains this entry-point. */
-    package: AbsoluteFsPath;
     /** The path to this entry point. */
     path: AbsoluteFsPath;
+    /**
+     * The name of the package that contains this entry-point (e.g. `@angular/core` or
+     * `@angular/common`).
+     */
+    packageName: string;
+    /** The path to the package that contains this entry-point. */
+    packagePath: AbsoluteFsPath;
+    /** The parsed package.json file for this entry-point. */
+    packageJson: EntryPointPackageJson;
     /** The path to a typings (.d.ts) file for this entry-point. */
     typings: AbsoluteFsPath;
     /** Is this EntryPoint compiled with the Angular View Engine compiler? */
@@ -53,17 +58,21 @@ export declare type PackageJsonFormatProperties = keyof PackageJsonFormatPropert
  */
 export interface EntryPointPackageJson extends JsonObject, PackageJsonFormatPropertiesMap {
     name: string;
+    version?: string;
     scripts?: Record<string, string>;
     __processed_by_ivy_ngcc__?: Record<string, string>;
 }
 export declare type EntryPointJsonProperty = Exclude<PackageJsonFormatProperties, 'types' | 'typings'>;
 export declare const SUPPORTED_FORMAT_PROPERTIES: EntryPointJsonProperty[];
 /**
- * The path does not represent an entry-point:
- * * there is no package.json at the path and there is no config to force an entry-point
- * * or the entrypoint is `ignored` by a config.
+ * The path does not represent an entry-point, i.e. there is no package.json at the path and there
+ * is no config to force an entry-point.
  */
 export declare const NO_ENTRY_POINT = "no-entry-point";
+/**
+ * The path represents an entry-point that is `ignored` by an ngcc config.
+ */
+export declare const IGNORED_ENTRY_POINT = "ignored-entry-point";
 /**
  * The path has a package.json, but it is not a valid entry-point for ngcc processing.
  */
@@ -77,20 +86,22 @@ export declare const INCOMPATIBLE_ENTRY_POINT = "incompatible-entry-point";
  * * INCOMPATIBLE_ENTRY_POINT - the path was a non-processable entry-point that should be searched
  * for sub-entry-points
  */
-export declare type GetEntryPointResult = EntryPoint | typeof INCOMPATIBLE_ENTRY_POINT | typeof NO_ENTRY_POINT;
+export declare type GetEntryPointResult = EntryPoint | typeof IGNORED_ENTRY_POINT | typeof INCOMPATIBLE_ENTRY_POINT | typeof NO_ENTRY_POINT;
 /**
  * Try to create an entry-point from the given paths and properties.
  *
  * @param packagePath the absolute path to the containing npm package
  * @param entryPointPath the absolute path to the potential entry-point.
  * @returns
- * - An entry-point if it is valid.
+ * - An entry-point if it is valid and not ignored.
  * - `NO_ENTRY_POINT` when there is no package.json at the path and there is no config to force an
- * entry-point or the entrypoint is `ignored`.
- * - `INCOMPATIBLE_ENTRY_POINT` there is a package.json but it is not a valid Angular compiled
- * entry-point.
+ *   entry-point,
+ * - `IGNORED_ENTRY_POINT` when the entry-point is ignored by an ngcc config.
+ * - `INCOMPATIBLE_ENTRY_POINT` when there is a package.json but it is not a valid Angular compiled
+ *   entry-point.
  */
 export declare function getEntryPointInfo(fs: FileSystem, config: NgccConfiguration, logger: Logger, packagePath: AbsoluteFsPath, entryPointPath: AbsoluteFsPath): GetEntryPointResult;
+export declare function isEntryPoint(result: GetEntryPointResult): result is EntryPoint;
 /**
  * Convert a package.json property into an entry-point format.
  *
