@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/core/src/compiler" />
 import * as ts from 'typescript';
-import { IncrementalDriver } from '../../incremental';
+import { IncrementalBuildStrategy, IncrementalDriver } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
 import { PerfRecorder } from '../../perf';
 import { TypeCheckingProgramStrategy } from '../../typecheck';
@@ -29,6 +29,7 @@ export declare class NgCompiler {
     private options;
     private tsProgram;
     private typeCheckingProgramStrategy;
+    private incrementalStrategy;
     private perfRecorder;
     /**
      * Lazily evaluated state of the compilation.
@@ -57,7 +58,7 @@ export declare class NgCompiler {
     readonly incrementalDriver: IncrementalDriver;
     readonly ignoreForDiagnostics: Set<ts.SourceFile>;
     readonly ignoreForEmit: Set<ts.SourceFile>;
-    constructor(adapter: NgCompilerAdapter, options: NgCompilerOptions, tsProgram: ts.Program, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
+    constructor(adapter: NgCompilerAdapter, options: NgCompilerOptions, tsProgram: ts.Program, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, incrementalStrategy: IncrementalBuildStrategy, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
     /**
      * Get all Angular-related diagnostics for this compilation.
      *

@@ -63,6 +63,7 @@ export declare class StaticInterpreter {
     private visitParenthesizedExpression;
     private evaluateFunctionArguments;
     private visitSpreadElement;
+    private visitBindingElement;
     private stringNameFromPropertyName;
     private getResolvedEnum;
     private getReference;
