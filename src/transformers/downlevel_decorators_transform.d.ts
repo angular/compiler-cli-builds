@@ -15,5 +15,11 @@ import { ReflectionHost } from '../ngtsc/reflection';
  * @param diagnostics List which will be populated with diagnostics if any.
  * @param isCore Whether the current TypeScript program is for the `@angular/core` package.
  * @param isClosureCompilerEnabled Whether closure annotations need to be added where needed.
+ * @param skipClassDecorators Whether class decorators should be skipped from downleveling.
+ *   This is useful for JIT mode where class decorators should be preserved as they could rely
+ *   on immediate execution. e.g. downleveling `@Injectable` means that the injectable factory
+ *   is not created, and injecting the token will not work. If this decorator would not be
+ *   downleveled, the `Injectable` decorator will execute immediately on file load, and
+ *   Angular will generate the corresponding injectable factory.
  */
-export declare function getDownlevelDecoratorsTransform(typeChecker: ts.TypeChecker, host: ReflectionHost, diagnostics: ts.Diagnostic[], isCore: boolean, isClosureCompilerEnabled: boolean): ts.TransformerFactory<ts.SourceFile>;
+export declare function getDownlevelDecoratorsTransform(typeChecker: ts.TypeChecker, host: ReflectionHost, diagnostics: ts.Diagnostic[], isCore: boolean, isClosureCompilerEnabled: boolean, skipClassDecorators: boolean): ts.TransformerFactory<ts.SourceFile>;
