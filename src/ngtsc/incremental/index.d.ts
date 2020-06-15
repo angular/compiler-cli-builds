@@ -8,3 +8,4 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental" />
 export { NOOP_INCREMENTAL_BUILD } from './src/noop';
 export { IncrementalDriver } from './src/state';
+export * from './src/strategy';

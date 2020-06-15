@@ -41,6 +41,7 @@ export declare class NgtscProgram implements api.Program {
     private host;
     private perfRecorder;
     private perfTracker;
+    private incrementalStrategy;
     constructor(rootNames: ReadonlyArray<string>, options: NgCompilerOptions, delegateHost: api.CompilerHost, oldProgram?: NgtscProgram);
     getTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
