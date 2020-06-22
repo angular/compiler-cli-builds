@@ -9,12 +9,12 @@
 import * as ts from 'typescript';
 import { ParsedConfiguration } from '../../..';
 import { FileSystem } from '../../../src/ngtsc/file_system';
+import { Logger } from '../../../src/ngtsc/logging';
 import { ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses } from '../analysis/switch_marker_analyzer';
 import { CompiledFile } from '../analysis/types';
 import { NgccReflectionHost } from '../host/ngcc_host';
-import { Logger } from '../logging/logger';
 import { RenderingFormatter } from '../rendering/rendering_formatter';
 import { FileToWrite } from '../rendering/utils';
 import { EntryPointBundle } from './entry_point_bundle';

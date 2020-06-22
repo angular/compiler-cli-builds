@@ -1,4 +1,11 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/locking/sync_locker" />
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import { LockFile } from './lock_file';
 /**
  * SyncLocker is used to prevent more than one instance of ngcc executing at the same time,

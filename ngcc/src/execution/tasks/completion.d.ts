@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { FileSystem } from '../../../../src/ngtsc/file_system';
-import { Logger } from '../../logging/logger';
+import { Logger } from '../../../../src/ngtsc/logging';
 import { PackageJsonUpdater } from '../../writing/package_json_updater';
 import { Task, TaskCompletedCallback, TaskProcessingOutcome, TaskQueue } from './api';
 /**

@@ -9,7 +9,7 @@
  */
 import { ChildProcess } from 'child_process';
 import { AbsoluteFsPath, FileSystem } from '../../../../src/ngtsc/file_system';
-import { Logger } from '../../logging/logger';
+import { Logger } from '../../../../src/ngtsc/logging';
 import { LockFile } from '../lock_file';
 /**
  * This `LockFile` implementation uses a child-process to remove the lock file when the main process

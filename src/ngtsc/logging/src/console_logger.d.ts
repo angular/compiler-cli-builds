@@ -1,4 +1,4 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/logging/console_logger" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/logging/src/console_logger" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

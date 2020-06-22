@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/sourcemaps/raw_source_map" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/sourcemaps/src/raw_source_map" />
 /**
  * This interface is the basic structure of the JSON in a raw source map that one might load from
  * disk.

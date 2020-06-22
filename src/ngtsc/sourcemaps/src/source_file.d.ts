@@ -1,5 +1,5 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/sourcemaps/source_file" />
-import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file" />
+import { AbsoluteFsPath } from '../../file_system';
 import { RawSourceMap } from './raw_source_map';
 import { SegmentMarker } from './segment_marker';
 export declare function removeSourceMapComments(contents: string): string;

@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/dependency_resolver" />
 import { DepGraph } from 'dependency-graph';
 import { FileSystem } from '../../../src/ngtsc/file_system';
-import { Logger } from '../logging/logger';
+import { Logger } from '../../../src/ngtsc/logging';
 import { NgccConfiguration } from '../packages/configuration';
 import { EntryPoint, EntryPointFormat } from '../packages/entry_point';
 import { PartiallyOrderedList } from '../utils';

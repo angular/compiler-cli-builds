@@ -1,7 +1,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point_manifest" />
 import { AbsoluteFsPath, FileSystem, PathSegment } from '../../../src/ngtsc/file_system';
+import { Logger } from '../../../src/ngtsc/logging';
 import { EntryPointWithDependencies } from '../dependencies/dependency_host';
-import { Logger } from '../logging/logger';
 import { NgccConfiguration } from './configuration';
 /**
  * Manages reading and writing a manifest file that contains a list of all the entry-points that

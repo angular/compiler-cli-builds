@@ -10,7 +10,7 @@ import { SourceMapConverter } from 'convert-source-map';
 import MagicString from 'magic-string';
 import * as ts from 'typescript';
 import { FileSystem } from '../../../src/ngtsc/file_system';
-import { Logger } from '../logging/logger';
+import { Logger } from '../../../src/ngtsc/logging';
 import { FileToWrite } from './utils';
 export interface SourceMapInfo {
     source: string;
