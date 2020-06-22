@@ -7,8 +7,8 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/umd_host" />
 import * as ts from 'typescript';
+import { Logger } from '../../../src/ngtsc/logging';
 import { Declaration, Import } from '../../../src/ngtsc/reflection';
-import { Logger } from '../logging/logger';
 import { BundleProgram } from '../packages/bundle_program';
 import { FactoryMap } from '../utils';
 import { Esm5ReflectionHost } from './esm5_host';

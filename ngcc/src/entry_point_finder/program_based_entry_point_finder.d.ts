@@ -7,9 +7,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
+import { Logger } from '../../../src/ngtsc/logging';
 import { ParsedConfiguration } from '../../../src/perform_compile';
 import { DependencyResolver } from '../dependencies/dependency_resolver';
-import { Logger } from '../logging/logger';
 import { NgccConfiguration } from '../packages/configuration';
 import { TracingEntryPointFinder } from './tracing_entry_point_finder';
 /**

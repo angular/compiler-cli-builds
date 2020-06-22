@@ -7,8 +7,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { AbsoluteFsPath, FileSystem } from '../../src/ngtsc/file_system';
+import { Logger } from '../../src/ngtsc/logging';
 import { ParsedConfiguration } from '../../src/perform_compile';
-import { Logger } from './logging/logger';
 import { PathMappings } from './path_mappings';
 import { FileWriter } from './writing/file_writer';
 import { PackageJsonUpdater } from './writing/package_json_updater';

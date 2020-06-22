@@ -6,6 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/execution/cluster/worker" />
-import { Logger } from '../../logging/logger';
+import { Logger } from '../../../../src/ngtsc/logging';
 import { CreateCompileFn } from '../api';
 export declare function startWorker(logger: Logger, createCompileFn: CreateCompileFn): Promise<void>;

@@ -2,12 +2,12 @@
 import * as ts from 'typescript';
 import { FileSystem } from '../../../src/ngtsc/file_system';
 import { Reexport } from '../../../src/ngtsc/imports';
+import { Logger } from '../../../src/ngtsc/logging';
 import { CompileResult } from '../../../src/ngtsc/transform';
 import { ModuleWithProvidersAnalyses, ModuleWithProvidersInfo } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo, PrivateDeclarationsAnalyses } from '../analysis/private_declarations_analyzer';
 import { DecorationAnalyses } from '../analysis/types';
 import { NgccReflectionHost } from '../host/ngcc_host';
-import { Logger } from '../logging/logger';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
 import { RenderingFormatter } from './rendering_formatter';
 import { FileToWrite } from './utils';

@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/execution/cluster/master" />
 import { FileSystem } from '../../../../src/ngtsc/file_system';
-import { Logger } from '../../logging/logger';
+import { Logger } from '../../../../src/ngtsc/logging';
 import { FileWriter } from '../../writing/file_writer';
 import { PackageJsonUpdater } from '../../writing/package_json_updater';
 import { AnalyzeEntryPointsFn } from '../api';

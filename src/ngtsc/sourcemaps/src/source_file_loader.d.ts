@@ -1,6 +1,6 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/sourcemaps/source_file_loader" />
-import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
-import { Logger } from '../logging/logger';
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader" />
+import { AbsoluteFsPath, FileSystem } from '../../file_system';
+import { Logger } from '../../logging';
 import { RawSourceMap } from './raw_source_map';
 import { SourceFile } from './source_file';
 /**

@@ -1,5 +1,12 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/locking/async_locker" />
-import { Logger } from '../logging/logger';
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { Logger } from '../../../src/ngtsc/logging';
 import { LockFile } from './lock_file';
 /**
  * AsyncLocker is used to prevent more than one instance of ngcc executing at the same time,

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/sourcemaps/segment_marker" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/sourcemaps/src/segment_marker" />
 /**
  * A marker that indicates the start of a segment in a mapping.
  *
