@@ -14,7 +14,7 @@ import { TypeCheckingProgramStrategy, UpdateMode } from './api';
  * reuse functionality.
  */
 export declare class ReusedProgramStrategy implements TypeCheckingProgramStrategy {
-    private program;
+    private originalProgram;
     private originalHost;
     private options;
     private shimExtensionPrefixes;
@@ -25,7 +25,8 @@ export declare class ReusedProgramStrategy implements TypeCheckingProgramStrateg
      * `originalHost`) and the template type-checking program being managed.
      */
     private sfMap;
-    constructor(program: ts.Program, originalHost: ts.CompilerHost, options: ts.CompilerOptions, shimExtensionPrefixes: string[]);
+    private program;
+    constructor(originalProgram: ts.Program, originalHost: ts.CompilerHost, options: ts.CompilerOptions, shimExtensionPrefixes: string[]);
     getProgram(): ts.Program;
     updateFiles(contents: Map<AbsoluteFsPath, string>, updateMode: UpdateMode): void;
 }

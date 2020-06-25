@@ -12,6 +12,7 @@ import * as ts from 'typescript';
  * `TypeCheckContext`.
  */
 export declare class TypeCheckProgramHost implements ts.CompilerHost {
+    private originalProgram;
     private delegate;
     private shimExtensionPrefixes;
     /**
@@ -30,7 +31,7 @@ export declare class TypeCheckProgramHost implements ts.CompilerHost {
      */
     private shimTagger;
     readonly resolveModuleNames?: ts.CompilerHost['resolveModuleNames'];
-    constructor(sfMap: Map<string, ts.SourceFile>, delegate: ts.CompilerHost, shimExtensionPrefixes: string[]);
+    constructor(sfMap: Map<string, ts.SourceFile>, originalProgram: ts.Program, delegate: ts.CompilerHost, shimExtensionPrefixes: string[]);
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
     postProgramCreationCleanup(): void;
     getDefaultLibFileName(options: ts.CompilerOptions): string;

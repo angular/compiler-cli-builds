@@ -31,8 +31,7 @@ export declare class ShimReferenceTagger {
      */
     tag(sf: ts.SourceFile): void;
     /**
-     * Restore the original `referencedFiles` values of all tagged `ts.SourceFile`s and disable the
-     * `ShimReferenceTagger`.
+     * Disable the `ShimReferenceTagger` and free memory associated with tracking tagged files.
      */
     finalize(): void;
 }

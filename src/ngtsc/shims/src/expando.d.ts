@@ -18,7 +18,14 @@ export declare const NgExtension: unique symbol;
 export interface NgExtensionData {
     isTopLevelShim: boolean;
     fileShim: NgFileShimData | null;
+    /**
+     * The contents of the `referencedFiles` array, before modification by a `ShimReferenceTagger`.
+     */
     originalReferencedFiles: ReadonlyArray<ts.FileReference> | null;
+    /**
+     * The contents of the `referencedFiles` array, after modification by a `ShimReferenceTagger`.
+     */
+    taggedReferenceFiles: ReadonlyArray<ts.FileReference> | null;
 }
 /**
  * A `ts.SourceFile` which has `NgExtension` data.
@@ -65,3 +72,23 @@ export declare function isShim(sf: ts.SourceFile): boolean;
  * Copy any shim data from one `ts.SourceFile` to another.
  */
 export declare function copyFileShimData(from: ts.SourceFile, to: ts.SourceFile): void;
+/**
+ * For those `ts.SourceFile`s in the `program` which have previously been tagged by a
+ * `ShimReferenceTagger`, restore the original `referencedFiles` array that does not have shim tags.
+ */
+export declare function untagAllTsFiles(program: ts.Program): void;
+/**
+ * For those `ts.SourceFile`s in the `program` which have previously been tagged by a
+ * `ShimReferenceTagger`, re-apply the effects of tagging by updating the `referencedFiles` array to
+ * the tagged version produced previously.
+ */
+export declare function retagAllTsFiles(program: ts.Program): void;
+/**
+ * Restore the original `referencedFiles` for the given `ts.SourceFile`.
+ */
+export declare function untagTsFile(sf: ts.SourceFile): void;
+/**
+ * Apply the previously tagged `referencedFiles` to the given `ts.SourceFile`, if it was previously
+ * tagged.
+ */
+export declare function retagTsFile(sf: ts.SourceFile): void;
