@@ -11,21 +11,23 @@ import { Logger } from '../../../src/ngtsc/logging';
 import { EntryPointWithDependencies } from '../dependencies/dependency_host';
 import { DependencyResolver, SortedEntryPointsInfo } from '../dependencies/dependency_resolver';
 import { NgccConfiguration } from '../packages/configuration';
-import { EntryPoint } from '../packages/entry_point';
 import { PathMappings } from '../path_mappings';
 import { EntryPointFinder } from './interface';
 /**
  * An EntryPointFinder that starts from a set of initial files and only returns entry-points that
  * are dependencies of these files.
  *
- * This is faster than searching the entire file-system for all the entry-points,
- * and is used primarily by the CLI integration.
+ * This is faster than processing all entry-points in the entire file-system, and is used primarily
+ * by the CLI integration.
  *
  * There are two concrete implementations of this class.
  *
- * * `TargetEntryPointFinder` - is given a single entry-point as the initial entry-point
- * * `ProgramBasedEntryPointFinder` - computes the initial entry-points from program files given by
- * a `tsconfig.json` file.
+ * * `TargetEntryPointFinder` - is given a single entry-point as the initial entry-point. This can
+ *   be used in the synchronous CLI integration where the build tool has identified an external
+ *   import to one of the source files being built.
+ * * `ProgramBasedEntryPointFinder` - computes the initial entry-points from the source files
+ *   computed from a `tsconfig.json` file. This can be used in the asynchronous CLI integration
+ *   where the `tsconfig.json` to be used to do the build is known.
  */
 export declare abstract class TracingEntryPointFinder implements EntryPointFinder {
     protected fs: FileSystem;
@@ -34,36 +36,33 @@ export declare abstract class TracingEntryPointFinder implements EntryPointFinde
     protected resolver: DependencyResolver;
     protected basePath: AbsoluteFsPath;
     protected pathMappings: PathMappings | undefined;
-    protected unprocessedPaths: AbsoluteFsPath[];
-    protected unsortedEntryPoints: Map<import("@angular/compiler-cli/src/ngtsc/file_system/src/types").BrandedPath<"AbsoluteFsPath">, EntryPointWithDependencies>;
     private basePaths;
     constructor(fs: FileSystem, config: NgccConfiguration, logger: Logger, resolver: DependencyResolver, basePath: AbsoluteFsPath, pathMappings: PathMappings | undefined);
-    protected getBasePaths(): import("@angular/compiler-cli/src/ngtsc/file_system/src/types").BrandedPath<"AbsoluteFsPath">[];
+    /**
+     * Search for Angular package entry-points.
+     */
     findEntryPoints(): SortedEntryPointsInfo;
+    /**
+     * Return an array of entry-point paths from which to start the trace.
+     */
     protected abstract getInitialEntryPointPaths(): AbsoluteFsPath[];
-    protected getEntryPoint(entryPointPath: AbsoluteFsPath): EntryPoint | null;
-    private processNextPath;
-    private computePackagePath;
     /**
-     * Search down to the `entryPointPath` from the `containingPath` for the first `package.json` that
-     * we come to. This is the path to the entry-point's containing package. For example if
-     * `containingPath` is `/a/b/c` and `entryPointPath` is `/a/b/c/d/e` and there exists
-     * `/a/b/c/d/package.json` and `/a/b/c/d/e/package.json`, then we will return `/a/b/c/d`.
+     * For the given `entryPointPath`, compute, or retrieve, the entry-point information, including
+     * paths to other entry-points that this entry-point depends upon.
      *
-     * To account for nested `node_modules` we actually start the search at the last `node_modules` in
-     * the `entryPointPath` that is below the `containingPath`. E.g. if `containingPath` is `/a/b/c`
-     * and `entryPointPath` is `/a/b/c/d/node_modules/x/y/z`, we start the search at
-     * `/a/b/c/d/node_modules`.
+     * @param entryPointPath the path to the entry-point whose information and dependencies are to be
+     *     retrieved or computed.
+     *
+     * @returns the entry-point and its dependencies or `null` if the entry-point is not compiled by
+     *     Angular or cannot be determined.
      */
-    private computePackagePathFromContainingPath;
+    protected abstract getEntryPointWithDeps(entryPointPath: AbsoluteFsPath): EntryPointWithDependencies | null;
     /**
-     * Search up the directory tree from the `entryPointPath` looking for a `node_modules` directory
-     * that we can use as a potential starting point for computing the package path.
+     * Parse the path-mappings to compute the base-paths that need to be considered when finding
+     * entry-points.
+     *
+     * This processing can be time-consuming if the path-mappings are complex or extensive.
+     * So the result is cached locally once computed.
      */
-    private computePackagePathFromNearestNodeModules;
-    /**
-     * Split the given `path` into path segments using an FS independent algorithm.
-     * @param path The path to split.
-     */
-    private splitPath;
+    protected getBasePaths(): import("@angular/compiler-cli/src/ngtsc/file_system/src/types").BrandedPath<"AbsoluteFsPath">[];
 }

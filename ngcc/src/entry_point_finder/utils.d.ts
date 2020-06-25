@@ -32,8 +32,8 @@ export declare function getBasePaths(logger: Logger, sourceDirectory: AbsoluteFs
 /**
  * Run a task and track how long it takes.
  *
- * @param task The task whose duration we are tracking
- * @param log The function to call with the duration of the task
+ * @param task The task whose duration we are tracking.
+ * @param log The function to call with the duration of the task.
  * @returns The result of calling `task`.
  */
 export declare function trackDuration<T = void>(task: () => T extends Promise<unknown> ? never : T, log: (duration: number) => void): T;
