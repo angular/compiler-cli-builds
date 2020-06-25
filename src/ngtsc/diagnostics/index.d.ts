@@ -6,6 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/diagnostics" />
-export { FatalDiagnosticError, isFatalDiagnosticError, makeDiagnostic } from './src/error';
+export { FatalDiagnosticError, isFatalDiagnosticError, makeDiagnostic, makeRelatedInformation } from './src/error';
 export { ErrorCode, ngErrorCode } from './src/error_code';
 export { replaceTsWithNgInErrors } from './src/util';
