@@ -39,6 +39,19 @@ export declare class SourceFile {
      */
     renderFlattenedSourceMap(): RawSourceMap;
     /**
+     * Find the original mapped location for the given `line` and `column` in the generated file.
+     *
+     * First we search for a mapping whose generated segment is at or directly before the given
+     * location. Then we compute the offset between the given location and the matching generated
+     * segment. Finally we apply this offset to the original source segment to get the desired
+     * original location.
+     */
+    getOriginalLocation(line: number, column: number): {
+        file: AbsoluteFsPath;
+        line: number;
+        column: number;
+    } | null;
+    /**
      * Flatten the parsed mappings for this source file, so that all the mappings are to pure original
      * source files with no transitive source maps.
      */

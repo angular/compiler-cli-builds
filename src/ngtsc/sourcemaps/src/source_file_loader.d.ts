@@ -15,8 +15,12 @@ import { SourceFile } from './source_file';
 export declare class SourceFileLoader {
     private fs;
     private logger;
+    /** A map of URL schemes to base paths. The scheme name should be lowercase. */
+    private schemeMap;
     private currentPaths;
-    constructor(fs: FileSystem, logger: Logger);
+    constructor(fs: FileSystem, logger: Logger, 
+    /** A map of URL schemes to base paths. The scheme name should be lowercase. */
+    schemeMap: Record<string, AbsoluteFsPath>);
     /**
      * Load a source file, compute its source map, and recursively load any referenced source files.
      *
@@ -71,6 +75,16 @@ export declare class SourceFileLoader {
      * recursion.
      */
     private trackPath;
+    private getLastNonEmptyLine;
+    /**
+     * Replace any matched URL schemes with their corresponding path held in the schemeMap.
+     *
+     * Some build tools replace real file paths with scheme prefixed paths - e.g. `webpack://`.
+     * We use the `schemeMap` passed to this class to convert such paths to "real" file paths.
+     * In some cases, this is not possible, since the file was actually synthesized by the build tool.
+     * But the end result is better than prefixing the sourceRoot in front of the scheme.
+     */
+    private replaceSchemeWithPath;
 }
 /** A small helper structure that is returned from `loadSourceMap()`. */
 interface MapAndPath {
