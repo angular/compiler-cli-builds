@@ -44,6 +44,7 @@ export declare class NgtscProgram implements api.Program {
     private incrementalStrategy;
     constructor(rootNames: ReadonlyArray<string>, options: NgCompilerOptions, delegateHost: api.CompilerHost, oldProgram?: NgtscProgram);
     getTsProgram(): ts.Program;
+    getReuseTsProgram(): ts.Program;
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
     getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
     getTsSemanticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
