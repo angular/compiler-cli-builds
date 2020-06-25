@@ -7,11 +7,23 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/diagnostics" />
 import * as ts from 'typescript';
+import { FatalDiagnosticError } from '../../diagnostics';
 import { Reference } from '../../imports';
 import { InjectableClassRegistry, MetadataReader } from '../../metadata';
-import { PartialEvaluator } from '../../partial_evaluator';
+import { PartialEvaluator, ResolvedValue } from '../../partial_evaluator';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
+/**
+ * Creates a `FatalDiagnosticError` for a node that did not evaluate to the expected type. The
+ * diagnostic that is created will include details on why the value is incorrect, i.e. it includes
+ * a representation of the actual type that was unsupported, or in the case of a dynamic value the
+ * trace to the node where the dynamic value originated.
+ *
+ * @param node The node for which the diagnostic should be produced.
+ * @param value The evaluated value that has the wrong type.
+ * @param messageText The message text of the error.
+ */
+export declare function createValueHasWrongTypeError(node: ts.Node, value: ResolvedValue, messageText: string): FatalDiagnosticError;
 /**
  * Gets the diagnostics for a set of provider classes.
  * @param providerClasses Classes that should be checked.
