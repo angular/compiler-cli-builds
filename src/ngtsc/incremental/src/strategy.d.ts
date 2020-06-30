@@ -35,8 +35,8 @@ export declare class NoopIncrementalBuildStrategy implements IncrementalBuildStr
  * Tracks an `IncrementalDriver` within the strategy itself.
  */
 export declare class TrackedIncrementalBuildStrategy implements IncrementalBuildStrategy {
-    private previous;
-    private next;
+    private driver;
+    private isSet;
     getIncrementalDriver(): IncrementalDriver | null;
     setIncrementalDriver(driver: IncrementalDriver): void;
     toNextBuildStrategy(): TrackedIncrementalBuildStrategy;
