@@ -26,7 +26,7 @@ export declare class NodeJSFileSystem implements FileSystem {
     join<T extends string>(basePath: T, ...paths: string[]): T;
     isRoot(path: AbsoluteFsPath): boolean;
     isRooted(path: string): boolean;
-    relative<T extends PathString>(from: T, to: T): PathSegment;
+    relative<T extends PathString>(from: T, to: T): PathSegment | AbsoluteFsPath;
     basename(filePath: string, extension?: string): PathSegment;
     extname(path: AbsoluteFsPath | PathSegment): string;
     realpath(path: AbsoluteFsPath): AbsoluteFsPath;
