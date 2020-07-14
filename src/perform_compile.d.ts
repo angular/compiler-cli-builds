@@ -20,6 +20,7 @@ export interface ParsedConfiguration {
     project: string;
     options: api.CompilerOptions;
     rootNames: string[];
+    projectReferences?: readonly ts.ProjectReference[] | undefined;
     emitFlags: api.EmitFlags;
     errors: Diagnostics;
 }
