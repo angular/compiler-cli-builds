@@ -43,8 +43,21 @@ export declare function isRooted(path: string): boolean;
 /**
  * Static access to `relative`.
  */
-export declare function relative<T extends PathString>(from: T, to: T): PathSegment;
+export declare function relative<T extends PathString>(from: T, to: T): PathSegment | AbsoluteFsPath;
 /**
  * Static access to `basename`.
  */
 export declare function basename(filePath: PathString, extension?: string): PathSegment;
+/**
+ * Returns true if the given path is locally relative.
+ *
+ * This is used to work out if the given path is relative (i.e. not absolute) but also is not
+ * escaping the current directory.
+ */
+export declare function isLocalRelativePath(relativePath: string): boolean;
+/**
+ * Converts a path to a form suitable for use as a relative module import specifier.
+ *
+ * In other words it adds the `./` to the path if it is locally relative.
+ */
+export declare function toRelativeImport(relativePath: PathSegment | AbsoluteFsPath): PathSegment | AbsoluteFsPath;
