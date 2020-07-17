@@ -6,7 +6,7 @@ export declare class MockFileSystemNative extends MockFileSystem {
     resolve(...paths: string[]): AbsoluteFsPath;
     dirname<T extends string>(file: T): T;
     join<T extends string>(basePath: T, ...paths: string[]): T;
-    relative<T extends PathString>(from: T, to: T): PathSegment;
+    relative<T extends PathString>(from: T, to: T): PathSegment | AbsoluteFsPath;
     basename(filePath: string, extension?: string): PathSegment;
     isCaseSensitive(): boolean;
     isRooted(path: string): boolean;

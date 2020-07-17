@@ -38,7 +38,7 @@ export declare class InvalidFileSystem implements FileSystem {
     join<T extends PathString>(basePath: T, ...paths: string[]): T;
     isRoot(path: AbsoluteFsPath): boolean;
     isRooted(path: string): boolean;
-    relative<T extends PathString>(from: T, to: T): PathSegment;
+    relative<T extends PathString>(from: T, to: T): PathSegment | AbsoluteFsPath;
     basename(filePath: string, extension?: string): PathSegment;
     realpath(filePath: AbsoluteFsPath): AbsoluteFsPath;
     getDefaultLibLocation(): AbsoluteFsPath;
