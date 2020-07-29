@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/api" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/api" />
 import { BoundTarget, DirectiveMeta, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
@@ -245,13 +245,36 @@ export interface ExternalTemplateSourceMapping {
     templateUrl: string;
 }
 /**
+ * Abstracts the operation of determining which shim file will host a particular component's
+ * template type-checking code.
+ *
+ * Different consumers of the type checking infrastructure may choose different approaches to
+ * optimize for their specific use case (for example, the command-line compiler optimizes for
+ * efficient `ts.Program` reuse in watch mode).
+ */
+export interface ComponentToShimMappingStrategy {
+    /**
+     * Given a component, determine a path to the shim file into which that component's type checking
+     * code will be generated.
+     *
+     * A major constraint is that components in different input files must not share the same shim
+     * file. The behavior of the template type-checking system is undefined if this is violated.
+     */
+    shimPathForComponent(node: ts.ClassDeclaration): AbsoluteFsPath;
+}
+/**
  * Strategy used to manage a `ts.Program` which contains template type-checking code and update it
  * over time.
  *
  * This abstraction allows both the Angular compiler itself as well as the language service to
  * implement efficient template type-checking using common infrastructure.
  */
-export interface TypeCheckingProgramStrategy {
+export interface TypeCheckingProgramStrategy extends ComponentToShimMappingStrategy {
+    /**
+     * Whether this strategy supports modifying user files (inline modifications) in addition to
+     * modifying type-checking shims.
+     */
+    readonly supportsInlineOperations: boolean;
     /**
      * Retrieve the latest version of the program, containing all the updates made thus far.
      */

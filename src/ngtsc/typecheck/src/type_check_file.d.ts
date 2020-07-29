@@ -10,7 +10,7 @@ import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { TypeCheckBlockMetadata, TypeCheckingConfig } from './api';
+import { TypeCheckBlockMetadata, TypeCheckingConfig } from '../api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
 import { OutOfBandDiagnosticRecorder } from './oob';

@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/augmented_program" />
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
-import { TypeCheckingProgramStrategy, UpdateMode } from './api';
+import { TypeCheckingProgramStrategy, UpdateMode } from '../api';
 /**
  * Implements a template type-checking program using `ts.createProgram` and TypeScript's program
  * reuse functionality.
@@ -27,6 +27,8 @@ export declare class ReusedProgramStrategy implements TypeCheckingProgramStrateg
     private sfMap;
     private program;
     constructor(originalProgram: ts.Program, originalHost: ts.CompilerHost, options: ts.CompilerOptions, shimExtensionPrefixes: string[]);
+    readonly supportsInlineOperations = true;
     getProgram(): ts.Program;
     updateFiles(contents: Map<AbsoluteFsPath, string>, updateMode: UpdateMode): void;
+    shimPathForComponent(node: ts.ClassDeclaration): AbsoluteFsPath;
 }

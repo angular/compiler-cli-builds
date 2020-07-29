@@ -7,9 +7,9 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/oob" />
 import { BindingPipe, PropertyWrite, TmplAstReference, TmplAstVariable } from '@angular/compiler';
-import * as ts from 'typescript';
-import { TemplateId } from './api';
-import { TemplateSourceResolver } from './diagnostics';
+import { ClassDeclaration } from '../../reflection';
+import { TemplateId } from '../api';
+import { TemplateDiagnostic, TemplateSourceResolver } from './diagnostics';
 /**
  * Collects `ts.Diagnostic`s on problems which occur in the template which aren't directly sourced
  * from Type Check Blocks.
@@ -20,7 +20,7 @@ import { TemplateSourceResolver } from './diagnostics';
  * recorder for later display.
  */
 export interface OutOfBandDiagnosticRecorder {
-    readonly diagnostics: ReadonlyArray<ts.Diagnostic>;
+    readonly diagnostics: ReadonlyArray<TemplateDiagnostic>;
     /**
      * Reports a `#ref="target"` expression in the template for which a target directive could not be
      * found.
@@ -49,14 +49,18 @@ export interface OutOfBandDiagnosticRecorder {
      * @param firstDecl the first variable declaration which uses the same name as `variable`.
      */
     duplicateTemplateVar(templateId: TemplateId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
+    requiresInlineTcb(templateId: TemplateId, node: ClassDeclaration): void;
+    requiresInlineTypeConstructors(templateId: TemplateId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
     private _diagnostics;
     constructor(resolver: TemplateSourceResolver);
-    get diagnostics(): ReadonlyArray<ts.Diagnostic>;
+    get diagnostics(): ReadonlyArray<TemplateDiagnostic>;
     missingReferenceTarget(templateId: TemplateId, ref: TmplAstReference): void;
     missingPipe(templateId: TemplateId, ast: BindingPipe): void;
     illegalAssignmentToTemplateVar(templateId: TemplateId, assignment: PropertyWrite, target: TmplAstVariable): void;
     duplicateTemplateVar(templateId: TemplateId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
+    requiresInlineTcb(templateId: TemplateId, node: ClassDeclaration): void;
+    requiresInlineTypeConstructors(templateId: TemplateId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
 }

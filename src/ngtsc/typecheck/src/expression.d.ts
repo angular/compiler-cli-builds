@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/expression" />
 import { AST } from '@angular/compiler';
 import * as ts from 'typescript';
-import { TypeCheckingConfig } from './api';
+import { TypeCheckingConfig } from '../api';
 export declare const NULL_AS_ANY: ts.AsExpression;
 /**
  * Convert an `AST` to TypeScript code directly, without going through an intermediate `Expression`

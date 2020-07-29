@@ -10,7 +10,7 @@ import { BoundTarget, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
-import { TemplateId, TypeCheckableDirectiveMeta, TypeCheckBlockMetadata } from './api';
+import { TemplateId, TypeCheckableDirectiveMeta, TypeCheckBlockMetadata } from '../api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
 import { OutOfBandDiagnosticRecorder } from './oob';
