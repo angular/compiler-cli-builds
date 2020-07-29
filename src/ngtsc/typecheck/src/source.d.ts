@@ -7,7 +7,8 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/source" />
 import { AbsoluteSourceSpan, ParseSourceFile, ParseSourceSpan } from '@angular/compiler';
-import { TemplateId, TemplateSourceMapping } from './api';
+import * as ts from 'typescript';
+import { TemplateId, TemplateSourceMapping } from '../api';
 import { TemplateSourceResolver } from './diagnostics';
 /**
  * Represents the source of a template that was processed during type-checking. This information is
@@ -28,14 +29,14 @@ export declare class TemplateSource {
  * Implements `TemplateSourceResolver` to resolve the source of a template based on these IDs.
  */
 export declare class TemplateSourceManager implements TemplateSourceResolver {
-    private nextTemplateId;
     /**
      * This map keeps track of all template sources that have been type-checked by the id that is
      * attached to a TCB's function declaration as leading trivia. This enables translation of
      * diagnostics produced for TCB code to their source location in the template.
      */
     private templateSources;
-    captureSource(mapping: TemplateSourceMapping, file: ParseSourceFile): TemplateId;
+    getTemplateId(node: ts.ClassDeclaration): TemplateId;
+    captureSource(node: ts.ClassDeclaration, mapping: TemplateSourceMapping, file: ParseSourceFile): TemplateId;
     getSourceMapping(id: TemplateId): TemplateSourceMapping;
     toParseSourceSpan(id: TemplateId, span: AbsoluteSourceSpan): ParseSourceSpan | null;
 }

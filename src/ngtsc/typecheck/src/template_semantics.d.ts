@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/template_semantics" />
 import { AST, BoundTarget, PropertyWrite, RecursiveAstVisitor } from '@angular/compiler';
-import { TemplateId } from './api';
+import { TemplateId } from '../api';
 import { OutOfBandDiagnosticRecorder } from './oob';
 /**
  * Visits a template and records any semantic errors within its expressions.

@@ -11,7 +11,7 @@ import * as ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
-import { TypeCheckableDirectiveMeta, TypeCheckingConfig } from './api';
+import { TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 /**
  * A context which hosts one or more Type Check Blocks (TCBs).
  *

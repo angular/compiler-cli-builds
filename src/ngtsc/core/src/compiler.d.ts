@@ -10,7 +10,7 @@ import * as ts from 'typescript';
 import { IncrementalBuildStrategy, IncrementalDriver } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
 import { PerfRecorder } from '../../perf';
-import { TypeCheckingProgramStrategy } from '../../typecheck';
+import { TemplateTypeChecker, TypeCheckingProgramStrategy } from '../../typecheck/api';
 import { LazyRoute, NgCompilerAdapter, NgCompilerOptions } from '../api';
 /**
  * The heart of the Angular Ivy compiler.
@@ -79,6 +79,7 @@ export declare class NgCompiler {
      * compilation. `getNextProgram` retrieves the `ts.Program` which can be used instead.
      */
     getNextProgram(): ts.Program;
+    getTemplateTypeChecker(): TemplateTypeChecker;
     /**
      * Perform Angular's analysis step (as a precursor to `getDiagnostics` or `prepareEmit`)
      * asynchronously.

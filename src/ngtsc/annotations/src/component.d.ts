@@ -16,7 +16,7 @@ import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence, ResolveResult } from '../../transform';
-import { TemplateSourceMapping, TypeCheckContext } from '../../typecheck';
+import { TemplateSourceMapping, TypeCheckContext } from '../../typecheck/api';
 import { SubsetOfKeys } from '../../util/src/typescript';
 import { ResourceLoader } from './api';
 /**

@@ -12,7 +12,7 @@ import { Reexport } from '../../imports';
 import { IndexingContext } from '../../indexer';
 import { ClassDeclaration, Decorator } from '../../reflection';
 import { ImportManager } from '../../translator';
-import { TypeCheckContext } from '../../typecheck';
+import { TypeCheckContext } from '../../typecheck/api';
 export declare enum HandlerPrecedence {
     /**
      * Handler with PRIMARY precedence cannot overlap - there can only be one on a given class.
