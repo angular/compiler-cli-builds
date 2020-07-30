@@ -12,7 +12,7 @@ import { IncrementalBuild } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
-import { ProgramTypeCheckAdapter, TypeCheckContext } from '../../typecheck';
+import { ProgramTypeCheckAdapter, TypeCheckContext } from '../../typecheck/api';
 import { CompileResult, DecoratorHandler, HandlerFlags } from './api';
 import { DtsTransformRegistry } from './declaration';
 import { PendingTrait, Trait } from './trait';

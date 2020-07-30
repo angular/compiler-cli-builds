@@ -9,7 +9,7 @@
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ClassRecord, TraitCompiler } from '../../transform';
-import { FileTypeCheckingData } from '../../typecheck/src/context';
+import { FileTypeCheckingData } from '../../typecheck/src/checker';
 import { IncrementalBuild } from '../api';
 import { FileDependencyGraph } from './dependency_tracking';
 /**

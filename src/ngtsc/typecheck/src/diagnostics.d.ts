@@ -8,7 +8,7 @@
  */
 import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
-import { TemplateId, TemplateSourceMapping } from './api';
+import { TemplateId, TemplateSourceMapping } from '../api';
 /**
  * A `ts.Diagnostic` with additional information about the diagnostic related to template
  * type-checking.
@@ -18,12 +18,17 @@ export interface TemplateDiagnostic extends ts.Diagnostic {
      * The component with the template that resulted in this diagnostic.
      */
     componentFile: ts.SourceFile;
+    /**
+     * The template id of the component that resulted in this diagnostic.
+     */
+    templateId: TemplateId;
 }
 /**
  * Adapter interface which allows the template type-checking diagnostics code to interpret offsets
  * in a TCB and map them back to original locations in the template.
  */
 export interface TemplateSourceResolver {
+    getTemplateId(node: ts.ClassDeclaration): TemplateId;
     /**
      * For the given template id, retrieve the original source mapping which describes how the offsets
      * in the template should be interpreted.
@@ -75,11 +80,12 @@ export declare function shouldReportDiagnostic(diagnostic: ts.Diagnostic): boole
  * should not be reported at all. This prevents diagnostics from non-TCB code in a user's source
  * file from being reported as type-check errors.
  */
-export declare function translateDiagnostic(diagnostic: ts.Diagnostic, resolver: TemplateSourceResolver): ts.Diagnostic | null;
+export declare function translateDiagnostic(diagnostic: ts.Diagnostic, resolver: TemplateSourceResolver): TemplateDiagnostic | null;
+export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId): ts.Node | null;
 /**
  * Constructs a `ts.Diagnostic` for a given `ParseSourceSpan` within a template.
  */
-export declare function makeTemplateDiagnostic(mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: number, messageText: string | ts.DiagnosticMessageChain, relatedMessage?: {
+export declare function makeTemplateDiagnostic(templateId: TemplateId, mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: number, messageText: string | ts.DiagnosticMessageChain, relatedMessage?: {
     text: string;
     span: ParseSourceSpan;
 }): TemplateDiagnostic;

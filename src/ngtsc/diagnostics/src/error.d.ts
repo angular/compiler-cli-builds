@@ -15,8 +15,6 @@ export declare class FatalDiagnosticError {
     constructor(code: ErrorCode, node: ts.Node, message: string);
     toDiagnostic(): ts.DiagnosticWithLocation;
 }
-export declare function makeDiagnostic(code: ErrorCode, node: ts.Node, messageText: string, relatedInfo?: {
-    node: ts.Node;
-    messageText: string;
-}[]): ts.DiagnosticWithLocation;
+export declare function makeDiagnostic(code: ErrorCode, node: ts.Node, messageText: string | ts.DiagnosticMessageChain, relatedInformation?: ts.DiagnosticRelatedInformation[]): ts.DiagnosticWithLocation;
+export declare function makeRelatedInformation(node: ts.Node, messageText: string): ts.DiagnosticRelatedInformation;
 export declare function isFatalDiagnosticError(err: any): err is FatalDiagnosticError;
