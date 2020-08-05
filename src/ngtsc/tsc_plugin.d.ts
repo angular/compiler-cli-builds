@@ -47,7 +47,7 @@ export declare class NgTscPlugin implements TscPlugin {
     private _compiler;
     get compiler(): NgCompiler;
     constructor(ngOptions: {});
-    wrapHost(host: ts.CompilerHost & UnifiedModulesHost, inputFiles: readonly string[], options: ts.CompilerOptions): PluginCompilerHost;
+    wrapHost(host: ts.CompilerHost & Partial<UnifiedModulesHost>, inputFiles: readonly string[], options: ts.CompilerOptions): PluginCompilerHost;
     setupCompilation(program: ts.Program, oldProgram?: ts.Program): {
         ignoreForDiagnostics: Set<ts.SourceFile>;
         ignoreForEmit: Set<ts.SourceFile>;
