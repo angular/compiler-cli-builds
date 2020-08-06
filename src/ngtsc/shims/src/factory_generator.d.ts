@@ -9,7 +9,7 @@
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ImportRewriter } from '../../imports';
-import { FactoryInfo, FactoryTracker, PerFileShimGenerator } from '../api';
+import { FactoryInfo, FactoryTracker, ModuleInfo, PerFileShimGenerator } from '../api';
 /**
  * Generates ts.SourceFiles which contain variable declarations for NgFactories for every exported
  * class of an input ts.SourceFile.
@@ -20,6 +20,6 @@ export declare class FactoryGenerator implements PerFileShimGenerator, FactoryTr
     readonly shouldEmit = true;
     readonly extensionPrefix = "ngfactory";
     generateShimForFile(sf: ts.SourceFile, genFilePath: AbsoluteFsPath): ts.SourceFile;
-    track(sf: ts.SourceFile, factorySymbolName: string): void;
+    track(sf: ts.SourceFile, moduleInfo: ModuleInfo): void;
 }
 export declare function generatedFactoryTransform(factoryMap: Map<string, FactoryInfo>, importRewriter: ImportRewriter): ts.TransformerFactory<ts.SourceFile>;
