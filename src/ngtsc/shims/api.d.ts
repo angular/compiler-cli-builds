@@ -53,13 +53,9 @@ export interface PerFileShimGenerator {
  */
 export interface FactoryTracker {
     readonly sourceInfo: Map<string, FactoryInfo>;
-    track(sf: ts.SourceFile, moduleInfo: ModuleInfo): void;
+    track(sf: ts.SourceFile, factorySymbolName: string): void;
 }
 export interface FactoryInfo {
     sourceFilePath: string;
-    moduleSymbols: Map<string, ModuleInfo>;
-}
-export interface ModuleInfo {
-    name: string;
-    hasId: boolean;
+    moduleSymbolNames: Set<string>;
 }
