@@ -11,7 +11,7 @@ import { CycleAnalyzer } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
-import { extractDirectiveGuards, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
+import { DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry } from '../../scope';
@@ -33,7 +33,7 @@ export interface ComponentAnalysisData {
      */
     meta: Omit<R3ComponentMetadata, ComponentMetadataResolvedFields>;
     baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
-    guards: ReturnType<typeof extractDirectiveGuards>;
+    typeCheckMeta: DirectiveTypeCheckMeta;
     template: ParsedTemplateWithSource;
     metadataStmt: Statement | null;
     /**

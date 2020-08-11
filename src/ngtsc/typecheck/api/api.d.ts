@@ -10,18 +10,15 @@ import { BoundTarget, DirectiveMeta, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference } from '../../imports';
-import { TemplateGuardMeta } from '../../metadata';
+import { DirectiveTypeCheckMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 /**
  * Extension of `DirectiveMeta` that includes additional information required to type-check the
  * usage of a particular directive.
  */
-export interface TypeCheckableDirectiveMeta extends DirectiveMeta {
+export interface TypeCheckableDirectiveMeta extends DirectiveMeta, DirectiveTypeCheckMeta {
     ref: Reference<ClassDeclaration>;
     queries: string[];
-    ngTemplateGuards: TemplateGuardMeta[];
-    coercedInputFields: Set<string>;
-    hasNgTemplateContextGuard: boolean;
 }
 export declare type TemplateId = string & {
     __brand: 'TemplateId';
@@ -82,6 +79,13 @@ export interface TypeCheckingConfig {
      * `checkTypeOfDomBindings` is set.
      */
     checkTypeOfInputBindings: boolean;
+    /**
+     * Whether to honor the access modifiers on input bindings for the component/directive.
+     *
+     * If a template binding attempts to assign to an input that is private/protected/readonly,
+     * this will produce errors when enabled but will not when disabled.
+     */
+    honorAccessModifiersForInputBindings: boolean;
     /**
      * Whether to use strict null types for input bindings for directives.
      *

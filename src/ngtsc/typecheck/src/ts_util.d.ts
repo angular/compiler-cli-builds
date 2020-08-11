@@ -25,6 +25,16 @@ export declare function tsCreateElement(tagName: string): ts.Expression;
  */
 export declare function tsDeclareVariable(id: ts.Identifier, type: ts.TypeNode): ts.VariableStatement;
 /**
+ * Creates a `ts.TypeQueryNode` for a coerced input.
+ *
+ * For example: `typeof MatInput.ngAcceptInputType_value`, where MatInput is `typeName` and `value`
+ * is the `coercedInputName`.
+ *
+ * @param typeName The `EntityName` of the Directive where the static coerced input is defined.
+ * @param coercedInputName The field name of the coerced input.
+ */
+export declare function tsCreateTypeQueryForCoercedInput(typeName: ts.EntityName, coercedInputName: string): ts.TypeQueryNode;
+/**
  * Create a `ts.VariableStatement` that initializes a variable with a given expression.
  *
  * Unlike with `tsDeclareVariable`, the type of the variable is inferred from the initializer
