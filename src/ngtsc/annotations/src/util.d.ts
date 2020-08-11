@@ -10,11 +10,8 @@ import { Expression, ParseSourceSpan, R3DependencyMetadata, R3Reference, Wrapped
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { ForeignFunctionResolver, PartialEvaluator } from '../../partial_evaluator';
-import { ClassDeclaration, CtorParameter, Decorator, Import, ReflectionHost, TypeValueReference } from '../../reflection';
+import { ClassDeclaration, CtorParameter, Decorator, Import, ImportedTypeValueReference, LocalTypeValueReference, ReflectionHost, TypeValueReference, UnavailableValue } from '../../reflection';
 import { DeclarationData } from '../../scope';
-export declare enum ConstructorDepErrorKind {
-    NO_SUITABLE_TOKEN = 0
-}
 export declare type ConstructorDeps = {
     deps: R3DependencyMetadata[];
 } | {
@@ -24,7 +21,7 @@ export declare type ConstructorDeps = {
 export interface ConstructorDepError {
     index: number;
     param: CtorParameter;
-    kind: ConstructorDepErrorKind;
+    reason: UnavailableValue;
 }
 export declare function getConstructorDependencies(clazz: ClassDeclaration, reflector: ReflectionHost, defaultImportRecorder: DefaultImportRecorder, isCore: boolean): ConstructorDeps | null;
 /**
@@ -34,9 +31,8 @@ export declare function getConstructorDependencies(clazz: ClassDeclaration, refl
  * references are converted to an `ExternalExpr`. Note that this is only valid in the context of the
  * file in which the `TypeValueReference` originated.
  */
-export declare function valueReferenceToExpression(valueRef: TypeValueReference, defaultImportRecorder: DefaultImportRecorder): Expression;
-export declare function valueReferenceToExpression(valueRef: null, defaultImportRecorder: DefaultImportRecorder): null;
-export declare function valueReferenceToExpression(valueRef: TypeValueReference | null, defaultImportRecorder: DefaultImportRecorder): Expression | null;
+export declare function valueReferenceToExpression(valueRef: LocalTypeValueReference | ImportedTypeValueReference, defaultImportRecorder: DefaultImportRecorder): Expression;
+export declare function valueReferenceToExpression(valueRef: TypeValueReference, defaultImportRecorder: DefaultImportRecorder): Expression | null;
 /**
  * Convert `ConstructorDeps` into the `R3DependencyMetadata` array for those deps if they're valid,
  * or into an `'invalid'` signal if they're not.

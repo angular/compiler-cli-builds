@@ -11,8 +11,9 @@ import { ErrorCode } from './error_code';
 export declare class FatalDiagnosticError {
     readonly code: ErrorCode;
     readonly node: ts.Node;
-    readonly message: string;
-    constructor(code: ErrorCode, node: ts.Node, message: string);
+    readonly message: string | ts.DiagnosticMessageChain;
+    readonly relatedInformation?: ts.DiagnosticRelatedInformation[] | undefined;
+    constructor(code: ErrorCode, node: ts.Node, message: string | ts.DiagnosticMessageChain, relatedInformation?: ts.DiagnosticRelatedInformation[] | undefined);
     toDiagnostic(): ts.DiagnosticWithLocation;
 }
 export declare function makeDiagnostic(code: ErrorCode, node: ts.Node, messageText: string | ts.DiagnosticMessageChain, relatedInformation?: ts.DiagnosticRelatedInformation[]): ts.DiagnosticWithLocation;
