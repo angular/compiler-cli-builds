@@ -9,15 +9,14 @@
 import { ConstantPool, ParsedHostBindings, R3DirectiveMetadata, R3QueryMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference } from '../../imports';
-import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
-import { extractDirectiveGuards } from '../../metadata/src/util';
+import { DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence, ResolveResult } from '../../transform';
 export interface DirectiveHandlerData {
     baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
-    guards: ReturnType<typeof extractDirectiveGuards>;
+    typeCheckMeta: DirectiveTypeCheckMeta;
     meta: R3DirectiveMetadata;
     metadataStmt: Statement | null;
     providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
