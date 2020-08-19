@@ -33,6 +33,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private isComplete;
     constructor(originalProgram: ts.Program, typeCheckingStrategy: TypeCheckingProgramStrategy, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>);
     resetOverrides(): void;
+    getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
     overrideComponentTemplate(component: ts.ClassDeclaration, template: string): {
         nodes: TmplAstNode[];
         errors?: ParseError[];

@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/context" />
-import { ParseSourceFile, R3TargetBinder, SchemaMetadata, TmplAstNode } from '@angular/compiler';
+import { BoundTarget, ParseSourceFile, R3TargetBinder, SchemaMetadata, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { ComponentToShimMappingStrategy, TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata } from '../api';
+import { ComponentToShimMappingStrategy, TemplateId, TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata } from '../api';
 import { TemplateDiagnostic } from './diagnostics';
 import { DomSchemaChecker } from './dom';
 import { OutOfBandDiagnosticRecorder } from './oob';
@@ -32,6 +32,25 @@ export interface ShimTypeCheckingData {
      * Whether any inline operations for the input file were required to generate this shim.
      */
     hasInlines: boolean;
+    /**
+     * Map of `TemplateId` to information collected about the template during the template
+     * type-checking process.
+     */
+    templates: Map<TemplateId, TemplateData>;
+}
+/**
+ * Data tracked for each template processed by the template type-checking system.
+ */
+export interface TemplateData {
+    /**
+     * Template nodes for which the TCB was generated.
+     */
+    template: TmplAstNode[];
+    /**
+     * `BoundTarget` which was used to generate the TCB, and contains bindings for the associated
+     * template nodes.
+     */
+    boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
 }
 /**
  * Data for an input file which is still in the process of template type-checking code generation.
@@ -64,6 +83,10 @@ export interface PendingShimData {
      * Shim file in the process of being generated.
      */
     file: TypeCheckFile;
+    /**
+     * Map of `TemplateId` to information collected about the template as it's ingested.
+     */
+    templates: Map<TemplateId, TemplateData>;
 }
 /**
  * Adapts the `TypeCheckContextImpl` to the larger template type-checking system.
