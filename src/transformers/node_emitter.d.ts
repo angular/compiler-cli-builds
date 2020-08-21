@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/node_emitter" />
 import { AssertNotNull, BinaryOperatorExpr, CastExpr, ClassStmt, CommaExpr, CommentStmt, ConditionalExpr, DeclareFunctionStmt, DeclareVarStmt, ExpressionStatement, ExpressionVisitor, ExternalExpr, FunctionExpr, IfStmt, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, JSDocCommentStmt, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, NotExpr, ParseSourceSpan, PartialModule, ReadKeyExpr, ReadPropExpr, ReadVarExpr, ReturnStatement, Statement, StatementVisitor, ThrowStmt, TryCatchStmt, TypeofExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
-import { LocalizedString } from '@angular/compiler/src/output/output_ast';
+import { LocalizedString, UnaryOperatorExpr } from '@angular/compiler/src/output/output_ast';
 import * as ts from 'typescript';
 export interface Node {
     sourceSpan: ParseSourceSpan | null;
@@ -95,6 +95,7 @@ export declare class NodeEmitterVisitor implements StatementVisitor, ExpressionV
     visitAssertNotNullExpr(expr: AssertNotNull): RecordedNode<ts.Expression>;
     visitCastExpr(expr: CastExpr): RecordedNode<ts.Expression>;
     visitFunctionExpr(expr: FunctionExpr): RecordedNode<ts.FunctionExpression>;
+    visitUnaryOperatorExpr(expr: UnaryOperatorExpr): RecordedNode<ts.UnaryExpression | ts.ParenthesizedExpression>;
     visitBinaryOperatorExpr(expr: BinaryOperatorExpr): RecordedNode<ts.BinaryExpression | ts.ParenthesizedExpression>;
     visitReadPropExpr(expr: ReadPropExpr): RecordedNode<ts.PropertyAccessExpression>;
     visitReadKeyExpr(expr: ReadKeyExpr): RecordedNode<ts.ElementAccessExpression>;
