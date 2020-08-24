@@ -15,7 +15,10 @@ export interface Node {
 export declare class TypeScriptNodeEmitter {
     private annotateForClosureCompiler;
     constructor(annotateForClosureCompiler: boolean);
-    updateSourceFile(sourceFile: ts.SourceFile, stmts: Statement[], preamble?: string): [ts.SourceFile, Map<ts.Node, Node>];
+    updateSourceFile(sourceFile: ts.SourceFile, stmts: Statement[], preamble?: string): [
+        ts.SourceFile,
+        Map<ts.Node, Node>
+    ];
     /** Creates a not emitted statement containing the given comment. */
     createCommentStatement(sourceFile: ts.SourceFile, comment: string): ts.Statement;
 }
@@ -87,7 +90,7 @@ export declare class NodeEmitterVisitor implements StatementVisitor, ExpressionV
     visitInvokeMethodExpr(expr: InvokeMethodExpr): RecordedNode<ts.CallExpression>;
     visitInvokeFunctionExpr(expr: InvokeFunctionExpr): RecordedNode<ts.CallExpression>;
     visitInstantiateExpr(expr: InstantiateExpr): RecordedNode<ts.NewExpression>;
-    visitLiteralExpr(expr: LiteralExpr): RecordedNode<ts.Identifier | ts.StringLiteral | (ts.NullLiteral & ts.Token<ts.SyntaxKind.NullKeyword>)>;
+    visitLiteralExpr(expr: LiteralExpr): RecordedNode<ts.Identifier | ts.NullLiteral | ts.StringLiteral>;
     visitLocalizedString(expr: LocalizedString, context: any): void;
     visitExternalExpr(expr: ExternalExpr): RecordedNode<ts.Expression>;
     visitConditionalExpr(expr: ConditionalExpr): RecordedNode<ts.ParenthesizedExpression>;

@@ -57,7 +57,13 @@ export declare class EntryPointManifest {
 export declare class InvalidatingEntryPointManifest extends EntryPointManifest {
     readEntryPointsUsingManifest(_basePath: AbsoluteFsPath): EntryPointWithDependencies[] | null;
 }
-export declare type EntryPointPaths = [string, string, Array<AbsoluteFsPath>?, Array<AbsoluteFsPath | PathSegment>?, Array<AbsoluteFsPath>?];
+export declare type EntryPointPaths = [
+    string,
+    string,
+    Array<AbsoluteFsPath>?,
+    Array<AbsoluteFsPath | PathSegment>?,
+    Array<AbsoluteFsPath>?
+];
 /**
  * The JSON format of the manifest file that is written to disk.
  */
