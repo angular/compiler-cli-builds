@@ -9,7 +9,7 @@
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
-    exports.process = void 0;
+    exports.process = exports.clearTsConfigCache = exports.LogLevel = exports.ConsoleLogger = void 0;
     /**
      * @license
      * Copyright Google LLC All Rights Reserved.
