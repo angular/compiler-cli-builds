@@ -9,7 +9,8 @@
 import { BindingPipe, PropertyWrite, TmplAstReference, TmplAstVariable } from '@angular/compiler';
 import { ClassDeclaration } from '../../reflection';
 import { TemplateId } from '../api';
-import { TemplateDiagnostic, TemplateSourceResolver } from './diagnostics';
+import { TemplateDiagnostic } from '../diagnostics';
+import { TemplateSourceResolver } from './diagnostics';
 /**
  * Collects `ts.Diagnostic`s on problems which occur in the template which aren't directly sourced
  * from Type Check Blocks.
