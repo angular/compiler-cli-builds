@@ -9,20 +9,7 @@
 import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
 import { TemplateId, TemplateSourceMapping } from '../api';
-/**
- * A `ts.Diagnostic` with additional information about the diagnostic related to template
- * type-checking.
- */
-export interface TemplateDiagnostic extends ts.Diagnostic {
-    /**
-     * The component with the template that resulted in this diagnostic.
-     */
-    componentFile: ts.SourceFile;
-    /**
-     * The template id of the component that resulted in this diagnostic.
-     */
-    templateId: TemplateId;
-}
+import { TemplateDiagnostic } from '../diagnostics';
 /**
  * Adapter interface which allows the template type-checking diagnostics code to interpret offsets
  * in a TCB and map them back to original locations in the template.
@@ -82,11 +69,3 @@ export declare function shouldReportDiagnostic(diagnostic: ts.Diagnostic): boole
  */
 export declare function translateDiagnostic(diagnostic: ts.Diagnostic, resolver: TemplateSourceResolver): TemplateDiagnostic | null;
 export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId): ts.Node | null;
-/**
- * Constructs a `ts.Diagnostic` for a given `ParseSourceSpan` within a template.
- */
-export declare function makeTemplateDiagnostic(templateId: TemplateId, mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: number, messageText: string | ts.DiagnosticMessageChain, relatedMessage?: {
-    text: string;
-    span: ParseSourceSpan;
-}): TemplateDiagnostic;
-export declare function isTemplateDiagnostic(diagnostic: ts.Diagnostic): diagnostic is TemplateDiagnostic;
