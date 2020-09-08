@@ -285,7 +285,7 @@ export interface UnsupportedType {
 export interface NoValueDeclaration {
     kind: ValueUnavailableKind.NO_VALUE_DECLARATION;
     typeNode: ts.TypeNode;
-    decl: ts.Declaration;
+    decl: ts.Declaration | null;
 }
 export interface TypeOnlyImport {
     kind: ValueUnavailableKind.TYPE_ONLY_IMPORT;
