@@ -18,8 +18,8 @@ export declare abstract class MockFileSystem implements FileSystem {
     isCaseSensitive(): boolean;
     exists(path: AbsoluteFsPath): boolean;
     readFile(path: AbsoluteFsPath): string;
-    readFileBuffer(path: AbsoluteFsPath): Buffer;
-    writeFile(path: AbsoluteFsPath, data: string | Buffer, exclusive?: boolean): void;
+    readFileBuffer(path: AbsoluteFsPath): Uint8Array;
+    writeFile(path: AbsoluteFsPath, data: string | Uint8Array, exclusive?: boolean): void;
     removeFile(path: AbsoluteFsPath): void;
     symlink(target: AbsoluteFsPath, path: AbsoluteFsPath): void;
     readdir(path: AbsoluteFsPath): PathSegment[];
@@ -60,7 +60,7 @@ export declare type Entity = Folder | File | SymLink;
 export interface Folder {
     [pathSegments: string]: Entity;
 }
-export declare type File = string | Buffer;
+export declare type File = string | Uint8Array;
 export declare class SymLink {
     path: AbsoluteFsPath;
     constructor(path: AbsoluteFsPath);
