@@ -11,7 +11,7 @@ import { CycleAnalyzer } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
-import { DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
+import { ClassPropertyMapping, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry } from '../../scope';
@@ -36,6 +36,8 @@ export interface ComponentAnalysisData {
     typeCheckMeta: DirectiveTypeCheckMeta;
     template: ParsedTemplateWithSource;
     metadataStmt: Statement | null;
+    inputs: ClassPropertyMapping;
+    outputs: ClassPropertyMapping;
     /**
      * Providers extracted from the `providers` field of the component annotation which will require
      * an Angular factory definition at runtime.

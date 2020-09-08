@@ -561,6 +561,15 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      */
     protected getConstructorParamInfo(classSymbol: NgccClassSymbol, parameterNodes: ts.ParameterDeclaration[]): CtorParameter[];
     /**
+     * Compute the `TypeValueReference` for the given `typeExpression`.
+     *
+     * In ngcc, all the `typeExpression` are guaranteed to be "values" because it is working in JS and
+     * not TS. This means that the TS compiler is not going to remove the "type" import and so we can
+     * always use a LOCAL `TypeValueReference` kind, rather than trying to force an additional import
+     * for non-local expressions.
+     */
+    private typeToValue;
+    /**
      * Get the parameter type and decorators for the constructor of a class,
      * where the information is stored on a static property of the class.
      *
