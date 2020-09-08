@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
-import { ConstantPool, InterpolationConfig, ParseError, ParseSourceFile, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
+import { ConstantPool, ParsedTemplate, ParseSourceFile, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import { CycleAnalyzer } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
-import { DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
+import { ClassPropertyMapping, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry } from '../../scope';
@@ -36,6 +36,8 @@ export interface ComponentAnalysisData {
     typeCheckMeta: DirectiveTypeCheckMeta;
     template: ParsedTemplateWithSource;
     metadataStmt: Statement | null;
+    inputs: ClassPropertyMapping;
+    outputs: ClassPropertyMapping;
     /**
      * Providers extracted from the `providers` field of the component annotation which will require
      * an Angular factory definition at runtime.
@@ -108,11 +110,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
  * This contains the actual parsed template as well as any metadata collected during its parsing,
  * some of which might be useful for re-parsing the template with different options.
  */
-export interface ParsedTemplate {
-    /**
-     * The `InterpolationConfig` specified by the user.
-     */
-    interpolation: InterpolationConfig;
+export interface ParsedComponentTemplate extends ParsedTemplate {
     /**
      * A full path to the file which contains the template.
      *
@@ -121,20 +119,10 @@ export interface ParsedTemplate {
      */
     templateUrl: string;
     /**
-     * The string contents of the template.
-     *
-     * This is the "logical" template string, after expansion of any escaped characters (for inline
-     * templates). This may differ from the actual template bytes as they appear in the .ts file.
+     * True if the original template was stored inline;
+     * False if the template was in an external file.
      */
-    template: string;
-    /**
-     * Any errors from parsing the template the first time.
-     */
-    errors?: ParseError[] | undefined;
-    /**
-     * The template AST, parsed according to the user's specifications.
-     */
-    emitNodes: TmplAstNode[];
+    isInline: boolean;
     /**
      * The template AST, parsed in a manner which preserves source map information for diagnostics.
      *
@@ -142,29 +130,10 @@ export interface ParsedTemplate {
      */
     diagNodes: TmplAstNode[];
     /**
-     *
-     */
-    /**
-     * Any styleUrls extracted from the metadata.
-     */
-    styleUrls: string[];
-    /**
-     * Any inline styles extracted from the metadata.
-     */
-    styles: string[];
-    /**
-     * Any ng-content selectors extracted from the template.
-     */
-    ngContentSelectors: string[];
-    /**
-     * Whether the template was inline.
-     */
-    isInline: boolean;
-    /**
      * The `ParseSourceFile` for the template.
      */
     file: ParseSourceFile;
 }
-export interface ParsedTemplateWithSource extends ParsedTemplate {
+export interface ParsedTemplateWithSource extends ParsedComponentTemplate {
     sourceMapping: TemplateSourceMapping;
 }

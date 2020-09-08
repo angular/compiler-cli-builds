@@ -7,8 +7,8 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/inheritance" />
 import { Reference } from '../../imports';
-import { DirectiveMeta, MetadataReader } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
+import { DirectiveMeta, MetadataReader } from './api';
 /**
  * Given a reference to a directive, return a flattened version of its `DirectiveMeta` metadata
  * which includes metadata from its entire inheritance chain.
