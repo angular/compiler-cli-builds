@@ -33,6 +33,8 @@ export declare function nodeDebugInfo(node: ts.Node): string;
  * Otherwise it will fallback on the `ts.ResolveModuleName()` function.
  */
 export declare function resolveModuleName(moduleName: string, containingFile: string, compilerOptions: ts.CompilerOptions, compilerHost: ts.ModuleResolutionHost & Pick<ts.CompilerHost, 'resolveModuleNames'>, moduleResolutionCache: ts.ModuleResolutionCache | null): ts.ResolvedModule | undefined;
+/** Returns true if the node is an assignment expression. */
+export declare function isAssignment(node: ts.Node): node is ts.BinaryExpression;
 /**
  * Asserts that the keys `K` form a subset of the keys of `T`.
  */

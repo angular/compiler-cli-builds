@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/checker" />
-import { ParseError, TmplAstNode } from '@angular/compiler';
+import { AST, ParseError, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
-import { OptimizeFor, ProgramTypeCheckAdapter, TemplateId, TemplateTypeChecker, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
+import { OptimizeFor, ProgramTypeCheckAdapter, Symbol, TemplateId, TemplateTypeChecker, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -34,6 +34,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     constructor(originalProgram: ts.Program, typeCheckingStrategy: TypeCheckingProgramStrategy, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>);
     resetOverrides(): void;
     getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
+    private getTemplateData;
     overrideComponentTemplate(component: ts.ClassDeclaration, template: string): {
         nodes: TmplAstNode[];
         errors?: ParseError[];
@@ -59,6 +60,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     clearAllShimDataUsingInlines(): void;
     private updateFromContext;
     getFileData(path: AbsoluteFsPath): FileTypeCheckingData;
+    getSymbolOfNode(node: AST | TmplAstNode, component: ts.ClassDeclaration): Symbol | null;
 }
 /**
  * Data for template type-checking related to a specific input file in the user's program (which
