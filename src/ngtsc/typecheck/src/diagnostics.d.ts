@@ -40,9 +40,12 @@ export interface TemplateSourceResolver {
  */
 export declare function wrapForDiagnostics(expr: ts.Expression): ts.Expression;
 /**
- * Adds a marker to the node that signifies that any errors within the node should not be reported.
+ * Wraps the node in parenthesis such that inserted span comments become attached to the proper
+ * node. This is an alias for `ts.createParen` with the benefit that it signifies that the
+ * inserted parenthesis are for use by the type checker, not for correctness of the rendered TCB
+ * code.
  */
-export declare function ignoreDiagnostics(node: ts.Node): void;
+export declare function wrapForTypeChecker(expr: ts.Expression): ts.Expression;
 /**
  * Adds a synthetic comment to the expression that represents the parse span of the provided node.
  * This comment can later be retrieved as trivia of a node to recover original source locations.

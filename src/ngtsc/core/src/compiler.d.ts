@@ -30,6 +30,7 @@ export declare class NgCompiler {
     private tsProgram;
     private typeCheckingProgramStrategy;
     private incrementalStrategy;
+    private enableTemplateTypeChecker;
     private perfRecorder;
     /**
      * Lazily evaluated state of the compilation.
@@ -58,7 +59,7 @@ export declare class NgCompiler {
     readonly incrementalDriver: IncrementalDriver;
     readonly ignoreForDiagnostics: Set<ts.SourceFile>;
     readonly ignoreForEmit: Set<ts.SourceFile>;
-    constructor(adapter: NgCompilerAdapter, options: NgCompilerOptions, tsProgram: ts.Program, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, incrementalStrategy: IncrementalBuildStrategy, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
+    constructor(adapter: NgCompilerAdapter, options: NgCompilerOptions, tsProgram: ts.Program, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, incrementalStrategy: IncrementalBuildStrategy, enableTemplateTypeChecker: boolean, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
     /**
      * Get all Angular-related diagnostics for this compilation.
      *
