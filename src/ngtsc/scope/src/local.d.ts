@@ -20,6 +20,7 @@ export interface LocalNgModuleData {
     exports: Reference<ClassDeclaration>[];
 }
 export interface LocalModuleScope extends ExportScope {
+    ngModule: ClassDeclaration;
     compilation: ScopeData;
     reexports: Reexport[] | null;
     schemas: SchemaMetadata[];
