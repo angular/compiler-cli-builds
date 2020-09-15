@@ -1,11 +1,4 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/ngcc_options" />
-/**
- * @license
- * Copyright Google LLC All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 import { AbsoluteFsPath, FileSystem } from '../../src/ngtsc/file_system';
 import { Logger } from '../../src/ngtsc/logging';
 import { ParsedConfiguration } from '../../src/perform_compile';
@@ -142,3 +135,11 @@ export declare type SharedSetup = {
  */
 export declare function getSharedSetup(options: NgccOptions): SharedSetup & RequiredNgccOptions & OptionalNgccOptions;
 export declare function clearTsConfigCache(): void;
+/**
+ * Determines the maximum number of workers to use for parallel execution. This can be set using the
+ * NGCC_MAX_WORKERS environment variable, or is computed based on the number of available CPUs. One
+ * CPU core is always reserved for the master process, so we take the number of CPUs minus one, with
+ * a maximum of 4 workers. We don't scale the number of workers beyond 4 by default, as it takes
+ * considerably more memory and CPU cycles while not offering a substantial improvement in time.
+ */
+export declare function getMaxNumberOfWorkers(): number;
