@@ -197,7 +197,8 @@ declare class Scope {
     static forNodes(tcb: Context, parent: Scope | null, templateOrNodes: TmplAstTemplate | (TmplAstNode[]), guard: ts.Expression | null): Scope;
     /**
      * Look up a `ts.Expression` representing the value of some operation in the current `Scope`,
-     * including any parent scope(s).
+     * including any parent scope(s). This method always returns a mutable clone of the
+     * `ts.Expression` with the comments cleared.
      *
      * @param node a `TmplAstNode` of the operation in question. The lookup performed will depend on
      * the type of this node:
