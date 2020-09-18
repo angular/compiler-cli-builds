@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/node_emitter" />
-import { AssertNotNull, BinaryOperatorExpr, CastExpr, ClassStmt, CommaExpr, ConditionalExpr, DeclareFunctionStmt, DeclareVarStmt, ExpressionStatement, ExpressionVisitor, ExternalExpr, FunctionExpr, IfStmt, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, LocalizedString, NotExpr, ParseSourceSpan, PartialModule, ReadKeyExpr, ReadPropExpr, ReadVarExpr, ReturnStatement, Statement, StatementVisitor, ThrowStmt, TryCatchStmt, TypeofExpr, UnaryOperatorExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
+import { AssertNotNull, BinaryOperatorExpr, CastExpr, ClassStmt, CommaExpr, CommentStmt, ConditionalExpr, DeclareFunctionStmt, DeclareVarStmt, ExpressionStatement, ExpressionVisitor, ExternalExpr, FunctionExpr, IfStmt, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, JSDocCommentStmt, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, NotExpr, ParseSourceSpan, PartialModule, ReadKeyExpr, ReadPropExpr, ReadVarExpr, ReturnStatement, Statement, StatementVisitor, ThrowStmt, TryCatchStmt, TypeofExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
+import { LocalizedString, UnaryOperatorExpr } from '@angular/compiler/src/output/output_ast';
 import * as ts from 'typescript';
 export interface Node {
     sourceSpan: ParseSourceSpan | null;
@@ -18,6 +19,8 @@ export declare class TypeScriptNodeEmitter {
         ts.SourceFile,
         Map<ts.Node, Node>
     ];
+    /** Creates a not emitted statement containing the given comment. */
+    createCommentStatement(sourceFile: ts.SourceFile, comment: string): ts.Statement;
 }
 /**
  * Update the given source file to include the changes specified in module.
@@ -54,7 +57,7 @@ export declare class NodeEmitterVisitor implements StatementVisitor, ExpressionV
     getImports(): ts.Statement[];
     getNodeMap(): Map<ts.Node, Node>;
     updateSourceMap(statements: ts.Statement[]): void;
-    private postProcess;
+    private record;
     private sourceRangeOf;
     private getModifiers;
     visitDeclareVarStmt(stmt: DeclareVarStmt): (ts.VariableStatement & {
@@ -71,6 +74,9 @@ export declare class NodeEmitterVisitor implements StatementVisitor, ExpressionV
     visitIfStmt(stmt: IfStmt): RecordedNode<ts.IfStatement>;
     visitTryCatchStmt(stmt: TryCatchStmt): RecordedNode<ts.TryStatement>;
     visitThrowStmt(stmt: ThrowStmt): RecordedNode<ts.ThrowStatement>;
+    visitCommentStmt(stmt: CommentStmt, sourceFile: ts.SourceFile): ts.NotEmittedStatement;
+    visitJSDocCommentStmt(stmt: JSDocCommentStmt, sourceFile: ts.SourceFile): ts.NotEmittedStatement;
+    private createCommentStmt;
     visitWrappedNodeExpr(expr: WrappedNodeExpr<any>): any;
     visitTypeofExpr(expr: TypeofExpr): RecordedNode<ts.TypeOfExpression>;
     visitReadVarExpr(expr: ReadVarExpr): (ts.Identifier & {
