@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/translator/src/translator" />
-import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LeadingComment, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Statement, Type, TypeofExpr, TypeVisitor, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
+import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Statement, Type, TypeofExpr, TypeVisitor, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
 import { LocalizedString, UnaryOperatorExpr } from '@angular/compiler/src/output/output_ast';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, ImportRewriter } from '../../imports';
@@ -81,10 +81,3 @@ export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVis
     private translateType;
     private translateExpression;
 }
-/**
- * Attach the given `leadingComments` to the `statement` node.
- *
- * @param statement The statement that will have comments attached.
- * @param leadingComments The comments to attach to the statement.
- */
-export declare function attachComments<T extends ts.Statement>(statement: T, leadingComments?: LeadingComment[]): T;
