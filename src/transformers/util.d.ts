@@ -29,9 +29,3 @@ export declare function relativeToRootDirs(filePath: string, rootDirs: string[])
  * I.e. only use this where the API allows only a ts.Diagnostic.
  */
 export declare function ngToTsDiagnostic(ng: Diagnostic): ts.Diagnostic;
-/**
- * Strip multiline comment start and end markers from the `commentText` string.
- *
- * This will also strip the JSDOC comment start marker (`/**`).
- */
-export declare function stripComment(commentText: string): string;
