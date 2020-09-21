@@ -1,3 +1,4 @@
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/translator/src/translator" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -5,86 +6,60 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/translator/src/translator" />
-import { ArrayType, AssertNotNull, BinaryOperatorExpr, BuiltinType, CastExpr, CommaExpr, ConditionalExpr, Expression, ExpressionType, ExpressionVisitor, ExternalExpr, FunctionExpr, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LeadingComment, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, MapType, NotExpr, ReadKeyExpr, ReadPropExpr, ReadVarExpr, Statement, Type, TypeofExpr, TypeVisitor, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
-import { LocalizedString, UnaryOperatorExpr } from '@angular/compiler/src/output/output_ast';
-import * as ts from 'typescript';
-import { DefaultImportRecorder, ImportRewriter } from '../../imports';
-export declare class Context {
-    readonly isStatement: boolean;
-    constructor(isStatement: boolean);
-    get withExpressionMode(): Context;
-    get withStatementMode(): Context;
+import * as o from '@angular/compiler';
+import { AstFactory } from './api/ast_factory';
+import { ImportGenerator } from './api/import_generator';
+import { Context } from './context';
+export declare type RecordWrappedNodeExprFn<TExpression> = (expr: TExpression) => void;
+export interface TranslatorOptions<TExpression> {
+    downlevelLocalizedStrings?: boolean;
+    downlevelVariableDeclarations?: boolean;
+    recordWrappedNodeExpr?: RecordWrappedNodeExprFn<TExpression>;
 }
-/**
- * Information about an import that has been added to a module.
- */
-export interface Import {
-    /** The name of the module that has been imported. */
-    specifier: string;
-    /** The alias of the imported module. */
-    qualifier: string;
-}
-/**
- * The symbol name and import namespace of an imported symbol,
- * which has been registered through the ImportManager.
- */
-export interface NamedImport {
-    /** The import namespace containing this imported symbol. */
-    moduleImport: string | null;
-    /** The (possibly rewritten) name of the imported symbol. */
-    symbol: string;
-}
-export declare class ImportManager {
-    protected rewriter: ImportRewriter;
-    private prefix;
-    private specifierToIdentifier;
-    private nextIndex;
-    constructor(rewriter?: ImportRewriter, prefix?: string);
-    generateNamedImport(moduleName: string, originalSymbol: string): NamedImport;
-    getAllImports(contextPath: string): Import[];
-}
-export declare function translateExpression(expression: Expression, imports: ImportManager, defaultImportRecorder: DefaultImportRecorder, scriptTarget: Exclude<ts.ScriptTarget, ts.ScriptTarget.JSON>): ts.Expression;
-export declare function translateStatement(statement: Statement, imports: ImportManager, defaultImportRecorder: DefaultImportRecorder, scriptTarget: Exclude<ts.ScriptTarget, ts.ScriptTarget.JSON>): ts.Statement;
-export declare function translateType(type: Type, imports: ImportManager): ts.TypeNode;
-export declare class TypeTranslatorVisitor implements ExpressionVisitor, TypeVisitor {
+export declare class ExpressionTranslatorVisitor<TStatement, TExpression> implements o.ExpressionVisitor, o.StatementVisitor {
+    private factory;
     private imports;
-    constructor(imports: ImportManager);
-    visitBuiltinType(type: BuiltinType, context: Context): ts.KeywordTypeNode;
-    visitExpressionType(type: ExpressionType, context: Context): ts.TypeNode;
-    visitArrayType(type: ArrayType, context: Context): ts.ArrayTypeNode;
-    visitMapType(type: MapType, context: Context): ts.TypeLiteralNode;
-    visitReadVarExpr(ast: ReadVarExpr, context: Context): ts.TypeQueryNode;
-    visitWriteVarExpr(expr: WriteVarExpr, context: Context): never;
-    visitWriteKeyExpr(expr: WriteKeyExpr, context: Context): never;
-    visitWritePropExpr(expr: WritePropExpr, context: Context): never;
-    visitInvokeMethodExpr(ast: InvokeMethodExpr, context: Context): never;
-    visitInvokeFunctionExpr(ast: InvokeFunctionExpr, context: Context): never;
-    visitInstantiateExpr(ast: InstantiateExpr, context: Context): never;
-    visitLiteralExpr(ast: LiteralExpr, context: Context): ts.TypeNode;
-    visitLocalizedString(ast: LocalizedString, context: Context): never;
-    visitExternalExpr(ast: ExternalExpr, context: Context): ts.EntityName | ts.TypeReferenceNode;
-    visitConditionalExpr(ast: ConditionalExpr, context: Context): void;
-    visitNotExpr(ast: NotExpr, context: Context): void;
-    visitAssertNotNullExpr(ast: AssertNotNull, context: Context): void;
-    visitCastExpr(ast: CastExpr, context: Context): void;
-    visitFunctionExpr(ast: FunctionExpr, context: Context): void;
-    visitUnaryOperatorExpr(ast: UnaryOperatorExpr, context: Context): void;
-    visitBinaryOperatorExpr(ast: BinaryOperatorExpr, context: Context): void;
-    visitReadPropExpr(ast: ReadPropExpr, context: Context): void;
-    visitReadKeyExpr(ast: ReadKeyExpr, context: Context): void;
-    visitLiteralArrayExpr(ast: LiteralArrayExpr, context: Context): ts.TupleTypeNode;
-    visitLiteralMapExpr(ast: LiteralMapExpr, context: Context): ts.TypeLiteralNode;
-    visitCommaExpr(ast: CommaExpr, context: Context): void;
-    visitWrappedNodeExpr(ast: WrappedNodeExpr<any>, context: Context): ts.TypeNode;
-    visitTypeofExpr(ast: TypeofExpr, context: Context): ts.TypeQueryNode;
-    private translateType;
-    private translateExpression;
+    private downlevelLocalizedStrings;
+    private downlevelVariableDeclarations;
+    private recordWrappedNodeExpr;
+    constructor(factory: AstFactory<TStatement, TExpression>, imports: ImportGenerator<TExpression>, options: TranslatorOptions<TExpression>);
+    visitDeclareVarStmt(stmt: o.DeclareVarStmt, context: Context): TStatement;
+    visitDeclareFunctionStmt(stmt: o.DeclareFunctionStmt, context: Context): TStatement;
+    visitExpressionStmt(stmt: o.ExpressionStatement, context: Context): TStatement;
+    visitReturnStmt(stmt: o.ReturnStatement, context: Context): TStatement;
+    visitDeclareClassStmt(_stmt: o.ClassStmt, _context: Context): never;
+    visitIfStmt(stmt: o.IfStmt, context: Context): TStatement;
+    visitTryCatchStmt(_stmt: o.TryCatchStmt, _context: Context): never;
+    visitThrowStmt(stmt: o.ThrowStmt, context: Context): TStatement;
+    visitReadVarExpr(ast: o.ReadVarExpr, _context: Context): TExpression;
+    visitWriteVarExpr(expr: o.WriteVarExpr, context: Context): TExpression;
+    visitWriteKeyExpr(expr: o.WriteKeyExpr, context: Context): TExpression;
+    visitWritePropExpr(expr: o.WritePropExpr, context: Context): TExpression;
+    visitInvokeMethodExpr(ast: o.InvokeMethodExpr, context: Context): TExpression;
+    visitInvokeFunctionExpr(ast: o.InvokeFunctionExpr, context: Context): TExpression;
+    visitInstantiateExpr(ast: o.InstantiateExpr, context: Context): TExpression;
+    visitLiteralExpr(ast: o.LiteralExpr, _context: Context): TExpression;
+    visitLocalizedString(ast: o.LocalizedString, context: Context): TExpression;
+    /**
+     * Translate the tagged template literal into a call that is compatible with ES5, using the
+     * imported `__makeTemplateObject` helper for ES5 formatted output.
+     */
+    private createES5TaggedTemplateFunctionCall;
+    visitExternalExpr(ast: o.ExternalExpr, _context: Context): TExpression;
+    visitConditionalExpr(ast: o.ConditionalExpr, context: Context): TExpression;
+    visitNotExpr(ast: o.NotExpr, context: Context): TExpression;
+    visitAssertNotNullExpr(ast: o.AssertNotNull, context: Context): TExpression;
+    visitCastExpr(ast: o.CastExpr, context: Context): TExpression;
+    visitFunctionExpr(ast: o.FunctionExpr, context: Context): TExpression;
+    visitBinaryOperatorExpr(ast: o.BinaryOperatorExpr, context: Context): TExpression;
+    visitReadPropExpr(ast: o.ReadPropExpr, context: Context): TExpression;
+    visitReadKeyExpr(ast: o.ReadKeyExpr, context: Context): TExpression;
+    visitLiteralArrayExpr(ast: o.LiteralArrayExpr, context: Context): TExpression;
+    visitLiteralMapExpr(ast: o.LiteralMapExpr, context: Context): TExpression;
+    visitCommaExpr(ast: o.CommaExpr, context: Context): never;
+    visitWrappedNodeExpr(ast: o.WrappedNodeExpr<any>, _context: Context): any;
+    visitTypeofExpr(ast: o.TypeofExpr, context: Context): TExpression;
+    visitUnaryOperatorExpr(ast: o.UnaryOperatorExpr, context: Context): TExpression;
+    private visitStatements;
+    private setSourceMapRange;
 }
-/**
- * Attach the given `leadingComments` to the `statement` node.
- *
- * @param statement The statement that will have comments attached.
- * @param leadingComments The comments to attach to the statement.
- */
-export declare function attachComments<T extends ts.Statement>(statement: T, leadingComments?: LeadingComment[]): T;
