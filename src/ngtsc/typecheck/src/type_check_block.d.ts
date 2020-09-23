@@ -244,7 +244,6 @@ declare class Scope {
     private checkAndAppendReferencesOfNode;
     private appendDirectivesAndInputsOfNode;
     private appendOutputsOfNode;
-    private appendDeepSchemaChecks;
 }
 export declare function requiresInlineTypeCheckBlock(node: ClassDeclaration<ts.ClassDeclaration>): boolean;
 export {};
