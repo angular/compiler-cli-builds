@@ -27,7 +27,7 @@ export declare abstract class MockFileSystem implements FileSystem {
     stat(path: AbsoluteFsPath): FileStats;
     copyFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     moveFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
-    ensureDir(path: AbsoluteFsPath): void;
+    ensureDir(path: AbsoluteFsPath): Folder;
     removeDeep(path: AbsoluteFsPath): void;
     isRoot(path: AbsoluteFsPath): boolean;
     extname(path: AbsoluteFsPath | PathSegment): string;
@@ -45,7 +45,9 @@ export declare abstract class MockFileSystem implements FileSystem {
     protected abstract splitPath<T extends PathString>(path: T): string[];
     dump(): Folder;
     init(folder: Folder): void;
+    mount(path: AbsoluteFsPath, folder: Folder): void;
     private cloneFolder;
+    private copyInto;
     protected findFromPath(path: AbsoluteFsPath, options?: {
         followSymLinks: boolean;
     }): FindResult;
