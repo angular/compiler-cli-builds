@@ -47,3 +47,4 @@ export declare function tsCreateVariable(id: ts.Identifier, initializer: ts.Expr
 export declare function tsCallMethod(receiver: ts.Expression, methodName: string, args?: ts.Expression[]): ts.CallExpression;
 export declare function checkIfClassIsExported(node: ClassDeclaration): boolean;
 export declare function checkIfGenericTypesAreUnbound(node: ClassDeclaration<ts.ClassDeclaration>): boolean;
+export declare function isAccessExpression(node: ts.Node): node is ts.ElementAccessExpression | ts.PropertyAccessExpression;
