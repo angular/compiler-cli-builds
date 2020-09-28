@@ -8,12 +8,50 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/host" />
 import * as ts from 'typescript';
 /**
+ * Represents the `ts.CompilerHost` interface, with a transformation applied that turns all
+ * methods (even optional ones) into required fields (which may be `undefined`, if the method was
+ * optional).
+ */
+export declare type RequiredCompilerHostDelegations = {
+    [M in keyof Required<ts.CompilerHost>]: ts.CompilerHost[M];
+};
+/**
+ * Delegates all methods of `ts.CompilerHost` to a delegate, with the exception of
+ * `getSourceFile`, `fileExists` and `writeFile` which are implemented in `TypeCheckProgramHost`.
+ *
+ * If a new method is added to `ts.CompilerHost` which is not delegated, a type error will be
+ * generated for this class.
+ */
+export declare class DelegatingCompilerHost implements Omit<RequiredCompilerHostDelegations, 'getSourceFile' | 'fileExists' | 'writeFile'> {
+    protected delegate: ts.CompilerHost;
+    constructor(delegate: ts.CompilerHost);
+    private delegateMethod;
+    createHash: ((data: string) => string) | undefined;
+    directoryExists: ((directoryName: string) => boolean) | undefined;
+    getCancellationToken: (() => ts.CancellationToken) | undefined;
+    getCanonicalFileName: (fileName: string) => string;
+    getCurrentDirectory: () => string;
+    getDefaultLibFileName: (options: ts.CompilerOptions) => string;
+    getDefaultLibLocation: (() => string) | undefined;
+    getDirectories: ((path: string) => string[]) | undefined;
+    getEnvironmentVariable: ((name: string) => string | undefined) | undefined;
+    getNewLine: () => string;
+    getParsedCommandLine: ((fileName: string) => ts.ParsedCommandLine | undefined) | undefined;
+    getSourceFileByPath: ((fileName: string, path: ts.Path, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined) => ts.SourceFile | undefined) | undefined;
+    readDirectory: ((rootDir: string, extensions: readonly string[], excludes: readonly string[] | undefined, includes: readonly string[], depth?: number | undefined) => string[]) | undefined;
+    readFile: (fileName: string) => string | undefined;
+    realpath: ((path: string) => string) | undefined;
+    resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedModule | undefined)[]) | undefined;
+    resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
+    trace: ((s: string) => void) | undefined;
+    useCaseSensitiveFileNames: () => boolean;
+}
+/**
  * A `ts.CompilerHost` which augments source files with type checking code from a
  * `TypeCheckContext`.
  */
-export declare class TypeCheckProgramHost implements ts.CompilerHost {
+export declare class TypeCheckProgramHost extends DelegatingCompilerHost {
     private originalProgram;
-    private delegate;
     private shimExtensionPrefixes;
     /**
      * Map of source file names to `ts.SourceFile` instances.
@@ -30,17 +68,9 @@ export declare class TypeCheckProgramHost implements ts.CompilerHost {
      * `TypeCheckProgramHost` has its own `ShimReferenceTagger` to perform this function.
      */
     private shimTagger;
-    readonly resolveModuleNames?: ts.CompilerHost['resolveModuleNames'];
     constructor(sfMap: Map<string, ts.SourceFile>, originalProgram: ts.Program, delegate: ts.CompilerHost, shimExtensionPrefixes: string[]);
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
     postProgramCreationCleanup(): void;
-    getDefaultLibFileName(options: ts.CompilerOptions): string;
-    writeFile(fileName: string, data: string, writeByteOrderMark: boolean, onError: ((message: string) => void) | undefined, sourceFiles: ReadonlyArray<ts.SourceFile> | undefined): void;
-    getCurrentDirectory(): string;
-    getDirectories?: (path: string) => string[];
-    getCanonicalFileName(fileName: string): string;
-    useCaseSensitiveFileNames(): boolean;
-    getNewLine(): string;
+    writeFile(): never;
     fileExists(fileName: string): boolean;
-    readFile(fileName: string): string | undefined;
 }
