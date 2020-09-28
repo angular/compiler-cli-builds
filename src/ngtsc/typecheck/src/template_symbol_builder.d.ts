@@ -27,6 +27,7 @@ export declare class SymbolBuilder {
     private getSymbolOfAstTemplate;
     private getSymbolOfElement;
     private getDirectivesOfNode;
+    private getDirectiveMeta;
     private getSymbolOfBoundEvent;
     private getSymbolOfInputBinding;
     private getDirectiveSymbolForAccessExpression;
@@ -35,4 +36,5 @@ export declare class SymbolBuilder {
     private getSymbolOfTemplateExpression;
     private getSymbolOfTsNode;
     private getSymbolOfVariableDeclaration;
+    private getShimPositionForNode;
 }
