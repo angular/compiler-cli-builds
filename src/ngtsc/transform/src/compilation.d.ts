@@ -13,7 +13,7 @@ import { IndexingContext } from '../../indexer';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ProgramTypeCheckAdapter, TypeCheckContext } from '../../typecheck/api';
-import { CompileResult, DecoratorHandler, HandlerFlags } from './api';
+import { CompilationMode, CompileResult, DecoratorHandler, HandlerFlags } from './api';
 import { DtsTransformRegistry } from './declaration';
 import { PendingTrait, Trait } from './trait';
 /**
@@ -59,6 +59,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     private perf;
     private incrementalBuild;
     private compileNonExportedClasses;
+    private compilationMode;
     private dtsTransforms;
     /**
      * Maps class declarations to their `ClassRecord`, which tracks the Ivy traits being applied to
@@ -72,7 +73,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     protected fileToClasses: Map<ts.SourceFile, Set<ClassDeclaration<ts.Declaration>>>;
     private reexportMap;
     private handlersByName;
-    constructor(handlers: DecoratorHandler<unknown, unknown, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord, unknown>, compileNonExportedClasses: boolean, dtsTransforms: DtsTransformRegistry);
+    constructor(handlers: DecoratorHandler<unknown, unknown, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord, unknown>, compileNonExportedClasses: boolean, compilationMode: CompilationMode, dtsTransforms: DtsTransformRegistry);
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     private analyze;

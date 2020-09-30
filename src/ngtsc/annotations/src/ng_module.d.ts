@@ -61,7 +61,7 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<NgModuleAnalysis>;
     register(node: ClassDeclaration, analysis: NgModuleAnalysis): void;
     resolve(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>): ResolveResult<NgModuleResolution>;
-    compile(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>, resolution: Readonly<NgModuleResolution>): CompileResult[];
+    compileFull(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>, resolution: Readonly<NgModuleResolution>): CompileResult[];
     private _toR3Reference;
     /**
      * Given a `FunctionDeclaration`, `MethodDeclaration` or `FunctionExpression`, check if it is
