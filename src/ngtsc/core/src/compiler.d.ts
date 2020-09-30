@@ -82,6 +82,10 @@ export declare class NgCompiler {
     getNextProgram(): ts.Program;
     getTemplateTypeChecker(): TemplateTypeChecker;
     /**
+     * Retrieves the `ts.Declaration`s for any component(s) which use the given template file.
+     */
+    getComponentsWithTemplateFile(templateFilePath: string): ReadonlySet<ts.Declaration>;
+    /**
      * Perform Angular's analysis step (as a precursor to `getDiagnostics` or `prepareEmit`)
      * asynchronously.
      *
