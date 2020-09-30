@@ -46,5 +46,5 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<InjectableHandlerData>;
     register(node: ClassDeclaration): void;
-    compile(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];
+    compileFull(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];
 }

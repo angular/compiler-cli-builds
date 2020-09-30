@@ -32,5 +32,5 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator,
     analyze(clazz: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<PipeHandlerData>;
     register(node: ClassDeclaration, analysis: Readonly<PipeHandlerData>): void;
     resolve(node: ClassDeclaration): ResolveResult<unknown>;
-    compile(node: ClassDeclaration, analysis: Readonly<PipeHandlerData>): CompileResult[];
+    compileFull(node: ClassDeclaration, analysis: Readonly<PipeHandlerData>): CompileResult[];
 }

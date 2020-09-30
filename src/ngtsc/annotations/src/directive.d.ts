@@ -41,7 +41,7 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator | null>, flags?: HandlerFlags): AnalysisOutput<DirectiveHandlerData>;
     register(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>): void;
     resolve(node: ClassDeclaration, analysis: DirectiveHandlerData): ResolveResult<unknown>;
-    compile(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>, resolution: Readonly<unknown>, pool: ConstantPool): CompileResult[];
+    compileFull(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>, resolution: Readonly<unknown>, pool: ConstantPool): CompileResult[];
     /**
      * Checks if a given class uses Angular features and returns the TypeScript node
      * that indicated the usage. Classes are considered using Angular features if they
