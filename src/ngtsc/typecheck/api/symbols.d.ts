@@ -166,11 +166,13 @@ export interface ElementSymbol {
     directives: DirectiveSymbol[];
     /** The location in the shim file for the variable that holds the type of the element. */
     shimLocation: ShimLocation;
+    templateNode: TmplAstElement;
 }
 export interface TemplateSymbol {
     kind: SymbolKind.Template;
     /** A list of directives applied to the element. */
     directives: DirectiveSymbol[];
+    templateNode: TmplAstTemplate;
 }
 /**
  * A representation of a directive/component whose selector matches a node in a component

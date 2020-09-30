@@ -35,6 +35,5 @@ export declare class SymbolBuilder {
     private getSymbolOfReference;
     private getSymbolOfTemplateExpression;
     private getSymbolOfTsNode;
-    private getSymbolOfVariableDeclaration;
     private getShimPositionForNode;
 }
