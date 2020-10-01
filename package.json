@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "11.0.0-next.4+13.sha-21213e1",
+  "version": "11.0.0-next.4+16.sha-7dd0db6",
   "description": "Angular - the compiler CLI for Node.js",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -11,6 +11,8 @@
     "ng-xi18n": "./src/extract_i18n.js"
   },
   "dependencies": {
+    "@babel/core": "^7.8.6",
+    "@babel/types": "^7.8.6",
     "reflect-metadata": "^0.1.2",
     "minimist": "^1.2.0",
     "canonical-path": "1.0.0",
@@ -26,7 +28,7 @@
     "yargs": "15.3.0"
   },
   "peerDependencies": {
-    "@angular/compiler": "11.0.0-next.4+13.sha-21213e1",
+    "@angular/compiler": "11.0.0-next.4+16.sha-7dd0db6",
     "typescript": ">=3.9 <4.1"
   },
   "engines": {

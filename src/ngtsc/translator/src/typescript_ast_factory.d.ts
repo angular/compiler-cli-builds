@@ -25,7 +25,7 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     };
     createElementAccess: (expression: ts.Expression, index: number | ts.Expression) => ts.ElementAccessExpression;
     createExpressionStatement: (expression: ts.Expression) => ts.ExpressionStatement;
-    createFunctionDeclaration(functionName: string | null, parameters: string[], body: ts.Statement): ts.Statement;
+    createFunctionDeclaration(functionName: string, parameters: string[], body: ts.Statement): ts.Statement;
     createFunctionExpression(functionName: string | null, parameters: string[], body: ts.Statement): ts.Expression;
     createIdentifier: (text: string) => ts.Identifier;
     createIfStatement(condition: ts.Expression, thenStatement: ts.Statement, elseStatement: ts.Statement | null): ts.Statement;
@@ -50,4 +50,4 @@ export declare function createTemplateTail(cooked: string, raw: string): ts.Temp
  * @param statement The statement that will have comments attached.
  * @param leadingComments The comments to attach to the statement.
  */
-export declare function attachComments<T extends ts.Statement>(statement: T, leadingComments?: LeadingComment[]): T;
+export declare function attachComments<T extends ts.Statement>(statement: T, leadingComments: LeadingComment[] | undefined): T;
