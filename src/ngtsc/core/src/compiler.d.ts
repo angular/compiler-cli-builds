@@ -61,6 +61,12 @@ export declare class NgCompiler {
     readonly ignoreForEmit: Set<ts.SourceFile>;
     constructor(adapter: NgCompilerAdapter, options: NgCompilerOptions, tsProgram: ts.Program, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, incrementalStrategy: IncrementalBuildStrategy, enableTemplateTypeChecker: boolean, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
     /**
+     * Get the resource dependencies of a file.
+     *
+     * If the file is not part of the compilation, an empty array will be returned.
+     */
+    getResourceDependencies(file: ts.SourceFile): string[];
+    /**
      * Get all Angular-related diagnostics for this compilation.
      *
      * If a `ts.SourceFile` is passed, only diagnostics related to that file are returned.
