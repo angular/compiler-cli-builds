@@ -9,6 +9,7 @@
 import { TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
+import { ClassDeclaration } from '../../reflection';
 export declare enum SymbolKind {
     Input = 0,
     Output = 1,
@@ -190,6 +191,8 @@ export interface DirectiveSymbol {
     selector: string | null;
     /** `true` if this `DirectiveSymbol` is for a @Component. */
     isComponent: boolean;
+    /** The `NgModule` that this directive is declared in or `null` if it could not be determined. */
+    ngModule: ClassDeclaration | null;
 }
 /**
  * A representation of an attribute on an element or template. These bindings aren't currently
