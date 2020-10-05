@@ -9,6 +9,7 @@
 import { AST, TmplAstElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
+import { ComponentScopeReader } from '../../scope';
 import { ElementSymbol, ReferenceSymbol, Symbol, TemplateSymbol, VariableSymbol } from '../api';
 import { TemplateData } from './context';
 /**
@@ -20,7 +21,8 @@ export declare class SymbolBuilder {
     private readonly shimPath;
     private readonly typeCheckBlock;
     private readonly templateData;
-    constructor(typeChecker: ts.TypeChecker, shimPath: AbsoluteFsPath, typeCheckBlock: ts.Node, templateData: TemplateData);
+    private readonly componentScopeReader;
+    constructor(typeChecker: ts.TypeChecker, shimPath: AbsoluteFsPath, typeCheckBlock: ts.Node, templateData: TemplateData, componentScopeReader: ComponentScopeReader);
     getSymbol(node: TmplAstTemplate | TmplAstElement): TemplateSymbol | ElementSymbol | null;
     getSymbol(node: TmplAstReference | TmplAstVariable): ReferenceSymbol | VariableSymbol | null;
     getSymbol(node: AST | TmplAstNode): Symbol | null;
@@ -28,6 +30,7 @@ export declare class SymbolBuilder {
     private getSymbolOfElement;
     private getDirectivesOfNode;
     private getDirectiveMeta;
+    private getDirectiveModule;
     private getSymbolOfBoundEvent;
     private getSymbolOfInputBinding;
     private getDirectiveSymbolForAccessExpression;
