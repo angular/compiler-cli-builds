@@ -62,4 +62,5 @@ export declare class ExpressionTranslatorVisitor<TStatement, TExpression> implem
     visitUnaryOperatorExpr(ast: o.UnaryOperatorExpr, context: Context): TExpression;
     private visitStatements;
     private setSourceMapRange;
+    private attachComments;
 }
