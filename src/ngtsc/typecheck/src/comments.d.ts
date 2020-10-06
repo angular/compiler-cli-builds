@@ -22,7 +22,8 @@ export declare enum CommentTriviaType {
 }
 /** Identifies what the TCB expression is for (for example, a directive declaration). */
 export declare enum ExpressionIdentifier {
-    DIRECTIVE = "DIR"
+    DIRECTIVE = "DIR",
+    COMPONENT_COMPLETION = "COMPCOMP"
 }
 /** Tags the node with the given expression identifier. */
 export declare function addExpressionIdentifier(node: ts.Node, identifier: ExpressionIdentifier): void;
@@ -35,6 +36,7 @@ export declare function markIgnoreDiagnostics(node: ts.Node): void;
 export declare function hasIgnoreMarker(node: ts.Node, sourceFile: ts.SourceFile): boolean;
 export interface FindOptions<T extends ts.Node> {
     filter: (node: ts.Node) => node is T;
+    withExpressionIdentifier?: ExpressionIdentifier;
     withSpan?: AbsoluteSourceSpan | ParseSourceSpan;
 }
 /**

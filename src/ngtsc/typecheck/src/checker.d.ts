@@ -6,14 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/checker" />
-import { AST, ParseError, TmplAstNode } from '@angular/compiler';
+import { AST, ParseError, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
 import { ComponentScopeReader } from '../../scope';
-import { OptimizeFor, ProgramTypeCheckAdapter, Symbol, TemplateId, TemplateTypeChecker, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
+import { GlobalCompletion, OptimizeFor, ProgramTypeCheckAdapter, Symbol, TemplateId, TemplateTypeChecker, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -36,7 +36,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     constructor(originalProgram: ts.Program, typeCheckingStrategy: TypeCheckingProgramStrategy, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, componentScopeReader: ComponentScopeReader);
     resetOverrides(): void;
     getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
-    private getTemplateData;
+    private getLatestComponentState;
     overrideComponentTemplate(component: ts.ClassDeclaration, template: string): {
         nodes: TmplAstNode[];
         errors?: ParseError[];
@@ -48,6 +48,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getDiagnosticsForFile(sf: ts.SourceFile, optimizeFor: OptimizeFor): ts.Diagnostic[];
     getDiagnosticsForComponent(component: ts.ClassDeclaration): ts.Diagnostic[];
     getTypeCheckBlock(component: ts.ClassDeclaration): ts.Node | null;
+    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration): GlobalCompletion[];
     private maybeAdoptPriorResultsForFile;
     private ensureAllShimsForAllFiles;
     private ensureAllShimsForOneFile;

@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/checker" />
-import { AST, ParseError, TmplAstNode } from '@angular/compiler';
+import { AST, ParseError, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
 import * as ts from 'typescript';
+import { GlobalCompletion } from './completion';
 import { Symbol } from './symbols';
 /**
  * Interface to the Angular Template Type Checker to extract diagnostics and intelligence from the
@@ -82,6 +83,16 @@ export interface TemplateTypeChecker {
      * @see Symbol
      */
     getSymbolOfNode(node: AST | TmplAstNode, component: ts.ClassDeclaration): Symbol | null;
+    /**
+     * Get "global" `Completion`s in the given context.
+     *
+     * Global completions are completions in the global context, as opposed to completions within an
+     * existing expression. For example, completing inside a new interpolation expression (`{{|}}`) or
+     * inside a new property binding `[input]="|" should retrieve global completions, which will
+     * include completions from the template's context component, as well as any local references or
+     * template variables which are in scope for that expression.
+     */
+    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration): GlobalCompletion[];
 }
 /**
  * Describes the scope of the caller's interest in template type-checking results.
