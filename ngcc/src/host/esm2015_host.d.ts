@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm2015_host" />
 import * as ts from 'typescript';
 import { Logger } from '../../../src/ngtsc/logging';
-import { ClassDeclaration, ClassMember, ClassMemberKind, CtorParameter, Declaration, Decorator, EnumMember, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, ClassMember, ClassMemberKind, CtorParameter, Declaration, DeclarationNode, Decorator, EnumMember, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
 import { BundleProgram } from '../packages/bundle_program';
 import { NgccClassSymbol, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
 export declare const DECORATORS: ts.__String;
@@ -54,7 +54,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * tree. Note that by definition the key and value declarations will not be in the same TS
      * program.
      */
-    protected publicDtsDeclarationMap: Map<ts.Declaration, ts.Declaration> | null;
+    protected publicDtsDeclarationMap: Map<DeclarationNode, ts.Declaration> | null;
     /**
      * A mapping from source declarations to typings declarations, which are not publicly exported.
      *
@@ -62,7 +62,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * the same name in both the source and the dts file. Note that by definition the key and value
      * declarations will not be in the same TS program.
      */
-    protected privateDtsDeclarationMap: Map<ts.Declaration, ts.Declaration> | null;
+    protected privateDtsDeclarationMap: Map<DeclarationNode, ts.Declaration> | null;
     /**
      * The set of source files that have already been preprocessed.
      */
@@ -82,14 +82,14 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      *
      * This map is populated during the preprocessing of each source file.
      */
-    protected aliasedClassDeclarations: Map<ts.Declaration, ts.Identifier>;
+    protected aliasedClassDeclarations: Map<DeclarationNode, ts.Identifier>;
     /**
      * Caches the information of the decorators on a class, as the work involved with extracting
      * decorators is complex and frequently used.
      *
      * This map is lazily populated during the first call to `acquireDecoratorInfo` for a given class.
      */
-    protected decoratorCache: Map<ClassDeclaration<ts.Declaration>, DecoratorInfo>;
+    protected decoratorCache: Map<ClassDeclaration<DeclarationNode>, DecoratorInfo>;
     constructor(logger: Logger, isCore: boolean, src: BundleProgram, dts?: BundleProgram | null);
     /**
      * Find a symbol for a node that we think is a class.
@@ -119,16 +119,17 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * Examine a declaration (for example, of a class or function) and return metadata about any
      * decorators present on the declaration.
      *
-     * @param declaration a TypeScript `ts.Declaration` node representing the class or function over
-     * which to reflect. For example, if the intent is to reflect the decorators of a class and the
-     * source is in ES6 format, this will be a `ts.ClassDeclaration` node. If the source is in ES5
-     * format, this might be a `ts.VariableDeclaration` as classes in ES5 are represented as the
-     * result of an IIFE execution.
+     * @param declaration a TypeScript node representing the class or function over which to reflect.
+     *     For example, if the intent is to reflect the decorators of a class and the source is in ES6
+     *     format, this will be a `ts.ClassDeclaration` node. If the source is in ES5 format, this
+     *     might be a `ts.VariableDeclaration` as classes in ES5 are represented as the result of an
+     *     IIFE execution.
      *
      * @returns an array of `Decorator` metadata if decorators are present on the declaration, or
-     * `null` if either no decorators were present or if the declaration is not of a decoratable type.
+     *     `null` if either no decorators were present or if the declaration is not of a decoratable
+     *     type.
      */
-    getDecoratorsOfDeclaration(declaration: ts.Declaration): Decorator[] | null;
+    getDecoratorsOfDeclaration(declaration: DeclarationNode): Decorator[] | null;
     /**
      * Examine a declaration which should be of a class, and return metadata about the members of the
      * class.
@@ -220,7 +221,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * Note that the `ts.ClassDeclaration` returned from this function may not be from the same
      * `ts.Program` as the input declaration.
      */
-    getDtsDeclaration(declaration: ts.Declaration): ts.Declaration | null;
+    getDtsDeclaration(declaration: DeclarationNode): ts.Declaration | null;
     getEndOfClass(classSymbol: NgccClassSymbol): ts.Node;
     /**
      * Check whether a `Declaration` corresponds with a known declaration, such as `Object`, and set
@@ -230,6 +231,16 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @return The passed in `Declaration` (potentially enhanced with a `KnownDeclaration`).
      */
     detectKnownDeclaration<T extends Declaration>(decl: T): T;
+    /**
+     * Extract all the "classes" from the `statement` and add them to the `classes` map.
+     */
+    protected addClassSymbolsFromStatement(classes: Map<ts.Symbol, NgccClassSymbol>, statement: ts.Statement): void;
+    /**
+     * Compute the inner declaration node of a "class" from the given `declaration` node.
+     *
+     * @param declaration a node that is either an inner declaration or an alias of a class.
+     */
+    protected getInnerDeclarationFromAliasOrInner(declaration: ts.Node): ts.Node;
     /**
      * A class may be declared as a top level class declaration:
      *
@@ -309,7 +320,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @returns the `NgccClassSymbol` representing the class, or undefined if a `ts.Symbol` for any of
      * the declarations could not be resolved.
      */
-    protected createClassSymbol(outerDeclaration: ClassDeclaration, innerDeclaration: ts.Node | null): NgccClassSymbol | undefined;
+    protected createClassSymbol(outerDeclaration: ts.Identifier, innerDeclaration: ts.Node | null): NgccClassSymbol | undefined;
     private getAdjacentSymbol;
     /**
      * Resolve a `ts.Symbol` to its declaration and detect whether it corresponds with a known
@@ -327,7 +338,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @returns The original identifier that the given class declaration resolves to, or `undefined`
      * if the declaration does not represent an aliased class.
      */
-    protected resolveAliasedClassIdentifier(declaration: ts.Declaration): ts.Identifier | null;
+    protected resolveAliasedClassIdentifier(declaration: DeclarationNode): ts.Identifier | null;
     /**
      * Ensures that the source file that `node` is part of has been preprocessed.
      *
@@ -647,7 +658,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param dts the program bundle containing the typings files.
      * @returns a map of source declarations to typings declarations.
      */
-    protected computePublicDtsDeclarationMap(src: BundleProgram, dts: BundleProgram): Map<ts.Declaration, ts.Declaration>;
+    protected computePublicDtsDeclarationMap(src: BundleProgram, dts: BundleProgram): Map<DeclarationNode, ts.Declaration>;
     /**
      * Create a mapping between the "private" exports in a src program and the "private" exports of a
      * dts program. These exports may be exported from individual files in the src or dts programs,
@@ -661,14 +672,14 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @param dts the program bundle containing the typings files.
      * @returns a map of source declarations to typings declarations.
      */
-    protected computePrivateDtsDeclarationMap(src: BundleProgram, dts: BundleProgram): Map<ts.Declaration, ts.Declaration>;
+    protected computePrivateDtsDeclarationMap(src: BundleProgram, dts: BundleProgram): Map<DeclarationNode, ts.Declaration>;
     /**
      * Collect mappings between names of exported declarations in a file and its actual declaration.
      *
      * Any new mappings are added to the `dtsDeclarationMap`.
      */
     protected collectDtsExportedDeclarations(dtsDeclarationMap: Map<string, ts.Declaration>, srcFile: ts.SourceFile, checker: ts.TypeChecker): void;
-    protected collectSrcExportedDeclarations(declarationMap: Map<ts.Declaration, ts.Declaration>, dtsDeclarationMap: Map<string, ts.Declaration>, srcFile: ts.SourceFile): void;
+    protected collectSrcExportedDeclarations(declarationMap: Map<DeclarationNode, ts.Declaration>, dtsDeclarationMap: Map<string, ts.Declaration>, srcFile: ts.SourceFile): void;
     protected getDeclarationOfExpression(expression: ts.Expression): Declaration | null;
     /** Checks if the specified declaration resolves to the known JavaScript global `Object`. */
     protected isJavaScriptObjectDeclaration(decl: Declaration): boolean;
@@ -714,6 +725,7 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * @returns An `EnumMember` if the statement is according to the expected syntax, null otherwise.
      */
     protected reflectEnumMember(enumName: ts.Identifier, statement: ts.Statement): EnumMember | null;
+    private getAdjacentNameOfClassSymbol;
 }
 /**
  * An enum member assignment that looks like `Enum[X] = Y;`.
@@ -861,28 +873,71 @@ declare type InitializedVariableClassDeclaration = ClassDeclaration<ts.VariableD
  * var MyClass = alias1 = alias2 = <<declaration>>
  * ```
  *
- * @node the LHS of a variable declaration.
+ * @param node the LHS of a variable declaration.
  * @returns the original AST node or the RHS of a series of assignments in a variable
  *     declaration.
  */
 export declare function skipClassAliases(node: InitializedVariableClassDeclaration): ts.Expression;
+/**
+ * This expression could either be a class expression
+ *
+ * ```
+ * class MyClass {};
+ * ```
+ *
+ * or an IIFE wrapped class expression
+ *
+ * ```
+ * (() => {
+ *   class MyClass {}
+ *   ...
+ *   return MyClass;
+ * })()
+ * ```
+ *
+ * or an IIFE wrapped aliased class expression
+ *
+ * ```
+ * (() => {
+ *   let MyClass = class MyClass {}
+ *   ...
+ *   return MyClass;
+ * })()
+ * ```
+ *
+ * or an IFFE wrapped ES5 class function
+ *
+ * ```
+ * (function () {
+ *  function MyClass() {}
+ *  ...
+ *  return MyClass
+ * })()
+ * ```
+ *
+ * @param expression the node that represents the class whose declaration we are finding.
+ * @returns the declaration of the class or `null` if it is not a "class".
+ */
+export declare function getInnerClassDeclaration(expression: ts.Expression): ClassDeclaration<ts.ClassExpression | ts.ClassDeclaration | ts.FunctionDeclaration> | null;
 /**
  * Find the statement that contains the given node
  * @param node a node whose containing statement we wish to find
  */
 export declare function getContainingStatement(node: ts.Node): ts.Statement;
 /**
- * Get the actual (outer) declaration of a class.
+ * Get a node that represents the actual (outer) declaration of a class from its implementation.
  *
  * Sometimes, the implementation of a class is an expression that is hidden inside an IIFE and
- * returned to be assigned to a variable outside the IIFE, which is what the rest of the program
- * interacts with.
+ * assigned to a variable outside the IIFE, which is what the rest of the program interacts with.
+ * For example,
  *
- * Given the inner declaration, we want to get to the declaration of the outer variable that
- * represents the class.
+ * ```
+ * OuterNode = Alias = (function() { function InnerNode() {} return InnerNode; })();
+ * ```
  *
- * @param node a node that could be the inner declaration inside an IIFE.
- * @returns the outer variable declaration or `null` if it is not a "class".
+ * @param node a node that could be the implementation inside an IIFE.
+ * @returns a node that represents the outer declaration, or `null` if it is does not match the IIFE
+ *     format shown above.
  */
-export declare function getClassDeclarationFromInnerDeclaration(node: ts.Node): ClassDeclaration<ts.VariableDeclaration> | null;
+export declare function getOuterNodeFromInnerDeclaration(node: ts.Node): ts.Node | null;
 export {};
