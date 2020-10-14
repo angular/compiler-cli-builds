@@ -36,6 +36,15 @@ export declare abstract class DependencyHostBase implements DependencyHost {
      */
     collectDependencies(entryPointPath: AbsoluteFsPath, { dependencies, missing, deepImports }: DependencyInfo): void;
     /**
+     * Find all the dependencies for the provided paths.
+     *
+     * @param files The list of absolute paths of JavaScript files to scan for dependencies.
+     * @param dependencyInfo An object containing information about the dependencies of the
+     * entry-point, including those that were missing or deep imports into other entry-points. The
+     * sets in this object will be updated with new information about the entry-point's dependencies.
+     */
+    collectDependenciesInFiles(files: AbsoluteFsPath[], { dependencies, missing, deepImports }: DependencyInfo): void;
+    /**
      * Compute the dependencies of the given file.
      *
      * @param file An absolute path to the file whose dependencies we want to get.
@@ -60,4 +69,10 @@ export declare abstract class DependencyHostBase implements DependencyHost {
      * deep-import), `false` otherwise.
      */
     protected processImport(importPath: string, file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<string>, alreadySeen: Set<AbsoluteFsPath>): boolean;
+    /**
+     * Processes the file if it has not already been seen. This will also recursively process
+     * all files that are imported from the file, while taking the set of already seen files
+     * into account.
+     */
+    protected processFile(file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<string>, alreadySeen: Set<AbsoluteFsPath>): void;
 }
