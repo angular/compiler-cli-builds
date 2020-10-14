@@ -10,7 +10,7 @@ import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
 import { UnifiedModulesHost } from '../../core/api';
 import { LogicalFileSystem } from '../../file_system';
-import { ReflectionHost } from '../../reflection';
+import { DeclarationNode, ReflectionHost } from '../../reflection';
 import { Reference } from './references';
 import { ModuleResolver } from './resolver';
 /**
@@ -106,7 +106,7 @@ export declare class AbsoluteModuleStrategy implements ReferenceEmitStrategy {
     emit(ref: Reference<ts.Node>, context: ts.SourceFile, importFlags: ImportFlags): Expression | null;
     private resolveImportName;
     private getExportsOfModule;
-    protected enumerateExportsOfModule(specifier: string, fromFile: string): Map<ts.Declaration, string> | null;
+    protected enumerateExportsOfModule(specifier: string, fromFile: string): Map<DeclarationNode, string> | null;
 }
 /**
  * A `ReferenceEmitStrategy` which will refer to declarations via relative paths, provided they're

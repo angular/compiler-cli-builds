@@ -10,6 +10,7 @@ import * as ts from 'typescript';
 import { IncrementalBuildStrategy, IncrementalDriver } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
 import { PerfRecorder } from '../../perf';
+import { DeclarationNode } from '../../reflection';
 import { TemplateTypeChecker, TypeCheckingProgramStrategy } from '../../typecheck/api';
 import { LazyRoute, NgCompilerAdapter, NgCompilerOptions } from '../api';
 /**
@@ -108,7 +109,7 @@ export declare class NgCompiler {
      *
      * See the `indexing` package for more details.
      */
-    getIndexedComponents(): Map<ts.Declaration, IndexedComponent>;
+    getIndexedComponents(): Map<DeclarationNode, IndexedComponent>;
     private ensureAnalyzed;
     private analyzeSync;
     private resolveCompilation;

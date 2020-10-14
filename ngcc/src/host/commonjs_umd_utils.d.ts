@@ -12,13 +12,6 @@ export interface ExportDeclaration {
     name: string;
     declaration: Declaration;
 }
-export interface ExportStatement extends ts.ExpressionStatement {
-    expression: ts.BinaryExpression & {
-        left: ts.PropertyAccessExpression & {
-            expression: ts.Identifier;
-        };
-    };
-}
 /**
  * A CommonJS or UMD wildcard re-export statement.
  *
@@ -53,6 +46,9 @@ export interface DefinePropertyReexportStatement extends ts.ExpressionStatement 
         arguments: [ts.Identifier, ts.StringLiteral, ts.ObjectLiteralExpression];
     };
 }
+/**
+ * A call expression that has a string literal for its first argument.
+ */
 export interface RequireCall extends ts.CallExpression {
     arguments: ts.CallExpression['arguments'] & [ts.StringLiteral];
 }
@@ -68,11 +64,6 @@ export declare function findNamespaceOfIdentifier(id: ts.Identifier): ts.Identif
  * `var <id> = require('...')`
  */
 export declare function findRequireCallReference(id: ts.Identifier, checker: ts.TypeChecker): RequireCall | null;
-/**
- * Check whether the specified `ts.Statement` is an export statement, i.e. an expression statement
- * of the form: `exports.<foo> = <bar>`
- */
-export declare function isExportStatement(stmt: ts.Statement): stmt is ExportStatement;
 /**
  * Check whether the specified `ts.Statement` is a wildcard re-export statement.
  * I.E. an expression statement of one of the following forms:
@@ -91,10 +82,66 @@ export declare function isWildcardReexportStatement(stmt: ts.Statement): stmt is
  * ```
  */
 export declare function isDefinePropertyReexportStatement(stmt: ts.Statement): stmt is DefinePropertyReexportStatement;
+/**
+ * Extract the "value" of the getter in a `defineProperty` statement.
+ *
+ * This will return the `ts.Expression` value of a single `return` statement in the `get` method
+ * of the property definition object, or `null` if that is not possible.
+ */
 export declare function extractGetterFnExpression(statement: DefinePropertyReexportStatement): ts.Expression | null;
 /**
  * Check whether the specified `ts.Node` represents a `require()` call, i.e. an call expression of
  * the form: `require('<foo>')`
  */
 export declare function isRequireCall(node: ts.Node): node is RequireCall;
+/**
+ * Check whether the specified `path` is an "external" import.
+ * In other words, that it comes from a entry-point outside the current one.
+ */
 export declare function isExternalImport(path: string): boolean;
+/**
+ * A UMD/CommonJS style export declaration of the form `exports.<name>`.
+ */
+export interface ExportsDeclaration extends ts.PropertyAccessExpression {
+    name: ts.Identifier;
+    expression: ts.Identifier;
+    parent: ExportsAssignment;
+}
+/**
+ * Check whether the specified `node` is a property access expression of the form
+ * `exports.<foo>`.
+ */
+export declare function isExportsDeclaration(expr: ts.Node): expr is ExportsDeclaration;
+/**
+ * A UMD/CommonJS style export assignment of the form `exports.<foo> = <bar>`.
+ */
+export interface ExportsAssignment extends ts.BinaryExpression {
+    left: ExportsDeclaration;
+}
+/**
+ * Check whether the specified `node` is an assignment expression of the form
+ * `exports.<foo> = <bar>`.
+ */
+export declare function isExportsAssignment(expr: ts.Node): expr is ExportsAssignment;
+/**
+ * An expression statement of the form `exports.<foo> = <bar>;`.
+ */
+export interface ExportsStatement extends ts.ExpressionStatement {
+    expression: ExportsAssignment;
+}
+/**
+ * Check whether the specified `stmt` is an expression statement of the form
+ * `exports.<foo> = <bar>;`.
+ */
+export declare function isExportsStatement(stmt: ts.Node): stmt is ExportsStatement;
+/**
+ * Find the far right hand side of a sequence of aliased assignements of the form
+ *
+ * ```
+ * exports.MyClass = alias1 = alias2 = <<declaration>>
+ * ```
+ *
+ * @param node the expression to parse
+ * @returns the original `node` or the far right expression of a series of assignments.
+ */
+export declare function skipAliases(node: ts.Expression): ts.Expression;

@@ -12,6 +12,7 @@ import { Declaration, Import } from '../../../src/ngtsc/reflection';
 import { BundleProgram } from '../packages/bundle_program';
 import { FactoryMap } from '../utils';
 import { Esm5ReflectionHost } from './esm5_host';
+import { NgccClassSymbol } from './ngcc_host';
 export declare class UmdReflectionHost extends Esm5ReflectionHost {
     protected umdModules: FactoryMap<ts.SourceFile, UmdModule | null>;
     protected umdExports: FactoryMap<ts.SourceFile, Map<string, Declaration<ts.Declaration>> | null>;
@@ -33,19 +34,33 @@ export declare class UmdReflectionHost extends Esm5ReflectionHost {
      * @returns An array of top level statements for the given module.
      */
     protected getModuleStatements(sourceFile: ts.SourceFile): ts.Statement[];
+    protected getClassSymbolFromOuterDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
+    protected getClassSymbolFromInnerDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
+    /**
+     * Extract all "classes" from the `statement` and add them to the `classes` map.
+     */
+    protected addClassSymbolsFromStatement(classes: Map<ts.Symbol, NgccClassSymbol>, statement: ts.Statement): void;
+    /**
+     * Analyze the given statement to see if it corresponds with an exports declaration like
+     * `exports.MyClass = MyClass_1 = <class def>;`. If so, the declaration of `MyClass_1`
+     * is associated with the `MyClass` identifier.
+     *
+     * @param statement The statement that needs to be preprocessed.
+     */
+    protected preprocessStatement(statement: ts.Statement): void;
     private computeUmdModule;
     private computeExportsOfUmdModule;
     private computeImportPath;
     private extractBasicUmdExportDeclaration;
     private extractUmdWildcardReexports;
     private extractUmdDefinePropertyExportDeclaration;
-    private extractUmdExportDeclaration;
     /**
      * Is the identifier a parameter on a UMD factory function, e.g. `function factory(this, core)`?
      * If so then return its declaration.
      */
     private findUmdImportParameter;
     private getUmdDeclaration;
+    private getExportsDeclaration;
     private getUmdModuleDeclaration;
     private getImportPathFromParameter;
     private getImportPathFromRequireCall;

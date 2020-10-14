@@ -11,7 +11,7 @@ import * as ts from 'typescript';
 import { IncrementalBuild } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
 import { PerfRecorder } from '../../perf';
-import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
+import { ClassDeclaration, DeclarationNode, Decorator, ReflectionHost } from '../../reflection';
 import { ProgramTypeCheckAdapter, TypeCheckContext } from '../../typecheck/api';
 import { CompileResult, DecoratorHandler, HandlerFlags } from './api';
 import { DtsTransformRegistry } from './declaration';
@@ -69,7 +69,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
      * Maps source files to any class declaration(s) within them which have been discovered to contain
      * Ivy traits.
      */
-    protected fileToClasses: Map<ts.SourceFile, Set<ClassDeclaration<ts.Declaration>>>;
+    protected fileToClasses: Map<ts.SourceFile, Set<ClassDeclaration<DeclarationNode>>>;
     private reexportMap;
     private handlersByName;
     constructor(handlers: DecoratorHandler<unknown, unknown, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord, unknown>, compileNonExportedClasses: boolean, dtsTransforms: DtsTransformRegistry);
@@ -98,7 +98,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
      */
     typeCheck(sf: ts.SourceFile, ctx: TypeCheckContext): void;
     index(ctx: IndexingContext): void;
-    compile(clazz: ts.Declaration, constantPool: ConstantPool): CompileResult[] | null;
+    compile(clazz: DeclarationNode, constantPool: ConstantPool): CompileResult[] | null;
     decoratorsFor(node: ts.Declaration): ts.Decorator[];
     get diagnostics(): ReadonlyArray<ts.Diagnostic>;
     get exportStatements(): Map<string, Map<string, [string, string]>>;

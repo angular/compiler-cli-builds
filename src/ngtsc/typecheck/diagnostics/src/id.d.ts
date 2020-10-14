@@ -6,6 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/diagnostics/src/id" />
-import * as ts from 'typescript';
+import { DeclarationNode } from '../../../reflection';
 import { TemplateId } from '../../api';
-export declare function getTemplateId(clazz: ts.Declaration): TemplateId;
+export declare function getTemplateId(clazz: DeclarationNode): TemplateId;

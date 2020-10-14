@@ -8,7 +8,7 @@
  */
 import * as ts from 'typescript';
 import { AbsoluteFsPath, FileSystem } from '../../src/ngtsc/file_system';
-import { KnownDeclaration } from '../../src/ngtsc/reflection';
+import { DeclarationNode, KnownDeclaration } from '../../src/ngtsc/reflection';
 /**
  * A list (`Array`) of partially ordered `T` items.
  *
@@ -43,7 +43,7 @@ export declare function findAll<T>(node: ts.Node, test: (node: ts.Node) => node 
  * @param declaration The declaration to test.
  * @returns true if the declaration has an identifier for a name.
  */
-export declare function hasNameIdentifier(declaration: ts.Declaration): declaration is ts.Declaration & {
+export declare function hasNameIdentifier(declaration: ts.Node): declaration is DeclarationNode & {
     name: ts.Identifier;
 };
 /**
@@ -76,7 +76,7 @@ export declare function resolveFileWithPostfixes(fs: FileSystem, path: AbsoluteF
  * Determine whether a function declaration corresponds with a TypeScript helper function, returning
  * its kind if so or null if the declaration does not seem to correspond with such a helper.
  */
-export declare function getTsHelperFnFromDeclaration(decl: ts.Declaration): KnownDeclaration | null;
+export declare function getTsHelperFnFromDeclaration(decl: DeclarationNode): KnownDeclaration | null;
 /**
  * Determine whether an identifier corresponds with a TypeScript helper function (based on its
  * name), returning its kind if so or null if the identifier does not seem to correspond with such a
