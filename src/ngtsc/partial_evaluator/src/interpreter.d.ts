@@ -47,6 +47,7 @@ export declare class StaticInterpreter {
     private visitElementAccessExpression;
     private visitPropertyAccessExpression;
     private visitSourceFile;
+    private visitAmbiguousDeclaration;
     private accessHelper;
     private visitCallExpression;
     /**

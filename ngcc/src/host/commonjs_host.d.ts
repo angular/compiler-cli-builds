@@ -53,7 +53,6 @@ export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
     private extractCommonJsWildcardReexports;
     private extractCommonJsDefinePropertyExportDeclaration;
     private findCommonJsImport;
-    private extractCommonJsExportDeclaration;
     /**
      * Handle the case where the identifier represents a reference to a whole CommonJS
      * module, i.e. the result of a call to `require(...)`.

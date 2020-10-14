@@ -134,3 +134,14 @@ export interface ExportsStatement extends ts.ExpressionStatement {
  * `exports.<foo> = <bar>;`.
  */
 export declare function isExportsStatement(stmt: ts.Node): stmt is ExportsStatement;
+/**
+ * Find the far right hand side of a sequence of aliased assignements of the form
+ *
+ * ```
+ * exports.MyClass = alias1 = alias2 = <<declaration>>
+ * ```
+ *
+ * @param node the expression to parse
+ * @returns the original `node` or the far right expression of a series of assignments.
+ */
+export declare function skipAliases(node: ts.Expression): ts.Expression;
