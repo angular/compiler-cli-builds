@@ -90,7 +90,7 @@ export declare function isDecoratorIdentifier(exp: ts.Expression): exp is Decora
  * For `ReflectionHost` purposes, a class declaration should always have a `name` identifier,
  * because we need to be able to reference it in other parts of the program.
  */
-export declare type ClassDeclaration<T extends ts.Declaration = ts.Declaration> = T & {
+export declare type ClassDeclaration<T extends DeclarationNode = DeclarationNode> = T & {
     name: ts.Identifier;
 };
 /**
@@ -235,7 +235,7 @@ export interface ImportedTypeValueReference {
      * When `null` or empty, the `importedName` itself is the symbol being referenced.
      */
     nestedPath: string[] | null;
-    valueDeclaration: ts.Declaration;
+    valueDeclaration: DeclarationNode;
 }
 /**
  * A representation for a type value reference that is used when no value is available. This can
@@ -452,9 +452,34 @@ export interface EnumMember {
     initializer: ts.Expression;
 }
 /**
+ * A type that is used to identify a declaration.
+ *
+ * Declarations are normally `ts.Declaration` types such as variable declarations, class
+ * declarations, function declarations etc.
+ * But in some cases there is no `ts.Declaration` that can be used for a declaration, such
+ * as when they are declared inline as part of an exported expression. Then we must use a
+ * `ts.Expression` as the declaration.
+ * An example of this is `exports.someVar = 42` where the declaration expression would be
+ * `exports.someVar`.
+ */
+export declare type DeclarationNode = ts.Declaration | ts.Expression;
+/**
+ * The type of a Declaration - whether its node is concrete (ts.Declaration) or inline
+ * (ts.Expression). See `ConcreteDeclaration`, `InlineDeclaration` and `DeclarationNode` for more
+ * information about this.
+ */
+export declare const enum DeclarationKind {
+    Concrete = 0,
+    Inline = 1
+}
+/**
  * Base type for all `Declaration`s.
  */
-export interface BaseDeclaration<T extends ts.Declaration = ts.Declaration> {
+export interface BaseDeclaration<T extends DeclarationNode> {
+    /**
+     * The type of the underlying `node`.
+     */
+    kind: DeclarationKind;
     /**
      * The absolute module path from which the symbol was imported into the application, if the symbol
      * was imported via an absolute module (even through a chain of re-exports). If the symbol is part
@@ -464,19 +489,19 @@ export interface BaseDeclaration<T extends ts.Declaration = ts.Declaration> {
     /**
      * TypeScript reference to the declaration itself, if one exists.
      */
-    node: T | null;
+    node: T;
     /**
      * If set, describes the type of the known declaration this declaration resolves to.
      */
     known: KnownDeclaration | null;
 }
 /**
- * A declaration that has an associated TypeScript `ts.Declaration`.
- *
- * The alternative is an `InlineDeclaration`.
+ * Returns true if the `decl` is a `ConcreteDeclaration` (ie. that its `node` property is a
+ * `ts.Declaration`).
  */
+export declare function isConcreteDeclaration(decl: Declaration): decl is ConcreteDeclaration;
 export interface ConcreteDeclaration<T extends ts.Declaration = ts.Declaration> extends BaseDeclaration<T> {
-    node: T;
+    kind: DeclarationKind.Concrete;
     /**
      * Optionally represents a special identity of the declaration, or `null` if the declaration
      * does not have a special identity.
@@ -497,27 +522,19 @@ export interface DownleveledEnum {
     enumMembers: EnumMember[];
 }
 /**
- * A declaration that does not have an associated TypeScript `ts.Declaration`, only a
- * `ts.Expression`.
+ * A declaration that does not have an associated TypeScript `ts.Declaration`.
  *
  * This can occur in some downlevelings when an `export const VAR = ...;` (a `ts.Declaration`) is
  * transpiled to an assignment statement (e.g. `exports.VAR = ...;`). There is no `ts.Declaration`
  * associated with `VAR` in that case, only an expression.
  */
-export interface InlineDeclaration extends BaseDeclaration {
-    node: null;
-    /**
-     * The `ts.Expression` which constitutes the value of the declaration.
-     */
-    expression: ts.Expression;
+export interface InlineDeclaration extends BaseDeclaration<Exclude<DeclarationNode, ts.Declaration>> {
+    kind: DeclarationKind.Inline;
+    implementation?: ts.Expression;
 }
 /**
  * The declaration of a symbol, along with information about how it was imported into the
  * application.
- *
- * This can either be a `ConcreteDeclaration` if the underlying TypeScript node for the symbol is an
- * actual `ts.Declaration`, or an `InlineDeclaration` if the declaration was transpiled in certain
- * downlevelings to a `ts.Expression` instead.
  */
 export declare type Declaration<T extends ts.Declaration = ts.Declaration> = ConcreteDeclaration<T> | InlineDeclaration;
 /**
@@ -545,7 +562,7 @@ export interface ReflectionHost {
      * @returns an array of `Decorator` metadata if decorators are present on the declaration, or
      * `null` if either no decorators were present or if the declaration is not of a decoratable type.
      */
-    getDecoratorsOfDeclaration(declaration: ts.Declaration): Decorator[] | null;
+    getDecoratorsOfDeclaration(declaration: DeclarationNode): Decorator[] | null;
     /**
      * Examine a declaration which should be of a class, and return metadata about the members of the
      * class.
@@ -698,7 +715,7 @@ export interface ReflectionHost {
      * Note that the `ts.Declaration` returned from this function may not be from the same
      * `ts.Program` as the input declaration.
      */
-    getDtsDeclaration(declaration: ts.Declaration): ts.Declaration | null;
+    getDtsDeclaration(declaration: DeclarationNode): ts.Declaration | null;
     /**
      * Get a `ts.Identifier` for a given `ClassDeclaration` which can be used to refer to the class
      * within its definition (such as in static fields).

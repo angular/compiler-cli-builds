@@ -10,6 +10,7 @@ import * as ts from 'typescript';
 import { IncrementalBuildStrategy, IncrementalDriver } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
 import { PerfRecorder } from '../../perf';
+import { DeclarationNode } from '../../reflection';
 import { TemplateTypeChecker, TypeCheckingProgramStrategy } from '../../typecheck/api';
 import { LazyRoute, NgCompilerAdapter, NgCompilerOptions } from '../api';
 /**
@@ -90,7 +91,7 @@ export declare class NgCompiler {
     /**
      * Retrieves the `ts.Declaration`s for any component(s) which use the given template file.
      */
-    getComponentsWithTemplateFile(templateFilePath: string): ReadonlySet<ts.Declaration>;
+    getComponentsWithTemplateFile(templateFilePath: string): ReadonlySet<DeclarationNode>;
     /**
      * Perform Angular's analysis step (as a precursor to `getDiagnostics` or `prepareEmit`)
      * asynchronously.
@@ -119,7 +120,7 @@ export declare class NgCompiler {
      *
      * See the `indexing` package for more details.
      */
-    getIndexedComponents(): Map<ts.Declaration, IndexedComponent>;
+    getIndexedComponents(): Map<DeclarationNode, IndexedComponent>;
     private ensureAnalyzed;
     private analyzeSync;
     private resolveCompilation;
