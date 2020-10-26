@@ -64,6 +64,11 @@ export declare class UmdReflectionHost extends Esm5ReflectionHost {
     private getUmdModuleDeclaration;
     private getImportPathFromParameter;
     private getImportPathFromRequireCall;
+    /**
+     * If this is an IIFE then try to grab the outer and inner classes otherwise fallback on the super
+     * class.
+     */
+    protected getDeclarationOfExpression(expression: ts.Expression): Declaration | null;
     private resolveModuleName;
 }
 export declare function parseStatementForUmdModule(statement: ts.Statement): UmdModule | null;

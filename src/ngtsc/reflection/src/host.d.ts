@@ -530,7 +530,7 @@ export interface DownleveledEnum {
  */
 export interface InlineDeclaration extends BaseDeclaration<Exclude<DeclarationNode, ts.Declaration>> {
     kind: DeclarationKind.Inline;
-    implementation?: ts.Expression;
+    implementation?: DeclarationNode;
 }
 /**
  * The declaration of a symbol, along with information about how it was imported into the
