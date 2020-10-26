@@ -61,5 +61,10 @@ export declare class CommonJsReflectionHost extends Esm5ReflectionHost {
      * @returns a declaration if `id` refers to a CommonJS module, or `null` otherwise.
      */
     private getCommonJsModuleDeclaration;
+    /**
+     * If this is an IFE then try to grab the outer and inner classes otherwise fallback on the super
+     * class.
+     */
+    protected getDeclarationOfExpression(expression: ts.Expression): Declaration | null;
     private resolveModuleName;
 }
