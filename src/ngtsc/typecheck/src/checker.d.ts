@@ -13,7 +13,7 @@ import { ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
 import { ComponentScopeReader } from '../../scope';
-import { GlobalCompletion, OptimizeFor, ProgramTypeCheckAdapter, Symbol, TemplateId, TemplateTypeChecker, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
+import { DirectiveInScope, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, Symbol, TemplateId, TemplateTypeChecker, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -32,6 +32,31 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private priorBuild;
     private readonly componentScopeReader;
     private state;
+    /**
+     * Stores the `CompletionEngine` which powers autocompletion for each component class.
+     *
+     * Must be invalidated whenever the component's template or the `ts.Program` changes. Invalidation
+     * on template changes is performed within this `TemplateTypeCheckerImpl` instance. When the
+     * `ts.Program` changes, the `TemplateTypeCheckerImpl` as a whole is destroyed and replaced.
+     */
+    private completionCache;
+    /**
+     * Stores the `SymbolBuilder` which creates symbols for each component class.
+     *
+     * Must be invalidated whenever the component's template or the `ts.Program` changes. Invalidation
+     * on template changes is performed within this `TemplateTypeCheckerImpl` instance. When the
+     * `ts.Program` changes, the `TemplateTypeCheckerImpl` as a whole is destroyed and replaced.
+     */
+    private symbolBuilderCache;
+    /**
+     * Stores directives and pipes that are in scope for each component.
+     *
+     * Unlike the other caches, the scope of a component is not affected by its template, so this
+     * cache does not need to be invalidate if the template is overridden. It will be destroyed when
+     * the `ts.Program` changes and the `TemplateTypeCheckerImpl` as a whole is destroyed and
+     * replaced.
+     */
+    private scopeCache;
     private isComplete;
     constructor(originalProgram: ts.Program, typeCheckingStrategy: TypeCheckingProgramStrategy, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, componentScopeReader: ComponentScopeReader);
     resetOverrides(): void;
@@ -48,7 +73,8 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getDiagnosticsForFile(sf: ts.SourceFile, optimizeFor: OptimizeFor): ts.Diagnostic[];
     getDiagnosticsForComponent(component: ts.ClassDeclaration): ts.Diagnostic[];
     getTypeCheckBlock(component: ts.ClassDeclaration): ts.Node | null;
-    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration): GlobalCompletion[];
+    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration): GlobalCompletion | null;
+    private getOrCreateCompletionEngine;
     private maybeAdoptPriorResultsForFile;
     private ensureAllShimsForAllFiles;
     private ensureAllShimsForOneFile;
@@ -64,6 +90,10 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private updateFromContext;
     getFileData(path: AbsoluteFsPath): FileTypeCheckingData;
     getSymbolOfNode(node: AST | TmplAstNode, component: ts.ClassDeclaration): Symbol | null;
+    private getOrCreateSymbolBuilder;
+    getDirectivesInScope(component: ts.ClassDeclaration): DirectiveInScope[] | null;
+    getPipesInScope(component: ts.ClassDeclaration): PipeInScope[] | null;
+    private getScopeData;
 }
 /**
  * Data for template type-checking related to a specific input file in the user's program (which

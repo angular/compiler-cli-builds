@@ -9,6 +9,7 @@
 import { AST, ParseError, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
 import * as ts from 'typescript';
 import { GlobalCompletion } from './completion';
+import { DirectiveInScope, PipeInScope } from './scope';
 import { Symbol } from './symbols';
 /**
  * Interface to the Angular Template Type Checker to extract diagnostics and intelligence from the
@@ -92,7 +93,15 @@ export interface TemplateTypeChecker {
      * include completions from the template's context component, as well as any local references or
      * template variables which are in scope for that expression.
      */
-    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration): GlobalCompletion[];
+    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration): GlobalCompletion | null;
+    /**
+     * Get basic metadata on the directives which are in scope for the given component.
+     */
+    getDirectivesInScope(component: ts.ClassDeclaration): DirectiveInScope[] | null;
+    /**
+     * Get basic metadata on the pipes which are in scope for the given component.
+     */
+    getPipesInScope(component: ts.ClassDeclaration): PipeInScope[] | null;
 }
 /**
  * Describes the scope of the caller's interest in template type-checking results.
