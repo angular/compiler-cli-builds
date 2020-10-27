@@ -13,16 +13,19 @@ import { ComponentScopeReader } from '../../scope';
 import { ElementSymbol, ReferenceSymbol, Symbol, TemplateSymbol, VariableSymbol } from '../api';
 import { TemplateData } from './context';
 /**
- * A class which extracts information from a type check block.
- * This class is essentially used as just a closure around the constructor parameters.
+ * Generates and caches `Symbol`s for various template structures for a given component.
+ *
+ * The `SymbolBuilder` internally caches the `Symbol`s it creates, and must be destroyed and
+ * replaced if the component's template changes.
  */
 export declare class SymbolBuilder {
-    private readonly typeChecker;
     private readonly shimPath;
     private readonly typeCheckBlock;
     private readonly templateData;
     private readonly componentScopeReader;
-    constructor(typeChecker: ts.TypeChecker, shimPath: AbsoluteFsPath, typeCheckBlock: ts.Node, templateData: TemplateData, componentScopeReader: ComponentScopeReader);
+    private readonly getTypeChecker;
+    private symbolCache;
+    constructor(shimPath: AbsoluteFsPath, typeCheckBlock: ts.Node, templateData: TemplateData, componentScopeReader: ComponentScopeReader, getTypeChecker: () => ts.TypeChecker);
     getSymbol(node: TmplAstTemplate | TmplAstElement): TemplateSymbol | ElementSymbol | null;
     getSymbol(node: TmplAstReference | TmplAstVariable): ReferenceSymbol | VariableSymbol | null;
     getSymbol(node: AST | TmplAstNode): Symbol | null;
