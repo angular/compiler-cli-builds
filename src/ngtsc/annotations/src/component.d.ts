@@ -11,7 +11,7 @@ import { CycleAnalyzer } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
-import { ClassPropertyMapping, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry, TemplateMapping } from '../../metadata';
+import { ClassPropertyMapping, ComponentResources, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry, ResourceRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry } from '../../scope';
@@ -48,6 +48,7 @@ export interface ComponentAnalysisData {
      * require an Angular factory definition at runtime.
      */
     viewProvidersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
+    resources: ComponentResources;
 }
 export declare type ComponentResolutionData = Pick<R3ComponentMetadata, ComponentMetadataResolvedFields>;
 /**
@@ -60,7 +61,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private metaReader;
     private scopeReader;
     private scopeRegistry;
-    private templateMapping;
+    private resourceRegistry;
     private isCore;
     private resourceLoader;
     private rootDirs;
@@ -75,7 +76,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private depTracker;
     private injectableRegistry;
     private annotateForClosureCompiler;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, templateMapping: TemplateMapping, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, annotateForClosureCompiler: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, annotateForClosureCompiler: boolean);
     private literalCache;
     private elementSchemaRegistry;
     private typeCheckScopes;
@@ -98,6 +99,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private _resolveLiteral;
     private _resolveEnumValue;
     private _extractStyleUrls;
+    private _extractStyleResources;
     private _preloadAndParseTemplate;
     private _extractExternalTemplate;
     private _extractInlineTemplate;

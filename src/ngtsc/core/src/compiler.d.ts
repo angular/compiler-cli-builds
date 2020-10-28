@@ -9,6 +9,7 @@
 import * as ts from 'typescript';
 import { IncrementalBuildStrategy, IncrementalDriver } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
+import { ComponentResources } from '../../metadata';
 import { PerfRecorder } from '../../perf';
 import { DeclarationNode } from '../../reflection';
 import { TemplateTypeChecker, TypeCheckingProgramStrategy } from '../../typecheck/api';
@@ -92,6 +93,14 @@ export declare class NgCompiler {
      * Retrieves the `ts.Declaration`s for any component(s) which use the given template file.
      */
     getComponentsWithTemplateFile(templateFilePath: string): ReadonlySet<DeclarationNode>;
+    /**
+     * Retrieves the `ts.Declaration`s for any component(s) which use the given template file.
+     */
+    getComponentsWithStyleFile(styleFilePath: string): ReadonlySet<DeclarationNode>;
+    /**
+     * Retrieves external resources for the given component.
+     */
+    getComponentResources(classDecl: DeclarationNode): ComponentResources | null;
     /**
      * Perform Angular's analysis step (as a precursor to `getDiagnostics` or `prepareEmit`)
      * asynchronously.
