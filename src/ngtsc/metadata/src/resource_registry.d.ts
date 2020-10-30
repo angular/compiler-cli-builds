@@ -10,22 +10,23 @@ import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ClassDeclaration } from '../../reflection';
 /**
- * Represents an external resource for a component and contains the `AbsoluteFsPath`
+ * Represents an resource for a component and contains the `AbsoluteFsPath`
  * to the file which was resolved by evaluating the `ts.Expression` (generally, a relative or
  * absolute string path to the resource).
+ *
+ * If the resource is inline, the `path` will be `null`.
  */
 export interface Resource {
-    path: AbsoluteFsPath;
+    path: AbsoluteFsPath | null;
     expression: ts.Expression;
 }
 /**
- * Represents the external resources of a component.
+ * Represents the either inline or external resources of a component.
  *
- * If the component uses an inline template, the template resource will be `null`.
- * If the component does not have external styles, the `styles` `Set` will be empty.
+ * A resource with a `path` of `null` is considered inline.
  */
 export interface ComponentResources {
-    template: Resource | null;
+    template: Resource;
     styles: ReadonlySet<Resource>;
 }
 /**
@@ -36,10 +37,10 @@ export interface ComponentResources {
  * assistance.
  */
 export declare class ResourceRegistry {
-    private templateToComponentsMap;
+    private externalTemplateToComponentsMap;
     private componentToTemplateMap;
     private componentToStylesMap;
-    private styleToComponentsMap;
+    private externalStyleToComponentsMap;
     getComponentsWithTemplate(template: AbsoluteFsPath): ReadonlySet<ClassDeclaration>;
     registerResources(resources: ComponentResources, component: ClassDeclaration): void;
     registerTemplate(templateResource: Resource, component: ClassDeclaration): void;
