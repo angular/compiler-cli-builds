@@ -61,6 +61,6 @@ export declare class Context {
      * might change depending on the type of data being stored.
      */
     allocateId(): ts.Identifier;
-    getPipeByName(name: string): ts.Expression | null;
+    getPipeByName(name: string): Reference<ClassDeclaration<ts.ClassDeclaration>> | null;
 }
 export declare function requiresInlineTypeCheckBlock(node: ClassDeclaration<ts.ClassDeclaration>): boolean;
