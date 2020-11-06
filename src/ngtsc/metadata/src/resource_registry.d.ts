@@ -20,6 +20,10 @@ export interface Resource {
     path: AbsoluteFsPath | null;
     expression: ts.Expression;
 }
+export interface ExternalResource extends Resource {
+    path: AbsoluteFsPath;
+}
+export declare function isExternalResource(resource: Resource): resource is ExternalResource;
 /**
  * Represents the either inline or external resources of a component.
  *
