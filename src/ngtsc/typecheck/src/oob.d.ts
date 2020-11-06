@@ -56,6 +56,11 @@ export interface OutOfBandDiagnosticRecorder {
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
     private _diagnostics;
+    /**
+     * Tracks which `BindingPipe` nodes have already been recorded as invalid, so only one diagnostic
+     * is ever produced per node.
+     */
+    private recordedPipes;
     constructor(resolver: TemplateSourceResolver);
     get diagnostics(): ReadonlyArray<TemplateDiagnostic>;
     missingReferenceTarget(templateId: TemplateId, ref: TmplAstReference): void;
