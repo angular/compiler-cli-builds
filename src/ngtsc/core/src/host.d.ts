@@ -10,15 +10,8 @@ import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ShimAdapter, ShimReferenceTagger } from '../../shims';
 import { FactoryTracker } from '../../shims/api';
+import { RequiredDelegations } from '../../util/src/typescript';
 import { ExtendedTsCompilerHost, NgCompilerAdapter, NgCompilerOptions, UnifiedModulesHost } from '../api';
-/**
- * Represents the `ExtendedTsCompilerHost` interface, with a transformation applied that turns all
- * methods (even optional ones) into required fields (which may be `undefined`, if the method was
- * optional).
- */
-export declare type RequiredCompilerHostDelegations = {
-    [M in keyof Required<ExtendedTsCompilerHost>]: ExtendedTsCompilerHost[M];
-};
 /**
  * Delegates all methods of `ExtendedTsCompilerHost` to a delegate, with the exception of
  * `getSourceFile` and `fileExists` which are implemented in `NgCompilerHost`.
@@ -26,7 +19,7 @@ export declare type RequiredCompilerHostDelegations = {
  * If a new method is added to `ts.CompilerHost` which is not delegated, a type error will be
  * generated for this class.
  */
-export declare class DelegatingCompilerHost implements Omit<RequiredCompilerHostDelegations, 'getSourceFile' | 'fileExists'> {
+export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<ExtendedTsCompilerHost>, 'getSourceFile' | 'fileExists'> {
     protected delegate: ExtendedTsCompilerHost;
     constructor(delegate: ExtendedTsCompilerHost);
     private delegateMethod;
@@ -66,7 +59,7 @@ export declare class DelegatingCompilerHost implements Omit<RequiredCompilerHost
  * The interface implementations here ensure that `NgCompilerHost` fully delegates to
  * `ExtendedTsCompilerHost` methods whenever present.
  */
-export declare class NgCompilerHost extends DelegatingCompilerHost implements RequiredCompilerHostDelegations, ExtendedTsCompilerHost, NgCompilerAdapter {
+export declare class NgCompilerHost extends DelegatingCompilerHost implements RequiredDelegations<ExtendedTsCompilerHost>, ExtendedTsCompilerHost, NgCompilerAdapter {
     private shimAdapter;
     private shimTagger;
     readonly factoryTracker: FactoryTracker | null;

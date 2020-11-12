@@ -7,14 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/host" />
 import * as ts from 'typescript';
-/**
- * Represents the `ts.CompilerHost` interface, with a transformation applied that turns all
- * methods (even optional ones) into required fields (which may be `undefined`, if the method was
- * optional).
- */
-export declare type RequiredCompilerHostDelegations = {
-    [M in keyof Required<ts.CompilerHost>]: ts.CompilerHost[M];
-};
+import { RequiredDelegations } from '../../util/src/typescript';
 /**
  * Delegates all methods of `ts.CompilerHost` to a delegate, with the exception of
  * `getSourceFile`, `fileExists` and `writeFile` which are implemented in `TypeCheckProgramHost`.
@@ -22,7 +15,7 @@ export declare type RequiredCompilerHostDelegations = {
  * If a new method is added to `ts.CompilerHost` which is not delegated, a type error will be
  * generated for this class.
  */
-export declare class DelegatingCompilerHost implements Omit<RequiredCompilerHostDelegations, 'getSourceFile' | 'fileExists' | 'writeFile'> {
+export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<ts.CompilerHost>, 'getSourceFile' | 'fileExists' | 'writeFile'> {
     protected delegate: ts.CompilerHost;
     constructor(delegate: ts.CompilerHost);
     private delegateMethod;
