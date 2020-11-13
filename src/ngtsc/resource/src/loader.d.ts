@@ -17,6 +17,7 @@ export declare class AdapterResourceLoader implements ResourceLoader {
     private options;
     private cache;
     private fetching;
+    private lookupResolutionHost;
     canPreload: boolean;
     constructor(adapter: NgCompilerAdapter, options: ts.CompilerOptions);
     /**
