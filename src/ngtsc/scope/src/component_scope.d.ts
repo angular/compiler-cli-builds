@@ -7,13 +7,20 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { ClassDeclaration } from '../../reflection';
+import { RemoteScope } from './api';
 import { LocalModuleScope } from './local';
 /**
  * Read information about the compilation scope of components.
  */
 export interface ComponentScopeReader {
     getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null | 'error';
-    getRequiresRemoteScope(clazz: ClassDeclaration): boolean | null;
+    /**
+     * Get the `RemoteScope` required for this component, if any.
+     *
+     * If the component requires remote scoping, then retrieve the directives/pipes registered for
+     * that component. If remote scoping is not required (the common case), returns `null`.
+     */
+    getRemoteScope(clazz: ClassDeclaration): RemoteScope | null;
 }
 /**
  * A `ComponentScopeReader` that reads from an ordered set of child readers until it obtains the
@@ -26,5 +33,5 @@ export declare class CompoundComponentScopeReader implements ComponentScopeReade
     private readers;
     constructor(readers: ComponentScopeReader[]);
     getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null | 'error';
-    getRequiresRemoteScope(clazz: ClassDeclaration): boolean | null;
+    getRemoteScope(clazz: ClassDeclaration): RemoteScope | null;
 }
