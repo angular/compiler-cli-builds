@@ -11,7 +11,7 @@ import * as ts from 'typescript';
 import { AliasingHost, Reexport, Reference, ReferenceEmitter } from '../../imports';
 import { DirectiveMeta, MetadataReader, MetadataRegistry, NgModuleMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
-import { ExportScope, ScopeData } from './api';
+import { ExportScope, RemoteScope, ScopeData } from './api';
 import { ComponentScopeReader } from './component_scope';
 import { DtsModuleScopeResolver } from './dependency';
 export interface LocalNgModuleData {
@@ -86,7 +86,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      */
     private cache;
     /**
-     * Tracks whether a given component requires "remote scoping".
+     * Tracks the `RemoteScope` for components requiring "remote scoping".
      *
      * Remote scoping is when the set of directives which apply to a given component is set in the
      * NgModule's file instead of directly on the component def (which is sometimes needed to get
@@ -152,11 +152,12 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
     /**
      * Check whether a component requires remote scoping.
      */
-    getRequiresRemoteScope(node: ClassDeclaration): boolean;
+    getRemoteScope(node: ClassDeclaration): RemoteScope | null;
     /**
-     * Set a component as requiring remote scoping.
+     * Set a component as requiring remote scoping, with the given directives and pipes to be
+     * registered remotely.
      */
-    setComponentAsRequiringRemoteScoping(node: ClassDeclaration): void;
+    setComponentRemoteScope(node: ClassDeclaration, directives: Reference[], pipes: Reference[]): void;
     /**
      * Look up the `ExportScope` of a given `Reference` to an NgModule.
      *
