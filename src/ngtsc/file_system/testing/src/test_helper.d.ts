@@ -1,6 +1,5 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/file_system/testing/src/test_helper" />
 import { AbsoluteFsPath } from '../../src/types';
-import { MockFileSystem } from './mock_file_system';
 export interface TestFile {
     name: AbsoluteFsPath;
     contents: string;
@@ -14,4 +13,4 @@ export interface RunInEachFileSystemFn {
     osX(callback: (os: string) => void): void;
 }
 export declare const runInEachFileSystem: RunInEachFileSystemFn;
-export declare function initMockFileSystem(os: string, cwd?: AbsoluteFsPath): MockFileSystem;
+export declare function initMockFileSystem(os: string, cwd?: AbsoluteFsPath): void;
