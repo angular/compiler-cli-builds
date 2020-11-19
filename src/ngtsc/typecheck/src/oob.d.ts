@@ -10,7 +10,7 @@ import { BindingPipe, PropertyWrite, TmplAstReference, TmplAstVariable } from '@
 import { ClassDeclaration } from '../../reflection';
 import { TemplateId } from '../api';
 import { TemplateDiagnostic } from '../diagnostics';
-import { TemplateSourceResolver } from './diagnostics';
+import { TemplateSourceResolver } from './tcb_util';
 /**
  * Collects `ts.Diagnostic`s on problems which occur in the template which aren't directly sourced
  * from Type Check Blocks.

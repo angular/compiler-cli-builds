@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/api" />
-import { BoundTarget, DirectiveMeta, SchemaMetadata } from '@angular/compiler';
+import { AbsoluteSourceSpan, BoundTarget, DirectiveMeta, ParseSourceSpan, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference } from '../../imports';
@@ -269,6 +269,22 @@ export interface ExternalTemplateSourceMapping {
     node: ts.Expression;
     template: string;
     templateUrl: string;
+}
+/**
+ * A mapping of a TCB template id to a span in the corresponding template source.
+ */
+export interface SourceLocation {
+    id: TemplateId;
+    span: AbsoluteSourceSpan;
+}
+/**
+ * A representation of all a node's template mapping information we know. Useful for producing
+ * diagnostics based on a TCB node or generally mapping from a TCB node back to a template location.
+ */
+export interface FullTemplateMapping {
+    sourceLocation: SourceLocation;
+    templateSourceMapping: TemplateSourceMapping;
+    span: ParseSourceSpan;
 }
 /**
  * Abstracts the operation of determining which shim file will host a particular component's
