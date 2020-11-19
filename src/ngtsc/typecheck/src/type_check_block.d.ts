@@ -247,5 +247,4 @@ declare class Scope {
     private appendDeepSchemaChecks;
     private appendIcuExpressions;
 }
-export declare function requiresInlineTypeCheckBlock(node: ClassDeclaration<ts.ClassDeclaration>): boolean;
 export {};

@@ -8,9 +8,10 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/checker" />
 import { AST, ParseError, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
 import * as ts from 'typescript';
+import { FullTemplateMapping } from './api';
 import { GlobalCompletion } from './completion';
 import { DirectiveInScope, PipeInScope } from './scope';
-import { Symbol } from './symbols';
+import { ShimLocation, Symbol } from './symbols';
 /**
  * Interface to the Angular Template Type Checker to extract diagnostics and intelligence from the
  * compiler's understanding of component templates.
@@ -62,6 +63,11 @@ export interface TemplateTypeChecker {
      * checking as part of the template type-checking program it creates.
      */
     getDiagnosticsForFile(sf: ts.SourceFile, optimizeFor: OptimizeFor): ts.Diagnostic[];
+    /**
+     * Given a `shim` and position within the file, returns information for mapping back to a template
+     * location.
+     */
+    getTemplateMappingAtShimLocation(shimLocation: ShimLocation): FullTemplateMapping | null;
     /**
      * Get all `ts.Diagnostic`s currently available that pertain to the given component.
      *

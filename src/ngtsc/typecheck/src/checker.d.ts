@@ -13,7 +13,7 @@ import { ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
 import { ComponentScopeReader } from '../../scope';
-import { DirectiveInScope, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, Symbol, TemplateId, TemplateTypeChecker, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
+import { DirectiveInScope, FullTemplateMapping, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, Symbol, TemplateId, TemplateTypeChecker, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -66,6 +66,8 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
         nodes: TmplAstNode[];
         errors?: ParseError[];
     };
+    private getFileAndShimRecordsForPath;
+    getTemplateMappingAtShimLocation({ shimPath, positionInShimFile }: ShimLocation): FullTemplateMapping | null;
     /**
      * Retrieve type-checking diagnostics from the given `ts.SourceFile` using the most recent
      * type-checking program.
