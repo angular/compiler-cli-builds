@@ -96,6 +96,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: Readonly<ComponentAnalysisData>): void;
     resolve(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): ResolveResult<ComponentResolutionData>;
     compileFull(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
+    compilePartial(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): CompileResult[];
+    private compileComponent;
     private _resolveLiteral;
     private _resolveEnumValue;
     private _extractStyleUrls;
