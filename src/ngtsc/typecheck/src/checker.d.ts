@@ -66,8 +66,10 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
         nodes: TmplAstNode[];
         errors?: ParseError[];
     };
+    isTrackedTypeCheckFile(filePath: AbsoluteFsPath): boolean;
     private getFileAndShimRecordsForPath;
     getTemplateMappingAtShimLocation({ shimPath, positionInShimFile }: ShimLocation): FullTemplateMapping | null;
+    generateAllTypeCheckBlocks(): void;
     /**
      * Retrieve type-checking diagnostics from the given `ts.SourceFile` using the most recent
      * type-checking program.
