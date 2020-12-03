@@ -92,6 +92,11 @@ export interface DirectiveMeta extends T2DirectiveMeta, DirectiveTypeCheckMeta {
      * another type, it could not statically determine the base class.
      */
     baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
+    /**
+     * Whether the directive had some issue with its declaration that means it might not have complete
+     * and reliable metadata.
+     */
+    isPoisoned: boolean;
 }
 /**
  * Metadata that describes a template guard for one of the directive's inputs.

@@ -80,9 +80,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
     private moduleToRef;
     /**
      * A cache of calculated `LocalModuleScope`s for each NgModule declared in the current program.
-     *
-     * A value of `undefined` indicates the scope was invalid and produced errors (therefore,
-     * diagnostics should exist in the `scopeErrors` map).
+  
      */
     private cache;
     /**
@@ -99,13 +97,9 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      */
     private scopeErrors;
     /**
-     * Tracks which NgModules are unreliable due to errors within their declarations.
-     *
-     * This provides a unified view of which modules have errors, across all of the different
-     * diagnostic categories that can be produced. Theoretically this can be inferred from the other
-     * properties of this class, but is tracked explicitly to simplify the logic.
+     * Tracks which NgModules have directives/pipes that are declared in more than one module.
      */
-    private taintedModules;
+    private modulesWithStructuralErrors;
     constructor(localReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasingHost: AliasingHost | null);
     /**
      * Add an NgModule's data to the registry.
@@ -113,7 +107,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
     registerNgModuleMetadata(data: NgModuleMeta): void;
     registerDirectiveMetadata(directive: DirectiveMeta): void;
     registerPipeMetadata(pipe: PipeMeta): void;
-    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null | 'error';
+    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
     /**
      * If `node` is declared in more than one NgModule (duplicate declaration), then get the
      * `DeclarationData` for each offending declaration.
@@ -130,7 +124,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * `LocalModuleScope` for the given NgModule if one can be produced, `null` if no scope was ever
      * defined, or the string `'error'` if the scope contained errors.
      */
-    getScopeOfModule(clazz: ClassDeclaration): LocalModuleScope | 'error' | null;
+    getScopeOfModule(clazz: ClassDeclaration): LocalModuleScope | null;
     /**
      * Retrieves any `ts.Diagnostic`s produced during the calculation of the `LocalModuleScope` for
      * the given NgModule, or `null` if no errors were present.
@@ -142,11 +136,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
     getCompilationScopes(): CompilationScope[];
     private registerDeclarationOfModule;
     /**
-     * Implementation of `getScopeOfModule` which accepts a reference to a class and differentiates
-     * between:
-     *
-     * * no scope being available (returns `null`)
-     * * a scope being produced with errors (returns `undefined`).
+     * Implementation of `getScopeOfModule` which accepts a reference to a class.
      */
     private getScopeOfModuleReference;
     /**
@@ -164,8 +154,8 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * The NgModule in question may be declared locally in the current ts.Program, or it may be
      * declared in a .d.ts file.
      *
-     * @returns `null` if no scope could be found, or `undefined` if an invalid scope
-     * was found.
+     * @returns `null` if no scope could be found, or `'invalid'` if the `Reference` is not a valid
+     *     NgModule.
      *
      * May also contribute diagnostics of its own by adding to the given `diagnostics`
      * array parameter.

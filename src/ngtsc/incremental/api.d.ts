@@ -59,4 +59,11 @@ export interface DependencyTracker<T extends {
      * `resourcesOf` they will not automatically be added to `from`.
      */
     addTransitiveResources(from: T, resourcesOf: T): void;
+    /**
+     * Record that the given file contains unresolvable dependencies.
+     *
+     * In practice, this means that the dependency graph cannot provide insight into the effects of
+     * future changes on that file.
+     */
+    recordDependencyAnalysisFailure(file: T): void;
 }
