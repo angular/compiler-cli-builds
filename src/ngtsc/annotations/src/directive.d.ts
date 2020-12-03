@@ -22,6 +22,7 @@ export interface DirectiveHandlerData {
     providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
     inputs: ClassPropertyMapping;
     outputs: ClassPropertyMapping;
+    isPoisoned: boolean;
 }
 export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decorator | null, DirectiveHandlerData, unknown> {
     private reflector;

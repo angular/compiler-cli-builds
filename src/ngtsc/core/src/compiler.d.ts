@@ -33,6 +33,7 @@ export declare class NgCompiler {
     private typeCheckingProgramStrategy;
     private incrementalStrategy;
     private enableTemplateTypeChecker;
+    private usePoisonedData;
     private perfRecorder;
     /**
      * Lazily evaluated state of the compilation.
@@ -61,7 +62,7 @@ export declare class NgCompiler {
     readonly incrementalDriver: IncrementalDriver;
     readonly ignoreForDiagnostics: Set<ts.SourceFile>;
     readonly ignoreForEmit: Set<ts.SourceFile>;
-    constructor(adapter: NgCompilerAdapter, options: NgCompilerOptions, tsProgram: ts.Program, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, incrementalStrategy: IncrementalBuildStrategy, enableTemplateTypeChecker: boolean, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
+    constructor(adapter: NgCompilerAdapter, options: NgCompilerOptions, tsProgram: ts.Program, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, incrementalStrategy: IncrementalBuildStrategy, enableTemplateTypeChecker: boolean, usePoisonedData: boolean, oldProgram?: ts.Program | null, perfRecorder?: PerfRecorder);
     /**
      * Get the resource dependencies of a file.
      *

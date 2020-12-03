@@ -29,6 +29,11 @@ export interface TypeCheckScope {
      * The schemas that are used in this scope.
      */
     schemas: SchemaMetadata[];
+    /**
+     * Whether the original compilation scope which produced this `TypeCheckScope` was itself poisoned
+     * (contained semantic errors during its production).
+     */
+    isPoisoned: boolean;
 }
 /**
  * Computes scope information to be used in template type checking.
@@ -51,6 +56,6 @@ export declare class TypeCheckScopes {
      * contains an error, then 'error' is returned. If the component is not declared in any NgModule,
      * an empty type-check scope is returned.
      */
-    getTypeCheckScope(node: ClassDeclaration): TypeCheckScope | 'error';
+    getTypeCheckScope(node: ClassDeclaration): TypeCheckScope;
     private getInheritedDirectiveMetadata;
 }
