@@ -27,6 +27,10 @@ export declare enum SymbolKind {
  * A representation of an entity in the `TemplateAst`.
  */
 export declare type Symbol = InputBindingSymbol | OutputBindingSymbol | ElementSymbol | ReferenceSymbol | VariableSymbol | ExpressionSymbol | DirectiveSymbol | TemplateSymbol | DomBindingSymbol;
+/**
+ * A `Symbol` which declares a new named entity in the template scope.
+ */
+export declare type TemplateDeclarationSymbol = ReferenceSymbol | VariableSymbol;
 /** Information about where a `ts.Node` can be found in the type check block shim file. */
 export interface ShimLocation {
     /**

@@ -64,7 +64,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private getLatestComponentState;
     overrideComponentTemplate(component: ts.ClassDeclaration, template: string): {
         nodes: TmplAstNode[];
-        errors?: ParseError[];
+        errors: ParseError[] | null;
     };
     isTrackedTypeCheckFile(filePath: AbsoluteFsPath): boolean;
     private getFileAndShimRecordsForPath;

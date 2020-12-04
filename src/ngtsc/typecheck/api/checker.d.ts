@@ -47,7 +47,7 @@ export interface TemplateTypeChecker {
      */
     overrideComponentTemplate(component: ts.ClassDeclaration, template: string): {
         nodes: TmplAstNode[];
-        errors?: ParseError[];
+        errors: ParseError[] | null;
     };
     /**
      * Get all `ts.Diagnostic`s currently available for the given `ts.SourceFile`.
