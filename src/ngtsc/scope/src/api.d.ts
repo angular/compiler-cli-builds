@@ -25,6 +25,11 @@ export interface ScopeData {
      * NgModules which contributed to the scope of the module.
      */
     ngModules: ClassDeclaration[];
+    /**
+     * Whether some module or component in this scope contains errors and is thus semantically
+     * unreliable.
+     */
+    isPoisoned: boolean;
 }
 /**
  * An export scope of an NgModule, containing the directives/pipes it contributes to other NgModules

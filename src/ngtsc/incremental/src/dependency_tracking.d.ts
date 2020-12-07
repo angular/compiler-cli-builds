@@ -29,6 +29,7 @@ export declare class FileDependencyGraph<T extends {
     addResourceDependency(from: T, resource: AbsoluteFsPath): void;
     addTransitiveDependency(from: T, on: T): void;
     addTransitiveResources(from: T, resourcesOf: T): void;
+    recordDependencyAnalysisFailure(file: T): void;
     getResourceDependencies(from: T): AbsoluteFsPath[];
     isStale(sf: T, changedTsPaths: Set<string>, changedResources: Set<AbsoluteFsPath>): boolean;
     /**

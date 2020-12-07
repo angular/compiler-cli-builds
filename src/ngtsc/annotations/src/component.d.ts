@@ -48,6 +48,7 @@ export interface ComponentAnalysisData {
      * require an Angular factory definition at runtime.
      */
     viewProvidersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
+    isPoisoned: boolean;
 }
 export declare type ComponentResolutionData = Pick<R3ComponentMetadata, ComponentMetadataResolvedFields>;
 /**
@@ -67,6 +68,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private defaultPreserveWhitespaces;
     private i18nUseExternalIds;
     private enableI18nLegacyMessageIdFormat;
+    private usePoisonedData;
     private i18nNormalizeLineEndingsInICUs;
     private moduleResolver;
     private cycleAnalyzer;
@@ -75,7 +77,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private depTracker;
     private injectableRegistry;
     private annotateForClosureCompiler;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, templateMapping: TemplateMapping, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, annotateForClosureCompiler: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, templateMapping: TemplateMapping, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, annotateForClosureCompiler: boolean);
     private literalCache;
     private elementSchemaRegistry;
     private typeCheckScopes;
