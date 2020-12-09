@@ -12,14 +12,14 @@ import { ImportGenerator } from './api/import_generator';
 import { Context } from './context';
 export declare type RecordWrappedNodeExprFn<TExpression> = (expr: TExpression) => void;
 export interface TranslatorOptions<TExpression> {
-    downlevelTaggedTemplates?: boolean;
+    downlevelLocalizedStrings?: boolean;
     downlevelVariableDeclarations?: boolean;
     recordWrappedNodeExpr?: RecordWrappedNodeExprFn<TExpression>;
 }
 export declare class ExpressionTranslatorVisitor<TStatement, TExpression> implements o.ExpressionVisitor, o.StatementVisitor {
     private factory;
     private imports;
-    private downlevelTaggedTemplates;
+    private downlevelLocalizedStrings;
     private downlevelVariableDeclarations;
     private recordWrappedNodeExpr;
     constructor(factory: AstFactory<TStatement, TExpression>, imports: ImportGenerator<TExpression>, options: TranslatorOptions<TExpression>);
@@ -37,11 +37,9 @@ export declare class ExpressionTranslatorVisitor<TStatement, TExpression> implem
     visitWritePropExpr(expr: o.WritePropExpr, context: Context): TExpression;
     visitInvokeMethodExpr(ast: o.InvokeMethodExpr, context: Context): TExpression;
     visitInvokeFunctionExpr(ast: o.InvokeFunctionExpr, context: Context): TExpression;
-    visitTaggedTemplateExpr(ast: o.TaggedTemplateExpr, context: Context): TExpression;
     visitInstantiateExpr(ast: o.InstantiateExpr, context: Context): TExpression;
     visitLiteralExpr(ast: o.LiteralExpr, _context: Context): TExpression;
     visitLocalizedString(ast: o.LocalizedString, context: Context): TExpression;
-    private createTaggedTemplateExpression;
     /**
      * Translate the tagged template literal into a call that is compatible with ES5, using the
      * imported `__makeTemplateObject` helper for ES5 formatted output.
