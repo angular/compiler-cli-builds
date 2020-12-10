@@ -86,16 +86,6 @@ export declare class TcbDirectiveOutputsOp extends TcbOp {
     constructor(tcb: Context, scope: Scope, node: TmplAstTemplate | TmplAstElement, dir: TypeCheckableDirectiveMeta);
     get optional(): boolean;
     execute(): null;
-    /**
-     * Outputs are a `ts.CallExpression` that look like one of the two:
-     *  - `_outputHelper(_t1["outputField"]).subscribe(handler);`
-     *  - `_t1.addEventListener(handler);`
-     * This method reverses the operations to create a call expression for a directive output.
-     * It unpacks the given call expression and returns the original element access (i.e.
-     * `_t1["outputField"]` in the example above). Returns `null` if the given call expression is not
-     * the expected structure of an output binding
-     */
-    static decodeOutputCallExpression(node: ts.CallExpression): ts.ElementAccessExpression | null;
 }
 /**
  * Overall generation context for the type check block.
