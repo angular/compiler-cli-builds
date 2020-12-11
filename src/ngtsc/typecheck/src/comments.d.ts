@@ -33,7 +33,7 @@ export declare function addExpressionIdentifier(node: ts.Node, identifier: Expre
  */
 export declare function markIgnoreDiagnostics(node: ts.Node): void;
 /** Returns true if the node has a marker that indicates diagnostics errors should be ignored.  */
-export declare function hasIgnoreMarker(node: ts.Node, sourceFile: ts.SourceFile): boolean;
+export declare function hasIgnoreForDiagnosticsMarker(node: ts.Node, sourceFile: ts.SourceFile): boolean;
 export interface FindOptions<T extends ts.Node> {
     filter: (node: ts.Node) => node is T;
     withExpressionIdentifier?: ExpressionIdentifier;

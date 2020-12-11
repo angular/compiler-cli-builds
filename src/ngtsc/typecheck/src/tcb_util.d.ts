@@ -30,11 +30,12 @@ export interface TemplateSourceResolver {
 }
 export declare function requiresInlineTypeCheckBlock(node: ClassDeclaration<ts.ClassDeclaration>): boolean;
 /** Maps a shim position back to a template location. */
-export declare function getTemplateMapping(shimSf: ts.SourceFile, position: number, resolver: TemplateSourceResolver): FullTemplateMapping | null;
-export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId): ts.Node | null;
+export declare function getTemplateMapping(shimSf: ts.SourceFile, position: number, resolver: TemplateSourceResolver, isDiagnosticRequest: boolean): FullTemplateMapping | null;
+export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId, isDiagnosticRequest: boolean): ts.Node | null;
 /**
  * Traverses up the AST starting from the given node to extract the source location from comments
  * that have been emitted into the TCB. If the node does not exist within a TCB, or if an ignore
- * marker comment is found up the tree, this function returns null.
+ * marker comment is found up the tree (and this is part of a diagnostic request), this function
+ * returns null.
  */
-export declare function findSourceLocation(node: ts.Node, sourceFile: ts.SourceFile): SourceLocation | null;
+export declare function findSourceLocation(node: ts.Node, sourceFile: ts.SourceFile, isDiagnosticsRequest: boolean): SourceLocation | null;
