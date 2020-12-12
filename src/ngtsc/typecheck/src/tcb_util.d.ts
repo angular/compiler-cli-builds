@@ -9,6 +9,7 @@
 import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
 import { ClassDeclaration } from '@angular/compiler-cli/src/ngtsc/reflection';
 import * as ts from 'typescript';
+import { Reference } from '../../imports';
 import { FullTemplateMapping, SourceLocation, TemplateId, TemplateSourceMapping } from '../api';
 /**
  * Adapter interface which allows the template type-checking diagnostics code to interpret offsets
@@ -28,7 +29,7 @@ export interface TemplateSourceResolver {
      */
     toParseSourceSpan(id: TemplateId, span: AbsoluteSourceSpan): ParseSourceSpan | null;
 }
-export declare function requiresInlineTypeCheckBlock(node: ClassDeclaration<ts.ClassDeclaration>): boolean;
+export declare function requiresInlineTypeCheckBlock(node: ClassDeclaration<ts.ClassDeclaration>, usedPipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>): boolean;
 /** Maps a shim position back to a template location. */
 export declare function getTemplateMapping(shimSf: ts.SourceFile, position: number, resolver: TemplateSourceResolver, isDiagnosticRequest: boolean): FullTemplateMapping | null;
 export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId, isDiagnosticRequest: boolean): ts.Node | null;
