@@ -6,14 +6,14 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/checker" />
-import { AST, MethodCall, ParseError, PropertyRead, SafeMethodCall, SafePropertyRead, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
+import { MethodCall, ParseError, PropertyRead, SafeMethodCall, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
-import { ComponentScopeReader } from '../../scope';
-import { DirectiveInScope, FullTemplateMapping, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, Symbol, TemplateId, TemplateTypeChecker, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
+import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
+import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, TemplateId, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -31,6 +31,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private compilerHost;
     private priorBuild;
     private readonly componentScopeReader;
+    private readonly typeCheckScopeRegistry;
     private state;
     /**
      * Stores the `CompletionEngine` which powers autocompletion for each component class.
@@ -51,14 +52,24 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     /**
      * Stores directives and pipes that are in scope for each component.
      *
-     * Unlike the other caches, the scope of a component is not affected by its template, so this
+     * Unlike other caches, the scope of a component is not affected by its template, so this
      * cache does not need to be invalidate if the template is overridden. It will be destroyed when
      * the `ts.Program` changes and the `TemplateTypeCheckerImpl` as a whole is destroyed and
      * replaced.
      */
     private scopeCache;
+    /**
+     * Stores potential element tags for each component (a union of DOM tags as well as directive
+     * tags).
+     *
+     * Unlike other caches, the scope of a component is not affected by its template, so this
+     * cache does not need to be invalidate if the template is overridden. It will be destroyed when
+     * the `ts.Program` changes and the `TemplateTypeCheckerImpl` as a whole is destroyed and
+     * replaced.
+     */
+    private elementTagCache;
     private isComplete;
-    constructor(originalProgram: ts.Program, typeCheckingStrategy: TypeCheckingProgramStrategy, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, componentScopeReader: ComponentScopeReader);
+    constructor(originalProgram: ts.Program, typeCheckingStrategy: TypeCheckingProgramStrategy, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry);
     resetOverrides(): void;
     getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
     private getLatestComponentState;
@@ -94,10 +105,17 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     clearAllShimDataUsingInlines(): void;
     private updateFromContext;
     getFileData(path: AbsoluteFsPath): FileTypeCheckingData;
-    getSymbolOfNode(node: AST | TmplAstNode, component: ts.ClassDeclaration): Symbol | null;
+    getSymbolOfNode(node: TmplAstTemplate, component: ts.ClassDeclaration): TemplateSymbol | null;
+    getSymbolOfNode(node: TmplAstElement, component: ts.ClassDeclaration): ElementSymbol | null;
     private getOrCreateSymbolBuilder;
     getDirectivesInScope(component: ts.ClassDeclaration): DirectiveInScope[] | null;
     getPipesInScope(component: ts.ClassDeclaration): PipeInScope[] | null;
+    getDirectiveMetadata(dir: ts.ClassDeclaration): TypeCheckableDirectiveMeta | null;
+    getPotentialElementTags(component: ts.ClassDeclaration): Map<string, DirectiveInScope | null>;
+    getPotentialDomBindings(tagName: string): {
+        attribute: string;
+        property: string;
+    }[];
     private getScopeData;
 }
 /**

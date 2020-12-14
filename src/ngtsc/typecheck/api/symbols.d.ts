@@ -9,7 +9,6 @@
 import { TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
-import { ClassDeclaration } from '../../reflection';
 import { DirectiveInScope } from './scope';
 export declare enum SymbolKind {
     Input = 0,
@@ -213,8 +212,6 @@ export interface DirectiveSymbol extends DirectiveInScope {
     tsType: ts.Type;
     /** The location in the shim file for the variable that holds the type of the directive. */
     shimLocation: ShimLocation;
-    /** The `NgModule` that this directive is declared in or `null` if it could not be determined. */
-    ngModule: ClassDeclaration | null;
 }
 /**
  * A representation of an attribute on an element or template. These bindings aren't currently
