@@ -7,7 +7,7 @@ import { FileSystem } from '../../../src/ngtsc/file_system';
 import { ModuleResolver, PrivateExportAliasingHost, ReferenceEmitter } from '../../../src/ngtsc/imports';
 import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, InjectableClassRegistry, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
-import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver } from '../../../src/ngtsc/scope';
+import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver, TypeCheckScopeRegistry } from '../../../src/ngtsc/scope';
 import { DecoratorHandler } from '../../../src/ngtsc/transform';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { Migration } from '../migrations/migration';
@@ -57,6 +57,7 @@ export declare class DecorationAnalyzer {
     importGraph: ImportGraph;
     cycleAnalyzer: CycleAnalyzer;
     injectableRegistry: InjectableClassRegistry;
+    typeCheckScopeRegistry: TypeCheckScopeRegistry;
     handlers: DecoratorHandler<unknown, unknown, unknown>[];
     compiler: NgccTraitCompiler;
     migrations: Migration[];

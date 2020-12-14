@@ -14,7 +14,7 @@ import { IndexingContext } from '../../indexer';
 import { ClassPropertyMapping, ComponentResources, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry, ResourceRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
-import { ComponentScopeReader, LocalModuleScopeRegistry } from '../../scope';
+import { ComponentScopeReader, LocalModuleScopeRegistry, TypeCheckScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence, ResolveResult } from '../../transform';
 import { TemplateSourceMapping, TypeCheckContext } from '../../typecheck/api';
 import { SubsetOfKeys } from '../../util/src/typescript';
@@ -62,6 +62,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private metaReader;
     private scopeReader;
     private scopeRegistry;
+    private typeCheckScopeRegistry;
     private resourceRegistry;
     private isCore;
     private resourceLoader;
@@ -78,10 +79,9 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private depTracker;
     private injectableRegistry;
     private annotateForClosureCompiler;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, annotateForClosureCompiler: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, annotateForClosureCompiler: boolean);
     private literalCache;
     private elementSchemaRegistry;
-    private typeCheckScopes;
     /**
      * During the asynchronous preanalyze phase, it's necessary to parse the template to extract
      * any potential <link> tags which might need to be loaded. This cache ensures that work is not

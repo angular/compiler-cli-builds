@@ -23,6 +23,7 @@ export interface DirectiveHandlerData {
     inputs: ClassPropertyMapping;
     outputs: ClassPropertyMapping;
     isPoisoned: boolean;
+    isStructural: boolean;
 }
 export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decorator | null, DirectiveHandlerData, unknown> {
     private reflector;
@@ -64,6 +65,7 @@ export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decora
     metadata: R3DirectiveMetadata;
     inputs: ClassPropertyMapping;
     outputs: ClassPropertyMapping;
+    isStructural: boolean;
 } | undefined;
 export declare function extractQueryMetadata(exprNode: ts.Node, name: string, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, evaluator: PartialEvaluator): R3QueryMetadata;
 export declare function extractQueriesFromDecorator(queryData: ts.Expression, reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean): {
