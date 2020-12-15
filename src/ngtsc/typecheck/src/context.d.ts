@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/context" />
-import { BoundTarget, ParseSourceFile, R3TargetBinder, SchemaMetadata, TmplAstNode } from '@angular/compiler';
+import { BoundTarget, ParseError, ParseSourceFile, R3TargetBinder, SchemaMetadata, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
@@ -38,6 +38,10 @@ export interface ShimTypeCheckingData {
      */
     templates: Map<TemplateId, TemplateData>;
 }
+export interface TemplateOverride {
+    nodes: TmplAstNode[];
+    errors: ParseError[] | null;
+}
 /**
  * Data tracked for each template processed by the template type-checking system.
  */
@@ -51,6 +55,10 @@ export interface TemplateData {
      * template nodes.
      */
     boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
+    /**
+     * Errors found while parsing them template, which have been converted to diagnostics.
+     */
+    templateDiagnostics: TemplateDiagnostic[];
 }
 /**
  * Data for an input file which is still in the process of template type-checking code generation.
@@ -112,7 +120,7 @@ export interface TypeCheckingHost {
      * Check if the given component has had its template overridden, and retrieve the new template
      * nodes if so.
      */
-    getTemplateOverride(sfPath: AbsoluteFsPath, node: ts.ClassDeclaration): TmplAstNode[] | null;
+    getTemplateOverride(sfPath: AbsoluteFsPath, node: ts.ClassDeclaration): TemplateOverride | null;
     /**
      * Report data from a shim generated from the given input file path.
      */
@@ -163,14 +171,11 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
      */
     private typeCtorPending;
     /**
-     * Record a template for the given component `node`, with a `SelectorMatcher` for directive
-     * matching.
+     * Register a template to potentially be type-checked.
      *
-     * @param node class of the node being recorded.
-     * @param template AST nodes of the template being recorded.
-     * @param matcher `SelectorMatcher` which tracks directives that are in scope for this template.
+     * Implements `TypeCheckContext.addTemplate`.
      */
-    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, template: TmplAstNode[], pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[], sourceMapping: TemplateSourceMapping, file: ParseSourceFile): void;
+    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, template: TmplAstNode[], pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[], sourceMapping: TemplateSourceMapping, file: ParseSourceFile, parseErrors: ParseError[] | null): void;
     /**
      * Record a type constructor for the given `node` with the given `ctorMetadata`.
      */
@@ -186,4 +191,5 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
     private addInlineTypeCheckBlock;
     private pendingShimForComponent;
     private dataForFile;
+    private getTemplateDiagnostics;
 }
