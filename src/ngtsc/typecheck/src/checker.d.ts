@@ -14,7 +14,7 @@ import { IncrementalBuild } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
 import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, TemplateId, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
-import { ShimTypeCheckingData } from './context';
+import { ShimTypeCheckingData, TemplateOverride } from './context';
 import { TemplateSourceManager } from './source';
 /**
  * Primary template type-checking engine, which performs type-checking using a
@@ -82,8 +82,8 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getTemplateMappingAtShimLocation({ shimPath, positionInShimFile }: ShimLocation): FullTemplateMapping | null;
     generateAllTypeCheckBlocks(): void;
     /**
-     * Retrieve type-checking diagnostics from the given `ts.SourceFile` using the most recent
-     * type-checking program.
+     * Retrieve type-checking and template parse diagnostics from the given `ts.SourceFile` using the
+     * most recent type-checking program.
      */
     getDiagnosticsForFile(sf: ts.SourceFile, optimizeFor: OptimizeFor): ts.Diagnostic[];
     getDiagnosticsForComponent(component: ts.ClassDeclaration): ts.Diagnostic[];
@@ -136,7 +136,7 @@ export interface FileTypeCheckingData {
     /**
      * Map of template overrides applied to any components in this input file.
      */
-    templateOverrides: Map<TemplateId, TmplAstNode[]> | null;
+    templateOverrides: Map<TemplateId, TemplateOverride> | null;
     /**
      * Data for each shim generated from this input file.
      *
