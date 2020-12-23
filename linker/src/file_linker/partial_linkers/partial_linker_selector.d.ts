@@ -1,6 +1,9 @@
 /// <amd-module name="@angular/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector" />
 import { LinkerOptions } from '../linker_options';
 import { PartialLinker } from './partial_linker';
+export declare const ɵɵngDeclareDirective = "\u0275\u0275ngDeclareDirective";
+export declare const ɵɵngDeclareComponent = "\u0275\u0275ngDeclareComponent";
+export declare const declarationFunctions: string[];
 export declare class PartialLinkerSelector<TExpression> {
     private options;
     /**
@@ -13,7 +16,7 @@ export declare class PartialLinkerSelector<TExpression> {
      * Also, ranges are matched to include "pre-releases", therefore if the range is `>=11.1.0-next.1`
      * then this includes `11.1.0-next.2` and also `12.0.0-next.1`.
      *
-     * Finally, note that we always start with the current version (i.e. `11.1.0-next.3+27.sha-e4fbab9`). This
+     * Finally, note that we always start with the current version (i.e. `11.1.0-next.3+29.sha-53b64fb`). This
      * allows the linker to work on local builds effectively.
      */
     private linkers;
