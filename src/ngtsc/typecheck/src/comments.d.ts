@@ -23,7 +23,8 @@ export declare enum CommentTriviaType {
 /** Identifies what the TCB expression is for (for example, a directive declaration). */
 export declare enum ExpressionIdentifier {
     DIRECTIVE = "DIR",
-    COMPONENT_COMPLETION = "COMPCOMP"
+    COMPONENT_COMPLETION = "COMPCOMP",
+    EVENT_PARAMETER = "EP"
 }
 /** Tags the node with the given expression identifier. */
 export declare function addExpressionIdentifier(node: ts.Node, identifier: ExpressionIdentifier): void;
