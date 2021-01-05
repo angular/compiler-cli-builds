@@ -38,16 +38,16 @@
              * Also, ranges are matched to include "pre-releases", therefore if the range is `>=11.1.0-next.1`
              * then this includes `11.1.0-next.2` and also `12.0.0-next.1`.
              *
-             * Finally, note that we always start with the current version (i.e. `11.1.0-next.3+44.sha-b473bc2`). This
+             * Finally, note that we always start with the current version (i.e. `11.1.0-next.3+50.sha-e43f7e2`). This
              * allows the linker to work on local builds effectively.
              */
             this.linkers = (_a = {},
                 _a[exports.ɵɵngDeclareDirective] = [
-                    { range: '11.1.0-next.3+44.sha-b473bc2', linker: new partial_directive_linker_1_1.PartialDirectiveLinkerVersion1() },
+                    { range: '11.1.0-next.3+50.sha-e43f7e2', linker: new partial_directive_linker_1_1.PartialDirectiveLinkerVersion1() },
                     { range: '>=11.1.0-next.1', linker: new partial_directive_linker_1_1.PartialDirectiveLinkerVersion1() },
                 ],
                 _a[exports.ɵɵngDeclareComponent] = [
-                    { range: '11.1.0-next.3+44.sha-b473bc2', linker: new partial_component_linker_1_1.PartialComponentLinkerVersion1(this.options) },
+                    { range: '11.1.0-next.3+50.sha-e43f7e2', linker: new partial_component_linker_1_1.PartialComponentLinkerVersion1(this.options) },
                     { range: '>=11.1.0-next.1', linker: new partial_component_linker_1_1.PartialComponentLinkerVersion1(this.options) },
                 ],
                 _a);
