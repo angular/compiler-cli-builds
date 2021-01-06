@@ -16,7 +16,7 @@ export declare class PartialLinkerSelector<TExpression> {
      * Also, ranges are matched to include "pre-releases", therefore if the range is `>=11.1.0-next.1`
      * then this includes `11.1.0-next.2` and also `12.0.0-next.1`.
      *
-     * Finally, note that we always start with the current version (i.e. `11.1.0-next.4+3.sha-989b4a9`). This
+     * Finally, note that we always start with the current version (i.e. `11.1.0-next.4+7.sha-1e151f9`). This
      * allows the linker to work on local builds effectively.
      */
     private linkers;
