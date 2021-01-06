@@ -25,7 +25,7 @@ export declare function isDeclaration(node: ts.Node): node is ts.Declaration;
 export declare function isValueDeclaration(node: ts.Node): node is ts.ClassDeclaration | ts.FunctionDeclaration | ts.VariableDeclaration;
 export declare function isTypeDeclaration(node: ts.Node): node is ts.EnumDeclaration | ts.TypeAliasDeclaration | ts.InterfaceDeclaration;
 export declare function isExported(node: DeclarationNode): boolean;
-export declare function getRootDirs(host: ts.CompilerHost, options: ts.CompilerOptions): AbsoluteFsPath[];
+export declare function getRootDirs(host: Pick<ts.CompilerHost, 'getCurrentDirectory' | 'getCanonicalFileName'>, options: ts.CompilerOptions): AbsoluteFsPath[];
 export declare function nodeDebugInfo(node: ts.Node): string;
 /**
  * Resolve the specified `moduleName` using the given `compilerOptions` and `compilerHost`.
