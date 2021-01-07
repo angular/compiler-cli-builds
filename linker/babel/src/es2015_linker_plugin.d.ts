@@ -7,11 +7,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { PluginObj } from '@babel/core';
-import { LinkerOptions } from '../../../linker';
+import { LinkerPluginOptions } from './linker_plugin_options';
 /**
  * Create a Babel plugin that visits the program, identifying and linking partial declarations.
  *
  * The plugin delegates most of its work to a generic `FileLinker` for each file (`t.Program` in
  * Babel) that is visited.
  */
-export declare function createEs2015LinkerPlugin(options?: Partial<LinkerOptions>): PluginObj;
+export declare function createEs2015LinkerPlugin({ fileSystem, logger, ...options }: LinkerPluginOptions): PluginObj;

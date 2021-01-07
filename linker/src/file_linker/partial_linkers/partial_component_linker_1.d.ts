@@ -6,20 +6,34 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ConstantPool, R3ComponentMetadata, R3DeclareComponentMetadata, R3PartialDeclaration } from '@angular/compiler';
+import { ConstantPool, R3PartialDeclaration } from '@angular/compiler';
 import * as o from '@angular/compiler/src/output/output_ast';
+import { AbsoluteFsPath } from '../../../../src/ngtsc/file_system';
 import { AstObject } from '../../ast/ast_value';
-import { LinkerOptions } from '../linker_options';
+import { GetSourceFileFn } from '../get_source_file';
+import { LinkerEnvironment } from '../linker_environment';
 import { PartialLinker } from './partial_linker';
 /**
  * A `PartialLinker` that is designed to process `ɵɵngDeclareComponent()` call expressions.
  */
-export declare class PartialComponentLinkerVersion1<TExpression> implements PartialLinker<TExpression> {
-    private readonly options;
-    constructor(options: LinkerOptions);
-    linkPartialDeclaration(sourceUrl: string, code: string, constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>): o.Expression;
+export declare class PartialComponentLinkerVersion1<TStatement, TExpression> implements PartialLinker<TExpression> {
+    private readonly environment;
+    private readonly getSourceFile;
+    private sourceUrl;
+    private code;
+    private readonly i18nNormalizeLineEndingsInICUs;
+    private readonly enableI18nLegacyMessageIdFormat;
+    private readonly i18nUseExternalIds;
+    constructor(environment: LinkerEnvironment<TStatement, TExpression>, getSourceFile: GetSourceFileFn, sourceUrl: AbsoluteFsPath, code: string);
+    linkPartialDeclaration(constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>): o.Expression;
+    /**
+     * This function derives the `R3ComponentMetadata` from the provided AST object.
+     */
+    private toR3ComponentMeta;
+    /**
+     * Update the range to remove the start and end chars, which should be quotes around the template.
+     */
+    private getTemplateInfo;
+    private tryExternalTemplate;
+    private templateFromPartialCode;
 }
-/**
- * This function derives the `R3ComponentMetadata` from the provided AST object.
- */
-export declare function toR3ComponentMeta<TExpression>(metaObj: AstObject<R3DeclareComponentMetadata, TExpression>, code: string, sourceUrl: string, options: LinkerOptions): R3ComponentMetadata;

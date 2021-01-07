@@ -8,7 +8,7 @@
  */
 import { ConstantPool } from '@angular/compiler';
 import * as o from '@angular/compiler/src/output/output_ast';
-import { LinkerEnvironment } from '../linker_environment';
+import { Translator } from '../translator';
 /**
  * This class represents (from the point of view of the `FileLinker`) the scope in which
  * statements and expressions related to a linked partial declaration will be emitted.
@@ -20,9 +20,9 @@ import { LinkerEnvironment } from '../linker_environment';
  */
 export declare class EmitScope<TStatement, TExpression> {
     protected readonly ngImport: TExpression;
-    protected readonly linkerEnvironment: LinkerEnvironment<TStatement, TExpression>;
+    protected readonly translator: Translator<TStatement, TExpression>;
     readonly constantPool: ConstantPool;
-    constructor(ngImport: TExpression, linkerEnvironment: LinkerEnvironment<TStatement, TExpression>);
+    constructor(ngImport: TExpression, translator: Translator<TStatement, TExpression>);
     /**
      * Translate the given Output AST definition expression into a generic `TExpression`.
      *
