@@ -26,6 +26,11 @@ export interface LinkerOptions {
      * The default is `false`.
      */
     i18nUseExternalIds: boolean;
+    /**
+     * Whether to use source-mapping to compute the original source for external templates.
+     * The default is `true`.
+     */
+    sourceMapping: boolean;
 }
 /**
  * The default linker options to use if properties are not provided.

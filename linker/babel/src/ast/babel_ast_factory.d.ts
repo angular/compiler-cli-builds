@@ -12,6 +12,11 @@ import { AstFactory, BinaryOperator, LeadingComment, ObjectLiteralProperty, Sour
  * A Babel flavored implementation of the AstFactory.
  */
 export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expression> {
+    /** The absolute path to the source file being compiled. */
+    private sourceUrl;
+    constructor(
+    /** The absolute path to the source file being compiled. */
+    sourceUrl: string);
     attachComments(statement: t.Statement, leadingComments: LeadingComment[]): void;
     createArrayLiteral: typeof t.arrayExpression;
     createAssignment(target: t.Expression, value: t.Expression): t.Expression;

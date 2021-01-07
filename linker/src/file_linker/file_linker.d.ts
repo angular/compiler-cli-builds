@@ -1,4 +1,5 @@
 /// <amd-module name="@angular/compiler-cli/linker/src/file_linker/file_linker" />
+import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { DeclarationScope } from './declaration_scope';
 import { LinkerEnvironment } from './linker_environment';
 export declare const NO_STATEMENTS: Readonly<any[]>;
@@ -7,11 +8,9 @@ export declare const NO_STATEMENTS: Readonly<any[]>;
  */
 export declare class FileLinker<TConstantScope, TStatement, TExpression> {
     private linkerEnvironment;
-    private sourceUrl;
-    readonly code: string;
     private linkerSelector;
     private emitScopes;
-    constructor(linkerEnvironment: LinkerEnvironment<TStatement, TExpression>, sourceUrl: string, code: string);
+    constructor(linkerEnvironment: LinkerEnvironment<TStatement, TExpression>, sourceUrl: AbsoluteFsPath, code: string);
     /**
      * Return true if the given callee name matches a partial declaration that can be linked.
      */

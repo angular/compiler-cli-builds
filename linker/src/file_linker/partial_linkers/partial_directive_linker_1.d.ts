@@ -8,6 +8,7 @@
  */
 import { ConstantPool, ParseSourceSpan, R3DeclareDirectiveMetadata, R3DirectiveMetadata, R3PartialDeclaration } from '@angular/compiler';
 import * as o from '@angular/compiler/src/output/output_ast';
+import { AbsoluteFsPath } from '../../../../src/ngtsc/file_system';
 import { Range } from '../../ast/ast_host';
 import { AstObject } from '../../ast/ast_value';
 import { PartialLinker } from './partial_linker';
@@ -15,10 +16,13 @@ import { PartialLinker } from './partial_linker';
  * A `PartialLinker` that is designed to process `ɵɵngDeclareDirective()` call expressions.
  */
 export declare class PartialDirectiveLinkerVersion1<TExpression> implements PartialLinker<TExpression> {
-    linkPartialDeclaration(sourceUrl: string, code: string, constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>): o.Expression;
+    private sourceUrl;
+    private code;
+    constructor(sourceUrl: AbsoluteFsPath, code: string);
+    linkPartialDeclaration(constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>): o.Expression;
 }
 /**
  * Derives the `R3DirectiveMetadata` structure from the AST object.
  */
-export declare function toR3DirectiveMeta<TExpression>(metaObj: AstObject<R3DeclareDirectiveMetadata, TExpression>, code: string, sourceUrl: string): R3DirectiveMetadata;
+export declare function toR3DirectiveMeta<TExpression>(metaObj: AstObject<R3DeclareDirectiveMetadata, TExpression>, code: string, sourceUrl: AbsoluteFsPath): R3DirectiveMetadata;
 export declare function createSourceSpan(range: Range, code: string, sourceUrl: string): ParseSourceSpan;
