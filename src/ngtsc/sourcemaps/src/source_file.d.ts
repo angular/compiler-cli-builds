@@ -1,5 +1,5 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file" />
-import { AbsoluteFsPath, FileSystem } from '../../file_system';
+import { AbsoluteFsPath, PathManipulation } from '../../file_system';
 import { RawSourceMap } from './raw_source_map';
 import { SegmentMarker } from './segment_marker';
 export declare function removeSourceMapComments(contents: string): string;
@@ -34,7 +34,7 @@ export declare class SourceFile {
     /** Whether this source file's source map was inline or external. */
     inline: boolean, 
     /** Any source files referenced by the raw source map associated with this source file. */
-    sources: (SourceFile | null)[], fs: FileSystem);
+    sources: (SourceFile | null)[], fs: PathManipulation);
     /**
      * Render the raw source map generated from the flattened mappings.
      */
