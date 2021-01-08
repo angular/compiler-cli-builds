@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/perform_compile" />
 import { Position } from '@angular/compiler';
 import * as ts from 'typescript';
-import { AbsoluteFsPath, FileSystem } from '../src/ngtsc/file_system';
+import { AbsoluteFsPath, ReadonlyFileSystem } from '../src/ngtsc/file_system';
 import * as api from './transformers/api';
 export declare type Diagnostics = ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
 export declare function filterErrorsAndWarnings(diagnostics: Diagnostics): Diagnostics;
@@ -17,7 +17,7 @@ export declare function flattenDiagnosticMessageChain(chain: api.DiagnosticMessa
 export declare function formatDiagnostic(diagnostic: api.Diagnostic, host?: ts.FormatDiagnosticsHost): string;
 export declare function formatDiagnostics(diags: Diagnostics, host?: ts.FormatDiagnosticsHost): string;
 /** Used to read configuration files. */
-export declare type ConfigurationHost = Pick<FileSystem, 'readFile' | 'exists' | 'lstat' | 'resolve' | 'join' | 'dirname' | 'extname' | 'pwd'>;
+export declare type ConfigurationHost = Pick<ReadonlyFileSystem, 'readFile' | 'exists' | 'lstat' | 'resolve' | 'join' | 'dirname' | 'extname' | 'pwd'>;
 export interface ParsedConfiguration {
     project: string;
     options: api.CompilerOptions;
