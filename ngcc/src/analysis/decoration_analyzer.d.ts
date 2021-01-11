@@ -3,7 +3,7 @@ import * as ts from 'typescript';
 import { ParsedConfiguration } from '../../..';
 import { ReferencesRegistry, ResourceLoader } from '../../../src/ngtsc/annotations';
 import { CycleAnalyzer, ImportGraph } from '../../../src/ngtsc/cycles';
-import { FileSystem } from '../../../src/ngtsc/file_system';
+import { ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
 import { ModuleResolver, PrivateExportAliasingHost, ReferenceEmitter } from '../../../src/ngtsc/imports';
 import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, InjectableClassRegistry, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
@@ -19,7 +19,7 @@ import { CompiledFile, DecorationAnalyses } from './types';
  */
 declare class NgccResourceLoader implements ResourceLoader {
     private fs;
-    constructor(fs: FileSystem);
+    constructor(fs: ReadonlyFileSystem);
     canPreload: boolean;
     preload(): undefined | Promise<void>;
     load(url: string): string;
@@ -60,7 +60,7 @@ export declare class DecorationAnalyzer {
     handlers: DecoratorHandler<unknown, unknown, unknown>[];
     compiler: NgccTraitCompiler;
     migrations: Migration[];
-    constructor(fs: FileSystem, bundle: EntryPointBundle, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, diagnosticHandler?: (error: ts.Diagnostic) => void, tsConfig?: ParsedConfiguration | null);
+    constructor(fs: ReadonlyFileSystem, bundle: EntryPointBundle, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, diagnosticHandler?: (error: ts.Diagnostic) => void, tsConfig?: ParsedConfiguration | null);
     /**
      * Analyze a program to find all the decorated files should be transformed.
      *

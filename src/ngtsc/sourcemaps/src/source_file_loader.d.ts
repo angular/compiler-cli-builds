@@ -1,5 +1,5 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader" />
-import { AbsoluteFsPath, FileSystem } from '../../file_system';
+import { AbsoluteFsPath, ReadonlyFileSystem } from '../../file_system';
 import { Logger } from '../../logging';
 import { RawSourceMap } from './raw_source_map';
 import { SourceFile } from './source_file';
@@ -18,7 +18,7 @@ export declare class SourceFileLoader {
     /** A map of URL schemes to base paths. The scheme name should be lowercase. */
     private schemeMap;
     private currentPaths;
-    constructor(fs: FileSystem, logger: Logger, 
+    constructor(fs: ReadonlyFileSystem, logger: Logger, 
     /** A map of URL schemes to base paths. The scheme name should be lowercase. */
     schemeMap: Record<string, AbsoluteFsPath>);
     /**
