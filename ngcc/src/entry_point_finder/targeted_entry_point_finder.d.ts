@@ -64,6 +64,15 @@ export declare class TargetedEntryPointFinder extends TracingEntryPointFinder {
      */
     private computePackagePath;
     /**
+     * Compute whether the `test` path is contained within the `base` path.
+     *
+     * Note that this doesn't use a simple `startsWith()` since that would result in a false positive
+     * for `test` paths such as `a/b/c-x` when the `base` path is `a/b/c`.
+     *
+     * Since `fs.relative()` can be quite expensive we check the fast possibilities first.
+     */
+    private isPathContainedBy;
+    /**
      * Search down to the `entryPointPath` from the `containingPath` for the first `package.json` that
      * we come to. This is the path to the entry-point's containing package. For example if
      * `containingPath` is `/a/b/c` and `entryPointPath` is `/a/b/c/d/e` and there exists
