@@ -12,7 +12,7 @@ import { IndexedComponent } from '../../indexer';
 import { ComponentResources } from '../../metadata';
 import { PerfRecorder } from '../../perf';
 import { DeclarationNode } from '../../reflection';
-import { TemplateTypeChecker, TypeCheckingProgramStrategy } from '../../typecheck/api';
+import { OptimizeFor, TemplateTypeChecker, TypeCheckingProgramStrategy } from '../../typecheck/api';
 import { LazyRoute, NgCompilerAdapter, NgCompilerOptions } from '../api';
 /**
  * The heart of the Angular Ivy compiler.
@@ -48,11 +48,12 @@ export declare class NgCompiler {
      */
     private constructionDiagnostics;
     /**
-     * Semantic diagnostics related to the program itself.
+     * Non-template diagnostics related to the program itself. Does not include template
+     * diagnostics because the template type checker memoizes them itself.
      *
-     * This is set by (and memoizes) `getDiagnostics`.
+     * This is set by (and memoizes) `getNonTemplateDiagnostics`.
      */
-    private diagnostics;
+    private nonTemplateDiagnostics;
     private closureCompilerEnabled;
     private nextProgram;
     private entryPoint;
@@ -71,10 +72,14 @@ export declare class NgCompiler {
     getResourceDependencies(file: ts.SourceFile): string[];
     /**
      * Get all Angular-related diagnostics for this compilation.
+     */
+    getDiagnostics(): ts.Diagnostic[];
+    /**
+     * Get all Angular-related diagnostics for this compilation.
      *
      * If a `ts.SourceFile` is passed, only diagnostics related to that file are returned.
      */
-    getDiagnostics(file?: ts.SourceFile): ts.Diagnostic[];
+    getDiagnosticsForFile(file: ts.SourceFile, optimizeFor: OptimizeFor): ts.Diagnostic[];
     /**
      * Get all setup-related diagnostics for this compilation.
      */
@@ -137,6 +142,8 @@ export declare class NgCompiler {
     private get fullTemplateTypeCheck();
     private getTypeCheckingConfig;
     private getTemplateDiagnostics;
+    private getTemplateDiagnosticsForFile;
+    private getNonTemplateDiagnostics;
     /**
      * Reifies the inter-dependencies of NgModules and the components within their compilation scopes
      * into the `IncrementalDriver`'s dependency graph.
