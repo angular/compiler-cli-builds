@@ -58,7 +58,7 @@ export declare class EsmRenderingFormatter implements RenderingFormatter {
      */
     removeDecorators(output: MagicString, decoratorsToRemove: RedundantDecoratorMap): void;
     /**
-     * Rewrite the the IVY switch markers to indicate we are in IVY mode.
+     * Rewrite the IVY switch markers to indicate we are in IVY mode.
      */
     rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile, declarations: SwitchableVariableDeclaration[]): void;
     /**
