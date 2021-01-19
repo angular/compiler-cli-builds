@@ -81,6 +81,10 @@ export declare class NgCompiler {
      */
     getDiagnosticsForFile(file: ts.SourceFile, optimizeFor: OptimizeFor): ts.Diagnostic[];
     /**
+     * Add Angular.io error guide links to diagnostics for this compilation.
+     */
+    private addMessageTextDetails;
+    /**
      * Get all setup-related diagnostics for this compilation.
      */
     getOptionDiagnostics(): ts.Diagnostic[];
