@@ -1,6 +1,6 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file" />
 import { AbsoluteFsPath, PathManipulation } from '../../file_system';
-import { RawSourceMap } from './raw_source_map';
+import { RawSourceMap, SourceMapInfo } from './raw_source_map';
 import { SegmentMarker } from './segment_marker';
 export declare function removeSourceMapComments(contents: string): string;
 export declare class SourceFile {
@@ -8,10 +8,8 @@ export declare class SourceFile {
     readonly sourcePath: AbsoluteFsPath;
     /** The contents of this source file. */
     readonly contents: string;
-    /** The raw source map (if any) associated with this source file. */
-    readonly rawMap: RawSourceMap | null;
-    /** Whether this source file's source map was inline or external. */
-    readonly inline: boolean;
+    /** The raw source map (if any) referenced by this source file. */
+    readonly rawMap: SourceMapInfo | null;
     /** Any source files referenced by the raw source map associated with this source file. */
     readonly sources: (SourceFile | null)[];
     private fs;
@@ -29,10 +27,8 @@ export declare class SourceFile {
     sourcePath: AbsoluteFsPath, 
     /** The contents of this source file. */
     contents: string, 
-    /** The raw source map (if any) associated with this source file. */
-    rawMap: RawSourceMap | null, 
-    /** Whether this source file's source map was inline or external. */
-    inline: boolean, 
+    /** The raw source map (if any) referenced by this source file. */
+    rawMap: SourceMapInfo | null, 
     /** Any source files referenced by the raw source map associated with this source file. */
     sources: (SourceFile | null)[], fs: PathManipulation);
     /**
