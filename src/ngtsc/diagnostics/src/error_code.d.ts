@@ -132,5 +132,10 @@ export declare enum ErrorCode {
     /**
      * An injectable already has a `ɵprov` property.
      */
-    INJECTABLE_DUPLICATE_PROV = 9001
+    INJECTABLE_DUPLICATE_PROV = 9001,
+    /**
+     * Suggest users to enable `strictTemplates` to make use of full capabilities
+     * provided by Angular language service.
+     */
+    SUGGEST_STRICT_TEMPLATES = 10001
 }
