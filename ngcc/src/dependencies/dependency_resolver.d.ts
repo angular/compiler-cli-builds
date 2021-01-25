@@ -1,14 +1,18 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/dependency_resolver" />
-import { Logger } from '../logging/logger';
-import { EntryPoint } from '../packages/entry_point';
-import { DependencyHost } from './dependency_host';
+import { DepGraph } from 'dependency-graph';
+import { ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
+import { Logger } from '../../../src/ngtsc/logging';
+import { NgccConfiguration } from '../packages/configuration';
+import { EntryPoint, EntryPointFormat } from '../packages/entry_point';
+import { PartiallyOrderedList } from '../utils';
+import { DependencyHost, EntryPointWithDependencies } from './dependency_host';
 /**
  * Holds information about entry points that are removed because
  * they have dependencies that are missing (directly or transitively).
@@ -44,24 +48,37 @@ export interface DependencyDiagnostics {
     ignoredDependencies: IgnoredDependency[];
 }
 /**
- * A list of entry-points, sorted by their dependencies.
+ * Represents a partially ordered list of entry-points.
+ *
+ * The entry-points' order/precedence is such that dependent entry-points always come later than
+ * their dependencies in the list.
+ *
+ * See `DependencyResolver#sortEntryPointsByDependency()`.
+ */
+export declare type PartiallyOrderedEntryPoints = PartiallyOrderedList<EntryPoint>;
+/**
+ * A list of entry-points, sorted by their dependencies, and the dependency graph.
  *
  * The `entryPoints` array will be ordered so that no entry point depends upon an entry point that
  * appears later in the array.
  *
- * Some entry points or their dependencies may be have been ignored. These are captured for
+ * Some entry points or their dependencies may have been ignored. These are captured for
  * diagnostic purposes in `invalidEntryPoints` and `ignoredDependencies` respectively.
  */
 export interface SortedEntryPointsInfo extends DependencyDiagnostics {
-    entryPoints: EntryPoint[];
+    entryPoints: PartiallyOrderedEntryPoints;
+    graph: DepGraph<EntryPoint>;
 }
 /**
  * A class that resolves dependencies between entry-points.
  */
 export declare class DependencyResolver {
+    private fs;
     private logger;
-    private host;
-    constructor(logger: Logger, host: DependencyHost);
+    private config;
+    private hosts;
+    private typingsHost;
+    constructor(fs: ReadonlyFileSystem, logger: Logger, config: NgccConfiguration, hosts: Partial<Record<EntryPointFormat, DependencyHost>>, typingsHost: DependencyHost);
     /**
      * Sort the array of entry points so that the dependant entry points always come later than
      * their dependencies in the array.
@@ -69,7 +86,8 @@ export declare class DependencyResolver {
      * @param target If provided, only return entry-points depended on by this entry-point.
      * @returns the result of sorting the entry points by dependency.
      */
-    sortEntryPointsByDependency(entryPoints: EntryPoint[], target?: EntryPoint): SortedEntryPointsInfo;
+    sortEntryPointsByDependency(entryPoints: EntryPointWithDependencies[], target?: EntryPoint): SortedEntryPointsInfo;
+    getEntryPointWithDependencies(entryPoint: EntryPoint): EntryPointWithDependencies;
     /**
      * Computes a dependency graph of the given entry-points.
      *
@@ -77,4 +95,9 @@ export declare class DependencyResolver {
      * (direct and transitive) all exist.
      */
     private computeDependencyGraph;
+    private getEntryPointFormatInfo;
+    /**
+     * Filter out the deepImports that can be ignored, according to this entryPoint's config.
+     */
+    private filterIgnorableDeepImports;
 }

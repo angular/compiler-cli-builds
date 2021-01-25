@@ -1,20 +1,19 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/analysis/private_declarations_analyzer" />
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { AbsoluteFsPath } from '../../../src/ngtsc/path';
+import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { NgccReferencesRegistry } from './ngcc_references_registry';
 export interface ExportInfo {
     identifier: string;
     from: AbsoluteFsPath;
     dtsFrom?: AbsoluteFsPath | null;
-    alias?: string | null;
 }
 export declare type PrivateDeclarationsAnalyses = ExportInfo[];
 /**

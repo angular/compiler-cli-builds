@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -8,13 +8,14 @@
 /// <amd-module name="@angular/compiler-cli/src/transformers/api" />
 import { ParseSourceSpan, Position } from '@angular/compiler';
 import * as ts from 'typescript';
+import { ExtendedTsCompilerHost, NgCompilerOptions } from '../ngtsc/core/api';
 export declare const DEFAULT_ERROR_CODE = 100;
 export declare const UNKNOWN_ERROR_CODE = 500;
 export declare const SOURCE: "angular";
 export interface DiagnosticMessageChain {
     messageText: string;
     position?: Position;
-    next?: DiagnosticMessageChain;
+    next?: DiagnosticMessageChain[];
 }
 export interface Diagnostic {
     messageText: string;
@@ -27,35 +28,23 @@ export interface Diagnostic {
 }
 export declare function isTsDiagnostic(diagnostic: any): diagnostic is ts.Diagnostic;
 export declare function isNgDiagnostic(diagnostic: any): diagnostic is Diagnostic;
-export interface CompilerOptions extends ts.CompilerOptions {
+export interface CompilerOptions extends NgCompilerOptions, ts.CompilerOptions {
     genDir?: string;
     basePath?: string;
     skipMetadataEmit?: boolean;
     strictMetadataEmit?: boolean;
     skipTemplateCodegen?: boolean;
-    strictInjectionParameters?: boolean;
-    flatModuleOutFile?: string;
-    flatModuleId?: string;
     flatModulePrivateSymbolPrefix?: string;
     generateCodeForLibraries?: boolean;
-    fullTemplateTypeCheck?: boolean;
-    _useHostForImportGeneration?: boolean;
-    annotateForClosureCompiler?: boolean;
     annotationsAs?: 'decorators' | 'static fields';
     trace?: boolean;
     disableExpressionLowering?: boolean;
-    disableTypeScriptVersionCheck?: boolean;
     i18nOutLocale?: string;
     i18nOutFormat?: string;
     i18nOutFile?: string;
     i18nInFormat?: string;
-    i18nInLocale?: string;
     i18nInFile?: string;
     i18nInMissingTranslations?: 'error' | 'warning' | 'ignore';
-    i18nUseExternalIds?: boolean;
-    preserveWhitespaces?: boolean;
-    /** generate all possible generated files  */
-    allowEmptyCodegenFiles?: boolean;
     /**
      * Whether to generate .ngsummary.ts files that allow to use AOTed artifacts
      * in JIT mode. This is off by default.
@@ -71,23 +60,6 @@ export interface CompilerOptions extends ts.CompilerOptions {
      */
     enableResourceInlining?: boolean;
     /**
-     * Tells the compiler to generate definitions using the Render3 style code generation.
-     * This option defaults to `false`.
-     *
-     * Not all features are supported with this option enabled. It is only supported
-     * for experimentation and testing of Render3 style code generation.
-     *
-     * Acceptable values are as follows:
-     *
-     * `false` - run ngc normally
-     * `true` - run the ngtsc compiler instead of the normal ngc compiler
-     * `ngtsc` - alias for `true`
-     * `tsc` - behave like plain tsc as much as possible (used for testing JIT code)
-     *
-     * @publicApi
-     */
-    enableIvy?: boolean | 'ngtsc' | 'tsc';
-    /**
      * Whether NGC should generate re-exports for external symbols which are referenced
      * in Angular metadata (e.g. @Component, @Inject, @ViewChild). This can be enabled in
      * order to avoid dynamically generated module dependencies which can break strict
@@ -96,22 +68,12 @@ export interface CompilerOptions extends ts.CompilerOptions {
      */
     createExternalSymbolFactoryReexports?: boolean;
 }
-export interface CompilerHost extends ts.CompilerHost {
+export interface CompilerHost extends ts.CompilerHost, ExtendedTsCompilerHost {
     /**
      * Converts a module name that is used in an `import` to a file path.
      * I.e. `path/to/containingFile.ts` containing `import {...} from 'module-name'`.
      */
     moduleNameToFileName?(moduleName: string, containingFile: string): string | null;
-    /**
-     * Converts a file path to a module name that can be used as an `import ...`
-     * I.e. `path/to/importedFile.ts` should be imported by `path/to/containingFile.ts`.
-     */
-    fileNameToModuleName?(importedFilePath: string, containingFilePath: string): string;
-    /**
-     * Converts a file path for a resource that is used in a source file or another resource
-     * into a filepath.
-     */
-    resourceNameToFileName?(resourceName: string, containingFilePath: string): string | null;
     /**
      * Converts a file name into a representation that should be stored in a summary file.
      * This has to include changing the suffix as well.
@@ -127,17 +89,10 @@ export interface CompilerHost extends ts.CompilerHost {
      */
     fromSummaryFileName?(fileName: string, referringLibFileName: string): string;
     /**
-     * Load a referenced resource either statically or asynchronously. If the host returns a
-     * `Promise<string>` it is assumed the user of the corresponding `Program` will call
-     * `loadNgStructureAsync()`. Returning  `Promise<string>` outside `loadNgStructureAsync()` will
-     * cause a diagnostics diagnostic error or an exception to be thrown.
-     */
-    readResource?(fileName: string): Promise<string> | string;
-    /**
      * Produce an AMD module name for the source file. Used in Bazel.
      *
      * An AMD module can have an arbitrary name, so that it is require'd by name
-     * rather than by path. See http://requirejs.org/docs/whyamd.html#namedmodules
+     * rather than by path. See https://requirejs.org/docs/whyamd.html#namedmodules
      */
     amdModuleName?(sf: ts.SourceFile): string | undefined;
 }

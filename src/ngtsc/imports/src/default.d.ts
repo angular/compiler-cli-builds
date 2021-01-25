@@ -1,10 +1,10 @@
 /**
-* @license
-* Copyright Google Inc. All Rights Reserved.
-*
-* Use of this source code is governed by an MIT-style license that can be
-* found in the LICENSE file at https://angular.io/license
-*/
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/imports/src/default" />
 import * as ts from 'typescript';
 /**
@@ -61,7 +61,7 @@ export declare const NOOP_DEFAULT_IMPORT_RECORDER: DefaultImportRecorder;
  * a dangling reference, as TS will elide the import because it was only used in the type position
  * originally.
  *
- * To avoid this, the compiler must "touch" the imports with `ts.updateImportClause`, and should
+ * To avoid this, the compiler must "touch" the imports with `ts.getMutableClone`, and should
  * only do this for imports which are actually consumed. The `DefaultImportTracker` keeps track of
  * these imports as they're encountered and emitted, and implements a transform which can correctly
  * flag the imports as required.

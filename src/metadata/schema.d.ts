@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -49,6 +49,7 @@ export interface MetadataMap {
 export interface MemberMetadata {
     __symbolic: 'constructor' | 'method' | 'property';
     decorators?: (MetadataSymbolicExpression | MetadataError)[];
+    parameters?: (MetadataSymbolicExpression | MetadataError | null | undefined)[];
 }
 export declare function isMemberMetadata(value: any): value is MemberMetadata;
 export interface MethodMetadata extends MemberMetadata {

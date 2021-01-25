@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -25,6 +25,16 @@ export declare function tsCreateElement(tagName: string): ts.Expression;
  */
 export declare function tsDeclareVariable(id: ts.Identifier, type: ts.TypeNode): ts.VariableStatement;
 /**
+ * Creates a `ts.TypeQueryNode` for a coerced input.
+ *
+ * For example: `typeof MatInput.ngAcceptInputType_value`, where MatInput is `typeName` and `value`
+ * is the `coercedInputName`.
+ *
+ * @param typeName The `EntityName` of the Directive where the static coerced input is defined.
+ * @param coercedInputName The field name of the coerced input.
+ */
+export declare function tsCreateTypeQueryForCoercedInput(typeName: ts.EntityName, coercedInputName: string): ts.TypeQueryNode;
+/**
  * Create a `ts.VariableStatement` that initializes a variable with a given expression.
  *
  * Unlike with `tsDeclareVariable`, the type of the variable is inferred from the initializer
@@ -37,3 +47,4 @@ export declare function tsCreateVariable(id: ts.Identifier, initializer: ts.Expr
 export declare function tsCallMethod(receiver: ts.Expression, methodName: string, args?: ts.Expression[]): ts.CallExpression;
 export declare function checkIfClassIsExported(node: ClassDeclaration): boolean;
 export declare function checkIfGenericTypesAreUnbound(node: ClassDeclaration<ts.ClassDeclaration>): boolean;
+export declare function isAccessExpression(node: ts.Node): node is ts.ElementAccessExpression | ts.PropertyAccessExpression;

@@ -1,21 +1,31 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/transformer" />
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { CompiledFile } from '../analysis/decoration_analyzer';
+import { ParsedConfiguration } from '../../..';
+import { ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
+import { Logger } from '../../../src/ngtsc/logging';
 import { ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses } from '../analysis/switch_marker_analyzer';
-import { FileSystem } from '../file_system/file_system';
+import { CompiledFile } from '../analysis/types';
 import { NgccReflectionHost } from '../host/ngcc_host';
-import { Logger } from '../logging/logger';
-import { FileInfo, Renderer } from '../rendering/renderer';
+import { RenderingFormatter } from '../rendering/rendering_formatter';
+import { FileToWrite } from '../rendering/utils';
 import { EntryPointBundle } from './entry_point_bundle';
+export declare type TransformResult = {
+    success: true;
+    diagnostics: ts.Diagnostic[];
+    transformedFiles: FileToWrite[];
+} | {
+    success: false;
+    diagnostics: ts.Diagnostic[];
+};
 /**
  * A Package is stored in a directory on disk and that directory can contain one or more package
  * formats - e.g. fesm2015, UMD, etc. Additionally, each package provides typings (`.d.ts` files).
@@ -40,21 +50,24 @@ import { EntryPointBundle } from './entry_point_bundle';
 export declare class Transformer {
     private fs;
     private logger;
-    constructor(fs: FileSystem, logger: Logger);
+    private tsConfig;
+    constructor(fs: ReadonlyFileSystem, logger: Logger, tsConfig?: ParsedConfiguration | null);
     /**
      * Transform the source (and typings) files of a bundle.
      * @param bundle the bundle to transform.
      * @returns information about the files that were transformed.
      */
-    transform(bundle: EntryPointBundle): FileInfo[];
-    getHost(isCore: boolean, bundle: EntryPointBundle): NgccReflectionHost;
-    getRenderer(host: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): Renderer;
-    analyzeProgram(reflectionHost: NgccReflectionHost, isCore: boolean, bundle: EntryPointBundle): ProgramAnalyses;
+    transform(bundle: EntryPointBundle): TransformResult;
+    getHost(bundle: EntryPointBundle): NgccReflectionHost;
+    getRenderingFormatter(host: NgccReflectionHost, bundle: EntryPointBundle): RenderingFormatter;
+    analyzeProgram(reflectionHost: NgccReflectionHost, bundle: EntryPointBundle): ProgramAnalyses;
 }
+export declare function hasErrors(diagnostics: ts.Diagnostic[]): boolean;
 interface ProgramAnalyses {
     decorationAnalyses: Map<ts.SourceFile, CompiledFile>;
     switchMarkerAnalyses: SwitchMarkerAnalyses;
     privateDeclarationsAnalyses: ExportInfo[];
     moduleWithProvidersAnalyses: ModuleWithProvidersAnalyses | null;
+    diagnostics: ts.Diagnostic[];
 }
 export {};

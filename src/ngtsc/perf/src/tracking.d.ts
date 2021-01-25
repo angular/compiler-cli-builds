@@ -1,12 +1,6 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/perf/src/tracking" />
 import * as ts from 'typescript';
+import { DeclarationNode } from '../../reflection';
 import { PerfRecorder } from './api';
 export declare class PerfTracker implements PerfRecorder {
     private zeroTime;
@@ -15,8 +9,8 @@ export declare class PerfTracker implements PerfRecorder {
     readonly enabled = true;
     private constructor();
     static zeroedToNow(): PerfTracker;
-    mark(name: string, node?: ts.SourceFile | ts.Declaration, category?: string, detail?: string): void;
-    start(name: string, node?: ts.SourceFile | ts.Declaration, category?: string, detail?: string): number;
+    mark(name: string, node?: DeclarationNode, category?: string, detail?: string): void;
+    start(name: string, node?: DeclarationNode, category?: string, detail?: string): number;
     stop(span: number): void;
     private makeLogMessage;
     asJson(): unknown;

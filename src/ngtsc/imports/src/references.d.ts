@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -8,10 +8,6 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/imports/src/references" />
 import { Expression } from '@angular/compiler';
 import * as ts from 'typescript';
-export declare enum ImportMode {
-    UseExistingImport = 0,
-    ForceNewImport = 1
-}
 export interface OwningModule {
     specifier: string;
     resolutionContext: string;
@@ -56,21 +52,21 @@ export declare class Reference<T extends ts.Node = ts.Node> {
      * The best guess at which module specifier owns this particular reference, or `null` if there
      * isn't one.
      */
-    readonly ownedByModuleGuess: string | null;
+    get ownedByModuleGuess(): string | null;
     /**
      * Whether this reference has a potential owning module or not.
      *
      * See `bestGuessOwningModule`.
      */
-    readonly hasOwningModuleGuess: boolean;
+    get hasOwningModuleGuess(): boolean;
     /**
      * A name for the node, if one is available.
      *
      * This is only suited for debugging. Any actual references to this node should be made with
      * `ts.Identifier`s (see `getIdentityIn`).
      */
-    readonly debugName: string | null;
-    readonly alias: Expression | null;
+    get debugName(): string | null;
+    get alias(): Expression | null;
     /**
      * Record a `ts.Identifier` by which it's valid to refer to this node, within the context of this
      * `Reference`.
@@ -81,6 +77,32 @@ export declare class Reference<T extends ts.Node = ts.Node> {
      * given `ts.SourceFile`, if any.
      */
     getIdentityIn(context: ts.SourceFile): ts.Identifier | null;
+    /**
+     * Get a `ts.Identifier` for this `Reference` that exists within the given expression.
+     *
+     * This is very useful for producing `ts.Diagnostic`s that reference `Reference`s that were
+     * extracted from some larger expression, as it can be used to pinpoint the `ts.Identifier` within
+     * the expression from which the `Reference` originated.
+     */
+    getIdentityInExpression(expr: ts.Expression): ts.Identifier | null;
+    /**
+     * Given the 'container' expression from which this `Reference` was extracted, produce a
+     * `ts.Expression` to use in a diagnostic which best indicates the position within the container
+     * expression that generated the `Reference`.
+     *
+     * For example, given a `Reference` to the class 'Bar' and the containing expression:
+     * `[Foo, Bar, Baz]`, this function would attempt to return the `ts.Identifier` for `Bar` within
+     * the array. This could be used to produce a nice diagnostic context:
+     *
+     * ```text
+     * [Foo, Bar, Baz]
+     *       ~~~
+     * ```
+     *
+     * If no specific node can be found, then the `fallback` expression is used, which defaults to the
+     * entire containing expression.
+     */
+    getOriginForDiagnostics(container: ts.Expression, fallback?: ts.Expression): ts.Expression;
     cloneWithAlias(alias: Expression): Reference<T>;
     cloneWithNoIdentifiers(): Reference<T>;
 }

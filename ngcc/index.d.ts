@@ -1,13 +1,6 @@
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 /// <amd-module name="@angular/compiler-cli/ngcc" />
-export { ConsoleLogger, LogLevel } from './src/logging/console_logger';
-export { Logger } from './src/logging/logger';
-export { NgccOptions, mainNgcc as process } from './src/main';
-export { PathMappings } from './src/utils';
-export declare function hasBeenProcessed(packageJson: object, format: string): boolean;
+import { AsyncNgccOptions, SyncNgccOptions } from './src/ngcc_options';
+export { ConsoleLogger, Logger, LogLevel } from '../src/ngtsc/logging';
+export { AsyncNgccOptions, clearTsConfigCache, NgccOptions, SyncNgccOptions } from './src/ngcc_options';
+export { PathMappings } from './src/path_mappings';
+export declare function process<T extends AsyncNgccOptions | SyncNgccOptions>(options: T): T extends AsyncNgccOptions ? Promise<void> : void;

@@ -1,12 +1,13 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/analysis/switch_marker_analyzer" />
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
 export interface SwitchMarkerAnalysis {
     sourceFile: ts.SourceFile;
@@ -20,7 +21,8 @@ export declare const SwitchMarkerAnalyses: MapConstructor;
  */
 export declare class SwitchMarkerAnalyzer {
     private host;
-    constructor(host: NgccReflectionHost);
+    private packagePath;
+    constructor(host: NgccReflectionHost, packagePath: AbsoluteFsPath);
     /**
      * Analyze the files in the program to identify declarations that contain R3
      * switch markers.

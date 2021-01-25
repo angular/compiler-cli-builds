@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -15,7 +15,7 @@ import { TypeValueReference } from './host';
  * This can return `null` if the `typeNode` is `null`, if it does not refer to a symbol with a value
  * declaration, or if it is not possible to statically understand.
  */
-export declare function typeToValue(typeNode: ts.TypeNode | null, checker: ts.TypeChecker): TypeValueReference | null;
+export declare function typeToValue(typeNode: ts.TypeNode | null, checker: ts.TypeChecker): TypeValueReference;
 /**
  * Attempt to extract a `ts.Expression` that's equivalent to a `ts.TypeNode`, as the two have
  * different AST shapes but can reference the same symbols.
