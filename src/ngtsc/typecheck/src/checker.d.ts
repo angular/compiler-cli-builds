@@ -90,6 +90,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getTypeCheckBlock(component: ts.ClassDeclaration): ts.Node | null;
     getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration): GlobalCompletion | null;
     getExpressionCompletionLocation(ast: PropertyRead | SafePropertyRead | MethodCall | SafeMethodCall, component: ts.ClassDeclaration): ShimLocation | null;
+    invalidateClass(clazz: ts.ClassDeclaration): void;
     private getOrCreateCompletionEngine;
     private maybeAdoptPriorResultsForFile;
     private ensureAllShimsForAllFiles;
