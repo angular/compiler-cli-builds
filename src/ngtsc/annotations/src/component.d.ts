@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
-import { ConstantPool, ParsedTemplate, ParseSourceFile, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
+import { ConstantPool, InterpolationConfig, ParsedTemplate, ParseSourceFile, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
+import * as ts from 'typescript';
 import { CycleAnalyzer } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
@@ -49,6 +50,14 @@ export interface ComponentAnalysisData {
      */
     viewProvidersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
     resources: ComponentResources;
+    /**
+     * The literal `styleUrls` extracted from the decorator, if present.
+     */
+    styleUrls: string[] | null;
+    /**
+     * Inline stylesheets extracted from the decorator, if present.
+     */
+    inlineStyles: string[] | null;
     isPoisoned: boolean;
 }
 export declare type ComponentResolutionData = Pick<R3ComponentMetadata, ComponentMetadataResolvedFields>;
@@ -97,6 +106,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     index(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): null | undefined;
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: Readonly<ComponentAnalysisData>): void;
     resolve(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): ResolveResult<ComponentResolutionData>;
+    updateResources(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
     compileFull(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): CompileResult[];
     private compileComponent;
@@ -105,9 +115,9 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private _extractStyleUrls;
     private _extractStyleResources;
     private _preloadAndParseTemplate;
-    private _extractExternalTemplate;
-    private _extractInlineTemplate;
+    private extractTemplate;
     private _parseTemplate;
+    private parseTemplateDeclaration;
     private _expressionToImportedFile;
     private _isCyclicImport;
     private _recordSyntheticImport;
@@ -137,4 +147,39 @@ export interface ParsedComponentTemplate extends ParsedTemplate {
 }
 export interface ParsedTemplateWithSource extends ParsedComponentTemplate {
     sourceMapping: TemplateSourceMapping;
+    declaration: TemplateDeclaration;
 }
+/**
+ * Common fields extracted from the declaration of a template.
+ */
+interface CommonTemplateDeclaration {
+    preserveWhitespaces: boolean;
+    interpolationConfig: InterpolationConfig;
+    templateUrl: string;
+    resolvedTemplateUrl: string;
+    sourceMapUrl: string;
+}
+/**
+ * Information extracted from the declaration of an inline template.
+ */
+interface InlineTemplateDeclaration extends CommonTemplateDeclaration {
+    isInline: true;
+    expression: ts.Expression;
+}
+/**
+ * Information extracted from the declaration of an external template.
+ */
+interface ExternalTemplateDeclaration extends CommonTemplateDeclaration {
+    isInline: false;
+    templateUrlExpression: ts.Expression;
+}
+/**
+ * The declaration of a template extracted from a component decorator.
+ *
+ * This data is extracted and stored separately to faciliate re-interpreting the template
+ * declaration whenever the compiler is notified of a change to a template file. With this
+ * information, `ComponentDecoratorHandler` is able to re-read the template and update the component
+ * record without needing to parse the original decorator again.
+ */
+declare type TemplateDeclaration = InlineTemplateDeclaration | ExternalTemplateDeclaration;
+export {};

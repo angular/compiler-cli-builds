@@ -148,6 +148,11 @@ export interface TemplateTypeChecker {
      * Retrieve the type checking engine's metadata for the given directive class, if available.
      */
     getDirectiveMetadata(dir: ts.ClassDeclaration): TypeCheckableDirectiveMeta | null;
+    /**
+     * Reset the `TemplateTypeChecker`'s state for the given class, so that it will be recomputed on
+     * the next request.
+     */
+    invalidateClass(clazz: ts.ClassDeclaration): void;
 }
 /**
  * Describes the scope of the caller's interest in template type-checking results.
