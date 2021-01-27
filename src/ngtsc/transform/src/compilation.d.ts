@@ -99,6 +99,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
      */
     typeCheck(sf: ts.SourceFile, ctx: TypeCheckContext): void;
     index(ctx: IndexingContext): void;
+    updateResources(clazz: DeclarationNode): void;
     compile(clazz: DeclarationNode, constantPool: ConstantPool): CompileResult[] | null;
     decoratorsFor(node: ts.Declaration): ts.Decorator[];
     get diagnostics(): ReadonlyArray<ts.Diagnostic>;
