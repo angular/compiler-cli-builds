@@ -38,10 +38,6 @@ export interface ShimTypeCheckingData {
      */
     templates: Map<TemplateId, TemplateData>;
 }
-export interface TemplateOverride {
-    nodes: TmplAstNode[];
-    errors: ParseError[] | null;
-}
 /**
  * Data tracked for each template processed by the template type-checking system.
  */
@@ -116,11 +112,6 @@ export interface TypeCheckingHost {
      * program.
      */
     shouldCheckComponent(node: ts.ClassDeclaration): boolean;
-    /**
-     * Check if the given component has had its template overridden, and retrieve the new template
-     * nodes if so.
-     */
-    getTemplateOverride(sfPath: AbsoluteFsPath, node: ts.ClassDeclaration): TemplateOverride | null;
     /**
      * Report data from a shim generated from the given input file path.
      */
