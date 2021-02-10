@@ -51,9 +51,9 @@ export interface ComponentAnalysisData {
     viewProvidersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
     resources: ComponentResources;
     /**
-     * The literal `styleUrls` extracted from the decorator, if present.
+     * `styleUrls` extracted from the decorator, if present.
      */
-    styleUrls: string[] | null;
+    styleUrls: StyleUrlMeta[] | null;
     /**
      * Inline stylesheets extracted from the decorator, if present.
      */
@@ -61,6 +61,28 @@ export interface ComponentAnalysisData {
     isPoisoned: boolean;
 }
 export declare type ComponentResolutionData = Pick<R3ComponentMetadata, ComponentMetadataResolvedFields>;
+/**
+ * The literal style url extracted from the decorator, along with metadata for diagnostics.
+ */
+export interface StyleUrlMeta {
+    url: string;
+    nodeForError: ts.Node;
+    source: ResourceTypeForDiagnostics.StylesheetFromTemplate | ResourceTypeForDiagnostics.StylesheetFromDecorator;
+}
+/**
+ * Information about the origin of a resource in the application code. This is used for creating
+ * diagnostics, so we can point to the root cause of an error in the application code.
+ *
+ * A template resource comes from the `templateUrl` property on the component decorator.
+ *
+ * Stylesheets resources can come from either the `styleUrls` property on the component decorator,
+ * or from inline `style` tags and style links on the external template.
+ */
+export declare const enum ResourceTypeForDiagnostics {
+    Template = 0,
+    StylesheetFromTemplate = 1,
+    StylesheetFromDecorator = 2
+}
 /**
  * `DecoratorHandler` which handles the `@Component` annotation.
  */
@@ -112,7 +134,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private compileComponent;
     private _resolveLiteral;
     private _resolveEnumValue;
-    private _extractStyleUrls;
+    private _extractComponentStyleUrls;
+    private _extractStyleUrlsFromExpression;
     private _extractStyleResources;
     private _preloadAndParseTemplate;
     private extractTemplate;
@@ -121,6 +144,13 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private _expressionToImportedFile;
     private _isCyclicImport;
     private _recordSyntheticImport;
+    /**
+     * Resolve the url of a resource relative to the file that contains the reference to it.
+     *
+     * Throws a FatalDiagnosticError when unable to resolve the file.
+     */
+    private _resolveResourceOrThrow;
+    private _extractTemplateStyleUrls;
 }
 /**
  * Information about the template which was extracted during parsing.
