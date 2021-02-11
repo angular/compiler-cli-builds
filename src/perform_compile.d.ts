@@ -30,8 +30,7 @@ export declare function calcProjectFileAndBasePath(project: string, host?: Confi
     projectFile: AbsoluteFsPath;
     basePath: AbsoluteFsPath;
 };
-export declare function createNgCompilerOptions(basePath: string, config: any, tsOptions: ts.CompilerOptions): api.CompilerOptions;
-export declare function readConfiguration(project: string, existingOptions?: ts.CompilerOptions, host?: ConfigurationHost): ParsedConfiguration;
+export declare function readConfiguration(project: string, existingOptions?: api.CompilerOptions, host?: ConfigurationHost): ParsedConfiguration;
 export interface PerformCompilationResult {
     diagnostics: Diagnostics;
     program?: api.Program;
