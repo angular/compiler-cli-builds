@@ -37,7 +37,7 @@
      * Also, ranges are matched to include "pre-releases", therefore if the range is `>=11.1.0-next.1`
      * then this includes `11.1.0-next.2` and also `12.0.0-next.1`.
      *
-     * Finally, note that we always start with the current version (i.e. `12.0.0-next.0+19.sha-5eb1954`). This
+     * Finally, note that we always start with the current version (i.e. `12.0.0-next.0+21.sha-ca43938`). This
      * allows the linker to work on local builds effectively.
      */
     var PartialLinkerSelector = /** @class */ (function () {
@@ -83,11 +83,11 @@
             var partialComponentLinkerVersion1 = new partial_component_linker_1_1.PartialComponentLinkerVersion1(environment, get_source_file_1.createGetSourceFile(sourceUrl, code, environment.sourceFileLoader), sourceUrl, code);
             var linkers = new Map();
             linkers.set(exports.ɵɵngDeclareDirective, [
-                { range: '12.0.0-next.0+19.sha-5eb1954', linker: partialDirectiveLinkerVersion1 },
+                { range: '12.0.0-next.0+21.sha-ca43938', linker: partialDirectiveLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialDirectiveLinkerVersion1 },
             ]);
             linkers.set(exports.ɵɵngDeclareComponent, [
-                { range: '12.0.0-next.0+19.sha-5eb1954', linker: partialComponentLinkerVersion1 },
+                { range: '12.0.0-next.0+21.sha-ca43938', linker: partialComponentLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialComponentLinkerVersion1 },
             ]);
             return linkers;
