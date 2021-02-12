@@ -4,6 +4,7 @@ import { LinkerEnvironment } from '../linker_environment';
 import { PartialLinker } from './partial_linker';
 export declare const ɵɵngDeclareDirective = "\u0275\u0275ngDeclareDirective";
 export declare const ɵɵngDeclareComponent = "\u0275\u0275ngDeclareComponent";
+export declare const ɵɵngDeclarePipe = "\u0275\u0275ngDeclarePipe";
 export declare const declarationFunctions: string[];
 /**
  * A helper that selects the appropriate `PartialLinker` for a given declaration.
@@ -17,7 +18,7 @@ export declare const declarationFunctions: string[];
  * Also, ranges are matched to include "pre-releases", therefore if the range is `>=11.1.0-next.1`
  * then this includes `11.1.0-next.2` and also `12.0.0-next.1`.
  *
- * Finally, note that we always start with the current version (i.e. `12.0.0-next.0+26.sha-6425a6d`). This
+ * Finally, note that we always start with the current version (i.e. `12.0.0-next.0+27.sha-9cb43fb`). This
  * allows the linker to work on local builds effectively.
  */
 export declare class PartialLinkerSelector<TStatement, TExpression> {
