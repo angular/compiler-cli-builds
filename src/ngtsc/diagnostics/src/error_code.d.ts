@@ -37,6 +37,11 @@ export declare enum ErrorCode {
      * has been discovered.
      */
     UNDECORATED_CLASS_USING_ANGULAR_FEATURES = 2007,
+    /**
+     * Raised when an component cannot resolve an external resource, such as a template or a style
+     * sheet.
+     */
+    COMPONENT_RESOURCE_NOT_FOUND = 2008,
     SYMBOL_NOT_EXPORTED = 3001,
     SYMBOL_EXPORTED_UNDER_DIFFERENT_NAME = 3002,
     CONFIG_FLAT_MODULE_NO_INDEX = 4001,
