@@ -44,6 +44,11 @@ export declare enum ErrorCode {
     COMPONENT_RESOURCE_NOT_FOUND = 2008,
     SYMBOL_NOT_EXPORTED = 3001,
     SYMBOL_EXPORTED_UNDER_DIFFERENT_NAME = 3002,
+    /**
+     * Raised when a relationship between directives and/or pipes would cause a cyclic import to be
+     * created that cannot be handled, such as in partial compilation mode.
+     */
+    IMPORT_CYCLE_DETECTED = 3003,
     CONFIG_FLAT_MODULE_NO_INDEX = 4001,
     CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK = 4002,
     /**
