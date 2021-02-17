@@ -30,6 +30,18 @@ export declare class ImportGraph {
     transitiveImportsOf(sf: ts.SourceFile): Set<ts.SourceFile>;
     private transitiveImportsOfHelper;
     /**
+     * Find an import path from the `start` SourceFile to the `end` SourceFile.
+     *
+     * This function implements a breadth first search that results in finding the
+     * shortest path between the `start` and `end` points.
+     *
+     * @param start the starting point of the path.
+     * @param end the ending point of the path.
+     * @returns an array of source files that connect the `start` and `end` source files, or `null` if
+     *     no path could be found.
+     */
+    findPath(start: ts.SourceFile, end: ts.SourceFile): ts.SourceFile[] | null;
+    /**
      * Add a record of an import from `sf` to `imported`, that's not present in the original
      * `ts.Program` but will be remembered by the `ImportGraph`.
      */

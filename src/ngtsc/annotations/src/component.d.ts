@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
 import { ConstantPool, InterpolationConfig, ParsedTemplate, ParseSourceFile, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
-import { CycleAnalyzer } from '../../cycles';
+import { CycleAnalyzer, CycleHandlingStrategy } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
@@ -105,12 +105,13 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private i18nNormalizeLineEndingsInICUs;
     private moduleResolver;
     private cycleAnalyzer;
+    private cycleHandlingStrategy;
     private refEmitter;
     private defaultImportRecorder;
     private depTracker;
     private injectableRegistry;
     private annotateForClosureCompiler;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, annotateForClosureCompiler: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, annotateForClosureCompiler: boolean);
     private literalCache;
     private elementSchemaRegistry;
     /**
@@ -142,7 +143,13 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private _parseTemplate;
     private parseTemplateDeclaration;
     private _expressionToImportedFile;
-    private _isCyclicImport;
+    /**
+     * Check whether adding an import from `origin` to the source-file corresponding to `expr` would
+     * create a cyclic import.
+     *
+     * @returns a `Cycle` object if a cycle would be created, otherwise `null`.
+     */
+    private _checkForCyclicImport;
     private _recordSyntheticImport;
     /**
      * Resolve the url of a resource relative to the file that contains the reference to it.
