@@ -8,11 +8,12 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
 import { ConstantPool, InterpolationConfig, ParsedTemplate, ParseSourceFile, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
-import { CycleAnalyzer } from '../../cycles';
+import { CycleAnalyzer, CycleHandlingStrategy } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
-import { ComponentResolutionRegistry, DependencyTracker } from '../../incremental/api';
+import { DependencyTracker } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
 import { ClassPropertyMapping, ComponentResources, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry, ResourceRegistry } from '../../metadata';
+import { SemanticDepGraphUpdater, SemanticSymbol } from '../../ngmodule_semantics';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry, TypeCheckScopeRegistry } from '../../scope';
@@ -20,6 +21,7 @@ import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerF
 import { TemplateSourceMapping, TypeCheckContext } from '../../typecheck/api';
 import { SubsetOfKeys } from '../../util/src/typescript';
 import { ResourceLoader } from './api';
+import { DirectiveSymbol } from './directive';
 /**
  * These fields of `R3ComponentMetadata` are updated in the `resolve` phase.
  *
@@ -84,9 +86,18 @@ export declare const enum ResourceTypeForDiagnostics {
     StylesheetFromDecorator = 2
 }
 /**
+ * Represents an Angular component.
+ */
+export declare class ComponentSymbol extends DirectiveSymbol {
+    usedDirectives: SemanticSymbol[];
+    usedPipes: SemanticSymbol[];
+    isRemotelyScoped: boolean;
+    isEmitAffected(previousSymbol: SemanticSymbol, publicApiAffected: Set<SemanticSymbol>): boolean;
+}
+/**
  * `DecoratorHandler` which handles the `@Component` annotation.
  */
-export declare class ComponentDecoratorHandler implements DecoratorHandler<Decorator, ComponentAnalysisData, ComponentResolutionData> {
+export declare class ComponentDecoratorHandler implements DecoratorHandler<Decorator, ComponentAnalysisData, ComponentSymbol, ComponentResolutionData> {
     private reflector;
     private evaluator;
     private metaRegistry;
@@ -105,13 +116,14 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private i18nNormalizeLineEndingsInICUs;
     private moduleResolver;
     private cycleAnalyzer;
+    private cycleHandlingStrategy;
     private refEmitter;
     private defaultImportRecorder;
     private depTracker;
     private injectableRegistry;
-    private componentResolutionRegistry;
+    private semanticDepGraphUpdater;
     private annotateForClosureCompiler;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, componentResolutionRegistry: ComponentResolutionRegistry, annotateForClosureCompiler: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean);
     private literalCache;
     private elementSchemaRegistry;
     /**
@@ -125,10 +137,11 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     preanalyze(node: ClassDeclaration, decorator: Readonly<Decorator>): Promise<void> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>, flags?: HandlerFlags): AnalysisOutput<ComponentAnalysisData>;
+    symbol(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): ComponentSymbol;
     register(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
     index(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): null | undefined;
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: Readonly<ComponentAnalysisData>): void;
-    resolve(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): ResolveResult<ComponentResolutionData>;
+    resolve(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, symbol: ComponentSymbol): ResolveResult<ComponentResolutionData>;
     updateResources(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
     compileFull(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): CompileResult[];
@@ -143,7 +156,13 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private _parseTemplate;
     private parseTemplateDeclaration;
     private _expressionToImportedFile;
-    private _isCyclicImport;
+    /**
+     * Check whether adding an import from `origin` to the source-file corresponding to `expr` would
+     * create a cyclic import.
+     *
+     * @returns a `Cycle` object if a cycle would be created, otherwise `null`.
+     */
+    private _checkForCyclicImport;
     private _recordSyntheticImport;
     /**
      * Resolve the url of a resource relative to the file that contains the reference to it.

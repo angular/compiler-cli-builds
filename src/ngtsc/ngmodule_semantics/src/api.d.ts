@@ -1,18 +1,6 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/ngmodule_semantics/src/api" />
-/**
- * @license
- * Copyright Google LLC All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 import { AbsoluteFsPath } from '../../file_system';
 import { ClassDeclaration } from '../../reflection';
-/**
- * Resolves the declaration to its semantic symbol. If no semantic symbol is available then an
- * `UnresolvedSymbol` that represents `decl` is returned.
- */
-export declare type SymbolResolver = (decl: ClassDeclaration) => SemanticSymbol;
 /**
  * Represents a symbol that is recognizable across incremental rebuilds, which enables the captured
  * metadata to be compared to the prior compilation. This allows for semantic understanding of
@@ -21,13 +9,13 @@ export declare type SymbolResolver = (decl: ClassDeclaration) => SemanticSymbol;
  */
 export declare abstract class SemanticSymbol {
     /**
-     * The path of the file that declares this symbol.
-     */
-    readonly path: AbsoluteFsPath;
-    /**
      * The declaration for this symbol.
      */
     readonly decl: ClassDeclaration;
+    /**
+     * The path of the file that declares this symbol.
+     */
+    readonly path: AbsoluteFsPath;
     /**
      * The identifier of this symbol, or null if no identifier could be determined. It should
      * uniquely identify the symbol relative to `file`. This is typically just the name of a
@@ -40,33 +28,16 @@ export declare abstract class SemanticSymbol {
     readonly identifier: string | null;
     constructor(
     /**
-     * The path of the file that declares this symbol.
-     */
-    path: AbsoluteFsPath, 
-    /**
      * The declaration for this symbol.
      */
-    decl: ClassDeclaration, 
+    decl: ClassDeclaration);
     /**
-     * The identifier of this symbol, or null if no identifier could be determined. It should
-     * uniquely identify the symbol relative to `file`. This is typically just the name of a
-     * top-level class declaration, as that uniquely identifies the class within the file.
+     * Allows the symbol to be compared to the equivalent symbol in the previous compilation. The
+     * return value indicates whether the symbol has been changed in a way such that its public API
+     * is affected.
      *
-     * If the identifier is null, then this symbol cannot be recognized across rebuilds. In that
-     * case, the symbol is always assumed to have semantically changed to guarantee a proper
-     * rebuild.
-     */
-    identifier: string | null);
-    /**
-     * Allows the symbol to connect itself to other symbols. This is called for all registered
-     * symbols, before the symbol is compared against its previous symbol in `diff`.
-     *
-     * @param resolve A function to obtain the symbol for a declaration.
-     */
-    connect?(resolve: SymbolResolver): void;
-    /**
-     * Allows the symbol to be compared to the symbol that had the same identifier in the previous
-     * compilation. The return value indicates how the changes affect the current compilation.
+     * This method determines whether a change to _this_ symbol require the symbols that
+     * use to this symbol to be re-emitted.
      *
      * Note: `previousSymbol` is obtained from the most recently succeeded compilation. Symbols of
      * failed compilations are never provided.
@@ -77,6 +48,9 @@ export declare abstract class SemanticSymbol {
     /**
      * Allows the symbol to determine whether its emit is affected. The equivalent symbol from a prior
      * build is given, in addition to the set of symbols of which the public API has changed.
+     *
+     * This method determines whether a change to _other_ symbols, i.e. those present in
+     * `publicApiAffected`, should cause _this_ symbol to be re-emitted.
      *
      * @param previousSymbol The equivalent symbol from a prior compilation. Note that it may be a
      * different type of symbol, if e.g. a Component was changed into a Directive with the same name.

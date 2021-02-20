@@ -9,6 +9,7 @@
 import { R3PipeMetadata, Statement } from '@angular/compiler';
 import { DefaultImportRecorder } from '../../imports';
 import { InjectableClassRegistry, MetadataRegistry } from '../../metadata';
+import { SemanticSymbol } from '../../ngmodule_semantics';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
@@ -17,7 +18,15 @@ export interface PipeHandlerData {
     meta: R3PipeMetadata;
     metadataStmt: Statement | null;
 }
-export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator, PipeHandlerData, unknown> {
+/**
+ * Represents an Angular pipe.
+ */
+export declare class PipeSymbol extends SemanticSymbol {
+    readonly name: string;
+    constructor(decl: ClassDeclaration, name: string);
+    isPublicApiAffected(previousSymbol: SemanticSymbol): boolean;
+}
+export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator, PipeHandlerData, PipeSymbol, unknown> {
     private reflector;
     private evaluator;
     private metaRegistry;
@@ -30,6 +39,7 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator,
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(clazz: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<PipeHandlerData>;
+    symbol(node: ClassDeclaration, analysis: Readonly<PipeHandlerData>): PipeSymbol;
     register(node: ClassDeclaration, analysis: Readonly<PipeHandlerData>): void;
     resolve(node: ClassDeclaration): ResolveResult<unknown>;
     compileFull(node: ClassDeclaration, analysis: Readonly<PipeHandlerData>): CompileResult[];

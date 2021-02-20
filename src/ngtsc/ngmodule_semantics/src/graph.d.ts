@@ -1,7 +1,12 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/ngmodule_semantics/src/graph" />
 import { AbsoluteFsPath } from '../../file_system';
-import { ComponentResolutionRegistry } from '../../incremental/api';
-import { DirectiveMeta, NgModuleMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 import { SemanticSymbol } from './api';
 export interface SemanticDependencyResult {
@@ -13,6 +18,15 @@ export interface SemanticDependencyResult {
      * The newly built graph that represents the current compilation.
      */
     newGraph: SemanticDepGraph;
+}
+/**
+ * Represents a declaration for which no semantic symbol has been registered. For example,
+ * declarations from external dependencies have not been explicitly registered and are represented
+ * by this symbol. This allows the unresolved symbol to still be compared to a symbol from a prior
+ * compilation.
+ */
+export declare class OpaqueSymbol extends SemanticSymbol {
+    isPublicApiAffected(): false;
 }
 /**
  * The semantic dependency graph of a single compilation.
@@ -27,10 +41,9 @@ export declare class SemanticDepGraph {
      * identifier are only able to find themselves in a prior graph if their declaration node is
      * identical.
      *
-     * @param decl
-     * @param factory
+     * @param symbol
      */
-    registerSymbol(decl: ClassDeclaration, factory: (path: AbsoluteFsPath, decl: ClassDeclaration, identifier: string | null) => SemanticSymbol): void;
+    registerSymbol(symbol: SemanticSymbol): void;
     /**
      * Attempts to resolve a symbol in this graph that represents the given symbol from another graph.
      * If no matching symbol could be found, null is returned.
@@ -52,7 +65,7 @@ export declare class SemanticDepGraph {
  * Implements the logic to go from a previous dependency graph to a new one, along with information
  * on which files have been affected.
  */
-export declare class SemanticDepGraphUpdater implements ComponentResolutionRegistry {
+export declare class SemanticDepGraphUpdater {
     /**
      * The semantic dependency graph of the most recently succeeded compilation, or null if this
      * is the initial build.
@@ -60,35 +73,27 @@ export declare class SemanticDepGraphUpdater implements ComponentResolutionRegis
     private priorGraph;
     private readonly newGraph;
     /**
-     * Contains unresolved symbols that were created for declarations for which there was no symbol
+     * Contains opaque symbols that were created for declarations for which there was no symbol
      * registered, which happens for e.g. external declarations.
      */
-    private readonly unresolvedSymbols;
+    private readonly opaqueSymbols;
     constructor(
     /**
      * The semantic dependency graph of the most recently succeeded compilation, or null if this
      * is the initial build.
      */
     priorGraph: SemanticDepGraph | null);
-    addNgModule(metadata: NgModuleMeta): void;
-    addDirective(metadata: DirectiveMeta): void;
-    addPipe(metadata: PipeMeta): void;
-    register(component: ClassDeclaration, usedDirectives: ClassDeclaration[], usedPipes: ClassDeclaration[], isRemotelyScoped: boolean): void;
+    registerSymbol(symbol: SemanticSymbol): void;
     /**
      * Takes all facts that have been gathered to create a new semantic dependency graph. In this
      * process, the semantic impact of the changes is determined which results in a set of files that
      * need to be emitted and/or type-checked.
      */
     finalize(): SemanticDependencyResult;
-    /**
-     * Implements the first phase of the semantic invalidation algorithm by connecting all symbols
-     * together.
-     */
-    private connect;
     private determineInvalidatedFiles;
-    private getSymbol;
+    getSymbol(decl: ClassDeclaration): SemanticSymbol;
     /**
-     * Gets or creates an `UnresolvedSymbol` for the provided class declaration.
+     * Gets or creates an `OpaqueSymbol` for the provided class declaration.
      */
-    private getUnresolvedSymbol;
+    private getOpaqueSymbol;
 }

@@ -1,4 +1,5 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/analysis/decoration_analyzer" />
+import { SemanticSymbol } from '@angular/compiler-cli/src/ngtsc/ngmodule_semantics/src/api';
 import * as ts from 'typescript';
 import { ParsedConfiguration } from '../../..';
 import { ReferencesRegistry, ResourceLoader } from '../../../src/ngtsc/annotations';
@@ -58,7 +59,7 @@ export declare class DecorationAnalyzer {
     cycleAnalyzer: CycleAnalyzer;
     injectableRegistry: InjectableClassRegistry;
     typeCheckScopeRegistry: TypeCheckScopeRegistry;
-    handlers: DecoratorHandler<unknown, unknown, unknown>[];
+    handlers: DecoratorHandler<unknown, unknown, SemanticSymbol | null, unknown>[];
     compiler: NgccTraitCompiler;
     migrations: Migration[];
     constructor(fs: ReadonlyFileSystem, bundle: EntryPointBundle, reflectionHost: NgccReflectionHost, referencesRegistry: ReferencesRegistry, diagnosticHandler?: (error: ts.Diagnostic) => void, tsConfig?: ParsedConfiguration | null);

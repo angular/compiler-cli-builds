@@ -10,6 +10,7 @@ import { ConstantPool, ParsedHostBindings, R3DirectiveMetadata, R3QueryMetadata,
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference } from '../../imports';
 import { ClassPropertyMapping, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
+import { SemanticSymbol } from '../../ngmodule_semantics';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
@@ -25,7 +26,19 @@ export interface DirectiveHandlerData {
     isPoisoned: boolean;
     isStructural: boolean;
 }
-export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decorator | null, DirectiveHandlerData, unknown> {
+/**
+ * Represents an Angular directive. Components are represented by `ComponentSymbol`, which inherits
+ * from this symbol.
+ */
+export declare class DirectiveSymbol extends SemanticSymbol {
+    readonly selector: string | null;
+    readonly inputs: string[];
+    readonly outputs: string[];
+    readonly exportAs: string[] | null;
+    constructor(decl: ClassDeclaration, selector: string | null, inputs: string[], outputs: string[], exportAs: string[] | null);
+    isPublicApiAffected(previousSymbol: SemanticSymbol): boolean;
+}
+export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decorator | null, DirectiveHandlerData, DirectiveSymbol, unknown> {
     private reflector;
     private evaluator;
     private metaRegistry;
@@ -41,6 +54,7 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator | null>, flags?: HandlerFlags): AnalysisOutput<DirectiveHandlerData>;
+    symbol(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>): DirectiveSymbol;
     register(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>): void;
     resolve(node: ClassDeclaration, analysis: DirectiveHandlerData): ResolveResult<unknown>;
     compileFull(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>, resolution: Readonly<unknown>, pool: ConstantPool): CompileResult[];
