@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/ngmodule_semantics/src/graph" />
+import { Expression } from '@angular/compiler';
 import { AbsoluteFsPath } from '../../file_system';
 import { ClassDeclaration } from '../../reflection';
-import { SemanticSymbol } from './api';
+import { SemanticReference, SemanticSymbol } from './api';
 export interface SemanticDependencyResult {
     /**
      * The files that need to be re-emitted.
@@ -91,6 +92,7 @@ export declare class SemanticDepGraphUpdater {
      */
     finalize(): SemanticDependencyResult;
     private determineInvalidatedFiles;
+    getSemanticReference(decl: ClassDeclaration, expr: Expression): SemanticReference;
     getSymbol(decl: ClassDeclaration): SemanticSymbol;
     /**
      * Gets or creates an `OpaqueSymbol` for the provided class declaration.

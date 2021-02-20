@@ -1,6 +1,14 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/ngmodule_semantics/src/api" />
 import { AbsoluteFsPath } from '../../file_system';
 import { ClassDeclaration } from '../../reflection';
+export interface SemanticReference {
+    symbol: SemanticSymbol;
+    /**
+     * The name by which the symbol has been referenced. This may differ from the symbols own name due
+     * to exports.
+     */
+    importPath: string | null;
+}
 /**
  * Represents a symbol that is recognizable across incremental rebuilds, which enables the captured
  * metadata to be compared to the prior compilation. This allows for semantic understanding of

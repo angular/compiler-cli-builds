@@ -10,7 +10,7 @@ import { Expression, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata, Sta
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
-import { SemanticSymbol } from '../../ngmodule_semantics/src/api';
+import { SemanticReference, SemanticSymbol } from '../../ngmodule_semantics';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { NgModuleRouteAnalyzer } from '../../routing';
@@ -42,7 +42,7 @@ export declare class NgModuleSymbol extends SemanticSymbol {
     private remotelyScopedComponents;
     isPublicApiAffected(previousSymbol: SemanticSymbol): boolean;
     isEmitAffected(previousSymbol: SemanticSymbol): boolean;
-    addRemotelyScopedComponent(component: SemanticSymbol, usedDirectives: SemanticSymbol[], usedPipes: SemanticSymbol[]): void;
+    addRemotelyScopedComponent(component: SemanticSymbol, usedDirectives: SemanticReference[], usedPipes: SemanticReference[]): void;
 }
 /**
  * Compiles @NgModule annotations to ngModuleDef fields.

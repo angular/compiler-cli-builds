@@ -11,6 +11,7 @@ import { SemanticSymbol } from './api';
  * Determines whether the provided symbols represent the same declaration.
  */
 export declare function isSymbolEqual(a: SemanticSymbol, b: SemanticSymbol): boolean;
+export declare function isImportPathEqual(a: string | null, b: string | null): boolean;
 export declare function referenceEquality<T>(a: T, b: T): boolean;
 /**
  * Determines if the provided arrays are equal to each other, using the provided equality tester

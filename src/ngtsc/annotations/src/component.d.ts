@@ -13,7 +13,7 @@ import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } fr
 import { DependencyTracker } from '../../incremental/api';
 import { IndexingContext } from '../../indexer';
 import { ClassPropertyMapping, ComponentResources, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry, ResourceRegistry } from '../../metadata';
-import { SemanticDepGraphUpdater, SemanticSymbol } from '../../ngmodule_semantics';
+import { SemanticDepGraphUpdater, SemanticReference, SemanticSymbol } from '../../ngmodule_semantics';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry, TypeCheckScopeRegistry } from '../../scope';
@@ -89,8 +89,8 @@ export declare const enum ResourceTypeForDiagnostics {
  * Represents an Angular component.
  */
 export declare class ComponentSymbol extends DirectiveSymbol {
-    usedDirectives: SemanticSymbol[];
-    usedPipes: SemanticSymbol[];
+    usedDirectives: SemanticReference[];
+    usedPipes: SemanticReference[];
     isRemotelyScoped: boolean;
     isEmitAffected(previousSymbol: SemanticSymbol, publicApiAffected: Set<SemanticSymbol>): boolean;
 }
