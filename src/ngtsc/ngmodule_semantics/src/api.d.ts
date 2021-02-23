@@ -1,14 +1,6 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/ngmodule_semantics/src/api" />
 import { AbsoluteFsPath } from '../../file_system';
 import { ClassDeclaration } from '../../reflection';
-export interface SemanticReference {
-    symbol: SemanticSymbol;
-    /**
-     * The name by which the symbol has been referenced. This may differ from the symbols own name due
-     * to exports.
-     */
-    importPath: string | null;
-}
 /**
  * Represents a symbol that is recognizable across incremental rebuilds, which enables the captured
  * metadata to be compared to the prior compilation. This allows for semantic understanding of
@@ -65,4 +57,19 @@ export declare abstract class SemanticSymbol {
      * @param publicApiAffected The set of symbols which of which the public API has changed.
      */
     isEmitAffected?(previousSymbol: SemanticSymbol, publicApiAffected: Set<SemanticSymbol>): boolean;
+}
+/**
+ * Represents a reference to a semantic symbol that has been emitted into a source file. The
+ * reference may refer to the symbol using a different name than the semantic symbol's declared
+ * name, e.g. in case a re-export under a different name was chosen by a reference emitter.
+ * Consequently, to know that an emitted reference is still valid not only requires that the
+ * semantic symbol is still valid, but also that the path by which the symbol is imported has not
+ * changed.
+ */
+export interface SemanticReference {
+    symbol: SemanticSymbol;
+    /**
+     * The path by which the symbol has been referenced.
+     */
+    importPath: string | null;
 }

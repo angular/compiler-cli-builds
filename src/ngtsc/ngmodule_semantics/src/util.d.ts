@@ -6,12 +6,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { SemanticSymbol } from './api';
+import { SemanticReference, SemanticSymbol } from './api';
 /**
  * Determines whether the provided symbols represent the same declaration.
  */
 export declare function isSymbolEqual(a: SemanticSymbol, b: SemanticSymbol): boolean;
-export declare function isImportPathEqual(a: string | null, b: string | null): boolean;
+/**
+ * Determines whether the provided references to a semantic symbol are still equal, i.e. represent
+ * the same symbol and are imported by the same path.
+ */
+export declare function isReferenceEqual(a: SemanticReference, b: SemanticReference): boolean;
 export declare function referenceEquality<T>(a: T, b: T): boolean;
 /**
  * Determines if the provided arrays are equal to each other, using the provided equality tester

@@ -8,4 +8,4 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/ngmodule_semantics" />
 export { SemanticReference, SemanticSymbol } from './src/api';
 export { SemanticDepGraph, SemanticDepGraphUpdater } from './src/graph';
-export { isArrayEqual, isImportPathEqual, isSymbolEqual } from './src/util';
+export { isArrayEqual, isReferenceEqual, isSymbolEqual } from './src/util';
