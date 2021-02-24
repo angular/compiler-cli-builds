@@ -8,8 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/pipe" />
 import { R3PipeMetadata, Statement } from '@angular/compiler';
 import { DefaultImportRecorder } from '../../imports';
+import { SemanticSymbol } from '../../incremental/semantic_graph';
 import { InjectableClassRegistry, MetadataRegistry } from '../../metadata';
-import { SemanticSymbol } from '../../ngmodule_semantics';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';

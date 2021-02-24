@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/trait" />
 import * as ts from 'typescript';
-import { SemanticSymbol } from '../../ngmodule_semantics';
+import { SemanticSymbol } from '../../incremental/semantic_graph';
 import { DecoratorHandler, DetectResult } from './api';
 export declare enum TraitState {
     /**

@@ -9,8 +9,8 @@
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
 import { IncrementalBuild } from '../../incremental/api';
+import { SemanticDepGraphUpdater, SemanticSymbol } from '../../incremental/semantic_graph';
 import { IndexingContext } from '../../indexer';
-import { SemanticDepGraphUpdater, SemanticSymbol } from '../../ngmodule_semantics';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, DeclarationNode, Decorator, ReflectionHost } from '../../reflection';
 import { ProgramTypeCheckAdapter, TypeCheckContext } from '../../typecheck/api';

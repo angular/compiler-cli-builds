@@ -9,8 +9,8 @@
 import { ConstantPool, Expression, Statement, Type } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Reexport } from '../../imports';
+import { SemanticSymbol } from '../../incremental/semantic_graph';
 import { IndexingContext } from '../../indexer';
-import { SemanticSymbol } from '../../ngmodule_semantics/src/api';
 import { ClassDeclaration, Decorator } from '../../reflection';
 import { ImportManager } from '../../translator';
 import { TypeCheckContext } from '../../typecheck/api';

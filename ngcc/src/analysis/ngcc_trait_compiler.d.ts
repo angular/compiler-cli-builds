@@ -6,8 +6,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { SemanticSymbol } from '@angular/compiler-cli/src/ngtsc/ngmodule_semantics/src/api';
 import * as ts from 'typescript';
+import { SemanticSymbol } from '../../../src/ngtsc/incremental/semantic_graph';
 import { ClassDeclaration, Decorator } from '../../../src/ngtsc/reflection';
 import { DecoratorHandler, HandlerFlags, Trait, TraitCompiler } from '../../../src/ngtsc/transform';
 import { NgccReflectionHost } from '../host/ngcc_host';

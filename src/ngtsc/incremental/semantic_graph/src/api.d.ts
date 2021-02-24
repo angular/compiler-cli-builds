@@ -1,6 +1,6 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/ngmodule_semantics/src/api" />
-import { AbsoluteFsPath } from '../../file_system';
-import { ClassDeclaration } from '../../reflection';
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api" />
+import { AbsoluteFsPath } from '../../../file_system';
+import { ClassDeclaration } from '../../../reflection';
 /**
  * Represents a symbol that is recognizable across incremental rebuilds, which enables the captured
  * metadata to be compared to the prior compilation. This allows for semantic understanding of

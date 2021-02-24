@@ -8,10 +8,10 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/src/state" />
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
-import { SemanticDepGraphUpdater } from '../../ngmodule_semantics';
 import { ClassRecord, TraitCompiler } from '../../transform';
 import { FileTypeCheckingData } from '../../typecheck/src/checker';
 import { IncrementalBuild } from '../api';
+import { SemanticDepGraphUpdater } from '../semantic_graph';
 import { FileDependencyGraph } from './dependency_tracking';
 /**
  * Drives an incremental build, by tracking changes and determining which files need to be emitted.
