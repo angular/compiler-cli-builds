@@ -26,6 +26,10 @@ export interface DirectiveHandlerData {
     isPoisoned: boolean;
     isStructural: boolean;
 }
+export interface SemanticTypeParameter {
+    hasGenericTypeBound: boolean;
+}
+export declare function extractSemanticTypeParameters(node: ClassDeclaration): SemanticTypeParameter[] | null;
 /**
  * Represents an Angular directive. Components are represented by `ComponentSymbol`, which inherits
  * from this symbol.
@@ -35,8 +39,10 @@ export declare class DirectiveSymbol extends SemanticSymbol {
     readonly inputs: string[];
     readonly outputs: string[];
     readonly exportAs: string[] | null;
-    constructor(decl: ClassDeclaration, selector: string | null, inputs: string[], outputs: string[], exportAs: string[] | null);
+    readonly typeParameters: SemanticTypeParameter[] | null;
+    constructor(decl: ClassDeclaration, selector: string | null, inputs: string[], outputs: string[], exportAs: string[] | null, typeParameters: SemanticTypeParameter[] | null);
     isPublicApiAffected(previousSymbol: SemanticSymbol): boolean;
+    isTypeCheckEmitAffected(previousSymbol: SemanticSymbol): boolean;
 }
 export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decorator | null, DirectiveHandlerData, DirectiveSymbol, unknown> {
     private reflector;

@@ -15,6 +15,7 @@ export interface SemanticDependencyResult {
      * The files that need to be re-emitted.
      */
     needsEmit: Set<AbsoluteFsPath>;
+    needsTypeCheckEmit: Set<AbsoluteFsPath>;
     /**
      * The newly built graph that represents the current compilation.
      */
@@ -28,6 +29,7 @@ export interface SemanticDependencyResult {
  */
 export declare class OpaqueSymbol extends SemanticSymbol {
     isPublicApiAffected(): false;
+    isTypeCheckEmitAffected(): false;
 }
 /**
  * The semantic dependency graph of a single compilation.
@@ -92,6 +94,7 @@ export declare class SemanticDepGraphUpdater {
      */
     finalize(): SemanticDependencyResult;
     private determineInvalidatedFiles;
+    private determineInvalidatedTypeCheckFiles;
     getSemanticReference(decl: ClassDeclaration, expr: Expression): SemanticReference;
     getSymbol(decl: ClassDeclaration): SemanticSymbol;
     /**

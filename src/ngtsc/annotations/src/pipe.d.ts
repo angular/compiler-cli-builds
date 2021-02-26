@@ -25,6 +25,7 @@ export declare class PipeSymbol extends SemanticSymbol {
     readonly name: string;
     constructor(decl: ClassDeclaration, name: string);
     isPublicApiAffected(previousSymbol: SemanticSymbol): boolean;
+    isTypeCheckEmitAffected(previousSymbol: SemanticSymbol): boolean;
 }
 export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator, PipeHandlerData, PipeSymbol, unknown> {
     private reflector;
