@@ -45,7 +45,6 @@ export declare abstract class SemanticSymbol {
      * @param previousSymbol The symbol from a prior compilation.
      */
     abstract isPublicApiAffected(previousSymbol: SemanticSymbol): boolean;
-    abstract isTypeCheckEmitAffected(previousSymbol: SemanticSymbol): boolean;
     /**
      * Allows the symbol to determine whether its emit is affected. The equivalent symbol from a prior
      * build is given, in addition to the set of symbols of which the public API has changed.
@@ -58,6 +57,8 @@ export declare abstract class SemanticSymbol {
      * @param publicApiAffected The set of symbols which of which the public API has changed.
      */
     isEmitAffected?(previousSymbol: SemanticSymbol, publicApiAffected: Set<SemanticSymbol>): boolean;
+    abstract isTypeCheckApiAffected(previousSymbol: SemanticSymbol): boolean;
+    isTypeCheckBlockAffected?(previousSymbol: SemanticSymbol, typeCheckApiAffected: Set<SemanticSymbol>): boolean;
 }
 /**
  * Represents a reference to a semantic symbol that has been emitted into a source file. The

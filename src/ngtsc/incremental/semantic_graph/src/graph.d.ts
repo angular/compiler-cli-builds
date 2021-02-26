@@ -29,7 +29,7 @@ export interface SemanticDependencyResult {
  */
 export declare class OpaqueSymbol extends SemanticSymbol {
     isPublicApiAffected(): false;
-    isTypeCheckEmitAffected(): false;
+    isTypeCheckApiAffected(): false;
 }
 /**
  * The semantic dependency graph of a single compilation.

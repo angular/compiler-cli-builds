@@ -40,9 +40,10 @@ export declare class DirectiveSymbol extends SemanticSymbol {
     readonly outputs: string[];
     readonly exportAs: string[] | null;
     readonly typeParameters: SemanticTypeParameter[] | null;
+    baseClass: SemanticSymbol | null;
     constructor(decl: ClassDeclaration, selector: string | null, inputs: string[], outputs: string[], exportAs: string[] | null, typeParameters: SemanticTypeParameter[] | null);
     isPublicApiAffected(previousSymbol: SemanticSymbol): boolean;
-    isTypeCheckEmitAffected(previousSymbol: SemanticSymbol): boolean;
+    isTypeCheckApiAffected(previousSymbol: SemanticSymbol): boolean;
 }
 export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decorator | null, DirectiveHandlerData, DirectiveSymbol, unknown> {
     private reflector;

@@ -42,7 +42,7 @@ export declare class NgModuleSymbol extends SemanticSymbol {
     private remotelyScopedComponents;
     isPublicApiAffected(previousSymbol: SemanticSymbol): boolean;
     isEmitAffected(previousSymbol: SemanticSymbol): boolean;
-    isTypeCheckEmitAffected(previousSymbol: SemanticSymbol): boolean;
+    isTypeCheckApiAffected(previousSymbol: SemanticSymbol): boolean;
     addRemotelyScopedComponent(component: SemanticSymbol, usedDirectives: SemanticReference[], usedPipes: SemanticReference[]): void;
 }
 /**

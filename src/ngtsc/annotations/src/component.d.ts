@@ -93,6 +93,7 @@ export declare class ComponentSymbol extends DirectiveSymbol {
     usedPipes: SemanticReference[];
     isRemotelyScoped: boolean;
     isEmitAffected(previousSymbol: SemanticSymbol, publicApiAffected: Set<SemanticSymbol>): boolean;
+    isTypeCheckBlockAffected(previousSymbol: SemanticSymbol, typeCheckApiAffected: Set<SemanticSymbol>): boolean;
 }
 /**
  * `DecoratorHandler` which handles the `@Component` annotation.
