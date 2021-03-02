@@ -8,4 +8,5 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/semantic_graph" />
 export { SemanticReference, SemanticSymbol } from './src/api';
 export { SemanticDepGraph, SemanticDepGraphUpdater } from './src/graph';
-export { isArrayEqual, isReferenceEqual, isSymbolEqual } from './src/util';
+export { areTypeParametersEqual, extractSemanticTypeParameters, SemanticTypeParameter } from './src/type_parameters';
+export { isArrayEqual, isReferenceEqual, isSetEqual, isSymbolEqual } from './src/util';

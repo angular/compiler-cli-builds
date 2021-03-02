@@ -15,21 +15,14 @@ export interface SemanticDependencyResult {
      * The files that need to be re-emitted.
      */
     needsEmit: Set<AbsoluteFsPath>;
+    /**
+     * The files for which the type-check block should be regenerated.
+     */
     needsTypeCheckEmit: Set<AbsoluteFsPath>;
     /**
      * The newly built graph that represents the current compilation.
      */
     newGraph: SemanticDepGraph;
-}
-/**
- * Represents a declaration for which no semantic symbol has been registered. For example,
- * declarations from external dependencies have not been explicitly registered and are represented
- * by this symbol. This allows the unresolved symbol to still be compared to a symbol from a prior
- * compilation.
- */
-export declare class OpaqueSymbol extends SemanticSymbol {
-    isPublicApiAffected(): false;
-    isTypeCheckApiAffected(): false;
 }
 /**
  * The semantic dependency graph of a single compilation.
@@ -38,13 +31,10 @@ export declare class SemanticDepGraph {
     readonly files: Map<import("@angular/compiler-cli/src/ngtsc/file_system/src/types").BrandedPath<"AbsoluteFsPath">, Map<string, SemanticSymbol>>;
     readonly symbolByDecl: Map<ClassDeclaration<import("@angular/compiler-cli/src/ngtsc/reflection").DeclarationNode>, SemanticSymbol>;
     /**
-     * Registers a symbol for the provided declaration as created by the factory function. The symbol
-     * is given a unique identifier if possible, such that its equivalent symbol can be obtained from
-     * a prior graph even if its declaration node has changed across rebuilds. Symbols without an
-     * identifier are only able to find themselves in a prior graph if their declaration node is
-     * identical.
-     *
-     * @param symbol
+     * Registers a symbol in the graph. The symbol is given a unique identifier if possible, such that
+     * its equivalent symbol can be obtained from a prior graph even if its declaration node has
+     * changed across rebuilds. Symbols without an identifier are only able to find themselves in a
+     * prior graph if their declaration node is identical.
      */
     registerSymbol(symbol: SemanticSymbol): void;
     /**
@@ -86,6 +76,9 @@ export declare class SemanticDepGraphUpdater {
      * is the initial build.
      */
     priorGraph: SemanticDepGraph | null);
+    /**
+     * Registers the symbol in the new graph that is being created.
+     */
     registerSymbol(symbol: SemanticSymbol): void;
     /**
      * Takes all facts that have been gathered to create a new semantic dependency graph. In this
@@ -95,7 +88,15 @@ export declare class SemanticDepGraphUpdater {
     finalize(): SemanticDependencyResult;
     private determineInvalidatedFiles;
     private determineInvalidatedTypeCheckFiles;
+    /**
+     * Creates a `SemanticReference` for the reference to `decl` using the expression `expr`. See
+     * the documentation of `SemanticReference` for details.
+     */
     getSemanticReference(decl: ClassDeclaration, expr: Expression): SemanticReference;
+    /**
+     * Gets the `SemanticSymbol` that was registered for `decl` during the current compilation, or
+     * returns an opaque symbol that represents `decl`.
+     */
     getSymbol(decl: ClassDeclaration): SemanticSymbol;
     /**
      * Gets or creates an `OpaqueSymbol` for the provided class declaration.

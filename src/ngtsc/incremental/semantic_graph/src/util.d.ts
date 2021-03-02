@@ -22,3 +22,8 @@ export declare function referenceEquality<T>(a: T, b: T): boolean;
  * that is called for all entries in the array.
  */
 export declare function isArrayEqual<T>(a: readonly T[] | null, b: readonly T[] | null, equalityTester?: (a: T, b: T) => boolean): boolean;
+/**
+ * Determines if the provided sets are equal to each other, using the provided equality tester.
+ * Sets that only differ in ordering are considered equal.
+ */
+export declare function isSetEqual<T>(a: ReadonlySet<T> | null, b: ReadonlySet<T> | null, equalityTester?: (a: T, b: T) => boolean): boolean;
