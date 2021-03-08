@@ -9,6 +9,7 @@
 import { Expression, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
+import { SemanticReference, SemanticSymbol } from '../../incremental/semantic_graph';
 import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
@@ -35,11 +36,21 @@ export interface NgModuleResolution {
     injectorImports: Expression[];
 }
 /**
+ * Represents an Angular NgModule.
+ */
+export declare class NgModuleSymbol extends SemanticSymbol {
+    private remotelyScopedComponents;
+    isPublicApiAffected(previousSymbol: SemanticSymbol): boolean;
+    isEmitAffected(previousSymbol: SemanticSymbol): boolean;
+    isTypeCheckApiAffected(previousSymbol: SemanticSymbol): boolean;
+    addRemotelyScopedComponent(component: SemanticSymbol, usedDirectives: SemanticReference[], usedPipes: SemanticReference[]): void;
+}
+/**
  * Compiles @NgModule annotations to ngModuleDef fields.
  *
  * TODO(alxhub): handle injector side of things as well.
  */
-export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decorator, NgModuleAnalysis, NgModuleResolution> {
+export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decorator, NgModuleAnalysis, NgModuleSymbol, NgModuleResolution> {
     private reflector;
     private evaluator;
     private metaReader;
@@ -59,6 +70,7 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<NgModuleAnalysis>;
+    symbol(node: ClassDeclaration): NgModuleSymbol;
     register(node: ClassDeclaration, analysis: NgModuleAnalysis): void;
     resolve(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>): ResolveResult<NgModuleResolution>;
     compileFull(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>, resolution: Readonly<NgModuleResolution>): CompileResult[];

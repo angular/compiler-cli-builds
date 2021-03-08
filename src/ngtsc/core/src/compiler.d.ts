@@ -220,11 +220,6 @@ export declare class NgCompiler {
     private getTemplateDiagnostics;
     private getTemplateDiagnosticsForFile;
     private getNonTemplateDiagnostics;
-    /**
-     * Reifies the inter-dependencies of NgModules and the components within their compilation scopes
-     * into the `IncrementalDriver`'s dependency graph.
-     */
-    private recordNgModuleScopeDependencies;
     private scanForMwp;
     private makeCompilation;
 }
