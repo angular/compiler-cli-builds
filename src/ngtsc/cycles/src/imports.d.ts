@@ -7,7 +7,6 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/cycles/src/imports" />
 import * as ts from 'typescript';
-import { ModuleResolver } from '../../imports';
 /**
  * A cached graph of imports in the `ts.Program`.
  *
@@ -15,9 +14,9 @@ import { ModuleResolver } from '../../imports';
  * dependencies within the same program are tracked; imports into packages on NPM are not.
  */
 export declare class ImportGraph {
-    private resolver;
+    private checker;
     private map;
-    constructor(resolver: ModuleResolver);
+    constructor(checker: ts.TypeChecker);
     /**
      * List the direct (not transitive) imports of a given `ts.SourceFile`.
      *

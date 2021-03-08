@@ -156,7 +156,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private extractTemplate;
     private _parseTemplate;
     private parseTemplateDeclaration;
-    private _expressionToImportedFile;
+    private _resolveImportedFile;
     /**
      * Check whether adding an import from `origin` to the source-file corresponding to `expr` would
      * create a cyclic import.
