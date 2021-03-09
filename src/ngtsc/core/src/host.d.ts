@@ -98,4 +98,5 @@ export declare class NgCompilerHost extends DelegatingCompilerHost implements Re
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
     fileExists(fileName: string): boolean;
     get unifiedModulesHost(): UnifiedModulesHost | null;
+    private createCachedResolveModuleNamesFunction;
 }
