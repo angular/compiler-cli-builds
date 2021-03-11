@@ -39,7 +39,7 @@
      * Also, ranges are matched to include "pre-releases", therefore if the range is `>=11.1.0-next.1`
      * then this includes `11.1.0-next.2` and also `12.0.0-next.1`.
      *
-     * Finally, note that we always start with the current version (i.e. `12.0.0-next.4+7.sha-e1e766a`). This
+     * Finally, note that we always start with the current version (i.e. `12.0.0-next.4+8.sha-f2ca29c`). This
      * allows the linker to work on local builds effectively.
      */
     var PartialLinkerSelector = /** @class */ (function () {
@@ -86,15 +86,15 @@
             var partialPipeLinkerVersion1 = new partial_pipe_linker_1_1.PartialPipeLinkerVersion1();
             var linkers = new Map();
             linkers.set(exports.ɵɵngDeclareDirective, [
-                { range: '12.0.0-next.4+7.sha-e1e766a', linker: partialDirectiveLinkerVersion1 },
+                { range: '12.0.0-next.4+8.sha-f2ca29c', linker: partialDirectiveLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialDirectiveLinkerVersion1 },
             ]);
             linkers.set(exports.ɵɵngDeclareComponent, [
-                { range: '12.0.0-next.4+7.sha-e1e766a', linker: partialComponentLinkerVersion1 },
+                { range: '12.0.0-next.4+8.sha-f2ca29c', linker: partialComponentLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialComponentLinkerVersion1 },
             ]);
             linkers.set(exports.ɵɵngDeclarePipe, [
-                { range: '12.0.0-next.4+7.sha-e1e766a', linker: partialPipeLinkerVersion1 },
+                { range: '12.0.0-next.4+8.sha-f2ca29c', linker: partialPipeLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialPipeLinkerVersion1 },
             ]);
             return linkers;
