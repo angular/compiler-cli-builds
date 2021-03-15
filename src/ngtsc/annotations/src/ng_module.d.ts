@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
-import { Expression, R3DependencyMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata, Statement } from '@angular/compiler';
+import { Expression, R3FactoryMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { SemanticReference, SemanticSymbol } from '../../incremental/semantic_graph';
@@ -21,7 +21,7 @@ import { ReferencesRegistry } from './references_registry';
 export interface NgModuleAnalysis {
     mod: R3NgModuleMetadata;
     inj: R3InjectorMetadata;
-    deps: R3DependencyMetadata[] | null;
+    fac: R3FactoryMetadata;
     metadataStmt: Statement | null;
     declarations: Reference<ClassDeclaration>[];
     rawDeclarations: ts.Expression | null;
@@ -72,7 +72,22 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     symbol(node: ClassDeclaration): NgModuleSymbol;
     register(node: ClassDeclaration, analysis: NgModuleAnalysis): void;
     resolve(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>): ResolveResult<NgModuleResolution>;
-    compileFull(node: ClassDeclaration, { inj, mod, deps, metadataStmt, declarations }: Readonly<NgModuleAnalysis>, resolution: Readonly<NgModuleResolution>): CompileResult[];
+    compileFull(node: ClassDeclaration, { inj, mod, fac, metadataStmt, declarations }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
+    compilePartial(node: ClassDeclaration, { inj, fac, mod, metadataStmt }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
+    /**
+     *  Merge the injector imports (which are 'exports' that were later found to be NgModules)
+     *  computed during resolution with the ones from analysis.
+     */
+    private mergeInjectorImports;
+    /**
+     * Add class metadata statements, if provided, to the `ngModuleStatements`.
+     */
+    private insertMetadataStatement;
+    /**
+     * Add remote scoping statements, as needed, to the `ngModuleStatements`.
+     */
+    private appendRemoteScopingStatements;
+    private compileNgModule;
     private _toR3Reference;
     /**
      * Given a `FunctionDeclaration`, `MethodDeclaration` or `FunctionExpression`, check if it is
