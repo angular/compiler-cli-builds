@@ -402,7 +402,15 @@ export declare enum KnownDeclaration {
     /**
      * Indicates the `__spreadArrays` TypeScript helper function.
      */
-    TsHelperSpreadArrays = 3
+    TsHelperSpreadArrays = 3,
+    /**
+     * Indicates the `__spreadArray` TypeScript helper function.
+     */
+    TsHelperSpreadArray = 4,
+    /**
+     * Indicates the `__read` TypeScript helper function.
+     */
+    TsHelperRead = 5
 }
 /**
  * A parameter to a function or method.
