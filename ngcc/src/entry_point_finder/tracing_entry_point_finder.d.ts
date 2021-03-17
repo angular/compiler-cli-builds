@@ -64,5 +64,5 @@ export declare abstract class TracingEntryPointFinder implements EntryPointFinde
      * This processing can be time-consuming if the path-mappings are complex or extensive.
      * So the result is cached locally once computed.
      */
-    protected getBasePaths(): import("@angular/compiler-cli/src/ngtsc/file_system/src/types").BrandedPath<"AbsoluteFsPath">[];
+    protected getBasePaths(): AbsoluteFsPath[];
 }

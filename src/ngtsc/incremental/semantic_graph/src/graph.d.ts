@@ -28,7 +28,7 @@ export interface SemanticDependencyResult {
  * The semantic dependency graph of a single compilation.
  */
 export declare class SemanticDepGraph {
-    readonly files: Map<import("@angular/compiler-cli/src/ngtsc/file_system/src/types").BrandedPath<"AbsoluteFsPath">, Map<string, SemanticSymbol>>;
+    readonly files: Map<AbsoluteFsPath, Map<string, SemanticSymbol>>;
     readonly symbolByDecl: Map<ClassDeclaration<import("@angular/compiler-cli/src/ngtsc/reflection").DeclarationNode>, SemanticSymbol>;
     /**
      * Registers a symbol in the graph. The symbol is given a unique identifier if possible, such that
