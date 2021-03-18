@@ -20,7 +20,7 @@ export declare const declarationFunctions: string[];
  * Also, ranges are matched to include "pre-releases", therefore if the range is `>=11.1.0-next.1`
  * then this includes `11.1.0-next.2` and also `12.0.0-next.1`.
  *
- * Finally, note that we always start with the current version (i.e. `12.0.0-next.5+3.sha-81d2aab`). This
+ * Finally, note that we always start with the current version (i.e. `12.0.0-next.5+6.sha-ac9c428`). This
  * allows the linker to work on local builds effectively.
  */
 export declare class PartialLinkerSelector<TStatement, TExpression> {
