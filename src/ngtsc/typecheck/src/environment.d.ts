@@ -27,7 +27,7 @@ export declare class Environment {
     readonly config: TypeCheckingConfig;
     protected importManager: ImportManager;
     private refEmitter;
-    private reflector;
+    readonly reflector: ReflectionHost;
     protected contextFile: ts.SourceFile;
     private nextIds;
     private typeCtors;
