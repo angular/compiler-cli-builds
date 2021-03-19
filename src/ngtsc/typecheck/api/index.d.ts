@@ -8,4 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api" />
 export * from './api';
 export * from './checker';
+export * from './completion';
 export * from './context';
+export * from './scope';
+export * from './symbols';

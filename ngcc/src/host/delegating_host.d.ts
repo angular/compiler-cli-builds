@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/delegating_host" />
 import * as ts from 'typescript';
-import { ClassDeclaration, ClassMember, CtorParameter, Declaration, Decorator, FunctionDefinition, Import, ReflectionHost } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, ClassMember, CtorParameter, Declaration, DeclarationNode, Decorator, FunctionDefinition, Import, ReflectionHost } from '../../../src/ngtsc/reflection';
 import { NgccClassSymbol, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
 /**
  * A reflection host implementation that delegates reflector queries depending on whether they
@@ -22,9 +22,9 @@ export declare class DelegatingReflectionHost implements NgccReflectionHost {
     constructor(tsHost: ReflectionHost, ngccHost: NgccReflectionHost);
     getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
     getDeclarationOfIdentifier(id: ts.Identifier): Declaration | null;
-    getDecoratorsOfDeclaration(declaration: ts.Declaration): Decorator[] | null;
+    getDecoratorsOfDeclaration(declaration: DeclarationNode): Decorator[] | null;
     getDefinitionOfFunction(fn: ts.Node): FunctionDefinition | null;
-    getDtsDeclaration(declaration: ts.Declaration): ts.Declaration | null;
+    getDtsDeclaration(declaration: DeclarationNode): ts.Declaration | null;
     getExportsOfModule(module: ts.Node): Map<string, Declaration> | null;
     getGenericArityOfClass(clazz: ClassDeclaration): number | null;
     getImportOfIdentifier(id: ts.Identifier): Import | null;

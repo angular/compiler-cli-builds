@@ -118,9 +118,9 @@ export interface StrictTemplateOptions {
     /**
      * If `true`, implies all template strictness flags below (unless individually disabled).
      *
-     * Has no effect unless `fullTemplateTypeCheck` is also enabled.
+     * This flag is a superset of `fullTemplateTypeCheck`.
      *
-     * Defaults to `false`, even if "fullTemplateTypeCheck" is set.
+     * Defaults to `false`, even if "fullTemplateTypeCheck" is `true`.
      */
     strictTemplates?: boolean;
     /**
@@ -135,6 +135,17 @@ export interface StrictTemplateOptions {
      * Defaults to `false`, even if "fullTemplateTypeCheck" is set.
      */
     strictInputTypes?: boolean;
+    /**
+     * Whether to check if the input binding attempts to assign to a restricted field (readonly,
+     * private, or protected) on the directive/component.
+     *
+     * Defaults to `false`, even if "fullTemplateTypeCheck", "strictTemplates" and/or
+     * "strictInputTypes" is set. Note that if `strictInputTypes` is not set, or set to `false`, this
+     * flag has no effect.
+     *
+     * Tracking issue for enabling this by default: https://github.com/angular/angular/issues/38400
+     */
+    strictInputAccessModifiers?: boolean;
     /**
      * Whether to use strict null types for input bindings for directives.
      *

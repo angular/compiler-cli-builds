@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/node_emitter" />
-import { AssertNotNull, BinaryOperatorExpr, CastExpr, ClassStmt, CommaExpr, CommentStmt, ConditionalExpr, DeclareFunctionStmt, DeclareVarStmt, ExpressionStatement, ExpressionVisitor, ExternalExpr, FunctionExpr, IfStmt, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, JSDocCommentStmt, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, NotExpr, ParseSourceSpan, PartialModule, ReadKeyExpr, ReadPropExpr, ReadVarExpr, ReturnStatement, Statement, StatementVisitor, ThrowStmt, TryCatchStmt, TypeofExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
-import { LocalizedString } from '@angular/compiler/src/output/output_ast';
+import { AssertNotNull, BinaryOperatorExpr, CastExpr, ClassStmt, CommaExpr, ConditionalExpr, DeclareFunctionStmt, DeclareVarStmt, ExpressionStatement, ExpressionVisitor, ExternalExpr, FunctionExpr, IfStmt, InstantiateExpr, InvokeFunctionExpr, InvokeMethodExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, LocalizedString, NotExpr, ParseSourceSpan, PartialModule, ReadKeyExpr, ReadPropExpr, ReadVarExpr, ReturnStatement, Statement, StatementVisitor, TaggedTemplateExpr, ThrowStmt, TryCatchStmt, TypeofExpr, UnaryOperatorExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
 import * as ts from 'typescript';
 export interface Node {
     sourceSpan: ParseSourceSpan | null;
@@ -15,9 +14,10 @@ export interface Node {
 export declare class TypeScriptNodeEmitter {
     private annotateForClosureCompiler;
     constructor(annotateForClosureCompiler: boolean);
-    updateSourceFile(sourceFile: ts.SourceFile, stmts: Statement[], preamble?: string): [ts.SourceFile, Map<ts.Node, Node>];
-    /** Creates a not emitted statement containing the given comment. */
-    createCommentStatement(sourceFile: ts.SourceFile, comment: string): ts.Statement;
+    updateSourceFile(sourceFile: ts.SourceFile, stmts: Statement[], preamble?: string): [
+        ts.SourceFile,
+        Map<ts.Node, Node>
+    ];
 }
 /**
  * Update the given source file to include the changes specified in module.
@@ -54,7 +54,7 @@ export declare class NodeEmitterVisitor implements StatementVisitor, ExpressionV
     getImports(): ts.Statement[];
     getNodeMap(): Map<ts.Node, Node>;
     updateSourceMap(statements: ts.Statement[]): void;
-    private record;
+    private postProcess;
     private sourceRangeOf;
     private getModifiers;
     visitDeclareVarStmt(stmt: DeclareVarStmt): (ts.VariableStatement & {
@@ -71,9 +71,6 @@ export declare class NodeEmitterVisitor implements StatementVisitor, ExpressionV
     visitIfStmt(stmt: IfStmt): RecordedNode<ts.IfStatement>;
     visitTryCatchStmt(stmt: TryCatchStmt): RecordedNode<ts.TryStatement>;
     visitThrowStmt(stmt: ThrowStmt): RecordedNode<ts.ThrowStatement>;
-    visitCommentStmt(stmt: CommentStmt, sourceFile: ts.SourceFile): ts.NotEmittedStatement;
-    visitJSDocCommentStmt(stmt: JSDocCommentStmt, sourceFile: ts.SourceFile): ts.NotEmittedStatement;
-    private createCommentStmt;
     visitWrappedNodeExpr(expr: WrappedNodeExpr<any>): any;
     visitTypeofExpr(expr: TypeofExpr): RecordedNode<ts.TypeOfExpression>;
     visitReadVarExpr(expr: ReadVarExpr): (ts.Identifier & {
@@ -86,8 +83,9 @@ export declare class NodeEmitterVisitor implements StatementVisitor, ExpressionV
     visitWritePropExpr(expr: WritePropExpr): RecordedNode<ts.BinaryExpression>;
     visitInvokeMethodExpr(expr: InvokeMethodExpr): RecordedNode<ts.CallExpression>;
     visitInvokeFunctionExpr(expr: InvokeFunctionExpr): RecordedNode<ts.CallExpression>;
+    visitTaggedTemplateExpr(expr: TaggedTemplateExpr): RecordedNode<ts.TaggedTemplateExpression>;
     visitInstantiateExpr(expr: InstantiateExpr): RecordedNode<ts.NewExpression>;
-    visitLiteralExpr(expr: LiteralExpr): RecordedNode<ts.Identifier | ts.StringLiteral | (ts.NullLiteral & ts.Token<ts.SyntaxKind.NullKeyword>)>;
+    visitLiteralExpr(expr: LiteralExpr): RecordedNode<ts.Identifier | ts.NullLiteral | ts.StringLiteral>;
     visitLocalizedString(expr: LocalizedString, context: any): void;
     visitExternalExpr(expr: ExternalExpr): RecordedNode<ts.Expression>;
     visitConditionalExpr(expr: ConditionalExpr): RecordedNode<ts.ParenthesizedExpression>;
@@ -95,6 +93,7 @@ export declare class NodeEmitterVisitor implements StatementVisitor, ExpressionV
     visitAssertNotNullExpr(expr: AssertNotNull): RecordedNode<ts.Expression>;
     visitCastExpr(expr: CastExpr): RecordedNode<ts.Expression>;
     visitFunctionExpr(expr: FunctionExpr): RecordedNode<ts.FunctionExpression>;
+    visitUnaryOperatorExpr(expr: UnaryOperatorExpr): RecordedNode<ts.UnaryExpression | ts.ParenthesizedExpression>;
     visitBinaryOperatorExpr(expr: BinaryOperatorExpr): RecordedNode<ts.BinaryExpression | ts.ParenthesizedExpression>;
     visitReadPropExpr(expr: ReadPropExpr): RecordedNode<ts.PropertyAccessExpression>;
     visitReadKeyExpr(expr: ReadKeyExpr): RecordedNode<ts.ElementAccessExpression>;

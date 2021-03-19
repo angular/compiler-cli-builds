@@ -7,14 +7,14 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/typescript" />
 import * as ts from 'typescript';
-import { ClassDeclaration, ClassMember, CtorParameter, Declaration, Decorator, FunctionDefinition, Import, ReflectionHost } from './host';
+import { ClassDeclaration, ClassMember, CtorParameter, Declaration, DeclarationNode, Decorator, FunctionDefinition, Import, ReflectionHost } from './host';
 /**
  * reflector.ts implements static reflection of declarations using the TypeScript `ts.TypeChecker`.
  */
 export declare class TypeScriptReflectionHost implements ReflectionHost {
     protected checker: ts.TypeChecker;
     constructor(checker: ts.TypeChecker);
-    getDecoratorsOfDeclaration(declaration: ts.Declaration): Decorator[] | null;
+    getDecoratorsOfDeclaration(declaration: DeclarationNode): Decorator[] | null;
     getMembersOfClass(clazz: ClassDeclaration): ClassMember[];
     getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
     getImportOfIdentifier(id: ts.Identifier): Import | null;
@@ -26,7 +26,7 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     getDefinitionOfFunction(node: ts.Node): FunctionDefinition | null;
     getGenericArityOfClass(clazz: ClassDeclaration): number | null;
     getVariableValue(declaration: ts.VariableDeclaration): ts.Expression | null;
-    getDtsDeclaration(_: ts.Declaration): ts.Declaration | null;
+    getDtsDeclaration(_: ClassDeclaration): ts.Declaration | null;
     getInternalNameOfClass(clazz: ClassDeclaration): ts.Identifier;
     getAdjacentNameOfClass(clazz: ClassDeclaration): ts.Identifier;
     protected getDirectImportOfIdentifier(id: ts.Identifier): Import | null;

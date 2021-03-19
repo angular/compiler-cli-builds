@@ -9,18 +9,20 @@
 import * as ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { DirectiveMeta, MetadataReader, NgModuleMeta, PipeMeta, TemplateGuardMeta } from './api';
+import { DirectiveMeta, DirectiveTypeCheckMeta, MetadataReader, NgModuleMeta, PipeMeta } from './api';
+import { ClassPropertyMapping } from './property_mapping';
 export declare function extractReferencesFromType(checker: ts.TypeChecker, def: ts.TypeNode, ngModuleImportedFrom: string | null, resolutionContext: string): Reference<ClassDeclaration>[];
 export declare function readStringType(type: ts.TypeNode): string | null;
 export declare function readStringMapType(type: ts.TypeNode): {
     [key: string]: string;
 };
 export declare function readStringArrayType(type: ts.TypeNode): string[];
-export declare function extractDirectiveGuards(node: ClassDeclaration, reflector: ReflectionHost): {
-    ngTemplateGuards: TemplateGuardMeta[];
-    hasNgTemplateContextGuard: boolean;
-    coercedInputFields: Set<string>;
-};
+/**
+ * Inspects the class' members and extracts the metadata that is used when type-checking templates
+ * that use the directive. This metadata does not contain information from a base class, if any,
+ * making this metadata invariant to changes of inherited classes.
+ */
+export declare function extractDirectiveTypeCheckMeta(node: ClassDeclaration, inputs: ClassPropertyMapping, reflector: ReflectionHost): DirectiveTypeCheckMeta;
 /**
  * A `MetadataReader` that reads from an ordered set of child readers until it obtains the requested
  * metadata.

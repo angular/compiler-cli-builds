@@ -37,8 +37,18 @@ export declare enum ErrorCode {
      * has been discovered.
      */
     UNDECORATED_CLASS_USING_ANGULAR_FEATURES = 2007,
+    /**
+     * Raised when an component cannot resolve an external resource, such as a template or a style
+     * sheet.
+     */
+    COMPONENT_RESOURCE_NOT_FOUND = 2008,
     SYMBOL_NOT_EXPORTED = 3001,
     SYMBOL_EXPORTED_UNDER_DIFFERENT_NAME = 3002,
+    /**
+     * Raised when a relationship between directives and/or pipes would cause a cyclic import to be
+     * created that cannot be handled, such as in partial compilation mode.
+     */
+    IMPORT_CYCLE_DETECTED = 3003,
     CONFIG_FLAT_MODULE_NO_INDEX = 4001,
     CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK = 4002,
     /**
@@ -46,6 +56,10 @@ export declare enum ErrorCode {
      * expression containing a pipe.
      */
     HOST_BINDING_PARSE_ERROR = 5001,
+    /**
+     * Raised when the compiler cannot parse a component's template.
+     */
+    TEMPLATE_PARSE_ERROR = 5002,
     /**
      * Raised when an NgModule contains an invalid reference in `declarations`.
      */
@@ -128,5 +142,10 @@ export declare enum ErrorCode {
     /**
      * An injectable already has a `ɵprov` property.
      */
-    INJECTABLE_DUPLICATE_PROV = 9001
+    INJECTABLE_DUPLICATE_PROV = 9001,
+    /**
+     * Suggest users to enable `strictTemplates` to make use of full capabilities
+     * provided by Angular language service.
+     */
+    SUGGEST_STRICT_TEMPLATES = 10001
 }

@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
-import { Expression, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata, Statement } from '@angular/compiler';
+import { Expression, R3FactoryMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
+import { SemanticReference, SemanticSymbol } from '../../incremental/semantic_graph';
 import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
@@ -20,6 +21,7 @@ import { ReferencesRegistry } from './references_registry';
 export interface NgModuleAnalysis {
     mod: R3NgModuleMetadata;
     inj: R3InjectorMetadata;
+    fac: R3FactoryMetadata;
     metadataStmt: Statement | null;
     declarations: Reference<ClassDeclaration>[];
     rawDeclarations: ts.Expression | null;
@@ -35,11 +37,19 @@ export interface NgModuleResolution {
     injectorImports: Expression[];
 }
 /**
- * Compiles @NgModule annotations to ngModuleDef fields.
- *
- * TODO(alxhub): handle injector side of things as well.
+ * Represents an Angular NgModule.
  */
-export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decorator, NgModuleAnalysis, NgModuleResolution> {
+export declare class NgModuleSymbol extends SemanticSymbol {
+    private remotelyScopedComponents;
+    isPublicApiAffected(previousSymbol: SemanticSymbol): boolean;
+    isEmitAffected(previousSymbol: SemanticSymbol): boolean;
+    isTypeCheckApiAffected(previousSymbol: SemanticSymbol): boolean;
+    addRemotelyScopedComponent(component: SemanticSymbol, usedDirectives: SemanticReference[], usedPipes: SemanticReference[]): void;
+}
+/**
+ * Compiles @NgModule annotations to ngModuleDef fields.
+ */
+export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decorator, NgModuleAnalysis, NgModuleSymbol, NgModuleResolution> {
     private reflector;
     private evaluator;
     private metaReader;
@@ -59,9 +69,25 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<NgModuleAnalysis>;
+    symbol(node: ClassDeclaration): NgModuleSymbol;
     register(node: ClassDeclaration, analysis: NgModuleAnalysis): void;
     resolve(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>): ResolveResult<NgModuleResolution>;
-    compile(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>, resolution: Readonly<NgModuleResolution>): CompileResult[];
+    compileFull(node: ClassDeclaration, { inj, mod, fac, metadataStmt, declarations }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
+    compilePartial(node: ClassDeclaration, { inj, fac, mod, metadataStmt }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
+    /**
+     *  Merge the injector imports (which are 'exports' that were later found to be NgModules)
+     *  computed during resolution with the ones from analysis.
+     */
+    private mergeInjectorImports;
+    /**
+     * Add class metadata statements, if provided, to the `ngModuleStatements`.
+     */
+    private insertMetadataStatement;
+    /**
+     * Add remote scoping statements, as needed, to the `ngModuleStatements`.
+     */
+    private appendRemoteScopingStatements;
+    private compileNgModule;
     private _toR3Reference;
     /**
      * Given a `FunctionDeclaration`, `MethodDeclaration` or `FunctionExpression`, check if it is

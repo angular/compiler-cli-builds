@@ -9,7 +9,7 @@
 import * as ts from 'typescript';
 import { ClassDeclaration, Decorator } from '../../../src/ngtsc/reflection';
 import { MigrationHost } from './migration';
-export declare function isClassDeclaration(clazz: ts.Declaration): clazz is ClassDeclaration;
+export declare function isClassDeclaration(clazz: ts.Node): clazz is ClassDeclaration<ts.Declaration>;
 /**
  * Returns true if the `clazz` is decorated as a `Directive` or `Component`.
  */

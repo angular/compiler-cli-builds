@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/context" />
-import { ParseSourceFile, R3TargetBinder, SchemaMetadata, TmplAstNode } from '@angular/compiler';
+import { BoundTarget, ParseError, ParseSourceFile, R3TargetBinder, SchemaMetadata, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { ComponentToShimMappingStrategy, TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata } from '../api';
-import { TemplateDiagnostic } from './diagnostics';
+import { ComponentToShimMappingStrategy, TemplateId, TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata } from '../api';
+import { TemplateDiagnostic } from '../diagnostics';
 import { DomSchemaChecker } from './dom';
 import { OutOfBandDiagnosticRecorder } from './oob';
 import { TemplateSourceManager } from './source';
@@ -32,6 +32,29 @@ export interface ShimTypeCheckingData {
      * Whether any inline operations for the input file were required to generate this shim.
      */
     hasInlines: boolean;
+    /**
+     * Map of `TemplateId` to information collected about the template during the template
+     * type-checking process.
+     */
+    templates: Map<TemplateId, TemplateData>;
+}
+/**
+ * Data tracked for each template processed by the template type-checking system.
+ */
+export interface TemplateData {
+    /**
+     * Template nodes for which the TCB was generated.
+     */
+    template: TmplAstNode[];
+    /**
+     * `BoundTarget` which was used to generate the TCB, and contains bindings for the associated
+     * template nodes.
+     */
+    boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
+    /**
+     * Errors found while parsing them template, which have been converted to diagnostics.
+     */
+    templateDiagnostics: TemplateDiagnostic[];
 }
 /**
  * Data for an input file which is still in the process of template type-checking code generation.
@@ -64,6 +87,10 @@ export interface PendingShimData {
      * Shim file in the process of being generated.
      */
     file: TypeCheckFile;
+    /**
+     * Map of `TemplateId` to information collected about the template as it's ingested.
+     */
+    templates: Map<TemplateId, TemplateData>;
 }
 /**
  * Adapts the `TypeCheckContextImpl` to the larger template type-checking system.
@@ -85,11 +112,6 @@ export interface TypeCheckingHost {
      * program.
      */
     shouldCheckComponent(node: ts.ClassDeclaration): boolean;
-    /**
-     * Check if the given component has had its template overridden, and retrieve the new template
-     * nodes if so.
-     */
-    getTemplateOverride(sfPath: AbsoluteFsPath, node: ts.ClassDeclaration): TmplAstNode[] | null;
     /**
      * Report data from a shim generated from the given input file path.
      */
@@ -140,14 +162,11 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
      */
     private typeCtorPending;
     /**
-     * Record a template for the given component `node`, with a `SelectorMatcher` for directive
-     * matching.
+     * Register a template to potentially be type-checked.
      *
-     * @param node class of the node being recorded.
-     * @param template AST nodes of the template being recorded.
-     * @param matcher `SelectorMatcher` which tracks directives that are in scope for this template.
+     * Implements `TypeCheckContext.addTemplate`.
      */
-    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, template: TmplAstNode[], pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[], sourceMapping: TemplateSourceMapping, file: ParseSourceFile): void;
+    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, template: TmplAstNode[], pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[], sourceMapping: TemplateSourceMapping, file: ParseSourceFile, parseErrors: ParseError[] | null): void;
     /**
      * Record a type constructor for the given `node` with the given `ctorMetadata`.
      */
@@ -163,4 +182,5 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
     private addInlineTypeCheckBlock;
     private pendingShimForComponent;
     private dataForFile;
+    private getTemplateDiagnostics;
 }

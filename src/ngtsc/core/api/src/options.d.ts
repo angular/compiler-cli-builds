@@ -24,10 +24,15 @@ export interface TestOnlyOptions {
     tracePerformance?: string;
 }
 /**
+ * Options that specify compilation target.
+ */
+export interface TargetOptions {
+}
+/**
  * A merged interface of all of the various Angular compiler options, as well as the standard
  * `ts.CompilerOptions`.
  *
  * Also includes a few miscellaneous options.
  */
-export interface NgCompilerOptions extends ts.CompilerOptions, LegacyNgcOptions, BazelAndG3Options, NgcCompatibilityOptions, StrictTemplateOptions, TestOnlyOptions, I18nOptions, MiscOptions {
+export interface NgCompilerOptions extends ts.CompilerOptions, LegacyNgcOptions, BazelAndG3Options, NgcCompatibilityOptions, StrictTemplateOptions, TestOnlyOptions, I18nOptions, TargetOptions, MiscOptions {
 }

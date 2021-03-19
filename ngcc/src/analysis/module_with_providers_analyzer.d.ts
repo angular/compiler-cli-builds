@@ -9,7 +9,7 @@
 import * as ts from 'typescript';
 import { ReferencesRegistry } from '../../../src/ngtsc/annotations';
 import { Reference } from '../../../src/ngtsc/imports';
-import { ClassDeclaration } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, DeclarationNode } from '../../../src/ngtsc/reflection';
 import { NgccReflectionHost } from '../host/ngcc_host';
 /**
  * A structure returned from `getModuleWithProvidersFunctions()` that describes functions
@@ -27,7 +27,7 @@ export interface ModuleWithProvidersInfo {
     /**
      * Declaration of the containing class (if this is a method)
      */
-    container: ts.Declaration | null;
+    container: DeclarationNode | null;
     /**
      * The declaration of the class that the `ngModule` property on the `ModuleWithProviders` object
      * refers to.

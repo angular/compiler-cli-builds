@@ -12,6 +12,7 @@ import * as api from '../transformers/api';
 import { NgCompiler } from './core';
 import { NgCompilerOptions } from './core/api';
 import { IndexedComponent } from './indexer';
+import { DeclarationNode } from './reflection';
 /**
  * Entrypoint to the Angular Compiler (Ivy+) which sits behind the `api.Program` interface, allowing
  * it to be a drop-in replacement for the legacy View Engine compiler to tooling such as the
@@ -68,7 +69,7 @@ export declare class NgtscProgram implements api.Program {
         emitCallback?: api.TsEmitCallback | undefined;
         mergeEmitResultsCallback?: api.TsMergeEmitResultsCallback | undefined;
     } | undefined): ts.EmitResult;
-    getIndexedComponents(): Map<ts.Declaration, IndexedComponent>;
+    getIndexedComponents(): Map<DeclarationNode, IndexedComponent>;
     getLibrarySummaries(): Map<string, api.LibrarySummary>;
     getEmittedGeneratedFiles(): Map<string, GeneratedFile>;
     getEmittedSourceFiles(): Map<string, ts.SourceFile>;

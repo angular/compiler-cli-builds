@@ -9,7 +9,8 @@
 import { BindingPipe, PropertyWrite, TmplAstReference, TmplAstVariable } from '@angular/compiler';
 import { ClassDeclaration } from '../../reflection';
 import { TemplateId } from '../api';
-import { TemplateDiagnostic, TemplateSourceResolver } from './diagnostics';
+import { TemplateDiagnostic } from '../diagnostics';
+import { TemplateSourceResolver } from './tcb_util';
 /**
  * Collects `ts.Diagnostic`s on problems which occur in the template which aren't directly sourced
  * from Type Check Blocks.
@@ -55,6 +56,11 @@ export interface OutOfBandDiagnosticRecorder {
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
     private _diagnostics;
+    /**
+     * Tracks which `BindingPipe` nodes have already been recorded as invalid, so only one diagnostic
+     * is ever produced per node.
+     */
+    private recordedPipes;
     constructor(resolver: TemplateSourceResolver);
     get diagnostics(): ReadonlyArray<TemplateDiagnostic>;
     missingReferenceTarget(templateId: TemplateId, ref: TmplAstReference): void;

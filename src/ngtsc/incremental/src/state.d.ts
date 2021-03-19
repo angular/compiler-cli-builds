@@ -11,12 +11,12 @@ import { AbsoluteFsPath } from '../../file_system';
 import { ClassRecord, TraitCompiler } from '../../transform';
 import { FileTypeCheckingData } from '../../typecheck/src/checker';
 import { IncrementalBuild } from '../api';
+import { SemanticDepGraphUpdater } from '../semantic_graph';
 import { FileDependencyGraph } from './dependency_tracking';
 /**
  * Drives an incremental build, by tracking changes and determining which files need to be emitted.
  */
 export declare class IncrementalDriver implements IncrementalBuild<ClassRecord, FileTypeCheckingData> {
-    private allTsFiles;
     readonly depGraph: FileDependencyGraph;
     private logicalChanges;
     /**
@@ -35,6 +35,7 @@ export declare class IncrementalDriver implements IncrementalBuild<ClassRecord, 
      */
     static reconcile(oldProgram: ts.Program, oldDriver: IncrementalDriver, newProgram: ts.Program, modifiedResourceFiles: Set<string> | null): IncrementalDriver;
     static fresh(program: ts.Program): IncrementalDriver;
+    getSemanticDepGraphUpdater(): SemanticDepGraphUpdater;
     recordSuccessfulAnalysis(traitCompiler: TraitCompiler): void;
     recordSuccessfulTypeCheck(results: Map<AbsoluteFsPath, FileTypeCheckingData>): void;
     recordSuccessfulEmit(sf: ts.SourceFile): void;

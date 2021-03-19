@@ -11,7 +11,7 @@ import * as ts from 'typescript';
 import { AliasingHost, Reexport, Reference, ReferenceEmitter } from '../../imports';
 import { DirectiveMeta, MetadataReader, MetadataRegistry, NgModuleMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
-import { ExportScope, ScopeData } from './api';
+import { ExportScope, RemoteScope, ScopeData } from './api';
 import { ComponentScopeReader } from './component_scope';
 import { DtsModuleScopeResolver } from './dependency';
 export interface LocalNgModuleData {
@@ -20,18 +20,10 @@ export interface LocalNgModuleData {
     exports: Reference<ClassDeclaration>[];
 }
 export interface LocalModuleScope extends ExportScope {
+    ngModule: ClassDeclaration;
     compilation: ScopeData;
     reexports: Reexport[] | null;
     schemas: SchemaMetadata[];
-}
-/**
- * Information about the compilation scope of a registered declaration.
- */
-export interface CompilationScope extends ScopeData {
-    /** The declaration whose compilation scope is described here. */
-    declaration: ClassDeclaration;
-    /** The declaration of the NgModule that declares this `declaration`. */
-    ngModule: ClassDeclaration;
 }
 /**
  * A registry which collects information about NgModules, Directives, Components, and Pipes which
@@ -79,13 +71,11 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
     private moduleToRef;
     /**
      * A cache of calculated `LocalModuleScope`s for each NgModule declared in the current program.
-     *
-     * A value of `undefined` indicates the scope was invalid and produced errors (therefore,
-     * diagnostics should exist in the `scopeErrors` map).
+  
      */
     private cache;
     /**
-     * Tracks whether a given component requires "remote scoping".
+     * Tracks the `RemoteScope` for components requiring "remote scoping".
      *
      * Remote scoping is when the set of directives which apply to a given component is set in the
      * NgModule's file instead of directly on the component def (which is sometimes needed to get
@@ -98,13 +88,9 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      */
     private scopeErrors;
     /**
-     * Tracks which NgModules are unreliable due to errors within their declarations.
-     *
-     * This provides a unified view of which modules have errors, across all of the different
-     * diagnostic categories that can be produced. Theoretically this can be inferred from the other
-     * properties of this class, but is tracked explicitly to simplify the logic.
+     * Tracks which NgModules have directives/pipes that are declared in more than one module.
      */
-    private taintedModules;
+    private modulesWithStructuralErrors;
     constructor(localReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasingHost: AliasingHost | null);
     /**
      * Add an NgModule's data to the registry.
@@ -112,7 +98,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
     registerNgModuleMetadata(data: NgModuleMeta): void;
     registerDirectiveMetadata(directive: DirectiveMeta): void;
     registerPipeMetadata(pipe: PipeMeta): void;
-    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null | 'error';
+    getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
     /**
      * If `node` is declared in more than one NgModule (duplicate declaration), then get the
      * `DeclarationData` for each offending declaration.
@@ -129,41 +115,34 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * `LocalModuleScope` for the given NgModule if one can be produced, `null` if no scope was ever
      * defined, or the string `'error'` if the scope contained errors.
      */
-    getScopeOfModule(clazz: ClassDeclaration): LocalModuleScope | 'error' | null;
+    getScopeOfModule(clazz: ClassDeclaration): LocalModuleScope | null;
     /**
      * Retrieves any `ts.Diagnostic`s produced during the calculation of the `LocalModuleScope` for
      * the given NgModule, or `null` if no errors were present.
      */
     getDiagnosticsOfModule(clazz: ClassDeclaration): ts.Diagnostic[] | null;
-    /**
-     * Returns a collection of the compilation scope for each registered declaration.
-     */
-    getCompilationScopes(): CompilationScope[];
     private registerDeclarationOfModule;
     /**
-     * Implementation of `getScopeOfModule` which accepts a reference to a class and differentiates
-     * between:
-     *
-     * * no scope being available (returns `null`)
-     * * a scope being produced with errors (returns `undefined`).
+     * Implementation of `getScopeOfModule` which accepts a reference to a class.
      */
     private getScopeOfModuleReference;
     /**
      * Check whether a component requires remote scoping.
      */
-    getRequiresRemoteScope(node: ClassDeclaration): boolean;
+    getRemoteScope(node: ClassDeclaration): RemoteScope | null;
     /**
-     * Set a component as requiring remote scoping.
+     * Set a component as requiring remote scoping, with the given directives and pipes to be
+     * registered remotely.
      */
-    setComponentAsRequiringRemoteScoping(node: ClassDeclaration): void;
+    setComponentRemoteScope(node: ClassDeclaration, directives: Reference[], pipes: Reference[]): void;
     /**
      * Look up the `ExportScope` of a given `Reference` to an NgModule.
      *
      * The NgModule in question may be declared locally in the current ts.Program, or it may be
      * declared in a .d.ts file.
      *
-     * @returns `null` if no scope could be found, or `undefined` if an invalid scope
-     * was found.
+     * @returns `null` if no scope could be found, or `'invalid'` if the `Reference` is not a valid
+     *     NgModule.
      *
      * May also contribute diagnostics of its own by adding to the given `diagnostics`
      * array parameter.

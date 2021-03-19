@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/api" />
+import { Reference } from '../../imports';
 import { DirectiveMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 /**
@@ -24,6 +25,11 @@ export interface ScopeData {
      * NgModules which contributed to the scope of the module.
      */
     ngModules: ClassDeclaration[];
+    /**
+     * Whether some module or component in this scope contains errors and is thus semantically
+     * unreliable.
+     */
+    isPoisoned: boolean;
 }
 /**
  * An export scope of an NgModule, containing the directives/pipes it contributes to other NgModules
@@ -34,4 +40,18 @@ export interface ExportScope {
      * The scope exported by an NgModule, and available for import.
      */
     exported: ScopeData;
+}
+/**
+ * A resolved scope for a given component that cannot be set locally in the component definition,
+ * and must be set via remote scoping call in the component's NgModule file.
+ */
+export interface RemoteScope {
+    /**
+     * Those directives used by the component that requires this scope to be set remotely.
+     */
+    directives: Reference[];
+    /**
+     * Those pipes used by the component that requires this scope to be set remotely.
+     */
+    pipes: Reference[];
 }

@@ -17,6 +17,7 @@ export declare class AdapterResourceLoader implements ResourceLoader {
     private options;
     private cache;
     private fetching;
+    private lookupResolutionHost;
     canPreload: boolean;
     constructor(adapter: NgCompilerAdapter, options: ts.CompilerOptions);
     /**
@@ -53,6 +54,10 @@ export declare class AdapterResourceLoader implements ResourceLoader {
      * @returns The contents of the resource.
      */
     load(resolvedUrl: string): string;
+    /**
+     * Invalidate the entire resource cache.
+     */
+    invalidate(): void;
     /**
      * Attempt to resolve `url` in the context of `fromFile`, while respecting the rootDirs
      * option from the tsconfig. First, normalize the file name.

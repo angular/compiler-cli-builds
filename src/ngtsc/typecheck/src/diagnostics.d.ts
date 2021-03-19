@@ -8,39 +8,9 @@
  */
 import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
-import { TemplateId, TemplateSourceMapping } from '../api';
-/**
- * A `ts.Diagnostic` with additional information about the diagnostic related to template
- * type-checking.
- */
-export interface TemplateDiagnostic extends ts.Diagnostic {
-    /**
-     * The component with the template that resulted in this diagnostic.
-     */
-    componentFile: ts.SourceFile;
-    /**
-     * The template id of the component that resulted in this diagnostic.
-     */
-    templateId: TemplateId;
-}
-/**
- * Adapter interface which allows the template type-checking diagnostics code to interpret offsets
- * in a TCB and map them back to original locations in the template.
- */
-export interface TemplateSourceResolver {
-    getTemplateId(node: ts.ClassDeclaration): TemplateId;
-    /**
-     * For the given template id, retrieve the original source mapping which describes how the offsets
-     * in the template should be interpreted.
-     */
-    getSourceMapping(id: TemplateId): TemplateSourceMapping;
-    /**
-     * Convert an absolute source span associated with the given template id into a full
-     * `ParseSourceSpan`. The returned parse span has line and column numbers in addition to only
-     * absolute offsets and gives access to the original template source.
-     */
-    toParseSourceSpan(id: TemplateId, span: AbsoluteSourceSpan): ParseSourceSpan | null;
-}
+import { TemplateId } from '../api';
+import { TemplateDiagnostic } from '../diagnostics';
+import { TemplateSourceResolver } from './tcb_util';
 /**
  * Wraps the node in parenthesis such that inserted span comments become attached to the proper
  * node. This is an alias for `ts.createParen` with the benefit that it signifies that the
@@ -53,9 +23,12 @@ export interface TemplateSourceResolver {
  */
 export declare function wrapForDiagnostics(expr: ts.Expression): ts.Expression;
 /**
- * Adds a marker to the node that signifies that any errors within the node should not be reported.
+ * Wraps the node in parenthesis such that inserted span comments become attached to the proper
+ * node. This is an alias for `ts.createParen` with the benefit that it signifies that the
+ * inserted parenthesis are for use by the type checker, not for correctness of the rendered TCB
+ * code.
  */
-export declare function ignoreDiagnostics(node: ts.Node): void;
+export declare function wrapForTypeChecker(expr: ts.Expression): ts.Expression;
 /**
  * Adds a synthetic comment to the expression that represents the parse span of the provided node.
  * This comment can later be retrieved as trivia of a node to recover original source locations.
@@ -81,12 +54,3 @@ export declare function shouldReportDiagnostic(diagnostic: ts.Diagnostic): boole
  * file from being reported as type-check errors.
  */
 export declare function translateDiagnostic(diagnostic: ts.Diagnostic, resolver: TemplateSourceResolver): TemplateDiagnostic | null;
-export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId): ts.Node | null;
-/**
- * Constructs a `ts.Diagnostic` for a given `ParseSourceSpan` within a template.
- */
-export declare function makeTemplateDiagnostic(templateId: TemplateId, mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: number, messageText: string | ts.DiagnosticMessageChain, relatedMessage?: {
-    text: string;
-    span: ParseSourceSpan;
-}): TemplateDiagnostic;
-export declare function isTemplateDiagnostic(diagnostic: ts.Diagnostic): diagnostic is TemplateDiagnostic;

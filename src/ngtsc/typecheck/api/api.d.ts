@@ -6,22 +6,21 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/api" />
-import { BoundTarget, DirectiveMeta, SchemaMetadata } from '@angular/compiler';
+import { AbsoluteSourceSpan, BoundTarget, DirectiveMeta, ParseSourceSpan, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference } from '../../imports';
-import { TemplateGuardMeta } from '../../metadata';
+import { ClassPropertyMapping, DirectiveTypeCheckMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 /**
  * Extension of `DirectiveMeta` that includes additional information required to type-check the
  * usage of a particular directive.
  */
-export interface TypeCheckableDirectiveMeta extends DirectiveMeta {
+export interface TypeCheckableDirectiveMeta extends DirectiveMeta, DirectiveTypeCheckMeta {
     ref: Reference<ClassDeclaration>;
     queries: string[];
-    ngTemplateGuards: TemplateGuardMeta[];
-    coercedInputFields: Set<string>;
-    hasNgTemplateContextGuard: boolean;
+    inputs: ClassPropertyMapping;
+    outputs: ClassPropertyMapping;
 }
 export declare type TemplateId = string & {
     __brand: 'TemplateId';
@@ -82,6 +81,13 @@ export interface TypeCheckingConfig {
      * `checkTypeOfDomBindings` is set.
      */
     checkTypeOfInputBindings: boolean;
+    /**
+     * Whether to honor the access modifiers on input bindings for the component/directive.
+     *
+     * If a template binding attempts to assign to an input that is private/protected/readonly,
+     * this will produce errors when enabled but will not when disabled.
+     */
+    honorAccessModifiersForInputBindings: boolean;
     /**
      * Whether to use strict null types for input bindings for directives.
      *
@@ -159,6 +165,21 @@ export interface TypeCheckingConfig {
      */
     checkTypeOfNonDomReferences: boolean;
     /**
+     * Whether to adjust the output of the TCB to ensure compatibility with the `TemplateTypeChecker`.
+     *
+     * The statements generated in the TCB are optimized for performance and producing diagnostics.
+     * These optimizations can result in generating a TCB that does not have all the information
+     * needed by the `TemplateTypeChecker` for retrieving `Symbol`s. For example, as an optimization,
+     * the TCB will not generate variable declaration statements for directives that have no
+     * references, inputs, or outputs. However, the `TemplateTypeChecker` always needs these
+     * statements to be present in order to provide `ts.Symbol`s and `ts.Type`s for the directives.
+     *
+     * When set to `false`, enables TCB optimizations for template diagnostics.
+     * When set to `true`, ensures all information required by `TemplateTypeChecker` to
+     * retrieve symbols for template nodes is available in the TCB.
+     */
+    enableTemplateTypeChecker: boolean;
+    /**
      * Whether to include type information from pipes in the type-checking operation.
      *
      * If this is `true`, then the pipe's type signature for `transform()` will be used to check the
@@ -184,6 +205,11 @@ export interface TypeCheckingConfig {
      */
     checkTemplateBodies: boolean;
     /**
+     * Whether to always apply DOM schema checks in template bodies, independently of the
+     * `checkTemplateBodies` setting.
+     */
+    alwaysCheckSchemaInTemplateBodies: boolean;
+    /**
      * Whether to check resolvable queries.
      *
      * This is currently an unsupported feature.
@@ -205,6 +231,20 @@ export interface TypeCheckingConfig {
      * literals are cast to `any` when declared.
      */
     strictLiteralTypes: boolean;
+    /**
+     * Whether to use inline type constructors.
+     *
+     * If this is `true`, create inline type constructors when required. For example, if a type
+     * constructor's parameters has private types, it cannot be created normally, so we inline it in
+     * the directives definition file.
+     *
+     * If false, do not create inline type constructors. Fall back to using `any` type for
+     * constructors that normally require inlining.
+     *
+     * This option requires the environment to support inlining. If the environment does not support
+     * inlining, this must be set to `false`.
+     */
+    useInlineTypeConstructors: boolean;
 }
 export declare type TemplateSourceMapping = DirectTemplateSourceMapping | IndirectTemplateSourceMapping | ExternalTemplateSourceMapping;
 /**
@@ -243,6 +283,22 @@ export interface ExternalTemplateSourceMapping {
     node: ts.Expression;
     template: string;
     templateUrl: string;
+}
+/**
+ * A mapping of a TCB template id to a span in the corresponding template source.
+ */
+export interface SourceLocation {
+    id: TemplateId;
+    span: AbsoluteSourceSpan;
+}
+/**
+ * A representation of all a node's template mapping information we know. Useful for producing
+ * diagnostics based on a TCB node or generally mapping from a TCB node back to a template location.
+ */
+export interface FullTemplateMapping {
+    sourceLocation: SourceLocation;
+    templateSourceMapping: TemplateSourceMapping;
+    span: ParseSourceSpan;
 }
 /**
  * Abstracts the operation of determining which shim file will host a particular component's

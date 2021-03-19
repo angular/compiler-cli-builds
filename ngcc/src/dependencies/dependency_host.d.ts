@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { AbsoluteFsPath, FileSystem, PathSegment } from '../../../src/ngtsc/file_system';
+import { AbsoluteFsPath, PathSegment, ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
 import { EntryPoint } from '../packages/entry_point';
 import { ModuleResolver } from './module_resolver';
 export interface DependencyHost {
@@ -23,9 +23,9 @@ export interface EntryPointWithDependencies {
 }
 export declare function createDependencyInfo(): DependencyInfo;
 export declare abstract class DependencyHostBase implements DependencyHost {
-    protected fs: FileSystem;
+    protected fs: ReadonlyFileSystem;
     protected moduleResolver: ModuleResolver;
-    constructor(fs: FileSystem, moduleResolver: ModuleResolver);
+    constructor(fs: ReadonlyFileSystem, moduleResolver: ModuleResolver);
     /**
      * Find all the dependencies for the entry-point at the given path.
      *
@@ -35,6 +35,15 @@ export declare abstract class DependencyHostBase implements DependencyHost {
      * sets in this object will be updated with new information about the entry-point's dependencies.
      */
     collectDependencies(entryPointPath: AbsoluteFsPath, { dependencies, missing, deepImports }: DependencyInfo): void;
+    /**
+     * Find all the dependencies for the provided paths.
+     *
+     * @param files The list of absolute paths of JavaScript files to scan for dependencies.
+     * @param dependencyInfo An object containing information about the dependencies of the
+     * entry-point, including those that were missing or deep imports into other entry-points. The
+     * sets in this object will be updated with new information about the entry-point's dependencies.
+     */
+    collectDependenciesInFiles(files: AbsoluteFsPath[], { dependencies, missing, deepImports }: DependencyInfo): void;
     /**
      * Compute the dependencies of the given file.
      *
@@ -60,4 +69,10 @@ export declare abstract class DependencyHostBase implements DependencyHost {
      * deep-import), `false` otherwise.
      */
     protected processImport(importPath: string, file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<string>, alreadySeen: Set<AbsoluteFsPath>): boolean;
+    /**
+     * Processes the file if it has not already been seen. This will also recursively process
+     * all files that are imported from the file, while taking the set of already seen files
+     * into account.
+     */
+    protected processFile(file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<string>, alreadySeen: Set<AbsoluteFsPath>): void;
 }

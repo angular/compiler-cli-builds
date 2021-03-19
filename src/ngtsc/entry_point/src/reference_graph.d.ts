@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/entry_point/src/reference_graph" />
-import * as ts from 'typescript';
-export declare class ReferenceGraph<T = ts.Declaration> {
+import { DeclarationNode } from '../../reflection';
+export declare class ReferenceGraph<T = DeclarationNode> {
     private references;
     add(from: T, to: T): void;
     transitiveReferencesOf(target: T): Set<T>;

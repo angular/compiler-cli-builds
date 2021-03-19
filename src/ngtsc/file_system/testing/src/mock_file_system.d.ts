@@ -18,8 +18,8 @@ export declare abstract class MockFileSystem implements FileSystem {
     isCaseSensitive(): boolean;
     exists(path: AbsoluteFsPath): boolean;
     readFile(path: AbsoluteFsPath): string;
-    readFileBuffer(path: AbsoluteFsPath): Buffer;
-    writeFile(path: AbsoluteFsPath, data: string | Buffer, exclusive?: boolean): void;
+    readFileBuffer(path: AbsoluteFsPath): Uint8Array;
+    writeFile(path: AbsoluteFsPath, data: string | Uint8Array, exclusive?: boolean): void;
     removeFile(path: AbsoluteFsPath): void;
     symlink(target: AbsoluteFsPath, path: AbsoluteFsPath): void;
     readdir(path: AbsoluteFsPath): PathSegment[];
@@ -27,7 +27,7 @@ export declare abstract class MockFileSystem implements FileSystem {
     stat(path: AbsoluteFsPath): FileStats;
     copyFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     moveFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
-    ensureDir(path: AbsoluteFsPath): void;
+    ensureDir(path: AbsoluteFsPath): Folder;
     removeDeep(path: AbsoluteFsPath): void;
     isRoot(path: AbsoluteFsPath): boolean;
     extname(path: AbsoluteFsPath | PathSegment): string;
@@ -45,7 +45,9 @@ export declare abstract class MockFileSystem implements FileSystem {
     protected abstract splitPath<T extends PathString>(path: T): string[];
     dump(): Folder;
     init(folder: Folder): void;
+    mount(path: AbsoluteFsPath, folder: Folder): void;
     private cloneFolder;
+    private copyInto;
     protected findFromPath(path: AbsoluteFsPath, options?: {
         followSymLinks: boolean;
     }): FindResult;
@@ -60,7 +62,7 @@ export declare type Entity = Folder | File | SymLink;
 export interface Folder {
     [pathSegments: string]: Entity;
 }
-export declare type File = string | Buffer;
+export declare type File = string | Uint8Array;
 export declare class SymLink {
     path: AbsoluteFsPath;
     constructor(path: AbsoluteFsPath);
