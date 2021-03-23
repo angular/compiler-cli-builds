@@ -52,6 +52,11 @@ export interface OutOfBandDiagnosticRecorder {
     duplicateTemplateVar(templateId: TemplateId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
     requiresInlineTcb(templateId: TemplateId, node: ClassDeclaration): void;
     requiresInlineTypeConstructors(templateId: TemplateId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
+    /**
+     * Report a warning when structural directives support context guards, but the current
+     * type-checking configuration prohibits their usage.
+     */
+    suboptimalTypeInference(templateId: TemplateId, variables: TmplAstVariable[]): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -69,4 +74,5 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     duplicateTemplateVar(templateId: TemplateId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
     requiresInlineTcb(templateId: TemplateId, node: ClassDeclaration): void;
     requiresInlineTypeConstructors(templateId: TemplateId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
+    suboptimalTypeInference(templateId: TemplateId, variables: TmplAstVariable[]): void;
 }
