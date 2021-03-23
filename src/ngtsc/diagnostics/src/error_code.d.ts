@@ -147,5 +147,11 @@ export declare enum ErrorCode {
      * Suggest users to enable `strictTemplates` to make use of full capabilities
      * provided by Angular language service.
      */
-    SUGGEST_STRICT_TEMPLATES = 10001
+    SUGGEST_STRICT_TEMPLATES = 10001,
+    /**
+     * Indicates that a particular structural directive provides advanced type narrowing
+     * functionality, but the current template type-checking configuration does not allow its usage in
+     * type inference.
+     */
+    SUGGEST_SUBOPTIMAL_TYPE_INFERENCE = 10002
 }
