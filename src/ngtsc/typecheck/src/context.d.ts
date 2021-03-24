@@ -10,6 +10,7 @@ import { BoundTarget, ParseError, ParseSourceFile, R3TargetBinder, SchemaMetadat
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
+import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ComponentToShimMappingStrategy, TemplateId, TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata } from '../api';
 import { TemplateDiagnostic } from '../diagnostics';
@@ -149,8 +150,9 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
     private reflector;
     private host;
     private inlining;
+    private perf;
     private fileMap;
-    constructor(config: TypeCheckingConfig, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, componentMappingStrategy: ComponentToShimMappingStrategy, refEmitter: ReferenceEmitter, reflector: ReflectionHost, host: TypeCheckingHost, inlining: InliningMode);
+    constructor(config: TypeCheckingConfig, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, componentMappingStrategy: ComponentToShimMappingStrategy, refEmitter: ReferenceEmitter, reflector: ReflectionHost, host: TypeCheckingHost, inlining: InliningMode, perf: PerfRecorder);
     /**
      * A `Map` of `ts.SourceFile`s that the context has seen to the operations (additions of methods
      * or type-check blocks) that need to be eventually performed on that file.
