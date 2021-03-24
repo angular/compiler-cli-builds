@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/src/state" />
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
+import { PerfRecorder } from '../../perf';
 import { ClassRecord, TraitCompiler } from '../../transform';
 import { FileTypeCheckingData } from '../../typecheck/src/checker';
 import { IncrementalBuild } from '../api';
@@ -33,7 +34,7 @@ export declare class IncrementalDriver implements IncrementalBuild<ClassRecord, 
      * The previous build's `BuildState` is reconciled with the new program's changes, and the results
      * are merged into the new build's `PendingBuildState`.
      */
-    static reconcile(oldProgram: ts.Program, oldDriver: IncrementalDriver, newProgram: ts.Program, modifiedResourceFiles: Set<string> | null): IncrementalDriver;
+    static reconcile(oldProgram: ts.Program, oldDriver: IncrementalDriver, newProgram: ts.Program, modifiedResourceFiles: Set<string> | null, perf: PerfRecorder): IncrementalDriver;
     static fresh(program: ts.Program): IncrementalDriver;
     getSemanticDepGraphUpdater(): SemanticDepGraphUpdater;
     recordSuccessfulAnalysis(traitCompiler: TraitCompiler): void;

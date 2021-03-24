@@ -12,6 +12,7 @@ import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../import
 import { SemanticReference, SemanticSymbol } from '../../incremental/semantic_graph';
 import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
+import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { NgModuleRouteAnalyzer } from '../../routing';
 import { LocalModuleScopeRegistry } from '../../scope';
@@ -63,8 +64,9 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     private defaultImportRecorder;
     private annotateForClosureCompiler;
     private injectableRegistry;
+    private perf;
     private localeId?;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, defaultImportRecorder: DefaultImportRecorder, annotateForClosureCompiler: boolean, injectableRegistry: InjectableClassRegistry, localeId?: string | undefined);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, defaultImportRecorder: DefaultImportRecorder, annotateForClosureCompiler: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, localeId?: string | undefined);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
