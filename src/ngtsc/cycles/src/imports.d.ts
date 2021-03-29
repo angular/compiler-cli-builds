@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/cycles/src/imports" />
 import * as ts from 'typescript';
+import { PerfRecorder } from '../../perf';
 /**
  * A cached graph of imports in the `ts.Program`.
  *
@@ -15,8 +16,9 @@ import * as ts from 'typescript';
  */
 export declare class ImportGraph {
     private checker;
+    private perf;
     private map;
-    constructor(checker: ts.TypeChecker);
+    constructor(checker: ts.TypeChecker, perf: PerfRecorder);
     /**
      * List the direct (not transitive) imports of a given `ts.SourceFile`.
      *

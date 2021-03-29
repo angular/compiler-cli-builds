@@ -12,6 +12,7 @@ import { DefaultImportRecorder, Reference } from '../../imports';
 import { SemanticDepGraphUpdater, SemanticSymbol, SemanticTypeParameter } from '../../incremental/semantic_graph';
 import { ClassPropertyMapping, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
+import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence, ResolveResult } from '../../transform';
@@ -54,7 +55,8 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     private semanticDepGraphUpdater;
     private annotateForClosureCompiler;
     private compileUndecoratedClassesWithAngularFeatures;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, defaultImportRecorder: DefaultImportRecorder, injectableRegistry: InjectableClassRegistry, isCore: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, compileUndecoratedClassesWithAngularFeatures: boolean);
+    private perf;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, defaultImportRecorder: DefaultImportRecorder, injectableRegistry: InjectableClassRegistry, isCore: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, compileUndecoratedClassesWithAngularFeatures: boolean, perf: PerfRecorder);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;

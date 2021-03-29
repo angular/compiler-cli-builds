@@ -11,6 +11,7 @@ import { DefaultImportRecorder } from '../../imports';
 import { SemanticSymbol } from '../../incremental/semantic_graph';
 import { InjectableClassRegistry, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
+import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { LocalModuleScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
@@ -35,7 +36,8 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator,
     private defaultImportRecorder;
     private injectableRegistry;
     private isCore;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, defaultImportRecorder: DefaultImportRecorder, injectableRegistry: InjectableClassRegistry, isCore: boolean);
+    private perf;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, defaultImportRecorder: DefaultImportRecorder, injectableRegistry: InjectableClassRegistry, isCore: boolean, perf: PerfRecorder);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;

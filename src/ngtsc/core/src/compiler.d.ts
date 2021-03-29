@@ -10,7 +10,7 @@ import * as ts from 'typescript';
 import { IncrementalBuildStrategy, IncrementalDriver } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
 import { ComponentResources } from '../../metadata';
-import { PerfRecorder } from '../../perf';
+import { ActivePerfRecorder } from '../../perf';
 import { DeclarationNode } from '../../reflection';
 import { OptimizeFor, TemplateTypeChecker, TypeCheckingProgramStrategy } from '../../typecheck/api';
 import { LazyRoute, NgCompilerAdapter, NgCompilerOptions } from '../api';
@@ -33,6 +33,7 @@ export interface FreshCompilationTicket {
     enableTemplateTypeChecker: boolean;
     usePoisonedData: boolean;
     tsProgram: ts.Program;
+    perfRecorder: ActivePerfRecorder;
 }
 /**
  * Begin an Angular compilation operation that incorporates changes to TypeScript code.
@@ -47,11 +48,13 @@ export interface IncrementalTypeScriptCompilationTicket {
     newDriver: IncrementalDriver;
     enableTemplateTypeChecker: boolean;
     usePoisonedData: boolean;
+    perfRecorder: ActivePerfRecorder;
 }
 export interface IncrementalResourceCompilationTicket {
     kind: CompilationTicketKind.IncrementalResource;
     compiler: NgCompiler;
     modifiedResourceFiles: Set<string>;
+    perfRecorder: ActivePerfRecorder;
 }
 /**
  * A request to begin Angular compilation, either starting from scratch or from a known prior state.
@@ -64,17 +67,17 @@ export declare type CompilationTicket = FreshCompilationTicket | IncrementalType
 /**
  * Create a `CompilationTicket` for a brand new compilation, using no prior state.
  */
-export declare function freshCompilationTicket(tsProgram: ts.Program, options: NgCompilerOptions, incrementalBuildStrategy: IncrementalBuildStrategy, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, enableTemplateTypeChecker: boolean, usePoisonedData: boolean): CompilationTicket;
+export declare function freshCompilationTicket(tsProgram: ts.Program, options: NgCompilerOptions, incrementalBuildStrategy: IncrementalBuildStrategy, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, perfRecorder: ActivePerfRecorder | null, enableTemplateTypeChecker: boolean, usePoisonedData: boolean): CompilationTicket;
 /**
  * Create a `CompilationTicket` as efficiently as possible, based on a previous `NgCompiler`
  * instance and a new `ts.Program`.
  */
-export declare function incrementalFromCompilerTicket(oldCompiler: NgCompiler, newProgram: ts.Program, incrementalBuildStrategy: IncrementalBuildStrategy, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, modifiedResourceFiles: Set<string>): CompilationTicket;
+export declare function incrementalFromCompilerTicket(oldCompiler: NgCompiler, newProgram: ts.Program, incrementalBuildStrategy: IncrementalBuildStrategy, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, modifiedResourceFiles: Set<string>, perfRecorder: ActivePerfRecorder | null): CompilationTicket;
 /**
  * Create a `CompilationTicket` directly from an old `ts.Program` and associated Angular compilation
  * state, along with a new `ts.Program`.
  */
-export declare function incrementalFromDriverTicket(oldProgram: ts.Program, oldDriver: IncrementalDriver, newProgram: ts.Program, options: NgCompilerOptions, incrementalBuildStrategy: IncrementalBuildStrategy, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, modifiedResourceFiles: Set<string>, enableTemplateTypeChecker: boolean, usePoisonedData: boolean): CompilationTicket;
+export declare function incrementalFromDriverTicket(oldProgram: ts.Program, oldDriver: IncrementalDriver, newProgram: ts.Program, options: NgCompilerOptions, incrementalBuildStrategy: IncrementalBuildStrategy, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, modifiedResourceFiles: Set<string>, perfRecorder: ActivePerfRecorder | null, enableTemplateTypeChecker: boolean, usePoisonedData: boolean): CompilationTicket;
 export declare function resourceChangeTicket(compiler: NgCompiler, modifiedResourceFiles: Set<string>): IncrementalResourceCompilationTicket;
 /**
  * The heart of the Angular Ivy compiler.
@@ -97,7 +100,7 @@ export declare class NgCompiler {
     readonly incrementalDriver: IncrementalDriver;
     readonly enableTemplateTypeChecker: boolean;
     readonly usePoisonedData: boolean;
-    private perfRecorder;
+    private livePerfRecorder;
     /**
      * Lazily evaluated state of the compilation.
      *
@@ -126,15 +129,23 @@ export declare class NgCompiler {
     readonly ignoreForDiagnostics: Set<ts.SourceFile>;
     readonly ignoreForEmit: Set<ts.SourceFile>;
     /**
+     * `NgCompiler` can be reused for multiple compilations (for resource-only changes), and each
+     * new compilation uses a fresh `PerfRecorder`. Thus, classes created with a lifespan of the
+     * `NgCompiler` use a `DelegatingPerfRecorder` so the `PerfRecorder` they write to can be updated
+     * with each fresh compilation.
+     */
+    private delegatingPerfRecorder;
+    /**
      * Convert a `CompilationTicket` into an `NgCompiler` instance for the requested compilation.
      *
      * Depending on the nature of the compilation request, the `NgCompiler` instance may be reused
      * from a previous compilation and updated with any changes, it may be a new instance which
-     * incrementally reuses state from a previous compilation, or it may represent a fresh compilation
-     * entirely.
+     * incrementally reuses state from a previous compilation, or it may represent a fresh
+     * compilation entirely.
      */
-    static fromTicket(ticket: CompilationTicket, adapter: NgCompilerAdapter, perfRecorder?: PerfRecorder): NgCompiler;
+    static fromTicket(ticket: CompilationTicket, adapter: NgCompilerAdapter): NgCompiler;
     private constructor();
+    get perfRecorder(): ActivePerfRecorder;
     private updateWithChangedResources;
     /**
      * Get the resource dependencies of a file.
