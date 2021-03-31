@@ -9,3 +9,4 @@
 import { R3FactoryMetadata } from '@angular/compiler';
 import { CompileResult } from '../../transform';
 export declare function compileNgFactoryDefField(metadata: R3FactoryMetadata): CompileResult;
+export declare function compileDeclareFactory(metadata: R3FactoryMetadata): CompileResult;

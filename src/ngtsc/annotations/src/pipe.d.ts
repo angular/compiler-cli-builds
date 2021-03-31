@@ -47,5 +47,4 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator,
     resolve(node: ClassDeclaration): ResolveResult<unknown>;
     compileFull(node: ClassDeclaration, analysis: Readonly<PipeHandlerData>): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<PipeHandlerData>): CompileResult[];
-    private compilePipe;
 }

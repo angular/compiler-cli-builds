@@ -50,4 +50,5 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
     symbol(): null;
     register(node: ClassDeclaration): void;
     compileFull(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];
+    compilePartial(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];
 }
