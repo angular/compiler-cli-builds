@@ -6,12 +6,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/util" />
-import { Expression, ParseSourceSpan, R3DependencyMetadata, R3Reference, WrappedNodeExpr } from '@angular/compiler';
+import { Expression, ParseSourceSpan, R3CompiledExpression, R3DependencyMetadata, R3Reference, Statement, WrappedNodeExpr } from '@angular/compiler';
+import { R3FactoryMetadata } from '@angular/compiler/src/compiler';
+import { FactoryTarget } from '@angular/compiler/src/render3/partial/api';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { ForeignFunctionResolver, PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, CtorParameter, Decorator, Import, ImportedTypeValueReference, LocalTypeValueReference, ReflectionHost, TypeValueReference, UnavailableValue } from '../../reflection';
 import { DeclarationData } from '../../scope';
+import { CompileResult } from '../../transform';
 export declare type ConstructorDeps = {
     deps: R3DependencyMetadata[];
 } | {
@@ -123,3 +126,8 @@ export declare function resolveProvidersRequiringFactory(rawProviders: ts.Expres
 export declare function wrapTypeReference(reflector: ReflectionHost, clazz: ClassDeclaration): R3Reference;
 /** Creates a ParseSourceSpan for a TypeScript node. */
 export declare function createSourceSpan(node: ts.Node): ParseSourceSpan;
+/**
+ * Collate the factory and definition compiled results into an array of CompileResult objects.
+ */
+export declare function compileResults(fac: CompileResult, def: R3CompiledExpression, metadataStmt: Statement | null, propName: string): CompileResult[];
+export declare function toFactoryMetadata(meta: Omit<R3FactoryMetadata, 'target'>, target: FactoryTarget): R3FactoryMetadata;

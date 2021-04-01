@@ -94,9 +94,37 @@ export declare enum PerfPhase {
      */
     LsReferencesAndRenames = 16,
     /**
+     * Time spent by the Angular Language Service calculating a "quick info" operation.
+     */
+    LsQuickInfo = 17,
+    /**
+     * Time spent by the Angular Language Service calculating a "get type definition" or "get
+     * definition" operation.
+     */
+    LsDefinition = 18,
+    /**
+     * Time spent by the Angular Language Service calculating a "get completions" (AKA autocomplete)
+     * operation.
+     */
+    LsCompletions = 19,
+    /**
+     * Time spent by the Angular Language Service calculating a "view template typecheck block"
+     * operation.
+     */
+    LsTcb = 20,
+    /**
+     * Time spent by the Angular Language Service calculating diagnostics.
+     */
+    LsDiagnostics = 21,
+    /**
+     * Time spent by the Angular Language Service calculating a "get component locations for template"
+     * operation.
+     */
+    LsComponentLocations = 22,
+    /**
      * Tracks the number of `PerfPhase`s, and must appear at the end of the list.
      */
-    LAST = 17
+    LAST = 23
 }
 /**
  * Represents some occurrence during compilation, and is tracked with a counter.

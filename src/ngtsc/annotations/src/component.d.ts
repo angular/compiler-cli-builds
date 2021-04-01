@@ -148,7 +148,6 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     updateResources(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
     compileFull(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): CompileResult[];
-    private compileComponent;
     private _resolveLiteral;
     private _resolveEnumValue;
     private _extractComponentStyleUrls;
