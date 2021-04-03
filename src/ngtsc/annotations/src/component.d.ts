@@ -135,6 +135,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      * thrown away, and the parsed template is reused during the analyze phase.
      */
     private preanalyzeTemplateCache;
+    private preanalyzeStylesCache;
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;

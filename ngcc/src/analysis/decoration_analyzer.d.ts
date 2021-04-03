@@ -22,7 +22,9 @@ declare class NgccResourceLoader implements ResourceLoader {
     private fs;
     constructor(fs: ReadonlyFileSystem);
     canPreload: boolean;
+    canPreprocess: boolean;
     preload(): undefined | Promise<void>;
+    preprocessInline(): Promise<string>;
     load(url: string): string;
     resolve(url: string, containingFile: string): string;
 }
