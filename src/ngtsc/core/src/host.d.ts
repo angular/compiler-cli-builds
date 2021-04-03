@@ -40,6 +40,7 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     readDirectory: ((rootDir: string, extensions: readonly string[], excludes: readonly string[] | undefined, includes: readonly string[], depth?: number | undefined) => string[]) | undefined;
     readFile: (fileName: string) => string | undefined;
     readResource: ((fileName: string) => string | Promise<string>) | undefined;
+    transformResource: ((data: string, context: import("@angular/compiler-cli/src/ngtsc/core/api/index").ResourceHostContext) => Promise<import("@angular/compiler-cli/src/ngtsc/core/api/index").TransformResourceResult | null>) | undefined;
     realpath: ((path: string) => string) | undefined;
     resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedModule | undefined)[]) | undefined;
     resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
