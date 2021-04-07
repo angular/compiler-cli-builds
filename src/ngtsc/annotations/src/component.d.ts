@@ -167,12 +167,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      */
     private _checkForCyclicImport;
     private _recordSyntheticImport;
-    /**
-     * Resolve the url of a resource relative to the file that contains the reference to it.
-     *
-     * Throws a FatalDiagnosticError when unable to resolve the file.
-     */
-    private _resolveResourceOrThrow;
+    private makeResourceNotFoundError;
     private _extractTemplateStyleUrls;
 }
 /**
