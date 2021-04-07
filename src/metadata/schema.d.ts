@@ -80,7 +80,7 @@ export declare type MetadataSymbolicExpression = MetadataSymbolicBinaryExpressio
 export declare function isMetadataSymbolicExpression(value: any): value is MetadataSymbolicExpression;
 export interface MetadataSymbolicBinaryExpression {
     __symbolic: 'binary';
-    operator: '&&' | '||' | '|' | '^' | '&' | '==' | '!=' | '===' | '!==' | '<' | '>' | '<=' | '>=' | 'instanceof' | 'in' | 'as' | '<<' | '>>' | '>>>' | '+' | '-' | '*' | '/' | '%' | '**';
+    operator: '&&' | '||' | '|' | '^' | '&' | '==' | '!=' | '===' | '!==' | '<' | '>' | '<=' | '>=' | 'instanceof' | 'in' | 'as' | '<<' | '>>' | '>>>' | '+' | '-' | '*' | '/' | '%' | '**' | '??';
     left: MetadataValue;
     right: MetadataValue;
 }
