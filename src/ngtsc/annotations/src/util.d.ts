@@ -67,14 +67,15 @@ export declare function isAngularDecorator(decorator: Decorator, name: string, i
  */
 export declare function unwrapExpression(node: ts.Expression): ts.Expression;
 /**
- * Possibly resolve a forwardRef() expression into the inner value.
+ * If the given `node` is a forwardRef() expression then resolve its inner value, otherwise return
+ * `null`.
  *
  * @param node the forwardRef() expression to resolve
  * @param reflector a ReflectionHost
- * @returns the resolved expression, if the original expression was a forwardRef(), or the original
- * expression otherwise
+ * @returns the resolved expression, if the original expression was a forwardRef(), or `null`
+ *     otherwise.
  */
-export declare function unwrapForwardRef(node: ts.Expression, reflector: ReflectionHost): ts.Expression;
+export declare function tryUnwrapForwardRef(node: ts.Expression, reflector: ReflectionHost): ts.Expression | null;
 /**
  * A foreign function resolver for `staticallyResolve` which unwraps forwardRef() expressions.
  *

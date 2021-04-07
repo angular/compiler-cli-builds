@@ -19,7 +19,7 @@ export interface InjectableHandlerData {
     needsFactory: boolean;
 }
 /**
- * Adapts the `compileIvyInjectable` compiler for `@Injectable` decorators to the Ivy compiler.
+ * Adapts the `compileInjectable` compiler for `@Injectable` decorators to the Ivy compiler.
  */
 export declare class InjectableDecoratorHandler implements DecoratorHandler<Decorator, InjectableHandlerData, null, unknown> {
     private reflector;
@@ -51,4 +51,5 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
     register(node: ClassDeclaration): void;
     compileFull(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];
+    private compile;
 }
