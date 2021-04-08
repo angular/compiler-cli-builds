@@ -11,8 +11,9 @@ import { IncrementalBuildStrategy, IncrementalDriver } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
 import { ComponentResources } from '../../metadata';
 import { ActivePerfRecorder } from '../../perf';
+import { ProgramDriver } from '../../program_driver';
 import { DeclarationNode } from '../../reflection';
-import { OptimizeFor, TemplateTypeChecker, TypeCheckingProgramStrategy } from '../../typecheck/api';
+import { OptimizeFor, TemplateTypeChecker } from '../../typecheck/api';
 import { LazyRoute, NgCompilerAdapter, NgCompilerOptions } from '../api';
 /**
  * Discriminant type for a `CompilationTicket`.
@@ -29,7 +30,7 @@ export interface FreshCompilationTicket {
     kind: CompilationTicketKind.Fresh;
     options: NgCompilerOptions;
     incrementalBuildStrategy: IncrementalBuildStrategy;
-    typeCheckingProgramStrategy: TypeCheckingProgramStrategy;
+    programDriver: ProgramDriver;
     enableTemplateTypeChecker: boolean;
     usePoisonedData: boolean;
     tsProgram: ts.Program;
@@ -44,7 +45,7 @@ export interface IncrementalTypeScriptCompilationTicket {
     oldProgram: ts.Program;
     newProgram: ts.Program;
     incrementalBuildStrategy: IncrementalBuildStrategy;
-    typeCheckingProgramStrategy: TypeCheckingProgramStrategy;
+    programDriver: ProgramDriver;
     newDriver: IncrementalDriver;
     enableTemplateTypeChecker: boolean;
     usePoisonedData: boolean;
@@ -67,17 +68,17 @@ export declare type CompilationTicket = FreshCompilationTicket | IncrementalType
 /**
  * Create a `CompilationTicket` for a brand new compilation, using no prior state.
  */
-export declare function freshCompilationTicket(tsProgram: ts.Program, options: NgCompilerOptions, incrementalBuildStrategy: IncrementalBuildStrategy, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, perfRecorder: ActivePerfRecorder | null, enableTemplateTypeChecker: boolean, usePoisonedData: boolean): CompilationTicket;
+export declare function freshCompilationTicket(tsProgram: ts.Program, options: NgCompilerOptions, incrementalBuildStrategy: IncrementalBuildStrategy, programDriver: ProgramDriver, perfRecorder: ActivePerfRecorder | null, enableTemplateTypeChecker: boolean, usePoisonedData: boolean): CompilationTicket;
 /**
  * Create a `CompilationTicket` as efficiently as possible, based on a previous `NgCompiler`
  * instance and a new `ts.Program`.
  */
-export declare function incrementalFromCompilerTicket(oldCompiler: NgCompiler, newProgram: ts.Program, incrementalBuildStrategy: IncrementalBuildStrategy, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, modifiedResourceFiles: Set<string>, perfRecorder: ActivePerfRecorder | null): CompilationTicket;
+export declare function incrementalFromCompilerTicket(oldCompiler: NgCompiler, newProgram: ts.Program, incrementalBuildStrategy: IncrementalBuildStrategy, programDriver: ProgramDriver, modifiedResourceFiles: Set<string>, perfRecorder: ActivePerfRecorder | null): CompilationTicket;
 /**
  * Create a `CompilationTicket` directly from an old `ts.Program` and associated Angular compilation
  * state, along with a new `ts.Program`.
  */
-export declare function incrementalFromDriverTicket(oldProgram: ts.Program, oldDriver: IncrementalDriver, newProgram: ts.Program, options: NgCompilerOptions, incrementalBuildStrategy: IncrementalBuildStrategy, typeCheckingProgramStrategy: TypeCheckingProgramStrategy, modifiedResourceFiles: Set<string>, perfRecorder: ActivePerfRecorder | null, enableTemplateTypeChecker: boolean, usePoisonedData: boolean): CompilationTicket;
+export declare function incrementalFromDriverTicket(oldProgram: ts.Program, oldDriver: IncrementalDriver, newProgram: ts.Program, options: NgCompilerOptions, incrementalBuildStrategy: IncrementalBuildStrategy, programDriver: ProgramDriver, modifiedResourceFiles: Set<string>, perfRecorder: ActivePerfRecorder | null, enableTemplateTypeChecker: boolean, usePoisonedData: boolean): CompilationTicket;
 export declare function resourceChangeTicket(compiler: NgCompiler, modifiedResourceFiles: Set<string>): IncrementalResourceCompilationTicket;
 /**
  * The heart of the Angular Ivy compiler.
@@ -94,8 +95,8 @@ export declare function resourceChangeTicket(compiler: NgCompiler, modifiedResou
 export declare class NgCompiler {
     private adapter;
     readonly options: NgCompilerOptions;
-    private tsProgram;
-    readonly typeCheckingProgramStrategy: TypeCheckingProgramStrategy;
+    private inputProgram;
+    readonly programDriver: ProgramDriver;
     readonly incrementalStrategy: IncrementalBuildStrategy;
     readonly incrementalDriver: IncrementalDriver;
     readonly enableTemplateTypeChecker: boolean;
@@ -121,7 +122,7 @@ export declare class NgCompiler {
      */
     private nonTemplateDiagnostics;
     private closureCompilerEnabled;
-    private nextProgram;
+    private currentProgram;
     private entryPoint;
     private moduleResolver;
     private resourceManager;
@@ -172,15 +173,21 @@ export declare class NgCompiler {
      */
     getOptionDiagnostics(): ts.Diagnostic[];
     /**
-     * Get the `ts.Program` to use as a starting point when spawning a subsequent incremental
-     * compilation.
+     * Get the current `ts.Program` known to this `NgCompiler`.
      *
-     * The `NgCompiler` spawns an internal incremental TypeScript compilation (inheriting the
-     * consumer's `ts.Program` into a new one for the purposes of template type-checking). After this
-     * operation, the consumer's `ts.Program` is no longer usable for starting a new incremental
-     * compilation. `getNextProgram` retrieves the `ts.Program` which can be used instead.
+     * Compilation begins with an input `ts.Program`, and during template type-checking operations new
+     * `ts.Program`s may be produced using the `ProgramDriver`. The most recent such `ts.Program` to
+     * be produced is available here.
+     *
+     * This `ts.Program` serves two key purposes:
+     *
+     * * As an incremental starting point for creating the next `ts.Program` based on files that the
+     *   user has changed (for clients using the TS compiler program APIs).
+     *
+     * * As the "before" point for an incremental compilation invocation, to determine what's changed
+     *   between the old and new programs (for all compilations).
      */
-    getNextProgram(): ts.Program;
+    getCurrentProgram(): ts.Program;
     getTemplateTypeChecker(): TemplateTypeChecker;
     /**
      * Retrieves the `ts.Declaration`s for any component(s) which use the given template file.

@@ -8,7 +8,6 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/api" />
 import { AbsoluteSourceSpan, BoundTarget, DirectiveMeta, ParseSourceSpan, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
-import { AbsoluteFsPath } from '../../file_system';
 import { Reference } from '../../imports';
 import { ClassPropertyMapping, DirectiveTypeCheckMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
@@ -312,58 +311,4 @@ export interface FullTemplateMapping {
     sourceLocation: SourceLocation;
     templateSourceMapping: TemplateSourceMapping;
     span: ParseSourceSpan;
-}
-/**
- * Abstracts the operation of determining which shim file will host a particular component's
- * template type-checking code.
- *
- * Different consumers of the type checking infrastructure may choose different approaches to
- * optimize for their specific use case (for example, the command-line compiler optimizes for
- * efficient `ts.Program` reuse in watch mode).
- */
-export interface ComponentToShimMappingStrategy {
-    /**
-     * Given a component, determine a path to the shim file into which that component's type checking
-     * code will be generated.
-     *
-     * A major constraint is that components in different input files must not share the same shim
-     * file. The behavior of the template type-checking system is undefined if this is violated.
-     */
-    shimPathForComponent(node: ts.ClassDeclaration): AbsoluteFsPath;
-}
-/**
- * Strategy used to manage a `ts.Program` which contains template type-checking code and update it
- * over time.
- *
- * This abstraction allows both the Angular compiler itself as well as the language service to
- * implement efficient template type-checking using common infrastructure.
- */
-export interface TypeCheckingProgramStrategy extends ComponentToShimMappingStrategy {
-    /**
-     * Whether this strategy supports modifying user files (inline modifications) in addition to
-     * modifying type-checking shims.
-     */
-    readonly supportsInlineOperations: boolean;
-    /**
-     * Retrieve the latest version of the program, containing all the updates made thus far.
-     */
-    getProgram(): ts.Program;
-    /**
-     * Incorporate a set of changes to either augment or completely replace the type-checking code
-     * included in the type-checking program.
-     */
-    updateFiles(contents: Map<AbsoluteFsPath, string>, updateMode: UpdateMode): void;
-}
-export declare enum UpdateMode {
-    /**
-     * A complete update creates a completely new overlay of type-checking code on top of the user's
-     * original program, which doesn't include type-checking code from previous calls to
-     * `updateFiles`.
-     */
-    Complete = 0,
-    /**
-     * An incremental update changes the contents of some files in the type-checking program without
-     * reverting any prior changes.
-     */
-    Incremental = 1
 }
