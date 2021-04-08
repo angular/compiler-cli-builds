@@ -12,9 +12,10 @@ import { AbsoluteFsPath } from '../../file_system';
 import { ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
 import { PerfRecorder } from '../../perf';
+import { ProgramDriver } from '../../program_driver';
 import { ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
+import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -24,7 +25,7 @@ import { TemplateSourceManager } from './source';
  */
 export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private originalProgram;
-    readonly typeCheckingStrategy: TypeCheckingProgramStrategy;
+    readonly programDriver: ProgramDriver;
     private typeCheckAdapter;
     private config;
     private refEmitter;
@@ -69,7 +70,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
      */
     private elementTagCache;
     private isComplete;
-    constructor(originalProgram: ts.Program, typeCheckingStrategy: TypeCheckingProgramStrategy, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
+    constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
     getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
     private getLatestComponentState;
     isTrackedTypeCheckFile(filePath: AbsoluteFsPath): boolean;

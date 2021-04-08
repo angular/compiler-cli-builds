@@ -12,7 +12,7 @@ import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { ComponentToShimMappingStrategy, TemplateId, TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata } from '../api';
+import { TemplateId, TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata } from '../api';
 import { TemplateDiagnostic } from '../diagnostics';
 import { DomSchemaChecker } from './dom';
 import { OutOfBandDiagnosticRecorder } from './oob';
@@ -145,14 +145,13 @@ export declare enum InliningMode {
 export declare class TypeCheckContextImpl implements TypeCheckContext {
     private config;
     private compilerHost;
-    private componentMappingStrategy;
     private refEmitter;
     private reflector;
     private host;
     private inlining;
     private perf;
     private fileMap;
-    constructor(config: TypeCheckingConfig, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, componentMappingStrategy: ComponentToShimMappingStrategy, refEmitter: ReferenceEmitter, reflector: ReflectionHost, host: TypeCheckingHost, inlining: InliningMode, perf: PerfRecorder);
+    constructor(config: TypeCheckingConfig, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, refEmitter: ReferenceEmitter, reflector: ReflectionHost, host: TypeCheckingHost, inlining: InliningMode, perf: PerfRecorder);
     /**
      * A `Map` of `ts.SourceFile`s that the context has seen to the operations (additions of methods
      * or type-check blocks) that need to be eventually performed on that file.
