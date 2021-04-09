@@ -50,7 +50,7 @@
      * Also, ranges are matched to include "pre-releases", therefore if the range is `>=11.1.0-next.1`
      * then this includes `11.1.0-next.2` and also `12.0.0-next.1`.
      *
-     * Finally, note that we always start with the current version (i.e. `12.0.0-next.8+25.sha-5e0d5a9`). This
+     * Finally, note that we always start with the current version (i.e. `12.0.0-next.8+26.sha-61bfa3d`). This
      * allows the linker to work on local builds effectively.
      */
     var PartialLinkerSelector = /** @class */ (function () {
@@ -101,31 +101,31 @@
             var partialPipeLinkerVersion1 = new partial_pipe_linker_1_1.PartialPipeLinkerVersion1();
             var linkers = new Map();
             linkers.set(exports.ɵɵngDeclareDirective, [
-                { range: '12.0.0-next.8+25.sha-5e0d5a9', linker: partialDirectiveLinkerVersion1 },
+                { range: '12.0.0-next.8+26.sha-61bfa3d', linker: partialDirectiveLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialDirectiveLinkerVersion1 },
             ]);
             linkers.set(exports.ɵɵngDeclareComponent, [
-                { range: '12.0.0-next.8+25.sha-5e0d5a9', linker: partialComponentLinkerVersion1 },
+                { range: '12.0.0-next.8+26.sha-61bfa3d', linker: partialComponentLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialComponentLinkerVersion1 },
             ]);
             linkers.set(exports.ɵɵngDeclareFactory, [
-                { range: '12.0.0-next.8+25.sha-5e0d5a9', linker: partialFactoryLinkerVersion1 },
+                { range: '12.0.0-next.8+26.sha-61bfa3d', linker: partialFactoryLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialFactoryLinkerVersion1 },
             ]);
             linkers.set(exports.ɵɵngDeclareInjectable, [
-                { range: '12.0.0-next.8+25.sha-5e0d5a9', linker: partialInjectableLinkerVersion1 },
+                { range: '12.0.0-next.8+26.sha-61bfa3d', linker: partialInjectableLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialInjectableLinkerVersion1 },
             ]);
             linkers.set(exports.ɵɵngDeclareInjector, [
-                { range: '12.0.0-next.8+25.sha-5e0d5a9', linker: partialInjectorLinkerVersion1 },
+                { range: '12.0.0-next.8+26.sha-61bfa3d', linker: partialInjectorLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialInjectorLinkerVersion1 },
             ]);
             linkers.set(exports.ɵɵngDeclareNgModule, [
-                { range: '12.0.0-next.8+25.sha-5e0d5a9', linker: partialNgModuleLinkerVersion1 },
+                { range: '12.0.0-next.8+26.sha-61bfa3d', linker: partialNgModuleLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialNgModuleLinkerVersion1 },
             ]);
             linkers.set(exports.ɵɵngDeclarePipe, [
-                { range: '12.0.0-next.8+25.sha-5e0d5a9', linker: partialPipeLinkerVersion1 },
+                { range: '12.0.0-next.8+26.sha-61bfa3d', linker: partialPipeLinkerVersion1 },
                 { range: '>=11.1.0-next.1', linker: partialPipeLinkerVersion1 },
             ]);
             return linkers;
