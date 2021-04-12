@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/directive" />
-import { ConstantPool, ParsedHostBindings, R3DirectiveMetadata, R3QueryMetadata, Statement } from '@angular/compiler';
+import { ConstantPool, ParsedHostBindings, R3ClassMetadata, R3DirectiveMetadata, R3QueryMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference } from '../../imports';
 import { SemanticDepGraphUpdater, SemanticSymbol, SemanticTypeParameter } from '../../incremental/semantic_graph';
@@ -20,7 +20,7 @@ export interface DirectiveHandlerData {
     baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
     typeCheckMeta: DirectiveTypeCheckMeta;
     meta: R3DirectiveMetadata;
-    metadataStmt: Statement | null;
+    classMetadata: R3ClassMetadata | null;
     providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
     inputs: ClassPropertyMapping;
     outputs: ClassPropertyMapping;
