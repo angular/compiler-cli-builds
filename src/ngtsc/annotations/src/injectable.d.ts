@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/injectable" />
-import { R3DependencyMetadata, R3InjectableMetadata, Statement } from '@angular/compiler';
+import { R3ClassMetadata, R3DependencyMetadata, R3InjectableMetadata } from '@angular/compiler';
 import { DefaultImportRecorder } from '../../imports';
 import { InjectableClassRegistry } from '../../metadata';
 import { PerfRecorder } from '../../perf';
@@ -14,7 +14,7 @@ import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
 export interface InjectableHandlerData {
     meta: R3InjectableMetadata;
-    metadataStmt: Statement | null;
+    classMetadata: R3ClassMetadata | null;
     ctorDeps: R3DependencyMetadata[] | 'invalid' | null;
     needsFactory: boolean;
 }

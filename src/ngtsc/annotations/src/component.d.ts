@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
-import { ConstantPool, InterpolationConfig, ParsedTemplate, ParseSourceFile, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
+import { ConstantPool, InterpolationConfig, ParsedTemplate, ParseSourceFile, R3ClassMetadata, R3ComponentMetadata, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
 import { CycleAnalyzer, CycleHandlingStrategy } from '../../cycles';
 import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
@@ -39,7 +39,7 @@ export interface ComponentAnalysisData {
     baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
     typeCheckMeta: DirectiveTypeCheckMeta;
     template: ParsedTemplateWithSource;
-    metadataStmt: Statement | null;
+    classMetadata: R3ClassMetadata | null;
     inputs: ClassPropertyMapping;
     outputs: ClassPropertyMapping;
     /**

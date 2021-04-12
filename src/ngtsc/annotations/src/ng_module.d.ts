@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
-import { Expression, R3FactoryMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata, Statement } from '@angular/compiler';
+import { Expression, R3ClassMetadata, R3FactoryMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
 import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
 import { SemanticReference, SemanticSymbol } from '../../incremental/semantic_graph';
@@ -23,7 +23,7 @@ export interface NgModuleAnalysis {
     mod: R3NgModuleMetadata;
     inj: R3InjectorMetadata;
     fac: R3FactoryMetadata;
-    metadataStmt: Statement | null;
+    classMetadata: R3ClassMetadata | null;
     declarations: Reference<ClassDeclaration>[];
     rawDeclarations: ts.Expression | null;
     schemas: SchemaMetadata[];
@@ -74,8 +74,8 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     symbol(node: ClassDeclaration): NgModuleSymbol;
     register(node: ClassDeclaration, analysis: NgModuleAnalysis): void;
     resolve(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>): ResolveResult<NgModuleResolution>;
-    compileFull(node: ClassDeclaration, { inj, mod, fac, metadataStmt, declarations }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
-    compilePartial(node: ClassDeclaration, { inj, fac, mod, metadataStmt }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
+    compileFull(node: ClassDeclaration, { inj, mod, fac, classMetadata, declarations }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
+    compilePartial(node: ClassDeclaration, { inj, fac, mod, classMetadata }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
     /**
      *  Merge the injector imports (which are 'exports' that were later found to be NgModules)
      *  computed during resolution with the ones from analysis.

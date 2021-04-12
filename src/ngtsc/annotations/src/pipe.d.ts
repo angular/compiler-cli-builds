@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/pipe" />
-import { R3PipeMetadata, Statement } from '@angular/compiler';
+import { R3ClassMetadata, R3PipeMetadata } from '@angular/compiler';
 import { DefaultImportRecorder } from '../../imports';
 import { SemanticSymbol } from '../../incremental/semantic_graph';
 import { InjectableClassRegistry, MetadataRegistry } from '../../metadata';
@@ -17,7 +17,7 @@ import { LocalModuleScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
 export interface PipeHandlerData {
     meta: R3PipeMetadata;
-    metadataStmt: Statement | null;
+    classMetadata: R3ClassMetadata | null;
 }
 /**
  * Represents an Angular pipe.
