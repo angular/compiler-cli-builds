@@ -7,7 +7,8 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/core/src/compiler" />
 import * as ts from 'typescript';
-import { IncrementalBuildStrategy, IncrementalDriver } from '../../incremental';
+import { AbsoluteFsPath } from '../../file_system';
+import { IncrementalBuildStrategy, IncrementalCompilation, IncrementalState } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
 import { ComponentResources } from '../../metadata';
 import { ActivePerfRecorder } from '../../perf';
@@ -42,11 +43,10 @@ export interface FreshCompilationTicket {
 export interface IncrementalTypeScriptCompilationTicket {
     kind: CompilationTicketKind.IncrementalTypeScript;
     options: NgCompilerOptions;
-    oldProgram: ts.Program;
     newProgram: ts.Program;
     incrementalBuildStrategy: IncrementalBuildStrategy;
+    incrementalCompilation: IncrementalCompilation;
     programDriver: ProgramDriver;
-    newDriver: IncrementalDriver;
     enableTemplateTypeChecker: boolean;
     usePoisonedData: boolean;
     perfRecorder: ActivePerfRecorder;
@@ -73,12 +73,12 @@ export declare function freshCompilationTicket(tsProgram: ts.Program, options: N
  * Create a `CompilationTicket` as efficiently as possible, based on a previous `NgCompiler`
  * instance and a new `ts.Program`.
  */
-export declare function incrementalFromCompilerTicket(oldCompiler: NgCompiler, newProgram: ts.Program, incrementalBuildStrategy: IncrementalBuildStrategy, programDriver: ProgramDriver, modifiedResourceFiles: Set<string>, perfRecorder: ActivePerfRecorder | null): CompilationTicket;
+export declare function incrementalFromCompilerTicket(oldCompiler: NgCompiler, newProgram: ts.Program, incrementalBuildStrategy: IncrementalBuildStrategy, programDriver: ProgramDriver, modifiedResourceFiles: Set<AbsoluteFsPath>, perfRecorder: ActivePerfRecorder | null): CompilationTicket;
 /**
  * Create a `CompilationTicket` directly from an old `ts.Program` and associated Angular compilation
  * state, along with a new `ts.Program`.
  */
-export declare function incrementalFromDriverTicket(oldProgram: ts.Program, oldDriver: IncrementalDriver, newProgram: ts.Program, options: NgCompilerOptions, incrementalBuildStrategy: IncrementalBuildStrategy, programDriver: ProgramDriver, modifiedResourceFiles: Set<string>, perfRecorder: ActivePerfRecorder | null, enableTemplateTypeChecker: boolean, usePoisonedData: boolean): CompilationTicket;
+export declare function incrementalFromStateTicket(oldProgram: ts.Program, oldState: IncrementalState, newProgram: ts.Program, options: NgCompilerOptions, incrementalBuildStrategy: IncrementalBuildStrategy, programDriver: ProgramDriver, modifiedResourceFiles: Set<AbsoluteFsPath>, perfRecorder: ActivePerfRecorder | null, enableTemplateTypeChecker: boolean, usePoisonedData: boolean): CompilationTicket;
 export declare function resourceChangeTicket(compiler: NgCompiler, modifiedResourceFiles: Set<string>): IncrementalResourceCompilationTicket;
 /**
  * The heart of the Angular Ivy compiler.
@@ -98,7 +98,7 @@ export declare class NgCompiler {
     private inputProgram;
     readonly programDriver: ProgramDriver;
     readonly incrementalStrategy: IncrementalBuildStrategy;
-    readonly incrementalDriver: IncrementalDriver;
+    readonly incrementalCompilation: IncrementalCompilation;
     readonly enableTemplateTypeChecker: boolean;
     readonly usePoisonedData: boolean;
     private livePerfRecorder;
@@ -147,6 +147,13 @@ export declare class NgCompiler {
     static fromTicket(ticket: CompilationTicket, adapter: NgCompilerAdapter): NgCompiler;
     private constructor();
     get perfRecorder(): ActivePerfRecorder;
+    /**
+     * Exposes the `IncrementalCompilation` under an old property name that the CLI uses, avoiding a
+     * chicken-and-egg problem with the rename to `incrementalCompilation`.
+     *
+     * TODO(alxhub): remove when the CLI uses the new name.
+     */
+    get incrementalDriver(): IncrementalCompilation;
     private updateWithChangedResources;
     /**
      * Get the resource dependencies of a file.
