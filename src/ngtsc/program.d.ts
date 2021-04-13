@@ -25,20 +25,6 @@ export declare class NgtscProgram implements api.Program {
      * The primary TypeScript program, which is used for analysis and emit.
      */
     private tsProgram;
-    /**
-     * The TypeScript program to use for the next incremental compilation.
-     *
-     * Once a TS program is used to create another (an incremental compilation operation), it can no
-     * longer be used to do so again.
-     *
-     * Since template type-checking uses the primary program to create a type-checking program, after
-     * this happens the primary program is no longer suitable for starting a subsequent compilation,
-     * and the template type-checking program should be used instead.
-     *
-     * Thus, the program which should be used for the next incremental compilation is tracked in
-     * `reuseTsProgram`, separately from the "primary" program which is always used for emit.
-     */
-    private reuseTsProgram;
     private closureCompilerEnabled;
     private host;
     private incrementalStrategy;
