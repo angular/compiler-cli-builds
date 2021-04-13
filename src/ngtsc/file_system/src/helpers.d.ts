@@ -1,12 +1,4 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/file_system/src/helpers" />
-/**
- * @license
- * Copyright Google LLC All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-import * as ts from 'typescript';
 import { AbsoluteFsPath, FileSystem, PathSegment, PathString } from './types';
 export declare function getFileSystem(): FileSystem;
 export declare function setFileSystem(fileSystem: FileSystem): void;
@@ -15,9 +7,11 @@ export declare function setFileSystem(fileSystem: FileSystem): void;
  */
 export declare function absoluteFrom(path: string): AbsoluteFsPath;
 /**
- * Extract an `AbsoluteFsPath` from a `ts.SourceFile`.
+ * Extract an `AbsoluteFsPath` from a `ts.SourceFile`-like object.
  */
-export declare function absoluteFromSourceFile(sf: ts.SourceFile): AbsoluteFsPath;
+export declare function absoluteFromSourceFile(sf: {
+    fileName: string;
+}): AbsoluteFsPath;
 /**
  * Convert the path `path` to a `PathSegment`, throwing an error if it's not a relative path.
  */

@@ -50,6 +50,6 @@ export declare class FileDependencyGraph<T extends {
      * L(n) = the logically changed files from build n - 1 to build n.
      * P(n) = the physically changed files from build n - 1 to build n.
      */
-    updateWithPhysicalChanges(previous: FileDependencyGraph<T>, changedTsPaths: Set<string>, deletedTsPaths: Set<string>, changedResources: Set<AbsoluteFsPath>): Set<string>;
+    updateWithPhysicalChanges(previous: FileDependencyGraph<T>, changedTsPaths: Set<AbsoluteFsPath>, deletedTsPaths: Set<AbsoluteFsPath>, changedResources: Set<AbsoluteFsPath>): Set<AbsoluteFsPath>;
     private nodeFor;
 }
