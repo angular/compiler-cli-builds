@@ -7,7 +7,6 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/injectable" />
 import { R3DependencyMetadata, R3InjectableMetadata, Statement } from '@angular/compiler';
-import { DefaultImportRecorder } from '../../imports';
 import { InjectableClassRegistry } from '../../metadata';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
@@ -23,7 +22,6 @@ export interface InjectableHandlerData {
  */
 export declare class InjectableDecoratorHandler implements DecoratorHandler<Decorator, InjectableHandlerData, null, unknown> {
     private reflector;
-    private defaultImportRecorder;
     private isCore;
     private strictCtorDeps;
     private injectableRegistry;
@@ -35,7 +33,7 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
      * If false then there is no error and a new ɵprov property is not added.
      */
     private errorOnDuplicateProv;
-    constructor(reflector: ReflectionHost, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, strictCtorDeps: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, 
+    constructor(reflector: ReflectionHost, isCore: boolean, strictCtorDeps: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, 
     /**
      * What to do if the injectable already contains a ɵprov property.
      *

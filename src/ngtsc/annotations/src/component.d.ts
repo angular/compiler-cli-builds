@@ -9,7 +9,7 @@
 import { ConstantPool, InterpolationConfig, ParsedTemplate, ParseSourceFile, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
 import { CycleAnalyzer, CycleHandlingStrategy } from '../../cycles';
-import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
+import { ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
 import { SemanticDepGraphUpdater, SemanticReference, SemanticSymbol } from '../../incremental/semantic_graph';
 import { IndexingContext } from '../../indexer';
@@ -120,13 +120,12 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private cycleAnalyzer;
     private cycleHandlingStrategy;
     private refEmitter;
-    private defaultImportRecorder;
     private depTracker;
     private injectableRegistry;
     private semanticDepGraphUpdater;
     private annotateForClosureCompiler;
     private perf;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder);
     private literalCache;
     private elementSchemaRegistry;
     /**

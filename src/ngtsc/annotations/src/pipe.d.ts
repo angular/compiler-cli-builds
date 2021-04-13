@@ -7,7 +7,6 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/pipe" />
 import { R3PipeMetadata, Statement } from '@angular/compiler';
-import { DefaultImportRecorder } from '../../imports';
 import { SemanticSymbol } from '../../incremental/semantic_graph';
 import { InjectableClassRegistry, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
@@ -33,11 +32,10 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator,
     private evaluator;
     private metaRegistry;
     private scopeRegistry;
-    private defaultImportRecorder;
     private injectableRegistry;
     private isCore;
     private perf;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, defaultImportRecorder: DefaultImportRecorder, injectableRegistry: InjectableClassRegistry, isCore: boolean, perf: PerfRecorder);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, injectableRegistry: InjectableClassRegistry, isCore: boolean, perf: PerfRecorder);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;

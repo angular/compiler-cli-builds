@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/directive" />
 import { ConstantPool, ParsedHostBindings, R3DirectiveMetadata, R3QueryMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
-import { DefaultImportRecorder, Reference } from '../../imports';
+import { Reference } from '../../imports';
 import { SemanticDepGraphUpdater, SemanticSymbol, SemanticTypeParameter } from '../../incremental/semantic_graph';
 import { ClassPropertyMapping, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
@@ -49,14 +49,13 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     private metaRegistry;
     private scopeRegistry;
     private metaReader;
-    private defaultImportRecorder;
     private injectableRegistry;
     private isCore;
     private semanticDepGraphUpdater;
     private annotateForClosureCompiler;
     private compileUndecoratedClassesWithAngularFeatures;
     private perf;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, defaultImportRecorder: DefaultImportRecorder, injectableRegistry: InjectableClassRegistry, isCore: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, compileUndecoratedClassesWithAngularFeatures: boolean, perf: PerfRecorder);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, isCore: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, compileUndecoratedClassesWithAngularFeatures: boolean, perf: PerfRecorder);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
@@ -81,7 +80,7 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
  * appear in the declarations of an `NgModule` and additional verification is done when processing
  * the module.
  */
-export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator | null>, reflector: ReflectionHost, evaluator: PartialEvaluator, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, flags: HandlerFlags, annotateForClosureCompiler: boolean, defaultSelector?: string | null): {
+export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator | null>, reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean, flags: HandlerFlags, annotateForClosureCompiler: boolean, defaultSelector?: string | null): {
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;
     inputs: ClassPropertyMapping;

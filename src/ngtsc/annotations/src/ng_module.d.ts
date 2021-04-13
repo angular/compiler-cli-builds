@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
 import { Expression, R3DependencyMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata, Statement } from '@angular/compiler';
 import * as ts from 'typescript';
-import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
+import { Reference, ReferenceEmitter } from '../../imports';
 import { SemanticReference, SemanticSymbol } from '../../incremental/semantic_graph';
 import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
@@ -61,12 +61,11 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     private routeAnalyzer;
     private refEmitter;
     private factoryTracker;
-    private defaultImportRecorder;
     private annotateForClosureCompiler;
     private injectableRegistry;
     private perf;
     private localeId?;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, defaultImportRecorder: DefaultImportRecorder, annotateForClosureCompiler: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, localeId?: string | undefined);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, annotateForClosureCompiler: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, localeId?: string | undefined);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
