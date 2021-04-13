@@ -47,3 +47,7 @@ export declare type SubsetOfKeys<T, K extends keyof T> = K;
 export declare type RequiredDelegations<T> = {
     [M in keyof Required<T>]: T[M];
 };
+/**
+ * Obtains the non-redirected source file for `sf`.
+ */
+export declare function toUnredirectedSourceFile(sf: ts.SourceFile): ts.SourceFile;
