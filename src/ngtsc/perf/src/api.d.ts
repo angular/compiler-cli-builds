@@ -122,9 +122,13 @@ export declare enum PerfPhase {
      */
     LsComponentLocations = 22,
     /**
+     * Time spent by the Angular Language Service calculating signature help.
+     */
+    LsSignatureHelp = 23,
+    /**
      * Tracks the number of `PerfPhase`s, and must appear at the end of the list.
      */
-    LAST = 23
+    LAST = 24
 }
 /**
  * Represents some occurrence during compilation, and is tracked with a counter.
