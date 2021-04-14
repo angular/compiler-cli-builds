@@ -43,7 +43,7 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     realpath: ((path: string) => string) | undefined;
     resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedModule | undefined)[]) | undefined;
     resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
-    resourceNameToFileName: ((resourceName: string, containingFilePath: string) => string | null) | undefined;
+    resourceNameToFileName: ((resourceName: string, containingFilePath: string, fallbackResolve?: ((url: string, fromFile: string) => string | null) | undefined) => string | null) | undefined;
     trace: ((s: string) => void) | undefined;
     useCaseSensitiveFileNames: () => boolean;
     writeFile: ts.WriteFileCallback;
