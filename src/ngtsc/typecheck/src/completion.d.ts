@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/completion" />
 import { TmplAstTemplate } from '@angular/compiler';
-import { AST, MethodCall, PropertyRead, PropertyWrite, SafeMethodCall, TmplAstNode } from '@angular/compiler/src/compiler';
+import { MethodCall, PropertyRead, PropertyWrite, SafeMethodCall } from '@angular/compiler/src/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { GlobalCompletion, ShimLocation } from '../api';
@@ -22,27 +22,17 @@ export declare class CompletionEngine {
     private tcb;
     private data;
     private shimPath;
-    private componentContext;
     /**
-     * Cache of completions for various levels of the template, including the root template (`null`).
-     * Memoizes `getTemplateContextCompletions`.
+     * Cache of `GlobalCompletion`s for various levels of the template, including the root template
+     * (`null`).
      */
-    private templateContextCache;
+    private globalCompletionCache;
     private expressionCompletionCache;
     constructor(tcb: ts.Node, data: TemplateData, shimPath: AbsoluteFsPath);
     /**
-     * Get global completions within the given template context and AST node.
-     *
-     * @param context the given template context - either a `TmplAstTemplate` embedded view, or `null`
-     *     for the root
-     * template context.
-     * @param node the given AST node
-     */
-    getGlobalCompletions(context: TmplAstTemplate | null, node: AST | TmplAstNode): GlobalCompletion | null;
-    getExpressionCompletionLocation(expr: PropertyRead | PropertyWrite | MethodCall | SafeMethodCall): ShimLocation | null;
-    /**
      * Get global completions within the given template context - either a `TmplAstTemplate` embedded
-     * view, or `null` for the root context.
+     * view, or `null` for the root template context.
      */
-    private getTemplateContextCompletions;
+    getGlobalCompletions(context: TmplAstTemplate | null): GlobalCompletion | null;
+    getExpressionCompletionLocation(expr: PropertyRead | PropertyWrite | MethodCall | SafeMethodCall): ShimLocation | null;
 }
