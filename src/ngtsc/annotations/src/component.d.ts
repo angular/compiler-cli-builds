@@ -6,15 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
-import { ConstantPool, InterpolationConfig, ParsedTemplate, ParseSourceFile, R3ComponentMetadata, Statement, TmplAstNode } from '@angular/compiler';
+import { ConstantPool, InterpolationConfig, ParsedTemplate, ParseSourceFile, R3ClassMetadata, R3ComponentMetadata, TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
 import { CycleAnalyzer, CycleHandlingStrategy } from '../../cycles';
-import { DefaultImportRecorder, ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
+import { ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
 import { SemanticDepGraphUpdater, SemanticReference, SemanticSymbol } from '../../incremental/semantic_graph';
 import { IndexingContext } from '../../indexer';
 import { ClassPropertyMapping, ComponentResources, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry, ResourceRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
+import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry, TypeCheckScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence, ResolveResult } from '../../transform';
@@ -38,7 +39,7 @@ export interface ComponentAnalysisData {
     baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
     typeCheckMeta: DirectiveTypeCheckMeta;
     template: ParsedTemplateWithSource;
-    metadataStmt: Statement | null;
+    classMetadata: R3ClassMetadata | null;
     inputs: ClassPropertyMapping;
     outputs: ClassPropertyMapping;
     /**
@@ -119,12 +120,12 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private cycleAnalyzer;
     private cycleHandlingStrategy;
     private refEmitter;
-    private defaultImportRecorder;
     private depTracker;
     private injectableRegistry;
     private semanticDepGraphUpdater;
     private annotateForClosureCompiler;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, defaultImportRecorder: DefaultImportRecorder, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean);
+    private perf;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean | undefined, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder);
     private literalCache;
     private elementSchemaRegistry;
     /**
@@ -133,6 +134,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      * thrown away, and the parsed template is reused during the analyze phase.
      */
     private preanalyzeTemplateCache;
+    private preanalyzeStylesCache;
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
@@ -146,7 +148,6 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     updateResources(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
     compileFull(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): CompileResult[];
-    private compileComponent;
     private _resolveLiteral;
     private _resolveEnumValue;
     private _extractComponentStyleUrls;
@@ -165,12 +166,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      */
     private _checkForCyclicImport;
     private _recordSyntheticImport;
-    /**
-     * Resolve the url of a resource relative to the file that contains the reference to it.
-     *
-     * Throws a FatalDiagnosticError when unable to resolve the file.
-     */
-    private _resolveResourceOrThrow;
+    private makeResourceNotFoundError;
     private _extractTemplateStyleUrls;
 }
 /**

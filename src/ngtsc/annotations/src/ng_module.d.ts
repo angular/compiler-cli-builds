@@ -6,12 +6,13 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
-import { Expression, R3DependencyMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata, Statement } from '@angular/compiler';
+import { Expression, R3ClassMetadata, R3FactoryMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
-import { DefaultImportRecorder, Reference, ReferenceEmitter } from '../../imports';
+import { Reference, ReferenceEmitter } from '../../imports';
 import { SemanticReference, SemanticSymbol } from '../../incremental/semantic_graph';
 import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';
+import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { NgModuleRouteAnalyzer } from '../../routing';
 import { LocalModuleScopeRegistry } from '../../scope';
@@ -21,8 +22,8 @@ import { ReferencesRegistry } from './references_registry';
 export interface NgModuleAnalysis {
     mod: R3NgModuleMetadata;
     inj: R3InjectorMetadata;
-    deps: R3DependencyMetadata[] | null;
-    metadataStmt: Statement | null;
+    fac: R3FactoryMetadata;
+    classMetadata: R3ClassMetadata | null;
     declarations: Reference<ClassDeclaration>[];
     rawDeclarations: ts.Expression | null;
     schemas: SchemaMetadata[];
@@ -60,11 +61,11 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     private routeAnalyzer;
     private refEmitter;
     private factoryTracker;
-    private defaultImportRecorder;
     private annotateForClosureCompiler;
     private injectableRegistry;
+    private perf;
     private localeId?;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, defaultImportRecorder: DefaultImportRecorder, annotateForClosureCompiler: boolean, injectableRegistry: InjectableClassRegistry, localeId?: string | undefined);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, annotateForClosureCompiler: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, localeId?: string | undefined);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
@@ -72,7 +73,22 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     symbol(node: ClassDeclaration): NgModuleSymbol;
     register(node: ClassDeclaration, analysis: NgModuleAnalysis): void;
     resolve(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>): ResolveResult<NgModuleResolution>;
-    compileFull(node: ClassDeclaration, { inj, mod, deps, metadataStmt, declarations }: Readonly<NgModuleAnalysis>, resolution: Readonly<NgModuleResolution>): CompileResult[];
+    compileFull(node: ClassDeclaration, { inj, mod, fac, classMetadata, declarations }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
+    compilePartial(node: ClassDeclaration, { inj, fac, mod, classMetadata }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
+    /**
+     *  Merge the injector imports (which are 'exports' that were later found to be NgModules)
+     *  computed during resolution with the ones from analysis.
+     */
+    private mergeInjectorImports;
+    /**
+     * Add class metadata statements, if provided, to the `ngModuleStatements`.
+     */
+    private insertMetadataStatement;
+    /**
+     * Add remote scoping statements, as needed, to the `ngModuleStatements`.
+     */
+    private appendRemoteScopingStatements;
+    private compileNgModule;
     private _toR3Reference;
     /**
      * Given a `FunctionDeclaration`, `MethodDeclaration` or `FunctionExpression`, check if it is

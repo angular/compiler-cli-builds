@@ -92,6 +92,11 @@ export declare enum ErrorCode {
      */
     NGMODULE_DECLARATION_NOT_UNIQUE = 6007,
     /**
+     * Not actually raised by the compiler, but reserved for documentation of a View Engine error when
+     * a View Engine build depends on an Ivy-compiled NgModule.
+     */
+    NGMODULE_VE_DEPENDENCY_ON_IVY_LIB = 6999,
+    /**
      * An element name failed validation against the DOM schema.
      */
     SCHEMA_INVALID_ELEMENT = 8001,
@@ -147,5 +152,11 @@ export declare enum ErrorCode {
      * Suggest users to enable `strictTemplates` to make use of full capabilities
      * provided by Angular language service.
      */
-    SUGGEST_STRICT_TEMPLATES = 10001
+    SUGGEST_STRICT_TEMPLATES = 10001,
+    /**
+     * Indicates that a particular structural directive provides advanced type narrowing
+     * functionality, but the current template type-checking configuration does not allow its usage in
+     * type inference.
+     */
+    SUGGEST_SUBOPTIMAL_TYPE_INFERENCE = 10002
 }
