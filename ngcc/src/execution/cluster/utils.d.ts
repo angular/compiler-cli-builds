@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/execution/cluster/utils" />
-import { MessageFromWorker } from './api';
+import { MessageFromWorker, MessageToWorker } from './api';
 /** Expose a `Promise` instance as well as APIs for resolving/rejecting it. */
 export declare class Deferred<T> {
     /**
@@ -31,13 +31,15 @@ export declare class Deferred<T> {
  * (This function should be invoked from cluster workers only.)
  *
  * @param msg The message to send to the cluster master.
+ * @return A promise that is resolved once the message has been sent.
  */
-export declare const sendMessageToMaster: (msg: MessageFromWorker) => void;
+export declare const sendMessageToMaster: (msg: MessageFromWorker) => Promise<void>;
 /**
  * Send a message to a cluster worker.
  * (This function should be invoked from the cluster master only.)
  *
  * @param workerId The ID of the recipient worker.
  * @param msg The message to send to the worker.
+ * @return A promise that is resolved once the message has been sent.
  */
-export declare const sendMessageToWorker: (workerId: number, msg: import("@angular/compiler-cli/ngcc/src/execution/cluster/api").ProcessTaskMessage) => void;
+export declare const sendMessageToWorker: (workerId: number, msg: MessageToWorker) => Promise<void>;

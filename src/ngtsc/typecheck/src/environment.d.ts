@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -9,9 +9,9 @@
 import { Type } from '@angular/compiler';
 import * as ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../imports';
-import { ClassDeclaration } from '../../reflection';
+import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
-import { TypeCheckableDirectiveMeta, TypeCheckingConfig } from './api';
+import { TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 /**
  * A context which hosts one or more Type Check Blocks (TCBs).
  *
@@ -27,15 +27,14 @@ export declare class Environment {
     readonly config: TypeCheckingConfig;
     protected importManager: ImportManager;
     private refEmitter;
+    readonly reflector: ReflectionHost;
     protected contextFile: ts.SourceFile;
     private nextIds;
     private typeCtors;
     protected typeCtorStatements: ts.Statement[];
     private pipeInsts;
     protected pipeInstStatements: ts.Statement[];
-    private outputHelperIdent;
-    protected helperStatements: ts.Statement[];
-    constructor(config: TypeCheckingConfig, importManager: ImportManager, refEmitter: ReferenceEmitter, contextFile: ts.SourceFile);
+    constructor(config: TypeCheckingConfig, importManager: ImportManager, refEmitter: ReferenceEmitter, reflector: ReflectionHost, contextFile: ts.SourceFile);
     /**
      * Get an expression referring to a type constructor for the given directive.
      *
@@ -44,13 +43,6 @@ export declare class Environment {
      */
     typeCtorFor(dir: TypeCheckableDirectiveMeta): ts.Expression;
     pipeInst(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): ts.Expression;
-    /**
-     * Declares a helper function to be able to cast directive outputs of type `EventEmitter<T>` to
-     * have an accurate `subscribe()` method that properly carries over the generic type `T` into the
-     * listener function passed as argument to `subscribe`. This is done to work around a typing
-     * deficiency in `EventEmitter.subscribe`, where the listener function is typed as any.
-     */
-    declareOutputHelper(): ts.Expression;
     /**
      * Generate a `ts.Expression` that references the given node.
      *
@@ -62,7 +54,8 @@ export declare class Environment {
      *
      * This may involve importing the node into the file if it's not declared there already.
      */
-    referenceType(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): ts.TypeNode;
+    referenceType(ref: Reference): ts.TypeNode;
+    private emitTypeParameters;
     /**
      * Generate a `ts.TypeNode` that references a given type from the provided module.
      *

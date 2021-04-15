@@ -1,36 +1,26 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/component_scope" />
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 import { ClassDeclaration } from '../../reflection';
+import { RemoteScope } from './api';
 import { LocalModuleScope } from './local';
-/**
- * Register information about the compilation scope of components.
- */
-export interface ComponentScopeRegistry {
-    registerComponentScope(clazz: ClassDeclaration, scope: LocalModuleScope): void;
-    setComponentAsRequiringRemoteScoping(clazz: ClassDeclaration): void;
-}
 /**
  * Read information about the compilation scope of components.
  */
 export interface ComponentScopeReader {
     getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
-    getRequiresRemoteScope(clazz: ClassDeclaration): boolean | null;
-}
-/**
- * A noop registry that doesn't do anything.
- *
- * This can be used in tests and cases where we don't care about the compilation scopes
- * being registered.
- */
-export declare class NoopComponentScopeRegistry implements ComponentScopeRegistry {
-    registerComponentScope(clazz: ClassDeclaration, scope: LocalModuleScope): void;
-    setComponentAsRequiringRemoteScoping(clazz: ClassDeclaration): void;
+    /**
+     * Get the `RemoteScope` required for this component, if any.
+     *
+     * If the component requires remote scoping, then retrieve the directives/pipes registered for
+     * that component. If remote scoping is not required (the common case), returns `null`.
+     */
+    getRemoteScope(clazz: ClassDeclaration): RemoteScope | null;
 }
 /**
  * A `ComponentScopeReader` that reads from an ordered set of child readers until it obtains the
@@ -43,5 +33,5 @@ export declare class CompoundComponentScopeReader implements ComponentScopeReade
     private readers;
     constructor(readers: ComponentScopeReader[]);
     getScopeForComponent(clazz: ClassDeclaration): LocalModuleScope | null;
-    getRequiresRemoteScope(clazz: ClassDeclaration): boolean | null;
+    getRemoteScope(clazz: ClassDeclaration): RemoteScope | null;
 }

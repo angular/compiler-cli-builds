@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -9,7 +9,7 @@
 import * as ts from 'typescript';
 import { ReferencesRegistry } from '../../../src/ngtsc/annotations';
 import { Reference } from '../../../src/ngtsc/imports';
-import { ConcreteDeclaration, ReflectionHost } from '../../../src/ngtsc/reflection';
+import { Declaration, DeclarationNode, ReflectionHost } from '../../../src/ngtsc/reflection';
 /**
  * This is a place for DecoratorHandlers to register references that they
  * find in their analysis of the code.
@@ -26,10 +26,10 @@ export declare class NgccReferencesRegistry implements ReferencesRegistry {
      * Only `ResolveReference` references are stored. Other types are ignored.
      * @param references A collection of references to register.
      */
-    add(source: ts.Declaration, ...references: Reference<ts.Declaration>[]): void;
+    add(source: DeclarationNode, ...references: Reference<DeclarationNode>[]): void;
     /**
      * Create and return a mapping for the registered resolved references.
      * @returns A map of reference identifiers to reference declarations.
      */
-    getDeclarationMap(): Map<ts.Identifier, ConcreteDeclaration>;
+    getDeclarationMap(): Map<ts.Identifier, Declaration>;
 }

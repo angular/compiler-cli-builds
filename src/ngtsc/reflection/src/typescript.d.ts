@@ -1,20 +1,20 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/typescript" />
 import * as ts from 'typescript';
-import { ClassDeclaration, ClassMember, CtorParameter, Declaration, Decorator, FunctionDefinition, Import, ReflectionHost } from './host';
+import { ClassDeclaration, ClassMember, CtorParameter, Declaration, DeclarationNode, Decorator, FunctionDefinition, Import, ReflectionHost } from './host';
 /**
  * reflector.ts implements static reflection of declarations using the TypeScript `ts.TypeChecker`.
  */
 export declare class TypeScriptReflectionHost implements ReflectionHost {
     protected checker: ts.TypeChecker;
     constructor(checker: ts.TypeChecker);
-    getDecoratorsOfDeclaration(declaration: ts.Declaration): Decorator[] | null;
+    getDecoratorsOfDeclaration(declaration: DeclarationNode): Decorator[] | null;
     getMembersOfClass(clazz: ClassDeclaration): ClassMember[];
     getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
     getImportOfIdentifier(id: ts.Identifier): Import | null;
@@ -26,7 +26,9 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     getDefinitionOfFunction(node: ts.Node): FunctionDefinition | null;
     getGenericArityOfClass(clazz: ClassDeclaration): number | null;
     getVariableValue(declaration: ts.VariableDeclaration): ts.Expression | null;
-    getDtsDeclaration(_: ts.Declaration): ts.Declaration | null;
+    getDtsDeclaration(_: ClassDeclaration): ts.Declaration | null;
+    getInternalNameOfClass(clazz: ClassDeclaration): ts.Identifier;
+    getAdjacentNameOfClass(clazz: ClassDeclaration): ts.Identifier;
     protected getDirectImportOfIdentifier(id: ts.Identifier): Import | null;
     /**
      * Try to get the import info for this identifier as though it is a namespaced import.
@@ -47,6 +49,10 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
      * @returns The import info if this is a namespaced import or `null`.
      */
     protected getImportOfNamespacedIdentifier(id: ts.Identifier, namespaceIdentifier: ts.Identifier | null): Import | null;
+    /**
+     * Resolve a `ts.Symbol` to its declaration, keeping track of the `viaModule` along the way.
+     */
+    protected getDeclarationOfSymbol(symbol: ts.Symbol, originalId: ts.Identifier | null): Declaration | null;
     private _reflectDecorator;
     private _reflectMember;
 }

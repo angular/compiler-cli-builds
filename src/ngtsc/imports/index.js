@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -16,27 +16,28 @@
 })(function (require, exports) {
     "use strict";
     Object.defineProperty(exports, "__esModule", { value: true });
+    exports.ModuleResolver = exports.Reference = exports.UnifiedModulesStrategy = exports.RelativePathStrategy = exports.ReferenceEmitter = exports.LogicalProjectStrategy = exports.LocalIdentifierStrategy = exports.ImportFlags = exports.AbsoluteModuleStrategy = exports.DefaultImportTracker = exports.validateAndRewriteCoreSymbol = exports.R3SymbolsImportRewriter = exports.NoopImportRewriter = exports.UnifiedModulesAliasingHost = exports.PrivateExportAliasingHost = exports.AliasStrategy = void 0;
     var alias_1 = require("@angular/compiler-cli/src/ngtsc/imports/src/alias");
-    exports.AliasStrategy = alias_1.AliasStrategy;
-    exports.FileToModuleAliasingHost = alias_1.FileToModuleAliasingHost;
-    exports.PrivateExportAliasingHost = alias_1.PrivateExportAliasingHost;
+    Object.defineProperty(exports, "AliasStrategy", { enumerable: true, get: function () { return alias_1.AliasStrategy; } });
+    Object.defineProperty(exports, "PrivateExportAliasingHost", { enumerable: true, get: function () { return alias_1.PrivateExportAliasingHost; } });
+    Object.defineProperty(exports, "UnifiedModulesAliasingHost", { enumerable: true, get: function () { return alias_1.UnifiedModulesAliasingHost; } });
     var core_1 = require("@angular/compiler-cli/src/ngtsc/imports/src/core");
-    exports.NoopImportRewriter = core_1.NoopImportRewriter;
-    exports.R3SymbolsImportRewriter = core_1.R3SymbolsImportRewriter;
-    exports.validateAndRewriteCoreSymbol = core_1.validateAndRewriteCoreSymbol;
+    Object.defineProperty(exports, "NoopImportRewriter", { enumerable: true, get: function () { return core_1.NoopImportRewriter; } });
+    Object.defineProperty(exports, "R3SymbolsImportRewriter", { enumerable: true, get: function () { return core_1.R3SymbolsImportRewriter; } });
+    Object.defineProperty(exports, "validateAndRewriteCoreSymbol", { enumerable: true, get: function () { return core_1.validateAndRewriteCoreSymbol; } });
     var default_1 = require("@angular/compiler-cli/src/ngtsc/imports/src/default");
-    exports.DefaultImportTracker = default_1.DefaultImportTracker;
-    exports.NOOP_DEFAULT_IMPORT_RECORDER = default_1.NOOP_DEFAULT_IMPORT_RECORDER;
+    Object.defineProperty(exports, "DefaultImportTracker", { enumerable: true, get: function () { return default_1.DefaultImportTracker; } });
     var emitter_1 = require("@angular/compiler-cli/src/ngtsc/imports/src/emitter");
-    exports.AbsoluteModuleStrategy = emitter_1.AbsoluteModuleStrategy;
-    exports.FileToModuleStrategy = emitter_1.FileToModuleStrategy;
-    exports.LocalIdentifierStrategy = emitter_1.LocalIdentifierStrategy;
-    exports.LogicalProjectStrategy = emitter_1.LogicalProjectStrategy;
-    exports.ReferenceEmitter = emitter_1.ReferenceEmitter;
+    Object.defineProperty(exports, "AbsoluteModuleStrategy", { enumerable: true, get: function () { return emitter_1.AbsoluteModuleStrategy; } });
+    Object.defineProperty(exports, "ImportFlags", { enumerable: true, get: function () { return emitter_1.ImportFlags; } });
+    Object.defineProperty(exports, "LocalIdentifierStrategy", { enumerable: true, get: function () { return emitter_1.LocalIdentifierStrategy; } });
+    Object.defineProperty(exports, "LogicalProjectStrategy", { enumerable: true, get: function () { return emitter_1.LogicalProjectStrategy; } });
+    Object.defineProperty(exports, "ReferenceEmitter", { enumerable: true, get: function () { return emitter_1.ReferenceEmitter; } });
+    Object.defineProperty(exports, "RelativePathStrategy", { enumerable: true, get: function () { return emitter_1.RelativePathStrategy; } });
+    Object.defineProperty(exports, "UnifiedModulesStrategy", { enumerable: true, get: function () { return emitter_1.UnifiedModulesStrategy; } });
     var references_1 = require("@angular/compiler-cli/src/ngtsc/imports/src/references");
-    exports.ImportMode = references_1.ImportMode;
-    exports.Reference = references_1.Reference;
+    Object.defineProperty(exports, "Reference", { enumerable: true, get: function () { return references_1.Reference; } });
     var resolver_1 = require("@angular/compiler-cli/src/ngtsc/imports/src/resolver");
-    exports.ModuleResolver = resolver_1.ModuleResolver;
+    Object.defineProperty(exports, "ModuleResolver", { enumerable: true, get: function () { return resolver_1.ModuleResolver; } });
 });
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9wYWNrYWdlcy9jb21waWxlci1jbGkvc3JjL25ndHNjL2ltcG9ydHMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7OztHQU1HOzs7Ozs7Ozs7Ozs7SUFFSCwyRUFBNkc7SUFBckcsZ0NBQUEsYUFBYSxDQUFBO0lBQWdCLDJDQUFBLHdCQUF3QixDQUFBO0lBQUUsNENBQUEseUJBQXlCLENBQUE7SUFDeEYseUVBQXFIO0lBQTdGLG9DQUFBLGtCQUFrQixDQUFBO0lBQUUseUNBQUEsdUJBQXVCLENBQUE7SUFBRSw4Q0FBQSw0QkFBNEIsQ0FBQTtJQUNqRywrRUFBd0c7SUFBekUseUNBQUEsb0JBQW9CLENBQUE7SUFBRSxpREFBQSw0QkFBNEIsQ0FBQTtJQUNqRiwrRUFBdUw7SUFBL0ssMkNBQUEsc0JBQXNCLENBQUE7SUFBb0IseUNBQUEsb0JBQW9CLENBQUE7SUFBRSw0Q0FBQSx1QkFBdUIsQ0FBQTtJQUFFLDJDQUFBLHNCQUFzQixDQUFBO0lBQXlCLHFDQUFBLGdCQUFnQixDQUFBO0lBRWhLLHFGQUFxRTtJQUE3RCxrQ0FBQSxVQUFVLENBQUE7SUFBZ0IsaUNBQUEsU0FBUyxDQUFBO0lBQzNDLGlGQUE4QztJQUF0QyxvQ0FBQSxjQUFjLENBQUEiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBsaWNlbnNlXG4gKiBDb3B5cmlnaHQgR29vZ2xlIEluYy4gQWxsIFJpZ2h0cyBSZXNlcnZlZC5cbiAqXG4gKiBVc2Ugb2YgdGhpcyBzb3VyY2UgY29kZSBpcyBnb3Zlcm5lZCBieSBhbiBNSVQtc3R5bGUgbGljZW5zZSB0aGF0IGNhbiBiZVxuICogZm91bmQgaW4gdGhlIExJQ0VOU0UgZmlsZSBhdCBodHRwczovL2FuZ3VsYXIuaW8vbGljZW5zZVxuICovXG5cbmV4cG9ydCB7QWxpYXNTdHJhdGVneSwgQWxpYXNpbmdIb3N0LCBGaWxlVG9Nb2R1bGVBbGlhc2luZ0hvc3QsIFByaXZhdGVFeHBvcnRBbGlhc2luZ0hvc3R9IGZyb20gJy4vc3JjL2FsaWFzJztcbmV4cG9ydCB7SW1wb3J0UmV3cml0ZXIsIE5vb3BJbXBvcnRSZXdyaXRlciwgUjNTeW1ib2xzSW1wb3J0UmV3cml0ZXIsIHZhbGlkYXRlQW5kUmV3cml0ZUNvcmVTeW1ib2x9IGZyb20gJy4vc3JjL2NvcmUnO1xuZXhwb3J0IHtEZWZhdWx0SW1wb3J0UmVjb3JkZXIsIERlZmF1bHRJbXBvcnRUcmFja2VyLCBOT09QX0RFRkFVTFRfSU1QT1JUX1JFQ09SREVSfSBmcm9tICcuL3NyYy9kZWZhdWx0JztcbmV4cG9ydCB7QWJzb2x1dGVNb2R1bGVTdHJhdGVneSwgRmlsZVRvTW9kdWxlSG9zdCwgRmlsZVRvTW9kdWxlU3RyYXRlZ3ksIExvY2FsSWRlbnRpZmllclN0cmF0ZWd5LCBMb2dpY2FsUHJvamVjdFN0cmF0ZWd5LCBSZWZlcmVuY2VFbWl0U3RyYXRlZ3ksIFJlZmVyZW5jZUVtaXR0ZXJ9IGZyb20gJy4vc3JjL2VtaXR0ZXInO1xuZXhwb3J0IHtSZWV4cG9ydH0gZnJvbSAnLi9zcmMvcmVleHBvcnQnO1xuZXhwb3J0IHtJbXBvcnRNb2RlLCBPd25pbmdNb2R1bGUsIFJlZmVyZW5jZX0gZnJvbSAnLi9zcmMvcmVmZXJlbmNlcyc7XG5leHBvcnQge01vZHVsZVJlc29sdmVyfSBmcm9tICcuL3NyYy9yZXNvbHZlcic7XG4iXX0=
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9wYWNrYWdlcy9jb21waWxlci1jbGkvc3JjL25ndHNjL2ltcG9ydHMvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7OztHQU1HOzs7Ozs7Ozs7Ozs7O0lBRUgsMkVBQStHO0lBQXpGLHNHQUFBLGFBQWEsT0FBQTtJQUFFLGtIQUFBLHlCQUF5QixPQUFBO0lBQUUsbUhBQUEsMEJBQTBCLE9BQUE7SUFDMUYseUVBQXFIO0lBQTdGLDBHQUFBLGtCQUFrQixPQUFBO0lBQUUsK0dBQUEsdUJBQXVCLE9BQUE7SUFBRSxvSEFBQSw0QkFBNEIsT0FBQTtJQUNqRywrRUFBbUQ7SUFBM0MsK0dBQUEsb0JBQW9CLE9BQUE7SUFDNUIsK0VBQTBPO0lBQWxPLGlIQUFBLHNCQUFzQixPQUFBO0lBQWtDLHNHQUFBLFdBQVcsT0FBQTtJQUFFLGtIQUFBLHVCQUF1QixPQUFBO0lBQUUsaUhBQUEsc0JBQXNCLE9BQUE7SUFBeUIsMkdBQUEsZ0JBQWdCLE9BQUE7SUFBRSwrR0FBQSxvQkFBb0IsT0FBQTtJQUFFLGlIQUFBLHNCQUFzQixPQUFBO0lBRW5OLHFGQUF5RDtJQUFuQyx1R0FBQSxTQUFTLE9BQUE7SUFDL0IsaUZBQThDO0lBQXRDLDBHQUFBLGNBQWMsT0FBQSIsInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogQGxpY2Vuc2VcbiAqIENvcHlyaWdodCBHb29nbGUgTExDIEFsbCBSaWdodHMgUmVzZXJ2ZWQuXG4gKlxuICogVXNlIG9mIHRoaXMgc291cmNlIGNvZGUgaXMgZ292ZXJuZWQgYnkgYW4gTUlULXN0eWxlIGxpY2Vuc2UgdGhhdCBjYW4gYmVcbiAqIGZvdW5kIGluIHRoZSBMSUNFTlNFIGZpbGUgYXQgaHR0cHM6Ly9hbmd1bGFyLmlvL2xpY2Vuc2VcbiAqL1xuXG5leHBvcnQge0FsaWFzaW5nSG9zdCwgQWxpYXNTdHJhdGVneSwgUHJpdmF0ZUV4cG9ydEFsaWFzaW5nSG9zdCwgVW5pZmllZE1vZHVsZXNBbGlhc2luZ0hvc3R9IGZyb20gJy4vc3JjL2FsaWFzJztcbmV4cG9ydCB7SW1wb3J0UmV3cml0ZXIsIE5vb3BJbXBvcnRSZXdyaXRlciwgUjNTeW1ib2xzSW1wb3J0UmV3cml0ZXIsIHZhbGlkYXRlQW5kUmV3cml0ZUNvcmVTeW1ib2x9IGZyb20gJy4vc3JjL2NvcmUnO1xuZXhwb3J0IHtEZWZhdWx0SW1wb3J0VHJhY2tlcn0gZnJvbSAnLi9zcmMvZGVmYXVsdCc7XG5leHBvcnQge0Fic29sdXRlTW9kdWxlU3RyYXRlZ3ksIEVtaXR0ZWRSZWZlcmVuY2UsIEltcG9ydGVkRmlsZSwgSW1wb3J0RmxhZ3MsIExvY2FsSWRlbnRpZmllclN0cmF0ZWd5LCBMb2dpY2FsUHJvamVjdFN0cmF0ZWd5LCBSZWZlcmVuY2VFbWl0U3RyYXRlZ3ksIFJlZmVyZW5jZUVtaXR0ZXIsIFJlbGF0aXZlUGF0aFN0cmF0ZWd5LCBVbmlmaWVkTW9kdWxlc1N0cmF0ZWd5fSBmcm9tICcuL3NyYy9lbWl0dGVyJztcbmV4cG9ydCB7UmVleHBvcnR9IGZyb20gJy4vc3JjL3JlZXhwb3J0JztcbmV4cG9ydCB7T3duaW5nTW9kdWxlLCBSZWZlcmVuY2V9IGZyb20gJy4vc3JjL3JlZmVyZW5jZXMnO1xuZXhwb3J0IHtNb2R1bGVSZXNvbHZlcn0gZnJvbSAnLi9zcmMvcmVzb2x2ZXInO1xuIl19

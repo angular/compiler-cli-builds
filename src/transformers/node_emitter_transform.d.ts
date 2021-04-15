@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -16,4 +16,4 @@ import * as ts from 'typescript';
  * - updates generated files that are not in the given map of generatedFiles to have an empty
  *   list of statements as their body.
  */
-export declare function getAngularEmitterTransformFactory(generatedFiles: Map<string, GeneratedFile>, program: ts.Program): () => (sourceFile: ts.SourceFile) => ts.SourceFile;
+export declare function getAngularEmitterTransformFactory(generatedFiles: Map<string, GeneratedFile>, program: ts.Program, annotateForClosureCompiler: boolean): () => (sourceFile: ts.SourceFile) => ts.SourceFile;

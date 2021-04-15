@@ -1,12 +1,12 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/indexer/src/transform" />
-import * as ts from 'typescript';
+import { DeclarationNode } from '../../reflection';
 import { IndexedComponent } from './api';
 import { IndexingContext } from './context';
 /**
@@ -15,4 +15,4 @@ import { IndexingContext } from './context';
  *
  * The context must be populated before `generateAnalysis` is called.
  */
-export declare function generateAnalysis(context: IndexingContext): Map<ts.Declaration, IndexedComponent>;
+export declare function generateAnalysis(context: IndexingContext): Map<DeclarationNode, IndexedComponent>;

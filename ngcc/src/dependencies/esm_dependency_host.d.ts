@@ -1,31 +1,77 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/esm_dependency_host" />
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
+import { AbsoluteFsPath, ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
 import { DependencyHostBase } from './dependency_host';
+import { ModuleResolver } from './module_resolver';
 /**
  * Helper functions for computing dependencies.
  */
 export declare class EsmDependencyHost extends DependencyHostBase {
+    private scanImportExpressions;
+    constructor(fs: ReadonlyFileSystem, moduleResolver: ModuleResolver, scanImportExpressions?: boolean);
+    private scanner;
+    protected canSkipFile(fileContents: string): boolean;
     /**
-     * Compute the dependencies of the given file.
+     * Extract any import paths from imports found in the contents of this file.
      *
-     * @param file An absolute path to the file whose dependencies we want to get.
-     * @param dependencies A set that will have the absolute paths of resolved entry points added to
-     * it.
-     * @param missing A set that will have the dependencies that could not be found added to it.
-     * @param deepImports A set that will have the import paths that exist but cannot be mapped to
-     * entry-points, i.e. deep-imports.
-     * @param alreadySeen A set that is used to track internal dependencies to prevent getting stuck
-     * in a circular dependency loop.
+     * This implementation uses the TypeScript scanner, which tokenizes source code,
+     * to process the string. This is halfway between working with the string directly,
+     * which is too difficult due to corner cases, and parsing the string into a full
+     * TypeScript Abstract Syntax Tree (AST), which ends up doing more processing than
+     * is needed.
+     *
+     * The scanning is not trivial because we must hold state between each token since
+     * the context of the token affects how it should be scanned, and the scanner does
+     * not manage this for us.
+     *
+     * Specifically, backticked strings are particularly challenging since it is possible
+     * to recursively nest backticks and TypeScript expressions within each other.
      */
-    protected recursivelyFindDependencies(file: AbsoluteFsPath, dependencies: Set<AbsoluteFsPath>, missing: Set<string>, deepImports: Set<string>, alreadySeen: Set<AbsoluteFsPath>): void;
+    protected extractImports(file: AbsoluteFsPath, fileContents: string): Set<string>;
+    /**
+     * We have found an `import` token so now try to identify the import path.
+     *
+     * This method will use the current state of `this.scanner` to extract a string literal module
+     * specifier. It expects that the current state of the scanner is that an `import` token has just
+     * been scanned.
+     *
+     * The following forms of import are matched:
+     *
+     * * `import "module-specifier";`
+     * * `import("module-specifier")`
+     * * `import defaultBinding from "module-specifier";`
+     * * `import defaultBinding, * as identifier from "module-specifier";`
+     * * `import defaultBinding, {...} from "module-specifier";`
+     * * `import * as identifier from "module-specifier";`
+     * * `import {...} from "module-specifier";`
+     *
+     * @returns the import path or null if there is no import or it is not a string literal.
+     */
+    protected extractImportPath(): string | null;
+    /**
+     * We have found an `export` token so now try to identify a re-export path.
+     *
+     * This method will use the current state of `this.scanner` to extract a string literal module
+     * specifier. It expects that the current state of the scanner is that an `export` token has
+     * just been scanned.
+     *
+     * There are three forms of re-export that are matched:
+     *
+     * * `export * from '...';
+     * * `export * as alias from '...';
+     * * `export {...} from '...';
+     */
+    protected extractReexportPath(): string | null;
+    protected skipNamespacedClause(): ts.SyntaxKind | null;
+    protected skipNamedClause(): ts.SyntaxKind;
+    protected tryStringLiteral(): string | null;
 }
 /**
  * Check whether a source file needs to be parsed for imports.

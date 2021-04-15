@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -18,6 +18,7 @@ import { NgccClassSymbol } from './ngcc_host';
  *  function CommonModule() {
  *  }
  *  CommonModule.decorators = [ ... ];
+ *  return CommonModule;
  * ```
  *
  * * "Classes" are decorated if they have a static property called `decorators`.
@@ -28,39 +29,7 @@ import { NgccClassSymbol } from './ngcc_host';
  *
  */
 export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
-    /**
-     * Determines whether the given declaration, which should be a "class", has a base "class".
-     *
-     * In ES5 code, we need to determine if the IIFE wrapper takes a `_super` parameter .
-     *
-     * @param clazz a `ClassDeclaration` representing the class over which to reflect.
-     */
-    hasBaseClass(clazz: ClassDeclaration): boolean;
     getBaseClassExpression(clazz: ClassDeclaration): ts.Expression | null;
-    /**
-     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE,
-     * whose value is assigned to a variable (which represents the class to the rest of the program).
-     * So we might need to dig around to get hold of the "class" declaration.
-     *
-     * This method extracts a `NgccClassSymbol` if `declaration` is the outer variable which is
-     * assigned the result of the IIFE. Otherwise, undefined is returned.
-     *
-     * @param declaration the declaration whose symbol we are finding.
-     * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
-     */
-    protected getClassSymbolFromOuterDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
-    /**
-     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE,
-     * whose value is assigned to a variable (which represents the class to the rest of the program).
-     * So we might need to dig around to get hold of the "class" declaration.
-     *
-     * This method extracts a `NgccClassSymbol` if `declaration` is the function declaration inside
-     * the IIFE. Otherwise, undefined is returned.
-     *
-     * @param declaration the declaration whose symbol we are finding.
-     * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
-     */
-    protected getClassSymbolFromInnerDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
     /**
      * Trace an identifier to its declaration, if possible.
      *
@@ -91,19 +60,25 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      */
     getDefinitionOfFunction(node: ts.Node): FunctionDefinition | null;
     /**
-     * Get the inner function declaration of an ES5-style class.
+     * Check whether a `Declaration` corresponds with a known declaration, such as a TypeScript helper
+     * function, and set its `known` property to the appropriate `KnownDeclaration`.
      *
-     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE
-     * and returned to be assigned to a variable outside the IIFE, which is what the rest of the
-     * program interacts with.
-     *
-     * Given the outer variable declaration, we want to get to the inner function declaration.
-     *
-     * @param node a node that could be the variable expression outside an ES5 class IIFE.
-     * @param checker the TS program TypeChecker
-     * @returns the inner function declaration or `undefined` if it is not a "class".
+     * @param decl The `Declaration` to check.
+     * @return The passed in `Declaration` (potentially enhanced with a `KnownDeclaration`).
      */
-    protected getInnerFunctionDeclarationFromClassDeclaration(node: ts.Node): ts.FunctionDeclaration | undefined;
+    detectKnownDeclaration<T extends Declaration>(decl: T): T;
+    /**
+     * In ES5, the implementation of a class is a function expression that is hidden inside an IIFE,
+     * whose value is assigned to a variable (which represents the class to the rest of the program).
+     * So we might need to dig around to get hold of the "class" declaration.
+     *
+     * This method extracts a `NgccClassSymbol` if `declaration` is the function declaration inside
+     * the IIFE. Otherwise, undefined is returned.
+     *
+     * @param declaration the declaration whose symbol we are finding.
+     * @returns the symbol for the node or `undefined` if it is not a "class" or has no symbol.
+     */
+    protected getClassSymbolFromInnerDeclaration(declaration: ts.Node): NgccClassSymbol | undefined;
     /**
      * Find the declarations of the constructor parameters of a class identified by its symbol.
      *
@@ -165,17 +140,160 @@ export declare class Esm5ReflectionHost extends Esm2015ReflectionHost {
      */
     protected getStatementsForClass(classSymbol: NgccClassSymbol): ts.Statement[];
     /**
-     * Try to retrieve the symbol of a static property on a class.
+     * A constructor function may have been "synthesized" by TypeScript during JavaScript emit,
+     * in the case no user-defined constructor exists and e.g. property initializers are used.
+     * Those initializers need to be emitted into a constructor in JavaScript, so the TypeScript
+     * compiler generates a synthetic constructor.
      *
-     * In ES5, a static property can either be set on the inner function declaration inside the class'
-     * IIFE, or it can be set on the outer variable declaration. Therefore, the ES5 host checks both
-     * places, first looking up the property on the inner symbol, and if the property is not found it
-     * will fall back to looking up the property on the outer symbol.
+     * We need to identify such constructors as ngcc needs to be able to tell if a class did
+     * originally have a constructor in the TypeScript source. For ES5, we can not tell an
+     * empty constructor apart from a synthesized constructor, but fortunately that does not
+     * matter for the code generated by ngtsc.
      *
-     * @param symbol the class whose property we are interested in.
-     * @param propertyName the name of static property.
-     * @returns the symbol if it is found or `undefined` if not.
+     * When a class has a superclass however, a synthesized constructor must not be considered
+     * as a user-defined constructor as that prevents a base factory call from being created by
+     * ngtsc, resulting in a factory function that does not inject the dependencies of the
+     * superclass. Hence, we identify a default synthesized super call in the constructor body,
+     * according to the structure that TypeScript's ES2015 to ES5 transformer generates in
+     * https://github.com/Microsoft/TypeScript/blob/v3.2.2/src/compiler/transformers/es2015.ts#L1082-L1098
+     *
+     * Additionally, we handle synthetic delegate constructors that are emitted when TypeScript
+     * downlevel's ES2015 synthetically generated to ES5. These vary slightly from the default
+     * structure mentioned above because the ES2015 output uses a spread operator, for delegating
+     * to the parent constructor, that is preserved through a TypeScript helper in ES5. e.g.
+     *
+     * ```
+     * return _super.apply(this, tslib.__spread(arguments)) || this;
+     * ```
+     *
+     * or, since TypeScript 4.2 it would be
+     *
+     * ```
+     * return _super.apply(this, tslib.__spreadArray([], tslib.__read(arguments))) || this;
+     * ```
+     *
+     * Such constructs can be still considered as synthetic delegate constructors as they are
+     * the product of a common TypeScript to ES5 synthetic constructor, just being downleveled
+     * to ES5 using `tsc`. See: https://github.com/angular/angular/issues/38453.
+     *
+     *
+     * @param constructor a constructor function to test
+     * @returns true if the constructor appears to have been synthesized
      */
-    protected getStaticProperty(symbol: NgccClassSymbol, propertyName: ts.__String): ts.Symbol | undefined;
+    private isSynthesizedConstructor;
+    /**
+     * Identifies synthesized super calls which pass-through function arguments directly and are
+     * being assigned to a common `_this` variable. The following patterns we intend to match:
+     *
+     * 1. Delegate call emitted by TypeScript when it emits ES5 directly.
+     *   ```
+     *   var _this = _super !== null && _super.apply(this, arguments) || this;
+     *   ```
+     *
+     * 2. Delegate call emitted by TypeScript when it downlevel's ES2015 to ES5.
+     *   ```
+     *   var _this = _super.apply(this, tslib.__spread(arguments)) || this;
+     *   ```
+     *   or using the syntax emitted since TypeScript 4.2:
+     *   ```
+     *   return _super.apply(this, tslib.__spreadArray([], tslib.__read(arguments))) || this;
+     *   ```
+     *
+     * @param statement a statement that may be a synthesized super call
+     * @returns true if the statement looks like a synthesized super call
+     */
+    private isSynthesizedSuperThisAssignment;
+    /**
+     * Identifies synthesized super calls which pass-through function arguments directly and
+     * are being returned. The following patterns correspond to synthetic super return calls:
+     *
+     * 1. Delegate call emitted by TypeScript when it emits ES5 directly.
+     *   ```
+     *   return _super !== null && _super.apply(this, arguments) || this;
+     *   ```
+     *
+     * 2. Delegate call emitted by TypeScript when it downlevel's ES2015 to ES5.
+     *   ```
+     *   return _super.apply(this, tslib.__spread(arguments)) || this;
+     *   ```
+     *   or using the syntax emitted since TypeScript 4.2:
+     *   ```
+     *   return _super.apply(this, tslib.__spreadArray([], tslib.__read(arguments))) || this;
+     *   ```
+     *
+     * @param statement a statement that may be a synthesized super call
+     * @returns true if the statement looks like a synthesized super call
+     */
+    private isSynthesizedSuperReturnStatement;
+    /**
+     * Identifies synthesized super calls which pass-through function arguments directly. The
+     * synthetic delegate super call match the following patterns we intend to match:
+     *
+     * 1. Delegate call emitted by TypeScript when it emits ES5 directly.
+     *   ```
+     *   _super !== null && _super.apply(this, arguments) || this;
+     *   ```
+     *
+     * 2. Delegate call emitted by TypeScript when it downlevel's ES2015 to ES5.
+     *   ```
+     *   _super.apply(this, tslib.__spread(arguments)) || this;
+     *   ```
+     *   or using the syntax emitted since TypeScript 4.2:
+     *   ```
+     *   return _super.apply(this, tslib.__spreadArray([], tslib.__read(arguments))) || this;
+     *   ```
+     *
+     * @param expression an expression that may represent a default super call
+     * @returns true if the expression corresponds with the above form
+     */
+    private isSynthesizedDefaultSuperCall;
+    /**
+     * Tests whether the expression corresponds to a `super` call passing through
+     * function arguments without any modification. e.g.
+     *
+     * ```
+     * _super !== null && _super.apply(this, arguments) || this;
+     * ```
+     *
+     * This structure is generated by TypeScript when transforming ES2015 to ES5, see
+     * https://github.com/Microsoft/TypeScript/blob/v3.2.2/src/compiler/transformers/es2015.ts#L1148-L1163
+     *
+     * Additionally, we also handle cases where `arguments` are wrapped by a TypeScript spread
+     * helper.
+     * This can happen if ES2015 class output contain auto-generated constructors due to class
+     * members. The ES2015 output will be using `super(...arguments)` to delegate to the superclass,
+     * but once downleveled to ES5, the spread operator will be persisted through a TypeScript spread
+     * helper. For example:
+     *
+     * ```
+     * _super.apply(this, __spread(arguments)) || this;
+     * ```
+     *
+     * or, since TypeScript 4.2 it would be
+     *
+     * ```
+     * _super.apply(this, tslib.__spreadArray([], tslib.__read(arguments))) || this;
+     * ```
+     *
+     * More details can be found in: https://github.com/angular/angular/issues/38453.
+     *
+     * @param expression an expression that may represent a default super call
+     * @returns true if the expression corresponds with the above form
+     */
+    private isSuperApplyCall;
+    /**
+     * Determines if the provided expression is one of the following call expressions:
+     *
+     * 1. `__spread(arguments)`
+     * 2. `__spreadArray([], __read(arguments))`
+     *
+     * The tslib helpers may have been emitted inline as in the above example, or they may be read
+     * from a namespace import.
+     */
+    private isSpreadArgumentsExpression;
+    /**
+     * Inspects the provided expression and determines if it corresponds with a known helper function
+     * as receiver expression.
+     */
+    private extractKnownHelperCall;
 }
-export declare function getIifeBody(declaration: ts.Declaration): ts.Block | undefined;

@@ -1,14 +1,15 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/interpreter" />
 import * as ts from 'typescript';
+import { DependencyTracker } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
-import { DependencyTracker, ForeignFunctionResolver } from './interface';
+import { ForeignFunctionResolver } from './interface';
 import { ResolvedValue } from './result';
 /**
  * Tracks the scope of a function body, which includes `ResolvedValue`s for the parameters of that
@@ -32,12 +33,12 @@ interface Context {
 export declare class StaticInterpreter {
     private host;
     private checker;
-    private dependencyTracker?;
-    constructor(host: ReflectionHost, checker: ts.TypeChecker, dependencyTracker?: DependencyTracker | undefined);
+    private dependencyTracker;
+    constructor(host: ReflectionHost, checker: ts.TypeChecker, dependencyTracker: DependencyTracker | null);
     visit(node: ts.Expression, context: Context): ResolvedValue;
     private visitExpression;
     private visitArrayLiteralExpression;
-    private visitObjectLiteralExpression;
+    protected visitObjectLiteralExpression(node: ts.ObjectLiteralExpression, context: Context): ResolvedValue;
     private visitTemplateExpression;
     private visitIdentifier;
     private visitDeclaration;
@@ -46,15 +47,26 @@ export declare class StaticInterpreter {
     private visitElementAccessExpression;
     private visitPropertyAccessExpression;
     private visitSourceFile;
+    private visitAmbiguousDeclaration;
     private accessHelper;
     private visitCallExpression;
+    /**
+     * Visit an expression which was extracted from a foreign-function resolver.
+     *
+     * This will process the result and ensure it's correct for FFR-resolved values, including marking
+     * `Reference`s as synthetic.
+     */
+    private visitFfrExpression;
+    private visitFunctionBody;
     private visitConditionalExpression;
     private visitPrefixUnaryExpression;
     private visitBinaryExpression;
     private visitParenthesizedExpression;
     private evaluateFunctionArguments;
     private visitSpreadElement;
+    private visitBindingElement;
     private stringNameFromPropertyName;
+    private getResolvedEnum;
     private getReference;
 }
 export {};

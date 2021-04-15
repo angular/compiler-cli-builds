@@ -1,13 +1,13 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/module_resolver" />
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
-import { PathMappings } from '../utils';
+import { AbsoluteFsPath, ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
+import { PathMappings } from '../path_mappings';
 /**
  * This is a very cut-down implementation of the TypeScript module resolution strategy.
  *
@@ -23,9 +23,9 @@ import { PathMappings } from '../utils';
  */
 export declare class ModuleResolver {
     private fs;
-    private relativeExtensions;
+    readonly relativeExtensions: string[];
     private pathMappings;
-    constructor(fs: FileSystem, pathMappings?: PathMappings, relativeExtensions?: string[]);
+    constructor(fs: ReadonlyFileSystem, pathMappings?: PathMappings, relativeExtensions?: string[]);
     /**
      * Resolve an absolute path for the `moduleName` imported into a file at `fromPath`.
      * @param moduleName The name of the import to resolve.

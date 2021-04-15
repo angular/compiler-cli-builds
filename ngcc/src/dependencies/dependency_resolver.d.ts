@@ -1,17 +1,18 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/dependency_resolver" />
 import { DepGraph } from 'dependency-graph';
-import { FileSystem } from '../../../src/ngtsc/file_system';
-import { Logger } from '../logging/logger';
+import { ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
+import { Logger } from '../../../src/ngtsc/logging';
+import { NgccConfiguration } from '../packages/configuration';
 import { EntryPoint, EntryPointFormat } from '../packages/entry_point';
 import { PartiallyOrderedList } from '../utils';
-import { DependencyHost, DependencyInfo } from './dependency_host';
+import { DependencyHost, EntryPointWithDependencies } from './dependency_host';
 /**
  * Holds information about entry points that are removed because
  * they have dependencies that are missing (directly or transitively).
@@ -74,8 +75,10 @@ export interface SortedEntryPointsInfo extends DependencyDiagnostics {
 export declare class DependencyResolver {
     private fs;
     private logger;
+    private config;
     private hosts;
-    constructor(fs: FileSystem, logger: Logger, hosts: Partial<Record<EntryPointFormat, DependencyHost>>);
+    private typingsHost;
+    constructor(fs: ReadonlyFileSystem, logger: Logger, config: NgccConfiguration, hosts: Partial<Record<EntryPointFormat, DependencyHost>>, typingsHost: DependencyHost);
     /**
      * Sort the array of entry points so that the dependant entry points always come later than
      * their dependencies in the array.
@@ -83,8 +86,8 @@ export declare class DependencyResolver {
      * @param target If provided, only return entry-points depended on by this entry-point.
      * @returns the result of sorting the entry points by dependency.
      */
-    sortEntryPointsByDependency(entryPoints: EntryPoint[], target?: EntryPoint): SortedEntryPointsInfo;
-    getEntryPointDependencies(entryPoint: EntryPoint): DependencyInfo;
+    sortEntryPointsByDependency(entryPoints: EntryPointWithDependencies[], target?: EntryPoint): SortedEntryPointsInfo;
+    getEntryPointWithDependencies(entryPoint: EntryPoint): EntryPointWithDependencies;
     /**
      * Computes a dependency graph of the given entry-points.
      *
@@ -93,4 +96,8 @@ export declare class DependencyResolver {
      */
     private computeDependencyGraph;
     private getEntryPointFormatInfo;
+    /**
+     * Filter out the deepImports that can be ignored, according to this entryPoint's config.
+     */
+    private filterIgnorableDeepImports;
 }
