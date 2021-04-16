@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/src/strategy" />
 import * as ts from 'typescript';
-import { IncrementalDriver } from './state';
+import { IncrementalState } from './state';
 /**
  * Strategy used to manage the association between a `ts.Program` and the `IncrementalDriver` which
  * represents the reusable Angular part of its compilation.
@@ -16,29 +16,35 @@ export interface IncrementalBuildStrategy {
     /**
      * Determine the Angular `IncrementalDriver` for the given `ts.Program`, if one is available.
      */
-    getIncrementalDriver(program: ts.Program): IncrementalDriver | null;
+    getIncrementalState(program: ts.Program): IncrementalState | null;
     /**
      * Associate the given `IncrementalDriver` with the given `ts.Program` and make it available to
      * future compilations.
      */
-    setIncrementalDriver(driver: IncrementalDriver, program: ts.Program): void;
+    setIncrementalState(driver: IncrementalState, program: ts.Program): void;
+    /**
+     * Convert this `IncrementalBuildStrategy` into a possibly new instance to be used in the next
+     * incremental compilation (may be a no-op if the strategy is not stateful).
+     */
+    toNextBuildStrategy(): IncrementalBuildStrategy;
 }
 /**
  * A noop implementation of `IncrementalBuildStrategy` which neither returns nor tracks any
  * incremental data.
  */
 export declare class NoopIncrementalBuildStrategy implements IncrementalBuildStrategy {
-    getIncrementalDriver(): null;
-    setIncrementalDriver(): void;
+    getIncrementalState(): null;
+    setIncrementalState(): void;
+    toNextBuildStrategy(): IncrementalBuildStrategy;
 }
 /**
  * Tracks an `IncrementalDriver` within the strategy itself.
  */
 export declare class TrackedIncrementalBuildStrategy implements IncrementalBuildStrategy {
-    private driver;
+    private state;
     private isSet;
-    getIncrementalDriver(): IncrementalDriver | null;
-    setIncrementalDriver(driver: IncrementalDriver): void;
+    getIncrementalState(): IncrementalState | null;
+    setIncrementalState(state: IncrementalState): void;
     toNextBuildStrategy(): TrackedIncrementalBuildStrategy;
 }
 /**
@@ -46,6 +52,7 @@ export declare class TrackedIncrementalBuildStrategy implements IncrementalBuild
  * program under `SYM_INCREMENTAL_DRIVER`.
  */
 export declare class PatchedProgramIncrementalBuildStrategy implements IncrementalBuildStrategy {
-    getIncrementalDriver(program: ts.Program): IncrementalDriver | null;
-    setIncrementalDriver(driver: IncrementalDriver, program: ts.Program): void;
+    getIncrementalState(program: ts.Program): IncrementalState | null;
+    setIncrementalState(state: IncrementalState, program: ts.Program): void;
+    toNextBuildStrategy(): IncrementalBuildStrategy;
 }

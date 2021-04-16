@@ -10,18 +10,19 @@ import * as o from '@angular/compiler';
 import { AstFactory } from './api/ast_factory';
 import { ImportGenerator } from './api/import_generator';
 import { Context } from './context';
-export declare type RecordWrappedNodeExprFn<TExpression> = (expr: TExpression) => void;
+export declare type RecordWrappedNodeFn<TExpression> = (node: o.WrappedNodeExpr<TExpression>) => void;
 export interface TranslatorOptions<TExpression> {
     downlevelTaggedTemplates?: boolean;
     downlevelVariableDeclarations?: boolean;
-    recordWrappedNodeExpr?: RecordWrappedNodeExprFn<TExpression>;
+    recordWrappedNode?: RecordWrappedNodeFn<TExpression>;
+    annotateForClosureCompiler?: boolean;
 }
 export declare class ExpressionTranslatorVisitor<TStatement, TExpression> implements o.ExpressionVisitor, o.StatementVisitor {
     private factory;
     private imports;
     private downlevelTaggedTemplates;
     private downlevelVariableDeclarations;
-    private recordWrappedNodeExpr;
+    private recordWrappedNode;
     constructor(factory: AstFactory<TStatement, TExpression>, imports: ImportGenerator<TExpression>, options: TranslatorOptions<TExpression>);
     visitDeclareVarStmt(stmt: o.DeclareVarStmt, context: Context): TStatement;
     visitDeclareFunctionStmt(stmt: o.DeclareFunctionStmt, context: Context): TStatement;

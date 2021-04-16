@@ -207,7 +207,7 @@ export declare type UnaryOperator = '+' | '-' | '!';
 /**
  * The binary operators supported by the `AstFactory`.
  */
-export declare type BinaryOperator = '&&' | '>' | '>=' | '&' | '/' | '==' | '===' | '<' | '<=' | '-' | '%' | '*' | '!=' | '!==' | '||' | '+';
+export declare type BinaryOperator = '&&' | '>' | '>=' | '&' | '/' | '==' | '===' | '<' | '<=' | '-' | '%' | '*' | '!=' | '!==' | '||' | '+' | '??';
 /**
  * The original location of the start or end of a node created by the `AstFactory`.
  */

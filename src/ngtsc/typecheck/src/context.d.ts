@@ -10,8 +10,9 @@ import { BoundTarget, ParseError, ParseSourceFile, R3TargetBinder, SchemaMetadat
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
+import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { ComponentToShimMappingStrategy, TemplateId, TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata } from '../api';
+import { TemplateId, TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata } from '../api';
 import { TemplateDiagnostic } from '../diagnostics';
 import { DomSchemaChecker } from './dom';
 import { OutOfBandDiagnosticRecorder } from './oob';
@@ -37,10 +38,6 @@ export interface ShimTypeCheckingData {
      * type-checking process.
      */
     templates: Map<TemplateId, TemplateData>;
-}
-export interface TemplateOverride {
-    nodes: TmplAstNode[];
-    errors: ParseError[] | null;
 }
 /**
  * Data tracked for each template processed by the template type-checking system.
@@ -117,11 +114,6 @@ export interface TypeCheckingHost {
      */
     shouldCheckComponent(node: ts.ClassDeclaration): boolean;
     /**
-     * Check if the given component has had its template overridden, and retrieve the new template
-     * nodes if so.
-     */
-    getTemplateOverride(sfPath: AbsoluteFsPath, node: ts.ClassDeclaration): TemplateOverride | null;
-    /**
      * Report data from a shim generated from the given input file path.
      */
     recordShimData(sfPath: AbsoluteFsPath, data: ShimTypeCheckingData): void;
@@ -153,13 +145,13 @@ export declare enum InliningMode {
 export declare class TypeCheckContextImpl implements TypeCheckContext {
     private config;
     private compilerHost;
-    private componentMappingStrategy;
     private refEmitter;
     private reflector;
     private host;
     private inlining;
+    private perf;
     private fileMap;
-    constructor(config: TypeCheckingConfig, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, componentMappingStrategy: ComponentToShimMappingStrategy, refEmitter: ReferenceEmitter, reflector: ReflectionHost, host: TypeCheckingHost, inlining: InliningMode);
+    constructor(config: TypeCheckingConfig, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, refEmitter: ReferenceEmitter, reflector: ReflectionHost, host: TypeCheckingHost, inlining: InliningMode, perf: PerfRecorder);
     /**
      * A `Map` of `ts.SourceFile`s that the context has seen to the operations (additions of methods
      * or type-check blocks) that need to be eventually performed on that file.

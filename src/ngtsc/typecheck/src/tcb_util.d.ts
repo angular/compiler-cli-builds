@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/tcb_util" />
 import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
-import { ClassDeclaration } from '@angular/compiler-cli/src/ngtsc/reflection';
+import { ClassDeclaration, ReflectionHost } from '@angular/compiler-cli/src/ngtsc/reflection';
 import * as ts from 'typescript';
 import { Reference } from '../../imports';
 import { FullTemplateMapping, SourceLocation, TemplateId, TemplateSourceMapping } from '../api';
@@ -29,7 +29,28 @@ export interface TemplateSourceResolver {
      */
     toParseSourceSpan(id: TemplateId, span: AbsoluteSourceSpan): ParseSourceSpan | null;
 }
-export declare function requiresInlineTypeCheckBlock(node: ClassDeclaration<ts.ClassDeclaration>, usedPipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>): boolean;
+/**
+ * Indicates whether a particular component requires an inline type check block.
+ *
+ * This is not a boolean state as inlining might only be required to get the best possible
+ * type-checking, but the component could theoretically still be checked without it.
+ */
+export declare enum TcbInliningRequirement {
+    /**
+     * There is no way to type check this component without inlining.
+     */
+    MustInline = 0,
+    /**
+     * Inlining should be used due to the component's generic bounds, but a non-inlining fallback
+     * method can be used if that's not possible.
+     */
+    ShouldInlineForGenericBounds = 1,
+    /**
+     * There is no requirement for this component's TCB to be inlined.
+     */
+    None = 2
+}
+export declare function requiresInlineTypeCheckBlock(node: ClassDeclaration<ts.ClassDeclaration>, usedPipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, reflector: ReflectionHost): TcbInliningRequirement;
 /** Maps a shim position back to a template location. */
 export declare function getTemplateMapping(shimSf: ts.SourceFile, position: number, resolver: TemplateSourceResolver, isDiagnosticRequest: boolean): FullTemplateMapping | null;
 export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId, isDiagnosticRequest: boolean): ts.Node | null;
@@ -40,3 +61,4 @@ export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId, 
  * returns null.
  */
 export declare function findSourceLocation(node: ts.Node, sourceFile: ts.SourceFile, isDiagnosticsRequest: boolean): SourceLocation | null;
+export declare function checkIfGenericTypeBoundsAreContextFree(node: ClassDeclaration<ts.ClassDeclaration>, reflector: ReflectionHost): boolean;

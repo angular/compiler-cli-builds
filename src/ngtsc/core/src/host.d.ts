@@ -40,10 +40,11 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     readDirectory: ((rootDir: string, extensions: readonly string[], excludes: readonly string[] | undefined, includes: readonly string[], depth?: number | undefined) => string[]) | undefined;
     readFile: (fileName: string) => string | undefined;
     readResource: ((fileName: string) => string | Promise<string>) | undefined;
+    transformResource: ((data: string, context: import("@angular/compiler-cli/src/ngtsc/core/api/index").ResourceHostContext) => Promise<import("@angular/compiler-cli/src/ngtsc/core/api/index").TransformResourceResult | null>) | undefined;
     realpath: ((path: string) => string) | undefined;
     resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedModule | undefined)[]) | undefined;
     resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
-    resourceNameToFileName: ((resourceName: string, containingFilePath: string) => string | null) | undefined;
+    resourceNameToFileName: ((resourceName: string, containingFilePath: string, fallbackResolve?: ((url: string, fromFile: string) => string | null) | undefined) => string | null) | undefined;
     trace: ((s: string) => void) | undefined;
     useCaseSensitiveFileNames: () => boolean;
     writeFile: ts.WriteFileCallback;
@@ -98,4 +99,5 @@ export declare class NgCompilerHost extends DelegatingCompilerHost implements Re
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
     fileExists(fileName: string): boolean;
     get unifiedModulesHost(): UnifiedModulesHost | null;
+    private createCachedResolveModuleNamesFunction;
 }

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations" />
-export { ResourceLoader } from './src/api';
+export { ResourceLoader, ResourceLoaderContext } from './src/api';
 export { ComponentDecoratorHandler } from './src/component';
 export { DirectiveDecoratorHandler } from './src/directive';
 export { InjectableDecoratorHandler } from './src/injectable';

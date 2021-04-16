@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { AbsoluteFsPath, PathManipulation } from '../../../src/ngtsc/file_system';
-export declare function getLockFilePath(fs: PathManipulation): import("@angular/compiler-cli/src/ngtsc/file_system/src/types").BrandedPath<"AbsoluteFsPath">;
+export declare function getLockFilePath(fs: PathManipulation): AbsoluteFsPath;
 export interface LockFile {
     path: AbsoluteFsPath;
     /**

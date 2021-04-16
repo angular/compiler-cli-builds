@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/metadata" />
-import { Statement } from '@angular/compiler';
-import { DefaultImportRecorder } from '../../imports';
+import { R3ClassMetadata } from '@angular/compiler';
 import { DeclarationNode, ReflectionHost } from '../../reflection';
 /**
  * Given a class declaration, generate a call to `setClassMetadata` with the Angular metadata
@@ -17,4 +16,4 @@ import { DeclarationNode, ReflectionHost } from '../../reflection';
  * If no such metadata is present, this function returns `null`. Otherwise, the call is returned
  * as a `Statement` for inclusion along with the class.
  */
-export declare function generateSetClassMetadataCall(clazz: DeclarationNode, reflection: ReflectionHost, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, annotateForClosureCompiler?: boolean): Statement | null;
+export declare function extractClassMetadata(clazz: DeclarationNode, reflection: ReflectionHost, isCore: boolean, annotateForClosureCompiler?: boolean): R3ClassMetadata | null;

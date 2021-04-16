@@ -7,10 +7,10 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/translator" />
 export { AstFactory, BinaryOperator, LeadingComment, ObjectLiteralProperty, SourceMapLocation, SourceMapRange, TemplateElement, TemplateLiteral, UnaryOperator, VariableDeclarationType } from './src/api/ast_factory';
-export { Import, ImportGenerator, NamedImport } from './src/api/import_generator';
+export { ImportGenerator, NamedImport } from './src/api/import_generator';
 export { Context } from './src/context';
-export { ImportManager } from './src/import_manager';
-export { ExpressionTranslatorVisitor, RecordWrappedNodeExprFn, TranslatorOptions } from './src/translator';
+export { Import, ImportManager } from './src/import_manager';
+export { ExpressionTranslatorVisitor, RecordWrappedNodeFn, TranslatorOptions } from './src/translator';
 export { translateType } from './src/type_translator';
 export { attachComments, createTemplateMiddle, createTemplateTail, TypeScriptAstFactory } from './src/typescript_ast_factory';
 export { translateExpression, translateStatement } from './src/typescript_translator';

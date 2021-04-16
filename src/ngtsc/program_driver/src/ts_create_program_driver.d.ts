@@ -5,9 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/host" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver" />
 import * as ts from 'typescript';
+import { AbsoluteFsPath } from '../../file_system';
 import { RequiredDelegations } from '../../util/src/typescript';
+import { ProgramDriver, UpdateMode } from './api';
 /**
  * Delegates all methods of `ts.CompilerHost` to a delegate, with the exception of
  * `getSourceFile`, `fileExists` and `writeFile` which are implemented in `TypeCheckProgramHost`.
@@ -40,30 +42,24 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     useCaseSensitiveFileNames: () => boolean;
 }
 /**
- * A `ts.CompilerHost` which augments source files with type checking code from a
- * `TypeCheckContext`.
+ * Updates a `ts.Program` instance with a new one that incorporates specific changes, using the
+ * TypeScript compiler APIs for incremental program creation.
  */
-export declare class TypeCheckProgramHost extends DelegatingCompilerHost {
+export declare class TsCreateProgramDriver implements ProgramDriver {
     private originalProgram;
+    private originalHost;
+    private options;
     private shimExtensionPrefixes;
     /**
-     * Map of source file names to `ts.SourceFile` instances.
+     * A map of source file paths to replacement `ts.SourceFile`s for those paths.
+     *
+     * Effectively, this tracks the delta between the user's program (represented by the
+     * `originalHost`) and the template type-checking program being managed.
      */
     private sfMap;
-    /**
-     * The `ShimReferenceTagger` responsible for tagging `ts.SourceFile`s loaded via this host.
-     *
-     * The `TypeCheckProgramHost` is used in the creation of a new `ts.Program`. Even though this new
-     * program is based on a prior one, TypeScript will still start from the root files and enumerate
-     * all source files to include in the new program.  This means that just like during the original
-     * program's creation, these source files must be tagged with references to per-file shims in
-     * order for those shims to be loaded, and then cleaned up afterwards. Thus the
-     * `TypeCheckProgramHost` has its own `ShimReferenceTagger` to perform this function.
-     */
-    private shimTagger;
-    constructor(sfMap: Map<string, ts.SourceFile>, originalProgram: ts.Program, delegate: ts.CompilerHost, shimExtensionPrefixes: string[]);
-    getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
-    postProgramCreationCleanup(): void;
-    writeFile(): never;
-    fileExists(fileName: string): boolean;
+    private program;
+    constructor(originalProgram: ts.Program, originalHost: ts.CompilerHost, options: ts.CompilerOptions, shimExtensionPrefixes: string[]);
+    readonly supportsInlineOperations = true;
+    getProgram(): ts.Program;
+    updateFiles(contents: Map<AbsoluteFsPath, string>, updateMode: UpdateMode): void;
 }

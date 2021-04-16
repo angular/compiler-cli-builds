@@ -12,7 +12,9 @@ import { AstFactory, BinaryOperator, LeadingComment, ObjectLiteralProperty, Sour
  * A TypeScript flavoured implementation of the AstFactory.
  */
 export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts.Expression> {
+    private annotateForClosureCompiler;
     private externalSourceFiles;
+    constructor(annotateForClosureCompiler: boolean);
     attachComments: typeof attachComments;
     createArrayLiteral: (elements?: readonly ts.Expression[] | undefined, multiLine?: boolean | undefined) => ts.ArrayLiteralExpression;
     createAssignment(target: ts.Expression, value: ts.Expression): ts.Expression;

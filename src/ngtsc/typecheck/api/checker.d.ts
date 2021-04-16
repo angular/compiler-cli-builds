@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/checker" />
-import { AST, MethodCall, ParseError, PropertyRead, SafeMethodCall, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
+import { AST, MethodCall, PropertyRead, SafeMethodCall, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
 import { AbsoluteFsPath } from '@angular/compiler-cli/src/ngtsc/file_system';
 import * as ts from 'typescript';
 import { FullTemplateMapping, TypeCheckableDirectiveMeta } from './api';
@@ -28,27 +28,9 @@ import { ElementSymbol, ShimLocation, Symbol, TemplateSymbol } from './symbols';
  */
 export interface TemplateTypeChecker {
     /**
-     * Clear all overrides and return the template type-checker to the original input program state.
-     */
-    resetOverrides(): void;
-    /**
      * Retrieve the template in use for the given component.
-     *
-     * If the template has been overridden via `overrideComponentTemplate`, this will retrieve the
-     * overridden template nodes.
      */
     getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
-    /**
-     * Provide a new template string that will be used in place of the user-defined template when
-     * checking or operating on the given component.
-     *
-     * The compiler will parse this template for diagnostics, and will return any parsing errors if it
-     * is not valid. If the template cannot be parsed correctly, no override will occur.
-     */
-    overrideComponentTemplate(component: ts.ClassDeclaration, template: string): {
-        nodes: TmplAstNode[];
-        errors: ParseError[] | null;
-    };
     /**
      * Get all `ts.Diagnostic`s currently available for the given `ts.SourceFile`.
      *
@@ -113,7 +95,7 @@ export interface TemplateTypeChecker {
      * include completions from the template's context component, as well as any local references or
      * template variables which are in scope for that expression.
      */
-    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration): GlobalCompletion | null;
+    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration, node: AST | TmplAstNode): GlobalCompletion | null;
     /**
      * For the given expression node, retrieve a `ShimLocation` that can be used to perform
      * autocompletion at that point in the expression, if such a location exists.
@@ -148,6 +130,11 @@ export interface TemplateTypeChecker {
      * Retrieve the type checking engine's metadata for the given directive class, if available.
      */
     getDirectiveMetadata(dir: ts.ClassDeclaration): TypeCheckableDirectiveMeta | null;
+    /**
+     * Reset the `TemplateTypeChecker`'s state for the given class, so that it will be recomputed on
+     * the next request.
+     */
+    invalidateClass(clazz: ts.ClassDeclaration): void;
 }
 /**
  * Describes the scope of the caller's interest in template type-checking results.

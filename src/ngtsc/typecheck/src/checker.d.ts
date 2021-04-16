@@ -6,15 +6,17 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/checker" />
-import { MethodCall, ParseError, PropertyRead, SafeMethodCall, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
+import { AST, MethodCall, PropertyRead, SafeMethodCall, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
+import { PerfRecorder } from '../../perf';
+import { ProgramDriver } from '../../program_driver';
 import { ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, TemplateId, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig, TypeCheckingProgramStrategy } from '../api';
-import { ShimTypeCheckingData, TemplateOverride } from './context';
+import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
  * Primary template type-checking engine, which performs type-checking using a
@@ -23,7 +25,7 @@ import { TemplateSourceManager } from './source';
  */
 export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private originalProgram;
-    readonly typeCheckingStrategy: TypeCheckingProgramStrategy;
+    readonly programDriver: ProgramDriver;
     private typeCheckAdapter;
     private config;
     private refEmitter;
@@ -32,6 +34,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private priorBuild;
     private readonly componentScopeReader;
     private readonly typeCheckScopeRegistry;
+    private readonly perf;
     private state;
     /**
      * Stores the `CompletionEngine` which powers autocompletion for each component class.
@@ -52,31 +55,24 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     /**
      * Stores directives and pipes that are in scope for each component.
      *
-     * Unlike other caches, the scope of a component is not affected by its template, so this
-     * cache does not need to be invalidate if the template is overridden. It will be destroyed when
-     * the `ts.Program` changes and the `TemplateTypeCheckerImpl` as a whole is destroyed and
-     * replaced.
+     * Unlike other caches, the scope of a component is not affected by its template. It will be
+     * destroyed when the `ts.Program` changes and the `TemplateTypeCheckerImpl` as a whole is
+     * destroyed and replaced.
      */
     private scopeCache;
     /**
      * Stores potential element tags for each component (a union of DOM tags as well as directive
      * tags).
      *
-     * Unlike other caches, the scope of a component is not affected by its template, so this
-     * cache does not need to be invalidate if the template is overridden. It will be destroyed when
-     * the `ts.Program` changes and the `TemplateTypeCheckerImpl` as a whole is destroyed and
-     * replaced.
+     * Unlike other caches, the scope of a component is not affected by its template. It will be
+     * destroyed when the `ts.Program` changes and the `TemplateTypeCheckerImpl` as a whole is
+     * destroyed and replaced.
      */
     private elementTagCache;
     private isComplete;
-    constructor(originalProgram: ts.Program, typeCheckingStrategy: TypeCheckingProgramStrategy, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry);
-    resetOverrides(): void;
+    constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
     getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
     private getLatestComponentState;
-    overrideComponentTemplate(component: ts.ClassDeclaration, template: string): {
-        nodes: TmplAstNode[];
-        errors: ParseError[] | null;
-    };
     isTrackedTypeCheckFile(filePath: AbsoluteFsPath): boolean;
     private getFileAndShimRecordsForPath;
     getTemplateMappingAtShimLocation({ shimPath, positionInShimFile }: ShimLocation): FullTemplateMapping | null;
@@ -88,8 +84,9 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getDiagnosticsForFile(sf: ts.SourceFile, optimizeFor: OptimizeFor): ts.Diagnostic[];
     getDiagnosticsForComponent(component: ts.ClassDeclaration): ts.Diagnostic[];
     getTypeCheckBlock(component: ts.ClassDeclaration): ts.Node | null;
-    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration): GlobalCompletion | null;
+    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration, node: AST | TmplAstNode): GlobalCompletion | null;
     getExpressionCompletionLocation(ast: PropertyRead | SafePropertyRead | MethodCall | SafeMethodCall, component: ts.ClassDeclaration): ShimLocation | null;
+    invalidateClass(clazz: ts.ClassDeclaration): void;
     private getOrCreateCompletionEngine;
     private maybeAdoptPriorResultsForFile;
     private ensureAllShimsForAllFiles;
@@ -133,10 +130,6 @@ export interface FileTypeCheckingData {
      * original template.
      */
     sourceManager: TemplateSourceManager;
-    /**
-     * Map of template overrides applied to any components in this input file.
-     */
-    templateOverrides: Map<TemplateId, TemplateOverride> | null;
     /**
      * Data for each shim generated from this input file.
      *
