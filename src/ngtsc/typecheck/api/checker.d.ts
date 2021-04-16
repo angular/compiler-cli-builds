@@ -95,7 +95,7 @@ export interface TemplateTypeChecker {
      * include completions from the template's context component, as well as any local references or
      * template variables which are in scope for that expression.
      */
-    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration, node: AST | TmplAstNode): GlobalCompletion | null;
+    getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration): GlobalCompletion | null;
     /**
      * For the given expression node, retrieve a `ShimLocation` that can be used to perform
      * autocompletion at that point in the expression, if such a location exists.
