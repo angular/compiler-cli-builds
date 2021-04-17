@@ -177,11 +177,6 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
  */
 export interface ParsedComponentTemplate extends ParsedTemplate {
     /**
-     * True if the original template was stored inline;
-     * False if the template was in an external file.
-     */
-    isInline: boolean;
-    /**
      * The template AST, parsed in a manner which preserves source map information for diagnostics.
      *
      * Not useful for emit.
@@ -193,6 +188,8 @@ export interface ParsedComponentTemplate extends ParsedTemplate {
     file: ParseSourceFile;
 }
 export interface ParsedTemplateWithSource extends ParsedComponentTemplate {
+    /** The string contents of the template. */
+    content: string;
     sourceMapping: TemplateSourceMapping;
     declaration: TemplateDeclaration;
 }
