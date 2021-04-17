@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -13,4 +13,4 @@ export declare type TransformerFactory = (context: ts.TransformationContext) => 
 /**
  * Returns a transformer that adds the requested static methods specified by modules.
  */
-export declare function getAngularClassTransformerFactory(modules: PartialModule[]): TransformerFactory;
+export declare function getAngularClassTransformerFactory(modules: PartialModule[], annotateForClosureCompiler: boolean): TransformerFactory;

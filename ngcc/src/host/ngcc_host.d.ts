@@ -1,42 +1,19 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/ngcc_host" />
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { ClassDeclaration, ConcreteDeclaration, Decorator, ReflectionHost } from '../../../src/ngtsc/reflection';
+import { ClassDeclaration, Declaration, Decorator, ReflectionHost } from '../../../src/ngtsc/reflection';
 export declare const PRE_R3_MARKER = "__PRE_R3__";
 export declare const POST_R3_MARKER = "__POST_R3__";
 export declare type SwitchableVariableDeclaration = ts.VariableDeclaration & {
     initializer: ts.Identifier;
 };
 export declare function isSwitchableVariableDeclaration(node: ts.Node): node is SwitchableVariableDeclaration;
-/**
- * A structure returned from `getModuleWithProviderInfo` that describes functions
- * that return ModuleWithProviders objects.
- */
-export interface ModuleWithProvidersFunction {
-    /**
-     * The name of the declared function.
-     */
-    name: string;
-    /**
-     * The declaration of the function that returns the `ModuleWithProviders` object.
-     */
-    declaration: ts.SignatureDeclaration;
-    /**
-     * Declaration of the containing class (if this is a method)
-     */
-    container: ts.Declaration | null;
-    /**
-     * The declaration of the class that the `ngModule` property on the `ModuleWithProviders` object
-     * refers to.
-     */
-    ngModule: ConcreteDeclaration<ClassDeclaration>;
-}
 /**
  * The symbol corresponding to a "class" declaration. I.e. a `ts.Symbol` whose `valueDeclaration` is
  * a `ClassDeclaration`.
@@ -65,6 +42,11 @@ export interface NgccClassSymbol {
      * declaration.
      */
     implementation: ts.Symbol;
+    /**
+     * Represents the symbol corresponding to a variable within a class IIFE that may be used to
+     * attach static properties or decorated.
+     */
+    adjacent?: ts.Symbol;
 }
 /**
  * A reflection host that has extra methods for looking at non-Typescript package formats
@@ -97,14 +79,6 @@ export interface NgccReflectionHost extends ReflectionHost {
      */
     findClassSymbols(sourceFile: ts.SourceFile): NgccClassSymbol[];
     /**
-     * Search the given source file for exported functions and static class methods that return
-     * ModuleWithProviders objects.
-     * @param f The source file to search for these functions
-     * @returns An array of info items about each of the functions that return ModuleWithProviders
-     * objects.
-     */
-    getModuleWithProvidersFunctions(f: ts.SourceFile): ModuleWithProvidersFunction[];
-    /**
      * Find the last node that is relevant to the specified class.
      *
      * As well as the main declaration, classes can have additional statements such as static
@@ -115,4 +89,12 @@ export interface NgccReflectionHost extends ReflectionHost {
      * @param classSymbol The class whose statements we want.
      */
     getEndOfClass(classSymbol: NgccClassSymbol): ts.Node;
+    /**
+     * Check whether a `Declaration` corresponds with a known declaration and set its `known` property
+     * to the appropriate `KnownDeclaration`.
+     *
+     * @param decl The `Declaration` to check.
+     * @return The passed in `Declaration` (potentially enhanced with a `KnownDeclaration`).
+     */
+    detectKnownDeclaration<T extends Declaration>(decl: T): T;
 }

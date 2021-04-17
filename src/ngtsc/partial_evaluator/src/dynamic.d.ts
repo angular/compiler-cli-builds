@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic" />
 import * as ts from 'typescript';
 import { Reference } from '../../imports';
+import { FunctionDefinition } from '../../reflection';
 /**
  * The reason why a value cannot be determined statically.
  */
@@ -48,9 +49,13 @@ export declare const enum DynamicValueReason {
      */
     INVALID_EXPRESSION_TYPE = 5,
     /**
+     * A function call could not be evaluated as the function's body is not a single return statement.
+     */
+    COMPLEX_FUNCTION_CALL = 6,
+    /**
      * A value could not be determined statically for any reason other the above.
      */
-    UNKNOWN = 6
+    UNKNOWN = 7
 }
 /**
  * Represents a value which cannot be determined statically.
@@ -66,6 +71,7 @@ export declare class DynamicValue<R = unknown> {
     static fromUnsupportedSyntax(node: ts.Node): DynamicValue;
     static fromUnknownIdentifier(node: ts.Identifier): DynamicValue;
     static fromInvalidExpressionType(node: ts.Node, value: unknown): DynamicValue<unknown>;
+    static fromComplexFunctionCall(node: ts.Node, fn: FunctionDefinition): DynamicValue<FunctionDefinition>;
     static fromUnknown(node: ts.Node): DynamicValue;
     isFromDynamicInput(this: DynamicValue<R>): this is DynamicValue<DynamicValue>;
     isFromDynamicString(this: DynamicValue<R>): this is DynamicValue;
@@ -73,5 +79,17 @@ export declare class DynamicValue<R = unknown> {
     isFromUnsupportedSyntax(this: DynamicValue<R>): this is DynamicValue;
     isFromUnknownIdentifier(this: DynamicValue<R>): this is DynamicValue;
     isFromInvalidExpressionType(this: DynamicValue<R>): this is DynamicValue<unknown>;
+    isFromComplexFunctionCall(this: DynamicValue<R>): this is DynamicValue<FunctionDefinition>;
     isFromUnknown(this: DynamicValue<R>): this is DynamicValue;
+    accept<R>(visitor: DynamicValueVisitor<R>): R;
+}
+export interface DynamicValueVisitor<R> {
+    visitDynamicInput(value: DynamicValue<DynamicValue>): R;
+    visitDynamicString(value: DynamicValue): R;
+    visitExternalReference(value: DynamicValue<Reference<ts.Declaration>>): R;
+    visitUnsupportedSyntax(value: DynamicValue): R;
+    visitUnknownIdentifier(value: DynamicValue): R;
+    visitInvalidExpressionType(value: DynamicValue): R;
+    visitComplexFunctionCall(value: DynamicValue<FunctionDefinition>): R;
+    visitUnknown(value: DynamicValue): R;
 }

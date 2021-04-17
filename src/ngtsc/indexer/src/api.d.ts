@@ -1,14 +1,13 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/indexer/src/api" />
 import { ParseSourceFile } from '@angular/compiler';
-import * as ts from 'typescript';
-import { ClassDeclaration } from '../../reflection';
+import { ClassDeclaration, DeclarationNode } from '../../reflection';
 /**
  * Describes the kind of identifier found in a template.
  */
@@ -114,7 +113,7 @@ export interface IndexedComponent {
     file: ParseSourceFile;
     template: {
         identifiers: Set<TopLevelIdentifier>;
-        usedComponents: Set<ts.Declaration>;
+        usedComponents: Set<DeclarationNode>;
         isInline: boolean;
         file: ParseSourceFile;
     };

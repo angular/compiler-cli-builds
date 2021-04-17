@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -17,7 +17,7 @@ import { DynamicValue } from './dynamic';
  * non-primitive value, or a special `DynamicValue` type which indicates the value was not
  * available statically.
  */
-export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | ResolvedModule | BuiltinFn | DynamicValue<unknown>;
+export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | ResolvedModule | KnownFn | DynamicValue<unknown>;
 /**
  * An array of `ResolvedValue`s.
  *
@@ -51,14 +51,16 @@ export declare class ResolvedModule {
  * Contains a `Reference` to the enumeration itself, and the name of the referenced member.
  */
 export declare class EnumValue {
-    readonly enumRef: Reference<ts.EnumDeclaration>;
+    readonly enumRef: Reference<ts.Declaration>;
     readonly name: string;
     readonly resolved: ResolvedValue;
-    constructor(enumRef: Reference<ts.EnumDeclaration>, name: string, resolved: ResolvedValue);
+    constructor(enumRef: Reference<ts.Declaration>, name: string, resolved: ResolvedValue);
 }
 /**
- * An implementation of a builtin function, such as `Array.prototype.slice`.
+ * An implementation of a known function that can be statically evaluated.
+ * It could be a built-in function or method (such as `Array.prototype.slice`) or a TypeScript
+ * helper (such as `__spread`).
  */
-export declare abstract class BuiltinFn {
-    abstract evaluate(args: ResolvedValueArray): ResolvedValue;
+export declare abstract class KnownFn {
+    abstract evaluate(node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
 }

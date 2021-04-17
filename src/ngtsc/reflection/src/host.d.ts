@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -72,6 +72,7 @@ export declare const Decorator: {
 export declare type DecoratorIdentifier = ts.Identifier | NamespacedIdentifier;
 export declare type NamespacedIdentifier = ts.PropertyAccessExpression & {
     expression: ts.Identifier;
+    name: ts.Identifier;
 };
 export declare function isDecoratorIdentifier(exp: ts.Expression): exp is DecoratorIdentifier;
 /**
@@ -89,7 +90,7 @@ export declare function isDecoratorIdentifier(exp: ts.Expression): exp is Decora
  * For `ReflectionHost` purposes, a class declaration should always have a `name` identifier,
  * because we need to be able to reference it in other parts of the program.
  */
-export declare type ClassDeclaration<T extends ts.Declaration = ts.Declaration> = T & {
+export declare type ClassDeclaration<T extends DeclarationNode = DeclarationNode> = T & {
     name: ts.Identifier;
 };
 /**
@@ -124,13 +125,13 @@ export interface ClassMember {
      */
     name: string;
     /**
-     * TypeScript `ts.Identifier` representing the name of the member, or `null` if no such node
-     * is present.
+     * TypeScript `ts.Identifier` or `ts.StringLiteral` representing the name of the member, or `null`
+     * if no such node is present.
      *
      * The `nameNode` is useful in writing references to this member that will be correctly source-
      * mapped back to the original file.
      */
-    nameNode: ts.Identifier | null;
+    nameNode: ts.Identifier | ts.StringLiteral | null;
     /**
      * TypeScript `ts.Expression` which represents the value of the member.
      *
@@ -191,6 +192,122 @@ export interface ClassMember {
      */
     decorators: Decorator[] | null;
 }
+export declare const enum TypeValueReferenceKind {
+    LOCAL = 0,
+    IMPORTED = 1,
+    UNAVAILABLE = 2
+}
+/**
+ * A type reference that refers to any type via a `ts.Expression` that's valid within the local file
+ * where the type was referenced.
+ */
+export interface LocalTypeValueReference {
+    kind: TypeValueReferenceKind.LOCAL;
+    /**
+     * The synthesized expression to reference the type in a value position.
+     */
+    expression: ts.Expression;
+    /**
+     * If the type originates from a default import, the import statement is captured here to be able
+     * to track its usages, preventing the import from being elided if it was originally only used in
+     * a type-position. See `DefaultImportTracker` for details.
+     */
+    defaultImportStatement: ts.ImportDeclaration | null;
+}
+/**
+ * A reference that refers to a type that was imported, and gives the symbol `name` and the
+ * `moduleName` of the import. Note that this `moduleName` may be a relative path, and thus is
+ * likely only valid within the context of the file which contained the original type reference.
+ */
+export interface ImportedTypeValueReference {
+    kind: TypeValueReferenceKind.IMPORTED;
+    /**
+     * The module specifier from which the `importedName` symbol should be imported.
+     */
+    moduleName: string;
+    /**
+     * The name of the top-level symbol that is imported from `moduleName`. If `nestedPath` is also
+     * present, a nested object is being referenced from the top-level symbol.
+     */
+    importedName: string;
+    /**
+     * If present, represents the symbol names that are referenced from the top-level import.
+     * When `null` or empty, the `importedName` itself is the symbol being referenced.
+     */
+    nestedPath: string[] | null;
+    valueDeclaration: DeclarationNode;
+}
+/**
+ * A representation for a type value reference that is used when no value is available. This can
+ * occur due to various reasons, which is indicated in the `reason` field.
+ */
+export interface UnavailableTypeValueReference {
+    kind: TypeValueReferenceKind.UNAVAILABLE;
+    /**
+     * The reason why no value reference could be determined for a type.
+     */
+    reason: UnavailableValue;
+}
+/**
+ * The various reasons why the compiler may be unable to synthesize a value from a type reference.
+ */
+export declare const enum ValueUnavailableKind {
+    /**
+     * No type node was available.
+     */
+    MISSING_TYPE = 0,
+    /**
+     * The type does not have a value declaration, e.g. an interface.
+     */
+    NO_VALUE_DECLARATION = 1,
+    /**
+     * The type is imported using a type-only imports, so it is not suitable to be used in a
+     * value-position.
+     */
+    TYPE_ONLY_IMPORT = 2,
+    /**
+     * The type reference could not be resolved to a declaration.
+     */
+    UNKNOWN_REFERENCE = 3,
+    /**
+     * The type corresponds with a namespace.
+     */
+    NAMESPACE = 4,
+    /**
+     * The type is not supported in the compiler, for example union types.
+     */
+    UNSUPPORTED = 5
+}
+export interface UnsupportedType {
+    kind: ValueUnavailableKind.UNSUPPORTED;
+    typeNode: ts.TypeNode;
+}
+export interface NoValueDeclaration {
+    kind: ValueUnavailableKind.NO_VALUE_DECLARATION;
+    typeNode: ts.TypeNode;
+    decl: ts.Declaration | null;
+}
+export interface TypeOnlyImport {
+    kind: ValueUnavailableKind.TYPE_ONLY_IMPORT;
+    typeNode: ts.TypeNode;
+    importClause: ts.ImportClause;
+}
+export interface NamespaceImport {
+    kind: ValueUnavailableKind.NAMESPACE;
+    typeNode: ts.TypeNode;
+    importClause: ts.ImportClause;
+}
+export interface UnknownReference {
+    kind: ValueUnavailableKind.UNKNOWN_REFERENCE;
+    typeNode: ts.TypeNode;
+}
+export interface MissingType {
+    kind: ValueUnavailableKind.MISSING_TYPE;
+}
+/**
+ * The various reasons why a type node may not be referred to as a value.
+ */
+export declare type UnavailableValue = UnsupportedType | NoValueDeclaration | TypeOnlyImport | NamespaceImport | UnknownReference | MissingType;
 /**
  * A reference to a value that originated from a type position.
  *
@@ -198,24 +315,9 @@ export interface ClassMember {
  * extracted from this would refer to the value of the class `Foo` (assuming it was actually a
  * type).
  *
- * There are two kinds of such references. A reference with `local: false` refers to a type that was
- * imported, and gives the symbol `name` and the `moduleName` of the import. Note that this
- * `moduleName` may be a relative path, and thus is likely only valid within the context of the file
- * which contained the original type reference.
- *
- * A reference with `local: true` refers to any other kind of type via a `ts.Expression` that's
- * valid within the local file where the type was referenced.
+ * See the individual types for additional information.
  */
-export declare type TypeValueReference = {
-    local: true;
-    expression: ts.Expression;
-    defaultImportStatement: ts.ImportDeclaration | null;
-} | {
-    local: false;
-    name: string;
-    moduleName: string;
-    valueDeclaration: ts.Declaration;
-};
+export declare type TypeValueReference = LocalTypeValueReference | ImportedTypeValueReference | UnavailableTypeValueReference;
 /**
  * A parameter to a constructor.
  */
@@ -238,14 +340,10 @@ export interface CtorParameter {
      * Reference to the value of the parameter's type annotation, if it's possible to refer to the
      * parameter's type as a value.
      *
-     * This can either be a reference to a local value, in which case it has `local` set to `true` and
-     * contains a `ts.Expression`, or it's a reference to an imported value, in which case `local` is
-     * set to `false` and the symbol and module name of the imported value are provided instead.
-     *
-     * If the type is not present or cannot be represented as an expression, `typeValueReference` is
-     * `null`.
+     * This can either be a reference to a local value, a reference to an imported value, or no
+     * value if no is present or cannot be represented as an expression.
      */
-    typeValueReference: TypeValueReference | null;
+    typeValueReference: TypeValueReference;
     /**
      * TypeScript `ts.TypeNode` representing the type node found in the type position.
      *
@@ -281,27 +379,38 @@ export interface FunctionDefinition {
      */
     body: ts.Statement[] | null;
     /**
-     * The type of tslib helper function, if the function is determined to represent a tslib helper
-     * function. Otherwise, this will be null.
-     */
-    helper: TsHelperFn | null;
-    /**
      * Metadata regarding the function's parameters, including possible default value expressions.
      */
     parameters: Parameter[];
 }
 /**
- * Possible functions from TypeScript's helper library.
+ * Possible declarations of known values, such as built-in objects/functions or TypeScript helpers.
  */
-export declare enum TsHelperFn {
+export declare enum KnownDeclaration {
     /**
-     * Indicates the `__spread` function.
+     * Indicates the JavaScript global `Object` class.
      */
-    Spread = 0,
+    JsGlobalObject = 0,
     /**
-     * Indicates the `__spreadArrays` function.
+     * Indicates the `__assign` TypeScript helper function.
      */
-    SpreadArrays = 1
+    TsHelperAssign = 1,
+    /**
+     * Indicates the `__spread` TypeScript helper function.
+     */
+    TsHelperSpread = 2,
+    /**
+     * Indicates the `__spreadArrays` TypeScript helper function.
+     */
+    TsHelperSpreadArrays = 3,
+    /**
+     * Indicates the `__spreadArray` TypeScript helper function.
+     */
+    TsHelperSpreadArray = 4,
+    /**
+     * Indicates the `__read` TypeScript helper function.
+     */
+    TsHelperRead = 5
 }
 /**
  * A parameter to a function or method.
@@ -337,9 +446,48 @@ export interface Import {
     from: string;
 }
 /**
+ * A single enum member extracted from JavaScript when no `ts.EnumDeclaration` is available.
+ */
+export interface EnumMember {
+    /**
+     * The name of the enum member.
+     */
+    name: ts.PropertyName;
+    /**
+     * The initializer expression of the enum member. Unlike in TypeScript, this is always available
+     * in emitted JavaScript.
+     */
+    initializer: ts.Expression;
+}
+/**
+ * A type that is used to identify a declaration.
+ *
+ * Declarations are normally `ts.Declaration` types such as variable declarations, class
+ * declarations, function declarations etc.
+ * But in some cases there is no `ts.Declaration` that can be used for a declaration, such
+ * as when they are declared inline as part of an exported expression. Then we must use a
+ * `ts.Expression` as the declaration.
+ * An example of this is `exports.someVar = 42` where the declaration expression would be
+ * `exports.someVar`.
+ */
+export declare type DeclarationNode = ts.Declaration | ts.Expression;
+/**
+ * The type of a Declaration - whether its node is concrete (ts.Declaration) or inline
+ * (ts.Expression). See `ConcreteDeclaration`, `InlineDeclaration` and `DeclarationNode` for more
+ * information about this.
+ */
+export declare const enum DeclarationKind {
+    Concrete = 0,
+    Inline = 1
+}
+/**
  * Base type for all `Declaration`s.
  */
-export interface BaseDeclaration<T extends ts.Declaration = ts.Declaration> {
+export interface BaseDeclaration<T extends DeclarationNode> {
+    /**
+     * The type of the underlying `node`.
+     */
+    kind: DeclarationKind;
     /**
      * The absolute module path from which the symbol was imported into the application, if the symbol
      * was imported via an absolute module (even through a chain of re-exports). If the symbol is part
@@ -349,38 +497,52 @@ export interface BaseDeclaration<T extends ts.Declaration = ts.Declaration> {
     /**
      * TypeScript reference to the declaration itself, if one exists.
      */
-    node: T | null;
-}
-/**
- * A declaration that has an associated TypeScript `ts.Declaration`.
- *
- * The alternative is an `InlineDeclaration`.
- */
-export interface ConcreteDeclaration<T extends ts.Declaration = ts.Declaration> extends BaseDeclaration<T> {
     node: T;
+    /**
+     * If set, describes the type of the known declaration this declaration resolves to.
+     */
+    known: KnownDeclaration | null;
 }
 /**
- * A declaration that does not have an associated TypeScript `ts.Declaration`, only a
- * `ts.Expression`.
+ * Returns true if the `decl` is a `ConcreteDeclaration` (ie. that its `node` property is a
+ * `ts.Declaration`).
+ */
+export declare function isConcreteDeclaration(decl: Declaration): decl is ConcreteDeclaration;
+export interface ConcreteDeclaration<T extends ts.Declaration = ts.Declaration> extends BaseDeclaration<T> {
+    kind: DeclarationKind.Concrete;
+    /**
+     * Optionally represents a special identity of the declaration, or `null` if the declaration
+     * does not have a special identity.
+     */
+    identity: SpecialDeclarationIdentity | null;
+}
+export declare type SpecialDeclarationIdentity = DownleveledEnum;
+export declare const enum SpecialDeclarationKind {
+    DownleveledEnum = 0
+}
+/**
+ * A special declaration identity that represents an enum. This is used in downleveled forms where
+ * a `ts.EnumDeclaration` is emitted in an alternative form, e.g. an IIFE call that declares all
+ * members.
+ */
+export interface DownleveledEnum {
+    kind: SpecialDeclarationKind.DownleveledEnum;
+    enumMembers: EnumMember[];
+}
+/**
+ * A declaration that does not have an associated TypeScript `ts.Declaration`.
  *
  * This can occur in some downlevelings when an `export const VAR = ...;` (a `ts.Declaration`) is
  * transpiled to an assignment statement (e.g. `exports.VAR = ...;`). There is no `ts.Declaration`
  * associated with `VAR` in that case, only an expression.
  */
-export interface InlineDeclaration extends BaseDeclaration {
-    node: null;
-    /**
-     * The `ts.Expression` which constitutes the value of the declaration.
-     */
-    expression: ts.Expression;
+export interface InlineDeclaration extends BaseDeclaration<Exclude<DeclarationNode, ts.Declaration>> {
+    kind: DeclarationKind.Inline;
+    implementation?: DeclarationNode;
 }
 /**
  * The declaration of a symbol, along with information about how it was imported into the
  * application.
- *
- * This can either be a `ConcreteDeclaration` if the underlying TypeScript node for the symbol is an
- * actual `ts.Declaration`, or an `InlineDeclaration` if the declaration was transpiled in certain
- * downlevelings to a `ts.Expression` instead.
  */
 export declare type Declaration<T extends ts.Declaration = ts.Declaration> = ConcreteDeclaration<T> | InlineDeclaration;
 /**
@@ -408,7 +570,7 @@ export interface ReflectionHost {
      * @returns an array of `Decorator` metadata if decorators are present on the declaration, or
      * `null` if either no decorators were present or if the declaration is not of a decoratable type.
      */
-    getDecoratorsOfDeclaration(declaration: ts.Declaration): Decorator[] | null;
+    getDecoratorsOfDeclaration(declaration: DeclarationNode): Decorator[] | null;
     /**
      * Examine a declaration which should be of a class, and return metadata about the members of the
      * class.
@@ -561,7 +723,7 @@ export interface ReflectionHost {
      * Note that the `ts.Declaration` returned from this function may not be from the same
      * `ts.Program` as the input declaration.
      */
-    getDtsDeclaration(declaration: ts.Declaration): ts.Declaration | null;
+    getDtsDeclaration(declaration: DeclarationNode): ts.Declaration | null;
     /**
      * Get a `ts.Identifier` for a given `ClassDeclaration` which can be used to refer to the class
      * within its definition (such as in static fields).

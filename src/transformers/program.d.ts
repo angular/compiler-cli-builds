@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -10,6 +10,8 @@ import { MessageBundle } from '@angular/compiler';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { CompilerHost, CompilerOptions, Program } from './api';
+export declare function setTempProgramHandlerForTest(handler: (program: ts.Program) => void): void;
+export declare function resetTempProgramHandlerForTest(): void;
 export declare function createProgram({ rootNames, options, host, oldProgram }: {
     rootNames: ReadonlyArray<string>;
     options: CompilerOptions;

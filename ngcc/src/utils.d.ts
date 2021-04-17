@@ -1,13 +1,14 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/utils" />
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 import * as ts from 'typescript';
-import { AbsoluteFsPath, FileSystem } from '../../src/ngtsc/file_system';
+import { AbsoluteFsPath, ReadonlyFileSystem } from '../../src/ngtsc/file_system';
+import { DeclarationNode, KnownDeclaration } from '../../src/ngtsc/reflection';
 /**
  * A list (`Array`) of partially ordered `T` items.
  *
@@ -42,27 +43,46 @@ export declare function findAll<T>(node: ts.Node, test: (node: ts.Node) => node 
  * @param declaration The declaration to test.
  * @returns true if the declaration has an identifier for a name.
  */
-export declare function hasNameIdentifier(declaration: ts.Declaration): declaration is ts.Declaration & {
+export declare function hasNameIdentifier(declaration: ts.Node): declaration is DeclarationNode & {
     name: ts.Identifier;
-};
-export declare type PathMappings = {
-    baseUrl: string;
-    paths: {
-        [key: string]: string[];
-    };
 };
 /**
  * Test whether a path is "relative".
  *
- * Relative paths start with `/`, `./` or `../`; or are simply `.` or `..`.
+ * Relative paths start with `/`, `./` or `../` (or the Windows equivalents); or are simply `.` or
+ * `..`.
  */
 export declare function isRelativePath(path: string): boolean;
+/**
+ * A `Map`-like object that can compute and memoize a missing value for any key.
+ *
+ * The computed values are memoized, so the factory function is not called more than once per key.
+ * This is useful for storing values that are expensive to compute and may be used multiple times.
+ */
+export declare class FactoryMap<K, V> {
+    private factory;
+    private internalMap;
+    constructor(factory: (key: K) => V, entries?: readonly (readonly [K, V])[] | null);
+    get(key: K): V;
+    set(key: K, value: V): void;
+}
 /**
  * Attempt to resolve a `path` to a file by appending the provided `postFixes`
  * to the `path` and checking if the file exists on disk.
  * @returns An absolute path to the first matching existing file, or `null` if none exist.
  */
-export declare function resolveFileWithPostfixes(fs: FileSystem, path: AbsoluteFsPath, postFixes: string[]): AbsoluteFsPath | null;
+export declare function resolveFileWithPostfixes(fs: ReadonlyFileSystem, path: AbsoluteFsPath, postFixes: string[]): AbsoluteFsPath | null;
+/**
+ * Determine whether a function declaration corresponds with a TypeScript helper function, returning
+ * its kind if so or null if the declaration does not seem to correspond with such a helper.
+ */
+export declare function getTsHelperFnFromDeclaration(decl: DeclarationNode): KnownDeclaration | null;
+/**
+ * Determine whether an identifier corresponds with a TypeScript helper function (based on its
+ * name), returning its kind if so or null if the identifier does not seem to correspond with such a
+ * helper.
+ */
+export declare function getTsHelperFnFromIdentifier(id: ts.Identifier): KnownDeclaration | null;
 /**
  * An identifier may become repeated when bundling multiple source files into a single bundle, so
  * bundlers have a strategy of suffixing non-unique identifiers with a suffix like $2. This function
@@ -71,3 +91,4 @@ export declare function resolveFileWithPostfixes(fs: FileSystem, path: AbsoluteF
  * @returns The canonical representation of the value, without any suffix.
  */
 export declare function stripDollarSuffix(value: string): string;
+export declare function stripExtension(fileName: string): string;

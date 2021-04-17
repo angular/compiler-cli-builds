@@ -1,7 +1,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/rendering/esm_rendering_formatter" />
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -9,22 +9,23 @@
 import { Statement } from '@angular/compiler';
 import MagicString from 'magic-string';
 import * as ts from 'typescript';
-import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
+import { AbsoluteFsPath, PathManipulation } from '../../../src/ngtsc/file_system';
 import { Reexport } from '../../../src/ngtsc/imports';
 import { Import, ImportManager } from '../../../src/ngtsc/translator';
-import { CompiledClass } from '../analysis/types';
-import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
 import { ModuleWithProvidersInfo } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
-import { RenderingFormatter, RedundantDecoratorMap } from './rendering_formatter';
+import { CompiledClass } from '../analysis/types';
+import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
+import { RedundantDecoratorMap, RenderingFormatter } from './rendering_formatter';
 /**
  * A RenderingFormatter that works with ECMAScript Module import and export statements.
  */
 export declare class EsmRenderingFormatter implements RenderingFormatter {
+    protected fs: PathManipulation;
     protected host: NgccReflectionHost;
     protected isCore: boolean;
     protected printer: ts.Printer;
-    constructor(host: NgccReflectionHost, isCore: boolean);
+    constructor(fs: PathManipulation, host: NgccReflectionHost, isCore: boolean);
     /**
      *  Add the imports at the top of the file, after any imports that are already there.
      */
@@ -57,7 +58,7 @@ export declare class EsmRenderingFormatter implements RenderingFormatter {
      */
     removeDecorators(output: MagicString, decoratorsToRemove: RedundantDecoratorMap): void;
     /**
-     * Rewrite the the IVY switch markers to indicate we are in IVY mode.
+     * Rewrite the IVY switch markers to indicate we are in IVY mode.
      */
     rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile, declarations: SwitchableVariableDeclaration[]): void;
     /**

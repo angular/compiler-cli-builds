@@ -2,9 +2,8 @@
 export declare function setTypeScriptVersionForTesting(version: string): void;
 export declare function restoreTypeScriptVersionForTesting(): void;
 /**
- * Checks whether a given version ∈ [minVersion, maxVersion[
- * An error will be thrown if the following statements are simultaneously true:
- * - the given version ∉ [minVersion, maxVersion[,
+ * Checks whether a given version ∈ [minVersion, maxVersion[.
+ * An error will be thrown when the given version ∉ [minVersion, maxVersion[.
  *
  * @param version The version on which the check will be performed
  * @param minVersion The lower bound version. A valid version needs to be greater than minVersion

@@ -1,20 +1,19 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/metadata" />
-import { Statement } from '@angular/compiler';
-import * as ts from 'typescript';
-import { DefaultImportRecorder } from '../../imports';
-import { ReflectionHost } from '../../reflection';
+import { R3ClassMetadata } from '@angular/compiler';
+import { DeclarationNode, ReflectionHost } from '../../reflection';
 /**
  * Given a class declaration, generate a call to `setClassMetadata` with the Angular metadata
- * present on the class or its member fields.
+ * present on the class or its member fields. An ngDevMode guard is used to allow the call to be
+ * tree-shaken away, as the `setClassMetadata` invocation is only needed for testing purposes.
  *
  * If no such metadata is present, this function returns `null`. Otherwise, the call is returned
  * as a `Statement` for inclusion along with the class.
  */
-export declare function generateSetClassMetadataCall(clazz: ts.Declaration, reflection: ReflectionHost, defaultImportRecorder: DefaultImportRecorder, isCore: boolean, annotateForClosureCompiler?: boolean): Statement | null;
+export declare function extractClassMetadata(clazz: DeclarationNode, reflection: ReflectionHost, isCore: boolean, annotateForClosureCompiler?: boolean): R3ClassMetadata | null;

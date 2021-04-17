@@ -1,11 +1,19 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/rendering/umd_rendering_formatter" />
-import * as ts from 'typescript';
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 import MagicString from 'magic-string';
+import * as ts from 'typescript';
+import { PathManipulation } from '../../../src/ngtsc/file_system';
+import { Reexport } from '../../../src/ngtsc/imports';
 import { Import, ImportManager } from '../../../src/ngtsc/translator';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { UmdReflectionHost } from '../host/umd_host';
 import { Esm5RenderingFormatter } from './esm5_rendering_formatter';
-import { Reexport } from '../../../src/ngtsc/imports';
 /**
  * A RenderingFormatter that works with UMD files, instead of `import` and `export` statements
  * the module is an IIFE with a factory function call with dependencies, which are defined in a
@@ -13,9 +21,26 @@ import { Reexport } from '../../../src/ngtsc/imports';
  */
 export declare class UmdRenderingFormatter extends Esm5RenderingFormatter {
     protected umdHost: UmdReflectionHost;
-    constructor(umdHost: UmdReflectionHost, isCore: boolean);
+    constructor(fs: PathManipulation, umdHost: UmdReflectionHost, isCore: boolean);
     /**
-     *  Add the imports to the UMD module IIFE.
+     * Add the imports to the UMD module IIFE.
+     *
+     * Note that imports at "prepended" to the start of the parameter list of the factory function,
+     * and so also to the arguments passed to it when it is called.
+     * This is because there are scenarios where the factory function does not accept as many
+     * parameters as are passed as argument in the call. For example:
+     *
+     * ```
+     * (function (global, factory) {
+     *     typeof exports === 'object' && typeof module !== 'undefined' ?
+     *         factory(exports,require('x'),require('z')) :
+     *     typeof define === 'function' && define.amd ?
+     *         define(['exports', 'x', 'z'], factory) :
+     *     (global = global || self, factory(global.myBundle = {}, global.x));
+     * }(this, (function (exports, x) { ... }
+     * ```
+     *
+     * (See that the `z` import is not being used by the factory function.)
      */
     addImports(output: MagicString, imports: Import[], file: ts.SourceFile): void;
     /**

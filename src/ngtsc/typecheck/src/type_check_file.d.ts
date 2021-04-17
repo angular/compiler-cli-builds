@@ -1,7 +1,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/type_check_file" />
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -9,11 +9,12 @@
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
-import { ClassDeclaration } from '../../reflection';
-import { TypeCheckBlockMetadata, TypeCheckingConfig } from './api';
+import { ClassDeclaration, ReflectionHost } from '../../reflection';
+import { TypeCheckBlockMetadata, TypeCheckingConfig } from '../api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
 import { OutOfBandDiagnosticRecorder } from './oob';
+import { TcbGenericContextBehavior } from './type_check_block';
 /**
  * An `Environment` representing the single type-checking file into which most (if not all) Type
  * Check Blocks (TCBs) will be generated.
@@ -23,12 +24,12 @@ import { OutOfBandDiagnosticRecorder } from './oob';
  * hoists them to the top of the generated `ts.SourceFile`.
  */
 export declare class TypeCheckFile extends Environment {
-    private fileName;
+    readonly fileName: AbsoluteFsPath;
     private nextTcbId;
     private tcbStatements;
-    constructor(fileName: string, config: TypeCheckingConfig, refEmitter: ReferenceEmitter);
-    addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder): void;
-    render(): ts.SourceFile;
+    constructor(fileName: AbsoluteFsPath, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>);
+    addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): void;
+    render(removeComments: boolean): string;
     getPreludeStatements(): ts.Statement[];
 }
 export declare function typeCheckFilePath(rootDirs: AbsoluteFsPath[]): AbsoluteFsPath;

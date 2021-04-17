@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -9,74 +9,52 @@
 import { GeneratedFile } from '@angular/compiler';
 import * as ts from 'typescript';
 import * as api from '../transformers/api';
-import { ReferencesRegistry } from './annotations';
-import { ReferenceGraph } from './entry_point';
-import { Reference } from './imports';
+import { NgCompiler } from './core';
+import { NgCompilerOptions } from './core/api';
 import { IndexedComponent } from './indexer';
+import { DeclarationNode } from './reflection';
+/**
+ * Entrypoint to the Angular Compiler (Ivy+) which sits behind the `api.Program` interface, allowing
+ * it to be a drop-in replacement for the legacy View Engine compiler to tooling such as the
+ * command-line main() function or the Angular CLI.
+ */
 export declare class NgtscProgram implements api.Program {
     private options;
-    private host;
+    readonly compiler: NgCompiler;
+    /**
+     * The primary TypeScript program, which is used for analysis and emit.
+     */
     private tsProgram;
-    private reuseTsProgram;
-    private resourceManager;
-    private compilation;
-    private factoryToSourceInfo;
-    private sourceToFactorySymbols;
-    private _coreImportsFrom;
-    private _importRewriter;
-    private _reflector;
-    private _isCore;
-    private rootDirs;
     private closureCompilerEnabled;
-    private entryPoint;
-    private exportReferenceGraph;
-    private flatIndexGenerator;
-    private routeAnalyzer;
-    private constructionDiagnostics;
-    private moduleResolver;
-    private cycleAnalyzer;
-    private metaReader;
-    private aliasingHost;
-    private refEmitter;
-    private fileToModuleHost;
-    private defaultImportTracker;
-    private perfRecorder;
-    private perfTracker;
-    private incrementalDriver;
-    private typeCheckFilePath;
-    private modifiedResourceFiles;
-    constructor(rootNames: ReadonlyArray<string>, options: api.CompilerOptions, host: api.CompilerHost, oldProgram?: NgtscProgram);
+    private host;
+    private incrementalStrategy;
+    constructor(rootNames: ReadonlyArray<string>, options: NgCompilerOptions, delegateHost: api.CompilerHost, oldProgram?: NgtscProgram);
     getTsProgram(): ts.Program;
-    getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
-    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
-    getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
-    getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<api.Diagnostic>;
-    getTsSemanticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
-    getNgSemanticDiagnostics(fileName?: string | undefined, cancellationToken?: ts.CancellationToken | undefined): ReadonlyArray<ts.Diagnostic>;
+    getReuseTsProgram(): ts.Program;
+    getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
+    getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
+    getTsSemanticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
+    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): readonly (ts.Diagnostic | api.Diagnostic)[];
+    getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken | undefined): readonly api.Diagnostic[];
+    getNgSemanticDiagnostics(fileName?: string | undefined, cancellationToken?: ts.CancellationToken | undefined): readonly (ts.Diagnostic | api.Diagnostic)[];
+    /**
+     * Ensure that the `NgCompiler` has properly analyzed the program, and allow for the asynchronous
+     * loading of any resources during the process.
+     *
+     * This is used by the Angular CLI to allow for spawning (async) child compilations for things
+     * like SASS files used in `styleUrls`.
+     */
     loadNgStructureAsync(): Promise<void>;
     listLazyRoutes(entryRoute?: string | undefined): api.LazyRoute[];
+    emit(opts?: {
+        emitFlags?: api.EmitFlags | undefined;
+        cancellationToken?: ts.CancellationToken | undefined;
+        customTransformers?: api.CustomTransformers | undefined;
+        emitCallback?: api.TsEmitCallback | undefined;
+        mergeEmitResultsCallback?: api.TsMergeEmitResultsCallback | undefined;
+    } | undefined): ts.EmitResult;
+    getIndexedComponents(): Map<DeclarationNode, IndexedComponent>;
     getLibrarySummaries(): Map<string, api.LibrarySummary>;
     getEmittedGeneratedFiles(): Map<string, GeneratedFile>;
     getEmittedSourceFiles(): Map<string, ts.SourceFile>;
-    private ensureAnalyzed;
-    emit(opts?: {
-        emitFlags?: api.EmitFlags;
-        cancellationToken?: ts.CancellationToken;
-        customTransformers?: api.CustomTransformers;
-        emitCallback?: api.TsEmitCallback;
-        mergeEmitResultsCallback?: api.TsMergeEmitResultsCallback;
-    }): ts.EmitResult;
-    private getTemplateDiagnostics;
-    getIndexedComponents(): Map<ts.Declaration, IndexedComponent>;
-    private makeCompilation;
-    private getI18nLegacyMessageFormat;
-    private readonly reflector;
-    private readonly coreImportsFrom;
-    private readonly isCore;
-    private readonly importRewriter;
-}
-export declare class ReferenceGraphAdapter implements ReferencesRegistry {
-    private graph;
-    constructor(graph: ReferenceGraph);
-    add(source: ts.Declaration, ...references: Reference<ts.Declaration>[]): void;
 }

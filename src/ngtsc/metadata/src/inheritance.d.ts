@@ -1,14 +1,14 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/inheritance" />
 import { Reference } from '../../imports';
-import { DirectiveMeta, MetadataReader } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
+import { DirectiveMeta, MetadataReader } from './api';
 /**
  * Given a reference to a directive, return a flattened version of its `DirectiveMeta` metadata
  * which includes metadata from its entire inheritance chain.

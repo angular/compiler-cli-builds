@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -26,36 +26,57 @@ export declare type AbsoluteFsPath = BrandedPath<'AbsoluteFsPath'>;
  */
 export declare type PathSegment = BrandedPath<'PathSegment'>;
 /**
+ * An abstraction over the path manipulation aspects of a file-system.
+ */
+export interface PathManipulation {
+    extname(path: AbsoluteFsPath | PathSegment): string;
+    isRoot(path: AbsoluteFsPath): boolean;
+    isRooted(path: string): boolean;
+    dirname<T extends PathString>(file: T): T;
+    extname(path: AbsoluteFsPath | PathSegment): string;
+    join<T extends PathString>(basePath: T, ...paths: string[]): T;
+    /**
+     * Compute the relative path between `from` and `to`.
+     *
+     * In file-systems that can have multiple file trees the returned path may not actually be
+     * "relative" (i.e. `PathSegment`). For example, Windows can have multiple drives :
+     * `relative('c:/a/b', 'd:/a/c')` would be `d:/a/c'.
+     */
+    relative<T extends PathString>(from: T, to: T): PathSegment | AbsoluteFsPath;
+    basename(filePath: string, extension?: string): PathSegment;
+    normalize<T extends PathString>(path: T): T;
+    resolve(...paths: string[]): AbsoluteFsPath;
+    pwd(): AbsoluteFsPath;
+    chdir(path: AbsoluteFsPath): void;
+}
+/**
+ * An abstraction over the read-only aspects of a file-system.
+ */
+export interface ReadonlyFileSystem extends PathManipulation {
+    isCaseSensitive(): boolean;
+    exists(path: AbsoluteFsPath): boolean;
+    readFile(path: AbsoluteFsPath): string;
+    readFileBuffer(path: AbsoluteFsPath): Uint8Array;
+    readdir(path: AbsoluteFsPath): PathSegment[];
+    lstat(path: AbsoluteFsPath): FileStats;
+    stat(path: AbsoluteFsPath): FileStats;
+    realpath(filePath: AbsoluteFsPath): AbsoluteFsPath;
+    getDefaultLibLocation(): AbsoluteFsPath;
+}
+/**
  * A basic interface to abstract the underlying file-system.
  *
  * This makes it easier to provide mock file-systems in unit tests,
  * but also to create clever file-systems that have features such as caching.
  */
-export interface FileSystem {
-    exists(path: AbsoluteFsPath): boolean;
-    readFile(path: AbsoluteFsPath): string;
-    writeFile(path: AbsoluteFsPath, data: string): void;
+export interface FileSystem extends ReadonlyFileSystem {
+    writeFile(path: AbsoluteFsPath, data: string | Uint8Array, exclusive?: boolean): void;
+    removeFile(path: AbsoluteFsPath): void;
     symlink(target: AbsoluteFsPath, path: AbsoluteFsPath): void;
-    readdir(path: AbsoluteFsPath): PathSegment[];
-    lstat(path: AbsoluteFsPath): FileStats;
-    stat(path: AbsoluteFsPath): FileStats;
-    pwd(): AbsoluteFsPath;
-    chdir(path: AbsoluteFsPath): void;
-    extname(path: AbsoluteFsPath | PathSegment): string;
     copyFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     moveFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     ensureDir(path: AbsoluteFsPath): void;
-    isCaseSensitive(): boolean;
-    isRoot(path: AbsoluteFsPath): boolean;
-    isRooted(path: string): boolean;
-    resolve(...paths: string[]): AbsoluteFsPath;
-    dirname<T extends PathString>(file: T): T;
-    join<T extends PathString>(basePath: T, ...paths: string[]): T;
-    relative<T extends PathString>(from: T, to: T): PathSegment;
-    basename(filePath: string, extension?: string): PathSegment;
-    realpath(filePath: AbsoluteFsPath): AbsoluteFsPath;
-    getDefaultLibLocation(): AbsoluteFsPath;
-    normalize<T extends PathString>(path: T): T;
+    removeDeep(path: AbsoluteFsPath): void;
 }
 export declare type PathString = string | AbsoluteFsPath | PathSegment;
 /**

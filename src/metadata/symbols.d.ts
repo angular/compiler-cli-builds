@@ -1,6 +1,6 @@
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
@@ -17,6 +17,6 @@ export declare class Symbols {
     define(name: string, value: MetadataValue): void;
     defineReference(name: string, value: MetadataSymbolicReferenceExpression): void;
     has(name: string): boolean;
-    private readonly symbols;
+    private get symbols();
     private buildImports;
 }

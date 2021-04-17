@@ -1,20 +1,21 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/rendering/renderer" />
 /**
  * @license
- * Copyright Google Inc. All Rights Reserved.
+ * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
 import { ConstantPool } from '@angular/compiler';
 import * as ts from 'typescript';
+import { ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
+import { Logger } from '../../../src/ngtsc/logging';
 import { ImportManager } from '../../../src/ngtsc/translator';
-import { CompiledFile, DecorationAnalyses } from '../analysis/types';
+import { ParsedConfiguration } from '../../../src/perform_compile';
 import { PrivateDeclarationsAnalyses } from '../analysis/private_declarations_analyzer';
 import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
-import { FileSystem } from '../../../src/ngtsc/file_system';
+import { CompiledFile, DecorationAnalyses } from '../analysis/types';
 import { NgccReflectionHost } from '../host/ngcc_host';
-import { Logger } from '../logging/logger';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
 import { RenderingFormatter } from './rendering_formatter';
 import { FileToWrite } from './utils';
@@ -30,7 +31,8 @@ export declare class Renderer {
     private fs;
     private logger;
     private bundle;
-    constructor(host: NgccReflectionHost, srcFormatter: RenderingFormatter, fs: FileSystem, logger: Logger, bundle: EntryPointBundle);
+    private tsConfig;
+    constructor(host: NgccReflectionHost, srcFormatter: RenderingFormatter, fs: ReadonlyFileSystem, logger: Logger, bundle: EntryPointBundle, tsConfig?: ParsedConfiguration | null);
     renderProgram(decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileToWrite[];
     /**
      * Render the source code and source-map for an Analyzed file.
