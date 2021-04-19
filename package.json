@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "12.0.0-next.8+139.sha-9016147",
+  "version": "12.0.0-next.8+159.sha-75d4182",
   "description": "Angular - the compiler CLI for Node.js",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -18,7 +18,7 @@
     "canonical-path": "1.0.0",
     "chokidar": "^3.0.0",
     "convert-source-map": "^1.5.1",
-    "dependency-graph": "^0.7.2",
+    "dependency-graph": "^0.11.0",
     "magic-string": "^0.25.0",
     "semver": "^6.3.0",
     "source-map": "^0.6.1",
@@ -27,7 +27,7 @@
     "yargs": "^16.2.0"
   },
   "peerDependencies": {
-    "@angular/compiler": "12.0.0-next.8+139.sha-9016147",
+    "@angular/compiler": "12.0.0-next.8+159.sha-75d4182",
     "typescript": ">=4.2.3 <4.3"
   },
   "repository": {
