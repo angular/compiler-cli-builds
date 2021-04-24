@@ -17,7 +17,7 @@ export declare class BabelAstHost implements AstHost<t.Expression> {
     parseStringLiteral(str: t.Expression): string;
     isNumericLiteral: typeof t.isNumericLiteral;
     parseNumericLiteral(num: t.Expression): number;
-    isBooleanLiteral: typeof t.isBooleanLiteral;
+    isBooleanLiteral(bool: t.Expression): boolean;
     parseBooleanLiteral(bool: t.Expression): boolean;
     isArrayLiteral: typeof t.isArrayExpression;
     parseArrayLiteral(array: t.Expression): t.Expression[];
