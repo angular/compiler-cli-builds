@@ -23,7 +23,7 @@ export declare class TypeScriptAstHost implements AstHost<ts.Expression> {
     parseStringLiteral(str: ts.Expression): string;
     isNumericLiteral: typeof ts.isNumericLiteral;
     parseNumericLiteral(num: ts.Expression): number;
-    isBooleanLiteral(node: ts.Expression): node is ts.FalseLiteral | ts.TrueLiteral;
+    isBooleanLiteral(node: ts.Expression): boolean;
     parseBooleanLiteral(bool: ts.Expression): boolean;
     isArrayLiteral: typeof ts.isArrayLiteralExpression;
     parseArrayLiteral(array: ts.Expression): ts.Expression[];
