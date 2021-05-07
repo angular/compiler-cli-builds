@@ -201,7 +201,7 @@ interface CommonTemplateDeclaration {
     interpolationConfig: InterpolationConfig;
     templateUrl: string;
     resolvedTemplateUrl: string;
-    sourceMapUrl: string;
+    potentialSourceMapUrl: string;
 }
 /**
  * Information extracted from the declaration of an inline template.
