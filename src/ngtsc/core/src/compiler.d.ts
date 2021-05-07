@@ -10,7 +10,7 @@ import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { IncrementalBuildStrategy, IncrementalCompilation, IncrementalState } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
-import { ComponentResources } from '../../metadata';
+import { ComponentResources, DirectiveMeta, PipeMeta } from '../../metadata';
 import { ActivePerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { DeclarationNode } from '../../reflection';
@@ -208,6 +208,7 @@ export declare class NgCompiler {
      * Retrieves external resources for the given component.
      */
     getComponentResources(classDecl: DeclarationNode): ComponentResources | null;
+    getMeta(classDecl: DeclarationNode): PipeMeta | DirectiveMeta | null;
     /**
      * Perform Angular's analysis step (as a precursor to `getDiagnostics` or `prepareEmit`)
      * asynchronously.
