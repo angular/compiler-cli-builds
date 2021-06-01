@@ -29,6 +29,7 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     getDtsDeclaration(_: ClassDeclaration): ts.Declaration | null;
     getInternalNameOfClass(clazz: ClassDeclaration): ts.Identifier;
     getAdjacentNameOfClass(clazz: ClassDeclaration): ts.Identifier;
+    isStaticallyExported(clazz: ClassDeclaration): boolean;
     protected getDirectImportOfIdentifier(id: ts.Identifier): Import | null;
     /**
      * Try to get the import info for this identifier as though it is a namespaced import.
@@ -55,6 +56,10 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
     protected getDeclarationOfSymbol(symbol: ts.Symbol, originalId: ts.Identifier | null): Declaration | null;
     private _reflectDecorator;
     private _reflectMember;
+    /**
+     * Get the set of classes declared in `file` which are exported.
+     */
+    private getLocalExportedClassesOfSourceFile;
 }
 export declare function reflectNameOfDeclaration(decl: ts.Declaration): string | null;
 export declare function reflectIdentifierOfDeclaration(decl: ts.Declaration): ts.Identifier | null;
