@@ -246,7 +246,6 @@ export declare class NgCompiler {
     private getTemplateDiagnostics;
     private getTemplateDiagnosticsForFile;
     private getNonTemplateDiagnostics;
-    private scanForMwp;
     private makeCompilation;
 }
 /**

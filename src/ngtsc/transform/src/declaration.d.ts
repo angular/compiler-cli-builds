@@ -18,9 +18,7 @@ import { DtsTransform } from './api';
  */
 export declare class DtsTransformRegistry {
     private ivyDeclarationTransforms;
-    private returnTypeTransforms;
     getIvyDeclarationTransform(sf: ts.SourceFile): IvyDeclarationDtsTransform;
-    getReturnTypeTransform(sf: ts.SourceFile): ReturnTypeTransform;
     /**
      * Gets the dts transforms to be applied for the given source file, or `null` if no transform is
      * necessary.
@@ -36,10 +34,4 @@ export declare class IvyDeclarationDtsTransform implements DtsTransform {
     private declarationFields;
     addFields(decl: ClassDeclaration, fields: IvyDeclarationField[]): void;
     transformClass(clazz: ts.ClassDeclaration, members: ReadonlyArray<ts.ClassElement>, imports: ImportManager): ts.ClassDeclaration;
-}
-export declare class ReturnTypeTransform implements DtsTransform {
-    private typeReplacements;
-    addTypeReplacement(declaration: ts.Declaration, type: Type): void;
-    transformClassElement(element: ts.ClassElement, imports: ImportManager): ts.ClassElement;
-    transformFunctionDeclaration(element: ts.FunctionDeclaration, imports: ImportManager): ts.FunctionDeclaration;
 }
