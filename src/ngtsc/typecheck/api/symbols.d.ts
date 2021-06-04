@@ -9,6 +9,7 @@
 import { TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
+import { SymbolWithValueDeclaration } from '../../util/src/typescript';
 import { DirectiveInScope } from './scope';
 export declare enum SymbolKind {
     Input = 0,
@@ -245,7 +246,7 @@ export interface ClassSymbol {
     /** The `ts.Type` of class. */
     tsType: ts.Type;
     /** The `ts.Symbol` for class. */
-    tsSymbol: ts.Symbol;
+    tsSymbol: SymbolWithValueDeclaration;
     /** The position for the variable declaration for the class instance. */
     shimLocation: ShimLocation;
 }

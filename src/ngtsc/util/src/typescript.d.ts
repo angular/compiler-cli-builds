@@ -9,6 +9,14 @@
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { DeclarationNode } from '../../reflection';
+/**
+ * Type describing a symbol that is guaranteed to have a value declaration.
+ */
+export declare type SymbolWithValueDeclaration = ts.Symbol & {
+    valueDeclaration: ts.Declaration;
+    declarations: ts.Declaration[];
+};
+export declare function isSymbolWithValueDeclaration(symbol: ts.Symbol | null | undefined): symbol is SymbolWithValueDeclaration;
 export declare function isDtsPath(filePath: string): boolean;
 export declare function isNonDeclarationTsPath(filePath: string): boolean;
 export declare function isFromDtsFile(node: ts.Node): boolean;

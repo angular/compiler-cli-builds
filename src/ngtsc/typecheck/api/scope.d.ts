@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/scope" />
 import * as ts from 'typescript';
 import { ClassDeclaration } from '../../reflection';
+import { SymbolWithValueDeclaration } from '../../util/src/typescript';
 /**
  * Metadata on a directive which is available in the scope of a template.
  */
@@ -15,7 +16,7 @@ export interface DirectiveInScope {
     /**
      * The `ts.Symbol` for the directive class.
      */
-    tsSymbol: ts.Symbol;
+    tsSymbol: SymbolWithValueDeclaration;
     /**
      * The module which declares the directive.
      */
