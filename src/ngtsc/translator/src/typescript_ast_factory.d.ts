@@ -35,7 +35,7 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     createNewExpression(expression: ts.Expression, args: ts.Expression[]): ts.Expression;
     createObjectLiteral(properties: ObjectLiteralProperty<ts.Expression>[]): ts.Expression;
     createParenthesizedExpression: (expression: ts.Expression) => ts.ParenthesizedExpression;
-    createPropertyAccess: (expression: ts.Expression, name: string | ts.Identifier | ts.PrivateIdentifier) => ts.PropertyAccessExpression;
+    createPropertyAccess: (expression: ts.Expression, name: string | ts.MemberName) => ts.PropertyAccessExpression;
     createReturnStatement(expression: ts.Expression | null): ts.Statement;
     createTaggedTemplate(tag: ts.Expression, template: TemplateLiteral<ts.Expression>): ts.Expression;
     createThrowStatement: (expression: ts.Expression) => ts.ThrowStatement;
