@@ -42,6 +42,11 @@ export declare enum ErrorCode {
      * sheet.
      */
     COMPONENT_RESOURCE_NOT_FOUND = 2008,
+    /**
+     * Raised when a component uses `ShadowDom` view encapsulation, but its selector
+     * does not match the shadow DOM tag name requirements.
+     */
+    COMPONENT_INVALID_SHADOW_DOM_SELECTOR = 2009,
     SYMBOL_NOT_EXPORTED = 3001,
     SYMBOL_EXPORTED_UNDER_DIFFERENT_NAME = 3002,
     /**
