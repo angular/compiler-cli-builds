@@ -81,6 +81,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     private analyze;
     recordFor(clazz: ClassDeclaration): ClassRecord | null;
     recordsFor(sf: ts.SourceFile): ClassRecord[] | null;
+    getAnalyzedRecords(): Map<ts.SourceFile, ClassRecord[]>;
     /**
      * Import a `ClassRecord` from a previous compilation.
      *
