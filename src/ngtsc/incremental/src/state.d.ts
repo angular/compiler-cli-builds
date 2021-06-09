@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/src/state" />
+import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
-import { TraitCompiler } from '../../transform';
+import { ClassRecord } from '../../transform';
 import { FileTypeCheckingData } from '../../typecheck/src/checker';
 import { SemanticDepGraph } from '../semantic_graph';
 import { FileDependencyGraph } from './dependency_tracking';
@@ -44,9 +45,10 @@ export interface AnalyzedIncrementalState {
      */
     semanticDepGraph: SemanticDepGraph;
     /**
-     * `TraitCompiler` which contains records of all analyzed classes within the build.
+     * The analysis data from a prior compilation. This stores the trait information for all source
+     * files that was present in a prior compilation.
      */
-    traitCompiler: TraitCompiler;
+    priorAnalysis: Map<ts.SourceFile, ClassRecord[]>;
     /**
      * All generated template type-checking files produced as part of this compilation, or `null` if
      * type-checking was not (yet) performed.
