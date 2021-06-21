@@ -22,10 +22,12 @@ export declare class TypeParameterEmitter {
      * called, as it would fail.
      */
     canEmit(): boolean;
+    private canEmitType;
     /**
      * Emits the type parameters using the provided emitter function for `Reference`s.
      */
     emit(emitReference: (ref: Reference) => ts.TypeNode): ts.TypeParameterDeclaration[] | undefined;
     private resolveTypeReference;
+    private isStaticallyExported;
     private isLocalTypeParameter;
 }

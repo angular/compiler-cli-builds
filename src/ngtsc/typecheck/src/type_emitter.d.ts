@@ -10,7 +10,8 @@ import * as ts from 'typescript';
 import { Reference } from '../../imports';
 /**
  * A resolved type reference can either be a `Reference`, the original `ts.TypeReferenceNode` itself
- * or null to indicate the no reference could be resolved.
+ * or null. A value of null indicates that no reference could be resolved or that the reference can
+ * not be emitted.
  */
 export declare type ResolvedTypeReference = Reference | ts.TypeReferenceNode | null;
 /**
