@@ -15,6 +15,7 @@ import { ActivePerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { DeclarationNode } from '../../reflection';
 import { OptimizeFor, TemplateTypeChecker } from '../../typecheck/api';
+import { Xi18nContext } from '../../xi18n';
 import { LazyRoute, NgCompilerAdapter, NgCompilerOptions } from '../api';
 /**
  * Discriminant type for a `CompilationTicket`.
@@ -238,6 +239,10 @@ export declare class NgCompiler {
      * See the `indexing` package for more details.
      */
     getIndexedComponents(): Map<DeclarationNode, IndexedComponent>;
+    /**
+     * Collect i18n messages into the `Xi18nContext`.
+     */
+    xi18n(ctx: Xi18nContext): void;
     private ensureAnalyzed;
     private analyzeSync;
     private resolveCompilation;
