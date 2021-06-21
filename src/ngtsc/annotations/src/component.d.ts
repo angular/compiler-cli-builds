@@ -21,6 +21,7 @@ import { ComponentScopeReader, LocalModuleScopeRegistry, TypeCheckScopeRegistry 
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence, ResolveResult } from '../../transform';
 import { TemplateSourceMapping, TypeCheckContext } from '../../typecheck/api';
 import { SubsetOfKeys } from '../../util/src/typescript';
+import { Xi18nContext } from '../../xi18n';
 import { ResourceLoader } from './api';
 import { DirectiveSymbol } from './directive';
 /**
@@ -145,6 +146,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     index(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): null | undefined;
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: Readonly<ComponentAnalysisData>): void;
     resolve(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, symbol: ComponentSymbol): ResolveResult<ComponentResolutionData>;
+    xi18n(ctx: Xi18nContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): void;
     updateResources(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
     compileFull(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): CompileResult[];
