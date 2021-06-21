@@ -46,6 +46,7 @@ export declare class NgtscProgram implements api.Program {
      */
     loadNgStructureAsync(): Promise<void>;
     listLazyRoutes(entryRoute?: string | undefined): api.LazyRoute[];
+    private emitXi18n;
     emit(opts?: {
         emitFlags?: api.EmitFlags | undefined;
         cancellationToken?: ts.CancellationToken | undefined;

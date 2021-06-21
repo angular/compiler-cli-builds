@@ -39,9 +39,6 @@ export interface CompilerOptions extends NgCompilerOptions, ts.CompilerOptions {
     annotationsAs?: 'decorators' | 'static fields';
     trace?: boolean;
     disableExpressionLowering?: boolean;
-    i18nOutLocale?: string;
-    i18nOutFormat?: string;
-    i18nOutFile?: string;
     i18nInFormat?: string;
     i18nInFile?: string;
     i18nInMissingTranslations?: 'error' | 'warning' | 'ignore';

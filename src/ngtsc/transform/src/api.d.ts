@@ -14,6 +14,7 @@ import { IndexingContext } from '../../indexer';
 import { ClassDeclaration, Decorator } from '../../reflection';
 import { ImportManager } from '../../translator';
 import { TypeCheckContext } from '../../typecheck/api';
+import { Xi18nContext } from '../../xi18n';
 /**
  * Specifies the compilation mode that is used for the compilation.
  */
@@ -152,6 +153,11 @@ export interface DecoratorHandler<D, A, S extends SemanticSymbol | null, R> {
      * the `analysis` before the emit phase.
      */
     resolve?(node: ClassDeclaration, analysis: Readonly<A>, symbol: S): ResolveResult<R>;
+    /**
+     * Extract i18n messages into the `Xi18nContext`, which is useful for generating various formats
+     * of message file outputs.
+     */
+    xi18n?(bundle: Xi18nContext, node: ClassDeclaration, analysis: Readonly<A>): void;
     typeCheck?(ctx: TypeCheckContext, node: ClassDeclaration, analysis: Readonly<A>, resolution: Readonly<R>): void;
     /**
      * Generate a description of the field which should be added to the class, including any
