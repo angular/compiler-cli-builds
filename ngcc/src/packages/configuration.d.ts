@@ -15,6 +15,12 @@ export interface NgccProjectConfig<T = RawNgccPackageConfig> {
      * Options that control how locking the process is handled.
      */
     locking?: ProcessLockingConfiguration;
+    /**
+     * Name of hash algorithm used to generate hashes of the configuration.
+     *
+     * Defaults to `sha256`.
+     */
+    hashAlgorithm?: string;
 }
 /**
  * Options that control how locking the process is handled.
@@ -155,6 +161,7 @@ export declare class NgccConfiguration {
     private projectConfig;
     private cache;
     readonly hash: string;
+    readonly hashAlgorithm: string;
     constructor(fs: ReadonlyFileSystem, baseDir: AbsoluteFsPath);
     /**
      * Get the configuration options for locking the ngcc process.

@@ -14,6 +14,7 @@ import { IndexingContext } from '../../indexer';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, DeclarationNode, Decorator, ReflectionHost } from '../../reflection';
 import { ProgramTypeCheckAdapter, TypeCheckContext } from '../../typecheck/api';
+import { Xi18nContext } from '../../xi18n';
 import { CompilationMode, CompileResult, DecoratorHandler, HandlerFlags } from './api';
 import { DtsTransformRegistry } from './declaration';
 import { PendingTrait, Trait } from './trait';
@@ -103,6 +104,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
      */
     typeCheck(sf: ts.SourceFile, ctx: TypeCheckContext): void;
     index(ctx: IndexingContext): void;
+    xi18n(bundle: Xi18nContext): void;
     updateResources(clazz: DeclarationNode): void;
     compile(clazz: DeclarationNode, constantPool: ConstantPool): CompileResult[] | null;
     decoratorsFor(node: ts.Declaration): ts.Decorator[];

@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/program" />
-import { MessageBundle } from '@angular/compiler';
 import * as path from 'path';
 import * as ts from 'typescript';
 import { CompilerHost, CompilerOptions, Program } from './api';
@@ -33,6 +32,3 @@ export declare function createSrcToOutPathMapper(outDir: string | undefined, sam
     resolve: typeof path.resolve;
     relative: typeof path.relative;
 }): (srcFileName: string) => string;
-export declare function i18nExtract(formatName: string | null, outFile: string | null, host: ts.CompilerHost, options: CompilerOptions, bundle: MessageBundle): string[];
-export declare function i18nSerialize(bundle: MessageBundle, formatName: string, options: CompilerOptions): string;
-export declare function i18nGetExtension(formatName: string): string;
