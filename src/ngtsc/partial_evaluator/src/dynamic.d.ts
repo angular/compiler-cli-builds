@@ -53,9 +53,24 @@ export declare const enum DynamicValueReason {
      */
     COMPLEX_FUNCTION_CALL = 6,
     /**
+     * A value that could not be determined because it contains type information that cannot be
+     * statically evaluated. This happens when producing a value from type information, but the value
+     * of the given type cannot be determined statically.
+     *
+     * E.g. evaluating a tuple.
+     *
+     *   `declare const foo: [string];`
+     *
+     *  Evaluating `foo` gives a DynamicValue wrapped in an array with a reason of DYNAMIC_TYPE. This
+     * is because the static evaluator has a `string` type for the first element of this tuple, and
+     * the value of that string cannot be determined statically. The type `string` permits it to be
+     * 'foo', 'bar' or any arbitrary string, so we evaluate it to a DynamicValue.
+     */
+    DYNAMIC_TYPE = 7,
+    /**
      * A value could not be determined statically for any reason other the above.
      */
-    UNKNOWN = 7
+    UNKNOWN = 8
 }
 /**
  * Represents a value which cannot be determined statically.
@@ -72,6 +87,7 @@ export declare class DynamicValue<R = unknown> {
     static fromUnknownIdentifier(node: ts.Identifier): DynamicValue;
     static fromInvalidExpressionType(node: ts.Node, value: unknown): DynamicValue<unknown>;
     static fromComplexFunctionCall(node: ts.Node, fn: FunctionDefinition): DynamicValue<FunctionDefinition>;
+    static fromDynamicType(node: ts.TypeNode): DynamicValue;
     static fromUnknown(node: ts.Node): DynamicValue;
     isFromDynamicInput(this: DynamicValue<R>): this is DynamicValue<DynamicValue>;
     isFromDynamicString(this: DynamicValue<R>): this is DynamicValue;
@@ -80,6 +96,7 @@ export declare class DynamicValue<R = unknown> {
     isFromUnknownIdentifier(this: DynamicValue<R>): this is DynamicValue;
     isFromInvalidExpressionType(this: DynamicValue<R>): this is DynamicValue<unknown>;
     isFromComplexFunctionCall(this: DynamicValue<R>): this is DynamicValue<FunctionDefinition>;
+    isFromDynamicType(this: DynamicValue<R>): this is DynamicValue;
     isFromUnknown(this: DynamicValue<R>): this is DynamicValue;
     accept<R>(visitor: DynamicValueVisitor<R>): R;
 }
@@ -91,5 +108,6 @@ export interface DynamicValueVisitor<R> {
     visitUnknownIdentifier(value: DynamicValue): R;
     visitInvalidExpressionType(value: DynamicValue): R;
     visitComplexFunctionCall(value: DynamicValue<FunctionDefinition>): R;
+    visitDynamicType(value: DynamicValue): R;
     visitUnknown(value: DynamicValue): R;
 }
