@@ -68,5 +68,7 @@ export declare class StaticInterpreter {
     private stringNameFromPropertyName;
     private getResolvedEnum;
     private getReference;
+    private visitType;
+    private visitTupleType;
 }
 export {};
