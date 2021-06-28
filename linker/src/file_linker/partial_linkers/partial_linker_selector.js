@@ -66,7 +66,7 @@
      */
     function createLinkerMap(environment, sourceUrl, code) {
         var linkers = new Map();
-        var LATEST_VERSION_RANGE = getRange('<=', '12.2.0-next.0+4.sha-56fb4eb');
+        var LATEST_VERSION_RANGE = getRange('<=', '12.2.0-next.0+9.sha-2a260dc');
         linkers.set(exports.ɵɵngDeclareDirective, [
             { range: LATEST_VERSION_RANGE, linker: new partial_directive_linker_1_1.PartialDirectiveLinkerVersion1(sourceUrl, code) },
         ]);
@@ -137,7 +137,7 @@
                 throw new Error("Unknown partial declaration function " + functionName + ".");
             }
             var linkerRanges = this.linkers.get(functionName);
-            if (version === '12.2.0-next.0+4.sha-56fb4eb') {
+            if (version === '12.2.0-next.0+9.sha-2a260dc') {
                 // Special case if the `version` is the same as the current compiler version.
                 // This helps with compliance tests where the version placeholders have not been replaced.
                 return linkerRanges[linkerRanges.length - 1].linker;
