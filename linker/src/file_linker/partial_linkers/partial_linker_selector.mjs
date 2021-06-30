@@ -53,7 +53,7 @@ export const declarationFunctions = [
  */
 export function createLinkerMap(environment, sourceUrl, code) {
     const linkers = new Map();
-    const LATEST_VERSION_RANGE = getRange('<=', '12.2.0-next.0+27.sha-59fe159');
+    const LATEST_VERSION_RANGE = getRange('<=', '12.2.0-next.0+28.sha-24624e6');
     linkers.set(ɵɵngDeclareDirective, [
         { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) },
     ]);
@@ -122,7 +122,7 @@ export class PartialLinkerSelector {
             throw new Error(`Unknown partial declaration function ${functionName}.`);
         }
         const linkerRanges = this.linkers.get(functionName);
-        if (version === '12.2.0-next.0+27.sha-59fe159') {
+        if (version === '12.2.0-next.0+28.sha-24624e6') {
             // Special case if the `version` is the same as the current compiler version.
             // This helps with compliance tests where the version placeholders have not been replaced.
             return linkerRanges[linkerRanges.length - 1].linker;
