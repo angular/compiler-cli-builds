@@ -1,5 +1,5 @@
 import { NGCC_PROPERTY_EXTENSION } from '../writing/new_entry_point_file_writer';
-export const NGCC_VERSION = '12.2.0-next.1+3.sha-bfa1b5d';
+export const NGCC_VERSION = '12.2.0-next.1+4.sha-74350a5';
 /**
  * Returns true if there is a format in this entry-point that was compiled with an outdated version
  * of ngcc.
