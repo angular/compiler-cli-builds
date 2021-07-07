@@ -12,7 +12,7 @@
     exports.markAsProcessed = exports.hasBeenProcessed = exports.cleanPackageJson = exports.needsCleaning = exports.NGCC_VERSION = void 0;
     var tslib_1 = require("tslib");
     var new_entry_point_file_writer_1 = require("@angular/compiler-cli/ngcc/src/writing/new_entry_point_file_writer");
-    exports.NGCC_VERSION = '12.2.0-next.1+18.sha-e064f17';
+    exports.NGCC_VERSION = '12.2.0-next.1+19.sha-24ac378';
     /**
      * Returns true if there is a format in this entry-point that was compiled with an outdated version
      * of ngcc.
