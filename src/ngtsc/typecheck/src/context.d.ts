@@ -11,6 +11,7 @@ import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { PerfRecorder } from '../../perf';
+import { FileUpdate } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { TemplateId, TemplateSourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata } from '../api';
 import { TemplateDiagnostic } from '../diagnostics';
@@ -179,7 +180,7 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
      * will be returned. Otherwise, a `null` return indicates no changes were necessary.
      */
     transform(sf: ts.SourceFile): string | null;
-    finalize(): Map<AbsoluteFsPath, string>;
+    finalize(): Map<AbsoluteFsPath, FileUpdate>;
     private addInlineTypeCheckBlock;
     private pendingShimForComponent;
     private dataForFile;
