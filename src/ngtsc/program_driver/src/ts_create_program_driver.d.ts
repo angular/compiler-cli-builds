@@ -9,7 +9,7 @@
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { RequiredDelegations } from '../../util/src/typescript';
-import { ProgramDriver, UpdateMode } from './api';
+import { FileUpdate, ProgramDriver, UpdateMode } from './api';
 /**
  * Delegates all methods of `ts.CompilerHost` to a delegate, with the exception of
  * `getSourceFile`, `fileExists` and `writeFile` which are implemented in `TypeCheckProgramHost`.
@@ -61,5 +61,5 @@ export declare class TsCreateProgramDriver implements ProgramDriver {
     constructor(originalProgram: ts.Program, originalHost: ts.CompilerHost, options: ts.CompilerOptions, shimExtensionPrefixes: string[]);
     readonly supportsInlineOperations = true;
     getProgram(): ts.Program;
-    updateFiles(contents: Map<AbsoluteFsPath, string>, updateMode: UpdateMode): void;
+    updateFiles(contents: Map<AbsoluteFsPath, FileUpdate>, updateMode: UpdateMode): void;
 }
