@@ -26,8 +26,10 @@ export interface TemplateDiagnostic extends ts.Diagnostic {
 /**
  * Constructs a `ts.Diagnostic` for a given `ParseSourceSpan` within a template.
  */
-export declare function makeTemplateDiagnostic(templateId: TemplateId, mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: number, messageText: string | ts.DiagnosticMessageChain, relatedMessage?: {
+export declare function makeTemplateDiagnostic(templateId: TemplateId, mapping: TemplateSourceMapping, span: ParseSourceSpan, category: ts.DiagnosticCategory, code: number, messageText: string | ts.DiagnosticMessageChain, relatedMessages?: {
     text: string;
-    span: ParseSourceSpan;
-}): TemplateDiagnostic;
+    start: number;
+    end: number;
+    sourceFile: ts.SourceFile;
+}[]): TemplateDiagnostic;
 export declare function isTemplateDiagnostic(diagnostic: ts.Diagnostic): diagnostic is TemplateDiagnostic;
