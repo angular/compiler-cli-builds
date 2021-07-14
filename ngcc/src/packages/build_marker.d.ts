@@ -9,7 +9,7 @@
 import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { PackageJsonUpdater } from '../writing/package_json_updater';
 import { EntryPointPackageJson, PackageJsonFormatProperties } from './entry_point';
-export declare const NGCC_VERSION = "12.2.0-next.1+106.sha-0b429d3";
+export declare const NGCC_VERSION = "12.2.0-next.2+1.sha-64bb7cd";
 /**
  * Returns true if there is a format in this entry-point that was compiled with an outdated version
  * of ngcc.
