@@ -13,6 +13,13 @@ import { ImportGraph } from './imports';
  */
 export declare class CycleAnalyzer {
     private importGraph;
+    /**
+     * Cycle detection is requested with the same `from` source file for all used directives and pipes
+     * within a component, which makes it beneficial to cache the results as long as the `from` source
+     * file has not changed. This avoids visiting the import graph that is reachable from multiple
+     * directives/pipes more than once.
+     */
+    private cachedResults;
     constructor(importGraph: ImportGraph);
     /**
      * Check for a cycle to be created in the `ts.Program` by adding an import between `from` and
