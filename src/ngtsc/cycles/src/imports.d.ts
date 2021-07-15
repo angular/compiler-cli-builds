@@ -17,7 +17,7 @@ import { PerfRecorder } from '../../perf';
 export declare class ImportGraph {
     private checker;
     private perf;
-    private map;
+    private imports;
     constructor(checker: ts.TypeChecker, perf: PerfRecorder);
     /**
      * List the direct (not transitive) imports of a given `ts.SourceFile`.
@@ -25,11 +25,6 @@ export declare class ImportGraph {
      * This operation is cached.
      */
     importsOf(sf: ts.SourceFile): Set<ts.SourceFile>;
-    /**
-     * Lists the transitive imports of a given `ts.SourceFile`.
-     */
-    transitiveImportsOf(sf: ts.SourceFile): Set<ts.SourceFile>;
-    private transitiveImportsOfHelper;
     /**
      * Find an import path from the `start` SourceFile to the `end` SourceFile.
      *
