@@ -74,6 +74,11 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
      * Ivy traits.
      */
     protected fileToClasses: Map<ts.SourceFile, Set<ClassDeclaration<DeclarationNode>>>;
+    /**
+     * Tracks which source files have been analyzed but did not contain any traits. This set allows
+     * the compiler to skip analyzing these files in an incremental rebuild.
+     */
+    protected filesWithoutTraits: Set<ts.SourceFile>;
     private reexportMap;
     private handlersByName;
     constructor(handlers: DecoratorHandler<unknown, unknown, SemanticSymbol | null, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord, unknown>, compileNonExportedClasses: boolean, compilationMode: CompilationMode, dtsTransforms: DtsTransformRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null);
