@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/checker" />
-import { AST, MethodCall, PropertyRead, SafeMethodCall, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
+import { AST, MethodCall, ParseSourceSpan, PropertyRead, SafeMethodCall, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
 import * as ts from 'typescript';
+import { ErrorCode } from '../../diagnostics';
 import { AbsoluteFsPath } from '../../file_system';
 import { ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
@@ -16,6 +17,7 @@ import { ProgramDriver } from '../../program_driver';
 import { ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
 import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { TemplateDiagnostic } from '../diagnostics';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -87,6 +89,12 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration, node: AST | TmplAstNode): GlobalCompletion | null;
     getExpressionCompletionLocation(ast: PropertyRead | SafePropertyRead | MethodCall | SafeMethodCall, component: ts.ClassDeclaration): ShimLocation | null;
     invalidateClass(clazz: ts.ClassDeclaration): void;
+    makeTemplateDiagnostic(clazz: ts.ClassDeclaration, sourceSpan: ParseSourceSpan, category: ts.DiagnosticCategory, errorCode: ErrorCode, message: string, relatedInformation?: {
+        text: string;
+        start: number;
+        end: number;
+        sourceFile: ts.SourceFile;
+    }[]): TemplateDiagnostic;
     private getOrCreateCompletionEngine;
     private maybeAdoptPriorResultsForFile;
     private ensureAllShimsForAllFiles;
