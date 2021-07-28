@@ -7,7 +7,8 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/completion" />
 import { TmplAstTemplate } from '@angular/compiler';
-import { AST, MethodCall, PropertyRead, PropertyWrite, SafeMethodCall, TmplAstNode } from '@angular/compiler/src/compiler';
+import { AST, LiteralPrimitive, MethodCall, PropertyRead, PropertyWrite, SafeMethodCall, TmplAstNode } from '@angular/compiler/src/compiler';
+import { TextAttribute } from '@angular/compiler/src/render3/r3_ast';
 import * as ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { GlobalCompletion, ShimLocation } from '../api';
@@ -40,6 +41,7 @@ export declare class CompletionEngine {
      */
     getGlobalCompletions(context: TmplAstTemplate | null, node: AST | TmplAstNode): GlobalCompletion | null;
     getExpressionCompletionLocation(expr: PropertyRead | PropertyWrite | MethodCall | SafeMethodCall): ShimLocation | null;
+    getLiteralCompletionLocation(expr: LiteralPrimitive | TextAttribute): ShimLocation | null;
     /**
      * Get global completions within the given template context - either a `TmplAstTemplate` embedded
      * view, or `null` for the root context.
