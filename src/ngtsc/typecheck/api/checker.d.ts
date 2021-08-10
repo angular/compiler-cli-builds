@@ -146,7 +146,7 @@ export interface TemplateTypeChecker {
     /**
      * Constructs a `ts.Diagnostic` for a given `ParseSourceSpan` within a template.
      */
-    makeTemplateDiagnostic(clazz: ts.ClassDeclaration, sourceSpan: ParseSourceSpan, category: ts.DiagnosticCategory, errorCode: ErrorCode, message: string, relatedInformation?: {
+    makeTemplateDiagnostic<T extends ErrorCode>(clazz: ts.ClassDeclaration, sourceSpan: ParseSourceSpan, category: ts.DiagnosticCategory, errorCode: T, message: string, relatedInformation?: {
         text: string;
         start: number;
         end: number;
