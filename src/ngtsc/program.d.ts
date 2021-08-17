@@ -25,7 +25,6 @@ export declare class NgtscProgram implements api.Program {
      * The primary TypeScript program, which is used for analysis and emit.
      */
     private tsProgram;
-    private closureCompilerEnabled;
     private host;
     private incrementalStrategy;
     constructor(rootNames: ReadonlyArray<string>, options: NgCompilerOptions, delegateHost: api.CompilerHost, oldProgram?: NgtscProgram);
