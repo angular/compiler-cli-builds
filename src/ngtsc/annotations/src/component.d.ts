@@ -150,6 +150,19 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     updateResources(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
     compileFull(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): CompileResult[];
+    /**
+     * Transforms the given decorator to inline external resources. i.e. if the decorator
+     * resolves to `@Component`, the `templateUrl` and `styleUrls` metadata fields will be
+     * transformed to their semantically-equivalent inline variants.
+     *
+     * This method is used for serializing decorators into the class metadata. The emitted
+     * class metadata should not refer to external resources as this would be inconsistent
+     * with the component definitions/declarations which already inline external resources.
+     *
+     * Additionally, the references to external resources would require libraries to ship
+     * external resources exclusively for the class metadata.
+     */
+    private _transformDecoratorToInlineResources;
     private _resolveLiteral;
     private _resolveEnumValue;
     private _extractComponentStyleUrls;
