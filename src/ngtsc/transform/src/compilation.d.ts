@@ -14,6 +14,7 @@ import { IndexingContext } from '../../indexer';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, DeclarationNode, Decorator, ReflectionHost } from '../../reflection';
 import { ProgramTypeCheckAdapter, TypeCheckContext } from '../../typecheck/api';
+import { ExtendedTemplateChecker } from '../../typecheck/extended/api';
 import { Xi18nContext } from '../../xi18n';
 import { CompilationMode, CompileResult, DecoratorHandler, HandlerFlags } from './api';
 import { DtsTransformRegistry } from './declaration';
@@ -108,6 +109,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
      * `ts.SourceFile`.
      */
     typeCheck(sf: ts.SourceFile, ctx: TypeCheckContext): void;
+    extendedTemplateCheck(sf: ts.SourceFile, extendedTemplateChecker: ExtendedTemplateChecker): ts.Diagnostic[];
     index(ctx: IndexingContext): void;
     xi18n(bundle: Xi18nContext): void;
     updateResources(clazz: DeclarationNode): void;

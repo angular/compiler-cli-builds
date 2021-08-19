@@ -23,10 +23,19 @@ export interface TestOnlyOptions {
     tracePerformance?: string;
 }
 /**
+ * Internal only options for compiler.
+ */
+export interface InternalOptions {
+    /**
+     * Whether to run all template checks and generate extended template diagnostics.
+     */
+    _extendedTemplateDiagnostics?: boolean;
+}
+/**
  * A merged interface of all of the various Angular compiler options, as well as the standard
  * `ts.CompilerOptions`.
  *
  * Also includes a few miscellaneous options.
  */
-export interface NgCompilerOptions extends ts.CompilerOptions, LegacyNgcOptions, BazelAndG3Options, NgcCompatibilityOptions, StrictTemplateOptions, TestOnlyOptions, I18nOptions, TargetOptions, MiscOptions {
+export interface NgCompilerOptions extends ts.CompilerOptions, LegacyNgcOptions, BazelAndG3Options, NgcCompatibilityOptions, StrictTemplateOptions, TestOnlyOptions, I18nOptions, TargetOptions, InternalOptions, MiscOptions {
 }
