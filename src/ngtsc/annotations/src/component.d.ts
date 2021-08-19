@@ -20,6 +20,7 @@ import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry, TypeCheckScopeRegistry } from '../../scope';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerFlags, HandlerPrecedence, ResolveResult } from '../../transform';
 import { TemplateSourceMapping, TypeCheckContext } from '../../typecheck/api';
+import { ExtendedTemplateChecker } from '../../typecheck/extended/api';
 import { SubsetOfKeys } from '../../util/src/typescript';
 import { Xi18nContext } from '../../xi18n';
 import { ResourceLoader } from './api';
@@ -145,6 +146,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     register(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
     index(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): null | undefined;
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: Readonly<ComponentAnalysisData>): void;
+    extendedTemplateCheck(component: ts.ClassDeclaration, extendedTemplateChecker: ExtendedTemplateChecker): ts.Diagnostic[];
     resolve(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, symbol: ComponentSymbol): ResolveResult<ComponentResolutionData>;
     xi18n(ctx: Xi18nContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): void;
     updateResources(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
