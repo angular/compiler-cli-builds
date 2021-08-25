@@ -9,13 +9,7 @@
 import { TmplAstNode } from '@angular/compiler';
 import * as ts from 'typescript';
 import { ErrorCode } from '../../../diagnostics';
-import { TemplateTypeChecker } from '../../api';
-/**
- * A `ts.Diangostic` with a specific error code.
- */
-export declare type TemplateDiagnostic<T extends ErrorCode> = ts.Diagnostic & {
-    code: T;
-};
+import { NgTemplateDiagnostic, TemplateTypeChecker } from '../../api';
 /**
  * A Template Check receives information about the template it's checking and returns
  * information about the diagnostics to be generated.
@@ -24,7 +18,7 @@ export interface TemplateCheck<T extends ErrorCode> {
     /** Unique template check code, used for configuration and searching the error. */
     code: T;
     /** Runs check and returns information about the diagnostics to be generated. */
-    run(ctx: TemplateContext, template: TmplAstNode[]): TemplateDiagnostic<T>[];
+    run(ctx: TemplateContext, template: TmplAstNode[]): NgTemplateDiagnostic<T>[];
 }
 /**
  * The TemplateContext provided to a Template Check to get diagnostic information.
