@@ -7,8 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/dom" />
 import { ParseSourceSpan, SchemaMetadata, TmplAstElement } from '@angular/compiler';
-import { TemplateId } from '../api';
-import { TemplateDiagnostic } from '../diagnostics';
+import { TemplateDiagnostic, TemplateId } from '../api';
 import { TemplateSourceResolver } from './tcb_util';
 /**
  * Checks every non-Angular element/property processed in a template and potentially produces

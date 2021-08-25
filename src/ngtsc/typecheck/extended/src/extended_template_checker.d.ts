@@ -8,12 +8,12 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker" />
 import * as ts from 'typescript';
 import { ErrorCode } from '../../../diagnostics';
-import { TemplateTypeChecker } from '../../api';
+import { TemplateDiagnostic, TemplateTypeChecker } from '../../api';
 import { ExtendedTemplateChecker, TemplateCheck } from '../api';
 export declare class ExtendedTemplateCheckerImpl implements ExtendedTemplateChecker {
     private readonly templateTypeChecker;
     private readonly typeChecker;
     private readonly templateChecks;
     constructor(templateTypeChecker: TemplateTypeChecker, typeChecker: ts.TypeChecker, templateChecks: TemplateCheck<ErrorCode>[]);
-    getExtendedTemplateDiagnosticsForComponent(component: ts.ClassDeclaration): ts.Diagnostic[];
+    getDiagnosticsForComponent(component: ts.ClassDeclaration): TemplateDiagnostic[];
 }

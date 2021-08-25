@@ -8,21 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic" />
 import { ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
-import { TemplateId, TemplateSourceMapping } from '../../api';
-/**
- * A `ts.Diagnostic` with additional information about the diagnostic related to template
- * type-checking.
- */
-export interface TemplateDiagnostic extends ts.Diagnostic {
-    /**
-     * The component with the template that resulted in this diagnostic.
-     */
-    componentFile: ts.SourceFile;
-    /**
-     * The template id of the component that resulted in this diagnostic.
-     */
-    templateId: TemplateId;
-}
+import { TemplateDiagnostic, TemplateId, TemplateSourceMapping } from '../../api';
 /**
  * Constructs a `ts.Diagnostic` for a given `ParseSourceSpan` within a template.
  */

@@ -17,8 +17,7 @@ import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
-import { TemplateDiagnostic } from '../diagnostics';
+import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -96,7 +95,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
         start: number;
         end: number;
         sourceFile: ts.SourceFile;
-    }[]): TemplateDiagnostic;
+    }[]): NgTemplateDiagnostic<T>;
     private getOrCreateCompletionEngine;
     private maybeAdoptPriorResultsForFile;
     private ensureAllShimsForAllFiles;
