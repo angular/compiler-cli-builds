@@ -8,7 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/extended/src/template_checks/invalid_banana_in_box" />
 import { TmplAstNode } from '@angular/compiler';
 import { ErrorCode } from '../../../../../diagnostics';
-import { TemplateCheck, TemplateContext, TemplateDiagnostic } from '../../../api';
+import { NgTemplateDiagnostic } from '../../../../api';
+import { TemplateCheck, TemplateContext } from '../../../api';
 /**
  * Ensures the two-way binding syntax is correct.
  * Parentheses should be inside the brackets "[()]".
@@ -16,5 +17,5 @@ import { TemplateCheck, TemplateContext, TemplateDiagnostic } from '../../../api
  */
 export declare class InvalidBananaInBoxCheck implements TemplateCheck<ErrorCode.INVALID_BANANA_IN_BOX> {
     code: ErrorCode.INVALID_BANANA_IN_BOX;
-    run(ctx: TemplateContext, template: TmplAstNode[]): TemplateDiagnostic<ErrorCode.INVALID_BANANA_IN_BOX>[];
+    run(ctx: TemplateContext, template: TmplAstNode[]): NgTemplateDiagnostic<ErrorCode.INVALID_BANANA_IN_BOX>[];
 }

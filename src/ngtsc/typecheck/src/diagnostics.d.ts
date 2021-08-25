@@ -8,8 +8,7 @@
  */
 import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
 import * as ts from 'typescript';
-import { TemplateId } from '../api';
-import { TemplateDiagnostic } from '../diagnostics';
+import { TemplateDiagnostic, TemplateId } from '../api';
 import { TemplateSourceResolver } from './tcb_util';
 /**
  * Wraps the node in parenthesis such that inserted span comments become attached to the proper

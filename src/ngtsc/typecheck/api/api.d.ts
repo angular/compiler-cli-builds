@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/api" />
 import { AbsoluteSourceSpan, BoundTarget, DirectiveMeta, ParseSourceSpan, SchemaMetadata } from '@angular/compiler';
 import * as ts from 'typescript';
+import { ErrorCode } from '../../diagnostics';
 import { Reference } from '../../imports';
 import { ClassPropertyMapping, DirectiveTypeCheckMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
@@ -23,6 +24,26 @@ export interface TypeCheckableDirectiveMeta extends DirectiveMeta, DirectiveType
 }
 export declare type TemplateId = string & {
     __brand: 'TemplateId';
+};
+/**
+ * A `ts.Diagnostic` with additional information about the diagnostic related to template
+ * type-checking.
+ */
+export interface TemplateDiagnostic extends ts.Diagnostic {
+    /**
+     * The component with the template that resulted in this diagnostic.
+     */
+    componentFile: ts.SourceFile;
+    /**
+     * The template id of the component that resulted in this diagnostic.
+     */
+    templateId: TemplateId;
+}
+/**
+ * A `TemplateDiagnostic` with a specific error code.
+ */
+export declare type NgTemplateDiagnostic<T extends ErrorCode> = TemplateDiagnostic & {
+    __ngCode: T;
 };
 /**
  * Metadata required in addition to a component class in order to generate a type check block (TCB)
