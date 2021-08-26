@@ -11,9 +11,8 @@ import { ErrorCode } from '../../../diagnostics';
 import { TemplateDiagnostic, TemplateTypeChecker } from '../../api';
 import { ExtendedTemplateChecker, TemplateCheck } from '../api';
 export declare class ExtendedTemplateCheckerImpl implements ExtendedTemplateChecker {
-    private readonly templateTypeChecker;
-    private readonly typeChecker;
     private readonly templateChecks;
+    private ctx;
     constructor(templateTypeChecker: TemplateTypeChecker, typeChecker: ts.TypeChecker, templateChecks: TemplateCheck<ErrorCode>[]);
     getDiagnosticsForComponent(component: ts.ClassDeclaration): TemplateDiagnostic[];
 }
