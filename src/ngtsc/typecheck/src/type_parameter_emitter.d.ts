@@ -28,6 +28,6 @@ export declare class TypeParameterEmitter {
      */
     emit(emitReference: (ref: Reference) => ts.TypeNode): ts.TypeParameterDeclaration[] | undefined;
     private resolveTypeReference;
-    private isStaticallyExported;
+    private isTopLevelExport;
     private isLocalTypeParameter;
 }
