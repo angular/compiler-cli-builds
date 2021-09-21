@@ -22,7 +22,6 @@ export declare class TypeTranslatorVisitor implements o.ExpressionVisitor, o.Typ
     visitWriteVarExpr(expr: o.WriteVarExpr, context: Context): never;
     visitWriteKeyExpr(expr: o.WriteKeyExpr, context: Context): never;
     visitWritePropExpr(expr: o.WritePropExpr, context: Context): never;
-    visitInvokeMethodExpr(ast: o.InvokeMethodExpr, context: Context): never;
     visitInvokeFunctionExpr(ast: o.InvokeFunctionExpr, context: Context): never;
     visitTaggedTemplateExpr(ast: o.TaggedTemplateExpr, context: Context): never;
     visitInstantiateExpr(ast: o.InstantiateExpr, context: Context): never;

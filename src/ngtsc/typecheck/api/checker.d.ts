@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/checker" />
-import { AST, LiteralPrimitive, MethodCall, ParseSourceSpan, PropertyRead, SafeMethodCall, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
+import { AST, LiteralPrimitive, ParseSourceSpan, PropertyRead, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
 import { AbsoluteFsPath } from '@angular/compiler-cli/src/ngtsc/file_system';
 import { TextAttribute } from '@angular/compiler/src/render3/r3_ast';
 import * as ts from 'typescript';
@@ -102,7 +102,7 @@ export interface TemplateTypeChecker {
      * For the given expression node, retrieve a `ShimLocation` that can be used to perform
      * autocompletion at that point in the expression, if such a location exists.
      */
-    getExpressionCompletionLocation(expr: PropertyRead | SafePropertyRead | MethodCall | SafeMethodCall, component: ts.ClassDeclaration): ShimLocation | null;
+    getExpressionCompletionLocation(expr: PropertyRead | SafePropertyRead, component: ts.ClassDeclaration): ShimLocation | null;
     /**
      * For the given node represents a `LiteralPrimitive`(the `TextAttribute` represents a string
      * literal), retrieve a `ShimLocation` that can be used to perform autocompletion at that point in

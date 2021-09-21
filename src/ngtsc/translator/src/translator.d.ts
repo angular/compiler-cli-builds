@@ -36,7 +36,6 @@ export declare class ExpressionTranslatorVisitor<TStatement, TExpression> implem
     visitWriteVarExpr(expr: o.WriteVarExpr, context: Context): TExpression;
     visitWriteKeyExpr(expr: o.WriteKeyExpr, context: Context): TExpression;
     visitWritePropExpr(expr: o.WritePropExpr, context: Context): TExpression;
-    visitInvokeMethodExpr(ast: o.InvokeMethodExpr, context: Context): TExpression;
     visitInvokeFunctionExpr(ast: o.InvokeFunctionExpr, context: Context): TExpression;
     visitTaggedTemplateExpr(ast: o.TaggedTemplateExpr, context: Context): TExpression;
     visitInstantiateExpr(ast: o.InstantiateExpr, context: Context): TExpression;

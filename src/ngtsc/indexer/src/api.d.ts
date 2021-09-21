@@ -41,7 +41,10 @@ interface ExpressionIdentifier extends TemplateIdentifier {
 export interface PropertyIdentifier extends ExpressionIdentifier {
     kind: IdentifierKind.Property;
 }
-/** Describes a method accessed in a template. */
+/**
+ * Describes a method accessed in a template.
+ * @deprecated No longer being used. To be removed.
+ */
 export interface MethodIdentifier extends ExpressionIdentifier {
     kind: IdentifierKind.Method;
 }
@@ -95,7 +98,7 @@ export interface VariableIdentifier extends TemplateIdentifier {
  * Identifiers recorded at the top level of the template, without any context about the HTML nodes
  * they were discovered in.
  */
-export declare type TopLevelIdentifier = PropertyIdentifier | MethodIdentifier | ElementIdentifier | TemplateNodeIdentifier | ReferenceIdentifier | VariableIdentifier;
+export declare type TopLevelIdentifier = PropertyIdentifier | ElementIdentifier | TemplateNodeIdentifier | ReferenceIdentifier | VariableIdentifier | MethodIdentifier;
 /**
  * Describes the absolute byte offsets of a text anchor in a source code.
  */
