@@ -27,12 +27,12 @@
             this.createTaskCompletedCallback = createTaskCompletedCallback;
         }
         ClusterExecutor.prototype.execute = function (analyzeEntryPoints, _createCompileFn) {
-            return tslib_1.__awaiter(this, void 0, void 0, function () {
+            return (0, tslib_1.__awaiter)(this, void 0, void 0, function () {
                 var _this = this;
-                return tslib_1.__generator(this, function (_a) {
-                    return [2 /*return*/, this.lockFile.lock(function () { return tslib_1.__awaiter(_this, void 0, void 0, function () {
+                return (0, tslib_1.__generator)(this, function (_a) {
+                    return [2 /*return*/, this.lockFile.lock(function () { return (0, tslib_1.__awaiter)(_this, void 0, void 0, function () {
                             var master;
-                            return tslib_1.__generator(this, function (_a) {
+                            return (0, tslib_1.__generator)(this, function (_a) {
                                 switch (_a.label) {
                                     case 0:
                                         this.logger.debug("Running ngcc on " + this.constructor.name + " (using " + this.workerCount + " worker processes).");
