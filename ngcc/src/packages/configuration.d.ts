@@ -4,12 +4,12 @@ import { PackageJsonFormatPropertiesMap } from './entry_point';
 /**
  * The format of a project level configuration file.
  */
-export interface NgccProjectConfig<T = RawNgccPackageConfig> {
+export interface NgccProjectConfig {
     /**
      * The packages that are configured by this project config.
      */
     packages?: {
-        [packagePath: string]: T | undefined;
+        [packagePath: string]: RawNgccPackageConfig | undefined;
     };
     /**
      * Options that control how locking the process is handled.
@@ -81,6 +81,44 @@ export interface NgccEntryPointConfig {
      * directives/pipes it makes available in support of those imports.
      */
     generateDeepReexports?: boolean;
+}
+interface VersionedPackageConfig extends RawNgccPackageConfig {
+    versionRange: string;
+}
+/**
+ * The internal representation of a configuration file. Configured packages are transformed into
+ * `ProcessedNgccPackageConfig` when a certain version is requested.
+ */
+export declare class PartiallyProcessedConfig {
+    /**
+     * The packages that are configured by this project config, keyed by package name.
+     */
+    packages: Map<string, VersionedPackageConfig[]>;
+    /**
+     * Options that control how locking the process is handled.
+     */
+    locking: ProcessLockingConfiguration;
+    /**
+     * Name of hash algorithm used to generate hashes of the configuration.
+     *
+     * Defaults to `sha256`.
+     */
+    hashAlgorithm: string;
+    constructor(projectConfig: NgccProjectConfig);
+    private splitNameAndVersion;
+    /**
+     * Registers the configuration for a particular version of the provided package.
+     */
+    private addPackageConfig;
+    /**
+     * Finds the configuration for a particular version of the provided package.
+     */
+    findPackageConfig(packageName: string, version: string | null): VersionedPackageConfig | null;
+    /**
+     * Converts the configuration into a JSON representation that is used to compute a hash of the
+     * configuration.
+     */
+    toJson(): string;
 }
 /**
  * The default configuration for ngcc.
@@ -177,10 +215,9 @@ export declare class NgccConfiguration {
      */
     getPackageConfig(packageName: string, packagePath: AbsoluteFsPath, version: string | null): ProcessedNgccPackageConfig;
     private getRawPackageConfig;
-    private processProjectConfig;
     private loadProjectConfig;
     private loadPackageConfig;
     private evalSrcFile;
-    private splitNameAndVersion;
     private computeHash;
 }
+export {};
