@@ -122,6 +122,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
         attribute: string;
         property: string;
     }[];
+    getPotentialDomEvents(tagName: string): string[];
     private getScopeData;
 }
 /**
