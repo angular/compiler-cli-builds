@@ -16,7 +16,7 @@ import { ProgramDriver } from '../../program_driver';
 import { DeclarationNode } from '../../reflection';
 import { OptimizeFor, TemplateTypeChecker } from '../../typecheck/api';
 import { Xi18nContext } from '../../xi18n';
-import { LazyRoute, NgCompilerAdapter, NgCompilerOptions } from '../api';
+import { NgCompilerAdapter, NgCompilerOptions } from '../api';
 /**
  * Discriminant type for a `CompilationTicket`.
  */
@@ -224,12 +224,6 @@ export declare class NgCompiler {
      * called first, and its `Promise` awaited prior to calling any other APIs of `NgCompiler`.
      */
     analyzeAsync(): Promise<void>;
-    /**
-     * List lazy routes detected during analysis.
-     *
-     * This can be called for one specific route, or to retrieve all top-level routes.
-     */
-    listLazyRoutes(entryRoute?: string): LazyRoute[];
     /**
      * Fetch transformers and other information which is necessary for a consumer to `emit` the
      * program with Angular-added definitions.
