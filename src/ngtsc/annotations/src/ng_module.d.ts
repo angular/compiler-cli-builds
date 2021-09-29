@@ -14,7 +14,6 @@ import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../..
 import { PartialEvaluator } from '../../partial_evaluator';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
-import { NgModuleRouteAnalyzer } from '../../routing';
 import { LocalModuleScopeRegistry } from '../../scope';
 import { FactoryTracker } from '../../shims/api';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
@@ -58,14 +57,13 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     private scopeRegistry;
     private referencesRegistry;
     private isCore;
-    private routeAnalyzer;
     private refEmitter;
     private factoryTracker;
     private annotateForClosureCompiler;
     private injectableRegistry;
     private perf;
     private localeId?;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, routeAnalyzer: NgModuleRouteAnalyzer | null, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, annotateForClosureCompiler: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, localeId?: string | undefined);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, annotateForClosureCompiler: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, localeId?: string | undefined);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
