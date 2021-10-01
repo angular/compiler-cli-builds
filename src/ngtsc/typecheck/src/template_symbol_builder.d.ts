@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder" />
 import { AST, TmplAstElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ComponentScopeReader } from '../../scope';
 import { ElementSymbol, ReferenceSymbol, Symbol, TemplateSymbol, VariableSymbol } from '../api';

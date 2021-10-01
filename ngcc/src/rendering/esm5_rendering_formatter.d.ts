@@ -8,7 +8,7 @@
  */
 import { Statement } from '@angular/compiler';
 import MagicString from 'magic-string';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ImportManager } from '../../../src/ngtsc/translator';
 import { CompiledClass } from '../analysis/types';
 import { EsmRenderingFormatter } from './esm_rendering_formatter';

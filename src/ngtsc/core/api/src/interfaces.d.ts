@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/core/api/src/interfaces" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 /**
  * A host backed by a build system which has a unified view of the module namespace.
  *

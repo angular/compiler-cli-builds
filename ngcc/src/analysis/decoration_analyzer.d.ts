@@ -1,5 +1,5 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/analysis/decoration_analyzer" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ParsedConfiguration } from '../../..';
 import { ReferencesRegistry, ResourceLoader } from '../../../src/ngtsc/annotations';
 import { CycleAnalyzer, ImportGraph } from '../../../src/ngtsc/cycles';

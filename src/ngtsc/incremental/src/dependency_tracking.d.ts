@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/src/dependency_tracking" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { DependencyTracker } from '../api';
 /**

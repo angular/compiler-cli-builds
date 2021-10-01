@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/cycles/src/imports" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { PerfRecorder } from '../../perf';
 /**
  * A cached graph of imports in the `ts.Program`.

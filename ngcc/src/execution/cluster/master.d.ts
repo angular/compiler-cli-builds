@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/execution/cluster/master" />
-import { PathManipulation } from '../../../../src/ngtsc/file_system';
+import { AbsoluteFsPath, PathManipulation } from '../../../../src/ngtsc/file_system';
 import { Logger } from '../../../../src/ngtsc/logging';
 import { FileWriter } from '../../writing/file_writer';
 import { PackageJsonUpdater } from '../../writing/package_json_updater';
@@ -36,8 +36,8 @@ export declare class ClusterMaster {
     private onWorkerExit;
     /** Handle a message from a worker. */
     private onWorkerMessage;
-    /** Handle a worker's coming online. */
-    private onWorkerOnline;
+    /** Handle a worker's coming online and ready for retrieving IPC messages. */
+    private onWorkerReady;
     /** Handle a worker's having completed their assigned task. */
     private onWorkerTaskCompleted;
     /** Handle a worker's message regarding the files transformed while processing its task. */
@@ -52,3 +52,5 @@ export declare class ClusterMaster {
      */
     private wrapEventHandler;
 }
+/** Gets the absolute file path to the cluster worker script. */
+export declare function getClusterWorkerScriptPath(fileSystem: PathManipulation): AbsoluteFsPath;

@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/compilation" />
 import { ConstantPool } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { IncrementalBuild } from '../../incremental/api';
 import { SemanticDepGraphUpdater, SemanticSymbol } from '../../incremental/semantic_graph';
 import { IndexingContext } from '../../indexer';

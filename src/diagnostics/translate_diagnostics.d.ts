@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/diagnostics/translate_diagnostics" />
 import { ParseSourceSpan } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Diagnostic } from '../transformers/api';
 export interface TypeCheckHost {
     parseSourceSpanOf(fileName: string, line: number, character: number): ParseSourceSpan | null;

@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/api" />
 import { ConstantPool, Expression, Statement, Type } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Reexport } from '../../imports';
 import { SemanticSymbol } from '../../incremental/semantic_graph';
 import { IndexingContext } from '../../indexer';

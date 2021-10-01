@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/shims/src/expando" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 /**
  * A `Symbol` which is used to patch extension data onto `ts.SourceFile`s.

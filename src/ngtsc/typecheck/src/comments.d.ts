@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/comments" />
 import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 /**
  * Reads the trailing comments and finds the first match which is a span comment (i.e. 4,10) on a
  * node and returns it as an `AbsoluteSourceSpan`.

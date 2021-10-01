@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/compiler_host" />
 import { AotCompilerHost, GeneratedFile, ParseSourceSpan } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { TypeCheckHost } from '../diagnostics/translate_diagnostics';
 import { ModuleMetadata } from '../metadata/index';
 import { CompilerHost, CompilerOptions, LibrarySummary } from './api';

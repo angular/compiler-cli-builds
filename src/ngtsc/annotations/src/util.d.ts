@@ -6,10 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/util" />
-import { Expression, ParseSourceSpan, R3CompiledExpression, R3DependencyMetadata, R3Reference, Statement, WrappedNodeExpr } from '@angular/compiler';
-import { R3FactoryMetadata } from '@angular/compiler/src/compiler';
-import { FactoryTarget } from '@angular/compiler/src/render3/partial/api';
-import * as ts from 'typescript';
+import { Expression, FactoryTarget, ParseSourceSpan, R3CompiledExpression, R3DependencyMetadata, R3FactoryMetadata, R3Reference, Statement, WrappedNodeExpr } from '@angular/compiler';
+import ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ForeignFunctionResolver, PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, CtorParameter, Decorator, Import, ImportedTypeValueReference, LocalTypeValueReference, ReflectionHost, TypeValueReference, UnavailableValue } from '../../reflection';

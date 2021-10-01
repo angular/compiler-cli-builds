@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/imports/src/default" />
 import { WrappedNodeExpr } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 /**
  * Attaches a default import declaration to `expr` to indicate the dependency of `expr` on the
  * default import.

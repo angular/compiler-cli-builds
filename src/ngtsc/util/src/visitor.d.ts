@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/util/src/visitor" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 /**
  * Result type of visiting a node that's typically an entry in a list, which allows specifying that
  * nodes should be added before the visited node in the output.

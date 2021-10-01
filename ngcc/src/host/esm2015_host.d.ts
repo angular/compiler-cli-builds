@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm2015_host" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Logger } from '../../../src/ngtsc/logging';
 import { ClassDeclaration, ClassMember, ClassMemberKind, CtorParameter, Declaration, DeclarationNode, Decorator, EnumMember, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
 import { BundleProgram } from '../packages/bundle_program';

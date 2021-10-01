@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/dts" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { DirectiveMeta, MetadataReader, NgModuleMeta, PipeMeta } from './api';

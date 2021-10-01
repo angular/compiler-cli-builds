@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/type_check_block" />
 import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
 import { TemplateId, TypeCheckableDirectiveMeta, TypeCheckBlockMetadata } from '../api';

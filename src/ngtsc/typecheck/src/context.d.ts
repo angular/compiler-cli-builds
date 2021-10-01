@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/context" />
 import { BoundTarget, ParseError, ParseSourceFile, R3TargetBinder, SchemaMetadata, TmplAstNode } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { PerfRecorder } from '../../perf';

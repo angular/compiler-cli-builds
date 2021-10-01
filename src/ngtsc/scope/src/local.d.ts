@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/local" />
 import { SchemaMetadata } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { AliasingHost, Reexport, Reference, ReferenceEmitter } from '../../imports';
 import { DirectiveMeta, MetadataReader, MetadataRegistry, NgModuleMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';

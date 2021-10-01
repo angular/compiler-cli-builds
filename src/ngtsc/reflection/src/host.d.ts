@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/host" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 /**
  * Metadata extracted from an instance of a decorator on another declaration, or synthesized from
  * other information about a class.

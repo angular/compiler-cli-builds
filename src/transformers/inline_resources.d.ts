@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/inline_resources" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { MetadataObject, MetadataValue } from '../metadata/index';
 import { MetadataTransformer, ValueTransform } from './metadata_cache';
 /** A subset of members from AotCompilerHost */

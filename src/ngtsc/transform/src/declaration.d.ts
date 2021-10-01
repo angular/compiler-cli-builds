@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/declaration" />
 import { Type } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ImportRewriter } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
 import { ImportManager } from '../../translator';

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/diagnostics" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { FatalDiagnosticError } from '../../diagnostics';
 import { Reference } from '../../imports';
 import { InjectableClassRegistry, MetadataReader } from '../../metadata';

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/metadata/evaluator" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { CollectorOptions } from './collector';
 import { MetadataEntry, MetadataError, MetadataValue } from './schema';
 import { Symbols } from './symbols';

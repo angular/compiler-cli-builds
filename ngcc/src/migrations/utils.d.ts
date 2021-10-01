@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ClassDeclaration, Decorator } from '../../../src/ngtsc/reflection';
 import { MigrationHost } from './migration';
 export declare function isClassDeclaration(clazz: ts.Node): clazz is ClassDeclaration<ts.Declaration>;

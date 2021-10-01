@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/node_emitter" />
 import { AssertNotNull, BinaryOperatorExpr, CastExpr, ClassStmt, CommaExpr, ConditionalExpr, DeclareFunctionStmt, DeclareVarStmt, ExpressionStatement, ExpressionVisitor, ExternalExpr, FunctionExpr, IfStmt, InstantiateExpr, InvokeFunctionExpr, LiteralArrayExpr, LiteralExpr, LiteralMapExpr, LocalizedString, NotExpr, ParseSourceSpan, PartialModule, ReadKeyExpr, ReadPropExpr, ReadVarExpr, ReturnStatement, Statement, StatementVisitor, TaggedTemplateExpr, ThrowStmt, TryCatchStmt, TypeofExpr, UnaryOperatorExpr, WrappedNodeExpr, WriteKeyExpr, WritePropExpr, WriteVarExpr } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 export interface Node {
     sourceSpan: ParseSourceSpan | null;
 }

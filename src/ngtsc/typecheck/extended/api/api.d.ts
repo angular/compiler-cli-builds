@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/extended/api/api" />
 import { AST, TmplAstNode } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ErrorCode } from '../../../diagnostics';
 import { NgTemplateDiagnostic, TemplateTypeChecker } from '../../api';
 /**

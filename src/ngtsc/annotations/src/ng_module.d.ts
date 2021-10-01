@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
 import { Expression, R3ClassMetadata, R3FactoryMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { SemanticReference, SemanticSymbol } from '../../incremental/semantic_graph';
 import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';

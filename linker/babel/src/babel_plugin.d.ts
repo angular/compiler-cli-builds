@@ -1,13 +1,6 @@
 /// <amd-module name="@angular/compiler-cli/linker/babel/src/babel_plugin" />
-/**
- * @license
- * Copyright Google LLC All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-import { ConfigAPI, PluginObj } from '@babel/core';
 import { LinkerOptions } from '../../src/file_linker/linker_options';
+import { ConfigAPI, PluginObj } from './babel_core';
 /**
  * This is the Babel plugin definition that is provided as a default export from the package, such
  * that the plugin can be used using the module specifier of the package. This is the recommended

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/cycles/src/analyzer" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ImportGraph } from './imports';
 /**
  * Analyzes a `ts.Program` for cycles.

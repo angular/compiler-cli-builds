@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/type_to_value" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { TypeValueReference } from './host';
 /**
  * Potentially convert a `ts.TypeNode` to a `TypeValueReference`, which indicates how to use the

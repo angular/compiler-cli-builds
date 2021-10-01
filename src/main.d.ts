@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -7,16 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/main" />
-import 'reflect-metadata';
-import * as ts from 'typescript';
-import * as api from './transformers/api';
+import ts from 'typescript';
 import { Diagnostics, ParsedConfiguration } from './perform_compile';
+import * as api from './transformers/api';
+declare type TsickleModule = typeof import('tsickle');
 export declare function main(args: string[], consoleError?: (s: string) => void, config?: NgcParsedConfiguration, customTransformers?: api.CustomTransformers, programReuse?: {
     program: api.Program | undefined;
-}, modifiedResourceFiles?: Set<string> | null): number;
+}, modifiedResourceFiles?: Set<string> | null, tsickle?: TsickleModule): number;
 export declare function mainDiagnosticsForTest(args: string[], config?: NgcParsedConfiguration, programReuse?: {
     program: api.Program | undefined;
-}, modifiedResourceFiles?: Set<string> | null): ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
+}, modifiedResourceFiles?: Set<string> | null, tsickle?: TsickleModule): ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
 export interface NgcParsedConfiguration extends ParsedConfiguration {
     watch?: boolean;
 }
@@ -27,3 +26,4 @@ export declare function watchMode(project: string, options: api.CompilerOptions,
     ready: (cb: () => void) => void;
     firstCompileResult: Diagnostics;
 };
+export {};

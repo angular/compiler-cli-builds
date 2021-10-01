@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/shims/src/reference_tagger" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 /**
  * Manipulates the `referencedFiles` property of `ts.SourceFile`s to add references to shim files
  * for each original source file, causing the shims to be loaded into the program as well.

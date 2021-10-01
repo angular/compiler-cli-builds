@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/core/api/src/options" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { BazelAndG3Options, I18nOptions, LegacyNgcOptions, MiscOptions, NgcCompatibilityOptions, StrictTemplateOptions, TargetOptions } from './public_options';
 /**
  * Non-public options which are useful during testing of the compiler.

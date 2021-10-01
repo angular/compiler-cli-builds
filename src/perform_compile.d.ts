@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/perform_compile" />
 import { Position } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { AbsoluteFsPath, ReadonlyFileSystem } from '../src/ngtsc/file_system';
 import * as api from './transformers/api';
 export declare type Diagnostics = ReadonlyArray<ts.Diagnostic | api.Diagnostic>;

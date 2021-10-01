@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/linker/src/ast/typescript/typescript_ast_host" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { AstHost, Range } from '../ast_host';
 /**
  * This implementation of `AstHost` is able to get information from TypeScript AST nodes.

@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/typecheck" />
 import { SchemaMetadata, SelectorMatcher } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Reference } from '../../imports';
 import { DirectiveMeta, MetadataReader } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';

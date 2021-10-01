@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/reflection/src/typescript" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ClassDeclaration, ClassMember, CtorParameter, Declaration, DeclarationNode, Decorator, FunctionDefinition, Import, ReflectionHost } from './host';
 /**
  * reflector.ts implements static reflection of declarations using the TypeScript `ts.TypeChecker`.

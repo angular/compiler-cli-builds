@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { ConstantPool } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
 import { Logger } from '../../../src/ngtsc/logging';
 import { ImportManager } from '../../../src/ngtsc/translator';

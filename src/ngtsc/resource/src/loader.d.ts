@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/resource/src/loader" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ResourceLoader, ResourceLoaderContext } from '../../annotations';
 import { NgCompilerAdapter } from '../../core/api';
 /**

@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/symbols" />
 import { TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { SymbolWithValueDeclaration } from '../../util/src/typescript';
 import { DirectiveInScope } from './scope';

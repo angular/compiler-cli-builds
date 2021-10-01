@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/node_emitter_transform" />
 import { GeneratedFile } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 /**
  * Returns a transformer that does two things for generated files (ngfactory etc):
  * - adds a fileoverview JSDoc comment containing Closure Compiler specific "suppress"ions in JSDoc.

@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/oob" />
-import { BindingPipe, PropertyWrite, TmplAstBoundEvent, TmplAstElement, TmplAstReference, TmplAstVariable } from '@angular/compiler';
-import { BoundAttribute } from '@angular/compiler/src/render3/r3_ast';
+import { BindingPipe, PropertyWrite, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstReference, TmplAstVariable } from '@angular/compiler';
 import { ClassDeclaration } from '../../reflection';
 import { TemplateDiagnostic, TemplateId } from '../api';
 import { TemplateSourceResolver } from './tcb_util';
@@ -60,7 +59,7 @@ export interface OutOfBandDiagnosticRecorder {
     /**
      * Reports a split two way binding error message.
      */
-    splitTwoWayBinding(templateId: TemplateId, input: BoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
+    splitTwoWayBinding(templateId: TemplateId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -79,5 +78,5 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     requiresInlineTcb(templateId: TemplateId, node: ClassDeclaration): void;
     requiresInlineTypeConstructors(templateId: TemplateId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
     suboptimalTypeInference(templateId: TemplateId, variables: TmplAstVariable[]): void;
-    splitTwoWayBinding(templateId: TemplateId, input: BoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
+    splitTwoWayBinding(templateId: TemplateId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
 }

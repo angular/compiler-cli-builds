@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/program" />
 import * as path from 'path';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { CompilerHost, CompilerOptions, Program } from './api';
 export declare function setTempProgramHandlerForTest(handler: (program: ts.Program) => void): void;
 export declare function resetTempProgramHandlerForTest(): void;

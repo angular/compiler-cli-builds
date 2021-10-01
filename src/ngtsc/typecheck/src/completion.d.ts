@@ -6,10 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/completion" />
-import { TmplAstTemplate } from '@angular/compiler';
-import { AST, LiteralPrimitive, PropertyRead, PropertyWrite, SafePropertyRead, TmplAstNode } from '@angular/compiler/src/compiler';
-import { TextAttribute } from '@angular/compiler/src/render3/r3_ast';
-import * as ts from 'typescript';
+import { AST, LiteralPrimitive, PropertyRead, PropertyWrite, SafePropertyRead, TmplAstNode, TmplAstTemplate, TmplAstTextAttribute } from '@angular/compiler';
+import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { GlobalCompletion, ShimLocation } from '../api';
 import { TemplateData } from './context';
@@ -41,7 +39,7 @@ export declare class CompletionEngine {
      */
     getGlobalCompletions(context: TmplAstTemplate | null, node: AST | TmplAstNode): GlobalCompletion | null;
     getExpressionCompletionLocation(expr: PropertyRead | PropertyWrite | SafePropertyRead): ShimLocation | null;
-    getLiteralCompletionLocation(expr: LiteralPrimitive | TextAttribute): ShimLocation | null;
+    getLiteralCompletionLocation(expr: LiteralPrimitive | TmplAstTextAttribute): ShimLocation | null;
     /**
      * Get global completions within the given template context - either a `TmplAstTemplate` embedded
      * view, or `null` for the root context.

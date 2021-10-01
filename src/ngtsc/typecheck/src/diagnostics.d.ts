@@ -7,7 +7,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { TemplateDiagnostic, TemplateId } from '../api';
 import { TemplateSourceResolver } from './tcb_util';
 /**

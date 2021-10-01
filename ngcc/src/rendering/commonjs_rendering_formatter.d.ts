@@ -8,7 +8,7 @@
  */
 import { PathManipulation } from '@angular/compiler-cli/src/ngtsc/file_system';
 import MagicString from 'magic-string';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Reexport } from '../../../src/ngtsc/imports';
 import { Import, ImportManager } from '../../../src/ngtsc/translator';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';

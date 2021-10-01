@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/scope" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ClassDeclaration } from '../../reflection';
 import { SymbolWithValueDeclaration } from '../../util/src/typescript';
 /**

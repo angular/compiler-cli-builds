@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/interface" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Reference } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';

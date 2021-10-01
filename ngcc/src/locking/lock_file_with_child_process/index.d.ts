@@ -39,3 +39,5 @@ export declare class LockFileWithChildProcess implements LockFile {
     remove(): void;
     protected createUnlocker(path: AbsoluteFsPath): ChildProcess;
 }
+/** Gets the absolute file path to the lock file unlocker script. */
+export declare function getLockFileUnlockerScriptPath(fileSystem: FileSystem): AbsoluteFsPath;

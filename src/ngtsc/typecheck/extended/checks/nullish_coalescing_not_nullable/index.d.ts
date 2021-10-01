@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/extended/checks/nullish_coalescing_not_nullable" />
 import { AST, TmplAstNode } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ErrorCode } from '../../../../diagnostics';
 import { NgTemplateDiagnostic } from '../../../api';
 import { TemplateCheckWithVisitor, TemplateContext } from '../../api';

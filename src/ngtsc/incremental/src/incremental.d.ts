@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/src/incremental" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { PerfRecorder } from '../../perf';
 import { ClassRecord, TraitCompiler } from '../../transform';

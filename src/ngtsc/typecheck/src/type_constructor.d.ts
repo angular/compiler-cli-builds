@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/type_constructor" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { TypeCtorMetadata } from '../api';
 export declare function generateTypeCtorDeclarationFn(node: ClassDeclaration<ts.ClassDeclaration>, meta: TypeCtorMetadata, nodeTypeRef: ts.EntityName, typeParams: ts.TypeParameterDeclaration[] | undefined, reflector: ReflectionHost): ts.Statement;

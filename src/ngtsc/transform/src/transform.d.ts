@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/transform" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { DefaultImportTracker, ImportRewriter } from '../../imports';
 import { PerfRecorder } from '../../perf';
 import { ReflectionHost } from '../../reflection';

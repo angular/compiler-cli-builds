@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/api" />
 import { ParseSourceSpan, Position } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ExtendedTsCompilerHost, NgCompilerOptions } from '../ngtsc/core/api';
 export declare const DEFAULT_ERROR_CODE = 100;
 export declare const UNKNOWN_ERROR_CODE = 500;

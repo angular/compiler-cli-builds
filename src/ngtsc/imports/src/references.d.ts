@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/imports/src/references" />
 import { Expression } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 export interface OwningModule {
     specifier: string;
     resolutionContext: string;

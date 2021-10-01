@@ -6,15 +6,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { SourceMapConverter } from 'convert-source-map';
+import mapHelpers from 'convert-source-map';
 import MagicString from 'magic-string';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
 import { Logger } from '../../../src/ngtsc/logging';
 import { FileToWrite } from './utils';
 export interface SourceMapInfo {
     source: string;
-    map: SourceMapConverter | null;
+    map: mapHelpers.SourceMapConverter | null;
     isInline: boolean;
 }
 /**

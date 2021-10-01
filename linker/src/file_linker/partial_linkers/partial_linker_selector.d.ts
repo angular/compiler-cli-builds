@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Range } from 'semver';
+import semver from 'semver';
 import { AbsoluteFsPath } from '../../../../src/ngtsc/file_system';
 import { Logger } from '../../../../src/ngtsc/logging';
 import { LinkerEnvironment } from '../linker_environment';
@@ -21,7 +21,7 @@ export declare const ɵɵngDeclareNgModule = "\u0275\u0275ngDeclareNgModule";
 export declare const ɵɵngDeclarePipe = "\u0275\u0275ngDeclarePipe";
 export declare const declarationFunctions: string[];
 export interface LinkerRange<TExpression> {
-    range: Range;
+    range: semver.Range;
     linker: PartialLinker<TExpression>;
 }
 /**

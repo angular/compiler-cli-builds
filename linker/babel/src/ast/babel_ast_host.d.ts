@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/linker/babel/src/ast/babel_ast_host" />
-import * as t from '@babel/types';
 import { AstHost, Range } from '../../../../linker';
+import { types as t } from '../babel_core';
 /**
  * This implementation of `AstHost` is able to get information from Babel AST nodes.
  */

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/extended/api/extended_template_checker" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { TemplateDiagnostic } from '../../api';
 /**
  * Interface to generate extended template diangostics from the component tempaltes.

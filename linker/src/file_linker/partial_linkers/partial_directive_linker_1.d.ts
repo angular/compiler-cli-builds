@@ -6,8 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ConstantPool, ParseSourceSpan, R3DeclareDirectiveMetadata, R3DirectiveMetadata, R3PartialDeclaration } from '@angular/compiler';
-import * as o from '@angular/compiler/src/output/output_ast';
+import { ConstantPool, outputAst as o, ParseSourceSpan, R3DeclareDirectiveMetadata, R3DirectiveMetadata, R3PartialDeclaration } from '@angular/compiler';
 import { AbsoluteFsPath } from '../../../../src/ngtsc/file_system';
 import { Range } from '../../ast/ast_host';
 import { AstObject } from '../../ast/ast_value';

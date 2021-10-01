@@ -1,5 +1,5 @@
 /// <amd-module name="@angular/compiler-cli/src/metadata/bundler" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { MetadataCache } from '../transformers/metadata_cache';
 import { MetadataEntry, ModuleMetadata } from './schema';
 export interface BundleEntries {

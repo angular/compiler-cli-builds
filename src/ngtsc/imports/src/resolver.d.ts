@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import * as ts from 'typescript';
+import ts from 'typescript';
 /**
  * Used by `RouterEntryPointManager` and `NgModuleRouteAnalyzer` (which is in turn is used by
  * `NgModuleDecoratorHandler`) for resolving the module source-files references in lazy-loaded

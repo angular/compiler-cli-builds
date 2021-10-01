@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/locking/lock_file" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -6,6 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/// <amd-module name="@angular/compiler-cli/ngcc/src/locking/lock_file" />
 import { AbsoluteFsPath, PathManipulation } from '../../../src/ngtsc/file_system';
 export declare function getLockFilePath(fs: PathManipulation): AbsoluteFsPath;
 export interface LockFile {

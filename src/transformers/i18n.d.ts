@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/i18n" />
 import { MessageBundle } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { CompilerOptions } from './api';
 export declare function i18nGetExtension(formatName: string): string;
 export declare function i18nExtract(formatName: string | null, outFile: string | null, host: ts.CompilerHost, options: CompilerOptions, bundle: MessageBundle, pathResolve?: (...segments: string[]) => string): string[];

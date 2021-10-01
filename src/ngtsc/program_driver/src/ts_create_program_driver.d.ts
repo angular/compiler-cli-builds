@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { RequiredDelegations } from '../../util/src/typescript';
 import { FileUpdate, ProgramDriver, UpdateMode } from './api';

@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/extended/checks/invalid_banana_in_box" />
 import { AST, TmplAstNode } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ErrorCode } from '../../../../diagnostics';
 import { NgTemplateDiagnostic } from '../../../api';
 import { TemplateCheckWithVisitor, TemplateContext } from '../../api';

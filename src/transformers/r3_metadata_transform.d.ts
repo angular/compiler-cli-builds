@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/r3_metadata_transform" />
 import { PartialModule } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { MetadataTransformer, ValueTransform } from './metadata_cache';
 export declare class PartialModuleMetadataTransformer implements MetadataTransformer {
     private moduleMap;

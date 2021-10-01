@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/program" />
 import { GeneratedFile } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import * as api from '../transformers/api';
 import { NgCompiler } from './core';
 import { NgCompilerOptions } from './core/api';

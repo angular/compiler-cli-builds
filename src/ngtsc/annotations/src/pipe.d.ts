@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/pipe" />
 import { R3ClassMetadata, R3PipeMetadata } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { SemanticSymbol } from '../../incremental/semantic_graph';
 import { InjectableClassRegistry, MetadataRegistry } from '../../metadata';
 import { PartialEvaluator } from '../../partial_evaluator';

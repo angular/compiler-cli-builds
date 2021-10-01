@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/expression" />
 import { AST } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { TypeCheckingConfig } from '../api';
 export declare const NULL_AS_ANY: ts.AsExpression;
 /**

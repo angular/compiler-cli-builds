@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
 import { ConstantPool, InterpolationConfig, ParsedTemplate, ParseSourceFile, R3ClassMetadata, R3ComponentMetadata, TmplAstNode } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { CycleAnalyzer, CycleHandlingStrategy } from '../../cycles';
 import { ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';

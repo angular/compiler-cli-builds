@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/entry_point/src/private_export_checker" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ReferenceGraph } from './reference_graph';
 /**
  * Produce `ts.Diagnostic`s for classes that are visible from exported types (e.g. directives

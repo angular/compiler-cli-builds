@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/diagnostics/src/error" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ErrorCode } from './error_code';
 export declare class FatalDiagnosticError {
     readonly code: ErrorCode;

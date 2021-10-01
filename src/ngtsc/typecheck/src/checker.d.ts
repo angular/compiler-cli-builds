@@ -6,9 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/checker" />
-import { AST, LiteralPrimitive, ParseSourceSpan, PropertyRead, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
-import { TextAttribute } from '@angular/compiler/src/render3/r3_ast';
-import * as ts from 'typescript';
+import { AST, LiteralPrimitive, ParseSourceSpan, PropertyRead, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate, TmplAstTextAttribute } from '@angular/compiler';
+import ts from 'typescript';
 import { ErrorCode } from '../../diagnostics';
 import { AbsoluteFsPath } from '../../file_system';
 import { ReferenceEmitter } from '../../imports';
@@ -88,7 +87,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getTypeCheckBlock(component: ts.ClassDeclaration): ts.Node | null;
     getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration, node: AST | TmplAstNode): GlobalCompletion | null;
     getExpressionCompletionLocation(ast: PropertyRead | SafePropertyRead, component: ts.ClassDeclaration): ShimLocation | null;
-    getLiteralCompletionLocation(node: LiteralPrimitive | TextAttribute, component: ts.ClassDeclaration): ShimLocation | null;
+    getLiteralCompletionLocation(node: LiteralPrimitive | TmplAstTextAttribute, component: ts.ClassDeclaration): ShimLocation | null;
     invalidateClass(clazz: ts.ClassDeclaration): void;
     makeTemplateDiagnostic<T extends ErrorCode>(clazz: ts.ClassDeclaration, sourceSpan: ParseSourceSpan, category: ts.DiagnosticCategory, errorCode: T, message: string, relatedInformation?: {
         text: string;

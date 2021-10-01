@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/imports/src/alias" />
 import { Expression } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { UnifiedModulesHost } from '../../core/api';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { EmittedReference, ImportFlags, ReferenceEmitStrategy } from './emitter';

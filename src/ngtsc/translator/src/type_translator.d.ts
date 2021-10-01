@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/translator/src/type_translator" />
 import * as o from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Context } from './context';
 import { ImportManager } from './import_manager';
 export declare function translateType(type: o.Type, imports: ImportManager): ts.TypeNode;

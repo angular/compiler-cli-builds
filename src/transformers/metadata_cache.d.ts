@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/metadata_cache" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { MetadataCollector, MetadataValue, ModuleMetadata } from '../metadata/index';
 import { MetadataProvider } from './compiler_host';
 export declare type ValueTransform = (value: MetadataValue, node: ts.Node) => MetadataValue;

@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/directive" />
 import { ConstantPool, ParsedHostBindings, R3ClassMetadata, R3DirectiveMetadata, R3QueryMetadata } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Reference } from '../../imports';
 import { SemanticDepGraphUpdater, SemanticSymbol, SemanticTypeParameter } from '../../incremental/semantic_graph';
 import { ClassPropertyMapping, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';

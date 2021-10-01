@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/translator/src/typescript_translator" />
 import * as o from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ImportGenerator } from './api/import_generator';
 import { TranslatorOptions } from './translator';
 export declare function translateExpression(expression: o.Expression, imports: ImportGenerator<ts.Expression>, options?: TranslatorOptions<ts.Expression>): ts.Expression;

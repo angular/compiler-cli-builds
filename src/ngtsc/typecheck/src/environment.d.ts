@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/environment" />
 import { Type } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';

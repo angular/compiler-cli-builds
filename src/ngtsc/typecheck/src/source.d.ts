@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/source" />
 import { AbsoluteSourceSpan, ParseSourceFile, ParseSourceSpan } from '@angular/compiler';
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { TemplateId, TemplateSourceMapping } from '../api';
 import { TemplateSourceResolver } from './tcb_util';
 /**

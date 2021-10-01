@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/partial_evaluator/src/ts_helpers" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ObjectAssignBuiltinFn } from './builtin';
 import { KnownFn, ResolvedValue, ResolvedValueArray } from './result';
 export declare class AssignHelperFn extends ObjectAssignBuiltinFn {

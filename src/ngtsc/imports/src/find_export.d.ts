@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/imports/src/find_export" />
-import * as ts from 'typescript';
+import ts from 'typescript';
 import { ReflectionHost } from '../../reflection';
 /**
  * Find the name, if any, by which a node is exported from a given file.
