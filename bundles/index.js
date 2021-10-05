@@ -446,7 +446,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.0.0-next.11+3.sha-bdc6ff4.with-local-changes");
+var VERSION = new Version("13.0.0-next.11+6.sha-318cf91.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/collector.mjs
 import ts4 from "typescript";
@@ -15659,7 +15659,7 @@ var TemplateSourceManager = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.mjs
-import { AST, ASTWithSource as ASTWithSource3, BindingPipe as BindingPipe2, Call as Call3, PropertyRead as PropertyRead3, PropertyWrite as PropertyWrite3, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement4, TmplAstReference as TmplAstReference4, TmplAstTemplate as TmplAstTemplate3, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable3 } from "@angular/compiler";
+import { AST, ASTWithSource as ASTWithSource3, BindingPipe as BindingPipe2, PropertyRead as PropertyRead3, PropertyWrite as PropertyWrite3, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement4, TmplAstReference as TmplAstReference4, TmplAstTemplate as TmplAstTemplate3, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable3 } from "@angular/compiler";
 import ts70 from "typescript";
 var SymbolBuilder = class {
   constructor(shimPath, typeCheckBlock, templateData, componentScopeReader, getTypeChecker) {
@@ -16013,8 +16013,6 @@ var SymbolBuilder = class {
     let withSpan = expression.sourceSpan;
     if (expression instanceof PropertyWrite3) {
       withSpan = expression.nameSpan;
-    } else if (expression instanceof Call3 && expression.receiver instanceof PropertyRead3) {
-      withSpan = expression.receiver.nameSpan;
     }
     let node = null;
     if (expression instanceof PropertyRead3) {
@@ -16029,8 +16027,8 @@ var SymbolBuilder = class {
     while (ts70.isParenthesizedExpression(node)) {
       node = node.expression;
     }
-    if ((expression instanceof SafePropertyRead4 || expression instanceof Call3 && expression.receiver instanceof SafePropertyRead4) && ts70.isConditionalExpression(node)) {
-      const whenTrueSymbol = expression instanceof Call3 && ts70.isCallExpression(node.whenTrue) ? this.getSymbolOfTsNode(node.whenTrue.expression) : this.getSymbolOfTsNode(node.whenTrue);
+    if (expression instanceof SafePropertyRead4 && ts70.isConditionalExpression(node)) {
+      const whenTrueSymbol = this.getSymbolOfTsNode(node.whenTrue);
       if (whenTrueSymbol === null) {
         return null;
       }
