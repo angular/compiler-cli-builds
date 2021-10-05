@@ -396,8 +396,8 @@ function toggleCase(str) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.mjs
-import minimist from "minimist";
 import ts88 from "typescript";
+import yargs from "yargs";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
 import { isSyntaxError as isSyntaxError2 } from "@angular/compiler";
@@ -20363,20 +20363,17 @@ function createEmitCallback(options, tsickle) {
 }
 function readNgcCommandLineAndConfiguration(args) {
   const options = {};
-  const parsedArgs = minimist(args);
+  const parsedArgs = yargs(args).parserConfiguration({ "strip-aliased": true }).option("i18nFile", { type: "string" }).option("i18nFormat", { type: "string" }).option("locale", { type: "string" }).option("missingTranslation", { type: "string", choices: ["error", "warning", "ignore"] }).option("outFile", { type: "string" }).option("watch", { type: "boolean", alias: ["w"] }).parseSync();
   if (parsedArgs.i18nFile)
     options.i18nInFile = parsedArgs.i18nFile;
   if (parsedArgs.i18nFormat)
     options.i18nInFormat = parsedArgs.i18nFormat;
   if (parsedArgs.locale)
     options.i18nInLocale = parsedArgs.locale;
-  const mt = parsedArgs.missingTranslation;
-  if (mt === "error" || mt === "warning" || mt === "ignore") {
-    options.i18nInMissingTranslations = mt;
-  }
+  if (parsedArgs.missingTranslation)
+    options.i18nInMissingTranslations = parsedArgs.missingTranslation;
   const config = readCommandLineAndConfiguration(args, options, ["i18nFile", "i18nFormat", "locale", "missingTranslation", "watch"]);
-  const watch2 = parsedArgs.w || parsedArgs.watch;
-  return __spreadProps(__spreadValues({}, config), { watch: watch2 });
+  return __spreadProps(__spreadValues({}, config), { watch: parsedArgs.watch });
 }
 function readCommandLineAndConfiguration(args, existingOptions = {}, ngCmdLineOptions = []) {
   let cmdConfig = ts88.parseCommandLine(args);
