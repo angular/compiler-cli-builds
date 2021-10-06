@@ -17358,7 +17358,7 @@ function compareVersions(v1, v2) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
-var MIN_TS_VERSION = "4.2.3";
+var MIN_TS_VERSION = "4.4.2";
 var MAX_TS_VERSION = "4.5.0";
 var tsVersion = ts74.version;
 function checkVersion(version, minVersion, maxVersion) {

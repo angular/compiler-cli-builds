@@ -446,7 +446,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.0.0-next.11+10.sha-fddb50b.with-local-changes");
+var VERSION = new Version("13.0.0-next.11+14.sha-c14085e.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/collector.mjs
 import ts4 from "typescript";
@@ -17477,7 +17477,7 @@ function compareVersions(v1, v2) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
-var MIN_TS_VERSION = "4.2.3";
+var MIN_TS_VERSION = "4.4.2";
 var MAX_TS_VERSION = "4.5.0";
 var tsVersion = ts74.version;
 function checkVersion(version, minVersion, maxVersion) {
