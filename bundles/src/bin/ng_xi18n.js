@@ -19852,9 +19852,6 @@ function isIvyNgModule(clazz) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
-function filterErrorsAndWarnings(diagnostics) {
-  return diagnostics.filter((d) => d.category !== ts86.DiagnosticCategory.Message);
-}
 var defaultFormatHost = {
   getCurrentDirectory: () => ts86.sys.getCurrentDirectory(),
   getCanonicalFileName: (fileName) => fileName,
@@ -20017,7 +20014,9 @@ function getExtendedConfigPathWorker(configFile, extendsValue, host, fs5) {
   return null;
 }
 function exitCodeFromResult(diags) {
-  if (!diags || filterErrorsAndWarnings(diags).length === 0) {
+  if (!diags)
+    return 0;
+  if (diags.every((diag) => diag.category !== ts86.DiagnosticCategory.Error)) {
     return 0;
   }
   return diags.some((d) => d.source === "angular" && d.code === UNKNOWN_ERROR_CODE) ? 2 : 1;
@@ -20406,7 +20405,7 @@ function getFormatDiagnosticsHost(options) {
   };
 }
 function reportErrorsAndExit(allDiagnostics, options, consoleError = console.error) {
-  const errorsAndWarnings = filterErrorsAndWarnings(allDiagnostics);
+  const errorsAndWarnings = allDiagnostics.filter((d) => d.category !== ts88.DiagnosticCategory.Message);
   printDiagnostics(errorsAndWarnings, options, consoleError);
   return exitCodeFromResult(allDiagnostics);
 }
