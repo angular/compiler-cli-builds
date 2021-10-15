@@ -11,7 +11,6 @@ import ts from 'typescript';
 import { AbsoluteFsPath, ReadonlyFileSystem } from '../src/ngtsc/file_system';
 import * as api from './transformers/api';
 export declare type Diagnostics = ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
-export declare function filterErrorsAndWarnings(diagnostics: Diagnostics): Diagnostics;
 export declare function formatDiagnosticPosition(position: Position, host?: ts.FormatDiagnosticsHost): string;
 export declare function flattenDiagnosticMessageChain(chain: api.DiagnosticMessageChain, host?: ts.FormatDiagnosticsHost, indent?: number): string;
 export declare function formatDiagnostic(diagnostic: api.Diagnostic, host?: ts.FormatDiagnosticsHost): string;

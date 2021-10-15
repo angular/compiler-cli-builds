@@ -446,7 +446,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.0.0-rc.0+8.sha-91e73c4.with-local-changes");
+var VERSION = new Version("13.0.0-rc.0+11.sha-426a3ec.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/collector.mjs
 import ts4 from "typescript";
@@ -19973,9 +19973,6 @@ function isIvyNgModule(clazz) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
 import { isSyntaxError as isSyntaxError2 } from "@angular/compiler";
 import ts86 from "typescript";
-function filterErrorsAndWarnings(diagnostics) {
-  return diagnostics.filter((d) => d.category !== ts86.DiagnosticCategory.Message);
-}
 var defaultFormatHost = {
   getCurrentDirectory: () => ts86.sys.getCurrentDirectory(),
   getCanonicalFileName: (fileName) => fileName,
@@ -20138,7 +20135,9 @@ function getExtendedConfigPathWorker(configFile, extendsValue, host, fs5) {
   return null;
 }
 function exitCodeFromResult(diags) {
-  if (!diags || filterErrorsAndWarnings(diags).length === 0) {
+  if (!diags)
+    return 0;
+  if (diags.every((diag) => diag.category !== ts86.DiagnosticCategory.Error)) {
     return 0;
   }
   return diags.some((d) => d.source === "angular" && d.code === UNKNOWN_ERROR_CODE) ? 2 : 1;
@@ -20358,7 +20357,6 @@ export {
   defaultGatherDiagnostics,
   dirname,
   exitCodeFromResult,
-  filterErrorsAndWarnings,
   flattenDiagnosticMessageChain,
   formatDiagnostic,
   formatDiagnosticPosition,

@@ -15,7 +15,10 @@ export declare function main(args: string[], consoleError?: (s: string) => void,
 }, modifiedResourceFiles?: Set<string> | null, tsickle?: TsickleModule): number;
 export declare function mainDiagnosticsForTest(args: string[], config?: NgcParsedConfiguration, programReuse?: {
     program: api.Program | undefined;
-}, modifiedResourceFiles?: Set<string> | null, tsickle?: TsickleModule): ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
+}, modifiedResourceFiles?: Set<string> | null, tsickle?: TsickleModule): {
+    exitCode: number;
+    diagnostics: ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
+};
 export interface NgcParsedConfiguration extends ParsedConfiguration {
     watch?: boolean;
 }
