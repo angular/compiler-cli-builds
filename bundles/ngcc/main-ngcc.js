@@ -3481,25 +3481,31 @@ var UmdReflectionHost = class extends Esm5ReflectionHost {
   }
 };
 function parseStatementForUmdModule(statement) {
-  const wrapperCall = getUmdWrapperCall(statement);
-  if (!wrapperCall)
+  const wrapper = getUmdWrapper(statement);
+  if (wrapper === null)
     return null;
-  const wrapperFn = wrapperCall.expression;
-  if (!ts14.isFunctionExpression(wrapperFn))
-    return null;
-  const factoryFnParamIndex = wrapperFn.parameters.findIndex((parameter) => ts14.isIdentifier(parameter.name) && parameter.name.text === "factory");
+  const factoryFnParamIndex = wrapper.fn.parameters.findIndex((parameter) => ts14.isIdentifier(parameter.name) && parameter.name.text === "factory");
   if (factoryFnParamIndex === -1)
     return null;
-  const factoryFn = stripParentheses(wrapperCall.arguments[factoryFnParamIndex]);
+  const factoryFn = stripParentheses(wrapper.call.arguments[factoryFnParamIndex]);
   if (!factoryFn || !ts14.isFunctionExpression(factoryFn))
     return null;
-  return { wrapperFn, factoryFn };
+  return { wrapperFn: wrapper.fn, factoryFn };
 }
-function getUmdWrapperCall(statement) {
-  if (!ts14.isExpressionStatement(statement) || !ts14.isParenthesizedExpression(statement.expression) || !ts14.isCallExpression(statement.expression.expression) || !ts14.isFunctionExpression(statement.expression.expression.expression)) {
+function getUmdWrapper(statement) {
+  if (!ts14.isExpressionStatement(statement))
     return null;
+  if (ts14.isParenthesizedExpression(statement.expression) && ts14.isCallExpression(statement.expression.expression) && ts14.isFunctionExpression(statement.expression.expression.expression)) {
+    const call = statement.expression.expression;
+    const fn = statement.expression.expression.expression;
+    return { call, fn };
   }
-  return statement.expression.expression;
+  if (ts14.isCallExpression(statement.expression) && ts14.isParenthesizedExpression(statement.expression.expression) && ts14.isFunctionExpression(statement.expression.expression.expression)) {
+    const call = statement.expression;
+    const fn = statement.expression.expression.expression;
+    return { call, fn };
+  }
+  return null;
 }
 function getImportsOfUmdModule(umdModule) {
   const imports = [];
@@ -4451,7 +4457,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "13.0.0-next.14+76.sha-60f3b33.with-local-changes";
+var NGCC_VERSION = "13.0.0-next.14+78.sha-9f40d2a.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
