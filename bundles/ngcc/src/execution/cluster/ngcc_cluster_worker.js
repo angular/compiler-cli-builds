@@ -10725,25 +10725,31 @@ var UmdReflectionHost = class extends Esm5ReflectionHost {
   }
 };
 function parseStatementForUmdModule(statement) {
-  const wrapperCall = getUmdWrapperCall(statement);
-  if (!wrapperCall)
+  const wrapper = getUmdWrapper(statement);
+  if (wrapper === null)
     return null;
-  const wrapperFn = wrapperCall.expression;
-  if (!ts93.isFunctionExpression(wrapperFn))
-    return null;
-  const factoryFnParamIndex = wrapperFn.parameters.findIndex((parameter) => ts93.isIdentifier(parameter.name) && parameter.name.text === "factory");
+  const factoryFnParamIndex = wrapper.fn.parameters.findIndex((parameter) => ts93.isIdentifier(parameter.name) && parameter.name.text === "factory");
   if (factoryFnParamIndex === -1)
     return null;
-  const factoryFn = stripParentheses(wrapperCall.arguments[factoryFnParamIndex]);
+  const factoryFn = stripParentheses(wrapper.call.arguments[factoryFnParamIndex]);
   if (!factoryFn || !ts93.isFunctionExpression(factoryFn))
     return null;
-  return { wrapperFn, factoryFn };
+  return { wrapperFn: wrapper.fn, factoryFn };
 }
-function getUmdWrapperCall(statement) {
-  if (!ts93.isExpressionStatement(statement) || !ts93.isParenthesizedExpression(statement.expression) || !ts93.isCallExpression(statement.expression.expression) || !ts93.isFunctionExpression(statement.expression.expression.expression)) {
+function getUmdWrapper(statement) {
+  if (!ts93.isExpressionStatement(statement))
     return null;
+  if (ts93.isParenthesizedExpression(statement.expression) && ts93.isCallExpression(statement.expression.expression) && ts93.isFunctionExpression(statement.expression.expression.expression)) {
+    const call = statement.expression.expression;
+    const fn = statement.expression.expression.expression;
+    return { call, fn };
   }
-  return statement.expression.expression;
+  if (ts93.isCallExpression(statement.expression) && ts93.isParenthesizedExpression(statement.expression.expression) && ts93.isFunctionExpression(statement.expression.expression.expression)) {
+    const call = statement.expression;
+    const fn = statement.expression.expression.expression;
+    return { call, fn };
+  }
+  return null;
 }
 function getImportsOfUmdModule(umdModule) {
   const imports = [];
