@@ -446,7 +446,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.0.0-rc.0+27.sha-b489ae5.with-local-changes");
+var VERSION = new Version("13.0.0-rc.0+39.sha-812a33d.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/collector.mjs
 import ts4 from "typescript";
@@ -19255,6 +19255,11 @@ function getAngularClassTransformerFactory(modules, annotateForClosureCompiler) 
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/program.mjs
 var MAX_FILE_COUNT_FOR_SINGLE_FILE_EMIT = 20;
+var VE_DISABLED_MESSAGE = `
+This compilation is using the View Engine compiler which is no longer supported by the Angular team
+and is being removed. Please upgrade to the Ivy compiler by switching to \`NgtscProgram\`. See
+https://angular.io/guide/ivy for more information.
+`.trim().split("\n").join(" ");
 var LOWER_FIELDS = ["useValue", "useFactory", "data", "id", "loadChildren"];
 var R3_LOWER_FIELDS = [...LOWER_FIELDS, "providers", "imports", "exports"];
 var tempProgramHandlerForTest = null;
@@ -19271,6 +19276,9 @@ var AngularCompilerProgram = class {
     this._optionsDiagnostics = [];
     this._transformTsDiagnostics = [];
     this._isCompilingAngularCore = null;
+    if (true) {
+      throw new Error(VE_DISABLED_MESSAGE);
+    }
     this.rootNames = [...rootNames];
     if (!options.disableTypeScriptVersionCheck) {
       verifySupportedTypeScriptVersion();

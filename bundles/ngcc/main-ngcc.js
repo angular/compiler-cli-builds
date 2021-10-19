@@ -4457,7 +4457,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "13.0.0-rc.0+27.sha-b489ae5.with-local-changes";
+var NGCC_VERSION = "13.0.0-rc.0+39.sha-812a33d.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -15369,6 +15369,11 @@ import { ClassStmt as ClassStmt2, StmtModifier as StmtModifier3 } from "@angular
 import ts110 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/program.mjs
+var VE_DISABLED_MESSAGE = `
+This compilation is using the View Engine compiler which is no longer supported by the Angular team
+and is being removed. Please upgrade to the Ivy compiler by switching to \`NgtscProgram\`. See
+https://angular.io/guide/ivy for more information.
+`.trim().split("\n").join(" ");
 var LOWER_FIELDS = ["useValue", "useFactory", "data", "id", "loadChildren"];
 var R3_LOWER_FIELDS = [...LOWER_FIELDS, "providers", "imports", "exports"];
 var emptyModules = {
