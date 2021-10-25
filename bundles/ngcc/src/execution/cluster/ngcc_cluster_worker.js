@@ -13402,11 +13402,11 @@ var UmdRenderingFormatter = class extends Esm5RenderingFormatter {
     if (!umdModule) {
       return;
     }
-    const wrapperFunction = umdModule.wrapperFn;
-    renderCommonJsDependencies(output, wrapperFunction, imports);
-    renderAmdDependencies(output, wrapperFunction, imports);
-    renderGlobalDependencies(output, wrapperFunction, imports);
-    renderFactoryParameters(output, wrapperFunction, imports);
+    const { wrapperFn, factoryFn } = umdModule;
+    renderCommonJsDependencies(output, wrapperFn, imports);
+    renderAmdDependencies(output, wrapperFn, imports);
+    renderGlobalDependencies(output, wrapperFn, imports);
+    renderFactoryParameters(output, factoryFn, imports);
   }
   addExports(output, entryPointBasePath, exports, importManager, file) {
     const umdModule = this.umdHost.getUmdModule(file);
@@ -13492,16 +13492,7 @@ function renderGlobalDependencies(output, wrapperFunction, imports) {
   const importString = imports.map((i) => `global.${getGlobalIdentifier(i)}`).join(",");
   output.appendLeft(injectionPoint, importString + (globalFactoryCall.arguments.length > 0 ? "," : ""));
 }
-function renderFactoryParameters(output, wrapperFunction, imports) {
-  const wrapperCall = wrapperFunction.parent;
-  const secondArgument = wrapperCall.arguments[1];
-  if (!secondArgument) {
-    return;
-  }
-  const factoryFunction = ts107.isParenthesizedExpression(secondArgument) ? secondArgument.expression : secondArgument;
-  if (!ts107.isFunctionExpression(factoryFunction)) {
-    return;
-  }
+function renderFactoryParameters(output, factoryFunction, imports) {
   const parameters = factoryFunction.parameters;
   const parameterString = imports.map((i) => i.qualifier.text).join(",");
   if (parameters.length > 0) {
