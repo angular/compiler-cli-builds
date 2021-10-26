@@ -446,7 +446,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.0.0-rc.1+21.sha-59e56e7.with-local-changes");
+var VERSION = new Version("13.0.0-rc.1+23.sha-fa7693f.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/collector.mjs
 import ts4 from "typescript";
@@ -3126,9 +3126,6 @@ import ts73 from "typescript";
 import { compileClassMetadata as compileClassMetadata3, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector, DEFAULT_INTERPOLATION_CONFIG, DomElementSchemaRegistry, ExternalExpr as ExternalExpr7, FactoryTarget as FactoryTarget3, InterpolationConfig, makeBindingParser as makeBindingParser2, ParseSourceFile as ParseSourceFile2, parseTemplate, R3TargetBinder, SelectorMatcher, ViewEncapsulation, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
 import ts39 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
-import ts10 from "typescript";
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.mjs
 var ErrorCode;
 (function(ErrorCode2) {
@@ -3179,7 +3176,8 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["SUGGEST_STRICT_TEMPLATES"] = 10001] = "SUGGEST_STRICT_TEMPLATES";
   ErrorCode2[ErrorCode2["SUGGEST_SUBOPTIMAL_TYPE_INFERENCE"] = 10002] = "SUGGEST_SUBOPTIMAL_TYPE_INFERENCE";
 })(ErrorCode || (ErrorCode = {}));
-var ERROR_DETAILS_PAGE_BASE_URL = "https://angular.io/errors";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/docs.mjs
 var COMPILER_ERRORS_WITH_GUIDES = new Set([
   ErrorCode.DECORATOR_ARG_NOT_LITERAL,
   ErrorCode.IMPORT_CYCLE_DETECTED,
@@ -3189,6 +3187,15 @@ var COMPILER_ERRORS_WITH_GUIDES = new Set([
   ErrorCode.MISSING_REFERENCE_TARGET,
   ErrorCode.COMPONENT_INVALID_SHADOW_DOM_SELECTOR
 ]);
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
+import ts10 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/util.mjs
+var ERROR_CODE_MATCHER = /(\u001b\[\d+m ?)TS-99(\d+: ?\u001b\[\d+m)/g;
+function replaceTsWithNgInErrors(errors) {
+  return errors.replace(ERROR_CODE_MATCHER, "$1NG$2");
+}
 function ngErrorCode(code) {
   return parseInt("-99" + code);
 }
@@ -3230,11 +3237,8 @@ function makeRelatedInformation(node, messageText) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/util.mjs
-var ERROR_CODE_MATCHER = /(\u001b\[\d+m ?)TS-99(\d+: ?\u001b\[\d+m)/g;
-function replaceTsWithNgInErrors(errors) {
-  return errors.replace(ERROR_CODE_MATCHER, "$1NG$2");
-}
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error_details_base_url.mjs
+var ERROR_DETAILS_PAGE_BASE_URL = "https://angular.io/errors";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/alias.mjs
 import { ExternalExpr as ExternalExpr2 } from "@angular/compiler";
