@@ -556,9 +556,6 @@ import {
 import { isSyntaxError as isSyntaxError2 } from "@angular/compiler";
 import ts86 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
-import ts2 from "typescript";
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.mjs
 var ErrorCode;
 (function(ErrorCode2) {
@@ -609,6 +606,8 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["SUGGEST_STRICT_TEMPLATES"] = 10001] = "SUGGEST_STRICT_TEMPLATES";
   ErrorCode2[ErrorCode2["SUGGEST_SUBOPTIMAL_TYPE_INFERENCE"] = 10002] = "SUGGEST_SUBOPTIMAL_TYPE_INFERENCE";
 })(ErrorCode || (ErrorCode = {}));
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/docs.mjs
 var COMPILER_ERRORS_WITH_GUIDES = new Set([
   ErrorCode.DECORATOR_ARG_NOT_LITERAL,
   ErrorCode.IMPORT_CYCLE_DETECTED,
@@ -618,6 +617,15 @@ var COMPILER_ERRORS_WITH_GUIDES = new Set([
   ErrorCode.MISSING_REFERENCE_TARGET,
   ErrorCode.COMPONENT_INVALID_SHADOW_DOM_SELECTOR
 ]);
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
+import ts2 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/util.mjs
+var ERROR_CODE_MATCHER = /(\u001b\[\d+m ?)TS-99(\d+: ?\u001b\[\d+m)/g;
+function replaceTsWithNgInErrors(errors) {
+  return errors.replace(ERROR_CODE_MATCHER, "$1NG$2");
+}
 function ngErrorCode(code) {
   return parseInt("-99" + code);
 }
@@ -660,12 +668,6 @@ function makeRelatedInformation(node, messageText) {
 }
 function isFatalDiagnosticError(err) {
   return err._isFatalDiagnosticError === true;
-}
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/util.mjs
-var ERROR_CODE_MATCHER = /(\u001b\[\d+m ?)TS-99(\d+: ?\u001b\[\d+m)/g;
-function replaceTsWithNgInErrors(errors) {
-  return errors.replace(ERROR_CODE_MATCHER, "$1NG$2");
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs

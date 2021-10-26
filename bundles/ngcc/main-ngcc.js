@@ -4457,7 +4457,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "13.0.0-next.14+118.sha-a91fe6d.with-local-changes";
+var NGCC_VERSION = "13.0.0-next.14+120.sha-28a40f3.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -5227,9 +5227,6 @@ var ClusterExecutor = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/create_compile_function.mjs
 import ts62 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
-import ts18 from "typescript";
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.mjs
 var ErrorCode;
 (function(ErrorCode2) {
@@ -5280,6 +5277,8 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["SUGGEST_STRICT_TEMPLATES"] = 10001] = "SUGGEST_STRICT_TEMPLATES";
   ErrorCode2[ErrorCode2["SUGGEST_SUBOPTIMAL_TYPE_INFERENCE"] = 10002] = "SUGGEST_SUBOPTIMAL_TYPE_INFERENCE";
 })(ErrorCode || (ErrorCode = {}));
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/docs.mjs
 var COMPILER_ERRORS_WITH_GUIDES = new Set([
   ErrorCode.DECORATOR_ARG_NOT_LITERAL,
   ErrorCode.IMPORT_CYCLE_DETECTED,
@@ -5289,6 +5288,15 @@ var COMPILER_ERRORS_WITH_GUIDES = new Set([
   ErrorCode.MISSING_REFERENCE_TARGET,
   ErrorCode.COMPONENT_INVALID_SHADOW_DOM_SELECTOR
 ]);
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
+import ts18 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/util.mjs
+var ERROR_CODE_MATCHER = /(\u001b\[\d+m ?)TS-99(\d+: ?\u001b\[\d+m)/g;
+function replaceTsWithNgInErrors(errors) {
+  return errors.replace(ERROR_CODE_MATCHER, "$1NG$2");
+}
 function ngErrorCode(code) {
   return parseInt("-99" + code);
 }
@@ -5331,12 +5339,6 @@ function makeRelatedInformation(node, messageText) {
 }
 function isFatalDiagnosticError(err) {
   return err._isFatalDiagnosticError === true;
-}
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/util.mjs
-var ERROR_CODE_MATCHER = /(\u001b\[\d+m ?)TS-99(\d+: ?\u001b\[\d+m)/g;
-function replaceTsWithNgInErrors(errors) {
-  return errors.replace(ERROR_CODE_MATCHER, "$1NG$2");
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/bundle_program.mjs
