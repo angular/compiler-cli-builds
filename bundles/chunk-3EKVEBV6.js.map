@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": ["../../../../../../packages/compiler-cli/private/tooling.ts"],
+  "mappings": ";;;;;;;;;;;;;;;;;AAAA,AAwBO,IAAM,yBAAyB;EACpC,WAAW;EACX,mBAAmB;;AAGd,IAAM,kCAAkC,iCAC1C,yBAD0C;EAE7C,WAAW;;AAUP,iDAAkD,SAAmB;AAEzE,QAAM,cAAc,QAAQ;AAC5B,QAAM,iBAAiB,IAAI,yBAAyB;AACpD,SAAO,gCACH,aAAa,gBAAgB,IAAiB,OAClB,OAAiC;;",
+  "names": []
+}
