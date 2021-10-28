@@ -446,7 +446,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.0.0-rc.2+1.sha-8d89b28.with-local-changes");
+var VERSION = new Version("13.0.0-rc.2+5.sha-f225bfd.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/collector.mjs
 import ts4 from "typescript";
@@ -9062,7 +9062,7 @@ var QUERY_TYPES = new Set([
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/ng_module.mjs
-import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, CUSTOM_ELEMENTS_SCHEMA, ExternalExpr as ExternalExpr6, FactoryTarget as FactoryTarget2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, LiteralExpr as LiteralExpr3, NO_ERRORS_SCHEMA, R3Identifiers, STRING_TYPE, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, CUSTOM_ELEMENTS_SCHEMA, ExternalExpr as ExternalExpr6, FactoryTarget as FactoryTarget2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, NO_ERRORS_SCHEMA, R3Identifiers, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
 import ts38 from "typescript";
 var NgModuleSymbol = class extends SemanticSymbol {
   constructor() {
@@ -9109,7 +9109,7 @@ var NgModuleSymbol = class extends SemanticSymbol {
   }
 };
 var NgModuleDecoratorHandler = class {
-  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, isCore, refEmitter, factoryTracker, annotateForClosureCompiler, injectableRegistry, perf, localeId) {
+  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, isCore, refEmitter, factoryTracker, annotateForClosureCompiler, injectableRegistry, perf) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaReader = metaReader;
@@ -9122,7 +9122,6 @@ var NgModuleDecoratorHandler = class {
     this.annotateForClosureCompiler = annotateForClosureCompiler;
     this.injectableRegistry = injectableRegistry;
     this.perf = perf;
-    this.localeId = localeId;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = NgModuleDecoratorHandler.name;
   }
@@ -9408,14 +9407,6 @@ var NgModuleDecoratorHandler = class {
         type: injectorDef.type
       }
     ];
-    if (this.localeId) {
-      res.push({
-        name: "\u0275loc",
-        initializer: new LiteralExpr3(this.localeId),
-        statements: [],
-        type: STRING_TYPE
-      });
-    }
     return res;
   }
   _toR3Reference(valueRef, valueContext, typeContext) {
@@ -10389,7 +10380,7 @@ function checkCustomElementSelectorForErrors(selector) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
-import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createR3ProviderExpression, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr4, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createR3ProviderExpression, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
 import ts40 from "typescript";
 var InjectableDecoratorHandler = class {
   constructor(reflector, isCore, strictCtorDeps, injectableRegistry, perf, errorOnDuplicateProv = true) {
@@ -10477,7 +10468,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
       type,
       typeArgumentCount,
       internalType,
-      providedIn: createR3ProviderExpression(new LiteralExpr4(null), false)
+      providedIn: createR3ProviderExpression(new LiteralExpr3(null), false)
     };
   } else if (decorator.args.length === 1) {
     const metaNode = decorator.args[0];
@@ -10485,7 +10476,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, `@Injectable argument must be an object literal`);
     }
     const meta = reflectObjectLiteral(metaNode);
-    const providedIn = meta.has("providedIn") ? getProviderExpression(meta.get("providedIn"), reflector) : createR3ProviderExpression(new LiteralExpr4(null), false);
+    const providedIn = meta.has("providedIn") ? getProviderExpression(meta.get("providedIn"), reflector) : createR3ProviderExpression(new LiteralExpr3(null), false);
     let deps = void 0;
     if ((meta.has("useClass") || meta.has("useFactory")) && meta.has("deps")) {
       const depsExpr = meta.get("deps");
@@ -17265,7 +17256,7 @@ var NgCompiler = class {
       new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, isCore, semanticDepGraphUpdater, this.closureCompilerEnabled, false, this.delegatingPerfRecorder),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, scopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder),
       new InjectableDecoratorHandler(reflector, isCore, this.options.strictInjectionParameters || false, injectableRegistry, this.delegatingPerfRecorder),
-      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, isCore, refEmitter, this.adapter.factoryTracker, this.closureCompilerEnabled, injectableRegistry, this.delegatingPerfRecorder, this.options.i18nInLocale)
+      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, isCore, refEmitter, this.adapter.factoryTracker, this.closureCompilerEnabled, injectableRegistry, this.delegatingPerfRecorder)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
