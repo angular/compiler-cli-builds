@@ -446,7 +446,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.0.0+5.sha-9741473.with-local-changes");
+var VERSION = new Version("13.0.0+6.sha-0744075.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/collector.mjs
 import ts4 from "typescript";
