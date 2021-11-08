@@ -103,7 +103,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.1.0-next.0+40.sha-9f37914.with-local-changes");
+var VERSION = new Version("13.1.0-next.0+42.sha-acddb7f.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
