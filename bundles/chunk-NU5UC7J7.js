@@ -2817,7 +2817,14 @@ import ts8 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/diagnostics/typescript_version.mjs
 function toNumbers(value) {
-  return value.split(".").map(Number);
+  const suffixIndex = value.lastIndexOf("-");
+  return value.slice(0, suffixIndex === -1 ? value.length : suffixIndex).split(".").map((segment) => {
+    const parsed = parseInt(segment, 10);
+    if (isNaN(parsed)) {
+      throw Error(`Unable to parse version string ${value}.`);
+    }
+    return parsed;
+  });
 }
 function compareNumbers(a, b) {
   const max = Math.max(a.length, b.length);
@@ -11987,4 +11994,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-LCD23VGR.js.map
+//# sourceMappingURL=chunk-NU5UC7J7.js.map
