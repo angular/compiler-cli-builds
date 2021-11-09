@@ -6699,12 +6699,7 @@ var TcbDirectiveInputsOp = class extends TcbOp {
     let dirId = null;
     const inputs = getBoundInputs(this.dir, this.node, this.tcb);
     for (const input of inputs) {
-      let expr = translateInput(input.attribute, this.tcb, this.scope);
-      if (!this.tcb.env.config.checkTypeOfInputBindings) {
-        expr = tsCastToAny(expr);
-      } else if (!this.tcb.env.config.strictNullInputBindings) {
-        expr = ts34.createNonNullExpression(expr);
-      }
+      const expr = widenBinding(translateInput(input.attribute, this.tcb, this.scope), this.tcb);
       let assignment = wrapForDiagnostics(expr);
       for (const fieldName of input.fieldNames) {
         let target;
@@ -6825,12 +6820,7 @@ var TcbUnclaimedInputsOp = class extends TcbOp {
       if (binding.type === 0 && this.claimedInputs.has(binding.name)) {
         continue;
       }
-      let expr = tcbExpression(binding.value, this.tcb, this.scope);
-      if (!this.tcb.env.config.checkTypeOfInputBindings) {
-        expr = tsCastToAny(expr);
-      } else if (!this.tcb.env.config.strictNullInputBindings) {
-        expr = ts34.createNonNullExpression(expr);
-      }
+      const expr = widenBinding(tcbExpression(binding.value, this.tcb, this.scope), this.tcb);
       if (this.tcb.env.config.checkTypeOfDomBindings && binding.type === 0) {
         if (binding.name !== "style" && binding.name !== "class") {
           if (elId === null) {
@@ -7315,12 +7305,7 @@ function tcbCallTypeCtor(dir, tcb, inputs) {
   const members = inputs.map((input) => {
     const propertyName = ts34.createStringLiteral(input.field);
     if (input.type === "binding") {
-      let expr = input.expression;
-      if (!tcb.env.config.checkTypeOfInputBindings) {
-        expr = tsCastToAny(expr);
-      } else if (!tcb.env.config.strictNullInputBindings) {
-        expr = ts34.createNonNullExpression(expr);
-      }
+      const expr = widenBinding(input.expression, tcb);
       const assignment = ts34.createPropertyAssignment(propertyName, wrapForDiagnostics(expr));
       addParseSpanInfo(assignment, input.sourceSpan);
       return assignment;
@@ -7355,6 +7340,19 @@ function translateInput(attr, tcb, scope) {
     return tcbExpression(attr.value, tcb, scope);
   } else {
     return ts34.createStringLiteral(attr.value);
+  }
+}
+function widenBinding(expr, tcb) {
+  if (!tcb.env.config.checkTypeOfInputBindings) {
+    return tsCastToAny(expr);
+  } else if (!tcb.env.config.strictNullInputBindings) {
+    if (ts34.isObjectLiteralExpression(expr) || ts34.isArrayLiteralExpression(expr)) {
+      return expr;
+    } else {
+      return ts34.createNonNullExpression(expr);
+    }
+  } else {
+    return expr;
   }
 }
 var EVENT_PARAMETER = "$event";
@@ -11989,4 +11987,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-2ILVXH35.js.map
+//# sourceMappingURL=chunk-LCD23VGR.js.map

@@ -60,7 +60,7 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-2ILVXH35.js";
+} from "./chunk-LCD23VGR.js";
 import "./chunk-YAVZZUIL.js";
 import "./chunk-PBA67OV4.js";
 import "./chunk-S3QIIFH7.js";
@@ -103,7 +103,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.1.0-next.0+47.sha-49964c8.with-local-changes");
+var VERSION = new Version("13.1.0-next.0+57.sha-4f8eaac.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {

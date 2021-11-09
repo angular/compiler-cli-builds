@@ -7,8 +7,8 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/checker" />
 import { AST, LiteralPrimitive, ParseSourceSpan, PropertyRead, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstTemplate, TmplAstTextAttribute } from '@angular/compiler';
-import { AbsoluteFsPath } from '@angular/compiler-cli/src/ngtsc/file_system';
 import ts from 'typescript';
+import { AbsoluteFsPath } from '../../../../src/ngtsc/file_system';
 import { ErrorCode } from '../../diagnostics';
 import { FullTemplateMapping, NgTemplateDiagnostic, TypeCheckableDirectiveMeta } from './api';
 import { GlobalCompletion } from './completion';
