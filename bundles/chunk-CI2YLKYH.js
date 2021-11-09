@@ -36,7 +36,7 @@ import {
   sendMessageToWorker,
   sortTasksByPriority,
   stringifyTask
-} from "./chunk-3AGYJ2RR.js";
+} from "./chunk-WM3FT7ZD.js";
 import {
   LogLevel
 } from "./chunk-SKBLJA43.js";
@@ -887,7 +887,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "13.1.0-next.0+57.sha-4f8eaac.with-local-changes";
+var NGCC_VERSION = "13.1.0-next.0+62.sha-28ef5af.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -1370,6 +1370,7 @@ var ClusterMaster = class {
     if (this.taskQueue.allTasksCompleted) {
       return Promise.resolve();
     }
+    this.logger.info('Processing legacy "View Engine" libraries:');
     cluster.on("message", this.wrapEventHandler((worker, msg) => this.onWorkerMessage(worker.id, msg)));
     cluster.on("exit", this.wrapEventHandler((worker, code, signal) => this.onWorkerExit(worker, code, signal)));
     cluster.fork();
@@ -1383,6 +1384,7 @@ var ClusterMaster = class {
     if (this.taskQueue.allTasksCompleted) {
       const duration = Math.round((Date.now() - this.processingStartTime) / 100) / 10;
       this.logger.debug(`Processed tasks in ${duration}s.`);
+      this.logger.info("Encourage the library authors to publish an Ivy distribution.");
       return this.finishedDeferred.resolve();
     }
     for (const [workerId, assignedTask] of Array.from(this.taskAssignments)) {
@@ -2172,4 +2174,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-6VRDPXJS.js.map
+//# sourceMappingURL=chunk-CI2YLKYH.js.map

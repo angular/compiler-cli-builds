@@ -2269,6 +2269,7 @@ function getEntryPointInfo(fs, config, logger, packagePath, entryPointPath) {
   const loadedPackagePackageJson = loadPackageJson(fs, packagePackageJsonPath);
   const loadedEntryPointPackageJson = packagePackageJsonPath === entryPointPackageJsonPath ? loadedPackagePackageJson : loadPackageJson(fs, entryPointPackageJsonPath);
   const { packageName, packageVersion } = getPackageNameAndVersion(fs, packagePath, loadedPackagePackageJson, loadedEntryPointPackageJson);
+  const repositoryUrl = getRepositoryUrl(loadedPackagePackageJson);
   const packageConfig = config.getPackageConfig(packageName, packagePath, packageVersion);
   const entryPointConfig = packageConfig.entryPoints.get(entryPointPath);
   let entryPointPackageJson;
@@ -2297,6 +2298,7 @@ function getEntryPointInfo(fs, config, logger, packagePath, entryPointPath) {
     path: entryPointPath,
     packageName,
     packagePath,
+    repositoryUrl,
     packageJson: entryPointPackageJson,
     typings: fs.resolve(entryPointPath, typings),
     compiledByAngular,
@@ -2404,6 +2406,15 @@ function getPackageNameAndVersion(fs, packagePath, packagePackageJson, entryPoin
     packageName,
     packageVersion: (_a = packagePackageJson == null ? void 0 : packagePackageJson.version) != null ? _a : null
   };
+}
+function getRepositoryUrl(packageJson) {
+  if ((packageJson == null ? void 0 : packageJson.repository) === void 0) {
+    return "";
+  }
+  if (typeof packageJson.repository === "string") {
+    return packageJson.repository;
+  }
+  return packageJson.repository.url;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/tasks/api.mjs
@@ -4592,7 +4603,7 @@ function getCreateCompileFn(fileSystem, logger, fileWriter, enableI18nLegacyMess
         onTaskCompleted(task, 1, `property \`${formatProperty}\` pointing to a missing or empty file: ${formatPath}`);
         return;
       }
-      logger.info(`Compiling ${entryPoint.name} : ${formatProperty} as ${format}`);
+      logger.info(`- ${entryPoint.name} [${formatProperty}/${format}] (${entryPoint.repositoryUrl})`);
       const bundle = makeEntryPointBundle(fileSystem, entryPoint, sharedFileCache, moduleResolutionCache, formatPath, isCore, format, processDts, pathMappings, true, enableI18nLegacyMessageIdFormat);
       const result = transformer.transform(bundle);
       if (result.success) {
@@ -5091,4 +5102,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3AGYJ2RR.js.map
+//# sourceMappingURL=chunk-WM3FT7ZD.js.map
