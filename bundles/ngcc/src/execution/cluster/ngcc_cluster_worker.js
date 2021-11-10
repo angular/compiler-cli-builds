@@ -5193,7 +5193,7 @@ function getInheritedUndecoratedCtorDiagnostic(node, baseClass, reader) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/directive.mjs
-import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirectiveFromMetadata, compileDirectiveFromMetadata, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr5, FactoryTarget, getSafePropertyAccessString, makeBindingParser, parseHostBindings, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr4 } from "@angular/compiler";
+import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirectiveFromMetadata, compileDirectiveFromMetadata, createMayBeForwardRefExpression, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr5, FactoryTarget, getSafePropertyAccessString, makeBindingParser, parseHostBindings, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr4 } from "@angular/compiler";
 import ts37 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/factory.mjs
@@ -5603,17 +5603,17 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, isCore
   };
 }
 function extractQueryMetadata(exprNode, name, args, propertyName, reflector, evaluator) {
-  var _a;
   if (args.length === 0) {
     throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, exprNode, `@${name} must have arguments`);
   }
   const first = name === "ViewChild" || name === "ContentChild";
-  const node = (_a = tryUnwrapForwardRef(args[0], reflector)) != null ? _a : args[0];
+  const forwardReferenceTarget = tryUnwrapForwardRef(args[0], reflector);
+  const node = forwardReferenceTarget != null ? forwardReferenceTarget : args[0];
   const arg = evaluator.evaluate(node);
   let isStatic = false;
   let predicate = null;
   if (arg instanceof Reference || arg instanceof DynamicValue) {
-    predicate = new WrappedNodeExpr4(node);
+    predicate = createMayBeForwardRefExpression(new WrappedNodeExpr4(node), forwardReferenceTarget !== null ? 2 : 0);
   } else if (typeof arg === "string") {
     predicate = [arg];
   } else if (isStringArrayOrDie(arg, `@${name} predicate`, node)) {
@@ -7176,7 +7176,7 @@ function checkCustomElementSelectorForErrors(selector) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
-import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createR3ProviderExpression, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
 import ts40 from "typescript";
 var InjectableDecoratorHandler = class {
   constructor(reflector, isCore, strictCtorDeps, injectableRegistry, perf, errorOnDuplicateProv = true) {
@@ -7264,7 +7264,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
       type,
       typeArgumentCount,
       internalType,
-      providedIn: createR3ProviderExpression(new LiteralExpr3(null), false)
+      providedIn: createMayBeForwardRefExpression2(new LiteralExpr3(null), 0)
     };
   } else if (decorator.args.length === 1) {
     const metaNode = decorator.args[0];
@@ -7272,7 +7272,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, `@Injectable argument must be an object literal`);
     }
     const meta = reflectObjectLiteral(metaNode);
-    const providedIn = meta.has("providedIn") ? getProviderExpression(meta.get("providedIn"), reflector) : createR3ProviderExpression(new LiteralExpr3(null), false);
+    const providedIn = meta.has("providedIn") ? getProviderExpression(meta.get("providedIn"), reflector) : createMayBeForwardRefExpression2(new LiteralExpr3(null), 0);
     let deps = void 0;
     if ((meta.has("useClass") || meta.has("useFactory")) && meta.has("deps")) {
       const depsExpr = meta.get("deps");
@@ -7300,7 +7300,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
 }
 function getProviderExpression(expression, reflector) {
   const forwardRefValue = tryUnwrapForwardRef(expression, reflector);
-  return createR3ProviderExpression(new WrappedNodeExpr7(forwardRefValue != null ? forwardRefValue : expression), forwardRefValue !== null);
+  return createMayBeForwardRefExpression2(new WrappedNodeExpr7(forwardRefValue != null ? forwardRefValue : expression), forwardRefValue !== null ? 2 : 0);
 }
 function extractInjectableCtorDeps(clazz, meta, decorator, reflector, isCore, strictCtorDeps) {
   if (decorator.args === null) {
