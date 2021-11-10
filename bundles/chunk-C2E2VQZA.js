@@ -32,7 +32,7 @@ import {
   makeRelatedInformation,
   ngErrorCode,
   replaceTsWithNgInErrors
-} from "./chunk-YAVZZUIL.js";
+} from "./chunk-7KFXR7FV.js";
 import {
   getDownlevelDecoratorsTransform
 } from "./chunk-PBA67OV4.js";
@@ -72,7 +72,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-HYTAZOQJ.js";
+} from "./chunk-WYO7JO2T.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -84,7 +84,7 @@ import {
   join,
   relative,
   resolve
-} from "./chunk-3IV7S3VF.js";
+} from "./chunk-EP5JHXG2.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -95,7 +95,7 @@ import {
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-5VGHS4A4.js";
+} from "./chunk-XA5IZLLC.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/schema.mjs
 var METADATA_VERSION = 4;
@@ -11994,4 +11994,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-NU5UC7J7.js.map
+//# sourceMappingURL=chunk-C2E2VQZA.js.map

@@ -27,12 +27,12 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-HYTAZOQJ.js";
+} from "./chunk-WYO7JO2T.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
   relative
-} from "./chunk-3IV7S3VF.js";
+} from "./chunk-EP5JHXG2.js";
 import {
   PerfEvent,
   PerfPhase
@@ -40,7 +40,7 @@ import {
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-5VGHS4A4.js";
+} from "./chunk-XA5IZLLC.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic.mjs
 var DynamicValue = class {
@@ -5660,4 +5660,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YAVZZUIL.js.map
+//# sourceMappingURL=chunk-7KFXR7FV.js.map

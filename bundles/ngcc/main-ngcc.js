@@ -6,22 +6,22 @@
     
 import {
   parseCommandLineOptions
-} from "../chunk-4NEDYUVN.js";
+} from "../chunk-UMUIU7TE.js";
 import {
   mainNgcc
-} from "../chunk-IXTHC2NT.js";
+} from "../chunk-CJ4AAD4E.js";
 import "../chunk-QDWL7SZJ.js";
-import "../chunk-KYAHF24O.js";
-import "../chunk-NU5UC7J7.js";
-import "../chunk-YAVZZUIL.js";
+import "../chunk-XUPMFYH7.js";
+import "../chunk-C2E2VQZA.js";
+import "../chunk-7KFXR7FV.js";
 import "../chunk-PBA67OV4.js";
 import "../chunk-S3QIIFH7.js";
 import "../chunk-SKBLJA43.js";
-import "../chunk-FOIIOIVJ.js";
-import "../chunk-HYTAZOQJ.js";
-import "../chunk-3IV7S3VF.js";
+import "../chunk-QL6ZC3U3.js";
+import "../chunk-WYO7JO2T.js";
+import "../chunk-EP5JHXG2.js";
 import "../chunk-GLCRIILX.js";
-import "../chunk-5VGHS4A4.js";
+import "../chunk-XA5IZLLC.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/main-ngcc.mjs
 process.title = "ngcc";

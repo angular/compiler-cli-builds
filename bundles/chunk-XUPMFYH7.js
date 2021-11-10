@@ -10,7 +10,7 @@ import {
   MetadataDtsModuleScopeResolver,
   TypeCheckScopeRegistry,
   readConfiguration
-} from "./chunk-NU5UC7J7.js";
+} from "./chunk-C2E2VQZA.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -33,7 +33,7 @@ import {
   isFatalDiagnosticError,
   readBaseClass,
   replaceTsWithNgInErrors
-} from "./chunk-YAVZZUIL.js";
+} from "./chunk-7KFXR7FV.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -52,7 +52,7 @@ import {
 import {
   ContentOrigin,
   SourceFileLoader
-} from "./chunk-FOIIOIVJ.js";
+} from "./chunk-QL6ZC3U3.js";
 import {
   AbsoluteModuleStrategy,
   ImportManager,
@@ -71,7 +71,7 @@ import {
   translateStatement,
   translateType,
   validateAndRewriteCoreSymbol
-} from "./chunk-HYTAZOQJ.js";
+} from "./chunk-WYO7JO2T.js";
 import {
   LogicalFileSystem,
   NgtscCompilerHost,
@@ -83,14 +83,14 @@ import {
   isRooted,
   relative,
   toRelativeImport
-} from "./chunk-3IV7S3VF.js";
+} from "./chunk-EP5JHXG2.js";
 import {
   NOOP_PERF_RECORDER
 } from "./chunk-GLCRIILX.js";
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-5VGHS4A4.js";
+} from "./chunk-XA5IZLLC.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/create_compile_function.mjs
 import ts23 from "typescript";
@@ -5102,4 +5102,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KYAHF24O.js.map
+//# sourceMappingURL=chunk-XUPMFYH7.js.map

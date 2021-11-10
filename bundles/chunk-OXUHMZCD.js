@@ -5,15 +5,15 @@
     
 import {
   SourceFileLoader
-} from "./chunk-FOIIOIVJ.js";
+} from "./chunk-QL6ZC3U3.js";
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-HYTAZOQJ.js";
+} from "./chunk-WYO7JO2T.js";
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-5VGHS4A4.js";
+} from "./chunk-XA5IZLLC.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.mjs
 var FatalLinkerError = class extends Error {
@@ -787,7 +787,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "13.1.0-next.0+64.sha-247c18d.with-local-changes");
+  const LATEST_VERSION_RANGE = getRange("<=", "13.1.0-next.0+68.sha-236bdff.with-local-changes");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -834,7 +834,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "13.1.0-next.0+64.sha-247c18d.with-local-changes") {
+    if (version === "13.1.0-next.0+68.sha-236bdff.with-local-changes") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -965,4 +965,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XR5J3AKU.js.map
+//# sourceMappingURL=chunk-OXUHMZCD.js.map
