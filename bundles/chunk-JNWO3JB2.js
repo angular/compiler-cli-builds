@@ -261,7 +261,7 @@ import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOL
 import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSourceFile, ParseSourceSpan } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
-import { createR3ProviderExpression, outputAst as o2 } from "@angular/compiler";
+import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -291,7 +291,7 @@ function getDependency(depObj) {
 }
 function extractForwardRef(expr) {
   if (!expr.isCallExpression()) {
-    return createR3ProviderExpression(expr.getOpaque(), false);
+    return createMayBeForwardRefExpression(expr.getOpaque(), 0);
   }
   const callee = expr.getCallee();
   if (callee.getSymbolName() !== "forwardRef") {
@@ -305,7 +305,7 @@ function extractForwardRef(expr) {
   if (!wrapperFn.isFunction()) {
     throw new FatalLinkerError(wrapperFn, "Unsupported `forwardRef(fn)` call, expected its argument to be a function");
   }
-  return createR3ProviderExpression(wrapperFn.getFunctionReturnValue().getOpaque(), true);
+  return createMayBeForwardRefExpression(wrapperFn.getFunctionReturnValue().getOpaque(), 2);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.mjs
@@ -388,7 +388,7 @@ function toQueryMetadata(obj) {
   if (predicateExpr.isArray()) {
     predicate = predicateExpr.getArray().map((entry) => entry.getString());
   } else {
-    predicate = predicateExpr.getOpaque();
+    predicate = extractForwardRef(predicateExpr);
   }
   return {
     propertyName: obj.getString("propertyName"),
@@ -442,8 +442,8 @@ ${errors}`);
         const directiveExpr = directive.getObject();
         const type = directiveExpr.getValue("type");
         const selector = directiveExpr.getString("selector");
-        const { expression: typeExpr, isForwardRef } = extractForwardRef(type);
-        if (isForwardRef) {
+        const { expression: typeExpr, forwardRef } = extractForwardRef(type);
+        if (forwardRef === 2) {
           declarationListEmitMode = 1;
         }
         return {
@@ -465,8 +465,8 @@ ${errors}`);
     let pipes = new Map();
     if (metaObj.has("pipes")) {
       pipes = metaObj.getObject("pipes").toMap((pipe) => {
-        const { expression: pipeType, isForwardRef } = extractForwardRef(pipe);
-        if (isForwardRef) {
+        const { expression: pipeType, forwardRef } = extractForwardRef(pipe);
+        if (forwardRef === 2) {
           declarationListEmitMode = 1;
         }
         return pipeType;
@@ -602,7 +602,7 @@ function getDependencies(metaObj, propName) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_injectable_linker_1.mjs
-import { compileInjectable, createR3ProviderExpression as createR3ProviderExpression2, outputAst as o3 } from "@angular/compiler";
+import { compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, outputAst as o3 } from "@angular/compiler";
 var PartialInjectableLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
     const meta = toR3InjectableMeta(metaObj);
@@ -621,7 +621,7 @@ function toR3InjectableMeta(metaObj) {
     type: wrapReference(typeExpr.getOpaque()),
     internalType: typeExpr.getOpaque(),
     typeArgumentCount: 0,
-    providedIn: metaObj.has("providedIn") ? extractForwardRef(metaObj.getValue("providedIn")) : createR3ProviderExpression2(o3.literal(null), false)
+    providedIn: metaObj.has("providedIn") ? extractForwardRef(metaObj.getValue("providedIn")) : createMayBeForwardRefExpression2(o3.literal(null), 0)
   };
   if (metaObj.has("useClass")) {
     meta.useClass = extractForwardRef(metaObj.getValue("useClass"));
@@ -787,7 +787,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "13.1.0-next.0+70.sha-ac7d5fa.with-local-changes");
+  const LATEST_VERSION_RANGE = getRange("<=", "13.1.0-next.0+74.sha-393efa5.with-local-changes");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -834,7 +834,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "13.1.0-next.0+70.sha-ac7d5fa.with-local-changes") {
+    if (version === "13.1.0-next.0+74.sha-393efa5.with-local-changes") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -965,4 +965,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-OXUHMZCD.js.map
+//# sourceMappingURL=chunk-JNWO3JB2.js.map
