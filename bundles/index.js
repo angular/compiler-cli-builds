@@ -446,7 +446,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.0.0+54.sha-5eac434.with-local-changes");
+var VERSION = new Version("13.0.0+68.sha-30a27ad.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/collector.mjs
 import ts4 from "typescript";
@@ -14580,12 +14580,7 @@ var TcbDirectiveInputsOp = class extends TcbOp {
     let dirId = null;
     const inputs = getBoundInputs(this.dir, this.node, this.tcb);
     for (const input of inputs) {
-      let expr = translateInput(input.attribute, this.tcb, this.scope);
-      if (!this.tcb.env.config.checkTypeOfInputBindings) {
-        expr = tsCastToAny(expr);
-      } else if (!this.tcb.env.config.strictNullInputBindings) {
-        expr = ts67.createNonNullExpression(expr);
-      }
+      const expr = widenBinding(translateInput(input.attribute, this.tcb, this.scope), this.tcb);
       let assignment = wrapForDiagnostics(expr);
       for (const fieldName of input.fieldNames) {
         let target;
@@ -14706,12 +14701,7 @@ var TcbUnclaimedInputsOp = class extends TcbOp {
       if (binding.type === 0 && this.claimedInputs.has(binding.name)) {
         continue;
       }
-      let expr = tcbExpression(binding.value, this.tcb, this.scope);
-      if (!this.tcb.env.config.checkTypeOfInputBindings) {
-        expr = tsCastToAny(expr);
-      } else if (!this.tcb.env.config.strictNullInputBindings) {
-        expr = ts67.createNonNullExpression(expr);
-      }
+      const expr = widenBinding(tcbExpression(binding.value, this.tcb, this.scope), this.tcb);
       if (this.tcb.env.config.checkTypeOfDomBindings && binding.type === 0) {
         if (binding.name !== "style" && binding.name !== "class") {
           if (elId === null) {
@@ -15196,12 +15186,7 @@ function tcbCallTypeCtor(dir, tcb, inputs) {
   const members = inputs.map((input) => {
     const propertyName = ts67.createStringLiteral(input.field);
     if (input.type === "binding") {
-      let expr = input.expression;
-      if (!tcb.env.config.checkTypeOfInputBindings) {
-        expr = tsCastToAny(expr);
-      } else if (!tcb.env.config.strictNullInputBindings) {
-        expr = ts67.createNonNullExpression(expr);
-      }
+      const expr = widenBinding(input.expression, tcb);
       const assignment = ts67.createPropertyAssignment(propertyName, wrapForDiagnostics(expr));
       addParseSpanInfo(assignment, input.sourceSpan);
       return assignment;
@@ -15236,6 +15221,19 @@ function translateInput(attr, tcb, scope) {
     return tcbExpression(attr.value, tcb, scope);
   } else {
     return ts67.createStringLiteral(attr.value);
+  }
+}
+function widenBinding(expr, tcb) {
+  if (!tcb.env.config.checkTypeOfInputBindings) {
+    return tsCastToAny(expr);
+  } else if (!tcb.env.config.strictNullInputBindings) {
+    if (ts67.isObjectLiteralExpression(expr) || ts67.isArrayLiteralExpression(expr)) {
+      return expr;
+    } else {
+      return ts67.createNonNullExpression(expr);
+    }
+  } else {
+    return expr;
   }
 }
 var EVENT_PARAMETER = "$event";
@@ -17445,7 +17443,14 @@ import ts74 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/diagnostics/typescript_version.mjs
 function toNumbers(value) {
-  return value.split(".").map(Number);
+  const suffixIndex = value.lastIndexOf("-");
+  return value.slice(0, suffixIndex === -1 ? value.length : suffixIndex).split(".").map((segment) => {
+    const parsed = parseInt(segment, 10);
+    if (isNaN(parsed)) {
+      throw Error(`Unable to parse version string ${value}.`);
+    }
+    return parsed;
+  });
 }
 function compareNumbers(a, b) {
   const max = Math.max(a.length, b.length);

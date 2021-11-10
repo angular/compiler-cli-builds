@@ -13651,7 +13651,7 @@ function getCreateCompileFn(fileSystem, logger, fileWriter, enableI18nLegacyMess
         onTaskCompleted(task, 1, `property \`${formatProperty}\` pointing to a missing or empty file: ${formatPath}`);
         return;
       }
-      logger.info(`Compiling ${entryPoint.name} : ${formatProperty} as ${format}`);
+      logger.info(`- ${entryPoint.name} [${formatProperty}/${format}] (${entryPoint.repositoryUrl})`);
       const bundle = makeEntryPointBundle(fileSystem, entryPoint, sharedFileCache, moduleResolutionCache, formatPath, isCore, format, processDts, pathMappings, true, enableI18nLegacyMessageIdFormat);
       const result = transformer.transform(bundle);
       if (result.success) {

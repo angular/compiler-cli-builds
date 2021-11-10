@@ -3551,6 +3551,7 @@ function getEntryPointInfo(fs5, config, logger, packagePath, entryPointPath) {
   const loadedPackagePackageJson = loadPackageJson(fs5, packagePackageJsonPath);
   const loadedEntryPointPackageJson = packagePackageJsonPath === entryPointPackageJsonPath ? loadedPackagePackageJson : loadPackageJson(fs5, entryPointPackageJsonPath);
   const { packageName, packageVersion } = getPackageNameAndVersion(fs5, packagePath, loadedPackagePackageJson, loadedEntryPointPackageJson);
+  const repositoryUrl = getRepositoryUrl(loadedPackagePackageJson);
   const packageConfig = config.getPackageConfig(packageName, packagePath, packageVersion);
   const entryPointConfig = packageConfig.entryPoints.get(entryPointPath);
   let entryPointPackageJson;
@@ -3579,6 +3580,7 @@ function getEntryPointInfo(fs5, config, logger, packagePath, entryPointPath) {
     path: entryPointPath,
     packageName,
     packagePath,
+    repositoryUrl,
     packageJson: entryPointPackageJson,
     typings: fs5.resolve(entryPointPath, typings),
     compiledByAngular,
@@ -3686,6 +3688,15 @@ function getPackageNameAndVersion(fs5, packagePath, packagePackageJson, entryPoi
     packageName,
     packageVersion: (_a = packagePackageJson == null ? void 0 : packagePackageJson.version) != null ? _a : null
   };
+}
+function getRepositoryUrl(packageJson) {
+  if ((packageJson == null ? void 0 : packageJson.repository) === void 0) {
+    return "";
+  }
+  if (typeof packageJson.repository === "string") {
+    return packageJson.repository;
+  }
+  return packageJson.repository.url;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/dependencies/dependency_resolver.mjs
@@ -4457,7 +4468,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "13.0.0+54.sha-5eac434.with-local-changes";
+var NGCC_VERSION = "13.0.0+68.sha-30a27ad.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -5034,6 +5045,7 @@ var ClusterMaster = class {
     if (this.taskQueue.allTasksCompleted) {
       return Promise.resolve();
     }
+    this.logger.info('Processing legacy "View Engine" libraries:');
     cluster2.on("message", this.wrapEventHandler((worker, msg) => this.onWorkerMessage(worker.id, msg)));
     cluster2.on("exit", this.wrapEventHandler((worker, code, signal) => this.onWorkerExit(worker, code, signal)));
     cluster2.fork();
@@ -5047,6 +5059,7 @@ var ClusterMaster = class {
     if (this.taskQueue.allTasksCompleted) {
       const duration = Math.round((Date.now() - this.processingStartTime) / 100) / 10;
       this.logger.debug(`Processed tasks in ${duration}s.`);
+      this.logger.info("Encourage the library authors to publish an Ivy distribution.");
       return this.finishedDeferred.resolve();
     }
     for (const [workerId, assignedTask] of Array.from(this.taskAssignments)) {
@@ -5671,88 +5684,6 @@ import ts61 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/analysis/decoration_analyzer.mjs
 import { ConstantPool as ConstantPool2 } from "@angular/compiler";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/api.mjs
-var PerfPhase;
-(function(PerfPhase2) {
-  PerfPhase2[PerfPhase2["Unaccounted"] = 0] = "Unaccounted";
-  PerfPhase2[PerfPhase2["Setup"] = 1] = "Setup";
-  PerfPhase2[PerfPhase2["TypeScriptProgramCreate"] = 2] = "TypeScriptProgramCreate";
-  PerfPhase2[PerfPhase2["Reconciliation"] = 3] = "Reconciliation";
-  PerfPhase2[PerfPhase2["ResourceUpdate"] = 4] = "ResourceUpdate";
-  PerfPhase2[PerfPhase2["TypeScriptDiagnostics"] = 5] = "TypeScriptDiagnostics";
-  PerfPhase2[PerfPhase2["Analysis"] = 6] = "Analysis";
-  PerfPhase2[PerfPhase2["Resolve"] = 7] = "Resolve";
-  PerfPhase2[PerfPhase2["CycleDetection"] = 8] = "CycleDetection";
-  PerfPhase2[PerfPhase2["TcbGeneration"] = 9] = "TcbGeneration";
-  PerfPhase2[PerfPhase2["TcbUpdateProgram"] = 10] = "TcbUpdateProgram";
-  PerfPhase2[PerfPhase2["TypeScriptEmit"] = 11] = "TypeScriptEmit";
-  PerfPhase2[PerfPhase2["Compile"] = 12] = "Compile";
-  PerfPhase2[PerfPhase2["TtcAutocompletion"] = 13] = "TtcAutocompletion";
-  PerfPhase2[PerfPhase2["TtcDiagnostics"] = 14] = "TtcDiagnostics";
-  PerfPhase2[PerfPhase2["TtcSymbol"] = 15] = "TtcSymbol";
-  PerfPhase2[PerfPhase2["LsReferencesAndRenames"] = 16] = "LsReferencesAndRenames";
-  PerfPhase2[PerfPhase2["LsQuickInfo"] = 17] = "LsQuickInfo";
-  PerfPhase2[PerfPhase2["LsDefinition"] = 18] = "LsDefinition";
-  PerfPhase2[PerfPhase2["LsCompletions"] = 19] = "LsCompletions";
-  PerfPhase2[PerfPhase2["LsTcb"] = 20] = "LsTcb";
-  PerfPhase2[PerfPhase2["LsDiagnostics"] = 21] = "LsDiagnostics";
-  PerfPhase2[PerfPhase2["LsComponentLocations"] = 22] = "LsComponentLocations";
-  PerfPhase2[PerfPhase2["LsSignatureHelp"] = 23] = "LsSignatureHelp";
-  PerfPhase2[PerfPhase2["LAST"] = 24] = "LAST";
-})(PerfPhase || (PerfPhase = {}));
-var PerfEvent;
-(function(PerfEvent2) {
-  PerfEvent2[PerfEvent2["InputDtsFile"] = 0] = "InputDtsFile";
-  PerfEvent2[PerfEvent2["InputTsFile"] = 1] = "InputTsFile";
-  PerfEvent2[PerfEvent2["AnalyzeComponent"] = 2] = "AnalyzeComponent";
-  PerfEvent2[PerfEvent2["AnalyzeDirective"] = 3] = "AnalyzeDirective";
-  PerfEvent2[PerfEvent2["AnalyzeInjectable"] = 4] = "AnalyzeInjectable";
-  PerfEvent2[PerfEvent2["AnalyzeNgModule"] = 5] = "AnalyzeNgModule";
-  PerfEvent2[PerfEvent2["AnalyzePipe"] = 6] = "AnalyzePipe";
-  PerfEvent2[PerfEvent2["TraitAnalyze"] = 7] = "TraitAnalyze";
-  PerfEvent2[PerfEvent2["TraitReuseAnalysis"] = 8] = "TraitReuseAnalysis";
-  PerfEvent2[PerfEvent2["SourceFilePhysicalChange"] = 9] = "SourceFilePhysicalChange";
-  PerfEvent2[PerfEvent2["SourceFileLogicalChange"] = 10] = "SourceFileLogicalChange";
-  PerfEvent2[PerfEvent2["SourceFileReuseAnalysis"] = 11] = "SourceFileReuseAnalysis";
-  PerfEvent2[PerfEvent2["GenerateTcb"] = 12] = "GenerateTcb";
-  PerfEvent2[PerfEvent2["SkipGenerateTcbNoInline"] = 13] = "SkipGenerateTcbNoInline";
-  PerfEvent2[PerfEvent2["ReuseTypeCheckFile"] = 14] = "ReuseTypeCheckFile";
-  PerfEvent2[PerfEvent2["UpdateTypeCheckProgram"] = 15] = "UpdateTypeCheckProgram";
-  PerfEvent2[PerfEvent2["EmitSkipSourceFile"] = 16] = "EmitSkipSourceFile";
-  PerfEvent2[PerfEvent2["EmitSourceFile"] = 17] = "EmitSourceFile";
-  PerfEvent2[PerfEvent2["LAST"] = 18] = "LAST";
-})(PerfEvent || (PerfEvent = {}));
-var PerfCheckpoint;
-(function(PerfCheckpoint2) {
-  PerfCheckpoint2[PerfCheckpoint2["Initial"] = 0] = "Initial";
-  PerfCheckpoint2[PerfCheckpoint2["TypeScriptProgramCreate"] = 1] = "TypeScriptProgramCreate";
-  PerfCheckpoint2[PerfCheckpoint2["PreAnalysis"] = 2] = "PreAnalysis";
-  PerfCheckpoint2[PerfCheckpoint2["Analysis"] = 3] = "Analysis";
-  PerfCheckpoint2[PerfCheckpoint2["Resolve"] = 4] = "Resolve";
-  PerfCheckpoint2[PerfCheckpoint2["TtcGeneration"] = 5] = "TtcGeneration";
-  PerfCheckpoint2[PerfCheckpoint2["TtcUpdateProgram"] = 6] = "TtcUpdateProgram";
-  PerfCheckpoint2[PerfCheckpoint2["PreEmit"] = 7] = "PreEmit";
-  PerfCheckpoint2[PerfCheckpoint2["Emit"] = 8] = "Emit";
-  PerfCheckpoint2[PerfCheckpoint2["LAST"] = 9] = "LAST";
-})(PerfCheckpoint || (PerfCheckpoint = {}));
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/noop.mjs
-var NoopPerfRecorder = class {
-  eventCount() {
-  }
-  memory() {
-  }
-  phase() {
-    return PerfPhase.Unaccounted;
-  }
-  inPhase(phase, fn) {
-    return fn();
-  }
-  reset() {
-  }
-};
-var NOOP_PERF_RECORDER = new NoopPerfRecorder();
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/component.mjs
 import { compileClassMetadata as compileClassMetadata3, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector, DEFAULT_INTERPOLATION_CONFIG, DomElementSchemaRegistry, ExternalExpr as ExternalExpr7, FactoryTarget as FactoryTarget3, InterpolationConfig, makeBindingParser as makeBindingParser2, ParseSourceFile as ParseSourceFile2, parseTemplate, R3TargetBinder, SelectorMatcher, ViewEncapsulation, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
@@ -7707,6 +7638,88 @@ var PartialEvaluator = class {
     });
   }
 };
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/api.mjs
+var PerfPhase;
+(function(PerfPhase2) {
+  PerfPhase2[PerfPhase2["Unaccounted"] = 0] = "Unaccounted";
+  PerfPhase2[PerfPhase2["Setup"] = 1] = "Setup";
+  PerfPhase2[PerfPhase2["TypeScriptProgramCreate"] = 2] = "TypeScriptProgramCreate";
+  PerfPhase2[PerfPhase2["Reconciliation"] = 3] = "Reconciliation";
+  PerfPhase2[PerfPhase2["ResourceUpdate"] = 4] = "ResourceUpdate";
+  PerfPhase2[PerfPhase2["TypeScriptDiagnostics"] = 5] = "TypeScriptDiagnostics";
+  PerfPhase2[PerfPhase2["Analysis"] = 6] = "Analysis";
+  PerfPhase2[PerfPhase2["Resolve"] = 7] = "Resolve";
+  PerfPhase2[PerfPhase2["CycleDetection"] = 8] = "CycleDetection";
+  PerfPhase2[PerfPhase2["TcbGeneration"] = 9] = "TcbGeneration";
+  PerfPhase2[PerfPhase2["TcbUpdateProgram"] = 10] = "TcbUpdateProgram";
+  PerfPhase2[PerfPhase2["TypeScriptEmit"] = 11] = "TypeScriptEmit";
+  PerfPhase2[PerfPhase2["Compile"] = 12] = "Compile";
+  PerfPhase2[PerfPhase2["TtcAutocompletion"] = 13] = "TtcAutocompletion";
+  PerfPhase2[PerfPhase2["TtcDiagnostics"] = 14] = "TtcDiagnostics";
+  PerfPhase2[PerfPhase2["TtcSymbol"] = 15] = "TtcSymbol";
+  PerfPhase2[PerfPhase2["LsReferencesAndRenames"] = 16] = "LsReferencesAndRenames";
+  PerfPhase2[PerfPhase2["LsQuickInfo"] = 17] = "LsQuickInfo";
+  PerfPhase2[PerfPhase2["LsDefinition"] = 18] = "LsDefinition";
+  PerfPhase2[PerfPhase2["LsCompletions"] = 19] = "LsCompletions";
+  PerfPhase2[PerfPhase2["LsTcb"] = 20] = "LsTcb";
+  PerfPhase2[PerfPhase2["LsDiagnostics"] = 21] = "LsDiagnostics";
+  PerfPhase2[PerfPhase2["LsComponentLocations"] = 22] = "LsComponentLocations";
+  PerfPhase2[PerfPhase2["LsSignatureHelp"] = 23] = "LsSignatureHelp";
+  PerfPhase2[PerfPhase2["LAST"] = 24] = "LAST";
+})(PerfPhase || (PerfPhase = {}));
+var PerfEvent;
+(function(PerfEvent2) {
+  PerfEvent2[PerfEvent2["InputDtsFile"] = 0] = "InputDtsFile";
+  PerfEvent2[PerfEvent2["InputTsFile"] = 1] = "InputTsFile";
+  PerfEvent2[PerfEvent2["AnalyzeComponent"] = 2] = "AnalyzeComponent";
+  PerfEvent2[PerfEvent2["AnalyzeDirective"] = 3] = "AnalyzeDirective";
+  PerfEvent2[PerfEvent2["AnalyzeInjectable"] = 4] = "AnalyzeInjectable";
+  PerfEvent2[PerfEvent2["AnalyzeNgModule"] = 5] = "AnalyzeNgModule";
+  PerfEvent2[PerfEvent2["AnalyzePipe"] = 6] = "AnalyzePipe";
+  PerfEvent2[PerfEvent2["TraitAnalyze"] = 7] = "TraitAnalyze";
+  PerfEvent2[PerfEvent2["TraitReuseAnalysis"] = 8] = "TraitReuseAnalysis";
+  PerfEvent2[PerfEvent2["SourceFilePhysicalChange"] = 9] = "SourceFilePhysicalChange";
+  PerfEvent2[PerfEvent2["SourceFileLogicalChange"] = 10] = "SourceFileLogicalChange";
+  PerfEvent2[PerfEvent2["SourceFileReuseAnalysis"] = 11] = "SourceFileReuseAnalysis";
+  PerfEvent2[PerfEvent2["GenerateTcb"] = 12] = "GenerateTcb";
+  PerfEvent2[PerfEvent2["SkipGenerateTcbNoInline"] = 13] = "SkipGenerateTcbNoInline";
+  PerfEvent2[PerfEvent2["ReuseTypeCheckFile"] = 14] = "ReuseTypeCheckFile";
+  PerfEvent2[PerfEvent2["UpdateTypeCheckProgram"] = 15] = "UpdateTypeCheckProgram";
+  PerfEvent2[PerfEvent2["EmitSkipSourceFile"] = 16] = "EmitSkipSourceFile";
+  PerfEvent2[PerfEvent2["EmitSourceFile"] = 17] = "EmitSourceFile";
+  PerfEvent2[PerfEvent2["LAST"] = 18] = "LAST";
+})(PerfEvent || (PerfEvent = {}));
+var PerfCheckpoint;
+(function(PerfCheckpoint2) {
+  PerfCheckpoint2[PerfCheckpoint2["Initial"] = 0] = "Initial";
+  PerfCheckpoint2[PerfCheckpoint2["TypeScriptProgramCreate"] = 1] = "TypeScriptProgramCreate";
+  PerfCheckpoint2[PerfCheckpoint2["PreAnalysis"] = 2] = "PreAnalysis";
+  PerfCheckpoint2[PerfCheckpoint2["Analysis"] = 3] = "Analysis";
+  PerfCheckpoint2[PerfCheckpoint2["Resolve"] = 4] = "Resolve";
+  PerfCheckpoint2[PerfCheckpoint2["TtcGeneration"] = 5] = "TtcGeneration";
+  PerfCheckpoint2[PerfCheckpoint2["TtcUpdateProgram"] = 6] = "TtcUpdateProgram";
+  PerfCheckpoint2[PerfCheckpoint2["PreEmit"] = 7] = "PreEmit";
+  PerfCheckpoint2[PerfCheckpoint2["Emit"] = 8] = "Emit";
+  PerfCheckpoint2[PerfCheckpoint2["LAST"] = 9] = "LAST";
+})(PerfCheckpoint || (PerfCheckpoint = {}));
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/noop.mjs
+var NoopPerfRecorder = class {
+  eventCount() {
+  }
+  memory() {
+  }
+  phase() {
+    return PerfPhase.Unaccounted;
+  }
+  inPhase(phase, fn) {
+    return fn();
+  }
+  reset() {
+  }
+};
+var NOOP_PERF_RECORDER = new NoopPerfRecorder();
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/api.mjs
 var CompilationMode;
@@ -14564,7 +14577,7 @@ function getCreateCompileFn(fileSystem, logger, fileWriter, enableI18nLegacyMess
         onTaskCompleted(task, 1, `property \`${formatProperty}\` pointing to a missing or empty file: ${formatPath}`);
         return;
       }
-      logger.info(`Compiling ${entryPoint.name} : ${formatProperty} as ${format}`);
+      logger.info(`- ${entryPoint.name} [${formatProperty}/${format}] (${entryPoint.repositoryUrl})`);
       const bundle = makeEntryPointBundle(fileSystem, entryPoint, sharedFileCache, moduleResolutionCache, formatPath, isCore, format, processDts, pathMappings, true, enableI18nLegacyMessageIdFormat);
       const result = transformer.transform(bundle);
       if (result.success) {

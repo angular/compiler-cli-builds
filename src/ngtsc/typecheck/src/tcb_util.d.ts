@@ -7,8 +7,8 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/tcb_util" />
 import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
-import { ClassDeclaration, ReflectionHost } from '@angular/compiler-cli/src/ngtsc/reflection';
 import ts from 'typescript';
+import { ClassDeclaration, ReflectionHost } from '../../../../src/ngtsc/reflection';
 import { Reference } from '../../imports';
 import { FullTemplateMapping, SourceLocation, TemplateId, TemplateSourceMapping } from '../api';
 /**
