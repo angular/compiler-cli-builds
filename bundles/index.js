@@ -446,7 +446,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.0.2+11.sha-427822e.with-local-changes");
+var VERSION = new Version("13.0.2+19.sha-6e351ed.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/collector.mjs
 import ts4 from "typescript";
@@ -5464,6 +5464,24 @@ var ArrayConcatBuiltinFn = class extends KnownFn {
     return result;
   }
 };
+var StringConcatBuiltinFn = class extends KnownFn {
+  constructor(lhs) {
+    super();
+    this.lhs = lhs;
+  }
+  evaluate(node, args) {
+    let result = this.lhs;
+    for (const arg of args) {
+      const resolved = arg instanceof EnumValue ? arg.resolved : arg;
+      if (typeof resolved === "string" || typeof resolved === "number" || typeof resolved === "boolean" || resolved == null) {
+        result = result.concat(resolved);
+      } else {
+        return DynamicValue.fromUnknown(node);
+      }
+    }
+    return result;
+  }
+};
 var ObjectAssignBuiltinFn = class extends KnownFn {
   evaluate(node, args) {
     if (args.length === 0) {
@@ -5853,6 +5871,8 @@ var StaticInterpreter = class {
         return DynamicValue.fromInvalidExpressionType(node, rhs);
       }
       return lhs[rhs];
+    } else if (typeof lhs === "string" && rhs === "concat") {
+      return new StringConcatBuiltinFn(lhs);
     } else if (lhs instanceof Reference) {
       const ref = lhs.node;
       if (this.host.isClass(ref)) {

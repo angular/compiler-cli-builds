@@ -1170,6 +1170,24 @@ var ArrayConcatBuiltinFn = class extends KnownFn {
     return result;
   }
 };
+var StringConcatBuiltinFn = class extends KnownFn {
+  constructor(lhs) {
+    super();
+    this.lhs = lhs;
+  }
+  evaluate(node, args) {
+    let result = this.lhs;
+    for (const arg of args) {
+      const resolved = arg instanceof EnumValue ? arg.resolved : arg;
+      if (typeof resolved === "string" || typeof resolved === "number" || typeof resolved === "boolean" || resolved == null) {
+        result = result.concat(resolved);
+      } else {
+        return DynamicValue.fromUnknown(node);
+      }
+    }
+    return result;
+  }
+};
 var ObjectAssignBuiltinFn = class extends KnownFn {
   evaluate(node, args) {
     if (args.length === 0) {
@@ -1559,6 +1577,8 @@ var StaticInterpreter = class {
         return DynamicValue.fromInvalidExpressionType(node, rhs);
       }
       return lhs[rhs];
+    } else if (typeof lhs === "string" && rhs === "concat") {
+      return new StringConcatBuiltinFn(lhs);
     } else if (lhs instanceof Reference) {
       const ref = lhs.node;
       if (this.host.isClass(ref)) {
