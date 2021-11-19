@@ -32,7 +32,7 @@ import {
   makeRelatedInformation,
   ngErrorCode,
   replaceTsWithNgInErrors
-} from "./chunk-MIQ5UCHZ.js";
+} from "./chunk-GW5PWKBP.js";
 import {
   getDownlevelDecoratorsTransform
 } from "./chunk-PBA67OV4.js";
@@ -11994,4 +11994,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-VKIZ4TCJ.js.map
+//# sourceMappingURL=chunk-LS3MUQ6Q.js.map

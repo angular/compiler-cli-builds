@@ -18,6 +18,11 @@ export declare class ArrayConcatBuiltinFn extends KnownFn {
     constructor(lhs: ResolvedValueArray);
     evaluate(node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
 }
+export declare class StringConcatBuiltinFn extends KnownFn {
+    private lhs;
+    constructor(lhs: string);
+    evaluate(node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
+}
 export declare class ObjectAssignBuiltinFn extends KnownFn {
     evaluate(node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
 }

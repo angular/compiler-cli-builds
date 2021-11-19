@@ -10,7 +10,7 @@ import {
   MetadataDtsModuleScopeResolver,
   TypeCheckScopeRegistry,
   readConfiguration
-} from "./chunk-VKIZ4TCJ.js";
+} from "./chunk-LS3MUQ6Q.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -33,7 +33,7 @@ import {
   isFatalDiagnosticError,
   readBaseClass,
   replaceTsWithNgInErrors
-} from "./chunk-MIQ5UCHZ.js";
+} from "./chunk-GW5PWKBP.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -5102,4 +5102,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2DL256T3.js.map
+//# sourceMappingURL=chunk-H3IDPHFD.js.map
