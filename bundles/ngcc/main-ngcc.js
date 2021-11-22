@@ -4468,7 +4468,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "13.0.2+22.sha-76adfc0.with-local-changes";
+var NGCC_VERSION = "13.0.2+26.sha-6f5c0c1.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -14798,8 +14798,8 @@ var ConsoleLogger = class {
 import module4 from "module";
 function getLockFilePath(fs5) {
   const requireFn = typeof __require !== "undefined" ? __require : module4.createRequire(__ESM_IMPORT_META_URL__);
-  const ngccEntryPointFile = requireFn.resolve("@angular/compiler-cli/ngcc");
-  return fs5.resolve(ngccEntryPointFile, "../__ngcc_lock_file__");
+  const ngccEntryPointFile = requireFn.resolve("@angular/compiler-cli/package.json");
+  return fs5.resolve(ngccEntryPointFile, "../../../.ngcc_lock_file");
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/locking/lock_file_with_child_process/util.mjs
