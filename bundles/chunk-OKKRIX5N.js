@@ -887,7 +887,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "13.1.0-next.2+28.sha-6214636.with-local-changes";
+var NGCC_VERSION = "13.1.0-next.2+31.sha-24b6353.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -1701,8 +1701,8 @@ import module4 from "module";
 import module3 from "module";
 function getLockFilePath(fs) {
   const requireFn = typeof __require !== "undefined" ? __require : module3.createRequire(__ESM_IMPORT_META_URL__);
-  const ngccEntryPointFile = requireFn.resolve("@angular/compiler-cli/ngcc");
-  return fs.resolve(ngccEntryPointFile, "../__ngcc_lock_file__");
+  const ngccEntryPointFile = requireFn.resolve("@angular/compiler-cli/package.json");
+  return fs.resolve(ngccEntryPointFile, "../../../.ngcc_lock_file");
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/locking/lock_file_with_child_process/index.mjs
@@ -2174,4 +2174,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4TBIPZB5.js.map
+//# sourceMappingURL=chunk-OKKRIX5N.js.map
