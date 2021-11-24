@@ -15,7 +15,7 @@ import { Import, ImportManager } from '../../../src/ngtsc/translator';
 import { ModuleWithProvidersInfo } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
 import { CompiledClass } from '../analysis/types';
-import { NgccReflectionHost, SwitchableVariableDeclaration } from '../host/ngcc_host';
+import { NgccReflectionHost } from '../host/ngcc_host';
 import { RedundantDecoratorMap, RenderingFormatter } from './rendering_formatter';
 /**
  * A RenderingFormatter that works with ECMAScript Module import and export statements.
@@ -57,10 +57,6 @@ export declare class EsmRenderingFormatter implements RenderingFormatter {
      * Remove static decorator properties from classes.
      */
     removeDecorators(output: MagicString, decoratorsToRemove: RedundantDecoratorMap): void;
-    /**
-     * Rewrite the IVY switch markers to indicate we are in IVY mode.
-     */
-    rewriteSwitchableDeclarations(outputText: MagicString, sourceFile: ts.SourceFile, declarations: SwitchableVariableDeclaration[]): void;
     /**
      * Add the type parameters to the appropriate functions that return `ModuleWithProviders`
      * structures.

@@ -10,7 +10,7 @@ import ts from 'typescript';
 import { Logger } from '../../../src/ngtsc/logging';
 import { ClassDeclaration, ClassMember, ClassMemberKind, CtorParameter, Declaration, DeclarationNode, Decorator, EnumMember, TypeScriptReflectionHost } from '../../../src/ngtsc/reflection';
 import { BundleProgram } from '../packages/bundle_program';
-import { NgccClassSymbol, NgccReflectionHost, SwitchableVariableDeclaration } from './ngcc_host';
+import { NgccClassSymbol, NgccReflectionHost } from './ngcc_host';
 export declare const DECORATORS: ts.__String;
 export declare const PROP_DECORATORS: ts.__String;
 export declare const CONSTRUCTOR: ts.__String;
@@ -186,13 +186,6 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
      * injected by a migration will not be present in the returned collection.
      */
     getDecoratorsOfSymbol(symbol: NgccClassSymbol): Decorator[] | null;
-    /**
-     * Search the given module for variable declarations in which the initializer
-     * is an identifier marked with the `PRE_R3_MARKER`.
-     * @param module the module in which to search for switchable declarations.
-     * @returns an array of variable declarations that match.
-     */
-    getSwitchableDeclarations(module: ts.Node): SwitchableVariableDeclaration[];
     getVariableValue(declaration: ts.VariableDeclaration): ts.Expression | null;
     /**
      * Find all top-level class symbols in the given file.

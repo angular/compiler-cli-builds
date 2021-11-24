@@ -13,7 +13,6 @@ import { Logger } from '../../../src/ngtsc/logging';
 import { ImportManager } from '../../../src/ngtsc/translator';
 import { ParsedConfiguration } from '../../../src/perform_compile';
 import { PrivateDeclarationsAnalyses } from '../analysis/private_declarations_analyzer';
-import { SwitchMarkerAnalyses, SwitchMarkerAnalysis } from '../analysis/switch_marker_analyzer';
 import { CompiledFile, DecorationAnalyses } from '../analysis/types';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { EntryPointBundle } from '../packages/entry_point_bundle';
@@ -33,13 +32,13 @@ export declare class Renderer {
     private bundle;
     private tsConfig;
     constructor(host: NgccReflectionHost, srcFormatter: RenderingFormatter, fs: ReadonlyFileSystem, logger: Logger, bundle: EntryPointBundle, tsConfig?: ParsedConfiguration | null);
-    renderProgram(decorationAnalyses: DecorationAnalyses, switchMarkerAnalyses: SwitchMarkerAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileToWrite[];
+    renderProgram(decorationAnalyses: DecorationAnalyses, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileToWrite[];
     /**
      * Render the source code and source-map for an Analyzed file.
      * @param compiledFile The analyzed file to render.
      * @param targetPath The absolute path where the rendered file will be written.
      */
-    renderFile(sourceFile: ts.SourceFile, compiledFile: CompiledFile | undefined, switchMarkerAnalysis: SwitchMarkerAnalysis | undefined, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileToWrite[];
+    renderFile(sourceFile: ts.SourceFile, compiledFile: CompiledFile | undefined, privateDeclarationsAnalyses: PrivateDeclarationsAnalyses): FileToWrite[];
     /**
      * From the given list of classes, computes a map of decorators that should be removed.
      * The decorators to remove are keyed by their container node, such that we can tell if

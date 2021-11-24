@@ -12,7 +12,6 @@ import { ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
 import { Logger } from '../../../src/ngtsc/logging';
 import { ModuleWithProvidersAnalyses } from '../analysis/module_with_providers_analyzer';
 import { ExportInfo } from '../analysis/private_declarations_analyzer';
-import { SwitchMarkerAnalyses } from '../analysis/switch_marker_analyzer';
 import { CompiledFile } from '../analysis/types';
 import { NgccReflectionHost } from '../host/ngcc_host';
 import { RenderingFormatter } from '../rendering/rendering_formatter';
@@ -65,7 +64,6 @@ export declare class Transformer {
 export declare function hasErrors(diagnostics: ts.Diagnostic[]): boolean;
 interface ProgramAnalyses {
     decorationAnalyses: Map<ts.SourceFile, CompiledFile>;
-    switchMarkerAnalyses: SwitchMarkerAnalyses;
     privateDeclarationsAnalyses: ExportInfo[];
     moduleWithProvidersAnalyses: ModuleWithProvidersAnalyses | null;
     diagnostics: ts.Diagnostic[];
