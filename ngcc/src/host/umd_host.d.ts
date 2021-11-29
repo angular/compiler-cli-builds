@@ -79,5 +79,8 @@ export declare function getImportsOfUmdModule(umdModule: UmdModule): {
 interface UmdModule {
     wrapperFn: ts.FunctionExpression;
     factoryFn: ts.FunctionExpression;
+    factoryCalls: Record<'amdDefine' | 'commonJs' | 'commonJs2' | 'global', ts.CallExpression | null> & {
+        cjsCallForImports: ts.CallExpression;
+    };
 }
 export {};

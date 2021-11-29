@@ -10726,7 +10726,17 @@ function parseStatementForUmdModule(statement) {
   const factoryFn = stripParentheses(wrapper.call.arguments[factoryFnParamIndex]);
   if (!factoryFn || !ts91.isFunctionExpression(factoryFn))
     return null;
-  return { wrapperFn: wrapper.fn, factoryFn };
+  let factoryCalls = null;
+  return {
+    wrapperFn: wrapper.fn,
+    factoryFn,
+    get factoryCalls() {
+      if (factoryCalls === null) {
+        factoryCalls = parseUmdWrapperFunction(this.wrapperFn);
+      }
+      return factoryCalls;
+    }
+  };
 }
 function getUmdWrapper(statement) {
   if (!ts91.isExpressionStatement(statement))
@@ -10743,34 +10753,140 @@ function getUmdWrapper(statement) {
   }
   return null;
 }
+function parseUmdWrapperFunction(wrapperFn) {
+  const stmt = wrapperFn.body.statements[0];
+  let conditionalFactoryCalls;
+  if (ts91.isExpressionStatement(stmt) && ts91.isConditionalExpression(stmt.expression)) {
+    conditionalFactoryCalls = extractFactoryCallsFromConditionalExpression(stmt.expression);
+  } else if (ts91.isIfStatement(stmt)) {
+    conditionalFactoryCalls = extractFactoryCallsFromIfStatement(stmt);
+  } else {
+    throw new Error("UMD wrapper body is not in a supported format (expected a conditional expression or if statement):\n" + wrapperFn.body.getText());
+  }
+  const amdDefine = getAmdDefineCall(conditionalFactoryCalls);
+  const commonJs = getCommonJsFactoryCall(conditionalFactoryCalls);
+  const commonJs2 = getCommonJs2FactoryCall(conditionalFactoryCalls);
+  const global = getGlobalFactoryCall(conditionalFactoryCalls);
+  const cjsCallForImports = commonJs2 || commonJs;
+  if (cjsCallForImports === null) {
+    throw new Error("Unable to find a CommonJS or CommonJS2 factory call inside the UMD wrapper function:\n" + stmt.getText());
+  }
+  return { amdDefine, commonJs, commonJs2, global, cjsCallForImports };
+}
+function extractFactoryCallsFromConditionalExpression(node) {
+  const factoryCalls = [];
+  let currentNode = node;
+  while (ts91.isConditionalExpression(currentNode)) {
+    if (!ts91.isBinaryExpression(currentNode.condition)) {
+      throw new Error("Condition inside UMD wrapper is not a binary expression:\n" + currentNode.condition.getText());
+    }
+    factoryCalls.push({
+      condition: currentNode.condition,
+      factoryCall: getFunctionCallFromExpression(currentNode.whenTrue)
+    });
+    currentNode = currentNode.whenFalse;
+  }
+  factoryCalls.push({
+    condition: null,
+    factoryCall: getFunctionCallFromExpression(currentNode)
+  });
+  return factoryCalls;
+}
+function extractFactoryCallsFromIfStatement(node) {
+  const factoryCalls = [];
+  let currentNode = node;
+  while (currentNode && ts91.isIfStatement(currentNode)) {
+    if (!ts91.isBinaryExpression(currentNode.expression)) {
+      throw new Error("Condition inside UMD wrapper is not a binary expression:\n" + currentNode.expression.getText());
+    }
+    if (!ts91.isExpressionStatement(currentNode.thenStatement)) {
+      throw new Error("Then-statement inside UMD wrapper is not an expression statement:\n" + currentNode.thenStatement.getText());
+    }
+    factoryCalls.push({
+      condition: currentNode.expression,
+      factoryCall: getFunctionCallFromExpression(currentNode.thenStatement.expression)
+    });
+    currentNode = currentNode.elseStatement;
+  }
+  if (currentNode) {
+    if (!ts91.isExpressionStatement(currentNode)) {
+      throw new Error("Else-statement inside UMD wrapper is not an expression statement:\n" + currentNode.getText());
+    }
+    factoryCalls.push({
+      condition: null,
+      factoryCall: getFunctionCallFromExpression(currentNode.expression)
+    });
+  }
+  return factoryCalls;
+}
+function getFunctionCallFromExpression(node) {
+  if (ts91.isParenthesizedExpression(node)) {
+    return getFunctionCallFromExpression(node.expression);
+  }
+  if (ts91.isBinaryExpression(node) && [ts91.SyntaxKind.CommaToken, ts91.SyntaxKind.EqualsToken].includes(node.operatorToken.kind)) {
+    return getFunctionCallFromExpression(node.right);
+  }
+  if (!ts91.isCallExpression(node)) {
+    throw new Error("Expression inside UMD wrapper is not a call expression:\n" + node.getText());
+  }
+  return node;
+}
+function getAmdDefineCall(calls) {
+  var _a;
+  const amdConditionalCall = calls.find((call) => {
+    var _a2;
+    return ((_a2 = call.condition) == null ? void 0 : _a2.operatorToken.kind) === ts91.SyntaxKind.AmpersandAmpersandToken && oneOfBinaryConditions(call.condition, (exp) => isTypeOf(exp, "define")) && ts91.isIdentifier(call.factoryCall.expression) && call.factoryCall.expression.text === "define";
+  });
+  return (_a = amdConditionalCall == null ? void 0 : amdConditionalCall.factoryCall) != null ? _a : null;
+}
+function getCommonJsFactoryCall(calls) {
+  var _a;
+  const cjsConditionalCall = calls.find((call) => {
+    var _a2;
+    return ((_a2 = call.condition) == null ? void 0 : _a2.operatorToken.kind) === ts91.SyntaxKind.EqualsEqualsEqualsToken && isTypeOf(call.condition, "exports") && ts91.isIdentifier(call.factoryCall.expression) && call.factoryCall.expression.text === "factory";
+  });
+  return (_a = cjsConditionalCall == null ? void 0 : cjsConditionalCall.factoryCall) != null ? _a : null;
+}
+function getCommonJs2FactoryCall(calls) {
+  var _a;
+  const cjs2ConditionalCall = calls.find((call) => {
+    var _a2;
+    return ((_a2 = call.condition) == null ? void 0 : _a2.operatorToken.kind) === ts91.SyntaxKind.AmpersandAmpersandToken && oneOfBinaryConditions(call.condition, (exp) => isTypeOf(exp, "exports", "module")) && ts91.isIdentifier(call.factoryCall.expression) && call.factoryCall.expression.text === "factory";
+  });
+  return (_a = cjs2ConditionalCall == null ? void 0 : cjs2ConditionalCall.factoryCall) != null ? _a : null;
+}
+function getGlobalFactoryCall(calls) {
+  var _a;
+  const globalConditionalCall = calls.find((call) => call.condition === null);
+  return (_a = globalConditionalCall == null ? void 0 : globalConditionalCall.factoryCall) != null ? _a : null;
+}
+function oneOfBinaryConditions(node, test) {
+  return test(node.left) || test(node.right);
+}
+function isTypeOf(node, ...types) {
+  return ts91.isBinaryExpression(node) && ts91.isTypeOfExpression(node.left) && ts91.isIdentifier(node.left.expression) && types.includes(node.left.expression.text);
+}
 function getImportsOfUmdModule(umdModule) {
   const imports = [];
-  for (let i = 1; i < umdModule.factoryFn.parameters.length; i++) {
-    imports.push({
-      parameter: umdModule.factoryFn.parameters[i],
-      path: getRequiredModulePath(umdModule.wrapperFn, i)
-    });
+  const cjsFactoryCall = umdModule.factoryCalls.cjsCallForImports;
+  const depStartIndex = cjsFactoryCall.arguments.findIndex((arg) => isRequireCall(arg));
+  if (depStartIndex !== -1) {
+    for (let i = depStartIndex; i < umdModule.factoryFn.parameters.length; i++) {
+      imports.push({
+        parameter: umdModule.factoryFn.parameters[i],
+        path: getRequiredModulePath(cjsFactoryCall, i)
+      });
+    }
   }
   return imports;
 }
-function getRequiredModulePath(wrapperFn, paramIndex) {
-  const statement = wrapperFn.body.statements[0];
-  if (!ts91.isExpressionStatement(statement)) {
-    throw new Error("UMD wrapper body is not an expression statement:\n" + wrapperFn.body.getText());
+function getRequiredModulePath(cjsFactoryCall, paramIndex) {
+  const requireCall = cjsFactoryCall.arguments[paramIndex];
+  if (requireCall !== void 0 && !isRequireCall(requireCall)) {
+    throw new Error(`Argument at index ${paramIndex} of UMD factory call is not a \`require\` call with a single string argument:
+` + cjsFactoryCall.getText());
   }
-  const modulePaths = [];
-  findModulePaths(statement.expression);
-  return modulePaths[paramIndex - 1];
-  function findModulePaths(node) {
-    if (isRequireCall(node)) {
-      const argument = node.arguments[0];
-      if (ts91.isStringLiteral(argument)) {
-        modulePaths.push(argument.text);
-      }
-    } else {
-      node.forEachChild(findModulePaths);
-    }
-  }
+  return requireCall.arguments[0].text;
 }
 function isExportsIdentifier(node) {
   return ts91.isIdentifier(node) && node.text === "exports";
@@ -13355,10 +13471,11 @@ var UmdRenderingFormatter = class extends Esm5RenderingFormatter {
     if (!umdModule) {
       return;
     }
-    const { wrapperFn, factoryFn } = umdModule;
-    renderCommonJsDependencies(output, wrapperFn, imports);
-    renderAmdDependencies(output, wrapperFn, imports);
-    renderGlobalDependencies(output, wrapperFn, imports);
+    const { factoryFn, factoryCalls } = umdModule;
+    renderCommonJsDependencies(output, factoryCalls.commonJs, imports);
+    renderCommonJsDependencies(output, factoryCalls.commonJs2, imports);
+    renderAmdDependencies(output, factoryCalls.amdDefine, imports);
+    renderGlobalDependencies(output, factoryCalls.global, imports);
     renderFactoryParameters(output, factoryFn, imports);
   }
   addExports(output, entryPointBasePath, exports, importManager, file) {
@@ -13409,22 +13526,18 @@ exports.${e.asAlias} = ${importNamespace}${namedImport.symbol};`;
     output.appendLeft(insertionPoint, "\n" + constants + "\n");
   }
 };
-function renderCommonJsDependencies(output, wrapperFunction, imports) {
-  const conditional = find(wrapperFunction.body.statements[0], isCommonJSConditional);
-  if (!conditional) {
+function renderCommonJsDependencies(output, factoryCall, imports) {
+  if (factoryCall === null) {
     return;
   }
-  const factoryCall = conditional.whenTrue;
   const injectionPoint = factoryCall.arguments.length > 0 ? factoryCall.arguments[0].getFullStart() : factoryCall.getEnd() - 1;
   const importString = imports.map((i) => `require('${i.specifier}')`).join(",");
   output.appendLeft(injectionPoint, importString + (factoryCall.arguments.length > 0 ? "," : ""));
 }
-function renderAmdDependencies(output, wrapperFunction, imports) {
-  const conditional = find(wrapperFunction.body.statements[0], isAmdConditional);
-  if (!conditional) {
+function renderAmdDependencies(output, amdDefineCall, imports) {
+  if (amdDefineCall === null) {
     return;
   }
-  const amdDefineCall = conditional.whenTrue;
   const importString = imports.map((i) => `'${i.specifier}'`).join(",");
   const factoryIndex = amdDefineCall.arguments.length - 1;
   const dependencyArray = amdDefineCall.arguments[factoryIndex - 1];
@@ -13436,14 +13549,13 @@ function renderAmdDependencies(output, wrapperFunction, imports) {
     output.appendLeft(injectionPoint, importString + (dependencyArray.elements.length > 0 ? "," : ""));
   }
 }
-function renderGlobalDependencies(output, wrapperFunction, imports) {
-  const globalFactoryCall = find(wrapperFunction.body.statements[0], isGlobalFactoryCall);
-  if (!globalFactoryCall) {
+function renderGlobalDependencies(output, factoryCall, imports) {
+  if (factoryCall === null) {
     return;
   }
-  const injectionPoint = globalFactoryCall.arguments.length > 0 ? globalFactoryCall.arguments[0].getFullStart() : globalFactoryCall.getEnd() - 1;
+  const injectionPoint = factoryCall.arguments.length > 0 ? factoryCall.arguments[0].getFullStart() : factoryCall.getEnd() - 1;
   const importString = imports.map((i) => `global.${getGlobalIdentifier(i)}`).join(",");
-  output.appendLeft(injectionPoint, importString + (globalFactoryCall.arguments.length > 0 ? "," : ""));
+  output.appendLeft(injectionPoint, importString + (factoryCall.arguments.length > 0 ? "," : ""));
 }
 function renderFactoryParameters(output, factoryFunction, imports) {
   const parameters = factoryFunction.parameters;
@@ -13456,59 +13568,8 @@ function renderFactoryParameters(output, factoryFunction, imports) {
     output.appendLeft(injectionPoint, parameterString);
   }
 }
-function isCommonJSConditional(value) {
-  if (!ts105.isConditionalExpression(value)) {
-    return false;
-  }
-  if (!ts105.isBinaryExpression(value.condition) || value.condition.operatorToken.kind !== ts105.SyntaxKind.AmpersandAmpersandToken) {
-    return false;
-  }
-  if (!oneOfBinaryConditions(value.condition, (exp) => isTypeOf(exp, "exports", "module"))) {
-    return false;
-  }
-  if (!ts105.isCallExpression(value.whenTrue) || !ts105.isIdentifier(value.whenTrue.expression)) {
-    return false;
-  }
-  return value.whenTrue.expression.text === "factory";
-}
-function isAmdConditional(value) {
-  if (!ts105.isConditionalExpression(value)) {
-    return false;
-  }
-  if (!ts105.isBinaryExpression(value.condition) || value.condition.operatorToken.kind !== ts105.SyntaxKind.AmpersandAmpersandToken) {
-    return false;
-  }
-  if (!oneOfBinaryConditions(value.condition, (exp) => isTypeOf(exp, "define"))) {
-    return false;
-  }
-  if (!ts105.isCallExpression(value.whenTrue) || !ts105.isIdentifier(value.whenTrue.expression)) {
-    return false;
-  }
-  return value.whenTrue.expression.text === "define";
-}
-function isGlobalFactoryCall(value) {
-  if (ts105.isCallExpression(value) && !!value.parent) {
-    value = isCommaExpression(value.parent) ? value.parent : value;
-    value = ts105.isParenthesizedExpression(value.parent) ? value.parent : value;
-    return !!value.parent && ts105.isConditionalExpression(value.parent) && value.parent.whenFalse === value;
-  } else {
-    return false;
-  }
-}
-function isCommaExpression(value) {
-  return ts105.isBinaryExpression(value) && value.operatorToken.kind === ts105.SyntaxKind.CommaToken;
-}
 function getGlobalIdentifier(i) {
   return i.specifier.replace(/^@angular\//, "ng.").replace(/^@/, "").replace(/\//g, ".").replace(/[-_]+(.?)/g, (_, c) => c.toUpperCase()).replace(/^./, (c) => c.toLowerCase());
-}
-function find(node, test) {
-  return test(node) ? node : node.forEachChild((child) => find(child, test));
-}
-function oneOfBinaryConditions(node, test) {
-  return test(node.left) || test(node.right);
-}
-function isTypeOf(node, ...types) {
-  return ts105.isBinaryExpression(node) && ts105.isTypeOfExpression(node.left) && ts105.isIdentifier(node.left.expression) && types.indexOf(node.left.expression.text) !== -1;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/transformer.mjs
