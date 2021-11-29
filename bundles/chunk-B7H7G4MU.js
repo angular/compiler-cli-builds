@@ -36,7 +36,7 @@ import {
   sendMessageToWorker,
   sortTasksByPriority,
   stringifyTask
-} from "./chunk-O2TTTXBN.js";
+} from "./chunk-TNJ3TBYO.js";
 import {
   LogLevel
 } from "./chunk-SKBLJA43.js";
@@ -570,7 +570,7 @@ var UmdDependencyHost = class extends DependencyHostBase {
     return !hasRequireCalls(fileContents);
   }
   extractImports(file, fileContents) {
-    const sf = ts3.createSourceFile(file, fileContents, ts3.ScriptTarget.ES2015, false, ts3.ScriptKind.JS);
+    const sf = ts3.createSourceFile(file, fileContents, ts3.ScriptTarget.ES2015, true, ts3.ScriptKind.JS);
     if (sf.statements.length !== 1) {
       return new Set();
     }
@@ -887,7 +887,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "13.1.0-next.2+56.sha-47f1c0f.with-local-changes";
+var NGCC_VERSION = "13.1.0-next.2+66.sha-708eb8c.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -2174,4 +2174,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-NQ7VVJAV.js.map
+//# sourceMappingURL=chunk-B7H7G4MU.js.map
