@@ -17937,7 +17937,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
     function transformConstructor(ctor) {
       ctor = ts77.visitEachChild(ctor, decoratorDownlevelVisitor, context);
       const newParameters = [];
-      const oldParameters = ts77.visitParameterList(ctor.parameters, decoratorDownlevelVisitor, context);
+      const oldParameters = ctor.parameters;
       const parametersInfo = [];
       for (const param of oldParameters) {
         const decoratorsToKeep = [];
@@ -17958,7 +17958,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         const newParam = ts77.updateParameter(param, decoratorsToKeep.length ? decoratorsToKeep : void 0, param.modifiers, param.dotDotDotToken, param.name, param.questionToken, param.type, param.initializer);
         newParameters.push(newParam);
       }
-      const updated = ts77.updateConstructor(ctor, ctor.decorators, ctor.modifiers, newParameters, ts77.visitFunctionBody(ctor.body, decoratorDownlevelVisitor, context));
+      const updated = ts77.updateConstructor(ctor, ctor.decorators, ctor.modifiers, newParameters, ctor.body);
       return [updated, parametersInfo];
     }
     function transformClassDeclaration(classDecl) {
