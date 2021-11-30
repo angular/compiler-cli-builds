@@ -249,7 +249,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
     function transformConstructor(ctor) {
       ctor = ts2.visitEachChild(ctor, decoratorDownlevelVisitor, context);
       const newParameters = [];
-      const oldParameters = ts2.visitParameterList(ctor.parameters, decoratorDownlevelVisitor, context);
+      const oldParameters = ctor.parameters;
       const parametersInfo = [];
       for (const param of oldParameters) {
         const decoratorsToKeep = [];
@@ -270,7 +270,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         const newParam = ts2.updateParameter(param, decoratorsToKeep.length ? decoratorsToKeep : void 0, param.modifiers, param.dotDotDotToken, param.name, param.questionToken, param.type, param.initializer);
         newParameters.push(newParam);
       }
-      const updated = ts2.updateConstructor(ctor, ctor.decorators, ctor.modifiers, newParameters, ts2.visitFunctionBody(ctor.body, decoratorDownlevelVisitor, context));
+      const updated = ts2.updateConstructor(ctor, ctor.decorators, ctor.modifiers, newParameters, ctor.body);
       return [updated, parametersInfo];
     }
     function transformClassDeclaration(classDecl) {
@@ -355,4 +355,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-PBA67OV4.js.map
+//# sourceMappingURL=chunk-DNJHKBKU.js.map

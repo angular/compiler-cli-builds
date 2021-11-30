@@ -10,7 +10,7 @@ import {
   MetadataDtsModuleScopeResolver,
   TypeCheckScopeRegistry,
   readConfiguration
-} from "./chunk-OV2AABFM.js";
+} from "./chunk-VFOJ5FVM.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -5103,4 +5103,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TNJ3TBYO.js.map
+//# sourceMappingURL=chunk-XETVOU6N.js.map

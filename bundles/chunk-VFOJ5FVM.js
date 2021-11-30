@@ -35,7 +35,7 @@ import {
 } from "./chunk-GW5PWKBP.js";
 import {
   getDownlevelDecoratorsTransform
-} from "./chunk-PBA67OV4.js";
+} from "./chunk-DNJHKBKU.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -11929,4 +11929,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-OV2AABFM.js.map
+//# sourceMappingURL=chunk-VFOJ5FVM.js.map
