@@ -42,12 +42,13 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     readResource: ((fileName: string) => string | Promise<string>) | undefined;
     transformResource: ((data: string, context: import("@angular/compiler-cli/src/ngtsc/core/api/index").ResourceHostContext) => Promise<import("@angular/compiler-cli/src/ngtsc/core/api/index").TransformResourceResult | null>) | undefined;
     realpath: ((path: string) => string) | undefined;
-    resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedModule | undefined)[]) | undefined;
+    resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile?: ts.SourceFile | undefined) => (ts.ResolvedModule | undefined)[]) | undefined;
     resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
     resourceNameToFileName: ((resourceName: string, containingFilePath: string, fallbackResolve?: ((url: string, fromFile: string) => string | null) | undefined) => string | null) | undefined;
     trace: ((s: string) => void) | undefined;
     useCaseSensitiveFileNames: () => boolean;
     writeFile: ts.WriteFileCallback;
+    getModuleResolutionCache: any;
 }
 /**
  * A wrapper around `ts.CompilerHost` (plus any extension methods from `ExtendedTsCompilerHost`).

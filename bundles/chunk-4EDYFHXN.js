@@ -74,6 +74,9 @@ function typeToValue(typeNode, checker) {
         defaultImportStatement: firstDecl.parent
       };
     } else if (ts2.isImportSpecifier(firstDecl)) {
+      if (firstDecl.isTypeOnly) {
+        return typeOnlyImport(typeNode, firstDecl);
+      }
       if (firstDecl.parent.parent.isTypeOnly) {
         return typeOnlyImport(typeNode, firstDecl.parent.parent);
       }
@@ -128,10 +131,10 @@ function noValueDeclaration(typeNode, decl) {
     reason: { kind: 1, typeNode, decl }
   };
 }
-function typeOnlyImport(typeNode, importClause) {
+function typeOnlyImport(typeNode, node) {
   return {
     kind: 2,
-    reason: { kind: 2, typeNode, importClause }
+    reason: { kind: 2, typeNode, node }
   };
 }
 function unknownReference(typeNode) {
@@ -675,4 +678,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-S3QIIFH7.js.map
+//# sourceMappingURL=chunk-4EDYFHXN.js.map

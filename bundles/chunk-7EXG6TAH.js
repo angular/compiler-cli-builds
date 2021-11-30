@@ -13,12 +13,13 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-S3QIIFH7.js";
+} from "./chunk-4EDYFHXN.js";
 import {
   ImportFlags,
   ImportManager,
   Reference,
   attachDefaultImportDeclaration,
+  createExportSpecifier,
   getDefaultImportDeclaration,
   getSourceFile,
   identifierOfNode,
@@ -27,7 +28,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-WYO7JO2T.js";
+} from "./chunk-Z4HWF26S.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -1293,7 +1294,7 @@ function createUnsuitableInjectionTokenError(clazz, error) {
       chainMessage = "Consider changing the type-only import to a regular import, or use the @Inject decorator to specify an injection token.";
       hints = [
         makeRelatedInformation(reason.typeNode, "This type is imported using a type-only import, which prevents it from being usable as an injection token."),
-        makeRelatedInformation(reason.importClause, "The type-only import occurs here.")
+        makeRelatedInformation(reason.node, "The type-only import occurs here.")
       ];
       break;
     case 4:
@@ -2319,7 +2320,7 @@ function aliasTransformFactory(exportStatements) {
       }
       const statements = [...file.statements];
       exportStatements.get(file.fileName).forEach(([moduleName, symbolName], aliasName) => {
-        const stmt = ts9.createExportDeclaration(void 0, void 0, ts9.createNamedExports([ts9.createExportSpecifier(symbolName, aliasName)]), ts9.createStringLiteral(moduleName));
+        const stmt = ts9.createExportDeclaration(void 0, void 0, ts9.createNamedExports([createExportSpecifier(symbolName, aliasName)]), ts9.createStringLiteral(moduleName));
         statements.push(stmt);
       });
       return ts9.updateSourceFileNode(file, statements);
@@ -5680,4 +5681,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GW5PWKBP.js.map
+//# sourceMappingURL=chunk-7EXG6TAH.js.map

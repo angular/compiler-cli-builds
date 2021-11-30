@@ -19,6 +19,7 @@ import {
 import ts from "typescript";
 var TS = /\.tsx?$/i;
 var D_TS = /\.d\.ts$/i;
+var PARSED_TS_VERSION = parseFloat(ts.versionMajorMinor);
 function isSymbolWithValueDeclaration(symbol) {
   return symbol != null && symbol.valueDeclaration !== void 0 && symbol.declarations !== void 0;
 }
@@ -108,6 +109,9 @@ function toUnredirectedSourceFile(sf) {
     return sf;
   }
   return redirectInfo.unredirected;
+}
+function createExportSpecifier(propertyName, name, isTypeOnly = false) {
+  return PARSED_TS_VERSION > 4.4 ? ts.createExportSpecifier(isTypeOnly, propertyName, name) : ts.createExportSpecifier(propertyName, name);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/references.mjs
@@ -1223,6 +1227,7 @@ export {
   nodeDebugInfo,
   isAssignment,
   toUnredirectedSourceFile,
+  createExportSpecifier,
   ImportFlags,
   ReferenceEmitter,
   LocalIdentifierStrategy,
@@ -1258,4 +1263,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-WYO7JO2T.js.map
+//# sourceMappingURL=chunk-Z4HWF26S.js.map

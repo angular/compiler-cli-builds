@@ -36,10 +36,11 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     readDirectory: ((rootDir: string, extensions: readonly string[], excludes: readonly string[] | undefined, includes: readonly string[], depth?: number | undefined) => string[]) | undefined;
     readFile: (fileName: string) => string | undefined;
     realpath: ((path: string) => string) | undefined;
-    resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedModule | undefined)[]) | undefined;
+    resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile?: ts.SourceFile | undefined) => (ts.ResolvedModule | undefined)[]) | undefined;
     resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
     trace: ((s: string) => void) | undefined;
     useCaseSensitiveFileNames: () => boolean;
+    getModuleResolutionCache: any;
 }
 /**
  * Updates a `ts.Program` instance with a new one that incorporates specific changes, using the

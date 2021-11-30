@@ -32,14 +32,14 @@ import {
   makeRelatedInformation,
   ngErrorCode,
   replaceTsWithNgInErrors
-} from "./chunk-GW5PWKBP.js";
+} from "./chunk-7EXG6TAH.js";
 import {
   getDownlevelDecoratorsTransform
 } from "./chunk-DNJHKBKU.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-S3QIIFH7.js";
+} from "./chunk-4EDYFHXN.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -58,6 +58,7 @@ import {
   UnifiedModulesAliasingHost,
   UnifiedModulesStrategy,
   attachComments,
+  createExportSpecifier,
   getRootDirs,
   getSourceFileOrNull,
   getTokenAtPosition,
@@ -72,7 +73,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-WYO7JO2T.js";
+} from "./chunk-Z4HWF26S.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -2852,7 +2853,7 @@ function compareVersions(v1, v2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
 var MIN_TS_VERSION = "4.4.2";
-var MAX_TS_VERSION = "4.5.0";
+var MAX_TS_VERSION = "4.6.0";
 var tsVersion = ts8.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
@@ -2985,7 +2986,7 @@ var ImportGraph = class {
         if (!ts9.isImportDeclaration(stmt) && !ts9.isExportDeclaration(stmt) || stmt.moduleSpecifier === void 0) {
           continue;
         }
-        if (ts9.isImportDeclaration(stmt) && stmt.importClause !== void 0 && stmt.importClause.isTypeOnly) {
+        if (ts9.isImportDeclaration(stmt) && stmt.importClause !== void 0 && isTypeOnlyImportClause(stmt.importClause)) {
           continue;
         }
         const symbol = this.checker.getSymbolAtLocation(stmt.moduleSpecifier);
@@ -3003,6 +3004,15 @@ var ImportGraph = class {
 };
 function isLocalFile(sf) {
   return !sf.isDeclarationFile;
+}
+function isTypeOnlyImportClause(node) {
+  if (node.isTypeOnly) {
+    return true;
+  }
+  if (node.namedBindings !== void 0 && ts9.isNamedImports(node.namedBindings) && node.namedBindings.elements.every((specifier) => specifier.isTypeOnly)) {
+    return true;
+  }
+  return false;
 }
 var Found = class {
   constructor(sourceFile, parent) {
@@ -3450,7 +3460,7 @@ function transformFactorySourceFile(factoryMap, context, importRewriter, file) {
     if (ts13.isImportDeclaration(stmt) && ts13.isStringLiteral(stmt.moduleSpecifier) && stmt.moduleSpecifier.text === "@angular/core") {
       const rewrittenModuleSpecifier = importRewriter.rewriteSpecifier("@angular/core", sourceFilePath);
       if (rewrittenModuleSpecifier !== stmt.moduleSpecifier.text) {
-        transformedStatements.push(ts13.updateImportDeclaration(stmt, stmt.decorators, stmt.modifiers, stmt.importClause, ts13.createStringLiteral(rewrittenModuleSpecifier)));
+        transformedStatements.push(ts13.updateImportDeclaration(stmt, stmt.decorators, stmt.modifiers, stmt.importClause, ts13.createStringLiteral(rewrittenModuleSpecifier), void 0));
         if (stmt.importClause !== void 0 && stmt.importClause.namedBindings !== void 0 && ts13.isNamespaceImport(stmt.importClause.namedBindings)) {
           coreImportIdentifiers.add(stmt.importClause.namedBindings.name.text);
         }
@@ -3627,6 +3637,7 @@ var DelegatingCompilerHost = class {
     this.resolveTypeReferenceDirectives = this.delegateMethod("resolveTypeReferenceDirectives");
     this.trace = this.delegateMethod("trace");
     this.useCaseSensitiveFileNames = this.delegateMethod("useCaseSensitiveFileNames");
+    this.getModuleResolutionCache = this.delegateMethod("getModuleResolutionCache");
   }
   delegateMethod(name) {
     return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
@@ -4435,7 +4446,8 @@ function createLookupResolutionHost(adapter) {
     getCurrentDirectory: adapter.getCurrentDirectory.bind(adapter),
     getDirectories: (_a = adapter.getDirectories) == null ? void 0 : _a.bind(adapter),
     realpath: (_b = adapter.realpath) == null ? void 0 : _b.bind(adapter),
-    trace: (_c = adapter.trace) == null ? void 0 : _c.bind(adapter)
+    trace: (_c = adapter.trace) == null ? void 0 : _c.bind(adapter),
+    useCaseSensitiveFileNames: typeof adapter.useCaseSensitiveFileNames === "function" ? adapter.useCaseSensitiveFileNames.bind(adapter) : adapter.useCaseSensitiveFileNames
   };
 }
 
@@ -9470,6 +9482,7 @@ var DelegatingCompilerHost2 = class {
     this.trace = this.delegateMethod("trace");
     this.useCaseSensitiveFileNames = this.delegateMethod("useCaseSensitiveFileNames");
     this.writeFile = this.delegateMethod("writeFile");
+    this.getModuleResolutionCache = this.delegateMethod("getModuleResolutionCache");
   }
   delegateMethod(name) {
     return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
@@ -10121,7 +10134,7 @@ function transformSourceFile(sourceFile, requests, context) {
           tmpStatements.push(statement);
         }
       });
-      tmpStatements.push(ts44.createExportDeclaration(void 0, void 0, ts44.createNamedExports(inserts.reduce((accumulator, insert) => [...accumulator, ...insert.declarations], []).map((declaration) => ts44.createExportSpecifier(void 0, declaration.name)))));
+      tmpStatements.push(ts44.createExportDeclaration(void 0, void 0, ts44.createNamedExports(inserts.reduce((accumulator, insert) => [...accumulator, ...insert.declarations], []).map((declaration) => createExportSpecifier(void 0, declaration.name)))));
       newStatements = tmpStatements;
     }
     const newSf = ts44.updateSourceFileNode(sourceFile2, ts44.setTextRange(ts44.createNodeArray(newStatements), sourceFile2.statements));
@@ -10353,7 +10366,7 @@ var MetadataCache = class {
 import ts47 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/node_emitter.mjs
-import { BinaryOperator, BuiltinMethod, BuiltinVar, ClassStmt, ExternalExpr as ExternalExpr3, Statement, StmtModifier, UnaryOperator } from "@angular/compiler";
+import { BinaryOperator, BuiltinVar, ClassStmt, ExternalExpr as ExternalExpr3, Statement, StmtModifier, UnaryOperator } from "@angular/compiler";
 import ts46 from "typescript";
 var METHOD_THIS_NAME = "this";
 var CATCH_ERROR_NAME = "error";
@@ -10474,7 +10487,7 @@ var NodeEmitterVisitor = class {
     });
   }
   getReexports() {
-    return Array.from(this._reexports.entries()).map(([exportedFilePath, reexports]) => ts46.createExportDeclaration(void 0, void 0, ts46.createNamedExports(reexports.map(({ name, as }) => ts46.createExportSpecifier(name, as))), createLiteral(exportedFilePath)));
+    return Array.from(this._reexports.entries()).map(([exportedFilePath, reexports]) => ts46.createExportDeclaration(void 0, void 0, ts46.createNamedExports(reexports.map(({ name, as }) => createExportSpecifier(name, as))), createLiteral(exportedFilePath)));
   }
   getImports() {
     return Array.from(this._importsWithPrefixes.entries()).map(([namespace, prefix]) => ts46.createImportDeclaration(void 0, void 0, ts46.createImportClause(void 0, ts46.createNamespaceImport(ts46.createIdentifier(prefix))), createLiteral(namespace)));
@@ -10565,7 +10578,7 @@ var NodeEmitterVisitor = class {
     const varDeclList = ts46.createVariableDeclarationList([ts46.createVariableDeclaration(ts46.createIdentifier(stmt.name), void 0, stmt.value && stmt.value.visitExpression(this, null) || void 0)]);
     if (stmt.hasModifier(StmtModifier.Exported)) {
       const tsVarStmt = this.postProcess(stmt, ts46.createVariableStatement([], varDeclList));
-      const exportStmt = this.postProcess(stmt, ts46.createExportDeclaration(void 0, void 0, ts46.createNamedExports([ts46.createExportSpecifier(stmt.name, stmt.name)])));
+      const exportStmt = this.postProcess(stmt, ts46.createExportDeclaration(void 0, void 0, ts46.createNamedExports([createExportSpecifier(stmt.name, stmt.name)])));
       return [tsVarStmt, exportStmt];
     }
     return this.postProcess(stmt, ts46.createVariableStatement(this.getModifiers(stmt), varDeclList));
@@ -11929,4 +11942,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-VFOJ5FVM.js.map
+//# sourceMappingURL=chunk-OAOOMMIL.js.map
