@@ -1252,7 +1252,6 @@ export {
   ImportManager,
   ExpressionTranslatorVisitor,
   translateType,
-  attachComments,
   translateExpression,
   translateStatement
 };
@@ -1263,4 +1262,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-Z4HWF26S.js.map
+//# sourceMappingURL=chunk-HDZS2JG2.js.map

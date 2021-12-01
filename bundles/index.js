@@ -7,12 +7,10 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-24SJCGLA.js";
+} from "./chunk-JJMLEEKA.js";
 import {
   DEFAULT_ERROR_CODE,
   EmitFlags,
-  METADATA_VERSION,
-  MetadataCollector,
   NgCompiler,
   NgCompilerHost,
   NgtscProgram,
@@ -22,7 +20,6 @@ import {
   TsCreateProgramDriver,
   UNKNOWN_ERROR_CODE,
   calcProjectFileAndBasePath,
-  createBundleIndexHost,
   createCompilerHost,
   createProgram,
   defaultGatherDiagnostics,
@@ -33,42 +30,20 @@ import {
   formatDiagnostics,
   freshCompilationTicket,
   incrementalFromStateTicket,
-  isClassMetadata,
-  isConstructorMetadata,
-  isFunctionMetadata,
-  isInterfaceMetadata,
-  isMemberMetadata,
-  isMetadataError,
-  isMetadataGlobalReferenceExpression,
-  isMetadataImportDefaultReference,
-  isMetadataImportedSymbolReferenceExpression,
-  isMetadataModuleReferenceExpression,
-  isMetadataSymbolicBinaryExpression,
-  isMetadataSymbolicCallExpression,
-  isMetadataSymbolicExpression,
-  isMetadataSymbolicIfExpression,
-  isMetadataSymbolicIndexExpression,
-  isMetadataSymbolicPrefixExpression,
-  isMetadataSymbolicReferenceExpression,
-  isMetadataSymbolicSelectExpression,
-  isMetadataSymbolicSpreadExpression,
-  isMethodMetadata,
-  isModuleMetadata,
   isNgDiagnostic,
   isTsDiagnostic,
   ngToTsDiagnostic,
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-OAOOMMIL.js";
-import "./chunk-7EXG6TAH.js";
-import "./chunk-DNJHKBKU.js";
+} from "./chunk-COAETSNP.js";
+import "./chunk-IESRH26X.js";
 import "./chunk-4EDYFHXN.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "./chunk-SKBLJA43.js";
-import "./chunk-Z4HWF26S.js";
+import "./chunk-HDZS2JG2.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -103,7 +78,7 @@ import { StaticReflector, StaticSymbol } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.1.0-next.2+86.sha-3f6d8f3.with-local-changes");
+var VERSION = new Version("13.1.0-next.2+89.sha-1922032.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
@@ -185,8 +160,6 @@ export {
   LogLevel,
   LogicalFileSystem,
   LogicalProjectPath,
-  METADATA_VERSION,
-  MetadataCollector,
   NgTscPlugin,
   NgtscCompilerHost,
   NgtscProgram,
@@ -202,7 +175,6 @@ export {
   basename,
   calcProjectFileAndBasePath,
   constructorParametersDownlevelTransform,
-  createBundleIndexHost,
   createCompilerHost,
   createProgram,
   defaultGatherDiagnostics,
@@ -214,28 +186,7 @@ export {
   formatDiagnostics,
   getFileSystem,
   getSourceFileOrError,
-  isClassMetadata,
-  isConstructorMetadata,
-  isFunctionMetadata,
-  isInterfaceMetadata,
   isLocalRelativePath,
-  isMemberMetadata,
-  isMetadataError,
-  isMetadataGlobalReferenceExpression,
-  isMetadataImportDefaultReference,
-  isMetadataImportedSymbolReferenceExpression,
-  isMetadataModuleReferenceExpression,
-  isMetadataSymbolicBinaryExpression,
-  isMetadataSymbolicCallExpression,
-  isMetadataSymbolicExpression,
-  isMetadataSymbolicIfExpression,
-  isMetadataSymbolicIndexExpression,
-  isMetadataSymbolicPrefixExpression,
-  isMetadataSymbolicReferenceExpression,
-  isMetadataSymbolicSelectExpression,
-  isMetadataSymbolicSpreadExpression,
-  isMethodMetadata,
-  isModuleMetadata,
   isNgDiagnostic,
   isRoot,
   isRooted,
