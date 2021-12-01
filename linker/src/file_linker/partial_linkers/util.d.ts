@@ -6,7 +6,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { R3DeclareDependencyMetadata, R3DependencyMetadata, R3ProviderExpression, R3Reference } from '@angular/compiler';
+import { MaybeForwardRefExpression, R3DeclareDependencyMetadata, R3DependencyMetadata, R3Reference } from '@angular/compiler';
 import * as o from '@angular/compiler/src/output/output_ast';
 import { AstObject, AstValue } from '../../ast/ast_value';
 export declare function wrapReference<TExpression>(wrapped: o.WrappedNodeExpr<TExpression>): R3Reference;
@@ -28,4 +28,4 @@ export declare function getDependency<TExpression>(depObj: AstObject<R3DeclareDe
  *
  * If there is no forwardRef call expression then we just return the opaque type.
  */
-export declare function extractForwardRef<TExpression>(expr: AstValue<unknown, TExpression>): R3ProviderExpression<o.WrappedNodeExpr<TExpression>>;
+export declare function extractForwardRef<TExpression>(expr: AstValue<unknown, TExpression>): MaybeForwardRefExpression<o.WrappedNodeExpr<TExpression>>;

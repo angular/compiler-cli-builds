@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/diagnostics/src/util" />
+import { ErrorCode } from './error_code';
 /**
  * During formatting of `ts.Diagnostic`s, the numeric code of each diagnostic is prefixed with the
  * hard-coded "TS" prefix. For Angular's own error codes, a prefix of "NG" is desirable. To achieve
@@ -16,3 +17,4 @@
  * @param errors The formatted diagnostics
  */
 export declare function replaceTsWithNgInErrors(errors: string): string;
+export declare function ngErrorCode(code: ErrorCode): number;
