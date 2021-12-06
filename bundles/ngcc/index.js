@@ -31,7 +31,7 @@ var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require
 });
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/index.mjs
-import { dirname as dirname6, join as join6 } from "path";
+import { dirname as dirname3, join as join3 } from "path";
 import { fileURLToPath as fileURLToPath2 } from "url";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/compiler_host.mjs
@@ -42,40 +42,40 @@ import ts from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/invalid_file_system.mjs
 var InvalidFileSystem = class {
-  exists(path7) {
+  exists(path2) {
     throw makeError();
   }
-  readFile(path7) {
+  readFile(path2) {
     throw makeError();
   }
-  readFileBuffer(path7) {
+  readFileBuffer(path2) {
     throw makeError();
   }
-  writeFile(path7, data, exclusive) {
+  writeFile(path2, data, exclusive) {
     throw makeError();
   }
-  removeFile(path7) {
+  removeFile(path2) {
     throw makeError();
   }
-  symlink(target, path7) {
+  symlink(target, path2) {
     throw makeError();
   }
-  readdir(path7) {
+  readdir(path2) {
     throw makeError();
   }
-  lstat(path7) {
+  lstat(path2) {
     throw makeError();
   }
-  stat(path7) {
+  stat(path2) {
     throw makeError();
   }
   pwd() {
     throw makeError();
   }
-  chdir(path7) {
+  chdir(path2) {
     throw makeError();
   }
-  extname(path7) {
+  extname(path2) {
     throw makeError();
   }
   copyFile(from, to) {
@@ -84,10 +84,10 @@ var InvalidFileSystem = class {
   moveFile(from, to) {
     throw makeError();
   }
-  ensureDir(path7) {
+  ensureDir(path2) {
     throw makeError();
   }
-  removeDeep(path7) {
+  removeDeep(path2) {
     throw makeError();
   }
   isCaseSensitive() {
@@ -102,10 +102,10 @@ var InvalidFileSystem = class {
   join(basePath, ...paths) {
     throw makeError();
   }
-  isRoot(path7) {
+  isRoot(path2) {
     throw makeError();
   }
-  isRooted(path7) {
+  isRooted(path2) {
     throw makeError();
   }
   relative(from, to) {
@@ -120,7 +120,7 @@ var InvalidFileSystem = class {
   getDefaultLibLocation() {
     throw makeError();
   }
-  normalize(path7) {
+  normalize(path2) {
     throw makeError();
   }
 };
@@ -130,8 +130,8 @@ function makeError() {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/util.mjs
 var TS_DTS_JS_EXTENSION = /(?:\.d)?\.ts$|\.js$/;
-function stripExtension(path7) {
-  return path7.replace(TS_DTS_JS_EXTENSION, "");
+function stripExtension(path2) {
+  return path2.replace(TS_DTS_JS_EXTENSION, "");
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/helpers.mjs
@@ -142,11 +142,11 @@ function getFileSystem() {
 function setFileSystem(fileSystem) {
   fs = fileSystem;
 }
-function absoluteFrom(path7) {
-  if (!fs.isRooted(path7)) {
-    throw new Error(`Internal Error: absoluteFrom(${path7}): path is not absolute`);
+function absoluteFrom(path2) {
+  if (!fs.isRooted(path2)) {
+    throw new Error(`Internal Error: absoluteFrom(${path2}): path is not absolute`);
   }
-  return fs.resolve(path7);
+  return fs.resolve(path2);
 }
 var ABSOLUTE_PATH = Symbol("AbsolutePath");
 function absoluteFromSourceFile(sf) {
@@ -162,8 +162,8 @@ function dirname(file) {
 function resolve(basePath, ...paths) {
   return fs.resolve(basePath, ...paths);
 }
-function isRooted(path7) {
-  return fs.isRooted(path7);
+function isRooted(path2) {
+  return fs.isRooted(path2);
 }
 function relative(from, to) {
   return fs.relative(from, to);
@@ -177,8 +177,8 @@ function toRelativeImport(relativePath) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/compiler_host.mjs
 var NgtscCompilerHost = class {
-  constructor(fs5, options = {}) {
-    this.fs = fs5;
+  constructor(fs3, options = {}) {
+    this.fs = fs3;
     this.options = options;
   }
   getSourceFile(fileName, languageVersion) {
@@ -192,9 +192,9 @@ var NgtscCompilerHost = class {
     return this.fs.getDefaultLibLocation();
   }
   writeFile(fileName, data, writeByteOrderMark, onError, sourceFiles) {
-    const path7 = absoluteFrom(fileName);
-    this.fs.ensureDir(this.fs.dirname(path7));
-    this.fs.writeFile(path7, data);
+    const path2 = absoluteFrom(fileName);
+    this.fs.ensureDir(this.fs.dirname(path2));
+    this.fs.writeFile(path2, data);
   }
   getCurrentDirectory() {
     return this.fs.pwd();
@@ -270,8 +270,8 @@ var LogicalFileSystem = class {
     return logicalPath.startsWith("/") ? logicalPath : "/" + logicalPath;
   }
 };
-function isWithinBasePath(base, path7) {
-  return isLocalRelativePath(relative(base, path7));
+function isWithinBasePath(base, path2) {
+  return isLocalRelativePath(relative(base, path2));
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/node_js_file_system.mjs
@@ -317,11 +317,11 @@ var NodeJSPathManipulation = class {
   join(basePath, ...paths) {
     return this.normalize(join(basePath, ...paths));
   }
-  isRoot(path7) {
-    return this.dirname(path7) === this.normalize(path7);
+  isRoot(path2) {
+    return this.dirname(path2) === this.normalize(path2);
   }
-  isRooted(path7) {
-    return isAbsolute(path7);
+  isRooted(path2) {
+    return isAbsolute(path2);
   }
   relative(from, to) {
     return this.normalize(relative2(from, to));
@@ -329,11 +329,11 @@ var NodeJSPathManipulation = class {
   basename(filePath, extension) {
     return basename(filePath, extension);
   }
-  extname(path7) {
-    return extname(path7);
+  extname(path2) {
+    return extname(path2);
   }
-  normalize(path7) {
-    return path7.replace(/\\/g, "/");
+  normalize(path2) {
+    return path2.replace(/\\/g, "/");
   }
 };
 var isCommonJS = typeof __filename !== "undefined";
@@ -350,26 +350,26 @@ var NodeJSReadonlyFileSystem = class extends NodeJSPathManipulation {
     }
     return this._caseSensitive;
   }
-  exists(path7) {
-    return existsSync(path7);
+  exists(path2) {
+    return existsSync(path2);
   }
-  readFile(path7) {
-    return readFileSync(path7, "utf8");
+  readFile(path2) {
+    return readFileSync(path2, "utf8");
   }
-  readFileBuffer(path7) {
-    return readFileSync(path7);
+  readFileBuffer(path2) {
+    return readFileSync(path2);
   }
-  readdir(path7) {
-    return readdirSync(path7);
+  readdir(path2) {
+    return readdirSync(path2);
   }
-  lstat(path7) {
-    return lstatSync(path7);
+  lstat(path2) {
+    return lstatSync(path2);
   }
-  stat(path7) {
-    return statSync(path7);
+  stat(path2) {
+    return statSync(path2);
   }
-  realpath(path7) {
-    return this.resolve(realpathSync(path7));
+  realpath(path2) {
+    return this.resolve(realpathSync(path2));
   }
   getDefaultLibLocation() {
     const requireFn = isCommonJS ? __require : module.createRequire(currentFileUrl);
@@ -377,14 +377,14 @@ var NodeJSReadonlyFileSystem = class extends NodeJSPathManipulation {
   }
 };
 var NodeJSFileSystem = class extends NodeJSReadonlyFileSystem {
-  writeFile(path7, data, exclusive = false) {
-    writeFileSync(path7, data, exclusive ? { flag: "wx" } : void 0);
+  writeFile(path2, data, exclusive = false) {
+    writeFileSync(path2, data, exclusive ? { flag: "wx" } : void 0);
   }
-  removeFile(path7) {
-    unlinkSync(path7);
+  removeFile(path2) {
+    unlinkSync(path2);
   }
-  symlink(target, path7) {
-    symlinkSync(target, path7);
+  symlink(target, path2) {
+    symlinkSync(target, path2);
   }
   copyFile(from, to) {
     copyFileSync(from, to);
@@ -392,24 +392,24 @@ var NodeJSFileSystem = class extends NodeJSReadonlyFileSystem {
   moveFile(from, to) {
     renameSync(from, to);
   }
-  ensureDir(path7) {
+  ensureDir(path2) {
     const parents = [];
-    while (!this.isRoot(path7) && !this.exists(path7)) {
-      parents.push(path7);
-      path7 = this.dirname(path7);
+    while (!this.isRoot(path2) && !this.exists(path2)) {
+      parents.push(path2);
+      path2 = this.dirname(path2);
     }
     while (parents.length) {
       this.safeMkdir(parents.pop());
     }
   }
-  removeDeep(path7) {
-    rmdirSync(path7, { recursive: true });
+  removeDeep(path2) {
+    rmdirSync(path2, { recursive: true });
   }
-  safeMkdir(path7) {
+  safeMkdir(path2) {
     try {
-      mkdirSync(path7);
+      mkdirSync(path2);
     } catch (err) {
-      if (!this.exists(path7) || !this.stat(path7).isDirectory()) {
+      if (!this.exists(path2) || !this.stat(path2).isDirectory()) {
         throw err;
       }
     }
@@ -559,8 +559,8 @@ function extractGetterFnExpression(statement) {
 function isRequireCall(node) {
   return ts3.isCallExpression(node) && ts3.isIdentifier(node.expression) && node.expression.text === "require" && node.arguments.length === 1 && ts3.isStringLiteral(node.arguments[0]);
 }
-function isExternalImport(path7) {
-  return !/^\.\.?(\/|$)/.test(path7);
+function isExternalImport(path2) {
+  return !/^\.\.?(\/|$)/.test(path2);
 }
 function isExportsDeclaration(expr) {
   return expr.parent && isExportsAssignment(expr.parent);
@@ -1242,8 +1242,8 @@ function hasNameIdentifier(declaration) {
   const namedDeclaration = declaration;
   return namedDeclaration.name !== void 0 && ts8.isIdentifier(namedDeclaration.name);
 }
-function isRelativePath(path7) {
-  return isRooted(path7) || /^\.\.?(\/|\\|$)/.test(path7);
+function isRelativePath(path2) {
+  return isRooted(path2) || /^\.\.?(\/|\\|$)/.test(path2);
 }
 var FactoryMap = class {
   constructor(factory, entries) {
@@ -1260,10 +1260,10 @@ var FactoryMap = class {
     this.internalMap.set(key, value);
   }
 };
-function resolveFileWithPostfixes(fs5, path7, postFixes) {
+function resolveFileWithPostfixes(fs3, path2, postFixes) {
   for (const postFix of postFixes) {
-    const testPath = absoluteFrom(path7 + postFix);
-    if (fs5.exists(testPath) && fs5.stat(testPath).isFile()) {
+    const testPath = absoluteFrom(path2 + postFix);
+    if (fs3.exists(testPath) && fs3.stat(testPath).isFile()) {
       return testPath;
     }
   }
@@ -1303,8 +1303,8 @@ function stripExtension2(fileName) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/dependencies/module_resolver.mjs
 var ModuleResolver = class {
-  constructor(fs5, pathMappings, relativeExtensions = ["", ".js", "/index.js"]) {
-    this.fs = fs5;
+  constructor(fs3, pathMappings, relativeExtensions = ["", ".js", "/index.js"]) {
+    this.fs = fs3;
     this.relativeExtensions = relativeExtensions;
     this.pathMappings = pathMappings ? this.processPathMappings(pathMappings) : [];
   }
@@ -1385,19 +1385,19 @@ var ModuleResolver = class {
     }
     return bestMapping !== void 0 && bestMatch !== void 0 ? this.computeMappedTemplates(bestMapping, bestMatch) : [];
   }
-  matchMapping(path7, mapping) {
+  matchMapping(path2, mapping) {
     const { prefix, postfix, hasWildcard } = mapping.matcher;
     if (hasWildcard) {
-      return path7.startsWith(prefix) && path7.endsWith(postfix) ? path7.substring(prefix.length, path7.length - postfix.length) : null;
+      return path2.startsWith(prefix) && path2.endsWith(postfix) ? path2.substring(prefix.length, path2.length - postfix.length) : null;
     } else {
-      return path7 === prefix ? "" : null;
+      return path2 === prefix ? "" : null;
     }
   }
   computeMappedTemplates(mapping, match) {
     return mapping.templates.map((template) => this.fs.resolve(mapping.baseUrl, template.prefix + match + template.postfix));
   }
-  findPackagePath(path7) {
-    let folder = path7;
+  findPackagePath(path2) {
+    let folder = path2;
     while (!this.fs.isRoot(folder)) {
       folder = this.fs.dirname(folder);
       if (this.fs.exists(this.fs.join(folder, "package.json"))) {
@@ -1435,8 +1435,8 @@ function createDependencyInfo() {
   return { dependencies: new Set(), missing: new Set(), deepImports: new Set() };
 }
 var DependencyHostBase = class {
-  constructor(fs5, moduleResolver) {
-    this.fs = fs5;
+  constructor(fs3, moduleResolver) {
+    this.fs = fs3;
     this.moduleResolver = moduleResolver;
   }
   collectDependencies(entryPointPath, { dependencies, missing, deepImports }) {
@@ -3639,18 +3639,18 @@ var SUPPORTED_FORMAT_PROPERTIES = ["fesm2015", "fesm5", "es2015", "esm2015", "es
 var NO_ENTRY_POINT = "no-entry-point";
 var IGNORED_ENTRY_POINT = "ignored-entry-point";
 var INCOMPATIBLE_ENTRY_POINT = "incompatible-entry-point";
-function getEntryPointInfo(fs5, config, logger, packagePath, entryPointPath) {
-  const packagePackageJsonPath = fs5.resolve(packagePath, "package.json");
-  const entryPointPackageJsonPath = fs5.resolve(entryPointPath, "package.json");
-  const loadedPackagePackageJson = loadPackageJson(fs5, packagePackageJsonPath);
-  const loadedEntryPointPackageJson = packagePackageJsonPath === entryPointPackageJsonPath ? loadedPackagePackageJson : loadPackageJson(fs5, entryPointPackageJsonPath);
-  const { packageName, packageVersion } = getPackageNameAndVersion(fs5, packagePath, loadedPackagePackageJson, loadedEntryPointPackageJson);
+function getEntryPointInfo(fs3, config, logger, packagePath, entryPointPath) {
+  const packagePackageJsonPath = fs3.resolve(packagePath, "package.json");
+  const entryPointPackageJsonPath = fs3.resolve(entryPointPath, "package.json");
+  const loadedPackagePackageJson = loadPackageJson(fs3, packagePackageJsonPath);
+  const loadedEntryPointPackageJson = packagePackageJsonPath === entryPointPackageJsonPath ? loadedPackagePackageJson : loadPackageJson(fs3, entryPointPackageJsonPath);
+  const { packageName, packageVersion } = getPackageNameAndVersion(fs3, packagePath, loadedPackagePackageJson, loadedEntryPointPackageJson);
   const repositoryUrl = getRepositoryUrl(loadedPackagePackageJson);
   const packageConfig = config.getPackageConfig(packageName, packagePath, packageVersion);
   const entryPointConfig = packageConfig.entryPoints.get(entryPointPath);
   let entryPointPackageJson;
   if (entryPointConfig === void 0) {
-    if (!fs5.exists(entryPointPackageJsonPath)) {
+    if (!fs3.exists(entryPointPackageJsonPath)) {
       return NO_ENTRY_POINT;
     } else if (loadedEntryPointPackageJson === null) {
       logger.warn(`Failed to read entry point info from invalid 'package.json' file: ${entryPointPackageJsonPath}`);
@@ -3661,14 +3661,14 @@ function getEntryPointInfo(fs5, config, logger, packagePath, entryPointPath) {
   } else if (entryPointConfig.ignore === true) {
     return IGNORED_ENTRY_POINT;
   } else {
-    entryPointPackageJson = mergeConfigAndPackageJson(fs5, loadedEntryPointPackageJson, entryPointConfig, packagePath, entryPointPath);
+    entryPointPackageJson = mergeConfigAndPackageJson(fs3, loadedEntryPointPackageJson, entryPointConfig, packagePath, entryPointPath);
   }
-  const typings = entryPointPackageJson.typings || entryPointPackageJson.types || guessTypingsFromPackageJson(fs5, entryPointPath, entryPointPackageJson);
+  const typings = entryPointPackageJson.typings || entryPointPackageJson.types || guessTypingsFromPackageJson(fs3, entryPointPath, entryPointPackageJson);
   if (typeof typings !== "string") {
     return INCOMPATIBLE_ENTRY_POINT;
   }
-  const metadataPath = fs5.resolve(entryPointPath, typings.replace(/\.d\.ts$/, "") + ".metadata.json");
-  const compiledByAngular = entryPointConfig !== void 0 || fs5.exists(metadataPath);
+  const metadataPath = fs3.resolve(entryPointPath, typings.replace(/\.d\.ts$/, "") + ".metadata.json");
+  const compiledByAngular = entryPointConfig !== void 0 || fs3.exists(metadataPath);
   const entryPointInfo = {
     name: entryPointPackageJson.name,
     path: entryPointPath,
@@ -3676,7 +3676,7 @@ function getEntryPointInfo(fs5, config, logger, packagePath, entryPointPath) {
     packagePath,
     repositoryUrl,
     packageJson: entryPointPackageJson,
-    typings: fs5.resolve(entryPointPath, typings),
+    typings: fs3.resolve(entryPointPath, typings),
     compiledByAngular,
     ignoreMissingDependencies: entryPointConfig !== void 0 ? !!entryPointConfig.ignoreMissingDependencies : false,
     generateDeepReexports: entryPointConfig !== void 0 ? !!entryPointConfig.generateDeepReexports : false
@@ -3686,7 +3686,7 @@ function getEntryPointInfo(fs5, config, logger, packagePath, entryPointPath) {
 function isEntryPoint(result) {
   return result !== NO_ENTRY_POINT && result !== INCOMPATIBLE_ENTRY_POINT && result !== IGNORED_ENTRY_POINT;
 }
-function getEntryPointFormat(fs5, entryPoint, property2) {
+function getEntryPointFormat(fs3, entryPoint, property2) {
   switch (property2) {
     case "fesm2015":
       return "esm2015";
@@ -3703,13 +3703,13 @@ function getEntryPointFormat(fs5, entryPoint, property2) {
       if (typeof browserFile !== "string") {
         return void 0;
       }
-      return sniffModuleFormat(fs5, fs5.join(entryPoint.path, browserFile));
+      return sniffModuleFormat(fs3, fs3.join(entryPoint.path, browserFile));
     case "main":
       const mainFile = entryPoint.packageJson["main"];
       if (mainFile === void 0) {
         return void 0;
       }
-      return sniffModuleFormat(fs5, fs5.join(entryPoint.path, mainFile));
+      return sniffModuleFormat(fs3, fs3.join(entryPoint.path, mainFile));
     case "module":
       const moduleFilePath = entryPoint.packageJson["module"];
       if (typeof moduleFilePath === "string" && moduleFilePath.includes("esm2015")) {
@@ -3720,19 +3720,19 @@ function getEntryPointFormat(fs5, entryPoint, property2) {
       return void 0;
   }
 }
-function loadPackageJson(fs5, packageJsonPath) {
+function loadPackageJson(fs3, packageJsonPath) {
   try {
-    return JSON.parse(fs5.readFile(packageJsonPath));
+    return JSON.parse(fs3.readFile(packageJsonPath));
   } catch {
     return null;
   }
 }
-function sniffModuleFormat(fs5, sourceFilePath) {
-  const resolvedPath = resolveFileWithPostfixes(fs5, sourceFilePath, ["", ".js", "/index.js"]);
+function sniffModuleFormat(fs3, sourceFilePath) {
+  const resolvedPath = resolveFileWithPostfixes(fs3, sourceFilePath, ["", ".js", "/index.js"]);
   if (resolvedPath === null) {
     return void 0;
   }
-  const sourceFile = ts14.createSourceFile(sourceFilePath, fs5.readFile(resolvedPath), ts14.ScriptTarget.ES5);
+  const sourceFile = ts14.createSourceFile(sourceFilePath, fs3.readFile(resolvedPath), ts14.ScriptTarget.ES5);
   if (sourceFile.statements.length === 0) {
     return void 0;
   }
@@ -3744,29 +3744,29 @@ function sniffModuleFormat(fs5, sourceFilePath) {
     return "commonjs";
   }
 }
-function mergeConfigAndPackageJson(fs5, entryPointPackageJson, entryPointConfig, packagePath, entryPointPath) {
+function mergeConfigAndPackageJson(fs3, entryPointPackageJson, entryPointConfig, packagePath, entryPointPath) {
   if (entryPointPackageJson !== null) {
     return __spreadValues(__spreadValues({}, entryPointPackageJson), entryPointConfig.override);
   } else {
-    const name = `${fs5.basename(packagePath)}/${fs5.relative(packagePath, entryPointPath)}`;
+    const name = `${fs3.basename(packagePath)}/${fs3.relative(packagePath, entryPointPath)}`;
     return __spreadValues({ name }, entryPointConfig.override);
   }
 }
-function guessTypingsFromPackageJson(fs5, entryPointPath, entryPointPackageJson) {
+function guessTypingsFromPackageJson(fs3, entryPointPath, entryPointPackageJson) {
   for (const prop of SUPPORTED_FORMAT_PROPERTIES) {
     const field = entryPointPackageJson[prop];
     if (typeof field !== "string") {
       continue;
     }
     const relativeTypingsPath = field.replace(/\.js$/, ".d.ts");
-    const typingsPath = fs5.resolve(entryPointPath, relativeTypingsPath);
-    if (fs5.exists(typingsPath)) {
+    const typingsPath = fs3.resolve(entryPointPath, relativeTypingsPath);
+    if (fs3.exists(typingsPath)) {
       return typingsPath;
     }
   }
   return null;
 }
-function getPackageNameAndVersion(fs5, packagePath, packagePackageJson, entryPointPackageJson) {
+function getPackageNameAndVersion(fs3, packagePath, packagePackageJson, entryPointPackageJson) {
   var _a;
   let packageName;
   if (packagePackageJson !== null) {
@@ -3774,8 +3774,8 @@ function getPackageNameAndVersion(fs5, packagePath, packagePackageJson, entryPoi
   } else if (entryPointPackageJson !== null) {
     packageName = /^(?:@[^/]+\/)?[^/]*/.exec(entryPointPackageJson.name)[0];
   } else {
-    const lastSegment = fs5.basename(packagePath);
-    const secondLastSegment = fs5.basename(fs5.dirname(packagePath));
+    const lastSegment = fs3.basename(packagePath);
+    const secondLastSegment = fs3.basename(fs3.dirname(packagePath));
     packageName = secondLastSegment.startsWith("@") ? `${secondLastSegment}/${lastSegment}` : lastSegment;
   }
   return {
@@ -3796,8 +3796,8 @@ function getRepositoryUrl(packageJson) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/dependencies/dependency_resolver.mjs
 var builtinNodeJsModules = new Set(module2.builtinModules);
 var DependencyResolver = class {
-  constructor(fs5, logger, config, hosts, typingsHost) {
-    this.fs = fs5;
+  constructor(fs3, logger, config, hosts, typingsHost) {
+    this.fs = fs3;
     this.logger = logger;
     this.config = config;
     this.hosts = hosts;
@@ -3817,7 +3817,7 @@ var DependencyResolver = class {
       sortedEntryPointNodes = graph.overallOrder();
     }
     return {
-      entryPoints: sortedEntryPointNodes.map((path7) => graph.getNodeData(path7)),
+      entryPoints: sortedEntryPointNodes.map((path2) => graph.getNodeData(path2)),
       graph,
       invalidEntryPoints,
       ignoredDependencies
@@ -3898,8 +3898,8 @@ var DependencyResolver = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/dependencies/esm_dependency_host.mjs
 import ts15 from "typescript";
 var EsmDependencyHost = class extends DependencyHostBase {
-  constructor(fs5, moduleResolver, scanImportExpressions = true) {
-    super(fs5, moduleResolver);
+  constructor(fs3, moduleResolver, scanImportExpressions = true) {
+    super(fs3, moduleResolver);
     this.scanImportExpressions = scanImportExpressions;
     this.scanner = ts15.createScanner(ts15.ScriptTarget.Latest, true);
   }
@@ -4063,8 +4063,8 @@ function canPrecedeARegex(kind) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/dependencies/dts_dependency_host.mjs
 var DtsDependencyHost = class extends EsmDependencyHost {
-  constructor(fs5, pathMappings) {
-    super(fs5, new ModuleResolver(fs5, pathMappings, ["", ".d.ts", "/index.d.ts", ".js", "/index.js"]), false);
+  constructor(fs3, pathMappings) {
+    super(fs3, new ModuleResolver(fs3, pathMappings, ["", ".d.ts", "/index.d.ts", ".js", "/index.js"]), false);
   }
   processImport(importPath, file, dependencies, missing, deepImports, alreadySeen) {
     return super.processImport(importPath, file, dependencies, missing, deepImports, alreadySeen) || super.processImport(`@types/${importPath}`, file, dependencies, missing, deepImports, alreadySeen);
@@ -4093,36 +4093,36 @@ var UmdDependencyHost = class extends DependencyHostBase {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/entry_point_finder/utils.mjs
 function getBasePaths(logger, sourceDirectory, pathMappings) {
-  const fs5 = getFileSystem();
+  const fs3 = getFileSystem();
   const basePaths = [sourceDirectory];
   if (pathMappings) {
-    const baseUrl = fs5.resolve(pathMappings.baseUrl);
-    if (fs5.isRoot(baseUrl)) {
+    const baseUrl = fs3.resolve(pathMappings.baseUrl);
+    if (fs3.isRoot(baseUrl)) {
       logger.warn(`The provided pathMappings baseUrl is the root path ${baseUrl}.
 This is likely to mess up how ngcc finds entry-points and is probably not correct.
 Please check your path mappings configuration such as in the tsconfig.json file.`);
     }
     for (const paths of Object.values(pathMappings.paths)) {
-      for (const path7 of paths) {
+      for (const path2 of paths) {
         let foundMatch = false;
-        const { prefix, hasWildcard } = extractPathPrefix(path7);
-        let basePath = fs5.resolve(baseUrl, prefix);
-        if (fs5.exists(basePath) && fs5.stat(basePath).isFile()) {
-          basePath = fs5.dirname(basePath);
+        const { prefix, hasWildcard } = extractPathPrefix(path2);
+        let basePath = fs3.resolve(baseUrl, prefix);
+        if (fs3.exists(basePath) && fs3.stat(basePath).isFile()) {
+          basePath = fs3.dirname(basePath);
         }
-        if (fs5.exists(basePath)) {
+        if (fs3.exists(basePath)) {
           basePaths.push(basePath);
           foundMatch = true;
         }
         if (hasWildcard) {
-          const wildcardContainer = fs5.dirname(basePath);
-          const wildcardPrefix = fs5.basename(basePath);
-          if (isExistingDirectory(fs5, wildcardContainer)) {
-            const candidates = fs5.readdir(wildcardContainer);
+          const wildcardContainer = fs3.dirname(basePath);
+          const wildcardPrefix = fs3.basename(basePath);
+          if (isExistingDirectory(fs3, wildcardContainer)) {
+            const candidates = fs3.readdir(wildcardContainer);
             for (const candidate of candidates) {
               if (candidate.startsWith(wildcardPrefix)) {
-                const candidatePath = fs5.resolve(wildcardContainer, candidate);
-                if (isExistingDirectory(fs5, candidatePath)) {
+                const candidatePath = fs3.resolve(wildcardContainer, candidate);
+                if (isExistingDirectory(fs3, candidatePath)) {
                   foundMatch = true;
                   basePaths.push(candidatePath);
                 }
@@ -4131,23 +4131,23 @@ Please check your path mappings configuration such as in the tsconfig.json file.
           }
         }
         if (!foundMatch) {
-          logger.debug(`The basePath "${basePath}" computed from baseUrl "${baseUrl}" and path mapping "${path7}" does not exist in the file-system.
+          logger.debug(`The basePath "${basePath}" computed from baseUrl "${baseUrl}" and path mapping "${path2}" does not exist in the file-system.
 It will not be scanned for entry-points.`);
         }
       }
     }
   }
-  const dedupedBasePaths = dedupePaths(fs5, basePaths);
-  if (fs5.basename(sourceDirectory) === "node_modules" && !dedupedBasePaths.includes(sourceDirectory)) {
+  const dedupedBasePaths = dedupePaths(fs3, basePaths);
+  if (fs3.basename(sourceDirectory) === "node_modules" && !dedupedBasePaths.includes(sourceDirectory)) {
     dedupedBasePaths.unshift(sourceDirectory);
   }
   return dedupedBasePaths;
 }
-function isExistingDirectory(fs5, path7) {
-  return fs5.exists(path7) && fs5.stat(path7).isDirectory();
+function isExistingDirectory(fs3, path2) {
+  return fs3.exists(path2) && fs3.stat(path2).isDirectory();
 }
-function extractPathPrefix(path7) {
-  const [prefix, rest] = path7.split("*", 2);
+function extractPathPrefix(path2) {
+  const [prefix, rest] = path2.split("*", 2);
   return { prefix, hasWildcard: rest !== void 0 };
 }
 function trackDuration(task, log) {
@@ -4157,17 +4157,17 @@ function trackDuration(task, log) {
   log(duration);
   return result;
 }
-function dedupePaths(fs5, paths) {
+function dedupePaths(fs3, paths) {
   const root = { children: new Map() };
-  for (const path7 of paths) {
-    addPath(fs5, root, path7);
+  for (const path2 of paths) {
+    addPath(fs3, root, path2);
   }
   return flattenTree(root);
 }
-function addPath(fs5, root, path7) {
+function addPath(fs3, root, path2) {
   let node = root;
-  if (!fs5.isRoot(path7)) {
-    const segments = path7.split("/");
+  if (!fs3.isRoot(path2)) {
+    const segments = path2.split("/");
     for (let index = 0; index < segments.length; index++) {
       if (isLeaf(node)) {
         return;
@@ -4179,7 +4179,7 @@ function addPath(fs5, root, path7) {
       node = node.children.get(next);
     }
   }
-  convertToLeaf(node, path7);
+  convertToLeaf(node, path2);
 }
 function flattenTree(root) {
   const paths = [];
@@ -4197,8 +4197,8 @@ function flattenTree(root) {
 function isLeaf(node) {
   return node.path !== void 0;
 }
-function convertToLeaf(node, path7) {
-  node.path = path7;
+function convertToLeaf(node, path2) {
+  node.path = path2;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/entry_point_finder/directory_walker_entry_point_finder.mjs
@@ -4231,8 +4231,8 @@ var DirectoryWalkerEntryPointFinder = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/writing/in_place_file_writer.mjs
 var NGCC_BACKUP_EXTENSION = ".__ivy_ngcc_bak";
 var InPlaceFileWriter = class {
-  constructor(fs5, logger, errorOnFailedEntryPoint) {
-    this.fs = fs5;
+  constructor(fs3, logger, errorOnFailedEntryPoint) {
+    this.fs = fs3;
     this.logger = logger;
     this.errorOnFailedEntryPoint = errorOnFailedEntryPoint;
   }
@@ -4281,8 +4281,8 @@ This error may be caused by one of the following:
 var NGCC_DIRECTORY = "__ivy_ngcc__";
 var NGCC_PROPERTY_EXTENSION = "_ivy_ngcc";
 var NewEntryPointFileWriter = class extends InPlaceFileWriter {
-  constructor(fs5, logger, errorOnFailedEntryPoint, pkgJsonUpdater) {
-    super(fs5, logger, errorOnFailedEntryPoint);
+  constructor(fs3, logger, errorOnFailedEntryPoint, pkgJsonUpdater) {
+    super(fs3, logger, errorOnFailedEntryPoint);
     this.pkgJsonUpdater = pkgJsonUpdater;
   }
   writeBundle(bundle, transformedFiles, formatProperties) {
@@ -4387,8 +4387,8 @@ var NewEntryPointFileWriter = class extends InPlaceFileWriter {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/entry_point_finder/entry_point_collector.mjs
 var EntryPointCollector = class {
-  constructor(fs5, config, logger, resolver) {
-    this.fs = fs5;
+  constructor(fs3, config, logger, resolver) {
+    this.fs = fs3;
     this.config = config;
     this.logger = logger;
     this.resolver = resolver;
@@ -4412,31 +4412,31 @@ var EntryPointCollector = class {
       }
       return entryPoints;
     }
-    for (const path7 of this.fs.readdir(sourceDirectory)) {
-      if (isIgnorablePath(path7)) {
+    for (const path2 of this.fs.readdir(sourceDirectory)) {
+      if (isIgnorablePath(path2)) {
         continue;
       }
-      const absolutePath = this.fs.resolve(sourceDirectory, path7);
+      const absolutePath = this.fs.resolve(sourceDirectory, path2);
       const stat = this.fs.lstat(absolutePath);
       if (stat.isSymbolicLink() || !stat.isDirectory()) {
         continue;
       }
-      entryPoints.push(...this.walkDirectoryForPackages(this.fs.join(sourceDirectory, path7)));
+      entryPoints.push(...this.walkDirectoryForPackages(this.fs.join(sourceDirectory, path2)));
     }
     return entryPoints;
   }
   collectSecondaryEntryPoints(entryPoints, packagePath, directory, paths) {
-    for (const path7 of paths) {
-      if (isIgnorablePath(path7)) {
+    for (const path2 of paths) {
+      if (isIgnorablePath(path2)) {
         continue;
       }
-      const absolutePath = this.fs.resolve(directory, path7);
+      const absolutePath = this.fs.resolve(directory, path2);
       const stat = this.fs.lstat(absolutePath);
       if (stat.isSymbolicLink()) {
         continue;
       }
       const isDirectory = stat.isDirectory();
-      if (!path7.endsWith(".js") && !isDirectory) {
+      if (!path2.endsWith(".js") && !isDirectory) {
         continue;
       }
       const possibleEntryPointPath = isDirectory ? absolutePath : stripJsExtension(absolutePath);
@@ -4459,15 +4459,15 @@ var EntryPointCollector = class {
 function stripJsExtension(filePath) {
   return filePath.replace(/\.js$/, "");
 }
-function isIgnorablePath(path7) {
-  return path7.startsWith(".") || path7 === "node_modules" || path7 === NGCC_DIRECTORY;
+function isIgnorablePath(path2) {
+  return path2.startsWith(".") || path2 === "node_modules" || path2 === NGCC_DIRECTORY;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/path_mappings.mjs
-function getPathMappingsFromTsConfig(fs5, tsConfig, projectPath) {
+function getPathMappingsFromTsConfig(fs3, tsConfig, projectPath) {
   if (tsConfig !== null && tsConfig.options.baseUrl !== void 0 && tsConfig.options.paths !== void 0) {
     return {
-      baseUrl: fs5.resolve(projectPath, tsConfig.options.baseUrl),
+      baseUrl: fs3.resolve(projectPath, tsConfig.options.baseUrl),
       paths: tsConfig.options.paths
     };
   }
@@ -4475,8 +4475,8 @@ function getPathMappingsFromTsConfig(fs5, tsConfig, projectPath) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/entry_point_finder/tracing_entry_point_finder.mjs
 var TracingEntryPointFinder = class {
-  constructor(fs5, config, logger, resolver, basePath, pathMappings) {
-    this.fs = fs5;
+  constructor(fs3, config, logger, resolver, basePath, pathMappings) {
+    this.fs = fs3;
     this.config = config;
     this.logger = logger;
     this.resolver = resolver;
@@ -4488,8 +4488,8 @@ var TracingEntryPointFinder = class {
     const unsortedEntryPoints = new Map();
     const unprocessedPaths = this.getInitialEntryPointPaths();
     while (unprocessedPaths.length > 0) {
-      const path7 = unprocessedPaths.shift();
-      const entryPointWithDeps = this.getEntryPointWithDeps(path7);
+      const path2 = unprocessedPaths.shift();
+      const entryPointWithDeps = this.getEntryPointWithDeps(path2);
       if (entryPointWithDeps === null) {
         continue;
       }
@@ -4512,8 +4512,8 @@ var TracingEntryPointFinder = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/entry_point_finder/program_based_entry_point_finder.mjs
 var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
-  constructor(fs5, config, logger, resolver, entryPointCollector, entryPointManifest, basePath, tsConfig, projectPath) {
-    super(fs5, config, logger, resolver, basePath, getPathMappingsFromTsConfig(fs5, tsConfig, projectPath));
+  constructor(fs3, config, logger, resolver, entryPointCollector, entryPointManifest, basePath, tsConfig, projectPath) {
+    super(fs3, config, logger, resolver, basePath, getPathMappingsFromTsConfig(fs3, tsConfig, projectPath));
     this.entryPointCollector = entryPointCollector;
     this.entryPointManifest = entryPointManifest;
     this.tsConfig = tsConfig;
@@ -4562,7 +4562,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "13.0.3+7.sha-e8e21ac.with-local-changes";
+var NGCC_VERSION = "13.0.3+11.sha-d06e546.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -4605,8 +4605,8 @@ function markAsProcessed(pkgJsonUpdater, packageJson, packageJsonPath, formatPro
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/entry_point_finder/targeted_entry_point_finder.mjs
 var TargetedEntryPointFinder = class extends TracingEntryPointFinder {
-  constructor(fs5, config, logger, resolver, basePath, pathMappings, targetPath) {
-    super(fs5, config, logger, resolver, basePath, pathMappings);
+  constructor(fs3, config, logger, resolver, basePath, pathMappings, targetPath) {
+    super(fs3, config, logger, resolver, basePath, pathMappings);
     this.targetPath = targetPath;
   }
   findEntryPoints() {
@@ -4706,12 +4706,12 @@ var TargetedEntryPointFinder = class extends TracingEntryPointFinder {
       return entryPointPath;
     }
   }
-  splitPath(path7) {
+  splitPath(path2) {
     const segments = [];
-    let container = this.fs.dirname(path7);
-    while (path7 !== container) {
-      segments.unshift(this.fs.basename(path7));
-      path7 = container;
+    let container = this.fs.dirname(path2);
+    while (path2 !== container) {
+      segments.unshift(this.fs.basename(path2));
+      path2 = container;
       container = this.fs.dirname(container);
     }
     return segments;
@@ -4909,9 +4909,9 @@ var SerialTaskQueue = class extends BaseTaskQueue {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/writing/cleaning/utils.mjs
-function isLocalDirectory(fs5, path7) {
-  if (fs5.exists(path7)) {
-    const stat = fs5.lstat(path7);
+function isLocalDirectory(fs3, path2) {
+  if (fs3.exists(path2)) {
+    const stat = fs3.lstat(path2);
     return stat.isDirectory();
   } else {
     return false;
@@ -4920,64 +4920,64 @@ function isLocalDirectory(fs5, path7) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/writing/cleaning/cleaning_strategies.mjs
 var PackageJsonCleaner = class {
-  constructor(fs5) {
-    this.fs = fs5;
+  constructor(fs3) {
+    this.fs = fs3;
   }
-  canClean(_path, basename6) {
-    return basename6 === "package.json";
+  canClean(_path, basename3) {
+    return basename3 === "package.json";
   }
-  clean(path7, _basename) {
-    const packageJson = JSON.parse(this.fs.readFile(path7));
+  clean(path2, _basename) {
+    const packageJson = JSON.parse(this.fs.readFile(path2));
     if (cleanPackageJson(packageJson)) {
-      this.fs.writeFile(path7, `${JSON.stringify(packageJson, null, 2)}
+      this.fs.writeFile(path2, `${JSON.stringify(packageJson, null, 2)}
 `);
     }
   }
 };
 var NgccDirectoryCleaner = class {
-  constructor(fs5) {
-    this.fs = fs5;
+  constructor(fs3) {
+    this.fs = fs3;
   }
-  canClean(path7, basename6) {
-    return basename6 === NGCC_DIRECTORY && isLocalDirectory(this.fs, path7);
+  canClean(path2, basename3) {
+    return basename3 === NGCC_DIRECTORY && isLocalDirectory(this.fs, path2);
   }
-  clean(path7, _basename) {
-    this.fs.removeDeep(path7);
+  clean(path2, _basename) {
+    this.fs.removeDeep(path2);
   }
 };
 var BackupFileCleaner = class {
-  constructor(fs5) {
-    this.fs = fs5;
+  constructor(fs3) {
+    this.fs = fs3;
   }
-  canClean(path7, basename6) {
-    return this.fs.extname(basename6) === NGCC_BACKUP_EXTENSION && this.fs.exists(absoluteFrom(path7.replace(NGCC_BACKUP_EXTENSION, "")));
+  canClean(path2, basename3) {
+    return this.fs.extname(basename3) === NGCC_BACKUP_EXTENSION && this.fs.exists(absoluteFrom(path2.replace(NGCC_BACKUP_EXTENSION, "")));
   }
-  clean(path7, _basename) {
-    this.fs.moveFile(path7, absoluteFrom(path7.replace(NGCC_BACKUP_EXTENSION, "")));
+  clean(path2, _basename) {
+    this.fs.moveFile(path2, absoluteFrom(path2.replace(NGCC_BACKUP_EXTENSION, "")));
   }
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/writing/cleaning/package_cleaner.mjs
 var PackageCleaner = class {
-  constructor(fs5, cleaners) {
-    this.fs = fs5;
+  constructor(fs3, cleaners) {
+    this.fs = fs3;
     this.cleaners = cleaners;
   }
   clean(directory) {
     const basenames = this.fs.readdir(directory);
-    for (const basename6 of basenames) {
-      if (basename6 === "node_modules") {
+    for (const basename3 of basenames) {
+      if (basename3 === "node_modules") {
         continue;
       }
-      const path7 = this.fs.resolve(directory, basename6);
+      const path2 = this.fs.resolve(directory, basename3);
       for (const cleaner of this.cleaners) {
-        if (cleaner.canClean(path7, basename6)) {
-          cleaner.clean(path7, basename6);
+        if (cleaner.canClean(path2, basename3)) {
+          cleaner.clean(path2, basename3);
           break;
         }
       }
-      if (isLocalDirectory(this.fs, path7)) {
-        this.clean(path7);
+      if (isLocalDirectory(this.fs, path2)) {
+        this.clean(path2);
       }
     }
   }
@@ -5038,8 +5038,8 @@ function getAnalyzeEntryPointsFn(logger, finder, fileSystem, supportedProperties
       }
     }
     if (unprocessableEntryPointPaths.length > 0) {
-      throw new Error(`Unable to process any formats for the following entry-points (tried ${propertiesToConsider.join(", ")}): ` + unprocessableEntryPointPaths.map((path7) => `
-  - ${path7}`).join(""));
+      throw new Error(`Unable to process any formats for the following entry-points (tried ${propertiesToConsider.join(", ")}): ` + unprocessableEntryPointPaths.map((path2) => `
+  - ${path2}`).join(""));
     }
     const duration = Math.round((Date.now() - startTime) / 100) / 10;
     logger.debug(`Analyzed ${entryPoints.length} entry-points in ${duration}s. (Total tasks: ${tasks.length})`);
@@ -5097,8 +5097,8 @@ import module3 from "module";
 import cluster from "cluster";
 var Deferred = class {
   constructor() {
-    this.promise = new Promise((resolve5, reject) => {
-      this.resolve = resolve5;
+    this.promise = new Promise((resolve4, reject) => {
+      this.resolve = resolve4;
       this.reject = reject;
     });
   }
@@ -5111,8 +5111,8 @@ var sendMessageToWorker = (workerId, msg) => {
   if (worker === void 0 || worker.isDead() || !worker.isConnected()) {
     throw new Error("Unable to send message to worker process: Recipient does not exist or has disconnected.");
   }
-  return new Promise((resolve5, reject) => {
-    worker.send(msg, (err) => err === null ? resolve5() : reject(err));
+  return new Promise((resolve4, reject) => {
+    worker.send(msg, (err) => err === null ? resolve4() : reject(err));
   });
 };
 
@@ -5557,28 +5557,28 @@ function makeUnsupportedTypeScriptError() {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/bundle_program.mjs
-function makeBundleProgram(fs5, isCore, pkg, path7, r3FileName, options, host, additionalFiles = []) {
-  const r3SymbolsPath = isCore ? findR3SymbolsPath(fs5, fs5.dirname(path7), r3FileName) : null;
-  let rootPaths = r3SymbolsPath ? [path7, r3SymbolsPath, ...additionalFiles] : [path7, ...additionalFiles];
+function makeBundleProgram(fs3, isCore, pkg, path2, r3FileName, options, host, additionalFiles = []) {
+  const r3SymbolsPath = isCore ? findR3SymbolsPath(fs3, fs3.dirname(path2), r3FileName) : null;
+  let rootPaths = r3SymbolsPath ? [path2, r3SymbolsPath, ...additionalFiles] : [path2, ...additionalFiles];
   const originalGetExpandoInitializer = patchTsGetExpandoInitializer();
   const program = ts19.createProgram(rootPaths, options, host);
   program.getTypeChecker();
   restoreGetExpandoInitializer(originalGetExpandoInitializer);
-  const file = program.getSourceFile(path7);
+  const file = program.getSourceFile(path2);
   const r3SymbolsFile = r3SymbolsPath && program.getSourceFile(r3SymbolsPath) || null;
-  return { program, options, host, package: pkg, path: path7, file, r3SymbolsPath, r3SymbolsFile };
+  return { program, options, host, package: pkg, path: path2, file, r3SymbolsPath, r3SymbolsFile };
 }
-function findR3SymbolsPath(fs5, directory, filename) {
-  const r3SymbolsFilePath = fs5.resolve(directory, filename);
-  if (fs5.exists(r3SymbolsFilePath)) {
+function findR3SymbolsPath(fs3, directory, filename) {
+  const r3SymbolsFilePath = fs3.resolve(directory, filename);
+  if (fs3.exists(r3SymbolsFilePath)) {
     return r3SymbolsFilePath;
   }
-  const subDirectories = fs5.readdir(directory).filter((p2) => !p2.startsWith(".")).filter((p2) => p2 !== "node_modules").filter((p2) => {
-    const stat = fs5.lstat(fs5.resolve(directory, p2));
+  const subDirectories = fs3.readdir(directory).filter((p2) => !p2.startsWith(".")).filter((p2) => p2 !== "node_modules").filter((p2) => {
+    const stat = fs3.lstat(fs3.resolve(directory, p2));
     return stat.isDirectory() && !stat.isSymbolicLink();
   });
   for (const subDirectory of subDirectories) {
-    const r3SymbolsFilePath2 = findR3SymbolsPath(fs5, fs5.resolve(directory, subDirectory), filename);
+    const r3SymbolsFilePath2 = findR3SymbolsPath(fs3, fs3.resolve(directory, subDirectory), filename);
     if (r3SymbolsFilePath2) {
       return r3SymbolsFilePath2;
     }
@@ -5589,8 +5589,8 @@ function findR3SymbolsPath(fs5, directory, filename) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/ngcc_compiler_host.mjs
 import ts20 from "typescript";
 var NgccSourcesCompilerHost = class extends NgtscCompilerHost {
-  constructor(fs5, options, cache, moduleResolutionCache, packagePath) {
-    super(fs5, options);
+  constructor(fs3, options, cache, moduleResolutionCache, packagePath) {
+    super(fs3, options);
     this.cache = cache;
     this.moduleResolutionCache = moduleResolutionCache;
     this.packagePath = packagePath;
@@ -5615,8 +5615,8 @@ var NgccSourcesCompilerHost = class extends NgtscCompilerHost {
   }
 };
 var NgccDtsCompilerHost = class extends NgtscCompilerHost {
-  constructor(fs5, options, cache, moduleResolutionCache) {
-    super(fs5, options);
+  constructor(fs3, options, cache, moduleResolutionCache) {
+    super(fs3, options);
     this.cache = cache;
     this.moduleResolutionCache = moduleResolutionCache;
   }
@@ -5634,8 +5634,8 @@ var NgccDtsCompilerHost = class extends NgtscCompilerHost {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/source_file_cache.mjs
 import ts21 from "typescript";
 var SharedFileCache = class {
-  constructor(fs5) {
-    this.fs = fs5;
+  constructor(fs3) {
+    this.fs = fs3;
     this.sfCache = new Map();
   }
   getCachedSourceFile(fileName) {
@@ -5672,17 +5672,17 @@ var SharedFileCache = class {
   }
 };
 var DEFAULT_LIB_PATTERN = ["node_modules", "typescript", "lib", /^lib\..+\.d\.ts$/];
-function isDefaultLibrary(absPath, fs5) {
-  return isFile(absPath, DEFAULT_LIB_PATTERN, fs5);
+function isDefaultLibrary(absPath, fs3) {
+  return isFile(absPath, DEFAULT_LIB_PATTERN, fs3);
 }
 var ANGULAR_DTS_PATTERN = ["node_modules", "@angular", /./, /\.d\.ts$/];
-function isAngularDts(absPath, fs5) {
-  return isFile(absPath, ANGULAR_DTS_PATTERN, fs5);
+function isAngularDts(absPath, fs3) {
+  return isFile(absPath, ANGULAR_DTS_PATTERN, fs3);
 }
-function isFile(path7, segments, fs5) {
+function isFile(path2, segments, fs3) {
   for (let i = segments.length - 1; i >= 0; i--) {
     const pattern = segments[i];
-    const segment = fs5.basename(path7);
+    const segment = fs3.basename(path2);
     if (typeof pattern === "string") {
       if (pattern !== segment) {
         return false;
@@ -5692,13 +5692,13 @@ function isFile(path7, segments, fs5) {
         return false;
       }
     }
-    path7 = fs5.dirname(path7);
+    path2 = fs3.dirname(path2);
   }
   return true;
 }
 var EntryPointFileCache = class {
-  constructor(fs5, sharedFileCache) {
-    this.fs = fs5;
+  constructor(fs3, sharedFileCache) {
+    this.fs = fs3;
     this.sharedFileCache = sharedFileCache;
     this.sfCache = new Map();
   }
@@ -5720,30 +5720,30 @@ var EntryPointFileCache = class {
     return sf;
   }
 };
-function readFile(absPath, fs5) {
-  if (!fs5.exists(absPath) || !fs5.stat(absPath).isFile()) {
+function readFile(absPath, fs3) {
+  if (!fs3.exists(absPath) || !fs3.stat(absPath).isFile()) {
     return void 0;
   }
-  return fs5.readFile(absPath);
+  return fs3.readFile(absPath);
 }
-function createModuleResolutionCache(fs5) {
-  return ts21.createModuleResolutionCache(fs5.pwd(), (fileName) => {
-    return fs5.isCaseSensitive() ? fileName : fileName.toLowerCase();
+function createModuleResolutionCache(fs3) {
+  return ts21.createModuleResolutionCache(fs3.pwd(), (fileName) => {
+    return fs3.isCaseSensitive() ? fileName : fileName.toLowerCase();
   });
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/entry_point_bundle.mjs
-function makeEntryPointBundle(fs5, entryPoint, sharedFileCache, moduleResolutionCache, formatPath, isCore, format, dtsProcessing, pathMappings, mirrorDtsFromSrc = false, enableI18nLegacyMessageIdFormat = true) {
+function makeEntryPointBundle(fs3, entryPoint, sharedFileCache, moduleResolutionCache, formatPath, isCore, format, dtsProcessing, pathMappings, mirrorDtsFromSrc = false, enableI18nLegacyMessageIdFormat = true) {
   const rootDir = entryPoint.packagePath;
   const options = __spreadValues({ allowJs: true, maxNodeModuleJsDepth: Infinity, rootDir }, pathMappings);
-  const entryPointCache = new EntryPointFileCache(fs5, sharedFileCache);
-  const dtsHost = new NgccDtsCompilerHost(fs5, options, entryPointCache, moduleResolutionCache);
-  const srcHost = new NgccSourcesCompilerHost(fs5, options, entryPointCache, moduleResolutionCache, entryPoint.packagePath);
-  const absFormatPath = fs5.resolve(entryPoint.path, formatPath);
-  const typingsPath = fs5.resolve(entryPoint.path, entryPoint.typings);
-  const src = makeBundleProgram(fs5, isCore, entryPoint.packagePath, absFormatPath, "r3_symbols.js", options, srcHost);
-  const additionalDtsFiles = dtsProcessing !== DtsProcessing.No && mirrorDtsFromSrc ? computePotentialDtsFilesFromJsFiles(fs5, src.program, absFormatPath, typingsPath) : [];
-  const dts = dtsProcessing !== DtsProcessing.No ? makeBundleProgram(fs5, isCore, entryPoint.packagePath, typingsPath, "r3_symbols.d.ts", __spreadProps(__spreadValues({}, options), { allowJs: false }), dtsHost, additionalDtsFiles) : null;
+  const entryPointCache = new EntryPointFileCache(fs3, sharedFileCache);
+  const dtsHost = new NgccDtsCompilerHost(fs3, options, entryPointCache, moduleResolutionCache);
+  const srcHost = new NgccSourcesCompilerHost(fs3, options, entryPointCache, moduleResolutionCache, entryPoint.packagePath);
+  const absFormatPath = fs3.resolve(entryPoint.path, formatPath);
+  const typingsPath = fs3.resolve(entryPoint.path, entryPoint.typings);
+  const src = makeBundleProgram(fs3, isCore, entryPoint.packagePath, absFormatPath, "r3_symbols.js", options, srcHost);
+  const additionalDtsFiles = dtsProcessing !== DtsProcessing.No && mirrorDtsFromSrc ? computePotentialDtsFilesFromJsFiles(fs3, src.program, absFormatPath, typingsPath) : [];
+  const dts = dtsProcessing !== DtsProcessing.No ? makeBundleProgram(fs3, isCore, entryPoint.packagePath, typingsPath, "r3_symbols.d.ts", __spreadProps(__spreadValues({}, options), { allowJs: false }), dtsHost, additionalDtsFiles) : null;
   const isFlatCore = isCore && src.r3SymbolsFile === null;
   return {
     entryPoint,
@@ -5757,16 +5757,16 @@ function makeEntryPointBundle(fs5, entryPoint, sharedFileCache, moduleResolution
     enableI18nLegacyMessageIdFormat
   };
 }
-function computePotentialDtsFilesFromJsFiles(fs5, srcProgram, formatPath, typingsPath) {
-  const formatRoot = fs5.dirname(formatPath);
-  const typingsRoot = fs5.dirname(typingsPath);
+function computePotentialDtsFilesFromJsFiles(fs3, srcProgram, formatPath, typingsPath) {
+  const formatRoot = fs3.dirname(formatPath);
+  const typingsRoot = fs3.dirname(typingsPath);
   const additionalFiles = [];
   for (const sf of srcProgram.getSourceFiles()) {
     if (!sf.fileName.endsWith(".js")) {
       continue;
     }
-    const mirroredDtsPath = fs5.resolve(typingsRoot, fs5.relative(formatRoot, sf.fileName.replace(/\.js$/, ".d.ts")));
-    if (fs5.exists(mirroredDtsPath)) {
+    const mirroredDtsPath = fs3.resolve(typingsRoot, fs3.relative(formatRoot, sf.fileName.replace(/\.js$/, ".d.ts")));
+    if (fs3.exists(mirroredDtsPath)) {
       additionalFiles.push(mirroredDtsPath);
     }
   }
@@ -6709,12 +6709,12 @@ var ResourceRegistry = class {
     }
   }
   registerTemplate(templateResource, component) {
-    const { path: path7 } = templateResource;
-    if (path7 !== null) {
-      if (!this.externalTemplateToComponentsMap.has(path7)) {
-        this.externalTemplateToComponentsMap.set(path7, new Set());
+    const { path: path2 } = templateResource;
+    if (path2 !== null) {
+      if (!this.externalTemplateToComponentsMap.has(path2)) {
+        this.externalTemplateToComponentsMap.set(path2, new Set());
       }
-      this.externalTemplateToComponentsMap.get(path7).add(component);
+      this.externalTemplateToComponentsMap.get(path2).add(component);
     }
     this.componentToTemplateMap.set(component, templateResource);
   }
@@ -6725,15 +6725,15 @@ var ResourceRegistry = class {
     return this.componentToTemplateMap.get(component);
   }
   registerStyle(styleResource, component) {
-    const { path: path7 } = styleResource;
+    const { path: path2 } = styleResource;
     if (!this.componentToStylesMap.has(component)) {
       this.componentToStylesMap.set(component, new Set());
     }
-    if (path7 !== null) {
-      if (!this.externalStyleToComponentsMap.has(path7)) {
-        this.externalStyleToComponentsMap.set(path7, new Set());
+    if (path2 !== null) {
+      if (!this.externalStyleToComponentsMap.has(path2)) {
+        this.externalStyleToComponentsMap.set(path2, new Set());
       }
-      this.externalStyleToComponentsMap.get(path7).add(component);
+      this.externalStyleToComponentsMap.get(path2).add(component);
     }
     this.componentToStylesMap.get(component).add(styleResource);
   }
@@ -7610,11 +7610,11 @@ var StaticInterpreter = class {
     }
   }
   visitBindingElement(node, context) {
-    const path7 = [];
+    const path2 = [];
     let closestDeclaration = node;
     while (ts30.isBindingElement(closestDeclaration) || ts30.isArrayBindingPattern(closestDeclaration) || ts30.isObjectBindingPattern(closestDeclaration)) {
       if (ts30.isBindingElement(closestDeclaration)) {
-        path7.unshift(closestDeclaration);
+        path2.unshift(closestDeclaration);
       }
       closestDeclaration = closestDeclaration.parent;
     }
@@ -7622,7 +7622,7 @@ var StaticInterpreter = class {
       return DynamicValue.fromUnknown(node);
     }
     let value = this.visit(closestDeclaration.initializer, context);
-    for (const element of path7) {
+    for (const element of path2) {
       let key;
       if (ts30.isArrayBindingPattern(element.parent)) {
         key = element.parent.elements.indexOf(element);
@@ -9174,12 +9174,12 @@ function validateConstructorDependencies(clazz, deps) {
   } else if (deps.deps !== null) {
     return deps.deps;
   } else {
-    const error2 = deps.errors[0];
-    throw createUnsuitableInjectionTokenError(clazz, error2);
+    const error = deps.errors[0];
+    throw createUnsuitableInjectionTokenError(clazz, error);
   }
 }
-function createUnsuitableInjectionTokenError(clazz, error2) {
-  const { param, index, reason } = error2;
+function createUnsuitableInjectionTokenError(clazz, error) {
+  const { param, index, reason } = error;
   let chainMessage = void 0;
   let hints = void 0;
   switch (reason.kind) {
@@ -10130,7 +10130,7 @@ function evaluateHostExpressionBindings(hostExpr, evaluator) {
   const bindings = parseHostBindings(hostMetadata);
   const errors = verifyHostBindings(bindings, createSourceSpan(hostExpr));
   if (errors.length > 0) {
-    throw new FatalDiagnosticError(ErrorCode.HOST_BINDING_PARSE_ERROR, hostExpr, errors.map((error2) => error2.msg).join("\n"));
+    throw new FatalDiagnosticError(ErrorCode.HOST_BINDING_PARSE_ERROR, hostExpr, errors.map((error) => error.msg).join("\n"));
   }
   return bindings;
 }
@@ -11489,9 +11489,9 @@ function getTemplateDeclarationNodeForError(declaration) {
 }
 function makeCyclicImportInfo(ref, type, cycle) {
   const name = ref.debugName || "(unknown)";
-  const path7 = cycle.getPath().map((sf) => sf.fileName).join(" -> ");
+  const path2 = cycle.getPath().map((sf) => sf.fileName).join(" -> ");
   const message = `The ${type} '${name}' is used in the template but importing it would create a cycle: `;
-  return makeRelatedInformation(ref.node, message + path7);
+  return makeRelatedInformation(ref.node, message + path2);
 }
 function checkCustomElementSelectorForErrors(selector) {
   if (selector.includes(".") || selector.includes("[") && selector.includes("]")) {
@@ -12809,8 +12809,8 @@ var DecorationAnalyses = Map;
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/analysis/decoration_analyzer.mjs
 var NgccResourceLoader = class {
-  constructor(fs5) {
-    this.fs = fs5;
+  constructor(fs3) {
+    this.fs = fs3;
     this.canPreload = false;
     this.canPreprocess = false;
   }
@@ -12828,9 +12828,9 @@ var NgccResourceLoader = class {
   }
 };
 var DecorationAnalyzer = class {
-  constructor(fs5, bundle, reflectionHost, referencesRegistry, diagnosticHandler = () => {
+  constructor(fs3, bundle, reflectionHost, referencesRegistry, diagnosticHandler = () => {
   }, tsConfig = null) {
-    this.fs = fs5;
+    this.fs = fs3;
     this.bundle = bundle;
     this.reflectionHost = reflectionHost;
     this.referencesRegistry = referencesRegistry;
@@ -13495,8 +13495,8 @@ function stripExtension3(filePath) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/esm_rendering_formatter.mjs
 var EsmRenderingFormatter = class {
-  constructor(fs5, host, isCore) {
-    this.fs = fs5;
+  constructor(fs3, host, isCore) {
+    this.fs = fs3;
     this.host = host;
     this.isCore = isCore;
     this.printer = ts55.createPrinter({ newLine: ts55.NewLineKind.LineFeed });
@@ -13683,8 +13683,8 @@ Expected an ES5 IIFE wrapped function. But got:
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/commonjs_rendering_formatter.mjs
 var CommonJsRenderingFormatter = class extends Esm5RenderingFormatter {
-  constructor(fs5, commonJsHost, isCore) {
-    super(fs5, commonJsHost, isCore);
+  constructor(fs3, commonJsHost, isCore) {
+    super(fs3, commonJsHost, isCore);
     this.commonJsHost = commonJsHost;
   }
   addImports(output, imports, file) {
@@ -13778,12 +13778,12 @@ function removeSourceMapComments(contents) {
   return mapHelpers.removeMapFileComments(mapHelpers.removeComments(contents)).replace(/\n\n$/, "\n");
 }
 var SourceFile = class {
-  constructor(sourcePath, contents, rawMap, sources, fs5) {
+  constructor(sourcePath, contents, rawMap, sources, fs3) {
     this.sourcePath = sourcePath;
     this.contents = contents;
     this.rawMap = rawMap;
     this.sources = sources;
-    this.fs = fs5;
+    this.fs = fs3;
     this.contents = removeSourceMapComments(contents);
     this.startOfLinePositions = computeStartOfLinePositions(this.contents);
     this.flattenedMappings = this.flattenMappings();
@@ -14028,8 +14028,8 @@ var Cache = class {
 import mapHelpers2 from "convert-source-map";
 var SCHEME_MATCHER = /^([a-z][a-z0-9.-]*):\/\//i;
 var SourceFileLoader = class {
-  constructor(fs5, logger, schemeMap) {
-    this.fs = fs5;
+  constructor(fs3, logger, schemeMap) {
+    this.fs = fs3;
     this.logger = logger;
     this.schemeMap = schemeMap;
     this.currentPaths = [];
@@ -14105,10 +14105,10 @@ var SourceFileLoader = class {
   processSources(basePath, { map, origin: sourceMapOrigin }) {
     const sourceRoot = this.fs.resolve(this.fs.dirname(basePath), this.replaceSchemeWithPath(map.sourceRoot || ""));
     return map.sources.map((source, index) => {
-      const path7 = this.fs.resolve(sourceRoot, this.replaceSchemeWithPath(source));
+      const path2 = this.fs.resolve(sourceRoot, this.replaceSchemeWithPath(source));
       const content = map.sourcesContent && map.sourcesContent[index] || null;
       const sourceOrigin = content !== null && sourceMapOrigin !== ContentOrigin.Provided ? ContentOrigin.Inline : ContentOrigin.FileSystem;
-      return this.loadSourceFileInternal(path7, content, sourceOrigin, null);
+      return this.loadSourceFileInternal(path2, content, sourceOrigin, null);
     });
   }
   readSourceFile(sourcePath) {
@@ -14119,11 +14119,11 @@ var SourceFileLoader = class {
     this.trackPath(mapPath);
     return JSON.parse(this.fs.readFile(mapPath));
   }
-  trackPath(path7) {
-    if (this.currentPaths.includes(path7)) {
-      throw new Error(`Circular source file mapping dependency: ${this.currentPaths.join(" -> ")} -> ${path7}`);
+  trackPath(path2) {
+    if (this.currentPaths.includes(path2)) {
+      throw new Error(`Circular source file mapping dependency: ${this.currentPaths.join(" -> ")} -> ${path2}`);
     }
-    this.currentPaths.push(path7);
+    this.currentPaths.push(path2);
   }
   getLastNonEmptyLine(contents) {
     let trailingWhitespaceIndex = contents.length - 1;
@@ -14136,20 +14136,20 @@ var SourceFileLoader = class {
     }
     return contents.substr(lastRealLineIndex + 1);
   }
-  replaceSchemeWithPath(path7) {
-    return path7.replace(SCHEME_MATCHER, (_, scheme) => this.schemeMap[scheme.toLowerCase()] || "");
+  replaceSchemeWithPath(path2) {
+    return path2.replace(SCHEME_MATCHER, (_, scheme) => this.schemeMap[scheme.toLowerCase()] || "");
   }
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/source_maps.mjs
-function renderSourceAndMap(logger, fs5, sourceFile, generatedMagicString) {
+function renderSourceAndMap(logger, fs3, sourceFile, generatedMagicString) {
   var _a;
   const sourceFilePath = absoluteFromSourceFile(sourceFile);
   const sourceMapPath = absoluteFrom(`${sourceFilePath}.map`);
   const generatedContent = generatedMagicString.toString();
   const generatedMap = generatedMagicString.generateMap({ file: sourceFilePath, source: sourceFilePath, includeContent: true });
   try {
-    const loader = new SourceFileLoader(fs5, logger, {});
+    const loader = new SourceFileLoader(fs3, logger, {});
     const generatedFile = loader.loadSourceFile(sourceFilePath, generatedContent, { map: generatedMap, mapPath: sourceMapPath });
     const rawMergedMap = generatedFile.renderFlattenedSourceMap();
     const mergedMap = mapHelpers3.fromObject(rawMergedMap);
@@ -14160,7 +14160,7 @@ function renderSourceAndMap(logger, fs5, sourceFile, generatedMagicString) {
 ${mergedMap.toComment()}` }
       ];
     }
-    const sourceMapComment = mapHelpers3.generateMapFileComment(`${fs5.basename(sourceFilePath)}.map`);
+    const sourceMapComment = mapHelpers3.generateMapFileComment(`${fs3.basename(sourceFilePath)}.map`);
     return [
       { path: sourceFilePath, contents: `${generatedFile.contents}
 ${sourceMapComment}` },
@@ -14185,9 +14185,9 @@ var DtsRenderInfo = class {
   }
 };
 var DtsRenderer = class {
-  constructor(dtsFormatter, fs5, logger, host, bundle) {
+  constructor(dtsFormatter, fs3, logger, host, bundle) {
     this.dtsFormatter = dtsFormatter;
-    this.fs = fs5;
+    this.fs = fs3;
     this.logger = logger;
     this.host = host;
     this.bundle = bundle;
@@ -14285,10 +14285,10 @@ var RedundantDecoratorMap = Map;
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/renderer.mjs
 var Renderer = class {
-  constructor(host, srcFormatter, fs5, logger, bundle, tsConfig = null) {
+  constructor(host, srcFormatter, fs3, logger, bundle, tsConfig = null) {
     this.host = host;
     this.srcFormatter = srcFormatter;
-    this.fs = fs5;
+    this.fs = fs3;
     this.logger = logger;
     this.bundle = bundle;
     this.tsConfig = tsConfig;
@@ -14389,8 +14389,8 @@ function createAssignmentStatement(receiverName, propName, initializer, leadingC
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/umd_rendering_formatter.mjs
 import ts59 from "typescript";
 var UmdRenderingFormatter = class extends Esm5RenderingFormatter {
-  constructor(fs5, umdHost, isCore) {
-    super(fs5, umdHost, isCore);
+  constructor(fs3, umdHost, isCore) {
+    super(fs3, umdHost, isCore);
     this.umdHost = umdHost;
   }
   addImports(output, imports, file) {
@@ -14504,8 +14504,8 @@ function getGlobalIdentifier(i) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/transformer.mjs
 var Transformer = class {
-  constructor(fs5, logger, tsConfig = null) {
-    this.fs = fs5;
+  constructor(fs3, logger, tsConfig = null) {
+    this.fs = fs3;
     this.logger = logger;
     this.tsConfig = tsConfig;
   }
@@ -14674,10 +14674,10 @@ function composeTaskCompletedCallbacks(callbacks) {
     callback(task, message);
   };
 }
-function createMarkAsProcessedHandler(fs5, pkgJsonUpdater) {
+function createMarkAsProcessedHandler(fs3, pkgJsonUpdater) {
   return (task) => {
     const { entryPoint, formatPropertiesToMarkAsProcessed, processDts } = task;
-    const packageJsonPath = fs5.resolve(entryPoint.path, "package.json");
+    const packageJsonPath = fs3.resolve(entryPoint.path, "package.json");
     const propsToMarkAsProcessed = [...formatPropertiesToMarkAsProcessed];
     if (processDts !== DtsProcessing.No) {
       propsToMarkAsProcessed.push("typings");
@@ -14685,20 +14685,20 @@ function createMarkAsProcessedHandler(fs5, pkgJsonUpdater) {
     markAsProcessed(pkgJsonUpdater, entryPoint.packageJson, packageJsonPath, propsToMarkAsProcessed);
   };
 }
-function createThrowErrorHandler(fs5) {
+function createThrowErrorHandler(fs3) {
   return (task, message) => {
-    throw new Error(createErrorMessage(fs5, task, message));
+    throw new Error(createErrorMessage(fs3, task, message));
   };
 }
-function createLogErrorHandler(logger, fs5, taskQueue) {
+function createLogErrorHandler(logger, fs3, taskQueue) {
   return (task, message) => {
     taskQueue.markAsFailed(task);
-    logger.error(createErrorMessage(fs5, task, message));
+    logger.error(createErrorMessage(fs3, task, message));
   };
 }
-function createErrorMessage(fs5, task, message) {
+function createErrorMessage(fs3, task, message) {
   var _a;
-  const jsFormat = `\`${task.formatProperty}\` as ${(_a = getEntryPointFormat(fs5, task.entryPoint, task.formatProperty)) != null ? _a : "unknown format"}`;
+  const jsFormat = `\`${task.formatProperty}\` as ${(_a = getEntryPointFormat(fs3, task.entryPoint, task.formatProperty)) != null ? _a : "unknown format"}`;
   const format = task.typingsOnly ? `typings only using ${jsFormat}` : jsFormat;
   message = message !== null ? ` due to ${message}` : "";
   return `Failed to compile entry-point ${task.entryPoint.name} (${format})` + message;
@@ -14745,7 +14745,7 @@ var AsyncLocker = class {
 Waiting up to ${this.retryDelay * this.retryAttempts / 1e3}s for it to finish.
 (If you are sure no ngcc process is running then you should delete the lock-file at ${this.lockFile.path}.)`);
         }
-        await new Promise((resolve5) => setTimeout(resolve5, this.retryDelay));
+        await new Promise((resolve4) => setTimeout(resolve4, this.retryDelay));
       }
     }
     throw new TimeoutError(`Timed out waiting ${this.retryAttempts * this.retryDelay / 1e3}s for another ngcc process, with id ${pid}, to complete.
@@ -14798,20 +14798,20 @@ var ConsoleLogger = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/locking/lock_file.mjs
 import module4 from "module";
-function getLockFilePath(fs5) {
+function getLockFilePath(fs3) {
   const requireFn = typeof __require !== "undefined" ? __require : module4.createRequire(__ESM_IMPORT_META_URL__);
   const ngccEntryPointFile = requireFn.resolve("@angular/compiler-cli/package.json");
-  return fs5.resolve(ngccEntryPointFile, "../../../.ngcc_lock_file");
+  return fs3.resolve(ngccEntryPointFile, "../../../.ngcc_lock_file");
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/locking/lock_file_with_child_process/util.mjs
-function removeLockFile(fs5, logger, lockFilePath, pid) {
+function removeLockFile(fs3, logger, lockFilePath, pid) {
   try {
     logger.debug(`Attempting to remove lock-file at ${lockFilePath}.`);
-    const lockFilePid = fs5.readFile(lockFilePath);
+    const lockFilePid = fs3.readFile(lockFilePath);
     if (lockFilePid === pid) {
       logger.debug(`PIDs match (${pid}), so removing ${lockFilePath}.`);
-      fs5.removeFile(lockFilePath);
+      fs3.removeFile(lockFilePath);
     } else {
       logger.debug(`PIDs do not match (${pid} and ${lockFilePid}), so not removing ${lockFilePath}.`);
     }
@@ -14826,10 +14826,10 @@ function removeLockFile(fs5, logger, lockFilePath, pid) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/locking/lock_file_with_child_process/index.mjs
 var LockFileWithChildProcess = class {
-  constructor(fs5, logger) {
-    this.fs = fs5;
+  constructor(fs3, logger) {
+    this.fs = fs3;
     this.logger = logger;
-    this.path = getLockFilePath(fs5);
+    this.path = getLockFilePath(fs3);
     this.unlocker = this.createUnlocker(this.path);
   }
   write() {
@@ -14854,12 +14854,12 @@ var LockFileWithChildProcess = class {
       this.unlocker = null;
     }
   }
-  createUnlocker(path7) {
+  createUnlocker(path2) {
     var _a, _b;
     this.logger.debug("Forking unlocker child-process");
     const logLevel = this.logger.level !== void 0 ? this.logger.level.toString() : LogLevel.info.toString();
     const isWindows = process.platform === "win32";
-    const unlocker = fork(getLockFileUnlockerScriptPath(this.fs), [path7, logLevel], { detached: true, stdio: isWindows ? "pipe" : "inherit" });
+    const unlocker = fork(getLockFileUnlockerScriptPath(this.fs), [path2, logLevel], { detached: true, stdio: isWindows ? "pipe" : "inherit" });
     if (isWindows) {
       (_a = unlocker.stdout) == null ? void 0 : _a.on("data", process.stdout.write.bind(process.stdout));
       (_b = unlocker.stderr) == null ? void 0 : _b.on("data", process.stderr.write.bind(process.stderr));
@@ -14910,8 +14910,8 @@ import {
 } from "os";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
-import { isSyntaxError as isSyntaxError2 } from "@angular/compiler";
-import ts110 from "typescript";
+import { isSyntaxError } from "@angular/compiler";
+import ts95 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var UNKNOWN_ERROR_CODE = 500;
@@ -14927,74 +14927,32 @@ var EmitFlags;
 })(EmitFlags || (EmitFlags = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/compiler_host.mjs
-import { collectExternalReferences, syntaxError as syntaxError2, TypeScriptEmitter } from "@angular/compiler";
-import fs3 from "fs";
-import {
-  basename as basename5,
-  dirname as dirname5,
-  join as join5,
-  normalize as normalize3,
-  relative as relative4,
-  resolve as resolve3
-} from "path";
-import ts68 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/collector.mjs
-import ts64 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/evaluator.mjs
 import ts62 from "typescript";
-var spreadElementSyntaxKind = ts62.SyntaxKind.SpreadElement || ts62.SyntaxKind.SpreadElementExpression;
-var empty = ts62.createNodeArray();
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/symbols.mjs
-import ts63 from "typescript";
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.mjs
+import { HtmlParser, MessageBundle } from "@angular/compiler";
+import ts93 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/bundle_index_host.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/i18n.mjs
+import { Xliff, Xliff2, Xmb } from "@angular/compiler";
 import {
-  basename as basename4,
-  dirname as dirname4,
-  join as join4,
-  normalize as normalize2
-} from "path";
-import ts66 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/metadata/bundler.mjs
-import {
-  basename as basename3,
-  dirname as dirname3,
-  join as join3,
-  normalize,
+  relative as relative3,
+  resolve as resolve3,
   sep
 } from "path";
-import ts65 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/util.mjs
-import { syntaxError } from "@angular/compiler";
-import {
-  relative as relative3
-} from "path";
-import ts67 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/program.mjs
-import { core, createAotCompiler, getMissingNgModuleMetadataErrorData, getParseErrors, isFormattedError, isSyntaxError } from "@angular/compiler";
-import {
-  readFileSync as readFileSync2
-} from "fs";
-import * as path6 from "path";
-import ts109 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/diagnostics/translate_diagnostics.mjs
-import ts69 from "typescript";
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
+import ts63 from "typescript";
+var tsVersion = ts63.version;
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
-import ts97 from "typescript";
+import ts91 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/generator.mjs
-import ts70 from "typescript";
+import ts64 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/private_export_checker.mjs
-import ts71 from "typescript";
+import ts65 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program_driver/src/api.mjs
 var NgOriginalFile = Symbol("NgOriginalFile");
@@ -15005,19 +14963,19 @@ var UpdateMode;
 })(UpdateMode || (UpdateMode = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver.mjs
-import ts75 from "typescript";
+import ts69 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/adapter.mjs
-import ts72 from "typescript";
+import ts66 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/expando.mjs
 var NgExtension = Symbol("NgExtension");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/factory_generator.mjs
-import ts73 from "typescript";
+import ts67 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/summary_generator.mjs
-import ts74 from "typescript";
+import ts68 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/state.mjs
 var IncrementalStateKind;
@@ -15056,7 +15014,7 @@ import { ParseSourceFile as ParseSourceFile3 } from "@angular/compiler";
 import { ASTWithSource, ImplicitReceiver, RecursiveAstVisitor, TmplAstElement, TmplAstRecursiveVisitor, TmplAstReference, TmplAstTemplate } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/resource/src/loader.mjs
-import ts76 from "typescript";
+import ts70 from "typescript";
 var RESOURCE_MARKER = ".$ngresource$";
 var RESOURCE_MARKER_TS = RESOURCE_MARKER + ".ts";
 
@@ -15094,7 +15052,7 @@ var SymbolKind;
 })(SymbolKind || (SymbolKind = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.mjs
-import ts77 from "typescript";
+import ts71 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/id.mjs
 var TEMPLATE_ID = Symbol("ngTemplateId");
@@ -15102,11 +15060,11 @@ var NEXT_TEMPLATE_ID = Symbol("ngNextTemplateId");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/completion.mjs
 import { EmptyExpr, ImplicitReceiver as ImplicitReceiver2, PropertyRead, PropertyWrite, SafePropertyRead, TmplAstReference as TmplAstReference2, TmplAstTextAttribute } from "@angular/compiler";
-import ts79 from "typescript";
+import ts73 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/comments.mjs
 import { AbsoluteSourceSpan as AbsoluteSourceSpan2 } from "@angular/compiler";
-import ts78 from "typescript";
+import ts72 from "typescript";
 var CommentTriviaType;
 (function(CommentTriviaType2) {
   CommentTriviaType2["DIAGNOSTIC"] = "D";
@@ -15121,47 +15079,47 @@ var ExpressionIdentifier;
 var IGNORE_FOR_DIAGNOSTICS_MARKER = `${CommentTriviaType.DIAGNOSTIC}:ignore`;
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/context.mjs
-import ts93 from "typescript";
+import ts87 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/dom.mjs
 import { DomElementSchemaRegistry as DomElementSchemaRegistry2 } from "@angular/compiler";
-import ts80 from "typescript";
+import ts74 from "typescript";
 var REGISTRY = new DomElementSchemaRegistry2();
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/environment.mjs
 import { ExpressionType, ExternalExpr as ExternalExpr9 } from "@angular/compiler";
-import ts86 from "typescript";
+import ts80 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.mjs
-import ts81 from "typescript";
+import ts75 from "typescript";
 var SAFE_TO_CAST_WITHOUT_PARENS = new Set([
-  ts81.SyntaxKind.ParenthesizedExpression,
-  ts81.SyntaxKind.Identifier,
-  ts81.SyntaxKind.CallExpression,
-  ts81.SyntaxKind.NonNullExpression,
-  ts81.SyntaxKind.ElementAccessExpression,
-  ts81.SyntaxKind.PropertyAccessExpression,
-  ts81.SyntaxKind.ArrayLiteralExpression,
-  ts81.SyntaxKind.ObjectLiteralExpression,
-  ts81.SyntaxKind.StringLiteral,
-  ts81.SyntaxKind.NumericLiteral,
-  ts81.SyntaxKind.TrueKeyword,
-  ts81.SyntaxKind.FalseKeyword,
-  ts81.SyntaxKind.NullKeyword,
-  ts81.SyntaxKind.UndefinedKeyword
+  ts75.SyntaxKind.ParenthesizedExpression,
+  ts75.SyntaxKind.Identifier,
+  ts75.SyntaxKind.CallExpression,
+  ts75.SyntaxKind.NonNullExpression,
+  ts75.SyntaxKind.ElementAccessExpression,
+  ts75.SyntaxKind.PropertyAccessExpression,
+  ts75.SyntaxKind.ArrayLiteralExpression,
+  ts75.SyntaxKind.ObjectLiteralExpression,
+  ts75.SyntaxKind.StringLiteral,
+  ts75.SyntaxKind.NumericLiteral,
+  ts75.SyntaxKind.TrueKeyword,
+  ts75.SyntaxKind.FalseKeyword,
+  ts75.SyntaxKind.NullKeyword,
+  ts75.SyntaxKind.UndefinedKeyword
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.mjs
-import ts85 from "typescript";
+import ts79 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.mjs
-import ts84 from "typescript";
+import ts78 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_parameter_emitter.mjs
-import ts83 from "typescript";
+import ts77 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_emitter.mjs
-import ts82 from "typescript";
+import ts76 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.mjs
 var TcbInliningRequirement;
@@ -15173,47 +15131,47 @@ var TcbInliningRequirement;
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/oob.mjs
 import { TmplAstElement as TmplAstElement2 } from "@angular/compiler";
-import ts87 from "typescript";
+import ts81 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/shim.mjs
-import ts88 from "typescript";
+import ts82 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
 import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead2, PropertyWrite as PropertyWrite2, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstElement as TmplAstElement3, TmplAstIcu, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
-import ts91 from "typescript";
+import ts85 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
 import { AbsoluteSourceSpan as AbsoluteSourceSpan3 } from "@angular/compiler";
-import ts89 from "typescript";
+import ts83 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/expression.mjs
 import { ASTWithSource as ASTWithSource2, Call, EmptyExpr as EmptyExpr2, SafeKeyedRead, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
-import ts90 from "typescript";
-var NULL_AS_ANY = ts90.createAsExpression(ts90.createNull(), ts90.createKeywordTypeNode(ts90.SyntaxKind.AnyKeyword));
-var UNDEFINED = ts90.createIdentifier("undefined");
+import ts84 from "typescript";
+var NULL_AS_ANY = ts84.createAsExpression(ts84.createNull(), ts84.createKeywordTypeNode(ts84.SyntaxKind.AnyKeyword));
+var UNDEFINED = ts84.createIdentifier("undefined");
 var UNARY_OPS = new Map([
-  ["+", ts90.SyntaxKind.PlusToken],
-  ["-", ts90.SyntaxKind.MinusToken]
+  ["+", ts84.SyntaxKind.PlusToken],
+  ["-", ts84.SyntaxKind.MinusToken]
 ]);
 var BINARY_OPS = new Map([
-  ["+", ts90.SyntaxKind.PlusToken],
-  ["-", ts90.SyntaxKind.MinusToken],
-  ["<", ts90.SyntaxKind.LessThanToken],
-  [">", ts90.SyntaxKind.GreaterThanToken],
-  ["<=", ts90.SyntaxKind.LessThanEqualsToken],
-  [">=", ts90.SyntaxKind.GreaterThanEqualsToken],
-  ["==", ts90.SyntaxKind.EqualsEqualsToken],
-  ["===", ts90.SyntaxKind.EqualsEqualsEqualsToken],
-  ["*", ts90.SyntaxKind.AsteriskToken],
-  ["/", ts90.SyntaxKind.SlashToken],
-  ["%", ts90.SyntaxKind.PercentToken],
-  ["!=", ts90.SyntaxKind.ExclamationEqualsToken],
-  ["!==", ts90.SyntaxKind.ExclamationEqualsEqualsToken],
-  ["||", ts90.SyntaxKind.BarBarToken],
-  ["&&", ts90.SyntaxKind.AmpersandAmpersandToken],
-  ["&", ts90.SyntaxKind.AmpersandToken],
-  ["|", ts90.SyntaxKind.BarToken],
-  ["??", ts90.SyntaxKind.QuestionQuestionToken]
+  ["+", ts84.SyntaxKind.PlusToken],
+  ["-", ts84.SyntaxKind.MinusToken],
+  ["<", ts84.SyntaxKind.LessThanToken],
+  [">", ts84.SyntaxKind.GreaterThanToken],
+  ["<=", ts84.SyntaxKind.LessThanEqualsToken],
+  [">=", ts84.SyntaxKind.GreaterThanEqualsToken],
+  ["==", ts84.SyntaxKind.EqualsEqualsToken],
+  ["===", ts84.SyntaxKind.EqualsEqualsEqualsToken],
+  ["*", ts84.SyntaxKind.AsteriskToken],
+  ["/", ts84.SyntaxKind.SlashToken],
+  ["%", ts84.SyntaxKind.PercentToken],
+  ["!=", ts84.SyntaxKind.ExclamationEqualsToken],
+  ["!==", ts84.SyntaxKind.ExclamationEqualsEqualsToken],
+  ["||", ts84.SyntaxKind.BarBarToken],
+  ["&&", ts84.SyntaxKind.AmpersandAmpersandToken],
+  ["&", ts84.SyntaxKind.AmpersandToken],
+  ["|", ts84.SyntaxKind.BarToken],
+  ["??", ts84.SyntaxKind.QuestionQuestionToken]
 ]);
 var VeSafeLhsInferenceBugDetector = class {
   static veWillInferAnyFor(ast) {
@@ -15296,10 +15254,10 @@ var TcbGenericContextBehavior;
   TcbGenericContextBehavior2[TcbGenericContextBehavior2["CopyClassNodes"] = 1] = "CopyClassNodes";
   TcbGenericContextBehavior2[TcbGenericContextBehavior2["FallbackToAny"] = 2] = "FallbackToAny";
 })(TcbGenericContextBehavior || (TcbGenericContextBehavior = {}));
-var INFER_TYPE_FOR_CIRCULAR_OP_EXPR = ts91.createNonNullExpression(ts91.createNull());
+var INFER_TYPE_FOR_CIRCULAR_OP_EXPR = ts85.createNonNullExpression(ts85.createNull());
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_file.mjs
-import ts92 from "typescript";
+import ts86 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/context.mjs
 var InliningMode;
@@ -15313,21 +15271,21 @@ import { ParseLocation as ParseLocation2, ParseSourceSpan as ParseSourceSpan2 } 
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.mjs
 import { AST, ASTWithSource as ASTWithSource3, BindingPipe as BindingPipe2, PropertyRead as PropertyRead3, PropertyWrite as PropertyWrite3, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement4, TmplAstReference as TmplAstReference4, TmplAstTemplate as TmplAstTemplate3, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable3 } from "@angular/compiler";
-import ts94 from "typescript";
+import ts88 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
 var REGISTRY2 = new DomElementSchemaRegistry3();
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/invalid_banana_in_box/index.mjs
 import { TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
-import ts95 from "typescript";
+import ts89 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/api/api.mjs
 import { ASTWithSource as ASTWithSource4, RecursiveAstVisitor as RecursiveAstVisitor3 } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/nullish_coalescing_not_nullable/index.mjs
 import { Binary } from "@angular/compiler";
-import ts96 from "typescript";
+import ts90 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
 var CompilationTicketKind;
@@ -15337,66 +15295,11 @@ var CompilationTicketKind;
   CompilationTicketKind2[CompilationTicketKind2["IncrementalResource"] = 2] = "IncrementalResource";
 })(CompilationTicketKind || (CompilationTicketKind = {}));
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.mjs
-import { HtmlParser, MessageBundle } from "@angular/compiler";
-import ts100 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/i18n.mjs
-import { Xliff, Xliff2, Xmb } from "@angular/compiler";
-import {
-  relative as relative5,
-  resolve as resolve4,
-  sep as sep2
-} from "path";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
-import ts98 from "typescript";
-var tsVersion = ts98.version;
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/host.mjs
-import ts99 from "typescript";
+import ts92 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/downlevel_decorators_transform/downlevel_decorators_transform.mjs
-import ts102 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/downlevel_decorators_transform/patch_alias_reference_resolution.mjs
-import ts101 from "typescript";
-var patchedReferencedAliasesSymbol = Symbol("patchedReferencedAliases");
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/inline_resources.mjs
-import ts103 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/lower_expressions.mjs
-import { createLoweredSymbol, isLoweredSymbol } from "@angular/compiler";
-import ts104 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/metadata_cache.mjs
-import ts105 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/node_emitter_transform.mjs
-import ts107 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/node_emitter.mjs
-import { BinaryOperator as BinaryOperator2, BuiltinMethod, BuiltinVar, ClassStmt, ExternalExpr as ExternalExpr10, Statement, StmtModifier as StmtModifier2, UnaryOperator as UnaryOperator2 } from "@angular/compiler";
-import ts106 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/r3_metadata_transform.mjs
-import { ClassStmt as ClassStmt2, StmtModifier as StmtModifier3 } from "@angular/compiler";
-import ts108 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/program.mjs
-var VE_DISABLED_MESSAGE = `
-This compilation is using the View Engine compiler which is no longer supported by the Angular team
-and is being removed. Please upgrade to the Ivy compiler by switching to \`NgtscProgram\`. See
-https://angular.io/guide/ivy for more information.
-`.trim().split("\n").join(" ");
-var LOWER_FIELDS = ["useValue", "useFactory", "data", "id", "loadChildren"];
-var R3_LOWER_FIELDS = [...LOWER_FIELDS, "providers", "imports", "exports"];
-var emptyModules = {
-  ngModules: [],
-  ngModuleByPipeOrDirective: new Map(),
-  files: []
-};
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/util.mjs
+import ts94 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
 function calcProjectFileAndBasePath(project, host = getFileSystem()) {
@@ -15410,16 +15313,16 @@ function calcProjectFileAndBasePath(project, host = getFileSystem()) {
 function readConfiguration(project, existingOptions, host = getFileSystem()) {
   var _a;
   try {
-    const fs5 = getFileSystem();
-    const readConfigFile = (configFile) => ts110.readConfigFile(configFile, (file) => host.readFile(host.resolve(file)));
+    const fs3 = getFileSystem();
+    const readConfigFile = (configFile) => ts95.readConfigFile(configFile, (file) => host.readFile(host.resolve(file)));
     const readAngularCompilerOptions = (configFile, parentOptions = {}) => {
-      const { config: config2, error: error3 } = readConfigFile(configFile);
-      if (error3) {
+      const { config: config2, error: error2 } = readConfigFile(configFile);
+      if (error2) {
         return parentOptions;
       }
       const existingNgCompilerOptions = __spreadValues(__spreadValues({}, config2.angularCompilerOptions), parentOptions);
       if (config2.extends && typeof config2.extends === "string") {
-        const extendedConfigPath = getExtendedConfigPath(configFile, config2.extends, host, fs5);
+        const extendedConfigPath = getExtendedConfigPath(configFile, config2.extends, host, fs3);
         if (extendedConfigPath !== null) {
           return readAngularCompilerOptions(extendedConfigPath, existingNgCompilerOptions);
         }
@@ -15428,11 +15331,11 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
     };
     const { projectFile, basePath } = calcProjectFileAndBasePath(project, host);
     const configFileName = host.resolve(host.pwd(), projectFile);
-    const { config, error: error2 } = readConfigFile(projectFile);
-    if (error2) {
+    const { config, error } = readConfigFile(projectFile);
+    if (error) {
       return {
         project,
-        errors: [error2],
+        errors: [error],
         rootNames: [],
         options: {},
         emitFlags: EmitFlags.Default
@@ -15442,8 +15345,8 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
       genDir: basePath,
       basePath
     }, readAngularCompilerOptions(configFileName)), existingOptions);
-    const parseConfigHost = createParseConfigHost(host, fs5);
-    const { options, errors, fileNames: rootNames, projectReferences } = ts110.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingCompilerOptions, configFileName);
+    const parseConfigHost = createParseConfigHost(host, fs3);
+    const { options, errors, fileNames: rootNames, projectReferences } = ts95.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingCompilerOptions, configFileName);
     options.enableIvy = !!((_a = options.enableIvy) != null ? _a : true);
     let emitFlags = EmitFlags.Default;
     if (!(options.skipMetadataEmit || options.flatModuleOutFile)) {
@@ -15455,7 +15358,7 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
     return { project: projectFile, rootNames, projectReferences, options, errors, emitFlags };
   } catch (e) {
     const errors = [{
-      category: ts110.DiagnosticCategory.Error,
+      category: ts95.DiagnosticCategory.Error,
       messageText: e.stack,
       file: void 0,
       start: void 0,
@@ -15466,30 +15369,30 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
     return { project: "", errors, rootNames: [], options: {}, emitFlags: EmitFlags.Default };
   }
 }
-function createParseConfigHost(host, fs5 = getFileSystem()) {
+function createParseConfigHost(host, fs3 = getFileSystem()) {
   return {
     fileExists: host.exists.bind(host),
-    readDirectory: ts110.sys.readDirectory,
+    readDirectory: ts95.sys.readDirectory,
     readFile: host.readFile.bind(host),
-    useCaseSensitiveFileNames: fs5.isCaseSensitive()
+    useCaseSensitiveFileNames: fs3.isCaseSensitive()
   };
 }
-function getExtendedConfigPath(configFile, extendsValue, host, fs5) {
-  const result = getExtendedConfigPathWorker(configFile, extendsValue, host, fs5);
+function getExtendedConfigPath(configFile, extendsValue, host, fs3) {
+  const result = getExtendedConfigPathWorker(configFile, extendsValue, host, fs3);
   if (result !== null) {
     return result;
   }
-  return getExtendedConfigPathWorker(configFile, `${extendsValue}.json`, host, fs5);
+  return getExtendedConfigPathWorker(configFile, `${extendsValue}.json`, host, fs3);
 }
-function getExtendedConfigPathWorker(configFile, extendsValue, host, fs5) {
-  if (extendsValue.startsWith(".") || fs5.isRooted(extendsValue)) {
+function getExtendedConfigPathWorker(configFile, extendsValue, host, fs3) {
+  if (extendsValue.startsWith(".") || fs3.isRooted(extendsValue)) {
     const extendedConfigPath = host.resolve(host.dirname(configFile), extendsValue);
     if (host.exists(extendedConfigPath)) {
       return extendedConfigPath;
     }
   } else {
-    const parseConfigHost = createParseConfigHost(host, fs5);
-    const { resolvedModule } = ts110.nodeModuleNameResolver(extendsValue, configFile, { moduleResolution: ts110.ModuleResolutionKind.NodeJs, resolveJsonModule: true }, parseConfigHost);
+    const parseConfigHost = createParseConfigHost(host, fs3);
+    const { resolvedModule } = ts95.nodeModuleNameResolver(extendsValue, configFile, { moduleResolution: ts95.ModuleResolutionKind.NodeJs, resolveJsonModule: true }, parseConfigHost);
     if (resolvedModule) {
       return absoluteFrom(resolvedModule.resolvedFileName);
     }
@@ -15663,16 +15566,16 @@ var NGCC_CONFIG_FILENAME = "ngcc.config.js";
 var isCommonJS2 = typeof __require !== "undefined";
 var currentFileUrl2 = isCommonJS2 ? null : __ESM_IMPORT_META_URL__;
 var ProcessedNgccPackageConfig = class {
-  constructor(fs5, packagePath, { entryPoints = {}, ignorableDeepImportMatchers = [] }) {
-    const absolutePathEntries = Object.entries(entryPoints).map(([relativePath, config]) => [fs5.resolve(packagePath, relativePath), config]);
+  constructor(fs3, packagePath, { entryPoints = {}, ignorableDeepImportMatchers = [] }) {
+    const absolutePathEntries = Object.entries(entryPoints).map(([relativePath, config]) => [fs3.resolve(packagePath, relativePath), config]);
     this.packagePath = packagePath;
     this.entryPoints = new Map(absolutePathEntries);
     this.ignorableDeepImportMatchers = ignorableDeepImportMatchers;
   }
 };
 var NgccConfiguration = class {
-  constructor(fs5, baseDir) {
-    this.fs = fs5;
+  constructor(fs3, baseDir) {
+    this.fs = fs3;
     this.cache = new Map();
     this.defaultConfig = new PartiallyProcessedConfig(DEFAULT_NGCC_CONFIG);
     this.projectConfig = new PartiallyProcessedConfig(this.loadProjectConfig(baseDir));
@@ -15764,8 +15667,8 @@ var NgccConfiguration = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/entry_point_manifest.mjs
 import { createHash as createHash2 } from "crypto";
 var EntryPointManifest = class {
-  constructor(fs5, config, logger) {
-    this.fs = fs5;
+  constructor(fs3, config, logger) {
+    this.fs = fs3;
     this.config = config;
     this.logger = logger;
   }
@@ -15893,8 +15796,8 @@ var PackageJsonUpdate = class {
   }
 };
 var DirectPackageJsonUpdater = class {
-  constructor(fs5) {
-    this.fs = fs5;
+  constructor(fs3) {
+    this.fs = fs3;
   }
   createUpdate() {
     return new PackageJsonUpdate((...args) => this.writeChanges(...args));
@@ -16031,13 +15934,13 @@ function getDependencyResolver(fileSystem, logger, config, pathMappings) {
     commonjs: commonJsDependencyHost
   }, dtsDependencyHost);
 }
-function getEntryPointFinder(fs5, logger, resolver, config, entryPointManifest, basePath, absoluteTargetEntryPointPath, pathMappings, tsConfig, projectPath) {
+function getEntryPointFinder(fs3, logger, resolver, config, entryPointManifest, basePath, absoluteTargetEntryPointPath, pathMappings, tsConfig, projectPath) {
   if (absoluteTargetEntryPointPath !== null) {
-    return new TargetedEntryPointFinder(fs5, config, logger, resolver, basePath, pathMappings, absoluteTargetEntryPointPath);
+    return new TargetedEntryPointFinder(fs3, config, logger, resolver, basePath, pathMappings, absoluteTargetEntryPointPath);
   } else {
-    const entryPointCollector = new EntryPointCollector(fs5, config, logger, resolver);
+    const entryPointCollector = new EntryPointCollector(fs3, config, logger, resolver);
     if (tsConfig !== null) {
-      return new ProgramBasedEntryPointFinder(fs5, config, logger, resolver, entryPointCollector, entryPointManifest, basePath, tsConfig, projectPath);
+      return new ProgramBasedEntryPointFinder(fs3, config, logger, resolver, entryPointCollector, entryPointManifest, basePath, tsConfig, projectPath);
     } else {
       return new DirectoryWalkerEntryPointFinder(logger, resolver, entryPointCollector, entryPointManifest, basePath, pathMappings);
     }
@@ -16049,8 +15952,8 @@ function process2(options) {
   setFileSystem(new NodeJSFileSystem());
   return mainNgcc(options);
 }
-var containingDirPath = typeof __dirname !== "undefined" ? __dirname : dirname6(fileURLToPath2(__ESM_IMPORT_META_URL__));
-var ngccMainFilePath = join6(containingDirPath, "./main-ngcc.js");
+var containingDirPath = typeof __dirname !== "undefined" ? __dirname : dirname3(fileURLToPath2(__ESM_IMPORT_META_URL__));
+var ngccMainFilePath = join3(containingDirPath, "./main-ngcc.js");
 export {
   ConsoleLogger,
   LogLevel,

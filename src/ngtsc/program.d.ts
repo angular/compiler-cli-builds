@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/program" />
-import { GeneratedFile } from '@angular/compiler';
 import ts from 'typescript';
 import * as api from '../transformers/api';
 import { NgCompiler } from './core';
@@ -33,9 +32,9 @@ export declare class NgtscProgram implements api.Program {
     getTsOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
     getTsSyntacticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
     getTsSemanticDiagnostics(sourceFile?: ts.SourceFile | undefined, cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
-    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): readonly (ts.Diagnostic | api.Diagnostic)[];
-    getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken | undefined): readonly api.Diagnostic[];
-    getNgSemanticDiagnostics(fileName?: string | undefined, cancellationToken?: ts.CancellationToken | undefined): readonly (ts.Diagnostic | api.Diagnostic)[];
+    getNgOptionDiagnostics(cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
+    getNgStructuralDiagnostics(cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
+    getNgSemanticDiagnostics(fileName?: string | undefined, cancellationToken?: ts.CancellationToken | undefined): readonly ts.Diagnostic[];
     /**
      * Ensure that the `NgCompiler` has properly analyzed the program, and allow for the asynchronous
      * loading of any resources during the process.
@@ -54,7 +53,5 @@ export declare class NgtscProgram implements api.Program {
         mergeEmitResultsCallback?: api.TsMergeEmitResultsCallback | undefined;
     } | undefined): ts.EmitResult;
     getIndexedComponents(): Map<DeclarationNode, IndexedComponent>;
-    getLibrarySummaries(): Map<string, api.LibrarySummary>;
-    getEmittedGeneratedFiles(): Map<string, GeneratedFile>;
     getEmittedSourceFiles(): Map<string, ts.SourceFile>;
 }
