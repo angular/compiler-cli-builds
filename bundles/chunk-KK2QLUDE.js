@@ -78,7 +78,6 @@ import {
   getFileSystem,
   getSourceFileOrError,
   join,
-  relative,
   resolve
 } from "./chunk-EP5JHXG2.js";
 import {
@@ -99,9 +98,6 @@ var UNKNOWN_ERROR_CODE = 500;
 var SOURCE = "angular";
 function isTsDiagnostic(diagnostic) {
   return diagnostic != null && diagnostic.source !== "angular";
-}
-function isNgDiagnostic(diagnostic) {
-  return diagnostic != null && diagnostic.source === "angular";
 }
 var EmitFlags;
 (function(EmitFlags2) {
@@ -161,7 +157,7 @@ import ts35 from "typescript";
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/i18n.mjs
 import { Xliff, Xliff2, Xmb } from "@angular/compiler";
 import {
-  relative as relative2,
+  relative,
   resolve as resolve2,
   sep
 } from "path";
@@ -208,7 +204,7 @@ function i18nSerialize(bundle, formatName, options) {
 }
 function getPathNormalizer(basePath) {
   return (sourcePath) => {
-    sourcePath = basePath ? relative2(basePath, sourcePath) : sourcePath;
+    sourcePath = basePath ? relative(basePath, sourcePath) : sourcePath;
     return sourcePath.split(sep).join("/");
   };
 }
@@ -7183,12 +7179,6 @@ var NgtscProgram = class {
   getIndexedComponents() {
     return this.compiler.getIndexedComponents();
   }
-  getLibrarySummaries() {
-    throw new Error("Method not implemented.");
-  }
-  getEmittedGeneratedFiles() {
-    throw new Error("Method not implemented.");
-  }
   getEmittedSourceFiles() {
     throw new Error("Method not implemented.");
   }
@@ -7207,18 +7197,13 @@ function mergeEmitResults(emitResults) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/program.mjs
-var VE_DISABLED_MESSAGE = `
-This compilation is using the View Engine compiler which is no longer supported by the Angular team
-and is being removed. Please upgrade to the Ivy compiler by switching to \`NgtscProgram\`. See
-https://angular.io/guide/ivy for more information.
-`.trim().split("\n").join(" ");
 function createProgram({ rootNames, options, host, oldProgram }) {
-  if (options.enableIvy !== false) {
-    return new NgtscProgram(rootNames, options, host, oldProgram);
-  } else {
-    throw new Error(VE_DISABLED_MESSAGE);
-  }
+  return new NgtscProgram(rootNames, options, host, oldProgram);
 }
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
+import { isSyntaxError } from "@angular/compiler";
+import ts37 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/util.mjs
 import ts36 from "typescript";
@@ -7234,88 +7219,16 @@ function createMessageDiagnostic(messageText) {
     source: SOURCE
   };
 }
-function ngToTsDiagnostic(ng2) {
-  let file;
-  let start;
-  let length;
-  if (ng2.span) {
-    file = { fileName: ng2.span.start.file.url, text: ng2.span.start.file.content };
-    start = ng2.span.start.offset;
-    length = ng2.span.end.offset - start;
-  }
-  return {
-    file,
-    messageText: ng2.messageText,
-    category: ng2.category,
-    code: ng2.code,
-    start,
-    length
-  };
-}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
-import { isSyntaxError } from "@angular/compiler";
-import ts37 from "typescript";
 var defaultFormatHost = {
   getCurrentDirectory: () => ts37.sys.getCurrentDirectory(),
   getCanonicalFileName: (fileName) => fileName,
   getNewLine: () => ts37.sys.newLine
 };
-function displayFileName(fileName, host) {
-  return relative(resolve(host.getCurrentDirectory()), resolve(host.getCanonicalFileName(fileName)));
-}
-function formatDiagnosticPosition(position, host = defaultFormatHost) {
-  return `${displayFileName(position.fileName, host)}(${position.line + 1},${position.column + 1})`;
-}
-function flattenDiagnosticMessageChain(chain, host = defaultFormatHost, indent = 0) {
-  const newLine = host.getNewLine();
-  let result = "";
-  if (indent) {
-    result += newLine;
-    for (let i = 0; i < indent; i++) {
-      result += "  ";
-    }
-  }
-  result += chain.messageText;
-  const position = chain.position;
-  if (position && indent !== 0) {
-    result += ` at ${formatDiagnosticPosition(position, host)}`;
-  }
-  indent++;
-  if (chain.next) {
-    for (const kid of chain.next) {
-      result += flattenDiagnosticMessageChain(kid, host, indent);
-    }
-  }
-  return result;
-}
-function formatDiagnostic(diagnostic, host = defaultFormatHost) {
-  let result = "";
-  const newLine = host.getNewLine();
-  const span = diagnostic.span;
-  if (span) {
-    result += `${formatDiagnosticPosition({ fileName: span.start.file.url, line: span.start.line, column: span.start.col }, host)}: `;
-  } else if (diagnostic.position) {
-    result += `${formatDiagnosticPosition(diagnostic.position, host)}: `;
-  }
-  if (diagnostic.span && diagnostic.span.details) {
-    result += `${diagnostic.span.details}, ${diagnostic.messageText}${newLine}`;
-  } else if (diagnostic.chain) {
-    result += `${flattenDiagnosticMessageChain(diagnostic.chain, host)}.${newLine}`;
-  } else {
-    result += `${diagnostic.messageText}${newLine}`;
-  }
-  return result;
-}
 function formatDiagnostics(diags, host = defaultFormatHost) {
   if (diags && diags.length) {
-    return diags.map((diagnostic) => {
-      if (isTsDiagnostic(diagnostic)) {
-        return replaceTsWithNgInErrors(ts37.formatDiagnosticsWithColorAndContext([diagnostic], host));
-      } else {
-        return formatDiagnostic(diagnostic, host);
-      }
-    }).join("");
+    return diags.map((diagnostic) => replaceTsWithNgInErrors(ts37.formatDiagnosticsWithColorAndContext([diagnostic], host))).join("");
   } else {
     return "";
   }
@@ -7460,7 +7373,14 @@ function performCompilation({ rootNames, options, host, oldProgram, emitCallback
       program = void 0;
       code = UNKNOWN_ERROR_CODE;
     }
-    allDiagnostics.push({ category: ts37.DiagnosticCategory.Error, messageText: errMsg, code, source: SOURCE });
+    allDiagnostics.push({
+      category: ts37.DiagnosticCategory.Error,
+      messageText: errMsg,
+      code,
+      file: void 0,
+      start: void 0,
+      length: void 0
+    });
     return { diagnostics: allDiagnostics, program };
   }
 }
@@ -7489,7 +7409,6 @@ export {
   UNKNOWN_ERROR_CODE,
   SOURCE,
   isTsDiagnostic,
-  isNgDiagnostic,
   EmitFlags,
   createCompilerHost,
   CycleAnalyzer,
@@ -7509,10 +7428,6 @@ export {
   createProgram,
   GENERATED_FILES,
   createMessageDiagnostic,
-  ngToTsDiagnostic,
-  formatDiagnosticPosition,
-  flattenDiagnosticMessageChain,
-  formatDiagnostic,
   formatDiagnostics,
   calcProjectFileAndBasePath,
   readConfiguration,
@@ -7528,4 +7443,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-COAETSNP.js.map
+//# sourceMappingURL=chunk-KK2QLUDE.js.map

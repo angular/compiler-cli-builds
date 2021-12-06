@@ -14,7 +14,7 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-COAETSNP.js";
+} from "./chunk-KK2QLUDE.js";
 import {
   __spreadProps,
   __spreadValues
@@ -43,7 +43,10 @@ function totalCompilationTimeDiagnostic(timeInMillis) {
     category: ts.DiagnosticCategory.Message,
     messageText: `Total time: ${duration}`,
     code: DEFAULT_ERROR_CODE,
-    source: SOURCE
+    source: SOURCE,
+    file: void 0,
+    start: void 0,
+    length: void 0
   };
 }
 var FileChangeEvent;
@@ -64,7 +67,10 @@ function createPerformWatchHost(configFileName, reportDiagnostics, existingOptio
           category: ts.DiagnosticCategory.Error,
           messageText: "Invalid configuration option. baseDir not specified",
           source: SOURCE,
-          code: DEFAULT_ERROR_CODE
+          code: DEFAULT_ERROR_CODE,
+          file: void 0,
+          start: void 0,
+          length: void 0
         }]);
         return { close: () => {
         } };
@@ -377,4 +383,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-7HVF6UHR.js.map
+//# sourceMappingURL=chunk-7KJJO2YZ.js.map

@@ -7,14 +7,12 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/util" />
 import ts from 'typescript';
-import { Diagnostic } from './api';
 export declare const GENERATED_FILES: RegExp;
 export declare function error(msg: string): never;
-export declare function createMessageDiagnostic(messageText: string): ts.Diagnostic & Diagnostic;
+export declare function createMessageDiagnostic(messageText: string): ts.Diagnostic;
 /**
- * Converts a ng.Diagnostic into a ts.Diagnostic.
- * This looses some information, and also uses an incomplete object as `file`.
+ * Strip multiline comment start and end markers from the `commentText` string.
  *
- * I.e. only use this where the API allows only a ts.Diagnostic.
+ * This will also strip the JSDOC comment start marker (`/**`).
  */
-export declare function ngToTsDiagnostic(ng: Diagnostic): ts.Diagnostic;
+export declare function stripComment(commentText: string): string;

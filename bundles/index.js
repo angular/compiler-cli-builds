@@ -24,19 +24,14 @@ import {
   createProgram,
   defaultGatherDiagnostics,
   exitCodeFromResult,
-  flattenDiagnosticMessageChain,
-  formatDiagnostic,
-  formatDiagnosticPosition,
   formatDiagnostics,
   freshCompilationTicket,
   incrementalFromStateTicket,
-  isNgDiagnostic,
   isTsDiagnostic,
-  ngToTsDiagnostic,
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-COAETSNP.js";
+} from "./chunk-KK2QLUDE.js";
 import "./chunk-IESRH26X.js";
 import "./chunk-4EDYFHXN.js";
 import {
@@ -73,12 +68,9 @@ import {
   __spreadValues
 } from "./chunk-XA5IZLLC.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/index.mjs
-import { StaticReflector, StaticSymbol } from "@angular/compiler";
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.1.0-next.3+8.sha-433a956.with-local-changes");
+var VERSION = new Version("13.1.0-next.3+9.sha-43db243.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
@@ -166,8 +158,6 @@ export {
   NodeJSFileSystem,
   OptimizeFor,
   SOURCE,
-  StaticReflector,
-  StaticSymbol,
   UNKNOWN_ERROR_CODE,
   VERSION,
   absoluteFrom,
@@ -180,19 +170,14 @@ export {
   defaultGatherDiagnostics,
   dirname,
   exitCodeFromResult,
-  flattenDiagnosticMessageChain,
-  formatDiagnostic,
-  formatDiagnosticPosition,
   formatDiagnostics,
   getFileSystem,
   getSourceFileOrError,
   isLocalRelativePath,
-  isNgDiagnostic,
   isRoot,
   isRooted,
   isTsDiagnostic,
   join,
-  ngToTsDiagnostic,
   performCompilation,
   readConfiguration,
   relative,

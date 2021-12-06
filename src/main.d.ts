@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/main" />
 import ts from 'typescript';
-import { Diagnostics, ParsedConfiguration } from './perform_compile';
+import { ParsedConfiguration } from './perform_compile';
 import * as api from './transformers/api';
 declare type TsickleModule = typeof import('tsickle');
 export declare function main(args: string[], consoleError?: (s: string) => void, config?: NgcParsedConfiguration, customTransformers?: api.CustomTransformers, programReuse?: {
@@ -17,7 +17,7 @@ export declare function mainDiagnosticsForTest(args: string[], config?: NgcParse
     program: api.Program | undefined;
 }, modifiedResourceFiles?: Set<string> | null, tsickle?: TsickleModule): {
     exitCode: number;
-    diagnostics: ReadonlyArray<ts.Diagnostic | api.Diagnostic>;
+    diagnostics: ReadonlyArray<ts.Diagnostic>;
 };
 export interface NgcParsedConfiguration extends ParsedConfiguration {
     watch?: boolean;
@@ -27,6 +27,6 @@ export declare function readCommandLineAndConfiguration(args: string[], existing
 export declare function watchMode(project: string, options: api.CompilerOptions, consoleError: (s: string) => void): {
     close: () => void;
     ready: (cb: () => void) => void;
-    firstCompileResult: Diagnostics;
+    firstCompileResult: readonly ts.Diagnostic[];
 };
 export {};
