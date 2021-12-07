@@ -3610,25 +3610,18 @@ function isTypeOf(node, ...types) {
 }
 function getImportsOfUmdModule(umdModule) {
   const imports = [];
-  const cjsFactoryCall = umdModule.factoryCalls.cjsCallForImports;
-  const depStartIndex = cjsFactoryCall.arguments.findIndex((arg) => isRequireCall(arg));
-  if (depStartIndex !== -1) {
-    for (let i = depStartIndex; i < umdModule.factoryFn.parameters.length; i++) {
+  const factoryFnParams = umdModule.factoryFn.parameters;
+  const cjsFactoryCallArgs = umdModule.factoryCalls.cjsCallForImports.arguments;
+  for (let i = 0; i < factoryFnParams.length; i++) {
+    const arg = cjsFactoryCallArgs[i];
+    if (arg !== void 0 && isRequireCall(arg)) {
       imports.push({
-        parameter: umdModule.factoryFn.parameters[i],
-        path: getRequiredModulePath(cjsFactoryCall, i)
+        parameter: factoryFnParams[i],
+        path: arg.arguments[0].text
       });
     }
   }
   return imports;
-}
-function getRequiredModulePath(cjsFactoryCall, paramIndex) {
-  const requireCall = cjsFactoryCall.arguments[paramIndex];
-  if (requireCall !== void 0 && !isRequireCall(requireCall)) {
-    throw new Error(`Argument at index ${paramIndex} of UMD factory call is not a \`require\` call with a single string argument:
-` + cjsFactoryCall.getText());
-  }
-  return requireCall.arguments[0].text;
 }
 function isExportsIdentifier(node) {
   return ts13.isIdentifier(node) && node.text === "exports";
@@ -4562,7 +4555,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "13.0.3+11.sha-d06e546.with-local-changes";
+var NGCC_VERSION = "13.0.3+15.sha-763212d.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }

@@ -443,7 +443,7 @@ function toggleCase(str) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.0.3+11.sha-d06e546.with-local-changes");
+var VERSION = new Version("13.0.3+15.sha-763212d.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
