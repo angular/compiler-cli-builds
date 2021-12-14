@@ -48,7 +48,7 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     trace: ((s: string) => void) | undefined;
     useCaseSensitiveFileNames: () => boolean;
     writeFile: ts.WriteFileCallback;
-    getModuleResolutionCache: any;
+    getModuleResolutionCache: (() => ts.ModuleResolutionCache | undefined) | undefined;
 }
 /**
  * A wrapper around `ts.CompilerHost` (plus any extension methods from `ExtendedTsCompilerHost`).

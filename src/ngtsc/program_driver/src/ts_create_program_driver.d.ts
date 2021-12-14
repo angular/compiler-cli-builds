@@ -40,7 +40,7 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
     trace: ((s: string) => void) | undefined;
     useCaseSensitiveFileNames: () => boolean;
-    getModuleResolutionCache: any;
+    getModuleResolutionCache: (() => ts.ModuleResolutionCache | undefined) | undefined;
 }
 /**
  * Updates a `ts.Program` instance with a new one that incorporates specific changes, using the
