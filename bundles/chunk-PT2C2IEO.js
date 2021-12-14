@@ -32,11 +32,11 @@ import {
   makeRelatedInformation,
   ngErrorCode,
   replaceTsWithNgInErrors
-} from "./chunk-IESRH26X.js";
+} from "./chunk-EA3P467R.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-4EDYFHXN.js";
+} from "./chunk-PUUB4PWZ.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -68,7 +68,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-HDZS2JG2.js";
+} from "./chunk-LSI3A7YI.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -7443,4 +7443,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-KK2QLUDE.js.map
+//# sourceMappingURL=chunk-PT2C2IEO.js.map

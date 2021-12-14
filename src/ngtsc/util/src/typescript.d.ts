@@ -67,8 +67,3 @@ export declare function toUnredirectedSourceFile(sf: ts.SourceFile): ts.SourceFi
  * to handle a breaking change between 4.4 and 4.5.
  */
 export declare function createExportSpecifier(propertyName: string | ts.Identifier | undefined, name: string | ts.Identifier, isTypeOnly?: boolean): ts.ExportSpecifier;
-/**
- * Backwards-compatible version of `ts.createImportSpecifier`
- * to handle a breaking change between 4.4 and 4.5.
- */
-export declare function createImportSpecifier(propertyName: string | ts.Identifier | undefined, name: string | ts.Identifier, isTypeOnly?: boolean): ts.ImportSpecifier;

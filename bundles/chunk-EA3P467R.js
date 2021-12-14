@@ -13,7 +13,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-4EDYFHXN.js";
+} from "./chunk-PUUB4PWZ.js";
 import {
   ImportFlags,
   ImportManager,
@@ -28,7 +28,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-HDZS2JG2.js";
+} from "./chunk-LSI3A7YI.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -5681,4 +5681,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-IESRH26X.js.map
+//# sourceMappingURL=chunk-EA3P467R.js.map
