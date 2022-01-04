@@ -10,3 +10,5 @@ export * from './src/ngtsc/file_system';
 export { NgTscPlugin } from './src/ngtsc/tsc_plugin';
 export { NgtscProgram } from './src/ngtsc/program';
 export { OptimizeFor } from './src/ngtsc/typecheck/api';
+export { ConsoleLogger, Logger, LogLevel } from './src/ngtsc/logging';
+export { NodeJSFileSystem } from './src/ngtsc/file_system';
