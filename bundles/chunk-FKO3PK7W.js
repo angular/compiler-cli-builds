@@ -32,7 +32,7 @@ import {
   makeRelatedInformation,
   ngErrorCode,
   replaceTsWithNgInErrors
-} from "./chunk-EA3P467R.js";
+} from "./chunk-YNQGSRTV.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -68,7 +68,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-LSI3A7YI.js";
+} from "./chunk-XLSGAGUL.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -7202,7 +7202,6 @@ function createProgram({ rootNames, options, host, oldProgram }) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
-import { isSyntaxError } from "@angular/compiler";
 import ts37 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/util.mjs
@@ -7363,20 +7362,11 @@ function performCompilation({ rootNames, options, host, oldProgram, emitCallback
     }
     return { diagnostics: allDiagnostics, program };
   } catch (e) {
-    let errMsg;
-    let code;
-    if (isSyntaxError(e)) {
-      errMsg = e.message;
-      code = DEFAULT_ERROR_CODE;
-    } else {
-      errMsg = e.stack;
-      program = void 0;
-      code = UNKNOWN_ERROR_CODE;
-    }
+    program = void 0;
     allDiagnostics.push({
       category: ts37.DiagnosticCategory.Error,
-      messageText: errMsg,
-      code,
+      messageText: e.stack,
+      code: UNKNOWN_ERROR_CODE,
       file: void 0,
       start: void 0,
       length: void 0
@@ -7443,4 +7433,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-PT2C2IEO.js.map
+//# sourceMappingURL=chunk-FKO3PK7W.js.map

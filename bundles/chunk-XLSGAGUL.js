@@ -626,17 +626,8 @@ var ExpressionTranslatorVisitor = class {
   visitReturnStmt(stmt, context) {
     return this.attachComments(this.factory.createReturnStatement(stmt.value.visitExpression(this, context.withExpressionMode)), stmt.leadingComments);
   }
-  visitDeclareClassStmt(_stmt, _context) {
-    throw new Error("Method not implemented.");
-  }
   visitIfStmt(stmt, context) {
     return this.attachComments(this.factory.createIfStatement(stmt.condition.visitExpression(this, context), this.factory.createBlock(this.visitStatements(stmt.trueCase, context.withStatementMode)), stmt.falseCase.length > 0 ? this.factory.createBlock(this.visitStatements(stmt.falseCase, context.withStatementMode)) : null), stmt.leadingComments);
-  }
-  visitTryCatchStmt(_stmt, _context) {
-    throw new Error("Method not implemented.");
-  }
-  visitThrowStmt(stmt, context) {
-    return this.attachComments(this.factory.createThrowStatement(stmt.error.visitExpression(this, context.withExpressionMode)), stmt.leadingComments);
   }
   visitReadVarExpr(ast, _context) {
     const identifier = this.factory.createIdentifier(ast.name);
@@ -732,12 +723,6 @@ var ExpressionTranslatorVisitor = class {
   }
   visitNotExpr(ast, context) {
     return this.factory.createUnaryExpression("!", ast.condition.visitExpression(this, context));
-  }
-  visitAssertNotNullExpr(ast, context) {
-    return ast.condition.visitExpression(this, context);
-  }
-  visitCastExpr(ast, context) {
-    return ast.value.visitExpression(this, context);
   }
   visitFunctionExpr(ast, context) {
     var _a;
@@ -958,12 +943,6 @@ var TypeTranslatorVisitor = class {
     throw new Error("Method not implemented.");
   }
   visitNotExpr(ast, context) {
-    throw new Error("Method not implemented.");
-  }
-  visitAssertNotNullExpr(ast, context) {
-    throw new Error("Method not implemented.");
-  }
-  visitCastExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
   visitFunctionExpr(ast, context) {
@@ -1262,4 +1241,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-LSI3A7YI.js.map
+//# sourceMappingURL=chunk-XLSGAGUL.js.map

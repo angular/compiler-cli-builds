@@ -28,10 +28,7 @@ export declare class ExpressionTranslatorVisitor<TStatement, TExpression> implem
     visitDeclareFunctionStmt(stmt: o.DeclareFunctionStmt, context: Context): TStatement;
     visitExpressionStmt(stmt: o.ExpressionStatement, context: Context): TStatement;
     visitReturnStmt(stmt: o.ReturnStatement, context: Context): TStatement;
-    visitDeclareClassStmt(_stmt: o.ClassStmt, _context: Context): never;
     visitIfStmt(stmt: o.IfStmt, context: Context): TStatement;
-    visitTryCatchStmt(_stmt: o.TryCatchStmt, _context: Context): never;
-    visitThrowStmt(stmt: o.ThrowStmt, context: Context): TStatement;
     visitReadVarExpr(ast: o.ReadVarExpr, _context: Context): TExpression;
     visitWriteVarExpr(expr: o.WriteVarExpr, context: Context): TExpression;
     visitWriteKeyExpr(expr: o.WriteKeyExpr, context: Context): TExpression;
@@ -50,8 +47,6 @@ export declare class ExpressionTranslatorVisitor<TStatement, TExpression> implem
     visitExternalExpr(ast: o.ExternalExpr, _context: Context): TExpression;
     visitConditionalExpr(ast: o.ConditionalExpr, context: Context): TExpression;
     visitNotExpr(ast: o.NotExpr, context: Context): TExpression;
-    visitAssertNotNullExpr(ast: o.AssertNotNull, context: Context): TExpression;
-    visitCastExpr(ast: o.CastExpr, context: Context): TExpression;
     visitFunctionExpr(ast: o.FunctionExpr, context: Context): TExpression;
     visitBinaryOperatorExpr(ast: o.BinaryOperatorExpr, context: Context): TExpression;
     visitReadPropExpr(ast: o.ReadPropExpr, context: Context): TExpression;

@@ -30,8 +30,6 @@ export declare class TypeTranslatorVisitor implements o.ExpressionVisitor, o.Typ
     visitExternalExpr(ast: o.ExternalExpr, context: Context): ts.EntityName | ts.TypeReferenceNode;
     visitConditionalExpr(ast: o.ConditionalExpr, context: Context): void;
     visitNotExpr(ast: o.NotExpr, context: Context): void;
-    visitAssertNotNullExpr(ast: o.AssertNotNull, context: Context): void;
-    visitCastExpr(ast: o.CastExpr, context: Context): void;
     visitFunctionExpr(ast: o.FunctionExpr, context: Context): void;
     visitUnaryOperatorExpr(ast: o.UnaryOperatorExpr, context: Context): void;
     visitBinaryOperatorExpr(ast: o.BinaryOperatorExpr, context: Context): void;
