@@ -11,7 +11,7 @@ import {
 } from "../../../../chunk-SKBLJA43.js";
 import {
   NodeJSFileSystem
-} from "../../../../chunk-EP5JHXG2.js";
+} from "../../../../chunk-P25X5ELY.js";
 import "../../../../chunk-XA5IZLLC.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/locking/lock_file_with_child_process/ngcc_lock_unlocker.mjs

@@ -12,6 +12,7 @@ import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
 import { TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { ReferenceEmitEnvironment } from './tcb_util';
 /**
  * A context which hosts one or more Type Check Blocks (TCBs).
  *
@@ -23,7 +24,7 @@ import { TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
  * `Environment` can be used in a standalone fashion, or can be extended to support more specialized
  * usage.
  */
-export declare class Environment {
+export declare class Environment implements ReferenceEmitEnvironment {
     readonly config: TypeCheckingConfig;
     protected importManager: ImportManager;
     private refEmitter;
@@ -49,6 +50,7 @@ export declare class Environment {
      * This may involve importing the node into the file if it's not declared there already.
      */
     reference(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): ts.Expression;
+    canReferenceType(ref: Reference): boolean;
     /**
      * Generate a `ts.TypeNode` that references the given node as a type.
      *

@@ -7,18 +7,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
-import { Reference } from '../../imports';
 /**
- * A resolved type reference can either be a `Reference`, the original `ts.TypeReferenceNode` itself
- * or null. A value of null indicates that no reference could be resolved or that the reference can
- * not be emitted.
+ * A type reference resolver function is responsible for translating a type reference from the
+ * origin source file into a type reference that is valid in the desired source file. If the type
+ * cannot be translated to the desired source file, then null can be returned.
  */
-export declare type ResolvedTypeReference = Reference | ts.TypeReferenceNode | null;
-/**
- * A type reference resolver function is responsible for finding the declaration of the type
- * reference and verifying whether it can be emitted.
- */
-export declare type TypeReferenceResolver = (type: ts.TypeReferenceNode) => ResolvedTypeReference;
+export declare type TypeReferenceTranslator = (type: ts.TypeReferenceNode) => ts.TypeReferenceNode | null;
 /**
  * Determines whether the provided type can be emitted, which means that it can be safely emitted
  * into a different location.
@@ -27,7 +21,7 @@ export declare type TypeReferenceResolver = (type: ts.TypeReferenceNode) => Reso
  * function returns false, then using the `TypeEmitter` should not be attempted as it is known to
  * fail.
  */
-export declare function canEmitType(type: ts.TypeNode, resolver: TypeReferenceResolver): boolean;
+export declare function canEmitType(type: ts.TypeNode, canEmit: (type: ts.TypeReferenceNode) => boolean): boolean;
 /**
  * Given a `ts.TypeNode`, this class derives an equivalent `ts.TypeNode` that has been emitted into
  * a different context.
@@ -58,16 +52,8 @@ export declare function canEmitType(type: ts.TypeNode, resolver: TypeReferenceRe
  * referring to the namespace import that was created.
  */
 export declare class TypeEmitter {
-    /**
-     * Resolver function that computes a `Reference` corresponding with a `ts.TypeReferenceNode`.
-     */
-    private resolver;
-    /**
-     * Given a `Reference`, this function is responsible for the actual emitting work. It should
-     * produce a `ts.TypeNode` that is valid within the desired context.
-     */
-    private emitReference;
-    constructor(resolver: TypeReferenceResolver, emitReference: (ref: Reference) => ts.TypeNode);
+    private translator;
+    constructor(translator: TypeReferenceTranslator);
     emitType(type: ts.TypeNode): ts.TypeNode;
     private emitTypeReference;
 }

@@ -9,7 +9,8 @@
 import ts from 'typescript';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { TypeCtorMetadata } from '../api';
-export declare function generateTypeCtorDeclarationFn(node: ClassDeclaration<ts.ClassDeclaration>, meta: TypeCtorMetadata, nodeTypeRef: ts.EntityName, typeParams: ts.TypeParameterDeclaration[] | undefined, reflector: ReflectionHost): ts.Statement;
+import { ReferenceEmitEnvironment } from './tcb_util';
+export declare function generateTypeCtorDeclarationFn(node: ClassDeclaration<ts.ClassDeclaration>, meta: TypeCtorMetadata, nodeTypeRef: ts.EntityName, typeParams: ts.TypeParameterDeclaration[] | undefined): ts.Statement;
 /**
  * Generate an inline type constructor for the given class and metadata.
  *
@@ -46,4 +47,4 @@ export declare function generateTypeCtorDeclarationFn(node: ClassDeclaration<ts.
  * @returns a `ts.MethodDeclaration` for the type constructor.
  */
 export declare function generateInlineTypeCtor(node: ClassDeclaration<ts.ClassDeclaration>, meta: TypeCtorMetadata): ts.MethodDeclaration;
-export declare function requiresInlineTypeCtor(node: ClassDeclaration<ts.ClassDeclaration>, host: ReflectionHost): boolean;
+export declare function requiresInlineTypeCtor(node: ClassDeclaration<ts.ClassDeclaration>, host: ReflectionHost, env: ReferenceEmitEnvironment): boolean;

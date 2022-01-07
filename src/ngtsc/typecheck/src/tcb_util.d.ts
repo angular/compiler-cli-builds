@@ -12,6 +12,14 @@ import { ClassDeclaration, ReflectionHost } from '../../../../src/ngtsc/reflecti
 import { Reference } from '../../imports';
 import { FullTemplateMapping, SourceLocation, TemplateId, TemplateSourceMapping } from '../api';
 /**
+ * Represents the origin environment from where reference will be emitted. This interface exists
+ * as an indirection for the `Environment` type, which would otherwise introduce a (type-only)
+ * import cycle.
+ */
+export interface ReferenceEmitEnvironment {
+    canReferenceType(ref: Reference): boolean;
+}
+/**
  * Adapter interface which allows the template type-checking diagnostics code to interpret offsets
  * in a TCB and map them back to original locations in the template.
  */
@@ -50,7 +58,7 @@ export declare enum TcbInliningRequirement {
      */
     None = 2
 }
-export declare function requiresInlineTypeCheckBlock(node: ClassDeclaration<ts.ClassDeclaration>, usedPipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, reflector: ReflectionHost): TcbInliningRequirement;
+export declare function requiresInlineTypeCheckBlock(node: ClassDeclaration<ts.ClassDeclaration>, env: ReferenceEmitEnvironment, usedPipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, reflector: ReflectionHost): TcbInliningRequirement;
 /** Maps a shim position back to a template location. */
 export declare function getTemplateMapping(shimSf: ts.SourceFile, position: number, resolver: TemplateSourceResolver, isDiagnosticRequest: boolean): FullTemplateMapping | null;
 export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId, isDiagnosticRequest: boolean): ts.Node | null;
@@ -61,4 +69,4 @@ export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId, 
  * returns null.
  */
 export declare function findSourceLocation(node: ts.Node, sourceFile: ts.SourceFile, isDiagnosticsRequest: boolean): SourceLocation | null;
-export declare function checkIfGenericTypeBoundsAreContextFree(node: ClassDeclaration<ts.ClassDeclaration>, reflector: ReflectionHost): boolean;
+export declare function checkIfGenericTypeBoundsCanBeEmitted(node: ClassDeclaration<ts.ClassDeclaration>, reflector: ReflectionHost, env: ReferenceEmitEnvironment): boolean;

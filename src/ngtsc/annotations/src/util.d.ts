@@ -50,7 +50,7 @@ export declare function getValidConstructorDependencies(clazz: ClassDeclaration,
  * deps.
  */
 export declare function validateConstructorDependencies(clazz: ClassDeclaration, deps: ConstructorDeps | null): R3DependencyMetadata[] | null;
-export declare function toR3Reference(valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile, refEmitter: ReferenceEmitter): R3Reference;
+export declare function toR3Reference(origin: ts.Node, valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile, refEmitter: ReferenceEmitter): R3Reference;
 export declare function isAngularCore(decorator: Decorator): decorator is Decorator & {
     import: Import;
 };

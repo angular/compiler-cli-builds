@@ -13,7 +13,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-EP5JHXG2.js";
+} from "./chunk-P25X5ELY.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/util/src/typescript.mjs
 import ts from "typescript";
@@ -184,8 +184,133 @@ import { ExternalExpr as ExternalExpr2 } from "@angular/compiler";
 import { ExternalExpr, ExternalReference, WrappedNodeExpr } from "@angular/compiler";
 import ts3 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/find_export.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.mjs
+var ErrorCode;
+(function(ErrorCode2) {
+  ErrorCode2[ErrorCode2["DECORATOR_ARG_NOT_LITERAL"] = 1001] = "DECORATOR_ARG_NOT_LITERAL";
+  ErrorCode2[ErrorCode2["DECORATOR_ARITY_WRONG"] = 1002] = "DECORATOR_ARITY_WRONG";
+  ErrorCode2[ErrorCode2["DECORATOR_NOT_CALLED"] = 1003] = "DECORATOR_NOT_CALLED";
+  ErrorCode2[ErrorCode2["DECORATOR_ON_ANONYMOUS_CLASS"] = 1004] = "DECORATOR_ON_ANONYMOUS_CLASS";
+  ErrorCode2[ErrorCode2["DECORATOR_UNEXPECTED"] = 1005] = "DECORATOR_UNEXPECTED";
+  ErrorCode2[ErrorCode2["DECORATOR_COLLISION"] = 1006] = "DECORATOR_COLLISION";
+  ErrorCode2[ErrorCode2["VALUE_HAS_WRONG_TYPE"] = 1010] = "VALUE_HAS_WRONG_TYPE";
+  ErrorCode2[ErrorCode2["VALUE_NOT_LITERAL"] = 1011] = "VALUE_NOT_LITERAL";
+  ErrorCode2[ErrorCode2["COMPONENT_MISSING_TEMPLATE"] = 2001] = "COMPONENT_MISSING_TEMPLATE";
+  ErrorCode2[ErrorCode2["PIPE_MISSING_NAME"] = 2002] = "PIPE_MISSING_NAME";
+  ErrorCode2[ErrorCode2["PARAM_MISSING_TOKEN"] = 2003] = "PARAM_MISSING_TOKEN";
+  ErrorCode2[ErrorCode2["DIRECTIVE_MISSING_SELECTOR"] = 2004] = "DIRECTIVE_MISSING_SELECTOR";
+  ErrorCode2[ErrorCode2["UNDECORATED_PROVIDER"] = 2005] = "UNDECORATED_PROVIDER";
+  ErrorCode2[ErrorCode2["DIRECTIVE_INHERITS_UNDECORATED_CTOR"] = 2006] = "DIRECTIVE_INHERITS_UNDECORATED_CTOR";
+  ErrorCode2[ErrorCode2["UNDECORATED_CLASS_USING_ANGULAR_FEATURES"] = 2007] = "UNDECORATED_CLASS_USING_ANGULAR_FEATURES";
+  ErrorCode2[ErrorCode2["COMPONENT_RESOURCE_NOT_FOUND"] = 2008] = "COMPONENT_RESOURCE_NOT_FOUND";
+  ErrorCode2[ErrorCode2["COMPONENT_INVALID_SHADOW_DOM_SELECTOR"] = 2009] = "COMPONENT_INVALID_SHADOW_DOM_SELECTOR";
+  ErrorCode2[ErrorCode2["SYMBOL_NOT_EXPORTED"] = 3001] = "SYMBOL_NOT_EXPORTED";
+  ErrorCode2[ErrorCode2["SYMBOL_EXPORTED_UNDER_DIFFERENT_NAME"] = 3002] = "SYMBOL_EXPORTED_UNDER_DIFFERENT_NAME";
+  ErrorCode2[ErrorCode2["IMPORT_CYCLE_DETECTED"] = 3003] = "IMPORT_CYCLE_DETECTED";
+  ErrorCode2[ErrorCode2["IMPORT_GENERATION_FAILURE"] = 3004] = "IMPORT_GENERATION_FAILURE";
+  ErrorCode2[ErrorCode2["CONFIG_FLAT_MODULE_NO_INDEX"] = 4001] = "CONFIG_FLAT_MODULE_NO_INDEX";
+  ErrorCode2[ErrorCode2["CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK"] = 4002] = "CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK";
+  ErrorCode2[ErrorCode2["HOST_BINDING_PARSE_ERROR"] = 5001] = "HOST_BINDING_PARSE_ERROR";
+  ErrorCode2[ErrorCode2["TEMPLATE_PARSE_ERROR"] = 5002] = "TEMPLATE_PARSE_ERROR";
+  ErrorCode2[ErrorCode2["NGMODULE_INVALID_DECLARATION"] = 6001] = "NGMODULE_INVALID_DECLARATION";
+  ErrorCode2[ErrorCode2["NGMODULE_INVALID_IMPORT"] = 6002] = "NGMODULE_INVALID_IMPORT";
+  ErrorCode2[ErrorCode2["NGMODULE_INVALID_EXPORT"] = 6003] = "NGMODULE_INVALID_EXPORT";
+  ErrorCode2[ErrorCode2["NGMODULE_INVALID_REEXPORT"] = 6004] = "NGMODULE_INVALID_REEXPORT";
+  ErrorCode2[ErrorCode2["NGMODULE_MODULE_WITH_PROVIDERS_MISSING_GENERIC"] = 6005] = "NGMODULE_MODULE_WITH_PROVIDERS_MISSING_GENERIC";
+  ErrorCode2[ErrorCode2["NGMODULE_REEXPORT_NAME_COLLISION"] = 6006] = "NGMODULE_REEXPORT_NAME_COLLISION";
+  ErrorCode2[ErrorCode2["NGMODULE_DECLARATION_NOT_UNIQUE"] = 6007] = "NGMODULE_DECLARATION_NOT_UNIQUE";
+  ErrorCode2[ErrorCode2["NGMODULE_VE_DEPENDENCY_ON_IVY_LIB"] = 6999] = "NGMODULE_VE_DEPENDENCY_ON_IVY_LIB";
+  ErrorCode2[ErrorCode2["SCHEMA_INVALID_ELEMENT"] = 8001] = "SCHEMA_INVALID_ELEMENT";
+  ErrorCode2[ErrorCode2["SCHEMA_INVALID_ATTRIBUTE"] = 8002] = "SCHEMA_INVALID_ATTRIBUTE";
+  ErrorCode2[ErrorCode2["MISSING_REFERENCE_TARGET"] = 8003] = "MISSING_REFERENCE_TARGET";
+  ErrorCode2[ErrorCode2["MISSING_PIPE"] = 8004] = "MISSING_PIPE";
+  ErrorCode2[ErrorCode2["WRITE_TO_READ_ONLY_VARIABLE"] = 8005] = "WRITE_TO_READ_ONLY_VARIABLE";
+  ErrorCode2[ErrorCode2["DUPLICATE_VARIABLE_DECLARATION"] = 8006] = "DUPLICATE_VARIABLE_DECLARATION";
+  ErrorCode2[ErrorCode2["SPLIT_TWO_WAY_BINDING"] = 8007] = "SPLIT_TWO_WAY_BINDING";
+  ErrorCode2[ErrorCode2["INVALID_BANANA_IN_BOX"] = 8101] = "INVALID_BANANA_IN_BOX";
+  ErrorCode2[ErrorCode2["NULLISH_COALESCING_NOT_NULLABLE"] = 8102] = "NULLISH_COALESCING_NOT_NULLABLE";
+  ErrorCode2[ErrorCode2["INLINE_TCB_REQUIRED"] = 8900] = "INLINE_TCB_REQUIRED";
+  ErrorCode2[ErrorCode2["INLINE_TYPE_CTOR_REQUIRED"] = 8901] = "INLINE_TYPE_CTOR_REQUIRED";
+  ErrorCode2[ErrorCode2["INJECTABLE_DUPLICATE_PROV"] = 9001] = "INJECTABLE_DUPLICATE_PROV";
+  ErrorCode2[ErrorCode2["SUGGEST_STRICT_TEMPLATES"] = 10001] = "SUGGEST_STRICT_TEMPLATES";
+  ErrorCode2[ErrorCode2["SUGGEST_SUBOPTIMAL_TYPE_INFERENCE"] = 10002] = "SUGGEST_SUBOPTIMAL_TYPE_INFERENCE";
+})(ErrorCode || (ErrorCode = {}));
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/docs.mjs
+var COMPILER_ERRORS_WITH_GUIDES = new Set([
+  ErrorCode.DECORATOR_ARG_NOT_LITERAL,
+  ErrorCode.IMPORT_CYCLE_DETECTED,
+  ErrorCode.PARAM_MISSING_TOKEN,
+  ErrorCode.SCHEMA_INVALID_ELEMENT,
+  ErrorCode.SCHEMA_INVALID_ATTRIBUTE,
+  ErrorCode.MISSING_REFERENCE_TARGET,
+  ErrorCode.COMPONENT_INVALID_SHADOW_DOM_SELECTOR
+]);
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
 import ts2 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/util.mjs
+var ERROR_CODE_MATCHER = /(\u001b\[\d+m ?)TS-99(\d+: ?\u001b\[\d+m)/g;
+function replaceTsWithNgInErrors(errors) {
+  return errors.replace(ERROR_CODE_MATCHER, "$1NG$2");
+}
+function ngErrorCode(code) {
+  return parseInt("-99" + code);
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
+var FatalDiagnosticError = class {
+  constructor(code, node, message, relatedInformation) {
+    this.code = code;
+    this.node = node;
+    this.message = message;
+    this.relatedInformation = relatedInformation;
+    this._isFatalDiagnosticError = true;
+  }
+  toDiagnostic() {
+    return makeDiagnostic(this.code, this.node, this.message, this.relatedInformation);
+  }
+};
+function makeDiagnostic(code, node, messageText, relatedInformation) {
+  node = ts2.getOriginalNode(node);
+  return {
+    category: ts2.DiagnosticCategory.Error,
+    code: ngErrorCode(code),
+    file: ts2.getOriginalNode(node).getSourceFile(),
+    start: node.getStart(void 0, false),
+    length: node.getWidth(),
+    messageText,
+    relatedInformation
+  };
+}
+function makeDiagnosticChain(messageText, next) {
+  return {
+    category: ts2.DiagnosticCategory.Message,
+    code: 0,
+    messageText,
+    next
+  };
+}
+function makeRelatedInformation(node, messageText) {
+  node = ts2.getOriginalNode(node);
+  return {
+    category: ts2.DiagnosticCategory.Message,
+    code: 0,
+    file: node.getSourceFile(),
+    start: node.getStart(),
+    length: node.getWidth(),
+    messageText
+  };
+}
+function isFatalDiagnosticError(err) {
+  return err._isFatalDiagnosticError === true;
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error_details_base_url.mjs
+var ERROR_DETAILS_PAGE_BASE_URL = "https://angular.io/errors";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/find_export.mjs
 function findExportedNameOfNode(target, file, reflector) {
   const exports = reflector.getExportsOfModule(file);
   if (exports === null) {
@@ -202,9 +327,6 @@ function findExportedNameOfNode(target, file, reflector) {
     }
     foundExportName = exportName;
   }
-  if (foundExportName === null) {
-    throw new Error(`Failed to find exported name of node (${target.getText()}) in '${file.fileName}'.`);
-  }
   return foundExportName;
 }
 
@@ -216,6 +338,13 @@ var ImportFlags;
   ImportFlags2[ImportFlags2["NoAliasing"] = 2] = "NoAliasing";
   ImportFlags2[ImportFlags2["AllowTypeImports"] = 4] = "AllowTypeImports";
 })(ImportFlags || (ImportFlags = {}));
+function assertSuccessfulReferenceEmit(result, origin, typeKind) {
+  if (result.kind === 0) {
+    return;
+  }
+  const message = makeDiagnosticChain(`Unable to import ${typeKind} ${nodeNameForError(result.ref.node)}.`, [makeDiagnosticChain(result.reason)]);
+  throw new FatalDiagnosticError(ErrorCode.IMPORT_GENERATION_FAILURE, origin, message, [makeRelatedInformation(result.ref.node, `The ${typeKind} is declared here.`)]);
+}
 var ReferenceEmitter = class {
   constructor(strategies) {
     this.strategies = strategies;
@@ -227,7 +356,12 @@ var ReferenceEmitter = class {
         return emitted;
       }
     }
-    throw new Error(`Unable to write a reference to ${nodeNameForError(ref.node)} in ${ref.node.getSourceFile().fileName} from ${context.fileName}`);
+    return {
+      kind: 1,
+      ref,
+      context,
+      reason: `Unable to write a reference to ${nodeNameForError(ref.node)}.`
+    };
   }
 };
 var LocalIdentifierStrategy = class {
@@ -238,6 +372,7 @@ var LocalIdentifierStrategy = class {
     }
     if (!isDeclaration(ref.node) && refSf === context) {
       return {
+        kind: 0,
         expression: new WrappedNodeExpr(ref.node),
         importedFile: null
       };
@@ -245,6 +380,7 @@ var LocalIdentifierStrategy = class {
     const identifier = ref.getIdentityIn(context);
     if (identifier !== null) {
       return {
+        kind: 0,
         expression: new WrappedNodeExpr(identifier),
         importedFile: null
       };
@@ -271,11 +407,24 @@ var AbsoluteModuleStrategy = class {
     }
     const { specifier, resolutionContext } = ref.bestGuessOwningModule;
     const exports = this.getExportsOfModule(specifier, resolutionContext);
-    if (exports === null || !exports.exportMap.has(ref.node)) {
-      throw new Error(`Symbol ${ref.debugName} declared in ${getSourceFile(ref.node).fileName} is not exported from ${specifier} (import into ${context.fileName})`);
+    if (exports.module === null) {
+      return {
+        kind: 1,
+        ref,
+        context,
+        reason: `The module '${specifier}' could not be found.`
+      };
+    } else if (exports.exportMap === null || !exports.exportMap.has(ref.node)) {
+      return {
+        kind: 1,
+        ref,
+        context,
+        reason: `The symbol is not exported from ${exports.module.fileName} (module '${specifier}').`
+      };
     }
     const symbolName = exports.exportMap.get(ref.node);
     return {
+      kind: 0,
       expression: new ExternalExpr(new ExternalReference(specifier, symbolName)),
       importedFile: exports.module
     };
@@ -289,11 +438,11 @@ var AbsoluteModuleStrategy = class {
   enumerateExportsOfModule(specifier, fromFile) {
     const entryPointFile = this.moduleResolver.resolveModule(specifier, fromFile);
     if (entryPointFile === null) {
-      return null;
+      return { module: null, exportMap: null };
     }
     const exports = this.reflectionHost.getExportsOfModule(entryPointFile);
     if (exports === null) {
-      return null;
+      return { module: entryPointFile, exportMap: null };
     }
     const exportMap = new Map();
     for (const [name, declaration] of exports) {
@@ -317,7 +466,12 @@ var LogicalProjectStrategy = class {
     const destSf = getSourceFile(ref.node);
     const destPath = this.logicalFs.logicalPathOfSf(destSf);
     if (destPath === null) {
-      return null;
+      return {
+        kind: 1,
+        ref,
+        context,
+        reason: `The file ${destSf.fileName} is outside of the configured 'rootDir'.`
+      };
     }
     const originPath = this.logicalFs.logicalPathOfSf(context);
     if (originPath === null) {
@@ -328,10 +482,16 @@ var LogicalProjectStrategy = class {
     }
     const name = findExportedNameOfNode(ref.node, destSf, this.reflector);
     if (name === null) {
-      return null;
+      return {
+        kind: 1,
+        ref,
+        context,
+        reason: `The symbol is not exported from ${destSf.fileName}.`
+      };
     }
     const moduleName = LogicalProjectPath.relativePathBetween(originPath, destPath);
     return {
+      kind: 0,
       expression: new ExternalExpr({ moduleName, name }),
       importedFile: destSf
     };
@@ -346,7 +506,19 @@ var RelativePathStrategy = class {
     const relativePath = relative(dirname(absoluteFromSourceFile(context)), absoluteFromSourceFile(destSf));
     const moduleName = toRelativeImport(stripExtension(relativePath));
     const name = findExportedNameOfNode(ref.node, destSf, this.reflector);
-    return { expression: new ExternalExpr({ moduleName, name }), importedFile: destSf };
+    if (name === null) {
+      return {
+        kind: 1,
+        ref,
+        context,
+        reason: `The symbol is not exported from ${destSf.fileName}.`
+      };
+    }
+    return {
+      kind: 0,
+      expression: new ExternalExpr({ moduleName, name }),
+      importedFile: destSf
+    };
   }
 };
 var UnifiedModulesStrategy = class {
@@ -362,6 +534,7 @@ var UnifiedModulesStrategy = class {
     }
     const moduleName = this.unifiedModulesHost.fileNameToModuleName(destSf.fileName, context.fileName);
     return {
+      kind: 0,
       expression: new ExternalExpr({ moduleName, name }),
       importedFile: destSf
     };
@@ -427,7 +600,11 @@ var AliasStrategy = class {
     if (importMode & ImportFlags.NoAliasing || ref.alias === null) {
       return null;
     }
-    return { expression: ref.alias, importedFile: "unknown" };
+    return {
+      kind: 0,
+      expression: ref.alias,
+      importedFile: "unknown"
+    };
   }
 };
 
@@ -1192,6 +1369,15 @@ function translateStatement(statement, imports, options = {}) {
 }
 
 export {
+  ErrorCode,
+  COMPILER_ERRORS_WITH_GUIDES,
+  replaceTsWithNgInErrors,
+  ngErrorCode,
+  FatalDiagnosticError,
+  makeDiagnostic,
+  makeRelatedInformation,
+  isFatalDiagnosticError,
+  ERROR_DETAILS_PAGE_BASE_URL,
   isSymbolWithValueDeclaration,
   isDtsPath,
   isNonDeclarationTsPath,
@@ -1208,6 +1394,7 @@ export {
   toUnredirectedSourceFile,
   createExportSpecifier,
   ImportFlags,
+  assertSuccessfulReferenceEmit,
   ReferenceEmitter,
   LocalIdentifierStrategy,
   AbsoluteModuleStrategy,
@@ -1241,4 +1428,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XLSGAGUL.js.map
+//# sourceMappingURL=chunk-CHJAKUHU.js.map

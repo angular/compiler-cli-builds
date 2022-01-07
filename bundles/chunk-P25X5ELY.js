@@ -223,6 +223,9 @@ var NgtscCompilerHost = class {
     }
     return this.fs.readFile(absPath);
   }
+  realpath(path) {
+    return this.fs.realpath(this.fs.resolve(path));
+  }
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/logical.mjs
@@ -240,7 +243,7 @@ var LogicalFileSystem = class {
     this.canonicalRootDirs = this.rootDirs.map((dir) => this.compilerHost.getCanonicalFileName(dir));
   }
   logicalPathOfSf(sf) {
-    return this.logicalPathOfFile(absoluteFrom(sf.fileName));
+    return this.logicalPathOfFile(absoluteFromSourceFile(sf));
   }
   logicalPathOfFile(physicalFile) {
     const canonicalFilePath = this.compilerHost.getCanonicalFileName(physicalFile);
@@ -445,4 +448,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-EP5JHXG2.js.map
+//# sourceMappingURL=chunk-P25X5ELY.js.map

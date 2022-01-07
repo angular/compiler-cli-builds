@@ -54,6 +54,10 @@ export declare enum ErrorCode {
      * created that cannot be handled, such as in partial compilation mode.
      */
     IMPORT_CYCLE_DETECTED = 3003,
+    /**
+     * Raised when the compiler is unable to generate an import statement for a reference.
+     */
+    IMPORT_GENERATION_FAILURE = 3004,
     CONFIG_FLAT_MODULE_NO_INDEX = 4001,
     CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK = 4002,
     /**
