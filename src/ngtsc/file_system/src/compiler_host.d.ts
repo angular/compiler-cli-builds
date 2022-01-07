@@ -22,4 +22,5 @@ export declare class NgtscCompilerHost implements ts.CompilerHost {
     getNewLine(): string;
     fileExists(fileName: string): boolean;
     readFile(fileName: string): string | undefined;
+    realpath(path: string): string;
 }

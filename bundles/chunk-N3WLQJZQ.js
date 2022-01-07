@@ -4,7 +4,6 @@
       const __ESM_IMPORT_META_URL__ = import.meta.url;
     
 import {
-  COMPILER_ERRORS_WITH_GUIDES,
   CompilationMode,
   ComponentDecoratorHandler,
   CompoundMetadataReader,
@@ -12,8 +11,6 @@ import {
   DirectiveDecoratorHandler,
   DtsMetadataReader,
   DtsTransformRegistry,
-  ERROR_DETAILS_PAGE_BASE_URL,
-  ErrorCode,
   InjectableClassRegistry,
   InjectableDecoratorHandler,
   LocalMetadataRegistry,
@@ -27,12 +24,8 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   flattenInheritedDirectiveMetadata,
-  ivyTransformFactory,
-  makeDiagnostic,
-  makeRelatedInformation,
-  ngErrorCode,
-  replaceTsWithNgInErrors
-} from "./chunk-YNQGSRTV.js";
+  ivyTransformFactory
+} from "./chunk-YGWYGZ6W.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -40,7 +33,10 @@ import {
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
+  COMPILER_ERRORS_WITH_GUIDES,
   DefaultImportTracker,
+  ERROR_DETAILS_PAGE_BASE_URL,
+  ErrorCode,
   ImportFlags,
   ImportManager,
   LocalIdentifierStrategy,
@@ -54,6 +50,7 @@ import {
   RelativePathStrategy,
   UnifiedModulesAliasingHost,
   UnifiedModulesStrategy,
+  assertSuccessfulReferenceEmit,
   getRootDirs,
   getSourceFileOrNull,
   getTokenAtPosition,
@@ -62,13 +59,17 @@ import {
   isDtsPath,
   isNonDeclarationTsPath,
   isSymbolWithValueDeclaration,
+  makeDiagnostic,
+  makeRelatedInformation,
+  ngErrorCode,
   nodeNameForError,
   normalizeSeparators,
   relativePathBetween,
+  replaceTsWithNgInErrors,
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-XLSGAGUL.js";
+} from "./chunk-CHJAKUHU.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -79,7 +80,7 @@ import {
   getSourceFileOrError,
   join,
   resolve
-} from "./chunk-EP5JHXG2.js";
+} from "./chunk-P25X5ELY.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -2172,7 +2173,9 @@ var LocalModuleScopeRegistry = class {
             asAlias: exportName
           });
         } else {
-          const expr = this.refEmitter.emit(exportRef.cloneWithNoIdentifiers(), sourceFile).expression;
+          const emittedRef = this.refEmitter.emit(exportRef.cloneWithNoIdentifiers(), sourceFile);
+          assertSuccessfulReferenceEmit(emittedRef, ngModuleRef.node.name, "class");
+          const expr = emittedRef.expression;
           if (!(expr instanceof ExternalExpr) || expr.value.moduleName === null || expr.value.name === null) {
             throw new Error("Expected ExternalExpr");
           }
@@ -2808,7 +2811,7 @@ import ts19 from "typescript";
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_emitter.mjs
 import ts18 from "typescript";
 var INELIGIBLE = {};
-function canEmitType(type, resolver) {
+function canEmitType(type, canEmit) {
   return canEmitTypeWorker(type);
   function canEmitTypeWorker(type2) {
     return visitNode(type2) !== INELIGIBLE;
@@ -2824,20 +2827,15 @@ function canEmitType(type, resolver) {
     }
   }
   function canEmitTypeReference(type2) {
-    const reference = resolver(type2);
-    if (reference === null) {
+    if (!canEmit(type2)) {
       return false;
-    }
-    if (reference instanceof Reference) {
-      return true;
     }
     return type2.typeArguments === void 0 || type2.typeArguments.every(canEmitTypeWorker);
   }
 }
 var TypeEmitter = class {
-  constructor(resolver, emitReference) {
-    this.resolver = resolver;
-    this.emitReference = emitReference;
+  constructor(translator) {
+    this.translator = translator;
   }
   emitType(type) {
     const typeReferenceTransformer = (context) => {
@@ -2860,23 +2858,15 @@ var TypeEmitter = class {
     return ts18.transform(type, [typeReferenceTransformer]).transformed[0];
   }
   emitTypeReference(type) {
-    const reference = this.resolver(type);
-    if (reference === null) {
+    const translatedType = this.translator(type);
+    if (translatedType === null) {
       throw new Error("Unable to emit an unresolved reference");
     }
     let typeArguments = void 0;
     if (type.typeArguments !== void 0) {
       typeArguments = ts18.createNodeArray(type.typeArguments.map((typeArg) => this.emitType(typeArg)));
     }
-    let typeName = type.typeName;
-    if (reference instanceof Reference) {
-      const emittedType = this.emitReference(reference);
-      if (!ts18.isTypeReferenceNode(emittedType)) {
-        throw new Error(`Expected TypeReferenceNode for emitted reference, got ${ts18.SyntaxKind[emittedType.kind]}`);
-      }
-      typeName = emittedType.typeName;
-    }
-    return ts18.updateTypeReferenceNode(type, typeName, typeArguments);
+    return ts18.updateTypeReferenceNode(type, translatedType.typeName, typeArguments);
   }
 };
 
@@ -2886,25 +2876,34 @@ var TypeParameterEmitter = class {
     this.typeParameters = typeParameters;
     this.reflector = reflector;
   }
-  canEmit() {
+  canEmit(canEmitReference) {
     if (this.typeParameters === void 0) {
       return true;
     }
     return this.typeParameters.every((typeParam) => {
-      return this.canEmitType(typeParam.constraint) && this.canEmitType(typeParam.default);
+      return this.canEmitType(typeParam.constraint, canEmitReference) && this.canEmitType(typeParam.default, canEmitReference);
     });
   }
-  canEmitType(type) {
+  canEmitType(type, canEmitReference) {
     if (type === void 0) {
       return true;
     }
-    return canEmitType(type, (typeReference) => this.resolveTypeReference(typeReference));
+    return canEmitType(type, (typeReference) => {
+      const reference = this.resolveTypeReference(typeReference);
+      if (reference === null) {
+        return false;
+      }
+      if (reference instanceof Reference) {
+        return canEmitReference(reference);
+      }
+      return true;
+    });
   }
   emit(emitReference) {
     if (this.typeParameters === void 0) {
       return void 0;
     }
-    const emitter = new TypeEmitter((type) => this.resolveTypeReference(type), emitReference);
+    const emitter = new TypeEmitter((type) => this.translateTypeReference(type, emitReference));
     return this.typeParameters.map((typeParam) => {
       const constraint = typeParam.constraint !== void 0 ? emitter.emitType(typeParam.constraint) : void 0;
       const defaultType = typeParam.default !== void 0 ? emitter.emitType(typeParam.default) : void 0;
@@ -2927,16 +2926,21 @@ var TypeParameterEmitter = class {
         resolutionContext: type.getSourceFile().fileName
       };
     }
-    if (!this.isTopLevelExport(declaration.node)) {
-      return null;
-    }
     return new Reference(declaration.node, owningModule);
   }
-  isTopLevelExport(decl) {
-    if (decl.parent === void 0 || !ts19.isSourceFile(decl.parent)) {
-      return false;
+  translateTypeReference(type, emitReference) {
+    const reference = this.resolveTypeReference(type);
+    if (!(reference instanceof Reference)) {
+      return reference;
     }
-    return this.reflector.isStaticallyExported(decl);
+    const typeNode = emitReference(reference);
+    if (typeNode === null) {
+      return null;
+    }
+    if (!ts19.isTypeReferenceNode(typeNode)) {
+      throw new Error(`Expected TypeReferenceNode for emitted reference, got ${ts19.SyntaxKind[typeNode.kind]}.`);
+    }
+    return typeNode;
   }
   isLocalTypeParameter(decl) {
     return this.typeParameters.some((param) => param === decl);
@@ -2950,10 +2954,10 @@ var TcbInliningRequirement;
   TcbInliningRequirement2[TcbInliningRequirement2["ShouldInlineForGenericBounds"] = 1] = "ShouldInlineForGenericBounds";
   TcbInliningRequirement2[TcbInliningRequirement2["None"] = 2] = "None";
 })(TcbInliningRequirement || (TcbInliningRequirement = {}));
-function requiresInlineTypeCheckBlock(node, usedPipes, reflector) {
+function requiresInlineTypeCheckBlock(node, env, usedPipes, reflector) {
   if (!checkIfClassIsExported(node)) {
     return TcbInliningRequirement.MustInline;
-  } else if (!checkIfGenericTypeBoundsAreContextFree(node, reflector)) {
+  } else if (!checkIfGenericTypeBoundsCanBeEmitted(node, reflector, env)) {
     return TcbInliningRequirement.ShouldInlineForGenericBounds;
   } else if (Array.from(usedPipes.values()).some((pipeRef) => !checkIfClassIsExported(pipeRef.node))) {
     return TcbInliningRequirement.MustInline;
@@ -3018,15 +3022,13 @@ function getTemplateId2(node, sourceFile, isDiagnosticRequest) {
     return commentText;
   }) || null;
 }
-function checkIfGenericTypeBoundsAreContextFree(node, reflector) {
-  return new TypeParameterEmitter(node.typeParameters, reflector).canEmit();
+function checkIfGenericTypeBoundsCanBeEmitted(node, reflector, env) {
+  const emitter = new TypeParameterEmitter(node.typeParameters, reflector);
+  return emitter.canEmit((ref) => env.canReferenceType(ref));
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.mjs
-function generateTypeCtorDeclarationFn(node, meta, nodeTypeRef, typeParams, reflector) {
-  if (requiresInlineTypeCtor(node, reflector)) {
-    throw new Error(`${node.name.text} requires an inline type constructor`);
-  }
+function generateTypeCtorDeclarationFn(node, meta, nodeTypeRef, typeParams) {
   const rawTypeArgs = typeParams !== void 0 ? generateGenericArgs(typeParams) : void 0;
   const rawType = ts21.createTypeReferenceNode(nodeTypeRef, rawTypeArgs);
   const initParam = constructTypeCtorParameter(node, meta, rawType);
@@ -3080,8 +3082,8 @@ function constructTypeCtorParameter(node, meta, rawType) {
 function generateGenericArgs(params) {
   return params.map((param) => ts21.createTypeReferenceNode(param.name, void 0));
 }
-function requiresInlineTypeCtor(node, host) {
-  return !checkIfGenericTypeBoundsAreContextFree(node, host);
+function requiresInlineTypeCtor(node, host, env) {
+  return !checkIfGenericTypeBoundsCanBeEmitted(node, host, env);
 }
 function typeParametersWithDefaultTypes(params) {
   if (params === void 0) {
@@ -3119,7 +3121,7 @@ var Environment = class {
     if (this.typeCtors.has(node)) {
       return this.typeCtors.get(node);
     }
-    if (requiresInlineTypeCtor(node, this.reflector)) {
+    if (requiresInlineTypeCtor(node, this.reflector, this)) {
       const ref = this.reference(dirRef);
       const typeCtorExpr = ts22.createPropertyAccess(ref, "ngTypeCtor");
       this.typeCtors.set(node, typeCtorExpr);
@@ -3141,7 +3143,7 @@ var Environment = class {
         coercedInputFields: dir.coercedInputFields
       };
       const typeParams = this.emitTypeParameters(node);
-      const typeCtor = generateTypeCtorDeclarationFn(node, meta, nodeTypeRef.typeName, typeParams, this.reflector);
+      const typeCtor = generateTypeCtorDeclarationFn(node, meta, nodeTypeRef.typeName, typeParams);
       this.typeCtorStatements.push(typeCtor);
       const fnId = ts22.createIdentifier(fnName);
       this.typeCtors.set(node, fnId);
@@ -3160,10 +3162,16 @@ var Environment = class {
   }
   reference(ref) {
     const ngExpr = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing);
+    assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "class");
     return translateExpression(ngExpr.expression, this.importManager);
+  }
+  canReferenceType(ref) {
+    const result = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports);
+    return result.kind === 0;
   }
   referenceType(ref) {
     const ngExpr = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports);
+    assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "symbol");
     return translateType(new ExpressionType(ngExpr.expression), this.importManager);
   }
   emitTypeParameters(declaration) {
@@ -4493,7 +4501,7 @@ var Scope = class {
       const dirRef = dir.ref;
       if (!dir.isGeneric) {
         directiveOp = new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, dir);
-      } else if (!requiresInlineTypeCtor(dirRef.node, host) || this.tcb.env.config.useInlineTypeConstructors) {
+      } else if (!requiresInlineTypeCtor(dirRef.node, host, this.tcb.env) || this.tcb.env.config.useInlineTypeConstructors) {
         directiveOp = new TcbDirectiveCtorOp(this.tcb, this, node, dir);
       } else {
         directiveOp = new TcbGenericDirectiveTypeWithAnyParamsOp(this.tcb, this, node, dir);
@@ -4834,7 +4842,7 @@ var TypeCheckContextImpl = class {
       for (const dir of boundTarget.getUsedDirectives()) {
         const dirRef = dir.ref;
         const dirNode = dirRef.node;
-        if (!dir.isGeneric || !requiresInlineTypeCtor(dirNode, this.reflector)) {
+        if (!dir.isGeneric || !requiresInlineTypeCtor(dirNode, this.reflector, shimData.file)) {
           continue;
         }
         this.addInlineTypeCtor(fileData, dirNode.getSourceFile(), dirRef, {
@@ -4854,7 +4862,7 @@ var TypeCheckContextImpl = class {
       boundTarget,
       templateDiagnostics
     });
-    const inliningRequirement = requiresInlineTypeCheckBlock(ref.node, pipes, this.reflector);
+    const inliningRequirement = requiresInlineTypeCheckBlock(ref.node, shimData.file, pipes, this.reflector);
     if (this.inlining === InliningMode.Error && inliningRequirement === TcbInliningRequirement.MustInline) {
       shimData.oobRecorder.requiresInlineTcb(templateId, ref.node);
       this.perf.eventCount(PerfEvent.SkipGenerateTcbNoInline);
@@ -7433,4 +7441,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-FKO3PK7W.js.map
+//# sourceMappingURL=chunk-N3WLQJZQ.js.map

@@ -10,7 +10,7 @@ import {
   MetadataDtsModuleScopeResolver,
   TypeCheckScopeRegistry,
   readConfiguration
-} from "./chunk-FKO3PK7W.js";
+} from "./chunk-N3WLQJZQ.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -30,10 +30,8 @@ import {
   TraitCompiler,
   TraitState,
   forwardRefResolver,
-  isFatalDiagnosticError,
-  readBaseClass,
-  replaceTsWithNgInErrors
-} from "./chunk-YNQGSRTV.js";
+  readBaseClass
+} from "./chunk-YGWYGZ6W.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -66,12 +64,14 @@ import {
   ReferenceEmitter,
   isAssignment,
   isDtsPath,
+  isFatalDiagnosticError,
   isFromDtsFile,
   isSymbolWithValueDeclaration,
+  replaceTsWithNgInErrors,
   translateStatement,
   translateType,
   validateAndRewriteCoreSymbol
-} from "./chunk-XLSGAGUL.js";
+} from "./chunk-CHJAKUHU.js";
 import {
   LogicalFileSystem,
   NgtscCompilerHost,
@@ -83,7 +83,7 @@ import {
   isRooted,
   relative,
   toRelativeImport
-} from "./chunk-EP5JHXG2.js";
+} from "./chunk-P25X5ELY.js";
 import {
   NOOP_PERF_RECORDER
 } from "./chunk-GLCRIILX.js";
@@ -5096,4 +5096,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-NKE5FLTL.js.map
+//# sourceMappingURL=chunk-LD5F4CE7.js.map

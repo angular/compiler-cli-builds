@@ -21,13 +21,13 @@ export declare class TypeParameterEmitter {
      * `emit` is known to succeed. Vice versa, if false is returned then `emit` should not be
      * called, as it would fail.
      */
-    canEmit(): boolean;
+    canEmit(canEmitReference: (ref: Reference) => boolean): boolean;
     private canEmitType;
     /**
      * Emits the type parameters using the provided emitter function for `Reference`s.
      */
     emit(emitReference: (ref: Reference) => ts.TypeNode): ts.TypeParameterDeclaration[] | undefined;
     private resolveTypeReference;
-    private isTopLevelExport;
+    private translateTypeReference;
     private isLocalTypeParameter;
 }
