@@ -6805,7 +6805,7 @@ One of the following actions is required:
 2. Remove "strictTemplates" or set it to 'false'.
 
 More information about the template type checking compiler options can be found in the documentation:
-https://v9.angular.io/guide/template-typecheck#template-type-checking`
+https://angular.io/guide/template-typecheck`
     };
   }
   return null;
@@ -7441,4 +7441,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-N3WLQJZQ.js.map
+//# sourceMappingURL=chunk-KHTS7CCP.js.map
