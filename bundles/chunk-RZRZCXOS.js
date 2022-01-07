@@ -4627,8 +4627,8 @@ var TcbExpressionTranslator = class {
       const result = ts27.createCall(methodAccess, void 0, [expr, ...args]);
       addParseSpanInfo(result, ast.sourceSpan);
       return result;
-    } else if (ast instanceof Call2 && (ast.receiver instanceof PropertyRead2 || ast.receiver instanceof SafePropertyRead3) && !(ast.receiver.receiver instanceof ThisReceiver)) {
-      if (ast.receiver.name === "$any" && ast.args.length === 1) {
+    } else if (ast instanceof Call2 && (ast.receiver instanceof PropertyRead2 || ast.receiver instanceof SafePropertyRead3)) {
+      if (ast.receiver.receiver instanceof ImplicitReceiver4 && !(ast.receiver.receiver instanceof ThisReceiver) && ast.receiver.name === "$any" && ast.args.length === 1) {
         const expr = this.translate(ast.args[0]);
         const exprAsAny = ts27.createAsExpression(expr, ts27.createKeywordTypeNode(ts27.SyntaxKind.AnyKeyword));
         const result = ts27.createParen(exprAsAny);
@@ -6805,7 +6805,7 @@ One of the following actions is required:
 2. Remove "strictTemplates" or set it to 'false'.
 
 More information about the template type checking compiler options can be found in the documentation:
-https://v9.angular.io/guide/template-typecheck#template-type-checking`
+https://angular.io/guide/template-typecheck`
     };
   }
   return null;
@@ -7441,4 +7441,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-N3WLQJZQ.js.map
+//# sourceMappingURL=chunk-RZRZCXOS.js.map
