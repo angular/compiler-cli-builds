@@ -3337,7 +3337,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
-import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead2, PropertyWrite as PropertyWrite2, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstElement as TmplAstElement3, TmplAstIcu, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead3, PropertyWrite as PropertyWrite2, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstElement as TmplAstElement3, TmplAstIcu, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts27 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
@@ -3387,7 +3387,7 @@ function translateDiagnostic(diagnostic, resolver) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/expression.mjs
-import { ASTWithSource as ASTWithSource2, Call, EmptyExpr as EmptyExpr2, SafeKeyedRead, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource2, Call, EmptyExpr as EmptyExpr2, PropertyRead as PropertyRead2, SafeKeyedRead, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
 import ts26 from "typescript";
 var NULL_AS_ANY = ts26.createAsExpression(ts26.createNull(), ts26.createKeywordTypeNode(ts26.SyntaxKind.AnyKeyword));
 var UNDEFINED = ts26.createIdentifier("undefined");
@@ -3601,9 +3601,22 @@ var AstTranslator = class {
   }
   visitCall(ast) {
     const args = ast.args.map((expr2) => this.translate(expr2));
-    const expr = wrapForDiagnostics(this.translate(ast.receiver));
+    let expr;
+    const receiver = ast.receiver;
+    if (receiver instanceof PropertyRead2) {
+      const resolved = this.maybeResolve(receiver);
+      if (resolved !== null) {
+        expr = resolved;
+      } else {
+        const propertyReceiver = wrapForDiagnostics(this.translate(receiver.receiver));
+        expr = ts26.createPropertyAccess(propertyReceiver, receiver.name);
+        addParseSpanInfo(expr, receiver.nameSpan);
+      }
+    } else {
+      expr = this.translate(receiver);
+    }
     let node;
-    if (ast.receiver instanceof SafePropertyRead2 || ast.receiver instanceof SafeKeyedRead) {
+    if (receiver instanceof SafePropertyRead2 || receiver instanceof SafeKeyedRead) {
       if (this.config.strictSafeNavigationTypes) {
         const call = ts26.createCall(ts26.createNonNullExpression(expr), void 0, args);
         node = ts26.createParen(ts26.createConditional(NULL_AS_ANY, call, UNDEFINED));
@@ -4591,7 +4604,7 @@ var TcbExpressionTranslator = class {
     return astToTypescript(ast, (ast2) => this.resolve(ast2), this.tcb.env.config);
   }
   resolve(ast) {
-    if (ast instanceof PropertyRead2 && ast.receiver instanceof ImplicitReceiver4) {
+    if (ast instanceof PropertyRead3 && ast.receiver instanceof ImplicitReceiver4) {
       return this.resolveTarget(ast);
     } else if (ast instanceof PropertyWrite2 && ast.receiver instanceof ImplicitReceiver4) {
       const target = this.resolveTarget(ast);
@@ -4623,7 +4636,7 @@ var TcbExpressionTranslator = class {
       const result = ts27.createCall(methodAccess, void 0, [expr, ...args]);
       addParseSpanInfo(result, ast.sourceSpan);
       return result;
-    } else if (ast instanceof Call2 && (ast.receiver instanceof PropertyRead2 || ast.receiver instanceof SafePropertyRead3)) {
+    } else if (ast instanceof Call2 && (ast.receiver instanceof PropertyRead3 || ast.receiver instanceof SafePropertyRead3)) {
       if (ast.receiver.receiver instanceof ImplicitReceiver4 && !(ast.receiver.receiver instanceof ThisReceiver) && ast.receiver.name === "$any" && ast.args.length === 1) {
         const expr = this.translate(ast.args[0]);
         const exprAsAny = ts27.createAsExpression(expr, ts27.createKeywordTypeNode(ts27.SyntaxKind.AnyKeyword));
@@ -4755,7 +4768,7 @@ function isSplitTwoWayBinding(inputName, output, inputs, tcb) {
 }
 var TcbEventHandlerTranslator = class extends TcbExpressionTranslator {
   resolve(ast) {
-    if (ast instanceof PropertyRead2 && ast.receiver instanceof ImplicitReceiver4 && !(ast.receiver instanceof ThisReceiver) && ast.name === EVENT_PARAMETER) {
+    if (ast instanceof PropertyRead3 && ast.receiver instanceof ImplicitReceiver4 && !(ast.receiver instanceof ThisReceiver) && ast.name === EVENT_PARAMETER) {
       const event = ts27.createIdentifier(EVENT_PARAMETER);
       addParseSpanInfo(event, ast.nameSpan);
       return event;
@@ -5126,7 +5139,7 @@ var TemplateSourceManager = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.mjs
-import { AST, ASTWithSource as ASTWithSource3, BindingPipe as BindingPipe2, PropertyRead as PropertyRead3, PropertyWrite as PropertyWrite3, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement4, TmplAstReference as TmplAstReference4, TmplAstTemplate as TmplAstTemplate3, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable3 } from "@angular/compiler";
+import { AST, ASTWithSource as ASTWithSource3, BindingPipe as BindingPipe2, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement4, TmplAstReference as TmplAstReference4, TmplAstTemplate as TmplAstTemplate3, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable3 } from "@angular/compiler";
 import ts30 from "typescript";
 var SymbolBuilder = class {
   constructor(shimPath, typeCheckBlock, templateData, componentScopeReader, getTypeChecker) {
@@ -5482,7 +5495,7 @@ var SymbolBuilder = class {
       withSpan = expression.nameSpan;
     }
     let node = null;
-    if (expression instanceof PropertyRead3) {
+    if (expression instanceof PropertyRead4) {
       node = findFirstMatchingNode(this.typeCheckBlock, { withSpan, filter: ts30.isPropertyAccessExpression });
     }
     if (node === null) {
@@ -7437,4 +7450,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-K72KRHPX.js.map
+//# sourceMappingURL=chunk-HW4TOWEH.js.map
