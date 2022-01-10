@@ -7,7 +7,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-ZFVLWTFB.js";
+} from "./chunk-A5PL3TE6.js";
 import {
   DEFAULT_ERROR_CODE,
   EmitFlags,
@@ -31,14 +31,14 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-RZRZCXOS.js";
-import "./chunk-YGWYGZ6W.js";
-import "./chunk-PUUB4PWZ.js";
+} from "./chunk-K72KRHPX.js";
+import "./chunk-YG6QAIXV.js";
+import "./chunk-7PY7XEFH.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "./chunk-SKBLJA43.js";
-import "./chunk-CHJAKUHU.js";
+import "./chunk-XNV7D7R3.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -59,18 +59,18 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-P25X5ELY.js";
+} from "./chunk-676MI6WZ.js";
 import {
   ActivePerfRecorder,
   PerfPhase
 } from "./chunk-GLCRIILX.js";
 import {
   __spreadValues
-} from "./chunk-XA5IZLLC.js";
+} from "./chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("13.1.1+80.sha-abc217b.with-local-changes");
+var VERSION = new Version("13.1.1+84.sha-c375e5d.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
@@ -105,7 +105,7 @@ var NgTscPlugin = class {
     const strategy = new PatchedProgramIncrementalBuildStrategy();
     const oldState = oldProgram !== void 0 ? strategy.getIncrementalState(oldProgram) : null;
     let ticket;
-    const modifiedResourceFiles = new Set();
+    const modifiedResourceFiles = /* @__PURE__ */ new Set();
     if (this.host.getModifiedResourceFiles !== void 0) {
       for (const resourceFile of (_a = this.host.getModifiedResourceFiles()) != null ? _a : []) {
         modifiedResourceFiles.add(resolve(resourceFile));

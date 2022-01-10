@@ -46,16 +46,16 @@ var __objRest = (source, exclude) => {
     }
   return target;
 };
-var __reExport = (target, module, desc) => {
+var __reExport = (target, module, copyDefault, desc) => {
   if (module && typeof module === "object" || typeof module === "function") {
     for (let key of __getOwnPropNames(module))
-      if (!__hasOwnProp.call(target, key) && key !== "default")
+      if (!__hasOwnProp.call(target, key) && (copyDefault || key !== "default"))
         __defProp(target, key, { get: () => module[key], enumerable: !(desc = __getOwnPropDesc(module, key)) || desc.enumerable });
   }
   return target;
 };
-var __toModule = (module) => {
-  return __reExport(__markAsModule(__defProp(module != null ? __create(__getProtoOf(module)) : {}, "default", module && module.__esModule && "default" in module ? { get: () => module.default, enumerable: true } : { value: module, enumerable: true })), module);
+var __toESM = (module, isNodeMode) => {
+  return __reExport(__markAsModule(__defProp(module != null ? __create(__getProtoOf(module)) : {}, "default", !isNodeMode && module && module.__esModule ? { get: () => module.default, enumerable: true } : { value: module, enumerable: true })), module);
 };
 
 export {
@@ -63,6 +63,6 @@ export {
   __spreadProps,
   __require,
   __objRest,
-  __toModule
+  __toESM
 };
-//# sourceMappingURL=chunk-XA5IZLLC.js.map
+//# sourceMappingURL=chunk-WQ3TNYTD.js.map

@@ -25,11 +25,11 @@ import {
   declarationTransformFactory,
   flattenInheritedDirectiveMetadata,
   ivyTransformFactory
-} from "./chunk-YGWYGZ6W.js";
+} from "./chunk-YG6QAIXV.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-PUUB4PWZ.js";
+} from "./chunk-7PY7XEFH.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -69,7 +69,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-CHJAKUHU.js";
+} from "./chunk-XNV7D7R3.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -80,7 +80,7 @@ import {
   getSourceFileOrError,
   join,
   resolve
-} from "./chunk-P25X5ELY.js";
+} from "./chunk-676MI6WZ.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -91,7 +91,7 @@ import {
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-XA5IZLLC.js";
+} from "./chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -157,11 +157,7 @@ import ts35 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/i18n.mjs
 import { Xliff, Xliff2, Xmb } from "@angular/compiler";
-import {
-  relative,
-  resolve as resolve2,
-  sep
-} from "path";
+import * as path from "path";
 function i18nGetExtension(formatName) {
   const format = formatName.toLowerCase();
   switch (format) {
@@ -176,7 +172,7 @@ function i18nGetExtension(formatName) {
   }
   throw new Error(`Unsupported format "${formatName}"`);
 }
-function i18nExtract(formatName, outFile, host, options, bundle, pathResolve = resolve2) {
+function i18nExtract(formatName, outFile, host, options, bundle, pathResolve = path.resolve) {
   formatName = formatName || "xlf";
   const ext = i18nGetExtension(formatName);
   const content = i18nSerialize(bundle, formatName, options);
@@ -205,8 +201,8 @@ function i18nSerialize(bundle, formatName, options) {
 }
 function getPathNormalizer(basePath) {
   return (sourcePath) => {
-    sourcePath = basePath ? relative(basePath, sourcePath) : sourcePath;
-    return sourcePath.split(sep).join("/");
+    sourcePath = basePath ? path.relative(basePath, sourcePath) : sourcePath;
+    return sourcePath.split(path.sep).join("/");
   };
 }
 
@@ -341,7 +337,7 @@ var ImportGraph = class {
   constructor(checker, perf) {
     this.checker = checker;
     this.perf = perf;
-    this.imports = new Map();
+    this.imports = /* @__PURE__ */ new Map();
   }
   importsOf(sf) {
     if (!this.imports.has(sf)) {
@@ -353,7 +349,7 @@ var ImportGraph = class {
     if (start === end) {
       return [start];
     }
-    const found = new Set([start]);
+    const found = /* @__PURE__ */ new Set([start]);
     const queue = [new Found(start, null)];
     while (queue.length > 0) {
       const current = queue.shift();
@@ -378,7 +374,7 @@ var ImportGraph = class {
   }
   scanImports(sf) {
     return this.perf.inPhase(PerfPhase.CycleDetection, () => {
-      const imports = new Set();
+      const imports = /* @__PURE__ */ new Set();
       for (const stmt of sf.statements) {
         if (!ts3.isImportDeclaration(stmt) && !ts3.isExportDeclaration(stmt) || stmt.moduleSpecifier === void 0) {
           continue;
@@ -472,7 +468,7 @@ function findFlatIndexEntryPoint(rootFiles) {
 import ts5 from "typescript";
 function checkForPrivateExports(entryPoint, checker, refGraph) {
   const diagnostics = [];
-  const topLevelExports = new Set();
+  const topLevelExports = /* @__PURE__ */ new Set();
   const moduleSymbol = checker.getSymbolAtLocation(entryPoint);
   if (moduleSymbol === void 0) {
     throw new Error(`Internal error: failed to get symbol for entrypoint`);
@@ -487,7 +483,7 @@ function checkForPrivateExports(entryPoint, checker, refGraph) {
       topLevelExports.add(decl);
     }
   });
-  const checkedSet = new Set();
+  const checkedSet = /* @__PURE__ */ new Set();
   topLevelExports.forEach((mainExport) => {
     refGraph.transitiveReferencesOf(mainExport).forEach((transitiveReference) => {
       if (checkedSet.has(transitiveReference)) {
@@ -551,21 +547,21 @@ function getDescriptorOfDeclaration(decl) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/reference_graph.mjs
 var ReferenceGraph = class {
   constructor() {
-    this.references = new Map();
+    this.references = /* @__PURE__ */ new Map();
   }
   add(from, to) {
     if (!this.references.has(from)) {
-      this.references.set(from, new Set());
+      this.references.set(from, /* @__PURE__ */ new Set());
     }
     this.references.get(from).add(to);
   }
   transitiveReferencesOf(target) {
-    const set = new Set();
+    const set = /* @__PURE__ */ new Set();
     this.collectTransitiveReferences(set, target);
     return set;
   }
   pathFrom(source, target) {
-    return this.collectPathFrom(source, target, new Set());
+    return this.collectPathFrom(source, target, /* @__PURE__ */ new Set());
   }
   collectPathFrom(source, target, seen) {
     if (source === target) {
@@ -695,11 +691,11 @@ function generatedModuleName(originalModuleName, originalFileName, genSuffix) {
 var ShimAdapter = class {
   constructor(delegate, tsRootFiles, topLevelGenerators, perFileGenerators, oldProgram) {
     this.delegate = delegate;
-    this.shims = new Map();
-    this.priorShims = new Map();
-    this.notShims = new Set();
+    this.shims = /* @__PURE__ */ new Map();
+    this.priorShims = /* @__PURE__ */ new Map();
+    this.notShims = /* @__PURE__ */ new Set();
     this.generators = [];
-    this.ignoreForEmit = new Set();
+    this.ignoreForEmit = /* @__PURE__ */ new Set();
     this.extensionPrefixes = [];
     for (const gen of perFileGenerators) {
       const pattern = `^(.*)\\.${gen.extensionPrefix}\\.ts$`;
@@ -794,8 +790,8 @@ var TS_DTS_SUFFIX = /(\.d)?\.ts$/;
 var STRIP_NG_FACTORY = /(.*)NgFactory$/;
 var FactoryGenerator = class {
   constructor() {
-    this.sourceInfo = new Map();
-    this.sourceToFactorySymbols = new Map();
+    this.sourceInfo = /* @__PURE__ */ new Map();
+    this.sourceToFactorySymbols = /* @__PURE__ */ new Map();
     this.shouldEmit = true;
     this.extensionPrefix = "ngfactory";
   }
@@ -821,7 +817,7 @@ var FactoryGenerator = class {
     if (sf.moduleName !== void 0) {
       genFile.moduleName = generatedModuleName(sf.moduleName, sf.fileName, ".ngfactory");
     }
-    const moduleSymbols = new Map();
+    const moduleSymbols = /* @__PURE__ */ new Map();
     this.sourceToFactorySymbols.set(absoluteSfPath, moduleSymbols);
     this.sourceInfo.set(genFilePath, {
       sourceFilePath: absoluteSfPath,
@@ -852,7 +848,7 @@ function transformFactorySourceFile(factoryMap, context, importRewriter, file) {
   const { moduleSymbols, sourceFilePath } = factoryMap.get(file.fileName);
   const transformedStatements = [];
   let nonEmptyExport = null;
-  const coreImportIdentifiers = new Set();
+  const coreImportIdentifiers = /* @__PURE__ */ new Set();
   for (const stmt of file.statements) {
     if (ts7.isImportDeclaration(stmt) && ts7.isStringLiteral(stmt.moduleSpecifier) && stmt.moduleSpecifier.text === "@angular/core") {
       const rewrittenModuleSpecifier = importRewriter.rewriteSpecifier("@angular/core", sourceFilePath);
@@ -940,7 +936,7 @@ function updateInitializers(stmt, update) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/reference_tagger.mjs
 var ShimReferenceTagger = class {
   constructor(shimExtensions) {
-    this.tagged = new Set();
+    this.tagged = /* @__PURE__ */ new Set();
     this.enabled = true;
     this.suffixes = shimExtensions.map((extension) => `.${extension}.ts`);
   }
@@ -1083,7 +1079,7 @@ var TsCreateProgramDriver = class {
     this.originalHost = originalHost;
     this.options = options;
     this.shimExtensionPrefixes = shimExtensionPrefixes;
-    this.sfMap = new Map();
+    this.sfMap = /* @__PURE__ */ new Map();
     this.program = this.originalProgram;
     this.supportsInlineOperations = true;
   }
@@ -1124,7 +1120,7 @@ var TsCreateProgramDriver = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/dependency_tracking.mjs
 var FileDependencyGraph = class {
   constructor() {
-    this.nodes = new Map();
+    this.nodes = /* @__PURE__ */ new Map();
   }
   addDependency(from, on) {
     this.nodeFor(from).dependsOn.add(absoluteFromSourceFile(on));
@@ -1140,7 +1136,7 @@ var FileDependencyGraph = class {
     return node ? [...node.usesResources] : [];
   }
   updateWithPhysicalChanges(previous, changedTsPaths, deletedTsPaths, changedResources) {
-    const logicallyChanged = new Set();
+    const logicallyChanged = /* @__PURE__ */ new Set();
     for (const sf of previous.nodes.keys()) {
       const sfPath = absoluteFromSourceFile(sf);
       const node = previous.nodeFor(sf);
@@ -1159,8 +1155,8 @@ var FileDependencyGraph = class {
   nodeFor(sf) {
     if (!this.nodes.has(sf)) {
       this.nodes.set(sf, {
-        dependsOn: new Set(),
-        usesResources: new Set(),
+        dependsOn: /* @__PURE__ */ new Set(),
+        usesResources: /* @__PURE__ */ new Set(),
         failedAnalysis: false
       });
     }
@@ -1221,7 +1217,7 @@ var IncrementalCompilation = class {
   }
   static incremental(program, newVersions, oldProgram, oldState, modifiedResourceFiles, perf) {
     return perf.inPhase(PerfPhase.Reconciliation, () => {
-      const physicallyChangedTsFiles = new Set();
+      const physicallyChangedTsFiles = /* @__PURE__ */ new Set();
       const changedResourceFiles = new Set(modifiedResourceFiles != null ? modifiedResourceFiles : []);
       let priorAnalysis;
       switch (oldState.kind) {
@@ -1297,7 +1293,7 @@ var IncrementalCompilation = class {
     const { needsEmit, needsTypeCheckEmit, newGraph } = this.phase.semanticDepGraphUpdater.finalize();
     let emitted;
     if (this.step === null) {
-      emitted = new Set();
+      emitted = /* @__PURE__ */ new Set();
     } else {
       emitted = new Set(this.step.priorState.emitted);
       for (const sfPath of this.step.logicallyChangedTsFiles) {
@@ -1454,7 +1450,7 @@ var AbsoluteSourceSpan = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/context.mjs
 var IndexingContext = class {
   constructor() {
-    this.components = new Set();
+    this.components = /* @__PURE__ */ new Set();
   }
   addComponent(info) {
     this.components.add(info);
@@ -1516,9 +1512,9 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
   constructor(boundTemplate) {
     super();
     this.boundTemplate = boundTemplate;
-    this.identifiers = new Set();
-    this.targetIdentifierCache = new Map();
-    this.elementAndTemplateIdentifierCache = new Map();
+    this.identifiers = /* @__PURE__ */ new Set();
+    this.targetIdentifierCache = /* @__PURE__ */ new Map();
+    this.elementAndTemplateIdentifierCache = /* @__PURE__ */ new Map();
   }
   visit(node) {
     node.visit(this);
@@ -1670,10 +1666,10 @@ function getTemplateIdentifiers(boundTemplate) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/transform.mjs
 function generateAnalysis(context) {
-  const analysis = new Map();
+  const analysis = /* @__PURE__ */ new Map();
   context.components.forEach(({ declaration, selector, boundTemplate, templateMeta }) => {
     const name = declaration.name.getText();
-    const usedComponents = new Set();
+    const usedComponents = /* @__PURE__ */ new Set();
     const usedDirs = boundTemplate.getUsedDirectives();
     usedDirs.forEach((dir) => {
       if (dir.isComponent) {
@@ -1711,8 +1707,8 @@ var AdapterResourceLoader = class {
   constructor(adapter, options) {
     this.adapter = adapter;
     this.options = options;
-    this.cache = new Map();
-    this.fetching = new Map();
+    this.cache = /* @__PURE__ */ new Map();
+    this.fetching = /* @__PURE__ */ new Map();
     this.lookupResolutionHost = createLookupResolutionHost(this.adapter);
     this.canPreload = !!this.adapter.readResource;
     this.canPreprocess = !!this.adapter.transformResource;
@@ -1853,7 +1849,7 @@ var MetadataDtsModuleScopeResolver = class {
   constructor(dtsMetaReader, aliasingHost) {
     this.dtsMetaReader = dtsMetaReader;
     this.aliasingHost = aliasingHost;
-    this.cache = new Map();
+    this.cache = /* @__PURE__ */ new Map();
   }
   resolve(ref) {
     const clazz = ref.node;
@@ -1866,13 +1862,13 @@ var MetadataDtsModuleScopeResolver = class {
     }
     const directives = [];
     const pipes = [];
-    const ngModules = new Set([clazz]);
+    const ngModules = /* @__PURE__ */ new Set([clazz]);
     const meta = this.dtsMetaReader.getNgModuleMetadata(ref);
     if (meta === null) {
       this.cache.set(clazz, null);
       return null;
     }
-    const declarations = new Set();
+    const declarations = /* @__PURE__ */ new Set();
     for (const declRef of meta.declarations) {
       declarations.add(declRef.node);
     }
@@ -1944,13 +1940,13 @@ var LocalModuleScopeRegistry = class {
     this.refEmitter = refEmitter;
     this.aliasingHost = aliasingHost;
     this.sealed = false;
-    this.declarationToModule = new Map();
-    this.duplicateDeclarations = new Map();
-    this.moduleToRef = new Map();
-    this.cache = new Map();
-    this.remoteScoping = new Map();
-    this.scopeErrors = new Map();
-    this.modulesWithStructuralErrors = new Set();
+    this.declarationToModule = /* @__PURE__ */ new Map();
+    this.duplicateDeclarations = /* @__PURE__ */ new Map();
+    this.moduleToRef = /* @__PURE__ */ new Map();
+    this.cache = /* @__PURE__ */ new Map();
+    this.remoteScoping = /* @__PURE__ */ new Map();
+    this.scopeErrors = /* @__PURE__ */ new Map();
+    this.modulesWithStructuralErrors = /* @__PURE__ */ new Set();
   }
   registerNgModuleMetadata(data) {
     this.assertCollecting();
@@ -1994,7 +1990,7 @@ var LocalModuleScopeRegistry = class {
     if (this.duplicateDeclarations.has(decl.node)) {
       this.duplicateDeclarations.get(decl.node).set(ngModule, declData);
     } else if (this.declarationToModule.has(decl.node) && this.declarationToModule.get(decl.node).ngModule !== ngModule) {
-      const duplicateDeclMap = new Map();
+      const duplicateDeclMap = /* @__PURE__ */ new Map();
       const firstDeclData = this.declarationToModule.get(decl.node);
       this.modulesWithStructuralErrors.add(firstDeclData.ngModule);
       this.modulesWithStructuralErrors.add(ngModule);
@@ -2016,14 +2012,14 @@ var LocalModuleScopeRegistry = class {
       this.cache.set(ref.node, null);
       return null;
     }
-    const compilationModules = new Set([ngModule.ref.node]);
-    const exportedModules = new Set([ngModule.ref.node]);
+    const compilationModules = /* @__PURE__ */ new Set([ngModule.ref.node]);
+    const exportedModules = /* @__PURE__ */ new Set([ngModule.ref.node]);
     const diagnostics = [];
-    const compilationDirectives = new Map();
-    const compilationPipes = new Map();
-    const declared = new Set();
-    const exportDirectives = new Map();
-    const exportPipes = new Map();
+    const compilationDirectives = /* @__PURE__ */ new Map();
+    const compilationPipes = /* @__PURE__ */ new Map();
+    const declared = /* @__PURE__ */ new Set();
+    const exportDirectives = /* @__PURE__ */ new Map();
+    const exportPipes = /* @__PURE__ */ new Map();
     let isPoisoned = false;
     if (this.modulesWithStructuralErrors.has(ngModule.ref.node)) {
       isPoisoned = true;
@@ -2154,7 +2150,7 @@ var LocalModuleScopeRegistry = class {
       return null;
     }
     reexports = [];
-    const reexportMap = new Map();
+    const reexportMap = /* @__PURE__ */ new Map();
     const ngModuleRef = ref;
     const addReexport = (exportRef) => {
       if (exportRef.node.getSourceFile() === sourceFile) {
@@ -2251,13 +2247,13 @@ var TypeCheckScopeRegistry = class {
   constructor(scopeReader, metaReader) {
     this.scopeReader = scopeReader;
     this.metaReader = metaReader;
-    this.flattenedDirectiveMetaCache = new Map();
-    this.scopeCache = new Map();
+    this.flattenedDirectiveMetaCache = /* @__PURE__ */ new Map();
+    this.scopeCache = /* @__PURE__ */ new Map();
   }
   getTypeCheckScope(node) {
     const matcher = new SelectorMatcher();
     const directives = [];
-    const pipes = new Map();
+    const pipes = /* @__PURE__ */ new Map();
     const scope = this.scopeReader.getScopeForComponent(node);
     if (scope === null) {
       return {
@@ -2528,8 +2524,8 @@ var CompletionEngine = class {
     this.tcb = tcb;
     this.data = data;
     this.shimPath = shimPath;
-    this.templateContextCache = new Map();
-    this.expressionCompletionCache = new Map();
+    this.templateContextCache = /* @__PURE__ */ new Map();
+    this.expressionCompletionCache = /* @__PURE__ */ new Map();
     const globalRead = findFirstMatchingNode(this.tcb, {
       filter: ts15.isPropertyAccessExpression,
       withExpressionIdentifier: ExpressionIdentifier.COMPONENT_COMPLETION
@@ -2654,7 +2650,7 @@ var CompletionEngine = class {
     if (this.templateContextCache.has(context)) {
       return this.templateContextCache.get(context);
     }
-    const templateContext = new Map();
+    const templateContext = /* @__PURE__ */ new Map();
     for (const node of this.data.boundTarget.getEntitiesInTemplateScope(context)) {
       if (node instanceof TmplAstReference2) {
         templateContext.set(node.name, {
@@ -2732,7 +2728,7 @@ import ts22 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.mjs
 import ts17 from "typescript";
-var SAFE_TO_CAST_WITHOUT_PARENS = new Set([
+var SAFE_TO_CAST_WITHOUT_PARENS = /* @__PURE__ */ new Set([
   ts17.SyntaxKind.ParenthesizedExpression,
   ts17.SyntaxKind.Identifier,
   ts17.SyntaxKind.CallExpression,
@@ -3110,9 +3106,9 @@ var Environment = class {
       pipeInst: 1,
       typeCtor: 1
     };
-    this.typeCtors = new Map();
+    this.typeCtors = /* @__PURE__ */ new Map();
     this.typeCtorStatements = [];
-    this.pipeInsts = new Map();
+    this.pipeInsts = /* @__PURE__ */ new Map();
     this.pipeInstStatements = [];
   }
   typeCtorFor(dir) {
@@ -3197,7 +3193,7 @@ var OutOfBandDiagnosticRecorderImpl = class {
   constructor(resolver) {
     this.resolver = resolver;
     this._diagnostics = [];
-    this.recordedPipes = new Set();
+    this.recordedPipes = /* @__PURE__ */ new Set();
   }
   get diagnostics() {
     return this._diagnostics;
@@ -3395,11 +3391,11 @@ import { ASTWithSource as ASTWithSource2, Call, EmptyExpr as EmptyExpr2, SafeKey
 import ts26 from "typescript";
 var NULL_AS_ANY = ts26.createAsExpression(ts26.createNull(), ts26.createKeywordTypeNode(ts26.SyntaxKind.AnyKeyword));
 var UNDEFINED = ts26.createIdentifier("undefined");
-var UNARY_OPS = new Map([
+var UNARY_OPS = /* @__PURE__ */ new Map([
   ["+", ts26.SyntaxKind.PlusToken],
   ["-", ts26.SyntaxKind.MinusToken]
 ]);
-var BINARY_OPS = new Map([
+var BINARY_OPS = /* @__PURE__ */ new Map([
   ["+", ts26.SyntaxKind.PlusToken],
   ["-", ts26.SyntaxKind.MinusToken],
   ["<", ts26.SyntaxKind.LessThanToken],
@@ -4010,7 +4006,7 @@ var TcbDirectiveCtorOp = class extends TcbOp {
     const id = this.tcb.allocateId();
     addExpressionIdentifier(id, ExpressionIdentifier.DIRECTIVE);
     addParseSpanInfo(id, this.node.startSourceSpan || this.node.sourceSpan);
-    const genericInputs = new Map();
+    const genericInputs = /* @__PURE__ */ new Map();
     const inputs = getBoundInputs(this.dir, this.node, this.tcb);
     for (const input of inputs) {
       if (!this.tcb.env.config.checkTypeOfAttributes && input.attribute instanceof TmplAstTextAttribute2) {
@@ -4333,11 +4329,11 @@ var Scope = class {
     this.parent = parent;
     this.guard = guard;
     this.opQueue = [];
-    this.elementOpMap = new Map();
-    this.directiveOpMap = new Map();
-    this.referenceOpMap = new Map();
-    this.templateCtxOpMap = new Map();
-    this.varMap = new Map();
+    this.elementOpMap = /* @__PURE__ */ new Map();
+    this.directiveOpMap = /* @__PURE__ */ new Map();
+    this.referenceOpMap = /* @__PURE__ */ new Map();
+    this.templateCtxOpMap = /* @__PURE__ */ new Map();
+    this.varMap = /* @__PURE__ */ new Map();
     this.statements = [];
   }
   static forNodes(tcb, parent, templateOrNodes, guard) {
@@ -4347,7 +4343,7 @@ var Scope = class {
     }
     let children;
     if (templateOrNodes instanceof TmplAstTemplate2) {
-      const varMap = new Map();
+      const varMap = /* @__PURE__ */ new Map();
       for (const v of templateOrNodes.variables) {
         if (!varMap.has(v.name)) {
           varMap.set(v.name, v);
@@ -4485,7 +4481,7 @@ var Scope = class {
     }
   }
   appendDirectivesAndInputsOfNode(node) {
-    const claimedInputs = new Set();
+    const claimedInputs = /* @__PURE__ */ new Set();
     const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
     if (directives === null || directives.length === 0) {
       if (node instanceof TmplAstElement3) {
@@ -4494,7 +4490,7 @@ var Scope = class {
       }
       return;
     }
-    const dirMap = new Map();
+    const dirMap = /* @__PURE__ */ new Map();
     for (const dir of directives) {
       let directiveOp;
       const host = this.tcb.env.reflector;
@@ -4523,7 +4519,7 @@ var Scope = class {
     }
   }
   appendOutputsOfNode(node) {
-    const claimedOutputs = new Set();
+    const claimedOutputs = /* @__PURE__ */ new Set();
     const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
     if (directives === null || directives.length === 0) {
       if (node instanceof TmplAstElement3) {
@@ -4549,7 +4545,7 @@ var Scope = class {
         continue;
       }
       if (node instanceof TmplAstElement3) {
-        const claimedInputs = new Set();
+        const claimedInputs = /* @__PURE__ */ new Set();
         const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
         let hasDirectives;
         if (directives === null || directives.length === 0) {
@@ -4819,9 +4815,9 @@ var TypeCheckContextImpl = class {
     this.host = host;
     this.inlining = inlining;
     this.perf = perf;
-    this.fileMap = new Map();
-    this.opMap = new Map();
-    this.typeCtorPending = new Set();
+    this.fileMap = /* @__PURE__ */ new Map();
+    this.opMap = /* @__PURE__ */ new Map();
+    this.typeCtorPending = /* @__PURE__ */ new Set();
     if (inlining === InliningMode.Error && config.useInlineTypeConstructors) {
       throw new Error(`AssertionError: invalid inlining configuration.`);
     }
@@ -4913,7 +4909,7 @@ var TypeCheckContextImpl = class {
     return code;
   }
   finalize() {
-    const updates = new Map();
+    const updates = /* @__PURE__ */ new Map();
     for (const originalSf of this.opMap.keys()) {
       const newText = this.transform(originalSf);
       if (newText !== null) {
@@ -4960,7 +4956,7 @@ var TypeCheckContextImpl = class {
         domSchemaChecker: new RegistryDomSchemaChecker(fileData.sourceManager),
         oobRecorder: new OutOfBandDiagnosticRecorderImpl(fileData.sourceManager),
         file: new TypeCheckFile(shimPath, this.config, this.refEmitter, this.reflector, this.compilerHost),
-        templates: new Map()
+        templates: /* @__PURE__ */ new Map()
       });
     }
     return fileData.shimData.get(shimPath);
@@ -4971,7 +4967,7 @@ var TypeCheckContextImpl = class {
       const data = {
         hasInlines: false,
         sourceManager: this.host.getSourceManager(sfPath),
-        shimData: new Map()
+        shimData: /* @__PURE__ */ new Map()
       };
       this.fileMap.set(sfPath, data);
     }
@@ -5104,7 +5100,7 @@ var TemplateSource = class {
 };
 var TemplateSourceManager = class {
   constructor() {
-    this.templateSources = new Map();
+    this.templateSources = /* @__PURE__ */ new Map();
   }
   getTemplateId(node) {
     return getTemplateId(node);
@@ -5139,7 +5135,7 @@ var SymbolBuilder = class {
     this.templateData = templateData;
     this.componentScopeReader = componentScopeReader;
     this.getTypeChecker = getTypeChecker;
-    this.symbolCache = new Map();
+    this.symbolCache = /* @__PURE__ */ new Map();
   }
   getSymbol(node) {
     if (this.symbolCache.has(node)) {
@@ -5569,11 +5565,11 @@ var TemplateTypeCheckerImpl = class {
     this.componentScopeReader = componentScopeReader;
     this.typeCheckScopeRegistry = typeCheckScopeRegistry;
     this.perf = perf;
-    this.state = new Map();
-    this.completionCache = new Map();
-    this.symbolBuilderCache = new Map();
-    this.scopeCache = new Map();
-    this.elementTagCache = new Map();
+    this.state = /* @__PURE__ */ new Map();
+    this.completionCache = /* @__PURE__ */ new Map();
+    this.symbolBuilderCache = /* @__PURE__ */ new Map();
+    this.scopeCache = /* @__PURE__ */ new Map();
+    this.elementTagCache = /* @__PURE__ */ new Map();
     this.isComplete = false;
   }
   getTemplate(component) {
@@ -5856,7 +5852,7 @@ var TemplateTypeCheckerImpl = class {
         hasInlines: false,
         sourceManager: new TemplateSourceManager(),
         isComplete: false,
-        shimData: new Map()
+        shimData: /* @__PURE__ */ new Map()
       });
     }
     return this.state.get(path2);
@@ -5904,7 +5900,7 @@ var TemplateTypeCheckerImpl = class {
     if (this.elementTagCache.has(component)) {
       return this.elementTagCache.get(component);
     }
-    const tagMap = new Map();
+    const tagMap = /* @__PURE__ */ new Map();
     for (const tag of REGISTRY2.allKnownElementNames()) {
       tagMap.set(tag, null);
     }
@@ -6347,7 +6343,7 @@ var NgCompiler = class {
         return;
       }
       this.resourceManager.invalidate();
-      const classesToUpdate = new Set();
+      const classesToUpdate = /* @__PURE__ */ new Set();
       for (const resourceFile of changedResources) {
         for (const templateClass of this.getComponentsWithTemplateFile(resourceFile)) {
           classesToUpdate.add(templateClass);
@@ -6848,7 +6844,7 @@ function versionMapFromProgram(program, driver) {
   if (driver.getSourceFileVersion === void 0) {
     return null;
   }
-  const versions = new Map();
+  const versions = /* @__PURE__ */ new Map();
   for (const possiblyRedirectedSourceFile of program.getSourceFiles()) {
     const sf = toUnredirectedSourceFile(possiblyRedirectedSourceFile);
     versions.set(absoluteFromSourceFile(sf), driver.getSourceFileVersion(sf));
@@ -7018,7 +7014,7 @@ var NgtscProgram = class {
     untagAllTsFiles(this.tsProgram);
     const programDriver = new TsCreateProgramDriver(this.tsProgram, this.host, this.options, this.host.shimExtensionPrefixes);
     this.incrementalStrategy = oldProgram !== void 0 ? oldProgram.incrementalStrategy.toNextBuildStrategy() : new TrackedIncrementalBuildStrategy();
-    const modifiedResourceFiles = new Set();
+    const modifiedResourceFiles = /* @__PURE__ */ new Set();
     if (this.host.getModifiedResourceFiles !== void 0) {
       const strings = this.host.getModifiedResourceFiles();
       if (strings !== void 0) {
@@ -7441,4 +7437,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-RZRZCXOS.js.map
+//# sourceMappingURL=chunk-K72KRHPX.js.map

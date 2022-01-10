@@ -14,23 +14,19 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-RZRZCXOS.js";
+} from "./chunk-K72KRHPX.js";
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-XA5IZLLC.js";
+} from "./chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.mjs
 import ts2 from "typescript";
 import yargs from "yargs";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_watch.mjs
-import {
-  watch
-} from "chokidar";
-import {
-  normalize
-} from "path";
+import * as chokidar from "chokidar";
+import * as path from "path";
 import ts from "typescript";
 function totalCompilationTimeDiagnostic(timeInMillis) {
   let duration;
@@ -75,7 +71,7 @@ function createPerformWatchHost(configFileName, reportDiagnostics, existingOptio
         return { close: () => {
         } };
       }
-      const watcher = watch(options.basePath, {
+      const watcher = chokidar.watch(options.basePath, {
         ignored: /((^[\/\\])\..)|(\.js$)|(\.map$)|(\.metadata\.json|node_modules)/,
         ignoreInitial: true,
         persistent: true
@@ -107,15 +103,15 @@ function performWatchCompilation(host) {
   let cachedCompilerHost;
   let cachedOptions;
   let timerHandleForRecompilation;
-  const ignoreFilesForWatch = new Set();
-  const fileCache = new Map();
+  const ignoreFilesForWatch = /* @__PURE__ */ new Set();
+  const fileCache = /* @__PURE__ */ new Map();
   const firstCompileResult = doCompilation();
   let resolveReadyPromise;
   const readyPromise = new Promise((resolve) => resolveReadyPromise = resolve);
   const fileWatcher = host.onFileChange(cachedOptions.options, watchedFileChanged, resolveReadyPromise);
   return { close, ready: (cb) => readyPromise.then(cb), firstCompileResult };
   function cacheEntry(fileName) {
-    fileName = normalize(fileName);
+    fileName = path.normalize(fileName);
     let entry = fileCache.get(fileName);
     if (!entry) {
       entry = {};
@@ -143,7 +139,7 @@ function performWatchCompilation(host) {
       cachedCompilerHost = host.createCompilerHost(cachedOptions.options);
       const originalWriteFileCallback = cachedCompilerHost.writeFile;
       cachedCompilerHost.writeFile = function(fileName, data, writeByteOrderMark, onError, sourceFiles = []) {
-        ignoreFilesForWatch.add(normalize(fileName));
+        ignoreFilesForWatch.add(path.normalize(fileName));
         return originalWriteFileCallback(fileName, data, writeByteOrderMark, onError, sourceFiles);
       };
       const originalFileExists = cachedCompilerHost.fileExists;
@@ -210,8 +206,8 @@ function performWatchCompilation(host) {
     cachedOptions = void 0;
   }
   function watchedFileChanged(event, fileName) {
-    const normalizedPath = normalize(fileName);
-    if (cachedOptions && event === FileChangeEvent.Change && normalizedPath === normalize(cachedOptions.project)) {
+    const normalizedPath = path.normalize(fileName);
+    if (cachedOptions && event === FileChangeEvent.Change && normalizedPath === path.normalize(cachedOptions.project)) {
       resetOptions();
     } else if (event === FileChangeEvent.CreateDelete || event === FileChangeEvent.CreateDeleteDir) {
       cachedOptions = void 0;
@@ -230,7 +226,7 @@ function performWatchCompilation(host) {
       host.clearTimeout(timerHandleForRecompilation.timerHandle);
     } else {
       timerHandleForRecompilation = {
-        modifiedResourceFiles: new Set(),
+        modifiedResourceFiles: /* @__PURE__ */ new Set(),
         timerHandle: void 0
       };
     }
@@ -383,4 +379,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QRV6PDDZ.js.map
+//# sourceMappingURL=chunk-IRYYIX46.js.map

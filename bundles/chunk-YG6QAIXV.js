@@ -13,7 +13,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-PUUB4PWZ.js";
+} from "./chunk-7PY7XEFH.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -33,12 +33,12 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-CHJAKUHU.js";
+} from "./chunk-XNV7D7R3.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
   relative
-} from "./chunk-P25X5ELY.js";
+} from "./chunk-676MI6WZ.js";
 import {
   PerfEvent,
   PerfPhase
@@ -46,7 +46,7 @@ import {
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-XA5IZLLC.js";
+} from "./chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic.mjs
 var DynamicValue = class {
@@ -149,7 +149,7 @@ var ResolvedModule = class {
     return this.evaluate(this.exports.get(name));
   }
   getExports() {
-    const map = new Map();
+    const map = /* @__PURE__ */ new Map();
     this.exports.forEach((decl, name) => {
       map.set(name, this.evaluate(decl));
     });
@@ -291,7 +291,7 @@ var ReadHelperFn = class extends KnownFn {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/known_declaration.mjs
-var jsGlobalObjectValue = new Map([["assign", new ObjectAssignBuiltinFn()]]);
+var jsGlobalObjectValue = /* @__PURE__ */ new Map([["assign", new ObjectAssignBuiltinFn()]]);
 var assignTsHelperFn = new AssignHelperFn();
 var spreadTsHelperFn = new SpreadHelperFn();
 var spreadArrayTsHelperFn = new SpreadArrayHelperFn();
@@ -321,7 +321,7 @@ function literalBinaryOp(op) {
 function referenceBinaryOp(op) {
   return { op, literal: false };
 }
-var BINARY_OPERATORS = new Map([
+var BINARY_OPERATORS = /* @__PURE__ */ new Map([
   [ts.SyntaxKind.PlusToken, literalBinaryOp((a, b) => a + b)],
   [ts.SyntaxKind.MinusToken, literalBinaryOp((a, b) => a - b)],
   [ts.SyntaxKind.AsteriskToken, literalBinaryOp((a, b) => a * b)],
@@ -345,7 +345,7 @@ var BINARY_OPERATORS = new Map([
   [ts.SyntaxKind.AmpersandAmpersandToken, referenceBinaryOp((a, b) => a && b)],
   [ts.SyntaxKind.BarBarToken, referenceBinaryOp((a, b) => a || b)]
 ]);
-var UNARY_OPERATORS = new Map([
+var UNARY_OPERATORS = /* @__PURE__ */ new Map([
   [ts.SyntaxKind.TildeToken, (a) => ~a],
   [ts.SyntaxKind.MinusToken, (a) => -a],
   [ts.SyntaxKind.PlusToken, (a) => +a],
@@ -423,7 +423,7 @@ var StaticInterpreter = class {
     return array;
   }
   visitObjectLiteralExpression(node, context) {
-    const map = new Map();
+    const map = /* @__PURE__ */ new Map();
     for (let i = 0; i < node.properties.length; i++) {
       const property = node.properties[i];
       if (ts.isPropertyAssignment(property)) {
@@ -536,7 +536,7 @@ var StaticInterpreter = class {
   }
   visitEnumDeclaration(node, context) {
     const enumRef = this.getReference(node, context);
-    const map = new Map();
+    const map = /* @__PURE__ */ new Map();
     node.members.forEach((member) => {
       const name = this.stringNameFromPropertyName(member.name, context);
       if (name !== void 0) {
@@ -693,7 +693,7 @@ var StaticInterpreter = class {
     }
     const ret = fn.body[0];
     const args = this.evaluateFunctionArguments(node, context);
-    const newScope = new Map();
+    const newScope = /* @__PURE__ */ new Map();
     const calleeContext = __spreadProps(__spreadValues({}, context), { scope: newScope });
     fn.parameters.forEach((param, index) => {
       let arg = args[index];
@@ -821,7 +821,7 @@ var StaticInterpreter = class {
   }
   getResolvedEnum(node, enumMembers, context) {
     const enumRef = this.getReference(node, context);
-    const map = new Map();
+    const map = /* @__PURE__ */ new Map();
     enumMembers.forEach((member) => {
       const name = this.stringNameFromPropertyName(member.name, context);
       if (name !== void 0) {
@@ -915,7 +915,7 @@ var PartialEvaluator = class {
       originatingFile: sourceFile,
       absoluteModuleName: null,
       resolutionContext: sourceFile.fileName,
-      scope: new Map(),
+      scope: /* @__PURE__ */ new Map(),
       foreignFunctionResolver
     });
   }
@@ -1346,7 +1346,7 @@ function makeDuplicateDeclarationError(node, data, kind) {
   return makeDiagnostic(ErrorCode.NGMODULE_DECLARATION_NOT_UNIQUE, node.name, `The ${kind} '${node.name.text}' is declared by more than one NgModule.`, context);
 }
 function resolveProvidersRequiringFactory(rawProviders, reflector, evaluator) {
-  const providers = new Set();
+  const providers = /* @__PURE__ */ new Set();
   const resolvedProviders = evaluator.evaluate(rawProviders);
   if (!Array.isArray(resolvedProviders)) {
     return providers;
@@ -1444,14 +1444,14 @@ var OpaqueSymbol = class extends SemanticSymbol {
 };
 var SemanticDepGraph = class {
   constructor() {
-    this.files = new Map();
-    this.symbolByDecl = new Map();
+    this.files = /* @__PURE__ */ new Map();
+    this.symbolByDecl = /* @__PURE__ */ new Map();
   }
   registerSymbol(symbol) {
     this.symbolByDecl.set(symbol.decl, symbol);
     if (symbol.identifier !== null) {
       if (!this.files.has(symbol.path)) {
-        this.files.set(symbol.path, new Map());
+        this.files.set(symbol.path, /* @__PURE__ */ new Map());
       }
       this.files.get(symbol.path).set(symbol.identifier, symbol);
     }
@@ -1484,7 +1484,7 @@ var SemanticDepGraphUpdater = class {
   constructor(priorGraph) {
     this.priorGraph = priorGraph;
     this.newGraph = new SemanticDepGraph();
-    this.opaqueSymbols = new Map();
+    this.opaqueSymbols = /* @__PURE__ */ new Map();
   }
   registerSymbol(symbol) {
     this.newGraph.registerSymbol(symbol);
@@ -1492,8 +1492,8 @@ var SemanticDepGraphUpdater = class {
   finalize() {
     if (this.priorGraph === null) {
       return {
-        needsEmit: new Set(),
-        needsTypeCheckEmit: new Set(),
+        needsEmit: /* @__PURE__ */ new Set(),
+        needsTypeCheckEmit: /* @__PURE__ */ new Set(),
         newGraph: this.newGraph
       };
     }
@@ -1506,14 +1506,14 @@ var SemanticDepGraphUpdater = class {
     };
   }
   determineInvalidatedFiles(priorGraph) {
-    const isPublicApiAffected = new Set();
+    const isPublicApiAffected = /* @__PURE__ */ new Set();
     for (const symbol of this.newGraph.symbolByDecl.values()) {
       const previousSymbol = priorGraph.getEquivalentSymbol(symbol);
       if (previousSymbol === null || symbol.isPublicApiAffected(previousSymbol)) {
         isPublicApiAffected.add(symbol);
       }
     }
-    const needsEmit = new Set();
+    const needsEmit = /* @__PURE__ */ new Set();
     for (const symbol of this.newGraph.symbolByDecl.values()) {
       if (symbol.isEmitAffected === void 0) {
         continue;
@@ -1526,14 +1526,14 @@ var SemanticDepGraphUpdater = class {
     return needsEmit;
   }
   determineInvalidatedTypeCheckFiles(priorGraph) {
-    const isTypeCheckApiAffected = new Set();
+    const isTypeCheckApiAffected = /* @__PURE__ */ new Set();
     for (const symbol of this.newGraph.symbolByDecl.values()) {
       const previousSymbol = priorGraph.getEquivalentSymbol(symbol);
       if (previousSymbol === null || symbol.isTypeCheckApiAffected(previousSymbol)) {
         isTypeCheckApiAffected.add(symbol);
       }
     }
-    const needsTypeCheckEmit = new Set();
+    const needsTypeCheckEmit = /* @__PURE__ */ new Set();
     for (const symbol of this.newGraph.symbolByDecl.values()) {
       if (symbol.isTypeCheckBlockAffected === void 0) {
         continue;
@@ -1665,10 +1665,10 @@ var ClassPropertyMapping = class {
     this.reverseMap = reverseMapFromForwardMap(forwardMap);
   }
   static empty() {
-    return new ClassPropertyMapping(new Map());
+    return new ClassPropertyMapping(/* @__PURE__ */ new Map());
   }
   static fromMappedObject(obj) {
-    const forwardMap = new Map();
+    const forwardMap = /* @__PURE__ */ new Map();
     for (const classPropertyName of Object.keys(obj)) {
       const value = obj[classPropertyName];
       const bindingPropertyName = Array.isArray(value) ? value[0] : value;
@@ -1724,7 +1724,7 @@ var ClassPropertyMapping = class {
   }
 };
 function reverseMapFromForwardMap(forwardMap) {
-  const reverseMap = new Map();
+  const reverseMap = /* @__PURE__ */ new Map();
   for (const [_, inputOrOutput] of forwardMap) {
     if (!reverseMap.has(inputOrOutput.bindingPropertyName)) {
       reverseMap.set(inputOrOutput.bindingPropertyName, []);
@@ -1798,9 +1798,9 @@ function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
   const ngTemplateGuards = staticMembers.map(extractTemplateGuard).filter((guard) => guard !== null);
   const hasNgTemplateContextGuard = staticMembers.some((member) => member.kind === ClassMemberKind.Method && member.name === "ngTemplateContextGuard");
   const coercedInputFields = new Set(staticMembers.map(extractCoercedInput).filter((inputName) => inputName !== null));
-  const restrictedInputFields = new Set();
-  const stringLiteralInputFields = new Set();
-  const undeclaredInputFields = new Set();
+  const restrictedInputFields = /* @__PURE__ */ new Set();
+  const stringLiteralInputFields = /* @__PURE__ */ new Set();
+  const undeclaredInputFields = /* @__PURE__ */ new Set();
   for (const classPropertyName of inputs.classPropertyNames) {
     const field = members.find((member) => member.name === classPropertyName);
     if (field === void 0 || field.node === null) {
@@ -2010,10 +2010,10 @@ function flattenInheritedDirectiveMetadata(reader, dir) {
   if (topMeta.baseClass === null) {
     return topMeta;
   }
-  const coercedInputFields = new Set();
-  const undeclaredInputFields = new Set();
-  const restrictedInputFields = new Set();
-  const stringLiteralInputFields = new Set();
+  const coercedInputFields = /* @__PURE__ */ new Set();
+  const undeclaredInputFields = /* @__PURE__ */ new Set();
+  const restrictedInputFields = /* @__PURE__ */ new Set();
+  const stringLiteralInputFields = /* @__PURE__ */ new Set();
   let isDynamic = false;
   let inputs = ClassPropertyMapping.empty();
   let outputs = ClassPropertyMapping.empty();
@@ -2061,9 +2061,9 @@ function flattenInheritedDirectiveMetadata(reader, dir) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/registry.mjs
 var LocalMetadataRegistry = class {
   constructor() {
-    this.directives = new Map();
-    this.ngModules = new Map();
-    this.pipes = new Map();
+    this.directives = /* @__PURE__ */ new Map();
+    this.ngModules = /* @__PURE__ */ new Map();
+    this.pipes = /* @__PURE__ */ new Map();
   }
   getDirectiveMetadata(ref) {
     return this.directives.has(ref.node) ? this.directives.get(ref.node) : null;
@@ -2107,7 +2107,7 @@ var CompoundMetadataRegistry = class {
 var InjectableClassRegistry = class {
   constructor(host) {
     this.host = host;
-    this.classes = new Set();
+    this.classes = /* @__PURE__ */ new Set();
   }
   registerInjectable(declaration) {
     this.classes.add(declaration);
@@ -2120,14 +2120,14 @@ var InjectableClassRegistry = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/resource_registry.mjs
 var ResourceRegistry = class {
   constructor() {
-    this.externalTemplateToComponentsMap = new Map();
-    this.componentToTemplateMap = new Map();
-    this.componentToStylesMap = new Map();
-    this.externalStyleToComponentsMap = new Map();
+    this.externalTemplateToComponentsMap = /* @__PURE__ */ new Map();
+    this.componentToTemplateMap = /* @__PURE__ */ new Map();
+    this.componentToStylesMap = /* @__PURE__ */ new Map();
+    this.externalStyleToComponentsMap = /* @__PURE__ */ new Map();
   }
   getComponentsWithTemplate(template) {
     if (!this.externalTemplateToComponentsMap.has(template)) {
-      return new Set();
+      return /* @__PURE__ */ new Set();
     }
     return this.externalTemplateToComponentsMap.get(template);
   }
@@ -2143,7 +2143,7 @@ var ResourceRegistry = class {
     const { path } = templateResource;
     if (path !== null) {
       if (!this.externalTemplateToComponentsMap.has(path)) {
-        this.externalTemplateToComponentsMap.set(path, new Set());
+        this.externalTemplateToComponentsMap.set(path, /* @__PURE__ */ new Set());
       }
       this.externalTemplateToComponentsMap.get(path).add(component);
     }
@@ -2158,11 +2158,11 @@ var ResourceRegistry = class {
   registerStyle(styleResource, component) {
     const { path } = styleResource;
     if (!this.componentToStylesMap.has(component)) {
-      this.componentToStylesMap.set(component, new Set());
+      this.componentToStylesMap.set(component, /* @__PURE__ */ new Set());
     }
     if (path !== null) {
       if (!this.externalStyleToComponentsMap.has(path)) {
-        this.externalStyleToComponentsMap.set(path, new Set());
+        this.externalStyleToComponentsMap.set(path, /* @__PURE__ */ new Set());
       }
       this.externalStyleToComponentsMap.get(path).add(component);
     }
@@ -2170,13 +2170,13 @@ var ResourceRegistry = class {
   }
   getStyles(component) {
     if (!this.componentToStylesMap.has(component)) {
-      return new Set();
+      return /* @__PURE__ */ new Set();
     }
     return this.componentToStylesMap.get(component);
   }
   getComponentsWithStyle(styleUrl) {
     if (!this.externalStyleToComponentsMap.has(styleUrl)) {
-      return new Set();
+      return /* @__PURE__ */ new Set();
     }
     return this.externalStyleToComponentsMap.get(styleUrl);
   }
@@ -2287,11 +2287,11 @@ var TraitCompiler = class {
     this.compilationMode = compilationMode;
     this.dtsTransforms = dtsTransforms;
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
-    this.classes = new Map();
-    this.fileToClasses = new Map();
-    this.filesWithoutTraits = new Set();
-    this.reexportMap = new Map();
-    this.handlersByName = new Map();
+    this.classes = /* @__PURE__ */ new Map();
+    this.fileToClasses = /* @__PURE__ */ new Map();
+    this.filesWithoutTraits = /* @__PURE__ */ new Set();
+    this.reexportMap = /* @__PURE__ */ new Map();
+    this.handlersByName = /* @__PURE__ */ new Map();
     for (const handler of handlers) {
       this.handlersByName.set(handler.name, handler);
     }
@@ -2351,7 +2351,7 @@ var TraitCompiler = class {
     return records;
   }
   getAnalyzedRecords() {
-    const result = new Map();
+    const result = /* @__PURE__ */ new Map();
     for (const [sf, classes] of this.fileToClasses) {
       const records = [];
       for (const clazz of classes) {
@@ -2389,7 +2389,7 @@ var TraitCompiler = class {
     this.classes.set(record.node, record);
     const sf = record.node.getSourceFile();
     if (!this.fileToClasses.has(sf)) {
-      this.fileToClasses.set(sf, new Set());
+      this.fileToClasses.set(sf, /* @__PURE__ */ new Set());
     }
     this.fileToClasses.get(sf).add(record.node);
   }
@@ -2423,7 +2423,7 @@ var TraitCompiler = class {
         this.classes.set(clazz, record);
         const sf = clazz.getSourceFile();
         if (!this.fileToClasses.has(sf)) {
-          this.fileToClasses.set(sf, new Set());
+          this.fileToClasses.set(sf, /* @__PURE__ */ new Set());
         }
         this.fileToClasses.get(sf).add(clazz);
       } else {
@@ -2552,7 +2552,7 @@ var TraitCompiler = class {
         if (result.reexports !== void 0) {
           const fileName = clazz.getSourceFile().fileName;
           if (!this.reexportMap.has(fileName)) {
-            this.reexportMap.set(fileName, new Map());
+            this.reexportMap.set(fileName, /* @__PURE__ */ new Map());
           }
           const fileReexports = this.reexportMap.get(fileName);
           for (const reexport of result.reexports) {
@@ -2747,7 +2747,7 @@ function isImportStatement(stmt) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/declaration.mjs
 var DtsTransformRegistry = class {
   constructor() {
-    this.ivyDeclarationTransforms = new Map();
+    this.ivyDeclarationTransforms = /* @__PURE__ */ new Map();
   }
   getIvyDeclarationTransform(sf) {
     if (!this.ivyDeclarationTransforms.has(sf)) {
@@ -2844,7 +2844,7 @@ var DtsTransformer = class {
 };
 var IvyDeclarationDtsTransform = class {
   constructor() {
-    this.declarationFields = new Map();
+    this.declarationFields = /* @__PURE__ */ new Map();
   }
   addFields(decl, fields) {
     this.declarationFields.set(decl, fields);
@@ -2880,8 +2880,8 @@ function visit(node, visitor, context) {
 }
 var Visitor = class {
   constructor() {
-    this._before = new Map();
-    this._after = new Map();
+    this._before = /* @__PURE__ */ new Map();
+    this._after = /* @__PURE__ */ new Map();
   }
   _visitListEntryNode(node, visitor) {
     const result = visitor(node);
@@ -2936,7 +2936,7 @@ function hasStatements(node) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/transform.mjs
-var NO_DECORATORS = new Set();
+var NO_DECORATORS = /* @__PURE__ */ new Set();
 var CLOSURE_FILE_OVERVIEW_REGEXP = /\s+@fileoverview\s+/i;
 function ivyTransformFactory(compilation, reflector, importRewriter, defaultImportTracker, perf, isCore, isClosureCompilerEnabled) {
   const recordWrappedNode = createRecorderFn(defaultImportTracker);
@@ -2951,7 +2951,7 @@ var IvyCompilationVisitor = class extends Visitor {
     super();
     this.compilation = compilation;
     this.constantPool = constantPool;
-    this.classCompilationMap = new Map();
+    this.classCompilationMap = /* @__PURE__ */ new Map();
   }
   visitClassDeclaration(node) {
     const result = this.compilation.compile(node, this.constantPool);
@@ -3328,7 +3328,7 @@ var FIELD_DECORATORS = [
   "HostBinding",
   "HostListener"
 ];
-var LIFECYCLE_HOOKS = new Set([
+var LIFECYCLE_HOOKS = /* @__PURE__ */ new Set([
   "ngOnChanges",
   "ngOnInit",
   "ngOnDestroy",
@@ -3531,7 +3531,7 @@ var DirectiveDecoratorHandler = class {
 function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, isCore, flags, annotateForClosureCompiler, defaultSelector = null) {
   let directive;
   if (decorator === null || decorator.args === null || decorator.args.length === 0) {
-    directive = new Map();
+    directive = /* @__PURE__ */ new Map();
   } else if (decorator.args.length !== 1) {
     throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `Incorrect number of arguments to @${decorator.name} decorator`);
   } else {
@@ -3871,7 +3871,7 @@ function extractHostBindings(members, evaluator, coreModule, metadata) {
   });
   return bindings;
 }
-var QUERY_TYPES = new Set([
+var QUERY_TYPES = /* @__PURE__ */ new Set([
   "ContentChild",
   "ContentChildren",
   "ViewChild",
@@ -4325,7 +4325,7 @@ function isNgModule(node, compilation) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/component.mjs
-var EMPTY_MAP = new Map();
+var EMPTY_MAP = /* @__PURE__ */ new Map();
 var EMPTY_ARRAY = [];
 var ComponentSymbol = class extends DirectiveSymbol {
   constructor() {
@@ -4387,10 +4387,10 @@ var ComponentDecoratorHandler = class {
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
     this.annotateForClosureCompiler = annotateForClosureCompiler;
     this.perf = perf;
-    this.literalCache = new Map();
+    this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry();
-    this.preanalyzeTemplateCache = new Map();
-    this.preanalyzeStylesCache = new Map();
+    this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
+    this.preanalyzeStylesCache = /* @__PURE__ */ new Map();
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = ComponentDecoratorHandler.name;
   }
@@ -4683,7 +4683,7 @@ var ComponentDecoratorHandler = class {
           matcher.addSelectables(CssSelector.parse(dir.selector), dir);
         }
       }
-      const pipes = new Map();
+      const pipes = /* @__PURE__ */ new Map();
       for (const pipe of scope.compilation.pipes) {
         pipes.set(pipe.name, pipe.ref);
       }
@@ -4722,14 +4722,14 @@ var ComponentDecoratorHandler = class {
         symbol.usedDirectives = usedDirectives.map((dir) => this.semanticDepGraphUpdater.getSemanticReference(dir.ref.node, dir.type));
         symbol.usedPipes = usedPipes.map((pipe) => this.semanticDepGraphUpdater.getSemanticReference(pipe.ref.node, pipe.expression));
       }
-      const cyclesFromDirectives = new Map();
+      const cyclesFromDirectives = /* @__PURE__ */ new Map();
       for (const usedDirective of usedDirectives) {
         const cycle = this._checkForCyclicImport(usedDirective.importedFile, usedDirective.type, context);
         if (cycle !== null) {
           cyclesFromDirectives.set(usedDirective, cycle);
         }
       }
-      const cyclesFromPipes = new Map();
+      const cyclesFromPipes = /* @__PURE__ */ new Map();
       for (const usedPipe of usedPipes) {
         const cycle = this._checkForCyclicImport(usedPipe.importedFile, usedPipe.expression, context);
         if (cycle !== null) {
@@ -4935,7 +4935,7 @@ var ComponentDecoratorHandler = class {
     return styleUrls;
   }
   _extractStyleResources(component, containingFile) {
-    const styles = new Set();
+    const styles = /* @__PURE__ */ new Set();
     function stringLiteralElements(array) {
       return array.elements.filter((e) => ts18.isStringLiteralLike(e));
     }
@@ -5577,4 +5577,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YGWYGZ6W.js.map
+//# sourceMappingURL=chunk-YG6QAIXV.js.map

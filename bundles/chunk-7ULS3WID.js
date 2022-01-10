@@ -10,7 +10,7 @@ import {
   MetadataDtsModuleScopeResolver,
   TypeCheckScopeRegistry,
   readConfiguration
-} from "./chunk-RZRZCXOS.js";
+} from "./chunk-K72KRHPX.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -31,7 +31,7 @@ import {
   TraitState,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-YGWYGZ6W.js";
+} from "./chunk-YG6QAIXV.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -42,7 +42,7 @@ import {
   isNamedFunctionDeclaration,
   isNamedVariableDeclaration,
   reflectObjectLiteral
-} from "./chunk-PUUB4PWZ.js";
+} from "./chunk-7PY7XEFH.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -50,7 +50,7 @@ import {
 import {
   ContentOrigin,
   SourceFileLoader
-} from "./chunk-QL6ZC3U3.js";
+} from "./chunk-ADHVDA4A.js";
 import {
   AbsoluteModuleStrategy,
   ImportManager,
@@ -71,7 +71,7 @@ import {
   translateStatement,
   translateType,
   validateAndRewriteCoreSymbol
-} from "./chunk-CHJAKUHU.js";
+} from "./chunk-XNV7D7R3.js";
 import {
   LogicalFileSystem,
   NgtscCompilerHost,
@@ -83,14 +83,14 @@ import {
   isRooted,
   relative,
   toRelativeImport
-} from "./chunk-P25X5ELY.js";
+} from "./chunk-676MI6WZ.js";
 import {
   NOOP_PERF_RECORDER
 } from "./chunk-GLCRIILX.js";
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-XA5IZLLC.js";
+} from "./chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/create_compile_function.mjs
 import ts22 from "typescript";
@@ -296,9 +296,9 @@ var Esm2015ReflectionHost = class extends TypeScriptReflectionHost {
     this.dts = dts;
     this.publicDtsDeclarationMap = null;
     this.privateDtsDeclarationMap = null;
-    this.preprocessedSourceFiles = new Set();
-    this.aliasedClassDeclarations = new Map();
-    this.decoratorCache = new Map();
+    this.preprocessedSourceFiles = /* @__PURE__ */ new Set();
+    this.aliasedClassDeclarations = /* @__PURE__ */ new Map();
+    this.decoratorCache = /* @__PURE__ */ new Map();
   }
   getClassSymbol(declaration) {
     const symbol = this.getClassSymbolFromOuterDeclaration(declaration);
@@ -441,7 +441,7 @@ ${declaration.getText()}`);
     return null;
   }
   findClassSymbols(sourceFile) {
-    const classes = new Map();
+    const classes = /* @__PURE__ */ new Map();
     this.getModuleStatements(sourceFile).forEach((statement) => this.addClassSymbolsFromStatement(classes, statement));
     return Array.from(classes.values());
   }
@@ -781,7 +781,7 @@ ${declaration.getText()}`);
     return members;
   }
   getMemberDecoratorsFromStaticProperty(decoratorsProperty) {
-    const memberDecorators = new Map();
+    const memberDecorators = /* @__PURE__ */ new Map();
     const propDecoratorsMap = getPropertyValueFromSymbol(decoratorsProperty);
     if (propDecoratorsMap && ts4.isObjectLiteralExpression(propDecoratorsMap)) {
       const propertiesMap = reflectObjectLiteral(propDecoratorsMap);
@@ -796,7 +796,7 @@ ${declaration.getText()}`);
   }
   computeDecoratorInfoFromHelperCalls(classSymbol) {
     let classDecorators = null;
-    const memberDecorators = new Map();
+    const memberDecorators = /* @__PURE__ */ new Map();
     const constructorParamInfo = [];
     const getConstructorParamInfo = (index) => {
       let param = constructorParamInfo[index];
@@ -1141,8 +1141,8 @@ ${declaration.getText()}`);
     }
   }
   computePublicDtsDeclarationMap(src, dts) {
-    const declarationMap = new Map();
-    const dtsDeclarationMap = new Map();
+    const declarationMap = /* @__PURE__ */ new Map();
+    const dtsDeclarationMap = /* @__PURE__ */ new Map();
     const rootDts = getRootFileOrFail(dts);
     this.collectDtsExportedDeclarations(dtsDeclarationMap, rootDts, dts.program.getTypeChecker());
     const rootSrc = getRootFileOrFail(src);
@@ -1150,8 +1150,8 @@ ${declaration.getText()}`);
     return declarationMap;
   }
   computePrivateDtsDeclarationMap(src, dts) {
-    const declarationMap = new Map();
-    const dtsDeclarationMap = new Map();
+    const declarationMap = /* @__PURE__ */ new Map();
+    const dtsDeclarationMap = /* @__PURE__ */ new Map();
     const typeChecker = dts.program.getTypeChecker();
     const dtsFiles = getNonRootPackageFiles(dts);
     for (const dtsFile of dtsFiles) {
@@ -1971,7 +1971,7 @@ var UmdReflectionHost = class extends Esm5ReflectionHost {
     return parseStatementForUmdModule(sourceFile.statements[0]);
   }
   computeExportsOfUmdModule(sourceFile) {
-    const moduleMap = new Map();
+    const moduleMap = /* @__PURE__ */ new Map();
     for (const statement of this.getModuleStatements(sourceFile)) {
       if (isExportsStatement(statement)) {
         const exportDeclaration = this.extractBasicUmdExportDeclaration(statement);
@@ -2700,7 +2700,7 @@ import ts11 from "typescript";
 var SharedFileCache = class {
   constructor(fs) {
     this.fs = fs;
-    this.sfCache = new Map();
+    this.sfCache = /* @__PURE__ */ new Map();
   }
   getCachedSourceFile(fileName) {
     const absPath = this.fs.resolve(fileName);
@@ -2764,7 +2764,7 @@ var EntryPointFileCache = class {
   constructor(fs, sharedFileCache) {
     this.fs = fs;
     this.sharedFileCache = sharedFileCache;
-    this.sfCache = new Map();
+    this.sfCache = /* @__PURE__ */ new Map();
   }
   getCachedSourceFile(fileName, languageVersion) {
     const staticSf = this.sharedFileCache.getCachedSourceFile(fileName);
@@ -3010,7 +3010,7 @@ function migrateProviderClass(provider, host) {
     host.injectSyntheticDecorator(clazz, createInjectableDecorator(clazz));
   }
 }
-var NO_MIGRATE_DECORATORS = new Set(["Injectable", "Directive", "Component", "Pipe"]);
+var NO_MIGRATE_DECORATORS = /* @__PURE__ */ new Set(["Injectable", "Directive", "Component", "Pipe"]);
 function needsInjectableDecorator(clazz, host) {
   const decorators = host.getAllDecorators(clazz);
   if (decorators === null) {
@@ -3506,7 +3506,7 @@ function isAnyKeyword(typeParam) {
 var NgccReferencesRegistry = class {
   constructor(host) {
     this.host = host;
-    this.map = new Map();
+    this.map = /* @__PURE__ */ new Map();
   }
   add(source, ...references) {
     references.forEach((ref) => {
@@ -3605,7 +3605,7 @@ var CommonJsReflectionHost = class extends Esm5ReflectionHost {
     return calls;
   }
   computeExportsOfCommonJsModule(sourceFile) {
-    const moduleMap = new Map();
+    const moduleMap = /* @__PURE__ */ new Map();
     for (const statement of this.getModuleStatements(sourceFile)) {
       if (isExportsStatement(statement)) {
         const exportDeclaration = this.extractBasicCommonJsExportDeclaration(statement);
@@ -4229,7 +4229,7 @@ export {${e.symbolName} as ${e.asAlias}} from '${e.fromModule}';`;
     return renderSourceAndMap(this.logger, this.fs, dtsFile, outputText);
   }
   getTypingsFilesToRender(decorationAnalyses, privateDeclarationsAnalyses, moduleWithProvidersAnalyses) {
-    const dtsMap = new Map();
+    const dtsMap = /* @__PURE__ */ new Map();
     decorationAnalyses.forEach((compiledFile) => {
       let appliedReexports = false;
       compiledFile.compiledClasses.forEach((compiledClass) => {
@@ -4621,9 +4621,7 @@ ${errors}`);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/ngcc_options.mjs
-import {
-  cpus
-} from "os";
+import * as os from "os";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/path_mappings.mjs
 function getPathMappingsFromTsConfig(fs, tsConfig, projectPath) {
@@ -4857,7 +4855,7 @@ If you did intend to use this file, then you can hide this warning by providing 
 function getMaxNumberOfWorkers() {
   const maxWorkers = process.env.NGCC_MAX_WORKERS;
   if (maxWorkers === void 0) {
-    return Math.max(1, Math.min(4, cpus().length - 1));
+    return Math.max(1, Math.min(4, os.cpus().length - 1));
   }
   const numericMaxWorkers = +maxWorkers.trim();
   if (!Number.isInteger(numericMaxWorkers)) {
@@ -4872,7 +4870,7 @@ function getMaxNumberOfWorkers() {
 var stringifyTask = (task) => `{entryPoint: ${task.entryPoint.name}, formatProperty: ${task.formatProperty}, processDts: ${DtsProcessing[task.processDts]}}`;
 function computeTaskDependencies(tasks, graph) {
   const dependencies = new TaskDependencies();
-  const candidateDependencies = new Map();
+  const candidateDependencies = /* @__PURE__ */ new Map();
   tasks.forEach((task) => {
     const entryPointPath = task.entryPoint.path;
     const deps = graph.dependenciesOf(entryPointPath);
@@ -4903,12 +4901,12 @@ function computeTaskDependencies(tasks, graph) {
 }
 function getDependentsSet(map, task) {
   if (!map.has(task)) {
-    map.set(task, new Set());
+    map.set(task, /* @__PURE__ */ new Set());
   }
   return map.get(task);
 }
 function getBlockedTasks(dependencies) {
-  const blockedTasks = new Map();
+  const blockedTasks = /* @__PURE__ */ new Map();
   for (const [dependency, dependents] of dependencies) {
     for (const dependent of dependents) {
       const dependentSet = getDependentsSet(blockedTasks, dependent);
@@ -4918,7 +4916,7 @@ function getBlockedTasks(dependencies) {
   return blockedTasks;
 }
 function sortTasksByPriority(tasks, dependencies) {
-  const priorityPerTask = new Map();
+  const priorityPerTask = /* @__PURE__ */ new Map();
   const computePriority = (task, idx) => [dependencies.has(task) ? dependencies.get(task).size : 0, idx];
   tasks.forEach((task, i) => priorityPerTask.set(task, computePriority(task, i)));
   return tasks.slice().sort((task1, task2) => {
@@ -5096,4 +5094,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-AZTQDYCD.js.map
+//# sourceMappingURL=chunk-7ULS3WID.js.map

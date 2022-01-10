@@ -13,17 +13,17 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-APEOR4QD.js";
-import "../../chunk-QL6ZC3U3.js";
-import "../../chunk-CHJAKUHU.js";
+} from "../../chunk-TXB6T4P6.js";
+import "../../chunk-ADHVDA4A.js";
+import "../../chunk-XNV7D7R3.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-P25X5ELY.js";
+} from "../../chunk-676MI6WZ.js";
 import {
   __objRest,
   __spreadProps,
   __spreadValues
-} from "../../chunk-XA5IZLLC.js";
+} from "../../chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/babel_core.mjs
 import * as _babelNamespace from "@babel/core";
@@ -34,7 +34,7 @@ var _typesNamespace = _babelNamespace.types;
 if (_babelDefault !== void 0) {
   _typesNamespace = _babelDefault.types;
 }
-var types = _typesNamespace;
+var types2 = _typesNamespace;
 var NodePath = babel.NodePath;
 var transformSync = babel.transformSync;
 var parse = babel.parse;
@@ -43,90 +43,90 @@ var parse = babel.parse;
 var BabelAstFactory = class {
   constructor(sourceUrl) {
     this.sourceUrl = sourceUrl;
-    this.createArrayLiteral = types.arrayExpression;
-    this.createBlock = types.blockStatement;
-    this.createConditional = types.conditionalExpression;
-    this.createExpressionStatement = types.expressionStatement;
-    this.createIdentifier = types.identifier;
-    this.createIfStatement = types.ifStatement;
-    this.createNewExpression = types.newExpression;
-    this.createParenthesizedExpression = types.parenthesizedExpression;
-    this.createReturnStatement = types.returnStatement;
-    this.createThrowStatement = types.throwStatement;
-    this.createUnaryExpression = types.unaryExpression;
+    this.createArrayLiteral = types2.arrayExpression;
+    this.createBlock = types2.blockStatement;
+    this.createConditional = types2.conditionalExpression;
+    this.createExpressionStatement = types2.expressionStatement;
+    this.createIdentifier = types2.identifier;
+    this.createIfStatement = types2.ifStatement;
+    this.createNewExpression = types2.newExpression;
+    this.createParenthesizedExpression = types2.parenthesizedExpression;
+    this.createReturnStatement = types2.returnStatement;
+    this.createThrowStatement = types2.throwStatement;
+    this.createUnaryExpression = types2.unaryExpression;
   }
   attachComments(statement, leadingComments) {
     for (let i = leadingComments.length - 1; i >= 0; i--) {
       const comment = leadingComments[i];
-      types.addComment(statement, "leading", comment.toString(), !comment.multiline);
+      types2.addComment(statement, "leading", comment.toString(), !comment.multiline);
     }
   }
   createAssignment(target, value) {
     assert(target, isLExpression, "must be a left hand side expression");
-    return types.assignmentExpression("=", target, value);
+    return types2.assignmentExpression("=", target, value);
   }
   createBinaryExpression(leftOperand, operator, rightOperand) {
     switch (operator) {
       case "&&":
       case "||":
       case "??":
-        return types.logicalExpression(operator, leftOperand, rightOperand);
+        return types2.logicalExpression(operator, leftOperand, rightOperand);
       default:
-        return types.binaryExpression(operator, leftOperand, rightOperand);
+        return types2.binaryExpression(operator, leftOperand, rightOperand);
     }
   }
   createCallExpression(callee, args, pure) {
-    const call = types.callExpression(callee, args);
+    const call = types2.callExpression(callee, args);
     if (pure) {
-      types.addComment(call, "leading", " @__PURE__ ", false);
+      types2.addComment(call, "leading", " @__PURE__ ", false);
     }
     return call;
   }
   createElementAccess(expression, element) {
-    return types.memberExpression(expression, element, true);
+    return types2.memberExpression(expression, element, true);
   }
   createFunctionDeclaration(functionName, parameters, body) {
-    assert(body, types.isBlockStatement, "a block");
-    return types.functionDeclaration(types.identifier(functionName), parameters.map((param) => types.identifier(param)), body);
+    assert(body, types2.isBlockStatement, "a block");
+    return types2.functionDeclaration(types2.identifier(functionName), parameters.map((param) => types2.identifier(param)), body);
   }
   createFunctionExpression(functionName, parameters, body) {
-    assert(body, types.isBlockStatement, "a block");
-    const name = functionName !== null ? types.identifier(functionName) : null;
-    return types.functionExpression(name, parameters.map((param) => types.identifier(param)), body);
+    assert(body, types2.isBlockStatement, "a block");
+    const name = functionName !== null ? types2.identifier(functionName) : null;
+    return types2.functionExpression(name, parameters.map((param) => types2.identifier(param)), body);
   }
   createLiteral(value) {
     if (typeof value === "string") {
-      return types.stringLiteral(value);
+      return types2.stringLiteral(value);
     } else if (typeof value === "number") {
-      return types.numericLiteral(value);
+      return types2.numericLiteral(value);
     } else if (typeof value === "boolean") {
-      return types.booleanLiteral(value);
+      return types2.booleanLiteral(value);
     } else if (value === void 0) {
-      return types.identifier("undefined");
+      return types2.identifier("undefined");
     } else if (value === null) {
-      return types.nullLiteral();
+      return types2.nullLiteral();
     } else {
       throw new Error(`Invalid literal: ${value} (${typeof value})`);
     }
   }
   createObjectLiteral(properties) {
-    return types.objectExpression(properties.map((prop) => {
-      const key = prop.quoted ? types.stringLiteral(prop.propertyName) : types.identifier(prop.propertyName);
-      return types.objectProperty(key, prop.value);
+    return types2.objectExpression(properties.map((prop) => {
+      const key = prop.quoted ? types2.stringLiteral(prop.propertyName) : types2.identifier(prop.propertyName);
+      return types2.objectProperty(key, prop.value);
     }));
   }
   createPropertyAccess(expression, propertyName) {
-    return types.memberExpression(expression, types.identifier(propertyName), false);
+    return types2.memberExpression(expression, types2.identifier(propertyName), false);
   }
   createTaggedTemplate(tag, template) {
-    const elements = template.elements.map((element, i) => this.setSourceMapRange(types.templateElement(element, i === template.elements.length - 1), element.range));
-    return types.taggedTemplateExpression(tag, types.templateLiteral(elements, template.expressions));
+    const elements = template.elements.map((element, i) => this.setSourceMapRange(types2.templateElement(element, i === template.elements.length - 1), element.range));
+    return types2.taggedTemplateExpression(tag, types2.templateLiteral(elements, template.expressions));
   }
   createTypeOfExpression(expression) {
-    return types.unaryExpression("typeof", expression);
+    return types2.unaryExpression("typeof", expression);
   }
   createVariableDeclaration(variableName, initializer, type) {
-    return types.variableDeclaration(type, [types.variableDeclarator(types.identifier(variableName), initializer)]);
+    return types2.variableDeclaration(type, [types2.variableDeclarator(types2.identifier(variableName), initializer)]);
   }
   setSourceMapRange(node, sourceMapRange) {
     if (sourceMapRange === null) {
@@ -149,40 +149,40 @@ var BabelAstFactory = class {
   }
 };
 function isLExpression(expr) {
-  return types.isLVal(expr);
+  return types2.isLVal(expr);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/ast/babel_ast_host.mjs
 var BabelAstHost = class {
   constructor() {
-    this.isStringLiteral = types.isStringLiteral;
-    this.isNumericLiteral = types.isNumericLiteral;
-    this.isArrayLiteral = types.isArrayExpression;
-    this.isObjectLiteral = types.isObjectExpression;
-    this.isCallExpression = types.isCallExpression;
+    this.isStringLiteral = types2.isStringLiteral;
+    this.isNumericLiteral = types2.isNumericLiteral;
+    this.isArrayLiteral = types2.isArrayExpression;
+    this.isObjectLiteral = types2.isObjectExpression;
+    this.isCallExpression = types2.isCallExpression;
   }
   getSymbolName(node) {
-    if (types.isIdentifier(node)) {
+    if (types2.isIdentifier(node)) {
       return node.name;
-    } else if (types.isMemberExpression(node) && types.isIdentifier(node.property)) {
+    } else if (types2.isMemberExpression(node) && types2.isIdentifier(node.property)) {
       return node.property.name;
     } else {
       return null;
     }
   }
   parseStringLiteral(str) {
-    assert(str, types.isStringLiteral, "a string literal");
+    assert(str, types2.isStringLiteral, "a string literal");
     return str.value;
   }
   parseNumericLiteral(num) {
-    assert(num, types.isNumericLiteral, "a numeric literal");
+    assert(num, types2.isNumericLiteral, "a numeric literal");
     return num.value;
   }
   isBooleanLiteral(bool) {
-    return types.isBooleanLiteral(bool) || isMinifiedBooleanLiteral(bool);
+    return types2.isBooleanLiteral(bool) || isMinifiedBooleanLiteral(bool);
   }
   parseBooleanLiteral(bool) {
-    if (types.isBooleanLiteral(bool)) {
+    if (types2.isBooleanLiteral(bool)) {
       return bool.value;
     } else if (isMinifiedBooleanLiteral(bool)) {
       return !bool.argument.value;
@@ -191,7 +191,7 @@ var BabelAstHost = class {
     }
   }
   parseArrayLiteral(array) {
-    assert(array, types.isArrayExpression, "an array literal");
+    assert(array, types2.isArrayExpression, "an array literal");
     return array.elements.map((element) => {
       assert(element, isNotEmptyElement, "element in array not to be empty");
       assert(element, isNotSpreadElement, "element in array not to use spread syntax");
@@ -199,45 +199,45 @@ var BabelAstHost = class {
     });
   }
   parseObjectLiteral(obj) {
-    assert(obj, types.isObjectExpression, "an object literal");
-    const result = new Map();
+    assert(obj, types2.isObjectExpression, "an object literal");
+    const result = /* @__PURE__ */ new Map();
     for (const property of obj.properties) {
-      assert(property, types.isObjectProperty, "a property assignment");
-      assert(property.value, types.isExpression, "an expression");
+      assert(property, types2.isObjectProperty, "a property assignment");
+      assert(property.value, types2.isExpression, "an expression");
       assert(property.key, isPropertyName, "a property name");
-      const key = types.isIdentifier(property.key) ? property.key.name : property.key.value;
+      const key = types2.isIdentifier(property.key) ? property.key.name : property.key.value;
       result.set(key, property.value);
     }
     return result;
   }
   isFunctionExpression(node) {
-    return types.isFunction(node);
+    return types2.isFunction(node);
   }
   parseReturnValue(fn) {
     assert(fn, this.isFunctionExpression, "a function");
-    if (!types.isBlockStatement(fn.body)) {
+    if (!types2.isBlockStatement(fn.body)) {
       return fn.body;
     }
     if (fn.body.body.length !== 1) {
       throw new FatalLinkerError(fn.body, "Unsupported syntax, expected a function body with a single return statement.");
     }
     const stmt = fn.body.body[0];
-    assert(stmt, types.isReturnStatement, "a function body with a single return statement");
+    assert(stmt, types2.isReturnStatement, "a function body with a single return statement");
     if (stmt.argument === null) {
       throw new FatalLinkerError(stmt, "Unsupported syntax, expected function to return a value.");
     }
     return stmt.argument;
   }
   parseCallee(call) {
-    assert(call, types.isCallExpression, "a call expression");
-    assert(call.callee, types.isExpression, "an expression");
+    assert(call, types2.isCallExpression, "a call expression");
+    assert(call.callee, types2.isExpression, "an expression");
     return call.callee;
   }
   parseArguments(call) {
-    assert(call, types.isCallExpression, "a call expression");
+    assert(call, types2.isCallExpression, "a call expression");
     return call.arguments.map((arg) => {
       assert(arg, isNotSpreadArgument, "argument not to use spread syntax");
-      assert(arg, types.isExpression, "argument to be an expression");
+      assert(arg, types2.isExpression, "argument to be an expression");
       return arg;
     });
   }
@@ -257,16 +257,16 @@ function isNotEmptyElement(e) {
   return e !== null;
 }
 function isNotSpreadElement(e) {
-  return !types.isSpreadElement(e);
+  return !types2.isSpreadElement(e);
 }
 function isPropertyName(e) {
-  return types.isIdentifier(e) || types.isStringLiteral(e) || types.isNumericLiteral(e);
+  return types2.isIdentifier(e) || types2.isStringLiteral(e) || types2.isNumericLiteral(e);
 }
 function isNotSpreadArgument(arg) {
-  return !types.isSpreadElement(arg);
+  return !types2.isSpreadElement(arg);
 }
 function isMinifiedBooleanLiteral(node) {
-  return types.isUnaryExpression(node) && node.prefix && node.operator === "!" && types.isNumericLiteral(node.argument) && (node.argument.value === 0 || node.argument.value === 1);
+  return types2.isUnaryExpression(node) && node.prefix && node.operator === "!" && types2.isNumericLiteral(node.argument) && (node.argument.value === 0 || node.argument.value === 1);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/babel_declaration_scope.mjs
@@ -276,10 +276,10 @@ var BabelDeclarationScope = class {
   }
   getConstantScopeRef(expression) {
     let bindingExpression = expression;
-    while (types.isMemberExpression(bindingExpression)) {
+    while (types2.isMemberExpression(bindingExpression)) {
       bindingExpression = bindingExpression.object;
     }
-    if (!types.isIdentifier(bindingExpression)) {
+    if (!types2.isIdentifier(bindingExpression)) {
       return null;
     }
     const binding = this.declarationScope.getBinding(bindingExpression.name);
@@ -367,18 +367,18 @@ function insertIntoProgram(program, statements) {
 }
 function getCalleeName(call) {
   const callee = call.node.callee;
-  if (types.isIdentifier(callee)) {
+  if (types2.isIdentifier(callee)) {
     return callee.name;
-  } else if (types.isMemberExpression(callee) && types.isIdentifier(callee.property)) {
+  } else if (types2.isMemberExpression(callee) && types2.isIdentifier(callee.property)) {
     return callee.property.name;
-  } else if (types.isMemberExpression(callee) && types.isStringLiteral(callee.property)) {
+  } else if (types2.isMemberExpression(callee) && types2.isStringLiteral(callee.property)) {
     return callee.property.value;
   } else {
     return null;
   }
 }
 function isExpressionArray(nodes) {
-  return nodes.every((node) => types.isExpression(node));
+  return nodes.every((node) => types2.isExpression(node));
 }
 function assertNull(obj) {
   if (obj !== null) {

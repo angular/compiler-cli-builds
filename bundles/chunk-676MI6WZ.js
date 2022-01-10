@@ -5,7 +5,7 @@
     
 import {
   __require
-} from "./chunk-XA5IZLLC.js";
+} from "./chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/util.mjs
 var TS_DTS_JS_EXTENSION = /(?:\.d)?\.ts$|\.js$/;
@@ -169,9 +169,7 @@ function toRelativeImport(relativePath) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/compiler_host.mjs
-import {
-  EOL
-} from "os";
+import * as os from "os";
 import ts from "typescript";
 var NgtscCompilerHost = class {
   constructor(fs3, options = {}) {
@@ -209,7 +207,7 @@ var NgtscCompilerHost = class {
       case ts.NewLineKind.LineFeed:
         return "\n";
       default:
-        return EOL;
+        return os.EOL;
     }
   }
   fileExists(fileName) {
@@ -238,7 +236,7 @@ var LogicalProjectPath = {
 var LogicalFileSystem = class {
   constructor(rootDirs, compilerHost) {
     this.compilerHost = compilerHost;
-    this.cache = new Map();
+    this.cache = /* @__PURE__ */ new Map();
     this.rootDirs = rootDirs.concat([]).sort((a, b) => b.length - a.length);
     this.canonicalRootDirs = this.rootDirs.map((dir) => this.compilerHost.getCanonicalFileName(dir));
   }
@@ -275,31 +273,9 @@ function isWithinBasePath(base, path) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/node_js_file_system.mjs
-import {
-  copyFileSync,
-  existsSync,
-  lstatSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  realpathSync,
-  renameSync,
-  rmdirSync,
-  statSync,
-  symlinkSync,
-  unlinkSync,
-  writeFileSync
-} from "fs";
+import * as fs2 from "fs";
 import module from "module";
-import {
-  basename as basename2,
-  dirname as dirname2,
-  extname,
-  isAbsolute,
-  join as join2,
-  relative as relative2,
-  resolve as resolve2
-} from "path";
+import * as p from "path";
 import { fileURLToPath } from "url";
 var NodeJSPathManipulation = class {
   pwd() {
@@ -309,28 +285,28 @@ var NodeJSPathManipulation = class {
     process.chdir(dir);
   }
   resolve(...paths) {
-    return this.normalize(resolve2(...paths));
+    return this.normalize(p.resolve(...paths));
   }
   dirname(file) {
-    return this.normalize(dirname2(file));
+    return this.normalize(p.dirname(file));
   }
   join(basePath, ...paths) {
-    return this.normalize(join2(basePath, ...paths));
+    return this.normalize(p.join(basePath, ...paths));
   }
   isRoot(path) {
     return this.dirname(path) === this.normalize(path);
   }
   isRooted(path) {
-    return isAbsolute(path);
+    return p.isAbsolute(path);
   }
   relative(from, to) {
-    return this.normalize(relative2(from, to));
+    return this.normalize(p.relative(from, to));
   }
   basename(filePath, extension) {
-    return basename2(filePath, extension);
+    return p.basename(filePath, extension);
   }
   extname(path) {
-    return extname(path);
+    return p.extname(path);
   }
   normalize(path) {
     return path.replace(/\\/g, "/");
@@ -346,30 +322,30 @@ var NodeJSReadonlyFileSystem = class extends NodeJSPathManipulation {
   }
   isCaseSensitive() {
     if (this._caseSensitive === void 0) {
-      this._caseSensitive = !existsSync(this.normalize(toggleCase(currentFileName)));
+      this._caseSensitive = !fs2.existsSync(this.normalize(toggleCase(currentFileName)));
     }
     return this._caseSensitive;
   }
   exists(path) {
-    return existsSync(path);
+    return fs2.existsSync(path);
   }
   readFile(path) {
-    return readFileSync(path, "utf8");
+    return fs2.readFileSync(path, "utf8");
   }
   readFileBuffer(path) {
-    return readFileSync(path);
+    return fs2.readFileSync(path);
   }
   readdir(path) {
-    return readdirSync(path);
+    return fs2.readdirSync(path);
   }
   lstat(path) {
-    return lstatSync(path);
+    return fs2.lstatSync(path);
   }
   stat(path) {
-    return statSync(path);
+    return fs2.statSync(path);
   }
   realpath(path) {
-    return this.resolve(realpathSync(path));
+    return this.resolve(fs2.realpathSync(path));
   }
   getDefaultLibLocation() {
     const requireFn = isCommonJS ? __require : module.createRequire(currentFileUrl);
@@ -378,19 +354,19 @@ var NodeJSReadonlyFileSystem = class extends NodeJSPathManipulation {
 };
 var NodeJSFileSystem = class extends NodeJSReadonlyFileSystem {
   writeFile(path, data, exclusive = false) {
-    writeFileSync(path, data, exclusive ? { flag: "wx" } : void 0);
+    fs2.writeFileSync(path, data, exclusive ? { flag: "wx" } : void 0);
   }
   removeFile(path) {
-    unlinkSync(path);
+    fs2.unlinkSync(path);
   }
   symlink(target, path) {
-    symlinkSync(target, path);
+    fs2.symlinkSync(target, path);
   }
   copyFile(from, to) {
-    copyFileSync(from, to);
+    fs2.copyFileSync(from, to);
   }
   moveFile(from, to) {
-    renameSync(from, to);
+    fs2.renameSync(from, to);
   }
   ensureDir(path) {
     const parents = [];
@@ -403,11 +379,11 @@ var NodeJSFileSystem = class extends NodeJSReadonlyFileSystem {
     }
   }
   removeDeep(path) {
-    rmdirSync(path, { recursive: true });
+    fs2.rmdirSync(path, { recursive: true });
   }
   safeMkdir(path) {
     try {
-      mkdirSync(path);
+      fs2.mkdirSync(path);
     } catch (err) {
       if (!this.exists(path) || !this.stat(path).isDirectory()) {
         throw err;
@@ -448,4 +424,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-P25X5ELY.js.map
+//# sourceMappingURL=chunk-676MI6WZ.js.map
