@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/component" />
-import { ConstantPool, InterpolationConfig, ParsedTemplate, ParseSourceFile, R3ClassMetadata, R3ComponentMetadata, TmplAstNode } from '@angular/compiler';
+import { AnimationTriggerNames, ConstantPool, InterpolationConfig, ParsedTemplate, ParseSourceFile, R3ClassMetadata, R3ComponentMetadata, TmplAstNode } from '@angular/compiler';
 import ts from 'typescript';
 import { CycleAnalyzer, CycleHandlingStrategy } from '../../cycles';
 import { ModuleResolver, Reference, ReferenceEmitter } from '../../imports';
@@ -64,6 +64,7 @@ export interface ComponentAnalysisData {
      */
     inlineStyles: string[] | null;
     isPoisoned: boolean;
+    animationTriggerNames: AnimationTriggerNames | null;
 }
 export declare type ComponentResolutionData = Pick<R3ComponentMetadata, ComponentMetadataResolvedFields>;
 /**

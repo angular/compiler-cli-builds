@@ -1953,7 +1953,8 @@ var DtsMetadataReader = class {
     }, extractDirectiveTypeCheckMeta(clazz, inputs, this.reflector)), {
       baseClass: readBaseClass2(clazz, this.checker, this.reflector),
       isPoisoned: false,
-      isStructural
+      isStructural,
+      animationTriggerNames: null
     });
   }
   getPipeMetadata(ref) {
@@ -3485,7 +3486,8 @@ var DirectiveDecoratorHandler = class {
       baseClass: analysis.baseClass
     }, analysis.typeCheckMeta), {
       isPoisoned: analysis.isPoisoned,
-      isStructural: analysis.isStructural
+      isStructural: analysis.isStructural,
+      animationTriggerNames: null
     }));
     this.injectableRegistry.registerInjectable(node);
   }
@@ -4465,8 +4467,12 @@ var ComponentDecoratorHandler = class {
     const encapsulation = (_a = this._resolveEnumValue(component, "encapsulation", "ViewEncapsulation")) != null ? _a : ViewEncapsulation.Emulated;
     const changeDetection = this._resolveEnumValue(component, "changeDetection", "ChangeDetectionStrategy");
     let animations = null;
+    let animationTriggerNames = null;
     if (component.has("animations")) {
       animations = new WrappedNodeExpr5(component.get("animations"));
+      const animationsValue = this.evaluator.evaluate(component.get("animations"));
+      animationTriggerNames = { includesDynamicAnimations: false, staticTriggerNames: [] };
+      collectAnimationNames(animationsValue, animationTriggerNames);
     }
     const relativeContextFilePath = this.rootDirs.reduce((previous, rootDir) => {
       const candidate = relative(absoluteFrom(rootDir), absoluteFrom(containingFile));
@@ -4582,7 +4588,8 @@ var ComponentDecoratorHandler = class {
           styles: styleResources,
           template: templateResource
         },
-        isPoisoned
+        isPoisoned,
+        animationTriggerNames
       },
       diagnostics
     };
@@ -4610,7 +4617,8 @@ var ComponentDecoratorHandler = class {
       baseClass: analysis.baseClass
     }, analysis.typeCheckMeta), {
       isPoisoned: analysis.isPoisoned,
-      isStructural: false
+      isStructural: false,
+      animationTriggerNames: analysis.animationTriggerNames
     }));
     this.resourceRegistry.registerResources(analysis.resources, node);
     this.injectableRegistry.registerInjectable(node);
@@ -5209,6 +5217,22 @@ function checkCustomElementSelectorForErrors(selector) {
   }
   return null;
 }
+function collectAnimationNames(value, animationTriggerNames) {
+  if (value instanceof Map) {
+    const name = value.get("name");
+    if (typeof name === "string") {
+      animationTriggerNames.staticTriggerNames.push(name);
+    } else {
+      animationTriggerNames.includesDynamicAnimations = true;
+    }
+  } else if (Array.isArray(value)) {
+    for (const resolvedValue of value) {
+      collectAnimationNames(resolvedValue, animationTriggerNames);
+    }
+  } else {
+    animationTriggerNames.includesDynamicAnimations = true;
+  }
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
@@ -5577,4 +5601,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YG6QAIXV.js.map
+//# sourceMappingURL=chunk-LZPDP4RF.js.map

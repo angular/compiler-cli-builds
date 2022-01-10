@@ -25,7 +25,7 @@ import {
   declarationTransformFactory,
   flattenInheritedDirectiveMetadata,
   ivyTransformFactory
-} from "./chunk-YG6QAIXV.js";
+} from "./chunk-LZPDP4RF.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -7450,4 +7450,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-HW4TOWEH.js.map
+//# sourceMappingURL=chunk-PMBVPVZB.js.map

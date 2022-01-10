@@ -8,7 +8,7 @@ import {
   PartialEvaluator,
   StaticInterpreter,
   forwardRefResolver
-} from "../chunk-YG6QAIXV.js";
+} from "../chunk-LZPDP4RF.js";
 import {
   TypeScriptReflectionHost,
   reflectObjectLiteral
