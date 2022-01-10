@@ -6,20 +6,20 @@
     
 import {
   main
-} from "../../chunk-QRV6PDDZ.js";
-import "../../chunk-RZRZCXOS.js";
-import "../../chunk-YGWYGZ6W.js";
-import "../../chunk-PUUB4PWZ.js";
-import "../../chunk-CHJAKUHU.js";
+} from "../../chunk-IRYYIX46.js";
+import "../../chunk-K72KRHPX.js";
+import "../../chunk-YG6QAIXV.js";
+import "../../chunk-7PY7XEFH.js";
+import "../../chunk-XNV7D7R3.js";
 import {
   NodeJSFileSystem,
   setFileSystem
-} from "../../chunk-P25X5ELY.js";
+} from "../../chunk-676MI6WZ.js";
 import "../../chunk-GLCRIILX.js";
 import {
   __require,
-  __toModule
-} from "../../chunk-XA5IZLLC.js";
+  __toESM
+} from "../../chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ngc.mjs
 import "reflect-metadata";
@@ -29,7 +29,7 @@ async function runNgcComamnd() {
   setFileSystem(new NodeJSFileSystem());
   let tsickleModule;
   try {
-    tsickleModule = (await Promise.resolve().then(() => __toModule(__require("tsickle")))).default;
+    tsickleModule = (await Promise.resolve().then(() => __toESM(__require("tsickle"), 1))).default;
   } catch {
   }
   process.exitCode = main(args, void 0, void 0, void 0, void 0, void 0, tsickleModule);

@@ -36,19 +36,19 @@ import {
   sendMessageToWorker,
   sortTasksByPriority,
   stringifyTask
-} from "./chunk-AZTQDYCD.js";
+} from "./chunk-7ULS3WID.js";
 import {
   LogLevel
 } from "./chunk-SKBLJA43.js";
 import {
   absoluteFrom,
   getFileSystem
-} from "./chunk-P25X5ELY.js";
+} from "./chunk-676MI6WZ.js";
 import {
   __require,
   __spreadProps,
   __spreadValues
-} from "./chunk-XA5IZLLC.js";
+} from "./chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/dependencies/commonjs_dependency_host.mjs
 import ts from "typescript";
@@ -184,7 +184,7 @@ function isRelativeImport(from, to) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/dependencies/dependency_host.mjs
 function createDependencyInfo() {
-  return { dependencies: new Set(), missing: new Set(), deepImports: new Set() };
+  return { dependencies: /* @__PURE__ */ new Set(), missing: /* @__PURE__ */ new Set(), deepImports: /* @__PURE__ */ new Set() };
 }
 var DependencyHostBase = class {
   constructor(fs, moduleResolver) {
@@ -194,12 +194,12 @@ var DependencyHostBase = class {
   collectDependencies(entryPointPath, { dependencies, missing, deepImports }) {
     const resolvedFile = resolveFileWithPostfixes(this.fs, entryPointPath, this.moduleResolver.relativeExtensions);
     if (resolvedFile !== null) {
-      const alreadySeen = new Set();
+      const alreadySeen = /* @__PURE__ */ new Set();
       this.recursivelyCollectDependencies(resolvedFile, dependencies, missing, deepImports, alreadySeen);
     }
   }
   collectDependenciesInFiles(files, { dependencies, missing, deepImports }) {
-    const alreadySeen = new Set();
+    const alreadySeen = /* @__PURE__ */ new Set();
     for (const file of files) {
       this.processFile(file, dependencies, missing, deepImports, alreadySeen);
     }
@@ -399,7 +399,7 @@ var EsmDependencyHost = class extends DependencyHostBase {
     return !hasImportOrReexportStatements(fileContents);
   }
   extractImports(file, fileContents) {
-    const imports = new Set();
+    const imports = /* @__PURE__ */ new Set();
     const templateStack = [];
     let lastToken = ts2.SyntaxKind.Unknown;
     let currentToken = ts2.SyntaxKind.Unknown;
@@ -572,12 +572,12 @@ var UmdDependencyHost = class extends DependencyHostBase {
   extractImports(file, fileContents) {
     const sf = ts3.createSourceFile(file, fileContents, ts3.ScriptTarget.ES2015, true, ts3.ScriptKind.JS);
     if (sf.statements.length !== 1) {
-      return new Set();
+      return /* @__PURE__ */ new Set();
     }
     const umdModule = parseStatementForUmdModule(sf.statements[0]);
     const umdImports = umdModule && getImportsOfUmdModule(umdModule);
     if (umdImports === null) {
-      return new Set();
+      return /* @__PURE__ */ new Set();
     }
     return new Set(umdImports.map((i) => i.path));
   }
@@ -650,7 +650,7 @@ function trackDuration(task, log) {
   return result;
 }
 function dedupePaths(fs, paths) {
-  const root = { children: new Map() };
+  const root = { children: /* @__PURE__ */ new Map() };
   for (const path of paths) {
     addPath(fs, root, path);
   }
@@ -666,7 +666,7 @@ function addPath(fs, root, path) {
       }
       const next = segments[index];
       if (!node.children.has(next)) {
-        node.children.set(next, { children: new Map() });
+        node.children.set(next, { children: /* @__PURE__ */ new Map() });
       }
       node = node.children.get(next);
     }
@@ -810,7 +810,7 @@ var TracingEntryPointFinder = class {
     this.basePaths = null;
   }
   findEntryPoints() {
-    const unsortedEntryPoints = new Map();
+    const unsortedEntryPoints = /* @__PURE__ */ new Map();
     const unprocessedPaths = this.getInitialEntryPointPaths();
     while (unprocessedPaths.length > 0) {
       const path = unprocessedPaths.shift();
@@ -868,7 +868,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
   }
   findOrLoadEntryPoints() {
     if (this.entryPointsWithDependencies === null) {
-      const entryPointsWithDependencies = this.entryPointsWithDependencies = new Map();
+      const entryPointsWithDependencies = this.entryPointsWithDependencies = /* @__PURE__ */ new Map();
       for (const basePath of this.getBasePaths()) {
         const entryPoints = this.entryPointManifest.readEntryPointsUsingManifest(basePath) || this.walkBasePathForPackages(basePath);
         for (const e of entryPoints) {
@@ -887,7 +887,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "13.2.0-next.1+88.sha-a55e842.with-local-changes";
+var NGCC_VERSION = "13.2.0-next.1+90.sha-dff497f.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -1049,8 +1049,8 @@ var BaseTaskQueue = class {
     this.logger = logger;
     this.tasks = tasks;
     this.dependencies = dependencies;
-    this.inProgressTasks = new Set();
-    this.tasksToSkip = new Map();
+    this.inProgressTasks = /* @__PURE__ */ new Set();
+    this.tasksToSkip = /* @__PURE__ */ new Map();
   }
   get allTasksCompleted() {
     return this.tasks.length === 0 && this.inProgressTasks.size === 0;
@@ -1239,7 +1239,7 @@ var PackageCleaner = class {
   }
 };
 function cleanOutdatedPackages(fileSystem, entryPoints) {
-  const packagesToClean = new Set();
+  const packagesToClean = /* @__PURE__ */ new Set();
   for (const entryPoint of entryPoints) {
     if (needsCleaning(entryPoint.packageJson)) {
       packagesToClean.add(entryPoint.packagePath);
@@ -1309,7 +1309,7 @@ function logInvalidEntryPoints(logger, invalidEntryPoints) {
   });
 }
 function getPropertiesToProcess(packageJson, propertiesToConsider, compileAllFormats, typingsOnly) {
-  const formatPathsToConsider = new Set();
+  const formatPathsToConsider = /* @__PURE__ */ new Set();
   const propertiesToProcess = [];
   for (const prop of propertiesToConsider) {
     const formatPath = packageJson[prop];
@@ -1332,7 +1332,7 @@ function getPropertiesToProcess(packageJson, propertiesToConsider, compileAllFor
     const list = formatPathToProperties[formatPath] || (formatPathToProperties[formatPath] = []);
     list.push(prop);
   }
-  const equivalentPropertiesMap = new Map();
+  const equivalentPropertiesMap = /* @__PURE__ */ new Map();
   for (const prop of propertiesToConsider) {
     const formatPath = packageJson[prop];
     const equivalentProperties = typingsOnly ? [] : formatPathToProperties[formatPath];
@@ -1357,7 +1357,7 @@ var ClusterMaster = class {
     this.pkgJsonUpdater = pkgJsonUpdater;
     this.finishedDeferred = new Deferred();
     this.processingStartTime = -1;
-    this.taskAssignments = new Map();
+    this.taskAssignments = /* @__PURE__ */ new Map();
     this.remainingRespawnAttempts = 3;
     if (!cluster.isMaster) {
       throw new Error("Tried to instantiate `ClusterMaster` on a worker process.");
@@ -1789,12 +1789,10 @@ If you are running multiple builds in parallel then you might try pre-processing
 import { createHash } from "crypto";
 import module5 from "module";
 import semver from "semver";
-import {
-  runInNewContext
-} from "vm";
+import * as vm from "vm";
 var PartiallyProcessedConfig = class {
   constructor(projectConfig) {
-    this.packages = new Map();
+    this.packages = /* @__PURE__ */ new Map();
     this.locking = {};
     this.hashAlgorithm = "sha256";
     if (projectConfig.locking !== void 0) {
@@ -1885,7 +1883,7 @@ var ProcessedNgccPackageConfig = class {
 var NgccConfiguration = class {
   constructor(fs, baseDir) {
     this.fs = fs;
-    this.cache = new Map();
+    this.cache = /* @__PURE__ */ new Map();
     this.defaultConfig = new PartiallyProcessedConfig(DEFAULT_NGCC_CONFIG);
     this.projectConfig = new PartiallyProcessedConfig(this.loadProjectConfig(baseDir));
     this.hashAlgorithm = this.projectConfig.hashAlgorithm;
@@ -1965,7 +1963,7 @@ var NgccConfiguration = class {
       __dirname: this.fs.dirname(srcPath),
       __filename: srcPath
     };
-    runInNewContext(src, sandbox, { filename: srcPath });
+    vm.runInNewContext(src, sandbox, { filename: srcPath });
     return sandbox.module.exports;
   }
   computeHash() {
@@ -2174,4 +2172,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-W5MCEQ45.js.map
+//# sourceMappingURL=chunk-UQDHMKHF.js.map

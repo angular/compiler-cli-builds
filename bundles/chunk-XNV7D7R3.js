@@ -13,7 +13,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-P25X5ELY.js";
+} from "./chunk-676MI6WZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/util/src/typescript.mjs
 import ts from "typescript";
@@ -237,7 +237,7 @@ var ErrorCode;
 })(ErrorCode || (ErrorCode = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/docs.mjs
-var COMPILER_ERRORS_WITH_GUIDES = new Set([
+var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
   ErrorCode.DECORATOR_ARG_NOT_LITERAL,
   ErrorCode.IMPORT_CYCLE_DETECTED,
   ErrorCode.PARAM_MISSING_TOKEN,
@@ -395,7 +395,7 @@ var AbsoluteModuleStrategy = class {
     this.checker = checker;
     this.moduleResolver = moduleResolver;
     this.reflectionHost = reflectionHost;
-    this.moduleExportsCache = new Map();
+    this.moduleExportsCache = /* @__PURE__ */ new Map();
   }
   emit(ref, context, importFlags) {
     if (ref.bestGuessOwningModule === null) {
@@ -444,7 +444,7 @@ var AbsoluteModuleStrategy = class {
     if (exports === null) {
       return { module: entryPointFile, exportMap: null };
     }
-    const exportMap = new Map();
+    const exportMap = /* @__PURE__ */ new Map();
     for (const [name, declaration] of exports) {
       if (exportMap.has(declaration.node)) {
         const existingExport = exportMap.get(declaration.node);
@@ -629,7 +629,7 @@ var NoopImportRewriter = class {
     return specifier;
   }
 };
-var CORE_SUPPORTED_SYMBOLS = new Map([
+var CORE_SUPPORTED_SYMBOLS = /* @__PURE__ */ new Map([
   ["\u0275\u0275defineInjectable", "\u0275\u0275defineInjectable"],
   ["\u0275\u0275defineInjector", "\u0275\u0275defineInjector"],
   ["\u0275\u0275defineNgModule", "\u0275\u0275defineNgModule"],
@@ -687,12 +687,12 @@ function getDefaultImportDeclaration(expr) {
 }
 var DefaultImportTracker = class {
   constructor() {
-    this.sourceFileToUsedImports = new Map();
+    this.sourceFileToUsedImports = /* @__PURE__ */ new Map();
   }
   recordUsedImport(importDecl) {
     const sf = getSourceFile(importDecl);
     if (!this.sourceFileToUsedImports.has(sf)) {
-      this.sourceFileToUsedImports.set(sf, new Set());
+      this.sourceFileToUsedImports.set(sf, /* @__PURE__ */ new Set());
     }
     this.sourceFileToUsedImports.get(sf).add(importDecl);
   }
@@ -751,34 +751,29 @@ var Context = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/translator.mjs
-import {
-  BinaryOperator,
-  ConditionalExpr,
-  StmtModifier,
-  UnaryOperator
-} from "@angular/compiler";
-var UNARY_OPERATORS = new Map([
-  [UnaryOperator.Minus, "-"],
-  [UnaryOperator.Plus, "+"]
+import * as o from "@angular/compiler";
+var UNARY_OPERATORS = /* @__PURE__ */ new Map([
+  [o.UnaryOperator.Minus, "-"],
+  [o.UnaryOperator.Plus, "+"]
 ]);
-var BINARY_OPERATORS = new Map([
-  [BinaryOperator.And, "&&"],
-  [BinaryOperator.Bigger, ">"],
-  [BinaryOperator.BiggerEquals, ">="],
-  [BinaryOperator.BitwiseAnd, "&"],
-  [BinaryOperator.Divide, "/"],
-  [BinaryOperator.Equals, "=="],
-  [BinaryOperator.Identical, "==="],
-  [BinaryOperator.Lower, "<"],
-  [BinaryOperator.LowerEquals, "<="],
-  [BinaryOperator.Minus, "-"],
-  [BinaryOperator.Modulo, "%"],
-  [BinaryOperator.Multiply, "*"],
-  [BinaryOperator.NotEquals, "!="],
-  [BinaryOperator.NotIdentical, "!=="],
-  [BinaryOperator.Or, "||"],
-  [BinaryOperator.Plus, "+"],
-  [BinaryOperator.NullishCoalesce, "??"]
+var BINARY_OPERATORS = /* @__PURE__ */ new Map([
+  [o.BinaryOperator.And, "&&"],
+  [o.BinaryOperator.Bigger, ">"],
+  [o.BinaryOperator.BiggerEquals, ">="],
+  [o.BinaryOperator.BitwiseAnd, "&"],
+  [o.BinaryOperator.Divide, "/"],
+  [o.BinaryOperator.Equals, "=="],
+  [o.BinaryOperator.Identical, "==="],
+  [o.BinaryOperator.Lower, "<"],
+  [o.BinaryOperator.LowerEquals, "<="],
+  [o.BinaryOperator.Minus, "-"],
+  [o.BinaryOperator.Modulo, "%"],
+  [o.BinaryOperator.Multiply, "*"],
+  [o.BinaryOperator.NotEquals, "!="],
+  [o.BinaryOperator.NotIdentical, "!=="],
+  [o.BinaryOperator.Or, "||"],
+  [o.BinaryOperator.Plus, "+"],
+  [o.BinaryOperator.NullishCoalesce, "??"]
 ]);
 var ExpressionTranslatorVisitor = class {
   constructor(factory, imports, options) {
@@ -791,7 +786,7 @@ var ExpressionTranslatorVisitor = class {
   }
   visitDeclareVarStmt(stmt, context) {
     var _a;
-    const varType = this.downlevelVariableDeclarations ? "var" : stmt.hasModifier(StmtModifier.Final) ? "const" : "let";
+    const varType = this.downlevelVariableDeclarations ? "var" : stmt.hasModifier(o.StmtModifier.Final) ? "const" : "let";
     return this.attachComments(this.factory.createVariableDeclaration(stmt.name, (_a = stmt.value) == null ? void 0 : _a.visitExpression(this, context.withExpressionMode), varType), stmt.leadingComments);
   }
   visitDeclareFunctionStmt(stmt, context) {
@@ -893,7 +888,7 @@ var ExpressionTranslatorVisitor = class {
   }
   visitConditionalExpr(ast, context) {
     let cond = ast.condition.visitExpression(this, context);
-    if (ast.condition instanceof ConditionalExpr) {
+    if (ast.condition instanceof o.ConditionalExpr) {
       cond = this.factory.createParenthesizedExpression(cond);
     }
     return this.factory.createConditional(cond, ast.trueCase.visitExpression(this, context), ast.falseCase.visitExpression(this, context));
@@ -907,7 +902,7 @@ var ExpressionTranslatorVisitor = class {
   }
   visitBinaryOperatorExpr(ast, context) {
     if (!BINARY_OPERATORS.has(ast.operator)) {
-      throw new Error(`Unknown binary operator: ${BinaryOperator[ast.operator]}`);
+      throw new Error(`Unknown binary operator: ${o.BinaryOperator[ast.operator]}`);
     }
     return this.factory.createBinaryExpression(ast.lhs.visitExpression(this, context), BINARY_OPERATORS.get(ast.operator), ast.rhs.visitExpression(this, context));
   }
@@ -942,7 +937,7 @@ var ExpressionTranslatorVisitor = class {
   }
   visitUnaryOperatorExpr(ast, context) {
     if (!UNARY_OPERATORS.has(ast.operator)) {
-      throw new Error(`Unknown unary operator: ${UnaryOperator[ast.operator]}`);
+      throw new Error(`Unknown unary operator: ${o.UnaryOperator[ast.operator]}`);
     }
     return this.factory.createUnaryExpression(UNARY_OPERATORS.get(ast.operator), ast.expr.visitExpression(this, context));
   }
@@ -985,7 +980,7 @@ var ImportManager = class {
   constructor(rewriter = new NoopImportRewriter(), prefix = "i") {
     this.rewriter = rewriter;
     this.prefix = prefix;
-    this.specifierToIdentifier = new Map();
+    this.specifierToIdentifier = /* @__PURE__ */ new Map();
     this.nextIndex = 0;
   }
   generateNamespaceImport(moduleName) {
@@ -1016,9 +1011,7 @@ var ImportManager = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/type_translator.mjs
-import {
-  BuiltinTypeName
-} from "@angular/compiler";
+import * as o2 from "@angular/compiler";
 import ts6 from "typescript";
 function translateType(type, imports) {
   return type.visitType(new TypeTranslatorVisitor(imports), new Context(false));
@@ -1029,19 +1022,19 @@ var TypeTranslatorVisitor = class {
   }
   visitBuiltinType(type, context) {
     switch (type.name) {
-      case BuiltinTypeName.Bool:
+      case o2.BuiltinTypeName.Bool:
         return ts6.createKeywordTypeNode(ts6.SyntaxKind.BooleanKeyword);
-      case BuiltinTypeName.Dynamic:
+      case o2.BuiltinTypeName.Dynamic:
         return ts6.createKeywordTypeNode(ts6.SyntaxKind.AnyKeyword);
-      case BuiltinTypeName.Int:
-      case BuiltinTypeName.Number:
+      case o2.BuiltinTypeName.Int:
+      case o2.BuiltinTypeName.Number:
         return ts6.createKeywordTypeNode(ts6.SyntaxKind.NumberKeyword);
-      case BuiltinTypeName.String:
+      case o2.BuiltinTypeName.String:
         return ts6.createKeywordTypeNode(ts6.SyntaxKind.StringKeyword);
-      case BuiltinTypeName.None:
+      case o2.BuiltinTypeName.None:
         return ts6.createKeywordTypeNode(ts6.SyntaxKind.NeverKeyword);
       default:
-        throw new Error(`Unsupported builtin type: ${BuiltinTypeName[type.name]}`);
+        throw new Error(`Unsupported builtin type: ${o2.BuiltinTypeName[type.name]}`);
     }
   }
   visitExpressionType(type, context) {
@@ -1227,7 +1220,7 @@ var VAR_TYPES = {
 var TypeScriptAstFactory = class {
   constructor(annotateForClosureCompiler) {
     this.annotateForClosureCompiler = annotateForClosureCompiler;
-    this.externalSourceFiles = new Map();
+    this.externalSourceFiles = /* @__PURE__ */ new Map();
     this.attachComments = attachComments;
     this.createArrayLiteral = ts7.createArrayLiteral;
     this.createConditional = ts7.createConditional;
@@ -1428,4 +1421,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CHJAKUHU.js.map
+//# sourceMappingURL=chunk-XNV7D7R3.js.map

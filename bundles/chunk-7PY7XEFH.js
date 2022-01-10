@@ -283,7 +283,7 @@ var TypeScriptReflectionHost = class {
     if (symbol === void 0) {
       return null;
     }
-    const map = new Map();
+    const map = /* @__PURE__ */ new Map();
     this.checker.getExportsOfModule(symbol).forEach((exportSymbol) => {
       const decl = this.getDeclarationOfSymbol(exportSymbol, null);
       if (decl !== null) {
@@ -519,7 +519,7 @@ var TypeScriptReflectionHost = class {
     if (cacheSf[LocalExportedDeclarations] !== void 0) {
       return cacheSf[LocalExportedDeclarations];
     }
-    const exportSet = new Set();
+    const exportSet = /* @__PURE__ */ new Set();
     cacheSf[LocalExportedDeclarations] = exportSet;
     const sfSymbol = this.checker.getSymbolAtLocation(cacheSf);
     if (sfSymbol === void 0 || sfSymbol.exports === void 0) {
@@ -600,7 +600,7 @@ function filterToMembersWithDecorator(members, name, module) {
   }).filter((value) => value !== null);
 }
 function reflectObjectLiteral(node) {
-  const map = new Map();
+  const map = /* @__PURE__ */ new Map();
   node.properties.forEach((prop) => {
     if (ts4.isPropertyAssignment(prop)) {
       const name = propertyNameToString(prop.name);
@@ -678,4 +678,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-PUUB4PWZ.js.map
+//# sourceMappingURL=chunk-7PY7XEFH.js.map

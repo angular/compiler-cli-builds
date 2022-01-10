@@ -5,11 +5,11 @@
     
 import {
   TypeScriptReflectionHost
-} from "./chunk-PUUB4PWZ.js";
+} from "./chunk-7PY7XEFH.js";
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-XA5IZLLC.js";
+} from "./chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/downlevel_decorators_transform/downlevel_decorators_transform.mjs
 import ts2 from "typescript";
@@ -30,7 +30,7 @@ function loadIsReferencedAliasDeclarationPatch(context) {
   if (originalIsReferencedAliasDeclaration === void 0) {
     throwIncompatibleTransformationContextError();
   }
-  const referencedAliases = new Set();
+  const referencedAliases = /* @__PURE__ */ new Set();
   emitResolver.isReferencedAliasDeclaration = function(node, ...args) {
     if (isAliasImportDeclaration(node) && referencedAliases.has(node)) {
       return true;
@@ -284,7 +284,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
     function transformClassDeclaration(classDecl) {
       classDecl = ts2.getMutableClone(classDecl);
       const newMembers = [];
-      const decoratedProperties = new Map();
+      const decoratedProperties = /* @__PURE__ */ new Map();
       let classParameters = null;
       for (const member of classDecl.members) {
         switch (member.kind) {
@@ -379,4 +379,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZFVLWTFB.js.map
+//# sourceMappingURL=chunk-A5PL3TE6.js.map

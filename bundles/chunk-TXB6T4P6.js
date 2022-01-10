@@ -5,15 +5,15 @@
     
 import {
   SourceFileLoader
-} from "./chunk-QL6ZC3U3.js";
+} from "./chunk-ADHVDA4A.js";
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-CHJAKUHU.js";
+} from "./chunk-XNV7D7R3.js";
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-XA5IZLLC.js";
+} from "./chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.mjs
 var FatalLinkerError = class extends Error {
@@ -35,9 +35,7 @@ function assert(node, predicate, expected) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/ast/ast_value.mjs
-import {
-  WrappedNodeExpr
-} from "@angular/compiler";
+import * as o from "@angular/compiler";
 var AstObject = class {
   constructor(expression, obj, host) {
     this.expression = expression;
@@ -70,7 +68,7 @@ var AstObject = class {
     return arr.map((entry) => new AstValue(entry, this.host));
   }
   getOpaque(propertyName) {
-    return new WrappedNodeExpr(this.getRequiredProperty(propertyName));
+    return new o.WrappedNodeExpr(this.getRequiredProperty(propertyName));
   }
   getNode(propertyName) {
     return this.getRequiredProperty(propertyName);
@@ -86,7 +84,7 @@ var AstObject = class {
     return result;
   }
   toMap(mapper) {
-    const result = new Map();
+    const result = /* @__PURE__ */ new Map();
     for (const [key, expression] of this.obj) {
       result.set(key, mapper(new AstValue(expression, this.host)));
     }
@@ -155,7 +153,7 @@ var AstValue = class {
     return args.map((arg) => new AstValue(arg, this.host));
   }
   getOpaque() {
-    return new WrappedNodeExpr(this.expression);
+    return new o.WrappedNodeExpr(this.expression);
   }
   getRange() {
     return this.host.getRange(this.expression);
@@ -462,7 +460,7 @@ ${errors}`);
     if (metaObj.has("directives")) {
       directives.push(...collectUsedDirectives(metaObj.getArray("directives")));
     }
-    let pipes = new Map();
+    let pipes = /* @__PURE__ */ new Map();
     if (metaObj.has("pipes")) {
       pipes = metaObj.getObject("pipes").toMap((pipe) => {
         const { expression: pipeType, forwardRef } = extractForwardRef(pipe);
@@ -786,8 +784,8 @@ var declarationFunctions = [
   \u0275\u0275ngDeclarePipe
 ];
 function createLinkerMap(environment, sourceUrl, code) {
-  const linkers = new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "13.2.0-next.1+88.sha-a55e842.with-local-changes");
+  const linkers = /* @__PURE__ */ new Map();
+  const LATEST_VERSION_RANGE = getRange("<=", "13.2.0-next.1+90.sha-dff497f.with-local-changes");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -834,7 +832,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "13.2.0-next.1+88.sha-a55e842.with-local-changes") {
+    if (version === "13.2.0-next.1+90.sha-dff497f.with-local-changes") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -864,7 +862,7 @@ function getRange(comparator, versionStr) {
 var FileLinker = class {
   constructor(linkerEnvironment, sourceUrl, code) {
     this.linkerEnvironment = linkerEnvironment;
-    this.emitScopes = new Map();
+    this.emitScopes = /* @__PURE__ */ new Map();
     this.linkerSelector = new PartialLinkerSelector(createLinkerMap(this.linkerEnvironment, sourceUrl, code), this.linkerEnvironment.logger, this.linkerEnvironment.options.unknownDeclarationVersionHandling);
   }
   isPartialDeclaration(calleeName) {
@@ -965,4 +963,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-APEOR4QD.js.map
+//# sourceMappingURL=chunk-TXB6T4P6.js.map

@@ -5,7 +5,7 @@
     
 import {
   __spreadValues
-} from "./chunk-XA5IZLLC.js";
+} from "./chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file.mjs
 import mapHelpers from "convert-source-map";
@@ -207,7 +207,7 @@ function parseMappings(rawMap, sources, generatedSourceStartOfLinePositions) {
   return mappings;
 }
 function extractOriginalSegments(mappings) {
-  const originalSegments = new Map();
+  const originalSegments = /* @__PURE__ */ new Map();
   for (const mapping of mappings) {
     const originalSource = mapping.originalSource;
     if (!originalSegments.has(originalSource)) {
@@ -241,7 +241,7 @@ function computeLineLengths(str) {
 }
 var IndexedMap = class {
   constructor() {
-    this.map = new Map();
+    this.map = /* @__PURE__ */ new Map();
     this.keys = [];
     this.values = [];
   }
@@ -257,7 +257,7 @@ var IndexedMap = class {
 };
 var IndexedSet = class {
   constructor() {
-    this.map = new Map();
+    this.map = /* @__PURE__ */ new Map();
     this.values = [];
   }
   add(value) {
@@ -272,7 +272,7 @@ var IndexedSet = class {
 var Cache = class {
   constructor(computeFn) {
     this.computeFn = computeFn;
-    this.map = new Map();
+    this.map = /* @__PURE__ */ new Map();
   }
   get(input) {
     if (!this.map.has(input)) {
@@ -421,4 +421,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QL6ZC3U3.js.map
+//# sourceMappingURL=chunk-ADHVDA4A.js.map
