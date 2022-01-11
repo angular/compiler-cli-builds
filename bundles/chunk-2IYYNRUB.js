@@ -3337,7 +3337,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
-import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead3, PropertyWrite as PropertyWrite2, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstElement as TmplAstElement3, TmplAstIcu, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead3, PropertyWrite as PropertyWrite2, SafeCall, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstElement as TmplAstElement3, TmplAstIcu, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts27 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
@@ -3616,20 +3616,30 @@ var AstTranslator = class {
       expr = this.translate(receiver);
     }
     let node;
-    if (receiver instanceof SafePropertyRead2 || receiver instanceof SafeKeyedRead) {
-      if (this.config.strictSafeNavigationTypes) {
-        const call = ts26.createCall(ts26.createNonNullExpression(expr), void 0, args);
-        node = ts26.createParen(ts26.createConditional(NULL_AS_ANY, call, UNDEFINED));
-      } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
-        node = ts26.createCall(tsCastToAny(expr), void 0, args);
-      } else {
-        node = tsCastToAny(ts26.createCall(ts26.createNonNullExpression(expr), void 0, args));
-      }
+    if (ast.receiver instanceof SafePropertyRead2 || ast.receiver instanceof SafeKeyedRead) {
+      node = this.convertToSafeCall(ast, expr, args);
     } else {
       node = ts26.createCall(expr, void 0, args);
     }
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
+  }
+  visitSafeCall(ast) {
+    const args = ast.args.map((expr2) => this.translate(expr2));
+    const expr = wrapForDiagnostics(this.translate(ast.receiver));
+    const node = this.convertToSafeCall(ast, expr, args);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  convertToSafeCall(ast, expr, args) {
+    if (this.config.strictSafeNavigationTypes) {
+      const call = ts26.createCall(ts26.createNonNullExpression(expr), void 0, args);
+      return ts26.createParen(ts26.createConditional(NULL_AS_ANY, call, UNDEFINED));
+    }
+    if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
+      return ts26.createCall(tsCastToAny(expr), void 0, args);
+    }
+    return tsCastToAny(ts26.createCall(ts26.createNonNullExpression(expr), void 0, args));
   }
 };
 var VeSafeLhsInferenceBugDetector = class {
@@ -3651,6 +3661,9 @@ var VeSafeLhsInferenceBugDetector = class {
   }
   visitCall(ast) {
     return true;
+  }
+  visitSafeCall(ast) {
+    return false;
   }
   visitImplicitReceiver(ast) {
     return false;
@@ -4636,7 +4649,7 @@ var TcbExpressionTranslator = class {
       const result = ts27.createCall(methodAccess, void 0, [expr, ...args]);
       addParseSpanInfo(result, ast.sourceSpan);
       return result;
-    } else if (ast instanceof Call2 && (ast.receiver instanceof PropertyRead3 || ast.receiver instanceof SafePropertyRead3)) {
+    } else if ((ast instanceof Call2 || ast instanceof SafeCall) && (ast.receiver instanceof PropertyRead3 || ast.receiver instanceof SafePropertyRead3)) {
       if (ast.receiver.receiver instanceof ImplicitReceiver4 && !(ast.receiver.receiver instanceof ThisReceiver) && ast.receiver.name === "$any" && ast.args.length === 1) {
         const expr = this.translate(ast.args[0]);
         const exprAsAny = ts27.createAsExpression(expr, ts27.createKeywordTypeNode(ts27.SyntaxKind.AnyKeyword));
@@ -7450,4 +7463,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-PMBVPVZB.js.map
+//# sourceMappingURL=chunk-2IYYNRUB.js.map
