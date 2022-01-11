@@ -10,7 +10,7 @@ import {
   MetadataDtsModuleScopeResolver,
   TypeCheckScopeRegistry,
   readConfiguration
-} from "./chunk-HW4TOWEH.js";
+} from "./chunk-TUNE6DP3.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -31,7 +31,7 @@ import {
   TraitState,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-YG6QAIXV.js";
+} from "./chunk-FUZ3CSDO.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -71,7 +71,7 @@ import {
   translateStatement,
   translateType,
   validateAndRewriteCoreSymbol
-} from "./chunk-XNV7D7R3.js";
+} from "./chunk-QBU7RUKB.js";
 import {
   LogicalFileSystem,
   NgtscCompilerHost,
@@ -5094,4 +5094,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CHTZFBES.js.map
+//# sourceMappingURL=chunk-5TY44ZS3.js.map
