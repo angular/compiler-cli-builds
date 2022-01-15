@@ -93,7 +93,7 @@ import {
 } from "./chunk-WQ3TNYTD.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/create_compile_function.mjs
-import ts22 from "typescript";
+import ts23 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/entry_point.mjs
 import ts7 from "typescript";
@@ -2512,21 +2512,58 @@ var DtsProcessing;
 })(DtsProcessing || (DtsProcessing = {}));
 var TaskDependencies = Map;
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/adjust_cjs_umd_exports.mjs
+import ts8 from "typescript";
+function adjustElementAccessExports(sourceText) {
+  if (!/exports\[["']/.test(sourceText)) {
+    return sourceText;
+  }
+  const replacements = [];
+  const sf = ts8.createSourceFile("input.js", sourceText, ts8.ScriptTarget.ES5, false, ts8.ScriptKind.JS);
+  ts8.forEachChild(sf, function visitNode(node) {
+    if (ts8.isElementAccessExpression(node) && isExportsIdentifier2(node.expression) && ts8.isStringLiteral(node.argumentExpression) && isJsIdentifier(node.argumentExpression.text)) {
+      replacements.push({
+        start: node.getStart(sf),
+        end: node.getEnd(),
+        identifier: node.argumentExpression.text
+      });
+    }
+    ts8.forEachChild(node, visitNode);
+  });
+  replacements.sort((a, b) => a.start - b.start);
+  const parts = [];
+  let currentIndex = 0;
+  for (const replacement of replacements) {
+    parts.push(sourceText.substring(currentIndex, replacement.start));
+    parts.push(`exports. ${replacement.identifier}  `);
+    currentIndex = replacement.end;
+  }
+  parts.push(sourceText.substring(currentIndex));
+  return parts.join("");
+}
+function isExportsIdentifier2(expr) {
+  return ts8.isIdentifier(expr) && expr.text === "exports";
+}
+var identifierPattern = /^(?!(?:do|if|in|for|let|new|try|var|case|else|enum|eval|false|null|this|true|void|with|break|catch|class|const|super|throw|while|yield|delete|export|import|public|return|static|switch|typeof|default|extends|finally|package|private|continue|debugger|function|arguments|interface|protected|implements|instanceof)$)[$A-Z\_a-z\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc][$A-Z\_a-z\xaa\xb5\xba\xc0-\xd6\xd8-\xf6\xf8-\u02c1\u02c6-\u02d1\u02e0-\u02e4\u02ec\u02ee\u0370-\u0374\u0376\u0377\u037a-\u037d\u0386\u0388-\u038a\u038c\u038e-\u03a1\u03a3-\u03f5\u03f7-\u0481\u048a-\u0527\u0531-\u0556\u0559\u0561-\u0587\u05d0-\u05ea\u05f0-\u05f2\u0620-\u064a\u066e\u066f\u0671-\u06d3\u06d5\u06e5\u06e6\u06ee\u06ef\u06fa-\u06fc\u06ff\u0710\u0712-\u072f\u074d-\u07a5\u07b1\u07ca-\u07ea\u07f4\u07f5\u07fa\u0800-\u0815\u081a\u0824\u0828\u0840-\u0858\u08a0\u08a2-\u08ac\u0904-\u0939\u093d\u0950\u0958-\u0961\u0971-\u0977\u0979-\u097f\u0985-\u098c\u098f\u0990\u0993-\u09a8\u09aa-\u09b0\u09b2\u09b6-\u09b9\u09bd\u09ce\u09dc\u09dd\u09df-\u09e1\u09f0\u09f1\u0a05-\u0a0a\u0a0f\u0a10\u0a13-\u0a28\u0a2a-\u0a30\u0a32\u0a33\u0a35\u0a36\u0a38\u0a39\u0a59-\u0a5c\u0a5e\u0a72-\u0a74\u0a85-\u0a8d\u0a8f-\u0a91\u0a93-\u0aa8\u0aaa-\u0ab0\u0ab2\u0ab3\u0ab5-\u0ab9\u0abd\u0ad0\u0ae0\u0ae1\u0b05-\u0b0c\u0b0f\u0b10\u0b13-\u0b28\u0b2a-\u0b30\u0b32\u0b33\u0b35-\u0b39\u0b3d\u0b5c\u0b5d\u0b5f-\u0b61\u0b71\u0b83\u0b85-\u0b8a\u0b8e-\u0b90\u0b92-\u0b95\u0b99\u0b9a\u0b9c\u0b9e\u0b9f\u0ba3\u0ba4\u0ba8-\u0baa\u0bae-\u0bb9\u0bd0\u0c05-\u0c0c\u0c0e-\u0c10\u0c12-\u0c28\u0c2a-\u0c33\u0c35-\u0c39\u0c3d\u0c58\u0c59\u0c60\u0c61\u0c85-\u0c8c\u0c8e-\u0c90\u0c92-\u0ca8\u0caa-\u0cb3\u0cb5-\u0cb9\u0cbd\u0cde\u0ce0\u0ce1\u0cf1\u0cf2\u0d05-\u0d0c\u0d0e-\u0d10\u0d12-\u0d3a\u0d3d\u0d4e\u0d60\u0d61\u0d7a-\u0d7f\u0d85-\u0d96\u0d9a-\u0db1\u0db3-\u0dbb\u0dbd\u0dc0-\u0dc6\u0e01-\u0e30\u0e32\u0e33\u0e40-\u0e46\u0e81\u0e82\u0e84\u0e87\u0e88\u0e8a\u0e8d\u0e94-\u0e97\u0e99-\u0e9f\u0ea1-\u0ea3\u0ea5\u0ea7\u0eaa\u0eab\u0ead-\u0eb0\u0eb2\u0eb3\u0ebd\u0ec0-\u0ec4\u0ec6\u0edc-\u0edf\u0f00\u0f40-\u0f47\u0f49-\u0f6c\u0f88-\u0f8c\u1000-\u102a\u103f\u1050-\u1055\u105a-\u105d\u1061\u1065\u1066\u106e-\u1070\u1075-\u1081\u108e\u10a0-\u10c5\u10c7\u10cd\u10d0-\u10fa\u10fc-\u1248\u124a-\u124d\u1250-\u1256\u1258\u125a-\u125d\u1260-\u1288\u128a-\u128d\u1290-\u12b0\u12b2-\u12b5\u12b8-\u12be\u12c0\u12c2-\u12c5\u12c8-\u12d6\u12d8-\u1310\u1312-\u1315\u1318-\u135a\u1380-\u138f\u13a0-\u13f4\u1401-\u166c\u166f-\u167f\u1681-\u169a\u16a0-\u16ea\u16ee-\u16f0\u1700-\u170c\u170e-\u1711\u1720-\u1731\u1740-\u1751\u1760-\u176c\u176e-\u1770\u1780-\u17b3\u17d7\u17dc\u1820-\u1877\u1880-\u18a8\u18aa\u18b0-\u18f5\u1900-\u191c\u1950-\u196d\u1970-\u1974\u1980-\u19ab\u19c1-\u19c7\u1a00-\u1a16\u1a20-\u1a54\u1aa7\u1b05-\u1b33\u1b45-\u1b4b\u1b83-\u1ba0\u1bae\u1baf\u1bba-\u1be5\u1c00-\u1c23\u1c4d-\u1c4f\u1c5a-\u1c7d\u1ce9-\u1cec\u1cee-\u1cf1\u1cf5\u1cf6\u1d00-\u1dbf\u1e00-\u1f15\u1f18-\u1f1d\u1f20-\u1f45\u1f48-\u1f4d\u1f50-\u1f57\u1f59\u1f5b\u1f5d\u1f5f-\u1f7d\u1f80-\u1fb4\u1fb6-\u1fbc\u1fbe\u1fc2-\u1fc4\u1fc6-\u1fcc\u1fd0-\u1fd3\u1fd6-\u1fdb\u1fe0-\u1fec\u1ff2-\u1ff4\u1ff6-\u1ffc\u2071\u207f\u2090-\u209c\u2102\u2107\u210a-\u2113\u2115\u2119-\u211d\u2124\u2126\u2128\u212a-\u212d\u212f-\u2139\u213c-\u213f\u2145-\u2149\u214e\u2160-\u2188\u2c00-\u2c2e\u2c30-\u2c5e\u2c60-\u2ce4\u2ceb-\u2cee\u2cf2\u2cf3\u2d00-\u2d25\u2d27\u2d2d\u2d30-\u2d67\u2d6f\u2d80-\u2d96\u2da0-\u2da6\u2da8-\u2dae\u2db0-\u2db6\u2db8-\u2dbe\u2dc0-\u2dc6\u2dc8-\u2dce\u2dd0-\u2dd6\u2dd8-\u2dde\u2e2f\u3005-\u3007\u3021-\u3029\u3031-\u3035\u3038-\u303c\u3041-\u3096\u309d-\u309f\u30a1-\u30fa\u30fc-\u30ff\u3105-\u312d\u3131-\u318e\u31a0-\u31ba\u31f0-\u31ff\u3400-\u4db5\u4e00-\u9fcc\ua000-\ua48c\ua4d0-\ua4fd\ua500-\ua60c\ua610-\ua61f\ua62a\ua62b\ua640-\ua66e\ua67f-\ua697\ua6a0-\ua6ef\ua717-\ua71f\ua722-\ua788\ua78b-\ua78e\ua790-\ua793\ua7a0-\ua7aa\ua7f8-\ua801\ua803-\ua805\ua807-\ua80a\ua80c-\ua822\ua840-\ua873\ua882-\ua8b3\ua8f2-\ua8f7\ua8fb\ua90a-\ua925\ua930-\ua946\ua960-\ua97c\ua984-\ua9b2\ua9cf\uaa00-\uaa28\uaa40-\uaa42\uaa44-\uaa4b\uaa60-\uaa76\uaa7a\uaa80-\uaaaf\uaab1\uaab5\uaab6\uaab9-\uaabd\uaac0\uaac2\uaadb-\uaadd\uaae0-\uaaea\uaaf2-\uaaf4\uab01-\uab06\uab09-\uab0e\uab11-\uab16\uab20-\uab26\uab28-\uab2e\uabc0-\uabe2\uac00-\ud7a3\ud7b0-\ud7c6\ud7cb-\ud7fb\uf900-\ufa6d\ufa70-\ufad9\ufb00-\ufb06\ufb13-\ufb17\ufb1d\ufb1f-\ufb28\ufb2a-\ufb36\ufb38-\ufb3c\ufb3e\ufb40\ufb41\ufb43\ufb44\ufb46-\ufbb1\ufbd3-\ufd3d\ufd50-\ufd8f\ufd92-\ufdc7\ufdf0-\ufdfb\ufe70-\ufe74\ufe76-\ufefc\uff21-\uff3a\uff41-\uff5a\uff66-\uffbe\uffc2-\uffc7\uffca-\uffcf\uffd2-\uffd7\uffda-\uffdc0-9\u0300-\u036f\u0483-\u0487\u0591-\u05bd\u05bf\u05c1\u05c2\u05c4\u05c5\u05c7\u0610-\u061a\u064b-\u0669\u0670\u06d6-\u06dc\u06df-\u06e4\u06e7\u06e8\u06ea-\u06ed\u06f0-\u06f9\u0711\u0730-\u074a\u07a6-\u07b0\u07c0-\u07c9\u07eb-\u07f3\u0816-\u0819\u081b-\u0823\u0825-\u0827\u0829-\u082d\u0859-\u085b\u08e4-\u08fe\u0900-\u0903\u093a-\u093c\u093e-\u094f\u0951-\u0957\u0962\u0963\u0966-\u096f\u0981-\u0983\u09bc\u09be-\u09c4\u09c7\u09c8\u09cb-\u09cd\u09d7\u09e2\u09e3\u09e6-\u09ef\u0a01-\u0a03\u0a3c\u0a3e-\u0a42\u0a47\u0a48\u0a4b-\u0a4d\u0a51\u0a66-\u0a71\u0a75\u0a81-\u0a83\u0abc\u0abe-\u0ac5\u0ac7-\u0ac9\u0acb-\u0acd\u0ae2\u0ae3\u0ae6-\u0aef\u0b01-\u0b03\u0b3c\u0b3e-\u0b44\u0b47\u0b48\u0b4b-\u0b4d\u0b56\u0b57\u0b62\u0b63\u0b66-\u0b6f\u0b82\u0bbe-\u0bc2\u0bc6-\u0bc8\u0bca-\u0bcd\u0bd7\u0be6-\u0bef\u0c01-\u0c03\u0c3e-\u0c44\u0c46-\u0c48\u0c4a-\u0c4d\u0c55\u0c56\u0c62\u0c63\u0c66-\u0c6f\u0c82\u0c83\u0cbc\u0cbe-\u0cc4\u0cc6-\u0cc8\u0cca-\u0ccd\u0cd5\u0cd6\u0ce2\u0ce3\u0ce6-\u0cef\u0d02\u0d03\u0d3e-\u0d44\u0d46-\u0d48\u0d4a-\u0d4d\u0d57\u0d62\u0d63\u0d66-\u0d6f\u0d82\u0d83\u0dca\u0dcf-\u0dd4\u0dd6\u0dd8-\u0ddf\u0df2\u0df3\u0e31\u0e34-\u0e3a\u0e47-\u0e4e\u0e50-\u0e59\u0eb1\u0eb4-\u0eb9\u0ebb\u0ebc\u0ec8-\u0ecd\u0ed0-\u0ed9\u0f18\u0f19\u0f20-\u0f29\u0f35\u0f37\u0f39\u0f3e\u0f3f\u0f71-\u0f84\u0f86\u0f87\u0f8d-\u0f97\u0f99-\u0fbc\u0fc6\u102b-\u103e\u1040-\u1049\u1056-\u1059\u105e-\u1060\u1062-\u1064\u1067-\u106d\u1071-\u1074\u1082-\u108d\u108f-\u109d\u135d-\u135f\u1712-\u1714\u1732-\u1734\u1752\u1753\u1772\u1773\u17b4-\u17d3\u17dd\u17e0-\u17e9\u180b-\u180d\u1810-\u1819\u18a9\u1920-\u192b\u1930-\u193b\u1946-\u194f\u19b0-\u19c0\u19c8\u19c9\u19d0-\u19d9\u1a17-\u1a1b\u1a55-\u1a5e\u1a60-\u1a7c\u1a7f-\u1a89\u1a90-\u1a99\u1b00-\u1b04\u1b34-\u1b44\u1b50-\u1b59\u1b6b-\u1b73\u1b80-\u1b82\u1ba1-\u1bad\u1bb0-\u1bb9\u1be6-\u1bf3\u1c24-\u1c37\u1c40-\u1c49\u1c50-\u1c59\u1cd0-\u1cd2\u1cd4-\u1ce8\u1ced\u1cf2-\u1cf4\u1dc0-\u1de6\u1dfc-\u1dff\u200c\u200d\u203f\u2040\u2054\u20d0-\u20dc\u20e1\u20e5-\u20f0\u2cef-\u2cf1\u2d7f\u2de0-\u2dff\u302a-\u302f\u3099\u309a\ua620-\ua629\ua66f\ua674-\ua67d\ua69f\ua6f0\ua6f1\ua802\ua806\ua80b\ua823-\ua827\ua880\ua881\ua8b4-\ua8c4\ua8d0-\ua8d9\ua8e0-\ua8f1\ua900-\ua909\ua926-\ua92d\ua947-\ua953\ua980-\ua983\ua9b3-\ua9c0\ua9d0-\ua9d9\uaa29-\uaa36\uaa43\uaa4c\uaa4d\uaa50-\uaa59\uaa7b\uaab0\uaab2-\uaab4\uaab7\uaab8\uaabe\uaabf\uaac1\uaaeb-\uaaef\uaaf5\uaaf6\uabe3-\uabea\uabec\uabed\uabf0-\uabf9\ufb1e\ufe00-\ufe0f\ufe20-\ufe26\ufe33\ufe34\ufe4d-\ufe4f\uff10-\uff19\uff3f]*$/;
+function isJsIdentifier(text) {
+  return identifierPattern.test(text);
+}
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/bundle_program.mjs
-import ts9 from "typescript";
+import ts10 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/patch_ts_expando_initializer.mjs
-import ts8 from "typescript";
+import ts9 from "typescript";
 function patchTsGetExpandoInitializer() {
   if (isTs31778GetExpandoInitializerFixed()) {
     return null;
   }
-  const originalGetExpandoInitializer = ts8.getExpandoInitializer;
+  const originalGetExpandoInitializer = ts9.getExpandoInitializer;
   if (originalGetExpandoInitializer === void 0) {
     throw makeUnsupportedTypeScriptError();
   }
-  ts8.getExpandoInitializer = (initializer, isPrototypeAssignment) => {
-    if (ts8.isParenthesizedExpression(initializer) && ts8.isCallExpression(initializer.expression)) {
+  ts9.getExpandoInitializer = (initializer, isPrototypeAssignment) => {
+    if (ts9.isParenthesizedExpression(initializer) && ts9.isCallExpression(initializer.expression)) {
       initializer = initializer.expression;
     }
     return originalGetExpandoInitializer(initializer, isPrototypeAssignment);
@@ -2535,7 +2572,7 @@ function patchTsGetExpandoInitializer() {
 }
 function restoreGetExpandoInitializer(originalGetExpandoInitializer) {
   if (originalGetExpandoInitializer !== null) {
-    ts8.getExpandoInitializer = originalGetExpandoInitializer;
+    ts9.getExpandoInitializer = originalGetExpandoInitializer;
   }
 }
 var ts31778FixedResult = null;
@@ -2566,7 +2603,7 @@ function checkIfExpandoPropertyIsPresent() {
       }());
       A.expando = true;
     }());`;
-  const sourceFile = ts8.createSourceFile("test.js", sourceText, ts8.ScriptTarget.ES5, true, ts8.ScriptKind.JS);
+  const sourceFile = ts9.createSourceFile("test.js", sourceText, ts9.ScriptTarget.ES5, true, ts9.ScriptKind.JS);
   const host = {
     getSourceFile() {
       return sourceFile;
@@ -2599,14 +2636,14 @@ function checkIfExpandoPropertyIsPresent() {
     }
   };
   const options = { noResolve: true, noLib: true, noEmit: true, allowJs: true };
-  const program = ts8.createProgram(["test.js"], options, host);
+  const program = ts9.createProgram(["test.js"], options, host);
   function visitor(node) {
-    if (ts8.isVariableDeclaration(node) && hasNameIdentifier(node) && node.name.text === "A") {
+    if (ts9.isVariableDeclaration(node) && hasNameIdentifier(node) && node.name.text === "A") {
       return node;
     }
-    return ts8.forEachChild(node, visitor);
+    return ts9.forEachChild(node, visitor);
   }
-  const declaration = ts8.forEachChild(sourceFile, visitor);
+  const declaration = ts9.forEachChild(sourceFile, visitor);
   if (declaration === void 0) {
     throw new Error("Unable to find declaration of outer A");
   }
@@ -2625,7 +2662,7 @@ function makeBundleProgram(fs, isCore, pkg, path, r3FileName, options, host, add
   const r3SymbolsPath = isCore ? findR3SymbolsPath(fs, fs.dirname(path), r3FileName) : null;
   let rootPaths = r3SymbolsPath ? [path, r3SymbolsPath, ...additionalFiles] : [path, ...additionalFiles];
   const originalGetExpandoInitializer = patchTsGetExpandoInitializer();
-  const program = ts9.createProgram(rootPaths, options, host);
+  const program = ts10.createProgram(rootPaths, options, host);
   program.getTypeChecker();
   restoreGetExpandoInitializer(originalGetExpandoInitializer);
   const file = program.getSourceFile(path);
@@ -2651,7 +2688,7 @@ function findR3SymbolsPath(fs, directory, filename) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/ngcc_compiler_host.mjs
-import ts10 from "typescript";
+import ts11 from "typescript";
 var NgccSourcesCompilerHost = class extends NgtscCompilerHost {
   constructor(fs, options, cache, moduleResolutionCache, packagePath) {
     super(fs, options);
@@ -2664,14 +2701,14 @@ var NgccSourcesCompilerHost = class extends NgtscCompilerHost {
   }
   resolveModuleNames(moduleNames, containingFile, reusedNames, redirectedReference) {
     return moduleNames.map((moduleName) => {
-      const { resolvedModule } = ts10.resolveModuleName(moduleName, containingFile, this.options, this, this.moduleResolutionCache, redirectedReference);
-      if ((resolvedModule == null ? void 0 : resolvedModule.extension) === ts10.Extension.Dts && containingFile.endsWith(".js") && isRelativePath(moduleName)) {
+      const { resolvedModule } = ts11.resolveModuleName(moduleName, containingFile, this.options, this, this.moduleResolutionCache, redirectedReference);
+      if ((resolvedModule == null ? void 0 : resolvedModule.extension) === ts11.Extension.Dts && containingFile.endsWith(".js") && isRelativePath(moduleName)) {
         const jsFile = resolvedModule.resolvedFileName.replace(/\.d\.ts$/, ".js");
         if (this.fileExists(jsFile)) {
-          return __spreadProps(__spreadValues({}, resolvedModule), { resolvedFileName: jsFile, extension: ts10.Extension.Js });
+          return __spreadProps(__spreadValues({}, resolvedModule), { resolvedFileName: jsFile, extension: ts11.Extension.Js });
         }
       }
-      if ((resolvedModule == null ? void 0 : resolvedModule.extension) === ts10.Extension.Js && !isWithinPackage(this.packagePath, this.fs.resolve(resolvedModule.resolvedFileName))) {
+      if ((resolvedModule == null ? void 0 : resolvedModule.extension) === ts11.Extension.Js && !isWithinPackage(this.packagePath, this.fs.resolve(resolvedModule.resolvedFileName))) {
         return void 0;
       }
       return resolvedModule;
@@ -2689,14 +2726,14 @@ var NgccDtsCompilerHost = class extends NgtscCompilerHost {
   }
   resolveModuleNames(moduleNames, containingFile, reusedNames, redirectedReference) {
     return moduleNames.map((moduleName) => {
-      const { resolvedModule } = ts10.resolveModuleName(moduleName, containingFile, this.options, this, this.moduleResolutionCache, redirectedReference);
+      const { resolvedModule } = ts11.resolveModuleName(moduleName, containingFile, this.options, this, this.moduleResolutionCache, redirectedReference);
       return resolvedModule;
     });
   }
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/source_file_cache.mjs
-import ts11 from "typescript";
+import ts12 from "typescript";
 var SharedFileCache = class {
   constructor(fs) {
     this.fs = fs;
@@ -2718,7 +2755,7 @@ var SharedFileCache = class {
       if (content === void 0) {
         return void 0;
       }
-      const sf = ts11.createSourceFile(absPath, content, ts11.ScriptTarget.ES2015);
+      const sf = ts12.createSourceFile(absPath, content, ts12.ScriptTarget.ES2015);
       this.sfCache.set(absPath, sf);
     }
     return this.sfCache.get(absPath);
@@ -2729,7 +2766,7 @@ var SharedFileCache = class {
       return void 0;
     }
     if (!this.sfCache.has(absPath) || this.sfCache.get(absPath).text !== content) {
-      const sf = ts11.createSourceFile(absPath, content, ts11.ScriptTarget.ES2015);
+      const sf = ts12.createSourceFile(absPath, content, ts12.ScriptTarget.ES2015);
       this.sfCache.set(absPath, sf);
     }
     return this.sfCache.get(absPath);
@@ -2761,9 +2798,10 @@ function isFile(path, segments, fs) {
   return true;
 }
 var EntryPointFileCache = class {
-  constructor(fs, sharedFileCache) {
+  constructor(fs, sharedFileCache, processSourceText) {
     this.fs = fs;
     this.sharedFileCache = sharedFileCache;
+    this.processSourceText = processSourceText;
     this.sfCache = /* @__PURE__ */ new Map();
   }
   getCachedSourceFile(fileName, languageVersion) {
@@ -2779,7 +2817,8 @@ var EntryPointFileCache = class {
     if (content === void 0) {
       return void 0;
     }
-    const sf = ts11.createSourceFile(fileName, content, languageVersion);
+    const processed = this.processSourceText(content);
+    const sf = ts12.createSourceFile(fileName, processed, languageVersion);
     this.sfCache.set(absPath, sf);
     return sf;
   }
@@ -2791,16 +2830,24 @@ function readFile(absPath, fs) {
   return fs.readFile(absPath);
 }
 function createModuleResolutionCache(fs) {
-  return ts11.createModuleResolutionCache(fs.pwd(), (fileName) => {
+  return ts12.createModuleResolutionCache(fs.pwd(), (fileName) => {
     return fs.isCaseSensitive() ? fileName : fileName.toLowerCase();
   });
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/entry_point_bundle.mjs
+function createSourceTextProcessor(format) {
+  if (format === "umd" || format === "commonjs") {
+    return adjustElementAccessExports;
+  } else {
+    return (sourceText) => sourceText;
+  }
+}
 function makeEntryPointBundle(fs, entryPoint, sharedFileCache, moduleResolutionCache, formatPath, isCore, format, dtsProcessing, pathMappings, mirrorDtsFromSrc = false, enableI18nLegacyMessageIdFormat = true) {
   const rootDir = entryPoint.packagePath;
   const options = __spreadValues({ allowJs: true, maxNodeModuleJsDepth: Infinity, rootDir }, pathMappings);
-  const entryPointCache = new EntryPointFileCache(fs, sharedFileCache);
+  const processSourceText = createSourceTextProcessor(format);
+  const entryPointCache = new EntryPointFileCache(fs, sharedFileCache, processSourceText);
   const dtsHost = new NgccDtsCompilerHost(fs, options, entryPointCache, moduleResolutionCache);
   const srcHost = new NgccSourcesCompilerHost(fs, options, entryPointCache, moduleResolutionCache, entryPoint.packagePath);
   const absFormatPath = fs.resolve(entryPoint.path, formatPath);
@@ -2838,13 +2885,13 @@ function computePotentialDtsFilesFromJsFiles(fs, srcProgram, formatPath, typings
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/transformer.mjs
-import ts21 from "typescript";
+import ts22 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/analysis/decoration_analyzer.mjs
 import { ConstantPool } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/migrations/utils.mjs
-import ts12 from "typescript";
+import ts13 from "typescript";
 function isClassDeclaration(clazz) {
   return isNamedClassDeclaration(clazz) || isNamedFunctionDeclaration(clazz) || isNamedVariableDeclaration(clazz);
 }
@@ -2869,7 +2916,7 @@ function createDirectiveDecorator(clazz, metadata) {
     if (metadata.exportAs !== null) {
       metaArgs.push(property("exportAs", metadata.exportAs.join(", ")));
     }
-    args.push(reifySourceFile(ts12.createObjectLiteral(metaArgs)));
+    args.push(reifySourceFile(ts13.createObjectLiteral(metaArgs)));
   }
   return {
     name: "Directive",
@@ -2897,7 +2944,7 @@ function createComponentDecorator(clazz, metadata) {
     node: null,
     synthesizedFor: clazz.name,
     args: [
-      reifySourceFile(ts12.createObjectLiteral(metaArgs))
+      reifySourceFile(ts13.createObjectLiteral(metaArgs))
     ]
   };
 }
@@ -2912,16 +2959,16 @@ function createInjectableDecorator(clazz) {
   };
 }
 function property(name, value) {
-  return ts12.createPropertyAssignment(name, ts12.createStringLiteral(value));
+  return ts13.createPropertyAssignment(name, ts13.createStringLiteral(value));
 }
-var EMPTY_SF = ts12.createSourceFile("(empty)", "", ts12.ScriptTarget.Latest);
+var EMPTY_SF = ts13.createSourceFile("(empty)", "", ts13.ScriptTarget.Latest);
 function reifySourceFile(expr) {
-  const printer = ts12.createPrinter();
-  const exprText = printer.printNode(ts12.EmitHint.Unspecified, expr, EMPTY_SF);
-  const sf = ts12.createSourceFile("(synthetic)", `const expr = ${exprText};`, ts12.ScriptTarget.Latest, true, ts12.ScriptKind.JS);
+  const printer = ts13.createPrinter();
+  const exprText = printer.printNode(ts13.EmitHint.Unspecified, expr, EMPTY_SF);
+  const sf = ts13.createSourceFile("(synthetic)", `const expr = ${exprText};`, ts13.ScriptTarget.Latest, true, ts13.ScriptKind.JS);
   const stmt = sf.statements[0];
-  if (!ts12.isVariableStatement(stmt)) {
-    throw new Error(`Expected VariableStatement, got ${ts12.SyntaxKind[stmt.kind]}`);
+  if (!ts13.isVariableStatement(stmt)) {
+    throw new Error(`Expected VariableStatement, got ${ts13.SyntaxKind[stmt.kind]}`);
   }
   return stmt.declarationList.declarations[0].initializer;
 }
@@ -3100,7 +3147,7 @@ function determineBaseClass(clazz, host) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/analysis/migration_host.mjs
-import ts13 from "typescript";
+import ts14 from "typescript";
 var DefaultMigrationHost = class {
   constructor(reflectionHost, metadata, evaluator, compiler, entryPointPath) {
     this.reflectionHost = reflectionHost;
@@ -3131,14 +3178,14 @@ function createMigrationDiagnostic(diagnostic, source, decorator) {
   const clone = __spreadValues({}, diagnostic);
   const chain = [{
     messageText: `Occurs for @${decorator.name} decorator inserted by an automatic migration`,
-    category: ts13.DiagnosticCategory.Message,
+    category: ts14.DiagnosticCategory.Message,
     code: 0
   }];
   if (decorator.args !== null) {
     const args = decorator.args.map((arg) => arg.getText()).join(", ");
     chain.push({
       messageText: `@${decorator.name}(${args})`,
-      category: ts13.DiagnosticCategory.Message,
+      category: ts14.DiagnosticCategory.Message,
       code: 0
     });
   }
@@ -3364,7 +3411,7 @@ var DecorationAnalyzer = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/analysis/module_with_providers_analyzer.mjs
-import ts14 from "typescript";
+import ts15 from "typescript";
 var ModuleWithProvidersAnalyses = Map;
 var ModuleWithProvidersAnalyzer = class {
   constructor(host, typeChecker, referencesRegistry, processDts) {
@@ -3386,7 +3433,7 @@ var ModuleWithProvidersAnalyzer = class {
         if (this.processDts) {
           const dtsFn = this.getDtsModuleWithProvidersFunction(fn);
           const dtsFnType = dtsFn.declaration.type;
-          const typeParam = dtsFnType && ts14.isTypeReferenceNode(dtsFnType) && dtsFnType.typeArguments && dtsFnType.typeArguments[0] || null;
+          const typeParam = dtsFnType && ts15.isTypeReferenceNode(dtsFnType) && dtsFnType.typeArguments && dtsFnType.typeArguments[0] || null;
           if (!typeParam || isAnyKeyword(typeParam)) {
             const dtsFile = dtsFn.declaration.getSourceFile();
             const analysis = analyses.has(dtsFile) ? analyses.get(dtsFile) : [];
@@ -3431,7 +3478,7 @@ var ModuleWithProvidersAnalyzer = class {
     return infos;
   }
   parseForModuleWithProviders(name, node, implementation = node, container = null) {
-    if (implementation === null || !ts14.isFunctionDeclaration(implementation) && !ts14.isMethodDeclaration(implementation) && !ts14.isFunctionExpression(implementation)) {
+    if (implementation === null || !ts15.isFunctionDeclaration(implementation) && !ts15.isMethodDeclaration(implementation) && !ts15.isFunctionExpression(implementation)) {
       return null;
     }
     const declaration = implementation;
@@ -3444,7 +3491,7 @@ var ModuleWithProvidersAnalyzer = class {
       return null;
     }
     const lastStatement = body[body.length - 1];
-    if (!ts14.isReturnStatement(lastStatement) || lastStatement.expression === void 0) {
+    if (!ts15.isReturnStatement(lastStatement) || lastStatement.expression === void 0) {
       return null;
     }
     const result = this.evaluator.evaluate(lastStatement.expression);
@@ -3466,7 +3513,7 @@ var ModuleWithProvidersAnalyzer = class {
     const containerClass = fn.container && this.host.getClassSymbol(fn.container);
     if (containerClass) {
       const dtsClass = this.host.getDtsDeclaration(containerClass.declaration.valueDeclaration);
-      dtsFn = dtsClass && ts14.isClassDeclaration(dtsClass) ? dtsClass.members.find((member) => ts14.isMethodDeclaration(member) && ts14.isIdentifier(member.name) && member.name.text === fn.name) : null;
+      dtsFn = dtsClass && ts15.isClassDeclaration(dtsClass) ? dtsClass.members.find((member) => ts15.isMethodDeclaration(member) && ts15.isIdentifier(member.name) && member.name.text === fn.name) : null;
     } else {
       dtsFn = this.host.getDtsDeclaration(fn.declaration);
     }
@@ -3496,10 +3543,10 @@ var ModuleWithProvidersAnalyzer = class {
   }
 };
 function isFunctionOrMethod(declaration) {
-  return ts14.isFunctionDeclaration(declaration) || ts14.isMethodDeclaration(declaration);
+  return ts15.isFunctionDeclaration(declaration) || ts15.isMethodDeclaration(declaration);
 }
 function isAnyKeyword(typeParam) {
-  return typeParam.kind === ts14.SyntaxKind.AnyKeyword;
+  return typeParam.kind === ts15.SyntaxKind.AnyKeyword;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/analysis/ngcc_references_registry.mjs
@@ -3565,7 +3612,7 @@ var PrivateDeclarationsAnalyzer = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/host/commonjs_host.mjs
-import ts15 from "typescript";
+import ts16 from "typescript";
 var CommonJsReflectionHost = class extends Esm5ReflectionHost {
   constructor(logger, isCore, src, dts = null) {
     super(logger, isCore, src, dts);
@@ -3639,7 +3686,7 @@ var CommonJsReflectionHost = class extends Esm5ReflectionHost {
   }
   extractCommonJsWildcardReexports(statement, containingFile) {
     const reexportArg = statement.expression.arguments[0];
-    const requireCall = isRequireCall(reexportArg) ? reexportArg : ts15.isIdentifier(reexportArg) ? findRequireCallReference(reexportArg, this.checker) : null;
+    const requireCall = isRequireCall(reexportArg) ? reexportArg : ts16.isIdentifier(reexportArg) ? findRequireCallReference(reexportArg, this.checker) : null;
     if (requireCall === null) {
       return [];
     }
@@ -3722,7 +3769,7 @@ var CommonJsReflectionHost = class extends Esm5ReflectionHost {
       const moduleInfo = this.compilerHost.resolveModuleNames([moduleName], containingFile.fileName, void 0, void 0, this.program.getCompilerOptions())[0];
       return moduleInfo && this.program.getSourceFile(absoluteFrom(moduleInfo.resolvedFileName));
     } else {
-      const moduleInfo = ts15.resolveModuleName(moduleName, containingFile.fileName, this.program.getCompilerOptions(), this.compilerHost);
+      const moduleInfo = ts16.resolveModuleName(moduleName, containingFile.fileName, this.program.getCompilerOptions(), this.compilerHost);
       return moduleInfo.resolvedModule && this.program.getSourceFile(absoluteFrom(moduleInfo.resolvedModule.resolvedFileName));
     }
   }
@@ -3850,13 +3897,13 @@ var DelegatingReflectionHost = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/commonjs_rendering_formatter.mjs
-import ts18 from "typescript";
+import ts19 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/esm5_rendering_formatter.mjs
-import ts17 from "typescript";
+import ts18 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/esm_rendering_formatter.mjs
-import ts16 from "typescript";
+import ts17 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/ngcc_import_rewriter.mjs
 var NgccFlatImportRewriter = class {
@@ -3899,7 +3946,7 @@ var EsmRenderingFormatter = class {
     this.fs = fs;
     this.host = host;
     this.isCore = isCore;
-    this.printer = ts16.createPrinter({ newLine: ts16.NewLineKind.LineFeed });
+    this.printer = ts17.createPrinter({ newLine: ts17.NewLineKind.LineFeed });
   }
   addImports(output, imports, sf) {
     if (imports.length === 0) {
@@ -3959,14 +4006,14 @@ export {${e.symbolName} as ${e.asAlias}} from '${e.fromModule}';`;
   }
   removeDecorators(output, decoratorsToRemove) {
     decoratorsToRemove.forEach((nodesToRemove, containerNode) => {
-      if (ts16.isArrayLiteralExpression(containerNode)) {
+      if (ts17.isArrayLiteralExpression(containerNode)) {
         const items = containerNode.elements;
         if (items.length === nodesToRemove.length) {
           const statement = findStatement(containerNode);
           if (statement) {
-            if (ts16.isExpressionStatement(statement)) {
+            if (ts17.isExpressionStatement(statement)) {
               output.remove(statement.getFullStart(), statement.getEnd());
-            } else if (ts16.isReturnStatement(statement) && statement.expression && isAssignment2(statement.expression)) {
+            } else if (ts17.isReturnStatement(statement) && statement.expression && isAssignment2(statement.expression)) {
               const startOfRemoval = statement.expression.left.getEnd();
               const endOfRemoval = getEndExceptSemicolon(statement);
               output.remove(startOfRemoval, endOfRemoval);
@@ -3999,7 +4046,7 @@ export {${e.symbolName} as ${e.asAlias}} from '${e.fromModule}';`;
       const importPath = info.ngModule.ownedByModuleGuess || (declarationFile !== ngModuleFile ? stripExtension2(relativeImport) : null);
       const ngModule = generateImportString(importManager, importPath, ngModuleName);
       if (info.declaration.type) {
-        const typeName = info.declaration.type && ts16.isTypeReferenceNode(info.declaration.type) ? info.declaration.type.typeName : null;
+        const typeName = info.declaration.type && ts17.isTypeReferenceNode(info.declaration.type) ? info.declaration.type.typeName : null;
         if (this.isCoreModuleWithProvidersType(typeName)) {
           outputText.overwrite(info.declaration.type.getStart(), info.declaration.type.getEnd(), `ModuleWithProviders<${ngModule}>`);
         } else {
@@ -4008,32 +4055,32 @@ export {${e.symbolName} as ${e.asAlias}} from '${e.fromModule}';`;
         }
       } else {
         const lastToken = info.declaration.getLastToken();
-        const insertPoint = lastToken && lastToken.kind === ts16.SyntaxKind.SemicolonToken ? lastToken.getStart() : info.declaration.getEnd();
+        const insertPoint = lastToken && lastToken.kind === ts17.SyntaxKind.SemicolonToken ? lastToken.getStart() : info.declaration.getEnd();
         outputText.appendLeft(insertPoint, `: ${generateImportString(importManager, "@angular/core", "ModuleWithProviders")}<${ngModule}>`);
       }
     });
   }
   printStatement(stmt, sourceFile, importManager) {
     const node = translateStatement(stmt, importManager);
-    const code = this.printer.printNode(ts16.EmitHint.Unspecified, node, sourceFile);
+    const code = this.printer.printNode(ts17.EmitHint.Unspecified, node, sourceFile);
     return code;
   }
   findEndOfImports(sf) {
     for (const stmt of sf.statements) {
-      if (!ts16.isImportDeclaration(stmt) && !ts16.isImportEqualsDeclaration(stmt) && !ts16.isNamespaceImport(stmt)) {
+      if (!ts17.isImportDeclaration(stmt) && !ts17.isImportEqualsDeclaration(stmt) && !ts17.isNamespaceImport(stmt)) {
         return stmt.getStart();
       }
     }
     return 0;
   }
   isCoreModuleWithProvidersType(typeName) {
-    const id = typeName && ts16.isIdentifier(typeName) ? this.host.getImportOfIdentifier(typeName) : null;
+    const id = typeName && ts17.isIdentifier(typeName) ? this.host.getImportOfIdentifier(typeName) : null;
     return id && id.name === "ModuleWithProviders" && (this.isCore || id.from === "@angular/core");
   }
 };
 function findStatement(node) {
   while (node) {
-    if (ts16.isExpressionStatement(node) || ts16.isReturnStatement(node)) {
+    if (ts17.isExpressionStatement(node) || ts17.isReturnStatement(node)) {
       return node;
     }
     node = node.parent;
@@ -4050,7 +4097,7 @@ function getNextSiblingInArray(node, array) {
 }
 function getEndExceptSemicolon(statement) {
   const lastToken = statement.getLastToken();
-  return lastToken && lastToken.kind === ts16.SyntaxKind.SemicolonToken ? statement.getEnd() - 1 : statement.getEnd();
+  return lastToken && lastToken.kind === ts17.SyntaxKind.SemicolonToken ? statement.getEnd() - 1 : statement.getEnd();
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/esm5_rendering_formatter.mjs
@@ -4064,10 +4111,10 @@ Expected an ES5 IIFE wrapped function. But got:
     }
     const declarationStatement = getContainingStatement(classSymbol.implementation.valueDeclaration);
     const iifeBody = declarationStatement.parent;
-    if (!iifeBody || !ts17.isBlock(iifeBody)) {
+    if (!iifeBody || !ts18.isBlock(iifeBody)) {
       throw new Error(`Compiled class declaration is not inside an IIFE: ${compiledClass.name} in ${compiledClass.declaration.getSourceFile().fileName}`);
     }
-    const returnStatement = iifeBody.statements.find(ts17.isReturnStatement);
+    const returnStatement = iifeBody.statements.find(ts18.isReturnStatement);
     if (!returnStatement) {
       throw new Error(`Compiled class wrapper IIFE does not have a return statement: ${compiledClass.name} in ${compiledClass.declaration.getSourceFile().fileName}`);
     }
@@ -4076,7 +4123,7 @@ Expected an ES5 IIFE wrapped function. But got:
   }
   printStatement(stmt, sourceFile, importManager) {
     const node = translateStatement(stmt, importManager, { downlevelTaggedTemplates: true, downlevelVariableDeclarations: true });
-    const code = this.printer.printNode(ts17.EmitHint.Unspecified, node, sourceFile);
+    const code = this.printer.printNode(ts18.EmitHint.Unspecified, node, sourceFile);
     return code;
   }
 };
@@ -4118,10 +4165,10 @@ exports.${e.asAlias} = ${importNamespace}${namedImport.symbol};`;
   }
   findEndOfImports(sf) {
     for (const statement of sf.statements) {
-      if (ts18.isExpressionStatement(statement) && isRequireCall(statement.expression)) {
+      if (ts19.isExpressionStatement(statement) && isRequireCall(statement.expression)) {
         continue;
       }
-      const declarations = ts18.isVariableStatement(statement) ? Array.from(statement.declarationList.declarations) : [];
+      const declarations = ts19.isVariableStatement(statement) ? Array.from(statement.declarationList.declarations) : [];
       if (declarations.some((d) => !d.initializer || !isRequireCall(d.initializer))) {
         return statement.getStart();
       }
@@ -4132,7 +4179,7 @@ exports.${e.asAlias} = ${importNamespace}${namedImport.symbol};`;
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/dts_renderer.mjs
 import MagicString from "magic-string";
-import ts19 from "typescript";
+import ts20 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/constants.mjs
 var IMPORT_PREFIX = "\u0275ngcc";
@@ -4203,14 +4250,14 @@ var DtsRenderer = class {
   }
   renderDtsFile(dtsFile, renderInfo) {
     const outputText = new MagicString(dtsFile.text);
-    const printer = ts19.createPrinter();
+    const printer = ts20.createPrinter();
     const importManager = new ImportManager(getImportRewriter(this.bundle.dts.r3SymbolsFile, this.bundle.isCore, false), IMPORT_PREFIX);
     renderInfo.classInfo.forEach((dtsClass) => {
       const endOfClass = dtsClass.dtsDeclaration.getEnd();
       dtsClass.compilation.forEach((declaration) => {
         const type = translateType(declaration.type, importManager);
         markForEmitAsSingleLine(type);
-        const typeStr = printer.printNode(ts19.EmitHint.Unspecified, type, dtsFile);
+        const typeStr = printer.printNode(ts20.EmitHint.Unspecified, type, dtsFile);
         const newStatement = `    static ${declaration.name}: ${typeStr};
 `;
         outputText.appendRight(endOfClass - 1, newStatement);
@@ -4270,8 +4317,8 @@ The simplest fix for this is to ensure that this class is exported from the pack
   }
 };
 function markForEmitAsSingleLine(node) {
-  ts19.setEmitFlags(node, ts19.EmitFlags.SingleLine);
-  ts19.forEachChild(node, markForEmitAsSingleLine);
+  ts20.setEmitFlags(node, ts20.EmitFlags.SingleLine);
+  ts20.forEachChild(node, markForEmitAsSingleLine);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/renderer.mjs
@@ -4385,7 +4432,7 @@ function createAssignmentStatement(receiverName, propName, initializer, leadingC
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/rendering/umd_rendering_formatter.mjs
-import ts20 from "typescript";
+import ts21 from "typescript";
 var UmdRenderingFormatter = class extends Esm5RenderingFormatter {
   constructor(fs, umdHost, isCore) {
     super(fs, umdHost, isCore);
@@ -4469,7 +4516,7 @@ function renderAmdDependencies(output, amdDefineCall, imports) {
   const importString = imports.map((i) => `'${i.specifier}'`).join(",");
   const factoryIndex = amdDefineCall.arguments.length - 1;
   const dependencyArray = amdDefineCall.arguments[factoryIndex - 1];
-  if (dependencyArray === void 0 || !ts20.isArrayLiteralExpression(dependencyArray)) {
+  if (dependencyArray === void 0 || !ts21.isArrayLiteralExpression(dependencyArray)) {
     const injectionPoint = amdDefineCall.arguments[factoryIndex].getFullStart();
     output.appendLeft(injectionPoint, `[${importString}],`);
   } else {
@@ -4578,7 +4625,7 @@ var Transformer = class {
   }
 };
 function hasErrors(diagnostics) {
-  return diagnostics.some((d) => d.category === ts21.DiagnosticCategory.Error);
+  return diagnostics.some((d) => d.category === ts22.DiagnosticCategory.Error);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/create_compile_function.mjs
@@ -4602,7 +4649,7 @@ function getCreateCompileFn(fileSystem, logger, fileWriter, enableI18nLegacyMess
       const result = transformer.transform(bundle);
       if (result.success) {
         if (result.diagnostics.length > 0) {
-          logger.warn(replaceTsWithNgInErrors(ts22.formatDiagnosticsWithColorAndContext(result.diagnostics, bundle.src.host)));
+          logger.warn(replaceTsWithNgInErrors(ts23.formatDiagnosticsWithColorAndContext(result.diagnostics, bundle.src.host)));
         }
         const writeBundle = () => {
           fileWriter.writeBundle(bundle, result.transformedFiles, formatPropertiesToMarkAsProcessed);
@@ -4612,7 +4659,7 @@ function getCreateCompileFn(fileSystem, logger, fileWriter, enableI18nLegacyMess
         const beforeWritingResult = beforeWritingFiles(result.transformedFiles);
         return beforeWritingResult instanceof Promise ? beforeWritingResult.then(writeBundle) : writeBundle();
       } else {
-        const errors = replaceTsWithNgInErrors(ts22.formatDiagnosticsWithColorAndContext(result.diagnostics, bundle.src.host));
+        const errors = replaceTsWithNgInErrors(ts23.formatDiagnosticsWithColorAndContext(result.diagnostics, bundle.src.host));
         onTaskCompleted(task, 1, `compilation errors:
 ${errors}`);
       }
@@ -5094,4 +5141,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QGM254OS.js.map
+//# sourceMappingURL=chunk-55DK655A.js.map
