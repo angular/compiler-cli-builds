@@ -27,6 +27,8 @@ import {
   getSourceFile,
   identifierOfNode,
   isDeclaration,
+  isDtsPath,
+  isNonDeclarationTsPath,
   makeDiagnostic,
   makeRelatedInformation,
   nodeDebugInfo,
@@ -37,6 +39,7 @@ import {
 import {
   absoluteFrom,
   absoluteFromSourceFile,
+  basename,
   relative
 } from "./chunk-676MI6WZ.js";
 import {
@@ -1414,7 +1417,7 @@ function toFactoryMetadata(meta, target) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/component.mjs
 import { compileClassMetadata as compileClassMetadata3, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector, DEFAULT_INTERPOLATION_CONFIG, DomElementSchemaRegistry, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget3, InterpolationConfig, makeBindingParser as makeBindingParser2, ParseSourceFile as ParseSourceFile2, parseTemplate, R3TargetBinder, SelectorMatcher, ViewEncapsulation, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
-import ts18 from "typescript";
+import ts21 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
 import ts4 from "typescript";
@@ -2219,7 +2222,405 @@ function aliasTransformFactory(exportStatements) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/compilation.mjs
+import ts12 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/adapter.mjs
 import ts9 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/expando.mjs
+var NgExtension = Symbol("NgExtension");
+function isExtended(sf) {
+  return sf[NgExtension] !== void 0;
+}
+function sfExtensionData(sf) {
+  const extSf = sf;
+  if (extSf[NgExtension] !== void 0) {
+    return extSf[NgExtension];
+  }
+  const extension = {
+    isTopLevelShim: false,
+    fileShim: null,
+    originalReferencedFiles: null,
+    taggedReferenceFiles: null
+  };
+  extSf[NgExtension] = extension;
+  return extension;
+}
+function isFileShimSourceFile(sf) {
+  return isExtended(sf) && sf[NgExtension].fileShim !== null;
+}
+function isShim(sf) {
+  return isExtended(sf) && (sf[NgExtension].fileShim !== null || sf[NgExtension].isTopLevelShim);
+}
+function copyFileShimData(from, to) {
+  if (!isFileShimSourceFile(from)) {
+    return;
+  }
+  sfExtensionData(to).fileShim = sfExtensionData(from).fileShim;
+}
+function untagAllTsFiles(program) {
+  for (const sf of program.getSourceFiles()) {
+    untagTsFile(sf);
+  }
+}
+function retagAllTsFiles(program) {
+  for (const sf of program.getSourceFiles()) {
+    retagTsFile(sf);
+  }
+}
+function untagTsFile(sf) {
+  if (sf.isDeclarationFile || !isExtended(sf)) {
+    return;
+  }
+  const ext = sfExtensionData(sf);
+  if (ext.originalReferencedFiles !== null) {
+    sf.referencedFiles = ext.originalReferencedFiles;
+  }
+}
+function retagTsFile(sf) {
+  if (sf.isDeclarationFile || !isExtended(sf)) {
+    return;
+  }
+  const ext = sfExtensionData(sf);
+  if (ext.taggedReferenceFiles !== null) {
+    sf.referencedFiles = ext.taggedReferenceFiles;
+  }
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/util.mjs
+var TS_EXTENSIONS = /\.tsx?$/i;
+function makeShimFileName(fileName, suffix) {
+  return absoluteFrom(fileName.replace(TS_EXTENSIONS, suffix));
+}
+function generatedModuleName(originalModuleName, originalFileName, genSuffix) {
+  let moduleName;
+  if (originalFileName.endsWith("/index.ts")) {
+    moduleName = originalModuleName + "/index" + genSuffix;
+  } else {
+    moduleName = originalModuleName + genSuffix;
+  }
+  return moduleName;
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/adapter.mjs
+var ShimAdapter = class {
+  constructor(delegate, tsRootFiles, topLevelGenerators, perFileGenerators, oldProgram) {
+    this.delegate = delegate;
+    this.shims = /* @__PURE__ */ new Map();
+    this.priorShims = /* @__PURE__ */ new Map();
+    this.notShims = /* @__PURE__ */ new Set();
+    this.generators = [];
+    this.ignoreForEmit = /* @__PURE__ */ new Set();
+    this.extensionPrefixes = [];
+    for (const gen of perFileGenerators) {
+      const pattern = `^(.*)\\.${gen.extensionPrefix}\\.ts$`;
+      const regexp = new RegExp(pattern, "i");
+      this.generators.push({
+        generator: gen,
+        test: regexp,
+        suffix: `.${gen.extensionPrefix}.ts`
+      });
+      this.extensionPrefixes.push(gen.extensionPrefix);
+    }
+    const extraInputFiles = [];
+    for (const gen of topLevelGenerators) {
+      const sf = gen.makeTopLevelShim();
+      sfExtensionData(sf).isTopLevelShim = true;
+      if (!gen.shouldEmit) {
+        this.ignoreForEmit.add(sf);
+      }
+      const fileName = absoluteFromSourceFile(sf);
+      this.shims.set(fileName, sf);
+      extraInputFiles.push(fileName);
+    }
+    for (const rootFile of tsRootFiles) {
+      for (const gen of this.generators) {
+        extraInputFiles.push(makeShimFileName(rootFile, gen.suffix));
+      }
+    }
+    this.extraInputFiles = extraInputFiles;
+    if (oldProgram !== null) {
+      for (const oldSf of oldProgram.getSourceFiles()) {
+        if (oldSf.isDeclarationFile || !isFileShimSourceFile(oldSf)) {
+          continue;
+        }
+        this.priorShims.set(absoluteFromSourceFile(oldSf), oldSf);
+      }
+    }
+  }
+  maybeGenerate(fileName) {
+    if (this.notShims.has(fileName)) {
+      return null;
+    } else if (this.shims.has(fileName)) {
+      return this.shims.get(fileName);
+    }
+    if (isDtsPath(fileName)) {
+      this.notShims.add(fileName);
+      return null;
+    }
+    for (const record of this.generators) {
+      const match = record.test.exec(fileName);
+      if (match === null) {
+        continue;
+      }
+      const prefix = match[1];
+      let baseFileName = absoluteFrom(prefix + ".ts");
+      if (!this.delegate.fileExists(baseFileName)) {
+        baseFileName = absoluteFrom(prefix + ".tsx");
+        if (!this.delegate.fileExists(baseFileName)) {
+          return void 0;
+        }
+      }
+      const inputFile = this.delegate.getSourceFile(baseFileName, ts9.ScriptTarget.Latest);
+      if (inputFile === void 0 || isShim(inputFile)) {
+        return void 0;
+      }
+      return this.generateSpecific(fileName, record.generator, inputFile);
+    }
+    this.notShims.add(fileName);
+    return null;
+  }
+  generateSpecific(fileName, generator, inputFile) {
+    let priorShimSf = null;
+    if (this.priorShims.has(fileName)) {
+      priorShimSf = this.priorShims.get(fileName);
+      this.priorShims.delete(fileName);
+    }
+    const shimSf = generator.generateShimForFile(inputFile, fileName, priorShimSf);
+    sfExtensionData(shimSf).fileShim = {
+      extension: generator.extensionPrefix,
+      generatedFrom: absoluteFromSourceFile(inputFile)
+    };
+    if (!generator.shouldEmit) {
+      this.ignoreForEmit.add(shimSf);
+    }
+    this.shims.set(fileName, shimSf);
+    return shimSf;
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/factory_generator.mjs
+import ts10 from "typescript";
+var TS_DTS_SUFFIX = /(\.d)?\.ts$/;
+var STRIP_NG_FACTORY = /(.*)NgFactory$/;
+var FactoryGenerator = class {
+  constructor() {
+    this.sourceInfo = /* @__PURE__ */ new Map();
+    this.sourceToFactorySymbols = /* @__PURE__ */ new Map();
+    this.shouldEmit = true;
+    this.extensionPrefix = "ngfactory";
+  }
+  generateShimForFile(sf, genFilePath) {
+    const absoluteSfPath = absoluteFromSourceFile(sf);
+    const relativePathToSource = "./" + basename(sf.fileName).replace(TS_DTS_SUFFIX, "");
+    const symbolNames = sf.statements.filter(ts10.isClassDeclaration).filter((decl) => isExported(decl) && decl.decorators !== void 0 && decl.name !== void 0).map((decl) => decl.name.text);
+    let sourceText = "";
+    const leadingComment = getFileoverviewComment(sf);
+    if (leadingComment !== null) {
+      sourceText = leadingComment + "\n\n";
+    }
+    if (symbolNames.length > 0) {
+      const varLines = symbolNames.map((name) => `export const ${name}NgFactory: i0.\u0275NgModuleFactory<any> = new i0.\u0275NgModuleFactory(${name});`);
+      sourceText += [
+        `import * as i0 from '@angular/core';`,
+        `import {${symbolNames.join(", ")}} from '${relativePathToSource}';`,
+        ...varLines
+      ].join("\n");
+    }
+    sourceText += "\nexport const \u0275NonEmptyModule = true;";
+    const genFile = ts10.createSourceFile(genFilePath, sourceText, sf.languageVersion, true, ts10.ScriptKind.TS);
+    if (sf.moduleName !== void 0) {
+      genFile.moduleName = generatedModuleName(sf.moduleName, sf.fileName, ".ngfactory");
+    }
+    const moduleSymbols = /* @__PURE__ */ new Map();
+    this.sourceToFactorySymbols.set(absoluteSfPath, moduleSymbols);
+    this.sourceInfo.set(genFilePath, {
+      sourceFilePath: absoluteSfPath,
+      moduleSymbols
+    });
+    return genFile;
+  }
+  track(sf, moduleInfo) {
+    if (this.sourceToFactorySymbols.has(sf.fileName)) {
+      this.sourceToFactorySymbols.get(sf.fileName).set(moduleInfo.name, moduleInfo);
+    }
+  }
+};
+function isExported(decl) {
+  return decl.modifiers !== void 0 && decl.modifiers.some((mod) => mod.kind == ts10.SyntaxKind.ExportKeyword);
+}
+function generatedFactoryTransform(factoryMap, importRewriter) {
+  return (context) => {
+    return (file) => {
+      return transformFactorySourceFile(factoryMap, context, importRewriter, file);
+    };
+  };
+}
+function transformFactorySourceFile(factoryMap, context, importRewriter, file) {
+  if (!factoryMap.has(file.fileName)) {
+    return file;
+  }
+  const { moduleSymbols, sourceFilePath } = factoryMap.get(file.fileName);
+  const transformedStatements = [];
+  let nonEmptyExport = null;
+  const coreImportIdentifiers = /* @__PURE__ */ new Set();
+  for (const stmt of file.statements) {
+    if (ts10.isImportDeclaration(stmt) && ts10.isStringLiteral(stmt.moduleSpecifier) && stmt.moduleSpecifier.text === "@angular/core") {
+      const rewrittenModuleSpecifier = importRewriter.rewriteSpecifier("@angular/core", sourceFilePath);
+      if (rewrittenModuleSpecifier !== stmt.moduleSpecifier.text) {
+        transformedStatements.push(ts10.updateImportDeclaration(stmt, stmt.decorators, stmt.modifiers, stmt.importClause, ts10.createStringLiteral(rewrittenModuleSpecifier), void 0));
+        if (stmt.importClause !== void 0 && stmt.importClause.namedBindings !== void 0 && ts10.isNamespaceImport(stmt.importClause.namedBindings)) {
+          coreImportIdentifiers.add(stmt.importClause.namedBindings.name.text);
+        }
+      } else {
+        transformedStatements.push(stmt);
+      }
+    } else if (ts10.isVariableStatement(stmt) && stmt.declarationList.declarations.length === 1) {
+      const decl = stmt.declarationList.declarations[0];
+      if (ts10.isIdentifier(decl.name)) {
+        if (decl.name.text === "\u0275NonEmptyModule") {
+          nonEmptyExport = stmt;
+          continue;
+        }
+        const match = STRIP_NG_FACTORY.exec(decl.name.text);
+        const module = match ? moduleSymbols.get(match[1]) : null;
+        if (module) {
+          const moduleIsTreeShakable = !module.hasId;
+          const newStmt = !moduleIsTreeShakable ? stmt : updateInitializers(stmt, (init) => init ? wrapInNoSideEffects(init) : void 0);
+          transformedStatements.push(newStmt);
+        }
+      } else {
+        transformedStatements.push(stmt);
+      }
+    } else {
+      transformedStatements.push(stmt);
+    }
+  }
+  if (!transformedStatements.some(ts10.isVariableStatement) && nonEmptyExport !== null) {
+    transformedStatements.push(nonEmptyExport);
+  }
+  file = ts10.updateSourceFileNode(file, transformedStatements);
+  if (coreImportIdentifiers.size > 0) {
+    const visit2 = (node) => {
+      node = ts10.visitEachChild(node, (child) => visit2(child), context);
+      if (ts10.isPropertyAccessExpression(node) && ts10.isIdentifier(node.expression) && coreImportIdentifiers.has(node.expression.text)) {
+        const rewrittenSymbol = importRewriter.rewriteSymbol(node.name.text, "@angular/core");
+        if (rewrittenSymbol !== node.name.text) {
+          const updated = ts10.updatePropertyAccess(node, node.expression, ts10.createIdentifier(rewrittenSymbol));
+          node = updated;
+        }
+      }
+      return node;
+    };
+    file = visit2(file);
+  }
+  return file;
+}
+function getFileoverviewComment(sourceFile) {
+  const text = sourceFile.getFullText();
+  const trivia = text.substring(0, sourceFile.getStart());
+  const leadingComments = ts10.getLeadingCommentRanges(trivia, 0);
+  if (!leadingComments || leadingComments.length === 0) {
+    return null;
+  }
+  const comment = leadingComments[0];
+  if (comment.kind !== ts10.SyntaxKind.MultiLineCommentTrivia) {
+    return null;
+  }
+  if (text.substring(comment.end, comment.end + 2) !== "\n\n") {
+    return null;
+  }
+  const commentText = text.substring(comment.pos, comment.end);
+  if (commentText.indexOf("@license") !== -1) {
+    return null;
+  }
+  return commentText;
+}
+function wrapInNoSideEffects(expr) {
+  const noSideEffects = ts10.createPropertyAccess(ts10.createIdentifier("i0"), "\u0275noSideEffects");
+  return ts10.createCall(noSideEffects, [], [
+    ts10.createFunctionExpression([], void 0, void 0, [], [], void 0, ts10.createBlock([
+      ts10.createReturn(expr)
+    ]))
+  ]);
+}
+function updateInitializers(stmt, update) {
+  return ts10.updateVariableStatement(stmt, stmt.modifiers, ts10.updateVariableDeclarationList(stmt.declarationList, stmt.declarationList.declarations.map((decl) => ts10.updateVariableDeclaration(decl, decl.name, decl.type, update(decl.initializer)))));
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/reference_tagger.mjs
+var ShimReferenceTagger = class {
+  constructor(shimExtensions) {
+    this.tagged = /* @__PURE__ */ new Set();
+    this.enabled = true;
+    this.suffixes = shimExtensions.map((extension) => `.${extension}.ts`);
+  }
+  tag(sf) {
+    if (!this.enabled || sf.isDeclarationFile || isShim(sf) || this.tagged.has(sf) || !isNonDeclarationTsPath(sf.fileName)) {
+      return;
+    }
+    const ext = sfExtensionData(sf);
+    if (ext.originalReferencedFiles === null) {
+      ext.originalReferencedFiles = sf.referencedFiles;
+    }
+    const referencedFiles = [...ext.originalReferencedFiles];
+    const sfPath = absoluteFromSourceFile(sf);
+    for (const suffix of this.suffixes) {
+      referencedFiles.push({
+        fileName: makeShimFileName(sfPath, suffix),
+        pos: 0,
+        end: 0
+      });
+    }
+    ext.taggedReferenceFiles = referencedFiles;
+    sf.referencedFiles = referencedFiles;
+    this.tagged.add(sf);
+  }
+  finalize() {
+    this.enabled = false;
+    this.tagged.clear();
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/summary_generator.mjs
+import ts11 from "typescript";
+var SummaryGenerator = class {
+  constructor() {
+    this.shouldEmit = true;
+    this.extensionPrefix = "ngsummary";
+  }
+  generateShimForFile(sf, genFilePath) {
+    const symbolNames = [];
+    for (const stmt of sf.statements) {
+      if (ts11.isClassDeclaration(stmt)) {
+        if (!isExported2(stmt) || stmt.decorators === void 0 || stmt.name === void 0) {
+          continue;
+        }
+        symbolNames.push(stmt.name.text);
+      } else if (ts11.isExportDeclaration(stmt)) {
+        if (stmt.exportClause === void 0 || stmt.moduleSpecifier !== void 0 || !ts11.isNamedExports(stmt.exportClause)) {
+          continue;
+        }
+        for (const specifier of stmt.exportClause.elements) {
+          symbolNames.push(specifier.name.text);
+        }
+      }
+    }
+    const varLines = symbolNames.map((name) => `export const ${name}NgSummary: any = null;`);
+    if (varLines.length === 0) {
+      varLines.push(`export const \u0275empty = null;`);
+    }
+    const sourceText = varLines.join("\n");
+    const genFile = ts11.createSourceFile(genFilePath, sourceText, sf.languageVersion, true, ts11.ScriptKind.TS);
+    if (sf.moduleName !== void 0) {
+      genFile.moduleName = generatedModuleName(sf.moduleName, sf.fileName, ".ngsummary");
+    }
+    return genFile;
+  }
+};
+function isExported2(decl) {
+  return decl.modifiers !== void 0 && decl.modifiers.some((mod) => mod.kind == ts11.SyntaxKind.ExportKeyword);
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/trait.mjs
 var TraitState;
@@ -2303,7 +2704,7 @@ var TraitCompiler = class {
     return this.analyze(sf, true);
   }
   analyze(sf, preanalyze) {
-    if (sf.isDeclarationFile) {
+    if (sf.isDeclarationFile || isShim(sf)) {
       return void 0;
     }
     const promises = [];
@@ -2324,9 +2725,12 @@ var TraitCompiler = class {
       if (this.reflector.isClass(node)) {
         this.analyzeClass(node, preanalyze ? promises : null);
       }
-      ts9.forEachChild(node, visit2);
+      ts12.forEachChild(node, visit2);
     };
     visit2(sf);
+    if (!this.fileToClasses.has(sf)) {
+      this.filesWithoutTraits.add(sf);
+    }
     if (preanalyze && promises.length > 0) {
       return Promise.all(promises).then(() => void 0);
     } else {
@@ -2435,7 +2839,7 @@ var TraitCompiler = class {
         }
         if (isPrimaryHandler && record.hasPrimaryHandler) {
           record.metaDiagnostics = [{
-            category: ts9.DiagnosticCategory.Error,
+            category: ts12.DiagnosticCategory.Error,
             code: Number("-99" + ErrorCode.DECORATOR_COLLISION),
             file: getSourceFile(clazz),
             start: clazz.getStart(void 0, false),
@@ -2643,7 +3047,7 @@ var TraitCompiler = class {
     }
   }
   compile(clazz, constantPool) {
-    const original = ts9.getOriginalNode(clazz);
+    const original = ts12.getOriginalNode(clazz);
     if (!this.reflector.isClass(clazz) || !this.reflector.isClass(original) || !this.classes.has(original)) {
       return null;
     }
@@ -2674,7 +3078,7 @@ var TraitCompiler = class {
     return res.length > 0 ? res : null;
   }
   decoratorsFor(node) {
-    const original = ts9.getOriginalNode(node);
+    const original = ts12.getOriginalNode(node);
     if (!this.reflector.isClass(original) || !this.classes.has(original)) {
       return [];
     }
@@ -2684,7 +3088,7 @@ var TraitCompiler = class {
       if (trait.state !== TraitState.Resolved) {
         continue;
       }
-      if (trait.detected.trigger !== null && ts9.isDecorator(trait.detected.trigger)) {
+      if (trait.detected.trigger !== null && ts12.isDecorator(trait.detected.trigger)) {
         decorators.push(trait.detected.trigger);
       }
     }
@@ -2714,23 +3118,23 @@ var TraitCompiler = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/declaration.mjs
-import ts11 from "typescript";
+import ts14 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/utils.mjs
-import ts10 from "typescript";
+import ts13 from "typescript";
 function addImports(importManager, sf, extraStatements = []) {
   const addedImports = importManager.getAllImports(sf.fileName).map((i) => {
-    const qualifier = ts10.createIdentifier(i.qualifier.text);
-    const importClause = ts10.createImportClause(void 0, ts10.createNamespaceImport(qualifier));
-    const decl = ts10.createImportDeclaration(void 0, void 0, importClause, ts10.createLiteral(i.specifier));
-    ts10.setOriginalNode(i.qualifier, decl);
+    const qualifier = ts13.createIdentifier(i.qualifier.text);
+    const importClause = ts13.createImportClause(void 0, ts13.createNamespaceImport(qualifier));
+    const decl = ts13.createImportDeclaration(void 0, void 0, importClause, ts13.createLiteral(i.specifier));
+    ts13.setOriginalNode(i.qualifier, decl);
     return decl;
   });
   const existingImports = sf.statements.filter((stmt) => isImportStatement(stmt));
   const body = sf.statements.filter((stmt) => !isImportStatement(stmt));
   if (addedImports.length > 0) {
-    const fileoverviewAnchorStmt = ts10.createNotEmittedStatement(sf);
-    return ts10.updateSourceFileNode(sf, ts10.createNodeArray([
+    const fileoverviewAnchorStmt = ts13.createNotEmittedStatement(sf);
+    return ts13.updateSourceFileNode(sf, ts13.createNodeArray([
       fileoverviewAnchorStmt,
       ...existingImports,
       ...addedImports,
@@ -2741,7 +3145,7 @@ function addImports(importManager, sf, extraStatements = []) {
   return sf;
 }
 function isImportStatement(stmt) {
-  return ts10.isImportDeclaration(stmt) || ts10.isImportEqualsDeclaration(stmt) || ts10.isNamespaceImport(stmt);
+  return ts13.isImportDeclaration(stmt) || ts13.isImportEqualsDeclaration(stmt) || ts13.isNamespaceImport(stmt);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/declaration.mjs
@@ -2759,7 +3163,7 @@ var DtsTransformRegistry = class {
     if (!sf.isDeclarationFile) {
       return null;
     }
-    const originalSf = ts11.getOriginalNode(sf);
+    const originalSf = ts14.getOriginalNode(sf);
     let transforms = null;
     if (this.ivyDeclarationTransforms.has(originalSf)) {
       transforms = [];
@@ -2772,7 +3176,7 @@ function declarationTransformFactory(transformRegistry, importRewriter, importPr
   return (context) => {
     const transformer = new DtsTransformer(context, importRewriter, importPrefix);
     return (fileOrBundle) => {
-      if (ts11.isBundle(fileOrBundle)) {
+      if (ts14.isBundle(fileOrBundle)) {
         return fileOrBundle;
       }
       const transforms = transformRegistry.getAllTransforms(fileOrBundle);
@@ -2792,15 +3196,15 @@ var DtsTransformer = class {
   transform(sf, transforms) {
     const imports = new ImportManager(this.importRewriter, this.importPrefix);
     const visitor = (node) => {
-      if (ts11.isClassDeclaration(node)) {
+      if (ts14.isClassDeclaration(node)) {
         return this.transformClassDeclaration(node, transforms, imports);
-      } else if (ts11.isFunctionDeclaration(node)) {
+      } else if (ts14.isFunctionDeclaration(node)) {
         return this.transformFunctionDeclaration(node, transforms, imports);
       } else {
-        return ts11.visitEachChild(node, visitor, this.ctx);
+        return ts14.visitEachChild(node, visitor, this.ctx);
       }
     };
-    sf = ts11.visitNode(sf, visitor);
+    sf = ts14.visitNode(sf, visitor);
     return addImports(imports, sf);
   }
   transformClassDeclaration(clazz, transforms, imports) {
@@ -2828,7 +3232,7 @@ var DtsTransformer = class {
       }
     }
     if (elementsChanged && clazz === newClazz) {
-      newClazz = ts11.updateClassDeclaration(clazz, clazz.decorators, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, elements);
+      newClazz = ts14.updateClassDeclaration(clazz, clazz.decorators, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, elements);
     }
     return newClazz;
   }
@@ -2850,31 +3254,31 @@ var IvyDeclarationDtsTransform = class {
     this.declarationFields.set(decl, fields);
   }
   transformClass(clazz, members, imports) {
-    const original = ts11.getOriginalNode(clazz);
+    const original = ts14.getOriginalNode(clazz);
     if (!this.declarationFields.has(original)) {
       return clazz;
     }
     const fields = this.declarationFields.get(original);
     const newMembers = fields.map((decl) => {
-      const modifiers = [ts11.createModifier(ts11.SyntaxKind.StaticKeyword)];
+      const modifiers = [ts14.createModifier(ts14.SyntaxKind.StaticKeyword)];
       const typeRef = translateType(decl.type, imports);
       markForEmitAsSingleLine(typeRef);
-      return ts11.createProperty(void 0, modifiers, decl.name, void 0, typeRef, void 0);
+      return ts14.createProperty(void 0, modifiers, decl.name, void 0, typeRef, void 0);
     });
-    return ts11.updateClassDeclaration(clazz, clazz.decorators, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, [...members, ...newMembers]);
+    return ts14.updateClassDeclaration(clazz, clazz.decorators, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, [...members, ...newMembers]);
   }
 };
 function markForEmitAsSingleLine(node) {
-  ts11.setEmitFlags(node, ts11.EmitFlags.SingleLine);
-  ts11.forEachChild(node, markForEmitAsSingleLine);
+  ts14.setEmitFlags(node, ts14.EmitFlags.SingleLine);
+  ts14.forEachChild(node, markForEmitAsSingleLine);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/transform.mjs
 import { ConstantPool } from "@angular/compiler";
-import ts13 from "typescript";
+import ts16 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/util/src/visitor.mjs
-import ts12 from "typescript";
+import ts15 from "typescript";
 function visit(node, visitor, context) {
   return visitor._visit(node, context);
 }
@@ -2898,8 +3302,8 @@ var Visitor = class {
   }
   _visit(node, context) {
     let visitedNode = null;
-    node = ts12.visitEachChild(node, (child) => this._visit(child, context), context);
-    if (ts12.isClassDeclaration(node)) {
+    node = ts15.visitEachChild(node, (child) => this._visit(child, context), context);
+    if (ts15.isClassDeclaration(node)) {
       visitedNode = this._visitListEntryNode(node, (node2) => this.visitClassDeclaration(node2));
     } else {
       visitedNode = this.visitOtherNode(node);
@@ -2913,7 +3317,7 @@ var Visitor = class {
     if (node.statements.every((stmt) => !this._before.has(stmt) && !this._after.has(stmt))) {
       return node;
     }
-    const clone = ts12.getMutableClone(node);
+    const clone = ts15.getMutableClone(node);
     const newStatements = [];
     clone.statements.forEach((stmt) => {
       if (this._before.has(stmt)) {
@@ -2926,7 +3330,7 @@ var Visitor = class {
         this._after.delete(stmt);
       }
     });
-    clone.statements = ts12.createNodeArray(newStatements, node.statements.hasTrailingComma);
+    clone.statements = ts15.createNodeArray(newStatements, node.statements.hasTrailingComma);
     return clone;
   }
 };
@@ -2984,14 +3388,14 @@ var IvyTransformationVisitor = class extends Visitor {
     const members = [...node.members];
     for (const field of this.classCompilationMap.get(node)) {
       const exprNode = translateExpression(field.initializer, this.importManager, translateOptions);
-      const property = ts13.createProperty(void 0, [ts13.createToken(ts13.SyntaxKind.StaticKeyword)], field.name, void 0, void 0, exprNode);
+      const property = ts16.createProperty(void 0, [ts16.createToken(ts16.SyntaxKind.StaticKeyword)], field.name, void 0, void 0, exprNode);
       if (this.isClosureCompilerEnabled) {
-        ts13.addSyntheticLeadingComment(property, ts13.SyntaxKind.MultiLineCommentTrivia, "* @nocollapse ", false);
+        ts16.addSyntheticLeadingComment(property, ts16.SyntaxKind.MultiLineCommentTrivia, "* @nocollapse ", false);
       }
       field.statements.map((stmt) => translateStatement(stmt, this.importManager, translateOptions)).forEach((stmt) => statements.push(stmt));
       members.push(property);
     }
-    node = ts13.updateClassDeclaration(node, maybeFilterDecorator(node.decorators, this.compilation.decoratorsFor(node)), node.modifiers, node.name, node.typeParameters, node.heritageClauses || [], members.map((member) => this._stripAngularDecorators(member)));
+    node = ts16.updateClassDeclaration(node, maybeFilterDecorator(node.decorators, this.compilation.decoratorsFor(node)), node.modifiers, node.name, node.typeParameters, node.heritageClauses || [], members.map((member) => this._stripAngularDecorators(member)));
     return { node, after: statements };
   }
   _angularCoreDecorators(decl) {
@@ -3020,25 +3424,25 @@ var IvyTransformationVisitor = class extends Visitor {
     if (filtered.length === 0) {
       return void 0;
     }
-    const array = ts13.createNodeArray(filtered);
+    const array = ts16.createNodeArray(filtered);
     array.pos = node.decorators.pos;
     array.end = node.decorators.end;
     return array;
   }
   _stripAngularDecorators(node) {
-    if (ts13.isParameter(node)) {
-      node = ts13.updateParameter(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.dotDotDotToken, node.name, node.questionToken, node.type, node.initializer);
-    } else if (ts13.isMethodDeclaration(node) && node.decorators !== void 0) {
-      node = ts13.updateMethod(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
-    } else if (ts13.isPropertyDeclaration(node) && node.decorators !== void 0) {
-      node = ts13.updateProperty(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.questionToken, node.type, node.initializer);
-    } else if (ts13.isGetAccessor(node)) {
-      node = ts13.updateGetAccessor(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.parameters, node.type, node.body);
-    } else if (ts13.isSetAccessor(node)) {
-      node = ts13.updateSetAccessor(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.parameters, node.body);
-    } else if (ts13.isConstructorDeclaration(node)) {
+    if (ts16.isParameter(node)) {
+      node = ts16.updateParameter(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.dotDotDotToken, node.name, node.questionToken, node.type, node.initializer);
+    } else if (ts16.isMethodDeclaration(node) && node.decorators !== void 0) {
+      node = ts16.updateMethod(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
+    } else if (ts16.isPropertyDeclaration(node) && node.decorators !== void 0) {
+      node = ts16.updateProperty(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.questionToken, node.type, node.initializer);
+    } else if (ts16.isGetAccessor(node)) {
+      node = ts16.updateGetAccessor(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.parameters, node.type, node.body);
+    } else if (ts16.isSetAccessor(node)) {
+      node = ts16.updateSetAccessor(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.parameters, node.body);
+    } else if (ts16.isConstructorDeclaration(node)) {
       const parameters = node.parameters.map((param) => this._stripAngularDecorators(param));
-      node = ts13.updateConstructor(node, node.decorators, node.modifiers, parameters, node.body);
+      node = ts16.updateConstructor(node, node.decorators, node.modifiers, parameters, node.body);
     }
     return node;
   }
@@ -3050,7 +3454,7 @@ function transformIvySourceFile(compilation, context, reflector, importRewriter,
   visit(file, compilationVisitor, context);
   const transformationVisitor = new IvyTransformationVisitor(compilation, compilationVisitor.classCompilationMap, reflector, importManager, recordWrappedNode, isClosureCompilerEnabled, isCore);
   let sf = visit(file, transformationVisitor, context);
-  const downlevelTranslatedCode = getLocalizeCompileTarget(context) < ts13.ScriptTarget.ES2015;
+  const downlevelTranslatedCode = getLocalizeCompileTarget(context) < ts16.ScriptTarget.ES2015;
   const constants = constantPool.statements.map((stmt) => translateStatement(stmt, importManager, {
     recordWrappedNode,
     downlevelTaggedTemplates: downlevelTranslatedCode,
@@ -3065,17 +3469,17 @@ function transformIvySourceFile(compilation, context, reflector, importRewriter,
   return sf;
 }
 function getLocalizeCompileTarget(context) {
-  const target = context.getCompilerOptions().target || ts13.ScriptTarget.ES2015;
-  return target !== ts13.ScriptTarget.JSON ? target : ts13.ScriptTarget.ES2015;
+  const target = context.getCompilerOptions().target || ts16.ScriptTarget.ES2015;
+  return target !== ts16.ScriptTarget.JSON ? target : ts16.ScriptTarget.ES2015;
 }
 function getFileOverviewComment(statements) {
   if (statements.length > 0) {
     const host = statements[0];
     let trailing = false;
-    let comments = ts13.getSyntheticLeadingComments(host);
+    let comments = ts16.getSyntheticLeadingComments(host);
     if (!comments || comments.length === 0) {
       trailing = true;
-      comments = ts13.getSyntheticTrailingComments(host);
+      comments = ts16.getSyntheticTrailingComments(host);
     }
     if (comments && comments.length > 0 && CLOSURE_FILE_OVERVIEW_REGEXP.test(comments[0].text)) {
       return { comments, host, trailing };
@@ -3087,22 +3491,22 @@ function setFileOverviewComment(sf, fileoverview) {
   const { comments, host, trailing } = fileoverview;
   if (sf.statements.length > 0 && host !== sf.statements[0]) {
     if (trailing) {
-      ts13.setSyntheticTrailingComments(host, void 0);
+      ts16.setSyntheticTrailingComments(host, void 0);
     } else {
-      ts13.setSyntheticLeadingComments(host, void 0);
+      ts16.setSyntheticLeadingComments(host, void 0);
     }
-    ts13.setSyntheticLeadingComments(sf.statements[0], comments);
+    ts16.setSyntheticLeadingComments(sf.statements[0], comments);
   }
 }
 function maybeFilterDecorator(decorators, toRemove) {
   if (decorators === void 0) {
     return void 0;
   }
-  const filtered = decorators.filter((dec) => toRemove.find((decToRemove) => ts13.getOriginalNode(dec) === decToRemove) === void 0);
+  const filtered = decorators.filter((dec) => toRemove.find((decToRemove) => ts16.getOriginalNode(dec) === decToRemove) === void 0);
   if (filtered.length === 0) {
     return void 0;
   }
-  return ts13.createNodeArray(filtered);
+  return ts16.createNodeArray(filtered);
 }
 function isFromAngularCore(decorator) {
   return decorator.import !== null && decorator.import.from === "@angular/core";
@@ -3117,7 +3521,7 @@ function createRecorderFn(defaultImportTracker) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/diagnostics.mjs
-import ts14 from "typescript";
+import ts17 from "typescript";
 function createValueHasWrongTypeError(node, value, messageText) {
   var _a;
   let chainedMessage;
@@ -3135,11 +3539,11 @@ function createValueHasWrongTypeError(node, value, messageText) {
   }
   const chain = {
     messageText,
-    category: ts14.DiagnosticCategory.Error,
+    category: ts17.DiagnosticCategory.Error,
     code: 0,
     next: [{
       messageText: chainedMessage,
-      category: ts14.DiagnosticCategory.Message,
+      category: ts17.DiagnosticCategory.Message,
       code: 0
     }]
   };
@@ -3215,7 +3619,7 @@ function getInheritedUndecoratedCtorDiagnostic(node, baseClass, reader) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/directive.mjs
 import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirectiveFromMetadata, compileDirectiveFromMetadata, createMayBeForwardRefExpression, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr3, FactoryTarget, getSafePropertyAccessString, makeBindingParser, parseHostBindings, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr3 } from "@angular/compiler";
-import ts16 from "typescript";
+import ts19 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/factory.mjs
 import { compileDeclareFactoryFunction, compileFactoryFunction } from "@angular/compiler";
@@ -3230,7 +3634,7 @@ function compileDeclareFactory(metadata) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/metadata.mjs
 import { FunctionExpr, LiteralArrayExpr, LiteralExpr as LiteralExpr2, literalMap, ReturnStatement, WrappedNodeExpr as WrappedNodeExpr2 } from "@angular/compiler";
-import ts15 from "typescript";
+import ts18 from "typescript";
 function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompiler, angularDecoratorTransform = (dec) => dec) {
   if (!reflection.isClass(clazz)) {
     return null;
@@ -3244,7 +3648,7 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
   if (ngClassDecorators.length === 0) {
     return null;
   }
-  const metaDecorators = new WrappedNodeExpr2(ts15.createArrayLiteral(ngClassDecorators));
+  const metaDecorators = new WrappedNodeExpr2(ts18.createArrayLiteral(ngClassDecorators));
   let metaCtorParameters = null;
   const classCtorParameters = reflection.getConstructorParameters(clazz);
   if (classCtorParameters !== null) {
@@ -3264,7 +3668,7 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
     return classMemberToMetadata((_a = member.nameNode) != null ? _a : member.name, member.decorators, isCore);
   });
   if (decoratedMembers.length > 0) {
-    metaPropDecorators = new WrappedNodeExpr2(ts15.createObjectLiteral(decoratedMembers));
+    metaPropDecorators = new WrappedNodeExpr2(ts18.createObjectLiteral(decoratedMembers));
   }
   return {
     type: new WrappedNodeExpr2(id),
@@ -3280,38 +3684,38 @@ function ctorParameterToMetadata(param, isCore) {
   ];
   if (param.decorators !== null) {
     const ngDecorators = param.decorators.filter((dec) => isAngularDecorator2(dec, isCore)).map((decorator) => decoratorToMetadata(decorator));
-    const value = new WrappedNodeExpr2(ts15.createArrayLiteral(ngDecorators));
+    const value = new WrappedNodeExpr2(ts18.createArrayLiteral(ngDecorators));
     mapEntries.push({ key: "decorators", value, quoted: false });
   }
   return literalMap(mapEntries);
 }
 function classMemberToMetadata(name, decorators, isCore) {
   const ngDecorators = decorators.filter((dec) => isAngularDecorator2(dec, isCore)).map((decorator) => decoratorToMetadata(decorator));
-  const decoratorMeta = ts15.createArrayLiteral(ngDecorators);
-  return ts15.createPropertyAssignment(name, decoratorMeta);
+  const decoratorMeta = ts18.createArrayLiteral(ngDecorators);
+  return ts18.createPropertyAssignment(name, decoratorMeta);
 }
 function decoratorToMetadata(decorator, wrapFunctionsInParens) {
   if (decorator.identifier === null) {
     throw new Error("Illegal state: synthesized decorator cannot be emitted in class metadata.");
   }
   const properties = [
-    ts15.createPropertyAssignment("type", ts15.getMutableClone(decorator.identifier))
+    ts18.createPropertyAssignment("type", ts18.getMutableClone(decorator.identifier))
   ];
   if (decorator.args !== null && decorator.args.length > 0) {
     const args = decorator.args.map((arg) => {
-      const expr = ts15.getMutableClone(arg);
+      const expr = ts18.getMutableClone(arg);
       return wrapFunctionsInParens ? wrapFunctionExpressionsInParens(expr) : expr;
     });
-    properties.push(ts15.createPropertyAssignment("args", ts15.createArrayLiteral(args)));
+    properties.push(ts18.createPropertyAssignment("args", ts18.createArrayLiteral(args)));
   }
-  return ts15.createObjectLiteral(properties, true);
+  return ts18.createObjectLiteral(properties, true);
 }
 function isAngularDecorator2(decorator, isCore) {
   return isCore || decorator.import !== null && decorator.import.from === "@angular/core";
 }
 function removeIdentifierReferences(node, name) {
-  const result = ts15.transform(node, [(context) => (root) => ts15.visitNode(root, function walk(current) {
-    return ts15.isIdentifier(current) && current.text === name ? ts15.createIdentifier(current.text) : ts15.visitEachChild(current, walk, context);
+  const result = ts18.transform(node, [(context) => (root) => ts18.visitNode(root, function walk(current) {
+    return ts18.isIdentifier(current) && current.text === name ? ts18.createIdentifier(current.text) : ts18.visitEachChild(current, walk, context);
   })]);
   return result.transformed[0];
 }
@@ -3536,7 +3940,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, isCore
     throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `Incorrect number of arguments to @${decorator.name} decorator`);
   } else {
     const meta = unwrapExpression(decorator.args[0]);
-    if (!ts16.isObjectLiteralExpression(meta)) {
+    if (!ts19.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, `@${decorator.name} argument must be an object literal`);
     }
     directive = reflectObjectLiteral(meta);
@@ -3647,7 +4051,7 @@ function extractQueryMetadata(exprNode, name, args, propertyName, reflector, eva
   let emitDistinctChangesOnly = emitDistinctChangesOnlyDefaultValue;
   if (args.length === 2) {
     const optionsExpr = unwrapExpression(args[1]);
-    if (!ts16.isObjectLiteralExpression(optionsExpr)) {
+    if (!ts19.isObjectLiteralExpression(optionsExpr)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, optionsExpr, `@${name} options must be an object literal`);
     }
     const options = reflectObjectLiteral(optionsExpr);
@@ -3692,16 +4096,16 @@ function extractQueryMetadata(exprNode, name, args, propertyName, reflector, eva
 }
 function extractQueriesFromDecorator(queryData, reflector, evaluator, isCore) {
   const content = [], view = [];
-  if (!ts16.isObjectLiteralExpression(queryData)) {
+  if (!ts19.isObjectLiteralExpression(queryData)) {
     throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, queryData, "Decorator queries metadata must be an object literal");
   }
   reflectObjectLiteral(queryData).forEach((queryExpr, propertyName) => {
     queryExpr = unwrapExpression(queryExpr);
-    if (!ts16.isNewExpression(queryExpr)) {
+    if (!ts19.isNewExpression(queryExpr)) {
       throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, queryData, "Decorator query metadata must be an instance of a query type");
     }
-    const queryType = ts16.isPropertyAccessExpression(queryExpr.expression) ? queryExpr.expression.name : queryExpr.expression;
-    if (!ts16.isIdentifier(queryType)) {
+    const queryType = ts19.isPropertyAccessExpression(queryExpr.expression) ? queryExpr.expression.name : queryExpr.expression;
+    if (!ts19.isIdentifier(queryType)) {
       throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, queryData, "Decorator query metadata must be an instance of a query type");
     }
     const type = reflector.getImportOfIdentifier(queryType);
@@ -3880,7 +4284,7 @@ var QUERY_TYPES = /* @__PURE__ */ new Set([
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/ng_module.mjs
 import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, CUSTOM_ELEMENTS_SCHEMA, ExternalExpr as ExternalExpr4, FactoryTarget as FactoryTarget2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, NO_ERRORS_SCHEMA, R3Identifiers, WrappedNodeExpr as WrappedNodeExpr4 } from "@angular/compiler";
-import ts17 from "typescript";
+import ts20 from "typescript";
 var NgModuleSymbol = class extends SemanticSymbol {
   constructor() {
     super(...arguments);
@@ -3963,8 +4367,8 @@ var NgModuleDecoratorHandler = class {
     if (decorator.args === null || decorator.args.length > 1) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `Incorrect number of arguments to @NgModule decorator`);
     }
-    const meta = decorator.args.length === 1 ? unwrapExpression(decorator.args[0]) : ts17.createObjectLiteral([]);
-    if (!ts17.isObjectLiteralExpression(meta)) {
+    const meta = decorator.args.length === 1 ? unwrapExpression(decorator.args[0]) : ts20.createObjectLiteral([]);
+    if (!ts20.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@NgModule argument must be an object literal");
     }
     const ngModule = reflectObjectLiteral(meta);
@@ -4255,10 +4659,10 @@ var NgModuleDecoratorHandler = class {
     return type && (this._reflectModuleFromTypeParam(type, node) || this._reflectModuleFromLiteralType(type));
   }
   _reflectModuleFromTypeParam(type, node) {
-    if (!ts17.isTypeReferenceNode(type)) {
+    if (!ts20.isTypeReferenceNode(type)) {
       return null;
     }
-    const typeName = type && (ts17.isIdentifier(type.typeName) && type.typeName || ts17.isQualifiedName(type.typeName) && type.typeName.right) || null;
+    const typeName = type && (ts20.isIdentifier(type.typeName) && type.typeName || ts20.isQualifiedName(type.typeName) && type.typeName.right) || null;
     if (typeName === null) {
       return null;
     }
@@ -4270,7 +4674,7 @@ var NgModuleDecoratorHandler = class {
       return null;
     }
     if (type.typeArguments === void 0 || type.typeArguments.length !== 1) {
-      const parent = ts17.isMethodDeclaration(node) && ts17.isClassDeclaration(node.parent) ? node.parent : null;
+      const parent = ts20.isMethodDeclaration(node) && ts20.isClassDeclaration(node.parent) ? node.parent : null;
       const symbolName = (parent && parent.name ? parent.name.getText() + "." : "") + (node.name ? node.name.getText() : "anonymous");
       throw new FatalDiagnosticError(ErrorCode.NGMODULE_MODULE_WITH_PROVIDERS_MISSING_GENERIC, type, `${symbolName} returns a ModuleWithProviders type without a generic type argument. Please add a generic type argument to the ModuleWithProviders type. If this occurrence is in library code you don't control, please contact the library authors.`);
     }
@@ -4278,13 +4682,13 @@ var NgModuleDecoratorHandler = class {
     return typeNodeToValueExpr(arg);
   }
   _reflectModuleFromLiteralType(type) {
-    if (!ts17.isIntersectionTypeNode(type)) {
+    if (!ts20.isIntersectionTypeNode(type)) {
       return null;
     }
     for (const t of type.types) {
-      if (ts17.isTypeLiteralNode(t)) {
+      if (ts20.isTypeLiteralNode(t)) {
         for (const m of t.members) {
-          const ngModuleType = ts17.isPropertySignature(m) && ts17.isIdentifier(m.name) && m.name.text === "ngModule" && m.type || null;
+          const ngModuleType = ts20.isPropertySignature(m) && ts20.isIdentifier(m.name) && m.name.text === "ngModule" && m.type || null;
           const ngModuleExpression = ngModuleType && typeNodeToValueExpr(ngModuleType);
           if (ngModuleExpression) {
             return ngModuleExpression;
@@ -4645,7 +5049,7 @@ var ComponentDecoratorHandler = class {
     });
   }
   typeCheck(ctx, node, meta) {
-    if (this.typeCheckScopeRegistry === null || !ts18.isClassDeclaration(node)) {
+    if (this.typeCheckScopeRegistry === null || !ts21.isClassDeclaration(node)) {
       return;
     }
     if (meta.isPoisoned && !this.usePoisonedData) {
@@ -4856,17 +5260,17 @@ var ComponentDecoratorHandler = class {
     const metadata = new Map(component);
     if (metadata.has("templateUrl")) {
       metadata.delete("templateUrl");
-      metadata.set("template", ts18.createStringLiteral(template.content));
+      metadata.set("template", ts21.createStringLiteral(template.content));
     }
     if (metadata.has("styleUrls")) {
       metadata.delete("styleUrls");
-      metadata.set("styles", ts18.createArrayLiteral(styles.map((s) => ts18.createStringLiteral(s))));
+      metadata.set("styles", ts21.createArrayLiteral(styles.map((s) => ts21.createStringLiteral(s))));
     }
     const newMetadataFields = [];
     for (const [name, value] of metadata.entries()) {
-      newMetadataFields.push(ts18.createPropertyAssignment(name, value));
+      newMetadataFields.push(ts21.createPropertyAssignment(name, value));
     }
-    return __spreadProps(__spreadValues({}, dec), { args: [ts18.createObjectLiteral(newMetadataFields)] });
+    return __spreadProps(__spreadValues({}, dec), { args: [ts21.createObjectLiteral(newMetadataFields)] });
   }
   _resolveLiteral(decorator) {
     if (this.literalCache.has(decorator)) {
@@ -4876,7 +5280,7 @@ var ComponentDecoratorHandler = class {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `Incorrect number of arguments to @Component decorator`);
     }
     const meta = unwrapExpression(decorator.args[0]);
-    if (!ts18.isObjectLiteralExpression(meta)) {
+    if (!ts21.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, `Decorator argument must be literal.`);
     }
     this.literalCache.set(decorator, meta);
@@ -4903,9 +5307,9 @@ var ComponentDecoratorHandler = class {
   }
   _extractStyleUrlsFromExpression(styleUrlsExpr) {
     const styleUrls = [];
-    if (ts18.isArrayLiteralExpression(styleUrlsExpr)) {
+    if (ts21.isArrayLiteralExpression(styleUrlsExpr)) {
       for (const styleUrlExpr of styleUrlsExpr.elements) {
-        if (ts18.isSpreadElement(styleUrlExpr)) {
+        if (ts21.isSpreadElement(styleUrlExpr)) {
           styleUrls.push(...this._extractStyleUrlsFromExpression(styleUrlExpr.expression));
         } else {
           const styleUrl = this.evaluator.evaluate(styleUrlExpr);
@@ -4937,10 +5341,10 @@ var ComponentDecoratorHandler = class {
   _extractStyleResources(component, containingFile) {
     const styles = /* @__PURE__ */ new Set();
     function stringLiteralElements(array) {
-      return array.elements.filter((e) => ts18.isStringLiteralLike(e));
+      return array.elements.filter((e) => ts21.isStringLiteralLike(e));
     }
     const styleUrlsExpr = component.get("styleUrls");
-    if (styleUrlsExpr !== void 0 && ts18.isArrayLiteralExpression(styleUrlsExpr)) {
+    if (styleUrlsExpr !== void 0 && ts21.isArrayLiteralExpression(styleUrlsExpr)) {
       for (const expression of stringLiteralElements(styleUrlsExpr)) {
         try {
           const resourceUrl = this.resourceLoader.resolve(expression.text, containingFile);
@@ -4950,7 +5354,7 @@ var ComponentDecoratorHandler = class {
       }
     }
     const stylesExpr = component.get("styles");
-    if (stylesExpr !== void 0 && ts18.isArrayLiteralExpression(stylesExpr)) {
+    if (stylesExpr !== void 0 && ts21.isArrayLiteralExpression(stylesExpr)) {
       for (const expression of stringLiteralElements(stylesExpr)) {
         styles.add({ path: null, expression });
       }
@@ -4995,7 +5399,7 @@ var ComponentDecoratorHandler = class {
       let sourceMapping;
       let escapedString = false;
       let sourceMapUrl;
-      if (ts18.isStringLiteral(template.expression) || ts18.isNoSubstitutionTemplateLiteral(template.expression)) {
+      if (ts21.isStringLiteral(template.expression) || ts21.isNoSubstitutionTemplateLiteral(template.expression)) {
         sourceParseRange = getTemplateRange(template.expression);
         sourceStr = template.expression.getSourceFile().text;
         templateContent = template.expression.text;
@@ -5169,7 +5573,7 @@ var ComponentDecoratorHandler = class {
 };
 function getTemplateRange(templateExpr) {
   const startPos = templateExpr.getStart() + 1;
-  const { line, character } = ts18.getLineAndCharacterOfPosition(templateExpr.getSourceFile(), startPos);
+  const { line, character } = ts21.getLineAndCharacterOfPosition(templateExpr.getSourceFile(), startPos);
   return {
     startPos,
     startLine: line,
@@ -5212,7 +5616,7 @@ function checkCustomElementSelectorForErrors(selector) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
-import ts19 from "typescript";
+import ts22 from "typescript";
 var InjectableDecoratorHandler = class {
   constructor(reflector, isCore, strictCtorDeps, injectableRegistry, perf, errorOnDuplicateProv = true) {
     this.reflector = reflector;
@@ -5303,7 +5707,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     };
   } else if (decorator.args.length === 1) {
     const metaNode = decorator.args[0];
-    if (!ts19.isObjectLiteralExpression(metaNode)) {
+    if (!ts22.isObjectLiteralExpression(metaNode)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, `@Injectable argument must be an object literal`);
     }
     const meta = reflectObjectLiteral(metaNode);
@@ -5311,7 +5715,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     let deps = void 0;
     if ((meta.has("useClass") || meta.has("useFactory")) && meta.has("deps")) {
       const depsExpr = meta.get("deps");
-      if (!ts19.isArrayLiteralExpression(depsExpr)) {
+      if (!ts22.isArrayLiteralExpression(depsExpr)) {
         throw new FatalDiagnosticError(ErrorCode.VALUE_NOT_LITERAL, depsExpr, `@Injectable deps metadata must be an inline array`);
       }
       deps = depsExpr.elements.map((dep) => getDep(dep, reflector));
@@ -5393,12 +5797,12 @@ function getDep(dep, reflector) {
     }
     return true;
   }
-  if (ts19.isArrayLiteralExpression(dep)) {
+  if (ts22.isArrayLiteralExpression(dep)) {
     dep.elements.forEach((el) => {
       let isDecorator = false;
-      if (ts19.isIdentifier(el)) {
+      if (ts22.isIdentifier(el)) {
         isDecorator = maybeUpdateDecorator(el, reflector);
-      } else if (ts19.isNewExpression(el) && ts19.isIdentifier(el.expression)) {
+      } else if (ts22.isNewExpression(el) && ts22.isIdentifier(el.expression)) {
         const token = el.arguments && el.arguments.length > 0 && el.arguments[0] || void 0;
         isDecorator = maybeUpdateDecorator(el.expression, reflector, token);
       }
@@ -5412,7 +5816,7 @@ function getDep(dep, reflector) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/pipe.mjs
 import { compileClassMetadata as compileClassMetadata5, compileDeclareClassMetadata as compileDeclareClassMetadata5, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
-import ts20 from "typescript";
+import ts23 from "typescript";
 var PipeSymbol = class extends SemanticSymbol {
   constructor(decl, name) {
     super(decl);
@@ -5467,7 +5871,7 @@ var PipeDecoratorHandler = class {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), "@Pipe must have exactly one argument");
     }
     const meta = unwrapExpression(decorator.args[0]);
-    if (!ts20.isObjectLiteralExpression(meta)) {
+    if (!ts23.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
     }
     const pipe = reflectObjectLiteral(meta);
@@ -5556,6 +5960,15 @@ export {
   CompilationMode,
   HandlerFlags,
   aliasTransformFactory,
+  isShim,
+  copyFileShimData,
+  untagAllTsFiles,
+  retagAllTsFiles,
+  ShimAdapter,
+  FactoryGenerator,
+  generatedFactoryTransform,
+  ShimReferenceTagger,
+  SummaryGenerator,
   TraitState,
   TraitCompiler,
   DtsTransformRegistry,
@@ -5577,4 +5990,5 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FUZ3CSDO.js.map
+// Closure Compiler ignores @suppress and similar if the comment contains @license.
+//# sourceMappingURL=chunk-KBT6VBRD.js.map
