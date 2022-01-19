@@ -6069,7 +6069,7 @@ var NgCompiler = class {
   getDiagnostics() {
     const diagnostics = [];
     diagnostics.push(...this.getNonTemplateDiagnostics(), ...this.getTemplateDiagnostics());
-    if (this.options._extendedTemplateDiagnostics) {
+    if (this.options.strictTemplates) {
       diagnostics.push(...this.getExtendedTemplateDiagnostics());
     }
     return this.addMessageTextDetails(diagnostics);
@@ -7197,4 +7197,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-456MGHXM.js.map
+//# sourceMappingURL=chunk-IFQJGTU3.js.map
