@@ -6077,7 +6077,7 @@ var NgCompiler = class {
   getDiagnosticsForFile(file, optimizeFor) {
     const diagnostics = [];
     diagnostics.push(...this.getNonTemplateDiagnostics().filter((diag) => diag.file === file), ...this.getTemplateDiagnosticsForFile(file, optimizeFor));
-    if (this.options._extendedTemplateDiagnostics) {
+    if (this.options.strictTemplates) {
       diagnostics.push(...this.getExtendedTemplateDiagnostics(file));
     }
     return this.addMessageTextDetails(diagnostics);
@@ -6087,7 +6087,7 @@ var NgCompiler = class {
     const ttc = compilation.templateTypeChecker;
     const diagnostics = [];
     diagnostics.push(...ttc.getDiagnosticsForComponent(component));
-    if (this.options._extendedTemplateDiagnostics) {
+    if (this.options.strictTemplates) {
       const extendedTemplateChecker = compilation.extendedTemplateChecker;
       diagnostics.push(...extendedTemplateChecker.getDiagnosticsForComponent(component));
     }
@@ -7197,4 +7197,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-IFQJGTU3.js.map
+//# sourceMappingURL=chunk-23PK6OJB.js.map
