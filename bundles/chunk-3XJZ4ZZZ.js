@@ -6087,8 +6087,8 @@ var NgCompiler = class {
     const ttc = compilation.templateTypeChecker;
     const diagnostics = [];
     diagnostics.push(...ttc.getDiagnosticsForComponent(component));
-    if (this.options.strictTemplates) {
-      const extendedTemplateChecker = compilation.extendedTemplateChecker;
+    const extendedTemplateChecker = compilation.extendedTemplateChecker;
+    if (this.options.strictTemplates && extendedTemplateChecker) {
       diagnostics.push(...extendedTemplateChecker.getDiagnosticsForComponent(component));
     }
     return this.addMessageTextDetails(diagnostics);
@@ -6362,6 +6362,9 @@ var NgCompiler = class {
     const diagnostics = [];
     const compilation = this.ensureAnalyzed();
     const extendedTemplateChecker = compilation.extendedTemplateChecker;
+    if (!extendedTemplateChecker) {
+      return [];
+    }
     if (sf !== void 0) {
       return compilation.traitCompiler.extendedTemplateCheck(sf, extendedTemplateChecker);
     }
@@ -6436,7 +6439,7 @@ var NgCompiler = class {
       this.currentProgram = program;
     });
     const templateTypeChecker = new TemplateTypeCheckerImpl(this.inputProgram, notifyingDriver, traitCompiler, this.getTypeCheckingConfig(), refEmitter, reflector, this.adapter, this.incrementalCompilation, scopeRegistry, typeCheckScopeRegistry, this.delegatingPerfRecorder);
-    const extendedTemplateChecker = new ExtendedTemplateCheckerImpl(templateTypeChecker, checker, ALL_DIAGNOSTIC_FACTORIES, this.options);
+    const extendedTemplateChecker = this.constructionDiagnostics.length === 0 ? new ExtendedTemplateCheckerImpl(templateTypeChecker, checker, ALL_DIAGNOSTIC_FACTORIES, this.options) : null;
     return {
       isCore,
       traitCompiler,
@@ -7197,4 +7200,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-23PK6OJB.js.map
+//# sourceMappingURL=chunk-3XJZ4ZZZ.js.map
