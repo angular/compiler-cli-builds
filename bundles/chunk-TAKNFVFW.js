@@ -1183,12 +1183,11 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
       name = node.tagName;
       kind = IdentifierKind.Template;
     } else {
-      if (node.name.startsWith(":")) {
-        name = node.name.split(":").pop();
-      } else {
-        name = node.name;
-      }
+      name = node.name;
       kind = IdentifierKind.Element;
+    }
+    if (name.startsWith(":")) {
+      name = name.split(":").pop();
     }
     const sourceSpan = node.startSourceSpan;
     const start = this.getStartLocation(name, sourceSpan);
@@ -7200,4 +7199,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3XJZ4ZZZ.js.map
+//# sourceMappingURL=chunk-TAKNFVFW.js.map
