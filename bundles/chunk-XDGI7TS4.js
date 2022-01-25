@@ -1174,13 +1174,14 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     this.identifiers.add(variableIdentifier);
   }
   elementOrTemplateToIdentifier(node) {
+    var _a;
     if (this.elementAndTemplateIdentifierCache.has(node)) {
       return this.elementAndTemplateIdentifierCache.get(node);
     }
     let name;
     let kind;
     if (node instanceof TmplAstTemplate) {
-      name = node.tagName;
+      name = (_a = node.tagName) != null ? _a : "ng-template";
       kind = IdentifierKind.Template;
     } else {
       name = node.name;
@@ -7199,4 +7200,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TAKNFVFW.js.map
+//# sourceMappingURL=chunk-XDGI7TS4.js.map
