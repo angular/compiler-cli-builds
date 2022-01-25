@@ -77,8 +77,9 @@ export declare function isAngularDts(absPath: AbsoluteFsPath, fs: ReadonlyFileSy
 export declare class EntryPointFileCache {
     private fs;
     private sharedFileCache;
+    private processSourceText;
     private readonly sfCache;
-    constructor(fs: ReadonlyFileSystem, sharedFileCache: SharedFileCache);
+    constructor(fs: ReadonlyFileSystem, sharedFileCache: SharedFileCache, processSourceText: (sourceText: string) => string);
     /**
      * Returns and caches a parsed `ts.SourceFile` for the provided `fileName`. If the `fileName` is
      * cached in the shared file cache, that result is used. Otherwise, the source file is cached
