@@ -15,4 +15,7 @@ import { ComponentMeta } from './context';
  * @param boundTemplate bound template target, which can be used for querying expression targets.
  * @return identifiers in template
  */
-export declare function getTemplateIdentifiers(boundTemplate: BoundTarget<ComponentMeta>): Set<TopLevelIdentifier>;
+export declare function getTemplateIdentifiers(boundTemplate: BoundTarget<ComponentMeta>): {
+    identifiers: Set<TopLevelIdentifier>;
+    errors: Error[];
+};

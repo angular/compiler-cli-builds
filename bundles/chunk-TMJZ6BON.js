@@ -1079,11 +1079,12 @@ var ExpressionVisitor = class extends RecursiveAstVisitor {
     this.boundTemplate = boundTemplate;
     this.targetToIdentifier = targetToIdentifier;
     this.identifiers = [];
+    this.errors = [];
   }
   static getIdentifiers(ast, source, absoluteOffset, boundTemplate, targetToIdentifier) {
     const visitor = new ExpressionVisitor(source, absoluteOffset, boundTemplate, targetToIdentifier);
     visitor.visit(ast);
-    return visitor.identifiers;
+    return { identifiers: visitor.identifiers, errors: visitor.errors };
   }
   visit(ast) {
     ast.visit(this);
@@ -1105,7 +1106,8 @@ var ExpressionVisitor = class extends RecursiveAstVisitor {
       identifierStart = ast.nameSpan.start - this.absoluteOffset;
     }
     if (!this.expressionStr.substring(identifierStart).startsWith(ast.name)) {
-      throw new Error(`Impossible state: "${ast.name}" not found in "${this.expressionStr}" at location ${identifierStart}`);
+      this.errors.push(new Error(`Impossible state: "${ast.name}" not found in "${this.expressionStr}" at location ${identifierStart}`));
+      return;
     }
     const absoluteStart = this.absoluteOffset + identifierStart;
     const span = new AbsoluteSourceSpan(absoluteStart, absoluteStart + ast.name.length);
@@ -1125,6 +1127,7 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     super();
     this.boundTemplate = boundTemplate;
     this.identifiers = /* @__PURE__ */ new Set();
+    this.errors = [];
     this.targetIdentifierCache = /* @__PURE__ */ new Map();
     this.elementAndTemplateIdentifierCache = /* @__PURE__ */ new Map();
   }
@@ -1136,7 +1139,9 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
   }
   visitElement(element) {
     const elementIdentifier = this.elementOrTemplateToIdentifier(element);
-    this.identifiers.add(elementIdentifier);
+    if (elementIdentifier !== null) {
+      this.identifiers.add(elementIdentifier);
+    }
     this.visitAll(element.references);
     this.visitAll(element.inputs);
     this.visitAll(element.attributes);
@@ -1145,7 +1150,9 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
   }
   visitTemplate(template) {
     const templateIdentifier = this.elementOrTemplateToIdentifier(template);
-    this.identifiers.add(templateIdentifier);
+    if (templateIdentifier !== null) {
+      this.identifiers.add(templateIdentifier);
+    }
     this.visitAll(template.variables);
     this.visitAll(template.attributes);
     this.visitAll(template.templateAttrs);
@@ -1156,8 +1163,9 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     if (attribute.valueSpan === void 0) {
       return;
     }
-    const identifiers = ExpressionVisitor.getIdentifiers(attribute.value, attribute.valueSpan.toString(), attribute.valueSpan.start.offset, this.boundTemplate, this.targetToIdentifier.bind(this));
+    const { identifiers, errors } = ExpressionVisitor.getIdentifiers(attribute.value, attribute.valueSpan.toString(), attribute.valueSpan.start.offset, this.boundTemplate, this.targetToIdentifier.bind(this));
     identifiers.forEach((id) => this.identifiers.add(id));
+    this.errors.push(...errors);
   }
   visitBoundEvent(attribute) {
     this.visitExpression(attribute.handler);
@@ -1167,10 +1175,16 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
   }
   visitReference(reference) {
     const referenceIdentifer = this.targetToIdentifier(reference);
+    if (referenceIdentifer === null) {
+      return;
+    }
     this.identifiers.add(referenceIdentifer);
   }
   visitVariable(variable) {
     const variableIdentifier = this.targetToIdentifier(variable);
+    if (variableIdentifier === null) {
+      return;
+    }
     this.identifiers.add(variableIdentifier);
   }
   elementOrTemplateToIdentifier(node) {
@@ -1192,6 +1206,9 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     }
     const sourceSpan = node.startSourceSpan;
     const start = this.getStartLocation(name, sourceSpan);
+    if (start === null) {
+      return null;
+    }
     const absoluteSpan = new AbsoluteSourceSpan(start, start + name.length);
     const attributes = node.attributes.map(({ name: name2, sourceSpan: sourceSpan2 }) => {
       return {
@@ -1222,23 +1239,30 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     }
     const { name, sourceSpan } = node;
     const start = this.getStartLocation(name, sourceSpan);
+    if (start === null) {
+      return null;
+    }
     const span = new AbsoluteSourceSpan(start, start + name.length);
     let identifier;
     if (node instanceof TmplAstReference) {
       const refTarget = this.boundTemplate.getReferenceTarget(node);
       let target = null;
       if (refTarget) {
+        let node2 = null;
+        let directive = null;
         if (refTarget instanceof TmplAstElement || refTarget instanceof TmplAstTemplate) {
-          target = {
-            node: this.elementOrTemplateToIdentifier(refTarget),
-            directive: null
-          };
+          node2 = this.elementOrTemplateToIdentifier(refTarget);
         } else {
-          target = {
-            node: this.elementOrTemplateToIdentifier(refTarget.node),
-            directive: refTarget.directive.ref.node
-          };
+          node2 = this.elementOrTemplateToIdentifier(refTarget.node);
+          directive = refTarget.directive.ref.node;
         }
+        if (node2 === null) {
+          return null;
+        }
+        target = {
+          node: node2,
+          directive
+        };
       }
       identifier = {
         name,
@@ -1259,7 +1283,8 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
   getStartLocation(name, context) {
     const localStr = context.toString();
     if (!localStr.includes(name)) {
-      throw new Error(`Impossible state: "${name}" not found in "${localStr}"`);
+      this.errors.push(new Error(`Impossible state: "${name}" not found in "${localStr}"`));
+      return null;
     }
     return context.start.offset + localStr.indexOf(name);
   }
@@ -1267,8 +1292,9 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     if (ast instanceof ASTWithSource && ast.source !== null) {
       const targetToIdentifier = this.targetToIdentifier.bind(this);
       const absoluteOffset = ast.sourceSpan.start;
-      const identifiers = ExpressionVisitor.getIdentifiers(ast, ast.source, absoluteOffset, this.boundTemplate, targetToIdentifier);
+      const { identifiers, errors } = ExpressionVisitor.getIdentifiers(ast, ast.source, absoluteOffset, this.boundTemplate, targetToIdentifier);
       identifiers.forEach((id) => this.identifiers.add(id));
+      this.errors.push(...errors);
     }
   }
 };
@@ -1277,12 +1303,13 @@ function getTemplateIdentifiers(boundTemplate) {
   if (boundTemplate.target.template !== void 0) {
     visitor.visitAll(boundTemplate.target.template);
   }
-  return visitor.identifiers;
+  return { identifiers: visitor.identifiers, errors: visitor.errors };
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/transform.mjs
 function generateAnalysis(context) {
   const analysis = /* @__PURE__ */ new Map();
+  const analysisErrors = [];
   context.components.forEach(({ declaration, selector, boundTemplate, templateMeta }) => {
     const name = declaration.name.getText();
     const usedComponents = /* @__PURE__ */ new Set();
@@ -1299,12 +1326,14 @@ function generateAnalysis(context) {
     } else {
       templateFile = templateMeta.file;
     }
+    const { identifiers, errors } = getTemplateIdentifiers(boundTemplate);
+    analysisErrors.push(...errors);
     analysis.set(declaration, {
       name,
       selector,
       file: componentFile,
       template: {
-        identifiers: getTemplateIdentifiers(boundTemplate),
+        identifiers,
         usedComponents,
         isInline: templateMeta.isInline,
         file: templateFile
@@ -7200,4 +7229,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XDGI7TS4.js.map
+//# sourceMappingURL=chunk-TMJZ6BON.js.map
