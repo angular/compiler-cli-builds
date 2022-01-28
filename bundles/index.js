@@ -71,7 +71,7 @@ import {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("14.0.0-next.0+1032.sha-c577a1d.with-local-changes");
+var VERSION = new Version("14.0.0-next.0+1033.sha-156fb37.with-local-changes");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
