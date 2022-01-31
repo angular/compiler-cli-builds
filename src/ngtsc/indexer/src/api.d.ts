@@ -120,5 +120,6 @@ export interface IndexedComponent {
         isInline: boolean;
         file: ParseSourceFile;
     };
+    errors: Error[];
 }
 export {};

@@ -1309,7 +1309,6 @@ function getTemplateIdentifiers(boundTemplate) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/transform.mjs
 function generateAnalysis(context) {
   const analysis = /* @__PURE__ */ new Map();
-  const analysisErrors = [];
   context.components.forEach(({ declaration, selector, boundTemplate, templateMeta }) => {
     const name = declaration.name.getText();
     const usedComponents = /* @__PURE__ */ new Set();
@@ -1327,7 +1326,6 @@ function generateAnalysis(context) {
       templateFile = templateMeta.file;
     }
     const { identifiers, errors } = getTemplateIdentifiers(boundTemplate);
-    analysisErrors.push(...errors);
     analysis.set(declaration, {
       name,
       selector,
@@ -1337,7 +1335,8 @@ function generateAnalysis(context) {
         usedComponents,
         isInline: templateMeta.isInline,
         file: templateFile
-      }
+      },
+      errors
     });
   });
   return analysis;
@@ -7229,4 +7228,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TMJZ6BON.js.map
+//# sourceMappingURL=chunk-C5OL7Z5W.js.map
