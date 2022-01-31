@@ -3205,9 +3205,6 @@ var AstTranslator = class {
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
   }
-  visitQuote(ast) {
-    return NULL_AS_ANY;
-  }
   visitSafePropertyRead(ast) {
     let node;
     const receiver = wrapForDiagnostics(this.translate(ast.receiver));
@@ -3346,9 +3343,6 @@ var VeSafeLhsInferenceBugDetector = class {
     return false;
   }
   visitPropertyWrite(ast) {
-    return false;
-  }
-  visitQuote(ast) {
     return false;
   }
   visitSafePropertyRead(ast) {
@@ -7233,4 +7227,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-5H3T4N4M.js.map
+//# sourceMappingURL=chunk-URBFBFJB.js.map
