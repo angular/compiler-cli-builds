@@ -7037,7 +7037,7 @@ function calcProjectFileAndBasePath(project, host = getFileSystem()) {
   return { projectFile, basePath };
 }
 function readConfiguration(project, existingOptions, host = getFileSystem()) {
-  var _a;
+  var _a, _b;
   try {
     const fs = getFileSystem();
     const readConfigFile = (configFile) => ts34.readConfigFile(configFile, (file) => host.readFile(host.resolve(file)));
@@ -7085,7 +7085,7 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
   } catch (e) {
     const errors = [{
       category: ts34.DiagnosticCategory.Error,
-      messageText: e.stack,
+      messageText: (_b = e.stack) != null ? _b : e.message,
       file: void 0,
       start: void 0,
       length: void 0,
@@ -7134,6 +7134,7 @@ function exitCodeFromResult(diags) {
   return diags.some((d) => d.source === "angular" && d.code === UNKNOWN_ERROR_CODE) ? 2 : 1;
 }
 function performCompilation({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics = defaultGatherDiagnostics, customTransformers, emitFlags = EmitFlags.Default, modifiedResourceFiles = null }) {
+  var _a;
   let program;
   let emitResult;
   let allDiagnostics = [];
@@ -7161,7 +7162,7 @@ function performCompilation({ rootNames, options, host, oldProgram, emitCallback
     program = void 0;
     allDiagnostics.push({
       category: ts34.DiagnosticCategory.Error,
-      messageText: e.stack,
+      messageText: (_a = e.stack) != null ? _a : e.message,
       code: UNKNOWN_ERROR_CODE,
       file: void 0,
       start: void 0,
@@ -7227,4 +7228,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-URBFBFJB.js.map
+//# sourceMappingURL=chunk-P2HMUDEX.js.map
