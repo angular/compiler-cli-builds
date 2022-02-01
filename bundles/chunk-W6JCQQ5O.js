@@ -6019,9 +6019,6 @@ var NgCompiler = class {
     this.constructionDiagnostics = [];
     this.nonTemplateDiagnostics = null;
     this.delegatingPerfRecorder = new DelegatingPerfRecorder(this.perfRecorder);
-    if (this.options._extendedTemplateDiagnostics === true && this.options.strictTemplates === false) {
-      throw new Error("The '_extendedTemplateDiagnostics' option requires 'strictTemplates' to also be enabled.");
-    }
     this.constructionDiagnostics.push(...this.adapter.constructionDiagnostics, ...verifyCompatibleTypeCheckOptions(this.options));
     this.currentProgram = inputProgram;
     this.closureCompilerEnabled = !!this.options.annotateForClosureCompiler;
@@ -7228,4 +7225,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-P2HMUDEX.js.map
+//# sourceMappingURL=chunk-W6JCQQ5O.js.map
