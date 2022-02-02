@@ -39,7 +39,20 @@ export declare enum ImportFlags {
      * declaration that is not retained during emit. Including this flag allows to emit references to
      * type-only declarations as used in e.g. template type-checking.
      */
-    AllowTypeImports = 4
+    AllowTypeImports = 4,
+    /**
+     * Indicates that importing from a declaration file using a relative import path is allowed.
+     *
+     * The generated imports should normally use module specifiers that are valid for use in
+     * production code, where arbitrary relative imports into e.g. node_modules are not allowed. For
+     * template type-checking code it is however acceptable to use relative imports, as such files are
+     * never emitted to JS code.
+     *
+     * Non-declaration files have to be contained within a configured `rootDir` so using relative
+     * paths may not be possible for those, hence this flag only applies when importing from a
+     * declaration file.
+     */
+    AllowRelativeDtsImports = 8
 }
 /**
  * An emitter strategy has the ability to indicate which `ts.SourceFile` is being imported by the
@@ -191,8 +204,9 @@ export declare class AbsoluteModuleStrategy implements ReferenceEmitStrategy {
 export declare class LogicalProjectStrategy implements ReferenceEmitStrategy {
     private reflector;
     private logicalFs;
+    private relativePathStrategy;
     constructor(reflector: ReflectionHost, logicalFs: LogicalFileSystem);
-    emit(ref: Reference, context: ts.SourceFile): ReferenceEmitResult | null;
+    emit(ref: Reference, context: ts.SourceFile, importFlags: ImportFlags): ReferenceEmitResult | null;
 }
 /**
  * A `ReferenceEmitStrategy` which constructs relatives paths between `ts.SourceFile`s.

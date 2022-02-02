@@ -34,7 +34,7 @@ import {
   ivyTransformFactory,
   retagAllTsFiles,
   untagAllTsFiles
-} from "./chunk-LMCFGUUV.js";
+} from "./chunk-C44PYKVA.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -79,7 +79,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-QBU7RUKB.js";
+} from "./chunk-XNYP2SFR.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -89,7 +89,7 @@ import {
   getSourceFileOrError,
   join,
   resolve
-} from "./chunk-676MI6WZ.js";
+} from "./chunk-FXU7FMZC.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -2806,11 +2806,11 @@ var Environment = class {
     return translateExpression(ngExpr.expression, this.importManager);
   }
   canReferenceType(ref) {
-    const result = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports);
+    const result = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
     return result.kind === 0;
   }
   referenceType(ref) {
-    const ngExpr = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports);
+    const ngExpr = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
     assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "symbol");
     return translateType(new ExpressionType(ngExpr.expression), this.importManager);
   }
@@ -7231,4 +7231,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4VCZKIWV.js.map
+//# sourceMappingURL=chunk-PJPAHVUO.js.map

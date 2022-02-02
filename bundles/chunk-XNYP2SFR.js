@@ -13,7 +13,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-676MI6WZ.js";
+} from "./chunk-FXU7FMZC.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/util/src/typescript.mjs
 import ts from "typescript";
@@ -347,6 +347,7 @@ var ImportFlags;
   ImportFlags2[ImportFlags2["ForceNewImport"] = 1] = "ForceNewImport";
   ImportFlags2[ImportFlags2["NoAliasing"] = 2] = "NoAliasing";
   ImportFlags2[ImportFlags2["AllowTypeImports"] = 4] = "AllowTypeImports";
+  ImportFlags2[ImportFlags2["AllowRelativeDtsImports"] = 8] = "AllowRelativeDtsImports";
 })(ImportFlags || (ImportFlags = {}));
 function assertSuccessfulReferenceEmit(result, origin, typeKind) {
   if (result.kind === 0) {
@@ -471,11 +472,15 @@ var LogicalProjectStrategy = class {
   constructor(reflector, logicalFs) {
     this.reflector = reflector;
     this.logicalFs = logicalFs;
+    this.relativePathStrategy = new RelativePathStrategy(this.reflector);
   }
-  emit(ref, context) {
+  emit(ref, context, importFlags) {
     const destSf = getSourceFile(ref.node);
     const destPath = this.logicalFs.logicalPathOfSf(destSf);
     if (destPath === null) {
+      if (destSf.isDeclarationFile && importFlags & ImportFlags.AllowRelativeDtsImports) {
+        return this.relativePathStrategy.emit(ref, context);
+      }
       return {
         kind: 1,
         ref,
@@ -1432,4 +1437,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QBU7RUKB.js.map
+//# sourceMappingURL=chunk-XNYP2SFR.js.map

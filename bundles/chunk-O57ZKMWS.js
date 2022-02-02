@@ -14,7 +14,7 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-4VCZKIWV.js";
+} from "./chunk-PJPAHVUO.js";
 import {
   __spreadProps,
   __spreadValues
@@ -379,4 +379,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-B7DFHWJF.js.map
+//# sourceMappingURL=chunk-O57ZKMWS.js.map
