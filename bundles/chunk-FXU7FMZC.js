@@ -244,8 +244,8 @@ var LogicalFileSystem = class {
     return this.logicalPathOfFile(absoluteFromSourceFile(sf));
   }
   logicalPathOfFile(physicalFile) {
-    const canonicalFilePath = this.compilerHost.getCanonicalFileName(physicalFile);
-    if (!this.cache.has(canonicalFilePath)) {
+    if (!this.cache.has(physicalFile)) {
+      const canonicalFilePath = this.compilerHost.getCanonicalFileName(physicalFile);
       let logicalFile = null;
       for (let i = 0; i < this.rootDirs.length; i++) {
         const rootDir = this.rootDirs[i];
@@ -259,9 +259,9 @@ var LogicalFileSystem = class {
           }
         }
       }
-      this.cache.set(canonicalFilePath, logicalFile);
+      this.cache.set(physicalFile, logicalFile);
     }
-    return this.cache.get(canonicalFilePath);
+    return this.cache.get(physicalFile);
   }
   createLogicalProjectPath(file, rootDir) {
     const logicalPath = stripExtension(file.substr(rootDir.length));
@@ -424,4 +424,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-676MI6WZ.js.map
+//# sourceMappingURL=chunk-FXU7FMZC.js.map
