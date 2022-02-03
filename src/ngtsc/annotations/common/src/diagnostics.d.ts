@@ -5,14 +5,22 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/diagnostics" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/common/src/diagnostics" />
 import ts from 'typescript';
-import { FatalDiagnosticError } from '../../diagnostics';
-import { Reference } from '../../imports';
-import { InjectableClassRegistry, MetadataReader } from '../../metadata';
-import { PartialEvaluator, ResolvedValue } from '../../partial_evaluator';
-import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { LocalModuleScopeRegistry } from '../../scope';
+import { FatalDiagnosticError } from '../../../diagnostics';
+import { Reference } from '../../../imports';
+import { InjectableClassRegistry, MetadataReader } from '../../../metadata';
+import { PartialEvaluator, ResolvedValue } from '../../../partial_evaluator';
+import { ClassDeclaration, ReflectionHost } from '../../../reflection';
+import { DeclarationData, LocalModuleScopeRegistry } from '../../../scope';
+/**
+ * Create a `ts.Diagnostic` which indicates the given class is part of the declarations of two or
+ * more NgModules.
+ *
+ * The resulting `ts.Diagnostic` will have a context entry for each NgModule showing the point where
+ * the directive/pipe exists in its `declarations` (if possible).
+ */
+export declare function makeDuplicateDeclarationError(node: ClassDeclaration, data: DeclarationData[], kind: string): ts.Diagnostic;
 /**
  * Creates a `FatalDiagnosticError` for a node that did not evaluate to the expected type. The
  * diagnostic that is created will include details on why the value is incorrect, i.e. it includes

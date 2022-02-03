@@ -5,19 +5,19 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/ng_module" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/ng_module/src/handler" />
 import { Expression, R3ClassMetadata, R3FactoryMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata } from '@angular/compiler';
 import ts from 'typescript';
-import { Reference, ReferenceEmitter } from '../../imports';
-import { SemanticReference, SemanticSymbol } from '../../incremental/semantic_graph';
-import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../metadata';
-import { PartialEvaluator } from '../../partial_evaluator';
-import { PerfRecorder } from '../../perf';
-import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
-import { LocalModuleScopeRegistry } from '../../scope';
-import { FactoryTracker } from '../../shims/api';
-import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
-import { ReferencesRegistry } from './references_registry';
+import { Reference, ReferenceEmitter } from '../../../imports';
+import { SemanticReference, SemanticSymbol } from '../../../incremental/semantic_graph';
+import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../../metadata';
+import { PartialEvaluator } from '../../../partial_evaluator';
+import { PerfRecorder } from '../../../perf';
+import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
+import { LocalModuleScopeRegistry } from '../../../scope';
+import { FactoryTracker } from '../../../shims/api';
+import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../../transform';
+import { ReferencesRegistry } from '../../common';
 export interface NgModuleAnalysis {
     mod: R3NgModuleMetadata;
     inj: R3InjectorMetadata;

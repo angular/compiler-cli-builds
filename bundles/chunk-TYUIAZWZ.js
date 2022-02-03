@@ -9,7 +9,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-XNYP2SFR.js";
+} from "./chunk-QMGQEVL2.js";
 import {
   __spreadProps,
   __spreadValues
@@ -343,7 +343,8 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl) {
       usesOnChanges: metaObj.has("usesOnChanges") ? metaObj.getBoolean("usesOnChanges") : false
     },
     name: typeName,
-    usesInheritance: metaObj.has("usesInheritance") ? metaObj.getBoolean("usesInheritance") : false
+    usesInheritance: metaObj.has("usesInheritance") ? metaObj.getBoolean("usesInheritance") : false,
+    isStandalone: metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : false
   };
 }
 function toInputMapping(value) {
@@ -753,6 +754,7 @@ function toR3PipeMeta(metaObj) {
     throw new FatalLinkerError(typeExpr.expression, "Unsupported type, its name could not be determined");
   }
   const pure = metaObj.has("pure") ? metaObj.getBoolean("pure") : true;
+  const isStandalone = metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : false;
   return {
     name: typeName,
     type: wrapReference(typeExpr.getOpaque()),
@@ -760,7 +762,8 @@ function toR3PipeMeta(metaObj) {
     typeArgumentCount: 0,
     deps: null,
     pipeName: metaObj.getString("name"),
-    pure
+    pure,
+    isStandalone
   };
 }
 
@@ -785,7 +788,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "14.0.0-next.1+9.sha-1aae414.with-local-changes");
+  const LATEST_VERSION_RANGE = getRange("<=", "14.0.0-next.1+12.sha-0072eb4.with-local-changes");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -832,7 +835,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "14.0.0-next.1+9.sha-1aae414.with-local-changes") {
+    if (version === "14.0.0-next.1+12.sha-0072eb4.with-local-changes") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -963,4 +966,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ALKVYGAK.js.map
+//# sourceMappingURL=chunk-TYUIAZWZ.js.map

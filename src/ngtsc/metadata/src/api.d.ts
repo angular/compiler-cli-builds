@@ -106,6 +106,10 @@ export interface DirectiveMeta extends T2DirectiveMeta, DirectiveTypeCheckMeta {
      * Whether the directive is likely a structural directive (injects `TemplateRef`).
      */
     isStructural: boolean;
+    /**
+     * Whether the directive is a standalone entity.
+     */
+    isStandalone: boolean;
 }
 /**
  * Metadata that describes a template guard for one of the directive's inputs.
@@ -132,6 +136,7 @@ export interface PipeMeta {
     ref: Reference<ClassDeclaration>;
     name: string;
     nameExpr: ts.Expression | null;
+    isStandalone: boolean;
 }
 /**
  * Reads metadata for directives, pipes, and modules from a particular source, such as .d.ts files

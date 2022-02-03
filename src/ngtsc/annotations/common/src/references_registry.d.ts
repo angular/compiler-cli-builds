@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/references_registry" />
-import { Reference } from '../../imports';
-import { DeclarationNode } from '../../reflection';
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/common/src/references_registry" />
+import { Reference } from '../../../imports';
+import { DeclarationNode } from '../../../reflection';
 /**
  * Implement this interface if you want DecoratorHandlers to register
  * references that they find in their analysis of the code.

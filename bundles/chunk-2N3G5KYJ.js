@@ -34,7 +34,7 @@ import {
   ivyTransformFactory,
   retagAllTsFiles,
   untagAllTsFiles
-} from "./chunk-C44PYKVA.js";
+} from "./chunk-7C3Q5ZSV.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -79,7 +79,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-XNYP2SFR.js";
+} from "./chunk-QMGQEVL2.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -6430,12 +6430,12 @@ var NgCompiler = class {
     const localMetaRegistry = new LocalMetadataRegistry();
     const localMetaReader = localMetaRegistry;
     const depScopeReader = new MetadataDtsModuleScopeResolver(dtsReader, aliasingHost);
+    const metaReader = new CompoundMetadataReader([localMetaReader, dtsReader]);
     const scopeRegistry = new LocalModuleScopeRegistry(localMetaReader, depScopeReader, refEmitter, aliasingHost);
     const scopeReader = scopeRegistry;
     const semanticDepGraphUpdater = this.incrementalCompilation.semanticDepGraphUpdater;
     const metaRegistry = new CompoundMetadataRegistry([localMetaRegistry, scopeRegistry]);
     const injectableRegistry = new InjectableClassRegistry(reflector);
-    const metaReader = new CompoundMetadataReader([localMetaReader, dtsReader]);
     const typeCheckScopeRegistry = new TypeCheckScopeRegistry(scopeReader, metaReader);
     let referencesRegistry;
     let exportReferenceGraph = null;
@@ -6451,7 +6451,7 @@ var NgCompiler = class {
     const compilationMode = this.options.compilationMode === "partial" && !isCore ? CompilationMode.PARTIAL : CompilationMode.FULL;
     const cycleHandlingStrategy = compilationMode === CompilationMode.FULL ? 0 : 1;
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder),
       new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, isCore, semanticDepGraphUpdater, this.closureCompilerEnabled, false, this.delegatingPerfRecorder),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, scopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder),
       new InjectableDecoratorHandler(reflector, isCore, this.options.strictInjectionParameters || false, injectableRegistry, this.delegatingPerfRecorder),
@@ -7225,4 +7225,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CKFLH7L7.js.map
+//# sourceMappingURL=chunk-2N3G5KYJ.js.map

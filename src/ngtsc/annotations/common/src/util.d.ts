@@ -5,26 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/util" />
-import { Expression, FactoryTarget, ParseSourceSpan, R3CompiledExpression, R3DependencyMetadata, R3FactoryMetadata, R3Reference, Statement, WrappedNodeExpr } from '@angular/compiler';
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/common/src/util" />
+import { Expression, FactoryTarget, ParseSourceSpan, R3CompiledExpression, R3FactoryMetadata, R3Reference, Statement, WrappedNodeExpr } from '@angular/compiler';
 import ts from 'typescript';
-import { Reference, ReferenceEmitter } from '../../imports';
-import { ForeignFunctionResolver, PartialEvaluator } from '../../partial_evaluator';
-import { ClassDeclaration, CtorParameter, Decorator, Import, ImportedTypeValueReference, LocalTypeValueReference, ReflectionHost, TypeValueReference, UnavailableValue } from '../../reflection';
-import { DeclarationData } from '../../scope';
-import { CompileResult } from '../../transform';
-export declare type ConstructorDeps = {
-    deps: R3DependencyMetadata[];
-} | {
-    deps: null;
-    errors: ConstructorDepError[];
-};
-export interface ConstructorDepError {
-    index: number;
-    param: CtorParameter;
-    reason: UnavailableValue;
-}
-export declare function getConstructorDependencies(clazz: ClassDeclaration, reflector: ReflectionHost, isCore: boolean): ConstructorDeps | null;
+import { ImportedFile, ModuleResolver, Reference, ReferenceEmitter } from '../../../imports';
+import { ForeignFunctionResolver, PartialEvaluator } from '../../../partial_evaluator';
+import { ClassDeclaration, Decorator, Import, ImportedTypeValueReference, LocalTypeValueReference, ReflectionHost, TypeValueReference } from '../../../reflection';
+import { CompileResult } from '../../../transform';
 /**
  * Convert a `TypeValueReference` to an `Expression` which refers to the type as a value.
  *
@@ -34,22 +21,6 @@ export declare function getConstructorDependencies(clazz: ClassDeclaration, refl
  */
 export declare function valueReferenceToExpression(valueRef: LocalTypeValueReference | ImportedTypeValueReference): Expression;
 export declare function valueReferenceToExpression(valueRef: TypeValueReference): Expression | null;
-/**
- * Convert `ConstructorDeps` into the `R3DependencyMetadata` array for those deps if they're valid,
- * or into an `'invalid'` signal if they're not.
- *
- * This is a companion function to `validateConstructorDependencies` which accepts invalid deps.
- */
-export declare function unwrapConstructorDependencies(deps: ConstructorDeps | null): R3DependencyMetadata[] | 'invalid' | null;
-export declare function getValidConstructorDependencies(clazz: ClassDeclaration, reflector: ReflectionHost, isCore: boolean): R3DependencyMetadata[] | null;
-/**
- * Validate that `ConstructorDeps` does not have any invalid dependencies and convert them into the
- * `R3DependencyMetadata` array if so, or raise a diagnostic if some deps are invalid.
- *
- * This is a companion function to `unwrapConstructorDependencies` which does not accept invalid
- * deps.
- */
-export declare function validateConstructorDependencies(clazz: ClassDeclaration, deps: ConstructorDeps | null): R3DependencyMetadata[] | null;
 export declare function toR3Reference(origin: ts.Node, valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile, refEmitter: ReferenceEmitter): R3Reference;
 export declare function isAngularCore(decorator: Decorator): decorator is Decorator & {
     import: Import;
@@ -103,14 +74,6 @@ export declare function readBaseClass(node: ClassDeclaration, reflector: Reflect
  */
 export declare function wrapFunctionExpressionsInParens(expression: ts.Expression): ts.Expression;
 /**
- * Create a `ts.Diagnostic` which indicates the given class is part of the declarations of two or
- * more NgModules.
- *
- * The resulting `ts.Diagnostic` will have a context entry for each NgModule showing the point where
- * the directive/pipe exists in its `declarations` (if possible).
- */
-export declare function makeDuplicateDeclarationError(node: ClassDeclaration, data: DeclarationData[], kind: string): ts.Diagnostic;
-/**
  * Resolves the given `rawProviders` into `ClassDeclarations` and returns
  * a set containing those that are known to require a factory definition.
  * @param rawProviders Expression that declared the providers array in the source.
@@ -130,3 +93,4 @@ export declare function createSourceSpan(node: ts.Node): ParseSourceSpan;
  */
 export declare function compileResults(fac: CompileResult, def: R3CompiledExpression, metadataStmt: Statement | null, propName: string): CompileResult[];
 export declare function toFactoryMetadata(meta: Omit<R3FactoryMetadata, 'target'>, target: FactoryTarget): R3FactoryMetadata;
+export declare function resolveImportedFile(moduleResolver: ModuleResolver, importedFile: ImportedFile, expr: Expression, origin: ts.SourceFile): ts.SourceFile | null;

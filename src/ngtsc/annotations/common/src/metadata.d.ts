@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/metadata" />
+/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/common/src/metadata" />
 import { R3ClassMetadata } from '@angular/compiler';
-import { DeclarationNode, Decorator, ReflectionHost } from '../../reflection';
+import { DeclarationNode, Decorator, ReflectionHost } from '../../../reflection';
 /**
  * Given a class declaration, generate a call to `setClassMetadata` with the Angular metadata
  * present on the class or its member fields. An ngDevMode guard is used to allow the call to be
