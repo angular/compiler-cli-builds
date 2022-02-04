@@ -887,7 +887,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "14.0.0-next.1+33.sha-38c03a2.with-local-changes";
+var NGCC_VERSION = "14.0.0-next.1+34.sha-9917152.with-local-changes";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
