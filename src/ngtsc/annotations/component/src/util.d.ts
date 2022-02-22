@@ -9,7 +9,7 @@
 import { AnimationTriggerNames } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../../imports';
-import { ResolvedValue } from '../../../partial_evaluator';
+import { ForeignFunctionResolver, ResolvedValue } from '../../../partial_evaluator';
 import { ClassDeclaration } from '../../../reflection';
 /**
  * Collect the animation names from the static evaluation result.
@@ -18,6 +18,8 @@ import { ClassDeclaration } from '../../../reflection';
  *     statically evaluated.
  */
 export declare function collectAnimationNames(value: ResolvedValue, animationTriggerNames: AnimationTriggerNames): void;
+export declare function isAngularAnimationsReference(reference: Reference, symbolName: string): boolean;
+export declare const animationTriggerResolver: ForeignFunctionResolver;
 export declare function validateAndFlattenComponentImports(imports: ResolvedValue, expr: ts.Expression): {
     imports: Reference<ClassDeclaration>[];
     diagnostics: ts.Diagnostic[];

@@ -1665,7 +1665,7 @@ var NoopReferencesRegistry = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 import { compileClassMetadata as compileClassMetadata3, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, SelectorMatcher, ViewEncapsulation, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
-import ts24 from "typescript";
+import ts25 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
 import ts8 from "typescript";
@@ -5268,6 +5268,7 @@ var ComponentSymbol = class extends DirectiveSymbol {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/util.mjs
+import ts24 from "typescript";
 function collectAnimationNames(value, animationTriggerNames) {
   if (value instanceof Map) {
     const name = value.get("name");
@@ -5284,6 +5285,23 @@ function collectAnimationNames(value, animationTriggerNames) {
     animationTriggerNames.includesDynamicAnimations = true;
   }
 }
+function isAngularAnimationsReference(reference, symbolName) {
+  return reference.ownedByModuleGuess === "@angular/animations" && reference.debugName === symbolName;
+}
+var animationTriggerResolver = (ref, args) => {
+  const animationTriggerMethodName = "trigger";
+  if (!isAngularAnimationsReference(ref, animationTriggerMethodName)) {
+    return null;
+  }
+  const triggerNameExpression = args[0];
+  if (!triggerNameExpression) {
+    return null;
+  }
+  const factory = ts24.factory;
+  return factory.createObjectLiteralExpression([
+    factory.createPropertyAssignment(factory.createIdentifier("name"), triggerNameExpression)
+  ], true);
+};
 function validateAndFlattenComponentImports(imports, expr) {
   const flattened = [];
   if (!Array.isArray(imports)) {
@@ -5428,8 +5446,9 @@ var ComponentDecoratorHandler = class {
     let animations = null;
     let animationTriggerNames = null;
     if (component.has("animations")) {
-      animations = new WrappedNodeExpr7(component.get("animations"));
-      const animationsValue = this.evaluator.evaluate(component.get("animations"));
+      const animationExpression = component.get("animations");
+      animations = new WrappedNodeExpr7(animationExpression);
+      const animationsValue = this.evaluator.evaluate(animationExpression, animationTriggerResolver);
       animationTriggerNames = { includesDynamicAnimations: false, staticTriggerNames: [] };
       collectAnimationNames(animationsValue, animationTriggerNames);
     }
@@ -5640,7 +5659,7 @@ var ComponentDecoratorHandler = class {
     });
   }
   typeCheck(ctx, node, meta) {
-    if (this.typeCheckScopeRegistry === null || !ts24.isClassDeclaration(node)) {
+    if (this.typeCheckScopeRegistry === null || !ts25.isClassDeclaration(node)) {
       return;
     }
     if (meta.isPoisoned && !this.usePoisonedData) {
@@ -5860,7 +5879,7 @@ var ComponentDecoratorHandler = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
-import ts25 from "typescript";
+import ts26 from "typescript";
 var InjectableDecoratorHandler = class {
   constructor(reflector, isCore, strictCtorDeps, injectableRegistry, perf, errorOnDuplicateProv = true) {
     this.reflector = reflector;
@@ -5951,7 +5970,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     };
   } else if (decorator.args.length === 1) {
     const metaNode = decorator.args[0];
-    if (!ts25.isObjectLiteralExpression(metaNode)) {
+    if (!ts26.isObjectLiteralExpression(metaNode)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, `@Injectable argument must be an object literal`);
     }
     const meta = reflectObjectLiteral(metaNode);
@@ -5959,7 +5978,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     let deps = void 0;
     if ((meta.has("useClass") || meta.has("useFactory")) && meta.has("deps")) {
       const depsExpr = meta.get("deps");
-      if (!ts25.isArrayLiteralExpression(depsExpr)) {
+      if (!ts26.isArrayLiteralExpression(depsExpr)) {
         throw new FatalDiagnosticError(ErrorCode.VALUE_NOT_LITERAL, depsExpr, `@Injectable deps metadata must be an inline array`);
       }
       deps = depsExpr.elements.map((dep) => getDep(dep, reflector));
@@ -6041,12 +6060,12 @@ function getDep(dep, reflector) {
     }
     return true;
   }
-  if (ts25.isArrayLiteralExpression(dep)) {
+  if (ts26.isArrayLiteralExpression(dep)) {
     dep.elements.forEach((el) => {
       let isDecorator = false;
-      if (ts25.isIdentifier(el)) {
+      if (ts26.isIdentifier(el)) {
         isDecorator = maybeUpdateDecorator(el, reflector);
-      } else if (ts25.isNewExpression(el) && ts25.isIdentifier(el.expression)) {
+      } else if (ts26.isNewExpression(el) && ts26.isIdentifier(el.expression)) {
         const token = el.arguments && el.arguments.length > 0 && el.arguments[0] || void 0;
         isDecorator = maybeUpdateDecorator(el.expression, reflector, token);
       }
@@ -6060,7 +6079,7 @@ function getDep(dep, reflector) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/pipe.mjs
 import { compileClassMetadata as compileClassMetadata5, compileDeclareClassMetadata as compileDeclareClassMetadata5, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
-import ts26 from "typescript";
+import ts27 from "typescript";
 var PipeSymbol = class extends SemanticSymbol {
   constructor(decl, name) {
     super(decl);
@@ -6115,7 +6134,7 @@ var PipeDecoratorHandler = class {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), "@Pipe must have exactly one argument");
     }
     const meta = unwrapExpression(decorator.args[0]);
-    if (!ts26.isObjectLiteralExpression(meta)) {
+    if (!ts27.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
     }
     const pipe = reflectObjectLiteral(meta);
@@ -6245,4 +6264,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-7C3Q5ZSV.js.map
+//# sourceMappingURL=chunk-A4NZ32JM.js.map
