@@ -12,8 +12,9 @@ import { TemplateDiagnostic, TemplateId } from '../api';
 import { TemplateSourceResolver } from './tcb_util';
 /**
  * Wraps the node in parenthesis such that inserted span comments become attached to the proper
- * node. This is an alias for `ts.createParen` with the benefit that it signifies that the
- * inserted parenthesis are for diagnostic purposes, not for correctness of the rendered TCB code.
+ * node. This is an alias for `ts.factory.createParenthesizedExpression` with the benefit that it
+ * signifies that the inserted parenthesis are for diagnostic purposes, not for correctness of the
+ * rendered TCB code.
  *
  * Note that it is important that nodes and its attached comment are not wrapped into parenthesis
  * by default, as it prevents correct translation of e.g. diagnostics produced for incorrect method
@@ -23,9 +24,9 @@ import { TemplateSourceResolver } from './tcb_util';
 export declare function wrapForDiagnostics(expr: ts.Expression): ts.Expression;
 /**
  * Wraps the node in parenthesis such that inserted span comments become attached to the proper
- * node. This is an alias for `ts.createParen` with the benefit that it signifies that the
- * inserted parenthesis are for use by the type checker, not for correctness of the rendered TCB
- * code.
+ * node. This is an alias for `ts.factory.createParenthesizedExpression` with the benefit that it
+ * signifies that the inserted parenthesis are for use by the type checker, not for correctness of
+ * the rendered TCB code.
  */
 export declare function wrapForTypeChecker(expr: ts.Expression): ts.Expression;
 /**

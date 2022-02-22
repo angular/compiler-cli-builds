@@ -5,7 +5,7 @@
     
 import {
   TypeScriptReflectionHost
-} from "./chunk-7PY7XEFH.js";
+} from "./chunk-AR265E4B.js";
 import {
   __spreadProps,
   __spreadValues
@@ -59,18 +59,18 @@ function extractMetadataFromSingleDecorator(decorator, diagnostics) {
   const expr = decorator.expression;
   switch (expr.kind) {
     case ts2.SyntaxKind.Identifier:
-      metadataProperties.push(ts2.createPropertyAssignment("type", expr));
+      metadataProperties.push(ts2.factory.createPropertyAssignment("type", expr));
       break;
     case ts2.SyntaxKind.CallExpression:
       const call = expr;
-      metadataProperties.push(ts2.createPropertyAssignment("type", call.expression));
+      metadataProperties.push(ts2.factory.createPropertyAssignment("type", call.expression));
       if (call.arguments.length) {
         const args = [];
         for (const arg of call.arguments) {
           args.push(arg);
         }
-        const argsArrayLiteral = ts2.createArrayLiteral(ts2.createNodeArray(args, true));
-        metadataProperties.push(ts2.createPropertyAssignment("args", argsArrayLiteral));
+        const argsArrayLiteral = ts2.factory.createArrayLiteralExpression(ts2.factory.createNodeArray(args, true));
+        metadataProperties.push(ts2.factory.createPropertyAssignment("args", argsArrayLiteral));
       }
       break;
     default:
@@ -84,28 +84,28 @@ function extractMetadataFromSingleDecorator(decorator, diagnostics) {
       });
       break;
   }
-  return ts2.createObjectLiteral(metadataProperties);
+  return ts2.factory.createObjectLiteralExpression(metadataProperties);
 }
 function createCtorParametersClassProperty(diagnostics, entityNameToExpression, ctorParameters, isClosureCompilerEnabled) {
   const params = [];
   for (const ctorParam of ctorParameters) {
     if (!ctorParam.type && ctorParam.decorators.length === 0) {
-      params.push(ts2.createNull());
+      params.push(ts2.factory.createNull());
       continue;
     }
     const paramType = ctorParam.type ? typeReferenceToExpression(entityNameToExpression, ctorParam.type) : void 0;
-    const members = [ts2.createPropertyAssignment("type", paramType || ts2.createIdentifier("undefined"))];
+    const members = [ts2.factory.createPropertyAssignment("type", paramType || ts2.factory.createIdentifier("undefined"))];
     const decorators = [];
     for (const deco of ctorParam.decorators) {
       decorators.push(extractMetadataFromSingleDecorator(deco, diagnostics));
     }
     if (decorators.length) {
-      members.push(ts2.createPropertyAssignment("decorators", ts2.createArrayLiteral(decorators)));
+      members.push(ts2.factory.createPropertyAssignment("decorators", ts2.factory.createArrayLiteralExpression(decorators)));
     }
-    params.push(ts2.createObjectLiteral(members));
+    params.push(ts2.factory.createObjectLiteralExpression(members));
   }
-  const initializer = ts2.createArrowFunction(void 0, void 0, [], void 0, ts2.createToken(ts2.SyntaxKind.EqualsGreaterThanToken), ts2.createArrayLiteral(params, true));
-  const ctorProp = ts2.createProperty(void 0, [ts2.createToken(ts2.SyntaxKind.StaticKeyword)], "ctorParameters", void 0, void 0, initializer);
+  const initializer = ts2.factory.createArrowFunction(void 0, void 0, [], void 0, ts2.factory.createToken(ts2.SyntaxKind.EqualsGreaterThanToken), ts2.factory.createArrayLiteralExpression(params, true));
+  const ctorProp = ts2.factory.createPropertyDeclaration(void 0, [ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword)], "ctorParameters", void 0, void 0, initializer);
   if (isClosureCompilerEnabled) {
     ts2.setSyntheticLeadingComments(ctorProp, [
       {
@@ -135,23 +135,23 @@ function typeReferenceToExpression(entityNameToExpression, node) {
   switch (kind) {
     case ts2.SyntaxKind.FunctionType:
     case ts2.SyntaxKind.ConstructorType:
-      return ts2.createIdentifier("Function");
+      return ts2.factory.createIdentifier("Function");
     case ts2.SyntaxKind.ArrayType:
     case ts2.SyntaxKind.TupleType:
-      return ts2.createIdentifier("Array");
+      return ts2.factory.createIdentifier("Array");
     case ts2.SyntaxKind.TypePredicate:
     case ts2.SyntaxKind.TrueKeyword:
     case ts2.SyntaxKind.FalseKeyword:
     case ts2.SyntaxKind.BooleanKeyword:
-      return ts2.createIdentifier("Boolean");
+      return ts2.factory.createIdentifier("Boolean");
     case ts2.SyntaxKind.StringLiteral:
     case ts2.SyntaxKind.StringKeyword:
-      return ts2.createIdentifier("String");
+      return ts2.factory.createIdentifier("String");
     case ts2.SyntaxKind.ObjectKeyword:
-      return ts2.createIdentifier("Object");
+      return ts2.factory.createIdentifier("Object");
     case ts2.SyntaxKind.NumberKeyword:
     case ts2.SyntaxKind.NumericLiteral:
-      return ts2.createIdentifier("Number");
+      return ts2.factory.createIdentifier("Number");
     case ts2.SyntaxKind.TypeReference:
       const typeRef = node;
       return entityNameToExpression(typeRef.typeName);
@@ -184,19 +184,19 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
     ]);
   }
   function createDecoratorClassProperty(decoratorList) {
-    const modifier = ts2.createToken(ts2.SyntaxKind.StaticKeyword);
-    const initializer = ts2.createArrayLiteral(decoratorList, true);
-    const prop = ts2.createProperty(void 0, [modifier], "decorators", void 0, void 0, initializer);
+    const modifier = ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword);
+    const initializer = ts2.factory.createArrayLiteralExpression(decoratorList, true);
+    const prop = ts2.factory.createPropertyDeclaration(void 0, [modifier], "decorators", void 0, void 0, initializer);
     addJSDocTypeAnnotation(prop, DECORATOR_INVOCATION_JSDOC_TYPE);
     return prop;
   }
   function createPropDecoratorsClassProperty(diagnostics2, properties) {
     const entries = [];
     for (const [name, decorators] of properties.entries()) {
-      entries.push(ts2.createPropertyAssignment(name, ts2.createArrayLiteral(decorators.map((deco) => extractMetadataFromSingleDecorator(deco, diagnostics2)))));
+      entries.push(ts2.factory.createPropertyAssignment(name, ts2.factory.createArrayLiteralExpression(decorators.map((deco) => extractMetadataFromSingleDecorator(deco, diagnostics2)))));
     }
-    const initializer = ts2.createObjectLiteral(entries, true);
-    const prop = ts2.createProperty(void 0, [ts2.createToken(ts2.SyntaxKind.StaticKeyword)], "propDecorators", void 0, void 0, initializer);
+    const initializer = ts2.factory.createObjectLiteralExpression(entries, true);
+    const prop = ts2.factory.createPropertyDeclaration(void 0, [ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword)], "propDecorators", void 0, void 0, initializer);
     addJSDocTypeAnnotation(prop, `!Object<string, ${DECORATOR_INVOCATION_JSDOC_TYPE}>`);
     return prop;
   }
@@ -212,7 +212,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         if (containerExpr === void 0) {
           return void 0;
         }
-        return ts2.createPropertyAccess(containerExpr, name.right);
+        return ts2.factory.createPropertyAccessExpression(containerExpr, name.right);
       }
       const decl = symbol.declarations[0];
       if (isAliasImportDeclaration(decl)) {
@@ -251,7 +251,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
       }
       const name = element.name.text;
       const mutable = ts2.getMutableClone(element);
-      mutable.decorators = decoratorsToKeep.length ? ts2.setTextRange(ts2.createNodeArray(decoratorsToKeep), mutable.decorators) : void 0;
+      mutable.decorators = decoratorsToKeep.length ? ts2.setTextRange(ts2.factory.createNodeArray(decoratorsToKeep), mutable.decorators) : void 0;
       return [name, mutable, toLower];
     }
     function transformConstructor(ctor) {
@@ -275,10 +275,10 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
           paramInfo.type = param.type;
         }
         parametersInfo.push(paramInfo);
-        const newParam = ts2.updateParameter(param, decoratorsToKeep.length ? decoratorsToKeep : void 0, param.modifiers, param.dotDotDotToken, param.name, param.questionToken, param.type, param.initializer);
+        const newParam = ts2.factory.updateParameterDeclaration(param, decoratorsToKeep.length ? decoratorsToKeep : void 0, param.modifiers, param.dotDotDotToken, param.name, param.questionToken, param.type, param.initializer);
         newParameters.push(newParam);
       }
-      const updated = ts2.updateConstructor(ctor, ctor.decorators, ctor.modifiers, newParameters, ctor.body);
+      const updated = ts2.factory.updateConstructorDeclaration(ctor, ctor.decorators, ctor.modifiers, newParameters, ctor.body);
       return [updated, parametersInfo];
     }
     function transformClassDeclaration(classDecl) {
@@ -338,8 +338,8 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
       if (decoratedProperties.size) {
         newMembers.push(createPropDecoratorsClassProperty(diagnostics, decoratedProperties));
       }
-      const members = ts2.setTextRange(ts2.createNodeArray(newMembers, classDecl.members.hasTrailingComma), classDecl.members);
-      return ts2.updateClassDeclaration(classDecl, decoratorsToKeep.size ? Array.from(decoratorsToKeep) : void 0, classDecl.modifiers, classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
+      const members = ts2.setTextRange(ts2.factory.createNodeArray(newMembers, classDecl.members.hasTrailingComma), classDecl.members);
+      return ts2.factory.updateClassDeclaration(classDecl, decoratorsToKeep.size ? Array.from(decoratorsToKeep) : void 0, classDecl.modifiers, classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
     }
     function decoratorDownlevelVisitor(node) {
       if (ts2.isClassDeclaration(node)) {
@@ -379,4 +379,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-A5PL3TE6.js.map
+//# sourceMappingURL=chunk-3MNDX4LL.js.map

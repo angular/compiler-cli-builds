@@ -10,7 +10,7 @@ import {
   MetadataDtsModuleScopeResolver,
   TypeCheckScopeRegistry,
   readConfiguration
-} from "./chunk-2DNG655A.js";
+} from "./chunk-O6MYVXDE.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -31,7 +31,7 @@ import {
   TraitState,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-A4NZ32JM.js";
+} from "./chunk-26T3CJIJ.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -42,7 +42,7 @@ import {
   isNamedFunctionDeclaration,
   isNamedVariableDeclaration,
   reflectObjectLiteral
-} from "./chunk-7PY7XEFH.js";
+} from "./chunk-AR265E4B.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -71,7 +71,7 @@ import {
   translateStatement,
   translateType,
   validateAndRewriteCoreSymbol
-} from "./chunk-QMGQEVL2.js";
+} from "./chunk-5RC6M6GX.js";
 import {
   LogicalFileSystem,
   NgtscCompilerHost,
@@ -2916,7 +2916,7 @@ function createDirectiveDecorator(clazz, metadata) {
     if (metadata.exportAs !== null) {
       metaArgs.push(property("exportAs", metadata.exportAs.join(", ")));
     }
-    args.push(reifySourceFile(ts13.createObjectLiteral(metaArgs)));
+    args.push(reifySourceFile(ts13.factory.createObjectLiteralExpression(metaArgs)));
   }
   return {
     name: "Directive",
@@ -2944,7 +2944,7 @@ function createComponentDecorator(clazz, metadata) {
     node: null,
     synthesizedFor: clazz.name,
     args: [
-      reifySourceFile(ts13.createObjectLiteral(metaArgs))
+      reifySourceFile(ts13.factory.createObjectLiteralExpression(metaArgs))
     ]
   };
 }
@@ -2959,7 +2959,7 @@ function createInjectableDecorator(clazz) {
   };
 }
 function property(name, value) {
-  return ts13.createPropertyAssignment(name, ts13.createStringLiteral(value));
+  return ts13.factory.createPropertyAssignment(name, ts13.factory.createStringLiteral(value));
 }
 var EMPTY_SF = ts13.createSourceFile("(empty)", "", ts13.ScriptTarget.Latest);
 function reifySourceFile(expr) {
@@ -5141,4 +5141,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-LGFJOKHN.js.map
+//# sourceMappingURL=chunk-NOHUA2VC.js.map

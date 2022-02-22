@@ -13,7 +13,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-7PY7XEFH.js";
+} from "./chunk-AR265E4B.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -35,7 +35,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-QMGQEVL2.js";
+} from "./chunk-5RC6M6GX.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -188,7 +188,7 @@ var parensWrapperTransformerFactory = (context) => {
   const visitor = (node) => {
     const visited = ts.visitEachChild(node, visitor, context);
     if (ts.isArrowFunction(visited) || ts.isFunctionExpression(visited)) {
-      return ts.createParen(visited);
+      return ts.factory.createParenthesizedExpression(visited);
     }
     return visited;
   };
@@ -1315,7 +1315,7 @@ function getConstructorDependencies(clazz, reflector, isCore) {
         if (ts4.isStringLiteralLike(attributeName)) {
           attributeNameType = new LiteralExpr(attributeName.text);
         } else {
-          attributeNameType = new WrappedNodeExpr2(ts4.createKeywordTypeNode(ts4.SyntaxKind.UnknownKeyword));
+          attributeNameType = new WrappedNodeExpr2(ts4.factory.createKeywordTypeNode(ts4.SyntaxKind.UnknownKeyword));
         }
       } else {
         throw new FatalDiagnosticError(ErrorCode.DECORATOR_UNEXPECTED, Decorator.nodeForError(dec), `Unexpected decorator ${name} on parameter.`);
@@ -1585,7 +1585,7 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
   if (ngClassDecorators.length === 0) {
     return null;
   }
-  const metaDecorators = new WrappedNodeExpr3(ts7.createArrayLiteral(ngClassDecorators));
+  const metaDecorators = new WrappedNodeExpr3(ts7.factory.createArrayLiteralExpression(ngClassDecorators));
   let metaCtorParameters = null;
   const classCtorParameters = reflection.getConstructorParameters(clazz);
   if (classCtorParameters !== null) {
@@ -1605,7 +1605,7 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
     return classMemberToMetadata((_a = member.nameNode) != null ? _a : member.name, member.decorators, isCore);
   });
   if (decoratedMembers.length > 0) {
-    metaPropDecorators = new WrappedNodeExpr3(ts7.createObjectLiteral(decoratedMembers));
+    metaPropDecorators = new WrappedNodeExpr3(ts7.factory.createObjectLiteralExpression(decoratedMembers));
   }
   return {
     type: new WrappedNodeExpr3(id),
@@ -1621,38 +1621,38 @@ function ctorParameterToMetadata(param, isCore) {
   ];
   if (param.decorators !== null) {
     const ngDecorators = param.decorators.filter((dec) => isAngularDecorator2(dec, isCore)).map((decorator) => decoratorToMetadata(decorator));
-    const value = new WrappedNodeExpr3(ts7.createArrayLiteral(ngDecorators));
+    const value = new WrappedNodeExpr3(ts7.factory.createArrayLiteralExpression(ngDecorators));
     mapEntries.push({ key: "decorators", value, quoted: false });
   }
   return literalMap(mapEntries);
 }
 function classMemberToMetadata(name, decorators, isCore) {
   const ngDecorators = decorators.filter((dec) => isAngularDecorator2(dec, isCore)).map((decorator) => decoratorToMetadata(decorator));
-  const decoratorMeta = ts7.createArrayLiteral(ngDecorators);
-  return ts7.createPropertyAssignment(name, decoratorMeta);
+  const decoratorMeta = ts7.factory.createArrayLiteralExpression(ngDecorators);
+  return ts7.factory.createPropertyAssignment(name, decoratorMeta);
 }
 function decoratorToMetadata(decorator, wrapFunctionsInParens) {
   if (decorator.identifier === null) {
     throw new Error("Illegal state: synthesized decorator cannot be emitted in class metadata.");
   }
   const properties = [
-    ts7.createPropertyAssignment("type", ts7.getMutableClone(decorator.identifier))
+    ts7.factory.createPropertyAssignment("type", ts7.getMutableClone(decorator.identifier))
   ];
   if (decorator.args !== null && decorator.args.length > 0) {
     const args = decorator.args.map((arg) => {
       const expr = ts7.getMutableClone(arg);
       return wrapFunctionsInParens ? wrapFunctionExpressionsInParens(expr) : expr;
     });
-    properties.push(ts7.createPropertyAssignment("args", ts7.createArrayLiteral(args)));
+    properties.push(ts7.factory.createPropertyAssignment("args", ts7.factory.createArrayLiteralExpression(args)));
   }
-  return ts7.createObjectLiteral(properties, true);
+  return ts7.factory.createObjectLiteralExpression(properties, true);
 }
 function isAngularDecorator2(decorator, isCore) {
   return isCore || decorator.import !== null && decorator.import.from === "@angular/core";
 }
 function removeIdentifierReferences(node, name) {
   const result = ts7.transform(node, [(context) => (root) => ts7.visitNode(root, function walk(current) {
-    return ts7.isIdentifier(current) && current.text === name ? ts7.createIdentifier(current.text) : ts7.visitEachChild(current, walk, context);
+    return ts7.isIdentifier(current) && current.text === name ? ts7.factory.createIdentifier(current.text) : ts7.visitEachChild(current, walk, context);
   })]);
   return result.transformed[0];
 }
@@ -2464,10 +2464,10 @@ function aliasTransformFactory(exportStatements) {
       }
       const statements = [...file.statements];
       exportStatements.get(file.fileName).forEach(([moduleName, symbolName], aliasName) => {
-        const stmt = ts12.createExportDeclaration(void 0, void 0, ts12.createNamedExports([createExportSpecifier(symbolName, aliasName)]), ts12.createStringLiteral(moduleName));
+        const stmt = ts12.factory.createExportDeclaration(void 0, void 0, false, ts12.createNamedExports([createExportSpecifier(symbolName, aliasName)]), ts12.factory.createStringLiteral(moduleName));
         statements.push(stmt);
       });
-      return ts12.updateSourceFileNode(file, statements);
+      return ts12.factory.updateSourceFile(file, statements);
     };
   };
 }
@@ -2719,7 +2719,7 @@ function transformFactorySourceFile(factoryMap, context, importRewriter, file) {
     if (ts14.isImportDeclaration(stmt) && ts14.isStringLiteral(stmt.moduleSpecifier) && stmt.moduleSpecifier.text === "@angular/core") {
       const rewrittenModuleSpecifier = importRewriter.rewriteSpecifier("@angular/core", sourceFilePath);
       if (rewrittenModuleSpecifier !== stmt.moduleSpecifier.text) {
-        transformedStatements.push(ts14.updateImportDeclaration(stmt, stmt.decorators, stmt.modifiers, stmt.importClause, ts14.createStringLiteral(rewrittenModuleSpecifier), void 0));
+        transformedStatements.push(ts14.factory.updateImportDeclaration(stmt, stmt.decorators, stmt.modifiers, stmt.importClause, ts14.factory.createStringLiteral(rewrittenModuleSpecifier), void 0));
         if (stmt.importClause !== void 0 && stmt.importClause.namedBindings !== void 0 && ts14.isNamespaceImport(stmt.importClause.namedBindings)) {
           coreImportIdentifiers.add(stmt.importClause.namedBindings.name.text);
         }
@@ -2750,14 +2750,14 @@ function transformFactorySourceFile(factoryMap, context, importRewriter, file) {
   if (!transformedStatements.some(ts14.isVariableStatement) && nonEmptyExport !== null) {
     transformedStatements.push(nonEmptyExport);
   }
-  file = ts14.updateSourceFileNode(file, transformedStatements);
+  file = ts14.factory.updateSourceFile(file, transformedStatements);
   if (coreImportIdentifiers.size > 0) {
     const visit2 = (node) => {
       node = ts14.visitEachChild(node, (child) => visit2(child), context);
       if (ts14.isPropertyAccessExpression(node) && ts14.isIdentifier(node.expression) && coreImportIdentifiers.has(node.expression.text)) {
         const rewrittenSymbol = importRewriter.rewriteSymbol(node.name.text, "@angular/core");
         if (rewrittenSymbol !== node.name.text) {
-          const updated = ts14.updatePropertyAccess(node, node.expression, ts14.createIdentifier(rewrittenSymbol));
+          const updated = ts14.factory.updatePropertyAccessExpression(node, node.expression, ts14.factory.createIdentifier(rewrittenSymbol));
           node = updated;
         }
       }
@@ -2788,15 +2788,15 @@ function getFileoverviewComment(sourceFile) {
   return commentText;
 }
 function wrapInNoSideEffects(expr) {
-  const noSideEffects = ts14.createPropertyAccess(ts14.createIdentifier("i0"), "\u0275noSideEffects");
-  return ts14.createCall(noSideEffects, [], [
-    ts14.createFunctionExpression([], void 0, void 0, [], [], void 0, ts14.createBlock([
-      ts14.createReturn(expr)
+  const noSideEffects = ts14.factory.createPropertyAccessExpression(ts14.factory.createIdentifier("i0"), "\u0275noSideEffects");
+  return ts14.factory.createCallExpression(noSideEffects, [], [
+    ts14.factory.createFunctionExpression([], void 0, void 0, [], [], void 0, ts14.factory.createBlock([
+      ts14.factory.createReturnStatement(expr)
     ]))
   ]);
 }
 function updateInitializers(stmt, update) {
-  return ts14.updateVariableStatement(stmt, stmt.modifiers, ts14.updateVariableDeclarationList(stmt.declarationList, stmt.declarationList.declarations.map((decl) => ts14.updateVariableDeclaration(decl, decl.name, decl.type, update(decl.initializer)))));
+  return ts14.factory.updateVariableStatement(stmt, stmt.modifiers, ts14.factory.updateVariableDeclarationList(stmt.declarationList, stmt.declarationList.declarations.map((decl) => ts14.updateVariableDeclaration(decl, decl.name, decl.type, update(decl.initializer)))));
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/reference_tagger.mjs
@@ -3375,17 +3375,17 @@ import ts18 from "typescript";
 import ts17 from "typescript";
 function addImports(importManager, sf, extraStatements = []) {
   const addedImports = importManager.getAllImports(sf.fileName).map((i) => {
-    const qualifier = ts17.createIdentifier(i.qualifier.text);
-    const importClause = ts17.createImportClause(void 0, ts17.createNamespaceImport(qualifier));
-    const decl = ts17.createImportDeclaration(void 0, void 0, importClause, ts17.createLiteral(i.specifier));
+    const qualifier = ts17.factory.createIdentifier(i.qualifier.text);
+    const importClause = ts17.factory.createImportClause(false, void 0, ts17.factory.createNamespaceImport(qualifier));
+    const decl = ts17.factory.createImportDeclaration(void 0, void 0, importClause, ts17.factory.createStringLiteral(i.specifier));
     ts17.setOriginalNode(i.qualifier, decl);
     return decl;
   });
   const existingImports = sf.statements.filter((stmt) => isImportStatement(stmt));
   const body = sf.statements.filter((stmt) => !isImportStatement(stmt));
   if (addedImports.length > 0) {
-    const fileoverviewAnchorStmt = ts17.createNotEmittedStatement(sf);
-    return ts17.updateSourceFileNode(sf, ts17.createNodeArray([
+    const fileoverviewAnchorStmt = ts17.factory.createNotEmittedStatement(sf);
+    return ts17.factory.updateSourceFile(sf, ts17.factory.createNodeArray([
       fileoverviewAnchorStmt,
       ...existingImports,
       ...addedImports,
@@ -3483,7 +3483,7 @@ var DtsTransformer = class {
       }
     }
     if (elementsChanged && clazz === newClazz) {
-      newClazz = ts18.updateClassDeclaration(clazz, clazz.decorators, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, elements);
+      newClazz = ts18.factory.updateClassDeclaration(clazz, clazz.decorators, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, elements);
     }
     return newClazz;
   }
@@ -3511,12 +3511,12 @@ var IvyDeclarationDtsTransform = class {
     }
     const fields = this.declarationFields.get(original);
     const newMembers = fields.map((decl) => {
-      const modifiers = [ts18.createModifier(ts18.SyntaxKind.StaticKeyword)];
+      const modifiers = [ts18.factory.createModifier(ts18.SyntaxKind.StaticKeyword)];
       const typeRef = translateType(decl.type, imports);
       markForEmitAsSingleLine(typeRef);
-      return ts18.createProperty(void 0, modifiers, decl.name, void 0, typeRef, void 0);
+      return ts18.factory.createPropertyDeclaration(void 0, modifiers, decl.name, void 0, typeRef, void 0);
     });
-    return ts18.updateClassDeclaration(clazz, clazz.decorators, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, [...members, ...newMembers]);
+    return ts18.factory.updateClassDeclaration(clazz, clazz.decorators, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, [...members, ...newMembers]);
   }
 };
 function markForEmitAsSingleLine(node) {
@@ -3581,7 +3581,7 @@ var Visitor = class {
         this._after.delete(stmt);
       }
     });
-    clone.statements = ts19.createNodeArray(newStatements, node.statements.hasTrailingComma);
+    clone.statements = ts19.factory.createNodeArray(newStatements, node.statements.hasTrailingComma);
     return clone;
   }
 };
@@ -3639,14 +3639,14 @@ var IvyTransformationVisitor = class extends Visitor {
     const members = [...node.members];
     for (const field of this.classCompilationMap.get(node)) {
       const exprNode = translateExpression(field.initializer, this.importManager, translateOptions);
-      const property = ts20.createProperty(void 0, [ts20.createToken(ts20.SyntaxKind.StaticKeyword)], field.name, void 0, void 0, exprNode);
+      const property = ts20.factory.createPropertyDeclaration(void 0, [ts20.factory.createToken(ts20.SyntaxKind.StaticKeyword)], field.name, void 0, void 0, exprNode);
       if (this.isClosureCompilerEnabled) {
         ts20.addSyntheticLeadingComment(property, ts20.SyntaxKind.MultiLineCommentTrivia, "* @nocollapse ", false);
       }
       field.statements.map((stmt) => translateStatement(stmt, this.importManager, translateOptions)).forEach((stmt) => statements.push(stmt));
       members.push(property);
     }
-    node = ts20.updateClassDeclaration(node, maybeFilterDecorator(node.decorators, this.compilation.decoratorsFor(node)), node.modifiers, node.name, node.typeParameters, node.heritageClauses || [], members.map((member) => this._stripAngularDecorators(member)));
+    node = ts20.factory.updateClassDeclaration(node, maybeFilterDecorator(node.decorators, this.compilation.decoratorsFor(node)), node.modifiers, node.name, node.typeParameters, node.heritageClauses || [], members.map((member) => this._stripAngularDecorators(member)));
     return { node, after: statements };
   }
   _angularCoreDecorators(decl) {
@@ -3675,25 +3675,25 @@ var IvyTransformationVisitor = class extends Visitor {
     if (filtered.length === 0) {
       return void 0;
     }
-    const array = ts20.createNodeArray(filtered);
+    const array = ts20.factory.createNodeArray(filtered);
     array.pos = node.decorators.pos;
     array.end = node.decorators.end;
     return array;
   }
   _stripAngularDecorators(node) {
     if (ts20.isParameter(node)) {
-      node = ts20.updateParameter(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.dotDotDotToken, node.name, node.questionToken, node.type, node.initializer);
+      node = ts20.factory.updateParameterDeclaration(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.dotDotDotToken, node.name, node.questionToken, node.type, node.initializer);
     } else if (ts20.isMethodDeclaration(node) && node.decorators !== void 0) {
-      node = ts20.updateMethod(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
+      node = ts20.factory.updateMethodDeclaration(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
     } else if (ts20.isPropertyDeclaration(node) && node.decorators !== void 0) {
-      node = ts20.updateProperty(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.questionToken, node.type, node.initializer);
+      node = ts20.factory.updatePropertyDeclaration(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.questionToken, node.type, node.initializer);
     } else if (ts20.isGetAccessor(node)) {
-      node = ts20.updateGetAccessor(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.parameters, node.type, node.body);
+      node = ts20.factory.updateGetAccessorDeclaration(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.parameters, node.type, node.body);
     } else if (ts20.isSetAccessor(node)) {
-      node = ts20.updateSetAccessor(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.parameters, node.body);
+      node = ts20.factory.updateSetAccessorDeclaration(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.parameters, node.body);
     } else if (ts20.isConstructorDeclaration(node)) {
       const parameters = node.parameters.map((param) => this._stripAngularDecorators(param));
-      node = ts20.updateConstructor(node, node.decorators, node.modifiers, parameters, node.body);
+      node = ts20.factory.updateConstructorDeclaration(node, node.decorators, node.modifiers, parameters, node.body);
     }
     return node;
   }
@@ -3757,7 +3757,7 @@ function maybeFilterDecorator(decorators, toRemove) {
   if (filtered.length === 0) {
     return void 0;
   }
-  return ts20.createNodeArray(filtered);
+  return ts20.factory.createNodeArray(filtered);
 }
 function isFromAngularCore(decorator) {
   return decorator.import !== null && decorator.import.from === "@angular/core";
@@ -4439,7 +4439,7 @@ var NgModuleDecoratorHandler = class {
     if (decorator.args === null || decorator.args.length > 1) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `Incorrect number of arguments to @NgModule decorator`);
     }
-    const meta = decorator.args.length === 1 ? unwrapExpression(decorator.args[0]) : ts22.createObjectLiteral([]);
+    const meta = decorator.args.length === 1 ? unwrapExpression(decorator.args[0]) : ts22.factory.createObjectLiteralExpression([]);
     if (!ts22.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@NgModule argument must be an object literal");
     }
@@ -5044,17 +5044,17 @@ function transformDecoratorToInlineResources(dec, component, styles, template) {
   const metadata = new Map(component);
   if (metadata.has("templateUrl")) {
     metadata.delete("templateUrl");
-    metadata.set("template", ts23.createStringLiteral(template.content));
+    metadata.set("template", ts23.factory.createStringLiteral(template.content));
   }
   if (metadata.has("styleUrls")) {
     metadata.delete("styleUrls");
-    metadata.set("styles", ts23.createArrayLiteral(styles.map((s) => ts23.createStringLiteral(s))));
+    metadata.set("styles", ts23.factory.createArrayLiteralExpression(styles.map((s) => ts23.factory.createStringLiteral(s))));
   }
   const newMetadataFields = [];
   for (const [name, value] of metadata.entries()) {
-    newMetadataFields.push(ts23.createPropertyAssignment(name, value));
+    newMetadataFields.push(ts23.factory.createPropertyAssignment(name, value));
   }
-  return __spreadProps(__spreadValues({}, dec), { args: [ts23.createObjectLiteral(newMetadataFields)] });
+  return __spreadProps(__spreadValues({}, dec), { args: [ts23.factory.createObjectLiteralExpression(newMetadataFields)] });
 }
 function extractComponentStyleUrls(evaluator, component) {
   if (!component.has("styleUrls")) {
@@ -6264,4 +6264,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-A4NZ32JM.js.map
+//# sourceMappingURL=chunk-26T3CJIJ.js.map

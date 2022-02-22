@@ -191,7 +191,7 @@ function resolveTypeSymbols(typeRef, checker) {
 function entityNameToValue(node) {
   if (ts2.isQualifiedName(node)) {
     const left = entityNameToValue(node.left);
-    return left !== null ? ts2.createPropertyAccess(left, node.right) : null;
+    return left !== null ? ts2.factory.createPropertyAccessExpression(left, node.right) : null;
   } else if (ts2.isIdentifier(node)) {
     return ts2.getMutableClone(node);
   } else {
@@ -678,4 +678,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-7PY7XEFH.js.map
+//# sourceMappingURL=chunk-AR265E4B.js.map
