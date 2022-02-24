@@ -206,7 +206,7 @@ var BabelAstHost = class {
       assert(property.value, types2.isExpression, "an expression");
       assert(property.key, isPropertyName, "a property name");
       const key = types2.isIdentifier(property.key) ? property.key.name : property.key.value;
-      result.set(key, property.value);
+      result.set(`${key}`, property.value);
     }
     return result;
   }
@@ -223,7 +223,7 @@ var BabelAstHost = class {
     }
     const stmt = fn.body.body[0];
     assert(stmt, types2.isReturnStatement, "a function body with a single return statement");
-    if (stmt.argument === null) {
+    if (stmt.argument === null || stmt.argument === void 0) {
       throw new FatalLinkerError(stmt, "Unsupported syntax, expected function to return a value.");
     }
     return stmt.argument;
@@ -287,7 +287,7 @@ var BabelDeclarationScope = class {
       return null;
     }
     const path = binding.scope.path;
-    if (!path.isFunctionParent() && !(path.isProgram() && path.node.sourceType === "module")) {
+    if (!path.isFunctionDeclaration() && !path.isFunctionExpression() && !(path.isProgram() && path.node.sourceType === "module")) {
       return null;
     }
     return path;
@@ -346,10 +346,10 @@ function createEs2015LinkerPlugin(_a2) {
   };
 }
 function insertStatements(path, statements) {
-  if (path.isFunction()) {
-    insertIntoFunction(path, statements);
-  } else if (path.isProgram()) {
+  if (path.isProgram()) {
     insertIntoProgram(path, statements);
+  } else {
+    insertIntoFunction(path, statements);
   }
 }
 function insertIntoFunction(fn, statements) {

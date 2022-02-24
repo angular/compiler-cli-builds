@@ -28,6 +28,7 @@
 import * as _babelNamespace from '@babel/core';
 import _typesNamespace = _babelNamespace.types;
 export import types = _typesNamespace;
+export declare type BabelFile = _babelNamespace.BabelFile;
 export declare type PluginObj = _babelNamespace.PluginObj;
 export declare type ConfigAPI = _babelNamespace.ConfigAPI;
 export declare type NodePath<T = _babelNamespace.Node> = _babelNamespace.NodePath<T>;

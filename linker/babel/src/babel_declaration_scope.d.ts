@@ -9,7 +9,7 @@
 import { NodePath, Scope } from '@babel/traverse';
 import { DeclarationScope } from '../../../linker';
 import { types as t } from './babel_core';
-export declare type ConstantScopePath = NodePath<t.Function | t.Program>;
+export declare type ConstantScopePath = NodePath<t.FunctionDeclaration> | NodePath<t.FunctionExpression> | NodePath<t.Program>;
 /**
  * This class represents the lexical scope of a partial declaration in Babel source code.
  *
