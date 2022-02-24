@@ -130,3 +130,5 @@ export declare function createSourceSpan(node: ts.Node): ParseSourceSpan;
  */
 export declare function compileResults(fac: CompileResult, def: R3CompiledExpression, metadataStmt: Statement | null, propName: string): CompileResult[];
 export declare function toFactoryMetadata(meta: Omit<R3FactoryMetadata, 'target'>, target: FactoryTarget): R3FactoryMetadata;
+export declare function isAngularAnimationsReference(reference: Reference, symbolName: string): boolean;
+export declare const animationTriggerResolver: ForeignFunctionResolver;

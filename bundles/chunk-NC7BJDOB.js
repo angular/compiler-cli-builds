@@ -1414,6 +1414,23 @@ function toFactoryMetadata(meta, target) {
     target
   };
 }
+function isAngularAnimationsReference(reference, symbolName) {
+  return reference.ownedByModuleGuess === "@angular/animations" && reference.debugName === symbolName;
+}
+var animationTriggerResolver = (ref, args) => {
+  const animationTriggerMethodName = "trigger";
+  if (!isAngularAnimationsReference(ref, animationTriggerMethodName)) {
+    return null;
+  }
+  const triggerNameExpression = args[0];
+  if (!triggerNameExpression) {
+    return null;
+  }
+  const factory = ts3.factory;
+  return factory.createObjectLiteralExpression([
+    factory.createPropertyAssignment(factory.createIdentifier("name"), triggerNameExpression)
+  ], true);
+};
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/component.mjs
 import { compileClassMetadata as compileClassMetadata3, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector, DEFAULT_INTERPOLATION_CONFIG, DomElementSchemaRegistry, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget3, InterpolationConfig, makeBindingParser as makeBindingParser2, ParseSourceFile as ParseSourceFile2, parseTemplate, R3TargetBinder, SelectorMatcher, ViewEncapsulation, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
@@ -4874,7 +4891,7 @@ var ComponentDecoratorHandler = class {
     let animationTriggerNames = null;
     if (component.has("animations")) {
       animations = new WrappedNodeExpr5(component.get("animations"));
-      const animationsValue = this.evaluator.evaluate(component.get("animations"));
+      const animationsValue = this.evaluator.evaluate(component.get("animations"), animationTriggerResolver);
       animationTriggerNames = { includesDynamicAnimations: false, staticTriggerNames: [] };
       collectAnimationNames(animationsValue, animationTriggerNames);
     }
@@ -6015,4 +6032,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-C44PYKVA.js.map
+//# sourceMappingURL=chunk-NC7BJDOB.js.map
