@@ -13,7 +13,7 @@ import {
   getSharedSetup,
   sendMessageToMaster,
   stringifyTask
-} from "../../../../chunk-Z3Y7IKOC.js";
+} from "../../../../chunk-NYXF6G67.js";
 import "../../../../chunk-KMCI52ED.js";
 import "../../../../chunk-26T3CJIJ.js";
 import "../../../../chunk-AR265E4B.js";

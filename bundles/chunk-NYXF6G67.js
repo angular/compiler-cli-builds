@@ -5003,7 +5003,7 @@ var sendMessageToWorker = (workerId, msg) => {
     throw new Error("Unable to send message to worker process: Recipient does not exist or has disconnected.");
   }
   return new Promise((resolve, reject) => {
-    worker.send(msg, (err) => err === null ? resolve() : reject(err));
+    worker.send(msg, void 0, (err) => err === null ? resolve() : reject(err));
   });
 };
 
@@ -5141,4 +5141,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-Z3Y7IKOC.js.map
+//# sourceMappingURL=chunk-NYXF6G67.js.map
