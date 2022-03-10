@@ -255,7 +255,7 @@ function compareVersions(v1, v2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
 var MIN_TS_VERSION = "4.4.2";
-var MAX_TS_VERSION = "4.6.0";
+var MAX_TS_VERSION = "4.7.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
@@ -7231,4 +7231,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XRCD4VXD.js.map
+//# sourceMappingURL=chunk-RK2SUO2Y.js.map
