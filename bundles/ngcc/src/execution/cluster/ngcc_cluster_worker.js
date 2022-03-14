@@ -5,7 +5,7 @@
     
 import {
   parseCommandLineOptions
-} from "../../../../chunk-Z2HS4HDG.js";
+} from "../../../../chunk-MXJN5K6C.js";
 import {
   PackageJsonUpdate,
   applyChange,
@@ -13,11 +13,11 @@ import {
   getSharedSetup,
   sendMessageToMaster,
   stringifyTask
-} from "../../../../chunk-NYXF6G67.js";
+} from "../../../../chunk-NM2N677S.js";
 import "../../../../chunk-KMCI52ED.js";
 import "../../../../chunk-26T3CJIJ.js";
 import "../../../../chunk-AR265E4B.js";
-import "../../../../chunk-SKBLJA43.js";
+import "../../../../chunk-646P2DOR.js";
 import "../../../../chunk-K2Z44JHH.js";
 import "../../../../chunk-5RC6M6GX.js";
 import "../../../../chunk-FXU7FMZC.js";
