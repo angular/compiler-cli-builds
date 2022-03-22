@@ -226,6 +226,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["NGMODULE_REEXPORT_NAME_COLLISION"] = 6006] = "NGMODULE_REEXPORT_NAME_COLLISION";
   ErrorCode2[ErrorCode2["NGMODULE_DECLARATION_NOT_UNIQUE"] = 6007] = "NGMODULE_DECLARATION_NOT_UNIQUE";
   ErrorCode2[ErrorCode2["NGMODULE_DECLARATION_IS_STANDALONE"] = 6008] = "NGMODULE_DECLARATION_IS_STANDALONE";
+  ErrorCode2[ErrorCode2["WARN_NGMODULE_ID_UNNECESSARY"] = 6100] = "WARN_NGMODULE_ID_UNNECESSARY";
   ErrorCode2[ErrorCode2["NGMODULE_VE_DEPENDENCY_ON_IVY_LIB"] = 6999] = "NGMODULE_VE_DEPENDENCY_ON_IVY_LIB";
   ErrorCode2[ErrorCode2["SCHEMA_INVALID_ELEMENT"] = 8001] = "SCHEMA_INVALID_ELEMENT";
   ErrorCode2[ErrorCode2["SCHEMA_INVALID_ATTRIBUTE"] = 8002] = "SCHEMA_INVALID_ATTRIBUTE";
@@ -251,7 +252,8 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
   ErrorCode.SCHEMA_INVALID_ELEMENT,
   ErrorCode.SCHEMA_INVALID_ATTRIBUTE,
   ErrorCode.MISSING_REFERENCE_TARGET,
-  ErrorCode.COMPONENT_INVALID_SHADOW_DOM_SELECTOR
+  ErrorCode.COMPONENT_INVALID_SHADOW_DOM_SELECTOR,
+  ErrorCode.WARN_NGMODULE_ID_UNNECESSARY
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
@@ -1447,4 +1449,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-5RC6M6GX.js.map
+//# sourceMappingURL=chunk-XWYEUXGN.js.map

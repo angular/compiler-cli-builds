@@ -9,7 +9,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-5RC6M6GX.js";
+} from "./chunk-XWYEUXGN.js";
 import {
   __spreadProps,
   __spreadValues
@@ -185,35 +185,43 @@ var LinkerImportGenerator = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/emit_scope.mjs
 var EmitScope = class {
-  constructor(ngImport, translator) {
+  constructor(ngImport, translator, factory) {
     this.ngImport = ngImport;
     this.translator = translator;
+    this.factory = factory;
     this.constantPool = new ConstantPool();
   }
   translateDefinition(definition) {
-    return this.translator.translateExpression(definition, new LinkerImportGenerator(this.ngImport));
+    const expression = this.translator.translateExpression(definition.expression, new LinkerImportGenerator(this.ngImport));
+    if (definition.statements.length > 0) {
+      const importGenerator = new LinkerImportGenerator(this.ngImport);
+      return this.wrapInIifeWithStatements(expression, definition.statements.map((statement) => this.translator.translateStatement(statement, importGenerator)));
+    } else {
+      return expression;
+    }
   }
   getConstantStatements() {
     const importGenerator = new LinkerImportGenerator(this.ngImport);
     return this.constantPool.statements.map((statement) => this.translator.translateStatement(statement, importGenerator));
   }
-};
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/iife_emit_scope.mjs
-var IifeEmitScope = class extends EmitScope {
-  constructor(ngImport, translator, factory) {
-    super(ngImport, translator);
-    this.factory = factory;
-  }
-  translateDefinition(definition) {
-    const constantStatements = super.getConstantStatements();
-    const returnStatement = this.factory.createReturnStatement(super.translateDefinition(definition));
-    const body = this.factory.createBlock([...constantStatements, returnStatement]);
+  wrapInIifeWithStatements(expression, statements) {
+    const returnStatement = this.factory.createReturnStatement(expression);
+    const body = this.factory.createBlock([...statements, returnStatement]);
     const fn = this.factory.createFunctionExpression(null, [], body);
     return this.factory.createCallExpression(fn, [], false);
   }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/local_emit_scope.mjs
+var LocalEmitScope = class extends EmitScope {
+  translateDefinition(definition) {
+    return super.translateDefinition({
+      expression: definition.expression,
+      statements: [...this.constantPool.statements, ...definition.statements]
+    });
+  }
   getConstantStatements() {
-    throw new Error("BUG - IifeEmitScope should not expose any constant statements");
+    throw new Error("BUG - LocalEmitScope should not expose any constant statements");
   }
 };
 
@@ -240,7 +248,10 @@ import { compileClassMetadata } from "@angular/compiler";
 var PartialClassMetadataLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
     const meta = toR3ClassMetadata(metaObj);
-    return compileClassMetadata(meta);
+    return {
+      expression: compileClassMetadata(meta),
+      statements: []
+    };
   }
 };
 function toR3ClassMetadata(metaObj) {
@@ -314,8 +325,7 @@ var PartialDirectiveLinkerVersion1 = class {
   }
   linkPartialDeclaration(constantPool, metaObj) {
     const meta = toR3DirectiveMeta(metaObj, this.code, this.sourceUrl);
-    const def = compileDirectiveFromMetadata(meta, constantPool, makeBindingParser());
-    return def.expression;
+    return compileDirectiveFromMetadata(meta, constantPool, makeBindingParser());
   }
 };
 function toR3DirectiveMeta(metaObj, code, sourceUrl) {
@@ -414,8 +424,7 @@ var PartialComponentLinkerVersion1 = class {
   }
   linkPartialDeclaration(constantPool, metaObj) {
     const meta = this.toR3ComponentMeta(metaObj);
-    const def = compileComponentFromMetadata(meta, constantPool, makeBindingParser2());
-    return def.expression;
+    return compileComponentFromMetadata(meta, constantPool, makeBindingParser2());
   }
   toR3ComponentMeta(metaObj) {
     const interpolation = parseInterpolationConfig(metaObj);
@@ -567,8 +576,7 @@ import { compileFactoryFunction, FactoryTarget } from "@angular/compiler";
 var PartialFactoryLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
     const meta = toR3FactoryMeta(metaObj);
-    const def = compileFactoryFunction(meta);
-    return def.expression;
+    return compileFactoryFunction(meta);
   }
 };
 function toR3FactoryMeta(metaObj) {
@@ -605,8 +613,7 @@ import { compileInjectable, createMayBeForwardRefExpression as createMayBeForwar
 var PartialInjectableLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
     const meta = toR3InjectableMeta(metaObj);
-    const def = compileInjectable(meta, false);
-    return def.expression;
+    return compileInjectable(meta, false);
   }
 };
 function toR3InjectableMeta(metaObj) {
@@ -645,8 +652,7 @@ import { compileInjector } from "@angular/compiler";
 var PartialInjectorLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
     const meta = toR3InjectorMeta(metaObj);
-    const def = compileInjector(meta);
-    return def.expression;
+    return compileInjector(meta);
   }
 };
 function toR3InjectorMeta(metaObj) {
@@ -665,18 +671,17 @@ function toR3InjectorMeta(metaObj) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_ng_module_linker_1.mjs
-import { compileNgModule } from "@angular/compiler";
+import { compileNgModule, R3SelectorScopeMode } from "@angular/compiler";
 var PartialNgModuleLinkerVersion1 = class {
   constructor(emitInline) {
     this.emitInline = emitInline;
   }
   linkPartialDeclaration(constantPool, metaObj) {
     const meta = toR3NgModuleMeta(metaObj, this.emitInline);
-    const def = compileNgModule(meta);
-    return def.expression;
+    return compileNgModule(meta);
   }
 };
-function toR3NgModuleMeta(metaObj, emitInline) {
+function toR3NgModuleMeta(metaObj, supportJit) {
   const wrappedType = metaObj.getOpaque("type");
   const meta = {
     type: wrapReference(wrappedType),
@@ -686,7 +691,7 @@ function toR3NgModuleMeta(metaObj, emitInline) {
     declarations: [],
     imports: [],
     exports: [],
-    emitInline,
+    selectorScopeMode: supportJit ? R3SelectorScopeMode.Inline : R3SelectorScopeMode.Omit,
     containsForwardDecls: false,
     schemas: [],
     id: metaObj.has("id") ? metaObj.getOpaque("id") : null
@@ -743,8 +748,7 @@ var PartialPipeLinkerVersion1 = class {
   }
   linkPartialDeclaration(constantPool, metaObj) {
     const meta = toR3PipeMeta(metaObj);
-    const def = compilePipeFromMetadata(meta);
-    return def.expression;
+    return compilePipeFromMetadata(meta);
   }
 };
 function toR3PipeMeta(metaObj) {
@@ -788,7 +792,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "14.0.0-next.7+13.sha-9d8ff5d");
+  const LATEST_VERSION_RANGE = getRange("<=", "14.0.0-next.7+18.sha-8155428");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -835,7 +839,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "14.0.0-next.7+13.sha-9d8ff5d") {
+    if (version === "14.0.0-next.7+18.sha-8155428") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -895,10 +899,10 @@ var FileLinker = class {
   getEmitScope(ngImport, declarationScope) {
     const constantScope = declarationScope.getConstantScopeRef(ngImport);
     if (constantScope === null) {
-      return new IifeEmitScope(ngImport, this.linkerEnvironment.translator, this.linkerEnvironment.factory);
+      return new LocalEmitScope(ngImport, this.linkerEnvironment.translator, this.linkerEnvironment.factory);
     }
     if (!this.emitScopes.has(constantScope)) {
-      this.emitScopes.set(constantScope, new EmitScope(ngImport, this.linkerEnvironment.translator));
+      this.emitScopes.set(constantScope, new EmitScope(ngImport, this.linkerEnvironment.translator, this.linkerEnvironment.factory));
     }
     return this.emitScopes.get(constantScope);
   }
@@ -966,4 +970,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-OOJDZK5W.js.map
+//# sourceMappingURL=chunk-GBI7TUYX.js.map

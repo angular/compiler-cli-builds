@@ -35,7 +35,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-5RC6M6GX.js";
+} from "./chunk-XWYEUXGN.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -2736,9 +2736,7 @@ function transformFactorySourceFile(factoryMap, context, importRewriter, file) {
         const match = STRIP_NG_FACTORY.exec(decl.name.text);
         const module = match ? moduleSymbols.get(match[1]) : null;
         if (module) {
-          const moduleIsTreeShakable = !module.hasId;
-          const newStmt = !moduleIsTreeShakable ? stmt : updateInitializers(stmt, (init) => init ? wrapInNoSideEffects(init) : void 0);
-          transformedStatements.push(newStmt);
+          transformedStatements.push(updateInitializers(stmt, (init) => init ? wrapInNoSideEffects(init) : void 0));
         }
       } else {
         transformedStatements.push(stmt);
@@ -3305,7 +3303,7 @@ var TraitCompiler = class {
     const record = this.classes.get(original);
     let res = [];
     for (const trait of record.traits) {
-      if (trait.state !== TraitState.Resolved || trait.analysisDiagnostics !== null || trait.resolveDiagnostics !== null) {
+      if (trait.state !== TraitState.Resolved || containsErrors(trait.analysisDiagnostics) || containsErrors(trait.resolveDiagnostics)) {
         continue;
       }
       let compileRes;
@@ -3367,6 +3365,9 @@ var TraitCompiler = class {
     return this.reexportMap;
   }
 };
+function containsErrors(diagnostics) {
+  return diagnostics !== null && diagnostics.some((diag) => diag.category === ts16.DiagnosticCategory.Error);
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/declaration.mjs
 import ts18 from "typescript";
@@ -4355,7 +4356,7 @@ var DirectiveDecoratorHandler = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.mjs
-import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, CUSTOM_ELEMENTS_SCHEMA, ExternalExpr as ExternalExpr4, FactoryTarget as FactoryTarget2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, NO_ERRORS_SCHEMA, R3Identifiers, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, CUSTOM_ELEMENTS_SCHEMA, ExternalExpr as ExternalExpr4, FactoryTarget as FactoryTarget2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, NO_ERRORS_SCHEMA, R3Identifiers, R3SelectorScopeMode, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
 import ts22 from "typescript";
 var NgModuleSymbol = class extends SemanticSymbol {
   constructor() {
@@ -4514,7 +4515,17 @@ var NgModuleDecoratorHandler = class {
         }
       }
     }
-    const id = ngModule.has("id") ? new WrappedNodeExpr6(ngModule.get("id")) : null;
+    let id = null;
+    if (ngModule.has("id")) {
+      const idExpr = ngModule.get("id");
+      if (!isModuleIdExpression(idExpr)) {
+        id = new WrappedNodeExpr6(idExpr);
+      } else {
+        const diag = makeDiagnostic(ErrorCode.WARN_NGMODULE_ID_UNNECESSARY, idExpr, `Using 'module.id' for NgModule.id is a common anti-pattern that is ignored by the Angular compiler.`);
+        diag.category = ts22.DiagnosticCategory.Warning;
+        diagnostics.push(diag);
+      }
+    }
     const valueContext = node.getSourceFile();
     let typeContext = valueContext;
     const typeNode = this.reflector.getDtsDeclaration(node);
@@ -4540,7 +4551,7 @@ var NgModuleDecoratorHandler = class {
       imports,
       containsForwardDecls,
       id,
-      emitInline: false,
+      selectorScopeMode: R3SelectorScopeMode.SideEffect,
       schemas: []
     };
     const rawProviders = ngModule.has("providers") ? ngModule.get("providers") : null;
@@ -4565,6 +4576,7 @@ var NgModuleDecoratorHandler = class {
       target: FactoryTarget2.NgModule
     };
     return {
+      diagnostics: diagnostics.length > 0 ? diagnostics : void 0,
       analysis: {
         id,
         schemas,
@@ -4596,8 +4608,7 @@ var NgModuleDecoratorHandler = class {
     });
     if (this.factoryTracker !== null) {
       this.factoryTracker.track(node.getSourceFile(), {
-        name: analysis.factorySymbolName,
-        hasId: analysis.id !== null
+        name: analysis.factorySymbolName
       });
     }
     this.injectableRegistry.registerInjectable(node);
@@ -4809,6 +4820,9 @@ var NgModuleDecoratorHandler = class {
 };
 function isNgModule(node, compilation) {
   return !compilation.directives.some((directive) => directive.ref.node === node) && !compilation.pipes.some((pipe) => pipe.ref.node === node);
+}
+function isModuleIdExpression(expr) {
+  return ts22.isPropertyAccessExpression(expr) && ts22.isIdentifier(expr.expression) && expr.expression.text === "module" && expr.name.text === "id";
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/diagnostics.mjs
@@ -6264,4 +6278,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-26T3CJIJ.js.map
+//# sourceMappingURL=chunk-XYYOAU7Q.js.map

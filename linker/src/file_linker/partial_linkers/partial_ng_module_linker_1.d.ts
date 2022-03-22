@@ -6,9 +6,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ConstantPool, outputAst as o, R3DeclareNgModuleMetadata, R3NgModuleMetadata, R3PartialDeclaration } from '@angular/compiler';
+import { ConstantPool, R3DeclareNgModuleMetadata, R3NgModuleMetadata, R3PartialDeclaration } from '@angular/compiler';
 import { AstObject } from '../../ast/ast_value';
-import { PartialLinker } from './partial_linker';
+import { LinkedDefinition, PartialLinker } from './partial_linker';
 /**
  * A `PartialLinker` that is designed to process `ɵɵngDeclareNgModule()` call expressions.
  */
@@ -24,9 +24,9 @@ export declare class PartialNgModuleLinkerVersion1<TExpression> implements Parti
      * definition. These are only used by JIT compilation.
      */
     emitInline: boolean);
-    linkPartialDeclaration(constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>): o.Expression;
+    linkPartialDeclaration(constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>): LinkedDefinition;
 }
 /**
  * Derives the `R3NgModuleMetadata` structure from the AST object.
  */
-export declare function toR3NgModuleMeta<TExpression>(metaObj: AstObject<R3DeclareNgModuleMetadata, TExpression>, emitInline: boolean): R3NgModuleMetadata;
+export declare function toR3NgModuleMeta<TExpression>(metaObj: AstObject<R3DeclareNgModuleMetadata, TExpression>, supportJit: boolean): R3NgModuleMetadata;
