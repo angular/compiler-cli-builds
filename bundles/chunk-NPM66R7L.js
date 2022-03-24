@@ -34,7 +34,7 @@ import {
   ivyTransformFactory,
   retagAllTsFiles,
   untagAllTsFiles
-} from "./chunk-XYYOAU7Q.js";
+} from "./chunk-TC2DJOPJ.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -79,7 +79,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-XWYEUXGN.js";
+} from "./chunk-D734ZMGK.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -254,7 +254,7 @@ function compareVersions(v1, v2) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
-var MIN_TS_VERSION = "4.4.2";
+var MIN_TS_VERSION = "4.6.2";
 var MAX_TS_VERSION = "4.7.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
@@ -7231,4 +7231,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2HJCVQPR.js.map
+//# sourceMappingURL=chunk-NPM66R7L.js.map

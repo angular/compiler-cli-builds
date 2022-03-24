@@ -62,8 +62,3 @@ export declare type RequiredDelegations<T> = {
  * Obtains the non-redirected source file for `sf`.
  */
 export declare function toUnredirectedSourceFile(sf: ts.SourceFile): ts.SourceFile;
-/**
- * Backwards-compatible version of `ts.createExportSpecifier`
- * to handle a breaking change between 4.4 and 4.5.
- */
-export declare function createExportSpecifier(propertyName: string | ts.Identifier | undefined, name: string | ts.Identifier, isTypeOnly?: boolean): ts.ExportSpecifier;

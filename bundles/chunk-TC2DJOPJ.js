@@ -22,7 +22,6 @@ import {
   Reference,
   assertSuccessfulReferenceEmit,
   attachDefaultImportDeclaration,
-  createExportSpecifier,
   getDefaultImportDeclaration,
   getSourceFile,
   identifierOfNode,
@@ -35,7 +34,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-XWYEUXGN.js";
+} from "./chunk-D734ZMGK.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -2464,7 +2463,7 @@ function aliasTransformFactory(exportStatements) {
       }
       const statements = [...file.statements];
       exportStatements.get(file.fileName).forEach(([moduleName, symbolName], aliasName) => {
-        const stmt = ts12.factory.createExportDeclaration(void 0, void 0, false, ts12.createNamedExports([createExportSpecifier(symbolName, aliasName)]), ts12.factory.createStringLiteral(moduleName));
+        const stmt = ts12.factory.createExportDeclaration(void 0, void 0, false, ts12.createNamedExports([ts12.factory.createExportSpecifier(false, symbolName, aliasName)]), ts12.factory.createStringLiteral(moduleName));
         statements.push(stmt);
       });
       return ts12.factory.updateSourceFile(file, statements);
@@ -6278,4 +6277,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-XYYOAU7Q.js.map
+//# sourceMappingURL=chunk-TC2DJOPJ.js.map
