@@ -264,7 +264,7 @@ var LogicalFileSystem = class {
     return this.cache.get(physicalFile);
   }
   createLogicalProjectPath(file, rootDir) {
-    const logicalPath = stripExtension(file.substr(rootDir.length));
+    const logicalPath = stripExtension(file.slice(rootDir.length));
     return logicalPath.startsWith("/") ? logicalPath : "/" + logicalPath;
   }
 };
@@ -424,4 +424,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FXU7FMZC.js.map
+//# sourceMappingURL=chunk-6SS5FBOU.js.map

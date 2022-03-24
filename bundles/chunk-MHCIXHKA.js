@@ -402,7 +402,7 @@ var SourceFileLoader = class {
     if (lastRealLineIndex === -1) {
       lastRealLineIndex = 0;
     }
-    return contents.substr(lastRealLineIndex + 1);
+    return contents.slice(lastRealLineIndex + 1);
   }
   replaceSchemeWithPath(path) {
     return path.replace(SCHEME_MATCHER, (_, scheme) => this.schemeMap[scheme.toLowerCase()] || "");
@@ -421,4 +421,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-K2Z44JHH.js.map
+//# sourceMappingURL=chunk-MHCIXHKA.js.map

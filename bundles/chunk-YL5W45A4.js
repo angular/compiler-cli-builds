@@ -34,7 +34,7 @@ import {
   ivyTransformFactory,
   retagAllTsFiles,
   untagAllTsFiles
-} from "./chunk-TC2DJOPJ.js";
+} from "./chunk-2L6ZEISZ.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -79,7 +79,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-D734ZMGK.js";
+} from "./chunk-MYWLID34.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -89,7 +89,7 @@ import {
   getSourceFileOrError,
   join,
   resolve
-} from "./chunk-FXU7FMZC.js";
+} from "./chunk-6SS5FBOU.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -7231,4 +7231,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-NPM66R7L.js.map
+//# sourceMappingURL=chunk-YL5W45A4.js.map

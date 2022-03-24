@@ -34,13 +34,13 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-D734ZMGK.js";
+} from "./chunk-MYWLID34.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
   basename,
   relative
-} from "./chunk-FXU7FMZC.js";
+} from "./chunk-6SS5FBOU.js";
 import {
   PerfEvent,
   PerfPhase
@@ -2144,7 +2144,7 @@ function afterUnderscore(str) {
   if (pos === -1) {
     throw new Error(`Expected '${str}' to contain '_'`);
   }
-  return str.substr(pos + 1);
+  return str.slice(pos + 1);
 }
 function hasInjectableFields(clazz, host) {
   const members = host.getMembersOfClass(clazz);
@@ -6277,4 +6277,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-TC2DJOPJ.js.map
+//# sourceMappingURL=chunk-2L6ZEISZ.js.map
