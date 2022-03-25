@@ -5,7 +5,7 @@
     
 import {
   __require
-} from "./chunk-WQ3TNYTD.js";
+} from "./chunk-GMSUYBZP.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/util.mjs
 var TS_DTS_JS_EXTENSION = /(?:\.d)?\.ts$|\.js$/;
@@ -424,4 +424,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FXU7FMZC.js.map
+//# sourceMappingURL=chunk-CLV7JFJQ.js.map

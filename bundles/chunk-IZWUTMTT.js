@@ -13,7 +13,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-FXU7FMZC.js";
+} from "./chunk-CLV7JFJQ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/util/src/typescript.mjs
 import ts from "typescript";
@@ -1437,4 +1437,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XNYP2SFR.js.map
+//# sourceMappingURL=chunk-IZWUTMTT.js.map

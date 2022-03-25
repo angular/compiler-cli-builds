@@ -13,7 +13,7 @@ import { UnifiedModulesHost } from './core/api';
  * A `ts.CompilerHost` which also returns a list of input files, out of which the `ts.Program`
  * should be created.
  *
- * Currently mirrored from @bazel/typescript/internal/tsc_wrapped/plugin_api (with the naming of
+ * Currently mirrored from @bazel/concatjs/internal/tsc_wrapped/plugin_api (with the naming of
  * `fileNameToModuleName` corrected).
  */
 interface PluginCompilerHost extends ts.CompilerHost, Partial<UnifiedModulesHost> {

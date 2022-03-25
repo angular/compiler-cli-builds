@@ -13,7 +13,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-7PY7XEFH.js";
+} from "./chunk-Q5GIQ3RV.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -35,21 +35,21 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-XNYP2SFR.js";
+} from "./chunk-IZWUTMTT.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
   basename,
   relative
-} from "./chunk-FXU7FMZC.js";
+} from "./chunk-CLV7JFJQ.js";
 import {
   PerfEvent,
   PerfPhase
-} from "./chunk-GLCRIILX.js";
+} from "./chunk-R4NY3TJC.js";
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-WQ3TNYTD.js";
+} from "./chunk-GMSUYBZP.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic.mjs
 var DynamicValue = class {
@@ -6032,4 +6032,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-NC7BJDOB.js.map
+//# sourceMappingURL=chunk-4J2PGUUV.js.map

@@ -13,10 +13,10 @@ var LogLevel;
 })(LogLevel || (LogLevel = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/logging/src/console_logger.mjs
-var RESET = "[0m";
-var RED = "[31m";
-var YELLOW = "[33m";
-var BLUE = "[36m";
+var RESET = "\x1B[0m";
+var RED = "\x1B[31m";
+var YELLOW = "\x1B[33m";
+var BLUE = "\x1B[36m";
 var DEBUG = `${BLUE}Debug:${RESET}`;
 var WARN = `${YELLOW}Warning:${RESET}`;
 var ERROR = `${RED}Error:${RESET}`;
@@ -53,4 +53,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-SKBLJA43.js.map
+//# sourceMappingURL=chunk-LX5Q27EF.js.map
