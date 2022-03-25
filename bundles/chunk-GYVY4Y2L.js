@@ -13,7 +13,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-AR265E4B.js";
+} from "./chunk-2IMT6JFI.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -34,21 +34,21 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-MYWLID34.js";
+} from "./chunk-UMDDHI5B.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
   basename,
   relative
-} from "./chunk-6SS5FBOU.js";
+} from "./chunk-T7MYRXIE.js";
 import {
   PerfEvent,
   PerfPhase
-} from "./chunk-GLCRIILX.js";
+} from "./chunk-R4NY3TJC.js";
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-WQ3TNYTD.js";
+} from "./chunk-GMSUYBZP.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
@@ -6277,4 +6277,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-2L6ZEISZ.js.map
+//# sourceMappingURL=chunk-GYVY4Y2L.js.map

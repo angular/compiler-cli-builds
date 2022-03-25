@@ -5,7 +5,7 @@
     
 import {
   removeLockFile
-} from "./chunk-QDWL7SZJ.js";
+} from "./chunk-R3C7RFJ4.js";
 import {
   Deferred,
   DirectPackageJsonUpdater,
@@ -36,19 +36,19 @@ import {
   sendMessageToWorker,
   sortTasksByPriority,
   stringifyTask
-} from "./chunk-ADLYECRU.js";
+} from "./chunk-34QUU6SJ.js";
 import {
   LogLevel
-} from "./chunk-646P2DOR.js";
+} from "./chunk-LX5Q27EF.js";
 import {
   absoluteFrom,
   getFileSystem
-} from "./chunk-6SS5FBOU.js";
+} from "./chunk-T7MYRXIE.js";
 import {
   __require,
   __spreadProps,
   __spreadValues
-} from "./chunk-WQ3TNYTD.js";
+} from "./chunk-GMSUYBZP.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/dependencies/commonjs_dependency_host.mjs
 import ts from "typescript";
@@ -887,7 +887,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "14.0.0-next.7+39.sha-aed95cd";
+var NGCC_VERSION = "14.0.0-next.8+13.sha-78eace6";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -2172,4 +2172,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-D6WVBCSQ.js.map
+//# sourceMappingURL=chunk-SNAJD4VP.js.map

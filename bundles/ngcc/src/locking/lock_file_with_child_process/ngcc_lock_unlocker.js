@@ -5,14 +5,14 @@
     
 import {
   removeLockFile
-} from "../../../../chunk-QDWL7SZJ.js";
+} from "../../../../chunk-R3C7RFJ4.js";
 import {
   ConsoleLogger
-} from "../../../../chunk-646P2DOR.js";
+} from "../../../../chunk-LX5Q27EF.js";
 import {
   NodeJSFileSystem
-} from "../../../../chunk-6SS5FBOU.js";
-import "../../../../chunk-WQ3TNYTD.js";
+} from "../../../../chunk-T7MYRXIE.js";
+import "../../../../chunk-GMSUYBZP.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/locking/lock_file_with_child_process/ngcc_lock_unlocker.mjs
 var fs = new NodeJSFileSystem();

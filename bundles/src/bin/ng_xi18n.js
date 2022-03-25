@@ -7,22 +7,22 @@
 import {
   main,
   readCommandLineAndConfiguration
-} from "../../chunk-ZVSNKT5F.js";
+} from "../../chunk-AGDZS4UG.js";
 import {
   EmitFlags
-} from "../../chunk-YL5W45A4.js";
-import "../../chunk-2L6ZEISZ.js";
-import "../../chunk-AR265E4B.js";
-import "../../chunk-MYWLID34.js";
+} from "../../chunk-M3IOYIU5.js";
+import "../../chunk-GYVY4Y2L.js";
+import "../../chunk-2IMT6JFI.js";
+import "../../chunk-UMDDHI5B.js";
 import {
   NodeJSFileSystem,
   setFileSystem
-} from "../../chunk-6SS5FBOU.js";
-import "../../chunk-GLCRIILX.js";
+} from "../../chunk-T7MYRXIE.js";
+import "../../chunk-R4NY3TJC.js";
 import {
   __spreadProps,
   __spreadValues
-} from "../../chunk-WQ3TNYTD.js";
+} from "../../chunk-GMSUYBZP.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ng_xi18n.mjs
 import "reflect-metadata";

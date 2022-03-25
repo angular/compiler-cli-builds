@@ -34,11 +34,11 @@ import {
   ivyTransformFactory,
   retagAllTsFiles,
   untagAllTsFiles
-} from "./chunk-2L6ZEISZ.js";
+} from "./chunk-GYVY4Y2L.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-AR265E4B.js";
+} from "./chunk-2IMT6JFI.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -79,7 +79,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-MYWLID34.js";
+} from "./chunk-UMDDHI5B.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -89,18 +89,18 @@ import {
   getSourceFileOrError,
   join,
   resolve
-} from "./chunk-6SS5FBOU.js";
+} from "./chunk-T7MYRXIE.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-GLCRIILX.js";
+} from "./chunk-R4NY3TJC.js";
 import {
   __spreadProps,
   __spreadValues
-} from "./chunk-WQ3TNYTD.js";
+} from "./chunk-GMSUYBZP.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -7231,4 +7231,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YL5W45A4.js.map
+//# sourceMappingURL=chunk-M3IOYIU5.js.map
