@@ -7,7 +7,7 @@ import {
   CycleAnalyzer,
   ImportGraph,
   readConfiguration
-} from "./chunk-TGFWWPO4.js";
+} from "./chunk-ESNS3BVQ.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -5141,4 +5141,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-D5Z5PUJ5.js.map
+//# sourceMappingURL=chunk-LQLIHXU2.js.map
