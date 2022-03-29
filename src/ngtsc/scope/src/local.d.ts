@@ -6,24 +6,16 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/local" />
-import { SchemaMetadata } from '@angular/compiler';
 import ts from 'typescript';
-import { AliasingHost, Reexport, Reference, ReferenceEmitter } from '../../imports';
+import { AliasingHost, Reference, ReferenceEmitter } from '../../imports';
 import { DirectiveMeta, MetadataReader, MetadataRegistry, NgModuleMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
-import { ExportScope, RemoteScope, ScopeData } from './api';
-import { ComponentScopeReader } from './component_scope';
+import { ComponentScopeReader, LocalModuleScope, RemoteScope } from './api';
 import { DtsModuleScopeResolver } from './dependency';
 export interface LocalNgModuleData {
     declarations: Reference<ClassDeclaration>[];
     imports: Reference<ClassDeclaration>[];
     exports: Reference<ClassDeclaration>[];
-}
-export interface LocalModuleScope extends ExportScope {
-    ngModule: ClassDeclaration;
-    compilation: ScopeData;
-    reexports: Reexport[] | null;
-    schemas: SchemaMetadata[];
 }
 /**
  * A registry which collects information about NgModules, Directives, Components, and Pipes which
@@ -46,6 +38,7 @@ export interface LocalModuleScope extends ExportScope {
  */
 export declare class LocalModuleScopeRegistry implements MetadataRegistry, ComponentScopeReader {
     private localReader;
+    private fullReader;
     private dependencyScopeReader;
     private refEmitter;
     private aliasingHost;
@@ -91,7 +84,7 @@ export declare class LocalModuleScopeRegistry implements MetadataRegistry, Compo
      * Tracks which NgModules have directives/pipes that are declared in more than one module.
      */
     private modulesWithStructuralErrors;
-    constructor(localReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasingHost: AliasingHost | null);
+    constructor(localReader: MetadataReader, fullReader: MetadataReader, dependencyScopeReader: DtsModuleScopeResolver, refEmitter: ReferenceEmitter, aliasingHost: AliasingHost | null);
     /**
      * Add an NgModule's data to the registry.
      */

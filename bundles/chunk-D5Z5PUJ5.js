@@ -6,11 +6,8 @@
 import {
   CycleAnalyzer,
   ImportGraph,
-  LocalModuleScopeRegistry,
-  MetadataDtsModuleScopeResolver,
-  TypeCheckScopeRegistry,
   readConfiguration
-} from "./chunk-M3IOYIU5.js";
+} from "./chunk-TGFWWPO4.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -23,15 +20,18 @@ import {
   InjectableClassRegistry,
   InjectableDecoratorHandler,
   LocalMetadataRegistry,
+  LocalModuleScopeRegistry,
+  MetadataDtsModuleScopeResolver,
   NgModuleDecoratorHandler,
   PartialEvaluator,
   PipeDecoratorHandler,
   ResourceRegistry,
   TraitCompiler,
   TraitState,
+  TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-GYVY4Y2L.js";
+} from "./chunk-RYXFJXXN.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -3303,7 +3303,7 @@ var DecorationAnalyzer = class {
     ]);
     this.aliasingHost = this.bundle.entryPoint.generateDeepReexports ? new PrivateExportAliasingHost(this.reflectionHost) : null;
     this.dtsModuleScopeResolver = new MetadataDtsModuleScopeResolver(this.dtsMetaReader, this.aliasingHost);
-    this.scopeRegistry = new LocalModuleScopeRegistry(this.metaRegistry, this.dtsModuleScopeResolver, this.refEmitter, this.aliasingHost);
+    this.scopeRegistry = new LocalModuleScopeRegistry(this.metaRegistry, this.fullMetaReader, this.dtsModuleScopeResolver, this.refEmitter, this.aliasingHost);
     this.fullRegistry = new CompoundMetadataRegistry([this.metaRegistry, this.scopeRegistry]);
     this.evaluator = new PartialEvaluator(this.reflectionHost, this.typeChecker, null);
     this.importGraph = new ImportGraph(this.typeChecker, NOOP_PERF_RECORDER);
@@ -5141,4 +5141,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-34QUU6SJ.js.map
+//# sourceMappingURL=chunk-D5Z5PUJ5.js.map

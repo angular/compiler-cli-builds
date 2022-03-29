@@ -27,7 +27,9 @@ export interface NgModuleAnalysis {
     rawDeclarations: ts.Expression | null;
     schemas: SchemaMetadata[];
     imports: Reference<ClassDeclaration>[];
+    rawImports: ts.Expression | null;
     exports: Reference<ClassDeclaration>[];
+    rawExports: ts.Expression | null;
     id: Expression | null;
     factorySymbolName: string;
     providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
