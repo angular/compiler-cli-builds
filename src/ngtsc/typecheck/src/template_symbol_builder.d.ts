@@ -19,13 +19,14 @@ import { TemplateData } from './context';
  * replaced if the component's template changes.
  */
 export declare class SymbolBuilder {
-    private readonly shimPath;
+    private readonly tcbPath;
+    private readonly tcbIsShim;
     private readonly typeCheckBlock;
     private readonly templateData;
     private readonly componentScopeReader;
     private readonly getTypeChecker;
     private symbolCache;
-    constructor(shimPath: AbsoluteFsPath, typeCheckBlock: ts.Node, templateData: TemplateData, componentScopeReader: ComponentScopeReader, getTypeChecker: () => ts.TypeChecker);
+    constructor(tcbPath: AbsoluteFsPath, tcbIsShim: boolean, typeCheckBlock: ts.Node, templateData: TemplateData, componentScopeReader: ComponentScopeReader, getTypeChecker: () => ts.TypeChecker);
     getSymbol(node: TmplAstTemplate | TmplAstElement): TemplateSymbol | ElementSymbol | null;
     getSymbol(node: TmplAstReference | TmplAstVariable): ReferenceSymbol | VariableSymbol | null;
     getSymbol(node: AST | TmplAstNode): Symbol | null;
@@ -42,5 +43,5 @@ export declare class SymbolBuilder {
     private getSymbolOfPipe;
     private getSymbolOfTemplateExpression;
     private getSymbolOfTsNode;
-    private getShimPositionForNode;
+    private getTcbPositionForNode;
 }

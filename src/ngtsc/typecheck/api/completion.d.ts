@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/completion" />
 import { TmplAstReference, TmplAstVariable } from '@angular/compiler';
-import { ShimLocation } from './symbols';
+import { TcbLocation } from './symbols';
 /**
  * An autocompletion source of any kind.
  */
@@ -51,7 +51,7 @@ export interface GlobalCompletion {
      * A location within the type-checking shim where TypeScript's completion APIs can be used to
      * access completions for the template's component context (component class members).
      */
-    componentContext: ShimLocation;
+    componentContext: TcbLocation;
     /**
      * `Map` of local references and variables that are visible at the requested level of the
      * template.
@@ -65,5 +65,5 @@ export interface GlobalCompletion {
      * A location within the type-checking shim where TypeScript's completion APIs can be used to
      * access completions for the AST node of the cursor position (primitive constants).
      */
-    nodeContext: ShimLocation | null;
+    nodeContext: TcbLocation | null;
 }

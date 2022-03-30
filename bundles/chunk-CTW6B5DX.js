@@ -2164,10 +2164,11 @@ function hasExpressionIdentifier(sourceFile, node, identifier) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/completion.mjs
 var CompletionEngine = class {
-  constructor(tcb, data, shimPath) {
+  constructor(tcb, data, tcbPath, tcbIsShim) {
     this.tcb = tcb;
     this.data = data;
-    this.shimPath = shimPath;
+    this.tcbPath = tcbPath;
+    this.tcbIsShim = tcbIsShim;
     this.templateContextCache = /* @__PURE__ */ new Map();
     this.expressionCompletionCache = /* @__PURE__ */ new Map();
     const globalRead = findFirstMatchingNode(this.tcb, {
@@ -2176,8 +2177,9 @@ var CompletionEngine = class {
     });
     if (globalRead !== null) {
       this.componentContext = {
-        shimPath: this.shimPath,
-        positionInShimFile: globalRead.name.getStart()
+        tcbPath: this.tcbPath,
+        isShimFile: this.tcbIsShim,
+        positionInFile: globalRead.name.getStart()
       };
     } else {
       this.componentContext = null;
@@ -2199,8 +2201,9 @@ var CompletionEngine = class {
       });
       if (nodeLocation !== null) {
         nodeContext = {
-          shimPath: this.shimPath,
-          positionInShimFile: nodeLocation.getStart()
+          tcbPath: this.tcbPath,
+          isShimFile: this.tcbIsShim,
+          positionInFile: nodeLocation.getStart()
         };
       }
     }
@@ -2211,8 +2214,9 @@ var CompletionEngine = class {
       });
       if (nodeLocation) {
         nodeContext = {
-          shimPath: this.shimPath,
-          positionInShimFile: nodeLocation.getStart()
+          tcbPath: this.tcbPath,
+          isShimFile: this.tcbIsShim,
+          positionInFile: nodeLocation.getStart()
         };
       }
     }
@@ -2251,8 +2255,9 @@ var CompletionEngine = class {
       return null;
     }
     const res = {
-      shimPath: this.shimPath,
-      positionInShimFile: tsExpr.name.getEnd()
+      tcbPath: this.tcbPath,
+      isShimFile: this.tcbIsShim,
+      positionInFile: tsExpr.name.getEnd()
     };
     this.expressionCompletionCache.set(expr, res);
     return res;
@@ -2284,8 +2289,9 @@ var CompletionEngine = class {
       positionInShimFile -= 1;
     }
     const res = {
-      shimPath: this.shimPath,
-      positionInShimFile
+      tcbPath: this.tcbPath,
+      isShimFile: this.tcbIsShim,
+      positionInFile: positionInShimFile
     };
     this.expressionCompletionCache.set(expr, res);
     return res;
@@ -4799,8 +4805,9 @@ var TemplateSourceManager = class {
 import { AST, ASTWithSource as ASTWithSource3, BindingPipe as BindingPipe2, PropertyRead as PropertyRead5, PropertyWrite as PropertyWrite4, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement4, TmplAstReference as TmplAstReference4, TmplAstTemplate as TmplAstTemplate3, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable3 } from "@angular/compiler";
 import ts27 from "typescript";
 var SymbolBuilder = class {
-  constructor(shimPath, typeCheckBlock, templateData, componentScopeReader, getTypeChecker) {
-    this.shimPath = shimPath;
+  constructor(tcbPath, tcbIsShim, typeCheckBlock, templateData, componentScopeReader, getTypeChecker) {
+    this.tcbPath = tcbPath;
+    this.tcbIsShim = tcbIsShim;
     this.typeCheckBlock = typeCheckBlock;
     this.templateData = templateData;
     this.componentScopeReader = componentScopeReader;
@@ -4949,7 +4956,7 @@ var SymbolBuilder = class {
         const addEventListener = outputFieldAccess.name;
         const tsSymbol = this.getTypeChecker().getSymbolAtLocation(addEventListener);
         const tsType = this.getTypeChecker().getTypeAtLocation(addEventListener);
-        const positionInShimFile = this.getShimPositionForNode(addEventListener);
+        const positionInFile = this.getTcbPositionForNode(addEventListener);
         const target = this.getSymbol(consumer);
         if (target === null || tsSymbol === void 0) {
           continue;
@@ -4959,7 +4966,11 @@ var SymbolBuilder = class {
           tsSymbol,
           tsType,
           target,
-          shimLocation: { shimPath: this.shimPath, positionInShimFile }
+          tcbLocation: {
+            tcbPath: this.tcbPath,
+            isShimFile: this.tcbIsShim,
+            positionInFile
+          }
         });
       } else {
         if (!ts27.isElementAccessExpression(outputFieldAccess)) {
@@ -4973,14 +4984,18 @@ var SymbolBuilder = class {
         if (target === null) {
           continue;
         }
-        const positionInShimFile = this.getShimPositionForNode(outputFieldAccess);
+        const positionInFile = this.getTcbPositionForNode(outputFieldAccess);
         const tsType = this.getTypeChecker().getTypeAtLocation(outputFieldAccess);
         bindings.push({
           kind: SymbolKind.Binding,
           tsSymbol,
           tsType,
           target,
-          shimLocation: { shimPath: this.shimPath, positionInShimFile }
+          tcbLocation: {
+            tcbPath: this.tcbPath,
+            isShimFile: this.tcbIsShim,
+            positionInFile
+          }
         });
       }
     }
@@ -5042,7 +5057,7 @@ var SymbolBuilder = class {
       kind: SymbolKind.Directive,
       tsSymbol: symbol.tsSymbol,
       tsType: symbol.tsType,
-      shimLocation: symbol.shimLocation,
+      tcbLocation: symbol.tcbLocation,
       isComponent,
       isStructural,
       selector,
@@ -5061,12 +5076,13 @@ var SymbolBuilder = class {
     return {
       tsType: expressionSymbol.tsType,
       tsSymbol: expressionSymbol.tsSymbol,
-      initializerLocation: expressionSymbol.shimLocation,
+      initializerLocation: expressionSymbol.tcbLocation,
       kind: SymbolKind.Variable,
       declaration: variable,
       localVarLocation: {
-        shimPath: this.shimPath,
-        positionInShimFile: this.getShimPositionForNode(node.name)
+        tcbPath: this.tcbPath,
+        isShimFile: this.tcbIsShim,
+        positionInFile: this.getTcbPositionForNode(node.name)
       }
     };
   }
@@ -5084,9 +5100,10 @@ var SymbolBuilder = class {
     if (symbol === null || symbol.tsSymbol === null) {
       return null;
     }
-    const referenceVarShimLocation = {
-      shimPath: this.shimPath,
-      positionInShimFile: this.getShimPositionForNode(node)
+    const referenceVarTcbLocation = {
+      tcbPath: this.tcbPath,
+      isShimFile: this.tcbIsShim,
+      positionInFile: this.getTcbPositionForNode(node)
     };
     if (target instanceof TmplAstTemplate3 || target instanceof TmplAstElement4) {
       return {
@@ -5095,8 +5112,8 @@ var SymbolBuilder = class {
         tsType: symbol.tsType,
         target,
         declaration: ref,
-        targetLocation: symbol.shimLocation,
-        referenceVarLocation: referenceVarShimLocation
+        targetLocation: symbol.tcbLocation,
+        referenceVarLocation: referenceVarTcbLocation
       };
     } else {
       if (!ts27.isClassDeclaration(target.directive.ref.node)) {
@@ -5108,8 +5125,8 @@ var SymbolBuilder = class {
         tsType: symbol.tsType,
         declaration: ref,
         target: target.directive.ref.node,
-        targetLocation: symbol.shimLocation,
-        referenceVarLocation: referenceVarShimLocation
+        targetLocation: symbol.tcbLocation,
+        referenceVarLocation: referenceVarTcbLocation
       };
     }
   }
@@ -5191,17 +5208,21 @@ var SymbolBuilder = class {
     } else {
       tsSymbol = this.getTypeChecker().getSymbolAtLocation(node);
     }
-    const positionInShimFile = this.getShimPositionForNode(node);
+    const positionInFile = this.getTcbPositionForNode(node);
     const type = this.getTypeChecker().getTypeAtLocation(node);
     return {
       tsSymbol: (_a = tsSymbol != null ? tsSymbol : type.symbol) != null ? _a : null,
       tsType: type,
-      shimLocation: { shimPath: this.shimPath, positionInShimFile }
+      tcbLocation: {
+        tcbPath: this.tcbPath,
+        isShimFile: this.tcbIsShim,
+        positionInFile
+      }
     };
   }
-  getShimPositionForNode(node) {
+  getTcbPositionForNode(node) {
     if (ts27.isTypeReferenceNode(node)) {
-      return this.getShimPositionForNode(node.typeName);
+      return this.getTcbPositionForNode(node.typeName);
     } else if (ts27.isQualifiedName(node)) {
       return node.right.getStart();
     } else if (ts27.isPropertyAccessExpression(node)) {
@@ -5256,7 +5277,7 @@ var TemplateTypeCheckerImpl = class {
     const shimPath = TypeCheckShimGenerator.shimFor(sfPath);
     const fileRecord = this.getFileData(sfPath);
     if (!fileRecord.shimData.has(shimPath)) {
-      return { data: null, tcb: null, shimPath };
+      return { data: null, tcb: null, tcbPath: shimPath, tcbIsShim: true };
     }
     const templateId = fileRecord.sourceManager.getTemplateId(component);
     const shimRecord = fileRecord.shimData.get(shimPath);
@@ -5267,18 +5288,37 @@ var TemplateTypeCheckerImpl = class {
       throw new Error(`Error: no shim file in program: ${shimPath}`);
     }
     let tcb = findTypeCheckBlock(shimSf, id, false);
+    let tcbPath = shimPath;
     if (tcb === null) {
       const inlineSf = getSourceFileOrError(program, sfPath);
       tcb = findTypeCheckBlock(inlineSf, id, false);
+      if (tcb !== null) {
+        tcbPath = sfPath;
+      }
     }
     let data = null;
     if (shimRecord.templates.has(templateId)) {
       data = shimRecord.templates.get(templateId);
     }
-    return { data, tcb, shimPath };
+    return { data, tcb, tcbPath, tcbIsShim: tcbPath === shimPath };
   }
   isTrackedTypeCheckFile(filePath) {
     return this.getFileAndShimRecordsForPath(filePath) !== null;
+  }
+  getFileRecordForTcbLocation({ tcbPath, isShimFile }) {
+    if (!isShimFile) {
+      if (this.state.has(tcbPath)) {
+        return this.state.get(tcbPath);
+      } else {
+        return null;
+      }
+    }
+    const records = this.getFileAndShimRecordsForPath(tcbPath);
+    if (records !== null) {
+      return records.fileRecord;
+    } else {
+      return null;
+    }
   }
   getFileAndShimRecordsForPath(shimPath) {
     for (const fileRecord of this.state.values()) {
@@ -5288,17 +5328,16 @@ var TemplateTypeCheckerImpl = class {
     }
     return null;
   }
-  getTemplateMappingAtShimLocation({ shimPath, positionInShimFile }) {
-    const records = this.getFileAndShimRecordsForPath(absoluteFrom(shimPath));
-    if (records === null) {
+  getTemplateMappingAtTcbLocation(tcbLocation) {
+    const fileRecord = this.getFileRecordForTcbLocation(tcbLocation);
+    if (fileRecord === null) {
       return null;
     }
-    const { fileRecord } = records;
-    const shimSf = this.programDriver.getProgram().getSourceFile(absoluteFrom(shimPath));
+    const shimSf = this.programDriver.getProgram().getSourceFile(tcbLocation.tcbPath);
     if (shimSf === void 0) {
       return null;
     }
-    return getTemplateMapping(shimSf, positionInShimFile, fileRecord.sourceManager, false);
+    return getTemplateMapping(shimSf, tcbLocation.positionInFile, fileRecord.sourceManager, false);
   }
   generateAllTypeCheckBlocks() {
     this.ensureAllShimsForAllFiles();
@@ -5410,11 +5449,11 @@ var TemplateTypeCheckerImpl = class {
     if (this.completionCache.has(component)) {
       return this.completionCache.get(component);
     }
-    const { tcb, data, shimPath } = this.getLatestComponentState(component);
+    const { tcb, data, tcbPath, tcbIsShim } = this.getLatestComponentState(component);
     if (tcb === null || data === null) {
       return null;
     }
-    const engine = new CompletionEngine(tcb, data, shimPath);
+    const engine = new CompletionEngine(tcb, data, tcbPath, tcbIsShim);
     this.completionCache.set(component, engine);
     return engine;
   }
@@ -5538,11 +5577,11 @@ var TemplateTypeCheckerImpl = class {
     if (this.symbolBuilderCache.has(component)) {
       return this.symbolBuilderCache.get(component);
     }
-    const { tcb, data, shimPath } = this.getLatestComponentState(component);
+    const { tcb, data, tcbPath, tcbIsShim } = this.getLatestComponentState(component);
     if (tcb === null || data === null) {
       return null;
     }
-    const builder = new SymbolBuilder(shimPath, tcb, data, this.componentScopeReader, () => this.programDriver.getProgram().getTypeChecker());
+    const builder = new SymbolBuilder(tcbPath, tcbIsShim, tcb, data, this.componentScopeReader, () => this.programDriver.getProgram().getTypeChecker());
     this.symbolBuilderCache.set(component, builder);
     return builder;
   }
@@ -5866,8 +5905,11 @@ var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
     if (symbol.kind !== SymbolKind.Expression) {
       return [];
     }
-    const span = ctx.templateTypeChecker.getTemplateMappingAtShimLocation(symbol.shimLocation).span;
-    const diagnostic = ctx.makeTemplateDiagnostic(span, `The left side of this nullish coalescing operation does not include 'null' or 'undefined' in its type, therefore the '??' operator can be safely removed.`);
+    const templateMapping = ctx.templateTypeChecker.getTemplateMappingAtTcbLocation(symbol.tcbLocation);
+    if (templateMapping === null) {
+      return [];
+    }
+    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, `The left side of this nullish coalescing operation does not include 'null' or 'undefined' in its type, therefore the '??' operator can be safely removed.`);
     return [diagnostic];
   }
 };
@@ -7231,4 +7273,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-EF5WBX5E.js.map
+//# sourceMappingURL=chunk-CTW6B5DX.js.map

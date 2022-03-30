@@ -16,7 +16,7 @@ import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, ShimLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -75,8 +75,9 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
     private getLatestComponentState;
     isTrackedTypeCheckFile(filePath: AbsoluteFsPath): boolean;
+    private getFileRecordForTcbLocation;
     private getFileAndShimRecordsForPath;
-    getTemplateMappingAtShimLocation({ shimPath, positionInShimFile }: ShimLocation): FullTemplateMapping | null;
+    getTemplateMappingAtTcbLocation(tcbLocation: TcbLocation): FullTemplateMapping | null;
     generateAllTypeCheckBlocks(): void;
     /**
      * Retrieve type-checking and template parse diagnostics from the given `ts.SourceFile` using the
@@ -86,8 +87,8 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getDiagnosticsForComponent(component: ts.ClassDeclaration): ts.Diagnostic[];
     getTypeCheckBlock(component: ts.ClassDeclaration): ts.Node | null;
     getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration, node: AST | TmplAstNode): GlobalCompletion | null;
-    getExpressionCompletionLocation(ast: PropertyRead | SafePropertyRead, component: ts.ClassDeclaration): ShimLocation | null;
-    getLiteralCompletionLocation(node: LiteralPrimitive | TmplAstTextAttribute, component: ts.ClassDeclaration): ShimLocation | null;
+    getExpressionCompletionLocation(ast: PropertyRead | SafePropertyRead, component: ts.ClassDeclaration): TcbLocation | null;
+    getLiteralCompletionLocation(node: LiteralPrimitive | TmplAstTextAttribute, component: ts.ClassDeclaration): TcbLocation | null;
     invalidateClass(clazz: ts.ClassDeclaration): void;
     makeTemplateDiagnostic<T extends ErrorCode>(clazz: ts.ClassDeclaration, sourceSpan: ParseSourceSpan, category: ts.DiagnosticCategory, errorCode: T, message: string, relatedInformation?: {
         text: string;
