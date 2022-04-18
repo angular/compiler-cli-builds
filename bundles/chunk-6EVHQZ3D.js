@@ -4266,6 +4266,9 @@ var DirectiveDecoratorHandler = class {
   }
   analyze(node, decorator, flags = HandlerFlags.NONE) {
     if (this.compileUndecoratedClassesWithAngularFeatures === false && decorator === null) {
+      if (this.isCore) {
+        return {};
+      }
       return { diagnostics: [getUndecoratedClassWithAngularFeaturesDiagnostic(node)] };
     }
     this.perf.eventCount(PerfEvent.AnalyzeDirective);
@@ -6773,4 +6776,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-RYXFJXXN.js.map
+//# sourceMappingURL=chunk-6EVHQZ3D.js.map
