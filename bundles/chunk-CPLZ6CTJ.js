@@ -264,7 +264,7 @@ function toR3ClassMetadata(metaObj) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.mjs
-import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, makeBindingParser as makeBindingParser2, parseTemplate, ViewEncapsulation } from "@angular/compiler";
+import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, makeBindingParser as makeBindingParser2, parseTemplate, R3TemplateDependencyKind, ViewEncapsulation } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.mjs
 import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSourceFile, ParseSourceSpan } from "@angular/compiler";
@@ -416,6 +416,17 @@ function createSourceSpan(range, code, sourceUrl) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.mjs
+function makeDirectiveMetadata(directiveExpr, typeExpr, isComponentByDefault = null) {
+  return {
+    kind: R3TemplateDependencyKind.Directive,
+    isComponent: isComponentByDefault || directiveExpr.has("kind") && directiveExpr.getString("kind") === "component",
+    type: typeExpr,
+    selector: directiveExpr.getString("selector"),
+    inputs: directiveExpr.has("inputs") ? directiveExpr.getArray("inputs").map((input) => input.getString()) : [],
+    outputs: directiveExpr.has("outputs") ? directiveExpr.getArray("outputs").map((input) => input.getString()) : [],
+    exportAs: directiveExpr.has("exportAs") ? directiveExpr.getArray("exportAs").map((exportAs) => exportAs.getString()) : null
+  };
+}
 var PartialComponentLinkerVersion1 = class {
   constructor(getSourceFile, sourceUrl, code) {
     this.getSourceFile = getSourceFile;
@@ -445,40 +456,66 @@ var PartialComponentLinkerVersion1 = class {
 ${errors}`);
     }
     let declarationListEmitMode = 0;
-    const collectUsedDirectives = (directives2) => {
-      return directives2.map((directive) => {
-        const directiveExpr = directive.getObject();
-        const type = directiveExpr.getValue("type");
-        const selector = directiveExpr.getString("selector");
-        const { expression: typeExpr, forwardRef } = extractForwardRef(type);
-        if (forwardRef === 2) {
-          declarationListEmitMode = 1;
-        }
-        return {
-          type: typeExpr,
-          selector,
-          inputs: directiveExpr.has("inputs") ? directiveExpr.getArray("inputs").map((input) => input.getString()) : [],
-          outputs: directiveExpr.has("outputs") ? directiveExpr.getArray("outputs").map((input) => input.getString()) : [],
-          exportAs: directiveExpr.has("exportAs") ? directiveExpr.getArray("exportAs").map((exportAs) => exportAs.getString()) : null
-        };
-      });
+    const extractDeclarationTypeExpr = (type) => {
+      const { expression, forwardRef } = extractForwardRef(type);
+      if (forwardRef === 2) {
+        declarationListEmitMode = 1;
+      }
+      return expression;
     };
-    let directives = [];
+    let declarations = [];
     if (metaObj.has("components")) {
-      directives.push(...collectUsedDirectives(metaObj.getArray("components")));
+      declarations.push(...metaObj.getArray("components").map((dir) => {
+        const dirExpr = dir.getObject();
+        const typeExpr = extractDeclarationTypeExpr(dirExpr.getValue("type"));
+        return makeDirectiveMetadata(dirExpr, typeExpr, true);
+      }));
     }
     if (metaObj.has("directives")) {
-      directives.push(...collectUsedDirectives(metaObj.getArray("directives")));
+      declarations.push(...metaObj.getArray("directives").map((dir) => {
+        const dirExpr = dir.getObject();
+        const typeExpr = extractDeclarationTypeExpr(dirExpr.getValue("type"));
+        return makeDirectiveMetadata(dirExpr, typeExpr);
+      }));
     }
-    let pipes = /* @__PURE__ */ new Map();
     if (metaObj.has("pipes")) {
-      pipes = metaObj.getObject("pipes").toMap((pipe) => {
-        const { expression: pipeType, forwardRef } = extractForwardRef(pipe);
-        if (forwardRef === 2) {
-          declarationListEmitMode = 1;
+      const pipes = metaObj.getObject("pipes").toMap((pipe) => pipe);
+      for (const [name, type] of pipes) {
+        const typeExpr = extractDeclarationTypeExpr(type);
+        declarations.push({
+          kind: R3TemplateDependencyKind.Pipe,
+          name,
+          type: typeExpr
+        });
+      }
+    }
+    if (metaObj.has("dependencies")) {
+      for (const dep of metaObj.getArray("dependencies")) {
+        const depObj = dep.getObject();
+        const typeExpr = extractDeclarationTypeExpr(depObj.getValue("type"));
+        switch (depObj.getString("kind")) {
+          case "directive":
+          case "component":
+            declarations.push(makeDirectiveMetadata(depObj, typeExpr));
+            break;
+          case "pipe":
+            const pipeObj = depObj;
+            declarations.push({
+              kind: R3TemplateDependencyKind.Pipe,
+              name: pipeObj.getString("name"),
+              type: typeExpr
+            });
+            break;
+          case "ngmodule":
+            declarations.push({
+              kind: R3TemplateDependencyKind.NgModule,
+              type: typeExpr
+            });
+            break;
+          default:
+            continue;
         }
-        return pipeType;
-      });
+      }
     }
     return __spreadProps(__spreadValues({}, toR3DirectiveMeta(metaObj, this.code, this.sourceUrl)), {
       viewProviders: metaObj.has("viewProviders") ? metaObj.getOpaque("viewProviders") : null,
@@ -494,8 +531,7 @@ ${errors}`);
       animations: metaObj.has("animations") ? metaObj.getOpaque("animations") : null,
       relativeContextFilePath: this.sourceUrl,
       i18nUseExternalIds: false,
-      pipes,
-      directives
+      declarations
     });
   }
   getTemplateInfo(templateNode, isInline) {
@@ -792,7 +828,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "14.0.0-next.13+44.sha-989e840");
+  const LATEST_VERSION_RANGE = getRange("<=", "14.0.0-next.13+54.sha-b8d3389");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -839,7 +875,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "14.0.0-next.13+44.sha-989e840") {
+    if (version === "14.0.0-next.13+54.sha-b8d3389") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -970,4 +1006,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FJDIFR5C.js.map
+//# sourceMappingURL=chunk-CPLZ6CTJ.js.map

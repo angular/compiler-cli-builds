@@ -6,6 +6,8 @@
 import {
   CompilationMode,
   ComponentDecoratorHandler,
+  ComponentScopeKind,
+  CompoundComponentScopeReader,
   CompoundMetadataReader,
   CompoundMetadataRegistry,
   DirectiveDecoratorHandler,
@@ -16,6 +18,7 @@ import {
   InjectableDecoratorHandler,
   LocalMetadataRegistry,
   LocalModuleScopeRegistry,
+  MetaKind,
   MetadataDtsModuleScopeResolver,
   NgModuleDecoratorHandler,
   NoopReferencesRegistry,
@@ -36,7 +39,7 @@ import {
   ivyTransformFactory,
   retagAllTsFiles,
   untagAllTsFiles
-} from "./chunk-6EVHQZ3D.js";
+} from "./chunk-OIKXZBPD.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -1487,6 +1490,83 @@ function createLookupResolutionHost(adapter) {
     useCaseSensitiveFileNames: typeof adapter.useCaseSensitiveFileNames === "function" ? adapter.useCaseSensitiveFileNames.bind(adapter) : adapter.useCaseSensitiveFileNames
   };
 }
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/standalone.mjs
+var StandaloneComponentScopeReader = class {
+  constructor(metaReader, localModuleReader, dtsModuleReader) {
+    this.metaReader = metaReader;
+    this.localModuleReader = localModuleReader;
+    this.dtsModuleReader = dtsModuleReader;
+    this.cache = /* @__PURE__ */ new Map();
+  }
+  getScopeForComponent(clazz) {
+    if (!this.cache.has(clazz)) {
+      const clazzRef = new Reference(clazz);
+      const clazzMeta = this.metaReader.getDirectiveMetadata(clazzRef);
+      if (clazzMeta === null || !clazzMeta.isComponent || !clazzMeta.isStandalone) {
+        this.cache.set(clazz, null);
+        return null;
+      }
+      const dependencies = /* @__PURE__ */ new Set([clazzMeta]);
+      const seen = /* @__PURE__ */ new Set([clazz]);
+      let isPoisoned = clazzMeta.isPoisoned;
+      if (clazzMeta.imports !== null) {
+        for (const ref of clazzMeta.imports) {
+          if (seen.has(ref.node)) {
+            continue;
+          }
+          seen.add(ref.node);
+          const dirMeta = this.metaReader.getDirectiveMetadata(ref);
+          if (dirMeta !== null) {
+            dependencies.add(dirMeta);
+            isPoisoned = isPoisoned || dirMeta.isPoisoned || !dirMeta.isStandalone;
+            continue;
+          }
+          const pipeMeta = this.metaReader.getPipeMetadata(ref);
+          if (pipeMeta !== null) {
+            dependencies.add(pipeMeta);
+            isPoisoned = isPoisoned || !pipeMeta.isStandalone;
+            continue;
+          }
+          const ngModuleMeta = this.metaReader.getNgModuleMetadata(ref);
+          if (ngModuleMeta !== null) {
+            dependencies.add(ngModuleMeta);
+            let ngModuleScope;
+            if (ref.node.getSourceFile().isDeclarationFile) {
+              ngModuleScope = this.dtsModuleReader.resolve(ref);
+            } else {
+              ngModuleScope = this.localModuleReader.getScopeOfModule(ref.node);
+            }
+            if (ngModuleScope === null) {
+              isPoisoned = true;
+              continue;
+            }
+            isPoisoned = isPoisoned || ngModuleScope.exported.isPoisoned;
+            for (const dep of ngModuleScope.exported.dependencies) {
+              if (!seen.has(dep.ref.node)) {
+                seen.add(dep.ref.node);
+                dependencies.add(dep);
+              }
+            }
+            continue;
+          }
+          isPoisoned = true;
+        }
+      }
+      this.cache.set(clazz, {
+        kind: ComponentScopeKind.Standalone,
+        component: clazz,
+        dependencies: Array.from(dependencies),
+        isPoisoned,
+        schemas: []
+      });
+    }
+    return this.cache.get(clazz);
+  }
+  getRemoteScope() {
+    return null;
+  }
+};
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
 import { CssSelector, DomElementSchemaRegistry as DomElementSchemaRegistry2 } from "@angular/compiler";
@@ -4459,7 +4539,7 @@ var SymbolBuilder = class {
   }
   getDirectiveModule(declaration) {
     const scope = this.componentScopeReader.getScopeForComponent(declaration);
-    if (scope === null) {
+    if (scope === null || scope.kind !== ComponentScopeKind.NgModule) {
       return null;
     }
     return scope.ngModule;
@@ -5191,42 +5271,44 @@ var TemplateTypeCheckerImpl = class {
     if (scope === null) {
       return null;
     }
+    const dependencies = scope.kind === ComponentScopeKind.NgModule ? scope.compilation.dependencies : scope.dependencies;
     const data = {
       directives: [],
       pipes: [],
-      isPoisoned: scope.compilation.isPoisoned
+      isPoisoned: scope.kind === ComponentScopeKind.NgModule ? scope.compilation.isPoisoned : scope.isPoisoned
     };
     const typeChecker = this.programDriver.getProgram().getTypeChecker();
-    for (const dir of scope.compilation.directives) {
-      if (dir.selector === null) {
-        continue;
+    for (const dep of dependencies) {
+      if (dep.kind === MetaKind.Directive) {
+        if (dep.selector === null) {
+          continue;
+        }
+        const tsSymbol = typeChecker.getSymbolAtLocation(dep.ref.node.name);
+        if (!isSymbolWithValueDeclaration(tsSymbol)) {
+          continue;
+        }
+        let ngModule = null;
+        const moduleScopeOfDir = this.componentScopeReader.getScopeForComponent(dep.ref.node);
+        if (moduleScopeOfDir !== null && moduleScopeOfDir.kind === ComponentScopeKind.NgModule) {
+          ngModule = moduleScopeOfDir.ngModule;
+        }
+        data.directives.push({
+          isComponent: dep.isComponent,
+          isStructural: dep.isStructural,
+          selector: dep.selector,
+          tsSymbol,
+          ngModule
+        });
+      } else if (dep.kind === MetaKind.Pipe) {
+        const tsSymbol = typeChecker.getSymbolAtLocation(dep.ref.node.name);
+        if (tsSymbol === void 0) {
+          continue;
+        }
+        data.pipes.push({
+          name: dep.name,
+          tsSymbol
+        });
       }
-      const tsSymbol = typeChecker.getSymbolAtLocation(dir.ref.node.name);
-      if (!isSymbolWithValueDeclaration(tsSymbol)) {
-        continue;
-      }
-      let ngModule = null;
-      const moduleScopeOfDir = this.componentScopeReader.getScopeForComponent(dir.ref.node);
-      if (moduleScopeOfDir !== null) {
-        ngModule = moduleScopeOfDir.ngModule;
-      }
-      data.directives.push({
-        isComponent: dir.isComponent,
-        isStructural: dir.isStructural,
-        selector: dir.selector,
-        tsSymbol,
-        ngModule
-      });
-    }
-    for (const pipe of scope.compilation.pipes) {
-      const tsSymbol = typeChecker.getSymbolAtLocation(pipe.ref.node.name);
-      if (tsSymbol === void 0) {
-        continue;
-      }
-      data.pipes.push({
-        name: pipe.name,
-        tsSymbol
-      });
     }
     this.scopeCache.set(component, data);
     return data;
@@ -6022,10 +6104,11 @@ var NgCompiler = class {
     const localMetaReader = localMetaRegistry;
     const depScopeReader = new MetadataDtsModuleScopeResolver(dtsReader, aliasingHost);
     const metaReader = new CompoundMetadataReader([localMetaReader, dtsReader]);
-    const scopeRegistry = new LocalModuleScopeRegistry(localMetaReader, metaReader, depScopeReader, refEmitter, aliasingHost);
-    const scopeReader = scopeRegistry;
+    const ngModuleScopeRegistry = new LocalModuleScopeRegistry(localMetaReader, metaReader, depScopeReader, refEmitter, aliasingHost);
+    const standaloneScopeReader = new StandaloneComponentScopeReader(metaReader, ngModuleScopeRegistry, depScopeReader);
+    const scopeReader = new CompoundComponentScopeReader([ngModuleScopeRegistry, standaloneScopeReader]);
     const semanticDepGraphUpdater = this.incrementalCompilation.semanticDepGraphUpdater;
-    const metaRegistry = new CompoundMetadataRegistry([localMetaRegistry, scopeRegistry]);
+    const metaRegistry = new CompoundMetadataRegistry([localMetaRegistry, ngModuleScopeRegistry]);
     const injectableRegistry = new InjectableClassRegistry(reflector);
     const typeCheckScopeRegistry = new TypeCheckScopeRegistry(scopeReader, metaReader);
     let referencesRegistry;
@@ -6042,24 +6125,24 @@ var NgCompiler = class {
     const compilationMode = this.options.compilationMode === "partial" && !isCore ? CompilationMode.PARTIAL : CompilationMode.FULL;
     const cycleHandlingStrategy = compilationMode === CompilationMode.FULL ? 0 : 1;
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder),
-      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, isCore, semanticDepGraphUpdater, this.closureCompilerEnabled, false, this.delegatingPerfRecorder),
-      new PipeDecoratorHandler(reflector, evaluator, metaRegistry, scopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder),
+      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, isCore, semanticDepGraphUpdater, this.closureCompilerEnabled, false, this.delegatingPerfRecorder),
+      new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder),
       new InjectableDecoratorHandler(reflector, isCore, this.options.strictInjectionParameters || false, injectableRegistry, this.delegatingPerfRecorder),
-      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, isCore, refEmitter, this.adapter.factoryTracker, this.closureCompilerEnabled, injectableRegistry, this.delegatingPerfRecorder)
+      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, isCore, refEmitter, this.adapter.factoryTracker, this.closureCompilerEnabled, injectableRegistry, this.delegatingPerfRecorder)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
       this.incrementalStrategy.setIncrementalState(this.incrementalCompilation.state, program);
       this.currentProgram = program;
     });
-    const templateTypeChecker = new TemplateTypeCheckerImpl(this.inputProgram, notifyingDriver, traitCompiler, this.getTypeCheckingConfig(), refEmitter, reflector, this.adapter, this.incrementalCompilation, scopeRegistry, typeCheckScopeRegistry, this.delegatingPerfRecorder);
+    const templateTypeChecker = new TemplateTypeCheckerImpl(this.inputProgram, notifyingDriver, traitCompiler, this.getTypeCheckingConfig(), refEmitter, reflector, this.adapter, this.incrementalCompilation, scopeReader, typeCheckScopeRegistry, this.delegatingPerfRecorder);
     const extendedTemplateChecker = this.constructionDiagnostics.length === 0 ? new ExtendedTemplateCheckerImpl(templateTypeChecker, checker, ALL_DIAGNOSTIC_FACTORIES, this.options) : null;
     return {
       isCore,
       traitCompiler,
       reflector,
-      scopeRegistry,
+      scopeRegistry: ngModuleScopeRegistry,
       dtsTransforms,
       exportReferenceGraph,
       metaReader,
@@ -6813,4 +6896,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-U4YHIVCX.js.map
+//# sourceMappingURL=chunk-QBKHQ7YH.js.map
