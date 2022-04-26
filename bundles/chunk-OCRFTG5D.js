@@ -144,21 +144,26 @@ function tryUnwrapForwardRef(node, reflector) {
   }
   return expr;
 }
-function forwardRefResolver(ref, args) {
-  if (!isAngularCoreReference(ref, "forwardRef") || args.length !== 1) {
-    return null;
+var forwardRefResolver = (fn, callExpr, resolve, unresolvable) => {
+  if (!isAngularCoreReference(fn, "forwardRef") || callExpr.arguments.length !== 1) {
+    return unresolvable;
   }
-  return expandForwardRef(args[0]);
-}
+  const expanded = expandForwardRef(callExpr.arguments[0]);
+  if (expanded !== null) {
+    return resolve(expanded);
+  } else {
+    return unresolvable;
+  }
+};
 function combineResolvers(resolvers) {
-  return (ref, args) => {
+  return (fn, callExpr, resolve, unresolvable) => {
     for (const resolver of resolvers) {
-      const resolved = resolver(ref, args);
-      if (resolved !== null) {
+      const resolved = resolver(fn, callExpr, resolve, unresolvable);
+      if (resolved !== unresolvable) {
         return resolved;
       }
     }
-    return null;
+    return unresolvable;
   };
 }
 function isExpressionForwardReference(expr, context, contextSource) {
@@ -304,8 +309,11 @@ var DynamicValue = class {
   static fromDynamicType(node) {
     return new DynamicValue(node, void 0, 7);
   }
+  static fromSyntheticInput(node, value) {
+    return new DynamicValue(node, value, 8);
+  }
   static fromUnknown(node) {
-    return new DynamicValue(node, void 0, 8);
+    return new DynamicValue(node, void 0, 9);
   }
   isFromDynamicInput() {
     return this.code === 0;
@@ -332,7 +340,7 @@ var DynamicValue = class {
     return this.code === 7;
   }
   isFromUnknown() {
-    return this.code === 8;
+    return this.code === 9;
   }
   accept(visitor) {
     switch (this.code) {
@@ -353,6 +361,8 @@ var DynamicValue = class {
       case 7:
         return visitor.visitDynamicType(this);
       case 8:
+        return visitor.visitSyntheticInput(this);
+      case 9:
         return visitor.visitUnknown(this);
     }
   }
@@ -538,6 +548,13 @@ function resolveKnownDeclaration(decl) {
       throw new Error(`Cannot resolve known declaration. Received: ${KnownDeclaration[decl]}.`);
   }
 }
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/synthetic.mjs
+var SyntheticValue = class {
+  constructor(value) {
+    this.value = value;
+  }
+};
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/interpreter.mjs
 function literalBinaryOp(op) {
@@ -854,6 +871,8 @@ var StaticInterpreter = class {
       }
     } else if (lhs instanceof DynamicValue) {
       return DynamicValue.fromDynamicInput(node, lhs);
+    } else if (lhs instanceof SyntheticValue) {
+      return DynamicValue.fromSyntheticInput(node, lhs);
     }
     return DynamicValue.fromUnknown(node);
   }
@@ -875,31 +894,24 @@ var StaticInterpreter = class {
     if (!isFunctionOrMethodReference(lhs)) {
       return DynamicValue.fromInvalidExpressionType(node.expression, lhs);
     }
-    if (fn.body === null) {
-      let expr = null;
-      if (context.foreignFunctionResolver) {
-        expr = context.foreignFunctionResolver(lhs, node.arguments);
-      }
-      if (expr === null) {
-        return DynamicValue.fromDynamicInput(node, DynamicValue.fromExternalReference(node.expression, lhs));
-      }
-      if (expr.getSourceFile() !== node.expression.getSourceFile() && lhs.bestGuessOwningModule !== null) {
-        context = __spreadProps(__spreadValues({}, context), {
+    const resolveFfrExpr = (expr) => {
+      let contextExtension = {};
+      if (fn.body === null && expr.getSourceFile() !== node.expression.getSourceFile() && lhs.bestGuessOwningModule !== null) {
+        contextExtension = {
           absoluteModuleName: lhs.bestGuessOwningModule.specifier,
           resolutionContext: lhs.bestGuessOwningModule.resolutionContext
-        });
+        };
       }
-      return this.visitFfrExpression(expr, context);
+      return this.visitFfrExpression(expr, __spreadValues(__spreadValues({}, context), contextExtension));
+    };
+    if (fn.body === null && context.foreignFunctionResolver !== void 0) {
+      const unresolvable = DynamicValue.fromDynamicInput(node, DynamicValue.fromExternalReference(node.expression, lhs));
+      return context.foreignFunctionResolver(lhs, node, resolveFfrExpr, unresolvable);
     }
-    let res = this.visitFunctionBody(node, fn, context);
+    const res = this.visitFunctionBody(node, fn, context);
     if (res instanceof DynamicValue && context.foreignFunctionResolver !== void 0) {
-      const ffrExpr = context.foreignFunctionResolver(lhs, node.arguments);
-      if (ffrExpr !== null) {
-        const ffrRes = this.visitFfrExpression(ffrExpr, context);
-        if (!(ffrRes instanceof DynamicValue)) {
-          res = ffrRes;
-        }
-      }
+      const unresolvable = DynamicValue.fromComplexFunctionCall(node, fn);
+      return context.foreignFunctionResolver(lhs, node, resolveFfrExpr, unresolvable);
     }
     return res;
   }
@@ -1205,6 +1217,9 @@ var TraceDynamicValueVisitor = class {
       trace.unshift(info);
     }
     return trace;
+  }
+  visitSyntheticInput(value) {
+    return [makeRelatedInformation(value.node, "Unable to evaluate this expression further.")];
   }
   visitDynamicString(value) {
     return [makeRelatedInformation(value.node, "A string value could not be determined statically.")];
@@ -1665,7 +1680,7 @@ var NoopReferencesRegistry = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 import { compileClassMetadata as compileClassMetadata3, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
-import ts27 from "typescript";
+import ts26 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
 import ts8 from "typescript";
@@ -5013,7 +5028,7 @@ var NgModuleDecoratorHandler = class {
       return {};
     }
     const moduleResolvers = combineResolvers([
-      (ref) => this._extractModuleFromModuleWithProvidersFn(ref.node),
+      (fn, call, resolve, unresolvable) => this._extractModuleFromModuleWithProvidersFn(fn, call, resolve, unresolvable),
       forwardRefResolver
     ]);
     const diagnostics = [];
@@ -5022,7 +5037,7 @@ var NgModuleDecoratorHandler = class {
     if (ngModule.has("declarations")) {
       rawDeclarations = ngModule.get("declarations");
       const declarationMeta = this.evaluator.evaluate(rawDeclarations, forwardRefResolver);
-      declarationRefs = this.resolveTypeList(rawDeclarations, declarationMeta, name, "declarations");
+      declarationRefs = this.resolveTypeList(rawDeclarations, declarationMeta, name, "declarations", 0).references;
       for (const ref of declarationRefs) {
         if (ref.node.getSourceFile().isDeclarationFile) {
           const errorNode = ref.getOriginForDiagnostics(rawDeclarations);
@@ -5038,21 +5053,21 @@ var NgModuleDecoratorHandler = class {
     if (ngModule.has("imports")) {
       rawImports = ngModule.get("imports");
       const importsMeta = this.evaluator.evaluate(rawImports, moduleResolvers);
-      importRefs = this.resolveTypeList(rawImports, importsMeta, name, "imports");
+      importRefs = this.resolveTypeList(rawImports, importsMeta, name, "imports", 0).references;
     }
     let exportRefs = [];
     let rawExports = null;
     if (ngModule.has("exports")) {
       rawExports = ngModule.get("exports");
       const exportsMeta = this.evaluator.evaluate(rawExports, moduleResolvers);
-      exportRefs = this.resolveTypeList(rawExports, exportsMeta, name, "exports");
+      exportRefs = this.resolveTypeList(rawExports, exportsMeta, name, "exports", 0).references;
       this.referencesRegistry.add(node, ...exportRefs);
     }
     let bootstrapRefs = [];
     if (ngModule.has("bootstrap")) {
       const expr = ngModule.get("bootstrap");
       const bootstrapMeta = this.evaluator.evaluate(expr, forwardRefResolver);
-      bootstrapRefs = this.resolveTypeList(expr, bootstrapMeta, name, "bootstrap");
+      bootstrapRefs = this.resolveTypeList(expr, bootstrapMeta, name, "bootstrap", 0).references;
     }
     const schemas = [];
     if (ngModule.has("schemas")) {
@@ -5122,16 +5137,38 @@ var NgModuleDecoratorHandler = class {
     };
     const rawProviders = ngModule.has("providers") ? ngModule.get("providers") : null;
     const wrapperProviders = rawProviders !== null ? new WrappedNodeExpr6(this.annotateForClosureCompiler ? wrapFunctionExpressionsInParens(rawProviders) : rawProviders) : null;
-    const injectorImports = [];
+    const topLevelImports = [];
     if (ngModule.has("imports")) {
-      injectorImports.push(new WrappedNodeExpr6(ngModule.get("imports")));
+      const rawImports2 = unwrapExpression(ngModule.get("imports"));
+      let topLevelExpressions = [];
+      if (ts24.isArrayLiteralExpression(rawImports2)) {
+        for (const element of rawImports2.elements) {
+          if (ts24.isSpreadElement(element)) {
+            topLevelExpressions.push(element.expression);
+            continue;
+          }
+          topLevelExpressions.push(element);
+        }
+      } else {
+        topLevelExpressions.push(rawImports2);
+      }
+      let absoluteIndex = 0;
+      for (const importExpr of topLevelExpressions) {
+        const resolved = this.evaluator.evaluate(importExpr, moduleResolvers);
+        const { references, hasModuleWithProviders } = this.resolveTypeList(importExpr, [resolved], node.name.text, "imports", absoluteIndex);
+        absoluteIndex += references.length;
+        topLevelImports.push({
+          expression: importExpr,
+          resolvedReferences: references,
+          hasModuleWithProviders
+        });
+      }
     }
     const injectorMetadata = {
       name,
       type,
       internalType,
-      providers: wrapperProviders,
-      imports: injectorImports
+      providers: wrapperProviders
     };
     const factoryMetadata = {
       name,
@@ -5151,8 +5188,9 @@ var NgModuleDecoratorHandler = class {
         fac: factoryMetadata,
         declarations: declarationRefs,
         rawDeclarations,
-        imports: importRefs,
+        imports: topLevelImports,
         rawImports,
+        importRefs,
         exports: exportRefs,
         rawExports,
         providers: rawProviders,
@@ -5171,7 +5209,7 @@ var NgModuleDecoratorHandler = class {
       ref: new Reference(node),
       schemas: analysis.schemas,
       declarations: analysis.declarations,
-      imports: analysis.imports,
+      imports: analysis.importRefs,
       exports: analysis.exports,
       rawDeclarations: analysis.rawDeclarations,
       rawImports: analysis.rawImports,
@@ -5198,6 +5236,34 @@ var NgModuleDecoratorHandler = class {
     const data = {
       injectorImports: []
     };
+    for (const topLevelImport of analysis.imports) {
+      if (topLevelImport.hasModuleWithProviders) {
+        data.injectorImports.push(new WrappedNodeExpr6(topLevelImport.expression));
+        continue;
+      }
+      const refsToEmit = [];
+      for (const ref of topLevelImport.resolvedReferences) {
+        const dirMeta = this.metaReader.getDirectiveMetadata(ref);
+        if (dirMeta !== null && !dirMeta.isComponent) {
+          continue;
+        }
+        const pipeMeta = dirMeta === null ? this.metaReader.getPipeMetadata(ref) : null;
+        if (pipeMeta !== null) {
+          continue;
+        }
+        refsToEmit.push(ref);
+      }
+      if (refsToEmit.length === topLevelImport.resolvedReferences.length) {
+        data.injectorImports.push(new WrappedNodeExpr6(topLevelImport.expression));
+      } else {
+        const context = node.getSourceFile();
+        for (const ref of refsToEmit) {
+          const emittedRef = this.refEmitter.emit(ref, context);
+          assertSuccessfulReferenceEmit(emittedRef, topLevelImport.expression, "class");
+          data.injectorImports.push(emittedRef.expression);
+        }
+      }
+    }
     if (scope !== null && !scope.compilation.isPoisoned) {
       const context = getSourceFile(node);
       for (const exportRef of analysis.exports) {
@@ -5232,7 +5298,9 @@ var NgModuleDecoratorHandler = class {
   }
   compileFull(node, { inj, mod, fac, classMetadata, declarations }, { injectorImports }) {
     const factoryFn = compileNgFactoryDefField(fac);
-    const ngInjectorDef = compileInjector(this.mergeInjectorImports(inj, injectorImports));
+    const ngInjectorDef = compileInjector(__spreadProps(__spreadValues({}, inj), {
+      imports: injectorImports
+    }));
     const ngModuleDef = compileNgModule(mod);
     const statements = ngModuleDef.statements;
     const metadata = classMetadata !== null ? compileClassMetadata2(classMetadata) : null;
@@ -5242,14 +5310,13 @@ var NgModuleDecoratorHandler = class {
   }
   compilePartial(node, { inj, fac, mod, classMetadata }, { injectorImports }) {
     const factoryFn = compileDeclareFactory(fac);
-    const injectorDef = compileDeclareInjectorFromMetadata(this.mergeInjectorImports(inj, injectorImports));
+    const injectorDef = compileDeclareInjectorFromMetadata(__spreadProps(__spreadValues({}, inj), {
+      imports: injectorImports
+    }));
     const ngModuleDef = compileDeclareNgModuleFromMetadata(mod);
     const metadata = classMetadata !== null ? compileDeclareClassMetadata2(classMetadata) : null;
     this.insertMetadataStatement(ngModuleDef.statements, metadata);
     return this.compileNgModule(factoryFn, injectorDef, ngModuleDef);
-  }
-  mergeInjectorImports(inj, injectorImports) {
-    return __spreadProps(__spreadValues({}, inj), { imports: [...inj.imports, ...injectorImports] });
   }
   insertMetadataStatement(ngModuleStatements, metadata) {
     if (metadata !== null) {
@@ -5312,9 +5379,20 @@ var NgModuleDecoratorHandler = class {
       return toR3Reference(origin, valueRef, typeRef, valueContext, typeContext, this.refEmitter);
     }
   }
-  _extractModuleFromModuleWithProvidersFn(node) {
-    const type = node.type || null;
-    return type && (this._reflectModuleFromTypeParam(type, node) || this._reflectModuleFromLiteralType(type));
+  _extractModuleFromModuleWithProvidersFn(fn, node, resolve, unresolvable) {
+    const rawType = fn.node.type || null;
+    const type = rawType && (this._reflectModuleFromTypeParam(rawType, fn.node) || this._reflectModuleFromLiteralType(rawType));
+    if (type === null) {
+      return unresolvable;
+    }
+    const ngModule = resolve(type);
+    if (!(ngModule instanceof Reference) || !isNamedClassDeclaration(ngModule.node)) {
+      return unresolvable;
+    }
+    return new SyntheticValue({
+      ngModule,
+      mwpCall: node
+    });
   }
   _reflectModuleFromTypeParam(type, node) {
     if (!ts24.isTypeReferenceNode(type)) {
@@ -5359,27 +5437,40 @@ var NgModuleDecoratorHandler = class {
   isClassDeclarationReference(ref) {
     return this.reflector.isClass(ref.node);
   }
-  resolveTypeList(expr, resolvedList, className, arrayName) {
+  resolveTypeList(expr, resolvedList, className, arrayName, absoluteIndex) {
+    let hasModuleWithProviders = false;
     const refList = [];
     if (!Array.isArray(resolvedList)) {
       throw createValueHasWrongTypeError(expr, resolvedList, `Expected array when reading the NgModule.${arrayName} of ${className}`);
     }
-    resolvedList.forEach((entry, idx) => {
-      if (entry instanceof Map && entry.has("ngModule")) {
+    for (let idx = 0; idx < resolvedList.length; idx++) {
+      let entry = resolvedList[idx];
+      if (entry instanceof SyntheticValue && isResolvedModuleWithProviders(entry)) {
+        entry = entry.value.ngModule;
+        hasModuleWithProviders = true;
+      } else if (entry instanceof Map && entry.has("ngModule")) {
         entry = entry.get("ngModule");
+        hasModuleWithProviders = true;
       }
       if (Array.isArray(entry)) {
-        refList.push(...this.resolveTypeList(expr, entry, className, arrayName));
+        const recursiveResult = this.resolveTypeList(expr, entry, className, arrayName, absoluteIndex);
+        refList.push(...recursiveResult.references);
+        absoluteIndex += recursiveResult.references.length;
+        hasModuleWithProviders = hasModuleWithProviders || recursiveResult.hasModuleWithProviders;
       } else if (entry instanceof Reference) {
         if (!this.isClassDeclarationReference(entry)) {
-          throw createValueHasWrongTypeError(entry.node, entry, `Value at position ${idx} in the NgModule.${arrayName} of ${className} is not a class`);
+          throw createValueHasWrongTypeError(entry.node, entry, `Value at position ${absoluteIndex} in the NgModule.${arrayName} of ${className} is not a class`);
         }
         refList.push(entry);
+        absoluteIndex += 1;
       } else {
-        throw createValueHasWrongTypeError(expr, entry, `Value at position ${idx} in the NgModule.${arrayName} of ${className} is not a reference`);
+        throw createValueHasWrongTypeError(expr, entry, `Value at position ${absoluteIndex} in the NgModule.${arrayName} of ${className} is not a reference`);
       }
-    });
-    return refList;
+    }
+    return {
+      references: refList,
+      hasModuleWithProviders
+    };
   }
 };
 function isNgModule(node, compilation) {
@@ -5387,6 +5478,9 @@ function isNgModule(node, compilation) {
 }
 function isModuleIdExpression(expr) {
   return ts24.isPropertyAccessExpression(expr) && ts24.isIdentifier(expr.expression) && expr.expression.text === "module" && expr.name.text === "id";
+}
+function isResolvedModuleWithProviders(sv) {
+  return typeof sv.value === "object" && sv.value != null && sv.value.hasOwnProperty("ngModule") && sv.value.hasOwnProperty("mwpCall");
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/diagnostics.mjs
@@ -5740,7 +5834,6 @@ var ComponentSymbol = class extends DirectiveSymbol {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/util.mjs
-import ts26 from "typescript";
 function collectAnimationNames(value, animationTriggerNames) {
   if (value instanceof Map) {
     const name = value.get("name");
@@ -5760,19 +5853,18 @@ function collectAnimationNames(value, animationTriggerNames) {
 function isAngularAnimationsReference(reference, symbolName) {
   return reference.ownedByModuleGuess === "@angular/animations" && reference.debugName === symbolName;
 }
-var animationTriggerResolver = (ref, args) => {
+var animationTriggerResolver = (fn, node, resolve, unresolvable) => {
   const animationTriggerMethodName = "trigger";
-  if (!isAngularAnimationsReference(ref, animationTriggerMethodName)) {
-    return null;
+  if (!isAngularAnimationsReference(fn, animationTriggerMethodName)) {
+    return unresolvable;
   }
-  const triggerNameExpression = args[0];
+  const triggerNameExpression = node.arguments[0];
   if (!triggerNameExpression) {
-    return null;
+    return unresolvable;
   }
-  const factory = ts26.factory;
-  return factory.createObjectLiteralExpression([
-    factory.createPropertyAssignment(factory.createIdentifier("name"), triggerNameExpression)
-  ], true);
+  const res = /* @__PURE__ */ new Map();
+  res.set("name", resolve(triggerNameExpression));
+  return res;
 };
 function validateAndFlattenComponentImports(imports, expr) {
   const flattened = [];
@@ -6140,7 +6232,7 @@ var ComponentDecoratorHandler = class {
     });
   }
   typeCheck(ctx, node, meta) {
-    if (this.typeCheckScopeRegistry === null || !ts27.isClassDeclaration(node)) {
+    if (this.typeCheckScopeRegistry === null || !ts26.isClassDeclaration(node)) {
       return;
     }
     if (meta.isPoisoned && !this.usePoisonedData) {
@@ -6415,7 +6507,7 @@ function validateStandaloneImports(importRefs, importExpr, metaReader, scopeRead
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
-import ts28 from "typescript";
+import ts27 from "typescript";
 var InjectableDecoratorHandler = class {
   constructor(reflector, isCore, strictCtorDeps, injectableRegistry, perf, errorOnDuplicateProv = true) {
     this.reflector = reflector;
@@ -6506,7 +6598,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     };
   } else if (decorator.args.length === 1) {
     const metaNode = decorator.args[0];
-    if (!ts28.isObjectLiteralExpression(metaNode)) {
+    if (!ts27.isObjectLiteralExpression(metaNode)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, `@Injectable argument must be an object literal`);
     }
     const meta = reflectObjectLiteral(metaNode);
@@ -6514,7 +6606,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     let deps = void 0;
     if ((meta.has("useClass") || meta.has("useFactory")) && meta.has("deps")) {
       const depsExpr = meta.get("deps");
-      if (!ts28.isArrayLiteralExpression(depsExpr)) {
+      if (!ts27.isArrayLiteralExpression(depsExpr)) {
         throw new FatalDiagnosticError(ErrorCode.VALUE_NOT_LITERAL, depsExpr, `@Injectable deps metadata must be an inline array`);
       }
       deps = depsExpr.elements.map((dep) => getDep(dep, reflector));
@@ -6596,12 +6688,12 @@ function getDep(dep, reflector) {
     }
     return true;
   }
-  if (ts28.isArrayLiteralExpression(dep)) {
+  if (ts27.isArrayLiteralExpression(dep)) {
     dep.elements.forEach((el) => {
       let isDecorator = false;
-      if (ts28.isIdentifier(el)) {
+      if (ts27.isIdentifier(el)) {
         isDecorator = maybeUpdateDecorator(el, reflector);
-      } else if (ts28.isNewExpression(el) && ts28.isIdentifier(el.expression)) {
+      } else if (ts27.isNewExpression(el) && ts27.isIdentifier(el.expression)) {
         const token = el.arguments && el.arguments.length > 0 && el.arguments[0] || void 0;
         isDecorator = maybeUpdateDecorator(el.expression, reflector, token);
       }
@@ -6615,7 +6707,7 @@ function getDep(dep, reflector) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/pipe.mjs
 import { compileClassMetadata as compileClassMetadata5, compileDeclareClassMetadata as compileDeclareClassMetadata5, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
-import ts29 from "typescript";
+import ts28 from "typescript";
 var PipeSymbol = class extends SemanticSymbol {
   constructor(decl, name) {
     super(decl);
@@ -6670,7 +6762,7 @@ var PipeDecoratorHandler = class {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), "@Pipe must have exactly one argument");
     }
     const meta = unwrapExpression(decorator.args[0]);
-    if (!ts29.isObjectLiteralExpression(meta)) {
+    if (!ts28.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
     }
     const pipe = reflectObjectLiteral(meta);
@@ -6805,4 +6897,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-OIKXZBPD.js.map
+//# sourceMappingURL=chunk-OCRFTG5D.js.map

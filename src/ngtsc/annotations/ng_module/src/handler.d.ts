@@ -20,13 +20,14 @@ import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerP
 import { ReferencesRegistry } from '../../common';
 export interface NgModuleAnalysis {
     mod: R3NgModuleMetadata;
-    inj: R3InjectorMetadata;
+    inj: Omit<R3InjectorMetadata, 'imports'>;
     fac: R3FactoryMetadata;
     classMetadata: R3ClassMetadata | null;
     declarations: Reference<ClassDeclaration>[];
     rawDeclarations: ts.Expression | null;
     schemas: SchemaMetadata[];
-    imports: Reference<ClassDeclaration>[];
+    imports: TopLevelImportedExpression[];
+    importRefs: Reference<ClassDeclaration>[];
     rawImports: ts.Expression | null;
     exports: Reference<ClassDeclaration>[];
     rawExports: ts.Expression | null;
@@ -75,11 +76,6 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     compileFull(node: ClassDeclaration, { inj, mod, fac, classMetadata, declarations }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
     compilePartial(node: ClassDeclaration, { inj, fac, mod, classMetadata }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
     /**
-     *  Merge the injector imports (which are 'exports' that were later found to be NgModules)
-     *  computed during resolution with the ones from analysis.
-     */
-    private mergeInjectorImports;
-    /**
      * Add class metadata statements, if provided, to the `ngModuleStatements`.
      */
     private insertMetadataStatement;
@@ -113,4 +109,9 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
      * Compute a list of `Reference`s from a resolved metadata value.
      */
     private resolveTypeList;
+}
+export interface TopLevelImportedExpression {
+    expression: ts.Expression;
+    resolvedReferences: Array<Reference<ClassDeclaration>>;
+    hasModuleWithProviders: boolean;
 }
