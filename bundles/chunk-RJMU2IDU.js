@@ -39,7 +39,7 @@ import {
   ivyTransformFactory,
   retagAllTsFiles,
   untagAllTsFiles
-} from "./chunk-OCRFTG5D.js";
+} from "./chunk-2ZVQLOCC.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -1500,6 +1500,7 @@ var StandaloneComponentScopeReader = class {
     this.cache = /* @__PURE__ */ new Map();
   }
   getScopeForComponent(clazz) {
+    var _a;
     if (!this.cache.has(clazz)) {
       const clazzRef = new Reference(clazz);
       const clazzMeta = this.metaReader.getDirectiveMetadata(clazzRef);
@@ -1558,7 +1559,7 @@ var StandaloneComponentScopeReader = class {
         component: clazz,
         dependencies: Array.from(dependencies),
         isPoisoned,
-        schemas: []
+        schemas: (_a = clazzMeta.schemas) != null ? _a : []
       });
     }
     return this.cache.get(clazz);
@@ -6896,4 +6897,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-VRQ2D6QN.js.map
+//# sourceMappingURL=chunk-RJMU2IDU.js.map

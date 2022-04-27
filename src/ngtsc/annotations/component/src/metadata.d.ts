@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/component/src/metadata" />
-import { AnimationTriggerNames, R3ClassMetadata, R3ComponentMetadata, R3TemplateDependencyMetadata } from '@angular/compiler';
+import { AnimationTriggerNames, R3ClassMetadata, R3ComponentMetadata, R3TemplateDependencyMetadata, SchemaMetadata } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../../imports';
 import { ClassPropertyMapping, ComponentResources, DirectiveTypeCheckMeta } from '../../../metadata';
@@ -55,5 +55,6 @@ export interface ComponentAnalysisData {
     animationTriggerNames: AnimationTriggerNames | null;
     rawImports: ts.Expression | null;
     resolvedImports: Reference<ClassDeclaration>[] | null;
+    schemas: SchemaMetadata[] | null;
 }
 export declare type ComponentResolutionData = Pick<R3ComponentMetadata<R3TemplateDependencyMetadata>, ComponentMetadataResolvedFields>;

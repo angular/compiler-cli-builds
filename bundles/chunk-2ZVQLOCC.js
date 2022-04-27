@@ -1678,6 +1678,36 @@ var NoopReferencesRegistry = class {
   }
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/schema.mjs
+import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from "@angular/compiler";
+function extractSchemas(rawExpr, evaluator, context) {
+  const schemas = [];
+  const result = evaluator.evaluate(rawExpr);
+  if (!Array.isArray(result)) {
+    throw createValueHasWrongTypeError(rawExpr, result, `${context}.schemas must be an array`);
+  }
+  for (const schemaRef of result) {
+    if (!(schemaRef instanceof Reference)) {
+      throw createValueHasWrongTypeError(rawExpr, result, `${context}.schemas must be an array of schemas`);
+    }
+    const id = schemaRef.getIdentityIn(schemaRef.node.getSourceFile());
+    if (id === null || schemaRef.ownedByModuleGuess !== "@angular/core") {
+      throw createValueHasWrongTypeError(rawExpr, result, `${context}.schemas must be an array of schemas`);
+    }
+    switch (id.text) {
+      case "CUSTOM_ELEMENTS_SCHEMA":
+        schemas.push(CUSTOM_ELEMENTS_SCHEMA);
+        break;
+      case "NO_ERRORS_SCHEMA":
+        schemas.push(NO_ERRORS_SCHEMA);
+        break;
+      default:
+        throw createValueHasWrongTypeError(rawExpr, schemaRef, `'${schemaRef.debugName}' is not a valid ${context} schema`);
+    }
+  }
+  return schemas;
+}
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 import { compileClassMetadata as compileClassMetadata3, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
 import ts26 from "typescript";
@@ -2241,7 +2271,8 @@ var DtsMetadataReader = class {
       isStructural,
       animationTriggerNames: null,
       isStandalone,
-      imports: null
+      imports: null,
+      schemas: null
     });
   }
   getPipeMetadata(ref) {
@@ -4890,7 +4921,8 @@ var DirectiveDecoratorHandler = class {
       isStructural: analysis.isStructural,
       animationTriggerNames: null,
       isStandalone: analysis.meta.isStandalone,
-      imports: null
+      imports: null,
+      schemas: null
     }));
     this.injectableRegistry.registerInjectable(node);
   }
@@ -4935,7 +4967,7 @@ var DirectiveDecoratorHandler = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.mjs
-import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, CUSTOM_ELEMENTS_SCHEMA, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, NO_ERRORS_SCHEMA, R3Identifiers, R3SelectorScopeMode, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, R3Identifiers, R3SelectorScopeMode, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
 import ts24 from "typescript";
 var NgModuleSymbol = class extends SemanticSymbol {
   constructor() {
@@ -5069,33 +5101,7 @@ var NgModuleDecoratorHandler = class {
       const bootstrapMeta = this.evaluator.evaluate(expr, forwardRefResolver);
       bootstrapRefs = this.resolveTypeList(expr, bootstrapMeta, name, "bootstrap", 0).references;
     }
-    const schemas = [];
-    if (ngModule.has("schemas")) {
-      const rawExpr = ngModule.get("schemas");
-      const result = this.evaluator.evaluate(rawExpr);
-      if (!Array.isArray(result)) {
-        throw createValueHasWrongTypeError(rawExpr, result, `NgModule.schemas must be an array`);
-      }
-      for (const schemaRef of result) {
-        if (!(schemaRef instanceof Reference)) {
-          throw createValueHasWrongTypeError(rawExpr, result, "NgModule.schemas must be an array of schemas");
-        }
-        const id2 = schemaRef.getIdentityIn(schemaRef.node.getSourceFile());
-        if (id2 === null || schemaRef.ownedByModuleGuess !== "@angular/core") {
-          throw createValueHasWrongTypeError(rawExpr, result, "NgModule.schemas must be an array of schemas");
-        }
-        switch (id2.text) {
-          case "CUSTOM_ELEMENTS_SCHEMA":
-            schemas.push(CUSTOM_ELEMENTS_SCHEMA);
-            break;
-          case "NO_ERRORS_SCHEMA":
-            schemas.push(NO_ERRORS_SCHEMA);
-            break;
-          default:
-            throw createValueHasWrongTypeError(rawExpr, schemaRef, `'${schemaRef.debugName}' is not a valid NgModule schema`);
-        }
-      }
-    }
+    const schemas = ngModule.has("schemas") ? extractSchemas(ngModule.get("schemas"), this.evaluator, "NgModule") : [];
     let id = null;
     if (ngModule.has("id")) {
       const idExpr = ngModule.get("id");
@@ -6063,6 +6069,17 @@ var ComponentDecoratorHandler = class {
         diagnostics.push(...validationDiagnostics);
       }
     }
+    let schemas = null;
+    if (component.has("schemas") && !metadata.isStandalone) {
+      if (diagnostics === void 0) {
+        diagnostics = [];
+      }
+      diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_NOT_STANDALONE, component.get("schemas"), `'schemas' is only valid on a component that is standalone.`));
+    } else if (component.has("schemas")) {
+      schemas = extractSchemas(component.get("schemas"), this.evaluator, "Component");
+    } else if (metadata.isStandalone) {
+      schemas = [];
+    }
     let template;
     if (this.preanalyzeTemplateCache.has(node)) {
       const preanalyzed = this.preanalyzeTemplateCache.get(node);
@@ -6165,7 +6182,8 @@ var ComponentDecoratorHandler = class {
         isPoisoned,
         animationTriggerNames,
         rawImports,
-        resolvedImports
+        resolvedImports,
+        schemas
       },
       diagnostics
     };
@@ -6196,7 +6214,8 @@ var ComponentDecoratorHandler = class {
       isStructural: false,
       isStandalone: analysis.meta.isStandalone,
       imports: analysis.resolvedImports,
-      animationTriggerNames: analysis.animationTriggerNames
+      animationTriggerNames: analysis.animationTriggerNames,
+      schemas: analysis.schemas
     }));
     this.resourceRegistry.registerResources(analysis.resources, node);
     this.injectableRegistry.registerInjectable(node);
@@ -6897,4 +6916,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-OCRFTG5D.js.map
+//# sourceMappingURL=chunk-2ZVQLOCC.js.map
