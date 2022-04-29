@@ -258,7 +258,7 @@ function compareVersions(v1, v2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
 var MIN_TS_VERSION = "4.6.2";
-var MAX_TS_VERSION = "4.7.0";
+var MAX_TS_VERSION = "4.8.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
@@ -2002,6 +2002,7 @@ import ts17 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.mjs
 import ts12 from "typescript";
+var PARSED_TS_VERSION = parseFloat(ts12.versionMajorMinor);
 var SAFE_TO_CAST_WITHOUT_PARENS = /* @__PURE__ */ new Set([
   ts12.SyntaxKind.ParenthesizedExpression,
   ts12.SyntaxKind.Identifier,
@@ -2042,6 +2043,9 @@ function tsCreateVariable(id, initializer) {
 function tsCallMethod(receiver, methodName, args = []) {
   const methodAccess = ts12.factory.createPropertyAccessExpression(receiver, methodName);
   return ts12.factory.createCallExpression(methodAccess, void 0, args);
+}
+function tsUpdateTypeParameterDeclaration(node, name, constraint, defaultType) {
+  return PARSED_TS_VERSION < 4.7 ? ts12.factory.updateTypeParameterDeclaration(node, name, constraint, defaultType) : ts12.factory.updateTypeParameterDeclaration(node, [], name, constraint, defaultType);
 }
 function checkIfClassIsExported(node) {
   if (node.modifiers !== void 0 && node.modifiers.some((mod) => mod.kind === ts12.SyntaxKind.ExportKeyword)) {
@@ -2177,7 +2181,7 @@ var TypeParameterEmitter = class {
     return this.typeParameters.map((typeParam) => {
       const constraint = typeParam.constraint !== void 0 ? emitter.emitType(typeParam.constraint) : void 0;
       const defaultType = typeParam.default !== void 0 ? emitter.emitType(typeParam.default) : void 0;
-      return ts14.factory.updateTypeParameterDeclaration(typeParam, typeParam.name, constraint, defaultType);
+      return tsUpdateTypeParameterDeclaration(typeParam, typeParam.name, constraint, defaultType);
     });
   }
   resolveTypeReference(type) {
@@ -2361,7 +2365,7 @@ function typeParametersWithDefaultTypes(params) {
   }
   return params.map((param) => {
     if (param.default === void 0) {
-      return ts16.factory.updateTypeParameterDeclaration(param, param.name, param.constraint, ts16.factory.createKeywordTypeNode(ts16.SyntaxKind.AnyKeyword));
+      return tsUpdateTypeParameterDeclaration(param, param.name, param.constraint, ts16.factory.createKeywordTypeNode(ts16.SyntaxKind.AnyKeyword));
     } else {
       return param;
     }
@@ -6897,4 +6901,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RJMU2IDU.js.map
+//# sourceMappingURL=chunk-YBSKVBB6.js.map

@@ -32,12 +32,12 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     getEnvironmentVariable: ((name: string) => string | undefined) | undefined;
     getNewLine: () => string;
     getParsedCommandLine: ((fileName: string) => ts.ParsedCommandLine | undefined) | undefined;
-    getSourceFileByPath: ((fileName: string, path: ts.Path, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined) => ts.SourceFile | undefined) | undefined;
+    getSourceFileByPath: ((fileName: string, path: ts.Path, languageVersionOrOptions: ts.ScriptTarget | ts.CreateSourceFileOptions, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined) => ts.SourceFile | undefined) | undefined;
     readDirectory: ((rootDir: string, extensions: readonly string[], excludes: readonly string[] | undefined, includes: readonly string[], depth?: number | undefined) => string[]) | undefined;
     readFile: (fileName: string) => string | undefined;
     realpath: ((path: string) => string) | undefined;
     resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile?: ts.SourceFile | undefined) => (ts.ResolvedModule | undefined)[]) | undefined;
-    resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
+    resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[] | readonly ts.FileReference[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingFileMode?: ts.ModuleKind.CommonJS | ts.ModuleKind.ESNext | undefined) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
     trace: ((s: string) => void) | undefined;
     useCaseSensitiveFileNames: () => boolean;
     getModuleResolutionCache: (() => ts.ModuleResolutionCache | undefined) | undefined;
