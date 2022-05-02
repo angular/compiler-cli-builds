@@ -3052,7 +3052,7 @@ function generateTypeCheckBlock(env, ref, name, meta, domSchemaChecker, oobRecor
         break;
     }
   }
-  const paramList = [tcbCtxParam(ref.node, ctxRawType.typeName, typeArguments)];
+  const paramList = [tcbThisParam(ref.node, ctxRawType.typeName, typeArguments)];
   const scopeStatements = scope.render();
   const innerBody = ts22.factory.createBlock([
     ...env.getPreludeStatements(),
@@ -3597,7 +3597,7 @@ var TcbComponentContextCompletionOp = class extends TcbOp {
     this.optional = false;
   }
   execute() {
-    const ctx = ts22.factory.createIdentifier("ctx");
+    const ctx = ts22.factory.createThis();
     const ctxDot = ts22.factory.createPropertyAccessExpression(ctx, "");
     markIgnoreDiagnostics(ctxDot);
     addExpressionIdentifier(ctxDot, ExpressionIdentifier.COMPONENT_COMPLETION);
@@ -3878,9 +3878,9 @@ var Scope = class {
     }
   }
 };
-function tcbCtxParam(node, name, typeArguments) {
+function tcbThisParam(node, name, typeArguments) {
   const type = ts22.factory.createTypeReferenceNode(name, typeArguments);
-  return ts22.factory.createParameterDeclaration(void 0, void 0, void 0, "ctx", void 0, type, void 0);
+  return ts22.factory.createParameterDeclaration(void 0, void 0, void 0, "this", void 0, type, void 0);
 }
 function tcbExpression(ast, tcb, scope) {
   const translator = new TcbExpressionTranslator(tcb, scope);
@@ -3907,7 +3907,7 @@ var TcbExpressionTranslator = class {
       addParseSpanInfo(result, ast.sourceSpan);
       return result;
     } else if (ast instanceof ImplicitReceiver4) {
-      return ts22.factory.createIdentifier("ctx");
+      return ts22.factory.createThis();
     } else if (ast instanceof BindingPipe) {
       const expr = this.translate(ast.exp);
       const pipeRef = this.tcb.getPipeByName(ast.name);
@@ -4032,7 +4032,7 @@ function tcbCreateEventHandler(event, tcb, scope, eventType) {
   }
   const eventParam = ts22.factory.createParameterDeclaration(void 0, void 0, void 0, EVENT_PARAMETER, void 0, eventParamType);
   addExpressionIdentifier(eventParam, ExpressionIdentifier.EVENT_PARAMETER);
-  return ts22.factory.createFunctionExpression(void 0, void 0, void 0, void 0, [eventParam], ts22.factory.createKeywordTypeNode(ts22.SyntaxKind.AnyKeyword), ts22.factory.createBlock([body]));
+  return ts22.factory.createArrowFunction(void 0, void 0, [eventParam], ts22.factory.createKeywordTypeNode(ts22.SyntaxKind.AnyKeyword), void 0, ts22.factory.createBlock([body]));
 }
 function tcbEventHandlerExpression(ast, tcb, scope) {
   const translator = new TcbEventHandlerTranslator(tcb, scope);
@@ -6901,4 +6901,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-NY7JAEMN.js.map
+//# sourceMappingURL=chunk-XA4M4QCN.js.map
