@@ -2621,7 +2621,7 @@ function getDiagnosticNode(ref, rawExpr) {
 }
 function makeNotStandaloneDiagnostic(scopeReader, ref, rawExpr, kind) {
   const scope = scopeReader.getScopeForComponent(ref.node);
-  let message = `The ${kind} '${ref.node.name.text}' appears in 'imports', but is not standalone and cannot be imported directly`;
+  let message = `The ${kind} '${ref.node.name.text}' appears in 'imports', but is not standalone and cannot be imported directly.`;
   let relatedInformation = void 0;
   if (scope !== null && scope.kind === ComponentScopeKind.NgModule) {
     const isExported3 = scope.exported.dependencies.some((dep) => dep.ref.node === ref.node);
@@ -6072,14 +6072,6 @@ var ComponentDecoratorHandler = class {
         }
         diagnostics.push(...importDiagnostics);
       }
-      const validationDiagnostics = validateStandaloneImports(resolvedImports, rawImports, this.metaReader, this.scopeReader);
-      if (validationDiagnostics.length > 0) {
-        isPoisoned = true;
-        if (diagnostics === void 0) {
-          diagnostics = [];
-        }
-        diagnostics.push(...validationDiagnostics);
-      }
     }
     let schemas = null;
     if (component.has("schemas") && !metadata.isStandalone) {
@@ -6420,6 +6412,10 @@ var ComponentDecoratorHandler = class {
           throw new FatalDiagnosticError(ErrorCode.IMPORT_CYCLE_DETECTED, node, "One or more import cycles would need to be created to compile this component, which is not supported by the current compiler configuration.", relatedMessages);
         }
       }
+    }
+    if (analysis.resolvedImports !== null && analysis.rawImports !== null) {
+      const standaloneDiagnostics = validateStandaloneImports(analysis.resolvedImports, analysis.rawImports, this.metaReader, this.scopeReader);
+      diagnostics.push(...standaloneDiagnostics);
     }
     if (analysis.providersRequiringFactory !== null && analysis.meta.providers instanceof WrappedNodeExpr7) {
       const providerDiagnostics = getProviderDiagnostics(analysis.providersRequiringFactory, analysis.meta.providers.node, this.injectableRegistry);
@@ -6928,4 +6924,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-QBONCRHV.js.map
+//# sourceMappingURL=chunk-S2HUVZS6.js.map
