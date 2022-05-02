@@ -35,7 +35,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-UMDDHI5B.js";
+} from "./chunk-JDKMNZ6O.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -5100,6 +5100,12 @@ var NgModuleDecoratorHandler = class {
       const expr = ngModule.get("bootstrap");
       const bootstrapMeta = this.evaluator.evaluate(expr, forwardRefResolver);
       bootstrapRefs = this.resolveTypeList(expr, bootstrapMeta, name, "bootstrap", 0).references;
+      for (const ref of bootstrapRefs) {
+        const dirMeta = this.metaReader.getDirectiveMetadata(ref);
+        if (dirMeta == null ? void 0 : dirMeta.isStandalone) {
+          diagnostics.push(makeStandaloneBootstrapDiagnostic(node, ref, expr));
+        }
+      }
     }
     const schemas = ngModule.has("schemas") ? extractSchemas(ngModule.get("schemas"), this.evaluator, "NgModule") : [];
     let id = null;
@@ -5487,6 +5493,12 @@ function isModuleIdExpression(expr) {
 }
 function isResolvedModuleWithProviders(sv) {
   return typeof sv.value === "object" && sv.value != null && sv.value.hasOwnProperty("ngModule") && sv.value.hasOwnProperty("mwpCall");
+}
+function makeStandaloneBootstrapDiagnostic(ngModuleClass, bootstrappedClassRef, rawBootstrapExpr) {
+  const componentClassName = bootstrappedClassRef.node.name.text;
+  const message = `The \`${componentClassName}\` class is a standalone component, which can not be used in the \`@NgModule.bootstrap\` array. Use the \`bootstrapApplication\` function for bootstrap instead.`;
+  const relatedInformation = [makeRelatedInformation(ngModuleClass, `The 'bootstrap' array is present on this NgModule.`)];
+  return makeDiagnostic(ErrorCode.NGMODULE_BOOTSTRAP_IS_STANDALONE, getDiagnosticNode(bootstrappedClassRef, rawBootstrapExpr), message, relatedInformation);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/diagnostics.mjs
@@ -6916,4 +6928,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-2ZVQLOCC.js.map
+//# sourceMappingURL=chunk-QBONCRHV.js.map

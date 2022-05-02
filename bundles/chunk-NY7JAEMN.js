@@ -39,7 +39,7 @@ import {
   ivyTransformFactory,
   retagAllTsFiles,
   untagAllTsFiles
-} from "./chunk-2ZVQLOCC.js";
+} from "./chunk-QBONCRHV.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -82,7 +82,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-UMDDHI5B.js";
+} from "./chunk-JDKMNZ6O.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -6901,4 +6901,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YBSKVBB6.js.map
+//# sourceMappingURL=chunk-NY7JAEMN.js.map
