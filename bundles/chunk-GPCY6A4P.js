@@ -6115,7 +6115,8 @@ var ComponentDecoratorHandler = class {
       if (diagnostics === void 0) {
         diagnostics = [];
       }
-      diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_NOT_STANDALONE, component.get("imports"), `'imports' is only valid on a component that is standalone.`));
+      diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_NOT_STANDALONE, component.get("imports"), `'imports' is only valid on a component that is standalone.`, [makeRelatedInformation(node.name, `Did you forget to add 'standalone: true' to this @Component?`)]));
+      isPoisoned = true;
     } else if (component.has("imports")) {
       const expr = component.get("imports");
       const imported = this.evaluator.evaluate(expr);
@@ -7002,4 +7003,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-E5336K37.js.map
+//# sourceMappingURL=chunk-GPCY6A4P.js.map
