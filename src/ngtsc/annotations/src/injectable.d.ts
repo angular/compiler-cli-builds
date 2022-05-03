@@ -7,10 +7,11 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/src/injectable" />
 import { R3ClassMetadata, R3DependencyMetadata, R3InjectableMetadata } from '@angular/compiler';
-import { InjectableClassRegistry } from '../../metadata';
+import { InjectableClassRegistry } from '../../annotations/common';
+import { PartialEvaluator } from '../../partial_evaluator';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
-import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence } from '../../transform';
+import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
 export interface InjectableHandlerData {
     meta: R3InjectableMetadata;
     classMetadata: R3ClassMetadata | null;
@@ -22,6 +23,7 @@ export interface InjectableHandlerData {
  */
 export declare class InjectableDecoratorHandler implements DecoratorHandler<Decorator, InjectableHandlerData, null, unknown> {
     private reflector;
+    private evaluator;
     private isCore;
     private strictCtorDeps;
     private injectableRegistry;
@@ -33,7 +35,7 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
      * If false then there is no error and a new ɵprov property is not added.
      */
     private errorOnDuplicateProv;
-    constructor(reflector: ReflectionHost, isCore: boolean, strictCtorDeps: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, 
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean, strictCtorDeps: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, 
     /**
      * What to do if the injectable already contains a ɵprov property.
      *
@@ -46,7 +48,8 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<InjectableHandlerData>;
     symbol(): null;
-    register(node: ClassDeclaration): void;
+    register(node: ClassDeclaration, analysis: InjectableHandlerData): void;
+    resolve(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>, symbol: null): ResolveResult<unknown>;
     compileFull(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];
     private compile;

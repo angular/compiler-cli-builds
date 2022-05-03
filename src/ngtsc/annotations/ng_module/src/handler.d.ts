@@ -10,14 +10,14 @@ import { Expression, R3ClassMetadata, R3FactoryMetadata, R3InjectorMetadata, R3N
 import ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../../imports';
 import { SemanticReference, SemanticSymbol } from '../../../incremental/semantic_graph';
-import { InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../../metadata';
+import { MetadataReader, MetadataRegistry } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { PerfRecorder } from '../../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
 import { LocalModuleScopeRegistry } from '../../../scope';
 import { FactoryTracker } from '../../../shims/api';
 import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../../transform';
-import { ReferencesRegistry } from '../../common';
+import { InjectableClassRegistry, ReferencesRegistry } from '../../common';
 export interface NgModuleAnalysis {
     mod: R3NgModuleMetadata;
     inj: Omit<R3InjectorMetadata, 'imports'>;
