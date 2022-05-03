@@ -116,7 +116,7 @@ export declare function makeResourceNotFoundError(file: string, nodeForError: ts
  * Additionally, the references to external resources would require libraries to ship
  * external resources exclusively for the class metadata.
  */
-export declare function transformDecoratorToInlineResources(dec: Decorator, component: Map<string, ts.Expression>, styles: string[], template: ParsedTemplateWithSource): Decorator;
+export declare function transformDecoratorResources(dec: Decorator, component: Map<string, ts.Expression>, styles: string[], template: ParsedTemplateWithSource): Decorator;
 export declare function extractComponentStyleUrls(evaluator: PartialEvaluator, component: Map<string, ts.Expression>): StyleUrlMeta[];
 export declare function extractStyleResources(resourceLoader: ResourceLoader, component: Map<string, ts.Expression>, containingFile: string): ReadonlySet<Resource>;
 export declare function _extractTemplateStyleUrls(template: ParsedTemplateWithSource): StyleUrlMeta[];

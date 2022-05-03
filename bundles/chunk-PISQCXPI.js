@@ -5724,11 +5724,11 @@ function makeResourceNotFoundError(file, nodeForError, resourceType) {
   }
   return new FatalDiagnosticError(ErrorCode.COMPONENT_RESOURCE_NOT_FOUND, nodeForError, errorText);
 }
-function transformDecoratorToInlineResources(dec, component, styles, template) {
+function transformDecoratorResources(dec, component, styles, template) {
   if (dec.name !== "Component") {
     return dec;
   }
-  if (!component.has("templateUrl") && !component.has("styleUrls")) {
+  if (!component.has("templateUrl") && !component.has("styleUrls") && !component.has("styles")) {
     return dec;
   }
   const metadata = new Map(component);
@@ -5736,9 +5736,20 @@ function transformDecoratorToInlineResources(dec, component, styles, template) {
     metadata.delete("templateUrl");
     metadata.set("template", ts25.factory.createStringLiteral(template.content));
   }
-  if (metadata.has("styleUrls")) {
+  if (metadata.has("styleUrls") || metadata.has("styles")) {
+    metadata.delete("styles");
     metadata.delete("styleUrls");
-    metadata.set("styles", ts25.factory.createArrayLiteralExpression(styles.map((s) => ts25.factory.createStringLiteral(s))));
+    if (styles.length > 0) {
+      const styleNodes = styles.reduce((result, style) => {
+        if (style.trim().length > 0) {
+          result.push(ts25.factory.createStringLiteral(style));
+        }
+        return result;
+      }, []);
+      if (styleNodes.length > 0) {
+        metadata.set("styles", ts25.factory.createArrayLiteralExpression(styleNodes));
+      }
+    }
   }
   const newMetadataFields = [];
   for (const [name, value] of metadata.entries()) {
@@ -6173,7 +6184,7 @@ var ComponentDecoratorHandler = class {
           relativeContextFilePath
         }),
         typeCheckMeta: extractDirectiveTypeCheckMeta(node, inputs, this.reflector),
-        classMetadata: extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler, (dec) => transformDecoratorToInlineResources(dec, component, styles, template)),
+        classMetadata: extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler, (dec) => transformDecoratorResources(dec, component, styles, template)),
         template,
         providersRequiringFactory,
         viewProvidersRequiringFactory,
@@ -6463,7 +6474,7 @@ var ComponentDecoratorHandler = class {
     for (const styleText of analysis.template.styles) {
       styles.push(styleText);
     }
-    analysis.meta.styles = styles;
+    analysis.meta.styles = styles.filter((s) => s.trim().length > 0);
   }
   compileFull(node, analysis, resolution, pool) {
     if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
@@ -6924,4 +6935,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-S2HUVZS6.js.map
+//# sourceMappingURL=chunk-PISQCXPI.js.map
