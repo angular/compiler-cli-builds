@@ -7,7 +7,7 @@ import {
   CycleAnalyzer,
   ImportGraph,
   readConfiguration
-} from "./chunk-QB62FAZD.js";
+} from "./chunk-6E6DHHHX.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -31,7 +31,7 @@ import {
   TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-UVJA6MFZ.js";
+} from "./chunk-HZUCTYDG.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -5141,4 +5141,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-STPKWI54.js.map
+//# sourceMappingURL=chunk-OGPZOZRU.js.map

@@ -6073,7 +6073,7 @@ var ComponentDecoratorHandler = class {
       isPoisoned = true;
     } else if (component.has("imports")) {
       const expr = component.get("imports");
-      const imported = this.evaluator.evaluate(expr);
+      const imported = this.evaluator.evaluate(expr, forwardRefResolver);
       const { imports: flattened, diagnostics: importDiagnostics } = validateAndFlattenComponentImports(imported, expr);
       resolvedImports = flattened;
       rawImports = expr;
@@ -6936,4 +6936,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-UVJA6MFZ.js.map
+//# sourceMappingURL=chunk-HZUCTYDG.js.map
