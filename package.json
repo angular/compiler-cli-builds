@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "14.1.0-next.0+sha-aef5c92",
+  "version": "14.1.0-next.0+sha-68a6a07",
   "description": "Angular - the compiler CLI for Node.js",
   "typings": "index.d.ts",
   "bin": {
@@ -65,7 +65,7 @@
     "yargs": "^17.2.1"
   },
   "peerDependencies": {
-    "@angular/compiler": "14.1.0-next.0+sha-aef5c92",
+    "@angular/compiler": "14.1.0-next.0+sha-68a6a07",
     "typescript": ">=4.6.2 <4.8"
   },
   "repository": {
@@ -84,7 +84,7 @@
   "bugs": {
     "url": "https://github.com/angular/angular/issues"
   },
-  "homepage": "https://github.com/angular/angular/tree/master/packages/compiler-cli",
+  "homepage": "https://github.com/angular/angular/tree/main/packages/compiler-cli",
   "ng-update": {
     "packageGroup": [
       "@angular/core",
