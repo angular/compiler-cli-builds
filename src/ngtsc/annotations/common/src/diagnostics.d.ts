@@ -9,10 +9,10 @@
 import ts from 'typescript';
 import { FatalDiagnosticError } from '../../../diagnostics';
 import { Reference } from '../../../imports';
+import { InjectableClassRegistry, MetadataReader } from '../../../metadata';
 import { PartialEvaluator, ResolvedValue } from '../../../partial_evaluator';
 import { ClassDeclaration, ReflectionHost } from '../../../reflection';
 import { DeclarationData, LocalModuleScopeRegistry } from '../../../scope';
-import { InjectableClassRegistry } from './injectable_registry';
 /**
  * Create a `ts.Diagnostic` which indicates the given class is part of the declarations of two or
  * more NgModules.
@@ -39,13 +39,6 @@ export declare function createValueHasWrongTypeError(node: ts.Node, value: Resol
  * @param registry Registry that keeps track of the registered injectable classes.
  */
 export declare function getProviderDiagnostics(providerClasses: Set<Reference<ClassDeclaration>>, providersDeclaration: ts.Expression, registry: InjectableClassRegistry): ts.Diagnostic[];
-export declare function getDirectiveDiagnostics(node: ClassDeclaration, injectableRegistry: InjectableClassRegistry, evaluator: PartialEvaluator, reflector: ReflectionHost, scopeRegistry: LocalModuleScopeRegistry, strictInjectionParameters: boolean, kind: 'Directive' | 'Component'): ts.Diagnostic[] | null;
+export declare function getDirectiveDiagnostics(node: ClassDeclaration, reader: MetadataReader, evaluator: PartialEvaluator, reflector: ReflectionHost, scopeRegistry: LocalModuleScopeRegistry, kind: string): ts.Diagnostic[] | null;
 export declare function getUndecoratedClassWithAngularFeaturesDiagnostic(node: ClassDeclaration): ts.Diagnostic;
-export declare function checkInheritanceOfInjectable(node: ClassDeclaration, injectableRegistry: InjectableClassRegistry, reflector: ReflectionHost, evaluator: PartialEvaluator, strictInjectionParameters: boolean, kind: 'Directive' | 'Component' | 'Pipe' | 'Injectable'): ts.Diagnostic | null;
-interface ClassWithCtor {
-    ref: Reference<ClassDeclaration>;
-    isCtorValid: boolean;
-    isDecorated: boolean;
-}
-export declare function findInheritedCtor(node: ClassDeclaration, injectableRegistry: InjectableClassRegistry, reflector: ReflectionHost, evaluator: PartialEvaluator): ClassWithCtor | null;
-export {};
+export declare function checkInheritanceOfDirective(node: ClassDeclaration, reader: MetadataReader, reflector: ReflectionHost, evaluator: PartialEvaluator): ts.Diagnostic | null;

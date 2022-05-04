@@ -60,11 +60,6 @@ export declare enum ErrorCode {
      * Raised when a type in the `imports` of a component is not a directive, pipe, or NgModule.
      */
     COMPONENT_UNKNOWN_IMPORT = 2012,
-    /**
-     * Raised when a type with Angular decorator inherits its constructor from a base class
-     * which has a constructor that is incompatible with Angular DI.
-     */
-    INJECTABLE_INHERITS_INVALID_CONSTRUCTOR = 2013,
     SYMBOL_NOT_EXPORTED = 3001,
     SYMBOL_EXPORTED_UNDER_DIFFERENT_NAME = 3002,
     /**

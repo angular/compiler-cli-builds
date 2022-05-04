@@ -35,7 +35,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-TCLGS4UG.js";
+} from "./chunk-JDKMNZ6O.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -276,9 +276,6 @@ function resolveImportedFile(moduleResolver, importedFile, expr, origin) {
     return null;
   }
   return moduleResolver.resolveModule(expr.value.moduleName, origin.fileName);
-}
-function isAbstractClassDeclaration(clazz) {
-  return clazz.modifiers !== void 0 && clazz.modifiers.some((mod) => mod.kind === ts.SyntaxKind.AbstractKeyword);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic.mjs
@@ -1478,8 +1475,7 @@ function createValueHasWrongTypeError(node, value, messageText) {
 function getProviderDiagnostics(providerClasses, providersDeclaration, registry) {
   const diagnostics = [];
   for (const provider of providerClasses) {
-    const injectableMeta = registry.getInjectableMeta(provider.node);
-    if (injectableMeta !== null) {
+    if (registry.isInjectable(provider.node)) {
       continue;
     }
     const contextNode = provider.getOriginForDiagnostics(providersDeclaration);
@@ -1490,7 +1486,7 @@ Either add the @Injectable() decorator to '${provider.node.name.text}', or confi
   }
   return diagnostics;
 }
-function getDirectiveDiagnostics(node, injectableRegistry, evaluator, reflector, scopeRegistry, strictInjectionParameters, kind) {
+function getDirectiveDiagnostics(node, reader, evaluator, reflector, scopeRegistry, kind) {
   let diagnostics = [];
   const addDiagnostics = (more) => {
     if (more === null) {
@@ -1507,26 +1503,13 @@ function getDirectiveDiagnostics(node, injectableRegistry, evaluator, reflector,
   if (duplicateDeclarations !== null) {
     addDiagnostics(makeDuplicateDeclarationError(node, duplicateDeclarations, kind));
   }
-  addDiagnostics(checkInheritanceOfInjectable(node, injectableRegistry, reflector, evaluator, strictInjectionParameters, kind));
+  addDiagnostics(checkInheritanceOfDirective(node, reader, reflector, evaluator));
   return diagnostics;
 }
 function getUndecoratedClassWithAngularFeaturesDiagnostic(node) {
   return makeDiagnostic(ErrorCode.UNDECORATED_CLASS_USING_ANGULAR_FEATURES, node.name, `Class is using Angular features but is not decorated. Please add an explicit Angular decorator.`);
 }
-function checkInheritanceOfInjectable(node, injectableRegistry, reflector, evaluator, strictInjectionParameters, kind) {
-  const classWithCtor = findInheritedCtor(node, injectableRegistry, reflector, evaluator);
-  if (classWithCtor === null || classWithCtor.isCtorValid) {
-    return null;
-  }
-  if (!classWithCtor.isDecorated) {
-    return getInheritedUndecoratedCtorDiagnostic(node, classWithCtor.ref, kind);
-  }
-  if (!strictInjectionParameters || isAbstractClassDeclaration(node)) {
-    return null;
-  }
-  return getInheritedInvalidCtorDiagnostic(node, classWithCtor.ref, kind);
-}
-function findInheritedCtor(node, injectableRegistry, reflector, evaluator) {
+function checkInheritanceOfDirective(node, reader, reflector, evaluator) {
   if (!reflector.isClass(node) || reflector.getConstructorParameters(node) !== null) {
     return null;
   }
@@ -1535,37 +1518,26 @@ function findInheritedCtor(node, injectableRegistry, reflector, evaluator) {
     if (baseClass === "dynamic") {
       return null;
     }
-    const injectableMeta = injectableRegistry.getInjectableMeta(baseClass.node);
-    if (injectableMeta !== null) {
-      if (injectableMeta.ctorDeps !== null) {
-        return {
-          ref: baseClass,
-          isCtorValid: injectableMeta.ctorDeps !== "invalid",
-          isDecorated: true
-        };
-      }
-    } else {
-      const baseClassConstructorParams = reflector.getConstructorParameters(baseClass.node);
-      if (baseClassConstructorParams !== null) {
-        return {
-          ref: baseClass,
-          isCtorValid: baseClassConstructorParams.length === 0,
-          isDecorated: false
-        };
-      }
+    const baseClassMeta = reader.getDirectiveMetadata(baseClass);
+    if (baseClassMeta !== null) {
+      return null;
     }
-    baseClass = readBaseClass(baseClass.node, reflector, evaluator);
+    const baseClassConstructorParams = reflector.getConstructorParameters(baseClass.node);
+    const newParentClass = readBaseClass(baseClass.node, reflector, evaluator);
+    if (baseClassConstructorParams !== null && baseClassConstructorParams.length > 0) {
+      return getInheritedUndecoratedCtorDiagnostic(node, baseClass, reader);
+    } else if (baseClassConstructorParams !== null || newParentClass === null) {
+      return null;
+    }
+    baseClass = newParentClass;
   }
   return null;
 }
-function getInheritedInvalidCtorDiagnostic(node, baseClass, kind) {
+function getInheritedUndecoratedCtorDiagnostic(node, baseClass, reader) {
+  const subclassMeta = reader.getDirectiveMetadata(new Reference(node));
+  const dirOrComp = subclassMeta.isComponent ? "Component" : "Directive";
   const baseClassName = baseClass.debugName;
-  return makeDiagnostic(ErrorCode.INJECTABLE_INHERITS_INVALID_CONSTRUCTOR, node.name, `The ${kind.toLowerCase()} ${node.name.text} inherits its constructor from ${baseClassName}, but the latter has a constructor parameter that is not compatible with dependency injection. Either add an explicit constructor to ${node.name.text} or change ${baseClassName}'s constructor to use parameters that are valid for DI.`);
-}
-function getInheritedUndecoratedCtorDiagnostic(node, baseClass, kind) {
-  const baseClassName = baseClass.debugName;
-  const baseNeedsDecorator = kind === "Component" || kind === "Directive" ? "Directive" : "Injectable";
-  return makeDiagnostic(ErrorCode.DIRECTIVE_INHERITS_UNDECORATED_CTOR, node.name, `The ${kind.toLowerCase()} ${node.name.text} inherits its constructor from ${baseClassName}, but the latter does not have an Angular decorator of its own. Dependency injection will not be able to resolve the parameters of ${baseClassName}'s constructor. Either add a @${baseNeedsDecorator} decorator to ${baseClassName}, or add an explicit constructor to ${node.name.text}.`);
+  return makeDiagnostic(ErrorCode.DIRECTIVE_INHERITS_UNDECORATED_CTOR, node.name, `The ${dirOrComp.toLowerCase()} ${node.name.text} inherits its constructor from ${baseClassName}, but the latter does not have an Angular decorator of its own. Dependency injection will not be able to resolve the parameters of ${baseClassName}'s constructor. Either add a @Directive decorator to ${baseClassName}, or add an explicit constructor to ${node.name.text}.`);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/evaluation.mjs
@@ -1612,581 +1584,9 @@ function compileDeclareFactory(metadata) {
   return { name: "\u0275fac", initializer: res.expression, statements: res.statements, type: res.type };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/api.mjs
-var MetaKind;
-(function(MetaKind2) {
-  MetaKind2[MetaKind2["Directive"] = 0] = "Directive";
-  MetaKind2[MetaKind2["Pipe"] = 1] = "Pipe";
-  MetaKind2[MetaKind2["NgModule"] = 2] = "NgModule";
-})(MetaKind || (MetaKind = {}));
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/dts.mjs
-import ts8 from "typescript";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/property_mapping.mjs
-var ClassPropertyMapping = class {
-  constructor(forwardMap) {
-    this.forwardMap = forwardMap;
-    this.reverseMap = reverseMapFromForwardMap(forwardMap);
-  }
-  static empty() {
-    return new ClassPropertyMapping(/* @__PURE__ */ new Map());
-  }
-  static fromMappedObject(obj) {
-    const forwardMap = /* @__PURE__ */ new Map();
-    for (const classPropertyName of Object.keys(obj)) {
-      const value = obj[classPropertyName];
-      const bindingPropertyName = Array.isArray(value) ? value[0] : value;
-      const inputOrOutput = { classPropertyName, bindingPropertyName };
-      forwardMap.set(classPropertyName, inputOrOutput);
-    }
-    return new ClassPropertyMapping(forwardMap);
-  }
-  static merge(a, b) {
-    const forwardMap = new Map(a.forwardMap.entries());
-    for (const [classPropertyName, inputOrOutput] of b.forwardMap) {
-      forwardMap.set(classPropertyName, inputOrOutput);
-    }
-    return new ClassPropertyMapping(forwardMap);
-  }
-  get classPropertyNames() {
-    return Array.from(this.forwardMap.keys());
-  }
-  get propertyNames() {
-    return Array.from(this.reverseMap.keys());
-  }
-  hasBindingPropertyName(propertyName) {
-    return this.reverseMap.has(propertyName);
-  }
-  getByBindingPropertyName(propertyName) {
-    return this.reverseMap.has(propertyName) ? this.reverseMap.get(propertyName) : null;
-  }
-  getByClassPropertyName(classPropertyName) {
-    return this.forwardMap.has(classPropertyName) ? this.forwardMap.get(classPropertyName) : null;
-  }
-  toDirectMappedObject() {
-    const obj = {};
-    for (const [classPropertyName, inputOrOutput] of this.forwardMap) {
-      obj[classPropertyName] = inputOrOutput.bindingPropertyName;
-    }
-    return obj;
-  }
-  toJointMappedObject() {
-    const obj = {};
-    for (const [classPropertyName, inputOrOutput] of this.forwardMap) {
-      if (inputOrOutput.bindingPropertyName === classPropertyName) {
-        obj[classPropertyName] = inputOrOutput.bindingPropertyName;
-      } else {
-        obj[classPropertyName] = [inputOrOutput.bindingPropertyName, classPropertyName];
-      }
-    }
-    return obj;
-  }
-  *[Symbol.iterator]() {
-    for (const [classPropertyName, inputOrOutput] of this.forwardMap.entries()) {
-      yield [classPropertyName, inputOrOutput.bindingPropertyName];
-    }
-  }
-};
-function reverseMapFromForwardMap(forwardMap) {
-  const reverseMap = /* @__PURE__ */ new Map();
-  for (const [_, inputOrOutput] of forwardMap) {
-    if (!reverseMap.has(inputOrOutput.bindingPropertyName)) {
-      reverseMap.set(inputOrOutput.bindingPropertyName, []);
-    }
-    reverseMap.get(inputOrOutput.bindingPropertyName).push(inputOrOutput);
-  }
-  return reverseMap;
-}
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/util.mjs
-import ts7 from "typescript";
-function extractReferencesFromType(checker, def, bestGuessOwningModule) {
-  if (!ts7.isTupleTypeNode(def)) {
-    return [];
-  }
-  return def.elements.map((element) => {
-    if (!ts7.isTypeQueryNode(element)) {
-      throw new Error(`Expected TypeQueryNode: ${nodeDebugInfo(element)}`);
-    }
-    const type = element.exprName;
-    const { node, from } = reflectTypeEntityToDeclaration(type, checker);
-    if (!isNamedClassDeclaration(node)) {
-      throw new Error(`Expected named ClassDeclaration: ${nodeDebugInfo(node)}`);
-    }
-    if (from !== null && !from.startsWith(".")) {
-      return new Reference(node, { specifier: from, resolutionContext: def.getSourceFile().fileName });
-    } else {
-      return new Reference(node, bestGuessOwningModule);
-    }
-  });
-}
-function readBooleanType(type) {
-  if (!ts7.isLiteralTypeNode(type)) {
-    return null;
-  }
-  switch (type.literal.kind) {
-    case ts7.SyntaxKind.TrueKeyword:
-      return true;
-    case ts7.SyntaxKind.FalseKeyword:
-      return false;
-    default:
-      return null;
-  }
-}
-function readStringType(type) {
-  if (!ts7.isLiteralTypeNode(type) || !ts7.isStringLiteral(type.literal)) {
-    return null;
-  }
-  return type.literal.text;
-}
-function readStringMapType(type) {
-  if (!ts7.isTypeLiteralNode(type)) {
-    return {};
-  }
-  const obj = {};
-  type.members.forEach((member) => {
-    if (!ts7.isPropertySignature(member) || member.type === void 0 || member.name === void 0 || !ts7.isStringLiteral(member.name)) {
-      return;
-    }
-    const value = readStringType(member.type);
-    if (value === null) {
-      return null;
-    }
-    obj[member.name.text] = value;
-  });
-  return obj;
-}
-function readStringArrayType(type) {
-  if (!ts7.isTupleTypeNode(type)) {
-    return [];
-  }
-  const res = [];
-  type.elements.forEach((el) => {
-    if (!ts7.isLiteralTypeNode(el) || !ts7.isStringLiteral(el.literal)) {
-      return;
-    }
-    res.push(el.literal.text);
-  });
-  return res;
-}
-function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
-  const members = reflector.getMembersOfClass(node);
-  const staticMembers = members.filter((member) => member.isStatic);
-  const ngTemplateGuards = staticMembers.map(extractTemplateGuard).filter((guard) => guard !== null);
-  const hasNgTemplateContextGuard = staticMembers.some((member) => member.kind === ClassMemberKind.Method && member.name === "ngTemplateContextGuard");
-  const coercedInputFields = new Set(staticMembers.map(extractCoercedInput).filter((inputName) => inputName !== null));
-  const restrictedInputFields = /* @__PURE__ */ new Set();
-  const stringLiteralInputFields = /* @__PURE__ */ new Set();
-  const undeclaredInputFields = /* @__PURE__ */ new Set();
-  for (const classPropertyName of inputs.classPropertyNames) {
-    const field = members.find((member) => member.name === classPropertyName);
-    if (field === void 0 || field.node === null) {
-      undeclaredInputFields.add(classPropertyName);
-      continue;
-    }
-    if (isRestricted(field.node)) {
-      restrictedInputFields.add(classPropertyName);
-    }
-    if (field.nameNode !== null && ts7.isStringLiteral(field.nameNode)) {
-      stringLiteralInputFields.add(classPropertyName);
-    }
-  }
-  const arity = reflector.getGenericArityOfClass(node);
-  return {
-    hasNgTemplateContextGuard,
-    ngTemplateGuards,
-    coercedInputFields,
-    restrictedInputFields,
-    stringLiteralInputFields,
-    undeclaredInputFields,
-    isGeneric: arity !== null && arity > 0
-  };
-}
-function isRestricted(node) {
-  if (node.modifiers === void 0) {
-    return false;
-  }
-  return node.modifiers.some((modifier) => modifier.kind === ts7.SyntaxKind.PrivateKeyword || modifier.kind === ts7.SyntaxKind.ProtectedKeyword || modifier.kind === ts7.SyntaxKind.ReadonlyKeyword);
-}
-function extractTemplateGuard(member) {
-  if (!member.name.startsWith("ngTemplateGuard_")) {
-    return null;
-  }
-  const inputName = afterUnderscore(member.name);
-  if (member.kind === ClassMemberKind.Property) {
-    let type = null;
-    if (member.type !== null && ts7.isLiteralTypeNode(member.type) && ts7.isStringLiteral(member.type.literal)) {
-      type = member.type.literal.text;
-    }
-    if (type !== "binding") {
-      return null;
-    }
-    return { inputName, type };
-  } else if (member.kind === ClassMemberKind.Method) {
-    return { inputName, type: "invocation" };
-  } else {
-    return null;
-  }
-}
-function extractCoercedInput(member) {
-  if (member.kind !== ClassMemberKind.Property || !member.name.startsWith("ngAcceptInputType_")) {
-    return null;
-  }
-  return afterUnderscore(member.name);
-}
-var CompoundMetadataReader = class {
-  constructor(readers) {
-    this.readers = readers;
-  }
-  getDirectiveMetadata(node) {
-    for (const reader of this.readers) {
-      const meta = reader.getDirectiveMetadata(node);
-      if (meta !== null) {
-        return meta;
-      }
-    }
-    return null;
-  }
-  getNgModuleMetadata(node) {
-    for (const reader of this.readers) {
-      const meta = reader.getNgModuleMetadata(node);
-      if (meta !== null) {
-        return meta;
-      }
-    }
-    return null;
-  }
-  getPipeMetadata(node) {
-    for (const reader of this.readers) {
-      const meta = reader.getPipeMetadata(node);
-      if (meta !== null) {
-        return meta;
-      }
-    }
-    return null;
-  }
-};
-function afterUnderscore(str) {
-  const pos = str.indexOf("_");
-  if (pos === -1) {
-    throw new Error(`Expected '${str}' to contain '_'`);
-  }
-  return str.slice(pos + 1);
-}
-function hasInjectableFields(clazz, host) {
-  const members = host.getMembersOfClass(clazz);
-  return members.some(({ isStatic, name }) => isStatic && (name === "\u0275prov" || name === "\u0275fac"));
-}
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/dts.mjs
-var DtsMetadataReader = class {
-  constructor(checker, reflector) {
-    this.checker = checker;
-    this.reflector = reflector;
-  }
-  getNgModuleMetadata(ref) {
-    const clazz = ref.node;
-    const ngModuleDef = this.reflector.getMembersOfClass(clazz).find((member) => member.name === "\u0275mod" && member.isStatic);
-    if (ngModuleDef === void 0) {
-      return null;
-    } else if (ngModuleDef.type === null || !ts8.isTypeReferenceNode(ngModuleDef.type) || ngModuleDef.type.typeArguments === void 0 || ngModuleDef.type.typeArguments.length !== 4) {
-      return null;
-    }
-    const [_, declarationMetadata, importMetadata, exportMetadata] = ngModuleDef.type.typeArguments;
-    return {
-      kind: MetaKind.NgModule,
-      ref,
-      declarations: extractReferencesFromType(this.checker, declarationMetadata, ref.bestGuessOwningModule),
-      exports: extractReferencesFromType(this.checker, exportMetadata, ref.bestGuessOwningModule),
-      imports: extractReferencesFromType(this.checker, importMetadata, ref.bestGuessOwningModule),
-      schemas: [],
-      rawDeclarations: null,
-      rawImports: null,
-      rawExports: null
-    };
-  }
-  getDirectiveMetadata(ref) {
-    var _a;
-    const clazz = ref.node;
-    const def = this.reflector.getMembersOfClass(clazz).find((field) => field.isStatic && (field.name === "\u0275cmp" || field.name === "\u0275dir"));
-    if (def === void 0) {
-      return null;
-    } else if (def.type === null || !ts8.isTypeReferenceNode(def.type) || def.type.typeArguments === void 0 || def.type.typeArguments.length < 2) {
-      return null;
-    }
-    const isComponent = def.name === "\u0275cmp";
-    const ctorParams = this.reflector.getConstructorParameters(clazz);
-    const isStructural = !isComponent && ctorParams !== null && ctorParams.some((param) => {
-      return param.typeValueReference.kind === 1 && param.typeValueReference.moduleName === "@angular/core" && param.typeValueReference.importedName === "TemplateRef";
-    });
-    const isStandalone = def.type.typeArguments.length > 7 && ((_a = readBooleanType(def.type.typeArguments[7])) != null ? _a : false);
-    const inputs = ClassPropertyMapping.fromMappedObject(readStringMapType(def.type.typeArguments[3]));
-    const outputs = ClassPropertyMapping.fromMappedObject(readStringMapType(def.type.typeArguments[4]));
-    return __spreadProps(__spreadValues({
-      kind: MetaKind.Directive,
-      ref,
-      name: clazz.name.text,
-      isComponent,
-      selector: readStringType(def.type.typeArguments[1]),
-      exportAs: readStringArrayType(def.type.typeArguments[2]),
-      inputs,
-      outputs,
-      queries: readStringArrayType(def.type.typeArguments[5])
-    }, extractDirectiveTypeCheckMeta(clazz, inputs, this.reflector)), {
-      baseClass: readBaseClass2(clazz, this.checker, this.reflector),
-      isPoisoned: false,
-      isStructural,
-      animationTriggerNames: null,
-      isStandalone,
-      imports: null,
-      schemas: null
-    });
-  }
-  getPipeMetadata(ref) {
-    var _a;
-    const def = this.reflector.getMembersOfClass(ref.node).find((field) => field.isStatic && field.name === "\u0275pipe");
-    if (def === void 0) {
-      return null;
-    } else if (def.type === null || !ts8.isTypeReferenceNode(def.type) || def.type.typeArguments === void 0 || def.type.typeArguments.length < 2) {
-      return null;
-    }
-    const type = def.type.typeArguments[1];
-    if (!ts8.isLiteralTypeNode(type) || !ts8.isStringLiteral(type.literal)) {
-      return null;
-    }
-    const name = type.literal.text;
-    const isStandalone = def.type.typeArguments.length > 2 && ((_a = readBooleanType(def.type.typeArguments[2])) != null ? _a : false);
-    return {
-      kind: MetaKind.Pipe,
-      ref,
-      name,
-      nameExpr: null,
-      isStandalone
-    };
-  }
-};
-function readBaseClass2(clazz, checker, reflector) {
-  if (!isNamedClassDeclaration(clazz)) {
-    return reflector.hasBaseClass(clazz) ? "dynamic" : null;
-  }
-  if (clazz.heritageClauses !== void 0) {
-    for (const clause of clazz.heritageClauses) {
-      if (clause.token === ts8.SyntaxKind.ExtendsKeyword) {
-        const baseExpr = clause.types[0].expression;
-        let symbol = checker.getSymbolAtLocation(baseExpr);
-        if (symbol === void 0) {
-          return "dynamic";
-        } else if (symbol.flags & ts8.SymbolFlags.Alias) {
-          symbol = checker.getAliasedSymbol(symbol);
-        }
-        if (symbol.valueDeclaration !== void 0 && isNamedClassDeclaration(symbol.valueDeclaration)) {
-          return new Reference(symbol.valueDeclaration);
-        } else {
-          return "dynamic";
-        }
-      }
-    }
-  }
-  return null;
-}
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/inheritance.mjs
-function flattenInheritedDirectiveMetadata(reader, dir) {
-  const topMeta = reader.getDirectiveMetadata(dir);
-  if (topMeta === null) {
-    throw new Error(`Metadata not found for directive: ${dir.debugName}`);
-  }
-  if (topMeta.baseClass === null) {
-    return topMeta;
-  }
-  const coercedInputFields = /* @__PURE__ */ new Set();
-  const undeclaredInputFields = /* @__PURE__ */ new Set();
-  const restrictedInputFields = /* @__PURE__ */ new Set();
-  const stringLiteralInputFields = /* @__PURE__ */ new Set();
-  let isDynamic = false;
-  let inputs = ClassPropertyMapping.empty();
-  let outputs = ClassPropertyMapping.empty();
-  let isStructural = false;
-  const addMetadata = (meta) => {
-    if (meta.baseClass === "dynamic") {
-      isDynamic = true;
-    } else if (meta.baseClass !== null) {
-      const baseMeta = reader.getDirectiveMetadata(meta.baseClass);
-      if (baseMeta !== null) {
-        addMetadata(baseMeta);
-      } else {
-        isDynamic = true;
-      }
-    }
-    isStructural = isStructural || meta.isStructural;
-    inputs = ClassPropertyMapping.merge(inputs, meta.inputs);
-    outputs = ClassPropertyMapping.merge(outputs, meta.outputs);
-    for (const coercedInputField of meta.coercedInputFields) {
-      coercedInputFields.add(coercedInputField);
-    }
-    for (const undeclaredInputField of meta.undeclaredInputFields) {
-      undeclaredInputFields.add(undeclaredInputField);
-    }
-    for (const restrictedInputField of meta.restrictedInputFields) {
-      restrictedInputFields.add(restrictedInputField);
-    }
-    for (const field of meta.stringLiteralInputFields) {
-      stringLiteralInputFields.add(field);
-    }
-  };
-  addMetadata(topMeta);
-  return __spreadProps(__spreadValues({}, topMeta), {
-    inputs,
-    outputs,
-    coercedInputFields,
-    undeclaredInputFields,
-    restrictedInputFields,
-    stringLiteralInputFields,
-    baseClass: isDynamic ? "dynamic" : null,
-    isStructural
-  });
-}
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/registry.mjs
-var LocalMetadataRegistry = class {
-  constructor() {
-    this.directives = /* @__PURE__ */ new Map();
-    this.ngModules = /* @__PURE__ */ new Map();
-    this.pipes = /* @__PURE__ */ new Map();
-  }
-  getDirectiveMetadata(ref) {
-    return this.directives.has(ref.node) ? this.directives.get(ref.node) : null;
-  }
-  getNgModuleMetadata(ref) {
-    return this.ngModules.has(ref.node) ? this.ngModules.get(ref.node) : null;
-  }
-  getPipeMetadata(ref) {
-    return this.pipes.has(ref.node) ? this.pipes.get(ref.node) : null;
-  }
-  registerDirectiveMetadata(meta) {
-    this.directives.set(meta.ref.node, meta);
-  }
-  registerNgModuleMetadata(meta) {
-    this.ngModules.set(meta.ref.node, meta);
-  }
-  registerPipeMetadata(meta) {
-    this.pipes.set(meta.ref.node, meta);
-  }
-};
-var CompoundMetadataRegistry = class {
-  constructor(registries) {
-    this.registries = registries;
-  }
-  registerDirectiveMetadata(meta) {
-    for (const registry of this.registries) {
-      registry.registerDirectiveMetadata(meta);
-    }
-  }
-  registerNgModuleMetadata(meta) {
-    for (const registry of this.registries) {
-      registry.registerNgModuleMetadata(meta);
-    }
-  }
-  registerPipeMetadata(meta) {
-    for (const registry of this.registries) {
-      registry.registerPipeMetadata(meta);
-    }
-  }
-};
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/resource_registry.mjs
-var ResourceRegistry = class {
-  constructor() {
-    this.externalTemplateToComponentsMap = /* @__PURE__ */ new Map();
-    this.componentToTemplateMap = /* @__PURE__ */ new Map();
-    this.componentToStylesMap = /* @__PURE__ */ new Map();
-    this.externalStyleToComponentsMap = /* @__PURE__ */ new Map();
-  }
-  getComponentsWithTemplate(template) {
-    if (!this.externalTemplateToComponentsMap.has(template)) {
-      return /* @__PURE__ */ new Set();
-    }
-    return this.externalTemplateToComponentsMap.get(template);
-  }
-  registerResources(resources, component) {
-    if (resources.template !== null) {
-      this.registerTemplate(resources.template, component);
-    }
-    for (const style of resources.styles) {
-      this.registerStyle(style, component);
-    }
-  }
-  registerTemplate(templateResource, component) {
-    const { path } = templateResource;
-    if (path !== null) {
-      if (!this.externalTemplateToComponentsMap.has(path)) {
-        this.externalTemplateToComponentsMap.set(path, /* @__PURE__ */ new Set());
-      }
-      this.externalTemplateToComponentsMap.get(path).add(component);
-    }
-    this.componentToTemplateMap.set(component, templateResource);
-  }
-  getTemplate(component) {
-    if (!this.componentToTemplateMap.has(component)) {
-      return null;
-    }
-    return this.componentToTemplateMap.get(component);
-  }
-  registerStyle(styleResource, component) {
-    const { path } = styleResource;
-    if (!this.componentToStylesMap.has(component)) {
-      this.componentToStylesMap.set(component, /* @__PURE__ */ new Set());
-    }
-    if (path !== null) {
-      if (!this.externalStyleToComponentsMap.has(path)) {
-        this.externalStyleToComponentsMap.set(path, /* @__PURE__ */ new Set());
-      }
-      this.externalStyleToComponentsMap.get(path).add(component);
-    }
-    this.componentToStylesMap.get(component).add(styleResource);
-  }
-  getStyles(component) {
-    if (!this.componentToStylesMap.has(component)) {
-      return /* @__PURE__ */ new Set();
-    }
-    return this.componentToStylesMap.get(component);
-  }
-  getComponentsWithStyle(styleUrl) {
-    if (!this.externalStyleToComponentsMap.has(styleUrl)) {
-      return /* @__PURE__ */ new Set();
-    }
-    return this.externalStyleToComponentsMap.get(styleUrl);
-  }
-};
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/injectable_registry.mjs
-var InjectableClassRegistry = class {
-  constructor(host, isCore) {
-    this.host = host;
-    this.isCore = isCore;
-    this.classes = /* @__PURE__ */ new Map();
-  }
-  registerInjectable(declaration, meta) {
-    this.classes.set(declaration, meta);
-  }
-  getInjectableMeta(declaration) {
-    if (this.classes.has(declaration)) {
-      return this.classes.get(declaration);
-    }
-    if (!hasInjectableFields(declaration, this.host)) {
-      return null;
-    }
-    const ctorDeps = getConstructorDependencies(declaration, this.host, this.isCore);
-    return {
-      ctorDeps: unwrapConstructorDependencies(ctorDeps)
-    };
-  }
-};
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/metadata.mjs
 import { FunctionExpr, LiteralArrayExpr, LiteralExpr as LiteralExpr2, literalMap, ReturnStatement, WrappedNodeExpr as WrappedNodeExpr3 } from "@angular/compiler";
-import ts9 from "typescript";
+import ts7 from "typescript";
 function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompiler, angularDecoratorTransform = (dec) => dec) {
   if (!reflection.isClass(clazz)) {
     return null;
@@ -2200,7 +1600,7 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
   if (ngClassDecorators.length === 0) {
     return null;
   }
-  const metaDecorators = new WrappedNodeExpr3(ts9.factory.createArrayLiteralExpression(ngClassDecorators));
+  const metaDecorators = new WrappedNodeExpr3(ts7.factory.createArrayLiteralExpression(ngClassDecorators));
   let metaCtorParameters = null;
   const classCtorParameters = reflection.getConstructorParameters(clazz);
   if (classCtorParameters !== null) {
@@ -2220,7 +1620,7 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
     return classMemberToMetadata((_a = member.nameNode) != null ? _a : member.name, member.decorators, isCore);
   });
   if (decoratedMembers.length > 0) {
-    metaPropDecorators = new WrappedNodeExpr3(ts9.factory.createObjectLiteralExpression(decoratedMembers));
+    metaPropDecorators = new WrappedNodeExpr3(ts7.factory.createObjectLiteralExpression(decoratedMembers));
   }
   return {
     type: new WrappedNodeExpr3(id),
@@ -2236,38 +1636,38 @@ function ctorParameterToMetadata(param, isCore) {
   ];
   if (param.decorators !== null) {
     const ngDecorators = param.decorators.filter((dec) => isAngularDecorator2(dec, isCore)).map((decorator) => decoratorToMetadata(decorator));
-    const value = new WrappedNodeExpr3(ts9.factory.createArrayLiteralExpression(ngDecorators));
+    const value = new WrappedNodeExpr3(ts7.factory.createArrayLiteralExpression(ngDecorators));
     mapEntries.push({ key: "decorators", value, quoted: false });
   }
   return literalMap(mapEntries);
 }
 function classMemberToMetadata(name, decorators, isCore) {
   const ngDecorators = decorators.filter((dec) => isAngularDecorator2(dec, isCore)).map((decorator) => decoratorToMetadata(decorator));
-  const decoratorMeta = ts9.factory.createArrayLiteralExpression(ngDecorators);
-  return ts9.factory.createPropertyAssignment(name, decoratorMeta);
+  const decoratorMeta = ts7.factory.createArrayLiteralExpression(ngDecorators);
+  return ts7.factory.createPropertyAssignment(name, decoratorMeta);
 }
 function decoratorToMetadata(decorator, wrapFunctionsInParens) {
   if (decorator.identifier === null) {
     throw new Error("Illegal state: synthesized decorator cannot be emitted in class metadata.");
   }
   const properties = [
-    ts9.factory.createPropertyAssignment("type", ts9.getMutableClone(decorator.identifier))
+    ts7.factory.createPropertyAssignment("type", ts7.getMutableClone(decorator.identifier))
   ];
   if (decorator.args !== null && decorator.args.length > 0) {
     const args = decorator.args.map((arg) => {
-      const expr = ts9.getMutableClone(arg);
+      const expr = ts7.getMutableClone(arg);
       return wrapFunctionsInParens ? wrapFunctionExpressionsInParens(expr) : expr;
     });
-    properties.push(ts9.factory.createPropertyAssignment("args", ts9.factory.createArrayLiteralExpression(args)));
+    properties.push(ts7.factory.createPropertyAssignment("args", ts7.factory.createArrayLiteralExpression(args)));
   }
-  return ts9.factory.createObjectLiteralExpression(properties, true);
+  return ts7.factory.createObjectLiteralExpression(properties, true);
 }
 function isAngularDecorator2(decorator, isCore) {
   return isCore || decorator.import !== null && decorator.import.from === "@angular/core";
 }
 function removeIdentifierReferences(node, name) {
-  const result = ts9.transform(node, [(context) => (root) => ts9.visitNode(root, function walk(current) {
-    return ts9.isIdentifier(current) && current.text === name ? ts9.factory.createIdentifier(current.text) : ts9.visitEachChild(current, walk, context);
+  const result = ts7.transform(node, [(context) => (root) => ts7.visitNode(root, function walk(current) {
+    return ts7.isIdentifier(current) && current.text === name ? ts7.factory.createIdentifier(current.text) : ts7.visitEachChild(current, walk, context);
   })]);
   return result.transformed[0];
 }
@@ -2313,7 +1713,7 @@ import { compileClassMetadata as compileClassMetadata3, compileComponentFromMeta
 import ts26 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
-import ts10 from "typescript";
+import ts8 from "typescript";
 var SemanticSymbol = class {
   constructor(decl) {
     this.decl = decl;
@@ -2322,7 +1722,7 @@ var SemanticSymbol = class {
   }
 };
 function getSymbolIdentifier(decl) {
-  if (!ts10.isSourceFile(decl.parent)) {
+  if (!ts8.isSourceFile(decl.parent)) {
     return null;
   }
   return decl.name.text;
@@ -2472,7 +1872,7 @@ function getImportPath(expr) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/type_parameters.mjs
-import ts11 from "typescript";
+import ts9 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/util.mjs
 function isSymbolEqual(a, b) {
@@ -2526,7 +1926,7 @@ function isSetEqual(a, b, equalityTester = referenceEquality) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/type_parameters.mjs
 function extractSemanticTypeParameters(node) {
-  if (!ts11.isClassDeclaration(node) || node.typeParameters === void 0) {
+  if (!ts9.isClassDeclaration(node) || node.typeParameters === void 0) {
     return null;
   }
   return node.typeParameters.map((typeParam) => ({ hasGenericTypeBound: typeParam.constraint !== void 0 }));
@@ -2543,6 +1943,566 @@ function areTypeParametersEqual(current, previous) {
 function isTypeParameterEqual(a, b) {
   return a.hasGenericTypeBound === b.hasGenericTypeBound;
 }
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/api.mjs
+var MetaKind;
+(function(MetaKind2) {
+  MetaKind2[MetaKind2["Directive"] = 0] = "Directive";
+  MetaKind2[MetaKind2["Pipe"] = 1] = "Pipe";
+  MetaKind2[MetaKind2["NgModule"] = 2] = "NgModule";
+})(MetaKind || (MetaKind = {}));
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/dts.mjs
+import ts11 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/property_mapping.mjs
+var ClassPropertyMapping = class {
+  constructor(forwardMap) {
+    this.forwardMap = forwardMap;
+    this.reverseMap = reverseMapFromForwardMap(forwardMap);
+  }
+  static empty() {
+    return new ClassPropertyMapping(/* @__PURE__ */ new Map());
+  }
+  static fromMappedObject(obj) {
+    const forwardMap = /* @__PURE__ */ new Map();
+    for (const classPropertyName of Object.keys(obj)) {
+      const value = obj[classPropertyName];
+      const bindingPropertyName = Array.isArray(value) ? value[0] : value;
+      const inputOrOutput = { classPropertyName, bindingPropertyName };
+      forwardMap.set(classPropertyName, inputOrOutput);
+    }
+    return new ClassPropertyMapping(forwardMap);
+  }
+  static merge(a, b) {
+    const forwardMap = new Map(a.forwardMap.entries());
+    for (const [classPropertyName, inputOrOutput] of b.forwardMap) {
+      forwardMap.set(classPropertyName, inputOrOutput);
+    }
+    return new ClassPropertyMapping(forwardMap);
+  }
+  get classPropertyNames() {
+    return Array.from(this.forwardMap.keys());
+  }
+  get propertyNames() {
+    return Array.from(this.reverseMap.keys());
+  }
+  hasBindingPropertyName(propertyName) {
+    return this.reverseMap.has(propertyName);
+  }
+  getByBindingPropertyName(propertyName) {
+    return this.reverseMap.has(propertyName) ? this.reverseMap.get(propertyName) : null;
+  }
+  getByClassPropertyName(classPropertyName) {
+    return this.forwardMap.has(classPropertyName) ? this.forwardMap.get(classPropertyName) : null;
+  }
+  toDirectMappedObject() {
+    const obj = {};
+    for (const [classPropertyName, inputOrOutput] of this.forwardMap) {
+      obj[classPropertyName] = inputOrOutput.bindingPropertyName;
+    }
+    return obj;
+  }
+  toJointMappedObject() {
+    const obj = {};
+    for (const [classPropertyName, inputOrOutput] of this.forwardMap) {
+      if (inputOrOutput.bindingPropertyName === classPropertyName) {
+        obj[classPropertyName] = inputOrOutput.bindingPropertyName;
+      } else {
+        obj[classPropertyName] = [inputOrOutput.bindingPropertyName, classPropertyName];
+      }
+    }
+    return obj;
+  }
+  *[Symbol.iterator]() {
+    for (const [classPropertyName, inputOrOutput] of this.forwardMap.entries()) {
+      yield [classPropertyName, inputOrOutput.bindingPropertyName];
+    }
+  }
+};
+function reverseMapFromForwardMap(forwardMap) {
+  const reverseMap = /* @__PURE__ */ new Map();
+  for (const [_, inputOrOutput] of forwardMap) {
+    if (!reverseMap.has(inputOrOutput.bindingPropertyName)) {
+      reverseMap.set(inputOrOutput.bindingPropertyName, []);
+    }
+    reverseMap.get(inputOrOutput.bindingPropertyName).push(inputOrOutput);
+  }
+  return reverseMap;
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/util.mjs
+import ts10 from "typescript";
+function extractReferencesFromType(checker, def, bestGuessOwningModule) {
+  if (!ts10.isTupleTypeNode(def)) {
+    return [];
+  }
+  return def.elements.map((element) => {
+    if (!ts10.isTypeQueryNode(element)) {
+      throw new Error(`Expected TypeQueryNode: ${nodeDebugInfo(element)}`);
+    }
+    const type = element.exprName;
+    const { node, from } = reflectTypeEntityToDeclaration(type, checker);
+    if (!isNamedClassDeclaration(node)) {
+      throw new Error(`Expected named ClassDeclaration: ${nodeDebugInfo(node)}`);
+    }
+    if (from !== null && !from.startsWith(".")) {
+      return new Reference(node, { specifier: from, resolutionContext: def.getSourceFile().fileName });
+    } else {
+      return new Reference(node, bestGuessOwningModule);
+    }
+  });
+}
+function readBooleanType(type) {
+  if (!ts10.isLiteralTypeNode(type)) {
+    return null;
+  }
+  switch (type.literal.kind) {
+    case ts10.SyntaxKind.TrueKeyword:
+      return true;
+    case ts10.SyntaxKind.FalseKeyword:
+      return false;
+    default:
+      return null;
+  }
+}
+function readStringType(type) {
+  if (!ts10.isLiteralTypeNode(type) || !ts10.isStringLiteral(type.literal)) {
+    return null;
+  }
+  return type.literal.text;
+}
+function readStringMapType(type) {
+  if (!ts10.isTypeLiteralNode(type)) {
+    return {};
+  }
+  const obj = {};
+  type.members.forEach((member) => {
+    if (!ts10.isPropertySignature(member) || member.type === void 0 || member.name === void 0 || !ts10.isStringLiteral(member.name)) {
+      return;
+    }
+    const value = readStringType(member.type);
+    if (value === null) {
+      return null;
+    }
+    obj[member.name.text] = value;
+  });
+  return obj;
+}
+function readStringArrayType(type) {
+  if (!ts10.isTupleTypeNode(type)) {
+    return [];
+  }
+  const res = [];
+  type.elements.forEach((el) => {
+    if (!ts10.isLiteralTypeNode(el) || !ts10.isStringLiteral(el.literal)) {
+      return;
+    }
+    res.push(el.literal.text);
+  });
+  return res;
+}
+function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
+  const members = reflector.getMembersOfClass(node);
+  const staticMembers = members.filter((member) => member.isStatic);
+  const ngTemplateGuards = staticMembers.map(extractTemplateGuard).filter((guard) => guard !== null);
+  const hasNgTemplateContextGuard = staticMembers.some((member) => member.kind === ClassMemberKind.Method && member.name === "ngTemplateContextGuard");
+  const coercedInputFields = new Set(staticMembers.map(extractCoercedInput).filter((inputName) => inputName !== null));
+  const restrictedInputFields = /* @__PURE__ */ new Set();
+  const stringLiteralInputFields = /* @__PURE__ */ new Set();
+  const undeclaredInputFields = /* @__PURE__ */ new Set();
+  for (const classPropertyName of inputs.classPropertyNames) {
+    const field = members.find((member) => member.name === classPropertyName);
+    if (field === void 0 || field.node === null) {
+      undeclaredInputFields.add(classPropertyName);
+      continue;
+    }
+    if (isRestricted(field.node)) {
+      restrictedInputFields.add(classPropertyName);
+    }
+    if (field.nameNode !== null && ts10.isStringLiteral(field.nameNode)) {
+      stringLiteralInputFields.add(classPropertyName);
+    }
+  }
+  const arity = reflector.getGenericArityOfClass(node);
+  return {
+    hasNgTemplateContextGuard,
+    ngTemplateGuards,
+    coercedInputFields,
+    restrictedInputFields,
+    stringLiteralInputFields,
+    undeclaredInputFields,
+    isGeneric: arity !== null && arity > 0
+  };
+}
+function isRestricted(node) {
+  if (node.modifiers === void 0) {
+    return false;
+  }
+  return node.modifiers.some((modifier) => modifier.kind === ts10.SyntaxKind.PrivateKeyword || modifier.kind === ts10.SyntaxKind.ProtectedKeyword || modifier.kind === ts10.SyntaxKind.ReadonlyKeyword);
+}
+function extractTemplateGuard(member) {
+  if (!member.name.startsWith("ngTemplateGuard_")) {
+    return null;
+  }
+  const inputName = afterUnderscore(member.name);
+  if (member.kind === ClassMemberKind.Property) {
+    let type = null;
+    if (member.type !== null && ts10.isLiteralTypeNode(member.type) && ts10.isStringLiteral(member.type.literal)) {
+      type = member.type.literal.text;
+    }
+    if (type !== "binding") {
+      return null;
+    }
+    return { inputName, type };
+  } else if (member.kind === ClassMemberKind.Method) {
+    return { inputName, type: "invocation" };
+  } else {
+    return null;
+  }
+}
+function extractCoercedInput(member) {
+  if (member.kind !== ClassMemberKind.Property || !member.name.startsWith("ngAcceptInputType_")) {
+    return null;
+  }
+  return afterUnderscore(member.name);
+}
+var CompoundMetadataReader = class {
+  constructor(readers) {
+    this.readers = readers;
+  }
+  getDirectiveMetadata(node) {
+    for (const reader of this.readers) {
+      const meta = reader.getDirectiveMetadata(node);
+      if (meta !== null) {
+        return meta;
+      }
+    }
+    return null;
+  }
+  getNgModuleMetadata(node) {
+    for (const reader of this.readers) {
+      const meta = reader.getNgModuleMetadata(node);
+      if (meta !== null) {
+        return meta;
+      }
+    }
+    return null;
+  }
+  getPipeMetadata(node) {
+    for (const reader of this.readers) {
+      const meta = reader.getPipeMetadata(node);
+      if (meta !== null) {
+        return meta;
+      }
+    }
+    return null;
+  }
+};
+function afterUnderscore(str) {
+  const pos = str.indexOf("_");
+  if (pos === -1) {
+    throw new Error(`Expected '${str}' to contain '_'`);
+  }
+  return str.slice(pos + 1);
+}
+function hasInjectableFields(clazz, host) {
+  const members = host.getMembersOfClass(clazz);
+  return members.some(({ isStatic, name }) => isStatic && (name === "\u0275prov" || name === "\u0275fac"));
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/dts.mjs
+var DtsMetadataReader = class {
+  constructor(checker, reflector) {
+    this.checker = checker;
+    this.reflector = reflector;
+  }
+  getNgModuleMetadata(ref) {
+    const clazz = ref.node;
+    const ngModuleDef = this.reflector.getMembersOfClass(clazz).find((member) => member.name === "\u0275mod" && member.isStatic);
+    if (ngModuleDef === void 0) {
+      return null;
+    } else if (ngModuleDef.type === null || !ts11.isTypeReferenceNode(ngModuleDef.type) || ngModuleDef.type.typeArguments === void 0 || ngModuleDef.type.typeArguments.length !== 4) {
+      return null;
+    }
+    const [_, declarationMetadata, importMetadata, exportMetadata] = ngModuleDef.type.typeArguments;
+    return {
+      kind: MetaKind.NgModule,
+      ref,
+      declarations: extractReferencesFromType(this.checker, declarationMetadata, ref.bestGuessOwningModule),
+      exports: extractReferencesFromType(this.checker, exportMetadata, ref.bestGuessOwningModule),
+      imports: extractReferencesFromType(this.checker, importMetadata, ref.bestGuessOwningModule),
+      schemas: [],
+      rawDeclarations: null,
+      rawImports: null,
+      rawExports: null
+    };
+  }
+  getDirectiveMetadata(ref) {
+    var _a;
+    const clazz = ref.node;
+    const def = this.reflector.getMembersOfClass(clazz).find((field) => field.isStatic && (field.name === "\u0275cmp" || field.name === "\u0275dir"));
+    if (def === void 0) {
+      return null;
+    } else if (def.type === null || !ts11.isTypeReferenceNode(def.type) || def.type.typeArguments === void 0 || def.type.typeArguments.length < 2) {
+      return null;
+    }
+    const isComponent = def.name === "\u0275cmp";
+    const ctorParams = this.reflector.getConstructorParameters(clazz);
+    const isStructural = !isComponent && ctorParams !== null && ctorParams.some((param) => {
+      return param.typeValueReference.kind === 1 && param.typeValueReference.moduleName === "@angular/core" && param.typeValueReference.importedName === "TemplateRef";
+    });
+    const isStandalone = def.type.typeArguments.length > 7 && ((_a = readBooleanType(def.type.typeArguments[7])) != null ? _a : false);
+    const inputs = ClassPropertyMapping.fromMappedObject(readStringMapType(def.type.typeArguments[3]));
+    const outputs = ClassPropertyMapping.fromMappedObject(readStringMapType(def.type.typeArguments[4]));
+    return __spreadProps(__spreadValues({
+      kind: MetaKind.Directive,
+      ref,
+      name: clazz.name.text,
+      isComponent,
+      selector: readStringType(def.type.typeArguments[1]),
+      exportAs: readStringArrayType(def.type.typeArguments[2]),
+      inputs,
+      outputs,
+      queries: readStringArrayType(def.type.typeArguments[5])
+    }, extractDirectiveTypeCheckMeta(clazz, inputs, this.reflector)), {
+      baseClass: readBaseClass2(clazz, this.checker, this.reflector),
+      isPoisoned: false,
+      isStructural,
+      animationTriggerNames: null,
+      isStandalone,
+      imports: null,
+      schemas: null
+    });
+  }
+  getPipeMetadata(ref) {
+    var _a;
+    const def = this.reflector.getMembersOfClass(ref.node).find((field) => field.isStatic && field.name === "\u0275pipe");
+    if (def === void 0) {
+      return null;
+    } else if (def.type === null || !ts11.isTypeReferenceNode(def.type) || def.type.typeArguments === void 0 || def.type.typeArguments.length < 2) {
+      return null;
+    }
+    const type = def.type.typeArguments[1];
+    if (!ts11.isLiteralTypeNode(type) || !ts11.isStringLiteral(type.literal)) {
+      return null;
+    }
+    const name = type.literal.text;
+    const isStandalone = def.type.typeArguments.length > 2 && ((_a = readBooleanType(def.type.typeArguments[2])) != null ? _a : false);
+    return {
+      kind: MetaKind.Pipe,
+      ref,
+      name,
+      nameExpr: null,
+      isStandalone
+    };
+  }
+};
+function readBaseClass2(clazz, checker, reflector) {
+  if (!isNamedClassDeclaration(clazz)) {
+    return reflector.hasBaseClass(clazz) ? "dynamic" : null;
+  }
+  if (clazz.heritageClauses !== void 0) {
+    for (const clause of clazz.heritageClauses) {
+      if (clause.token === ts11.SyntaxKind.ExtendsKeyword) {
+        const baseExpr = clause.types[0].expression;
+        let symbol = checker.getSymbolAtLocation(baseExpr);
+        if (symbol === void 0) {
+          return "dynamic";
+        } else if (symbol.flags & ts11.SymbolFlags.Alias) {
+          symbol = checker.getAliasedSymbol(symbol);
+        }
+        if (symbol.valueDeclaration !== void 0 && isNamedClassDeclaration(symbol.valueDeclaration)) {
+          return new Reference(symbol.valueDeclaration);
+        } else {
+          return "dynamic";
+        }
+      }
+    }
+  }
+  return null;
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/inheritance.mjs
+function flattenInheritedDirectiveMetadata(reader, dir) {
+  const topMeta = reader.getDirectiveMetadata(dir);
+  if (topMeta === null) {
+    throw new Error(`Metadata not found for directive: ${dir.debugName}`);
+  }
+  if (topMeta.baseClass === null) {
+    return topMeta;
+  }
+  const coercedInputFields = /* @__PURE__ */ new Set();
+  const undeclaredInputFields = /* @__PURE__ */ new Set();
+  const restrictedInputFields = /* @__PURE__ */ new Set();
+  const stringLiteralInputFields = /* @__PURE__ */ new Set();
+  let isDynamic = false;
+  let inputs = ClassPropertyMapping.empty();
+  let outputs = ClassPropertyMapping.empty();
+  let isStructural = false;
+  const addMetadata = (meta) => {
+    if (meta.baseClass === "dynamic") {
+      isDynamic = true;
+    } else if (meta.baseClass !== null) {
+      const baseMeta = reader.getDirectiveMetadata(meta.baseClass);
+      if (baseMeta !== null) {
+        addMetadata(baseMeta);
+      } else {
+        isDynamic = true;
+      }
+    }
+    isStructural = isStructural || meta.isStructural;
+    inputs = ClassPropertyMapping.merge(inputs, meta.inputs);
+    outputs = ClassPropertyMapping.merge(outputs, meta.outputs);
+    for (const coercedInputField of meta.coercedInputFields) {
+      coercedInputFields.add(coercedInputField);
+    }
+    for (const undeclaredInputField of meta.undeclaredInputFields) {
+      undeclaredInputFields.add(undeclaredInputField);
+    }
+    for (const restrictedInputField of meta.restrictedInputFields) {
+      restrictedInputFields.add(restrictedInputField);
+    }
+    for (const field of meta.stringLiteralInputFields) {
+      stringLiteralInputFields.add(field);
+    }
+  };
+  addMetadata(topMeta);
+  return __spreadProps(__spreadValues({}, topMeta), {
+    inputs,
+    outputs,
+    coercedInputFields,
+    undeclaredInputFields,
+    restrictedInputFields,
+    stringLiteralInputFields,
+    baseClass: isDynamic ? "dynamic" : null,
+    isStructural
+  });
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/registry.mjs
+var LocalMetadataRegistry = class {
+  constructor() {
+    this.directives = /* @__PURE__ */ new Map();
+    this.ngModules = /* @__PURE__ */ new Map();
+    this.pipes = /* @__PURE__ */ new Map();
+  }
+  getDirectiveMetadata(ref) {
+    return this.directives.has(ref.node) ? this.directives.get(ref.node) : null;
+  }
+  getNgModuleMetadata(ref) {
+    return this.ngModules.has(ref.node) ? this.ngModules.get(ref.node) : null;
+  }
+  getPipeMetadata(ref) {
+    return this.pipes.has(ref.node) ? this.pipes.get(ref.node) : null;
+  }
+  registerDirectiveMetadata(meta) {
+    this.directives.set(meta.ref.node, meta);
+  }
+  registerNgModuleMetadata(meta) {
+    this.ngModules.set(meta.ref.node, meta);
+  }
+  registerPipeMetadata(meta) {
+    this.pipes.set(meta.ref.node, meta);
+  }
+};
+var CompoundMetadataRegistry = class {
+  constructor(registries) {
+    this.registries = registries;
+  }
+  registerDirectiveMetadata(meta) {
+    for (const registry of this.registries) {
+      registry.registerDirectiveMetadata(meta);
+    }
+  }
+  registerNgModuleMetadata(meta) {
+    for (const registry of this.registries) {
+      registry.registerNgModuleMetadata(meta);
+    }
+  }
+  registerPipeMetadata(meta) {
+    for (const registry of this.registries) {
+      registry.registerPipeMetadata(meta);
+    }
+  }
+};
+var InjectableClassRegistry = class {
+  constructor(host) {
+    this.host = host;
+    this.classes = /* @__PURE__ */ new Set();
+  }
+  registerInjectable(declaration) {
+    this.classes.add(declaration);
+  }
+  isInjectable(declaration) {
+    return this.classes.has(declaration) || hasInjectableFields(declaration, this.host);
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/resource_registry.mjs
+var ResourceRegistry = class {
+  constructor() {
+    this.externalTemplateToComponentsMap = /* @__PURE__ */ new Map();
+    this.componentToTemplateMap = /* @__PURE__ */ new Map();
+    this.componentToStylesMap = /* @__PURE__ */ new Map();
+    this.externalStyleToComponentsMap = /* @__PURE__ */ new Map();
+  }
+  getComponentsWithTemplate(template) {
+    if (!this.externalTemplateToComponentsMap.has(template)) {
+      return /* @__PURE__ */ new Set();
+    }
+    return this.externalTemplateToComponentsMap.get(template);
+  }
+  registerResources(resources, component) {
+    if (resources.template !== null) {
+      this.registerTemplate(resources.template, component);
+    }
+    for (const style of resources.styles) {
+      this.registerStyle(style, component);
+    }
+  }
+  registerTemplate(templateResource, component) {
+    const { path } = templateResource;
+    if (path !== null) {
+      if (!this.externalTemplateToComponentsMap.has(path)) {
+        this.externalTemplateToComponentsMap.set(path, /* @__PURE__ */ new Set());
+      }
+      this.externalTemplateToComponentsMap.get(path).add(component);
+    }
+    this.componentToTemplateMap.set(component, templateResource);
+  }
+  getTemplate(component) {
+    if (!this.componentToTemplateMap.has(component)) {
+      return null;
+    }
+    return this.componentToTemplateMap.get(component);
+  }
+  registerStyle(styleResource, component) {
+    const { path } = styleResource;
+    if (!this.componentToStylesMap.has(component)) {
+      this.componentToStylesMap.set(component, /* @__PURE__ */ new Set());
+    }
+    if (path !== null) {
+      if (!this.externalStyleToComponentsMap.has(path)) {
+        this.externalStyleToComponentsMap.set(path, /* @__PURE__ */ new Set());
+      }
+      this.externalStyleToComponentsMap.get(path).add(component);
+    }
+    this.componentToStylesMap.get(component).add(styleResource);
+  }
+  getStyles(component) {
+    if (!this.componentToStylesMap.has(component)) {
+      return /* @__PURE__ */ new Set();
+    }
+    return this.componentToStylesMap.get(component);
+  }
+  getComponentsWithStyle(styleUrl) {
+    if (!this.externalStyleToComponentsMap.has(styleUrl)) {
+      return /* @__PURE__ */ new Set();
+    }
+    return this.externalStyleToComponentsMap.get(styleUrl);
+  }
+};
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/api.mjs
 var ComponentScopeKind;
@@ -4884,7 +4844,7 @@ var LIFECYCLE_HOOKS = /* @__PURE__ */ new Set([
   "ngAfterContentChecked"
 ]);
 var DirectiveDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, compileUndecoratedClassesWithAngularFeatures, perf) {
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, isCore, semanticDepGraphUpdater, annotateForClosureCompiler, compileUndecoratedClassesWithAngularFeatures, perf) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -4892,7 +4852,6 @@ var DirectiveDecoratorHandler = class {
     this.metaReader = metaReader;
     this.injectableRegistry = injectableRegistry;
     this.isCore = isCore;
-    this.strictCtorDeps = strictCtorDeps;
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
     this.annotateForClosureCompiler = annotateForClosureCompiler;
     this.compileUndecoratedClassesWithAngularFeatures = compileUndecoratedClassesWithAngularFeatures;
@@ -4965,9 +4924,7 @@ var DirectiveDecoratorHandler = class {
       imports: null,
       schemas: null
     }));
-    this.injectableRegistry.registerInjectable(node, {
-      ctorDeps: analysis.meta.deps
-    });
+    this.injectableRegistry.registerInjectable(node);
   }
   resolve(node, analysis, symbol) {
     if (this.semanticDepGraphUpdater !== null && analysis.baseClass instanceof Reference) {
@@ -4978,7 +4935,7 @@ var DirectiveDecoratorHandler = class {
       const providerDiagnostics = getProviderDiagnostics(analysis.providersRequiringFactory, analysis.meta.providers.node, this.injectableRegistry);
       diagnostics.push(...providerDiagnostics);
     }
-    const directiveDiagnostics = getDirectiveDiagnostics(node, this.injectableRegistry, this.evaluator, this.reflector, this.scopeRegistry, this.strictCtorDeps, "Directive");
+    const directiveDiagnostics = getDirectiveDiagnostics(node, this.metaReader, this.evaluator, this.reflector, this.scopeRegistry, "Directive");
     if (directiveDiagnostics !== null) {
       diagnostics.push(...directiveDiagnostics);
     }
@@ -5275,9 +5232,7 @@ var NgModuleDecoratorHandler = class {
         name: analysis.factorySymbolName
       });
     }
-    this.injectableRegistry.registerInjectable(node, {
-      ctorDeps: analysis.fac.deps
-    });
+    this.injectableRegistry.registerInjectable(node);
   }
   resolve(node, analysis) {
     const scope = this.scopeRegistry.getScopeOfModule(node);
@@ -5971,7 +5926,7 @@ function validateAndFlattenComponentImports(imports, expr) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 var EMPTY_ARRAY = [];
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -5982,7 +5937,6 @@ var ComponentDecoratorHandler = class {
     this.typeCheckScopeRegistry = typeCheckScopeRegistry;
     this.resourceRegistry = resourceRegistry;
     this.isCore = isCore;
-    this.strictCtorDeps = strictCtorDeps;
     this.resourceLoader = resourceLoader;
     this.rootDirs = rootDirs;
     this.defaultPreserveWhitespaces = defaultPreserveWhitespaces;
@@ -6280,9 +6234,7 @@ var ComponentDecoratorHandler = class {
       schemas: analysis.schemas
     }));
     this.resourceRegistry.registerResources(analysis.resources, node);
-    this.injectableRegistry.registerInjectable(node, {
-      ctorDeps: analysis.meta.deps
-    });
+    this.injectableRegistry.registerInjectable(node);
   }
   index(context, node, analysis) {
     if (analysis.isPoisoned && !this.usePoisonedData) {
@@ -6485,7 +6437,7 @@ var ComponentDecoratorHandler = class {
       const viewProviderDiagnostics = getProviderDiagnostics(analysis.viewProvidersRequiringFactory, analysis.meta.viewProviders.node, this.injectableRegistry);
       diagnostics.push(...viewProviderDiagnostics);
     }
-    const directiveDiagnostics = getDirectiveDiagnostics(node, this.injectableRegistry, this.evaluator, this.reflector, this.scopeRegistry, this.strictCtorDeps, "Component");
+    const directiveDiagnostics = getDirectiveDiagnostics(node, this.metaReader, this.evaluator, this.reflector, this.scopeRegistry, "Component");
     if (directiveDiagnostics !== null) {
       diagnostics.push(...directiveDiagnostics);
     }
@@ -6596,9 +6548,8 @@ function validateStandaloneImports(importRefs, importExpr, metaReader, scopeRead
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
 import ts27 from "typescript";
 var InjectableDecoratorHandler = class {
-  constructor(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, perf, errorOnDuplicateProv = true) {
+  constructor(reflector, isCore, strictCtorDeps, injectableRegistry, perf, errorOnDuplicateProv = true) {
     this.reflector = reflector;
-    this.evaluator = evaluator;
     this.isCore = isCore;
     this.strictCtorDeps = strictCtorDeps;
     this.injectableRegistry = injectableRegistry;
@@ -6638,21 +6589,8 @@ var InjectableDecoratorHandler = class {
   symbol() {
     return null;
   }
-  register(node, analysis) {
-    this.injectableRegistry.registerInjectable(node, {
-      ctorDeps: analysis.ctorDeps
-    });
-  }
-  resolve(node, analysis, symbol) {
-    if (requiresValidCtor(analysis.meta)) {
-      const diagnostic = checkInheritanceOfInjectable(node, this.injectableRegistry, this.reflector, this.evaluator, this.strictCtorDeps, "Injectable");
-      if (diagnostic !== null) {
-        return {
-          diagnostics: [diagnostic]
-        };
-      }
-    }
-    return {};
+  register(node) {
+    this.injectableRegistry.registerInjectable(node);
   }
   compileFull(node, analysis) {
     return this.compile(compileNgFactoryDefField, (meta) => compileInjectable(meta, false), compileClassMetadata4, node, analysis);
@@ -6739,7 +6677,7 @@ function extractInjectableCtorDeps(clazz, meta, decorator, reflector, isCore, st
   }
   let ctorDeps = null;
   if (decorator.args.length === 0) {
-    if (strictCtorDeps && !isAbstractClassDeclaration(clazz)) {
+    if (strictCtorDeps) {
       ctorDeps = getValidConstructorDependencies(clazz, reflector, isCore);
     } else {
       ctorDeps = unwrapConstructorDependencies(getConstructorDependencies(clazz, reflector, isCore));
@@ -6747,16 +6685,13 @@ function extractInjectableCtorDeps(clazz, meta, decorator, reflector, isCore, st
     return ctorDeps;
   } else if (decorator.args.length === 1) {
     const rawCtorDeps = getConstructorDependencies(clazz, reflector, isCore);
-    if (strictCtorDeps && !isAbstractClassDeclaration(clazz) && requiresValidCtor(meta)) {
+    if (strictCtorDeps && meta.useValue === void 0 && meta.useExisting === void 0 && meta.useClass === void 0 && meta.useFactory === void 0) {
       ctorDeps = validateConstructorDependencies(clazz, rawCtorDeps);
     } else {
       ctorDeps = unwrapConstructorDependencies(rawCtorDeps);
     }
   }
   return ctorDeps;
-}
-function requiresValidCtor(meta) {
-  return meta.useValue === void 0 && meta.useExisting === void 0 && meta.useClass === void 0 && meta.useFactory === void 0;
 }
 function getDep(dep, reflector) {
   const meta = {
@@ -6925,9 +6860,7 @@ var PipeDecoratorHandler = class {
       nameExpr: analysis.pipeNameExpr,
       isStandalone: analysis.meta.isStandalone
     });
-    this.injectableRegistry.registerInjectable(node, {
-      ctorDeps: analysis.meta.deps
-    });
+    this.injectableRegistry.registerInjectable(node);
   }
   resolve(node) {
     const duplicateDeclData = this.scopeRegistry.getDuplicateDeclarations(node);
@@ -6958,15 +6891,15 @@ export {
   DynamicValue,
   StaticInterpreter,
   PartialEvaluator,
+  NoopReferencesRegistry,
+  SemanticDepGraphUpdater,
   MetaKind,
   CompoundMetadataReader,
   DtsMetadataReader,
   LocalMetadataRegistry,
   CompoundMetadataRegistry,
-  ResourceRegistry,
   InjectableClassRegistry,
-  NoopReferencesRegistry,
-  SemanticDepGraphUpdater,
+  ResourceRegistry,
   ComponentScopeKind,
   CompoundComponentScopeReader,
   MetadataDtsModuleScopeResolver,
@@ -7003,4 +6936,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-GPCY6A4P.js.map
+//# sourceMappingURL=chunk-UVJA6MFZ.js.map

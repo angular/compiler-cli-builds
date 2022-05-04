@@ -13,7 +13,7 @@ import { ModuleResolver, ReferenceEmitter } from '../../../imports';
 import { DependencyTracker } from '../../../incremental/api';
 import { SemanticDepGraphUpdater } from '../../../incremental/semantic_graph';
 import { IndexingContext } from '../../../indexer';
-import { MetadataReader, MetadataRegistry, ResourceRegistry } from '../../../metadata';
+import { InjectableClassRegistry, MetadataReader, MetadataRegistry, ResourceRegistry } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { PerfRecorder } from '../../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
@@ -22,7 +22,7 @@ import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerF
 import { TypeCheckContext } from '../../../typecheck/api';
 import { ExtendedTemplateChecker } from '../../../typecheck/extended/api';
 import { Xi18nContext } from '../../../xi18n';
-import { InjectableClassRegistry, ResourceLoader } from '../../common';
+import { ResourceLoader } from '../../common';
 import { ComponentAnalysisData, ComponentResolutionData } from './metadata';
 import { ComponentSymbol } from './symbol';
 /**
@@ -39,7 +39,6 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private typeCheckScopeRegistry;
     private resourceRegistry;
     private isCore;
-    private strictCtorDeps;
     private resourceLoader;
     private rootDirs;
     private defaultPreserveWhitespaces;
@@ -56,7 +55,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private semanticDepGraphUpdater;
     private annotateForClosureCompiler;
     private perf;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, dtsScopeReader: DtsModuleScopeResolver, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, strictCtorDeps: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, dtsScopeReader: DtsModuleScopeResolver, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder);
     private literalCache;
     private elementSchemaRegistry;
     /**
