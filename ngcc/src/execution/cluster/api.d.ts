@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/execution/cluster/api" />
 import { AbsoluteFsPath } from '../../../../src/ngtsc/file_system';
-import { JsonObject } from '../../packages/entry_point';
+import { JsonObject } from '../../utils';
 import { PackageJsonChange } from '../../writing/package_json_updater';
 import { Task, TaskProcessingOutcome } from '../tasks/api';
 /** A message reporting that the worker is ready for retrieving tasks. */

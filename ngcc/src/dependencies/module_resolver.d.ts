@@ -65,14 +65,17 @@ export declare class ModuleResolver {
      * Try to resolve the `moduleName` as an external entry-point by searching the `node_modules`
      * folders up the tree for a matching `.../node_modules/${moduleName}`.
      *
-     * If a folder is found but the path does not contain a `package.json` then it is marked as a
-     * "deep-import".
+     * If a folder is found but the path is not considered an entry-point (see `isEntryPoint()`) then
+     * it is marked as a "deep-import".
      */
     private resolveAsEntryPoint;
     /**
      * Can we consider the given path as an entry-point to a package?
      *
      * This is achieved by checking for the existence of `${modulePath}/package.json`.
+     * If there is no `package.json`, we check whether this is an APF v14+ secondary entry-point,
+     * which does not have its own `package.json` but has an `exports` entry in the package's primary
+     * `package.json`.
      */
     private isEntryPoint;
     /**

@@ -1,6 +1,7 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point" />
 import { AbsoluteFsPath, ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
 import { Logger } from '../../../src/ngtsc/logging';
+import { JsonObject } from '../utils';
 import { NgccConfiguration } from './configuration';
 /**
  * The possible values for the format of an entry-point.
@@ -34,13 +35,6 @@ export interface EntryPoint extends JsonObject {
     ignoreMissingDependencies: boolean;
     /** Should ngcc generate deep re-exports for this entrypoint? */
     generateDeepReexports: boolean;
-}
-export declare type JsonPrimitive = string | number | boolean | null;
-export declare type JsonValue = JsonPrimitive | JsonArray | JsonObject | undefined;
-export interface JsonArray extends Array<JsonValue> {
-}
-export interface JsonObject {
-    [key: string]: JsonValue;
 }
 export interface PackageJsonFormatPropertiesMap {
     browser?: string;

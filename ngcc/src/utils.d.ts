@@ -9,6 +9,13 @@
 import ts from 'typescript';
 import { AbsoluteFsPath, ReadonlyFileSystem } from '../../src/ngtsc/file_system';
 import { DeclarationNode, KnownDeclaration } from '../../src/ngtsc/reflection';
+export declare type JsonPrimitive = string | number | boolean | null;
+export declare type JsonValue = JsonPrimitive | JsonArray | JsonObject | undefined;
+export interface JsonArray extends Array<JsonValue> {
+}
+export interface JsonObject {
+    [key: string]: JsonValue;
+}
 /**
  * A list (`Array`) of partially ordered `T` items.
  *
@@ -85,3 +92,22 @@ export declare function getTsHelperFnFromIdentifier(id: ts.Identifier): KnownDec
  */
 export declare function stripDollarSuffix(value: string): string;
 export declare function stripExtension(fileName: string): string;
+/**
+ * Parse the JSON from a `package.json` file.
+ *
+ * @param packageJsonPath The absolute path to the `package.json` file.
+ * @returns JSON from the `package.json` file if it exists and is valid, `null` otherwise.
+ */
+export declare function loadJson<T extends JsonObject = JsonObject>(fs: ReadonlyFileSystem, packageJsonPath: AbsoluteFsPath): T | null;
+/**
+ * Given the parsed JSON of a `package.json` file, try to extract info for a secondary entry-point
+ * from the `exports` property. Such info will only be present for packages following Angular
+ * Package Format v14+.
+ *
+ * @param primaryPackageJson The parsed JSON of the primary `package.json` (or `null` if it failed
+ *     to be loaded).
+ * @param packagePath The absolute path to the containing npm package.
+ * @param entryPointPath The absolute path to the secondary entry-point.
+ * @returns The `exports` info for the specified entry-point if it exists, `null` otherwise.
+ */
+export declare function loadSecondaryEntryPointInfoForApfV14(fs: ReadonlyFileSystem, primaryPackageJson: JsonObject | null, packagePath: AbsoluteFsPath, entryPointPath: AbsoluteFsPath): JsonObject | null;

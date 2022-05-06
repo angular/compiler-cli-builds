@@ -171,6 +171,26 @@ function stripDollarSuffix(value) {
 function stripExtension(fileName) {
   return fileName.replace(/\..+$/, "");
 }
+function loadJson(fs, packageJsonPath) {
+  try {
+    return JSON.parse(fs.readFile(packageJsonPath));
+  } catch {
+    return null;
+  }
+}
+function loadSecondaryEntryPointInfoForApfV14(fs, primaryPackageJson, packagePath, entryPointPath) {
+  const exportMap = primaryPackageJson == null ? void 0 : primaryPackageJson.exports;
+  if (!isExportObject(exportMap)) {
+    return null;
+  }
+  const relativeEntryPointPath = fs.relative(packagePath, entryPointPath);
+  const entryPointExportKey = `./${relativeEntryPointPath}`;
+  const entryPointInfo = exportMap[entryPointExportKey];
+  return isExportObject(entryPointInfo) ? entryPointInfo : null;
+}
+function isExportObject(thing) {
+  return typeof thing === "object" && thing !== null && !Array.isArray(thing);
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/host/commonjs_umd_utils.mjs
 import ts2 from "typescript";
@@ -2352,21 +2372,21 @@ var INCOMPATIBLE_ENTRY_POINT = "incompatible-entry-point";
 function getEntryPointInfo(fs, config, logger, packagePath, entryPointPath) {
   const packagePackageJsonPath = fs.resolve(packagePath, "package.json");
   const entryPointPackageJsonPath = fs.resolve(entryPointPath, "package.json");
-  const loadedPackagePackageJson = loadPackageJson(fs, packagePackageJsonPath);
-  const loadedEntryPointPackageJson = packagePackageJsonPath === entryPointPackageJsonPath ? loadedPackagePackageJson : loadPackageJson(fs, entryPointPackageJsonPath);
+  const loadedPackagePackageJson = loadJson(fs, packagePackageJsonPath);
+  const loadedEntryPointPackageJson = packagePackageJsonPath === entryPointPackageJsonPath ? loadedPackagePackageJson : loadOrSynthesizeSecondaryPackageJson(fs, packagePath, entryPointPath, entryPointPackageJsonPath, loadedPackagePackageJson);
   const { packageName, packageVersion } = getPackageNameAndVersion(fs, packagePath, loadedPackagePackageJson, loadedEntryPointPackageJson);
   const repositoryUrl = getRepositoryUrl(loadedPackagePackageJson);
   const packageConfig = config.getPackageConfig(packageName, packagePath, packageVersion);
   const entryPointConfig = packageConfig.entryPoints.get(entryPointPath);
   let entryPointPackageJson;
   if (entryPointConfig === void 0) {
-    if (!fs.exists(entryPointPackageJsonPath)) {
+    if (loadedEntryPointPackageJson !== null) {
+      entryPointPackageJson = loadedEntryPointPackageJson;
+    } else if (!fs.exists(entryPointPackageJsonPath)) {
       return NO_ENTRY_POINT;
-    } else if (loadedEntryPointPackageJson === null) {
+    } else {
       logger.warn(`Failed to read entry point info from invalid 'package.json' file: ${entryPointPackageJsonPath}`);
       return INCOMPATIBLE_ENTRY_POINT;
-    } else {
-      entryPointPackageJson = loadedEntryPointPackageJson;
     }
   } else if (entryPointConfig.ignore === true) {
     return IGNORED_ENTRY_POINT;
@@ -2430,12 +2450,28 @@ function getEntryPointFormat(fs, entryPoint, property2) {
       return void 0;
   }
 }
-function loadPackageJson(fs, packageJsonPath) {
-  try {
-    return JSON.parse(fs.readFile(packageJsonPath));
-  } catch {
+function loadOrSynthesizeSecondaryPackageJson(fs, packagePath, entryPointPath, secondaryPackageJsonPath, primaryPackageJson) {
+  const loadedPackageJson = loadJson(fs, secondaryPackageJsonPath);
+  if (loadedPackageJson !== null) {
+    return loadedPackageJson;
+  }
+  const entryPointInfo = loadSecondaryEntryPointInfoForApfV14(fs, primaryPackageJson, packagePath, entryPointPath);
+  if (entryPointInfo === null) {
     return null;
   }
+  const synthesizedPackageJson = {
+    synthesized: true,
+    name: `${primaryPackageJson.name}/${fs.relative(packagePath, entryPointPath)}`
+  };
+  for (const prop of [...SUPPORTED_FORMAT_PROPERTIES, "types", "typings"]) {
+    const packageRelativePath = entryPointInfo[prop];
+    if (typeof packageRelativePath === "string") {
+      const absolutePath = fs.resolve(packagePath, packageRelativePath);
+      const entryPointRelativePath = fs.relative(entryPointPath, absolutePath);
+      synthesizedPackageJson[prop] = fs.isRooted(entryPointRelativePath) || entryPointRelativePath.startsWith(".") ? entryPointRelativePath : `./${entryPointRelativePath}`;
+    }
+  }
+  return synthesizedPackageJson;
 }
 function sniffModuleFormat(fs, sourceFilePath) {
   const resolvedPath = resolveFileWithPostfixes(fs, sourceFilePath, ["", ".js", "/index.js"]);
@@ -5021,12 +5057,18 @@ var PackageJsonUpdate = class {
   }
   writeChanges(packageJsonPath, parsedJson) {
     this.ensureNotApplied();
+    this.ensureNotSynthesized(parsedJson);
     this.writeChangesImpl(this.changes, packageJsonPath, parsedJson);
     this.applied = true;
   }
   ensureNotApplied() {
     if (this.applied) {
       throw new Error("Trying to apply a `PackageJsonUpdate` that has already been applied.");
+    }
+  }
+  ensureNotSynthesized(parsedJson) {
+    if (parsedJson == null ? void 0 : parsedJson.synthesized) {
+      throw new Error("Trying to update a non-existent (synthesized) `package.json` file.");
     }
   }
 };
@@ -5104,6 +5146,8 @@ export {
   isRequireCall,
   isRelativePath,
   resolveFileWithPostfixes,
+  loadJson,
+  loadSecondaryEntryPointInfoForApfV14,
   parseStatementForUmdModule,
   getImportsOfUmdModule,
   SUPPORTED_FORMAT_PROPERTIES,
@@ -5141,4 +5185,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-OGPZOZRU.js.map
+//# sourceMappingURL=chunk-CSUTRRO6.js.map
