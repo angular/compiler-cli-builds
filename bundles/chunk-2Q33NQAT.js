@@ -31,12 +31,14 @@ import {
   isRelativePath,
   isRequireCall,
   isWildcardReexportStatement,
+  loadJson,
+  loadSecondaryEntryPointInfoForApfV14,
   parseStatementForUmdModule,
   resolveFileWithPostfixes,
   sendMessageToWorker,
   sortTasksByPriority,
   stringifyTask
-} from "./chunk-OGPZOZRU.js";
+} from "./chunk-CSUTRRO6.js";
 import {
   LogLevel
 } from "./chunk-LX5Q27EF.js";
@@ -114,7 +116,16 @@ var ModuleResolver = class {
     return null;
   }
   isEntryPoint(modulePath) {
-    return this.fs.exists(this.fs.join(modulePath, "package.json"));
+    if (this.fs.exists(this.fs.join(modulePath, "package.json"))) {
+      return true;
+    }
+    const packagePath = this.findPackagePath(modulePath);
+    if (packagePath === null) {
+      return false;
+    }
+    const packagePackageJson = loadJson(this.fs, this.fs.join(packagePath, "package.json"));
+    const entryPointInfoForApfV14 = loadSecondaryEntryPointInfoForApfV14(this.fs, packagePackageJson, packagePath, modulePath);
+    return entryPointInfoForApfV14 !== null;
   }
   findMappedPaths(moduleName) {
     const matches = this.pathMappings.map((mapping) => this.matchMapping(moduleName, mapping));
@@ -887,7 +898,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "14.1.0-next.0+sha-3f3812e";
+var NGCC_VERSION = "14.1.0-next.0+sha-d4e949f";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -2172,4 +2183,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-36EOQKNZ.js.map
+//# sourceMappingURL=chunk-2Q33NQAT.js.map

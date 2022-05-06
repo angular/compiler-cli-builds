@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/writing/package_json_updater" />
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
-import { JsonObject, JsonValue } from '../packages/entry_point';
+import { JsonObject, JsonValue } from '../utils';
 export declare type PackageJsonChange = [string[], JsonValue, PackageJsonPropertyPositioning];
 export declare type PackageJsonPropertyPositioning = 'unimportant' | 'alphabetic' | {
     before: string;
@@ -87,6 +87,7 @@ export declare class PackageJsonUpdate {
      */
     writeChanges(packageJsonPath: AbsoluteFsPath, parsedJson?: JsonObject): void;
     private ensureNotApplied;
+    private ensureNotSynthesized;
 }
 /** A `PackageJsonUpdater` that writes directly to the file-system. */
 export declare class DirectPackageJsonUpdater implements PackageJsonUpdater {

@@ -7,7 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/ngcc/src/execution/cluster/package_json_updater" />
 import { AbsoluteFsPath } from '../../../../src/ngtsc/file_system';
-import { JsonObject } from '../../packages/entry_point';
+import { JsonObject } from '../../utils';
 import { PackageJsonChange, PackageJsonUpdate, PackageJsonUpdater } from '../../writing/package_json_updater';
 /**
  * A `PackageJsonUpdater` for cluster workers that will send update changes to the master process so
