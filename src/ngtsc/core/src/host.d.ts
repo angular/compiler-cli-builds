@@ -97,6 +97,13 @@ export declare class NgCompilerHost extends DelegatingCompilerHost implements Re
      * If this returns false, the file is user-provided.
      */
     isShim(sf: ts.SourceFile): boolean;
+    /**
+     * Check whether the given `ts.SourceFile` is a resource file.
+     *
+     * This simply returns `false` for the compiler-cli since resource files are not added as root
+     * files to the project.
+     */
+    isResource(sf: ts.SourceFile): boolean;
     getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
     fileExists(fileName: string): boolean;
     get unifiedModulesHost(): UnifiedModulesHost | null;

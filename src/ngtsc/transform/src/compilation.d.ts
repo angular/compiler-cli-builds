@@ -8,6 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/transform/src/compilation" />
 import { ConstantPool } from '@angular/compiler';
 import ts from 'typescript';
+import { SourceFileTypeIdentifier } from '../../core/api';
 import { IncrementalBuild } from '../../incremental/api';
 import { SemanticDepGraphUpdater, SemanticSymbol } from '../../incremental/semantic_graph';
 import { IndexingContext } from '../../indexer';
@@ -65,6 +66,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     private compilationMode;
     private dtsTransforms;
     private semanticDepGraphUpdater;
+    private sourceFileTypeIdentifier;
     /**
      * Maps class declarations to their `ClassRecord`, which tracks the Ivy traits being applied to
      * those classes.
@@ -82,7 +84,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     protected filesWithoutTraits: Set<ts.SourceFile>;
     private reexportMap;
     private handlersByName;
-    constructor(handlers: DecoratorHandler<unknown, unknown, SemanticSymbol | null, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord, unknown>, compileNonExportedClasses: boolean, compilationMode: CompilationMode, dtsTransforms: DtsTransformRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null);
+    constructor(handlers: DecoratorHandler<unknown, unknown, SemanticSymbol | null, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord, unknown>, compileNonExportedClasses: boolean, compilationMode: CompilationMode, dtsTransforms: DtsTransformRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, sourceFileTypeIdentifier: SourceFileTypeIdentifier);
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     private analyze;
