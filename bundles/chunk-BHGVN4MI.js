@@ -6,8 +6,9 @@
 import {
   CycleAnalyzer,
   ImportGraph,
+  isShim,
   readConfiguration
-} from "./chunk-6E6DHHHX.js";
+} from "./chunk-N6HUFHQ6.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -31,7 +32,7 @@ import {
   TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-HZUCTYDG.js";
+} from "./chunk-GJVJ6GH4.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -3245,7 +3246,7 @@ function createMigrationDiagnostic(diagnostic, source, decorator) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/analysis/ngcc_trait_compiler.mjs
 var NgccTraitCompiler = class extends TraitCompiler {
   constructor(handlers, ngccReflector) {
-    super(handlers, ngccReflector, NOOP_PERF_RECORDER, new NoIncrementalBuild(), true, CompilationMode.FULL, new DtsTransformRegistry(), null);
+    super(handlers, ngccReflector, NOOP_PERF_RECORDER, new NoIncrementalBuild(), true, CompilationMode.FULL, new DtsTransformRegistry(), null, { isShim, isResource: () => false });
     this.ngccReflector = ngccReflector;
   }
   get analyzedFiles() {
@@ -5185,4 +5186,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CSUTRRO6.js.map
+//# sourceMappingURL=chunk-BHGVN4MI.js.map
