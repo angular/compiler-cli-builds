@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-GJVJ6GH4.js";
+} from "./chunk-74SXTDBS.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -1909,19 +1909,19 @@ var StandaloneComponentScopeReader = class {
           seen.add(ref.node);
           const dirMeta = this.metaReader.getDirectiveMetadata(ref);
           if (dirMeta !== null) {
-            dependencies.add(dirMeta);
+            dependencies.add(__spreadProps(__spreadValues({}, dirMeta), { ref }));
             isPoisoned = isPoisoned || dirMeta.isPoisoned || !dirMeta.isStandalone;
             continue;
           }
           const pipeMeta = this.metaReader.getPipeMetadata(ref);
           if (pipeMeta !== null) {
-            dependencies.add(pipeMeta);
+            dependencies.add(__spreadProps(__spreadValues({}, pipeMeta), { ref }));
             isPoisoned = isPoisoned || !pipeMeta.isStandalone;
             continue;
           }
           const ngModuleMeta = this.metaReader.getNgModuleMetadata(ref);
           if (ngModuleMeta !== null) {
-            dependencies.add(ngModuleMeta);
+            dependencies.add(__spreadProps(__spreadValues({}, ngModuleMeta), { ref }));
             let ngModuleScope;
             if (ref.node.getSourceFile().isDeclarationFile) {
               ngModuleScope = this.dtsModuleReader.resolve(ref);
@@ -7297,4 +7297,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-N6HUFHQ6.js.map
+//# sourceMappingURL=chunk-TFEYVOY6.js.map

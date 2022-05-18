@@ -88,5 +88,5 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      * @returns a `Cycle` object if a cycle would be created, otherwise `null`.
      */
     private _checkForCyclicImport;
-    private _recordSyntheticImport;
+    private maybeRecordSyntheticImport;
 }

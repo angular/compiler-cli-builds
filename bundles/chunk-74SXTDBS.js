@@ -5983,23 +5983,25 @@ var ComponentDecoratorHandler = class {
       }
       const cyclesFromDirectives = /* @__PURE__ */ new Map();
       const cyclesFromPipes = /* @__PURE__ */ new Map();
-      for (const usedDep of declarations) {
-        const cycle = this._checkForCyclicImport(usedDep.importedFile, usedDep.type, context);
-        if (cycle !== null) {
-          switch (usedDep.kind) {
-            case R3TemplateDependencyKind.Directive:
-              cyclesFromDirectives.set(usedDep, cycle);
-              break;
-            case R3TemplateDependencyKind.Pipe:
-              cyclesFromPipes.set(usedDep, cycle);
-              break;
+      if (!metadata.isStandalone) {
+        for (const usedDep of declarations) {
+          const cycle = this._checkForCyclicImport(usedDep.importedFile, usedDep.type, context);
+          if (cycle !== null) {
+            switch (usedDep.kind) {
+              case R3TemplateDependencyKind.Directive:
+                cyclesFromDirectives.set(usedDep, cycle);
+                break;
+              case R3TemplateDependencyKind.Pipe:
+                cyclesFromPipes.set(usedDep, cycle);
+                break;
+            }
           }
         }
       }
       const cycleDetected = cyclesFromDirectives.size !== 0 || cyclesFromPipes.size !== 0;
       if (!cycleDetected) {
         for (const { type, importedFile } of declarations) {
-          this._recordSyntheticImport(importedFile, type, context);
+          this.maybeRecordSyntheticImport(importedFile, type, context);
         }
         const wrapDirectivesAndPipesInClosure = declarations.some((decl) => isExpressionForwardReference(decl.type, node.name, context));
         data.declarations = declarations;
@@ -6112,7 +6114,7 @@ var ComponentDecoratorHandler = class {
     }
     return this.cycleAnalyzer.wouldCreateCycle(origin, imported);
   }
-  _recordSyntheticImport(importedFile, expr, origin) {
+  maybeRecordSyntheticImport(importedFile, expr, origin) {
     const imported = resolveImportedFile(this.moduleResolver, importedFile, expr, origin);
     if (imported === null) {
       return;
@@ -6528,4 +6530,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GJVJ6GH4.js.map
+//# sourceMappingURL=chunk-74SXTDBS.js.map
