@@ -204,7 +204,7 @@ var BabelAstHost = class {
     for (const property of obj.properties) {
       assert(property, types2.isObjectProperty, "a property assignment");
       assert(property.value, types2.isExpression, "an expression");
-      assert(property.key, isPropertyName, "a property name");
+      assert(property.key, isObjectExpressionPropertyName, "a property name");
       const key = types2.isIdentifier(property.key) ? property.key.name : property.key.value;
       result.set(`${key}`, property.value);
     }
@@ -242,7 +242,7 @@ var BabelAstHost = class {
     });
   }
   getRange(node) {
-    if (node.loc == null || node.start === null || node.end === null) {
+    if (node.loc == null || node.start == null || node.end == null) {
       throw new FatalLinkerError(node, "Unable to read range for node - it is missing location information.");
     }
     return {
@@ -259,8 +259,8 @@ function isNotEmptyElement(e) {
 function isNotSpreadElement(e) {
   return !types2.isSpreadElement(e);
 }
-function isPropertyName(e) {
-  return types2.isIdentifier(e) || types2.isStringLiteral(e) || types2.isNumericLiteral(e);
+function isObjectExpressionPropertyName(n) {
+  return types2.isIdentifier(n) || types2.isStringLiteral(n) || types2.isNumericLiteral(n);
 }
 function isNotSpreadArgument(arg) {
   return !types2.isSpreadElement(arg);
