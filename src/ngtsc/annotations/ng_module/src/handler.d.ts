@@ -85,25 +85,6 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     private appendRemoteScopingStatements;
     private compileNgModule;
     private _toR3Reference;
-    /**
-     * Given a `FunctionDeclaration`, `MethodDeclaration` or `FunctionExpression`, check if it is
-     * typed as a `ModuleWithProviders` and return an expression referencing the module if available.
-     */
-    private _extractModuleFromModuleWithProvidersFn;
-    /**
-     * Retrieve an `NgModule` identifier (T) from the specified `type`, if it is of the form:
-     * `ModuleWithProviders<T>`
-     * @param type The type to reflect on.
-     * @returns the identifier of the NgModule type if found, or null otherwise.
-     */
-    private _reflectModuleFromTypeParam;
-    /**
-     * Retrieve an `NgModule` identifier (T) from the specified `type`, if it is of the form:
-     * `A|B|{ngModule: T}|C`.
-     * @param type The type to reflect on.
-     * @returns the identifier of the NgModule type if found, or null otherwise.
-     */
-    private _reflectModuleFromLiteralType;
     private isClassDeclarationReference;
     /**
      * Compute a list of `Reference`s from a resolved metadata value.

@@ -7,3 +7,4 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/ng_module" />
 export { NgModuleDecoratorHandler, NgModuleSymbol } from './src/handler';
+export { createModuleWithProvidersResolver, isResolvedModuleWithProviders, ResolvedModuleWithProviders } from './src/module_with_providers';

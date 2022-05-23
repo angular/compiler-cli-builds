@@ -274,6 +274,15 @@ function resolveImportedFile(moduleResolver, importedFile, expr, origin) {
   }
   return moduleResolver.resolveModule(expr.value.moduleName, origin.fileName);
 }
+function getOriginNodeForDiagnostics(expr, container) {
+  const nodeSf = expr.getSourceFile();
+  const exprSf = container.getSourceFile();
+  if (nodeSf === exprSf && expr.pos >= container.pos && expr.end <= container.end) {
+    return expr;
+  } else {
+    return container;
+  }
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic.mjs
 var DynamicValue = class {
@@ -1707,7 +1716,7 @@ function extractSchemas(rawExpr, evaluator, context) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 import { compileClassMetadata as compileClassMetadata3, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
-import ts23 from "typescript";
+import ts24 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
 import ts8 from "typescript";
@@ -4570,7 +4579,76 @@ var DirectiveDecoratorHandler = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.mjs
 import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, R3Identifiers, R3SelectorScopeMode, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
+import ts22 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/module_with_providers.mjs
 import ts21 from "typescript";
+function createModuleWithProvidersResolver(reflector, isCore) {
+  function _reflectModuleFromTypeParam(type, node) {
+    if (!ts21.isTypeReferenceNode(type)) {
+      return null;
+    }
+    const typeName = type && (ts21.isIdentifier(type.typeName) && type.typeName || ts21.isQualifiedName(type.typeName) && type.typeName.right) || null;
+    if (typeName === null) {
+      return null;
+    }
+    const id = reflector.getImportOfIdentifier(typeName);
+    if (id === null || id.name !== "ModuleWithProviders") {
+      return null;
+    }
+    if (!isCore && id.from !== "@angular/core") {
+      return null;
+    }
+    if (type.typeArguments === void 0 || type.typeArguments.length !== 1) {
+      const parent = ts21.isMethodDeclaration(node) && ts21.isClassDeclaration(node.parent) ? node.parent : null;
+      const symbolName = (parent && parent.name ? parent.name.getText() + "." : "") + (node.name ? node.name.getText() : "anonymous");
+      throw new FatalDiagnosticError(ErrorCode.NGMODULE_MODULE_WITH_PROVIDERS_MISSING_GENERIC, type, `${symbolName} returns a ModuleWithProviders type without a generic type argument. Please add a generic type argument to the ModuleWithProviders type. If this occurrence is in library code you don't control, please contact the library authors.`);
+    }
+    const arg = type.typeArguments[0];
+    return typeNodeToValueExpr(arg);
+  }
+  function _reflectModuleFromLiteralType(type) {
+    if (!ts21.isIntersectionTypeNode(type)) {
+      return null;
+    }
+    for (const t of type.types) {
+      if (ts21.isTypeLiteralNode(t)) {
+        for (const m of t.members) {
+          const ngModuleType = ts21.isPropertySignature(m) && ts21.isIdentifier(m.name) && m.name.text === "ngModule" && m.type || null;
+          const ngModuleExpression = ngModuleType && typeNodeToValueExpr(ngModuleType);
+          if (ngModuleExpression) {
+            return ngModuleExpression;
+          }
+        }
+      }
+    }
+    return null;
+  }
+  return (fn, callExpr, resolve, unresolvable) => {
+    var _a;
+    const rawType = fn.node.type;
+    if (rawType === void 0) {
+      return unresolvable;
+    }
+    const type = (_a = _reflectModuleFromTypeParam(rawType, fn.node)) != null ? _a : _reflectModuleFromLiteralType(rawType);
+    if (type === null) {
+      return unresolvable;
+    }
+    const ngModule = resolve(type);
+    if (!(ngModule instanceof Reference) || !isNamedClassDeclaration(ngModule.node)) {
+      return unresolvable;
+    }
+    return new SyntheticValue({
+      ngModule,
+      mwpCall: callExpr
+    });
+  };
+}
+function isResolvedModuleWithProviders(sv) {
+  return typeof sv.value === "object" && sv.value != null && sv.value.hasOwnProperty("ngModule") && sv.value.hasOwnProperty("mwpCall");
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.mjs
 var NgModuleSymbol = class extends SemanticSymbol {
   constructor() {
     super(...arguments);
@@ -4653,8 +4731,8 @@ var NgModuleDecoratorHandler = class {
     if (decorator.args === null || decorator.args.length > 1) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `Incorrect number of arguments to @NgModule decorator`);
     }
-    const meta = decorator.args.length === 1 ? unwrapExpression(decorator.args[0]) : ts21.factory.createObjectLiteralExpression([]);
-    if (!ts21.isObjectLiteralExpression(meta)) {
+    const meta = decorator.args.length === 1 ? unwrapExpression(decorator.args[0]) : ts22.factory.createObjectLiteralExpression([]);
+    if (!ts22.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@NgModule argument must be an object literal");
     }
     const ngModule = reflectObjectLiteral(meta);
@@ -4662,7 +4740,7 @@ var NgModuleDecoratorHandler = class {
       return {};
     }
     const moduleResolvers = combineResolvers([
-      (fn, call, resolve, unresolvable) => this._extractModuleFromModuleWithProvidersFn(fn, call, resolve, unresolvable),
+      createModuleWithProvidersResolver(this.reflector, this.isCore),
       forwardRefResolver
     ]);
     const diagnostics = [];
@@ -4717,7 +4795,7 @@ var NgModuleDecoratorHandler = class {
         id = new WrappedNodeExpr6(idExpr);
       } else {
         const diag = makeDiagnostic(ErrorCode.WARN_NGMODULE_ID_UNNECESSARY, idExpr, `Using 'module.id' for NgModule.id is a common anti-pattern that is ignored by the Angular compiler.`);
-        diag.category = ts21.DiagnosticCategory.Warning;
+        diag.category = ts22.DiagnosticCategory.Warning;
         diagnostics.push(diag);
       }
     }
@@ -4755,9 +4833,9 @@ var NgModuleDecoratorHandler = class {
     if (ngModule.has("imports")) {
       const rawImports2 = unwrapExpression(ngModule.get("imports"));
       let topLevelExpressions = [];
-      if (ts21.isArrayLiteralExpression(rawImports2)) {
+      if (ts22.isArrayLiteralExpression(rawImports2)) {
         for (const element of rawImports2.elements) {
-          if (ts21.isSpreadElement(element)) {
+          if (ts22.isSpreadElement(element)) {
             topLevelExpressions.push(element.expression);
             continue;
           }
@@ -4993,61 +5071,6 @@ var NgModuleDecoratorHandler = class {
       return toR3Reference(origin, valueRef, typeRef, valueContext, typeContext, this.refEmitter);
     }
   }
-  _extractModuleFromModuleWithProvidersFn(fn, node, resolve, unresolvable) {
-    const rawType = fn.node.type || null;
-    const type = rawType && (this._reflectModuleFromTypeParam(rawType, fn.node) || this._reflectModuleFromLiteralType(rawType));
-    if (type === null) {
-      return unresolvable;
-    }
-    const ngModule = resolve(type);
-    if (!(ngModule instanceof Reference) || !isNamedClassDeclaration(ngModule.node)) {
-      return unresolvable;
-    }
-    return new SyntheticValue({
-      ngModule,
-      mwpCall: node
-    });
-  }
-  _reflectModuleFromTypeParam(type, node) {
-    if (!ts21.isTypeReferenceNode(type)) {
-      return null;
-    }
-    const typeName = type && (ts21.isIdentifier(type.typeName) && type.typeName || ts21.isQualifiedName(type.typeName) && type.typeName.right) || null;
-    if (typeName === null) {
-      return null;
-    }
-    const id = this.reflector.getImportOfIdentifier(typeName);
-    if (id === null || id.name !== "ModuleWithProviders") {
-      return null;
-    }
-    if (!this.isCore && id.from !== "@angular/core") {
-      return null;
-    }
-    if (type.typeArguments === void 0 || type.typeArguments.length !== 1) {
-      const parent = ts21.isMethodDeclaration(node) && ts21.isClassDeclaration(node.parent) ? node.parent : null;
-      const symbolName = (parent && parent.name ? parent.name.getText() + "." : "") + (node.name ? node.name.getText() : "anonymous");
-      throw new FatalDiagnosticError(ErrorCode.NGMODULE_MODULE_WITH_PROVIDERS_MISSING_GENERIC, type, `${symbolName} returns a ModuleWithProviders type without a generic type argument. Please add a generic type argument to the ModuleWithProviders type. If this occurrence is in library code you don't control, please contact the library authors.`);
-    }
-    const arg = type.typeArguments[0];
-    return typeNodeToValueExpr(arg);
-  }
-  _reflectModuleFromLiteralType(type) {
-    if (!ts21.isIntersectionTypeNode(type)) {
-      return null;
-    }
-    for (const t of type.types) {
-      if (ts21.isTypeLiteralNode(t)) {
-        for (const m of t.members) {
-          const ngModuleType = ts21.isPropertySignature(m) && ts21.isIdentifier(m.name) && m.name.text === "ngModule" && m.type || null;
-          const ngModuleExpression = ngModuleType && typeNodeToValueExpr(ngModuleType);
-          if (ngModuleExpression) {
-            return ngModuleExpression;
-          }
-        }
-      }
-    }
-    return null;
-  }
   isClassDeclarationReference(ref) {
     return this.reflector.isClass(ref.node);
   }
@@ -5091,10 +5114,7 @@ function isNgModule(node, compilation) {
   return !compilation.dependencies.some((dep) => dep.ref.node === node);
 }
 function isModuleIdExpression(expr) {
-  return ts21.isPropertyAccessExpression(expr) && ts21.isIdentifier(expr.expression) && expr.expression.text === "module" && expr.name.text === "id";
-}
-function isResolvedModuleWithProviders(sv) {
-  return typeof sv.value === "object" && sv.value != null && sv.value.hasOwnProperty("ngModule") && sv.value.hasOwnProperty("mwpCall");
+  return ts22.isPropertyAccessExpression(expr) && ts22.isIdentifier(expr.expression) && expr.expression.text === "module" && expr.name.text === "id";
 }
 function makeStandaloneBootstrapDiagnostic(ngModuleClass, bootstrappedClassRef, rawBootstrapExpr) {
   const componentClassName = bootstrappedClassRef.node.name.text;
@@ -5128,7 +5148,7 @@ function checkCustomElementSelectorForErrors(selector) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/resources.mjs
 import { DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, ParseSourceFile as ParseSourceFile2, parseTemplate } from "@angular/compiler";
-import ts22 from "typescript";
+import ts23 from "typescript";
 function getTemplateDeclarationNodeForError(declaration) {
   switch (declaration.isInline) {
     case true:
@@ -5145,7 +5165,7 @@ function extractTemplate(node, template, evaluator, depTracker, resourceLoader, 
     let sourceMapping;
     let escapedString = false;
     let sourceMapUrl;
-    if (ts22.isStringLiteral(template.expression) || ts22.isNoSubstitutionTemplateLiteral(template.expression)) {
+    if (ts23.isStringLiteral(template.expression) || ts23.isNoSubstitutionTemplateLiteral(template.expression)) {
       sourceParseRange = getTemplateRange(template.expression);
       sourceStr = template.expression.getSourceFile().text;
       templateContent = template.expression.text;
@@ -5303,7 +5323,7 @@ function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanaly
 }
 function getTemplateRange(templateExpr) {
   const startPos = templateExpr.getStart() + 1;
-  const { line, character } = ts22.getLineAndCharacterOfPosition(templateExpr.getSourceFile(), startPos);
+  const { line, character } = ts23.getLineAndCharacterOfPosition(templateExpr.getSourceFile(), startPos);
   return {
     startPos,
     startLine: line,
@@ -5336,7 +5356,7 @@ function transformDecoratorResources(dec, component, styles, template) {
   const metadata = new Map(component);
   if (metadata.has("templateUrl")) {
     metadata.delete("templateUrl");
-    metadata.set("template", ts22.factory.createStringLiteral(template.content));
+    metadata.set("template", ts23.factory.createStringLiteral(template.content));
   }
   if (metadata.has("styleUrls") || metadata.has("styles")) {
     metadata.delete("styles");
@@ -5344,20 +5364,20 @@ function transformDecoratorResources(dec, component, styles, template) {
     if (styles.length > 0) {
       const styleNodes = styles.reduce((result, style) => {
         if (style.trim().length > 0) {
-          result.push(ts22.factory.createStringLiteral(style));
+          result.push(ts23.factory.createStringLiteral(style));
         }
         return result;
       }, []);
       if (styleNodes.length > 0) {
-        metadata.set("styles", ts22.factory.createArrayLiteralExpression(styleNodes));
+        metadata.set("styles", ts23.factory.createArrayLiteralExpression(styleNodes));
       }
     }
   }
   const newMetadataFields = [];
   for (const [name, value] of metadata.entries()) {
-    newMetadataFields.push(ts22.factory.createPropertyAssignment(name, value));
+    newMetadataFields.push(ts23.factory.createPropertyAssignment(name, value));
   }
-  return __spreadProps(__spreadValues({}, dec), { args: [ts22.factory.createObjectLiteralExpression(newMetadataFields)] });
+  return __spreadProps(__spreadValues({}, dec), { args: [ts23.factory.createObjectLiteralExpression(newMetadataFields)] });
 }
 function extractComponentStyleUrls(evaluator, component) {
   if (!component.has("styleUrls")) {
@@ -5367,9 +5387,9 @@ function extractComponentStyleUrls(evaluator, component) {
 }
 function extractStyleUrlsFromExpression(evaluator, styleUrlsExpr) {
   const styleUrls = [];
-  if (ts22.isArrayLiteralExpression(styleUrlsExpr)) {
+  if (ts23.isArrayLiteralExpression(styleUrlsExpr)) {
     for (const styleUrlExpr of styleUrlsExpr.elements) {
-      if (ts22.isSpreadElement(styleUrlExpr)) {
+      if (ts23.isSpreadElement(styleUrlExpr)) {
         styleUrls.push(...extractStyleUrlsFromExpression(evaluator, styleUrlExpr.expression));
       } else {
         const styleUrl = evaluator.evaluate(styleUrlExpr);
@@ -5401,10 +5421,10 @@ function extractStyleUrlsFromExpression(evaluator, styleUrlsExpr) {
 function extractStyleResources(resourceLoader, component, containingFile) {
   const styles = /* @__PURE__ */ new Set();
   function stringLiteralElements(array) {
-    return array.elements.filter((e) => ts22.isStringLiteralLike(e));
+    return array.elements.filter((e) => ts23.isStringLiteralLike(e));
   }
   const styleUrlsExpr = component.get("styleUrls");
-  if (styleUrlsExpr !== void 0 && ts22.isArrayLiteralExpression(styleUrlsExpr)) {
+  if (styleUrlsExpr !== void 0 && ts23.isArrayLiteralExpression(styleUrlsExpr)) {
     for (const expression of stringLiteralElements(styleUrlsExpr)) {
       try {
         const resourceUrl = resourceLoader.resolve(expression.text, containingFile);
@@ -5414,7 +5434,7 @@ function extractStyleResources(resourceLoader, component, containingFile) {
     }
   }
   const stylesExpr = component.get("styles");
-  if (stylesExpr !== void 0 && ts22.isArrayLiteralExpression(stylesExpr)) {
+  if (stylesExpr !== void 0 && ts23.isArrayLiteralExpression(stylesExpr)) {
     for (const expression of stringLiteralElements(stylesExpr)) {
       styles.add({ path: null, expression });
     }
@@ -5518,11 +5538,26 @@ function validateAndFlattenComponentImports(imports, expr) {
       } else {
         diagnostics.push(createValueHasWrongTypeError(ref.getOriginForDiagnostics(expr), ref, `'imports' must be an array of components, directives, pipes, or NgModules`).toDiagnostic());
       }
+    } else if (isLikelyModuleWithProviders(ref)) {
+      let origin = expr;
+      if (ref instanceof SyntheticValue) {
+        origin = getOriginNodeForDiagnostics(ref.value.mwpCall, expr);
+      }
+      diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_UNKNOWN_IMPORT, origin, `'imports' contains a ModuleWithProviders value, likely the result of a 'Module.forRoot()'-style call. These calls are not used to configure components and are not valid in standalone component imports - consider importing them in the application bootstrap instead.`));
     } else {
       diagnostics.push(createValueHasWrongTypeError(expr, imports, `'imports' must be an array of components, directives, pipes, or NgModules`).toDiagnostic());
     }
   }
   return { imports: flattened, diagnostics };
+}
+function isLikelyModuleWithProviders(value) {
+  if (value instanceof SyntheticValue && isResolvedModuleWithProviders(value)) {
+    return true;
+  }
+  if (value instanceof Map && value.has("ngModule")) {
+    return true;
+  }
+  return false;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
@@ -5675,7 +5710,11 @@ var ComponentDecoratorHandler = class {
       isPoisoned = true;
     } else if (component.has("imports")) {
       const expr = component.get("imports");
-      const imported = this.evaluator.evaluate(expr, forwardRefResolver);
+      const importResolvers = combineResolvers([
+        createModuleWithProvidersResolver(this.reflector, this.isCore),
+        forwardRefResolver
+      ]);
+      const imported = this.evaluator.evaluate(expr, importResolvers);
       const { imports: flattened, diagnostics: importDiagnostics } = validateAndFlattenComponentImports(imported, expr);
       resolvedImports = flattened;
       rawImports = expr;
@@ -5869,7 +5908,7 @@ var ComponentDecoratorHandler = class {
     });
   }
   typeCheck(ctx, node, meta) {
-    if (this.typeCheckScopeRegistry === null || !ts23.isClassDeclaration(node)) {
+    if (this.typeCheckScopeRegistry === null || !ts24.isClassDeclaration(node)) {
       return;
     }
     if (meta.isPoisoned && !this.usePoisonedData) {
@@ -6150,7 +6189,7 @@ function validateStandaloneImports(importRefs, importExpr, metaReader, scopeRead
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
-import ts24 from "typescript";
+import ts25 from "typescript";
 var InjectableDecoratorHandler = class {
   constructor(reflector, isCore, strictCtorDeps, injectableRegistry, perf, errorOnDuplicateProv = true) {
     this.reflector = reflector;
@@ -6241,7 +6280,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     };
   } else if (decorator.args.length === 1) {
     const metaNode = decorator.args[0];
-    if (!ts24.isObjectLiteralExpression(metaNode)) {
+    if (!ts25.isObjectLiteralExpression(metaNode)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, `@Injectable argument must be an object literal`);
     }
     const meta = reflectObjectLiteral(metaNode);
@@ -6249,7 +6288,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     let deps = void 0;
     if ((meta.has("useClass") || meta.has("useFactory")) && meta.has("deps")) {
       const depsExpr = meta.get("deps");
-      if (!ts24.isArrayLiteralExpression(depsExpr)) {
+      if (!ts25.isArrayLiteralExpression(depsExpr)) {
         throw new FatalDiagnosticError(ErrorCode.VALUE_NOT_LITERAL, depsExpr, `@Injectable deps metadata must be an inline array`);
       }
       deps = depsExpr.elements.map((dep) => getDep(dep, reflector));
@@ -6331,12 +6370,12 @@ function getDep(dep, reflector) {
     }
     return true;
   }
-  if (ts24.isArrayLiteralExpression(dep)) {
+  if (ts25.isArrayLiteralExpression(dep)) {
     dep.elements.forEach((el) => {
       let isDecorator = false;
-      if (ts24.isIdentifier(el)) {
+      if (ts25.isIdentifier(el)) {
         isDecorator = maybeUpdateDecorator(el, reflector);
-      } else if (ts24.isNewExpression(el) && ts24.isIdentifier(el.expression)) {
+      } else if (ts25.isNewExpression(el) && ts25.isIdentifier(el.expression)) {
         const token = el.arguments && el.arguments.length > 0 && el.arguments[0] || void 0;
         isDecorator = maybeUpdateDecorator(el.expression, reflector, token);
       }
@@ -6350,7 +6389,7 @@ function getDep(dep, reflector) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/pipe.mjs
 import { compileClassMetadata as compileClassMetadata5, compileDeclareClassMetadata as compileDeclareClassMetadata5, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
-import ts25 from "typescript";
+import ts26 from "typescript";
 var PipeSymbol = class extends SemanticSymbol {
   constructor(decl, name) {
     super(decl);
@@ -6405,7 +6444,7 @@ var PipeDecoratorHandler = class {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), "@Pipe must have exactly one argument");
     }
     const meta = unwrapExpression(decorator.args[0]);
-    if (!ts25.isObjectLiteralExpression(meta)) {
+    if (!ts26.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
     }
     const pipe = reflectObjectLiteral(meta);
@@ -6530,4 +6569,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-26XMGX27.js.map
+//# sourceMappingURL=chunk-SYSV56XP.js.map

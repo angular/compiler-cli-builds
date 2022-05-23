@@ -94,3 +94,9 @@ export declare function createSourceSpan(node: ts.Node): ParseSourceSpan;
 export declare function compileResults(fac: CompileResult, def: R3CompiledExpression, metadataStmt: Statement | null, propName: string): CompileResult[];
 export declare function toFactoryMetadata(meta: Omit<R3FactoryMetadata, 'target'>, target: FactoryTarget): R3FactoryMetadata;
 export declare function resolveImportedFile(moduleResolver: ModuleResolver, importedFile: ImportedFile, expr: Expression, origin: ts.SourceFile): ts.SourceFile | null;
+/**
+ * Determines the most appropriate expression for diagnostic reporting purposes. If `expr` is
+ * contained within `container` then `expr` is used as origin node, otherwise `container` itself is
+ * used.
+ */
+export declare function getOriginNodeForDiagnostics(expr: ts.Expression, container: ts.Expression): ts.Expression;
