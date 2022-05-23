@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-74SXTDBS.js";
+} from "./chunk-SYSV56XP.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -2349,18 +2349,19 @@ var RegistryDomSchemaChecker = class {
   get diagnostics() {
     return this._diagnostics;
   }
-  checkElement(id, element, schemas) {
+  checkElement(id, element, schemas, hostIsStandalone) {
     const name = element.name.replace(REMOVE_XHTML_REGEX, "");
     if (!REGISTRY.hasElement(name, schemas)) {
       const mapping = this.resolver.getSourceMapping(id);
+      const schemas2 = `'${hostIsStandalone ? "@Component" : "@NgModule"}.schemas'`;
       let errorMsg = `'${name}' is not a known element:
 `;
-      errorMsg += `1. If '${name}' is an Angular component, then verify that it is part of this module.
+      errorMsg += `1. If '${name}' is an Angular component, then verify that it is ${hostIsStandalone ? "included in the '@Component.imports' of this component" : "part of this module"}.
 `;
       if (name.indexOf("-") > -1) {
-        errorMsg += `2. If '${name}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message.`;
+        errorMsg += `2. If '${name}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.`;
       } else {
-        errorMsg += `2. To allow any element add 'NO_ERRORS_SCHEMA' to the '@NgModule.schemas' of this component.`;
+        errorMsg += `2. To allow any element add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
       }
       const diag = makeTemplateDiagnostic(id, mapping, element.startSourceSpan, ts14.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ELEMENT), errorMsg);
       this._diagnostics.push(diag);
@@ -3416,7 +3417,7 @@ var TcbGenericContextBehavior;
   TcbGenericContextBehavior2[TcbGenericContextBehavior2["FallbackToAny"] = 2] = "FallbackToAny";
 })(TcbGenericContextBehavior || (TcbGenericContextBehavior = {}));
 function generateTypeCheckBlock(env, ref, name, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
-  const tcb = new Context(env, domSchemaChecker, oobRecorder, meta.id, meta.boundTarget, meta.pipes, meta.schemas);
+  const tcb = new Context(env, domSchemaChecker, oobRecorder, meta.id, meta.boundTarget, meta.pipes, meta.schemas, meta.isStandalone);
   const scope = Scope.forNodes(tcb, null, tcb.boundTarget.target.template, null);
   const ctxRawType = env.referenceType(ref);
   if (!ts25.isTypeReferenceNode(ctxRawType)) {
@@ -3828,7 +3829,7 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
   }
   execute() {
     if (this.checkElement) {
-      this.tcb.domSchemaChecker.checkElement(this.tcb.id, this.element, this.tcb.schemas);
+      this.tcb.domSchemaChecker.checkElement(this.tcb.id, this.element, this.tcb.schemas, this.tcb.hostIsStandalone);
     }
     for (const binding of this.element.inputs) {
       if (binding.type === 0 && this.claimedInputs.has(binding.name)) {
@@ -3997,7 +3998,7 @@ var TcbComponentContextCompletionOp = class extends TcbOp {
 };
 var INFER_TYPE_FOR_CIRCULAR_OP_EXPR = ts25.factory.createNonNullExpression(ts25.factory.createNull());
 var Context = class {
-  constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas) {
+  constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone) {
     this.env = env;
     this.domSchemaChecker = domSchemaChecker;
     this.oobRecorder = oobRecorder;
@@ -4005,6 +4006,7 @@ var Context = class {
     this.boundTarget = boundTarget;
     this.pipes = pipes;
     this.schemas = schemas;
+    this.hostIsStandalone = hostIsStandalone;
     this.nextId = 1;
   }
   allocateId() {
@@ -4516,7 +4518,7 @@ var TypeCheckContextImpl = class {
       throw new Error(`AssertionError: invalid inlining configuration.`);
     }
   }
-  addTemplate(ref, binder, template, pipes, schemas, sourceMapping, file, parseErrors) {
+  addTemplate(ref, binder, template, pipes, schemas, sourceMapping, file, parseErrors, isStandalone) {
     if (!this.host.shouldCheckComponent(ref.node)) {
       return;
     }
@@ -4562,7 +4564,8 @@ var TypeCheckContextImpl = class {
       id: fileData.sourceManager.captureSource(ref.node, sourceMapping, file),
       boundTarget,
       pipes,
-      schemas
+      schemas,
+      isStandalone
     };
     this.perf.eventCount(PerfEvent.GenerateTcb);
     if (inliningRequirement !== TcbInliningRequirement.None && this.inlining === InliningMode.InlineOps) {
@@ -7297,4 +7300,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-TFEYVOY6.js.map
+//# sourceMappingURL=chunk-4P37JXA5.js.map

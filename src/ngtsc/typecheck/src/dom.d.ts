@@ -31,8 +31,10 @@ export interface DomSchemaChecker {
      * @param element the element node in question.
      * @param schemas any active schemas for the template, which might affect the validity of the
      * element.
+     * @param hostIsStandalone boolean indicating whether the element's host is a standalone
+     *     component.
      */
-    checkElement(id: string, element: TmplAstElement, schemas: SchemaMetadata[]): void;
+    checkElement(id: string, element: TmplAstElement, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
     /**
      * Check a property binding on an element and record any diagnostics about it.
      *
@@ -55,6 +57,6 @@ export declare class RegistryDomSchemaChecker implements DomSchemaChecker {
     private _diagnostics;
     get diagnostics(): ReadonlyArray<TemplateDiagnostic>;
     constructor(resolver: TemplateSourceResolver);
-    checkElement(id: TemplateId, element: TmplAstElement, schemas: SchemaMetadata[]): void;
+    checkElement(id: TemplateId, element: TmplAstElement, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
     checkProperty(id: TemplateId, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[]): void;
 }
