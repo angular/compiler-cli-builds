@@ -5880,7 +5880,7 @@ var ComponentDecoratorHandler = class {
       return;
     }
     const binder = new R3TargetBinder(scope.matcher);
-    ctx.addTemplate(new Reference(node), binder, meta.template.diagNodes, scope.pipes, scope.schemas, meta.template.sourceMapping, meta.template.file, meta.template.errors);
+    ctx.addTemplate(new Reference(node), binder, meta.template.diagNodes, scope.pipes, scope.schemas, meta.template.sourceMapping, meta.template.file, meta.template.errors, meta.meta.isStandalone);
   }
   extendedTemplateCheck(component, extendedTemplateChecker) {
     return extendedTemplateChecker.getDiagnosticsForComponent(component);
@@ -6530,4 +6530,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-74SXTDBS.js.map
+//# sourceMappingURL=chunk-26XMGX27.js.map

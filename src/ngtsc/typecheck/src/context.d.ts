@@ -167,7 +167,7 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
      *
      * Implements `TypeCheckContext.addTemplate`.
      */
-    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, template: TmplAstNode[], pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[], sourceMapping: TemplateSourceMapping, file: ParseSourceFile, parseErrors: ParseError[] | null): void;
+    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, template: TmplAstNode[], pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[], sourceMapping: TemplateSourceMapping, file: ParseSourceFile, parseErrors: ParseError[] | null, isStandalone: boolean): void;
     /**
      * Record a type constructor for the given `node` with the given `ctorMetadata`.
      */
