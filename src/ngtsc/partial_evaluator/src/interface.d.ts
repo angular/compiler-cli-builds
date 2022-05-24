@@ -10,9 +10,8 @@ import ts from 'typescript';
 import { Reference } from '../../imports';
 import { DependencyTracker } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
-import { DynamicValue } from './dynamic';
 import { ResolvedValue } from './result';
-export declare type ForeignFunctionResolver = (fn: Reference<ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>, callExpr: ts.CallExpression, resolve: (expr: ts.Expression) => ResolvedValue, unresolvable: DynamicValue) => ResolvedValue;
+export declare type ForeignFunctionResolver = (node: Reference<ts.FunctionDeclaration | ts.MethodDeclaration | ts.FunctionExpression>, args: ReadonlyArray<ts.Expression>) => ts.Expression | null;
 export declare class PartialEvaluator {
     private host;
     private checker;

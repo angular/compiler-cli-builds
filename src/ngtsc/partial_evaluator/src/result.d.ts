@@ -10,7 +10,6 @@ import ts from 'typescript';
 import { Reference } from '../../imports';
 import { Declaration } from '../../reflection';
 import { DynamicValue } from './dynamic';
-import { SyntheticValue } from './synthetic';
 /**
  * A value resulting from static resolution.
  *
@@ -18,7 +17,7 @@ import { SyntheticValue } from './synthetic';
  * non-primitive value, or a special `DynamicValue` type which indicates the value was not
  * available statically.
  */
-export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | ResolvedModule | KnownFn | SyntheticValue<unknown> | DynamicValue<unknown>;
+export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | ResolvedModule | KnownFn | DynamicValue<unknown>;
 /**
  * An array of `ResolvedValue`s.
  *

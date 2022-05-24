@@ -21,7 +21,10 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     createBinaryExpression(leftOperand: ts.Expression, operator: BinaryOperator, rightOperand: ts.Expression): ts.Expression;
     createBlock(body: ts.Statement[]): ts.Statement;
     createCallExpression(callee: ts.Expression, args: ts.Expression[], pure: boolean): ts.Expression;
-    createConditional(condition: ts.Expression, whenTrue: ts.Expression, whenFalse: ts.Expression): ts.Expression;
+    createConditional: {
+        (condition: ts.Expression, whenTrue: ts.Expression, whenFalse: ts.Expression): ts.ConditionalExpression;
+        (condition: ts.Expression, questionToken: ts.QuestionToken, whenTrue: ts.Expression, colonToken: ts.ColonToken, whenFalse: ts.Expression): ts.ConditionalExpression;
+    };
     createElementAccess: (expression: ts.Expression, index: number | ts.Expression) => ts.ElementAccessExpression;
     createExpressionStatement: (expression: ts.Expression) => ts.ExpressionStatement;
     createFunctionDeclaration(functionName: string, parameters: string[], body: ts.Statement): ts.Statement;

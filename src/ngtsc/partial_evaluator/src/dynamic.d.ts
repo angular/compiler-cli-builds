@@ -9,7 +9,6 @@
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { FunctionDefinition } from '../../reflection';
-import { SyntheticValue } from './synthetic';
 /**
  * The reason why a value cannot be determined statically.
  */
@@ -69,14 +68,9 @@ export declare const enum DynamicValueReason {
      */
     DYNAMIC_TYPE = 7,
     /**
-     * A value could not be determined because one of the inputs to its evaluation is a synthetically
-     * produced value.
-     */
-    SYNTHETIC_INPUT = 8,
-    /**
      * A value could not be determined statically for any reason other the above.
      */
-    UNKNOWN = 9
+    UNKNOWN = 8
 }
 /**
  * Represents a value which cannot be determined statically.
@@ -94,7 +88,6 @@ export declare class DynamicValue<R = unknown> {
     static fromInvalidExpressionType(node: ts.Node, value: unknown): DynamicValue<unknown>;
     static fromComplexFunctionCall(node: ts.Node, fn: FunctionDefinition): DynamicValue<FunctionDefinition>;
     static fromDynamicType(node: ts.TypeNode): DynamicValue;
-    static fromSyntheticInput(node: ts.Node, value: SyntheticValue<unknown>): DynamicValue<SyntheticValue<unknown>>;
     static fromUnknown(node: ts.Node): DynamicValue;
     isFromDynamicInput(this: DynamicValue<R>): this is DynamicValue<DynamicValue>;
     isFromDynamicString(this: DynamicValue<R>): this is DynamicValue;
@@ -116,6 +109,5 @@ export interface DynamicValueVisitor<R> {
     visitInvalidExpressionType(value: DynamicValue): R;
     visitComplexFunctionCall(value: DynamicValue<FunctionDefinition>): R;
     visitDynamicType(value: DynamicValue): R;
-    visitSyntheticInput(value: DynamicValue<SyntheticValue<unknown>>): R;
     visitUnknown(value: DynamicValue): R;
 }

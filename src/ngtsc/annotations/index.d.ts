@@ -6,9 +6,11 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations" />
-export { forwardRefResolver, NoopReferencesRegistry, ReferencesRegistry, ResourceLoader, ResourceLoaderContext } from './common';
-export { ComponentDecoratorHandler } from './component';
-export { DirectiveDecoratorHandler } from './directive';
-export { NgModuleDecoratorHandler } from './ng_module';
+export { ResourceLoader, ResourceLoaderContext } from './src/api';
+export { ComponentDecoratorHandler } from './src/component';
+export { DirectiveDecoratorHandler } from './src/directive';
 export { InjectableDecoratorHandler } from './src/injectable';
+export { NgModuleDecoratorHandler } from './src/ng_module';
 export { PipeDecoratorHandler } from './src/pipe';
+export { NoopReferencesRegistry, ReferencesRegistry } from './src/references_registry';
+export { forwardRefResolver } from './src/util';

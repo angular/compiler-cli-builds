@@ -129,9 +129,8 @@ export declare class Context {
     readonly boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
     private pipes;
     readonly schemas: SchemaMetadata[];
-    readonly hostIsStandalone: boolean;
     private nextId;
-    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: TemplateId, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[], hostIsStandalone: boolean);
+    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: TemplateId, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[]);
     /**
      * Allocate a new variable name for use within the `Context`.
      *

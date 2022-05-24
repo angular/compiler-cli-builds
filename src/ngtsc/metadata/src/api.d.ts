@@ -15,7 +15,6 @@ import { ClassPropertyMapping, ClassPropertyName } from './property_mapping';
  * Metadata collected for an `NgModule`.
  */
 export interface NgModuleMeta {
-    kind: MetaKind.NgModule;
     ref: Reference<ClassDeclaration>;
     declarations: Reference<ClassDeclaration>[];
     imports: Reference<ClassDeclaration>[];
@@ -28,20 +27,6 @@ export interface NgModuleMeta {
      * because the module came from a .d.ts file).
      */
     rawDeclarations: ts.Expression | null;
-    /**
-     * The raw `ts.Expression` which gave rise to `imports`, if one exists.
-     *
-     * If this is `null`, then either no imports exist, or no expression was available (likely
-     * because the module came from a .d.ts file).
-     */
-    rawImports: ts.Expression | null;
-    /**
-     * The raw `ts.Expression` which gave rise to `exports`, if one exists.
-     *
-     * If this is `null`, then either no exports exist, or no expression was available (likely
-     * because the module came from a .d.ts file).
-     */
-    rawExports: ts.Expression | null;
 }
 /**
  * Typing metadata collected for a directive within an NgModule's scope.
@@ -82,19 +67,15 @@ export interface DirectiveTypeCheckMeta {
      */
     isGeneric: boolean;
 }
-/**
- * Disambiguates different kinds of compiler metadata objects.
- */
-export declare enum MetaKind {
-    Directive = 0,
-    Pipe = 1,
-    NgModule = 2
+export declare enum MetaType {
+    Pipe = 0,
+    Directive = 1
 }
 /**
  * Metadata collected for a directive within an NgModule's scope.
  */
 export interface DirectiveMeta extends T2DirectiveMeta, DirectiveTypeCheckMeta {
-    kind: MetaKind.Directive;
+    type: MetaType.Directive;
     ref: Reference<ClassDeclaration>;
     /**
      * Unparsed selector of the directive, or null if the directive does not have a selector.
@@ -125,18 +106,6 @@ export interface DirectiveMeta extends T2DirectiveMeta, DirectiveTypeCheckMeta {
      * Whether the directive is likely a structural directive (injects `TemplateRef`).
      */
     isStructural: boolean;
-    /**
-     * Whether the directive is a standalone entity.
-     */
-    isStandalone: boolean;
-    /**
-     * For standalone components, the list of imported types.
-     */
-    imports: Reference<ClassDeclaration>[] | null;
-    /**
-     * For standalone components, the list of schemas declared.
-     */
-    schemas: SchemaMetadata[] | null;
 }
 /**
  * Metadata that describes a template guard for one of the directive's inputs.
@@ -159,11 +128,10 @@ export interface TemplateGuardMeta {
  * Metadata for a pipe within an NgModule's scope.
  */
 export interface PipeMeta {
-    kind: MetaKind.Pipe;
+    type: MetaType.Pipe;
     ref: Reference<ClassDeclaration>;
     name: string;
     nameExpr: ts.Expression | null;
-    isStandalone: boolean;
 }
 /**
  * Reads metadata for directives, pipes, and modules from a particular source, such as .d.ts files

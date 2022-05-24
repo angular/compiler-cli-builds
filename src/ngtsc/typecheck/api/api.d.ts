@@ -65,7 +65,6 @@ export interface TypeCheckBlockMetadata {
      * Schemas that apply to this template.
      */
     schemas: SchemaMetadata[];
-    isStandalone: boolean;
 }
 export interface TypeCtorMetadata {
     /**
