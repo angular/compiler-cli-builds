@@ -35,6 +35,7 @@ export interface NgModuleAnalysis {
     factorySymbolName: string;
     providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
     providers: ts.Expression | null;
+    remoteScopesMayRequireCycleProtection: boolean;
 }
 export interface NgModuleResolution {
     injectorImports: Expression[];
@@ -73,7 +74,7 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     symbol(node: ClassDeclaration): NgModuleSymbol;
     register(node: ClassDeclaration, analysis: NgModuleAnalysis): void;
     resolve(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>): ResolveResult<NgModuleResolution>;
-    compileFull(node: ClassDeclaration, { inj, mod, fac, classMetadata, declarations }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
+    compileFull(node: ClassDeclaration, { inj, mod, fac, classMetadata, declarations, remoteScopesMayRequireCycleProtection }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
     compilePartial(node: ClassDeclaration, { inj, fac, mod, classMetadata }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
     /**
      * Add class metadata statements, if provided, to the `ngModuleStatements`.
