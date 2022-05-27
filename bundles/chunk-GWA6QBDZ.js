@@ -4578,7 +4578,7 @@ var DirectiveDecoratorHandler = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.mjs
-import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, R3Identifiers, R3SelectorScopeMode, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget2, FunctionExpr as FunctionExpr2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, R3Identifiers, R3SelectorScopeMode, ReturnStatement as ReturnStatement2, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
 import ts22 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/module_with_providers.mjs
@@ -4870,6 +4870,7 @@ var NgModuleDecoratorHandler = class {
       deps: getValidConstructorDependencies(node, this.reflector, this.isCore),
       target: FactoryTarget2.NgModule
     };
+    const remoteScopesMayRequireCycleProtection = declarationRefs.some(isSyntheticReference) || importRefs.some(isSyntheticReference);
     return {
       diagnostics: diagnostics.length > 0 ? diagnostics : void 0,
       analysis: {
@@ -4888,7 +4889,8 @@ var NgModuleDecoratorHandler = class {
         providers: rawProviders,
         providersRequiringFactory: rawProviders ? resolveProvidersRequiringFactory(rawProviders, this.reflector, this.evaluator) : null,
         classMetadata: extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler),
-        factorySymbolName: node.name.text
+        factorySymbolName: node.name.text,
+        remoteScopesMayRequireCycleProtection
       }
     };
   }
@@ -4988,7 +4990,7 @@ var NgModuleDecoratorHandler = class {
       };
     }
   }
-  compileFull(node, { inj, mod, fac, classMetadata, declarations }, { injectorImports }) {
+  compileFull(node, { inj, mod, fac, classMetadata, declarations, remoteScopesMayRequireCycleProtection }, { injectorImports }) {
     const factoryFn = compileNgFactoryDefField(fac);
     const ngInjectorDef = compileInjector(__spreadProps(__spreadValues({}, inj), {
       imports: injectorImports
@@ -4997,7 +4999,7 @@ var NgModuleDecoratorHandler = class {
     const statements = ngModuleDef.statements;
     const metadata = classMetadata !== null ? compileClassMetadata2(classMetadata) : null;
     this.insertMetadataStatement(statements, metadata);
-    this.appendRemoteScopingStatements(statements, node, declarations);
+    this.appendRemoteScopingStatements(statements, node, declarations, remoteScopesMayRequireCycleProtection);
     return this.compileNgModule(factoryFn, ngInjectorDef, ngModuleDef);
   }
   compilePartial(node, { inj, fac, mod, classMetadata }, { injectorImports }) {
@@ -5015,7 +5017,7 @@ var NgModuleDecoratorHandler = class {
       ngModuleStatements.unshift(metadata.toStmt());
     }
   }
-  appendRemoteScopingStatements(ngModuleStatements, node, declarations) {
+  appendRemoteScopingStatements(ngModuleStatements, node, declarations, remoteScopesMayRequireCycleProtection) {
     const context = getSourceFile(node);
     for (const decl of declarations) {
       const remoteScope = this.scopeRegistry.getRemoteScope(decl.node);
@@ -5032,11 +5034,13 @@ var NgModuleDecoratorHandler = class {
         });
         const directiveArray = new LiteralArrayExpr2(directives);
         const pipesArray = new LiteralArrayExpr2(pipes);
+        const directiveExpr = remoteScopesMayRequireCycleProtection && directives.length > 0 ? new FunctionExpr2([], [new ReturnStatement2(directiveArray)]) : directiveArray;
+        const pipesExpr = remoteScopesMayRequireCycleProtection && pipes.length > 0 ? new FunctionExpr2([], [new ReturnStatement2(pipesArray)]) : pipesArray;
         const componentType = this.refEmitter.emit(decl, context);
         assertSuccessfulReferenceEmit(componentType, node, "component");
         const declExpr = componentType.expression;
         const setComponentScope = new ExternalExpr5(R3Identifiers.setComponentScope);
-        const callExpr = new InvokeFunctionExpr(setComponentScope, [declExpr, directiveArray, pipesArray]);
+        const callExpr = new InvokeFunctionExpr(setComponentScope, [declExpr, directiveExpr, pipesExpr]);
         ngModuleStatements.push(callExpr.toStmt());
       }
     }
@@ -5121,6 +5125,9 @@ function makeStandaloneBootstrapDiagnostic(ngModuleClass, bootstrappedClassRef, 
   const message = `The \`${componentClassName}\` class is a standalone component, which can not be used in the \`@NgModule.bootstrap\` array. Use the \`bootstrapApplication\` function for bootstrap instead.`;
   const relatedInformation = [makeRelatedInformation(ngModuleClass, `The 'bootstrap' array is present on this NgModule.`)];
   return makeDiagnostic(ErrorCode.NGMODULE_BOOTSTRAP_IS_STANDALONE, getDiagnosticNode(bootstrappedClassRef, rawBootstrapExpr), message, relatedInformation);
+}
+function isSyntheticReference(ref) {
+  return ref.synthetic;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/diagnostics.mjs
@@ -6037,12 +6044,14 @@ var ComponentDecoratorHandler = class {
           }
         }
       }
+      const standaloneImportMayBeForwardDeclared = analysis.resolvedImports !== null && analysis.resolvedImports.some((ref) => ref.synthetic);
       const cycleDetected = cyclesFromDirectives.size !== 0 || cyclesFromPipes.size !== 0;
       if (!cycleDetected) {
         for (const { type, importedFile } of declarations) {
           this.maybeRecordSyntheticImport(importedFile, type, context);
         }
-        const wrapDirectivesAndPipesInClosure = declarations.some((decl) => isExpressionForwardReference(decl.type, node.name, context));
+        const declarationIsForwardDeclared = declarations.some((decl) => isExpressionForwardReference(decl.type, node.name, context));
+        const wrapDirectivesAndPipesInClosure = declarationIsForwardDeclared || standaloneImportMayBeForwardDeclared;
         data.declarations = declarations;
         data.declarationListEmitMode = wrapDirectivesAndPipesInClosure ? 1 : 0;
       } else {
@@ -6569,4 +6578,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-SYSV56XP.js.map
+//# sourceMappingURL=chunk-GWA6QBDZ.js.map
