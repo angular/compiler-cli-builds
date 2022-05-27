@@ -46,7 +46,7 @@ export interface DomSchemaChecker {
      * @param schemas any active schemas for the template, which might affect the validity of the
      * property.
      */
-    checkProperty(id: string, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[]): void;
+    checkProperty(id: string, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
 }
 /**
  * Checks non-Angular elements and properties against the `DomElementSchemaRegistry`, a schema
@@ -58,5 +58,5 @@ export declare class RegistryDomSchemaChecker implements DomSchemaChecker {
     get diagnostics(): ReadonlyArray<TemplateDiagnostic>;
     constructor(resolver: TemplateSourceResolver);
     checkElement(id: TemplateId, element: TmplAstElement, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
-    checkProperty(id: TemplateId, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[]): void;
+    checkProperty(id: TemplateId, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
 }
