@@ -2367,19 +2367,21 @@ var RegistryDomSchemaChecker = class {
       this._diagnostics.push(diag);
     }
   }
-  checkProperty(id, element, name, span, schemas) {
+  checkProperty(id, element, name, span, schemas, hostIsStandalone) {
     if (!REGISTRY.hasProperty(element.name, name, schemas)) {
       const mapping = this.resolver.getSourceMapping(id);
+      const decorator = hostIsStandalone ? "@Component" : "@NgModule";
+      const schemas2 = `'${decorator}.schemas'`;
       let errorMsg = `Can't bind to '${name}' since it isn't a known property of '${element.name}'.`;
       if (element.name.startsWith("ng-")) {
         errorMsg += `
-1. If '${name}' is an Angular directive, then add 'CommonModule' to the '@NgModule.imports' of this component.
-2. To allow any property add 'NO_ERRORS_SCHEMA' to the '@NgModule.schemas' of this component.`;
+1. If '${name}' is an Angular directive, then add 'CommonModule' to the '${decorator}.imports' of this component.
+2. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
       } else if (element.name.indexOf("-") > -1) {
         errorMsg += `
-1. If '${element.name}' is an Angular component and it has '${name}' input, then verify that it is part of this module.
-2. If '${element.name}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message.
-3. To allow any property add 'NO_ERRORS_SCHEMA' to the '@NgModule.schemas' of this component.`;
+1. If '${element.name}' is an Angular component and it has '${name}' input, then verify that it is ${hostIsStandalone ? "included in the '@Component.imports' of this component" : "part of this module"}.
+2. If '${element.name}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
       }
       const diag = makeTemplateDiagnostic(id, mapping, span, ts14.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
       this._diagnostics.push(diag);
@@ -3838,7 +3840,7 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
       if (binding.type === 0) {
         if (binding.name !== "style" && binding.name !== "class") {
           const propertyName = ATTR_TO_PROP[binding.name] || binding.name;
-          this.tcb.domSchemaChecker.checkProperty(this.tcb.id, this.element, propertyName, binding.sourceSpan, this.tcb.schemas);
+          this.tcb.domSchemaChecker.checkProperty(this.tcb.id, this.element, propertyName, binding.sourceSpan, this.tcb.schemas, this.tcb.hostIsStandalone);
         }
       }
     }
@@ -7300,4 +7302,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-5XYXKEHT.js.map
+//# sourceMappingURL=chunk-AWUSLKAS.js.map
