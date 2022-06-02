@@ -64,9 +64,10 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     private refEmitter;
     private factoryTracker;
     private annotateForClosureCompiler;
+    private onlyPublishPublicTypings;
     private injectableRegistry;
     private perf;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, annotateForClosureCompiler: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, refEmitter: ReferenceEmitter, factoryTracker: FactoryTracker | null, annotateForClosureCompiler: boolean, onlyPublishPublicTypings: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;

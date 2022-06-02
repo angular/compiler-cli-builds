@@ -4694,7 +4694,7 @@ var NgModuleSymbol = class extends SemanticSymbol {
   }
 };
 var NgModuleDecoratorHandler = class {
-  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, isCore, refEmitter, factoryTracker, annotateForClosureCompiler, injectableRegistry, perf) {
+  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, isCore, refEmitter, factoryTracker, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaReader = metaReader;
@@ -4705,6 +4705,7 @@ var NgModuleDecoratorHandler = class {
     this.refEmitter = refEmitter;
     this.factoryTracker = factoryTracker;
     this.annotateForClosureCompiler = annotateForClosureCompiler;
+    this.onlyPublishPublicTypings = onlyPublishPublicTypings;
     this.injectableRegistry = injectableRegistry;
     this.perf = perf;
     this.precedence = HandlerPrecedence.PRIMARY;
@@ -4805,8 +4806,17 @@ var NgModuleDecoratorHandler = class {
     if (typeNode !== null) {
       typeContext = typeNode.getSourceFile();
     }
+    const exportedNodes = new Set(exportRefs.map((ref) => ref.node));
+    const declarations = [];
+    const exportedDeclarations = [];
     const bootstrap = bootstrapRefs.map((bootstrap2) => this._toR3Reference(bootstrap2.getOriginForDiagnostics(meta, node.name), bootstrap2, valueContext, typeContext));
-    const declarations = declarationRefs.map((decl) => this._toR3Reference(decl.getOriginForDiagnostics(meta, node.name), decl, valueContext, typeContext));
+    for (const ref of declarationRefs) {
+      const decl = this._toR3Reference(ref.getOriginForDiagnostics(meta, node.name), ref, valueContext, typeContext);
+      declarations.push(decl);
+      if (exportedNodes.has(ref.node)) {
+        exportedDeclarations.push(decl.type);
+      }
+    }
     const imports = importRefs.map((imp) => this._toR3Reference(imp.getOriginForDiagnostics(meta, node.name), imp, valueContext, typeContext));
     const exports = exportRefs.map((exp) => this._toR3Reference(exp.getOriginForDiagnostics(meta, node.name), exp, valueContext, typeContext));
     const isForwardReference = (ref) => isExpressionForwardReference(ref.value, node.name, valueContext);
@@ -4820,8 +4830,10 @@ var NgModuleDecoratorHandler = class {
       adjacentType,
       bootstrap,
       declarations,
+      publicDeclarationTypes: this.onlyPublishPublicTypings ? exportedDeclarations : null,
       exports,
       imports,
+      includeImportTypes: !this.onlyPublishPublicTypings,
       containsForwardDecls,
       id,
       selectorScopeMode: R3SelectorScopeMode.SideEffect,
@@ -6578,4 +6590,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GWA6QBDZ.js.map
+//# sourceMappingURL=chunk-JA6BOULY.js.map

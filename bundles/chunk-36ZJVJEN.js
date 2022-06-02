@@ -8,7 +8,7 @@ import {
   ImportGraph,
   isShim,
   readConfiguration
-} from "./chunk-AWUSLKAS.js";
+} from "./chunk-K266VDM3.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -32,7 +32,7 @@ import {
   TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-GWA6QBDZ.js";
+} from "./chunk-JA6BOULY.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -3352,7 +3352,7 @@ var DecorationAnalyzer = class {
       new DirectiveDecoratorHandler(this.reflectionHost, this.evaluator, this.fullRegistry, this.scopeRegistry, this.fullMetaReader, this.injectableRegistry, this.isCore, null, !!this.compilerOptions.annotateForClosureCompiler, true, NOOP_PERF_RECORDER),
       new PipeDecoratorHandler(this.reflectionHost, this.evaluator, this.metaRegistry, this.scopeRegistry, this.injectableRegistry, this.isCore, NOOP_PERF_RECORDER),
       new InjectableDecoratorHandler(this.reflectionHost, this.isCore, false, this.injectableRegistry, NOOP_PERF_RECORDER, false),
-      new NgModuleDecoratorHandler(this.reflectionHost, this.evaluator, this.fullMetaReader, this.fullRegistry, this.scopeRegistry, this.referencesRegistry, this.isCore, this.refEmitter, null, !!this.compilerOptions.annotateForClosureCompiler, this.injectableRegistry, NOOP_PERF_RECORDER)
+      new NgModuleDecoratorHandler(this.reflectionHost, this.evaluator, this.fullMetaReader, this.fullRegistry, this.scopeRegistry, this.referencesRegistry, this.isCore, this.refEmitter, null, !!this.compilerOptions.annotateForClosureCompiler, false, this.injectableRegistry, NOOP_PERF_RECORDER)
     ];
     this.compiler = new NgccTraitCompiler(this.handlers, this.reflectionHost);
     this.migrations = [
@@ -5186,4 +5186,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KAZROYQX.js.map
+//# sourceMappingURL=chunk-36ZJVJEN.js.map

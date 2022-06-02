@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-GWA6QBDZ.js";
+} from "./chunk-JA6BOULY.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -6471,6 +6471,7 @@ var NgCompiler = class {
     return diagnostics;
   }
   makeCompilation() {
+    var _a;
     const checker = this.inputProgram.getTypeChecker();
     const reflector = new TypeScriptReflectionHost(checker);
     let refEmitter;
@@ -6529,7 +6530,7 @@ var NgCompiler = class {
       new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, isCore, semanticDepGraphUpdater, this.closureCompilerEnabled, false, this.delegatingPerfRecorder),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder),
       new InjectableDecoratorHandler(reflector, isCore, this.options.strictInjectionParameters || false, injectableRegistry, this.delegatingPerfRecorder),
-      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, isCore, refEmitter, this.adapter.factoryTracker, this.closureCompilerEnabled, injectableRegistry, this.delegatingPerfRecorder)
+      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, isCore, refEmitter, this.adapter.factoryTracker, this.closureCompilerEnabled, (_a = this.options.onlyPublishPublicTypingsForNgModules) != null ? _a : false, injectableRegistry, this.delegatingPerfRecorder)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
@@ -7302,4 +7303,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-AWUSLKAS.js.map
+//# sourceMappingURL=chunk-K266VDM3.js.map
