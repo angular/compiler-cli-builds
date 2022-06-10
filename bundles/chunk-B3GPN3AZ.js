@@ -2440,28 +2440,6 @@ function tsCallMethod(receiver, methodName, args = []) {
 function tsUpdateTypeParameterDeclaration(node, name, constraint, defaultType) {
   return PARSED_TS_VERSION < 4.7 ? ts15.factory.updateTypeParameterDeclaration(node, name, constraint, defaultType) : ts15.factory.updateTypeParameterDeclaration(node, [], name, constraint, defaultType);
 }
-function checkIfClassIsExported(node) {
-  if (node.modifiers !== void 0 && node.modifiers.some((mod) => mod.kind === ts15.SyntaxKind.ExportKeyword)) {
-    return true;
-  } else if (node.parent !== void 0 && ts15.isSourceFile(node.parent) && checkIfFileHasExport(node.parent, node.name.text)) {
-    return true;
-  }
-  return false;
-}
-function checkIfFileHasExport(sf, name) {
-  for (const stmt of sf.statements) {
-    if (ts15.isExportDeclaration(stmt) && stmt.exportClause !== void 0 && ts15.isNamedExports(stmt.exportClause)) {
-      for (const element of stmt.exportClause.elements) {
-        if (element.propertyName === void 0 && element.name.text === name) {
-          return true;
-        } else if (element.propertyName !== void 0 && element.propertyName.text == name) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
-}
 function isAccessExpression(node) {
   return ts15.isPropertyAccessExpression(node) || ts15.isElementAccessExpression(node);
 }
@@ -2621,12 +2599,12 @@ var TcbInliningRequirement;
   TcbInliningRequirement2[TcbInliningRequirement2["ShouldInlineForGenericBounds"] = 1] = "ShouldInlineForGenericBounds";
   TcbInliningRequirement2[TcbInliningRequirement2["None"] = 2] = "None";
 })(TcbInliningRequirement || (TcbInliningRequirement = {}));
-function requiresInlineTypeCheckBlock(node, env, usedPipes, reflector) {
-  if (!checkIfClassIsExported(node)) {
+function requiresInlineTypeCheckBlock(ref, env, usedPipes, reflector) {
+  if (!env.canReferenceType(ref)) {
     return TcbInliningRequirement.MustInline;
-  } else if (!checkIfGenericTypeBoundsCanBeEmitted(node, reflector, env)) {
+  } else if (!checkIfGenericTypeBoundsCanBeEmitted(ref.node, reflector, env)) {
     return TcbInliningRequirement.ShouldInlineForGenericBounds;
-  } else if (Array.from(usedPipes.values()).some((pipeRef) => !checkIfClassIsExported(pipeRef.node))) {
+  } else if (Array.from(usedPipes.values()).some((pipeRef) => !env.canReferenceType(pipeRef))) {
     return TcbInliningRequirement.MustInline;
   } else {
     return TcbInliningRequirement.None;
@@ -4556,7 +4534,7 @@ var TypeCheckContextImpl = class {
       boundTarget,
       templateDiagnostics
     });
-    const inliningRequirement = requiresInlineTypeCheckBlock(ref.node, shimData.file, pipes, this.reflector);
+    const inliningRequirement = requiresInlineTypeCheckBlock(ref, shimData.file, pipes, this.reflector);
     if (this.inlining === InliningMode.Error && inliningRequirement === TcbInliningRequirement.MustInline) {
       shimData.oobRecorder.requiresInlineTcb(templateId, ref.node);
       this.perf.eventCount(PerfEvent.SkipGenerateTcbNoInline);
@@ -7302,4 +7280,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-E3TZESX5.js.map
+//# sourceMappingURL=chunk-B3GPN3AZ.js.map
