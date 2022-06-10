@@ -4828,7 +4828,10 @@ var NgModuleDecoratorHandler = class {
       schemas: []
     };
     const rawProviders = ngModule.has("providers") ? ngModule.get("providers") : null;
-    const wrapperProviders = rawProviders !== null ? new WrappedNodeExpr6(this.annotateForClosureCompiler ? wrapFunctionExpressionsInParens(rawProviders) : rawProviders) : null;
+    let wrappedProviders = null;
+    if (rawProviders !== null && (!ts22.isArrayLiteralExpression(rawProviders) || rawProviders.elements.length > 0)) {
+      wrappedProviders = new WrappedNodeExpr6(this.annotateForClosureCompiler ? wrapFunctionExpressionsInParens(rawProviders) : rawProviders);
+    }
     const topLevelImports = [];
     if (ngModule.has("imports")) {
       const rawImports2 = unwrapExpression(ngModule.get("imports"));
@@ -4860,7 +4863,7 @@ var NgModuleDecoratorHandler = class {
       name,
       type,
       internalType,
-      providers: wrapperProviders
+      providers: wrappedProviders
     };
     const factoryMetadata = {
       name,
@@ -6578,4 +6581,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GWA6QBDZ.js.map
+//# sourceMappingURL=chunk-N5CM3LUE.js.map
