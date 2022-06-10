@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-OOGERXG2.js";
+} from "./chunk-32MQTE7C.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -73,7 +73,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-JDKMNZ6O.js";
+} from "./chunk-KGCKQ2PH.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -5883,6 +5883,45 @@ var factory = {
   create: () => new InvalidBananaInBoxCheck()
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_control_flow_directive/index.mjs
+import { TmplAstTemplate as TmplAstTemplate4 } from "@angular/compiler";
+var KNOWN_CONTROL_FLOW_DIRECTIVES = /* @__PURE__ */ new Set(["ngIf", "ngFor", "ngSwitchCase", "ngSwitchDefault"]);
+var MissingControlFlowDirectiveCheck = class extends TemplateCheckWithVisitor {
+  constructor() {
+    super(...arguments);
+    this.code = ErrorCode.MISSING_CONTROL_FLOW_DIRECTIVE;
+  }
+  run(ctx, component, template) {
+    const componentMetadata = ctx.templateTypeChecker.getDirectiveMetadata(component);
+    if (!componentMetadata || !componentMetadata.isStandalone) {
+      return [];
+    }
+    return super.run(ctx, component, template);
+  }
+  visitNode(ctx, component, node) {
+    if (!(node instanceof TmplAstTemplate4))
+      return [];
+    const controlFlowAttr = node.templateAttrs.find((attr) => KNOWN_CONTROL_FLOW_DIRECTIVES.has(attr.name));
+    if (!controlFlowAttr)
+      return [];
+    const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
+    if (symbol === null || symbol.directives.length > 0) {
+      return [];
+    }
+    const sourceSpan = controlFlowAttr.keySpan || controlFlowAttr.sourceSpan;
+    const errorMessage = `The \`*${controlFlowAttr.name}\` directive was used in the template, but the \`CommonModule\` was not imported. Please make sure that the \`CommonModule\` is included into the \`@Component.imports\` array of this component.`;
+    const diagnostic = ctx.makeTemplateDiagnostic(sourceSpan, errorMessage);
+    return [diagnostic];
+  }
+};
+var factory2 = {
+  code: ErrorCode.MISSING_CONTROL_FLOW_DIRECTIVE,
+  name: ExtendedTemplateDiagnosticName.MISSING_CONTROL_FLOW_DIRECTIVE,
+  create: (options) => {
+    return new MissingControlFlowDirectiveCheck();
+  }
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/nullish_coalescing_not_nullable/index.mjs
 import { Binary } from "@angular/compiler";
 import ts29 from "typescript";
@@ -5916,7 +5955,7 @@ var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory2 = {
+var factory3 = {
   code: ErrorCode.NULLISH_COALESCING_NOT_NULLABLE,
   name: ExtendedTemplateDiagnosticName.NULLISH_COALESCING_NOT_NULLABLE,
   create: (options) => {
@@ -5945,12 +5984,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory3 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory3.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory4 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory4.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory3.create(options);
+      const check = factory4.create(options);
       if (check === null) {
         continue;
       }
@@ -5994,6 +6033,7 @@ ${value}`);
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/index.mjs
 var ALL_DIAGNOSTIC_FACTORIES = [
   factory,
+  factory3,
   factory2
 ];
 
@@ -6610,7 +6650,7 @@ ${allowedCategoryLabels.join("\n")}
       `.trim()
     });
   }
-  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory3) => factory3.name);
+  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory4) => factory4.name);
   for (const [checkName, category] of Object.entries((_c = (_b = options.extendedDiagnostics) == null ? void 0 : _b.checks) != null ? _c : {})) {
     if (!allExtendedDiagnosticNames.includes(checkName)) {
       yield makeConfigDiagnostic({
@@ -7281,4 +7321,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-AAO5RM3N.js.map
+//# sourceMappingURL=chunk-6ZMA2L3P.js.map
