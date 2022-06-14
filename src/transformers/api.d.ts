@@ -179,9 +179,8 @@ export interface Program {
      *
      * Angular structural information is required to emit files.
      */
-    emit({ emitFlags, forceEmit, cancellationToken, customTransformers, emitCallback, mergeEmitResultsCallback, }?: {
+    emit({ emitFlags, cancellationToken, customTransformers, emitCallback, mergeEmitResultsCallback }?: {
         emitFlags?: EmitFlags;
-        forceEmit?: boolean;
         cancellationToken?: ts.CancellationToken;
         customTransformers?: CustomTransformers;
         emitCallback?: TsEmitCallback;
