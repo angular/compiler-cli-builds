@@ -6959,6 +6959,7 @@ var NgtscProgram = class {
     i18nExtract((_b = this.options.i18nOutFormat) != null ? _b : null, (_c = this.options.i18nOutFile) != null ? _c : null, this.host, this.options, ctx, resolve);
   }
   emit(opts) {
+    var _a;
     if (opts !== void 0 && opts.emitFlags !== void 0 && opts.emitFlags & EmitFlags.I18nBundle) {
       this.emitXi18n();
       if (!(opts.emitFlags & EmitFlags.JS)) {
@@ -6969,6 +6970,7 @@ var NgtscProgram = class {
         };
       }
     }
+    const forceEmit = (_a = opts == null ? void 0 : opts.forceEmit) != null ? _a : false;
     this.compiler.perfRecorder.memory(PerfCheckpoint.PreEmit);
     const res = this.compiler.perfRecorder.inPhase(PerfPhase.TypeScriptEmit, () => {
       const { transformers } = this.compiler.prepareEmit();
@@ -6996,7 +6998,7 @@ var NgtscProgram = class {
         if (targetSourceFile.isDeclarationFile || ignoreFiles.has(targetSourceFile)) {
           continue;
         }
-        if (this.compiler.incrementalCompilation.safeToSkipEmit(targetSourceFile)) {
+        if (!forceEmit && this.compiler.incrementalCompilation.safeToSkipEmit(targetSourceFile)) {
           this.compiler.perfRecorder.eventCount(PerfEvent.EmitSkipSourceFile);
           continue;
         }
@@ -7185,7 +7187,7 @@ function exitCodeFromResult(diags) {
   }
   return diags.some((d) => d.source === "angular" && d.code === UNKNOWN_ERROR_CODE) ? 2 : 1;
 }
-function performCompilation({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics = defaultGatherDiagnostics, customTransformers, emitFlags = EmitFlags.Default, modifiedResourceFiles = null }) {
+function performCompilation({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics = defaultGatherDiagnostics, customTransformers, emitFlags = EmitFlags.Default, forceEmit = false, modifiedResourceFiles = null }) {
   var _a;
   let program;
   let emitResult;
@@ -7205,7 +7207,7 @@ function performCompilation({ rootNames, options, host, oldProgram, emitCallback
       allDiagnostics.push(createMessageDiagnostic(`Time for diagnostics: ${afterDiags - beforeDiags}ms.`));
     }
     if (!hasErrors(allDiagnostics)) {
-      emitResult = program.emit({ emitCallback, mergeEmitResultsCallback, customTransformers, emitFlags });
+      emitResult = program.emit({ emitCallback, mergeEmitResultsCallback, customTransformers, emitFlags, forceEmit });
       allDiagnostics.push(...emitResult.diagnostics);
       return { diagnostics: allDiagnostics, program, emitResult };
     }
@@ -7280,4 +7282,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-B3GPN3AZ.js.map
+//# sourceMappingURL=chunk-XDCGNQL5.js.map

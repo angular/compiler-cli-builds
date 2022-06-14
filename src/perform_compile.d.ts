@@ -31,7 +31,7 @@ export interface PerformCompilationResult {
     emitResult?: ts.EmitResult;
 }
 export declare function exitCodeFromResult(diags: ReadonlyArray<ts.Diagnostic> | undefined): number;
-export declare function performCompilation({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags, modifiedResourceFiles }: {
+export declare function performCompilation({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags, forceEmit, modifiedResourceFiles }: {
     rootNames: string[];
     options: api.CompilerOptions;
     host?: api.CompilerHost;
@@ -41,6 +41,7 @@ export declare function performCompilation({ rootNames, options, host, oldProgra
     gatherDiagnostics?: (program: api.Program) => ReadonlyArray<ts.Diagnostic>;
     customTransformers?: api.CustomTransformers;
     emitFlags?: api.EmitFlags;
+    forceEmit?: boolean;
     modifiedResourceFiles?: Set<string> | null;
 }): PerformCompilationResult;
 export declare function defaultGatherDiagnostics(program: api.Program): ReadonlyArray<ts.Diagnostic>;

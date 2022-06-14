@@ -47,6 +47,7 @@ export declare class NgtscProgram implements api.Program {
     private emitXi18n;
     emit(opts?: {
         emitFlags?: api.EmitFlags | undefined;
+        forceEmit?: boolean;
         cancellationToken?: ts.CancellationToken | undefined;
         customTransformers?: api.CustomTransformers | undefined;
         emitCallback?: api.TsEmitCallback | undefined;
