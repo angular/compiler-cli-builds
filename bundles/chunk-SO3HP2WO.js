@@ -830,7 +830,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "14.1.0-next.2+sha-66baa8c");
+  const LATEST_VERSION_RANGE = getRange("<=", "14.1.0-next.3+sha-9711067");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -877,7 +877,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "14.1.0-next.2+sha-66baa8c") {
+    if (version === "14.1.0-next.3+sha-9711067") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
