@@ -31,14 +31,14 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-DSIJ6FBS.js";
-import "./chunk-32MQTE7C.js";
+} from "./chunk-K4XEMWX4.js";
+import "./chunk-RUNC33XY.js";
 import "./chunk-2IMT6JFI.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "./chunk-LX5Q27EF.js";
-import "./chunk-KGCKQ2PH.js";
+import "./chunk-JRBVL2HZ.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -70,7 +70,7 @@ import {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("14.1.0-next.3+sha-5dd9d4a");
+var VERSION = new Version("14.1.0-next.3+sha-6f11a58");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {

@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-32MQTE7C.js";
+} from "./chunk-RUNC33XY.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -73,7 +73,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-KGCKQ2PH.js";
+} from "./chunk-JRBVL2HZ.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -5967,6 +5967,45 @@ var factory3 = {
   }
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/text_attribute_not_binding/index.mjs
+import { TmplAstTextAttribute as TmplAstTextAttribute4 } from "@angular/compiler";
+var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
+  constructor() {
+    super(...arguments);
+    this.code = ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING;
+  }
+  visitNode(ctx, component, node) {
+    if (!(node instanceof TmplAstTextAttribute4))
+      return [];
+    const name = node.name;
+    if (!name.startsWith("attr.") && !name.startsWith("style.") && !name.startsWith("class.")) {
+      return [];
+    }
+    let errorString;
+    if (name.startsWith("attr.")) {
+      const staticAttr = name.replace("attr.", "");
+      errorString = `Static attributes should be written without the 'attr.' prefix.`;
+      if (node.value) {
+        errorString += ` For example, ${staticAttr}="${node.value}".`;
+      }
+    } else {
+      const expectedKey = `[${name}]`;
+      const expectedValue = node.value === "true" || node.value === "false" ? node.value : `'${node.value}'`;
+      errorString = "Attribute, style, and class bindings should be enclosed with square braces.";
+      if (node.value) {
+        errorString += ` For example, '${expectedKey}="${expectedValue}"'.`;
+      }
+    }
+    const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
+    return [diagnostic];
+  }
+};
+var factory4 = {
+  code: ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING,
+  name: ExtendedTemplateDiagnosticName.TEXT_ATTRIBUTE_NOT_BINDING,
+  create: () => new TextAttributeNotBindingSpec()
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.mjs
 import ts30 from "typescript";
 
@@ -5984,12 +6023,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory4 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory4.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory5 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory5.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory4.create(options);
+      const check = factory5.create(options);
       if (check === null) {
         continue;
       }
@@ -6034,7 +6073,8 @@ ${value}`);
 var ALL_DIAGNOSTIC_FACTORIES = [
   factory,
   factory3,
-  factory2
+  factory2,
+  factory4
 ];
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
@@ -6650,7 +6690,7 @@ ${allowedCategoryLabels.join("\n")}
       `.trim()
     });
   }
-  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory4) => factory4.name);
+  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory5) => factory5.name);
   for (const [checkName, category] of Object.entries((_c = (_b = options.extendedDiagnostics) == null ? void 0 : _b.checks) != null ? _c : {})) {
     if (!allExtendedDiagnosticNames.includes(checkName)) {
       yield makeConfigDiagnostic({
@@ -7323,4 +7363,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-DSIJ6FBS.js.map
+//# sourceMappingURL=chunk-K4XEMWX4.js.map
