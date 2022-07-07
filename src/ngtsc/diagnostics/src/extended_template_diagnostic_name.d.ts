@@ -19,5 +19,6 @@ export declare enum ExtendedTemplateDiagnosticName {
     INVALID_BANANA_IN_BOX = "invalidBananaInBox",
     NULLISH_COALESCING_NOT_NULLABLE = "nullishCoalescingNotNullable",
     MISSING_CONTROL_FLOW_DIRECTIVE = "missingControlFlowDirective",
-    TEXT_ATTRIBUTE_NOT_BINDING = "textAttributeNotBinding"
+    TEXT_ATTRIBUTE_NOT_BINDING = "textAttributeNotBinding",
+    MISSING_NGFOROF_LET = "missingNgForOfLet"
 }

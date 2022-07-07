@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-RUNC33XY.js";
+} from "./chunk-UXX3TA52.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -73,7 +73,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-JRBVL2HZ.js";
+} from "./chunk-GMOTLNRJ.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -5922,6 +5922,39 @@ var factory2 = {
   }
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_ngforof_let/index.mjs
+import { TmplAstTemplate as TmplAstTemplate5 } from "@angular/compiler";
+var MissingNgForOfLetCheck = class extends TemplateCheckWithVisitor {
+  constructor() {
+    super(...arguments);
+    this.code = ErrorCode.MISSING_NGFOROF_LET;
+  }
+  visitNode(ctx, component, node) {
+    const isTemplate = node instanceof TmplAstTemplate5;
+    if (!(node instanceof TmplAstTemplate5)) {
+      return [];
+    }
+    if (node.templateAttrs.length === 0) {
+      return [];
+    }
+    const attr = node.templateAttrs.find((x) => x.name === "ngFor");
+    if (attr === void 0) {
+      return [];
+    }
+    if (node.variables.length > 0) {
+      return [];
+    }
+    const errorString = "Your ngFor is missing a value. Did you forget to add the `let` keyword?";
+    const diagnostic = ctx.makeTemplateDiagnostic(attr.sourceSpan, errorString);
+    return [diagnostic];
+  }
+};
+var factory3 = {
+  code: ErrorCode.MISSING_NGFOROF_LET,
+  name: ExtendedTemplateDiagnosticName.MISSING_NGFOROF_LET,
+  create: () => new MissingNgForOfLetCheck()
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/nullish_coalescing_not_nullable/index.mjs
 import { Binary } from "@angular/compiler";
 import ts29 from "typescript";
@@ -5955,7 +5988,7 @@ var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory3 = {
+var factory4 = {
   code: ErrorCode.NULLISH_COALESCING_NOT_NULLABLE,
   name: ExtendedTemplateDiagnosticName.NULLISH_COALESCING_NOT_NULLABLE,
   create: (options) => {
@@ -6000,7 +6033,7 @@ var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory4 = {
+var factory5 = {
   code: ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING,
   name: ExtendedTemplateDiagnosticName.TEXT_ATTRIBUTE_NOT_BINDING,
   create: () => new TextAttributeNotBindingSpec()
@@ -6023,12 +6056,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory5 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory5.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory6 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory6.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory5.create(options);
+      const check = factory6.create(options);
       if (check === null) {
         continue;
       }
@@ -6072,9 +6105,10 @@ ${value}`);
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/index.mjs
 var ALL_DIAGNOSTIC_FACTORIES = [
   factory,
-  factory3,
+  factory4,
   factory2,
-  factory4
+  factory5,
+  factory3
 ];
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
@@ -6690,7 +6724,7 @@ ${allowedCategoryLabels.join("\n")}
       `.trim()
     });
   }
-  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory5) => factory5.name);
+  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory6) => factory6.name);
   for (const [checkName, category] of Object.entries((_c = (_b = options.extendedDiagnostics) == null ? void 0 : _b.checks) != null ? _c : {})) {
     if (!allExtendedDiagnosticNames.includes(checkName)) {
       yield makeConfigDiagnostic({
@@ -7363,4 +7397,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-K4XEMWX4.js.map
+//# sourceMappingURL=chunk-ACOKJWV5.js.map
