@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-UXX3TA52.js";
+} from "./chunk-KHP4GA2G.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -73,7 +73,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-GMOTLNRJ.js";
+} from "./chunk-IBCFCGG5.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -6000,6 +6000,30 @@ var factory4 = {
   }
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/suffix_not_supported/index.mjs
+import { TmplAstBoundAttribute as TmplAstBoundAttribute3 } from "@angular/compiler";
+var STYLE_SUFFIXES = ["px", "%", "em"];
+var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
+  constructor() {
+    super(...arguments);
+    this.code = ErrorCode.SUFFIX_NOT_SUPPORTED;
+  }
+  visitNode(ctx, component, node) {
+    if (!(node instanceof TmplAstBoundAttribute3))
+      return [];
+    if (!node.keySpan.toString().startsWith("attr.") || !STYLE_SUFFIXES.some((suffix) => node.name.endsWith(`.${suffix}`))) {
+      return [];
+    }
+    const diagnostic = ctx.makeTemplateDiagnostic(node.keySpan, `The ${STYLE_SUFFIXES.map((suffix) => `'.${suffix}'`).join(", ")} suffixes are only supported on style bindings.`);
+    return [diagnostic];
+  }
+};
+var factory5 = {
+  code: ErrorCode.SUFFIX_NOT_SUPPORTED,
+  name: ExtendedTemplateDiagnosticName.SUFFIX_NOT_SUPPORTED,
+  create: () => new SuffixNotSupportedCheck()
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/text_attribute_not_binding/index.mjs
 import { TmplAstTextAttribute as TmplAstTextAttribute4 } from "@angular/compiler";
 var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
@@ -6033,7 +6057,7 @@ var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory5 = {
+var factory6 = {
   code: ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING,
   name: ExtendedTemplateDiagnosticName.TEXT_ATTRIBUTE_NOT_BINDING,
   create: () => new TextAttributeNotBindingSpec()
@@ -6056,12 +6080,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory6 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory6.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory7 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory7.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory6.create(options);
+      const check = factory7.create(options);
       if (check === null) {
         continue;
       }
@@ -6107,8 +6131,9 @@ var ALL_DIAGNOSTIC_FACTORIES = [
   factory,
   factory4,
   factory2,
-  factory5,
-  factory3
+  factory6,
+  factory3,
+  factory5
 ];
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
@@ -6724,7 +6749,7 @@ ${allowedCategoryLabels.join("\n")}
       `.trim()
     });
   }
-  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory6) => factory6.name);
+  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory7) => factory7.name);
   for (const [checkName, category] of Object.entries((_c = (_b = options.extendedDiagnostics) == null ? void 0 : _b.checks) != null ? _c : {})) {
     if (!allExtendedDiagnosticNames.includes(checkName)) {
       yield makeConfigDiagnostic({
@@ -7397,4 +7422,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-ACOKJWV5.js.map
+//# sourceMappingURL=chunk-FTTMFASI.js.map
