@@ -26,7 +26,7 @@ export declare class ActivePerfRecorder implements PerfRecorder {
     private currentPhase;
     private currentPhaseEntered;
     /**
-     * Creates an `ActivePerfRecoder` with its zero point set to the current time.
+     * Creates an `ActivePerfRecorder` with its zero point set to the current time.
      */
     static zeroedToNow(): ActivePerfRecorder;
     private constructor();

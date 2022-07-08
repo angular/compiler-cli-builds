@@ -38,7 +38,7 @@ export interface ComponentInfo {
     };
 }
 /**
- * A context for storing indexing infromation about components of a program.
+ * A context for storing indexing information about components of a program.
  *
  * An `IndexingContext` collects component and template analysis information from
  * `DecoratorHandler`s and exposes them to be indexed.

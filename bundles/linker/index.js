@@ -11,7 +11,7 @@ import {
   assert,
   isFatalLinkerError,
   needsLinking
-} from "../chunk-EOHGFSKG.js";
+} from "../chunk-KTVIB7VN.js";
 import "../chunk-WGBFSDVQ.js";
 import "../chunk-IBCFCGG5.js";
 import "../chunk-T7MYRXIE.js";

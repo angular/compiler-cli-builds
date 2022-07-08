@@ -60,7 +60,7 @@ export interface RequireCall extends ts.CallExpression {
 export declare function findNamespaceOfIdentifier(id: ts.Identifier): ts.Identifier | null;
 /**
  * Return the `RequireCall` that is used to initialize the specified `ts.Identifier`, if the
- * specified indentifier was indeed initialized with a require call in a declaration of the form:
+ * specified identifier was indeed initialized with a require call in a declaration of the form:
  * `var <id> = require('...')`
  */
 export declare function findRequireCallReference(id: ts.Identifier, checker: ts.TypeChecker): RequireCall | null;
@@ -135,7 +135,7 @@ export interface ExportsStatement extends ts.ExpressionStatement {
  */
 export declare function isExportsStatement(stmt: ts.Node): stmt is ExportsStatement;
 /**
- * Find the far right hand side of a sequence of aliased assignements of the form
+ * Find the far right hand side of a sequence of aliased assignments of the form
  *
  * ```
  * exports.MyClass = alias1 = alias2 = <<declaration>>

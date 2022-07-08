@@ -14,7 +14,7 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-FTTMFASI.js";
+} from "./chunk-K2RDEF4J.js";
 import {
   __spreadProps,
   __spreadValues
@@ -379,4 +379,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QWBIXIXO.js.map
+//# sourceMappingURL=chunk-KIJQDLI4.js.map

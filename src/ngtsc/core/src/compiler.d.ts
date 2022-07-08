@@ -220,8 +220,8 @@ export declare class NgCompiler {
      *
      * Normally, this operation happens lazily whenever `getDiagnostics` or `prepareEmit` are called.
      * However, certain consumers may wish to allow for an asynchronous phase of analysis, where
-     * resources such as `styleUrls` are resolved asynchonously. In these cases `analyzeAsync` must be
-     * called first, and its `Promise` awaited prior to calling any other APIs of `NgCompiler`.
+     * resources such as `styleUrls` are resolved asynchronously. In these cases `analyzeAsync` must
+     * be called first, and its `Promise` awaited prior to calling any other APIs of `NgCompiler`.
      */
     analyzeAsync(): Promise<void>;
     /**

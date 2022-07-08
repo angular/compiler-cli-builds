@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-KHP4GA2G.js";
+} from "./chunk-EHOG2PUP.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -1567,11 +1567,11 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     this.visitExpression(text.value);
   }
   visitReference(reference) {
-    const referenceIdentifer = this.targetToIdentifier(reference);
-    if (referenceIdentifer === null) {
+    const referenceIdentifier = this.targetToIdentifier(reference);
+    if (referenceIdentifier === null) {
       return;
     }
-    this.identifiers.add(referenceIdentifer);
+    this.identifiers.add(referenceIdentifier);
   }
   visitVariable(variable) {
     const variableIdentifier = this.targetToIdentifier(variable);
@@ -7422,4 +7422,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-FTTMFASI.js.map
+//# sourceMappingURL=chunk-K2RDEF4J.js.map
