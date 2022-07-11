@@ -5,7 +5,7 @@
     
 import {
   parseCommandLineOptions
-} from "../../../../chunk-OLGEBPBY.js";
+} from "../../../../chunk-FM6NPN5V.js";
 import {
   PackageJsonUpdate,
   applyChange,
@@ -13,16 +13,16 @@ import {
   getSharedSetup,
   sendMessageToMaster,
   stringifyTask
-} from "../../../../chunk-DIXBUYVP.js";
-import "../../../../chunk-XDCGNQL5.js";
-import "../../../../chunk-N5CM3LUE.js";
-import "../../../../chunk-2IMT6JFI.js";
-import "../../../../chunk-LX5Q27EF.js";
-import "../../../../chunk-WGBFSDVQ.js";
-import "../../../../chunk-JDKMNZ6O.js";
-import "../../../../chunk-T7MYRXIE.js";
-import "../../../../chunk-R4NY3TJC.js";
-import "../../../../chunk-GMSUYBZP.js";
+} from "../../../../chunk-MMUW576P.js";
+import "../../../../chunk-4MXMV2ID.js";
+import "../../../../chunk-FMUPZDH2.js";
+import "../../../../chunk-NFCN3OZI.js";
+import "../../../../chunk-E7NQQTT7.js";
+import "../../../../chunk-CYVTLM4Z.js";
+import "../../../../chunk-ACDOC2V2.js";
+import "../../../../chunk-TOKOIIBI.js";
+import "../../../../chunk-ACXPVP2W.js";
+import "../../../../chunk-XYNRD7NE.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/cluster/package_json_updater.mjs
 import cluster from "cluster";

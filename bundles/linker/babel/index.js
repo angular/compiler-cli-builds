@@ -6,24 +6,20 @@
 import {
   ConsoleLogger,
   LogLevel
-} from "../../chunk-LX5Q27EF.js";
+} from "../../chunk-E7NQQTT7.js";
 import {
   FatalLinkerError,
   FileLinker,
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-7XY4OMWJ.js";
-import "../../chunk-WGBFSDVQ.js";
-import "../../chunk-JDKMNZ6O.js";
+} from "../../chunk-AFKKTW7O.js";
+import "../../chunk-CYVTLM4Z.js";
+import "../../chunk-ACDOC2V2.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-T7MYRXIE.js";
-import {
-  __objRest,
-  __spreadProps,
-  __spreadValues
-} from "../../chunk-GMSUYBZP.js";
+} from "../../chunk-TOKOIIBI.js";
+import "../../chunk-XYNRD7NE.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/babel_core.mjs
 import * as _babelNamespace from "@babel/core";
@@ -295,21 +291,20 @@ var BabelDeclarationScope = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.mjs
-function createEs2015LinkerPlugin(_a2) {
-  var _b = _a2, { fileSystem, logger } = _b, options = __objRest(_b, ["fileSystem", "logger"]);
+function createEs2015LinkerPlugin({ fileSystem, logger, ...options }) {
   let fileLinker = null;
   return {
     visitor: {
       Program: {
         enter(path) {
-          var _a3, _b2;
+          var _a2, _b;
           assertNull(fileLinker);
           const file = path.hub.file;
-          const filename = (_a3 = file.opts.filename) != null ? _a3 : file.opts.filenameRelative;
+          const filename = (_a2 = file.opts.filename) != null ? _a2 : file.opts.filenameRelative;
           if (!filename) {
             throw new Error("No filename (nor filenameRelative) provided by Babel. This is required for the linking of partially compiled directives and components.");
           }
-          const sourceUrl = fileSystem.resolve((_b2 = file.opts.cwd) != null ? _b2 : ".", filename);
+          const sourceUrl = fileSystem.resolve((_b = file.opts.cwd) != null ? _b : ".", filename);
           const linkerEnvironment = LinkerEnvironment.create(fileSystem, logger, new BabelAstHost(), new BabelAstFactory(sourceUrl), options);
           fileLinker = new FileLinker(linkerEnvironment, sourceUrl, file.code);
         },
@@ -399,10 +394,11 @@ function buildCodeFrameError(file, message, node) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/babel_plugin.mjs
 function defaultLinkerPlugin(api, options) {
   api.assertVersion(7);
-  return createEs2015LinkerPlugin(__spreadProps(__spreadValues({}, options), {
+  return createEs2015LinkerPlugin({
+    ...options,
     fileSystem: new NodeJSFileSystem(),
     logger: new ConsoleLogger(LogLevel.info)
-  }));
+  });
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/index.mjs

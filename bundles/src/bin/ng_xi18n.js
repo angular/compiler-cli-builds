@@ -7,22 +7,19 @@
 import {
   main,
   readCommandLineAndConfiguration
-} from "../../chunk-EBIPNBQL.js";
+} from "../../chunk-G3AGOLLD.js";
 import {
   EmitFlags
-} from "../../chunk-XDCGNQL5.js";
-import "../../chunk-N5CM3LUE.js";
-import "../../chunk-2IMT6JFI.js";
-import "../../chunk-JDKMNZ6O.js";
+} from "../../chunk-4MXMV2ID.js";
+import "../../chunk-FMUPZDH2.js";
+import "../../chunk-NFCN3OZI.js";
+import "../../chunk-ACDOC2V2.js";
 import {
   NodeJSFileSystem,
   setFileSystem
-} from "../../chunk-T7MYRXIE.js";
-import "../../chunk-R4NY3TJC.js";
-import {
-  __spreadProps,
-  __spreadValues
-} from "../../chunk-GMSUYBZP.js";
+} from "../../chunk-TOKOIIBI.js";
+import "../../chunk-ACXPVP2W.js";
+import "../../chunk-XYNRD7NE.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ng_xi18n.mjs
 import "reflect-metadata";
@@ -47,7 +44,7 @@ function readXi18nCommandLineAndConfiguration(args2) {
     "i18nFormat",
     "locale"
   ]);
-  return __spreadProps(__spreadValues({}, config), { emitFlags: EmitFlags.I18nBundle });
+  return { ...config, emitFlags: EmitFlags.I18nBundle };
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ng_xi18n.mjs

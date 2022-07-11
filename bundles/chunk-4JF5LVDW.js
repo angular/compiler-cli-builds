@@ -5,11 +5,7 @@
     
 import {
   TypeScriptReflectionHost
-} from "./chunk-2IMT6JFI.js";
-import {
-  __spreadProps,
-  __spreadValues
-} from "./chunk-GMSUYBZP.js";
+} from "./chunk-NFCN3OZI.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/downlevel_decorators_transform/downlevel_decorators_transform.mjs
 import ts2 from "typescript";
@@ -358,9 +354,10 @@ var GLOBAL_DEFS_FOR_TERSER = {
   ngDevMode: false,
   ngI18nClosureMode: false
 };
-var GLOBAL_DEFS_FOR_TERSER_WITH_AOT = __spreadProps(__spreadValues({}, GLOBAL_DEFS_FOR_TERSER), {
+var GLOBAL_DEFS_FOR_TERSER_WITH_AOT = {
+  ...GLOBAL_DEFS_FOR_TERSER,
   ngJitMode: false
-});
+};
 function constructorParametersDownlevelTransform(program) {
   const typeChecker = program.getTypeChecker();
   const reflectionHost = new TypeScriptReflectionHost(typeChecker);
@@ -379,4 +376,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-W6KM7BUM.js.map
+//# sourceMappingURL=chunk-4JF5LVDW.js.map

@@ -30,11 +30,11 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-N5CM3LUE.js";
+} from "./chunk-FMUPZDH2.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-2IMT6JFI.js";
+} from "./chunk-NFCN3OZI.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -73,7 +73,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-JDKMNZ6O.js";
+} from "./chunk-ACDOC2V2.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -84,18 +84,14 @@ import {
   getSourceFileOrError,
   join,
   resolve
-} from "./chunk-T7MYRXIE.js";
+} from "./chunk-TOKOIIBI.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-R4NY3TJC.js";
-import {
-  __spreadProps,
-  __spreadValues
-} from "./chunk-GMSUYBZP.js";
+} from "./chunk-ACXPVP2W.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -502,13 +498,13 @@ function checkForPrivateExports(entryPoint, checker, refGraph) {
         if (transitivePath !== null) {
           visibleVia = transitivePath.map((seg) => getNameOfDeclaration(seg)).join(" -> ");
         }
-        const diagnostic = __spreadProps(__spreadValues({
+        const diagnostic = {
           category: ts5.DiagnosticCategory.Error,
           code: ngErrorCode(ErrorCode.SYMBOL_NOT_EXPORTED),
-          file: transitiveReference.getSourceFile()
-        }, getPosOfDeclaration(transitiveReference)), {
+          file: transitiveReference.getSourceFile(),
+          ...getPosOfDeclaration(transitiveReference),
           messageText: `Unsupported private ${descriptor} ${name}. This ${descriptor} is visible to consumers via ${visibleVia}, but is not exported from the top-level library entrypoint.`
-        });
+        };
         diagnostics.push(diagnostic);
       }
     });
@@ -1909,19 +1905,19 @@ var StandaloneComponentScopeReader = class {
           seen.add(ref.node);
           const dirMeta = this.metaReader.getDirectiveMetadata(ref);
           if (dirMeta !== null) {
-            dependencies.add(__spreadProps(__spreadValues({}, dirMeta), { ref }));
+            dependencies.add({ ...dirMeta, ref });
             isPoisoned = isPoisoned || dirMeta.isPoisoned || !dirMeta.isStandalone;
             continue;
           }
           const pipeMeta = this.metaReader.getPipeMetadata(ref);
           if (pipeMeta !== null) {
-            dependencies.add(__spreadProps(__spreadValues({}, pipeMeta), { ref }));
+            dependencies.add({ ...pipeMeta, ref });
             isPoisoned = isPoisoned || !pipeMeta.isStandalone;
             continue;
           }
           const ngModuleMeta = this.metaReader.getNgModuleMetadata(ref);
           if (ngModuleMeta !== null) {
-            dependencies.add(__spreadProps(__spreadValues({}, ngModuleMeta), { ref }));
+            dependencies.add({ ...ngModuleMeta, ref });
             let ngModuleScope;
             if (ref.node.getSourceFile().isDeclarationFile) {
               ngModuleScope = this.dtsModuleReader.resolve(ref);
@@ -2961,10 +2957,11 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
   }
 };
 function makeInlineDiagnostic(templateId, code, node, messageText, relatedInformation) {
-  return __spreadProps(__spreadValues({}, makeDiagnostic(code, node, messageText, relatedInformation)), {
+  return {
+    ...makeDiagnostic(code, node, messageText, relatedInformation),
     componentFile: node.getSourceFile(),
     templateId
-  });
+  };
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/shim.mjs
@@ -4857,11 +4854,12 @@ var SymbolBuilder = class {
       return null;
     }
     const directives = this.getDirectivesOfNode(element);
-    return __spreadProps(__spreadValues({}, symbolFromDeclaration), {
+    return {
+      ...symbolFromDeclaration,
       kind: SymbolKind.Element,
       directives,
       templateNode: element
-    });
+    };
   }
   getDirectivesOfNode(element) {
     var _a;
@@ -4884,14 +4882,15 @@ var SymbolBuilder = class {
         return null;
       }
       const isComponent = (_a2 = meta.isComponent) != null ? _a2 : null;
-      const directiveSymbol = __spreadProps(__spreadValues({}, symbol), {
+      const directiveSymbol = {
+        ...symbol,
         tsSymbol: symbol.tsSymbol,
         selector: meta.selector,
         isComponent,
         ngModule,
         kind: SymbolKind.Directive,
         isStructural: meta.isStructural
-      });
+      };
       return directiveSymbol;
     }).filter((d) => d !== null);
   }
@@ -5028,11 +5027,12 @@ var SymbolBuilder = class {
       if (target === null) {
         continue;
       }
-      bindings.push(__spreadProps(__spreadValues({}, symbolInfo), {
+      bindings.push({
+        ...symbolInfo,
         tsSymbol: symbolInfo.tsSymbol,
         kind: SymbolKind.Binding,
         target
-      }));
+      });
     }
     if (bindings.length === 0) {
       return null;
@@ -5149,13 +5149,14 @@ var SymbolBuilder = class {
     if (symbolInfo === null) {
       return null;
     }
-    return __spreadProps(__spreadValues({
-      kind: SymbolKind.Pipe
-    }, symbolInfo), {
-      classSymbol: __spreadProps(__spreadValues({}, pipeInstance), {
+    return {
+      kind: SymbolKind.Pipe,
+      ...symbolInfo,
+      classSymbol: {
+        ...pipeInstance,
         tsSymbol: pipeInstance.tsSymbol
-      })
-    });
+      }
+    };
   }
   getSymbolOfTemplateExpression(expression) {
     if (expression instanceof ASTWithSource3) {
@@ -5187,13 +5188,14 @@ var SymbolBuilder = class {
       if (whenTrueSymbol === null) {
         return null;
       }
-      return __spreadProps(__spreadValues({}, whenTrueSymbol), {
+      return {
+        ...whenTrueSymbol,
         kind: SymbolKind.Expression,
         tsType: this.getTypeChecker().getTypeAtLocation(node)
-      });
+      };
     } else {
       const symbolInfo = this.getSymbolOfTsNode(node);
-      return symbolInfo === null ? null : __spreadProps(__spreadValues({}, symbolInfo), { kind: SymbolKind.Expression });
+      return symbolInfo === null ? null : { ...symbolInfo, kind: SymbolKind.Expression };
     }
   }
   getSymbolOfTsNode(node) {
@@ -5442,9 +5444,10 @@ var TemplateTypeCheckerImpl = class {
     const fileRecord = this.state.get(sfPath);
     const templateId = fileRecord.sourceManager.getTemplateId(clazz);
     const mapping = fileRecord.sourceManager.getSourceMapping(templateId);
-    return __spreadProps(__spreadValues({}, makeTemplateDiagnostic(templateId, mapping, sourceSpan, category, ngErrorCode(errorCode), message, relatedInformation)), {
+    return {
+      ...makeTemplateDiagnostic(templateId, mapping, sourceSpan, category, ngErrorCode(errorCode), message, relatedInformation),
       __ngCode: errorCode
-    });
+    };
   }
   getOrCreateCompletionEngine(component) {
     if (this.completionCache.has(component)) {
@@ -5964,11 +5967,12 @@ var ExtendedTemplateCheckerImpl = class {
     }
     const diagnostics = [];
     for (const [check, category] of this.templateChecks.entries()) {
-      const ctx = __spreadProps(__spreadValues({}, this.partialCtx), {
+      const ctx = {
+        ...this.partialCtx,
         makeTemplateDiagnostic: (span, message, relatedInformation) => {
           return this.partialCtx.templateTypeChecker.makeTemplateDiagnostic(component, span, category, check.code, message, relatedInformation);
         }
-      });
+      };
       diagnostics.push(...check.run(ctx, component, template));
     }
     return diagnostics;
@@ -6171,9 +6175,10 @@ var NgCompiler = class {
   addMessageTextDetails(diagnostics) {
     return diagnostics.map((diag) => {
       if (diag.code && COMPILER_ERRORS_WITH_GUIDES.has(ngErrorCode(diag.code))) {
-        return __spreadProps(__spreadValues({}, diag), {
+        return {
+          ...diag,
           messageText: diag.messageText + `. Find more at ${ERROR_DETAILS_PAGE_BASE_URL}/NG${ngErrorCode(diag.code)}`
-        });
+        };
       }
       return diag;
     });
@@ -7100,7 +7105,7 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
       if (error2) {
         return parentOptions;
       }
-      const existingNgCompilerOptions = __spreadValues(__spreadValues({}, config2.angularCompilerOptions), parentOptions);
+      const existingNgCompilerOptions = { ...config2.angularCompilerOptions, ...parentOptions };
       if (config2.extends && typeof config2.extends === "string") {
         const extendedConfigPath = getExtendedConfigPath(configFile, config2.extends, host, fs);
         if (extendedConfigPath !== null) {
@@ -7121,10 +7126,12 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
         emitFlags: EmitFlags.Default
       };
     }
-    const existingCompilerOptions = __spreadValues(__spreadValues({
+    const existingCompilerOptions = {
       genDir: basePath,
-      basePath
-    }, readAngularCompilerOptions(configFileName)), existingOptions);
+      basePath,
+      ...readAngularCompilerOptions(configFileName),
+      ...existingOptions
+    };
     const parseConfigHost = createParseConfigHost(host, fs);
     const { options, errors, fileNames: rootNames, projectReferences } = ts35.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingCompilerOptions, configFileName);
     options.enableIvy = !!((_a = options.enableIvy) != null ? _a : true);
@@ -7282,4 +7289,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-XDCGNQL5.js.map
+//# sourceMappingURL=chunk-4MXMV2ID.js.map

@@ -3,10 +3,6 @@
       const require = __cjsCompatRequire(import.meta.url);
       const __ESM_IMPORT_META_URL__ = import.meta.url;
     
-import {
-  __spreadValues
-} from "./chunk-GMSUYBZP.js";
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file.mjs
 import mapHelpers from "convert-source-map";
 import { decode, encode } from "sourcemap-codec";
@@ -304,7 +300,7 @@ var SourceFileLoader = class {
   }
   loadSourceFile(sourcePath, contents = null, mapAndPath = null) {
     const contentsOrigin = contents !== null ? ContentOrigin.Provided : ContentOrigin.FileSystem;
-    const sourceMapInfo = mapAndPath && __spreadValues({ origin: ContentOrigin.Provided }, mapAndPath);
+    const sourceMapInfo = mapAndPath && { origin: ContentOrigin.Provided, ...mapAndPath };
     return this.loadSourceFileInternal(sourcePath, contents, contentsOrigin, sourceMapInfo);
   }
   loadSourceFileInternal(sourcePath, contents, sourceOrigin, sourceMapInfo) {
@@ -421,4 +417,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-WGBFSDVQ.js.map
+//# sourceMappingURL=chunk-CYVTLM4Z.js.map

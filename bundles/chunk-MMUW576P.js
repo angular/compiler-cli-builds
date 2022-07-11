@@ -8,7 +8,7 @@ import {
   ImportGraph,
   isShim,
   readConfiguration
-} from "./chunk-XDCGNQL5.js";
+} from "./chunk-4MXMV2ID.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -32,7 +32,7 @@ import {
   TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-N5CM3LUE.js";
+} from "./chunk-FMUPZDH2.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -43,15 +43,15 @@ import {
   isNamedFunctionDeclaration,
   isNamedVariableDeclaration,
   reflectObjectLiteral
-} from "./chunk-2IMT6JFI.js";
+} from "./chunk-NFCN3OZI.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "./chunk-LX5Q27EF.js";
+} from "./chunk-E7NQQTT7.js";
 import {
   ContentOrigin,
   SourceFileLoader
-} from "./chunk-WGBFSDVQ.js";
+} from "./chunk-CYVTLM4Z.js";
 import {
   AbsoluteModuleStrategy,
   ImportManager,
@@ -72,7 +72,7 @@ import {
   translateStatement,
   translateType,
   validateAndRewriteCoreSymbol
-} from "./chunk-JDKMNZ6O.js";
+} from "./chunk-ACDOC2V2.js";
 import {
   LogicalFileSystem,
   NgtscCompilerHost,
@@ -84,14 +84,10 @@ import {
   isRooted,
   relative,
   toRelativeImport
-} from "./chunk-T7MYRXIE.js";
+} from "./chunk-TOKOIIBI.js";
 import {
   NOOP_PERF_RECORDER
-} from "./chunk-R4NY3TJC.js";
-import {
-  __spreadProps,
-  __spreadValues
-} from "./chunk-GMSUYBZP.js";
+} from "./chunk-ACXPVP2W.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/create_compile_function.mjs
 import ts23 from "typescript";
@@ -1229,7 +1225,7 @@ ${declaration.getText()}`);
       return null;
     }
     const exportDecl = namespaceExports.get(expression.name.text);
-    return __spreadProps(__spreadValues({}, exportDecl), { viaModule: namespaceDecl.viaModule });
+    return { ...exportDecl, viaModule: namespaceDecl.viaModule };
   }
   isJavaScriptObjectDeclaration(decl) {
     const node = decl.node;
@@ -2067,7 +2063,7 @@ var UmdReflectionHost = class extends Esm5ReflectionHost {
     }
     const viaModule = stripExtension(importedFile.fileName);
     const reexports = [];
-    importedExports.forEach((decl, name) => reexports.push({ name, declaration: __spreadProps(__spreadValues({}, decl), { viaModule }) }));
+    importedExports.forEach((decl, name) => reexports.push({ name, declaration: { ...decl, viaModule } }));
     return reexports;
   }
   extractUmdDefinePropertyExportDeclaration(statement) {
@@ -2128,7 +2124,7 @@ var UmdReflectionHost = class extends Esm5ReflectionHost {
       return null;
     }
     const viaModule = declaration.viaModule === null ? moduleDeclaration.viaModule : declaration.viaModule;
-    return __spreadProps(__spreadValues({}, declaration), { viaModule, known: getTsHelperFnFromIdentifier(id) });
+    return { ...declaration, viaModule, known: getTsHelperFnFromIdentifier(id) };
   }
   getExportsDeclaration(id) {
     if (!isExportsIdentifier(id)) {
@@ -2493,10 +2489,10 @@ function sniffModuleFormat(fs, sourceFilePath) {
 }
 function mergeConfigAndPackageJson(fs, entryPointPackageJson, entryPointConfig, packagePath, entryPointPath) {
   if (entryPointPackageJson !== null) {
-    return __spreadValues(__spreadValues({}, entryPointPackageJson), entryPointConfig.override);
+    return { ...entryPointPackageJson, ...entryPointConfig.override };
   } else {
     const name = `${fs.basename(packagePath)}/${fs.relative(packagePath, entryPointPath)}`;
-    return __spreadValues({ name }, entryPointConfig.override);
+    return { name, ...entryPointConfig.override };
   }
 }
 function guessTypingsFromPackageJson(fs, entryPointPath, entryPointPackageJson) {
@@ -2742,7 +2738,7 @@ var NgccSourcesCompilerHost = class extends NgtscCompilerHost {
       if ((resolvedModule == null ? void 0 : resolvedModule.extension) === ts11.Extension.Dts && containingFile.endsWith(".js") && isRelativePath(moduleName)) {
         const jsFile = resolvedModule.resolvedFileName.replace(/\.d\.ts$/, ".js");
         if (this.fileExists(jsFile)) {
-          return __spreadProps(__spreadValues({}, resolvedModule), { resolvedFileName: jsFile, extension: ts11.Extension.Js });
+          return { ...resolvedModule, resolvedFileName: jsFile, extension: ts11.Extension.Js };
         }
       }
       if ((resolvedModule == null ? void 0 : resolvedModule.extension) === ts11.Extension.Js && !isWithinPackage(this.packagePath, this.fs.resolve(resolvedModule.resolvedFileName))) {
@@ -2882,7 +2878,7 @@ function createSourceTextProcessor(format) {
 }
 function makeEntryPointBundle(fs, entryPoint, sharedFileCache, moduleResolutionCache, formatPath, isCore, format, dtsProcessing, pathMappings, mirrorDtsFromSrc = false, enableI18nLegacyMessageIdFormat = true) {
   const rootDir = entryPoint.packagePath;
-  const options = __spreadValues({ allowJs: true, maxNodeModuleJsDepth: Infinity, rootDir }, pathMappings);
+  const options = { allowJs: true, maxNodeModuleJsDepth: Infinity, rootDir, ...pathMappings };
   const processSourceText = createSourceTextProcessor(format);
   const entryPointCache = new EntryPointFileCache(fs, sharedFileCache, processSourceText);
   const dtsHost = new NgccDtsCompilerHost(fs, options, entryPointCache, moduleResolutionCache);
@@ -2891,7 +2887,7 @@ function makeEntryPointBundle(fs, entryPoint, sharedFileCache, moduleResolutionC
   const typingsPath = fs.resolve(entryPoint.path, entryPoint.typings);
   const src = makeBundleProgram(fs, isCore, entryPoint.packagePath, absFormatPath, "r3_symbols.js", options, srcHost);
   const additionalDtsFiles = dtsProcessing !== DtsProcessing.No && mirrorDtsFromSrc ? computePotentialDtsFilesFromJsFiles(fs, src.program, absFormatPath, typingsPath) : [];
-  const dts = dtsProcessing !== DtsProcessing.No ? makeBundleProgram(fs, isCore, entryPoint.packagePath, typingsPath, "r3_symbols.d.ts", __spreadProps(__spreadValues({}, options), { allowJs: false }), dtsHost, additionalDtsFiles) : null;
+  const dts = dtsProcessing !== DtsProcessing.No ? makeBundleProgram(fs, isCore, entryPoint.packagePath, typingsPath, "r3_symbols.d.ts", { ...options, allowJs: false }, dtsHost, additionalDtsFiles) : null;
   const isFlatCore = isCore && src.r3SymbolsFile === null;
   return {
     entryPoint,
@@ -3212,7 +3208,7 @@ var DefaultMigrationHost = class {
   }
 };
 function createMigrationDiagnostic(diagnostic, source, decorator) {
-  const clone = __spreadValues({}, diagnostic);
+  const clone = { ...diagnostic };
   const chain = [{
     messageText: `Occurs for @${decorator.name} decorator inserted by an automatic migration`,
     category: ts14.DiagnosticCategory.Message,
@@ -3740,7 +3736,7 @@ var CommonJsReflectionHost = class extends Esm5ReflectionHost {
     const reexports = [];
     importedExports.forEach((declaration, name) => {
       if (viaModule !== null && declaration.viaModule === null) {
-        declaration = __spreadProps(__spreadValues({}, declaration), { viaModule });
+        declaration = { ...declaration, viaModule };
       }
       reexports.push({ name, declaration });
     });
@@ -5186,4 +5182,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-DIXBUYVP.js.map
+//# sourceMappingURL=chunk-MMUW576P.js.map

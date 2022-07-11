@@ -7,7 +7,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-W6KM7BUM.js";
+} from "./chunk-4JF5LVDW.js";
 import {
   DEFAULT_ERROR_CODE,
   EmitFlags,
@@ -31,14 +31,14 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-XDCGNQL5.js";
-import "./chunk-N5CM3LUE.js";
-import "./chunk-2IMT6JFI.js";
+} from "./chunk-4MXMV2ID.js";
+import "./chunk-FMUPZDH2.js";
+import "./chunk-NFCN3OZI.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "./chunk-LX5Q27EF.js";
-import "./chunk-JDKMNZ6O.js";
+} from "./chunk-E7NQQTT7.js";
+import "./chunk-ACDOC2V2.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -59,18 +59,16 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-T7MYRXIE.js";
+} from "./chunk-TOKOIIBI.js";
 import {
   ActivePerfRecorder,
   PerfPhase
-} from "./chunk-R4NY3TJC.js";
-import {
-  __spreadValues
-} from "./chunk-GMSUYBZP.js";
+} from "./chunk-ACXPVP2W.js";
+import "./chunk-XYNRD7NE.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("14.0.5+sha-d51e0f2");
+var VERSION = new Version("14.0.5+sha-9d2d92a");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
@@ -89,7 +87,7 @@ var NgTscPlugin = class {
     return this._compiler;
   }
   wrapHost(host, inputFiles, options) {
-    this.options = __spreadValues(__spreadValues({}, this.ngOptions), options);
+    this.options = { ...this.ngOptions, ...options };
     this.host = NgCompilerHost.wrap(host, inputFiles, this.options, null);
     return this.host;
   }
