@@ -5,15 +5,11 @@
     
 import {
   SourceFileLoader
-} from "./chunk-WGBFSDVQ.js";
+} from "./chunk-CYVTLM4Z.js";
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-IBCFCGG5.js";
-import {
-  __spreadProps,
-  __spreadValues
-} from "./chunk-GMSUYBZP.js";
+} from "./chunk-2X3DL4IU.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.mjs
 var FatalLinkerError = class extends Error {
@@ -517,7 +513,8 @@ ${errors}`);
         }
       }
     }
-    return __spreadProps(__spreadValues({}, toR3DirectiveMeta(metaObj, this.code, this.sourceUrl)), {
+    return {
+      ...toR3DirectiveMeta(metaObj, this.code, this.sourceUrl),
       viewProviders: metaObj.has("viewProviders") ? metaObj.getOpaque("viewProviders") : null,
       template: {
         nodes: template.nodes,
@@ -532,7 +529,7 @@ ${errors}`);
       relativeContextFilePath: this.sourceUrl,
       i18nUseExternalIds: false,
       declarations
-    });
+    };
   }
   getTemplateInfo(templateNode, isInline) {
     const range = templateNode.getRange();
@@ -830,7 +827,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "14.1.0-next.4+sha-19e6d9c");
+  const LATEST_VERSION_RANGE = getRange("<=", "14.1.0-next.4+sha-7b9269c");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -877,7 +874,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "14.1.0-next.4+sha-19e6d9c") {
+    if (version === "14.1.0-next.4+sha-7b9269c") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -1008,4 +1005,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KTVIB7VN.js.map
+//# sourceMappingURL=chunk-ATKLTOVY.js.map

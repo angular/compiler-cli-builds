@@ -38,19 +38,17 @@ import {
   sendMessageToWorker,
   sortTasksByPriority,
   stringifyTask
-} from "./chunk-7FPR2KDM.js";
+} from "./chunk-MYF3RC3S.js";
 import {
   LogLevel
-} from "./chunk-LX5Q27EF.js";
+} from "./chunk-E7NQQTT7.js";
 import {
   absoluteFrom,
   getFileSystem
-} from "./chunk-T7MYRXIE.js";
+} from "./chunk-TOKOIIBI.js";
 import {
-  __require,
-  __spreadProps,
-  __spreadValues
-} from "./chunk-GMSUYBZP.js";
+  __require
+} from "./chunk-XYNRD7NE.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/dependencies/commonjs_dependency_host.mjs
 import ts from "typescript";
@@ -898,7 +896,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "14.1.0-next.4+sha-19e6d9c";
+var NGCC_VERSION = "14.1.0-next.4+sha-7b9269c";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -1813,7 +1811,7 @@ var PartiallyProcessedConfig = class {
       const packageConfig = projectConfig.packages[packageNameAndVersion];
       if (packageConfig) {
         const [packageName, versionRange = "*"] = this.splitNameAndVersion(packageNameAndVersion);
-        this.addPackageConfig(packageName, __spreadProps(__spreadValues({}, packageConfig), { versionRange }));
+        this.addPackageConfig(packageName, { ...packageConfig, versionRange });
       }
     }
     if (projectConfig.hashAlgorithm !== void 0) {
@@ -1953,9 +1951,10 @@ var NgccConfiguration = class {
     if (this.fs.exists(configFilePath)) {
       try {
         const packageConfig = this.evalSrcFile(configFilePath);
-        return __spreadProps(__spreadValues({}, packageConfig), {
+        return {
+          ...packageConfig,
           versionRange: version || "*"
-        });
+        };
       } catch (e) {
         throw new Error(`Invalid package configuration file at "${configFilePath}": ` + e.message);
       }
@@ -2183,4 +2182,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-EBUI4S2D.js.map
+//# sourceMappingURL=chunk-KUYUFP3M.js.map

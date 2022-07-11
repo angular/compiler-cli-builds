@@ -14,11 +14,7 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-K2RDEF4J.js";
-import {
-  __spreadProps,
-  __spreadValues
-} from "./chunk-GMSUYBZP.js";
+} from "./chunk-ZFMSE3Z3.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.mjs
 import ts2 from "typescript";
@@ -286,7 +282,7 @@ function createEmitCallback(options, tsickle) {
     transformDecorators: false,
     transformTypesToClosure: true
   };
-  return ({ program, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, customTransformers = {}, host, options: options2 }) => tsickle.emitWithTsickle(program, __spreadProps(__spreadValues({}, tsickleHost), { options: options2, moduleResolutionHost: host }), host, options2, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
+  return ({ program, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, customTransformers = {}, host, options: options2 }) => tsickle.emitWithTsickle(program, { ...tsickleHost, options: options2, moduleResolutionHost: host }, host, options2, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
     beforeTs: customTransformers.before,
     afterTs: customTransformers.after
   });
@@ -303,7 +299,7 @@ function readNgcCommandLineAndConfiguration(args) {
   if (parsedArgs.missingTranslation)
     options.i18nInMissingTranslations = parsedArgs.missingTranslation;
   const config = readCommandLineAndConfiguration(args, options, ["i18nFile", "i18nFormat", "locale", "missingTranslation", "watch"]);
-  return __spreadProps(__spreadValues({}, config), { watch: parsedArgs.watch });
+  return { ...config, watch: parsedArgs.watch };
 }
 function readCommandLineAndConfiguration(args, existingOptions = {}, ngCmdLineOptions = []) {
   let cmdConfig = ts2.parseCommandLine(args);
@@ -325,7 +321,7 @@ function readCommandLineAndConfiguration(args, existingOptions = {}, ngCmdLineOp
     };
   }
   const config = readConfiguration(project, cmdConfig.options);
-  const options = __spreadValues(__spreadValues({}, config.options), existingOptions);
+  const options = { ...config.options, ...existingOptions };
   if (options.locale) {
     options.i18nInLocale = options.locale;
   }
@@ -379,4 +375,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KIJQDLI4.js.map
+//# sourceMappingURL=chunk-QMXL3H2Q.js.map
