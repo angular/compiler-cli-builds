@@ -2600,7 +2600,7 @@ function requiresInlineTypeCheckBlock(ref, env, usedPipes, reflector) {
     return TcbInliningRequirement.MustInline;
   } else if (!checkIfGenericTypeBoundsCanBeEmitted(ref.node, reflector, env)) {
     return TcbInliningRequirement.ShouldInlineForGenericBounds;
-  } else if (Array.from(usedPipes.values()).some((pipeRef) => !env.canReferenceType(pipeRef))) {
+  } else if (usedPipes.some((pipeRef) => !env.canReferenceType(pipeRef))) {
     return TcbInliningRequirement.MustInline;
   } else {
     return TcbInliningRequirement.None;
@@ -4531,7 +4531,14 @@ var TypeCheckContextImpl = class {
       boundTarget,
       templateDiagnostics
     });
-    const inliningRequirement = requiresInlineTypeCheckBlock(ref, shimData.file, pipes, this.reflector);
+    const usedPipes = [];
+    for (const name of boundTarget.getUsedPipes()) {
+      if (!pipes.has(name)) {
+        continue;
+      }
+      usedPipes.push(pipes.get(name));
+    }
+    const inliningRequirement = requiresInlineTypeCheckBlock(ref, shimData.file, usedPipes, this.reflector);
     if (this.inlining === InliningMode.Error && inliningRequirement === TcbInliningRequirement.MustInline) {
       shimData.oobRecorder.requiresInlineTcb(templateId, ref.node);
       this.perf.eventCount(PerfEvent.SkipGenerateTcbNoInline);
@@ -7476,4 +7483,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-6PWDHGNV.js.map
+//# sourceMappingURL=chunk-WAXJ3P3Y.js.map
