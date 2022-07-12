@@ -9,7 +9,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-2X3DL4IU.js";
+} from "./chunk-24DFPZCS.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.mjs
 var FatalLinkerError = class extends Error {
@@ -827,7 +827,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "14.1.0-next.4+sha-a6d5fe2");
+  const LATEST_VERSION_RANGE = getRange("<=", "14.1.0-next.4+sha-c0ca3fc");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -874,7 +874,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "14.1.0-next.4+sha-a6d5fe2") {
+    if (version === "14.1.0-next.4+sha-c0ca3fc") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -1005,4 +1005,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ATKLTOVY.js.map
+//# sourceMappingURL=chunk-ATB3HJXN.js.map

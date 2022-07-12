@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-ACFQSGIG.js";
+} from "./chunk-LPUQQ2CH.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -73,7 +73,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-2X3DL4IU.js";
+} from "./chunk-24DFPZCS.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -153,7 +153,7 @@ var SymbolKind;
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.mjs
 import { HtmlParser, MessageBundle } from "@angular/compiler";
-import ts33 from "typescript";
+import ts34 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/i18n.mjs
 import { Xliff, Xliff2, Xmb } from "@angular/compiler";
@@ -258,7 +258,7 @@ function verifySupportedTypeScriptVersion() {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
-import ts31 from "typescript";
+import ts32 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/cycles/src/analyzer.mjs
 var CycleAnalyzer = class {
@@ -6003,6 +6003,52 @@ var factory4 = {
   }
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/optional_chain_not_nullable/index.mjs
+import { SafeCall as SafeCall2, SafeKeyedRead as SafeKeyedRead2, SafePropertyRead as SafePropertyRead5 } from "@angular/compiler";
+import ts30 from "typescript";
+var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
+  constructor() {
+    super(...arguments);
+    this.code = ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE;
+  }
+  visitNode(ctx, component, node) {
+    if (!(node instanceof SafeCall2) && !(node instanceof SafePropertyRead5) && !(node instanceof SafeKeyedRead2))
+      return [];
+    const symbolLeft = ctx.templateTypeChecker.getSymbolOfNode(node.receiver, component);
+    if (symbolLeft === null || symbolLeft.kind !== SymbolKind.Expression) {
+      return [];
+    }
+    const typeLeft = symbolLeft.tsType;
+    if (typeLeft.flags & (ts30.TypeFlags.Any | ts30.TypeFlags.Unknown)) {
+      return [];
+    }
+    if (typeLeft.getNonNullableType() !== typeLeft)
+      return [];
+    const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
+    if (symbol.kind !== SymbolKind.Expression) {
+      return [];
+    }
+    const templateMapping = ctx.templateTypeChecker.getTemplateMappingAtTcbLocation(symbol.tcbLocation);
+    if (templateMapping === null) {
+      return [];
+    }
+    const advice = node instanceof SafePropertyRead5 ? `the '?.' operator can be replaced with the '.' operator` : `the '?.' operator can be safely removed`;
+    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, `The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore ${advice}.`);
+    return [diagnostic];
+  }
+};
+var factory5 = {
+  code: ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE,
+  name: ExtendedTemplateDiagnosticName.OPTIONAL_CHAIN_NOT_NULLABLE,
+  create: (options) => {
+    const strictNullChecks = options.strictNullChecks === void 0 ? !!options.strict : !!options.strictNullChecks;
+    if (!strictNullChecks) {
+      return null;
+    }
+    return new OptionalChainNotNullableCheck();
+  }
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/suffix_not_supported/index.mjs
 import { TmplAstBoundAttribute as TmplAstBoundAttribute3 } from "@angular/compiler";
 var STYLE_SUFFIXES = ["px", "%", "em"];
@@ -6021,7 +6067,7 @@ var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory5 = {
+var factory6 = {
   code: ErrorCode.SUFFIX_NOT_SUPPORTED,
   name: ExtendedTemplateDiagnosticName.SUFFIX_NOT_SUPPORTED,
   create: () => new SuffixNotSupportedCheck()
@@ -6060,14 +6106,14 @@ var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory6 = {
+var factory7 = {
   code: ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING,
   name: ExtendedTemplateDiagnosticName.TEXT_ATTRIBUTE_NOT_BINDING,
   create: () => new TextAttributeNotBindingSpec()
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.mjs
-import ts30 from "typescript";
+import ts31 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/api/src/public_options.mjs
 var DiagnosticCategoryLabel;
@@ -6083,12 +6129,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory7 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory7.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory8 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory8.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory7.create(options);
+      const check = factory8.create(options);
       if (check === null) {
         continue;
       }
@@ -6116,9 +6162,9 @@ var ExtendedTemplateCheckerImpl = class {
 function diagnosticLabelToCategory(label) {
   switch (label) {
     case DiagnosticCategoryLabel.Warning:
-      return ts30.DiagnosticCategory.Warning;
+      return ts31.DiagnosticCategory.Warning;
     case DiagnosticCategoryLabel.Error:
-      return ts30.DiagnosticCategory.Error;
+      return ts31.DiagnosticCategory.Error;
     case DiagnosticCategoryLabel.Suppress:
       return null;
     default:
@@ -6134,10 +6180,11 @@ ${value}`);
 var ALL_DIAGNOSTIC_FACTORIES = [
   factory,
   factory4,
+  factory5,
   factory2,
-  factory6,
+  factory7,
   factory3,
-  factory5
+  factory6
 ];
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
@@ -6217,7 +6264,7 @@ var NgCompiler = class {
     this.currentProgram = inputProgram;
     this.closureCompilerEnabled = !!this.options.annotateForClosureCompiler;
     this.entryPoint = adapter.entryPoint !== null ? getSourceFileOrNull(inputProgram, adapter.entryPoint) : null;
-    const moduleResolutionCache = ts31.createModuleResolutionCache(this.adapter.getCurrentDirectory(), this.adapter.getCanonicalFileName.bind(this.adapter));
+    const moduleResolutionCache = ts32.createModuleResolutionCache(this.adapter.getCurrentDirectory(), this.adapter.getCanonicalFileName.bind(this.adapter));
     this.moduleResolver = new ModuleResolver(inputProgram, this.options, this.adapter, moduleResolutionCache);
     this.resourceManager = new AdapterResourceLoader(adapter, this.options);
     this.cycleAnalyzer = new CycleAnalyzer(new ImportGraph(inputProgram.getTypeChecker(), this.delegatingPerfRecorder));
@@ -6273,7 +6320,7 @@ var NgCompiler = class {
       }
       for (const clazz of classesToUpdate) {
         this.compilation.traitCompiler.updateResources(clazz);
-        if (!ts31.isClassDeclaration(clazz)) {
+        if (!ts32.isClassDeclaration(clazz)) {
           continue;
         }
         this.compilation.templateTypeChecker.invalidateClass(clazz);
@@ -6684,17 +6731,17 @@ function isAngularCorePackage(program) {
     return false;
   }
   return r3Symbols.statements.some((stmt) => {
-    if (!ts31.isVariableStatement(stmt)) {
+    if (!ts32.isVariableStatement(stmt)) {
       return false;
     }
-    if (stmt.modifiers === void 0 || !stmt.modifiers.some((mod) => mod.kind === ts31.SyntaxKind.ExportKeyword)) {
+    if (stmt.modifiers === void 0 || !stmt.modifiers.some((mod) => mod.kind === ts32.SyntaxKind.ExportKeyword)) {
       return false;
     }
     return stmt.declarationList.declarations.some((decl) => {
-      if (!ts31.isIdentifier(decl.name) || decl.name.text !== "ITS_JUST_ANGULAR") {
+      if (!ts32.isIdentifier(decl.name) || decl.name.text !== "ITS_JUST_ANGULAR") {
         return false;
       }
-      if (decl.initializer === void 0 || decl.initializer.kind !== ts31.SyntaxKind.TrueKeyword) {
+      if (decl.initializer === void 0 || decl.initializer.kind !== ts32.SyntaxKind.TrueKeyword) {
         return false;
       }
       return true;
@@ -6708,7 +6755,7 @@ function* verifyCompatibleTypeCheckOptions(options) {
   var _a, _b, _c;
   if (options.fullTemplateTypeCheck === false && options.strictTemplates === true) {
     yield makeConfigDiagnostic({
-      category: ts31.DiagnosticCategory.Error,
+      category: ts32.DiagnosticCategory.Error,
       code: ErrorCode.CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK,
       messageText: `
 Angular compiler option "strictTemplates" is enabled, however "fullTemplateTypeCheck" is disabled.
@@ -6727,7 +6774,7 @@ https://angular.io/guide/template-typecheck
   }
   if (options.extendedDiagnostics && options.strictTemplates === false) {
     yield makeConfigDiagnostic({
-      category: ts31.DiagnosticCategory.Error,
+      category: ts32.DiagnosticCategory.Error,
       code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_IMPLIES_STRICT_TEMPLATES,
       messageText: `
 Angular compiler option "extendedDiagnostics" is configured, however "strictTemplates" is disabled.
@@ -6744,7 +6791,7 @@ One of the following actions is required:
   const defaultCategory = (_a = options.extendedDiagnostics) == null ? void 0 : _a.defaultCategory;
   if (defaultCategory && !allowedCategoryLabels.includes(defaultCategory)) {
     yield makeConfigDiagnostic({
-      category: ts31.DiagnosticCategory.Error,
+      category: ts32.DiagnosticCategory.Error,
       code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CATEGORY_LABEL,
       messageText: `
 Angular compiler option "extendedDiagnostics.defaultCategory" has an unknown diagnostic category: "${defaultCategory}".
@@ -6754,11 +6801,11 @@ ${allowedCategoryLabels.join("\n")}
       `.trim()
     });
   }
-  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory7) => factory7.name);
+  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory8) => factory8.name);
   for (const [checkName, category] of Object.entries((_c = (_b = options.extendedDiagnostics) == null ? void 0 : _b.checks) != null ? _c : {})) {
     if (!allExtendedDiagnosticNames.includes(checkName)) {
       yield makeConfigDiagnostic({
-        category: ts31.DiagnosticCategory.Error,
+        category: ts32.DiagnosticCategory.Error,
         code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CHECK,
         messageText: `
 Angular compiler option "extendedDiagnostics.checks" has an unknown check: "${checkName}".
@@ -6770,7 +6817,7 @@ ${allExtendedDiagnosticNames.join("\n")}
     }
     if (!allowedCategoryLabels.includes(category)) {
       yield makeConfigDiagnostic({
-        category: ts31.DiagnosticCategory.Error,
+        category: ts32.DiagnosticCategory.Error,
         code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CATEGORY_LABEL,
         messageText: `
 Angular compiler option "extendedDiagnostics.checks['${checkName}']" has an unknown diagnostic category: "${category}".
@@ -6800,7 +6847,7 @@ var ReferenceGraphAdapter = class {
     for (const { node } of references) {
       let sourceFile = node.getSourceFile();
       if (sourceFile === void 0) {
-        sourceFile = ts31.getOriginalNode(node).getSourceFile();
+        sourceFile = ts32.getOriginalNode(node).getSourceFile();
       }
       if (sourceFile === void 0 || !isDtsPath(sourceFile.fileName)) {
         this.graph.add(source, node);
@@ -6839,7 +6886,7 @@ function versionMapFromProgram(program, driver) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/host.mjs
-import ts32 from "typescript";
+import ts33 from "typescript";
 var DelegatingCompilerHost2 = class {
   constructor(delegate) {
     this.delegate = delegate;
@@ -6929,7 +6976,7 @@ var NgCompilerHost = class extends DelegatingCompilerHost2 {
       entryPoint = findFlatIndexEntryPoint(normalizedTsInputFiles);
       if (entryPoint === null) {
         diagnostics.push({
-          category: ts32.DiagnosticCategory.Error,
+          category: ts33.DiagnosticCategory.Error,
           code: ngErrorCode(ErrorCode.CONFIG_FLAT_MODULE_NO_INDEX),
           file: void 0,
           start: void 0,
@@ -6972,10 +7019,10 @@ var NgCompilerHost = class extends DelegatingCompilerHost2 {
     return this.fileNameToModuleName !== void 0 ? this : null;
   }
   createCachedResolveModuleNamesFunction() {
-    const moduleResolutionCache = ts32.createModuleResolutionCache(this.getCurrentDirectory(), this.getCanonicalFileName.bind(this));
+    const moduleResolutionCache = ts33.createModuleResolutionCache(this.getCurrentDirectory(), this.getCanonicalFileName.bind(this));
     return (moduleNames, containingFile, reusedNames, redirectedReference, options) => {
       return moduleNames.map((moduleName) => {
-        const module = ts32.resolveModuleName(moduleName, containingFile, options, this, moduleResolutionCache, redirectedReference);
+        const module = ts33.resolveModuleName(moduleName, containingFile, options, this, moduleResolutionCache, redirectedReference);
         return module.resolvedModule;
       });
     };
@@ -6996,7 +7043,7 @@ var NgtscProgram = class {
     if (reuseProgram !== void 0) {
       retagAllTsFiles(reuseProgram);
     }
-    this.tsProgram = perfRecorder.inPhase(PerfPhase.TypeScriptProgramCreate, () => ts33.createProgram(this.host.inputFiles, options, this.host, reuseProgram));
+    this.tsProgram = perfRecorder.inPhase(PerfPhase.TypeScriptProgramCreate, () => ts34.createProgram(this.host.inputFiles, options, this.host, reuseProgram));
     perfRecorder.phase(PerfPhase.Unaccounted);
     perfRecorder.memory(PerfCheckpoint.TypeScriptProgramCreate);
     this.host.postProgramCreationCleanup();
@@ -7197,17 +7244,17 @@ function createProgram({ rootNames, options, host, oldProgram }) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
-import ts35 from "typescript";
+import ts36 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/util.mjs
-import ts34 from "typescript";
+import ts35 from "typescript";
 var GENERATED_FILES = /(.*?)\.(ngfactory|shim\.ngstyle|ngstyle|ngsummary)\.(js|d\.ts|ts)$/;
 function createMessageDiagnostic(messageText) {
   return {
     file: void 0,
     start: void 0,
     length: void 0,
-    category: ts34.DiagnosticCategory.Message,
+    category: ts35.DiagnosticCategory.Message,
     messageText,
     code: DEFAULT_ERROR_CODE,
     source: SOURCE
@@ -7216,13 +7263,13 @@ function createMessageDiagnostic(messageText) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
 var defaultFormatHost = {
-  getCurrentDirectory: () => ts35.sys.getCurrentDirectory(),
+  getCurrentDirectory: () => ts36.sys.getCurrentDirectory(),
   getCanonicalFileName: (fileName) => fileName,
-  getNewLine: () => ts35.sys.newLine
+  getNewLine: () => ts36.sys.newLine
 };
 function formatDiagnostics(diags, host = defaultFormatHost) {
   if (diags && diags.length) {
-    return diags.map((diagnostic) => replaceTsWithNgInErrors(ts35.formatDiagnosticsWithColorAndContext([diagnostic], host))).join("");
+    return diags.map((diagnostic) => replaceTsWithNgInErrors(ts36.formatDiagnosticsWithColorAndContext([diagnostic], host))).join("");
   } else {
     return "";
   }
@@ -7239,7 +7286,7 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
   var _a, _b;
   try {
     const fs = getFileSystem();
-    const readConfigFile = (configFile) => ts35.readConfigFile(configFile, (file) => host.readFile(host.resolve(file)));
+    const readConfigFile = (configFile) => ts36.readConfigFile(configFile, (file) => host.readFile(host.resolve(file)));
     const readAngularCompilerOptions = (configFile, parentOptions = {}) => {
       const { config: config2, error: error2 } = readConfigFile(configFile);
       if (error2) {
@@ -7273,7 +7320,7 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
       ...existingOptions
     };
     const parseConfigHost = createParseConfigHost(host, fs);
-    const { options, errors, fileNames: rootNames, projectReferences } = ts35.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingCompilerOptions, configFileName);
+    const { options, errors, fileNames: rootNames, projectReferences } = ts36.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingCompilerOptions, configFileName);
     options.enableIvy = !!((_a = options.enableIvy) != null ? _a : true);
     let emitFlags = EmitFlags.Default;
     if (!(options.skipMetadataEmit || options.flatModuleOutFile)) {
@@ -7285,7 +7332,7 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
     return { project: projectFile, rootNames, projectReferences, options, errors, emitFlags };
   } catch (e) {
     const errors = [{
-      category: ts35.DiagnosticCategory.Error,
+      category: ts36.DiagnosticCategory.Error,
       messageText: (_b = e.stack) != null ? _b : e.message,
       file: void 0,
       start: void 0,
@@ -7299,7 +7346,7 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
 function createParseConfigHost(host, fs = getFileSystem()) {
   return {
     fileExists: host.exists.bind(host),
-    readDirectory: ts35.sys.readDirectory,
+    readDirectory: ts36.sys.readDirectory,
     readFile: host.readFile.bind(host),
     useCaseSensitiveFileNames: fs.isCaseSensitive()
   };
@@ -7319,7 +7366,7 @@ function getExtendedConfigPathWorker(configFile, extendsValue, host, fs) {
     }
   } else {
     const parseConfigHost = createParseConfigHost(host, fs);
-    const { resolvedModule } = ts35.nodeModuleNameResolver(extendsValue, configFile, { moduleResolution: ts35.ModuleResolutionKind.NodeJs, resolveJsonModule: true }, parseConfigHost);
+    const { resolvedModule } = ts36.nodeModuleNameResolver(extendsValue, configFile, { moduleResolution: ts36.ModuleResolutionKind.NodeJs, resolveJsonModule: true }, parseConfigHost);
     if (resolvedModule) {
       return absoluteFrom(resolvedModule.resolvedFileName);
     }
@@ -7329,7 +7376,7 @@ function getExtendedConfigPathWorker(configFile, extendsValue, host, fs) {
 function exitCodeFromResult(diags) {
   if (!diags)
     return 0;
-  if (diags.every((diag) => diag.category !== ts35.DiagnosticCategory.Error)) {
+  if (diags.every((diag) => diag.category !== ts36.DiagnosticCategory.Error)) {
     return 0;
   }
   return diags.some((d) => d.source === "angular" && d.code === UNKNOWN_ERROR_CODE) ? 2 : 1;
@@ -7362,7 +7409,7 @@ function performCompilation({ rootNames, options, host, oldProgram, emitCallback
   } catch (e) {
     program = void 0;
     allDiagnostics.push({
-      category: ts35.DiagnosticCategory.Error,
+      category: ts36.DiagnosticCategory.Error,
       messageText: (_a = e.stack) != null ? _a : e.message,
       code: UNKNOWN_ERROR_CODE,
       file: void 0,
@@ -7389,7 +7436,7 @@ function defaultGatherDiagnostics(program) {
   return allDiagnostics;
 }
 function hasErrors(diags) {
-  return diags.some((d) => d.category === ts35.DiagnosticCategory.Error);
+  return diags.some((d) => d.category === ts36.DiagnosticCategory.Error);
 }
 
 export {
@@ -7429,4 +7476,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-ZFMSE3Z3.js.map
+//# sourceMappingURL=chunk-6PWDHGNV.js.map
