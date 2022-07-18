@@ -5895,7 +5895,12 @@ var factory = {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_control_flow_directive/index.mjs
 import { TmplAstTemplate as TmplAstTemplate4 } from "@angular/compiler";
-var KNOWN_CONTROL_FLOW_DIRECTIVES = /* @__PURE__ */ new Set(["ngIf", "ngFor", "ngSwitchCase", "ngSwitchDefault"]);
+var KNOWN_CONTROL_FLOW_DIRECTIVES = /* @__PURE__ */ new Map([
+  ["ngIf", "NgIf"],
+  ["ngFor", "NgForOf"],
+  ["ngSwitchCase", "NgSwitchCase"],
+  ["ngSwitchDefault", "NgSwitchDefault"]
+]);
 var MissingControlFlowDirectiveCheck = class extends TemplateCheckWithVisitor {
   constructor() {
     super(...arguments);
@@ -5919,7 +5924,8 @@ var MissingControlFlowDirectiveCheck = class extends TemplateCheckWithVisitor {
       return [];
     }
     const sourceSpan = controlFlowAttr.keySpan || controlFlowAttr.sourceSpan;
-    const errorMessage = `The \`*${controlFlowAttr.name}\` directive was used in the template, but the \`CommonModule\` was not imported. Please make sure that the \`CommonModule\` is included into the \`@Component.imports\` array of this component.`;
+    const correspondingImport = KNOWN_CONTROL_FLOW_DIRECTIVES.get(controlFlowAttr.name);
+    const errorMessage = `The \`*${controlFlowAttr.name}\` directive was used in the template, but neither the \`${correspondingImport}\` directive nor the \`CommonModule\` was imported. Please make sure that either the \`${correspondingImport}\` directive or the \`CommonModule\` is included in the \`@Component.imports\` array of this component.`;
     const diagnostic = ctx.makeTemplateDiagnostic(sourceSpan, errorMessage);
     return [diagnostic];
   }
@@ -7483,4 +7489,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-WAXJ3P3Y.js.map
+//# sourceMappingURL=chunk-7HGQY7TW.js.map
