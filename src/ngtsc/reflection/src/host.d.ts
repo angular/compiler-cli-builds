@@ -620,7 +620,7 @@ export interface ReflectionHost {
      * Determine if an identifier was imported from another module and return `Import` metadata
      * describing its origin.
      *
-     * @param id a TypeScript `ts.Identifer` to reflect.
+     * @param id a TypeScript `ts.Identifier` to reflect.
      *
      * @returns metadata about the `Import` if the identifier was imported from another module, or
      * `null` if the identifier doesn't resolve to an import but instead is locally defined.

@@ -25,7 +25,8 @@ export declare class LocalMetadataRegistry implements MetadataRegistry, Metadata
     registerPipeMetadata(meta: PipeMeta): void;
 }
 /**
- * A `MetadataRegistry` which registers metdata with multiple delegate `MetadataRegistry` instances.
+ * A `MetadataRegistry` which registers metadata with multiple delegate `MetadataRegistry`
+ * instances.
  */
 export declare class CompoundMetadataRegistry implements MetadataRegistry {
     private registries;

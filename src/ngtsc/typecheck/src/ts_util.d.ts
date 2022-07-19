@@ -7,7 +7,6 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/ts_util" />
 import ts from 'typescript';
-import { ClassDeclaration } from '../../reflection';
 export declare function tsCastToAny(expr: ts.Expression): ts.Expression;
 /**
  * Create an expression which instantiates an element by its HTML tagName.
@@ -52,6 +51,4 @@ export declare function tsCallMethod(receiver: ts.Expression, methodName: string
  * We should remove it once we have dropped support for the older versions.
  */
 export declare function tsUpdateTypeParameterDeclaration(node: ts.TypeParameterDeclaration, name: ts.Identifier, constraint: ts.TypeNode | undefined, defaultType: ts.TypeNode | undefined): ts.TypeParameterDeclaration;
-export declare function checkIfClassIsExported(node: ClassDeclaration): boolean;
-export declare function checkIfGenericTypesAreUnbound(node: ClassDeclaration<ts.ClassDeclaration>): boolean;
 export declare function isAccessExpression(node: ts.Node): node is ts.ElementAccessExpression | ts.PropertyAccessExpression;
