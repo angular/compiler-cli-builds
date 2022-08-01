@@ -13,7 +13,6 @@ export declare enum ErrorCode {
     DECORATOR_ARG_NOT_LITERAL = 1001,
     DECORATOR_ARITY_WRONG = 1002,
     DECORATOR_NOT_CALLED = 1003,
-    DECORATOR_ON_ANONYMOUS_CLASS = 1004,
     DECORATOR_UNEXPECTED = 1005,
     /**
      * This error code indicates that there are incompatible decorators on a type or a class field.
@@ -61,7 +60,6 @@ export declare enum ErrorCode {
      */
     COMPONENT_UNKNOWN_IMPORT = 2012,
     SYMBOL_NOT_EXPORTED = 3001,
-    SYMBOL_EXPORTED_UNDER_DIFFERENT_NAME = 3002,
     /**
      * Raised when a relationship between directives and/or pipes would cause a cyclic import to be
      * created that cannot be handled, such as in partial compilation mode.
@@ -230,7 +228,7 @@ export declare enum ErrorCode {
     /**
      * Indicates that the binding suffix is not supported
      *
-     * Style bindings support suffixes like `stlye.width.px`, `.em`, and `.%`.
+     * Style bindings support suffixes like `style.width.px`, `.em`, and `.%`.
      * These suffixes are _not_ supported for attribute bindings.
      *
      * For example `[attr.width.px]="5"` becomes `width.px="5"` when bound.
