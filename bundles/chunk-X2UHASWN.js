@@ -33,7 +33,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-24DFPZCS.js";
+} from "./chunk-TSVR3WF5.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -2632,11 +2632,8 @@ function makeNotStandaloneDiagnostic(scopeReader, ref, rawExpr, kind) {
   let relatedInformation = void 0;
   if (scope !== null && scope.kind === ComponentScopeKind.NgModule) {
     const isExported = scope.exported.dependencies.some((dep) => dep.ref.node === ref.node);
-    if (isExported) {
-      relatedInformation = [makeRelatedInformation(scope.ngModule.name, `It can be imported using its NgModule '${scope.ngModule.name.text}' instead.`)];
-    } else {
-      relatedInformation = [makeRelatedInformation(scope.ngModule.name, `It's declared in the NgModule '${scope.ngModule.name.text}', but is not exported. Consider exporting it.`)];
-    }
+    const relatedInfoMessageText = isExported ? `It can be imported using its '${scope.ngModule.name.text}' NgModule instead.` : `It's declared in the '${scope.ngModule.name.text}' NgModule, but is not exported. Consider exporting it and importing the NgModule instead.`;
+    relatedInformation = [makeRelatedInformation(scope.ngModule.name, relatedInfoMessageText)];
   } else {
   }
   if (relatedInformation === void 0) {
@@ -6600,4 +6597,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-LPUQQ2CH.js.map
+//# sourceMappingURL=chunk-X2UHASWN.js.map
