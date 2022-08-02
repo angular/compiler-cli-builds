@@ -8,7 +8,7 @@ import {
   ImportGraph,
   isShim,
   readConfiguration
-} from "./chunk-ZBS75WH7.js";
+} from "./chunk-WCXUQ743.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -32,7 +32,7 @@ import {
   TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-X2UHASWN.js";
+} from "./chunk-3ALDQ2SE.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -87,7 +87,7 @@ import {
 } from "./chunk-TOKOIIBI.js";
 import {
   NOOP_PERF_RECORDER
-} from "./chunk-ACXPVP2W.js";
+} from "./chunk-2HPI44CB.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/create_compile_function.mjs
 import ts23 from "typescript";
@@ -5182,4 +5182,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4N37OTSF.js.map
+//# sourceMappingURL=chunk-DEKIANJX.js.map

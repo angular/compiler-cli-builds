@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-X2UHASWN.js";
+} from "./chunk-3ALDQ2SE.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -91,7 +91,7 @@ import {
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-ACXPVP2W.js";
+} from "./chunk-2HPI44CB.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -7489,4 +7489,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-ZBS75WH7.js.map
+//# sourceMappingURL=chunk-WCXUQ743.js.map
