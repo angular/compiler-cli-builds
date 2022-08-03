@@ -42,7 +42,7 @@ import {
 import {
   PerfEvent,
   PerfPhase
-} from "./chunk-ACXPVP2W.js";
+} from "./chunk-2HPI44CB.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
@@ -6597,4 +6597,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-X2UHASWN.js.map
+//# sourceMappingURL=chunk-3ALDQ2SE.js.map
