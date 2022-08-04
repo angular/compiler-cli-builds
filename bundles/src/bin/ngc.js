@@ -6,7 +6,7 @@
     
 import {
   main
-} from "../../chunk-2EU3LGV7.js";
+} from "../../chunk-V6TZZGEE.js";
 import "../../chunk-WCXUQ743.js";
 import "../../chunk-3ALDQ2SE.js";
 import "../../chunk-NFCN3OZI.js";

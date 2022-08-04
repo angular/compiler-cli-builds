@@ -280,7 +280,9 @@ function createEmitCallback(options, tsickle) {
     untyped: true,
     convertIndexImportShorthand: false,
     transformDecorators: false,
-    transformTypesToClosure: true
+    transformTypesToClosure: true,
+    generateExtraSuppressions: true,
+    rootDirsRelative: (fileName) => fileName
   };
   return ({ program, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, customTransformers = {}, host, options: options2 }) => tsickle.emitWithTsickle(program, { ...tsickleHost, options: options2, moduleResolutionHost: host }, host, options2, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
     beforeTs: customTransformers.before,
@@ -375,4 +377,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2EU3LGV7.js.map
+//# sourceMappingURL=chunk-V6TZZGEE.js.map
