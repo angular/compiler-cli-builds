@@ -5,7 +5,17 @@
     
 import {
   TypeScriptReflectionHost
-} from "./chunk-NFCN3OZI.js";
+} from "./chunk-TFREAQMZ.js";
+import {
+  IS_AFTER_TS_48,
+  combineModifiers,
+  createPropertyDeclaration,
+  getDecorators,
+  getModifiers,
+  updateClassDeclaration,
+  updateConstructorDeclaration,
+  updateParameterDeclaration
+} from "./chunk-BH5CCJUJ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/downlevel_decorators_transform/downlevel_decorators_transform.mjs
 import ts2 from "typescript";
@@ -101,7 +111,7 @@ function createCtorParametersClassProperty(diagnostics, entityNameToExpression, 
     params.push(ts2.factory.createObjectLiteralExpression(members));
   }
   const initializer = ts2.factory.createArrowFunction(void 0, void 0, [], void 0, ts2.factory.createToken(ts2.SyntaxKind.EqualsGreaterThanToken), ts2.factory.createArrayLiteralExpression(params, true));
-  const ctorProp = ts2.factory.createPropertyDeclaration(void 0, [ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword)], "ctorParameters", void 0, void 0, initializer);
+  const ctorProp = createPropertyDeclaration([ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword)], "ctorParameters", void 0, void 0, initializer);
   if (isClosureCompilerEnabled) {
     ts2.setSyntheticLeadingComments(ctorProp, [
       {
@@ -182,7 +192,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
   function createDecoratorClassProperty(decoratorList) {
     const modifier = ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword);
     const initializer = ts2.factory.createArrayLiteralExpression(decoratorList, true);
-    const prop = ts2.factory.createPropertyDeclaration(void 0, [modifier], "decorators", void 0, void 0, initializer);
+    const prop = createPropertyDeclaration([modifier], "decorators", void 0, void 0, initializer);
     addJSDocTypeAnnotation(prop, DECORATOR_INVOCATION_JSDOC_TYPE);
     return prop;
   }
@@ -192,7 +202,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
       entries.push(ts2.factory.createPropertyAssignment(name, ts2.factory.createArrayLiteralExpression(decorators.map((deco) => extractMetadataFromSingleDecorator(deco, diagnostics2)))));
     }
     const initializer = ts2.factory.createObjectLiteralExpression(entries, true);
-    const prop = ts2.factory.createPropertyDeclaration(void 0, [ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword)], "propDecorators", void 0, void 0, initializer);
+    const prop = createPropertyDeclaration([ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword)], "propDecorators", void 0, void 0, initializer);
     addJSDocTypeAnnotation(prop, `!Object<string, ${DECORATOR_INVOCATION_JSDOC_TYPE}>`);
     return prop;
   }
@@ -247,7 +257,11 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
       }
       const name = element.name.text;
       const mutable = ts2.getMutableClone(element);
-      mutable.decorators = decoratorsToKeep.length ? ts2.setTextRange(ts2.factory.createNodeArray(decoratorsToKeep), mutable.decorators) : void 0;
+      if (IS_AFTER_TS_48) {
+        mutable.modifiers = decoratorsToKeep.length ? ts2.setTextRange(ts2.factory.createNodeArray(combineModifiers(decoratorsToKeep, getModifiers(mutable))), mutable.modifiers) : void 0;
+      } else {
+        mutable.decorators = decoratorsToKeep.length ? ts2.setTextRange(ts2.factory.createNodeArray(decoratorsToKeep), mutable.decorators) : void 0;
+      }
       return [name, mutable, toLower];
     }
     function transformConstructor(ctor) {
@@ -271,10 +285,10 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
           paramInfo.type = param.type;
         }
         parametersInfo.push(paramInfo);
-        const newParam = ts2.factory.updateParameterDeclaration(param, decoratorsToKeep.length ? decoratorsToKeep : void 0, param.modifiers, param.dotDotDotToken, param.name, param.questionToken, param.type, param.initializer);
+        const newParam = updateParameterDeclaration(param, combineModifiers(decoratorsToKeep.length ? decoratorsToKeep : void 0, getModifiers(param)), param.dotDotDotToken, param.name, param.questionToken, param.type, param.initializer);
         newParameters.push(newParam);
       }
-      const updated = ts2.factory.updateConstructorDeclaration(ctor, ctor.decorators, ctor.modifiers, newParameters, ctor.body);
+      const updated = updateConstructorDeclaration(ctor, getModifiers(ctor), newParameters, ctor.body);
       return [updated, parametersInfo];
     }
     function transformClassDeclaration(classDecl) {
@@ -308,7 +322,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         }
         newMembers.push(ts2.visitEachChild(member, decoratorDownlevelVisitor, context));
       }
-      const decoratorsToKeep = new Set(classDecl.decorators);
+      const decoratorsToKeep = new Set(getDecorators(classDecl));
       const possibleAngularDecorators = host.getDecoratorsOfDeclaration(classDecl) || [];
       let hasAngularDecorator = false;
       const decoratorsToLower = [];
@@ -335,7 +349,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         newMembers.push(createPropDecoratorsClassProperty(diagnostics, decoratedProperties));
       }
       const members = ts2.setTextRange(ts2.factory.createNodeArray(newMembers, classDecl.members.hasTrailingComma), classDecl.members);
-      return ts2.factory.updateClassDeclaration(classDecl, decoratorsToKeep.size ? Array.from(decoratorsToKeep) : void 0, classDecl.modifiers, classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
+      return updateClassDeclaration(classDecl, combineModifiers(decoratorsToKeep.size ? Array.from(decoratorsToKeep) : void 0, getModifiers(classDecl)), classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
     }
     function decoratorDownlevelVisitor(node) {
       if (ts2.isClassDeclaration(node)) {
@@ -376,4 +390,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4JF5LVDW.js.map
+//# sourceMappingURL=chunk-OTSBWRQY.js.map

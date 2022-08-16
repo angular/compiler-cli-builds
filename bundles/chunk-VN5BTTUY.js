@@ -13,7 +13,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-NFCN3OZI.js";
+} from "./chunk-TFREAQMZ.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -33,7 +33,20 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-TSVR3WF5.js";
+} from "./chunk-Q4CRY2QL.js";
+import {
+  combineModifiers,
+  createPropertyDeclaration,
+  getDecorators,
+  getModifiers,
+  updateClassDeclaration,
+  updateConstructorDeclaration,
+  updateGetAccessorDeclaration,
+  updateMethodDeclaration,
+  updateParameterDeclaration,
+  updatePropertyDeclaration,
+  updateSetAccessorDeclaration
+} from "./chunk-BH5CCJUJ.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -1115,7 +1128,8 @@ function isVariableDeclarationDeclared(node) {
     return false;
   }
   const varStmt = declList.parent;
-  return varStmt.modifiers !== void 0 && varStmt.modifiers.some((mod) => mod.kind === ts2.SyntaxKind.DeclareKeyword);
+  const modifiers = getModifiers(varStmt);
+  return modifiers !== void 0 && modifiers.some((mod) => mod.kind === ts2.SyntaxKind.DeclareKeyword);
 }
 var EMPTY = {};
 function joinModuleContext(existing, node, decl) {
@@ -2141,10 +2155,10 @@ function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
   };
 }
 function isRestricted(node) {
-  if (node.modifiers === void 0) {
-    return false;
-  }
-  return node.modifiers.some((modifier) => modifier.kind === ts10.SyntaxKind.PrivateKeyword || modifier.kind === ts10.SyntaxKind.ProtectedKeyword || modifier.kind === ts10.SyntaxKind.ReadonlyKeyword);
+  const modifiers = getModifiers(node);
+  return modifiers !== void 0 && modifiers.some(({ kind }) => {
+    return kind === ts10.SyntaxKind.PrivateKeyword || kind === ts10.SyntaxKind.ProtectedKeyword || kind === ts10.SyntaxKind.ReadonlyKeyword;
+  });
 }
 function extractTemplateGuard(member) {
   if (!member.name.startsWith("ngTemplateGuard_")) {
@@ -3699,7 +3713,7 @@ var DtsTransformer = class {
       }
     }
     if (elementsChanged && clazz === newClazz) {
-      newClazz = ts17.factory.updateClassDeclaration(clazz, clazz.decorators, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, elements);
+      newClazz = updateClassDeclaration(clazz, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, elements);
     }
     return newClazz;
   }
@@ -3730,9 +3744,9 @@ var IvyDeclarationDtsTransform = class {
       const modifiers = [ts17.factory.createModifier(ts17.SyntaxKind.StaticKeyword)];
       const typeRef = translateType(decl.type, imports);
       markForEmitAsSingleLine(typeRef);
-      return ts17.factory.createPropertyDeclaration(void 0, modifiers, decl.name, void 0, typeRef, void 0);
+      return createPropertyDeclaration(modifiers, decl.name, void 0, typeRef, void 0);
     });
-    return ts17.factory.updateClassDeclaration(clazz, clazz.decorators, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, [...members, ...newMembers]);
+    return updateClassDeclaration(clazz, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, [...members, ...newMembers]);
   }
 };
 function markForEmitAsSingleLine(node) {
@@ -3855,14 +3869,15 @@ var IvyTransformationVisitor = class extends Visitor {
     const members = [...node.members];
     for (const field of this.classCompilationMap.get(node)) {
       const exprNode = translateExpression(field.initializer, this.importManager, translateOptions);
-      const property = ts19.factory.createPropertyDeclaration(void 0, [ts19.factory.createToken(ts19.SyntaxKind.StaticKeyword)], field.name, void 0, void 0, exprNode);
+      const property = createPropertyDeclaration([ts19.factory.createToken(ts19.SyntaxKind.StaticKeyword)], field.name, void 0, void 0, exprNode);
       if (this.isClosureCompilerEnabled) {
         ts19.addSyntheticLeadingComment(property, ts19.SyntaxKind.MultiLineCommentTrivia, "* @nocollapse ", false);
       }
       field.statements.map((stmt) => translateStatement(stmt, this.importManager, translateOptions)).forEach((stmt) => statements.push(stmt));
       members.push(property);
     }
-    node = ts19.factory.updateClassDeclaration(node, maybeFilterDecorator(node.decorators, this.compilation.decoratorsFor(node)), node.modifiers, node.name, node.typeParameters, node.heritageClauses || [], members.map((member) => this._stripAngularDecorators(member)));
+    const filteredDecorators = maybeFilterDecorator(getDecorators(node), this.compilation.decoratorsFor(node));
+    node = updateClassDeclaration(node, combineModifiers(filteredDecorators, getModifiers(node)), node.name, node.typeParameters, node.heritageClauses || [], members.map((member) => this._stripAngularDecorators(member)));
     return { node, after: statements };
   }
   _angularCoreDecorators(decl) {
@@ -3878,38 +3893,36 @@ var IvyTransformationVisitor = class extends Visitor {
     }
   }
   _nonCoreDecoratorsOnly(node) {
-    if (node.decorators === void 0) {
+    const decorators = getDecorators(node);
+    if (decorators === void 0) {
       return void 0;
     }
     const coreDecorators = this._angularCoreDecorators(node);
-    if (coreDecorators.size === node.decorators.length) {
+    if (coreDecorators.size === decorators.length) {
       return void 0;
     } else if (coreDecorators.size === 0) {
-      return node.decorators;
+      return nodeArrayFromDecoratorsArray(decorators);
     }
-    const filtered = node.decorators.filter((dec) => !coreDecorators.has(dec));
+    const filtered = decorators.filter((dec) => !coreDecorators.has(dec));
     if (filtered.length === 0) {
       return void 0;
     }
-    const array = ts19.factory.createNodeArray(filtered);
-    array.pos = node.decorators.pos;
-    array.end = node.decorators.end;
-    return array;
+    return nodeArrayFromDecoratorsArray(filtered);
   }
   _stripAngularDecorators(node) {
     if (ts19.isParameter(node)) {
-      node = ts19.factory.updateParameterDeclaration(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.dotDotDotToken, node.name, node.questionToken, node.type, node.initializer);
-    } else if (ts19.isMethodDeclaration(node) && node.decorators !== void 0) {
-      node = ts19.factory.updateMethodDeclaration(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
-    } else if (ts19.isPropertyDeclaration(node) && node.decorators !== void 0) {
-      node = ts19.factory.updatePropertyDeclaration(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.questionToken, node.type, node.initializer);
+      node = updateParameterDeclaration(node, combineModifiers(this._nonCoreDecoratorsOnly(node), getModifiers(node)), node.dotDotDotToken, node.name, node.questionToken, node.type, node.initializer);
+    } else if (ts19.isMethodDeclaration(node) && getDecorators(node) !== void 0) {
+      node = updateMethodDeclaration(node, combineModifiers(this._nonCoreDecoratorsOnly(node), getModifiers(node)), node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
+    } else if (ts19.isPropertyDeclaration(node) && getDecorators(node) !== void 0) {
+      node = updatePropertyDeclaration(node, combineModifiers(this._nonCoreDecoratorsOnly(node), getModifiers(node)), node.name, node.questionToken, node.type, node.initializer);
     } else if (ts19.isGetAccessor(node)) {
-      node = ts19.factory.updateGetAccessorDeclaration(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.parameters, node.type, node.body);
+      node = updateGetAccessorDeclaration(node, combineModifiers(this._nonCoreDecoratorsOnly(node), getModifiers(node)), node.name, node.parameters, node.type, node.body);
     } else if (ts19.isSetAccessor(node)) {
-      node = ts19.factory.updateSetAccessorDeclaration(node, this._nonCoreDecoratorsOnly(node), node.modifiers, node.name, node.parameters, node.body);
+      node = updateSetAccessorDeclaration(node, combineModifiers(this._nonCoreDecoratorsOnly(node), getModifiers(node)), node.name, node.parameters, node.body);
     } else if (ts19.isConstructorDeclaration(node)) {
       const parameters = node.parameters.map((param) => this._stripAngularDecorators(param));
-      node = ts19.factory.updateConstructorDeclaration(node, node.decorators, node.modifiers, parameters, node.body);
+      node = updateConstructorDeclaration(node, getModifiers(node), parameters, node.body);
     }
     return node;
   }
@@ -3985,6 +3998,14 @@ function createRecorderFn(defaultImportTracker) {
       defaultImportTracker.recordUsedImport(importDecl);
     }
   };
+}
+function nodeArrayFromDecoratorsArray(decorators) {
+  const array = ts19.factory.createNodeArray(decorators);
+  if (array.length > 0) {
+    array.pos = decorators[0].pos;
+    array.end = decorators[decorators.length - 1].end;
+  }
+  return array;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/handler.mjs
@@ -6597,4 +6618,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3ALDQ2SE.js.map
+//# sourceMappingURL=chunk-VN5BTTUY.js.map

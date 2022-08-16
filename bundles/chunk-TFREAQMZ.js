@@ -3,6 +3,11 @@
       const require = __cjsCompatRequire(import.meta.url);
       const __ESM_IMPORT_META_URL__ = import.meta.url;
     
+import {
+  getDecorators,
+  getModifiers
+} from "./chunk-BH5CCJUJ.js";
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/typescript.mjs
 import ts4 from "typescript";
 
@@ -226,10 +231,8 @@ var TypeScriptReflectionHost = class {
     this.checker = checker;
   }
   getDecoratorsOfDeclaration(declaration) {
-    if (declaration.decorators === void 0 || declaration.decorators.length === 0) {
-      return null;
-    }
-    return declaration.decorators.map((decorator) => this._reflectDecorator(decorator)).filter((dec) => dec !== null);
+    const decorators = getDecorators(declaration);
+    return decorators !== void 0 && decorators.length ? decorators.map((decorator) => this._reflectDecorator(decorator)).filter((dec) => dec !== null) : null;
   }
   getMembersOfClass(clazz) {
     const tsClazz = castDeclarationToClassOrDie(clazz);
@@ -356,7 +359,8 @@ var TypeScriptReflectionHost = class {
     if (ts4.isVariableDeclaration(decl) && ts4.isVariableDeclarationList(decl.parent)) {
       topLevel = decl.parent.parent;
     }
-    if (topLevel.modifiers !== void 0 && topLevel.modifiers.some((modifier) => modifier.kind === ts4.SyntaxKind.ExportKeyword)) {
+    const modifiers = getModifiers(topLevel);
+    if (modifiers !== void 0 && modifiers.some((modifier) => modifier.kind === ts4.SyntaxKind.ExportKeyword)) {
       return true;
     }
     if (topLevel.parent === void 0 || !ts4.isSourceFile(topLevel.parent)) {
@@ -501,7 +505,8 @@ var TypeScriptReflectionHost = class {
       return null;
     }
     const decorators = this.getDecoratorsOfDeclaration(node);
-    const isStatic = node.modifiers !== void 0 && node.modifiers.some((mod) => mod.kind === ts4.SyntaxKind.StaticKeyword);
+    const modifiers = getModifiers(node);
+    const isStatic = modifiers !== void 0 && modifiers.some((mod) => mod.kind === ts4.SyntaxKind.StaticKeyword);
     return {
       node,
       implementation: node,
@@ -678,4 +683,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-NFCN3OZI.js.map
+//# sourceMappingURL=chunk-TFREAQMZ.js.map

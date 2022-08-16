@@ -44,11 +44,4 @@ export declare function tsCreateVariable(id: ts.Identifier, initializer: ts.Expr
  * Construct a `ts.CallExpression` that calls a method on a receiver.
  */
 export declare function tsCallMethod(receiver: ts.Expression, methodName: string, args?: ts.Expression[]): ts.CallExpression;
-/**
- * Updates a `ts.TypeParameter` declaration.
- *
- * TODO(crisbeto): this is a backwards-compatibility layer for versions of TypeScript less than 4.7.
- * We should remove it once we have dropped support for the older versions.
- */
-export declare function tsUpdateTypeParameterDeclaration(node: ts.TypeParameterDeclaration, name: ts.Identifier, constraint: ts.TypeNode | undefined, defaultType: ts.TypeNode | undefined): ts.TypeParameterDeclaration;
 export declare function isAccessExpression(node: ts.Node): node is ts.ElementAccessExpression | ts.PropertyAccessExpression;

@@ -30,11 +30,11 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-3ALDQ2SE.js";
+} from "./chunk-VN5BTTUY.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-NFCN3OZI.js";
+} from "./chunk-TFREAQMZ.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -73,7 +73,13 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-TSVR3WF5.js";
+} from "./chunk-Q4CRY2QL.js";
+import {
+  getDecorators,
+  getModifiers,
+  updateImportDeclaration,
+  updateTypeParameterDeclaration
+} from "./chunk-BH5CCJUJ.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -246,7 +252,7 @@ function compareVersions(v1, v2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
 var MIN_TS_VERSION = "4.6.2";
-var MAX_TS_VERSION = "4.8.0";
+var MAX_TS_VERSION = "4.9.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
@@ -798,7 +804,7 @@ var FactoryGenerator = class {
   generateShimForFile(sf, genFilePath) {
     const absoluteSfPath = absoluteFromSourceFile(sf);
     const relativePathToSource = "./" + basename(sf.fileName).replace(TS_DTS_SUFFIX, "");
-    const symbolNames = sf.statements.filter(ts7.isClassDeclaration).filter((decl) => isExported(decl) && decl.decorators !== void 0 && decl.name !== void 0).map((decl) => decl.name.text);
+    const symbolNames = sf.statements.filter(ts7.isClassDeclaration).filter((decl) => isExported(decl) && getDecorators(decl) !== void 0 && decl.name !== void 0).map((decl) => decl.name.text);
     let sourceText = "";
     const leadingComment = getFileoverviewComment(sf);
     if (leadingComment !== null) {
@@ -832,7 +838,8 @@ var FactoryGenerator = class {
   }
 };
 function isExported(decl) {
-  return decl.modifiers !== void 0 && decl.modifiers.some((mod) => mod.kind == ts7.SyntaxKind.ExportKeyword);
+  const modifiers = getModifiers(decl);
+  return modifiers !== void 0 && modifiers.some((mod) => mod.kind == ts7.SyntaxKind.ExportKeyword);
 }
 function generatedFactoryTransform(factoryMap, importRewriter) {
   return (context) => {
@@ -853,7 +860,7 @@ function transformFactorySourceFile(factoryMap, context, importRewriter, file) {
     if (ts7.isImportDeclaration(stmt) && ts7.isStringLiteral(stmt.moduleSpecifier) && stmt.moduleSpecifier.text === "@angular/core") {
       const rewrittenModuleSpecifier = importRewriter.rewriteSpecifier("@angular/core", sourceFilePath);
       if (rewrittenModuleSpecifier !== stmt.moduleSpecifier.text) {
-        transformedStatements.push(ts7.factory.updateImportDeclaration(stmt, stmt.decorators, stmt.modifiers, stmt.importClause, ts7.factory.createStringLiteral(rewrittenModuleSpecifier), void 0));
+        transformedStatements.push(updateImportDeclaration(stmt, getModifiers(stmt), stmt.importClause, ts7.factory.createStringLiteral(rewrittenModuleSpecifier), void 0));
         if (stmt.importClause !== void 0 && stmt.importClause.namedBindings !== void 0 && ts7.isNamespaceImport(stmt.importClause.namedBindings)) {
           coreImportIdentifiers.add(stmt.importClause.namedBindings.name.text);
         }
@@ -928,7 +935,7 @@ function wrapInNoSideEffects(expr) {
   ]);
 }
 function updateInitializers(stmt, update) {
-  return ts7.factory.updateVariableStatement(stmt, stmt.modifiers, ts7.factory.updateVariableDeclarationList(stmt.declarationList, stmt.declarationList.declarations.map((decl) => ts7.updateVariableDeclaration(decl, decl.name, decl.type, update(decl.initializer)))));
+  return ts7.factory.updateVariableStatement(stmt, getModifiers(stmt), ts7.factory.updateVariableDeclarationList(stmt.declarationList, stmt.declarationList.declarations.map((decl) => ts7.factory.updateVariableDeclaration(decl, decl.name, decl.exclamationToken, decl.type, update(decl.initializer)))));
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/reference_tagger.mjs
@@ -976,7 +983,7 @@ var SummaryGenerator = class {
     const symbolNames = [];
     for (const stmt of sf.statements) {
       if (ts8.isClassDeclaration(stmt)) {
-        if (!isExported2(stmt) || stmt.decorators === void 0 || stmt.name === void 0) {
+        if (!isExported2(stmt) || stmt.name === void 0 || getDecorators(stmt) === void 0) {
           continue;
         }
         symbolNames.push(stmt.name.text);
@@ -1002,7 +1009,8 @@ var SummaryGenerator = class {
   }
 };
 function isExported2(decl) {
-  return decl.modifiers !== void 0 && decl.modifiers.some((mod) => mod.kind == ts8.SyntaxKind.ExportKeyword);
+  const modifiers = getModifiers(decl);
+  return modifiers !== void 0 && modifiers.some((mod) => mod.kind == ts8.SyntaxKind.ExportKeyword) || false;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver.mjs
@@ -2391,7 +2399,6 @@ import ts20 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.mjs
 import ts15 from "typescript";
-var PARSED_TS_VERSION = parseFloat(ts15.versionMajorMinor);
 var SAFE_TO_CAST_WITHOUT_PARENS = /* @__PURE__ */ new Set([
   ts15.SyntaxKind.ParenthesizedExpression,
   ts15.SyntaxKind.Identifier,
@@ -2432,9 +2439,6 @@ function tsCreateVariable(id, initializer) {
 function tsCallMethod(receiver, methodName, args = []) {
   const methodAccess = ts15.factory.createPropertyAccessExpression(receiver, methodName);
   return ts15.factory.createCallExpression(methodAccess, void 0, args);
-}
-function tsUpdateTypeParameterDeclaration(node, name, constraint, defaultType) {
-  return PARSED_TS_VERSION < 4.7 ? ts15.factory.updateTypeParameterDeclaration(node, name, constraint, defaultType) : ts15.factory.updateTypeParameterDeclaration(node, [], name, constraint, defaultType);
 }
 function isAccessExpression(node) {
   return ts15.isPropertyAccessExpression(node) || ts15.isElementAccessExpression(node);
@@ -2548,7 +2552,7 @@ var TypeParameterEmitter = class {
     return this.typeParameters.map((typeParam) => {
       const constraint = typeParam.constraint !== void 0 ? emitter.emitType(typeParam.constraint) : void 0;
       const defaultType = typeParam.default !== void 0 ? emitter.emitType(typeParam.default) : void 0;
-      return tsUpdateTypeParameterDeclaration(typeParam, typeParam.name, constraint, defaultType);
+      return updateTypeParameterDeclaration(typeParam, typeParam.modifiers, typeParam.name, constraint, defaultType);
     });
   }
   resolveTypeReference(type) {
@@ -2732,7 +2736,7 @@ function typeParametersWithDefaultTypes(params) {
   }
   return params.map((param) => {
     if (param.default === void 0) {
-      return tsUpdateTypeParameterDeclaration(param, param.name, param.constraint, ts19.factory.createKeywordTypeNode(ts19.SyntaxKind.AnyKeyword));
+      return updateTypeParameterDeclaration(param, param.modifiers, param.name, param.constraint, ts19.factory.createKeywordTypeNode(ts19.SyntaxKind.AnyKeyword));
     } else {
       return param;
     }
@@ -6747,7 +6751,8 @@ function isAngularCorePackage(program) {
     if (!ts32.isVariableStatement(stmt)) {
       return false;
     }
-    if (stmt.modifiers === void 0 || !stmt.modifiers.some((mod) => mod.kind === ts32.SyntaxKind.ExportKeyword)) {
+    const modifiers = getModifiers(stmt);
+    if (modifiers === void 0 || !modifiers.some((mod) => mod.kind === ts32.SyntaxKind.ExportKeyword)) {
       return false;
     }
     return stmt.declarationList.declarations.some((decl) => {
@@ -7489,4 +7494,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-WCXUQ743.js.map
+//# sourceMappingURL=chunk-UAMSPVPZ.js.map
