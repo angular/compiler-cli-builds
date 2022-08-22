@@ -7,6 +7,7 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/directive/src/handler" />
 import { ConstantPool, R3ClassMetadata, R3DirectiveMetadata } from '@angular/compiler';
+import ts from 'typescript';
 import { Reference } from '../../../imports';
 import { SemanticDepGraphUpdater } from '../../../incremental/semantic_graph';
 import { ClassPropertyMapping, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../../metadata';
@@ -26,6 +27,7 @@ export interface DirectiveHandlerData {
     outputs: ClassPropertyMapping;
     isPoisoned: boolean;
     isStructural: boolean;
+    decorator: ts.Decorator | null;
 }
 export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decorator | null, DirectiveHandlerData, DirectiveSymbol, unknown> {
     private reflector;

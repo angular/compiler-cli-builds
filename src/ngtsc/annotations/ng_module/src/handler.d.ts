@@ -36,6 +36,7 @@ export interface NgModuleAnalysis {
     providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
     providers: ts.Expression | null;
     remoteScopesMayRequireCycleProtection: boolean;
+    decorator: ts.Decorator | null;
 }
 export interface NgModuleResolution {
     injectorImports: Expression[];

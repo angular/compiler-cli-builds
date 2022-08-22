@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-VN5BTTUY.js";
+} from "./chunk-CASCK5UN.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -5258,7 +5258,7 @@ function sourceSpanEqual(a, b) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
 var REGISTRY2 = new DomElementSchemaRegistry2();
 var TemplateTypeCheckerImpl = class {
-  constructor(originalProgram, programDriver, typeCheckAdapter, config, refEmitter, reflector, compilerHost, priorBuild, componentScopeReader, typeCheckScopeRegistry, perf) {
+  constructor(originalProgram, programDriver, typeCheckAdapter, config, refEmitter, reflector, compilerHost, priorBuild, metaReader, componentScopeReader, typeCheckScopeRegistry, perf) {
     this.originalProgram = originalProgram;
     this.programDriver = programDriver;
     this.typeCheckAdapter = typeCheckAdapter;
@@ -5267,6 +5267,7 @@ var TemplateTypeCheckerImpl = class {
     this.reflector = reflector;
     this.compilerHost = compilerHost;
     this.priorBuild = priorBuild;
+    this.metaReader = metaReader;
     this.componentScopeReader = componentScopeReader;
     this.typeCheckScopeRegistry = typeCheckScopeRegistry;
     this.perf = perf;
@@ -5651,6 +5652,26 @@ var TemplateTypeCheckerImpl = class {
   }
   getPotentialDomEvents(tagName) {
     return REGISTRY2.allKnownEventsOfElement(tagName);
+  }
+  getPrimaryAngularDecorator(target) {
+    this.ensureAllShimsForOneFile(target.getSourceFile());
+    if (!isNamedClassDeclaration(target)) {
+      return null;
+    }
+    const ref = new Reference(target);
+    const dirMeta = this.metaReader.getDirectiveMetadata(ref);
+    if (dirMeta !== null) {
+      return dirMeta.decorator;
+    }
+    const pipeMeta = this.metaReader.getPipeMetadata(ref);
+    if (pipeMeta !== null) {
+      return pipeMeta.decorator;
+    }
+    const ngModuleMeta = this.metaReader.getNgModuleMetadata(ref);
+    if (ngModuleMeta !== null) {
+      return ngModuleMeta.decorator;
+    }
+    return null;
   }
   getScopeData(component) {
     if (this.scopeCache.has(component)) {
@@ -6264,19 +6285,20 @@ function incrementalFromStateTicket(oldProgram, oldState, newProgram, options, i
 }
 var NgCompiler = class {
   constructor(adapter, options, inputProgram, programDriver, incrementalStrategy, incrementalCompilation, enableTemplateTypeChecker, usePoisonedData, livePerfRecorder) {
+    var _a;
     this.adapter = adapter;
     this.options = options;
     this.inputProgram = inputProgram;
     this.programDriver = programDriver;
     this.incrementalStrategy = incrementalStrategy;
     this.incrementalCompilation = incrementalCompilation;
-    this.enableTemplateTypeChecker = enableTemplateTypeChecker;
     this.usePoisonedData = usePoisonedData;
     this.livePerfRecorder = livePerfRecorder;
     this.compilation = null;
     this.constructionDiagnostics = [];
     this.nonTemplateDiagnostics = null;
     this.delegatingPerfRecorder = new DelegatingPerfRecorder(this.perfRecorder);
+    this.enableTemplateTypeChecker = enableTemplateTypeChecker || ((_a = options._enableTemplateTypeChecker) != null ? _a : false);
     this.constructionDiagnostics.push(...this.adapter.constructionDiagnostics, ...verifyCompatibleTypeCheckOptions(this.options));
     this.currentProgram = inputProgram;
     this.closureCompilerEnabled = !!this.options.annotateForClosureCompiler;
@@ -6723,7 +6745,7 @@ var NgCompiler = class {
       this.incrementalStrategy.setIncrementalState(this.incrementalCompilation.state, program);
       this.currentProgram = program;
     });
-    const templateTypeChecker = new TemplateTypeCheckerImpl(this.inputProgram, notifyingDriver, traitCompiler, this.getTypeCheckingConfig(), refEmitter, reflector, this.adapter, this.incrementalCompilation, scopeReader, typeCheckScopeRegistry, this.delegatingPerfRecorder);
+    const templateTypeChecker = new TemplateTypeCheckerImpl(this.inputProgram, notifyingDriver, traitCompiler, this.getTypeCheckingConfig(), refEmitter, reflector, this.adapter, this.incrementalCompilation, metaReader, scopeReader, typeCheckScopeRegistry, this.delegatingPerfRecorder);
     const extendedTemplateChecker = this.constructionDiagnostics.length === 0 ? new ExtendedTemplateCheckerImpl(templateTypeChecker, checker, ALL_DIAGNOSTIC_FACTORIES, this.options) : null;
     return {
       isCore,
@@ -7494,4 +7516,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-UAMSPVPZ.js.map
+//# sourceMappingURL=chunk-KPB2EKX6.js.map
