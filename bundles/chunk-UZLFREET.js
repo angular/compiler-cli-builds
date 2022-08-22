@@ -5,17 +5,19 @@
     
 import {
   TypeScriptReflectionHost
-} from "./chunk-TFREAQMZ.js";
+} from "./chunk-XDX5RDY5.js";
 import {
-  IS_AFTER_TS_48,
   combineModifiers,
+  createClassDeclaration,
+  createGetAccessorDeclaration,
+  createMethodDeclaration,
   createPropertyDeclaration,
+  createSetAccessorDeclaration,
   getDecorators,
   getModifiers,
-  updateClassDeclaration,
   updateConstructorDeclaration,
   updateParameterDeclaration
-} from "./chunk-BH5CCJUJ.js";
+} from "./chunk-7YHMCUJT.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/downlevel_decorators_transform/downlevel_decorators_transform.mjs
 import ts2 from "typescript";
@@ -224,10 +226,10 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
       if (isAliasImportDeclaration(decl)) {
         referencedParameterTypes.add(decl);
         if (decl.name !== void 0) {
-          return ts2.getMutableClone(decl.name);
+          return ts2.setOriginalNode(ts2.factory.createIdentifier(decl.name.text), decl.name);
         }
       }
-      return ts2.getMutableClone(name);
+      return ts2.setOriginalNode(ts2.factory.createIdentifier(name.text), name);
     }
     function transformClassElement(element) {
       element = ts2.visitEachChild(element, decoratorDownlevelVisitor, context);
@@ -255,14 +257,8 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         });
         return [void 0, element, []];
       }
-      const name = element.name.text;
-      const mutable = ts2.getMutableClone(element);
-      if (IS_AFTER_TS_48) {
-        mutable.modifiers = decoratorsToKeep.length ? ts2.setTextRange(ts2.factory.createNodeArray(combineModifiers(decoratorsToKeep, getModifiers(mutable))), mutable.modifiers) : void 0;
-      } else {
-        mutable.decorators = decoratorsToKeep.length ? ts2.setTextRange(ts2.factory.createNodeArray(decoratorsToKeep), mutable.decorators) : void 0;
-      }
-      return [name, mutable, toLower];
+      const modifiers = decoratorsToKeep.length ? ts2.setTextRange(ts2.factory.createNodeArray(combineModifiers(decoratorsToKeep, getModifiers(element))), element.modifiers) : getModifiers(element);
+      return [element.name.text, cloneClassElementWithModifiers(element, modifiers), toLower];
     }
     function transformConstructor(ctor) {
       ctor = ts2.visitEachChild(ctor, decoratorDownlevelVisitor, context);
@@ -292,7 +288,6 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
       return [updated, parametersInfo];
     }
     function transformClassDeclaration(classDecl) {
-      classDecl = ts2.getMutableClone(classDecl);
       const newMembers = [];
       const decoratedProperties = /* @__PURE__ */ new Map();
       let classParameters = null;
@@ -349,7 +344,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         newMembers.push(createPropDecoratorsClassProperty(diagnostics, decoratedProperties));
       }
       const members = ts2.setTextRange(ts2.factory.createNodeArray(newMembers, classDecl.members.hasTrailingComma), classDecl.members);
-      return updateClassDeclaration(classDecl, combineModifiers(decoratorsToKeep.size ? Array.from(decoratorsToKeep) : void 0, getModifiers(classDecl)), classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
+      return createClassDeclaration(combineModifiers(decoratorsToKeep.size ? Array.from(decoratorsToKeep) : void 0, getModifiers(classDecl)), classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
     }
     function decoratorDownlevelVisitor(node) {
       if (ts2.isClassDeclaration(node)) {
@@ -361,6 +356,21 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
       return ts2.visitEachChild(sf, decoratorDownlevelVisitor, context);
     };
   };
+}
+function cloneClassElementWithModifiers(node, modifiers) {
+  let clone;
+  if (ts2.isMethodDeclaration(node)) {
+    clone = createMethodDeclaration(modifiers, node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
+  } else if (ts2.isPropertyDeclaration(node)) {
+    clone = createPropertyDeclaration(modifiers, node.name, node.questionToken, node.type, node.initializer);
+  } else if (ts2.isGetAccessor(node)) {
+    clone = createGetAccessorDeclaration(modifiers, node.name, node.parameters, node.type, node.body);
+  } else if (ts2.isSetAccessor(node)) {
+    clone = createSetAccessorDeclaration(modifiers, node.name, node.parameters, node.body);
+  } else {
+    throw new Error(`Unsupported decorated member with kind ${ts2.SyntaxKind[node.kind]}`);
+  }
+  return ts2.setOriginalNode(clone, node);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/private/tooling.mjs
@@ -390,4 +400,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-OTSBWRQY.js.map
+//# sourceMappingURL=chunk-UZLFREET.js.map

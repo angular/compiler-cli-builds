@@ -7,8 +7,6 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/ts_compatibility/src/ts_cross_version_utils" />
 import ts from 'typescript';
-/** Whether the current TypeScript version is after 4.8. */
-export declare const IS_AFTER_TS_48: boolean;
 /** Equivalent of `ts.ModifierLike` which is only present in TS 4.8+. */
 export declare type ModifierLike = ts.Modifier | ts.Decorator;
 /** Type of `ts.factory.updateTypeParameterDeclaration` in TS 4.7+. */
@@ -47,6 +45,15 @@ declare type Ts48UpdateClassDeclarationFn = (node: ts.ClassDeclaration, modifier
  * We should remove it once we have dropped support for the older versions.
  */
 export declare const updateClassDeclaration: Ts48UpdateClassDeclarationFn;
+/** Type of `ts.factory.createClassDeclaration` in TS 4.8+. */
+declare type Ts48CreateClassDeclarationFn = (modifiers: readonly ModifierLike[] | undefined, name: ts.Identifier | undefined, typeParameters: readonly ts.TypeParameterDeclaration[] | undefined, heritageClauses: readonly ts.HeritageClause[] | undefined, members: readonly ts.ClassElement[]) => ts.ClassDeclaration;
+/**
+ * Creates a `ts.ClassDeclaration` declaration.
+ *
+ * TODO(crisbeto): this is a backwards-compatibility layer for versions of TypeScript less than 4.8.
+ * We should remove it once we have dropped support for the older versions.
+ */
+export declare const createClassDeclaration: Ts48CreateClassDeclarationFn;
 /** Type of `ts.factory.updateMethodDeclaration` in TS 4.8+. */
 declare type Ts48UpdateMethodDeclarationFn = (node: ts.MethodDeclaration, modifiers: readonly ModifierLike[] | undefined, asteriskToken: ts.AsteriskToken | undefined, name: ts.PropertyName, questionToken: ts.QuestionToken | undefined, typeParameters: readonly ts.TypeParameterDeclaration[] | undefined, parameters: readonly ts.ParameterDeclaration[], type: ts.TypeNode | undefined, body: ts.Block | undefined) => ts.MethodDeclaration;
 /**
@@ -56,6 +63,15 @@ declare type Ts48UpdateMethodDeclarationFn = (node: ts.MethodDeclaration, modifi
  * We should remove it once we have dropped support for the older versions.
  */
 export declare const updateMethodDeclaration: Ts48UpdateMethodDeclarationFn;
+/** Type of `ts.factory.createMethodDeclaration` in TS 4.8+. */
+declare type Ts48CreateMethodDeclarationFn = (modifiers: readonly ModifierLike[] | undefined, asteriskToken: ts.AsteriskToken | undefined, name: ts.PropertyName, questionToken: ts.QuestionToken | undefined, typeParameters: readonly ts.TypeParameterDeclaration[] | undefined, parameters: readonly ts.ParameterDeclaration[], type: ts.TypeNode | undefined, body: ts.Block | undefined) => ts.MethodDeclaration;
+/**
+ * Creates a `ts.MethodDeclaration` declaration.
+ *
+ * TODO(crisbeto): this is a backwards-compatibility layer for versions of TypeScript less than 4.8.
+ * We should remove it once we have dropped support for the older versions.
+ */
+export declare const createMethodDeclaration: Ts48CreateMethodDeclarationFn;
 /** Type of `ts.factory.updatePropertyDeclaration` in TS 4.8+. */
 declare type Ts48UpdatePropertyDeclarationFn = (node: ts.PropertyDeclaration, modifiers: readonly ModifierLike[] | undefined, name: string | ts.PropertyName, questionOrExclamationToken: ts.QuestionToken | ts.ExclamationToken | undefined, type: ts.TypeNode | undefined, initializer: ts.Expression | undefined) => ts.PropertyDeclaration;
 /**
@@ -83,6 +99,15 @@ declare type Ts48UpdateGetAccessorDeclarationFn = (node: ts.GetAccessorDeclarati
  * We should remove it once we have dropped support for the older versions.
  */
 export declare const updateGetAccessorDeclaration: Ts48UpdateGetAccessorDeclarationFn;
+/** Type of `ts.factory.createGetAccessorDeclaration` in TS 4.8+. */
+declare type Ts48CreateGetAccessorDeclarationFn = (modifiers: readonly ModifierLike[] | undefined, name: ts.PropertyName, parameters: readonly ts.ParameterDeclaration[], type: ts.TypeNode | undefined, body: ts.Block | undefined) => ts.GetAccessorDeclaration;
+/**
+ * Creates a `ts.GetAccessorDeclaration` declaration.
+ *
+ * TODO(crisbeto): this is a backwards-compatibility layer for versions of TypeScript less than 4.8.
+ * We should remove it once we have dropped support for the older versions.
+ */
+export declare const createGetAccessorDeclaration: Ts48CreateGetAccessorDeclarationFn;
 /** Type of `ts.factory.updateSetAccessorDeclaration` in TS 4.8+. */
 declare type Ts48UpdateSetAccessorDeclarationFn = (node: ts.SetAccessorDeclaration, modifiers: readonly ModifierLike[] | undefined, name: ts.PropertyName, parameters: readonly ts.ParameterDeclaration[], body: ts.Block | undefined) => ts.SetAccessorDeclaration;
 /**
@@ -92,6 +117,15 @@ declare type Ts48UpdateSetAccessorDeclarationFn = (node: ts.SetAccessorDeclarati
  * We should remove it once we have dropped support for the older versions.
  */
 export declare const updateSetAccessorDeclaration: Ts48UpdateSetAccessorDeclarationFn;
+/** Type of `ts.factory.createSetAccessorDeclaration` in TS 4.8+. */
+declare type Ts48CreateSetAccessorDeclarationFn = (modifiers: readonly ModifierLike[] | undefined, name: ts.PropertyName, parameters: readonly ts.ParameterDeclaration[], body: ts.Block | undefined) => ts.SetAccessorDeclaration;
+/**
+ * Creates a `ts.GetAccessorDeclaration` declaration.
+ *
+ * TODO(crisbeto): this is a backwards-compatibility layer for versions of TypeScript less than 4.8.
+ * We should remove it once we have dropped support for the older versions.
+ */
+export declare const createSetAccessorDeclaration: Ts48CreateSetAccessorDeclarationFn;
 /** Type of `ts.factory.updateConstructorDeclaration` in TS 4.8+. */
 declare type Ts48UpdateConstructorDeclarationFn = (node: ts.ConstructorDeclaration, modifiers: readonly ts.Modifier[] | undefined, parameters: readonly ts.ParameterDeclaration[], body: ts.Block | undefined) => ts.ConstructorDeclaration;
 /**

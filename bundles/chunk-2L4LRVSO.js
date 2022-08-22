@@ -30,11 +30,11 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-CASCK5UN.js";
+} from "./chunk-2VBPNPMZ.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-TFREAQMZ.js";
+} from "./chunk-XDX5RDY5.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -73,13 +73,13 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-Q4CRY2QL.js";
+} from "./chunk-WAZH2LJQ.js";
 import {
   getDecorators,
   getModifiers,
   updateImportDeclaration,
   updateTypeParameterDeclaration
-} from "./chunk-BH5CCJUJ.js";
+} from "./chunk-7YHMCUJT.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -2491,7 +2491,20 @@ var TypeEmitter = class {
         if (ts16.isTypeReferenceNode(node)) {
           return this.emitTypeReference(node);
         } else if (ts16.isLiteralExpression(node)) {
-          const clone = ts16.getMutableClone(node);
+          let clone;
+          if (ts16.isStringLiteral(node)) {
+            clone = ts16.factory.createStringLiteral(node.text);
+          } else if (ts16.isNumericLiteral(node)) {
+            clone = ts16.factory.createNumericLiteral(node.text);
+          } else if (ts16.isBigIntLiteral(node)) {
+            clone = ts16.factory.createBigIntLiteral(node.text);
+          } else if (ts16.isNoSubstitutionTemplateLiteral(node)) {
+            clone = ts16.factory.createNoSubstitutionTemplateLiteral(node.text, node.rawText);
+          } else if (ts16.isRegularExpressionLiteral(node)) {
+            clone = ts16.factory.createRegularExpressionLiteral(node.text);
+          } else {
+            throw new Error(`Unsupported literal kind ${ts16.SyntaxKind[node.kind]}`);
+          }
           ts16.setTextRange(clone, { pos: -1, end: -1 });
           return clone;
         } else {
@@ -4043,9 +4056,17 @@ var Scope = class {
   resolve(node, directive) {
     const res = this.resolveLocal(node, directive);
     if (res !== null) {
-      const clone = ts25.getMutableClone(res);
-      ts25.setSyntheticTrailingComments(clone, []);
-      return clone;
+      let clone;
+      if (ts25.isIdentifier(res)) {
+        clone = ts25.factory.createIdentifier(res.text);
+      } else if (ts25.isNonNullExpression(res)) {
+        clone = ts25.factory.createNonNullExpression(res.expression);
+      } else {
+        throw new Error(`Could not resolve ${node} to an Identifier or a NonNullExpression`);
+      }
+      ts25.setOriginalNode(clone, res);
+      clone.parent = clone.parent;
+      return ts25.setSyntheticTrailingComments(clone, []);
     } else if (this.parent !== null) {
       return this.parent.resolve(node, directive);
     } else {
@@ -7516,4 +7537,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-KPB2EKX6.js.map
+//# sourceMappingURL=chunk-2L4LRVSO.js.map
