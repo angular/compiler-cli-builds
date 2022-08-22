@@ -9,7 +9,7 @@
 import { SchemaMetadata, SelectorMatcher } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
-import { DirectiveMeta, MetadataReader } from '../../metadata';
+import { DirectiveMeta, HostDirectivesResolver, MetadataReader } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 import { ComponentScopeReader } from './api';
 /**
@@ -20,7 +20,7 @@ export interface TypeCheckScope {
      * A `SelectorMatcher` instance that contains the flattened directive metadata of all directives
      * that are in the compilation scope of the declaring NgModule.
      */
-    matcher: SelectorMatcher<DirectiveMeta>;
+    matcher: SelectorMatcher<DirectiveMeta[]>;
     /**
      * All of the directives available in the compilation scope of the declaring NgModule.
      */
@@ -45,6 +45,7 @@ export interface TypeCheckScope {
 export declare class TypeCheckScopeRegistry {
     private scopeReader;
     private metaReader;
+    private hostDirectivesResolver;
     /**
      * Cache of flattened directive metadata. Because flattened metadata is scope-invariant it's
      * cached individually, such that all scopes refer to the same flattened metadata.
@@ -54,7 +55,7 @@ export declare class TypeCheckScopeRegistry {
      * Cache of the computed type check scope per NgModule declaration.
      */
     private scopeCache;
-    constructor(scopeReader: ComponentScopeReader, metaReader: MetadataReader);
+    constructor(scopeReader: ComponentScopeReader, metaReader: MetadataReader, hostDirectivesResolver: HostDirectivesResolver);
     /**
      * Computes the type-check scope information for the component declaration. If the NgModule
      * contains an error, then 'error' is returned. If the component is not declared in any NgModule,

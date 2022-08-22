@@ -8,7 +8,7 @@ import {
   ImportGraph,
   isShim,
   readConfiguration
-} from "./chunk-NXPKS4U5.js";
+} from "./chunk-E4OVVZKS.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -18,6 +18,7 @@ import {
   DtsMetadataReader,
   DtsTransformRegistry,
   HandlerFlags,
+  HostDirectivesResolver,
   InjectableClassRegistry,
   InjectableDecoratorHandler,
   LocalMetadataRegistry,
@@ -32,7 +33,7 @@ import {
   TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-2VBPNPMZ.js";
+} from "./chunk-6HT5M2ZS.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -72,7 +73,7 @@ import {
   translateStatement,
   translateType,
   validateAndRewriteCoreSymbol
-} from "./chunk-WAZH2LJQ.js";
+} from "./chunk-FPF3B646.js";
 import {
   getModifiers
 } from "./chunk-7YHMCUJT.js";
@@ -3346,10 +3347,11 @@ var DecorationAnalyzer = class {
     this.importGraph = new ImportGraph(this.typeChecker, NOOP_PERF_RECORDER);
     this.cycleAnalyzer = new CycleAnalyzer(this.importGraph);
     this.injectableRegistry = new InjectableClassRegistry(this.reflectionHost);
-    this.typeCheckScopeRegistry = new TypeCheckScopeRegistry(this.scopeRegistry, this.fullMetaReader);
+    this.hostDirectivesResolver = new HostDirectivesResolver(this.fullMetaReader);
+    this.typeCheckScopeRegistry = new TypeCheckScopeRegistry(this.scopeRegistry, this.fullMetaReader, this.hostDirectivesResolver);
     this.handlers = [
-      new ComponentDecoratorHandler(this.reflectionHost, this.evaluator, this.fullRegistry, this.fullMetaReader, this.scopeRegistry, this.dtsModuleScopeResolver, this.scopeRegistry, this.typeCheckScopeRegistry, new ResourceRegistry(), this.isCore, this.resourceManager, this.rootDirs, !!this.compilerOptions.preserveWhitespaces, true, this.bundle.enableI18nLegacyMessageIdFormat, false, false, this.moduleResolver, this.cycleAnalyzer, 0, this.refEmitter, NOOP_DEPENDENCY_TRACKER, this.injectableRegistry, null, !!this.compilerOptions.annotateForClosureCompiler, NOOP_PERF_RECORDER),
-      new DirectiveDecoratorHandler(this.reflectionHost, this.evaluator, this.fullRegistry, this.scopeRegistry, this.fullMetaReader, this.injectableRegistry, this.isCore, null, !!this.compilerOptions.annotateForClosureCompiler, true, NOOP_PERF_RECORDER),
+      new ComponentDecoratorHandler(this.reflectionHost, this.evaluator, this.fullRegistry, this.fullMetaReader, this.scopeRegistry, this.dtsModuleScopeResolver, this.scopeRegistry, this.typeCheckScopeRegistry, new ResourceRegistry(), this.isCore, this.resourceManager, this.rootDirs, !!this.compilerOptions.preserveWhitespaces, true, this.bundle.enableI18nLegacyMessageIdFormat, false, false, this.moduleResolver, this.cycleAnalyzer, 0, this.refEmitter, NOOP_DEPENDENCY_TRACKER, this.injectableRegistry, null, !!this.compilerOptions.annotateForClosureCompiler, NOOP_PERF_RECORDER, this.hostDirectivesResolver),
+      new DirectiveDecoratorHandler(this.reflectionHost, this.evaluator, this.fullRegistry, this.scopeRegistry, this.fullMetaReader, this.injectableRegistry, this.refEmitter, this.isCore, null, !!this.compilerOptions.annotateForClosureCompiler, true, NOOP_PERF_RECORDER),
       new PipeDecoratorHandler(this.reflectionHost, this.evaluator, this.metaRegistry, this.scopeRegistry, this.injectableRegistry, this.isCore, NOOP_PERF_RECORDER),
       new InjectableDecoratorHandler(this.reflectionHost, this.isCore, false, this.injectableRegistry, NOOP_PERF_RECORDER, false),
       new NgModuleDecoratorHandler(this.reflectionHost, this.evaluator, this.fullMetaReader, this.fullRegistry, this.scopeRegistry, this.referencesRegistry, this.isCore, this.refEmitter, null, !!this.compilerOptions.annotateForClosureCompiler, false, this.injectableRegistry, NOOP_PERF_RECORDER)
@@ -5186,4 +5188,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-MVTWT6ZE.js.map
+//# sourceMappingURL=chunk-MQ5TXBJZ.js.map

@@ -8,7 +8,8 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/directive/src/shared" />
 import { ParsedHostBindings, R3DirectiveMetadata, R3QueryMetadata } from '@angular/compiler';
 import ts from 'typescript';
-import { ClassPropertyMapping } from '../../../metadata';
+import { ReferenceEmitter } from '../../../imports';
+import { ClassPropertyMapping, HostDirectiveMeta } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../../reflection';
 import { HandlerFlags } from '../../../transform';
@@ -18,12 +19,14 @@ import { HandlerFlags } from '../../../transform';
  * appear in the declarations of an `NgModule` and additional verification is done when processing
  * the module.
  */
-export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator | null>, reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean, flags: HandlerFlags, annotateForClosureCompiler: boolean, defaultSelector?: string | null): {
+export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator | null>, reflector: ReflectionHost, evaluator: PartialEvaluator, refEmitter: ReferenceEmitter, isCore: boolean, flags: HandlerFlags, annotateForClosureCompiler: boolean, defaultSelector?: string | null): {
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;
     inputs: ClassPropertyMapping;
     outputs: ClassPropertyMapping;
     isStructural: boolean;
+    hostDirectives: HostDirectiveMeta[] | null;
+    rawHostDirectives: ts.Expression | null;
 } | undefined;
 export declare function extractQueryMetadata(exprNode: ts.Node, name: string, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, evaluator: PartialEvaluator): R3QueryMetadata;
 export declare function extractHostBindings(members: ClassMember[], evaluator: PartialEvaluator, coreModule: string | undefined, metadata?: Map<string, ts.Expression>): ParsedHostBindings;

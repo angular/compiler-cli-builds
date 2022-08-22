@@ -8,9 +8,9 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/directive/src/handler" />
 import { ConstantPool, R3ClassMetadata, R3DirectiveMetadata } from '@angular/compiler';
 import ts from 'typescript';
-import { Reference } from '../../../imports';
+import { Reference, ReferenceEmitter } from '../../../imports';
 import { SemanticDepGraphUpdater } from '../../../incremental/semantic_graph';
-import { ClassPropertyMapping, DirectiveTypeCheckMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../../metadata';
+import { ClassPropertyMapping, DirectiveTypeCheckMeta, HostDirectiveMeta, InjectableClassRegistry, MetadataReader, MetadataRegistry } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { PerfRecorder } from '../../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
@@ -28,6 +28,8 @@ export interface DirectiveHandlerData {
     isPoisoned: boolean;
     isStructural: boolean;
     decorator: ts.Decorator | null;
+    hostDirectives: HostDirectiveMeta[] | null;
+    rawHostDirectives: ts.Expression | null;
 }
 export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decorator | null, DirectiveHandlerData, DirectiveSymbol, unknown> {
     private reflector;
@@ -36,12 +38,13 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     private scopeRegistry;
     private metaReader;
     private injectableRegistry;
+    private refEmitter;
     private isCore;
     private semanticDepGraphUpdater;
     private annotateForClosureCompiler;
     private compileUndecoratedClassesWithAngularFeatures;
     private perf;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, isCore: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, compileUndecoratedClassesWithAngularFeatures: boolean, perf: PerfRecorder);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, refEmitter: ReferenceEmitter, isCore: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, compileUndecoratedClassesWithAngularFeatures: boolean, perf: PerfRecorder);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;

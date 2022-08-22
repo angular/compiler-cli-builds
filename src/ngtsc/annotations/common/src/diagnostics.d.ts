@@ -9,7 +9,7 @@
 import ts from 'typescript';
 import { FatalDiagnosticError } from '../../../diagnostics';
 import { Reference } from '../../../imports';
-import { InjectableClassRegistry, MetadataReader } from '../../../metadata';
+import { HostDirectiveMeta, InjectableClassRegistry, MetadataReader } from '../../../metadata';
 import { PartialEvaluator, ResolvedValue } from '../../../partial_evaluator';
 import { ClassDeclaration, ReflectionHost } from '../../../reflection';
 import { DeclarationData, LocalModuleScopeRegistry } from '../../../scope';
@@ -40,5 +40,6 @@ export declare function createValueHasWrongTypeError(node: ts.Node, value: Resol
  */
 export declare function getProviderDiagnostics(providerClasses: Set<Reference<ClassDeclaration>>, providersDeclaration: ts.Expression, registry: InjectableClassRegistry): ts.Diagnostic[];
 export declare function getDirectiveDiagnostics(node: ClassDeclaration, reader: MetadataReader, evaluator: PartialEvaluator, reflector: ReflectionHost, scopeRegistry: LocalModuleScopeRegistry, kind: string): ts.Diagnostic[] | null;
+export declare function validateHostDirectives(origin: ts.Expression, hostDirectives: HostDirectiveMeta[], metaReader: MetadataReader): ts.DiagnosticWithLocation[];
 export declare function getUndecoratedClassWithAngularFeaturesDiagnostic(node: ClassDeclaration): ts.Diagnostic;
 export declare function checkInheritanceOfDirective(node: ClassDeclaration, reader: MetadataReader, reflector: ReflectionHost, evaluator: PartialEvaluator): ts.Diagnostic | null;

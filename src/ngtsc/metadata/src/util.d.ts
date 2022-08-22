@@ -12,10 +12,11 @@ import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { DirectiveMeta, DirectiveTypeCheckMeta, MetadataReader, NgModuleMeta, PipeMeta } from './api';
 import { ClassPropertyMapping } from './property_mapping';
 export declare function extractReferencesFromType(checker: ts.TypeChecker, def: ts.TypeNode, bestGuessOwningModule: OwningModule | null): Reference<ClassDeclaration>[];
+export declare function extraReferenceFromTypeQuery(checker: ts.TypeChecker, typeNode: ts.TypeQueryNode, origin: ts.TypeNode, bestGuessOwningModule: OwningModule | null): Reference<ClassDeclaration<ts.ClassDeclaration>>;
 export declare function readBooleanType(type: ts.TypeNode): boolean | null;
 export declare function readStringType(type: ts.TypeNode): string | null;
-export declare function readStringMapType(type: ts.TypeNode): {
-    [key: string]: string;
+export declare function readMapType<T>(type: ts.TypeNode, valueTransform: (type: ts.TypeNode) => T | null): {
+    [key: string]: T;
 };
 export declare function readStringArrayType(type: ts.TypeNode): string[];
 /**

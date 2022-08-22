@@ -13,6 +13,7 @@ import {
   DirectiveDecoratorHandler,
   DtsMetadataReader,
   DtsTransformRegistry,
+  HostDirectivesResolver,
   InjectableClassRegistry,
   InjectableDecoratorHandler,
   LocalMetadataRegistry,
@@ -30,7 +31,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-2VBPNPMZ.js";
+} from "./chunk-6HT5M2ZS.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -73,7 +74,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-WAZH2LJQ.js";
+} from "./chunk-FPF3B646.js";
 import {
   getDecorators,
   getModifiers,
@@ -6754,7 +6755,8 @@ var NgCompiler = class {
     const semanticDepGraphUpdater = this.incrementalCompilation.semanticDepGraphUpdater;
     const metaRegistry = new CompoundMetadataRegistry([localMetaRegistry, ngModuleScopeRegistry]);
     const injectableRegistry = new InjectableClassRegistry(reflector);
-    const typeCheckScopeRegistry = new TypeCheckScopeRegistry(scopeReader, metaReader);
+    const hostDirectivesResolver = new HostDirectivesResolver(metaReader);
+    const typeCheckScopeRegistry = new TypeCheckScopeRegistry(scopeReader, metaReader, hostDirectivesResolver);
     let referencesRegistry;
     let exportReferenceGraph = null;
     if (this.entryPoint !== null) {
@@ -6769,8 +6771,8 @@ var NgCompiler = class {
     const compilationMode = this.options.compilationMode === "partial" && !isCore ? CompilationMode.PARTIAL : CompilationMode.FULL;
     const cycleHandlingStrategy = compilationMode === CompilationMode.FULL ? 0 : 1;
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder),
-      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, isCore, semanticDepGraphUpdater, this.closureCompilerEnabled, false, this.delegatingPerfRecorder),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver),
+      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, isCore, semanticDepGraphUpdater, this.closureCompilerEnabled, false, this.delegatingPerfRecorder),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder),
       new InjectableDecoratorHandler(reflector, isCore, this.options.strictInjectionParameters || false, injectableRegistry, this.delegatingPerfRecorder),
       new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, isCore, refEmitter, this.adapter.factoryTracker, this.closureCompilerEnabled, (_a = this.options.onlyPublishPublicTypingsForNgModules) != null ? _a : false, injectableRegistry, this.delegatingPerfRecorder)
@@ -7551,4 +7553,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-NXPKS4U5.js.map
+//# sourceMappingURL=chunk-E4OVVZKS.js.map

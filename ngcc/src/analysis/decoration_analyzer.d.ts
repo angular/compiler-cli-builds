@@ -6,7 +6,7 @@ import { CycleAnalyzer, ImportGraph } from '../../../src/ngtsc/cycles';
 import { ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
 import { ModuleResolver, PrivateExportAliasingHost, ReferenceEmitter } from '../../../src/ngtsc/imports';
 import { SemanticSymbol } from '../../../src/ngtsc/incremental/semantic_graph';
-import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, InjectableClassRegistry, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
+import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, HostDirectivesResolver, InjectableClassRegistry, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
 import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver, TypeCheckScopeRegistry } from '../../../src/ngtsc/scope';
 import { DecoratorHandler } from '../../../src/ngtsc/transform';
@@ -60,6 +60,7 @@ export declare class DecorationAnalyzer {
     importGraph: ImportGraph;
     cycleAnalyzer: CycleAnalyzer;
     injectableRegistry: InjectableClassRegistry;
+    hostDirectivesResolver: HostDirectivesResolver;
     typeCheckScopeRegistry: TypeCheckScopeRegistry;
     handlers: DecoratorHandler<unknown, unknown, SemanticSymbol | null, unknown>[];
     compiler: NgccTraitCompiler;

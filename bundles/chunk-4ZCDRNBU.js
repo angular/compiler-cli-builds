@@ -9,7 +9,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-WAZH2LJQ.js";
+} from "./chunk-FPF3B646.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.mjs
 var FatalLinkerError = class extends Error {
@@ -350,7 +350,8 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl) {
     },
     name: typeName,
     usesInheritance: metaObj.has("usesInheritance") ? metaObj.getBoolean("usesInheritance") : false,
-    isStandalone: metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : false
+    isStandalone: metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : false,
+    hostDirectives: metaObj.has("hostDirectives") ? toHostDirectivesMetadata(metaObj.getValue("hostDirectives")) : null
   };
 }
 function toInputMapping(value) {
@@ -404,6 +405,27 @@ function toQueryMetadata(obj) {
     read: obj.has("read") ? obj.getOpaque("read") : null,
     static: obj.has("static") ? obj.getBoolean("static") : false
   };
+}
+function toHostDirectivesMetadata(hostDirectives) {
+  return hostDirectives.getArray().map((hostDirective) => {
+    const hostObject = hostDirective.getObject();
+    const type = extractForwardRef(hostObject.getValue("directive"));
+    const meta = {
+      directive: wrapReference(type.expression),
+      isForwardReference: type.forwardRef !== 0,
+      inputs: hostObject.has("inputs") ? getHostDirectiveBindingMapping(hostObject.getArray("inputs")) : null,
+      outputs: hostObject.has("outputs") ? getHostDirectiveBindingMapping(hostObject.getArray("outputs")) : null
+    };
+    return meta;
+  });
+}
+function getHostDirectiveBindingMapping(array) {
+  let result = null;
+  for (let i = 1; i < array.length; i += 2) {
+    result = result || {};
+    result[array[i - 1].getString()] = array[i].getString();
+  }
+  return result;
 }
 function createSourceSpan(range, code, sourceUrl) {
   const sourceFile = new ParseSourceFile(code, sourceUrl);
@@ -827,7 +849,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "14.3.0-next.0+sha-b6fbbea");
+  const LATEST_VERSION_RANGE = getRange("<=", "14.3.0-next.0+sha-54ceed5");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -874,7 +896,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "14.3.0-next.0+sha-b6fbbea") {
+    if (version === "14.3.0-next.0+sha-54ceed5") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -1005,4 +1027,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-L2QFSPXM.js.map
+//# sourceMappingURL=chunk-4ZCDRNBU.js.map

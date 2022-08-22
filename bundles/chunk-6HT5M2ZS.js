@@ -33,7 +33,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-WAZH2LJQ.js";
+} from "./chunk-FPF3B646.js";
 import {
   combineModifiers,
   createPropertyDeclaration,
@@ -1525,6 +1525,23 @@ function getDirectiveDiagnostics(node, reader, evaluator, reflector, scopeRegist
   addDiagnostics(checkInheritanceOfDirective(node, reader, reflector, evaluator));
   return diagnostics;
 }
+function validateHostDirectives(origin, hostDirectives, metaReader) {
+  const diagnostics = [];
+  for (const current of hostDirectives) {
+    const hostMeta = metaReader.getDirectiveMetadata(current.directive);
+    if (hostMeta === null) {
+      diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_INVALID, current.directive.getOriginForDiagnostics(origin), `${current.directive.debugName} must be a standalone directive to be used as a host directive`));
+      continue;
+    }
+    if (!hostMeta.isStandalone) {
+      diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_NOT_STANDALONE, current.directive.getOriginForDiagnostics(origin), `Host directive ${hostMeta.name} must be standalone`));
+    }
+    if (hostMeta.isComponent) {
+      diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_COMPONENT, current.directive.getOriginForDiagnostics(origin), `Host directive ${hostMeta.name} cannot be a component`));
+    }
+  }
+  return diagnostics;
+}
 function getUndecoratedClassWithAngularFeaturesDiagnostic(node) {
   return makeDiagnostic(ErrorCode.UNDECORATED_CLASS_USING_ANGULAR_FEATURES, node.name, `Class is using Angular features but is not decorated. Please add an explicit Angular decorator.`);
 }
@@ -1969,6 +1986,11 @@ var MetaKind;
   MetaKind2[MetaKind2["Pipe"] = 1] = "Pipe";
   MetaKind2[MetaKind2["NgModule"] = 2] = "NgModule";
 })(MetaKind || (MetaKind = {}));
+var MatchSource;
+(function(MatchSource2) {
+  MatchSource2[MatchSource2["Selector"] = 0] = "Selector";
+  MatchSource2[MatchSource2["HostDirective"] = 1] = "HostDirective";
+})(MatchSource || (MatchSource = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/dts.mjs
 import ts11 from "typescript";
@@ -2059,17 +2081,19 @@ function extractReferencesFromType(checker, def, bestGuessOwningModule) {
     if (!ts10.isTypeQueryNode(element)) {
       throw new Error(`Expected TypeQueryNode: ${nodeDebugInfo(element)}`);
     }
-    const type = element.exprName;
-    const { node, from } = reflectTypeEntityToDeclaration(type, checker);
-    if (!isNamedClassDeclaration(node)) {
-      throw new Error(`Expected named ClassDeclaration: ${nodeDebugInfo(node)}`);
-    }
-    if (from !== null && !from.startsWith(".")) {
-      return new Reference(node, { specifier: from, resolutionContext: def.getSourceFile().fileName });
-    } else {
-      return new Reference(node, bestGuessOwningModule);
-    }
+    return extraReferenceFromTypeQuery(checker, element, def, bestGuessOwningModule);
   });
+}
+function extraReferenceFromTypeQuery(checker, typeNode, origin, bestGuessOwningModule) {
+  const type = typeNode.exprName;
+  const { node, from } = reflectTypeEntityToDeclaration(type, checker);
+  if (!isNamedClassDeclaration(node)) {
+    throw new Error(`Expected named ClassDeclaration: ${nodeDebugInfo(node)}`);
+  }
+  if (from !== null && !from.startsWith(".")) {
+    return new Reference(node, { specifier: from, resolutionContext: origin.getSourceFile().fileName });
+  }
+  return new Reference(node, bestGuessOwningModule);
 }
 function readBooleanType(type) {
   if (!ts10.isLiteralTypeNode(type)) {
@@ -2090,16 +2114,16 @@ function readStringType(type) {
   }
   return type.literal.text;
 }
-function readStringMapType(type) {
+function readMapType(type, valueTransform) {
   if (!ts10.isTypeLiteralNode(type)) {
     return {};
   }
   const obj = {};
   type.members.forEach((member) => {
-    if (!ts10.isPropertySignature(member) || member.type === void 0 || member.name === void 0 || !ts10.isStringLiteral(member.name)) {
+    if (!ts10.isPropertySignature(member) || member.type === void 0 || member.name === void 0 || !ts10.isStringLiteral(member.name) && !ts10.isIdentifier(member.name)) {
       return;
     }
-    const value = readStringType(member.type);
+    const value = valueTransform(member.type);
     if (value === null) {
       return null;
     }
@@ -2272,10 +2296,12 @@ var DtsMetadataReader = class {
       return param.typeValueReference.kind === 1 && param.typeValueReference.moduleName === "@angular/core" && param.typeValueReference.importedName === "TemplateRef";
     });
     const isStandalone = def.type.typeArguments.length > 7 && ((_a = readBooleanType(def.type.typeArguments[7])) != null ? _a : false);
-    const inputs = ClassPropertyMapping.fromMappedObject(readStringMapType(def.type.typeArguments[3]));
-    const outputs = ClassPropertyMapping.fromMappedObject(readStringMapType(def.type.typeArguments[4]));
+    const inputs = ClassPropertyMapping.fromMappedObject(readMapType(def.type.typeArguments[3], readStringType));
+    const outputs = ClassPropertyMapping.fromMappedObject(readMapType(def.type.typeArguments[4], readStringType));
+    const hostDirectives = def.type.typeArguments.length > 8 ? readHostDirectivesType(this.checker, def.type.typeArguments[8], ref.bestGuessOwningModule) : null;
     return {
       kind: MetaKind.Directive,
+      matchSource: MatchSource.Selector,
       ref,
       name: clazz.name.text,
       isComponent,
@@ -2283,6 +2309,7 @@ var DtsMetadataReader = class {
       exportAs: readStringArrayType(def.type.typeArguments[2]),
       inputs,
       outputs,
+      hostDirectives,
       queries: readStringArrayType(def.type.typeArguments[5]),
       ...extractDirectiveTypeCheckMeta(clazz, inputs, this.reflector),
       baseClass: readBaseClass2(clazz, this.checker, this.reflector),
@@ -2342,6 +2369,27 @@ function readBaseClass2(clazz, checker, reflector) {
     }
   }
   return null;
+}
+function readHostDirectivesType(checker, type, bestGuessOwningModule) {
+  if (!ts11.isTupleTypeNode(type) || type.elements.length === 0) {
+    return null;
+  }
+  const result = [];
+  for (const hostDirectiveType of type.elements) {
+    const { directive, inputs, outputs } = readMapType(hostDirectiveType, (type2) => type2);
+    if (directive) {
+      if (!ts11.isTypeQueryNode(directive)) {
+        throw new Error(`Expected TypeQueryNode: ${nodeDebugInfo(directive)}`);
+      }
+      result.push({
+        directive: extraReferenceFromTypeQuery(checker, directive, type, bestGuessOwningModule),
+        isForwardReference: false,
+        inputs: readMapType(inputs, readStringType),
+        outputs: readMapType(outputs, readStringType)
+      });
+    }
+  }
+  return result.length > 0 ? result : null;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/inheritance.mjs
@@ -2523,6 +2571,57 @@ var ResourceRegistry = class {
       return /* @__PURE__ */ new Set();
     }
     return this.externalStyleToComponentsMap.get(styleUrl);
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/host_directives_resolver.mjs
+var EMPTY_ARRAY = [];
+var HostDirectivesResolver = class {
+  constructor(metaReader) {
+    this.metaReader = metaReader;
+    this.cache = /* @__PURE__ */ new Map();
+  }
+  resolve(metadata) {
+    if (this.cache.has(metadata.ref.node)) {
+      return this.cache.get(metadata.ref.node);
+    }
+    const results = metadata.hostDirectives && metadata.hostDirectives.length > 0 ? this.walkHostDirectives(metadata.hostDirectives, []) : EMPTY_ARRAY;
+    this.cache.set(metadata.ref.node, results);
+    return results;
+  }
+  walkHostDirectives(directives, results) {
+    for (const current of directives) {
+      const hostMeta = flattenInheritedDirectiveMetadata(this.metaReader, current.directive);
+      if (hostMeta === null) {
+        throw new Error(`Could not resolve host directive metadata of ${current.directive.debugName}`);
+      }
+      if (hostMeta.hostDirectives) {
+        this.walkHostDirectives(hostMeta.hostDirectives, results);
+      }
+      results.push({
+        ...hostMeta,
+        matchSource: MatchSource.HostDirective,
+        inputs: this.filterMappings(hostMeta.inputs, current.inputs),
+        outputs: this.filterMappings(hostMeta.outputs, current.outputs)
+      });
+    }
+    return results;
+  }
+  filterMappings(source, allowedProperties) {
+    const result = {};
+    if (allowedProperties !== null) {
+      for (const publicName in allowedProperties) {
+        if (allowedProperties.hasOwnProperty(publicName)) {
+          const bindings = source.getByBindingPropertyName(publicName);
+          if (bindings !== null) {
+            for (const binding of bindings) {
+              result[binding.classPropertyName] = allowedProperties[publicName];
+            }
+          }
+        }
+      }
+    }
+    return ClassPropertyMapping.fromMappedObject(result);
   }
 };
 
@@ -3004,9 +3103,10 @@ function reexportCollision(module, refA, refB) {
 import { CssSelector, SelectorMatcher } from "@angular/compiler";
 import ts13 from "typescript";
 var TypeCheckScopeRegistry = class {
-  constructor(scopeReader, metaReader) {
+  constructor(scopeReader, metaReader, hostDirectivesResolver) {
     this.scopeReader = scopeReader;
     this.metaReader = metaReader;
+    this.hostDirectivesResolver = hostDirectivesResolver;
     this.flattenedDirectiveMetaCache = /* @__PURE__ */ new Map();
     this.scopeCache = /* @__PURE__ */ new Map();
   }
@@ -3032,7 +3132,7 @@ var TypeCheckScopeRegistry = class {
     for (const meta of dependencies) {
       if (meta.kind === MetaKind.Directive && meta.selector !== null) {
         const extMeta = this.getTypeCheckDirectiveMetadata(meta.ref);
-        matcher.addSelectables(CssSelector.parse(meta.selector), extMeta);
+        matcher.addSelectables(CssSelector.parse(meta.selector), [...this.hostDirectivesResolver.resolve(extMeta), extMeta]);
         directives.push(extMeta);
       } else if (meta.kind === MetaKind.Pipe) {
         if (!ts13.isClassDeclaration(meta.ref.node)) {
@@ -4022,7 +4122,7 @@ var QUERY_TYPES = /* @__PURE__ */ new Set([
   "ViewChild",
   "ViewChildren"
 ]);
-function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, isCore, flags, annotateForClosureCompiler, defaultSelector = null) {
+function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmitter, isCore, flags, annotateForClosureCompiler, defaultSelector = null) {
   let directive;
   if (decorator === null || decorator.args === null || decorator.args.length === 0) {
     directive = /* @__PURE__ */ new Map();
@@ -4093,10 +4193,13 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, isCore
     isStandalone = resolved;
   }
   const usesInheritance = reflector.hasBaseClass(clazz);
+  const sourceFile = clazz.getSourceFile();
   const type = wrapTypeReference(reflector, clazz);
   const internalType = new WrappedNodeExpr4(reflector.getInternalNameOfClass(clazz));
   const inputs = ClassPropertyMapping.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
   const outputs = ClassPropertyMapping.fromMappedObject({ ...outputsFromMeta, ...outputsFromFields });
+  const rawHostDirectives = directive.get("hostDirectives") || null;
+  const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator);
   const metadata = {
     name: clazz.name.text,
     deps: ctorDeps,
@@ -4117,14 +4220,17 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, isCore
     usesInheritance,
     exportAs,
     providers,
-    isStandalone
+    isStandalone,
+    hostDirectives: (hostDirectives == null ? void 0 : hostDirectives.map((hostDir) => toHostDirectiveMetadata(hostDir, sourceFile, refEmitter))) || null
   };
   return {
     decorator: directive,
     metadata,
     inputs,
     outputs,
-    isStructural
+    isStructural,
+    hostDirectives,
+    rawHostDirectives
   };
 }
 function extractQueryMetadata(exprNode, name, args, propertyName, reflector, evaluator) {
@@ -4313,12 +4419,15 @@ function isPropertyTypeMember(member) {
 }
 function parseFieldToPropertyMapping(directive, field, evaluator) {
   const metaValues = parseFieldArrayValue(directive, field, evaluator);
-  if (!metaValues) {
-    return EMPTY_OBJECT;
-  }
-  return metaValues.reduce((results, value) => {
-    const [field2, property] = value.split(":", 2).map((str) => str.trim());
-    results[field2] = property || field2;
+  return metaValues ? parseInputOutputMappingArray(metaValues) : EMPTY_OBJECT;
+}
+function parseInputOutputMappingArray(values) {
+  return values.reduce((results, value) => {
+    if (typeof value !== "string") {
+      throw new Error("Mapping value must be a string");
+    }
+    const [field, property] = value.split(":", 2).map((str) => str.trim());
+    results[field] = property || field;
     return results;
   }, {});
 }
@@ -4374,6 +4483,46 @@ function evaluateHostExpressionBindings(hostExpr, evaluator) {
     throw new FatalDiagnosticError(ErrorCode.HOST_BINDING_PARSE_ERROR, hostExpr, errors.map((error) => error.msg).join("\n"));
   }
   return bindings;
+}
+function extractHostDirectives(rawHostDirectives, evaluator) {
+  const resolved = evaluator.evaluate(rawHostDirectives, forwardRefResolver);
+  if (!Array.isArray(resolved)) {
+    throw createValueHasWrongTypeError(rawHostDirectives, resolved, "hostDirectives must be an array");
+  }
+  return resolved.map((value) => {
+    const hostReference = value instanceof Map ? value.get("directive") : value;
+    if (!(hostReference instanceof Reference)) {
+      throw createValueHasWrongTypeError(rawHostDirectives, hostReference, "Host directive must be a reference");
+    }
+    if (!isNamedClassDeclaration(hostReference.node)) {
+      throw createValueHasWrongTypeError(rawHostDirectives, hostReference, "Host directive reference must be a class");
+    }
+    const meta = {
+      directive: hostReference,
+      isForwardReference: hostReference.synthetic,
+      inputs: parseHostDirectivesMapping("inputs", value, hostReference.node, rawHostDirectives),
+      outputs: parseHostDirectivesMapping("outputs", value, hostReference.node, rawHostDirectives)
+    };
+    return meta;
+  });
+}
+function parseHostDirectivesMapping(field, resolvedValue, classReference, sourceExpression) {
+  if (resolvedValue instanceof Map && resolvedValue.has(field)) {
+    const nameForErrors = `@Directive.hostDirectives.${classReference.name.text}.${field}`;
+    const rawInputs = resolvedValue.get(field);
+    if (isStringArrayOrDie(rawInputs, nameForErrors, sourceExpression)) {
+      return parseInputOutputMappingArray(rawInputs);
+    }
+  }
+  return null;
+}
+function toHostDirectiveMetadata(hostDirective, context, refEmitter) {
+  return {
+    directive: toR3Reference(hostDirective.directive.node, hostDirective.directive, hostDirective.directive, context, context, refEmitter),
+    isForwardReference: hostDirective.isForwardReference,
+    inputs: hostDirective.inputs || null,
+    outputs: hostDirective.outputs || null
+  };
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/symbol.mjs
@@ -4475,13 +4624,14 @@ var LIFECYCLE_HOOKS = /* @__PURE__ */ new Set([
   "ngAfterContentChecked"
 ]);
 var DirectiveDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, isCore, semanticDepGraphUpdater, annotateForClosureCompiler, compileUndecoratedClassesWithAngularFeatures, perf) {
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, isCore, semanticDepGraphUpdater, annotateForClosureCompiler, compileUndecoratedClassesWithAngularFeatures, perf) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
     this.scopeRegistry = scopeRegistry;
     this.metaReader = metaReader;
     this.injectableRegistry = injectableRegistry;
+    this.refEmitter = refEmitter;
     this.isCore = isCore;
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
     this.annotateForClosureCompiler = annotateForClosureCompiler;
@@ -4508,7 +4658,7 @@ var DirectiveDecoratorHandler = class {
       return { diagnostics: [getUndecoratedClassWithAngularFeaturesDiagnostic(node)] };
     }
     this.perf.eventCount(PerfEvent.AnalyzeDirective);
-    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.evaluator, this.isCore, flags, this.annotateForClosureCompiler);
+    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.evaluator, this.refEmitter, this.isCore, flags, this.annotateForClosureCompiler);
     if (directiveResult === void 0) {
       return {};
     }
@@ -4522,6 +4672,8 @@ var DirectiveDecoratorHandler = class {
         inputs: directiveResult.inputs,
         outputs: directiveResult.outputs,
         meta: analysis,
+        hostDirectives: directiveResult.hostDirectives,
+        rawHostDirectives: directiveResult.rawHostDirectives,
         classMetadata: extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler),
         baseClass: readBaseClass(node, this.reflector, this.evaluator),
         typeCheckMeta: extractDirectiveTypeCheckMeta(node, directiveResult.inputs, this.reflector),
@@ -4540,6 +4692,7 @@ var DirectiveDecoratorHandler = class {
     const ref = new Reference(node);
     this.metaRegistry.registerDirectiveMetadata({
       kind: MetaKind.Directive,
+      matchSource: MatchSource.Selector,
       ref,
       name: node.name.text,
       selector: analysis.meta.selector,
@@ -4549,6 +4702,7 @@ var DirectiveDecoratorHandler = class {
       queries: analysis.meta.queries.map((query) => query.propertyName),
       isComponent: false,
       baseClass: analysis.baseClass,
+      hostDirectives: analysis.hostDirectives,
       ...analysis.typeCheckMeta,
       isPoisoned: analysis.isPoisoned,
       isStructural: analysis.isStructural,
@@ -4572,6 +4726,10 @@ var DirectiveDecoratorHandler = class {
     const directiveDiagnostics = getDirectiveDiagnostics(node, this.metaReader, this.evaluator, this.reflector, this.scopeRegistry, "Directive");
     if (directiveDiagnostics !== null) {
       diagnostics.push(...directiveDiagnostics);
+    }
+    const hostDirectivesDiagnotics = analysis.hostDirectives && analysis.rawHostDirectives ? validateHostDirectives(analysis.rawHostDirectives, analysis.hostDirectives, this.metaReader) : null;
+    if (hostDirectivesDiagnotics !== null) {
+      diagnostics.push(...hostDirectivesDiagnotics);
     }
     return { diagnostics: diagnostics.length > 0 ? diagnostics : void 0 };
   }
@@ -5614,9 +5772,9 @@ function isLikelyModuleWithProviders(value) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
-var EMPTY_ARRAY = [];
+var EMPTY_ARRAY2 = [];
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -5643,6 +5801,7 @@ var ComponentDecoratorHandler = class {
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
     this.annotateForClosureCompiler = annotateForClosureCompiler;
     this.perf = perf;
+    this.hostDirectivesResolver = hostDirectivesResolver;
     this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
@@ -5718,11 +5877,11 @@ var ComponentDecoratorHandler = class {
     this.literalCache.delete(decorator);
     let diagnostics;
     let isPoisoned = false;
-    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.evaluator, this.isCore, flags, this.annotateForClosureCompiler, this.elementSchemaRegistry.getDefaultComponentElementName());
+    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.evaluator, this.refEmitter, this.isCore, flags, this.annotateForClosureCompiler, this.elementSchemaRegistry.getDefaultComponentElementName());
     if (directiveResult === void 0) {
       return {};
     }
-    const { decorator: component, metadata, inputs, outputs } = directiveResult;
+    const { decorator: component, metadata, inputs, outputs, hostDirectives, rawHostDirectives } = directiveResult;
     const encapsulation = (_a = resolveEnumValue(this.evaluator, component, "encapsulation", "ViewEncapsulation")) != null ? _a : ViewEncapsulation.Emulated;
     const changeDetection = resolveEnumValue(this.evaluator, component, "changeDetection", "ChangeDetectionStrategy");
     let animations = null;
@@ -5865,6 +6024,8 @@ var ComponentDecoratorHandler = class {
         baseClass: readBaseClass(node, this.reflector, this.evaluator),
         inputs,
         outputs,
+        hostDirectives,
+        rawHostDirectives,
         meta: {
           ...metadata,
           template: {
@@ -5912,6 +6073,7 @@ var ComponentDecoratorHandler = class {
     const ref = new Reference(node);
     this.metaRegistry.registerDirectiveMetadata({
       kind: MetaKind.Directive,
+      matchSource: MatchSource.Selector,
       ref,
       name: node.name.text,
       selector: analysis.meta.selector,
@@ -5921,6 +6083,7 @@ var ComponentDecoratorHandler = class {
       queries: analysis.meta.queries.map((query) => query.propertyName),
       isComponent: true,
       baseClass: analysis.baseClass,
+      hostDirectives: analysis.hostDirectives,
       ...analysis.typeCheckMeta,
       isPoisoned: analysis.isPoisoned,
       isStructural: false,
@@ -5947,7 +6110,7 @@ var ComponentDecoratorHandler = class {
       }
       for (const dep of dependencies) {
         if (dep.kind === MetaKind.Directive && dep.selector !== null) {
-          matcher.addSelectables(CssSelector2.parse(dep.selector), dep);
+          matcher.addSelectables(CssSelector2.parse(dep.selector), [...this.hostDirectivesResolver.resolve(dep), dep]);
         }
       }
     }
@@ -5990,7 +6153,7 @@ var ComponentDecoratorHandler = class {
     const context = getSourceFile(node);
     const metadata = analysis.meta;
     const data = {
-      declarations: EMPTY_ARRAY,
+      declarations: EMPTY_ARRAY2,
       declarationListEmitMode: 0
     };
     const diagnostics = [];
@@ -6001,7 +6164,7 @@ var ComponentDecoratorHandler = class {
       const dependencies = scope.kind === ComponentScopeKind.NgModule ? scope.compilation.dependencies : scope.dependencies;
       for (const dep of dependencies) {
         if (dep.kind === MetaKind.Directive && dep.selector !== null) {
-          matcher.addSelectables(CssSelector2.parse(dep.selector), dep);
+          matcher.addSelectables(CssSelector2.parse(dep.selector), [dep]);
         } else if (dep.kind === MetaKind.Pipe) {
           pipes.set(dep.name, dep);
         }
@@ -6027,7 +6190,7 @@ var ComponentDecoratorHandler = class {
         seen.add(dep.ref.node);
         switch (dep.kind) {
           case MetaKind.Directive:
-            if (!used.has(dep.ref.node)) {
+            if (!used.has(dep.ref.node) || dep.matchSource !== MatchSource.Selector) {
               continue;
             }
             const dirType = this.refEmitter.emit(dep.ref, context);
@@ -6141,6 +6304,10 @@ var ComponentDecoratorHandler = class {
     const directiveDiagnostics = getDirectiveDiagnostics(node, this.metaReader, this.evaluator, this.reflector, this.scopeRegistry, "Component");
     if (directiveDiagnostics !== null) {
       diagnostics.push(...directiveDiagnostics);
+    }
+    const hostDirectivesDiagnotics = analysis.hostDirectives && analysis.rawHostDirectives ? validateHostDirectives(analysis.rawHostDirectives, analysis.hostDirectives, this.metaReader) : null;
+    if (hostDirectivesDiagnotics !== null) {
+      diagnostics.push(...hostDirectivesDiagnotics);
     }
     if (diagnostics.length > 0) {
       return { diagnostics };
@@ -6604,6 +6771,7 @@ export {
   CompoundMetadataRegistry,
   InjectableClassRegistry,
   ResourceRegistry,
+  HostDirectivesResolver,
   ComponentScopeKind,
   CompoundComponentScopeReader,
   MetadataDtsModuleScopeResolver,
@@ -6623,6 +6791,13 @@ export {
   InjectableDecoratorHandler,
   PipeDecoratorHandler
 };
+/*!
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -6630,4 +6805,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2VBPNPMZ.js.map
+//# sourceMappingURL=chunk-6HT5M2ZS.js.map
