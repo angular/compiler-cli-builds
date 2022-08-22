@@ -126,6 +126,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     }[];
     getPotentialDomEvents(tagName: string): string[];
     getPrimaryAngularDecorator(target: ts.ClassDeclaration): ts.Decorator | null;
+    getOwningNgModule(component: ts.ClassDeclaration): ts.ClassDeclaration | null;
     private getScopeData;
 }
 /**

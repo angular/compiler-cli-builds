@@ -5694,6 +5694,20 @@ var TemplateTypeCheckerImpl = class {
     }
     return null;
   }
+  getOwningNgModule(component) {
+    if (!isNamedClassDeclaration(component)) {
+      return null;
+    }
+    const dirMeta = this.metaReader.getDirectiveMetadata(new Reference(component));
+    if (dirMeta !== null && dirMeta.isStandalone) {
+      return null;
+    }
+    const scope = this.componentScopeReader.getScopeForComponent(component);
+    if (scope === null || scope.kind !== ComponentScopeKind.NgModule || !isNamedClassDeclaration(scope.ngModule)) {
+      return null;
+    }
+    return scope.ngModule;
+  }
   getScopeData(component) {
     if (this.scopeCache.has(component)) {
       return this.scopeCache.get(component);
@@ -7537,4 +7551,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-2L4LRVSO.js.map
+//# sourceMappingURL=chunk-NXPKS4U5.js.map
