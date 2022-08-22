@@ -56,5 +56,6 @@ export interface ComponentAnalysisData {
     rawImports: ts.Expression | null;
     resolvedImports: Reference<ClassDeclaration>[] | null;
     schemas: SchemaMetadata[] | null;
+    decorator: ts.Decorator | null;
 }
 export declare type ComponentResolutionData = Pick<R3ComponentMetadata<R3TemplateDependencyMetadata>, ComponentMetadataResolvedFields>;

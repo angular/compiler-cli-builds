@@ -19,6 +19,7 @@ export interface PipeHandlerData {
     meta: R3PipeMetadata;
     classMetadata: R3ClassMetadata | null;
     pipeNameExpr: ts.Expression;
+    decorator: ts.Decorator | null;
 }
 /**
  * Represents an Angular pipe.
