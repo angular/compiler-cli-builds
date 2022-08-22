@@ -100,7 +100,6 @@ export declare class NgCompiler {
     readonly programDriver: ProgramDriver;
     readonly incrementalStrategy: IncrementalBuildStrategy;
     readonly incrementalCompilation: IncrementalCompilation;
-    readonly enableTemplateTypeChecker: boolean;
     readonly usePoisonedData: boolean;
     private livePerfRecorder;
     /**
@@ -130,6 +129,7 @@ export declare class NgCompiler {
     private cycleAnalyzer;
     readonly ignoreForDiagnostics: Set<ts.SourceFile>;
     readonly ignoreForEmit: Set<ts.SourceFile>;
+    readonly enableTemplateTypeChecker: boolean;
     /**
      * `NgCompiler` can be reused for multiple compilations (for resource-only changes), and each
      * new compilation uses a fresh `PerfRecorder`. Thus, classes created with a lifespan of the

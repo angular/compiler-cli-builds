@@ -2240,7 +2240,8 @@ var DtsMetadataReader = class {
       schemas: [],
       rawDeclarations: null,
       rawImports: null,
-      rawExports: null
+      rawExports: null,
+      decorator: null
     };
   }
   getDirectiveMetadata(ref) {
@@ -2277,7 +2278,8 @@ var DtsMetadataReader = class {
       animationTriggerNames: null,
       isStandalone,
       imports: null,
-      schemas: null
+      schemas: null,
+      decorator: null
     };
   }
   getPipeMetadata(ref) {
@@ -2299,7 +2301,8 @@ var DtsMetadataReader = class {
       ref,
       name,
       nameExpr: null,
-      isStandalone
+      isStandalone,
+      decorator: null
     };
   }
 };
@@ -4478,6 +4481,7 @@ var DirectiveDecoratorHandler = class {
     }
   }
   analyze(node, decorator, flags = HandlerFlags.NONE) {
+    var _a;
     if (this.compileUndecoratedClassesWithAngularFeatures === false && decorator === null) {
       if (this.isCore) {
         return {};
@@ -4504,7 +4508,8 @@ var DirectiveDecoratorHandler = class {
         typeCheckMeta: extractDirectiveTypeCheckMeta(node, directiveResult.inputs, this.reflector),
         providersRequiringFactory,
         isPoisoned: false,
-        isStructural: directiveResult.isStructural
+        isStructural: directiveResult.isStructural,
+        decorator: (_a = decorator == null ? void 0 : decorator.node) != null ? _a : null
       }
     };
   }
@@ -4531,7 +4536,8 @@ var DirectiveDecoratorHandler = class {
       animationTriggerNames: null,
       isStandalone: analysis.meta.isStandalone,
       imports: null,
-      schemas: null
+      schemas: null,
+      decorator: analysis.decorator
     });
     this.injectableRegistry.registerInjectable(node);
   }
@@ -4725,6 +4731,7 @@ var NgModuleDecoratorHandler = class {
     }
   }
   analyze(node, decorator) {
+    var _a;
     this.perf.eventCount(PerfEvent.AnalyzeNgModule);
     const name = node.name.text;
     if (decorator.args === null || decorator.args.length > 1) {
@@ -4903,7 +4910,8 @@ var NgModuleDecoratorHandler = class {
         providersRequiringFactory: rawProviders ? resolveProvidersRequiringFactory(rawProviders, this.reflector, this.evaluator) : null,
         classMetadata: extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler),
         factorySymbolName: node.name.text,
-        remoteScopesMayRequireCycleProtection
+        remoteScopesMayRequireCycleProtection,
+        decorator: (_a = decorator == null ? void 0 : decorator.node) != null ? _a : null
       }
     };
   }
@@ -4920,7 +4928,8 @@ var NgModuleDecoratorHandler = class {
       exports: analysis.exports,
       rawDeclarations: analysis.rawDeclarations,
       rawImports: analysis.rawImports,
-      rawExports: analysis.rawExports
+      rawExports: analysis.rawExports,
+      decorator: analysis.decorator
     });
     if (this.factoryTracker !== null) {
       this.factoryTracker.track(node.getSourceFile(), {
@@ -5684,7 +5693,7 @@ var ComponentDecoratorHandler = class {
     ]).then(() => void 0);
   }
   analyze(node, decorator, flags = HandlerFlags.NONE) {
-    var _a, _b;
+    var _a, _b, _c;
     this.perf.eventCount(PerfEvent.AnalyzeComponent);
     const containingFile = node.getSourceFile().fileName;
     this.literalCache.delete(decorator);
@@ -5866,7 +5875,8 @@ var ComponentDecoratorHandler = class {
         animationTriggerNames,
         rawImports,
         resolvedImports,
-        schemas
+        schemas,
+        decorator: (_c = decorator == null ? void 0 : decorator.node) != null ? _c : null
       },
       diagnostics
     };
@@ -5898,7 +5908,8 @@ var ComponentDecoratorHandler = class {
       isStandalone: analysis.meta.isStandalone,
       imports: analysis.resolvedImports,
       animationTriggerNames: analysis.animationTriggerNames,
-      schemas: analysis.schemas
+      schemas: analysis.schemas,
+      decorator: analysis.decorator
     });
     this.resourceRegistry.registerResources(analysis.resources, node);
     this.injectableRegistry.registerInjectable(node);
@@ -6461,6 +6472,7 @@ var PipeDecoratorHandler = class {
     }
   }
   analyze(clazz, decorator) {
+    var _a;
     this.perf.eventCount(PerfEvent.AnalyzePipe);
     const name = clazz.name.text;
     const type = wrapTypeReference(this.reflector, clazz);
@@ -6515,7 +6527,8 @@ var PipeDecoratorHandler = class {
           isStandalone
         },
         classMetadata: extractClassMetadata(clazz, this.reflector, this.isCore),
-        pipeNameExpr
+        pipeNameExpr,
+        decorator: (_a = decorator == null ? void 0 : decorator.node) != null ? _a : null
       }
     };
   }
@@ -6529,7 +6542,8 @@ var PipeDecoratorHandler = class {
       ref,
       name: analysis.meta.pipeName,
       nameExpr: analysis.pipeNameExpr,
-      isStandalone: analysis.meta.isStandalone
+      isStandalone: analysis.meta.isStandalone,
+      decorator: analysis.decorator
     });
     this.injectableRegistry.registerInjectable(node);
   }
@@ -6597,4 +6611,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-X2UHASWN.js.map
+//# sourceMappingURL=chunk-Q5OSUARV.js.map

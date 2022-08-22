@@ -42,6 +42,12 @@ export interface NgModuleMeta {
      * because the module came from a .d.ts file).
      */
     rawExports: ts.Expression | null;
+    /**
+     * The primary decorator associated with this `ngModule`.
+     *
+     * If this is `null`, no decorator exists, meaning it's probably from a .d.ts file.
+     */
+    decorator: ts.Decorator | null;
 }
 /**
  * Typing metadata collected for a directive within an NgModule's scope.
@@ -137,6 +143,12 @@ export interface DirectiveMeta extends T2DirectiveMeta, DirectiveTypeCheckMeta {
      * For standalone components, the list of schemas declared.
      */
     schemas: SchemaMetadata[] | null;
+    /**
+     * The primary decorator associated with this directive.
+     *
+     * If this is `null`, no decorator exists, meaning it's probably from a .d.ts file.
+     */
+    decorator: ts.Decorator | null;
 }
 /**
  * Metadata that describes a template guard for one of the directive's inputs.
@@ -164,6 +176,7 @@ export interface PipeMeta {
     name: string;
     nameExpr: ts.Expression | null;
     isStandalone: boolean;
+    decorator: ts.Decorator | null;
 }
 /**
  * Reads metadata for directives, pipes, and modules from a particular source, such as .d.ts files

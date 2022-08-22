@@ -12,6 +12,7 @@ import { ErrorCode } from '../../diagnostics';
 import { AbsoluteFsPath } from '../../file_system';
 import { ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
+import { MetadataReader } from '../../metadata';
 import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ReflectionHost } from '../../reflection';
@@ -33,6 +34,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private reflector;
     private compilerHost;
     private priorBuild;
+    private readonly metaReader;
     private readonly componentScopeReader;
     private readonly typeCheckScopeRegistry;
     private readonly perf;
@@ -71,7 +73,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
      */
     private elementTagCache;
     private isComplete;
-    constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
+    constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, metaReader: MetadataReader, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
     getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
     private getLatestComponentState;
     isTrackedTypeCheckFile(filePath: AbsoluteFsPath): boolean;
@@ -123,6 +125,8 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
         property: string;
     }[];
     getPotentialDomEvents(tagName: string): string[];
+    getPrimaryAngularDecorator(target: ts.ClassDeclaration): ts.Decorator | null;
+    getOwningNgModule(component: ts.ClassDeclaration): ts.ClassDeclaration | null;
     private getScopeData;
 }
 /**
