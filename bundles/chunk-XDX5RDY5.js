@@ -6,7 +6,7 @@
 import {
   getDecorators,
   getModifiers
-} from "./chunk-BH5CCJUJ.js";
+} from "./chunk-7YHMCUJT.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/typescript.mjs
 import ts4 from "typescript";
@@ -198,7 +198,9 @@ function entityNameToValue(node) {
     const left = entityNameToValue(node.left);
     return left !== null ? ts2.factory.createPropertyAccessExpression(left, node.right) : null;
   } else if (ts2.isIdentifier(node)) {
-    return ts2.getMutableClone(node);
+    const clone = ts2.setOriginalNode(ts2.factory.createIdentifier(node.text), node);
+    clone.parent = node.parent;
+    return clone;
   } else {
     return null;
   }
@@ -683,4 +685,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TFREAQMZ.js.map
+//# sourceMappingURL=chunk-XDX5RDY5.js.map

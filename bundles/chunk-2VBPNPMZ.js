@@ -13,7 +13,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-TFREAQMZ.js";
+} from "./chunk-XDX5RDY5.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -33,7 +33,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-Q4CRY2QL.js";
+} from "./chunk-WAZH2LJQ.js";
 import {
   combineModifiers,
   createPropertyDeclaration,
@@ -46,7 +46,7 @@ import {
   updateParameterDeclaration,
   updatePropertyDeclaration,
   updateSetAccessorDeclaration
-} from "./chunk-BH5CCJUJ.js";
+} from "./chunk-7YHMCUJT.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -1670,12 +1670,11 @@ function decoratorToMetadata(decorator, wrapFunctionsInParens) {
     throw new Error("Illegal state: synthesized decorator cannot be emitted in class metadata.");
   }
   const properties = [
-    ts7.factory.createPropertyAssignment("type", ts7.getMutableClone(decorator.identifier))
+    ts7.factory.createPropertyAssignment("type", decorator.identifier)
   ];
   if (decorator.args !== null && decorator.args.length > 0) {
     const args = decorator.args.map((arg) => {
-      const expr = ts7.getMutableClone(arg);
-      return wrapFunctionsInParens ? wrapFunctionExpressionsInParens(expr) : expr;
+      return wrapFunctionsInParens ? wrapFunctionExpressionsInParens(arg) : arg;
     });
     properties.push(ts7.factory.createPropertyAssignment("args", ts7.factory.createArrayLiteralExpression(args)));
   }
@@ -3792,7 +3791,7 @@ var Visitor = class {
     } else {
       visitedNode = this.visitOtherNode(node);
     }
-    if (hasStatements(visitedNode)) {
+    if (ts18.isBlock(visitedNode) || ts18.isSourceFile(visitedNode)) {
       visitedNode = this._maybeProcessStatements(visitedNode);
     }
     return visitedNode;
@@ -3801,9 +3800,8 @@ var Visitor = class {
     if (node.statements.every((stmt) => !this._before.has(stmt) && !this._after.has(stmt))) {
       return node;
     }
-    const clone = ts18.getMutableClone(node);
     const newStatements = [];
-    clone.statements.forEach((stmt) => {
+    node.statements.forEach((stmt) => {
       if (this._before.has(stmt)) {
         newStatements.push(...this._before.get(stmt));
         this._before.delete(stmt);
@@ -3814,14 +3812,14 @@ var Visitor = class {
         this._after.delete(stmt);
       }
     });
-    clone.statements = ts18.factory.createNodeArray(newStatements, node.statements.hasTrailingComma);
-    return clone;
+    const statementsArray = ts18.factory.createNodeArray(newStatements, node.statements.hasTrailingComma);
+    if (ts18.isBlock(node)) {
+      return ts18.factory.updateBlock(node, statementsArray);
+    } else {
+      return ts18.factory.updateSourceFile(node, statementsArray, node.isDeclarationFile, node.referencedFiles, node.typeReferenceDirectives, node.hasNoDefaultLib, node.libReferenceDirectives);
+    }
   }
 };
-function hasStatements(node) {
-  const block = node;
-  return block.statements !== void 0 && Array.isArray(block.statements);
-}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/transform.mjs
 var NO_DECORATORS = /* @__PURE__ */ new Set();
@@ -6632,4 +6630,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CASCK5UN.js.map
+//# sourceMappingURL=chunk-2VBPNPMZ.js.map

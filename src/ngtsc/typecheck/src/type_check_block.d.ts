@@ -231,7 +231,7 @@ declare class Scope {
      * @param directive if present, a directive type on a `TmplAstElement` or `TmplAstTemplate` to
      * look up instead of the default for an element or template node.
      */
-    resolve(node: TmplAstElement | TmplAstTemplate | TmplAstVariable | TmplAstReference, directive?: TypeCheckableDirectiveMeta): ts.Expression;
+    resolve(node: TmplAstElement | TmplAstTemplate | TmplAstVariable | TmplAstReference, directive?: TypeCheckableDirectiveMeta): ts.Identifier | ts.NonNullExpression;
     /**
      * Add a statement to this scope.
      */
