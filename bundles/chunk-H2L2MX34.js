@@ -6,7 +6,6 @@
 import {
   DEFAULT_ERROR_CODE,
   EmitFlags,
-  GENERATED_FILES,
   SOURCE,
   createCompilerHost,
   createMessageDiagnostic,
@@ -14,7 +13,7 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-E4OVVZKS.js";
+} from "./chunk-ZK5AXUNL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.mjs
 import ts2 from "typescript";
@@ -272,7 +271,7 @@ function createEmitCallback(options, tsickle) {
     throw Error("Tsickle is not provided but `annotateForClosureCompiler` is enabled.");
   }
   const tsickleHost = {
-    shouldSkipTsickleProcessing: (fileName) => /\.d\.ts$/.test(fileName) || !options.enableIvy && GENERATED_FILES.test(fileName),
+    shouldSkipTsickleProcessing: (fileName) => fileName.endsWith(".d.ts"),
     pathToModuleName: (context, importPath) => "",
     shouldIgnoreWarningsForPath: (filePath) => false,
     fileNameToModuleId: (fileName) => fileName,
@@ -377,4 +376,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-HPZCIG4P.js.map
+//# sourceMappingURL=chunk-H2L2MX34.js.map

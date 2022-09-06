@@ -7,7 +7,6 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/transformers/util" />
 import ts from 'typescript';
-export declare const GENERATED_FILES: RegExp;
 export declare function error(msg: string): never;
 export declare function createMessageDiagnostic(messageText: string): ts.Diagnostic;
 /**

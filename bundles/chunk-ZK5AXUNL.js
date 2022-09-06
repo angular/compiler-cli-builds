@@ -7325,7 +7325,6 @@ import ts36 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/util.mjs
 import ts35 from "typescript";
-var GENERATED_FILES = /(.*?)\.(ngfactory|shim\.ngstyle|ngstyle|ngsummary)\.(js|d\.ts|ts)$/;
 function createMessageDiagnostic(messageText) {
   return {
     file: void 0,
@@ -7360,7 +7359,7 @@ function calcProjectFileAndBasePath(project, host = getFileSystem()) {
   return { projectFile, basePath };
 }
 function readConfiguration(project, existingOptions, host = getFileSystem()) {
-  var _a, _b;
+  var _a;
   try {
     const fs = getFileSystem();
     const readConfigFile = (configFile) => ts36.readConfigFile(configFile, (file) => host.readFile(host.resolve(file)));
@@ -7398,7 +7397,6 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
     };
     const parseConfigHost = createParseConfigHost(host, fs);
     const { options, errors, fileNames: rootNames, projectReferences } = ts36.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingCompilerOptions, configFileName);
-    options.enableIvy = !!((_a = options.enableIvy) != null ? _a : true);
     let emitFlags = EmitFlags.Default;
     if (!(options.skipMetadataEmit || options.flatModuleOutFile)) {
       emitFlags |= EmitFlags.Metadata;
@@ -7410,7 +7408,7 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
   } catch (e) {
     const errors = [{
       category: ts36.DiagnosticCategory.Error,
-      messageText: (_b = e.stack) != null ? _b : e.message,
+      messageText: (_a = e.stack) != null ? _a : e.message,
       file: void 0,
       start: void 0,
       length: void 0,
@@ -7536,7 +7534,6 @@ export {
   NgCompilerHost,
   NgtscProgram,
   createProgram,
-  GENERATED_FILES,
   createMessageDiagnostic,
   formatDiagnostics,
   calcProjectFileAndBasePath,
@@ -7553,4 +7550,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-E4OVVZKS.js.map
+//# sourceMappingURL=chunk-ZK5AXUNL.js.map
