@@ -3852,6 +3852,7 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
     return false;
   }
   execute() {
+    var _a;
     if (this.checkElement) {
       this.tcb.domSchemaChecker.checkElement(this.tcb.id, this.element, this.tcb.schemas, this.tcb.hostIsStandalone);
     }
@@ -3861,7 +3862,7 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
       }
       if (binding.type === 0) {
         if (binding.name !== "style" && binding.name !== "class") {
-          const propertyName = ATTR_TO_PROP[binding.name] || binding.name;
+          const propertyName = (_a = ATTR_TO_PROP.get(binding.name)) != null ? _a : binding.name;
           this.tcb.domSchemaChecker.checkProperty(this.tcb.id, this.element, propertyName, binding.sourceSpan, this.tcb.schemas, this.tcb.hostIsStandalone);
         }
       }
@@ -3869,14 +3870,14 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
     return null;
   }
 };
-var ATTR_TO_PROP = {
+var ATTR_TO_PROP = new Map(Object.entries({
   "class": "className",
   "for": "htmlFor",
   "formaction": "formAction",
   "innerHtml": "innerHTML",
   "readonly": "readOnly",
   "tabindex": "tabIndex"
-};
+}));
 var TcbUnclaimedInputsOp = class extends TcbOp {
   constructor(tcb, scope, element, claimedInputs) {
     super();
@@ -3889,6 +3890,7 @@ var TcbUnclaimedInputsOp = class extends TcbOp {
     return false;
   }
   execute() {
+    var _a;
     let elId = null;
     for (const binding of this.element.inputs) {
       if (binding.type === 0 && this.claimedInputs.has(binding.name)) {
@@ -3900,7 +3902,7 @@ var TcbUnclaimedInputsOp = class extends TcbOp {
           if (elId === null) {
             elId = this.scope.resolve(this.element);
           }
-          const propertyName = ATTR_TO_PROP[binding.name] || binding.name;
+          const propertyName = (_a = ATTR_TO_PROP.get(binding.name)) != null ? _a : binding.name;
           const prop = ts25.factory.createElementAccessExpression(elId, ts25.factory.createStringLiteral(propertyName));
           const stmt = ts25.factory.createBinaryExpression(prop, ts25.SyntaxKind.EqualsToken, wrapForDiagnostics(expr));
           addParseSpanInfo(stmt, binding.sourceSpan);
@@ -7579,4 +7581,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-FX7WUAPN.js.map
+//# sourceMappingURL=chunk-NJU6754X.js.map
