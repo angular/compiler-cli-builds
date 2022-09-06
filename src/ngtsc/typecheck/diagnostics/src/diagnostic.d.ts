@@ -18,4 +18,8 @@ export declare function makeTemplateDiagnostic(templateId: TemplateId, mapping: 
     end: number;
     sourceFile: ts.SourceFile;
 }[]): TemplateDiagnostic;
+export declare function setParseTemplateAsSourceFileForTest(fn: typeof parseTemplateAsSourceFile): void;
+export declare function resetParseTemplateAsSourceFileForTest(): void;
+declare function parseTemplateAsSourceFile(fileName: string, template: string): ts.SourceFile;
 export declare function isTemplateDiagnostic(diagnostic: ts.Diagnostic): diagnostic is TemplateDiagnostic;
+export {};

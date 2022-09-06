@@ -315,6 +315,17 @@ function makeRelatedInformation(node, messageText) {
     messageText
   };
 }
+function addDiagnosticChain(messageText, add) {
+  if (typeof messageText === "string") {
+    return makeDiagnosticChain(messageText, add);
+  }
+  if (messageText.next === void 0) {
+    messageText.next = add;
+  } else {
+    messageText.next.push(...add);
+  }
+  return messageText;
+}
 function isFatalDiagnosticError(err) {
   return err._isFatalDiagnosticError === true;
 }
@@ -1403,7 +1414,9 @@ export {
   ngErrorCode,
   FatalDiagnosticError,
   makeDiagnostic,
+  makeDiagnosticChain,
   makeRelatedInformation,
+  addDiagnosticChain,
   isFatalDiagnosticError,
   ERROR_DETAILS_PAGE_BASE_URL,
   ExtendedTemplateDiagnosticName,
@@ -1456,4 +1469,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FPF3B646.js.map
+//# sourceMappingURL=chunk-TF2TR2WS.js.map

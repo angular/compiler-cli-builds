@@ -31,7 +31,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-6HT5M2ZS.js";
+} from "./chunk-I6QQYDN3.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -57,6 +57,7 @@ import {
   RelativePathStrategy,
   UnifiedModulesAliasingHost,
   UnifiedModulesStrategy,
+  addDiagnosticChain,
   assertSuccessfulReferenceEmit,
   getRootDirs,
   getSourceFileOrNull,
@@ -66,6 +67,7 @@ import {
   isNonDeclarationTsPath,
   isSymbolWithValueDeclaration,
   makeDiagnostic,
+  makeDiagnosticChain,
   makeRelatedInformation,
   ngErrorCode,
   normalizeSeparators,
@@ -74,7 +76,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-FPF3B646.js";
+} from "./chunk-TF2TR2WS.js";
 import {
   getDecorators,
   getModifiers,
@@ -1970,6 +1972,7 @@ import { CssSelector, DomElementSchemaRegistry as DomElementSchemaRegistry2 } fr
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.mjs
 import ts11 from "typescript";
 function makeTemplateDiagnostic(templateId, mapping, span, category, code, messageText, relatedMessages) {
+  var _a;
   if (mapping.type === "direct") {
     let relatedInformation = void 0;
     if (relatedMessages !== void 0) {
@@ -2001,7 +2004,6 @@ function makeTemplateDiagnostic(templateId, mapping, span, category, code, messa
     const componentSf = mapping.componentClass.getSourceFile();
     const componentName = mapping.componentClass.name.text;
     const fileName = mapping.type === "indirect" ? `${componentSf.fileName} (${componentName} template)` : mapping.templateUrl;
-    const sf = ts11.createSourceFile(fileName, mapping.template, ts11.ScriptTarget.Latest, false, ts11.ScriptKind.JSX);
     let relatedInformation = [];
     if (relatedMessages !== void 0) {
       for (const relatedMessage of relatedMessages) {
@@ -2014,6 +2016,26 @@ function makeTemplateDiagnostic(templateId, mapping, span, category, code, messa
           messageText: relatedMessage.text
         });
       }
+    }
+    let sf;
+    try {
+      sf = parseTemplateAsSourceFile(fileName, mapping.template);
+    } catch (e) {
+      const failureChain = makeDiagnosticChain(`Failed to report an error in '${fileName}' at ${span.start.line + 1}:${span.start.col + 1}`, [
+        makeDiagnosticChain((_a = e == null ? void 0 : e.stack) != null ? _a : `${e}`)
+      ]);
+      return {
+        source: "ngtsc",
+        category,
+        code,
+        messageText: addDiagnosticChain(messageText, [failureChain]),
+        file: componentSf,
+        componentFile: componentSf,
+        templateId,
+        start: mapping.node.getStart(),
+        length: mapping.node.getEnd() - mapping.node.getStart(),
+        relatedInformation
+      };
     }
     relatedInformation.push({
       category: ts11.DiagnosticCategory.Message,
@@ -2038,6 +2060,13 @@ function makeTemplateDiagnostic(templateId, mapping, span, category, code, messa
   } else {
     throw new Error(`Unexpected source mapping type: ${mapping.type}`);
   }
+}
+var parseTemplateAsSourceFileForTest = null;
+function parseTemplateAsSourceFile(fileName, template) {
+  if (parseTemplateAsSourceFileForTest !== null) {
+    return parseTemplateAsSourceFileForTest(fileName, template);
+  }
+  return ts11.createSourceFile(fileName, template, ts11.ScriptTarget.Latest, false, ts11.ScriptKind.JSX);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/id.mjs
@@ -7550,4 +7579,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-ZK5AXUNL.js.map
+//# sourceMappingURL=chunk-FX7WUAPN.js.map
