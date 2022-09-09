@@ -5989,7 +5989,7 @@ var factory = {
 import { TmplAstTemplate as TmplAstTemplate4 } from "@angular/compiler";
 var KNOWN_CONTROL_FLOW_DIRECTIVES = /* @__PURE__ */ new Map([
   ["ngIf", "NgIf"],
-  ["ngFor", "NgForOf"],
+  ["ngFor", "NgFor"],
   ["ngSwitchCase", "NgSwitchCase"],
   ["ngSwitchDefault", "NgSwitchDefault"]
 ]);
@@ -7581,4 +7581,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-NJU6754X.js.map
+//# sourceMappingURL=chunk-4KPFDKY6.js.map
