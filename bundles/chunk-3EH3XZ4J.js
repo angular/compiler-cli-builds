@@ -8,7 +8,7 @@ import {
   ImportGraph,
   isShim,
   readConfiguration
-} from "./chunk-GG7BM2LH.js";
+} from "./chunk-OR5NRX3I.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -5186,4 +5186,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3ATQVS47.js.map
+//# sourceMappingURL=chunk-3EH3XZ4J.js.map
