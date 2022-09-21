@@ -2019,7 +2019,7 @@ function makeTemplateDiagnostic(templateId, mapping, span, category, code, messa
     }
     let sf;
     try {
-      sf = parseTemplateAsSourceFile(fileName, mapping.template);
+      sf = getParsedTemplateSourceFile(fileName, mapping);
     } catch (e) {
       const failureChain = makeDiagnosticChain(`Failed to report an error in '${fileName}' at ${span.start.line + 1}:${span.start.col + 1}`, [
         makeDiagnosticChain((_a = e == null ? void 0 : e.stack) != null ? _a : `${e}`)
@@ -2060,6 +2060,13 @@ function makeTemplateDiagnostic(templateId, mapping, span, category, code, messa
   } else {
     throw new Error(`Unexpected source mapping type: ${mapping.type}`);
   }
+}
+var TemplateSourceFile = Symbol("TemplateSourceFile");
+function getParsedTemplateSourceFile(fileName, mapping) {
+  if (mapping[TemplateSourceFile] === void 0) {
+    mapping[TemplateSourceFile] = parseTemplateAsSourceFile(fileName, mapping.template);
+  }
+  return mapping[TemplateSourceFile];
 }
 var parseTemplateAsSourceFileForTest = null;
 function parseTemplateAsSourceFile(fileName, template) {
@@ -7581,4 +7588,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-4KPFDKY6.js.map
+//# sourceMappingURL=chunk-BRHIVW3E.js.map
