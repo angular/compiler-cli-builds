@@ -2000,7 +2000,7 @@ function makeTemplateDiagnostic(templateId, mapping, span, category, code, messa
     const componentSf = mapping.componentClass.getSourceFile();
     const componentName = mapping.componentClass.name.text;
     const fileName = mapping.type === "indirect" ? `${componentSf.fileName} (${componentName} template)` : mapping.templateUrl;
-    const sf = ts11.createSourceFile(fileName, mapping.template, ts11.ScriptTarget.Latest, false, ts11.ScriptKind.JSX);
+    const sf = getParsedTemplateSourceFile(fileName, mapping);
     let relatedInformation = [];
     if (relatedMessages !== void 0) {
       for (const relatedMessage of relatedMessages) {
@@ -2037,6 +2037,13 @@ function makeTemplateDiagnostic(templateId, mapping, span, category, code, messa
   } else {
     throw new Error(`Unexpected source mapping type: ${mapping.type}`);
   }
+}
+var TemplateSourceFile = Symbol("TemplateSourceFile");
+function getParsedTemplateSourceFile(fileName, mapping) {
+  if (mapping[TemplateSourceFile] === void 0) {
+    mapping[TemplateSourceFile] = ts11.createSourceFile(fileName, mapping.template, ts11.ScriptTarget.Latest, false, ts11.ScriptKind.JSX);
+  }
+  return mapping[TemplateSourceFile];
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/id.mjs
@@ -7553,4 +7560,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-OR5NRX3I.js.map
+//# sourceMappingURL=chunk-RO4YJD54.js.map
