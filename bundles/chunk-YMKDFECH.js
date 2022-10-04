@@ -1040,6 +1040,7 @@ var DelegatingCompilerHost = class {
     this.trace = this.delegateMethod("trace");
     this.useCaseSensitiveFileNames = this.delegateMethod("useCaseSensitiveFileNames");
     this.getModuleResolutionCache = this.delegateMethod("getModuleResolutionCache");
+    this.hasInvalidatedResolutions = this.delegateMethod("hasInvalidatedResolutions");
   }
   delegateMethod(name) {
     return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
@@ -7031,6 +7032,7 @@ var DelegatingCompilerHost2 = class {
     this.useCaseSensitiveFileNames = this.delegateMethod("useCaseSensitiveFileNames");
     this.writeFile = this.delegateMethod("writeFile");
     this.getModuleResolutionCache = this.delegateMethod("getModuleResolutionCache");
+    this.hasInvalidatedResolutions = this.delegateMethod("hasInvalidatedResolutions");
   }
   delegateMethod(name) {
     return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
@@ -7588,4 +7590,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-BRHIVW3E.js.map
+//# sourceMappingURL=chunk-YMKDFECH.js.map
