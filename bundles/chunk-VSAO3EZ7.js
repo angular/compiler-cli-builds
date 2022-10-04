@@ -2475,6 +2475,9 @@ var LocalMetadataRegistry = class {
   registerPipeMetadata(meta) {
     this.pipes.set(meta.ref.node, meta);
   }
+  getKnownDirectives() {
+    return this.directives.keys();
+  }
 };
 var CompoundMetadataRegistry = class {
   constructor(registries) {
@@ -6805,4 +6808,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-I6QQYDN3.js.map
+//# sourceMappingURL=chunk-VSAO3EZ7.js.map

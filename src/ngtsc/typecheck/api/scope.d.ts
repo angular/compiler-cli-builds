@@ -7,12 +7,14 @@
  */
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/api/scope" />
 import ts from 'typescript';
+import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
 import { SymbolWithValueDeclaration } from '../../util/src/typescript';
 /**
- * Metadata on a directive which is available in the scope of a template.
+ * Metadata on a directive which is available in a template.
  */
-export interface DirectiveInScope {
+export interface PotentialDirective {
+    ref: Reference<ClassDeclaration>;
     /**
      * The `ts.Symbol` for the directive class.
      */
@@ -33,11 +35,15 @@ export interface DirectiveInScope {
      * `true` if this directive is a structural directive.
      */
     isStructural: boolean;
+    /**
+     * Whether or not this directive is in scope.
+     */
+    isInScope: boolean;
 }
 /**
- * Metadata for a pipe which is available in the scope of a template.
+ * Metadata for a pipe which is available in a template.
  */
-export interface PipeInScope {
+export interface PotentialPipe {
     /**
      * The `ts.Symbol` for the pipe class.
      */
@@ -46,4 +52,8 @@ export interface PipeInScope {
      * Name of the pipe.
      */
     name: string;
+    /**
+     * Whether or not this pipe is in scope.
+     */
+    isInScope: boolean;
 }

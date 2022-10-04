@@ -12,12 +12,12 @@ import { ErrorCode } from '../../diagnostics';
 import { AbsoluteFsPath } from '../../file_system';
 import { ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
-import { MetadataReader } from '../../metadata';
+import { MetadataReader, MetadataReaderWithIndex } from '../../metadata';
 import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { DirectiveInScope, ElementSymbol, FullTemplateMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PipeInScope, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { ElementSymbol, FullTemplateMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialPipe, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -35,6 +35,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private compilerHost;
     private priorBuild;
     private readonly metaReader;
+    private readonly localMetaReader;
     private readonly componentScopeReader;
     private readonly typeCheckScopeRegistry;
     private readonly perf;
@@ -73,7 +74,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
      */
     private elementTagCache;
     private isComplete;
-    constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, metaReader: MetadataReader, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
+    constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, metaReader: MetadataReader, localMetaReader: MetadataReaderWithIndex, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
     getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
     private getLatestComponentState;
     isTrackedTypeCheckFile(filePath: AbsoluteFsPath): boolean;
@@ -116,10 +117,10 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getSymbolOfNode(node: TmplAstTemplate, component: ts.ClassDeclaration): TemplateSymbol | null;
     getSymbolOfNode(node: TmplAstElement, component: ts.ClassDeclaration): ElementSymbol | null;
     private getOrCreateSymbolBuilder;
-    getDirectivesInScope(component: ts.ClassDeclaration): DirectiveInScope[] | null;
-    getPipesInScope(component: ts.ClassDeclaration): PipeInScope[] | null;
+    getPotentialTemplateDirectives(component: ts.ClassDeclaration): PotentialDirective[];
+    getPipesInScope(component: ts.ClassDeclaration): PotentialPipe[] | null;
     getDirectiveMetadata(dir: ts.ClassDeclaration): TypeCheckableDirectiveMeta | null;
-    getPotentialElementTags(component: ts.ClassDeclaration): Map<string, DirectiveInScope | null>;
+    getPotentialElementTags(component: ts.ClassDeclaration): Map<string, PotentialDirective | null>;
     getPotentialDomBindings(tagName: string): {
         attribute: string;
         property: string;
@@ -128,6 +129,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getPrimaryAngularDecorator(target: ts.ClassDeclaration): ts.Decorator | null;
     getOwningNgModule(component: ts.ClassDeclaration): ts.ClassDeclaration | null;
     private getScopeData;
+    private scopeDataOfDirectiveMeta;
 }
 /**
  * Data for template type-checking related to a specific input file in the user's program (which

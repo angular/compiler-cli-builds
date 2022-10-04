@@ -31,7 +31,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-I6QQYDN3.js";
+} from "./chunk-VSAO3EZ7.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -4954,14 +4954,17 @@ var SymbolBuilder = class {
         return null;
       }
       const isComponent = (_a2 = meta.isComponent) != null ? _a2 : null;
+      const ref = new Reference(symbol.tsSymbol.valueDeclaration);
       const directiveSymbol = {
         ...symbol,
+        ref,
         tsSymbol: symbol.tsSymbol,
         selector: meta.selector,
         isComponent,
         ngModule,
         kind: SymbolKind.Directive,
-        isStructural: meta.isStructural
+        isStructural: meta.isStructural,
+        isInScope: true
       };
       return directiveSymbol;
     }).filter((d) => d !== null);
@@ -5125,8 +5128,10 @@ var SymbolBuilder = class {
     if (symbol === null || !isSymbolWithValueDeclaration(symbol.tsSymbol) || !ts28.isClassDeclaration(symbol.tsSymbol.valueDeclaration)) {
       return null;
     }
+    const ref = new Reference(symbol.tsSymbol.valueDeclaration);
     const ngModule = this.getDirectiveModule(symbol.tsSymbol.valueDeclaration);
     return {
+      ref,
       kind: SymbolKind.Directive,
       tsSymbol: symbol.tsSymbol,
       tsType: symbol.tsType,
@@ -5134,7 +5139,8 @@ var SymbolBuilder = class {
       isComponent,
       isStructural,
       selector,
-      ngModule
+      ngModule,
+      isInScope: true
     };
   }
   getSymbolOfVariable(variable) {
@@ -5319,7 +5325,7 @@ function sourceSpanEqual(a, b) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
 var REGISTRY2 = new DomElementSchemaRegistry2();
 var TemplateTypeCheckerImpl = class {
-  constructor(originalProgram, programDriver, typeCheckAdapter, config, refEmitter, reflector, compilerHost, priorBuild, metaReader, componentScopeReader, typeCheckScopeRegistry, perf) {
+  constructor(originalProgram, programDriver, typeCheckAdapter, config, refEmitter, reflector, compilerHost, priorBuild, metaReader, localMetaReader, componentScopeReader, typeCheckScopeRegistry, perf) {
     this.originalProgram = originalProgram;
     this.programDriver = programDriver;
     this.typeCheckAdapter = typeCheckAdapter;
@@ -5329,6 +5335,7 @@ var TemplateTypeCheckerImpl = class {
     this.compilerHost = compilerHost;
     this.priorBuild = priorBuild;
     this.metaReader = metaReader;
+    this.localMetaReader = localMetaReader;
     this.componentScopeReader = componentScopeReader;
     this.typeCheckScopeRegistry = typeCheckScopeRegistry;
     this.perf = perf;
@@ -5662,12 +5669,26 @@ var TemplateTypeCheckerImpl = class {
     this.symbolBuilderCache.set(component, builder);
     return builder;
   }
-  getDirectivesInScope(component) {
-    const data = this.getScopeData(component);
-    if (data === null) {
-      return null;
+  getPotentialTemplateDirectives(component) {
+    var _a, _b;
+    const typeChecker = this.programDriver.getProgram().getTypeChecker();
+    const inScopeDirectives = (_b = (_a = this.getScopeData(component)) == null ? void 0 : _a.directives) != null ? _b : [];
+    const resultingDirectives = /* @__PURE__ */ new Map();
+    for (const d of inScopeDirectives) {
+      resultingDirectives.set(d.ref.node, d);
     }
-    return data.directives;
+    for (const directiveClass of this.localMetaReader.getKnownDirectives()) {
+      const directiveMeta = this.metaReader.getDirectiveMetadata(new Reference(directiveClass));
+      if (directiveMeta === null)
+        continue;
+      if (resultingDirectives.has(directiveClass))
+        continue;
+      const withScope = this.scopeDataOfDirectiveMeta(typeChecker, directiveMeta);
+      if (withScope === null)
+        continue;
+      resultingDirectives.set(directiveClass, { ...withScope, isInScope: false });
+    }
+    return Array.from(resultingDirectives.values());
   }
   getPipesInScope(component) {
     const data = this.getScopeData(component);
@@ -5768,25 +5789,10 @@ var TemplateTypeCheckerImpl = class {
     const typeChecker = this.programDriver.getProgram().getTypeChecker();
     for (const dep of dependencies) {
       if (dep.kind === MetaKind.Directive) {
-        if (dep.selector === null) {
+        const dirScope = this.scopeDataOfDirectiveMeta(typeChecker, dep);
+        if (dirScope === null)
           continue;
-        }
-        const tsSymbol = typeChecker.getSymbolAtLocation(dep.ref.node.name);
-        if (!isSymbolWithValueDeclaration(tsSymbol)) {
-          continue;
-        }
-        let ngModule = null;
-        const moduleScopeOfDir = this.componentScopeReader.getScopeForComponent(dep.ref.node);
-        if (moduleScopeOfDir !== null && moduleScopeOfDir.kind === ComponentScopeKind.NgModule) {
-          ngModule = moduleScopeOfDir.ngModule;
-        }
-        data.directives.push({
-          isComponent: dep.isComponent,
-          isStructural: dep.isStructural,
-          selector: dep.selector,
-          tsSymbol,
-          ngModule
-        });
+        data.directives.push({ ...dirScope, isInScope: true });
       } else if (dep.kind === MetaKind.Pipe) {
         const tsSymbol = typeChecker.getSymbolAtLocation(dep.ref.node.name);
         if (tsSymbol === void 0) {
@@ -5794,12 +5800,35 @@ var TemplateTypeCheckerImpl = class {
         }
         data.pipes.push({
           name: dep.name,
-          tsSymbol
+          tsSymbol,
+          isInScope: true
         });
       }
     }
     this.scopeCache.set(component, data);
     return data;
+  }
+  scopeDataOfDirectiveMeta(typeChecker, dep) {
+    if (dep.selector === null) {
+      return null;
+    }
+    const tsSymbol = typeChecker.getSymbolAtLocation(dep.ref.node.name);
+    if (!isSymbolWithValueDeclaration(tsSymbol)) {
+      return null;
+    }
+    let ngModule = null;
+    const moduleScopeOfDir = this.componentScopeReader.getScopeForComponent(dep.ref.node);
+    if (moduleScopeOfDir !== null && moduleScopeOfDir.kind === ComponentScopeKind.NgModule) {
+      ngModule = moduleScopeOfDir.ngModule;
+    }
+    return {
+      ref: dep.ref,
+      isComponent: dep.isComponent,
+      isStructural: dep.isStructural,
+      selector: dep.selector,
+      tsSymbol,
+      ngModule
+    };
   }
 };
 function convertDiagnostic(diag, sourceResolver) {
@@ -6821,7 +6850,7 @@ var NgCompiler = class {
       this.incrementalStrategy.setIncrementalState(this.incrementalCompilation.state, program);
       this.currentProgram = program;
     });
-    const templateTypeChecker = new TemplateTypeCheckerImpl(this.inputProgram, notifyingDriver, traitCompiler, this.getTypeCheckingConfig(), refEmitter, reflector, this.adapter, this.incrementalCompilation, metaReader, scopeReader, typeCheckScopeRegistry, this.delegatingPerfRecorder);
+    const templateTypeChecker = new TemplateTypeCheckerImpl(this.inputProgram, notifyingDriver, traitCompiler, this.getTypeCheckingConfig(), refEmitter, reflector, this.adapter, this.incrementalCompilation, metaReader, localMetaReader, scopeReader, typeCheckScopeRegistry, this.delegatingPerfRecorder);
     const extendedTemplateChecker = this.constructionDiagnostics.length === 0 ? new ExtendedTemplateCheckerImpl(templateTypeChecker, checker, ALL_DIAGNOSTIC_FACTORIES, this.options) : null;
     return {
       isCore,
@@ -7590,4 +7619,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-YMKDFECH.js.map
+//# sourceMappingURL=chunk-YEQI6VDV.js.map

@@ -216,6 +216,12 @@ export interface MetadataReader {
     getPipeMetadata(node: Reference<ClassDeclaration>): PipeMeta | null;
 }
 /**
+ * A MetadataReader which also allows access to the set of all known directive classes.
+ */
+export interface MetadataReaderWithIndex extends MetadataReader {
+    getKnownDirectives(): Iterable<ClassDeclaration>;
+}
+/**
  * Registers new metadata for directives, pipes, and modules.
  */
 export interface MetadataRegistry {
