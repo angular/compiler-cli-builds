@@ -17,7 +17,7 @@ import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { ElementSymbol, FullTemplateMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialPipe, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { ElementSymbol, FullTemplateMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialPipe, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -128,6 +128,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getPotentialDomEvents(tagName: string): string[];
     getPrimaryAngularDecorator(target: ts.ClassDeclaration): ts.Decorator | null;
     getOwningNgModule(component: ts.ClassDeclaration): ts.ClassDeclaration | null;
+    getPotentialImportsFor(toImport: PotentialDirective, inContext: ts.ClassDeclaration): ReadonlyArray<PotentialImport>;
     private getScopeData;
     private scopeDataOfDirectiveMeta;
 }

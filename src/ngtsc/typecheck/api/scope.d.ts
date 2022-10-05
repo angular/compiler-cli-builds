@@ -11,6 +11,22 @@ import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
 import { SymbolWithValueDeclaration } from '../../util/src/typescript';
 /**
+ * A PotentialImport for some Angular trait has a TypeScript module specifier, which can be
+ * relative, as well as an identifier name.
+ */
+export interface PotentialImport {
+    kind: PotentialImportKind;
+    moduleSpecifier: string;
+    symbolName: string;
+}
+/**
+ * Which kind of Angular Trait the import targets.
+ */
+export declare enum PotentialImportKind {
+    NgModule = 0,
+    Standalone = 1
+}
+/**
  * Metadata on a directive which is available in a template.
  */
 export interface PotentialDirective {

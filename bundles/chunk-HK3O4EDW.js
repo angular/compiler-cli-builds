@@ -144,6 +144,13 @@ var CompletionKind;
   CompletionKind2[CompletionKind2["Variable"] = 1] = "Variable";
 })(CompletionKind || (CompletionKind = {}));
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/scope.mjs
+var PotentialImportKind;
+(function(PotentialImportKind2) {
+  PotentialImportKind2[PotentialImportKind2["NgModule"] = 0] = "NgModule";
+  PotentialImportKind2[PotentialImportKind2["Standalone"] = 1] = "Standalone";
+})(PotentialImportKind || (PotentialImportKind = {}));
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/symbols.mjs
 var SymbolKind;
 (function(SymbolKind2) {
@@ -5769,6 +5776,26 @@ var TemplateTypeCheckerImpl = class {
     }
     return scope.ngModule;
   }
+  getPotentialImportsFor(toImport, inContext) {
+    var _a;
+    let ngModuleRef;
+    if (toImport.ngModule !== null) {
+      ngModuleRef = (_a = this.metaReader.getNgModuleMetadata(new Reference(toImport.ngModule))) == null ? void 0 : _a.ref;
+    }
+    const importTarget = ngModuleRef != null ? ngModuleRef : toImport.ref;
+    const emittedRef = this.refEmitter.emit(importTarget, inContext.getSourceFile());
+    if (emittedRef.kind === 1)
+      return [];
+    const emittedExpression = emittedRef.expression;
+    if (emittedExpression.value.moduleName === null || emittedExpression.value.name === null)
+      return [];
+    const preferredImport = {
+      kind: ngModuleRef ? PotentialImportKind.NgModule : PotentialImportKind.Standalone,
+      moduleSpecifier: emittedExpression.value.moduleName,
+      symbolName: emittedExpression.value.name
+    };
+    return [preferredImport];
+  }
   getScopeData(component) {
     if (this.scopeCache.has(component)) {
       return this.scopeCache.get(component);
@@ -7619,4 +7646,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-YEQI6VDV.js.map
+//# sourceMappingURL=chunk-HK3O4EDW.js.map

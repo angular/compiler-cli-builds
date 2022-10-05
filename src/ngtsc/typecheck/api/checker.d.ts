@@ -12,7 +12,7 @@ import { AbsoluteFsPath } from '../../../../src/ngtsc/file_system';
 import { ErrorCode } from '../../diagnostics';
 import { FullTemplateMapping, NgTemplateDiagnostic, TypeCheckableDirectiveMeta } from './api';
 import { GlobalCompletion } from './completion';
-import { PotentialDirective, PotentialPipe } from './scope';
+import { PotentialDirective, PotentialImport, PotentialPipe } from './scope';
 import { ElementSymbol, Symbol, TcbLocation, TemplateSymbol } from './symbols';
 /**
  * Interface to the Angular Template Type Checker to extract diagnostics and intelligence from the
@@ -123,6 +123,10 @@ export interface TemplateTypeChecker {
      * the DOM schema.
      */
     getPotentialElementTags(component: ts.ClassDeclaration): Map<string, PotentialDirective | null>;
+    /**
+     * In the context of an Angular trait, generate potential imports for a directive.
+     */
+    getPotentialImportsFor(directive: PotentialDirective, inComponent: ts.ClassDeclaration): ReadonlyArray<PotentialImport>;
     /**
      * Get the primary decorator for an Angular class (such as @Component). This does not work for
      * `@Injectable`.
