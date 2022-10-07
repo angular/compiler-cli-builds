@@ -756,13 +756,11 @@ var ShimAdapter = class {
       }
       const prefix = match[1];
       let baseFileName = absoluteFrom(prefix + ".ts");
-      if (!this.delegate.fileExists(baseFileName)) {
+      let inputFile = this.delegate.getSourceFile(baseFileName, ts6.ScriptTarget.Latest);
+      if (inputFile === void 0) {
         baseFileName = absoluteFrom(prefix + ".tsx");
-        if (!this.delegate.fileExists(baseFileName)) {
-          return void 0;
-        }
+        inputFile = this.delegate.getSourceFile(baseFileName, ts6.ScriptTarget.Latest);
       }
-      const inputFile = this.delegate.getSourceFile(baseFileName, ts6.ScriptTarget.Latest);
       if (inputFile === void 0 || isShim(inputFile)) {
         return void 0;
       }
@@ -7560,4 +7558,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-RO4YJD54.js.map
+//# sourceMappingURL=chunk-EATPCOP5.js.map
