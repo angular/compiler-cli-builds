@@ -6,8 +6,6 @@
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/ts_compatibility/src/ts_cross_version_utils.mjs
 import ts from "typescript";
 var IS_AFTER_TS_48 = isAfterVersion(4, 8);
-var IS_AFTER_TS_47 = isAfterVersion(4, 7);
-var updateTypeParameterDeclaration = IS_AFTER_TS_47 ? ts.factory.updateTypeParameterDeclaration : (node, _modifiers, name, constraint, defaultType) => ts.factory.updateTypeParameterDeclaration(node, name, constraint, defaultType);
 var updateParameterDeclaration = IS_AFTER_TS_48 ? ts.factory.updateParameterDeclaration : (node, modifiers, dotDotDotToken, name, questionToken, type, initializer) => ts.factory.updateParameterDeclaration(node, ...splitModifiers(modifiers), dotDotDotToken, name, questionToken, type, initializer);
 var updateImportDeclaration = IS_AFTER_TS_48 ? ts.factory.updateImportDeclaration : (node, modifiers, importClause, moduleSpecifier, assertClause) => ts.factory.updateImportDeclaration(node, void 0, modifiers, importClause, moduleSpecifier, assertClause);
 var updateClassDeclaration = IS_AFTER_TS_48 ? ts.factory.updateClassDeclaration : (node, combinedModifiers, name, typeParameters, heritageClauses, members) => ts.factory.updateClassDeclaration(node, ...splitModifiers(combinedModifiers), name, typeParameters, heritageClauses, members);
@@ -61,7 +59,6 @@ function isAfterVersion(targetMajor, targetMinor) {
 }
 
 export {
-  updateTypeParameterDeclaration,
   updateParameterDeclaration,
   updateImportDeclaration,
   updateClassDeclaration,
@@ -93,4 +90,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-7YHMCUJT.js.map
+//# sourceMappingURL=chunk-F526PAOI.js.map

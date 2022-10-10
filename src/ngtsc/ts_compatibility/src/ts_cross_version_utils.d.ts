@@ -9,15 +9,6 @@
 import ts from 'typescript';
 /** Equivalent of `ts.ModifierLike` which is only present in TS 4.8+. */
 export declare type ModifierLike = ts.Modifier | ts.Decorator;
-/** Type of `ts.factory.updateTypeParameterDeclaration` in TS 4.7+. */
-declare type Ts47UpdateTypeParameterDeclarationFn = (node: ts.TypeParameterDeclaration, modifiers: readonly ts.Modifier[] | undefined, name: ts.Identifier, constraint: ts.TypeNode | undefined, defaultType: ts.TypeNode | undefined) => ts.TypeParameterDeclaration;
-/**
- * Updates a `ts.TypeParameter` declaration.
- *
- * TODO(crisbeto): this is a backwards-compatibility layer for versions of TypeScript less than 4.7.
- * We should remove it once we have dropped support for the older versions.
- */
-export declare const updateTypeParameterDeclaration: Ts47UpdateTypeParameterDeclarationFn;
 /** Type of `ts.factory.updateParameterDeclaration` in TS 4.8+. */
 declare type Ts48UpdateParameterDeclarationFn = (node: ts.ParameterDeclaration, modifiers: readonly ModifierLike[] | undefined, dotDotDotToken: ts.DotDotDotToken | undefined, name: string | ts.BindingName, questionToken: ts.QuestionToken | undefined, type: ts.TypeNode | undefined, initializer: ts.Expression | undefined) => ts.ParameterDeclaration;
 /**

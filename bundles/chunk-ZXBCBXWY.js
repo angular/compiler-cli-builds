@@ -6,7 +6,7 @@
 import {
   getDecorators,
   getModifiers
-} from "./chunk-7YHMCUJT.js";
+} from "./chunk-F526PAOI.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/typescript.mjs
 import ts4 from "typescript";
@@ -685,4 +685,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XDX5RDY5.js.map
+//# sourceMappingURL=chunk-ZXBCBXWY.js.map

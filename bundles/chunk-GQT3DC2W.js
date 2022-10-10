@@ -5,7 +5,7 @@
     
 import {
   TypeScriptReflectionHost
-} from "./chunk-XDX5RDY5.js";
+} from "./chunk-ZXBCBXWY.js";
 import {
   combineModifiers,
   createClassDeclaration,
@@ -17,7 +17,7 @@ import {
   getModifiers,
   updateConstructorDeclaration,
   updateParameterDeclaration
-} from "./chunk-7YHMCUJT.js";
+} from "./chunk-F526PAOI.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/downlevel_decorators_transform/downlevel_decorators_transform.mjs
 import ts2 from "typescript";
@@ -400,4 +400,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-UZLFREET.js.map
+//# sourceMappingURL=chunk-GQT3DC2W.js.map

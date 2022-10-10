@@ -13,7 +13,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-XDX5RDY5.js";
+} from "./chunk-ZXBCBXWY.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -46,7 +46,7 @@ import {
   updateParameterDeclaration,
   updatePropertyDeclaration,
   updateSetAccessorDeclaration
-} from "./chunk-7YHMCUJT.js";
+} from "./chunk-F526PAOI.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -6808,4 +6808,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-VSAO3EZ7.js.map
+//# sourceMappingURL=chunk-WFNK2IJZ.js.map

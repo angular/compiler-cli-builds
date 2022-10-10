@@ -31,11 +31,11 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-VSAO3EZ7.js";
+} from "./chunk-WFNK2IJZ.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-XDX5RDY5.js";
+} from "./chunk-ZXBCBXWY.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -80,9 +80,8 @@ import {
 import {
   getDecorators,
   getModifiers,
-  updateImportDeclaration,
-  updateTypeParameterDeclaration
-} from "./chunk-7YHMCUJT.js";
+  updateImportDeclaration
+} from "./chunk-F526PAOI.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -261,7 +260,7 @@ function compareVersions(v1, v2) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
-var MIN_TS_VERSION = "4.6.2";
+var MIN_TS_VERSION = "4.8.2";
 var MAX_TS_VERSION = "4.9.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
@@ -2608,7 +2607,7 @@ var TypeParameterEmitter = class {
     return this.typeParameters.map((typeParam) => {
       const constraint = typeParam.constraint !== void 0 ? emitter.emitType(typeParam.constraint) : void 0;
       const defaultType = typeParam.default !== void 0 ? emitter.emitType(typeParam.default) : void 0;
-      return updateTypeParameterDeclaration(typeParam, typeParam.modifiers, typeParam.name, constraint, defaultType);
+      return ts17.factory.updateTypeParameterDeclaration(typeParam, typeParam.modifiers, typeParam.name, constraint, defaultType);
     });
   }
   resolveTypeReference(type) {
@@ -2792,7 +2791,7 @@ function typeParametersWithDefaultTypes(params) {
   }
   return params.map((param) => {
     if (param.default === void 0) {
-      return updateTypeParameterDeclaration(param, param.modifiers, param.name, param.constraint, ts19.factory.createKeywordTypeNode(ts19.SyntaxKind.AnyKeyword));
+      return ts19.factory.updateTypeParameterDeclaration(param, param.modifiers, param.name, param.constraint, ts19.factory.createKeywordTypeNode(ts19.SyntaxKind.AnyKeyword));
     } else {
       return param;
     }
@@ -7644,4 +7643,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-KOHOPD3V.js.map
+//# sourceMappingURL=chunk-HCEYNOO7.js.map
