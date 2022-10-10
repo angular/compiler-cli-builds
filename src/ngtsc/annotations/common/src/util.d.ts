@@ -100,3 +100,4 @@ export declare function resolveImportedFile(moduleResolver: ModuleResolver, impo
  * used.
  */
 export declare function getOriginNodeForDiagnostics(expr: ts.Expression, container: ts.Expression): ts.Expression;
+export declare function isAbstractClassDeclaration(clazz: ClassDeclaration): boolean;

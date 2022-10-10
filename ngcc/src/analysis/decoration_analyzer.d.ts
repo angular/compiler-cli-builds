@@ -2,11 +2,12 @@
 import ts from 'typescript';
 import { ParsedConfiguration } from '../../..';
 import { ReferencesRegistry, ResourceLoader } from '../../../src/ngtsc/annotations';
+import { InjectableClassRegistry } from '../../../src/ngtsc/annotations/common';
 import { CycleAnalyzer, ImportGraph } from '../../../src/ngtsc/cycles';
 import { ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
 import { ModuleResolver, PrivateExportAliasingHost, ReferenceEmitter } from '../../../src/ngtsc/imports';
 import { SemanticSymbol } from '../../../src/ngtsc/incremental/semantic_graph';
-import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, HostDirectivesResolver, InjectableClassRegistry, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
+import { CompoundMetadataReader, CompoundMetadataRegistry, DtsMetadataReader, HostDirectivesResolver, LocalMetadataRegistry } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';
 import { LocalModuleScopeRegistry, MetadataDtsModuleScopeResolver, TypeCheckScopeRegistry } from '../../../src/ngtsc/scope';
 import { DecoratorHandler } from '../../../src/ngtsc/transform';

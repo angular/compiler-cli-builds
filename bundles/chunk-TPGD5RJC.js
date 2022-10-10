@@ -31,7 +31,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-WFNK2IJZ.js";
+} from "./chunk-5C5S42DV.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -76,7 +76,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-TF2TR2WS.js";
+} from "./chunk-EQ7NIVSK.js";
 import {
   getDecorators,
   getModifiers,
@@ -6835,6 +6835,7 @@ var NgCompiler = class {
       ]);
       aliasingHost = new UnifiedModulesAliasingHost(this.adapter.unifiedModulesHost);
     }
+    const isCore = isAngularCorePackage(this.inputProgram);
     const evaluator = new PartialEvaluator(reflector, checker, this.incrementalCompilation.depGraph);
     const dtsReader = new DtsMetadataReader(checker, reflector);
     const localMetaRegistry = new LocalMetadataRegistry();
@@ -6846,7 +6847,7 @@ var NgCompiler = class {
     const scopeReader = new CompoundComponentScopeReader([ngModuleScopeRegistry, standaloneScopeReader]);
     const semanticDepGraphUpdater = this.incrementalCompilation.semanticDepGraphUpdater;
     const metaRegistry = new CompoundMetadataRegistry([localMetaRegistry, ngModuleScopeRegistry]);
-    const injectableRegistry = new InjectableClassRegistry(reflector);
+    const injectableRegistry = new InjectableClassRegistry(reflector, isCore);
     const hostDirectivesResolver = new HostDirectivesResolver(metaReader);
     const typeCheckScopeRegistry = new TypeCheckScopeRegistry(scopeReader, metaReader, hostDirectivesResolver);
     let referencesRegistry;
@@ -6858,15 +6859,15 @@ var NgCompiler = class {
       referencesRegistry = new NoopReferencesRegistry();
     }
     const dtsTransforms = new DtsTransformRegistry();
-    const isCore = isAngularCorePackage(this.inputProgram);
     const resourceRegistry = new ResourceRegistry();
     const compilationMode = this.options.compilationMode === "partial" && !isCore ? CompilationMode.PARTIAL : CompilationMode.FULL;
     const cycleHandlingStrategy = compilationMode === CompilationMode.FULL ? 0 : 1;
+    const strictCtorDeps = this.options.strictInjectionParameters || false;
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver),
-      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, isCore, semanticDepGraphUpdater, this.closureCompilerEnabled, false, this.delegatingPerfRecorder),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver),
+      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, false, this.delegatingPerfRecorder),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder),
-      new InjectableDecoratorHandler(reflector, isCore, this.options.strictInjectionParameters || false, injectableRegistry, this.delegatingPerfRecorder),
+      new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder),
       new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, isCore, refEmitter, this.adapter.factoryTracker, this.closureCompilerEnabled, (_a = this.options.onlyPublishPublicTypingsForNgModules) != null ? _a : false, injectableRegistry, this.delegatingPerfRecorder)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter);
@@ -7643,4 +7644,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-HCEYNOO7.js.map
+//# sourceMappingURL=chunk-TPGD5RJC.js.map

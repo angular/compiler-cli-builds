@@ -38,7 +38,7 @@ import {
   sendMessageToWorker,
   sortTasksByPriority,
   stringifyTask
-} from "./chunk-KIK73DV5.js";
+} from "./chunk-HPA3H7DZ.js";
 import {
   LogLevel
 } from "./chunk-E7NQQTT7.js";
@@ -896,7 +896,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "15.0.0-next.5+sha-48b354a";
+var NGCC_VERSION = "15.0.0-next.5+sha-bc54687";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -2182,4 +2182,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CYXTZL7I.js.map
+//# sourceMappingURL=chunk-YUCQY5BN.js.map

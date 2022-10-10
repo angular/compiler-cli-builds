@@ -8,7 +8,7 @@ import {
   ImportGraph,
   isShim,
   readConfiguration
-} from "./chunk-HCEYNOO7.js";
+} from "./chunk-TPGD5RJC.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -33,7 +33,7 @@ import {
   TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-WFNK2IJZ.js";
+} from "./chunk-5C5S42DV.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -73,7 +73,7 @@ import {
   translateStatement,
   translateType,
   validateAndRewriteCoreSymbol
-} from "./chunk-TF2TR2WS.js";
+} from "./chunk-EQ7NIVSK.js";
 import {
   getModifiers
 } from "./chunk-F526PAOI.js";
@@ -3346,14 +3346,14 @@ var DecorationAnalyzer = class {
     this.evaluator = new PartialEvaluator(this.reflectionHost, this.typeChecker, null);
     this.importGraph = new ImportGraph(this.typeChecker, NOOP_PERF_RECORDER);
     this.cycleAnalyzer = new CycleAnalyzer(this.importGraph);
-    this.injectableRegistry = new InjectableClassRegistry(this.reflectionHost);
+    this.injectableRegistry = new InjectableClassRegistry(this.reflectionHost, this.isCore);
     this.hostDirectivesResolver = new HostDirectivesResolver(this.fullMetaReader);
     this.typeCheckScopeRegistry = new TypeCheckScopeRegistry(this.scopeRegistry, this.fullMetaReader, this.hostDirectivesResolver);
     this.handlers = [
-      new ComponentDecoratorHandler(this.reflectionHost, this.evaluator, this.fullRegistry, this.fullMetaReader, this.scopeRegistry, this.dtsModuleScopeResolver, this.scopeRegistry, this.typeCheckScopeRegistry, new ResourceRegistry(), this.isCore, this.resourceManager, this.rootDirs, !!this.compilerOptions.preserveWhitespaces, true, this.bundle.enableI18nLegacyMessageIdFormat, false, false, this.moduleResolver, this.cycleAnalyzer, 0, this.refEmitter, NOOP_DEPENDENCY_TRACKER, this.injectableRegistry, null, !!this.compilerOptions.annotateForClosureCompiler, NOOP_PERF_RECORDER, this.hostDirectivesResolver),
-      new DirectiveDecoratorHandler(this.reflectionHost, this.evaluator, this.fullRegistry, this.scopeRegistry, this.fullMetaReader, this.injectableRegistry, this.refEmitter, this.isCore, null, !!this.compilerOptions.annotateForClosureCompiler, true, NOOP_PERF_RECORDER),
+      new ComponentDecoratorHandler(this.reflectionHost, this.evaluator, this.fullRegistry, this.fullMetaReader, this.scopeRegistry, this.dtsModuleScopeResolver, this.scopeRegistry, this.typeCheckScopeRegistry, new ResourceRegistry(), this.isCore, false, this.resourceManager, this.rootDirs, !!this.compilerOptions.preserveWhitespaces, true, this.bundle.enableI18nLegacyMessageIdFormat, false, false, this.moduleResolver, this.cycleAnalyzer, 0, this.refEmitter, NOOP_DEPENDENCY_TRACKER, this.injectableRegistry, null, !!this.compilerOptions.annotateForClosureCompiler, NOOP_PERF_RECORDER, this.hostDirectivesResolver),
+      new DirectiveDecoratorHandler(this.reflectionHost, this.evaluator, this.fullRegistry, this.scopeRegistry, this.fullMetaReader, this.injectableRegistry, this.refEmitter, this.isCore, false, null, !!this.compilerOptions.annotateForClosureCompiler, true, NOOP_PERF_RECORDER),
       new PipeDecoratorHandler(this.reflectionHost, this.evaluator, this.metaRegistry, this.scopeRegistry, this.injectableRegistry, this.isCore, NOOP_PERF_RECORDER),
-      new InjectableDecoratorHandler(this.reflectionHost, this.isCore, false, this.injectableRegistry, NOOP_PERF_RECORDER, false),
+      new InjectableDecoratorHandler(this.reflectionHost, this.evaluator, this.isCore, false, this.injectableRegistry, NOOP_PERF_RECORDER, false),
       new NgModuleDecoratorHandler(this.reflectionHost, this.evaluator, this.fullMetaReader, this.fullRegistry, this.scopeRegistry, this.referencesRegistry, this.isCore, this.refEmitter, null, !!this.compilerOptions.annotateForClosureCompiler, false, this.injectableRegistry, NOOP_PERF_RECORDER)
     ];
     this.compiler = new NgccTraitCompiler(this.handlers, this.reflectionHost);
@@ -5188,4 +5188,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KIK73DV5.js.map
+//# sourceMappingURL=chunk-HPA3H7DZ.js.map
