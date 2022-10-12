@@ -5573,7 +5573,7 @@ var animationTriggerResolver = (fn, node, resolve, unresolvable) => {
 function validateAndFlattenComponentImports(imports, expr) {
   const flattened = [];
   if (!Array.isArray(imports)) {
-    const error = createValueHasWrongTypeError(expr, imports, `'imports' must be an array of components, directives, pipes, or NgModules`).toDiagnostic();
+    const error = createValueHasWrongTypeError(expr, imports, `'imports' must be an array of components, directives, pipes, or NgModules.`).toDiagnostic();
     return {
       imports: [],
       diagnostics: [error]
@@ -5589,7 +5589,7 @@ function validateAndFlattenComponentImports(imports, expr) {
       if (isNamedClassDeclaration(ref.node)) {
         flattened.push(ref);
       } else {
-        diagnostics.push(createValueHasWrongTypeError(ref.getOriginForDiagnostics(expr), ref, `'imports' must be an array of components, directives, pipes, or NgModules`).toDiagnostic());
+        diagnostics.push(createValueHasWrongTypeError(ref.getOriginForDiagnostics(expr), ref, `'imports' must be an array of components, directives, pipes, or NgModules.`).toDiagnostic());
       }
     } else if (isLikelyModuleWithProviders(ref)) {
       let origin = expr;
@@ -5598,7 +5598,7 @@ function validateAndFlattenComponentImports(imports, expr) {
       }
       diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_UNKNOWN_IMPORT, origin, `'imports' contains a ModuleWithProviders value, likely the result of a 'Module.forRoot()'-style call. These calls are not used to configure components and are not valid in standalone component imports - consider importing them in the application bootstrap instead.`));
     } else {
-      diagnostics.push(createValueHasWrongTypeError(expr, imports, `'imports' must be an array of components, directives, pipes, or NgModules`).toDiagnostic());
+      diagnostics.push(createValueHasWrongTypeError(expr, imports, `'imports' must be an array of components, directives, pipes, or NgModules.`).toDiagnostic());
     }
   }
   return { imports: flattened, diagnostics };
@@ -6630,4 +6630,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2VBPNPMZ.js.map
+//# sourceMappingURL=chunk-I5J5TMUB.js.map
