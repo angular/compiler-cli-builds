@@ -369,26 +369,10 @@ var NodeJSFileSystem = class extends NodeJSReadonlyFileSystem {
     fs2.renameSync(from, to);
   }
   ensureDir(path) {
-    const parents = [];
-    while (!this.isRoot(path) && !this.exists(path)) {
-      parents.push(path);
-      path = this.dirname(path);
-    }
-    while (parents.length) {
-      this.safeMkdir(parents.pop());
-    }
+    fs2.mkdirSync(path, { recursive: true });
   }
   removeDeep(path) {
     fs2.rmdirSync(path, { recursive: true });
-  }
-  safeMkdir(path) {
-    try {
-      fs2.mkdirSync(path);
-    } catch (err) {
-      if (!this.exists(path) || !this.stat(path).isDirectory()) {
-        throw err;
-      }
-    }
   }
 };
 function toggleCase(str) {
@@ -424,4 +408,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TOKOIIBI.js.map
+//# sourceMappingURL=chunk-WEEZR5JR.js.map
