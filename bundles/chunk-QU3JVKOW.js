@@ -31,7 +31,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-R4GD76QD.js";
+} from "./chunk-I7SHRSKR.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -76,7 +76,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-EQ7NIVSK.js";
+} from "./chunk-TQIDTWES.js";
 import {
   getDecorators,
   getModifiers,
@@ -92,7 +92,7 @@ import {
   getSourceFileOrError,
   join,
   resolve
-} from "./chunk-TOKOIIBI.js";
+} from "./chunk-WEEZR5JR.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -7644,4 +7644,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-2LFNJ4YC.js.map
+//# sourceMappingURL=chunk-QU3JVKOW.js.map

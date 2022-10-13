@@ -42,5 +42,4 @@ export declare class NodeJSFileSystem extends NodeJSReadonlyFileSystem implement
     moveFile(from: AbsoluteFsPath, to: AbsoluteFsPath): void;
     ensureDir(path: AbsoluteFsPath): void;
     removeDeep(path: AbsoluteFsPath): void;
-    private safeMkdir;
 }
