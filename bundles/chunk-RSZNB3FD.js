@@ -33,7 +33,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-TQIDTWES.js";
+} from "./chunk-JBW3LNWN.js";
 import {
   combineModifiers,
   createPropertyDeclaration,
@@ -1455,198 +1455,7 @@ function createUnsuitableInjectionTokenError(clazz, error) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/diagnostics.mjs
-import ts5 from "typescript";
-function makeDuplicateDeclarationError(node, data, kind) {
-  const context = [];
-  for (const decl of data) {
-    if (decl.rawDeclarations === null) {
-      continue;
-    }
-    const contextNode = decl.ref.getOriginForDiagnostics(decl.rawDeclarations, decl.ngModule.name);
-    context.push(makeRelatedInformation(contextNode, `'${node.name.text}' is listed in the declarations of the NgModule '${decl.ngModule.name.text}'.`));
-  }
-  return makeDiagnostic(ErrorCode.NGMODULE_DECLARATION_NOT_UNIQUE, node.name, `The ${kind} '${node.name.text}' is declared by more than one NgModule.`, context);
-}
-function createValueHasWrongTypeError(node, value, messageText) {
-  var _a;
-  let chainedMessage;
-  let relatedInformation;
-  if (value instanceof DynamicValue) {
-    chainedMessage = "Value could not be determined statically.";
-    relatedInformation = traceDynamicValue(node, value);
-  } else if (value instanceof Reference) {
-    const target = value.debugName !== null ? `'${value.debugName}'` : "an anonymous declaration";
-    chainedMessage = `Value is a reference to ${target}.`;
-    const referenceNode = (_a = identifierOfNode(value.node)) != null ? _a : value.node;
-    relatedInformation = [makeRelatedInformation(referenceNode, "Reference is declared here.")];
-  } else {
-    chainedMessage = `Value is of type '${describeResolvedType(value)}'.`;
-  }
-  const chain = {
-    messageText,
-    category: ts5.DiagnosticCategory.Error,
-    code: 0,
-    next: [{
-      messageText: chainedMessage,
-      category: ts5.DiagnosticCategory.Message,
-      code: 0
-    }]
-  };
-  return new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, node, chain, relatedInformation);
-}
-function getProviderDiagnostics(providerClasses, providersDeclaration, registry) {
-  const diagnostics = [];
-  for (const provider of providerClasses) {
-    const injectableMeta = registry.getInjectableMeta(provider.node);
-    if (injectableMeta !== null) {
-      continue;
-    }
-    const contextNode = provider.getOriginForDiagnostics(providersDeclaration);
-    diagnostics.push(makeDiagnostic(ErrorCode.UNDECORATED_PROVIDER, contextNode, `The class '${provider.node.name.text}' cannot be created via dependency injection, as it does not have an Angular decorator. This will result in an error at runtime.
-
-Either add the @Injectable() decorator to '${provider.node.name.text}', or configure a different provider (such as a provider with 'useFactory').
-`, [makeRelatedInformation(provider.node, `'${provider.node.name.text}' is declared here.`)]));
-  }
-  return diagnostics;
-}
-function getDirectiveDiagnostics(node, injectableRegistry, evaluator, reflector, scopeRegistry, strictInjectionParameters, kind) {
-  let diagnostics = [];
-  const addDiagnostics = (more) => {
-    if (more === null) {
-      return;
-    } else if (diagnostics === null) {
-      diagnostics = Array.isArray(more) ? more : [more];
-    } else if (Array.isArray(more)) {
-      diagnostics.push(...more);
-    } else {
-      diagnostics.push(more);
-    }
-  };
-  const duplicateDeclarations = scopeRegistry.getDuplicateDeclarations(node);
-  if (duplicateDeclarations !== null) {
-    addDiagnostics(makeDuplicateDeclarationError(node, duplicateDeclarations, kind));
-  }
-  addDiagnostics(checkInheritanceOfInjectable(node, injectableRegistry, reflector, evaluator, strictInjectionParameters, kind));
-  return diagnostics;
-}
-function validateHostDirectives(origin, hostDirectives, metaReader) {
-  const diagnostics = [];
-  for (const current of hostDirectives) {
-    const hostMeta = metaReader.getDirectiveMetadata(current.directive);
-    if (hostMeta === null) {
-      diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_INVALID, current.directive.getOriginForDiagnostics(origin), `${current.directive.debugName} must be a standalone directive to be used as a host directive`));
-      continue;
-    }
-    if (!hostMeta.isStandalone) {
-      diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_NOT_STANDALONE, current.directive.getOriginForDiagnostics(origin), `Host directive ${hostMeta.name} must be standalone`));
-    }
-    if (hostMeta.isComponent) {
-      diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_COMPONENT, current.directive.getOriginForDiagnostics(origin), `Host directive ${hostMeta.name} cannot be a component`));
-    }
-  }
-  return diagnostics;
-}
-function getUndecoratedClassWithAngularFeaturesDiagnostic(node) {
-  return makeDiagnostic(ErrorCode.UNDECORATED_CLASS_USING_ANGULAR_FEATURES, node.name, `Class is using Angular features but is not decorated. Please add an explicit Angular decorator.`);
-}
-function checkInheritanceOfInjectable(node, injectableRegistry, reflector, evaluator, strictInjectionParameters, kind) {
-  const classWithCtor = findInheritedCtor(node, injectableRegistry, reflector, evaluator);
-  if (classWithCtor === null || classWithCtor.isCtorValid) {
-    return null;
-  }
-  if (!classWithCtor.isDecorated) {
-    return getInheritedUndecoratedCtorDiagnostic(node, classWithCtor.ref, kind);
-  }
-  if (!strictInjectionParameters || isAbstractClassDeclaration(node)) {
-    return null;
-  }
-  return getInheritedInvalidCtorDiagnostic(node, classWithCtor.ref, kind);
-}
-function findInheritedCtor(node, injectableRegistry, reflector, evaluator) {
-  if (!reflector.isClass(node) || reflector.getConstructorParameters(node) !== null) {
-    return null;
-  }
-  let baseClass = readBaseClass(node, reflector, evaluator);
-  while (baseClass !== null) {
-    if (baseClass === "dynamic") {
-      return null;
-    }
-    const injectableMeta = injectableRegistry.getInjectableMeta(baseClass.node);
-    if (injectableMeta !== null) {
-      if (injectableMeta.ctorDeps !== null) {
-        return {
-          ref: baseClass,
-          isCtorValid: injectableMeta.ctorDeps !== "invalid",
-          isDecorated: true
-        };
-      }
-    } else {
-      const baseClassConstructorParams = reflector.getConstructorParameters(baseClass.node);
-      if (baseClassConstructorParams !== null) {
-        return {
-          ref: baseClass,
-          isCtorValid: baseClassConstructorParams.length === 0,
-          isDecorated: false
-        };
-      }
-    }
-    baseClass = readBaseClass(baseClass.node, reflector, evaluator);
-  }
-  return null;
-}
-function getInheritedInvalidCtorDiagnostic(node, baseClass, kind) {
-  const baseClassName = baseClass.debugName;
-  return makeDiagnostic(ErrorCode.INJECTABLE_INHERITS_INVALID_CONSTRUCTOR, node.name, `The ${kind.toLowerCase()} ${node.name.text} inherits its constructor from ${baseClassName}, but the latter has a constructor parameter that is not compatible with dependency injection. Either add an explicit constructor to ${node.name.text} or change ${baseClassName}'s constructor to use parameters that are valid for DI.`);
-}
-function getInheritedUndecoratedCtorDiagnostic(node, baseClass, kind) {
-  const baseClassName = baseClass.debugName;
-  const baseNeedsDecorator = kind === "Component" || kind === "Directive" ? "Directive" : "Injectable";
-  return makeDiagnostic(ErrorCode.DIRECTIVE_INHERITS_UNDECORATED_CTOR, node.name, `The ${kind.toLowerCase()} ${node.name.text} inherits its constructor from ${baseClassName}, but the latter does not have an Angular decorator of its own. Dependency injection will not be able to resolve the parameters of ${baseClassName}'s constructor. Either add a @${baseNeedsDecorator} decorator to ${baseClassName}, or add an explicit constructor to ${node.name.text}.`);
-}
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/evaluation.mjs
-import ts6 from "typescript";
-function resolveEnumValue(evaluator, metadata, field, enumSymbolName) {
-  let resolved = null;
-  if (metadata.has(field)) {
-    const expr = metadata.get(field);
-    const value = evaluator.evaluate(expr);
-    if (value instanceof EnumValue && isAngularCoreReference(value.enumRef, enumSymbolName)) {
-      resolved = value.resolved;
-    } else {
-      throw createValueHasWrongTypeError(expr, value, `${field} must be a member of ${enumSymbolName} enum from @angular/core`);
-    }
-  }
-  return resolved;
-}
-function isStringArray(resolvedValue) {
-  return Array.isArray(resolvedValue) && resolvedValue.every((elem) => typeof elem === "string");
-}
-function resolveLiteral(decorator, literalCache) {
-  if (literalCache.has(decorator)) {
-    return literalCache.get(decorator);
-  }
-  if (decorator.args === null || decorator.args.length !== 1) {
-    throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `Incorrect number of arguments to @${decorator.name} decorator`);
-  }
-  const meta = unwrapExpression(decorator.args[0]);
-  if (!ts6.isObjectLiteralExpression(meta)) {
-    throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, `Decorator argument must be literal.`);
-  }
-  literalCache.set(decorator, meta);
-  return meta;
-}
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/factory.mjs
-import { compileDeclareFactoryFunction, compileFactoryFunction } from "@angular/compiler";
-function compileNgFactoryDefField(metadata) {
-  const res = compileFactoryFunction(metadata);
-  return { name: "\u0275fac", initializer: res.expression, statements: res.statements, type: res.type };
-}
-function compileDeclareFactory(metadata) {
-  const res = compileDeclareFactoryFunction(metadata);
-  return { name: "\u0275fac", initializer: res.expression, statements: res.statements, type: res.type };
-}
+import ts7 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/api.mjs
 var MetaKind;
@@ -1662,7 +1471,7 @@ var MatchSource;
 })(MatchSource || (MatchSource = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/dts.mjs
-import ts8 from "typescript";
+import ts6 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/property_mapping.mjs
 var ClassPropertyMapping = class {
@@ -1741,13 +1550,13 @@ function reverseMapFromForwardMap(forwardMap) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/util.mjs
-import ts7 from "typescript";
+import ts5 from "typescript";
 function extractReferencesFromType(checker, def, bestGuessOwningModule) {
-  if (!ts7.isTupleTypeNode(def)) {
+  if (!ts5.isTupleTypeNode(def)) {
     return [];
   }
   return def.elements.map((element) => {
-    if (!ts7.isTypeQueryNode(element)) {
+    if (!ts5.isTypeQueryNode(element)) {
       throw new Error(`Expected TypeQueryNode: ${nodeDebugInfo(element)}`);
     }
     return extraReferenceFromTypeQuery(checker, element, def, bestGuessOwningModule);
@@ -1765,31 +1574,31 @@ function extraReferenceFromTypeQuery(checker, typeNode, origin, bestGuessOwningM
   return new Reference(node, bestGuessOwningModule);
 }
 function readBooleanType(type) {
-  if (!ts7.isLiteralTypeNode(type)) {
+  if (!ts5.isLiteralTypeNode(type)) {
     return null;
   }
   switch (type.literal.kind) {
-    case ts7.SyntaxKind.TrueKeyword:
+    case ts5.SyntaxKind.TrueKeyword:
       return true;
-    case ts7.SyntaxKind.FalseKeyword:
+    case ts5.SyntaxKind.FalseKeyword:
       return false;
     default:
       return null;
   }
 }
 function readStringType(type) {
-  if (!ts7.isLiteralTypeNode(type) || !ts7.isStringLiteral(type.literal)) {
+  if (!ts5.isLiteralTypeNode(type) || !ts5.isStringLiteral(type.literal)) {
     return null;
   }
   return type.literal.text;
 }
 function readMapType(type, valueTransform) {
-  if (!ts7.isTypeLiteralNode(type)) {
+  if (!ts5.isTypeLiteralNode(type)) {
     return {};
   }
   const obj = {};
   type.members.forEach((member) => {
-    if (!ts7.isPropertySignature(member) || member.type === void 0 || member.name === void 0 || !ts7.isStringLiteral(member.name) && !ts7.isIdentifier(member.name)) {
+    if (!ts5.isPropertySignature(member) || member.type === void 0 || member.name === void 0 || !ts5.isStringLiteral(member.name) && !ts5.isIdentifier(member.name)) {
       return;
     }
     const value = valueTransform(member.type);
@@ -1801,12 +1610,12 @@ function readMapType(type, valueTransform) {
   return obj;
 }
 function readStringArrayType(type) {
-  if (!ts7.isTupleTypeNode(type)) {
+  if (!ts5.isTupleTypeNode(type)) {
     return [];
   }
   const res = [];
   type.elements.forEach((el) => {
-    if (!ts7.isLiteralTypeNode(el) || !ts7.isStringLiteral(el.literal)) {
+    if (!ts5.isLiteralTypeNode(el) || !ts5.isStringLiteral(el.literal)) {
       return;
     }
     res.push(el.literal.text);
@@ -1831,7 +1640,7 @@ function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
     if (isRestricted(field.node)) {
       restrictedInputFields.add(classPropertyName);
     }
-    if (field.nameNode !== null && ts7.isStringLiteral(field.nameNode)) {
+    if (field.nameNode !== null && ts5.isStringLiteral(field.nameNode)) {
       stringLiteralInputFields.add(classPropertyName);
     }
   }
@@ -1849,7 +1658,7 @@ function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
 function isRestricted(node) {
   const modifiers = getModifiers(node);
   return modifiers !== void 0 && modifiers.some(({ kind }) => {
-    return kind === ts7.SyntaxKind.PrivateKeyword || kind === ts7.SyntaxKind.ProtectedKeyword || kind === ts7.SyntaxKind.ReadonlyKeyword;
+    return kind === ts5.SyntaxKind.PrivateKeyword || kind === ts5.SyntaxKind.ProtectedKeyword || kind === ts5.SyntaxKind.ReadonlyKeyword;
   });
 }
 function extractTemplateGuard(member) {
@@ -1859,7 +1668,7 @@ function extractTemplateGuard(member) {
   const inputName = afterUnderscore(member.name);
   if (member.kind === ClassMemberKind.Property) {
     let type = null;
-    if (member.type !== null && ts7.isLiteralTypeNode(member.type) && ts7.isStringLiteral(member.type.literal)) {
+    if (member.type !== null && ts5.isLiteralTypeNode(member.type) && ts5.isStringLiteral(member.type.literal)) {
       type = member.type.literal.text;
     }
     if (type !== "binding") {
@@ -1933,7 +1742,7 @@ var DtsMetadataReader = class {
     const ngModuleDef = this.reflector.getMembersOfClass(clazz).find((member) => member.name === "\u0275mod" && member.isStatic);
     if (ngModuleDef === void 0) {
       return null;
-    } else if (ngModuleDef.type === null || !ts8.isTypeReferenceNode(ngModuleDef.type) || ngModuleDef.type.typeArguments === void 0 || ngModuleDef.type.typeArguments.length !== 4) {
+    } else if (ngModuleDef.type === null || !ts6.isTypeReferenceNode(ngModuleDef.type) || ngModuleDef.type.typeArguments === void 0 || ngModuleDef.type.typeArguments.length !== 4) {
       return null;
     }
     const [_, declarationMetadata, importMetadata, exportMetadata] = ngModuleDef.type.typeArguments;
@@ -1956,7 +1765,7 @@ var DtsMetadataReader = class {
     const def = this.reflector.getMembersOfClass(clazz).find((field) => field.isStatic && (field.name === "\u0275cmp" || field.name === "\u0275dir"));
     if (def === void 0) {
       return null;
-    } else if (def.type === null || !ts8.isTypeReferenceNode(def.type) || def.type.typeArguments === void 0 || def.type.typeArguments.length < 2) {
+    } else if (def.type === null || !ts6.isTypeReferenceNode(def.type) || def.type.typeArguments === void 0 || def.type.typeArguments.length < 2) {
       return null;
     }
     const isComponent = def.name === "\u0275cmp";
@@ -1996,11 +1805,11 @@ var DtsMetadataReader = class {
     const def = this.reflector.getMembersOfClass(ref.node).find((field) => field.isStatic && field.name === "\u0275pipe");
     if (def === void 0) {
       return null;
-    } else if (def.type === null || !ts8.isTypeReferenceNode(def.type) || def.type.typeArguments === void 0 || def.type.typeArguments.length < 2) {
+    } else if (def.type === null || !ts6.isTypeReferenceNode(def.type) || def.type.typeArguments === void 0 || def.type.typeArguments.length < 2) {
       return null;
     }
     const type = def.type.typeArguments[1];
-    if (!ts8.isLiteralTypeNode(type) || !ts8.isStringLiteral(type.literal)) {
+    if (!ts6.isLiteralTypeNode(type) || !ts6.isStringLiteral(type.literal)) {
       return null;
     }
     const name = type.literal.text;
@@ -2021,12 +1830,12 @@ function readBaseClass2(clazz, checker, reflector) {
   }
   if (clazz.heritageClauses !== void 0) {
     for (const clause of clazz.heritageClauses) {
-      if (clause.token === ts8.SyntaxKind.ExtendsKeyword) {
+      if (clause.token === ts6.SyntaxKind.ExtendsKeyword) {
         const baseExpr = clause.types[0].expression;
         let symbol = checker.getSymbolAtLocation(baseExpr);
         if (symbol === void 0) {
           return "dynamic";
-        } else if (symbol.flags & ts8.SymbolFlags.Alias) {
+        } else if (symbol.flags & ts6.SymbolFlags.Alias) {
           symbol = checker.getAliasedSymbol(symbol);
         }
         if (symbol.valueDeclaration !== void 0 && isNamedClassDeclaration(symbol.valueDeclaration)) {
@@ -2040,14 +1849,14 @@ function readBaseClass2(clazz, checker, reflector) {
   return null;
 }
 function readHostDirectivesType(checker, type, bestGuessOwningModule) {
-  if (!ts8.isTupleTypeNode(type) || type.elements.length === 0) {
+  if (!ts6.isTupleTypeNode(type) || type.elements.length === 0) {
     return null;
   }
   const result = [];
   for (const hostDirectiveType of type.elements) {
     const { directive, inputs, outputs } = readMapType(hostDirectiveType, (type2) => type2);
     if (directive) {
-      if (!ts8.isTypeQueryNode(directive)) {
+      if (!ts6.isTypeQueryNode(directive)) {
         throw new Error(`Expected TypeQueryNode: ${nodeDebugInfo(directive)}`);
       }
       result.push({
@@ -2284,6 +2093,222 @@ var HostDirectivesResolver = class {
     return ClassPropertyMapping.fromMappedObject(result);
   }
 };
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/diagnostics.mjs
+function makeDuplicateDeclarationError(node, data, kind) {
+  const context = [];
+  for (const decl of data) {
+    if (decl.rawDeclarations === null) {
+      continue;
+    }
+    const contextNode = decl.ref.getOriginForDiagnostics(decl.rawDeclarations, decl.ngModule.name);
+    context.push(makeRelatedInformation(contextNode, `'${node.name.text}' is listed in the declarations of the NgModule '${decl.ngModule.name.text}'.`));
+  }
+  return makeDiagnostic(ErrorCode.NGMODULE_DECLARATION_NOT_UNIQUE, node.name, `The ${kind} '${node.name.text}' is declared by more than one NgModule.`, context);
+}
+function createValueHasWrongTypeError(node, value, messageText) {
+  var _a;
+  let chainedMessage;
+  let relatedInformation;
+  if (value instanceof DynamicValue) {
+    chainedMessage = "Value could not be determined statically.";
+    relatedInformation = traceDynamicValue(node, value);
+  } else if (value instanceof Reference) {
+    const target = value.debugName !== null ? `'${value.debugName}'` : "an anonymous declaration";
+    chainedMessage = `Value is a reference to ${target}.`;
+    const referenceNode = (_a = identifierOfNode(value.node)) != null ? _a : value.node;
+    relatedInformation = [makeRelatedInformation(referenceNode, "Reference is declared here.")];
+  } else {
+    chainedMessage = `Value is of type '${describeResolvedType(value)}'.`;
+  }
+  const chain = {
+    messageText,
+    category: ts7.DiagnosticCategory.Error,
+    code: 0,
+    next: [{
+      messageText: chainedMessage,
+      category: ts7.DiagnosticCategory.Message,
+      code: 0
+    }]
+  };
+  return new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, node, chain, relatedInformation);
+}
+function getProviderDiagnostics(providerClasses, providersDeclaration, registry) {
+  const diagnostics = [];
+  for (const provider of providerClasses) {
+    const injectableMeta = registry.getInjectableMeta(provider.node);
+    if (injectableMeta !== null) {
+      continue;
+    }
+    const contextNode = provider.getOriginForDiagnostics(providersDeclaration);
+    diagnostics.push(makeDiagnostic(ErrorCode.UNDECORATED_PROVIDER, contextNode, `The class '${provider.node.name.text}' cannot be created via dependency injection, as it does not have an Angular decorator. This will result in an error at runtime.
+
+Either add the @Injectable() decorator to '${provider.node.name.text}', or configure a different provider (such as a provider with 'useFactory').
+`, [makeRelatedInformation(provider.node, `'${provider.node.name.text}' is declared here.`)]));
+  }
+  return diagnostics;
+}
+function getDirectiveDiagnostics(node, injectableRegistry, evaluator, reflector, scopeRegistry, strictInjectionParameters, kind) {
+  let diagnostics = [];
+  const addDiagnostics = (more) => {
+    if (more === null) {
+      return;
+    } else if (diagnostics === null) {
+      diagnostics = Array.isArray(more) ? more : [more];
+    } else if (Array.isArray(more)) {
+      diagnostics.push(...more);
+    } else {
+      diagnostics.push(more);
+    }
+  };
+  const duplicateDeclarations = scopeRegistry.getDuplicateDeclarations(node);
+  if (duplicateDeclarations !== null) {
+    addDiagnostics(makeDuplicateDeclarationError(node, duplicateDeclarations, kind));
+  }
+  addDiagnostics(checkInheritanceOfInjectable(node, injectableRegistry, reflector, evaluator, strictInjectionParameters, kind));
+  return diagnostics;
+}
+function validateHostDirectives(origin, hostDirectives, metaReader) {
+  const diagnostics = [];
+  for (const current of hostDirectives) {
+    const hostMeta = flattenInheritedDirectiveMetadata(metaReader, current.directive);
+    if (hostMeta === null) {
+      diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_INVALID, current.directive.getOriginForDiagnostics(origin), `${current.directive.debugName} must be a standalone directive to be used as a host directive`));
+      continue;
+    }
+    if (!hostMeta.isStandalone) {
+      diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_NOT_STANDALONE, current.directive.getOriginForDiagnostics(origin), `Host directive ${hostMeta.name} must be standalone`));
+    }
+    if (hostMeta.isComponent) {
+      diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_COMPONENT, current.directive.getOriginForDiagnostics(origin), `Host directive ${hostMeta.name} cannot be a component`));
+    }
+    validateHostDirectiveMappings("input", current, hostMeta, origin, diagnostics);
+    validateHostDirectiveMappings("output", current, hostMeta, origin, diagnostics);
+  }
+  return diagnostics;
+}
+function validateHostDirectiveMappings(bindingType, hostDirectiveMeta, meta, origin, diagnostics) {
+  const className = meta.name;
+  const hostDirectiveMappings = bindingType === "input" ? hostDirectiveMeta.inputs : hostDirectiveMeta.outputs;
+  const existingBindings = bindingType === "input" ? meta.inputs : meta.outputs;
+  for (const publicName in hostDirectiveMappings) {
+    if (hostDirectiveMappings.hasOwnProperty(publicName)) {
+      if (!existingBindings.hasBindingPropertyName(publicName)) {
+        diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_UNDEFINED_BINDING, hostDirectiveMeta.directive.getOriginForDiagnostics(origin), `Directive ${className} does not have an ${bindingType} with a public name of ${publicName}.`));
+      }
+      const remappedPublicName = hostDirectiveMappings[publicName];
+      const bindingsForPublicName = existingBindings.getByBindingPropertyName(remappedPublicName);
+      if (bindingsForPublicName !== null) {
+        for (const binding of bindingsForPublicName) {
+          if (binding.bindingPropertyName !== publicName) {
+            diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_CONFLICTING_ALIAS, hostDirectiveMeta.directive.getOriginForDiagnostics(origin), `Cannot alias ${bindingType} ${publicName} of host directive ${className} to ${remappedPublicName}, because it already has a different ${bindingType} with the same public name.`));
+          }
+        }
+      }
+    }
+  }
+}
+function getUndecoratedClassWithAngularFeaturesDiagnostic(node) {
+  return makeDiagnostic(ErrorCode.UNDECORATED_CLASS_USING_ANGULAR_FEATURES, node.name, `Class is using Angular features but is not decorated. Please add an explicit Angular decorator.`);
+}
+function checkInheritanceOfInjectable(node, injectableRegistry, reflector, evaluator, strictInjectionParameters, kind) {
+  const classWithCtor = findInheritedCtor(node, injectableRegistry, reflector, evaluator);
+  if (classWithCtor === null || classWithCtor.isCtorValid) {
+    return null;
+  }
+  if (!classWithCtor.isDecorated) {
+    return getInheritedUndecoratedCtorDiagnostic(node, classWithCtor.ref, kind);
+  }
+  if (!strictInjectionParameters || isAbstractClassDeclaration(node)) {
+    return null;
+  }
+  return getInheritedInvalidCtorDiagnostic(node, classWithCtor.ref, kind);
+}
+function findInheritedCtor(node, injectableRegistry, reflector, evaluator) {
+  if (!reflector.isClass(node) || reflector.getConstructorParameters(node) !== null) {
+    return null;
+  }
+  let baseClass = readBaseClass(node, reflector, evaluator);
+  while (baseClass !== null) {
+    if (baseClass === "dynamic") {
+      return null;
+    }
+    const injectableMeta = injectableRegistry.getInjectableMeta(baseClass.node);
+    if (injectableMeta !== null) {
+      if (injectableMeta.ctorDeps !== null) {
+        return {
+          ref: baseClass,
+          isCtorValid: injectableMeta.ctorDeps !== "invalid",
+          isDecorated: true
+        };
+      }
+    } else {
+      const baseClassConstructorParams = reflector.getConstructorParameters(baseClass.node);
+      if (baseClassConstructorParams !== null) {
+        return {
+          ref: baseClass,
+          isCtorValid: baseClassConstructorParams.length === 0,
+          isDecorated: false
+        };
+      }
+    }
+    baseClass = readBaseClass(baseClass.node, reflector, evaluator);
+  }
+  return null;
+}
+function getInheritedInvalidCtorDiagnostic(node, baseClass, kind) {
+  const baseClassName = baseClass.debugName;
+  return makeDiagnostic(ErrorCode.INJECTABLE_INHERITS_INVALID_CONSTRUCTOR, node.name, `The ${kind.toLowerCase()} ${node.name.text} inherits its constructor from ${baseClassName}, but the latter has a constructor parameter that is not compatible with dependency injection. Either add an explicit constructor to ${node.name.text} or change ${baseClassName}'s constructor to use parameters that are valid for DI.`);
+}
+function getInheritedUndecoratedCtorDiagnostic(node, baseClass, kind) {
+  const baseClassName = baseClass.debugName;
+  const baseNeedsDecorator = kind === "Component" || kind === "Directive" ? "Directive" : "Injectable";
+  return makeDiagnostic(ErrorCode.DIRECTIVE_INHERITS_UNDECORATED_CTOR, node.name, `The ${kind.toLowerCase()} ${node.name.text} inherits its constructor from ${baseClassName}, but the latter does not have an Angular decorator of its own. Dependency injection will not be able to resolve the parameters of ${baseClassName}'s constructor. Either add a @${baseNeedsDecorator} decorator to ${baseClassName}, or add an explicit constructor to ${node.name.text}.`);
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/evaluation.mjs
+import ts8 from "typescript";
+function resolveEnumValue(evaluator, metadata, field, enumSymbolName) {
+  let resolved = null;
+  if (metadata.has(field)) {
+    const expr = metadata.get(field);
+    const value = evaluator.evaluate(expr);
+    if (value instanceof EnumValue && isAngularCoreReference(value.enumRef, enumSymbolName)) {
+      resolved = value.resolved;
+    } else {
+      throw createValueHasWrongTypeError(expr, value, `${field} must be a member of ${enumSymbolName} enum from @angular/core`);
+    }
+  }
+  return resolved;
+}
+function isStringArray(resolvedValue) {
+  return Array.isArray(resolvedValue) && resolvedValue.every((elem) => typeof elem === "string");
+}
+function resolveLiteral(decorator, literalCache) {
+  if (literalCache.has(decorator)) {
+    return literalCache.get(decorator);
+  }
+  if (decorator.args === null || decorator.args.length !== 1) {
+    throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `Incorrect number of arguments to @${decorator.name} decorator`);
+  }
+  const meta = unwrapExpression(decorator.args[0]);
+  if (!ts8.isObjectLiteralExpression(meta)) {
+    throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, `Decorator argument must be literal.`);
+  }
+  literalCache.set(decorator, meta);
+  return meta;
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/factory.mjs
+import { compileDeclareFactoryFunction, compileFactoryFunction } from "@angular/compiler";
+function compileNgFactoryDefField(metadata) {
+  const res = compileFactoryFunction(metadata);
+  return { name: "\u0275fac", initializer: res.expression, statements: res.statements, type: res.type };
+}
+function compileDeclareFactory(metadata) {
+  const res = compileDeclareFactoryFunction(metadata);
+  return { name: "\u0275fac", initializer: res.expression, statements: res.statements, type: res.type };
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/injectable_registry.mjs
 var InjectableClassRegistry = class {
@@ -6831,9 +6856,6 @@ var PipeDecoratorHandler = class {
 export {
   forwardRefResolver,
   readBaseClass,
-  DynamicValue,
-  StaticInterpreter,
-  PartialEvaluator,
   MetaKind,
   CompoundMetadataReader,
   DtsMetadataReader,
@@ -6841,6 +6863,9 @@ export {
   CompoundMetadataRegistry,
   ResourceRegistry,
   HostDirectivesResolver,
+  DynamicValue,
+  StaticInterpreter,
+  PartialEvaluator,
   InjectableClassRegistry,
   NoopReferencesRegistry,
   SemanticDepGraphUpdater,
@@ -6877,4 +6902,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-I7SHRSKR.js.map
+//# sourceMappingURL=chunk-RSZNB3FD.js.map
