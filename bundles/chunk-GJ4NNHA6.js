@@ -8,7 +8,7 @@ import {
   ImportGraph,
   isShim,
   readConfiguration
-} from "./chunk-QU3JVKOW.js";
+} from "./chunk-IF3DS77J.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -33,7 +33,7 @@ import {
   TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-I7SHRSKR.js";
+} from "./chunk-RSZNB3FD.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -73,7 +73,7 @@ import {
   translateStatement,
   translateType,
   validateAndRewriteCoreSymbol
-} from "./chunk-TQIDTWES.js";
+} from "./chunk-JBW3LNWN.js";
 import {
   getModifiers
 } from "./chunk-F526PAOI.js";
@@ -5188,4 +5188,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-5W3GRQYJ.js.map
+//# sourceMappingURL=chunk-GJ4NNHA6.js.map
