@@ -14,18 +14,18 @@ export declare enum FileChangeEvent {
     CreateDelete = 1,
     CreateDeleteDir = 2
 }
-export interface PerformWatchHost {
+export interface PerformWatchHost<CbEmitRes extends ts.EmitResult = ts.EmitResult> {
     reportDiagnostics(diagnostics: ReadonlyArray<ts.Diagnostic>): void;
     readConfiguration(): ParsedConfiguration;
     createCompilerHost(options: api.CompilerOptions): api.CompilerHost;
-    createEmitCallback(options: api.CompilerOptions): api.TsEmitCallback | undefined;
+    createEmitCallback(options: api.CompilerOptions): api.TsEmitCallback<CbEmitRes> | undefined;
     onFileChange(options: api.CompilerOptions, listener: (event: FileChangeEvent, fileName: string) => void, ready: () => void): {
         close: () => void;
     };
     setTimeout(callback: () => void, ms: number): any;
     clearTimeout(timeoutId: any): void;
 }
-export declare function createPerformWatchHost(configFileName: string, reportDiagnostics: (diagnostics: ReadonlyArray<ts.Diagnostic>) => void, existingOptions?: ts.CompilerOptions, createEmitCallback?: (options: api.CompilerOptions) => api.TsEmitCallback | undefined): PerformWatchHost;
+export declare function createPerformWatchHost<CbEmitRes extends ts.EmitResult = ts.EmitResult>(configFileName: string, reportDiagnostics: (diagnostics: ReadonlyArray<ts.Diagnostic>) => void, existingOptions?: ts.CompilerOptions, createEmitCallback?: (options: api.CompilerOptions) => api.TsEmitCallback<CbEmitRes> | undefined): PerformWatchHost;
 /**
  * The logic in this function is adapted from `tsc.ts` from TypeScript.
  */

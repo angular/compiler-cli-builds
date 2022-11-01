@@ -45,14 +45,7 @@ export declare class NgtscProgram implements api.Program {
     loadNgStructureAsync(): Promise<void>;
     listLazyRoutes(entryRoute?: string | undefined): api.LazyRoute[];
     private emitXi18n;
-    emit(opts?: {
-        emitFlags?: api.EmitFlags | undefined;
-        forceEmit?: boolean;
-        cancellationToken?: ts.CancellationToken | undefined;
-        customTransformers?: api.CustomTransformers | undefined;
-        emitCallback?: api.TsEmitCallback | undefined;
-        mergeEmitResultsCallback?: api.TsMergeEmitResultsCallback | undefined;
-    } | undefined): ts.EmitResult;
+    emit<CbEmitRes extends ts.EmitResult>(opts?: api.EmitOptions<CbEmitRes> | undefined): ts.EmitResult;
     getIndexedComponents(): Map<DeclarationNode, IndexedComponent>;
     getEmittedSourceFiles(): Map<string, ts.SourceFile>;
 }

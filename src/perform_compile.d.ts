@@ -31,13 +31,13 @@ export interface PerformCompilationResult {
     emitResult?: ts.EmitResult;
 }
 export declare function exitCodeFromResult(diags: ReadonlyArray<ts.Diagnostic> | undefined): number;
-export declare function performCompilation({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags, forceEmit, modifiedResourceFiles }: {
+export declare function performCompilation<CbEmitRes extends ts.EmitResult = ts.EmitResult>({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags, forceEmit, modifiedResourceFiles }: {
     rootNames: string[];
     options: api.CompilerOptions;
     host?: api.CompilerHost;
     oldProgram?: api.Program;
-    emitCallback?: api.TsEmitCallback;
-    mergeEmitResultsCallback?: api.TsMergeEmitResultsCallback;
+    emitCallback?: api.TsEmitCallback<CbEmitRes>;
+    mergeEmitResultsCallback?: api.TsMergeEmitResultsCallback<CbEmitRes>;
     gatherDiagnostics?: (program: api.Program) => ReadonlyArray<ts.Diagnostic>;
     customTransformers?: api.CustomTransformers;
     emitFlags?: api.EmitFlags;
