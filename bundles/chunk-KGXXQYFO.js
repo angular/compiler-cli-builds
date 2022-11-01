@@ -7336,9 +7336,10 @@ var NgtscProgram = class {
     const forceEmit = (_a = opts == null ? void 0 : opts.forceEmit) != null ? _a : false;
     this.compiler.perfRecorder.memory(PerfCheckpoint.PreEmit);
     const res = this.compiler.perfRecorder.inPhase(PerfPhase.TypeScriptEmit, () => {
+      var _a2;
       const { transformers } = this.compiler.prepareEmit();
       const ignoreFiles = this.compiler.ignoreForEmit;
-      const emitCallback = opts && opts.emitCallback || defaultEmitCallback;
+      const emitCallback = (_a2 = opts == null ? void 0 : opts.emitCallback) != null ? _a2 : defaultEmitCallback;
       const writeFile = (fileName, data, writeByteOrderMark, onError, sourceFiles) => {
         if (sourceFiles !== void 0) {
           for (const writtenSf of sourceFiles) {
@@ -7644,4 +7645,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-IF3DS77J.js.map
+//# sourceMappingURL=chunk-KGXXQYFO.js.map
