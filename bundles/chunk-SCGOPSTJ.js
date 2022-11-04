@@ -1972,7 +1972,7 @@ var StandaloneComponentScopeReader = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
-import { CssSelector, DomElementSchemaRegistry as DomElementSchemaRegistry2 } from "@angular/compiler";
+import { CssSelector, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr2, WrappedNodeExpr } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.mjs
 import ts11 from "typescript";
@@ -5779,11 +5779,18 @@ var TemplateTypeCheckerImpl = class {
     if (toImport.ngModule !== null) {
       ngModuleRef = (_a = this.metaReader.getNgModuleMetadata(new Reference(toImport.ngModule))) == null ? void 0 : _a.ref;
     }
+    const kind = ngModuleRef ? PotentialImportKind.NgModule : PotentialImportKind.Standalone;
     const importTarget = ngModuleRef != null ? ngModuleRef : toImport.ref;
     const emittedRef = this.refEmitter.emit(importTarget, inContext.getSourceFile());
     if (emittedRef.kind === 1)
       return [];
     const emittedExpression = emittedRef.expression;
+    if (emittedExpression instanceof WrappedNodeExpr) {
+      return [{ kind, symbolName: emittedExpression.node.getText() }];
+    }
+    if (!(emittedExpression instanceof ExternalExpr2)) {
+      return [];
+    }
     if (emittedExpression.value.moduleName === null || emittedExpression.value.name === null)
       return [];
     const preferredImport = {
@@ -7645,4 +7652,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-KGXXQYFO.js.map
+//# sourceMappingURL=chunk-SCGOPSTJ.js.map

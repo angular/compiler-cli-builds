@@ -16,7 +16,7 @@ import { SymbolWithValueDeclaration } from '../../util/src/typescript';
  */
 export interface PotentialImport {
     kind: PotentialImportKind;
-    moduleSpecifier: string;
+    moduleSpecifier?: string;
     symbolName: string;
 }
 /**
