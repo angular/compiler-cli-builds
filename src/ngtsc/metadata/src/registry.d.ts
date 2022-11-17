@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/registry" />
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
-import { DirectiveMeta, MetadataReaderWithIndex, MetadataRegistry, NgModuleMeta, PipeMeta } from './api';
+import { DirectiveMeta, MetadataReaderWithIndex, MetadataRegistry, MetaKind, NgModuleMeta, PipeMeta } from './api';
 /**
  * A registry of directive, pipe, and module metadata for types defined in the current compilation
  * unit, which supports both reading and registering.
@@ -23,7 +23,7 @@ export declare class LocalMetadataRegistry implements MetadataRegistry, Metadata
     registerDirectiveMetadata(meta: DirectiveMeta): void;
     registerNgModuleMetadata(meta: NgModuleMeta): void;
     registerPipeMetadata(meta: PipeMeta): void;
-    getKnownDirectives(): Iterable<ClassDeclaration>;
+    getKnown(kind: MetaKind): Iterable<ClassDeclaration>;
 }
 /**
  * A `MetadataRegistry` which registers metadata with multiple delegate `MetadataRegistry`

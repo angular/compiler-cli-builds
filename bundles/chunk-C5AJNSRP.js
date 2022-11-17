@@ -31,7 +31,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-RSZNB3FD.js";
+} from "./chunk-JVNCFS25.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -5681,7 +5681,7 @@ var TemplateTypeCheckerImpl = class {
     for (const d of inScopeDirectives) {
       resultingDirectives.set(d.ref.node, d);
     }
-    for (const directiveClass of this.localMetaReader.getKnownDirectives()) {
+    for (const directiveClass of this.localMetaReader.getKnown(MetaKind.Directive)) {
       const directiveMeta = this.metaReader.getDirectiveMetadata(new Reference(directiveClass));
       if (directiveMeta === null)
         continue;
@@ -5694,12 +5694,26 @@ var TemplateTypeCheckerImpl = class {
     }
     return Array.from(resultingDirectives.values());
   }
-  getPipesInScope(component) {
-    const data = this.getScopeData(component);
-    if (data === null) {
-      return null;
+  getPotentialPipes(component) {
+    var _a, _b;
+    const typeChecker = this.programDriver.getProgram().getTypeChecker();
+    const inScopePipes = (_b = (_a = this.getScopeData(component)) == null ? void 0 : _a.pipes) != null ? _b : [];
+    const resultingPipes = /* @__PURE__ */ new Map();
+    for (const p of inScopePipes) {
+      resultingPipes.set(p.ref.node, p);
     }
-    return data.pipes;
+    for (const pipeClass of this.localMetaReader.getKnown(MetaKind.Pipe)) {
+      const pipeMeta = this.metaReader.getPipeMetadata(new Reference(pipeClass));
+      if (pipeMeta === null)
+        continue;
+      if (resultingPipes.has(pipeClass))
+        continue;
+      const withScope = this.scopeDataOfPipeMeta(typeChecker, pipeMeta);
+      if (withScope === null)
+        continue;
+      resultingPipes.set(pipeClass, { ...withScope, isInScope: false });
+    }
+    return Array.from(resultingPipes.values());
   }
   getDirectiveMetadata(dir) {
     if (!isNamedClassDeclaration(dir)) {
@@ -5825,15 +5839,10 @@ var TemplateTypeCheckerImpl = class {
           continue;
         data.directives.push({ ...dirScope, isInScope: true });
       } else if (dep.kind === MetaKind.Pipe) {
-        const tsSymbol = typeChecker.getSymbolAtLocation(dep.ref.node.name);
-        if (tsSymbol === void 0) {
+        const pipeScope = this.scopeDataOfPipeMeta(typeChecker, dep);
+        if (pipeScope === null)
           continue;
-        }
-        data.pipes.push({
-          name: dep.name,
-          tsSymbol,
-          isInScope: true
-        });
+        data.pipes.push({ ...pipeScope, isInScope: true });
       }
     }
     this.scopeCache.set(component, data);
@@ -5859,6 +5868,17 @@ var TemplateTypeCheckerImpl = class {
       selector: dep.selector,
       tsSymbol,
       ngModule
+    };
+  }
+  scopeDataOfPipeMeta(typeChecker, dep) {
+    const tsSymbol = typeChecker.getSymbolAtLocation(dep.ref.node.name);
+    if (tsSymbol === void 0) {
+      return null;
+    }
+    return {
+      ref: dep.ref,
+      name: dep.name,
+      tsSymbol
     };
   }
 };
@@ -7652,4 +7672,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-SCGOPSTJ.js.map
+//# sourceMappingURL=chunk-C5AJNSRP.js.map

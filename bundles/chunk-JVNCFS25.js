@@ -1953,8 +1953,15 @@ var LocalMetadataRegistry = class {
   registerPipeMetadata(meta) {
     this.pipes.set(meta.ref.node, meta);
   }
-  getKnownDirectives() {
-    return this.directives.keys();
+  getKnown(kind) {
+    switch (kind) {
+      case MetaKind.Directive:
+        return this.directives.keys();
+      case MetaKind.Pipe:
+        return this.pipes.keys();
+      case MetaKind.NgModule:
+        return this.ngModules.keys();
+    }
   }
 };
 var CompoundMetadataRegistry = class {
@@ -6902,4 +6909,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RSZNB3FD.js.map
+//# sourceMappingURL=chunk-JVNCFS25.js.map

@@ -118,7 +118,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getSymbolOfNode(node: TmplAstElement, component: ts.ClassDeclaration): ElementSymbol | null;
     private getOrCreateSymbolBuilder;
     getPotentialTemplateDirectives(component: ts.ClassDeclaration): PotentialDirective[];
-    getPipesInScope(component: ts.ClassDeclaration): PotentialPipe[] | null;
+    getPotentialPipes(component: ts.ClassDeclaration): PotentialPipe[];
     getDirectiveMetadata(dir: ts.ClassDeclaration): TypeCheckableDirectiveMeta | null;
     getPotentialElementTags(component: ts.ClassDeclaration): Map<string, PotentialDirective | null>;
     getPotentialDomBindings(tagName: string): {
@@ -131,6 +131,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getPotentialImportsFor(toImport: PotentialDirective, inContext: ts.ClassDeclaration): ReadonlyArray<PotentialImport>;
     private getScopeData;
     private scopeDataOfDirectiveMeta;
+    private scopeDataOfPipeMeta;
 }
 /**
  * Data for template type-checking related to a specific input file in the user's program (which

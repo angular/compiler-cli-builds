@@ -219,7 +219,7 @@ export interface MetadataReader {
  * A MetadataReader which also allows access to the set of all known directive classes.
  */
 export interface MetadataReaderWithIndex extends MetadataReader {
-    getKnownDirectives(): Iterable<ClassDeclaration>;
+    getKnown(kind: MetaKind): Iterable<ClassDeclaration>;
 }
 /**
  * Registers new metadata for directives, pipes, and modules.
