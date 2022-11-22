@@ -210,17 +210,25 @@ export interface TemplateSymbol {
     directives: DirectiveSymbol[];
     templateNode: TmplAstTemplate;
 }
-/**
- * A representation of a directive/component whose selector matches a node in a component
- * template.
- */
-export interface DirectiveSymbol extends PotentialDirective {
+/** Interface shared between host and non-host directives. */
+interface DirectiveSymbolBase extends PotentialDirective {
     kind: SymbolKind.Directive;
     /** The `ts.Type` for the class declaration. */
     tsType: ts.Type;
     /** The location in the shim file for the variable that holds the type of the directive. */
     tcbLocation: TcbLocation;
 }
+/**
+ * A representation of a directive/component whose selector matches a node in a component
+ * template.
+ */
+export declare type DirectiveSymbol = (DirectiveSymbolBase & {
+    isHostDirective: false;
+}) | (DirectiveSymbolBase & {
+    isHostDirective: true;
+    exposedInputs: Record<string, string> | null;
+    exposedOutputs: Record<string, string> | null;
+});
 /**
  * A representation of an attribute on an element or template. These bindings aren't currently
  * type-checked (see `checkTypeOfDomBindings`) so they won't have a `ts.Type`, `ts.Symbol`, or shim
@@ -257,3 +265,4 @@ export interface ClassSymbol {
     /** The position for the variable declaration for the class instance. */
     tcbLocation: TcbLocation;
 }
+export {};

@@ -10,7 +10,7 @@ import { AbsoluteSourceSpan, BoundTarget, DirectiveMeta, ParseSourceSpan, Schema
 import ts from 'typescript';
 import { ErrorCode } from '../../diagnostics';
 import { Reference } from '../../imports';
-import { ClassPropertyMapping, DirectiveTypeCheckMeta } from '../../metadata';
+import { ClassPropertyMapping, DirectiveTypeCheckMeta, HostDirectiveMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 /**
  * Extension of `DirectiveMeta` that includes additional information required to type-check the
@@ -22,6 +22,7 @@ export interface TypeCheckableDirectiveMeta extends DirectiveMeta, DirectiveType
     inputs: ClassPropertyMapping;
     outputs: ClassPropertyMapping;
     isStandalone: boolean;
+    hostDirectives: HostDirectiveMeta[] | null;
 }
 export declare type TemplateId = string & {
     __brand: 'TemplateId';
