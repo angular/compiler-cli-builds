@@ -4943,35 +4943,63 @@ var SymbolBuilder = class {
     const tcbSourceFile = this.typeCheckBlock.getSourceFile();
     const isDirectiveDeclaration = (node) => (ts28.isTypeNode(node) || ts28.isIdentifier(node)) && ts28.isVariableDeclaration(node.parent) && hasExpressionIdentifier(tcbSourceFile, node, ExpressionIdentifier.DIRECTIVE);
     const nodes = findAllMatchingNodes(this.typeCheckBlock, { withSpan: elementSourceSpan, filter: isDirectiveDeclaration });
-    return nodes.map((node) => {
-      var _a2;
+    const symbols = [];
+    for (const node of nodes) {
       const symbol = this.getSymbolOfTsNode(node.parent);
       if (symbol === null || !isSymbolWithValueDeclaration(symbol.tsSymbol) || !ts28.isClassDeclaration(symbol.tsSymbol.valueDeclaration)) {
-        return null;
+        continue;
       }
       const meta = this.getDirectiveMeta(element, symbol.tsSymbol.valueDeclaration);
-      if (meta === null) {
-        return null;
+      if (meta !== null && meta.selector !== null) {
+        const ref = new Reference(symbol.tsSymbol.valueDeclaration);
+        if (meta.hostDirectives !== null) {
+          this.addHostDirectiveSymbols(element, meta.hostDirectives, symbols);
+        }
+        const directiveSymbol = {
+          ...symbol,
+          ref,
+          tsSymbol: symbol.tsSymbol,
+          selector: meta.selector,
+          isComponent: meta.isComponent,
+          ngModule: this.getDirectiveModule(symbol.tsSymbol.valueDeclaration),
+          kind: SymbolKind.Directive,
+          isStructural: meta.isStructural,
+          isInScope: true,
+          isHostDirective: false
+        };
+        symbols.push(directiveSymbol);
       }
-      const ngModule = this.getDirectiveModule(symbol.tsSymbol.valueDeclaration);
-      if (meta.selector === null) {
-        return null;
+    }
+    return symbols;
+  }
+  addHostDirectiveSymbols(host, hostDirectives, symbols) {
+    for (const current of hostDirectives) {
+      if (!ts28.isClassDeclaration(current.directive.node)) {
+        continue;
       }
-      const isComponent = (_a2 = meta.isComponent) != null ? _a2 : null;
-      const ref = new Reference(symbol.tsSymbol.valueDeclaration);
-      const directiveSymbol = {
-        ...symbol,
-        ref,
-        tsSymbol: symbol.tsSymbol,
-        selector: meta.selector,
-        isComponent,
-        ngModule,
-        kind: SymbolKind.Directive,
-        isStructural: meta.isStructural,
-        isInScope: true
-      };
-      return directiveSymbol;
-    }).filter((d) => d !== null);
+      const symbol = this.getSymbolOfTsNode(current.directive.node);
+      const meta = this.getDirectiveMeta(host, current.directive.node);
+      if (meta !== null && symbol !== null && isSymbolWithValueDeclaration(symbol.tsSymbol)) {
+        if (meta.hostDirectives !== null) {
+          this.addHostDirectiveSymbols(host, meta.hostDirectives, symbols);
+        }
+        const directiveSymbol = {
+          ...symbol,
+          isHostDirective: true,
+          ref: current.directive,
+          tsSymbol: symbol.tsSymbol,
+          exposedInputs: current.inputs,
+          exposedOutputs: current.outputs,
+          selector: meta.selector || "",
+          isComponent: meta.isComponent,
+          ngModule: this.getDirectiveModule(current.directive.node),
+          kind: SymbolKind.Directive,
+          isStructural: meta.isStructural,
+          isInScope: true
+        };
+        symbols.push(directiveSymbol);
+      }
+    }
   }
   getDirectiveMeta(host, directiveDeclaration) {
     var _a;
@@ -5144,6 +5172,7 @@ var SymbolBuilder = class {
       isStructural,
       selector,
       ngModule,
+      isHostDirective: false,
       isInScope: true
     };
   }
@@ -7645,4 +7674,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-KGXXQYFO.js.map
+//# sourceMappingURL=chunk-O2S73OAP.js.map

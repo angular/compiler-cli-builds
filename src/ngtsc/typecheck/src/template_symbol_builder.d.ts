@@ -33,6 +33,7 @@ export declare class SymbolBuilder {
     private getSymbolOfAstTemplate;
     private getSymbolOfElement;
     private getDirectivesOfNode;
+    private addHostDirectiveSymbols;
     private getDirectiveMeta;
     private getDirectiveModule;
     private getSymbolOfBoundEvent;
