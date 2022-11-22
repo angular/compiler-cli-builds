@@ -7,7 +7,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-GQT3DC2W.js";
+} from "./chunk-JGWOWDGB.js";
 import {
   DEFAULT_ERROR_CODE,
   EmitFlags,
@@ -31,15 +31,15 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-TCQAAUHD.js";
-import "./chunk-JVNCFS25.js";
-import "./chunk-ZXBCBXWY.js";
+} from "./chunk-HF2JKD7M.js";
+import "./chunk-FMIP4JSD.js";
+import "./chunk-ALSLKTUB.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "./chunk-E7NQQTT7.js";
-import "./chunk-JBW3LNWN.js";
-import "./chunk-F526PAOI.js";
+} from "./chunk-OFXSI6E3.js";
+import "./chunk-TOW3O33K.js";
+import "./chunk-DSVWG4QJ.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -60,16 +60,16 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-WEEZR5JR.js";
+} from "./chunk-E7DPJFUS.js";
 import {
   ActivePerfRecorder,
   PerfPhase
-} from "./chunk-2HPI44CB.js";
-import "./chunk-XYNRD7NE.js";
+} from "./chunk-4F26FKLW.js";
+import "./chunk-NDREJTCS.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("15.1.0-next.0+sha-2e2135b");
+var VERSION = new Version("15.1.0-next.0+sha-903917b");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
@@ -111,7 +111,15 @@ var NgTscPlugin = class {
       }
     }
     if (oldProgram === void 0 || oldState === null) {
-      ticket = freshCompilationTicket(program, this.options, strategy, programDriver, perfRecorder, false, false);
+      ticket = freshCompilationTicket(
+        program,
+        this.options,
+        strategy,
+        programDriver,
+        perfRecorder,
+        false,
+        false
+      );
     } else {
       strategy.toNextBuildStrategy().getIncrementalState(oldProgram);
       ticket = incrementalFromStateTicket(oldProgram, oldState, program, this.options, strategy, programDriver, modifiedResourceFiles, perfRecorder, false, false);
