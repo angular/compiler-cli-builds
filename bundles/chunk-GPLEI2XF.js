@@ -5129,7 +5129,7 @@ var SymbolBuilder = class {
           tsSymbol: symbol.tsSymbol,
           exposedInputs: current.inputs,
           exposedOutputs: current.outputs,
-          selector: meta.selector || "",
+          selector: meta.selector,
           isComponent: meta.isComponent,
           ngModule: this.getDirectiveModule(current.directive.node),
           kind: SymbolKind.Directive,
@@ -5909,6 +5909,9 @@ var TemplateTypeCheckerImpl = class {
     const scope = this.getScopeData(component);
     if (scope !== null) {
       for (const directive of scope.directives) {
+        if (directive.selector === null) {
+          continue;
+        }
         for (const selector of CssSelector.parse(directive.selector)) {
           if (selector.element === null || tagMap.has(selector.element)) {
             continue;
@@ -7860,4 +7863,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-HF2JKD7M.js.map
+//# sourceMappingURL=chunk-GPLEI2XF.js.map
