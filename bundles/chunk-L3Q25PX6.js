@@ -26,6 +26,7 @@ import {
   getSourceFile,
   identifierOfNode,
   isDeclaration,
+  isFromDtsFile,
   makeDiagnostic,
   makeRelatedInformation,
   nodeDebugInfo,
@@ -2225,6 +2226,9 @@ function checkInheritanceOfInjectable(node, injectableRegistry, reflector, evalu
   }
   if (!classWithCtor.isDecorated) {
     return getInheritedUndecoratedCtorDiagnostic(node, classWithCtor.ref, kind);
+  }
+  if (isFromDtsFile(classWithCtor.ref.node)) {
+    return null;
   }
   if (!strictInjectionParameters || isAbstractClassDeclaration(node)) {
     return null;
@@ -6967,4 +6971,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FMIP4JSD.js.map
+//# sourceMappingURL=chunk-L3Q25PX6.js.map
