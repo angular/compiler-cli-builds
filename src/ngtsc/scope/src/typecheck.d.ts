@@ -62,5 +62,5 @@ export declare class TypeCheckScopeRegistry {
      * an empty type-check scope is returned.
      */
     getTypeCheckScope(node: ClassDeclaration): TypeCheckScope;
-    getTypeCheckDirectiveMetadata(ref: Reference<ClassDeclaration>): DirectiveMeta;
+    getTypeCheckDirectiveMetadata(ref: Reference<ClassDeclaration>): DirectiveMeta | null;
 }

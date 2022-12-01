@@ -1875,7 +1875,7 @@ function readHostDirectivesType(checker, type, bestGuessOwningModule) {
 function flattenInheritedDirectiveMetadata(reader, dir) {
   const topMeta = reader.getDirectiveMetadata(dir);
   if (topMeta === null) {
-    throw new Error(`Metadata not found for directive: ${dir.debugName}`);
+    return null;
   }
   if (topMeta.baseClass === null) {
     return topMeta;
@@ -2063,7 +2063,7 @@ var HostDirectivesResolver = class {
     for (const current of directives) {
       const hostMeta = flattenInheritedDirectiveMetadata(this.metaReader, current.directive);
       if (hostMeta === null) {
-        throw new Error(`Could not resolve host directive metadata of ${current.directive.debugName}`);
+        continue;
       }
       if (hostMeta.hostDirectives) {
         this.walkHostDirectives(hostMeta.hostDirectives, results);
@@ -3206,6 +3206,9 @@ var TypeCheckScopeRegistry = class {
     for (const meta of dependencies) {
       if (meta.kind === MetaKind.Directive && meta.selector !== null) {
         const extMeta = this.getTypeCheckDirectiveMetadata(meta.ref);
+        if (extMeta === null) {
+          continue;
+        }
         matcher.addSelectables(CssSelector.parse(meta.selector), [...this.hostDirectivesResolver.resolve(extMeta), extMeta]);
         directives.push(extMeta);
       } else if (meta.kind === MetaKind.Pipe) {
@@ -3231,6 +3234,9 @@ var TypeCheckScopeRegistry = class {
       return this.flattenedDirectiveMetaCache.get(clazz);
     }
     const meta = flattenInheritedDirectiveMetadata(this.metaReader, ref);
+    if (meta === null) {
+      return null;
+    }
     this.flattenedDirectiveMetaCache.set(clazz, meta);
     return meta;
   }
@@ -6964,4 +6970,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-EUEL67MF.js.map
+//# sourceMappingURL=chunk-VF6SIDZK.js.map

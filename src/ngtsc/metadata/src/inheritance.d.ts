@@ -17,4 +17,4 @@ import { DirectiveMeta, MetadataReader } from './api';
  * fully resolved, or `baseClass: 'dynamic'` if the inheritance chain could not be completely
  * followed.
  */
-export declare function flattenInheritedDirectiveMetadata(reader: MetadataReader, dir: Reference<ClassDeclaration>): DirectiveMeta;
+export declare function flattenInheritedDirectiveMetadata(reader: MetadataReader, dir: Reference<ClassDeclaration>): DirectiveMeta | null;
