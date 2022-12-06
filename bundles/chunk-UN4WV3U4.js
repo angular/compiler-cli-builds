@@ -4,6 +4,11 @@
       const __ESM_IMPORT_META_URL__ = import.meta.url;
     
 import {
+  createFunctionDeclaration,
+  createIndexSignature,
+  createParameterDeclaration
+} from "./chunk-IZN5U2AM.js";
+import {
   LogicalProjectPath,
   absoluteFrom,
   absoluteFromSourceFile,
@@ -1111,9 +1116,9 @@ var TypeTranslatorVisitor = class {
     return ts6.factory.createArrayTypeNode(this.translateType(type.of, context));
   }
   visitMapType(type, context) {
-    const parameter = ts6.factory.createParameterDeclaration(void 0, void 0, void 0, "key", void 0, ts6.factory.createKeywordTypeNode(ts6.SyntaxKind.StringKeyword));
+    const parameter = createParameterDeclaration(void 0, void 0, "key", void 0, ts6.factory.createKeywordTypeNode(ts6.SyntaxKind.StringKeyword));
     const typeArgs = type.valueType !== null ? this.translateType(type.valueType, context) : ts6.factory.createKeywordTypeNode(ts6.SyntaxKind.UnknownKeyword);
-    const indexSignature = ts6.factory.createIndexSignature(void 0, void 0, [parameter], typeArgs);
+    const indexSignature = createIndexSignature(void 0, [parameter], typeArgs);
     return ts6.factory.createTypeLiteralNode([indexSignature]);
   }
   visitReadVarExpr(ast, context) {
@@ -1321,13 +1326,13 @@ var TypeScriptAstFactory = class {
     if (!ts7.isBlock(body)) {
       throw new Error(`Invalid syntax, expected a block, but got ${ts7.SyntaxKind[body.kind]}.`);
     }
-    return ts7.factory.createFunctionDeclaration(void 0, void 0, void 0, functionName, void 0, parameters.map((param) => ts7.factory.createParameterDeclaration(void 0, void 0, void 0, param)), void 0, body);
+    return createFunctionDeclaration(void 0, void 0, functionName, void 0, parameters.map((param) => createParameterDeclaration(void 0, void 0, param)), void 0, body);
   }
   createFunctionExpression(functionName, parameters, body) {
     if (!ts7.isBlock(body)) {
       throw new Error(`Invalid syntax, expected a block, but got ${ts7.SyntaxKind[body.kind]}.`);
     }
-    return ts7.factory.createFunctionExpression(void 0, void 0, functionName != null ? functionName : void 0, void 0, parameters.map((param) => ts7.factory.createParameterDeclaration(void 0, void 0, void 0, param)), void 0, body);
+    return ts7.factory.createFunctionExpression(void 0, void 0, functionName != null ? functionName : void 0, void 0, parameters.map((param) => createParameterDeclaration(void 0, void 0, param)), void 0, body);
   }
   createIfStatement(condition, thenStatement, elseStatement) {
     return ts7.factory.createIfStatement(condition, thenStatement, elseStatement != null ? elseStatement : void 0);
@@ -1496,4 +1501,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TOW3O33K.js.map
+//# sourceMappingURL=chunk-UN4WV3U4.js.map

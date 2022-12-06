@@ -9,8 +9,8 @@
 import ts from 'typescript';
 import { AbsoluteFsPath, ReadonlyFileSystem } from '../../src/ngtsc/file_system';
 import { DeclarationNode, KnownDeclaration } from '../../src/ngtsc/reflection';
-export declare type JsonPrimitive = string | number | boolean | null;
-export declare type JsonValue = JsonPrimitive | JsonArray | JsonObject | undefined;
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonArray | JsonObject | undefined;
 export interface JsonArray extends Array<JsonValue> {
 }
 export interface JsonObject {

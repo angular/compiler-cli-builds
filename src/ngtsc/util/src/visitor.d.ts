@@ -11,7 +11,7 @@ import ts from 'typescript';
  * Result type of visiting a node that's typically an entry in a list, which allows specifying that
  * nodes should be added before the visited node in the output.
  */
-export declare type VisitListEntryResult<B extends ts.Node, T extends B> = {
+export type VisitListEntryResult<B extends ts.Node, T extends B> = {
     node: T;
     before?: B[];
     after?: B[];

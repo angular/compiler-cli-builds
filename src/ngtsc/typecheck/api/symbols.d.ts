@@ -27,11 +27,11 @@ export declare enum SymbolKind {
 /**
  * A representation of an entity in the `TemplateAst`.
  */
-export declare type Symbol = InputBindingSymbol | OutputBindingSymbol | ElementSymbol | ReferenceSymbol | VariableSymbol | ExpressionSymbol | DirectiveSymbol | TemplateSymbol | DomBindingSymbol | PipeSymbol;
+export type Symbol = InputBindingSymbol | OutputBindingSymbol | ElementSymbol | ReferenceSymbol | VariableSymbol | ExpressionSymbol | DirectiveSymbol | TemplateSymbol | DomBindingSymbol | PipeSymbol;
 /**
  * A `Symbol` which declares a new named entity in the template scope.
  */
-export declare type TemplateDeclarationSymbol = ReferenceSymbol | VariableSymbol;
+export type TemplateDeclarationSymbol = ReferenceSymbol | VariableSymbol;
 /**
  * Information about where a `ts.Node` can be found in the type check file. This can either be
  * a type-checking shim file, or an original source file for inline type check blocks.
@@ -222,7 +222,7 @@ interface DirectiveSymbolBase extends PotentialDirective {
  * A representation of a directive/component whose selector matches a node in a component
  * template.
  */
-export declare type DirectiveSymbol = (DirectiveSymbolBase & {
+export type DirectiveSymbol = (DirectiveSymbolBase & {
     isHostDirective: false;
 }) | (DirectiveSymbolBase & {
     isHostDirective: true;

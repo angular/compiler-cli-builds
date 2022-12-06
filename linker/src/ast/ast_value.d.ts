@@ -11,29 +11,24 @@ import { AstHost, Range } from './ast_host';
 /**
  * Represents only those types in `T` that are object types.
  */
-declare type ObjectType<T> = Extract<T, object>;
+type ObjectType<T> = Extract<T, object>;
 /**
  * Represents the value type of an object literal.
  */
-declare type ObjectValueType<T> = T extends Record<string, infer R> ? R : never;
+type ObjectValueType<T> = T extends Record<string, infer R> ? R : never;
 /**
  * Represents the value type of an array literal.
  */
-declare type ArrayValueType<T> = T extends Array<infer R> ? R : never;
+type ArrayValueType<T> = T extends Array<infer R> ? R : never;
 /**
  * Ensures that `This` has its generic type `Actual` conform to the expected generic type in
  * `Expected`, to disallow calling a method if the generic type does not conform.
  */
-declare type ConformsTo<This, Actual, Expected> = Actual extends Expected ? This : never;
-/**
- * Ensures that `This` is an `AstValue` whose generic type conforms to `Expected`, to disallow
- * calling a method if the value's type does not conform.
- */
-declare type HasValueType<This, Expected> = This extends AstValue<infer Actual, any> ? ConformsTo<This, Actual, Expected> : never;
+type ConformsTo<This, Actual, Expected> = Actual extends Expected ? This : never;
 /**
  * Represents only the string keys of type `T`.
  */
-declare type PropertyKey<T> = keyof T & string;
+type PropertyKey<T> = keyof T & string;
 /**
  * This helper class wraps an object expression along with an `AstHost` object, exposing helper
  * methods that make it easier to extract the properties of the object.
@@ -145,7 +140,7 @@ export declare class AstValue<T, TExpression> {
     /**
      * Parse the number from this value, or error if it is not a number.
      */
-    getNumber(this: HasValueType<this, number>): number;
+    getNumber(this: ConformsTo<this, T, number>): number;
     /**
      * Is this value a string?
      */
@@ -153,7 +148,7 @@ export declare class AstValue<T, TExpression> {
     /**
      * Parse the string from this value, or error if it is not a string.
      */
-    getString(this: HasValueType<this, string>): string;
+    getString(this: ConformsTo<this, T, string>): string;
     /**
      * Is this value a boolean?
      */
@@ -161,7 +156,7 @@ export declare class AstValue<T, TExpression> {
     /**
      * Parse the boolean from this value, or error if it is not a boolean.
      */
-    getBoolean(this: HasValueType<this, boolean>): boolean;
+    getBoolean(this: ConformsTo<this, T, boolean>): boolean;
     /**
      * Is this value an object literal?
      */
@@ -169,7 +164,7 @@ export declare class AstValue<T, TExpression> {
     /**
      * Parse this value into an `AstObject`, or error if it is not an object literal.
      */
-    getObject(this: HasValueType<this, object>): AstObject<ObjectType<T>, TExpression>;
+    getObject(this: ConformsTo<this, T, object>): AstObject<ObjectType<T>, TExpression>;
     /**
      * Is this value an array literal?
      */
@@ -177,7 +172,7 @@ export declare class AstValue<T, TExpression> {
     /**
      * Parse this value into an array of `AstValue` objects, or error if it is not an array literal.
      */
-    getArray(this: HasValueType<this, unknown[]>): AstValue<ArrayValueType<T>, TExpression>[];
+    getArray(this: ConformsTo<this, T, unknown[]>): AstValue<ArrayValueType<T>, TExpression>[];
     /**
      * Is this value a function expression?
      */
@@ -186,7 +181,7 @@ export declare class AstValue<T, TExpression> {
      * Extract the return value as an `AstValue` from this value as a function expression, or error if
      * it is not a function expression.
      */
-    getFunctionReturnValue<R>(this: HasValueType<this, Function>): AstValue<R, TExpression>;
+    getFunctionReturnValue<R>(this: ConformsTo<this, T, Function>): AstValue<R, TExpression>;
     isCallExpression(): boolean;
     getCallee(): AstValue<unknown, TExpression>;
     getArguments(): AstValue<unknown, TExpression>[];

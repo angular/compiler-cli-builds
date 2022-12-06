@@ -7,7 +7,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-JGWOWDGB.js";
+} from "./chunk-Y6MBLTIR.js";
 import {
   DEFAULT_ERROR_CODE,
   EmitFlags,
@@ -31,15 +31,15 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-ENZHIOMX.js";
-import "./chunk-CVG4XBDA.js";
-import "./chunk-ALSLKTUB.js";
+} from "./chunk-ONRVYLCK.js";
+import "./chunk-KY7HVS6H.js";
+import "./chunk-OHYTYUA4.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "./chunk-OFXSI6E3.js";
-import "./chunk-TOW3O33K.js";
-import "./chunk-DSVWG4QJ.js";
+import "./chunk-UN4WV3U4.js";
+import "./chunk-IZN5U2AM.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -64,15 +64,21 @@ import {
 import {
   ActivePerfRecorder,
   PerfPhase
-} from "./chunk-4F26FKLW.js";
+} from "./chunk-MAF2KC4N.js";
 import "./chunk-NDREJTCS.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("15.1.0-next.1+sha-8656ac0");
+var VERSION = new Version("15.1.0-next.1+sha-dd42974");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
+  get compiler() {
+    if (this._compiler === null) {
+      throw new Error("Lifecycle error: setupCompilation() must be called first.");
+    }
+    return this._compiler;
+  }
   constructor(ngOptions) {
     this.ngOptions = ngOptions;
     this.name = "ngtsc";
@@ -80,12 +86,6 @@ var NgTscPlugin = class {
     this.host = null;
     this._compiler = null;
     setFileSystem(new NodeJSFileSystem());
-  }
-  get compiler() {
-    if (this._compiler === null) {
-      throw new Error("Lifecycle error: setupCompilation() must be called first.");
-    }
-    return this._compiler;
   }
   wrapHost(host, inputFiles, options) {
     this.options = { ...this.ngOptions, ...options };

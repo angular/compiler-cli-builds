@@ -723,10 +723,10 @@ export declare class Esm2015ReflectionHost extends TypeScriptReflectionHost impl
 /**
  * An enum member assignment that looks like `Enum[X] = Y;`.
  */
-export declare type EnumMemberAssignment = ts.BinaryExpression & {
+export type EnumMemberAssignment = ts.BinaryExpression & {
     left: ts.ElementAccessExpression;
 };
-export declare type ParamInfo = {
+export type ParamInfo = {
     decorators: Decorator[] | null;
     typeExpression: ts.Expression | null;
 };
@@ -768,7 +768,7 @@ export interface DecoratorCall {
  * ], SomeDirective);
  * ```
  */
-export declare type DecorateHelperEntry = ParameterTypes | ParameterDecorators | DecoratorCall;
+export type DecorateHelperEntry = ParameterTypes | ParameterDecorators | DecoratorCall;
 /**
  * The recorded decorator information of a single class. This information is cached in the host.
  */
@@ -792,7 +792,7 @@ interface DecoratorInfo {
 /**
  * A statement node that represents an assignment.
  */
-export declare type AssignmentStatement = ts.ExpressionStatement & {
+export type AssignmentStatement = ts.ExpressionStatement & {
     expression: {
         left: ts.Identifier;
         right: ts.Expression;
@@ -856,7 +856,7 @@ export declare function isMemberDecorateCall(call: ts.CallExpression, matches: (
  * which is actually the symbol of the identifier of the property.
  */
 export declare function getPropertyValueFromSymbol(propSymbol: ts.Symbol): ts.Expression | undefined;
-declare type InitializedVariableClassDeclaration = ClassDeclaration<ts.VariableDeclaration> & {
+type InitializedVariableClassDeclaration = ClassDeclaration<ts.VariableDeclaration> & {
     initializer: ts.Expression;
 };
 /**

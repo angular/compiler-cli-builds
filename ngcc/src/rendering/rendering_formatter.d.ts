@@ -19,7 +19,7 @@ import { CompiledClass } from '../analysis/types';
  * of Ivy static fields. The map is keyed by the container node, such that we
  * can tell if we should remove the entire decorator property
  */
-export declare type RedundantDecoratorMap = Map<ts.Node, ts.Node[]>;
+export type RedundantDecoratorMap = Map<ts.Node, ts.Node[]>;
 export declare const RedundantDecoratorMap: MapConstructor;
 /**
  * Implement this interface with methods that know how to render a specific format,

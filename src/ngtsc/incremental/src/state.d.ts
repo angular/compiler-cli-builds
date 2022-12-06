@@ -95,4 +95,4 @@ export interface DeltaIncrementalState {
  *
  * Discriminated by the `IncrementalStateKind` enum.
  */
-export declare type IncrementalState = AnalyzedIncrementalState | DeltaIncrementalState | FreshIncrementalState;
+export type IncrementalState = AnalyzedIncrementalState | DeltaIncrementalState | FreshIncrementalState;

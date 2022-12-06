@@ -8,7 +8,7 @@ import {
   ImportGraph,
   isShim,
   readConfiguration
-} from "./chunk-ENZHIOMX.js";
+} from "./chunk-ONRVYLCK.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -33,7 +33,7 @@ import {
   TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-CVG4XBDA.js";
+} from "./chunk-KY7HVS6H.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -44,7 +44,7 @@ import {
   isNamedFunctionDeclaration,
   isNamedVariableDeclaration,
   reflectObjectLiteral
-} from "./chunk-ALSLKTUB.js";
+} from "./chunk-OHYTYUA4.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -73,10 +73,10 @@ import {
   translateStatement,
   translateType,
   validateAndRewriteCoreSymbol
-} from "./chunk-TOW3O33K.js";
+} from "./chunk-UN4WV3U4.js";
 import {
   getModifiers
-} from "./chunk-DSVWG4QJ.js";
+} from "./chunk-IZN5U2AM.js";
 import {
   LogicalFileSystem,
   NgtscCompilerHost,
@@ -91,7 +91,7 @@ import {
 } from "./chunk-E7DPJFUS.js";
 import {
   NOOP_PERF_RECORDER
-} from "./chunk-4F26FKLW.js";
+} from "./chunk-MAF2KC4N.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/create_compile_function.mjs
 import ts23 from "typescript";
@@ -5109,15 +5109,16 @@ var sendMessageToMaster = (msg) => {
   });
 };
 var sendMessageToWorker = (workerId, msg) => {
+  var _a;
   if (!cluster.isMaster) {
     throw new Error("Unable to send message to worker process: Sender is not the master process.");
   }
-  const worker = cluster.workers[workerId];
+  const worker = (_a = cluster.workers) == null ? void 0 : _a[workerId];
   if (worker === void 0 || worker.isDead() || !worker.isConnected()) {
     throw new Error("Unable to send message to worker process: Recipient does not exist or has disconnected.");
   }
   return new Promise((resolve, reject) => {
-    worker.send(msg, void 0, (err) => err === null ? resolve() : reject(err));
+    worker.send(msg, (err) => err === null ? resolve() : reject(err));
   });
 };
 
@@ -5263,4 +5264,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2XJ7645Q.js.map
+//# sourceMappingURL=chunk-PPMCRK4H.js.map

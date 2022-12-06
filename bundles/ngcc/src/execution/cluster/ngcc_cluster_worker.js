@@ -13,16 +13,16 @@ import {
   getSharedSetup,
   sendMessageToMaster,
   stringifyTask
-} from "../../../../chunk-2XJ7645Q.js";
-import "../../../../chunk-ENZHIOMX.js";
-import "../../../../chunk-CVG4XBDA.js";
-import "../../../../chunk-ALSLKTUB.js";
+} from "../../../../chunk-PPMCRK4H.js";
+import "../../../../chunk-ONRVYLCK.js";
+import "../../../../chunk-KY7HVS6H.js";
+import "../../../../chunk-OHYTYUA4.js";
 import "../../../../chunk-OFXSI6E3.js";
 import "../../../../chunk-TTNJEW7O.js";
-import "../../../../chunk-TOW3O33K.js";
-import "../../../../chunk-DSVWG4QJ.js";
+import "../../../../chunk-UN4WV3U4.js";
+import "../../../../chunk-IZN5U2AM.js";
 import "../../../../chunk-E7DPJFUS.js";
-import "../../../../chunk-4F26FKLW.js";
+import "../../../../chunk-MAF2KC4N.js";
 import "../../../../chunk-NDREJTCS.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/cluster/package_json_updater.mjs
@@ -56,26 +56,27 @@ var ClusterWorkerPackageJsonUpdater = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/cluster/worker.mjs
 import cluster2 from "cluster";
 async function startWorker(logger, createCompileFn) {
-  if (cluster2.isMaster) {
+  if (cluster2.isMaster || !cluster2.worker) {
     throw new Error("Tried to run cluster worker on the master process.");
   }
+  const worker = cluster2.worker;
   const compile = createCompileFn((transformedFiles) => sendMessageToMaster({
     type: "transformed-files",
     files: transformedFiles.map((f) => f.path)
   }), (_task, outcome, message) => sendMessageToMaster({ type: "task-completed", outcome, message }));
-  cluster2.worker.on("message", async (msg) => {
+  worker.on("message", async (msg) => {
     try {
       switch (msg.type) {
         case "process-task":
-          logger.debug(`[Worker #${cluster2.worker.id}] Processing task: ${stringifyTask(msg.task)}`);
+          logger.debug(`[Worker #${worker.id}] Processing task: ${stringifyTask(msg.task)}`);
           return await compile(msg.task);
         default:
-          throw new Error(`[Worker #${cluster2.worker.id}] Invalid message received: ${JSON.stringify(msg)}`);
+          throw new Error(`[Worker #${worker.id}] Invalid message received: ${JSON.stringify(msg)}`);
       }
     } catch (err) {
       switch (err && err.code) {
         case "ENOMEM":
-          logger.warn(`[Worker #${cluster2.worker.id}] ${err.stack || err.message}`);
+          logger.warn(`[Worker #${worker.id}] ${err.stack || err.message}`);
           return process.exit(1);
         default:
           await sendMessageToMaster({

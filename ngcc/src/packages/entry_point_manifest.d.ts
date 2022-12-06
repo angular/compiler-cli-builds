@@ -58,7 +58,7 @@ export declare class EntryPointManifest {
 export declare class InvalidatingEntryPointManifest extends EntryPointManifest {
     readEntryPointsUsingManifest(_basePath: AbsoluteFsPath): EntryPointWithDependencies[] | null;
 }
-export declare type EntryPointPaths = [
+export type EntryPointPaths = [
     string,
     string,
     Array<AbsoluteFsPath>?,
@@ -75,6 +75,6 @@ export interface EntryPointManifestFile {
     entryPointPaths: EntryPointPaths[];
 }
 /** The JSON format of the entrypoint properties. */
-export declare type NewEntryPointPropertiesMap = {
+export type NewEntryPointPropertiesMap = {
     [Property in PackageJsonFormatProperties as `${Property}_ivy_ngcc`]?: string;
 };

@@ -12,7 +12,7 @@ import ts from 'typescript';
  * origin source file into a type reference that is valid in the desired source file. If the type
  * cannot be translated to the desired source file, then null can be returned.
  */
-export declare type TypeReferenceTranslator = (type: ts.TypeReferenceNode) => ts.TypeReferenceNode | null;
+export type TypeReferenceTranslator = (type: ts.TypeReferenceNode) => ts.TypeReferenceNode | null;
 /**
  * Determines whether the provided type can be emitted, which means that it can be safely emitted
  * into a different location.

@@ -17,7 +17,7 @@ import { NgccReflectionHost } from '../host/ngcc_host';
 import { RenderingFormatter } from '../rendering/rendering_formatter';
 import { FileToWrite } from '../rendering/utils';
 import { EntryPointBundle } from './entry_point_bundle';
-export declare type TransformResult = {
+export type TransformResult = {
     success: true;
     diagnostics: ts.Diagnostic[];
     transformedFiles: FileToWrite[];

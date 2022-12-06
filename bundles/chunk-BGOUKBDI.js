@@ -9,7 +9,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-TOW3O33K.js";
+} from "./chunk-UN4WV3U4.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.mjs
 var FatalLinkerError = class extends Error {
@@ -33,14 +33,14 @@ function assert(node, predicate, expected) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/ast/ast_value.mjs
 import * as o from "@angular/compiler";
 var AstObject = class {
+  static parse(expression, host) {
+    const obj = host.parseObjectLiteral(expression);
+    return new AstObject(expression, obj, host);
+  }
   constructor(expression, obj, host) {
     this.expression = expression;
     this.obj = obj;
     this.host = host;
-  }
-  static parse(expression, host) {
-    const obj = host.parseObjectLiteral(expression);
-    return new AstObject(expression, obj, host);
   }
   has(propertyName) {
     return this.obj.has(propertyName);
@@ -849,7 +849,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "15.1.0-next.1+sha-8656ac0");
+  const LATEST_VERSION_RANGE = getRange("<=", "15.1.0-next.1+sha-dd42974");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -896,7 +896,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "15.1.0-next.1+sha-8656ac0") {
+    if (version === "15.1.0-next.1+sha-dd42974") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -1027,4 +1027,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-R3UUI3WU.js.map
+//# sourceMappingURL=chunk-BGOUKBDI.js.map

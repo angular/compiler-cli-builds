@@ -16,7 +16,7 @@ import { Task, TaskCompletedCallback, TaskProcessingOutcome, TaskQueue } from '.
  * These functions can be composed using the `composeTaskCompletedCallbacks()`
  * to create a `TaskCompletedCallback` function that can be passed to an `Executor`.
  */
-export declare type TaskCompletedHandler = (task: Task, message: string | null) => void;
+export type TaskCompletedHandler = (task: Task, message: string | null) => void;
 /**
  * Compose a group of TaskCompletedHandlers into a single TaskCompletedCallback.
  *

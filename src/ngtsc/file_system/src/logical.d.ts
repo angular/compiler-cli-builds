@@ -14,7 +14,7 @@ import { AbsoluteFsPath, BrandedPath, PathSegment } from './types';
  *
  * Paths in the type system use POSIX format.
  */
-export declare type LogicalProjectPath = BrandedPath<'LogicalProjectPath'>;
+export type LogicalProjectPath = BrandedPath<'LogicalProjectPath'>;
 export declare const LogicalProjectPath: {
     /**
      * Get the relative path between two `LogicalProjectPath`s.

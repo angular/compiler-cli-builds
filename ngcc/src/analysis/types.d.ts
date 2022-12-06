@@ -26,5 +26,5 @@ export interface CompiledFile {
      */
     reexports: Reexport[];
 }
-export declare type DecorationAnalyses = Map<ts.SourceFile, CompiledFile>;
+export type DecorationAnalyses = Map<ts.SourceFile, CompiledFile>;
 export declare const DecorationAnalyses: MapConstructor;

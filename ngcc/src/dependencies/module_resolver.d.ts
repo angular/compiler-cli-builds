@@ -108,7 +108,7 @@ export declare class ModuleResolver {
     private findPackagePath;
 }
 /** The result of resolving an import to a module. */
-export declare type ResolvedModule = ResolvedExternalModule | ResolvedRelativeModule | ResolvedDeepImport;
+export type ResolvedModule = ResolvedExternalModule | ResolvedRelativeModule | ResolvedDeepImport;
 /**
  * A module that is external to the package doing the importing.
  * In this case we capture the folder containing the entry-point.

@@ -10,7 +10,7 @@ import * as o from '@angular/compiler';
 import { AstFactory } from './api/ast_factory';
 import { ImportGenerator } from './api/import_generator';
 import { Context } from './context';
-export declare type RecordWrappedNodeFn<TExpression> = (node: o.WrappedNodeExpr<TExpression>) => void;
+export type RecordWrappedNodeFn<TExpression> = (node: o.WrappedNodeExpr<TExpression>) => void;
 export interface TranslatorOptions<TExpression> {
     downlevelTaggedTemplates?: boolean;
     downlevelVariableDeclarations?: boolean;

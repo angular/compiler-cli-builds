@@ -66,20 +66,20 @@ export declare enum DtsProcessing {
  *
  * See `DependencyResolver#sortEntryPointsByDependency()`.
  */
-export declare type PartiallyOrderedTasks = PartiallyOrderedList<Task>;
+export type PartiallyOrderedTasks = PartiallyOrderedList<Task>;
 /**
  * A mapping from Tasks to the Tasks that depend upon them (dependents).
  */
-export declare type TaskDependencies = Map<Task, Set<Task>>;
+export type TaskDependencies = Map<Task, Set<Task>>;
 export declare const TaskDependencies: MapConstructor;
 /**
  * A function to create a TaskCompletedCallback function.
  */
-export declare type CreateTaskCompletedCallback = (taskQueue: TaskQueue) => TaskCompletedCallback;
+export type CreateTaskCompletedCallback = (taskQueue: TaskQueue) => TaskCompletedCallback;
 /**
  * A function to be called once a task has been processed.
  */
-export declare type TaskCompletedCallback = (task: Task, outcome: TaskProcessingOutcome, message: string | null) => void;
+export type TaskCompletedCallback = (task: Task, outcome: TaskProcessingOutcome, message: string | null) => void;
 /**
  * Represents the outcome of processing a `Task`.
  */

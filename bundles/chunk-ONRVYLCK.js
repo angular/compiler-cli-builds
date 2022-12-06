@@ -31,11 +31,11 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-CVG4XBDA.js";
+} from "./chunk-KY7HVS6H.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-ALSLKTUB.js";
+} from "./chunk-OHYTYUA4.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -76,12 +76,14 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-TOW3O33K.js";
+} from "./chunk-UN4WV3U4.js";
 import {
+  createFunctionDeclaration,
+  createParameterDeclaration,
   getDecorators,
   getModifiers,
   updateImportDeclaration
-} from "./chunk-DSVWG4QJ.js";
+} from "./chunk-IZN5U2AM.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -99,7 +101,7 @@ import {
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-4F26FKLW.js";
+} from "./chunk-MAF2KC4N.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -261,7 +263,7 @@ function compareVersions(v1, v2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
 var MIN_TS_VERSION = "4.8.2";
-var MAX_TS_VERSION = "4.9.0";
+var MAX_TS_VERSION = "5.0.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
@@ -2410,12 +2412,12 @@ import ts14 from "typescript";
 var REGISTRY = new DomElementSchemaRegistry();
 var REMOVE_XHTML_REGEX = /^:xhtml:/;
 var RegistryDomSchemaChecker = class {
+  get diagnostics() {
+    return this._diagnostics;
+  }
   constructor(resolver) {
     this.resolver = resolver;
     this._diagnostics = [];
-  }
-  get diagnostics() {
-    return this._diagnostics;
   }
   checkElement(id, element, schemas, hostIsStandalone) {
     const name = element.name.replace(REMOVE_XHTML_REGEX, "");
@@ -2800,8 +2802,7 @@ function generateTypeCtorDeclarationFn(node, meta, nodeTypeRef, typeParams) {
       declList
     );
   } else {
-    return ts19.factory.createFunctionDeclaration(
-      void 0,
+    return createFunctionDeclaration(
       [ts19.factory.createModifier(ts19.SyntaxKind.DeclareKeyword)],
       void 0,
       meta.fnName,
@@ -2862,8 +2863,7 @@ function constructTypeCtorParameter(node, meta, rawType) {
   if (initType === null) {
     initType = ts19.factory.createTypeLiteralNode([]);
   }
-  return ts19.factory.createParameterDeclaration(
-    void 0,
+  return createParameterDeclaration(
     void 0,
     void 0,
     "init",
@@ -3572,15 +3572,14 @@ function generateTypeCheckBlock(env, ref, name, meta, domSchemaChecker, oobRecor
         break;
     }
   }
-  const paramList = [tcbThisParam(ref.node, ctxRawType.typeName, typeArguments)];
+  const paramList = [tcbThisParam(ctxRawType.typeName, typeArguments)];
   const scopeStatements = scope.render();
   const innerBody = ts25.factory.createBlock([
     ...env.getPreludeStatements(),
     ...scopeStatements
   ]);
   const body = ts25.factory.createBlock([ts25.factory.createIfStatement(ts25.factory.createTrue(), innerBody, void 0)]);
-  const fnDecl = ts25.factory.createFunctionDeclaration(
-    void 0,
+  const fnDecl = createFunctionDeclaration(
     void 0,
     void 0,
     name,
@@ -4425,15 +4424,13 @@ var Scope = class {
     }
   }
 };
-function tcbThisParam(node, name, typeArguments) {
-  const type = ts25.factory.createTypeReferenceNode(name, typeArguments);
-  return ts25.factory.createParameterDeclaration(
-    void 0,
+function tcbThisParam(name, typeArguments) {
+  return createParameterDeclaration(
     void 0,
     void 0,
     "this",
     void 0,
-    type,
+    ts25.factory.createTypeReferenceNode(name, typeArguments),
     void 0
   );
 }
@@ -4593,8 +4590,7 @@ function tcbCreateEventHandler(event, tcb, scope, eventType) {
   if (guards !== null) {
     body = ts25.factory.createIfStatement(guards, body);
   }
-  const eventParam = ts25.factory.createParameterDeclaration(
-    void 0,
+  const eventParam = createParameterDeclaration(
     void 0,
     void 0,
     EVENT_PARAMETER,
@@ -6619,6 +6615,18 @@ function incrementalFromStateTicket(oldProgram, oldState, newProgram, options, i
   };
 }
 var NgCompiler = class {
+  static fromTicket(ticket, adapter) {
+    switch (ticket.kind) {
+      case CompilationTicketKind.Fresh:
+        return new NgCompiler(adapter, ticket.options, ticket.tsProgram, ticket.programDriver, ticket.incrementalBuildStrategy, IncrementalCompilation.fresh(ticket.tsProgram, versionMapFromProgram(ticket.tsProgram, ticket.programDriver)), ticket.enableTemplateTypeChecker, ticket.usePoisonedData, ticket.perfRecorder);
+      case CompilationTicketKind.IncrementalTypeScript:
+        return new NgCompiler(adapter, ticket.options, ticket.newProgram, ticket.programDriver, ticket.incrementalBuildStrategy, ticket.incrementalCompilation, ticket.enableTemplateTypeChecker, ticket.usePoisonedData, ticket.perfRecorder);
+      case CompilationTicketKind.IncrementalResource:
+        const compiler = ticket.compiler;
+        compiler.updateWithChangedResources(ticket.modifiedResourceFiles, ticket.perfRecorder);
+        return compiler;
+    }
+  }
   constructor(adapter, options, inputProgram, programDriver, incrementalStrategy, incrementalCompilation, enableTemplateTypeChecker, usePoisonedData, livePerfRecorder) {
     var _a;
     this.adapter = adapter;
@@ -6659,18 +6667,6 @@ var NgCompiler = class {
     }
     livePerfRecorder.eventCount(PerfEvent.InputDtsFile, dtsFileCount);
     livePerfRecorder.eventCount(PerfEvent.InputTsFile, nonDtsFileCount);
-  }
-  static fromTicket(ticket, adapter) {
-    switch (ticket.kind) {
-      case CompilationTicketKind.Fresh:
-        return new NgCompiler(adapter, ticket.options, ticket.tsProgram, ticket.programDriver, ticket.incrementalBuildStrategy, IncrementalCompilation.fresh(ticket.tsProgram, versionMapFromProgram(ticket.tsProgram, ticket.programDriver)), ticket.enableTemplateTypeChecker, ticket.usePoisonedData, ticket.perfRecorder);
-      case CompilationTicketKind.IncrementalTypeScript:
-        return new NgCompiler(adapter, ticket.options, ticket.newProgram, ticket.programDriver, ticket.incrementalBuildStrategy, ticket.incrementalCompilation, ticket.enableTemplateTypeChecker, ticket.usePoisonedData, ticket.perfRecorder);
-      case CompilationTicketKind.IncrementalResource:
-        const compiler = ticket.compiler;
-        compiler.updateWithChangedResources(ticket.modifiedResourceFiles, ticket.perfRecorder);
-        return compiler;
-    }
   }
   get perfRecorder() {
     return this.livePerfRecorder;
@@ -7863,4 +7859,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-ENZHIOMX.js.map
+//# sourceMappingURL=chunk-ONRVYLCK.js.map

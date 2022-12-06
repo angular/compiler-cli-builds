@@ -12,7 +12,7 @@ import { DeclarationNode } from '../../reflection';
 /**
  * Type describing a symbol that is guaranteed to have a value declaration.
  */
-export declare type SymbolWithValueDeclaration = ts.Symbol & {
+export type SymbolWithValueDeclaration = ts.Symbol & {
     valueDeclaration: ts.Declaration;
     declarations: ts.Declaration[];
 };
@@ -50,12 +50,12 @@ export declare function isAssignment(node: ts.Node): node is ts.BinaryExpression
 /**
  * Asserts that the keys `K` form a subset of the keys of `T`.
  */
-export declare type SubsetOfKeys<T, K extends keyof T> = K;
+export type SubsetOfKeys<T, K extends keyof T> = K;
 /**
  * Represents the type `T`, with a transformation applied that turns all methods (even optional
  * ones) into required fields (which may be `undefined`, if the method was optional).
  */
-export declare type RequiredDelegations<T> = {
+export type RequiredDelegations<T> = {
     [M in keyof Required<T>]: T[M];
 };
 /**

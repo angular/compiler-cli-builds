@@ -65,7 +65,7 @@ export interface IncrementalResourceCompilationTicket {
  * Angular compiler. They abstract the starting state of compilation and allow `NgCompiler` to be
  * managed independently of any incremental compilation lifecycle.
  */
-export declare type CompilationTicket = FreshCompilationTicket | IncrementalTypeScriptCompilationTicket | IncrementalResourceCompilationTicket;
+export type CompilationTicket = FreshCompilationTicket | IncrementalTypeScriptCompilationTicket | IncrementalResourceCompilationTicket;
 /**
  * Create a `CompilationTicket` for a brand new compilation, using no prior state.
  */

@@ -63,7 +63,7 @@ export declare enum ImportFlags {
  * source file, then `'unknown'` should be returned. If the generated expression does not represent
  * an import then `null` should be used.
  */
-export declare type ImportedFile = ts.SourceFile | 'unknown' | null;
+export type ImportedFile = ts.SourceFile | 'unknown' | null;
 export declare const enum ReferenceEmitKind {
     Success = 0,
     Failed = 1
@@ -104,7 +104,7 @@ export interface FailedEmitResult {
      */
     reason: string;
 }
-export declare type ReferenceEmitResult = EmittedReference | FailedEmitResult;
+export type ReferenceEmitResult = EmittedReference | FailedEmitResult;
 /**
  * Verifies that a reference was emitted successfully, or raises a `FatalDiagnosticError` otherwise.
  * @param result The emit result that should have been successful.

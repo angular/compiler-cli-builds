@@ -24,7 +24,7 @@ export interface TypeCheckableDirectiveMeta extends DirectiveMeta, DirectiveType
     isStandalone: boolean;
     hostDirectives: HostDirectiveMeta[] | null;
 }
-export declare type TemplateId = string & {
+export type TemplateId = string & {
     __brand: 'TemplateId';
 };
 /**
@@ -44,7 +44,7 @@ export interface TemplateDiagnostic extends ts.Diagnostic {
 /**
  * A `TemplateDiagnostic` with a specific error code.
  */
-export declare type NgTemplateDiagnostic<T extends ErrorCode> = TemplateDiagnostic & {
+export type NgTemplateDiagnostic<T extends ErrorCode> = TemplateDiagnostic & {
     __ngCode: T;
 };
 /**
@@ -282,7 +282,7 @@ export interface TypeCheckingConfig {
      */
     suggestionsForSuboptimalTypeInference: boolean;
 }
-export declare type TemplateSourceMapping = DirectTemplateSourceMapping | IndirectTemplateSourceMapping | ExternalTemplateSourceMapping;
+export type TemplateSourceMapping = DirectTemplateSourceMapping | IndirectTemplateSourceMapping | ExternalTemplateSourceMapping;
 /**
  * A mapping to an inline template in a TS file.
  *

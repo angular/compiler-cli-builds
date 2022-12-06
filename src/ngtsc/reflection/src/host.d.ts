@@ -11,7 +11,7 @@ import ts from 'typescript';
  * Metadata extracted from an instance of a decorator on another declaration, or synthesized from
  * other information about a class.
  */
-export declare type Decorator = ConcreteDecorator | SyntheticDecorator;
+export type Decorator = ConcreteDecorator | SyntheticDecorator;
 export interface BaseDecorator {
     /**
      * Name by which the decorator was invoked in the user's code.
@@ -69,8 +69,8 @@ export declare const Decorator: {
  * A decorator is identified by either a simple identifier (e.g. `Decorator`) or, in some cases,
  * a namespaced property access (e.g. `core.Decorator`).
  */
-export declare type DecoratorIdentifier = ts.Identifier | NamespacedIdentifier;
-export declare type NamespacedIdentifier = ts.PropertyAccessExpression & {
+export type DecoratorIdentifier = ts.Identifier | NamespacedIdentifier;
+export type NamespacedIdentifier = ts.PropertyAccessExpression & {
     expression: ts.Identifier;
     name: ts.Identifier;
 };
@@ -90,7 +90,7 @@ export declare function isDecoratorIdentifier(exp: ts.Expression): exp is Decora
  * For `ReflectionHost` purposes, a class declaration should always have a `name` identifier,
  * because we need to be able to reference it in other parts of the program.
  */
-export declare type ClassDeclaration<T extends DeclarationNode = DeclarationNode> = T & {
+export type ClassDeclaration<T extends DeclarationNode = DeclarationNode> = T & {
     name: ts.Identifier;
 };
 /**
@@ -307,7 +307,7 @@ export interface MissingType {
 /**
  * The various reasons why a type node may not be referred to as a value.
  */
-export declare type UnavailableValue = UnsupportedType | NoValueDeclaration | TypeOnlyImport | NamespaceImport | UnknownReference | MissingType;
+export type UnavailableValue = UnsupportedType | NoValueDeclaration | TypeOnlyImport | NamespaceImport | UnknownReference | MissingType;
 /**
  * A reference to a value that originated from a type position.
  *
@@ -317,7 +317,7 @@ export declare type UnavailableValue = UnsupportedType | NoValueDeclaration | Ty
  *
  * See the individual types for additional information.
  */
-export declare type TypeValueReference = LocalTypeValueReference | ImportedTypeValueReference | UnavailableTypeValueReference;
+export type TypeValueReference = LocalTypeValueReference | ImportedTypeValueReference | UnavailableTypeValueReference;
 /**
  * A parameter to a constructor.
  */
@@ -470,7 +470,7 @@ export interface EnumMember {
  * An example of this is `exports.someVar = 42` where the declaration expression would be
  * `exports.someVar`.
  */
-export declare type DeclarationNode = ts.Declaration | ts.Expression;
+export type DeclarationNode = ts.Declaration | ts.Expression;
 /**
  * The type of a Declaration - whether its node is concrete (ts.Declaration) or inline
  * (ts.Expression). See `ConcreteDeclaration`, `InlineDeclaration` and `DeclarationNode` for more
@@ -516,7 +516,7 @@ export interface ConcreteDeclaration<T extends ts.Declaration = ts.Declaration> 
      */
     identity: SpecialDeclarationIdentity | null;
 }
-export declare type SpecialDeclarationIdentity = DownleveledEnum;
+export type SpecialDeclarationIdentity = DownleveledEnum;
 export declare const enum SpecialDeclarationKind {
     DownleveledEnum = 0
 }
@@ -544,7 +544,7 @@ export interface InlineDeclaration extends BaseDeclaration<Exclude<DeclarationNo
  * The declaration of a symbol, along with information about how it was imported into the
  * application.
  */
-export declare type Declaration<T extends ts.Declaration = ts.Declaration> = ConcreteDeclaration<T> | InlineDeclaration;
+export type Declaration<T extends ts.Declaration = ts.Declaration> = ConcreteDeclaration<T> | InlineDeclaration;
 /**
  * Abstracts reflection operations on a TypeScript AST.
  *

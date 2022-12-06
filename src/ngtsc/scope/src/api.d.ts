@@ -63,7 +63,7 @@ export interface StandaloneScope {
     schemas: SchemaMetadata[];
     isPoisoned: boolean;
 }
-export declare type ComponentScope = LocalModuleScope | StandaloneScope;
+export type ComponentScope = LocalModuleScope | StandaloneScope;
 /**
  * Read information about the compilation scope of components.
  */

@@ -8,11 +8,11 @@
 /// <amd-module name="@angular/compiler-cli/ngcc/src/writing/package_json_updater" />
 import { AbsoluteFsPath, FileSystem } from '../../../src/ngtsc/file_system';
 import { JsonObject, JsonValue } from '../utils';
-export declare type PackageJsonChange = [string[], JsonValue, PackageJsonPropertyPositioning];
-export declare type PackageJsonPropertyPositioning = 'unimportant' | 'alphabetic' | {
+export type PackageJsonChange = [string[], JsonValue, PackageJsonPropertyPositioning];
+export type PackageJsonPropertyPositioning = 'unimportant' | 'alphabetic' | {
     before: string;
 };
-export declare type WritePackageJsonChangesFn = (changes: PackageJsonChange[], packageJsonPath: AbsoluteFsPath, parsedJson?: JsonObject) => void;
+export type WritePackageJsonChangesFn = (changes: PackageJsonChange[], packageJsonPath: AbsoluteFsPath, parsedJson?: JsonObject) => void;
 /**
  * A utility object that can be used to safely update values in a `package.json` file.
  *

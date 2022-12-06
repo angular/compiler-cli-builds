@@ -98,7 +98,7 @@ export interface VariableIdentifier extends TemplateIdentifier {
  * Identifiers recorded at the top level of the template, without any context about the HTML nodes
  * they were discovered in.
  */
-export declare type TopLevelIdentifier = PropertyIdentifier | ElementIdentifier | TemplateNodeIdentifier | ReferenceIdentifier | VariableIdentifier | MethodIdentifier;
+export type TopLevelIdentifier = PropertyIdentifier | ElementIdentifier | TemplateNodeIdentifier | ReferenceIdentifier | VariableIdentifier | MethodIdentifier;
 /**
  * Describes the absolute byte offsets of a text anchor in a source code.
  */

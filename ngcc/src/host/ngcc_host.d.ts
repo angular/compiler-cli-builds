@@ -13,7 +13,7 @@ import { SymbolWithValueDeclaration } from '../../../src/ngtsc/util/src/typescri
  * The symbol corresponding to a "class" declaration. I.e. a `ts.Symbol` whose `valueDeclaration` is
  * a `ClassDeclaration`.
  */
-export declare type ClassSymbol = ts.Symbol & {
+export type ClassSymbol = ts.Symbol & {
     valueDeclaration: ClassDeclaration;
 };
 /**

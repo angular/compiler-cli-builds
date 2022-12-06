@@ -6,7 +6,7 @@ import { NgccConfiguration } from './configuration';
 /**
  * The possible values for the format of an entry-point.
  */
-export declare type EntryPointFormat = 'esm5' | 'esm2015' | 'umd' | 'commonjs';
+export type EntryPointFormat = 'esm5' | 'esm2015' | 'umd' | 'commonjs';
 /**
  * An object containing information about an entry-point, including paths
  * to each of the possible entry-point formats.
@@ -48,7 +48,7 @@ export interface PackageJsonFormatPropertiesMap {
     types?: string;
     typings?: string;
 }
-export declare type PackageJsonFormatProperties = keyof PackageJsonFormatPropertiesMap;
+export type PackageJsonFormatProperties = keyof PackageJsonFormatPropertiesMap;
 /**
  * The properties that may be loaded from the `package.json` file.
  */
@@ -61,7 +61,7 @@ export interface EntryPointPackageJson extends JsonObject, PackageJsonFormatProp
     };
     __processed_by_ivy_ngcc__?: Record<string, string>;
 }
-export declare type EntryPointJsonProperty = Exclude<PackageJsonFormatProperties, 'types' | 'typings'>;
+export type EntryPointJsonProperty = Exclude<PackageJsonFormatProperties, 'types' | 'typings'>;
 export declare const SUPPORTED_FORMAT_PROPERTIES: EntryPointJsonProperty[];
 /**
  * The path does not represent an entry-point, i.e. there is no package.json at the path and there
@@ -85,7 +85,7 @@ export declare const INCOMPATIBLE_ENTRY_POINT = "incompatible-entry-point";
  * * INCOMPATIBLE_ENTRY_POINT - the path was a non-processable entry-point that should be searched
  * for sub-entry-points
  */
-export declare type GetEntryPointResult = EntryPoint | typeof IGNORED_ENTRY_POINT | typeof INCOMPATIBLE_ENTRY_POINT | typeof NO_ENTRY_POINT;
+export type GetEntryPointResult = EntryPoint | typeof IGNORED_ENTRY_POINT | typeof INCOMPATIBLE_ENTRY_POINT | typeof NO_ENTRY_POINT;
 /**
  * Try to create an entry-point from the given paths and properties.
  *

@@ -9,7 +9,7 @@
 import ts from 'typescript';
 import { ParsedConfiguration } from './perform_compile';
 import * as api from './transformers/api';
-declare type TsickleModule = typeof import('tsickle');
+type TsickleModule = typeof import('tsickle');
 export declare function main(args: string[], consoleError?: (s: string) => void, config?: NgcParsedConfiguration, customTransformers?: api.CustomTransformers, programReuse?: {
     program: api.Program | undefined;
 }, modifiedResourceFiles?: Set<string> | null, tsickle?: TsickleModule): number;

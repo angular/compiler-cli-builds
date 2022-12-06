@@ -34,7 +34,7 @@ export interface ModuleWithProvidersInfo {
      */
     ngModule: Reference<ClassDeclaration>;
 }
-export declare type ModuleWithProvidersAnalyses = Map<ts.SourceFile, ModuleWithProvidersInfo[]>;
+export type ModuleWithProvidersAnalyses = Map<ts.SourceFile, ModuleWithProvidersInfo[]>;
 export declare const ModuleWithProvidersAnalyses: MapConstructor;
 export declare class ModuleWithProvidersAnalyzer {
     private host;

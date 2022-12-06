@@ -12,13 +12,13 @@ import { InputOutputPropertySet } from '@angular/compiler';
  *
  * This type exists for documentation only.
  */
-export declare type ClassPropertyName = string;
+export type ClassPropertyName = string;
 /**
  * The name by which an input or output of a directive or component is bound in an Angular template.
  *
  * This type exists for documentation only.
  */
-export declare type BindingPropertyName = string;
+export type BindingPropertyName = string;
 /**
  * An input or output of a directive that has both a named JavaScript class property on a component
  * or directive class, as well as an Angular template property name used for binding.

@@ -11,7 +11,7 @@ import { TcbLocation } from './symbols';
 /**
  * An autocompletion source of any kind.
  */
-export declare type Completion = ReferenceCompletion | VariableCompletion;
+export type Completion = ReferenceCompletion | VariableCompletion;
 /**
  * Discriminant of an autocompletion source (a `Completion`).
  */

@@ -11,7 +11,7 @@ import { SourceFile, SourceFileLoader } from '../../../src/ngtsc/sourcemaps';
 /**
  * A function that will return a `SourceFile` object (or null) for the current file being linked.
  */
-export declare type GetSourceFileFn = () => SourceFile | null;
+export type GetSourceFileFn = () => SourceFile | null;
 /**
  * Create a `GetSourceFileFn` that will return the `SourceFile` being linked or `null`, if not
  * available.

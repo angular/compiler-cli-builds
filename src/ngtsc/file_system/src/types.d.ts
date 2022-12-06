@@ -12,19 +12,19 @@
  * A `string` is not assignable to a `BrandedPath`, but a `BrandedPath` is assignable to a `string`.
  * Two `BrandedPath`s with different brands are not mutually assignable.
  */
-export declare type BrandedPath<B extends string> = string & {
+export type BrandedPath<B extends string> = string & {
     _brand: B;
 };
 /**
  * A fully qualified path in the file system, in POSIX form.
  */
-export declare type AbsoluteFsPath = BrandedPath<'AbsoluteFsPath'>;
+export type AbsoluteFsPath = BrandedPath<'AbsoluteFsPath'>;
 /**
  * A path that's relative to another (unspecified) root.
  *
  * This does not necessarily have to refer to a physical file.
  */
-export declare type PathSegment = BrandedPath<'PathSegment'>;
+export type PathSegment = BrandedPath<'PathSegment'>;
 /**
  * An abstraction over the path manipulation aspects of a file-system.
  */
@@ -78,7 +78,7 @@ export interface FileSystem extends ReadonlyFileSystem {
     ensureDir(path: AbsoluteFsPath): void;
     removeDeep(path: AbsoluteFsPath): void;
 }
-export declare type PathString = string | AbsoluteFsPath | PathSegment;
+export type PathString = string | AbsoluteFsPath | PathSegment;
 /**
  * Information about an object in the FileSystem.
  * This is analogous to the `fs.Stats` class in Node.js.

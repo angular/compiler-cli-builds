@@ -7,6 +7,7 @@
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/ts_compatibility/src/ts_cross_version_utils.mjs
 import ts from "typescript";
 var IS_AFTER_TS_48 = isAfterVersion(4, 8);
+var IS_AFTER_TS_49 = isAfterVersion(4, 9);
 var updateParameterDeclaration = IS_AFTER_TS_48 ? ts.factory.updateParameterDeclaration : (node, modifiers, dotDotDotToken, name, questionToken, type, initializer) => ts.factory.updateParameterDeclaration(node, ...splitModifiers(modifiers), dotDotDotToken, name, questionToken, type, initializer);
 var updateImportDeclaration = IS_AFTER_TS_48 ? ts.factory.updateImportDeclaration : (node, modifiers, importClause, moduleSpecifier, assertClause) => ts.factory.updateImportDeclaration(node, void 0, modifiers, importClause, moduleSpecifier, assertClause);
 var updateClassDeclaration = IS_AFTER_TS_48 ? ts.factory.updateClassDeclaration : (node, combinedModifiers, name, typeParameters, heritageClauses, members) => ts.factory.updateClassDeclaration(node, ...splitModifiers(combinedModifiers), name, typeParameters, heritageClauses, members);
@@ -22,6 +23,10 @@ var createSetAccessorDeclaration = IS_AFTER_TS_48 ? ts.factory.createSetAccessor
 var updateConstructorDeclaration = IS_AFTER_TS_48 ? ts.factory.updateConstructorDeclaration : (node, modifiers, parameters, body) => ts.factory.updateConstructorDeclaration(node, void 0, modifiers, parameters, body);
 var getDecorators = IS_AFTER_TS_48 ? ts.getDecorators : (node) => node.decorators;
 var getModifiers = IS_AFTER_TS_48 ? ts.getModifiers : (node) => node.modifiers;
+var createParameterDeclaration = IS_AFTER_TS_49 ? ts.factory.createParameterDeclaration : (modifiers, dotDotDotToken, name, questionToken, type, initializer) => ts.factory.createParameterDeclaration(...splitModifiers(modifiers), dotDotDotToken, name, questionToken, type, initializer);
+var createImportDeclaration = IS_AFTER_TS_49 ? ts.factory.createImportDeclaration : (modifiers, importClause, moduleSpecifier, assertClause) => ts.factory.createImportDeclaration(void 0, modifiers, importClause, moduleSpecifier, assertClause);
+var createFunctionDeclaration = IS_AFTER_TS_49 ? ts.factory.createFunctionDeclaration : (modifiers, asteriskToken, name, typeParameters, parameters, type, body) => ts.factory.createFunctionDeclaration(...splitModifiers(modifiers), asteriskToken, name, typeParameters, parameters, type, body);
+var createIndexSignature = IS_AFTER_TS_49 ? ts.factory.createIndexSignature : (modifiers, parameters, type) => ts.factory.createIndexSignature(modifiers, parameters, type);
 function combineModifiers(decorators, modifiers) {
   const hasDecorators = decorators == null ? void 0 : decorators.length;
   const hasModifiers = modifiers == null ? void 0 : modifiers.length;
@@ -75,6 +80,10 @@ export {
   updateConstructorDeclaration,
   getDecorators,
   getModifiers,
+  createParameterDeclaration,
+  createImportDeclaration,
+  createFunctionDeclaration,
+  createIndexSignature,
   combineModifiers
 };
 /*!
@@ -91,4 +100,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-DSVWG4QJ.js.map
+//# sourceMappingURL=chunk-IZN5U2AM.js.map

@@ -13,7 +13,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-ALSLKTUB.js";
+} from "./chunk-OHYTYUA4.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -34,9 +34,10 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-TOW3O33K.js";
+} from "./chunk-UN4WV3U4.js";
 import {
   combineModifiers,
+  createImportDeclaration,
   createPropertyDeclaration,
   getDecorators,
   getModifiers,
@@ -47,7 +48,7 @@ import {
   updateParameterDeclaration,
   updatePropertyDeclaration,
   updateSetAccessorDeclaration
-} from "./chunk-DSVWG4QJ.js";
+} from "./chunk-IZN5U2AM.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -56,7 +57,7 @@ import {
 import {
   PerfEvent,
   PerfPhase
-} from "./chunk-4F26FKLW.js";
+} from "./chunk-MAF2KC4N.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
@@ -3806,8 +3807,7 @@ function addImports(importManager, sf, extraStatements = []) {
       void 0,
       ts16.factory.createNamespaceImport(qualifier)
     );
-    const decl = ts16.factory.createImportDeclaration(
-      void 0,
+    const decl = createImportDeclaration(
       void 0,
       importClause,
       ts16.factory.createStringLiteral(i.specifier)
@@ -6977,4 +6977,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CVG4XBDA.js.map
+//# sourceMappingURL=chunk-KY7HVS6H.js.map

@@ -15,7 +15,7 @@ import { ResolvedValue } from './result';
  * Tracks the scope of a function body, which includes `ResolvedValue`s for the parameters of that
  * body.
  */
-declare type Scope = Map<ts.ParameterDeclaration, ResolvedValue>;
+type Scope = Map<ts.ParameterDeclaration, ResolvedValue>;
 interface Context {
     originatingFile: ts.SourceFile;
     /**

@@ -19,7 +19,7 @@ import { ParsedTemplateWithSource, StyleUrlMeta } from './resources';
  * The `keyof R3ComponentMetadata &` condition ensures that only fields of `R3ComponentMetadata` can
  * be included here.
  */
-export declare type ComponentMetadataResolvedFields = SubsetOfKeys<R3ComponentMetadata<R3TemplateDependencyMetadata>, 'declarations' | 'declarationListEmitMode'>;
+export type ComponentMetadataResolvedFields = SubsetOfKeys<R3ComponentMetadata<R3TemplateDependencyMetadata>, 'declarations' | 'declarationListEmitMode'>;
 export interface ComponentAnalysisData {
     /**
      * `meta` includes those fields of `R3ComponentMetadata` which are calculated at `analyze` time
@@ -62,4 +62,4 @@ export interface ComponentAnalysisData {
     /** Raw expression that defined the host directives array. Used for diagnostics. */
     rawHostDirectives: ts.Expression | null;
 }
-export declare type ComponentResolutionData = Pick<R3ComponentMetadata<R3TemplateDependencyMetadata>, ComponentMetadataResolvedFields>;
+export type ComponentResolutionData = Pick<R3ComponentMetadata<R3TemplateDependencyMetadata>, ComponentMetadataResolvedFields>;

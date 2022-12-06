@@ -38,7 +38,7 @@ import {
   sendMessageToWorker,
   sortTasksByPriority,
   stringifyTask
-} from "./chunk-2XJ7645Q.js";
+} from "./chunk-PPMCRK4H.js";
 import {
   LogLevel
 } from "./chunk-OFXSI6E3.js";
@@ -896,7 +896,7 @@ var ProgramBasedEntryPointFinder = class extends TracingEntryPointFinder {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/packages/build_marker.mjs
-var NGCC_VERSION = "15.1.0-next.1+sha-8656ac0";
+var NGCC_VERSION = "15.1.0-next.1+sha-dd42974";
 function needsCleaning(packageJson) {
   return Object.values(packageJson.__processed_by_ivy_ngcc__ || {}).some((value) => value !== NGCC_VERSION);
 }
@@ -1054,15 +1054,15 @@ var TargetedEntryPointFinder = class extends TracingEntryPointFinder {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/tasks/queues/base_task_queue.mjs
 var BaseTaskQueue = class {
+  get allTasksCompleted() {
+    return this.tasks.length === 0 && this.inProgressTasks.size === 0;
+  }
   constructor(logger, tasks, dependencies) {
     this.logger = logger;
     this.tasks = tasks;
     this.dependencies = dependencies;
     this.inProgressTasks = /* @__PURE__ */ new Set();
     this.tasksToSkip = /* @__PURE__ */ new Map();
-  }
-  get allTasksCompleted() {
-    return this.tasks.length === 0 && this.inProgressTasks.size === 0;
   }
   getNextTask() {
     let nextTask = this.computeNextTask();
@@ -1411,7 +1411,7 @@ var ClusterMaster = class {
       isWorkerAvailable = false;
     }
     if (!isWorkerAvailable) {
-      const spawnedWorkerCount = Object.keys(cluster.workers).length;
+      const spawnedWorkerCount = cluster.workers ? Object.keys(cluster.workers).length : 0;
       if (spawnedWorkerCount < this.maxWorkerCount) {
         this.logger.debug("Spawning another worker process as there is more work to be done.");
         cluster.fork();
@@ -1446,7 +1446,7 @@ var ClusterMaster = class {
         this.fileWriter.revertBundle(task.entryPoint, files, task.formatPropertiesToMarkAsProcessed);
       }
       this.taskQueue.markAsUnprocessed(task);
-      const spawnedWorkerCount = Object.keys(cluster.workers).length;
+      const spawnedWorkerCount = cluster.workers ? Object.keys(cluster.workers).length : 0;
       if (spawnedWorkerCount > 0) {
         this.logger.debug(`Not spawning another worker process to replace #${worker.id}. Continuing with ${spawnedWorkerCount} workers...`);
         this.maybeDistributeWork();
@@ -1530,10 +1530,12 @@ var ClusterMaster = class {
     this.pkgJsonUpdater.writeChanges(msg.changes, msg.packageJsonPath, entryPoint.packageJson);
   }
   stopWorkers() {
-    const workers = Object.values(cluster.workers);
-    this.logger.debug(`Stopping ${workers.length} workers...`);
-    cluster.removeAllListeners();
-    workers.forEach((worker) => worker.kill());
+    if (cluster.workers) {
+      const workers = Object.values(cluster.workers);
+      this.logger.debug(`Stopping ${workers.length} workers...`);
+      cluster.removeAllListeners();
+      workers.forEach((worker) => worker.kill());
+    }
   }
   wrapEventHandler(fn) {
     return async (...args) => {
@@ -2182,4 +2184,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RT3JY3BZ.js.map
+//# sourceMappingURL=chunk-PPWXQG65.js.map

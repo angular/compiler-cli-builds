@@ -18,7 +18,7 @@ import { SyntheticValue } from './synthetic';
  * non-primitive value, or a special `DynamicValue` type which indicates the value was not
  * available statically.
  */
-export declare type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | ResolvedModule | KnownFn | SyntheticValue<unknown> | DynamicValue<unknown>;
+export type ResolvedValue = number | boolean | string | null | undefined | Reference | EnumValue | ResolvedValueArray | ResolvedValueMap | ResolvedModule | KnownFn | SyntheticValue<unknown> | DynamicValue<unknown>;
 /**
  * An array of `ResolvedValue`s.
  *

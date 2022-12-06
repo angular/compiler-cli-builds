@@ -15,7 +15,7 @@ export interface ExportInfo {
     from: AbsoluteFsPath;
     dtsFrom?: AbsoluteFsPath | null;
 }
-export declare type PrivateDeclarationsAnalyses = ExportInfo[];
+export type PrivateDeclarationsAnalyses = ExportInfo[];
 /**
  * This class will analyze a program to find all the declared classes
  * (i.e. on an NgModule) that are not publicly exported via an entry-point.

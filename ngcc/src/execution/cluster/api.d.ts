@@ -47,6 +47,6 @@ export interface UpdatePackageJsonMessage extends JsonObject {
     changes: PackageJsonChange[];
 }
 /** The type of messages sent from cluster workers to the cluster master. */
-export declare type MessageFromWorker = ReadyMessage | ErrorMessage | TaskCompletedMessage | TransformedFilesMessage | UpdatePackageJsonMessage;
+export type MessageFromWorker = ReadyMessage | ErrorMessage | TaskCompletedMessage | TransformedFilesMessage | UpdatePackageJsonMessage;
 /** The type of messages sent from the cluster master to cluster workers. */
-export declare type MessageToWorker = ProcessTaskMessage;
+export type MessageToWorker = ProcessTaskMessage;

@@ -8,7 +8,7 @@
  */
 import { AbsoluteFsPath, PathManipulation } from '../../src/ngtsc/file_system';
 import { ParsedConfiguration } from '../../src/perform_compile';
-export declare type PathMappings = {
+export type PathMappings = {
     baseUrl: string;
     paths: {
         [key: string]: string[];

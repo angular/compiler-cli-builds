@@ -199,15 +199,15 @@ export interface AstFactory<TStatement, TExpression> {
 /**
  * The type of a variable declaration.
  */
-export declare type VariableDeclarationType = 'const' | 'let' | 'var';
+export type VariableDeclarationType = 'const' | 'let' | 'var';
 /**
  * The unary operators supported by the `AstFactory`.
  */
-export declare type UnaryOperator = '+' | '-' | '!';
+export type UnaryOperator = '+' | '-' | '!';
 /**
  * The binary operators supported by the `AstFactory`.
  */
-export declare type BinaryOperator = '&&' | '>' | '>=' | '&' | '/' | '==' | '===' | '<' | '<=' | '-' | '%' | '*' | '!=' | '!==' | '||' | '+' | '??';
+export type BinaryOperator = '&&' | '>' | '>=' | '&' | '/' | '==' | '===' | '<' | '<=' | '-' | '%' | '*' | '!=' | '!==' | '||' | '+' | '??';
 /**
  * The original location of the start or end of a node created by the `AstFactory`.
  */

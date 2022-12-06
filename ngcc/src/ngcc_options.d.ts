@@ -122,17 +122,17 @@ export interface SyncNgccOptions {
 /**
  * The options to configure the ngcc compiler for asynchronous execution.
  */
-export declare type AsyncNgccOptions = Omit<SyncNgccOptions, 'async'> & {
+export type AsyncNgccOptions = Omit<SyncNgccOptions, 'async'> & {
     async: true;
 };
 /**
  * The options to configure the ngcc compiler.
  */
-export declare type NgccOptions = AsyncNgccOptions | SyncNgccOptions;
-export declare type OptionalNgccOptionKeys = 'targetEntryPointPath' | 'tsConfigPath' | 'pathMappings' | 'findEntryPointsFromTsConfigProgram';
-export declare type RequiredNgccOptions = Required<Omit<NgccOptions, OptionalNgccOptionKeys>>;
-export declare type OptionalNgccOptions = Pick<NgccOptions, OptionalNgccOptionKeys>;
-export declare type SharedSetup = {
+export type NgccOptions = AsyncNgccOptions | SyncNgccOptions;
+export type OptionalNgccOptionKeys = 'targetEntryPointPath' | 'tsConfigPath' | 'pathMappings' | 'findEntryPointsFromTsConfigProgram';
+export type RequiredNgccOptions = Required<Omit<NgccOptions, OptionalNgccOptionKeys>>;
+export type OptionalNgccOptions = Pick<NgccOptions, OptionalNgccOptionKeys>;
+export type SharedSetup = {
     fileSystem: FileSystem;
     absBasePath: AbsoluteFsPath;
     projectPath: AbsoluteFsPath;

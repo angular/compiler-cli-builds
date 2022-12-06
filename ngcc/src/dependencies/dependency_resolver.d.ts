@@ -55,7 +55,7 @@ export interface DependencyDiagnostics {
  *
  * See `DependencyResolver#sortEntryPointsByDependency()`.
  */
-export declare type PartiallyOrderedEntryPoints = PartiallyOrderedList<EntryPoint>;
+export type PartiallyOrderedEntryPoints = PartiallyOrderedList<EntryPoint>;
 /**
  * A list of entry-points, sorted by their dependencies, and the dependency graph.
  *

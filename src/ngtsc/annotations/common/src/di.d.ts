@@ -8,7 +8,7 @@
 /// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/common/src/di" />
 import { R3DependencyMetadata } from '@angular/compiler';
 import { ClassDeclaration, CtorParameter, ReflectionHost, UnavailableValue } from '../../../reflection';
-export declare type ConstructorDeps = {
+export type ConstructorDeps = {
     deps: R3DependencyMetadata[];
 } | {
     deps: null;

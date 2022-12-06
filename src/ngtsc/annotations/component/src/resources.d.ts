@@ -92,7 +92,7 @@ export interface ExternalTemplateDeclaration extends CommonTemplateDeclaration {
  * information, `ComponentDecoratorHandler` is able to re-read the template and update the component
  * record without needing to parse the original decorator again.
  */
-export declare type TemplateDeclaration = InlineTemplateDeclaration | ExternalTemplateDeclaration;
+export type TemplateDeclaration = InlineTemplateDeclaration | ExternalTemplateDeclaration;
 /** Determines the node to use for debugging purposes for the given TemplateDeclaration. */
 export declare function getTemplateDeclarationNodeForError(declaration: TemplateDeclaration): ts.Node;
 export interface ExtractTemplateOptions {
