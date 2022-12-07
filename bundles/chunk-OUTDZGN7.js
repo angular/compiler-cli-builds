@@ -5,8 +5,8 @@
     
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file.mjs
+import { decode, encode } from "@jridgewell/sourcemap-codec";
 import mapHelpers from "convert-source-map";
-import { decode, encode } from "sourcemap-codec";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/segment_marker.mjs
 function compareSegments(a, b) {
@@ -418,4 +418,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TTNJEW7O.js.map
+//# sourceMappingURL=chunk-OUTDZGN7.js.map

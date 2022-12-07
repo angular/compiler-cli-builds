@@ -70,5 +70,6 @@ export declare class StaticInterpreter {
     private getReference;
     private visitType;
     private visitTupleType;
+    private visitTypeQuery;
 }
 export {};

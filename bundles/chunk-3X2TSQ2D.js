@@ -1101,6 +1101,10 @@ var StaticInterpreter = class {
       return this.visitTupleType(node, context);
     } else if (ts2.isNamedTupleMember(node)) {
       return this.visitType(node.type, context);
+    } else if (ts2.isTypeOperatorNode(node) && node.operator === ts2.SyntaxKind.ReadonlyKeyword) {
+      return this.visitType(node.type, context);
+    } else if (ts2.isTypeQueryNode(node)) {
+      return this.visitTypeQuery(node, context);
     }
     return DynamicValue.fromDynamicType(node);
   }
@@ -1110,6 +1114,17 @@ var StaticInterpreter = class {
       res.push(this.visitType(elem, context));
     }
     return res;
+  }
+  visitTypeQuery(node, context) {
+    if (!ts2.isIdentifier(node.exprName)) {
+      return DynamicValue.fromUnknown(node);
+    }
+    const decl = this.host.getDeclarationOfIdentifier(node.exprName);
+    if (decl === null) {
+      return DynamicValue.fromUnknownIdentifier(node.exprName);
+    }
+    const declContext = { ...context, ...joinModuleContext(context, node, decl) };
+    return this.visitAmbiguousDeclaration(decl, declContext);
   }
 };
 function isFunctionOrMethodReference(ref) {
@@ -6977,4 +6992,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KY7HVS6H.js.map
+//# sourceMappingURL=chunk-3X2TSQ2D.js.map
