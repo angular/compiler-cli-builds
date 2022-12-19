@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/translator/src/translator" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

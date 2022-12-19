@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/host_directives_resolver" />
 import { DirectiveMeta, MetadataReader } from '../../metadata/src/api';
 /** Resolves the host directives of a directive to a flat array of matches. */
 export declare class HostDirectivesResolver {

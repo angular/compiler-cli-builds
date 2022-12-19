@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/diagnostics/src/extended_template_diagnostic_name" />
 /**
  * Enum holding the name of each extended template diagnostic. The name is used as a user-meaningful
  * value for configuring the diagnostic in the project's options.

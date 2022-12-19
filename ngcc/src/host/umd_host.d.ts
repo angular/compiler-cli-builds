@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/host/umd_host" />
 import ts from 'typescript';
 import { Logger } from '../../../src/ngtsc/logging';
 import { Declaration, Import } from '../../../src/ngtsc/reflection';

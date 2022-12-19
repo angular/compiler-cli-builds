@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/logging" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

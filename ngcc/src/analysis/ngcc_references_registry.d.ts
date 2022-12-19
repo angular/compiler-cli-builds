@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/analysis/ngcc_references_registry" />
 import ts from 'typescript';
 import { ReferencesRegistry } from '../../../src/ngtsc/annotations';
 import { Reference } from '../../../src/ngtsc/imports';

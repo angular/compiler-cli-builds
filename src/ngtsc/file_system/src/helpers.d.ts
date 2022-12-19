@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/file_system/src/helpers" />
 import { AbsoluteFsPath, FileSystem, PathSegment, PathString } from './types';
 export declare function getFileSystem(): FileSystem;
 export declare function setFileSystem(fileSystem: FileSystem): void;

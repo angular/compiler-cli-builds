@@ -2,26 +2,25 @@
 
       import {createRequire as __cjsCompatRequire} from 'module';
       const require = __cjsCompatRequire(import.meta.url);
-      const __ESM_IMPORT_META_URL__ = import.meta.url;
     
 import {
   parseCommandLineOptions
-} from "../chunk-QVO57CDR.js";
+} from "../chunk-K7P4IHT5.js";
 import {
   mainNgcc
-} from "../chunk-V5JWXGQQ.js";
-import "../chunk-DLVFMDSC.js";
-import "../chunk-3S7MERES.js";
-import "../chunk-I4VIIB6S.js";
-import "../chunk-3X2TSQ2D.js";
-import "../chunk-OHYTYUA4.js";
-import "../chunk-OFXSI6E3.js";
-import "../chunk-OUTDZGN7.js";
-import "../chunk-UN4WV3U4.js";
-import "../chunk-IZN5U2AM.js";
-import "../chunk-E7DPJFUS.js";
-import "../chunk-MAF2KC4N.js";
-import "../chunk-NDREJTCS.js";
+} from "../chunk-J2RT6VEF.js";
+import "../chunk-B57SP4JB.js";
+import "../chunk-XMXUF7ND.js";
+import "../chunk-VCBXVSET.js";
+import "../chunk-GF4EHNOX.js";
+import "../chunk-BYV3J3MV.js";
+import "../chunk-LYJKWJUC.js";
+import "../chunk-2NLFVEGY.js";
+import "../chunk-GZI5O5VP.js";
+import "../chunk-D25A632J.js";
+import "../chunk-TBUSSXUA.js";
+import "../chunk-YZWN2KWE.js";
+import "../chunk-SRFZMXHZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/main-ngcc.mjs
 process.title = "ngcc";

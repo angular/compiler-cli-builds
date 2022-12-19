@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/migrations/undecorated_parent_migration" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

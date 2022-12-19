@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/locking/lock_file_with_child_process/index" />
 /// <reference types="node" />
 /**
  * @license
@@ -39,5 +38,7 @@ export declare class LockFileWithChildProcess implements LockFile {
     remove(): void;
     protected createUnlocker(path: AbsoluteFsPath): ChildProcess;
 }
-/** Gets the absolute file path to the lock file unlocker script. */
-export declare function getLockFileUnlockerScriptPath(fileSystem: FileSystem): AbsoluteFsPath;
+/** Wrapper for resolving the lock file unlocker script. Useful for test patching. */
+export declare class LockFileUnlockerScriptResolver {
+    static resolve(fs: FileSystem): AbsoluteFsPath;
+}

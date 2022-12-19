@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/oob" />
 import { BindingPipe, PropertyWrite, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstReference, TmplAstVariable } from '@angular/compiler';
 import { ClassDeclaration } from '../../reflection';
 import { TemplateDiagnostic, TemplateId } from '../api';

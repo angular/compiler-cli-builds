@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/shims/src/factory_generator" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/entry_point_finder/directory_walker_entry_point_finder" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

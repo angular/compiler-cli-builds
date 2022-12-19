@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/metadata/src/property_mapping" />
 import { InputOutputPropertySet } from '@angular/compiler';
 /**
  * The name of a class property that backs an input or output declared by a directive or component.

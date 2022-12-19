@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/writing/cleaning/utils" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

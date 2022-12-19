@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/rendering/renderer" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

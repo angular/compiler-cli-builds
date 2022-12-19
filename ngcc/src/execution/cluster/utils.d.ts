@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/execution/cluster/utils" />
 import { MessageFromWorker, MessageToWorker } from './api';
 /** Expose a `Promise` instance as well as APIs for resolving/rejecting it. */
 export declare class Deferred<T> {

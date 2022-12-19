@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/transformers/downlevel_decorators_transform/patch_alias_reference_resolution" />
 import ts from 'typescript';
 /**
  * Gets whether a given node corresponds to an import alias declaration. Alias

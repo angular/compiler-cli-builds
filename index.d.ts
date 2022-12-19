@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli" />
 export { VERSION } from './src/version';
 export * from './src/transformers/api';
 export * from './src/transformers/entry_points';

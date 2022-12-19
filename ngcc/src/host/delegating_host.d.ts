@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/host/delegating_host" />
 import ts from 'typescript';
 import { ClassDeclaration, ClassMember, CtorParameter, Declaration, DeclarationNode, Decorator, FunctionDefinition, Import, ReflectionHost } from '../../../src/ngtsc/reflection';
 import { NgccClassSymbol, NgccReflectionHost } from './ngcc_host';

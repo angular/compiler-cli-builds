@@ -2,25 +2,24 @@
 
       import {createRequire as __cjsCompatRequire} from 'module';
       const require = __cjsCompatRequire(import.meta.url);
-      const __ESM_IMPORT_META_URL__ = import.meta.url;
     
 import {
   main
-} from "../../chunk-Y6OF4IE7.js";
-import "../../chunk-I4VIIB6S.js";
-import "../../chunk-3X2TSQ2D.js";
-import "../../chunk-OHYTYUA4.js";
-import "../../chunk-UN4WV3U4.js";
-import "../../chunk-IZN5U2AM.js";
+} from "../../chunk-2RW7MKJK.js";
+import "../../chunk-VCBXVSET.js";
+import "../../chunk-GF4EHNOX.js";
+import "../../chunk-BYV3J3MV.js";
+import "../../chunk-GZI5O5VP.js";
+import "../../chunk-D25A632J.js";
 import {
   NodeJSFileSystem,
   setFileSystem
-} from "../../chunk-E7DPJFUS.js";
-import "../../chunk-MAF2KC4N.js";
+} from "../../chunk-TBUSSXUA.js";
+import "../../chunk-YZWN2KWE.js";
 import {
   __require,
   __toESM
-} from "../../chunk-NDREJTCS.js";
+} from "../../chunk-SRFZMXHZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ngc.mjs
 import "reflect-metadata";

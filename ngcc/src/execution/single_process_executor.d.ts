@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/execution/single_process_executor" />
 import { Logger } from '../../../src/ngtsc/logging';
 import { AsyncLocker } from '../locking/async_locker';
 import { SyncLocker } from '../locking/sync_locker';

@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/semantic_graph/src/graph" />
 import { Expression } from '@angular/compiler';
 import { AbsoluteFsPath } from '../../../file_system';
 import { ClassDeclaration } from '../../../reflection';
@@ -29,7 +28,7 @@ export interface SemanticDependencyResult {
  */
 export declare class SemanticDepGraph {
     readonly files: Map<AbsoluteFsPath, Map<string, SemanticSymbol>>;
-    readonly symbolByDecl: Map<ClassDeclaration<import("@angular/compiler-cli/src/ngtsc/reflection").DeclarationNode>, SemanticSymbol>;
+    readonly symbolByDecl: Map<ClassDeclaration<import("../../../reflection").DeclarationNode>, SemanticSymbol>;
     /**
      * Registers a symbol in the graph. The symbol is given a unique identifier if possible, such that
      * its equivalent symbol can be obtained from a prior graph even if its declaration node has

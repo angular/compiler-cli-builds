@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/core/src/host" />
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ShimAdapter, ShimReferenceTagger } from '../../shims';
@@ -40,7 +39,7 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     readDirectory: ((rootDir: string, extensions: readonly string[], excludes: readonly string[] | undefined, includes: readonly string[], depth?: number | undefined) => string[]) | undefined;
     readFile: (fileName: string) => string | undefined;
     readResource: ((fileName: string) => string | Promise<string>) | undefined;
-    transformResource: ((data: string, context: import("@angular/compiler-cli/src/ngtsc/core/api/index").ResourceHostContext) => Promise<import("@angular/compiler-cli/src/ngtsc/core/api/index").TransformResourceResult | null>) | undefined;
+    transformResource: ((data: string, context: import("../api").ResourceHostContext) => Promise<import("../api").TransformResourceResult | null>) | undefined;
     realpath: ((path: string) => string) | undefined;
     resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile?: ts.SourceFile | undefined) => (ts.ResolvedModule | undefined)[]) | undefined;
     resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[] | readonly ts.FileReference[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingFileMode?: ts.ModuleKind.CommonJS | ts.ModuleKind.ESNext | undefined) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;

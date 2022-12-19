@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/patch_ts_expando_initializer" />
 /**
  * Consider the following ES5 code that may have been generated for a class:
  *

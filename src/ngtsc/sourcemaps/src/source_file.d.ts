@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file" />
 import { AbsoluteFsPath, PathManipulation } from '../../file_system';
 import { RawSourceMap, SourceMapInfo } from './raw_source_map';
 import { SegmentMarker } from './segment_marker';

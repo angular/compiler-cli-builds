@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/common/src/di" />
 import { R3DependencyMetadata } from '@angular/compiler';
 import { ClassDeclaration, CtorParameter, ReflectionHost, UnavailableValue } from '../../../reflection';
 export type ConstructorDeps = {

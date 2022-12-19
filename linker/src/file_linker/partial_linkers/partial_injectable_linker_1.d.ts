@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/linker/src/file_linker/partial_linkers/partial_injectable_linker_1" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

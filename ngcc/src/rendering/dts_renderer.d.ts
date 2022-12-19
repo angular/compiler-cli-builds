@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/rendering/dts_renderer" />
 import ts from 'typescript';
 import { ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
 import { Reexport } from '../../../src/ngtsc/imports';

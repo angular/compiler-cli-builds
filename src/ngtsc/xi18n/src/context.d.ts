@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/xi18n/src/context" />
 import { InterpolationConfig } from '@angular/compiler';
 /**
  * Captures template information intended for extraction of i18n messages from a template.

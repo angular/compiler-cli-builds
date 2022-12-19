@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/linker/src/file_linker/file_linker" />
 import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { DeclarationScope } from './declaration_scope';
 import { LinkerEnvironment } from './linker_environment';

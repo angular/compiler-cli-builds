@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/host/commonjs_umd_utils" />
 import ts from 'typescript';
 import { Declaration } from '../../../src/ngtsc/reflection';
 export interface ExportDeclaration {

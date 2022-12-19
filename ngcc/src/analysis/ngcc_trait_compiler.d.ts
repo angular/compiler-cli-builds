@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/analysis/ngcc_trait_compiler" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

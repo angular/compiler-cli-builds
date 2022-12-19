@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/analysis/util" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

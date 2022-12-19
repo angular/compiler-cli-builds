@@ -1,18 +1,17 @@
 
       import {createRequire as __cjsCompatRequire} from 'module';
       const require = __cjsCompatRequire(import.meta.url);
-      const __ESM_IMPORT_META_URL__ = import.meta.url;
     
 import {
   removeLockFile
-} from "../../../../chunk-DLVFMDSC.js";
+} from "../../../../chunk-B57SP4JB.js";
 import {
   ConsoleLogger
-} from "../../../../chunk-OFXSI6E3.js";
+} from "../../../../chunk-LYJKWJUC.js";
 import {
   NodeJSFileSystem
-} from "../../../../chunk-E7DPJFUS.js";
-import "../../../../chunk-NDREJTCS.js";
+} from "../../../../chunk-TBUSSXUA.js";
+import "../../../../chunk-SRFZMXHZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/locking/lock_file_with_child_process/ngcc_lock_unlocker.mjs
 var fs = new NodeJSFileSystem();

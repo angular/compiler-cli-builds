@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/translator/src/typescript_ast_factory" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

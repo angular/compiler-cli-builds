@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point_bundle" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/execution/tasks/queues/base_task_queue" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

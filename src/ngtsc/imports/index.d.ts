@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/imports" />
 export { AliasingHost, AliasStrategy, PrivateExportAliasingHost, UnifiedModulesAliasingHost } from './src/alias';
 export { ImportRewriter, NoopImportRewriter, R3SymbolsImportRewriter, validateAndRewriteCoreSymbol } from './src/core';
 export { DefaultImportTracker } from './src/default';

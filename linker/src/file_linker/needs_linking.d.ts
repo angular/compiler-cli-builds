@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/linker/src/file_linker/needs_linking" />
 /**
  * Determines if the provided source file may need to be processed by the linker, i.e. whether it
  * potentially contains any declarations. If true is returned, then the source file should be

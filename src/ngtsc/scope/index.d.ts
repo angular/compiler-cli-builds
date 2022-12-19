@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/scope" />
 export { ComponentScopeKind, ComponentScopeReader, ExportScope, LocalModuleScope, ScopeData, StandaloneScope } from './src/api';
 export { CompoundComponentScopeReader } from './src/component_scope';
 export { DtsModuleScopeResolver, MetadataDtsModuleScopeResolver } from './src/dependency';

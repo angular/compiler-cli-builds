@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/file_system/src/node_js_file_system" />
 import { AbsoluteFsPath, FileStats, FileSystem, PathManipulation, PathSegment, PathString, ReadonlyFileSystem } from './types';
 /**
  * A wrapper around the Node.js file-system that supports path manipulation.

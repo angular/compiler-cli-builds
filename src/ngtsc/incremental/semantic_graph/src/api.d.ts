@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api" />
 import { AbsoluteFsPath } from '../../../file_system';
 import { ClassDeclaration } from '../../../reflection';
 /**

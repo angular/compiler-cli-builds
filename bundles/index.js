@@ -1,13 +1,12 @@
 
       import {createRequire as __cjsCompatRequire} from 'module';
       const require = __cjsCompatRequire(import.meta.url);
-      const __ESM_IMPORT_META_URL__ = import.meta.url;
     
 import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-Y6MBLTIR.js";
+} from "./chunk-OQZ47NVO.js";
 import {
   DEFAULT_ERROR_CODE,
   EmitFlags,
@@ -31,15 +30,15 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-I4VIIB6S.js";
-import "./chunk-3X2TSQ2D.js";
-import "./chunk-OHYTYUA4.js";
+} from "./chunk-VCBXVSET.js";
+import "./chunk-GF4EHNOX.js";
+import "./chunk-BYV3J3MV.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "./chunk-OFXSI6E3.js";
-import "./chunk-UN4WV3U4.js";
-import "./chunk-IZN5U2AM.js";
+} from "./chunk-LYJKWJUC.js";
+import "./chunk-GZI5O5VP.js";
+import "./chunk-D25A632J.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -60,16 +59,16 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-E7DPJFUS.js";
+} from "./chunk-TBUSSXUA.js";
 import {
   ActivePerfRecorder,
   PerfPhase
-} from "./chunk-MAF2KC4N.js";
-import "./chunk-NDREJTCS.js";
+} from "./chunk-YZWN2KWE.js";
+import "./chunk-SRFZMXHZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("15.1.0-next.3+sha-e59406f");
+var VERSION = new Version("15.1.0-next.3+sha-22871e9");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {

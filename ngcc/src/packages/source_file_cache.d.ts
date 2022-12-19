@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/source_file_cache" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

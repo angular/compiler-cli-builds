@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/semantic_graph/src/type_parameters" />
 import { ClassDeclaration } from '../../../reflection';
 /**
  * Describes a generic type parameter of a semantic symbol. A class declaration with type parameters

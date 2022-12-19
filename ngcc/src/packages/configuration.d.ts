@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/configuration" />
 import { AbsoluteFsPath, PathManipulation, ReadonlyFileSystem } from '../../../src/ngtsc/file_system';
 import { PackageJsonFormatPropertiesMap } from './entry_point';
 /**

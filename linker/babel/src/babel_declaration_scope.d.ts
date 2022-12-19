@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/linker/babel/src/babel_declaration_scope" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -6,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { types as t } from '@babel/core';
 import { NodePath, Scope } from '@babel/traverse';
 import { DeclarationScope } from '../../../linker';
-import { types as t } from './babel_core';
 export type ConstantScopePath = NodePath<t.FunctionDeclaration> | NodePath<t.FunctionExpression> | NodePath<t.Program>;
 /**
  * This class represents the lexical scope of a partial declaration in Babel source code.

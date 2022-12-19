@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/line_mappings" />
 /** Gets the line and character for the given position from the line starts map. */
 export declare function getLineAndCharacterFromPosition(lineStartsMap: number[], position: number): {
     character: number;

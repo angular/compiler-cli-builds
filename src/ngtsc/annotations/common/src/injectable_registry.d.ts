@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/common/src/injectable_registry" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
