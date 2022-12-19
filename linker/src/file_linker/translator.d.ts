@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/linker/src/file_linker/translator" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/entry_point_manifest" />
 import { AbsoluteFsPath, FileSystem, PathSegment } from '../../../src/ngtsc/file_system';
 import { Logger } from '../../../src/ngtsc/logging';
 import { EntryPointWithDependencies } from '../dependencies/dependency_host';

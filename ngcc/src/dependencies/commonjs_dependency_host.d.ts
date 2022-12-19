@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/commonjs_dependency_host" />
 import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { DependencyHostBase } from './dependency_host';
 /**

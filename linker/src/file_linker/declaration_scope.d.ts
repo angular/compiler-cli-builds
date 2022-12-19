@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/linker/src/file_linker/declaration_scope" />
 /**
  * This interface represents the lexical scope of a partial declaration in the source code.
  *

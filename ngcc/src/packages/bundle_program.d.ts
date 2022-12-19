@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/packages/bundle_program" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

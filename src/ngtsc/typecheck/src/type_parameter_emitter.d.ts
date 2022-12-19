@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/typecheck/src/type_parameter_emitter" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

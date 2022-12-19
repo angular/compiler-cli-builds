@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/linker/src/file_linker/emit_scopes/local_emit_scope" />
 import { LinkedDefinition } from '../partial_linkers/partial_linker';
 import { EmitScope } from './emit_scope';
 /**

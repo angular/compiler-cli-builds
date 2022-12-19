@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/file_system/src/invalid_file_system" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

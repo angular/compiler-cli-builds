@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/dependencies/dts_dependency_host" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

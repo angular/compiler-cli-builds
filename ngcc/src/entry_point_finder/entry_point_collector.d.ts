@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/entry_point_finder/entry_point_collector" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

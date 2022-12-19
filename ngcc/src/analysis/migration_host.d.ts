@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/analysis/migration_host" />
 import { AbsoluteFsPath } from '../../../src/ngtsc/file_system';
 import { MetadataReader } from '../../../src/ngtsc/metadata';
 import { PartialEvaluator } from '../../../src/ngtsc/partial_evaluator';

@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/analysis/private_declarations_analyzer" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

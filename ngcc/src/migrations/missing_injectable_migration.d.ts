@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/migrations/missing_injectable_migration" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/linker/babel/src/linker_plugin_options" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

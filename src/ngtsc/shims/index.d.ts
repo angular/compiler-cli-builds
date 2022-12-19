@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/shims" />
 export { ShimAdapter } from './src/adapter';
 export { copyFileShimData, isShim, retagAllTsFiles, retagTsFile, sfExtensionData, untagAllTsFiles, untagTsFile } from './src/expando';
 export { FactoryGenerator, generatedFactoryTransform } from './src/factory_generator';

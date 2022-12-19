@@ -1,6 +1,12 @@
-/// <amd-module name="@angular/compiler-cli/linker/babel/src/ast/babel_ast_factory" />
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { types as t } from '@babel/core';
 import { AstFactory, BinaryOperator, LeadingComment, ObjectLiteralProperty, SourceMapRange, TemplateLiteral, VariableDeclarationType } from '../../../../src/ngtsc/translator';
-import { types as t } from '../babel_core';
 /**
  * A Babel flavored implementation of the AstFactory.
  */

@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/execution/analyze_entry_points" />
 import { FileSystem } from '../../../src/ngtsc/file_system';
 import { Logger } from '../../../src/ngtsc/logging';
 import { EntryPointFinder } from '../entry_point_finder/interface';

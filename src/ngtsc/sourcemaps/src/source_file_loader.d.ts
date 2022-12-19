@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader" />
 import { AbsoluteFsPath, ReadonlyFileSystem } from '../../file_system';
 import { Logger } from '../../logging';
 import { MapAndPath } from './raw_source_map';

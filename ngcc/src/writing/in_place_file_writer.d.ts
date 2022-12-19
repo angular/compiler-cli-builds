@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/writing/in_place_file_writer" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

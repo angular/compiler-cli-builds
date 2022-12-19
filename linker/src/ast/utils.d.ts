@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/linker/src/ast/utils" />
 /**
  * Assert that the given `node` is of the type guarded by the `predicate` function.
  */

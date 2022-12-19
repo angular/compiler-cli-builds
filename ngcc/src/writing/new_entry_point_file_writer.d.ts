@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/writing/new_entry_point_file_writer" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/scope/src/component_scope" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

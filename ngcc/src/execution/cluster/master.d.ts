@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/execution/cluster/master" />
 import { AbsoluteFsPath, PathManipulation } from '../../../../src/ngtsc/file_system';
 import { Logger } from '../../../../src/ngtsc/logging';
 import { FileWriter } from '../../writing/file_writer';
@@ -52,5 +51,7 @@ export declare class ClusterMaster {
      */
     private wrapEventHandler;
 }
-/** Gets the absolute file path to the cluster worker script. */
-export declare function getClusterWorkerScriptPath(fileSystem: PathManipulation): AbsoluteFsPath;
+/** Wrapper for resolving the cluster worker script. Useful for test patching. */
+export declare class ClusterWorkerScriptResolver {
+    static resolve(fileSystem: PathManipulation): AbsoluteFsPath;
+}

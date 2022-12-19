@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/ngcc/src/rendering/esm_rendering_formatter" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

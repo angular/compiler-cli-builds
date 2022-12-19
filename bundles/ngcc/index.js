@@ -1,31 +1,30 @@
 
       import {createRequire as __cjsCompatRequire} from 'module';
       const require = __cjsCompatRequire(import.meta.url);
-      const __ESM_IMPORT_META_URL__ = import.meta.url;
     
 import {
   mainNgcc
-} from "../chunk-4DUYFEVT.js";
-import "../chunk-DLVFMDSC.js";
+} from "../chunk-HLWHHA6H.js";
+import "../chunk-B57SP4JB.js";
 import {
   clearTsConfigCache
-} from "../chunk-6SQNW4B4.js";
-import "../chunk-7BIXVSI3.js";
-import "../chunk-QYEU7OV5.js";
-import "../chunk-ALSLKTUB.js";
+} from "../chunk-XJEQRU7K.js";
+import "../chunk-COBHG3T2.js";
+import "../chunk-Z2L6JES6.js";
+import "../chunk-5GWLYYRD.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "../chunk-OFXSI6E3.js";
-import "../chunk-OUTDZGN7.js";
-import "../chunk-TOW3O33K.js";
-import "../chunk-DSVWG4QJ.js";
+} from "../chunk-LYJKWJUC.js";
+import "../chunk-2NLFVEGY.js";
+import "../chunk-PTFZECDY.js";
+import "../chunk-Y3PK6A7M.js";
 import {
   NodeJSFileSystem,
   setFileSystem
-} from "../chunk-E7DPJFUS.js";
-import "../chunk-4F26FKLW.js";
-import "../chunk-NDREJTCS.js";
+} from "../chunk-TBUSSXUA.js";
+import "../chunk-3OSIBB62.js";
+import "../chunk-SRFZMXHZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/index.mjs
 import { dirname, join } from "path";
@@ -34,13 +33,12 @@ function process(options) {
   setFileSystem(new NodeJSFileSystem());
   return mainNgcc(options);
 }
-var containingDirPath = typeof __dirname !== "undefined" ? __dirname : dirname(fileURLToPath(__ESM_IMPORT_META_URL__));
+var containingDirPath = dirname(fileURLToPath(import.meta.url));
 var ngccMainFilePath = join(containingDirPath, "./main-ngcc.js");
 export {
   ConsoleLogger,
   LogLevel,
   clearTsConfigCache,
-  containingDirPath,
   ngccMainFilePath,
   process
 };

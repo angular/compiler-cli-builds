@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/util/src/visitor" />
 import ts from 'typescript';
 /**
  * Result type of visiting a node that's typically an entry in a list, which allows specifying that

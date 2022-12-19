@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/migrations/undecorated_child_migration" />
 import ts from 'typescript';
 import { Reference } from '../../../src/ngtsc/imports';
 import { ClassDeclaration } from '../../../src/ngtsc/reflection';

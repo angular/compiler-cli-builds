@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/core/api/src/public_options" />
 import { ExtendedTemplateDiagnosticName } from '../../../../ngtsc/diagnostics';
 /**
  * Options supported by the legacy View Engine compiler, which are still consumed by the Angular Ivy

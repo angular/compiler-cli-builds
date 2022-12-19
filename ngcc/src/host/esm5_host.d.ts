@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/ngcc/src/host/esm5_host" />
 import ts from 'typescript';
 import { ClassDeclaration, ClassMember, Declaration, Decorator, FunctionDefinition } from '../../../src/ngtsc/reflection';
 import { Esm2015ReflectionHost, ParamInfo } from './esm2015_host';

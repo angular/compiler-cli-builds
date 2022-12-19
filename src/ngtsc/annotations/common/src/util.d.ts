@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/common/src/util" />
 import { Expression, FactoryTarget, ParseSourceSpan, R3CompiledExpression, R3FactoryMetadata, R3Reference, Statement, WrappedNodeExpr } from '@angular/compiler';
 import ts from 'typescript';
 import { ImportedFile, ModuleResolver, Reference, ReferenceEmitter } from '../../../imports';

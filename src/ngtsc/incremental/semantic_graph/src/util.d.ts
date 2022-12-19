@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/incremental/semantic_graph/src/util" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

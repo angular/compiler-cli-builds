@@ -1,4 +1,3 @@
-/// <amd-module name="@angular/compiler-cli/src/typescript_support" />
 export declare function setTypeScriptVersionForTesting(version: string): void;
 export declare function restoreTypeScriptVersionForTesting(): void;
 /**

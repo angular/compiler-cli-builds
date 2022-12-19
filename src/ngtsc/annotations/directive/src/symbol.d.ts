@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <amd-module name="@angular/compiler-cli/src/ngtsc/annotations/directive/src/symbol" />
 import { SemanticSymbol, SemanticTypeParameter } from '../../../incremental/semantic_graph';
 import { ClassPropertyMapping, DirectiveTypeCheckMeta } from '../../../metadata';
 import { ClassDeclaration } from '../../../reflection';

@@ -1,11 +1,10 @@
 
       import {createRequire as __cjsCompatRequire} from 'module';
       const require = __cjsCompatRequire(import.meta.url);
-      const __ESM_IMPORT_META_URL__ = import.meta.url;
     
 import {
   parseCommandLineOptions
-} from "../../../../chunk-QVO57CDR.js";
+} from "../../../../chunk-K7P4IHT5.js";
 import {
   PackageJsonUpdate,
   applyChange,
@@ -13,17 +12,17 @@ import {
   getSharedSetup,
   sendMessageToMaster,
   stringifyTask
-} from "../../../../chunk-6SQNW4B4.js";
-import "../../../../chunk-7BIXVSI3.js";
-import "../../../../chunk-QYEU7OV5.js";
-import "../../../../chunk-ALSLKTUB.js";
-import "../../../../chunk-OFXSI6E3.js";
-import "../../../../chunk-OUTDZGN7.js";
-import "../../../../chunk-TOW3O33K.js";
-import "../../../../chunk-DSVWG4QJ.js";
-import "../../../../chunk-E7DPJFUS.js";
-import "../../../../chunk-4F26FKLW.js";
-import "../../../../chunk-NDREJTCS.js";
+} from "../../../../chunk-XJEQRU7K.js";
+import "../../../../chunk-COBHG3T2.js";
+import "../../../../chunk-Z2L6JES6.js";
+import "../../../../chunk-5GWLYYRD.js";
+import "../../../../chunk-LYJKWJUC.js";
+import "../../../../chunk-2NLFVEGY.js";
+import "../../../../chunk-PTFZECDY.js";
+import "../../../../chunk-Y3PK6A7M.js";
+import "../../../../chunk-TBUSSXUA.js";
+import "../../../../chunk-3OSIBB62.js";
+import "../../../../chunk-SRFZMXHZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/ngcc/src/execution/cluster/package_json_updater.mjs
 import cluster from "cluster";
