@@ -12,7 +12,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-BYV3J3MV.js";
+} from "./chunk-ZF3IVDQ2.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -21,6 +21,7 @@ import {
   Reference,
   assertSuccessfulReferenceEmit,
   attachDefaultImportDeclaration,
+  createImportDeclaration,
   getDefaultImportDeclaration,
   getSourceFile,
   identifierOfNode,
@@ -33,21 +34,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-GZI5O5VP.js";
-import {
-  combineModifiers,
-  createImportDeclaration,
-  createPropertyDeclaration,
-  getDecorators,
-  getModifiers,
-  updateClassDeclaration,
-  updateConstructorDeclaration,
-  updateGetAccessorDeclaration,
-  updateMethodDeclaration,
-  updateParameterDeclaration,
-  updatePropertyDeclaration,
-  updateSetAccessorDeclaration
-} from "./chunk-D25A632J.js";
+} from "./chunk-ZOI6L3RR.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -1147,7 +1134,7 @@ function isVariableDeclarationDeclared(node) {
     return false;
   }
   const varStmt = declList.parent;
-  const modifiers = getModifiers(varStmt);
+  const modifiers = ts2.getModifiers(varStmt);
   return modifiers !== void 0 && modifiers.some((mod) => mod.kind === ts2.SyntaxKind.DeclareKeyword);
 }
 var EMPTY = {};
@@ -1672,7 +1659,7 @@ function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
   };
 }
 function isRestricted(node) {
-  const modifiers = getModifiers(node);
+  const modifiers = ts5.canHaveModifiers(node) ? ts5.getModifiers(node) : void 0;
   return modifiers !== void 0 && modifiers.some(({ kind }) => {
     return kind === ts5.SyntaxKind.PrivateKeyword || kind === ts5.SyntaxKind.ProtectedKeyword || kind === ts5.SyntaxKind.ReadonlyKeyword;
   });
@@ -3931,7 +3918,7 @@ var DtsTransformer = class {
       }
     }
     if (elementsChanged && clazz === newClazz) {
-      newClazz = updateClassDeclaration(
+      newClazz = ts17.factory.updateClassDeclaration(
         clazz,
         clazz.modifiers,
         clazz.name,
@@ -3969,7 +3956,7 @@ var IvyDeclarationDtsTransform = class {
       const modifiers = [ts17.factory.createModifier(ts17.SyntaxKind.StaticKeyword)];
       const typeRef = translateType(decl.type, imports);
       markForEmitAsSingleLine(typeRef);
-      return createPropertyDeclaration(
+      return ts17.factory.createPropertyDeclaration(
         modifiers,
         decl.name,
         void 0,
@@ -3977,7 +3964,7 @@ var IvyDeclarationDtsTransform = class {
         void 0
       );
     });
-    return updateClassDeclaration(
+    return ts17.factory.updateClassDeclaration(
       clazz,
       clazz.modifiers,
       clazz.name,
@@ -4106,7 +4093,7 @@ var IvyTransformationVisitor = class extends Visitor {
     const members = [...node.members];
     for (const field of this.classCompilationMap.get(node)) {
       const exprNode = translateExpression(field.initializer, this.importManager, translateOptions);
-      const property = createPropertyDeclaration([ts19.factory.createToken(ts19.SyntaxKind.StaticKeyword)], field.name, void 0, void 0, exprNode);
+      const property = ts19.factory.createPropertyDeclaration([ts19.factory.createToken(ts19.SyntaxKind.StaticKeyword)], field.name, void 0, void 0, exprNode);
       if (this.isClosureCompilerEnabled) {
         ts19.addSyntheticLeadingComment(
           property,
@@ -4118,10 +4105,15 @@ var IvyTransformationVisitor = class extends Visitor {
       field.statements.map((stmt) => translateStatement(stmt, this.importManager, translateOptions)).forEach((stmt) => statements.push(stmt));
       members.push(property);
     }
-    const filteredDecorators = maybeFilterDecorator(getDecorators(node), this.compilation.decoratorsFor(node));
-    node = updateClassDeclaration(
+    const filteredDecorators = maybeFilterDecorator(ts19.getDecorators(node), this.compilation.decoratorsFor(node));
+    const nodeModifiers = ts19.getModifiers(node);
+    let updatedModifiers;
+    if ((filteredDecorators == null ? void 0 : filteredDecorators.length) || (nodeModifiers == null ? void 0 : nodeModifiers.length)) {
+      updatedModifiers = [...filteredDecorators || [], ...nodeModifiers || []];
+    }
+    node = ts19.factory.updateClassDeclaration(
       node,
-      combineModifiers(filteredDecorators, getModifiers(node)),
+      updatedModifiers,
       node.name,
       node.typeParameters,
       node.heritageClauses || [],
@@ -4142,7 +4134,7 @@ var IvyTransformationVisitor = class extends Visitor {
     }
   }
   _nonCoreDecoratorsOnly(node) {
-    const decorators = getDecorators(node);
+    const decorators = ts19.getDecorators(node);
     if (decorators === void 0) {
       return void 0;
     }
@@ -4159,19 +4151,22 @@ var IvyTransformationVisitor = class extends Visitor {
     return nodeArrayFromDecoratorsArray(filtered);
   }
   _stripAngularDecorators(node) {
+    const modifiers = ts19.canHaveModifiers(node) ? ts19.getModifiers(node) : void 0;
+    const nonCoreDecorators = ts19.canHaveDecorators(node) ? this._nonCoreDecoratorsOnly(node) : void 0;
+    const combinedModifiers = [...nonCoreDecorators || [], ...modifiers || []];
     if (ts19.isParameter(node)) {
-      node = updateParameterDeclaration(node, combineModifiers(this._nonCoreDecoratorsOnly(node), getModifiers(node)), node.dotDotDotToken, node.name, node.questionToken, node.type, node.initializer);
-    } else if (ts19.isMethodDeclaration(node) && getDecorators(node) !== void 0) {
-      node = updateMethodDeclaration(node, combineModifiers(this._nonCoreDecoratorsOnly(node), getModifiers(node)), node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
-    } else if (ts19.isPropertyDeclaration(node) && getDecorators(node) !== void 0) {
-      node = updatePropertyDeclaration(node, combineModifiers(this._nonCoreDecoratorsOnly(node), getModifiers(node)), node.name, node.questionToken, node.type, node.initializer);
+      node = ts19.factory.updateParameterDeclaration(node, combinedModifiers, node.dotDotDotToken, node.name, node.questionToken, node.type, node.initializer);
+    } else if (ts19.isMethodDeclaration(node)) {
+      node = ts19.factory.updateMethodDeclaration(node, combinedModifiers, node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
+    } else if (ts19.isPropertyDeclaration(node)) {
+      node = ts19.factory.updatePropertyDeclaration(node, combinedModifiers, node.name, node.questionToken, node.type, node.initializer);
     } else if (ts19.isGetAccessor(node)) {
-      node = updateGetAccessorDeclaration(node, combineModifiers(this._nonCoreDecoratorsOnly(node), getModifiers(node)), node.name, node.parameters, node.type, node.body);
+      node = ts19.factory.updateGetAccessorDeclaration(node, combinedModifiers, node.name, node.parameters, node.type, node.body);
     } else if (ts19.isSetAccessor(node)) {
-      node = updateSetAccessorDeclaration(node, combineModifiers(this._nonCoreDecoratorsOnly(node), getModifiers(node)), node.name, node.parameters, node.body);
+      node = ts19.factory.updateSetAccessorDeclaration(node, combinedModifiers, node.name, node.parameters, node.body);
     } else if (ts19.isConstructorDeclaration(node)) {
       const parameters = node.parameters.map((param) => this._stripAngularDecorators(param));
-      node = updateConstructorDeclaration(node, getModifiers(node), parameters, node.body);
+      node = ts19.factory.updateConstructorDeclaration(node, modifiers, parameters, node.body);
     }
     return node;
   }
@@ -6991,4 +6986,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GF4EHNOX.js.map
+//# sourceMappingURL=chunk-HNCKBB7A.js.map

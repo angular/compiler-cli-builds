@@ -2,10 +2,6 @@
       import {createRequire as __cjsCompatRequire} from 'module';
       const require = __cjsCompatRequire(import.meta.url);
     
-import {
-  getDecorators,
-  getModifiers
-} from "./chunk-D25A632J.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/typescript.mjs
 import ts4 from "typescript";
@@ -232,7 +228,7 @@ var TypeScriptReflectionHost = class {
     this.checker = checker;
   }
   getDecoratorsOfDeclaration(declaration) {
-    const decorators = getDecorators(declaration);
+    const decorators = ts4.canHaveDecorators(declaration) ? ts4.getDecorators(declaration) : void 0;
     return decorators !== void 0 && decorators.length ? decorators.map((decorator) => this._reflectDecorator(decorator)).filter((dec) => dec !== null) : null;
   }
   getMembersOfClass(clazz) {
@@ -360,7 +356,7 @@ var TypeScriptReflectionHost = class {
     if (ts4.isVariableDeclaration(decl) && ts4.isVariableDeclarationList(decl.parent)) {
       topLevel = decl.parent.parent;
     }
-    const modifiers = getModifiers(topLevel);
+    const modifiers = ts4.canHaveModifiers(topLevel) ? ts4.getModifiers(topLevel) : void 0;
     if (modifiers !== void 0 && modifiers.some((modifier) => modifier.kind === ts4.SyntaxKind.ExportKeyword)) {
       return true;
     }
@@ -506,7 +502,7 @@ var TypeScriptReflectionHost = class {
       return null;
     }
     const decorators = this.getDecoratorsOfDeclaration(node);
-    const modifiers = getModifiers(node);
+    const modifiers = ts4.getModifiers(node);
     const isStatic = modifiers !== void 0 && modifiers.some((mod) => mod.kind === ts4.SyntaxKind.StaticKeyword);
     return {
       node,
@@ -684,4 +680,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-BYV3J3MV.js.map
+//# sourceMappingURL=chunk-ZF3IVDQ2.js.map

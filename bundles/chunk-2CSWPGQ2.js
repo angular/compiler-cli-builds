@@ -30,11 +30,11 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-GF4EHNOX.js";
+} from "./chunk-HNCKBB7A.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-BYV3J3MV.js";
+} from "./chunk-ZF3IVDQ2.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -58,6 +58,8 @@ import {
   UnifiedModulesStrategy,
   addDiagnosticChain,
   assertSuccessfulReferenceEmit,
+  createFunctionDeclaration,
+  createParameterDeclaration,
   getRootDirs,
   getSourceFileOrNull,
   getTokenAtPosition,
@@ -75,14 +77,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-GZI5O5VP.js";
-import {
-  createFunctionDeclaration,
-  createParameterDeclaration,
-  getDecorators,
-  getModifiers,
-  updateImportDeclaration
-} from "./chunk-D25A632J.js";
+} from "./chunk-ZOI6L3RR.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -812,7 +807,7 @@ var FactoryGenerator = class {
   generateShimForFile(sf, genFilePath) {
     const absoluteSfPath = absoluteFromSourceFile(sf);
     const relativePathToSource = "./" + basename(sf.fileName).replace(TS_DTS_SUFFIX, "");
-    const symbolNames = sf.statements.filter(ts7.isClassDeclaration).filter((decl) => isExported(decl) && getDecorators(decl) !== void 0 && decl.name !== void 0).map((decl) => decl.name.text);
+    const symbolNames = sf.statements.filter(ts7.isClassDeclaration).filter((decl) => isExported(decl) && ts7.getDecorators(decl) !== void 0 && decl.name !== void 0).map((decl) => decl.name.text);
     let sourceText = "";
     const leadingComment = getFileoverviewComment(sf);
     if (leadingComment !== null) {
@@ -846,7 +841,7 @@ var FactoryGenerator = class {
   }
 };
 function isExported(decl) {
-  const modifiers = getModifiers(decl);
+  const modifiers = ts7.canHaveModifiers(decl) ? ts7.getModifiers(decl) : void 0;
   return modifiers !== void 0 && modifiers.some((mod) => mod.kind == ts7.SyntaxKind.ExportKeyword);
 }
 function generatedFactoryTransform(factoryMap, importRewriter) {
@@ -868,7 +863,7 @@ function transformFactorySourceFile(factoryMap, context, importRewriter, file) {
     if (ts7.isImportDeclaration(stmt) && ts7.isStringLiteral(stmt.moduleSpecifier) && stmt.moduleSpecifier.text === "@angular/core") {
       const rewrittenModuleSpecifier = importRewriter.rewriteSpecifier("@angular/core", sourceFilePath);
       if (rewrittenModuleSpecifier !== stmt.moduleSpecifier.text) {
-        transformedStatements.push(updateImportDeclaration(stmt, getModifiers(stmt), stmt.importClause, ts7.factory.createStringLiteral(rewrittenModuleSpecifier), void 0));
+        transformedStatements.push(ts7.factory.updateImportDeclaration(stmt, ts7.getModifiers(stmt), stmt.importClause, ts7.factory.createStringLiteral(rewrittenModuleSpecifier), void 0));
         if (stmt.importClause !== void 0 && stmt.importClause.namedBindings !== void 0 && ts7.isNamespaceImport(stmt.importClause.namedBindings)) {
           coreImportIdentifiers.add(stmt.importClause.namedBindings.name.text);
         }
@@ -955,7 +950,7 @@ function wrapInNoSideEffects(expr) {
   );
 }
 function updateInitializers(stmt, update) {
-  return ts7.factory.updateVariableStatement(stmt, getModifiers(stmt), ts7.factory.updateVariableDeclarationList(stmt.declarationList, stmt.declarationList.declarations.map((decl) => ts7.factory.updateVariableDeclaration(decl, decl.name, decl.exclamationToken, decl.type, update(decl.initializer)))));
+  return ts7.factory.updateVariableStatement(stmt, ts7.getModifiers(stmt), ts7.factory.updateVariableDeclarationList(stmt.declarationList, stmt.declarationList.declarations.map((decl) => ts7.factory.updateVariableDeclaration(decl, decl.name, decl.exclamationToken, decl.type, update(decl.initializer)))));
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/reference_tagger.mjs
@@ -1003,7 +998,7 @@ var SummaryGenerator = class {
     const symbolNames = [];
     for (const stmt of sf.statements) {
       if (ts8.isClassDeclaration(stmt)) {
-        if (!isExported2(stmt) || stmt.name === void 0 || getDecorators(stmt) === void 0) {
+        if (!isExported2(stmt) || stmt.name === void 0 || ts8.getDecorators(stmt) === void 0) {
           continue;
         }
         symbolNames.push(stmt.name.text);
@@ -1029,7 +1024,7 @@ var SummaryGenerator = class {
   }
 };
 function isExported2(decl) {
-  const modifiers = getModifiers(decl);
+  const modifiers = ts8.canHaveModifiers(decl) ? ts8.getModifiers(decl) : void 0;
   return modifiers !== void 0 && modifiers.some((mod) => mod.kind == ts8.SyntaxKind.ExportKeyword) || false;
 }
 
@@ -7108,7 +7103,7 @@ function isAngularCorePackage(program) {
     if (!ts32.isVariableStatement(stmt)) {
       return false;
     }
-    const modifiers = getModifiers(stmt);
+    const modifiers = ts32.getModifiers(stmt);
     if (modifiers === void 0 || !modifiers.some((mod) => mod.kind === ts32.SyntaxKind.ExportKeyword)) {
       return false;
     }
@@ -7858,4 +7853,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-VCBXVSET.js.map
+//# sourceMappingURL=chunk-2CSWPGQ2.js.map

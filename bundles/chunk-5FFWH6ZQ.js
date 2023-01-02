@@ -7,7 +7,7 @@ import {
   ImportGraph,
   isShim,
   readConfiguration
-} from "./chunk-VCBXVSET.js";
+} from "./chunk-2CSWPGQ2.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -32,7 +32,7 @@ import {
   TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-GF4EHNOX.js";
+} from "./chunk-HNCKBB7A.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -43,7 +43,7 @@ import {
   isNamedFunctionDeclaration,
   isNamedVariableDeclaration,
   reflectObjectLiteral
-} from "./chunk-BYV3J3MV.js";
+} from "./chunk-ZF3IVDQ2.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -72,10 +72,7 @@ import {
   translateStatement,
   translateType,
   validateAndRewriteCoreSymbol
-} from "./chunk-GZI5O5VP.js";
-import {
-  getModifiers
-} from "./chunk-D25A632J.js";
+} from "./chunk-ZOI6L3RR.js";
 import {
   LogicalFileSystem,
   NgtscCompilerHost,
@@ -1040,7 +1037,7 @@ ${declaration.getText()}`);
       }
     }
     if (isStatic === void 0) {
-      const modifiers = getModifiers(node);
+      const modifiers = ts4.canHaveModifiers(node) ? ts4.getModifiers(node) : void 0;
       isStatic = modifiers !== void 0 && modifiers.some((mod) => mod.kind === ts4.SyntaxKind.StaticKeyword);
     }
     const type = node.type || null;
@@ -5263,4 +5260,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XMXUF7ND.js.map
+//# sourceMappingURL=chunk-5FFWH6ZQ.js.map

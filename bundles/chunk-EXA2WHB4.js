@@ -4,19 +4,7 @@
     
 import {
   TypeScriptReflectionHost
-} from "./chunk-BYV3J3MV.js";
-import {
-  combineModifiers,
-  createClassDeclaration,
-  createGetAccessorDeclaration,
-  createMethodDeclaration,
-  createPropertyDeclaration,
-  createSetAccessorDeclaration,
-  getDecorators,
-  getModifiers,
-  updateConstructorDeclaration,
-  updateParameterDeclaration
-} from "./chunk-D25A632J.js";
+} from "./chunk-ZF3IVDQ2.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/downlevel_decorators_transform/downlevel_decorators_transform.mjs
 import ts2 from "typescript";
@@ -112,7 +100,7 @@ function createCtorParametersClassProperty(diagnostics, entityNameToExpression, 
     params.push(ts2.factory.createObjectLiteralExpression(members));
   }
   const initializer = ts2.factory.createArrowFunction(void 0, void 0, [], void 0, ts2.factory.createToken(ts2.SyntaxKind.EqualsGreaterThanToken), ts2.factory.createArrayLiteralExpression(params, true));
-  const ctorProp = createPropertyDeclaration([ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword)], "ctorParameters", void 0, void 0, initializer);
+  const ctorProp = ts2.factory.createPropertyDeclaration([ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword)], "ctorParameters", void 0, void 0, initializer);
   if (isClosureCompilerEnabled) {
     ts2.setSyntheticLeadingComments(ctorProp, [
       {
@@ -193,7 +181,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
   function createDecoratorClassProperty(decoratorList) {
     const modifier = ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword);
     const initializer = ts2.factory.createArrayLiteralExpression(decoratorList, true);
-    const prop = createPropertyDeclaration([modifier], "decorators", void 0, void 0, initializer);
+    const prop = ts2.factory.createPropertyDeclaration([modifier], "decorators", void 0, void 0, initializer);
     addJSDocTypeAnnotation(prop, DECORATOR_INVOCATION_JSDOC_TYPE);
     return prop;
   }
@@ -203,7 +191,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
       entries.push(ts2.factory.createPropertyAssignment(name, ts2.factory.createArrayLiteralExpression(decorators.map((deco) => extractMetadataFromSingleDecorator(deco, diagnostics2)))));
     }
     const initializer = ts2.factory.createObjectLiteralExpression(entries, true);
-    const prop = createPropertyDeclaration([ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword)], "propDecorators", void 0, void 0, initializer);
+    const prop = ts2.factory.createPropertyDeclaration([ts2.factory.createToken(ts2.SyntaxKind.StaticKeyword)], "propDecorators", void 0, void 0, initializer);
     addJSDocTypeAnnotation(prop, `!Object<string, ${DECORATOR_INVOCATION_JSDOC_TYPE}>`);
     return prop;
   }
@@ -256,7 +244,11 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         });
         return [void 0, element, []];
       }
-      const modifiers = decoratorsToKeep.length ? ts2.setTextRange(ts2.factory.createNodeArray(combineModifiers(decoratorsToKeep, getModifiers(element))), element.modifiers) : getModifiers(element);
+      const elementModifiers = ts2.canHaveModifiers(element) ? ts2.getModifiers(element) : void 0;
+      let modifiers;
+      if (decoratorsToKeep.length || (elementModifiers == null ? void 0 : elementModifiers.length)) {
+        modifiers = ts2.setTextRange(ts2.factory.createNodeArray([...decoratorsToKeep, ...elementModifiers || []]), element.modifiers);
+      }
       return [element.name.text, cloneClassElementWithModifiers(element, modifiers), toLower];
     }
     function transformConstructor(ctor) {
@@ -280,13 +272,15 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
           paramInfo.type = param.type;
         }
         parametersInfo.push(paramInfo);
-        const newParam = updateParameterDeclaration(param, combineModifiers(
-          decoratorsToKeep.length ? decoratorsToKeep : void 0,
-          getModifiers(param)
-        ), param.dotDotDotToken, param.name, param.questionToken, param.type, param.initializer);
+        let modifiers;
+        const paramModifiers = ts2.getModifiers(param);
+        if (decoratorsToKeep.length || (paramModifiers == null ? void 0 : paramModifiers.length)) {
+          modifiers = [...decoratorsToKeep, ...paramModifiers || []];
+        }
+        const newParam = ts2.factory.updateParameterDeclaration(param, modifiers, param.dotDotDotToken, param.name, param.questionToken, param.type, param.initializer);
         newParameters.push(newParam);
       }
-      const updated = updateConstructorDeclaration(ctor, getModifiers(ctor), newParameters, ctor.body);
+      const updated = ts2.factory.updateConstructorDeclaration(ctor, ts2.getModifiers(ctor), newParameters, ctor.body);
       return [updated, parametersInfo];
     }
     function transformClassDeclaration(classDecl) {
@@ -319,7 +313,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         }
         newMembers.push(ts2.visitEachChild(member, decoratorDownlevelVisitor, context));
       }
-      const decoratorsToKeep = new Set(getDecorators(classDecl));
+      const decoratorsToKeep = new Set(ts2.getDecorators(classDecl));
       const possibleAngularDecorators = host.getDecoratorsOfDeclaration(classDecl) || [];
       let hasAngularDecorator = false;
       const decoratorsToLower = [];
@@ -346,7 +340,12 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         newMembers.push(createPropDecoratorsClassProperty(diagnostics, decoratedProperties));
       }
       const members = ts2.setTextRange(ts2.factory.createNodeArray(newMembers, classDecl.members.hasTrailingComma), classDecl.members);
-      return createClassDeclaration(combineModifiers(decoratorsToKeep.size ? Array.from(decoratorsToKeep) : void 0, getModifiers(classDecl)), classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
+      const classModifiers = ts2.getModifiers(classDecl);
+      let modifiers;
+      if (decoratorsToKeep.size || (classModifiers == null ? void 0 : classModifiers.length)) {
+        modifiers = [...decoratorsToKeep, ...classModifiers || []];
+      }
+      return ts2.factory.createClassDeclaration(modifiers, classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
     }
     function decoratorDownlevelVisitor(node) {
       if (ts2.isClassDeclaration(node)) {
@@ -362,13 +361,13 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
 function cloneClassElementWithModifiers(node, modifiers) {
   let clone;
   if (ts2.isMethodDeclaration(node)) {
-    clone = createMethodDeclaration(modifiers, node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
+    clone = ts2.factory.createMethodDeclaration(modifiers, node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
   } else if (ts2.isPropertyDeclaration(node)) {
-    clone = createPropertyDeclaration(modifiers, node.name, node.questionToken, node.type, node.initializer);
+    clone = ts2.factory.createPropertyDeclaration(modifiers, node.name, node.questionToken, node.type, node.initializer);
   } else if (ts2.isGetAccessor(node)) {
-    clone = createGetAccessorDeclaration(modifiers, node.name, node.parameters, node.type, node.body);
+    clone = ts2.factory.createGetAccessorDeclaration(modifiers, node.name, node.parameters, node.type, node.body);
   } else if (ts2.isSetAccessor(node)) {
-    clone = createSetAccessorDeclaration(modifiers, node.name, node.parameters, node.body);
+    clone = ts2.factory.createSetAccessorDeclaration(modifiers, node.name, node.parameters, node.body);
   } else {
     throw new Error(`Unsupported decorated member with kind ${ts2.SyntaxKind[node.kind]}`);
   }
@@ -409,4 +408,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-OQZ47NVO.js.map
+//# sourceMappingURL=chunk-EXA2WHB4.js.map
