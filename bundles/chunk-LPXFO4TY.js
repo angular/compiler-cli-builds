@@ -345,7 +345,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
       if (decoratorsToKeep.size || (classModifiers == null ? void 0 : classModifiers.length)) {
         modifiers = [...decoratorsToKeep, ...classModifiers || []];
       }
-      return ts2.factory.createClassDeclaration(modifiers, classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
+      return ts2.factory.updateClassDeclaration(classDecl, modifiers, classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
     }
     function decoratorDownlevelVisitor(node) {
       if (ts2.isClassDeclaration(node)) {
@@ -408,4 +408,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-EXA2WHB4.js.map
+//# sourceMappingURL=chunk-LPXFO4TY.js.map
