@@ -6,7 +6,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-LPXFO4TY.js";
+} from "./chunk-EXA2WHB4.js";
 import {
   DEFAULT_ERROR_CODE,
   EmitFlags,
@@ -67,7 +67,7 @@ import "./chunk-SRFZMXHZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("15.1.0-next.3+sha-33f35b0");
+var VERSION = new Version("15.1.0-next.3+sha-2d3c98d");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
