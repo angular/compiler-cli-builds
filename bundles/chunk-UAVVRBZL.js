@@ -3277,7 +3277,7 @@ var HandlerFlags;
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/alias.mjs
 import ts14 from "typescript";
 function aliasTransformFactory(exportStatements) {
-  return (context) => {
+  return () => {
     return (file) => {
       if (ts14.isBundle(file) || !exportStatements.has(file.fileName)) {
         return file;
@@ -3286,9 +3286,8 @@ function aliasTransformFactory(exportStatements) {
       exportStatements.get(file.fileName).forEach(([moduleName, symbolName], aliasName) => {
         const stmt = ts14.factory.createExportDeclaration(
           void 0,
-          void 0,
           false,
-          ts14.createNamedExports([ts14.factory.createExportSpecifier(false, symbolName, aliasName)]),
+          ts14.factory.createNamedExports([ts14.factory.createExportSpecifier(false, symbolName, aliasName)]),
           ts14.factory.createStringLiteral(moduleName)
         );
         statements.push(stmt);
@@ -6984,4 +6983,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-Z2L6JES6.js.map
+//# sourceMappingURL=chunk-UAVVRBZL.js.map

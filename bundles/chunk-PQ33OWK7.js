@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-Z2L6JES6.js";
+} from "./chunk-UAVVRBZL.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -7835,4 +7835,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-COBHG3T2.js.map
+//# sourceMappingURL=chunk-PQ33OWK7.js.map
