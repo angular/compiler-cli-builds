@@ -30,7 +30,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-P6RV7WPP.js";
+} from "./chunk-WMBVD6VD.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -1754,6 +1754,95 @@ function generateAnalysis(context) {
   });
   return analysis;
 }
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/ng_module_index.mjs
+var NgModuleIndexImpl = class {
+  constructor(metaReader, localReader) {
+    this.metaReader = metaReader;
+    this.localReader = localReader;
+    this.ngModuleAuthoritativeReference = /* @__PURE__ */ new Map();
+    this.typeToExportingModules = /* @__PURE__ */ new Map();
+    this.indexed = false;
+  }
+  updateWith(cache, key, elem) {
+    if (cache.has(key)) {
+      cache.get(key).add(elem);
+    } else {
+      const set = /* @__PURE__ */ new Set();
+      set.add(elem);
+      cache.set(key, set);
+    }
+  }
+  index() {
+    const seenTypesWithReexports = /* @__PURE__ */ new Map();
+    const locallyDeclaredDirsAndNgModules = [
+      ...this.localReader.getKnown(MetaKind.NgModule),
+      ...this.localReader.getKnown(MetaKind.Directive)
+    ];
+    for (const decl of locallyDeclaredDirsAndNgModules) {
+      this.indexTrait(new Reference(decl), seenTypesWithReexports);
+    }
+    this.indexed = true;
+  }
+  indexTrait(ref, seenTypesWithReexports) {
+    var _a, _b, _c;
+    if (seenTypesWithReexports.has(ref.node)) {
+      return;
+    }
+    seenTypesWithReexports.set(ref.node, /* @__PURE__ */ new Set());
+    const meta = (_a = this.metaReader.getDirectiveMetadata(ref)) != null ? _a : this.metaReader.getNgModuleMetadata(ref);
+    if (meta === null) {
+      return;
+    }
+    if (meta.imports !== null) {
+      for (const childRef of meta.imports) {
+        this.indexTrait(childRef, seenTypesWithReexports);
+      }
+    }
+    if (meta.kind === MetaKind.NgModule) {
+      if (!this.ngModuleAuthoritativeReference.has(ref.node)) {
+        this.ngModuleAuthoritativeReference.set(ref.node, ref);
+      }
+      for (const childRef of meta.exports) {
+        this.indexTrait(childRef, seenTypesWithReexports);
+        const childMeta = (_c = (_b = this.metaReader.getDirectiveMetadata(childRef)) != null ? _b : this.metaReader.getPipeMetadata(childRef)) != null ? _c : this.metaReader.getNgModuleMetadata(childRef);
+        if (childMeta === null) {
+          continue;
+        }
+        switch (childMeta.kind) {
+          case MetaKind.Directive:
+          case MetaKind.Pipe:
+            this.updateWith(this.typeToExportingModules, childRef.node, ref.node);
+            this.updateWith(seenTypesWithReexports, ref.node, childRef.node);
+            break;
+          case MetaKind.NgModule:
+            if (seenTypesWithReexports.has(childRef.node)) {
+              for (const reexported of seenTypesWithReexports.get(childRef.node)) {
+                this.updateWith(this.typeToExportingModules, reexported, ref.node);
+                this.updateWith(seenTypesWithReexports, ref.node, reexported);
+              }
+            }
+            break;
+        }
+      }
+    }
+  }
+  getNgModulesExporting(directiveOrPipe) {
+    if (!this.indexed) {
+      this.index();
+    }
+    if (!this.typeToExportingModules.has(directiveOrPipe)) {
+      return [];
+    }
+    const refs = [];
+    for (const ngModule of this.typeToExportingModules.get(directiveOrPipe)) {
+      if (this.ngModuleAuthoritativeReference.has(ngModule)) {
+        refs.push(this.ngModuleAuthoritativeReference.get(ngModule));
+      }
+    }
+    return refs;
+  }
+};
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/resource/src/loader.mjs
 import ts10 from "typescript";
@@ -5491,7 +5580,7 @@ function sourceSpanEqual(a, b) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
 var REGISTRY2 = new DomElementSchemaRegistry2();
 var TemplateTypeCheckerImpl = class {
-  constructor(originalProgram, programDriver, typeCheckAdapter, config, refEmitter, reflector, compilerHost, priorBuild, metaReader, localMetaReader, componentScopeReader, typeCheckScopeRegistry, perf) {
+  constructor(originalProgram, programDriver, typeCheckAdapter, config, refEmitter, reflector, compilerHost, priorBuild, metaReader, localMetaReader, ngModuleIndex, componentScopeReader, typeCheckScopeRegistry, perf) {
     this.originalProgram = originalProgram;
     this.programDriver = programDriver;
     this.typeCheckAdapter = typeCheckAdapter;
@@ -5502,6 +5591,7 @@ var TemplateTypeCheckerImpl = class {
     this.priorBuild = priorBuild;
     this.metaReader = metaReader;
     this.localMetaReader = localMetaReader;
+    this.ngModuleIndex = ngModuleIndex;
     this.componentScopeReader = componentScopeReader;
     this.typeCheckScopeRegistry = typeCheckScopeRegistry;
     this.perf = perf;
@@ -5957,32 +6047,46 @@ var TemplateTypeCheckerImpl = class {
     }
     return scope.ngModule;
   }
+  emit(kind, refTo, inContext) {
+    const emittedRef = this.refEmitter.emit(refTo, inContext.getSourceFile());
+    if (emittedRef.kind === 1) {
+      return null;
+    }
+    const emitted = emittedRef.expression;
+    if (emitted instanceof WrappedNodeExpr) {
+      return { kind, symbolName: emitted.node.text };
+    } else if (emitted instanceof ExternalExpr2 && emitted.value.moduleName !== null && emitted.value.name !== null) {
+      return {
+        kind,
+        moduleSpecifier: emitted.value.moduleName,
+        symbolName: emitted.value.name
+      };
+    }
+    return null;
+  }
   getPotentialImportsFor(toImport, inContext) {
     var _a;
-    let ngModuleRef;
-    if (toImport.ngModule !== null) {
-      ngModuleRef = (_a = this.metaReader.getNgModuleMetadata(new Reference(toImport.ngModule))) == null ? void 0 : _a.ref;
+    const imports = [];
+    const meta = (_a = this.metaReader.getDirectiveMetadata(toImport.ref)) != null ? _a : this.metaReader.getPipeMetadata(toImport.ref);
+    if (meta === null) {
+      return imports;
     }
-    const kind = ngModuleRef ? PotentialImportKind.NgModule : PotentialImportKind.Standalone;
-    const importTarget = ngModuleRef != null ? ngModuleRef : toImport.ref;
-    const emittedRef = this.refEmitter.emit(importTarget, inContext.getSourceFile());
-    if (emittedRef.kind === 1)
-      return [];
-    const emittedExpression = emittedRef.expression;
-    if (emittedExpression instanceof WrappedNodeExpr) {
-      return [{ kind, symbolName: emittedExpression.node.getText() }];
+    if (meta.isStandalone) {
+      const emitted = this.emit(PotentialImportKind.Standalone, toImport.ref, inContext);
+      if (emitted !== null) {
+        imports.push(emitted);
+      }
     }
-    if (!(emittedExpression instanceof ExternalExpr2)) {
-      return [];
+    const exportingNgModules = this.ngModuleIndex.getNgModulesExporting(meta.ref.node);
+    if (exportingNgModules !== null) {
+      for (const exporter of exportingNgModules) {
+        const emittedRef = this.emit(PotentialImportKind.Standalone, exporter, inContext);
+        if (emittedRef !== null) {
+          imports.push(emittedRef);
+        }
+      }
     }
-    if (emittedExpression.value.moduleName === null || emittedExpression.value.name === null)
-      return [];
-    const preferredImport = {
-      kind: ngModuleRef ? PotentialImportKind.NgModule : PotentialImportKind.Standalone,
-      moduleSpecifier: emittedExpression.value.moduleName,
-      symbolName: emittedExpression.value.name
-    };
-    return [preferredImport];
+    return imports;
   }
   getScopeData(component) {
     if (this.scopeCache.has(component)) {
@@ -7042,6 +7146,7 @@ var NgCompiler = class {
     const localMetaReader = localMetaRegistry;
     const depScopeReader = new MetadataDtsModuleScopeResolver(dtsReader, aliasingHost);
     const metaReader = new CompoundMetadataReader([localMetaReader, dtsReader]);
+    const ngModuleIndex = new NgModuleIndexImpl(metaReader, localMetaReader);
     const ngModuleScopeRegistry = new LocalModuleScopeRegistry(localMetaReader, metaReader, depScopeReader, refEmitter, aliasingHost);
     const standaloneScopeReader = new StandaloneComponentScopeReader(metaReader, ngModuleScopeRegistry, depScopeReader);
     const scopeReader = new CompoundComponentScopeReader([ngModuleScopeRegistry, standaloneScopeReader]);
@@ -7075,7 +7180,7 @@ var NgCompiler = class {
       this.incrementalStrategy.setIncrementalState(this.incrementalCompilation.state, program);
       this.currentProgram = program;
     });
-    const templateTypeChecker = new TemplateTypeCheckerImpl(this.inputProgram, notifyingDriver, traitCompiler, this.getTypeCheckingConfig(), refEmitter, reflector, this.adapter, this.incrementalCompilation, metaReader, localMetaReader, scopeReader, typeCheckScopeRegistry, this.delegatingPerfRecorder);
+    const templateTypeChecker = new TemplateTypeCheckerImpl(this.inputProgram, notifyingDriver, traitCompiler, this.getTypeCheckingConfig(), refEmitter, reflector, this.adapter, this.incrementalCompilation, metaReader, localMetaReader, ngModuleIndex, scopeReader, typeCheckScopeRegistry, this.delegatingPerfRecorder);
     const extendedTemplateChecker = this.constructionDiagnostics.length === 0 ? new ExtendedTemplateCheckerImpl(templateTypeChecker, checker, ALL_DIAGNOSTIC_FACTORIES, this.options) : null;
     return {
       isCore,
@@ -7853,4 +7958,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-2SEOGDKD.js.map
+//# sourceMappingURL=chunk-PAJNKMTB.js.map

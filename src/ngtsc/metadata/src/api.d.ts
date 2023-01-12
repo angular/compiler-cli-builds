@@ -215,10 +215,16 @@ export interface MetadataReader {
     getPipeMetadata(node: Reference<ClassDeclaration>): PipeMeta | null;
 }
 /**
- * A MetadataReader which also allows access to the set of all known directive classes.
+ * A MetadataReader which also allows access to the set of all known trait classes.
  */
 export interface MetadataReaderWithIndex extends MetadataReader {
-    getKnown(kind: MetaKind): Iterable<ClassDeclaration>;
+    getKnown(kind: MetaKind): Array<ClassDeclaration>;
+}
+/**
+ * An NgModuleIndex allows access to information about traits exported by NgModules.
+ */
+export interface NgModuleIndex {
+    getNgModulesExporting(directiveOrPipe: ClassDeclaration): Array<Reference<ClassDeclaration>>;
 }
 /**
  * Registers new metadata for directives, pipes, and modules.

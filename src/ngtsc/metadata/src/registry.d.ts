@@ -22,7 +22,7 @@ export declare class LocalMetadataRegistry implements MetadataRegistry, Metadata
     registerDirectiveMetadata(meta: DirectiveMeta): void;
     registerNgModuleMetadata(meta: NgModuleMeta): void;
     registerPipeMetadata(meta: PipeMeta): void;
-    getKnown(kind: MetaKind): Iterable<ClassDeclaration>;
+    getKnown(kind: MetaKind): Array<ClassDeclaration>;
 }
 /**
  * A `MetadataRegistry` which registers metadata with multiple delegate `MetadataRegistry`

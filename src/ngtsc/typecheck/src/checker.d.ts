@@ -11,7 +11,7 @@ import { ErrorCode } from '../../diagnostics';
 import { AbsoluteFsPath } from '../../file_system';
 import { ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
-import { MetadataReader, MetadataReaderWithIndex } from '../../metadata';
+import { MetadataReader, MetadataReaderWithIndex, NgModuleIndex } from '../../metadata';
 import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ReflectionHost } from '../../reflection';
@@ -35,6 +35,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private priorBuild;
     private readonly metaReader;
     private readonly localMetaReader;
+    private readonly ngModuleIndex;
     private readonly componentScopeReader;
     private readonly typeCheckScopeRegistry;
     private readonly perf;
@@ -73,7 +74,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
      */
     private elementTagCache;
     private isComplete;
-    constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, metaReader: MetadataReader, localMetaReader: MetadataReaderWithIndex, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
+    constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, metaReader: MetadataReader, localMetaReader: MetadataReaderWithIndex, ngModuleIndex: NgModuleIndex, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
     getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
     private getLatestComponentState;
     isTrackedTypeCheckFile(filePath: AbsoluteFsPath): boolean;
@@ -127,7 +128,8 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getPotentialDomEvents(tagName: string): string[];
     getPrimaryAngularDecorator(target: ts.ClassDeclaration): ts.Decorator | null;
     getOwningNgModule(component: ts.ClassDeclaration): ts.ClassDeclaration | null;
-    getPotentialImportsFor(toImport: PotentialDirective, inContext: ts.ClassDeclaration): ReadonlyArray<PotentialImport>;
+    private emit;
+    getPotentialImportsFor(toImport: PotentialDirective | PotentialPipe, inContext: ts.ClassDeclaration): ReadonlyArray<PotentialImport>;
     private getScopeData;
     private scopeDataOfDirectiveMeta;
     private scopeDataOfPipeMeta;

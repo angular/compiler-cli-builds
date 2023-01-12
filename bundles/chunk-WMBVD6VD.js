@@ -1959,11 +1959,11 @@ var LocalMetadataRegistry = class {
   getKnown(kind) {
     switch (kind) {
       case MetaKind.Directive:
-        return this.directives.keys();
+        return Array.from(this.directives.values()).map((v) => v.ref.node);
       case MetaKind.Pipe:
-        return this.pipes.keys();
+        return Array.from(this.pipes.values()).map((v) => v.ref.node);
       case MetaKind.NgModule:
-        return this.ngModules.keys();
+        return Array.from(this.ngModules.values()).map((v) => v.ref.node);
     }
   }
 };
@@ -6985,4 +6985,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-P6RV7WPP.js.map
+//# sourceMappingURL=chunk-WMBVD6VD.js.map
