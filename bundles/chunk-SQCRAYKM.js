@@ -4,6 +4,7 @@
     
 import {
   CompilationMode,
+  CompletionKind,
   ComponentDecoratorHandler,
   ComponentScopeKind,
   CompoundComponentScopeReader,
@@ -21,16 +22,20 @@ import {
   MetadataDtsModuleScopeResolver,
   NgModuleDecoratorHandler,
   NoopReferencesRegistry,
+  OptimizeFor,
   PartialEvaluator,
   PipeDecoratorHandler,
+  PotentialImportKind,
+  PotentialImportMode,
   ResourceRegistry,
   SemanticDepGraphUpdater,
+  SymbolKind,
   TraitCompiler,
   TypeCheckScopeRegistry,
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-WMBVD6VD.js";
+} from "./chunk-TNUB43C4.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -124,43 +129,6 @@ function createCompilerHost({ options, tsHost = ts.createCompilerHost(options, t
   }
   return tsHost;
 }
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/checker.mjs
-var OptimizeFor;
-(function(OptimizeFor2) {
-  OptimizeFor2[OptimizeFor2["SingleFile"] = 0] = "SingleFile";
-  OptimizeFor2[OptimizeFor2["WholeProgram"] = 1] = "WholeProgram";
-})(OptimizeFor || (OptimizeFor = {}));
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/completion.mjs
-var CompletionKind;
-(function(CompletionKind2) {
-  CompletionKind2[CompletionKind2["Reference"] = 0] = "Reference";
-  CompletionKind2[CompletionKind2["Variable"] = 1] = "Variable";
-})(CompletionKind || (CompletionKind = {}));
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/scope.mjs
-var PotentialImportKind;
-(function(PotentialImportKind2) {
-  PotentialImportKind2[PotentialImportKind2["NgModule"] = 0] = "NgModule";
-  PotentialImportKind2[PotentialImportKind2["Standalone"] = 1] = "Standalone";
-})(PotentialImportKind || (PotentialImportKind = {}));
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/symbols.mjs
-var SymbolKind;
-(function(SymbolKind2) {
-  SymbolKind2[SymbolKind2["Input"] = 0] = "Input";
-  SymbolKind2[SymbolKind2["Output"] = 1] = "Output";
-  SymbolKind2[SymbolKind2["Binding"] = 2] = "Binding";
-  SymbolKind2[SymbolKind2["Reference"] = 3] = "Reference";
-  SymbolKind2[SymbolKind2["Variable"] = 4] = "Variable";
-  SymbolKind2[SymbolKind2["Directive"] = 5] = "Directive";
-  SymbolKind2[SymbolKind2["Element"] = 6] = "Element";
-  SymbolKind2[SymbolKind2["Template"] = 7] = "Template";
-  SymbolKind2[SymbolKind2["Expression"] = 8] = "Expression";
-  SymbolKind2[SymbolKind2["DomBinding"] = 9] = "DomBinding";
-  SymbolKind2[SymbolKind2["Pipe"] = 10] = "Pipe";
-})(SymbolKind || (SymbolKind = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.mjs
 import { HtmlParser, MessageBundle } from "@angular/compiler";
@@ -5609,6 +5577,14 @@ var TemplateTypeCheckerImpl = class {
     }
     return data.template;
   }
+  getUsedDirectives(component) {
+    var _a;
+    return ((_a = this.getLatestComponentState(component).data) == null ? void 0 : _a.boundTarget.getUsedDirectives()) || null;
+  }
+  getUsedPipes(component) {
+    var _a;
+    return ((_a = this.getLatestComponentState(component).data) == null ? void 0 : _a.boundTarget.getUsedPipes()) || null;
+  }
   getLatestComponentState(component) {
     this.ensureShimForComponent(component);
     const sf = component.getSourceFile();
@@ -5978,6 +5954,18 @@ var TemplateTypeCheckerImpl = class {
     }
     return this.typeCheckScopeRegistry.getTypeCheckDirectiveMetadata(new Reference(dir));
   }
+  getNgModuleMetadata(module) {
+    if (!isNamedClassDeclaration(module)) {
+      return null;
+    }
+    return this.metaReader.getNgModuleMetadata(new Reference(module));
+  }
+  getPipeMetadata(pipe) {
+    if (!isNamedClassDeclaration(pipe)) {
+      return null;
+    }
+    return this.metaReader.getPipeMetadata(new Reference(pipe));
+  }
   getPotentialElementTags(component) {
     if (this.elementTagCache.has(component)) {
       return this.elementTagCache.get(component);
@@ -6064,15 +6052,15 @@ var TemplateTypeCheckerImpl = class {
     }
     return null;
   }
-  getPotentialImportsFor(toImport, inContext) {
+  getPotentialImportsFor(toImport, inContext, importMode) {
     var _a;
     const imports = [];
-    const meta = (_a = this.metaReader.getDirectiveMetadata(toImport.ref)) != null ? _a : this.metaReader.getPipeMetadata(toImport.ref);
+    const meta = (_a = this.metaReader.getDirectiveMetadata(toImport)) != null ? _a : this.metaReader.getPipeMetadata(toImport);
     if (meta === null) {
       return imports;
     }
-    if (meta.isStandalone) {
-      const emitted = this.emit(PotentialImportKind.Standalone, toImport.ref, inContext);
+    if (meta.isStandalone || importMode === PotentialImportMode.ForceDirect) {
+      const emitted = this.emit(PotentialImportKind.Standalone, toImport, inContext);
       if (emitted !== null) {
         imports.push(emitted);
       }
@@ -6080,7 +6068,7 @@ var TemplateTypeCheckerImpl = class {
     const exportingNgModules = this.ngModuleIndex.getNgModulesExporting(meta.ref.node);
     if (exportingNgModules !== null) {
       for (const exporter of exportingNgModules) {
-        const emittedRef = this.emit(PotentialImportKind.Standalone, exporter, inContext);
+        const emittedRef = this.emit(PotentialImportKind.NgModule, exporter, inContext);
         if (emittedRef !== null) {
           imports.push(emittedRef);
         }
@@ -7935,7 +7923,6 @@ export {
   untagAllTsFiles,
   TsCreateProgramDriver,
   PatchedProgramIncrementalBuildStrategy,
-  OptimizeFor,
   freshCompilationTicket,
   incrementalFromStateTicket,
   NgCompiler,
@@ -7958,4 +7945,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-PAJNKMTB.js.map
+//# sourceMappingURL=chunk-SQCRAYKM.js.map

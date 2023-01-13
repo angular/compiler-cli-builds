@@ -73,3 +73,16 @@ export interface PotentialPipe {
      */
     isInScope: boolean;
 }
+/**
+ * Possible modes in which to look up a potential import.
+ */
+export declare enum PotentialImportMode {
+    /** Whether an import is standalone is inferred based on its metadata. */
+    Normal = 0,
+    /**
+     * An import is assumed to be standalone and is imported directly. This is useful for migrations
+     * where a declaration wasn't standalone when the program was created, but will become standalone
+     * as a part of the migration.
+     */
+    ForceDirect = 1
+}

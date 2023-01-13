@@ -5,9 +5,11 @@
 import {
   DynamicValue,
   PartialEvaluator,
+  PotentialImportKind,
+  PotentialImportMode,
   StaticInterpreter,
   forwardRefResolver
-} from "../chunk-WMBVD6VD.js";
+} from "../chunk-TNUB43C4.js";
 import {
   TypeScriptReflectionHost,
   reflectObjectLiteral
@@ -21,6 +23,8 @@ import "../chunk-SRFZMXHZ.js";
 export {
   DynamicValue,
   PartialEvaluator,
+  PotentialImportKind,
+  PotentialImportMode,
   Reference,
   StaticInterpreter,
   TypeScriptReflectionHost,

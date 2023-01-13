@@ -9,14 +9,14 @@ import { AST, LiteralPrimitive, ParseSourceSpan, PropertyRead, SafePropertyRead,
 import ts from 'typescript';
 import { ErrorCode } from '../../diagnostics';
 import { AbsoluteFsPath } from '../../file_system';
-import { ReferenceEmitter } from '../../imports';
+import { Reference, ReferenceEmitter } from '../../imports';
 import { IncrementalBuild } from '../../incremental/api';
-import { MetadataReader, MetadataReaderWithIndex, NgModuleIndex } from '../../metadata';
+import { MetadataReader, MetadataReaderWithIndex, NgModuleIndex, NgModuleMeta, PipeMeta } from '../../metadata';
 import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
-import { ReflectionHost } from '../../reflection';
+import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { ElementSymbol, FullTemplateMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialPipe, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { ElementSymbol, FullTemplateMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { TemplateSourceManager } from './source';
 /**
@@ -76,6 +76,8 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private isComplete;
     constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, metaReader: MetadataReader, localMetaReader: MetadataReaderWithIndex, ngModuleIndex: NgModuleIndex, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
     getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
+    getUsedDirectives(component: ts.ClassDeclaration): TypeCheckableDirectiveMeta[] | null;
+    getUsedPipes(component: ts.ClassDeclaration): string[] | null;
     private getLatestComponentState;
     isTrackedTypeCheckFile(filePath: AbsoluteFsPath): boolean;
     private getFileRecordForTcbLocation;
@@ -120,6 +122,8 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getPotentialTemplateDirectives(component: ts.ClassDeclaration): PotentialDirective[];
     getPotentialPipes(component: ts.ClassDeclaration): PotentialPipe[];
     getDirectiveMetadata(dir: ts.ClassDeclaration): TypeCheckableDirectiveMeta | null;
+    getNgModuleMetadata(module: ts.ClassDeclaration): NgModuleMeta | null;
+    getPipeMetadata(pipe: ts.ClassDeclaration): PipeMeta | null;
     getPotentialElementTags(component: ts.ClassDeclaration): Map<string, PotentialDirective | null>;
     getPotentialDomBindings(tagName: string): {
         attribute: string;
@@ -129,7 +133,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getPrimaryAngularDecorator(target: ts.ClassDeclaration): ts.Decorator | null;
     getOwningNgModule(component: ts.ClassDeclaration): ts.ClassDeclaration | null;
     private emit;
-    getPotentialImportsFor(toImport: PotentialDirective | PotentialPipe, inContext: ts.ClassDeclaration): ReadonlyArray<PotentialImport>;
+    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inContext: ts.ClassDeclaration, importMode: PotentialImportMode): ReadonlyArray<PotentialImport>;
     private getScopeData;
     private scopeDataOfDirectiveMeta;
     private scopeDataOfPipeMeta;

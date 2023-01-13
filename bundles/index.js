@@ -13,7 +13,6 @@ import {
   NgCompiler,
   NgCompilerHost,
   NgtscProgram,
-  OptimizeFor,
   PatchedProgramIncrementalBuildStrategy,
   SOURCE,
   TsCreateProgramDriver,
@@ -30,8 +29,10 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-PAJNKMTB.js";
-import "./chunk-WMBVD6VD.js";
+} from "./chunk-SQCRAYKM.js";
+import {
+  OptimizeFor
+} from "./chunk-TNUB43C4.js";
 import "./chunk-ZF3IVDQ2.js";
 import {
   ConsoleLogger,
@@ -67,7 +68,7 @@ import "./chunk-SRFZMXHZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("15.2.0-next.0+sha-5f21c6d");
+var VERSION = new Version("15.2.0-next.0+sha-6beff5e");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
