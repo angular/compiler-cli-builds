@@ -2818,7 +2818,6 @@ function generateInlineTypeCtor(node, meta) {
     ]);
   }
   return ts19.factory.createMethodDeclaration(
-    void 0,
     [ts19.factory.createModifier(ts19.SyntaxKind.StaticKeyword)],
     void 0,
     meta.fnName,
@@ -7853,4 +7852,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-2SEOGDKD.js.map
+//# sourceMappingURL=chunk-DEOVYZ6W.js.map
