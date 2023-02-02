@@ -17,6 +17,7 @@ export interface PotentialImport {
     kind: PotentialImportKind;
     moduleSpecifier?: string;
     symbolName: string;
+    isForwardReference: boolean;
 }
 /**
  * Which kind of Angular Trait the import targets.

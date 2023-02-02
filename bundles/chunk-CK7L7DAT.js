@@ -35,7 +35,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-TNUB43C4.js";
+} from "./chunk-LORORWYD.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -6041,12 +6041,17 @@ var TemplateTypeCheckerImpl = class {
     }
     const emitted = emittedRef.expression;
     if (emitted instanceof WrappedNodeExpr) {
-      return { kind, symbolName: emitted.node.text };
+      return {
+        kind,
+        symbolName: emitted.node.text,
+        isForwardReference: emitted.node.getStart() > inContext.getStart()
+      };
     } else if (emitted instanceof ExternalExpr2 && emitted.value.moduleName !== null && emitted.value.name !== null) {
       return {
         kind,
         moduleSpecifier: emitted.value.moduleName,
-        symbolName: emitted.value.name
+        symbolName: emitted.value.name,
+        isForwardReference: false
       };
     }
     return null;
@@ -7944,4 +7949,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-72YORMPM.js.map
+//# sourceMappingURL=chunk-CK7L7DAT.js.map
