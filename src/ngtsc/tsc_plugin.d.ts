@@ -15,7 +15,7 @@ import { UnifiedModulesHost } from './core/api';
  * Currently mirrored from @bazel/concatjs/internal/tsc_wrapped/plugin_api (with the naming of
  * `fileNameToModuleName` corrected).
  */
-interface PluginCompilerHost extends ts.CompilerHost, Partial<UnifiedModulesHost> {
+export interface PluginCompilerHost extends ts.CompilerHost, Partial<UnifiedModulesHost> {
     readonly inputFiles: ReadonlyArray<string>;
 }
 /**
