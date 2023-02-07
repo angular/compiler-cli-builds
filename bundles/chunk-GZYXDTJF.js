@@ -6035,17 +6035,21 @@ var TemplateTypeCheckerImpl = class {
     return scope.ngModule;
   }
   emit(kind, refTo, inContext) {
+    var _a, _b;
     const emittedRef = this.refEmitter.emit(refTo, inContext.getSourceFile());
     if (emittedRef.kind === 1) {
       return null;
     }
     const emitted = emittedRef.expression;
     if (emitted instanceof WrappedNodeExpr) {
-      return {
-        kind,
-        symbolName: emitted.node.text,
-        isForwardReference: emitted.node.getStart() > inContext.getStart()
-      };
+      let isForwardReference = false;
+      if (emitted.node.getStart() > inContext.getStart()) {
+        const declaration = (_b = (_a = this.programDriver.getProgram().getTypeChecker().getTypeAtLocation(emitted.node).getSymbol()) == null ? void 0 : _a.declarations) == null ? void 0 : _b[0];
+        if (declaration && declaration.getSourceFile() === inContext.getSourceFile()) {
+          isForwardReference = true;
+        }
+      }
+      return { kind, symbolName: emitted.node.text, isForwardReference };
     } else if (emitted instanceof ExternalExpr2 && emitted.value.moduleName !== null && emitted.value.name !== null) {
       return {
         kind,
@@ -7949,4 +7953,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-CK7L7DAT.js.map
+//# sourceMappingURL=chunk-GZYXDTJF.js.map
