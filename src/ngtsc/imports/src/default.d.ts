@@ -39,18 +39,18 @@ export declare function getDefaultImportDeclaration(expr: WrappedNodeExpr<unknow
  * a dangling reference, as TS will elide the import because it was only used in the type position
  * originally.
  *
- * To avoid this, the compiler must "touch" the imports with `ts.getMutableClone`, and should
- * only do this for imports which are actually consumed. The `DefaultImportTracker` keeps track of
- * these imports as they're encountered and emitted, and implements a transform which can correctly
- * flag the imports as required.
+ * To avoid this, the compiler must patch the emit resolver, and should only do this for imports
+ * which are actually consumed. The `DefaultImportTracker` keeps track of these imports as they're
+ * encountered and emitted, and implements a transform which can correctly flag the imports as
+ * required.
  *
  * This problem does not exist for non-default imports as the compiler can easily insert
  * "import * as X" style imports for those, and the "X" identifier survives transformation.
  */
 export declare class DefaultImportTracker {
     /**
-     * A `Map` which tracks the `Set` of `ts.ImportDeclaration`s for default imports that were used in
-     * a given `ts.SourceFile` and need to be preserved.
+     * A `Map` which tracks the `Set` of `ts.ImportClause`s for default imports that were used in
+     * a given file name.
      */
     private sourceFileToUsedImports;
     recordUsedImport(importDecl: ts.ImportDeclaration): void;
@@ -61,8 +61,4 @@ export declare class DefaultImportTracker {
      * This transformer must run after any other transformers which call `recordUsedImport`.
      */
     importPreservingTransformer(): ts.TransformerFactory<ts.SourceFile>;
-    /**
-     * Process a `ts.SourceFile` and replace any `ts.ImportDeclaration`s.
-     */
-    private transformSourceFile;
 }
