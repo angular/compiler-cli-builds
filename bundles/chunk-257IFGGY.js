@@ -35,11 +35,18 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-LORORWYD.js";
+} from "./chunk-BRMPHBTG.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
 } from "./chunk-ZF3IVDQ2.js";
+import {
+  ImportManager,
+  createFunctionDeclaration,
+  createParameterDeclaration,
+  translateExpression,
+  translateType
+} from "./chunk-IJECERTO.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -49,7 +56,6 @@ import {
   ErrorCode,
   ExtendedTemplateDiagnosticName,
   ImportFlags,
-  ImportManager,
   LocalIdentifierStrategy,
   LogicalProjectStrategy,
   ModuleResolver,
@@ -63,8 +69,6 @@ import {
   UnifiedModulesStrategy,
   addDiagnosticChain,
   assertSuccessfulReferenceEmit,
-  createFunctionDeclaration,
-  createParameterDeclaration,
   getRootDirs,
   getSourceFileOrNull,
   getTokenAtPosition,
@@ -79,10 +83,8 @@ import {
   normalizeSeparators,
   relativePathBetween,
   replaceTsWithNgInErrors,
-  toUnredirectedSourceFile,
-  translateExpression,
-  translateType
-} from "./chunk-ZOI6L3RR.js";
+  toUnredirectedSourceFile
+} from "./chunk-IYYB2HTK.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -7953,4 +7955,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-GZYXDTJF.js.map
+//# sourceMappingURL=chunk-257IFGGY.js.map

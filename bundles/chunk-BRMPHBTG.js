@@ -14,14 +14,19 @@ import {
   typeNodeToValueExpr
 } from "./chunk-ZF3IVDQ2.js";
 import {
+  ImportManager,
+  createImportDeclaration,
+  translateExpression,
+  translateStatement,
+  translateType
+} from "./chunk-IJECERTO.js";
+import {
   ErrorCode,
   FatalDiagnosticError,
   ImportFlags,
-  ImportManager,
   Reference,
   assertSuccessfulReferenceEmit,
   attachDefaultImportDeclaration,
-  createImportDeclaration,
   getDefaultImportDeclaration,
   getSourceFile,
   identifierOfNode,
@@ -30,11 +35,8 @@ import {
   makeDiagnostic,
   makeRelatedInformation,
   nodeDebugInfo,
-  nodeNameForError,
-  translateExpression,
-  translateStatement,
-  translateType
-} from "./chunk-ZOI6L3RR.js";
+  nodeNameForError
+} from "./chunk-IYYB2HTK.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -7032,4 +7034,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-LORORWYD.js.map
+//# sourceMappingURL=chunk-BRMPHBTG.js.map
