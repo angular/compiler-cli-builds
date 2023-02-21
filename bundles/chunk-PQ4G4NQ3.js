@@ -5026,7 +5026,7 @@ var NgModuleSymbol = class extends SemanticSymbol {
   }
 };
 var NgModuleDecoratorHandler = class {
-  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, isCore, refEmitter, factoryTracker, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf) {
+  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaReader = metaReader;
@@ -5035,7 +5035,6 @@ var NgModuleDecoratorHandler = class {
     this.referencesRegistry = referencesRegistry;
     this.isCore = isCore;
     this.refEmitter = refEmitter;
-    this.factoryTracker = factoryTracker;
     this.annotateForClosureCompiler = annotateForClosureCompiler;
     this.onlyPublishPublicTypings = onlyPublishPublicTypings;
     this.injectableRegistry = injectableRegistry;
@@ -5259,11 +5258,6 @@ var NgModuleDecoratorHandler = class {
       rawExports: analysis.rawExports,
       decorator: analysis.decorator
     });
-    if (this.factoryTracker !== null) {
-      this.factoryTracker.track(node.getSourceFile(), {
-        name: analysis.factorySymbolName
-      });
-    }
     this.injectableRegistry.registerInjectable(node, {
       ctorDeps: analysis.fac.deps
     });
@@ -7031,4 +7025,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-NCTZ2MDA.js.map
+//# sourceMappingURL=chunk-PQ4G4NQ3.js.map

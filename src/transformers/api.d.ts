@@ -26,11 +26,6 @@ export interface CompilerOptions extends NgCompilerOptions, ts.CompilerOptions {
     i18nInFile?: string;
     i18nInMissingTranslations?: 'error' | 'warning' | 'ignore';
     /**
-     * Whether to generate .ngsummary.ts files that allow to use AOTed artifacts
-     * in JIT mode. This is off by default.
-     */
-    enableSummariesForJit?: boolean;
-    /**
      * Whether to replace the `templateUrl` and `styleUrls` property in all
      * @Component decorators with inlined contents in `template` and `styles`
      * properties.

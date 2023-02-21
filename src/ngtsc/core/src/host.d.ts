@@ -8,7 +8,6 @@
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ShimAdapter, ShimReferenceTagger } from '../../shims';
-import { FactoryTracker } from '../../shims/api';
 import { RequiredDelegations } from '../../util/src/typescript';
 import { ExtendedTsCompilerHost, NgCompilerAdapter, NgCompilerOptions, UnifiedModulesHost } from '../api';
 /**
@@ -54,8 +53,8 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
  * A wrapper around `ts.CompilerHost` (plus any extension methods from `ExtendedTsCompilerHost`).
  *
  * In order for a consumer to include Angular compilation in their TypeScript compiler, the
- * `ts.Program` must be created with a host that adds Angular-specific files (e.g. factories,
- * summaries, the template type-checking file, etc) to the compilation. `NgCompilerHost` is the
+ * `ts.Program` must be created with a host that adds Angular-specific files (e.g.
+ * the template type-checking file, etc) to the compilation. `NgCompilerHost` is the
  * host implementation which supports this.
  *
  * The interface implementations here ensure that `NgCompilerHost` fully delegates to
@@ -64,12 +63,11 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
 export declare class NgCompilerHost extends DelegatingCompilerHost implements RequiredDelegations<ExtendedTsCompilerHost>, ExtendedTsCompilerHost, NgCompilerAdapter {
     private shimAdapter;
     private shimTagger;
-    readonly factoryTracker: FactoryTracker | null;
     readonly entryPoint: AbsoluteFsPath | null;
     readonly constructionDiagnostics: ts.Diagnostic[];
     readonly inputFiles: ReadonlyArray<string>;
     readonly rootDirs: ReadonlyArray<AbsoluteFsPath>;
-    constructor(delegate: ExtendedTsCompilerHost, inputFiles: ReadonlyArray<string>, rootDirs: ReadonlyArray<AbsoluteFsPath>, shimAdapter: ShimAdapter, shimTagger: ShimReferenceTagger, entryPoint: AbsoluteFsPath | null, factoryTracker: FactoryTracker | null, diagnostics: ts.Diagnostic[]);
+    constructor(delegate: ExtendedTsCompilerHost, inputFiles: ReadonlyArray<string>, rootDirs: ReadonlyArray<AbsoluteFsPath>, shimAdapter: ShimAdapter, shimTagger: ShimReferenceTagger, entryPoint: AbsoluteFsPath | null, diagnostics: ts.Diagnostic[]);
     /**
      * Retrieves a set of `ts.SourceFile`s which should not be emitted as JS files.
      *
