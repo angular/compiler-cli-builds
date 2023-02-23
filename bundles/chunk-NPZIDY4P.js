@@ -15,11 +15,10 @@ import {
 } from "./chunk-QQGJEWBQ.js";
 import {
   ImportManager,
-  createImportDeclaration,
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-QHFX7V7F.js";
+} from "./chunk-6PDKXFWN.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -3809,7 +3808,7 @@ function addImports(importManager, sf, extraStatements = []) {
       void 0,
       ts16.factory.createNamespaceImport(qualifier)
     );
-    const decl = createImportDeclaration(
+    const decl = ts16.factory.createImportDeclaration(
       void 0,
       importClause,
       ts16.factory.createStringLiteral(i.specifier)
@@ -7025,4 +7024,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-PQ4G4NQ3.js.map
+//# sourceMappingURL=chunk-NPZIDY4P.js.map

@@ -35,18 +35,16 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-PQ4G4NQ3.js";
+} from "./chunk-NPZIDY4P.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
 } from "./chunk-QQGJEWBQ.js";
 import {
   ImportManager,
-  createFunctionDeclaration,
-  createParameterDeclaration,
   translateExpression,
   translateType
-} from "./chunk-QHFX7V7F.js";
+} from "./chunk-6PDKXFWN.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -225,7 +223,7 @@ function compareVersions(v1, v2) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
-var MIN_TS_VERSION = "4.8.2";
+var MIN_TS_VERSION = "4.9.3";
 var MAX_TS_VERSION = "5.0.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
@@ -2644,7 +2642,7 @@ function generateTypeCtorDeclarationFn(node, meta, nodeTypeRef, typeParams) {
       declList
     );
   } else {
-    return createFunctionDeclaration(
+    return ts17.factory.createFunctionDeclaration(
       [ts17.factory.createModifier(ts17.SyntaxKind.DeclareKeyword)],
       void 0,
       meta.fnName,
@@ -2704,7 +2702,7 @@ function constructTypeCtorParameter(node, meta, rawType) {
   if (initType === null) {
     initType = ts17.factory.createTypeLiteralNode([]);
   }
-  return createParameterDeclaration(
+  return ts17.factory.createParameterDeclaration(
     void 0,
     void 0,
     "init",
@@ -3420,7 +3418,7 @@ function generateTypeCheckBlock(env, ref, name, meta, domSchemaChecker, oobRecor
     ...scopeStatements
   ]);
   const body = ts23.factory.createBlock([ts23.factory.createIfStatement(ts23.factory.createTrue(), innerBody, void 0)]);
-  const fnDecl = createFunctionDeclaration(
+  const fnDecl = ts23.factory.createFunctionDeclaration(
     void 0,
     void 0,
     name,
@@ -4266,7 +4264,7 @@ var Scope = class {
   }
 };
 function tcbThisParam(name, typeArguments) {
-  return createParameterDeclaration(
+  return ts23.factory.createParameterDeclaration(
     void 0,
     void 0,
     "this",
@@ -4431,7 +4429,7 @@ function tcbCreateEventHandler(event, tcb, scope, eventType) {
   if (guards !== null) {
     body = ts23.factory.createIfStatement(guards, body);
   }
-  const eventParam = createParameterDeclaration(
+  const eventParam = ts23.factory.createParameterDeclaration(
     void 0,
     void 0,
     EVENT_PARAMETER,
@@ -7723,4 +7721,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CXFX4ZM6.js.map
+//# sourceMappingURL=chunk-PS7YOOFL.js.map
