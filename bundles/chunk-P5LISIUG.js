@@ -5611,7 +5611,7 @@ function parseExtractedTemplate(template, sourceStr, sourceParseRange, escapedSt
     file: new ParseSourceFile2(sourceStr, sourceMapUrl != null ? sourceMapUrl : "")
   };
 }
-function parseTemplateDeclaration(decorator, component, containingFile, evaluator, resourceLoader, defaultPreserveWhitespaces) {
+function parseTemplateDeclaration(node, decorator, component, containingFile, evaluator, depTracker, resourceLoader, defaultPreserveWhitespaces) {
   let preserveWhitespaces = defaultPreserveWhitespaces;
   if (component.has("preserveWhitespaces")) {
     const expr = component.get("preserveWhitespaces");
@@ -5647,6 +5647,9 @@ function parseTemplateDeclaration(decorator, component, containingFile, evaluato
         resolvedTemplateUrl: resourceUrl
       };
     } catch (e) {
+      if (depTracker !== null) {
+        depTracker.recordDependencyAnalysisFailure(node.getSourceFile());
+      }
       throw makeResourceNotFoundError(templateUrl, templateUrlExpr, 0);
     }
   } else if (component.has("template")) {
@@ -5674,7 +5677,7 @@ function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanaly
       const templatePromise = resourceLoader.preload(resourceUrl, { type: "template", containingFile });
       if (templatePromise !== void 0) {
         return templatePromise.then(() => {
-          const templateDecl = parseTemplateDeclaration(decorator, component, containingFile, evaluator, resourceLoader, defaultPreserveWhitespaces);
+          const templateDecl = parseTemplateDeclaration(node, decorator, component, containingFile, evaluator, depTracker, resourceLoader, defaultPreserveWhitespaces);
           const template = extractTemplate(node, templateDecl, evaluator, depTracker, resourceLoader, options);
           preanalyzeTemplateCache.set(node, template);
           return template;
@@ -5683,10 +5686,13 @@ function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanaly
         return Promise.resolve(null);
       }
     } catch (e) {
+      if (depTracker !== null) {
+        depTracker.recordDependencyAnalysisFailure(node.getSourceFile());
+      }
       throw makeResourceNotFoundError(templateUrl, templateUrlExpr, 0);
     }
   } else {
-    const templateDecl = parseTemplateDeclaration(decorator, component, containingFile, evaluator, resourceLoader, defaultPreserveWhitespaces);
+    const templateDecl = parseTemplateDeclaration(node, decorator, component, containingFile, evaluator, depTracker, resourceLoader, defaultPreserveWhitespaces);
     const template = extractTemplate(node, templateDecl, evaluator, depTracker, resourceLoader, options);
     preanalyzeTemplateCache.set(node, template);
     return Promise.resolve(template);
@@ -6116,7 +6122,7 @@ var ComponentDecoratorHandler = class {
       this.preanalyzeTemplateCache.delete(node);
       template = preanalyzed;
     } else {
-      const templateDecl = parseTemplateDeclaration(decorator, component, containingFile, this.evaluator, this.resourceLoader, this.defaultPreserveWhitespaces);
+      const templateDecl = parseTemplateDeclaration(node, decorator, component, containingFile, this.evaluator, this.depTracker, this.resourceLoader, this.defaultPreserveWhitespaces);
       template = extractTemplate(node, templateDecl, this.evaluator, this.depTracker, this.resourceLoader, {
         enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
         i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
@@ -6142,6 +6148,9 @@ var ComponentDecoratorHandler = class {
           this.depTracker.addResourceDependency(node.getSourceFile(), absoluteFrom(resourceUrl));
         }
       } catch {
+        if (this.depTracker !== null) {
+          this.depTracker.recordDependencyAnalysisFailure(node.getSourceFile());
+        }
         if (diagnostics === void 0) {
           diagnostics = [];
         }
@@ -7034,4 +7043,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-BRMPHBTG.js.map
+//# sourceMappingURL=chunk-P5LISIUG.js.map
