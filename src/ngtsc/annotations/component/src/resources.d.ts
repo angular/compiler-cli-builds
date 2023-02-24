@@ -100,7 +100,7 @@ export interface ExtractTemplateOptions {
     i18nNormalizeLineEndingsInICUs: boolean;
 }
 export declare function extractTemplate(node: ClassDeclaration, template: TemplateDeclaration, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, options: ExtractTemplateOptions): ParsedTemplateWithSource;
-export declare function parseTemplateDeclaration(decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, evaluator: PartialEvaluator, resourceLoader: ResourceLoader, defaultPreserveWhitespaces: boolean): TemplateDeclaration;
+export declare function parseTemplateDeclaration(node: ClassDeclaration, decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, defaultPreserveWhitespaces: boolean): TemplateDeclaration;
 export declare function preloadAndParseTemplate(evaluator: PartialEvaluator, resourceLoader: ResourceLoader, depTracker: DependencyTracker | null, preanalyzeTemplateCache: Map<DeclarationNode, ParsedTemplateWithSource>, node: ClassDeclaration, decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, defaultPreserveWhitespaces: boolean, options: ExtractTemplateOptions): Promise<ParsedTemplateWithSource | null>;
 export declare function makeResourceNotFoundError(file: string, nodeForError: ts.Node, resourceType: ResourceTypeForDiagnostics): FatalDiagnosticError;
 /**
