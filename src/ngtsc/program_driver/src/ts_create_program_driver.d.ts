@@ -36,11 +36,13 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     readFile: (fileName: string) => string | undefined;
     realpath: ((path: string) => string) | undefined;
     resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile?: ts.SourceFile | undefined) => (ts.ResolvedModule | undefined)[]) | undefined;
-    resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[] | readonly ts.FileReference[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingFileMode?: ts.ModuleKind.CommonJS | ts.ModuleKind.ESNext | undefined) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
+    resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[] | readonly ts.FileReference[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingFileMode?: ts.ResolutionMode) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
     trace: ((s: string) => void) | undefined;
     useCaseSensitiveFileNames: () => boolean;
     getModuleResolutionCache: (() => ts.ModuleResolutionCache | undefined) | undefined;
     hasInvalidatedResolutions: ((filePath: ts.Path) => boolean) | undefined;
+    resolveModuleNameLiterals: ((moduleLiterals: readonly ts.StringLiteralLike[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile, reusedNames: readonly ts.StringLiteralLike[] | undefined) => readonly ts.ResolvedModuleWithFailedLookupLocations[]) | undefined;
+    resolveTypeReferenceDirectiveReferences: (<T extends string | ts.FileReference>(typeDirectiveReferences: readonly T[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile | undefined, reusedNames: readonly T[] | undefined) => readonly ts.ResolvedTypeReferenceDirectiveWithFailedLookupLocations[]) | undefined;
 }
 /**
  * Updates a `ts.Program` instance with a new one that incorporates specific changes, using the

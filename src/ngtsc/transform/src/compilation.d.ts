@@ -75,7 +75,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
      * Maps source files to any class declaration(s) within them which have been discovered to contain
      * Ivy traits.
      */
-    protected fileToClasses: Map<ts.SourceFile, Set<ClassDeclaration<DeclarationNode>>>;
+    protected fileToClasses: Map<ts.SourceFile, Set<ClassDeclaration>>;
     /**
      * Tracks which source files have been analyzed but did not contain any traits. This set allows
      * the compiler to skip analyzing these files in an incremental rebuild.

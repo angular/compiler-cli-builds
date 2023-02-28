@@ -282,7 +282,7 @@ function getOriginNodeForDiagnostics(expr, container) {
   }
 }
 function isAbstractClassDeclaration(clazz) {
-  return clazz.modifiers !== void 0 && clazz.modifiers.some((mod) => mod.kind === ts.SyntaxKind.AbstractKeyword);
+  return ts.canHaveModifiers(clazz) && clazz.modifiers !== void 0 ? clazz.modifiers.some((mod) => mod.kind === ts.SyntaxKind.AbstractKeyword) : false;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic.mjs
@@ -3890,7 +3890,7 @@ var DtsTransformer = class {
         return ts17.visitEachChild(node, visitor, this.ctx);
       }
     };
-    sf = ts17.visitNode(sf, visitor);
+    sf = ts17.visitNode(sf, visitor, ts17.isSourceFile) || sf;
     return addImports(imports, sf);
   }
   transformClassDeclaration(clazz, transforms, imports) {
@@ -7033,4 +7033,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-Y24BEMDH.js.map
+//# sourceMappingURL=chunk-XS6XKZQP.js.map

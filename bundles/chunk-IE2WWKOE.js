@@ -35,7 +35,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-Y24BEMDH.js";
+} from "./chunk-XS6XKZQP.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -224,7 +224,7 @@ function compareVersions(v1, v2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
 var MIN_TS_VERSION = "4.9.3";
-var MAX_TS_VERSION = "5.0.0";
+var MAX_TS_VERSION = "5.1.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
@@ -810,6 +810,8 @@ var DelegatingCompilerHost = class {
     this.useCaseSensitiveFileNames = this.delegateMethod("useCaseSensitiveFileNames");
     this.getModuleResolutionCache = this.delegateMethod("getModuleResolutionCache");
     this.hasInvalidatedResolutions = this.delegateMethod("hasInvalidatedResolutions");
+    this.resolveModuleNameLiterals = this.delegateMethod("resolveModuleNameLiterals");
+    this.resolveTypeReferenceDirectiveReferences = this.delegateMethod("resolveTypeReferenceDirectiveReferences");
   }
   delegateMethod(name) {
     return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
@@ -2444,7 +2446,7 @@ var TypeEmitter = class {
           return ts14.visitEachChild(node, visitNode, context);
         }
       };
-      return (node) => ts14.visitNode(node, visitNode);
+      return (node) => ts14.visitNode(node, visitNode, ts14.isTypeNode);
     };
     return ts14.transform(type, [typeReferenceTransformer]).transformed[0];
   }
@@ -7174,6 +7176,8 @@ var DelegatingCompilerHost2 = class {
     this.writeFile = this.delegateMethod("writeFile");
     this.getModuleResolutionCache = this.delegateMethod("getModuleResolutionCache");
     this.hasInvalidatedResolutions = this.delegateMethod("hasInvalidatedResolutions");
+    this.resolveModuleNameLiterals = this.delegateMethod("resolveModuleNameLiterals");
+    this.resolveTypeReferenceDirectiveReferences = this.delegateMethod("resolveTypeReferenceDirectiveReferences");
   }
   delegateMethod(name) {
     return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
@@ -7617,7 +7621,12 @@ function getExtendedConfigPathWorker(configFile, extendsValue, host, fs) {
     }
   } else {
     const parseConfigHost = createParseConfigHost(host, fs);
-    const { resolvedModule } = ts34.nodeModuleNameResolver(extendsValue, configFile, { moduleResolution: ts34.ModuleResolutionKind.NodeJs, resolveJsonModule: true }, parseConfigHost);
+    const { resolvedModule } = ts34.nodeModuleNameResolver(
+      extendsValue,
+      configFile,
+      { moduleResolution: 2, resolveJsonModule: true },
+      parseConfigHost
+    );
     if (resolvedModule) {
       return absoluteFrom(resolvedModule.resolvedFileName);
     }
@@ -7721,4 +7730,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ER5YUL2O.js.map
+//# sourceMappingURL=chunk-IE2WWKOE.js.map

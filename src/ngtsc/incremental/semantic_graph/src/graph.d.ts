@@ -28,7 +28,7 @@ export interface SemanticDependencyResult {
  */
 export declare class SemanticDepGraph {
     readonly files: Map<AbsoluteFsPath, Map<string, SemanticSymbol>>;
-    readonly symbolByDecl: Map<ClassDeclaration<import("../../../reflection").DeclarationNode>, SemanticSymbol>;
+    readonly symbolByDecl: Map<ClassDeclaration, SemanticSymbol>;
     /**
      * Registers a symbol in the graph. The symbol is given a unique identifier if possible, such that
      * its equivalent symbol can be obtained from a prior graph even if its declaration node has
