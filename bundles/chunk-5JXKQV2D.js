@@ -7548,14 +7548,15 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
       if (error2) {
         return parentOptions;
       }
-      const existingNgCompilerOptions = { ...config2.angularCompilerOptions, ...parentOptions };
-      if (config2.extends && typeof config2.extends === "string") {
-        const extendedConfigPath = getExtendedConfigPath(configFile, config2.extends, host, fs);
-        if (extendedConfigPath !== null) {
-          return readAngularCompilerOptions(extendedConfigPath, existingNgCompilerOptions);
-        }
+      let existingNgCompilerOptions = { ...config2.angularCompilerOptions, ...parentOptions };
+      if (!config2.extends) {
+        return existingNgCompilerOptions;
       }
-      return existingNgCompilerOptions;
+      const extendsPaths = typeof config2.extends === "string" ? [config2.extends] : config2.extends;
+      return [...extendsPaths].reverse().reduce((prevOptions, extendsPath) => {
+        const extendedConfigPath = getExtendedConfigPath(configFile, extendsPath, host, fs);
+        return extendedConfigPath === null ? prevOptions : readAngularCompilerOptions(extendedConfigPath, prevOptions);
+      }, existingNgCompilerOptions);
     };
     const { projectFile, basePath } = calcProjectFileAndBasePath(project, host);
     const configFileName = host.resolve(host.pwd(), projectFile);
@@ -7730,4 +7731,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-IE2WWKOE.js.map
+//# sourceMappingURL=chunk-5JXKQV2D.js.map
