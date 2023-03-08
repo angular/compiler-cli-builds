@@ -130,7 +130,7 @@ function symbolIsRuntimeValue(typeChecker, symbol) {
   }
   return (symbol.flags & ts.SymbolFlags.Value & ts.SymbolFlags.ConstEnumExcludes) !== 0;
 }
-function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore, isClosureCompilerEnabled, skipClassDecorators) {
+function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore, isClosureCompilerEnabled) {
   function addJSDocTypeAnnotation(node, jsdocType) {
     if (!isClosureCompilerEnabled) {
       return;
@@ -144,13 +144,6 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         hasTrailingNewLine: true
       }
     ]);
-  }
-  function createDecoratorClassProperty(decoratorList) {
-    const modifier = ts.factory.createToken(ts.SyntaxKind.StaticKeyword);
-    const initializer = ts.factory.createArrayLiteralExpression(decoratorList, true);
-    const prop = ts.factory.createPropertyDeclaration([modifier], "decorators", void 0, void 0, initializer);
-    addJSDocTypeAnnotation(prop, DECORATOR_INVOCATION_JSDOC_TYPE);
-    return prop;
   }
   function createPropDecoratorsClassProperty(diagnostics2, properties) {
     const entries = [];
@@ -280,24 +273,8 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         }
         newMembers.push(ts.visitEachChild(member, decoratorDownlevelVisitor, context));
       }
-      const decoratorsToKeep = new Set(ts.getDecorators(classDecl));
       const possibleAngularDecorators = host.getDecoratorsOfDeclaration(classDecl) || [];
-      let hasAngularDecorator = false;
-      const decoratorsToLower = [];
-      for (const decorator of possibleAngularDecorators) {
-        const decoratorNode = decorator.node;
-        const isNgDecorator = isAngularDecorator(decorator, isCore);
-        if (isNgDecorator) {
-          hasAngularDecorator = true;
-        }
-        if (isNgDecorator && !skipClassDecorators) {
-          decoratorsToLower.push(extractMetadataFromSingleDecorator(decoratorNode, diagnostics));
-          decoratorsToKeep.delete(decoratorNode);
-        }
-      }
-      if (decoratorsToLower.length) {
-        newMembers.push(createDecoratorClassProperty(decoratorsToLower));
-      }
+      const hasAngularDecorator = possibleAngularDecorators.some((d) => isAngularDecorator(d, isCore));
       if (classParameters) {
         if (hasAngularDecorator || classParameters.some((p) => !!p.decorators.length)) {
           newMembers.push(createCtorParametersClassProperty(diagnostics, entityNameToExpression, classParameters, isClosureCompilerEnabled));
@@ -307,12 +284,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         newMembers.push(createPropDecoratorsClassProperty(diagnostics, decoratedProperties));
       }
       const members = ts.setTextRange(ts.factory.createNodeArray(newMembers, classDecl.members.hasTrailingComma), classDecl.members);
-      const classModifiers = ts.getModifiers(classDecl);
-      let modifiers;
-      if (decoratorsToKeep.size || (classModifiers == null ? void 0 : classModifiers.length)) {
-        modifiers = [...decoratorsToKeep, ...classModifiers || []];
-      }
-      return ts.factory.updateClassDeclaration(classDecl, modifiers, classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
+      return ts.factory.updateClassDeclaration(classDecl, classDecl.modifiers, classDecl.name, classDecl.typeParameters, classDecl.heritageClauses, members);
     }
     function decoratorDownlevelVisitor(node) {
       if (ts.isClassDeclaration(node)) {
@@ -358,8 +330,7 @@ function constructorParametersDownlevelTransform(program) {
     reflectionHost,
     [],
     false,
-    false,
-    true
+    false
   );
 }
 
@@ -375,4 +346,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TGEKDMUX.js.map
+//# sourceMappingURL=chunk-ZV3QKZR5.js.map
