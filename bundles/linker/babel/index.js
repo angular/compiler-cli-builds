@@ -8,7 +8,7 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-JEQIMWEA.js";
+} from "../../chunk-EL2BCWSO.js";
 import {
   ConsoleLogger,
   LogLevel

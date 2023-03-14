@@ -22,6 +22,7 @@ export declare class HostDirectivesResolver {
      * Filters the class property mappings so that only the allowed ones are present.
      * @param source Property mappings that should be filtered.
      * @param allowedProperties Property mappings that are allowed in the final results.
+     * @param valueResolver Function used to resolve the value that is assigned to the final mapping.
      */
     private filterMappings;
 }

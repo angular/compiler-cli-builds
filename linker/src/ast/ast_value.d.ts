@@ -107,7 +107,7 @@ export declare class AstObject<T extends object, TExpression> {
      * Converts the AstObject to a raw JavaScript object, mapping each property value (as an
      * `AstValue`) to the generic type (`T`) via the `mapper` function.
      */
-    toLiteral<V>(mapper: (value: AstValue<ObjectValueType<T>, TExpression>) => V): Record<string, V>;
+    toLiteral<V>(mapper: (value: AstValue<ObjectValueType<T>, TExpression>, key: string) => V): Record<string, V>;
     /**
      * Converts the AstObject to a JavaScript Map, mapping each property value (as an
      * `AstValue`) to the generic type (`T`) via the `mapper` function.

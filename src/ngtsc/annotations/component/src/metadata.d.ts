@@ -8,7 +8,7 @@
 import { AnimationTriggerNames, R3ClassMetadata, R3ComponentMetadata, R3TemplateDependencyMetadata, SchemaMetadata } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../../imports';
-import { ClassPropertyMapping, ComponentResources, DirectiveTypeCheckMeta, HostDirectiveMeta } from '../../../metadata';
+import { ClassPropertyMapping, ComponentResources, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping } from '../../../metadata';
 import { ClassDeclaration } from '../../../reflection';
 import { SubsetOfKeys } from '../../../util/src/typescript';
 import { ParsedTemplateWithSource, StyleUrlMeta } from './resources';
@@ -29,7 +29,7 @@ export interface ComponentAnalysisData {
     typeCheckMeta: DirectiveTypeCheckMeta;
     template: ParsedTemplateWithSource;
     classMetadata: R3ClassMetadata | null;
-    inputs: ClassPropertyMapping;
+    inputs: ClassPropertyMapping<InputMapping>;
     outputs: ClassPropertyMapping;
     /**
      * Providers extracted from the `providers` field of the component annotation which will require

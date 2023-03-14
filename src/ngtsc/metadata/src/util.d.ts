@@ -8,7 +8,7 @@
 import ts from 'typescript';
 import { OwningModule, Reference } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { DirectiveMeta, DirectiveTypeCheckMeta, MetadataReader, NgModuleMeta, PipeMeta } from './api';
+import { DirectiveMeta, DirectiveTypeCheckMeta, InputMapping, MetadataReader, NgModuleMeta, PipeMeta } from './api';
 import { ClassPropertyMapping } from './property_mapping';
 export declare function extractReferencesFromType(checker: ts.TypeChecker, def: ts.TypeNode, bestGuessOwningModule: OwningModule | null): Reference<ClassDeclaration>[];
 export declare function extraReferenceFromTypeQuery(checker: ts.TypeChecker, typeNode: ts.TypeQueryNode, origin: ts.TypeNode, bestGuessOwningModule: OwningModule | null): Reference<ClassDeclaration<ts.ClassDeclaration>>;
@@ -23,7 +23,7 @@ export declare function readStringArrayType(type: ts.TypeNode): string[];
  * that use the directive. This metadata does not contain information from a base class, if any,
  * making this metadata invariant to changes of inherited classes.
  */
-export declare function extractDirectiveTypeCheckMeta(node: ClassDeclaration, inputs: ClassPropertyMapping, reflector: ReflectionHost): DirectiveTypeCheckMeta;
+export declare function extractDirectiveTypeCheckMeta(node: ClassDeclaration, inputs: ClassPropertyMapping<InputMapping>, reflector: ReflectionHost): DirectiveTypeCheckMeta;
 /**
  * A `MetadataReader` that reads from an ordered set of child readers until it obtains the requested
  * metadata.

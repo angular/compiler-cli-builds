@@ -35,7 +35,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-XS6XKZQP.js";
+} from "./chunk-PHEKJMF2.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -3701,9 +3701,9 @@ var TcbDirectiveCtorOp = class extends TcbOp {
         });
       }
     }
-    for (const [fieldName] of this.dir.inputs) {
-      if (!genericInputs.has(fieldName)) {
-        genericInputs.set(fieldName, { type: "unset", field: fieldName });
+    for (const { classPropertyName } of this.dir.inputs) {
+      if (!genericInputs.has(classPropertyName)) {
+        genericInputs.set(classPropertyName, { type: "unset", field: classPropertyName });
       }
     }
     const typeCtor = tcbCallTypeCtor(this.dir, this.tcb, Array.from(genericInputs.values()));
@@ -7731,4 +7731,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-5JXKQV2D.js.map
+//# sourceMappingURL=chunk-2REVAOE3.js.map

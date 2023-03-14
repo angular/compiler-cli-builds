@@ -9,7 +9,7 @@ import { DirectiveMeta as T2DirectiveMeta, SchemaMetadata } from '@angular/compi
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
-import { ClassPropertyMapping, ClassPropertyName } from './property_mapping';
+import { ClassPropertyMapping, ClassPropertyName, InputOrOutput } from './property_mapping';
 /**
  * Metadata collected for an `NgModule`.
  */
@@ -104,6 +104,10 @@ export declare enum MatchSource {
     /** The directive was applied as a host directive. */
     HostDirective = 1
 }
+/** Metadata for a single input mapping. */
+export type InputMapping = InputOrOutput & {
+    required: boolean;
+};
 /**
  * Metadata collected for a directive within an NgModule's scope.
  */
@@ -120,7 +124,7 @@ export interface DirectiveMeta extends T2DirectiveMeta, DirectiveTypeCheckMeta {
     /**
      * A mapping of input field names to the property names.
      */
-    inputs: ClassPropertyMapping;
+    inputs: ClassPropertyMapping<InputMapping>;
     /**
      * A mapping of output field names to the property names.
      */

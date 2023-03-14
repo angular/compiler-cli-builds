@@ -44,7 +44,7 @@ export interface InputOrOutput {
  * Allows bidirectional querying of the mapping - looking up all inputs/outputs with a given
  * property name, or mapping from a specific class property to its binding property name.
  */
-export declare class ClassPropertyMapping implements InputOutputPropertySet {
+export declare class ClassPropertyMapping<T extends InputOrOutput = InputOrOutput> implements InputOutputPropertySet {
     /**
      * Mapping from class property names to the single `InputOrOutput` for that class property.
      */
@@ -57,20 +57,20 @@ export declare class ClassPropertyMapping implements InputOutputPropertySet {
     /**
      * Construct a `ClassPropertyMapping` with no entries.
      */
-    static empty(): ClassPropertyMapping;
+    static empty<T extends InputOrOutput>(): ClassPropertyMapping<T>;
     /**
      * Construct a `ClassPropertyMapping` from a primitive JS object which maps class property names
      * to either binding property names or an array that contains both names, which is used in on-disk
      * metadata formats (e.g. in .d.ts files).
      */
-    static fromMappedObject(obj: {
-        [classPropertyName: string]: BindingPropertyName | [ClassPropertyName, BindingPropertyName];
-    }): ClassPropertyMapping;
+    static fromMappedObject<T extends InputOrOutput>(obj: {
+        [classPropertyName: string]: BindingPropertyName | [ClassPropertyName, BindingPropertyName] | T;
+    }): ClassPropertyMapping<T>;
     /**
      * Merge two mappings into one, with class properties from `b` taking precedence over class
      * properties from `a`.
      */
-    static merge(a: ClassPropertyMapping, b: ClassPropertyMapping): ClassPropertyMapping;
+    static merge<T extends InputOrOutput>(a: ClassPropertyMapping<T>, b: ClassPropertyMapping<T>): ClassPropertyMapping<T>;
     /**
      * All class property names mapped in this mapping.
      */
@@ -86,11 +86,11 @@ export declare class ClassPropertyMapping implements InputOutputPropertySet {
     /**
      * Lookup all `InputOrOutput`s that use this `propertyName`.
      */
-    getByBindingPropertyName(propertyName: string): ReadonlyArray<InputOrOutput> | null;
+    getByBindingPropertyName(propertyName: string): ReadonlyArray<T> | null;
     /**
      * Lookup the `InputOrOutput` associated with a `classPropertyName`.
      */
-    getByClassPropertyName(classPropertyName: string): InputOrOutput | null;
+    getByClassPropertyName(classPropertyName: string): T | null;
     /**
      * Convert this mapping to a primitive JS object which maps each class property directly to the
      * binding property name associated with it.
@@ -106,11 +106,11 @@ export declare class ClassPropertyMapping implements InputOutputPropertySet {
      * This object format is used when mappings are serialized (for example into .d.ts files).
      */
     toJointMappedObject(): {
-        [classPropertyName: string]: BindingPropertyName | [BindingPropertyName, ClassPropertyName];
+        [classPropertyName: string]: T;
     };
     /**
      * Implement the iterator protocol and return entry objects which contain the class and binding
      * property names (and are useful for destructuring).
      */
-    [Symbol.iterator](): IterableIterator<[ClassPropertyName, BindingPropertyName]>;
+    [Symbol.iterator](): IterableIterator<T>;
 }

@@ -1490,8 +1490,14 @@ var ClassPropertyMapping = class {
     const forwardMap = /* @__PURE__ */ new Map();
     for (const classPropertyName of Object.keys(obj)) {
       const value = obj[classPropertyName];
-      const bindingPropertyName = Array.isArray(value) ? value[0] : value;
-      const inputOrOutput = { classPropertyName, bindingPropertyName };
+      let inputOrOutput;
+      if (typeof value === "string") {
+        inputOrOutput = { classPropertyName, bindingPropertyName: value };
+      } else if (Array.isArray(value)) {
+        inputOrOutput = { classPropertyName, bindingPropertyName: value[0] };
+      } else {
+        inputOrOutput = value;
+      }
       forwardMap.set(classPropertyName, inputOrOutput);
     }
     return new ClassPropertyMapping(forwardMap);
@@ -1528,17 +1534,13 @@ var ClassPropertyMapping = class {
   toJointMappedObject() {
     const obj = {};
     for (const [classPropertyName, inputOrOutput] of this.forwardMap) {
-      if (inputOrOutput.bindingPropertyName === classPropertyName) {
-        obj[classPropertyName] = inputOrOutput.bindingPropertyName;
-      } else {
-        obj[classPropertyName] = [inputOrOutput.bindingPropertyName, classPropertyName];
-      }
+      obj[classPropertyName] = inputOrOutput;
     }
     return obj;
   }
   *[Symbol.iterator]() {
-    for (const [classPropertyName, inputOrOutput] of this.forwardMap.entries()) {
-      yield [classPropertyName, inputOrOutput.bindingPropertyName];
+    for (const inputOrOutput of this.forwardMap.values()) {
+      yield inputOrOutput;
     }
   }
 };
@@ -1778,7 +1780,7 @@ var DtsMetadataReader = class {
       return param.typeValueReference.kind === 1 && param.typeValueReference.moduleName === "@angular/core" && param.typeValueReference.importedName === "TemplateRef";
     });
     const isStandalone = def.type.typeArguments.length > 7 && ((_a = readBooleanType(def.type.typeArguments[7])) != null ? _a : false);
-    const inputs = ClassPropertyMapping.fromMappedObject(readMapType(def.type.typeArguments[3], readStringType));
+    const inputs = ClassPropertyMapping.fromMappedObject(readInputsType(def.type.typeArguments[3]));
     const outputs = ClassPropertyMapping.fromMappedObject(readMapType(def.type.typeArguments[4], readStringType));
     const hostDirectives = def.type.typeArguments.length > 8 ? readHostDirectivesType(this.checker, def.type.typeArguments[8], ref.bestGuessOwningModule) : null;
     return {
@@ -1828,6 +1830,25 @@ var DtsMetadataReader = class {
     };
   }
 };
+function readInputsType(type) {
+  const inputsMap = {};
+  if (ts6.isTypeLiteralNode(type)) {
+    for (const member of type.members) {
+      if (!ts6.isPropertySignature(member) || member.type === void 0 || member.name === void 0 || !ts6.isStringLiteral(member.name) && !ts6.isIdentifier(member.name)) {
+        continue;
+      }
+      const stringValue = readStringType(member.type);
+      if (stringValue != null) {
+        inputsMap[member.name.text] = {
+          bindingPropertyName: stringValue,
+          classPropertyName: member.name.text,
+          required: false
+        };
+      }
+    }
+  }
+  return inputsMap;
+}
 function readBaseClass2(clazz, checker, reflector) {
   if (!isNamedClassDeclaration(clazz)) {
     return reflector.hasBaseClass(clazz) ? "dynamic" : null;
@@ -2081,13 +2102,13 @@ var HostDirectivesResolver = class {
       results.push({
         ...hostMeta,
         matchSource: MatchSource.HostDirective,
-        inputs: this.filterMappings(hostMeta.inputs, current.inputs),
-        outputs: this.filterMappings(hostMeta.outputs, current.outputs)
+        inputs: ClassPropertyMapping.fromMappedObject(this.filterMappings(hostMeta.inputs, current.inputs, resolveInput)),
+        outputs: ClassPropertyMapping.fromMappedObject(this.filterMappings(hostMeta.outputs, current.outputs, resolveOutput))
       });
     }
     return results;
   }
-  filterMappings(source, allowedProperties) {
+  filterMappings(source, allowedProperties, valueResolver) {
     const result = {};
     if (allowedProperties !== null) {
       for (const publicName in allowedProperties) {
@@ -2095,15 +2116,21 @@ var HostDirectivesResolver = class {
           const bindings = source.getByBindingPropertyName(publicName);
           if (bindings !== null) {
             for (const binding of bindings) {
-              result[binding.classPropertyName] = allowedProperties[publicName];
+              result[binding.classPropertyName] = valueResolver(allowedProperties[publicName], binding.classPropertyName);
             }
           }
         }
       }
     }
-    return ClassPropertyMapping.fromMappedObject(result);
+    return result;
   }
 };
+function resolveInput(bindingName, classPropertyName) {
+  return { bindingPropertyName: bindingName, classPropertyName, required: false };
+}
+function resolveOutput(bindingName) {
+  return bindingName;
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/diagnostics.mjs
 function makeDuplicateDeclarationError(node, data, kind) {
@@ -4284,10 +4311,12 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const members = reflector.getMembersOfClass(clazz);
   const decoratedElements = members.filter((member) => !member.isStatic && member.decorators !== null);
   const coreModule = isCore ? void 0 : "@angular/core";
-  const inputsFromMeta = parseFieldToPropertyMapping(directive, "inputs", evaluator);
-  const inputsFromFields = parseDecoratedFields(filterToMembersWithDecorator(decoratedElements, "Input", coreModule), evaluator, resolveInput);
-  const outputsFromMeta = parseFieldToPropertyMapping(directive, "outputs", evaluator);
-  const outputsFromFields = parseDecoratedFields(filterToMembersWithDecorator(decoratedElements, "Output", coreModule), evaluator, resolveOutput);
+  const inputsFromMeta = parseInputsArray(directive, evaluator);
+  const inputsFromFields = parseInputFields(filterToMembersWithDecorator(decoratedElements, "Input", coreModule), evaluator);
+  const inputs = ClassPropertyMapping.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
+  const outputsFromMeta = parseOutputsArray(directive, evaluator);
+  const outputsFromFields = parseOutputFields(filterToMembersWithDecorator(decoratedElements, "Output", coreModule), evaluator);
+  const outputs = ClassPropertyMapping.fromMappedObject({ ...outputsFromMeta, ...outputsFromFields });
   const contentChildFromFields = queriesFromFields(filterToMembersWithDecorator(decoratedElements, "ContentChild", coreModule), reflector, evaluator);
   const contentChildrenFromFields = queriesFromFields(filterToMembersWithDecorator(decoratedElements, "ContentChildren", coreModule), reflector, evaluator);
   const queries = [...contentChildFromFields, ...contentChildrenFromFields];
@@ -4339,8 +4368,6 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const sourceFile = clazz.getSourceFile();
   const type = wrapTypeReference(reflector, clazz);
   const internalType = new WrappedNodeExpr4(reflector.getInternalNameOfClass(clazz));
-  const inputs = ClassPropertyMapping.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
-  const outputs = ClassPropertyMapping.fromMappedObject({ ...outputsFromMeta, ...outputsFromFields });
   const rawHostDirectives = directive.get("hostDirectives") || null;
   const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator);
   const metadata = {
@@ -4520,7 +4547,7 @@ function extractQueriesFromDecorator(queryData, reflector, evaluator, isCore) {
   });
   return { content, view };
 }
-function parseFieldArrayValue(directive, field, evaluator) {
+function parseFieldStringArrayValue(directive, field, evaluator) {
   if (!directive.has(field)) {
     return null;
   }
@@ -4560,44 +4587,80 @@ function queriesFromFields(fields, reflector, evaluator) {
 function isPropertyTypeMember(member) {
   return member.kind === ClassMemberKind.Getter || member.kind === ClassMemberKind.Setter || member.kind === ClassMemberKind.Property;
 }
-function parseFieldToPropertyMapping(directive, field, evaluator) {
-  const metaValues = parseFieldArrayValue(directive, field, evaluator);
-  return metaValues ? parseInputOutputMappingArray(metaValues) : EMPTY_OBJECT;
-}
-function parseInputOutputMappingArray(values) {
+function parseMappingStringArray(values) {
   return values.reduce((results, value) => {
     if (typeof value !== "string") {
       throw new Error("Mapping value must be a string");
     }
-    const [field, property] = value.split(":", 2).map((str) => str.trim());
-    results[field] = property || field;
+    const [bindingPropertyName, fieldName] = parseMappingString(value);
+    results[fieldName] = bindingPropertyName;
     return results;
   }, {});
 }
-function parseDecoratedFields(fields, evaluator, mapValueResolver) {
-  return fields.reduce((results, field) => {
+function parseMappingString(value) {
+  const [fieldName, bindingPropertyName] = value.split(":", 2).map((str) => str.trim());
+  return [bindingPropertyName != null ? bindingPropertyName : fieldName, fieldName];
+}
+function parseDecoratedFields(fields, evaluator, callback) {
+  for (const field of fields) {
     const fieldName = field.member.name;
-    field.decorators.forEach((decorator) => {
-      if (decorator.args == null || decorator.args.length === 0) {
-        results[fieldName] = fieldName;
-      } else if (decorator.args.length === 1) {
-        const property = evaluator.evaluate(decorator.args[0]);
-        if (typeof property !== "string") {
-          throw createValueHasWrongTypeError(Decorator.nodeForError(decorator), property, `@${decorator.name} decorator argument must resolve to a string`);
-        }
-        results[fieldName] = mapValueResolver(property, fieldName);
-      } else {
+    for (const decorator of field.decorators) {
+      if (decorator.args != null && decorator.args.length > 1) {
         throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `@${decorator.name} can have at most one argument, got ${decorator.args.length} argument(s)`);
       }
-    });
-    return results;
-  }, {});
+      const value = decorator.args != null && decorator.args.length > 0 ? evaluator.evaluate(decorator.args[0]) : null;
+      callback(fieldName, value, decorator);
+    }
+  }
 }
-function resolveInput(publicName, internalName) {
-  return [publicName, internalName];
+function parseInputsArray(decoratorMetadata, evaluator) {
+  const inputsField = decoratorMetadata.get("inputs");
+  if (inputsField === void 0) {
+    return {};
+  }
+  const inputs = {};
+  const inputsArray = evaluator.evaluate(inputsField);
+  if (!Array.isArray(inputsArray)) {
+    throw createValueHasWrongTypeError(inputsField, inputsArray, `Failed to resolve @Directive.inputs to a string array`);
+  }
+  for (const value of inputsArray) {
+    if (typeof value === "string") {
+      const [bindingPropertyName, fieldName] = parseMappingString(value);
+      inputs[fieldName] = { bindingPropertyName, classPropertyName: fieldName, required: false };
+    } else {
+      throw createValueHasWrongTypeError(inputsField, value, `Failed to resolve @Directive.inputs to a string array`);
+    }
+  }
+  return inputs;
 }
-function resolveOutput(publicName, internalName) {
-  return publicName;
+function parseInputFields(inputMembers, evaluator) {
+  const inputs = {};
+  parseDecoratedFields(inputMembers, evaluator, (classPropertyName, options, decorator) => {
+    let bindingPropertyName;
+    if (options === null) {
+      bindingPropertyName = classPropertyName;
+    } else if (typeof options === "string") {
+      bindingPropertyName = options;
+    } else {
+      throw createValueHasWrongTypeError(Decorator.nodeForError(decorator), options, `@${decorator.name} decorator argument must resolve to a string`);
+    }
+    inputs[classPropertyName] = { bindingPropertyName, classPropertyName, required: false };
+  });
+  return inputs;
+}
+function parseOutputsArray(directive, evaluator) {
+  const metaValues = parseFieldStringArrayValue(directive, "outputs", evaluator);
+  return metaValues ? parseMappingStringArray(metaValues) : EMPTY_OBJECT;
+}
+function parseOutputFields(outputMembers, evaluator) {
+  const outputs = {};
+  parseDecoratedFields(outputMembers, evaluator, (fieldName, bindingPropertyName, decorator) => {
+    if (bindingPropertyName != null && typeof bindingPropertyName !== "string") {
+      throw createValueHasWrongTypeError(Decorator.nodeForError(decorator), bindingPropertyName, `@${decorator.name} decorator argument must resolve to a string`);
+    }
+    outputs[fieldName] = bindingPropertyName != null ? bindingPropertyName : fieldName;
+  });
+  return outputs;
 }
 function evaluateHostExpressionBindings(hostExpr, evaluator) {
   const hostMetaMap = evaluator.evaluate(hostExpr);
@@ -4658,7 +4721,7 @@ function parseHostDirectivesMapping(field, resolvedValue, classReference, source
     const nameForErrors = `@Directive.hostDirectives.${classReference.name.text}.${field}`;
     const rawInputs = resolvedValue.get(field);
     if (isStringArrayOrDie(rawInputs, nameForErrors, sourceExpression)) {
-      return parseInputOutputMappingArray(rawInputs);
+      return parseMappingStringArray(rawInputs);
     }
   }
   return null;
@@ -4697,7 +4760,7 @@ var DirectiveSymbol = class extends SemanticSymbol {
     if (!(previousSymbol instanceof DirectiveSymbol)) {
       return true;
     }
-    if (!isArrayEqual(Array.from(this.inputs), Array.from(previousSymbol.inputs), isInputMappingEqual) || !isArrayEqual(Array.from(this.outputs), Array.from(previousSymbol.outputs), isInputMappingEqual)) {
+    if (!isArrayEqual(Array.from(this.inputs), Array.from(previousSymbol.inputs), isInputMappingEqual) || !isArrayEqual(Array.from(this.outputs), Array.from(previousSymbol.outputs), isInputOrOutputEqual)) {
       return true;
     }
     if (!areTypeParametersEqual(this.typeParameters, previousSymbol.typeParameters)) {
@@ -4713,7 +4776,10 @@ var DirectiveSymbol = class extends SemanticSymbol {
   }
 };
 function isInputMappingEqual(current, previous) {
-  return current[0] === previous[0] && current[1] === previous[1];
+  return isInputOrOutputEqual(current, previous) && current.required === previous.required;
+}
+function isInputOrOutputEqual(current, previous) {
+  return current.classPropertyName === previous.classPropertyName && current.bindingPropertyName === previous.bindingPropertyName;
 }
 function isTypeCheckMetaEqual(current, previous) {
   if (current.hasNgTemplateContextGuard !== previous.hasNgTemplateContextGuard) {
@@ -6013,7 +6079,7 @@ var ComponentDecoratorHandler = class {
     const componentStyleUrls = extractComponentStyleUrls(this.evaluator, component);
     let inlineStyles;
     if (component.has("styles")) {
-      const litStyles = parseFieldArrayValue(component, "styles", this.evaluator);
+      const litStyles = parseFieldStringArrayValue(component, "styles", this.evaluator);
       if (litStyles === null) {
         this.preanalyzeStylesCache.set(node, null);
       } else {
@@ -6172,7 +6238,7 @@ var ComponentDecoratorHandler = class {
         throw new Error("Inline resource processing requires asynchronous preanalyze.");
       }
       if (component.has("styles")) {
-        const litStyles = parseFieldArrayValue(component, "styles", this.evaluator);
+        const litStyles = parseFieldStringArrayValue(component, "styles", this.evaluator);
         if (litStyles !== null) {
           inlineStyles = [...litStyles];
           styles.push(...litStyles);
@@ -7033,4 +7099,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XS6XKZQP.js.map
+//# sourceMappingURL=chunk-PHEKJMF2.js.map

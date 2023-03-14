@@ -9,7 +9,7 @@ import { ConstantPool, R3ClassMetadata, R3DirectiveMetadata } from '@angular/com
 import ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../../imports';
 import { SemanticDepGraphUpdater } from '../../../incremental/semantic_graph';
-import { ClassPropertyMapping, DirectiveTypeCheckMeta, HostDirectiveMeta, MetadataReader, MetadataRegistry } from '../../../metadata';
+import { ClassPropertyMapping, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping, MetadataReader, MetadataRegistry } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { PerfRecorder } from '../../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
@@ -23,7 +23,7 @@ export interface DirectiveHandlerData {
     meta: R3DirectiveMetadata;
     classMetadata: R3ClassMetadata | null;
     providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
-    inputs: ClassPropertyMapping;
+    inputs: ClassPropertyMapping<InputMapping>;
     outputs: ClassPropertyMapping;
     isPoisoned: boolean;
     isStructural: boolean;
