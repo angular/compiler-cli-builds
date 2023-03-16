@@ -4,7 +4,7 @@
     
 import {
   NoopImportRewriter
-} from "./chunk-UZSESMCH.js";
+} from "./chunk-TK3GHMT6.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/context.mjs
 var Context = class {
@@ -669,4 +669,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-WWVESPME.js.map
+//# sourceMappingURL=chunk-6PDKXFWN.js.map
