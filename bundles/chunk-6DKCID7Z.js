@@ -35,7 +35,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-PHEKJMF2.js";
+} from "./chunk-P4OQTMU7.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -44,7 +44,7 @@ import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-6PDKXFWN.js";
+} from "./chunk-WWVESPME.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -82,7 +82,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-TK3GHMT6.js";
+} from "./chunk-UZSESMCH.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -2948,6 +2948,10 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
     }
     this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, input.keySpan, ts19.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SPLIT_TWO_WAY_BINDING), errorMsg, relatedMessages));
   }
+  missingRequiredInputs(templateId, element, directiveName, isComponent, inputAliases) {
+    const message = `Required input${inputAliases.length === 1 ? "" : "s"} ${inputAliases.map((n) => `'${n}'`).join(", ")} from ${isComponent ? "component" : "directive"} ${directiveName} must be specified.`;
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), element.startSourceSpan, ts19.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
+  }
 };
 function makeInlineDiagnostic(templateId, code, node, messageText, relatedInformation) {
   return {
@@ -3683,22 +3687,17 @@ var TcbDirectiveCtorOp = class extends TcbOp {
     addExpressionIdentifier(id, ExpressionIdentifier.DIRECTIVE);
     addParseSpanInfo(id, this.node.startSourceSpan || this.node.sourceSpan);
     const genericInputs = /* @__PURE__ */ new Map();
-    const inputs = getBoundInputs(this.dir, this.node, this.tcb);
-    for (const input of inputs) {
-      if (!this.tcb.env.config.checkTypeOfAttributes && input.attribute instanceof TmplAstTextAttribute2) {
+    const boundAttrs = getBoundAttributes(this.dir, this.node);
+    for (const attr of boundAttrs) {
+      if (!this.tcb.env.config.checkTypeOfAttributes && attr.attribute instanceof TmplAstTextAttribute2) {
         continue;
       }
-      for (const fieldName of input.fieldNames) {
+      for (const { fieldName } of attr.inputs) {
         if (genericInputs.has(fieldName)) {
           continue;
         }
-        const expression = translateInput(input.attribute, this.tcb, this.scope);
-        genericInputs.set(fieldName, {
-          type: "binding",
-          field: fieldName,
-          expression,
-          sourceSpan: input.attribute.sourceSpan
-        });
+        const expression = translateInput(attr.attribute, this.tcb, this.scope);
+        genericInputs.set(fieldName, { type: "binding", field: fieldName, expression, sourceSpan: attr.attribute.sourceSpan });
       }
     }
     for (const { classPropertyName } of this.dir.inputs) {
@@ -3728,12 +3727,16 @@ var TcbDirectiveInputsOp = class extends TcbOp {
   }
   execute() {
     let dirId = null;
-    const inputs = getBoundInputs(this.dir, this.node, this.tcb);
-    for (const input of inputs) {
-      const expr = widenBinding(translateInput(input.attribute, this.tcb, this.scope), this.tcb);
+    const boundAttrs = getBoundAttributes(this.dir, this.node);
+    const seenRequiredInputs = /* @__PURE__ */ new Set();
+    for (const attr of boundAttrs) {
+      const expr = widenBinding(translateInput(attr.attribute, this.tcb, this.scope), this.tcb);
       let assignment = wrapForDiagnostics(expr);
-      for (const fieldName of input.fieldNames) {
+      for (const { fieldName, required } of attr.inputs) {
         let target;
+        if (required) {
+          seenRequiredInputs.add(fieldName);
+        }
         if (this.dir.coercedInputFields.has(fieldName)) {
           const dirTypeRef = this.tcb.env.referenceType(this.dir.ref);
           if (!ts23.isTypeReferenceNode(dirTypeRef)) {
@@ -3764,18 +3767,30 @@ var TcbDirectiveInputsOp = class extends TcbOp {
           }
           target = this.dir.stringLiteralInputFields.has(fieldName) ? ts23.factory.createElementAccessExpression(dirId, ts23.factory.createStringLiteral(fieldName)) : ts23.factory.createPropertyAccessExpression(dirId, ts23.factory.createIdentifier(fieldName));
         }
-        if (input.attribute.keySpan !== void 0) {
-          addParseSpanInfo(target, input.attribute.keySpan);
+        if (attr.attribute.keySpan !== void 0) {
+          addParseSpanInfo(target, attr.attribute.keySpan);
         }
         assignment = ts23.factory.createBinaryExpression(target, ts23.SyntaxKind.EqualsToken, assignment);
       }
-      addParseSpanInfo(assignment, input.attribute.sourceSpan);
-      if (!this.tcb.env.config.checkTypeOfAttributes && input.attribute instanceof TmplAstTextAttribute2) {
+      addParseSpanInfo(assignment, attr.attribute.sourceSpan);
+      if (!this.tcb.env.config.checkTypeOfAttributes && attr.attribute instanceof TmplAstTextAttribute2) {
         markIgnoreDiagnostics(assignment);
       }
       this.scope.addStatement(ts23.factory.createExpressionStatement(assignment));
     }
+    this.checkRequiredInputs(seenRequiredInputs);
     return null;
+  }
+  checkRequiredInputs(seenRequiredInputs) {
+    const missing = [];
+    for (const input of this.dir.inputs) {
+      if (input.required && !seenRequiredInputs.has(input.classPropertyName)) {
+        missing.push(input.bindingPropertyName);
+      }
+    }
+    if (missing.length > 0) {
+      this.tcb.oobRecorder.missingRequiredInputs(this.tcb.id, this.node, this.dir.name, this.dir.isComponent, missing);
+    }
   }
 };
 var TcbDirectiveCtorCircularFallbackOp = class extends TcbOp {
@@ -4375,18 +4390,19 @@ function tcbCallTypeCtor(dir, tcb, inputs) {
     [ts23.factory.createObjectLiteralExpression(members)]
   );
 }
-function getBoundInputs(directive, node, tcb) {
+function getBoundAttributes(directive, node) {
   const boundInputs = [];
   const processAttribute = (attr) => {
     if (attr instanceof TmplAstBoundAttribute && attr.type !== 0) {
       return;
     }
     const inputs = directive.inputs.getByBindingPropertyName(attr.name);
-    if (inputs === null) {
-      return;
+    if (inputs !== null) {
+      boundInputs.push({
+        attribute: attr,
+        inputs: inputs.map((input) => ({ fieldName: input.classPropertyName, required: input.required }))
+      });
     }
-    const fieldNames = inputs.map((input) => input.classPropertyName);
-    boundInputs.push({ attribute: attr, fieldNames });
   };
   node.inputs.forEach(processAttribute);
   node.attributes.forEach(processAttribute);
@@ -7731,4 +7747,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2REVAOE3.js.map
+//# sourceMappingURL=chunk-6DKCID7Z.js.map

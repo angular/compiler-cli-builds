@@ -18,7 +18,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-6PDKXFWN.js";
+} from "./chunk-WWVESPME.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -35,7 +35,7 @@ import {
   makeRelatedInformation,
   nodeDebugInfo,
   nodeNameForError
-} from "./chunk-TK3GHMT6.js";
+} from "./chunk-UZSESMCH.js";
 import {
   PerfEvent,
   PerfPhase
@@ -1844,6 +1844,16 @@ function readInputsType(type) {
           classPropertyName: member.name.text,
           required: false
         };
+      } else {
+        const config = readMapType(member.type, (innerValue) => {
+          var _a;
+          return (_a = readStringType(innerValue)) != null ? _a : readBooleanType(innerValue);
+        });
+        inputsMap[member.name.text] = {
+          classPropertyName: member.name.text,
+          bindingPropertyName: config.alias,
+          required: config.required
+        };
       }
     }
   }
@@ -2116,7 +2126,7 @@ var HostDirectivesResolver = class {
           const bindings = source.getByBindingPropertyName(publicName);
           if (bindings !== null) {
             for (const binding of bindings) {
-              result[binding.classPropertyName] = valueResolver(allowedProperties[publicName], binding.classPropertyName);
+              result[binding.classPropertyName] = valueResolver(allowedProperties[publicName], binding);
             }
           }
         }
@@ -2125,8 +2135,12 @@ var HostDirectivesResolver = class {
     return result;
   }
 };
-function resolveInput(bindingName, classPropertyName) {
-  return { bindingPropertyName: bindingName, classPropertyName, required: false };
+function resolveInput(bindingName, binding) {
+  return {
+    bindingPropertyName: bindingName,
+    classPropertyName: binding.classPropertyName,
+    required: binding.required
+  };
 }
 function resolveOutput(bindingName) {
   return bindingName;
@@ -2220,19 +2234,28 @@ function validateHostDirectives(origin, hostDirectives, metaReader) {
     if (hostMeta.isComponent) {
       diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_COMPONENT, current.directive.getOriginForDiagnostics(origin), `Host directive ${hostMeta.name} cannot be a component`));
     }
-    validateHostDirectiveMappings("input", current, hostMeta, origin, diagnostics);
-    validateHostDirectiveMappings("output", current, hostMeta, origin, diagnostics);
+    const requiredInputNames = Array.from(hostMeta.inputs).filter((input) => input.required).map((input) => input.classPropertyName);
+    validateHostDirectiveMappings("input", current, hostMeta, origin, diagnostics, requiredInputNames.length > 0 ? new Set(requiredInputNames) : null);
+    validateHostDirectiveMappings("output", current, hostMeta, origin, diagnostics, null);
   }
   return diagnostics;
 }
-function validateHostDirectiveMappings(bindingType, hostDirectiveMeta, meta, origin, diagnostics) {
+function validateHostDirectiveMappings(bindingType, hostDirectiveMeta, meta, origin, diagnostics, requiredBindings) {
   const className = meta.name;
   const hostDirectiveMappings = bindingType === "input" ? hostDirectiveMeta.inputs : hostDirectiveMeta.outputs;
   const existingBindings = bindingType === "input" ? meta.inputs : meta.outputs;
+  const exposedRequiredBindings = /* @__PURE__ */ new Set();
   for (const publicName in hostDirectiveMappings) {
     if (hostDirectiveMappings.hasOwnProperty(publicName)) {
-      if (!existingBindings.hasBindingPropertyName(publicName)) {
+      const bindings = existingBindings.getByBindingPropertyName(publicName);
+      if (bindings === null) {
         diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_UNDEFINED_BINDING, hostDirectiveMeta.directive.getOriginForDiagnostics(origin), `Directive ${className} does not have an ${bindingType} with a public name of ${publicName}.`));
+      } else if (requiredBindings !== null) {
+        for (const field of bindings) {
+          if (requiredBindings.has(field.classPropertyName)) {
+            exposedRequiredBindings.add(field.classPropertyName);
+          }
+        }
       }
       const remappedPublicName = hostDirectiveMappings[publicName];
       const bindingsForPublicName = existingBindings.getByBindingPropertyName(remappedPublicName);
@@ -2244,6 +2267,18 @@ function validateHostDirectiveMappings(bindingType, hostDirectiveMeta, meta, ori
         }
       }
     }
+  }
+  if (requiredBindings !== null && requiredBindings.size !== exposedRequiredBindings.size) {
+    const missingBindings = [];
+    for (const publicName of requiredBindings) {
+      if (!exposedRequiredBindings.has(publicName)) {
+        const name = existingBindings.getByClassPropertyName(publicName);
+        if (name) {
+          missingBindings.push(`'${name.bindingPropertyName}'`);
+        }
+      }
+    }
+    diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_MISSING_REQUIRED_BINDING, hostDirectiveMeta.directive.getOriginForDiagnostics(origin), `Required ${bindingType}${missingBindings.length === 1 ? "" : "s"} ${missingBindings.join(", ")} from host directive ${className} must be exposed.`));
   }
 }
 function getUndecoratedClassWithAngularFeaturesDiagnostic(node) {
@@ -4621,14 +4656,27 @@ function parseInputsArray(decoratorMetadata, evaluator) {
   const inputs = {};
   const inputsArray = evaluator.evaluate(inputsField);
   if (!Array.isArray(inputsArray)) {
-    throw createValueHasWrongTypeError(inputsField, inputsArray, `Failed to resolve @Directive.inputs to a string array`);
+    throw createValueHasWrongTypeError(inputsField, inputsArray, `Failed to resolve @Directive.inputs to an array`);
   }
-  for (const value of inputsArray) {
+  for (let i = 0; i < inputsArray.length; i++) {
+    const value = inputsArray[i];
     if (typeof value === "string") {
-      const [bindingPropertyName, fieldName] = parseMappingString(value);
-      inputs[fieldName] = { bindingPropertyName, classPropertyName: fieldName, required: false };
+      const [bindingPropertyName, classPropertyName] = parseMappingString(value);
+      inputs[classPropertyName] = { bindingPropertyName, classPropertyName, required: false };
+    } else if (value instanceof Map) {
+      const name = value.get("name");
+      const alias = value.get("alias");
+      const required = value.get("required");
+      if (typeof name !== "string") {
+        throw createValueHasWrongTypeError(inputsField, name, `Value at position ${i} of @Directive.inputs array must have a "name" property`);
+      }
+      inputs[name] = {
+        classPropertyName: name,
+        bindingPropertyName: typeof alias === "string" ? alias : name,
+        required: required === true
+      };
     } else {
-      throw createValueHasWrongTypeError(inputsField, value, `Failed to resolve @Directive.inputs to a string array`);
+      throw createValueHasWrongTypeError(inputsField, value, `@Directive.inputs array can only contain strings or object literals`);
     }
   }
   return inputs;
@@ -4637,14 +4685,19 @@ function parseInputFields(inputMembers, evaluator) {
   const inputs = {};
   parseDecoratedFields(inputMembers, evaluator, (classPropertyName, options, decorator) => {
     let bindingPropertyName;
+    let required = false;
     if (options === null) {
       bindingPropertyName = classPropertyName;
     } else if (typeof options === "string") {
       bindingPropertyName = options;
+    } else if (options instanceof Map) {
+      const aliasInConfig = options.get("alias");
+      bindingPropertyName = typeof aliasInConfig === "string" ? aliasInConfig : classPropertyName;
+      required = options.get("required") === true;
     } else {
-      throw createValueHasWrongTypeError(Decorator.nodeForError(decorator), options, `@${decorator.name} decorator argument must resolve to a string`);
+      throw createValueHasWrongTypeError(Decorator.nodeForError(decorator), options, `@${decorator.name} decorator argument must resolve to a string or an object literal`);
     }
-    inputs[classPropertyName] = { bindingPropertyName, classPropertyName, required: false };
+    inputs[classPropertyName] = { bindingPropertyName, classPropertyName, required };
   });
   return inputs;
 }
@@ -4776,7 +4829,7 @@ var DirectiveSymbol = class extends SemanticSymbol {
   }
 };
 function isInputMappingEqual(current, previous) {
-  return isInputOrOutputEqual(current, previous) && current.required === previous.required;
+  return isInputOrOutputEqual(current, previous);
 }
 function isInputOrOutputEqual(current, previous) {
   return current.classPropertyName === previous.classPropertyName && current.bindingPropertyName === previous.bindingPropertyName;
@@ -7099,4 +7152,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-PHEKJMF2.js.map
+//# sourceMappingURL=chunk-P4OQTMU7.js.map

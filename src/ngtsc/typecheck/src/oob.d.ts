@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BindingPipe, PropertyWrite, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstReference, TmplAstVariable } from '@angular/compiler';
+import { BindingPipe, PropertyWrite, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import { ClassDeclaration } from '../../reflection';
 import { TemplateDiagnostic, TemplateId } from '../api';
 import { TemplateSourceResolver } from './tcb_util';
@@ -59,6 +59,8 @@ export interface OutOfBandDiagnosticRecorder {
      * Reports a split two way binding error message.
      */
     splitTwoWayBinding(templateId: TemplateId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
+    /** Reports required inputs that haven't been bound. */
+    missingRequiredInputs(templateId: TemplateId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -78,4 +80,5 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     requiresInlineTypeConstructors(templateId: TemplateId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
     suboptimalTypeInference(templateId: TemplateId, variables: TmplAstVariable[]): void;
     splitTwoWayBinding(templateId: TemplateId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
+    missingRequiredInputs(templateId: TemplateId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
 }
