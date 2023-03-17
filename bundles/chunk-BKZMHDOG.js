@@ -8,7 +8,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-6PDKXFWN.js";
+} from "./chunk-WWVESPME.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.mjs
 var FatalLinkerError = class extends Error {
@@ -355,13 +355,13 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl) {
 }
 function toInputMapping(value, key) {
   if (value.isString()) {
-    return { bindingPropertyName: value.getString(), classPropertyName: key };
+    return { bindingPropertyName: value.getString(), classPropertyName: key, required: false };
   }
   const values = value.getArray().map((innerValue) => innerValue.getString());
   if (values.length !== 2) {
     throw new FatalLinkerError(value.expression, "Unsupported input, expected a string or an array containing exactly two strings");
   }
-  return { bindingPropertyName: values[0], classPropertyName: values[1] };
+  return { bindingPropertyName: values[0], classPropertyName: values[1], required: false };
 }
 function toHostMetadata(metaObj) {
   if (!metaObj.has("host")) {
@@ -848,7 +848,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "16.0.0-next.3+sha-9636910");
+  const LATEST_VERSION_RANGE = getRange("<=", "16.0.0-next.3+sha-13dd614");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -895,7 +895,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "16.0.0-next.3+sha-9636910") {
+    if (version === "16.0.0-next.3+sha-13dd614") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -1026,4 +1026,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-EL2BCWSO.js.map
+//# sourceMappingURL=chunk-BKZMHDOG.js.map
