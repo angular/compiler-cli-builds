@@ -82,6 +82,11 @@ export declare enum ErrorCode {
      * binding to a pre-existing binding's public name.
      */
     HOST_DIRECTIVE_CONFLICTING_ALIAS = 2018,
+    /**
+     * Raised when a host directive definition doesn't expose a
+     * required binding from the host directive.
+     */
+    HOST_DIRECTIVE_MISSING_REQUIRED_BINDING = 2019,
     SYMBOL_NOT_EXPORTED = 3001,
     /**
      * Raised when a relationship between directives and/or pipes would cause a cyclic import to be
@@ -199,6 +204,10 @@ export declare enum ErrorCode {
      * in which the input and output are going to different places.
      */
     SPLIT_TWO_WAY_BINDING = 8007,
+    /**
+     * A directive usage isn't binding to one or more required inputs.
+     */
+    MISSING_REQUIRED_INPUTS = 8008,
     /**
      * A two way binding in a template has an incorrect syntax,
      * parentheses outside brackets. For example:
