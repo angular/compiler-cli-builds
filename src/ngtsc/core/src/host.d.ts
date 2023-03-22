@@ -19,8 +19,6 @@ import { ExtendedTsCompilerHost, NgCompilerAdapter, NgCompilerOptions, UnifiedMo
  */
 export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<ExtendedTsCompilerHost>, 'getSourceFile' | 'fileExists'> {
     protected delegate: ExtendedTsCompilerHost;
-    constructor(delegate: ExtendedTsCompilerHost);
-    private delegateMethod;
     createHash: ((data: string) => string) | undefined;
     directoryExists: ((directoryName: string) => boolean) | undefined;
     fileNameToModuleName: ((importedFilePath: string, containingFilePath: string) => string) | undefined;
@@ -50,6 +48,8 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     hasInvalidatedResolutions: ((filePath: ts.Path) => boolean) | undefined;
     resolveModuleNameLiterals: ((moduleLiterals: readonly ts.StringLiteralLike[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile, reusedNames: readonly ts.StringLiteralLike[] | undefined) => readonly ts.ResolvedModuleWithFailedLookupLocations[]) | undefined;
     resolveTypeReferenceDirectiveReferences: (<T extends string | ts.FileReference>(typeDirectiveReferences: readonly T[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile | undefined, reusedNames: readonly T[] | undefined) => readonly ts.ResolvedTypeReferenceDirectiveWithFailedLookupLocations[]) | undefined;
+    constructor(delegate: ExtendedTsCompilerHost);
+    private delegateMethod;
 }
 /**
  * A wrapper around `ts.CompilerHost` (plus any extension methods from `ExtendedTsCompilerHost`).
