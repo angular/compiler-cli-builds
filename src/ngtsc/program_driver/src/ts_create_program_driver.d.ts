@@ -18,6 +18,8 @@ import { FileUpdate, ProgramDriver, UpdateMode } from './api';
  */
 export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<ts.CompilerHost>, 'getSourceFile' | 'fileExists' | 'writeFile'> {
     protected delegate: ts.CompilerHost;
+    constructor(delegate: ts.CompilerHost);
+    private delegateMethod;
     createHash: ((data: string) => string) | undefined;
     directoryExists: ((directoryName: string) => boolean) | undefined;
     getCancellationToken: (() => ts.CancellationToken) | undefined;
@@ -41,8 +43,6 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     hasInvalidatedResolutions: ((filePath: ts.Path) => boolean) | undefined;
     resolveModuleNameLiterals: ((moduleLiterals: readonly ts.StringLiteralLike[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile, reusedNames: readonly ts.StringLiteralLike[] | undefined) => readonly ts.ResolvedModuleWithFailedLookupLocations[]) | undefined;
     resolveTypeReferenceDirectiveReferences: (<T extends string | ts.FileReference>(typeDirectiveReferences: readonly T[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile | undefined, reusedNames: readonly T[] | undefined) => readonly ts.ResolvedTypeReferenceDirectiveWithFailedLookupLocations[]) | undefined;
-    constructor(delegate: ts.CompilerHost);
-    private delegateMethod;
 }
 /**
  * Updates a `ts.Program` instance with a new one that incorporates specific changes, using the
