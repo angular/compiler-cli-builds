@@ -35,7 +35,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-4TZUPGBE.js";
+} from "./chunk-CRF27U5E.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -44,7 +44,7 @@ import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-WWVESPME.js";
+} from "./chunk-7GPHN444.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -82,14 +82,14 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-UZSESMCH.js";
+} from "./chunk-4J2XFBXP.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-N6MSUQVH.js";
+} from "./chunk-7PCPPTTO.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -861,8 +861,8 @@ var TsCreateProgramDriver = class {
     this.options = options;
     this.shimExtensionPrefixes = shimExtensionPrefixes;
     this.sfMap = /* @__PURE__ */ new Map();
-    this.program = this.originalProgram;
     this.supportsInlineOperations = true;
+    this.program = this.originalProgram;
   }
   getProgram() {
     return this.program;
@@ -3288,9 +3288,9 @@ var AstTranslator = class {
     return tsCastToAny(ts22.factory.createCallExpression(ts22.factory.createNonNullExpression(expr), void 0, args));
   }
 };
-var VeSafeLhsInferenceBugDetector = class {
+var _VeSafeLhsInferenceBugDetector = class {
   static veWillInferAnyFor(ast) {
-    const visitor = VeSafeLhsInferenceBugDetector.SINGLETON;
+    const visitor = _VeSafeLhsInferenceBugDetector.SINGLETON;
     return ast instanceof Call ? ast.visit(visitor) : ast.receiver.visit(visitor);
   }
   visitUnary(ast) {
@@ -3357,7 +3357,10 @@ var VeSafeLhsInferenceBugDetector = class {
     return false;
   }
 };
-VeSafeLhsInferenceBugDetector.SINGLETON = new VeSafeLhsInferenceBugDetector();
+var VeSafeLhsInferenceBugDetector = _VeSafeLhsInferenceBugDetector;
+(() => {
+  _VeSafeLhsInferenceBugDetector.SINGLETON = new _VeSafeLhsInferenceBugDetector();
+})();
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/template_semantics.mjs
 import { ImplicitReceiver as ImplicitReceiver3, RecursiveAstVisitor as RecursiveAstVisitor2, TmplAstVariable } from "@angular/compiler";
@@ -7747,4 +7750,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-J5XCN5DY.js.map
+//# sourceMappingURL=chunk-BDV725D5.js.map

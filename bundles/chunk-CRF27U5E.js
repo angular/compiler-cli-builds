@@ -18,7 +18,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-WWVESPME.js";
+} from "./chunk-7GPHN444.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -35,11 +35,11 @@ import {
   makeRelatedInformation,
   nodeDebugInfo,
   nodeNameForError
-} from "./chunk-UZSESMCH.js";
+} from "./chunk-4J2XFBXP.js";
 import {
   PerfEvent,
   PerfPhase
-} from "./chunk-N6MSUQVH.js";
+} from "./chunk-7PCPPTTO.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -6085,13 +6085,13 @@ var ComponentDecoratorHandler = class {
     this.elementSchemaRegistry = new DomElementSchemaRegistry();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
     this.preanalyzeStylesCache = /* @__PURE__ */ new Map();
+    this.precedence = HandlerPrecedence.PRIMARY;
+    this.name = ComponentDecoratorHandler.name;
     this.extractTemplateOptions = {
       enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
       i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
       usePoisonedData: this.usePoisonedData
     };
-    this.precedence = HandlerPrecedence.PRIMARY;
-    this.name = ComponentDecoratorHandler.name;
   }
   detect(node, decorators) {
     if (!decorators) {
@@ -7152,4 +7152,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4TZUPGBE.js.map
+//# sourceMappingURL=chunk-CRF27U5E.js.map
