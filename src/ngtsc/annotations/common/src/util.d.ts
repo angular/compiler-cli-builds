@@ -20,7 +20,7 @@ import { CompileResult } from '../../../transform';
  */
 export declare function valueReferenceToExpression(valueRef: LocalTypeValueReference | ImportedTypeValueReference): Expression;
 export declare function valueReferenceToExpression(valueRef: TypeValueReference): Expression | null;
-export declare function toR3Reference(origin: ts.Node, valueRef: Reference, typeRef: Reference, valueContext: ts.SourceFile, typeContext: ts.SourceFile, refEmitter: ReferenceEmitter): R3Reference;
+export declare function toR3Reference(origin: ts.Node, ref: Reference, context: ts.SourceFile, refEmitter: ReferenceEmitter): R3Reference;
 export declare function isAngularCore(decorator: Decorator): decorator is Decorator & {
     import: Import;
 };
@@ -82,7 +82,7 @@ export declare function resolveProvidersRequiringFactory(rawProviders: ts.Expres
  * Create an R3Reference for a class.
  *
  * The `value` is the exported declaration of the class from its source file.
- * The `type` is an expression that would be used by ngcc in the typings (.d.ts) files.
+ * The `type` is an expression that would be used in the typings (.d.ts) files.
  */
 export declare function wrapTypeReference(reflector: ReflectionHost, clazz: ClassDeclaration): R3Reference;
 /** Creates a ParseSourceSpan for a TypeScript node. */

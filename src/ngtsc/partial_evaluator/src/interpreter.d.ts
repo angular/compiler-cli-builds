@@ -46,7 +46,6 @@ export declare class StaticInterpreter {
     private visitElementAccessExpression;
     private visitPropertyAccessExpression;
     private visitSourceFile;
-    private visitAmbiguousDeclaration;
     private accessHelper;
     private visitCallExpression;
     /**
@@ -65,7 +64,6 @@ export declare class StaticInterpreter {
     private visitSpreadElement;
     private visitBindingElement;
     private stringNameFromPropertyName;
-    private getResolvedEnum;
     private getReference;
     private visitType;
     private visitTupleType;

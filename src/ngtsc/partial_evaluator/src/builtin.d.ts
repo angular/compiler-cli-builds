@@ -22,6 +22,3 @@ export declare class StringConcatBuiltinFn extends KnownFn {
     constructor(lhs: string);
     evaluate(node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
 }
-export declare class ObjectAssignBuiltinFn extends KnownFn {
-    evaluate(node: ts.CallExpression, args: ResolvedValueArray): ResolvedValue;
-}

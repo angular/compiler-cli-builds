@@ -8,15 +8,6 @@ import ts4 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/host.mjs
 import ts from "typescript";
-var Decorator = {
-  nodeForError: (decorator) => {
-    if (decorator.node !== null) {
-      return decorator.node;
-    } else {
-      return decorator.synthesizedFor;
-    }
-  }
-};
 function isDecoratorIdentifier(exp) {
   return ts.isIdentifier(exp) || ts.isPropertyAccessExpression(exp) && ts.isIdentifier(exp.expression) && ts.isIdentifier(exp.name);
 }
@@ -28,18 +19,6 @@ var ClassMemberKind;
   ClassMemberKind2[ClassMemberKind2["Property"] = 3] = "Property";
   ClassMemberKind2[ClassMemberKind2["Method"] = 4] = "Method";
 })(ClassMemberKind || (ClassMemberKind = {}));
-var KnownDeclaration;
-(function(KnownDeclaration2) {
-  KnownDeclaration2[KnownDeclaration2["JsGlobalObject"] = 0] = "JsGlobalObject";
-  KnownDeclaration2[KnownDeclaration2["TsHelperAssign"] = 1] = "TsHelperAssign";
-  KnownDeclaration2[KnownDeclaration2["TsHelperSpread"] = 2] = "TsHelperSpread";
-  KnownDeclaration2[KnownDeclaration2["TsHelperSpreadArrays"] = 3] = "TsHelperSpreadArrays";
-  KnownDeclaration2[KnownDeclaration2["TsHelperSpreadArray"] = 4] = "TsHelperSpreadArray";
-  KnownDeclaration2[KnownDeclaration2["TsHelperRead"] = 5] = "TsHelperRead";
-})(KnownDeclaration || (KnownDeclaration = {}));
-function isConcreteDeclaration(decl) {
-  return decl.kind === 0;
-}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/type_to_value.mjs
 import ts2 from "typescript";
@@ -336,15 +315,6 @@ var TypeScriptReflectionHost = class {
   getVariableValue(declaration) {
     return declaration.initializer || null;
   }
-  getDtsDeclaration(_) {
-    return null;
-  }
-  getInternalNameOfClass(clazz) {
-    return clazz.name;
-  }
-  getAdjacentNameOfClass(clazz) {
-    return clazz.name;
-  }
   isStaticallyExported(decl) {
     let topLevel = decl;
     if (ts4.isVariableDeclaration(decl) && ts4.isVariableDeclarationList(decl.parent)) {
@@ -428,18 +398,12 @@ var TypeScriptReflectionHost = class {
     if (symbol.valueDeclaration !== void 0) {
       return {
         node: symbol.valueDeclaration,
-        known: null,
-        viaModule,
-        identity: null,
-        kind: 0
+        viaModule
       };
     } else if (symbol.declarations !== void 0 && symbol.declarations.length > 0) {
       return {
         node: symbol.declarations[0],
-        known: null,
-        viaModule,
-        identity: null,
-        kind: 0
+        viaModule
       };
     } else {
       return null;
@@ -653,10 +617,7 @@ function getExportedName(decl, originalId) {
 var LocalExportedDeclarations = Symbol("LocalExportedDeclarations");
 
 export {
-  Decorator,
   ClassMemberKind,
-  KnownDeclaration,
-  isConcreteDeclaration,
   typeNodeToValueExpr,
   isNamedClassDeclaration,
   TypeScriptReflectionHost,
@@ -671,4 +632,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QQGJEWBQ.js.map
+//# sourceMappingURL=chunk-4UQC5DMJ.js.map

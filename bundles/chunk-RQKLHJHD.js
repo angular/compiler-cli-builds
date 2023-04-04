@@ -4,15 +4,12 @@
     
 import {
   ClassMemberKind,
-  Decorator,
-  KnownDeclaration,
   filterToMembersWithDecorator,
-  isConcreteDeclaration,
   isNamedClassDeclaration,
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-QQGJEWBQ.js";
+} from "./chunk-4UQC5DMJ.js";
 import {
   ImportManager,
   translateExpression,
@@ -68,10 +65,10 @@ function valueReferenceToExpression(valueRef) {
     return importExpr;
   }
 }
-function toR3Reference(origin, valueRef, typeRef, valueContext, typeContext, refEmitter) {
-  const emittedValueRef = refEmitter.emit(valueRef, valueContext);
+function toR3Reference(origin, ref, context, refEmitter) {
+  const emittedValueRef = refEmitter.emit(ref, context);
   assertSuccessfulReferenceEmit(emittedValueRef, origin, "class");
-  const emittedTypeRef = refEmitter.emit(typeRef, typeContext, ImportFlags.ForceNewImport | ImportFlags.AllowTypeImports);
+  const emittedTypeRef = refEmitter.emit(ref, context, ImportFlags.ForceNewImport | ImportFlags.AllowTypeImports);
   assertSuccessfulReferenceEmit(emittedTypeRef, origin, "class");
   return {
     value: emittedValueRef.expression,
@@ -225,9 +222,8 @@ function resolveProvidersRequiringFactory(rawProviders, reflector, evaluator) {
   return providers;
 }
 function wrapTypeReference(reflector, clazz) {
-  const dtsClass = reflector.getDtsDeclaration(clazz);
   const value = new WrappedNodeExpr(clazz.name);
-  const type = dtsClass !== null && isNamedClassDeclaration(dtsClass) ? new WrappedNodeExpr(dtsClass.name) : value;
+  const type = value;
   return { value, type };
 }
 function createSourceSpan(node) {
@@ -257,7 +253,6 @@ function toFactoryMetadata(meta, target) {
   return {
     name: meta.name,
     type: meta.type,
-    internalType: meta.internalType,
     typeArgumentCount: meta.typeArgumentCount,
     deps: meta.deps,
     target
@@ -459,102 +454,6 @@ var StringConcatBuiltinFn = class extends KnownFn {
     return result;
   }
 };
-var ObjectAssignBuiltinFn = class extends KnownFn {
-  evaluate(node, args) {
-    if (args.length === 0) {
-      return DynamicValue.fromUnsupportedSyntax(node);
-    }
-    for (const arg of args) {
-      if (arg instanceof DynamicValue) {
-        return DynamicValue.fromDynamicInput(node, arg);
-      } else if (!(arg instanceof Map)) {
-        return DynamicValue.fromUnsupportedSyntax(node);
-      }
-    }
-    const [target, ...sources] = args;
-    for (const source of sources) {
-      source.forEach((value, key) => target.set(key, value));
-    }
-    return target;
-  }
-};
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/ts_helpers.mjs
-var AssignHelperFn = class extends ObjectAssignBuiltinFn {
-};
-var SpreadHelperFn = class extends KnownFn {
-  evaluate(node, args) {
-    const result = [];
-    for (const arg of args) {
-      if (arg instanceof DynamicValue) {
-        result.push(DynamicValue.fromDynamicInput(node, arg));
-      } else if (Array.isArray(arg)) {
-        result.push(...arg);
-      } else {
-        result.push(arg);
-      }
-    }
-    return result;
-  }
-};
-var SpreadArrayHelperFn = class extends KnownFn {
-  evaluate(node, args) {
-    if (args.length !== 2 && args.length !== 3) {
-      return DynamicValue.fromUnknown(node);
-    }
-    const [to, from] = args;
-    if (to instanceof DynamicValue) {
-      return DynamicValue.fromDynamicInput(node, to);
-    } else if (from instanceof DynamicValue) {
-      return DynamicValue.fromDynamicInput(node, from);
-    }
-    if (!Array.isArray(to)) {
-      return DynamicValue.fromInvalidExpressionType(node, to);
-    } else if (!Array.isArray(from)) {
-      return DynamicValue.fromInvalidExpressionType(node, from);
-    }
-    return to.concat(from);
-  }
-};
-var ReadHelperFn = class extends KnownFn {
-  evaluate(node, args) {
-    if (args.length !== 1) {
-      return DynamicValue.fromUnknown(node);
-    }
-    const [value] = args;
-    if (value instanceof DynamicValue) {
-      return DynamicValue.fromDynamicInput(node, value);
-    }
-    if (!Array.isArray(value)) {
-      return DynamicValue.fromInvalidExpressionType(node, value);
-    }
-    return value;
-  }
-};
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/known_declaration.mjs
-var jsGlobalObjectValue = /* @__PURE__ */ new Map([["assign", new ObjectAssignBuiltinFn()]]);
-var assignTsHelperFn = new AssignHelperFn();
-var spreadTsHelperFn = new SpreadHelperFn();
-var spreadArrayTsHelperFn = new SpreadArrayHelperFn();
-var readTsHelperFn = new ReadHelperFn();
-function resolveKnownDeclaration(decl) {
-  switch (decl) {
-    case KnownDeclaration.JsGlobalObject:
-      return jsGlobalObjectValue;
-    case KnownDeclaration.TsHelperAssign:
-      return assignTsHelperFn;
-    case KnownDeclaration.TsHelperSpread:
-    case KnownDeclaration.TsHelperSpreadArrays:
-      return spreadTsHelperFn;
-    case KnownDeclaration.TsHelperSpreadArray:
-      return spreadArrayTsHelperFn;
-    case KnownDeclaration.TsHelperRead:
-      return readTsHelperFn;
-    default:
-      throw new Error(`Cannot resolve known declaration. Received: ${KnownDeclaration[decl]}.`);
-  }
-}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/synthetic.mjs
 var SyntheticValue = class {
@@ -729,13 +628,8 @@ var StaticInterpreter = class {
         return DynamicValue.fromUnknownIdentifier(node);
       }
     }
-    if (decl.known !== null) {
-      return resolveKnownDeclaration(decl.known);
-    } else if (isConcreteDeclaration(decl) && decl.identity !== null && decl.identity.kind === 0) {
-      return this.getResolvedEnum(decl.node, decl.identity.enumMembers, context);
-    }
     const declContext = { ...context, ...joinModuleContext(context, node, decl) };
-    const result = this.visitAmbiguousDeclaration(decl, declContext);
+    const result = this.visitDeclaration(decl.node, declContext);
     if (result instanceof Reference) {
       if (!result.synthetic) {
         result.addIdentifier(node);
@@ -823,18 +717,12 @@ var StaticInterpreter = class {
       return DynamicValue.fromUnknown(node);
     }
     return new ResolvedModule(declarations, (decl) => {
-      if (decl.known !== null) {
-        return resolveKnownDeclaration(decl.known);
-      }
       const declContext = {
         ...context,
         ...joinModuleContext(context, node, decl)
       };
-      return this.visitAmbiguousDeclaration(decl, declContext);
+      return this.visitDeclaration(decl.node, declContext);
     });
-  }
-  visitAmbiguousDeclaration(decl, declContext) {
-    return decl.kind === 1 && decl.implementation !== void 0 && !isDeclaration(decl.implementation) ? this.visitExpression(decl.implementation, declContext) : this.visitDeclaration(decl.node, declContext);
   }
   accessHelper(node, lhs, rhs, context) {
     const strIndex = `${rhs}`;
@@ -1066,18 +954,6 @@ var StaticInterpreter = class {
       return void 0;
     }
   }
-  getResolvedEnum(node, enumMembers, context) {
-    const enumRef = this.getReference(node, context);
-    const map = /* @__PURE__ */ new Map();
-    enumMembers.forEach((member) => {
-      const name = this.stringNameFromPropertyName(member.name, context);
-      if (name !== void 0) {
-        const resolved = this.visit(member.initializer, context);
-        map.set(name, new EnumValue(enumRef, name, resolved));
-      }
-    });
-    return map;
-  }
   getReference(node, context) {
     return new Reference(node, owningModule(context));
   }
@@ -1111,7 +987,7 @@ var StaticInterpreter = class {
       return DynamicValue.fromUnknownIdentifier(node.exprName);
     }
     const declContext = { ...context, ...joinModuleContext(context, node, decl) };
-    return this.visitAmbiguousDeclaration(decl, declContext);
+    return this.visitDeclaration(decl.node, declContext);
   }
 };
 function isFunctionOrMethodReference(ref) {
@@ -1336,7 +1212,7 @@ function getConstructorDependencies(clazz, reflector, isCore) {
       const name = isCore || dec.import === null ? dec.name : dec.import.name;
       if (name === "Inject") {
         if (dec.args === null || dec.args.length !== 1) {
-          throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(dec), `Unexpected number of arguments to @Inject().`);
+          throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, dec.node, `Unexpected number of arguments to @Inject().`);
         }
         token = new WrappedNodeExpr2(dec.args[0]);
       } else if (name === "Optional") {
@@ -1349,7 +1225,7 @@ function getConstructorDependencies(clazz, reflector, isCore) {
         host = true;
       } else if (name === "Attribute") {
         if (dec.args === null || dec.args.length !== 1) {
-          throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(dec), `Unexpected number of arguments to @Attribute().`);
+          throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, dec.node, `Unexpected number of arguments to @Attribute().`);
         }
         const attributeName = dec.args[0];
         token = new WrappedNodeExpr2(attributeName);
@@ -1359,7 +1235,7 @@ function getConstructorDependencies(clazz, reflector, isCore) {
           attributeNameType = new WrappedNodeExpr2(ts4.factory.createKeywordTypeNode(ts4.SyntaxKind.UnknownKeyword));
         }
       } else {
-        throw new FatalDiagnosticError(ErrorCode.DECORATOR_UNEXPECTED, Decorator.nodeForError(dec), `Unexpected decorator ${name} on parameter.`);
+        throw new FatalDiagnosticError(ErrorCode.DECORATOR_UNEXPECTED, dec.node, `Unexpected decorator ${name} on parameter.`);
       }
     });
     if (token === null) {
@@ -2365,7 +2241,7 @@ function resolveLiteral(decorator, literalCache) {
     return literalCache.get(decorator);
   }
   if (decorator.args === null || decorator.args.length !== 1) {
-    throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `Incorrect number of arguments to @${decorator.name} decorator`);
+    throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `Incorrect number of arguments to @${decorator.name} decorator`);
   }
   const meta = unwrapExpression(decorator.args[0]);
   if (!ts8.isObjectLiteralExpression(meta)) {
@@ -2419,7 +2295,7 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
   if (!reflection.isClass(clazz)) {
     return null;
   }
-  const id = reflection.getAdjacentNameOfClass(clazz);
+  const id = clazz.name;
   const classDecorators = reflection.getDecoratorsOfDeclaration(clazz);
   if (classDecorators === null) {
     return null;
@@ -3210,9 +3086,9 @@ function invalidRef(decl, rawExpr, type) {
     const annotationType = type === "import" ? "@NgModule" : "Angular";
     relatedMessage = `Is it missing an ${annotationType} annotation?`;
   } else if (sf.fileName.indexOf("node_modules") !== -1) {
-    relatedMessage = `This likely means that the library${library} which declares ${decl.debugName} has not been processed correctly by ngcc, or is not compatible with Angular Ivy. Check if a newer version of the library is available, and update if so. Also consider checking with the library's authors to see if the library is expected to be compatible with Ivy.`;
+    relatedMessage = `This likely means that the library${library} which declares ${decl.debugName} is not compatible with Angular Ivy. Check if a newer version of the library is available, and update if so. Also consider checking with the library's authors to see if the library is expected to be compatible with Ivy.`;
   } else {
-    relatedMessage = `This likely means that the dependency${library} which declares ${decl.debugName} has not been processed correctly by ngcc.`;
+    relatedMessage = `This likely means that the dependency${library} which declares ${decl.debugName} is not compatible with Angular Ivy.`;
   }
   return makeDiagnostic(code, getDiagnosticNode(decl, rawExpr), message, [makeRelatedInformation(decl.node.name, relatedMessage)]);
 }
@@ -3480,16 +3356,6 @@ var TraitCompiler = class {
     } else {
       return null;
     }
-  }
-  recordsFor(sf) {
-    if (!this.fileToClasses.has(sf)) {
-      return null;
-    }
-    const records = [];
-    for (const clazz of this.fileToClasses.get(sf)) {
-      records.push(this.classes.get(clazz));
-    }
-    return records;
   }
   getAnalyzedRecords() {
     const result = /* @__PURE__ */ new Map();
@@ -4332,7 +4198,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   if (decorator === null || decorator.args === null || decorator.args.length === 0) {
     directive = /* @__PURE__ */ new Map();
   } else if (decorator.args.length !== 1) {
-    throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `Incorrect number of arguments to @${decorator.name} decorator`);
+    throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `Incorrect number of arguments to @${decorator.name} decorator`);
   } else {
     const meta = unwrapExpression(decorator.args[0]);
     if (!ts20.isObjectLiteralExpression(meta)) {
@@ -4402,7 +4268,6 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const usesInheritance = reflector.hasBaseClass(clazz);
   const sourceFile = clazz.getSourceFile();
   const type = wrapTypeReference(reflector, clazz);
-  const internalType = new WrappedNodeExpr4(reflector.getInternalNameOfClass(clazz));
   const rawHostDirectives = directive.get("hostDirectives") || null;
   const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator);
   const metadata = {
@@ -4419,7 +4284,6 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
     selector,
     fullInheritance: !!(flags & HandlerFlags.FULL_INHERITANCE),
     type,
-    internalType,
     typeArgumentCount: reflector.getGenericArityOfClass(clazz) || 0,
     typeSourceSpan: createSourceSpan(clazz.name),
     usesInheritance,
@@ -4517,11 +4381,11 @@ function extractHostBindings(members, evaluator, coreModule, metadata) {
       let hostPropertyName = member.name;
       if (decorator.args !== null && decorator.args.length > 0) {
         if (decorator.args.length !== 1) {
-          throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `@HostBinding can have at most one argument, got ${decorator.args.length} argument(s)`);
+          throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `@HostBinding can have at most one argument, got ${decorator.args.length} argument(s)`);
         }
         const resolved = evaluator.evaluate(decorator.args[0]);
         if (typeof resolved !== "string") {
-          throw createValueHasWrongTypeError(Decorator.nodeForError(decorator), resolved, `@HostBinding's argument must be a string`);
+          throw createValueHasWrongTypeError(decorator.node, resolved, `@HostBinding's argument must be a string`);
         }
         hostPropertyName = resolved;
       }
@@ -4607,7 +4471,7 @@ function isStringArrayOrDie(value, name, node) {
 function queriesFromFields(fields, reflector, evaluator) {
   return fields.map(({ member, decorators }) => {
     const decorator = decorators[0];
-    const node = member.node || Decorator.nodeForError(decorator);
+    const node = member.node || decorator.node;
     if (member.decorators.some((v) => v.name === "Input")) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_COLLISION, node, "Cannot combine @Input decorators with query decorators");
     }
@@ -4641,7 +4505,7 @@ function parseDecoratedFields(fields, evaluator, callback) {
     const fieldName = field.member.name;
     for (const decorator of field.decorators) {
       if (decorator.args != null && decorator.args.length > 1) {
-        throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `@${decorator.name} can have at most one argument, got ${decorator.args.length} argument(s)`);
+        throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `@${decorator.name} can have at most one argument, got ${decorator.args.length} argument(s)`);
       }
       const value = decorator.args != null && decorator.args.length > 0 ? evaluator.evaluate(decorator.args[0]) : null;
       callback(fieldName, value, decorator);
@@ -4695,7 +4559,7 @@ function parseInputFields(inputMembers, evaluator) {
       bindingPropertyName = typeof aliasInConfig === "string" ? aliasInConfig : classPropertyName;
       required = options.get("required") === true;
     } else {
-      throw createValueHasWrongTypeError(Decorator.nodeForError(decorator), options, `@${decorator.name} decorator argument must resolve to a string or an object literal`);
+      throw createValueHasWrongTypeError(decorator.node, options, `@${decorator.name} decorator argument must resolve to a string or an object literal`);
     }
     inputs[classPropertyName] = { bindingPropertyName, classPropertyName, required };
   });
@@ -4709,7 +4573,7 @@ function parseOutputFields(outputMembers, evaluator) {
   const outputs = {};
   parseDecoratedFields(outputMembers, evaluator, (fieldName, bindingPropertyName, decorator) => {
     if (bindingPropertyName != null && typeof bindingPropertyName !== "string") {
-      throw createValueHasWrongTypeError(Decorator.nodeForError(decorator), bindingPropertyName, `@${decorator.name} decorator argument must resolve to a string`);
+      throw createValueHasWrongTypeError(decorator.node, bindingPropertyName, `@${decorator.name} decorator argument must resolve to a string`);
     }
     outputs[fieldName] = bindingPropertyName != null ? bindingPropertyName : fieldName;
   });
@@ -4781,7 +4645,7 @@ function parseHostDirectivesMapping(field, resolvedValue, classReference, source
 }
 function toHostDirectiveMetadata(hostDirective, context, refEmitter) {
   return {
-    directive: toR3Reference(hostDirective.directive.node, hostDirective.directive, hostDirective.directive, context, context, refEmitter),
+    directive: toR3Reference(hostDirective.directive.node, hostDirective.directive, context, refEmitter),
     isForwardReference: hostDirective.isForwardReference,
     inputs: hostDirective.inputs || null,
     outputs: hostDirective.outputs || null
@@ -4890,7 +4754,7 @@ var LIFECYCLE_HOOKS = /* @__PURE__ */ new Set([
   "ngAfterContentChecked"
 ]);
 var DirectiveDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, compileUndecoratedClassesWithAngularFeatures, perf) {
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -4902,7 +4766,6 @@ var DirectiveDecoratorHandler = class {
     this.strictCtorDeps = strictCtorDeps;
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
     this.annotateForClosureCompiler = annotateForClosureCompiler;
-    this.compileUndecoratedClassesWithAngularFeatures = compileUndecoratedClassesWithAngularFeatures;
     this.perf = perf;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = DirectiveDecoratorHandler.name;
@@ -4918,7 +4781,7 @@ var DirectiveDecoratorHandler = class {
   }
   analyze(node, decorator, flags = HandlerFlags.NONE) {
     var _a;
-    if (this.compileUndecoratedClassesWithAngularFeatures === false && decorator === null) {
+    if (decorator === null) {
       if (this.isCore) {
         return {};
       }
@@ -5180,7 +5043,7 @@ var NgModuleDecoratorHandler = class {
     this.perf.eventCount(PerfEvent.AnalyzeNgModule);
     const name = node.name.text;
     if (decorator.args === null || decorator.args.length > 1) {
-      throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), `Incorrect number of arguments to @NgModule decorator`);
+      throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `Incorrect number of arguments to @NgModule decorator`);
     }
     const meta = decorator.args.length === 1 ? unwrapExpression(decorator.args[0]) : ts22.factory.createObjectLiteralExpression([]);
     if (!ts22.isObjectLiteralExpression(meta)) {
@@ -5251,33 +5114,24 @@ var NgModuleDecoratorHandler = class {
       }
     }
     const valueContext = node.getSourceFile();
-    let typeContext = valueContext;
-    const typeNode = this.reflector.getDtsDeclaration(node);
-    if (typeNode !== null) {
-      typeContext = typeNode.getSourceFile();
-    }
     const exportedNodes = new Set(exportRefs.map((ref) => ref.node));
     const declarations = [];
     const exportedDeclarations = [];
-    const bootstrap = bootstrapRefs.map((bootstrap2) => this._toR3Reference(bootstrap2.getOriginForDiagnostics(meta, node.name), bootstrap2, valueContext, typeContext));
+    const bootstrap = bootstrapRefs.map((bootstrap2) => this._toR3Reference(bootstrap2.getOriginForDiagnostics(meta, node.name), bootstrap2, valueContext));
     for (const ref of declarationRefs) {
-      const decl = this._toR3Reference(ref.getOriginForDiagnostics(meta, node.name), ref, valueContext, typeContext);
+      const decl = this._toR3Reference(ref.getOriginForDiagnostics(meta, node.name), ref, valueContext);
       declarations.push(decl);
       if (exportedNodes.has(ref.node)) {
         exportedDeclarations.push(decl.type);
       }
     }
-    const imports = importRefs.map((imp) => this._toR3Reference(imp.getOriginForDiagnostics(meta, node.name), imp, valueContext, typeContext));
-    const exports = exportRefs.map((exp) => this._toR3Reference(exp.getOriginForDiagnostics(meta, node.name), exp, valueContext, typeContext));
+    const imports = importRefs.map((imp) => this._toR3Reference(imp.getOriginForDiagnostics(meta, node.name), imp, valueContext));
+    const exports = exportRefs.map((exp) => this._toR3Reference(exp.getOriginForDiagnostics(meta, node.name), exp, valueContext));
     const isForwardReference = (ref) => isExpressionForwardReference(ref.value, node.name, valueContext);
     const containsForwardDecls = bootstrap.some(isForwardReference) || declarations.some(isForwardReference) || imports.some(isForwardReference) || exports.some(isForwardReference);
     const type = wrapTypeReference(this.reflector, node);
-    const internalType = new WrappedNodeExpr6(this.reflector.getInternalNameOfClass(node));
-    const adjacentType = new WrappedNodeExpr6(this.reflector.getAdjacentNameOfClass(node));
     const ngModuleMetadata = {
       type,
-      internalType,
-      adjacentType,
       bootstrap,
       declarations,
       publicDeclarationTypes: this.onlyPublishPublicTypings ? exportedDeclarations : null,
@@ -5324,13 +5178,11 @@ var NgModuleDecoratorHandler = class {
     const injectorMetadata = {
       name,
       type,
-      internalType,
       providers: wrappedProviders
     };
     const factoryMetadata = {
       name,
       type,
-      internalType,
       typeArgumentCount: 0,
       deps: getValidConstructorDependencies(node, this.reflector, this.isCore),
       target: FactoryTarget2.NgModule
@@ -5529,16 +5381,11 @@ var NgModuleDecoratorHandler = class {
     ];
     return res;
   }
-  _toR3Reference(origin, valueRef, valueContext, typeContext) {
+  _toR3Reference(origin, valueRef, valueContext) {
     if (valueRef.hasOwningModuleGuess) {
-      return toR3Reference(origin, valueRef, valueRef, valueContext, valueContext, this.refEmitter);
+      return toR3Reference(origin, valueRef, valueContext, this.refEmitter);
     } else {
-      let typeRef = valueRef;
-      let typeNode = this.reflector.getDtsDeclaration(typeRef.node);
-      if (typeNode !== null && isNamedClassDeclaration(typeNode)) {
-        typeRef = new Reference(typeNode);
-      }
-      return toR3Reference(origin, valueRef, typeRef, valueContext, typeContext, this.refEmitter);
+      return toR3Reference(origin, valueRef, valueContext, this.refEmitter);
     }
   }
   isClassDeclarationReference(ref) {
@@ -5774,7 +5621,7 @@ function parseTemplateDeclaration(node, decorator, component, containingFile, ev
       resolvedTemplateUrl: containingFile
     };
   } else {
-    throw new FatalDiagnosticError(ErrorCode.COMPONENT_MISSING_TEMPLATE, Decorator.nodeForError(decorator), "component is missing a template");
+    throw new FatalDiagnosticError(ErrorCode.COMPONENT_MISSING_TEMPLATE, decorator.node, "component is missing a template");
   }
 }
 function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanalyzeTemplateCache, node, decorator, component, containingFile, defaultPreserveWhitespaces, options) {
@@ -6788,17 +6635,15 @@ var InjectableDecoratorHandler = class {
 function extractInjectableMetadata(clazz, decorator, reflector) {
   const name = clazz.name.text;
   const type = wrapTypeReference(reflector, clazz);
-  const internalType = new WrappedNodeExpr8(reflector.getInternalNameOfClass(clazz));
   const typeArgumentCount = reflector.getGenericArityOfClass(clazz) || 0;
   if (decorator.args === null) {
-    throw new FatalDiagnosticError(ErrorCode.DECORATOR_NOT_CALLED, Decorator.nodeForError(decorator), "@Injectable must be called");
+    throw new FatalDiagnosticError(ErrorCode.DECORATOR_NOT_CALLED, decorator.node, "@Injectable must be called");
   }
   if (decorator.args.length === 0) {
     return {
       name,
       type,
       typeArgumentCount,
-      internalType,
       providedIn: createMayBeForwardRefExpression2(new LiteralExpr3(null), 0)
     };
   } else if (decorator.args.length === 1) {
@@ -6816,7 +6661,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
       }
       deps = depsExpr.elements.map((dep) => getDep(dep, reflector));
     }
-    const result = { name, type, typeArgumentCount, internalType, providedIn };
+    const result = { name, type, typeArgumentCount, providedIn };
     if (meta.has("useValue")) {
       result.useValue = getProviderExpression(meta.get("useValue"), reflector);
     } else if (meta.has("useExisting")) {
@@ -6839,7 +6684,7 @@ function getProviderExpression(expression, reflector) {
 }
 function extractInjectableCtorDeps(clazz, meta, decorator, reflector, isCore, strictCtorDeps) {
   if (decorator.args === null) {
-    throw new FatalDiagnosticError(ErrorCode.DECORATOR_NOT_CALLED, Decorator.nodeForError(decorator), "@Injectable must be called");
+    throw new FatalDiagnosticError(ErrorCode.DECORATOR_NOT_CALLED, decorator.node, "@Injectable must be called");
   }
   let ctorDeps = null;
   if (decorator.args.length === 0) {
@@ -6914,7 +6759,7 @@ function getDep(dep, reflector) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/pipe.mjs
-import { compileClassMetadata as compileClassMetadata5, compileDeclareClassMetadata as compileDeclareClassMetadata5, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata5, compileDeclareClassMetadata as compileDeclareClassMetadata5, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5 } from "@angular/compiler";
 import ts26 from "typescript";
 var PipeSymbol = class extends SemanticSymbol {
   constructor(decl, name) {
@@ -6963,12 +6808,11 @@ var PipeDecoratorHandler = class {
     this.perf.eventCount(PerfEvent.AnalyzePipe);
     const name = clazz.name.text;
     const type = wrapTypeReference(this.reflector, clazz);
-    const internalType = new WrappedNodeExpr9(this.reflector.getInternalNameOfClass(clazz));
     if (decorator.args === null) {
-      throw new FatalDiagnosticError(ErrorCode.DECORATOR_NOT_CALLED, Decorator.nodeForError(decorator), `@Pipe must be called`);
+      throw new FatalDiagnosticError(ErrorCode.DECORATOR_NOT_CALLED, decorator.node, `@Pipe must be called`);
     }
     if (decorator.args.length !== 1) {
-      throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, Decorator.nodeForError(decorator), "@Pipe must have exactly one argument");
+      throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, "@Pipe must have exactly one argument");
     }
     const meta = unwrapExpression(decorator.args[0]);
     if (!ts26.isObjectLiteralExpression(meta)) {
@@ -7006,7 +6850,6 @@ var PipeDecoratorHandler = class {
         meta: {
           name,
           type,
-          internalType,
           typeArgumentCount: this.reflector.getGenericArityOfClass(clazz) || 0,
           pipeName,
           deps: getValidConstructorDependencies(clazz, this.reflector, this.isCore),
@@ -7152,4 +6995,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-SY7FDL66.js.map
+//# sourceMappingURL=chunk-RQKLHJHD.js.map

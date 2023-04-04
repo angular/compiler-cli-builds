@@ -333,7 +333,6 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl) {
     typeSourceSpan: createSourceSpan(typeExpr.getRange(), code, sourceUrl),
     type: wrapReference(typeExpr.getOpaque()),
     typeArgumentCount: 0,
-    internalType: metaObj.getOpaque("type"),
     deps: null,
     host: toHostMetadata(metaObj),
     inputs: metaObj.has("inputs") ? metaObj.getObject("inputs").toLiteral(toInputMapping) : {},
@@ -642,7 +641,6 @@ function toR3FactoryMeta(metaObj) {
   return {
     name: typeName,
     type: wrapReference(typeExpr.getOpaque()),
-    internalType: metaObj.getOpaque("type"),
     typeArgumentCount: 0,
     target: parseEnum(metaObj.getValue("target"), FactoryTarget),
     deps: getDependencies(metaObj, "deps")
@@ -679,7 +677,6 @@ function toR3InjectableMeta(metaObj) {
   const meta = {
     name: typeName,
     type: wrapReference(typeExpr.getOpaque()),
-    internalType: typeExpr.getOpaque(),
     typeArgumentCount: 0,
     providedIn: metaObj.has("providedIn") ? extractForwardRef(metaObj.getValue("providedIn")) : createMayBeForwardRefExpression2(o3.literal(null), 0)
   };
@@ -718,7 +715,6 @@ function toR3InjectorMeta(metaObj) {
   return {
     name: typeName,
     type: wrapReference(typeExpr.getOpaque()),
-    internalType: metaObj.getOpaque("type"),
     providers: metaObj.has("providers") ? metaObj.getOpaque("providers") : null,
     imports: metaObj.has("imports") ? metaObj.getArray("imports").map((i) => i.getOpaque()) : []
   };
@@ -739,8 +735,6 @@ function toR3NgModuleMeta(metaObj, supportJit) {
   const wrappedType = metaObj.getOpaque("type");
   const meta = {
     type: wrapReference(wrappedType),
-    internalType: wrappedType,
-    adjacentType: wrappedType,
     bootstrap: [],
     declarations: [],
     publicDeclarationTypes: null,
@@ -818,7 +812,6 @@ function toR3PipeMeta(metaObj) {
   return {
     name: typeName,
     type: wrapReference(typeExpr.getOpaque()),
-    internalType: metaObj.getOpaque("type"),
     typeArgumentCount: 0,
     deps: null,
     pipeName: metaObj.getString("name"),
@@ -848,7 +841,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "16.0.0-next.6+sha-61bedaf");
+  const LATEST_VERSION_RANGE = getRange("<=", "16.0.0-next.6+sha-6ca1a53");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -895,7 +888,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "16.0.0-next.6+sha-61bedaf") {
+    if (version === "16.0.0-next.6+sha-6ca1a53") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -1026,4 +1019,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-76ZWV2KR.js.map
+//# sourceMappingURL=chunk-SIHBKSBW.js.map

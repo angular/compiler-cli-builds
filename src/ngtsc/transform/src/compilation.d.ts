@@ -16,7 +16,7 @@ import { ClassDeclaration, DeclarationNode, Decorator, ReflectionHost } from '..
 import { ProgramTypeCheckAdapter, TypeCheckContext } from '../../typecheck/api';
 import { ExtendedTemplateChecker } from '../../typecheck/extended/api';
 import { Xi18nContext } from '../../xi18n';
-import { CompilationMode, CompileResult, DecoratorHandler, HandlerFlags } from './api';
+import { CompilationMode, CompileResult, DecoratorHandler } from './api';
 import { DtsTransformRegistry } from './declaration';
 import { PendingTrait, Trait } from './trait';
 /**
@@ -75,12 +75,12 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
      * Maps source files to any class declaration(s) within them which have been discovered to contain
      * Ivy traits.
      */
-    protected fileToClasses: Map<ts.SourceFile, Set<ClassDeclaration>>;
+    private fileToClasses;
     /**
      * Tracks which source files have been analyzed but did not contain any traits. This set allows
      * the compiler to skip analyzing these files in an incremental rebuild.
      */
-    protected filesWithoutTraits: Set<ts.SourceFile>;
+    private filesWithoutTraits;
     private reexportMap;
     private handlersByName;
     constructor(handlers: DecoratorHandler<unknown, unknown, SemanticSymbol | null, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord, unknown>, compileNonExportedClasses: boolean, compilationMode: CompilationMode, dtsTransforms: DtsTransformRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, sourceFileTypeIdentifier: SourceFileTypeIdentifier);
@@ -88,7 +88,6 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     private analyze;
     recordFor(clazz: ClassDeclaration): ClassRecord | null;
-    recordsFor(sf: ts.SourceFile): ClassRecord[] | null;
     getAnalyzedRecords(): Map<ts.SourceFile, ClassRecord[]>;
     /**
      * Import a `ClassRecord` from a previous compilation.
@@ -102,8 +101,8 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     private scanClassForTraits;
     protected detectTraits(clazz: ClassDeclaration, decorators: Decorator[] | null): PendingTrait<unknown, unknown, SemanticSymbol | null, unknown>[] | null;
     private makeSymbolForTrait;
-    protected analyzeClass(clazz: ClassDeclaration, preanalyzeQueue: Promise<void>[] | null): void;
-    protected analyzeTrait(clazz: ClassDeclaration, trait: Trait<unknown, unknown, SemanticSymbol | null, unknown>, flags?: HandlerFlags): void;
+    private analyzeClass;
+    private analyzeTrait;
     resolve(): void;
     /**
      * Generate type-checking code into the `TypeCheckContext` for any components within the given
