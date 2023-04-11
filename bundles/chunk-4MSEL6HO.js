@@ -3253,6 +3253,7 @@ var TraitImpl = class {
     this.resolution = null;
     this.analysisDiagnostics = null;
     this.resolveDiagnostics = null;
+    this.typeCheckDiagnostics = null;
     this.handler = handler;
     this.detected = detected;
   }
@@ -3272,6 +3273,7 @@ var TraitImpl = class {
     this.resolution = resolution;
     this.state = TraitState.Resolved;
     this.resolveDiagnostics = diagnostics;
+    this.typeCheckDiagnostics = null;
     return this;
   }
   toSkipped() {
@@ -3698,6 +3700,7 @@ var TraitCompiler = class {
     return decorators;
   }
   get diagnostics() {
+    var _a;
     const diagnostics = [];
     for (const clazz of this.classes.keys()) {
       const record = this.classes.get(clazz);
@@ -3708,8 +3711,8 @@ var TraitCompiler = class {
         if ((trait.state === TraitState.Analyzed || trait.state === TraitState.Resolved) && trait.analysisDiagnostics !== null) {
           diagnostics.push(...trait.analysisDiagnostics);
         }
-        if (trait.state === TraitState.Resolved && trait.resolveDiagnostics !== null) {
-          diagnostics.push(...trait.resolveDiagnostics);
+        if (trait.state === TraitState.Resolved) {
+          diagnostics.push(...(_a = trait.resolveDiagnostics) != null ? _a : []);
         }
       }
     }
@@ -4193,7 +4196,7 @@ var QUERY_TYPES = /* @__PURE__ */ new Set([
   "ViewChild",
   "ViewChildren"
 ]);
-function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmitter, isCore, flags, annotateForClosureCompiler, defaultSelector = null) {
+function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmitter, referencesRegistry, isCore, flags, annotateForClosureCompiler, defaultSelector = null) {
   let directive;
   if (decorator === null || decorator.args === null || decorator.args.length === 0) {
     directive = /* @__PURE__ */ new Map();
@@ -4270,6 +4273,9 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const type = wrapTypeReference(reflector, clazz);
   const rawHostDirectives = directive.get("hostDirectives") || null;
   const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator);
+  if (hostDirectives !== null) {
+    referencesRegistry.add(clazz, ...hostDirectives.map((hostDir) => hostDir.directive));
+  }
   const metadata = {
     name: clazz.name.text,
     deps: ctorDeps,
@@ -4754,7 +4760,7 @@ var LIFECYCLE_HOOKS = /* @__PURE__ */ new Set([
   "ngAfterContentChecked"
 ]);
 var DirectiveDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf) {
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -4762,6 +4768,7 @@ var DirectiveDecoratorHandler = class {
     this.metaReader = metaReader;
     this.injectableRegistry = injectableRegistry;
     this.refEmitter = refEmitter;
+    this.referencesRegistry = referencesRegistry;
     this.isCore = isCore;
     this.strictCtorDeps = strictCtorDeps;
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
@@ -4788,7 +4795,7 @@ var DirectiveDecoratorHandler = class {
       return { diagnostics: [getUndecoratedClassWithAngularFeaturesDiagnostic(node)] };
     }
     this.perf.eventCount(PerfEvent.AnalyzeDirective);
-    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.evaluator, this.refEmitter, this.isCore, flags, this.annotateForClosureCompiler);
+    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, flags, this.annotateForClosureCompiler);
     if (directiveResult === void 0) {
       return {};
     }
@@ -5899,7 +5906,7 @@ function isLikelyModuleWithProviders(value) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 var EMPTY_ARRAY2 = [];
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -5922,6 +5929,7 @@ var ComponentDecoratorHandler = class {
     this.cycleAnalyzer = cycleAnalyzer;
     this.cycleHandlingStrategy = cycleHandlingStrategy;
     this.refEmitter = refEmitter;
+    this.referencesRegistry = referencesRegistry;
     this.depTracker = depTracker;
     this.injectableRegistry = injectableRegistry;
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
@@ -6003,7 +6011,7 @@ var ComponentDecoratorHandler = class {
     this.literalCache.delete(decorator);
     let diagnostics;
     let isPoisoned = false;
-    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.evaluator, this.refEmitter, this.isCore, flags, this.annotateForClosureCompiler, this.elementSchemaRegistry.getDefaultComponentElementName());
+    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, flags, this.annotateForClosureCompiler, this.elementSchemaRegistry.getDefaultComponentElementName());
     if (directiveResult === void 0) {
       return {};
     }
@@ -6995,4 +7003,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RQKLHJHD.js.map
+//# sourceMappingURL=chunk-4MSEL6HO.js.map
