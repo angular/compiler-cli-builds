@@ -7,7 +7,7 @@ import {
   ImportGraph,
   isShim,
   readConfiguration
-} from "./chunk-RMPM4VAI.js";
+} from "./chunk-E3MCJFSW.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -32,7 +32,7 @@ import {
   TypeCheckScopeRegistry,
   forwardRefResolver,
   readBaseClass
-} from "./chunk-P5LISIUG.js";
+} from "./chunk-JEWI23RF.js";
 import {
   ClassMemberKind,
   KnownDeclaration,
@@ -3381,6 +3381,7 @@ var DecorationAnalyzer = class {
         this.cycleAnalyzer,
         0,
         this.refEmitter,
+        this.referencesRegistry,
         NOOP_DEPENDENCY_TRACKER,
         this.injectableRegistry,
         null,
@@ -3396,6 +3397,7 @@ var DecorationAnalyzer = class {
         this.fullMetaReader,
         this.injectableRegistry,
         this.refEmitter,
+        this.referencesRegistry,
         this.isCore,
         false,
         null,
@@ -5262,4 +5264,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-WN75SNW4.js.map
+//# sourceMappingURL=chunk-BGY2CNQJ.js.map
