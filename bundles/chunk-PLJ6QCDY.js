@@ -5566,12 +5566,7 @@ function checkCustomElementSelectorForErrors(selector) {
 import { DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, ParseSourceFile as ParseSourceFile2, parseTemplate } from "@angular/compiler";
 import ts23 from "typescript";
 function getTemplateDeclarationNodeForError(declaration) {
-  switch (declaration.isInline) {
-    case true:
-      return declaration.expression;
-    case false:
-      return declaration.templateUrlExpression;
-  }
+  return declaration.isInline ? declaration.expression : declaration.templateUrlExpression;
 }
 function extractTemplate(node, template, evaluator, depTracker, resourceLoader, options) {
   if (template.isInline) {
@@ -7094,4 +7089,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-WB6MZEWH.js.map
+//# sourceMappingURL=chunk-PLJ6QCDY.js.map
