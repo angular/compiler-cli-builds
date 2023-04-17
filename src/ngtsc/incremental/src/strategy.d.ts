@@ -8,16 +8,16 @@
 import ts from 'typescript';
 import { IncrementalState } from './state';
 /**
- * Strategy used to manage the association between a `ts.Program` and the `IncrementalState` which
+ * Strategy used to manage the association between a `ts.Program` and the `IncrementalDriver` which
  * represents the reusable Angular part of its compilation.
  */
 export interface IncrementalBuildStrategy {
     /**
-     * Determine the Angular `IncrementalState` for the given `ts.Program`, if one is available.
+     * Determine the Angular `IncrementalDriver` for the given `ts.Program`, if one is available.
      */
     getIncrementalState(program: ts.Program): IncrementalState | null;
     /**
-     * Associate the given `IncrementalState` with the given `ts.Program` and make it available to
+     * Associate the given `IncrementalDriver` with the given `ts.Program` and make it available to
      * future compilations.
      */
     setIncrementalState(driver: IncrementalState, program: ts.Program): void;
@@ -37,7 +37,7 @@ export declare class NoopIncrementalBuildStrategy implements IncrementalBuildStr
     toNextBuildStrategy(): IncrementalBuildStrategy;
 }
 /**
- * Tracks an `IncrementalState` within the strategy itself.
+ * Tracks an `IncrementalDriver` within the strategy itself.
  */
 export declare class TrackedIncrementalBuildStrategy implements IncrementalBuildStrategy {
     private state;
@@ -47,8 +47,8 @@ export declare class TrackedIncrementalBuildStrategy implements IncrementalBuild
     toNextBuildStrategy(): TrackedIncrementalBuildStrategy;
 }
 /**
- * Manages the `IncrementalState` associated with a `ts.Program` by monkey-patching it onto the
- * program under `SYM_INCREMENTAL_STATE`.
+ * Manages the `IncrementalDriver` associated with a `ts.Program` by monkey-patching it onto the
+ * program under `SYM_INCREMENTAL_DRIVER`.
  */
 export declare class PatchedProgramIncrementalBuildStrategy implements IncrementalBuildStrategy {
     getIncrementalState(program: ts.Program): IncrementalState | null;
