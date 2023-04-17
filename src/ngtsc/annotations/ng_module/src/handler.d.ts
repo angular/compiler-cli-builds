@@ -8,8 +8,8 @@
 import { Expression, R3ClassMetadata, R3FactoryMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../../imports';
-import { SemanticReference, SemanticSymbol } from '../../../incremental/semantic_graph';
-import { MetadataReader, MetadataRegistry } from '../../../metadata';
+import { SemanticDepGraphUpdater, SemanticReference, SemanticSymbol } from '../../../incremental/semantic_graph';
+import { ExportedProviderStatusResolver, MetadataReader, MetadataRegistry } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { PerfRecorder } from '../../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
@@ -43,11 +43,24 @@ export interface NgModuleResolution {
  * Represents an Angular NgModule.
  */
 export declare class NgModuleSymbol extends SemanticSymbol {
+    readonly hasProviders: boolean;
     private remotelyScopedComponents;
+    /**
+     * `SemanticSymbol`s of the transitive imports of this NgModule which came from imported
+     * standalone components.
+     *
+     * Standalone components are excluded/included in the `InjectorDef` emit output of the NgModule
+     * based on whether the compiler can prove that their transitive imports may contain exported
+     * providers, so a change in this set of symbols may affect the compilation output of this
+     * NgModule.
+     */
+    private transitiveImportsFromStandaloneComponents;
+    constructor(decl: ClassDeclaration, hasProviders: boolean);
     isPublicApiAffected(previousSymbol: SemanticSymbol): boolean;
     isEmitAffected(previousSymbol: SemanticSymbol): boolean;
     isTypeCheckApiAffected(previousSymbol: SemanticSymbol): boolean;
     addRemotelyScopedComponent(component: SemanticSymbol, usedDirectives: SemanticReference[], usedPipes: SemanticReference[]): void;
+    addTransitiveImportFromStandaloneComponent(importedSymbol: SemanticSymbol): void;
 }
 /**
  * Compiles @NgModule annotations to ngModuleDef fields.
@@ -59,18 +72,20 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     private metaRegistry;
     private scopeRegistry;
     private referencesRegistry;
+    private exportedProviderStatusResolver;
+    private semanticDepGraphUpdater;
     private isCore;
     private refEmitter;
     private annotateForClosureCompiler;
     private onlyPublishPublicTypings;
     private injectableRegistry;
     private perf;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, isCore: boolean, refEmitter: ReferenceEmitter, annotateForClosureCompiler: boolean, onlyPublishPublicTypings: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, exportedProviderStatusResolver: ExportedProviderStatusResolver, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, isCore: boolean, refEmitter: ReferenceEmitter, annotateForClosureCompiler: boolean, onlyPublishPublicTypings: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name: string;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<NgModuleAnalysis>;
-    symbol(node: ClassDeclaration): NgModuleSymbol;
+    symbol(node: ClassDeclaration, analysis: NgModuleAnalysis): NgModuleSymbol;
     register(node: ClassDeclaration, analysis: NgModuleAnalysis): void;
     resolve(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>): ResolveResult<NgModuleResolution>;
     compileFull(node: ClassDeclaration, { inj, mod, fac, classMetadata, declarations, remoteScopesMayRequireCycleProtection }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];

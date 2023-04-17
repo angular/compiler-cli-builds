@@ -147,13 +147,6 @@ export declare class NgCompiler {
     static fromTicket(ticket: CompilationTicket, adapter: NgCompilerAdapter): NgCompiler;
     private constructor();
     get perfRecorder(): ActivePerfRecorder;
-    /**
-     * Exposes the `IncrementalCompilation` under an old property name that the CLI uses, avoiding a
-     * chicken-and-egg problem with the rename to `incrementalCompilation`.
-     *
-     * TODO(alxhub): remove when the CLI uses the new name.
-     */
-    get incrementalDriver(): IncrementalCompilation;
     private updateWithChangedResources;
     /**
      * Get the resource dependencies of a file.
