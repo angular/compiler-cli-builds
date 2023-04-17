@@ -6577,9 +6577,6 @@ var NgCompiler = class {
   get perfRecorder() {
     return this.livePerfRecorder;
   }
-  get incrementalDriver() {
-    return this.incrementalCompilation;
-  }
   updateWithChangedResources(changedResources, perfRecorder) {
     this.livePerfRecorder = perfRecorder;
     this.delegatingPerfRecorder.target = perfRecorder;
@@ -7767,4 +7764,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-6IXTZ7YZ.js.map
+//# sourceMappingURL=chunk-QU2XS7DB.js.map
