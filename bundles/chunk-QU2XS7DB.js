@@ -13,6 +13,7 @@ import {
   DirectiveDecoratorHandler,
   DtsMetadataReader,
   DtsTransformRegistry,
+  ExportedProviderStatusResolver,
   HostDirectivesResolver,
   InjectableClassRegistry,
   InjectableDecoratorHandler,
@@ -35,7 +36,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-4MSEL6HO.js";
+} from "./chunk-WB6MZEWH.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -6576,9 +6577,6 @@ var NgCompiler = class {
   get perfRecorder() {
     return this.livePerfRecorder;
   }
-  get incrementalDriver() {
-    return this.incrementalCompilation;
-  }
   updateWithChangedResources(changedResources, perfRecorder) {
     this.livePerfRecorder = perfRecorder;
     this.delegatingPerfRecorder.target = perfRecorder;
@@ -6972,6 +6970,7 @@ var NgCompiler = class {
     const metaRegistry = new CompoundMetadataRegistry([localMetaRegistry, ngModuleScopeRegistry]);
     const injectableRegistry = new InjectableClassRegistry(reflector, isCore);
     const hostDirectivesResolver = new HostDirectivesResolver(metaReader);
+    const exportedProviderStatusResolver = new ExportedProviderStatusResolver(metaReader);
     const typeCheckScopeRegistry = new TypeCheckScopeRegistry(scopeReader, metaReader, hostDirectivesResolver);
     let referencesRegistry;
     let exportReferenceGraph = null;
@@ -6991,7 +6990,7 @@ var NgCompiler = class {
       new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder),
-      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, isCore, refEmitter, this.closureCompilerEnabled, (_a = this.options.onlyPublishPublicTypingsForNgModules) != null ? _a : false, injectableRegistry, this.delegatingPerfRecorder)
+      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_a = this.options.onlyPublishPublicTypingsForNgModules) != null ? _a : false, injectableRegistry, this.delegatingPerfRecorder)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
@@ -7765,4 +7764,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YGYAPJAN.js.map
+//# sourceMappingURL=chunk-QU2XS7DB.js.map

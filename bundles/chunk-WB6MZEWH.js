@@ -1638,7 +1638,8 @@ var DtsMetadataReader = class {
       rawDeclarations: null,
       rawImports: null,
       rawExports: null,
-      decorator: null
+      decorator: null,
+      mayDeclareProviders: true
     };
   }
   getDirectiveMetadata(ref) {
@@ -1679,7 +1680,8 @@ var DtsMetadataReader = class {
       isStandalone,
       imports: null,
       schemas: null,
-      decorator: null
+      decorator: null,
+      assumedToExportProviders: isComponent && isStandalone
     };
   }
   getPipeMetadata(ref) {
@@ -1958,6 +1960,50 @@ var ResourceRegistry = class {
       return /* @__PURE__ */ new Set();
     }
     return this.externalStyleToComponentsMap.get(styleUrl);
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/providers.mjs
+var ExportedProviderStatusResolver = class {
+  constructor(metaReader) {
+    this.metaReader = metaReader;
+    this.calculating = /* @__PURE__ */ new Set();
+  }
+  mayExportProviders(ref, dependencyCallback) {
+    var _a;
+    if (this.calculating.has(ref.node)) {
+      return false;
+    }
+    this.calculating.add(ref.node);
+    if (dependencyCallback !== void 0) {
+      dependencyCallback(ref);
+    }
+    try {
+      const dirMeta = this.metaReader.getDirectiveMetadata(ref);
+      if (dirMeta !== null) {
+        if (!dirMeta.isComponent || !dirMeta.isStandalone) {
+          return false;
+        }
+        if (dirMeta.assumedToExportProviders) {
+          return true;
+        }
+        return ((_a = dirMeta.imports) != null ? _a : []).some((importRef) => this.mayExportProviders(importRef, dependencyCallback));
+      }
+      const pipeMeta = this.metaReader.getPipeMetadata(ref);
+      if (pipeMeta !== null) {
+        return false;
+      }
+      const ngModuleMeta = this.metaReader.getNgModuleMetadata(ref);
+      if (ngModuleMeta !== null) {
+        if (ngModuleMeta.mayDeclareProviders) {
+          return true;
+        }
+        return ngModuleMeta.imports.some((importRef) => this.mayExportProviders(importRef, dependencyCallback));
+      }
+      return false;
+    } finally {
+      this.calculating.delete(ref.node);
+    }
   }
 };
 
@@ -4847,7 +4893,8 @@ var DirectiveDecoratorHandler = class {
       isStandalone: analysis.meta.isStandalone,
       imports: null,
       schemas: null,
-      decorator: analysis.decorator
+      decorator: analysis.decorator,
+      assumedToExportProviders: false
     });
     this.injectableRegistry.registerInjectable(node, {
       ctorDeps: analysis.meta.deps
@@ -4970,12 +5017,17 @@ function isResolvedModuleWithProviders(sv) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.mjs
 var NgModuleSymbol = class extends SemanticSymbol {
-  constructor() {
-    super(...arguments);
+  constructor(decl, hasProviders) {
+    super(decl);
+    this.hasProviders = hasProviders;
     this.remotelyScopedComponents = [];
+    this.transitiveImportsFromStandaloneComponents = /* @__PURE__ */ new Set();
   }
   isPublicApiAffected(previousSymbol) {
     if (!(previousSymbol instanceof NgModuleSymbol)) {
+      return true;
+    }
+    if (previousSymbol.hasProviders !== this.hasProviders) {
       return true;
     }
     return false;
@@ -5001,6 +5053,19 @@ var NgModuleSymbol = class extends SemanticSymbol {
         return true;
       }
     }
+    if (previousSymbol.transitiveImportsFromStandaloneComponents.size !== this.transitiveImportsFromStandaloneComponents.size) {
+      return true;
+    }
+    const previousImports = Array.from(previousSymbol.transitiveImportsFromStandaloneComponents);
+    for (const transitiveImport of this.transitiveImportsFromStandaloneComponents) {
+      const prevEntry = previousImports.find((prevEntry2) => isSymbolEqual(prevEntry2, transitiveImport));
+      if (prevEntry === void 0) {
+        return true;
+      }
+      if (transitiveImport.isPublicApiAffected(prevEntry)) {
+        return true;
+      }
+    }
     return false;
   }
   isTypeCheckApiAffected(previousSymbol) {
@@ -5012,15 +5077,20 @@ var NgModuleSymbol = class extends SemanticSymbol {
   addRemotelyScopedComponent(component, usedDirectives, usedPipes) {
     this.remotelyScopedComponents.push({ component, usedDirectives, usedPipes });
   }
+  addTransitiveImportFromStandaloneComponent(importedSymbol) {
+    this.transitiveImportsFromStandaloneComponents.add(importedSymbol);
+  }
 };
 var NgModuleDecoratorHandler = class {
-  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf) {
+  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaReader = metaReader;
     this.metaRegistry = metaRegistry;
     this.scopeRegistry = scopeRegistry;
     this.referencesRegistry = referencesRegistry;
+    this.exportedProviderStatusResolver = exportedProviderStatusResolver;
+    this.semanticDepGraphUpdater = semanticDepGraphUpdater;
     this.isCore = isCore;
     this.refEmitter = refEmitter;
     this.annotateForClosureCompiler = annotateForClosureCompiler;
@@ -5219,8 +5289,8 @@ var NgModuleDecoratorHandler = class {
       }
     };
   }
-  symbol(node) {
-    return new NgModuleSymbol(node);
+  symbol(node, analysis) {
+    return new NgModuleSymbol(node, analysis.providers !== null);
   }
   register(node, analysis) {
     this.metaRegistry.registerNgModuleMetadata({
@@ -5233,7 +5303,8 @@ var NgModuleDecoratorHandler = class {
       rawDeclarations: analysis.rawDeclarations,
       rawImports: analysis.rawImports,
       rawExports: analysis.rawExports,
-      decorator: analysis.decorator
+      decorator: analysis.decorator,
+      mayDeclareProviders: analysis.providers !== null
     });
     this.injectableRegistry.registerInjectable(node, {
       ctorDeps: analysis.fac.deps
@@ -5259,10 +5330,28 @@ var NgModuleDecoratorHandler = class {
         continue;
       }
       const refsToEmit = [];
+      let symbol = null;
+      if (this.semanticDepGraphUpdater !== null) {
+        const sym = this.semanticDepGraphUpdater.getSymbol(node);
+        if (sym instanceof NgModuleSymbol) {
+          symbol = sym;
+        }
+      }
       for (const ref of topLevelImport.resolvedReferences) {
         const dirMeta = this.metaReader.getDirectiveMetadata(ref);
-        if (dirMeta !== null && !dirMeta.isComponent) {
-          continue;
+        if (dirMeta !== null) {
+          if (!dirMeta.isComponent) {
+            continue;
+          }
+          const mayExportProviders = this.exportedProviderStatusResolver.mayExportProviders(dirMeta.ref, (importRef) => {
+            if (symbol !== null && this.semanticDepGraphUpdater !== null) {
+              const importSymbol = this.semanticDepGraphUpdater.getSymbol(importRef.node);
+              symbol.addTransitiveImportFromStandaloneComponent(importSymbol);
+            }
+          });
+          if (!mayExportProviders) {
+            continue;
+          }
         }
         const pipeMeta = dirMeta === null ? this.metaReader.getPipeMetadata(ref) : null;
         if (pipeMeta !== null) {
@@ -6228,7 +6317,8 @@ var ComponentDecoratorHandler = class {
       imports: analysis.resolvedImports,
       animationTriggerNames: analysis.animationTriggerNames,
       schemas: analysis.schemas,
-      decorator: analysis.decorator
+      decorator: analysis.decorator,
+      assumedToExportProviders: false
     });
     this.resourceRegistry.registerResources(analysis.resources, node);
     this.injectableRegistry.registerInjectable(node, {
@@ -6960,6 +7050,7 @@ export {
   LocalMetadataRegistry,
   CompoundMetadataRegistry,
   ResourceRegistry,
+  ExportedProviderStatusResolver,
   HostDirectivesResolver,
   DynamicValue,
   StaticInterpreter,
@@ -7003,4 +7094,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4MSEL6HO.js.map
+//# sourceMappingURL=chunk-WB6MZEWH.js.map
