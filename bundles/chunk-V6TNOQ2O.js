@@ -3241,6 +3241,7 @@ var CompilationMode;
 (function(CompilationMode2) {
   CompilationMode2[CompilationMode2["FULL"] = 0] = "FULL";
   CompilationMode2[CompilationMode2["PARTIAL"] = 1] = "PARTIAL";
+  CompilationMode2[CompilationMode2["LOCAL"] = 2] = "LOCAL";
 })(CompilationMode || (CompilationMode = {}));
 var HandlerPrecedence;
 (function(HandlerPrecedence2) {
@@ -7089,4 +7090,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-PLJ6QCDY.js.map
+//# sourceMappingURL=chunk-V6TNOQ2O.js.map

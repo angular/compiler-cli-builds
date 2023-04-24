@@ -26,7 +26,12 @@ export declare enum CompilationMode {
     /**
      * Generates code using a stable, but intermediate format suitable to be published to NPM.
      */
-    PARTIAL = 1
+    PARTIAL = 1,
+    /**
+     * Generates code based on each individual source file without using its
+     * dependencies (suitable for local dev edit/refresh workflow).
+     */
+    LOCAL = 2
 }
 export declare enum HandlerPrecedence {
     /**
