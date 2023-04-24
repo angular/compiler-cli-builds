@@ -36,7 +36,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-PLJ6QCDY.js";
+} from "./chunk-V6TNOQ2O.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -6982,7 +6982,20 @@ var NgCompiler = class {
     }
     const dtsTransforms = new DtsTransformRegistry();
     const resourceRegistry = new ResourceRegistry();
-    const compilationMode = this.options.compilationMode === "partial" && !isCore ? CompilationMode.PARTIAL : CompilationMode.FULL;
+    let compilationMode = CompilationMode.FULL;
+    if (!isCore) {
+      switch (this.options.compilationMode) {
+        case "full":
+          compilationMode = CompilationMode.FULL;
+          break;
+        case "partial":
+          compilationMode = CompilationMode.PARTIAL;
+          break;
+        case "experimental-local":
+          compilationMode = CompilationMode.LOCAL;
+          break;
+      }
+    }
     const cycleHandlingStrategy = compilationMode === CompilationMode.FULL ? 0 : 1;
     const strictCtorDeps = this.options.strictInjectionParameters || false;
     const handlers = [
@@ -7764,4 +7777,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3RNF4LUH.js.map
+//# sourceMappingURL=chunk-MJBNRS3J.js.map
