@@ -1643,7 +1643,7 @@ var DtsMetadataReader = class {
     };
   }
   getDirectiveMetadata(ref) {
-    var _a;
+    var _a, _b;
     const clazz = ref.node;
     const def = this.reflector.getMembersOfClass(clazz).find((field) => field.isStatic && (field.name === "\u0275cmp" || field.name === "\u0275dir"));
     if (def === void 0) {
@@ -1660,6 +1660,7 @@ var DtsMetadataReader = class {
     const inputs = ClassPropertyMapping.fromMappedObject(readInputsType(def.type.typeArguments[3]));
     const outputs = ClassPropertyMapping.fromMappedObject(readMapType(def.type.typeArguments[4], readStringType));
     const hostDirectives = def.type.typeArguments.length > 8 ? readHostDirectivesType(this.checker, def.type.typeArguments[8], ref.bestGuessOwningModule) : null;
+    const isSignal = def.type.typeArguments.length > 9 && ((_b = readBooleanType(def.type.typeArguments[9])) != null ? _b : false);
     return {
       kind: MetaKind.Directive,
       matchSource: MatchSource.Selector,
@@ -1678,6 +1679,7 @@ var DtsMetadataReader = class {
       isStructural,
       animationTriggerNames: null,
       isStandalone,
+      isSignal,
       imports: null,
       schemas: null,
       decorator: null,
@@ -4315,6 +4317,15 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
     }
     isStandalone = resolved;
   }
+  let isSignal = false;
+  if (directive.has("signals")) {
+    const expr = directive.get("signals");
+    const resolved = evaluator.evaluate(expr);
+    if (typeof resolved !== "boolean") {
+      throw createValueHasWrongTypeError(expr, resolved, `signals flag must be a boolean`);
+    }
+    isSignal = resolved;
+  }
   const usesInheritance = reflector.hasBaseClass(clazz);
   const sourceFile = clazz.getSourceFile();
   const type = wrapTypeReference(reflector, clazz);
@@ -4343,6 +4354,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
     exportAs,
     providers,
     isStandalone,
+    isSignal,
     hostDirectives: (hostDirectives == null ? void 0 : hostDirectives.map((hostDir) => toHostDirectiveMetadata(hostDir, sourceFile, refEmitter))) || null
   };
   return {
@@ -4892,6 +4904,7 @@ var DirectiveDecoratorHandler = class {
       isStructural: analysis.isStructural,
       animationTriggerNames: null,
       isStandalone: analysis.meta.isStandalone,
+      isSignal: analysis.meta.isSignal,
       imports: null,
       schemas: null,
       decorator: analysis.decorator,
@@ -6310,6 +6323,7 @@ var ComponentDecoratorHandler = class {
       isPoisoned: analysis.isPoisoned,
       isStructural: false,
       isStandalone: analysis.meta.isStandalone,
+      isSignal: analysis.meta.isSignal,
       imports: analysis.resolvedImports,
       animationTriggerNames: analysis.animationTriggerNames,
       schemas: analysis.schemas,
@@ -7090,4 +7104,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KASRNAFZ.js.map
+//# sourceMappingURL=chunk-JGLWIYTE.js.map

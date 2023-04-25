@@ -349,6 +349,7 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl) {
     name: typeName,
     usesInheritance: metaObj.has("usesInheritance") ? metaObj.getBoolean("usesInheritance") : false,
     isStandalone: metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : false,
+    isSignal: metaObj.has("isSignal") ? metaObj.getBoolean("isSignal") : false,
     hostDirectives: metaObj.has("hostDirectives") ? toHostDirectivesMetadata(metaObj.getValue("hostDirectives")) : null
   };
 }
@@ -841,7 +842,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "16.1.0-next.0+sha-f5dd3b4");
+  const LATEST_VERSION_RANGE = getRange("<=", "16.1.0-next.0+sha-5214df4");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -888,7 +889,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "16.1.0-next.0+sha-f5dd3b4") {
+    if (version === "16.1.0-next.0+sha-5214df4") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -1019,4 +1020,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-SIHBKSBW.js.map
+//# sourceMappingURL=chunk-QS7CGVLD.js.map

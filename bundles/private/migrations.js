@@ -9,7 +9,7 @@ import {
   PotentialImportMode,
   StaticInterpreter,
   forwardRefResolver
-} from "../chunk-KASRNAFZ.js";
+} from "../chunk-JGLWIYTE.js";
 import {
   TypeScriptReflectionHost,
   reflectObjectLiteral
