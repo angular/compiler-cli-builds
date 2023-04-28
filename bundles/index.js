@@ -29,7 +29,7 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-IXDBDSWG.js";
+} from "./chunk-265L32OL.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -69,7 +69,7 @@ import "./chunk-SRFZMXHZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("16.0.0-rc.3+sha-4a5d4a9");
+var VERSION = new Version("16.0.0-rc.3+sha-6da1054");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
