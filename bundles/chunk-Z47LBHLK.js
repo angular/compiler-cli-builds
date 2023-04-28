@@ -6821,10 +6821,17 @@ var NgCompiler = class {
     const compilation = this.ensureAnalyzed();
     const ttc = compilation.templateTypeChecker;
     const diagnostics = [];
-    diagnostics.push(...ttc.getDiagnosticsForComponent(component));
-    const extendedTemplateChecker = compilation.extendedTemplateChecker;
-    if (this.options.strictTemplates && extendedTemplateChecker) {
-      diagnostics.push(...extendedTemplateChecker.getDiagnosticsForComponent(component));
+    try {
+      diagnostics.push(...ttc.getDiagnosticsForComponent(component));
+      const extendedTemplateChecker = compilation.extendedTemplateChecker;
+      if (this.options.strictTemplates && extendedTemplateChecker) {
+        diagnostics.push(...extendedTemplateChecker.getDiagnosticsForComponent(component));
+      }
+    } catch (err) {
+      if (!(err instanceof FatalDiagnosticError)) {
+        throw err;
+      }
+      diagnostics.push(err.toDiagnostic());
     }
     return this.addMessageTextDetails(diagnostics);
   }
@@ -7970,4 +7977,4 @@ export {
  * found in the LICENSE file at https://angular.io/license
  */
 // Closure Compiler ignores @suppress and similar if the comment contains @license.
-//# sourceMappingURL=chunk-HKF2SJOH.js.map
+//# sourceMappingURL=chunk-Z47LBHLK.js.map
