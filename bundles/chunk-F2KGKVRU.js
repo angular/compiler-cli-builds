@@ -36,11 +36,11 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-KASRNAFZ.js";
+} from "./chunk-CKDMX3WV.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-4UQC5DMJ.js";
+} from "./chunk-T2BBDUF3.js";
 import {
   ImportManager,
   translateExpression,
@@ -7784,4 +7784,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-265L32OL.js.map
+//# sourceMappingURL=chunk-F2KGKVRU.js.map
