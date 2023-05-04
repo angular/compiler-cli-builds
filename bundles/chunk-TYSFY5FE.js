@@ -9,7 +9,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-4UQC5DMJ.js";
+} from "./chunk-T2BBDUF3.js";
 import {
   ImportManager,
   translateExpression,
@@ -7104,4 +7104,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-JGLWIYTE.js.map
+//# sourceMappingURL=chunk-TYSFY5FE.js.map
