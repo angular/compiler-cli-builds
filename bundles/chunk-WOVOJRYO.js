@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-C4B5W2XC.js";
+} from "./chunk-VLCBVJOY.js";
 import {
   SourceFileLoader
 } from "./chunk-EKTJ7622.js";
@@ -842,7 +842,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "16.1.0-next.0+sha-f755853");
+  const LATEST_VERSION_RANGE = getRange("<=", "16.1.0-next.0+sha-0f40756");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -889,7 +889,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "16.1.0-next.0+sha-f755853") {
+    if (version === "16.1.0-next.0+sha-0f40756") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -1020,4 +1020,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-LDKAJ2UH.js.map
+//# sourceMappingURL=chunk-WOVOJRYO.js.map
