@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Type } from '@angular/compiler';
+import { TransplantedType, Type } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
@@ -64,5 +64,11 @@ export declare class Environment implements ReferenceEmitEnvironment {
      * provided.
      */
     referenceExternalType(moduleName: string, name: string, typeParams?: Type[]): ts.TypeNode;
+    /**
+     * Generates a `ts.TypeNode` representing a type that is being referenced from a different place
+     * in the program. Any type references inside the transplanted type will be rewritten so that
+     * they can be imported in the context fiel.
+     */
+    referenceTransplantedType(type: TransplantedType<ts.TypeNode>): ts.TypeNode;
     getPreludeStatements(): ts.Statement[];
 }
