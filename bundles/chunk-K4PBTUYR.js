@@ -36,7 +36,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-QCPJUH3P.js";
+} from "./chunk-TYSFY5FE.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -45,7 +45,7 @@ import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-VLCBVJOY.js";
+} from "./chunk-C4B5W2XC.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -226,7 +226,7 @@ function compareVersions(v1, v2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
 var MIN_TS_VERSION = "4.9.3";
-var MAX_TS_VERSION = "5.2.0";
+var MAX_TS_VERSION = "5.1.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
@@ -2808,7 +2808,7 @@ var Environment = class {
   referenceType(ref) {
     const ngExpr = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
     assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "symbol");
-    return translateType(new ExpressionType(ngExpr.expression), this.contextFile, this.reflector, this.refEmitter, this.importManager);
+    return translateType(new ExpressionType(ngExpr.expression), this.importManager);
   }
   emitTypeParameters(declaration) {
     const emitter = new TypeParameterEmitter(declaration.typeParameters, this.reflector);
@@ -2816,10 +2816,7 @@ var Environment = class {
   }
   referenceExternalType(moduleName, name, typeParams) {
     const external = new ExternalExpr({ moduleName, name });
-    return translateType(new ExpressionType(external, TypeModifier.None, typeParams), this.contextFile, this.reflector, this.refEmitter, this.importManager);
-  }
-  referenceTransplantedType(type) {
-    return translateType(type, this.contextFile, this.reflector, this.refEmitter, this.importManager);
+    return translateType(new ExpressionType(external, TypeModifier.None, typeParams), this.importManager);
   }
   getPreludeStatements() {
     return [
@@ -6738,7 +6735,7 @@ var NgCompiler = class {
     ];
     const afterDeclarations = [];
     if (compilation.dtsTransforms !== null) {
-      afterDeclarations.push(declarationTransformFactory(compilation.dtsTransforms, compilation.reflector, compilation.refEmitter, importRewriter));
+      afterDeclarations.push(declarationTransformFactory(compilation.dtsTransforms, importRewriter));
     }
     if (compilation.aliasingHost !== null && compilation.aliasingHost.aliasExportsInDts) {
       afterDeclarations.push(aliasTransformFactory(compilation.traitCompiler.exportStatements));
@@ -7787,4 +7784,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-Q5UROHFU.js.map
+//# sourceMappingURL=chunk-K4PBTUYR.js.map

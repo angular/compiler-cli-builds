@@ -7,8 +7,8 @@
  */
 import { Type } from '@angular/compiler';
 import ts from 'typescript';
-import { ImportRewriter, ReferenceEmitter } from '../../imports';
-import { ClassDeclaration, ReflectionHost } from '../../reflection';
+import { ImportRewriter } from '../../imports';
+import { ClassDeclaration } from '../../reflection';
 import { ImportManager } from '../../translator';
 import { DtsTransform } from './api';
 /**
@@ -24,7 +24,7 @@ export declare class DtsTransformRegistry {
      */
     getAllTransforms(sf: ts.SourceFile): DtsTransform[] | null;
 }
-export declare function declarationTransformFactory(transformRegistry: DtsTransformRegistry, reflector: ReflectionHost, refEmitter: ReferenceEmitter, importRewriter: ImportRewriter, importPrefix?: string): ts.TransformerFactory<ts.SourceFile>;
+export declare function declarationTransformFactory(transformRegistry: DtsTransformRegistry, importRewriter: ImportRewriter, importPrefix?: string): ts.TransformerFactory<ts.SourceFile>;
 export interface IvyDeclarationField {
     name: string;
     type: Type;
@@ -32,5 +32,5 @@ export interface IvyDeclarationField {
 export declare class IvyDeclarationDtsTransform implements DtsTransform {
     private declarationFields;
     addFields(decl: ClassDeclaration, fields: IvyDeclarationField[]): void;
-    transformClass(clazz: ts.ClassDeclaration, members: ReadonlyArray<ts.ClassElement>, reflector: ReflectionHost, refEmitter: ReferenceEmitter, imports: ImportManager): ts.ClassDeclaration;
+    transformClass(clazz: ts.ClassDeclaration, members: ReadonlyArray<ts.ClassElement>, imports: ImportManager): ts.ClassDeclaration;
 }
