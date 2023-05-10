@@ -3,7 +3,10 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  NoopImportRewriter
+  ImportFlags,
+  NoopImportRewriter,
+  Reference,
+  assertSuccessfulReferenceEmit
 } from "./chunk-B6WD2R2T.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/context.mjs
@@ -290,12 +293,15 @@ var ImportManager = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/type_translator.mjs
 import * as o2 from "@angular/compiler";
 import ts2 from "typescript";
-function translateType(type, imports) {
-  return type.visitType(new TypeTranslatorVisitor(imports), new Context(false));
+function translateType(type, contextFile, reflector, refEmitter, imports) {
+  return type.visitType(new TypeTranslatorVisitor(imports, contextFile, reflector, refEmitter), new Context(false));
 }
 var TypeTranslatorVisitor = class {
-  constructor(imports) {
+  constructor(imports, contextFile, reflector, refEmitter) {
     this.imports = imports;
+    this.contextFile = contextFile;
+    this.reflector = reflector;
+    this.refEmitter = refEmitter;
   }
   visitBuiltinType(type, context) {
     switch (type.name) {
@@ -335,6 +341,12 @@ var TypeTranslatorVisitor = class {
     const typeArgs = type.valueType !== null ? this.translateType(type.valueType, context) : ts2.factory.createKeywordTypeNode(ts2.SyntaxKind.UnknownKeyword);
     const indexSignature = ts2.factory.createIndexSignature(void 0, [parameter], typeArgs);
     return ts2.factory.createTypeLiteralNode([indexSignature]);
+  }
+  visitTransplantedType(ast, context) {
+    if (!ts2.isTypeNode(ast.type)) {
+      throw new Error(`A TransplantedType must wrap a TypeNode`);
+    }
+    return this.translateTransplantedTypeNode(ast.type, context);
   }
   visitReadVarExpr(ast, context) {
     if (ast.name === null) {
@@ -460,6 +472,38 @@ var TypeTranslatorVisitor = class {
       throw new Error(`An Expression must translate to a TypeNode, but was ${ts2.SyntaxKind[typeNode.kind]}`);
     }
     return typeNode;
+  }
+  translateTransplantedTypeReferenceNode(node, context) {
+    const declaration = this.reflector.getDeclarationOfIdentifier(node.typeName);
+    if (declaration === null) {
+      throw new Error(`Unable to statically determine the declaration file of type node ${node.typeName.text}`);
+    }
+    const emittedType = this.refEmitter.emit(new Reference(declaration.node), this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
+    assertSuccessfulReferenceEmit(emittedType, node, "type");
+    const result = emittedType.expression.visitExpression(this, context);
+    if (!ts2.isTypeReferenceNode(result)) {
+      throw new Error(`Expected TypeReferenceNode when referencing the type for ${node.typeName.text}, but received ${ts2.SyntaxKind[result.kind]}`);
+    }
+    if (node.typeArguments === void 0 || node.typeArguments.length === 0) {
+      return result;
+    }
+    const translatedArgs = node.typeArguments.map((arg) => this.translateTransplantedTypeNode(arg, context));
+    return ts2.factory.updateTypeReferenceNode(result, result.typeName, ts2.factory.createNodeArray(translatedArgs));
+  }
+  translateTransplantedTypeNode(rootNode, context) {
+    const factory = (transformContext) => (root) => {
+      const walk = (node) => {
+        if (ts2.isTypeReferenceNode(node) && ts2.isIdentifier(node.typeName)) {
+          const translated = this.translateTransplantedTypeReferenceNode(node, context);
+          if (translated !== node) {
+            return translated;
+          }
+        }
+        return ts2.visitEachChild(node, walk, transformContext);
+      };
+      return ts2.visitNode(root, walk);
+    };
+    return ts2.transform(rootNode, [factory]).transformed[0];
   }
 };
 
@@ -669,4 +713,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-C4B5W2XC.js.map
+//# sourceMappingURL=chunk-VLCBVJOY.js.map

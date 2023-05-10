@@ -15,7 +15,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-C4B5W2XC.js";
+} from "./chunk-VLCBVJOY.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -3836,9 +3836,9 @@ var DtsTransformRegistry = class {
     return transforms;
   }
 };
-function declarationTransformFactory(transformRegistry, importRewriter, importPrefix) {
+function declarationTransformFactory(transformRegistry, reflector, refEmitter, importRewriter, importPrefix) {
   return (context) => {
-    const transformer = new DtsTransformer(context, importRewriter, importPrefix);
+    const transformer = new DtsTransformer(context, reflector, refEmitter, importRewriter, importPrefix);
     return (fileOrBundle) => {
       if (ts17.isBundle(fileOrBundle)) {
         return fileOrBundle;
@@ -3852,8 +3852,10 @@ function declarationTransformFactory(transformRegistry, importRewriter, importPr
   };
 }
 var DtsTransformer = class {
-  constructor(ctx, importRewriter, importPrefix) {
+  constructor(ctx, reflector, refEmitter, importRewriter, importPrefix) {
     this.ctx = ctx;
+    this.reflector = reflector;
+    this.refEmitter = refEmitter;
     this.importRewriter = importRewriter;
     this.importPrefix = importPrefix;
   }
@@ -3892,7 +3894,7 @@ var DtsTransformer = class {
     for (const transform of transforms) {
       if (transform.transformClass !== void 0) {
         const inputMembers = clazz === newClazz ? elements : newClazz.members;
-        newClazz = transform.transformClass(newClazz, inputMembers, imports);
+        newClazz = transform.transformClass(newClazz, inputMembers, this.reflector, this.refEmitter, imports);
       }
     }
     if (elementsChanged && clazz === newClazz) {
@@ -3924,7 +3926,7 @@ var IvyDeclarationDtsTransform = class {
   addFields(decl, fields) {
     this.declarationFields.set(decl, fields);
   }
-  transformClass(clazz, members, imports) {
+  transformClass(clazz, members, reflector, refEmitter, imports) {
     const original = ts17.getOriginalNode(clazz);
     if (!this.declarationFields.has(original)) {
       return clazz;
@@ -3932,7 +3934,7 @@ var IvyDeclarationDtsTransform = class {
     const fields = this.declarationFields.get(original);
     const newMembers = fields.map((decl) => {
       const modifiers = [ts17.factory.createModifier(ts17.SyntaxKind.StaticKeyword)];
-      const typeRef = translateType(decl.type, imports);
+      const typeRef = translateType(decl.type, original.getSourceFile(), reflector, refEmitter, imports);
       markForEmitAsSingleLine(typeRef);
       return ts17.factory.createPropertyDeclaration(
         modifiers,
@@ -7090,4 +7092,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CKDMX3WV.js.map
+//# sourceMappingURL=chunk-JI4NJHOK.js.map

@@ -36,7 +36,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-CKDMX3WV.js";
+} from "./chunk-JI4NJHOK.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -45,7 +45,7 @@ import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-C4B5W2XC.js";
+} from "./chunk-VLCBVJOY.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -2808,7 +2808,7 @@ var Environment = class {
   referenceType(ref) {
     const ngExpr = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
     assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "symbol");
-    return translateType(new ExpressionType(ngExpr.expression), this.importManager);
+    return translateType(new ExpressionType(ngExpr.expression), this.contextFile, this.reflector, this.refEmitter, this.importManager);
   }
   emitTypeParameters(declaration) {
     const emitter = new TypeParameterEmitter(declaration.typeParameters, this.reflector);
@@ -2816,7 +2816,10 @@ var Environment = class {
   }
   referenceExternalType(moduleName, name, typeParams) {
     const external = new ExternalExpr({ moduleName, name });
-    return translateType(new ExpressionType(external, TypeModifier.None, typeParams), this.importManager);
+    return translateType(new ExpressionType(external, TypeModifier.None, typeParams), this.contextFile, this.reflector, this.refEmitter, this.importManager);
+  }
+  referenceTransplantedType(type) {
+    return translateType(type, this.contextFile, this.reflector, this.refEmitter, this.importManager);
   }
   getPreludeStatements() {
     return [
@@ -6735,7 +6738,7 @@ var NgCompiler = class {
     ];
     const afterDeclarations = [];
     if (compilation.dtsTransforms !== null) {
-      afterDeclarations.push(declarationTransformFactory(compilation.dtsTransforms, importRewriter));
+      afterDeclarations.push(declarationTransformFactory(compilation.dtsTransforms, compilation.reflector, compilation.refEmitter, importRewriter));
     }
     if (compilation.aliasingHost !== null && compilation.aliasingHost.aliasExportsInDts) {
       afterDeclarations.push(aliasTransformFactory(compilation.traitCompiler.exportStatements));
@@ -7784,4 +7787,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-F2KGKVRU.js.map
+//# sourceMappingURL=chunk-UUUQF5ZZ.js.map
