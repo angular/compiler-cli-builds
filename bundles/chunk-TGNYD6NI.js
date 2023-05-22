@@ -3573,7 +3573,7 @@ var TraitCompiler = class {
   }
   resolve() {
     var _a, _b;
-    const classes = Array.from(this.classes.keys());
+    const classes = this.classes.keys();
     for (const clazz of classes) {
       const record = this.classes.get(clazz);
       for (let trait of record.traits) {
@@ -7092,4 +7092,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-JI4NJHOK.js.map
+//# sourceMappingURL=chunk-TGNYD6NI.js.map
