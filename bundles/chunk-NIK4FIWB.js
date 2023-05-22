@@ -300,9 +300,12 @@ var TypeScriptReflectionHost = class {
     if (node.body !== void 0) {
       body = ts4.isBlock(node.body) ? Array.from(node.body.statements) : [ts4.factory.createReturnStatement(node.body)];
     }
+    const type = this.checker.getTypeAtLocation(node);
+    const signatures = this.checker.getSignaturesOfType(type, ts4.SignatureKind.Call);
     return {
       node,
       body,
+      signatureCount: signatures.length,
       typeParameters: node.typeParameters === void 0 ? null : Array.from(node.typeParameters),
       parameters: node.parameters.map((param) => {
         const name = parameterName(param.name);
@@ -637,4 +640,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-T2BBDUF3.js.map
+//# sourceMappingURL=chunk-NIK4FIWB.js.map

@@ -104,9 +104,10 @@ export declare class ClassPropertyMapping<T extends InputOrOutput = InputOrOutpu
      * names if they differ.
      *
      * This object format is used when mappings are serialized (for example into .d.ts files).
+     * @param transform Function used to transform the values of the generated map.
      */
-    toJointMappedObject(): {
-        [classPropertyName: string]: T;
+    toJointMappedObject<O = T>(transform: (value: T) => O): {
+        [classPropertyName: string]: O;
     };
     /**
      * Implement the iterator protocol and return entry objects which contain the class and binding

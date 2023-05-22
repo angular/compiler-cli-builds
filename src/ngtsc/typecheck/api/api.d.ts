@@ -83,8 +83,7 @@ export interface TypeCtorMetadata {
      * Input, output, and query field names in the type which should be included as constructor input.
      */
     fields: {
-        inputs: string[];
-        outputs: string[];
+        inputs: ClassPropertyMapping<InputMapping>;
         queries: string[];
     };
     /**

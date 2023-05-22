@@ -360,6 +360,10 @@ export interface FunctionDefinition {
      * Generic type parameters of the function.
      */
     typeParameters: ts.TypeParameterDeclaration[] | null;
+    /**
+     * Number of known signatures of the function.
+     */
+    signatureCount: number;
 }
 /**
  * A parameter to a function or method.

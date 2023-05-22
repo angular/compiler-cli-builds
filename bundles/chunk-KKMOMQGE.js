@@ -9,13 +9,13 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-T2BBDUF3.js";
+} from "./chunk-NIK4FIWB.js";
 import {
   ImportManager,
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-VLCBVJOY.js";
+} from "./chunk-LOZJLM26.js";
 import {
   ErrorCode,
   FatalDiagnosticError,
@@ -32,7 +32,7 @@ import {
   makeRelatedInformation,
   nodeDebugInfo,
   nodeNameForError
-} from "./chunk-B6WD2R2T.js";
+} from "./chunk-WF3L5COT.js";
 import {
   PerfEvent,
   PerfPhase
@@ -234,12 +234,12 @@ function createSourceSpan(node) {
   const parseSf = new ParseSourceFile(sf.getFullText(), sf.fileName);
   return new ParseSourceSpan(new ParseLocation(parseSf, startOffset, startLine + 1, startCol + 1), new ParseLocation(parseSf, endOffset, endLine + 1, endCol + 1));
 }
-function compileResults(fac, def, metadataStmt, propName) {
+function compileResults(fac, def, metadataStmt, propName, additionalFields) {
   const statements = def.statements;
   if (metadataStmt !== null) {
     statements.push(metadataStmt);
   }
-  return [
+  const results = [
     fac,
     {
       name: propName,
@@ -248,6 +248,10 @@ function compileResults(fac, def, metadataStmt, propName) {
       type: def.type
     }
   ];
+  if (additionalFields !== null) {
+    results.push(...additionalFields);
+  }
+  return results;
 }
 function toFactoryMetadata(meta, target) {
   return {
@@ -1407,10 +1411,10 @@ var ClassPropertyMapping = class {
     }
     return obj;
   }
-  toJointMappedObject() {
+  toJointMappedObject(transform) {
     const obj = {};
     for (const [classPropertyName, inputOrOutput] of this.forwardMap) {
-      obj[classPropertyName] = inputOrOutput;
+      obj[classPropertyName] = transform(inputOrOutput);
     }
     return obj;
   }
@@ -1513,7 +1517,7 @@ function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
   const restrictedInputFields = /* @__PURE__ */ new Set();
   const stringLiteralInputFields = /* @__PURE__ */ new Set();
   const undeclaredInputFields = /* @__PURE__ */ new Set();
-  for (const classPropertyName of inputs.classPropertyNames) {
+  for (const { classPropertyName, transform } of inputs) {
     const field = members.find((member) => member.name === classPropertyName);
     if (field === void 0 || field.node === null) {
       undeclaredInputFields.add(classPropertyName);
@@ -1524,6 +1528,9 @@ function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
     }
     if (field.nameNode !== null && ts5.isStringLiteral(field.nameNode)) {
       stringLiteralInputFields.add(classPropertyName);
+    }
+    if (transform !== null) {
+      coercedInputFields.add(classPropertyName);
     }
   }
   const arity = reflector.getGenericArityOfClass(node);
@@ -1718,21 +1725,24 @@ function readInputsType(type) {
         continue;
       }
       const stringValue = readStringType(member.type);
+      const classPropertyName = member.name.text;
       if (stringValue != null) {
-        inputsMap[member.name.text] = {
+        inputsMap[classPropertyName] = {
           bindingPropertyName: stringValue,
-          classPropertyName: member.name.text,
-          required: false
+          classPropertyName,
+          required: false,
+          transform: null
         };
       } else {
         const config = readMapType(member.type, (innerValue) => {
           var _a;
           return (_a = readStringType(innerValue)) != null ? _a : readBooleanType(innerValue);
         });
-        inputsMap[member.name.text] = {
-          classPropertyName: member.name.text,
+        inputsMap[classPropertyName] = {
+          classPropertyName,
           bindingPropertyName: config.alias,
-          required: config.required
+          required: config.required,
+          transform: null
         };
       }
     }
@@ -2063,7 +2073,8 @@ function resolveInput(bindingName, binding) {
   return {
     bindingPropertyName: bindingName,
     classPropertyName: binding.classPropertyName,
-    required: binding.required
+    required: binding.required,
+    transform: binding.transform
   };
 }
 function resolveOutput(bindingName) {
@@ -2457,6 +2468,23 @@ function extractSchemas(rawExpr, evaluator, context) {
     }
   }
   return schemas;
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/input_transforms.mjs
+import { outputAst } from "@angular/compiler";
+function compileInputTransformFields(inputs) {
+  const extraFields = [];
+  for (const input of inputs) {
+    if (input.transform) {
+      extraFields.push({
+        name: `ngAcceptInputType_${input.classPropertyName}`,
+        type: outputAst.transplantedType(input.transform.type),
+        statements: [],
+        initializer: null
+      });
+    }
+  }
+  return extraFields;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
@@ -4074,6 +4102,9 @@ var IvyTransformationVisitor = class extends Visitor {
     const statements = [];
     const members = [...node.members];
     for (const field of this.classCompilationMap.get(node)) {
+      if (field.initializer === null) {
+        continue;
+      }
       const exprNode = translateExpression(field.initializer, this.importManager, translateOptions);
       const property = ts19.factory.createPropertyDeclaration([ts19.factory.createToken(ts19.SyntaxKind.StaticKeyword)], field.name, void 0, void 0, exprNode);
       if (this.isClosureCompilerEnabled) {
@@ -4266,8 +4297,8 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const members = reflector.getMembersOfClass(clazz);
   const decoratedElements = members.filter((member) => !member.isStatic && member.decorators !== null);
   const coreModule = isCore ? void 0 : "@angular/core";
-  const inputsFromMeta = parseInputsArray(directive, evaluator);
-  const inputsFromFields = parseInputFields(filterToMembersWithDecorator(decoratedElements, "Input", coreModule), evaluator);
+  const inputsFromMeta = parseInputsArray(clazz, directive, evaluator, reflector, refEmitter);
+  const inputsFromFields = parseInputFields(clazz, filterToMembersWithDecorator(decoratedElements, "Input", coreModule), evaluator, reflector, refEmitter);
   const inputs = ClassPropertyMapping.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
   const outputsFromMeta = parseOutputsArray(directive, evaluator);
   const outputsFromFields = parseOutputFields(filterToMembersWithDecorator(decoratedElements, "Output", coreModule), evaluator);
@@ -4343,7 +4374,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
     lifecycle: {
       usesOnChanges
     },
-    inputs: inputs.toJointMappedObject(),
+    inputs: inputs.toJointMappedObject(toR3InputMetadata),
     outputs: outputs.toDirectMappedObject(),
     queries,
     viewQueries,
@@ -4579,7 +4610,7 @@ function parseDecoratedFields(fields, evaluator, callback) {
     }
   }
 }
-function parseInputsArray(decoratorMetadata, evaluator) {
+function parseInputsArray(clazz, decoratorMetadata, evaluator, reflector, refEmitter) {
   const inputsField = decoratorMetadata.get("inputs");
   if (inputsField === void 0) {
     return {};
@@ -4593,18 +4624,32 @@ function parseInputsArray(decoratorMetadata, evaluator) {
     const value = inputsArray[i];
     if (typeof value === "string") {
       const [bindingPropertyName, classPropertyName] = parseMappingString(value);
-      inputs[classPropertyName] = { bindingPropertyName, classPropertyName, required: false };
+      inputs[classPropertyName] = {
+        bindingPropertyName,
+        classPropertyName,
+        required: false,
+        transform: null
+      };
     } else if (value instanceof Map) {
       const name = value.get("name");
       const alias = value.get("alias");
       const required = value.get("required");
+      let transform = null;
       if (typeof name !== "string") {
         throw createValueHasWrongTypeError(inputsField, name, `Value at position ${i} of @Directive.inputs array must have a "name" property`);
+      }
+      if (value.has("transform")) {
+        const transformValue = value.get("transform");
+        if (!(transformValue instanceof DynamicValue) && !(transformValue instanceof Reference)) {
+          throw createValueHasWrongTypeError(inputsField, transformValue, `Transform of value at position ${i} of @Directive.inputs array must be a function`);
+        }
+        transform = parseInputTransformFunction(clazz, name, transformValue, reflector, refEmitter);
       }
       inputs[name] = {
         classPropertyName: name,
         bindingPropertyName: typeof alias === "string" ? alias : name,
-        required: required === true
+        required: required === true,
+        transform
       };
     } else {
       throw createValueHasWrongTypeError(inputsField, value, `@Directive.inputs array can only contain strings or object literals`);
@@ -4612,11 +4657,12 @@ function parseInputsArray(decoratorMetadata, evaluator) {
   }
   return inputs;
 }
-function parseInputFields(inputMembers, evaluator) {
+function parseInputFields(clazz, inputMembers, evaluator, reflector, refEmitter) {
   const inputs = {};
   parseDecoratedFields(inputMembers, evaluator, (classPropertyName, options, decorator) => {
     let bindingPropertyName;
     let required = false;
+    let transform = null;
     if (options === null) {
       bindingPropertyName = classPropertyName;
     } else if (typeof options === "string") {
@@ -4625,12 +4671,71 @@ function parseInputFields(inputMembers, evaluator) {
       const aliasInConfig = options.get("alias");
       bindingPropertyName = typeof aliasInConfig === "string" ? aliasInConfig : classPropertyName;
       required = options.get("required") === true;
+      if (options.has("transform")) {
+        const transformValue = options.get("transform");
+        if (!(transformValue instanceof DynamicValue) && !(transformValue instanceof Reference)) {
+          throw createValueHasWrongTypeError(decorator.node, transformValue, `Input transform must be a function`);
+        }
+        transform = parseInputTransformFunction(clazz, classPropertyName, transformValue, reflector, refEmitter);
+      }
     } else {
       throw createValueHasWrongTypeError(decorator.node, options, `@${decorator.name} decorator argument must resolve to a string or an object literal`);
     }
-    inputs[classPropertyName] = { bindingPropertyName, classPropertyName, required };
+    inputs[classPropertyName] = { bindingPropertyName, classPropertyName, required, transform };
   });
   return inputs;
+}
+function parseInputTransformFunction(clazz, classPropertyName, value, reflector, refEmitter) {
+  var _a;
+  const definition = reflector.getDefinitionOfFunction(value.node);
+  if (definition === null) {
+    throw createValueHasWrongTypeError(value.node, value, "Input transform must be a function");
+  }
+  if (definition.typeParameters !== null && definition.typeParameters.length > 0) {
+    throw createValueHasWrongTypeError(value.node, value, "Input transform function cannot be generic");
+  }
+  if (definition.signatureCount > 1) {
+    throw createValueHasWrongTypeError(value.node, value, "Input transform function cannot have multiple signatures");
+  }
+  const members = reflector.getMembersOfClass(clazz);
+  for (const member of members) {
+    const conflictingName = `ngAcceptInputType_${classPropertyName}`;
+    if (member.name === conflictingName && member.isStatic) {
+      throw new FatalDiagnosticError(ErrorCode.CONFLICTING_INPUT_TRANSFORM, value.node, `Class cannot have both a transform function on Input ${classPropertyName} and a static member called ${conflictingName}`);
+    }
+  }
+  const node = value instanceof Reference ? value.getIdentityIn(clazz.getSourceFile()) : value.node;
+  if (node === null) {
+    throw createValueHasWrongTypeError(value.node, value, "Input transform function could not be referenced");
+  }
+  const firstParam = ((_a = definition.parameters[0]) == null ? void 0 : _a.name) === "this" ? definition.parameters[1] : definition.parameters[0];
+  if (!firstParam) {
+    return { node, type: ts20.factory.createKeywordTypeNode(ts20.SyntaxKind.UnknownKeyword) };
+  }
+  if (!firstParam.type) {
+    throw createValueHasWrongTypeError(value.node, value, "Input transform function first parameter must have a type");
+  }
+  if (firstParam.node.dotDotDotToken) {
+    throw createValueHasWrongTypeError(value.node, value, "Input transform function first parameter cannot be a spread parameter");
+  }
+  assertEmittableInputType(firstParam.type, clazz.getSourceFile(), reflector, refEmitter);
+  return { node, type: firstParam.type };
+}
+function assertEmittableInputType(type, contextFile, reflector, refEmitter) {
+  (function walk(node) {
+    if (ts20.isTypeReferenceNode(node) && ts20.isIdentifier(node.typeName)) {
+      const declaration = reflector.getDeclarationOfIdentifier(node.typeName);
+      if (declaration !== null) {
+        if (declaration.node.getSourceFile() !== contextFile) {
+          const emittedType = refEmitter.emit(new Reference(declaration.node), contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
+          assertSuccessfulReferenceEmit(emittedType, node, "type");
+        } else if (!reflector.isStaticallyExported(declaration.node)) {
+          throw new FatalDiagnosticError(ErrorCode.SYMBOL_NOT_EXPORTED, type, `Symbol must be exported in order to be used as the type of an Input transform function`, [makeRelatedInformation(declaration.node, `The symbol is declared here.`)]);
+        }
+      }
+    }
+    node.forEachChild(walk);
+  })(type);
 }
 function parseOutputsArray(directive, evaluator) {
   const metaValues = parseFieldStringArrayValue(directive, "outputs", evaluator);
@@ -4716,6 +4821,14 @@ function toHostDirectiveMetadata(hostDirective, context, refEmitter) {
     isForwardReference: hostDirective.isForwardReference,
     inputs: hostDirective.inputs || null,
     outputs: hostDirective.outputs || null
+  };
+}
+function toR3InputMetadata(mapping) {
+  return {
+    classPropertyName: mapping.classPropertyName,
+    bindingPropertyName: mapping.bindingPropertyName,
+    required: mapping.required,
+    transformFunction: mapping.transform !== null ? new WrappedNodeExpr4(mapping.transform.node) : null
   };
 }
 
@@ -4938,14 +5051,16 @@ var DirectiveDecoratorHandler = class {
   compileFull(node, analysis, resolution, pool) {
     const fac = compileNgFactoryDefField(toFactoryMetadata(analysis.meta, FactoryTarget.Directive));
     const def = compileDirectiveFromMetadata(analysis.meta, pool, makeBindingParser());
+    const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const classMetadata = analysis.classMetadata !== null ? compileClassMetadata(analysis.classMetadata).toStmt() : null;
-    return compileResults(fac, def, classMetadata, "\u0275dir");
+    return compileResults(fac, def, classMetadata, "\u0275dir", inputTransformFields);
   }
   compilePartial(node, analysis, resolution) {
     const fac = compileDeclareFactory(toFactoryMetadata(analysis.meta, FactoryTarget.Directive));
     const def = compileDeclareDirectiveFromMetadata(analysis.meta);
+    const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const classMetadata = analysis.classMetadata !== null ? compileDeclareClassMetadata(analysis.classMetadata).toStmt() : null;
-    return compileResults(fac, def, classMetadata, "\u0275dir");
+    return compileResults(fac, def, classMetadata, "\u0275dir", inputTransformFields);
   }
   findClassFieldWithAngularFeatures(node) {
     return this.reflector.getMembersOfClass(node).find((member) => {
@@ -6593,8 +6708,9 @@ var ComponentDecoratorHandler = class {
     const meta = { ...analysis.meta, ...resolution };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
     const def = compileComponentFromMetadata(meta, pool, makeBindingParser2());
+    const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const classMetadata = analysis.classMetadata !== null ? compileClassMetadata3(analysis.classMetadata).toStmt() : null;
-    return compileResults(fac, def, classMetadata, "\u0275cmp");
+    return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields);
   }
   compilePartial(node, analysis, resolution) {
     if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
@@ -6608,9 +6724,10 @@ var ComponentDecoratorHandler = class {
     };
     const meta = { ...analysis.meta, ...resolution };
     const fac = compileDeclareFactory(toFactoryMetadata(meta, FactoryTarget3.Component));
+    const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const def = compileDeclareComponentFromMetadata(meta, analysis.template, templateInfo);
     const classMetadata = analysis.classMetadata !== null ? compileDeclareClassMetadata3(analysis.classMetadata).toStmt() : null;
-    return compileResults(fac, def, classMetadata, "\u0275cmp");
+    return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields);
   }
   _checkForCyclicImport(importedFile, expr, origin) {
     const imported = resolveImportedFile(this.moduleResolver, importedFile, expr, origin);
@@ -7002,13 +7119,13 @@ var PipeDecoratorHandler = class {
     const fac = compileNgFactoryDefField(toFactoryMetadata(analysis.meta, FactoryTarget5.Pipe));
     const def = compilePipeFromMetadata(analysis.meta);
     const classMetadata = analysis.classMetadata !== null ? compileClassMetadata5(analysis.classMetadata).toStmt() : null;
-    return compileResults(fac, def, classMetadata, "\u0275pipe");
+    return compileResults(fac, def, classMetadata, "\u0275pipe", null);
   }
   compilePartial(node, analysis) {
     const fac = compileDeclareFactory(toFactoryMetadata(analysis.meta, FactoryTarget5.Pipe));
     const def = compileDeclarePipeFromMetadata(analysis.meta);
     const classMetadata = analysis.classMetadata !== null ? compileDeclareClassMetadata5(analysis.classMetadata).toStmt() : null;
-    return compileResults(fac, def, classMetadata, "\u0275pipe");
+    return compileResults(fac, def, classMetadata, "\u0275pipe", null);
   }
 };
 
@@ -7106,4 +7223,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-IFHL4IZQ.js.map
+//# sourceMappingURL=chunk-KKMOMQGE.js.map

@@ -4,11 +4,11 @@
     
 import {
   TypeScriptReflectionHost
-} from "./chunk-T2BBDUF3.js";
+} from "./chunk-NIK4FIWB.js";
 import {
   isAliasImportDeclaration,
   loadIsReferencedAliasDeclarationPatch
-} from "./chunk-B6WD2R2T.js";
+} from "./chunk-WF3L5COT.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/downlevel_decorators_transform/downlevel_decorators_transform.mjs
 import ts from "typescript";
@@ -346,4 +346,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-64MYZ5SD.js.map
+//# sourceMappingURL=chunk-SJLWUYXS.js.map

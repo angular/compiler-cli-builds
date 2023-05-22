@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-VLCBVJOY.js";
+} from "./chunk-LOZJLM26.js";
 import {
   SourceFileLoader
 } from "./chunk-EKTJ7622.js";
@@ -355,13 +355,23 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl) {
 }
 function toInputMapping(value, key) {
   if (value.isString()) {
-    return { bindingPropertyName: value.getString(), classPropertyName: key, required: false };
+    return {
+      bindingPropertyName: value.getString(),
+      classPropertyName: key,
+      required: false,
+      transformFunction: null
+    };
   }
-  const values = value.getArray().map((innerValue) => innerValue.getString());
-  if (values.length !== 2) {
-    throw new FatalLinkerError(value.expression, "Unsupported input, expected a string or an array containing exactly two strings");
+  const values = value.getArray();
+  if (values.length !== 2 && values.length !== 3) {
+    throw new FatalLinkerError(value.expression, "Unsupported input, expected a string or an array containing two strings and an optional function");
   }
-  return { bindingPropertyName: values[0], classPropertyName: values[1], required: false };
+  return {
+    bindingPropertyName: values[0].getString(),
+    classPropertyName: values[1].getString(),
+    transformFunction: values.length > 2 ? values[2].getOpaque() : null,
+    required: false
+  };
 }
 function toHostMetadata(metaObj) {
   if (!metaObj.has("host")) {
@@ -842,7 +852,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "16.1.0-next.1+sha-d0a5530");
+  const LATEST_VERSION_RANGE = getRange("<=", "16.1.0-next.1+sha-f6da091");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -889,7 +899,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "16.1.0-next.1+sha-d0a5530") {
+    if (version === "16.1.0-next.1+sha-f6da091") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -1020,4 +1030,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-WOVOJRYO.js.map
+//# sourceMappingURL=chunk-ADNHTL54.js.map

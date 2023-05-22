@@ -36,16 +36,16 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-IFHL4IZQ.js";
+} from "./chunk-KKMOMQGE.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
-} from "./chunk-T2BBDUF3.js";
+} from "./chunk-NIK4FIWB.js";
 import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-VLCBVJOY.js";
+} from "./chunk-LOZJLM26.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -84,7 +84,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-B6WD2R2T.js";
+} from "./chunk-WF3L5COT.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -2680,18 +2680,17 @@ function generateInlineTypeCtor(node, meta) {
 }
 function constructTypeCtorParameter(node, meta, rawType) {
   let initType = null;
-  const keys = meta.fields.inputs;
   const plainKeys = [];
   const coercedKeys = [];
-  for (const key of keys) {
-    if (!meta.coercedInputFields.has(key)) {
-      plainKeys.push(ts17.factory.createLiteralTypeNode(ts17.factory.createStringLiteral(key)));
+  for (const { classPropertyName, transform } of meta.fields.inputs) {
+    if (!meta.coercedInputFields.has(classPropertyName)) {
+      plainKeys.push(ts17.factory.createLiteralTypeNode(ts17.factory.createStringLiteral(classPropertyName)));
     } else {
       coercedKeys.push(ts17.factory.createPropertySignature(
         void 0,
-        key,
+        classPropertyName,
         void 0,
-        tsCreateTypeQueryForCoercedInput(rawType.typeName, key)
+        transform == null ? tsCreateTypeQueryForCoercedInput(rawType.typeName, classPropertyName) : transform.type
       ));
     }
   }
@@ -2772,8 +2771,7 @@ var Environment = class {
         fnName,
         body: true,
         fields: {
-          inputs: dir.inputs.classPropertyNames,
-          outputs: dir.outputs.classPropertyNames,
+          inputs: dir.inputs,
           queries: dir.queries
         },
         coercedInputFields: dir.coercedInputFields
@@ -2985,7 +2983,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
-import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, SafeCall, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstElement as TmplAstElement3, TmplAstIcu, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, SafeCall, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstElement as TmplAstElement3, TmplAstIcu, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
 import ts23 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
@@ -3740,18 +3738,23 @@ var TcbDirectiveInputsOp = class extends TcbOp {
     for (const attr of boundAttrs) {
       const expr = widenBinding(translateInput(attr.attribute, this.tcb, this.scope), this.tcb);
       let assignment = wrapForDiagnostics(expr);
-      for (const { fieldName, required } of attr.inputs) {
+      for (const { fieldName, required, transformType } of attr.inputs) {
         let target;
         if (required) {
           seenRequiredInputs.add(fieldName);
         }
         if (this.dir.coercedInputFields.has(fieldName)) {
-          const dirTypeRef = this.tcb.env.referenceType(this.dir.ref);
-          if (!ts23.isTypeReferenceNode(dirTypeRef)) {
-            throw new Error(`Expected TypeReferenceNode from reference to ${this.dir.ref.debugName}`);
+          let type;
+          if (transformType) {
+            type = this.tcb.env.referenceTransplantedType(new TransplantedType(transformType));
+          } else {
+            const dirTypeRef = this.tcb.env.referenceType(this.dir.ref);
+            if (!ts23.isTypeReferenceNode(dirTypeRef)) {
+              throw new Error(`Expected TypeReferenceNode from reference to ${this.dir.ref.debugName}`);
+            }
+            type = tsCreateTypeQueryForCoercedInput(dirTypeRef.typeName, fieldName);
           }
           const id = this.tcb.allocateId();
-          const type = tsCreateTypeQueryForCoercedInput(dirTypeRef.typeName, fieldName);
           this.scope.addStatement(tsDeclareVariable(id, type));
           target = id;
         } else if (this.dir.undeclaredInputFields.has(fieldName)) {
@@ -4408,7 +4411,14 @@ function getBoundAttributes(directive, node) {
     if (inputs !== null) {
       boundInputs.push({
         attribute: attr,
-        inputs: inputs.map((input) => ({ fieldName: input.classPropertyName, required: input.required }))
+        inputs: inputs.map((input) => {
+          var _a;
+          return {
+            fieldName: input.classPropertyName,
+            required: input.required,
+            transformType: ((_a = input.transform) == null ? void 0 : _a.type) || null
+          };
+        })
       });
     }
   };
@@ -4587,8 +4597,7 @@ var TypeCheckContextImpl = class {
           fnName: "ngTypeCtor",
           body: !dirNode.getSourceFile().isDeclarationFile,
           fields: {
-            inputs: dir.inputs.classPropertyNames,
-            outputs: dir.outputs.classPropertyNames,
+            inputs: dir.inputs,
             queries: dir.queries
           },
           coercedInputFields: dir.coercedInputFields
@@ -7787,4 +7796,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-AO5W6SCJ.js.map
+//# sourceMappingURL=chunk-OGRHCPOV.js.map
