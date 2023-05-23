@@ -69,7 +69,7 @@ import "./chunk-SRFZMXHZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("16.0.2+sha-c11041e");
+var VERSION = new Version("16.0.2+sha-ac0150f");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
