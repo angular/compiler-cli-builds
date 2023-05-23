@@ -6,7 +6,7 @@
 import {
   main,
   readCommandLineAndConfiguration
-} from "../../chunk-ZLNNBK4V.js";
+} from "../../chunk-FRTWQNIQ.js";
 import {
   EmitFlags
 } from "../../chunk-MQDABKJE.js";

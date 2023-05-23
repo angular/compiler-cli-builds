@@ -276,7 +276,6 @@ function createEmitCallback(options, tsickle) {
     fileNameToModuleId: (fileName) => fileName,
     googmodule: false,
     untyped: true,
-    convertIndexImportShorthand: false,
     transformDecorators: false,
     transformTypesToClosure: true,
     generateExtraSuppressions: true,
@@ -375,4 +374,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZLNNBK4V.js.map
+//# sourceMappingURL=chunk-FRTWQNIQ.js.map
