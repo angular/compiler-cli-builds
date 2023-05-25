@@ -623,7 +623,7 @@ var StaticInterpreter = class {
   visitIdentifier(node, context) {
     const decl = this.host.getDeclarationOfIdentifier(node);
     if (decl === null) {
-      if (getOriginalKeywordKind(node) === ts2.SyntaxKind.UndefinedKeyword) {
+      if (node.originalKeywordKind === ts2.SyntaxKind.UndefinedKeyword) {
         return void 0;
       } else {
         if (this.dependencyTracker !== null && this.host.getImportOfIdentifier(node) !== null) {
@@ -1042,9 +1042,6 @@ function owningModule(context, override = null) {
   } else {
     return null;
   }
-}
-function getOriginalKeywordKind(identifier) {
-  return typeof ts2.identifierToKeywordKind === "function" ? ts2.identifierToKeywordKind(identifier) : identifier.originalKeywordKind;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/interface.mjs
@@ -7226,4 +7223,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-T5X4DFVC.js.map
+//# sourceMappingURL=chunk-KKMOMQGE.js.map

@@ -29,10 +29,10 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-YIFTBRO6.js";
+} from "./chunk-OGRHCPOV.js";
 import {
   OptimizeFor
-} from "./chunk-T5X4DFVC.js";
+} from "./chunk-KKMOMQGE.js";
 import "./chunk-NIK4FIWB.js";
 import "./chunk-LOZJLM26.js";
 import "./chunk-WF3L5COT.js";
@@ -69,7 +69,7 @@ import "./chunk-SRFZMXHZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("16.1.0-next.2+sha-3a05e4c");
+var VERSION = new Version("16.1.0-next.2+sha-4f5f496");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
