@@ -6737,7 +6737,7 @@ var NgCompiler = class {
       defaultImportTracker.importPreservingTransformer()
     ];
     const afterDeclarations = [];
-    if (compilation.dtsTransforms !== null) {
+    if (this.options.compilationMode !== "experimental-local" && compilation.dtsTransforms !== null) {
       afterDeclarations.push(declarationTransformFactory(compilation.dtsTransforms, compilation.reflector, compilation.refEmitter, importRewriter));
     }
     if (compilation.aliasingHost !== null && compilation.aliasingHost.aliasExportsInDts) {
@@ -7787,4 +7787,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-MQDABKJE.js.map
+//# sourceMappingURL=chunk-W3UP6TTU.js.map
