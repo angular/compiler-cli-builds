@@ -47,7 +47,7 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     private perf;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, strictCtorDeps: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder);
     readonly precedence = HandlerPrecedence.PRIMARY;
-    readonly name: string;
+    readonly name = "DirectiveDecoratorHandler";
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator | null>, flags?: HandlerFlags): AnalysisOutput<DirectiveHandlerData>;
     symbol(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>): DirectiveSymbol;

@@ -3615,7 +3615,7 @@ var TraitCompiler = class {
           case TraitState.Skipped:
             continue;
           case TraitState.Pending:
-            throw new Error(`Resolving a trait that hasn't been analyzed: ${clazz.name.text} / ${Object.getPrototypeOf(trait.handler).constructor.name}`);
+            throw new Error(`Resolving a trait that hasn't been analyzed: ${clazz.name.text} / ${trait.handler.name}`);
           case TraitState.Resolved:
             throw new Error(`Resolving an already resolved trait`);
         }
@@ -4952,7 +4952,7 @@ var DirectiveDecoratorHandler = class {
     this.annotateForClosureCompiler = annotateForClosureCompiler;
     this.perf = perf;
     this.precedence = HandlerPrecedence.PRIMARY;
-    this.name = DirectiveDecoratorHandler.name;
+    this.name = "DirectiveDecoratorHandler";
   }
   detect(node, decorators) {
     if (!decorators) {
@@ -5232,7 +5232,7 @@ var NgModuleDecoratorHandler = class {
     this.injectableRegistry = injectableRegistry;
     this.perf = perf;
     this.precedence = HandlerPrecedence.PRIMARY;
-    this.name = NgModuleDecoratorHandler.name;
+    this.name = "NgModuleDecoratorHandler";
   }
   detect(node, decorators) {
     if (!decorators) {
@@ -6159,7 +6159,7 @@ var ComponentDecoratorHandler = class {
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
     this.preanalyzeStylesCache = /* @__PURE__ */ new Map();
     this.precedence = HandlerPrecedence.PRIMARY;
-    this.name = ComponentDecoratorHandler.name;
+    this.name = "ComponentDecoratorHandler";
     this.extractTemplateOptions = {
       enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
       i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
@@ -6786,7 +6786,7 @@ var InjectableDecoratorHandler = class {
     this.perf = perf;
     this.errorOnDuplicateProv = errorOnDuplicateProv;
     this.precedence = HandlerPrecedence.SHARED;
-    this.name = InjectableDecoratorHandler.name;
+    this.name = "InjectableDecoratorHandler";
   }
   detect(node, decorators) {
     if (!decorators) {
@@ -7016,7 +7016,7 @@ var PipeDecoratorHandler = class {
     this.isCore = isCore;
     this.perf = perf;
     this.precedence = HandlerPrecedence.PRIMARY;
-    this.name = PipeDecoratorHandler.name;
+    this.name = "PipeDecoratorHandler";
   }
   detect(node, decorators) {
     if (!decorators) {
@@ -7226,4 +7226,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-T5X4DFVC.js.map
+//# sourceMappingURL=chunk-3PRCF6WK.js.map
