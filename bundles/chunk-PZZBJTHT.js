@@ -5866,6 +5866,9 @@ var TemplateTypeCheckerImpl = class {
     }
     const emitted = emittedRef.expression;
     if (emitted instanceof WrappedNodeExpr) {
+      if (refTo.node === inContext) {
+        return null;
+      }
       let isForwardReference = false;
       if (emitted.node.getStart() > inContext.getStart()) {
         const declaration = (_b = (_a = this.programDriver.getProgram().getTypeChecker().getTypeAtLocation(emitted.node).getSymbol()) == null ? void 0 : _a.declarations) == null ? void 0 : _b[0];
@@ -7796,4 +7799,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4OH4YIDK.js.map
+//# sourceMappingURL=chunk-PZZBJTHT.js.map
