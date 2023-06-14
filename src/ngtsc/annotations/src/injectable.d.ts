@@ -43,7 +43,7 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
      */
     errorOnDuplicateProv?: boolean);
     readonly precedence = HandlerPrecedence.SHARED;
-    readonly name: string;
+    readonly name = "InjectableDecoratorHandler";
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<InjectableHandlerData>;
     symbol(): null;

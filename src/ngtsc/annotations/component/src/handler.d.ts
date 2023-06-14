@@ -69,7 +69,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private preanalyzeStylesCache;
     private extractTemplateOptions;
     readonly precedence = HandlerPrecedence.PRIMARY;
-    readonly name: string;
+    readonly name = "ComponentDecoratorHandler";
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     preanalyze(node: ClassDeclaration, decorator: Readonly<Decorator>): Promise<void> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>, flags?: HandlerFlags): AnalysisOutput<ComponentAnalysisData>;

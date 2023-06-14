@@ -40,7 +40,7 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator,
     private perf;
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, injectableRegistry: InjectableClassRegistry, isCore: boolean, perf: PerfRecorder);
     readonly precedence = HandlerPrecedence.PRIMARY;
-    readonly name: string;
+    readonly name = "PipeDecoratorHandler";
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;
     analyze(clazz: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<PipeHandlerData>;
     symbol(node: ClassDeclaration, analysis: Readonly<PipeHandlerData>): PipeSymbol;
