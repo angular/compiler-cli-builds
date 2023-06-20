@@ -27,6 +27,7 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
     private strictCtorDeps;
     private injectableRegistry;
     private perf;
+    private includeClassMetadata;
     /**
      * What to do if the injectable already contains a ɵprov property.
      *
@@ -34,7 +35,7 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
      * If false then there is no error and a new ɵprov property is not added.
      */
     private errorOnDuplicateProv;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean, strictCtorDeps: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, 
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean, strictCtorDeps: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, includeClassMetadata: boolean, 
     /**
      * What to do if the injectable already contains a ɵprov property.
      *
