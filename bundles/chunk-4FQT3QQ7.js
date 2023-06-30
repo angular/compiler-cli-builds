@@ -5075,7 +5075,7 @@ var DirectiveDecoratorHandler = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.mjs
-import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget2, FunctionExpr as FunctionExpr2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, R3Identifiers, R3SelectorScopeMode, ReturnStatement as ReturnStatement2, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget2, FunctionExpr as FunctionExpr2, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, R3Identifiers, R3NgModuleMetadataKind, R3SelectorScopeMode, ReturnStatement as ReturnStatement2, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
 import ts22 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/module_with_providers.mjs
@@ -5212,7 +5212,7 @@ var NgModuleSymbol = class extends SemanticSymbol {
   }
 };
 var NgModuleDecoratorHandler = class {
-  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf, includeClassMetadata) {
+  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf, includeClassMetadata, compilationMode) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaReader = metaReader;
@@ -5228,6 +5228,7 @@ var NgModuleDecoratorHandler = class {
     this.injectableRegistry = injectableRegistry;
     this.perf = perf;
     this.includeClassMetadata = includeClassMetadata;
+    this.compilationMode = compilationMode;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = "NgModuleDecoratorHandler";
   }
@@ -5247,7 +5248,7 @@ var NgModuleDecoratorHandler = class {
     }
   }
   analyze(node, decorator) {
-    var _a;
+    var _a, _b, _c, _d, _e;
     this.perf.eventCount(PerfEvent.AnalyzeNgModule);
     const name = node.name.text;
     if (decorator.args === null || decorator.args.length > 1) {
@@ -5267,9 +5268,8 @@ var NgModuleDecoratorHandler = class {
     ]);
     const diagnostics = [];
     let declarationRefs = [];
-    let rawDeclarations = null;
-    if (ngModule.has("declarations")) {
-      rawDeclarations = ngModule.get("declarations");
+    const rawDeclarations = (_a = ngModule.get("declarations")) != null ? _a : null;
+    if (this.compilationMode !== CompilationMode.LOCAL && rawDeclarations !== null) {
       const declarationMeta = this.evaluator.evaluate(rawDeclarations, forwardRefResolver);
       declarationRefs = this.resolveTypeList(rawDeclarations, declarationMeta, name, "declarations", 0).references;
       for (const ref of declarationRefs) {
@@ -5283,33 +5283,31 @@ var NgModuleDecoratorHandler = class {
       return { diagnostics };
     }
     let importRefs = [];
-    let rawImports = null;
-    if (ngModule.has("imports")) {
-      rawImports = ngModule.get("imports");
+    let rawImports = (_b = ngModule.get("imports")) != null ? _b : null;
+    if (this.compilationMode !== CompilationMode.LOCAL && rawImports !== null) {
       const importsMeta = this.evaluator.evaluate(rawImports, moduleResolvers);
       importRefs = this.resolveTypeList(rawImports, importsMeta, name, "imports", 0).references;
     }
     let exportRefs = [];
-    let rawExports = null;
-    if (ngModule.has("exports")) {
-      rawExports = ngModule.get("exports");
+    const rawExports = (_c = ngModule.get("exports")) != null ? _c : null;
+    if (this.compilationMode !== CompilationMode.LOCAL && rawExports !== null) {
       const exportsMeta = this.evaluator.evaluate(rawExports, moduleResolvers);
       exportRefs = this.resolveTypeList(rawExports, exportsMeta, name, "exports", 0).references;
       this.referencesRegistry.add(node, ...exportRefs);
     }
     let bootstrapRefs = [];
-    if (ngModule.has("bootstrap")) {
-      const expr = ngModule.get("bootstrap");
-      const bootstrapMeta = this.evaluator.evaluate(expr, forwardRefResolver);
-      bootstrapRefs = this.resolveTypeList(expr, bootstrapMeta, name, "bootstrap", 0).references;
+    const rawBootstrap = (_d = ngModule.get("bootstrap")) != null ? _d : null;
+    if (this.compilationMode !== CompilationMode.LOCAL && rawBootstrap !== null) {
+      const bootstrapMeta = this.evaluator.evaluate(rawBootstrap, forwardRefResolver);
+      bootstrapRefs = this.resolveTypeList(rawBootstrap, bootstrapMeta, name, "bootstrap", 0).references;
       for (const ref of bootstrapRefs) {
         const dirMeta = this.metaReader.getDirectiveMetadata(ref);
         if (dirMeta == null ? void 0 : dirMeta.isStandalone) {
-          diagnostics.push(makeStandaloneBootstrapDiagnostic(node, ref, expr));
+          diagnostics.push(makeStandaloneBootstrapDiagnostic(node, ref, rawBootstrap));
         }
       }
     }
-    const schemas = ngModule.has("schemas") ? extractSchemas(ngModule.get("schemas"), this.evaluator, "NgModule") : [];
+    const schemas = this.compilationMode !== CompilationMode.LOCAL && ngModule.has("schemas") ? extractSchemas(ngModule.get("schemas"), this.evaluator, "NgModule") : [];
     let id = null;
     if (ngModule.has("id")) {
       const idExpr = ngModule.get("id");
@@ -5338,26 +5336,42 @@ var NgModuleDecoratorHandler = class {
     const isForwardReference = (ref) => isExpressionForwardReference(ref.value, node.name, valueContext);
     const containsForwardDecls = bootstrap.some(isForwardReference) || declarations.some(isForwardReference) || imports.some(isForwardReference) || exports.some(isForwardReference);
     const type = wrapTypeReference(this.reflector, node);
-    const ngModuleMetadata = {
-      type,
-      bootstrap,
-      declarations,
-      publicDeclarationTypes: this.onlyPublishPublicTypings ? exportedDeclarations : null,
-      exports,
-      imports,
-      includeImportTypes: !this.onlyPublishPublicTypings,
-      containsForwardDecls,
-      id,
-      selectorScopeMode: R3SelectorScopeMode.SideEffect,
-      schemas: []
-    };
+    let ngModuleMetadata;
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      ngModuleMetadata = {
+        kind: R3NgModuleMetadataKind.Local,
+        type,
+        bootstrapExpression: rawBootstrap ? new WrappedNodeExpr6(rawBootstrap) : null,
+        declarationsExpression: rawDeclarations ? new WrappedNodeExpr6(rawDeclarations) : null,
+        exportsExpression: rawExports ? new WrappedNodeExpr6(rawExports) : null,
+        importsExpression: rawImports ? new WrappedNodeExpr6(rawImports) : null,
+        id,
+        selectorScopeMode: R3SelectorScopeMode.SideEffect,
+        schemas: []
+      };
+    } else {
+      ngModuleMetadata = {
+        kind: R3NgModuleMetadataKind.Global,
+        type,
+        bootstrap,
+        declarations,
+        publicDeclarationTypes: this.onlyPublishPublicTypings ? exportedDeclarations : null,
+        exports,
+        imports,
+        includeImportTypes: !this.onlyPublishPublicTypings,
+        containsForwardDecls,
+        id,
+        selectorScopeMode: R3SelectorScopeMode.SideEffect,
+        schemas: []
+      };
+    }
     const rawProviders = ngModule.has("providers") ? ngModule.get("providers") : null;
     let wrappedProviders = null;
     if (rawProviders !== null && (!ts22.isArrayLiteralExpression(rawProviders) || rawProviders.elements.length > 0)) {
       wrappedProviders = new WrappedNodeExpr6(this.annotateForClosureCompiler ? wrapFunctionExpressionsInParens(rawProviders) : rawProviders);
     }
     const topLevelImports = [];
-    if (ngModule.has("imports")) {
+    if (this.compilationMode !== CompilationMode.LOCAL && ngModule.has("imports")) {
       const rawImports2 = unwrapExpression(ngModule.get("imports"));
       let topLevelExpressions = [];
       if (ts22.isArrayLiteralExpression(rawImports2)) {
@@ -5416,7 +5430,7 @@ var NgModuleDecoratorHandler = class {
         classMetadata: this.includeClassMetadata ? extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler) : null,
         factorySymbolName: node.name.text,
         remoteScopesMayRequireCycleProtection,
-        decorator: (_a = decorator == null ? void 0 : decorator.node) != null ? _a : null
+        decorator: (_e = decorator == null ? void 0 : decorator.node) != null ? _e : null
       }
     };
   }
@@ -7226,4 +7240,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3SPKRPX3.js.map
+//# sourceMappingURL=chunk-4FQT3QQ7.js.map
