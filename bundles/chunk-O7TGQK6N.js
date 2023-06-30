@@ -732,7 +732,7 @@ function toR3InjectorMeta(metaObj) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_ng_module_linker_1.mjs
-import { compileNgModule, R3SelectorScopeMode } from "@angular/compiler";
+import { compileNgModule, R3NgModuleMetadataKind, R3SelectorScopeMode } from "@angular/compiler";
 var PartialNgModuleLinkerVersion1 = class {
   constructor(emitInline) {
     this.emitInline = emitInline;
@@ -745,6 +745,7 @@ var PartialNgModuleLinkerVersion1 = class {
 function toR3NgModuleMeta(metaObj, supportJit) {
   const wrappedType = metaObj.getOpaque("type");
   const meta = {
+    kind: R3NgModuleMetadataKind.Global,
     type: wrapReference(wrappedType),
     bootstrap: [],
     declarations: [],
@@ -852,7 +853,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "16.2.0-next.1+sha-a19a87d");
+  const LATEST_VERSION_RANGE = getRange("<=", "16.2.0-next.1+sha-471cdff");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -899,7 +900,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "16.2.0-next.1+sha-a19a87d") {
+    if (version === "16.2.0-next.1+sha-471cdff") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -1030,4 +1031,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ADNHTL54.js.map
+//# sourceMappingURL=chunk-O7TGQK6N.js.map
