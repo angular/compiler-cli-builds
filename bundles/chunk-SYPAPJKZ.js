@@ -36,7 +36,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-4FQT3QQ7.js";
+} from "./chunk-IQABJ7BD.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -6949,7 +6949,7 @@ var NgCompiler = class {
     return diagnostics;
   }
   makeCompilation() {
-    var _a, _b;
+    var _a, _b, _c;
     const checker = this.inputProgram.getTypeChecker();
     const reflector = new TypeScriptReflectionHost(checker);
     let refEmitter;
@@ -7020,16 +7020,20 @@ var NgCompiler = class {
     }
     const cycleHandlingStrategy = compilationMode === CompilationMode.FULL ? 0 : 1;
     const strictCtorDeps = this.options.strictInjectionParameters || false;
-    const supportTestBed = (_a = this.options.supportTestBed) != null ? _a : true;
+    const supportJitMode = (_a = this.options.supportJitMode) != null ? _a : true;
+    const supportTestBed = (_b = this.options.supportTestBed) != null ? _b : true;
     if (supportTestBed === false && compilationMode === CompilationMode.PARTIAL) {
       throw new Error('TestBed support ("supportTestBed" option) cannot be disabled in partial compilation mode.');
+    }
+    if (supportJitMode === false && compilationMode === CompilationMode.PARTIAL) {
+      throw new Error('JIT mode support ("supportJitMode" option) cannot be disabled in partial compilation mode.');
     }
     const handlers = [
       new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, supportTestBed),
       new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, supportTestBed),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed),
-      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_b = this.options.onlyPublishPublicTypingsForNgModules) != null ? _b : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode)
+      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_c = this.options.onlyPublishPublicTypingsForNgModules) != null ? _c : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
@@ -7803,4 +7807,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-JYMI4NI3.js.map
+//# sourceMappingURL=chunk-SYPAPJKZ.js.map

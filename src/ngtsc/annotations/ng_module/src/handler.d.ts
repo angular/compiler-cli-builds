@@ -81,8 +81,9 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     private injectableRegistry;
     private perf;
     private includeClassMetadata;
+    private includeSelectorScope;
     private readonly compilationMode;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, exportedProviderStatusResolver: ExportedProviderStatusResolver, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, isCore: boolean, refEmitter: ReferenceEmitter, annotateForClosureCompiler: boolean, onlyPublishPublicTypings: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, includeClassMetadata: boolean, compilationMode: CompilationMode);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, exportedProviderStatusResolver: ExportedProviderStatusResolver, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, isCore: boolean, refEmitter: ReferenceEmitter, annotateForClosureCompiler: boolean, onlyPublishPublicTypings: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, includeClassMetadata: boolean, includeSelectorScope: boolean, compilationMode: CompilationMode);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name = "NgModuleDecoratorHandler";
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;

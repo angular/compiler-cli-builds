@@ -5212,7 +5212,7 @@ var NgModuleSymbol = class extends SemanticSymbol {
   }
 };
 var NgModuleDecoratorHandler = class {
-  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf, includeClassMetadata, compilationMode) {
+  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf, includeClassMetadata, includeSelectorScope, compilationMode) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaReader = metaReader;
@@ -5228,6 +5228,7 @@ var NgModuleDecoratorHandler = class {
     this.injectableRegistry = injectableRegistry;
     this.perf = perf;
     this.includeClassMetadata = includeClassMetadata;
+    this.includeSelectorScope = includeSelectorScope;
     this.compilationMode = compilationMode;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = "NgModuleDecoratorHandler";
@@ -5361,7 +5362,7 @@ var NgModuleDecoratorHandler = class {
         includeImportTypes: !this.onlyPublishPublicTypings,
         containsForwardDecls,
         id,
-        selectorScopeMode: R3SelectorScopeMode.SideEffect,
+        selectorScopeMode: this.includeSelectorScope ? R3SelectorScopeMode.SideEffect : R3SelectorScopeMode.Omit,
         schemas: []
       };
     }
@@ -7240,4 +7241,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4FQT3QQ7.js.map
+//# sourceMappingURL=chunk-IQABJ7BD.js.map
