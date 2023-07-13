@@ -3398,7 +3398,7 @@ var TraitCompiler = class {
       return void 0;
     }
     const promises = [];
-    const priorWork = this.incrementalBuild.priorAnalysisFor(sf);
+    const priorWork = this.compilationMode !== CompilationMode.LOCAL ? this.incrementalBuild.priorAnalysisFor(sf) : null;
     if (priorWork !== null) {
       this.perf.eventCount(PerfEvent.SourceFileReuseAnalysis);
       if (priorWork.length > 0) {
@@ -3594,13 +3594,16 @@ var TraitCompiler = class {
       }
     }
     const symbol = this.makeSymbolForTrait(trait.handler, clazz, (_a = result.analysis) != null ? _a : null);
-    if (result.analysis !== void 0 && trait.handler.register !== void 0) {
+    if (this.compilationMode !== CompilationMode.LOCAL && result.analysis !== void 0 && trait.handler.register !== void 0) {
       trait.handler.register(clazz, result.analysis);
     }
     trait = trait.toAnalyzed((_b = result.analysis) != null ? _b : null, (_c = result.diagnostics) != null ? _c : null, symbol);
   }
   resolve() {
     var _a, _b;
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return;
+    }
     const classes = this.classes.keys();
     for (const clazz of classes) {
       const record = this.classes.get(clazz);
@@ -3665,6 +3668,9 @@ var TraitCompiler = class {
     }
   }
   extendedTemplateCheck(sf, extendedTemplateChecker) {
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return [];
+    }
     const classes = this.fileToClasses.get(sf);
     if (classes === void 0) {
       return [];
@@ -3715,7 +3721,7 @@ var TraitCompiler = class {
     }
   }
   updateResources(clazz) {
-    if (!this.reflector.isClass(clazz) || !this.classes.has(clazz)) {
+    if (this.compilationMode === CompilationMode.LOCAL || !this.reflector.isClass(clazz) || !this.classes.has(clazz)) {
       return;
     }
     const record = this.classes.get(clazz);
@@ -3734,14 +3740,21 @@ var TraitCompiler = class {
     const record = this.classes.get(original);
     let res = [];
     for (const trait of record.traits) {
-      if (trait.state !== TraitState.Resolved || containsErrors(trait.analysisDiagnostics) || containsErrors(trait.resolveDiagnostics)) {
-        continue;
-      }
       let compileRes;
-      if (this.compilationMode === CompilationMode.PARTIAL && trait.handler.compilePartial !== void 0) {
-        compileRes = trait.handler.compilePartial(clazz, trait.analysis, trait.resolution);
+      if (this.compilationMode === CompilationMode.LOCAL) {
+        if (trait.state !== TraitState.Analyzed || trait.analysis === null || containsErrors(trait.analysisDiagnostics)) {
+          continue;
+        }
+        compileRes = trait.handler.compileLocal(clazz, trait.analysis, constantPool);
       } else {
-        compileRes = trait.handler.compileFull(clazz, trait.analysis, trait.resolution, constantPool);
+        if (trait.state !== TraitState.Resolved || containsErrors(trait.analysisDiagnostics) || containsErrors(trait.resolveDiagnostics)) {
+          continue;
+        }
+        if (this.compilationMode === CompilationMode.PARTIAL && trait.handler.compilePartial !== void 0) {
+          compileRes = trait.handler.compilePartial(clazz, trait.analysis, trait.resolution);
+        } else {
+          compileRes = trait.handler.compileFull(clazz, trait.analysis, trait.resolution, constantPool);
+        }
       }
       const compileMatchRes = compileRes;
       if (Array.isArray(compileMatchRes)) {
@@ -3765,7 +3778,7 @@ var TraitCompiler = class {
     const record = this.classes.get(original);
     const decorators = [];
     for (const trait of record.traits) {
-      if (trait.state !== TraitState.Resolved) {
+      if (this.compilationMode !== CompilationMode.LOCAL && trait.state !== TraitState.Resolved) {
         continue;
       }
       if (trait.detected.trigger !== null && ts15.isDecorator(trait.detected.trigger)) {
@@ -5061,6 +5074,13 @@ var DirectiveDecoratorHandler = class {
     const classMetadata = analysis.classMetadata !== null ? compileDeclareClassMetadata(analysis.classMetadata).toStmt() : null;
     return compileResults(fac, def, classMetadata, "\u0275dir", inputTransformFields);
   }
+  compileLocal(node, analysis, pool) {
+    const fac = compileNgFactoryDefField(toFactoryMetadata(analysis.meta, FactoryTarget.Directive));
+    const def = compileDirectiveFromMetadata(analysis.meta, pool, makeBindingParser());
+    const inputTransformFields = compileInputTransformFields(analysis.inputs);
+    const classMetadata = analysis.classMetadata !== null ? compileClassMetadata(analysis.classMetadata).toStmt() : null;
+    return compileResults(fac, def, classMetadata, "\u0275dir", inputTransformFields);
+  }
   findClassFieldWithAngularFeatures(node) {
     return this.reflector.getMembersOfClass(node).find((member) => {
       if (!member.isStatic && member.kind === ClassMemberKind.Method && LIFECYCLE_HOOKS.has(member.name)) {
@@ -5571,6 +5591,19 @@ var NgModuleDecoratorHandler = class {
     const metadata = classMetadata !== null ? compileDeclareClassMetadata2(classMetadata) : null;
     this.insertMetadataStatement(ngModuleDef.statements, metadata);
     return this.compileNgModule(factoryFn, injectorDef, ngModuleDef);
+  }
+  compileLocal(node, { inj, mod, fac, classMetadata, declarations, remoteScopesMayRequireCycleProtection }) {
+    const factoryFn = compileNgFactoryDefField(fac);
+    const ngInjectorDef = compileInjector({
+      ...inj,
+      imports: []
+    });
+    const ngModuleDef = compileNgModule(mod);
+    const statements = ngModuleDef.statements;
+    const metadata = classMetadata !== null ? compileClassMetadata2(classMetadata) : null;
+    this.insertMetadataStatement(statements, metadata);
+    this.appendRemoteScopingStatements(statements, node, declarations, remoteScopesMayRequireCycleProtection);
+    return this.compileNgModule(factoryFn, ngInjectorDef, ngModuleDef);
   }
   insertMetadataStatement(ngModuleStatements, metadata) {
     if (metadata !== null) {
@@ -6136,7 +6169,7 @@ function isLikelyModuleWithProviders(value) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 var EMPTY_ARRAY2 = [];
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata, compilationMode) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -6167,6 +6200,7 @@ var ComponentDecoratorHandler = class {
     this.perf = perf;
     this.hostDirectivesResolver = hostDirectivesResolver;
     this.includeClassMetadata = includeClassMetadata;
+    this.compilationMode = compilationMode;
     this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
@@ -6236,7 +6270,7 @@ var ComponentDecoratorHandler = class {
     ]).then(() => void 0);
   }
   analyze(node, decorator) {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     this.perf.eventCount(PerfEvent.AnalyzeComponent);
     const containingFile = node.getSourceFile().fileName;
     this.literalCache.delete(decorator);
@@ -6278,15 +6312,15 @@ var ComponentDecoratorHandler = class {
       providersRequiringFactory = resolveProvidersRequiringFactory(component.get("providers"), this.reflector, this.evaluator);
     }
     let resolvedImports = null;
-    let rawImports = null;
-    if (component.has("imports") && !metadata.isStandalone) {
+    let rawImports = (_b = component.get("imports")) != null ? _b : null;
+    if (rawImports && !metadata.isStandalone) {
       if (diagnostics === void 0) {
         diagnostics = [];
       }
       diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_NOT_STANDALONE, component.get("imports"), `'imports' is only valid on a component that is standalone.`, [makeRelatedInformation(node.name, `Did you forget to add 'standalone: true' to this @Component?`)]));
       isPoisoned = true;
-    } else if (component.has("imports")) {
-      const expr = component.get("imports");
+    } else if (this.compilationMode !== CompilationMode.LOCAL && rawImports) {
+      const expr = rawImports;
       const importResolvers = combineResolvers([
         createModuleWithProvidersResolver(this.reflector, this.isCore),
         forwardRefResolver
@@ -6309,7 +6343,7 @@ var ComponentDecoratorHandler = class {
         diagnostics = [];
       }
       diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_NOT_STANDALONE, component.get("schemas"), `'schemas' is only valid on a component that is standalone.`));
-    } else if (component.has("schemas")) {
+    } else if (this.compilationMode !== CompilationMode.LOCAL && component.has("schemas")) {
       schemas = extractSchemas(component.get("schemas"), this.evaluator, "Component");
     } else if (metadata.isStandalone) {
       schemas = [];
@@ -6401,7 +6435,7 @@ var ComponentDecoratorHandler = class {
             ngContentSelectors: template.ngContentSelectors
           },
           encapsulation,
-          interpolation: (_b = template.interpolationConfig) != null ? _b : DEFAULT_INTERPOLATION_CONFIG2,
+          interpolation: (_c = template.interpolationConfig) != null ? _c : DEFAULT_INTERPOLATION_CONFIG2,
           styles,
           animations,
           viewProviders: wrappedViewProviders,
@@ -6424,7 +6458,7 @@ var ComponentDecoratorHandler = class {
         rawImports,
         resolvedImports,
         schemas,
-        decorator: (_c = decorator == null ? void 0 : decorator.node) != null ? _c : null
+        decorator: (_d = decorator == null ? void 0 : decorator.node) != null ? _d : null
       },
       diagnostics
     };
@@ -6745,6 +6779,21 @@ var ComponentDecoratorHandler = class {
     const classMetadata = analysis.classMetadata !== null ? compileDeclareClassMetadata3(analysis.classMetadata).toStmt() : null;
     return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields);
   }
+  compileLocal(node, analysis, pool) {
+    if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
+      return [];
+    }
+    const meta = {
+      ...analysis.meta,
+      declarationListEmitMode: 0,
+      declarations: []
+    };
+    const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
+    const def = compileComponentFromMetadata(meta, pool, makeBindingParser2());
+    const inputTransformFields = compileInputTransformFields(analysis.inputs);
+    const classMetadata = analysis.classMetadata !== null ? compileClassMetadata3(analysis.classMetadata).toStmt() : null;
+    return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields);
+  }
   _checkForCyclicImport(importedFile, expr, origin) {
     const imported = resolveImportedFile(this.moduleResolver, importedFile, expr, origin);
     if (imported === null) {
@@ -6854,6 +6903,9 @@ var InjectableDecoratorHandler = class {
   }
   compilePartial(node, analysis) {
     return this.compile(compileDeclareFactory, compileDeclareInjectableFromMetadata, compileDeclareClassMetadata4, node, analysis);
+  }
+  compileLocal(node, analysis) {
+    return this.compile(compileNgFactoryDefField, (meta) => compileInjectable(meta, false), compileClassMetadata4, node, analysis);
   }
   compile(compileFactoryFn, compileInjectableFn, compileClassMetadataFn, node, analysis) {
     const results = [];
@@ -7145,6 +7197,12 @@ var PipeDecoratorHandler = class {
     const classMetadata = analysis.classMetadata !== null ? compileDeclareClassMetadata5(analysis.classMetadata).toStmt() : null;
     return compileResults(fac, def, classMetadata, "\u0275pipe", null);
   }
+  compileLocal(node, analysis) {
+    const fac = compileNgFactoryDefField(toFactoryMetadata(analysis.meta, FactoryTarget5.Pipe));
+    const def = compilePipeFromMetadata(analysis.meta);
+    const classMetadata = analysis.classMetadata !== null ? compileClassMetadata5(analysis.classMetadata).toStmt() : null;
+    return compileResults(fac, def, classMetadata, "\u0275pipe", null);
+  }
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/checker.mjs
@@ -7241,4 +7299,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-IQABJ7BD.js.map
+//# sourceMappingURL=chunk-2T5RMTKO.js.map

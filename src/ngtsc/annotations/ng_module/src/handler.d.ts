@@ -93,6 +93,7 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     resolve(node: ClassDeclaration, analysis: Readonly<NgModuleAnalysis>): ResolveResult<NgModuleResolution>;
     compileFull(node: ClassDeclaration, { inj, mod, fac, classMetadata, declarations, remoteScopesMayRequireCycleProtection }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
     compilePartial(node: ClassDeclaration, { inj, fac, mod, classMetadata }: Readonly<NgModuleAnalysis>, { injectorImports }: Readonly<NgModuleResolution>): CompileResult[];
+    compileLocal(node: ClassDeclaration, { inj, mod, fac, classMetadata, declarations, remoteScopesMayRequireCycleProtection }: Readonly<NgModuleAnalysis>): CompileResult[];
     /**
      * Add class metadata statements, if provided, to the `ngModuleStatements`.
      */

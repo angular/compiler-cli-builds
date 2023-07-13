@@ -90,7 +90,8 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     recordFor(clazz: ClassDeclaration): ClassRecord | null;
     getAnalyzedRecords(): Map<ts.SourceFile, ClassRecord[]>;
     /**
-     * Import a `ClassRecord` from a previous compilation.
+     * Import a `ClassRecord` from a previous compilation (only to be used in global compilation
+     * modes)
      *
      * Traits from the `ClassRecord` have accurate metadata, but the `handler` is from the old program
      * and needs to be updated (matching is done by name). A new pending trait is created and then
