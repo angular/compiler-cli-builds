@@ -173,6 +173,9 @@ var ExpressionTranslatorVisitor = class {
     }
     return this.factory.createConditional(cond, ast.trueCase.visitExpression(this, context), ast.falseCase.visitExpression(this, context));
   }
+  visitDynamicImportExpr(ast, context) {
+    return this.factory.createDynamicImport(ast.url);
+  }
   visitNotExpr(ast, context) {
     return this.factory.createUnaryExpression("!", ast.condition.visitExpression(this, context));
   }
@@ -401,6 +404,9 @@ var TypeTranslatorVisitor = class {
   visitConditionalExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
+  visitDynamicImportExpr(ast, context) {
+    throw new Error("Method not implemented.");
+  }
   visitNotExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
@@ -581,6 +587,13 @@ var TypeScriptAstFactory = class {
   createConditional(condition, whenTrue, whenFalse) {
     return ts3.factory.createConditionalExpression(condition, void 0, whenTrue, void 0, whenFalse);
   }
+  createDynamicImport(url) {
+    return ts3.factory.createCallExpression(
+      ts3.factory.createToken(ts3.SyntaxKind.ImportKeyword),
+      void 0,
+      [ts3.factory.createStringLiteral(url)]
+    );
+  }
   createFunctionDeclaration(functionName, parameters, body) {
     if (!ts3.isBlock(body)) {
       throw new Error(`Invalid syntax, expected a block, but got ${ts3.SyntaxKind[body.kind]}.`);
@@ -713,4 +726,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-LOZJLM26.js.map
+//# sourceMappingURL=chunk-IPC76KA7.js.map

@@ -36,7 +36,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-K3BXK5TF.js";
+} from "./chunk-YZ3WOD5G.js";
 import {
   TypeScriptReflectionHost,
   isNamedClassDeclaration
@@ -45,7 +45,7 @@ import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-LOZJLM26.js";
+} from "./chunk-IPC76KA7.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -7846,4 +7846,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-VVXU7VEH.js.map
+//# sourceMappingURL=chunk-E72KZKRK.js.map

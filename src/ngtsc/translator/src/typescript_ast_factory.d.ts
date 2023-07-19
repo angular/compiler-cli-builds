@@ -23,6 +23,7 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     createConditional(condition: ts.Expression, whenTrue: ts.Expression, whenFalse: ts.Expression): ts.Expression;
     createElementAccess: (expression: ts.Expression, index: number | ts.Expression) => ts.ElementAccessExpression;
     createExpressionStatement: (expression: ts.Expression) => ts.ExpressionStatement;
+    createDynamicImport(url: string): ts.CallExpression;
     createFunctionDeclaration(functionName: string, parameters: string[], body: ts.Statement): ts.Statement;
     createFunctionExpression(functionName: string | null, parameters: string[], body: ts.Statement): ts.Expression;
     createIdentifier: (text: string) => ts.Identifier;

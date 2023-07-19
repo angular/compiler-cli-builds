@@ -29,6 +29,7 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createFunctionExpression(functionName: string | null, parameters: string[], body: t.Statement): t.Expression;
     createIdentifier: typeof t.identifier;
     createIfStatement: typeof t.ifStatement;
+    createDynamicImport(url: string): t.Expression;
     createLiteral(value: string | number | boolean | null | undefined): t.Expression;
     createNewExpression: typeof t.newExpression;
     createObjectLiteral(properties: ObjectLiteralProperty<t.Expression>[]): t.Expression;

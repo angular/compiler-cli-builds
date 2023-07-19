@@ -45,6 +45,7 @@ export declare class ExpressionTranslatorVisitor<TStatement, TExpression> implem
     private createES5TaggedTemplateFunctionCall;
     visitExternalExpr(ast: o.ExternalExpr, _context: Context): TExpression;
     visitConditionalExpr(ast: o.ConditionalExpr, context: Context): TExpression;
+    visitDynamicImportExpr(ast: o.DynamicImportExpr, context: any): TExpression;
     visitNotExpr(ast: o.NotExpr, context: Context): TExpression;
     visitFunctionExpr(ast: o.FunctionExpr, context: Context): TExpression;
     visitBinaryOperatorExpr(ast: o.BinaryOperatorExpr, context: Context): TExpression;

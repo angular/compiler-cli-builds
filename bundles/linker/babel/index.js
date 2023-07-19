@@ -8,8 +8,8 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-O7TGQK6N.js";
-import "../../chunk-LOZJLM26.js";
+} from "../../chunk-DKWZY2MH.js";
+import "../../chunk-IPC76KA7.js";
 import "../../chunk-WF3L5COT.js";
 import {
   ConsoleLogger,
@@ -79,6 +79,9 @@ var BabelAstFactory = class {
     assert(body, t.isBlockStatement, "a block");
     const name = functionName !== null ? t.identifier(functionName) : null;
     return t.functionExpression(name, parameters.map((param) => t.identifier(param)), body);
+  }
+  createDynamicImport(url) {
+    return this.createCallExpression(t.import(), [t.stringLiteral(url)], false);
   }
   createLiteral(value) {
     if (typeof value === "string") {
