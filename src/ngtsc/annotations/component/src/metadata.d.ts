@@ -18,7 +18,7 @@ import { ParsedTemplateWithSource, StyleUrlMeta } from './resources';
  * The `keyof R3ComponentMetadata &` condition ensures that only fields of `R3ComponentMetadata` can
  * be included here.
  */
-export type ComponentMetadataResolvedFields = SubsetOfKeys<R3ComponentMetadata<R3TemplateDependencyMetadata>, 'declarations' | 'declarationListEmitMode'>;
+export type ComponentMetadataResolvedFields = SubsetOfKeys<R3ComponentMetadata<R3TemplateDependencyMetadata>, 'declarations' | 'declarationListEmitMode' | 'deferBlocks' | 'deferrableDeclToImportDecl'>;
 export interface ComponentAnalysisData {
     /**
      * `meta` includes those fields of `R3ComponentMetadata` which are calculated at `analyze` time

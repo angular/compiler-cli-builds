@@ -3,36 +3,34 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  ClassMemberKind,
-  filterToMembersWithDecorator,
-  isNamedClassDeclaration,
-  reflectObjectLiteral,
-  reflectTypeEntityToDeclaration,
-  typeNodeToValueExpr
-} from "./chunk-NIK4FIWB.js";
-import {
   ImportManager,
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-IPC76KA7.js";
+} from "./chunk-CSE6A7DF.js";
 import {
+  ClassMemberKind,
   ErrorCode,
   FatalDiagnosticError,
   ImportFlags,
   Reference,
   assertSuccessfulReferenceEmit,
   attachDefaultImportDeclaration,
+  filterToMembersWithDecorator,
   getDefaultImportDeclaration,
   getSourceFile,
   identifierOfNode,
   isDeclaration,
   isFromDtsFile,
+  isNamedClassDeclaration,
   makeDiagnostic,
   makeRelatedInformation,
   nodeDebugInfo,
-  nodeNameForError
-} from "./chunk-WF3L5COT.js";
+  nodeNameForError,
+  reflectObjectLiteral,
+  reflectTypeEntityToDeclaration,
+  typeNodeToValueExpr
+} from "./chunk-RYGXSEBC.js";
 import {
   PerfEvent,
   PerfPhase
@@ -6169,8 +6167,10 @@ function isLikelyModuleWithProviders(value) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 var EMPTY_ARRAY2 = [];
+var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
+var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, enabledBlockTypes, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata, compilationMode) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, enabledBlockTypes, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata, compilationMode, deferredSymbolTracker) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -6203,6 +6203,7 @@ var ComponentDecoratorHandler = class {
     this.hostDirectivesResolver = hostDirectivesResolver;
     this.includeClassMetadata = includeClassMetadata;
     this.compilationMode = compilationMode;
+    this.deferredSymbolTracker = deferredSymbolTracker;
     this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
@@ -6564,7 +6565,9 @@ var ComponentDecoratorHandler = class {
     const metadata = analysis.meta;
     const data = {
       declarations: EMPTY_ARRAY2,
-      declarationListEmitMode: 0
+      declarationListEmitMode: 0,
+      deferBlocks: /* @__PURE__ */ new Map(),
+      deferrableDeclToImportDecl: /* @__PURE__ */ new Map()
     };
     const diagnostics = [];
     const scope = this.scopeReader.getScopeForComponent(node);
@@ -6581,31 +6584,45 @@ var ComponentDecoratorHandler = class {
       }
       const binder = new R3TargetBinder(matcher);
       const bound = binder.bind({ template: metadata.template.nodes });
-      const used = /* @__PURE__ */ new Set();
-      for (const dir of bound.getUsedDirectives()) {
-        used.add(dir.ref.node);
+      const deferBlocks = /* @__PURE__ */ new Map();
+      for (const deferBlock of bound.getDeferBlocks()) {
+        deferBlocks.set(deferBlock, binder.bind({ template: deferBlock.children }));
       }
-      for (const name of bound.getUsedPipes()) {
+      const eagerlyUsed = /* @__PURE__ */ new Set();
+      for (const dir of bound.getEagerlyUsedDirectives()) {
+        eagerlyUsed.add(dir.ref.node);
+      }
+      for (const name of bound.getEagerlyUsedPipes()) {
         if (!pipes.has(name)) {
           continue;
         }
-        used.add(pipes.get(name).ref.node);
+        eagerlyUsed.add(pipes.get(name).ref.node);
       }
-      const declarations = [];
-      const seen = /* @__PURE__ */ new Set();
+      const wholeTemplateUsed = new Set(eagerlyUsed);
+      for (const bound2 of deferBlocks.values()) {
+        for (const dir of bound2.getEagerlyUsedDirectives()) {
+          wholeTemplateUsed.add(dir.ref.node);
+        }
+        for (const name of bound2.getEagerlyUsedPipes()) {
+          if (!pipes.has(name)) {
+            continue;
+          }
+          wholeTemplateUsed.add(pipes.get(name).ref.node);
+        }
+      }
+      const declarations = /* @__PURE__ */ new Map();
       for (const dep of dependencies) {
-        if (seen.has(dep.ref.node)) {
+        if (declarations.has(dep.ref.node)) {
           continue;
         }
-        seen.add(dep.ref.node);
         switch (dep.kind) {
           case MetaKind.Directive:
-            if (!used.has(dep.ref.node) || dep.matchSource !== MatchSource.Selector) {
+            if (!wholeTemplateUsed.has(dep.ref.node) || dep.matchSource !== MatchSource.Selector) {
               continue;
             }
             const dirType = this.refEmitter.emit(dep.ref, context);
             assertSuccessfulReferenceEmit(dirType, node.name, dep.isComponent ? "component" : "directive");
-            declarations.push({
+            declarations.set(dep.ref.node, {
               kind: R3TemplateDependencyKind.Directive,
               ref: dep.ref,
               type: dirType.expression,
@@ -6618,12 +6635,12 @@ var ComponentDecoratorHandler = class {
             });
             break;
           case MetaKind.Pipe:
-            if (!used.has(dep.ref.node)) {
+            if (!wholeTemplateUsed.has(dep.ref.node)) {
               continue;
             }
             const pipeType = this.refEmitter.emit(dep.ref, context);
             assertSuccessfulReferenceEmit(pipeType, node.name, "pipe");
-            declarations.push({
+            declarations.set(dep.ref.node, {
               kind: R3TemplateDependencyKind.Pipe,
               type: pipeType.expression,
               name: dep.name,
@@ -6634,7 +6651,7 @@ var ComponentDecoratorHandler = class {
           case MetaKind.NgModule:
             const ngModuleType = this.refEmitter.emit(dep.ref, context);
             assertSuccessfulReferenceEmit(ngModuleType, node.name, "NgModule");
-            declarations.push({
+            declarations.set(dep.ref.node, {
               kind: R3TemplateDependencyKind.NgModule,
               type: ngModuleType.expression,
               importedFile: ngModuleType.importedFile
@@ -6642,17 +6659,17 @@ var ComponentDecoratorHandler = class {
             break;
         }
       }
-      const isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
-      const isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
       const getSemanticReference = (decl) => this.semanticDepGraphUpdater.getSemanticReference(decl.ref.node, decl.type);
       if (this.semanticDepGraphUpdater !== null) {
-        symbol.usedDirectives = declarations.filter(isUsedDirective).map(getSemanticReference);
-        symbol.usedPipes = declarations.filter(isUsedPipe).map(getSemanticReference);
+        symbol.usedDirectives = Array.from(declarations.values()).filter(isUsedDirective).map(getSemanticReference);
+        symbol.usedPipes = Array.from(declarations.values()).filter(isUsedPipe).map(getSemanticReference);
       }
+      const eagerDeclarations = Array.from(declarations.values()).filter((decl) => decl.kind === R3TemplateDependencyKind.NgModule || eagerlyUsed.has(decl.ref.node));
+      this.resolveDeferBlocks(deferBlocks, declarations, data, analysis, eagerlyUsed);
       const cyclesFromDirectives = /* @__PURE__ */ new Map();
       const cyclesFromPipes = /* @__PURE__ */ new Map();
       if (!metadata.isStandalone) {
-        for (const usedDep of declarations) {
+        for (const usedDep of eagerDeclarations) {
           const cycle = this._checkForCyclicImport(usedDep.importedFile, usedDep.type, context);
           if (cycle !== null) {
             switch (usedDep.kind) {
@@ -6669,16 +6686,16 @@ var ComponentDecoratorHandler = class {
       const standaloneImportMayBeForwardDeclared = analysis.resolvedImports !== null && analysis.resolvedImports.some((ref) => ref.synthetic);
       const cycleDetected = cyclesFromDirectives.size !== 0 || cyclesFromPipes.size !== 0;
       if (!cycleDetected) {
-        for (const { type, importedFile } of declarations) {
+        for (const { type, importedFile } of eagerDeclarations) {
           this.maybeRecordSyntheticImport(importedFile, type, context);
         }
-        const declarationIsForwardDeclared = declarations.some((decl) => isExpressionForwardReference(decl.type, node.name, context));
+        const declarationIsForwardDeclared = eagerDeclarations.some((decl) => isExpressionForwardReference(decl.type, node.name, context));
         const wrapDirectivesAndPipesInClosure = declarationIsForwardDeclared || standaloneImportMayBeForwardDeclared;
-        data.declarations = declarations;
+        data.declarations = eagerDeclarations;
         data.declarationListEmitMode = wrapDirectivesAndPipesInClosure ? 1 : 0;
       } else {
         if (this.cycleHandlingStrategy === 0) {
-          this.scopeRegistry.setComponentRemoteScope(node, declarations.filter(isUsedDirective).map((dir) => dir.ref), declarations.filter(isUsedPipe).map((pipe) => pipe.ref));
+          this.scopeRegistry.setComponentRemoteScope(node, eagerDeclarations.filter(isUsedDirective).map((dir) => dir.ref), eagerDeclarations.filter(isUsedPipe).map((pipe) => pipe.ref));
           symbol.isRemotelyScoped = true;
           if (this.semanticDepGraphUpdater !== null && scope.kind === ComponentScopeKind.NgModule && scope.ngModule !== null) {
             const moduleSymbol = this.semanticDepGraphUpdater.getSymbol(scope.ngModule);
@@ -6756,8 +6773,20 @@ var ComponentDecoratorHandler = class {
     analysis.meta.styles = styles.filter((s) => s.trim().length > 0);
   }
   compileFull(node, analysis, resolution, pool) {
+    var _a;
     if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
       return [];
+    }
+    for (const [_, deferBlockDeps] of resolution.deferBlocks) {
+      for (const deferBlockDep of deferBlockDeps) {
+        const dep = deferBlockDep;
+        const classDecl = dep.classDeclaration;
+        const importDecl = (_a = resolution.deferrableDeclToImportDecl.get(classDecl)) != null ? _a : null;
+        if (importDecl && this.deferredSymbolTracker.canDefer(importDecl)) {
+          deferBlockDep.isDeferrable = true;
+          deferBlockDep.importPath = importDecl.moduleSpecifier.text;
+        }
+      }
     }
     const meta = { ...analysis.meta, ...resolution };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
@@ -6790,7 +6819,9 @@ var ComponentDecoratorHandler = class {
     const meta = {
       ...analysis.meta,
       declarationListEmitMode: 0,
-      declarations: []
+      declarations: [],
+      deferBlocks: /* @__PURE__ */ new Map(),
+      deferrableDeclToImportDecl: /* @__PURE__ */ new Map()
     };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
     const def = compileComponentFromMetadata(meta, pool, makeBindingParser2());
@@ -6811,6 +6842,71 @@ var ComponentDecoratorHandler = class {
       return;
     }
     this.cycleAnalyzer.recordSyntheticImport(origin, imported);
+  }
+  resolveDeferBlocks(deferBlocks, deferrableDecls, resolutionData, analysisData, eagerlyUsedDecls) {
+    const allDeferredDecls = /* @__PURE__ */ new Set();
+    for (const [deferBlock, bound] of deferBlocks) {
+      const usedDirectives = new Set(bound.getEagerlyUsedDirectives().map((d) => d.ref.node));
+      const usedPipes = new Set(bound.getEagerlyUsedPipes());
+      const deps = [];
+      for (const decl of Array.from(deferrableDecls.values())) {
+        if (decl.kind === R3TemplateDependencyKind.NgModule) {
+          continue;
+        }
+        if (decl.kind === R3TemplateDependencyKind.Directive && !usedDirectives.has(decl.ref.node)) {
+          continue;
+        }
+        if (decl.kind === R3TemplateDependencyKind.Pipe && !usedPipes.has(decl.name)) {
+          continue;
+        }
+        deps.push({
+          type: decl.type,
+          symbolName: decl.ref.node.name.escapedText,
+          isDeferrable: false,
+          importPath: null,
+          classDeclaration: decl.ref.node
+        });
+        allDeferredDecls.add(decl.ref.node);
+      }
+      resolutionData.deferBlocks.set(deferBlock, deps);
+    }
+    if (analysisData.meta.isStandalone && analysisData.rawImports !== null && ts24.isArrayLiteralExpression(analysisData.rawImports)) {
+      for (const node of analysisData.rawImports.elements) {
+        if (!ts24.isIdentifier(node)) {
+          continue;
+        }
+        const imp = this.reflector.getImportOfIdentifier(node);
+        if (imp === null) {
+          continue;
+        }
+        const decl = this.reflector.getDeclarationOfIdentifier(node);
+        if (decl === null) {
+          continue;
+        }
+        if (!isNamedClassDeclaration(decl.node)) {
+          continue;
+        }
+        if (!allDeferredDecls.has(decl.node)) {
+          continue;
+        }
+        if (eagerlyUsedDecls.has(decl.node)) {
+          continue;
+        }
+        const dirMeta = this.metaReader.getDirectiveMetadata(new Reference(decl.node));
+        if (dirMeta !== null && !dirMeta.isStandalone) {
+          continue;
+        }
+        const pipeMeta = this.metaReader.getPipeMetadata(new Reference(decl.node));
+        if (pipeMeta !== null && !pipeMeta.isStandalone) {
+          continue;
+        }
+        if (dirMeta === null && pipeMeta === null) {
+          continue;
+        }
+        resolutionData.deferrableDeclToImportDecl.set(decl.node, imp.node);
+        this.deferredSymbolTracker.markAsDeferrableCandidate(node, imp.node);
+      }
+    }
   }
 };
 function validateStandaloneImports(importRefs, importExpr, metaReader, scopeReader) {
@@ -7303,4 +7399,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YZ3WOD5G.js.map
+//# sourceMappingURL=chunk-KJO35U2F.js.map

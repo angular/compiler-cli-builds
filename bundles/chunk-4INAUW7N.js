@@ -36,21 +36,18 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-YZ3WOD5G.js";
-import {
-  TypeScriptReflectionHost,
-  isNamedClassDeclaration
-} from "./chunk-NIK4FIWB.js";
+} from "./chunk-KJO35U2F.js";
 import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-IPC76KA7.js";
+} from "./chunk-CSE6A7DF.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
   COMPILER_ERRORS_WITH_GUIDES,
   DefaultImportTracker,
+  DeferredSymbolTracker,
   ERROR_DETAILS_PAGE_BASE_URL,
   ErrorCode,
   ExtendedTemplateDiagnosticName,
@@ -65,6 +62,7 @@ import {
   Reference,
   ReferenceEmitter,
   RelativePathStrategy,
+  TypeScriptReflectionHost,
   UnifiedModulesAliasingHost,
   UnifiedModulesStrategy,
   addDiagnosticChain,
@@ -74,6 +72,7 @@ import {
   getTokenAtPosition,
   isAssignment,
   isDtsPath,
+  isNamedClassDeclaration,
   isNonDeclarationTsPath,
   isSymbolWithValueDeclaration,
   makeDiagnostic,
@@ -84,7 +83,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-WF3L5COT.js";
+} from "./chunk-RYGXSEBC.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -7043,6 +7042,7 @@ var NgCompiler = class {
     }
     const dtsTransforms = new DtsTransformRegistry();
     const resourceRegistry = new ResourceRegistry();
+    const deferredSymbolsTracker = new DeferredSymbolTracker(this.inputProgram.getTypeChecker());
     let compilationMode = CompilationMode.FULL;
     if (!isCore) {
       switch (this.options.compilationMode) {
@@ -7068,7 +7068,7 @@ var NgCompiler = class {
       throw new Error('JIT mode support ("supportJitMode" option) cannot be disabled in partial compilation mode.');
     }
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.enabledBlockTypes, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, supportTestBed, compilationMode),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.enabledBlockTypes, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, supportTestBed, compilationMode, deferredSymbolsTracker),
       new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, supportTestBed),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed),
@@ -7846,4 +7846,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-E72KZKRK.js.map
+//# sourceMappingURL=chunk-4INAUW7N.js.map

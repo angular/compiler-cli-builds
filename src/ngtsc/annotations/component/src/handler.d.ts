@@ -8,7 +8,7 @@
 import { ConstantPool } from '@angular/compiler';
 import ts from 'typescript';
 import { CycleAnalyzer, CycleHandlingStrategy } from '../../../cycles';
-import { ModuleResolver, ReferenceEmitter } from '../../../imports';
+import { DeferredSymbolTracker, ModuleResolver, ReferenceEmitter } from '../../../imports';
 import { DependencyTracker } from '../../../incremental/api';
 import { SemanticDepGraphUpdater } from '../../../incremental/semantic_graph';
 import { IndexingContext } from '../../../indexer';
@@ -60,7 +60,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private hostDirectivesResolver;
     private includeClassMetadata;
     private readonly compilationMode;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, dtsScopeReader: DtsModuleScopeResolver, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, strictCtorDeps: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean, enabledBlockTypes: Set<string>, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, hostDirectivesResolver: HostDirectivesResolver, includeClassMetadata: boolean, compilationMode: CompilationMode);
+    private readonly deferredSymbolTracker;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, dtsScopeReader: DtsModuleScopeResolver, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, strictCtorDeps: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean, enabledBlockTypes: Set<string>, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, hostDirectivesResolver: HostDirectivesResolver, includeClassMetadata: boolean, compilationMode: CompilationMode, deferredSymbolTracker: DeferredSymbolTracker);
     private literalCache;
     private elementSchemaRegistry;
     /**
@@ -95,4 +96,9 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      */
     private _checkForCyclicImport;
     private maybeRecordSyntheticImport;
+    /**
+     * Resolves information about defer blocks dependencies to make it
+     * available for the final `compile` step.
+     */
+    private resolveDeferBlocks;
 }

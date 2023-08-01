@@ -3,12 +3,10 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  TypeScriptReflectionHost
-} from "./chunk-NIK4FIWB.js";
-import {
+  TypeScriptReflectionHost,
   isAliasImportDeclaration,
   loadIsReferencedAliasDeclarationPatch
-} from "./chunk-WF3L5COT.js";
+} from "./chunk-RYGXSEBC.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/downlevel_decorators_transform/downlevel_decorators_transform.mjs
 import ts from "typescript";
@@ -346,4 +344,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-SJLWUYXS.js.map
+//# sourceMappingURL=chunk-3GVOXFUL.js.map
