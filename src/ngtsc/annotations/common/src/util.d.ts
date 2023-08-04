@@ -90,7 +90,7 @@ export declare function createSourceSpan(node: ts.Node): ParseSourceSpan;
 /**
  * Collate the factory and definition compiled results into an array of CompileResult objects.
  */
-export declare function compileResults(fac: CompileResult, def: R3CompiledExpression, metadataStmt: Statement | null, propName: string, additionalFields: CompileResult[] | null): CompileResult[];
+export declare function compileResults(fac: CompileResult, def: R3CompiledExpression, metadataStmt: Statement | null, propName: string, additionalFields: CompileResult[] | null, deferrableImports: Set<ts.ImportDeclaration> | null): CompileResult[];
 export declare function toFactoryMetadata(meta: Omit<R3FactoryMetadata, 'target'>, target: FactoryTarget): R3FactoryMetadata;
 export declare function resolveImportedFile(moduleResolver: ModuleResolver, importedFile: ImportedFile, expr: Expression, origin: ts.SourceFile): ts.SourceFile | null;
 /**
