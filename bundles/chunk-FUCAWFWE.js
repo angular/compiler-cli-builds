@@ -1361,11 +1361,7 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     this.identifiers.add(variableIdentifier);
   }
   visitDeferredBlock(deferred) {
-    var _a, _b, _c;
-    this.visitAll(deferred.children);
-    (_a = deferred.placeholder) == null ? void 0 : _a.visit(this);
-    (_b = deferred.loading) == null ? void 0 : _b.visit(this);
-    (_c = deferred.error) == null ? void 0 : _c.visit(this);
+    deferred.visitAll(this);
   }
   visitDeferredBlockPlaceholder(block) {
     this.visitAll(block.children);
@@ -6154,12 +6150,7 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor3 {
   visitIcu(icu) {
   }
   visitDeferredBlock(deferred) {
-    this.visitAllNodes(deferred.children);
-    this.visitAllNodes(deferred.triggers);
-    this.visitAllNodes(deferred.prefetchTriggers);
-    deferred.placeholder && this.visit(deferred.placeholder);
-    deferred.loading && this.visit(deferred.loading);
-    deferred.error && this.visit(deferred.error);
+    deferred.visitAll(this);
   }
   visitDeferredTrigger(trigger) {
     if (trigger instanceof TmplAstBoundDeferredTrigger) {
@@ -7846,4 +7837,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4INAUW7N.js.map
+//# sourceMappingURL=chunk-FUCAWFWE.js.map
