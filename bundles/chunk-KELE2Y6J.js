@@ -1549,6 +1549,13 @@ export {
   addDiagnosticChain,
   ERROR_DETAILS_PAGE_BASE_URL,
   ExtendedTemplateDiagnosticName,
+  ClassMemberKind,
+  typeNodeToValueExpr,
+  isNamedClassDeclaration,
+  TypeScriptReflectionHost,
+  reflectTypeEntityToDeclaration,
+  filterToMembersWithDecorator,
+  reflectObjectLiteral,
   isSymbolWithValueDeclaration,
   isDtsPath,
   isNonDeclarationTsPath,
@@ -1583,13 +1590,6 @@ export {
   attachDefaultImportDeclaration,
   getDefaultImportDeclaration,
   DefaultImportTracker,
-  ClassMemberKind,
-  typeNodeToValueExpr,
-  isNamedClassDeclaration,
-  TypeScriptReflectionHost,
-  reflectTypeEntityToDeclaration,
-  filterToMembersWithDecorator,
-  reflectObjectLiteral,
   DeferredSymbolTracker,
   Reference,
   ModuleResolver
@@ -1601,4 +1601,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RYGXSEBC.js.map
+//# sourceMappingURL=chunk-KELE2Y6J.js.map

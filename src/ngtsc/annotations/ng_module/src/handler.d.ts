@@ -18,7 +18,7 @@ import { AnalysisOutput, CompilationMode, CompileResult, DecoratorHandler, Detec
 import { InjectableClassRegistry, ReferencesRegistry } from '../../common';
 export interface NgModuleAnalysis {
     mod: R3NgModuleMetadata;
-    inj: Omit<R3InjectorMetadata, 'imports'>;
+    inj: R3InjectorMetadata;
     fac: R3FactoryMetadata;
     classMetadata: R3ClassMetadata | null;
     declarations: Reference<ClassDeclaration>[];

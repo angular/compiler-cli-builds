@@ -10,7 +10,7 @@ import { InjectableClassRegistry } from '../../annotations/common';
 import { PartialEvaluator } from '../../partial_evaluator';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
-import { AnalysisOutput, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
+import { AnalysisOutput, CompilationMode, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../transform';
 export interface InjectableHandlerData {
     meta: R3InjectableMetadata;
     classMetadata: R3ClassMetadata | null;
@@ -28,6 +28,7 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
     private injectableRegistry;
     private perf;
     private includeClassMetadata;
+    private readonly compilationMode;
     /**
      * What to do if the injectable already contains a ɵprov property.
      *
@@ -35,7 +36,7 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
      * If false then there is no error and a new ɵprov property is not added.
      */
     private errorOnDuplicateProv;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean, strictCtorDeps: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, includeClassMetadata: boolean, 
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean, strictCtorDeps: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, includeClassMetadata: boolean, compilationMode: CompilationMode, 
     /**
      * What to do if the injectable already contains a ɵprov property.
      *

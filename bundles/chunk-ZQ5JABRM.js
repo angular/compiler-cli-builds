@@ -36,12 +36,12 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-WJXW3ICJ.js";
+} from "./chunk-XOQLEIWZ.js";
 import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-CSE6A7DF.js";
+} from "./chunk-FL7UUIBR.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -83,7 +83,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-RYGXSEBC.js";
+} from "./chunk-KELE2Y6J.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -7060,9 +7060,9 @@ var NgCompiler = class {
     }
     const handlers = [
       new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.enabledBlockTypes, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, supportTestBed, compilationMode, deferredSymbolsTracker),
-      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, supportTestBed),
-      new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed),
-      new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed),
+      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, supportTestBed, compilationMode),
+      new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode),
+      new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
       new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_c = this.options.onlyPublishPublicTypingsForNgModules) != null ? _c : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter);
@@ -7392,6 +7392,9 @@ var NgtscProgram = class {
     if (!options.disableTypeScriptVersionCheck) {
       verifySupportedTypeScriptVersion();
     }
+    if (options.compilationMode === "experimental-local") {
+      options.noEmitOnError = false;
+    }
     const reuseProgram = oldProgram == null ? void 0 : oldProgram.compiler.getCurrentProgram();
     this.host = NgCompilerHost.wrap(delegateHost, rootNames, options, reuseProgram != null ? reuseProgram : null);
     if (reuseProgram !== void 0) {
@@ -7460,6 +7463,9 @@ var NgtscProgram = class {
     });
   }
   getTsSemanticDiagnostics(sourceFile, cancellationToken) {
+    if (this.options.compilationMode === "experimental-local") {
+      return [];
+    }
     return this.compiler.perfRecorder.inPhase(PerfPhase.TypeScriptDiagnostics, () => {
       const ignoredFiles = this.compiler.ignoreForDiagnostics;
       let res;
@@ -7837,4 +7843,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RRZV5ZOZ.js.map
+//# sourceMappingURL=chunk-ZQ5JABRM.js.map
