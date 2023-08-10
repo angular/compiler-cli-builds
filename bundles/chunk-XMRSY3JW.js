@@ -1243,7 +1243,7 @@ var IndexingContext = class {
 import { ParseSourceFile } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/template.mjs
-import { ASTWithSource, ImplicitReceiver, PropertyRead, PropertyWrite, RecursiveAstVisitor, TmplAstElement, TmplAstRecursiveVisitor, TmplAstReference, TmplAstTemplate } from "@angular/compiler";
+import { ASTWithSource, ImplicitReceiver, PropertyRead, PropertyWrite, RecursiveAstVisitor, TmplAstBoundDeferredTrigger, TmplAstElement, TmplAstRecursiveVisitor, TmplAstReference, TmplAstTemplate } from "@angular/compiler";
 var ExpressionVisitor = class extends RecursiveAstVisitor {
   constructor(expressionStr, absoluteOffset, boundTemplate, targetToIdentifier) {
     super();
@@ -1370,6 +1370,35 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     this.visitAll(block.children);
   }
   visitDeferredBlockLoading(block) {
+    this.visitAll(block.children);
+  }
+  visitDeferredTrigger(trigger) {
+    if (trigger instanceof TmplAstBoundDeferredTrigger) {
+      this.visitExpression(trigger.value);
+    }
+  }
+  visitSwitchBlock(block) {
+    this.visitExpression(block.expression);
+    this.visitAll(block.cases);
+  }
+  visitSwitchBlockCase(block) {
+    block.expression && this.visitExpression(block.expression);
+    this.visitAll(block.children);
+  }
+  visitForLoopBlock(block) {
+    var _a;
+    this.visitExpression(block.expression);
+    this.visitAll(block.children);
+    (_a = block.empty) == null ? void 0 : _a.visit(this);
+  }
+  visitForLoopBlockEmpty(block) {
+    this.visitAll(block.children);
+  }
+  visitIfBlock(block) {
+    this.visitAll(block.branches);
+  }
+  visitIfBlockBranch(block) {
+    block.expression && this.visitExpression(block.expression);
     this.visitAll(block.children);
   }
   elementOrTemplateToIdentifier(node) {
@@ -6080,7 +6109,7 @@ var SingleShimTypeCheckingHost = class extends SingleFileTypeCheckingHost {
 import { TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/api/api.mjs
-import { ASTWithSource as ASTWithSource4, RecursiveAstVisitor as RecursiveAstVisitor3, TmplAstBoundDeferredTrigger } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource4, RecursiveAstVisitor as RecursiveAstVisitor3, TmplAstBoundDeferredTrigger as TmplAstBoundDeferredTrigger2 } from "@angular/compiler";
 var TemplateCheckWithVisitor = class {
   run(ctx, component, template) {
     const visitor = new TemplateVisitor2(ctx, component, this);
@@ -6153,7 +6182,7 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor3 {
     deferred.visitAll(this);
   }
   visitDeferredTrigger(trigger) {
-    if (trigger instanceof TmplAstBoundDeferredTrigger) {
+    if (trigger instanceof TmplAstBoundDeferredTrigger2) {
       this.visitAst(trigger.value);
     }
   }
@@ -6164,6 +6193,30 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor3 {
     this.visitAllNodes(block.children);
   }
   visitDeferredBlockLoading(block) {
+    this.visitAllNodes(block.children);
+  }
+  visitSwitchBlock(block) {
+    this.visitAst(block.expression);
+    this.visitAllNodes(block.cases);
+  }
+  visitSwitchBlockCase(block) {
+    block.expression && this.visitAst(block.expression);
+    this.visitAllNodes(block.children);
+  }
+  visitForLoopBlock(block) {
+    var _a;
+    this.visitAst(block.expression);
+    this.visitAllNodes(block.children);
+    (_a = block.empty) == null ? void 0 : _a.visit(this);
+  }
+  visitForLoopBlockEmpty(block) {
+    this.visitAllNodes(block.children);
+  }
+  visitIfBlock(block) {
+    this.visitAllNodes(block.branches);
+  }
+  visitIfBlockBranch(block) {
+    block.expression && this.visitAst(block.expression);
     this.visitAllNodes(block.children);
   }
   getDiagnostics(template) {
@@ -7843,4 +7896,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZQ5JABRM.js.map
+//# sourceMappingURL=chunk-XMRSY3JW.js.map
