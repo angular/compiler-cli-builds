@@ -7,7 +7,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-FL7UUIBR.js";
+} from "./chunk-4DJJ3USC.js";
 import {
   ClassMemberKind,
   ErrorCode,
@@ -30,7 +30,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-KELE2Y6J.js";
+} from "./chunk-77KGVZJF.js";
 import {
   PerfEvent,
   PerfPhase
@@ -3478,9 +3478,9 @@ function decoratorToMetadata(decorator, wrapFunctionsInParens) {
 function isAngularDecorator2(decorator, isCore) {
   return isCore || decorator.import !== null && decorator.import.from === "@angular/core";
 }
-function removeIdentifierReferences(node, name) {
+function removeIdentifierReferences(node, names) {
   const result = ts15.transform(node, [(context) => (root) => ts15.visitNode(root, function walk(current) {
-    return ts15.isIdentifier(current) && current.text === name ? ts15.factory.createIdentifier(current.text) : ts15.visitEachChild(current, walk, context);
+    return ts15.isIdentifier(current) && (typeof names === "string" ? current.text === names : names.has(current.text)) ? ts15.factory.createIdentifier(current.text) : ts15.visitEachChild(current, walk, context);
   })]);
   return result.transformed[0];
 }
@@ -3540,7 +3540,7 @@ function compileInputTransformFields(inputs) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
-import { compileClassMetadata as compileClassMetadata3, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata3, compileComponentClassMetadata, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
 import ts24 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
@@ -6833,6 +6833,7 @@ var ComponentDecoratorHandler = class {
     if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
       return [];
     }
+    const deferrableTypes = /* @__PURE__ */ new Map();
     for (const [_, deferBlockDeps] of resolution.deferBlocks) {
       for (const deferBlockDep of deferBlockDeps) {
         const dep = deferBlockDep;
@@ -6841,14 +6842,20 @@ var ComponentDecoratorHandler = class {
         if (importDecl && this.deferredSymbolTracker.canDefer(importDecl)) {
           deferBlockDep.isDeferrable = true;
           deferBlockDep.importPath = importDecl.moduleSpecifier.text;
+          deferrableTypes.set(deferBlockDep.symbolName, deferBlockDep.importPath);
         }
       }
     }
     const meta = { ...analysis.meta, ...resolution };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
+    if (analysis.classMetadata) {
+      const deferrableSymbols = new Set(deferrableTypes.keys());
+      const rewrittenDecoratorsNode = removeIdentifierReferences(analysis.classMetadata.decorators.node, deferrableSymbols);
+      analysis.classMetadata.decorators = new WrappedNodeExpr7(rewrittenDecoratorsNode);
+    }
     const def = compileComponentFromMetadata(meta, pool, makeBindingParser2());
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
-    const classMetadata = analysis.classMetadata !== null ? compileClassMetadata3(analysis.classMetadata).toStmt() : null;
+    const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, deferrableTypes).toStmt() : null;
     const deferrableImports = this.deferredSymbolTracker.getDeferrableImportDecls();
     return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports);
   }
@@ -7464,4 +7471,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XOQLEIWZ.js.map
+//# sourceMappingURL=chunk-ZCXAJUBK.js.map

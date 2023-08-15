@@ -7,7 +7,7 @@ import {
   NoopImportRewriter,
   Reference,
   assertSuccessfulReferenceEmit
-} from "./chunk-KELE2Y6J.js";
+} from "./chunk-77KGVZJF.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/context.mjs
 var Context = class {
@@ -726,4 +726,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FL7UUIBR.js.map
+//# sourceMappingURL=chunk-4DJJ3USC.js.map

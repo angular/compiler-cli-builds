@@ -1313,6 +1313,7 @@ var CORE_SUPPORTED_SYMBOLS = /* @__PURE__ */ new Map([
   ["\u0275\u0275inject", "\u0275\u0275inject"],
   ["\u0275\u0275FactoryDeclaration", "\u0275\u0275FactoryDeclaration"],
   ["\u0275setClassMetadata", "setClassMetadata"],
+  ["\u0275setClassMetadataAsync", "setClassMetadataAsync"],
   ["\u0275\u0275InjectableDeclaration", "\u0275\u0275InjectableDeclaration"],
   ["\u0275\u0275InjectorDeclaration", "\u0275\u0275InjectorDeclaration"],
   ["\u0275\u0275NgModuleDeclaration", "\u0275\u0275NgModuleDeclaration"],
@@ -1601,4 +1602,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KELE2Y6J.js.map
+//# sourceMappingURL=chunk-77KGVZJF.js.map
