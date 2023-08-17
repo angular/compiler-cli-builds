@@ -7,7 +7,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-QJNBIBVG.js";
+} from "./chunk-DT65N2JF.js";
 import {
   ClassMemberKind,
   ErrorCode,
@@ -30,7 +30,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-NGWY7NOB.js";
+} from "./chunk-HXWXLTDZ.js";
 import {
   PerfEvent,
   PerfPhase
@@ -4597,30 +4597,6 @@ function extractQueriesFromDecorator(queryData, reflector, evaluator, isCore) {
   });
   return { content, view };
 }
-function parseDirectiveStyles(directive, evaluator, compilationMode) {
-  const expression = directive.get("styles");
-  if (!expression) {
-    return null;
-  }
-  const value = evaluator.evaluate(expression);
-  if (compilationMode === CompilationMode.LOCAL && Array.isArray(value)) {
-    for (const entry of value) {
-      if (entry instanceof DynamicValue && entry.isFromUnknownIdentifier()) {
-        const relatedInformation = traceDynamicValue(expression, entry);
-        const chain = {
-          messageText: `Unknown identifier used as styles string: ${entry.node.getText()} (did you import this string from another file? This is not allowed in local compilation mode. Please either inline it or move it to a separate file and include it using'styleUrls')`,
-          category: ts20.DiagnosticCategory.Error,
-          code: 0
-        };
-        throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_IMPORTED_STYLES_STRING, expression, chain, relatedInformation);
-      }
-    }
-  }
-  if (!isStringArrayOrDie(value, "styles", expression)) {
-    throw createValueHasWrongTypeError(expression, value, `Failed to resolve @Directive.styles to a string array`);
-  }
-  return value;
-}
 function parseFieldStringArrayValue(directive, field, evaluator) {
   if (!directive.has(field)) {
     return null;
@@ -5824,7 +5800,7 @@ import ts23 from "typescript";
 function getTemplateDeclarationNodeForError(declaration) {
   return declaration.isInline ? declaration.expression : declaration.templateUrlExpression;
 }
-function extractTemplate(node, template, evaluator, depTracker, resourceLoader, options, compilationMode) {
+function extractTemplate(node, template, evaluator, depTracker, resourceLoader, options) {
   if (template.isInline) {
     let sourceStr;
     let sourceParseRange = null;
@@ -5844,15 +5820,6 @@ function extractTemplate(node, template, evaluator, depTracker, resourceLoader, 
       sourceMapUrl = template.resolvedTemplateUrl;
     } else {
       const resolvedTemplate = evaluator.evaluate(template.expression);
-      if (compilationMode === CompilationMode.LOCAL && resolvedTemplate instanceof DynamicValue && resolvedTemplate.isFromUnknownIdentifier()) {
-        const relatedInformation = traceDynamicValue(template.expression, resolvedTemplate);
-        const chain = {
-          messageText: `Unknown identifier used as template string: ${template.expression.getText()} (did you import this string from another file? This is not allowed in local compilation mode. Please either inline it or move it to a separate file and include it using 'templateUrl')`,
-          category: ts23.DiagnosticCategory.Error,
-          code: 0
-        };
-        throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_IMPORTED_TEMPLATE_STRING, template.expression, chain, relatedInformation);
-      }
       if (typeof resolvedTemplate !== "string") {
         throw createValueHasWrongTypeError(template.expression, resolvedTemplate, "template must be a string");
       }
@@ -5981,7 +5948,7 @@ function parseTemplateDeclaration(node, decorator, component, containingFile, ev
     throw new FatalDiagnosticError(ErrorCode.COMPONENT_MISSING_TEMPLATE, decorator.node, "component is missing a template");
   }
 }
-function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanalyzeTemplateCache, node, decorator, component, containingFile, defaultPreserveWhitespaces, options, compilationMode) {
+function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanalyzeTemplateCache, node, decorator, component, containingFile, defaultPreserveWhitespaces, options) {
   if (component.has("templateUrl")) {
     const templateUrlExpr = component.get("templateUrl");
     const templateUrl = evaluator.evaluate(templateUrlExpr);
@@ -5994,7 +5961,7 @@ function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanaly
       if (templatePromise !== void 0) {
         return templatePromise.then(() => {
           const templateDecl = parseTemplateDeclaration(node, decorator, component, containingFile, evaluator, depTracker, resourceLoader, defaultPreserveWhitespaces);
-          const template = extractTemplate(node, templateDecl, evaluator, depTracker, resourceLoader, options, compilationMode);
+          const template = extractTemplate(node, templateDecl, evaluator, depTracker, resourceLoader, options);
           preanalyzeTemplateCache.set(node, template);
           return template;
         });
@@ -6009,7 +5976,7 @@ function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanaly
     }
   } else {
     const templateDecl = parseTemplateDeclaration(node, decorator, component, containingFile, evaluator, depTracker, resourceLoader, defaultPreserveWhitespaces);
-    const template = extractTemplate(node, templateDecl, evaluator, depTracker, resourceLoader, options, compilationMode);
+    const template = extractTemplate(node, templateDecl, evaluator, depTracker, resourceLoader, options);
     preanalyzeTemplateCache.set(node, template);
     return Promise.resolve(template);
   }
@@ -6335,7 +6302,7 @@ var ComponentDecoratorHandler = class {
         return void 0;
       }
     };
-    const templateAndTemplateStyleResources = preloadAndParseTemplate(this.evaluator, this.resourceLoader, this.depTracker, this.preanalyzeTemplateCache, node, decorator, component, containingFile, this.defaultPreserveWhitespaces, this.extractTemplateOptions, this.compilationMode).then((template) => {
+    const templateAndTemplateStyleResources = preloadAndParseTemplate(this.evaluator, this.resourceLoader, this.depTracker, this.preanalyzeTemplateCache, node, decorator, component, containingFile, this.defaultPreserveWhitespaces, this.extractTemplateOptions).then((template) => {
       if (template === null) {
         return void 0;
       }
@@ -6344,7 +6311,7 @@ var ComponentDecoratorHandler = class {
     const componentStyleUrls = extractComponentStyleUrls(this.evaluator, component);
     let inlineStyles;
     if (component.has("styles")) {
-      const litStyles = parseDirectiveStyles(component, this.evaluator, this.compilationMode);
+      const litStyles = parseFieldStringArrayValue(component, "styles", this.evaluator);
       if (litStyles === null) {
         this.preanalyzeStylesCache.set(node, null);
       } else {
@@ -6452,7 +6419,7 @@ var ComponentDecoratorHandler = class {
         i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
         usePoisonedData: this.usePoisonedData,
         enabledBlockTypes: this.enabledBlockTypes
-      }, this.compilationMode);
+      });
     }
     const templateResource = template.declaration.isInline ? { path: null, expression: component.get("template") } : {
       path: absoluteFrom(template.declaration.resolvedTemplateUrl),
@@ -6504,7 +6471,7 @@ var ComponentDecoratorHandler = class {
         throw new Error("Inline resource processing requires asynchronous preanalyze.");
       }
       if (component.has("styles")) {
-        const litStyles = parseDirectiveStyles(component, this.evaluator, this.compilationMode);
+        const litStyles = parseFieldStringArrayValue(component, "styles", this.evaluator);
         if (litStyles !== null) {
           inlineStyles = [...litStyles];
           styles.push(...litStyles);
@@ -6838,7 +6805,7 @@ var ComponentDecoratorHandler = class {
     const containingFile = node.getSourceFile().fileName;
     const templateDecl = analysis.template.declaration;
     if (!templateDecl.isInline) {
-      analysis.template = extractTemplate(node, templateDecl, this.evaluator, this.depTracker, this.resourceLoader, this.extractTemplateOptions, this.compilationMode);
+      analysis.template = extractTemplate(node, templateDecl, this.evaluator, this.depTracker, this.resourceLoader, this.extractTemplateOptions);
     }
     let styles = [];
     if (analysis.styleUrls !== null) {
@@ -7504,4 +7471,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-BOXNK2F2.js.map
+//# sourceMappingURL=chunk-UOW23UB4.js.map
