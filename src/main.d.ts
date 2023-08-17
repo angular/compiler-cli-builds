@@ -8,13 +8,12 @@
 import ts from 'typescript';
 import { ParsedConfiguration } from './perform_compile';
 import * as api from './transformers/api';
-type TsickleModule = typeof import('tsickle');
 export declare function main(args: string[], consoleError?: (s: string) => void, config?: NgcParsedConfiguration, customTransformers?: api.CustomTransformers, programReuse?: {
     program: api.Program | undefined;
-}, modifiedResourceFiles?: Set<string> | null, tsickle?: TsickleModule): number;
+}, modifiedResourceFiles?: Set<string> | null): number;
 export declare function mainDiagnosticsForTest(args: string[], config?: NgcParsedConfiguration, programReuse?: {
     program: api.Program | undefined;
-}, modifiedResourceFiles?: Set<string> | null, tsickle?: TsickleModule): {
+}, modifiedResourceFiles?: Set<string> | null): {
     exitCode: number;
     diagnostics: ReadonlyArray<ts.Diagnostic>;
 };
@@ -28,4 +27,3 @@ export declare function watchMode(project: string, options: api.CompilerOptions,
     ready: (cb: () => void) => void;
     firstCompileResult: readonly ts.Diagnostic[];
 };
-export {};

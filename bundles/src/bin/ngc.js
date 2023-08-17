@@ -5,21 +5,18 @@
     
 import {
   main
-} from "../../chunk-3FYLK7GS.js";
-import "../../chunk-3XAWZBOI.js";
-import "../../chunk-ZCXAJUBK.js";
+} from "../../chunk-M27QHWKU.js";
+import "../../chunk-2WPGLHB5.js";
+import "../../chunk-UOW23UB4.js";
 import "../../chunk-JZC4T2RR.js";
-import "../../chunk-4DJJ3USC.js";
-import "../../chunk-77KGVZJF.js";
+import "../../chunk-DT65N2JF.js";
+import "../../chunk-HXWXLTDZ.js";
 import "../../chunk-7PCPPTTO.js";
 import {
   NodeJSFileSystem,
   setFileSystem
-} from "../../chunk-TBUSSXUA.js";
-import {
-  __require,
-  __toESM
-} from "../../chunk-SRFZMXHZ.js";
+} from "../../chunk-PCMLSPQF.js";
+import "../../chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ngc.mjs
 import "reflect-metadata";
@@ -27,12 +24,7 @@ async function runNgcComamnd() {
   process.title = "Angular Compiler (ngc)";
   const args = process.argv.slice(2);
   setFileSystem(new NodeJSFileSystem());
-  let tsickleModule;
-  try {
-    tsickleModule = (await Promise.resolve().then(() => __toESM(__require("tsickle"), 1))).default;
-  } catch {
-  }
-  process.exitCode = main(args, void 0, void 0, void 0, void 0, void 0, tsickleModule);
+  process.exitCode = main(args, void 0, void 0, void 0, void 0, void 0);
 }
 runNgcComamnd().catch((e) => {
   console.error(e);

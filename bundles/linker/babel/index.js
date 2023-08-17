@@ -8,9 +8,9 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-NN5BCW7J.js";
-import "../../chunk-4DJJ3USC.js";
-import "../../chunk-77KGVZJF.js";
+} from "../../chunk-3RARUEAS.js";
+import "../../chunk-DT65N2JF.js";
+import "../../chunk-HXWXLTDZ.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -18,8 +18,8 @@ import {
 import "../../chunk-EKTJ7622.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-TBUSSXUA.js";
-import "../../chunk-SRFZMXHZ.js";
+} from "../../chunk-PCMLSPQF.js";
+import "../../chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.mjs
 import { types as t4 } from "@babel/core";

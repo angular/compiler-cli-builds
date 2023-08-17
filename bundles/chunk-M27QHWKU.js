@@ -12,7 +12,7 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-3XAWZBOI.js";
+} from "./chunk-2WPGLHB5.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.mjs
 import ts2 from "typescript";
@@ -45,12 +45,12 @@ var FileChangeEvent;
   FileChangeEvent2[FileChangeEvent2["CreateDelete"] = 1] = "CreateDelete";
   FileChangeEvent2[FileChangeEvent2["CreateDeleteDir"] = 2] = "CreateDeleteDir";
 })(FileChangeEvent || (FileChangeEvent = {}));
-function createPerformWatchHost(configFileName, reportDiagnostics, existingOptions, createEmitCallback2) {
+function createPerformWatchHost(configFileName, reportDiagnostics, existingOptions, createEmitCallback) {
   return {
     reportDiagnostics,
     createCompilerHost: (options) => createCompilerHost({ options }),
     readConfiguration: () => readConfiguration(configFileName, existingOptions),
-    createEmitCallback: (options) => createEmitCallback2 ? createEmitCallback2(options) : void 0,
+    createEmitCallback: (options) => createEmitCallback ? createEmitCallback(options) : void 0,
     onFileChange: (options, listener, ready) => {
       if (!options.basePath) {
         reportDiagnostics([{
@@ -235,7 +235,7 @@ function performWatchCompilation(host) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.mjs
-function main(args, consoleError = console.error, config, customTransformers, programReuse, modifiedResourceFiles, tsickle) {
+function main(args, consoleError = console.error, config, customTransformers, programReuse, modifiedResourceFiles) {
   let { project, rootNames, options, errors: configErrors, watch: watch2, emitFlags } = config || readNgcCommandLineAndConfiguration(args);
   if (configErrors.length) {
     return reportErrorsAndExit(configErrors, void 0, consoleError);
@@ -248,43 +248,11 @@ function main(args, consoleError = console.error, config, customTransformers, pr
   if (programReuse !== void 0) {
     oldProgram = programReuse.program;
   }
-  const { diagnostics: compileDiags, program } = performCompilation({
-    rootNames,
-    options,
-    emitFlags,
-    oldProgram,
-    emitCallback: createEmitCallback(options, tsickle),
-    customTransformers,
-    modifiedResourceFiles
-  });
+  const { diagnostics: compileDiags, program } = performCompilation({ rootNames, options, emitFlags, oldProgram, customTransformers, modifiedResourceFiles });
   if (programReuse !== void 0) {
     programReuse.program = program;
   }
   return reportErrorsAndExit(compileDiags, options, consoleError);
-}
-function createEmitCallback(options, tsickle) {
-  if (!options.annotateForClosureCompiler) {
-    return void 0;
-  }
-  if (tsickle == void 0) {
-    throw Error("Tsickle is not provided but `annotateForClosureCompiler` is enabled.");
-  }
-  const tsickleHost = {
-    shouldSkipTsickleProcessing: (fileName) => fileName.endsWith(".d.ts"),
-    pathToModuleName: (context, importPath) => "",
-    shouldIgnoreWarningsForPath: (filePath) => false,
-    fileNameToModuleId: (fileName) => fileName,
-    googmodule: false,
-    untyped: true,
-    transformDecorators: false,
-    transformTypesToClosure: true,
-    generateExtraSuppressions: true,
-    rootDirsRelative: (fileName) => fileName
-  };
-  return ({ program, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, customTransformers = {}, host, options: options2 }) => tsickle.emitWithTsickle(program, { ...tsickleHost, options: options2, moduleResolutionHost: host }, host, options2, targetSourceFile, writeFile, cancellationToken, emitOnlyDtsFiles, {
-    beforeTs: customTransformers.before,
-    afterTs: customTransformers.after
-  });
 }
 function readNgcCommandLineAndConfiguration(args) {
   const options = {};
@@ -353,7 +321,7 @@ function reportErrorsAndExit(allDiagnostics, options, consoleError = console.err
 function watchMode(project, options, consoleError) {
   return performWatchCompilation(createPerformWatchHost(project, (diagnostics) => {
     printDiagnostics(diagnostics, options, consoleError);
-  }, options, (options2) => createEmitCallback(options2)));
+  }, options, void 0));
 }
 function printDiagnostics(diagnostics, options, consoleError) {
   if (diagnostics.length === 0) {
@@ -374,4 +342,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3FYLK7GS.js.map
+//# sourceMappingURL=chunk-M27QHWKU.js.map
