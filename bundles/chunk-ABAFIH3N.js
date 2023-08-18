@@ -36,12 +36,12 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-UOW23UB4.js";
+} from "./chunk-BOXNK2F2.js";
 import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-DT65N2JF.js";
+} from "./chunk-QJNBIBVG.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -83,7 +83,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-HXWXLTDZ.js";
+} from "./chunk-NGWY7NOB.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -225,7 +225,7 @@ function compareVersions(v1, v2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
 var MIN_TS_VERSION = "4.9.3";
-var MAX_TS_VERSION = "5.2.0";
+var MAX_TS_VERSION = "5.3.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
@@ -7896,4 +7896,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2WPGLHB5.js.map
+//# sourceMappingURL=chunk-ABAFIH3N.js.map

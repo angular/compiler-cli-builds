@@ -12,6 +12,7 @@ import { DependencyTracker } from '../../../incremental/api';
 import { Resource } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, DeclarationNode, Decorator } from '../../../reflection';
+import { CompilationMode } from '../../../transform';
 import { TemplateSourceMapping } from '../../../typecheck/api';
 import { ResourceLoader } from '../../common';
 /**
@@ -100,9 +101,9 @@ export interface ExtractTemplateOptions {
     i18nNormalizeLineEndingsInICUs: boolean;
     enabledBlockTypes: Set<string>;
 }
-export declare function extractTemplate(node: ClassDeclaration, template: TemplateDeclaration, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, options: ExtractTemplateOptions): ParsedTemplateWithSource;
+export declare function extractTemplate(node: ClassDeclaration, template: TemplateDeclaration, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, options: ExtractTemplateOptions, compilationMode: CompilationMode): ParsedTemplateWithSource;
 export declare function parseTemplateDeclaration(node: ClassDeclaration, decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, defaultPreserveWhitespaces: boolean): TemplateDeclaration;
-export declare function preloadAndParseTemplate(evaluator: PartialEvaluator, resourceLoader: ResourceLoader, depTracker: DependencyTracker | null, preanalyzeTemplateCache: Map<DeclarationNode, ParsedTemplateWithSource>, node: ClassDeclaration, decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, defaultPreserveWhitespaces: boolean, options: ExtractTemplateOptions): Promise<ParsedTemplateWithSource | null>;
+export declare function preloadAndParseTemplate(evaluator: PartialEvaluator, resourceLoader: ResourceLoader, depTracker: DependencyTracker | null, preanalyzeTemplateCache: Map<DeclarationNode, ParsedTemplateWithSource>, node: ClassDeclaration, decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, defaultPreserveWhitespaces: boolean, options: ExtractTemplateOptions, compilationMode: CompilationMode): Promise<ParsedTemplateWithSource | null>;
 export declare function makeResourceNotFoundError(file: string, nodeForError: ts.Node, resourceType: ResourceTypeForDiagnostics): FatalDiagnosticError;
 /**
  * Transforms the given decorator to inline external resources. i.e. if the decorator
