@@ -26,6 +26,7 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     createDynamicImport(url: string): ts.CallExpression;
     createFunctionDeclaration(functionName: string, parameters: string[], body: ts.Statement): ts.Statement;
     createFunctionExpression(functionName: string | null, parameters: string[], body: ts.Statement): ts.Expression;
+    createArrowFunctionExpression(parameters: string[], body: ts.Statement | ts.Expression): ts.Expression;
     createIdentifier: (text: string) => ts.Identifier;
     createIfStatement(condition: ts.Expression, thenStatement: ts.Statement, elseStatement: ts.Statement | null): ts.Statement;
     createLiteral(value: string | number | boolean | null | undefined): ts.Expression;

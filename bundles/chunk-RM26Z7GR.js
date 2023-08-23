@@ -183,6 +183,9 @@ var ExpressionTranslatorVisitor = class {
     var _a;
     return this.factory.createFunctionExpression((_a = ast.name) != null ? _a : null, ast.params.map((param) => param.name), this.factory.createBlock(this.visitStatements(ast.statements, context)));
   }
+  visitArrowFunctionExpr(ast, context) {
+    return this.factory.createArrowFunctionExpression(ast.params.map((param) => param.name), Array.isArray(ast.body) ? this.factory.createBlock(this.visitStatements(ast.body, context)) : ast.body.visitExpression(this, context));
+  }
   visitBinaryOperatorExpr(ast, context) {
     if (!BINARY_OPERATORS.has(ast.operator)) {
       throw new Error(`Unknown binary operator: ${o.BinaryOperator[ast.operator]}`);
@@ -413,6 +416,9 @@ var TypeTranslatorVisitor = class {
   visitFunctionExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
+  visitArrowFunctionExpr(ast, context) {
+    throw new Error("Method not implemented.");
+  }
   visitUnaryOperatorExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
@@ -606,6 +612,12 @@ var TypeScriptAstFactory = class {
     }
     return ts3.factory.createFunctionExpression(void 0, void 0, functionName != null ? functionName : void 0, void 0, parameters.map((param) => ts3.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
   }
+  createArrowFunctionExpression(parameters, body) {
+    if (ts3.isStatement(body) && !ts3.isBlock(body)) {
+      throw new Error(`Invalid syntax, expected a block, but got ${ts3.SyntaxKind[body.kind]}.`);
+    }
+    return ts3.factory.createArrowFunction(void 0, void 0, parameters.map((param) => ts3.factory.createParameterDeclaration(void 0, void 0, param)), void 0, void 0, body);
+  }
   createIfStatement(condition, thenStatement, elseStatement) {
     return ts3.factory.createIfStatement(condition, thenStatement, elseStatement != null ? elseStatement : void 0);
   }
@@ -726,4 +738,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QJNBIBVG.js.map
+//# sourceMappingURL=chunk-RM26Z7GR.js.map

@@ -26,6 +26,7 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createElementAccess(expression: t.Expression, element: t.Expression): t.Expression;
     createExpressionStatement: typeof t.expressionStatement;
     createFunctionDeclaration(functionName: string, parameters: string[], body: t.Statement): t.Statement;
+    createArrowFunctionExpression(parameters: string[], body: t.Statement | t.Expression): t.Expression;
     createFunctionExpression(functionName: string | null, parameters: string[], body: t.Statement): t.Expression;
     createIdentifier: typeof t.identifier;
     createIfStatement: typeof t.ifStatement;

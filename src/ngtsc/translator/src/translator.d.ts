@@ -48,6 +48,7 @@ export declare class ExpressionTranslatorVisitor<TStatement, TExpression> implem
     visitDynamicImportExpr(ast: o.DynamicImportExpr, context: any): TExpression;
     visitNotExpr(ast: o.NotExpr, context: Context): TExpression;
     visitFunctionExpr(ast: o.FunctionExpr, context: Context): TExpression;
+    visitArrowFunctionExpr(ast: o.ArrowFunctionExpr, context: any): TExpression;
     visitBinaryOperatorExpr(ast: o.BinaryOperatorExpr, context: Context): TExpression;
     visitReadPropExpr(ast: o.ReadPropExpr, context: Context): TExpression;
     visitReadKeyExpr(ast: o.ReadKeyExpr, context: Context): TExpression;

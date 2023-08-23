@@ -8,8 +8,8 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-Y4VOTDJT.js";
-import "../../chunk-QJNBIBVG.js";
+} from "../../chunk-DJV5J7EO.js";
+import "../../chunk-RM26Z7GR.js";
 import "../../chunk-NGWY7NOB.js";
 import {
   ConsoleLogger,
@@ -74,6 +74,12 @@ var BabelAstFactory = class {
   createFunctionDeclaration(functionName, parameters, body) {
     assert(body, t.isBlockStatement, "a block");
     return t.functionDeclaration(t.identifier(functionName), parameters.map((param) => t.identifier(param)), body);
+  }
+  createArrowFunctionExpression(parameters, body) {
+    if (t.isStatement(body)) {
+      assert(body, t.isBlockStatement, "a block");
+    }
+    return t.arrowFunctionExpression(parameters.map((param) => t.identifier(param)), body);
   }
   createFunctionExpression(functionName, parameters, body) {
     assert(body, t.isBlockStatement, "a block");
