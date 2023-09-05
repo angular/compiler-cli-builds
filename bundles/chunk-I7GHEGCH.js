@@ -36,7 +36,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-CZK6HEUJ.js";
+} from "./chunk-Y4VU3VP2.js";
 import {
   ImportManager,
   translateExpression,
@@ -3023,7 +3023,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
-import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, SafeCall, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstElement as TmplAstElement3, TmplAstIcu, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
+import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, SafeCall, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
 import ts23 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
@@ -3613,18 +3613,18 @@ var TcbTemplateBodyOp = class extends TcbOp {
     return null;
   }
 };
-var TcbTextInterpolationOp = class extends TcbOp {
-  constructor(tcb, scope, binding) {
+var TcbExpressionOp = class extends TcbOp {
+  constructor(tcb, scope, expression) {
     super();
     this.tcb = tcb;
     this.scope = scope;
-    this.binding = binding;
+    this.expression = expression;
   }
   get optional() {
     return false;
   }
   execute() {
-    const expr = tcbExpression(this.binding.value, this.tcb, this.scope);
+    const expr = tcbExpression(this.expression, this.tcb, this.scope);
     this.scope.addStatement(ts23.factory.createExpressionStatement(expr));
     return null;
   }
@@ -4201,9 +4201,7 @@ var Scope = class {
       this.elementOpMap.set(node, opIndex);
       this.appendDirectivesAndInputsOfNode(node);
       this.appendOutputsOfNode(node);
-      for (const child of node.children) {
-        this.appendNode(child);
-      }
+      this.appendChildren(node);
       this.checkAndAppendReferencesOfNode(node);
     } else if (node instanceof TmplAstTemplate2) {
       this.appendDirectivesAndInputsOfNode(node);
@@ -4216,10 +4214,33 @@ var Scope = class {
         this.appendDeepSchemaChecks(node.children);
       }
       this.checkAndAppendReferencesOfNode(node);
+    } else if (node instanceof TmplAstDeferredBlock) {
+      node.triggers.when !== void 0 && this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.triggers.when.value));
+      node.prefetchTriggers.when !== void 0 && this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.prefetchTriggers.when.value));
+      this.appendChildren(node);
+      node.placeholder !== null && this.appendChildren(node.placeholder);
+      node.loading !== null && this.appendChildren(node.loading);
+      node.error !== null && this.appendChildren(node.error);
+    } else if (node instanceof TmplAstIfBlock) {
+      for (const branch of node.branches) {
+        this.appendChildren(branch);
+      }
+    } else if (node instanceof TmplAstSwitchBlock) {
+      for (const currentCase of node.cases) {
+        this.appendChildren(currentCase);
+      }
+    } else if (node instanceof TmplAstForLoopBlock) {
+      this.appendChildren(node);
+      node.empty && this.appendChildren(node.empty);
     } else if (node instanceof TmplAstBoundText) {
-      this.opQueue.push(new TcbTextInterpolationOp(this.tcb, this, node));
+      this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.value));
     } else if (node instanceof TmplAstIcu) {
       this.appendIcuExpressions(node);
+    }
+  }
+  appendChildren(node) {
+    for (const child of node.children) {
+      this.appendNode(child);
     }
   }
   checkAndAppendReferencesOfNode(node) {
@@ -4322,11 +4343,11 @@ var Scope = class {
   }
   appendIcuExpressions(node) {
     for (const variable of Object.values(node.vars)) {
-      this.opQueue.push(new TcbTextInterpolationOp(this.tcb, this, variable));
+      this.opQueue.push(new TcbExpressionOp(this.tcb, this, variable.value));
     }
     for (const placeholder of Object.values(node.placeholders)) {
       if (placeholder instanceof TmplAstBoundText) {
-        this.opQueue.push(new TcbTextInterpolationOp(this.tcb, this, placeholder));
+        this.opQueue.push(new TcbExpressionOp(this.tcb, this, placeholder.value));
       }
     }
   }
@@ -7896,4 +7917,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-MNLUIL3E.js.map
+//# sourceMappingURL=chunk-I7GHEGCH.js.map

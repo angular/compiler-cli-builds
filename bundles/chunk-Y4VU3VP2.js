@@ -5919,7 +5919,8 @@ function parseExtractedTemplate(template, sourceStr, sourceParseRange, escapedSt
     enableI18nLegacyMessageIdFormat: options.enableI18nLegacyMessageIdFormat,
     i18nNormalizeLineEndingsInICUs,
     leadingTriviaChars: [],
-    alwaysAttemptHtmlToR3AstConversion: options.usePoisonedData
+    alwaysAttemptHtmlToR3AstConversion: options.usePoisonedData,
+    enabledBlockTypes: options.enabledBlockTypes
   });
   return {
     ...parsedTemplate,
@@ -7504,4 +7505,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CZK6HEUJ.js.map
+//# sourceMappingURL=chunk-Y4VU3VP2.js.map

@@ -258,6 +258,7 @@ declare class Scope {
      */
     private executeOp;
     private appendNode;
+    private appendChildren;
     private checkAndAppendReferencesOfNode;
     private appendDirectivesAndInputsOfNode;
     private appendOutputsOfNode;
