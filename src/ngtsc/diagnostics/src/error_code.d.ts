@@ -92,6 +92,8 @@ export declare enum ErrorCode {
      * and has a corresponding `ngAcceptInputType_` member for the same input.
      */
     CONFLICTING_INPUT_TRANSFORM = 2020,
+    /** Raised when a component has both `styleUrls` and `styleUrl`. */
+    COMPONENT_INVALID_STYLE_URLS = 2021,
     SYMBOL_NOT_EXPORTED = 3001,
     /**
      * Raised when a relationship between directives and/or pipes would cause a cyclic import to be

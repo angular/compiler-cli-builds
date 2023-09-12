@@ -36,12 +36,12 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-UXZZUS4N.js";
+} from "./chunk-KC52PQKJ.js";
 import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-QYCH2357.js";
+} from "./chunk-EJSJTIHK.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -83,7 +83,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-I2HNYMSV.js";
+} from "./chunk-T6QD5I2A.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -7917,4 +7917,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-J3PLED64.js.map
+//# sourceMappingURL=chunk-UYFEPQRA.js.map

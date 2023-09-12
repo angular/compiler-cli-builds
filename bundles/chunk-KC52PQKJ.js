@@ -7,7 +7,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-QYCH2357.js";
+} from "./chunk-EJSJTIHK.js";
 import {
   ClassMemberKind,
   ErrorCode,
@@ -30,7 +30,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-I2HNYMSV.js";
+} from "./chunk-T6QD5I2A.js";
 import {
   PerfEvent,
   PerfPhase
@@ -4601,13 +4601,14 @@ function parseDirectiveStyles(directive, evaluator, compilationMode) {
   if (!expression) {
     return null;
   }
-  const value = evaluator.evaluate(expression);
+  const evaluated = evaluator.evaluate(expression);
+  const value = typeof evaluated === "string" ? [evaluated] : evaluated;
   if (compilationMode === CompilationMode.LOCAL && Array.isArray(value)) {
     for (const entry of value) {
       if (entry instanceof DynamicValue && entry.isFromUnknownIdentifier()) {
         const relatedInformation = traceDynamicValue(expression, entry);
         const chain = {
-          messageText: `Unknown identifier used as styles string: ${entry.node.getText()} (did you import this string from another file? This is not allowed in local compilation mode. Please either inline it or move it to a separate file and include it using'styleUrls')`,
+          messageText: `Unknown identifier used as styles string: ${entry.node.getText()} (did you import this string from another file? This is not allowed in local compilation mode. Please either inline it or move it to a separate file and include it using 'styleUrl')`,
           category: ts20.DiagnosticCategory.Error,
           code: 0
         };
@@ -4616,7 +4617,7 @@ function parseDirectiveStyles(directive, evaluator, compilationMode) {
     }
   }
   if (!isStringArrayOrDie(value, "styles", expression)) {
-    throw createValueHasWrongTypeError(expression, value, `Failed to resolve @Directive.styles to a string array`);
+    throw createValueHasWrongTypeError(expression, value, `Failed to resolve @Component.styles to a string or an array of strings`);
   }
   return value;
 }
@@ -6043,7 +6044,7 @@ function transformDecoratorResources(dec, component, styles, template) {
   if (dec.name !== "Component") {
     return dec;
   }
-  if (!component.has("templateUrl") && !component.has("styleUrls") && !component.has("styles")) {
+  if (!component.has("templateUrl") && !component.has("styleUrls") && !component.has("styleUrl") && !component.has("styles")) {
     return dec;
   }
   const metadata = new Map(component);
@@ -6051,9 +6052,10 @@ function transformDecoratorResources(dec, component, styles, template) {
     metadata.delete("templateUrl");
     metadata.set("template", ts23.factory.createStringLiteral(template.content));
   }
-  if (metadata.has("styleUrls") || metadata.has("styles")) {
+  if (metadata.has("styleUrls") || metadata.has("styleUrl") || metadata.has("styles")) {
     metadata.delete("styles");
     metadata.delete("styleUrls");
+    metadata.delete("styleUrl");
     if (styles.length > 0) {
       const styleNodes = styles.reduce((result, style) => {
         if (style.trim().length > 0) {
@@ -6073,10 +6075,26 @@ function transformDecoratorResources(dec, component, styles, template) {
   return { ...dec, args: [ts23.factory.createObjectLiteralExpression(newMetadataFields)] };
 }
 function extractComponentStyleUrls(evaluator, component) {
-  if (!component.has("styleUrls")) {
-    return [];
+  const styleUrlsExpr = component.get("styleUrls");
+  const styleUrlExpr = component.get("styleUrl");
+  if (styleUrlsExpr !== void 0 && styleUrlExpr !== void 0) {
+    throw new FatalDiagnosticError(ErrorCode.COMPONENT_INVALID_STYLE_URLS, styleUrlExpr, "@Component cannot define both `styleUrl` and `styleUrls`. Use `styleUrl` if the component has one stylesheet, or `styleUrls` if it has multiple");
   }
-  return extractStyleUrlsFromExpression(evaluator, component.get("styleUrls"));
+  if (styleUrlsExpr !== void 0) {
+    return extractStyleUrlsFromExpression(evaluator, component.get("styleUrls"));
+  }
+  if (styleUrlExpr !== void 0) {
+    const styleUrl = evaluator.evaluate(styleUrlExpr);
+    if (typeof styleUrl !== "string") {
+      throw createValueHasWrongTypeError(styleUrlExpr, styleUrl, "styleUrl must be a string");
+    }
+    return [{
+      url: styleUrl,
+      source: 2,
+      nodeForError: styleUrlExpr
+    }];
+  }
+  return [];
 }
 function extractStyleUrlsFromExpression(evaluator, styleUrlsExpr) {
   const styleUrls = [];
@@ -6116,23 +6134,40 @@ function extractStyleResources(resourceLoader, component, containingFile) {
   function stringLiteralElements(array) {
     return array.elements.filter((e) => ts23.isStringLiteralLike(e));
   }
+  const styleUrlExpr = component.get("styleUrl");
   const styleUrlsExpr = component.get("styleUrls");
   if (styleUrlsExpr !== void 0 && ts23.isArrayLiteralExpression(styleUrlsExpr)) {
     for (const expression of stringLiteralElements(styleUrlsExpr)) {
-      try {
-        const resourceUrl = resourceLoader.resolve(expression.text, containingFile);
-        styles.add({ path: absoluteFrom(resourceUrl), expression });
-      } catch {
+      const resource = stringLiteralUrlToResource(resourceLoader, expression, containingFile);
+      if (resource !== null) {
+        styles.add(resource);
       }
+    }
+  } else if (styleUrlExpr !== void 0 && ts23.isStringLiteralLike(styleUrlExpr)) {
+    const resource = stringLiteralUrlToResource(resourceLoader, styleUrlExpr, containingFile);
+    if (resource !== null) {
+      styles.add(resource);
     }
   }
   const stylesExpr = component.get("styles");
-  if (stylesExpr !== void 0 && ts23.isArrayLiteralExpression(stylesExpr)) {
-    for (const expression of stringLiteralElements(stylesExpr)) {
-      styles.add({ path: null, expression });
+  if (stylesExpr !== void 0) {
+    if (ts23.isArrayLiteralExpression(stylesExpr)) {
+      for (const expression of stringLiteralElements(stylesExpr)) {
+        styles.add({ path: null, expression });
+      }
+    } else if (ts23.isStringLiteralLike(stylesExpr)) {
+      styles.add({ path: null, expression: stylesExpr });
     }
   }
   return styles;
+}
+function stringLiteralUrlToResource(resourceLoader, expression, containingFile) {
+  try {
+    const resourceUrl = resourceLoader.resolve(expression.text, containingFile);
+    return { path: absoluteFrom(resourceUrl), expression };
+  } catch {
+    return null;
+  }
 }
 function _extractTemplateStyleUrls(template) {
   if (template.styleUrls === null) {
@@ -7505,4 +7540,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-UXZZUS4N.js.map
+//# sourceMappingURL=chunk-KC52PQKJ.js.map
