@@ -36,7 +36,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-Y4VU3VP2.js";
+} from "./chunk-UXZZUS4N.js";
 import {
   ImportManager,
   translateExpression,
@@ -6664,8 +6664,8 @@ var NgCompiler = class {
     this.constructionDiagnostics = [];
     this.nonTemplateDiagnostics = null;
     this.delegatingPerfRecorder = new DelegatingPerfRecorder(this.perfRecorder);
-    this.enableTemplateTypeChecker = enableTemplateTypeChecker || ((_a = options._enableTemplateTypeChecker) != null ? _a : false);
-    this.enabledBlockTypes = new Set((_b = options._enabledBlockTypes) != null ? _b : []);
+    this.enableTemplateTypeChecker = enableTemplateTypeChecker || ((_a = options["_enableTemplateTypeChecker"]) != null ? _a : false);
+    this.enabledBlockTypes = new Set((_b = options["_enabledBlockTypes"]) != null ? _b : []);
     this.constructionDiagnostics.push(...this.adapter.constructionDiagnostics, ...verifyCompatibleTypeCheckOptions(this.options));
     this.currentProgram = inputProgram;
     this.closureCompilerEnabled = !!this.options.annotateForClosureCompiler;
@@ -7057,7 +7057,7 @@ var NgCompiler = class {
     const reflector = new TypeScriptReflectionHost(checker);
     let refEmitter;
     let aliasingHost = null;
-    if (this.adapter.unifiedModulesHost === null || !this.options._useHostForImportGeneration) {
+    if (this.adapter.unifiedModulesHost === null || !this.options["_useHostForImportGeneration"]) {
       let localImportStrategy;
       if (this.options.rootDir !== void 0 || this.options.rootDirs !== void 0 && this.options.rootDirs.length > 0) {
         localImportStrategy = new LogicalProjectStrategy(reflector, new LogicalFileSystem([...this.adapter.rootDirs], this.adapter));
@@ -7124,8 +7124,8 @@ var NgCompiler = class {
     }
     const cycleHandlingStrategy = compilationMode === CompilationMode.FULL ? 0 : 1;
     const strictCtorDeps = this.options.strictInjectionParameters || false;
-    const supportJitMode = (_a = this.options.supportJitMode) != null ? _a : true;
-    const supportTestBed = (_b = this.options.supportTestBed) != null ? _b : true;
+    const supportJitMode = (_a = this.options["supportJitMode"]) != null ? _a : true;
+    const supportTestBed = (_b = this.options["supportTestBed"]) != null ? _b : true;
     if (supportTestBed === false && compilationMode === CompilationMode.PARTIAL) {
       throw new Error('TestBed support ("supportTestBed" option) cannot be disabled in partial compilation mode.');
     }
@@ -7765,10 +7765,10 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
     const parseConfigHost = createParseConfigHost(host, fs);
     const { options, errors, fileNames: rootNames, projectReferences } = ts34.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingCompilerOptions, configFileName);
     let emitFlags = EmitFlags.Default;
-    if (!(options.skipMetadataEmit || options.flatModuleOutFile)) {
+    if (!(options["skipMetadataEmit"] || options["flatModuleOutFile"])) {
       emitFlags |= EmitFlags.Metadata;
     }
-    if (options.skipTemplateCodegen) {
+    if (options["skipTemplateCodegen"]) {
       emitFlags = emitFlags & ~EmitFlags.Codegen;
     }
     return { project: projectFile, rootNames, projectReferences, options, errors, emitFlags };
@@ -7917,4 +7917,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-I7GHEGCH.js.map
+//# sourceMappingURL=chunk-J3PLED64.js.map

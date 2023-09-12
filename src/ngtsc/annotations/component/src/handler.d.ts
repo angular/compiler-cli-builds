@@ -79,7 +79,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<ComponentAnalysisData>;
     symbol(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): ComponentSymbol;
     register(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
-    index(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): null | undefined;
+    index(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): null;
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: Readonly<ComponentAnalysisData>): void;
     extendedTemplateCheck(component: ts.ClassDeclaration, extendedTemplateChecker: ExtendedTemplateChecker): ts.Diagnostic[];
     resolve(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, symbol: ComponentSymbol): ResolveResult<ComponentResolutionData>;

@@ -2527,10 +2527,9 @@ function readMapType(type, valueTransform) {
       return;
     }
     const value = valueTransform(member.type);
-    if (value === null) {
-      return null;
+    if (value !== null) {
+      obj[member.name.text] = value;
     }
-    obj[member.name.text] = value;
   });
   return obj;
 }
@@ -6626,6 +6625,7 @@ var ComponentDecoratorHandler = class {
         file: analysis.template.file
       }
     });
+    return null;
   }
   typeCheck(ctx, node, meta) {
     if (this.typeCheckScopeRegistry === null || !ts24.isClassDeclaration(node)) {
@@ -7505,4 +7505,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-Y4VU3VP2.js.map
+//# sourceMappingURL=chunk-UXZZUS4N.js.map
