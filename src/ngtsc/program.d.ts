@@ -9,6 +9,7 @@ import ts from 'typescript';
 import * as api from '../transformers/api';
 import { NgCompiler } from './core';
 import { NgCompilerOptions } from './core/api';
+import { DocEntry } from './docs';
 import { IndexedComponent } from './indexer';
 import { DeclarationNode } from './reflection';
 /**
@@ -46,5 +47,11 @@ export declare class NgtscProgram implements api.Program {
     private emitXi18n;
     emit<CbEmitRes extends ts.EmitResult>(opts?: api.EmitOptions<CbEmitRes> | undefined): ts.EmitResult;
     getIndexedComponents(): Map<DeclarationNode, IndexedComponent>;
+    /**
+     * Gets information for the current program that may be used to generate API
+     * reference documentation. This includes Angular-specific information, such
+     * as component inputs and outputs.
+     */
+    getApiDocumentation(): DocEntry[];
     getEmittedSourceFiles(): Map<string, ts.SourceFile>;
 }

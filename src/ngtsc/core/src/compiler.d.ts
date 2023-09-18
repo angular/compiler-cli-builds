@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
+import { DocEntry } from '../../docs';
 import { AbsoluteFsPath } from '../../file_system';
 import { IncrementalBuildStrategy, IncrementalCompilation, IncrementalState } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
@@ -230,6 +231,12 @@ export declare class NgCompiler {
      * See the `indexing` package for more details.
      */
     getIndexedComponents(): Map<DeclarationNode, IndexedComponent>;
+    /**
+     * Gets information for the current program that may be used to generate API
+     * reference documentation. This includes Angular-specific information, such
+     * as component inputs and outputs.
+     */
+    getApiDocumentation(): DocEntry[];
     /**
      * Collect i18n messages into the `Xi18nContext`.
      */

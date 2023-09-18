@@ -1,0 +1,107 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/** Type of top-level documentation entry. */
+export declare enum EntryType {
+    Block = "Block",
+    Component = "component",
+    Constant = "constant",
+    Decorator = "decorator",
+    Directive = "directive",
+    Element = "element",
+    Enum = "enum",
+    Function = "function",
+    Interface = "interface",
+    NgModule = "ng_module",
+    Pipe = "pipe",
+    TypeAlias = "type_alias",
+    UndecoratedClass = "undecorated_class"
+}
+/** Types of class members */
+export declare enum MemberType {
+    Property = "property",
+    Method = "method",
+    Getter = "getter",
+    Setter = "setter",
+    EnumItem = "enum_item"
+}
+/** Informational tags applicable to class members. */
+export declare enum MemberTags {
+    Static = "static",
+    Readonly = "readonly",
+    Protected = "protected",
+    Optional = "optional",
+    Input = "input",
+    Output = "output"
+}
+export interface JsDocTagEntry {
+    name: string;
+    comment: string;
+}
+/** Base type for all documentation entities. */
+export interface DocEntry {
+    entryType: EntryType;
+    name: string;
+    description: string;
+    rawComment: string;
+    jsdocTags: JsDocTagEntry[];
+}
+/** Documentation entity for a constant. */
+export interface ConstantEntry extends DocEntry {
+    type: string;
+}
+/** Documentation entity for a TypeScript class. */
+export interface ClassEntry extends DocEntry {
+    members: MemberEntry[];
+}
+/** Documentation entity for a TypeScript enum. */
+export interface EnumEntry extends DocEntry {
+    members: EnumMemberEntry[];
+}
+/** Documentation entity for an Angular directives and components. */
+export interface DirectiveEntry extends ClassEntry {
+    selector: string;
+    exportAs: string[];
+    isStandalone: boolean;
+}
+export interface PipeEntry extends ClassEntry {
+    pipeName: string;
+    isStandalone: boolean;
+}
+export interface FunctionEntry extends DocEntry {
+    params: ParameterEntry[];
+    returnType: string;
+}
+/** Sub-entry for a single class or enum member. */
+export interface MemberEntry {
+    name: string;
+    memberType: MemberType;
+    memberTags: MemberTags[];
+    description: string;
+    jsdocTags: JsDocTagEntry[];
+}
+/** Sub-entry for an enum member. */
+export interface EnumMemberEntry extends MemberEntry {
+    type: string;
+    value: string;
+}
+/** Sub-entry for a class property. */
+export interface PropertyEntry extends MemberEntry {
+    type: string;
+    inputAlias?: string;
+    outputAlias?: string;
+}
+/** Sub-entry for a class method. */
+export type MethodEntry = MemberEntry & FunctionEntry;
+/** Sub-entry for a single function parameter. */
+export interface ParameterEntry {
+    name: string;
+    description: string;
+    type: string;
+    isOptional: boolean;
+    isRestParam: boolean;
+}
