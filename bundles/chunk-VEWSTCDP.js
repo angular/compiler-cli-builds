@@ -2635,7 +2635,7 @@ var CompletionEngine = class {
       return this.templateContextCache.get(context);
     }
     const templateContext = /* @__PURE__ */ new Map();
-    for (const node of this.data.boundTarget.getEntitiesInTemplateScope(context)) {
+    for (const node of this.data.boundTarget.getEntitiesInScope(context)) {
       if (node instanceof TmplAstReference2) {
         templateContext.set(node.name, {
           kind: CompletionKind.Reference,
@@ -8298,4 +8298,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2KM7MCZN.js.map
+//# sourceMappingURL=chunk-VEWSTCDP.js.map
