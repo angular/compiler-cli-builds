@@ -130,6 +130,41 @@ function createCompilerHost({ options, tsHost = ts.createCompilerHost(options, t
   return tsHost;
 }
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/entities.mjs
+var EntryType;
+(function(EntryType2) {
+  EntryType2["Block"] = "Block";
+  EntryType2["Component"] = "component";
+  EntryType2["Constant"] = "constant";
+  EntryType2["Decorator"] = "decorator";
+  EntryType2["Directive"] = "directive";
+  EntryType2["Element"] = "element";
+  EntryType2["Enum"] = "enum";
+  EntryType2["Function"] = "function";
+  EntryType2["Interface"] = "interface";
+  EntryType2["NgModule"] = "ng_module";
+  EntryType2["Pipe"] = "pipe";
+  EntryType2["TypeAlias"] = "type_alias";
+  EntryType2["UndecoratedClass"] = "undecorated_class";
+})(EntryType || (EntryType = {}));
+var MemberType;
+(function(MemberType2) {
+  MemberType2["Property"] = "property";
+  MemberType2["Method"] = "method";
+  MemberType2["Getter"] = "getter";
+  MemberType2["Setter"] = "setter";
+  MemberType2["EnumItem"] = "enum_item";
+})(MemberType || (MemberType = {}));
+var MemberTags;
+(function(MemberTags2) {
+  MemberTags2["Static"] = "static";
+  MemberTags2["Readonly"] = "readonly";
+  MemberTags2["Protected"] = "protected";
+  MemberTags2["Optional"] = "optional";
+  MemberTags2["Input"] = "input";
+  MemberTags2["Output"] = "output";
+})(MemberTags || (MemberTags = {}));
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.mjs
 import { HtmlParser, MessageBundle } from "@angular/compiler";
 import ts36 from "typescript";
@@ -401,41 +436,6 @@ var Found = class {
     return array.reverse();
   }
 };
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/entities.mjs
-var EntryType;
-(function(EntryType2) {
-  EntryType2["Block"] = "Block";
-  EntryType2["Component"] = "component";
-  EntryType2["Constant"] = "constant";
-  EntryType2["Decorator"] = "decorator";
-  EntryType2["Directive"] = "directive";
-  EntryType2["Element"] = "element";
-  EntryType2["Enum"] = "enum";
-  EntryType2["Function"] = "function";
-  EntryType2["Interface"] = "interface";
-  EntryType2["NgModule"] = "ng_module";
-  EntryType2["Pipe"] = "pipe";
-  EntryType2["TypeAlias"] = "type_alias";
-  EntryType2["UndecoratedClass"] = "undecorated_class";
-})(EntryType || (EntryType = {}));
-var MemberType;
-(function(MemberType2) {
-  MemberType2["Property"] = "property";
-  MemberType2["Method"] = "method";
-  MemberType2["Getter"] = "getter";
-  MemberType2["Setter"] = "setter";
-  MemberType2["EnumItem"] = "enum_item";
-})(MemberType || (MemberType = {}));
-var MemberTags;
-(function(MemberTags2) {
-  MemberTags2["Static"] = "static";
-  MemberTags2["Readonly"] = "readonly";
-  MemberTags2["Protected"] = "protected";
-  MemberTags2["Optional"] = "optional";
-  MemberTags2["Input"] = "input";
-  MemberTags2["Output"] = "output";
-})(MemberTags || (MemberTags = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/jsdoc_extractor.mjs
 import ts4 from "typescript";
@@ -738,33 +738,32 @@ var DocsExtractor = class {
     this.metadataReader = metadataReader;
   }
   extractAll(sourceFile) {
+    var _a;
     const entries = [];
-    for (const statement of sourceFile.statements) {
-      if (!this.isExported(statement))
-        continue;
-      if (isNamedClassDeclaration(statement)) {
-        entries.push(extractClass(statement, this.metadataReader, this.typeChecker));
+    const reflector = new TypeScriptReflectionHost(this.typeChecker);
+    const exportedDeclarationMap = reflector.getExportsOfModule(sourceFile);
+    const exportedDeclarations = Array.from((_a = exportedDeclarationMap == null ? void 0 : exportedDeclarationMap.entries()) != null ? _a : []).map(([exportName, declaration]) => [exportName, declaration.node]).sort(([a, declarationA], [b, declarationB]) => declarationA.pos - declarationB.pos);
+    for (const [exportName, node] of exportedDeclarations) {
+      let entry = void 0;
+      if (isNamedClassDeclaration(node)) {
+        entry = extractClass(node, this.metadataReader, this.typeChecker);
       }
-      if (ts7.isFunctionDeclaration(statement)) {
-        const functionExtractor = new FunctionExtractor(statement, this.typeChecker);
-        entries.push(functionExtractor.extract());
+      if (ts7.isFunctionDeclaration(node)) {
+        const functionExtractor = new FunctionExtractor(node, this.typeChecker);
+        entry = functionExtractor.extract();
       }
-      if (ts7.isVariableStatement(statement)) {
-        statement.declarationList.forEachChild((declaration) => {
-          if (ts7.isVariableDeclaration(declaration) && !isSyntheticAngularConstant(declaration)) {
-            entries.push(extractConstant(declaration, this.typeChecker));
-          }
-        });
+      if (ts7.isVariableDeclaration(node) && !isSyntheticAngularConstant(node)) {
+        entry = extractConstant(node, this.typeChecker);
       }
-      if (ts7.isEnumDeclaration(statement)) {
-        entries.push(extractEnum(statement, this.typeChecker));
+      if (ts7.isEnumDeclaration(node)) {
+        entry = extractEnum(node, this.typeChecker);
+      }
+      if (entry) {
+        entry.name = exportName;
+        entries.push(entry);
       }
     }
     return entries;
-  }
-  isExported(node) {
-    var _a;
-    return ts7.canHaveModifiers(node) && ((_a = ts7.getModifiers(node)) != null ? _a : []).some((mod) => mod.kind === ts7.SyntaxKind.ExportKeyword);
   }
 };
 
@@ -7384,17 +7383,17 @@ var NgCompiler = class {
     compilation.traitCompiler.index(context);
     return generateAnalysis(context);
   }
-  getApiDocumentation() {
+  getApiDocumentation(entryPoint) {
     const compilation = this.ensureAnalyzed();
     const checker = this.inputProgram.getTypeChecker();
     const docsExtractor = new DocsExtractor(checker, compilation.metaReader);
-    let entries = [];
-    for (const sourceFile of this.inputProgram.getSourceFiles()) {
-      if (sourceFile.isDeclarationFile)
-        continue;
-      entries.push(...docsExtractor.extractAll(sourceFile));
+    const entryPointSourceFile = this.inputProgram.getSourceFiles().find((sourceFile) => {
+      return sourceFile.fileName.includes(entryPoint);
+    });
+    if (!entryPointSourceFile) {
+      throw new Error(`Entry point "${entryPoint}" not found in program sources.`);
     }
-    return entries;
+    return docsExtractor.extractAll(entryPointSourceFile);
   }
   xi18n(ctx) {
     const compilation = this.ensureAnalyzed();
@@ -8194,8 +8193,8 @@ var NgtscProgram = class {
   getIndexedComponents() {
     return this.compiler.getIndexedComponents();
   }
-  getApiDocumentation() {
-    return this.compiler.getApiDocumentation();
+  getApiDocumentation(entryPoint) {
+    return this.compiler.getApiDocumentation(entryPoint);
   }
   getEmittedSourceFiles() {
     throw new Error("Method not implemented.");
@@ -8426,6 +8425,9 @@ export {
   isTsDiagnostic,
   EmitFlags,
   createCompilerHost,
+  EntryType,
+  MemberType,
+  MemberTags,
   untagAllTsFiles,
   TsCreateProgramDriver,
   PatchedProgramIncrementalBuildStrategy,
@@ -8450,4 +8452,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-M3ARU5ST.js.map
+//# sourceMappingURL=chunk-EU2472NP.js.map

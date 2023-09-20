@@ -17,10 +17,10 @@ export declare class DocsExtractor {
     private metadataReader;
     constructor(typeChecker: ts.TypeChecker, metadataReader: MetadataReader);
     /**
-     * Gets the set of all documentable entries from a source file.
+     * Gets the set of all documentable entries from a source file, including
+     * declarations that are re-exported from this file as an entry-point.
+     *
      * @param sourceFile The file from which to extract documentable entries.
      */
     extractAll(sourceFile: ts.SourceFile): DocEntry[];
-    /** Gets whether the given AST node has an `export` modifier. */
-    private isExported;
 }
