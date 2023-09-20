@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BindingPipe, PropertyWrite, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
+import { BindingPipe, PropertyRead, PropertyWrite, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstForLoopBlock, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import { ClassDeclaration } from '../../reflection';
 import { TemplateDiagnostic, TemplateId } from '../api';
 import { TemplateSourceResolver } from './tcb_util';
@@ -61,6 +61,10 @@ export interface OutOfBandDiagnosticRecorder {
     splitTwoWayBinding(templateId: TemplateId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
     /** Reports required inputs that haven't been bound. */
     missingRequiredInputs(templateId: TemplateId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
+    /**
+     * Reports accesses of properties that aren't available in a `for` block's tracking expression.
+     */
+    illegalForLoopTrackAccess(templateId: TemplateId, block: TmplAstForLoopBlock, access: PropertyRead): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -81,4 +85,5 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     suboptimalTypeInference(templateId: TemplateId, variables: TmplAstVariable[]): void;
     splitTwoWayBinding(templateId: TemplateId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
     missingRequiredInputs(templateId: TemplateId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
+    illegalForLoopTrackAccess(templateId: TemplateId, block: TmplAstForLoopBlock, access: PropertyRead): void;
 }

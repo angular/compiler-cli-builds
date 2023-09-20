@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
+import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstForLoopBlock, TmplAstIfBlockBranch, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
@@ -207,11 +207,13 @@ declare class Scope {
      * @param tcb the overall context of TCB generation.
      * @param parent the `Scope` of the parent template (if any) or `null` if this is the root
      * `Scope`.
-     * @param templateOrNodes either a `TmplAstTemplate` representing the template for which to
+     * @param blockOrNodes either a `TmplAstTemplate` representing the template for which to
      * calculate the `Scope`, or a list of nodes if no outer template object is available.
      * @param guard an expression that is applied to this scope for type narrowing purposes.
      */
-    static forNodes(tcb: Context, parent: Scope | null, templateOrNodes: TmplAstTemplate | (TmplAstNode[]), guard: ts.Expression | null): Scope;
+    static forNodes(tcb: Context, parent: Scope | null, blockOrNodes: TmplAstTemplate | TmplAstIfBlockBranch | TmplAstForLoopBlock | TmplAstNode[], guard: ts.Expression | null): Scope;
+    /** Registers a local variable with a scope. */
+    private static registerVariable;
     /**
      * Look up a `ts.Expression` representing the value of some operation in the current `Scope`,
      * including any parent scope(s). This method always returns a mutable clone of the

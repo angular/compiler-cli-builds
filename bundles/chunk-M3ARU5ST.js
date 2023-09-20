@@ -36,12 +36,12 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-KC52PQKJ.js";
+} from "./chunk-7WWFUFOR.js";
 import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-EJSJTIHK.js";
+} from "./chunk-SKCSSB6K.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -83,7 +83,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-T6QD5I2A.js";
+} from "./chunk-OT6HFT3X.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -1753,6 +1753,8 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
   }
   visitForLoopBlock(block) {
     var _a;
+    block.item.visit(this);
+    this.visitAll(Object.values(block.contextVariables));
     this.visitExpression(block.expression);
     this.visitAll(block.children);
     (_a = block.empty) == null ? void 0 : _a.visit(this);
@@ -1764,7 +1766,9 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     this.visitAll(block.branches);
   }
   visitIfBlockBranch(block) {
+    var _a;
     block.expression && this.visitExpression(block.expression);
+    (_a = block.expressionAlias) == null ? void 0 : _a.visit(this);
     this.visitAll(block.children);
   }
   elementOrTemplateToIdentifier(node) {
@@ -3361,6 +3365,14 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
     const message = `Required input${inputAliases.length === 1 ? "" : "s"} ${inputAliases.map((n) => `'${n}'`).join(", ")} from ${isComponent ? "component" : "directive"} ${directiveName} must be specified.`;
     this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), element.startSourceSpan, ts23.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
   }
+  illegalForLoopTrackAccess(templateId, block, access) {
+    const sourceSpan = this.resolver.toParseSourceSpan(templateId, access.sourceSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for property read.`);
+    }
+    const message = `Cannot access '${access.name}' inside of a track expression. Only '${block.item.name}', '${block.contextVariables.$index.name}' and properties on the containing component are available to this expression.`;
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), sourceSpan, ts23.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
+  }
 };
 function makeInlineDiagnostic(templateId, code, node, messageText, relatedInformation) {
   return {
@@ -3389,7 +3401,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
-import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, SafeCall, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
+import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, SafeCall, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
 import ts27 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
@@ -3871,7 +3883,7 @@ var TcbElementOp = class extends TcbOp {
     return id;
   }
 };
-var TcbVariableOp = class extends TcbOp {
+var TcbTemplateVariableOp = class extends TcbOp {
   constructor(tcb, scope, template, variable) {
     super();
     this.tcb = tcb;
@@ -4415,6 +4427,115 @@ var TcbComponentContextCompletionOp = class extends TcbOp {
     return null;
   }
 };
+var TcbBlockVariableOp = class extends TcbOp {
+  constructor(tcb, scope, initializer, variable) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.initializer = initializer;
+    this.variable = variable;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    addParseSpanInfo(id, this.variable.keySpan);
+    this.scope.addStatement(tsCreateVariable(id, this.initializer));
+    return id;
+  }
+};
+var TcbBlockImplicitVariableOp = class extends TcbOp {
+  constructor(tcb, scope, type, variable) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.type = type;
+    this.variable = variable;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    addParseSpanInfo(id, this.variable.keySpan);
+    this.scope.addStatement(tsDeclareVariable(id, this.type));
+    return id;
+  }
+};
+var TcbIfOp = class extends TcbOp {
+  constructor(tcb, scope, block) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.block = block;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const root = this.generateBranch(0);
+    root && this.scope.addStatement(root);
+    return null;
+  }
+  generateBranch(index) {
+    const branch = this.block.branches[index];
+    if (!branch) {
+      return void 0;
+    }
+    const branchScope = Scope.forNodes(this.tcb, this.scope, branch, null);
+    return branch.expression === null ? ts27.factory.createBlock(branchScope.render()) : ts27.factory.createIfStatement(tcbExpression(branch.expression, this.tcb, branchScope), ts27.factory.createBlock(branchScope.render()), this.generateBranch(index + 1));
+  }
+};
+var TcbSwitchOp = class extends TcbOp {
+  constructor(tcb, scope, block) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.block = block;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const clauses = [];
+    for (const current of this.block.cases) {
+      const breakStatement = ts27.factory.createBreakStatement();
+      const clauseScope = Scope.forNodes(this.tcb, this.scope, current.children, null);
+      if (current.expression === null) {
+        clauses.push(ts27.factory.createDefaultClause([...clauseScope.render(), breakStatement]));
+      } else {
+        clauses.push(ts27.factory.createCaseClause(tcbExpression(current.expression, this.tcb, clauseScope), [...clauseScope.render(), breakStatement]));
+      }
+    }
+    this.scope.addStatement(ts27.factory.createSwitchStatement(tcbExpression(this.block.expression, this.tcb, this.scope), ts27.factory.createCaseBlock(clauses)));
+    return null;
+  }
+};
+var TcbForOfOp = class extends TcbOp {
+  constructor(tcb, scope, block) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.block = block;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const loopScope = Scope.forNodes(this.tcb, this.scope, this.block, null);
+    const initializer = ts27.factory.createVariableDeclarationList([ts27.factory.createVariableDeclaration(this.block.item.name)], ts27.NodeFlags.Const);
+    const expression = tcbExpression(this.block.expression, this.tcb, loopScope);
+    const trackTranslator = new TcbForLoopTrackTranslator(this.tcb, loopScope, this.block);
+    const trackExpression = trackTranslator.translate(this.block.trackBy);
+    const statements = [
+      ...loopScope.render(),
+      ts27.factory.createExpressionStatement(trackExpression)
+    ];
+    this.scope.addStatement(ts27.factory.createForOfStatement(void 0, initializer, expression, ts27.factory.createBlock(statements)));
+    return null;
+  }
+};
 var INFER_TYPE_FOR_CIRCULAR_OP_EXPR = ts27.factory.createNonNullExpression(ts27.factory.createNull());
 var Context = class {
   constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone) {
@@ -4451,32 +4572,48 @@ var Scope = class {
     this.varMap = /* @__PURE__ */ new Map();
     this.statements = [];
   }
-  static forNodes(tcb, parent, templateOrNodes, guard) {
+  static forNodes(tcb, parent, blockOrNodes, guard) {
     const scope = new Scope(tcb, parent, guard);
     if (parent === null && tcb.env.config.enableTemplateTypeChecker) {
       scope.opQueue.push(new TcbComponentContextCompletionOp(scope));
     }
     let children;
-    if (templateOrNodes instanceof TmplAstTemplate2) {
+    if (blockOrNodes instanceof TmplAstTemplate2) {
       const varMap = /* @__PURE__ */ new Map();
-      for (const v of templateOrNodes.variables) {
+      for (const v of blockOrNodes.variables) {
         if (!varMap.has(v.name)) {
           varMap.set(v.name, v);
         } else {
           const firstDecl = varMap.get(v.name);
           tcb.oobRecorder.duplicateTemplateVar(tcb.id, v, firstDecl);
         }
-        const opIndex = scope.opQueue.push(new TcbVariableOp(tcb, scope, templateOrNodes, v)) - 1;
-        scope.varMap.set(v, opIndex);
+        this.registerVariable(scope, v, new TcbTemplateVariableOp(tcb, scope, blockOrNodes, v));
       }
-      children = templateOrNodes.children;
+      children = blockOrNodes.children;
+    } else if (blockOrNodes instanceof TmplAstIfBlockBranch) {
+      const { expression, expressionAlias } = blockOrNodes;
+      if (expression !== null && expressionAlias !== null) {
+        this.registerVariable(scope, expressionAlias, new TcbBlockVariableOp(tcb, scope, tcbExpression(expression, tcb, scope), expressionAlias));
+      }
+      children = blockOrNodes.children;
+    } else if (blockOrNodes instanceof TmplAstForLoopBlock) {
+      this.registerVariable(scope, blockOrNodes.item, new TcbBlockVariableOp(tcb, scope, ts27.factory.createIdentifier(blockOrNodes.item.name), blockOrNodes.item));
+      for (const variable of Object.values(blockOrNodes.contextVariables)) {
+        const type = ts27.factory.createKeywordTypeNode(ts27.SyntaxKind.NumberKeyword);
+        this.registerVariable(scope, variable, new TcbBlockImplicitVariableOp(tcb, scope, type, variable));
+      }
+      children = blockOrNodes.children;
     } else {
-      children = templateOrNodes;
+      children = blockOrNodes;
     }
     for (const node of children) {
       scope.appendNode(node);
     }
     return scope;
+  }
+  static registerVariable(scope, variable, op) {
+    const opIndex = scope.opQueue.push(op) - 1;
+    scope.varMap.set(variable, opIndex);
   }
   resolve(node, directive) {
     const res = this.resolveLocal(node, directive);
@@ -4588,15 +4725,11 @@ var Scope = class {
       node.loading !== null && this.appendChildren(node.loading);
       node.error !== null && this.appendChildren(node.error);
     } else if (node instanceof TmplAstIfBlock) {
-      for (const branch of node.branches) {
-        this.appendChildren(branch);
-      }
+      this.opQueue.push(new TcbIfOp(this.tcb, this, node));
     } else if (node instanceof TmplAstSwitchBlock) {
-      for (const currentCase of node.cases) {
-        this.appendChildren(currentCase);
-      }
+      this.opQueue.push(new TcbSwitchOp(this.tcb, this, node));
     } else if (node instanceof TmplAstForLoopBlock) {
-      this.appendChildren(node);
+      this.opQueue.push(new TcbForOfOp(this.tcb, this, node));
       node.empty && this.appendChildren(node.empty);
     } else if (node instanceof TmplAstBoundText) {
       this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.value));
@@ -4938,6 +5071,21 @@ var TcbEventHandlerTranslator = class extends TcbExpressionTranslator {
       const event = ts27.factory.createIdentifier(EVENT_PARAMETER);
       addParseSpanInfo(event, ast.nameSpan);
       return event;
+    }
+    return super.resolve(ast);
+  }
+};
+var TcbForLoopTrackTranslator = class extends TcbExpressionTranslator {
+  constructor(tcb, scope, block) {
+    super(tcb, scope);
+    this.block = block;
+  }
+  resolve(ast) {
+    if (ast instanceof PropertyRead4 && ast.receiver instanceof ImplicitReceiver4) {
+      const target = this.tcb.boundTarget.getExpressionTarget(ast);
+      if (target !== null && target !== this.block.item && target !== this.block.contextVariables.$index) {
+        this.tcb.oobRecorder.illegalForLoopTrackAccess(this.tcb.id, this.block, ast);
+      }
     }
     return super.resolve(ast);
   }
@@ -6592,6 +6740,8 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor3 {
   }
   visitForLoopBlock(block) {
     var _a;
+    block.item.visit(this);
+    this.visitAllNodes(Object.values(block.contextVariables));
     this.visitAst(block.expression);
     this.visitAllNodes(block.children);
     (_a = block.empty) == null ? void 0 : _a.visit(this);
@@ -6603,7 +6753,9 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor3 {
     this.visitAllNodes(block.branches);
   }
   visitIfBlockBranch(block) {
+    var _a;
     block.expression && this.visitAst(block.expression);
+    (_a = block.expressionAlias) == null ? void 0 : _a.visit(this);
     this.visitAllNodes(block.children);
   }
   getDiagnostics(template) {
@@ -8298,4 +8450,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-VEWSTCDP.js.map
+//# sourceMappingURL=chunk-M3ARU5ST.js.map

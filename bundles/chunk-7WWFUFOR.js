@@ -7,7 +7,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-EJSJTIHK.js";
+} from "./chunk-SKCSSB6K.js";
 import {
   ClassMemberKind,
   ErrorCode,
@@ -30,7 +30,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-T6QD5I2A.js";
+} from "./chunk-OT6HFT3X.js";
 import {
   PerfEvent,
   PerfPhase
@@ -5492,11 +5492,17 @@ var NgModuleDecoratorHandler = class {
       imports: []
     };
     if (this.compilationMode === CompilationMode.LOCAL) {
-      if (rawImports !== null && ts22.isArrayLiteralExpression(rawImports) && rawImports.elements) {
-        injectorMetadata.imports.push(...rawImports.elements.map((n) => new WrappedNodeExpr6(n)));
-      }
-      if (rawExports !== null && ts22.isArrayLiteralExpression(rawExports) && rawExports.elements) {
-        injectorMetadata.imports.push(...rawExports.elements.map((n) => new WrappedNodeExpr6(n)));
+      for (const exp of [rawImports, rawExports]) {
+        if (exp === null) {
+          continue;
+        }
+        if (ts22.isArrayLiteralExpression(exp)) {
+          if (exp.elements) {
+            injectorMetadata.imports.push(...exp.elements.map((n) => new WrappedNodeExpr6(n)));
+          }
+        } else {
+          injectorMetadata.imports.push(new WrappedNodeExpr6(exp));
+        }
       }
     }
     const factoryMetadata = {
@@ -6569,7 +6575,7 @@ var ComponentDecoratorHandler = class {
           viewProviders: wrappedViewProviders,
           i18nUseExternalIds: this.i18nUseExternalIds,
           relativeContextFilePath,
-          rawImports: rawImports !== null && ts24.isArrayLiteralExpression(rawImports) && rawImports.elements.length > 0 ? new WrappedNodeExpr7(rawImports) : void 0
+          rawImports: rawImports !== null ? new WrappedNodeExpr7(rawImports) : void 0
         },
         typeCheckMeta: extractDirectiveTypeCheckMeta(node, inputs, this.reflector),
         classMetadata: this.includeClassMetadata ? extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler, (dec) => transformDecoratorResources(dec, component, styles, template)) : null,
@@ -7540,4 +7546,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KC52PQKJ.js.map
+//# sourceMappingURL=chunk-7WWFUFOR.js.map
