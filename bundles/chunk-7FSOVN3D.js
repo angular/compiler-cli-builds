@@ -259,7 +259,7 @@ function toR3ClassMetadata(metaObj) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.mjs
-import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, makeBindingParser as makeBindingParser2, parseTemplate, R3TemplateDependencyKind, ViewEncapsulation } from "@angular/compiler";
+import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, makeBindingParser as makeBindingParser2, parseTemplate, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher, ViewEncapsulation } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.mjs
 import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSourceFile, ParseSourceSpan } from "@angular/compiler";
@@ -482,6 +482,8 @@ var PartialComponentLinkerVersion1 = class {
       throw new FatalLinkerError(templateSource.expression, `Errors found in the template:
 ${errors}`);
     }
+    const binder = new R3TargetBinder(new SelectorMatcher());
+    const boundTarget = binder.bind({ template: template.nodes });
     let declarationListEmitMode = 0;
     const extractDeclarationTypeExpr = (type) => {
       const { expression, forwardRef } = extractForwardRef(type);
@@ -553,7 +555,7 @@ ${errors}`);
       },
       declarationListEmitMode,
       styles: metaObj.has("styles") ? metaObj.getArray("styles").map((entry) => entry.getString()) : [],
-      deferBlocks: /* @__PURE__ */ new Map(),
+      deferBlocks: this.createR3DeferredMetadata(boundTarget),
       deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
       encapsulation: metaObj.has("encapsulation") ? parseEncapsulation(metaObj.getValue("encapsulation")) : ViewEncapsulation.Emulated,
       interpolation,
@@ -601,6 +603,23 @@ ${errors}`);
       range: { startPos: startPos + 1, endPos: endPos - 1, startLine, startCol: startCol + 1 },
       isEscaped: true
     };
+  }
+  createR3DeferredMetadata(boundTarget) {
+    const deferredBlocks = boundTarget.getDeferBlocks();
+    const meta = /* @__PURE__ */ new Map();
+    for (const block of deferredBlocks) {
+      const triggerElements = /* @__PURE__ */ new Map();
+      this.resolveDeferTriggers(block, block.triggers, boundTarget, triggerElements);
+      this.resolveDeferTriggers(block, block.prefetchTriggers, boundTarget, triggerElements);
+      meta.set(block, { deps: [], triggerElements });
+    }
+    return meta;
+  }
+  resolveDeferTriggers(block, triggers, boundTarget, triggerElements) {
+    Object.keys(triggers).forEach((key) => {
+      const trigger = triggers[key];
+      triggerElements.set(trigger, boundTarget.getDeferredTriggerTarget(block, trigger));
+    });
   }
 };
 function parseInterpolationConfig(metaObj) {
@@ -855,7 +874,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "17.0.0-next.5+sha-0598613");
+  const LATEST_VERSION_RANGE = getRange("<=", "17.0.0-next.5+sha-3cbb2a8");
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -902,7 +921,7 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "17.0.0-next.5+sha-0598613") {
+    if (version === "17.0.0-next.5+sha-3cbb2a8") {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
@@ -1033,4 +1052,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-6GN336FX.js.map
+//# sourceMappingURL=chunk-7FSOVN3D.js.map

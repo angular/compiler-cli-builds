@@ -6796,7 +6796,7 @@ var ComponentDecoratorHandler = class {
         symbol.usedPipes = Array.from(declarations.values()).filter(isUsedPipe).map(getSemanticReference);
       }
       const eagerDeclarations = Array.from(declarations.values()).filter((decl) => decl.kind === R3TemplateDependencyKind.NgModule || eagerlyUsed.has(decl.ref.node));
-      this.resolveDeferBlocks(deferBlocks, declarations, data, analysis, eagerlyUsed);
+      this.resolveDeferBlocks(deferBlocks, declarations, data, analysis, eagerlyUsed, bound);
       const cyclesFromDirectives = /* @__PURE__ */ new Map();
       const cyclesFromPipes = /* @__PURE__ */ new Map();
       if (!metadata.isStandalone) {
@@ -6845,6 +6845,16 @@ var ComponentDecoratorHandler = class {
           }
           throw new FatalDiagnosticError(ErrorCode.IMPORT_CYCLE_DETECTED, node, "One or more import cycles would need to be created to compile this component, which is not supported by the current compiler configuration.", relatedMessages);
         }
+      }
+    } else {
+      const directivelessBinder = new R3TargetBinder(new SelectorMatcher2());
+      const bound = directivelessBinder.bind({ template: metadata.template.nodes });
+      const deferredBlocks = bound.getDeferBlocks();
+      const triggerElements = /* @__PURE__ */ new Map();
+      for (const block of deferredBlocks) {
+        this.resolveDeferTriggers(block, block.triggers, bound, triggerElements);
+        this.resolveDeferTriggers(block, block.prefetchTriggers, bound, triggerElements);
+        data.deferBlocks.set(block, { deps: [], triggerElements });
       }
     }
     if (analysis.resolvedImports !== null && analysis.rawImports !== null) {
@@ -6909,8 +6919,8 @@ var ComponentDecoratorHandler = class {
       return [];
     }
     const deferrableTypes = /* @__PURE__ */ new Map();
-    for (const [_, deferBlockDeps] of resolution.deferBlocks) {
-      for (const deferBlockDep of deferBlockDeps) {
+    for (const [_, metadata] of resolution.deferBlocks) {
+      for (const deferBlockDep of metadata.deps) {
         const dep = deferBlockDep;
         const classDecl = dep.classDeclaration;
         const importDecl = (_a = resolution.deferrableDeclToImportDecl.get(classDecl)) != null ? _a : null;
@@ -6982,12 +6992,13 @@ var ComponentDecoratorHandler = class {
     }
     this.cycleAnalyzer.recordSyntheticImport(origin, imported);
   }
-  resolveDeferBlocks(deferBlocks, deferrableDecls, resolutionData, analysisData, eagerlyUsedDecls) {
+  resolveDeferBlocks(deferBlocks, deferrableDecls, resolutionData, analysisData, eagerlyUsedDecls, componentBoundTarget) {
     const allDeferredDecls = /* @__PURE__ */ new Set();
     for (const [deferBlock, bound] of deferBlocks) {
       const usedDirectives = new Set(bound.getEagerlyUsedDirectives().map((d) => d.ref.node));
       const usedPipes = new Set(bound.getEagerlyUsedPipes());
       const deps = [];
+      const triggerElements = /* @__PURE__ */ new Map();
       for (const decl of Array.from(deferrableDecls.values())) {
         if (decl.kind === R3TemplateDependencyKind.NgModule) {
           continue;
@@ -7007,7 +7018,9 @@ var ComponentDecoratorHandler = class {
         });
         allDeferredDecls.add(decl.ref.node);
       }
-      resolutionData.deferBlocks.set(deferBlock, deps);
+      this.resolveDeferTriggers(deferBlock, deferBlock.triggers, componentBoundTarget, triggerElements);
+      this.resolveDeferTriggers(deferBlock, deferBlock.prefetchTriggers, componentBoundTarget, triggerElements);
+      resolutionData.deferBlocks.set(deferBlock, { deps, triggerElements });
     }
     if (analysisData.meta.isStandalone && analysisData.rawImports !== null && ts24.isArrayLiteralExpression(analysisData.rawImports)) {
       for (const node of analysisData.rawImports.elements) {
@@ -7046,6 +7059,12 @@ var ComponentDecoratorHandler = class {
         this.deferredSymbolTracker.markAsDeferrableCandidate(node, imp.node);
       }
     }
+  }
+  resolveDeferTriggers(block, triggers, componentBoundTarget, triggerElements) {
+    Object.keys(triggers).forEach((key) => {
+      const trigger = triggers[key];
+      triggerElements.set(trigger, componentBoundTarget.getDeferredTriggerTarget(block, trigger));
+    });
   }
 };
 function validateStandaloneImports(importRefs, importExpr, metaReader, scopeReader) {
@@ -7546,4 +7565,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-7WWFUFOR.js.map
+//# sourceMappingURL=chunk-P3LJPI4J.js.map
