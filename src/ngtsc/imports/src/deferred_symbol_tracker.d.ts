@@ -11,7 +11,7 @@ import ts from 'typescript';
  *
  * This information is later used to determine whether it's safe to drop
  * a regular import of this symbol (actually the entire import declaration)
- * in favor of using a dynamic import for cases when `{#defer}` blocks are used.
+ * in favor of using a dynamic import for cases when defer blocks are used.
  */
 export declare class DeferredSymbolTracker {
     private readonly typeChecker;
