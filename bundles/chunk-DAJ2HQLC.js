@@ -3316,6 +3316,7 @@ function getInheritedUndecoratedCtorDiagnostic(node, baseClass, kind) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/evaluation.mjs
+import { ViewEncapsulation } from "@angular/compiler";
 import ts14 from "typescript";
 function resolveEnumValue(evaluator, metadata, field, enumSymbolName) {
   let resolved = null;
@@ -3329,6 +3330,23 @@ function resolveEnumValue(evaluator, metadata, field, enumSymbolName) {
     }
   }
   return resolved;
+}
+function resolveEncapsulationEnumValueLocally(expr) {
+  if (!expr) {
+    return null;
+  }
+  const exprText = expr.getText().trim();
+  for (const key in ViewEncapsulation) {
+    if (!Number.isNaN(Number(key))) {
+      continue;
+    }
+    const suffix = `ViewEncapsulation.${key}`;
+    if (exprText === suffix || exprText.endsWith(`.${suffix}`)) {
+      const ans = Number(ViewEncapsulation[key]);
+      return ans;
+    }
+  }
+  return null;
 }
 function isStringArray(resolvedValue) {
   return Array.isArray(resolvedValue) && resolvedValue.every((elem) => typeof elem === "string");
@@ -3537,7 +3555,7 @@ function compileInputTransformFields(inputs) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
-import { compileClassMetadata as compileClassMetadata3, compileComponentClassMetadata, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata3, compileComponentClassMetadata, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
 import ts24 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
@@ -6412,8 +6430,13 @@ var ComponentDecoratorHandler = class {
       return {};
     }
     const { decorator: component, metadata, inputs, outputs, hostDirectives, rawHostDirectives } = directiveResult;
-    const encapsulation = (_a = resolveEnumValue(this.evaluator, component, "encapsulation", "ViewEncapsulation")) != null ? _a : ViewEncapsulation.Emulated;
-    const changeDetection = resolveEnumValue(this.evaluator, component, "changeDetection", "ChangeDetectionStrategy");
+    const encapsulation = (_a = this.compilationMode !== CompilationMode.LOCAL ? resolveEnumValue(this.evaluator, component, "encapsulation", "ViewEncapsulation") : resolveEncapsulationEnumValueLocally(component.get("encapsulation"))) != null ? _a : ViewEncapsulation2.Emulated;
+    let changeDetection = null;
+    if (this.compilationMode !== CompilationMode.LOCAL) {
+      changeDetection = resolveEnumValue(this.evaluator, component, "changeDetection", "ChangeDetectionStrategy");
+    } else if (component.has("changeDetection")) {
+      changeDetection = new WrappedNodeExpr7(component.get("changeDetection"));
+    }
     let animations = null;
     let animationTriggerNames = null;
     if (component.has("animations")) {
@@ -6522,7 +6545,7 @@ var ComponentDecoratorHandler = class {
         diagnostics.push(makeResourceNotFoundError(styleUrl.url, styleUrl.nodeForError, resourceType).toDiagnostic());
       }
     }
-    if (encapsulation === ViewEncapsulation.ShadowDom && metadata.selector !== null) {
+    if (encapsulation === ViewEncapsulation2.ShadowDom && metadata.selector !== null) {
       const selectorError = checkCustomElementSelectorForErrors(metadata.selector);
       if (selectorError !== null) {
         if (diagnostics === void 0) {
@@ -6567,6 +6590,7 @@ var ComponentDecoratorHandler = class {
             ngContentSelectors: template.ngContentSelectors
           },
           encapsulation,
+          changeDetection,
           interpolation: (_c = template.interpolationConfig) != null ? _c : DEFAULT_INTERPOLATION_CONFIG2,
           styles,
           animations,
@@ -6595,9 +6619,6 @@ var ComponentDecoratorHandler = class {
       },
       diagnostics
     };
-    if (changeDetection !== null) {
-      output.analysis.meta.changeDetection = changeDetection;
-    }
     return output;
   }
   symbol(node, analysis) {
@@ -7563,4 +7584,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-IG6JMNQH.js.map
+//# sourceMappingURL=chunk-DAJ2HQLC.js.map
