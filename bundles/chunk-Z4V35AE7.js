@@ -36,12 +36,12 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-DAJ2HQLC.js";
+} from "./chunk-43KICHVD.js";
 import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-SKCSSB6K.js";
+} from "./chunk-KV3DCGDX.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -83,7 +83,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-OT6HFT3X.js";
+} from "./chunk-VV77Q6YH.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -3372,6 +3372,17 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
     const message = `Cannot access '${access.name}' inside of a track expression. Only '${block.item.name}', '${block.contextVariables.$index.name}' and properties on the containing component are available to this expression.`;
     this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), sourceSpan, ts23.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
   }
+  inaccessibleDeferredTriggerElement(templateId, trigger) {
+    let message;
+    if (trigger.reference === null) {
+      message = `Trigger cannot find reference. Make sure that the @defer block has a @placeholder with at least one root element node.`;
+    } else {
+      message = `Trigger cannot find reference "${trigger.reference}".
+Check that an element with #${trigger.reference} exists in the same template and it's accessible from the @defer block.
+Deferred blocks can only access triggers in same view, a parent embedded view or the root view of the @placeholder block.`;
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), trigger.sourceSpan, ts23.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
+  }
 };
 function makeInlineDiagnostic(templateId, code, node, messageText, relatedInformation) {
   return {
@@ -4717,12 +4728,7 @@ var Scope = class {
       }
       this.checkAndAppendReferencesOfNode(node);
     } else if (node instanceof TmplAstDeferredBlock) {
-      node.triggers.when !== void 0 && this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.triggers.when.value));
-      node.prefetchTriggers.when !== void 0 && this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.prefetchTriggers.when.value));
-      this.appendChildren(node);
-      node.placeholder !== null && this.appendChildren(node.placeholder);
-      node.loading !== null && this.appendChildren(node.loading);
-      node.error !== null && this.appendChildren(node.error);
+      this.appendDeferredBlock(node);
     } else if (node instanceof TmplAstIfBlock) {
       this.opQueue.push(new TcbIfOp(this.tcb, this, node));
     } else if (node instanceof TmplAstSwitchBlock) {
@@ -4847,6 +4853,39 @@ var Scope = class {
       if (placeholder instanceof TmplAstBoundText) {
         this.opQueue.push(new TcbExpressionOp(this.tcb, this, placeholder.value));
       }
+    }
+  }
+  appendDeferredBlock(block) {
+    this.appendDeferredTriggers(block, block.triggers);
+    this.appendDeferredTriggers(block, block.prefetchTriggers);
+    this.appendChildren(block);
+    if (block.placeholder !== null) {
+      this.appendChildren(block.placeholder);
+    }
+    if (block.loading !== null) {
+      this.appendChildren(block.loading);
+    }
+    if (block.error !== null) {
+      this.appendChildren(block.error);
+    }
+  }
+  appendDeferredTriggers(block, triggers) {
+    if (triggers.when !== void 0) {
+      this.opQueue.push(new TcbExpressionOp(this.tcb, this, triggers.when.value));
+    }
+    if (triggers.hover !== void 0) {
+      this.appendReferenceBasedDeferredTrigger(block, triggers.hover);
+    }
+    if (triggers.interaction !== void 0) {
+      this.appendReferenceBasedDeferredTrigger(block, triggers.interaction);
+    }
+    if (triggers.viewport !== void 0) {
+      this.appendReferenceBasedDeferredTrigger(block, triggers.viewport);
+    }
+  }
+  appendReferenceBasedDeferredTrigger(block, trigger) {
+    if (this.tcb.boundTarget.getDeferredTriggerTarget(block, trigger) === null) {
+      this.tcb.oobRecorder.inaccessibleDeferredTriggerElement(this.tcb.id, trigger);
     }
   }
 };
@@ -8452,4 +8491,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-Q4HPPY3H.js.map
+//# sourceMappingURL=chunk-Z4V35AE7.js.map

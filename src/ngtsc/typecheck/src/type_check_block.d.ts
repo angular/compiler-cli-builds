@@ -266,5 +266,8 @@ declare class Scope {
     private appendOutputsOfNode;
     private appendDeepSchemaChecks;
     private appendIcuExpressions;
+    private appendDeferredBlock;
+    private appendDeferredTriggers;
+    private appendReferenceBasedDeferredTrigger;
 }
 export {};
