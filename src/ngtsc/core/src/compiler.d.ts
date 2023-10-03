@@ -127,7 +127,6 @@ export declare class NgCompiler {
     private moduleResolver;
     private resourceManager;
     private cycleAnalyzer;
-    private enabledBlockTypes;
     readonly ignoreForDiagnostics: Set<ts.SourceFile>;
     readonly ignoreForEmit: Set<ts.SourceFile>;
     readonly enableTemplateTypeChecker: boolean;

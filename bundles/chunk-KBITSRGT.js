@@ -267,7 +267,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "17.0.0-next.6+sha-1beef49";
+var PLACEHOLDER_VERSION = "17.0.0-next.6+sha-43e6fb0";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -471,7 +471,7 @@ var PartialComponentLinkerVersion1 = class {
     const templateSource = metaObj.getValue("template");
     const isInline = metaObj.has("isInline") ? metaObj.getBoolean("isInline") : false;
     const templateInfo = this.getTemplateInfo(templateSource, isInline);
-    const supportsBlockSyntax = semver.major(version) >= 17 || version === PLACEHOLDER_VERSION;
+    const enableBlockSyntax = semver.major(version) >= 17 || version === PLACEHOLDER_VERSION;
     const template = parseTemplate(templateInfo.code, templateInfo.sourceUrl, {
       escapedString: templateInfo.isEscaped,
       interpolationConfig: interpolation,
@@ -479,7 +479,7 @@ var PartialComponentLinkerVersion1 = class {
       enableI18nLegacyMessageIdFormat: false,
       preserveWhitespaces: metaObj.has("preserveWhitespaces") ? metaObj.getBoolean("preserveWhitespaces") : false,
       i18nNormalizeLineEndingsInICUs: isInline,
-      enabledBlockTypes: supportsBlockSyntax ? /* @__PURE__ */ new Set(["if", "switch", "for", "defer"]) : void 0
+      enableBlockSyntax
     });
     if (template.errors !== null) {
       const errors = template.errors.map((err) => err.toString()).join("\n");
@@ -1056,4 +1056,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-Z5VXV73R.js.map
+//# sourceMappingURL=chunk-KBITSRGT.js.map
