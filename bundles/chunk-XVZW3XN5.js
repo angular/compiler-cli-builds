@@ -531,15 +531,14 @@ import ts7 from "typescript";
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/class_extractor.mjs
 import ts6 from "typescript";
 var ClassExtractor = class {
-  constructor(declaration, reference, typeChecker) {
+  constructor(declaration, typeChecker) {
     this.declaration = declaration;
-    this.reference = reference;
     this.typeChecker = typeChecker;
   }
   extract() {
     return {
       name: this.declaration.name.text,
-      entryType: EntryType.UndecoratedClass,
+      entryType: ts6.isInterfaceDeclaration(this.declaration) ? EntryType.Interface : EntryType.UndecoratedClass,
       members: this.extractAllClassMembers(this.declaration),
       description: extractJsDocDescription(this.declaration),
       jsdocTags: extractJsDocTags(this.declaration),
@@ -559,9 +558,9 @@ var ClassExtractor = class {
     return members;
   }
   extractClassMember(memberDeclaration) {
-    if (ts6.isMethodDeclaration(memberDeclaration)) {
+    if (this.isMethod(memberDeclaration)) {
       return this.extractMethod(memberDeclaration);
-    } else if (ts6.isPropertyDeclaration(memberDeclaration)) {
+    } else if (this.isProperty(memberDeclaration)) {
       return this.extractClassProperty(memberDeclaration);
     } else if (ts6.isAccessor(memberDeclaration)) {
       return this.extractGetterSetter(memberDeclaration);
@@ -626,12 +625,19 @@ var ClassExtractor = class {
     return !member.name || !this.isDocumentableMember(member) || !!((_a = member.modifiers) == null ? void 0 : _a.some((mod) => mod.kind === ts6.SyntaxKind.PrivateKeyword));
   }
   isDocumentableMember(member) {
-    return ts6.isMethodDeclaration(member) || ts6.isPropertyDeclaration(member) || ts6.isAccessor(member);
+    return this.isMethod(member) || this.isProperty(member) || ts6.isAccessor(member);
+  }
+  isProperty(member) {
+    return ts6.isPropertyDeclaration(member) || ts6.isPropertySignature(member);
+  }
+  isMethod(member) {
+    return ts6.isMethodDeclaration(member) || ts6.isMethodSignature(member);
   }
 };
 var DirectiveExtractor = class extends ClassExtractor {
   constructor(declaration, reference, metadata, checker) {
-    super(declaration, reference, checker);
+    super(declaration, checker);
+    this.reference = reference;
     this.metadata = metadata;
   }
   extract() {
@@ -671,7 +677,8 @@ var DirectiveExtractor = class extends ClassExtractor {
 };
 var PipeExtractor = class extends ClassExtractor {
   constructor(declaration, reference, metadata, typeChecker) {
-    super(declaration, reference, typeChecker);
+    super(declaration, typeChecker);
+    this.reference = reference;
     this.metadata = metadata;
   }
   extract() {
@@ -685,7 +692,8 @@ var PipeExtractor = class extends ClassExtractor {
 };
 var NgModuleExtractor = class extends ClassExtractor {
   constructor(declaration, reference, metadata, typeChecker) {
-    super(declaration, reference, typeChecker);
+    super(declaration, typeChecker);
+    this.reference = reference;
     this.metadata = metadata;
   }
   extract() {
@@ -708,8 +716,12 @@ function extractClass(classDeclaration, metadataReader, typeChecker) {
   } else if (ngModuleMetadata) {
     extractor = new NgModuleExtractor(classDeclaration, ref, ngModuleMetadata, typeChecker);
   } else {
-    extractor = new ClassExtractor(classDeclaration, ref, typeChecker);
+    extractor = new ClassExtractor(classDeclaration, typeChecker);
   }
+  return extractor.extract();
+}
+function extractInterface(declaration, typeChecker) {
+  const extractor = new ClassExtractor(declaration, typeChecker);
   return extractor.extract();
 }
 
@@ -747,6 +759,9 @@ var DocsExtractor = class {
       let entry = void 0;
       if (isNamedClassDeclaration(node)) {
         entry = extractClass(node, this.metadataReader, this.typeChecker);
+      }
+      if (ts7.isInterfaceDeclaration(node)) {
+        entry = extractInterface(node, this.typeChecker);
       }
       if (ts7.isFunctionDeclaration(node)) {
         const functionExtractor = new FunctionExtractor(node, this.typeChecker);
@@ -8496,4 +8511,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XGOYJPSZ.js.map
+//# sourceMappingURL=chunk-XVZW3XN5.js.map

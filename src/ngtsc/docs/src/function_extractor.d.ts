@@ -10,7 +10,7 @@ import ts from 'typescript';
 export declare class FunctionExtractor {
     private declaration;
     private typeChecker;
-    constructor(declaration: ts.FunctionDeclaration | ts.MethodDeclaration, typeChecker: ts.TypeChecker);
+    constructor(declaration: ts.FunctionDeclaration | ts.MethodDeclaration | ts.MethodSignature, typeChecker: ts.TypeChecker);
     extract(): FunctionEntry;
     private extractAllParams;
 }
