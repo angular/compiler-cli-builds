@@ -7037,7 +7037,8 @@ var ComponentDecoratorHandler = class {
       resolutionData.deferBlocks.set(deferBlock, { deps, triggerElements });
     }
     if (analysisData.meta.isStandalone && analysisData.rawImports !== null && ts24.isArrayLiteralExpression(analysisData.rawImports)) {
-      for (const node of analysisData.rawImports.elements) {
+      for (const element of analysisData.rawImports.elements) {
+        const node = tryUnwrapForwardRef(element, this.reflector) || element;
         if (!ts24.isIdentifier(node)) {
           continue;
         }
@@ -7579,4 +7580,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-73F7WSBU.js.map
+//# sourceMappingURL=chunk-OXFWJ6Q4.js.map
