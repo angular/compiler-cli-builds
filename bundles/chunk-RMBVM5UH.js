@@ -4535,7 +4535,7 @@ var TcbForOfOp = class extends TcbOp {
   execute() {
     const loopScope = Scope.forNodes(this.tcb, this.scope, this.block, null);
     const initializer = ts27.factory.createVariableDeclarationList([ts27.factory.createVariableDeclaration(this.block.item.name)], ts27.NodeFlags.Const);
-    const expression = tcbExpression(this.block.expression, this.tcb, loopScope);
+    const expression = ts27.factory.createNonNullExpression(tcbExpression(this.block.expression, this.tcb, loopScope));
     const trackTranslator = new TcbForLoopTrackTranslator(this.tcb, loopScope, this.block);
     const trackExpression = trackTranslator.translate(this.block.trackBy);
     const statements = [
@@ -8490,4 +8490,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TJ4GKKOZ.js.map
+//# sourceMappingURL=chunk-RMBVM5UH.js.map
