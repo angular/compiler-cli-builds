@@ -3826,7 +3826,7 @@ var TcbGenericContextBehavior;
 })(TcbGenericContextBehavior || (TcbGenericContextBehavior = {}));
 function generateTypeCheckBlock(env, ref, name, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
   const tcb = new Context(env, domSchemaChecker, oobRecorder, meta.id, meta.boundTarget, meta.pipes, meta.schemas, meta.isStandalone);
-  const scope = Scope.forNodes(tcb, null, tcb.boundTarget.target.template, null);
+  const scope = Scope.forNodes(tcb, null, null, tcb.boundTarget.target.template, null);
   const ctxRawType = env.referenceType(ref);
   if (!ts27.isTypeReferenceNode(ctxRawType)) {
     throw new Error(`Expected TypeReferenceNode when referencing the ctx param for ${ref.debugName}`);
@@ -3988,7 +3988,7 @@ var TcbTemplateBodyOp = class extends TcbOp {
     if (directiveGuards.length > 0) {
       guard = directiveGuards.reduce((expr, dirGuard) => ts27.factory.createBinaryExpression(expr, ts27.SyntaxKind.AmpersandAmpersandToken, dirGuard), directiveGuards.pop());
     }
-    const tmplScope = Scope.forNodes(this.tcb, this.scope, this.template, guard);
+    const tmplScope = Scope.forNodes(this.tcb, this.scope, this.template, this.template.children, guard);
     const statements = tmplScope.render();
     if (statements.length === 0) {
       return null;
@@ -4493,8 +4493,20 @@ var TcbIfOp = class extends TcbOp {
     if (!branch) {
       return void 0;
     }
-    const branchScope = Scope.forNodes(this.tcb, this.scope, branch, null);
-    return branch.expression === null ? ts27.factory.createBlock(branchScope.render()) : ts27.factory.createIfStatement(tcbExpression(branch.expression, this.tcb, branchScope), ts27.factory.createBlock(branchScope.render()), this.generateBranch(index + 1));
+    if (branch.expression === null) {
+      const branchScope2 = Scope.forNodes(this.tcb, this.scope, null, branch.children, null);
+      return ts27.factory.createBlock(branchScope2.render());
+    }
+    let branchParentScope;
+    if (branch.expressionAlias === null) {
+      branchParentScope = this.scope;
+    } else {
+      branchParentScope = Scope.forNodes(this.tcb, this.scope, branch, [], null);
+      branchParentScope.render().forEach((stmt) => this.scope.addStatement(stmt));
+    }
+    const branchScope = Scope.forNodes(this.tcb, branchParentScope, null, branch.children, null);
+    const expression = branch.expressionAlias === null ? tcbExpression(branch.expression, this.tcb, branchScope) : branchScope.resolve(branch.expressionAlias);
+    return ts27.factory.createIfStatement(expression, ts27.factory.createBlock(branchScope.render()), this.generateBranch(index + 1));
   }
 };
 var TcbSwitchOp = class extends TcbOp {
@@ -4511,7 +4523,7 @@ var TcbSwitchOp = class extends TcbOp {
     const clauses = [];
     for (const current of this.block.cases) {
       const breakStatement = ts27.factory.createBreakStatement();
-      const clauseScope = Scope.forNodes(this.tcb, this.scope, current.children, null);
+      const clauseScope = Scope.forNodes(this.tcb, this.scope, null, current.children, null);
       if (current.expression === null) {
         clauses.push(ts27.factory.createDefaultClause([...clauseScope.render(), breakStatement]));
       } else {
@@ -4533,7 +4545,7 @@ var TcbForOfOp = class extends TcbOp {
     return false;
   }
   execute() {
-    const loopScope = Scope.forNodes(this.tcb, this.scope, this.block, null);
+    const loopScope = Scope.forNodes(this.tcb, this.scope, this.block, this.block.children, null);
     const initializer = ts27.factory.createVariableDeclarationList([ts27.factory.createVariableDeclaration(this.block.item.name)], ts27.NodeFlags.Const);
     const expression = ts27.factory.createNonNullExpression(tcbExpression(this.block.expression, this.tcb, loopScope));
     const trackTranslator = new TcbForLoopTrackTranslator(this.tcb, loopScope, this.block);
@@ -4582,39 +4594,33 @@ var Scope = class {
     this.varMap = /* @__PURE__ */ new Map();
     this.statements = [];
   }
-  static forNodes(tcb, parent, blockOrNodes, guard) {
-    const scope = new Scope(tcb, parent, guard);
-    if (parent === null && tcb.env.config.enableTemplateTypeChecker) {
+  static forNodes(tcb, parentScope, scopedNode, children, guard) {
+    const scope = new Scope(tcb, parentScope, guard);
+    if (parentScope === null && tcb.env.config.enableTemplateTypeChecker) {
       scope.opQueue.push(new TcbComponentContextCompletionOp(scope));
     }
-    let children;
-    if (blockOrNodes instanceof TmplAstTemplate2) {
+    if (scopedNode instanceof TmplAstTemplate2) {
       const varMap = /* @__PURE__ */ new Map();
-      for (const v of blockOrNodes.variables) {
+      for (const v of scopedNode.variables) {
         if (!varMap.has(v.name)) {
           varMap.set(v.name, v);
         } else {
           const firstDecl = varMap.get(v.name);
           tcb.oobRecorder.duplicateTemplateVar(tcb.id, v, firstDecl);
         }
-        this.registerVariable(scope, v, new TcbTemplateVariableOp(tcb, scope, blockOrNodes, v));
+        this.registerVariable(scope, v, new TcbTemplateVariableOp(tcb, scope, scopedNode, v));
       }
-      children = blockOrNodes.children;
-    } else if (blockOrNodes instanceof TmplAstIfBlockBranch) {
-      const { expression, expressionAlias } = blockOrNodes;
+    } else if (scopedNode instanceof TmplAstIfBlockBranch) {
+      const { expression, expressionAlias } = scopedNode;
       if (expression !== null && expressionAlias !== null) {
         this.registerVariable(scope, expressionAlias, new TcbBlockVariableOp(tcb, scope, tcbExpression(expression, tcb, scope), expressionAlias));
       }
-      children = blockOrNodes.children;
-    } else if (blockOrNodes instanceof TmplAstForLoopBlock) {
-      this.registerVariable(scope, blockOrNodes.item, new TcbBlockVariableOp(tcb, scope, ts27.factory.createIdentifier(blockOrNodes.item.name), blockOrNodes.item));
-      for (const variable of Object.values(blockOrNodes.contextVariables)) {
+    } else if (scopedNode instanceof TmplAstForLoopBlock) {
+      this.registerVariable(scope, scopedNode.item, new TcbBlockVariableOp(tcb, scope, ts27.factory.createIdentifier(scopedNode.item.name), scopedNode.item));
+      for (const variable of Object.values(scopedNode.contextVariables)) {
         const type = ts27.factory.createKeywordTypeNode(ts27.SyntaxKind.NumberKeyword);
         this.registerVariable(scope, variable, new TcbBlockImplicitVariableOp(tcb, scope, type, variable));
       }
-      children = blockOrNodes.children;
-    } else {
-      children = blockOrNodes;
     }
     for (const node of children) {
       scope.appendNode(node);
@@ -8490,4 +8496,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RMBVM5UH.js.map
+//# sourceMappingURL=chunk-AHRIX4JB.js.map

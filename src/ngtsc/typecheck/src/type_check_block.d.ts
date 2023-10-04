@@ -205,13 +205,14 @@ declare class Scope {
      * Constructs a `Scope` given either a `TmplAstTemplate` or a list of `TmplAstNode`s.
      *
      * @param tcb the overall context of TCB generation.
-     * @param parent the `Scope` of the parent template (if any) or `null` if this is the root
+     * @param parentScope the `Scope` of the parent template (if any) or `null` if this is the root
      * `Scope`.
-     * @param blockOrNodes either a `TmplAstTemplate` representing the template for which to
-     * calculate the `Scope`, or a list of nodes if no outer template object is available.
+     * @param scopedNode Node that provides the scope around the child nodes (e.g. a
+     * `TmplAstTemplate` node exposing variables to its children).
+     * @param children Child nodes that should be appended to the TCB.
      * @param guard an expression that is applied to this scope for type narrowing purposes.
      */
-    static forNodes(tcb: Context, parent: Scope | null, blockOrNodes: TmplAstTemplate | TmplAstIfBlockBranch | TmplAstForLoopBlock | TmplAstNode[], guard: ts.Expression | null): Scope;
+    static forNodes(tcb: Context, parentScope: Scope | null, scopedNode: TmplAstTemplate | TmplAstIfBlockBranch | TmplAstForLoopBlock | null, children: TmplAstNode[], guard: ts.Expression | null): Scope;
     /** Registers a local variable with a scope. */
     private static registerVariable;
     /**
