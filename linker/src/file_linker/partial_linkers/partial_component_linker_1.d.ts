@@ -18,7 +18,7 @@ export declare class PartialComponentLinkerVersion1<TStatement, TExpression> imp
     private sourceUrl;
     private code;
     constructor(getSourceFile: GetSourceFileFn, sourceUrl: AbsoluteFsPath, code: string);
-    linkPartialDeclaration(constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>): LinkedDefinition;
+    linkPartialDeclaration(constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>, version: string): LinkedDefinition;
     /**
      * This function derives the `R3ComponentMetadata` from the provided AST object.
      */

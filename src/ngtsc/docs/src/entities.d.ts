@@ -58,6 +58,8 @@ export interface ConstantEntry extends DocEntry {
 export interface ClassEntry extends DocEntry {
     members: MemberEntry[];
 }
+/** Documentation entity for a TypeScript interface. */
+export type InterfaceEntry = ClassEntry;
 /** Documentation entity for a TypeScript enum. */
 export interface EnumEntry extends DocEntry {
     members: EnumMemberEntry[];

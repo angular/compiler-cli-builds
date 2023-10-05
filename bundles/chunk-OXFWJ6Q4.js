@@ -5929,8 +5929,7 @@ function parseExtractedTemplate(template, sourceStr, sourceParseRange, escapedSt
     escapedString,
     enableI18nLegacyMessageIdFormat: options.enableI18nLegacyMessageIdFormat,
     i18nNormalizeLineEndingsInICUs,
-    alwaysAttemptHtmlToR3AstConversion: options.usePoisonedData,
-    enabledBlockTypes: options.enabledBlockTypes
+    alwaysAttemptHtmlToR3AstConversion: options.usePoisonedData
   });
   const { nodes: diagNodes } = parseTemplate(sourceStr, sourceMapUrl != null ? sourceMapUrl : "", {
     preserveWhitespaces: true,
@@ -5941,8 +5940,7 @@ function parseExtractedTemplate(template, sourceStr, sourceParseRange, escapedSt
     enableI18nLegacyMessageIdFormat: options.enableI18nLegacyMessageIdFormat,
     i18nNormalizeLineEndingsInICUs,
     leadingTriviaChars: [],
-    alwaysAttemptHtmlToR3AstConversion: options.usePoisonedData,
-    enabledBlockTypes: options.enabledBlockTypes
+    alwaysAttemptHtmlToR3AstConversion: options.usePoisonedData
   });
   return {
     ...parsedTemplate,
@@ -6315,7 +6313,7 @@ var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, enabledBlockTypes, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata, compilationMode, deferredSymbolTracker) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata, compilationMode, deferredSymbolTracker) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -6334,7 +6332,6 @@ var ComponentDecoratorHandler = class {
     this.enableI18nLegacyMessageIdFormat = enableI18nLegacyMessageIdFormat;
     this.usePoisonedData = usePoisonedData;
     this.i18nNormalizeLineEndingsInICUs = i18nNormalizeLineEndingsInICUs;
-    this.enabledBlockTypes = enabledBlockTypes;
     this.moduleResolver = moduleResolver;
     this.cycleAnalyzer = cycleAnalyzer;
     this.cycleHandlingStrategy = cycleHandlingStrategy;
@@ -6358,8 +6355,7 @@ var ComponentDecoratorHandler = class {
     this.extractTemplateOptions = {
       enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
       i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
-      usePoisonedData: this.usePoisonedData,
-      enabledBlockTypes: this.enabledBlockTypes
+      usePoisonedData: this.usePoisonedData
     };
   }
   detect(node, decorators) {
@@ -6512,8 +6508,7 @@ var ComponentDecoratorHandler = class {
       template = extractTemplate(node, templateDecl, this.evaluator, this.depTracker, this.resourceLoader, {
         enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
         i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
-        usePoisonedData: this.usePoisonedData,
-        enabledBlockTypes: this.enabledBlockTypes
+        usePoisonedData: this.usePoisonedData
       }, this.compilationMode);
     }
     const templateResource = template.declaration.isInline ? { path: null, expression: component.get("template") } : {
@@ -7042,7 +7037,8 @@ var ComponentDecoratorHandler = class {
       resolutionData.deferBlocks.set(deferBlock, { deps, triggerElements });
     }
     if (analysisData.meta.isStandalone && analysisData.rawImports !== null && ts24.isArrayLiteralExpression(analysisData.rawImports)) {
-      for (const node of analysisData.rawImports.elements) {
+      for (const element of analysisData.rawImports.elements) {
+        const node = tryUnwrapForwardRef(element, this.reflector) || element;
         if (!ts24.isIdentifier(node)) {
           continue;
         }
@@ -7584,4 +7580,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-43KICHVD.js.map
+//# sourceMappingURL=chunk-OXFWJ6Q4.js.map

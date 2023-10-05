@@ -221,7 +221,7 @@ var LocalEmitScope = class extends EmitScope {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.mjs
-import semver from "semver";
+import semver2 from "semver";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/get_source_file.mjs
 function createGetSourceFile(sourceUrl, code, loader) {
@@ -260,12 +260,14 @@ function toR3ClassMetadata(metaObj) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.mjs
 import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, makeBindingParser as makeBindingParser2, parseTemplate, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher, ViewEncapsulation } from "@angular/compiler";
+import semver from "semver";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.mjs
 import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSourceFile, ParseSourceSpan } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
+var PLACEHOLDER_VERSION = "17.0.0-next.7+sha-0d3373b";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -460,22 +462,24 @@ var PartialComponentLinkerVersion1 = class {
     this.sourceUrl = sourceUrl;
     this.code = code;
   }
-  linkPartialDeclaration(constantPool, metaObj) {
-    const meta = this.toR3ComponentMeta(metaObj);
+  linkPartialDeclaration(constantPool, metaObj, version) {
+    const meta = this.toR3ComponentMeta(metaObj, version);
     return compileComponentFromMetadata(meta, constantPool, makeBindingParser2());
   }
-  toR3ComponentMeta(metaObj) {
+  toR3ComponentMeta(metaObj, version) {
     const interpolation = parseInterpolationConfig(metaObj);
     const templateSource = metaObj.getValue("template");
     const isInline = metaObj.has("isInline") ? metaObj.getBoolean("isInline") : false;
     const templateInfo = this.getTemplateInfo(templateSource, isInline);
+    const enableBlockSyntax = semver.major(version) >= 17 || version === PLACEHOLDER_VERSION;
     const template = parseTemplate(templateInfo.code, templateInfo.sourceUrl, {
       escapedString: templateInfo.isEscaped,
       interpolationConfig: interpolation,
       range: templateInfo.range,
       enableI18nLegacyMessageIdFormat: false,
       preserveWhitespaces: metaObj.has("preserveWhitespaces") ? metaObj.getBoolean("preserveWhitespaces") : false,
-      i18nNormalizeLineEndingsInICUs: isInline
+      i18nNormalizeLineEndingsInICUs: isInline,
+      enableBlockSyntax
     });
     if (template.errors !== null) {
       const errors = template.errors.map((err) => err.toString()).join("\n");
@@ -874,7 +878,7 @@ var declarationFunctions = [
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
-  const LATEST_VERSION_RANGE = getRange("<=", "17.0.0-next.6+sha-ee0d04b");
+  const LATEST_VERSION_RANGE = getRange("<=", PLACEHOLDER_VERSION);
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
   ]);
@@ -921,12 +925,12 @@ var PartialLinkerSelector = class {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
     }
     const linkerRanges = this.linkers.get(functionName);
-    if (version === "17.0.0-next.6+sha-ee0d04b") {
+    if (version === PLACEHOLDER_VERSION) {
       return linkerRanges[linkerRanges.length - 1].linker;
     }
     const declarationRange = getRange(">=", minVersion);
     for (const { range: linkerRange, linker } of linkerRanges) {
-      if (semver.intersects(declarationRange, linkerRange)) {
+      if (semver2.intersects(declarationRange, linkerRange)) {
         return linker;
       }
     }
@@ -942,9 +946,9 @@ Attempting to continue using this version of Angular.`);
   }
 };
 function getRange(comparator, versionStr) {
-  const version = new semver.SemVer(versionStr);
+  const version = new semver2.SemVer(versionStr);
   version.prerelease = [];
-  return new semver.Range(`${comparator}${version.format()}`);
+  return new semver2.Range(`${comparator}${version.format()}`);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/file_linker.mjs
@@ -967,7 +971,7 @@ var FileLinker = class {
     const minVersion = metaObj.getString("minVersion");
     const version = metaObj.getString("version");
     const linker = this.linkerSelector.getLinker(declarationFn, minVersion, version);
-    const definition = linker.linkPartialDeclaration(emitScope.constantPool, metaObj);
+    const definition = linker.linkPartialDeclaration(emitScope.constantPool, metaObj, version);
     return emitScope.translateDefinition(definition);
   }
   getConstantStatements() {
@@ -1052,4 +1056,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-27WLSLUX.js.map
+//# sourceMappingURL=chunk-KBITSRGT.js.map
