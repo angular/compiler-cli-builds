@@ -6759,6 +6759,8 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor3 {
   }
   visitTextAttribute(attribute) {
   }
+  visitUnknownBlock(block) {
+  }
   visitBoundAttribute(attribute) {
     this.visitAst(attribute.value);
   }
@@ -8511,4 +8513,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XVZW3XN5.js.map
+//# sourceMappingURL=chunk-42Y3VKG5.js.map
