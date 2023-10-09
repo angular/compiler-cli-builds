@@ -13,4 +13,7 @@ export declare class FunctionExtractor {
     constructor(declaration: ts.FunctionDeclaration | ts.MethodDeclaration | ts.MethodSignature, typeChecker: ts.TypeChecker);
     extract(): FunctionEntry;
     private extractAllParams;
+    /** Gets all overloads for the function (excluding this extractor's FunctionDeclaration). */
+    getOverloads(): ts.FunctionDeclaration[];
+    private getSymbol;
 }
