@@ -125,17 +125,21 @@ export declare enum PerfPhase {
      */
     LsSignatureHelp = 23,
     /**
+     * Time spent by the Angular Language Service calculating outlining spans.
+     */
+    OutliningSpans = 24,
+    /**
      * Tracks the number of `PerfPhase`s, and must appear at the end of the list.
      */
-    LAST = 24,
+    LAST = 25,
     /**
      * Time spent by the Angular Language Service calculating code fixes.
      */
-    LsCodeFixes = 25,
+    LsCodeFixes = 26,
     /**
      * Time spent by the Angular Language Service to fix all detected same type errors.
      */
-    LsCodeFixesAll = 26
+    LsCodeFixesAll = 27
 }
 /**
  * Represents some occurrence during compilation, and is tracked with a counter.

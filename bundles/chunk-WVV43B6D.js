@@ -34,7 +34,7 @@ import {
 import {
   PerfEvent,
   PerfPhase
-} from "./chunk-7PCPPTTO.js";
+} from "./chunk-BV3ZUD7T.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -7580,4 +7580,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-OXFWJ6Q4.js.map
+//# sourceMappingURL=chunk-WVV43B6D.js.map

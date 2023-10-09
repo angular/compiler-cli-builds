@@ -30,9 +30,10 @@ var PerfPhase;
   PerfPhase2[PerfPhase2["LsDiagnostics"] = 21] = "LsDiagnostics";
   PerfPhase2[PerfPhase2["LsComponentLocations"] = 22] = "LsComponentLocations";
   PerfPhase2[PerfPhase2["LsSignatureHelp"] = 23] = "LsSignatureHelp";
-  PerfPhase2[PerfPhase2["LAST"] = 24] = "LAST";
-  PerfPhase2[PerfPhase2["LsCodeFixes"] = 25] = "LsCodeFixes";
-  PerfPhase2[PerfPhase2["LsCodeFixesAll"] = 26] = "LsCodeFixesAll";
+  PerfPhase2[PerfPhase2["OutliningSpans"] = 24] = "OutliningSpans";
+  PerfPhase2[PerfPhase2["LAST"] = 25] = "LAST";
+  PerfPhase2[PerfPhase2["LsCodeFixes"] = 26] = "LsCodeFixes";
+  PerfPhase2[PerfPhase2["LsCodeFixesAll"] = 27] = "LsCodeFixesAll";
 })(PerfPhase || (PerfPhase = {}));
 var PerfEvent;
 (function(PerfEvent2) {
@@ -204,4 +205,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-7PCPPTTO.js.map
+//# sourceMappingURL=chunk-BV3ZUD7T.js.map
