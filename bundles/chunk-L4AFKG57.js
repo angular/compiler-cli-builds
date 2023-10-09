@@ -4535,18 +4535,29 @@ var TcbSwitchOp = class extends TcbOp {
     return false;
   }
   execute() {
-    const clauses = [];
-    for (const current of this.block.cases) {
-      const breakStatement = ts27.factory.createBreakStatement();
-      const clauseScope = Scope.forNodes(this.tcb, this.scope, null, current.children, null);
-      if (current.expression === null) {
-        clauses.push(ts27.factory.createDefaultClause([...clauseScope.render(), breakStatement]));
-      } else {
-        clauses.push(ts27.factory.createCaseClause(tcbExpression(current.expression, this.tcb, clauseScope), [...clauseScope.render(), breakStatement]));
-      }
+    const expression = tcbExpression(this.block.expression, this.tcb, this.scope);
+    markIgnoreDiagnostics(expression);
+    const root = this.generateCase(0, expression, null);
+    if (root !== void 0) {
+      this.scope.addStatement(root);
     }
-    this.scope.addStatement(ts27.factory.createSwitchStatement(tcbExpression(this.block.expression, this.tcb, this.scope), ts27.factory.createCaseBlock(clauses)));
     return null;
+  }
+  generateCase(index, switchValue, defaultCase) {
+    if (index >= this.block.cases.length) {
+      if (defaultCase !== null) {
+        const defaultScope = Scope.forNodes(this.tcb, this.scope, null, defaultCase.children, null);
+        return ts27.factory.createBlock(defaultScope.render());
+      }
+      return void 0;
+    }
+    const current = this.block.cases[index];
+    if (current.expression === null) {
+      return this.generateCase(index + 1, switchValue, current);
+    }
+    const caseScope = Scope.forNodes(this.tcb, this.scope, null, current.children, null);
+    const caseValue = tcbExpression(current.expression, this.tcb, caseScope);
+    return ts27.factory.createIfStatement(ts27.factory.createBinaryExpression(switchValue, ts27.SyntaxKind.EqualsEqualsEqualsToken, caseValue), ts27.factory.createBlock(caseScope.render()), this.generateCase(index + 1, switchValue, defaultCase));
   }
 };
 var TcbForOfOp = class extends TcbOp {
@@ -4753,7 +4764,7 @@ var Scope = class {
     } else if (node instanceof TmplAstIfBlock) {
       this.opQueue.push(new TcbIfOp(this.tcb, this, node));
     } else if (node instanceof TmplAstSwitchBlock) {
-      this.opQueue.push(new TcbSwitchOp(this.tcb, this, node));
+      this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.expression), new TcbSwitchOp(this.tcb, this, node));
     } else if (node instanceof TmplAstForLoopBlock) {
       this.opQueue.push(new TcbForOfOp(this.tcb, this, node));
       node.empty && this.appendChildren(node.empty);
@@ -8513,4 +8524,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-6MZ76B75.js.map
+//# sourceMappingURL=chunk-L4AFKG57.js.map
