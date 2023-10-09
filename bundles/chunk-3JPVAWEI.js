@@ -2237,14 +2237,7 @@ function getConstructorDependencies(clazz, reflector, isCore, compilationMode) {
     if (compilationMode === CompilationMode.LOCAL && param.typeValueReference.kind === 2 && param.typeValueReference.reason.kind !== 0) {
       const typeNode = param.typeValueReference.reason.typeNode;
       if (ts10.isTypeReferenceNode(typeNode)) {
-        if (ts10.isIdentifier(typeNode.typeName)) {
-          token = new WrappedNodeExpr2(typeNode.typeName);
-        } else if (ts10.isQualifiedName(typeNode.typeName)) {
-          const receiver = new WrappedNodeExpr2(typeNode.typeName.left);
-          token = new ReadPropExpr2(receiver, typeNode.typeName.right.getText());
-        } else {
-          throw new Error("Impossible state!");
-        }
+        token = toQualifiedExpression(typeNode.typeName);
       }
     } else {
       token = valueReferenceToExpression(param.typeValueReference);
@@ -2299,6 +2292,12 @@ function getConstructorDependencies(clazz, reflector, isCore, compilationMode) {
   } else {
     return { deps: null, errors };
   }
+}
+function toQualifiedExpression(entity) {
+  if (ts10.isIdentifier(entity)) {
+    return new WrappedNodeExpr2(entity);
+  }
+  return new ReadPropExpr2(toQualifiedExpression(entity.left), entity.right.text);
 }
 function unwrapConstructorDependencies(deps) {
   if (deps === null) {
@@ -7580,4 +7579,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-WVV43B6D.js.map
+//# sourceMappingURL=chunk-3JPVAWEI.js.map
