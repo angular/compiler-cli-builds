@@ -7,4 +7,4 @@
  */
 import { R3ClassDebugInfo } from '@angular/compiler';
 import { DeclarationNode, ReflectionHost } from '../../../reflection';
-export declare function extractClassDebugInfo(clazz: DeclarationNode, reflection: ReflectionHost, rootDirs: ReadonlyArray<string>): R3ClassDebugInfo | null;
+export declare function extractClassDebugInfo(clazz: DeclarationNode, reflection: ReflectionHost, rootDirs: ReadonlyArray<string>, forbidOrphanRendering: boolean): R3ClassDebugInfo | null;

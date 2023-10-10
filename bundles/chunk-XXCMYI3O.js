@@ -3502,7 +3502,7 @@ function removeIdentifierReferences(node, names) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/debug_info.mjs
 import { literal as literal2, WrappedNodeExpr as WrappedNodeExpr4 } from "@angular/compiler";
 import * as path from "path";
-function extractClassDebugInfo(clazz, reflection, rootDirs) {
+function extractClassDebugInfo(clazz, reflection, rootDirs, forbidOrphanRendering) {
   if (!reflection.isClass(clazz)) {
     return null;
   }
@@ -3512,7 +3512,8 @@ function extractClassDebugInfo(clazz, reflection, rootDirs) {
     type: new WrappedNodeExpr4(clazz.name),
     className: literal2(clazz.name.getText()),
     filePath: srcFileMaybeRelativePath ? literal2(srcFileMaybeRelativePath) : null,
-    lineNumber: literal2(srcFile.getLineAndCharacterOfPosition(clazz.name.pos).line + 1)
+    lineNumber: literal2(srcFile.getLineAndCharacterOfPosition(clazz.name.pos).line + 1),
+    forbidOrphanRendering
   };
 }
 function computeRelativePathIfPossible(filePath, rootDirs) {
@@ -6338,7 +6339,7 @@ var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata, compilationMode, deferredSymbolTracker) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -6371,6 +6372,7 @@ var ComponentDecoratorHandler = class {
     this.includeClassMetadata = includeClassMetadata;
     this.compilationMode = compilationMode;
     this.deferredSymbolTracker = deferredSymbolTracker;
+    this.forbidOrphanRendering = forbidOrphanRendering;
     this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
@@ -6621,7 +6623,12 @@ var ComponentDecoratorHandler = class {
         },
         typeCheckMeta: extractDirectiveTypeCheckMeta(node, inputs, this.reflector),
         classMetadata: this.includeClassMetadata ? extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler, (dec) => transformDecoratorResources(dec, component, styles, template)) : null,
-        classDebugInfo: extractClassDebugInfo(node, this.reflector, this.rootDirs),
+        classDebugInfo: extractClassDebugInfo(
+          node,
+          this.reflector,
+          this.rootDirs,
+          this.forbidOrphanRendering
+        ),
         template,
         providersRequiringFactory,
         viewProvidersRequiringFactory,
@@ -7608,4 +7615,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-OFWZHKEF.js.map
+//# sourceMappingURL=chunk-XXCMYI3O.js.map
