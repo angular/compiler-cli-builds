@@ -36,7 +36,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-AH5UY2ZU.js";
+} from "./chunk-MQ4YPFAS.js";
 import {
   ImportManager,
   translateExpression,
@@ -8483,12 +8483,7 @@ function getExtendedConfigPathWorker(configFile, extendsValue, host, fs) {
     }
   } else {
     const parseConfigHost = createParseConfigHost(host, fs);
-    const { resolvedModule } = ts39.nodeModuleNameResolver(
-      extendsValue,
-      configFile,
-      { moduleResolution: 2, resolveJsonModule: true },
-      parseConfigHost
-    );
+    const { resolvedModule } = ts39.nodeModuleNameResolver(extendsValue, configFile, { moduleResolution: ts39.ModuleResolutionKind.Node10, resolveJsonModule: true }, parseConfigHost);
     if (resolvedModule) {
       return absoluteFrom(resolvedModule.resolvedFileName);
     }
@@ -8595,4 +8590,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-76XUL5HJ.js.map
+//# sourceMappingURL=chunk-ZZYOV2AN.js.map
