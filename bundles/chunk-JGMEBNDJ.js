@@ -4565,6 +4565,7 @@ var TcbIfOp = class extends TcbOp {
     this.tcb = tcb;
     this.scope = scope;
     this.block = block;
+    this.expressionScopes = /* @__PURE__ */ new Map();
   }
   get optional() {
     return false;
@@ -4580,19 +4581,38 @@ var TcbIfOp = class extends TcbOp {
       return void 0;
     }
     if (branch.expression === null) {
-      const branchScope2 = Scope.forNodes(this.tcb, this.scope, null, branch.children, null);
-      return ts28.factory.createBlock(branchScope2.render());
+      const branchScope = Scope.forNodes(this.tcb, this.scope, null, branch.children, this.generateBranchGuard(index));
+      return ts28.factory.createBlock(branchScope.render());
     }
-    let branchParentScope;
-    if (branch.expressionAlias === null) {
-      branchParentScope = this.scope;
-    } else {
-      branchParentScope = Scope.forNodes(this.tcb, this.scope, branch, [], null);
-      branchParentScope.render().forEach((stmt) => this.scope.addStatement(stmt));
+    const expressionScope = Scope.forNodes(this.tcb, this.scope, branch, [], null);
+    expressionScope.render().forEach((stmt) => this.scope.addStatement(stmt));
+    this.expressionScopes.set(branch, expressionScope);
+    const expression = branch.expressionAlias === null ? tcbExpression(branch.expression, this.tcb, expressionScope) : expressionScope.resolve(branch.expressionAlias);
+    const bodyScope = Scope.forNodes(this.tcb, expressionScope, null, branch.children, this.generateBranchGuard(index));
+    return ts28.factory.createIfStatement(expression, ts28.factory.createBlock(bodyScope.render()), this.generateBranch(index + 1));
+  }
+  generateBranchGuard(index) {
+    let guard = null;
+    for (let i = 0; i <= index; i++) {
+      const branch = this.block.branches[i];
+      if (branch.expression === null) {
+        continue;
+      }
+      if (!this.expressionScopes.has(branch)) {
+        throw new Error(`Could not determine expression scope of branch at index ${i}`);
+      }
+      const expressionScope = this.expressionScopes.get(branch);
+      let expression;
+      if (branch.expressionAlias === null) {
+        expression = tcbExpression(branch.expression, this.tcb, expressionScope);
+        markIgnoreDiagnostics(expression);
+      } else {
+        expression = expressionScope.resolve(branch.expressionAlias);
+      }
+      const comparisonExpression = i === index ? expression : ts28.factory.createPrefixUnaryExpression(ts28.SyntaxKind.ExclamationToken, ts28.factory.createParenthesizedExpression(expression));
+      guard = guard === null ? comparisonExpression : ts28.factory.createBinaryExpression(guard, ts28.SyntaxKind.AmpersandAmpersandToken, comparisonExpression);
     }
-    const branchScope = Scope.forNodes(this.tcb, branchParentScope, null, branch.children, null);
-    const expression = branch.expressionAlias === null ? tcbExpression(branch.expression, this.tcb, branchScope) : branchScope.resolve(branch.expressionAlias);
-    return ts28.factory.createIfStatement(expression, ts28.factory.createBlock(branchScope.render()), this.generateBranch(index + 1));
+    return guard;
   }
 };
 var TcbSwitchOp = class extends TcbOp {
@@ -4617,7 +4637,7 @@ var TcbSwitchOp = class extends TcbOp {
   generateCase(index, switchValue, defaultCase) {
     if (index >= this.block.cases.length) {
       if (defaultCase !== null) {
-        const defaultScope = Scope.forNodes(this.tcb, this.scope, null, defaultCase.children, null);
+        const defaultScope = Scope.forNodes(this.tcb, this.scope, null, defaultCase.children, this.generateGuard(defaultCase, switchValue));
         return ts28.factory.createBlock(defaultScope.render());
       }
       return void 0;
@@ -4626,9 +4646,31 @@ var TcbSwitchOp = class extends TcbOp {
     if (current.expression === null) {
       return this.generateCase(index + 1, switchValue, current);
     }
-    const caseScope = Scope.forNodes(this.tcb, this.scope, null, current.children, null);
+    const caseScope = Scope.forNodes(this.tcb, this.scope, null, current.children, this.generateGuard(current, switchValue));
     const caseValue = tcbExpression(current.expression, this.tcb, caseScope);
     return ts28.factory.createIfStatement(ts28.factory.createBinaryExpression(switchValue, ts28.SyntaxKind.EqualsEqualsEqualsToken, caseValue), ts28.factory.createBlock(caseScope.render()), this.generateCase(index + 1, switchValue, defaultCase));
+  }
+  generateGuard(node, switchValue) {
+    if (node.expression !== null) {
+      const expression = tcbExpression(node.expression, this.tcb, this.scope);
+      markIgnoreDiagnostics(expression);
+      return ts28.factory.createBinaryExpression(switchValue, ts28.SyntaxKind.EqualsEqualsEqualsToken, expression);
+    }
+    let guard = null;
+    for (const current of this.block.cases) {
+      if (current.expression === null) {
+        continue;
+      }
+      const expression = tcbExpression(current.expression, this.tcb, this.scope);
+      markIgnoreDiagnostics(expression);
+      const comparison = ts28.factory.createBinaryExpression(switchValue, ts28.SyntaxKind.ExclamationEqualsEqualsToken, expression);
+      if (guard === null) {
+        guard = comparison;
+      } else {
+        guard = ts28.factory.createBinaryExpression(guard, ts28.SyntaxKind.AmpersandAmpersandToken, comparison);
+      }
+    }
+    return guard;
   }
 };
 var TcbForOfOp = class extends TcbOp {
@@ -8590,4 +8632,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZZYOV2AN.js.map
+//# sourceMappingURL=chunk-JGMEBNDJ.js.map
