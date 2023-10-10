@@ -55,6 +55,8 @@ export interface DocEntry {
 export interface ConstantEntry extends DocEntry {
     type: string;
 }
+/** Documentation entity for a type alias. */
+export type TypeAliasEntry = ConstantEntry;
 /** Documentation entity for a TypeScript class. */
 export interface ClassEntry extends DocEntry {
     isAbstract: boolean;

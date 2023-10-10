@@ -797,6 +797,18 @@ function isSyntheticAngularConstant(declaration) {
   return declaration.name.getText() === "USED_FOR_NG_TYPE_CHECKING";
 }
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/type_alias_extractor.mjs
+function extractTypeAlias(declaration) {
+  return {
+    name: declaration.name.getText(),
+    type: declaration.type.getText(),
+    entryType: EntryType.TypeAlias,
+    rawComment: extractRawJsDoc(declaration),
+    description: extractJsDocDescription(declaration),
+    jsdocTags: extractJsDocTags(declaration)
+  };
+}
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/extractor.mjs
 var DocsExtractor = class {
   constructor(typeChecker, metadataReader) {
@@ -829,6 +841,9 @@ var DocsExtractor = class {
     }
     if (ts8.isVariableDeclaration(node) && !isSyntheticAngularConstant(node)) {
       return extractConstant(node, this.typeChecker);
+    }
+    if (ts8.isTypeAliasDeclaration(node)) {
+      return extractTypeAlias(node);
     }
     if (ts8.isEnumDeclaration(node)) {
       return extractEnum(node, this.typeChecker);
@@ -8632,4 +8647,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KMFKB462.js.map
+//# sourceMappingURL=chunk-SN5VLH4F.js.map
