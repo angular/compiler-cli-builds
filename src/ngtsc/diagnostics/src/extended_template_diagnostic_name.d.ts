@@ -22,5 +22,6 @@ export declare enum ExtendedTemplateDiagnosticName {
     TEXT_ATTRIBUTE_NOT_BINDING = "textAttributeNotBinding",
     MISSING_NGFOROF_LET = "missingNgForOfLet",
     SUFFIX_NOT_SUPPORTED = "suffixNotSupported",
-    SKIP_HYDRATION_NOT_STATIC = "skipHydrationNotStatic"
+    SKIP_HYDRATION_NOT_STATIC = "skipHydrationNotStatic",
+    INTERPOLATED_SIGNAL_NOT_INVOKED = "interpolatedSignalNotInvoked"
 }

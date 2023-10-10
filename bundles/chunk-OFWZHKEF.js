@@ -7,7 +7,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-KV3DCGDX.js";
+} from "./chunk-5WC7IWWT.js";
 import {
   ClassMemberKind,
   ErrorCode,
@@ -30,7 +30,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-VV77Q6YH.js";
+} from "./chunk-NVNYQX3M.js";
 import {
   PerfEvent,
   PerfPhase
@@ -7608,4 +7608,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-MQ4YPFAS.js.map
+//# sourceMappingURL=chunk-OFWZHKEF.js.map
