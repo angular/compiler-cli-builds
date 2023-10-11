@@ -12,12 +12,11 @@ import { ClassDeclaration, DeclarationNode } from '../../reflection';
  */
 export declare enum IdentifierKind {
     Property = 0,
-    Method = 1,
-    Element = 2,
-    Template = 3,
-    Attribute = 4,
-    Reference = 5,
-    Variable = 6
+    Element = 1,
+    Template = 2,
+    Attribute = 3,
+    Reference = 4,
+    Variable = 5
 }
 /**
  * Describes a semantically-interesting identifier in a template, such as an interpolated variable
@@ -39,13 +38,6 @@ interface ExpressionIdentifier extends TemplateIdentifier {
 /** Describes a property accessed in a template. */
 export interface PropertyIdentifier extends ExpressionIdentifier {
     kind: IdentifierKind.Property;
-}
-/**
- * Describes a method accessed in a template.
- * @deprecated No longer being used. To be removed.
- */
-export interface MethodIdentifier extends ExpressionIdentifier {
-    kind: IdentifierKind.Method;
 }
 /** Describes an element attribute in a template. */
 export interface AttributeIdentifier extends TemplateIdentifier {
@@ -97,7 +89,7 @@ export interface VariableIdentifier extends TemplateIdentifier {
  * Identifiers recorded at the top level of the template, without any context about the HTML nodes
  * they were discovered in.
  */
-export type TopLevelIdentifier = PropertyIdentifier | ElementIdentifier | TemplateNodeIdentifier | ReferenceIdentifier | VariableIdentifier | MethodIdentifier;
+export type TopLevelIdentifier = PropertyIdentifier | ElementIdentifier | TemplateNodeIdentifier | ReferenceIdentifier | VariableIdentifier;
 /**
  * Describes the absolute byte offsets of a text anchor in a source code.
  */
