@@ -70,5 +70,6 @@ export declare class Environment implements ReferenceEmitEnvironment {
      * they can be imported in the context fiel.
      */
     referenceTransplantedType(type: TransplantedType<ts.TypeNode>): ts.TypeNode;
+    referenceExternalSymbol(moduleName: string, name: string): ts.Expression;
     getPreludeStatements(): ts.Statement[];
 }

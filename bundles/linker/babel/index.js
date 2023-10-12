@@ -8,9 +8,9 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-EQ7Q3KIO.js";
-import "../../chunk-5WC7IWWT.js";
-import "../../chunk-NVNYQX3M.js";
+} from "../../chunk-KHHO4IJ3.js";
+import "../../chunk-HEGQWPAS.js";
+import "../../chunk-MQN6YN3D.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -57,6 +57,8 @@ var BabelAstFactory = class {
       case "||":
       case "??":
         return t.logicalExpression(operator, leftOperand, rightOperand);
+      case "=":
+        return this.createAssignment(leftOperand, rightOperand);
       default:
         return t.binaryExpression(operator, leftOperand, rightOperand);
     }

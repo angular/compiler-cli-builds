@@ -7,7 +7,7 @@ import {
   NoopImportRewriter,
   Reference,
   assertSuccessfulReferenceEmit
-} from "./chunk-NVNYQX3M.js";
+} from "./chunk-MQN6YN3D.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/context.mjs
 var Context = class {
@@ -30,6 +30,7 @@ var UNARY_OPERATORS = /* @__PURE__ */ new Map([
 ]);
 var BINARY_OPERATORS = /* @__PURE__ */ new Map([
   [o.BinaryOperator.And, "&&"],
+  [o.BinaryOperator.Assign, "="],
   [o.BinaryOperator.Bigger, ">"],
   [o.BinaryOperator.BiggerEquals, ">="],
   [o.BinaryOperator.BitwiseAnd, "&"],
@@ -532,6 +533,7 @@ var UNARY_OPERATORS2 = {
   "!": ts3.SyntaxKind.ExclamationToken
 };
 var BINARY_OPERATORS2 = {
+  "=": ts3.SyntaxKind.EqualsToken,
   "&&": ts3.SyntaxKind.AmpersandAmpersandToken,
   ">": ts3.SyntaxKind.GreaterThanToken,
   ">=": ts3.SyntaxKind.GreaterThanEqualsToken,
@@ -738,4 +740,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-5WC7IWWT.js.map
+//# sourceMappingURL=chunk-HEGQWPAS.js.map

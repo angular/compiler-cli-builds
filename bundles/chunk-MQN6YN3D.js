@@ -884,6 +884,8 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["INLINE_TCB_REQUIRED"] = 8900] = "INLINE_TCB_REQUIRED";
   ErrorCode2[ErrorCode2["INLINE_TYPE_CTOR_REQUIRED"] = 8901] = "INLINE_TYPE_CTOR_REQUIRED";
   ErrorCode2[ErrorCode2["INJECTABLE_DUPLICATE_PROV"] = 9001] = "INJECTABLE_DUPLICATE_PROV";
+  ErrorCode2[ErrorCode2["QUERY_DEFINITION_ARITY_WRONG"] = 9002] = "QUERY_DEFINITION_ARITY_WRONG";
+  ErrorCode2[ErrorCode2["QUERY_DEFINITION_ARG_NOT_LITERAL"] = 9003] = "QUERY_DEFINITION_ARG_NOT_LITERAL";
   ErrorCode2[ErrorCode2["SUGGEST_STRICT_TEMPLATES"] = 10001] = "SUGGEST_STRICT_TEMPLATES";
   ErrorCode2[ErrorCode2["SUGGEST_SUBOPTIMAL_TYPE_INFERENCE"] = 10002] = "SUGGEST_SUBOPTIMAL_TYPE_INFERENCE";
   ErrorCode2[ErrorCode2["LOCAL_COMPILATION_IMPORTED_TEMPLATE_STRING"] = 11001] = "LOCAL_COMPILATION_IMPORTED_TEMPLATE_STRING";
@@ -1608,4 +1610,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-NVNYQX3M.js.map
+//# sourceMappingURL=chunk-MQN6YN3D.js.map

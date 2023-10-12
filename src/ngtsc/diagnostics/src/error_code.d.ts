@@ -344,6 +344,12 @@ export declare enum ErrorCode {
      * An injectable already has a `ɵprov` property.
      */
     INJECTABLE_DUPLICATE_PROV = 9001,
+    /** Invalid number of arguments when defining a query, either using decorator or signal APIs. */
+    QUERY_DEFINITION_ARITY_WRONG = 9002,
+    /**
+     * An argument for defining a query is expected to be a literal, but turned out to be different.
+     */
+    QUERY_DEFINITION_ARG_NOT_LITERAL = 9003,
     /**
      * Suggest users to enable `strictTemplates` to make use of full capabilities
      * provided by Angular language service.

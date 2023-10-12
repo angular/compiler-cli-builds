@@ -36,12 +36,12 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-XXCMYI3O.js";
+} from "./chunk-WOW5HDN4.js";
 import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-5WC7IWWT.js";
+} from "./chunk-HEGQWPAS.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -83,7 +83,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-NVNYQX3M.js";
+} from "./chunk-MQN6YN3D.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -3329,6 +3329,10 @@ var Environment = class {
   referenceTransplantedType(type) {
     return translateType(type, this.contextFile, this.reflector, this.refEmitter, this.importManager);
   }
+  referenceExternalSymbol(moduleName, name) {
+    const external = new ExternalExpr({ moduleName, name });
+    return translateExpression(external, this.importManager);
+  }
   getPreludeStatements() {
     return [
       ...this.pipeInstStatements,
@@ -3512,7 +3516,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
-import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, SafeCall, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
+import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers, SafeCall, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
 import ts28 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
@@ -4305,7 +4309,23 @@ var TcbDirectiveInputsOp = class extends TcbOp {
           if (dirId === null) {
             dirId = this.scope.resolve(this.node, this.dir);
           }
-          target = this.dir.stringLiteralInputFields.has(fieldName) ? ts28.factory.createElementAccessExpression(dirId, ts28.factory.createStringLiteral(fieldName)) : ts28.factory.createPropertyAccessExpression(dirId, ts28.factory.createIdentifier(fieldName));
+          if (this.dir.isSignal) {
+            const dirTypeRef = this.tcb.env.referenceType(this.dir.ref);
+            if (!ts28.isTypeReferenceNode(dirTypeRef)) {
+              throw new Error(`Expected TypeReferenceNode from reference to ${this.dir.ref.debugName}`);
+            }
+            const getSignalWriteType = this.tcb.env.referenceExternalType(R3Identifiers.getInputSignalWriteType.moduleName, R3Identifiers.getInputSignalWriteType.name);
+            if (!ts28.isTypeReferenceNode(getSignalWriteType)) {
+              throw new Error(`Expected TypeReferenceNode from reference to ${R3Identifiers.getInputSignalWriteType.name}`);
+            }
+            const inputFieldType = ts28.factory.createIndexedAccessTypeNode(ts28.factory.createTypeQueryNode(dirId), ts28.factory.createLiteralTypeNode(ts28.factory.createStringLiteral(fieldName)));
+            const inputWriteTypeId = this.tcb.allocateId();
+            const inputWriteTypeSt = tsDeclareVariable(inputWriteTypeId, ts28.factory.createTypeReferenceNode(getSignalWriteType.typeName, [inputFieldType]));
+            this.scope.addStatement(inputWriteTypeSt);
+            target = inputWriteTypeId;
+          } else {
+            target = this.dir.stringLiteralInputFields.has(fieldName) ? ts28.factory.createElementAccessExpression(dirId, ts28.factory.createStringLiteral(fieldName)) : ts28.factory.createPropertyAccessExpression(dirId, ts28.factory.createIdentifier(fieldName));
+          }
         }
         if (attr.attribute.keySpan !== void 0) {
           addParseSpanInfo(target, attr.attribute.keySpan);
@@ -8650,4 +8670,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-35SQ73FP.js.map
+//# sourceMappingURL=chunk-Q5H3QWA4.js.map

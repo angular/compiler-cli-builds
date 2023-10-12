@@ -28,7 +28,13 @@ export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decora
     hostDirectives: HostDirectiveMeta[] | null;
     rawHostDirectives: ts.Expression | null;
 } | undefined;
-export declare function extractQueryMetadata(exprNode: ts.Node, name: string, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, evaluator: PartialEvaluator): R3QueryMetadata;
+export declare function extractQueryMetadata(exprNode: ts.Node, name: QueryType, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, evaluator: PartialEvaluator): R3QueryMetadata;
 export declare function extractHostBindings(members: ClassMember[], evaluator: PartialEvaluator, coreModule: string | undefined, metadata?: Map<string, ts.Expression>): ParsedHostBindings;
+interface QueryType {
+    forError: string;
+    first: boolean;
+    type: 'view' | 'content';
+}
 export declare function parseDirectiveStyles(directive: Map<string, ts.Expression>, evaluator: PartialEvaluator, compilationMode: CompilationMode): null | string[];
 export declare function parseFieldStringArrayValue(directive: Map<string, ts.Expression>, field: string, evaluator: PartialEvaluator): null | string[];
+export {};

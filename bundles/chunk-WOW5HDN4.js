@@ -7,7 +7,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-5WC7IWWT.js";
+} from "./chunk-HEGQWPAS.js";
 import {
   ClassMemberKind,
   ErrorCode,
@@ -30,7 +30,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-NVNYQX3M.js";
+} from "./chunk-MQN6YN3D.js";
 import {
   PerfEvent,
   PerfPhase
@@ -4392,17 +4392,26 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const decoratedElements = members.filter((member) => !member.isStatic && member.decorators !== null);
   const coreModule = isCore ? void 0 : "@angular/core";
   const inputsFromMeta = parseInputsArray(clazz, directive, evaluator, reflector, refEmitter);
-  const inputsFromFields = parseInputFields(clazz, filterToMembersWithDecorator(decoratedElements, "Input", coreModule), evaluator, reflector, refEmitter);
+  let inputsFromFields = parseInputFields(clazz, filterToMembersWithDecorator(decoratedElements, "Input", coreModule), evaluator, reflector, refEmitter);
+  inputsFromFields = {
+    ...inputsFromFields,
+    ...findAndParseSignalInputs(reflector, evaluator, refEmitter, coreModule, clazz, members)
+  };
   const inputs = ClassPropertyMapping.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
   const outputsFromMeta = parseOutputsArray(directive, evaluator);
-  const outputsFromFields = parseOutputFields(filterToMembersWithDecorator(decoratedElements, "Output", coreModule), evaluator);
+  let outputsFromFields = parseOutputFields(filterToMembersWithDecorator(decoratedElements, "Output", coreModule), evaluator);
+  outputsFromFields = {
+    ...outputsFromFields,
+    ...findAndParseSignalOutputs(reflector, evaluator, coreModule, members)
+  };
   const outputs = ClassPropertyMapping.fromMappedObject({ ...outputsFromMeta, ...outputsFromFields });
+  const signalQueryDefinitions = findAndParseSignalQueries(reflector, evaluator, coreModule, members);
   const contentChildFromFields = queriesFromFields(filterToMembersWithDecorator(decoratedElements, "ContentChild", coreModule), reflector, evaluator);
   const contentChildrenFromFields = queriesFromFields(filterToMembersWithDecorator(decoratedElements, "ContentChildren", coreModule), reflector, evaluator);
-  const queries = [...contentChildFromFields, ...contentChildrenFromFields];
+  const queries = [...contentChildFromFields, ...contentChildrenFromFields, ...signalQueryDefinitions.content];
   const viewChildFromFields = queriesFromFields(filterToMembersWithDecorator(decoratedElements, "ViewChild", coreModule), reflector, evaluator);
   const viewChildrenFromFields = queriesFromFields(filterToMembersWithDecorator(decoratedElements, "ViewChildren", coreModule), reflector, evaluator);
-  const viewQueries = [...viewChildFromFields, ...viewChildrenFromFields];
+  const viewQueries = [...viewChildFromFields, ...viewChildrenFromFields, ...signalQueryDefinitions.view];
   if (directive.has("queries")) {
     const queriesFromDecorator = extractQueriesFromDecorator(directive.get("queries"), reflector, evaluator, isCore);
     queries.push(...queriesFromDecorator.content);
@@ -4496,9 +4505,9 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
 }
 function extractQueryMetadata(exprNode, name, args, propertyName, reflector, evaluator) {
   if (args.length === 0) {
-    throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, exprNode, `@${name} must have arguments`);
+    throw new FatalDiagnosticError(ErrorCode.QUERY_DEFINITION_ARITY_WRONG, exprNode, `${name.forError} must have arguments`);
   }
-  const first = name === "ViewChild" || name === "ContentChild";
+  const first = name.first;
   const forwardReferenceTarget = tryUnwrapForwardRef(args[0], reflector);
   const node = forwardReferenceTarget != null ? forwardReferenceTarget : args[0];
   const arg = evaluator.evaluate(node);
@@ -4508,18 +4517,18 @@ function extractQueryMetadata(exprNode, name, args, propertyName, reflector, eva
     predicate = createMayBeForwardRefExpression(new WrappedNodeExpr5(node), forwardReferenceTarget !== null ? 2 : 0);
   } else if (typeof arg === "string") {
     predicate = [arg];
-  } else if (isStringArrayOrDie(arg, `@${name} predicate`, node)) {
+  } else if (isStringArrayOrDie(arg, `${name.forError} predicate`, node)) {
     predicate = arg;
   } else {
-    throw createValueHasWrongTypeError(node, arg, `@${name} predicate cannot be interpreted`);
+    throw createValueHasWrongTypeError(node, arg, `${name.forError} predicate cannot be interpreted`);
   }
   let read = null;
-  let descendants = name !== "ContentChildren";
+  let descendants = !(name.type === "content" && name.first === false);
   let emitDistinctChangesOnly = emitDistinctChangesOnlyDefaultValue;
   if (args.length === 2) {
     const optionsExpr = unwrapExpression(args[1]);
     if (!ts20.isObjectLiteralExpression(optionsExpr)) {
-      throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, optionsExpr, `@${name} options must be an object literal`);
+      throw new FatalDiagnosticError(ErrorCode.QUERY_DEFINITION_ARG_NOT_LITERAL, optionsExpr, `${name.forError} options must be an object literal`);
     }
     const options = reflectObjectLiteral(optionsExpr);
     if (options.has("read")) {
@@ -4529,7 +4538,7 @@ function extractQueryMetadata(exprNode, name, args, propertyName, reflector, eva
       const descendantsExpr = options.get("descendants");
       const descendantsValue = evaluator.evaluate(descendantsExpr);
       if (typeof descendantsValue !== "boolean") {
-        throw createValueHasWrongTypeError(descendantsExpr, descendantsValue, `@${name} options.descendants must be a boolean`);
+        throw createValueHasWrongTypeError(descendantsExpr, descendantsValue, `${name.forError} options.descendants must be a boolean`);
       }
       descendants = descendantsValue;
     }
@@ -4537,19 +4546,19 @@ function extractQueryMetadata(exprNode, name, args, propertyName, reflector, eva
       const emitDistinctChangesOnlyExpr = options.get("emitDistinctChangesOnly");
       const emitDistinctChangesOnlyValue = evaluator.evaluate(emitDistinctChangesOnlyExpr);
       if (typeof emitDistinctChangesOnlyValue !== "boolean") {
-        throw createValueHasWrongTypeError(emitDistinctChangesOnlyExpr, emitDistinctChangesOnlyValue, `@${name} options.emitDistinctChangesOnly must be a boolean`);
+        throw createValueHasWrongTypeError(emitDistinctChangesOnlyExpr, emitDistinctChangesOnlyValue, `${name.forError} options.emitDistinctChangesOnly must be a boolean`);
       }
       emitDistinctChangesOnly = emitDistinctChangesOnlyValue;
     }
     if (options.has("static")) {
       const staticValue = evaluator.evaluate(options.get("static"));
       if (typeof staticValue !== "boolean") {
-        throw createValueHasWrongTypeError(node, staticValue, `@${name} options.static must be a boolean`);
+        throw createValueHasWrongTypeError(node, staticValue, `${name.forError} options.static must be a boolean`);
       }
       isStatic = staticValue;
     }
   } else if (args.length > 2) {
-    throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, node, `@${name} has too many arguments`);
+    throw new FatalDiagnosticError(ErrorCode.QUERY_DEFINITION_ARITY_WRONG, node, `${name.forError} has too many arguments`);
   }
   return {
     propertyName,
@@ -4611,6 +4620,20 @@ function extractHostBindings(members, evaluator, coreModule, metadata) {
   });
   return bindings;
 }
+function categorizeQueryByDecoratorName(name) {
+  const forError = `@${name}`;
+  switch (name) {
+    case "ViewChild":
+      return { first: true, type: "view", forError };
+    case "ViewChildren":
+      return { first: false, type: "view", forError };
+    case "ContentChild":
+      return { first: true, type: "content", forError };
+    case "ContentChildren":
+      return { first: false, type: "content", forError };
+  }
+  throw new Error(`Unexpected query name: ${name}`);
+}
 function extractQueriesFromDecorator(queryData, reflector, evaluator, isCore) {
   const content = [], view = [];
   if (!ts20.isObjectLiteralExpression(queryData)) {
@@ -4629,7 +4652,7 @@ function extractQueriesFromDecorator(queryData, reflector, evaluator, isCore) {
     if (type === null || !isCore && type.from !== "@angular/core" || !QUERY_TYPES.has(type.name)) {
       throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, queryData, "Decorator query metadata must be an instance of a query type");
     }
-    const query = extractQueryMetadata(queryExpr, type.name, queryExpr.arguments || [], propertyName, reflector, evaluator);
+    const query = extractQueryMetadata(queryExpr, categorizeQueryByDecoratorName(type.name), queryExpr.arguments || [], propertyName, reflector, evaluator);
     if (type.name.startsWith("Content")) {
       content.push(query);
     } else {
@@ -4697,7 +4720,7 @@ function queriesFromFields(fields, reflector, evaluator) {
     } else if (!isPropertyTypeMember(member)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_UNEXPECTED, node, "Query decorator must go on a property-type member");
     }
-    return extractQueryMetadata(node, decorator.name, decorator.args || [], member.name, reflector, evaluator);
+    return extractQueryMetadata(node, categorizeQueryByDecoratorName(decorator.name), decorator.args || [], member.name, reflector, evaluator);
   });
 }
 function isPropertyTypeMember(member) {
@@ -4901,6 +4924,146 @@ function evaluateHostExpressionBindings(hostExpr, evaluator) {
     );
   }
   return bindings;
+}
+function getOptionsExpressionForInputCall(call) {
+  if (call.arguments.length === 0) {
+    return null;
+  }
+  if (call.arguments.length === 2) {
+    return call.arguments[1];
+  }
+  if (!ts20.isObjectLiteralExpression(unwrapExpression(call.arguments[0]))) {
+    return null;
+  }
+  return call.arguments[0];
+}
+function findAndParseSignalInputs(reflector, evaluator, refEmitter, coreModule, clazz, members) {
+  var _a, _b;
+  const res = {};
+  for (const m of members) {
+    if (m.value === null) {
+      continue;
+    }
+    const value = unwrapExpression(m.value);
+    if (!ts20.isCallExpression(value)) {
+      continue;
+    }
+    const callTarget = unwrapExpression(value.expression);
+    if (!ts20.isIdentifier(callTarget)) {
+      continue;
+    }
+    if (!isCoreSymbolReference(callTarget, "input", reflector, coreModule)) {
+      continue;
+    }
+    const optionsNode = getOptionsExpressionForInputCall(value);
+    const options = optionsNode === null ? null : evaluator.evaluate(optionsNode);
+    if (options !== null && !(options instanceof Map)) {
+      throw new Error("Input options are not an object..");
+    }
+    let transform = null;
+    if (options == null ? void 0 : options.has("transform")) {
+      const transformValue = options.get("transform");
+      if (!(transformValue instanceof DynamicValue) && !(transformValue instanceof Reference)) {
+        throw createValueHasWrongTypeError(optionsNode, transformValue, `Input transform must be a function`);
+      }
+      transform = parseInputTransformFunction(clazz, m.name, transformValue, reflector, refEmitter);
+    }
+    res[m.name] = {
+      classPropertyName: m.name,
+      bindingPropertyName: (_b = (_a = options == null ? void 0 : options.get("alias")) == null ? void 0 : _a.toString()) != null ? _b : m.name,
+      required: !!(options == null ? void 0 : options.get("required")),
+      transform
+    };
+  }
+  return res;
+}
+function findAndParseSignalOutputs(reflector, evaluator, coreModule, members) {
+  const res = {};
+  for (const m of members) {
+    if (m.value === null) {
+      continue;
+    }
+    const value = unwrapExpression(m.value);
+    if (!ts20.isCallExpression(value)) {
+      continue;
+    }
+    const callTarget = unwrapExpression(value.expression);
+    if (!ts20.isIdentifier(callTarget)) {
+      continue;
+    }
+    if (!isCoreSymbolReference(callTarget, "output", reflector, coreModule)) {
+      continue;
+    }
+    const propertyName = m.name;
+    const optionsNode = value.arguments[0];
+    let publicOutputName = propertyName;
+    if (optionsNode !== void 0) {
+      const options = evaluator.evaluate(optionsNode);
+      if (!(options instanceof Map)) {
+        throw createValueHasWrongTypeError(optionsNode, options, `Output options must be an object.`);
+      }
+      const alias = options.get("alias");
+      if (alias !== void 0) {
+        if (typeof alias !== "string") {
+          throw createValueHasWrongTypeError(optionsNode, options, `Alias must resolve to a string`);
+        }
+        publicOutputName = alias;
+      }
+    }
+    res[propertyName] = publicOutputName;
+  }
+  return res;
+}
+function findAndParseSignalQueries(reflector, evaluator, coreModule, members) {
+  const res = { view: [], content: [] };
+  for (const m of members) {
+    if (m.value === null) {
+      continue;
+    }
+    const value = unwrapExpression(m.value);
+    if (!ts20.isCallExpression(value)) {
+      continue;
+    }
+    const callTarget = unwrapExpression(value.expression);
+    if (!ts20.isIdentifier(callTarget)) {
+      continue;
+    }
+    const viewChild = isCoreSymbolReference(callTarget, "viewChild", reflector, coreModule) && {
+      first: true,
+      forError: "viewChild()",
+      type: "view"
+    };
+    const viewChildren = isCoreSymbolReference(callTarget, "viewChildren", reflector, coreModule) && {
+      first: false,
+      forError: "viewChildren()",
+      type: "view"
+    };
+    const contentChild = isCoreSymbolReference(callTarget, "contentChild", reflector, coreModule) && {
+      first: true,
+      forError: "contentChild()",
+      type: "content"
+    };
+    const contentChildren = isCoreSymbolReference(callTarget, "contentChildren", reflector, coreModule) && {
+      first: false,
+      forError: "contentChildren()",
+      type: "content"
+    };
+    const query = viewChild || viewChildren || contentChild || contentChildren;
+    if (query === false) {
+      continue;
+    }
+    const metadata = extractQueryMetadata(callTarget, query, value.arguments, m.name, reflector, evaluator);
+    if (query.type === "view") {
+      res.view.push(metadata);
+    } else {
+      res.content.push(metadata);
+    }
+  }
+  return res;
+}
+function isCoreSymbolReference(callTarget, name, reflector, coreModule) {
+  const imp = reflector.getImportOfIdentifier(callTarget);
+  return imp !== null ? imp.from === coreModule && imp.name === name : callTarget.text === name && coreModule === void 0;
 }
 function extractHostDirectives(rawHostDirectives, evaluator) {
   const resolved = evaluator.evaluate(rawHostDirectives, forwardRefResolver);
@@ -7615,4 +7778,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XXCMYI3O.js.map
+//# sourceMappingURL=chunk-WOW5HDN4.js.map
