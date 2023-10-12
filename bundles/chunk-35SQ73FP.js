@@ -1681,11 +1681,12 @@ var SYM_INCREMENTAL_STATE = Symbol("NgIncrementalState");
 var IdentifierKind;
 (function(IdentifierKind2) {
   IdentifierKind2[IdentifierKind2["Property"] = 0] = "Property";
-  IdentifierKind2[IdentifierKind2["Element"] = 1] = "Element";
-  IdentifierKind2[IdentifierKind2["Template"] = 2] = "Template";
-  IdentifierKind2[IdentifierKind2["Attribute"] = 3] = "Attribute";
-  IdentifierKind2[IdentifierKind2["Reference"] = 4] = "Reference";
-  IdentifierKind2[IdentifierKind2["Variable"] = 5] = "Variable";
+  IdentifierKind2[IdentifierKind2["Method"] = 1] = "Method";
+  IdentifierKind2[IdentifierKind2["Element"] = 2] = "Element";
+  IdentifierKind2[IdentifierKind2["Template"] = 3] = "Template";
+  IdentifierKind2[IdentifierKind2["Attribute"] = 4] = "Attribute";
+  IdentifierKind2[IdentifierKind2["Reference"] = 5] = "Reference";
+  IdentifierKind2[IdentifierKind2["Variable"] = 6] = "Variable";
 })(IdentifierKind || (IdentifierKind = {}));
 var AbsoluteSourceSpan = class {
   constructor(start, end) {
@@ -8649,4 +8650,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-K2XRNNEA.js.map
+//# sourceMappingURL=chunk-35SQ73FP.js.map
