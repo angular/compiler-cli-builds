@@ -498,6 +498,21 @@ function getEnumMemberValue(memberNode) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/function_extractor.mjs
 import ts6 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/generics_extractor.mjs
+function extractGenerics(declaration) {
+  var _a, _b;
+  return (_b = (_a = declaration.typeParameters) == null ? void 0 : _a.map((typeParam) => {
+    var _a2, _b2;
+    return {
+      name: typeParam.name.getText(),
+      constraint: (_a2 = typeParam.constraint) == null ? void 0 : _a2.getText(),
+      default: (_b2 = typeParam.default) == null ? void 0 : _b2.getText()
+    };
+  })) != null ? _b : [];
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/function_extractor.mjs
 var FunctionExtractor = class {
   constructor(declaration, typeChecker) {
     this.declaration = declaration;
@@ -511,6 +526,7 @@ var FunctionExtractor = class {
       name: this.declaration.name.getText(),
       returnType,
       entryType: EntryType.Function,
+      generics: extractGenerics(this.declaration),
       description: extractJsDocDescription(this.declaration),
       jsdocTags: extractJsDocTags(this.declaration),
       rawComment: extractRawJsDoc(this.declaration)
@@ -575,6 +591,7 @@ var ClassExtractor = class {
       isAbstract: this.isAbstract(),
       entryType: ts7.isInterfaceDeclaration(this.declaration) ? EntryType.Interface : EntryType.UndecoratedClass,
       members: this.extractAllClassMembers(this.declaration),
+      generics: extractGenerics(this.declaration),
       description: extractJsDocDescription(this.declaration),
       jsdocTags: extractJsDocTags(this.declaration),
       rawComment: extractRawJsDoc(this.declaration)
@@ -8650,4 +8667,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-35SQ73FP.js.map
+//# sourceMappingURL=chunk-2FBH5FDN.js.map
