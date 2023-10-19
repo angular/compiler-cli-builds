@@ -7010,10 +7010,10 @@ var factory = {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_control_flow_directive/index.mjs
 import { TmplAstTemplate as TmplAstTemplate4 } from "@angular/compiler";
 var KNOWN_CONTROL_FLOW_DIRECTIVES = /* @__PURE__ */ new Map([
-  ["ngIf", "NgIf"],
-  ["ngFor", "NgFor"],
-  ["ngSwitchCase", "NgSwitchCase"],
-  ["ngSwitchDefault", "NgSwitchDefault"]
+  ["ngIf", { directive: "NgIf", builtIn: "@if" }],
+  ["ngFor", { directive: "NgFor", builtIn: "@for" }],
+  ["ngSwitchCase", { directive: "NgSwitchCase", builtIn: "@switch with @case" }],
+  ["ngSwitchDefault", { directive: "NgSwitchDefault", builtIn: "@switch with @default" }]
 ]);
 var MissingControlFlowDirectiveCheck = class extends TemplateCheckWithVisitor {
   constructor() {
@@ -7038,8 +7038,8 @@ var MissingControlFlowDirectiveCheck = class extends TemplateCheckWithVisitor {
       return [];
     }
     const sourceSpan = controlFlowAttr.keySpan || controlFlowAttr.sourceSpan;
-    const correspondingImport = KNOWN_CONTROL_FLOW_DIRECTIVES.get(controlFlowAttr.name);
-    const errorMessage = `The \`*${controlFlowAttr.name}\` directive was used in the template, but neither the \`${correspondingImport}\` directive nor the \`CommonModule\` was imported. Please make sure that either the \`${correspondingImport}\` directive or the \`CommonModule\` is included in the \`@Component.imports\` array of this component.`;
+    const directiveAndBuiltIn = KNOWN_CONTROL_FLOW_DIRECTIVES.get(controlFlowAttr.name);
+    const errorMessage = `The \`*${controlFlowAttr.name}\` directive was used in the template, but neither the \`${directiveAndBuiltIn == null ? void 0 : directiveAndBuiltIn.directive}\` directive nor the \`CommonModule\` was imported. Use Angular's built-in control flow ${directiveAndBuiltIn == null ? void 0 : directiveAndBuiltIn.builtIn} or make sure that either the \`${directiveAndBuiltIn == null ? void 0 : directiveAndBuiltIn.directive}\` directive or the \`CommonModule\` is included in the \`@Component.imports\` array of this component.`;
     const diagnostic = ctx.makeTemplateDiagnostic(sourceSpan, errorMessage);
     return [diagnostic];
   }
@@ -8667,4 +8667,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2FBH5FDN.js.map
+//# sourceMappingURL=chunk-B6GLN5PX.js.map

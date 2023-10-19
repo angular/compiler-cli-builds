@@ -16,5 +16,8 @@ import { TemplateCheckFactory } from '../../api';
  * are used as structural directives and a warning would be generated. Once the
  * `CommonModule` is included, the `ngSwitch` would also be covered.
  */
-export declare const KNOWN_CONTROL_FLOW_DIRECTIVES: Map<string, string>;
+export declare const KNOWN_CONTROL_FLOW_DIRECTIVES: Map<string, {
+    directive: string;
+    builtIn: string;
+}>;
 export declare const factory: TemplateCheckFactory<ErrorCode.MISSING_CONTROL_FLOW_DIRECTIVE, ExtendedTemplateDiagnosticName.MISSING_CONTROL_FLOW_DIRECTIVE>;
