@@ -36,12 +36,12 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-XXCMYI3O.js";
+} from "./chunk-WLYYUPVA.js";
 import {
   ImportManager,
   translateExpression,
   translateType
-} from "./chunk-5WC7IWWT.js";
+} from "./chunk-MODFRDS5.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -83,7 +83,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-NVNYQX3M.js";
+} from "./chunk-AWMVW53W.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -7799,8 +7799,23 @@ var NgCompiler = class {
   }
   makeCompilation() {
     var _a, _b, _c;
+    const isCore = isAngularCorePackage(this.inputProgram);
+    let compilationMode = CompilationMode.FULL;
+    if (!isCore) {
+      switch (this.options.compilationMode) {
+        case "full":
+          compilationMode = CompilationMode.FULL;
+          break;
+        case "partial":
+          compilationMode = CompilationMode.PARTIAL;
+          break;
+        case "experimental-local":
+          compilationMode = CompilationMode.LOCAL;
+          break;
+      }
+    }
     const checker = this.inputProgram.getTypeChecker();
-    const reflector = new TypeScriptReflectionHost(checker);
+    const reflector = new TypeScriptReflectionHost(checker, compilationMode === CompilationMode.LOCAL);
     let refEmitter;
     let aliasingHost = null;
     if (this.adapter.unifiedModulesHost === null || !this.options["_useHostForImportGeneration"]) {
@@ -7826,7 +7841,6 @@ var NgCompiler = class {
       ]);
       aliasingHost = new UnifiedModulesAliasingHost(this.adapter.unifiedModulesHost);
     }
-    const isCore = isAngularCorePackage(this.inputProgram);
     const evaluator = new PartialEvaluator(reflector, checker, this.incrementalCompilation.depGraph);
     const dtsReader = new DtsMetadataReader(checker, reflector);
     const localMetaRegistry = new LocalMetadataRegistry();
@@ -7854,20 +7868,6 @@ var NgCompiler = class {
     const dtsTransforms = new DtsTransformRegistry();
     const resourceRegistry = new ResourceRegistry();
     const deferredSymbolsTracker = new DeferredSymbolTracker(this.inputProgram.getTypeChecker());
-    let compilationMode = CompilationMode.FULL;
-    if (!isCore) {
-      switch (this.options.compilationMode) {
-        case "full":
-          compilationMode = CompilationMode.FULL;
-          break;
-        case "partial":
-          compilationMode = CompilationMode.PARTIAL;
-          break;
-        case "experimental-local":
-          compilationMode = CompilationMode.LOCAL;
-          break;
-      }
-    }
     const cycleHandlingStrategy = compilationMode === CompilationMode.FULL ? 0 : 1;
     const strictCtorDeps = this.options.strictInjectionParameters || false;
     const supportJitMode = (_a = this.options["supportJitMode"]) != null ? _a : true;
@@ -8667,4 +8667,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-B6GLN5PX.js.map
+//# sourceMappingURL=chunk-PZPSKFX7.js.map

@@ -209,7 +209,7 @@ export interface ImportedTypeValueReference {
      * When `null` or empty, the `importedName` itself is the symbol being referenced.
      */
     nestedPath: string[] | null;
-    valueDeclaration: DeclarationNode;
+    valueDeclaration: DeclarationNode | null;
 }
 /**
  * A representation for a type value reference that is used when no value is available. This can

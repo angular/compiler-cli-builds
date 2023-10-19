@@ -33,7 +33,8 @@ var ClassMemberKind;
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/type_to_value.mjs
 import ts2 from "typescript";
-function typeToValue(typeNode, checker) {
+function typeToValue(typeNode, checker, isLocalCompilation) {
+  var _a, _b;
   if (typeNode === null) {
     return missingType();
   }
@@ -50,7 +51,13 @@ function typeToValue(typeNode, checker) {
     if (decl.declarations !== void 0 && decl.declarations.length > 0) {
       typeOnlyDecl = decl.declarations[0];
     }
-    return noValueDeclaration(typeNode, typeOnlyDecl);
+    if (!isLocalCompilation || typeOnlyDecl && [
+      ts2.SyntaxKind.TypeParameter,
+      ts2.SyntaxKind.TypeAliasDeclaration,
+      ts2.SyntaxKind.InterfaceDeclaration
+    ].includes(typeOnlyDecl.kind)) {
+      return noValueDeclaration(typeNode, typeOnlyDecl);
+    }
   }
   const firstDecl = local.declarations && local.declarations[0];
   if (firstDecl !== void 0) {
@@ -75,7 +82,7 @@ function typeToValue(typeNode, checker) {
       const moduleName = extractModuleName(firstDecl.parent.parent.parent);
       return {
         kind: 1,
-        valueDeclaration: decl.valueDeclaration,
+        valueDeclaration: (_a = decl.valueDeclaration) != null ? _a : null,
         moduleName,
         importedName,
         nestedPath
@@ -91,7 +98,7 @@ function typeToValue(typeNode, checker) {
       const moduleName = extractModuleName(firstDecl.parent.parent);
       return {
         kind: 1,
-        valueDeclaration: decl.valueDeclaration,
+        valueDeclaration: (_b = decl.valueDeclaration) != null ? _b : null,
         moduleName,
         importedName,
         nestedPath
@@ -208,8 +215,9 @@ function isIdentifier(node) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/typescript.mjs
 var TypeScriptReflectionHost = class {
-  constructor(checker) {
+  constructor(checker, isLocalCompilation = false) {
     this.checker = checker;
+    this.isLocalCompilation = isLocalCompilation;
   }
   getDecoratorsOfDeclaration(declaration) {
     const decorators = ts4.canHaveDecorators(declaration) ? ts4.getDecorators(declaration) : void 0;
@@ -237,7 +245,7 @@ var TypeScriptReflectionHost = class {
           typeNode = childTypeNodes[0];
         }
       }
-      const typeValueReference = typeToValue(typeNode, this.checker);
+      const typeValueReference = typeToValue(typeNode, this.checker, this.isLocalCompilation);
       return {
         name,
         nameNode: node.name,
@@ -1556,13 +1564,6 @@ export {
   addDiagnosticChain,
   ERROR_DETAILS_PAGE_BASE_URL,
   ExtendedTemplateDiagnosticName,
-  ClassMemberKind,
-  typeNodeToValueExpr,
-  isNamedClassDeclaration,
-  TypeScriptReflectionHost,
-  reflectTypeEntityToDeclaration,
-  filterToMembersWithDecorator,
-  reflectObjectLiteral,
   isSymbolWithValueDeclaration,
   isDtsPath,
   isNonDeclarationTsPath,
@@ -1597,6 +1598,13 @@ export {
   attachDefaultImportDeclaration,
   getDefaultImportDeclaration,
   DefaultImportTracker,
+  ClassMemberKind,
+  typeNodeToValueExpr,
+  isNamedClassDeclaration,
+  TypeScriptReflectionHost,
+  reflectTypeEntityToDeclaration,
+  filterToMembersWithDecorator,
+  reflectObjectLiteral,
   DeferredSymbolTracker,
   Reference,
   ModuleResolver
@@ -1608,4 +1616,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-NVNYQX3M.js.map
+//# sourceMappingURL=chunk-AWMVW53W.js.map

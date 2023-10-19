@@ -14,7 +14,7 @@ import { TypeValueReference } from './host';
  * This can return `null` if the `typeNode` is `null`, if it does not refer to a symbol with a value
  * declaration, or if it is not possible to statically understand.
  */
-export declare function typeToValue(typeNode: ts.TypeNode | null, checker: ts.TypeChecker): TypeValueReference;
+export declare function typeToValue(typeNode: ts.TypeNode | null, checker: ts.TypeChecker, isLocalCompilation: boolean): TypeValueReference;
 /**
  * Attempt to extract a `ts.Expression` that's equivalent to a `ts.TypeNode`, as the two have
  * different AST shapes but can reference the same symbols.

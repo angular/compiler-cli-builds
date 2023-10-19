@@ -12,7 +12,8 @@ import { ClassDeclaration, ClassMember, CtorParameter, Declaration, DeclarationN
  */
 export declare class TypeScriptReflectionHost implements ReflectionHost {
     protected checker: ts.TypeChecker;
-    constructor(checker: ts.TypeChecker);
+    private readonly isLocalCompilation;
+    constructor(checker: ts.TypeChecker, isLocalCompilation?: boolean);
     getDecoratorsOfDeclaration(declaration: DeclarationNode): Decorator[] | null;
     getMembersOfClass(clazz: ClassDeclaration): ClassMember[];
     getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
