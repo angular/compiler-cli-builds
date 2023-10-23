@@ -4658,8 +4658,9 @@ var TcbSwitchOp = class extends TcbOp {
     return false;
   }
   execute() {
-    const expression = tcbExpression(this.block.expression, this.tcb, this.scope);
-    markIgnoreDiagnostics(expression);
+    const comparisonExpression = tcbExpression(this.block.expression, this.tcb, this.scope);
+    markIgnoreDiagnostics(comparisonExpression);
+    const expression = ts28.factory.createParenthesizedExpression(comparisonExpression);
     const root = this.generateCase(0, expression, null);
     if (root !== void 0) {
       this.scope.addStatement(root);
@@ -8667,4 +8668,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-PZPSKFX7.js.map
+//# sourceMappingURL=chunk-BZ4ZO3XI.js.map
