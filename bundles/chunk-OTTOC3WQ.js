@@ -1447,11 +1447,16 @@ var DeferredSymbolTracker = class {
     if (importDecl.importClause === void 0) {
       throw new Error(`Provided import declaration doesn't have any symbols.`);
     }
+    if (importDecl.importClause.isTypeOnly) {
+      return symbolMap;
+    }
     if (importDecl.importClause.namedBindings !== void 0) {
       const bindings = importDecl.importClause.namedBindings;
       if (ts9.isNamedImports(bindings)) {
         for (const element of bindings.elements) {
-          symbolMap.set(element.name.text, AssumeEager);
+          if (!element.isTypeOnly) {
+            symbolMap.set(element.name.text, AssumeEager);
+          }
         }
       } else {
         symbolMap.set(bindings.name.text, AssumeEager);
@@ -1608,4 +1613,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-NVNYQX3M.js.map
+//# sourceMappingURL=chunk-OTTOC3WQ.js.map
