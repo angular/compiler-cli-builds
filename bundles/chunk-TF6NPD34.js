@@ -7,7 +7,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-CSE6A7DF.js";
+} from "./chunk-IKMWHQDV.js";
 import {
   ClassMemberKind,
   ErrorCode,
@@ -4746,7 +4746,10 @@ function parseInputTransformFunction(clazz, classPropertyName, value, reflector,
   }
   const firstParam = ((_a = definition.parameters[0]) == null ? void 0 : _a.name) === "this" ? definition.parameters[1] : definition.parameters[0];
   if (!firstParam) {
-    return { node, type: ts20.factory.createKeywordTypeNode(ts20.SyntaxKind.UnknownKeyword) };
+    return {
+      node,
+      type: new Reference(ts20.factory.createKeywordTypeNode(ts20.SyntaxKind.UnknownKeyword))
+    };
   }
   if (!firstParam.type) {
     throw createValueHasWrongTypeError(value.node, value, "Input transform function first parameter must have a type");
@@ -4755,7 +4758,8 @@ function parseInputTransformFunction(clazz, classPropertyName, value, reflector,
     throw createValueHasWrongTypeError(value.node, value, "Input transform function first parameter cannot be a spread parameter");
   }
   assertEmittableInputType(firstParam.type, clazz.getSourceFile(), reflector, refEmitter);
-  return { node, type: firstParam.type };
+  const viaModule = value instanceof Reference ? value.bestGuessOwningModule : null;
+  return { node, type: new Reference(firstParam.type, viaModule) };
 }
 function assertEmittableInputType(type, contextFile, reflector, refEmitter) {
   (function walk(node) {
@@ -7435,4 +7439,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-WJXW3ICJ.js.map
+//# sourceMappingURL=chunk-TF6NPD34.js.map

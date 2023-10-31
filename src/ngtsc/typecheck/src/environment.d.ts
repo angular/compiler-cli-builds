@@ -67,8 +67,8 @@ export declare class Environment implements ReferenceEmitEnvironment {
     /**
      * Generates a `ts.TypeNode` representing a type that is being referenced from a different place
      * in the program. Any type references inside the transplanted type will be rewritten so that
-     * they can be imported in the context fiel.
+     * they can be imported in the context file.
      */
-    referenceTransplantedType(type: TransplantedType<ts.TypeNode>): ts.TypeNode;
+    referenceTransplantedType(type: TransplantedType<Reference<ts.TypeNode>>): ts.TypeNode;
     getPreludeStatements(): ts.Statement[];
 }
