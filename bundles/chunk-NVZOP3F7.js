@@ -296,84 +296,9 @@ var ImportManager = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/type_emitter.mjs
-import ts2 from "typescript";
-var INELIGIBLE = {};
-function canEmitType(type, canEmit) {
-  return canEmitTypeWorker(type);
-  function canEmitTypeWorker(type2) {
-    return visitNode(type2) !== INELIGIBLE;
-  }
-  function visitNode(node) {
-    if (ts2.isImportTypeNode(node)) {
-      return INELIGIBLE;
-    }
-    if (ts2.isTypeReferenceNode(node) && !canEmitTypeReference(node)) {
-      return INELIGIBLE;
-    } else {
-      return ts2.forEachChild(node, visitNode);
-    }
-  }
-  function canEmitTypeReference(type2) {
-    if (!canEmit(type2)) {
-      return false;
-    }
-    return type2.typeArguments === void 0 || type2.typeArguments.every(canEmitTypeWorker);
-  }
-}
-var TypeEmitter = class {
-  constructor(translator) {
-    this.translator = translator;
-  }
-  emitType(type) {
-    const typeReferenceTransformer = (context) => {
-      const visitNode = (node) => {
-        if (ts2.isImportTypeNode(node)) {
-          throw new Error("Unable to emit import type");
-        }
-        if (ts2.isTypeReferenceNode(node)) {
-          return this.emitTypeReference(node);
-        } else if (ts2.isLiteralExpression(node)) {
-          let clone;
-          if (ts2.isStringLiteral(node)) {
-            clone = ts2.factory.createStringLiteral(node.text);
-          } else if (ts2.isNumericLiteral(node)) {
-            clone = ts2.factory.createNumericLiteral(node.text);
-          } else if (ts2.isBigIntLiteral(node)) {
-            clone = ts2.factory.createBigIntLiteral(node.text);
-          } else if (ts2.isNoSubstitutionTemplateLiteral(node)) {
-            clone = ts2.factory.createNoSubstitutionTemplateLiteral(node.text, node.rawText);
-          } else if (ts2.isRegularExpressionLiteral(node)) {
-            clone = ts2.factory.createRegularExpressionLiteral(node.text);
-          } else {
-            throw new Error(`Unsupported literal kind ${ts2.SyntaxKind[node.kind]}`);
-          }
-          ts2.setTextRange(clone, { pos: -1, end: -1 });
-          return clone;
-        } else {
-          return ts2.visitEachChild(node, visitNode, context);
-        }
-      };
-      return (node) => ts2.visitNode(node, visitNode, ts2.isTypeNode);
-    };
-    return ts2.transform(type, [typeReferenceTransformer]).transformed[0];
-  }
-  emitTypeReference(type) {
-    const translatedType = this.translator(type);
-    if (translatedType === null) {
-      throw new Error("Unable to emit an unresolved reference");
-    }
-    let typeArguments = void 0;
-    if (type.typeArguments !== void 0) {
-      typeArguments = ts2.factory.createNodeArray(type.typeArguments.map((typeArg) => this.emitType(typeArg)));
-    }
-    return ts2.factory.updateTypeReferenceNode(type, translatedType.typeName, typeArguments);
-  }
-};
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/type_translator.mjs
 import * as o2 from "@angular/compiler";
-import ts3 from "typescript";
+import ts2 from "typescript";
 function translateType(type, contextFile, reflector, refEmitter, imports) {
   return type.visitType(new TypeTranslatorVisitor(imports, contextFile, reflector, refEmitter), new Context(false));
 }
@@ -387,16 +312,16 @@ var TypeTranslatorVisitor = class {
   visitBuiltinType(type, context) {
     switch (type.name) {
       case o2.BuiltinTypeName.Bool:
-        return ts3.factory.createKeywordTypeNode(ts3.SyntaxKind.BooleanKeyword);
+        return ts2.factory.createKeywordTypeNode(ts2.SyntaxKind.BooleanKeyword);
       case o2.BuiltinTypeName.Dynamic:
-        return ts3.factory.createKeywordTypeNode(ts3.SyntaxKind.AnyKeyword);
+        return ts2.factory.createKeywordTypeNode(ts2.SyntaxKind.AnyKeyword);
       case o2.BuiltinTypeName.Int:
       case o2.BuiltinTypeName.Number:
-        return ts3.factory.createKeywordTypeNode(ts3.SyntaxKind.NumberKeyword);
+        return ts2.factory.createKeywordTypeNode(ts2.SyntaxKind.NumberKeyword);
       case o2.BuiltinTypeName.String:
-        return ts3.factory.createKeywordTypeNode(ts3.SyntaxKind.StringKeyword);
+        return ts2.factory.createKeywordTypeNode(ts2.SyntaxKind.StringKeyword);
       case o2.BuiltinTypeName.None:
-        return ts3.factory.createKeywordTypeNode(ts3.SyntaxKind.NeverKeyword);
+        return ts2.factory.createKeywordTypeNode(ts2.SyntaxKind.NeverKeyword);
       default:
         throw new Error(`Unsupported builtin type: ${o2.BuiltinTypeName[type.name]}`);
     }
@@ -406,37 +331,34 @@ var TypeTranslatorVisitor = class {
     if (type.typeParams === null) {
       return typeNode;
     }
-    if (!ts3.isTypeReferenceNode(typeNode)) {
+    if (!ts2.isTypeReferenceNode(typeNode)) {
       throw new Error("An ExpressionType with type arguments must translate into a TypeReferenceNode");
     } else if (typeNode.typeArguments !== void 0) {
       throw new Error(`An ExpressionType with type arguments cannot have multiple levels of type arguments`);
     }
     const typeArgs = type.typeParams.map((param) => this.translateType(param, context));
-    return ts3.factory.createTypeReferenceNode(typeNode.typeName, typeArgs);
+    return ts2.factory.createTypeReferenceNode(typeNode.typeName, typeArgs);
   }
   visitArrayType(type, context) {
-    return ts3.factory.createArrayTypeNode(this.translateType(type.of, context));
+    return ts2.factory.createArrayTypeNode(this.translateType(type.of, context));
   }
   visitMapType(type, context) {
-    const parameter = ts3.factory.createParameterDeclaration(void 0, void 0, "key", void 0, ts3.factory.createKeywordTypeNode(ts3.SyntaxKind.StringKeyword));
-    const typeArgs = type.valueType !== null ? this.translateType(type.valueType, context) : ts3.factory.createKeywordTypeNode(ts3.SyntaxKind.UnknownKeyword);
-    const indexSignature = ts3.factory.createIndexSignature(void 0, [parameter], typeArgs);
-    return ts3.factory.createTypeLiteralNode([indexSignature]);
+    const parameter = ts2.factory.createParameterDeclaration(void 0, void 0, "key", void 0, ts2.factory.createKeywordTypeNode(ts2.SyntaxKind.StringKeyword));
+    const typeArgs = type.valueType !== null ? this.translateType(type.valueType, context) : ts2.factory.createKeywordTypeNode(ts2.SyntaxKind.UnknownKeyword);
+    const indexSignature = ts2.factory.createIndexSignature(void 0, [parameter], typeArgs);
+    return ts2.factory.createTypeLiteralNode([indexSignature]);
   }
   visitTransplantedType(ast, context) {
-    const node = ast.type instanceof Reference ? ast.type.node : ast.type;
-    if (!ts3.isTypeNode(node)) {
+    if (!ts2.isTypeNode(ast.type)) {
       throw new Error(`A TransplantedType must wrap a TypeNode`);
     }
-    const viaModule = ast.type instanceof Reference ? ast.type.bestGuessOwningModule : null;
-    const emitter = new TypeEmitter((typeRef) => this.translateTypeReference(typeRef, context, viaModule));
-    return emitter.emitType(node);
+    return this.translateTransplantedTypeNode(ast.type, context);
   }
   visitReadVarExpr(ast, context) {
     if (ast.name === null) {
       throw new Error(`ReadVarExpr with no variable name in type`);
     }
-    return ts3.factory.createTypeQueryNode(ts3.factory.createIdentifier(ast.name));
+    return ts2.factory.createTypeQueryNode(ts2.factory.createIdentifier(ast.name));
   }
   visitWriteVarExpr(expr, context) {
     throw new Error("Method not implemented.");
@@ -458,15 +380,15 @@ var TypeTranslatorVisitor = class {
   }
   visitLiteralExpr(ast, context) {
     if (ast.value === null) {
-      return ts3.factory.createLiteralTypeNode(ts3.factory.createNull());
+      return ts2.factory.createLiteralTypeNode(ts2.factory.createNull());
     } else if (ast.value === void 0) {
-      return ts3.factory.createKeywordTypeNode(ts3.SyntaxKind.UndefinedKeyword);
+      return ts2.factory.createKeywordTypeNode(ts2.SyntaxKind.UndefinedKeyword);
     } else if (typeof ast.value === "boolean") {
-      return ts3.factory.createLiteralTypeNode(ast.value ? ts3.factory.createTrue() : ts3.factory.createFalse());
+      return ts2.factory.createLiteralTypeNode(ast.value ? ts2.factory.createTrue() : ts2.factory.createFalse());
     } else if (typeof ast.value === "number") {
-      return ts3.factory.createLiteralTypeNode(ts3.factory.createNumericLiteral(ast.value));
+      return ts2.factory.createLiteralTypeNode(ts2.factory.createNumericLiteral(ast.value));
     } else {
-      return ts3.factory.createLiteralTypeNode(ts3.factory.createStringLiteral(ast.value));
+      return ts2.factory.createLiteralTypeNode(ts2.factory.createStringLiteral(ast.value));
     }
   }
   visitLocalizedString(ast, context) {
@@ -477,10 +399,10 @@ var TypeTranslatorVisitor = class {
       throw new Error(`Import unknown module or symbol`);
     }
     const { moduleImport, symbol } = this.imports.generateNamedImport(ast.value.moduleName, ast.value.name);
-    const symbolIdentifier = ts3.factory.createIdentifier(symbol);
-    const typeName = moduleImport ? ts3.factory.createQualifiedName(moduleImport, symbolIdentifier) : symbolIdentifier;
+    const symbolIdentifier = ts2.factory.createIdentifier(symbol);
+    const typeName = moduleImport ? ts2.factory.createQualifiedName(moduleImport, symbolIdentifier) : symbolIdentifier;
     const typeArguments = ast.typeParams !== null ? ast.typeParams.map((type) => this.translateType(type, context)) : void 0;
-    return ts3.factory.createTypeReferenceNode(typeName, typeArguments);
+    return ts2.factory.createTypeReferenceNode(typeName, typeArguments);
   }
   visitConditionalExpr(ast, context) {
     throw new Error("Method not implemented.");
@@ -511,147 +433,157 @@ var TypeTranslatorVisitor = class {
   }
   visitLiteralArrayExpr(ast, context) {
     const values = ast.entries.map((expr) => this.translateExpression(expr, context));
-    return ts3.factory.createTupleTypeNode(values);
+    return ts2.factory.createTupleTypeNode(values);
   }
   visitLiteralMapExpr(ast, context) {
     const entries = ast.entries.map((entry) => {
       const { key, quoted } = entry;
       const type = this.translateExpression(entry.value, context);
-      return ts3.factory.createPropertySignature(
+      return ts2.factory.createPropertySignature(
         void 0,
-        quoted ? ts3.factory.createStringLiteral(key) : key,
+        quoted ? ts2.factory.createStringLiteral(key) : key,
         void 0,
         type
       );
     });
-    return ts3.factory.createTypeLiteralNode(entries);
+    return ts2.factory.createTypeLiteralNode(entries);
   }
   visitCommaExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
   visitWrappedNodeExpr(ast, context) {
     const node = ast.node;
-    if (ts3.isEntityName(node)) {
-      return ts3.factory.createTypeReferenceNode(node, void 0);
-    } else if (ts3.isTypeNode(node)) {
+    if (ts2.isEntityName(node)) {
+      return ts2.factory.createTypeReferenceNode(node, void 0);
+    } else if (ts2.isTypeNode(node)) {
       return node;
-    } else if (ts3.isLiteralExpression(node)) {
-      return ts3.factory.createLiteralTypeNode(node);
+    } else if (ts2.isLiteralExpression(node)) {
+      return ts2.factory.createLiteralTypeNode(node);
     } else {
-      throw new Error(`Unsupported WrappedNodeExpr in TypeTranslatorVisitor: ${ts3.SyntaxKind[node.kind]}`);
+      throw new Error(`Unsupported WrappedNodeExpr in TypeTranslatorVisitor: ${ts2.SyntaxKind[node.kind]}`);
     }
   }
   visitTypeofExpr(ast, context) {
     const typeNode = this.translateExpression(ast.expr, context);
-    if (!ts3.isTypeReferenceNode(typeNode)) {
+    if (!ts2.isTypeReferenceNode(typeNode)) {
       throw new Error(`The target of a typeof expression must be a type reference, but it was
-          ${ts3.SyntaxKind[typeNode.kind]}`);
+          ${ts2.SyntaxKind[typeNode.kind]}`);
     }
-    return ts3.factory.createTypeQueryNode(typeNode.typeName);
+    return ts2.factory.createTypeQueryNode(typeNode.typeName);
   }
   translateType(type, context) {
     const typeNode = type.visitType(this, context);
-    if (!ts3.isTypeNode(typeNode)) {
-      throw new Error(`A Type must translate to a TypeNode, but was ${ts3.SyntaxKind[typeNode.kind]}`);
+    if (!ts2.isTypeNode(typeNode)) {
+      throw new Error(`A Type must translate to a TypeNode, but was ${ts2.SyntaxKind[typeNode.kind]}`);
     }
     return typeNode;
   }
   translateExpression(expr, context) {
     const typeNode = expr.visitExpression(this, context);
-    if (!ts3.isTypeNode(typeNode)) {
-      throw new Error(`An Expression must translate to a TypeNode, but was ${ts3.SyntaxKind[typeNode.kind]}`);
+    if (!ts2.isTypeNode(typeNode)) {
+      throw new Error(`An Expression must translate to a TypeNode, but was ${ts2.SyntaxKind[typeNode.kind]}`);
     }
     return typeNode;
   }
-  translateTypeReference(type, context, viaModule) {
-    const target = ts3.isIdentifier(type.typeName) ? type.typeName : type.typeName.right;
-    const declaration = this.reflector.getDeclarationOfIdentifier(target);
+  translateTransplantedTypeReferenceNode(node, context) {
+    const declaration = this.reflector.getDeclarationOfIdentifier(node.typeName);
     if (declaration === null) {
-      throw new Error(`Unable to statically determine the declaration file of type node ${target.text}`);
+      throw new Error(`Unable to statically determine the declaration file of type node ${node.typeName.text}`);
     }
-    let owningModule = viaModule;
-    if (declaration.viaModule !== null) {
-      owningModule = {
-        specifier: declaration.viaModule,
-        resolutionContext: type.getSourceFile().fileName
+    const emittedType = this.refEmitter.emit(new Reference(declaration.node), this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
+    assertSuccessfulReferenceEmit(emittedType, node, "type");
+    const result = emittedType.expression.visitExpression(this, context);
+    if (!ts2.isTypeReferenceNode(result)) {
+      throw new Error(`Expected TypeReferenceNode when referencing the type for ${node.typeName.text}, but received ${ts2.SyntaxKind[result.kind]}`);
+    }
+    if (node.typeArguments === void 0 || node.typeArguments.length === 0) {
+      return result;
+    }
+    const translatedArgs = node.typeArguments.map((arg) => this.translateTransplantedTypeNode(arg, context));
+    return ts2.factory.updateTypeReferenceNode(result, result.typeName, ts2.factory.createNodeArray(translatedArgs));
+  }
+  translateTransplantedTypeNode(rootNode, context) {
+    const factory = (transformContext) => (root) => {
+      const walk = (node) => {
+        if (ts2.isTypeReferenceNode(node) && ts2.isIdentifier(node.typeName)) {
+          const translated = this.translateTransplantedTypeReferenceNode(node, context);
+          if (translated !== node) {
+            return translated;
+          }
+        }
+        return ts2.visitEachChild(node, walk, transformContext);
       };
-    }
-    const reference = new Reference(declaration.node, owningModule);
-    const emittedType = this.refEmitter.emit(reference, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports);
-    assertSuccessfulReferenceEmit(emittedType, target, "type");
-    const typeNode = this.translateExpression(emittedType.expression, context);
-    if (!ts3.isTypeReferenceNode(typeNode)) {
-      throw new Error(`Expected TypeReferenceNode for emitted reference, got ${ts3.SyntaxKind[typeNode.kind]}.`);
-    }
-    return typeNode;
+      return ts2.visitNode(root, walk);
+    };
+    return ts2.transform(rootNode, [factory]).transformed[0];
   }
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/typescript_ast_factory.mjs
-import ts4 from "typescript";
+import ts3 from "typescript";
 var PureAnnotation;
 (function(PureAnnotation2) {
   PureAnnotation2["CLOSURE"] = "* @pureOrBreakMyCode ";
   PureAnnotation2["TERSER"] = "@__PURE__";
 })(PureAnnotation || (PureAnnotation = {}));
 var UNARY_OPERATORS2 = {
-  "+": ts4.SyntaxKind.PlusToken,
-  "-": ts4.SyntaxKind.MinusToken,
-  "!": ts4.SyntaxKind.ExclamationToken
+  "+": ts3.SyntaxKind.PlusToken,
+  "-": ts3.SyntaxKind.MinusToken,
+  "!": ts3.SyntaxKind.ExclamationToken
 };
 var BINARY_OPERATORS2 = {
-  "&&": ts4.SyntaxKind.AmpersandAmpersandToken,
-  ">": ts4.SyntaxKind.GreaterThanToken,
-  ">=": ts4.SyntaxKind.GreaterThanEqualsToken,
-  "&": ts4.SyntaxKind.AmpersandToken,
-  "/": ts4.SyntaxKind.SlashToken,
-  "==": ts4.SyntaxKind.EqualsEqualsToken,
-  "===": ts4.SyntaxKind.EqualsEqualsEqualsToken,
-  "<": ts4.SyntaxKind.LessThanToken,
-  "<=": ts4.SyntaxKind.LessThanEqualsToken,
-  "-": ts4.SyntaxKind.MinusToken,
-  "%": ts4.SyntaxKind.PercentToken,
-  "*": ts4.SyntaxKind.AsteriskToken,
-  "!=": ts4.SyntaxKind.ExclamationEqualsToken,
-  "!==": ts4.SyntaxKind.ExclamationEqualsEqualsToken,
-  "||": ts4.SyntaxKind.BarBarToken,
-  "+": ts4.SyntaxKind.PlusToken,
-  "??": ts4.SyntaxKind.QuestionQuestionToken
+  "&&": ts3.SyntaxKind.AmpersandAmpersandToken,
+  ">": ts3.SyntaxKind.GreaterThanToken,
+  ">=": ts3.SyntaxKind.GreaterThanEqualsToken,
+  "&": ts3.SyntaxKind.AmpersandToken,
+  "/": ts3.SyntaxKind.SlashToken,
+  "==": ts3.SyntaxKind.EqualsEqualsToken,
+  "===": ts3.SyntaxKind.EqualsEqualsEqualsToken,
+  "<": ts3.SyntaxKind.LessThanToken,
+  "<=": ts3.SyntaxKind.LessThanEqualsToken,
+  "-": ts3.SyntaxKind.MinusToken,
+  "%": ts3.SyntaxKind.PercentToken,
+  "*": ts3.SyntaxKind.AsteriskToken,
+  "!=": ts3.SyntaxKind.ExclamationEqualsToken,
+  "!==": ts3.SyntaxKind.ExclamationEqualsEqualsToken,
+  "||": ts3.SyntaxKind.BarBarToken,
+  "+": ts3.SyntaxKind.PlusToken,
+  "??": ts3.SyntaxKind.QuestionQuestionToken
 };
 var VAR_TYPES = {
-  "const": ts4.NodeFlags.Const,
-  "let": ts4.NodeFlags.Let,
-  "var": ts4.NodeFlags.None
+  "const": ts3.NodeFlags.Const,
+  "let": ts3.NodeFlags.Let,
+  "var": ts3.NodeFlags.None
 };
 var TypeScriptAstFactory = class {
   constructor(annotateForClosureCompiler) {
     this.annotateForClosureCompiler = annotateForClosureCompiler;
     this.externalSourceFiles = /* @__PURE__ */ new Map();
     this.attachComments = attachComments;
-    this.createArrayLiteral = ts4.factory.createArrayLiteralExpression;
-    this.createElementAccess = ts4.factory.createElementAccessExpression;
-    this.createExpressionStatement = ts4.factory.createExpressionStatement;
-    this.createIdentifier = ts4.factory.createIdentifier;
-    this.createParenthesizedExpression = ts4.factory.createParenthesizedExpression;
-    this.createPropertyAccess = ts4.factory.createPropertyAccessExpression;
-    this.createThrowStatement = ts4.factory.createThrowStatement;
-    this.createTypeOfExpression = ts4.factory.createTypeOfExpression;
+    this.createArrayLiteral = ts3.factory.createArrayLiteralExpression;
+    this.createElementAccess = ts3.factory.createElementAccessExpression;
+    this.createExpressionStatement = ts3.factory.createExpressionStatement;
+    this.createIdentifier = ts3.factory.createIdentifier;
+    this.createParenthesizedExpression = ts3.factory.createParenthesizedExpression;
+    this.createPropertyAccess = ts3.factory.createPropertyAccessExpression;
+    this.createThrowStatement = ts3.factory.createThrowStatement;
+    this.createTypeOfExpression = ts3.factory.createTypeOfExpression;
   }
   createAssignment(target, value) {
-    return ts4.factory.createBinaryExpression(target, ts4.SyntaxKind.EqualsToken, value);
+    return ts3.factory.createBinaryExpression(target, ts3.SyntaxKind.EqualsToken, value);
   }
   createBinaryExpression(leftOperand, operator, rightOperand) {
-    return ts4.factory.createBinaryExpression(leftOperand, BINARY_OPERATORS2[operator], rightOperand);
+    return ts3.factory.createBinaryExpression(leftOperand, BINARY_OPERATORS2[operator], rightOperand);
   }
   createBlock(body) {
-    return ts4.factory.createBlock(body);
+    return ts3.factory.createBlock(body);
   }
   createCallExpression(callee, args, pure) {
-    const call = ts4.factory.createCallExpression(callee, void 0, args);
+    const call = ts3.factory.createCallExpression(callee, void 0, args);
     if (pure) {
-      ts4.addSyntheticLeadingComment(
+      ts3.addSyntheticLeadingComment(
         call,
-        ts4.SyntaxKind.MultiLineCommentTrivia,
+        ts3.SyntaxKind.MultiLineCommentTrivia,
         this.annotateForClosureCompiler ? PureAnnotation.CLOSURE : PureAnnotation.TERSER,
         false
       );
@@ -659,64 +591,64 @@ var TypeScriptAstFactory = class {
     return call;
   }
   createConditional(condition, whenTrue, whenFalse) {
-    return ts4.factory.createConditionalExpression(condition, void 0, whenTrue, void 0, whenFalse);
+    return ts3.factory.createConditionalExpression(condition, void 0, whenTrue, void 0, whenFalse);
   }
   createDynamicImport(url) {
-    return ts4.factory.createCallExpression(
-      ts4.factory.createToken(ts4.SyntaxKind.ImportKeyword),
+    return ts3.factory.createCallExpression(
+      ts3.factory.createToken(ts3.SyntaxKind.ImportKeyword),
       void 0,
-      [ts4.factory.createStringLiteral(url)]
+      [ts3.factory.createStringLiteral(url)]
     );
   }
   createFunctionDeclaration(functionName, parameters, body) {
-    if (!ts4.isBlock(body)) {
-      throw new Error(`Invalid syntax, expected a block, but got ${ts4.SyntaxKind[body.kind]}.`);
+    if (!ts3.isBlock(body)) {
+      throw new Error(`Invalid syntax, expected a block, but got ${ts3.SyntaxKind[body.kind]}.`);
     }
-    return ts4.factory.createFunctionDeclaration(void 0, void 0, functionName, void 0, parameters.map((param) => ts4.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
+    return ts3.factory.createFunctionDeclaration(void 0, void 0, functionName, void 0, parameters.map((param) => ts3.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
   }
   createFunctionExpression(functionName, parameters, body) {
-    if (!ts4.isBlock(body)) {
-      throw new Error(`Invalid syntax, expected a block, but got ${ts4.SyntaxKind[body.kind]}.`);
+    if (!ts3.isBlock(body)) {
+      throw new Error(`Invalid syntax, expected a block, but got ${ts3.SyntaxKind[body.kind]}.`);
     }
-    return ts4.factory.createFunctionExpression(void 0, void 0, functionName != null ? functionName : void 0, void 0, parameters.map((param) => ts4.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
+    return ts3.factory.createFunctionExpression(void 0, void 0, functionName != null ? functionName : void 0, void 0, parameters.map((param) => ts3.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
   }
   createArrowFunctionExpression(parameters, body) {
-    if (ts4.isStatement(body) && !ts4.isBlock(body)) {
-      throw new Error(`Invalid syntax, expected a block, but got ${ts4.SyntaxKind[body.kind]}.`);
+    if (ts3.isStatement(body) && !ts3.isBlock(body)) {
+      throw new Error(`Invalid syntax, expected a block, but got ${ts3.SyntaxKind[body.kind]}.`);
     }
-    return ts4.factory.createArrowFunction(void 0, void 0, parameters.map((param) => ts4.factory.createParameterDeclaration(void 0, void 0, param)), void 0, void 0, body);
+    return ts3.factory.createArrowFunction(void 0, void 0, parameters.map((param) => ts3.factory.createParameterDeclaration(void 0, void 0, param)), void 0, void 0, body);
   }
   createIfStatement(condition, thenStatement, elseStatement) {
-    return ts4.factory.createIfStatement(condition, thenStatement, elseStatement != null ? elseStatement : void 0);
+    return ts3.factory.createIfStatement(condition, thenStatement, elseStatement != null ? elseStatement : void 0);
   }
   createLiteral(value) {
     if (value === void 0) {
-      return ts4.factory.createIdentifier("undefined");
+      return ts3.factory.createIdentifier("undefined");
     } else if (value === null) {
-      return ts4.factory.createNull();
+      return ts3.factory.createNull();
     } else if (typeof value === "boolean") {
-      return value ? ts4.factory.createTrue() : ts4.factory.createFalse();
+      return value ? ts3.factory.createTrue() : ts3.factory.createFalse();
     } else if (typeof value === "number") {
-      return ts4.factory.createNumericLiteral(value);
+      return ts3.factory.createNumericLiteral(value);
     } else {
-      return ts4.factory.createStringLiteral(value);
+      return ts3.factory.createStringLiteral(value);
     }
   }
   createNewExpression(expression, args) {
-    return ts4.factory.createNewExpression(expression, void 0, args);
+    return ts3.factory.createNewExpression(expression, void 0, args);
   }
   createObjectLiteral(properties) {
-    return ts4.factory.createObjectLiteralExpression(properties.map((prop) => ts4.factory.createPropertyAssignment(prop.quoted ? ts4.factory.createStringLiteral(prop.propertyName) : ts4.factory.createIdentifier(prop.propertyName), prop.value)));
+    return ts3.factory.createObjectLiteralExpression(properties.map((prop) => ts3.factory.createPropertyAssignment(prop.quoted ? ts3.factory.createStringLiteral(prop.propertyName) : ts3.factory.createIdentifier(prop.propertyName), prop.value)));
   }
   createReturnStatement(expression) {
-    return ts4.factory.createReturnStatement(expression != null ? expression : void 0);
+    return ts3.factory.createReturnStatement(expression != null ? expression : void 0);
   }
   createTaggedTemplate(tag, template) {
     let templateLiteral;
     const length = template.elements.length;
     const head = template.elements[0];
     if (length === 1) {
-      templateLiteral = ts4.factory.createNoSubstitutionTemplateLiteral(head.cooked, head.raw);
+      templateLiteral = ts3.factory.createNoSubstitutionTemplateLiteral(head.cooked, head.raw);
     } else {
       const spans = [];
       for (let i = 1; i < length - 1; i++) {
@@ -725,7 +657,7 @@ var TypeScriptAstFactory = class {
         if (range !== null) {
           this.setSourceMapRange(middle, range);
         }
-        spans.push(ts4.factory.createTemplateSpan(template.expressions[i - 1], middle));
+        spans.push(ts3.factory.createTemplateSpan(template.expressions[i - 1], middle));
       }
       const resolvedExpression = template.expressions[length - 2];
       const templatePart = template.elements[length - 1];
@@ -733,19 +665,19 @@ var TypeScriptAstFactory = class {
       if (templatePart.range !== null) {
         this.setSourceMapRange(templateTail, templatePart.range);
       }
-      spans.push(ts4.factory.createTemplateSpan(resolvedExpression, templateTail));
-      templateLiteral = ts4.factory.createTemplateExpression(ts4.factory.createTemplateHead(head.cooked, head.raw), spans);
+      spans.push(ts3.factory.createTemplateSpan(resolvedExpression, templateTail));
+      templateLiteral = ts3.factory.createTemplateExpression(ts3.factory.createTemplateHead(head.cooked, head.raw), spans);
     }
     if (head.range !== null) {
       this.setSourceMapRange(templateLiteral, head.range);
     }
-    return ts4.factory.createTaggedTemplateExpression(tag, void 0, templateLiteral);
+    return ts3.factory.createTaggedTemplateExpression(tag, void 0, templateLiteral);
   }
   createUnaryExpression(operator, operand) {
-    return ts4.factory.createPrefixUnaryExpression(UNARY_OPERATORS2[operator], operand);
+    return ts3.factory.createPrefixUnaryExpression(UNARY_OPERATORS2[operator], operand);
   }
   createVariableDeclaration(variableName, initializer, type) {
-    return ts4.factory.createVariableStatement(void 0, ts4.factory.createVariableDeclarationList([ts4.factory.createVariableDeclaration(variableName, void 0, void 0, initializer != null ? initializer : void 0)], VAR_TYPES[type]));
+    return ts3.factory.createVariableStatement(void 0, ts3.factory.createVariableDeclarationList([ts3.factory.createVariableDeclaration(variableName, void 0, void 0, initializer != null ? initializer : void 0)], VAR_TYPES[type]));
   }
   setSourceMapRange(node, sourceMapRange) {
     if (sourceMapRange === null) {
@@ -753,31 +685,31 @@ var TypeScriptAstFactory = class {
     }
     const url = sourceMapRange.url;
     if (!this.externalSourceFiles.has(url)) {
-      this.externalSourceFiles.set(url, ts4.createSourceMapSource(url, sourceMapRange.content, (pos) => pos));
+      this.externalSourceFiles.set(url, ts3.createSourceMapSource(url, sourceMapRange.content, (pos) => pos));
     }
     const source = this.externalSourceFiles.get(url);
-    ts4.setSourceMapRange(node, { pos: sourceMapRange.start.offset, end: sourceMapRange.end.offset, source });
+    ts3.setSourceMapRange(node, { pos: sourceMapRange.start.offset, end: sourceMapRange.end.offset, source });
     return node;
   }
 };
 function createTemplateMiddle(cooked, raw) {
-  const node = ts4.factory.createTemplateHead(cooked, raw);
-  node.kind = ts4.SyntaxKind.TemplateMiddle;
+  const node = ts3.factory.createTemplateHead(cooked, raw);
+  node.kind = ts3.SyntaxKind.TemplateMiddle;
   return node;
 }
 function createTemplateTail(cooked, raw) {
-  const node = ts4.factory.createTemplateHead(cooked, raw);
-  node.kind = ts4.SyntaxKind.TemplateTail;
+  const node = ts3.factory.createTemplateHead(cooked, raw);
+  node.kind = ts3.SyntaxKind.TemplateTail;
   return node;
 }
 function attachComments(statement, leadingComments) {
   for (const comment of leadingComments) {
-    const commentKind = comment.multiline ? ts4.SyntaxKind.MultiLineCommentTrivia : ts4.SyntaxKind.SingleLineCommentTrivia;
+    const commentKind = comment.multiline ? ts3.SyntaxKind.MultiLineCommentTrivia : ts3.SyntaxKind.SingleLineCommentTrivia;
     if (comment.multiline) {
-      ts4.addSyntheticLeadingComment(statement, commentKind, comment.toString(), comment.trailingNewline);
+      ts3.addSyntheticLeadingComment(statement, commentKind, comment.toString(), comment.trailingNewline);
     } else {
       for (const line of comment.toString().split("\n")) {
-        ts4.addSyntheticLeadingComment(statement, commentKind, line, comment.trailingNewline);
+        ts3.addSyntheticLeadingComment(statement, commentKind, line, comment.trailingNewline);
       }
     }
   }
@@ -795,8 +727,6 @@ export {
   Context,
   ImportManager,
   ExpressionTranslatorVisitor,
-  canEmitType,
-  TypeEmitter,
   translateType,
   translateExpression,
   translateStatement
@@ -808,4 +738,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YWRPXGJ5.js.map
+//# sourceMappingURL=chunk-NVZOP3F7.js.map
