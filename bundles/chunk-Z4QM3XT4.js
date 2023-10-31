@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-SNOBCVHR.js";
+} from "./chunk-ELZXPNCU.js";
 import {
   SourceFileLoader
 } from "./chunk-EKTJ7622.js";
@@ -267,7 +267,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "17.0.0-rc.1+sha-d8280ac";
+var PLACEHOLDER_VERSION = "17.0.0-rc.1+sha-b9ea2d6";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -1056,4 +1056,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YIBWGXHD.js.map
+//# sourceMappingURL=chunk-Z4QM3XT4.js.map
