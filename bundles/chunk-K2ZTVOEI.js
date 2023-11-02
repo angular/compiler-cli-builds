@@ -135,7 +135,7 @@ function createCompilerHost({ options, tsHost = ts.createCompilerHost(options, t
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/entities.mjs
 var EntryType;
 (function(EntryType2) {
-  EntryType2["Block"] = "Block";
+  EntryType2["Block"] = "block";
   EntryType2["Component"] = "component";
   EntryType2["Constant"] = "constant";
   EntryType2["Decorator"] = "decorator";
@@ -478,26 +478,46 @@ function extractGenerics(declaration) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/jsdoc_extractor.mjs
 import ts4 from "typescript";
+var decoratorExpression = /@(?=(Injectable|Component|Directive|Pipe|NgModule|Input|Output|HostBinding|HostListener|Inject|Optional|Self|Host|SkipSelf))/g;
 function extractJsDocTags(node) {
-  return ts4.getJSDocTags(node).map((t) => {
+  const escapedNode = getEscapedNode(node);
+  return ts4.getJSDocTags(escapedNode).map((t) => {
     var _a;
     return {
       name: t.tagName.getText(),
-      comment: (_a = ts4.getTextOfJSDocComment(t.comment)) != null ? _a : ""
+      comment: unescapeAngularDecorators((_a = ts4.getTextOfJSDocComment(t.comment)) != null ? _a : "")
     };
   });
 }
 function extractJsDocDescription(node) {
   var _a, _b;
-  const commentOrTag = ts4.getJSDocCommentsAndTags(node).find((d) => {
+  const escapedNode = getEscapedNode(node);
+  const commentOrTag = ts4.getJSDocCommentsAndTags(escapedNode).find((d) => {
     return ts4.isJSDoc(d) || ts4.isJSDocParameterTag(d);
   });
   const comment = (_a = commentOrTag == null ? void 0 : commentOrTag.comment) != null ? _a : "";
-  return typeof comment === "string" ? comment : (_b = ts4.getTextOfJSDocComment(comment)) != null ? _b : "";
+  const description = typeof comment === "string" ? comment : (_b = ts4.getTextOfJSDocComment(comment)) != null ? _b : "";
+  return unescapeAngularDecorators(description);
 }
 function extractRawJsDoc(node) {
   var _a, _b;
-  return (_b = (_a = ts4.getJSDocCommentsAndTags(node).find(ts4.isJSDoc)) == null ? void 0 : _a.getFullText()) != null ? _b : "";
+  const comment = (_b = (_a = ts4.getJSDocCommentsAndTags(node).find(ts4.isJSDoc)) == null ? void 0 : _a.getFullText()) != null ? _b : "";
+  return unescapeAngularDecorators(comment);
+}
+function getEscapedNode(node) {
+  if (ts4.isParameter(node)) {
+    return node;
+  }
+  const rawComment = extractRawJsDoc(node);
+  const escaped = escapeAngularDecorators(rawComment);
+  const file = ts4.createSourceFile("x.ts", `${escaped}class X {}`, ts4.ScriptTarget.ES2020, true);
+  return file.statements.find((s) => ts4.isClassDeclaration(s));
+}
+function escapeAngularDecorators(comment) {
+  return comment.replace(decoratorExpression, "_NG_AT_");
+}
+function unescapeAngularDecorators(comment) {
+  return comment.replace(/_NG_AT_/g, "@");
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/type_extractor.mjs
@@ -8692,4 +8712,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-5CQLMTG4.js.map
+//# sourceMappingURL=chunk-K2ZTVOEI.js.map
