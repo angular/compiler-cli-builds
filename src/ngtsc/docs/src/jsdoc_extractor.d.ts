@@ -15,7 +15,7 @@ export declare function extractJsDocTags(node: ts.HasJSDoc): JsDocTagEntry[];
  */
 export declare function extractJsDocDescription(node: ts.HasJSDoc): string;
 /**
- * Gets the raw JsDoc applied to a node. If the node does not have a JsDoc block,
- * returns the empty string.
+ * Gets the raw JsDoc applied to a node.
+ * If the node does not have a JsDoc block, returns the empty string.
  */
 export declare function extractRawJsDoc(node: ts.HasJSDoc): string;
