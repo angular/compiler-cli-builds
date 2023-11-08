@@ -99,6 +99,7 @@ export interface ExtractTemplateOptions {
     usePoisonedData: boolean;
     enableI18nLegacyMessageIdFormat: boolean;
     i18nNormalizeLineEndingsInICUs: boolean;
+    enableBlockSyntax: boolean;
 }
 export declare function extractTemplate(node: ClassDeclaration, template: TemplateDeclaration, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, options: ExtractTemplateOptions, compilationMode: CompilationMode): ParsedTemplateWithSource;
 export declare function parseTemplateDeclaration(node: ClassDeclaration, decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, defaultPreserveWhitespaces: boolean): TemplateDeclaration;
