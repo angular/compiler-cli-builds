@@ -130,6 +130,7 @@ export declare class NgCompiler {
     readonly ignoreForDiagnostics: Set<ts.SourceFile>;
     readonly ignoreForEmit: Set<ts.SourceFile>;
     readonly enableTemplateTypeChecker: boolean;
+    private readonly enableBlockSyntax;
     /**
      * `NgCompiler` can be reused for multiple compilations (for resource-only changes), and each
      * new compilation uses a fresh `PerfRecorder`. Thus, classes created with a lifespan of the
