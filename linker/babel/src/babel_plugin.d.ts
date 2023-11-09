@@ -1,3 +1,5 @@
+/// <reference types="@types/babel__core" />
+/// <reference types="@angular/compiler-cli/private/babel" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

@@ -12,7 +12,7 @@ import { ClassDeclaration, DeclarationNode } from '../../reflection';
  */
 export declare enum IdentifierKind {
     Property = 0,
-    Method = 1,
+    Method = 1,// TODO: No longer being used. To be removed together with `MethodIdentifier`.
     Element = 2,
     Template = 3,
     Attribute = 4,

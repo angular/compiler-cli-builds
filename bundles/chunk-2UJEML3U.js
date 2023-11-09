@@ -7,7 +7,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-YWRPXGJ5.js";
+} from "./chunk-XCEXKEDO.js";
 import {
   ClassMemberKind,
   ErrorCode,
@@ -30,16 +30,16 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-C3WLROOO.js";
+} from "./chunk-VHIKXGRX.js";
 import {
   PerfEvent,
   PerfPhase
-} from "./chunk-BV3ZUD7T.js";
+} from "./chunk-64JBPJBS.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
   relative
-} from "./chunk-PCMLSPQF.js";
+} from "./chunk-DUY2FPLZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
@@ -7608,4 +7608,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-EUKEB2A5.js.map
+//# sourceMappingURL=chunk-2UJEML3U.js.map

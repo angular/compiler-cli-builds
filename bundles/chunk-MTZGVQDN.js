@@ -36,14 +36,14 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-EUKEB2A5.js";
+} from "./chunk-2UJEML3U.js";
 import {
   ImportManager,
   TypeEmitter,
   canEmitType,
   translateExpression,
   translateType
-} from "./chunk-YWRPXGJ5.js";
+} from "./chunk-XCEXKEDO.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -85,14 +85,14 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-C3WLROOO.js";
+} from "./chunk-VHIKXGRX.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-BV3ZUD7T.js";
+} from "./chunk-64JBPJBS.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -102,7 +102,7 @@ import {
   getSourceFileOrError,
   join,
   resolve
-} from "./chunk-PCMLSPQF.js";
+} from "./chunk-DUY2FPLZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -270,7 +270,7 @@ function compareVersions(v1, v2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
 var MIN_TS_VERSION = "5.2.0";
-var MAX_TS_VERSION = "5.3.0";
+var MAX_TS_VERSION = "5.4.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
@@ -927,7 +927,9 @@ function extractEnumMembers(declaration, checker) {
 }
 function getEnumMemberValue(memberNode) {
   var _a;
-  const literal = memberNode.getChildren().find((n) => ts8.isNumericLiteral(n) || ts8.isStringLiteral(n));
+  const literal = memberNode.getChildren().find((n) => {
+    return ts8.isNumericLiteral(n) || ts8.isStringLiteral(n) || ts8.isPrefixUnaryExpression(n) && n.operator === ts8.SyntaxKind.MinusToken && ts8.isNumericLiteral(n.operand);
+  });
   return (_a = literal == null ? void 0 : literal.getText()) != null ? _a : "";
 }
 
@@ -1416,6 +1418,7 @@ var DelegatingCompilerHost = class {
     this.hasInvalidatedResolutions = this.delegateMethod("hasInvalidatedResolutions");
     this.resolveModuleNameLiterals = this.delegateMethod("resolveModuleNameLiterals");
     this.resolveTypeReferenceDirectiveReferences = this.delegateMethod("resolveTypeReferenceDirectiveReferences");
+    this.jsDocParsingMode = this.delegateMethod("jsDocParsingMode");
   }
   delegateMethod(name) {
     return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
@@ -3031,6 +3034,13 @@ function tsCallMethod(receiver, methodName, args = []) {
 function isAccessExpression(node) {
   return ts19.isPropertyAccessExpression(node) || ts19.isElementAccessExpression(node);
 }
+function tsNumericExpression(value) {
+  if (value < 0) {
+    const operand = ts19.factory.createNumericLiteral(Math.abs(value));
+    return ts19.factory.createPrefixUnaryExpression(ts19.SyntaxKind.MinusToken, operand);
+  }
+  return ts19.factory.createNumericLiteral(value);
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.mjs
 import ts22 from "typescript";
@@ -3763,7 +3773,7 @@ var AstTranslator = class {
     } else if (typeof ast.value === "string") {
       node = ts27.factory.createStringLiteral(ast.value);
     } else if (typeof ast.value === "number") {
-      node = ts27.factory.createNumericLiteral(ast.value);
+      node = tsNumericExpression(ast.value);
     } else if (typeof ast.value === "boolean") {
       node = ast.value ? ts27.factory.createTrue() : ts27.factory.createFalse();
     } else {
@@ -8207,6 +8217,7 @@ var DelegatingCompilerHost2 = class {
     this.hasInvalidatedResolutions = this.delegateMethod("hasInvalidatedResolutions");
     this.resolveModuleNameLiterals = this.delegateMethod("resolveModuleNameLiterals");
     this.resolveTypeReferenceDirectiveReferences = this.delegateMethod("resolveTypeReferenceDirectiveReferences");
+    this.jsDocParsingMode = this.delegateMethod("jsDocParsingMode");
   }
   delegateMethod(name) {
     return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
@@ -8768,4 +8779,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-33SFMGMS.js.map
+//# sourceMappingURL=chunk-MTZGVQDN.js.map

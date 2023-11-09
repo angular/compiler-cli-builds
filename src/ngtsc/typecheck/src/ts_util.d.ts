@@ -44,3 +44,7 @@ export declare function tsCreateVariable(id: ts.Identifier, initializer: ts.Expr
  */
 export declare function tsCallMethod(receiver: ts.Expression, methodName: string, args?: ts.Expression[]): ts.CallExpression;
 export declare function isAccessExpression(node: ts.Node): node is ts.ElementAccessExpression | ts.PropertyAccessExpression;
+/**
+ * Creates a TypeScript node representing a numeric value.
+ */
+export declare function tsNumericExpression(value: number): ts.NumericLiteral | ts.PrefixUnaryExpression;
