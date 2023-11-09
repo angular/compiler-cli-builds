@@ -2990,11 +2990,15 @@ function tsCreateElement(tagName) {
   );
 }
 function tsDeclareVariable(id, type) {
+  let initializer = ts19.factory.createNonNullExpression(ts19.factory.createNull());
+  if (type.kind === ts19.SyntaxKind.BooleanKeyword) {
+    initializer = ts19.factory.createAsExpression(initializer, ts19.factory.createKeywordTypeNode(ts19.SyntaxKind.BooleanKeyword));
+  }
   const decl = ts19.factory.createVariableDeclaration(
     id,
     void 0,
     type,
-    ts19.factory.createNonNullExpression(ts19.factory.createNull())
+    initializer
   );
   return ts19.factory.createVariableStatement(
     void 0,
@@ -4796,7 +4800,7 @@ var Context = class {
     return this.pipes.get(name);
   }
 };
-var Scope = class {
+var _Scope = class {
   constructor(tcb, parent = null, guard = null) {
     this.tcb = tcb;
     this.parent = parent;
@@ -4810,7 +4814,7 @@ var Scope = class {
     this.statements = [];
   }
   static forNodes(tcb, parentScope, scopedNode, children, guard) {
-    const scope = new Scope(tcb, parentScope, guard);
+    const scope = new _Scope(tcb, parentScope, guard);
     if (parentScope === null && tcb.env.config.enableTemplateTypeChecker) {
       scope.opQueue.push(new TcbComponentContextCompletionOp(scope));
     }
@@ -4832,8 +4836,11 @@ var Scope = class {
       }
     } else if (scopedNode instanceof TmplAstForLoopBlock) {
       this.registerVariable(scope, scopedNode.item, new TcbBlockVariableOp(tcb, scope, ts28.factory.createIdentifier(scopedNode.item.name), scopedNode.item));
-      for (const variable of Object.values(scopedNode.contextVariables)) {
-        const type = ts28.factory.createKeywordTypeNode(ts28.SyntaxKind.NumberKeyword);
+      for (const [name, variable] of Object.entries(scopedNode.contextVariables)) {
+        if (!this.forLoopContextVariableTypes.has(name)) {
+          throw new Error(`Unrecognized for loop context variable ${name}`);
+        }
+        const type = ts28.factory.createKeywordTypeNode(this.forLoopContextVariableTypes.get(name));
         this.registerVariable(scope, variable, new TcbBlockImplicitVariableOp(tcb, scope, type, variable));
       }
     }
@@ -5110,6 +5117,17 @@ var Scope = class {
     }
   }
 };
+var Scope = _Scope;
+(() => {
+  _Scope.forLoopContextVariableTypes = /* @__PURE__ */ new Map([
+    ["$first", ts28.SyntaxKind.BooleanKeyword],
+    ["$last", ts28.SyntaxKind.BooleanKeyword],
+    ["$even", ts28.SyntaxKind.BooleanKeyword],
+    ["$odd", ts28.SyntaxKind.BooleanKeyword],
+    ["$index", ts28.SyntaxKind.NumberKeyword],
+    ["$count", ts28.SyntaxKind.NumberKeyword]
+  ]);
+})();
 function tcbThisParam(name, typeArguments) {
   return ts28.factory.createParameterDeclaration(
     void 0,
@@ -6899,8 +6917,8 @@ var SingleShimTypeCheckingHost = class extends SingleFileTypeCheckingHost {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/invalid_banana_in_box/index.mjs
-import { TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.mjs
+import { Interpolation, PropertyRead as PropertyRead6 } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/api/api.mjs
 import { ASTWithSource as ASTWithSource4, RecursiveAstVisitor as RecursiveAstVisitor3, TmplAstBoundDeferredTrigger as TmplAstBoundDeferredTrigger2 } from "@angular/compiler";
@@ -7026,7 +7044,43 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor3 {
   }
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.mjs
+var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
+  constructor() {
+    super(...arguments);
+    this.code = ErrorCode.INTERPOLATED_SIGNAL_NOT_INVOKED;
+  }
+  visitNode(ctx, component, node) {
+    if (node instanceof Interpolation) {
+      return node.expressions.filter((item) => item instanceof PropertyRead6).flatMap((item) => {
+        if (item instanceof PropertyRead6) {
+          return buildDiagnosticForSignal(ctx, item, component);
+        }
+        return [];
+      });
+    }
+    return [];
+  }
+};
+function buildDiagnosticForSignal(ctx, node, component) {
+  var _a, _b;
+  const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
+  if ((symbol == null ? void 0 : symbol.kind) === SymbolKind.Expression && (((_a = symbol.tsType.symbol) == null ? void 0 : _a.escapedName) === "WritableSignal" || ((_b = symbol.tsType.symbol) == null ? void 0 : _b.escapedName) === "Signal") && symbol.tsType.symbol.parent.escapedName.includes("@angular/core")) {
+    const templateMapping = ctx.templateTypeChecker.getTemplateMappingAtTcbLocation(symbol.tcbLocation);
+    const errorString = `${node.name} is a function and should be invoked: ${node.name}()`;
+    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
+    return [diagnostic];
+  }
+  return [];
+}
+var factory = {
+  code: ErrorCode.INTERPOLATED_SIGNAL_NOT_INVOKED,
+  name: ExtendedTemplateDiagnosticName.INTERPOLATED_SIGNAL_NOT_INVOKED,
+  create: () => new InterpolatedSignalCheck()
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/invalid_banana_in_box/index.mjs
+import { TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
 var InvalidBananaInBoxCheck = class extends TemplateCheckWithVisitor {
   constructor() {
     super(...arguments);
@@ -7045,7 +7099,7 @@ var InvalidBananaInBoxCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory = {
+var factory2 = {
   code: ErrorCode.INVALID_BANANA_IN_BOX,
   name: ExtendedTemplateDiagnosticName.INVALID_BANANA_IN_BOX,
   create: () => new InvalidBananaInBoxCheck()
@@ -7088,7 +7142,7 @@ var MissingControlFlowDirectiveCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory2 = {
+var factory3 = {
   code: ErrorCode.MISSING_CONTROL_FLOW_DIRECTIVE,
   name: ExtendedTemplateDiagnosticName.MISSING_CONTROL_FLOW_DIRECTIVE,
   create: (options) => {
@@ -7123,7 +7177,7 @@ var MissingNgForOfLetCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory3 = {
+var factory4 = {
   code: ErrorCode.MISSING_NGFOROF_LET,
   name: ExtendedTemplateDiagnosticName.MISSING_NGFOROF_LET,
   create: () => new MissingNgForOfLetCheck()
@@ -7162,7 +7216,7 @@ var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory4 = {
+var factory5 = {
   code: ErrorCode.NULLISH_COALESCING_NOT_NULLABLE,
   name: ExtendedTemplateDiagnosticName.NULLISH_COALESCING_NOT_NULLABLE,
   create: (options) => {
@@ -7208,7 +7262,7 @@ var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory5 = {
+var factory6 = {
   code: ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE,
   name: ExtendedTemplateDiagnosticName.OPTIONAL_CHAIN_NOT_NULLABLE,
   create: (options) => {
@@ -7238,7 +7292,7 @@ var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory6 = {
+var factory7 = {
   code: ErrorCode.SUFFIX_NOT_SUPPORTED,
   name: ExtendedTemplateDiagnosticName.SUFFIX_NOT_SUPPORTED,
   create: () => new SuffixNotSupportedCheck()
@@ -7277,7 +7331,7 @@ var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory7 = {
+var factory8 = {
   code: ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING,
   name: ExtendedTemplateDiagnosticName.TEXT_ATTRIBUTE_NOT_BINDING,
   create: () => new TextAttributeNotBindingSpec()
@@ -7300,12 +7354,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory8 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory8.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory9 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory9.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory8.create(options);
+      const check = factory9.create(options);
       if (check === null) {
         continue;
       }
@@ -7349,13 +7403,14 @@ ${value}`);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/index.mjs
 var ALL_DIAGNOSTIC_FACTORIES = [
-  factory,
-  factory4,
-  factory5,
   factory2,
-  factory7,
+  factory5,
+  factory6,
   factory3,
-  factory6
+  factory8,
+  factory4,
+  factory7,
+  factory
 ];
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
@@ -8034,7 +8089,7 @@ ${allowedCategoryLabels.join("\n")}
       `.trim()
     });
   }
-  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory8) => factory8.name);
+  const allExtendedDiagnosticNames = ALL_DIAGNOSTIC_FACTORIES.map((factory9) => factory9.name);
   for (const [checkName, category] of Object.entries((_c = (_b = options.extendedDiagnostics) == null ? void 0 : _b.checks) != null ? _c : {})) {
     if (!allExtendedDiagnosticNames.includes(checkName)) {
       yield makeConfigDiagnostic({
@@ -8713,4 +8768,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-VBLBTWOL.js.map
+//# sourceMappingURL=chunk-EKZWOVDR.js.map
