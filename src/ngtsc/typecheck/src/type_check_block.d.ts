@@ -200,6 +200,10 @@ declare class Scope {
      * Executing the `TcbOp`s in the `opQueue` populates this array.
      */
     private statements;
+    /**
+     * Names of the for loop context variables and their types.
+     */
+    private static readonly forLoopContextVariableTypes;
     private constructor();
     /**
      * Constructs a `Scope` given either a `TmplAstTemplate` or a list of `TmplAstNode`s.
