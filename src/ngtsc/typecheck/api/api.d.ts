@@ -69,10 +69,6 @@ export interface TypeCheckBlockMetadata {
      */
     schemas: SchemaMetadata[];
     isStandalone: boolean;
-    /**
-     * A boolean indicating whether the component preserves whitespaces in its template.
-     */
-    preserveWhitespaces: boolean;
 }
 export interface TypeCtorMetadata {
     /**

@@ -129,9 +129,8 @@ export declare class Context {
     private pipes;
     readonly schemas: SchemaMetadata[];
     readonly hostIsStandalone: boolean;
-    readonly hostPreserveWhitespaces: boolean;
     private nextId;
-    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: TemplateId, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[], hostIsStandalone: boolean, hostPreserveWhitespaces: boolean);
+    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: TemplateId, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[], hostIsStandalone: boolean);
     /**
      * Allocate a new variable name for use within the `Context`.
      *
@@ -272,7 +271,6 @@ declare class Scope {
     private appendOutputsOfNode;
     private appendDeepSchemaChecks;
     private appendIcuExpressions;
-    private appendContentProjectionCheckOp;
     private appendDeferredBlock;
     private appendDeferredTriggers;
     private appendReferenceBasedDeferredTrigger;

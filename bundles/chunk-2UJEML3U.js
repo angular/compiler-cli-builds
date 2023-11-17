@@ -7,7 +7,7 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-7JZOZRTE.js";
+} from "./chunk-XCEXKEDO.js";
 import {
   ClassMemberKind,
   ErrorCode,
@@ -30,7 +30,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-J72CGISC.js";
+} from "./chunk-VHIKXGRX.js";
 import {
   PerfEvent,
   PerfPhase
@@ -1664,7 +1664,6 @@ var DtsMetadataReader = class {
     const isStructural = !isComponent && ctorParams !== null && ctorParams.some((param) => {
       return param.typeValueReference.kind === 1 && param.typeValueReference.moduleName === "@angular/core" && param.typeValueReference.importedName === "TemplateRef";
     });
-    const ngContentSelectors = def.type.typeArguments.length > 6 ? readStringArrayType(def.type.typeArguments[6]) : null;
     const isStandalone = def.type.typeArguments.length > 7 && ((_a = readBooleanType(def.type.typeArguments[7])) != null ? _a : false);
     const inputs = ClassPropertyMapping.fromMappedObject(readInputsType(def.type.typeArguments[3]));
     const outputs = ClassPropertyMapping.fromMappedObject(readMapType(def.type.typeArguments[4], readStringType));
@@ -1687,14 +1686,12 @@ var DtsMetadataReader = class {
       isPoisoned: false,
       isStructural,
       animationTriggerNames: null,
-      ngContentSelectors,
       isStandalone,
       isSignal,
       imports: null,
       schemas: null,
       decorator: null,
-      assumedToExportProviders: isComponent && isStandalone,
-      preserveWhitespaces: false
+      assumedToExportProviders: isComponent && isStandalone
     };
   }
   getPipeMetadata(ref) {
@@ -5134,9 +5131,7 @@ var DirectiveDecoratorHandler = class {
       isSignal: analysis.meta.isSignal,
       imports: null,
       schemas: null,
-      ngContentSelectors: null,
       decorator: analysis.decorator,
-      preserveWhitespaces: false,
       assumedToExportProviders: false
     });
     this.injectableRegistry.registerInjectable(node, {
@@ -6605,7 +6600,10 @@ var ComponentDecoratorHandler = class {
         rawHostDirectives,
         meta: {
           ...metadata,
-          template,
+          template: {
+            nodes: template.nodes,
+            ngContentSelectors: template.ngContentSelectors
+          },
           encapsulation,
           changeDetection,
           interpolation: (_c = template.interpolationConfig) != null ? _c : DEFAULT_INTERPOLATION_CONFIG2,
@@ -6649,7 +6647,6 @@ var ComponentDecoratorHandler = class {
     return new ComponentSymbol(node, analysis.meta.selector, analysis.inputs, analysis.outputs, analysis.meta.exportAs, analysis.typeCheckMeta, typeParameters);
   }
   register(node, analysis) {
-    var _a;
     const ref = new Reference(node);
     this.metaRegistry.registerDirectiveMetadata({
       kind: MetaKind.Directive,
@@ -6673,9 +6670,7 @@ var ComponentDecoratorHandler = class {
       animationTriggerNames: analysis.animationTriggerNames,
       schemas: analysis.schemas,
       decorator: analysis.decorator,
-      assumedToExportProviders: false,
-      ngContentSelectors: analysis.template.ngContentSelectors,
-      preserveWhitespaces: (_a = analysis.template.preserveWhitespaces) != null ? _a : false
+      assumedToExportProviders: false
     });
     this.resourceRegistry.registerResources(analysis.resources, node);
     this.injectableRegistry.registerInjectable(node, {
@@ -6714,7 +6709,6 @@ var ComponentDecoratorHandler = class {
     return null;
   }
   typeCheck(ctx, node, meta) {
-    var _a;
     if (this.typeCheckScopeRegistry === null || !ts24.isClassDeclaration(node)) {
       return;
     }
@@ -6726,7 +6720,7 @@ var ComponentDecoratorHandler = class {
       return;
     }
     const binder = new R3TargetBinder(scope.matcher);
-    ctx.addTemplate(new Reference(node), binder, meta.template.diagNodes, scope.pipes, scope.schemas, meta.template.sourceMapping, meta.template.file, meta.template.errors, meta.meta.isStandalone, (_a = meta.meta.template.preserveWhitespaces) != null ? _a : false);
+    ctx.addTemplate(new Reference(node), binder, meta.template.diagNodes, scope.pipes, scope.schemas, meta.template.sourceMapping, meta.template.file, meta.template.errors, meta.meta.isStandalone);
   }
   extendedTemplateCheck(component, extendedTemplateChecker) {
     return extendedTemplateChecker.getDiagnosticsForComponent(component);
@@ -7614,4 +7608,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CZTSLQ3Q.js.map
+//# sourceMappingURL=chunk-2UJEML3U.js.map
