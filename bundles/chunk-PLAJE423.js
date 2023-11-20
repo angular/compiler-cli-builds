@@ -2845,6 +2845,7 @@ function flattenInheritedDirectiveMetadata(reader, dir) {
   const undeclaredInputFields = /* @__PURE__ */ new Set();
   const restrictedInputFields = /* @__PURE__ */ new Set();
   const stringLiteralInputFields = /* @__PURE__ */ new Set();
+  let hostDirectives = null;
   let isDynamic = false;
   let inputs = ClassPropertyMapping.empty();
   let outputs = ClassPropertyMapping.empty();
@@ -2875,6 +2876,10 @@ function flattenInheritedDirectiveMetadata(reader, dir) {
     for (const field of meta.stringLiteralInputFields) {
       stringLiteralInputFields.add(field);
     }
+    if (meta.hostDirectives !== null && meta.hostDirectives.length > 0) {
+      hostDirectives != null ? hostDirectives : hostDirectives = [];
+      hostDirectives.push(...meta.hostDirectives);
+    }
   };
   addMetadata(topMeta);
   return {
@@ -2886,7 +2891,8 @@ function flattenInheritedDirectiveMetadata(reader, dir) {
     restrictedInputFields,
     stringLiteralInputFields,
     baseClass: isDynamic ? "dynamic" : null,
-    isStructural
+    isStructural,
+    hostDirectives
   };
 }
 
@@ -7624,4 +7630,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-HKIDKKUJ.js.map
+//# sourceMappingURL=chunk-PLAJE423.js.map
