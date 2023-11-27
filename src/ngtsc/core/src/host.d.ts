@@ -48,7 +48,8 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     hasInvalidatedResolutions: ((filePath: ts.Path) => boolean) | undefined;
     resolveModuleNameLiterals: ((moduleLiterals: readonly ts.StringLiteralLike[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile, reusedNames: readonly ts.StringLiteralLike[] | undefined) => readonly ts.ResolvedModuleWithFailedLookupLocations[]) | undefined;
     resolveTypeReferenceDirectiveReferences: (<T extends string | ts.FileReference>(typeDirectiveReferences: readonly T[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile | undefined, reusedNames: readonly T[] | undefined) => readonly ts.ResolvedTypeReferenceDirectiveWithFailedLookupLocations[]) | undefined;
-    jsDocParsingMode: ts.JSDocParsingMode | undefined;
+    get jsDocParsingMode(): ts.JSDocParsingMode | undefined;
+    set jsDocParsingMode(mode: ts.JSDocParsingMode | undefined);
     constructor(delegate: ExtendedTsCompilerHost);
     private delegateMethod;
 }
@@ -105,7 +106,7 @@ export declare class NgCompilerHost extends DelegatingCompilerHost implements Re
      * files to the project.
      */
     isResource(sf: ts.SourceFile): boolean;
-    getSourceFile(fileName: string, languageVersion: ts.ScriptTarget, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
+    getSourceFile(fileName: string, languageVersionOrOptions: ts.ScriptTarget | ts.CreateSourceFileOptions, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined): ts.SourceFile | undefined;
     fileExists(fileName: string): boolean;
     get unifiedModulesHost(): UnifiedModulesHost | null;
     private createCachedResolveModuleNamesFunction;

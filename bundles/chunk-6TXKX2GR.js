@@ -8186,6 +8186,12 @@ function versionMapFromProgram(program, driver) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/host.mjs
 import ts36 from "typescript";
 var DelegatingCompilerHost2 = class {
+  get jsDocParsingMode() {
+    return this.delegate.jsDocParsingMode;
+  }
+  set jsDocParsingMode(mode) {
+    this.delegate.jsDocParsingMode = mode;
+  }
   constructor(delegate) {
     this.delegate = delegate;
     this.createHash = this.delegateMethod("createHash");
@@ -8217,7 +8223,6 @@ var DelegatingCompilerHost2 = class {
     this.hasInvalidatedResolutions = this.delegateMethod("hasInvalidatedResolutions");
     this.resolveModuleNameLiterals = this.delegateMethod("resolveModuleNameLiterals");
     this.resolveTypeReferenceDirectiveReferences = this.delegateMethod("resolveTypeReferenceDirectiveReferences");
-    this.jsDocParsingMode = this.delegateMethod("jsDocParsingMode");
   }
   delegateMethod(name) {
     return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
@@ -8288,12 +8293,12 @@ var NgCompilerHost = class extends DelegatingCompilerHost2 {
   isResource(sf) {
     return false;
   }
-  getSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile) {
+  getSourceFile(fileName, languageVersionOrOptions, onError, shouldCreateNewSourceFile) {
     const shimSf = this.shimAdapter.maybeGenerate(resolve(fileName));
     if (shimSf !== null) {
       return shimSf;
     }
-    const sf = this.delegate.getSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile);
+    const sf = this.delegate.getSourceFile(fileName, languageVersionOrOptions, onError, shouldCreateNewSourceFile);
     if (sf === void 0) {
       return void 0;
     }
@@ -8779,4 +8784,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-LABVZWIN.js.map
+//# sourceMappingURL=chunk-6TXKX2GR.js.map
