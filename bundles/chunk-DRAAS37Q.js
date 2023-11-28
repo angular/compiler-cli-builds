@@ -36,14 +36,14 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-FGCWQO44.js";
+} from "./chunk-VBXCCPRJ.js";
 import {
   ImportManager,
   TypeEmitter,
   canEmitType,
   translateExpression,
   translateType
-} from "./chunk-XCEXKEDO.js";
+} from "./chunk-7JZOZRTE.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -85,7 +85,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-VHIKXGRX.js";
+} from "./chunk-J72CGISC.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -2480,7 +2480,7 @@ var StandaloneComponentScopeReader = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
-import { CssSelector, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr2, WrappedNodeExpr } from "@angular/compiler";
+import { CssSelector as CssSelector2, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr2, WrappedNodeExpr } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.mjs
 import ts15 from "typescript";
@@ -3412,7 +3412,7 @@ var Environment = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/oob.mjs
-import { TmplAstElement as TmplAstElement2 } from "@angular/compiler";
+import { TmplAstElement as TmplAstElement2, TmplAstIfBlockBranch } from "@angular/compiler";
 import ts24 from "typescript";
 var OutOfBandDiagnosticRecorderImpl = class {
   constructor(resolver) {
@@ -3558,6 +3558,20 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     }
     this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), trigger.sourceSpan, ts24.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
   }
+  controlFlowPreventingContentProjection(templateId, projectionNode, componentName, slotSelector, controlFlowNode, preservesWhitespaces) {
+    const blockName = controlFlowNode instanceof TmplAstIfBlockBranch ? "@if" : "@for";
+    const lines = [
+      `Node matches the "${slotSelector}" slot of the "${componentName}" component, but will not be projected into the specific slot because the surrounding ${blockName} has more than one node at its root. To project the node in the right slot, you can:
+`,
+      `1. Wrap the content of the ${blockName} block in an <ng-container/> that matches the "${slotSelector}" selector.`,
+      `2. Split the content of the ${blockName} block across multiple ${blockName} blocks such that each one only has a single projectable node at its root.`,
+      `3. Remove all content from the ${blockName} block, except for the node being projected.`
+    ];
+    if (preservesWhitespaces) {
+      lines.push(`Note: the host component has \`preserveWhitespaces: true\` which may cause whitespace to affect content projection.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), projectionNode.startSourceSpan, ts24.DiagnosticCategory.Warning, ngErrorCode(ErrorCode.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION), lines.join("\n")));
+  }
 };
 function makeInlineDiagnostic(templateId, code, node, messageText, relatedInformation) {
   return {
@@ -3586,7 +3600,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
-import { BindingPipe, Call as Call2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, SafeCall, SafePropertyRead as SafePropertyRead3, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
+import { BindingPipe, Call as Call2, createCssSelectorFromNode, CssSelector, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, SafeCall, SafePropertyRead as SafePropertyRead3, SelectorMatcher, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch as TmplAstIfBlockBranch2, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
 import ts28 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
@@ -4000,7 +4014,7 @@ var TcbGenericContextBehavior;
   TcbGenericContextBehavior2[TcbGenericContextBehavior2["FallbackToAny"] = 2] = "FallbackToAny";
 })(TcbGenericContextBehavior || (TcbGenericContextBehavior = {}));
 function generateTypeCheckBlock(env, ref, name, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
-  const tcb = new Context(env, domSchemaChecker, oobRecorder, meta.id, meta.boundTarget, meta.pipes, meta.schemas, meta.isStandalone);
+  const tcb = new Context(env, domSchemaChecker, oobRecorder, meta.id, meta.boundTarget, meta.pipes, meta.schemas, meta.isStandalone, meta.preserveWhitespaces);
   const scope = Scope.forNodes(tcb, null, null, tcb.boundTarget.target.template, null);
   const ctxRawType = env.referenceType(ref);
   if (!ts28.isTypeReferenceNode(ctxRawType)) {
@@ -4456,6 +4470,61 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
     return null;
   }
 };
+var TcbControlFlowContentProjectionOp = class extends TcbOp {
+  constructor(tcb, element, ngContentSelectors, componentName) {
+    super();
+    this.tcb = tcb;
+    this.element = element;
+    this.ngContentSelectors = ngContentSelectors;
+    this.componentName = componentName;
+    this.optional = false;
+  }
+  execute() {
+    const controlFlowToCheck = this.findPotentialControlFlowNodes();
+    if (controlFlowToCheck.length > 0) {
+      const matcher = new SelectorMatcher();
+      for (const selector of this.ngContentSelectors) {
+        if (selector !== "*") {
+          matcher.addSelectables(CssSelector.parse(selector), selector);
+        }
+      }
+      for (const root of controlFlowToCheck) {
+        for (const child of root.children) {
+          if (child instanceof TmplAstElement3 || child instanceof TmplAstTemplate2) {
+            matcher.match(createCssSelectorFromNode(child), (_, originalSelector) => {
+              this.tcb.oobRecorder.controlFlowPreventingContentProjection(this.tcb.id, child, this.componentName, originalSelector, root, this.tcb.hostPreserveWhitespaces);
+            });
+          }
+        }
+      }
+    }
+    return null;
+  }
+  findPotentialControlFlowNodes() {
+    const result = [];
+    for (const child of this.element.children) {
+      let eligibleNode = null;
+      if (child instanceof TmplAstForLoopBlock) {
+        eligibleNode = child;
+      } else if (child instanceof TmplAstIfBlock) {
+        eligibleNode = child.branches[0];
+      }
+      if (eligibleNode === null || eligibleNode.children.length < 2) {
+        continue;
+      }
+      const rootNodeCount = eligibleNode.children.reduce((count, node) => {
+        if (!(node instanceof TmplAstText) || this.tcb.hostPreserveWhitespaces || node.value.trim().length > 0) {
+          count++;
+        }
+        return count;
+      }, 0);
+      if (rootNodeCount > 1) {
+        result.push(eligibleNode);
+      }
+    }
+    return result;
+  }
+};
 var ATTR_TO_PROP = new Map(Object.entries({
   "class": "className",
   "for": "htmlFor",
@@ -4789,7 +4858,7 @@ var TcbForOfOp = class extends TcbOp {
 };
 var INFER_TYPE_FOR_CIRCULAR_OP_EXPR = ts28.factory.createNonNullExpression(ts28.factory.createNull());
 var Context = class {
-  constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone) {
+  constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone, hostPreserveWhitespaces) {
     this.env = env;
     this.domSchemaChecker = domSchemaChecker;
     this.oobRecorder = oobRecorder;
@@ -4798,6 +4867,7 @@ var Context = class {
     this.pipes = pipes;
     this.schemas = schemas;
     this.hostIsStandalone = hostIsStandalone;
+    this.hostPreserveWhitespaces = hostPreserveWhitespaces;
     this.nextId = 1;
   }
   allocateId() {
@@ -4839,7 +4909,7 @@ var _Scope = class {
         }
         this.registerVariable(scope, v, new TcbTemplateVariableOp(tcb, scope, scopedNode, v));
       }
-    } else if (scopedNode instanceof TmplAstIfBlockBranch) {
+    } else if (scopedNode instanceof TmplAstIfBlockBranch2) {
       const { expression, expressionAlias } = scopedNode;
       if (expression !== null && expressionAlias !== null) {
         this.registerVariable(scope, expressionAlias, new TcbBlockVariableOp(tcb, scope, tcbExpression(expression, tcb, scope), expressionAlias));
@@ -4950,6 +5020,7 @@ var _Scope = class {
     if (node instanceof TmplAstElement3) {
       const opIndex = this.opQueue.push(new TcbElementOp(this.tcb, this, node)) - 1;
       this.elementOpMap.set(node, opIndex);
+      this.appendContentProjectionCheckOp(node);
       this.appendDirectivesAndInputsOfNode(node);
       this.appendOutputsOfNode(node);
       this.appendChildren(node);
@@ -5090,6 +5161,16 @@ var _Scope = class {
     for (const placeholder of Object.values(node.placeholders)) {
       if (placeholder instanceof TmplAstBoundText) {
         this.opQueue.push(new TcbExpressionOp(this.tcb, this, placeholder.value));
+      }
+    }
+  }
+  appendContentProjectionCheckOp(root) {
+    var _a;
+    const meta = ((_a = this.tcb.boundTarget.getDirectivesOfNode(root)) == null ? void 0 : _a.find((meta2) => meta2.isComponent)) || null;
+    if (meta !== null && meta.ngContentSelectors !== null && meta.ngContentSelectors.length > 0) {
+      const selectors = meta.ngContentSelectors;
+      if (selectors.length > 1 || selectors.length === 1 && selectors[0] !== "*") {
+        this.opQueue.push(new TcbControlFlowContentProjectionOp(this.tcb, root, selectors, meta.name));
       }
     }
   }
@@ -5436,7 +5517,7 @@ var TypeCheckContextImpl = class {
       throw new Error(`AssertionError: invalid inlining configuration.`);
     }
   }
-  addTemplate(ref, binder, template, pipes, schemas, sourceMapping, file, parseErrors, isStandalone) {
+  addTemplate(ref, binder, template, pipes, schemas, sourceMapping, file, parseErrors, isStandalone, preserveWhitespaces) {
     if (!this.host.shouldCheckComponent(ref.node)) {
       return;
     }
@@ -5489,7 +5570,8 @@ var TypeCheckContextImpl = class {
       boundTarget,
       pipes,
       schemas,
-      isStandalone
+      isStandalone,
+      preserveWhitespaces
     };
     this.perf.eventCount(PerfEvent.GenerateTcb);
     if (inliningRequirement !== TcbInliningRequirement.None && this.inlining === InliningMode.InlineOps) {
@@ -6665,7 +6747,7 @@ var TemplateTypeCheckerImpl = class {
         if (directive.selector === null) {
           continue;
         }
-        for (const selector of CssSelector.parse(directive.selector)) {
+        for (const selector of CssSelector2.parse(directive.selector)) {
           if (selector.element === null || tagMap.has(selector.element)) {
             continue;
           }
@@ -8784,4 +8866,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-6TXKX2GR.js.map
+//# sourceMappingURL=chunk-DRAAS37Q.js.map
