@@ -41,7 +41,8 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     hasInvalidatedResolutions: ((filePath: ts.Path) => boolean) | undefined;
     resolveModuleNameLiterals: ((moduleLiterals: readonly ts.StringLiteralLike[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile, reusedNames: readonly ts.StringLiteralLike[] | undefined) => readonly ts.ResolvedModuleWithFailedLookupLocations[]) | undefined;
     resolveTypeReferenceDirectiveReferences: (<T extends string | ts.FileReference>(typeDirectiveReferences: readonly T[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile | undefined, reusedNames: readonly T[] | undefined) => readonly ts.ResolvedTypeReferenceDirectiveWithFailedLookupLocations[]) | undefined;
-    jsDocParsingMode: ts.JSDocParsingMode | undefined;
+    get jsDocParsingMode(): ts.JSDocParsingMode | undefined;
+    set jsDocParsingMode(mode: ts.JSDocParsingMode | undefined);
     constructor(delegate: ts.CompilerHost);
     private delegateMethod;
 }

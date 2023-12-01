@@ -1393,6 +1393,12 @@ var ShimReferenceTagger = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver.mjs
 var DelegatingCompilerHost = class {
+  get jsDocParsingMode() {
+    return this.delegate.jsDocParsingMode;
+  }
+  set jsDocParsingMode(mode) {
+    this.delegate.jsDocParsingMode = mode;
+  }
   constructor(delegate) {
     this.delegate = delegate;
     this.createHash = this.delegateMethod("createHash");
@@ -1418,7 +1424,6 @@ var DelegatingCompilerHost = class {
     this.hasInvalidatedResolutions = this.delegateMethod("hasInvalidatedResolutions");
     this.resolveModuleNameLiterals = this.delegateMethod("resolveModuleNameLiterals");
     this.resolveTypeReferenceDirectiveReferences = this.delegateMethod("resolveTypeReferenceDirectiveReferences");
-    this.jsDocParsingMode = this.delegateMethod("jsDocParsingMode");
   }
   delegateMethod(name) {
     return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
@@ -1432,10 +1437,10 @@ var UpdatedProgramHost = class extends DelegatingCompilerHost {
     this.shimTagger = new ShimReferenceTagger(this.shimExtensionPrefixes);
     this.sfMap = sfMap;
   }
-  getSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile) {
+  getSourceFile(fileName, languageVersionOrOptions, onError, shouldCreateNewSourceFile) {
     let delegateSf = this.originalProgram.getSourceFile(fileName);
     if (delegateSf === void 0) {
-      delegateSf = this.delegate.getSourceFile(fileName, languageVersion, onError, shouldCreateNewSourceFile);
+      delegateSf = this.delegate.getSourceFile(fileName, languageVersionOrOptions, onError, shouldCreateNewSourceFile);
     }
     if (delegateSf === void 0) {
       return void 0;
@@ -8866,4 +8871,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-DRAAS37Q.js.map
+//# sourceMappingURL=chunk-4SCK7IJF.js.map
