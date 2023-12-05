@@ -192,7 +192,8 @@ declare class Scope {
     private templateCtxOpMap;
     /**
      * Map of variables declared on the template that created this `Scope` (represented by
-     * `TmplAstVariable` nodes) to the index of their `TcbVariableOp`s in the `opQueue`.
+     * `TmplAstVariable` nodes) to the index of their `TcbVariableOp`s in the `opQueue`, or to
+     * pre-resolved variable identifiers.
      */
     private varMap;
     /**
