@@ -4765,7 +4765,11 @@ var TcbForOfOp = class extends TcbOp {
   }
   execute() {
     const loopScope = Scope.forNodes(this.tcb, this.scope, this.block, this.block.children, null);
-    const initializer = ts28.factory.createVariableDeclarationList([ts28.factory.createVariableDeclaration(this.block.item.name)], ts28.NodeFlags.Const);
+    const initializerId = loopScope.resolve(this.block.item);
+    if (!ts28.isIdentifier(initializerId)) {
+      throw new Error(`Could not resolve for loop variable ${this.block.item.name} to an identifier`);
+    }
+    const initializer = ts28.factory.createVariableDeclarationList([ts28.factory.createVariableDeclaration(initializerId)], ts28.NodeFlags.Const);
     const expression = ts28.factory.createNonNullExpression(tcbExpression(this.block.expression, this.tcb, loopScope));
     const trackTranslator = new TcbForLoopTrackTranslator(this.tcb, loopScope, this.block);
     const trackExpression = trackTranslator.translate(this.block.trackBy);
@@ -4835,7 +4839,9 @@ var _Scope = class {
         this.registerVariable(scope, expressionAlias, new TcbBlockVariableOp(tcb, scope, tcbExpression(expression, tcb, scope), expressionAlias));
       }
     } else if (scopedNode instanceof TmplAstForLoopBlock) {
-      this.registerVariable(scope, scopedNode.item, new TcbBlockVariableOp(tcb, scope, ts28.factory.createIdentifier(scopedNode.item.name), scopedNode.item));
+      const loopInitializer = tcb.allocateId();
+      addParseSpanInfo(loopInitializer, scopedNode.item.sourceSpan);
+      scope.varMap.set(scopedNode.item, loopInitializer);
       for (const [name, variable] of Object.entries(scopedNode.contextVariables)) {
         if (!this.forLoopContextVariableTypes.has(name)) {
           throw new Error(`Unrecognized for loop context variable ${name}`);
@@ -4900,7 +4906,8 @@ var _Scope = class {
     if (ref instanceof TmplAstReference3 && this.referenceOpMap.has(ref)) {
       return this.resolveOp(this.referenceOpMap.get(ref));
     } else if (ref instanceof TmplAstVariable2 && this.varMap.has(ref)) {
-      return this.resolveOp(this.varMap.get(ref));
+      const opIndexOrNode = this.varMap.get(ref);
+      return typeof opIndexOrNode === "number" ? this.resolveOp(opIndexOrNode) : opIndexOrNode;
     } else if (ref instanceof TmplAstTemplate2 && directive === void 0 && this.templateCtxOpMap.has(ref)) {
       return this.resolveOp(this.templateCtxOpMap.get(ref));
     } else if ((ref instanceof TmplAstElement3 || ref instanceof TmplAstTemplate2) && directive !== void 0 && this.directiveOpMap.has(ref)) {
@@ -8768,4 +8775,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-LN7QCCMF.js.map
+//# sourceMappingURL=chunk-OZJNOITR.js.map
