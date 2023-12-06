@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { BindingPipe, PropertyRead, PropertyWrite, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstForLoopBlock, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstReference, TmplAstTemplate, TmplAstVariable, TmplAstViewportDeferredTrigger } from '@angular/compiler';
+import ts from 'typescript';
 import { ClassDeclaration } from '../../reflection';
 import { TemplateDiagnostic, TemplateId } from '../api';
 import { TemplateSourceResolver } from './tcb_util';
@@ -72,7 +73,7 @@ export interface OutOfBandDiagnosticRecorder {
     /**
      * Reports cases where control flow nodes prevent content projection.
      */
-    controlFlowPreventingContentProjection(templateId: TemplateId, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstForLoopBlock, preservesWhitespaces: boolean): void;
+    controlFlowPreventingContentProjection(templateId: TemplateId, category: ts.DiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstForLoopBlock, preservesWhitespaces: boolean): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -95,5 +96,5 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     missingRequiredInputs(templateId: TemplateId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
     illegalForLoopTrackAccess(templateId: TemplateId, block: TmplAstForLoopBlock, access: PropertyRead): void;
     inaccessibleDeferredTriggerElement(templateId: TemplateId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
-    controlFlowPreventingContentProjection(templateId: TemplateId, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstForLoopBlock, preservesWhitespaces: boolean): void;
+    controlFlowPreventingContentProjection(templateId: TemplateId, category: ts.DiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstForLoopBlock, preservesWhitespaces: boolean): void;
 }
