@@ -1,4 +1,6 @@
+/// <reference types="@types/babel__traverse" />
 /// <reference types="@angular/compiler-cli/private/babel" />
+/// <reference types="@types/babel__core" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -6,7 +8,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { NodePath, types as t } from '@babel/core';
+import { types as t } from '@babel/core';
+import { NodePath, Scope } from '@babel/traverse';
 import { DeclarationScope } from '../../../linker';
 export type ConstantScopePath = NodePath<t.FunctionDeclaration> | NodePath<t.FunctionExpression> | NodePath<t.Program>;
 /**
@@ -22,7 +25,7 @@ export declare class BabelDeclarationScope implements DeclarationScope<ConstantS
      *
      * @param declarationScope the Babel scope containing the declaration call expression.
      */
-    constructor(declarationScope: NodePath['scope']);
+    constructor(declarationScope: Scope);
     /**
      * Compute the Babel `NodePath` that can be used to reference the lexical scope where any
      * shared constant statements would be inserted.
