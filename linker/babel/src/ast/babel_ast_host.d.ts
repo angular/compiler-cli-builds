@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/// <reference types="@types/babel__core" />
 /// <reference types="@angular/compiler-cli/private/babel" />
 import { types as t } from '@babel/core';
 import { AstHost, Range } from '../../../../linker';
