@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "17.0.6+sha-a398c55",
+  "version": "17.0.6+sha-f88b77b",
   "description": "Angular - the compiler CLI for Node.js",
   "typings": "index.d.ts",
   "bin": {
@@ -53,7 +53,7 @@
     "yargs": "^17.2.1"
   },
   "peerDependencies": {
-    "@angular/compiler": "17.0.6+sha-a398c55",
+    "@angular/compiler": "17.0.6+sha-f88b77b",
     "typescript": ">=5.2 <5.3"
   },
   "repository": {
