@@ -297,10 +297,10 @@ function createEs2015LinkerPlugin({ fileSystem, logger, ...options }) {
   return {
     visitor: {
       Program: {
-        enter(path) {
+        enter(_, state) {
           var _a, _b;
           assertNull(fileLinker);
-          const file = path.hub.file;
+          const file = state.file;
           const filename = (_a = file.opts.filename) != null ? _a : file.opts.filenameRelative;
           if (!filename) {
             throw new Error("No filename (nor filenameRelative) provided by Babel. This is required for the linking of partially compiled directives and components.");
@@ -317,7 +317,7 @@ function createEs2015LinkerPlugin({ fileSystem, logger, ...options }) {
           fileLinker = null;
         }
       },
-      CallExpression(call) {
+      CallExpression(call, state) {
         if (fileLinker === null) {
           return;
         }
@@ -335,7 +335,7 @@ function createEs2015LinkerPlugin({ fileSystem, logger, ...options }) {
           call.replaceWith(replacement);
         } catch (e) {
           const node = isFatalLinkerError(e) ? e.node : call.node;
-          throw buildCodeFrameError(call.hub.file, e.message, node);
+          throw buildCodeFrameError(state.file, e.message, node);
         }
       }
     }
@@ -388,7 +388,7 @@ function assertNotNull(obj) {
 }
 function buildCodeFrameError(file, message, node) {
   const filename = file.opts.filename || "(unknown file)";
-  const error = file.buildCodeFrameError(node, message);
+  const error = file.hub.buildError(node, message);
   return `${filename}: ${error.message}`;
 }
 
