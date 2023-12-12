@@ -4713,9 +4713,7 @@ var TcbBlockImplicitVariableOp = class extends TcbOp {
     this.scope = scope;
     this.type = type;
     this.variable = variable;
-  }
-  get optional() {
-    return false;
+    this.optional = true;
   }
   execute() {
     const id = this.tcb.allocateId();
@@ -8891,4 +8889,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KDBOKUIO.js.map
+//# sourceMappingURL=chunk-MUL2RA73.js.map
