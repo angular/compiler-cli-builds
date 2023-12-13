@@ -3,11 +3,12 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
+  AmbientImport,
   ImportFlags,
   NoopImportRewriter,
   Reference,
   assertSuccessfulReferenceEmit
-} from "./chunk-S4LCPAFI.js";
+} from "./chunk-YGUON63I.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/context.mjs
 var Context = class {
@@ -582,14 +583,14 @@ var TypeTranslatorVisitor = class {
       throw new Error(`Unable to statically determine the declaration file of type node ${target.text}`);
     }
     let owningModule = viaModule;
-    if (declaration.viaModule !== null) {
+    if (typeof declaration.viaModule === "string") {
       owningModule = {
         specifier: declaration.viaModule,
         resolutionContext: type.getSourceFile().fileName
       };
     }
-    const reference = new Reference(declaration.node, owningModule);
-    const emittedType = this.refEmitter.emit(reference, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports);
+    const reference = new Reference(declaration.node, declaration.viaModule === AmbientImport ? AmbientImport : owningModule);
+    const emittedType = this.refEmitter.emit(reference, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowAmbientReferences);
     assertSuccessfulReferenceEmit(emittedType, target, "type");
     const typeNode = this.translateExpression(emittedType.expression, context);
     if (!ts4.isTypeReferenceNode(typeNode)) {
@@ -827,4 +828,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-IZEGA6M4.js.map
+//# sourceMappingURL=chunk-72ZMP7J3.js.map

@@ -36,17 +36,18 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-OTVYTATO.js";
+} from "./chunk-2ASRA6WC.js";
 import {
   ImportManager,
   TypeEmitter,
   canEmitType,
   translateExpression,
   translateType
-} from "./chunk-IZEGA6M4.js";
+} from "./chunk-72ZMP7J3.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
+  AmbientImport,
   COMPILER_ERRORS_WITH_GUIDES,
   DefaultImportTracker,
   DeferredSymbolTracker,
@@ -85,7 +86,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-S4LCPAFI.js";
+} from "./chunk-YGUON63I.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -3104,13 +3105,13 @@ var TypeParameterEmitter = class {
       return type;
     }
     let owningModule = null;
-    if (declaration.viaModule !== null) {
+    if (typeof declaration.viaModule === "string") {
       owningModule = {
         specifier: declaration.viaModule,
         resolutionContext: type.getSourceFile().fileName
       };
     }
-    return new Reference(declaration.node, owningModule);
+    return new Reference(declaration.node, declaration.viaModule === AmbientImport ? AmbientImport : owningModule);
   }
   translateTypeReference(type, emitReference) {
     const reference = this.resolveTypeReference(type);
@@ -3388,12 +3389,12 @@ var Environment = class {
     assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "class");
     return translateExpression(ngExpr.expression, this.importManager);
   }
-  canReferenceType(ref) {
-    const result = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
+  canReferenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
+    const result = this.refEmitter.emit(ref, this.contextFile, flags);
     return result.kind === 0;
   }
-  referenceType(ref) {
-    const ngExpr = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
+  referenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
+    const ngExpr = this.refEmitter.emit(ref, this.contextFile, flags);
     assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "symbol");
     return translateType(new ExpressionType(ngExpr.expression), this.contextFile, this.reflector, this.refEmitter, this.importManager);
   }
@@ -8889,4 +8890,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-MUL2RA73.js.map
+//# sourceMappingURL=chunk-TGXBEN6D.js.map

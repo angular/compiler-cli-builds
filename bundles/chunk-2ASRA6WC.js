@@ -7,8 +7,9 @@ import {
   translateExpression,
   translateStatement,
   translateType
-} from "./chunk-IZEGA6M4.js";
+} from "./chunk-72ZMP7J3.js";
 import {
+  AmbientImport,
   ClassMemberKind,
   ErrorCode,
   FatalDiagnosticError,
@@ -30,7 +31,7 @@ import {
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
   typeNodeToValueExpr
-} from "./chunk-S4LCPAFI.js";
+} from "./chunk-YGUON63I.js";
 import {
   PerfEvent,
   PerfPhase
@@ -1022,7 +1023,7 @@ function isVariableDeclarationDeclared(node) {
 }
 var EMPTY = {};
 function joinModuleContext(existing, node, decl) {
-  if (decl.viaModule !== null && decl.viaModule !== existing.absoluteModuleName) {
+  if (typeof decl.viaModule === "string" && decl.viaModule !== existing.absoluteModuleName) {
     return {
       absoluteModuleName: decl.viaModule,
       resolutionContext: node.getSourceFile().fileName
@@ -4843,7 +4844,7 @@ function assertEmittableInputType(type, contextFile, reflector, refEmitter) {
       const declaration = reflector.getDeclarationOfIdentifier(node.typeName);
       if (declaration !== null) {
         if (declaration.node.getSourceFile() !== contextFile) {
-          const emittedType = refEmitter.emit(new Reference(declaration.node), contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
+          const emittedType = refEmitter.emit(new Reference(declaration.node, declaration.viaModule === AmbientImport ? AmbientImport : null), contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports | ImportFlags.AllowAmbientReferences);
           assertSuccessfulReferenceEmit(emittedType, node, "type");
         } else if (!reflector.isStaticallyExported(declaration.node)) {
           throw new FatalDiagnosticError(ErrorCode.SYMBOL_NOT_EXPORTED, type, `Symbol must be exported in order to be used as the type of an Input transform function`, [makeRelatedInformation(declaration.node, `The symbol is declared here.`)]);
@@ -7620,4 +7621,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-OTVYTATO.js.map
+//# sourceMappingURL=chunk-2ASRA6WC.js.map

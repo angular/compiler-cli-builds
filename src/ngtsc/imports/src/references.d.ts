@@ -7,6 +7,7 @@
  */
 import { Expression } from '@angular/compiler';
 import ts from 'typescript';
+import { AmbientImport } from '../../reflection';
 export interface OwningModule {
     specifier: string;
     resolutionContext: string;
@@ -46,7 +47,8 @@ export declare class Reference<T extends ts.Node = ts.Node> {
      */
     synthetic: boolean;
     private _alias;
-    constructor(node: T, bestGuessOwningModule?: OwningModule | null);
+    readonly isAmbient: boolean;
+    constructor(node: T, bestGuessOwningModule?: OwningModule | AmbientImport | null);
     /**
      * The best guess at which module specifier owns this particular reference, or `null` if there
      * isn't one.
