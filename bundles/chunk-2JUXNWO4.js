@@ -1375,9 +1375,11 @@ var ClassPropertyMapping = class {
       const value = obj[classPropertyName];
       let inputOrOutput;
       if (typeof value === "string") {
-        inputOrOutput = { classPropertyName, bindingPropertyName: value };
-      } else if (Array.isArray(value)) {
-        inputOrOutput = { classPropertyName, bindingPropertyName: value[0] };
+        inputOrOutput = {
+          classPropertyName,
+          bindingPropertyName: value,
+          isSignal: false
+        };
       } else {
         inputOrOutput = value;
       }
@@ -1515,7 +1517,13 @@ function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
   const staticMembers = members.filter((member) => member.isStatic);
   const ngTemplateGuards = staticMembers.map(extractTemplateGuard).filter((guard) => guard !== null);
   const hasNgTemplateContextGuard = staticMembers.some((member) => member.kind === ClassMemberKind.Method && member.name === "ngTemplateContextGuard");
-  const coercedInputFields = new Set(staticMembers.map(extractCoercedInput).filter((inputName) => inputName !== null));
+  const coercedInputFields = new Set(staticMembers.map(extractCoercedInput).filter((inputName) => {
+    var _a;
+    if (inputName === null || ((_a = inputs.getByClassPropertyName(inputName)) == null ? void 0 : _a.isSignal)) {
+      return false;
+    }
+    return true;
+  }));
   const restrictedInputFields = /* @__PURE__ */ new Set();
   const stringLiteralInputFields = /* @__PURE__ */ new Set();
   const undeclaredInputFields = /* @__PURE__ */ new Set();
@@ -1736,6 +1744,7 @@ function readInputsType(type) {
           bindingPropertyName: stringValue,
           classPropertyName,
           required: false,
+          isSignal: false,
           transform: null
         };
       } else {
@@ -1747,6 +1756,7 @@ function readInputsType(type) {
           classPropertyName,
           bindingPropertyName: config.alias,
           required: config.required,
+          isSignal: !!config.isSignal,
           transform: null
         };
       }
@@ -2085,7 +2095,8 @@ function resolveInput(bindingName, binding) {
     bindingPropertyName: bindingName,
     classPropertyName: binding.classPropertyName,
     required: binding.required,
-    transform: binding.transform
+    transform: binding.transform,
+    isSignal: binding.isSignal
   };
 }
 function resolveOutput(bindingName) {
@@ -2556,7 +2567,7 @@ function compileInputTransformFields(inputs) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 import { compileClassDebugInfo, compileClassMetadata as compileClassMetadata3, compileComponentClassMetadata, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
-import ts24 from "typescript";
+import ts25 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
 import ts10 from "typescript";
@@ -4358,7 +4369,61 @@ import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirect
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.mjs
 import { createMayBeForwardRefExpression, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr4, getSafePropertyAccessString, parseHostBindings, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
+import ts21 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/input_function.mjs
 import ts20 from "typescript";
+function tryParseInputInitializerAndOptions(member, reflector, coreModule) {
+  if (member.value === null || !ts20.isCallExpression(member.value)) {
+    return null;
+  }
+  const call = member.value;
+  let target = extractPropertyTarget(call.expression);
+  if (target === null) {
+    return null;
+  }
+  if (target.text === "input" || target.text === "\u0275input") {
+    if (!isReferenceToInputFunction(target, coreModule, reflector)) {
+      return null;
+    }
+    const optionsNode2 = call.arguments[1];
+    return { inputCall: call, optionsNode: optionsNode2, isRequired: false };
+  }
+  if (target.text !== "required" || !ts20.isPropertyAccessExpression(call.expression)) {
+    return null;
+  }
+  const inputCall = call.expression;
+  target = extractPropertyTarget(inputCall.expression);
+  if (target === null || !isReferenceToInputFunction(target, coreModule, reflector)) {
+    return null;
+  }
+  const optionsNode = call.arguments[0];
+  return {
+    inputCall: call,
+    optionsNode,
+    isRequired: true
+  };
+}
+function extractPropertyTarget(node) {
+  if (ts20.isPropertyAccessExpression(node) && ts20.isIdentifier(node.name)) {
+    return node.name;
+  } else if (ts20.isIdentifier(node)) {
+    return node;
+  }
+  return null;
+}
+function isReferenceToInputFunction(target, coreModule, reflector) {
+  const decl = reflector.getDeclarationOfIdentifier(target);
+  if (decl === null || !ts20.isVariableDeclaration(decl.node) || decl.node.name === void 0 || !ts20.isIdentifier(decl.node.name)) {
+    return false;
+  }
+  if (coreModule !== void 0 && decl.viaModule !== coreModule) {
+    return false;
+  }
+  return decl.node.name.text === "input" || decl.node.name.text === "\u0275input";
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.mjs
 var EMPTY_OBJECT = {};
 var QUERY_TYPES = /* @__PURE__ */ new Set([
   "ContentChild",
@@ -4374,7 +4439,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
     throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `Incorrect number of arguments to @${decorator.name} decorator`);
   } else {
     const meta = unwrapExpression(decorator.args[0]);
-    if (!ts20.isObjectLiteralExpression(meta)) {
+    if (!ts21.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, `@${decorator.name} argument must be an object literal`);
     }
     directive = reflectObjectLiteral(meta);
@@ -4386,7 +4451,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const decoratedElements = members.filter((member) => !member.isStatic && member.decorators !== null);
   const coreModule = isCore ? void 0 : "@angular/core";
   const inputsFromMeta = parseInputsArray(clazz, directive, evaluator, reflector, refEmitter);
-  const inputsFromFields = parseInputFields(clazz, filterToMembersWithDecorator(decoratedElements, "Input", coreModule), evaluator, reflector, refEmitter);
+  const inputsFromFields = parseInputFields(clazz, members, evaluator, reflector, refEmitter, coreModule);
   const inputs = ClassPropertyMapping.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
   const outputsFromMeta = parseOutputsArray(directive, evaluator);
   const outputsFromFields = parseOutputFields(filterToMembersWithDecorator(decoratedElements, "Output", coreModule), evaluator);
@@ -4512,7 +4577,7 @@ function extractQueryMetadata(exprNode, name, args, propertyName, reflector, eva
   let emitDistinctChangesOnly = emitDistinctChangesOnlyDefaultValue;
   if (args.length === 2) {
     const optionsExpr = unwrapExpression(args[1]);
-    if (!ts20.isObjectLiteralExpression(optionsExpr)) {
+    if (!ts21.isObjectLiteralExpression(optionsExpr)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, optionsExpr, `@${name} options must be an object literal`);
     }
     const options = reflectObjectLiteral(optionsExpr);
@@ -4607,16 +4672,16 @@ function extractHostBindings(members, evaluator, coreModule, metadata) {
 }
 function extractQueriesFromDecorator(queryData, reflector, evaluator, isCore) {
   const content = [], view = [];
-  if (!ts20.isObjectLiteralExpression(queryData)) {
+  if (!ts21.isObjectLiteralExpression(queryData)) {
     throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, queryData, "Decorator queries metadata must be an object literal");
   }
   reflectObjectLiteral(queryData).forEach((queryExpr, propertyName) => {
     queryExpr = unwrapExpression(queryExpr);
-    if (!ts20.isNewExpression(queryExpr)) {
+    if (!ts21.isNewExpression(queryExpr)) {
       throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, queryData, "Decorator query metadata must be an instance of a query type");
     }
-    const queryType = ts20.isPropertyAccessExpression(queryExpr.expression) ? queryExpr.expression.name : queryExpr.expression;
-    if (!ts20.isIdentifier(queryType)) {
+    const queryType = ts21.isPropertyAccessExpression(queryExpr.expression) ? queryExpr.expression.name : queryExpr.expression;
+    if (!ts21.isIdentifier(queryType)) {
       throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, queryData, "Decorator query metadata must be an instance of a query type");
     }
     const type = reflector.getImportOfIdentifier(queryType);
@@ -4645,7 +4710,7 @@ function parseDirectiveStyles(directive, evaluator, compilationMode) {
         const relatedInformation = traceDynamicValue(expression, entry);
         const chain = {
           messageText: `Unknown identifier used as styles string: ${entry.node.getText()} (did you import this string from another file? This is not allowed in local compilation mode. Please either inline it or move it to a separate file and include it using 'styleUrl')`,
-          category: ts20.DiagnosticCategory.Error,
+          category: ts21.DiagnosticCategory.Error,
           code: 0
         };
         throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_IMPORTED_STYLES_STRING, expression, chain, relatedInformation);
@@ -4741,7 +4806,8 @@ function parseInputsArray(clazz, decoratorMetadata, evaluator, reflector, refEmi
         bindingPropertyName,
         classPropertyName,
         required: false,
-        transform: null
+        transform: null,
+        isSignal: false
       };
     } else if (value instanceof Map) {
       const name = value.get("name");
@@ -4756,12 +4822,13 @@ function parseInputsArray(clazz, decoratorMetadata, evaluator, reflector, refEmi
         if (!(transformValue instanceof DynamicValue) && !(transformValue instanceof Reference)) {
           throw createValueHasWrongTypeError(inputsField, transformValue, `Transform of value at position ${i} of @Directive.inputs array must be a function`);
         }
-        transform = parseInputTransformFunction(clazz, name, transformValue, reflector, refEmitter);
+        transform = parseDecoratorInputTransformFunction(clazz, name, transformValue, reflector, refEmitter);
       }
       inputs[name] = {
         classPropertyName: name,
         bindingPropertyName: typeof alias === "string" ? alias : name,
         required: required === true,
+        isSignal: false,
         transform
       };
     } else {
@@ -4770,35 +4837,90 @@ function parseInputsArray(clazz, decoratorMetadata, evaluator, reflector, refEmi
   }
   return inputs;
 }
-function parseInputFields(clazz, inputMembers, evaluator, reflector, refEmitter) {
-  const inputs = {};
-  parseDecoratedFields(inputMembers, evaluator, (classPropertyName, options, decorator) => {
-    let bindingPropertyName;
-    let required = false;
-    let transform = null;
-    if (options === null) {
-      bindingPropertyName = classPropertyName;
-    } else if (typeof options === "string") {
-      bindingPropertyName = options;
-    } else if (options instanceof Map) {
-      const aliasInConfig = options.get("alias");
-      bindingPropertyName = typeof aliasInConfig === "string" ? aliasInConfig : classPropertyName;
-      required = options.get("required") === true;
-      if (options.has("transform")) {
-        const transformValue = options.get("transform");
-        if (!(transformValue instanceof DynamicValue) && !(transformValue instanceof Reference)) {
-          throw createValueHasWrongTypeError(decorator.node, transformValue, `Input transform must be a function`);
-        }
-        transform = parseInputTransformFunction(clazz, classPropertyName, transformValue, reflector, refEmitter);
-      }
-    } else {
+function tryGetDecoratorOnMember(member, decoratorName, coreModule) {
+  if (member.decorators === null) {
+    return null;
+  }
+  for (const decorator of member.decorators) {
+    if (decorator.import === null || decorator.import.name !== decoratorName) {
+      continue;
+    }
+    if (coreModule !== void 0 && decorator.import.from !== coreModule) {
+      continue;
+    }
+    return decorator;
+  }
+  return null;
+}
+function tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModule, refEmitter) {
+  const classPropertyName = member.name;
+  const decorator = tryGetDecoratorOnMember(member, "Input", coreModule);
+  if (decorator !== null) {
+    if (decorator.args !== null && decorator.args.length > 1) {
+      throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `@${decorator.name} can have at most one argument, got ${decorator.args.length} argument(s)`);
+    }
+    const optionsNode = decorator.args !== null && decorator.args.length === 1 ? decorator.args[0] : void 0;
+    const options = optionsNode !== void 0 ? evaluator.evaluate(optionsNode) : null;
+    const required = options instanceof Map ? options.get("required") === true : false;
+    if (options !== null && typeof options !== "string" && !(options instanceof Map)) {
       throw createValueHasWrongTypeError(decorator.node, options, `@${decorator.name} decorator argument must resolve to a string or an object literal`);
     }
-    inputs[classPropertyName] = { bindingPropertyName, classPropertyName, required, transform };
-  });
+    let alias = null;
+    if (typeof options === "string") {
+      alias = options;
+    } else if (options instanceof Map && typeof options.get("alias") === "string") {
+      alias = options.get("alias");
+    }
+    const publicInputName = alias != null ? alias : classPropertyName;
+    let transform = null;
+    if (options instanceof Map && options.has("transform")) {
+      const transformValue = options.get("transform");
+      if (!(transformValue instanceof DynamicValue) && !(transformValue instanceof Reference)) {
+        throw createValueHasWrongTypeError(optionsNode, transformValue, `Input transform must be a function`);
+      }
+      transform = parseDecoratorInputTransformFunction(clazz, classPropertyName, transformValue, reflector, refEmitter);
+    }
+    return {
+      isSignal: false,
+      classPropertyName,
+      bindingPropertyName: publicInputName,
+      transform,
+      required
+    };
+  }
+  const signalInput = tryParseInputInitializerAndOptions(member, reflector, coreModule);
+  if (signalInput !== null) {
+    const optionsNode = signalInput.optionsNode;
+    const options = optionsNode !== void 0 ? evaluator.evaluate(optionsNode) : null;
+    let bindingPropertyName = classPropertyName;
+    if (options instanceof Map && typeof options.get("alias") === "string") {
+      bindingPropertyName = options.get("alias");
+    }
+    return {
+      isSignal: true,
+      classPropertyName,
+      bindingPropertyName,
+      required: signalInput.isRequired,
+      transform: null
+    };
+  }
+  return null;
+}
+function parseInputFields(clazz, members, evaluator, reflector, refEmitter, coreModule) {
+  const inputs = {};
+  for (const member of members) {
+    if (member.isStatic) {
+      continue;
+    }
+    const classPropertyName = member.name;
+    const inputMapping = tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModule, refEmitter);
+    if (inputMapping !== null) {
+      inputs[classPropertyName] = inputMapping;
+    }
+  }
   return inputs;
 }
-function parseInputTransformFunction(clazz, classPropertyName, value, reflector, refEmitter) {
+function parseDecoratorInputTransformFunction(clazz, classPropertyName, value, reflector, refEmitter) {
   var _a;
   const definition = reflector.getDefinitionOfFunction(value.node);
   if (definition === null) {
@@ -4825,7 +4947,7 @@ function parseInputTransformFunction(clazz, classPropertyName, value, reflector,
   if (!firstParam) {
     return {
       node,
-      type: new Reference(ts20.factory.createKeywordTypeNode(ts20.SyntaxKind.UnknownKeyword))
+      type: new Reference(ts21.factory.createKeywordTypeNode(ts21.SyntaxKind.UnknownKeyword))
     };
   }
   if (!firstParam.type) {
@@ -4840,7 +4962,7 @@ function parseInputTransformFunction(clazz, classPropertyName, value, reflector,
 }
 function assertEmittableInputType(type, contextFile, reflector, refEmitter) {
   (function walk(node) {
-    if (ts20.isTypeReferenceNode(node) && ts20.isIdentifier(node.typeName)) {
+    if (ts21.isTypeReferenceNode(node) && ts21.isIdentifier(node.typeName)) {
       const declaration = reflector.getDeclarationOfIdentifier(node.typeName);
       if (declaration !== null) {
         if (declaration.node.getSourceFile() !== contextFile) {
@@ -4945,7 +5067,8 @@ function toR3InputMetadata(mapping) {
     classPropertyName: mapping.classPropertyName,
     bindingPropertyName: mapping.bindingPropertyName,
     required: mapping.required,
-    transformFunction: mapping.transform !== null ? new WrappedNodeExpr5(mapping.transform.node) : null
+    transformFunction: mapping.transform !== null ? new WrappedNodeExpr5(mapping.transform.node) : null,
+    isSignal: mapping.isSignal
   };
 }
 
@@ -4993,7 +5116,7 @@ function isInputMappingEqual(current, previous) {
   return isInputOrOutputEqual(current, previous) && current.required === previous.required;
 }
 function isInputOrOutputEqual(current, previous) {
-  return current.classPropertyName === previous.classPropertyName && current.bindingPropertyName === previous.bindingPropertyName;
+  return current.classPropertyName === previous.classPropertyName && current.bindingPropertyName === previous.bindingPropertyName && current.isSignal === previous.isSignal;
 }
 function isTypeCheckMetaEqual(current, previous) {
   if (current.hasNgTemplateContextGuard !== previous.hasNgTemplateContextGuard) {
@@ -5205,16 +5328,16 @@ var DirectiveDecoratorHandler = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.mjs
 import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget2, FunctionExpr, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, R3Identifiers, R3NgModuleMetadataKind, R3SelectorScopeMode, ReturnStatement, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
-import ts22 from "typescript";
+import ts23 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/module_with_providers.mjs
-import ts21 from "typescript";
+import ts22 from "typescript";
 function createModuleWithProvidersResolver(reflector, isCore) {
   function _reflectModuleFromTypeParam(type, node) {
-    if (!ts21.isTypeReferenceNode(type)) {
+    if (!ts22.isTypeReferenceNode(type)) {
       return null;
     }
-    const typeName = type && (ts21.isIdentifier(type.typeName) && type.typeName || ts21.isQualifiedName(type.typeName) && type.typeName.right) || null;
+    const typeName = type && (ts22.isIdentifier(type.typeName) && type.typeName || ts22.isQualifiedName(type.typeName) && type.typeName.right) || null;
     if (typeName === null) {
       return null;
     }
@@ -5226,7 +5349,7 @@ function createModuleWithProvidersResolver(reflector, isCore) {
       return null;
     }
     if (type.typeArguments === void 0 || type.typeArguments.length !== 1) {
-      const parent = ts21.isMethodDeclaration(node) && ts21.isClassDeclaration(node.parent) ? node.parent : null;
+      const parent = ts22.isMethodDeclaration(node) && ts22.isClassDeclaration(node.parent) ? node.parent : null;
       const symbolName = (parent && parent.name ? parent.name.getText() + "." : "") + (node.name ? node.name.getText() : "anonymous");
       throw new FatalDiagnosticError(ErrorCode.NGMODULE_MODULE_WITH_PROVIDERS_MISSING_GENERIC, type, `${symbolName} returns a ModuleWithProviders type without a generic type argument. Please add a generic type argument to the ModuleWithProviders type. If this occurrence is in library code you don't control, please contact the library authors.`);
     }
@@ -5234,13 +5357,13 @@ function createModuleWithProvidersResolver(reflector, isCore) {
     return typeNodeToValueExpr(arg);
   }
   function _reflectModuleFromLiteralType(type) {
-    if (!ts21.isIntersectionTypeNode(type)) {
+    if (!ts22.isIntersectionTypeNode(type)) {
       return null;
     }
     for (const t of type.types) {
-      if (ts21.isTypeLiteralNode(t)) {
+      if (ts22.isTypeLiteralNode(t)) {
         for (const m of t.members) {
-          const ngModuleType = ts21.isPropertySignature(m) && ts21.isIdentifier(m.name) && m.name.text === "ngModule" && m.type || null;
+          const ngModuleType = ts22.isPropertySignature(m) && ts22.isIdentifier(m.name) && m.name.text === "ngModule" && m.type || null;
           const ngModuleExpression = ngModuleType && typeNodeToValueExpr(ngModuleType);
           if (ngModuleExpression) {
             return ngModuleExpression;
@@ -5384,8 +5507,8 @@ var NgModuleDecoratorHandler = class {
     if (decorator.args === null || decorator.args.length > 1) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `Incorrect number of arguments to @NgModule decorator`);
     }
-    const meta = decorator.args.length === 1 ? unwrapExpression(decorator.args[0]) : ts22.factory.createObjectLiteralExpression([]);
-    if (!ts22.isObjectLiteralExpression(meta)) {
+    const meta = decorator.args.length === 1 ? unwrapExpression(decorator.args[0]) : ts23.factory.createObjectLiteralExpression([]);
+    if (!ts23.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@NgModule argument must be an object literal");
     }
     const ngModule = reflectObjectLiteral(meta);
@@ -5445,7 +5568,7 @@ var NgModuleDecoratorHandler = class {
         id = new WrappedNodeExpr7(idExpr);
       } else {
         const diag = makeDiagnostic(ErrorCode.WARN_NGMODULE_ID_UNNECESSARY, idExpr, `Using 'module.id' for NgModule.id is a common anti-pattern that is ignored by the Angular compiler.`);
-        diag.category = ts22.DiagnosticCategory.Warning;
+        diag.category = ts23.DiagnosticCategory.Warning;
         diagnostics.push(diag);
       }
     }
@@ -5497,16 +5620,16 @@ var NgModuleDecoratorHandler = class {
     }
     const rawProviders = ngModule.has("providers") ? ngModule.get("providers") : null;
     let wrappedProviders = null;
-    if (rawProviders !== null && (!ts22.isArrayLiteralExpression(rawProviders) || rawProviders.elements.length > 0)) {
+    if (rawProviders !== null && (!ts23.isArrayLiteralExpression(rawProviders) || rawProviders.elements.length > 0)) {
       wrappedProviders = new WrappedNodeExpr7(this.annotateForClosureCompiler ? wrapFunctionExpressionsInParens(rawProviders) : rawProviders);
     }
     const topLevelImports = [];
     if (this.compilationMode !== CompilationMode.LOCAL && ngModule.has("imports")) {
       const rawImports2 = unwrapExpression(ngModule.get("imports"));
       let topLevelExpressions = [];
-      if (ts22.isArrayLiteralExpression(rawImports2)) {
+      if (ts23.isArrayLiteralExpression(rawImports2)) {
         for (const element of rawImports2.elements) {
-          if (ts22.isSpreadElement(element)) {
+          if (ts23.isSpreadElement(element)) {
             topLevelExpressions.push(element.expression);
             continue;
           }
@@ -5538,7 +5661,7 @@ var NgModuleDecoratorHandler = class {
         if (exp === null) {
           continue;
         }
-        if (ts22.isArrayLiteralExpression(exp)) {
+        if (ts23.isArrayLiteralExpression(exp)) {
           if (exp.elements) {
             injectorMetadata.imports.push(...exp.elements.map((n) => new WrappedNodeExpr7(n)));
           }
@@ -5831,7 +5954,7 @@ function isNgModule(node, compilation) {
   return !compilation.dependencies.some((dep) => dep.ref.node === node);
 }
 function isModuleIdExpression(expr) {
-  return ts22.isPropertyAccessExpression(expr) && ts22.isIdentifier(expr.expression) && expr.expression.text === "module" && expr.name.text === "id";
+  return ts23.isPropertyAccessExpression(expr) && ts23.isIdentifier(expr.expression) && expr.expression.text === "module" && expr.name.text === "id";
 }
 function makeStandaloneBootstrapDiagnostic(ngModuleClass, bootstrappedClassRef, rawBootstrapExpr) {
   const componentClassName = bootstrappedClassRef.node.name.text;
@@ -5868,7 +5991,7 @@ function checkCustomElementSelectorForErrors(selector) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/resources.mjs
 import { DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, ParseSourceFile as ParseSourceFile2, parseTemplate } from "@angular/compiler";
-import ts23 from "typescript";
+import ts24 from "typescript";
 function getTemplateDeclarationNodeForError(declaration) {
   return declaration.isInline ? declaration.expression : declaration.templateUrlExpression;
 }
@@ -5880,7 +6003,7 @@ function extractTemplate(node, template, evaluator, depTracker, resourceLoader, 
     let sourceMapping;
     let escapedString = false;
     let sourceMapUrl;
-    if (ts23.isStringLiteral(template.expression) || ts23.isNoSubstitutionTemplateLiteral(template.expression)) {
+    if (ts24.isStringLiteral(template.expression) || ts24.isNoSubstitutionTemplateLiteral(template.expression)) {
       sourceParseRange = getTemplateRange(template.expression);
       sourceStr = template.expression.getSourceFile().text;
       templateContent = template.expression.text;
@@ -5896,7 +6019,7 @@ function extractTemplate(node, template, evaluator, depTracker, resourceLoader, 
         const relatedInformation = traceDynamicValue(template.expression, resolvedTemplate);
         const chain = {
           messageText: `Unknown identifier used as template string: ${template.expression.getText()} (did you import this string from another file? This is not allowed in local compilation mode. Please either inline it or move it to a separate file and include it using 'templateUrl')`,
-          category: ts23.DiagnosticCategory.Error,
+          category: ts24.DiagnosticCategory.Error,
           code: 0
         };
         throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_IMPORTED_TEMPLATE_STRING, template.expression, chain, relatedInformation);
@@ -6065,7 +6188,7 @@ function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanaly
 }
 function getTemplateRange(templateExpr) {
   const startPos = templateExpr.getStart() + 1;
-  const { line, character } = ts23.getLineAndCharacterOfPosition(templateExpr.getSourceFile(), startPos);
+  const { line, character } = ts24.getLineAndCharacterOfPosition(templateExpr.getSourceFile(), startPos);
   return {
     startPos,
     startLine: line,
@@ -6098,7 +6221,7 @@ function transformDecoratorResources(dec, component, styles, template) {
   const metadata = new Map(component);
   if (metadata.has("templateUrl")) {
     metadata.delete("templateUrl");
-    metadata.set("template", ts23.factory.createStringLiteral(template.content));
+    metadata.set("template", ts24.factory.createStringLiteral(template.content));
   }
   if (metadata.has("styleUrls") || metadata.has("styleUrl") || metadata.has("styles")) {
     metadata.delete("styles");
@@ -6107,20 +6230,20 @@ function transformDecoratorResources(dec, component, styles, template) {
     if (styles.length > 0) {
       const styleNodes = styles.reduce((result, style) => {
         if (style.trim().length > 0) {
-          result.push(ts23.factory.createStringLiteral(style));
+          result.push(ts24.factory.createStringLiteral(style));
         }
         return result;
       }, []);
       if (styleNodes.length > 0) {
-        metadata.set("styles", ts23.factory.createArrayLiteralExpression(styleNodes));
+        metadata.set("styles", ts24.factory.createArrayLiteralExpression(styleNodes));
       }
     }
   }
   const newMetadataFields = [];
   for (const [name, value] of metadata.entries()) {
-    newMetadataFields.push(ts23.factory.createPropertyAssignment(name, value));
+    newMetadataFields.push(ts24.factory.createPropertyAssignment(name, value));
   }
-  return { ...dec, args: [ts23.factory.createObjectLiteralExpression(newMetadataFields)] };
+  return { ...dec, args: [ts24.factory.createObjectLiteralExpression(newMetadataFields)] };
 }
 function extractComponentStyleUrls(evaluator, component) {
   const styleUrlsExpr = component.get("styleUrls");
@@ -6146,9 +6269,9 @@ function extractComponentStyleUrls(evaluator, component) {
 }
 function extractStyleUrlsFromExpression(evaluator, styleUrlsExpr) {
   const styleUrls = [];
-  if (ts23.isArrayLiteralExpression(styleUrlsExpr)) {
+  if (ts24.isArrayLiteralExpression(styleUrlsExpr)) {
     for (const styleUrlExpr of styleUrlsExpr.elements) {
-      if (ts23.isSpreadElement(styleUrlExpr)) {
+      if (ts24.isSpreadElement(styleUrlExpr)) {
         styleUrls.push(...extractStyleUrlsFromExpression(evaluator, styleUrlExpr.expression));
       } else {
         const styleUrl = evaluator.evaluate(styleUrlExpr);
@@ -6180,18 +6303,18 @@ function extractStyleUrlsFromExpression(evaluator, styleUrlsExpr) {
 function extractStyleResources(resourceLoader, component, containingFile) {
   const styles = /* @__PURE__ */ new Set();
   function stringLiteralElements(array) {
-    return array.elements.filter((e) => ts23.isStringLiteralLike(e));
+    return array.elements.filter((e) => ts24.isStringLiteralLike(e));
   }
   const styleUrlExpr = component.get("styleUrl");
   const styleUrlsExpr = component.get("styleUrls");
-  if (styleUrlsExpr !== void 0 && ts23.isArrayLiteralExpression(styleUrlsExpr)) {
+  if (styleUrlsExpr !== void 0 && ts24.isArrayLiteralExpression(styleUrlsExpr)) {
     for (const expression of stringLiteralElements(styleUrlsExpr)) {
       const resource = stringLiteralUrlToResource(resourceLoader, expression, containingFile);
       if (resource !== null) {
         styles.add(resource);
       }
     }
-  } else if (styleUrlExpr !== void 0 && ts23.isStringLiteralLike(styleUrlExpr)) {
+  } else if (styleUrlExpr !== void 0 && ts24.isStringLiteralLike(styleUrlExpr)) {
     const resource = stringLiteralUrlToResource(resourceLoader, styleUrlExpr, containingFile);
     if (resource !== null) {
       styles.add(resource);
@@ -6199,11 +6322,11 @@ function extractStyleResources(resourceLoader, component, containingFile) {
   }
   const stylesExpr = component.get("styles");
   if (stylesExpr !== void 0) {
-    if (ts23.isArrayLiteralExpression(stylesExpr)) {
+    if (ts24.isArrayLiteralExpression(stylesExpr)) {
       for (const expression of stringLiteralElements(stylesExpr)) {
         styles.add({ path: null, expression });
       }
-    } else if (ts23.isStringLiteralLike(stylesExpr)) {
+    } else if (ts24.isStringLiteralLike(stylesExpr)) {
       styles.add({ path: null, expression: stylesExpr });
     }
   }
@@ -6722,7 +6845,7 @@ var ComponentDecoratorHandler = class {
   }
   typeCheck(ctx, node, meta) {
     var _a;
-    if (this.typeCheckScopeRegistry === null || !ts24.isClassDeclaration(node)) {
+    if (this.typeCheckScopeRegistry === null || !ts25.isClassDeclaration(node)) {
       return;
     }
     if (meta.isPoisoned && !this.usePoisonedData) {
@@ -7077,10 +7200,10 @@ var ComponentDecoratorHandler = class {
       this.resolveDeferTriggers(deferBlock, deferBlock.prefetchTriggers, componentBoundTarget, triggerElements);
       resolutionData.deferBlocks.set(deferBlock, { deps, triggerElements });
     }
-    if (analysisData.meta.isStandalone && analysisData.rawImports !== null && ts24.isArrayLiteralExpression(analysisData.rawImports)) {
+    if (analysisData.meta.isStandalone && analysisData.rawImports !== null && ts25.isArrayLiteralExpression(analysisData.rawImports)) {
       for (const element of analysisData.rawImports.elements) {
         const node = tryUnwrapForwardRef(element, this.reflector) || element;
-        if (!ts24.isIdentifier(node)) {
+        if (!ts25.isIdentifier(node)) {
           continue;
         }
         const imp = this.reflector.getImportOfIdentifier(node);
@@ -7151,7 +7274,7 @@ function validateStandaloneImports(importRefs, importExpr, metaReader, scopeRead
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
-import ts25 from "typescript";
+import ts26 from "typescript";
 var InjectableDecoratorHandler = class {
   constructor(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, perf, includeClassMetadata, compilationMode, errorOnDuplicateProv = true) {
     this.reflector = reflector;
@@ -7265,7 +7388,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     };
   } else if (decorator.args.length === 1) {
     const metaNode = decorator.args[0];
-    if (!ts25.isObjectLiteralExpression(metaNode)) {
+    if (!ts26.isObjectLiteralExpression(metaNode)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, `@Injectable argument must be an object literal`);
     }
     const meta = reflectObjectLiteral(metaNode);
@@ -7273,7 +7396,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     let deps = void 0;
     if ((meta.has("useClass") || meta.has("useFactory")) && meta.has("deps")) {
       const depsExpr = meta.get("deps");
-      if (!ts25.isArrayLiteralExpression(depsExpr)) {
+      if (!ts26.isArrayLiteralExpression(depsExpr)) {
         throw new FatalDiagnosticError(ErrorCode.VALUE_NOT_LITERAL, depsExpr, `@Injectable deps metadata must be an inline array`);
       }
       deps = depsExpr.elements.map((dep) => getDep(dep, reflector));
@@ -7358,12 +7481,12 @@ function getDep(dep, reflector) {
     }
     return true;
   }
-  if (ts25.isArrayLiteralExpression(dep)) {
+  if (ts26.isArrayLiteralExpression(dep)) {
     dep.elements.forEach((el) => {
       let isDecorator = false;
-      if (ts25.isIdentifier(el)) {
+      if (ts26.isIdentifier(el)) {
         isDecorator = maybeUpdateDecorator(el, reflector);
-      } else if (ts25.isNewExpression(el) && ts25.isIdentifier(el.expression)) {
+      } else if (ts26.isNewExpression(el) && ts26.isIdentifier(el.expression)) {
         const token = el.arguments && el.arguments.length > 0 && el.arguments[0] || void 0;
         isDecorator = maybeUpdateDecorator(el.expression, reflector, token);
       }
@@ -7377,7 +7500,7 @@ function getDep(dep, reflector) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/pipe.mjs
 import { compileClassMetadata as compileClassMetadata5, compileDeclareClassMetadata as compileDeclareClassMetadata5, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5 } from "@angular/compiler";
-import ts26 from "typescript";
+import ts27 from "typescript";
 var PipeSymbol = class extends SemanticSymbol {
   constructor(decl, name) {
     super(decl);
@@ -7434,7 +7557,7 @@ var PipeDecoratorHandler = class {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, "@Pipe must have exactly one argument");
     }
     const meta = unwrapExpression(decorator.args[0]);
-    if (!ts26.isObjectLiteralExpression(meta)) {
+    if (!ts27.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
     }
     const pipe = reflectObjectLiteral(meta);
@@ -7621,4 +7744,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2ASRA6WC.js.map
+//# sourceMappingURL=chunk-2JUXNWO4.js.map

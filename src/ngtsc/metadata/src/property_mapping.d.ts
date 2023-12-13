@@ -32,6 +32,8 @@ export interface InputOrOutput {
      * The property name used to bind this input or output in an Angular template.
      */
     readonly bindingPropertyName: BindingPropertyName;
+    /** Whether the input or output is signal based. */
+    readonly isSignal: boolean;
 }
 /**
  * A mapping of component property and template binding property names, for example containing the
@@ -64,7 +66,7 @@ export declare class ClassPropertyMapping<T extends InputOrOutput = InputOrOutpu
      * metadata formats (e.g. in .d.ts files).
      */
     static fromMappedObject<T extends InputOrOutput>(obj: {
-        [classPropertyName: string]: BindingPropertyName | [ClassPropertyName, BindingPropertyName] | T;
+        [classPropertyName: string]: BindingPropertyName | T;
     }): ClassPropertyMapping<T>;
     /**
      * Merge two mappings into one, with class properties from `b` taking precedence over class

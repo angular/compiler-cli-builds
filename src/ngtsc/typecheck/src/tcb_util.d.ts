@@ -10,14 +10,7 @@ import ts from 'typescript';
 import { ClassDeclaration, ReflectionHost } from '../../../../src/ngtsc/reflection';
 import { Reference } from '../../imports';
 import { FullTemplateMapping, SourceLocation, TemplateId, TemplateSourceMapping } from '../api';
-/**
- * Represents the origin environment from where reference will be emitted. This interface exists
- * as an indirection for the `Environment` type, which would otherwise introduce a (type-only)
- * import cycle.
- */
-export interface ReferenceEmitEnvironment {
-    canReferenceType(ref: Reference): boolean;
-}
+import { ReferenceEmitEnvironment } from './reference_emit_environment';
 /**
  * Adapter interface which allows the template type-checking diagnostics code to interpret offsets
  * in a TCB and map them back to original locations in the template.
@@ -68,4 +61,10 @@ export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId, 
  * returns null.
  */
 export declare function findSourceLocation(node: ts.Node, sourceFile: ts.SourceFile, isDiagnosticsRequest: boolean): SourceLocation | null;
+/**
+ * Ensure imports for certain external modules that should always
+ * exist are generated. These are ensures to exist to avoid frequent
+ * import graph changes whenever e.g. a signal input is introduced in user code.
+ */
+export declare function ensureTypeCheckFilePreparationImports(env: ReferenceEmitEnvironment): void;
 export declare function checkIfGenericTypeBoundsCanBeEmitted(node: ClassDeclaration<ts.ClassDeclaration>, reflector: ReflectionHost, env: ReferenceEmitEnvironment): boolean;

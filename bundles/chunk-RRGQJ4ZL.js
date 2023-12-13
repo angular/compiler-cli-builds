@@ -267,7 +267,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "17.1.0-next.3+sha-629343f";
+var PLACEHOLDER_VERSION = "17.1.0-next.3+sha-4866fce";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -361,7 +361,8 @@ function toInputMapping(value, key) {
       bindingPropertyName: value.getString(),
       classPropertyName: key,
       required: false,
-      transformFunction: null
+      transformFunction: null,
+      isSignal: false
     };
   }
   const values = value.getArray();
@@ -372,7 +373,8 @@ function toInputMapping(value, key) {
     bindingPropertyName: values[0].getString(),
     classPropertyName: values[1].getString(),
     transformFunction: values.length > 2 ? values[2].getOpaque() : null,
-    required: false
+    required: false,
+    isSignal: false
   };
 }
 function toHostMetadata(metaObj) {
@@ -1056,4 +1058,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-A5EOT7SE.js.map
+//# sourceMappingURL=chunk-RRGQJ4ZL.js.map

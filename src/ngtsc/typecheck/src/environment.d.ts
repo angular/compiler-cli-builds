@@ -5,13 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { TransplantedType, Type } from '@angular/compiler';
 import ts from 'typescript';
-import { ImportFlags, Reference, ReferenceEmitter } from '../../imports';
+import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
 import { TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
-import { ReferenceEmitEnvironment } from './tcb_util';
+import { ReferenceEmitEnvironment } from './reference_emit_environment';
 /**
  * A context which hosts one or more Type Check Blocks (TCBs).
  *
@@ -23,12 +22,8 @@ import { ReferenceEmitEnvironment } from './tcb_util';
  * `Environment` can be used in a standalone fashion, or can be extended to support more specialized
  * usage.
  */
-export declare class Environment implements ReferenceEmitEnvironment {
+export declare class Environment extends ReferenceEmitEnvironment {
     readonly config: TypeCheckingConfig;
-    protected importManager: ImportManager;
-    private refEmitter;
-    readonly reflector: ReflectionHost;
-    protected contextFile: ts.SourceFile;
     private nextIds;
     private typeCtors;
     protected typeCtorStatements: ts.Statement[];
@@ -49,26 +44,6 @@ export declare class Environment implements ReferenceEmitEnvironment {
      * This may involve importing the node into the file if it's not declared there already.
      */
     reference(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): ts.Expression;
-    canReferenceType(ref: Reference, flags?: ImportFlags): boolean;
-    /**
-     * Generate a `ts.TypeNode` that references the given node as a type.
-     *
-     * This may involve importing the node into the file if it's not declared there already.
-     */
-    referenceType(ref: Reference, flags?: ImportFlags): ts.TypeNode;
     private emitTypeParameters;
-    /**
-     * Generate a `ts.TypeNode` that references a given type from the provided module.
-     *
-     * This will involve importing the type into the file, and will also add type parameters if
-     * provided.
-     */
-    referenceExternalType(moduleName: string, name: string, typeParams?: Type[]): ts.TypeNode;
-    /**
-     * Generates a `ts.TypeNode` representing a type that is being referenced from a different place
-     * in the program. Any type references inside the transplanted type will be rewritten so that
-     * they can be imported in the context file.
-     */
-    referenceTransplantedType(type: TransplantedType<Reference<ts.TypeNode>>): ts.TypeNode;
     getPreludeStatements(): ts.Statement[];
 }

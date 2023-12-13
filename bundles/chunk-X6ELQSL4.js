@@ -36,7 +36,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-2ASRA6WC.js";
+} from "./chunk-2JUXNWO4.js";
 import {
   ImportManager,
   TypeEmitter,
@@ -2486,7 +2486,7 @@ var StandaloneComponentScopeReader = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
-import { CssSelector as CssSelector2, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr2, WrappedNodeExpr } from "@angular/compiler";
+import { CssSelector as CssSelector2, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr2, WrappedNodeExpr as WrappedNodeExpr2 } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.mjs
 import ts15 from "typescript";
@@ -2960,8 +2960,38 @@ var RegistryDomSchemaChecker = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/environment.mjs
-import { ExpressionType, ExternalExpr, TypeModifier } from "@angular/compiler";
 import ts23 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/reference_emit_environment.mjs
+import { ExpressionType, ExternalExpr, TypeModifier } from "@angular/compiler";
+var ReferenceEmitEnvironment = class {
+  constructor(importManager, refEmitter, reflector, contextFile) {
+    this.importManager = importManager;
+    this.refEmitter = refEmitter;
+    this.reflector = reflector;
+    this.contextFile = contextFile;
+  }
+  canReferenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
+    const result = this.refEmitter.emit(ref, this.contextFile, flags);
+    return result.kind === 0;
+  }
+  referenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
+    const ngExpr = this.refEmitter.emit(ref, this.contextFile, flags);
+    assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "symbol");
+    return translateType(new ExpressionType(ngExpr.expression), this.contextFile, this.reflector, this.refEmitter, this.importManager);
+  }
+  referenceExternalSymbol(moduleName, name) {
+    const external = new ExternalExpr({ moduleName, name });
+    return translateExpression(external, this.importManager);
+  }
+  referenceExternalType(moduleName, name, typeParams) {
+    const external = new ExternalExpr({ moduleName, name });
+    return translateType(new ExpressionType(external, TypeModifier.None, typeParams), this.contextFile, this.reflector, this.refEmitter, this.importManager);
+  }
+  referenceTransplantedType(type) {
+    return translateType(type, this.contextFile, this.reflector, this.refEmitter, this.importManager);
+  }
+};
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.mjs
 import ts19 from "typescript";
@@ -3049,9 +3079,11 @@ function tsNumericExpression(value) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.mjs
+import { ExpressionType as ExpressionType2, R3Identifiers as R3Identifiers2, WrappedNodeExpr } from "@angular/compiler";
 import ts22 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.mjs
+import { R3Identifiers } from "@angular/compiler";
 import ts21 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_parameter_emitter.mjs
@@ -3133,6 +3165,9 @@ var TypeParameterEmitter = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.mjs
+var TCB_FILE_IMPORT_GRAPH_PREPARE_MODULES = [
+  R3Identifiers.InputSignalBrandWriteType.moduleName
+];
 var TcbInliningRequirement;
 (function(TcbInliningRequirement2) {
   TcbInliningRequirement2[TcbInliningRequirement2["MustInline"] = 0] = "MustInline";
@@ -3207,16 +3242,21 @@ function getTemplateId2(node, sourceFile, isDiagnosticRequest) {
     return commentText;
   }) || null;
 }
+function ensureTypeCheckFilePreparationImports(env) {
+  for (const moduleName of TCB_FILE_IMPORT_GRAPH_PREPARE_MODULES) {
+    env.importManager.generateNamespaceImport(moduleName);
+  }
+}
 function checkIfGenericTypeBoundsCanBeEmitted(node, reflector, env) {
   const emitter = new TypeParameterEmitter(node.typeParameters, reflector);
   return emitter.canEmit((ref) => env.canReferenceType(ref));
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.mjs
-function generateTypeCtorDeclarationFn(node, meta, nodeTypeRef, typeParams) {
+function generateTypeCtorDeclarationFn(env, meta, nodeTypeRef, typeParams) {
   const rawTypeArgs = typeParams !== void 0 ? generateGenericArgs(typeParams) : void 0;
   const rawType = ts22.factory.createTypeReferenceNode(nodeTypeRef, rawTypeArgs);
-  const initParam = constructTypeCtorParameter(node, meta, rawType);
+  const initParam = constructTypeCtorParameter(env, meta, rawType);
   const typeParameters = typeParametersWithDefaultTypes(typeParams);
   if (meta.body) {
     const fnType = ts22.factory.createFunctionTypeNode(
@@ -3247,10 +3287,10 @@ function generateTypeCtorDeclarationFn(node, meta, nodeTypeRef, typeParams) {
     );
   }
 }
-function generateInlineTypeCtor(node, meta) {
+function generateInlineTypeCtor(env, node, meta) {
   const rawTypeArgs = node.typeParameters !== void 0 ? generateGenericArgs(node.typeParameters) : void 0;
   const rawType = ts22.factory.createTypeReferenceNode(node.name, rawTypeArgs);
-  const initParam = constructTypeCtorParameter(node, meta, rawType);
+  const initParam = constructTypeCtorParameter(env, meta, rawType);
   let body = void 0;
   if (meta.body) {
     body = ts22.factory.createBlock([
@@ -3268,19 +3308,23 @@ function generateInlineTypeCtor(node, meta) {
     body
   );
 }
-function constructTypeCtorParameter(node, meta, rawType) {
+function constructTypeCtorParameter(env, meta, rawType) {
   let initType = null;
   const plainKeys = [];
   const coercedKeys = [];
-  for (const { classPropertyName, transform } of meta.fields.inputs) {
-    if (!meta.coercedInputFields.has(classPropertyName)) {
+  const signalInputKeys = [];
+  for (const { classPropertyName, transform, isSignal } of meta.fields.inputs) {
+    if (isSignal) {
+      signalInputKeys.push(ts22.factory.createLiteralTypeNode(ts22.factory.createStringLiteral(classPropertyName)));
+    } else if (!meta.coercedInputFields.has(classPropertyName)) {
       plainKeys.push(ts22.factory.createLiteralTypeNode(ts22.factory.createStringLiteral(classPropertyName)));
     } else {
+      const coercionType = transform != null ? transform.type.node : tsCreateTypeQueryForCoercedInput(rawType.typeName, classPropertyName);
       coercedKeys.push(ts22.factory.createPropertySignature(
         void 0,
         classPropertyName,
         void 0,
-        transform == null ? tsCreateTypeQueryForCoercedInput(rawType.typeName, classPropertyName) : transform.type.node
+        coercionType
       ));
     }
   }
@@ -3291,6 +3335,14 @@ function constructTypeCtorParameter(node, meta, rawType) {
   if (coercedKeys.length > 0) {
     const coercedLiteral = ts22.factory.createTypeLiteralNode(coercedKeys);
     initType = initType !== null ? ts22.factory.createIntersectionTypeNode([initType, coercedLiteral]) : coercedLiteral;
+  }
+  if (signalInputKeys.length > 0) {
+    const keyTypeUnion = ts22.factory.createUnionTypeNode(signalInputKeys);
+    const unwrapDirectiveSignalInputsExpr = env.referenceExternalType(R3Identifiers2.UnwrapDirectiveSignalInputs.moduleName, R3Identifiers2.UnwrapDirectiveSignalInputs.name, [
+      new ExpressionType2(new WrappedNodeExpr(rawType)),
+      new ExpressionType2(new WrappedNodeExpr(keyTypeUnion))
+    ]);
+    initType = initType !== null ? ts22.factory.createIntersectionTypeNode([initType, unwrapDirectiveSignalInputsExpr]) : unwrapDirectiveSignalInputsExpr;
   }
   if (initType === null) {
     initType = ts22.factory.createTypeLiteralNode([]);
@@ -3324,13 +3376,10 @@ function typeParametersWithDefaultTypes(params) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/environment.mjs
-var Environment = class {
+var Environment = class extends ReferenceEmitEnvironment {
   constructor(config, importManager, refEmitter, reflector, contextFile) {
+    super(importManager, refEmitter, reflector, contextFile);
     this.config = config;
-    this.importManager = importManager;
-    this.refEmitter = refEmitter;
-    this.reflector = reflector;
-    this.contextFile = contextFile;
     this.nextIds = {
       pipeInst: 1,
       typeCtor: 1
@@ -3367,7 +3416,7 @@ var Environment = class {
         coercedInputFields: dir.coercedInputFields
       };
       const typeParams = this.emitTypeParameters(node);
-      const typeCtor = generateTypeCtorDeclarationFn(node, meta, nodeTypeRef.typeName, typeParams);
+      const typeCtor = generateTypeCtorDeclarationFn(this, meta, nodeTypeRef.typeName, typeParams);
       this.typeCtorStatements.push(typeCtor);
       const fnId = ts23.factory.createIdentifier(fnName);
       this.typeCtors.set(node, fnId);
@@ -3389,25 +3438,9 @@ var Environment = class {
     assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "class");
     return translateExpression(ngExpr.expression, this.importManager);
   }
-  canReferenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
-    const result = this.refEmitter.emit(ref, this.contextFile, flags);
-    return result.kind === 0;
-  }
-  referenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
-    const ngExpr = this.refEmitter.emit(ref, this.contextFile, flags);
-    assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "symbol");
-    return translateType(new ExpressionType(ngExpr.expression), this.contextFile, this.reflector, this.refEmitter, this.importManager);
-  }
   emitTypeParameters(declaration) {
     const emitter = new TypeParameterEmitter(declaration.typeParameters, this.reflector);
     return emitter.emit((ref) => this.referenceType(ref));
-  }
-  referenceExternalType(moduleName, name, typeParams) {
-    const external = new ExternalExpr({ moduleName, name });
-    return translateType(new ExpressionType(external, TypeModifier.None, typeParams), this.contextFile, this.reflector, this.refEmitter, this.importManager);
-  }
-  referenceTransplantedType(type) {
-    return translateType(type, this.contextFile, this.reflector, this.refEmitter, this.importManager);
   }
   getPreludeStatements() {
     return [
@@ -3607,7 +3640,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
-import { BindingPipe, Call as Call2, createCssSelectorFromNode, CssSelector, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, SafeCall, SafePropertyRead as SafePropertyRead3, SelectorMatcher, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch as TmplAstIfBlockBranch2, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
+import { BindingPipe, Call as Call2, createCssSelectorFromNode, CssSelector, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers3, SafeCall, SafePropertyRead as SafePropertyRead3, SelectorMatcher, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch as TmplAstIfBlockBranch2, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
 import ts28 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
@@ -4327,7 +4360,12 @@ var TcbDirectiveCtorOp = class extends TcbOp {
           continue;
         }
         const expression = translateInput(attr.attribute, this.tcb, this.scope);
-        genericInputs.set(fieldName, { type: "binding", field: fieldName, expression, sourceSpan: attr.attribute.sourceSpan });
+        genericInputs.set(fieldName, {
+          type: "binding",
+          field: fieldName,
+          expression,
+          sourceSpan: attr.attribute.sourceSpan
+        });
       }
     }
     for (const { classPropertyName } of this.dir.inputs) {
@@ -4362,7 +4400,7 @@ var TcbDirectiveInputsOp = class extends TcbOp {
     for (const attr of boundAttrs) {
       const expr = widenBinding(translateInput(attr.attribute, this.tcb, this.scope), this.tcb);
       let assignment = wrapForDiagnostics(expr);
-      for (const { fieldName, required, transformType } of attr.inputs) {
+      for (const { fieldName, required, transformType, isSignal } of attr.inputs) {
         let target;
         if (required) {
           seenRequiredInputs.add(fieldName);
@@ -4401,6 +4439,13 @@ var TcbDirectiveInputsOp = class extends TcbOp {
             dirId = this.scope.resolve(this.node, this.dir);
           }
           target = this.dir.stringLiteralInputFields.has(fieldName) ? ts28.factory.createElementAccessExpression(dirId, ts28.factory.createStringLiteral(fieldName)) : ts28.factory.createPropertyAccessExpression(dirId, ts28.factory.createIdentifier(fieldName));
+        }
+        if (isSignal) {
+          const inputSignalBrandWriteSymbol = this.tcb.env.referenceExternalSymbol(R3Identifiers3.InputSignalBrandWriteType.moduleName, R3Identifiers3.InputSignalBrandWriteType.name);
+          if (!ts28.isIdentifier(inputSignalBrandWriteSymbol) && !ts28.isPropertyAccessExpression(inputSignalBrandWriteSymbol)) {
+            throw new Error(`Expected identifier or property access for reference to ${R3Identifiers3.InputSignalBrandWriteType.name}`);
+          }
+          target = ts28.factory.createElementAccessExpression(target, inputSignalBrandWriteSymbol);
         }
         if (attr.attribute.keySpan !== void 0) {
           addParseSpanInfo(target, attr.attribute.keySpan);
@@ -5359,7 +5404,8 @@ function getBoundAttributes(directive, node) {
           return {
             fieldName: input.classPropertyName,
             required: input.required,
-            transformType: ((_a = input.transform) == null ? void 0 : _a.type) || null
+            transformType: ((_a = input.transform) == null ? void 0 : _a.type) || null,
+            isSignal: input.isSignal
           };
         })
       });
@@ -5489,6 +5535,7 @@ var TypeCheckFile = class extends Environment {
     this.tcbStatements.push(fn);
   }
   render(removeComments) {
+    ensureTypeCheckFilePreparationImports(this);
     let source = this.importManager.getAllImports(this.contextFile.fileName).map((i) => `import * as ${i.qualifier.text} from '${i.specifier}';`).join("\n") + "\n\n";
     const printer = ts29.createPrinter({ removeComments });
     source += "\n";
@@ -5606,7 +5653,7 @@ var TypeCheckContextImpl = class {
       this.opMap.set(sf, []);
     }
     const ops = this.opMap.get(sf);
-    ops.push(new TypeCtorOp(ref, ctorMeta));
+    ops.push(new TypeCtorOp(ref, this.reflector, ctorMeta));
     fileData.hasInlines = true;
   }
   transform(sf) {
@@ -5721,15 +5768,17 @@ var InlineTcbOp = class {
   }
 };
 var TypeCtorOp = class {
-  constructor(ref, meta) {
+  constructor(ref, reflector, meta) {
     this.ref = ref;
+    this.reflector = reflector;
     this.meta = meta;
   }
   get splitPoint() {
     return this.ref.node.end - 1;
   }
   execute(im, sf, refEmitter, printer) {
-    const tcb = generateInlineTypeCtor(this.ref.node, this.meta);
+    const emitEnv = new ReferenceEmitEnvironment(im, refEmitter, this.reflector, sf);
+    const tcb = generateInlineTypeCtor(emitEnv, this.ref.node, this.meta);
     return printer.printNode(ts30.EmitHint.Unspecified, tcb, sf);
   }
 };
@@ -6824,7 +6873,7 @@ var TemplateTypeCheckerImpl = class {
       return null;
     }
     const emitted = emittedRef.expression;
-    if (emitted instanceof WrappedNodeExpr) {
+    if (emitted instanceof WrappedNodeExpr2) {
       if (refTo.node === inContext) {
         return null;
       }
@@ -8890,4 +8939,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TGXBEN6D.js.map
+//# sourceMappingURL=chunk-X6ELQSL4.js.map

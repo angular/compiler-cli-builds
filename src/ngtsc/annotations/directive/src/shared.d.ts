@@ -7,9 +7,9 @@
  */
 import { ParsedHostBindings, R3DirectiveMetadata, R3QueryMetadata } from '@angular/compiler';
 import ts from 'typescript';
-import { ReferenceEmitter } from '../../../imports';
-import { ClassPropertyMapping, HostDirectiveMeta, InputMapping } from '../../../metadata';
-import { PartialEvaluator } from '../../../partial_evaluator';
+import { Reference, ReferenceEmitter } from '../../../imports';
+import { ClassPropertyMapping, DecoratorInputTransform, HostDirectiveMeta, InputMapping } from '../../../metadata';
+import { DynamicValue, PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../../reflection';
 import { CompilationMode } from '../../../transform';
 import { ReferencesRegistry } from '../../common';
@@ -32,3 +32,15 @@ export declare function extractQueryMetadata(exprNode: ts.Node, name: string, ar
 export declare function extractHostBindings(members: ClassMember[], evaluator: PartialEvaluator, coreModule: string | undefined, metadata?: Map<string, ts.Expression>): ParsedHostBindings;
 export declare function parseDirectiveStyles(directive: Map<string, ts.Expression>, evaluator: PartialEvaluator, compilationMode: CompilationMode): null | string[];
 export declare function parseFieldStringArrayValue(directive: Map<string, ts.Expression>, field: string, evaluator: PartialEvaluator): null | string[];
+/**
+ * Parses the `transform` function and its type for a decorator `@Input`.
+ *
+ * This logic verifies feasibility of extracting the transform write type
+ * into a different place, so that the input write type can be captured at
+ * a later point in a static acceptance member.
+ *
+ * Note: This is not needed for signal inputs where the transform type is
+ * automatically captured in the type of the `InputSignal`.
+ *
+ */
+export declare function parseDecoratorInputTransformFunction(clazz: ClassDeclaration, classPropertyName: string, value: DynamicValue | Reference, reflector: ReflectionHost, refEmitter: ReferenceEmitter): DecoratorInputTransform;
