@@ -56,6 +56,7 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
      * Get the set of declarations declared in `file` which are exported.
      */
     private getLocalExportedDeclarationsOfSourceFile;
+    private _viaModule;
 }
 export declare function reflectNameOfDeclaration(decl: ts.Declaration): string | null;
 export declare function reflectIdentifierOfDeclaration(decl: ts.Declaration): ts.Identifier | null;

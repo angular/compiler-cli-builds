@@ -30,6 +30,7 @@ var ClassMemberKind;
   ClassMemberKind2[ClassMemberKind2["Property"] = 3] = "Property";
   ClassMemberKind2[ClassMemberKind2["Method"] = 4] = "Method";
 })(ClassMemberKind || (ClassMemberKind = {}));
+var AmbientImport = {};
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/type_to_value.mjs
 import ts2 from "typescript";
@@ -415,19 +416,18 @@ var TypeScriptReflectionHost = class {
       return this.getDeclarationOfSymbol(targetSymbol, originalId);
     }
     const importInfo = originalId && this.getImportOfIdentifier(originalId);
-    const viaModule = importInfo !== null && importInfo.from !== null && !importInfo.from.startsWith(".") ? importInfo.from : null;
     while (symbol.flags & ts4.SymbolFlags.Alias) {
       symbol = this.checker.getAliasedSymbol(symbol);
     }
     if (symbol.valueDeclaration !== void 0) {
       return {
         node: symbol.valueDeclaration,
-        viaModule
+        viaModule: this._viaModule(symbol.valueDeclaration, originalId, importInfo)
       };
     } else if (symbol.declarations !== void 0 && symbol.declarations.length > 0) {
       return {
         node: symbol.declarations[0],
-        viaModule
+        viaModule: this._viaModule(symbol.declarations[0], originalId, importInfo)
       };
     } else {
       return null;
@@ -522,6 +522,12 @@ var TypeScriptReflectionHost = class {
       item = iter.next();
     }
     return exportSet;
+  }
+  _viaModule(declaration, originalId, importInfo) {
+    if (importInfo === null && originalId !== null && declaration.getSourceFile() !== originalId.getSourceFile()) {
+      return AmbientImport;
+    }
+    return importInfo !== null && importInfo.from !== null && !importInfo.from.startsWith(".") ? importInfo.from : null;
   }
 };
 function reflectTypeEntityToDeclaration(type, checker) {
@@ -748,7 +754,13 @@ var Reference = class {
     this.identifiers = [];
     this.synthetic = false;
     this._alias = null;
-    this.bestGuessOwningModule = bestGuessOwningModule;
+    if (bestGuessOwningModule === AmbientImport) {
+      this.isAmbient = true;
+      this.bestGuessOwningModule = null;
+    } else {
+      this.isAmbient = false;
+      this.bestGuessOwningModule = bestGuessOwningModule;
+    }
     const id = identifierOfNode(node);
     if (id !== null) {
       this.identifiers.push(id);
@@ -791,13 +803,13 @@ var Reference = class {
     return id !== null ? id : fallback;
   }
   cloneWithAlias(alias) {
-    const ref = new Reference(this.node, this.bestGuessOwningModule);
+    const ref = new Reference(this.node, this.isAmbient ? AmbientImport : this.bestGuessOwningModule);
     ref.identifiers = [...this.identifiers];
     ref._alias = alias;
     return ref;
   }
   cloneWithNoIdentifiers() {
-    const ref = new Reference(this.node, this.bestGuessOwningModule);
+    const ref = new Reference(this.node, this.isAmbient ? AmbientImport : this.bestGuessOwningModule);
     ref._alias = this._alias;
     ref.identifiers = [];
     return ref;
@@ -1017,6 +1029,7 @@ var ImportFlags;
   ImportFlags2[ImportFlags2["NoAliasing"] = 2] = "NoAliasing";
   ImportFlags2[ImportFlags2["AllowTypeImports"] = 4] = "AllowTypeImports";
   ImportFlags2[ImportFlags2["AllowRelativeDtsImports"] = 8] = "AllowRelativeDtsImports";
+  ImportFlags2[ImportFlags2["AllowAmbientReferences"] = 16] = "AllowAmbientReferences";
 })(ImportFlags || (ImportFlags = {}));
 function assertSuccessfulReferenceEmit(result, origin, typeKind) {
   if (result.kind === 0) {
@@ -1056,6 +1069,18 @@ var LocalIdentifierStrategy = class {
         expression: new WrappedNodeExpr(ref.node),
         importedFile: null
       };
+    }
+    if (ref.isAmbient && importFlags & ImportFlags.AllowAmbientReferences) {
+      const identifier2 = identifierOfNode(ref.node);
+      if (identifier2 !== null) {
+        return {
+          kind: 0,
+          expression: new WrappedNodeExpr(identifier2),
+          importedFile: null
+        };
+      } else {
+        return null;
+      }
     }
     const identifier = ref.getIdentityIn(context);
     if (identifier !== null) {
@@ -1564,6 +1589,7 @@ export {
   ERROR_DETAILS_PAGE_BASE_URL,
   ExtendedTemplateDiagnosticName,
   ClassMemberKind,
+  AmbientImport,
   typeNodeToValueExpr,
   isNamedClassDeclaration,
   TypeScriptReflectionHost,
@@ -1615,4 +1641,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GFBWTDAL.js.map
+//# sourceMappingURL=chunk-T7ZCYM77.js.map

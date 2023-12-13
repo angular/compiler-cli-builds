@@ -410,6 +410,11 @@ export interface Import {
  * A type that is used to identify a declaration.
  */
 export type DeclarationNode = ts.Declaration;
+export type AmbientImport = {
+    __brand: 'AmbientImport';
+};
+/** Indicates that a declaration is referenced through an ambient type. */
+export declare const AmbientImport: AmbientImport;
 /**
  * The declaration of a symbol, along with information about how it was imported into the
  * application.
@@ -420,7 +425,7 @@ export interface Declaration<T extends ts.Declaration = ts.Declaration> {
      * was imported via an absolute module (even through a chain of re-exports). If the symbol is part
      * of the application and was not imported from an absolute path, this will be `null`.
      */
-    viaModule: string | null;
+    viaModule: string | AmbientImport | null;
     /**
      * TypeScript reference to the declaration itself, if one exists.
      */

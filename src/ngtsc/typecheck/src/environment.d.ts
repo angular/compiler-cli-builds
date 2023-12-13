@@ -7,7 +7,7 @@
  */
 import { TransplantedType, Type } from '@angular/compiler';
 import ts from 'typescript';
-import { Reference, ReferenceEmitter } from '../../imports';
+import { ImportFlags, Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
 import { TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
@@ -49,13 +49,13 @@ export declare class Environment implements ReferenceEmitEnvironment {
      * This may involve importing the node into the file if it's not declared there already.
      */
     reference(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): ts.Expression;
-    canReferenceType(ref: Reference): boolean;
+    canReferenceType(ref: Reference, flags?: ImportFlags): boolean;
     /**
      * Generate a `ts.TypeNode` that references the given node as a type.
      *
      * This may involve importing the node into the file if it's not declared there already.
      */
-    referenceType(ref: Reference): ts.TypeNode;
+    referenceType(ref: Reference, flags?: ImportFlags): ts.TypeNode;
     private emitTypeParameters;
     /**
      * Generate a `ts.TypeNode` that references a given type from the provided module.
