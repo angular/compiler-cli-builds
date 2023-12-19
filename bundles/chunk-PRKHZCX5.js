@@ -3451,7 +3451,7 @@ var Environment = class extends ReferenceEmitEnvironment {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/oob.mjs
-import { TmplAstElement as TmplAstElement2, TmplAstIfBlockBranch } from "@angular/compiler";
+import { TmplAstElement as TmplAstElement2, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty } from "@angular/compiler";
 import ts24 from "typescript";
 var OutOfBandDiagnosticRecorderImpl = class {
   constructor(resolver) {
@@ -3598,7 +3598,14 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), trigger.sourceSpan, ts24.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
   }
   controlFlowPreventingContentProjection(templateId, category, projectionNode, componentName, slotSelector, controlFlowNode, preservesWhitespaces) {
-    const blockName = controlFlowNode instanceof TmplAstIfBlockBranch ? "@if" : "@for";
+    let blockName;
+    if (controlFlowNode instanceof TmplAstForLoopBlockEmpty) {
+      blockName = "@empty";
+    } else if (controlFlowNode instanceof TmplAstForLoopBlock) {
+      blockName = "@for";
+    } else {
+      blockName = "@if";
+    }
     const lines = [
       `Node matches the "${slotSelector}" slot of the "${componentName}" component, but will not be projected into the specific slot because the surrounding ${blockName} has more than one node at its root. To project the node in the right slot, you can:
 `,
@@ -3640,7 +3647,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
-import { BindingPipe, Call as Call2, createCssSelectorFromNode, CssSelector, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers3, SafeCall, SafePropertyRead as SafePropertyRead3, SelectorMatcher, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch as TmplAstIfBlockBranch2, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
+import { BindingPipe, Call as Call2, createCssSelectorFromNode, CssSelector, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers3, SafeCall, SafePropertyRead as SafePropertyRead3, SelectorMatcher, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock as TmplAstForLoopBlock2, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
 import ts28 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
@@ -4557,8 +4564,13 @@ var TcbControlFlowContentProjectionOp = class extends TcbOp {
     const result = [];
     for (const child of this.element.children) {
       let eligibleNode = null;
-      if (child instanceof TmplAstForLoopBlock) {
-        eligibleNode = child;
+      if (child instanceof TmplAstForLoopBlock2) {
+        if (this.shouldCheck(child)) {
+          result.push(child);
+        }
+        if (child.empty !== null && this.shouldCheck(child.empty)) {
+          result.push(child.empty);
+        }
       } else if (child instanceof TmplAstIfBlock) {
         eligibleNode = child.branches[0];
       }
@@ -4576,6 +4588,18 @@ var TcbControlFlowContentProjectionOp = class extends TcbOp {
       }
     }
     return result;
+  }
+  shouldCheck(node) {
+    if (node.children.length < 2) {
+      return false;
+    }
+    const rootNodeCount = node.children.reduce((count, node2) => {
+      if (!(node2 instanceof TmplAstText) || this.tcb.hostPreserveWhitespaces || node2.value.trim().length > 0) {
+        count++;
+      }
+      return count;
+    }, 0);
+    return rootNodeCount > 1;
   }
 };
 var ATTR_TO_PROP = new Map(Object.entries({
@@ -4964,12 +4988,12 @@ var _Scope = class {
         }
         this.registerVariable(scope, v, new TcbTemplateVariableOp(tcb, scope, scopedNode, v));
       }
-    } else if (scopedNode instanceof TmplAstIfBlockBranch2) {
+    } else if (scopedNode instanceof TmplAstIfBlockBranch) {
       const { expression, expressionAlias } = scopedNode;
       if (expression !== null && expressionAlias !== null) {
         this.registerVariable(scope, expressionAlias, new TcbBlockVariableOp(tcb, scope, tcbExpression(expression, tcb, scope), expressionAlias));
       }
-    } else if (scopedNode instanceof TmplAstForLoopBlock) {
+    } else if (scopedNode instanceof TmplAstForLoopBlock2) {
       const loopInitializer = tcb.allocateId();
       addParseSpanInfo(loopInitializer, scopedNode.item.sourceSpan);
       scope.varMap.set(scopedNode.item, loopInitializer);
@@ -5102,7 +5126,7 @@ var _Scope = class {
       this.opQueue.push(new TcbIfOp(this.tcb, this, node));
     } else if (node instanceof TmplAstSwitchBlock) {
       this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.expression), new TcbSwitchOp(this.tcb, this, node));
-    } else if (node instanceof TmplAstForLoopBlock) {
+    } else if (node instanceof TmplAstForLoopBlock2) {
       this.opQueue.push(new TcbForOfOp(this.tcb, this, node));
       node.empty && this.appendChildren(node.empty);
     } else if (node instanceof TmplAstBoundText) {
@@ -8939,4 +8963,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-X6ELQSL4.js.map
+//# sourceMappingURL=chunk-PRKHZCX5.js.map
