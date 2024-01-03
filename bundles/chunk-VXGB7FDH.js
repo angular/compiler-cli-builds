@@ -7154,10 +7154,12 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
     return [];
   }
 };
+function isSignal(symbol) {
+  return ((symbol == null ? void 0 : symbol.escapedName) === "WritableSignal" || (symbol == null ? void 0 : symbol.escapedName) === "Signal") && symbol.parent.escapedName.includes("@angular/core");
+}
 function buildDiagnosticForSignal(ctx, node, component) {
-  var _a, _b;
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
-  if ((symbol == null ? void 0 : symbol.kind) === SymbolKind.Expression && (((_a = symbol.tsType.symbol) == null ? void 0 : _a.escapedName) === "WritableSignal" || ((_b = symbol.tsType.symbol) == null ? void 0 : _b.escapedName) === "Signal") && symbol.tsType.symbol.parent.escapedName.includes("@angular/core")) {
+  if ((symbol == null ? void 0 : symbol.kind) === SymbolKind.Expression && (isSignal(symbol.tsType.symbol) || isSignal(symbol.tsType.aliasSymbol))) {
     const templateMapping = ctx.templateTypeChecker.getTemplateMappingAtTcbLocation(symbol.tcbLocation);
     const errorString = `${node.name} is a function and should be invoked: ${node.name}()`;
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
@@ -8869,4 +8871,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-BZNTUSTX.js.map
+//# sourceMappingURL=chunk-VXGB7FDH.js.map
