@@ -3313,8 +3313,8 @@ function constructTypeCtorParameter(env, meta, rawType) {
   const plainKeys = [];
   const coercedKeys = [];
   const signalInputKeys = [];
-  for (const { classPropertyName, transform, isSignal } of meta.fields.inputs) {
-    if (isSignal) {
+  for (const { classPropertyName, transform, isSignal: isSignal2 } of meta.fields.inputs) {
+    if (isSignal2) {
       signalInputKeys.push(ts22.factory.createLiteralTypeNode(ts22.factory.createStringLiteral(classPropertyName)));
     } else if (!meta.coercedInputFields.has(classPropertyName)) {
       plainKeys.push(ts22.factory.createLiteralTypeNode(ts22.factory.createStringLiteral(classPropertyName)));
@@ -4407,7 +4407,7 @@ var TcbDirectiveInputsOp = class extends TcbOp {
     for (const attr of boundAttrs) {
       const expr = widenBinding(translateInput(attr.attribute, this.tcb, this.scope), this.tcb);
       let assignment = wrapForDiagnostics(expr);
-      for (const { fieldName, required, transformType, isSignal } of attr.inputs) {
+      for (const { fieldName, required, transformType, isSignal: isSignal2 } of attr.inputs) {
         let target;
         if (required) {
           seenRequiredInputs.add(fieldName);
@@ -4447,7 +4447,7 @@ var TcbDirectiveInputsOp = class extends TcbOp {
           }
           target = this.dir.stringLiteralInputFields.has(fieldName) ? ts28.factory.createElementAccessExpression(dirId, ts28.factory.createStringLiteral(fieldName)) : ts28.factory.createPropertyAccessExpression(dirId, ts28.factory.createIdentifier(fieldName));
         }
-        if (isSignal) {
+        if (isSignal2) {
           const inputSignalBrandWriteSymbol = this.tcb.env.referenceExternalSymbol(R3Identifiers3.InputSignalBrandWriteType.moduleName, R3Identifiers3.InputSignalBrandWriteType.name);
           if (!ts28.isIdentifier(inputSignalBrandWriteSymbol) && !ts28.isPropertyAccessExpression(inputSignalBrandWriteSymbol)) {
             throw new Error(`Expected identifier or property access for reference to ${R3Identifiers3.InputSignalBrandWriteType.name}`);
@@ -7242,10 +7242,12 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
     return [];
   }
 };
+function isSignal(symbol) {
+  return ((symbol == null ? void 0 : symbol.escapedName) === "WritableSignal" || (symbol == null ? void 0 : symbol.escapedName) === "Signal") && symbol.parent.escapedName.includes("@angular/core");
+}
 function buildDiagnosticForSignal(ctx, node, component) {
-  var _a, _b;
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
-  if ((symbol == null ? void 0 : symbol.kind) === SymbolKind.Expression && (((_a = symbol.tsType.symbol) == null ? void 0 : _a.escapedName) === "WritableSignal" || ((_b = symbol.tsType.symbol) == null ? void 0 : _b.escapedName) === "Signal") && symbol.tsType.symbol.parent.escapedName.includes("@angular/core")) {
+  if ((symbol == null ? void 0 : symbol.kind) === SymbolKind.Expression && (isSignal(symbol.tsType.symbol) || isSignal(symbol.tsType.aliasSymbol))) {
     const templateMapping = ctx.templateTypeChecker.getTemplateMappingAtTcbLocation(symbol.tcbLocation);
     const errorString = `${node.name} is a function and should be invoked: ${node.name}()`;
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
@@ -8963,4 +8965,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-I5H6EARU.js.map
+//# sourceMappingURL=chunk-XGYTC2HT.js.map
