@@ -43,4 +43,4 @@ export declare function parseFieldStringArrayValue(directive: Map<string, ts.Exp
  * automatically captured in the type of the `InputSignal`.
  *
  */
-export declare function parseDecoratorInputTransformFunction(clazz: ClassDeclaration, classPropertyName: string, value: DynamicValue | Reference, reflector: ReflectionHost, refEmitter: ReferenceEmitter): DecoratorInputTransform;
+export declare function parseDecoratorInputTransformFunction(clazz: ClassDeclaration, classPropertyName: string, value: DynamicValue | Reference, reflector: ReflectionHost, refEmitter: ReferenceEmitter, compilationMode: CompilationMode): DecoratorInputTransform;

@@ -4450,8 +4450,8 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const members = reflector.getMembersOfClass(clazz);
   const decoratedElements = members.filter((member) => !member.isStatic && member.decorators !== null);
   const coreModule = isCore ? void 0 : "@angular/core";
-  const inputsFromMeta = parseInputsArray(clazz, directive, evaluator, reflector, refEmitter);
-  const inputsFromFields = parseInputFields(clazz, members, evaluator, reflector, refEmitter, coreModule);
+  const inputsFromMeta = parseInputsArray(clazz, directive, evaluator, reflector, refEmitter, compilationMode);
+  const inputsFromFields = parseInputFields(clazz, members, evaluator, reflector, refEmitter, coreModule, compilationMode);
   const inputs = ClassPropertyMapping.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
   const outputsFromMeta = parseOutputsArray(directive, evaluator);
   const outputsFromFields = parseOutputFields(filterToMembersWithDecorator(decoratedElements, "Output", coreModule), evaluator);
@@ -4788,7 +4788,7 @@ function parseDecoratedFields(fields, evaluator, callback) {
     }
   }
 }
-function parseInputsArray(clazz, decoratorMetadata, evaluator, reflector, refEmitter) {
+function parseInputsArray(clazz, decoratorMetadata, evaluator, reflector, refEmitter, compilationMode) {
   const inputsField = decoratorMetadata.get("inputs");
   if (inputsField === void 0) {
     return {};
@@ -4822,7 +4822,7 @@ function parseInputsArray(clazz, decoratorMetadata, evaluator, reflector, refEmi
         if (!(transformValue instanceof DynamicValue) && !(transformValue instanceof Reference)) {
           throw createValueHasWrongTypeError(inputsField, transformValue, `Transform of value at position ${i} of @Directive.inputs array must be a function`);
         }
-        transform = parseDecoratorInputTransformFunction(clazz, name, transformValue, reflector, refEmitter);
+        transform = parseDecoratorInputTransformFunction(clazz, name, transformValue, reflector, refEmitter, compilationMode);
       }
       inputs[name] = {
         classPropertyName: name,
@@ -4852,7 +4852,7 @@ function tryGetDecoratorOnMember(member, decoratorName, coreModule) {
   }
   return null;
 }
-function tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModule, refEmitter) {
+function tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModule, refEmitter, compilationMode) {
   const classPropertyName = member.name;
   const decorator = tryGetDecoratorOnMember(member, "Input", coreModule);
   if (decorator !== null) {
@@ -4878,7 +4878,7 @@ function tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModu
       if (!(transformValue instanceof DynamicValue) && !(transformValue instanceof Reference)) {
         throw createValueHasWrongTypeError(optionsNode, transformValue, `Input transform must be a function`);
       }
-      transform = parseDecoratorInputTransformFunction(clazz, classPropertyName, transformValue, reflector, refEmitter);
+      transform = parseDecoratorInputTransformFunction(clazz, classPropertyName, transformValue, reflector, refEmitter, compilationMode);
     }
     return {
       isSignal: false,
@@ -4906,22 +4906,32 @@ function tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModu
   }
   return null;
 }
-function parseInputFields(clazz, members, evaluator, reflector, refEmitter, coreModule) {
+function parseInputFields(clazz, members, evaluator, reflector, refEmitter, coreModule, compilationMode) {
   const inputs = {};
   for (const member of members) {
     if (member.isStatic) {
       continue;
     }
     const classPropertyName = member.name;
-    const inputMapping = tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModule, refEmitter);
+    const inputMapping = tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModule, refEmitter, compilationMode);
     if (inputMapping !== null) {
       inputs[classPropertyName] = inputMapping;
     }
   }
   return inputs;
 }
-function parseDecoratorInputTransformFunction(clazz, classPropertyName, value, reflector, refEmitter) {
+function parseDecoratorInputTransformFunction(clazz, classPropertyName, value, reflector, refEmitter, compilationMode) {
   var _a;
+  if (compilationMode === CompilationMode.LOCAL) {
+    const node2 = value instanceof Reference ? value.getIdentityIn(clazz.getSourceFile()) : value.node;
+    if (node2 === null) {
+      throw createValueHasWrongTypeError(value.node, value, "Input transform function could not be referenced");
+    }
+    return {
+      node: node2,
+      type: new Reference(ts21.factory.createKeywordTypeNode(ts21.SyntaxKind.UnknownKeyword))
+    };
+  }
   const definition = reflector.getDefinitionOfFunction(value.node);
   if (definition === null) {
     throw createValueHasWrongTypeError(value.node, value, "Input transform must be a function");
@@ -7744,4 +7754,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2JUXNWO4.js.map
+//# sourceMappingURL=chunk-PVVKSWP6.js.map
