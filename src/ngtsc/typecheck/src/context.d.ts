@@ -9,6 +9,7 @@ import { BoundTarget, ParseError, ParseSourceFile, R3TargetBinder, SchemaMetadat
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
+import { PipeMeta } from '../../metadata';
 import { PerfRecorder } from '../../perf';
 import { FileUpdate } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
@@ -166,7 +167,7 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
      *
      * Implements `TypeCheckContext.addTemplate`.
      */
-    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, template: TmplAstNode[], pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>, schemas: SchemaMetadata[], sourceMapping: TemplateSourceMapping, file: ParseSourceFile, parseErrors: ParseError[] | null, isStandalone: boolean, preserveWhitespaces: boolean): void;
+    addTemplate(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, template: TmplAstNode[], pipes: Map<string, PipeMeta>, schemas: SchemaMetadata[], sourceMapping: TemplateSourceMapping, file: ParseSourceFile, parseErrors: ParseError[] | null, isStandalone: boolean, preserveWhitespaces: boolean): void;
     /**
      * Record a type constructor for the given `node` with the given `ctorMetadata`.
      */

@@ -19,7 +19,7 @@ import { ClassDeclaration } from '../../../reflection';
 export declare function collectAnimationNames(value: ResolvedValue, animationTriggerNames: AnimationTriggerNames): void;
 export declare function isAngularAnimationsReference(reference: Reference, symbolName: string): boolean;
 export declare const animationTriggerResolver: ForeignFunctionResolver;
-export declare function validateAndFlattenComponentImports(imports: ResolvedValue, expr: ts.Expression): {
+export declare function validateAndFlattenComponentImports(imports: ResolvedValue, expr: ts.Expression, isDeferred: boolean): {
     imports: Reference<ClassDeclaration>[];
     diagnostics: ts.Diagnostic[];
 };

@@ -15,8 +15,9 @@ import ts from 'typescript';
  */
 export declare class DeferredSymbolTracker {
     private readonly typeChecker;
+    private onlyExplicitDeferDependencyImports;
     private readonly imports;
-    constructor(typeChecker: ts.TypeChecker);
+    constructor(typeChecker: ts.TypeChecker, onlyExplicitDeferDependencyImports: boolean);
     /**
      * Given an import declaration node, extract the names of all imported symbols
      * and return them as a map where each symbol is a key and `AssumeEager` is a value.
@@ -28,6 +29,11 @@ export declare class DeferredSymbolTracker {
      * Case 3: `import * as x from 'a'`
      */
     private extractImportedSymbols;
+    /**
+     * Marks a given import declaration as explicitly deferred, since it's
+     * used in the `@Component.deferredImports` field.
+     */
+    markAsExplicitlyDeferred(importDecl: ts.ImportDeclaration): void;
     /**
      * Marks a given identifier and an associated import declaration as a candidate
      * for defer loading.

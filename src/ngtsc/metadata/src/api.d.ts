@@ -193,6 +193,11 @@ export interface DirectiveMeta extends T2DirectiveMeta, DirectiveTypeCheckMeta {
      */
     imports: Reference<ClassDeclaration>[] | null;
     /**
+     * For standalone components, the list of imported types that can be used
+     * in `@defer` blocks (when only explicit dependencies are allowed).
+     */
+    deferredImports: Reference<ClassDeclaration>[] | null;
+    /**
      * For standalone components, the list of schemas declared.
      */
     schemas: SchemaMetadata[] | null;
@@ -208,6 +213,11 @@ export interface DirectiveMeta extends T2DirectiveMeta, DirectiveTypeCheckMeta {
      * Whether the directive should be assumed to export providers if imported as a standalone type.
      */
     assumedToExportProviders: boolean;
+    /**
+     * Whether this class was imported into a standalone component's
+     * scope via `@Component.deferredImports` field.
+     */
+    isExplicitlyDeferred: boolean;
 }
 /** Metadata collected about an additional directive that is being applied to a directive host. */
 export interface HostDirectiveMeta {
@@ -251,6 +261,7 @@ export interface PipeMeta {
     nameExpr: ts.Expression | null;
     isStandalone: boolean;
     decorator: ts.Decorator | null;
+    isExplicitlyDeferred: boolean;
 }
 /**
  * Reads metadata for directives, pipes, and modules from a particular source, such as .d.ts files

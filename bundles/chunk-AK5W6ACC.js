@@ -865,6 +865,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["HOST_DIRECTIVE_MISSING_REQUIRED_BINDING"] = 2019] = "HOST_DIRECTIVE_MISSING_REQUIRED_BINDING";
   ErrorCode2[ErrorCode2["CONFLICTING_INPUT_TRANSFORM"] = 2020] = "CONFLICTING_INPUT_TRANSFORM";
   ErrorCode2[ErrorCode2["COMPONENT_INVALID_STYLE_URLS"] = 2021] = "COMPONENT_INVALID_STYLE_URLS";
+  ErrorCode2[ErrorCode2["COMPONENT_UNKNOWN_DEFERRED_IMPORT"] = 2022] = "COMPONENT_UNKNOWN_DEFERRED_IMPORT";
   ErrorCode2[ErrorCode2["SYMBOL_NOT_EXPORTED"] = 3001] = "SYMBOL_NOT_EXPORTED";
   ErrorCode2[ErrorCode2["IMPORT_CYCLE_DETECTED"] = 3003] = "IMPORT_CYCLE_DETECTED";
   ErrorCode2[ErrorCode2["IMPORT_GENERATION_FAILURE"] = 3004] = "IMPORT_GENERATION_FAILURE";
@@ -896,6 +897,9 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["ILLEGAL_FOR_LOOP_TRACK_ACCESS"] = 8009] = "ILLEGAL_FOR_LOOP_TRACK_ACCESS";
   ErrorCode2[ErrorCode2["INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT"] = 8010] = "INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT";
   ErrorCode2[ErrorCode2["CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION"] = 8011] = "CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION";
+  ErrorCode2[ErrorCode2["DEFERRED_PIPE_USED_EAGERLY"] = 8012] = "DEFERRED_PIPE_USED_EAGERLY";
+  ErrorCode2[ErrorCode2["DEFERRED_DIRECTIVE_USED_EAGERLY"] = 8013] = "DEFERRED_DIRECTIVE_USED_EAGERLY";
+  ErrorCode2[ErrorCode2["DEFERRED_DEPENDENCY_IMPORTED_EAGERLY"] = 8014] = "DEFERRED_DEPENDENCY_IMPORTED_EAGERLY";
   ErrorCode2[ErrorCode2["INVALID_BANANA_IN_BOX"] = 8101] = "INVALID_BANANA_IN_BOX";
   ErrorCode2[ErrorCode2["NULLISH_COALESCING_NOT_NULLABLE"] = 8102] = "NULLISH_COALESCING_NOT_NULLABLE";
   ErrorCode2[ErrorCode2["MISSING_CONTROL_FLOW_DIRECTIVE"] = 8103] = "MISSING_CONTROL_FLOW_DIRECTIVE";
@@ -1475,9 +1479,11 @@ var DefaultImportTracker = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/deferred_symbol_tracker.mjs
 import ts9 from "typescript";
 var AssumeEager = "AssumeEager";
+var ExplicitlyDeferred = "ExplicitlyDeferred";
 var DeferredSymbolTracker = class {
-  constructor(typeChecker) {
+  constructor(typeChecker, onlyExplicitDeferDependencyImports) {
     this.typeChecker = typeChecker;
+    this.onlyExplicitDeferDependencyImports = onlyExplicitDeferDependencyImports;
     this.imports = /* @__PURE__ */ new Map();
   }
   extractImportedSymbols(importDecl) {
@@ -1506,12 +1512,21 @@ var DeferredSymbolTracker = class {
     }
     return symbolMap;
   }
+  markAsExplicitlyDeferred(importDecl) {
+    this.imports.set(importDecl, ExplicitlyDeferred);
+  }
   markAsDeferrableCandidate(identifier, importDecl) {
-    if (!this.imports.has(importDecl)) {
-      const symbolMap2 = this.extractImportedSymbols(importDecl);
-      this.imports.set(importDecl, symbolMap2);
+    if (this.onlyExplicitDeferDependencyImports) {
+      return;
     }
-    const symbolMap = this.imports.get(importDecl);
+    let symbolMap = this.imports.get(importDecl);
+    if (symbolMap === ExplicitlyDeferred) {
+      return;
+    }
+    if (!symbolMap) {
+      symbolMap = this.extractImportedSymbols(importDecl);
+      this.imports.set(importDecl, symbolMap);
+    }
     if (!symbolMap.has(identifier.text)) {
       throw new Error(`The '${identifier.text}' identifier doesn't belong to the provided import declaration.`);
     }
@@ -1526,6 +1541,9 @@ var DeferredSymbolTracker = class {
       return false;
     }
     const symbolsMap = this.imports.get(importDecl);
+    if (symbolsMap === ExplicitlyDeferred) {
+      return true;
+    }
     for (const [symbol, refs] of symbolsMap) {
       if (refs === AssumeEager || refs.size > 0) {
         return false;
@@ -2464,4 +2482,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RM5TMXKT.js.map
+//# sourceMappingURL=chunk-AK5W6ACC.js.map
