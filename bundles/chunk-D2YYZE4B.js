@@ -3,8 +3,14 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  CompilationMode,
   CompletionKind,
+  OptimizeFor,
+  PotentialImportKind,
+  PotentialImportMode,
+  SymbolKind
+} from "./chunk-6VEEN3ZS.js";
+import {
+  CompilationMode,
   ComponentDecoratorHandler,
   ComponentScopeKind,
   CompoundComponentScopeReader,
@@ -23,27 +29,16 @@ import {
   MetadataDtsModuleScopeResolver,
   NgModuleDecoratorHandler,
   NoopReferencesRegistry,
-  OptimizeFor,
   PartialEvaluator,
   PipeDecoratorHandler,
-  PotentialImportKind,
-  PotentialImportMode,
   ResourceRegistry,
   SemanticDepGraphUpdater,
-  SymbolKind,
   TraitCompiler,
   TypeCheckScopeRegistry,
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-PVVKSWP6.js";
-import {
-  ImportManager,
-  TypeEmitter,
-  canEmitType,
-  translateExpression,
-  translateType
-} from "./chunk-72ZMP7J3.js";
+} from "./chunk-6HLUQITP.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -56,6 +51,7 @@ import {
   ExtendedTemplateDiagnosticName,
   FatalDiagnosticError,
   ImportFlags,
+  ImportManager,
   LocalIdentifierStrategy,
   LogicalProjectStrategy,
   ModuleResolver,
@@ -65,11 +61,13 @@ import {
   Reference,
   ReferenceEmitter,
   RelativePathStrategy,
+  TypeEmitter,
   TypeScriptReflectionHost,
   UnifiedModulesAliasingHost,
   UnifiedModulesStrategy,
   addDiagnosticChain,
   assertSuccessfulReferenceEmit,
+  canEmitType,
   getRootDirs,
   getSourceFileOrNull,
   getTokenAtPosition,
@@ -85,8 +83,10 @@ import {
   normalizeSeparators,
   relativePathBetween,
   replaceTsWithNgInErrors,
-  toUnredirectedSourceFile
-} from "./chunk-YGUON63I.js";
+  toUnredirectedSourceFile,
+  translateExpression,
+  translateType
+} from "./chunk-RM5TMXKT.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -8965,4 +8965,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-UZBZH3FX.js.map
+//# sourceMappingURL=chunk-D2YYZE4B.js.map

@@ -1,0 +1,22 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import ts from 'typescript';
+import { PartialEvaluator } from '../../ngtsc/partial_evaluator';
+import { ReflectionHost } from '../../ngtsc/reflection';
+/**
+ * Creates a TypeScript transformer that will automatically add an `@Input` decorator
+ * for all signal inputs in Angular classes. The decorator will capture metadata of
+ * the signal input, derived from the `input()/input.required()` initializer.
+ *
+ * This transform is useful for JIT environments where signal inputs would like to be
+ * used. e.g. for Angular CLI unit testing. In such environments, signal inputs are not
+ * statically retrievable at runtime. JIT compilation needs to know about all possible inputs
+ * before instantiating directives. A decorator exposes this information to the class without
+ * the class needing to be instantiated.
+ */
+export declare function getInputSignalsMetadataTransform(host: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean): ts.TransformerFactory<ts.SourceFile>;

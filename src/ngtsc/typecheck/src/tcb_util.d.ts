@@ -63,7 +63,7 @@ export declare function findTypeCheckBlock(file: ts.SourceFile, id: TemplateId, 
 export declare function findSourceLocation(node: ts.Node, sourceFile: ts.SourceFile, isDiagnosticsRequest: boolean): SourceLocation | null;
 /**
  * Ensure imports for certain external modules that should always
- * exist are generated. These are ensures to exist to avoid frequent
+ * exist are generated. These are ensured to exist to avoid frequent
  * import graph changes whenever e.g. a signal input is introduced in user code.
  */
 export declare function ensureTypeCheckFilePreparationImports(env: ReferenceEmitEnvironment): void;

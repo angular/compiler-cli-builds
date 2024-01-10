@@ -8,9 +8,8 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-RRGQJ4ZL.js";
-import "../../chunk-72ZMP7J3.js";
-import "../../chunk-YGUON63I.js";
+} from "../../chunk-MGI4JOJM.js";
+import "../../chunk-RM5TMXKT.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -185,6 +184,9 @@ var BabelAstHost = class {
     } else {
       throw new FatalLinkerError(bool, "Unsupported syntax, expected a boolean literal.");
     }
+  }
+  isNull(node) {
+    return t2.isNullLiteral(node);
   }
   parseArrayLiteral(array) {
     assert(array, t2.isArrayExpression, "an array literal");

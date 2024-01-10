@@ -9,8 +9,11 @@ import * as o from '@angular/compiler';
 import { AstHost, Range } from './ast_host';
 /**
  * Represents only those types in `T` that are object types.
+ *
+ * Note: Excluding `Array` types as we consider object literals are "objects"
+ * in the AST.
  */
-type ObjectType<T> = Extract<T, object>;
+type ObjectType<T> = T extends Array<any> ? never : T extends Record<string, any> ? T : never;
 /**
  * Represents the value type of an object literal.
  */
@@ -126,6 +129,8 @@ export declare class AstObject<T extends object, TExpression> {
 export declare class AstValue<T, TExpression> {
     readonly expression: TExpression;
     private host;
+    /** Type brand that ensures that the `T` type is respected for assignability. */
+    ɵtypeBrand: T;
     constructor(expression: TExpression, host: AstHost<TExpression>);
     /**
      * Get the name of the symbol represented by the given expression node, or `null` if it is not a
@@ -168,6 +173,8 @@ export declare class AstValue<T, TExpression> {
      * Is this value an array literal?
      */
     isArray(): boolean;
+    /** Whether the value is explicitly set to `null`. */
+    isNull(): boolean;
     /**
      * Parse this value into an array of `AstValue` objects, or error if it is not an array literal.
      */

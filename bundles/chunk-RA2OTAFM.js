@@ -3,14 +3,21 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
+  PartialEvaluator,
+  addImports,
+  isAngularDecorator,
+  tryParseSignalInputMapping
+} from "./chunk-6HLUQITP.js";
+import {
+  ImportManager,
   TypeScriptReflectionHost,
   isAliasImportDeclaration,
   loadIsReferencedAliasDeclarationPatch
-} from "./chunk-YGUON63I.js";
+} from "./chunk-RM5TMXKT.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/downlevel_decorators_transform/downlevel_decorators_transform.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/downlevel_decorators_transform.mjs
 import ts from "typescript";
-function isAngularDecorator(decorator, isCore) {
+function isAngularDecorator2(decorator, isCore) {
   return isCore || decorator.import !== null && decorator.import.from === "@angular/core";
 }
 var DECORATOR_INVOCATION_JSDOC_TYPE = "!Array<{type: !Function, args: (undefined|!Array<?>)}>";
@@ -183,7 +190,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
       const decorators = host.getDecoratorsOfDeclaration(element) || [];
       for (const decorator of decorators) {
         const decoratorNode = decorator.node;
-        if (!isAngularDecorator(decorator, isCore)) {
+        if (!isAngularDecorator2(decorator, isCore)) {
           decoratorsToKeep.push(decoratorNode);
           continue;
         }
@@ -220,7 +227,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         const decorators = host.getDecoratorsOfDeclaration(param) || [];
         for (const decorator of decorators) {
           const decoratorNode = decorator.node;
-          if (!isAngularDecorator(decorator, isCore)) {
+          if (!isAngularDecorator2(decorator, isCore)) {
             decoratorsToKeep.push(decoratorNode);
             continue;
           }
@@ -272,7 +279,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
         newMembers.push(ts.visitEachChild(member, decoratorDownlevelVisitor, context));
       }
       const possibleAngularDecorators = host.getDecoratorsOfDeclaration(classDecl) || [];
-      const hasAngularDecorator = possibleAngularDecorators.some((d) => isAngularDecorator(d, isCore));
+      const hasAngularDecorator = possibleAngularDecorators.some((d) => isAngularDecorator2(d, isCore));
       if (classParameters) {
         if (hasAngularDecorator || classParameters.some((p) => !!p.decorators.length)) {
           newMembers.push(createCtorParametersClassProperty(diagnostics, entityNameToExpression, classParameters, isClosureCompilerEnabled));
@@ -311,6 +318,71 @@ function cloneClassElementWithModifiers(node, modifiers) {
   return ts.setOriginalNode(clone, node);
 }
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/signal_inputs_metadata_transform.mjs
+import ts2 from "typescript";
+var decoratorsWithInputs = ["Directive", "Component"];
+var coreModuleName = "@angular/core";
+function getInputSignalsMetadataTransform(host, evaluator, isCore) {
+  return (ctx) => {
+    return (sourceFile) => {
+      const importManager = new ImportManager(void 0, void 0, ctx.factory);
+      sourceFile = ts2.visitNode(sourceFile, createTransformVisitor(ctx, host, evaluator, importManager, isCore), ts2.isSourceFile);
+      const newImports = importManager.getAllImports(sourceFile.fileName);
+      if (newImports.length > 0) {
+        sourceFile = addImports(ctx.factory, importManager, sourceFile);
+      }
+      return sourceFile;
+    };
+  };
+}
+function createTransformVisitor(ctx, host, evaluator, importManager, isCore) {
+  const visitor = (node) => {
+    var _a;
+    if (ts2.isClassDeclaration(node) && node.name !== void 0) {
+      const angularDecorator = (_a = host.getDecoratorsOfDeclaration(node)) == null ? void 0 : _a.find((d) => decoratorsWithInputs.some((name) => isAngularDecorator(d, name, isCore)));
+      if (angularDecorator !== void 0) {
+        return visitClassDeclaration(ctx, host, evaluator, importManager, node, angularDecorator, isCore);
+      }
+    }
+    return ts2.visitEachChild(node, visitor, ctx);
+  };
+  return visitor;
+}
+function visitClassDeclaration(ctx, host, evaluator, importManager, clazz, classDecorator, isCore) {
+  const members = clazz.members.map((member) => {
+    var _a, _b, _c;
+    if (!ts2.isPropertyDeclaration(member)) {
+      return member;
+    }
+    if (!ts2.isIdentifier(member.name) && !ts2.isStringLiteralLike(member.name)) {
+      return member;
+    }
+    if ((_a = host.getDecoratorsOfDeclaration(member)) == null ? void 0 : _a.some((d) => isAngularDecorator(d, "Input", isCore))) {
+      return member;
+    }
+    const inputMapping = tryParseSignalInputMapping({ name: member.name.text, value: (_b = member.initializer) != null ? _b : null }, host, evaluator, isCore ? coreModuleName : void 0);
+    if (inputMapping === null) {
+      return member;
+    }
+    const fields = {
+      "isSignal": ctx.factory.createTrue(),
+      "alias": ctx.factory.createStringLiteral(inputMapping.bindingPropertyName),
+      "required": inputMapping.required ? ctx.factory.createTrue() : ctx.factory.createFalse(),
+      "transform": ctx.factory.createIdentifier("undefined")
+    };
+    const classDecoratorIdentifier = ts2.isIdentifier(classDecorator.identifier) ? classDecorator.identifier : classDecorator.identifier.expression;
+    const newDecorator = ctx.factory.createDecorator(ctx.factory.createCallExpression(ctx.factory.createPropertyAccessExpression(
+      importManager.generateNamespaceImport(coreModuleName),
+      ts2.setOriginalNode(ctx.factory.createIdentifier("Input"), classDecoratorIdentifier)
+    ), void 0, [ctx.factory.createAsExpression(
+      ctx.factory.createObjectLiteralExpression(Object.entries(fields).map(([name, value]) => ctx.factory.createPropertyAssignment(name, value))),
+      ctx.factory.createKeywordTypeNode(ts2.SyntaxKind.AnyKeyword)
+    )]));
+    return ctx.factory.updatePropertyDeclaration(member, [newDecorator, ...(_c = member.modifiers) != null ? _c : []], member.name, member.questionToken, member.type, member.initializer);
+  });
+  return ctx.factory.updateClassDeclaration(clazz, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, members);
+}
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/private/tooling.mjs
 var GLOBAL_DEFS_FOR_TERSER = {
   ngDevMode: false,
@@ -320,21 +392,32 @@ var GLOBAL_DEFS_FOR_TERSER_WITH_AOT = {
   ...GLOBAL_DEFS_FOR_TERSER,
   ngJitMode: false
 };
-function constructorParametersDownlevelTransform(program) {
+function angularJitApplicationTransform(program, isCore = false) {
   const typeChecker = program.getTypeChecker();
   const reflectionHost = new TypeScriptReflectionHost(typeChecker);
-  return getDownlevelDecoratorsTransform(
+  const evaluator = new PartialEvaluator(reflectionHost, typeChecker, null);
+  const downlevelDecoratorTransform = getDownlevelDecoratorsTransform(
     typeChecker,
     reflectionHost,
     [],
-    false,
+    isCore,
     false
   );
+  const inputSignalMetadataTransform = getInputSignalsMetadataTransform(reflectionHost, evaluator, isCore);
+  return (ctx) => {
+    return (sourceFile) => {
+      sourceFile = inputSignalMetadataTransform(ctx)(sourceFile);
+      sourceFile = downlevelDecoratorTransform(ctx)(sourceFile);
+      return sourceFile;
+    };
+  };
 }
+var constructorParametersDownlevelTransform = angularJitApplicationTransform;
 
 export {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
+  angularJitApplicationTransform,
   constructorParametersDownlevelTransform
 };
 /**
@@ -344,4 +427,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-X3PHUTHT.js.map
+//# sourceMappingURL=chunk-RA2OTAFM.js.map

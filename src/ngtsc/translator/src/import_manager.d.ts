@@ -20,9 +20,10 @@ export interface Import {
 export declare class ImportManager implements ImportGenerator<ts.Identifier> {
     protected rewriter: ImportRewriter;
     private prefix;
+    private factory;
     private specifierToIdentifier;
     private nextIndex;
-    constructor(rewriter?: ImportRewriter, prefix?: string);
+    constructor(rewriter?: ImportRewriter, prefix?: string, factory?: ts.NodeFactory);
     generateNamespaceImport(moduleName: string): ts.Identifier;
     generateNamedImport(moduleName: string, originalSymbol: string): NamedImport<ts.Identifier>;
     getAllImports(contextPath: string): Import[];

@@ -20,6 +20,7 @@ export declare class TypeScriptAstHost implements AstHost<ts.Expression> {
     getSymbolName(node: ts.Expression): string | null;
     isStringLiteral: typeof ts.isStringLiteral;
     parseStringLiteral(str: ts.Expression): string;
+    isNull(node: ts.Expression): boolean;
     isNumericLiteral: typeof ts.isNumericLiteral;
     parseNumericLiteral(num: ts.Expression): number;
     isBooleanLiteral(node: ts.Expression): boolean;

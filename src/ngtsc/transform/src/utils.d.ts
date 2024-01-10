@@ -12,4 +12,4 @@ import { ImportManager } from '../../translator';
  * and before the module body.
  * Can optionally add extra statements (e.g. new constants) before the body as well.
  */
-export declare function addImports(importManager: ImportManager, sf: ts.SourceFile, extraStatements?: ts.Statement[]): ts.SourceFile;
+export declare function addImports(factory: ts.NodeFactory | undefined, importManager: ImportManager, sf: ts.SourceFile, extraStatements?: ts.Statement[]): ts.SourceFile;

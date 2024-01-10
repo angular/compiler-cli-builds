@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-72ZMP7J3.js";
+} from "./chunk-RM5TMXKT.js";
 import {
   SourceFileLoader
 } from "./chunk-2WQIUGOU.js";
@@ -96,6 +96,7 @@ var AstValue = class {
   constructor(expression, host) {
     this.expression = expression;
     this.host = host;
+    this.\u0275typeBrand = null;
   }
   getSymbolName() {
     return this.host.getSymbolName(this.expression);
@@ -126,6 +127,9 @@ var AstValue = class {
   }
   isArray() {
     return this.host.isArrayLiteral(this.expression);
+  }
+  isNull() {
+    return this.host.isNull(this.expression);
   }
   getArray() {
     const arr = this.host.parseArrayLiteral(this.expression);
@@ -267,7 +271,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "17.1.0-next.5+sha-5978b3d";
+var PLACEHOLDER_VERSION = "17.1.0-next.5+sha-7862686";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -356,6 +360,20 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl) {
   };
 }
 function toInputMapping(value, key) {
+  if (value.isObject()) {
+    const obj = value.getObject();
+    const transformValue = obj.getValue("transformFunction");
+    return {
+      classPropertyName: obj.getString("classPropertyName"),
+      bindingPropertyName: obj.getString("publicName"),
+      isSignal: obj.getBoolean("isSignal"),
+      required: obj.getBoolean("isRequired"),
+      transformFunction: transformValue.isNull() ? null : transformValue.getOpaque()
+    };
+  }
+  return parseLegacyInputPartialOutput(key, value);
+}
+function parseLegacyInputPartialOutput(key, value) {
   if (value.isString()) {
     return {
       bindingPropertyName: value.getString(),
@@ -1058,4 +1076,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RRGQJ4ZL.js.map
+//# sourceMappingURL=chunk-MGI4JOJM.js.map

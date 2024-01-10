@@ -3,17 +3,12 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  ImportManager,
-  translateExpression,
-  translateStatement,
-  translateType
-} from "./chunk-72ZMP7J3.js";
-import {
   AmbientImport,
   ClassMemberKind,
   ErrorCode,
   FatalDiagnosticError,
   ImportFlags,
+  ImportManager,
   Reference,
   assertSuccessfulReferenceEmit,
   attachDefaultImportDeclaration,
@@ -30,8 +25,11 @@ import {
   nodeNameForError,
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
+  translateExpression,
+  translateStatement,
+  translateType,
   typeNodeToValueExpr
-} from "./chunk-YGUON63I.js";
+} from "./chunk-RM5TMXKT.js";
 import {
   PerfEvent,
   PerfPhase
@@ -3894,18 +3892,18 @@ import ts17 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/utils.mjs
 import ts16 from "typescript";
-function addImports(importManager, sf, extraStatements = []) {
+function addImports(factory = ts16.factory, importManager, sf, extraStatements = []) {
   const addedImports = importManager.getAllImports(sf.fileName).map((i) => {
-    const qualifier = ts16.factory.createIdentifier(i.qualifier.text);
-    const importClause = ts16.factory.createImportClause(
+    const qualifier = factory.createIdentifier(i.qualifier.text);
+    const importClause = factory.createImportClause(
       false,
       void 0,
-      ts16.factory.createNamespaceImport(qualifier)
+      factory.createNamespaceImport(qualifier)
     );
-    const decl = ts16.factory.createImportDeclaration(
+    const decl = factory.createImportDeclaration(
       void 0,
       importClause,
-      ts16.factory.createStringLiteral(i.specifier)
+      factory.createStringLiteral(i.specifier)
     );
     ts16.setOriginalNode(i.qualifier, decl);
     return decl;
@@ -3913,8 +3911,8 @@ function addImports(importManager, sf, extraStatements = []) {
   const existingImports = sf.statements.filter((stmt) => isImportStatement(stmt));
   const body = sf.statements.filter((stmt) => !isImportStatement(stmt));
   if (addedImports.length > 0) {
-    const fileoverviewAnchorStmt = ts16.factory.createNotEmittedStatement(sf);
-    return ts16.factory.updateSourceFile(sf, ts16.factory.createNodeArray([
+    const fileoverviewAnchorStmt = factory.createNotEmittedStatement(sf);
+    return factory.updateSourceFile(sf, factory.createNodeArray([
       fileoverviewAnchorStmt,
       ...existingImports,
       ...addedImports,
@@ -3987,7 +3985,7 @@ var DtsTransformer = class {
       }
     };
     sf = ts17.visitNode(sf, visitor, ts17.isSourceFile) || sf;
-    return addImports(imports, sf);
+    return addImports(this.ctx.factory, imports, sf);
   }
   transformClassDeclaration(clazz, transforms, imports) {
     let elements = clazz.members;
@@ -4298,7 +4296,7 @@ function transformIvySourceFile(compilation, context, reflector, importRewriter,
     annotateForClosureCompiler: isClosureCompilerEnabled
   }));
   const fileOverviewMeta = isClosureCompilerEnabled ? getFileOverviewComment(sf.statements) : null;
-  sf = addImports(importManager, sf, constants);
+  sf = addImports(context.factory, importManager, sf, constants);
   if (fileOverviewMeta !== null) {
     setFileOverviewComment(sf, fileOverviewMeta);
   }
@@ -4413,14 +4411,34 @@ function extractPropertyTarget(node) {
   return null;
 }
 function isReferenceToInputFunction(target, coreModule, reflector) {
-  const decl = reflector.getDeclarationOfIdentifier(target);
-  if (decl === null || !ts20.isVariableDeclaration(decl.node) || decl.node.name === void 0 || !ts20.isIdentifier(decl.node.name)) {
-    return false;
+  let targetImport = reflector.getImportOfIdentifier(target);
+  if (targetImport === null) {
+    if (coreModule !== void 0) {
+      return false;
+    }
+    targetImport = { name: target.text };
   }
-  if (coreModule !== void 0 && decl.viaModule !== coreModule) {
-    return false;
+  return targetImport.name === "input" || targetImport.name === "\u0275input";
+}
+function tryParseSignalInputMapping(member, reflector, evaluator, coreModule) {
+  const signalInput = tryParseInputInitializerAndOptions(member, reflector, coreModule);
+  if (signalInput === null) {
+    return null;
   }
-  return decl.node.name.text === "input" || decl.node.name.text === "\u0275input";
+  const optionsNode = signalInput.optionsNode;
+  const options = optionsNode !== void 0 ? evaluator.evaluate(optionsNode) : null;
+  const classPropertyName = member.name;
+  let bindingPropertyName = classPropertyName;
+  if (options instanceof Map && typeof options.get("alias") === "string") {
+    bindingPropertyName = options.get("alias");
+  }
+  return {
+    isSignal: true,
+    classPropertyName,
+    bindingPropertyName,
+    required: signalInput.isRequired,
+    transform: null
+  };
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.mjs
@@ -4433,7 +4451,7 @@ var QUERY_TYPES = /* @__PURE__ */ new Set([
 ]);
 function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmitter, referencesRegistry, isCore, annotateForClosureCompiler, compilationMode, defaultSelector = null) {
   let directive;
-  if (decorator === null || decorator.args === null || decorator.args.length === 0) {
+  if (decorator.args === null || decorator.args.length === 0) {
     directive = /* @__PURE__ */ new Map();
   } else if (decorator.args.length !== 1) {
     throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `Incorrect number of arguments to @${decorator.name} decorator`);
@@ -4451,7 +4469,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const decoratedElements = members.filter((member) => !member.isStatic && member.decorators !== null);
   const coreModule = isCore ? void 0 : "@angular/core";
   const inputsFromMeta = parseInputsArray(clazz, directive, evaluator, reflector, refEmitter, compilationMode);
-  const inputsFromFields = parseInputFields(clazz, members, evaluator, reflector, refEmitter, coreModule, compilationMode);
+  const inputsFromFields = parseInputFields(clazz, members, evaluator, reflector, refEmitter, coreModule, compilationMode, inputsFromMeta, decorator);
   const inputs = ClassPropertyMapping.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
   const outputsFromMeta = parseOutputsArray(directive, evaluator);
   const outputsFromFields = parseOutputFields(filterToMembersWithDecorator(decoratedElements, "Output", coreModule), evaluator);
@@ -4855,6 +4873,10 @@ function tryGetDecoratorOnMember(member, decoratorName, coreModule) {
 function tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModule, refEmitter, compilationMode) {
   const classPropertyName = member.name;
   const decorator = tryGetDecoratorOnMember(member, "Input", coreModule);
+  const signalInputMapping = tryParseSignalInputMapping(member, reflector, evaluator, coreModule);
+  if (decorator !== null && signalInputMapping !== null) {
+    throw new FatalDiagnosticError(ErrorCode.SIGNAL_INPUT_AND_DISALLOWED_DECORATOR, decorator.node, `Using @Input with a signal input is not allowed.`);
+  }
   if (decorator !== null) {
     if (decorator.args !== null && decorator.args.length > 1) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `@${decorator.name} can have at most one argument, got ${decorator.args.length} argument(s)`);
@@ -4888,35 +4910,27 @@ function tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModu
       required
     };
   }
-  const signalInput = tryParseInputInitializerAndOptions(member, reflector, coreModule);
-  if (signalInput !== null) {
-    const optionsNode = signalInput.optionsNode;
-    const options = optionsNode !== void 0 ? evaluator.evaluate(optionsNode) : null;
-    let bindingPropertyName = classPropertyName;
-    if (options instanceof Map && typeof options.get("alias") === "string") {
-      bindingPropertyName = options.get("alias");
-    }
-    return {
-      isSignal: true,
-      classPropertyName,
-      bindingPropertyName,
-      required: signalInput.isRequired,
-      transform: null
-    };
+  if (signalInputMapping !== null) {
+    return signalInputMapping;
   }
   return null;
 }
-function parseInputFields(clazz, members, evaluator, reflector, refEmitter, coreModule, compilationMode) {
+function parseInputFields(clazz, members, evaluator, reflector, refEmitter, coreModule, compilationMode, inputsFromClassDecorator, classDecorator) {
+  var _a, _b;
   const inputs = {};
   for (const member of members) {
-    if (member.isStatic) {
-      continue;
-    }
     const classPropertyName = member.name;
     const inputMapping = tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModule, refEmitter, compilationMode);
-    if (inputMapping !== null) {
-      inputs[classPropertyName] = inputMapping;
+    if (inputMapping === null) {
+      continue;
     }
+    if (member.isStatic) {
+      throw new FatalDiagnosticError(ErrorCode.INPUT_DECLARED_ON_STATIC_MEMBER, (_a = member.node) != null ? _a : clazz, `Input "${member.name}" is incorrectly declared as static member of "${clazz.name.text}".`);
+    }
+    if (inputMapping.isSignal && inputsFromClassDecorator.hasOwnProperty(classPropertyName)) {
+      throw new FatalDiagnosticError(ErrorCode.SIGNAL_INPUT_AND_INPUTS_ARRAY_COLLISION, (_b = member.node) != null ? _b : clazz, `Input "${member.name}" is also declared as non-signal in @${classDecorator.name}.`);
+    }
+    inputs[classPropertyName] = inputMapping;
   }
   return inputs;
 }
@@ -7660,49 +7674,8 @@ var PipeDecoratorHandler = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/checker.mjs
-var OptimizeFor;
-(function(OptimizeFor2) {
-  OptimizeFor2[OptimizeFor2["SingleFile"] = 0] = "SingleFile";
-  OptimizeFor2[OptimizeFor2["WholeProgram"] = 1] = "WholeProgram";
-})(OptimizeFor || (OptimizeFor = {}));
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/scope.mjs
-var PotentialImportKind;
-(function(PotentialImportKind2) {
-  PotentialImportKind2[PotentialImportKind2["NgModule"] = 0] = "NgModule";
-  PotentialImportKind2[PotentialImportKind2["Standalone"] = 1] = "Standalone";
-})(PotentialImportKind || (PotentialImportKind = {}));
-var PotentialImportMode;
-(function(PotentialImportMode2) {
-  PotentialImportMode2[PotentialImportMode2["Normal"] = 0] = "Normal";
-  PotentialImportMode2[PotentialImportMode2["ForceDirect"] = 1] = "ForceDirect";
-})(PotentialImportMode || (PotentialImportMode = {}));
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/completion.mjs
-var CompletionKind;
-(function(CompletionKind2) {
-  CompletionKind2[CompletionKind2["Reference"] = 0] = "Reference";
-  CompletionKind2[CompletionKind2["Variable"] = 1] = "Variable";
-})(CompletionKind || (CompletionKind = {}));
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/symbols.mjs
-var SymbolKind;
-(function(SymbolKind2) {
-  SymbolKind2[SymbolKind2["Input"] = 0] = "Input";
-  SymbolKind2[SymbolKind2["Output"] = 1] = "Output";
-  SymbolKind2[SymbolKind2["Binding"] = 2] = "Binding";
-  SymbolKind2[SymbolKind2["Reference"] = 3] = "Reference";
-  SymbolKind2[SymbolKind2["Variable"] = 4] = "Variable";
-  SymbolKind2[SymbolKind2["Directive"] = 5] = "Directive";
-  SymbolKind2[SymbolKind2["Element"] = 6] = "Element";
-  SymbolKind2[SymbolKind2["Template"] = 7] = "Template";
-  SymbolKind2[SymbolKind2["Expression"] = 8] = "Expression";
-  SymbolKind2[SymbolKind2["DomBinding"] = 9] = "DomBinding";
-  SymbolKind2[SymbolKind2["Pipe"] = 10] = "Pipe";
-})(SymbolKind || (SymbolKind = {}));
-
 export {
+  isAngularDecorator,
   forwardRefResolver,
   MetaKind,
   CompoundMetadataReader,
@@ -7726,19 +7699,16 @@ export {
   CompilationMode,
   aliasTransformFactory,
   TraitCompiler,
+  addImports,
   DtsTransformRegistry,
   declarationTransformFactory,
   ivyTransformFactory,
+  tryParseSignalInputMapping,
   DirectiveDecoratorHandler,
   NgModuleDecoratorHandler,
   ComponentDecoratorHandler,
   InjectableDecoratorHandler,
-  PipeDecoratorHandler,
-  OptimizeFor,
-  CompletionKind,
-  PotentialImportKind,
-  PotentialImportMode,
-  SymbolKind
+  PipeDecoratorHandler
 };
 /*!
  * @license
@@ -7754,4 +7724,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-PVVKSWP6.js.map
+//# sourceMappingURL=chunk-6HLUQITP.js.map

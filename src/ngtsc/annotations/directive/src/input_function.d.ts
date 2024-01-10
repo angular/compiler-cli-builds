@@ -5,19 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import ts from 'typescript';
+import { InputMapping } from '../../../metadata';
+import { PartialEvaluator } from '../../../partial_evaluator';
 import { ClassMember, ReflectionHost } from '../../../reflection';
-/** Metadata describing an input declared via the `input` function. */
-export interface InputMemberMetadata {
-    /** Node referring to the call expression. */
-    inputCall: ts.CallExpression;
-    /** Node referring to the options expression, if specified. */
-    optionsNode: ts.Expression | undefined;
-    /** Whether the input is required or not. i.e. `input.required` was used. */
-    isRequired: boolean;
-}
 /**
- * Attempts to identify and parse an Angular input that is declared
- * as a class member using the `input`/`input.required` functions.
+ * Attempts to parse a signal input class member. Returns the parsed
+ * input mapping if possible.
  */
-export declare function tryParseInputInitializerAndOptions(member: ClassMember, reflector: ReflectionHost, coreModule: string | undefined): InputMemberMetadata | null;
+export declare function tryParseSignalInputMapping(member: Pick<ClassMember, 'name' | 'value'>, reflector: ReflectionHost, evaluator: PartialEvaluator, coreModule: string | undefined): InputMapping | null;
