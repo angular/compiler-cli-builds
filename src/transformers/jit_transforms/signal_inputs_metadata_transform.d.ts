@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
-import { PartialEvaluator } from '../../ngtsc/partial_evaluator';
 import { ReflectionHost } from '../../ngtsc/reflection';
 /**
  * Creates a TypeScript transformer that will automatically add an `@Input` decorator
@@ -19,4 +18,4 @@ import { ReflectionHost } from '../../ngtsc/reflection';
  * before instantiating directives. A decorator exposes this information to the class without
  * the class needing to be instantiated.
  */
-export declare function getInputSignalsMetadataTransform(host: ReflectionHost, evaluator: PartialEvaluator, isCore: boolean): ts.TransformerFactory<ts.SourceFile>;
+export declare function getInputSignalsMetadataTransform(host: ReflectionHost, isCore: boolean): ts.TransformerFactory<ts.SourceFile>;

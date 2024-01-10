@@ -7,7 +7,7 @@ import {
   addImports,
   isAngularDecorator,
   tryParseSignalInputMapping
-} from "./chunk-6HLUQITP.js";
+} from "./chunk-2SNOTZU5.js";
 import {
   ImportManager,
   TypeScriptReflectionHost,
@@ -322,11 +322,11 @@ function cloneClassElementWithModifiers(node, modifiers) {
 import ts2 from "typescript";
 var decoratorsWithInputs = ["Directive", "Component"];
 var coreModuleName = "@angular/core";
-function getInputSignalsMetadataTransform(host, evaluator, isCore) {
+function getInputSignalsMetadataTransform(host, isCore) {
   return (ctx) => {
     return (sourceFile) => {
       const importManager = new ImportManager(void 0, void 0, ctx.factory);
-      sourceFile = ts2.visitNode(sourceFile, createTransformVisitor(ctx, host, evaluator, importManager, isCore), ts2.isSourceFile);
+      sourceFile = ts2.visitNode(sourceFile, createTransformVisitor(ctx, host, importManager, isCore), ts2.isSourceFile);
       const newImports = importManager.getAllImports(sourceFile.fileName);
       if (newImports.length > 0) {
         sourceFile = addImports(ctx.factory, importManager, sourceFile);
@@ -335,20 +335,20 @@ function getInputSignalsMetadataTransform(host, evaluator, isCore) {
     };
   };
 }
-function createTransformVisitor(ctx, host, evaluator, importManager, isCore) {
+function createTransformVisitor(ctx, host, importManager, isCore) {
   const visitor = (node) => {
     var _a;
     if (ts2.isClassDeclaration(node) && node.name !== void 0) {
       const angularDecorator = (_a = host.getDecoratorsOfDeclaration(node)) == null ? void 0 : _a.find((d) => decoratorsWithInputs.some((name) => isAngularDecorator(d, name, isCore)));
       if (angularDecorator !== void 0) {
-        return visitClassDeclaration(ctx, host, evaluator, importManager, node, angularDecorator, isCore);
+        return visitClassDeclaration(ctx, host, importManager, node, angularDecorator, isCore);
       }
     }
     return ts2.visitEachChild(node, visitor, ctx);
   };
   return visitor;
 }
-function visitClassDeclaration(ctx, host, evaluator, importManager, clazz, classDecorator, isCore) {
+function visitClassDeclaration(ctx, host, importManager, clazz, classDecorator, isCore) {
   const members = clazz.members.map((member) => {
     var _a, _b, _c;
     if (!ts2.isPropertyDeclaration(member)) {
@@ -360,7 +360,7 @@ function visitClassDeclaration(ctx, host, evaluator, importManager, clazz, class
     if ((_a = host.getDecoratorsOfDeclaration(member)) == null ? void 0 : _a.some((d) => isAngularDecorator(d, "Input", isCore))) {
       return member;
     }
-    const inputMapping = tryParseSignalInputMapping({ name: member.name.text, value: (_b = member.initializer) != null ? _b : null }, host, evaluator, isCore ? coreModuleName : void 0);
+    const inputMapping = tryParseSignalInputMapping({ name: member.name.text, value: (_b = member.initializer) != null ? _b : null }, host, isCore ? coreModuleName : void 0);
     if (inputMapping === null) {
       return member;
     }
@@ -403,7 +403,7 @@ function angularJitApplicationTransform(program, isCore = false) {
     isCore,
     false
   );
-  const inputSignalMetadataTransform = getInputSignalsMetadataTransform(reflectionHost, evaluator, isCore);
+  const inputSignalMetadataTransform = getInputSignalsMetadataTransform(reflectionHost, isCore);
   return (ctx) => {
     return (sourceFile) => {
       sourceFile = inputSignalMetadataTransform(ctx)(sourceFile);
@@ -427,4 +427,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RA2OTAFM.js.map
+//# sourceMappingURL=chunk-KFXS2VXK.js.map

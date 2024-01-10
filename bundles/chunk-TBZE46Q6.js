@@ -38,7 +38,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-6HLUQITP.js";
+} from "./chunk-2SNOTZU5.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -8965,4 +8965,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-D2YYZE4B.js.map
+//# sourceMappingURL=chunk-TBZE46Q6.js.map

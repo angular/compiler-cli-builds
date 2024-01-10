@@ -4380,7 +4380,7 @@ function tryParseInputInitializerAndOptions(member, reflector, coreModule) {
   if (target === null) {
     return null;
   }
-  if (target.text === "input" || target.text === "\u0275input") {
+  if (target.text === "input") {
     if (!isReferenceToInputFunction(target, coreModule, reflector)) {
       return null;
     }
@@ -4418,24 +4418,36 @@ function isReferenceToInputFunction(target, coreModule, reflector) {
     }
     targetImport = { name: target.text };
   }
-  return targetImport.name === "input" || targetImport.name === "\u0275input";
+  return targetImport.name === "input";
 }
-function tryParseSignalInputMapping(member, reflector, evaluator, coreModule) {
+function parseAndValidateOptions(optionsNode) {
+  if (!ts20.isObjectLiteralExpression(optionsNode)) {
+    throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, optionsNode, "Argument needs to be an object literal that is statically analyzable.");
+  }
+  const options = reflectObjectLiteral(optionsNode);
+  let alias = void 0;
+  if (options.has("alias")) {
+    const aliasExpr = options.get("alias");
+    if (!ts20.isStringLiteralLike(aliasExpr)) {
+      throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, aliasExpr, "Alias needs to be a string that is statically analyzable.");
+    }
+    alias = aliasExpr.text;
+  }
+  return { alias };
+}
+function tryParseSignalInputMapping(member, reflector, coreModule) {
+  var _a;
   const signalInput = tryParseInputInitializerAndOptions(member, reflector, coreModule);
   if (signalInput === null) {
     return null;
   }
   const optionsNode = signalInput.optionsNode;
-  const options = optionsNode !== void 0 ? evaluator.evaluate(optionsNode) : null;
+  const options = optionsNode !== void 0 ? parseAndValidateOptions(optionsNode) : null;
   const classPropertyName = member.name;
-  let bindingPropertyName = classPropertyName;
-  if (options instanceof Map && typeof options.get("alias") === "string") {
-    bindingPropertyName = options.get("alias");
-  }
   return {
     isSignal: true,
     classPropertyName,
-    bindingPropertyName,
+    bindingPropertyName: (_a = options == null ? void 0 : options.alias) != null ? _a : classPropertyName,
     required: signalInput.isRequired,
     transform: null
   };
@@ -4873,7 +4885,7 @@ function tryGetDecoratorOnMember(member, decoratorName, coreModule) {
 function tryParseInputFieldMapping(clazz, member, evaluator, reflector, coreModule, refEmitter, compilationMode) {
   const classPropertyName = member.name;
   const decorator = tryGetDecoratorOnMember(member, "Input", coreModule);
-  const signalInputMapping = tryParseSignalInputMapping(member, reflector, evaluator, coreModule);
+  const signalInputMapping = tryParseSignalInputMapping(member, reflector, coreModule);
   if (decorator !== null && signalInputMapping !== null) {
     throw new FatalDiagnosticError(ErrorCode.SIGNAL_INPUT_AND_DISALLOWED_DECORATOR, decorator.node, `Using @Input with a signal input is not allowed.`);
   }
@@ -7724,4 +7736,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-6HLUQITP.js.map
+//# sourceMappingURL=chunk-2SNOTZU5.js.map
