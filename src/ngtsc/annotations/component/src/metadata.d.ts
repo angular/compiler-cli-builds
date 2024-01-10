@@ -18,7 +18,7 @@ import { ParsedTemplateWithSource, StyleUrlMeta } from './resources';
  * The `keyof R3ComponentMetadata &` condition ensures that only fields of `R3ComponentMetadata` can
  * be included here.
  */
-export type ComponentMetadataResolvedFields = SubsetOfKeys<R3ComponentMetadata<R3TemplateDependencyMetadata>, 'declarations' | 'declarationListEmitMode' | 'deferBlocks' | 'deferrableDeclToImportDecl'>;
+export type ComponentMetadataResolvedFields = SubsetOfKeys<R3ComponentMetadata<R3TemplateDependencyMetadata>, 'declarations' | 'declarationListEmitMode' | 'deferBlocks' | 'deferrableDeclToImportDecl' | 'deferrableTypes'>;
 export interface ComponentAnalysisData {
     /**
      * `meta` includes those fields of `R3ComponentMetadata` which are calculated at `analyze` time
@@ -55,6 +55,8 @@ export interface ComponentAnalysisData {
     animationTriggerNames: AnimationTriggerNames | null;
     rawImports: ts.Expression | null;
     resolvedImports: Reference<ClassDeclaration>[] | null;
+    rawDeferredImports: ts.Expression | null;
+    resolvedDeferredImports: Reference<ClassDeclaration>[] | null;
     schemas: SchemaMetadata[] | null;
     decorator: ts.Decorator | null;
     /** Additional directives applied to the component host. */

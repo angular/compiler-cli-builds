@@ -38,7 +38,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-2SNOTZU5.js";
+} from "./chunk-S743FATK.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -86,7 +86,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-RM5TMXKT.js";
+} from "./chunk-AK5W6ACC.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -2425,6 +2425,7 @@ var StandaloneComponentScopeReader = class {
         return null;
       }
       const dependencies = /* @__PURE__ */ new Set([clazzMeta]);
+      const deferredDependencies = /* @__PURE__ */ new Set();
       const seen = /* @__PURE__ */ new Set([clazz]);
       let isPoisoned = clazzMeta.isPoisoned;
       if (clazzMeta.imports !== null) {
@@ -2470,10 +2471,27 @@ var StandaloneComponentScopeReader = class {
           isPoisoned = true;
         }
       }
+      if (clazzMeta.deferredImports !== null) {
+        for (const ref of clazzMeta.deferredImports) {
+          const dirMeta = this.metaReader.getDirectiveMetadata(ref);
+          if (dirMeta !== null) {
+            deferredDependencies.add({ ...dirMeta, ref, isExplicitlyDeferred: true });
+            isPoisoned = isPoisoned || dirMeta.isPoisoned || !dirMeta.isStandalone;
+            continue;
+          }
+          const pipeMeta = this.metaReader.getPipeMetadata(ref);
+          if (pipeMeta !== null) {
+            deferredDependencies.add({ ...pipeMeta, ref, isExplicitlyDeferred: true });
+            isPoisoned = isPoisoned || !pipeMeta.isStandalone;
+            continue;
+          }
+        }
+      }
       this.cache.set(clazz, {
         kind: ComponentScopeKind.Standalone,
         component: clazz,
         dependencies: Array.from(dependencies),
+        deferredDependencies: Array.from(deferredDependencies),
         isPoisoned,
         schemas: (_a = clazzMeta.schemas) != null ? _a : []
       });
@@ -3451,7 +3469,7 @@ var Environment = class extends ReferenceEmitEnvironment {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/oob.mjs
-import { TmplAstElement as TmplAstElement2, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty } from "@angular/compiler";
+import { AbsoluteSourceSpan as AbsoluteSourceSpan3, TmplAstElement as TmplAstElement2, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty } from "@angular/compiler";
 import ts24 from "typescript";
 var OutOfBandDiagnosticRecorderImpl = class {
   constructor(resolver) {
@@ -3480,6 +3498,30 @@ var OutOfBandDiagnosticRecorderImpl = class {
     }
     this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, sourceSpan, ts24.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
     this.recordedPipes.add(ast);
+  }
+  deferredPipeUsedEagerly(templateId, ast) {
+    if (this.recordedPipes.has(ast)) {
+      return;
+    }
+    const mapping = this.resolver.getSourceMapping(templateId);
+    const errorMsg = `Pipe '${ast.name}' was imported  via \`@Component.deferredImports\`, but was used outside of a \`@defer\` block in a template. To fix this, either use the '${ast.name}' pipe inside of a \`@defer\` block or import this dependency using the \`@Component.imports\` field.`;
+    const sourceSpan = this.resolver.toParseSourceSpan(templateId, ast.nameSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, sourceSpan, ts24.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
+    this.recordedPipes.add(ast);
+  }
+  deferredComponentUsedEagerly(templateId, element) {
+    const mapping = this.resolver.getSourceMapping(templateId);
+    const errorMsg = `Element '${element.name}' contains a component or a directive that was imported  via \`@Component.deferredImports\`, but the element itself is located outside of a \`@defer\` block in a template. To fix this, either use the '${element.name}' element inside of a \`@defer\` block or import referenced component/directive dependency using the \`@Component.imports\` field.`;
+    const { start, end } = element.startSourceSpan;
+    const absoluteSourceSpan = new AbsoluteSourceSpan3(start.offset, end.offset);
+    const sourceSpan = this.resolver.toParseSourceSpan(templateId, absoluteSourceSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${element.name}'.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, sourceSpan, ts24.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
   }
   illegalAssignmentToTemplateVar(templateId, assignment, target) {
     var _a, _b;
@@ -3651,7 +3693,7 @@ import { BindingPipe, Call as Call2, createCssSelectorFromNode, CssSelector, DYN
 import ts28 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
-import { AbsoluteSourceSpan as AbsoluteSourceSpan3 } from "@angular/compiler";
+import { AbsoluteSourceSpan as AbsoluteSourceSpan4 } from "@angular/compiler";
 import ts26 from "typescript";
 function wrapForDiagnostics(expr) {
   return ts26.factory.createParenthesizedExpression(expr);
@@ -3661,7 +3703,7 @@ function wrapForTypeChecker(expr) {
 }
 function addParseSpanInfo(node, span) {
   let commentText;
-  if (span instanceof AbsoluteSourceSpan3) {
+  if (span instanceof AbsoluteSourceSpan4) {
     commentText = `${span.start},${span.end}`;
   } else {
     commentText = `${span.start.offset},${span.end.offset}`;
@@ -5164,6 +5206,13 @@ var _Scope = class {
         this.opQueue.push(new TcbDomSchemaCheckerOp(this.tcb, node, true, claimedInputs));
       }
       return;
+    } else {
+      if (node instanceof TmplAstElement3) {
+        const isDeferred = this.tcb.boundTarget.isDeferred(node);
+        if (!isDeferred && directives.some((dirMeta) => dirMeta.isExplicitlyDeferred)) {
+          this.tcb.oobRecorder.deferredComponentUsedEagerly(this.tcb.id, node);
+        }
+      }
     }
     const dirMap = /* @__PURE__ */ new Map();
     for (const dir of directives) {
@@ -5341,13 +5390,16 @@ var TcbExpressionTranslator = class {
       return ts28.factory.createThis();
     } else if (ast instanceof BindingPipe) {
       const expr = this.translate(ast.exp);
-      const pipeRef = this.tcb.getPipeByName(ast.name);
+      const pipeMeta = this.tcb.getPipeByName(ast.name);
       let pipe;
-      if (pipeRef === null) {
+      if (pipeMeta === null) {
         this.tcb.oobRecorder.missingPipe(this.tcb.id, ast);
         pipe = NULL_AS_ANY;
+      } else if (pipeMeta.isExplicitlyDeferred && this.tcb.boundTarget.getEagerlyUsedPipes().includes(ast.name)) {
+        this.tcb.oobRecorder.deferredPipeUsedEagerly(this.tcb.id, ast);
+        pipe = NULL_AS_ANY;
       } else {
-        pipe = this.tcb.env.pipeInst(pipeRef);
+        pipe = this.tcb.env.pipeInst(pipeMeta.ref);
       }
       const args = ast.args.map((arg) => this.translate(arg));
       let methodAccess = ts28.factory.createPropertyAccessExpression(pipe, "transform");
@@ -5643,7 +5695,7 @@ var TypeCheckContextImpl = class {
       if (!pipes.has(name)) {
         continue;
       }
-      usedPipes.push(pipes.get(name));
+      usedPipes.push(pipes.get(name).ref);
     }
     const inliningRequirement = requiresInlineTypeCheckBlock(ref, shimData.file, usedPipes, this.reflector);
     if (this.inlining === InliningMode.Error && inliningRequirement === TcbInliningRequirement.MustInline) {
@@ -8090,7 +8142,7 @@ var NgCompiler = class {
     return diagnostics;
   }
   makeCompilation() {
-    var _a, _b, _c;
+    var _a, _b, _c, _d;
     const isCore = isAngularCorePackage(this.inputProgram);
     let compilationMode = CompilationMode.FULL;
     if (!isCore) {
@@ -8159,11 +8211,11 @@ var NgCompiler = class {
     }
     const dtsTransforms = new DtsTransformRegistry();
     const resourceRegistry = new ResourceRegistry();
-    const deferredSymbolsTracker = new DeferredSymbolTracker(this.inputProgram.getTypeChecker());
+    const deferredSymbolsTracker = new DeferredSymbolTracker(this.inputProgram.getTypeChecker(), (_a = this.options.onlyExplicitDeferDependencyImports) != null ? _a : false);
     const cycleHandlingStrategy = compilationMode === CompilationMode.FULL ? 0 : 1;
     const strictCtorDeps = this.options.strictInjectionParameters || false;
-    const supportJitMode = (_a = this.options["supportJitMode"]) != null ? _a : true;
-    const supportTestBed = (_b = this.options["supportTestBed"]) != null ? _b : true;
+    const supportJitMode = (_b = this.options["supportJitMode"]) != null ? _b : true;
+    const supportTestBed = (_c = this.options["supportTestBed"]) != null ? _c : true;
     if (supportTestBed === false && compilationMode === CompilationMode.PARTIAL) {
       throw new Error('TestBed support ("supportTestBed" option) cannot be disabled in partial compilation mode.');
     }
@@ -8178,7 +8230,7 @@ var NgCompiler = class {
       new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, supportTestBed, compilationMode),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
-      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_c = this.options.onlyPublishPublicTypingsForNgModules) != null ? _c : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode)
+      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_d = this.options.onlyPublishPublicTypingsForNgModules) != null ? _d : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
@@ -8965,4 +9017,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TBZE46Q6.js.map
+//# sourceMappingURL=chunk-DFXU7BBR.js.map

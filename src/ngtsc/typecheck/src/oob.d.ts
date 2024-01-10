@@ -39,6 +39,24 @@ export interface OutOfBandDiagnosticRecorder {
      * @param ast the `BindingPipe` invocation of the pipe which could not be found.
      */
     missingPipe(templateId: TemplateId, ast: BindingPipe): void;
+    /**
+     * Reports usage of a pipe imported via `@Component.deferredImports` outside
+     * of a `@defer` block in a template.
+     *
+     * @param templateId the template type-checking ID of the template which contains the unknown
+     * pipe.
+     * @param ast the `BindingPipe` invocation of the pipe which could not be found.
+     */
+    deferredPipeUsedEagerly(templateId: TemplateId, ast: BindingPipe): void;
+    /**
+     * Reports usage of a component/directive imported via `@Component.deferredImports` outside
+     * of a `@defer` block in a template.
+     *
+     * @param templateId the template type-checking ID of the template which contains the unknown
+     * pipe.
+     * @param element the element which hosts a component that was defer-loaded.
+     */
+    deferredComponentUsedEagerly(templateId: TemplateId, element: TmplAstElement): void;
     illegalAssignmentToTemplateVar(templateId: TemplateId, assignment: PropertyWrite, target: TmplAstVariable): void;
     /**
      * Reports a duplicate declaration of a template variable.
@@ -87,6 +105,8 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     get diagnostics(): ReadonlyArray<TemplateDiagnostic>;
     missingReferenceTarget(templateId: TemplateId, ref: TmplAstReference): void;
     missingPipe(templateId: TemplateId, ast: BindingPipe): void;
+    deferredPipeUsedEagerly(templateId: TemplateId, ast: BindingPipe): void;
+    deferredComponentUsedEagerly(templateId: TemplateId, element: TmplAstElement): void;
     illegalAssignmentToTemplateVar(templateId: TemplateId, assignment: PropertyWrite, target: TmplAstVariable): void;
     duplicateTemplateVar(templateId: TemplateId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
     requiresInlineTcb(templateId: TemplateId, node: ClassDeclaration): void;

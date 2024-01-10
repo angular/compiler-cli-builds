@@ -90,6 +90,20 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     compilePartial(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): CompileResult[];
     compileLocal(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, pool: ConstantPool): CompileResult[];
     /**
+     * Locates defer blocks in case scope information is not available.
+     * For example, this happens in the local compilation mode.
+     */
+    private locateDeferBlocksWithoutScope;
+    /**
+     * Computes a list of deferrable symbols based on dependencies from
+     * the `@Component.imports` field and their usage in `@defer` blocks.
+     */
+    private collectDeferredSymbols;
+    /**
+     * Collects a list of deferrable symbols based on the `@Component.deferredImports` field.
+     */
+    private collectExplicitlyDeferredSymbols;
+    /**
      * Check whether adding an import from `origin` to the source-file corresponding to `expr` would
      * create a cyclic import.
      *
@@ -102,6 +116,12 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      * available for the final `compile` step.
      */
     private resolveDeferBlocks;
+    /**
+     * Inspects provided imports expression (either `@Component.imports` or
+     * `@Component.deferredImports`) and registers imported types as deferrable
+     * candidates.
+     */
+    private registerDeferrableCandidates;
     /** Resolves the triggers of the defer block to the elements that they're pointing to. */
     private resolveDeferTriggers;
 }

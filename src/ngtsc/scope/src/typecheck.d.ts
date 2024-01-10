@@ -6,9 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { SchemaMetadata, SelectorMatcher } from '@angular/compiler';
-import ts from 'typescript';
 import { Reference } from '../../imports';
-import { DirectiveMeta, HostDirectivesResolver, MetadataReader } from '../../metadata';
+import { DirectiveMeta, HostDirectivesResolver, MetadataReader, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 import { ComponentScopeReader } from './api';
 /**
@@ -27,7 +26,7 @@ export interface TypeCheckScope {
     /**
      * The pipes that are available in the compilation scope.
      */
-    pipes: Map<string, Reference<ClassDeclaration<ts.ClassDeclaration>>>;
+    pipes: Map<string, PipeMeta>;
     /**
      * The schemas that are used in this scope.
      */
@@ -62,4 +61,5 @@ export declare class TypeCheckScopeRegistry {
      */
     getTypeCheckScope(node: ClassDeclaration): TypeCheckScope;
     getTypeCheckDirectiveMetadata(ref: Reference<ClassDeclaration>): DirectiveMeta | null;
+    private applyExplicitlyDeferredFlag;
 }
