@@ -7806,10 +7806,17 @@ var NgCompiler = class {
     return this.addMessageTextDetails(diagnostics);
   }
   getDiagnosticsForFile(file, optimizeFor) {
-    const diagnostics = [];
-    diagnostics.push(...this.getNonTemplateDiagnostics().filter((diag) => diag.file === file), ...this.getTemplateDiagnosticsForFile(file, optimizeFor));
-    if (this.options.strictTemplates) {
-      diagnostics.push(...this.getExtendedTemplateDiagnostics(file));
+    const diagnostics = [...this.getNonTemplateDiagnostics().filter((diag) => diag.file === file)];
+    try {
+      diagnostics.push(...this.getTemplateDiagnosticsForFile(file, optimizeFor));
+      if (this.options.strictTemplates) {
+        diagnostics.push(...this.getExtendedTemplateDiagnostics(file));
+      }
+    } catch (e) {
+      if (e instanceof FatalDiagnosticError) {
+        diagnostics.push(e.toDiagnostic());
+      }
+      throw e;
     }
     return this.addMessageTextDetails(diagnostics);
   }
@@ -8102,14 +8109,7 @@ var NgCompiler = class {
     const compilation = this.ensureAnalyzed();
     const diagnostics = [];
     if (!sf.isDeclarationFile && !this.adapter.isShim(sf)) {
-      try {
-        diagnostics.push(...compilation.templateTypeChecker.getDiagnosticsForFile(sf, optimizeFor));
-      } catch (err) {
-        if (!(err instanceof FatalDiagnosticError)) {
-          throw err;
-        }
-        diagnostics.push(err.toDiagnostic());
-      }
+      diagnostics.push(...compilation.templateTypeChecker.getDiagnosticsForFile(sf, optimizeFor));
     }
     const program = this.programDriver.getProgram();
     this.incrementalStrategy.setIncrementalState(this.incrementalCompilation.state, program);
@@ -9017,4 +9017,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-DFXU7BBR.js.map
+//# sourceMappingURL=chunk-AX3YYJXD.js.map
