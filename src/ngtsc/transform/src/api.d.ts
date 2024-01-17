@@ -167,7 +167,7 @@ export interface DecoratorHandler<D, A, S extends SemanticSymbol | null, R> {
      * Generates code based on each individual source file without using its
      * dependencies (suitable for local dev edit/refresh workflow)
      */
-    compileLocal(node: ClassDeclaration, analysis: Readonly<A>, constantPool: ConstantPool): CompileResult | CompileResult[];
+    compileLocal(node: ClassDeclaration, analysis: Readonly<A>, resolution: Readonly<Partial<R>>, constantPool: ConstantPool): CompileResult | CompileResult[];
 }
 /**
  * The output of detecting a trait for a declaration as the result of the first phase of the

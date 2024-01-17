@@ -1526,16 +1526,13 @@ var TraitCompiler = class {
       }
     }
     const symbol = this.makeSymbolForTrait(trait.handler, clazz, (_a = result.analysis) != null ? _a : null);
-    if (this.compilationMode !== CompilationMode.LOCAL && result.analysis !== void 0 && trait.handler.register !== void 0) {
+    if (result.analysis !== void 0 && trait.handler.register !== void 0) {
       trait.handler.register(clazz, result.analysis);
     }
     trait = trait.toAnalyzed((_b = result.analysis) != null ? _b : null, (_c = result.diagnostics) != null ? _c : null, symbol);
   }
   resolve() {
     var _a, _b;
-    if (this.compilationMode === CompilationMode.LOCAL) {
-      return;
-    }
     const classes = this.classes.keys();
     for (const clazz of classes) {
       const record = this.classes.get(clazz);
@@ -1582,7 +1579,7 @@ var TraitCompiler = class {
     }
   }
   typeCheck(sf, ctx) {
-    if (!this.fileToClasses.has(sf)) {
+    if (!this.fileToClasses.has(sf) || this.compilationMode === CompilationMode.LOCAL) {
       return;
     }
     for (const clazz of this.fileToClasses.get(sf)) {
@@ -1673,15 +1670,12 @@ var TraitCompiler = class {
     let res = [];
     for (const trait of record.traits) {
       let compileRes;
+      if (trait.state !== TraitState.Resolved || containsErrors(trait.analysisDiagnostics) || containsErrors(trait.resolveDiagnostics)) {
+        continue;
+      }
       if (this.compilationMode === CompilationMode.LOCAL) {
-        if (trait.state !== TraitState.Analyzed || trait.analysis === null || containsErrors(trait.analysisDiagnostics)) {
-          continue;
-        }
-        compileRes = trait.handler.compileLocal(clazz, trait.analysis, constantPool);
+        compileRes = trait.handler.compileLocal(clazz, trait.analysis, trait.resolution, constantPool);
       } else {
-        if (trait.state !== TraitState.Resolved || containsErrors(trait.analysisDiagnostics) || containsErrors(trait.resolveDiagnostics)) {
-          continue;
-        }
         if (this.compilationMode === CompilationMode.PARTIAL && trait.handler.compilePartial !== void 0) {
           compileRes = trait.handler.compilePartial(clazz, trait.analysis, trait.resolution);
         } else {
@@ -5135,6 +5129,9 @@ var DirectiveDecoratorHandler = class {
     return new DirectiveSymbol(node, analysis.meta.selector, analysis.inputs, analysis.outputs, analysis.meta.exportAs, analysis.typeCheckMeta, typeParameters);
   }
   register(node, analysis) {
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return;
+    }
     const ref = new Reference(node);
     this.metaRegistry.registerDirectiveMetadata({
       kind: MetaKind.Directive,
@@ -5167,6 +5164,9 @@ var DirectiveDecoratorHandler = class {
     });
   }
   resolve(node, analysis, symbol) {
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return {};
+    }
     if (this.semanticDepGraphUpdater !== null && analysis.baseClass instanceof Reference) {
       symbol.baseClass = this.semanticDepGraphUpdater.getSymbol(analysis.baseClass.node);
     }
@@ -5199,7 +5199,7 @@ var DirectiveDecoratorHandler = class {
     const classMetadata = analysis.classMetadata !== null ? compileDeclareClassMetadata(analysis.classMetadata).toStmt() : null;
     return compileResults(fac, def, classMetadata, "\u0275dir", inputTransformFields, null);
   }
-  compileLocal(node, analysis, pool) {
+  compileLocal(node, analysis, resolution, pool) {
     const fac = compileNgFactoryDefField(toFactoryMetadata(analysis.meta, FactoryTarget.Directive));
     const def = compileDirectiveFromMetadata(analysis.meta, pool, makeBindingParser());
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
@@ -5599,6 +5599,9 @@ var NgModuleDecoratorHandler = class {
     return new NgModuleSymbol(node, analysis.providers !== null);
   }
   register(node, analysis) {
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return;
+    }
     this.metaRegistry.registerNgModuleMetadata({
       kind: MetaKind.NgModule,
       ref: new Reference(node),
@@ -5617,6 +5620,9 @@ var NgModuleDecoratorHandler = class {
     });
   }
   resolve(node, analysis) {
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return {};
+    }
     const scope = this.scopeRegistry.getScopeOfModule(node);
     const diagnostics = [];
     const scopeDiagnostics = this.scopeRegistry.getDiagnosticsOfModule(node);
@@ -6673,6 +6679,9 @@ var ComponentDecoratorHandler = class {
   }
   register(node, analysis) {
     var _a;
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return;
+    }
     const ref = new Reference(node);
     this.metaRegistry.registerDirectiveMetadata({
       kind: MetaKind.Directive,
@@ -6755,6 +6764,9 @@ var ComponentDecoratorHandler = class {
     return extendedTemplateChecker.getDiagnosticsForComponent(component);
   }
   resolve(node, analysis, symbol) {
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return {};
+    }
     if (this.semanticDepGraphUpdater !== null && analysis.baseClass instanceof Reference) {
       symbol.baseClass = this.semanticDepGraphUpdater.getSymbol(analysis.baseClass.node);
     }
@@ -7031,7 +7043,7 @@ var ComponentDecoratorHandler = class {
     const classMetadata = analysis.classMetadata !== null ? compileDeclareClassMetadata3(analysis.classMetadata).toStmt() : null;
     return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, null);
   }
-  compileLocal(node, analysis, pool) {
+  compileLocal(node, analysis, resolution, pool) {
     if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
       return [];
     }
@@ -7214,11 +7226,17 @@ var InjectableDecoratorHandler = class {
     return null;
   }
   register(node, analysis) {
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return;
+    }
     this.injectableRegistry.registerInjectable(node, {
       ctorDeps: analysis.ctorDeps
     });
   }
-  resolve(node, analysis, symbol) {
+  resolve(node, analysis) {
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return {};
+    }
     if (requiresValidCtor(analysis.meta)) {
       const diagnostic = checkInheritanceOfInjectable(node, this.injectableRegistry, this.reflector, this.evaluator, this.strictCtorDeps, "Injectable");
       if (diagnostic !== null) {
@@ -7501,6 +7519,9 @@ var PipeDecoratorHandler = class {
     return new PipeSymbol(node, analysis.meta.pipeName);
   }
   register(node, analysis) {
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return;
+    }
     const ref = new Reference(node);
     this.metaRegistry.registerPipeMetadata({
       kind: MetaKind.Pipe,
@@ -7515,6 +7536,9 @@ var PipeDecoratorHandler = class {
     });
   }
   resolve(node) {
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return {};
+    }
     const duplicateDeclData = this.scopeRegistry.getDuplicateDeclarations(node);
     if (duplicateDeclData !== null) {
       return {
@@ -7637,4 +7661,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-AELNC5TV.js.map
+//# sourceMappingURL=chunk-E3AP62QJ.js.map
