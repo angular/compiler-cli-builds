@@ -1479,12 +1479,12 @@ var DefaultImportTracker = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/deferred_symbol_tracker.mjs
 import ts9 from "typescript";
 var AssumeEager = "AssumeEager";
-var ExplicitlyDeferred = "ExplicitlyDeferred";
 var DeferredSymbolTracker = class {
   constructor(typeChecker, onlyExplicitDeferDependencyImports) {
     this.typeChecker = typeChecker;
     this.onlyExplicitDeferDependencyImports = onlyExplicitDeferDependencyImports;
     this.imports = /* @__PURE__ */ new Map();
+    this.explicitlyDeferredImports = /* @__PURE__ */ new Map();
   }
   extractImportedSymbols(importDecl) {
     const symbolMap = /* @__PURE__ */ new Map();
@@ -1512,17 +1512,29 @@ var DeferredSymbolTracker = class {
     }
     return symbolMap;
   }
-  markAsExplicitlyDeferred(importDecl) {
-    this.imports.set(importDecl, ExplicitlyDeferred);
+  getNonRemovableDeferredImports(sourceFile, classDecl) {
+    var _a;
+    const affectedImports = [];
+    const importDecls = (_a = this.explicitlyDeferredImports.get(classDecl)) != null ? _a : [];
+    for (const importDecl of importDecls) {
+      if (importDecl.getSourceFile() === sourceFile && !this.canDefer(importDecl)) {
+        affectedImports.push(importDecl);
+      }
+    }
+    return affectedImports;
   }
-  markAsDeferrableCandidate(identifier, importDecl) {
-    if (this.onlyExplicitDeferDependencyImports) {
+  markAsDeferrableCandidate(identifier, importDecl, componentClassDecl, isExplicitlyDeferred) {
+    if (this.onlyExplicitDeferDependencyImports && !isExplicitlyDeferred) {
       return;
+    }
+    if (isExplicitlyDeferred) {
+      if (this.explicitlyDeferredImports.has(componentClassDecl)) {
+        this.explicitlyDeferredImports.get(componentClassDecl).push(importDecl);
+      } else {
+        this.explicitlyDeferredImports.set(componentClassDecl, [importDecl]);
+      }
     }
     let symbolMap = this.imports.get(importDecl);
-    if (symbolMap === ExplicitlyDeferred) {
-      return;
-    }
     if (!symbolMap) {
       symbolMap = this.extractImportedSymbols(importDecl);
       this.imports.set(importDecl, symbolMap);
@@ -1541,9 +1553,6 @@ var DeferredSymbolTracker = class {
       return false;
     }
     const symbolsMap = this.imports.get(importDecl);
-    if (symbolsMap === ExplicitlyDeferred) {
-      return true;
-    }
     for (const [symbol, refs] of symbolsMap) {
       if (refs === AssumeEager || refs.size > 0) {
         return false;
@@ -2482,4 +2491,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-AK5W6ACC.js.map
+//# sourceMappingURL=chunk-TFBB265K.js.map

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
+import { ClassDeclaration } from '../../reflection';
 /**
  * Allows to register a symbol as deferrable and keep track of its usage.
  *
@@ -17,6 +18,11 @@ export declare class DeferredSymbolTracker {
     private readonly typeChecker;
     private onlyExplicitDeferDependencyImports;
     private readonly imports;
+    /**
+     * Map of a component class -> all import declarations that bring symbols
+     * used within `@Component.deferredImports` field.
+     */
+    private readonly explicitlyDeferredImports;
     constructor(typeChecker: ts.TypeChecker, onlyExplicitDeferDependencyImports: boolean);
     /**
      * Given an import declaration node, extract the names of all imported symbols
@@ -30,15 +36,17 @@ export declare class DeferredSymbolTracker {
      */
     private extractImportedSymbols;
     /**
-     * Marks a given import declaration as explicitly deferred, since it's
-     * used in the `@Component.deferredImports` field.
+     * Retrieves a list of import declarations that contain symbols used within
+     * `@Component.deferredImports` of a specific component class, but those imports
+     * can not be removed, since there are other symbols imported alongside deferred
+     * components.
      */
-    markAsExplicitlyDeferred(importDecl: ts.ImportDeclaration): void;
+    getNonRemovableDeferredImports(sourceFile: ts.SourceFile, classDecl: ClassDeclaration): ts.ImportDeclaration[];
     /**
      * Marks a given identifier and an associated import declaration as a candidate
      * for defer loading.
      */
-    markAsDeferrableCandidate(identifier: ts.Identifier, importDecl: ts.ImportDeclaration): void;
+    markAsDeferrableCandidate(identifier: ts.Identifier, importDecl: ts.ImportDeclaration, componentClassDecl: ClassDeclaration, isExplicitlyDeferred: boolean): void;
     /**
      * Whether all symbols from a given import declaration have no references
      * in a source file, thus it's safe to use dynamic imports.

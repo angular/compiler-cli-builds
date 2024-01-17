@@ -100,7 +100,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      */
     private collectDeferredSymbols;
     /**
-     * Collects a list of deferrable symbols based on the `@Component.deferredImports` field.
+     * Collects deferrable symbols from the `@Component.deferredImports` field.
      */
     private collectExplicitlyDeferredSymbols;
     /**

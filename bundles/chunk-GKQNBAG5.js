@@ -29,7 +29,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-AK5W6ACC.js";
+} from "./chunk-TFBB265K.js";
 import {
   PerfEvent,
   PerfPhase
@@ -6801,6 +6801,15 @@ var ComponentDecoratorHandler = class {
     if (template.styles.length > 0) {
       styles.push(...template.styles);
     }
+    let explicitlyDeferredTypes = null;
+    if (metadata.isStandalone && rawDeferredImports !== null) {
+      const deferredTypes = this.collectExplicitlyDeferredSymbols(rawDeferredImports);
+      for (const [deferredType, importDetails] of deferredTypes) {
+        explicitlyDeferredTypes != null ? explicitlyDeferredTypes : explicitlyDeferredTypes = /* @__PURE__ */ new Map();
+        explicitlyDeferredTypes.set(importDetails.name, importDetails.from);
+        this.deferredSymbolTracker.markAsDeferrableCandidate(deferredType, importDetails.node, node, true);
+      }
+    }
     const output = {
       analysis: {
         baseClass: readBaseClass(node, this.reflector, this.evaluator),
@@ -6844,6 +6853,7 @@ var ComponentDecoratorHandler = class {
         resolvedImports,
         rawDeferredImports,
         resolvedDeferredImports,
+        explicitlyDeferredTypes,
         schemas,
         decorator: (_e = decorator == null ? void 0 : decorator.node) != null ? _e : null
       },
@@ -6944,8 +6954,28 @@ var ComponentDecoratorHandler = class {
     return extendedTemplateChecker.getDiagnosticsForComponent(component);
   }
   resolve(node, analysis, symbol) {
+    const metadata = analysis.meta;
+    const diagnostics = [];
+    const context = getSourceFile(node);
+    const nonRemovableImports = this.deferredSymbolTracker.getNonRemovableDeferredImports(context, node);
+    if (nonRemovableImports.length > 0) {
+      for (const importDecl of nonRemovableImports) {
+        const diagnostic = makeDiagnostic(ErrorCode.DEFERRED_DEPENDENCY_IMPORTED_EAGERLY, importDecl, `This import contains symbols used in the \`@Component.deferredImports\` array of the \`${node.name.getText()}\` component, but also some other symbols that are not in any \`@Component.deferredImports\` array. This renders all these defer imports useless as this import remains and its module is eagerly loaded. To fix this, make sure that this import contains *only* symbols that are used within \`@Component.deferredImports\` arrays.`);
+        diagnostics.push(diagnostic);
+      }
+      return { diagnostics };
+    }
     if (this.compilationMode === CompilationMode.LOCAL) {
-      return {};
+      return {
+        data: {
+          declarationListEmitMode: !analysis.meta.isStandalone || analysis.rawImports !== null ? 3 : 0,
+          declarations: EMPTY_ARRAY2,
+          deferBlocks: this.locateDeferBlocksWithoutScope(analysis.template),
+          deferBlockDepsEmitMode: 1,
+          deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
+          deferrableTypes: /* @__PURE__ */ new Map()
+        }
+      };
     }
     if (this.semanticDepGraphUpdater !== null && analysis.baseClass instanceof Reference) {
       symbol.baseClass = this.semanticDepGraphUpdater.getSymbol(analysis.baseClass.node);
@@ -6953,16 +6983,14 @@ var ComponentDecoratorHandler = class {
     if (analysis.isPoisoned && !this.usePoisonedData) {
       return {};
     }
-    const context = getSourceFile(node);
-    const metadata = analysis.meta;
     const data = {
       declarations: EMPTY_ARRAY2,
       declarationListEmitMode: 0,
       deferBlocks: /* @__PURE__ */ new Map(),
+      deferBlockDepsEmitMode: 0,
       deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
       deferrableTypes: /* @__PURE__ */ new Map()
     };
-    const diagnostics = [];
     const scope = this.scopeReader.getScopeForComponent(node);
     if (scope !== null) {
       const isModuleScope = scope.kind === ComponentScopeKind.NgModule;
@@ -7064,7 +7092,7 @@ var ComponentDecoratorHandler = class {
         symbol.usedPipes = Array.from(declarations.values()).filter(isUsedPipe).map(getSemanticReference);
       }
       const eagerDeclarations = Array.from(declarations.values()).filter((decl) => decl.kind === R3TemplateDependencyKind.NgModule || eagerlyUsed.has(decl.ref.node));
-      this.resolveDeferBlocks(deferBlocks, declarations, data, analysis, eagerlyUsed, bound);
+      this.resolveDeferBlocks(node, deferBlocks, declarations, data, analysis, eagerlyUsed, bound);
       const cyclesFromDirectives = /* @__PURE__ */ new Map();
       const cyclesFromPipes = /* @__PURE__ */ new Map();
       if (!metadata.isStandalone) {
@@ -7181,9 +7209,12 @@ var ComponentDecoratorHandler = class {
     if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
       return [];
     }
-    this.collectExplicitlyDeferredSymbols(analysis);
     const deferrableTypes = this.collectDeferredSymbols(resolution);
-    const meta = { ...analysis.meta, ...resolution };
+    const meta = {
+      ...analysis.meta,
+      ...resolution,
+      deferrableTypes
+    };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
     removeDeferrableTypesFromComponentDecorator(analysis, deferrableTypes);
     const def = compileComponentFromMetadata(meta, pool, makeBindingParser2());
@@ -7214,16 +7245,15 @@ var ComponentDecoratorHandler = class {
     if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
       return [];
     }
-    const deferrableTypes = this.collectExplicitlyDeferredSymbols(analysis);
+    const deferrableTypes = analysis.explicitlyDeferredTypes;
     const meta = {
       ...analysis.meta,
-      declarationListEmitMode: !analysis.meta.isStandalone || analysis.rawImports !== null ? 3 : 0,
-      declarations: EMPTY_ARRAY2,
-      deferBlocks: this.locateDeferBlocksWithoutScope(analysis.template),
-      deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
-      deferrableTypes
+      ...resolution,
+      deferrableTypes: deferrableTypes != null ? deferrableTypes : /* @__PURE__ */ new Map()
     };
-    removeDeferrableTypesFromComponentDecorator(analysis, deferrableTypes);
+    if (analysis.explicitlyDeferredTypes !== null) {
+      removeDeferrableTypesFromComponentDecorator(analysis, analysis.explicitlyDeferredTypes);
+    }
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
     const def = compileComponentFromMetadata(meta, pool, makeBindingParser2());
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
@@ -7262,22 +7292,22 @@ var ComponentDecoratorHandler = class {
     }
     return deferrableTypes;
   }
-  collectExplicitlyDeferredSymbols(analysis) {
-    const deferrableTypes = /* @__PURE__ */ new Map();
-    if (!analysis.meta.isStandalone || analysis.rawDeferredImports === null || !ts25.isArrayLiteralExpression(analysis.rawDeferredImports))
-      return deferrableTypes;
-    for (const element of analysis.rawDeferredImports.elements) {
+  collectExplicitlyDeferredSymbols(rawDeferredImports) {
+    const deferredTypes = /* @__PURE__ */ new Map();
+    if (!ts25.isArrayLiteralExpression(rawDeferredImports)) {
+      return deferredTypes;
+    }
+    for (const element of rawDeferredImports.elements) {
       const node = tryUnwrapForwardRef(element, this.reflector) || element;
       if (!ts25.isIdentifier(node)) {
         continue;
       }
       const imp = this.reflector.getImportOfIdentifier(node);
       if (imp !== null) {
-        deferrableTypes.set(imp.name, imp.from);
-        this.deferredSymbolTracker.markAsExplicitlyDeferred(imp.node);
+        deferredTypes.set(node, imp);
       }
     }
-    return deferrableTypes;
+    return deferredTypes;
   }
   _checkForCyclicImport(importedFile, expr, origin) {
     const imported = resolveImportedFile(this.moduleResolver, importedFile, expr, origin);
@@ -7293,7 +7323,7 @@ var ComponentDecoratorHandler = class {
     }
     this.cycleAnalyzer.recordSyntheticImport(origin, imported);
   }
-  resolveDeferBlocks(deferBlocks, deferrableDecls, resolutionData, analysisData, eagerlyUsedDecls, componentBoundTarget) {
+  resolveDeferBlocks(componentClassDecl, deferBlocks, deferrableDecls, resolutionData, analysisData, eagerlyUsedDecls, componentBoundTarget) {
     const allDeferredDecls = /* @__PURE__ */ new Set();
     for (const [deferBlock, bound] of deferBlocks) {
       const usedDirectives = new Set(bound.getEagerlyUsedDirectives().map((d) => d.ref.node));
@@ -7325,14 +7355,14 @@ var ComponentDecoratorHandler = class {
     }
     if (analysisData.meta.isStandalone) {
       if (analysisData.rawImports !== null) {
-        this.registerDeferrableCandidates(analysisData.rawImports, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
+        this.registerDeferrableCandidates(componentClassDecl, analysisData.rawImports, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
       }
       if (analysisData.rawDeferredImports !== null) {
-        this.registerDeferrableCandidates(analysisData.rawDeferredImports, true, allDeferredDecls, eagerlyUsedDecls, resolutionData);
+        this.registerDeferrableCandidates(componentClassDecl, analysisData.rawDeferredImports, true, allDeferredDecls, eagerlyUsedDecls, resolutionData);
       }
     }
   }
-  registerDeferrableCandidates(importsExpr, isDeferredImport, allDeferredDecls, eagerlyUsedDecls, resolutionData) {
+  registerDeferrableCandidates(componentClassDecl, importsExpr, isDeferredImport, allDeferredDecls, eagerlyUsedDecls, resolutionData) {
     if (!ts25.isArrayLiteralExpression(importsExpr)) {
       return;
     }
@@ -7370,11 +7400,7 @@ var ComponentDecoratorHandler = class {
         continue;
       }
       resolutionData.deferrableDeclToImportDecl.set(decl.node, imp.node);
-      if (isDeferredImport) {
-        this.deferredSymbolTracker.markAsExplicitlyDeferred(imp.node);
-      } else {
-        this.deferredSymbolTracker.markAsDeferrableCandidate(node, imp.node);
-      }
+      this.deferredSymbolTracker.markAsDeferrableCandidate(node, imp.node, componentClassDecl, isDeferredImport);
     }
   }
   resolveDeferTriggers(block, triggers, componentBoundTarget, triggerElements) {
@@ -7895,4 +7921,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-S5UPGK62.js.map
+//# sourceMappingURL=chunk-GKQNBAG5.js.map
