@@ -11,7 +11,7 @@ import {
   PartialEvaluator,
   StaticInterpreter,
   forwardRefResolver
-} from "../chunk-S743FATK.js";
+} from "../chunk-S5UPGK62.js";
 import {
   Reference,
   TypeScriptReflectionHost,

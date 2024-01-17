@@ -50,7 +50,7 @@ export declare class InjectableDecoratorHandler implements DecoratorHandler<Deco
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<InjectableHandlerData>;
     symbol(): null;
     register(node: ClassDeclaration, analysis: InjectableHandlerData): void;
-    resolve(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>, symbol: null): ResolveResult<unknown>;
+    resolve(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): ResolveResult<unknown>;
     compileFull(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];
     compileLocal(node: ClassDeclaration, analysis: Readonly<InjectableHandlerData>): CompileResult[];

@@ -88,7 +88,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     updateResources(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
     compileFull(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): CompileResult[];
-    compileLocal(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, pool: ConstantPool): CompileResult[];
+    compileLocal(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<Partial<ComponentResolutionData>>, pool: ConstantPool): CompileResult[];
     /**
      * Locates defer blocks in case scope information is not available.
      * For example, this happens in the local compilation mode.
