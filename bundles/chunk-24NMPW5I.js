@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-AK5W6ACC.js";
+} from "./chunk-TFBB265K.js";
 import {
   SourceFileLoader
 } from "./chunk-2WQIUGOU.js";
@@ -271,7 +271,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "17.1.0-rc.0+sha-6616019";
+var PLACEHOLDER_VERSION = "17.1.0-rc.0+sha-79e8539";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -582,6 +582,7 @@ ${errors}`);
       deferBlocks: this.createR3DeferredMetadata(boundTarget),
       deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
       deferrableTypes: /* @__PURE__ */ new Map(),
+      deferBlockDepsEmitMode: 0,
       encapsulation: metaObj.has("encapsulation") ? parseEncapsulation(metaObj.getValue("encapsulation")) : ViewEncapsulation.Emulated,
       interpolation,
       changeDetection: metaObj.has("changeDetection") ? parseChangeDetectionStrategy(metaObj.getValue("changeDetection")) : ChangeDetectionStrategy.Default,
@@ -1077,4 +1078,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FW5I2EVL.js.map
+//# sourceMappingURL=chunk-24NMPW5I.js.map
