@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "17.2.0-next.0+sha-a057b61",
+  "version": "17.2.0-next.0+sha-ee68df9",
   "description": "Angular - the compiler CLI for Node.js",
   "typings": "index.d.ts",
   "bin": {
@@ -45,7 +45,7 @@
   "dependencies": {
     "@babel/core": "7.23.2",
     "@jridgewell/sourcemap-codec": "^1.4.14",
-    "reflect-metadata": "^0.1.2",
+    "reflect-metadata": "^0.2.0",
     "chokidar": "^3.0.0",
     "convert-source-map": "^1.5.1",
     "semver": "^7.0.0",
@@ -53,7 +53,7 @@
     "yargs": "^17.2.1"
   },
   "peerDependencies": {
-    "@angular/compiler": "17.2.0-next.0+sha-a057b61",
+    "@angular/compiler": "17.2.0-next.0+sha-ee68df9",
     "typescript": ">=5.2 <5.4"
   },
   "repository": {
