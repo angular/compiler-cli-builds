@@ -37,8 +37,9 @@ import {
   TypeCheckScopeRegistry,
   aliasTransformFactory,
   declarationTransformFactory,
+  isHostDirectiveMetaForGlobalMode,
   ivyTransformFactory
-} from "./chunk-GKQNBAG5.js";
+} from "./chunk-CRPGU6KX.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -86,7 +87,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-TFBB265K.js";
+} from "./chunk-4UAE3OZG.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -6067,6 +6068,9 @@ var SymbolBuilder = class {
   }
   addHostDirectiveSymbols(host, hostDirectives, symbols) {
     for (const current of hostDirectives) {
+      if (!isHostDirectiveMetaForGlobalMode(current)) {
+        throw new Error("Impossible state: typecheck code path in local compilation mode.");
+      }
       if (!ts31.isClassDeclaration(current.directive.node)) {
         continue;
       }
@@ -9019,4 +9023,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XX6L5IBR.js.map
+//# sourceMappingURL=chunk-EAO3BO4W.js.map

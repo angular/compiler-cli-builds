@@ -8,7 +8,7 @@
 import ts from 'typescript';
 import { OwningModule, Reference } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { DirectiveMeta, DirectiveTypeCheckMeta, InputMapping, MetadataReader, NgModuleMeta, PipeMeta } from './api';
+import { DirectiveMeta, DirectiveTypeCheckMeta, HostDirectiveMeta, HostDirectiveMetaForGlobalMode, InputMapping, MetadataReader, NgModuleMeta, PipeMeta } from './api';
 import { ClassPropertyMapping } from './property_mapping';
 export declare function extractReferencesFromType(checker: ts.TypeChecker, def: ts.TypeNode, bestGuessOwningModule: OwningModule | null): Reference<ClassDeclaration>[];
 export declare function extraReferenceFromTypeQuery(checker: ts.TypeChecker, typeNode: ts.TypeQueryNode, origin: ts.TypeNode, bestGuessOwningModule: OwningModule | null): Reference<ClassDeclaration<ts.ClassDeclaration>>;
@@ -40,3 +40,4 @@ export declare class CompoundMetadataReader implements MetadataReader {
 }
 /** Returns whether a class declaration has the necessary class fields to make it injectable. */
 export declare function hasInjectableFields(clazz: ClassDeclaration, host: ReflectionHost): boolean;
+export declare function isHostDirectiveMetaForGlobalMode(hostDirectiveMeta: HostDirectiveMeta): hostDirectiveMeta is HostDirectiveMetaForGlobalMode;

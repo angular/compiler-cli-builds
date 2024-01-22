@@ -404,5 +404,10 @@ export declare enum ErrorCode {
      * A string is imported from another file to be used as styles string for a component in local
      * compilation mode.
      */
-    LOCAL_COMPILATION_IMPORTED_STYLES_STRING = 11002
+    LOCAL_COMPILATION_IMPORTED_STYLES_STRING = 11002,
+    /**
+     * Raised when the compiler wasn't able to resolve the metadata of a host directive in local
+     * compilation mode.
+     */
+    LOCAL_COMPILATION_HOST_DIRECTIVE_INVALID = 11003
 }

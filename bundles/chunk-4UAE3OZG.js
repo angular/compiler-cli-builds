@@ -916,6 +916,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["SUGGEST_SUBOPTIMAL_TYPE_INFERENCE"] = 10002] = "SUGGEST_SUBOPTIMAL_TYPE_INFERENCE";
   ErrorCode2[ErrorCode2["LOCAL_COMPILATION_IMPORTED_TEMPLATE_STRING"] = 11001] = "LOCAL_COMPILATION_IMPORTED_TEMPLATE_STRING";
   ErrorCode2[ErrorCode2["LOCAL_COMPILATION_IMPORTED_STYLES_STRING"] = 11002] = "LOCAL_COMPILATION_IMPORTED_STYLES_STRING";
+  ErrorCode2[ErrorCode2["LOCAL_COMPILATION_HOST_DIRECTIVE_INVALID"] = 11003] = "LOCAL_COMPILATION_HOST_DIRECTIVE_INVALID";
 })(ErrorCode || (ErrorCode = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/docs.mjs
@@ -2491,4 +2492,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TFBB265K.js.map
+//# sourceMappingURL=chunk-4UAE3OZG.js.map

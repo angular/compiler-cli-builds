@@ -29,7 +29,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-TFBB265K.js";
+} from "./chunk-4UAE3OZG.js";
 import {
   PerfEvent,
   PerfPhase
@@ -1627,6 +1627,9 @@ function hasInjectableFields(clazz, host) {
   const members = host.getMembersOfClass(clazz);
   return members.some(({ isStatic, name }) => isStatic && (name === "\u0275prov" || name === "\u0275fac"));
 }
+function isHostDirectiveMetaForGlobalMode(hostDirectiveMeta) {
+  return hostDirectiveMeta.directive instanceof Reference;
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/dts.mjs
 var DtsMetadataReader = class {
@@ -2058,6 +2061,9 @@ var HostDirectivesResolver = class {
   }
   walkHostDirectives(directives, results) {
     for (const current of directives) {
+      if (!isHostDirectiveMetaForGlobalMode(current)) {
+        throw new Error("Impossible state: resolving code path in local compilation mode");
+      }
       const hostMeta = flattenInheritedDirectiveMetadata(this.metaReader, current.directive);
       if (hostMeta === null) {
         continue;
@@ -2181,6 +2187,9 @@ function getDirectiveDiagnostics(node, injectableRegistry, evaluator, reflector,
 function validateHostDirectives(origin, hostDirectives, metaReader) {
   const diagnostics = [];
   for (const current of hostDirectives) {
+    if (!isHostDirectiveMetaForGlobalMode(current)) {
+      throw new Error("Impossible state: diagnostics code path for local compilation");
+    }
     const hostMeta = flattenInheritedDirectiveMetadata(metaReader, current.directive);
     if (hostMeta === null) {
       diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_INVALID, current.directive.getOriginForDiagnostics(origin), `${current.directive.debugName} must be a standalone directive to be used as a host directive`));
@@ -2199,6 +2208,9 @@ function validateHostDirectives(origin, hostDirectives, metaReader) {
   return diagnostics;
 }
 function validateHostDirectiveMappings(bindingType, hostDirectiveMeta, meta, origin, diagnostics, requiredBindings) {
+  if (!isHostDirectiveMetaForGlobalMode(hostDirectiveMeta)) {
+    throw new Error("Impossible state: diagnostics code path for local compilation");
+  }
   const className = meta.name;
   const hostDirectiveMappings = bindingType === "input" ? hostDirectiveMeta.inputs : hostDirectiveMeta.outputs;
   const existingBindings = bindingType === "input" ? meta.inputs : meta.outputs;
@@ -4555,9 +4567,14 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const sourceFile = clazz.getSourceFile();
   const type = wrapTypeReference(reflector, clazz);
   const rawHostDirectives = directive.get("hostDirectives") || null;
-  const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator);
-  if (hostDirectives !== null) {
-    referencesRegistry.add(clazz, ...hostDirectives.map((hostDir) => hostDir.directive));
+  const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator, compilationMode);
+  if (compilationMode !== CompilationMode.LOCAL && hostDirectives !== null) {
+    referencesRegistry.add(clazz, ...hostDirectives.map((hostDir) => {
+      if (!isHostDirectiveMetaForGlobalMode(hostDir)) {
+        throw new Error("Impossible state");
+      }
+      return hostDir.directive;
+    }));
   }
   const metadata = {
     name: clazz.name.text,
@@ -5067,31 +5084,45 @@ function evaluateHostExpressionBindings(hostExpr, evaluator) {
   }
   return bindings;
 }
-function extractHostDirectives(rawHostDirectives, evaluator) {
+function extractHostDirectives(rawHostDirectives, evaluator, compilationMode) {
   const resolved = evaluator.evaluate(rawHostDirectives, forwardRefResolver);
   if (!Array.isArray(resolved)) {
     throw createValueHasWrongTypeError(rawHostDirectives, resolved, "hostDirectives must be an array");
   }
   return resolved.map((value) => {
     const hostReference = value instanceof Map ? value.get("directive") : value;
-    if (!(hostReference instanceof Reference)) {
-      throw createValueHasWrongTypeError(rawHostDirectives, hostReference, "Host directive must be a reference");
+    if (compilationMode !== CompilationMode.LOCAL) {
+      if (!(hostReference instanceof Reference)) {
+        throw createValueHasWrongTypeError(rawHostDirectives, hostReference, "Host directive must be a reference");
+      }
+      if (!isNamedClassDeclaration(hostReference.node)) {
+        throw createValueHasWrongTypeError(rawHostDirectives, hostReference, "Host directive reference must be a class");
+      }
     }
-    if (!isNamedClassDeclaration(hostReference.node)) {
-      throw createValueHasWrongTypeError(rawHostDirectives, hostReference, "Host directive reference must be a class");
+    let directive;
+    let nameForErrors = (fieldName) => "@Directive.hostDirectives";
+    if (compilationMode === CompilationMode.LOCAL && hostReference instanceof DynamicValue) {
+      if (!ts21.isIdentifier(hostReference.node) && !ts21.isPropertyAccessExpression(hostReference.node)) {
+        throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_HOST_DIRECTIVE_INVALID, hostReference.node, `In local compilation mode, host directive cannot be an expression`);
+      }
+      directive = new WrappedNodeExpr5(hostReference.node);
+    } else if (hostReference instanceof Reference) {
+      directive = hostReference;
+      nameForErrors = (fieldName) => `@Directive.hostDirectives.${directive.node.name.text}.${fieldName}`;
+    } else {
+      throw new Error("Impossible state");
     }
     const meta = {
-      directive: hostReference,
-      isForwardReference: hostReference.synthetic,
-      inputs: parseHostDirectivesMapping("inputs", value, hostReference.node, rawHostDirectives),
-      outputs: parseHostDirectivesMapping("outputs", value, hostReference.node, rawHostDirectives)
+      directive,
+      isForwardReference: hostReference instanceof Reference && hostReference.synthetic,
+      inputs: parseHostDirectivesMapping("inputs", value, nameForErrors("input"), rawHostDirectives),
+      outputs: parseHostDirectivesMapping("outputs", value, nameForErrors("output"), rawHostDirectives)
     };
     return meta;
   });
 }
-function parseHostDirectivesMapping(field, resolvedValue, classReference, sourceExpression) {
+function parseHostDirectivesMapping(field, resolvedValue, nameForErrors, sourceExpression) {
   if (resolvedValue instanceof Map && resolvedValue.has(field)) {
-    const nameForErrors = `@Directive.hostDirectives.${classReference.name.text}.${field}`;
     const rawInputs = resolvedValue.get(field);
     if (isStringArrayOrDie(rawInputs, nameForErrors, sourceExpression)) {
       return parseMappingStringArray(rawInputs);
@@ -5100,8 +5131,17 @@ function parseHostDirectivesMapping(field, resolvedValue, classReference, source
   return null;
 }
 function toHostDirectiveMetadata(hostDirective, context, refEmitter) {
+  let directive;
+  if (hostDirective.directive instanceof Reference) {
+    directive = toR3Reference(hostDirective.directive.node, hostDirective.directive, context, refEmitter);
+  } else {
+    directive = {
+      value: hostDirective.directive,
+      type: hostDirective.directive
+    };
+  }
   return {
-    directive: toR3Reference(hostDirective.directive.node, hostDirective.directive, context, refEmitter),
+    directive,
     isForwardReference: hostDirective.isForwardReference,
     inputs: hostDirective.inputs || null,
     outputs: hostDirective.outputs || null
@@ -7876,6 +7916,7 @@ export {
   forwardRefResolver,
   MetaKind,
   CompoundMetadataReader,
+  isHostDirectiveMetaForGlobalMode,
   DtsMetadataReader,
   LocalMetadataRegistry,
   CompoundMetadataRegistry,
@@ -7921,4 +7962,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GKQNBAG5.js.map
+//# sourceMappingURL=chunk-CRPGU6KX.js.map
