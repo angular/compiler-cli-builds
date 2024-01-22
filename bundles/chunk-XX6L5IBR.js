@@ -8162,7 +8162,7 @@ var NgCompiler = class {
     const reflector = new TypeScriptReflectionHost(checker, compilationMode === CompilationMode.LOCAL);
     let refEmitter;
     let aliasingHost = null;
-    if (this.adapter.unifiedModulesHost === null || !this.options["_useHostForImportGeneration"]) {
+    if (this.adapter.unifiedModulesHost === null || !this.options["_useHostForImportGeneration"] && !this.options["_useHostForImportAndAliasGeneration"]) {
       let localImportStrategy;
       if (this.options.rootDir !== void 0 || this.options.rootDirs !== void 0 && this.options.rootDirs.length > 0) {
         localImportStrategy = new LogicalProjectStrategy(reflector, new LogicalFileSystem([...this.adapter.rootDirs], this.adapter));
@@ -8180,10 +8180,12 @@ var NgCompiler = class {
     } else {
       refEmitter = new ReferenceEmitter([
         new LocalIdentifierStrategy(),
-        new AliasStrategy(),
+        ...this.options["_useHostForImportAndAliasGeneration"] ? [new AliasStrategy()] : [],
         new UnifiedModulesStrategy(reflector, this.adapter.unifiedModulesHost)
       ]);
-      aliasingHost = new UnifiedModulesAliasingHost(this.adapter.unifiedModulesHost);
+      if (this.options["_useHostForImportAndAliasGeneration"]) {
+        aliasingHost = new UnifiedModulesAliasingHost(this.adapter.unifiedModulesHost);
+      }
     }
     const evaluator = new PartialEvaluator(reflector, checker, this.incrementalCompilation.depGraph);
     const dtsReader = new DtsMetadataReader(checker, reflector);
@@ -9017,4 +9019,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3YK6BSET.js.map
+//# sourceMappingURL=chunk-XX6L5IBR.js.map
