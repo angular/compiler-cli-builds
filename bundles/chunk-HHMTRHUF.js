@@ -7,7 +7,7 @@ import {
   addImports,
   isAngularDecorator,
   tryParseSignalInputMapping
-} from "./chunk-CRPGU6KX.js";
+} from "./chunk-FTXPEWNZ.js";
 import {
   ImportManager,
   TypeScriptReflectionHost,
@@ -360,7 +360,7 @@ function visitClassDeclaration(ctx, host, importManager, clazz, classDecorator, 
     if ((_a = host.getDecoratorsOfDeclaration(member)) == null ? void 0 : _a.some((d) => isAngularDecorator(d, "Input", isCore))) {
       return member;
     }
-    const inputMapping = tryParseSignalInputMapping({ name: member.name.text, value: (_b = member.initializer) != null ? _b : null }, host, isCore ? coreModuleName : void 0);
+    const inputMapping = tryParseSignalInputMapping({ name: member.name.text, value: (_b = member.initializer) != null ? _b : null }, host, isCore);
     if (inputMapping === null) {
       return member;
     }
@@ -427,4 +427,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-UVQDTLEB.js.map
+//# sourceMappingURL=chunk-HHMTRHUF.js.map

@@ -11,4 +11,4 @@ import { ClassMember, ReflectionHost } from '../../../reflection';
  * Attempts to parse a signal input class member. Returns the parsed
  * input mapping if possible.
  */
-export declare function tryParseSignalInputMapping(member: Pick<ClassMember, 'name' | 'value'>, reflector: ReflectionHost, coreModule: string | undefined): InputMapping | null;
+export declare function tryParseSignalInputMapping(member: Pick<ClassMember, 'name' | 'value'>, reflector: ReflectionHost, isCore: boolean): InputMapping | null;

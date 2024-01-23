@@ -271,7 +271,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "17.2.0-next.0+sha-9384537";
+var PLACEHOLDER_VERSION = "17.2.0-next.0+sha-f81a436";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -434,7 +434,8 @@ function toQueryMetadata(obj) {
     descendants: obj.has("descendants") ? obj.getBoolean("descendants") : false,
     emitDistinctChangesOnly: obj.has("emitDistinctChangesOnly") ? obj.getBoolean("emitDistinctChangesOnly") : true,
     read: obj.has("read") ? obj.getOpaque("read") : null,
-    static: obj.has("static") ? obj.getBoolean("static") : false
+    static: obj.has("static") ? obj.getBoolean("static") : false,
+    isSignal: obj.has("isSignal") ? obj.getBoolean("isSignal") : false
   };
 }
 function toHostDirectivesMetadata(hostDirectives) {
@@ -1078,4 +1079,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-Q62NY25E.js.map
+//# sourceMappingURL=chunk-RREHW33B.js.map
