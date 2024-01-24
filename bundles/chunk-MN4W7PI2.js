@@ -2661,6 +2661,7 @@ var ExpressionIdentifier;
   ExpressionIdentifier2["DIRECTIVE"] = "DIR";
   ExpressionIdentifier2["COMPONENT_COMPLETION"] = "COMPCOMP";
   ExpressionIdentifier2["EVENT_PARAMETER"] = "EP";
+  ExpressionIdentifier2["VARIABLE_AS_EXPRESSION"] = "VAE";
 })(ExpressionIdentifier || (ExpressionIdentifier = {}));
 function addExpressionIdentifier(node, identifier) {
   ts16.addSyntheticTrailingComment(
@@ -3047,14 +3048,12 @@ function tsCreateElement(tagName) {
   );
 }
 function tsDeclareVariable(id, type) {
-  let initializer = ts19.factory.createNonNullExpression(ts19.factory.createNull());
-  if (type.kind === ts19.SyntaxKind.BooleanKeyword) {
-    initializer = ts19.factory.createAsExpression(initializer, ts19.factory.createKeywordTypeNode(ts19.SyntaxKind.BooleanKeyword));
-  }
+  addExpressionIdentifier(type, ExpressionIdentifier.VARIABLE_AS_EXPRESSION);
+  const initializer = ts19.factory.createAsExpression(ts19.factory.createNonNullExpression(ts19.factory.createNull()), type);
   const decl = ts19.factory.createVariableDeclaration(
     id,
     void 0,
-    type,
+    void 0,
     initializer
   );
   return ts19.factory.createVariableStatement(
@@ -4320,8 +4319,8 @@ var TcbDirectiveTypeOpBase = class extends TcbOp {
       type = ts28.factory.createTypeReferenceNode(rawType.typeName, typeArguments);
     }
     const id = this.tcb.allocateId();
-    addExpressionIdentifier(type, ExpressionIdentifier.DIRECTIVE);
-    addParseSpanInfo(type, this.node.startSourceSpan || this.node.sourceSpan);
+    addExpressionIdentifier(id, ExpressionIdentifier.DIRECTIVE);
+    addParseSpanInfo(id, this.node.startSourceSpan || this.node.sourceSpan);
     this.scope.addStatement(tsDeclareVariable(id, type));
     return id;
   }
@@ -4814,7 +4813,9 @@ var TcbBlockVariableOp = class extends TcbOp {
   execute() {
     const id = this.tcb.allocateId();
     addParseSpanInfo(id, this.variable.keySpan);
-    this.scope.addStatement(tsCreateVariable(id, this.initializer));
+    const variable = tsCreateVariable(id, wrapForTypeChecker(this.initializer));
+    addParseSpanInfo(variable.declarationList.declarations[0], this.variable.sourceSpan);
+    this.scope.addStatement(variable);
     return id;
   }
 };
@@ -4830,7 +4831,9 @@ var TcbBlockImplicitVariableOp = class extends TcbOp {
   execute() {
     const id = this.tcb.allocateId();
     addParseSpanInfo(id, this.variable.keySpan);
-    this.scope.addStatement(tsDeclareVariable(id, this.type));
+    const variable = tsDeclareVariable(id, this.type);
+    addParseSpanInfo(variable.declarationList.declarations[0], this.variable.sourceSpan);
+    this.scope.addStatement(variable);
     return id;
   }
 };
@@ -4966,6 +4969,7 @@ var TcbForOfOp = class extends TcbOp {
       throw new Error(`Could not resolve for loop variable ${this.block.item.name} to an identifier`);
     }
     const initializer = ts28.factory.createVariableDeclarationList([ts28.factory.createVariableDeclaration(initializerId)], ts28.NodeFlags.Const);
+    addParseSpanInfo(initializer, this.block.item.keySpan);
     const expression = ts28.factory.createNonNullExpression(tcbExpression(this.block.expression, this.tcb, loopScope));
     const trackTranslator = new TcbForLoopTrackTranslator(this.tcb, loopScope, this.block);
     const trackExpression = trackTranslator.translate(this.block.trackBy);
@@ -6275,17 +6279,22 @@ var SymbolBuilder = class {
   }
   getSymbolOfVariable(variable) {
     const node = findFirstMatchingNode(this.typeCheckBlock, { withSpan: variable.sourceSpan, filter: ts31.isVariableDeclaration });
-    if (node === null || node.initializer === void 0) {
+    if (node === null) {
       return null;
     }
-    const expressionSymbol = this.getSymbolOfTsNode(node.initializer);
-    if (expressionSymbol === null) {
+    let nodeValueSymbol = null;
+    if (ts31.isForOfStatement(node.parent.parent)) {
+      nodeValueSymbol = this.getSymbolOfTsNode(node);
+    } else if (node.initializer !== void 0) {
+      nodeValueSymbol = this.getSymbolOfTsNode(node.initializer);
+    }
+    if (nodeValueSymbol === null) {
       return null;
     }
     return {
-      tsType: expressionSymbol.tsType,
-      tsSymbol: expressionSymbol.tsSymbol,
-      initializerLocation: expressionSymbol.tcbLocation,
+      tsType: nodeValueSymbol.tsType,
+      tsSymbol: nodeValueSymbol.tsSymbol,
+      initializerLocation: nodeValueSymbol.tcbLocation,
       kind: SymbolKind.Variable,
       declaration: variable,
       localVarLocation: {
@@ -9017,4 +9026,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3YK6BSET.js.map
+//# sourceMappingURL=chunk-MN4W7PI2.js.map

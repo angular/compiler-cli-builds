@@ -23,7 +23,8 @@ export declare enum CommentTriviaType {
 export declare enum ExpressionIdentifier {
     DIRECTIVE = "DIR",
     COMPONENT_COMPLETION = "COMPCOMP",
-    EVENT_PARAMETER = "EP"
+    EVENT_PARAMETER = "EP",
+    VARIABLE_AS_EXPRESSION = "VAE"
 }
 /** Tags the node with the given expression identifier. */
 export declare function addExpressionIdentifier(node: ts.Node, identifier: ExpressionIdentifier): void;
