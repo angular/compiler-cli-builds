@@ -11,6 +11,8 @@ import { ImportedFile, ModuleResolver, Reference, ReferenceEmitter } from '../..
 import { ForeignFunctionResolver, PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, Decorator, Import, ImportedTypeValueReference, LocalTypeValueReference, ReflectionHost, TypeValueReference } from '../../../reflection';
 import { CompileResult } from '../../../transform';
+/** Module name of the framework core. */
+export declare const CORE_MODULE = "@angular/core";
 /**
  * Convert a `TypeValueReference` to an `Expression` which refers to the type as a value.
  *

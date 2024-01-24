@@ -29,7 +29,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-4UAE3OZG.js";
+} from "./chunk-ZO5DVEPZ.js";
 import {
   PerfEvent,
   PerfPhase
@@ -43,6 +43,7 @@ import {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
 import ts from "typescript";
+var CORE_MODULE = "@angular/core";
 function valueReferenceToExpression(valueRef) {
   if (valueRef.kind === 2) {
     return null;
@@ -73,10 +74,10 @@ function toR3Reference(origin, ref, context, refEmitter) {
   };
 }
 function isAngularCore(decorator) {
-  return decorator.import !== null && decorator.import.from === "@angular/core";
+  return decorator.import !== null && decorator.import.from === CORE_MODULE;
 }
 function isAngularCoreReference(reference, symbolName) {
-  return reference.ownedByModuleGuess === "@angular/core" && reference.debugName === symbolName;
+  return reference.ownedByModuleGuess === CORE_MODULE && reference.debugName === symbolName;
 }
 function findAngularDecorator(decorators, name, isCore) {
   return decorators.find((decorator) => isAngularDecorator(decorator, name, isCore));
@@ -4453,9 +4454,9 @@ function isReferenceToInitializerApiFunction(functionName, target, isCore, refle
     if (!isCore) {
       return false;
     }
-    targetImport = { name: target.text };
+    targetImport = { name: target.text, from: CORE_MODULE };
   }
-  return targetImport.name === functionName;
+  return targetImport.name === functionName && targetImport.from === CORE_MODULE;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/input_function.mjs
@@ -4516,6 +4517,7 @@ function tryParseSignalQueryFromInitializer(member, reflector, isCore) {
   const descendants = (options == null ? void 0 : options.has("descendants")) ? parseDescendantsOption(options.get("descendants")) : defaultDescendantsValue(query.apiName);
   return {
     name: query.apiName,
+    call: query.call,
     metadata: {
       isSignal: true,
       propertyName: member.name,
@@ -4581,9 +4583,16 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const outputs = ClassPropertyMapping.fromMappedObject({ ...outputsFromMeta, ...outputsFromFields });
   const { viewQueries, contentQueries } = parseQueriesOfClassFields(members, reflector, evaluator, isCore);
   if (directive.has("queries")) {
+    const signalQueryFields = new Set([...viewQueries, ...contentQueries].filter((q) => q.isSignal).map((q) => q.propertyName));
     const queriesFromDecorator = extractQueriesFromDecorator(directive.get("queries"), reflector, evaluator, isCore);
-    contentQueries.push(...queriesFromDecorator.content);
-    viewQueries.push(...queriesFromDecorator.view);
+    const checkAndUnwrapQuery = (q) => {
+      if (signalQueryFields.has(q.metadata.propertyName)) {
+        throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_DECORATOR_METADATA_COLLISION, q.expr, `Query is declared multiple times. "@${decorator.name}" declares a query for the same property.`);
+      }
+      return q.metadata;
+    };
+    contentQueries.push(...queriesFromDecorator.content.map((q) => checkAndUnwrapQuery(q)));
+    viewQueries.push(...queriesFromDecorator.view.map((q) => checkAndUnwrapQuery(q)));
   }
   let selector = defaultSelector;
   if (directive.has("selector")) {
@@ -4795,7 +4804,8 @@ function extractHostBindings(members, evaluator, coreModule, metadata) {
   return bindings;
 }
 function extractQueriesFromDecorator(queryData, reflector, evaluator, isCore) {
-  const content = [], view = [];
+  const content = [];
+  const view = [];
   if (!ts23.isObjectLiteralExpression(queryData)) {
     throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, queryData, "Decorator queries metadata must be an object literal");
   }
@@ -4814,9 +4824,9 @@ function extractQueriesFromDecorator(queryData, reflector, evaluator, isCore) {
     }
     const query = extractDecoratorQueryMetadata(queryExpr, type.name, queryExpr.arguments || [], propertyName, reflector, evaluator);
     if (type.name.startsWith("Content")) {
-      content.push(query);
+      content.push({ expr: queryExpr, metadata: query });
     } else {
-      view.push(query);
+      view.push({ expr: queryExpr, metadata: query });
     }
   });
   return { content, view };
@@ -4892,6 +4902,7 @@ function tryGetQueryFromFieldDecorator(member, reflector, evaluator, isCore) {
   const name = (_c = (_b = decorator.import) == null ? void 0 : _b.name) != null ? _c : decorator.name;
   return {
     name,
+    decorator,
     metadata: extractDecoratorQueryMetadata(node, name, decorator.args || [], member.name, reflector, evaluator)
   };
 }
@@ -4989,7 +5000,7 @@ function tryParseInputFieldMapping(clazz, member, evaluator, reflector, isCore, 
   const decorator = tryGetDecoratorOnMember(member, "Input", isCore);
   const signalInputMapping = tryParseSignalInputMapping(member, reflector, isCore);
   if (decorator !== null && signalInputMapping !== null) {
-    throw new FatalDiagnosticError(ErrorCode.SIGNAL_INPUT_AND_DISALLOWED_DECORATOR, decorator.node, `Using @Input with a signal input is not allowed.`);
+    throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_WITH_DISALLOWED_DECORATOR, decorator.node, `Using @Input with a signal input is not allowed.`);
   }
   if (decorator !== null) {
     if (decorator.args !== null && decorator.args.length > 1) {
@@ -5039,10 +5050,10 @@ function parseInputFields(clazz, members, evaluator, reflector, refEmitter, isCo
       continue;
     }
     if (member.isStatic) {
-      throw new FatalDiagnosticError(ErrorCode.INPUT_DECLARED_ON_STATIC_MEMBER, (_a = member.node) != null ? _a : clazz, `Input "${member.name}" is incorrectly declared as static member of "${clazz.name.text}".`);
+      throw new FatalDiagnosticError(ErrorCode.INCORRECTLY_DECLARED_ON_STATIC_MEMBER, (_a = member.node) != null ? _a : clazz, `Input "${member.name}" is incorrectly declared as static member of "${clazz.name.text}".`);
     }
     if (inputMapping.isSignal && inputsFromClassDecorator.hasOwnProperty(classPropertyName)) {
-      throw new FatalDiagnosticError(ErrorCode.SIGNAL_INPUT_AND_INPUTS_ARRAY_COLLISION, (_b = member.node) != null ? _b : clazz, `Input "${member.name}" is also declared as non-signal in @${classDecorator.name}.`);
+      throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_DECORATOR_METADATA_COLLISION, (_b = member.node) != null ? _b : clazz, `Input "${member.name}" is also declared as non-signal in @${classDecorator.name}.`);
     }
     inputs[classPropertyName] = inputMapping;
   }
@@ -5115,6 +5126,7 @@ function assertEmittableInputType(type, contextFile, reflector, refEmitter) {
   })(type);
 }
 function parseQueriesOfClassFields(members, reflector, evaluator, isCore) {
+  var _a;
   const viewQueries = [];
   const contentQueries = [];
   const decoratorViewChild = [];
@@ -5122,11 +5134,15 @@ function parseQueriesOfClassFields(members, reflector, evaluator, isCore) {
   const decoratorContentChild = [];
   const decoratorContentChildren = [];
   for (const member of members) {
-    if (member.isStatic) {
-      continue;
-    }
     const decoratorQuery = tryGetQueryFromFieldDecorator(member, reflector, evaluator, isCore);
     const signalQuery = tryParseSignalQueryFromInitializer(member, reflector, isCore);
+    if (decoratorQuery !== null && signalQuery !== null) {
+      throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_WITH_DISALLOWED_DECORATOR, decoratorQuery.decorator.node, `Using @${decoratorQuery.name} with a signal-based query is not allowed.`);
+    }
+    const queryNode = (_a = decoratorQuery == null ? void 0 : decoratorQuery.decorator.node) != null ? _a : signalQuery == null ? void 0 : signalQuery.call;
+    if (queryNode !== void 0 && member.isStatic) {
+      throw new FatalDiagnosticError(ErrorCode.INCORRECTLY_DECLARED_ON_STATIC_MEMBER, queryNode, `Query is incorrectly declared on a static class member.`);
+    }
     if (decoratorQuery !== null) {
       switch (decoratorQuery.name) {
         case "ViewChild":
@@ -8084,4 +8100,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-27V25WC5.js.map
+//# sourceMappingURL=chunk-6O434EJY.js.map

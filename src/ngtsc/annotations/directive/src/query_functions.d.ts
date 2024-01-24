@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { R3QueryMetadata } from '@angular/compiler';
+import ts from 'typescript';
 import { ClassMember, ReflectionHost } from '../../../reflection';
 /** Possible query initializer API functions. */
 type QueryFunctionName = 'viewChild' | 'contentChild' | 'viewChildren' | 'contentChildren';
@@ -20,5 +21,6 @@ type QueryFunctionName = 'viewChild' | 'contentChild' | 'viewChildren' | 'conten
 export declare function tryParseSignalQueryFromInitializer(member: Pick<ClassMember, 'name' | 'value'>, reflector: ReflectionHost, isCore: boolean): {
     name: QueryFunctionName;
     metadata: R3QueryMetadata;
+    call: ts.CallExpression;
 } | null;
 export {};
