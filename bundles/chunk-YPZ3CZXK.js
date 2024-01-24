@@ -39,7 +39,7 @@ import {
   declarationTransformFactory,
   isHostDirectiveMetaForGlobalMode,
   ivyTransformFactory
-} from "./chunk-6O434EJY.js";
+} from "./chunk-QT4O55XU.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -2662,6 +2662,7 @@ var ExpressionIdentifier;
   ExpressionIdentifier2["DIRECTIVE"] = "DIR";
   ExpressionIdentifier2["COMPONENT_COMPLETION"] = "COMPCOMP";
   ExpressionIdentifier2["EVENT_PARAMETER"] = "EP";
+  ExpressionIdentifier2["VARIABLE_AS_EXPRESSION"] = "VAE";
 })(ExpressionIdentifier || (ExpressionIdentifier = {}));
 function addExpressionIdentifier(node, identifier) {
   ts16.addSyntheticTrailingComment(
@@ -3048,14 +3049,12 @@ function tsCreateElement(tagName) {
   );
 }
 function tsDeclareVariable(id, type) {
-  let initializer = ts19.factory.createNonNullExpression(ts19.factory.createNull());
-  if (type.kind === ts19.SyntaxKind.BooleanKeyword) {
-    initializer = ts19.factory.createAsExpression(initializer, ts19.factory.createKeywordTypeNode(ts19.SyntaxKind.BooleanKeyword));
-  }
+  addExpressionIdentifier(type, ExpressionIdentifier.VARIABLE_AS_EXPRESSION);
+  const initializer = ts19.factory.createAsExpression(ts19.factory.createNonNullExpression(ts19.factory.createNull()), type);
   const decl = ts19.factory.createVariableDeclaration(
     id,
     void 0,
-    type,
+    void 0,
     initializer
   );
   return ts19.factory.createVariableStatement(
@@ -4321,8 +4320,8 @@ var TcbDirectiveTypeOpBase = class extends TcbOp {
       type = ts28.factory.createTypeReferenceNode(rawType.typeName, typeArguments);
     }
     const id = this.tcb.allocateId();
-    addExpressionIdentifier(type, ExpressionIdentifier.DIRECTIVE);
-    addParseSpanInfo(type, this.node.startSourceSpan || this.node.sourceSpan);
+    addExpressionIdentifier(id, ExpressionIdentifier.DIRECTIVE);
+    addParseSpanInfo(id, this.node.startSourceSpan || this.node.sourceSpan);
     this.scope.addStatement(tsDeclareVariable(id, type));
     return id;
   }
@@ -4815,7 +4814,9 @@ var TcbBlockVariableOp = class extends TcbOp {
   execute() {
     const id = this.tcb.allocateId();
     addParseSpanInfo(id, this.variable.keySpan);
-    this.scope.addStatement(tsCreateVariable(id, this.initializer));
+    const variable = tsCreateVariable(id, wrapForTypeChecker(this.initializer));
+    addParseSpanInfo(variable.declarationList.declarations[0], this.variable.sourceSpan);
+    this.scope.addStatement(variable);
     return id;
   }
 };
@@ -4831,7 +4832,9 @@ var TcbBlockImplicitVariableOp = class extends TcbOp {
   execute() {
     const id = this.tcb.allocateId();
     addParseSpanInfo(id, this.variable.keySpan);
-    this.scope.addStatement(tsDeclareVariable(id, this.type));
+    const variable = tsDeclareVariable(id, this.type);
+    addParseSpanInfo(variable.declarationList.declarations[0], this.variable.sourceSpan);
+    this.scope.addStatement(variable);
     return id;
   }
 };
@@ -4967,6 +4970,7 @@ var TcbForOfOp = class extends TcbOp {
       throw new Error(`Could not resolve for loop variable ${this.block.item.name} to an identifier`);
     }
     const initializer = ts28.factory.createVariableDeclarationList([ts28.factory.createVariableDeclaration(initializerId)], ts28.NodeFlags.Const);
+    addParseSpanInfo(initializer, this.block.item.keySpan);
     const expression = ts28.factory.createNonNullExpression(tcbExpression(this.block.expression, this.tcb, loopScope));
     const trackTranslator = new TcbForLoopTrackTranslator(this.tcb, loopScope, this.block);
     const trackExpression = trackTranslator.translate(this.block.trackBy);
@@ -6279,17 +6283,22 @@ var SymbolBuilder = class {
   }
   getSymbolOfVariable(variable) {
     const node = findFirstMatchingNode(this.typeCheckBlock, { withSpan: variable.sourceSpan, filter: ts31.isVariableDeclaration });
-    if (node === null || node.initializer === void 0) {
+    if (node === null) {
       return null;
     }
-    const expressionSymbol = this.getSymbolOfTsNode(node.initializer);
-    if (expressionSymbol === null) {
+    let nodeValueSymbol = null;
+    if (ts31.isForOfStatement(node.parent.parent)) {
+      nodeValueSymbol = this.getSymbolOfTsNode(node);
+    } else if (node.initializer !== void 0) {
+      nodeValueSymbol = this.getSymbolOfTsNode(node.initializer);
+    }
+    if (nodeValueSymbol === null) {
       return null;
     }
     return {
-      tsType: expressionSymbol.tsType,
-      tsSymbol: expressionSymbol.tsSymbol,
-      initializerLocation: expressionSymbol.tcbLocation,
+      tsType: nodeValueSymbol.tsType,
+      tsSymbol: nodeValueSymbol.tsSymbol,
+      initializerLocation: nodeValueSymbol.tcbLocation,
       kind: SymbolKind.Variable,
       declaration: variable,
       localVarLocation: {
@@ -7656,6 +7665,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
+var SHOULD_USE_TEMPLATE_PIPELINE = false;
 var CompilationTicketKind;
 (function(CompilationTicketKind2) {
   CompilationTicketKind2[CompilationTicketKind2["Fresh"] = 0] = "Fresh";
@@ -8146,7 +8156,7 @@ var NgCompiler = class {
     return diagnostics;
   }
   makeCompilation() {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e, _f;
     const isCore = isAngularCorePackage(this.inputProgram);
     let compilationMode = CompilationMode.FULL;
     if (!isCore) {
@@ -8232,11 +8242,11 @@ var NgCompiler = class {
       throw new Error('JIT mode support ("supportJitMode" option) cannot be disabled when forbidOrphanComponents is set to true');
     }
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax),
-      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, supportTestBed, compilationMode),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, (_d = this.options.useTemplatePipeline) != null ? _d : SHOULD_USE_TEMPLATE_PIPELINE),
+      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, supportTestBed, compilationMode, (_e = this.options.useTemplatePipeline) != null ? _e : SHOULD_USE_TEMPLATE_PIPELINE),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
-      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_d = this.options.onlyPublishPublicTypingsForNgModules) != null ? _d : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode)
+      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_f = this.options.onlyPublishPublicTypingsForNgModules) != null ? _f : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
@@ -9023,4 +9033,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QHQTJ2GS.js.map
+//# sourceMappingURL=chunk-YPZ3CZXK.js.map

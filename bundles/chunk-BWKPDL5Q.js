@@ -7,7 +7,7 @@ import {
   addImports,
   isAngularDecorator,
   tryParseSignalInputMapping
-} from "./chunk-6O434EJY.js";
+} from "./chunk-QT4O55XU.js";
 import {
   ImportManager,
   TypeScriptReflectionHost,
@@ -427,4 +427,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2B66O2FL.js.map
+//# sourceMappingURL=chunk-BWKPDL5Q.js.map

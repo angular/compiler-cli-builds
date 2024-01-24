@@ -4556,7 +4556,7 @@ function parseDescendantsOption(value) {
 var EMPTY_OBJECT = {};
 var queryDecoratorNames = ["ViewChild", "ViewChildren", "ContentChild", "ContentChildren"];
 var QUERY_TYPES = new Set(queryDecoratorNames);
-function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmitter, referencesRegistry, isCore, annotateForClosureCompiler, compilationMode, defaultSelector = null) {
+function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmitter, referencesRegistry, isCore, annotateForClosureCompiler, compilationMode, defaultSelector, useTemplatePipeline) {
   let directive;
   if (decorator.args === null || decorator.args.length === 0) {
     directive = /* @__PURE__ */ new Map();
@@ -4655,7 +4655,10 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const metadata = {
     name: clazz.name.text,
     deps: ctorDeps,
-    host,
+    host: {
+      ...host,
+      useTemplatePipeline
+    },
     lifecycle: {
       usesOnChanges
     },
@@ -5397,7 +5400,7 @@ var LIFECYCLE_HOOKS = /* @__PURE__ */ new Set([
   "ngAfterContentChecked"
 ]);
 var DirectiveDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, includeClassMetadata, compilationMode) {
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, includeClassMetadata, compilationMode, useTemplatePipeline) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -5413,6 +5416,7 @@ var DirectiveDecoratorHandler = class {
     this.perf = perf;
     this.includeClassMetadata = includeClassMetadata;
     this.compilationMode = compilationMode;
+    this.useTemplatePipeline = useTemplatePipeline;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = "DirectiveDecoratorHandler";
   }
@@ -5434,7 +5438,19 @@ var DirectiveDecoratorHandler = class {
       return { diagnostics: [getUndecoratedClassWithAngularFeaturesDiagnostic(node)] };
     }
     this.perf.eventCount(PerfEvent.AnalyzeDirective);
-    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, this.annotateForClosureCompiler, this.compilationMode);
+    const directiveResult = extractDirectiveMetadata(
+      node,
+      decorator,
+      this.reflector,
+      this.evaluator,
+      this.refEmitter,
+      this.referencesRegistry,
+      this.isCore,
+      this.annotateForClosureCompiler,
+      this.compilationMode,
+      null,
+      this.useTemplatePipeline
+    );
     if (directiveResult === void 0) {
       return {};
     }
@@ -6702,7 +6718,7 @@ var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, useTemplatePipeline) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -6737,6 +6753,7 @@ var ComponentDecoratorHandler = class {
     this.deferredSymbolTracker = deferredSymbolTracker;
     this.forbidOrphanRendering = forbidOrphanRendering;
     this.enableBlockSyntax = enableBlockSyntax;
+    this.useTemplatePipeline = useTemplatePipeline;
     this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
@@ -6813,7 +6830,7 @@ var ComponentDecoratorHandler = class {
     this.literalCache.delete(decorator);
     let diagnostics;
     let isPoisoned = false;
-    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, this.annotateForClosureCompiler, this.compilationMode, this.elementSchemaRegistry.getDefaultComponentElementName());
+    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, this.annotateForClosureCompiler, this.compilationMode, this.elementSchemaRegistry.getDefaultComponentElementName(), this.useTemplatePipeline);
     if (directiveResult === void 0) {
       return {};
     }
@@ -7006,7 +7023,8 @@ var ComponentDecoratorHandler = class {
           viewProviders: wrappedViewProviders,
           i18nUseExternalIds: this.i18nUseExternalIds,
           relativeContextFilePath,
-          rawImports: rawImports !== null ? new WrappedNodeExpr8(rawImports) : void 0
+          rawImports: rawImports !== null ? new WrappedNodeExpr8(rawImports) : void 0,
+          useTemplatePipeline: this.useTemplatePipeline
         },
         typeCheckMeta: extractDirectiveTypeCheckMeta(node, inputs, this.reflector),
         classMetadata: this.includeClassMetadata ? extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler, (dec) => transformDecoratorResources(dec, component, styles, template)) : null,
@@ -8100,4 +8118,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-6O434EJY.js.map
+//# sourceMappingURL=chunk-QT4O55XU.js.map
