@@ -7122,7 +7122,7 @@ var ComponentDecoratorHandler = class {
     const nonRemovableImports = this.deferredSymbolTracker.getNonRemovableDeferredImports(context, node);
     if (nonRemovableImports.length > 0) {
       for (const importDecl of nonRemovableImports) {
-        const diagnostic = makeDiagnostic(ErrorCode.DEFERRED_DEPENDENCY_IMPORTED_EAGERLY, importDecl, `This import contains symbols used in the \`@Component.deferredImports\` array of the \`${node.name.getText()}\` component, but also some other symbols that are not in any \`@Component.deferredImports\` array. This renders all these defer imports useless as this import remains and its module is eagerly loaded. To fix this, make sure that this import contains *only* symbols that are used within \`@Component.deferredImports\` arrays.`);
+        const diagnostic = makeDiagnostic(ErrorCode.DEFERRED_DEPENDENCY_IMPORTED_EAGERLY, importDecl, `This import contains symbols that are used both inside and outside of the \`@Component.deferredImports\` fields in the file. This renders all these defer imports useless as this import remains and its module is eagerly loaded. To fix this, make sure that all symbols from the import are *only* used within \`@Component.deferredImports\` arrays and there are no other references to those symbols present in this file.`);
         diagnostics.push(diagnostic);
       }
       return { diagnostics };
@@ -8084,4 +8084,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FTXPEWNZ.js.map
+//# sourceMappingURL=chunk-27V25WC5.js.map
