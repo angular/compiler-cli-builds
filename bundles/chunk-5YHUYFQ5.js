@@ -4557,14 +4557,13 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
       this.tcb.domSchemaChecker.checkElement(this.tcb.id, this.element, this.tcb.schemas, this.tcb.hostIsStandalone);
     }
     for (const binding of this.element.inputs) {
-      if (binding.type === 0 && this.claimedInputs.has(binding.name)) {
+      const isPropertyBinding = binding.type === 0 || binding.type === 5;
+      if (isPropertyBinding && this.claimedInputs.has(binding.name)) {
         continue;
       }
-      if (binding.type === 0) {
-        if (binding.name !== "style" && binding.name !== "class") {
-          const propertyName = (_a = ATTR_TO_PROP.get(binding.name)) != null ? _a : binding.name;
-          this.tcb.domSchemaChecker.checkProperty(this.tcb.id, this.element, propertyName, binding.sourceSpan, this.tcb.schemas, this.tcb.hostIsStandalone);
-        }
+      if (isPropertyBinding && binding.name !== "style" && binding.name !== "class") {
+        const propertyName = (_a = ATTR_TO_PROP.get(binding.name)) != null ? _a : binding.name;
+        this.tcb.domSchemaChecker.checkProperty(this.tcb.id, this.element, propertyName, binding.sourceSpan, this.tcb.schemas, this.tcb.hostIsStandalone);
       }
     }
     return null;
@@ -4666,11 +4665,12 @@ var TcbUnclaimedInputsOp = class extends TcbOp {
     var _a;
     let elId = null;
     for (const binding of this.element.inputs) {
-      if (binding.type === 0 && this.claimedInputs.has(binding.name)) {
+      const isPropertyBinding = binding.type === 0 || binding.type === 5;
+      if (isPropertyBinding && this.claimedInputs.has(binding.name)) {
         continue;
       }
       const expr = widenBinding(tcbExpression(binding.value, this.tcb, this.scope), this.tcb);
-      if (this.tcb.env.config.checkTypeOfDomBindings && binding.type === 0) {
+      if (this.tcb.env.config.checkTypeOfDomBindings && isPropertyBinding) {
         if (binding.name !== "style" && binding.name !== "class") {
           if (elId === null) {
             elId = this.scope.resolve(this.element);
@@ -4705,7 +4705,7 @@ var TcbDirectiveOutputsOp = class extends TcbOp {
     let dirId = null;
     const outputs = this.dir.outputs;
     for (const output of this.node.outputs) {
-      if (output.type !== 0 || !outputs.hasBindingPropertyName(output.name)) {
+      if (output.type === 1 || !outputs.hasBindingPropertyName(output.name)) {
         continue;
       }
       if (this.tcb.env.config.checkTypeOfOutputEvents && output.name.endsWith("Change")) {
@@ -5472,7 +5472,7 @@ function tcbCallTypeCtor(dir, tcb, inputs) {
 function getBoundAttributes(directive, node) {
   const boundInputs = [];
   const processAttribute = (attr) => {
-    if (attr instanceof TmplAstBoundAttribute && attr.type !== 0) {
+    if (attr instanceof TmplAstBoundAttribute && attr.type !== 0 && attr.type !== 5) {
       return;
     }
     const inputs = directive.inputs.getByBindingPropertyName(attr.name);
@@ -9026,4 +9026,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-MN4W7PI2.js.map
+//# sourceMappingURL=chunk-5YHUYFQ5.js.map
