@@ -11,7 +11,7 @@ import {
   PartialEvaluator,
   StaticInterpreter,
   forwardRefResolver
-} from "../chunk-QT4O55XU.js";
+} from "../chunk-QZSNDK5J.js";
 import {
   Reference,
   TypeScriptReflectionHost,

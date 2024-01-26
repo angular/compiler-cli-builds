@@ -3598,10 +3598,14 @@ var TraitCompiler = class {
   detectTraits(clazz, decorators) {
     let record = this.recordFor(clazz);
     let foundTraits = [];
+    const nonNgDecoratorsInLocalMode = this.compilationMode === CompilationMode.LOCAL ? new Set(decorators) : null;
     for (const handler of this.handlers) {
       const result = handler.detect(clazz, decorators);
       if (result === void 0) {
         continue;
+      }
+      if (nonNgDecoratorsInLocalMode !== null && result.decorator !== null) {
+        nonNgDecoratorsInLocalMode.delete(result.decorator);
       }
       const isPrimaryHandler = handler.precedence === HandlerPrecedence.PRIMARY;
       const isWeakHandler = handler.precedence === HandlerPrecedence.WEAK;
@@ -3643,6 +3647,17 @@ var TraitCompiler = class {
         record.traits.push(trait);
         record.hasPrimaryHandler = record.hasPrimaryHandler || isPrimaryHandler;
       }
+    }
+    if (nonNgDecoratorsInLocalMode !== null && nonNgDecoratorsInLocalMode.size > 0 && record !== null && record.metaDiagnostics === null) {
+      record.metaDiagnostics = [...nonNgDecoratorsInLocalMode].map((decorator) => ({
+        category: ts15.DiagnosticCategory.Error,
+        code: Number("-99" + ErrorCode.DECORATOR_UNEXPECTED),
+        file: getSourceFile(clazz),
+        start: decorator.node.getStart(),
+        length: decorator.node.getWidth(),
+        messageText: "In local compilation mode, Angular does not support custom decorators. Ensure all class decorators are from Angular."
+      }));
+      record.traits = foundTraits = [];
     }
     return foundTraits.length > 0 ? foundTraits : null;
   }
@@ -8118,4 +8133,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QT4O55XU.js.map
+//# sourceMappingURL=chunk-QZSNDK5J.js.map
