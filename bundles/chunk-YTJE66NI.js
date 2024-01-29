@@ -7421,10 +7421,12 @@ var ComponentDecoratorHandler = class {
       return [];
     }
     const deferrableTypes = this.collectDeferredSymbols(resolution);
+    const useTemplatePipeline = this.useTemplatePipeline;
     const meta = {
       ...analysis.meta,
       ...resolution,
-      deferrableTypes
+      deferrableTypes,
+      useTemplatePipeline
     };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
     removeDeferrableTypesFromComponentDecorator(analysis, deferrableTypes);
@@ -7445,7 +7447,12 @@ var ComponentDecoratorHandler = class {
       isInline: analysis.template.declaration.isInline,
       inlineTemplateLiteralExpression: analysis.template.sourceMapping.type === "direct" ? new WrappedNodeExpr8(analysis.template.sourceMapping.node) : null
     };
-    const meta = { ...analysis.meta, ...resolution };
+    const useTemplatePipeline = this.useTemplatePipeline;
+    const meta = {
+      ...analysis.meta,
+      ...resolution,
+      useTemplatePipeline
+    };
     const fac = compileDeclareFactory(toFactoryMetadata(meta, FactoryTarget3.Component));
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const def = compileDeclareComponentFromMetadata(meta, analysis.template, templateInfo);
@@ -7457,10 +7464,12 @@ var ComponentDecoratorHandler = class {
       return [];
     }
     const deferrableTypes = analysis.explicitlyDeferredTypes;
+    const useTemplatePipeline = this.useTemplatePipeline;
     const meta = {
       ...analysis.meta,
       ...resolution,
-      deferrableTypes: deferrableTypes != null ? deferrableTypes : /* @__PURE__ */ new Map()
+      deferrableTypes: deferrableTypes != null ? deferrableTypes : /* @__PURE__ */ new Map(),
+      useTemplatePipeline
     };
     if (analysis.explicitlyDeferredTypes !== null) {
       removeDeferrableTypesFromComponentDecorator(analysis, analysis.explicitlyDeferredTypes);
@@ -8133,4 +8142,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QZSNDK5J.js.map
+//# sourceMappingURL=chunk-YTJE66NI.js.map
