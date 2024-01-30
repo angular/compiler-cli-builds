@@ -40,7 +40,8 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator,
     private perf;
     private includeClassMetadata;
     private readonly compilationMode;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, injectableRegistry: InjectableClassRegistry, isCore: boolean, perf: PerfRecorder, includeClassMetadata: boolean, compilationMode: CompilationMode);
+    private readonly generateExtraImportsInLocalMode;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, injectableRegistry: InjectableClassRegistry, isCore: boolean, perf: PerfRecorder, includeClassMetadata: boolean, compilationMode: CompilationMode, generateExtraImportsInLocalMode: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name = "PipeDecoratorHandler";
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;

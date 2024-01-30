@@ -39,7 +39,7 @@ import {
   declarationTransformFactory,
   isHostDirectiveMetaForGlobalMode,
   ivyTransformFactory
-} from "./chunk-YTJE66NI.js";
+} from "./chunk-IWZ4MO7Q.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -53,6 +53,7 @@ import {
   FatalDiagnosticError,
   ImportFlags,
   ImportManager,
+  LocalCompilationExtraImportsTracker,
   LocalIdentifierStrategy,
   LogicalProjectStrategy,
   ModuleResolver,
@@ -87,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-ZO5DVEPZ.js";
+} from "./chunk-7HZQIUTO.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -3126,6 +3127,13 @@ function tsNumericExpression(value) {
   }
   return ts19.factory.createNumericLiteral(value);
 }
+function getImportString(imp) {
+  if (imp.qualifier === null) {
+    return `import from '${imp.specifier}';`;
+  } else {
+    return `import * as ${imp.qualifier.text} from '${imp.specifier}';`;
+  }
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.mjs
 import { ExpressionType as ExpressionType2, R3Identifiers as R3Identifiers2, WrappedNodeExpr } from "@angular/compiler";
@@ -5648,7 +5656,7 @@ var TypeCheckFile = class extends Environment {
   }
   render(removeComments) {
     ensureTypeCheckFilePreparationImports(this);
-    let source = this.importManager.getAllImports(this.contextFile.fileName).map((i) => `import * as ${i.qualifier.text} from '${i.specifier}';`).join("\n") + "\n\n";
+    let source = this.importManager.getAllImports(this.contextFile.fileName).map(getImportString).join("\n") + "\n\n";
     const printer = ts29.createPrinter({ removeComments });
     source += "\n";
     for (const stmt of this.pipeInstStatements) {
@@ -5781,7 +5789,7 @@ var TypeCheckContextImpl = class {
       const text = op.execute(importManager, sf, this.refEmitter, printer);
       code += "\n\n" + text + textParts[idx + 1];
     });
-    let imports = importManager.getAllImports(sf.fileName).map((i) => `import * as ${i.qualifier.text} from '${i.specifier}';`).join("\n");
+    let imports = importManager.getAllImports(sf.fileName).map(getImportString).join("\n");
     code = imports + "\n" + code;
     return code;
   }
@@ -7997,7 +8005,7 @@ var NgCompiler = class {
     }
     const defaultImportTracker = new DefaultImportTracker();
     const before = [
-      ivyTransformFactory(compilation.traitCompiler, compilation.reflector, importRewriter, defaultImportTracker, this.delegatingPerfRecorder, compilation.isCore, this.closureCompilerEnabled),
+      ivyTransformFactory(compilation.traitCompiler, compilation.reflector, importRewriter, defaultImportTracker, compilation.localCompilationExtraImportsTracker, this.delegatingPerfRecorder, compilation.isCore, this.closureCompilerEnabled),
       aliasTransformFactory(compilation.traitCompiler.exportStatements),
       defaultImportTracker.importPreservingTransformer()
     ];
@@ -8285,7 +8293,11 @@ var NgCompiler = class {
     const dtsTransforms = new DtsTransformRegistry();
     const resourceRegistry = new ResourceRegistry();
     const deferredSymbolsTracker = new DeferredSymbolTracker(this.inputProgram.getTypeChecker(), (_a = this.options.onlyExplicitDeferDependencyImports) != null ? _a : false);
-    const cycleHandlingStrategy = compilationMode === CompilationMode.FULL ? 0 : 1;
+    let localCompilationExtraImportsTracker = null;
+    if (compilationMode === CompilationMode.LOCAL && this.options.generateExtraImportsInLocalMode) {
+      localCompilationExtraImportsTracker = new LocalCompilationExtraImportsTracker(checker);
+    }
+    const cycleHandlingStrategy = compilationMode === CompilationMode.PARTIAL ? 1 : 0;
     const strictCtorDeps = this.options.strictInjectionParameters || false;
     const supportJitMode = (_b = this.options["supportJitMode"]) != null ? _b : true;
     const supportTestBed = (_c = this.options["supportTestBed"]) != null ? _c : true;
@@ -8299,11 +8311,11 @@ var NgCompiler = class {
       throw new Error('JIT mode support ("supportJitMode" option) cannot be disabled when forbidOrphanComponents is set to true');
     }
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, (_d = this.options.useTemplatePipeline) != null ? _d : SHOULD_USE_TEMPLATE_PIPELINE),
-      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, supportTestBed, compilationMode, (_e = this.options.useTemplatePipeline) != null ? _e : SHOULD_USE_TEMPLATE_PIPELINE),
-      new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, (_d = this.options.useTemplatePipeline) != null ? _d : SHOULD_USE_TEMPLATE_PIPELINE, localCompilationExtraImportsTracker),
+      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, supportTestBed, compilationMode, (_e = this.options.useTemplatePipeline) != null ? _e : SHOULD_USE_TEMPLATE_PIPELINE, !!this.options.generateExtraImportsInLocalMode),
+      new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode, !!this.options.generateExtraImportsInLocalMode),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
-      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_f = this.options.onlyPublishPublicTypingsForNgModules) != null ? _f : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode)
+      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_f = this.options.onlyPublishPublicTypingsForNgModules) != null ? _f : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode, localCompilationExtraImportsTracker)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
@@ -8325,7 +8337,8 @@ var NgCompiler = class {
       refEmitter,
       templateTypeChecker,
       resourceRegistry,
-      extendedTemplateChecker
+      extendedTemplateChecker,
+      localCompilationExtraImportsTracker
     };
   }
 };
@@ -9090,4 +9103,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-VTQ6NOW6.js.map
+//# sourceMappingURL=chunk-GJ7EAXBI.js.map

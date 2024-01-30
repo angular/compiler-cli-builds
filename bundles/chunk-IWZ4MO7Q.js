@@ -29,7 +29,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-ZO5DVEPZ.js";
+} from "./chunk-7HZQIUTO.js";
 import {
   PerfEvent,
   PerfPhase
@@ -2590,7 +2590,7 @@ function compileInputTransformFields(inputs) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
-import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
+import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr6, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
 import ts27 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
@@ -3940,21 +3940,7 @@ import ts17 from "typescript";
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/utils.mjs
 import ts16 from "typescript";
 function addImports(factory = ts16.factory, importManager, sf, extraStatements = []) {
-  const addedImports = importManager.getAllImports(sf.fileName).map((i) => {
-    const qualifier = factory.createIdentifier(i.qualifier.text);
-    const importClause = factory.createImportClause(
-      false,
-      void 0,
-      factory.createNamespaceImport(qualifier)
-    );
-    const decl = factory.createImportDeclaration(
-      void 0,
-      importClause,
-      factory.createStringLiteral(i.specifier)
-    );
-    ts16.setOriginalNode(i.qualifier, decl);
-    return decl;
-  });
+  const addedImports = importManager.getAllImports(sf.fileName).map((i) => i.qualifier !== null ? createNamespaceImportDecl(i, factory) : createSideEffectImportDecl(i, factory));
   const existingImports = sf.statements.filter((stmt) => isImportStatement(stmt));
   const body = sf.statements.filter((stmt) => !isImportStatement(stmt));
   if (addedImports.length > 0) {
@@ -3968,6 +3954,28 @@ function addImports(factory = ts16.factory, importManager, sf, extraStatements =
     ]));
   }
   return sf;
+}
+function createNamespaceImportDecl(i, factory) {
+  const qualifier = factory.createIdentifier(i.qualifier.text);
+  const importClause = factory.createImportClause(
+    false,
+    void 0,
+    factory.createNamespaceImport(qualifier)
+  );
+  const decl = factory.createImportDeclaration(
+    void 0,
+    importClause,
+    factory.createStringLiteral(i.specifier)
+  );
+  ts16.setOriginalNode(i.qualifier, decl);
+  return decl;
+}
+function createSideEffectImportDecl(i, factory) {
+  return factory.createImportDeclaration(
+    void 0,
+    void 0,
+    ts16.factory.createStringLiteral(i.specifier)
+  );
 }
 function isImportStatement(stmt) {
   return ts16.isImportDeclaration(stmt) || ts16.isImportEqualsDeclaration(stmt) || ts16.isNamespaceImport(stmt);
@@ -4188,11 +4196,11 @@ var Visitor = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/transform.mjs
 var NO_DECORATORS = /* @__PURE__ */ new Set();
 var CLOSURE_FILE_OVERVIEW_REGEXP = /\s+@fileoverview\s+/i;
-function ivyTransformFactory(compilation, reflector, importRewriter, defaultImportTracker, perf, isCore, isClosureCompilerEnabled) {
+function ivyTransformFactory(compilation, reflector, importRewriter, defaultImportTracker, localCompilationExtraImportsTracker, perf, isCore, isClosureCompilerEnabled) {
   const recordWrappedNode = createRecorderFn(defaultImportTracker);
   return (context) => {
     return (file) => {
-      return perf.inPhase(PerfPhase.Compile, () => transformIvySourceFile(compilation, context, reflector, importRewriter, file, isCore, isClosureCompilerEnabled, recordWrappedNode));
+      return perf.inPhase(PerfPhase.Compile, () => transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, recordWrappedNode));
     };
   };
 }
@@ -4328,7 +4336,7 @@ var IvyTransformationVisitor = class extends Visitor {
     return node;
   }
 };
-function transformIvySourceFile(compilation, context, reflector, importRewriter, file, isCore, isClosureCompilerEnabled, recordWrappedNode) {
+function transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, recordWrappedNode) {
   const constantPool = new ConstantPool(isClosureCompilerEnabled);
   const importManager = new ImportManager(importRewriter);
   const compilationVisitor = new IvyCompilationVisitor(compilation, constantPool);
@@ -4343,6 +4351,11 @@ function transformIvySourceFile(compilation, context, reflector, importRewriter,
     annotateForClosureCompiler: isClosureCompilerEnabled
   }));
   const fileOverviewMeta = isClosureCompilerEnabled ? getFileOverviewComment(sf.statements) : null;
+  if (localCompilationExtraImportsTracker !== null) {
+    for (const moduleName of localCompilationExtraImportsTracker.getImportsForFile(sf)) {
+      importManager.generateSideEffectImport(moduleName);
+    }
+  }
   sf = addImports(context.factory, importManager, sf, constants);
   if (fileOverviewMeta !== null) {
     setFileOverviewComment(sf, fileOverviewMeta);
@@ -5415,7 +5428,7 @@ var LIFECYCLE_HOOKS = /* @__PURE__ */ new Set([
   "ngAfterContentChecked"
 ]);
 var DirectiveDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, includeClassMetadata, compilationMode, useTemplatePipeline) {
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, includeClassMetadata, compilationMode, useTemplatePipeline, generateExtraImportsInLocalMode) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -5432,6 +5445,7 @@ var DirectiveDecoratorHandler = class {
     this.includeClassMetadata = includeClassMetadata;
     this.compilationMode = compilationMode;
     this.useTemplatePipeline = useTemplatePipeline;
+    this.generateExtraImportsInLocalMode = generateExtraImportsInLocalMode;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = "DirectiveDecoratorHandler";
   }
@@ -5496,9 +5510,6 @@ var DirectiveDecoratorHandler = class {
     return new DirectiveSymbol(node, analysis.meta.selector, analysis.inputs, analysis.outputs, analysis.meta.exportAs, analysis.typeCheckMeta, typeParameters);
   }
   register(node, analysis) {
-    if (this.compilationMode === CompilationMode.LOCAL) {
-      return;
-    }
     const ref = new Reference(node);
     this.metaRegistry.registerDirectiveMetadata({
       kind: MetaKind.Directive,
@@ -5726,7 +5737,7 @@ var NgModuleSymbol = class extends SemanticSymbol {
   }
 };
 var NgModuleDecoratorHandler = class {
-  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf, includeClassMetadata, includeSelectorScope, compilationMode) {
+  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf, includeClassMetadata, includeSelectorScope, compilationMode, localCompilationExtraImportsTracker) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaReader = metaReader;
@@ -5744,6 +5755,7 @@ var NgModuleDecoratorHandler = class {
     this.includeClassMetadata = includeClassMetadata;
     this.includeSelectorScope = includeSelectorScope;
     this.compilationMode = compilationMode;
+    this.localCompilationExtraImportsTracker = localCompilationExtraImportsTracker;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = "NgModuleDecoratorHandler";
   }
@@ -5784,9 +5796,9 @@ var NgModuleDecoratorHandler = class {
     const diagnostics = [];
     let declarationRefs = [];
     const rawDeclarations = (_a = ngModule.get("declarations")) != null ? _a : null;
-    if (this.compilationMode !== CompilationMode.LOCAL && rawDeclarations !== null) {
+    if (rawDeclarations !== null) {
       const declarationMeta = this.evaluator.evaluate(rawDeclarations, forwardRefResolver);
-      declarationRefs = this.resolveTypeList(rawDeclarations, declarationMeta, name, "declarations", 0).references;
+      declarationRefs = this.resolveTypeList(rawDeclarations, declarationMeta, name, "declarations", 0, this.compilationMode === CompilationMode.LOCAL).references;
       for (const ref of declarationRefs) {
         if (ref.node.getSourceFile().isDeclarationFile) {
           const errorNode = ref.getOriginForDiagnostics(rawDeclarations);
@@ -5799,22 +5811,35 @@ var NgModuleDecoratorHandler = class {
     }
     let importRefs = [];
     let rawImports = (_b = ngModule.get("imports")) != null ? _b : null;
-    if (this.compilationMode !== CompilationMode.LOCAL && rawImports !== null) {
+    if (rawImports !== null) {
       const importsMeta = this.evaluator.evaluate(rawImports, moduleResolvers);
-      importRefs = this.resolveTypeList(rawImports, importsMeta, name, "imports", 0).references;
+      const result = this.resolveTypeList(rawImports, importsMeta, name, "imports", 0, this.compilationMode === CompilationMode.LOCAL);
+      if (this.compilationMode === CompilationMode.LOCAL && this.localCompilationExtraImportsTracker !== null) {
+        for (const d of result.dynamicValues) {
+          this.localCompilationExtraImportsTracker.addGlobalImportFromIdentifier(d.node);
+        }
+      }
+      importRefs = result.references;
     }
     let exportRefs = [];
     const rawExports = (_c = ngModule.get("exports")) != null ? _c : null;
-    if (this.compilationMode !== CompilationMode.LOCAL && rawExports !== null) {
+    if (rawExports !== null) {
       const exportsMeta = this.evaluator.evaluate(rawExports, moduleResolvers);
-      exportRefs = this.resolveTypeList(rawExports, exportsMeta, name, "exports", 0).references;
+      exportRefs = this.resolveTypeList(rawExports, exportsMeta, name, "exports", 0, this.compilationMode === CompilationMode.LOCAL).references;
       this.referencesRegistry.add(node, ...exportRefs);
     }
     let bootstrapRefs = [];
     const rawBootstrap = (_d = ngModule.get("bootstrap")) != null ? _d : null;
     if (this.compilationMode !== CompilationMode.LOCAL && rawBootstrap !== null) {
       const bootstrapMeta = this.evaluator.evaluate(rawBootstrap, forwardRefResolver);
-      bootstrapRefs = this.resolveTypeList(rawBootstrap, bootstrapMeta, name, "bootstrap", 0).references;
+      bootstrapRefs = this.resolveTypeList(
+        rawBootstrap,
+        bootstrapMeta,
+        name,
+        "bootstrap",
+        0,
+        false
+      ).references;
       for (const ref of bootstrapRefs) {
         const dirMeta = this.metaReader.getDirectiveMetadata(ref);
         if (dirMeta == null ? void 0 : dirMeta.isStandalone) {
@@ -5903,7 +5928,14 @@ var NgModuleDecoratorHandler = class {
       let absoluteIndex = 0;
       for (const importExpr of topLevelExpressions) {
         const resolved = this.evaluator.evaluate(importExpr, moduleResolvers);
-        const { references, hasModuleWithProviders } = this.resolveTypeList(importExpr, [resolved], node.name.text, "imports", absoluteIndex);
+        const { references, hasModuleWithProviders } = this.resolveTypeList(
+          importExpr,
+          [resolved],
+          node.name.text,
+          "imports",
+          absoluteIndex,
+          false
+        );
         absoluteIndex += references.length;
         topLevelImports.push({
           expression: importExpr,
@@ -5968,9 +6000,6 @@ var NgModuleDecoratorHandler = class {
     return new NgModuleSymbol(node, analysis.providers !== null);
   }
   register(node, analysis) {
-    if (this.compilationMode === CompilationMode.LOCAL) {
-      return;
-    }
     this.metaRegistry.registerNgModuleMetadata({
       kind: MetaKind.NgModule,
       ref: new Reference(node),
@@ -6125,6 +6154,9 @@ var NgModuleDecoratorHandler = class {
     }
   }
   appendRemoteScopingStatements(ngModuleStatements, node, declarations, remoteScopesMayRequireCycleProtection) {
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return;
+    }
     const context = getSourceFile(node);
     for (const decl of declarations) {
       const remoteScope = this.scopeRegistry.getRemoteScope(decl.node);
@@ -6182,10 +6214,18 @@ var NgModuleDecoratorHandler = class {
   isClassDeclarationReference(ref) {
     return this.reflector.isClass(ref.node);
   }
-  resolveTypeList(expr, resolvedList, className, arrayName, absoluteIndex) {
+  resolveTypeList(expr, resolvedList, className, arrayName, absoluteIndex, allowUnresolvedReferences) {
     let hasModuleWithProviders = false;
     const refList = [];
+    const dynamicValueSet = /* @__PURE__ */ new Set();
     if (!Array.isArray(resolvedList)) {
+      if (allowUnresolvedReferences) {
+        return {
+          references: [],
+          hasModuleWithProviders: false,
+          dynamicValues: []
+        };
+      }
       throw createValueHasWrongTypeError(expr, resolvedList, `Expected array when reading the NgModule.${arrayName} of ${className}`);
     }
     for (let idx = 0; idx < resolvedList.length; idx++) {
@@ -6198,8 +6238,11 @@ var NgModuleDecoratorHandler = class {
         hasModuleWithProviders = true;
       }
       if (Array.isArray(entry)) {
-        const recursiveResult = this.resolveTypeList(expr, entry, className, arrayName, absoluteIndex);
+        const recursiveResult = this.resolveTypeList(expr, entry, className, arrayName, absoluteIndex, allowUnresolvedReferences);
         refList.push(...recursiveResult.references);
+        for (const d of recursiveResult.dynamicValues) {
+          dynamicValueSet.add(d);
+        }
         absoluteIndex += recursiveResult.references.length;
         hasModuleWithProviders = hasModuleWithProviders || recursiveResult.hasModuleWithProviders;
       } else if (entry instanceof Reference) {
@@ -6208,13 +6251,17 @@ var NgModuleDecoratorHandler = class {
         }
         refList.push(entry);
         absoluteIndex += 1;
+      } else if (entry instanceof DynamicValue && allowUnresolvedReferences) {
+        dynamicValueSet.add(entry);
+        continue;
       } else {
         throw createValueHasWrongTypeError(expr, entry, `Value at position ${absoluteIndex} in the NgModule.${arrayName} of ${className} is not a reference`);
       }
     }
     return {
       references: refList,
-      hasModuleWithProviders
+      hasModuleWithProviders,
+      dynamicValues: [...dynamicValueSet]
     };
   }
 };
@@ -6733,7 +6780,7 @@ var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, useTemplatePipeline) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, useTemplatePipeline, localCompilationExtraImportsTracker) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -6769,6 +6816,7 @@ var ComponentDecoratorHandler = class {
     this.forbidOrphanRendering = forbidOrphanRendering;
     this.enableBlockSyntax = enableBlockSyntax;
     this.useTemplatePipeline = useTemplatePipeline;
+    this.localCompilationExtraImportsTracker = localCompilationExtraImportsTracker;
     this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
@@ -7078,9 +7126,6 @@ var ComponentDecoratorHandler = class {
   }
   register(node, analysis) {
     var _a;
-    if (this.compilationMode === CompilationMode.LOCAL) {
-      return;
-    }
     const ref = new Reference(node);
     this.metaRegistry.registerDirectiveMetadata({
       kind: MetaKind.Directive,
@@ -7176,16 +7221,27 @@ var ComponentDecoratorHandler = class {
       }
       return { diagnostics };
     }
+    let data;
     if (this.compilationMode === CompilationMode.LOCAL) {
-      return {
-        data: {
-          declarationListEmitMode: !analysis.meta.isStandalone || analysis.rawImports !== null ? 3 : 0,
-          declarations: EMPTY_ARRAY2,
-          deferBlocks: this.locateDeferBlocksWithoutScope(analysis.template),
-          deferBlockDepsEmitMode: 1,
-          deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
-          deferrableTypes: /* @__PURE__ */ new Map()
-        }
+      data = {
+        declarations: EMPTY_ARRAY2,
+        declarationListEmitMode: !analysis.meta.isStandalone || analysis.rawImports !== null ? 3 : 0,
+        deferBlocks: this.locateDeferBlocksWithoutScope(analysis.template),
+        deferBlockDepsEmitMode: 1,
+        deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
+        deferrableTypes: /* @__PURE__ */ new Map()
+      };
+      if (this.localCompilationExtraImportsTracker === null) {
+        return { data };
+      }
+    } else {
+      data = {
+        declarations: EMPTY_ARRAY2,
+        declarationListEmitMode: 0,
+        deferBlocks: /* @__PURE__ */ new Map(),
+        deferBlockDepsEmitMode: 0,
+        deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
+        deferrableTypes: /* @__PURE__ */ new Map()
       };
     }
     if (this.semanticDepGraphUpdater !== null && analysis.baseClass instanceof Reference) {
@@ -7194,14 +7250,6 @@ var ComponentDecoratorHandler = class {
     if (analysis.isPoisoned && !this.usePoisonedData) {
       return {};
     }
-    const data = {
-      declarations: EMPTY_ARRAY2,
-      declarationListEmitMode: 0,
-      deferBlocks: /* @__PURE__ */ new Map(),
-      deferBlockDepsEmitMode: 0,
-      deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
-      deferrableTypes: /* @__PURE__ */ new Map()
-    };
     const scope = this.scopeReader.getScopeForComponent(node);
     if (scope !== null) {
       const isModuleScope = scope.kind === ComponentScopeKind.NgModule;
@@ -7303,7 +7351,9 @@ var ComponentDecoratorHandler = class {
         symbol.usedPipes = Array.from(declarations.values()).filter(isUsedPipe).map(getSemanticReference);
       }
       const eagerDeclarations = Array.from(declarations.values()).filter((decl) => decl.kind === R3TemplateDependencyKind.NgModule || eagerlyUsed.has(decl.ref.node));
-      this.resolveDeferBlocks(node, deferBlocks, declarations, data, analysis, eagerlyUsed, bound);
+      if (this.compilationMode !== CompilationMode.LOCAL) {
+        this.resolveDeferBlocks(node, deferBlocks, declarations, data, analysis, eagerlyUsed, bound);
+      }
       const cyclesFromDirectives = /* @__PURE__ */ new Map();
       const cyclesFromPipes = /* @__PURE__ */ new Map();
       if (!metadata.isStandalone) {
@@ -7328,9 +7378,17 @@ var ComponentDecoratorHandler = class {
           this.maybeRecordSyntheticImport(importedFile, type, context);
         }
         const declarationIsForwardDeclared = eagerDeclarations.some((decl) => isExpressionForwardReference(decl.type, node.name, context));
-        const wrapDirectivesAndPipesInClosure = declarationIsForwardDeclared || standaloneImportMayBeForwardDeclared;
+        if (this.compilationMode !== CompilationMode.LOCAL && (declarationIsForwardDeclared || standaloneImportMayBeForwardDeclared)) {
+          data.declarationListEmitMode = 1;
+        }
         data.declarations = eagerDeclarations;
-        data.declarationListEmitMode = wrapDirectivesAndPipesInClosure ? 1 : 0;
+        if (this.compilationMode === CompilationMode.LOCAL && this.localCompilationExtraImportsTracker !== null) {
+          for (const { type } of eagerDeclarations) {
+            if (type instanceof ExternalExpr6 && type.value.moduleName) {
+              this.localCompilationExtraImportsTracker.addImportForFile(context, type.value.moduleName);
+            }
+          }
+        }
       } else {
         if (this.cycleHandlingStrategy === 0) {
           this.scopeRegistry.setComponentRemoteScope(node, eagerDeclarations.filter(isUsedDirective).map((dir) => dir.ref), eagerDeclarations.filter(isUsedPipe).map((pipe) => pipe.ref));
@@ -7356,29 +7414,31 @@ var ComponentDecoratorHandler = class {
     } else {
       data.deferBlocks = this.locateDeferBlocksWithoutScope(metadata.template);
     }
-    if (analysis.resolvedImports !== null && analysis.rawImports !== null) {
-      const importDiagnostics = validateStandaloneImports(analysis.resolvedImports, analysis.rawImports, this.metaReader, this.scopeReader, false);
-      diagnostics.push(...importDiagnostics);
-    }
-    if (analysis.resolvedDeferredImports !== null && analysis.rawDeferredImports !== null) {
-      const importDiagnostics = validateStandaloneImports(analysis.resolvedDeferredImports, analysis.rawDeferredImports, this.metaReader, this.scopeReader, true);
-      diagnostics.push(...importDiagnostics);
-    }
-    if (analysis.providersRequiringFactory !== null && analysis.meta.providers instanceof WrappedNodeExpr8) {
-      const providerDiagnostics = getProviderDiagnostics(analysis.providersRequiringFactory, analysis.meta.providers.node, this.injectableRegistry);
-      diagnostics.push(...providerDiagnostics);
-    }
-    if (analysis.viewProvidersRequiringFactory !== null && analysis.meta.viewProviders instanceof WrappedNodeExpr8) {
-      const viewProviderDiagnostics = getProviderDiagnostics(analysis.viewProvidersRequiringFactory, analysis.meta.viewProviders.node, this.injectableRegistry);
-      diagnostics.push(...viewProviderDiagnostics);
-    }
-    const directiveDiagnostics = getDirectiveDiagnostics(node, this.injectableRegistry, this.evaluator, this.reflector, this.scopeRegistry, this.strictCtorDeps, "Component");
-    if (directiveDiagnostics !== null) {
-      diagnostics.push(...directiveDiagnostics);
-    }
-    const hostDirectivesDiagnostics = analysis.hostDirectives && analysis.rawHostDirectives ? validateHostDirectives(analysis.rawHostDirectives, analysis.hostDirectives, this.metaReader) : null;
-    if (hostDirectivesDiagnostics !== null) {
-      diagnostics.push(...hostDirectivesDiagnostics);
+    if (this.compilationMode !== CompilationMode.LOCAL) {
+      if (analysis.resolvedImports !== null && analysis.rawImports !== null) {
+        const importDiagnostics = validateStandaloneImports(analysis.resolvedImports, analysis.rawImports, this.metaReader, this.scopeReader, false);
+        diagnostics.push(...importDiagnostics);
+      }
+      if (analysis.resolvedDeferredImports !== null && analysis.rawDeferredImports !== null) {
+        const importDiagnostics = validateStandaloneImports(analysis.resolvedDeferredImports, analysis.rawDeferredImports, this.metaReader, this.scopeReader, true);
+        diagnostics.push(...importDiagnostics);
+      }
+      if (analysis.providersRequiringFactory !== null && analysis.meta.providers instanceof WrappedNodeExpr8) {
+        const providerDiagnostics = getProviderDiagnostics(analysis.providersRequiringFactory, analysis.meta.providers.node, this.injectableRegistry);
+        diagnostics.push(...providerDiagnostics);
+      }
+      if (analysis.viewProvidersRequiringFactory !== null && analysis.meta.viewProviders instanceof WrappedNodeExpr8) {
+        const viewProviderDiagnostics = getProviderDiagnostics(analysis.viewProvidersRequiringFactory, analysis.meta.viewProviders.node, this.injectableRegistry);
+        diagnostics.push(...viewProviderDiagnostics);
+      }
+      const directiveDiagnostics = getDirectiveDiagnostics(node, this.injectableRegistry, this.evaluator, this.reflector, this.scopeRegistry, this.strictCtorDeps, "Component");
+      if (directiveDiagnostics !== null) {
+        diagnostics.push(...directiveDiagnostics);
+      }
+      const hostDirectivesDiagnostics = analysis.hostDirectives && analysis.rawHostDirectives ? validateHostDirectives(analysis.rawHostDirectives, analysis.hostDirectives, this.metaReader) : null;
+      if (hostDirectivesDiagnostics !== null) {
+        diagnostics.push(...hostDirectivesDiagnostics);
+      }
     }
     if (diagnostics.length > 0) {
       return { diagnostics };
@@ -7951,7 +8011,7 @@ var PipeSymbol = class extends SemanticSymbol {
   }
 };
 var PipeDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, injectableRegistry, isCore, perf, includeClassMetadata, compilationMode) {
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, injectableRegistry, isCore, perf, includeClassMetadata, compilationMode, generateExtraImportsInLocalMode) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -7961,6 +8021,7 @@ var PipeDecoratorHandler = class {
     this.perf = perf;
     this.includeClassMetadata = includeClassMetadata;
     this.compilationMode = compilationMode;
+    this.generateExtraImportsInLocalMode = generateExtraImportsInLocalMode;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = "PipeDecoratorHandler";
   }
@@ -8042,9 +8103,6 @@ var PipeDecoratorHandler = class {
     return new PipeSymbol(node, analysis.meta.pipeName);
   }
   register(node, analysis) {
-    if (this.compilationMode === CompilationMode.LOCAL) {
-      return;
-    }
     const ref = new Reference(node);
     this.metaRegistry.registerPipeMetadata({
       kind: MetaKind.Pipe,
@@ -8142,4 +8200,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YTJE66NI.js.map
+//# sourceMappingURL=chunk-IWZ4MO7Q.js.map

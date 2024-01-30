@@ -1598,6 +1598,53 @@ var DeferredSymbolTracker = class {
   }
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/local_compilation_extra_imports_tracker.mjs
+import ts10 from "typescript";
+var LocalCompilationExtraImportsTracker = class {
+  constructor(typeChecker) {
+    this.typeChecker = typeChecker;
+    this.localImportsMap = /* @__PURE__ */ new Map();
+    this.globalImportsSet = /* @__PURE__ */ new Set();
+  }
+  addImportForFile(sf, moduleName) {
+    if (!this.localImportsMap.has(sf.fileName)) {
+      this.localImportsMap.set(sf.fileName, /* @__PURE__ */ new Set());
+    }
+    this.localImportsMap.get(sf.fileName).add(moduleName);
+  }
+  addGlobalImportFromIdentifier(node) {
+    var _a;
+    let identifier = null;
+    if (ts10.isIdentifier(node)) {
+      identifier = node;
+    } else if (ts10.isPropertyAccessExpression(node) && ts10.isIdentifier(node.expression)) {
+      identifier = node.expression;
+    }
+    if (identifier === null) {
+      return;
+    }
+    const sym = this.typeChecker.getSymbolAtLocation(identifier);
+    if (!((_a = sym == null ? void 0 : sym.declarations) == null ? void 0 : _a.length)) {
+      return;
+    }
+    const importClause = sym.declarations[0];
+    const decl = getContainingImportDeclaration(importClause);
+    if (decl !== null) {
+      this.globalImportsSet.add(removeQuotations(decl.moduleSpecifier.getText()));
+    }
+  }
+  getImportsForFile(sf) {
+    var _a;
+    return [
+      ...this.globalImportsSet,
+      ...(_a = this.localImportsMap.get(sf.fileName)) != null ? _a : []
+    ];
+  }
+};
+function removeQuotations(s) {
+  return s.substring(1, s.length - 1).trim();
+}
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/resolver.mjs
 var ModuleResolver = class {
   constructor(program, compilerOptions, host, moduleResolutionCache) {
@@ -1616,9 +1663,9 @@ var ModuleResolver = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/import_manager.mjs
-import ts10 from "typescript";
+import ts11 from "typescript";
 var ImportManager = class {
-  constructor(rewriter = new NoopImportRewriter(), prefix = "i", factory = ts10.factory) {
+  constructor(rewriter = new NoopImportRewriter(), prefix = "i", factory = ts11.factory) {
     this.rewriter = rewriter;
     this.prefix = prefix;
     this.factory = factory;
@@ -1626,7 +1673,7 @@ var ImportManager = class {
     this.nextIndex = 0;
   }
   generateNamespaceImport(moduleName) {
-    if (!this.specifierToIdentifier.has(moduleName)) {
+    if (!this.specifierToIdentifier.has(moduleName) || this.specifierToIdentifier.get(moduleName) === null) {
       this.specifierToIdentifier.set(moduleName, this.factory.createIdentifier(`${this.prefix}${this.nextIndex++}`));
     }
     return this.specifierToIdentifier.get(moduleName);
@@ -1638,6 +1685,11 @@ var ImportManager = class {
     }
     const moduleImport = this.generateNamespaceImport(moduleName);
     return { moduleImport, symbol };
+  }
+  generateSideEffectImport(moduleName) {
+    if (!this.specifierToIdentifier.has(moduleName)) {
+      this.specifierToIdentifier.set(moduleName, null);
+    }
   }
   getAllImports(contextPath) {
     const imports = [];
@@ -1905,7 +1957,7 @@ function createRange(span) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/type_emitter.mjs
-import ts11 from "typescript";
+import ts12 from "typescript";
 var INELIGIBLE = {};
 function canEmitType(type, canEmit) {
   return canEmitTypeWorker(type);
@@ -1913,13 +1965,13 @@ function canEmitType(type, canEmit) {
     return visitNode(type2) !== INELIGIBLE;
   }
   function visitNode(node) {
-    if (ts11.isImportTypeNode(node)) {
+    if (ts12.isImportTypeNode(node)) {
       return INELIGIBLE;
     }
-    if (ts11.isTypeReferenceNode(node) && !canEmitTypeReference(node)) {
+    if (ts12.isTypeReferenceNode(node) && !canEmitTypeReference(node)) {
       return INELIGIBLE;
     } else {
-      return ts11.forEachChild(node, visitNode);
+      return ts12.forEachChild(node, visitNode);
     }
   }
   function canEmitTypeReference(type2) {
@@ -1936,35 +1988,35 @@ var TypeEmitter = class {
   emitType(type) {
     const typeReferenceTransformer = (context) => {
       const visitNode = (node) => {
-        if (ts11.isImportTypeNode(node)) {
+        if (ts12.isImportTypeNode(node)) {
           throw new Error("Unable to emit import type");
         }
-        if (ts11.isTypeReferenceNode(node)) {
+        if (ts12.isTypeReferenceNode(node)) {
           return this.emitTypeReference(node);
-        } else if (ts11.isLiteralExpression(node)) {
+        } else if (ts12.isLiteralExpression(node)) {
           let clone;
-          if (ts11.isStringLiteral(node)) {
-            clone = ts11.factory.createStringLiteral(node.text);
-          } else if (ts11.isNumericLiteral(node)) {
-            clone = ts11.factory.createNumericLiteral(node.text);
-          } else if (ts11.isBigIntLiteral(node)) {
-            clone = ts11.factory.createBigIntLiteral(node.text);
-          } else if (ts11.isNoSubstitutionTemplateLiteral(node)) {
-            clone = ts11.factory.createNoSubstitutionTemplateLiteral(node.text, node.rawText);
-          } else if (ts11.isRegularExpressionLiteral(node)) {
-            clone = ts11.factory.createRegularExpressionLiteral(node.text);
+          if (ts12.isStringLiteral(node)) {
+            clone = ts12.factory.createStringLiteral(node.text);
+          } else if (ts12.isNumericLiteral(node)) {
+            clone = ts12.factory.createNumericLiteral(node.text);
+          } else if (ts12.isBigIntLiteral(node)) {
+            clone = ts12.factory.createBigIntLiteral(node.text);
+          } else if (ts12.isNoSubstitutionTemplateLiteral(node)) {
+            clone = ts12.factory.createNoSubstitutionTemplateLiteral(node.text, node.rawText);
+          } else if (ts12.isRegularExpressionLiteral(node)) {
+            clone = ts12.factory.createRegularExpressionLiteral(node.text);
           } else {
-            throw new Error(`Unsupported literal kind ${ts11.SyntaxKind[node.kind]}`);
+            throw new Error(`Unsupported literal kind ${ts12.SyntaxKind[node.kind]}`);
           }
-          ts11.setTextRange(clone, { pos: -1, end: -1 });
+          ts12.setTextRange(clone, { pos: -1, end: -1 });
           return clone;
         } else {
-          return ts11.visitEachChild(node, visitNode, context);
+          return ts12.visitEachChild(node, visitNode, context);
         }
       };
-      return (node) => ts11.visitNode(node, visitNode, ts11.isTypeNode);
+      return (node) => ts12.visitNode(node, visitNode, ts12.isTypeNode);
     };
-    return ts11.transform(type, [typeReferenceTransformer]).transformed[0];
+    return ts12.transform(type, [typeReferenceTransformer]).transformed[0];
   }
   emitTypeReference(type) {
     const translatedType = this.translator(type);
@@ -1973,24 +2025,24 @@ var TypeEmitter = class {
     }
     let typeArguments = void 0;
     if (type.typeArguments !== void 0) {
-      typeArguments = ts11.factory.createNodeArray(type.typeArguments.map((typeArg) => this.emitType(typeArg)));
+      typeArguments = ts12.factory.createNodeArray(type.typeArguments.map((typeArg) => this.emitType(typeArg)));
     }
-    return ts11.factory.updateTypeReferenceNode(type, translatedType.typeName, typeArguments);
+    return ts12.factory.updateTypeReferenceNode(type, translatedType.typeName, typeArguments);
   }
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/type_translator.mjs
 import * as o2 from "@angular/compiler";
-import ts13 from "typescript";
+import ts14 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/ts_util.mjs
-import ts12 from "typescript";
+import ts13 from "typescript";
 function tsNumericExpression(value) {
   if (value < 0) {
-    const operand = ts12.factory.createNumericLiteral(Math.abs(value));
-    return ts12.factory.createPrefixUnaryExpression(ts12.SyntaxKind.MinusToken, operand);
+    const operand = ts13.factory.createNumericLiteral(Math.abs(value));
+    return ts13.factory.createPrefixUnaryExpression(ts13.SyntaxKind.MinusToken, operand);
   }
-  return ts12.factory.createNumericLiteral(value);
+  return ts13.factory.createNumericLiteral(value);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/type_translator.mjs
@@ -2007,16 +2059,16 @@ var TypeTranslatorVisitor = class {
   visitBuiltinType(type, context) {
     switch (type.name) {
       case o2.BuiltinTypeName.Bool:
-        return ts13.factory.createKeywordTypeNode(ts13.SyntaxKind.BooleanKeyword);
+        return ts14.factory.createKeywordTypeNode(ts14.SyntaxKind.BooleanKeyword);
       case o2.BuiltinTypeName.Dynamic:
-        return ts13.factory.createKeywordTypeNode(ts13.SyntaxKind.AnyKeyword);
+        return ts14.factory.createKeywordTypeNode(ts14.SyntaxKind.AnyKeyword);
       case o2.BuiltinTypeName.Int:
       case o2.BuiltinTypeName.Number:
-        return ts13.factory.createKeywordTypeNode(ts13.SyntaxKind.NumberKeyword);
+        return ts14.factory.createKeywordTypeNode(ts14.SyntaxKind.NumberKeyword);
       case o2.BuiltinTypeName.String:
-        return ts13.factory.createKeywordTypeNode(ts13.SyntaxKind.StringKeyword);
+        return ts14.factory.createKeywordTypeNode(ts14.SyntaxKind.StringKeyword);
       case o2.BuiltinTypeName.None:
-        return ts13.factory.createKeywordTypeNode(ts13.SyntaxKind.NeverKeyword);
+        return ts14.factory.createKeywordTypeNode(ts14.SyntaxKind.NeverKeyword);
       default:
         throw new Error(`Unsupported builtin type: ${o2.BuiltinTypeName[type.name]}`);
     }
@@ -2026,26 +2078,26 @@ var TypeTranslatorVisitor = class {
     if (type.typeParams === null) {
       return typeNode;
     }
-    if (!ts13.isTypeReferenceNode(typeNode)) {
+    if (!ts14.isTypeReferenceNode(typeNode)) {
       throw new Error("An ExpressionType with type arguments must translate into a TypeReferenceNode");
     } else if (typeNode.typeArguments !== void 0) {
       throw new Error(`An ExpressionType with type arguments cannot have multiple levels of type arguments`);
     }
     const typeArgs = type.typeParams.map((param) => this.translateType(param, context));
-    return ts13.factory.createTypeReferenceNode(typeNode.typeName, typeArgs);
+    return ts14.factory.createTypeReferenceNode(typeNode.typeName, typeArgs);
   }
   visitArrayType(type, context) {
-    return ts13.factory.createArrayTypeNode(this.translateType(type.of, context));
+    return ts14.factory.createArrayTypeNode(this.translateType(type.of, context));
   }
   visitMapType(type, context) {
-    const parameter = ts13.factory.createParameterDeclaration(void 0, void 0, "key", void 0, ts13.factory.createKeywordTypeNode(ts13.SyntaxKind.StringKeyword));
-    const typeArgs = type.valueType !== null ? this.translateType(type.valueType, context) : ts13.factory.createKeywordTypeNode(ts13.SyntaxKind.UnknownKeyword);
-    const indexSignature = ts13.factory.createIndexSignature(void 0, [parameter], typeArgs);
-    return ts13.factory.createTypeLiteralNode([indexSignature]);
+    const parameter = ts14.factory.createParameterDeclaration(void 0, void 0, "key", void 0, ts14.factory.createKeywordTypeNode(ts14.SyntaxKind.StringKeyword));
+    const typeArgs = type.valueType !== null ? this.translateType(type.valueType, context) : ts14.factory.createKeywordTypeNode(ts14.SyntaxKind.UnknownKeyword);
+    const indexSignature = ts14.factory.createIndexSignature(void 0, [parameter], typeArgs);
+    return ts14.factory.createTypeLiteralNode([indexSignature]);
   }
   visitTransplantedType(ast, context) {
     const node = ast.type instanceof Reference ? ast.type.node : ast.type;
-    if (!ts13.isTypeNode(node)) {
+    if (!ts14.isTypeNode(node)) {
       throw new Error(`A TransplantedType must wrap a TypeNode`);
     }
     const viaModule = ast.type instanceof Reference ? ast.type.bestGuessOwningModule : null;
@@ -2056,7 +2108,7 @@ var TypeTranslatorVisitor = class {
     if (ast.name === null) {
       throw new Error(`ReadVarExpr with no variable name in type`);
     }
-    return ts13.factory.createTypeQueryNode(ts13.factory.createIdentifier(ast.name));
+    return ts14.factory.createTypeQueryNode(ts14.factory.createIdentifier(ast.name));
   }
   visitWriteVarExpr(expr, context) {
     throw new Error("Method not implemented.");
@@ -2078,15 +2130,15 @@ var TypeTranslatorVisitor = class {
   }
   visitLiteralExpr(ast, context) {
     if (ast.value === null) {
-      return ts13.factory.createLiteralTypeNode(ts13.factory.createNull());
+      return ts14.factory.createLiteralTypeNode(ts14.factory.createNull());
     } else if (ast.value === void 0) {
-      return ts13.factory.createKeywordTypeNode(ts13.SyntaxKind.UndefinedKeyword);
+      return ts14.factory.createKeywordTypeNode(ts14.SyntaxKind.UndefinedKeyword);
     } else if (typeof ast.value === "boolean") {
-      return ts13.factory.createLiteralTypeNode(ast.value ? ts13.factory.createTrue() : ts13.factory.createFalse());
+      return ts14.factory.createLiteralTypeNode(ast.value ? ts14.factory.createTrue() : ts14.factory.createFalse());
     } else if (typeof ast.value === "number") {
-      return ts13.factory.createLiteralTypeNode(tsNumericExpression(ast.value));
+      return ts14.factory.createLiteralTypeNode(tsNumericExpression(ast.value));
     } else {
-      return ts13.factory.createLiteralTypeNode(ts13.factory.createStringLiteral(ast.value));
+      return ts14.factory.createLiteralTypeNode(ts14.factory.createStringLiteral(ast.value));
     }
   }
   visitLocalizedString(ast, context) {
@@ -2097,10 +2149,10 @@ var TypeTranslatorVisitor = class {
       throw new Error(`Import unknown module or symbol`);
     }
     const { moduleImport, symbol } = this.imports.generateNamedImport(ast.value.moduleName, ast.value.name);
-    const symbolIdentifier = ts13.factory.createIdentifier(symbol);
-    const typeName = moduleImport ? ts13.factory.createQualifiedName(moduleImport, symbolIdentifier) : symbolIdentifier;
+    const symbolIdentifier = ts14.factory.createIdentifier(symbol);
+    const typeName = moduleImport ? ts14.factory.createQualifiedName(moduleImport, symbolIdentifier) : symbolIdentifier;
     const typeArguments = ast.typeParams !== null ? ast.typeParams.map((type) => this.translateType(type, context)) : void 0;
-    return ts13.factory.createTypeReferenceNode(typeName, typeArguments);
+    return ts14.factory.createTypeReferenceNode(typeName, typeArguments);
   }
   visitConditionalExpr(ast, context) {
     throw new Error("Method not implemented.");
@@ -2131,60 +2183,60 @@ var TypeTranslatorVisitor = class {
   }
   visitLiteralArrayExpr(ast, context) {
     const values = ast.entries.map((expr) => this.translateExpression(expr, context));
-    return ts13.factory.createTupleTypeNode(values);
+    return ts14.factory.createTupleTypeNode(values);
   }
   visitLiteralMapExpr(ast, context) {
     const entries = ast.entries.map((entry) => {
       const { key, quoted } = entry;
       const type = this.translateExpression(entry.value, context);
-      return ts13.factory.createPropertySignature(
+      return ts14.factory.createPropertySignature(
         void 0,
-        quoted ? ts13.factory.createStringLiteral(key) : key,
+        quoted ? ts14.factory.createStringLiteral(key) : key,
         void 0,
         type
       );
     });
-    return ts13.factory.createTypeLiteralNode(entries);
+    return ts14.factory.createTypeLiteralNode(entries);
   }
   visitCommaExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
   visitWrappedNodeExpr(ast, context) {
     const node = ast.node;
-    if (ts13.isEntityName(node)) {
-      return ts13.factory.createTypeReferenceNode(node, void 0);
-    } else if (ts13.isTypeNode(node)) {
+    if (ts14.isEntityName(node)) {
+      return ts14.factory.createTypeReferenceNode(node, void 0);
+    } else if (ts14.isTypeNode(node)) {
       return node;
-    } else if (ts13.isLiteralExpression(node)) {
-      return ts13.factory.createLiteralTypeNode(node);
+    } else if (ts14.isLiteralExpression(node)) {
+      return ts14.factory.createLiteralTypeNode(node);
     } else {
-      throw new Error(`Unsupported WrappedNodeExpr in TypeTranslatorVisitor: ${ts13.SyntaxKind[node.kind]}`);
+      throw new Error(`Unsupported WrappedNodeExpr in TypeTranslatorVisitor: ${ts14.SyntaxKind[node.kind]}`);
     }
   }
   visitTypeofExpr(ast, context) {
     const typeNode = this.translateExpression(ast.expr, context);
-    if (!ts13.isTypeReferenceNode(typeNode)) {
+    if (!ts14.isTypeReferenceNode(typeNode)) {
       throw new Error(`The target of a typeof expression must be a type reference, but it was
-          ${ts13.SyntaxKind[typeNode.kind]}`);
+          ${ts14.SyntaxKind[typeNode.kind]}`);
     }
-    return ts13.factory.createTypeQueryNode(typeNode.typeName);
+    return ts14.factory.createTypeQueryNode(typeNode.typeName);
   }
   translateType(type, context) {
     const typeNode = type.visitType(this, context);
-    if (!ts13.isTypeNode(typeNode)) {
-      throw new Error(`A Type must translate to a TypeNode, but was ${ts13.SyntaxKind[typeNode.kind]}`);
+    if (!ts14.isTypeNode(typeNode)) {
+      throw new Error(`A Type must translate to a TypeNode, but was ${ts14.SyntaxKind[typeNode.kind]}`);
     }
     return typeNode;
   }
   translateExpression(expr, context) {
     const typeNode = expr.visitExpression(this, context);
-    if (!ts13.isTypeNode(typeNode)) {
-      throw new Error(`An Expression must translate to a TypeNode, but was ${ts13.SyntaxKind[typeNode.kind]}`);
+    if (!ts14.isTypeNode(typeNode)) {
+      throw new Error(`An Expression must translate to a TypeNode, but was ${ts14.SyntaxKind[typeNode.kind]}`);
     }
     return typeNode;
   }
   translateTypeReference(type, context, viaModule) {
-    const target = ts13.isIdentifier(type.typeName) ? type.typeName : type.typeName.right;
+    const target = ts14.isIdentifier(type.typeName) ? type.typeName : type.typeName.right;
     const declaration = this.reflector.getDeclarationOfIdentifier(target);
     if (declaration === null) {
       throw new Error(`Unable to statically determine the declaration file of type node ${target.text}`);
@@ -2200,79 +2252,79 @@ var TypeTranslatorVisitor = class {
     const emittedType = this.refEmitter.emit(reference, this.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowAmbientReferences);
     assertSuccessfulReferenceEmit(emittedType, target, "type");
     const typeNode = this.translateExpression(emittedType.expression, context);
-    if (!ts13.isTypeReferenceNode(typeNode)) {
-      throw new Error(`Expected TypeReferenceNode for emitted reference, got ${ts13.SyntaxKind[typeNode.kind]}.`);
+    if (!ts14.isTypeReferenceNode(typeNode)) {
+      throw new Error(`Expected TypeReferenceNode for emitted reference, got ${ts14.SyntaxKind[typeNode.kind]}.`);
     }
     return typeNode;
   }
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/typescript_ast_factory.mjs
-import ts14 from "typescript";
+import ts15 from "typescript";
 var PureAnnotation;
 (function(PureAnnotation2) {
   PureAnnotation2["CLOSURE"] = "* @pureOrBreakMyCode ";
   PureAnnotation2["TERSER"] = "@__PURE__";
 })(PureAnnotation || (PureAnnotation = {}));
 var UNARY_OPERATORS2 = {
-  "+": ts14.SyntaxKind.PlusToken,
-  "-": ts14.SyntaxKind.MinusToken,
-  "!": ts14.SyntaxKind.ExclamationToken
+  "+": ts15.SyntaxKind.PlusToken,
+  "-": ts15.SyntaxKind.MinusToken,
+  "!": ts15.SyntaxKind.ExclamationToken
 };
 var BINARY_OPERATORS2 = {
-  "&&": ts14.SyntaxKind.AmpersandAmpersandToken,
-  ">": ts14.SyntaxKind.GreaterThanToken,
-  ">=": ts14.SyntaxKind.GreaterThanEqualsToken,
-  "&": ts14.SyntaxKind.AmpersandToken,
-  "|": ts14.SyntaxKind.BarToken,
-  "/": ts14.SyntaxKind.SlashToken,
-  "==": ts14.SyntaxKind.EqualsEqualsToken,
-  "===": ts14.SyntaxKind.EqualsEqualsEqualsToken,
-  "<": ts14.SyntaxKind.LessThanToken,
-  "<=": ts14.SyntaxKind.LessThanEqualsToken,
-  "-": ts14.SyntaxKind.MinusToken,
-  "%": ts14.SyntaxKind.PercentToken,
-  "*": ts14.SyntaxKind.AsteriskToken,
-  "!=": ts14.SyntaxKind.ExclamationEqualsToken,
-  "!==": ts14.SyntaxKind.ExclamationEqualsEqualsToken,
-  "||": ts14.SyntaxKind.BarBarToken,
-  "+": ts14.SyntaxKind.PlusToken,
-  "??": ts14.SyntaxKind.QuestionQuestionToken
+  "&&": ts15.SyntaxKind.AmpersandAmpersandToken,
+  ">": ts15.SyntaxKind.GreaterThanToken,
+  ">=": ts15.SyntaxKind.GreaterThanEqualsToken,
+  "&": ts15.SyntaxKind.AmpersandToken,
+  "|": ts15.SyntaxKind.BarToken,
+  "/": ts15.SyntaxKind.SlashToken,
+  "==": ts15.SyntaxKind.EqualsEqualsToken,
+  "===": ts15.SyntaxKind.EqualsEqualsEqualsToken,
+  "<": ts15.SyntaxKind.LessThanToken,
+  "<=": ts15.SyntaxKind.LessThanEqualsToken,
+  "-": ts15.SyntaxKind.MinusToken,
+  "%": ts15.SyntaxKind.PercentToken,
+  "*": ts15.SyntaxKind.AsteriskToken,
+  "!=": ts15.SyntaxKind.ExclamationEqualsToken,
+  "!==": ts15.SyntaxKind.ExclamationEqualsEqualsToken,
+  "||": ts15.SyntaxKind.BarBarToken,
+  "+": ts15.SyntaxKind.PlusToken,
+  "??": ts15.SyntaxKind.QuestionQuestionToken
 };
 var VAR_TYPES = {
-  "const": ts14.NodeFlags.Const,
-  "let": ts14.NodeFlags.Let,
-  "var": ts14.NodeFlags.None
+  "const": ts15.NodeFlags.Const,
+  "let": ts15.NodeFlags.Let,
+  "var": ts15.NodeFlags.None
 };
 var TypeScriptAstFactory = class {
   constructor(annotateForClosureCompiler) {
     this.annotateForClosureCompiler = annotateForClosureCompiler;
     this.externalSourceFiles = /* @__PURE__ */ new Map();
     this.attachComments = attachComments;
-    this.createArrayLiteral = ts14.factory.createArrayLiteralExpression;
-    this.createElementAccess = ts14.factory.createElementAccessExpression;
-    this.createExpressionStatement = ts14.factory.createExpressionStatement;
-    this.createIdentifier = ts14.factory.createIdentifier;
-    this.createParenthesizedExpression = ts14.factory.createParenthesizedExpression;
-    this.createPropertyAccess = ts14.factory.createPropertyAccessExpression;
-    this.createThrowStatement = ts14.factory.createThrowStatement;
-    this.createTypeOfExpression = ts14.factory.createTypeOfExpression;
+    this.createArrayLiteral = ts15.factory.createArrayLiteralExpression;
+    this.createElementAccess = ts15.factory.createElementAccessExpression;
+    this.createExpressionStatement = ts15.factory.createExpressionStatement;
+    this.createIdentifier = ts15.factory.createIdentifier;
+    this.createParenthesizedExpression = ts15.factory.createParenthesizedExpression;
+    this.createPropertyAccess = ts15.factory.createPropertyAccessExpression;
+    this.createThrowStatement = ts15.factory.createThrowStatement;
+    this.createTypeOfExpression = ts15.factory.createTypeOfExpression;
   }
   createAssignment(target, value) {
-    return ts14.factory.createBinaryExpression(target, ts14.SyntaxKind.EqualsToken, value);
+    return ts15.factory.createBinaryExpression(target, ts15.SyntaxKind.EqualsToken, value);
   }
   createBinaryExpression(leftOperand, operator, rightOperand) {
-    return ts14.factory.createBinaryExpression(leftOperand, BINARY_OPERATORS2[operator], rightOperand);
+    return ts15.factory.createBinaryExpression(leftOperand, BINARY_OPERATORS2[operator], rightOperand);
   }
   createBlock(body) {
-    return ts14.factory.createBlock(body);
+    return ts15.factory.createBlock(body);
   }
   createCallExpression(callee, args, pure) {
-    const call = ts14.factory.createCallExpression(callee, void 0, args);
+    const call = ts15.factory.createCallExpression(callee, void 0, args);
     if (pure) {
-      ts14.addSyntheticLeadingComment(
+      ts15.addSyntheticLeadingComment(
         call,
-        ts14.SyntaxKind.MultiLineCommentTrivia,
+        ts15.SyntaxKind.MultiLineCommentTrivia,
         this.annotateForClosureCompiler ? PureAnnotation.CLOSURE : PureAnnotation.TERSER,
         false
       );
@@ -2280,64 +2332,64 @@ var TypeScriptAstFactory = class {
     return call;
   }
   createConditional(condition, whenTrue, whenFalse) {
-    return ts14.factory.createConditionalExpression(condition, void 0, whenTrue, void 0, whenFalse);
+    return ts15.factory.createConditionalExpression(condition, void 0, whenTrue, void 0, whenFalse);
   }
   createDynamicImport(url) {
-    return ts14.factory.createCallExpression(
-      ts14.factory.createToken(ts14.SyntaxKind.ImportKeyword),
+    return ts15.factory.createCallExpression(
+      ts15.factory.createToken(ts15.SyntaxKind.ImportKeyword),
       void 0,
-      [ts14.factory.createStringLiteral(url)]
+      [ts15.factory.createStringLiteral(url)]
     );
   }
   createFunctionDeclaration(functionName, parameters, body) {
-    if (!ts14.isBlock(body)) {
-      throw new Error(`Invalid syntax, expected a block, but got ${ts14.SyntaxKind[body.kind]}.`);
+    if (!ts15.isBlock(body)) {
+      throw new Error(`Invalid syntax, expected a block, but got ${ts15.SyntaxKind[body.kind]}.`);
     }
-    return ts14.factory.createFunctionDeclaration(void 0, void 0, functionName, void 0, parameters.map((param) => ts14.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
+    return ts15.factory.createFunctionDeclaration(void 0, void 0, functionName, void 0, parameters.map((param) => ts15.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
   }
   createFunctionExpression(functionName, parameters, body) {
-    if (!ts14.isBlock(body)) {
-      throw new Error(`Invalid syntax, expected a block, but got ${ts14.SyntaxKind[body.kind]}.`);
+    if (!ts15.isBlock(body)) {
+      throw new Error(`Invalid syntax, expected a block, but got ${ts15.SyntaxKind[body.kind]}.`);
     }
-    return ts14.factory.createFunctionExpression(void 0, void 0, functionName != null ? functionName : void 0, void 0, parameters.map((param) => ts14.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
+    return ts15.factory.createFunctionExpression(void 0, void 0, functionName != null ? functionName : void 0, void 0, parameters.map((param) => ts15.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
   }
   createArrowFunctionExpression(parameters, body) {
-    if (ts14.isStatement(body) && !ts14.isBlock(body)) {
-      throw new Error(`Invalid syntax, expected a block, but got ${ts14.SyntaxKind[body.kind]}.`);
+    if (ts15.isStatement(body) && !ts15.isBlock(body)) {
+      throw new Error(`Invalid syntax, expected a block, but got ${ts15.SyntaxKind[body.kind]}.`);
     }
-    return ts14.factory.createArrowFunction(void 0, void 0, parameters.map((param) => ts14.factory.createParameterDeclaration(void 0, void 0, param)), void 0, void 0, body);
+    return ts15.factory.createArrowFunction(void 0, void 0, parameters.map((param) => ts15.factory.createParameterDeclaration(void 0, void 0, param)), void 0, void 0, body);
   }
   createIfStatement(condition, thenStatement, elseStatement) {
-    return ts14.factory.createIfStatement(condition, thenStatement, elseStatement != null ? elseStatement : void 0);
+    return ts15.factory.createIfStatement(condition, thenStatement, elseStatement != null ? elseStatement : void 0);
   }
   createLiteral(value) {
     if (value === void 0) {
-      return ts14.factory.createIdentifier("undefined");
+      return ts15.factory.createIdentifier("undefined");
     } else if (value === null) {
-      return ts14.factory.createNull();
+      return ts15.factory.createNull();
     } else if (typeof value === "boolean") {
-      return value ? ts14.factory.createTrue() : ts14.factory.createFalse();
+      return value ? ts15.factory.createTrue() : ts15.factory.createFalse();
     } else if (typeof value === "number") {
       return tsNumericExpression(value);
     } else {
-      return ts14.factory.createStringLiteral(value);
+      return ts15.factory.createStringLiteral(value);
     }
   }
   createNewExpression(expression, args) {
-    return ts14.factory.createNewExpression(expression, void 0, args);
+    return ts15.factory.createNewExpression(expression, void 0, args);
   }
   createObjectLiteral(properties) {
-    return ts14.factory.createObjectLiteralExpression(properties.map((prop) => ts14.factory.createPropertyAssignment(prop.quoted ? ts14.factory.createStringLiteral(prop.propertyName) : ts14.factory.createIdentifier(prop.propertyName), prop.value)));
+    return ts15.factory.createObjectLiteralExpression(properties.map((prop) => ts15.factory.createPropertyAssignment(prop.quoted ? ts15.factory.createStringLiteral(prop.propertyName) : ts15.factory.createIdentifier(prop.propertyName), prop.value)));
   }
   createReturnStatement(expression) {
-    return ts14.factory.createReturnStatement(expression != null ? expression : void 0);
+    return ts15.factory.createReturnStatement(expression != null ? expression : void 0);
   }
   createTaggedTemplate(tag, template) {
     let templateLiteral;
     const length = template.elements.length;
     const head = template.elements[0];
     if (length === 1) {
-      templateLiteral = ts14.factory.createNoSubstitutionTemplateLiteral(head.cooked, head.raw);
+      templateLiteral = ts15.factory.createNoSubstitutionTemplateLiteral(head.cooked, head.raw);
     } else {
       const spans = [];
       for (let i = 1; i < length - 1; i++) {
@@ -2346,7 +2398,7 @@ var TypeScriptAstFactory = class {
         if (range !== null) {
           this.setSourceMapRange(middle, range);
         }
-        spans.push(ts14.factory.createTemplateSpan(template.expressions[i - 1], middle));
+        spans.push(ts15.factory.createTemplateSpan(template.expressions[i - 1], middle));
       }
       const resolvedExpression = template.expressions[length - 2];
       const templatePart = template.elements[length - 1];
@@ -2354,19 +2406,19 @@ var TypeScriptAstFactory = class {
       if (templatePart.range !== null) {
         this.setSourceMapRange(templateTail, templatePart.range);
       }
-      spans.push(ts14.factory.createTemplateSpan(resolvedExpression, templateTail));
-      templateLiteral = ts14.factory.createTemplateExpression(ts14.factory.createTemplateHead(head.cooked, head.raw), spans);
+      spans.push(ts15.factory.createTemplateSpan(resolvedExpression, templateTail));
+      templateLiteral = ts15.factory.createTemplateExpression(ts15.factory.createTemplateHead(head.cooked, head.raw), spans);
     }
     if (head.range !== null) {
       this.setSourceMapRange(templateLiteral, head.range);
     }
-    return ts14.factory.createTaggedTemplateExpression(tag, void 0, templateLiteral);
+    return ts15.factory.createTaggedTemplateExpression(tag, void 0, templateLiteral);
   }
   createUnaryExpression(operator, operand) {
-    return ts14.factory.createPrefixUnaryExpression(UNARY_OPERATORS2[operator], operand);
+    return ts15.factory.createPrefixUnaryExpression(UNARY_OPERATORS2[operator], operand);
   }
   createVariableDeclaration(variableName, initializer, type) {
-    return ts14.factory.createVariableStatement(void 0, ts14.factory.createVariableDeclarationList([ts14.factory.createVariableDeclaration(variableName, void 0, void 0, initializer != null ? initializer : void 0)], VAR_TYPES[type]));
+    return ts15.factory.createVariableStatement(void 0, ts15.factory.createVariableDeclarationList([ts15.factory.createVariableDeclaration(variableName, void 0, void 0, initializer != null ? initializer : void 0)], VAR_TYPES[type]));
   }
   setSourceMapRange(node, sourceMapRange) {
     if (sourceMapRange === null) {
@@ -2374,31 +2426,31 @@ var TypeScriptAstFactory = class {
     }
     const url = sourceMapRange.url;
     if (!this.externalSourceFiles.has(url)) {
-      this.externalSourceFiles.set(url, ts14.createSourceMapSource(url, sourceMapRange.content, (pos) => pos));
+      this.externalSourceFiles.set(url, ts15.createSourceMapSource(url, sourceMapRange.content, (pos) => pos));
     }
     const source = this.externalSourceFiles.get(url);
-    ts14.setSourceMapRange(node, { pos: sourceMapRange.start.offset, end: sourceMapRange.end.offset, source });
+    ts15.setSourceMapRange(node, { pos: sourceMapRange.start.offset, end: sourceMapRange.end.offset, source });
     return node;
   }
 };
 function createTemplateMiddle(cooked, raw) {
-  const node = ts14.factory.createTemplateHead(cooked, raw);
-  node.kind = ts14.SyntaxKind.TemplateMiddle;
+  const node = ts15.factory.createTemplateHead(cooked, raw);
+  node.kind = ts15.SyntaxKind.TemplateMiddle;
   return node;
 }
 function createTemplateTail(cooked, raw) {
-  const node = ts14.factory.createTemplateHead(cooked, raw);
-  node.kind = ts14.SyntaxKind.TemplateTail;
+  const node = ts15.factory.createTemplateHead(cooked, raw);
+  node.kind = ts15.SyntaxKind.TemplateTail;
   return node;
 }
 function attachComments(statement, leadingComments) {
   for (const comment of leadingComments) {
-    const commentKind = comment.multiline ? ts14.SyntaxKind.MultiLineCommentTrivia : ts14.SyntaxKind.SingleLineCommentTrivia;
+    const commentKind = comment.multiline ? ts15.SyntaxKind.MultiLineCommentTrivia : ts15.SyntaxKind.SingleLineCommentTrivia;
     if (comment.multiline) {
-      ts14.addSyntheticLeadingComment(statement, commentKind, comment.toString(), comment.trailingNewline);
+      ts15.addSyntheticLeadingComment(statement, commentKind, comment.toString(), comment.trailingNewline);
     } else {
       for (const line of comment.toString().split("\n")) {
-        ts14.addSyntheticLeadingComment(statement, commentKind, line, comment.trailingNewline);
+        ts15.addSyntheticLeadingComment(statement, commentKind, line, comment.trailingNewline);
       }
     }
   }
@@ -2467,6 +2519,7 @@ export {
   filterToMembersWithDecorator,
   reflectObjectLiteral,
   DeferredSymbolTracker,
+  LocalCompilationExtraImportsTracker,
   Reference,
   ModuleResolver,
   Context,
@@ -2492,4 +2545,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZO5DVEPZ.js.map
+//# sourceMappingURL=chunk-7HZQIUTO.js.map
