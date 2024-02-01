@@ -72,7 +72,6 @@ export declare function filterToMembersWithDecorator(members: ClassMember[], nam
 export declare function findMember(members: ClassMember[], name: string, isStatic?: boolean): ClassMember | null;
 export declare function reflectObjectLiteral(node: ts.ObjectLiteralExpression): Map<string, ts.Expression>;
 /**
- * Return the ImportDeclaration for the given `node` if it is either an `ImportSpecifier` or a
- * `NamespaceImport`. If not return `null`.
+ * Gets the closest ancestor `ImportDeclaration` to a node.
  */
 export declare function getContainingImportDeclaration(node: ts.Node): ts.ImportDeclaration | null;

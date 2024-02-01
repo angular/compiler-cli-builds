@@ -647,7 +647,14 @@ function getFarLeftIdentifier(propertyAccess) {
   return ts4.isIdentifier(propertyAccess.expression) ? propertyAccess.expression : null;
 }
 function getContainingImportDeclaration(node) {
-  return ts4.isImportSpecifier(node) ? node.parent.parent.parent : ts4.isNamespaceImport(node) ? node.parent.parent : null;
+  let parent = node.parent;
+  while (parent && !ts4.isSourceFile(parent)) {
+    if (ts4.isImportDeclaration(parent)) {
+      return parent;
+    }
+    parent = parent.parent;
+  }
+  return null;
 }
 function getExportedName(decl, originalId) {
   return ts4.isImportSpecifier(decl) ? (decl.propertyName !== void 0 ? decl.propertyName : decl.name).text : originalId.text;
@@ -2491,4 +2498,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TFBB265K.js.map
+//# sourceMappingURL=chunk-T5BKID5K.js.map

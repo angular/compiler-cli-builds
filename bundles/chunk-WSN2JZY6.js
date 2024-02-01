@@ -29,7 +29,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-TFBB265K.js";
+} from "./chunk-T5BKID5K.js";
 import {
   PerfEvent,
   PerfPhase
@@ -6806,7 +6806,10 @@ var ComponentDecoratorHandler = class {
       const deferredTypes = this.collectExplicitlyDeferredSymbols(rawDeferredImports);
       for (const [deferredType, importDetails] of deferredTypes) {
         explicitlyDeferredTypes != null ? explicitlyDeferredTypes : explicitlyDeferredTypes = /* @__PURE__ */ new Map();
-        explicitlyDeferredTypes.set(importDetails.name, importDetails.from);
+        explicitlyDeferredTypes.set(importDetails.name, {
+          importPath: importDetails.from,
+          isDefaultImport: isDefaultImport(importDetails.node)
+        });
         this.deferredSymbolTracker.markAsDeferrableCandidate(deferredType, importDetails.node, node, true);
       }
     }
@@ -7286,7 +7289,10 @@ var ComponentDecoratorHandler = class {
         if (importDecl !== null && this.deferredSymbolTracker.canDefer(importDecl)) {
           deferBlockDep.isDeferrable = true;
           deferBlockDep.importPath = importDecl.moduleSpecifier.text;
-          deferrableTypes.set(deferBlockDep.symbolName, deferBlockDep.importPath);
+          deferrableTypes.set(deferBlockDep.symbolName, {
+            importPath: deferBlockDep.importPath,
+            isDefaultImport: isDefaultImport(importDecl)
+          });
         }
       }
     }
@@ -7345,6 +7351,7 @@ var ComponentDecoratorHandler = class {
           symbolName: decl.ref.node.name.escapedText,
           isDeferrable: false,
           importPath: null,
+          isDefaultImport: false,
           classDeclaration: decl.ref.node
         });
         allDeferredDecls.add(decl.ref.node);
@@ -7478,6 +7485,9 @@ function validateStandaloneImports(importRefs, importExpr, metaReader, scopeRead
     diagnostics.push(error);
   }
   return diagnostics;
+}
+function isDefaultImport(node) {
+  return node.importClause !== void 0 && node.importClause.namedBindings === void 0;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
@@ -7921,4 +7931,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GKQNBAG5.js.map
+//# sourceMappingURL=chunk-WSN2JZY6.js.map
