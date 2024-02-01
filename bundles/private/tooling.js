@@ -5,18 +5,16 @@
 import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-  angularJitApplicationTransform,
   constructorParametersDownlevelTransform
-} from "../chunk-D6QFM4YJ.js";
-import "../chunk-IWZ4MO7Q.js";
-import "../chunk-7HZQIUTO.js";
+} from "../chunk-3CMYJDBW.js";
+import "../chunk-F5WHWWI6.js";
+import "../chunk-BSV5GWXS.js";
 import "../chunk-64JBPJBS.js";
 import "../chunk-DUY2FPLZ.js";
 import "../chunk-XI2RTGAL.js";
 export {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-  angularJitApplicationTransform,
   constructorParametersDownlevelTransform
 };
 //# sourceMappingURL=tooling.js.map

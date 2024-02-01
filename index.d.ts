@@ -1,4 +1,5 @@
 export { VERSION } from './src/version';
+export * from './src/transformers/jit_transforms';
 export * from './src/transformers/api';
 export * from './src/transformers/entry_points';
 export * from './src/perform_compile';

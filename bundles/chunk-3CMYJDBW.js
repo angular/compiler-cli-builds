@@ -7,13 +7,13 @@ import {
   addImports,
   isAngularDecorator,
   tryParseSignalInputMapping
-} from "./chunk-IWZ4MO7Q.js";
+} from "./chunk-F5WHWWI6.js";
 import {
   ImportManager,
   TypeScriptReflectionHost,
   isAliasImportDeclaration,
   loadIsReferencedAliasDeclarationPatch
-} from "./chunk-7HZQIUTO.js";
+} from "./chunk-BSV5GWXS.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/downlevel_decorators_transform.mjs
 import ts from "typescript";
@@ -318,15 +318,47 @@ function cloneClassElementWithModifiers(node, modifiers) {
   return ts.setOriginalNode(clone, node);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/signal_inputs_metadata_transform.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/initializer_api_transforms/transform.mjs
+import ts3 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/initializer_api_transforms/input_function.mjs
 import ts2 from "typescript";
+var signalInputsTransform = (member, host, factory, importManager, decorator, isCore) => {
+  var _a, _b, _c;
+  if ((_a = host.getDecoratorsOfDeclaration(member)) == null ? void 0 : _a.some((d) => isAngularDecorator(d, "Input", isCore))) {
+    return member;
+  }
+  const inputMapping = tryParseSignalInputMapping({ name: member.name.text, value: (_b = member.initializer) != null ? _b : null }, host, isCore);
+  if (inputMapping === null) {
+    return member;
+  }
+  const fields = {
+    "isSignal": factory.createTrue(),
+    "alias": factory.createStringLiteral(inputMapping.bindingPropertyName),
+    "required": inputMapping.required ? factory.createTrue() : factory.createFalse(),
+    "transform": factory.createIdentifier("undefined")
+  };
+  const classDecoratorIdentifier = ts2.isIdentifier(decorator.identifier) ? decorator.identifier : decorator.identifier.expression;
+  const newDecorator = factory.createDecorator(factory.createCallExpression(factory.createPropertyAccessExpression(
+    importManager.generateNamespaceImport("@angular/core"),
+    ts2.setOriginalNode(factory.createIdentifier("Input"), classDecoratorIdentifier)
+  ), void 0, [factory.createAsExpression(
+    factory.createObjectLiteralExpression(Object.entries(fields).map(([name, value]) => factory.createPropertyAssignment(name, value))),
+    factory.createKeywordTypeNode(ts2.SyntaxKind.AnyKeyword)
+  )]));
+  return factory.updatePropertyDeclaration(member, [newDecorator, ...(_c = member.modifiers) != null ? _c : []], member.name, member.questionToken, member.type, member.initializer);
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/initializer_api_transforms/transform.mjs
 var decoratorsWithInputs = ["Directive", "Component"];
-var coreModuleName = "@angular/core";
-function getInputSignalsMetadataTransform(host, isCore) {
+var propertyTransforms = [
+  signalInputsTransform
+];
+function getInitializerApiJitTransform(host, isCore) {
   return (ctx) => {
     return (sourceFile) => {
       const importManager = new ImportManager(void 0, void 0, ctx.factory);
-      sourceFile = ts2.visitNode(sourceFile, createTransformVisitor(ctx, host, importManager, isCore), ts2.isSourceFile);
+      sourceFile = ts3.visitNode(sourceFile, createTransformVisitor(ctx, host, importManager, isCore), ts3.isSourceFile);
       const newImports = importManager.getAllImports(sourceFile.fileName);
       if (newImports.length > 0) {
         sourceFile = addImports(ctx.factory, importManager, sourceFile);
@@ -338,60 +370,37 @@ function getInputSignalsMetadataTransform(host, isCore) {
 function createTransformVisitor(ctx, host, importManager, isCore) {
   const visitor = (node) => {
     var _a;
-    if (ts2.isClassDeclaration(node) && node.name !== void 0) {
+    if (ts3.isClassDeclaration(node) && node.name !== void 0) {
       const angularDecorator = (_a = host.getDecoratorsOfDeclaration(node)) == null ? void 0 : _a.find((d) => decoratorsWithInputs.some((name) => isAngularDecorator(d, name, isCore)));
       if (angularDecorator !== void 0) {
-        return visitClassDeclaration(ctx, host, importManager, node, angularDecorator, isCore);
+        let hasChanged = false;
+        const members = node.members.map((member) => {
+          if (!ts3.isPropertyDeclaration(member)) {
+            return member;
+          }
+          if (!ts3.isIdentifier(member.name) && !ts3.isStringLiteralLike(member.name)) {
+            return member;
+          }
+          for (const transform of propertyTransforms) {
+            const newNode = transform(member, host, ctx.factory, importManager, angularDecorator, isCore);
+            if (newNode !== member) {
+              hasChanged = true;
+              return newNode;
+            }
+          }
+          return member;
+        });
+        if (hasChanged) {
+          return ctx.factory.updateClassDeclaration(node, node.modifiers, node.name, node.typeParameters, node.heritageClauses, members);
+        }
       }
     }
-    return ts2.visitEachChild(node, visitor, ctx);
+    return ts3.visitEachChild(node, visitor, ctx);
   };
   return visitor;
 }
-function visitClassDeclaration(ctx, host, importManager, clazz, classDecorator, isCore) {
-  const members = clazz.members.map((member) => {
-    var _a, _b, _c;
-    if (!ts2.isPropertyDeclaration(member)) {
-      return member;
-    }
-    if (!ts2.isIdentifier(member.name) && !ts2.isStringLiteralLike(member.name)) {
-      return member;
-    }
-    if ((_a = host.getDecoratorsOfDeclaration(member)) == null ? void 0 : _a.some((d) => isAngularDecorator(d, "Input", isCore))) {
-      return member;
-    }
-    const inputMapping = tryParseSignalInputMapping({ name: member.name.text, value: (_b = member.initializer) != null ? _b : null }, host, isCore);
-    if (inputMapping === null) {
-      return member;
-    }
-    const fields = {
-      "isSignal": ctx.factory.createTrue(),
-      "alias": ctx.factory.createStringLiteral(inputMapping.bindingPropertyName),
-      "required": inputMapping.required ? ctx.factory.createTrue() : ctx.factory.createFalse(),
-      "transform": ctx.factory.createIdentifier("undefined")
-    };
-    const classDecoratorIdentifier = ts2.isIdentifier(classDecorator.identifier) ? classDecorator.identifier : classDecorator.identifier.expression;
-    const newDecorator = ctx.factory.createDecorator(ctx.factory.createCallExpression(ctx.factory.createPropertyAccessExpression(
-      importManager.generateNamespaceImport(coreModuleName),
-      ts2.setOriginalNode(ctx.factory.createIdentifier("Input"), classDecoratorIdentifier)
-    ), void 0, [ctx.factory.createAsExpression(
-      ctx.factory.createObjectLiteralExpression(Object.entries(fields).map(([name, value]) => ctx.factory.createPropertyAssignment(name, value))),
-      ctx.factory.createKeywordTypeNode(ts2.SyntaxKind.AnyKeyword)
-    )]));
-    return ctx.factory.updatePropertyDeclaration(member, [newDecorator, ...(_c = member.modifiers) != null ? _c : []], member.name, member.questionToken, member.type, member.initializer);
-  });
-  return ctx.factory.updateClassDeclaration(clazz, clazz.modifiers, clazz.name, clazz.typeParameters, clazz.heritageClauses, members);
-}
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/private/tooling.mjs
-var GLOBAL_DEFS_FOR_TERSER = {
-  ngDevMode: false,
-  ngI18nClosureMode: false
-};
-var GLOBAL_DEFS_FOR_TERSER_WITH_AOT = {
-  ...GLOBAL_DEFS_FOR_TERSER,
-  ngJitMode: false
-};
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/index.mjs
 function angularJitApplicationTransform(program, isCore = false) {
   const typeChecker = program.getTypeChecker();
   const reflectionHost = new TypeScriptReflectionHost(typeChecker);
@@ -403,21 +412,35 @@ function angularJitApplicationTransform(program, isCore = false) {
     isCore,
     false
   );
-  const inputSignalMetadataTransform = getInputSignalsMetadataTransform(reflectionHost, isCore);
+  const initializerApisJitTransform = getInitializerApiJitTransform(reflectionHost, isCore);
   return (ctx) => {
     return (sourceFile) => {
-      sourceFile = inputSignalMetadataTransform(ctx)(sourceFile);
+      sourceFile = initializerApisJitTransform(ctx)(sourceFile);
       sourceFile = downlevelDecoratorTransform(ctx)(sourceFile);
       return sourceFile;
     };
   };
 }
-var constructorParametersDownlevelTransform = angularJitApplicationTransform;
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/private/tooling.mjs
+var GLOBAL_DEFS_FOR_TERSER = {
+  ngDevMode: false,
+  ngI18nClosureMode: false
+};
+var GLOBAL_DEFS_FOR_TERSER_WITH_AOT = {
+  ...GLOBAL_DEFS_FOR_TERSER,
+  ngJitMode: false
+};
+var constructorParametersDownlevelTransform = (program, isCore = false) => {
+  return angularJitApplicationTransform(program, isCore);
+};
 
 export {
+  getDownlevelDecoratorsTransform,
+  getInitializerApiJitTransform,
+  angularJitApplicationTransform,
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-  angularJitApplicationTransform,
   constructorParametersDownlevelTransform
 };
 /**
@@ -427,4 +450,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-D6QFM4YJ.js.map
+//# sourceMappingURL=chunk-3CMYJDBW.js.map
