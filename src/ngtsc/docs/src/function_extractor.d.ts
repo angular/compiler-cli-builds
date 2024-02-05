@@ -7,11 +7,12 @@
  */
 import ts from 'typescript';
 import { FunctionEntry } from './entities';
-export type FunctionLike = ts.FunctionDeclaration | ts.MethodDeclaration | ts.MethodSignature;
+export type FunctionLike = ts.FunctionDeclaration | ts.MethodDeclaration | ts.MethodSignature | ts.CallSignatureDeclaration | ts.ConstructSignatureDeclaration;
 export declare class FunctionExtractor {
+    private name;
     private declaration;
     private typeChecker;
-    constructor(declaration: FunctionLike, typeChecker: ts.TypeChecker);
+    constructor(name: string, declaration: FunctionLike, typeChecker: ts.TypeChecker);
     extract(): FunctionEntry;
     private extractAllParams;
     /** Gets all overloads for the function (excluding this extractor's FunctionDeclaration). */

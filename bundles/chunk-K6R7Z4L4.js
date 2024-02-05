@@ -528,7 +528,8 @@ function extractResolvedTypeString(node, checker) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/function_extractor.mjs
 var FunctionExtractor = class {
-  constructor(declaration, typeChecker) {
+  constructor(name, declaration, typeChecker) {
+    this.name = name;
     this.declaration = declaration;
     this.typeChecker = typeChecker;
   }
@@ -537,7 +538,8 @@ var FunctionExtractor = class {
     const returnType = signature ? this.typeChecker.typeToString(this.typeChecker.getReturnTypeOfSignature(signature)) : "unknown";
     return {
       params: this.extractAllParams(this.declaration.parameters),
-      name: this.declaration.name.getText(),
+      name: this.name,
+      isNewType: ts5.isConstructSignatureDeclaration(this.declaration),
       returnType,
       entryType: EntryType.Function,
       generics: extractGenerics(this.declaration),
@@ -591,7 +593,7 @@ var ClassExtractor = class {
       name: this.declaration.name.text,
       isAbstract: this.isAbstract(),
       entryType: ts6.isInterfaceDeclaration(this.declaration) ? EntryType.Interface : EntryType.UndecoratedClass,
-      members: this.extractAllClassMembers(),
+      members: this.extractSignatures().concat(this.extractAllClassMembers()),
       generics: extractGenerics(this.declaration),
       description: extractJsDocDescription(this.declaration),
       jsdocTags: extractJsDocTags(this.declaration),
@@ -620,12 +622,23 @@ var ClassExtractor = class {
     }
     return void 0;
   }
+  extractSignatures() {
+    return this.computeAllSignatureDeclarations().map((s) => this.extractSignature(s));
+  }
   extractMethod(methodDeclaration) {
-    const functionExtractor = new FunctionExtractor(methodDeclaration, this.typeChecker);
+    const functionExtractor = new FunctionExtractor(methodDeclaration.name.getText(), methodDeclaration, this.typeChecker);
     return {
       ...functionExtractor.extract(),
       memberType: MemberType.Method,
       memberTags: this.getMemberTags(methodDeclaration)
+    };
+  }
+  extractSignature(signature) {
+    const functionExtractor = new FunctionExtractor(ts6.isConstructSignatureDeclaration(signature) ? "new" : "", signature, this.typeChecker);
+    return {
+      ...functionExtractor.extract(),
+      memberType: MemberType.Method,
+      memberTags: []
     };
   }
   extractClassProperty(propertyDeclaration) {
@@ -654,6 +667,21 @@ var ClassExtractor = class {
       tags.push(MemberTags.Inherited);
     }
     return tags;
+  }
+  computeAllSignatureDeclarations() {
+    const type = this.typeChecker.getTypeAtLocation(this.declaration);
+    const signatures = [
+      ...type.getCallSignatures(),
+      ...type.getConstructSignatures()
+    ];
+    const result = [];
+    for (const signature of signatures) {
+      const decl = signature.getDeclaration();
+      if (this.isDocumentableSignature(decl) && this.isDocumentableMember(decl)) {
+        result.push(decl);
+      }
+    }
+    return result;
   }
   getMemberDeclarations() {
     var _a;
@@ -707,6 +735,9 @@ var ClassExtractor = class {
   }
   isMethod(member) {
     return ts6.isMethodDeclaration(member) || ts6.isMethodSignature(member);
+  }
+  isDocumentableSignature(signature) {
+    return ts6.isConstructSignatureDeclaration(signature) || ts6.isCallSignatureDeclaration(signature);
   }
   isAbstract() {
     var _a;
@@ -973,7 +1004,7 @@ var DocsExtractor = class {
       return extractInterface(node, this.typeChecker);
     }
     if (ts9.isFunctionDeclaration(node)) {
-      const functionExtractor = new FunctionExtractor(node, this.typeChecker);
+      const functionExtractor = new FunctionExtractor(node.name.getText(), node, this.typeChecker);
       return functionExtractor.extract();
     }
     if (ts9.isVariableDeclaration(node) && !isSyntheticAngularConstant(node)) {
@@ -996,7 +1027,7 @@ var DocsExtractor = class {
     for (let i = 0; i < declarationCount; i++) {
       const [exportName, declaration] = exportedDeclarations[i];
       if (ts9.isFunctionDeclaration(declaration)) {
-        const extractor = new FunctionExtractor(declaration, this.typeChecker);
+        const extractor = new FunctionExtractor(exportName, declaration, this.typeChecker);
         const overloads = extractor.getOverloads().map((overload) => [exportName, overload]);
         exportedDeclarations.push(...overloads);
       }
@@ -5973,7 +6004,7 @@ var TemplateSourceManager = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.mjs
-import { AST, ASTWithSource as ASTWithSource3, BindingPipe as BindingPipe2, PropertyRead as PropertyRead5, PropertyWrite as PropertyWrite4, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement4, TmplAstReference as TmplAstReference4, TmplAstTemplate as TmplAstTemplate3, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable3 } from "@angular/compiler";
+import { AST, ASTWithSource as ASTWithSource3, BindingPipe as BindingPipe2, PropertyRead as PropertyRead5, PropertyWrite as PropertyWrite4, R3Identifiers as R3Identifiers4, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement4, TmplAstReference as TmplAstReference4, TmplAstTemplate as TmplAstTemplate3, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable3 } from "@angular/compiler";
 import ts31 from "typescript";
 var SymbolBuilder = class {
   constructor(tcbPath, tcbIsShim, typeCheckBlock, templateData, componentScopeReader, getTypeChecker) {
@@ -6209,6 +6240,7 @@ var SymbolBuilder = class {
     return { kind: SymbolKind.Output, bindings };
   }
   getSymbolOfInputBinding(binding) {
+    var _a;
     const consumer = this.templateData.boundTarget.getConsumerOfBinding(binding);
     if (consumer === null) {
       return null;
@@ -6223,11 +6255,23 @@ var SymbolBuilder = class {
       if (!isAccessExpression(node.left)) {
         continue;
       }
-      const symbolInfo = this.getSymbolOfTsNode(node.left);
+      const signalInputAssignment = unwrapSignalInputWriteTAccessor(node.left);
+      let symbolInfo = null;
+      if (signalInputAssignment !== null) {
+        const fieldSymbol = this.getSymbolOfTsNode(signalInputAssignment.fieldExpr);
+        const typeSymbol = this.getSymbolOfTsNode(signalInputAssignment.typeExpr);
+        symbolInfo = fieldSymbol === null || typeSymbol === null ? null : {
+          tcbLocation: fieldSymbol.tcbLocation,
+          tsSymbol: fieldSymbol.tsSymbol,
+          tsType: typeSymbol.tsType
+        };
+      } else {
+        symbolInfo = this.getSymbolOfTsNode(node.left);
+      }
       if (symbolInfo === null || symbolInfo.tsSymbol === null) {
         continue;
       }
-      const target = this.getDirectiveSymbolForAccessExpression(node.left, consumer);
+      const target = this.getDirectiveSymbolForAccessExpression((_a = signalInputAssignment == null ? void 0 : signalInputAssignment.fieldExpr) != null ? _a : node.left, consumer);
       if (target === null) {
         continue;
       }
@@ -6243,9 +6287,9 @@ var SymbolBuilder = class {
     }
     return { kind: SymbolKind.Input, bindings };
   }
-  getDirectiveSymbolForAccessExpression(node, { isComponent, selector, isStructural }) {
+  getDirectiveSymbolForAccessExpression(fieldAccessExpr, { isComponent, selector, isStructural }) {
     var _a;
-    const tsSymbol = this.getTypeChecker().getSymbolAtLocation(node.expression);
+    const tsSymbol = this.getTypeChecker().getSymbolAtLocation(fieldAccessExpr.expression);
     if ((tsSymbol == null ? void 0 : tsSymbol.declarations) === void 0 || tsSymbol.declarations.length === 0 || selector === null) {
       return null;
     }
@@ -6423,8 +6467,6 @@ var SymbolBuilder = class {
     let tsSymbol;
     if (ts31.isPropertyAccessExpression(node)) {
       tsSymbol = this.getTypeChecker().getSymbolAtLocation(node.name);
-    } else if (ts31.isElementAccessExpression(node)) {
-      tsSymbol = this.getTypeChecker().getSymbolAtLocation(node.argumentExpression);
     } else {
       tsSymbol = this.getTypeChecker().getSymbolAtLocation(node);
     }
@@ -6459,6 +6501,21 @@ function anyNodeFilter(n) {
 }
 function sourceSpanEqual(a, b) {
   return a.start.offset === b.start.offset && a.end.offset === b.end.offset;
+}
+function unwrapSignalInputWriteTAccessor(expr) {
+  if (!ts31.isElementAccessExpression(expr) || !ts31.isPropertyAccessExpression(expr.argumentExpression)) {
+    return null;
+  }
+  if (!ts31.isIdentifier(expr.argumentExpression.name) || expr.argumentExpression.name.text !== R3Identifiers4.InputSignalBrandWriteType.name) {
+    return null;
+  }
+  if (!ts31.isPropertyAccessExpression(expr.expression) && !ts31.isElementAccessExpression(expr.expression)) {
+    throw new Error("Unexpected expression for signal input write type.");
+  }
+  return {
+    fieldExpr: expr.expression,
+    typeExpr: expr
+  };
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
@@ -7304,7 +7361,7 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
   }
 };
 function isSignal(symbol) {
-  return ((symbol == null ? void 0 : symbol.escapedName) === "WritableSignal" || (symbol == null ? void 0 : symbol.escapedName) === "Signal" || (symbol == null ? void 0 : symbol.escapedName) === "InputSignal") && symbol.parent.escapedName.includes("@angular/core");
+  return ((symbol == null ? void 0 : symbol.escapedName) === "WritableSignal" || (symbol == null ? void 0 : symbol.escapedName) === "Signal" || (symbol == null ? void 0 : symbol.escapedName) === "InputSignal" || (symbol == null ? void 0 : symbol.escapedName) === "InputSignalWithTransform") && symbol.parent.escapedName.includes("@angular/core");
 }
 function buildDiagnosticForSignal(ctx, node, component) {
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
@@ -9026,4 +9083,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2DJCWC36.js.map
+//# sourceMappingURL=chunk-K6R7Z4L4.js.map
