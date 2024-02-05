@@ -3479,7 +3479,7 @@ var TraitImpl = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/compilation.mjs
 var TraitCompiler = class {
-  constructor(handlers, reflector, perf, incrementalBuild, compileNonExportedClasses, compilationMode, dtsTransforms, semanticDepGraphUpdater, sourceFileTypeIdentifier, isCore, forbidOrphanComponents) {
+  constructor(handlers, reflector, perf, incrementalBuild, compileNonExportedClasses, compilationMode, dtsTransforms, semanticDepGraphUpdater, sourceFileTypeIdentifier) {
     this.handlers = handlers;
     this.reflector = reflector;
     this.perf = perf;
@@ -3489,8 +3489,6 @@ var TraitCompiler = class {
     this.dtsTransforms = dtsTransforms;
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
     this.sourceFileTypeIdentifier = sourceFileTypeIdentifier;
-    this.isCore = isCore;
-    this.forbidOrphanComponents = forbidOrphanComponents;
     this.classes = /* @__PURE__ */ new Map();
     this.fileToClasses = /* @__PURE__ */ new Map();
     this.filesWithoutTraits = /* @__PURE__ */ new Set();
@@ -3600,14 +3598,14 @@ var TraitCompiler = class {
   detectTraits(clazz, decorators) {
     let record = this.recordFor(clazz);
     let foundTraits = [];
-    const detectedDecorators = this.compilationMode === CompilationMode.LOCAL || this.forbidOrphanComponents ? /* @__PURE__ */ new Set() : null;
+    const nonNgDecoratorsInLocalMode = this.compilationMode === CompilationMode.LOCAL ? new Set(decorators) : null;
     for (const handler of this.handlers) {
       const result = handler.detect(clazz, decorators);
       if (result === void 0) {
         continue;
       }
-      if (detectedDecorators !== null && result.decorator !== null) {
-        detectedDecorators.add(result.decorator);
+      if (nonNgDecoratorsInLocalMode !== null && result.decorator !== null) {
+        nonNgDecoratorsInLocalMode.delete(result.decorator);
       }
       const isPrimaryHandler = handler.precedence === HandlerPrecedence.PRIMARY;
       const isWeakHandler = handler.precedence === HandlerPrecedence.WEAK;
@@ -3650,22 +3648,14 @@ var TraitCompiler = class {
         record.hasPrimaryHandler = record.hasPrimaryHandler || isPrimaryHandler;
       }
     }
-    if (decorators !== null && detectedDecorators !== null && detectedDecorators.size < decorators.length && record !== null && record.metaDiagnostics === null && hasDepsTrackerAffectingScopeDecorator(detectedDecorators, this.isCore)) {
-      let messageText;
-      if (this.compilationMode === CompilationMode.LOCAL) {
-        messageText = "In local compilation mode, Angular does not support custom decorators or duplicate Angular decorators (except for `@Injectable` classes). Ensure all class decorators are from Angular and each decorator is used at most once for each class.";
-      } else if (this.forbidOrphanComponents) {
-        messageText = 'When the Angular compiler option "forbidOrphanComponents" is set, Angular does not support custom decorators or duplicate Angular decorators (except for `@Injectable` classes). Ensure all class decorators are from Angular and each decorator is used at most once for each class.';
-      } else {
-        throw new Error("Impossible state!");
-      }
-      record.metaDiagnostics = decorators.filter((decorator) => !detectedDecorators.has(decorator)).map((decorator) => ({
+    if (nonNgDecoratorsInLocalMode !== null && nonNgDecoratorsInLocalMode.size > 0 && record !== null && record.metaDiagnostics === null) {
+      record.metaDiagnostics = [...nonNgDecoratorsInLocalMode].map((decorator) => ({
         category: ts15.DiagnosticCategory.Error,
         code: Number("-99" + ErrorCode.DECORATOR_UNEXPECTED),
         file: getSourceFile(clazz),
         start: decorator.node.getStart(),
         length: decorator.node.getWidth(),
-        messageText
+        messageText: "In local compilation mode, Angular does not support custom decorators. Ensure all class decorators are from Angular."
       }));
       record.traits = foundTraits = [];
     }
@@ -3942,22 +3932,6 @@ var TraitCompiler = class {
 };
 function containsErrors(diagnostics) {
   return diagnostics !== null && diagnostics.some((diag) => diag.category === ts15.DiagnosticCategory.Error);
-}
-function isInjectableDecorator(decorator, isCore) {
-  if (isCore) {
-    return decorator.name === "Injectable";
-  } else if (decorator.import !== null && decorator.import.from === "@angular/core") {
-    return decorator.import.name === "Injectable";
-  }
-  return false;
-}
-function hasDepsTrackerAffectingScopeDecorator(decoratorSet, isCore) {
-  for (const decorator of decoratorSet) {
-    if (!isInjectableDecorator(decorator, isCore)) {
-      return true;
-    }
-  }
-  return false;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/declaration.mjs
@@ -8289,4 +8263,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-EWVPEQCZ.js.map
+//# sourceMappingURL=chunk-GOJVVFPC.js.map
