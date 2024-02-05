@@ -39,7 +39,7 @@ import {
   declarationTransformFactory,
   isHostDirectiveMetaForGlobalMode,
   ivyTransformFactory
-} from "./chunk-F5WHWWI6.js";
+} from "./chunk-EWVPEQCZ.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -88,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-BSV5GWXS.js";
+} from "./chunk-ESTR4VH2.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -8317,7 +8317,7 @@ var NgCompiler = class {
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
       new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_f = this.options.onlyPublishPublicTypingsForNgModules) != null ? _f : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode, localCompilationExtraImportsTracker)
     ];
-    const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter);
+    const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter, isCore, !!this.options.forbidOrphanComponents);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
       this.incrementalStrategy.setIncrementalState(this.incrementalCompilation.state, program);
       this.currentProgram = program;
@@ -9103,4 +9103,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-BQWAVJSE.js.map
+//# sourceMappingURL=chunk-DTZPPTPB.js.map

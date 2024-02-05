@@ -66,6 +66,8 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     private dtsTransforms;
     private semanticDepGraphUpdater;
     private sourceFileTypeIdentifier;
+    private readonly isCore;
+    private readonly forbidOrphanComponents;
     /**
      * Maps class declarations to their `ClassRecord`, which tracks the Ivy traits being applied to
      * those classes.
@@ -83,7 +85,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     private filesWithoutTraits;
     private reexportMap;
     private handlersByName;
-    constructor(handlers: DecoratorHandler<unknown, unknown, SemanticSymbol | null, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord, unknown>, compileNonExportedClasses: boolean, compilationMode: CompilationMode, dtsTransforms: DtsTransformRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, sourceFileTypeIdentifier: SourceFileTypeIdentifier);
+    constructor(handlers: DecoratorHandler<unknown, unknown, SemanticSymbol | null, unknown>[], reflector: ReflectionHost, perf: PerfRecorder, incrementalBuild: IncrementalBuild<ClassRecord, unknown>, compileNonExportedClasses: boolean, compilationMode: CompilationMode, dtsTransforms: DtsTransformRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, sourceFileTypeIdentifier: SourceFileTypeIdentifier, isCore: boolean, forbidOrphanComponents: boolean);
     analyzeSync(sf: ts.SourceFile): void;
     analyzeAsync(sf: ts.SourceFile): Promise<void> | undefined;
     private analyze;

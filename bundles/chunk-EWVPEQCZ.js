@@ -29,7 +29,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-BSV5GWXS.js";
+} from "./chunk-ESTR4VH2.js";
 import {
   PerfEvent,
   PerfPhase
@@ -3479,7 +3479,7 @@ var TraitImpl = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/compilation.mjs
 var TraitCompiler = class {
-  constructor(handlers, reflector, perf, incrementalBuild, compileNonExportedClasses, compilationMode, dtsTransforms, semanticDepGraphUpdater, sourceFileTypeIdentifier) {
+  constructor(handlers, reflector, perf, incrementalBuild, compileNonExportedClasses, compilationMode, dtsTransforms, semanticDepGraphUpdater, sourceFileTypeIdentifier, isCore, forbidOrphanComponents) {
     this.handlers = handlers;
     this.reflector = reflector;
     this.perf = perf;
@@ -3489,6 +3489,8 @@ var TraitCompiler = class {
     this.dtsTransforms = dtsTransforms;
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
     this.sourceFileTypeIdentifier = sourceFileTypeIdentifier;
+    this.isCore = isCore;
+    this.forbidOrphanComponents = forbidOrphanComponents;
     this.classes = /* @__PURE__ */ new Map();
     this.fileToClasses = /* @__PURE__ */ new Map();
     this.filesWithoutTraits = /* @__PURE__ */ new Set();
@@ -3598,14 +3600,14 @@ var TraitCompiler = class {
   detectTraits(clazz, decorators) {
     let record = this.recordFor(clazz);
     let foundTraits = [];
-    const nonNgDecoratorsInLocalMode = this.compilationMode === CompilationMode.LOCAL ? new Set(decorators) : null;
+    const detectedDecorators = this.compilationMode === CompilationMode.LOCAL || this.forbidOrphanComponents ? /* @__PURE__ */ new Set() : null;
     for (const handler of this.handlers) {
       const result = handler.detect(clazz, decorators);
       if (result === void 0) {
         continue;
       }
-      if (nonNgDecoratorsInLocalMode !== null && result.decorator !== null) {
-        nonNgDecoratorsInLocalMode.delete(result.decorator);
+      if (detectedDecorators !== null && result.decorator !== null) {
+        detectedDecorators.add(result.decorator);
       }
       const isPrimaryHandler = handler.precedence === HandlerPrecedence.PRIMARY;
       const isWeakHandler = handler.precedence === HandlerPrecedence.WEAK;
@@ -3648,14 +3650,22 @@ var TraitCompiler = class {
         record.hasPrimaryHandler = record.hasPrimaryHandler || isPrimaryHandler;
       }
     }
-    if (nonNgDecoratorsInLocalMode !== null && nonNgDecoratorsInLocalMode.size > 0 && record !== null && record.metaDiagnostics === null) {
-      record.metaDiagnostics = [...nonNgDecoratorsInLocalMode].map((decorator) => ({
+    if (decorators !== null && detectedDecorators !== null && detectedDecorators.size < decorators.length && record !== null && record.metaDiagnostics === null && hasDepsTrackerAffectingScopeDecorator(detectedDecorators, this.isCore)) {
+      let messageText;
+      if (this.compilationMode === CompilationMode.LOCAL) {
+        messageText = "In local compilation mode, Angular does not support custom decorators or duplicate Angular decorators (except for `@Injectable` classes). Ensure all class decorators are from Angular and each decorator is used at most once for each class.";
+      } else if (this.forbidOrphanComponents) {
+        messageText = 'When the Angular compiler option "forbidOrphanComponents" is set, Angular does not support custom decorators or duplicate Angular decorators (except for `@Injectable` classes). Ensure all class decorators are from Angular and each decorator is used at most once for each class.';
+      } else {
+        throw new Error("Impossible state!");
+      }
+      record.metaDiagnostics = decorators.filter((decorator) => !detectedDecorators.has(decorator)).map((decorator) => ({
         category: ts15.DiagnosticCategory.Error,
         code: Number("-99" + ErrorCode.DECORATOR_UNEXPECTED),
         file: getSourceFile(clazz),
         start: decorator.node.getStart(),
         length: decorator.node.getWidth(),
-        messageText: "In local compilation mode, Angular does not support custom decorators. Ensure all class decorators are from Angular."
+        messageText
       }));
       record.traits = foundTraits = [];
     }
@@ -3932,6 +3942,22 @@ var TraitCompiler = class {
 };
 function containsErrors(diagnostics) {
   return diagnostics !== null && diagnostics.some((diag) => diag.category === ts15.DiagnosticCategory.Error);
+}
+function isInjectableDecorator(decorator, isCore) {
+  if (isCore) {
+    return decorator.name === "Injectable";
+  } else if (decorator.import !== null && decorator.import.from === "@angular/core") {
+    return decorator.import.name === "Injectable";
+  }
+  return false;
+}
+function hasDepsTrackerAffectingScopeDecorator(decoratorSet, isCore) {
+  for (const decorator of decoratorSet) {
+    if (!isInjectableDecorator(decorator, isCore)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/declaration.mjs
@@ -4429,9 +4455,6 @@ import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirect
 import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr4, getSafePropertyAccessString, parseHostBindings, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
 import ts23 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/input_function.mjs
-import ts21 from "typescript";
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/initializer_functions.mjs
 import ts20 from "typescript";
 function tryParseInitializerApiMember(fnNames, member, reflector, isCore) {
@@ -4487,8 +4510,9 @@ function isReferenceToInitializerApiFunction(functionName, target, isCore, refle
   return targetImport.name === functionName && targetImport.from === CORE_MODULE;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/input_function.mjs
-function parseAndValidateOptions(optionsNode) {
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/input_output_parse_options.mjs
+import ts21 from "typescript";
+function parseAndValidateInputAndOutputOptions(optionsNode) {
   if (!ts21.isObjectLiteralExpression(optionsNode)) {
     throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, optionsNode, "Argument needs to be an object literal that is statically analyzable.");
   }
@@ -4503,6 +4527,8 @@ function parseAndValidateOptions(optionsNode) {
   }
   return { alias };
 }
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/input_function.mjs
 function tryParseSignalInputMapping(member, reflector, isCore) {
   var _a;
   const signalInput = tryParseInitializerApiMember(["input"], member, reflector, isCore);
@@ -4510,7 +4536,7 @@ function tryParseSignalInputMapping(member, reflector, isCore) {
     return null;
   }
   const optionsNode = signalInput.isRequired ? signalInput.call.arguments[0] : signalInput.call.arguments[1];
-  const options = optionsNode !== void 0 ? parseAndValidateOptions(optionsNode) : null;
+  const options = optionsNode !== void 0 ? parseAndValidateInputAndOutputOptions(optionsNode) : null;
   const classPropertyName = member.name;
   return {
     isSignal: true,
@@ -4518,6 +4544,29 @@ function tryParseSignalInputMapping(member, reflector, isCore) {
     bindingPropertyName: (_a = options == null ? void 0 : options.alias) != null ? _a : classPropertyName,
     required: signalInput.isRequired,
     transform: null
+  };
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/output_function.mjs
+function tryParseInitializerBasedOutput(member, reflector, isCore) {
+  var _a;
+  const output = tryParseInitializerApiMember(["output", "\u0275output"], member, reflector, isCore);
+  if (output === null) {
+    return null;
+  }
+  if (output.isRequired) {
+    throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_NO_REQUIRED_FUNCTION, output.call, `Output does not support ".required()".`);
+  }
+  const optionsNode = output.call.arguments[0];
+  const options = optionsNode !== void 0 ? parseAndValidateInputAndOutputOptions(optionsNode) : null;
+  const classPropertyName = member.name;
+  return {
+    call: output.call,
+    metadata: {
+      isSignal: false,
+      classPropertyName,
+      bindingPropertyName: (_a = options == null ? void 0 : options.alias) != null ? _a : classPropertyName
+    }
   };
 }
 
@@ -4607,7 +4656,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, evaluator, refEmi
   const inputsFromFields = parseInputFields(clazz, members, evaluator, reflector, refEmitter, isCore, compilationMode, inputsFromMeta, decorator);
   const inputs = ClassPropertyMapping.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
   const outputsFromMeta = parseOutputsArray(directive, evaluator);
-  const outputsFromFields = parseOutputFields(filterToMembersWithDecorator(decoratedElements, "Output", coreModule), evaluator);
+  const outputsFromFields = parseOutputFields(clazz, decorator, members, isCore, reflector, evaluator, outputsFromMeta);
   const outputs = ClassPropertyMapping.fromMappedObject({ ...outputsFromMeta, ...outputsFromFields });
   const { viewQueries, contentQueries } = parseQueriesOfClassFields(members, reflector, evaluator, isCore);
   if (directive.has("queries")) {
@@ -4954,18 +5003,6 @@ function parseMappingString(value) {
   const [fieldName, bindingPropertyName] = value.split(":", 2).map((str) => str.trim());
   return [bindingPropertyName != null ? bindingPropertyName : fieldName, fieldName];
 }
-function parseDecoratedFields(fields, evaluator, callback) {
-  for (const field of fields) {
-    const fieldName = field.member.name;
-    for (const decorator of field.decorators) {
-      if (decorator.args != null && decorator.args.length > 1) {
-        throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `@${decorator.name} can have at most one argument, got ${decorator.args.length} argument(s)`);
-      }
-      const value = decorator.args != null && decorator.args.length > 0 ? evaluator.evaluate(decorator.args[0]) : null;
-      callback(fieldName, value, decorator);
-    }
-  }
-}
 function parseInputsArray(clazz, decoratorMetadata, evaluator, reflector, refEmitter, compilationMode) {
   const inputsField = decoratorMetadata.get("inputs");
   if (inputsField === void 0) {
@@ -5211,15 +5248,56 @@ function parseOutputsArray(directive, evaluator) {
   const metaValues = parseFieldStringArrayValue(directive, "outputs", evaluator);
   return metaValues ? parseMappingStringArray(metaValues) : EMPTY_OBJECT;
 }
-function parseOutputFields(outputMembers, evaluator) {
+function parseOutputFields(clazz, classDecorator, members, isCore, reflector, evaluator, outputsFromMeta) {
+  var _a, _b, _c;
   const outputs = {};
-  parseDecoratedFields(outputMembers, evaluator, (fieldName, bindingPropertyName, decorator) => {
-    if (bindingPropertyName != null && typeof bindingPropertyName !== "string") {
-      throw createValueHasWrongTypeError(decorator.node, bindingPropertyName, `@${decorator.name} decorator argument must resolve to a string`);
+  for (const member of members) {
+    const decoratorOutput = tryParseDecoratorOutput(member, evaluator, isCore);
+    const initializerOutput = tryParseInitializerBasedOutput(member, reflector, isCore);
+    if (decoratorOutput !== null && initializerOutput !== null) {
+      throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_WITH_DISALLOWED_DECORATOR, decoratorOutput.decorator.node, `Using "@Output" with "output()" is not allowed.`);
     }
-    outputs[fieldName] = bindingPropertyName != null ? bindingPropertyName : fieldName;
-  });
+    const queryNode = (_a = decoratorOutput == null ? void 0 : decoratorOutput.decorator.node) != null ? _a : initializerOutput == null ? void 0 : initializerOutput.call;
+    if (queryNode !== void 0 && member.isStatic) {
+      throw new FatalDiagnosticError(ErrorCode.INCORRECTLY_DECLARED_ON_STATIC_MEMBER, queryNode, `Output is incorrectly declared on a static class member.`);
+    }
+    const metadata = (_b = decoratorOutput != null ? decoratorOutput : initializerOutput) == null ? void 0 : _b.metadata;
+    if (metadata === void 0) {
+      continue;
+    }
+    if (initializerOutput !== null && outputsFromMeta.hasOwnProperty(metadata.classPropertyName)) {
+      throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_DECORATOR_METADATA_COLLISION, (_c = member.node) != null ? _c : clazz, `Output "${member.name}" is unexpectedly declared in @${classDecorator.name} as well.`);
+    }
+    outputs[metadata == null ? void 0 : metadata.classPropertyName] = metadata.bindingPropertyName;
+  }
   return outputs;
+}
+function tryParseDecoratorOutput(member, evaluator, isCore) {
+  var _a;
+  const decorator = tryGetDecoratorOnMember(member, "Output", isCore);
+  if (decorator === null) {
+    return null;
+  }
+  if (decorator.args !== null && decorator.args.length > 1) {
+    throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, `@Output can have at most one argument, got ${decorator.args.length} argument(s)`);
+  }
+  const classPropertyName = member.name;
+  let alias = null;
+  if (((_a = decorator.args) == null ? void 0 : _a.length) === 1) {
+    const resolvedAlias = evaluator.evaluate(decorator.args[0]);
+    if (typeof resolvedAlias !== "string") {
+      throw createValueHasWrongTypeError(decorator.node, resolvedAlias, `@Output decorator argument must resolve to a string`);
+    }
+    alias = resolvedAlias;
+  }
+  return {
+    decorator,
+    metadata: {
+      isSignal: false,
+      classPropertyName,
+      bindingPropertyName: alias != null ? alias : classPropertyName
+    }
+  };
 }
 function evaluateHostExpressionBindings(hostExpr, evaluator) {
   const hostMetaMap = evaluator.evaluate(hostExpr);
@@ -8190,6 +8268,7 @@ export {
   declarationTransformFactory,
   ivyTransformFactory,
   tryParseSignalInputMapping,
+  tryParseInitializerBasedOutput,
   DirectiveDecoratorHandler,
   NgModuleDecoratorHandler,
   ComponentDecoratorHandler,
@@ -8210,4 +8289,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-F5WHWWI6.js.map
+//# sourceMappingURL=chunk-EWVPEQCZ.js.map

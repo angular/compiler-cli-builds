@@ -8,7 +8,14 @@
 import ts from 'typescript';
 import { Decorator, ReflectionHost } from '../../..//ngtsc/reflection';
 import { ImportManager } from '../../../ngtsc/translator';
-/** Function that can be used to transform a class properties. */
+/** Function that can be used to transform class properties. */
 export type PropertyTransform = (node: ts.PropertyDeclaration & {
     name: ts.Identifier | ts.StringLiteralLike;
-}, host: ReflectionHost, factory: ts.NodeFactory, importManager: ImportManager, decorator: Decorator, isCore: boolean) => ts.PropertyDeclaration;
+}, host: ReflectionHost, factory: ts.NodeFactory, importManager: ImportManager, classDecorator: Decorator, isCore: boolean) => ts.PropertyDeclaration;
+/**
+ * Creates an import and access for a given Angular core import while
+ * ensuring the decorator symbol access can be traced back to an Angular core
+ * import in order to make the synthetic decorator compatible with the JIT
+ * decorator downlevel transform.
+ */
+export declare function createSyntheticAngularCoreDecoratorAccess(factory: ts.NodeFactory, importManager: ImportManager, ngClassDecorator: Decorator, decoratorName: string): ts.PropertyAccessExpression;
