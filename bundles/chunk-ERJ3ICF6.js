@@ -4592,7 +4592,10 @@ function parseLocator(expression, reflector) {
   return createMayBeForwardRefExpression(new o.WrappedNodeExpr(expression), unwrappedExpression !== null ? 2 : 0);
 }
 function parseReadOption(value) {
-  return new o.WrappedNodeExpr(value);
+  if (ts22.isPropertyAccessExpression(value) && ts22.isIdentifier(value.expression) || ts22.isIdentifier(value)) {
+    return new o.WrappedNodeExpr(value);
+  }
+  throw new FatalDiagnosticError(ErrorCode.VALUE_NOT_LITERAL, value, `Query "read" option expected a literal class reference.`);
 }
 function parseDescendantsOption(value) {
   if (value.kind === ts22.SyntaxKind.TrueKeyword) {
@@ -8216,6 +8219,7 @@ export {
   StaticInterpreter,
   PartialEvaluator,
   isAngularDecorator,
+  getAngularDecorators,
   forwardRefResolver,
   MetaKind,
   CompoundMetadataReader,
@@ -8243,6 +8247,8 @@ export {
   ivyTransformFactory,
   tryParseSignalInputMapping,
   tryParseInitializerBasedOutput,
+  tryParseSignalQueryFromInitializer,
+  queryDecoratorNames,
   DirectiveDecoratorHandler,
   NgModuleDecoratorHandler,
   ComponentDecoratorHandler,
@@ -8263,4 +8269,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GOJVVFPC.js.map
+//# sourceMappingURL=chunk-ERJ3ICF6.js.map

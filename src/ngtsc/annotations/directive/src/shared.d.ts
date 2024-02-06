@@ -13,6 +13,8 @@ import { DynamicValue, PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../../reflection';
 import { CompilationMode } from '../../../transform';
 import { ReferencesRegistry } from '../../common';
+type QueryDecoratorName = 'ViewChild' | 'ViewChildren' | 'ContentChild' | 'ContentChildren';
+export declare const queryDecoratorNames: QueryDecoratorName[];
 /**
  * Helper function to extract metadata from a `Directive` or `Component`. `Directive`s without a
  * selector are allowed to be used for abstract base classes. These abstract directives should not
@@ -44,3 +46,4 @@ export declare function parseFieldStringArrayValue(directive: Map<string, ts.Exp
  *
  */
 export declare function parseDecoratorInputTransformFunction(clazz: ClassDeclaration, classPropertyName: string, value: DynamicValue | Reference, reflector: ReflectionHost, refEmitter: ReferenceEmitter, compilationMode: CompilationMode): DecoratorInputTransform;
+export {};

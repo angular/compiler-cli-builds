@@ -9,7 +9,7 @@ import { R3QueryMetadata } from '@angular/compiler';
 import ts from 'typescript';
 import { ClassMember, ReflectionHost } from '../../../reflection';
 /** Possible query initializer API functions. */
-type QueryFunctionName = 'viewChild' | 'contentChild' | 'viewChildren' | 'contentChildren';
+export type QueryFunctionName = 'viewChild' | 'contentChild' | 'viewChildren' | 'contentChildren';
 /**
  * Attempts to detect a possible query definition for the given class member.
  *
@@ -23,4 +23,3 @@ export declare function tryParseSignalQueryFromInitializer(member: Pick<ClassMem
     metadata: R3QueryMetadata;
     call: ts.CallExpression;
 } | null;
-export {};
