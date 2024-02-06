@@ -13,6 +13,7 @@ import { PartialEvaluator, ResolvedValue } from '../../../partial_evaluator';
 import { ClassDeclaration, ReflectionHost } from '../../../reflection';
 import { DeclarationData, LocalModuleScopeRegistry } from '../../../scope';
 import { InjectableClassRegistry } from './injectable_registry';
+import { CompilationMode } from '../../../transform';
 /**
  * Create a `ts.Diagnostic` which indicates the given class is part of the declarations of two or
  * more NgModules.
@@ -49,4 +50,14 @@ interface ClassWithCtor {
     isDecorated: boolean;
 }
 export declare function findInheritedCtor(node: ClassDeclaration, injectableRegistry: InjectableClassRegistry, reflector: ReflectionHost, evaluator: PartialEvaluator): ClassWithCtor | null;
+/**
+ * Throws `FatalDiagnosticError` with error code `LOCAL_COMPILATION_UNRESOLVED_CONST`
+ * if the compilation mode is local and the value is not resolved due to being imported
+ * from external files. This is a common scenario for errors in local compilation mode,
+ * and so this helper can be used to quickly generate the relevant errors.
+ *
+ * @param nodeToHighlight Node to be highlighted in teh error message.
+ * Will default to value.node if not provided.
+ */
+export declare function assertLocalCompilationUnresolvedConst(compilationMode: CompilationMode, value: ResolvedValue, nodeToHighlight: ts.Node | null, errorMessage: string): void;
 export {};

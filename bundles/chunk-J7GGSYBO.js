@@ -922,9 +922,8 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["INJECTABLE_DUPLICATE_PROV"] = 9001] = "INJECTABLE_DUPLICATE_PROV";
   ErrorCode2[ErrorCode2["SUGGEST_STRICT_TEMPLATES"] = 10001] = "SUGGEST_STRICT_TEMPLATES";
   ErrorCode2[ErrorCode2["SUGGEST_SUBOPTIMAL_TYPE_INFERENCE"] = 10002] = "SUGGEST_SUBOPTIMAL_TYPE_INFERENCE";
-  ErrorCode2[ErrorCode2["LOCAL_COMPILATION_IMPORTED_TEMPLATE_STRING"] = 11001] = "LOCAL_COMPILATION_IMPORTED_TEMPLATE_STRING";
-  ErrorCode2[ErrorCode2["LOCAL_COMPILATION_IMPORTED_STYLES_STRING"] = 11002] = "LOCAL_COMPILATION_IMPORTED_STYLES_STRING";
-  ErrorCode2[ErrorCode2["LOCAL_COMPILATION_HOST_DIRECTIVE_INVALID"] = 11003] = "LOCAL_COMPILATION_HOST_DIRECTIVE_INVALID";
+  ErrorCode2[ErrorCode2["LOCAL_COMPILATION_UNRESOLVED_CONST"] = 11001] = "LOCAL_COMPILATION_UNRESOLVED_CONST";
+  ErrorCode2[ErrorCode2["LOCAL_COMPILATION_EXPRESSION_FOR_HOST_DIRECTIVE"] = 11003] = "LOCAL_COMPILATION_EXPRESSION_FOR_HOST_DIRECTIVE";
 })(ErrorCode || (ErrorCode = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/docs.mjs
@@ -2553,4 +2552,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ESTR4VH2.js.map
+//# sourceMappingURL=chunk-J7GGSYBO.js.map
