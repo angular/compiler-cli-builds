@@ -10,14 +10,15 @@ import {
   queryDecoratorNames,
   tryParseInitializerBasedOutput,
   tryParseSignalInputMapping,
+  tryParseSignalModelMapping,
   tryParseSignalQueryFromInitializer
-} from "./chunk-HWURMW4G.js";
+} from "./chunk-NJFGOCNY.js";
 import {
   ImportManager,
   TypeScriptReflectionHost,
   isAliasImportDeclaration,
   loadIsReferencedAliasDeclarationPatch
-} from "./chunk-J7GGSYBO.js";
+} from "./chunk-XFL5OADT.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/downlevel_decorators_transform.mjs
 import ts from "typescript";
@@ -323,7 +324,7 @@ function cloneClassElementWithModifiers(node, modifiers) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/initializer_api_transforms/transform.mjs
-import ts3 from "typescript";
+import ts4 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/initializer_api_transforms/transform_api.mjs
 import ts2 from "typescript";
@@ -359,6 +360,43 @@ var signalInputsTransform = (member, host, factory, importManager, classDecorato
   ]));
   return factory.updatePropertyDeclaration(member, [newDecorator, ...(_c = member.modifiers) != null ? _c : []], member.name, member.questionToken, member.type, member.initializer);
 };
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/initializer_api_transforms/model_function.mjs
+import ts3 from "typescript";
+var signalModelTransform = (member, host, factory, importManager, decorator, isCore) => {
+  var _a, _b, _c;
+  if ((_a = host.getDecoratorsOfDeclaration(member)) == null ? void 0 : _a.some((d) => {
+    return isAngularDecorator(d, "Input", isCore) || isAngularDecorator(d, "Output", isCore);
+  })) {
+    return member;
+  }
+  const modelMapping = tryParseSignalModelMapping({ name: member.name.text, value: (_b = member.initializer) != null ? _b : null }, host, isCore);
+  if (modelMapping === null) {
+    return member;
+  }
+  const classDecoratorIdentifier = ts3.isIdentifier(decorator.identifier) ? decorator.identifier : decorator.identifier.expression;
+  const inputConfig = factory.createObjectLiteralExpression([
+    factory.createPropertyAssignment("isSignal", modelMapping.input.isSignal ? factory.createTrue() : factory.createFalse()),
+    factory.createPropertyAssignment("alias", factory.createStringLiteral(modelMapping.input.bindingPropertyName)),
+    factory.createPropertyAssignment("required", modelMapping.input.required ? factory.createTrue() : factory.createFalse())
+  ]);
+  const inputDecorator = createDecorator(
+    "Input",
+    factory.createAsExpression(inputConfig, factory.createKeywordTypeNode(ts3.SyntaxKind.AnyKeyword)),
+    classDecoratorIdentifier,
+    factory,
+    importManager
+  );
+  const outputDecorator = createDecorator("Output", factory.createStringLiteral(modelMapping.output.bindingPropertyName), classDecoratorIdentifier, factory, importManager);
+  return factory.updatePropertyDeclaration(member, [inputDecorator, outputDecorator, ...(_c = member.modifiers) != null ? _c : []], member.name, member.questionToken, member.type, member.initializer);
+};
+function createDecorator(name, config, classDecoratorIdentifier, factory, importManager) {
+  const callTarget = factory.createPropertyAccessExpression(
+    importManager.generateNamespaceImport("@angular/core"),
+    ts3.setOriginalNode(factory.createIdentifier(name), classDecoratorIdentifier)
+  );
+  return factory.createDecorator(factory.createCallExpression(callTarget, void 0, [config]));
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/initializer_api_transforms/output_function.mjs
 var initializerApiOutputTransform = (member, host, factory, importManager, classDecorator, isCore) => {
@@ -412,13 +450,14 @@ var decoratorsWithInputs = ["Directive", "Component"];
 var propertyTransforms = [
   signalInputsTransform,
   initializerApiOutputTransform,
-  queryFunctionsTransforms
+  queryFunctionsTransforms,
+  signalModelTransform
 ];
 function getInitializerApiJitTransform(host, isCore) {
   return (ctx) => {
     return (sourceFile) => {
       const importManager = new ImportManager(void 0, void 0, ctx.factory);
-      sourceFile = ts3.visitNode(sourceFile, createTransformVisitor(ctx, host, importManager, isCore), ts3.isSourceFile);
+      sourceFile = ts4.visitNode(sourceFile, createTransformVisitor(ctx, host, importManager, isCore), ts4.isSourceFile);
       const newImports = importManager.getAllImports(sourceFile.fileName);
       if (newImports.length > 0) {
         sourceFile = addImports(ctx.factory, importManager, sourceFile);
@@ -430,15 +469,15 @@ function getInitializerApiJitTransform(host, isCore) {
 function createTransformVisitor(ctx, host, importManager, isCore) {
   const visitor = (node) => {
     var _a;
-    if (ts3.isClassDeclaration(node) && node.name !== void 0) {
+    if (ts4.isClassDeclaration(node) && node.name !== void 0) {
       const angularDecorator = (_a = host.getDecoratorsOfDeclaration(node)) == null ? void 0 : _a.find((d) => decoratorsWithInputs.some((name) => isAngularDecorator(d, name, isCore)));
       if (angularDecorator !== void 0) {
         let hasChanged = false;
         const members = node.members.map((member) => {
-          if (!ts3.isPropertyDeclaration(member)) {
+          if (!ts4.isPropertyDeclaration(member)) {
             return member;
           }
-          if (!ts3.isIdentifier(member.name) && !ts3.isStringLiteralLike(member.name)) {
+          if (!ts4.isIdentifier(member.name) && !ts4.isStringLiteralLike(member.name)) {
             return member;
           }
           for (const transform of propertyTransforms) {
@@ -455,7 +494,7 @@ function createTransformVisitor(ctx, host, importManager, isCore) {
         }
       }
     }
-    return ts3.visitEachChild(node, visitor, ctx);
+    return ts4.visitEachChild(node, visitor, ctx);
   };
   return visitor;
 }
@@ -510,4 +549,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4VX3BEK3.js.map
+//# sourceMappingURL=chunk-QMD6FMYW.js.map

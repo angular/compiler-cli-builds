@@ -39,7 +39,7 @@ import {
   declarationTransformFactory,
   isHostDirectiveMetaForGlobalMode,
   ivyTransformFactory
-} from "./chunk-HWURMW4G.js";
+} from "./chunk-NJFGOCNY.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -50,7 +50,6 @@ import {
   ERROR_DETAILS_PAGE_BASE_URL,
   ErrorCode,
   ExtendedTemplateDiagnosticName,
-  FatalDiagnosticError,
   ImportFlags,
   ImportManager,
   LocalCompilationExtraImportsTracker,
@@ -75,6 +74,7 @@ import {
   getTokenAtPosition,
   isAssignment,
   isDtsPath,
+  isFatalDiagnosticError,
   isNamedClassDeclaration,
   isNonDeclarationTsPath,
   isSymbolWithValueDeclaration,
@@ -88,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-J7GGSYBO.js";
+} from "./chunk-XFL5OADT.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -4443,7 +4443,7 @@ var TcbDirectiveCtorOp = class extends TcbOp {
       if (!this.tcb.env.config.checkTypeOfAttributes && attr.attribute instanceof TmplAstTextAttribute2) {
         continue;
       }
-      for (const { fieldName } of attr.inputs) {
+      for (const { fieldName, isTwoWayBinding } of attr.inputs) {
         if (genericInputs.has(fieldName)) {
           continue;
         }
@@ -4452,7 +4452,8 @@ var TcbDirectiveCtorOp = class extends TcbOp {
           type: "binding",
           field: fieldName,
           expression,
-          sourceSpan: attr.attribute.sourceSpan
+          sourceSpan: attr.attribute.sourceSpan,
+          isTwoWayBinding
         });
       }
     }
@@ -4488,7 +4489,7 @@ var TcbDirectiveInputsOp = class extends TcbOp {
     for (const attr of boundAttrs) {
       const expr = widenBinding(translateInput(attr.attribute, this.tcb, this.scope), this.tcb);
       let assignment = wrapForDiagnostics(expr);
-      for (const { fieldName, required, transformType, isSignal: isSignal2 } of attr.inputs) {
+      for (const { fieldName, required, transformType, isSignal: isSignal2, isTwoWayBinding } of attr.inputs) {
         let target;
         if (required) {
           seenRequiredInputs.add(fieldName);
@@ -4537,6 +4538,9 @@ var TcbDirectiveInputsOp = class extends TcbOp {
         }
         if (attr.attribute.keySpan !== void 0) {
           addParseSpanInfo(target, attr.attribute.keySpan);
+        }
+        if (isTwoWayBinding) {
+          assignment = unwrapWritableSignal(assignment, this.tcb);
         }
         assignment = ts28.factory.createBinaryExpression(target, ts28.SyntaxKind.EqualsToken, assignment);
       }
@@ -5495,7 +5499,10 @@ function tcbCallTypeCtor(dir, tcb, inputs) {
   const members = inputs.map((input) => {
     const propertyName = ts28.factory.createStringLiteral(input.field);
     if (input.type === "binding") {
-      const expr = widenBinding(input.expression, tcb);
+      let expr = widenBinding(input.expression, tcb);
+      if (input.isTwoWayBinding) {
+        expr = unwrapWritableSignal(expr, tcb);
+      }
       const assignment = ts28.factory.createPropertyAssignment(propertyName, wrapForDiagnostics(expr));
       addParseSpanInfo(assignment, input.sourceSpan);
       return assignment;
@@ -5525,7 +5532,8 @@ function getBoundAttributes(directive, node) {
             fieldName: input.classPropertyName,
             required: input.required,
             transformType: ((_a = input.transform) == null ? void 0 : _a.type) || null,
-            isSignal: input.isSignal
+            isSignal: input.isSignal,
+            isTwoWayBinding: attr instanceof TmplAstBoundAttribute && attr.type === 5
           };
         })
       });
@@ -5557,6 +5565,10 @@ function widenBinding(expr, tcb) {
   } else {
     return expr;
   }
+}
+function unwrapWritableSignal(expression, tcb) {
+  const unwrapRef = tcb.env.referenceExternalSymbol(R3Identifiers3.unwrapWritableSignal.moduleName, R3Identifiers3.unwrapWritableSignal.name);
+  return ts28.factory.createCallExpression(unwrapRef, void 0, [expression]);
 }
 var EVENT_PARAMETER = "$event";
 function tcbCreateEventHandler(event, tcb, scope, eventType) {
@@ -7877,10 +7889,19 @@ var NgCompiler = class {
     return this.incrementalCompilation.depGraph.getResourceDependencies(file);
   }
   getDiagnostics() {
-    const diagnostics = [];
-    diagnostics.push(...this.getNonTemplateDiagnostics(), ...this.getTemplateDiagnostics());
-    if (this.options.strictTemplates) {
-      diagnostics.push(...this.getExtendedTemplateDiagnostics());
+    const diagnostics = [
+      ...this.getNonTemplateDiagnostics()
+    ];
+    try {
+      diagnostics.push(...this.getTemplateDiagnostics());
+      if (this.options.strictTemplates) {
+        diagnostics.push(...this.getExtendedTemplateDiagnostics());
+      }
+    } catch (err) {
+      if (!isFatalDiagnosticError(err)) {
+        throw err;
+      }
+      diagnostics.push(err.toDiagnostic());
     }
     return this.addMessageTextDetails(diagnostics);
   }
@@ -7891,11 +7912,11 @@ var NgCompiler = class {
       if (this.options.strictTemplates) {
         diagnostics.push(...this.getExtendedTemplateDiagnostics(file));
       }
-    } catch (e) {
-      if (e instanceof FatalDiagnosticError) {
-        diagnostics.push(e.toDiagnostic());
+    } catch (err) {
+      if (!isFatalDiagnosticError(err)) {
+        throw err;
       }
-      throw e;
+      diagnostics.push(err.toDiagnostic());
     }
     return this.addMessageTextDetails(diagnostics);
   }
@@ -7910,7 +7931,7 @@ var NgCompiler = class {
         diagnostics.push(...extendedTemplateChecker.getDiagnosticsForComponent(component));
       }
     } catch (err) {
-      if (!(err instanceof FatalDiagnosticError)) {
+      if (!isFatalDiagnosticError(err)) {
         throw err;
       }
       diagnostics.push(err.toDiagnostic());
@@ -8170,14 +8191,7 @@ var NgCompiler = class {
       if (sf.isDeclarationFile || this.adapter.isShim(sf)) {
         continue;
       }
-      try {
-        diagnostics.push(...compilation.templateTypeChecker.getDiagnosticsForFile(sf, OptimizeFor.WholeProgram));
-      } catch (err) {
-        if (!(err instanceof FatalDiagnosticError)) {
-          throw err;
-        }
-        diagnostics.push(err.toDiagnostic());
-      }
+      diagnostics.push(...compilation.templateTypeChecker.getDiagnosticsForFile(sf, OptimizeFor.WholeProgram));
     }
     const program = this.programDriver.getProgram();
     this.incrementalStrategy.setIncrementalState(this.incrementalCompilation.state, program);
@@ -9103,4 +9117,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZJZZDW5O.js.map
+//# sourceMappingURL=chunk-UVQ74F5L.js.map

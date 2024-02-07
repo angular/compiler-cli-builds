@@ -128,6 +128,15 @@ export type InputMapping = InputOrOutput & {
      */
     transform: DecoratorInputTransform | null;
 };
+/** Metadata for a model mapping. */
+export interface ModelMapping {
+    /** Node defining the model mapping. */
+    call: ts.CallExpression;
+    /** Information about the input declared by the model. */
+    input: InputMapping;
+    /** Information about the output implicitly declared by the model. */
+    output: InputOrOutput;
+}
 /** Metadata for an `@Input()` transform function. */
 export interface DecoratorInputTransform {
     /**

@@ -29,7 +29,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-J7GGSYBO.js";
+} from "./chunk-XFL5OADT.js";
 import {
   PerfEvent,
   PerfPhase
@@ -4526,6 +4526,34 @@ function tryParseSignalInputMapping(member, reflector, isCore) {
   };
 }
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/model_function.mjs
+function tryParseSignalModelMapping(member, reflector, isCore) {
+  var _a;
+  const model = tryParseInitializerApiMember(["model"], member, reflector, isCore);
+  if (model === null) {
+    return null;
+  }
+  const optionsNode = model.isRequired ? model.call.arguments[0] : model.call.arguments[1];
+  const options = optionsNode !== void 0 ? parseAndValidateInputAndOutputOptions(optionsNode) : null;
+  const classPropertyName = member.name;
+  const bindingPropertyName = (_a = options == null ? void 0 : options.alias) != null ? _a : classPropertyName;
+  return {
+    call: model.call,
+    input: {
+      isSignal: true,
+      transform: null,
+      classPropertyName,
+      bindingPropertyName,
+      required: model.isRequired
+    },
+    output: {
+      isSignal: false,
+      classPropertyName,
+      bindingPropertyName: bindingPropertyName + "Change"
+    }
+  };
+}
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/output_function.mjs
 function tryParseInitializerBasedOutput(member, reflector, isCore) {
   var _a;
@@ -5053,8 +5081,12 @@ function tryParseInputFieldMapping(clazz, member, evaluator, reflector, isCore, 
   const classPropertyName = member.name;
   const decorator = tryGetDecoratorOnMember(member, "Input", isCore);
   const signalInputMapping = tryParseSignalInputMapping(member, reflector, isCore);
+  const modelInputMapping = tryParseSignalModelMapping(member, reflector, isCore);
   if (decorator !== null && signalInputMapping !== null) {
     throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_WITH_DISALLOWED_DECORATOR, decorator.node, `Using @Input with a signal input is not allowed.`);
+  }
+  if (decorator !== null && modelInputMapping !== null) {
+    throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_WITH_DISALLOWED_DECORATOR, decorator.node, `Using @Input with a model input is not allowed.`);
   }
   if (decorator !== null) {
     if (decorator.args !== null && decorator.args.length > 1) {
@@ -5091,6 +5123,9 @@ function tryParseInputFieldMapping(clazz, member, evaluator, reflector, isCore, 
   }
   if (signalInputMapping !== null) {
     return signalInputMapping;
+  }
+  if (modelInputMapping !== null) {
+    return modelInputMapping.input;
   }
   return null;
 }
@@ -5240,21 +5275,31 @@ function parseOutputFields(clazz, classDecorator, members, isCore, reflector, ev
   for (const member of members) {
     const decoratorOutput = tryParseDecoratorOutput(member, evaluator, isCore);
     const initializerOutput = tryParseInitializerBasedOutput(member, reflector, isCore);
+    const modelMapping = tryParseSignalModelMapping(member, reflector, isCore);
     if (decoratorOutput !== null && initializerOutput !== null) {
       throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_WITH_DISALLOWED_DECORATOR, decoratorOutput.decorator.node, `Using "@Output" with "output()" is not allowed.`);
     }
-    const queryNode = (_a = decoratorOutput == null ? void 0 : decoratorOutput.decorator.node) != null ? _a : initializerOutput == null ? void 0 : initializerOutput.call;
+    if (decoratorOutput !== null && modelMapping !== null) {
+      throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_WITH_DISALLOWED_DECORATOR, decoratorOutput.decorator.node, `Using @Output with a model input is not allowed.`);
+    }
+    const queryNode = (_b = (_a = decoratorOutput == null ? void 0 : decoratorOutput.decorator.node) != null ? _a : initializerOutput == null ? void 0 : initializerOutput.call) != null ? _b : modelMapping == null ? void 0 : modelMapping.call;
     if (queryNode !== void 0 && member.isStatic) {
       throw new FatalDiagnosticError(ErrorCode.INCORRECTLY_DECLARED_ON_STATIC_MEMBER, queryNode, `Output is incorrectly declared on a static class member.`);
     }
-    const metadata = (_b = decoratorOutput != null ? decoratorOutput : initializerOutput) == null ? void 0 : _b.metadata;
-    if (metadata === void 0) {
+    let bindingPropertyName;
+    if (decoratorOutput !== null) {
+      bindingPropertyName = decoratorOutput.metadata.bindingPropertyName;
+    } else if (initializerOutput !== null) {
+      bindingPropertyName = initializerOutput.metadata.bindingPropertyName;
+    } else if (modelMapping !== null) {
+      bindingPropertyName = modelMapping.output.bindingPropertyName;
+    } else {
       continue;
     }
-    if (initializerOutput !== null && outputsFromMeta.hasOwnProperty(metadata.classPropertyName)) {
+    if ((initializerOutput !== null || modelMapping !== null) && outputsFromMeta.hasOwnProperty(member.name)) {
       throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_DECORATOR_METADATA_COLLISION, (_c = member.node) != null ? _c : clazz, `Output "${member.name}" is unexpectedly declared in @${classDecorator.name} as well.`);
     }
-    outputs[metadata == null ? void 0 : metadata.classPropertyName] = metadata.bindingPropertyName;
+    outputs[member.name] = bindingPropertyName;
   }
   return outputs;
 }
@@ -8247,6 +8292,7 @@ export {
   LocalModuleScopeRegistry,
   TypeCheckScopeRegistry,
   tryParseSignalInputMapping,
+  tryParseSignalModelMapping,
   tryParseInitializerBasedOutput,
   tryParseSignalQueryFromInitializer,
   queryDecoratorNames,
@@ -8270,4 +8316,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-HWURMW4G.js.map
+//# sourceMappingURL=chunk-NJFGOCNY.js.map

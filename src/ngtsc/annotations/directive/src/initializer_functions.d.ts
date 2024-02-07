@@ -18,7 +18,7 @@ import { ClassMember, ReflectionHost } from '../../../reflection';
  * Similarly, signal-based queries follow the same pattern and are also
  * declared through initializer APIs.
  */
-export type InitializerApiFunction = 'input' | 'ɵoutput' | 'output' | 'viewChild' | 'viewChildren' | 'contentChild' | 'contentChildren';
+export type InitializerApiFunction = 'input' | 'model' | 'ɵoutput' | 'output' | 'viewChild' | 'viewChildren' | 'contentChild' | 'contentChildren';
 /**
  * Metadata describing an Angular class member that was recognized through
  * a function initializer. Like `input`, `input.required` or `viewChild`.
