@@ -7,13 +7,13 @@ import {
   addImports,
   isAngularDecorator,
   tryParseSignalInputMapping
-} from "./chunk-WSN2JZY6.js";
+} from "./chunk-OJA52XGE.js";
 import {
   ImportManager,
   TypeScriptReflectionHost,
   isAliasImportDeclaration,
   loadIsReferencedAliasDeclarationPatch
-} from "./chunk-T5BKID5K.js";
+} from "./chunk-C7YE4OKM.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/downlevel_decorators_transform.mjs
 import ts from "typescript";
@@ -427,4 +427,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-PNUO43JH.js.map
+//# sourceMappingURL=chunk-WXOFPBWU.js.map

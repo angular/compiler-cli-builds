@@ -7,12 +7,13 @@
  */
 import ts from 'typescript';
 import { ErrorCode } from './error_code';
-export declare class FatalDiagnosticError {
+export declare class FatalDiagnosticError extends Error {
     readonly code: ErrorCode;
     readonly node: ts.Node;
-    readonly message: string | ts.DiagnosticMessageChain;
+    readonly diagnosticMessage: string | ts.DiagnosticMessageChain;
     readonly relatedInformation?: ts.DiagnosticRelatedInformation[] | undefined;
-    constructor(code: ErrorCode, node: ts.Node, message: string | ts.DiagnosticMessageChain, relatedInformation?: ts.DiagnosticRelatedInformation[] | undefined);
+    constructor(code: ErrorCode, node: ts.Node, diagnosticMessage: string | ts.DiagnosticMessageChain, relatedInformation?: ts.DiagnosticRelatedInformation[] | undefined);
+    message: never;
     toDiagnostic(): ts.DiagnosticWithLocation;
 }
 export declare function makeDiagnostic(code: ErrorCode, node: ts.Node, messageText: string | ts.DiagnosticMessageChain, relatedInformation?: ts.DiagnosticRelatedInformation[]): ts.DiagnosticWithLocation;

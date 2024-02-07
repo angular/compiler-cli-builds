@@ -38,7 +38,7 @@ import {
   aliasTransformFactory,
   declarationTransformFactory,
   ivyTransformFactory
-} from "./chunk-WSN2JZY6.js";
+} from "./chunk-OJA52XGE.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -49,7 +49,6 @@ import {
   ERROR_DETAILS_PAGE_BASE_URL,
   ErrorCode,
   ExtendedTemplateDiagnosticName,
-  FatalDiagnosticError,
   ImportFlags,
   ImportManager,
   LocalIdentifierStrategy,
@@ -73,6 +72,7 @@ import {
   getTokenAtPosition,
   isAssignment,
   isDtsPath,
+  isFatalDiagnosticError,
   isNamedClassDeclaration,
   isNonDeclarationTsPath,
   isSymbolWithValueDeclaration,
@@ -86,7 +86,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-T5BKID5K.js";
+} from "./chunk-C7YE4OKM.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -7864,10 +7864,19 @@ var NgCompiler = class {
     return this.incrementalCompilation.depGraph.getResourceDependencies(file);
   }
   getDiagnostics() {
-    const diagnostics = [];
-    diagnostics.push(...this.getNonTemplateDiagnostics(), ...this.getTemplateDiagnostics());
-    if (this.options.strictTemplates) {
-      diagnostics.push(...this.getExtendedTemplateDiagnostics());
+    const diagnostics = [
+      ...this.getNonTemplateDiagnostics()
+    ];
+    try {
+      diagnostics.push(...this.getTemplateDiagnostics());
+      if (this.options.strictTemplates) {
+        diagnostics.push(...this.getExtendedTemplateDiagnostics());
+      }
+    } catch (err) {
+      if (!isFatalDiagnosticError(err)) {
+        throw err;
+      }
+      diagnostics.push(err.toDiagnostic());
     }
     return this.addMessageTextDetails(diagnostics);
   }
@@ -7878,11 +7887,11 @@ var NgCompiler = class {
       if (this.options.strictTemplates) {
         diagnostics.push(...this.getExtendedTemplateDiagnostics(file));
       }
-    } catch (e) {
-      if (e instanceof FatalDiagnosticError) {
-        diagnostics.push(e.toDiagnostic());
+    } catch (err) {
+      if (!isFatalDiagnosticError(err)) {
+        throw err;
       }
-      throw e;
+      diagnostics.push(err.toDiagnostic());
     }
     return this.addMessageTextDetails(diagnostics);
   }
@@ -7897,7 +7906,7 @@ var NgCompiler = class {
         diagnostics.push(...extendedTemplateChecker.getDiagnosticsForComponent(component));
       }
     } catch (err) {
-      if (!(err instanceof FatalDiagnosticError)) {
+      if (!isFatalDiagnosticError(err)) {
         throw err;
       }
       diagnostics.push(err.toDiagnostic());
@@ -8157,14 +8166,7 @@ var NgCompiler = class {
       if (sf.isDeclarationFile || this.adapter.isShim(sf)) {
         continue;
       }
-      try {
-        diagnostics.push(...compilation.templateTypeChecker.getDiagnosticsForFile(sf, OptimizeFor.WholeProgram));
-      } catch (err) {
-        if (!(err instanceof FatalDiagnosticError)) {
-          throw err;
-        }
-        diagnostics.push(err.toDiagnostic());
-      }
+      diagnostics.push(...compilation.templateTypeChecker.getDiagnosticsForFile(sf, OptimizeFor.WholeProgram));
     }
     const program = this.programDriver.getProgram();
     this.incrementalStrategy.setIncrementalState(this.incrementalCompilation.state, program);
@@ -9083,4 +9085,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-K6R7Z4L4.js.map
+//# sourceMappingURL=chunk-GILDNKES.js.map

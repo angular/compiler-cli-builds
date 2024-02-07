@@ -950,16 +950,18 @@ function ngErrorCode(code) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
-var FatalDiagnosticError = class {
-  constructor(code, node, message, relatedInformation) {
+var FatalDiagnosticError = class extends Error {
+  constructor(code, node, diagnosticMessage, relatedInformation) {
+    super(`FatalDiagnosticError #${code}: ${diagnosticMessage}`);
     this.code = code;
     this.node = node;
-    this.message = message;
+    this.diagnosticMessage = diagnosticMessage;
     this.relatedInformation = relatedInformation;
+    this.message = null;
     this._isFatalDiagnosticError = true;
   }
   toDiagnostic() {
-    return makeDiagnostic(this.code, this.node, this.message, this.relatedInformation);
+    return makeDiagnostic(this.code, this.node, this.diagnosticMessage, this.relatedInformation);
   }
 };
 function makeDiagnostic(code, node, messageText, relatedInformation) {
@@ -1003,6 +1005,9 @@ function addDiagnosticChain(messageText, add) {
     messageText.next.push(...add);
   }
   return messageText;
+}
+function isFatalDiagnosticError(err) {
+  return err._isFatalDiagnosticError === true;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error_details_base_url.mjs
@@ -2428,6 +2433,7 @@ export {
   makeDiagnosticChain,
   makeRelatedInformation,
   addDiagnosticChain,
+  isFatalDiagnosticError,
   ERROR_DETAILS_PAGE_BASE_URL,
   ExtendedTemplateDiagnosticName,
   isSymbolWithValueDeclaration,
@@ -2498,4 +2504,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-T5BKID5K.js.map
+//# sourceMappingURL=chunk-C7YE4OKM.js.map
