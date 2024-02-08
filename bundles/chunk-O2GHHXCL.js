@@ -12,7 +12,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-DUY2FPLZ.js";
+} from "./chunk-UM6JO3VZ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/typescript.mjs
 import ts4 from "typescript";
@@ -959,6 +959,7 @@ var FatalDiagnosticError = class extends Error {
     this.relatedInformation = relatedInformation;
     this.message = null;
     this._isFatalDiagnosticError = true;
+    Object.setPrototypeOf(this, new.target.prototype);
   }
   toDiagnostic() {
     return makeDiagnostic(this.code, this.node, this.diagnosticMessage, this.relatedInformation);
@@ -2504,4 +2505,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-C7YE4OKM.js.map
+//# sourceMappingURL=chunk-O2GHHXCL.js.map
