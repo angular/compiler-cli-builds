@@ -7385,7 +7385,7 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
   }
 };
 function isSignal(symbol) {
-  return ((symbol == null ? void 0 : symbol.escapedName) === "WritableSignal" || (symbol == null ? void 0 : symbol.escapedName) === "Signal" || (symbol == null ? void 0 : symbol.escapedName) === "InputSignal" || (symbol == null ? void 0 : symbol.escapedName) === "InputSignalWithTransform") && symbol.parent.escapedName.includes("@angular/core");
+  return ((symbol == null ? void 0 : symbol.escapedName) === "WritableSignal" || (symbol == null ? void 0 : symbol.escapedName) === "Signal" || (symbol == null ? void 0 : symbol.escapedName) === "InputSignal" || (symbol == null ? void 0 : symbol.escapedName) === "InputSignalWithTransform" || (symbol == null ? void 0 : symbol.escapedName) === "ModelSignal") && symbol.parent.escapedName.includes("@angular/core");
 }
 function buildDiagnosticForSignal(ctx, node, component) {
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
@@ -9117,4 +9117,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-R7LEZKGA.js.map
+//# sourceMappingURL=chunk-JIFH6OZK.js.map
