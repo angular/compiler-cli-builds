@@ -273,7 +273,7 @@ function isWithinBasePath(base, path) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/node_js_file_system.mjs
 import fs2 from "fs";
-import module from "module";
+import { createRequire } from "module";
 import * as p from "path";
 import { fileURLToPath } from "url";
 var NodeJSPathManipulation = class {
@@ -347,7 +347,7 @@ var NodeJSReadonlyFileSystem = class extends NodeJSPathManipulation {
     return this.resolve(fs2.realpathSync(path));
   }
   getDefaultLibLocation() {
-    const requireFn = isCommonJS ? __require : module.createRequire(currentFileUrl);
+    const requireFn = isCommonJS ? __require : createRequire(currentFileUrl);
     return this.resolve(requireFn.resolve("typescript"), "..");
   }
 };
@@ -407,4 +407,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-DUY2FPLZ.js.map
+//# sourceMappingURL=chunk-UM6JO3VZ.js.map
