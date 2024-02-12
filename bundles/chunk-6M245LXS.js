@@ -29,7 +29,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-CVK4HV4K.js";
+} from "./chunk-WTUY4U7E.js";
 import {
   PerfEvent,
   PerfPhase
@@ -5381,7 +5381,7 @@ function extractHostDirectives(rawHostDirectives, evaluator, compilationMode) {
     let nameForErrors = (fieldName) => "@Directive.hostDirectives";
     if (compilationMode === CompilationMode.LOCAL && hostReference instanceof DynamicValue) {
       if (!ts23.isIdentifier(hostReference.node) && !ts23.isPropertyAccessExpression(hostReference.node)) {
-        throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_EXPRESSION_FOR_HOST_DIRECTIVE, hostReference.node, `In local compilation mode, host directive cannot be an expression. Use an identifier instead`);
+        throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, hostReference.node, `In local compilation mode, host directive cannot be an expression. Use an identifier instead`);
       }
       directive = new WrappedNodeExpr5(hostReference.node);
     } else if (hostReference instanceof Reference) {
@@ -8316,4 +8316,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-PQBKKYRL.js.map
+//# sourceMappingURL=chunk-6M245LXS.js.map

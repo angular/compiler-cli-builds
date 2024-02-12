@@ -21,3 +21,10 @@ export declare function makeDiagnosticChain(messageText: string, next?: ts.Diagn
 export declare function makeRelatedInformation(node: ts.Node, messageText: string): ts.DiagnosticRelatedInformation;
 export declare function addDiagnosticChain(messageText: string | ts.DiagnosticMessageChain, add: ts.DiagnosticMessageChain[]): ts.DiagnosticMessageChain;
 export declare function isFatalDiagnosticError(err: any): err is FatalDiagnosticError;
+/**
+ * Whether the compiler diagnostics represents an error related to local compilation mode.
+ *
+ * This helper has application in 1P where we check whether a diagnostic is related to local
+ * compilation in order to add some g3 specific info to it.
+ */
+export declare function isLocalCompilationDiagnostics(diagnostic: ts.Diagnostic): boolean;
