@@ -4539,7 +4539,7 @@ var TcbDirectiveInputsOp = class extends TcbOp {
         if (attr.attribute.keySpan !== void 0) {
           addParseSpanInfo(target, attr.attribute.keySpan);
         }
-        if (isTwoWayBinding) {
+        if (isTwoWayBinding && this.tcb.env.config.allowSignalsInTwoWayBindings) {
           assignment = unwrapWritableSignal(assignment, this.tcb);
         }
         assignment = ts28.factory.createBinaryExpression(target, ts28.SyntaxKind.EqualsToken, assignment);
@@ -5500,7 +5500,7 @@ function tcbCallTypeCtor(dir, tcb, inputs) {
     const propertyName = ts28.factory.createStringLiteral(input.field);
     if (input.type === "binding") {
       let expr = widenBinding(input.expression, tcb);
-      if (input.isTwoWayBinding) {
+      if (input.isTwoWayBinding && tcb.env.config.allowSignalsInTwoWayBindings) {
         expr = unwrapWritableSignal(expr, tcb);
       }
       const assignment = ts28.factory.createPropertyAssignment(propertyName, wrapForDiagnostics(expr));
@@ -7829,6 +7829,7 @@ var NgCompiler = class {
     this.delegatingPerfRecorder = new DelegatingPerfRecorder(this.perfRecorder);
     this.enableTemplateTypeChecker = enableTemplateTypeChecker || ((_a = options["_enableTemplateTypeChecker"]) != null ? _a : false);
     this.enableBlockSyntax = (_b = options["_enableBlockSyntax"]) != null ? _b : true;
+    this.angularCoreVersion = options["_angularCoreVersion"] == null ? null : new Version(options["_angularCoreVersion"]);
     this.constructionDiagnostics.push(...this.adapter.constructionDiagnostics, ...verifyCompatibleTypeCheckOptions(this.options));
     this.currentProgram = inputProgram;
     this.closureCompilerEnabled = !!this.options.annotateForClosureCompiler;
@@ -8095,6 +8096,7 @@ var NgCompiler = class {
     var _a, _b, _c, _d;
     const strictTemplates = !!this.options.strictTemplates;
     const useInlineTypeConstructors = this.programDriver.supportsInlineOperations;
+    const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || this.angularCoreVersion.major > 17 || this.angularCoreVersion.major === 17 && this.angularCoreVersion.minor >= 2 || (this.angularCoreVersion.major === 0 && this.angularCoreVersion.minor === 0 || this.angularCoreVersion.patch === 0);
     let typeCheckingConfig;
     if (this.fullTemplateTypeCheck) {
       typeCheckingConfig = {
@@ -8119,7 +8121,8 @@ var NgCompiler = class {
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
         suggestionsForSuboptimalTypeInference: this.enableTemplateTypeChecker && !strictTemplates,
-        controlFlowPreventingContentProjection: ((_a = this.options.extendedDiagnostics) == null ? void 0 : _a.defaultCategory) || DiagnosticCategoryLabel.Warning
+        controlFlowPreventingContentProjection: ((_a = this.options.extendedDiagnostics) == null ? void 0 : _a.defaultCategory) || DiagnosticCategoryLabel.Warning,
+        allowSignalsInTwoWayBindings
       };
     } else {
       typeCheckingConfig = {
@@ -8144,7 +8147,8 @@ var NgCompiler = class {
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
         suggestionsForSuboptimalTypeInference: false,
-        controlFlowPreventingContentProjection: ((_b = this.options.extendedDiagnostics) == null ? void 0 : _b.defaultCategory) || DiagnosticCategoryLabel.Warning
+        controlFlowPreventingContentProjection: ((_b = this.options.extendedDiagnostics) == null ? void 0 : _b.defaultCategory) || DiagnosticCategoryLabel.Warning,
+        allowSignalsInTwoWayBindings
       };
     }
     if (this.options.strictInputTypes !== void 0) {
@@ -8515,6 +8519,15 @@ function versionMapFromProgram(program, driver) {
   }
   return versions;
 }
+var Version = class {
+  constructor(full) {
+    this.full = full;
+    [this.major, this.minor, this.patch] = full.split(".").map((part) => {
+      const parsed = parseInt(part);
+      return isNaN(parsed) ? -1 : parsed;
+    });
+  }
+};
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/host.mjs
 import ts36 from "typescript";
@@ -9117,4 +9130,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZORU7UHK.js.map
+//# sourceMappingURL=chunk-AOTH5CUB.js.map
