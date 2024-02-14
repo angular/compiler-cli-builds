@@ -8096,7 +8096,7 @@ var NgCompiler = class {
     var _a, _b, _c, _d;
     const strictTemplates = !!this.options.strictTemplates;
     const useInlineTypeConstructors = this.programDriver.supportsInlineOperations;
-    const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || this.angularCoreVersion.major > 17 || this.angularCoreVersion.major === 17 && this.angularCoreVersion.minor >= 2 || (this.angularCoreVersion.major === 0 && this.angularCoreVersion.minor === 0 || this.angularCoreVersion.patch === 0);
+    const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || this.angularCoreVersion.major > 17 || this.angularCoreVersion.major === 17 && this.angularCoreVersion.minor >= 2 || this.angularCoreVersion.major === 0 && this.angularCoreVersion.minor === 0 && this.angularCoreVersion.patch === 0;
     let typeCheckingConfig;
     if (this.fullTemplateTypeCheck) {
       typeCheckingConfig = {
@@ -9130,4 +9130,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-AOTH5CUB.js.map
+//# sourceMappingURL=chunk-NBBW7IPD.js.map
