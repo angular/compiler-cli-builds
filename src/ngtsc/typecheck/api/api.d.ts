@@ -290,6 +290,10 @@ export interface TypeCheckingConfig {
      * opportunities to improve their own developer experience.
      */
     suggestionsForSuboptimalTypeInference: boolean;
+    /**
+     * Whether the type of two-way bindings should be widened to allow `WritableSignal`.
+     */
+    allowSignalsInTwoWayBindings: boolean;
 }
 export type TemplateSourceMapping = DirectTemplateSourceMapping | IndirectTemplateSourceMapping | ExternalTemplateSourceMapping;
 /**
