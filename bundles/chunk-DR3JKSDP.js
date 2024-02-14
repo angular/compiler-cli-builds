@@ -271,7 +271,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "17.3.0-next.0+sha-12d4b8e";
+var PLACEHOLDER_VERSION = "17.3.0-next.0+sha-da7fbb4";
 var SHOULD_USE_TEMPLATE_PIPELINE_FOR_LINKER = false;
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
@@ -973,6 +973,9 @@ Attempting to continue using this version of Angular.`);
   }
 };
 function getRange(comparator, versionStr) {
+  if (versionStr === "0.0.0" && PLACEHOLDER_VERSION === "0.0.0") {
+    return new semver2.Range("*.*.*");
+  }
   const version = new semver2.SemVer(versionStr);
   version.prerelease = [];
   return new semver2.Range(`${comparator}${version.format()}`);
@@ -1083,4 +1086,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-OQU7V5PD.js.map
+//# sourceMappingURL=chunk-DR3JKSDP.js.map
