@@ -7670,9 +7670,10 @@ var ComponentDecoratorHandler = class {
         if (importDecl !== null && this.deferredSymbolTracker.canDefer(importDecl)) {
           deferBlockDep.isDeferrable = true;
           deferBlockDep.importPath = importDecl.moduleSpecifier.text;
+          deferBlockDep.isDefaultImport = isDefaultImport(importDecl);
           deferrableTypes.set(deferBlockDep.symbolName, {
             importPath: deferBlockDep.importPath,
-            isDefaultImport: isDefaultImport(importDecl)
+            isDefaultImport: deferBlockDep.isDefaultImport
           });
         }
       }
@@ -8316,4 +8317,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-6M245LXS.js.map
+//# sourceMappingURL=chunk-SYQVL5NR.js.map
