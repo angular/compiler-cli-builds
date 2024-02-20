@@ -12,7 +12,7 @@ import {
   tryParseSignalInputMapping,
   tryParseSignalModelMapping,
   tryParseSignalQueryFromInitializer
-} from "./chunk-PQBKKYRL.js";
+} from "./chunk-K5VKFWQ3.js";
 import {
   ImportManager,
   TypeScriptReflectionHost,
@@ -549,4 +549,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KYE5EYIK.js.map
+//# sourceMappingURL=chunk-3NQCS6TU.js.map

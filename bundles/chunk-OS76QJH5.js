@@ -39,7 +39,7 @@ import {
   declarationTransformFactory,
   isHostDirectiveMetaForGlobalMode,
   ivyTransformFactory
-} from "./chunk-PQBKKYRL.js";
+} from "./chunk-K5VKFWQ3.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -9130,4 +9130,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KMYUI7UU.js.map
+//# sourceMappingURL=chunk-OS76QJH5.js.map
