@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
-import { ConstantEntry } from './entities';
+import { ConstantEntry, EnumEntry } from './entities';
 /** Extracts documentation entry for a constant. */
-export declare function extractConstant(declaration: ts.VariableDeclaration, typeChecker: ts.TypeChecker): ConstantEntry;
+export declare function extractConstant(declaration: ts.VariableDeclaration, typeChecker: ts.TypeChecker): ConstantEntry | EnumEntry;
 /** Gets whether a given constant is an Angular-added const that should be ignored for docs. */
 export declare function isSyntheticAngularConstant(declaration: ts.VariableDeclaration): boolean;
