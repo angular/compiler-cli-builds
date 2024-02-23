@@ -7779,7 +7779,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
-var SHOULD_USE_TEMPLATE_PIPELINE = false;
+var SHOULD_USE_TEMPLATE_PIPELINE = true;
 var CompilationTicketKind;
 (function(CompilationTicketKind2) {
   CompilationTicketKind2[CompilationTicketKind2["Fresh"] = 0] = "Fresh";
@@ -9167,4 +9167,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-MDDJ57CT.js.map
+//# sourceMappingURL=chunk-S4IVFC6S.js.map
