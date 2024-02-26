@@ -7,7 +7,6 @@
  */
 import { R3QueryMetadata } from '@angular/compiler';
 import ts from 'typescript';
-import { ImportedSymbolsTracker } from '../../../imports';
 import { ClassMember, ReflectionHost } from '../../../reflection';
 /** Possible query initializer API functions. */
 export type QueryFunctionName = 'viewChild' | 'contentChild' | 'viewChildren' | 'contentChildren';
@@ -19,7 +18,7 @@ export type QueryFunctionName = 'viewChild' | 'contentChild' | 'viewChildren' | 
  *
  * @returns Resolved query metadata, or null if no query is declared.
  */
-export declare function tryParseSignalQueryFromInitializer(member: Pick<ClassMember, 'name' | 'value'>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker): {
+export declare function tryParseSignalQueryFromInitializer(member: Pick<ClassMember, 'name' | 'value'>, reflector: ReflectionHost, isCore: boolean): {
     name: QueryFunctionName;
     metadata: R3QueryMetadata;
     call: ts.CallExpression;
