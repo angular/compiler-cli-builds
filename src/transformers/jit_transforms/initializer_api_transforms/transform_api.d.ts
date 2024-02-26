@@ -6,13 +6,12 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
-import { ImportedSymbolsTracker } from '../../../ngtsc/imports';
-import { Decorator, ReflectionHost } from '../../../ngtsc/reflection';
+import { Decorator, ReflectionHost } from '../../..//ngtsc/reflection';
 import { ImportManager } from '../../../ngtsc/translator';
 /** Function that can be used to transform class properties. */
 export type PropertyTransform = (node: ts.PropertyDeclaration & {
     name: ts.Identifier | ts.StringLiteralLike;
-}, host: ReflectionHost, factory: ts.NodeFactory, importTracker: ImportedSymbolsTracker, importManager: ImportManager, classDecorator: Decorator, isCore: boolean) => ts.PropertyDeclaration;
+}, host: ReflectionHost, factory: ts.NodeFactory, importManager: ImportManager, classDecorator: Decorator, isCore: boolean) => ts.PropertyDeclaration;
 /**
  * Creates an import and access for a given Angular core import while
  * ensuring the decorator symbol access can be traced back to an Angular core
