@@ -7804,6 +7804,15 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ...ALL_DIAGNOSTIC_FACTORIES.map((factory9) => factory9.name)
 ]);
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/feature_detection.mjs
+import semver from "semver";
+function coreVersionSupportsFeature(coreVersion, minVersion) {
+  if (coreVersion === `0.0.0-${"PLACEHOLDER"}`) {
+    return true;
+  }
+  return semver.satisfies(coreVersion, minVersion);
+}
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
 var SHOULD_USE_TEMPLATE_PIPELINE = true;
 var CompilationTicketKind;
@@ -7877,7 +7886,7 @@ var NgCompiler = class {
     }
   }
   constructor(adapter, options, inputProgram, programDriver, incrementalStrategy, incrementalCompilation, enableTemplateTypeChecker, usePoisonedData, livePerfRecorder) {
-    var _a, _b;
+    var _a, _b, _c;
     this.adapter = adapter;
     this.options = options;
     this.inputProgram = inputProgram;
@@ -7892,7 +7901,7 @@ var NgCompiler = class {
     this.delegatingPerfRecorder = new DelegatingPerfRecorder(this.perfRecorder);
     this.enableTemplateTypeChecker = enableTemplateTypeChecker || ((_a = options["_enableTemplateTypeChecker"]) != null ? _a : false);
     this.enableBlockSyntax = (_b = options["_enableBlockSyntax"]) != null ? _b : true;
-    this.angularCoreVersion = options["_angularCoreVersion"] == null ? null : new Version(options["_angularCoreVersion"]);
+    this.angularCoreVersion = (_c = options["_angularCoreVersion"]) != null ? _c : null;
     this.constructionDiagnostics.push(...this.adapter.constructionDiagnostics, ...verifyCompatibleTypeCheckOptions(this.options));
     this.currentProgram = inputProgram;
     this.closureCompilerEnabled = !!this.options.annotateForClosureCompiler;
@@ -8159,7 +8168,7 @@ var NgCompiler = class {
     var _a, _b, _c, _d;
     const strictTemplates = !!this.options.strictTemplates;
     const useInlineTypeConstructors = this.programDriver.supportsInlineOperations;
-    const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || this.angularCoreVersion.major > 17 || this.angularCoreVersion.major === 17 && this.angularCoreVersion.minor >= 2 || this.angularCoreVersion.major === 0 && this.angularCoreVersion.minor === 0 && this.angularCoreVersion.patch === 0;
+    const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0-0");
     let typeCheckingConfig;
     if (this.fullTemplateTypeCheck) {
       typeCheckingConfig = {
@@ -8583,15 +8592,6 @@ function versionMapFromProgram(program, driver) {
   }
   return versions;
 }
-var Version = class {
-  constructor(full) {
-    this.full = full;
-    [this.major, this.minor, this.patch] = full.split(".").map((part) => {
-      const parsed = parseInt(part);
-      return isNaN(parsed) ? -1 : parsed;
-    });
-  }
-};
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/host.mjs
 import ts38 from "typescript";
@@ -9187,6 +9187,13 @@ export {
   performCompilation,
   defaultGatherDiagnostics
 };
+/*!
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -9194,4 +9201,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZNYVMEGP.js.map
+//# sourceMappingURL=chunk-B3N6GPMQ.js.map
