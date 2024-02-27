@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
+import { ImportedSymbolsTracker } from '../../../ngtsc/imports';
 import { ReflectionHost } from '../../../ngtsc/reflection';
 /**
  * Creates an AST transform that looks for Angular classes and transforms
@@ -14,4 +15,4 @@ import { ReflectionHost } from '../../../ngtsc/reflection';
  * For example, an `input()` member may be transformed to add an `@Input`
  * decorator for JIT.
  */
-export declare function getInitializerApiJitTransform(host: ReflectionHost, isCore: boolean): ts.TransformerFactory<ts.SourceFile>;
+export declare function getInitializerApiJitTransform(host: ReflectionHost, importTracker: ImportedSymbolsTracker, isCore: boolean): ts.TransformerFactory<ts.SourceFile>;

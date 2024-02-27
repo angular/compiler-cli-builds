@@ -7,7 +7,7 @@
  */
 import { ConstantPool, R3ClassMetadata, R3DirectiveMetadata } from '@angular/compiler';
 import ts from 'typescript';
-import { Reference, ReferenceEmitter } from '../../../imports';
+import { ImportedSymbolsTracker, Reference, ReferenceEmitter } from '../../../imports';
 import { SemanticDepGraphUpdater } from '../../../incremental/semantic_graph';
 import { ClassPropertyMapping, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping, MetadataReader, MetadataRegistry } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
@@ -45,11 +45,12 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     private semanticDepGraphUpdater;
     private annotateForClosureCompiler;
     private perf;
+    private importTracker;
     private includeClassMetadata;
     private readonly compilationMode;
     private readonly useTemplatePipeline;
     private readonly generateExtraImportsInLocalMode;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, strictCtorDeps: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, includeClassMetadata: boolean, compilationMode: CompilationMode, useTemplatePipeline: boolean, generateExtraImportsInLocalMode: boolean);
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, strictCtorDeps: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, compilationMode: CompilationMode, useTemplatePipeline: boolean, generateExtraImportsInLocalMode: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name = "DirectiveDecoratorHandler";
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
