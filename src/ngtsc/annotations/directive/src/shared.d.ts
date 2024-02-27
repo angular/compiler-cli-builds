@@ -7,7 +7,7 @@
  */
 import { ParsedHostBindings, R3DirectiveMetadata, R3QueryMetadata } from '@angular/compiler';
 import ts from 'typescript';
-import { Reference, ReferenceEmitter } from '../../../imports';
+import { ImportedSymbolsTracker, Reference, ReferenceEmitter } from '../../../imports';
 import { ClassPropertyMapping, DecoratorInputTransform, HostDirectiveMeta, InputMapping } from '../../../metadata';
 import { DynamicValue, PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, ClassMember, Decorator, ReflectionHost } from '../../../reflection';
@@ -21,7 +21,7 @@ export declare const queryDecoratorNames: QueryDecoratorName[];
  * appear in the declarations of an `NgModule` and additional verification is done when processing
  * the module.
  */
-export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator>, reflector: ReflectionHost, evaluator: PartialEvaluator, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, annotateForClosureCompiler: boolean, compilationMode: CompilationMode, defaultSelector: string | null, useTemplatePipeline: boolean): {
+export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker, evaluator: PartialEvaluator, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, annotateForClosureCompiler: boolean, compilationMode: CompilationMode, defaultSelector: string | null, useTemplatePipeline: boolean): {
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;
     inputs: ClassPropertyMapping<InputMapping>;

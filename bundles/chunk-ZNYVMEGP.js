@@ -39,7 +39,7 @@ import {
   declarationTransformFactory,
   isHostDirectiveMetaForGlobalMode,
   ivyTransformFactory
-} from "./chunk-SYQVL5NR.js";
+} from "./chunk-YXQVJIUH.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -52,6 +52,7 @@ import {
   ExtendedTemplateDiagnosticName,
   ImportFlags,
   ImportManager,
+  ImportedSymbolsTracker,
   LocalCompilationExtraImportsTracker,
   LocalIdentifierStrategy,
   LogicalProjectStrategy,
@@ -88,7 +89,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-WTUY4U7E.js";
+} from "./chunk-4FMRFW4X.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -273,7 +274,7 @@ function compareVersions(v1, v2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
 var MIN_TS_VERSION = "5.2.0";
-var MAX_TS_VERSION = "5.4.0";
+var MAX_TS_VERSION = "5.5.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
@@ -877,9 +878,12 @@ function isSyntheticAngularConstant(declaration) {
   return declaration.name.getText() === "USED_FOR_NG_TYPE_CHECKING";
 }
 function extractLiteralPropertiesAsEnumMembers(declaration) {
-  const initializer = declaration.initializer;
+  let initializer = declaration.initializer;
+  while (initializer && (ts7.isAsExpression(initializer) || ts7.isParenthesizedExpression(initializer))) {
+    initializer = initializer.expression;
+  }
   if (initializer === void 0 || !ts7.isObjectLiteralExpression(initializer)) {
-    throw new Error(`Declaration tagged with "${LITERAL_AS_ENUM_TAG}" must be initialized to an object literal`);
+    throw new Error(`Declaration tagged with "${LITERAL_AS_ENUM_TAG}" must be initialized to an object literal, but received ${initializer ? ts7.SyntaxKind[initializer.kind] : "undefined"}`);
   }
   return initializer.properties.map((prop) => {
     if (!ts7.isPropertyAssignment(prop) || !ts7.isIdentifier(prop.name)) {
@@ -7412,6 +7416,8 @@ var SIGNAL_FNS = /* @__PURE__ */ new Set([
   "InputSignalWithTransform",
   "ModelSignal"
 ]);
+var SIGNAL_INSTANCE_PROPERTIES = /* @__PURE__ */ new Set(["set", "update", "asReadonly"]);
+var FUNCTION_INSTANCE_PROPERTIES = /* @__PURE__ */ new Set(["name", "length", "prototype"]);
 var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
   constructor() {
     super(...arguments);
@@ -7431,11 +7437,24 @@ function isSignal(symbol) {
     return (ts33.isInterfaceDeclaration(decl) || ts33.isTypeAliasDeclaration(decl)) && SIGNAL_FNS.has(decl.name.text) && (fileName.includes("@angular/core") || fileName.includes("angular2/rc/packages/core"));
   });
 }
+function isFunctionInstanceProperty(name) {
+  return FUNCTION_INSTANCE_PROPERTIES.has(name);
+}
+function isSignalInstanceProperty(name) {
+  return SIGNAL_INSTANCE_PROPERTIES.has(name);
+}
 function buildDiagnosticForSignal(ctx, node, component) {
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
   if ((symbol == null ? void 0 : symbol.kind) === SymbolKind.Expression && (isSignal(symbol.tsType.symbol) || isSignal(symbol.tsType.aliasSymbol))) {
     const templateMapping = ctx.templateTypeChecker.getTemplateMappingAtTcbLocation(symbol.tcbLocation);
     const errorString = `${node.name} is a function and should be invoked: ${node.name}()`;
+    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
+    return [diagnostic];
+  }
+  const symbolOfReceiver = ctx.templateTypeChecker.getSymbolOfNode(node.receiver, component);
+  if ((isFunctionInstanceProperty(node.name) || isSignalInstanceProperty(node.name)) && (symbolOfReceiver == null ? void 0 : symbolOfReceiver.kind) === SymbolKind.Expression && (isSignal(symbolOfReceiver.tsType.symbol) || isSignal(symbolOfReceiver.tsType.aliasSymbol))) {
+    const templateMapping = ctx.templateTypeChecker.getTemplateMappingAtTcbLocation(symbolOfReceiver.tcbLocation);
+    const errorString = `${node.receiver.name} is a function and should be invoked: ${node.receiver.name}()`;
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
     return [diagnostic];
   }
@@ -8343,6 +8362,7 @@ var NgCompiler = class {
     const injectableRegistry = new InjectableClassRegistry(reflector, isCore);
     const hostDirectivesResolver = new HostDirectivesResolver(metaReader);
     const exportedProviderStatusResolver = new ExportedProviderStatusResolver(metaReader);
+    const importTracker = new ImportedSymbolsTracker();
     const typeCheckScopeRegistry = new TypeCheckScopeRegistry(scopeReader, metaReader, hostDirectivesResolver);
     let referencesRegistry;
     let exportReferenceGraph = null;
@@ -8373,8 +8393,8 @@ var NgCompiler = class {
       throw new Error('JIT mode support ("supportJitMode" option) cannot be disabled when forbidOrphanComponents is set to true');
     }
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, (_d = this.options.useTemplatePipeline) != null ? _d : SHOULD_USE_TEMPLATE_PIPELINE, localCompilationExtraImportsTracker),
-      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, supportTestBed, compilationMode, (_e = this.options.useTemplatePipeline) != null ? _e : SHOULD_USE_TEMPLATE_PIPELINE, !!this.options.generateExtraImportsInLocalMode),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, (_d = this.options.useTemplatePipeline) != null ? _d : SHOULD_USE_TEMPLATE_PIPELINE, localCompilationExtraImportsTracker),
+      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, importTracker, supportTestBed, compilationMode, (_e = this.options.useTemplatePipeline) != null ? _e : SHOULD_USE_TEMPLATE_PIPELINE, !!this.options.generateExtraImportsInLocalMode),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode, !!this.options.generateExtraImportsInLocalMode),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
       new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_f = this.options.onlyPublishPublicTypingsForNgModules) != null ? _f : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode, localCompilationExtraImportsTracker)
@@ -9174,4 +9194,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-MTJPV7ZL.js.map
+//# sourceMappingURL=chunk-ZNYVMEGP.js.map

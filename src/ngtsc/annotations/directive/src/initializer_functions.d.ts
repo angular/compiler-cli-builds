@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
+import { ImportedSymbolsTracker } from '../../../imports';
 import { ClassMember, ReflectionHost } from '../../../reflection';
 /**
  * @fileoverview
@@ -38,7 +39,5 @@ interface InitializerFunctionMetadata {
  * Note that multiple possible initializer API function names can be specified,
  * allowing for checking multiple types in one pass.
  */
-export declare function tryParseInitializerApiMember<FnNames extends InitializerApiFunction[]>(fnNames: FnNames, member: Pick<ClassMember, 'value'>, reflector: ReflectionHost, isCore: boolean): InitializerFunctionMetadata & {
-    apiName: FnNames[number];
-} | null;
+export declare function tryParseInitializerApiMember<FnNames extends InitializerApiFunction[]>(fnNames: FnNames, member: Pick<ClassMember, 'value'>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker): InitializerFunctionMetadata | null;
 export {};
