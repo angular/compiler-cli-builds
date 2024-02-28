@@ -4626,6 +4626,9 @@ function parseLocator(expression, reflector) {
   return createMayBeForwardRefExpression(new o.WrappedNodeExpr(expression), unwrappedExpression !== null ? 2 : 0);
 }
 function parseReadOption(value) {
+  if (ts22.isExpressionWithTypeArguments(value) || ts22.isParenthesizedExpression(value) || ts22.isAsExpression(value)) {
+    return parseReadOption(value.expression);
+  }
   if (ts22.isPropertyAccessExpression(value) && ts22.isIdentifier(value.expression) || ts22.isIdentifier(value)) {
     return new o.WrappedNodeExpr(value);
   }
@@ -8321,4 +8324,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-6CTADBJK.js.map
+//# sourceMappingURL=chunk-EE4LOEZ4.js.map
