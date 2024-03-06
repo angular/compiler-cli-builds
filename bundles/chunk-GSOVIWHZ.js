@@ -12,6 +12,7 @@ import {
   Reference,
   assertSuccessfulReferenceEmit,
   attachDefaultImportDeclaration,
+  entityNameToValue,
   filterToMembersWithDecorator,
   getDefaultImportDeclaration,
   getSourceFile,
@@ -29,7 +30,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-4FMRFW4X.js";
+} from "./chunk-EVW55VLC.js";
 import {
   PerfEvent,
   PerfPhase
@@ -4436,58 +4437,71 @@ import ts23 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/initializer_functions.mjs
 import ts20 from "typescript";
-function tryParseInitializerApiMember(fnNames, member, reflector, importTracker) {
+function tryParseInitializerApiMember(functions, member, reflector, importTracker) {
   if (member.value === null || !ts20.isCallExpression(member.value)) {
     return null;
   }
   const call = member.value;
-  const staticResult = parseTopLevelCall(call, fnNames, importTracker) || parseTopLevelRequiredCall(call, fnNames, importTracker) || parseTopLevelCallFromNamespace(call, fnNames, importTracker);
+  const staticResult = parseTopLevelCall(call, functions, importTracker) || parseTopLevelRequiredCall(call, functions, importTracker) || parseTopLevelCallFromNamespace(call, functions, importTracker);
   if (staticResult === null) {
     return null;
   }
-  const resolvedImport = reflector.getImportOfIdentifier(staticResult.node);
-  if (resolvedImport === null || !fnNames.includes(resolvedImport.name)) {
+  const resolvedImport = reflector.getImportOfIdentifier(staticResult.apiReference);
+  if (resolvedImport === null || staticResult.api.functionName !== resolvedImport.name || staticResult.api.owningModule !== resolvedImport.from) {
     return null;
   }
   return {
+    api: staticResult.api,
     call,
-    isRequired: staticResult.isRequired,
-    apiName: resolvedImport.name
+    isRequired: staticResult.isRequired
   };
 }
-function parseTopLevelCall(call, fnNames, importTracker) {
+function parseTopLevelCall(call, functions, importTracker) {
   const node = call.expression;
   if (!ts20.isIdentifier(node)) {
     return null;
   }
-  return fnNames.some((name) => importTracker.isPotentialReferenceToNamedImport(node, name, CORE_MODULE)) ? { node, isRequired: false } : null;
+  const matchingApi = functions.find((fn) => importTracker.isPotentialReferenceToNamedImport(node, fn.functionName, fn.owningModule));
+  if (matchingApi === void 0) {
+    return null;
+  }
+  return { api: matchingApi, apiReference: node, isRequired: false };
 }
-function parseTopLevelRequiredCall(call, fnNames, importTracker) {
+function parseTopLevelRequiredCall(call, functions, importTracker) {
   const node = call.expression;
   if (!ts20.isPropertyAccessExpression(node) || !ts20.isIdentifier(node.expression) || node.name.text !== "required") {
     return null;
   }
   const expression = node.expression;
-  const matchesCoreApi = fnNames.some((name) => importTracker.isPotentialReferenceToNamedImport(expression, name, CORE_MODULE));
-  return matchesCoreApi ? { node: expression, isRequired: true } : null;
+  const matchingApi = functions.find((fn) => importTracker.isPotentialReferenceToNamedImport(expression, fn.functionName, fn.owningModule));
+  if (matchingApi === void 0) {
+    return null;
+  }
+  return { api: matchingApi, apiReference: expression, isRequired: true };
 }
-function parseTopLevelCallFromNamespace(call, fnNames, importTracker) {
+function parseTopLevelCallFromNamespace(call, functions, importTracker) {
   const node = call.expression;
   if (!ts20.isPropertyAccessExpression(node)) {
     return null;
   }
   let apiReference = null;
+  let matchingApi = void 0;
   let isRequired = false;
-  if (ts20.isIdentifier(node.expression) && ts20.isIdentifier(node.name) && importTracker.isPotentialReferenceToNamespaceImport(node.expression, CORE_MODULE)) {
+  if (ts20.isIdentifier(node.expression) && ts20.isIdentifier(node.name)) {
+    const namespaceRef = node.expression;
     apiReference = node.name;
-  } else if (ts20.isPropertyAccessExpression(node.expression) && ts20.isIdentifier(node.expression.expression) && ts20.isIdentifier(node.expression.name) && importTracker.isPotentialReferenceToNamespaceImport(node.expression.expression, CORE_MODULE) && node.name.text === "required") {
+    matchingApi = functions.find((fn) => node.name.text === fn.functionName && importTracker.isPotentialReferenceToNamespaceImport(namespaceRef, fn.owningModule));
+  } else if (ts20.isPropertyAccessExpression(node.expression) && ts20.isIdentifier(node.expression.expression) && ts20.isIdentifier(node.expression.name) && node.name.text === "required") {
+    const potentialName = node.expression.name.text;
+    const namespaceRef = node.expression.expression;
     apiReference = node.expression.name;
+    matchingApi = functions.find((fn) => fn.functionName === potentialName && importTracker.isPotentialReferenceToNamespaceImport(namespaceRef, fn.owningModule));
     isRequired = true;
   }
-  if (apiReference === null || !fnNames.includes(apiReference.text)) {
+  if (matchingApi === void 0 || apiReference === null) {
     return null;
   }
-  return { node: apiReference, isRequired };
+  return { api: matchingApi, apiReference, isRequired };
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/input_output_parse_options.mjs
@@ -4511,7 +4525,7 @@ function parseAndValidateInputAndOutputOptions(optionsNode) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/input_function.mjs
 function tryParseSignalInputMapping(member, reflector, importTracker) {
   var _a;
-  const signalInput = tryParseInitializerApiMember(["input"], member, reflector, importTracker);
+  const signalInput = tryParseInitializerApiMember([{ functionName: "input", owningModule: "@angular/core" }], member, reflector, importTracker);
   if (signalInput === null) {
     return null;
   }
@@ -4530,7 +4544,7 @@ function tryParseSignalInputMapping(member, reflector, importTracker) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/model_function.mjs
 function tryParseSignalModelMapping(member, reflector, importTracker) {
   var _a;
-  const model = tryParseInitializerApiMember(["model"], member, reflector, importTracker);
+  const model = tryParseInitializerApiMember([{ functionName: "model", owningModule: "@angular/core" }], member, reflector, importTracker);
   if (model === null) {
     return null;
   }
@@ -4558,14 +4572,17 @@ function tryParseSignalModelMapping(member, reflector, importTracker) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/output_function.mjs
 function tryParseInitializerBasedOutput(member, reflector, importTracker) {
   var _a;
-  const output = tryParseInitializerApiMember(["output", "\u0275output"], member, reflector, importTracker);
+  const output = tryParseInitializerApiMember([
+    { functionName: "output", owningModule: "@angular/core" },
+    { functionName: "outputFromObservable", owningModule: "@angular/core/rxjs-interop" }
+  ], member, reflector, importTracker);
   if (output === null) {
     return null;
   }
   if (output.isRequired) {
     throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_NO_REQUIRED_FUNCTION, output.call, `Output does not support ".required()".`);
   }
-  const optionsNode = output.call.arguments[0];
+  const optionsNode = output.api.functionName === "output" ? output.call.arguments[0] : output.call.arguments[1];
   const options = optionsNode !== void 0 ? parseAndValidateInputAndOutputOptions(optionsNode) : null;
   const classPropertyName = member.name;
   return {
@@ -4584,11 +4601,13 @@ import ts22 from "typescript";
 var queryFunctionNames = ["viewChild", "viewChildren", "contentChild", "contentChildren"];
 var defaultDescendantsValue = (type) => type !== "contentChildren";
 function tryParseSignalQueryFromInitializer(member, reflector, importTracker) {
-  const query = tryParseInitializerApiMember(queryFunctionNames, member, reflector, importTracker);
+  const initializerFns = queryFunctionNames.map((fnName) => ({ functionName: fnName, owningModule: "@angular/core" }));
+  const query = tryParseInitializerApiMember(initializerFns, member, reflector, importTracker);
   if (query === null) {
     return null;
   }
-  const isSingleQuery = query.apiName === "viewChild" || query.apiName === "contentChild";
+  const { functionName } = query.api;
+  const isSingleQuery = functionName === "viewChild" || functionName === "contentChild";
   const predicateNode = query.call.arguments[0];
   if (predicateNode === void 0) {
     throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, query.call, "No locator specified.");
@@ -4599,9 +4618,9 @@ function tryParseSignalQueryFromInitializer(member, reflector, importTracker) {
   }
   const options = optionsNode && reflectObjectLiteral(optionsNode);
   const read = (options == null ? void 0 : options.has("read")) ? parseReadOption(options.get("read")) : null;
-  const descendants = (options == null ? void 0 : options.has("descendants")) ? parseDescendantsOption(options.get("descendants")) : defaultDescendantsValue(query.apiName);
+  const descendants = (options == null ? void 0 : options.has("descendants")) ? parseDescendantsOption(options.get("descendants")) : defaultDescendantsValue(functionName);
   return {
-    name: query.apiName,
+    name: functionName,
     call: query.call,
     metadata: {
       isSignal: true,
@@ -5752,7 +5771,12 @@ function createModuleWithProvidersResolver(reflector, isCore) {
       if (ts24.isTypeLiteralNode(t)) {
         for (const m of t.members) {
           const ngModuleType = ts24.isPropertySignature(m) && ts24.isIdentifier(m.name) && m.name.text === "ngModule" && m.type || null;
-          const ngModuleExpression = ngModuleType && typeNodeToValueExpr(ngModuleType);
+          let ngModuleExpression = null;
+          if (ngModuleType !== null && ts24.isTypeQueryNode(ngModuleType)) {
+            ngModuleExpression = entityNameToValue(ngModuleType.exprName);
+          } else if (ngModuleType !== null) {
+            ngModuleExpression = typeNodeToValueExpr(ngModuleType);
+          }
           if (ngModuleExpression) {
             return ngModuleExpression;
           }
@@ -8324,4 +8348,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-KHCI3Z55.js.map
+//# sourceMappingURL=chunk-GSOVIWHZ.js.map

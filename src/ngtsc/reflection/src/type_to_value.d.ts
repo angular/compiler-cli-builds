@@ -22,3 +22,4 @@ export declare function typeToValue(typeNode: ts.TypeNode | null, checker: ts.Ty
  * This will return `null` if an equivalent expression cannot be constructed.
  */
 export declare function typeNodeToValueExpr(node: ts.TypeNode): ts.Expression | null;
+export declare function entityNameToValue(node: ts.EntityName): ts.Expression | null;
