@@ -3769,7 +3769,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
-import { BindingPipe, Call as Call2, createCssSelectorFromNode, CssSelector, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers3, SafeCall, SafePropertyRead as SafePropertyRead3, SelectorMatcher, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock as TmplAstForLoopBlock2, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
+import { BindingPipe, BindingType, Call as Call2, createCssSelectorFromNode, CssSelector, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver4, ParsedEventType, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers3, SafeCall, SafePropertyRead as SafePropertyRead3, SelectorMatcher, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock as TmplAstForLoopBlock2, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2, TransplantedType } from "@angular/compiler";
 import ts29 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
@@ -4642,7 +4642,7 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
       this.tcb.domSchemaChecker.checkElement(this.tcb.id, this.element, this.tcb.schemas, this.tcb.hostIsStandalone);
     }
     for (const binding of this.element.inputs) {
-      const isPropertyBinding = binding.type === 0 || binding.type === 5;
+      const isPropertyBinding = binding.type === BindingType.Property || binding.type === BindingType.TwoWay;
       if (isPropertyBinding && this.claimedInputs.has(binding.name)) {
         continue;
       }
@@ -4750,7 +4750,7 @@ var TcbUnclaimedInputsOp = class extends TcbOp {
     var _a;
     let elId = null;
     for (const binding of this.element.inputs) {
-      const isPropertyBinding = binding.type === 0 || binding.type === 5;
+      const isPropertyBinding = binding.type === BindingType.Property || binding.type === BindingType.TwoWay;
       if (isPropertyBinding && this.claimedInputs.has(binding.name)) {
         continue;
       }
@@ -4790,7 +4790,7 @@ var TcbDirectiveOutputsOp = class extends TcbOp {
     let dirId = null;
     const outputs = this.dir.outputs;
     for (const output of this.node.outputs) {
-      if (output.type === 1 || !outputs.hasBindingPropertyName(output.name)) {
+      if (output.type === ParsedEventType.Animation || !outputs.hasBindingPropertyName(output.name)) {
         continue;
       }
       if (this.tcb.env.config.checkTypeOfOutputEvents && output.name.endsWith("Change")) {
@@ -4842,7 +4842,7 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
           continue;
         }
       }
-      if (output.type === 1) {
+      if (output.type === ParsedEventType.Animation) {
         const eventType = this.tcb.env.config.checkTypeOfAnimationEvents ? this.tcb.env.referenceExternalType("@angular/animations", "AnimationEvent") : 1;
         const handler = tcbCreateEventHandler(output, this.tcb, this.scope, eventType);
         this.scope.addStatement(ts29.factory.createExpressionStatement(handler));
@@ -5560,7 +5560,7 @@ function tcbCallTypeCtor(dir, tcb, inputs) {
 function getBoundAttributes(directive, node) {
   const boundInputs = [];
   const processAttribute = (attr) => {
-    if (attr instanceof TmplAstBoundAttribute && attr.type !== 0 && attr.type !== 5) {
+    if (attr instanceof TmplAstBoundAttribute && attr.type !== BindingType.Property && attr.type !== BindingType.TwoWay) {
       return;
     }
     const inputs = directive.inputs.getByBindingPropertyName(attr.name);
@@ -5574,7 +5574,7 @@ function getBoundAttributes(directive, node) {
             required: input.required,
             transformType: ((_a = input.transform) == null ? void 0 : _a.type) || null,
             isSignal: input.isSignal,
-            isTwoWayBinding: attr instanceof TmplAstBoundAttribute && attr.type === 5
+            isTwoWayBinding: attr instanceof TmplAstBoundAttribute && attr.type === BindingType.TwoWay
           };
         })
       });
@@ -9201,4 +9201,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-UEKPICEE.js.map
+//# sourceMappingURL=chunk-RZH7YERX.js.map
