@@ -3638,7 +3638,7 @@ function compileInputTransformFields(inputs) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
-import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr6, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, outputAst as o2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
+import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr6, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
 import ts27 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
@@ -7035,13 +7035,13 @@ var ComponentDecoratorHandler = class {
     if (this.compilationMode !== CompilationMode.LOCAL) {
       changeDetection = resolveEnumValue(this.evaluator, component, "changeDetection", "ChangeDetectionStrategy");
     } else if (component.has("changeDetection")) {
-      changeDetection = new o2.WrappedNodeExpr(component.get("changeDetection"));
+      changeDetection = new WrappedNodeExpr8(component.get("changeDetection"));
     }
     let animations = null;
     let animationTriggerNames = null;
     if (component.has("animations")) {
       const animationExpression = component.get("animations");
-      animations = new o2.WrappedNodeExpr(animationExpression);
+      animations = new WrappedNodeExpr8(animationExpression);
       const animationsValue = this.evaluator.evaluate(animationExpression, animationTriggerResolver);
       animationTriggerNames = { includesDynamicAnimations: false, staticTriggerNames: [] };
       collectAnimationNames(animationsValue, animationTriggerNames);
@@ -7060,7 +7060,7 @@ var ComponentDecoratorHandler = class {
     if (component.has("viewProviders")) {
       const viewProviders = component.get("viewProviders");
       viewProvidersRequiringFactory = resolveProvidersRequiringFactory(viewProviders, this.reflector, this.evaluator);
-      wrappedViewProviders = new o2.WrappedNodeExpr(this.annotateForClosureCompiler ? wrapFunctionExpressionsInParens(viewProviders) : viewProviders);
+      wrappedViewProviders = new WrappedNodeExpr8(this.annotateForClosureCompiler ? wrapFunctionExpressionsInParens(viewProviders) : viewProviders);
     }
     if (component.has("providers")) {
       providersRequiringFactory = resolveProvidersRequiringFactory(component.get("providers"), this.reflector, this.evaluator);
@@ -7221,7 +7221,7 @@ var ComponentDecoratorHandler = class {
           viewProviders: wrappedViewProviders,
           i18nUseExternalIds: this.i18nUseExternalIds,
           relativeContextFilePath,
-          rawImports: rawImports !== null ? new o2.WrappedNodeExpr(rawImports) : void 0,
+          rawImports: rawImports !== null ? new WrappedNodeExpr8(rawImports) : void 0,
           useTemplatePipeline: this.useTemplatePipeline
         },
         typeCheckMeta: extractDirectiveTypeCheckMeta(node, inputs, this.reflector),
@@ -7345,7 +7345,6 @@ var ComponentDecoratorHandler = class {
     return extendedTemplateChecker.getDiagnosticsForComponent(component);
   }
   resolve(node, analysis, symbol) {
-    var _a;
     const metadata = analysis.meta;
     const diagnostics = [];
     const context = getSourceFile(node);
@@ -7362,10 +7361,10 @@ var ComponentDecoratorHandler = class {
       data = {
         declarations: EMPTY_ARRAY2,
         declarationListEmitMode: !analysis.meta.isStandalone || analysis.rawImports !== null ? 3 : 0,
-        deferBlockDependencies: this.locateDeferBlocksWithoutScope(analysis.template),
+        deferBlocks: this.locateDeferBlocksWithoutScope(analysis.template),
         deferBlockDepsEmitMode: 1,
         deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
-        deferrableTypes: (_a = analysis.explicitlyDeferredTypes) != null ? _a : /* @__PURE__ */ new Map()
+        deferrableTypes: /* @__PURE__ */ new Map()
       };
       if (this.localCompilationExtraImportsTracker === null) {
         return { data };
@@ -7374,7 +7373,7 @@ var ComponentDecoratorHandler = class {
       data = {
         declarations: EMPTY_ARRAY2,
         declarationListEmitMode: 0,
-        deferBlockDependencies: /* @__PURE__ */ new Map(),
+        deferBlocks: /* @__PURE__ */ new Map(),
         deferBlockDepsEmitMode: 0,
         deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
         deferrableTypes: /* @__PURE__ */ new Map()
@@ -7488,7 +7487,7 @@ var ComponentDecoratorHandler = class {
       }
       const eagerDeclarations = Array.from(declarations.values()).filter((decl) => decl.kind === R3TemplateDependencyKind.NgModule || eagerlyUsed.has(decl.ref.node));
       if (this.compilationMode !== CompilationMode.LOCAL) {
-        this.resolveDeferBlocks(node, deferBlocks, declarations, data, analysis, eagerlyUsed);
+        this.resolveDeferBlocks(node, deferBlocks, declarations, data, analysis, eagerlyUsed, bound);
       }
       const cyclesFromDirectives = /* @__PURE__ */ new Map();
       const cyclesFromPipes = /* @__PURE__ */ new Map();
@@ -7548,7 +7547,7 @@ var ComponentDecoratorHandler = class {
         }
       }
     } else {
-      data.deferBlockDependencies = this.locateDeferBlocksWithoutScope(metadata.template);
+      data.deferBlocks = this.locateDeferBlocksWithoutScope(metadata.template);
     }
     if (this.compilationMode !== CompilationMode.LOCAL) {
       if (analysis.resolvedImports !== null && analysis.rawImports !== null) {
@@ -7559,11 +7558,11 @@ var ComponentDecoratorHandler = class {
         const importDiagnostics = validateStandaloneImports(analysis.resolvedDeferredImports, analysis.rawDeferredImports, this.metaReader, this.scopeReader, true);
         diagnostics.push(...importDiagnostics);
       }
-      if (analysis.providersRequiringFactory !== null && analysis.meta.providers instanceof o2.WrappedNodeExpr) {
+      if (analysis.providersRequiringFactory !== null && analysis.meta.providers instanceof WrappedNodeExpr8) {
         const providerDiagnostics = getProviderDiagnostics(analysis.providersRequiringFactory, analysis.meta.providers.node, this.injectableRegistry);
         diagnostics.push(...providerDiagnostics);
       }
-      if (analysis.viewProvidersRequiringFactory !== null && analysis.meta.viewProviders instanceof o2.WrappedNodeExpr) {
+      if (analysis.viewProvidersRequiringFactory !== null && analysis.meta.viewProviders instanceof WrappedNodeExpr8) {
         const viewProviderDiagnostics = getProviderDiagnostics(analysis.viewProvidersRequiringFactory, analysis.meta.viewProviders.node, this.injectableRegistry);
         diagnostics.push(...viewProviderDiagnostics);
       }
@@ -7621,7 +7620,7 @@ var ComponentDecoratorHandler = class {
     const meta = {
       ...analysis.meta,
       ...resolution,
-      defer: this.compileDeferBlocks(resolution),
+      deferrableTypes,
       useTemplatePipeline
     };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
@@ -7641,13 +7640,12 @@ var ComponentDecoratorHandler = class {
       content: analysis.template.content,
       sourceUrl: analysis.template.declaration.resolvedTemplateUrl,
       isInline: analysis.template.declaration.isInline,
-      inlineTemplateLiteralExpression: analysis.template.sourceMapping.type === "direct" ? new o2.WrappedNodeExpr(analysis.template.sourceMapping.node) : null
+      inlineTemplateLiteralExpression: analysis.template.sourceMapping.type === "direct" ? new WrappedNodeExpr8(analysis.template.sourceMapping.node) : null
     };
     const useTemplatePipeline = this.useTemplatePipeline;
     const meta = {
       ...analysis.meta,
       ...resolution,
-      defer: this.compileDeferBlocks(resolution),
       useTemplatePipeline
     };
     const fac = compileDeclareFactory(toFactoryMetadata(meta, FactoryTarget3.Component));
@@ -7665,7 +7663,7 @@ var ComponentDecoratorHandler = class {
     const meta = {
       ...analysis.meta,
       ...resolution,
-      defer: this.compileDeferBlocks(resolution),
+      deferrableTypes: deferrableTypes != null ? deferrableTypes : /* @__PURE__ */ new Map(),
       useTemplatePipeline
     };
     if (analysis.explicitlyDeferredTypes !== null) {
@@ -7684,17 +7682,22 @@ var ComponentDecoratorHandler = class {
     const directivelessBinder = new R3TargetBinder(new SelectorMatcher2());
     const bound = directivelessBinder.bind({ template: template.nodes });
     const deferredBlocks = bound.getDeferBlocks();
+    const triggerElements = /* @__PURE__ */ new Map();
     for (const block of deferredBlocks) {
-      deferBlocks.set(block, []);
+      this.resolveDeferTriggers(block, block.triggers, bound, triggerElements);
+      this.resolveDeferTriggers(block, block.prefetchTriggers, bound, triggerElements);
+      deferBlocks.set(block, { deps: [], triggerElements });
     }
     return deferBlocks;
   }
   collectDeferredSymbols(resolution) {
     var _a;
     const deferrableTypes = /* @__PURE__ */ new Map();
-    for (const [_, deps] of resolution.deferBlockDependencies) {
-      for (const deferBlockDep of deps) {
-        const importDecl = (_a = resolution.deferrableDeclToImportDecl.get(deferBlockDep.type.node)) != null ? _a : null;
+    for (const [_, metadata] of resolution.deferBlocks) {
+      for (const deferBlockDep of metadata.deps) {
+        const dep = deferBlockDep;
+        const classDecl = dep.classDeclaration;
+        const importDecl = (_a = resolution.deferrableDeclToImportDecl.get(classDecl)) != null ? _a : null;
         if (importDecl !== null && this.deferredSymbolTracker.canDefer(importDecl)) {
           deferBlockDep.isDeferrable = true;
           deferBlockDep.importPath = importDecl.moduleSpecifier.text;
@@ -7739,18 +7742,13 @@ var ComponentDecoratorHandler = class {
     }
     this.cycleAnalyzer.recordSyntheticImport(origin, imported);
   }
-  resolveDeferBlocks(componentClassDecl, deferBlocks, deferrableDecls, resolutionData, analysisData, eagerlyUsedDecls) {
+  resolveDeferBlocks(componentClassDecl, deferBlocks, deferrableDecls, resolutionData, analysisData, eagerlyUsedDecls, componentBoundTarget) {
     const allDeferredDecls = /* @__PURE__ */ new Set();
     for (const [deferBlock, bound] of deferBlocks) {
       const usedDirectives = new Set(bound.getEagerlyUsedDirectives().map((d) => d.ref.node));
       const usedPipes = new Set(bound.getEagerlyUsedPipes());
-      let deps;
-      if (resolutionData.deferBlockDependencies.has(deferBlock)) {
-        deps = resolutionData.deferBlockDependencies.get(deferBlock);
-      } else {
-        deps = [];
-        resolutionData.deferBlockDependencies.set(deferBlock, deps);
-      }
+      const deps = [];
+      const triggerElements = /* @__PURE__ */ new Map();
       for (const decl of Array.from(deferrableDecls.values())) {
         if (decl.kind === R3TemplateDependencyKind.NgModule) {
           continue;
@@ -7762,14 +7760,18 @@ var ComponentDecoratorHandler = class {
           continue;
         }
         deps.push({
-          type: decl.ref,
-          symbolName: decl.ref.node.name.text,
+          type: decl.type,
+          symbolName: decl.ref.node.name.escapedText,
           isDeferrable: false,
           importPath: null,
-          isDefaultImport: false
+          isDefaultImport: false,
+          classDeclaration: decl.ref.node
         });
         allDeferredDecls.add(decl.ref.node);
       }
+      this.resolveDeferTriggers(deferBlock, deferBlock.triggers, componentBoundTarget, triggerElements);
+      this.resolveDeferTriggers(deferBlock, deferBlock.prefetchTriggers, componentBoundTarget, triggerElements);
+      resolutionData.deferBlocks.set(deferBlock, { deps, triggerElements });
     }
     if (analysisData.meta.isStandalone) {
       if (analysisData.rawImports !== null) {
@@ -7821,46 +7823,11 @@ var ComponentDecoratorHandler = class {
       this.deferredSymbolTracker.markAsDeferrableCandidate(node, imp.node, componentClassDecl, isDeferredImport);
     }
   }
-  compileDeferBlocks(resolution) {
-    if (resolution.deferBlockDepsEmitMode === 0) {
-      if (!resolution.deferBlockDependencies) {
-        throw new Error("Internal error: deferBlockDependencies must be present when compiling in PerBlock mode");
-      }
-      const blocks = /* @__PURE__ */ new Map();
-      for (const [block, dependencies] of resolution.deferBlockDependencies) {
-        const depExpressions = [];
-        for (const dep of dependencies) {
-          if (dep.isDeferrable) {
-            const innerFn = o2.arrowFn(
-              [new o2.FnParam("m", o2.DYNAMIC_TYPE)],
-              o2.variable("m").prop(dep.isDefaultImport ? "default" : dep.symbolName)
-            );
-            const importExpr = new o2.DynamicImportExpr(dep.importPath).prop("then").callFn([innerFn]);
-            depExpressions.push(importExpr);
-          } else {
-            depExpressions.push(o2.variable(dep.symbolName));
-          }
-        }
-        blocks.set(block, depExpressions.length === 0 ? null : o2.arrowFn([], o2.literalArr(depExpressions)));
-      }
-      return { mode: 0, blocks };
-    }
-    if (resolution.deferBlockDepsEmitMode === 1) {
-      if (!resolution.deferBlockDependencies || !resolution.deferrableTypes) {
-        throw new Error("Internal error: deferBlockDependencies and deferrableTypes must be present in PerComponent mode");
-      }
-      const depExpressions = [];
-      for (const [symbolName, { importPath, isDefaultImport: isDefaultImport2 }] of resolution.deferrableTypes) {
-        const innerFn = o2.arrowFn([new o2.FnParam("m", o2.DYNAMIC_TYPE)], o2.variable("m").prop(isDefaultImport2 ? "default" : symbolName));
-        const importExpr = new o2.DynamicImportExpr(importPath).prop("then").callFn([innerFn]);
-        depExpressions.push(importExpr);
-      }
-      return {
-        mode: 1,
-        dependenciesFn: depExpressions.length === 0 ? null : o2.arrowFn([], o2.literalArr(depExpressions))
-      };
-    }
-    throw new Error(`Invalid deferBlockDepsEmitMode. Cannot compile deferred block metadata.`);
+  resolveDeferTriggers(block, triggers, componentBoundTarget, triggerElements) {
+    Object.keys(triggers).forEach((key) => {
+      const trigger = triggers[key];
+      triggerElements.set(trigger, componentBoundTarget.getDeferredTriggerTarget(block, trigger));
+    });
   }
 };
 function createTargetBinder(dependencies) {
@@ -7888,7 +7855,7 @@ function removeDeferrableTypesFromComponentDecorator(analysis, deferrableTypes) 
   if (analysis.classMetadata) {
     const deferrableSymbols = new Set(deferrableTypes.keys());
     const rewrittenDecoratorsNode = removeIdentifierReferences(analysis.classMetadata.decorators.node, deferrableSymbols);
-    analysis.classMetadata.decorators = new o2.WrappedNodeExpr(rewrittenDecoratorsNode);
+    analysis.classMetadata.decorators = new WrappedNodeExpr8(rewrittenDecoratorsNode);
   }
 }
 function validateNoImportOverlap(eagerDeps, deferredDeps, rawDeferredImports) {
@@ -7937,7 +7904,7 @@ function isDefaultImport(node) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
-import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
 import ts28 from "typescript";
 var InjectableDecoratorHandler = class {
   constructor(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, perf, includeClassMetadata, compilationMode, errorOnDuplicateProv = true) {
@@ -8080,7 +8047,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
       result.useClass = getProviderExpression(meta.get("useClass"), reflector);
       result.deps = deps;
     } else if (meta.has("useFactory")) {
-      result.useFactory = new WrappedNodeExpr8(meta.get("useFactory"));
+      result.useFactory = new WrappedNodeExpr9(meta.get("useFactory"));
       result.deps = deps;
     }
     return result;
@@ -8090,7 +8057,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
 }
 function getProviderExpression(expression, reflector) {
   const forwardRefValue = tryUnwrapForwardRef(expression, reflector);
-  return createMayBeForwardRefExpression3(new WrappedNodeExpr8(forwardRefValue != null ? forwardRefValue : expression), forwardRefValue !== null ? 2 : 0);
+  return createMayBeForwardRefExpression3(new WrappedNodeExpr9(forwardRefValue != null ? forwardRefValue : expression), forwardRefValue !== null ? 2 : 0);
 }
 function extractInjectableCtorDeps(clazz, meta, decorator, reflector, isCore, strictCtorDeps) {
   if (decorator.args === null) {
@@ -8119,7 +8086,7 @@ function requiresValidCtor(meta) {
 }
 function getDep(dep, reflector) {
   const meta = {
-    token: new WrappedNodeExpr8(dep),
+    token: new WrappedNodeExpr9(dep),
     attributeNameType: null,
     host: false,
     optional: false,
@@ -8134,7 +8101,7 @@ function getDep(dep, reflector) {
     switch (source.name) {
       case "Inject":
         if (token !== void 0) {
-          meta.token = new WrappedNodeExpr8(token);
+          meta.token = new WrappedNodeExpr9(token);
         }
         break;
       case "Optional":
@@ -8161,7 +8128,7 @@ function getDep(dep, reflector) {
         isDecorator = maybeUpdateDecorator(el.expression, reflector, token);
       }
       if (!isDecorator) {
-        meta.token = new WrappedNodeExpr8(el);
+        meta.token = new WrappedNodeExpr9(el);
       }
     });
   }
@@ -8381,4 +8348,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-BRZFE5TW.js.map
+//# sourceMappingURL=chunk-GSOVIWHZ.js.map

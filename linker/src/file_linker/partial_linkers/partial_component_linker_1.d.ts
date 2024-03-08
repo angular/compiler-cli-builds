@@ -29,5 +29,6 @@ export declare class PartialComponentLinkerVersion1<TStatement, TExpression> imp
     private getTemplateInfo;
     private tryExternalTemplate;
     private templateFromPartialCode;
-    private createR3DeferMetadata;
+    private createR3DeferredMetadata;
+    private resolveDeferTriggers;
 }
