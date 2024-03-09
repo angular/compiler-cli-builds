@@ -271,8 +271,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "18.0.0-next.0+sha-37d1f71";
-var SHOULD_USE_TEMPLATE_PIPELINE_FOR_LINKER = true;
+var PLACEHOLDER_VERSION = "18.0.0-next.0+sha-54340a9";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -402,8 +401,7 @@ function toHostMetadata(metaObj) {
       attributes: {},
       listeners: {},
       properties: {},
-      specialAttributes: {},
-      useTemplatePipeline: SHOULD_USE_TEMPLATE_PIPELINE_FOR_LINKER
+      specialAttributes: {}
     };
   }
   const host = metaObj.getObject("host");
@@ -418,8 +416,7 @@ function toHostMetadata(metaObj) {
     attributes: host.has("attributes") ? host.getObject("attributes").toLiteral((value) => value.getOpaque()) : {},
     listeners: host.has("listeners") ? host.getObject("listeners").toLiteral((value) => value.getString()) : {},
     properties: host.has("properties") ? host.getObject("properties").toLiteral((value) => value.getString()) : {},
-    specialAttributes,
-    useTemplatePipeline: SHOULD_USE_TEMPLATE_PIPELINE_FOR_LINKER
+    specialAttributes
   };
 }
 function toQueryMetadata(obj) {
@@ -593,8 +590,7 @@ ${errors}`);
       animations: metaObj.has("animations") ? metaObj.getOpaque("animations") : null,
       relativeContextFilePath: this.sourceUrl,
       i18nUseExternalIds: false,
-      declarations,
-      useTemplatePipeline: SHOULD_USE_TEMPLATE_PIPELINE_FOR_LINKER
+      declarations
     };
   }
   getTemplateInfo(templateNode, isInline) {
@@ -1086,4 +1082,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4KZ3HACB.js.map
+//# sourceMappingURL=chunk-ZOZPUVVI.js.map
