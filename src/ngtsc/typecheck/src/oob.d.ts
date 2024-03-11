@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BindingPipe, PropertyRead, PropertyWrite, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstReference, TmplAstTemplate, TmplAstVariable, TmplAstViewportDeferredTrigger } from '@angular/compiler';
+import { BindingPipe, PropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstReference, TmplAstTemplate, TmplAstVariable, TmplAstViewportDeferredTrigger } from '@angular/compiler';
 import ts from 'typescript';
 import { ClassDeclaration } from '../../reflection';
 import { TemplateDiagnostic, TemplateId } from '../api';
@@ -57,7 +57,6 @@ export interface OutOfBandDiagnosticRecorder {
      * @param element the element which hosts a component that was defer-loaded.
      */
     deferredComponentUsedEagerly(templateId: TemplateId, element: TmplAstElement): void;
-    illegalAssignmentToTemplateVar(templateId: TemplateId, assignment: PropertyWrite, target: TmplAstVariable): void;
     /**
      * Reports a duplicate declaration of a template variable.
      *
@@ -107,7 +106,6 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     missingPipe(templateId: TemplateId, ast: BindingPipe): void;
     deferredPipeUsedEagerly(templateId: TemplateId, ast: BindingPipe): void;
     deferredComponentUsedEagerly(templateId: TemplateId, element: TmplAstElement): void;
-    illegalAssignmentToTemplateVar(templateId: TemplateId, assignment: PropertyWrite, target: TmplAstVariable): void;
     duplicateTemplateVar(templateId: TemplateId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
     requiresInlineTcb(templateId: TemplateId, node: ClassDeclaration): void;
     requiresInlineTypeConstructors(templateId: TemplateId, node: ClassDeclaration, directives: ClassDeclaration[]): void;

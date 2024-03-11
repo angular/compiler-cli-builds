@@ -253,13 +253,7 @@ export declare class NgCompiler {
     private getTemplateDiagnostics;
     private getTemplateDiagnosticsForFile;
     private getNonTemplateDiagnostics;
-    /**
-     * Calls the `extendedTemplateCheck` phase of the trait compiler
-     * @param sf optional parameter to get diagnostics for a certain file
-     *     or all files in the program if `sf` is undefined
-     * @returns generated extended template diagnostics
-     */
-    private getExtendedTemplateDiagnostics;
+    private runAdditionalChecks;
     private makeCompilation;
 }
 /**
