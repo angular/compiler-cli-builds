@@ -7,7 +7,7 @@
  */
 import { MaybeForwardRefExpression, outputAst as o, R3DeclareDependencyMetadata, R3DependencyMetadata, R3Reference } from '@angular/compiler';
 import { AstObject, AstValue } from '../../ast/ast_value';
-export declare const PLACEHOLDER_VERSION = "17.2.4+sha-67bc88f";
+export declare const PLACEHOLDER_VERSION = "17.2.4+sha-4799a3b";
 export declare const SHOULD_USE_TEMPLATE_PIPELINE_FOR_LINKER = false;
 export declare function wrapReference<TExpression>(wrapped: o.WrappedNodeExpr<TExpression>): R3Reference;
 /**
