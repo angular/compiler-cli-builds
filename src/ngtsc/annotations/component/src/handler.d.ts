@@ -20,6 +20,7 @@ import { ComponentScopeReader, DtsModuleScopeResolver, LocalModuleScopeRegistry,
 import { AnalysisOutput, CompilationMode, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../../transform';
 import { TypeCheckContext } from '../../../typecheck/api';
 import { ExtendedTemplateChecker } from '../../../typecheck/extended/api';
+import { TemplateSemanticsChecker } from '../../../typecheck/template_semantics/api/api';
 import { Xi18nContext } from '../../../xi18n';
 import { InjectableClassRegistry, ReferencesRegistry, ResourceLoader } from '../../common';
 import { ComponentAnalysisData, ComponentResolutionData } from './metadata';
@@ -86,6 +87,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     index(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): null;
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: Readonly<ComponentAnalysisData>): void;
     extendedTemplateCheck(component: ts.ClassDeclaration, extendedTemplateChecker: ExtendedTemplateChecker): ts.Diagnostic[];
+    templateSemanticsCheck(component: ts.ClassDeclaration, templateSemanticsChecker: TemplateSemanticsChecker): ts.Diagnostic[];
     resolve(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, symbol: ComponentSymbol): ResolveResult<ComponentResolutionData>;
     xi18n(ctx: Xi18nContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): void;
     updateResources(node: ClassDeclaration, analysis: ComponentAnalysisData): void;

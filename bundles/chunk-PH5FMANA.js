@@ -2532,7 +2532,7 @@ var TraitCompiler = class {
       }
     }
   }
-  extendedTemplateCheck(sf, extendedTemplateChecker) {
+  runAdditionalChecks(sf, check) {
     if (this.compilationMode === CompilationMode.LOCAL) {
       return [];
     }
@@ -2547,10 +2547,10 @@ var TraitCompiler = class {
       }
       const record = this.classes.get(clazz);
       for (const trait of record.traits) {
-        if (trait.handler.extendedTemplateCheck === void 0) {
-          continue;
+        const result = check(clazz, trait.handler);
+        if (result !== null) {
+          diagnostics.push(...result);
         }
-        diagnostics.push(...trait.handler.extendedTemplateCheck(clazz, extendedTemplateChecker));
       }
     }
     return diagnostics;
@@ -7344,6 +7344,9 @@ var ComponentDecoratorHandler = class {
   extendedTemplateCheck(component, extendedTemplateChecker) {
     return extendedTemplateChecker.getDiagnosticsForComponent(component);
   }
+  templateSemanticsCheck(component, templateSemanticsChecker) {
+    return templateSemanticsChecker.getDiagnosticsForComponent(component);
+  }
   resolve(node, analysis, symbol) {
     const metadata = analysis.meta;
     const diagnostics = [];
@@ -8348,4 +8351,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GSOVIWHZ.js.map
+//# sourceMappingURL=chunk-PH5FMANA.js.map
