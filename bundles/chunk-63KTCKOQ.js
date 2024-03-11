@@ -271,7 +271,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "18.0.0-next.0+sha-64f870c";
+var PLACEHOLDER_VERSION = "18.0.0-next.0+sha-6ea208e";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -580,10 +580,7 @@ ${errors}`);
       },
       declarationListEmitMode,
       styles: metaObj.has("styles") ? metaObj.getArray("styles").map((entry) => entry.getString()) : [],
-      deferBlocks: this.createR3DeferredMetadata(boundTarget),
-      deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
-      deferrableTypes: /* @__PURE__ */ new Map(),
-      deferBlockDepsEmitMode: 0,
+      defer: this.createR3ComponentDeferMetadata(boundTarget),
       encapsulation: metaObj.has("encapsulation") ? parseEncapsulation(metaObj.getValue("encapsulation")) : ViewEncapsulation.Emulated,
       interpolation,
       changeDetection: metaObj.has("changeDetection") ? parseChangeDetectionStrategy(metaObj.getValue("changeDetection")) : ChangeDetectionStrategy.Default,
@@ -631,22 +628,13 @@ ${errors}`);
       isEscaped: true
     };
   }
-  createR3DeferredMetadata(boundTarget) {
+  createR3ComponentDeferMetadata(boundTarget) {
     const deferredBlocks = boundTarget.getDeferBlocks();
-    const meta = /* @__PURE__ */ new Map();
+    const blocks = /* @__PURE__ */ new Map();
     for (const block of deferredBlocks) {
-      const triggerElements = /* @__PURE__ */ new Map();
-      this.resolveDeferTriggers(block, block.triggers, boundTarget, triggerElements);
-      this.resolveDeferTriggers(block, block.prefetchTriggers, boundTarget, triggerElements);
-      meta.set(block, { deps: [], triggerElements });
+      blocks.set(block, null);
     }
-    return meta;
-  }
-  resolveDeferTriggers(block, triggers, boundTarget, triggerElements) {
-    Object.keys(triggers).forEach((key) => {
-      const trigger = triggers[key];
-      triggerElements.set(trigger, boundTarget.getDeferredTriggerTarget(block, trigger));
-    });
+    return { mode: 0, blocks };
   }
 };
 function parseInterpolationConfig(metaObj) {
@@ -1082,4 +1070,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZOZPUVVI.js.map
+//# sourceMappingURL=chunk-63KTCKOQ.js.map

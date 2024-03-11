@@ -126,6 +126,5 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      * candidates.
      */
     private registerDeferrableCandidates;
-    /** Resolves the triggers of the defer block to the elements that they're pointing to. */
-    private resolveDeferTriggers;
+    private compileDeferBlocks;
 }
