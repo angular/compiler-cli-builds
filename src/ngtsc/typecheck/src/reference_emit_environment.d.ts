@@ -20,7 +20,7 @@ export declare class ReferenceEmitEnvironment {
     readonly importManager: ImportManager;
     protected refEmitter: ReferenceEmitter;
     readonly reflector: ReflectionHost;
-    protected contextFile: ts.SourceFile;
+    contextFile: ts.SourceFile;
     constructor(importManager: ImportManager, refEmitter: ReferenceEmitter, reflector: ReflectionHost, contextFile: ts.SourceFile);
     canReferenceType(ref: Reference, flags?: ImportFlags): boolean;
     /**

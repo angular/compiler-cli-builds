@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
+/** Possible alias import declarations */
+export type AliasImportDeclaration = ts.ImportSpecifier | ts.NamespaceImport | ts.ImportClause;
 /**
  * Patches the alias declaration reference resolution for a given transformation context
  * so that TypeScript knows about the specified alias declarations being referenced.
@@ -58,4 +60,4 @@ export declare function loadIsReferencedAliasDeclarationPatch(context: ts.Transf
  * declarations can be import specifiers, namespace imports or import clauses
  * as these do not declare an actual symbol but just point to a target declaration.
  */
-export declare function isAliasImportDeclaration(node: ts.Node): node is ts.ImportSpecifier | ts.NamespaceImport | ts.ImportClause;
+export declare function isAliasImportDeclaration(node: ts.Node): node is AliasImportDeclaration;

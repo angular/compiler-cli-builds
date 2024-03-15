@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { ImportGenerator, NamedImport } from '../../src/ngtsc/translator';
+import { AstFactory, ImportGenerator, ImportRequest } from '../../src/ngtsc/translator';
 /**
  * A class that is used to generate imports when translating from Angular Output AST to an AST to
  * render, such as Babel.
@@ -14,10 +14,10 @@ import { ImportGenerator, NamedImport } from '../../src/ngtsc/translator';
  * must be achieved by property access on an `ng` namespace identifier, which is passed in via the
  * constructor.
  */
-export declare class LinkerImportGenerator<TExpression> implements ImportGenerator<TExpression> {
+export declare class LinkerImportGenerator<TStatement, TExpression> implements ImportGenerator<null, TExpression> {
+    private factory;
     private ngImport;
-    constructor(ngImport: TExpression);
-    generateNamespaceImport(moduleName: string): TExpression;
-    generateNamedImport(moduleName: string, originalSymbol: string): NamedImport<TExpression>;
+    constructor(factory: AstFactory<TStatement, TExpression>, ngImport: TExpression);
+    addImport(request: ImportRequest<null>): TExpression;
     private assertModuleName;
 }

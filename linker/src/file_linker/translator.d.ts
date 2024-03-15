@@ -17,9 +17,9 @@ export declare class Translator<TStatement, TExpression> {
     /**
      * Translate the given output AST in the context of an expression.
      */
-    translateExpression(expression: o.Expression, imports: ImportGenerator<TExpression>, options?: TranslatorOptions<TExpression>): TExpression;
+    translateExpression(expression: o.Expression, imports: ImportGenerator<null, TExpression>, options?: TranslatorOptions<TExpression>): TExpression;
     /**
      * Translate the given output AST in the context of a statement.
      */
-    translateStatement(statement: o.Statement, imports: ImportGenerator<TExpression>, options?: TranslatorOptions<TExpression>): TStatement;
+    translateStatement(statement: o.Statement, imports: ImportGenerator<null, TExpression>, options?: TranslatorOptions<TExpression>): TStatement;
 }
