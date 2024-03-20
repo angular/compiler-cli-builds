@@ -286,6 +286,7 @@ function verifySupportedTypeScriptVersion() {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
+import { R3Identifiers as R3Identifiers5 } from "@angular/compiler";
 import ts38 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/cycles/src/analyzer.mjs
@@ -8884,6 +8885,25 @@ function unwrapAstWithSource(ast) {
   return ast instanceof ASTWithSource5 ? ast.ast : ast;
 }
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/core_version.mjs
+function coreHasSymbol(program, symbol) {
+  const checker = program.getTypeChecker();
+  for (const sf of program.getSourceFiles().filter(isMaybeCore)) {
+    const sym = checker.getSymbolAtLocation(sf);
+    if (sym === void 0 || sym.exports === void 0) {
+      continue;
+    }
+    if (!sym.exports.has("\u0275\u0275template")) {
+      continue;
+    }
+    return sym.exports.has(symbol.name);
+  }
+  return null;
+}
+function isMaybeCore(sf) {
+  return sf.isDeclarationFile && sf.fileName.includes("@angular/core") && sf.fileName.endsWith("index.d.ts");
+}
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/feature_detection.mjs
 import semver from "semver";
 function coreVersionSupportsFeature(coreVersion, minVersion) {
@@ -9241,10 +9261,10 @@ var NgCompiler = class {
     return strictTemplates || !!this.options.fullTemplateTypeCheck;
   }
   getTypeCheckingConfig() {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     const strictTemplates = !!this.options.strictTemplates;
     const useInlineTypeConstructors = this.programDriver.supportsInlineOperations;
-    const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0-0");
+    let allowSignalsInTwoWayBindings = (_a = coreHasSymbol(this.inputProgram, R3Identifiers5.unwrapWritableSignal)) != null ? _a : this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0-0");
     let typeCheckingConfig;
     if (this.fullTemplateTypeCheck) {
       typeCheckingConfig = {
@@ -9269,7 +9289,7 @@ var NgCompiler = class {
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
         suggestionsForSuboptimalTypeInference: this.enableTemplateTypeChecker && !strictTemplates,
-        controlFlowPreventingContentProjection: ((_a = this.options.extendedDiagnostics) == null ? void 0 : _a.defaultCategory) || DiagnosticCategoryLabel.Warning,
+        controlFlowPreventingContentProjection: ((_b = this.options.extendedDiagnostics) == null ? void 0 : _b.defaultCategory) || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings
       };
     } else {
@@ -9295,7 +9315,7 @@ var NgCompiler = class {
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
         suggestionsForSuboptimalTypeInference: false,
-        controlFlowPreventingContentProjection: ((_b = this.options.extendedDiagnostics) == null ? void 0 : _b.defaultCategory) || DiagnosticCategoryLabel.Warning,
+        controlFlowPreventingContentProjection: ((_c = this.options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings
       };
     }
@@ -9331,7 +9351,7 @@ var NgCompiler = class {
     if (this.options.strictLiteralTypes !== void 0) {
       typeCheckingConfig.strictLiteralTypes = this.options.strictLiteralTypes;
     }
-    if (((_d = (_c = this.options.extendedDiagnostics) == null ? void 0 : _c.checks) == null ? void 0 : _d.controlFlowPreventingContentProjection) !== void 0) {
+    if (((_e = (_d = this.options.extendedDiagnostics) == null ? void 0 : _d.checks) == null ? void 0 : _e.controlFlowPreventingContentProjection) !== void 0) {
       typeCheckingConfig.controlFlowPreventingContentProjection = this.options.extendedDiagnostics.checks.controlFlowPreventingContentProjection;
     }
     return typeCheckingConfig;
@@ -10285,4 +10305,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-NGKCH6GE.js.map
+//# sourceMappingURL=chunk-X5G6WKVT.js.map
