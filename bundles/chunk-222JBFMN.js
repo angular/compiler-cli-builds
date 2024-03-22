@@ -39,7 +39,7 @@ import {
   declarationTransformFactory,
   isHostDirectiveMetaForGlobalMode,
   ivyTransformFactory
-} from "./chunk-CTRPNV5S.js";
+} from "./chunk-JR3FM2IP.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -273,7 +273,7 @@ function compareVersions(v1, v2) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
-var MIN_TS_VERSION = "5.2.0";
+var MIN_TS_VERSION = "5.4.0";
 var MAX_TS_VERSION = "5.5.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
@@ -2075,7 +2075,7 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
   visitForLoopBlock(block) {
     var _a;
     block.item.visit(this);
-    this.visitAll(Object.values(block.contextVariables));
+    this.visitAll(block.contextVariables);
     this.visitExpression(block.expression);
     this.visitAll(block.children);
     (_a = block.empty) == null ? void 0 : _a.visit(this);
@@ -4557,7 +4557,7 @@ var Environment = class extends ReferenceEmitEnvironment {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/oob.mjs
-import { AbsoluteSourceSpan as AbsoluteSourceSpan3, TmplAstElement as TmplAstElement2, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty } from "@angular/compiler";
+import { AbsoluteSourceSpan as AbsoluteSourceSpan3, TmplAstElement as TmplAstElement2 } from "@angular/compiler";
 import ts25 from "typescript";
 var OutOfBandDiagnosticRecorderImpl = class {
   constructor(resolver) {
@@ -4698,7 +4698,8 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for property read.`);
     }
-    const message = `Cannot access '${access.name}' inside of a track expression. Only '${block.item.name}', '${block.contextVariables.$index.name}' and properties on the containing component are available to this expression.`;
+    const messageVars = [block.item, ...block.contextVariables.filter((v) => v.value === "$index")].map((v) => `'${v.name}'`).join(", ");
+    const message = `Cannot access '${access.name}' inside of a track expression. Only ${messageVars} and properties on the containing component are available to this expression.`;
     this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), sourceSpan, ts25.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
   }
   inaccessibleDeferredTriggerElement(templateId, trigger) {
@@ -4713,14 +4714,7 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), trigger.sourceSpan, ts25.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
   }
   controlFlowPreventingContentProjection(templateId, category, projectionNode, componentName, slotSelector, controlFlowNode, preservesWhitespaces) {
-    let blockName;
-    if (controlFlowNode instanceof TmplAstForLoopBlockEmpty) {
-      blockName = "@empty";
-    } else if (controlFlowNode instanceof TmplAstForLoopBlock) {
-      blockName = "@for";
-    } else {
-      blockName = "@if";
-    }
+    const blockName = controlFlowNode.nameSpan.toString().trim();
     const lines = [
       `Node matches the "${slotSelector}" slot of the "${componentName}" component, but will not be projected into the specific slot because the surrounding ${blockName} has more than one node at its root. To project the node in the right slot, you can:
 `,
@@ -4762,7 +4756,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
-import { BindingPipe, BindingType, Call as Call2, createCssSelectorFromNode, CssSelector, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver3, ParsedEventType, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers3, SafeCall, SafePropertyRead as SafePropertyRead3, SelectorMatcher, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock as TmplAstForLoopBlock2, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable, TransplantedType } from "@angular/compiler";
+import { BindingPipe, BindingType, Call as Call2, createCssSelectorFromNode, CssSelector, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver3, ParsedEventType, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers3, SafeCall, SafePropertyRead as SafePropertyRead3, SelectorMatcher, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstDeferredBlock, TmplAstElement as TmplAstElement3, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstReference as TmplAstReference3, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable, TransplantedType } from "@angular/compiler";
 import ts29 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
@@ -5657,8 +5651,7 @@ var TcbControlFlowContentProjectionOp = class extends TcbOp {
   findPotentialControlFlowNodes() {
     const result = [];
     for (const child of this.element.children) {
-      let eligibleNode = null;
-      if (child instanceof TmplAstForLoopBlock2) {
+      if (child instanceof TmplAstForLoopBlock) {
         if (this.shouldCheck(child)) {
           result.push(child);
         }
@@ -5666,19 +5659,17 @@ var TcbControlFlowContentProjectionOp = class extends TcbOp {
           result.push(child.empty);
         }
       } else if (child instanceof TmplAstIfBlock) {
-        eligibleNode = child.branches[0];
-      }
-      if (eligibleNode === null || eligibleNode.children.length < 2) {
-        continue;
-      }
-      const rootNodeCount = eligibleNode.children.reduce((count, node) => {
-        if (!(node instanceof TmplAstText) || this.tcb.hostPreserveWhitespaces || node.value.trim().length > 0) {
-          count++;
+        for (const branch of child.branches) {
+          if (this.shouldCheck(branch)) {
+            result.push(branch);
+          }
         }
-        return count;
-      }, 0);
-      if (rootNodeCount > 1) {
-        result.push(eligibleNode);
+      } else if (child instanceof TmplAstSwitchBlock) {
+        for (const current of child.cases) {
+          if (this.shouldCheck(current)) {
+            result.push(current);
+          }
+        }
       }
     }
     return result;
@@ -5687,13 +5678,16 @@ var TcbControlFlowContentProjectionOp = class extends TcbOp {
     if (node.children.length < 2) {
       return false;
     }
-    const rootNodeCount = node.children.reduce((count, node2) => {
-      if (!(node2 instanceof TmplAstText) || this.tcb.hostPreserveWhitespaces || node2.value.trim().length > 0) {
-        count++;
+    let hasSeenRootNode = false;
+    for (const child of node.children) {
+      if (!(child instanceof TmplAstText) || this.tcb.hostPreserveWhitespaces || child.value.trim().length > 0) {
+        if (hasSeenRootNode) {
+          return true;
+        }
+        hasSeenRootNode = true;
       }
-      return count;
-    }, 0);
-    return rootNodeCount > 1;
+    }
+    return false;
   }
 };
 var ATTR_TO_PROP = new Map(Object.entries({
@@ -6091,15 +6085,15 @@ var _Scope = class {
       if (expression !== null && expressionAlias !== null) {
         this.registerVariable(scope, expressionAlias, new TcbBlockVariableOp(tcb, scope, tcbExpression(expression, tcb, scope), expressionAlias));
       }
-    } else if (scopedNode instanceof TmplAstForLoopBlock2) {
+    } else if (scopedNode instanceof TmplAstForLoopBlock) {
       const loopInitializer = tcb.allocateId();
       addParseSpanInfo(loopInitializer, scopedNode.item.sourceSpan);
       scope.varMap.set(scopedNode.item, loopInitializer);
-      for (const [name, variable] of Object.entries(scopedNode.contextVariables)) {
-        if (!this.forLoopContextVariableTypes.has(name)) {
-          throw new Error(`Unrecognized for loop context variable ${name}`);
+      for (const variable of scopedNode.contextVariables) {
+        if (!this.forLoopContextVariableTypes.has(variable.value)) {
+          throw new Error(`Unrecognized for loop context variable ${variable.name}`);
         }
-        const type = ts29.factory.createKeywordTypeNode(this.forLoopContextVariableTypes.get(name));
+        const type = ts29.factory.createKeywordTypeNode(this.forLoopContextVariableTypes.get(variable.value));
         this.registerVariable(scope, variable, new TcbBlockImplicitVariableOp(tcb, scope, type, variable));
       }
     }
@@ -6224,7 +6218,7 @@ var _Scope = class {
       this.opQueue.push(new TcbIfOp(this.tcb, this, node));
     } else if (node instanceof TmplAstSwitchBlock) {
       this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.expression), new TcbSwitchOp(this.tcb, this, node));
-    } else if (node instanceof TmplAstForLoopBlock2) {
+    } else if (node instanceof TmplAstForLoopBlock) {
       this.opQueue.push(new TcbForOfOp(this.tcb, this, node));
       node.empty && this.appendChildren(node.empty);
     } else if (node instanceof TmplAstBoundText) {
@@ -6648,11 +6642,17 @@ var TcbForLoopTrackTranslator = class extends TcbExpressionTranslator {
   constructor(tcb, scope, block) {
     super(tcb, scope);
     this.block = block;
+    this.allowedVariables = /* @__PURE__ */ new Set([block.item]);
+    for (const variable of block.contextVariables) {
+      if (variable.value === "$index") {
+        this.allowedVariables.add(variable);
+      }
+    }
   }
   resolve(ast) {
     if (ast instanceof PropertyRead4 && ast.receiver instanceof ImplicitReceiver3) {
       const target = this.tcb.boundTarget.getExpressionTarget(ast);
-      if (target !== null && target !== this.block.item && target !== this.block.contextVariables.$index) {
+      if (target !== null && !this.allowedVariables.has(target)) {
         this.tcb.oobRecorder.illegalForLoopTrackAccess(this.tcb.id, this.block, ast);
       }
     }
@@ -8397,7 +8397,7 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor2 {
   visitForLoopBlock(block) {
     var _a;
     block.item.visit(this);
-    this.visitAllNodes(Object.values(block.contextVariables));
+    this.visitAllNodes(block.contextVariables);
     this.visitAst(block.expression);
     this.visitAllNodes(block.children);
     (_a = block.empty) == null ? void 0 : _a.visit(this);
@@ -10305,4 +10305,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-X5G6WKVT.js.map
+//# sourceMappingURL=chunk-222JBFMN.js.map

@@ -3596,7 +3596,7 @@ function compileInputTransformFields(inputs) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
-import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentFromMetadata, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareComponentFromMetadata, compileDeferResolverFunction, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr6, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, outputAst as o2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
+import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr6, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, outputAst as o2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
 import ts26 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
@@ -7573,17 +7573,17 @@ var ComponentDecoratorHandler = class {
     if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
       return [];
     }
-    const deferrableTypes = this.collectDeferredSymbols(resolution);
+    const perComponentDeferredDeps = this.resolveAllDeferredDependencies(resolution);
     const meta = {
       ...analysis.meta,
       ...resolution,
       defer: this.compileDeferBlocks(resolution)
     };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
-    removeDeferrableTypesFromComponentDecorator(analysis, deferrableTypes);
+    removeDeferrableTypesFromComponentDecorator(analysis, perComponentDeferredDeps);
     const def = compileComponentFromMetadata(meta, pool, makeBindingParser2());
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
-    const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, deferrableTypes).toStmt() : null;
+    const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, perComponentDeferredDeps).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
     const deferrableImports = this.deferredSymbolTracker.getDeferrableImportDecls();
     return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports, debugInfo);
@@ -7598,6 +7598,7 @@ var ComponentDecoratorHandler = class {
       isInline: analysis.template.declaration.isInline,
       inlineTemplateLiteralExpression: analysis.template.sourceMapping.type === "direct" ? new o2.WrappedNodeExpr(analysis.template.sourceMapping.node) : null
     };
+    const perComponentDeferredDeps = this.resolveAllDeferredDependencies(resolution);
     const meta = {
       ...analysis.meta,
       ...resolution,
@@ -7606,8 +7607,9 @@ var ComponentDecoratorHandler = class {
     const fac = compileDeclareFactory(toFactoryMetadata(meta, FactoryTarget3.Component));
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const def = compileDeclareComponentFromMetadata(meta, analysis.template, templateInfo);
-    const classMetadata = analysis.classMetadata !== null ? compileDeclareClassMetadata3(analysis.classMetadata).toStmt() : null;
-    return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, null);
+    const classMetadata = analysis.classMetadata !== null ? compileComponentDeclareClassMetadata(analysis.classMetadata, perComponentDeferredDeps).toStmt() : null;
+    const deferrableImports = this.deferredSymbolTracker.getDeferrableImportDecls();
+    return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports);
   }
   compileLocal(node, analysis, resolution, pool) {
     if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
@@ -7640,7 +7642,7 @@ var ComponentDecoratorHandler = class {
     }
     return deferBlocks;
   }
-  collectDeferredSymbols(resolution) {
+  resolveAllDeferredDependencies(resolution) {
     var _a;
     const deferrableTypes = [];
     for (const [_, deps] of resolution.deferPerBlockDependencies) {
@@ -7787,7 +7789,7 @@ var ComponentDecoratorHandler = class {
         throw new Error("Internal error: deferPerComponentDependencies must be present in PerComponent mode");
       }
       return {
-        mode: 1,
+        mode,
         dependenciesFn: perComponentDeps.length === 0 ? null : compileDeferResolverFunction({ mode, dependencies: perComponentDeps })
       };
     }
@@ -7868,7 +7870,7 @@ function isDefaultImport(node) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
-import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
 import ts27 from "typescript";
 var InjectableDecoratorHandler = class {
   constructor(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, perf, includeClassMetadata, compilationMode, errorOnDuplicateProv = true) {
@@ -7941,7 +7943,7 @@ var InjectableDecoratorHandler = class {
     return this.compile(compileNgFactoryDefField, (meta) => compileInjectable(meta, false), compileClassMetadata3, node, analysis);
   }
   compilePartial(node, analysis) {
-    return this.compile(compileDeclareFactory, compileDeclareInjectableFromMetadata, compileDeclareClassMetadata4, node, analysis);
+    return this.compile(compileDeclareFactory, compileDeclareInjectableFromMetadata, compileDeclareClassMetadata3, node, analysis);
   }
   compileLocal(node, analysis) {
     return this.compile(compileNgFactoryDefField, (meta) => compileInjectable(meta, false), compileClassMetadata3, node, analysis);
@@ -8100,7 +8102,7 @@ function getDep(dep, reflector) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/pipe.mjs
-import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata5, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5 } from "@angular/compiler";
 import ts28 from "typescript";
 var PipeSymbol = class extends SemanticSymbol {
   constructor(decl, name) {
@@ -8245,7 +8247,7 @@ var PipeDecoratorHandler = class {
   compilePartial(node, analysis) {
     const fac = compileDeclareFactory(toFactoryMetadata(analysis.meta, FactoryTarget5.Pipe));
     const def = compileDeclarePipeFromMetadata(analysis.meta);
-    const classMetadata = analysis.classMetadata !== null ? compileDeclareClassMetadata5(analysis.classMetadata).toStmt() : null;
+    const classMetadata = analysis.classMetadata !== null ? compileDeclareClassMetadata4(analysis.classMetadata).toStmt() : null;
     return compileResults(fac, def, classMetadata, "\u0275pipe", null, null);
   }
   compileLocal(node, analysis) {
@@ -8311,4 +8313,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CTRPNV5S.js.map
+//# sourceMappingURL=chunk-JR3FM2IP.js.map

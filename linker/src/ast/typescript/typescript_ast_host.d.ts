@@ -31,6 +31,7 @@ export declare class TypeScriptAstHost implements AstHost<ts.Expression> {
     parseObjectLiteral(obj: ts.Expression): Map<string, ts.Expression>;
     isFunctionExpression(node: ts.Expression): node is ts.FunctionExpression | ts.ArrowFunction;
     parseReturnValue(fn: ts.Expression): ts.Expression;
+    parseParameters(fn: ts.Expression): ts.Expression[];
     isCallExpression: typeof ts.isCallExpression;
     parseCallee(call: ts.Expression): ts.Expression;
     parseArguments(call: ts.Expression): ts.Expression[];

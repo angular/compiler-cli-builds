@@ -8,7 +8,7 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-PBK22ZCF.js";
+} from "../../chunk-IGYG27D2.js";
 import "../../chunk-SOAFZ4HK.js";
 import {
   ConsoleLogger,
@@ -209,7 +209,7 @@ var BabelAstHost = class {
     return result;
   }
   isFunctionExpression(node) {
-    return t2.isFunction(node);
+    return t2.isFunction(node) || t2.isArrowFunctionExpression(node);
   }
   parseReturnValue(fn) {
     assert(fn, this.isFunctionExpression, "a function");
@@ -225,6 +225,13 @@ var BabelAstHost = class {
       throw new FatalLinkerError(stmt, "Unsupported syntax, expected function to return a value.");
     }
     return stmt.argument;
+  }
+  parseParameters(fn) {
+    assert(fn, this.isFunctionExpression, "a function");
+    return fn.params.map((param) => {
+      assert(param, t2.isIdentifier, "an identifier");
+      return param;
+    });
   }
   parseCallee(call) {
     assert(call, t2.isCallExpression, "a call expression");

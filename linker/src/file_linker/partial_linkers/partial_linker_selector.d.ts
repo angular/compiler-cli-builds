@@ -18,6 +18,7 @@ export declare const ɵɵngDeclareInjectable = "\u0275\u0275ngDeclareInjectable"
 export declare const ɵɵngDeclareInjector = "\u0275\u0275ngDeclareInjector";
 export declare const ɵɵngDeclareNgModule = "\u0275\u0275ngDeclareNgModule";
 export declare const ɵɵngDeclarePipe = "\u0275\u0275ngDeclarePipe";
+export declare const ɵɵngDeclareClassMetadataAsync = "\u0275\u0275ngDeclareClassMetadataAsync";
 export declare const declarationFunctions: string[];
 export interface LinkerRange<TExpression> {
     range: semver.Range;

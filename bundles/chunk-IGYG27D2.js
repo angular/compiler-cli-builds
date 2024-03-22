@@ -141,6 +141,9 @@ var AstValue = class {
   getFunctionReturnValue() {
     return new AstValue(this.host.parseReturnValue(this.expression), this.host);
   }
+  getFunctionParameters() {
+    return this.host.parseParameters(this.expression).map((param) => new AstValue(param, this.host));
+  }
   isCallExpression() {
     return this.host.isCallExpression(this.expression);
   }
@@ -242,6 +245,31 @@ function createGetSourceFile(sourceUrl, code, loader) {
   }
 }
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_class_metadata_async_linker_1.mjs
+import { compileOpaqueAsyncClassMetadata } from "@angular/compiler";
+var PartialClassMetadataAsyncLinkerVersion1 = class {
+  linkPartialDeclaration(constantPool, metaObj) {
+    const resolveMetadataKey = "resolveMetadata";
+    const resolveMetadata = metaObj.getValue(resolveMetadataKey);
+    if (!resolveMetadata.isFunction()) {
+      throw new FatalLinkerError(resolveMetadata, `Unsupported \`${resolveMetadataKey}\` value. Expected a function.`);
+    }
+    const dependencyResolverFunction = metaObj.getOpaque("resolveDeferredDeps");
+    const deferredSymbolNames = resolveMetadata.getFunctionParameters().map((p) => p.getSymbolName());
+    const returnValue = resolveMetadata.getFunctionReturnValue().getObject();
+    const metadata = {
+      type: metaObj.getOpaque("type"),
+      decorators: returnValue.getOpaque("decorators"),
+      ctorParameters: returnValue.getOpaque("ctorParameters"),
+      propDecorators: returnValue.getOpaque("propDecorators")
+    };
+    return {
+      expression: compileOpaqueAsyncClassMetadata(metadata, dependencyResolverFunction, deferredSymbolNames),
+      statements: []
+    };
+  }
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_class_metadata_linker_1.mjs
 import { compileClassMetadata } from "@angular/compiler";
 var PartialClassMetadataLinkerVersion1 = class {
@@ -271,7 +299,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "18.0.0-next.1+sha-0461bff";
+var PLACEHOLDER_VERSION = "18.0.0-next.1+sha-5bd188a";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -580,7 +608,7 @@ ${errors}`);
       },
       declarationListEmitMode,
       styles: metaObj.has("styles") ? metaObj.getArray("styles").map((entry) => entry.getString()) : [],
-      defer: this.createR3ComponentDeferMetadata(boundTarget),
+      defer: this.createR3ComponentDeferMetadata(metaObj, boundTarget),
       encapsulation: metaObj.has("encapsulation") ? parseEncapsulation(metaObj.getValue("encapsulation")) : ViewEncapsulation.Emulated,
       interpolation,
       changeDetection: metaObj.has("changeDetection") ? parseChangeDetectionStrategy(metaObj.getValue("changeDetection")) : ChangeDetectionStrategy.Default,
@@ -628,11 +656,17 @@ ${errors}`);
       isEscaped: true
     };
   }
-  createR3ComponentDeferMetadata(boundTarget) {
+  createR3ComponentDeferMetadata(metaObj, boundTarget) {
     const deferredBlocks = boundTarget.getDeferBlocks();
     const blocks = /* @__PURE__ */ new Map();
-    for (const block of deferredBlocks) {
-      blocks.set(block, null);
+    const dependencies = metaObj.has("deferBlockDependencies") ? metaObj.getArray("deferBlockDependencies") : null;
+    for (let i = 0; i < deferredBlocks.length; i++) {
+      const matchingDependencyFn = dependencies == null ? void 0 : dependencies[i];
+      if (matchingDependencyFn == null) {
+        blocks.set(deferredBlocks[i], null);
+      } else {
+        blocks.set(deferredBlocks[i], matchingDependencyFn.isNull() ? null : matchingDependencyFn.getOpaque());
+      }
     }
     return { mode: 0, blocks };
   }
@@ -877,6 +911,7 @@ var \u0275\u0275ngDeclareInjectable = "\u0275\u0275ngDeclareInjectable";
 var \u0275\u0275ngDeclareInjector = "\u0275\u0275ngDeclareInjector";
 var \u0275\u0275ngDeclareNgModule = "\u0275\u0275ngDeclareNgModule";
 var \u0275\u0275ngDeclarePipe = "\u0275\u0275ngDeclarePipe";
+var \u0275\u0275ngDeclareClassMetadataAsync = "\u0275\u0275ngDeclareClassMetadataAsync";
 var declarationFunctions = [
   \u0275\u0275ngDeclareDirective,
   \u0275\u0275ngDeclareClassMetadata,
@@ -885,13 +920,17 @@ var declarationFunctions = [
   \u0275\u0275ngDeclareInjectable,
   \u0275\u0275ngDeclareInjector,
   \u0275\u0275ngDeclareNgModule,
-  \u0275\u0275ngDeclarePipe
+  \u0275\u0275ngDeclarePipe,
+  \u0275\u0275ngDeclareClassMetadataAsync
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
   const LATEST_VERSION_RANGE = getRange("<=", PLACEHOLDER_VERSION);
   linkers.set(\u0275\u0275ngDeclareDirective, [
     { range: LATEST_VERSION_RANGE, linker: new PartialDirectiveLinkerVersion1(sourceUrl, code) }
+  ]);
+  linkers.set(\u0275\u0275ngDeclareClassMetadataAsync, [
+    { range: LATEST_VERSION_RANGE, linker: new PartialClassMetadataAsyncLinkerVersion1() }
   ]);
   linkers.set(\u0275\u0275ngDeclareClassMetadata, [
     { range: LATEST_VERSION_RANGE, linker: new PartialClassMetadataLinkerVersion1() }
@@ -1070,4 +1109,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-PBK22ZCF.js.map
+//# sourceMappingURL=chunk-IGYG27D2.js.map

@@ -188,6 +188,11 @@ export declare class AstValue<T, TExpression> {
      * it is not a function expression.
      */
     getFunctionReturnValue<R>(this: ConformsTo<this, T, Function>): AstValue<R, TExpression>;
+    /**
+     * Extract the parameters from this value as a function expression, or error if it is not a
+     * function expression.
+     */
+    getFunctionParameters<R>(this: ConformsTo<this, T, Function>): AstValue<R, TExpression>[];
     isCallExpression(): boolean;
     getCallee(): AstValue<unknown, TExpression>;
     getArguments(): AstValue<unknown, TExpression>[];

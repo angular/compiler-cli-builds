@@ -24,8 +24,9 @@ export declare class BabelAstHost implements AstHost<t.Expression> {
     parseArrayLiteral(array: t.Expression): t.Expression[];
     isObjectLiteral: typeof t.isObjectExpression;
     parseObjectLiteral(obj: t.Expression): Map<string, t.Expression>;
-    isFunctionExpression(node: t.Expression): node is Extract<t.Function, t.Expression>;
+    isFunctionExpression(node: t.Expression): node is Extract<t.Function | t.ArrowFunctionExpression, t.Expression>;
     parseReturnValue(fn: t.Expression): t.Expression;
+    parseParameters(fn: t.Expression): t.Expression[];
     isCallExpression: typeof t.isCallExpression;
     parseCallee(call: t.Expression): t.Expression;
     parseArguments(call: t.Expression): t.Expression[];
