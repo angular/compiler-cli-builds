@@ -13,6 +13,7 @@ import {
 import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
+  DocsExtractor,
   EmitFlags,
   EntryType,
   MemberTags,
@@ -36,7 +37,7 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-222JBFMN.js";
+} from "./chunk-TDX2QWIH.js";
 import {
   OptimizeFor
 } from "./chunk-XIYC7KSQ.js";
@@ -77,7 +78,7 @@ import "./chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("18.0.0-next.1+sha-e1650e3");
+var VERSION = new Version("18.0.0-next.1+sha-d15dca0");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
@@ -162,6 +163,7 @@ export {
   ConsoleLogger,
   DEFAULT_ERROR_CODE,
   DecoratorType,
+  DocsExtractor,
   EmitFlags,
   EntryType,
   GLOBAL_DEFS_FOR_TERSER,
