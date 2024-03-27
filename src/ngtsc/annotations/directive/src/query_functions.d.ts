@@ -19,7 +19,7 @@ export type QueryFunctionName = 'viewChild' | 'contentChild' | 'viewChildren' | 
  *
  * @returns Resolved query metadata, or null if no query is declared.
  */
-export declare function tryParseSignalQueryFromInitializer(member: Pick<ClassMember, 'name' | 'value'>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker): {
+export declare function tryParseSignalQueryFromInitializer(member: Pick<ClassMember, 'name' | 'value' | 'accessLevel'>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker): {
     name: QueryFunctionName;
     metadata: R3QueryMetadata;
     call: ts.CallExpression;

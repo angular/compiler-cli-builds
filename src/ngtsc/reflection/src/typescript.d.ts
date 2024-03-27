@@ -52,7 +52,6 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
      */
     protected getDeclarationOfSymbol(symbol: ts.Symbol, originalId: ts.Identifier | null): Declaration | null;
     private _reflectDecorator;
-    private _reflectMember;
     /**
      * Get the set of declarations declared in `file` which are exported.
      */
@@ -69,6 +68,14 @@ export declare function filterToMembersWithDecorator(members: ClassMember[], nam
     member: ClassMember;
     decorators: Decorator[];
 }[];
+/**
+ * Reflects a class element and returns static information about the
+ * class member.
+ *
+ * Note: Decorator information is not included in this helper as it relies
+ * on type checking to resolve originating import.
+ */
+export declare function reflectClassMember(node: ts.ClassElement): Omit<ClassMember, 'decorators'> | null;
 export declare function findMember(members: ClassMember[], name: string, isStatic?: boolean): ClassMember | null;
 export declare function reflectObjectLiteral(node: ts.ObjectLiteralExpression): Map<string, ts.Expression>;
 /**
