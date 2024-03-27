@@ -16,13 +16,14 @@ export interface TranslatorOptions<TExpression> {
     recordWrappedNode?: RecordWrappedNodeFn<TExpression>;
     annotateForClosureCompiler?: boolean;
 }
-export declare class ExpressionTranslatorVisitor<TStatement, TExpression> implements o.ExpressionVisitor, o.StatementVisitor {
+export declare class ExpressionTranslatorVisitor<TFile, TStatement, TExpression> implements o.ExpressionVisitor, o.StatementVisitor {
     private factory;
     private imports;
+    private contextFile;
     private downlevelTaggedTemplates;
     private downlevelVariableDeclarations;
     private recordWrappedNode;
-    constructor(factory: AstFactory<TStatement, TExpression>, imports: ImportGenerator<TExpression>, options: TranslatorOptions<TExpression>);
+    constructor(factory: AstFactory<TStatement, TExpression>, imports: ImportGenerator<TFile, TExpression>, contextFile: TFile, options: TranslatorOptions<TExpression>);
     visitDeclareVarStmt(stmt: o.DeclareVarStmt, context: Context): TStatement;
     visitDeclareFunctionStmt(stmt: o.DeclareFunctionStmt, context: Context): TStatement;
     visitExpressionStmt(stmt: o.ExpressionStatement, context: Context): TStatement;

@@ -19,6 +19,6 @@ export type PropertyTransform = (node: ts.PropertyDeclaration & {
  * import in order to make the synthetic decorator compatible with the JIT
  * decorator downlevel transform.
  */
-export declare function createSyntheticAngularCoreDecoratorAccess(factory: ts.NodeFactory, importManager: ImportManager, ngClassDecorator: Decorator, decoratorName: string): ts.PropertyAccessExpression;
+export declare function createSyntheticAngularCoreDecoratorAccess(factory: ts.NodeFactory, importManager: ImportManager, ngClassDecorator: Decorator, sourceFile: ts.SourceFile, decoratorName: string): ts.PropertyAccessExpression;
 /** Casts the given expression as `any`. */
 export declare function castAsAny(factory: ts.NodeFactory, expr: ts.Expression): ts.Expression;

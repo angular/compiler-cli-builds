@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-EVW55VLC.js";
+} from "./chunk-SOAFZ4HK.js";
 import {
   SourceFileLoader
 } from "./chunk-2WQIUGOU.js";
@@ -164,16 +164,16 @@ import { ConstantPool } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/linker_import_generator.mjs
 var LinkerImportGenerator = class {
-  constructor(ngImport) {
+  constructor(factory, ngImport) {
+    this.factory = factory;
     this.ngImport = ngImport;
   }
-  generateNamespaceImport(moduleName) {
-    this.assertModuleName(moduleName);
-    return this.ngImport;
-  }
-  generateNamedImport(moduleName, originalSymbol) {
-    this.assertModuleName(moduleName);
-    return { moduleImport: this.ngImport, symbol: originalSymbol };
+  addImport(request) {
+    this.assertModuleName(request.exportModuleSpecifier);
+    if (request.exportSymbolName === null) {
+      return this.ngImport;
+    }
+    return this.factory.createPropertyAccess(this.ngImport, request.exportSymbolName);
   }
   assertModuleName(moduleName) {
     if (moduleName !== "@angular/core") {
@@ -191,16 +191,16 @@ var EmitScope = class {
     this.constantPool = new ConstantPool();
   }
   translateDefinition(definition) {
-    const expression = this.translator.translateExpression(definition.expression, new LinkerImportGenerator(this.ngImport));
+    const expression = this.translator.translateExpression(definition.expression, new LinkerImportGenerator(this.factory, this.ngImport));
     if (definition.statements.length > 0) {
-      const importGenerator = new LinkerImportGenerator(this.ngImport);
+      const importGenerator = new LinkerImportGenerator(this.factory, this.ngImport);
       return this.wrapInIifeWithStatements(expression, definition.statements.map((statement) => this.translator.translateStatement(statement, importGenerator)));
     } else {
       return expression;
     }
   }
   getConstantStatements() {
-    const importGenerator = new LinkerImportGenerator(this.ngImport);
+    const importGenerator = new LinkerImportGenerator(this.factory, this.ngImport);
     return this.constantPool.statements.map((statement) => this.translator.translateStatement(statement, importGenerator));
   }
   wrapInIifeWithStatements(expression, statements) {
@@ -271,7 +271,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "17.3.1+sha-d1d9f55";
+var PLACEHOLDER_VERSION = "17.3.1+sha-93ce4d0";
 var SHOULD_USE_TEMPLATE_PIPELINE_FOR_LINKER = true;
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
@@ -1037,10 +1037,10 @@ var Translator = class {
     this.factory = factory;
   }
   translateExpression(expression, imports, options = {}) {
-    return expression.visitExpression(new ExpressionTranslatorVisitor(this.factory, imports, options), new Context(false));
+    return expression.visitExpression(new ExpressionTranslatorVisitor(this.factory, imports, null, options), new Context(false));
   }
   translateStatement(statement, imports, options = {}) {
-    return statement.visitStatement(new ExpressionTranslatorVisitor(this.factory, imports, options), new Context(true));
+    return statement.visitStatement(new ExpressionTranslatorVisitor(this.factory, imports, null, options), new Context(true));
   }
 };
 
@@ -1086,4 +1086,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4KZ3HACB.js.map
+//# sourceMappingURL=chunk-YDAXPVHC.js.map

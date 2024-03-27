@@ -3,7 +3,6 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  addImports,
   getAngularDecorators,
   isAngularDecorator,
   queryDecoratorNames,
@@ -11,14 +10,14 @@ import {
   tryParseSignalInputMapping,
   tryParseSignalModelMapping,
   tryParseSignalQueryFromInitializer
-} from "./chunk-PH5FMANA.js";
+} from "./chunk-4RHMCICC.js";
 import {
   ImportManager,
   ImportedSymbolsTracker,
   TypeScriptReflectionHost,
   isAliasImportDeclaration,
   loadIsReferencedAliasDeclarationPatch
-} from "./chunk-EVW55VLC.js";
+} from "./chunk-SOAFZ4HK.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/downlevel_decorators_transform.mjs
 import ts from "typescript";
@@ -328,10 +327,14 @@ import ts4 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/initializer_api_transforms/transform_api.mjs
 import ts2 from "typescript";
-function createSyntheticAngularCoreDecoratorAccess(factory, importManager, ngClassDecorator, decoratorName) {
+function createSyntheticAngularCoreDecoratorAccess(factory, importManager, ngClassDecorator, sourceFile, decoratorName) {
   const classDecoratorIdentifier = ts2.isIdentifier(ngClassDecorator.identifier) ? ngClassDecorator.identifier : ngClassDecorator.identifier.expression;
   return factory.createPropertyAccessExpression(
-    importManager.generateNamespaceImport("@angular/core"),
+    importManager.addImport({
+      exportModuleSpecifier: "@angular/core",
+      exportSymbolName: null,
+      requestedFile: sourceFile
+    }),
     ts2.setOriginalNode(factory.createIdentifier(decoratorName), classDecoratorIdentifier)
   );
 }
@@ -355,7 +358,8 @@ var signalInputsTransform = (member, host, factory, importTracker, importManager
     "required": inputMapping.required ? factory.createTrue() : factory.createFalse(),
     "transform": factory.createIdentifier("undefined")
   };
-  const newDecorator = factory.createDecorator(factory.createCallExpression(createSyntheticAngularCoreDecoratorAccess(factory, importManager, classDecorator, "Input"), void 0, [
+  const sourceFile = member.getSourceFile();
+  const newDecorator = factory.createDecorator(factory.createCallExpression(createSyntheticAngularCoreDecoratorAccess(factory, importManager, classDecorator, sourceFile, "Input"), void 0, [
     castAsAny(factory, factory.createObjectLiteralExpression(Object.entries(fields).map(([name, value]) => factory.createPropertyAssignment(name, value))))
   ]));
   return factory.updatePropertyDeclaration(member, [newDecorator, ...(_c = member.modifiers) != null ? _c : []], member.name, member.questionToken, member.type, member.initializer);
@@ -363,7 +367,7 @@ var signalInputsTransform = (member, host, factory, importTracker, importManager
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/initializer_api_transforms/model_function.mjs
 import ts3 from "typescript";
-var signalModelTransform = (member, host, factory, importTracker, importManager, decorator, isCore) => {
+var signalModelTransform = (member, host, factory, importTracker, importManager, classDecorator, isCore) => {
   var _a, _b, _c;
   if ((_a = host.getDecoratorsOfDeclaration(member)) == null ? void 0 : _a.some((d) => {
     return isAngularDecorator(d, "Input", isCore) || isAngularDecorator(d, "Output", isCore);
@@ -374,27 +378,25 @@ var signalModelTransform = (member, host, factory, importTracker, importManager,
   if (modelMapping === null) {
     return member;
   }
-  const classDecoratorIdentifier = ts3.isIdentifier(decorator.identifier) ? decorator.identifier : decorator.identifier.expression;
   const inputConfig = factory.createObjectLiteralExpression([
     factory.createPropertyAssignment("isSignal", modelMapping.input.isSignal ? factory.createTrue() : factory.createFalse()),
     factory.createPropertyAssignment("alias", factory.createStringLiteral(modelMapping.input.bindingPropertyName)),
     factory.createPropertyAssignment("required", modelMapping.input.required ? factory.createTrue() : factory.createFalse())
   ]);
+  const sourceFile = member.getSourceFile();
   const inputDecorator = createDecorator(
     "Input",
     factory.createAsExpression(inputConfig, factory.createKeywordTypeNode(ts3.SyntaxKind.AnyKeyword)),
-    classDecoratorIdentifier,
+    classDecorator,
     factory,
+    sourceFile,
     importManager
   );
-  const outputDecorator = createDecorator("Output", factory.createStringLiteral(modelMapping.output.bindingPropertyName), classDecoratorIdentifier, factory, importManager);
+  const outputDecorator = createDecorator("Output", factory.createStringLiteral(modelMapping.output.bindingPropertyName), classDecorator, factory, sourceFile, importManager);
   return factory.updatePropertyDeclaration(member, [inputDecorator, outputDecorator, ...(_c = member.modifiers) != null ? _c : []], member.name, member.questionToken, member.type, member.initializer);
 };
-function createDecorator(name, config, classDecoratorIdentifier, factory, importManager) {
-  const callTarget = factory.createPropertyAccessExpression(
-    importManager.generateNamespaceImport("@angular/core"),
-    ts3.setOriginalNode(factory.createIdentifier(name), classDecoratorIdentifier)
-  );
+function createDecorator(name, config, classDecorator, factory, sourceFile, importManager) {
+  const callTarget = createSyntheticAngularCoreDecoratorAccess(factory, importManager, classDecorator, sourceFile, name);
   return factory.createDecorator(factory.createCallExpression(callTarget, void 0, [config]));
 }
 
@@ -408,7 +410,8 @@ var initializerApiOutputTransform = (member, host, factory, importTracker, impor
   if (output === null) {
     return member;
   }
-  const newDecorator = factory.createDecorator(factory.createCallExpression(createSyntheticAngularCoreDecoratorAccess(factory, importManager, classDecorator, "Output"), void 0, [factory.createStringLiteral(output.metadata.bindingPropertyName)]));
+  const sourceFile = member.getSourceFile();
+  const newDecorator = factory.createDecorator(factory.createCallExpression(createSyntheticAngularCoreDecoratorAccess(factory, importManager, classDecorator, sourceFile, "Output"), void 0, [factory.createStringLiteral(output.metadata.bindingPropertyName)]));
   return factory.updatePropertyDeclaration(member, [newDecorator, ...(_c = member.modifiers) != null ? _c : []], member.name, member.questionToken, member.type, member.initializer);
 };
 
@@ -430,9 +433,10 @@ var queryFunctionsTransforms = (member, host, factory, importTracker, importMana
   if (queryDefinition === null) {
     return member;
   }
+  const sourceFile = member.getSourceFile();
   const callArgs = queryDefinition.call.arguments;
   const newDecorator = factory.createDecorator(factory.createCallExpression(
-    createSyntheticAngularCoreDecoratorAccess(factory, importManager, classDecorator, queryFunctionToDecorator[queryDefinition.name]),
+    createSyntheticAngularCoreDecoratorAccess(factory, importManager, classDecorator, sourceFile, queryFunctionToDecorator[queryDefinition.name]),
     void 0,
     [
       queryDefinition.call.arguments[0],
@@ -456,13 +460,9 @@ var propertyTransforms = [
 function getInitializerApiJitTransform(host, importTracker, isCore) {
   return (ctx) => {
     return (sourceFile) => {
-      const importManager = new ImportManager(void 0, void 0, ctx.factory);
+      const importManager = new ImportManager();
       sourceFile = ts4.visitNode(sourceFile, createTransformVisitor(ctx, host, importManager, importTracker, isCore), ts4.isSourceFile);
-      const newImports = importManager.getAllImports(sourceFile.fileName);
-      if (newImports.length > 0) {
-        sourceFile = addImports(ctx.factory, importManager, sourceFile);
-      }
-      return sourceFile;
+      return importManager.transformTsFile(ctx, sourceFile);
     };
   };
 }
@@ -549,4 +549,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QWXFWJTJ.js.map
+//# sourceMappingURL=chunk-DH6VNQG4.js.map

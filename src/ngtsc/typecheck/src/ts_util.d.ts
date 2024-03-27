@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
-import { Import } from '../../translator';
 export declare function tsCastToAny(expr: ts.Expression): ts.Expression;
 /**
  * Create an expression which instantiates an element by its HTML tagName.
@@ -49,4 +48,3 @@ export declare function isAccessExpression(node: ts.Node): node is ts.ElementAcc
  * Creates a TypeScript node representing a numeric value.
  */
 export declare function tsNumericExpression(value: number): ts.NumericLiteral | ts.PrefixUnaryExpression;
-export declare function getImportString(imp: Import): string;

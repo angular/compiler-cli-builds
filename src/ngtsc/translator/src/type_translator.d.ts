@@ -9,5 +9,5 @@ import * as o from '@angular/compiler';
 import ts from 'typescript';
 import { ReferenceEmitter } from '../../imports';
 import { ReflectionHost } from '../../reflection';
-import { ImportManager } from './import_manager';
+import { ImportManager } from './import_manager/import_manager';
 export declare function translateType(type: o.Type, contextFile: ts.SourceFile, reflector: ReflectionHost, refEmitter: ReferenceEmitter, imports: ImportManager): ts.TypeNode;
