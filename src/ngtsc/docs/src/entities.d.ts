@@ -19,7 +19,8 @@ export declare enum EntryType {
     NgModule = "ng_module",
     Pipe = "pipe",
     TypeAlias = "type_alias",
-    UndecoratedClass = "undecorated_class"
+    UndecoratedClass = "undecorated_class",
+    InitializerApiFunction = "initializer_api_function"
 }
 /** Types of class members */
 export declare enum MemberType {
@@ -132,4 +133,38 @@ export interface ParameterEntry {
     type: string;
     isOptional: boolean;
     isRestParam: boolean;
+}
+/** Interface describing a function with overload signatures. */
+export interface FunctionWithOverloads {
+    name: string;
+    signatures: FunctionEntry[];
+    implementation: FunctionEntry | null;
+}
+/**
+ * Docs entry describing an initializer API function.
+ *
+ * An initializer API function is a function that is invoked as
+ * initializer of class members. The function may hold additional
+ * sub functions, like `.required`.
+ *
+ * Known popular initializer APIs are `input()`, `output()`, `model()`.
+ *
+ * Initializer APIs are often constructed typed in complex ways so this
+ * entry type allows for readable "parsing" and interpretation of such
+ * constructs. Initializer APIs are explicitly denoted via a JSDoc tag.
+ */
+export interface InitializerApiFunctionEntry extends DocEntry {
+    callFunction: FunctionWithOverloads;
+    subFunctions: FunctionWithOverloads[];
+    __docsMetadata__?: {
+        /**
+         * Whether types should be shown in the signature
+         * preview of docs.
+         *
+         * By default, for readability purposes, types are omitted, but
+         * shorter initializer API functions like `output` may decide to
+         * render these types.
+         */
+        showTypesInSignaturePreview?: boolean;
+    };
 }

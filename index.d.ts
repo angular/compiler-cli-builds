@@ -13,4 +13,5 @@ export { OptimizeFor } from './src/ngtsc/typecheck/api';
 export { ConsoleLogger, Logger, LogLevel } from './src/ngtsc/logging';
 export { NodeJSFileSystem } from './src/ngtsc/file_system';
 export * from './src/ngtsc/docs/src/entities';
+export * from './src/ngtsc/docs';
 export { isLocalCompilationDiagnostics } from './src/ngtsc/diagnostics';
