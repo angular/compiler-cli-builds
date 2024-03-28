@@ -30,6 +30,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["INITIALIZER_API_WITH_DISALLOWED_DECORATOR"] = 1050] = "INITIALIZER_API_WITH_DISALLOWED_DECORATOR";
   ErrorCode2[ErrorCode2["INITIALIZER_API_DECORATOR_METADATA_COLLISION"] = 1051] = "INITIALIZER_API_DECORATOR_METADATA_COLLISION";
   ErrorCode2[ErrorCode2["INITIALIZER_API_NO_REQUIRED_FUNCTION"] = 1052] = "INITIALIZER_API_NO_REQUIRED_FUNCTION";
+  ErrorCode2[ErrorCode2["INITIALIZER_API_DISALLOWED_MEMBER_VISIBILITY"] = 1053] = "INITIALIZER_API_DISALLOWED_MEMBER_VISIBILITY";
   ErrorCode2[ErrorCode2["INCORRECTLY_DECLARED_ON_STATIC_MEMBER"] = 1100] = "INCORRECTLY_DECLARED_ON_STATIC_MEMBER";
   ErrorCode2[ErrorCode2["COMPONENT_MISSING_TEMPLATE"] = 2001] = "COMPONENT_MISSING_TEMPLATE";
   ErrorCode2[ErrorCode2["PIPE_MISSING_NAME"] = 2002] = "PIPE_MISSING_NAME";
@@ -117,12 +118,12 @@ function ngErrorCode(code) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
 var FatalDiagnosticError = class extends Error {
   constructor(code, node, diagnosticMessage, relatedInformation) {
-    super(`FatalDiagnosticError #${code}: ${diagnosticMessage}`);
+    super(`FatalDiagnosticError: Code: ${code}, Message: ${ts.flattenDiagnosticMessageText(diagnosticMessage, "\n")}`);
     this.code = code;
     this.node = node;
     this.diagnosticMessage = diagnosticMessage;
     this.relatedInformation = relatedInformation;
-    this.message = null;
+    this.message = this.message;
     this._isFatalDiagnosticError = true;
     Object.setPrototypeOf(this, new.target.prototype);
   }
@@ -225,6 +226,14 @@ var ClassMemberKind;
   ClassMemberKind2[ClassMemberKind2["Property"] = 3] = "Property";
   ClassMemberKind2[ClassMemberKind2["Method"] = 4] = "Method";
 })(ClassMemberKind || (ClassMemberKind = {}));
+var ClassMemberAccessLevel;
+(function(ClassMemberAccessLevel2) {
+  ClassMemberAccessLevel2[ClassMemberAccessLevel2["PublicWritable"] = 0] = "PublicWritable";
+  ClassMemberAccessLevel2[ClassMemberAccessLevel2["PublicReadonly"] = 1] = "PublicReadonly";
+  ClassMemberAccessLevel2[ClassMemberAccessLevel2["Protected"] = 2] = "Protected";
+  ClassMemberAccessLevel2[ClassMemberAccessLevel2["Private"] = 3] = "Private";
+  ClassMemberAccessLevel2[ClassMemberAccessLevel2["EcmaScriptPrivate"] = 4] = "EcmaScriptPrivate";
+})(ClassMemberAccessLevel || (ClassMemberAccessLevel = {}));
 var AmbientImport = {};
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/type_to_value.mjs
@@ -408,6 +417,21 @@ function isNamedClassDeclaration(node) {
 function isIdentifier(node) {
   return node !== void 0 && ts4.isIdentifier(node);
 }
+function classMemberAccessLevelToString(level) {
+  switch (level) {
+    case ClassMemberAccessLevel.EcmaScriptPrivate:
+      return "ES private";
+    case ClassMemberAccessLevel.Private:
+      return "private";
+    case ClassMemberAccessLevel.Protected:
+      return "protected";
+    case ClassMemberAccessLevel.PublicReadonly:
+      return "public readonly";
+    case ClassMemberAccessLevel.PublicWritable:
+    default:
+      return "public";
+  }
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/typescript.mjs
 var TypeScriptReflectionHost = class {
@@ -421,7 +445,16 @@ var TypeScriptReflectionHost = class {
   }
   getMembersOfClass(clazz) {
     const tsClazz = castDeclarationToClassOrDie(clazz);
-    return tsClazz.members.map((member) => this._reflectMember(member)).filter((member) => member !== null);
+    return tsClazz.members.map((member) => {
+      const result = reflectClassMember(member);
+      if (result === null) {
+        return null;
+      }
+      return {
+        ...result,
+        decorators: this.getDecoratorsOfDeclaration(member)
+      };
+    }).filter((member) => member !== null);
   }
   getConstructorParameters(clazz) {
     const tsClazz = castDeclarationToClassOrDie(clazz);
@@ -656,51 +689,6 @@ var TypeScriptReflectionHost = class {
       args
     };
   }
-  _reflectMember(node) {
-    let kind = null;
-    let value = null;
-    let name = null;
-    let nameNode = null;
-    if (ts5.isPropertyDeclaration(node)) {
-      kind = ClassMemberKind.Property;
-      value = node.initializer || null;
-    } else if (ts5.isGetAccessorDeclaration(node)) {
-      kind = ClassMemberKind.Getter;
-    } else if (ts5.isSetAccessorDeclaration(node)) {
-      kind = ClassMemberKind.Setter;
-    } else if (ts5.isMethodDeclaration(node)) {
-      kind = ClassMemberKind.Method;
-    } else if (ts5.isConstructorDeclaration(node)) {
-      kind = ClassMemberKind.Constructor;
-    } else {
-      return null;
-    }
-    if (ts5.isConstructorDeclaration(node)) {
-      name = "constructor";
-    } else if (ts5.isIdentifier(node.name)) {
-      name = node.name.text;
-      nameNode = node.name;
-    } else if (ts5.isStringLiteral(node.name)) {
-      name = node.name.text;
-      nameNode = node.name;
-    } else {
-      return null;
-    }
-    const decorators = this.getDecoratorsOfDeclaration(node);
-    const modifiers = ts5.getModifiers(node);
-    const isStatic = modifiers !== void 0 && modifiers.some((mod) => mod.kind === ts5.SyntaxKind.StaticKeyword);
-    return {
-      node,
-      implementation: node,
-      kind,
-      type: node.type || null,
-      name,
-      nameNode,
-      decorators,
-      value,
-      isStatic
-    };
-  }
   getLocalExportedDeclarationsOfSourceFile(file) {
     const cacheSf = file;
     if (cacheSf[LocalExportedDeclarations] !== void 0) {
@@ -791,6 +779,83 @@ function filterToMembersWithDecorator(members, name, module) {
     }
     return { member, decorators };
   }).filter((value) => value !== null);
+}
+function extractModifiersOfMember(node) {
+  const modifiers = ts5.getModifiers(node);
+  let isStatic = false;
+  let isReadonly = false;
+  let accessLevel = ClassMemberAccessLevel.PublicWritable;
+  if (modifiers !== void 0) {
+    for (const modifier of modifiers) {
+      switch (modifier.kind) {
+        case ts5.SyntaxKind.StaticKeyword:
+          isStatic = true;
+          break;
+        case ts5.SyntaxKind.PrivateKeyword:
+          accessLevel = ClassMemberAccessLevel.Private;
+          break;
+        case ts5.SyntaxKind.ProtectedKeyword:
+          accessLevel = ClassMemberAccessLevel.Protected;
+          break;
+        case ts5.SyntaxKind.ReadonlyKeyword:
+          isReadonly = true;
+          break;
+      }
+    }
+  }
+  if (isReadonly && accessLevel === ClassMemberAccessLevel.PublicWritable) {
+    accessLevel = ClassMemberAccessLevel.PublicReadonly;
+  }
+  if (node.name !== void 0 && ts5.isPrivateIdentifier(node.name)) {
+    accessLevel = ClassMemberAccessLevel.EcmaScriptPrivate;
+  }
+  return { accessLevel, isStatic };
+}
+function reflectClassMember(node) {
+  let kind = null;
+  let value = null;
+  let name = null;
+  let nameNode = null;
+  if (ts5.isPropertyDeclaration(node)) {
+    kind = ClassMemberKind.Property;
+    value = node.initializer || null;
+  } else if (ts5.isGetAccessorDeclaration(node)) {
+    kind = ClassMemberKind.Getter;
+  } else if (ts5.isSetAccessorDeclaration(node)) {
+    kind = ClassMemberKind.Setter;
+  } else if (ts5.isMethodDeclaration(node)) {
+    kind = ClassMemberKind.Method;
+  } else if (ts5.isConstructorDeclaration(node)) {
+    kind = ClassMemberKind.Constructor;
+  } else {
+    return null;
+  }
+  if (ts5.isConstructorDeclaration(node)) {
+    name = "constructor";
+  } else if (ts5.isIdentifier(node.name)) {
+    name = node.name.text;
+    nameNode = node.name;
+  } else if (ts5.isStringLiteral(node.name)) {
+    name = node.name.text;
+    nameNode = node.name;
+  } else if (ts5.isPrivateIdentifier(node.name)) {
+    name = node.name.text;
+    nameNode = node.name;
+  } else {
+    return null;
+  }
+  const { accessLevel, isStatic } = extractModifiersOfMember(node);
+  return {
+    node,
+    implementation: node,
+    kind,
+    type: node.type || null,
+    accessLevel,
+    name,
+    nameNode,
+    value,
+    isStatic
+  };
 }
 function reflectObjectLiteral(node) {
   const map = /* @__PURE__ */ new Map();
@@ -2865,13 +2930,16 @@ export {
   getDefaultImportDeclaration,
   DefaultImportTracker,
   ClassMemberKind,
+  ClassMemberAccessLevel,
   AmbientImport,
   typeNodeToValueExpr,
   entityNameToValue,
   isNamedClassDeclaration,
+  classMemberAccessLevelToString,
   TypeScriptReflectionHost,
   reflectTypeEntityToDeclaration,
   filterToMembersWithDecorator,
+  reflectClassMember,
   reflectObjectLiteral,
   DeferredSymbolTracker,
   ImportedSymbolsTracker,
@@ -2902,4 +2970,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-SOAFZ4HK.js.map
+//# sourceMappingURL=chunk-XZRJJDCL.js.map

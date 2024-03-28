@@ -4,6 +4,7 @@
     
 import {
   AmbientImport,
+  ClassMemberAccessLevel,
   ClassMemberKind,
   ErrorCode,
   FatalDiagnosticError,
@@ -12,6 +13,7 @@ import {
   Reference,
   assertSuccessfulReferenceEmit,
   attachDefaultImportDeclaration,
+  classMemberAccessLevelToString,
   entityNameToValue,
   filterToMembersWithDecorator,
   getDefaultImportDeclaration,
@@ -21,6 +23,7 @@ import {
   isFromDtsFile,
   isNamedClassDeclaration,
   makeDiagnostic,
+  makeDiagnosticChain,
   makeRelatedInformation,
   nodeDebugInfo,
   nodeNameForError,
@@ -31,7 +34,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-SOAFZ4HK.js";
+} from "./chunk-XZRJJDCL.js";
 import {
   PerfEvent,
   PerfPhase
@@ -4393,25 +4396,32 @@ import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirect
 import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr4, getSafePropertyAccessString, parseHostBindings, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
 import ts22 from "typescript";
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/initializer_function_access.mjs
+function validateAccessOfInitializerApiMember({ api, call }, member) {
+  if (!api.allowedAccessLevels.includes(member.accessLevel)) {
+    throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_DISALLOWED_MEMBER_VISIBILITY, call, makeDiagnosticChain(`Cannot use "${api.functionName}" on a class member that is declared as ${classMemberAccessLevelToString(member.accessLevel)}.`, [makeDiagnosticChain(`Update the class field to be either: ` + api.allowedAccessLevels.map((l) => classMemberAccessLevelToString(l)).join(", "))]));
+  }
+}
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/initializer_functions.mjs
 import ts19 from "typescript";
-function tryParseInitializerApiMember(functions, member, reflector, importTracker) {
-  if (member.value === null || !ts19.isCallExpression(member.value)) {
+function tryParseInitializerApi(functions, expression, reflector, importTracker) {
+  if (!ts19.isCallExpression(expression)) {
     return null;
   }
-  const call = member.value;
-  const staticResult = parseTopLevelCall(call, functions, importTracker) || parseTopLevelRequiredCall(call, functions, importTracker) || parseTopLevelCallFromNamespace(call, functions, importTracker);
+  const staticResult = parseTopLevelCall(expression, functions, importTracker) || parseTopLevelRequiredCall(expression, functions, importTracker) || parseTopLevelCallFromNamespace(expression, functions, importTracker);
   if (staticResult === null) {
     return null;
   }
-  const resolvedImport = reflector.getImportOfIdentifier(staticResult.apiReference);
-  if (resolvedImport === null || staticResult.api.functionName !== resolvedImport.name || staticResult.api.owningModule !== resolvedImport.from) {
+  const { api, apiReference, isRequired } = staticResult;
+  const resolvedImport = reflector.getImportOfIdentifier(apiReference);
+  if (resolvedImport === null || api.functionName !== resolvedImport.name || api.owningModule !== resolvedImport.from) {
     return null;
   }
   return {
-    api: staticResult.api,
-    call,
-    isRequired: staticResult.isRequired
+    api,
+    call: expression,
+    isRequired
   };
 }
 function parseTopLevelCall(call, functions, importTracker) {
@@ -4483,10 +4493,22 @@ function parseAndValidateInputAndOutputOptions(optionsNode) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/input_function.mjs
 function tryParseSignalInputMapping(member, reflector, importTracker) {
   var _a;
-  const signalInput = tryParseInitializerApiMember([{ functionName: "input", owningModule: "@angular/core" }], member, reflector, importTracker);
+  if (member.value === null) {
+    return null;
+  }
+  const signalInput = tryParseInitializerApi([{
+    functionName: "input",
+    owningModule: "@angular/core",
+    allowedAccessLevels: [
+      ClassMemberAccessLevel.PublicWritable,
+      ClassMemberAccessLevel.PublicReadonly,
+      ClassMemberAccessLevel.Protected
+    ]
+  }], member.value, reflector, importTracker);
   if (signalInput === null) {
     return null;
   }
+  validateAccessOfInitializerApiMember(signalInput, member);
   const optionsNode = signalInput.isRequired ? signalInput.call.arguments[0] : signalInput.call.arguments[1];
   const options = optionsNode !== void 0 ? parseAndValidateInputAndOutputOptions(optionsNode) : null;
   const classPropertyName = member.name;
@@ -4502,10 +4524,22 @@ function tryParseSignalInputMapping(member, reflector, importTracker) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/model_function.mjs
 function tryParseSignalModelMapping(member, reflector, importTracker) {
   var _a;
-  const model = tryParseInitializerApiMember([{ functionName: "model", owningModule: "@angular/core" }], member, reflector, importTracker);
+  if (member.value === null) {
+    return null;
+  }
+  const model = tryParseInitializerApi([{
+    functionName: "model",
+    owningModule: "@angular/core",
+    allowedAccessLevels: [
+      ClassMemberAccessLevel.PublicWritable,
+      ClassMemberAccessLevel.PublicReadonly,
+      ClassMemberAccessLevel.Protected
+    ]
+  }], member.value, reflector, importTracker);
   if (model === null) {
     return null;
   }
+  validateAccessOfInitializerApiMember(model, member);
   const optionsNode = model.isRequired ? model.call.arguments[0] : model.call.arguments[1];
   const options = optionsNode !== void 0 ? parseAndValidateInputAndOutputOptions(optionsNode) : null;
   const classPropertyName = member.name;
@@ -4528,18 +4562,35 @@ function tryParseSignalModelMapping(member, reflector, importTracker) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/output_function.mjs
+var allowedAccessLevels = [
+  ClassMemberAccessLevel.PublicWritable,
+  ClassMemberAccessLevel.PublicReadonly,
+  ClassMemberAccessLevel.Protected
+];
 function tryParseInitializerBasedOutput(member, reflector, importTracker) {
   var _a;
-  const output = tryParseInitializerApiMember([
-    { functionName: "output", owningModule: "@angular/core" },
-    { functionName: "outputFromObservable", owningModule: "@angular/core/rxjs-interop" }
-  ], member, reflector, importTracker);
+  if (member.value === null) {
+    return null;
+  }
+  const output = tryParseInitializerApi([
+    {
+      functionName: "output",
+      owningModule: "@angular/core",
+      allowedAccessLevels
+    },
+    {
+      functionName: "outputFromObservable",
+      owningModule: "@angular/core/rxjs-interop",
+      allowedAccessLevels
+    }
+  ], member.value, reflector, importTracker);
   if (output === null) {
     return null;
   }
   if (output.isRequired) {
     throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_NO_REQUIRED_FUNCTION, output.call, `Output does not support ".required()".`);
   }
+  validateAccessOfInitializerApiMember(output, member);
   const optionsNode = output.api.functionName === "output" ? output.call.arguments[0] : output.call.arguments[1];
   const options = optionsNode !== void 0 ? parseAndValidateInputAndOutputOptions(optionsNode) : null;
   const classPropertyName = member.name;
@@ -4557,13 +4608,26 @@ function tryParseInitializerBasedOutput(member, reflector, importTracker) {
 import { createMayBeForwardRefExpression, outputAst as o } from "@angular/compiler";
 import ts21 from "typescript";
 var queryFunctionNames = ["viewChild", "viewChildren", "contentChild", "contentChildren"];
+var initializerFns = queryFunctionNames.map((fnName) => ({
+  functionName: fnName,
+  owningModule: "@angular/core",
+  allowedAccessLevels: [
+    ClassMemberAccessLevel.PublicWritable,
+    ClassMemberAccessLevel.PublicReadonly,
+    ClassMemberAccessLevel.Protected,
+    ClassMemberAccessLevel.Private
+  ]
+}));
 var defaultDescendantsValue = (type) => type !== "contentChildren";
 function tryParseSignalQueryFromInitializer(member, reflector, importTracker) {
-  const initializerFns = queryFunctionNames.map((fnName) => ({ functionName: fnName, owningModule: "@angular/core" }));
-  const query = tryParseInitializerApiMember(initializerFns, member, reflector, importTracker);
+  if (member.value === null) {
+    return null;
+  }
+  const query = tryParseInitializerApi(initializerFns, member.value, reflector, importTracker);
   if (query === null) {
     return null;
   }
+  validateAccessOfInitializerApiMember(query, member);
   const { functionName } = query.api;
   const isSingleQuery = functionName === "viewChild" || functionName === "contentChild";
   const predicateNode = query.call.arguments[0];
@@ -8308,4 +8372,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4RHMCICC.js.map
+//# sourceMappingURL=chunk-JO46TGKL.js.map

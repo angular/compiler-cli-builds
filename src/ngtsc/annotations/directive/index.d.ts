@@ -12,3 +12,4 @@ export * from './src/input_function';
 export * from './src/output_function';
 export * from './src/query_functions';
 export * from './src/model_function';
+export * from './src/initializer_functions';

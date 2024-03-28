@@ -11,4 +11,4 @@ import { ClassMember, ReflectionHost } from '../../../reflection';
 /**
  * Attempts to parse a model class member. Returns the parsed model mapping if possible.
  */
-export declare function tryParseSignalModelMapping(member: Pick<ClassMember, 'name' | 'value'>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker): ModelMapping | null;
+export declare function tryParseSignalModelMapping(member: Pick<ClassMember, 'name' | 'value' | 'accessLevel'>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker): ModelMapping | null;
