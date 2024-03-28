@@ -9,6 +9,9 @@ import ts from 'typescript';
 import { ImportedSymbolsTracker } from '../../../imports';
 import { InputOrOutput } from '../../../metadata';
 import { ClassMember, ReflectionHost } from '../../../reflection';
+import { InitializerApiFunction } from './initializer_functions';
+/** Possible functions that can declare an output. */
+export declare const OUTPUT_INITIALIZER_FNS: InitializerApiFunction[];
 /**
  * Attempts to parse a signal output class member. Returns the parsed
  * input mapping if possible.

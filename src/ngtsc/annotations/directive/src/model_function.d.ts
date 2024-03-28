@@ -8,6 +8,9 @@
 import { ImportedSymbolsTracker } from '../../../imports';
 import { ModelMapping } from '../../../metadata';
 import { ClassMember, ReflectionHost } from '../../../reflection';
+import { InitializerApiFunction } from './initializer_functions';
+/** Represents a function that can declare a model. */
+export declare const MODEL_INITIALIZER_FN: InitializerApiFunction;
 /**
  * Attempts to parse a model class member. Returns the parsed model mapping if possible.
  */

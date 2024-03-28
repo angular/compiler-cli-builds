@@ -8,9 +8,15 @@
 import { R3QueryMetadata } from '@angular/compiler';
 import ts from 'typescript';
 import { ImportedSymbolsTracker } from '../../../imports';
-import { ClassMember, ReflectionHost } from '../../../reflection';
+import { ClassMember, ClassMemberAccessLevel, ReflectionHost } from '../../../reflection';
 /** Possible query initializer API functions. */
 export type QueryFunctionName = 'viewChild' | 'contentChild' | 'viewChildren' | 'contentChildren';
+/** Possible query initializer API functions. */
+export declare const QUERY_INITIALIZER_FNS: {
+    functionName: QueryFunctionName;
+    owningModule: "@angular/core";
+    allowedAccessLevels: ClassMemberAccessLevel[];
+}[];
 /**
  * Attempts to detect a possible query definition for the given class member.
  *

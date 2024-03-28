@@ -8,6 +8,9 @@
 import { ImportedSymbolsTracker } from '../../../imports';
 import { InputMapping } from '../../../metadata';
 import { ClassMember, ReflectionHost } from '../../../reflection';
+import { InitializerApiFunction } from './initializer_functions';
+/** Represents a function that can declare an input. */
+export declare const INPUT_INITIALIZER_FN: InitializerApiFunction;
 /**
  * Attempts to parse a signal input class member. Returns the parsed
  * input mapping if possible.

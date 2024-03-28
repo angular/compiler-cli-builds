@@ -32,6 +32,19 @@ export declare class ImportedSymbolsTracker {
      * @param moduleName Module from which the namespace is imported.
      */
     isPotentialReferenceToNamespaceImport(node: ts.Identifier, moduleName: string): boolean;
+    /**
+     * Checks if a file has a named imported of a certain symbol.
+     * @param sourceFile File to be checked.
+     * @param exportedName Name of the exported symbol that is being checked.
+     * @param moduleName Module that exports the symbol.
+     */
+    hasNamedImport(sourceFile: ts.SourceFile, exportedName: string, moduleName: string): boolean;
+    /**
+     * Checks if a file has namespace imports of a certain symbol.
+     * @param sourceFile File to be checked.
+     * @param moduleName Module whose namespace import is being searched for.
+     */
+    hasNamespaceImport(sourceFile: ts.SourceFile, moduleName: string): boolean;
     /** Scans a `SourceFile` for import statements and caches them for later use. */
     private scanImports;
 }

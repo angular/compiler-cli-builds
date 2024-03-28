@@ -34,7 +34,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-XZRJJDCL.js";
+} from "./chunk-A2ENG2AK.js";
 import {
   PerfEvent,
   PerfPhase
@@ -4491,20 +4491,21 @@ function parseAndValidateInputAndOutputOptions(optionsNode) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/input_function.mjs
+var INPUT_INITIALIZER_FN = {
+  functionName: "input",
+  owningModule: "@angular/core",
+  allowedAccessLevels: [
+    ClassMemberAccessLevel.PublicWritable,
+    ClassMemberAccessLevel.PublicReadonly,
+    ClassMemberAccessLevel.Protected
+  ]
+};
 function tryParseSignalInputMapping(member, reflector, importTracker) {
   var _a;
   if (member.value === null) {
     return null;
   }
-  const signalInput = tryParseInitializerApi([{
-    functionName: "input",
-    owningModule: "@angular/core",
-    allowedAccessLevels: [
-      ClassMemberAccessLevel.PublicWritable,
-      ClassMemberAccessLevel.PublicReadonly,
-      ClassMemberAccessLevel.Protected
-    ]
-  }], member.value, reflector, importTracker);
+  const signalInput = tryParseInitializerApi([INPUT_INITIALIZER_FN], member.value, reflector, importTracker);
   if (signalInput === null) {
     return null;
   }
@@ -4522,20 +4523,21 @@ function tryParseSignalInputMapping(member, reflector, importTracker) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/model_function.mjs
+var MODEL_INITIALIZER_FN = {
+  functionName: "model",
+  owningModule: "@angular/core",
+  allowedAccessLevels: [
+    ClassMemberAccessLevel.PublicWritable,
+    ClassMemberAccessLevel.PublicReadonly,
+    ClassMemberAccessLevel.Protected
+  ]
+};
 function tryParseSignalModelMapping(member, reflector, importTracker) {
   var _a;
   if (member.value === null) {
     return null;
   }
-  const model = tryParseInitializerApi([{
-    functionName: "model",
-    owningModule: "@angular/core",
-    allowedAccessLevels: [
-      ClassMemberAccessLevel.PublicWritable,
-      ClassMemberAccessLevel.PublicReadonly,
-      ClassMemberAccessLevel.Protected
-    ]
-  }], member.value, reflector, importTracker);
+  const model = tryParseInitializerApi([MODEL_INITIALIZER_FN], member.value, reflector, importTracker);
   if (model === null) {
     return null;
   }
@@ -4567,23 +4569,24 @@ var allowedAccessLevels = [
   ClassMemberAccessLevel.PublicReadonly,
   ClassMemberAccessLevel.Protected
 ];
+var OUTPUT_INITIALIZER_FNS = [
+  {
+    functionName: "output",
+    owningModule: "@angular/core",
+    allowedAccessLevels
+  },
+  {
+    functionName: "outputFromObservable",
+    owningModule: "@angular/core/rxjs-interop",
+    allowedAccessLevels
+  }
+];
 function tryParseInitializerBasedOutput(member, reflector, importTracker) {
   var _a;
   if (member.value === null) {
     return null;
   }
-  const output = tryParseInitializerApi([
-    {
-      functionName: "output",
-      owningModule: "@angular/core",
-      allowedAccessLevels
-    },
-    {
-      functionName: "outputFromObservable",
-      owningModule: "@angular/core/rxjs-interop",
-      allowedAccessLevels
-    }
-  ], member.value, reflector, importTracker);
+  const output = tryParseInitializerApi(OUTPUT_INITIALIZER_FNS, member.value, reflector, importTracker);
   if (output === null) {
     return null;
   }
@@ -4608,7 +4611,7 @@ function tryParseInitializerBasedOutput(member, reflector, importTracker) {
 import { createMayBeForwardRefExpression, outputAst as o } from "@angular/compiler";
 import ts21 from "typescript";
 var queryFunctionNames = ["viewChild", "viewChildren", "contentChild", "contentChildren"];
-var initializerFns = queryFunctionNames.map((fnName) => ({
+var QUERY_INITIALIZER_FNS = queryFunctionNames.map((fnName) => ({
   functionName: fnName,
   owningModule: "@angular/core",
   allowedAccessLevels: [
@@ -4623,7 +4626,7 @@ function tryParseSignalQueryFromInitializer(member, reflector, importTracker) {
   if (member.value === null) {
     return null;
   }
-  const query = tryParseInitializerApi(initializerFns, member.value, reflector, importTracker);
+  const query = tryParseInitializerApi(QUERY_INITIALIZER_FNS, member.value, reflector, importTracker);
   if (query === null) {
     return null;
   }
@@ -8352,9 +8355,14 @@ export {
   MetadataDtsModuleScopeResolver,
   LocalModuleScopeRegistry,
   TypeCheckScopeRegistry,
+  tryParseInitializerApi,
+  INPUT_INITIALIZER_FN,
   tryParseSignalInputMapping,
+  MODEL_INITIALIZER_FN,
   tryParseSignalModelMapping,
+  OUTPUT_INITIALIZER_FNS,
   tryParseInitializerBasedOutput,
+  QUERY_INITIALIZER_FNS,
   tryParseSignalQueryFromInitializer,
   queryDecoratorNames,
   DirectiveDecoratorHandler,
@@ -8377,4 +8385,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-BJQ7CLE7.js.map
+//# sourceMappingURL=chunk-SHYYCQQE.js.map

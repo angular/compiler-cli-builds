@@ -97,6 +97,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["OPTIONAL_CHAIN_NOT_NULLABLE"] = 8107] = "OPTIONAL_CHAIN_NOT_NULLABLE";
   ErrorCode2[ErrorCode2["SKIP_HYDRATION_NOT_STATIC"] = 8108] = "SKIP_HYDRATION_NOT_STATIC";
   ErrorCode2[ErrorCode2["INTERPOLATED_SIGNAL_NOT_INVOKED"] = 8109] = "INTERPOLATED_SIGNAL_NOT_INVOKED";
+  ErrorCode2[ErrorCode2["UNSUPPORTED_INITIALIZER_API_USAGE"] = 8110] = "UNSUPPORTED_INITIALIZER_API_USAGE";
   ErrorCode2[ErrorCode2["INLINE_TCB_REQUIRED"] = 8900] = "INLINE_TCB_REQUIRED";
   ErrorCode2[ErrorCode2["INLINE_TYPE_CTOR_REQUIRED"] = 8901] = "INLINE_TYPE_CTOR_REQUIRED";
   ErrorCode2[ErrorCode2["INJECTABLE_DUPLICATE_PROV"] = 9001] = "INJECTABLE_DUPLICATE_PROV";
@@ -1695,6 +1696,17 @@ var ImportedSymbolsTracker = class {
     const namespaces = this.fileToNamespaceImports.get(sourceFile);
     return (_b = (_a = namespaces.get(moduleName)) == null ? void 0 : _a.has(node.text)) != null ? _b : false;
   }
+  hasNamedImport(sourceFile, exportedName, moduleName) {
+    this.scanImports(sourceFile);
+    const fileImports = this.fileToNamedImports.get(sourceFile);
+    const moduleImports = fileImports.get(moduleName);
+    return moduleImports !== void 0 && moduleImports.has(exportedName);
+  }
+  hasNamespaceImport(sourceFile, moduleName) {
+    this.scanImports(sourceFile);
+    const namespaces = this.fileToNamespaceImports.get(sourceFile);
+    return namespaces.has(moduleName);
+  }
   scanImports(sourceFile) {
     var _a, _b;
     if (this.fileToNamedImports.has(sourceFile) && this.fileToNamespaceImports.has(sourceFile)) {
@@ -2970,4 +2982,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XZRJJDCL.js.map
+//# sourceMappingURL=chunk-A2ENG2AK.js.map
