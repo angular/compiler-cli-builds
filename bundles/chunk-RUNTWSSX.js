@@ -124,7 +124,6 @@ var FatalDiagnosticError = class extends Error {
     this.node = node;
     this.diagnosticMessage = diagnosticMessage;
     this.relatedInformation = relatedInformation;
-    this.message = this.message;
     this._isFatalDiagnosticError = true;
     Object.setPrototypeOf(this, new.target.prototype);
   }
@@ -2982,4 +2981,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-A2ENG2AK.js.map
+//# sourceMappingURL=chunk-RUNTWSSX.js.map

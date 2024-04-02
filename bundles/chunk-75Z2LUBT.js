@@ -44,7 +44,7 @@ import {
   isHostDirectiveMetaForGlobalMode,
   ivyTransformFactory,
   tryParseInitializerApi
-} from "./chunk-SHYYCQQE.js";
+} from "./chunk-UYDKSYFP.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -94,7 +94,7 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-A2ENG2AK.js";
+} from "./chunk-RUNTWSSX.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -6120,30 +6120,14 @@ var TcbSwitchOp = class extends TcbOp {
     return false;
   }
   execute() {
-    const comparisonExpression = tcbExpression(this.block.expression, this.tcb, this.scope);
-    markIgnoreDiagnostics(comparisonExpression);
-    const expression = ts31.factory.createParenthesizedExpression(comparisonExpression);
-    const root = this.generateCase(0, expression, null);
-    if (root !== void 0) {
-      this.scope.addStatement(root);
-    }
+    const switchExpression = tcbExpression(this.block.expression, this.tcb, this.scope);
+    const clauses = this.block.cases.map((current) => {
+      const clauseScope = Scope.forNodes(this.tcb, this.scope, null, current.children, this.generateGuard(current, switchExpression));
+      const statements = [...clauseScope.render(), ts31.factory.createBreakStatement()];
+      return current.expression === null ? ts31.factory.createDefaultClause(statements) : ts31.factory.createCaseClause(tcbExpression(current.expression, this.tcb, clauseScope), statements);
+    });
+    this.scope.addStatement(ts31.factory.createSwitchStatement(switchExpression, ts31.factory.createCaseBlock(clauses)));
     return null;
-  }
-  generateCase(index, switchValue, defaultCase) {
-    if (index >= this.block.cases.length) {
-      if (defaultCase !== null) {
-        const defaultScope = Scope.forNodes(this.tcb, this.scope, null, defaultCase.children, this.generateGuard(defaultCase, switchValue));
-        return ts31.factory.createBlock(defaultScope.render());
-      }
-      return void 0;
-    }
-    const current = this.block.cases[index];
-    if (current.expression === null) {
-      return this.generateCase(index + 1, switchValue, current);
-    }
-    const caseScope = Scope.forNodes(this.tcb, this.scope, null, current.children, this.generateGuard(current, switchValue));
-    const caseValue = tcbExpression(current.expression, this.tcb, caseScope);
-    return ts31.factory.createIfStatement(ts31.factory.createBinaryExpression(switchValue, ts31.SyntaxKind.EqualsEqualsEqualsToken, caseValue), ts31.factory.createBlock(caseScope.render()), this.generateCase(index + 1, switchValue, defaultCase));
   }
   generateGuard(node, switchValue) {
     if (node.expression !== null) {
@@ -6387,7 +6371,7 @@ var _Scope = class {
     } else if (node instanceof TmplAstIfBlock) {
       this.opQueue.push(new TcbIfOp(this.tcb, this, node));
     } else if (node instanceof TmplAstSwitchBlock) {
-      this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.expression), new TcbSwitchOp(this.tcb, this, node));
+      this.opQueue.push(new TcbSwitchOp(this.tcb, this, node));
     } else if (node instanceof TmplAstForLoopBlock) {
       this.opQueue.push(new TcbForOfOp(this.tcb, this, node));
       node.empty && this.appendChildren(node.empty);
@@ -10576,4 +10560,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-LJIXYA7A.js.map
+//# sourceMappingURL=chunk-75Z2LUBT.js.map
