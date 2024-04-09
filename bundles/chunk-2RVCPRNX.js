@@ -4124,21 +4124,29 @@ var MagicString = class {
     if (searchValue.global) {
       const matches = matchAll(searchValue, this.original);
       matches.forEach((match) => {
-        if (match.index != null)
-          this.overwrite(
-            match.index,
-            match.index + match[0].length,
-            getReplacement(match, this.original)
-          );
+        if (match.index != null) {
+          const replacement2 = getReplacement(match, this.original);
+          if (replacement2 !== match[0]) {
+            this.overwrite(
+              match.index,
+              match.index + match[0].length,
+              replacement2
+            );
+          }
+        }
       });
     } else {
       const match = this.original.match(searchValue);
-      if (match && match.index != null)
-        this.overwrite(
-          match.index,
-          match.index + match[0].length,
-          getReplacement(match, this.original)
-        );
+      if (match && match.index != null) {
+        const replacement2 = getReplacement(match, this.original);
+        if (replacement2 !== match[0]) {
+          this.overwrite(
+            match.index,
+            match.index + match[0].length,
+            replacement2
+          );
+        }
+      }
     }
     return this;
   }
@@ -4160,7 +4168,9 @@ var MagicString = class {
     const { original } = this;
     const stringLength = string.length;
     for (let index = original.indexOf(string); index !== -1; index = original.indexOf(string, index + stringLength)) {
-      this.overwrite(index, index + stringLength, replacement);
+      const previous = original.slice(index, index + stringLength);
+      if (previous !== replacement)
+        this.overwrite(index, index + stringLength, replacement);
     }
     return this;
   }
@@ -10560,4 +10570,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XWLQOUOW.js.map
+//# sourceMappingURL=chunk-2RVCPRNX.js.map
