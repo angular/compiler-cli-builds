@@ -4828,7 +4828,7 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
   splitTwoWayBinding(templateId, input, output, inputConsumer, outputConsumer) {
     const mapping = this.resolver.getSourceMapping(templateId);
     const errorMsg = `The property and event halves of the two-way binding '${input.name}' are not bound to the same target.
-            Find more at https://angular.io/guide/two-way-binding#how-two-way-binding-works`;
+            Find more at https://angular.dev/guide/templates/two-way-binding#how-two-way-binding-works`;
     const relatedMessages = [];
     relatedMessages.push({
       text: `The property half of the binding is to the '${inputConsumer.name.text}' component.`,
@@ -8638,7 +8638,7 @@ var InvalidBananaInBoxCheck = class extends TemplateCheckWithVisitor {
     const boundSyntax = node.sourceSpan.toString();
     const expectedBoundSyntax = boundSyntax.replace(`(${name})`, `[(${name.slice(1, -1)})]`);
     const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, `In the two-way binding syntax the parentheses should be inside the brackets, ex. '${expectedBoundSyntax}'.
-        Find more at https://angular.io/guide/two-way-binding`);
+        Find more at https://angular.dev/guide/templates/two-way-binding`);
     return [diagnostic];
   }
 };
@@ -9835,7 +9835,7 @@ One of the following actions is required:
 2. Remove "strictTemplates" or set it to 'false'.
 
 More information about the template type checking compiler options can be found in the documentation:
-https://angular.io/guide/template-typecheck
+https://angular.dev/tools/cli/template-typecheck
       `.trim()
     });
   }
@@ -10560,4 +10560,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-75Z2LUBT.js.map
+//# sourceMappingURL=chunk-XWLQOUOW.js.map
