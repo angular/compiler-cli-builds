@@ -1983,6 +1983,10 @@ var ImportManager = class {
     this._config = _config;
     this.newImports = /* @__PURE__ */ new Map();
     this.nextUniqueIndex = 0;
+    this.reuseGeneratedImportsTracker = {
+      directReuseCache: /* @__PURE__ */ new Map(),
+      namespaceImportReuseCache: /* @__PURE__ */ new Map()
+    };
     this.config = {
       shouldUseSingleQuotes: () => false,
       rewriter: null,
@@ -1996,10 +2000,6 @@ var ImportManager = class {
       generateUniqueIdentifier: this.config.generateUniqueIdentifier,
       reusedAliasDeclarations: /* @__PURE__ */ new Set(),
       updatedImports: /* @__PURE__ */ new Map()
-    };
-    this.reuseGeneratedImportsTracker = {
-      directReuseCache: /* @__PURE__ */ new Map(),
-      namespaceImportReuseCache: /* @__PURE__ */ new Map()
     };
   }
   addSideEffectImport(requestedFile, moduleSpecifier) {
@@ -2981,4 +2981,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RUNTWSSX.js.map
+//# sourceMappingURL=chunk-HE4PX3Z3.js.map
