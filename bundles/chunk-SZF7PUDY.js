@@ -184,6 +184,9 @@ var MemberTags;
   MemberTags2["Output"] = "output";
   MemberTags2["Inherited"] = "override";
 })(MemberTags || (MemberTags = {}));
+function isDocEntryWithSourceInfo(entry) {
+  return "source" in entry;
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/extractor.mjs
 import ts10 from "typescript";
@@ -913,7 +916,7 @@ var DocsExtractor = class {
     this.typeChecker = typeChecker;
     this.metadataReader = metadataReader;
   }
-  extractAll(sourceFile) {
+  extractAll(sourceFile, rootDir) {
     const entries = [];
     const exportedDeclarations = this.getExportedDeclarations(sourceFile);
     for (const [exportName, node] of exportedDeclarations) {
@@ -922,6 +925,12 @@ var DocsExtractor = class {
       }
       const entry = this.extractDeclaration(node);
       if (entry && !isIgnoredDocEntry(entry)) {
+        const realSourceFile = node.getSourceFile();
+        entry.source = {
+          filePath: getRelativeFilePath(realSourceFile, rootDir),
+          startLine: ts10.getLineAndCharacterOfPosition(realSourceFile, node.getFullStart()).line,
+          endLine: ts10.getLineAndCharacterOfPosition(realSourceFile, node.getEnd()).line
+        };
         entries.push({ ...entry, name: exportName });
       }
     }
@@ -978,6 +987,11 @@ function isIgnoredDocEntry(entry) {
     throw new Error(`Docs extraction: Entry "${entry.name}" is marked as "@docsPrivate" but without reasoning.`);
   }
   return isDocsPrivate !== void 0;
+}
+function getRelativeFilePath(sourceFile, rootDir) {
+  const fullPath = sourceFile.fileName;
+  const relativePath = fullPath.replace(rootDir, "");
+  return relativePath;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.mjs
@@ -9480,7 +9494,8 @@ var NgCompiler = class {
     if (!entryPointSourceFile) {
       throw new Error(`Entry point "${entryPoint}" not found in program sources.`);
     }
-    return docsExtractor.extractAll(entryPointSourceFile);
+    const rootDir = this.inputProgram.getCurrentDirectory();
+    return docsExtractor.extractAll(entryPointSourceFile, rootDir);
   }
   xi18n(ctx) {
     const compilation = this.ensureAnalyzed();
@@ -10538,6 +10553,7 @@ export {
   MemberType,
   DecoratorType,
   MemberTags,
+  isDocEntryWithSourceInfo,
   DocsExtractor,
   untagAllTsFiles,
   TsCreateProgramDriver,
@@ -10570,4 +10586,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-BD43R5KN.js.map
+//# sourceMappingURL=chunk-SZF7PUDY.js.map
