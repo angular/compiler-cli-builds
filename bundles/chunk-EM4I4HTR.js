@@ -6060,15 +6060,19 @@ var TcbIfOp = class extends TcbOp {
       return void 0;
     }
     if (branch.expression === null) {
-      const branchScope = Scope.forNodes(this.tcb, this.scope, null, branch.children, this.generateBranchGuard(index));
+      const branchScope = this.getBranchScope(this.scope, branch, index);
       return ts30.factory.createBlock(branchScope.render());
     }
     const expressionScope = Scope.forNodes(this.tcb, this.scope, branch, [], null);
     expressionScope.render().forEach((stmt) => this.scope.addStatement(stmt));
     this.expressionScopes.set(branch, expressionScope);
     const expression = branch.expressionAlias === null ? tcbExpression(branch.expression, this.tcb, expressionScope) : expressionScope.resolve(branch.expressionAlias);
-    const bodyScope = Scope.forNodes(this.tcb, expressionScope, null, branch.children, this.generateBranchGuard(index));
+    const bodyScope = this.getBranchScope(expressionScope, branch, index);
     return ts30.factory.createIfStatement(expression, ts30.factory.createBlock(bodyScope.render()), this.generateBranch(index + 1));
+  }
+  getBranchScope(parentScope, branch, index) {
+    const checkBody = this.tcb.env.config.checkControlFlowBodies;
+    return Scope.forNodes(this.tcb, parentScope, null, checkBody ? branch.children : [], checkBody ? this.generateBranchGuard(index) : null);
   }
   generateBranchGuard(index) {
     let guard = null;
@@ -6115,9 +6119,10 @@ var TcbSwitchOp = class extends TcbOp {
     return null;
   }
   generateCase(index, switchValue, defaultCase) {
+    const checkBodies = this.tcb.env.config.checkControlFlowBodies;
     if (index >= this.block.cases.length) {
       if (defaultCase !== null) {
-        const defaultScope = Scope.forNodes(this.tcb, this.scope, null, defaultCase.children, this.generateGuard(defaultCase, switchValue));
+        const defaultScope = Scope.forNodes(this.tcb, this.scope, null, checkBodies ? defaultCase.children : [], checkBodies ? this.generateGuard(defaultCase, switchValue) : null);
         return ts30.factory.createBlock(defaultScope.render());
       }
       return void 0;
@@ -6126,7 +6131,7 @@ var TcbSwitchOp = class extends TcbOp {
     if (current.expression === null) {
       return this.generateCase(index + 1, switchValue, current);
     }
-    const caseScope = Scope.forNodes(this.tcb, this.scope, null, current.children, this.generateGuard(current, switchValue));
+    const caseScope = Scope.forNodes(this.tcb, this.scope, null, checkBodies ? current.children : [], checkBodies ? this.generateGuard(current, switchValue) : null);
     const caseValue = tcbExpression(current.expression, this.tcb, caseScope);
     return ts30.factory.createIfStatement(ts30.factory.createBinaryExpression(switchValue, ts30.SyntaxKind.EqualsEqualsEqualsToken, caseValue), ts30.factory.createBlock(caseScope.render()), this.generateCase(index + 1, switchValue, defaultCase));
   }
@@ -6164,7 +6169,7 @@ var TcbForOfOp = class extends TcbOp {
     return false;
   }
   execute() {
-    const loopScope = Scope.forNodes(this.tcb, this.scope, this.block, this.block.children, null);
+    const loopScope = Scope.forNodes(this.tcb, this.scope, this.block, this.tcb.env.config.checkControlFlowBodies ? this.block.children : [], null);
     const initializerId = loopScope.resolve(this.block.item);
     if (!ts30.isIdentifier(initializerId)) {
       throw new Error(`Could not resolve for loop variable ${this.block.item.name} to an identifier`);
@@ -6375,7 +6380,7 @@ var _Scope = class {
       this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.expression), new TcbSwitchOp(this.tcb, this, node));
     } else if (node instanceof TmplAstForLoopBlock2) {
       this.opQueue.push(new TcbForOfOp(this.tcb, this, node));
-      node.empty && this.appendChildren(node.empty);
+      node.empty && this.tcb.env.config.checkControlFlowBodies && this.appendChildren(node.empty);
     } else if (node instanceof TmplAstBoundText) {
       this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.value));
     } else if (node instanceof TmplAstIcu) {
@@ -9424,6 +9429,7 @@ var NgCompiler = class {
         alwaysCheckSchemaInTemplateBodies: true,
         checkTypeOfInputBindings: strictTemplates,
         honorAccessModifiersForInputBindings: false,
+        checkControlFlowBodies: true,
         strictNullInputBindings: strictTemplates,
         checkTypeOfAttributes: strictTemplates,
         checkTypeOfDomBindings: false,
@@ -9447,6 +9453,7 @@ var NgCompiler = class {
         applyTemplateContextGuards: false,
         checkQueries: false,
         checkTemplateBodies: false,
+        checkControlFlowBodies: false,
         alwaysCheckSchemaInTemplateBodies: this.closureCompilerEnabled,
         checkTypeOfInputBindings: false,
         strictNullInputBindings: false,
@@ -10456,4 +10463,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YUCWD6QQ.js.map
+//# sourceMappingURL=chunk-EM4I4HTR.js.map
