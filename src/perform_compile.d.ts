@@ -30,7 +30,7 @@ export interface PerformCompilationResult {
     emitResult?: ts.EmitResult;
 }
 export declare function exitCodeFromResult(diags: ReadonlyArray<ts.Diagnostic> | undefined): number;
-export declare function performCompilation<CbEmitRes extends ts.EmitResult = ts.EmitResult>({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags, forceEmit, modifiedResourceFiles }: {
+export declare function performCompilation<CbEmitRes extends ts.EmitResult = ts.EmitResult>({ rootNames, options, host, oldProgram, emitCallback, mergeEmitResultsCallback, gatherDiagnostics, customTransformers, emitFlags, forceEmit, modifiedResourceFiles, }: {
     rootNames: string[];
     options: api.CompilerOptions;
     host?: api.CompilerHost;

@@ -10,7 +10,7 @@ import {
   tryParseSignalInputMapping,
   tryParseSignalModelMapping,
   tryParseSignalQueryFromInitializer
-} from "./chunk-A2LVDCHW.js";
+} from "./chunk-3ZM5BFEI.js";
 import {
   ImportManager,
   ImportedSymbolsTracker,
@@ -18,7 +18,7 @@ import {
   isAliasImportDeclaration,
   loadIsReferencedAliasDeclarationPatch,
   reflectClassMember
-} from "./chunk-HE4PX3Z3.js";
+} from "./chunk-CFIOLJL4.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/jit_transforms/downlevel_decorators_transform.mjs
 import ts from "typescript";
@@ -66,7 +66,9 @@ function createCtorParametersClassProperty(diagnostics, entityNameToExpression, 
       continue;
     }
     const paramType = ctorParam.type ? typeReferenceToExpression(entityNameToExpression, ctorParam.type) : void 0;
-    const members = [ts.factory.createPropertyAssignment("type", paramType || ts.factory.createIdentifier("undefined"))];
+    const members = [
+      ts.factory.createPropertyAssignment("type", paramType || ts.factory.createIdentifier("undefined"))
+    ];
     const decorators = [];
     for (const deco of ctorParam.decorators) {
       decorators.push(extractMetadataFromSingleDecorator(deco, diagnostics));
@@ -551,4 +553,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CU5WWBVV.js.map
+//# sourceMappingURL=chunk-5DY7CLVW.js.map

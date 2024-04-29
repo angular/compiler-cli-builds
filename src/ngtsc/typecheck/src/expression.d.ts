@@ -13,4 +13,4 @@ export declare const NULL_AS_ANY: ts.AsExpression;
  * Convert an `AST` to TypeScript code directly, without going through an intermediate `Expression`
  * AST.
  */
-export declare function astToTypescript(ast: AST, maybeResolve: (ast: AST) => (ts.Expression | null), config: TypeCheckingConfig): ts.Expression;
+export declare function astToTypescript(ast: AST, maybeResolve: (ast: AST) => ts.Expression | null, config: TypeCheckingConfig): ts.Expression;

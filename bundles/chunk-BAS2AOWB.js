@@ -12,7 +12,7 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-JJY5IERQ.js";
+} from "./chunk-XAPDG6EU.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.mjs
 import ts2 from "typescript";
@@ -53,15 +53,17 @@ function createPerformWatchHost(configFileName, reportDiagnostics, existingOptio
     createEmitCallback: (options) => createEmitCallback ? createEmitCallback(options) : void 0,
     onFileChange: (options, listener, ready) => {
       if (!options.basePath) {
-        reportDiagnostics([{
-          category: ts.DiagnosticCategory.Error,
-          messageText: "Invalid configuration option. baseDir not specified",
-          source: SOURCE,
-          code: DEFAULT_ERROR_CODE,
-          file: void 0,
-          start: void 0,
-          length: void 0
-        }]);
+        reportDiagnostics([
+          {
+            category: ts.DiagnosticCategory.Error,
+            messageText: "Invalid configuration option. baseDir not specified",
+            source: SOURCE,
+            code: DEFAULT_ERROR_CODE,
+            file: void 0,
+            start: void 0,
+            length: void 0
+          }
+        ]);
         return { close: () => {
         } };
       }
@@ -188,9 +190,13 @@ function performWatchCompilation(host) {
     const exitCode = exitCodeFromResult(compileResult.diagnostics);
     if (exitCode == 0) {
       cachedProgram = compileResult.program;
-      host.reportDiagnostics([createMessageDiagnostic("Compilation complete. Watching for file changes.")]);
+      host.reportDiagnostics([
+        createMessageDiagnostic("Compilation complete. Watching for file changes.")
+      ]);
     } else {
-      host.reportDiagnostics([createMessageDiagnostic("Compilation failed. Watching for file changes.")]);
+      host.reportDiagnostics([
+        createMessageDiagnostic("Compilation failed. Watching for file changes.")
+      ]);
     }
     return compileResult.diagnostics;
   }
@@ -228,7 +234,9 @@ function performWatchCompilation(host) {
     timerHandleForRecompilation.modifiedResourceFiles.add(changedPath);
   }
   function recompile() {
-    host.reportDiagnostics([createMessageDiagnostic("File change detected. Starting incremental compilation.")]);
+    host.reportDiagnostics([
+      createMessageDiagnostic("File change detected. Starting incremental compilation.")
+    ]);
     doCompilation();
     timerHandleForRecompilation = void 0;
   }
@@ -248,7 +256,14 @@ function main(args, consoleError = console.error, config, customTransformers, pr
   if (programReuse !== void 0) {
     oldProgram = programReuse.program;
   }
-  const { diagnostics: compileDiags, program } = performCompilation({ rootNames, options, emitFlags, oldProgram, customTransformers, modifiedResourceFiles });
+  const { diagnostics: compileDiags, program } = performCompilation({
+    rootNames,
+    options,
+    emitFlags,
+    oldProgram,
+    customTransformers,
+    modifiedResourceFiles
+  });
   if (programReuse !== void 0) {
     programReuse.program = program;
   }
@@ -265,7 +280,13 @@ function readNgcCommandLineAndConfiguration(args) {
     options.i18nInLocale = parsedArgs.locale;
   if (parsedArgs.missingTranslation)
     options.i18nInMissingTranslations = parsedArgs.missingTranslation;
-  const config = readCommandLineAndConfiguration(args, options, ["i18nFile", "i18nFormat", "locale", "missingTranslation", "watch"]);
+  const config = readCommandLineAndConfiguration(args, options, [
+    "i18nFile",
+    "i18nFormat",
+    "locale",
+    "missingTranslation",
+    "watch"
+  ]);
   return { ...config, watch: parsedArgs.watch };
 }
 function readCommandLineAndConfiguration(args, existingOptions = {}, ngCmdLineOptions = []) {
@@ -342,4 +363,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QWOTSGRF.js.map
+//# sourceMappingURL=chunk-BAS2AOWB.js.map

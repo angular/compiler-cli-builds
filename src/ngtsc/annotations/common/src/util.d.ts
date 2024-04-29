@@ -23,9 +23,9 @@ export declare const CORE_MODULE = "@angular/core";
 export declare function valueReferenceToExpression(valueRef: LocalTypeValueReference | ImportedTypeValueReference): Expression;
 export declare function valueReferenceToExpression(valueRef: TypeValueReference): Expression | null;
 export declare function toR3Reference(origin: ts.Node, ref: Reference, context: ts.SourceFile, refEmitter: ReferenceEmitter): R3Reference;
-export declare function isAngularCore(decorator: Decorator): decorator is (Decorator & {
+export declare function isAngularCore(decorator: Decorator): decorator is Decorator & {
     import: Import;
-});
+};
 export declare function isAngularCoreReference(reference: Reference, symbolName: string): boolean;
 export declare function findAngularDecorator(decorators: Decorator[], name: string, isCore: boolean): Decorator | undefined;
 export declare function isAngularDecorator(decorator: Decorator, name: string, isCore: boolean): boolean;
