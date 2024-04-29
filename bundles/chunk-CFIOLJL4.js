@@ -12,7 +12,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-UM6JO3VZ.js";
+} from "./chunk-3W345P4E.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
 import ts from "typescript";
@@ -1133,7 +1133,9 @@ function assertSuccessfulReferenceEmit(result, origin, typeKind) {
     return;
   }
   const message = makeDiagnosticChain(`Unable to import ${typeKind} ${nodeNameForError(result.ref.node)}.`, [makeDiagnosticChain(result.reason)]);
-  throw new FatalDiagnosticError(ErrorCode.IMPORT_GENERATION_FAILURE, origin, message, [makeRelatedInformation(result.ref.node, `The ${typeKind} is declared here.`)]);
+  throw new FatalDiagnosticError(ErrorCode.IMPORT_GENERATION_FAILURE, origin, message, [
+    makeRelatedInformation(result.ref.node, `The ${typeKind} is declared here.`)
+  ]);
 }
 var ReferenceEmitter = class {
   constructor(strategies) {
@@ -1780,10 +1782,7 @@ var LocalCompilationExtraImportsTracker = class {
   }
   getImportsForFile(sf) {
     var _a;
-    return [
-      ...this.globalImportsSet,
-      ...(_a = this.localImportsMap.get(sf.fileName)) != null ? _a : []
-    ];
+    return [...this.globalImportsSet, ...(_a = this.localImportsMap.get(sf.fileName)) != null ? _a : []];
   }
 };
 function removeQuotations(s) {
@@ -1860,7 +1859,10 @@ function createTsTransformForImportManager(manager, extraStatementsForFiles) {
       }
       const newClause = ctx.factory.updateImportClause(clause, clause.isTypeOnly, clause.name, updatedImports.get(clause.namedBindings));
       const newImport = ctx.factory.updateImportDeclaration(node, node.modifiers, newClause, node.moduleSpecifier, node.attributes);
-      ts13.setOriginalNode(newImport, { importClause: newClause, kind: newImport.kind });
+      ts13.setOriginalNode(newImport, {
+        importClause: newClause,
+        kind: newImport.kind
+      });
       return newImport;
     };
     return (sourceFile) => {
@@ -2846,7 +2848,9 @@ var TypeScriptAstFactory = class {
     return ts20.factory.createPrefixUnaryExpression(UNARY_OPERATORS2[operator], operand);
   }
   createVariableDeclaration(variableName, initializer, type) {
-    return ts20.factory.createVariableStatement(void 0, ts20.factory.createVariableDeclarationList([ts20.factory.createVariableDeclaration(variableName, void 0, void 0, initializer != null ? initializer : void 0)], VAR_TYPES[type]));
+    return ts20.factory.createVariableStatement(void 0, ts20.factory.createVariableDeclarationList([
+      ts20.factory.createVariableDeclaration(variableName, void 0, void 0, initializer != null ? initializer : void 0)
+    ], VAR_TYPES[type]));
   }
   setSourceMapRange(node, sourceMapRange) {
     if (sourceMapRange === null) {
@@ -2857,7 +2861,11 @@ var TypeScriptAstFactory = class {
       this.externalSourceFiles.set(url, ts20.createSourceMapSource(url, sourceMapRange.content, (pos) => pos));
     }
     const source = this.externalSourceFiles.get(url);
-    ts20.setSourceMapRange(node, { pos: sourceMapRange.start.offset, end: sourceMapRange.end.offset, source });
+    ts20.setSourceMapRange(node, {
+      pos: sourceMapRange.start.offset,
+      end: sourceMapRange.end.offset,
+      source
+    });
     return node;
   }
 };
@@ -2981,4 +2989,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-HE4PX3Z3.js.map
+//# sourceMappingURL=chunk-CFIOLJL4.js.map

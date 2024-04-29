@@ -8,7 +8,7 @@ import {
   PotentialImportKind,
   PotentialImportMode,
   SymbolKind
-} from "./chunk-XIYC7KSQ.js";
+} from "./chunk-ZX6BKV7T.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -44,7 +44,7 @@ import {
   isHostDirectiveMetaForGlobalMode,
   ivyTransformFactory,
   tryParseInitializerApi
-} from "./chunk-A2LVDCHW.js";
+} from "./chunk-3ZM5BFEI.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -94,14 +94,14 @@ import {
   toUnredirectedSourceFile,
   translateExpression,
   translateType
-} from "./chunk-HE4PX3Z3.js";
+} from "./chunk-CFIOLJL4.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-64JBPJBS.js";
+} from "./chunk-JZQHA4E7.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -111,7 +111,7 @@ import {
   getSourceFileOrError,
   join,
   resolve
-} from "./chunk-UM6JO3VZ.js";
+} from "./chunk-3W345P4E.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -2584,7 +2584,11 @@ var AdapterResourceLoader = class {
     if (!this.adapter.transformResource || context.type !== "style") {
       return data;
     }
-    const transformResult = await this.adapter.transformResource(data, { type: "style", containingFile: context.containingFile, resourceFile: null });
+    const transformResult = await this.adapter.transformResource(data, {
+      type: "style",
+      containingFile: context.containingFile,
+      resourceFile: null
+    });
     if (transformResult === null) {
       return data;
     }
@@ -2817,9 +2821,7 @@ function makeTemplateDiagnostic(templateId, mapping, span, category, code, messa
     try {
       sf = getParsedTemplateSourceFile(fileName, mapping);
     } catch (e) {
-      const failureChain = makeDiagnosticChain(`Failed to report an error in '${fileName}' at ${span.start.line + 1}:${span.start.col + 1}`, [
-        makeDiagnosticChain((_a = e == null ? void 0 : e.stack) != null ? _a : `${e}`)
-      ]);
+      const failureChain = makeDiagnosticChain(`Failed to report an error in '${fileName}' at ${span.start.line + 1}:${span.start.col + 1}`, [makeDiagnosticChain((_a = e == null ? void 0 : e.stack) != null ? _a : `${e}`)]);
       return {
         source: "ngtsc",
         category,
@@ -2869,7 +2871,13 @@ function parseTemplateAsSourceFile(fileName, template) {
   if (parseTemplateAsSourceFileForTest !== null) {
     return parseTemplateAsSourceFileForTest(fileName, template);
   }
-  return ts18.createSourceFile(fileName, template, ts18.ScriptTarget.Latest, false, ts18.ScriptKind.JSX);
+  return ts18.createSourceFile(
+    fileName,
+    template,
+    ts18.ScriptTarget.Latest,
+    false,
+    ts18.ScriptKind.JSX
+  );
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/id.mjs
@@ -4743,10 +4751,7 @@ var Environment = class extends ReferenceEmitEnvironment {
     return emitter.emit((ref) => this.referenceType(ref));
   }
   getPreludeStatements() {
-    return [
-      ...this.pipeInstStatements,
-      ...this.typeCtorStatements
-    ];
+    return [...this.pipeInstStatements, ...this.typeCtorStatements];
   }
 };
 
@@ -4808,12 +4813,14 @@ var OutOfBandDiagnosticRecorderImpl = class {
   duplicateTemplateVar(templateId, variable, firstDecl) {
     const mapping = this.resolver.getSourceMapping(templateId);
     const errorMsg = `Cannot redeclare variable '${variable.name}' as it was previously declared elsewhere for the same template.`;
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, variable.sourceSpan, ts27.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [{
-      text: `The variable '${firstDecl.name}' was first declared here.`,
-      start: firstDecl.sourceSpan.start.offset,
-      end: firstDecl.sourceSpan.end.offset,
-      sourceFile: mapping.node.getSourceFile()
-    }]));
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, variable.sourceSpan, ts27.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [
+      {
+        text: `The variable '${firstDecl.name}' was first declared here.`,
+        start: firstDecl.sourceSpan.start.offset,
+        end: firstDecl.sourceSpan.end.offset,
+        sourceFile: mapping.node.getSourceFile()
+      }
+    ]));
   }
   requiresInlineTcb(templateId, node) {
     this._diagnostics.push(makeInlineDiagnostic(templateId, ErrorCode.INLINE_TCB_REQUIRED, node.name, `This component requires inline template type-checking, which is not supported by the current environment.`));
@@ -4831,7 +4838,7 @@ var OutOfBandDiagnosticRecorderImpl = class {
     const mapping = this.resolver.getSourceMapping(templateId);
     let diagnosticVar = null;
     for (const variable of variables) {
-      if (diagnosticVar === null || (variable.value === "" || variable.value === "$implicit")) {
+      if (diagnosticVar === null || variable.value === "" || variable.value === "$implicit") {
         diagnosticVar = variable;
       }
     }
@@ -4969,7 +4976,12 @@ function addParseSpanInfo(node, span) {
   } else {
     commentText = `${span.start.offset},${span.end.offset}`;
   }
-  ts29.addSyntheticTrailingComment(node, ts29.SyntaxKind.MultiLineCommentTrivia, commentText, false);
+  ts29.addSyntheticTrailingComment(
+    node,
+    ts29.SyntaxKind.MultiLineCommentTrivia,
+    commentText,
+    false
+  );
 }
 function addTemplateId(tcb, id) {
   ts29.addSyntheticLeadingComment(tcb, ts29.SyntaxKind.MultiLineCommentTrivia, id, true);
@@ -4991,7 +5003,12 @@ function translateDiagnostic(diagnostic, resolver) {
   if (diagnostic.file === void 0 || diagnostic.start === void 0) {
     return null;
   }
-  const fullMapping = getTemplateMapping(diagnostic.file, diagnostic.start, resolver, true);
+  const fullMapping = getTemplateMapping(
+    diagnostic.file,
+    diagnostic.start,
+    resolver,
+    true
+  );
   if (fullMapping === null) {
     return null;
   }
@@ -5368,11 +5385,10 @@ function generateTypeCheckBlock(env, ref, name, meta, domSchemaChecker, oobRecor
   }
   const paramList = [tcbThisParam(ctxRawType.typeName, typeArguments)];
   const scopeStatements = scope.render();
-  const innerBody = ts31.factory.createBlock([
-    ...env.getPreludeStatements(),
-    ...scopeStatements
+  const innerBody = ts31.factory.createBlock([...env.getPreludeStatements(), ...scopeStatements]);
+  const body = ts31.factory.createBlock([
+    ts31.factory.createIfStatement(ts31.factory.createTrue(), innerBody, void 0)
   ]);
-  const body = ts31.factory.createBlock([ts31.factory.createIfStatement(ts31.factory.createTrue(), innerBody, void 0)]);
   const fnDecl = ts31.factory.createFunctionDeclaration(
     void 0,
     void 0,
@@ -5510,7 +5526,10 @@ var TcbTemplateBodyOp = class extends TcbOp {
     }
     let tmplBlock = ts31.factory.createBlock(statements);
     if (guard !== null) {
-      tmplBlock = ts31.factory.createIfStatement(guard, tmplBlock);
+      tmplBlock = ts31.factory.createIfStatement(
+        guard,
+        tmplBlock
+      );
     }
     this.scope.addStatement(tmplBlock);
     return null;
@@ -5777,7 +5796,11 @@ var TcbDirectiveCtorCircularFallbackOp = class extends TcbOp {
   execute() {
     const id = this.tcb.allocateId();
     const typeCtor = this.tcb.env.typeCtorFor(this.dir);
-    const circularPlaceholder = ts31.factory.createCallExpression(typeCtor, void 0, [ts31.factory.createNonNullExpression(ts31.factory.createNull())]);
+    const circularPlaceholder = ts31.factory.createCallExpression(
+      typeCtor,
+      void 0,
+      [ts31.factory.createNonNullExpression(ts31.factory.createNull())]
+    );
     this.scope.addStatement(tsCreateVariable(id, circularPlaceholder));
     return id;
   }
@@ -5963,7 +5986,9 @@ var TcbDirectiveOutputsOp = class extends TcbOp {
       if (this.tcb.env.config.checkTypeOfOutputEvents) {
         const handler = tcbCreateEventHandler(output, this.tcb, this.scope, 0);
         const subscribeFn = ts31.factory.createPropertyAccessExpression(outputField, "subscribe");
-        const call = ts31.factory.createCallExpression(subscribeFn, void 0, [handler]);
+        const call = ts31.factory.createCallExpression(subscribeFn, void 0, [
+          handler
+        ]);
         addParseSpanInfo(call, output.sourceSpan);
         this.scope.addStatement(ts31.factory.createExpressionStatement(call));
       } else {
@@ -7286,7 +7311,10 @@ var SymbolBuilder = class {
   getSymbolOfElement(element) {
     var _a;
     const elementSourceSpan = (_a = element.startSourceSpan) != null ? _a : element.sourceSpan;
-    const node = findFirstMatchingNode(this.typeCheckBlock, { withSpan: elementSourceSpan, filter: ts34.isVariableDeclaration });
+    const node = findFirstMatchingNode(this.typeCheckBlock, {
+      withSpan: elementSourceSpan,
+      filter: ts34.isVariableDeclaration
+    });
     if (node === null) {
       return null;
     }
@@ -7307,7 +7335,10 @@ var SymbolBuilder = class {
     const elementSourceSpan = (_a = element.startSourceSpan) != null ? _a : element.sourceSpan;
     const tcbSourceFile = this.typeCheckBlock.getSourceFile();
     const isDirectiveDeclaration = (node) => (ts34.isTypeNode(node) || ts34.isIdentifier(node)) && ts34.isVariableDeclaration(node.parent) && hasExpressionIdentifier(tcbSourceFile, node, ExpressionIdentifier.DIRECTIVE);
-    const nodes = findAllMatchingNodes(this.typeCheckBlock, { withSpan: elementSourceSpan, filter: isDirectiveDeclaration });
+    const nodes = findAllMatchingNodes(this.typeCheckBlock, {
+      withSpan: elementSourceSpan,
+      filter: isDirectiveDeclaration
+    });
     const symbols = [];
     for (const node of nodes) {
       const symbol = this.getSymbolOfTsNode(node.parent);
@@ -7421,7 +7452,10 @@ var SymbolBuilder = class {
         return ts34.isStringLiteral(n2.argumentExpression) && n2.argumentExpression.text === expectedAccess;
       }
     }
-    const outputFieldAccesses = findAllMatchingNodes(this.typeCheckBlock, { withSpan: eventBinding.keySpan, filter });
+    const outputFieldAccesses = findAllMatchingNodes(this.typeCheckBlock, {
+      withSpan: eventBinding.keySpan,
+      filter
+    });
     const bindings = [];
     for (const outputFieldAccess of outputFieldAccesses) {
       if (consumer instanceof TmplAstTemplate3 || consumer instanceof TmplAstElement4) {
@@ -7489,7 +7523,10 @@ var SymbolBuilder = class {
       const host = this.getSymbol(consumer);
       return host !== null ? { kind: SymbolKind.DomBinding, host } : null;
     }
-    const nodes = findAllMatchingNodes(this.typeCheckBlock, { withSpan: binding.sourceSpan, filter: isAssignment });
+    const nodes = findAllMatchingNodes(this.typeCheckBlock, {
+      withSpan: binding.sourceSpan,
+      filter: isAssignment
+    });
     const bindings = [];
     for (const node of nodes) {
       if (!isAccessExpression(node.left)) {
@@ -7562,7 +7599,10 @@ var SymbolBuilder = class {
     };
   }
   getSymbolOfVariable(variable) {
-    const node = findFirstMatchingNode(this.typeCheckBlock, { withSpan: variable.sourceSpan, filter: ts34.isVariableDeclaration });
+    const node = findFirstMatchingNode(this.typeCheckBlock, {
+      withSpan: variable.sourceSpan,
+      filter: ts34.isVariableDeclaration
+    });
     if (node === null) {
       return null;
     }
@@ -7590,7 +7630,10 @@ var SymbolBuilder = class {
   }
   getSymbolOfReference(ref) {
     const target = this.templateData.boundTarget.getReferenceTarget(ref);
-    let node = findFirstMatchingNode(this.typeCheckBlock, { withSpan: ref.sourceSpan, filter: ts34.isVariableDeclaration });
+    let node = findFirstMatchingNode(this.typeCheckBlock, {
+      withSpan: ref.sourceSpan,
+      filter: ts34.isVariableDeclaration
+    });
     if (node === null || target === null || node.initializer === void 0) {
       return null;
     }
@@ -7633,7 +7676,10 @@ var SymbolBuilder = class {
     }
   }
   getSymbolOfPipe(expression) {
-    const methodAccess = findFirstMatchingNode(this.typeCheckBlock, { withSpan: expression.nameSpan, filter: ts34.isPropertyAccessExpression });
+    const methodAccess = findFirstMatchingNode(this.typeCheckBlock, {
+      withSpan: expression.nameSpan,
+      filter: ts34.isPropertyAccessExpression
+    });
     if (methodAccess === null) {
       return null;
     }
@@ -7673,7 +7719,10 @@ var SymbolBuilder = class {
     }
     let node = null;
     if (expression instanceof PropertyRead5) {
-      node = findFirstMatchingNode(this.typeCheckBlock, { withSpan, filter: ts34.isPropertyAccessExpression });
+      node = findFirstMatchingNode(this.typeCheckBlock, {
+        withSpan,
+        filter: ts34.isPropertyAccessExpression
+      });
     }
     if (node === null) {
       node = findFirstMatchingNode(this.typeCheckBlock, { withSpan, filter: anyNodeFilter });
@@ -9059,12 +9108,14 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor3 {
   }
   makeIllegalTemplateVarDiagnostic(target, expressionNode, errorMessage) {
     var _a, _b;
-    return this.templateTypeChecker.makeTemplateDiagnostic(this.component, expressionNode.handlerSpan, ts39.DiagnosticCategory.Error, ngErrorCode(ErrorCode.WRITE_TO_READ_ONLY_VARIABLE), errorMessage, [{
-      text: `The variable ${target.name} is declared here.`,
-      start: ((_a = target.valueSpan) == null ? void 0 : _a.start.offset) || target.sourceSpan.start.offset,
-      end: ((_b = target.valueSpan) == null ? void 0 : _b.end.offset) || target.sourceSpan.end.offset,
-      sourceFile: this.component.getSourceFile()
-    }]);
+    return this.templateTypeChecker.makeTemplateDiagnostic(this.component, expressionNode.handlerSpan, ts39.DiagnosticCategory.Error, ngErrorCode(ErrorCode.WRITE_TO_READ_ONLY_VARIABLE), errorMessage, [
+      {
+        text: `The variable ${target.name} is declared here.`,
+        start: ((_a = target.valueSpan) == null ? void 0 : _a.start.offset) || target.sourceSpan.start.offset,
+        end: ((_b = target.valueSpan) == null ? void 0 : _b.end.offset) || target.sourceSpan.end.offset,
+        sourceFile: this.component.getSourceFile()
+      }
+    ]);
   }
 };
 function unwrapAstWithSource(ast) {
@@ -9336,9 +9387,7 @@ var NgCompiler = class {
     return this.incrementalCompilation.depGraph.getResourceDependencies(file);
   }
   getDiagnostics() {
-    const diagnostics = [
-      ...this.getNonTemplateDiagnostics()
-    ];
+    const diagnostics = [...this.getNonTemplateDiagnostics()];
     try {
       diagnostics.push(...this.getTemplateDiagnostics(), ...this.runAdditionalChecks());
     } catch (err) {
@@ -9350,7 +9399,9 @@ var NgCompiler = class {
     return this.addMessageTextDetails(diagnostics);
   }
   getDiagnosticsForFile(file, optimizeFor) {
-    const diagnostics = [...this.getNonTemplateDiagnostics().filter((diag) => diag.file === file)];
+    const diagnostics = [
+      ...this.getNonTemplateDiagnostics().filter((diag) => diag.file === file)
+    ];
     try {
       diagnostics.push(...this.getTemplateDiagnosticsForFile(file, optimizeFor), ...this.runAdditionalChecks(file));
     } catch (err) {
@@ -9751,7 +9802,10 @@ var NgCompiler = class {
     const ngModuleIndex = new NgModuleIndexImpl(metaReader, localMetaReader);
     const ngModuleScopeRegistry = new LocalModuleScopeRegistry(localMetaReader, metaReader, depScopeReader, refEmitter, aliasingHost);
     const standaloneScopeReader = new StandaloneComponentScopeReader(metaReader, ngModuleScopeRegistry, depScopeReader);
-    const scopeReader = new CompoundComponentScopeReader([ngModuleScopeRegistry, standaloneScopeReader]);
+    const scopeReader = new CompoundComponentScopeReader([
+      ngModuleScopeRegistry,
+      standaloneScopeReader
+    ]);
     const semanticDepGraphUpdater = this.incrementalCompilation.semanticDepGraphUpdater;
     const metaRegistry = new CompoundMetadataRegistry([localMetaRegistry, ngModuleScopeRegistry]);
     const injectableRegistry = new InjectableClassRegistry(reflector, isCore);
@@ -10441,15 +10495,17 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
     }
     return { project: projectFile, rootNames, projectReferences, options, errors, emitFlags };
   } catch (e) {
-    const errors = [{
-      category: ts45.DiagnosticCategory.Error,
-      messageText: (_a = e.stack) != null ? _a : e.message,
-      file: void 0,
-      start: void 0,
-      length: void 0,
-      source: "angular",
-      code: UNKNOWN_ERROR_CODE
-    }];
+    const errors = [
+      {
+        category: ts45.DiagnosticCategory.Error,
+        messageText: (_a = e.stack) != null ? _a : e.message,
+        file: void 0,
+        start: void 0,
+        length: void 0,
+        source: "angular",
+        code: UNKNOWN_ERROR_CODE
+      }
+    ];
     return { project: "", errors, rootNames: [], options: {}, emitFlags: EmitFlags.Default };
   }
 }
@@ -10511,7 +10567,13 @@ function performCompilation({ rootNames, options, host, oldProgram, emitCallback
       allDiagnostics.push(createMessageDiagnostic(`Time for diagnostics: ${afterDiags - beforeDiags}ms.`));
     }
     if (!hasErrors(allDiagnostics)) {
-      emitResult = program.emit({ emitCallback, mergeEmitResultsCallback, customTransformers, emitFlags, forceEmit });
+      emitResult = program.emit({
+        emitCallback,
+        mergeEmitResultsCallback,
+        customTransformers,
+        emitFlags,
+        forceEmit
+      });
       allDiagnostics.push(...emitResult.diagnostics);
       return { diagnostics: allDiagnostics, program, emitResult };
     }
@@ -10541,7 +10603,10 @@ function defaultGatherDiagnostics(program) {
   let checkOtherDiagnostics = true;
   checkOtherDiagnostics = checkOtherDiagnostics && checkDiagnostics([...program.getTsOptionDiagnostics(), ...program.getNgOptionDiagnostics()]);
   checkOtherDiagnostics = checkOtherDiagnostics && checkDiagnostics(program.getTsSyntacticDiagnostics());
-  checkOtherDiagnostics = checkOtherDiagnostics && checkDiagnostics([...program.getTsSemanticDiagnostics(), ...program.getNgStructuralDiagnostics()]);
+  checkOtherDiagnostics = checkOtherDiagnostics && checkDiagnostics([
+    ...program.getTsSemanticDiagnostics(),
+    ...program.getNgStructuralDiagnostics()
+  ]);
   checkOtherDiagnostics = checkOtherDiagnostics && checkDiagnostics(program.getNgSemanticDiagnostics());
   return allDiagnostics;
 }
@@ -10593,4 +10658,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-JJY5IERQ.js.map
+//# sourceMappingURL=chunk-XAPDG6EU.js.map

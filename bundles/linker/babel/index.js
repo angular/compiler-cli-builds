@@ -8,16 +8,16 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-5YGSPVK5.js";
-import "../../chunk-HE4PX3Z3.js";
+} from "../../chunk-3UXY73FR.js";
+import "../../chunk-CFIOLJL4.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "../../chunk-LYJKWJUC.js";
-import "../../chunk-2WQIUGOU.js";
+import "../../chunk-QYV344EV.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-UM6JO3VZ.js";
+} from "../../chunk-3W345P4E.js";
 import "../../chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.mjs
@@ -120,7 +120,9 @@ var BabelAstFactory = class {
     return t.unaryExpression("typeof", expression);
   }
   createVariableDeclaration(variableName, initializer, type) {
-    return t.variableDeclaration(type, [t.variableDeclarator(t.identifier(variableName), initializer)]);
+    return t.variableDeclaration(type, [
+      t.variableDeclarator(t.identifier(variableName), initializer)
+    ]);
   }
   setSourceMapRange(node, sourceMapRange) {
     if (sourceMapRange === null) {

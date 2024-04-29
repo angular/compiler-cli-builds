@@ -6,4 +6,4 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export { NgModuleDecoratorHandler, NgModuleSymbol } from './src/handler';
-export { createModuleWithProvidersResolver, isResolvedModuleWithProviders, ResolvedModuleWithProviders } from './src/module_with_providers';
+export { createModuleWithProvidersResolver, isResolvedModuleWithProviders, ResolvedModuleWithProviders, } from './src/module_with_providers';

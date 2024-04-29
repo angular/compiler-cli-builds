@@ -23,7 +23,7 @@ export interface InitializerApiFunction {
     /** Module name where the initializer function is imported from. */
     owningModule: '@angular/core' | '@angular/core/rxjs-interop';
     /** Export name of the initializer function. */
-    functionName: ('input' | 'model' | 'output' | 'outputFromObservable' | 'viewChild' | 'viewChildren' | 'contentChild' | 'contentChildren');
+    functionName: 'input' | 'model' | 'output' | 'outputFromObservable' | 'viewChild' | 'viewChildren' | 'contentChild' | 'contentChildren';
     /** Class member access levels compatible with the API. */
     allowedAccessLevels: ClassMemberAccessLevel[];
 }
@@ -49,4 +49,4 @@ export interface InitializerFunctionMetadata {
  */
 export declare function tryParseInitializerApi<Functions extends InitializerApiFunction[]>(functions: Functions, expression: ts.Expression, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker): (InitializerFunctionMetadata & {
     api: Functions[number];
-} | null);
+}) | null;

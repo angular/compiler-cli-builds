@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { CompilerHost, CompilerOptions, Program } from './api';
-export declare function createProgram({ rootNames, options, host, oldProgram }: {
+export declare function createProgram({ rootNames, options, host, oldProgram, }: {
     rootNames: ReadonlyArray<string>;
     options: CompilerOptions;
     host: CompilerHost;

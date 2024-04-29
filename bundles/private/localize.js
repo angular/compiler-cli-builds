@@ -9,7 +9,7 @@ import {
 import {
   SourceFile,
   SourceFileLoader
-} from "../chunk-2WQIUGOU.js";
+} from "../chunk-QYV344EV.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -30,7 +30,7 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "../chunk-UM6JO3VZ.js";
+} from "../chunk-3W345P4E.js";
 import "../chunk-XI2RTGAL.js";
 export {
   ConsoleLogger,

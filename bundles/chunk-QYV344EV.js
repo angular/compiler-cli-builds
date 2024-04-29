@@ -300,7 +300,10 @@ var SourceFileLoader = class {
   }
   loadSourceFile(sourcePath, contents = null, mapAndPath = null) {
     const contentsOrigin = contents !== null ? ContentOrigin.Provided : ContentOrigin.FileSystem;
-    const sourceMapInfo = mapAndPath && { origin: ContentOrigin.Provided, ...mapAndPath };
+    const sourceMapInfo = mapAndPath && {
+      origin: ContentOrigin.Provided,
+      ...mapAndPath
+    };
     return this.loadSourceFileInternal(sourcePath, contents, contentsOrigin, sourceMapInfo);
   }
   loadSourceFileInternal(sourcePath, contents, sourceOrigin, sourceMapInfo) {
@@ -416,4 +419,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2WQIUGOU.js.map
+//# sourceMappingURL=chunk-QYV344EV.js.map

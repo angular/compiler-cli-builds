@@ -34,16 +34,16 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-HE4PX3Z3.js";
+} from "./chunk-CFIOLJL4.js";
 import {
   PerfEvent,
   PerfPhase
-} from "./chunk-64JBPJBS.js";
+} from "./chunk-JZQHA4E7.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
   relative
-} from "./chunk-UM6JO3VZ.js";
+} from "./chunk-3W345P4E.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
@@ -59,7 +59,10 @@ function valueReferenceToExpression(valueRef) {
     }
     return expr;
   } else {
-    let importExpr = new ExternalExpr({ moduleName: valueRef.moduleName, name: valueRef.importedName });
+    let importExpr = new ExternalExpr({
+      moduleName: valueRef.moduleName,
+      name: valueRef.importedName
+    });
     if (valueRef.nestedPath !== null) {
       for (const property of valueRef.nestedPath) {
         importExpr = new ReadPropExpr(importExpr, property);
@@ -1145,12 +1148,16 @@ var TraceDynamicValueVisitor = class {
     return [makeRelatedInformation(value.node, "Unable to evaluate this expression further.")];
   }
   visitDynamicString(value) {
-    return [makeRelatedInformation(value.node, "A string value could not be determined statically.")];
+    return [
+      makeRelatedInformation(value.node, "A string value could not be determined statically.")
+    ];
   }
   visitExternalReference(value) {
     const name = value.reason.debugName;
     const description = name !== null ? `'${name}'` : "an anonymous declaration";
-    return [makeRelatedInformation(value.node, `A value for ${description} cannot be determined statically, as it is an external declaration.`)];
+    return [
+      makeRelatedInformation(value.node, `A value for ${description} cannot be determined statically, as it is an external declaration.`)
+    ];
   }
   visitComplexFunctionCall(value) {
     return [
@@ -1346,11 +1353,13 @@ function createUnsuitableInjectionTokenError(clazz, error) {
     messageText: `No suitable injection token for parameter '${param.name || index}' of class '${clazz.name.text}'.`,
     category: ts4.DiagnosticCategory.Error,
     code: 0,
-    next: [{
-      messageText: chainMessage,
-      category: ts4.DiagnosticCategory.Message,
-      code: 0
-    }]
+    next: [
+      {
+        messageText: chainMessage,
+        category: ts4.DiagnosticCategory.Message,
+        code: 0
+      }
+    ]
   };
   return new FatalDiagnosticError(ErrorCode.PARAM_MISSING_TOKEN, param.nameNode, chain, hints);
 }
@@ -1474,7 +1483,10 @@ function extraReferenceFromTypeQuery(checker, typeNode, origin, bestGuessOwningM
     throw new Error(`Expected named ClassDeclaration: ${nodeDebugInfo(node)}`);
   }
   if (from !== null && !from.startsWith(".")) {
-    return new Reference(node, { specifier: from, resolutionContext: origin.getSourceFile().fileName });
+    return new Reference(node, {
+      specifier: from,
+      resolutionContext: origin.getSourceFile().fileName
+    });
   }
   return new Reference(node, bestGuessOwningModule);
 }
@@ -2153,7 +2165,9 @@ function aliasTransformFactory(exportStatements) {
         const stmt = ts7.factory.createExportDeclaration(
           void 0,
           false,
-          ts7.factory.createNamedExports([ts7.factory.createExportSpecifier(false, symbolName, aliasName)]),
+          ts7.factory.createNamedExports([
+            ts7.factory.createExportSpecifier(false, symbolName, aliasName)
+          ]),
           ts7.factory.createStringLiteral(moduleName)
         );
         statements.push(stmt);
@@ -2379,14 +2393,16 @@ var TraitCompiler = class {
           continue;
         }
         if (isPrimaryHandler && record.hasPrimaryHandler) {
-          record.metaDiagnostics = [{
-            category: ts8.DiagnosticCategory.Error,
-            code: Number("-99" + ErrorCode.DECORATOR_COLLISION),
-            file: getSourceFile(clazz),
-            start: clazz.getStart(void 0, false),
-            length: clazz.getWidth(),
-            messageText: "Two incompatible decorators on class"
-          }];
+          record.metaDiagnostics = [
+            {
+              category: ts8.DiagnosticCategory.Error,
+              code: Number("-99" + ErrorCode.DECORATOR_COLLISION),
+              file: getSourceFile(clazz),
+              start: clazz.getStart(void 0, false),
+              length: clazz.getWidth(),
+              messageText: "Two incompatible decorators on class"
+            }
+          ];
           record.traits = foundTraits = [];
           break;
         }
@@ -2728,7 +2744,10 @@ var DtsTransformer = class {
     this.importRewriter = importRewriter;
   }
   transform(sf, transforms) {
-    const imports = new ImportManager({ ...presetImportManagerForceNamespaceImports, rewriter: this.importRewriter });
+    const imports = new ImportManager({
+      ...presetImportManagerForceNamespaceImports,
+      rewriter: this.importRewriter
+    });
     const visitor = (node) => {
       if (ts9.isClassDeclaration(node)) {
         return this.transformClassDeclaration(node, transforms, imports);
@@ -3038,7 +3057,10 @@ var IvyTransformationVisitor = class extends Visitor {
 };
 function transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, recordWrappedNode) {
   const constantPool = new ConstantPool(isClosureCompilerEnabled);
-  const importManager = new ImportManager({ ...presetImportManagerForceNamespaceImports, rewriter: importRewriter });
+  const importManager = new ImportManager({
+    ...presetImportManagerForceNamespaceImports,
+    rewriter: importRewriter
+  });
   const compilationVisitor = new IvyCompilationVisitor(compilation, constantPool);
   visit(file, compilationVisitor, context);
   const transformationVisitor = new IvyTransformationVisitor(compilation, compilationVisitor.classCompilationMap, reflector, importManager, recordWrappedNode, isClosureCompilerEnabled, isCore, compilationVisitor.deferrableImports);
@@ -3156,11 +3178,13 @@ function createValueHasWrongTypeError(node, value, messageText) {
     messageText,
     category: ts12.DiagnosticCategory.Error,
     code: 0,
-    next: [{
-      messageText: chainedMessage,
-      category: ts12.DiagnosticCategory.Message,
-      code: 0
-    }]
+    next: [
+      {
+        messageText: chainedMessage,
+        category: ts12.DiagnosticCategory.Message,
+        code: 0
+      }
+    ]
   };
   return new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, node, chain, relatedInformation);
 }
@@ -3511,9 +3535,11 @@ function isAngularDecorator2(decorator, isCore) {
   return isCore || decorator.import !== null && decorator.import.from === "@angular/core";
 }
 function removeIdentifierReferences(node, names) {
-  const result = ts14.transform(node, [(context) => (root) => ts14.visitNode(root, function walk(current) {
-    return ts14.isIdentifier(current) && (typeof names === "string" ? current.text === names : names.has(current.text)) ? ts14.factory.createIdentifier(current.text) : ts14.visitEachChild(current, walk, context);
-  })]);
+  const result = ts14.transform(node, [
+    (context) => (root) => ts14.visitNode(root, function walk(current) {
+      return ts14.isIdentifier(current) && (typeof names === "string" ? current.text === names : names.has(current.text)) ? ts14.factory.createIdentifier(current.text) : ts14.visitEachChild(current, walk, context);
+    })
+  ]);
   return result.transformed[0];
 }
 
@@ -3819,7 +3845,9 @@ function extractSemanticTypeParameters(node) {
   if (!ts16.isClassDeclaration(node) || node.typeParameters === void 0) {
     return null;
   }
-  return node.typeParameters.map((typeParam) => ({ hasGenericTypeBound: typeParam.constraint !== void 0 }));
+  return node.typeParameters.map((typeParam) => ({
+    hasGenericTypeBound: typeParam.constraint !== void 0
+  }));
 }
 function areTypeParametersEqual(current, previous) {
   if (!isArrayEqual(current, previous, isTypeParameterEqual)) {
@@ -4280,7 +4308,9 @@ function invalidRef(decl, rawExpr, type) {
   } else {
     relatedMessage = `This likely means that the dependency${library} which declares ${decl.debugName} is not compatible with Angular Ivy.`;
   }
-  return makeDiagnostic(code, getDiagnosticNode(decl, rawExpr), message, [makeRelatedInformation(decl.node.name, relatedMessage)]);
+  return makeDiagnostic(code, getDiagnosticNode(decl, rawExpr), message, [
+    makeRelatedInformation(decl.node.name, relatedMessage)
+  ]);
 }
 function invalidTransitiveNgModuleRef(decl, rawExpr, type) {
   const code = type === "import" ? ErrorCode.NGMODULE_INVALID_IMPORT : ErrorCode.NGMODULE_INVALID_EXPORT;
@@ -4353,7 +4383,10 @@ var TypeCheckScopeRegistry = class {
           continue;
         }
         const directiveMeta = this.applyExplicitlyDeferredFlag(extMeta, meta.isExplicitlyDeferred);
-        matcher.addSelectables(CssSelector.parse(meta.selector), [...this.hostDirectivesResolver.resolve(directiveMeta), directiveMeta]);
+        matcher.addSelectables(CssSelector.parse(meta.selector), [
+          ...this.hostDirectivesResolver.resolve(directiveMeta),
+          directiveMeta
+        ]);
         directives.push(directiveMeta);
       } else if (meta.kind === MetaKind.Pipe) {
         if (!ts18.isClassDeclaration(meta.ref.node)) {
@@ -4399,7 +4432,9 @@ import ts22 from "typescript";
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/initializer_function_access.mjs
 function validateAccessOfInitializerApiMember({ api, call }, member) {
   if (!api.allowedAccessLevels.includes(member.accessLevel)) {
-    throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_DISALLOWED_MEMBER_VISIBILITY, call, makeDiagnosticChain(`Cannot use "${api.functionName}" on a class member that is declared as ${classMemberAccessLevelToString(member.accessLevel)}.`, [makeDiagnosticChain(`Update the class field to be either: ` + api.allowedAccessLevels.map((l) => classMemberAccessLevelToString(l)).join(", "))]));
+    throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_DISALLOWED_MEMBER_VISIBILITY, call, makeDiagnosticChain(`Cannot use "${api.functionName}" on a class member that is declared as ${classMemberAccessLevelToString(member.accessLevel)}.`, [
+      makeDiagnosticChain(`Update the class field to be either: ` + api.allowedAccessLevels.map((l) => classMemberAccessLevelToString(l)).join(", "))
+    ]));
   }
 }
 
@@ -4610,7 +4645,12 @@ function tryParseInitializerBasedOutput(member, reflector, importTracker) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/query_functions.mjs
 import { createMayBeForwardRefExpression, outputAst as o } from "@angular/compiler";
 import ts21 from "typescript";
-var queryFunctionNames = ["viewChild", "viewChildren", "contentChild", "contentChildren"];
+var queryFunctionNames = [
+  "viewChild",
+  "viewChildren",
+  "contentChild",
+  "contentChildren"
+];
 var QUERY_INITIALIZER_FNS = queryFunctionNames.map((fnName) => ({
   functionName: fnName,
   owningModule: "@angular/core",
@@ -4689,7 +4729,12 @@ function parseDescendantsOption(value) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.mjs
 var EMPTY_OBJECT = {};
-var queryDecoratorNames = ["ViewChild", "ViewChildren", "ContentChild", "ContentChildren"];
+var queryDecoratorNames = [
+  "ViewChild",
+  "ViewChildren",
+  "ContentChild",
+  "ContentChildren"
+];
 var QUERY_TYPES = new Set(queryDecoratorNames);
 function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, evaluator, refEmitter, referencesRegistry, isCore, annotateForClosureCompiler, compilationMode, defaultSelector) {
   let directive;
@@ -6340,7 +6385,11 @@ var NgModuleDecoratorHandler = class {
         assertSuccessfulReferenceEmit(componentType, node, "component");
         const declExpr = componentType.expression;
         const setComponentScope = new ExternalExpr5(R3Identifiers.setComponentScope);
-        const callExpr = new InvokeFunctionExpr(setComponentScope, [declExpr, directiveExpr, pipesExpr]);
+        const callExpr = new InvokeFunctionExpr(setComponentScope, [
+          declExpr,
+          directiveExpr,
+          pipesExpr
+        ]);
         ngModuleStatements.push(callExpr.toStmt());
       }
     }
@@ -6435,7 +6484,9 @@ function isModuleIdExpression(expr) {
 function makeStandaloneBootstrapDiagnostic(ngModuleClass, bootstrappedClassRef, rawBootstrapExpr) {
   const componentClassName = bootstrappedClassRef.node.name.text;
   const message = `The \`${componentClassName}\` class is a standalone component, which can not be used in the \`@NgModule.bootstrap\` array. Use the \`bootstrapApplication\` function for bootstrap instead.`;
-  const relatedInformation = [makeRelatedInformation(ngModuleClass, `The 'bootstrap' array is present on this NgModule.`)];
+  const relatedInformation = [
+    makeRelatedInformation(ngModuleClass, `The 'bootstrap' array is present on this NgModule.`)
+  ];
   return makeDiagnostic(ErrorCode.NGMODULE_BOOTSTRAP_IS_STANDALONE, getDiagnosticNode(bootstrappedClassRef, rawBootstrapExpr), message, relatedInformation);
 }
 function isSyntheticReference(ref) {
@@ -6630,7 +6681,10 @@ function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanaly
     }
     try {
       const resourceUrl = resourceLoader.resolve(templateUrl, containingFile);
-      const templatePromise = resourceLoader.preload(resourceUrl, { type: "template", containingFile });
+      const templatePromise = resourceLoader.preload(resourceUrl, {
+        type: "template",
+        containingFile
+      });
       if (templatePromise !== void 0) {
         return templatePromise.then(() => {
           const templateDecl = parseTemplateDeclaration(node, decorator, component, containingFile, evaluator, depTracker, resourceLoader, defaultPreserveWhitespaces);
@@ -6727,11 +6781,13 @@ function extractComponentStyleUrls(evaluator, component) {
     if (typeof styleUrl !== "string") {
       throw createValueHasWrongTypeError(styleUrlExpr, styleUrl, "styleUrl must be a string");
     }
-    return [{
-      url: styleUrl,
-      source: 2,
-      nodeForError: styleUrlExpr
-    }];
+    return [
+      {
+        url: styleUrl,
+        source: 2,
+        nodeForError: styleUrlExpr
+      }
+    ];
   }
   return [];
 }
@@ -6813,7 +6869,11 @@ function _extractTemplateStyleUrls(template) {
     return [];
   }
   const nodeForError = getTemplateDeclarationNodeForError(template.declaration);
-  return template.styleUrls.map((url) => ({ url, source: 1, nodeForError }));
+  return template.styleUrls.map((url) => ({
+    url,
+    source: 1,
+    nodeForError
+  }));
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/symbol.mjs
@@ -7095,7 +7155,9 @@ var ComponentDecoratorHandler = class {
         diagnostics = [];
       }
       const importsField = rawImports ? "imports" : "deferredImports";
-      diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_NOT_STANDALONE, component.get(importsField), `'${importsField}' is only valid on a component that is standalone.`, [makeRelatedInformation(node.name, `Did you forget to add 'standalone: true' to this @Component?`)]));
+      diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_NOT_STANDALONE, component.get(importsField), `'${importsField}' is only valid on a component that is standalone.`, [
+        makeRelatedInformation(node.name, `Did you forget to add 'standalone: true' to this @Component?`)
+      ]));
       isPoisoned = true;
     } else if (this.compilationMode !== CompilationMode.LOCAL && (rawImports || rawDeferredImports)) {
       const importResolvers = combineResolvers([
@@ -7330,7 +7392,10 @@ var ComponentDecoratorHandler = class {
       }
       for (const dep of dependencies) {
         if (dep.kind === MetaKind.Directive && dep.selector !== null) {
-          matcher.addSelectables(CssSelector2.parse(dep.selector), [...this.hostDirectivesResolver.resolve(dep), dep]);
+          matcher.addSelectables(CssSelector2.parse(dep.selector), [
+            ...this.hostDirectivesResolver.resolve(dep),
+            dep
+          ]);
         }
       }
     }
@@ -8385,4 +8450,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-A2LVDCHW.js.map
+//# sourceMappingURL=chunk-3ZM5BFEI.js.map

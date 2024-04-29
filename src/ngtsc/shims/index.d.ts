@@ -6,5 +6,5 @@
  * found in the LICENSE file at https://angular.io/license
  */
 export { ShimAdapter } from './src/adapter';
-export { copyFileShimData, isShim, retagAllTsFiles, retagTsFile, sfExtensionData, untagAllTsFiles, untagTsFile } from './src/expando';
+export { copyFileShimData, isShim, retagAllTsFiles, retagTsFile, sfExtensionData, untagAllTsFiles, untagTsFile, } from './src/expando';
 export { ShimReferenceTagger } from './src/reference_tagger';
