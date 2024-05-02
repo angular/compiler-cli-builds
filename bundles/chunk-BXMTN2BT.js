@@ -34,7 +34,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-CFIOLJL4.js";
+} from "./chunk-3M2BMCNC.js";
 import {
   PerfEvent,
   PerfPhase
@@ -7434,7 +7434,7 @@ var ComponentDecoratorHandler = class {
     return templateSemanticsChecker.getDiagnosticsForComponent(component);
   }
   resolve(node, analysis, symbol) {
-    var _a;
+    var _a, _b;
     const metadata = analysis.meta;
     const diagnostics = [];
     const context = getSourceFile(node);
@@ -7480,6 +7480,9 @@ var ComponentDecoratorHandler = class {
       const isModuleScope = scope.kind === ComponentScopeKind.NgModule;
       const dependencies = isModuleScope ? scope.compilation.dependencies : scope.dependencies;
       const explicitlyDeferredDependencies = getExplicitlyDeferredDeps(scope);
+      if (isModuleScope && context.fileName !== getSourceFile(scope.ngModule).fileName) {
+        (_b = this.localCompilationExtraImportsTracker) == null ? void 0 : _b.markFileForExtraImportGeneration(context);
+      }
       if (metadata.isStandalone && analysis.rawDeferredImports !== null && explicitlyDeferredDependencies.length > 0) {
         const diagnostic = validateNoImportOverlap(dependencies, explicitlyDeferredDependencies, analysis.rawDeferredImports);
         if (diagnostic !== null) {
@@ -8450,4 +8453,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3ZM5BFEI.js.map
+//# sourceMappingURL=chunk-BXMTN2BT.js.map

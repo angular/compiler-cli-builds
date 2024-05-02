@@ -1752,6 +1752,10 @@ var LocalCompilationExtraImportsTracker = class {
     this.typeChecker = typeChecker;
     this.localImportsMap = /* @__PURE__ */ new Map();
     this.globalImportsSet = /* @__PURE__ */ new Set();
+    this.markedFilesSet = /* @__PURE__ */ new Set();
+  }
+  markFileForExtraImportGeneration(sf) {
+    this.markedFilesSet.add(sf.fileName);
   }
   addImportForFile(sf, moduleName) {
     if (!this.localImportsMap.has(sf.fileName)) {
@@ -1782,6 +1786,9 @@ var LocalCompilationExtraImportsTracker = class {
   }
   getImportsForFile(sf) {
     var _a;
+    if (!this.markedFilesSet.has(sf.fileName)) {
+      return [];
+    }
     return [...this.globalImportsSet, ...(_a = this.localImportsMap.get(sf.fileName)) != null ? _a : []];
   }
 };
@@ -2989,4 +2996,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CFIOLJL4.js.map
+//# sourceMappingURL=chunk-3M2BMCNC.js.map
