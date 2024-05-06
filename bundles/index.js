@@ -9,7 +9,7 @@ import {
   constructorParametersDownlevelTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-2BWSP647.js";
+} from "./chunk-5DY7CLVW.js";
 import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
@@ -38,14 +38,14 @@ import {
   performCompilation,
   readConfiguration,
   untagAllTsFiles
-} from "./chunk-KEQCP3PY.js";
+} from "./chunk-XAPDG6EU.js";
 import {
   OptimizeFor
 } from "./chunk-ZX6BKV7T.js";
-import "./chunk-BXMTN2BT.js";
+import "./chunk-3ZM5BFEI.js";
 import {
   isLocalCompilationDiagnostics
-} from "./chunk-3M2BMCNC.js";
+} from "./chunk-CFIOLJL4.js";
 import {
   ActivePerfRecorder,
   PerfPhase
@@ -79,7 +79,7 @@ import "./chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("18.1.0-next.0+sha-8f273ce");
+var VERSION = new Version("18.1.0-next.0+sha-aea3b57");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
