@@ -32,7 +32,18 @@ export declare class LocalCompilationExtraImportsTracker {
     private readonly typeChecker;
     private readonly localImportsMap;
     private readonly globalImportsSet;
+    /** Names of the files marked for extra import generation. */
+    private readonly markedFilesSet;
     constructor(typeChecker: ts.TypeChecker);
+    /**
+     * Marks the source file for extra imports generation.
+     *
+     * The extra imports are generated only for the files marked through this method. In other words,
+     * the method {@link getImportsForFile} returns empty if the file is not marked. This allows the
+     * consumers of this tool to avoid generating extra imports for unrelated files (e.g., non-Angular
+     * files)
+     */
+    markFileForExtraImportGeneration(sf: ts.SourceFile): void;
     /**
      * Adds an extra import to be added to the generated file of a specific source file.
      */
