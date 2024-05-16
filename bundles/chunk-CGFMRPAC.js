@@ -7514,7 +7514,6 @@ var SymbolBuilder = class {
     return { kind: SymbolKind.Output, bindings };
   }
   getSymbolOfInputBinding(binding) {
-    var _a;
     const consumer = this.templateData.boundTarget.getConsumerOfBinding(binding);
     if (consumer === null) {
       return null;
@@ -7533,22 +7532,28 @@ var SymbolBuilder = class {
         continue;
       }
       const signalInputAssignment = unwrapSignalInputWriteTAccessor(node.left);
+      let fieldAccessExpr;
       let symbolInfo = null;
       if (signalInputAssignment !== null) {
+        if (ts34.isIdentifier(signalInputAssignment.fieldExpr)) {
+          continue;
+        }
         const fieldSymbol = this.getSymbolOfTsNode(signalInputAssignment.fieldExpr);
         const typeSymbol = this.getSymbolOfTsNode(signalInputAssignment.typeExpr);
+        fieldAccessExpr = signalInputAssignment.fieldExpr;
         symbolInfo = fieldSymbol === null || typeSymbol === null ? null : {
           tcbLocation: fieldSymbol.tcbLocation,
           tsSymbol: fieldSymbol.tsSymbol,
           tsType: typeSymbol.tsType
         };
       } else {
+        fieldAccessExpr = node.left;
         symbolInfo = this.getSymbolOfTsNode(node.left);
       }
       if (symbolInfo === null || symbolInfo.tsSymbol === null) {
         continue;
       }
-      const target = this.getDirectiveSymbolForAccessExpression((_a = signalInputAssignment == null ? void 0 : signalInputAssignment.fieldExpr) != null ? _a : node.left, consumer);
+      const target = this.getDirectiveSymbolForAccessExpression(fieldAccessExpr, consumer);
       if (target === null) {
         continue;
       }
@@ -7798,7 +7803,7 @@ function unwrapSignalInputWriteTAccessor(expr) {
   if (!ts34.isIdentifier(expr.argumentExpression.name) || expr.argumentExpression.name.text !== R3Identifiers4.InputSignalBrandWriteType.name) {
     return null;
   }
-  if (!ts34.isPropertyAccessExpression(expr.expression) && !ts34.isElementAccessExpression(expr.expression)) {
+  if (!ts34.isPropertyAccessExpression(expr.expression) && !ts34.isElementAccessExpression(expr.expression) && !ts34.isIdentifier(expr.expression)) {
     throw new Error("Unexpected expression for signal input write type.");
   }
   return {
@@ -10658,4 +10663,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-YUQANVFR.js.map
+//# sourceMappingURL=chunk-CGFMRPAC.js.map
