@@ -6130,7 +6130,10 @@ var TcbIfOp = class extends TcbOp {
     const expressionScope = Scope.forNodes(this.tcb, this.scope, branch, [], null);
     expressionScope.render().forEach((stmt) => this.scope.addStatement(stmt));
     this.expressionScopes.set(branch, expressionScope);
-    const expression = branch.expressionAlias === null ? tcbExpression(branch.expression, this.tcb, expressionScope) : expressionScope.resolve(branch.expressionAlias);
+    let expression = tcbExpression(branch.expression, this.tcb, expressionScope);
+    if (branch.expressionAlias !== null) {
+      expression = ts31.factory.createBinaryExpression(ts31.factory.createParenthesizedExpression(expression), ts31.SyntaxKind.AmpersandAmpersandToken, expressionScope.resolve(branch.expressionAlias));
+    }
     const bodyScope = this.getBranchScope(expressionScope, branch, index);
     return ts31.factory.createIfStatement(expression, ts31.factory.createBlock(bodyScope.render()), this.generateBranch(index + 1));
   }
@@ -6150,12 +6153,11 @@ var TcbIfOp = class extends TcbOp {
       }
       const expressionScope = this.expressionScopes.get(branch);
       let expression;
-      if (branch.expressionAlias === null) {
-        expression = tcbExpression(branch.expression, this.tcb, expressionScope);
-        markIgnoreDiagnostics(expression);
-      } else {
-        expression = expressionScope.resolve(branch.expressionAlias);
+      expression = tcbExpression(branch.expression, this.tcb, expressionScope);
+      if (branch.expressionAlias !== null) {
+        expression = ts31.factory.createBinaryExpression(ts31.factory.createParenthesizedExpression(expression), ts31.SyntaxKind.AmpersandAmpersandToken, expressionScope.resolve(branch.expressionAlias));
       }
+      markIgnoreDiagnostics(expression);
       const comparisonExpression = i === index ? expression : ts31.factory.createPrefixUnaryExpression(ts31.SyntaxKind.ExclamationToken, ts31.factory.createParenthesizedExpression(expression));
       guard = guard === null ? comparisonExpression : ts31.factory.createBinaryExpression(guard, ts31.SyntaxKind.AmpersandAmpersandToken, comparisonExpression);
     }
@@ -8514,7 +8516,7 @@ var SingleShimTypeCheckingHost = class extends SingleFileTypeCheckingHost {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.mjs
-import { Interpolation, PropertyRead as PropertyRead6 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource5, BindingType as BindingType2, Interpolation, PropertyRead as PropertyRead6, TmplAstBoundAttribute as TmplAstBoundAttribute3 } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/symbol_util.mjs
 import ts35 from "typescript";
@@ -8672,6 +8674,14 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
   visitNode(ctx, component, node) {
     if (node instanceof Interpolation) {
       return node.expressions.filter((item) => item instanceof PropertyRead6).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
+    } else if (node instanceof TmplAstBoundAttribute3) {
+      const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
+      if (symbol !== null && symbol.kind === SymbolKind.Input) {
+        return [];
+      }
+      if (node.type === BindingType2.Property && node.value instanceof ASTWithSource5 && node.value.ast instanceof PropertyRead6) {
+        return buildDiagnosticForSignal(ctx, node.value.ast, component);
+      }
     }
     return [];
   }
@@ -8901,7 +8911,7 @@ var factory6 = {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/suffix_not_supported/index.mjs
-import { TmplAstBoundAttribute as TmplAstBoundAttribute3 } from "@angular/compiler";
+import { TmplAstBoundAttribute as TmplAstBoundAttribute4 } from "@angular/compiler";
 var STYLE_SUFFIXES = ["px", "%", "em"];
 var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
   constructor() {
@@ -8909,7 +8919,7 @@ var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
     this.code = ErrorCode.SUFFIX_NOT_SUPPORTED;
   }
   visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstBoundAttribute3))
+    if (!(node instanceof TmplAstBoundAttribute4))
       return [];
     if (!node.keySpan.toString().startsWith("attr.") || !STYLE_SUFFIXES.some((suffix) => node.name.endsWith(`.${suffix}`))) {
       return [];
@@ -9044,7 +9054,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.mjs
-import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver4, ParsedEventType as ParsedEventType2, RecursiveAstVisitor as RecursiveAstVisitor3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstRecursiveVisitor as TmplAstRecursiveVisitor2, TmplAstVariable as TmplAstVariable3 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource6, ImplicitReceiver as ImplicitReceiver4, ParsedEventType as ParsedEventType2, RecursiveAstVisitor as RecursiveAstVisitor3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstRecursiveVisitor as TmplAstRecursiveVisitor2, TmplAstVariable as TmplAstVariable3 } from "@angular/compiler";
 import ts39 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   constructor(templateTypeChecker) {
@@ -9124,7 +9134,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor3 {
   }
 };
 function unwrapAstWithSource(ast) {
-  return ast instanceof ASTWithSource5 ? ast.ast : ast;
+  return ast instanceof ASTWithSource6 ? ast.ast : ast;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/rules/initializer_api_usage_rule.mjs
@@ -10663,4 +10673,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-IN2DRZTX.js.map
+//# sourceMappingURL=chunk-H5OAK2DW.js.map
