@@ -27,6 +27,7 @@ var CompletionKind;
 (function(CompletionKind2) {
   CompletionKind2[CompletionKind2["Reference"] = 0] = "Reference";
   CompletionKind2[CompletionKind2["Variable"] = 1] = "Variable";
+  CompletionKind2[CompletionKind2["LetDeclaration"] = 2] = "LetDeclaration";
 })(CompletionKind || (CompletionKind = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/symbols.mjs
@@ -43,6 +44,7 @@ var SymbolKind;
   SymbolKind2[SymbolKind2["Expression"] = 8] = "Expression";
   SymbolKind2[SymbolKind2["DomBinding"] = 9] = "DomBinding";
   SymbolKind2[SymbolKind2["Pipe"] = 10] = "Pipe";
+  SymbolKind2[SymbolKind2["LetDeclaration"] = 11] = "LetDeclaration";
 })(SymbolKind || (SymbolKind = {}));
 
 export {
@@ -59,4 +61,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZX6BKV7T.js.map
+//# sourceMappingURL=chunk-6X2NNIEJ.js.map

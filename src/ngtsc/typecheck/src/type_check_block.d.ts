@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstForLoopBlock, TmplAstIfBlockBranch, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
+import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstForLoopBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { PipeMeta } from '../../metadata';
@@ -64,6 +64,8 @@ export declare enum TcbGenericContextBehavior {
  * bounds) will be referenced from the generated TCB code.
  */
 export declare function generateTypeCheckBlock(env: Environment, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, name: ts.Identifier, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): ts.FunctionDeclaration;
+/** Types that can referenced locally in a template. */
+type LocalSymbol = TmplAstElement | TmplAstTemplate | TmplAstVariable | TmplAstLetDeclaration | TmplAstReference;
 /**
  * A code generation operation that's involved in the construction of a Type Check Block.
  *
@@ -198,6 +200,12 @@ declare class Scope {
      */
     private varMap;
     /**
+     * A map of the names of `TmplAstLetDeclaration`s to the index of their op in the `opQueue`.
+     *
+     * Assumes that there won't be duplicated `@let` declarations within the same scope.
+     */
+    private letDeclOpMap;
+    /**
      * Statements for this template.
      *
      * Executing the `TcbOp`s in the `opQueue` populates this array.
@@ -235,12 +243,13 @@ declare class Scope {
      * * `TmplAstElement` - retrieve the expression for the element DOM node
      * * `TmplAstTemplate` - retrieve the template context variable
      * * `TmplAstVariable` - retrieve a template let- variable
+     * * `TmplAstLetDeclaration` - retrieve a template `@let` declaration
      * * `TmplAstReference` - retrieve variable created for the local ref
      *
      * @param directive if present, a directive type on a `TmplAstElement` or `TmplAstTemplate` to
      * look up instead of the default for an element or template node.
      */
-    resolve(node: TmplAstElement | TmplAstTemplate | TmplAstVariable | TmplAstReference, directive?: TypeCheckableDirectiveMeta): ts.Identifier | ts.NonNullExpression;
+    resolve(node: LocalSymbol, directive?: TypeCheckableDirectiveMeta): ts.Identifier | ts.NonNullExpression;
     /**
      * Add a statement to this scope.
      */
@@ -254,6 +263,8 @@ declare class Scope {
      * parent scopes. If no guards have been applied, null is returned.
      */
     guards(): ts.Expression | null;
+    /** Returns whether a template symbol is defined locally within the current scope. */
+    isLocal(node: TmplAstVariable | TmplAstLetDeclaration | TmplAstReference): boolean;
     private resolveLocal;
     /**
      * Like `executeOp`, but assert that the operation actually returned `ts.Expression`.

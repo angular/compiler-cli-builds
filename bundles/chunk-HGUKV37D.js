@@ -34,7 +34,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-HQ26OHOE.js";
+} from "./chunk-RZ7P6VD7.js";
 import {
   PerfEvent,
   PerfPhase
@@ -6590,27 +6590,25 @@ function extractTemplate(node, template, evaluator, depTracker, resourceLoader, 
 }
 function parseExtractedTemplate(template, sourceStr, sourceParseRange, escapedString, sourceMapUrl, options) {
   const i18nNormalizeLineEndingsInICUs = escapedString || options.i18nNormalizeLineEndingsInICUs;
-  const parsedTemplate = parseTemplate(sourceStr, sourceMapUrl != null ? sourceMapUrl : "", {
-    preserveWhitespaces: template.preserveWhitespaces,
+  const commonParseOptions = {
     interpolationConfig: template.interpolationConfig,
     range: sourceParseRange != null ? sourceParseRange : void 0,
-    escapedString,
     enableI18nLegacyMessageIdFormat: options.enableI18nLegacyMessageIdFormat,
     i18nNormalizeLineEndingsInICUs,
     alwaysAttemptHtmlToR3AstConversion: options.usePoisonedData,
-    enableBlockSyntax: options.enableBlockSyntax
+    escapedString,
+    enableBlockSyntax: options.enableBlockSyntax,
+    enableLetSyntax: options.enableLetSyntax
+  };
+  const parsedTemplate = parseTemplate(sourceStr, sourceMapUrl != null ? sourceMapUrl : "", {
+    ...commonParseOptions,
+    preserveWhitespaces: template.preserveWhitespaces
   });
   const { nodes: diagNodes } = parseTemplate(sourceStr, sourceMapUrl != null ? sourceMapUrl : "", {
+    ...commonParseOptions,
     preserveWhitespaces: true,
     preserveLineEndings: true,
-    interpolationConfig: template.interpolationConfig,
-    range: sourceParseRange != null ? sourceParseRange : void 0,
-    escapedString,
-    enableI18nLegacyMessageIdFormat: options.enableI18nLegacyMessageIdFormat,
-    i18nNormalizeLineEndingsInICUs,
-    leadingTriviaChars: [],
-    alwaysAttemptHtmlToR3AstConversion: options.usePoisonedData,
-    enableBlockSyntax: options.enableBlockSyntax
+    leadingTriviaChars: []
   });
   return {
     ...parsedTemplate,
@@ -6993,7 +6991,7 @@ var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, localCompilationExtraImportsTracker) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, localCompilationExtraImportsTracker) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -7029,6 +7027,7 @@ var ComponentDecoratorHandler = class {
     this.deferredSymbolTracker = deferredSymbolTracker;
     this.forbidOrphanRendering = forbidOrphanRendering;
     this.enableBlockSyntax = enableBlockSyntax;
+    this.enableLetSyntax = enableLetSyntax;
     this.localCompilationExtraImportsTracker = localCompilationExtraImportsTracker;
     this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry();
@@ -7040,7 +7039,8 @@ var ComponentDecoratorHandler = class {
       enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
       i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
       usePoisonedData: this.usePoisonedData,
-      enableBlockSyntax: this.enableBlockSyntax
+      enableBlockSyntax: this.enableBlockSyntax,
+      enableLetSyntax: this.enableLetSyntax
     };
   }
   detect(node, decorators) {
@@ -7211,7 +7211,8 @@ var ComponentDecoratorHandler = class {
         enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
         i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
         usePoisonedData: this.usePoisonedData,
-        enableBlockSyntax: this.enableBlockSyntax
+        enableBlockSyntax: this.enableBlockSyntax,
+        enableLetSyntax: this.enableLetSyntax
       }, this.compilationMode);
     }
     const templateResource = template.declaration.isInline ? { path: null, expression: component.get("template") } : {
@@ -8450,4 +8451,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3CTKQZ2E.js.map
+//# sourceMappingURL=chunk-HGUKV37D.js.map

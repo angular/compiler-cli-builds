@@ -38,7 +38,7 @@ export declare function tsCreateTypeQueryForCoercedInput(typeName: ts.EntityName
  * Unlike with `tsDeclareVariable`, the type of the variable is inferred from the initializer
  * expression.
  */
-export declare function tsCreateVariable(id: ts.Identifier, initializer: ts.Expression): ts.VariableStatement;
+export declare function tsCreateVariable(id: ts.Identifier, initializer: ts.Expression, flags?: ts.NodeFlags | null): ts.VariableStatement;
 /**
  * Construct a `ts.CallExpression` that calls a method on a receiver.
  */
