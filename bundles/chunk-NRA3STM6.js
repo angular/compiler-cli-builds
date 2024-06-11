@@ -262,17 +262,20 @@ var FunctionExtractor = class {
     this.typeChecker = typeChecker;
   }
   extract() {
+    var _a;
     const signature = this.typeChecker.getSignatureFromDeclaration(this.declaration);
     const returnType = signature ? this.typeChecker.typeToString(this.typeChecker.getReturnTypeOfSignature(signature)) : "unknown";
+    const jsdocsTags = extractJsDocTags(this.declaration);
     return {
       params: extractAllParams(this.declaration.parameters, this.typeChecker),
       name: this.name,
       isNewType: ts3.isConstructSignatureDeclaration(this.declaration),
       returnType,
+      returnDescription: (_a = jsdocsTags.find((tag) => tag.name === "returns")) == null ? void 0 : _a.comment,
       entryType: EntryType.Function,
       generics: extractGenerics(this.declaration),
       description: extractJsDocDescription(this.declaration),
-      jsdocTags: extractJsDocTags(this.declaration),
+      jsdocTags: jsdocsTags,
       rawComment: extractRawJsDoc(this.declaration)
     };
   }
@@ -4607,4 +4610,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4HWDU6FJ.js.map
+//# sourceMappingURL=chunk-NRA3STM6.js.map
