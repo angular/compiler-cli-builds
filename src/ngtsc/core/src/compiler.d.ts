@@ -131,6 +131,7 @@ export declare class NgCompiler {
     readonly ignoreForEmit: Set<ts.SourceFile>;
     readonly enableTemplateTypeChecker: boolean;
     private readonly enableBlockSyntax;
+    private readonly enableLetSyntax;
     private readonly angularCoreVersion;
     /**
      * `NgCompiler` can be reused for multiple compilations (for resource-only changes), and each

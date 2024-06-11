@@ -183,5 +183,5 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
     private addInlineTypeCheckBlock;
     private pendingShimForComponent;
     private dataForFile;
-    private getTemplateDiagnostics;
 }
+export declare function getTemplateDiagnostics(parseErrors: ParseError[], templateId: TemplateId, sourceMapping: TemplateSourceMapping): TemplateDiagnostic[];

@@ -9,7 +9,7 @@ import {
   constructorParametersDownlevelTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-3HR6YOCA.js";
+} from "./chunk-CK5W7X4H.js";
 import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
@@ -23,7 +23,6 @@ import {
   NgtscProgram,
   PatchedProgramIncrementalBuildStrategy,
   SOURCE,
-  TsCreateProgramDriver,
   UNKNOWN_ERROR_CODE,
   calcProjectFileAndBasePath,
   createCompilerHost,
@@ -36,16 +35,16 @@ import {
   isDocEntryWithSourceInfo,
   isTsDiagnostic,
   performCompilation,
-  readConfiguration,
-  untagAllTsFiles
-} from "./chunk-IN2DRZTX.js";
+  readConfiguration
+} from "./chunk-4HWDU6FJ.js";
 import {
-  OptimizeFor
-} from "./chunk-ZX6BKV7T.js";
-import "./chunk-W5YD5Y43.js";
+  OptimizeFor,
+  TsCreateProgramDriver,
+  untagAllTsFiles
+} from "./chunk-CWU65S2B.js";
 import {
   isLocalCompilationDiagnostics
-} from "./chunk-73B3CO3L.js";
+} from "./chunk-YPERM5UE.js";
 import {
   ActivePerfRecorder,
   PerfPhase
@@ -74,12 +73,12 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-3W345P4E.js";
+} from "./chunk-54G5EVKM.js";
 import "./chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("18.1.0-next.0+sha-1360110");
+var VERSION = new Version("18.1.0-next.1+sha-567c2f6");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {

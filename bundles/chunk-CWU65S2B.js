@@ -11,39 +11,52 @@ import {
   ImportFlags,
   ImportManager,
   Reference,
+  TypeEmitter,
+  addDiagnosticChain,
   assertSuccessfulReferenceEmit,
   attachDefaultImportDeclaration,
+  canEmitType,
   classMemberAccessLevelToString,
   entityNameToValue,
   filterToMembersWithDecorator,
   getDefaultImportDeclaration,
   getSourceFile,
+  getSourceFileOrNull,
+  getTokenAtPosition,
   identifierOfNode,
+  isAssignment,
   isDeclaration,
+  isDtsPath,
   isFromDtsFile,
   isNamedClassDeclaration,
+  isNonDeclarationTsPath,
+  isSymbolWithValueDeclaration,
   makeDiagnostic,
   makeDiagnosticChain,
   makeRelatedInformation,
+  ngErrorCode,
   nodeDebugInfo,
   nodeNameForError,
   presetImportManagerForceNamespaceImports,
   reflectObjectLiteral,
   reflectTypeEntityToDeclaration,
+  toUnredirectedSourceFile,
   translateExpression,
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-73B3CO3L.js";
+} from "./chunk-YPERM5UE.js";
 import {
+  PerfCheckpoint,
   PerfEvent,
   PerfPhase
 } from "./chunk-JZQHA4E7.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
+  getSourceFileOrError,
   relative
-} from "./chunk-3W345P4E.js";
+} from "./chunk-54G5EVKM.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
@@ -1217,6 +1230,50 @@ function getContainerNode(node) {
   }
   return node.getSourceFile();
 }
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/checker.mjs
+var OptimizeFor;
+(function(OptimizeFor2) {
+  OptimizeFor2[OptimizeFor2["SingleFile"] = 0] = "SingleFile";
+  OptimizeFor2[OptimizeFor2["WholeProgram"] = 1] = "WholeProgram";
+})(OptimizeFor || (OptimizeFor = {}));
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/scope.mjs
+var PotentialImportKind;
+(function(PotentialImportKind2) {
+  PotentialImportKind2[PotentialImportKind2["NgModule"] = 0] = "NgModule";
+  PotentialImportKind2[PotentialImportKind2["Standalone"] = 1] = "Standalone";
+})(PotentialImportKind || (PotentialImportKind = {}));
+var PotentialImportMode;
+(function(PotentialImportMode2) {
+  PotentialImportMode2[PotentialImportMode2["Normal"] = 0] = "Normal";
+  PotentialImportMode2[PotentialImportMode2["ForceDirect"] = 1] = "ForceDirect";
+})(PotentialImportMode || (PotentialImportMode = {}));
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/completion.mjs
+var CompletionKind;
+(function(CompletionKind2) {
+  CompletionKind2[CompletionKind2["Reference"] = 0] = "Reference";
+  CompletionKind2[CompletionKind2["Variable"] = 1] = "Variable";
+  CompletionKind2[CompletionKind2["LetDeclaration"] = 2] = "LetDeclaration";
+})(CompletionKind || (CompletionKind = {}));
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/api/symbols.mjs
+var SymbolKind;
+(function(SymbolKind2) {
+  SymbolKind2[SymbolKind2["Input"] = 0] = "Input";
+  SymbolKind2[SymbolKind2["Output"] = 1] = "Output";
+  SymbolKind2[SymbolKind2["Binding"] = 2] = "Binding";
+  SymbolKind2[SymbolKind2["Reference"] = 3] = "Reference";
+  SymbolKind2[SymbolKind2["Variable"] = 4] = "Variable";
+  SymbolKind2[SymbolKind2["Directive"] = 5] = "Directive";
+  SymbolKind2[SymbolKind2["Element"] = 6] = "Element";
+  SymbolKind2[SymbolKind2["Template"] = 7] = "Template";
+  SymbolKind2[SymbolKind2["Expression"] = 8] = "Expression";
+  SymbolKind2[SymbolKind2["DomBinding"] = 9] = "DomBinding";
+  SymbolKind2[SymbolKind2["Pipe"] = 10] = "Pipe";
+  SymbolKind2[SymbolKind2["LetDeclaration"] = 11] = "LetDeclaration";
+})(SymbolKind || (SymbolKind = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/di.mjs
 import { LiteralExpr, WrappedNodeExpr as WrappedNodeExpr2 } from "@angular/compiler";
@@ -3625,8 +3682,8 @@ function compileInputTransformFields(inputs) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
-import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, CssSelector as CssSelector2, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr6, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, outputAst as o2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
-import ts26 from "typescript";
+import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, CssSelector as CssSelector4, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry as DomElementSchemaRegistry3, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, outputAst as o2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher3, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
+import ts45 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
 import ts15 from "typescript";
@@ -6163,7 +6220,7 @@ var NgModuleDecoratorHandler = class {
         }
         if (ts24.isArrayLiteralExpression(exp)) {
           if (exp.elements) {
-            injectorMetadata.imports.push(...exp.elements.map((n) => new WrappedNodeExpr7(n)));
+            injectorMetadata.imports.push(...exp.elements.map((n2) => new WrappedNodeExpr7(n2)));
           }
         } else {
           injectorMetadata.imports.push(new WrappedNodeExpr7(exp));
@@ -6590,27 +6647,25 @@ function extractTemplate(node, template, evaluator, depTracker, resourceLoader, 
 }
 function parseExtractedTemplate(template, sourceStr, sourceParseRange, escapedString, sourceMapUrl, options) {
   const i18nNormalizeLineEndingsInICUs = escapedString || options.i18nNormalizeLineEndingsInICUs;
-  const parsedTemplate = parseTemplate(sourceStr, sourceMapUrl != null ? sourceMapUrl : "", {
-    preserveWhitespaces: template.preserveWhitespaces,
+  const commonParseOptions = {
     interpolationConfig: template.interpolationConfig,
     range: sourceParseRange != null ? sourceParseRange : void 0,
-    escapedString,
     enableI18nLegacyMessageIdFormat: options.enableI18nLegacyMessageIdFormat,
     i18nNormalizeLineEndingsInICUs,
     alwaysAttemptHtmlToR3AstConversion: options.usePoisonedData,
-    enableBlockSyntax: options.enableBlockSyntax
+    escapedString,
+    enableBlockSyntax: options.enableBlockSyntax,
+    enableLetSyntax: options.enableLetSyntax
+  };
+  const parsedTemplate = parseTemplate(sourceStr, sourceMapUrl != null ? sourceMapUrl : "", {
+    ...commonParseOptions,
+    preserveWhitespaces: template.preserveWhitespaces
   });
   const { nodes: diagNodes } = parseTemplate(sourceStr, sourceMapUrl != null ? sourceMapUrl : "", {
+    ...commonParseOptions,
     preserveWhitespaces: true,
     preserveLineEndings: true,
-    interpolationConfig: template.interpolationConfig,
-    range: sourceParseRange != null ? sourceParseRange : void 0,
-    escapedString,
-    enableI18nLegacyMessageIdFormat: options.enableI18nLegacyMessageIdFormat,
-    i18nNormalizeLineEndingsInICUs,
-    leadingTriviaChars: [],
-    alwaysAttemptHtmlToR3AstConversion: options.usePoisonedData,
-    enableBlockSyntax: options.enableBlockSyntax
+    leadingTriviaChars: []
   });
   return {
     ...parsedTemplate,
@@ -6988,12 +7043,6197 @@ function isLikelyModuleWithProviders(value) {
   return false;
 }
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
+import { CssSelector as CssSelector3, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr7, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program_driver/src/api.mjs
+var NgOriginalFile = Symbol("NgOriginalFile");
+var UpdateMode;
+(function(UpdateMode2) {
+  UpdateMode2[UpdateMode2["Complete"] = 0] = "Complete";
+  UpdateMode2[UpdateMode2["Incremental"] = 1] = "Incremental";
+})(UpdateMode || (UpdateMode = {}));
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver.mjs
+import ts27 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/adapter.mjs
+import ts26 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/expando.mjs
+var NgExtension = Symbol("NgExtension");
+function isExtended(sf) {
+  return sf[NgExtension] !== void 0;
+}
+function sfExtensionData(sf) {
+  const extSf = sf;
+  if (extSf[NgExtension] !== void 0) {
+    return extSf[NgExtension];
+  }
+  const extension = {
+    isTopLevelShim: false,
+    fileShim: null,
+    originalReferencedFiles: null,
+    taggedReferenceFiles: null
+  };
+  extSf[NgExtension] = extension;
+  return extension;
+}
+function isFileShimSourceFile(sf) {
+  return isExtended(sf) && sf[NgExtension].fileShim !== null;
+}
+function isShim(sf) {
+  return isExtended(sf) && (sf[NgExtension].fileShim !== null || sf[NgExtension].isTopLevelShim);
+}
+function copyFileShimData(from, to) {
+  if (!isFileShimSourceFile(from)) {
+    return;
+  }
+  sfExtensionData(to).fileShim = sfExtensionData(from).fileShim;
+}
+function untagAllTsFiles(program) {
+  for (const sf of program.getSourceFiles()) {
+    untagTsFile(sf);
+  }
+}
+function retagAllTsFiles(program) {
+  for (const sf of program.getSourceFiles()) {
+    retagTsFile(sf);
+  }
+}
+function untagTsFile(sf) {
+  if (sf.isDeclarationFile || !isExtended(sf)) {
+    return;
+  }
+  const ext = sfExtensionData(sf);
+  if (ext.originalReferencedFiles !== null) {
+    sf.referencedFiles = ext.originalReferencedFiles;
+  }
+}
+function retagTsFile(sf) {
+  if (sf.isDeclarationFile || !isExtended(sf)) {
+    return;
+  }
+  const ext = sfExtensionData(sf);
+  if (ext.taggedReferenceFiles !== null) {
+    sf.referencedFiles = ext.taggedReferenceFiles;
+  }
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/util.mjs
+var TS_EXTENSIONS = /\.tsx?$/i;
+function makeShimFileName(fileName, suffix) {
+  return absoluteFrom(fileName.replace(TS_EXTENSIONS, suffix));
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/adapter.mjs
+var ShimAdapter = class {
+  constructor(delegate, tsRootFiles, topLevelGenerators, perFileGenerators, oldProgram) {
+    this.delegate = delegate;
+    this.shims = /* @__PURE__ */ new Map();
+    this.priorShims = /* @__PURE__ */ new Map();
+    this.notShims = /* @__PURE__ */ new Set();
+    this.generators = [];
+    this.ignoreForEmit = /* @__PURE__ */ new Set();
+    this.extensionPrefixes = [];
+    for (const gen of perFileGenerators) {
+      const pattern = `^(.*)\\.${gen.extensionPrefix}\\.ts$`;
+      const regexp = new RegExp(pattern, "i");
+      this.generators.push({
+        generator: gen,
+        test: regexp,
+        suffix: `.${gen.extensionPrefix}.ts`
+      });
+      this.extensionPrefixes.push(gen.extensionPrefix);
+    }
+    const extraInputFiles = [];
+    for (const gen of topLevelGenerators) {
+      const sf = gen.makeTopLevelShim();
+      sfExtensionData(sf).isTopLevelShim = true;
+      if (!gen.shouldEmit) {
+        this.ignoreForEmit.add(sf);
+      }
+      const fileName = absoluteFromSourceFile(sf);
+      this.shims.set(fileName, sf);
+      extraInputFiles.push(fileName);
+    }
+    for (const rootFile of tsRootFiles) {
+      for (const gen of this.generators) {
+        extraInputFiles.push(makeShimFileName(rootFile, gen.suffix));
+      }
+    }
+    this.extraInputFiles = extraInputFiles;
+    if (oldProgram !== null) {
+      for (const oldSf of oldProgram.getSourceFiles()) {
+        if (oldSf.isDeclarationFile || !isFileShimSourceFile(oldSf)) {
+          continue;
+        }
+        this.priorShims.set(absoluteFromSourceFile(oldSf), oldSf);
+      }
+    }
+  }
+  maybeGenerate(fileName) {
+    if (this.notShims.has(fileName)) {
+      return null;
+    } else if (this.shims.has(fileName)) {
+      return this.shims.get(fileName);
+    }
+    if (isDtsPath(fileName)) {
+      this.notShims.add(fileName);
+      return null;
+    }
+    for (const record of this.generators) {
+      const match = record.test.exec(fileName);
+      if (match === null) {
+        continue;
+      }
+      const prefix = match[1];
+      let baseFileName = absoluteFrom(prefix + ".ts");
+      let inputFile = this.delegate.getSourceFile(baseFileName, ts26.ScriptTarget.Latest);
+      if (inputFile === void 0) {
+        baseFileName = absoluteFrom(prefix + ".tsx");
+        inputFile = this.delegate.getSourceFile(baseFileName, ts26.ScriptTarget.Latest);
+      }
+      if (inputFile === void 0 || isShim(inputFile)) {
+        return void 0;
+      }
+      return this.generateSpecific(fileName, record.generator, inputFile);
+    }
+    this.notShims.add(fileName);
+    return null;
+  }
+  generateSpecific(fileName, generator, inputFile) {
+    let priorShimSf = null;
+    if (this.priorShims.has(fileName)) {
+      priorShimSf = this.priorShims.get(fileName);
+      this.priorShims.delete(fileName);
+    }
+    const shimSf = generator.generateShimForFile(inputFile, fileName, priorShimSf);
+    sfExtensionData(shimSf).fileShim = {
+      extension: generator.extensionPrefix,
+      generatedFrom: absoluteFromSourceFile(inputFile)
+    };
+    if (!generator.shouldEmit) {
+      this.ignoreForEmit.add(shimSf);
+    }
+    this.shims.set(fileName, shimSf);
+    return shimSf;
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/reference_tagger.mjs
+var ShimReferenceTagger = class {
+  constructor(shimExtensions) {
+    this.tagged = /* @__PURE__ */ new Set();
+    this.enabled = true;
+    this.suffixes = shimExtensions.map((extension) => `.${extension}.ts`);
+  }
+  tag(sf) {
+    if (!this.enabled || sf.isDeclarationFile || isShim(sf) || this.tagged.has(sf) || !isNonDeclarationTsPath(sf.fileName)) {
+      return;
+    }
+    const ext = sfExtensionData(sf);
+    if (ext.originalReferencedFiles === null) {
+      ext.originalReferencedFiles = sf.referencedFiles;
+    }
+    const referencedFiles = [...ext.originalReferencedFiles];
+    const sfPath = absoluteFromSourceFile(sf);
+    for (const suffix of this.suffixes) {
+      referencedFiles.push({
+        fileName: makeShimFileName(sfPath, suffix),
+        pos: 0,
+        end: 0
+      });
+    }
+    ext.taggedReferenceFiles = referencedFiles;
+    sf.referencedFiles = referencedFiles;
+    this.tagged.add(sf);
+  }
+  finalize() {
+    this.enabled = false;
+    this.tagged.clear();
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver.mjs
+var DelegatingCompilerHost = class {
+  get jsDocParsingMode() {
+    return this.delegate.jsDocParsingMode;
+  }
+  set jsDocParsingMode(mode) {
+    this.delegate.jsDocParsingMode = mode;
+  }
+  constructor(delegate) {
+    this.delegate = delegate;
+    this.createHash = this.delegateMethod("createHash");
+    this.directoryExists = this.delegateMethod("directoryExists");
+    this.getCancellationToken = this.delegateMethod("getCancellationToken");
+    this.getCanonicalFileName = this.delegateMethod("getCanonicalFileName");
+    this.getCurrentDirectory = this.delegateMethod("getCurrentDirectory");
+    this.getDefaultLibFileName = this.delegateMethod("getDefaultLibFileName");
+    this.getDefaultLibLocation = this.delegateMethod("getDefaultLibLocation");
+    this.getDirectories = this.delegateMethod("getDirectories");
+    this.getEnvironmentVariable = this.delegateMethod("getEnvironmentVariable");
+    this.getNewLine = this.delegateMethod("getNewLine");
+    this.getParsedCommandLine = this.delegateMethod("getParsedCommandLine");
+    this.getSourceFileByPath = this.delegateMethod("getSourceFileByPath");
+    this.readDirectory = this.delegateMethod("readDirectory");
+    this.readFile = this.delegateMethod("readFile");
+    this.realpath = this.delegateMethod("realpath");
+    this.resolveModuleNames = this.delegateMethod("resolveModuleNames");
+    this.resolveTypeReferenceDirectives = this.delegateMethod("resolveTypeReferenceDirectives");
+    this.trace = this.delegateMethod("trace");
+    this.useCaseSensitiveFileNames = this.delegateMethod("useCaseSensitiveFileNames");
+    this.getModuleResolutionCache = this.delegateMethod("getModuleResolutionCache");
+    this.hasInvalidatedResolutions = this.delegateMethod("hasInvalidatedResolutions");
+    this.resolveModuleNameLiterals = this.delegateMethod("resolveModuleNameLiterals");
+    this.resolveTypeReferenceDirectiveReferences = this.delegateMethod("resolveTypeReferenceDirectiveReferences");
+  }
+  delegateMethod(name) {
+    return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
+  }
+};
+var UpdatedProgramHost = class extends DelegatingCompilerHost {
+  constructor(sfMap, originalProgram, delegate, shimExtensionPrefixes) {
+    super(delegate);
+    this.originalProgram = originalProgram;
+    this.shimExtensionPrefixes = shimExtensionPrefixes;
+    this.shimTagger = new ShimReferenceTagger(this.shimExtensionPrefixes);
+    this.sfMap = sfMap;
+  }
+  getSourceFile(fileName, languageVersionOrOptions, onError, shouldCreateNewSourceFile) {
+    let delegateSf = this.originalProgram.getSourceFile(fileName);
+    if (delegateSf === void 0) {
+      delegateSf = this.delegate.getSourceFile(fileName, languageVersionOrOptions, onError, shouldCreateNewSourceFile);
+    }
+    if (delegateSf === void 0) {
+      return void 0;
+    }
+    let sf;
+    if (this.sfMap.has(fileName)) {
+      sf = this.sfMap.get(fileName);
+      copyFileShimData(delegateSf, sf);
+    } else {
+      sf = delegateSf;
+    }
+    sf = toUnredirectedSourceFile(sf);
+    this.shimTagger.tag(sf);
+    return sf;
+  }
+  postProgramCreationCleanup() {
+    this.shimTagger.finalize();
+  }
+  writeFile() {
+    throw new Error(`TypeCheckProgramHost should never write files`);
+  }
+  fileExists(fileName) {
+    return this.sfMap.has(fileName) || this.delegate.fileExists(fileName);
+  }
+};
+var TsCreateProgramDriver = class {
+  constructor(originalProgram, originalHost, options, shimExtensionPrefixes) {
+    this.originalProgram = originalProgram;
+    this.originalHost = originalHost;
+    this.options = options;
+    this.shimExtensionPrefixes = shimExtensionPrefixes;
+    this.sfMap = /* @__PURE__ */ new Map();
+    this.supportsInlineOperations = true;
+    this.program = this.originalProgram;
+  }
+  getProgram() {
+    return this.program;
+  }
+  updateFiles(contents, updateMode) {
+    if (contents.size === 0) {
+      if (updateMode !== UpdateMode.Complete || this.sfMap.size === 0) {
+        return;
+      }
+    }
+    if (updateMode === UpdateMode.Complete) {
+      this.sfMap.clear();
+    }
+    for (const [filePath, { newText, originalFile }] of contents.entries()) {
+      const sf = ts27.createSourceFile(filePath, newText, {
+        impliedNodeFormat: void 0,
+        languageVersion: ts27.ScriptTarget.Latest
+      }, true);
+      if (originalFile !== null) {
+        sf[NgOriginalFile] = originalFile;
+      }
+      this.sfMap.set(filePath, sf);
+    }
+    const host = new UpdatedProgramHost(this.sfMap, this.originalProgram, this.originalHost, this.shimExtensionPrefixes);
+    const oldProgram = this.program;
+    retagAllTsFiles(oldProgram);
+    this.program = ts27.createProgram({
+      host,
+      rootNames: this.program.getRootFileNames(),
+      options: this.options,
+      oldProgram
+    });
+    host.postProgramCreationCleanup();
+    untagAllTsFiles(this.program);
+    untagAllTsFiles(oldProgram);
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.mjs
+import ts28 from "typescript";
+function makeTemplateDiagnostic(templateId, mapping, span, category, code, messageText, relatedMessages) {
+  var _a;
+  if (mapping.type === "direct") {
+    let relatedInformation = void 0;
+    if (relatedMessages !== void 0) {
+      relatedInformation = [];
+      for (const relatedMessage of relatedMessages) {
+        relatedInformation.push({
+          category: ts28.DiagnosticCategory.Message,
+          code: 0,
+          file: relatedMessage.sourceFile,
+          start: relatedMessage.start,
+          length: relatedMessage.end - relatedMessage.start,
+          messageText: relatedMessage.text
+        });
+      }
+    }
+    return {
+      source: "ngtsc",
+      code,
+      category,
+      messageText,
+      file: mapping.node.getSourceFile(),
+      componentFile: mapping.node.getSourceFile(),
+      templateId,
+      start: span.start.offset,
+      length: span.end.offset - span.start.offset,
+      relatedInformation
+    };
+  } else if (mapping.type === "indirect" || mapping.type === "external") {
+    const componentSf = mapping.componentClass.getSourceFile();
+    const componentName = mapping.componentClass.name.text;
+    const fileName = mapping.type === "indirect" ? `${componentSf.fileName} (${componentName} template)` : mapping.templateUrl;
+    let relatedInformation = [];
+    if (relatedMessages !== void 0) {
+      for (const relatedMessage of relatedMessages) {
+        relatedInformation.push({
+          category: ts28.DiagnosticCategory.Message,
+          code: 0,
+          file: relatedMessage.sourceFile,
+          start: relatedMessage.start,
+          length: relatedMessage.end - relatedMessage.start,
+          messageText: relatedMessage.text
+        });
+      }
+    }
+    let sf;
+    try {
+      sf = getParsedTemplateSourceFile(fileName, mapping);
+    } catch (e) {
+      const failureChain = makeDiagnosticChain(`Failed to report an error in '${fileName}' at ${span.start.line + 1}:${span.start.col + 1}`, [makeDiagnosticChain((_a = e == null ? void 0 : e.stack) != null ? _a : `${e}`)]);
+      return {
+        source: "ngtsc",
+        category,
+        code,
+        messageText: addDiagnosticChain(messageText, [failureChain]),
+        file: componentSf,
+        componentFile: componentSf,
+        templateId,
+        start: mapping.node.getStart(),
+        length: mapping.node.getEnd() - mapping.node.getStart(),
+        relatedInformation
+      };
+    }
+    relatedInformation.push({
+      category: ts28.DiagnosticCategory.Message,
+      code: 0,
+      file: componentSf,
+      start: mapping.node.getStart(),
+      length: mapping.node.getEnd() - mapping.node.getStart(),
+      messageText: `Error occurs in the template of component ${componentName}.`
+    });
+    return {
+      source: "ngtsc",
+      category,
+      code,
+      messageText,
+      file: sf,
+      componentFile: componentSf,
+      templateId,
+      start: span.start.offset,
+      length: span.end.offset - span.start.offset,
+      relatedInformation
+    };
+  } else {
+    throw new Error(`Unexpected source mapping type: ${mapping.type}`);
+  }
+}
+var TemplateSourceFile = Symbol("TemplateSourceFile");
+function getParsedTemplateSourceFile(fileName, mapping) {
+  if (mapping[TemplateSourceFile] === void 0) {
+    mapping[TemplateSourceFile] = parseTemplateAsSourceFile(fileName, mapping.template);
+  }
+  return mapping[TemplateSourceFile];
+}
+var parseTemplateAsSourceFileForTest = null;
+function parseTemplateAsSourceFile(fileName, template) {
+  if (parseTemplateAsSourceFileForTest !== null) {
+    return parseTemplateAsSourceFileForTest(fileName, template);
+  }
+  return ts28.createSourceFile(
+    fileName,
+    template,
+    ts28.ScriptTarget.Latest,
+    false,
+    ts28.ScriptKind.JSX
+  );
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/id.mjs
+var TEMPLATE_ID = Symbol("ngTemplateId");
+var NEXT_TEMPLATE_ID = Symbol("ngNextTemplateId");
+function getTemplateId(clazz) {
+  const node = clazz;
+  if (node[TEMPLATE_ID] === void 0) {
+    node[TEMPLATE_ID] = allocateTemplateId(node.getSourceFile());
+  }
+  return node[TEMPLATE_ID];
+}
+function allocateTemplateId(sf) {
+  if (sf[NEXT_TEMPLATE_ID] === void 0) {
+    sf[NEXT_TEMPLATE_ID] = 1;
+  }
+  return `tcb${sf[NEXT_TEMPLATE_ID]++}`;
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/completion.mjs
+import { EmptyExpr, ImplicitReceiver, PropertyRead, PropertyWrite, SafePropertyRead, TmplAstLetDeclaration, TmplAstReference, TmplAstTextAttribute } from "@angular/compiler";
+import ts30 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/comments.mjs
+import { AbsoluteSourceSpan } from "@angular/compiler";
+import ts29 from "typescript";
+var parseSpanComment = /^(\d+),(\d+)$/;
+function readSpanComment(node, sourceFile = node.getSourceFile()) {
+  return ts29.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts29.SyntaxKind.MultiLineCommentTrivia) {
+      return null;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    const match = commentText.match(parseSpanComment);
+    if (match === null) {
+      return null;
+    }
+    return new AbsoluteSourceSpan(+match[1], +match[2]);
+  }) || null;
+}
+var CommentTriviaType;
+(function(CommentTriviaType2) {
+  CommentTriviaType2["DIAGNOSTIC"] = "D";
+  CommentTriviaType2["EXPRESSION_TYPE_IDENTIFIER"] = "T";
+})(CommentTriviaType || (CommentTriviaType = {}));
+var ExpressionIdentifier;
+(function(ExpressionIdentifier2) {
+  ExpressionIdentifier2["DIRECTIVE"] = "DIR";
+  ExpressionIdentifier2["COMPONENT_COMPLETION"] = "COMPCOMP";
+  ExpressionIdentifier2["EVENT_PARAMETER"] = "EP";
+  ExpressionIdentifier2["VARIABLE_AS_EXPRESSION"] = "VAE";
+})(ExpressionIdentifier || (ExpressionIdentifier = {}));
+function addExpressionIdentifier(node, identifier) {
+  ts29.addSyntheticTrailingComment(
+    node,
+    ts29.SyntaxKind.MultiLineCommentTrivia,
+    `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`,
+    false
+  );
+}
+var IGNORE_FOR_DIAGNOSTICS_MARKER = `${CommentTriviaType.DIAGNOSTIC}:ignore`;
+function markIgnoreDiagnostics(node) {
+  ts29.addSyntheticTrailingComment(
+    node,
+    ts29.SyntaxKind.MultiLineCommentTrivia,
+    IGNORE_FOR_DIAGNOSTICS_MARKER,
+    false
+  );
+}
+function hasIgnoreForDiagnosticsMarker(node, sourceFile) {
+  return ts29.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts29.SyntaxKind.MultiLineCommentTrivia) {
+      return null;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    return commentText === IGNORE_FOR_DIAGNOSTICS_MARKER;
+  }) === true;
+}
+function makeRecursiveVisitor(visitor) {
+  function recursiveVisitor(node) {
+    const res = visitor(node);
+    return res !== null ? res : node.forEachChild(recursiveVisitor);
+  }
+  return recursiveVisitor;
+}
+function getSpanFromOptions(opts) {
+  let withSpan = null;
+  if (opts.withSpan !== void 0) {
+    if (opts.withSpan instanceof AbsoluteSourceSpan) {
+      withSpan = opts.withSpan;
+    } else {
+      withSpan = { start: opts.withSpan.start.offset, end: opts.withSpan.end.offset };
+    }
+  }
+  return withSpan;
+}
+function findFirstMatchingNode(tcb, opts) {
+  var _a;
+  const withSpan = getSpanFromOptions(opts);
+  const withExpressionIdentifier = opts.withExpressionIdentifier;
+  const sf = tcb.getSourceFile();
+  const visitor = makeRecursiveVisitor((node) => {
+    if (!opts.filter(node)) {
+      return null;
+    }
+    if (withSpan !== null) {
+      const comment = readSpanComment(node, sf);
+      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
+        return null;
+      }
+    }
+    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
+      return null;
+    }
+    return node;
+  });
+  return (_a = tcb.forEachChild(visitor)) != null ? _a : null;
+}
+function findAllMatchingNodes(tcb, opts) {
+  const withSpan = getSpanFromOptions(opts);
+  const withExpressionIdentifier = opts.withExpressionIdentifier;
+  const results = [];
+  const stack = [tcb];
+  const sf = tcb.getSourceFile();
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!opts.filter(node)) {
+      stack.push(...node.getChildren());
+      continue;
+    }
+    if (withSpan !== null) {
+      const comment = readSpanComment(node, sf);
+      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
+        stack.push(...node.getChildren());
+        continue;
+      }
+    }
+    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
+      continue;
+    }
+    results.push(node);
+  }
+  return results;
+}
+function hasExpressionIdentifier(sourceFile, node, identifier) {
+  return ts29.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts29.SyntaxKind.MultiLineCommentTrivia) {
+      return false;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    return commentText === `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
+  }) || false;
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/completion.mjs
+var CompletionEngine = class {
+  constructor(tcb, data, tcbPath, tcbIsShim) {
+    this.tcb = tcb;
+    this.data = data;
+    this.tcbPath = tcbPath;
+    this.tcbIsShim = tcbIsShim;
+    this.templateContextCache = /* @__PURE__ */ new Map();
+    this.expressionCompletionCache = /* @__PURE__ */ new Map();
+    const globalRead = findFirstMatchingNode(this.tcb, {
+      filter: ts30.isPropertyAccessExpression,
+      withExpressionIdentifier: ExpressionIdentifier.COMPONENT_COMPLETION
+    });
+    if (globalRead !== null) {
+      this.componentContext = {
+        tcbPath: this.tcbPath,
+        isShimFile: this.tcbIsShim,
+        positionInFile: globalRead.name.getStart()
+      };
+    } else {
+      this.componentContext = null;
+    }
+  }
+  getGlobalCompletions(context, node) {
+    if (this.componentContext === null) {
+      return null;
+    }
+    const templateContext = this.getTemplateContextCompletions(context);
+    if (templateContext === null) {
+      return null;
+    }
+    let nodeContext = null;
+    if (node instanceof EmptyExpr) {
+      const nodeLocation = findFirstMatchingNode(this.tcb, {
+        filter: ts30.isIdentifier,
+        withSpan: node.sourceSpan
+      });
+      if (nodeLocation !== null) {
+        nodeContext = {
+          tcbPath: this.tcbPath,
+          isShimFile: this.tcbIsShim,
+          positionInFile: nodeLocation.getStart()
+        };
+      }
+    }
+    if (node instanceof PropertyRead && node.receiver instanceof ImplicitReceiver) {
+      const nodeLocation = findFirstMatchingNode(this.tcb, {
+        filter: ts30.isPropertyAccessExpression,
+        withSpan: node.sourceSpan
+      });
+      if (nodeLocation) {
+        nodeContext = {
+          tcbPath: this.tcbPath,
+          isShimFile: this.tcbIsShim,
+          positionInFile: nodeLocation.getStart()
+        };
+      }
+    }
+    return {
+      componentContext: this.componentContext,
+      templateContext,
+      nodeContext
+    };
+  }
+  getExpressionCompletionLocation(expr) {
+    if (this.expressionCompletionCache.has(expr)) {
+      return this.expressionCompletionCache.get(expr);
+    }
+    let tsExpr = null;
+    if (expr instanceof PropertyRead || expr instanceof PropertyWrite) {
+      tsExpr = findFirstMatchingNode(this.tcb, {
+        filter: ts30.isPropertyAccessExpression,
+        withSpan: expr.nameSpan
+      });
+    } else if (expr instanceof SafePropertyRead) {
+      const ternaryExpr = findFirstMatchingNode(this.tcb, {
+        filter: ts30.isParenthesizedExpression,
+        withSpan: expr.sourceSpan
+      });
+      if (ternaryExpr === null || !ts30.isConditionalExpression(ternaryExpr.expression)) {
+        return null;
+      }
+      const whenTrue = ternaryExpr.expression.whenTrue;
+      if (ts30.isPropertyAccessExpression(whenTrue)) {
+        tsExpr = whenTrue;
+      } else if (ts30.isCallExpression(whenTrue) && ts30.isPropertyAccessExpression(whenTrue.expression)) {
+        tsExpr = whenTrue.expression;
+      }
+    }
+    if (tsExpr === null) {
+      return null;
+    }
+    const res = {
+      tcbPath: this.tcbPath,
+      isShimFile: this.tcbIsShim,
+      positionInFile: tsExpr.name.getEnd()
+    };
+    this.expressionCompletionCache.set(expr, res);
+    return res;
+  }
+  getLiteralCompletionLocation(expr) {
+    if (this.expressionCompletionCache.has(expr)) {
+      return this.expressionCompletionCache.get(expr);
+    }
+    let tsExpr = null;
+    if (expr instanceof TmplAstTextAttribute) {
+      const strNode = findFirstMatchingNode(this.tcb, {
+        filter: ts30.isParenthesizedExpression,
+        withSpan: expr.sourceSpan
+      });
+      if (strNode !== null && ts30.isStringLiteral(strNode.expression)) {
+        tsExpr = strNode.expression;
+      }
+    } else {
+      tsExpr = findFirstMatchingNode(this.tcb, {
+        filter: (n2) => ts30.isStringLiteral(n2) || ts30.isNumericLiteral(n2),
+        withSpan: expr.sourceSpan
+      });
+    }
+    if (tsExpr === null) {
+      return null;
+    }
+    let positionInShimFile = tsExpr.getEnd();
+    if (ts30.isStringLiteral(tsExpr)) {
+      positionInShimFile -= 1;
+    }
+    const res = {
+      tcbPath: this.tcbPath,
+      isShimFile: this.tcbIsShim,
+      positionInFile: positionInShimFile
+    };
+    this.expressionCompletionCache.set(expr, res);
+    return res;
+  }
+  getTemplateContextCompletions(context) {
+    if (this.templateContextCache.has(context)) {
+      return this.templateContextCache.get(context);
+    }
+    const templateContext = /* @__PURE__ */ new Map();
+    for (const node of this.data.boundTarget.getEntitiesInScope(context)) {
+      if (node instanceof TmplAstReference) {
+        templateContext.set(node.name, {
+          kind: CompletionKind.Reference,
+          node
+        });
+      } else if (node instanceof TmplAstLetDeclaration) {
+        templateContext.set(node.name, {
+          kind: CompletionKind.LetDeclaration,
+          node
+        });
+      } else {
+        templateContext.set(node.name, {
+          kind: CompletionKind.Variable,
+          node
+        });
+      }
+    }
+    this.templateContextCache.set(context, templateContext);
+    return templateContext;
+  }
+};
+
+// node_modules/magic-string/dist/magic-string.es.mjs
+import { encode } from "@jridgewell/sourcemap-codec";
+var BitSet = class {
+  constructor(arg) {
+    this.bits = arg instanceof BitSet ? arg.bits.slice() : [];
+  }
+  add(n2) {
+    this.bits[n2 >> 5] |= 1 << (n2 & 31);
+  }
+  has(n2) {
+    return !!(this.bits[n2 >> 5] & 1 << (n2 & 31));
+  }
+};
+var Chunk = class {
+  constructor(start, end, content) {
+    this.start = start;
+    this.end = end;
+    this.original = content;
+    this.intro = "";
+    this.outro = "";
+    this.content = content;
+    this.storeName = false;
+    this.edited = false;
+    {
+      this.previous = null;
+      this.next = null;
+    }
+  }
+  appendLeft(content) {
+    this.outro += content;
+  }
+  appendRight(content) {
+    this.intro = this.intro + content;
+  }
+  clone() {
+    const chunk = new Chunk(this.start, this.end, this.original);
+    chunk.intro = this.intro;
+    chunk.outro = this.outro;
+    chunk.content = this.content;
+    chunk.storeName = this.storeName;
+    chunk.edited = this.edited;
+    return chunk;
+  }
+  contains(index) {
+    return this.start < index && index < this.end;
+  }
+  eachNext(fn) {
+    let chunk = this;
+    while (chunk) {
+      fn(chunk);
+      chunk = chunk.next;
+    }
+  }
+  eachPrevious(fn) {
+    let chunk = this;
+    while (chunk) {
+      fn(chunk);
+      chunk = chunk.previous;
+    }
+  }
+  edit(content, storeName, contentOnly) {
+    this.content = content;
+    if (!contentOnly) {
+      this.intro = "";
+      this.outro = "";
+    }
+    this.storeName = storeName;
+    this.edited = true;
+    return this;
+  }
+  prependLeft(content) {
+    this.outro = content + this.outro;
+  }
+  prependRight(content) {
+    this.intro = content + this.intro;
+  }
+  reset() {
+    this.intro = "";
+    this.outro = "";
+    if (this.edited) {
+      this.content = this.original;
+      this.storeName = false;
+      this.edited = false;
+    }
+  }
+  split(index) {
+    const sliceIndex = index - this.start;
+    const originalBefore = this.original.slice(0, sliceIndex);
+    const originalAfter = this.original.slice(sliceIndex);
+    this.original = originalBefore;
+    const newChunk = new Chunk(index, this.end, originalAfter);
+    newChunk.outro = this.outro;
+    this.outro = "";
+    this.end = index;
+    if (this.edited) {
+      newChunk.edit("", false);
+      this.content = "";
+    } else {
+      this.content = originalBefore;
+    }
+    newChunk.next = this.next;
+    if (newChunk.next)
+      newChunk.next.previous = newChunk;
+    newChunk.previous = this;
+    this.next = newChunk;
+    return newChunk;
+  }
+  toString() {
+    return this.intro + this.content + this.outro;
+  }
+  trimEnd(rx) {
+    this.outro = this.outro.replace(rx, "");
+    if (this.outro.length)
+      return true;
+    const trimmed = this.content.replace(rx, "");
+    if (trimmed.length) {
+      if (trimmed !== this.content) {
+        this.split(this.start + trimmed.length).edit("", void 0, true);
+        if (this.edited) {
+          this.edit(trimmed, this.storeName, true);
+        }
+      }
+      return true;
+    } else {
+      this.edit("", void 0, true);
+      this.intro = this.intro.replace(rx, "");
+      if (this.intro.length)
+        return true;
+    }
+  }
+  trimStart(rx) {
+    this.intro = this.intro.replace(rx, "");
+    if (this.intro.length)
+      return true;
+    const trimmed = this.content.replace(rx, "");
+    if (trimmed.length) {
+      if (trimmed !== this.content) {
+        const newChunk = this.split(this.end - trimmed.length);
+        if (this.edited) {
+          newChunk.edit(trimmed, this.storeName, true);
+        }
+        this.edit("", void 0, true);
+      }
+      return true;
+    } else {
+      this.edit("", void 0, true);
+      this.outro = this.outro.replace(rx, "");
+      if (this.outro.length)
+        return true;
+    }
+  }
+};
+function getBtoa() {
+  if (typeof globalThis !== "undefined" && typeof globalThis.btoa === "function") {
+    return (str) => globalThis.btoa(unescape(encodeURIComponent(str)));
+  } else if (typeof Buffer === "function") {
+    return (str) => Buffer.from(str, "utf-8").toString("base64");
+  } else {
+    return () => {
+      throw new Error("Unsupported environment: `window.btoa` or `Buffer` should be supported.");
+    };
+  }
+}
+var btoa = /* @__PURE__ */ getBtoa();
+var SourceMap = class {
+  constructor(properties) {
+    this.version = 3;
+    this.file = properties.file;
+    this.sources = properties.sources;
+    this.sourcesContent = properties.sourcesContent;
+    this.names = properties.names;
+    this.mappings = encode(properties.mappings);
+    if (typeof properties.x_google_ignoreList !== "undefined") {
+      this.x_google_ignoreList = properties.x_google_ignoreList;
+    }
+  }
+  toString() {
+    return JSON.stringify(this);
+  }
+  toUrl() {
+    return "data:application/json;charset=utf-8;base64," + btoa(this.toString());
+  }
+};
+function guessIndent(code) {
+  const lines = code.split("\n");
+  const tabbed = lines.filter((line) => /^\t+/.test(line));
+  const spaced = lines.filter((line) => /^ {2,}/.test(line));
+  if (tabbed.length === 0 && spaced.length === 0) {
+    return null;
+  }
+  if (tabbed.length >= spaced.length) {
+    return "	";
+  }
+  const min = spaced.reduce((previous, current) => {
+    const numSpaces = /^ +/.exec(current)[0].length;
+    return Math.min(numSpaces, previous);
+  }, Infinity);
+  return new Array(min + 1).join(" ");
+}
+function getRelativePath(from, to) {
+  const fromParts = from.split(/[/\\]/);
+  const toParts = to.split(/[/\\]/);
+  fromParts.pop();
+  while (fromParts[0] === toParts[0]) {
+    fromParts.shift();
+    toParts.shift();
+  }
+  if (fromParts.length) {
+    let i = fromParts.length;
+    while (i--)
+      fromParts[i] = "..";
+  }
+  return fromParts.concat(toParts).join("/");
+}
+var toString = Object.prototype.toString;
+function isObject(thing) {
+  return toString.call(thing) === "[object Object]";
+}
+function getLocator(source) {
+  const originalLines = source.split("\n");
+  const lineOffsets = [];
+  for (let i = 0, pos = 0; i < originalLines.length; i++) {
+    lineOffsets.push(pos);
+    pos += originalLines[i].length + 1;
+  }
+  return function locate(index) {
+    let i = 0;
+    let j = lineOffsets.length;
+    while (i < j) {
+      const m = i + j >> 1;
+      if (index < lineOffsets[m]) {
+        j = m;
+      } else {
+        i = m + 1;
+      }
+    }
+    const line = i - 1;
+    const column = index - lineOffsets[line];
+    return { line, column };
+  };
+}
+var wordRegex = /\w/;
+var Mappings = class {
+  constructor(hires) {
+    this.hires = hires;
+    this.generatedCodeLine = 0;
+    this.generatedCodeColumn = 0;
+    this.raw = [];
+    this.rawSegments = this.raw[this.generatedCodeLine] = [];
+    this.pending = null;
+  }
+  addEdit(sourceIndex, content, loc, nameIndex) {
+    if (content.length) {
+      const contentLengthMinusOne = content.length - 1;
+      let contentLineEnd = content.indexOf("\n", 0);
+      let previousContentLineEnd = -1;
+      while (contentLineEnd >= 0 && contentLengthMinusOne > contentLineEnd) {
+        const segment2 = [this.generatedCodeColumn, sourceIndex, loc.line, loc.column];
+        if (nameIndex >= 0) {
+          segment2.push(nameIndex);
+        }
+        this.rawSegments.push(segment2);
+        this.generatedCodeLine += 1;
+        this.raw[this.generatedCodeLine] = this.rawSegments = [];
+        this.generatedCodeColumn = 0;
+        previousContentLineEnd = contentLineEnd;
+        contentLineEnd = content.indexOf("\n", contentLineEnd + 1);
+      }
+      const segment = [this.generatedCodeColumn, sourceIndex, loc.line, loc.column];
+      if (nameIndex >= 0) {
+        segment.push(nameIndex);
+      }
+      this.rawSegments.push(segment);
+      this.advance(content.slice(previousContentLineEnd + 1));
+    } else if (this.pending) {
+      this.rawSegments.push(this.pending);
+      this.advance(content);
+    }
+    this.pending = null;
+  }
+  addUneditedChunk(sourceIndex, chunk, original, loc, sourcemapLocations) {
+    let originalCharIndex = chunk.start;
+    let first = true;
+    let charInHiresBoundary = false;
+    while (originalCharIndex < chunk.end) {
+      if (this.hires || first || sourcemapLocations.has(originalCharIndex)) {
+        const segment = [this.generatedCodeColumn, sourceIndex, loc.line, loc.column];
+        if (this.hires === "boundary") {
+          if (wordRegex.test(original[originalCharIndex])) {
+            if (!charInHiresBoundary) {
+              this.rawSegments.push(segment);
+              charInHiresBoundary = true;
+            }
+          } else {
+            this.rawSegments.push(segment);
+            charInHiresBoundary = false;
+          }
+        } else {
+          this.rawSegments.push(segment);
+        }
+      }
+      if (original[originalCharIndex] === "\n") {
+        loc.line += 1;
+        loc.column = 0;
+        this.generatedCodeLine += 1;
+        this.raw[this.generatedCodeLine] = this.rawSegments = [];
+        this.generatedCodeColumn = 0;
+        first = true;
+      } else {
+        loc.column += 1;
+        this.generatedCodeColumn += 1;
+        first = false;
+      }
+      originalCharIndex += 1;
+    }
+    this.pending = null;
+  }
+  advance(str) {
+    if (!str)
+      return;
+    const lines = str.split("\n");
+    if (lines.length > 1) {
+      for (let i = 0; i < lines.length - 1; i++) {
+        this.generatedCodeLine++;
+        this.raw[this.generatedCodeLine] = this.rawSegments = [];
+      }
+      this.generatedCodeColumn = 0;
+    }
+    this.generatedCodeColumn += lines[lines.length - 1].length;
+  }
+};
+var n = "\n";
+var warned = {
+  insertLeft: false,
+  insertRight: false,
+  storeName: false
+};
+var MagicString = class {
+  constructor(string, options = {}) {
+    const chunk = new Chunk(0, string.length, string);
+    Object.defineProperties(this, {
+      original: { writable: true, value: string },
+      outro: { writable: true, value: "" },
+      intro: { writable: true, value: "" },
+      firstChunk: { writable: true, value: chunk },
+      lastChunk: { writable: true, value: chunk },
+      lastSearchedChunk: { writable: true, value: chunk },
+      byStart: { writable: true, value: {} },
+      byEnd: { writable: true, value: {} },
+      filename: { writable: true, value: options.filename },
+      indentExclusionRanges: { writable: true, value: options.indentExclusionRanges },
+      sourcemapLocations: { writable: true, value: new BitSet() },
+      storedNames: { writable: true, value: {} },
+      indentStr: { writable: true, value: void 0 },
+      ignoreList: { writable: true, value: options.ignoreList }
+    });
+    this.byStart[0] = chunk;
+    this.byEnd[string.length] = chunk;
+  }
+  addSourcemapLocation(char) {
+    this.sourcemapLocations.add(char);
+  }
+  append(content) {
+    if (typeof content !== "string")
+      throw new TypeError("outro content must be a string");
+    this.outro += content;
+    return this;
+  }
+  appendLeft(index, content) {
+    if (typeof content !== "string")
+      throw new TypeError("inserted content must be a string");
+    this._split(index);
+    const chunk = this.byEnd[index];
+    if (chunk) {
+      chunk.appendLeft(content);
+    } else {
+      this.intro += content;
+    }
+    return this;
+  }
+  appendRight(index, content) {
+    if (typeof content !== "string")
+      throw new TypeError("inserted content must be a string");
+    this._split(index);
+    const chunk = this.byStart[index];
+    if (chunk) {
+      chunk.appendRight(content);
+    } else {
+      this.outro += content;
+    }
+    return this;
+  }
+  clone() {
+    const cloned = new MagicString(this.original, { filename: this.filename });
+    let originalChunk = this.firstChunk;
+    let clonedChunk = cloned.firstChunk = cloned.lastSearchedChunk = originalChunk.clone();
+    while (originalChunk) {
+      cloned.byStart[clonedChunk.start] = clonedChunk;
+      cloned.byEnd[clonedChunk.end] = clonedChunk;
+      const nextOriginalChunk = originalChunk.next;
+      const nextClonedChunk = nextOriginalChunk && nextOriginalChunk.clone();
+      if (nextClonedChunk) {
+        clonedChunk.next = nextClonedChunk;
+        nextClonedChunk.previous = clonedChunk;
+        clonedChunk = nextClonedChunk;
+      }
+      originalChunk = nextOriginalChunk;
+    }
+    cloned.lastChunk = clonedChunk;
+    if (this.indentExclusionRanges) {
+      cloned.indentExclusionRanges = this.indentExclusionRanges.slice();
+    }
+    cloned.sourcemapLocations = new BitSet(this.sourcemapLocations);
+    cloned.intro = this.intro;
+    cloned.outro = this.outro;
+    return cloned;
+  }
+  generateDecodedMap(options) {
+    options = options || {};
+    const sourceIndex = 0;
+    const names = Object.keys(this.storedNames);
+    const mappings = new Mappings(options.hires);
+    const locate = getLocator(this.original);
+    if (this.intro) {
+      mappings.advance(this.intro);
+    }
+    this.firstChunk.eachNext((chunk) => {
+      const loc = locate(chunk.start);
+      if (chunk.intro.length)
+        mappings.advance(chunk.intro);
+      if (chunk.edited) {
+        mappings.addEdit(
+          sourceIndex,
+          chunk.content,
+          loc,
+          chunk.storeName ? names.indexOf(chunk.original) : -1
+        );
+      } else {
+        mappings.addUneditedChunk(sourceIndex, chunk, this.original, loc, this.sourcemapLocations);
+      }
+      if (chunk.outro.length)
+        mappings.advance(chunk.outro);
+    });
+    return {
+      file: options.file ? options.file.split(/[/\\]/).pop() : void 0,
+      sources: [
+        options.source ? getRelativePath(options.file || "", options.source) : options.file || ""
+      ],
+      sourcesContent: options.includeContent ? [this.original] : void 0,
+      names,
+      mappings: mappings.raw,
+      x_google_ignoreList: this.ignoreList ? [sourceIndex] : void 0
+    };
+  }
+  generateMap(options) {
+    return new SourceMap(this.generateDecodedMap(options));
+  }
+  _ensureindentStr() {
+    if (this.indentStr === void 0) {
+      this.indentStr = guessIndent(this.original);
+    }
+  }
+  _getRawIndentString() {
+    this._ensureindentStr();
+    return this.indentStr;
+  }
+  getIndentString() {
+    this._ensureindentStr();
+    return this.indentStr === null ? "	" : this.indentStr;
+  }
+  indent(indentStr, options) {
+    const pattern = /^[^\r\n]/gm;
+    if (isObject(indentStr)) {
+      options = indentStr;
+      indentStr = void 0;
+    }
+    if (indentStr === void 0) {
+      this._ensureindentStr();
+      indentStr = this.indentStr || "	";
+    }
+    if (indentStr === "")
+      return this;
+    options = options || {};
+    const isExcluded = {};
+    if (options.exclude) {
+      const exclusions = typeof options.exclude[0] === "number" ? [options.exclude] : options.exclude;
+      exclusions.forEach((exclusion) => {
+        for (let i = exclusion[0]; i < exclusion[1]; i += 1) {
+          isExcluded[i] = true;
+        }
+      });
+    }
+    let shouldIndentNextCharacter = options.indentStart !== false;
+    const replacer = (match) => {
+      if (shouldIndentNextCharacter)
+        return `${indentStr}${match}`;
+      shouldIndentNextCharacter = true;
+      return match;
+    };
+    this.intro = this.intro.replace(pattern, replacer);
+    let charIndex = 0;
+    let chunk = this.firstChunk;
+    while (chunk) {
+      const end = chunk.end;
+      if (chunk.edited) {
+        if (!isExcluded[charIndex]) {
+          chunk.content = chunk.content.replace(pattern, replacer);
+          if (chunk.content.length) {
+            shouldIndentNextCharacter = chunk.content[chunk.content.length - 1] === "\n";
+          }
+        }
+      } else {
+        charIndex = chunk.start;
+        while (charIndex < end) {
+          if (!isExcluded[charIndex]) {
+            const char = this.original[charIndex];
+            if (char === "\n") {
+              shouldIndentNextCharacter = true;
+            } else if (char !== "\r" && shouldIndentNextCharacter) {
+              shouldIndentNextCharacter = false;
+              if (charIndex === chunk.start) {
+                chunk.prependRight(indentStr);
+              } else {
+                this._splitChunk(chunk, charIndex);
+                chunk = chunk.next;
+                chunk.prependRight(indentStr);
+              }
+            }
+          }
+          charIndex += 1;
+        }
+      }
+      charIndex = chunk.end;
+      chunk = chunk.next;
+    }
+    this.outro = this.outro.replace(pattern, replacer);
+    return this;
+  }
+  insert() {
+    throw new Error(
+      "magicString.insert(...) is deprecated. Use prependRight(...) or appendLeft(...)"
+    );
+  }
+  insertLeft(index, content) {
+    if (!warned.insertLeft) {
+      console.warn(
+        "magicString.insertLeft(...) is deprecated. Use magicString.appendLeft(...) instead"
+      );
+      warned.insertLeft = true;
+    }
+    return this.appendLeft(index, content);
+  }
+  insertRight(index, content) {
+    if (!warned.insertRight) {
+      console.warn(
+        "magicString.insertRight(...) is deprecated. Use magicString.prependRight(...) instead"
+      );
+      warned.insertRight = true;
+    }
+    return this.prependRight(index, content);
+  }
+  move(start, end, index) {
+    if (index >= start && index <= end)
+      throw new Error("Cannot move a selection inside itself");
+    this._split(start);
+    this._split(end);
+    this._split(index);
+    const first = this.byStart[start];
+    const last = this.byEnd[end];
+    const oldLeft = first.previous;
+    const oldRight = last.next;
+    const newRight = this.byStart[index];
+    if (!newRight && last === this.lastChunk)
+      return this;
+    const newLeft = newRight ? newRight.previous : this.lastChunk;
+    if (oldLeft)
+      oldLeft.next = oldRight;
+    if (oldRight)
+      oldRight.previous = oldLeft;
+    if (newLeft)
+      newLeft.next = first;
+    if (newRight)
+      newRight.previous = last;
+    if (!first.previous)
+      this.firstChunk = last.next;
+    if (!last.next) {
+      this.lastChunk = first.previous;
+      this.lastChunk.next = null;
+    }
+    first.previous = newLeft;
+    last.next = newRight || null;
+    if (!newLeft)
+      this.firstChunk = first;
+    if (!newRight)
+      this.lastChunk = last;
+    return this;
+  }
+  overwrite(start, end, content, options) {
+    options = options || {};
+    return this.update(start, end, content, { ...options, overwrite: !options.contentOnly });
+  }
+  update(start, end, content, options) {
+    if (typeof content !== "string")
+      throw new TypeError("replacement content must be a string");
+    while (start < 0)
+      start += this.original.length;
+    while (end < 0)
+      end += this.original.length;
+    if (end > this.original.length)
+      throw new Error("end is out of bounds");
+    if (start === end)
+      throw new Error(
+        "Cannot overwrite a zero-length range \u2013 use appendLeft or prependRight instead"
+      );
+    this._split(start);
+    this._split(end);
+    if (options === true) {
+      if (!warned.storeName) {
+        console.warn(
+          "The final argument to magicString.overwrite(...) should be an options object. See https://github.com/rich-harris/magic-string"
+        );
+        warned.storeName = true;
+      }
+      options = { storeName: true };
+    }
+    const storeName = options !== void 0 ? options.storeName : false;
+    const overwrite = options !== void 0 ? options.overwrite : false;
+    if (storeName) {
+      const original = this.original.slice(start, end);
+      Object.defineProperty(this.storedNames, original, {
+        writable: true,
+        value: true,
+        enumerable: true
+      });
+    }
+    const first = this.byStart[start];
+    const last = this.byEnd[end];
+    if (first) {
+      let chunk = first;
+      while (chunk !== last) {
+        if (chunk.next !== this.byStart[chunk.end]) {
+          throw new Error("Cannot overwrite across a split point");
+        }
+        chunk = chunk.next;
+        chunk.edit("", false);
+      }
+      first.edit(content, storeName, !overwrite);
+    } else {
+      const newChunk = new Chunk(start, end, "").edit(content, storeName);
+      last.next = newChunk;
+      newChunk.previous = last;
+    }
+    return this;
+  }
+  prepend(content) {
+    if (typeof content !== "string")
+      throw new TypeError("outro content must be a string");
+    this.intro = content + this.intro;
+    return this;
+  }
+  prependLeft(index, content) {
+    if (typeof content !== "string")
+      throw new TypeError("inserted content must be a string");
+    this._split(index);
+    const chunk = this.byEnd[index];
+    if (chunk) {
+      chunk.prependLeft(content);
+    } else {
+      this.intro = content + this.intro;
+    }
+    return this;
+  }
+  prependRight(index, content) {
+    if (typeof content !== "string")
+      throw new TypeError("inserted content must be a string");
+    this._split(index);
+    const chunk = this.byStart[index];
+    if (chunk) {
+      chunk.prependRight(content);
+    } else {
+      this.outro = content + this.outro;
+    }
+    return this;
+  }
+  remove(start, end) {
+    while (start < 0)
+      start += this.original.length;
+    while (end < 0)
+      end += this.original.length;
+    if (start === end)
+      return this;
+    if (start < 0 || end > this.original.length)
+      throw new Error("Character is out of bounds");
+    if (start > end)
+      throw new Error("end must be greater than start");
+    this._split(start);
+    this._split(end);
+    let chunk = this.byStart[start];
+    while (chunk) {
+      chunk.intro = "";
+      chunk.outro = "";
+      chunk.edit("");
+      chunk = end > chunk.end ? this.byStart[chunk.end] : null;
+    }
+    return this;
+  }
+  reset(start, end) {
+    while (start < 0)
+      start += this.original.length;
+    while (end < 0)
+      end += this.original.length;
+    if (start === end)
+      return this;
+    if (start < 0 || end > this.original.length)
+      throw new Error("Character is out of bounds");
+    if (start > end)
+      throw new Error("end must be greater than start");
+    this._split(start);
+    this._split(end);
+    let chunk = this.byStart[start];
+    while (chunk) {
+      chunk.reset();
+      chunk = end > chunk.end ? this.byStart[chunk.end] : null;
+    }
+    return this;
+  }
+  lastChar() {
+    if (this.outro.length)
+      return this.outro[this.outro.length - 1];
+    let chunk = this.lastChunk;
+    do {
+      if (chunk.outro.length)
+        return chunk.outro[chunk.outro.length - 1];
+      if (chunk.content.length)
+        return chunk.content[chunk.content.length - 1];
+      if (chunk.intro.length)
+        return chunk.intro[chunk.intro.length - 1];
+    } while (chunk = chunk.previous);
+    if (this.intro.length)
+      return this.intro[this.intro.length - 1];
+    return "";
+  }
+  lastLine() {
+    let lineIndex = this.outro.lastIndexOf(n);
+    if (lineIndex !== -1)
+      return this.outro.substr(lineIndex + 1);
+    let lineStr = this.outro;
+    let chunk = this.lastChunk;
+    do {
+      if (chunk.outro.length > 0) {
+        lineIndex = chunk.outro.lastIndexOf(n);
+        if (lineIndex !== -1)
+          return chunk.outro.substr(lineIndex + 1) + lineStr;
+        lineStr = chunk.outro + lineStr;
+      }
+      if (chunk.content.length > 0) {
+        lineIndex = chunk.content.lastIndexOf(n);
+        if (lineIndex !== -1)
+          return chunk.content.substr(lineIndex + 1) + lineStr;
+        lineStr = chunk.content + lineStr;
+      }
+      if (chunk.intro.length > 0) {
+        lineIndex = chunk.intro.lastIndexOf(n);
+        if (lineIndex !== -1)
+          return chunk.intro.substr(lineIndex + 1) + lineStr;
+        lineStr = chunk.intro + lineStr;
+      }
+    } while (chunk = chunk.previous);
+    lineIndex = this.intro.lastIndexOf(n);
+    if (lineIndex !== -1)
+      return this.intro.substr(lineIndex + 1) + lineStr;
+    return this.intro + lineStr;
+  }
+  slice(start = 0, end = this.original.length) {
+    while (start < 0)
+      start += this.original.length;
+    while (end < 0)
+      end += this.original.length;
+    let result = "";
+    let chunk = this.firstChunk;
+    while (chunk && (chunk.start > start || chunk.end <= start)) {
+      if (chunk.start < end && chunk.end >= end) {
+        return result;
+      }
+      chunk = chunk.next;
+    }
+    if (chunk && chunk.edited && chunk.start !== start)
+      throw new Error(`Cannot use replaced character ${start} as slice start anchor.`);
+    const startChunk = chunk;
+    while (chunk) {
+      if (chunk.intro && (startChunk !== chunk || chunk.start === start)) {
+        result += chunk.intro;
+      }
+      const containsEnd = chunk.start < end && chunk.end >= end;
+      if (containsEnd && chunk.edited && chunk.end !== end)
+        throw new Error(`Cannot use replaced character ${end} as slice end anchor.`);
+      const sliceStart = startChunk === chunk ? start - chunk.start : 0;
+      const sliceEnd = containsEnd ? chunk.content.length + end - chunk.end : chunk.content.length;
+      result += chunk.content.slice(sliceStart, sliceEnd);
+      if (chunk.outro && (!containsEnd || chunk.end === end)) {
+        result += chunk.outro;
+      }
+      if (containsEnd) {
+        break;
+      }
+      chunk = chunk.next;
+    }
+    return result;
+  }
+  snip(start, end) {
+    const clone = this.clone();
+    clone.remove(0, start);
+    clone.remove(end, clone.original.length);
+    return clone;
+  }
+  _split(index) {
+    if (this.byStart[index] || this.byEnd[index])
+      return;
+    let chunk = this.lastSearchedChunk;
+    const searchForward = index > chunk.end;
+    while (chunk) {
+      if (chunk.contains(index))
+        return this._splitChunk(chunk, index);
+      chunk = searchForward ? this.byStart[chunk.end] : this.byEnd[chunk.start];
+    }
+  }
+  _splitChunk(chunk, index) {
+    if (chunk.edited && chunk.content.length) {
+      const loc = getLocator(this.original)(index);
+      throw new Error(
+        `Cannot split a chunk that has already been edited (${loc.line}:${loc.column} \u2013 "${chunk.original}")`
+      );
+    }
+    const newChunk = chunk.split(index);
+    this.byEnd[index] = chunk;
+    this.byStart[index] = newChunk;
+    this.byEnd[newChunk.end] = newChunk;
+    if (chunk === this.lastChunk)
+      this.lastChunk = newChunk;
+    this.lastSearchedChunk = chunk;
+    return true;
+  }
+  toString() {
+    let str = this.intro;
+    let chunk = this.firstChunk;
+    while (chunk) {
+      str += chunk.toString();
+      chunk = chunk.next;
+    }
+    return str + this.outro;
+  }
+  isEmpty() {
+    let chunk = this.firstChunk;
+    do {
+      if (chunk.intro.length && chunk.intro.trim() || chunk.content.length && chunk.content.trim() || chunk.outro.length && chunk.outro.trim())
+        return false;
+    } while (chunk = chunk.next);
+    return true;
+  }
+  length() {
+    let chunk = this.firstChunk;
+    let length = 0;
+    do {
+      length += chunk.intro.length + chunk.content.length + chunk.outro.length;
+    } while (chunk = chunk.next);
+    return length;
+  }
+  trimLines() {
+    return this.trim("[\\r\\n]");
+  }
+  trim(charType) {
+    return this.trimStart(charType).trimEnd(charType);
+  }
+  trimEndAborted(charType) {
+    const rx = new RegExp((charType || "\\s") + "+$");
+    this.outro = this.outro.replace(rx, "");
+    if (this.outro.length)
+      return true;
+    let chunk = this.lastChunk;
+    do {
+      const end = chunk.end;
+      const aborted = chunk.trimEnd(rx);
+      if (chunk.end !== end) {
+        if (this.lastChunk === chunk) {
+          this.lastChunk = chunk.next;
+        }
+        this.byEnd[chunk.end] = chunk;
+        this.byStart[chunk.next.start] = chunk.next;
+        this.byEnd[chunk.next.end] = chunk.next;
+      }
+      if (aborted)
+        return true;
+      chunk = chunk.previous;
+    } while (chunk);
+    return false;
+  }
+  trimEnd(charType) {
+    this.trimEndAborted(charType);
+    return this;
+  }
+  trimStartAborted(charType) {
+    const rx = new RegExp("^" + (charType || "\\s") + "+");
+    this.intro = this.intro.replace(rx, "");
+    if (this.intro.length)
+      return true;
+    let chunk = this.firstChunk;
+    do {
+      const end = chunk.end;
+      const aborted = chunk.trimStart(rx);
+      if (chunk.end !== end) {
+        if (chunk === this.lastChunk)
+          this.lastChunk = chunk.next;
+        this.byEnd[chunk.end] = chunk;
+        this.byStart[chunk.next.start] = chunk.next;
+        this.byEnd[chunk.next.end] = chunk.next;
+      }
+      if (aborted)
+        return true;
+      chunk = chunk.next;
+    } while (chunk);
+    return false;
+  }
+  trimStart(charType) {
+    this.trimStartAborted(charType);
+    return this;
+  }
+  hasChanged() {
+    return this.original !== this.toString();
+  }
+  _replaceRegexp(searchValue, replacement) {
+    function getReplacement(match, str) {
+      if (typeof replacement === "string") {
+        return replacement.replace(/\$(\$|&|\d+)/g, (_, i) => {
+          if (i === "$")
+            return "$";
+          if (i === "&")
+            return match[0];
+          const num = +i;
+          if (num < match.length)
+            return match[+i];
+          return `$${i}`;
+        });
+      } else {
+        return replacement(...match, match.index, str, match.groups);
+      }
+    }
+    function matchAll(re, str) {
+      let match;
+      const matches = [];
+      while (match = re.exec(str)) {
+        matches.push(match);
+      }
+      return matches;
+    }
+    if (searchValue.global) {
+      const matches = matchAll(searchValue, this.original);
+      matches.forEach((match) => {
+        if (match.index != null) {
+          const replacement2 = getReplacement(match, this.original);
+          if (replacement2 !== match[0]) {
+            this.overwrite(
+              match.index,
+              match.index + match[0].length,
+              replacement2
+            );
+          }
+        }
+      });
+    } else {
+      const match = this.original.match(searchValue);
+      if (match && match.index != null) {
+        const replacement2 = getReplacement(match, this.original);
+        if (replacement2 !== match[0]) {
+          this.overwrite(
+            match.index,
+            match.index + match[0].length,
+            replacement2
+          );
+        }
+      }
+    }
+    return this;
+  }
+  _replaceString(string, replacement) {
+    const { original } = this;
+    const index = original.indexOf(string);
+    if (index !== -1) {
+      this.overwrite(index, index + string.length, replacement);
+    }
+    return this;
+  }
+  replace(searchValue, replacement) {
+    if (typeof searchValue === "string") {
+      return this._replaceString(searchValue, replacement);
+    }
+    return this._replaceRegexp(searchValue, replacement);
+  }
+  _replaceAllString(string, replacement) {
+    const { original } = this;
+    const stringLength = string.length;
+    for (let index = original.indexOf(string); index !== -1; index = original.indexOf(string, index + stringLength)) {
+      const previous = original.slice(index, index + stringLength);
+      if (previous !== replacement)
+        this.overwrite(index, index + stringLength, replacement);
+    }
+    return this;
+  }
+  replaceAll(searchValue, replacement) {
+    if (typeof searchValue === "string") {
+      return this._replaceAllString(searchValue, replacement);
+    }
+    if (!searchValue.global) {
+      throw new TypeError(
+        "MagicString.prototype.replaceAll called with a non-global RegExp argument"
+      );
+    }
+    return this._replaceRegexp(searchValue, replacement);
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/context.mjs
+import ts43 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/dom.mjs
+import { DomElementSchemaRegistry } from "@angular/compiler";
+import ts31 from "typescript";
+var REGISTRY = new DomElementSchemaRegistry();
+var REMOVE_XHTML_REGEX = /^:xhtml:/;
+var RegistryDomSchemaChecker = class {
+  get diagnostics() {
+    return this._diagnostics;
+  }
+  constructor(resolver) {
+    this.resolver = resolver;
+    this._diagnostics = [];
+  }
+  checkElement(id, element, schemas, hostIsStandalone) {
+    const name = element.name.replace(REMOVE_XHTML_REGEX, "");
+    if (!REGISTRY.hasElement(name, schemas)) {
+      const mapping = this.resolver.getSourceMapping(id);
+      const schemas2 = `'${hostIsStandalone ? "@Component" : "@NgModule"}.schemas'`;
+      let errorMsg = `'${name}' is not a known element:
+`;
+      errorMsg += `1. If '${name}' is an Angular component, then verify that it is ${hostIsStandalone ? "included in the '@Component.imports' of this component" : "part of this module"}.
+`;
+      if (name.indexOf("-") > -1) {
+        errorMsg += `2. If '${name}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.`;
+      } else {
+        errorMsg += `2. To allow any element add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
+      }
+      const diag = makeTemplateDiagnostic(id, mapping, element.startSourceSpan, ts31.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ELEMENT), errorMsg);
+      this._diagnostics.push(diag);
+    }
+  }
+  checkProperty(id, element, name, span, schemas, hostIsStandalone) {
+    if (!REGISTRY.hasProperty(element.name, name, schemas)) {
+      const mapping = this.resolver.getSourceMapping(id);
+      const decorator = hostIsStandalone ? "@Component" : "@NgModule";
+      const schemas2 = `'${decorator}.schemas'`;
+      let errorMsg = `Can't bind to '${name}' since it isn't a known property of '${element.name}'.`;
+      if (element.name.startsWith("ng-")) {
+        errorMsg += `
+1. If '${name}' is an Angular directive, then add 'CommonModule' to the '${decorator}.imports' of this component.
+2. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
+      } else if (element.name.indexOf("-") > -1) {
+        errorMsg += `
+1. If '${element.name}' is an Angular component and it has '${name}' input, then verify that it is ${hostIsStandalone ? "included in the '@Component.imports' of this component" : "part of this module"}.
+2. If '${element.name}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
+      }
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts31.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
+      this._diagnostics.push(diag);
+    }
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/environment.mjs
+import ts36 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/reference_emit_environment.mjs
+import { ExpressionType, ExternalExpr as ExternalExpr6, TypeModifier } from "@angular/compiler";
+var ReferenceEmitEnvironment = class {
+  constructor(importManager, refEmitter, reflector, contextFile) {
+    this.importManager = importManager;
+    this.refEmitter = refEmitter;
+    this.reflector = reflector;
+    this.contextFile = contextFile;
+  }
+  canReferenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
+    const result = this.refEmitter.emit(ref, this.contextFile, flags);
+    return result.kind === 0;
+  }
+  referenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
+    const ngExpr = this.refEmitter.emit(ref, this.contextFile, flags);
+    assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "symbol");
+    return translateType(new ExpressionType(ngExpr.expression), this.contextFile, this.reflector, this.refEmitter, this.importManager);
+  }
+  referenceExternalSymbol(moduleName, name) {
+    const external = new ExternalExpr6({ moduleName, name });
+    return translateExpression(this.contextFile, external, this.importManager);
+  }
+  referenceExternalType(moduleName, name, typeParams) {
+    const external = new ExternalExpr6({ moduleName, name });
+    return translateType(new ExpressionType(external, TypeModifier.None, typeParams), this.contextFile, this.reflector, this.refEmitter, this.importManager);
+  }
+  referenceTransplantedType(type) {
+    return translateType(type, this.contextFile, this.reflector, this.refEmitter, this.importManager);
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.mjs
+import ts32 from "typescript";
+var SAFE_TO_CAST_WITHOUT_PARENS = /* @__PURE__ */ new Set([
+  ts32.SyntaxKind.ParenthesizedExpression,
+  ts32.SyntaxKind.Identifier,
+  ts32.SyntaxKind.CallExpression,
+  ts32.SyntaxKind.NonNullExpression,
+  ts32.SyntaxKind.ElementAccessExpression,
+  ts32.SyntaxKind.PropertyAccessExpression,
+  ts32.SyntaxKind.ArrayLiteralExpression,
+  ts32.SyntaxKind.ObjectLiteralExpression,
+  ts32.SyntaxKind.StringLiteral,
+  ts32.SyntaxKind.NumericLiteral,
+  ts32.SyntaxKind.TrueKeyword,
+  ts32.SyntaxKind.FalseKeyword,
+  ts32.SyntaxKind.NullKeyword,
+  ts32.SyntaxKind.UndefinedKeyword
+]);
+function tsCastToAny(expr) {
+  if (!SAFE_TO_CAST_WITHOUT_PARENS.has(expr.kind)) {
+    expr = ts32.factory.createParenthesizedExpression(expr);
+  }
+  return ts32.factory.createParenthesizedExpression(ts32.factory.createAsExpression(expr, ts32.factory.createKeywordTypeNode(ts32.SyntaxKind.AnyKeyword)));
+}
+function tsCreateElement(tagName) {
+  const createElement = ts32.factory.createPropertyAccessExpression(
+    ts32.factory.createIdentifier("document"),
+    "createElement"
+  );
+  return ts32.factory.createCallExpression(
+    createElement,
+    void 0,
+    [ts32.factory.createStringLiteral(tagName)]
+  );
+}
+function tsDeclareVariable(id, type) {
+  addExpressionIdentifier(type, ExpressionIdentifier.VARIABLE_AS_EXPRESSION);
+  const initializer = ts32.factory.createAsExpression(ts32.factory.createNonNullExpression(ts32.factory.createNull()), type);
+  const decl = ts32.factory.createVariableDeclaration(
+    id,
+    void 0,
+    void 0,
+    initializer
+  );
+  return ts32.factory.createVariableStatement(
+    void 0,
+    [decl]
+  );
+}
+function tsCreateTypeQueryForCoercedInput(typeName, coercedInputName) {
+  return ts32.factory.createTypeQueryNode(ts32.factory.createQualifiedName(typeName, `ngAcceptInputType_${coercedInputName}`));
+}
+function tsCreateVariable(id, initializer, flags = null) {
+  const decl = ts32.factory.createVariableDeclaration(
+    id,
+    void 0,
+    void 0,
+    initializer
+  );
+  return ts32.factory.createVariableStatement(
+    void 0,
+    flags === null ? [decl] : ts32.factory.createVariableDeclarationList([decl], flags)
+  );
+}
+function tsCallMethod(receiver, methodName, args = []) {
+  const methodAccess = ts32.factory.createPropertyAccessExpression(receiver, methodName);
+  return ts32.factory.createCallExpression(
+    methodAccess,
+    void 0,
+    args
+  );
+}
+function isAccessExpression(node) {
+  return ts32.isPropertyAccessExpression(node) || ts32.isElementAccessExpression(node);
+}
+function tsNumericExpression(value) {
+  if (value < 0) {
+    const operand = ts32.factory.createNumericLiteral(Math.abs(value));
+    return ts32.factory.createPrefixUnaryExpression(ts32.SyntaxKind.MinusToken, operand);
+  }
+  return ts32.factory.createNumericLiteral(value);
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.mjs
+import { ExpressionType as ExpressionType2, R3Identifiers as R3Identifiers3, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
+import ts35 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.mjs
+import { R3Identifiers as R3Identifiers2 } from "@angular/compiler";
+import ts34 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_parameter_emitter.mjs
+import ts33 from "typescript";
+var TypeParameterEmitter = class {
+  constructor(typeParameters, reflector) {
+    this.typeParameters = typeParameters;
+    this.reflector = reflector;
+  }
+  canEmit(canEmitReference) {
+    if (this.typeParameters === void 0) {
+      return true;
+    }
+    return this.typeParameters.every((typeParam) => {
+      return this.canEmitType(typeParam.constraint, canEmitReference) && this.canEmitType(typeParam.default, canEmitReference);
+    });
+  }
+  canEmitType(type, canEmitReference) {
+    if (type === void 0) {
+      return true;
+    }
+    return canEmitType(type, (typeReference) => {
+      const reference = this.resolveTypeReference(typeReference);
+      if (reference === null) {
+        return false;
+      }
+      if (reference instanceof Reference) {
+        return canEmitReference(reference);
+      }
+      return true;
+    });
+  }
+  emit(emitReference) {
+    if (this.typeParameters === void 0) {
+      return void 0;
+    }
+    const emitter = new TypeEmitter((type) => this.translateTypeReference(type, emitReference));
+    return this.typeParameters.map((typeParam) => {
+      const constraint = typeParam.constraint !== void 0 ? emitter.emitType(typeParam.constraint) : void 0;
+      const defaultType = typeParam.default !== void 0 ? emitter.emitType(typeParam.default) : void 0;
+      return ts33.factory.updateTypeParameterDeclaration(typeParam, typeParam.modifiers, typeParam.name, constraint, defaultType);
+    });
+  }
+  resolveTypeReference(type) {
+    const target = ts33.isIdentifier(type.typeName) ? type.typeName : type.typeName.right;
+    const declaration = this.reflector.getDeclarationOfIdentifier(target);
+    if (declaration === null || declaration.node === null) {
+      return null;
+    }
+    if (this.isLocalTypeParameter(declaration.node)) {
+      return type;
+    }
+    let owningModule2 = null;
+    if (typeof declaration.viaModule === "string") {
+      owningModule2 = {
+        specifier: declaration.viaModule,
+        resolutionContext: type.getSourceFile().fileName
+      };
+    }
+    return new Reference(declaration.node, declaration.viaModule === AmbientImport ? AmbientImport : owningModule2);
+  }
+  translateTypeReference(type, emitReference) {
+    const reference = this.resolveTypeReference(type);
+    if (!(reference instanceof Reference)) {
+      return reference;
+    }
+    const typeNode = emitReference(reference);
+    if (typeNode === null) {
+      return null;
+    }
+    if (!ts33.isTypeReferenceNode(typeNode)) {
+      throw new Error(`Expected TypeReferenceNode for emitted reference, got ${ts33.SyntaxKind[typeNode.kind]}.`);
+    }
+    return typeNode;
+  }
+  isLocalTypeParameter(decl) {
+    return this.typeParameters.some((param) => param === decl);
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.mjs
+var TCB_FILE_IMPORT_GRAPH_PREPARE_IDENTIFIERS = [
+  R3Identifiers2.InputSignalBrandWriteType
+];
+var TcbInliningRequirement;
+(function(TcbInliningRequirement2) {
+  TcbInliningRequirement2[TcbInliningRequirement2["MustInline"] = 0] = "MustInline";
+  TcbInliningRequirement2[TcbInliningRequirement2["ShouldInlineForGenericBounds"] = 1] = "ShouldInlineForGenericBounds";
+  TcbInliningRequirement2[TcbInliningRequirement2["None"] = 2] = "None";
+})(TcbInliningRequirement || (TcbInliningRequirement = {}));
+function requiresInlineTypeCheckBlock(ref, env, usedPipes, reflector) {
+  if (!env.canReferenceType(ref)) {
+    return TcbInliningRequirement.MustInline;
+  } else if (!checkIfGenericTypeBoundsCanBeEmitted(ref.node, reflector, env)) {
+    return TcbInliningRequirement.ShouldInlineForGenericBounds;
+  } else if (usedPipes.some((pipeRef) => !env.canReferenceType(pipeRef))) {
+    return TcbInliningRequirement.MustInline;
+  } else {
+    return TcbInliningRequirement.None;
+  }
+}
+function getTemplateMapping(shimSf, position, resolver, isDiagnosticRequest) {
+  const node = getTokenAtPosition(shimSf, position);
+  const sourceLocation = findSourceLocation(node, shimSf, isDiagnosticRequest);
+  if (sourceLocation === null) {
+    return null;
+  }
+  const mapping = resolver.getSourceMapping(sourceLocation.id);
+  const span = resolver.toParseSourceSpan(sourceLocation.id, sourceLocation.span);
+  if (span === null) {
+    return null;
+  }
+  return { sourceLocation, templateSourceMapping: mapping, span };
+}
+function findTypeCheckBlock(file, id, isDiagnosticRequest) {
+  for (const stmt of file.statements) {
+    if (ts34.isFunctionDeclaration(stmt) && getTemplateId2(stmt, file, isDiagnosticRequest) === id) {
+      return stmt;
+    }
+  }
+  return null;
+}
+function findSourceLocation(node, sourceFile, isDiagnosticsRequest) {
+  while (node !== void 0 && !ts34.isFunctionDeclaration(node)) {
+    if (hasIgnoreForDiagnosticsMarker(node, sourceFile) && isDiagnosticsRequest) {
+      return null;
+    }
+    const span = readSpanComment(node, sourceFile);
+    if (span !== null) {
+      const id = getTemplateId2(node, sourceFile, isDiagnosticsRequest);
+      if (id === null) {
+        return null;
+      }
+      return { id, span };
+    }
+    node = node.parent;
+  }
+  return null;
+}
+function getTemplateId2(node, sourceFile, isDiagnosticRequest) {
+  while (!ts34.isFunctionDeclaration(node)) {
+    if (hasIgnoreForDiagnosticsMarker(node, sourceFile) && isDiagnosticRequest) {
+      return null;
+    }
+    node = node.parent;
+    if (node === void 0) {
+      return null;
+    }
+  }
+  const start = node.getFullStart();
+  return ts34.forEachLeadingCommentRange(sourceFile.text, start, (pos, end, kind) => {
+    if (kind !== ts34.SyntaxKind.MultiLineCommentTrivia) {
+      return null;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    return commentText;
+  }) || null;
+}
+function ensureTypeCheckFilePreparationImports(env) {
+  for (const identifier of TCB_FILE_IMPORT_GRAPH_PREPARE_IDENTIFIERS) {
+    env.importManager.addImport({
+      exportModuleSpecifier: identifier.moduleName,
+      exportSymbolName: identifier.name,
+      requestedFile: env.contextFile
+    });
+  }
+}
+function checkIfGenericTypeBoundsCanBeEmitted(node, reflector, env) {
+  const emitter = new TypeParameterEmitter(node.typeParameters, reflector);
+  return emitter.canEmit((ref) => env.canReferenceType(ref));
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.mjs
+function generateTypeCtorDeclarationFn(env, meta, nodeTypeRef, typeParams) {
+  const rawTypeArgs = typeParams !== void 0 ? generateGenericArgs(typeParams) : void 0;
+  const rawType = ts35.factory.createTypeReferenceNode(nodeTypeRef, rawTypeArgs);
+  const initParam = constructTypeCtorParameter(env, meta, rawType);
+  const typeParameters = typeParametersWithDefaultTypes(typeParams);
+  if (meta.body) {
+    const fnType = ts35.factory.createFunctionTypeNode(
+      typeParameters,
+      [initParam],
+      rawType
+    );
+    const decl = ts35.factory.createVariableDeclaration(
+      meta.fnName,
+      void 0,
+      fnType,
+      ts35.factory.createNonNullExpression(ts35.factory.createNull())
+    );
+    const declList = ts35.factory.createVariableDeclarationList([decl], ts35.NodeFlags.Const);
+    return ts35.factory.createVariableStatement(
+      void 0,
+      declList
+    );
+  } else {
+    return ts35.factory.createFunctionDeclaration(
+      [ts35.factory.createModifier(ts35.SyntaxKind.DeclareKeyword)],
+      void 0,
+      meta.fnName,
+      typeParameters,
+      [initParam],
+      rawType,
+      void 0
+    );
+  }
+}
+function generateInlineTypeCtor(env, node, meta) {
+  const rawTypeArgs = node.typeParameters !== void 0 ? generateGenericArgs(node.typeParameters) : void 0;
+  const rawType = ts35.factory.createTypeReferenceNode(node.name, rawTypeArgs);
+  const initParam = constructTypeCtorParameter(env, meta, rawType);
+  let body = void 0;
+  if (meta.body) {
+    body = ts35.factory.createBlock([
+      ts35.factory.createReturnStatement(ts35.factory.createNonNullExpression(ts35.factory.createNull()))
+    ]);
+  }
+  return ts35.factory.createMethodDeclaration(
+    [ts35.factory.createModifier(ts35.SyntaxKind.StaticKeyword)],
+    void 0,
+    meta.fnName,
+    void 0,
+    typeParametersWithDefaultTypes(node.typeParameters),
+    [initParam],
+    rawType,
+    body
+  );
+}
+function constructTypeCtorParameter(env, meta, rawType) {
+  let initType = null;
+  const plainKeys = [];
+  const coercedKeys = [];
+  const signalInputKeys = [];
+  for (const { classPropertyName, transform, isSignal } of meta.fields.inputs) {
+    if (isSignal) {
+      signalInputKeys.push(ts35.factory.createLiteralTypeNode(ts35.factory.createStringLiteral(classPropertyName)));
+    } else if (!meta.coercedInputFields.has(classPropertyName)) {
+      plainKeys.push(ts35.factory.createLiteralTypeNode(ts35.factory.createStringLiteral(classPropertyName)));
+    } else {
+      const coercionType = transform != null ? transform.type.node : tsCreateTypeQueryForCoercedInput(rawType.typeName, classPropertyName);
+      coercedKeys.push(ts35.factory.createPropertySignature(
+        void 0,
+        classPropertyName,
+        void 0,
+        coercionType
+      ));
+    }
+  }
+  if (plainKeys.length > 0) {
+    const keyTypeUnion = ts35.factory.createUnionTypeNode(plainKeys);
+    initType = ts35.factory.createTypeReferenceNode("Pick", [rawType, keyTypeUnion]);
+  }
+  if (coercedKeys.length > 0) {
+    const coercedLiteral = ts35.factory.createTypeLiteralNode(coercedKeys);
+    initType = initType !== null ? ts35.factory.createIntersectionTypeNode([initType, coercedLiteral]) : coercedLiteral;
+  }
+  if (signalInputKeys.length > 0) {
+    const keyTypeUnion = ts35.factory.createUnionTypeNode(signalInputKeys);
+    const unwrapDirectiveSignalInputsExpr = env.referenceExternalType(R3Identifiers3.UnwrapDirectiveSignalInputs.moduleName, R3Identifiers3.UnwrapDirectiveSignalInputs.name, [
+      new ExpressionType2(new WrappedNodeExpr8(rawType)),
+      new ExpressionType2(new WrappedNodeExpr8(keyTypeUnion))
+    ]);
+    initType = initType !== null ? ts35.factory.createIntersectionTypeNode([initType, unwrapDirectiveSignalInputsExpr]) : unwrapDirectiveSignalInputsExpr;
+  }
+  if (initType === null) {
+    initType = ts35.factory.createTypeLiteralNode([]);
+  }
+  return ts35.factory.createParameterDeclaration(
+    void 0,
+    void 0,
+    "init",
+    void 0,
+    initType,
+    void 0
+  );
+}
+function generateGenericArgs(params) {
+  return params.map((param) => ts35.factory.createTypeReferenceNode(param.name, void 0));
+}
+function requiresInlineTypeCtor(node, host, env) {
+  return !checkIfGenericTypeBoundsCanBeEmitted(node, host, env);
+}
+function typeParametersWithDefaultTypes(params) {
+  if (params === void 0) {
+    return void 0;
+  }
+  return params.map((param) => {
+    if (param.default === void 0) {
+      return ts35.factory.updateTypeParameterDeclaration(param, param.modifiers, param.name, param.constraint, ts35.factory.createKeywordTypeNode(ts35.SyntaxKind.AnyKeyword));
+    } else {
+      return param;
+    }
+  });
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/environment.mjs
+var Environment = class extends ReferenceEmitEnvironment {
+  constructor(config, importManager, refEmitter, reflector, contextFile) {
+    super(importManager, refEmitter, reflector, contextFile);
+    this.config = config;
+    this.nextIds = {
+      pipeInst: 1,
+      typeCtor: 1
+    };
+    this.typeCtors = /* @__PURE__ */ new Map();
+    this.typeCtorStatements = [];
+    this.pipeInsts = /* @__PURE__ */ new Map();
+    this.pipeInstStatements = [];
+  }
+  typeCtorFor(dir) {
+    const dirRef = dir.ref;
+    const node = dirRef.node;
+    if (this.typeCtors.has(node)) {
+      return this.typeCtors.get(node);
+    }
+    if (requiresInlineTypeCtor(node, this.reflector, this)) {
+      const ref = this.reference(dirRef);
+      const typeCtorExpr = ts36.factory.createPropertyAccessExpression(ref, "ngTypeCtor");
+      this.typeCtors.set(node, typeCtorExpr);
+      return typeCtorExpr;
+    } else {
+      const fnName = `_ctor${this.nextIds.typeCtor++}`;
+      const nodeTypeRef = this.referenceType(dirRef);
+      if (!ts36.isTypeReferenceNode(nodeTypeRef)) {
+        throw new Error(`Expected TypeReferenceNode from reference to ${dirRef.debugName}`);
+      }
+      const meta = {
+        fnName,
+        body: true,
+        fields: {
+          inputs: dir.inputs,
+          queries: dir.queries
+        },
+        coercedInputFields: dir.coercedInputFields
+      };
+      const typeParams = this.emitTypeParameters(node);
+      const typeCtor = generateTypeCtorDeclarationFn(this, meta, nodeTypeRef.typeName, typeParams);
+      this.typeCtorStatements.push(typeCtor);
+      const fnId = ts36.factory.createIdentifier(fnName);
+      this.typeCtors.set(node, fnId);
+      return fnId;
+    }
+  }
+  pipeInst(ref) {
+    if (this.pipeInsts.has(ref.node)) {
+      return this.pipeInsts.get(ref.node);
+    }
+    const pipeType = this.referenceType(ref);
+    const pipeInstId = ts36.factory.createIdentifier(`_pipe${this.nextIds.pipeInst++}`);
+    this.pipeInstStatements.push(tsDeclareVariable(pipeInstId, pipeType));
+    this.pipeInsts.set(ref.node, pipeInstId);
+    return pipeInstId;
+  }
+  reference(ref) {
+    const ngExpr = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing);
+    assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "class");
+    return translateExpression(this.contextFile, ngExpr.expression, this.importManager);
+  }
+  emitTypeParameters(declaration) {
+    const emitter = new TypeParameterEmitter(declaration.typeParameters, this.reflector);
+    return emitter.emit((ref) => this.referenceType(ref));
+  }
+  getPreludeStatements() {
+    return [...this.pipeInstStatements, ...this.typeCtorStatements];
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/oob.mjs
+import { AbsoluteSourceSpan as AbsoluteSourceSpan2, TmplAstElement } from "@angular/compiler";
+import ts37 from "typescript";
+var OutOfBandDiagnosticRecorderImpl = class {
+  constructor(resolver) {
+    this.resolver = resolver;
+    this._diagnostics = [];
+    this.recordedPipes = /* @__PURE__ */ new Set();
+  }
+  get diagnostics() {
+    return this._diagnostics;
+  }
+  missingReferenceTarget(templateId, ref) {
+    const mapping = this.resolver.getSourceMapping(templateId);
+    const value = ref.value.trim();
+    const errorMsg = `No directive found with exportAs '${value}'.`;
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, ref.valueSpan || ref.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REFERENCE_TARGET), errorMsg));
+  }
+  missingPipe(templateId, ast) {
+    if (this.recordedPipes.has(ast)) {
+      return;
+    }
+    const mapping = this.resolver.getSourceMapping(templateId);
+    const errorMsg = `No pipe found with name '${ast.name}'.`;
+    const sourceSpan = this.resolver.toParseSourceSpan(templateId, ast.nameSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
+    this.recordedPipes.add(ast);
+  }
+  deferredPipeUsedEagerly(templateId, ast) {
+    if (this.recordedPipes.has(ast)) {
+      return;
+    }
+    const mapping = this.resolver.getSourceMapping(templateId);
+    const errorMsg = `Pipe '${ast.name}' was imported  via \`@Component.deferredImports\`, but was used outside of a \`@defer\` block in a template. To fix this, either use the '${ast.name}' pipe inside of a \`@defer\` block or import this dependency using the \`@Component.imports\` field.`;
+    const sourceSpan = this.resolver.toParseSourceSpan(templateId, ast.nameSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
+    this.recordedPipes.add(ast);
+  }
+  deferredComponentUsedEagerly(templateId, element) {
+    const mapping = this.resolver.getSourceMapping(templateId);
+    const errorMsg = `Element '${element.name}' contains a component or a directive that was imported  via \`@Component.deferredImports\`, but the element itself is located outside of a \`@defer\` block in a template. To fix this, either use the '${element.name}' element inside of a \`@defer\` block or import referenced component/directive dependency using the \`@Component.imports\` field.`;
+    const { start, end } = element.startSourceSpan;
+    const absoluteSourceSpan = new AbsoluteSourceSpan2(start.offset, end.offset);
+    const sourceSpan = this.resolver.toParseSourceSpan(templateId, absoluteSourceSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${element.name}'.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
+  }
+  duplicateTemplateVar(templateId, variable, firstDecl) {
+    const mapping = this.resolver.getSourceMapping(templateId);
+    const errorMsg = `Cannot redeclare variable '${variable.name}' as it was previously declared elsewhere for the same template.`;
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, variable.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [
+      {
+        text: `The variable '${firstDecl.name}' was first declared here.`,
+        start: firstDecl.sourceSpan.start.offset,
+        end: firstDecl.sourceSpan.end.offset,
+        sourceFile: mapping.node.getSourceFile()
+      }
+    ]));
+  }
+  requiresInlineTcb(templateId, node) {
+    this._diagnostics.push(makeInlineDiagnostic(templateId, ErrorCode.INLINE_TCB_REQUIRED, node.name, `This component requires inline template type-checking, which is not supported by the current environment.`));
+  }
+  requiresInlineTypeConstructors(templateId, node, directives) {
+    let message;
+    if (directives.length > 1) {
+      message = `This component uses directives which require inline type constructors, which are not supported by the current environment.`;
+    } else {
+      message = `This component uses a directive which requires an inline type constructor, which is not supported by the current environment.`;
+    }
+    this._diagnostics.push(makeInlineDiagnostic(templateId, ErrorCode.INLINE_TYPE_CTOR_REQUIRED, node.name, message, directives.map((dir) => makeRelatedInformation(dir.name, `Requires an inline type constructor.`))));
+  }
+  suboptimalTypeInference(templateId, variables) {
+    const mapping = this.resolver.getSourceMapping(templateId);
+    let diagnosticVar = null;
+    for (const variable of variables) {
+      if (diagnosticVar === null || variable.value === "" || variable.value === "$implicit") {
+        diagnosticVar = variable;
+      }
+    }
+    if (diagnosticVar === null) {
+      return;
+    }
+    let varIdentification = `'${diagnosticVar.name}'`;
+    if (variables.length === 2) {
+      varIdentification += ` (and 1 other)`;
+    } else if (variables.length > 2) {
+      varIdentification += ` (and ${variables.length - 1} others)`;
+    }
+    const message = `This structural directive supports advanced type inference, but the current compiler configuration prevents its usage. The variable ${varIdentification} will have type 'any' as a result.
+
+Consider enabling the 'strictTemplates' option in your tsconfig.json for better type inference within this template.`;
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, diagnosticVar.keySpan, ts37.DiagnosticCategory.Suggestion, ngErrorCode(ErrorCode.SUGGEST_SUBOPTIMAL_TYPE_INFERENCE), message));
+  }
+  splitTwoWayBinding(templateId, input, output, inputConsumer, outputConsumer) {
+    const mapping = this.resolver.getSourceMapping(templateId);
+    const errorMsg = `The property and event halves of the two-way binding '${input.name}' are not bound to the same target.
+            Find more at https://angular.dev/guide/templates/two-way-binding#how-two-way-binding-works`;
+    const relatedMessages = [];
+    relatedMessages.push({
+      text: `The property half of the binding is to the '${inputConsumer.name.text}' component.`,
+      start: inputConsumer.name.getStart(),
+      end: inputConsumer.name.getEnd(),
+      sourceFile: inputConsumer.name.getSourceFile()
+    });
+    if (outputConsumer instanceof TmplAstElement) {
+      let message = `The event half of the binding is to a native event called '${input.name}' on the <${outputConsumer.name}> DOM element.`;
+      if (!mapping.node.getSourceFile().isDeclarationFile) {
+        message += `
+ 
+ Are you missing an output declaration called '${output.name}'?`;
+      }
+      relatedMessages.push({
+        text: message,
+        start: outputConsumer.sourceSpan.start.offset + 1,
+        end: outputConsumer.sourceSpan.start.offset + outputConsumer.name.length + 1,
+        sourceFile: mapping.node.getSourceFile()
+      });
+    } else {
+      relatedMessages.push({
+        text: `The event half of the binding is to the '${outputConsumer.name.text}' component.`,
+        start: outputConsumer.name.getStart(),
+        end: outputConsumer.name.getEnd(),
+        sourceFile: outputConsumer.name.getSourceFile()
+      });
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, input.keySpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SPLIT_TWO_WAY_BINDING), errorMsg, relatedMessages));
+  }
+  missingRequiredInputs(templateId, element, directiveName, isComponent, inputAliases) {
+    const message = `Required input${inputAliases.length === 1 ? "" : "s"} ${inputAliases.map((n2) => `'${n2}'`).join(", ")} from ${isComponent ? "component" : "directive"} ${directiveName} must be specified.`;
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), element.startSourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
+  }
+  illegalForLoopTrackAccess(templateId, block, access) {
+    const sourceSpan = this.resolver.toParseSourceSpan(templateId, access.sourceSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for property read.`);
+    }
+    const messageVars = [block.item, ...block.contextVariables.filter((v) => v.value === "$index")].map((v) => `'${v.name}'`).join(", ");
+    const message = `Cannot access '${access.name}' inside of a track expression. Only ${messageVars} and properties on the containing component are available to this expression.`;
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
+  }
+  inaccessibleDeferredTriggerElement(templateId, trigger) {
+    let message;
+    if (trigger.reference === null) {
+      message = `Trigger cannot find reference. Make sure that the @defer block has a @placeholder with at least one root element node.`;
+    } else {
+      message = `Trigger cannot find reference "${trigger.reference}".
+Check that an element with #${trigger.reference} exists in the same template and it's accessible from the @defer block.
+Deferred blocks can only access triggers in same view, a parent embedded view or the root view of the @placeholder block.`;
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), trigger.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
+  }
+  controlFlowPreventingContentProjection(templateId, category, projectionNode, componentName, slotSelector, controlFlowNode, preservesWhitespaces) {
+    const blockName = controlFlowNode.nameSpan.toString().trim();
+    const lines = [
+      `Node matches the "${slotSelector}" slot of the "${componentName}" component, but will not be projected into the specific slot because the surrounding ${blockName} has more than one node at its root. To project the node in the right slot, you can:
+`,
+      `1. Wrap the content of the ${blockName} block in an <ng-container/> that matches the "${slotSelector}" selector.`,
+      `2. Split the content of the ${blockName} block across multiple ${blockName} blocks such that each one only has a single projectable node at its root.`,
+      `3. Remove all content from the ${blockName} block, except for the node being projected.`
+    ];
+    if (preservesWhitespaces) {
+      lines.push("Note: the host component has `preserveWhitespaces: true` which may cause whitespace to affect content projection.");
+    }
+    lines.push("", 'This check can be disabled using the `extendedDiagnostics.checks.controlFlowPreventingContentProjection = "suppress" compiler option.`');
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), projectionNode.startSourceSpan, category, ngErrorCode(ErrorCode.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION), lines.join("\n")));
+  }
+  illegalWriteToLetDeclaration(templateId, node, target) {
+    const sourceSpan = this.resolver.toParseSourceSpan(templateId, node.sourceSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for property write.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_LET_WRITE), `Cannot assign to @let declaration '${target.name}'.`));
+  }
+  letUsedBeforeDefinition(templateId, node, target) {
+    const sourceSpan = this.resolver.toParseSourceSpan(templateId, node.sourceSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for property read.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.LET_USED_BEFORE_DEFINITION), `Cannot read @let declaration '${target.name}' before it has been defined.`));
+  }
+  duplicateLetDeclaration(templateId, current) {
+    const mapping = this.resolver.getSourceMapping(templateId);
+    const errorMsg = `Cannot declare @let called '${current.name}' as there is another @let declaration with the same name.`;
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, current.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_LET_DECLARATION), errorMsg));
+  }
+};
+function makeInlineDiagnostic(templateId, code, node, messageText, relatedInformation) {
+  return {
+    ...makeDiagnostic(code, node, messageText, relatedInformation),
+    componentFile: node.getSourceFile(),
+    templateId
+  };
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/shim.mjs
+import ts38 from "typescript";
+var TypeCheckShimGenerator = class {
+  constructor() {
+    this.extensionPrefix = "ngtypecheck";
+    this.shouldEmit = false;
+  }
+  generateShimForFile(sf, genFilePath, priorShimSf) {
+    if (priorShimSf !== null) {
+      return priorShimSf;
+    }
+    return ts38.createSourceFile(genFilePath, "export const USED_FOR_NG_TYPE_CHECKING = true;", ts38.ScriptTarget.Latest, true, ts38.ScriptKind.TS);
+  }
+  static shimFor(fileName) {
+    return absoluteFrom(fileName.replace(/\.tsx?$/, ".ngtypecheck.ts"));
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
+import { BindingPipe, BindingType, Call as Call2, createCssSelectorFromNode, CssSelector as CssSelector2, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver2, ParsedEventType, PropertyRead as PropertyRead3, PropertyWrite as PropertyWrite2, R3Identifiers as R3Identifiers4, SafeCall, SafePropertyRead as SafePropertyRead3, SelectorMatcher as SelectorMatcher2, ThisReceiver, TmplAstBoundAttribute, TmplAstBoundText, TmplAstContent, TmplAstDeferredBlock, TmplAstElement as TmplAstElement2, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference as TmplAstReference2, TmplAstSwitchBlock, TmplAstTemplate, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable, TransplantedType } from "@angular/compiler";
+import ts41 from "typescript";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.mjs
+import { AbsoluteSourceSpan as AbsoluteSourceSpan3 } from "@angular/compiler";
+import ts39 from "typescript";
+function wrapForDiagnostics(expr) {
+  return ts39.factory.createParenthesizedExpression(expr);
+}
+function wrapForTypeChecker(expr) {
+  return ts39.factory.createParenthesizedExpression(expr);
+}
+function addParseSpanInfo(node, span) {
+  let commentText;
+  if (span instanceof AbsoluteSourceSpan3) {
+    commentText = `${span.start},${span.end}`;
+  } else {
+    commentText = `${span.start.offset},${span.end.offset}`;
+  }
+  ts39.addSyntheticTrailingComment(
+    node,
+    ts39.SyntaxKind.MultiLineCommentTrivia,
+    commentText,
+    false
+  );
+}
+function addTemplateId(tcb, id) {
+  ts39.addSyntheticLeadingComment(tcb, ts39.SyntaxKind.MultiLineCommentTrivia, id, true);
+}
+function shouldReportDiagnostic(diagnostic) {
+  const { code } = diagnostic;
+  if (code === 6133) {
+    return false;
+  } else if (code === 6199) {
+    return false;
+  } else if (code === 2695) {
+    return false;
+  } else if (code === 7006) {
+    return false;
+  }
+  return true;
+}
+function translateDiagnostic(diagnostic, resolver) {
+  if (diagnostic.file === void 0 || diagnostic.start === void 0) {
+    return null;
+  }
+  const fullMapping = getTemplateMapping(
+    diagnostic.file,
+    diagnostic.start,
+    resolver,
+    true
+  );
+  if (fullMapping === null) {
+    return null;
+  }
+  const { sourceLocation, templateSourceMapping, span } = fullMapping;
+  return makeTemplateDiagnostic(sourceLocation.id, templateSourceMapping, span, diagnostic.category, diagnostic.code, diagnostic.messageText);
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/expression.mjs
+import { ASTWithSource, Call, EmptyExpr as EmptyExpr2, PropertyRead as PropertyRead2, SafeKeyedRead, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
+import ts40 from "typescript";
+var NULL_AS_ANY = ts40.factory.createAsExpression(ts40.factory.createNull(), ts40.factory.createKeywordTypeNode(ts40.SyntaxKind.AnyKeyword));
+var UNDEFINED = ts40.factory.createIdentifier("undefined");
+var UNARY_OPS = /* @__PURE__ */ new Map([
+  ["+", ts40.SyntaxKind.PlusToken],
+  ["-", ts40.SyntaxKind.MinusToken]
+]);
+var BINARY_OPS = /* @__PURE__ */ new Map([
+  ["+", ts40.SyntaxKind.PlusToken],
+  ["-", ts40.SyntaxKind.MinusToken],
+  ["<", ts40.SyntaxKind.LessThanToken],
+  [">", ts40.SyntaxKind.GreaterThanToken],
+  ["<=", ts40.SyntaxKind.LessThanEqualsToken],
+  [">=", ts40.SyntaxKind.GreaterThanEqualsToken],
+  ["==", ts40.SyntaxKind.EqualsEqualsToken],
+  ["===", ts40.SyntaxKind.EqualsEqualsEqualsToken],
+  ["*", ts40.SyntaxKind.AsteriskToken],
+  ["/", ts40.SyntaxKind.SlashToken],
+  ["%", ts40.SyntaxKind.PercentToken],
+  ["!=", ts40.SyntaxKind.ExclamationEqualsToken],
+  ["!==", ts40.SyntaxKind.ExclamationEqualsEqualsToken],
+  ["||", ts40.SyntaxKind.BarBarToken],
+  ["&&", ts40.SyntaxKind.AmpersandAmpersandToken],
+  ["&", ts40.SyntaxKind.AmpersandToken],
+  ["|", ts40.SyntaxKind.BarToken],
+  ["??", ts40.SyntaxKind.QuestionQuestionToken]
+]);
+function astToTypescript(ast, maybeResolve, config) {
+  const translator = new AstTranslator(maybeResolve, config);
+  return translator.translate(ast);
+}
+var AstTranslator = class {
+  constructor(maybeResolve, config) {
+    this.maybeResolve = maybeResolve;
+    this.config = config;
+  }
+  translate(ast) {
+    if (ast instanceof ASTWithSource) {
+      ast = ast.ast;
+    }
+    if (ast instanceof EmptyExpr2) {
+      const res = ts40.factory.createIdentifier("undefined");
+      addParseSpanInfo(res, ast.sourceSpan);
+      return res;
+    }
+    const resolved = this.maybeResolve(ast);
+    if (resolved !== null) {
+      return resolved;
+    }
+    return ast.visit(this);
+  }
+  visitUnary(ast) {
+    const expr = this.translate(ast.expr);
+    const op = UNARY_OPS.get(ast.operator);
+    if (op === void 0) {
+      throw new Error(`Unsupported Unary.operator: ${ast.operator}`);
+    }
+    const node = wrapForDiagnostics(ts40.factory.createPrefixUnaryExpression(op, expr));
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitBinary(ast) {
+    const lhs = wrapForDiagnostics(this.translate(ast.left));
+    const rhs = wrapForDiagnostics(this.translate(ast.right));
+    const op = BINARY_OPS.get(ast.operation);
+    if (op === void 0) {
+      throw new Error(`Unsupported Binary.operation: ${ast.operation}`);
+    }
+    const node = ts40.factory.createBinaryExpression(lhs, op, rhs);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitChain(ast) {
+    const elements = ast.expressions.map((expr) => this.translate(expr));
+    const node = wrapForDiagnostics(ts40.factory.createCommaListExpression(elements));
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitConditional(ast) {
+    const condExpr = this.translate(ast.condition);
+    const trueExpr = this.translate(ast.trueExp);
+    const falseExpr = wrapForTypeChecker(this.translate(ast.falseExp));
+    const node = ts40.factory.createParenthesizedExpression(ts40.factory.createConditionalExpression(condExpr, void 0, trueExpr, void 0, falseExpr));
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitImplicitReceiver(ast) {
+    throw new Error("Method not implemented.");
+  }
+  visitThisReceiver(ast) {
+    throw new Error("Method not implemented.");
+  }
+  visitInterpolation(ast) {
+    return ast.expressions.reduce((lhs, ast2) => ts40.factory.createBinaryExpression(lhs, ts40.SyntaxKind.PlusToken, wrapForTypeChecker(this.translate(ast2))), ts40.factory.createStringLiteral(""));
+  }
+  visitKeyedRead(ast) {
+    const receiver = wrapForDiagnostics(this.translate(ast.receiver));
+    const key = this.translate(ast.key);
+    const node = ts40.factory.createElementAccessExpression(receiver, key);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitKeyedWrite(ast) {
+    const receiver = wrapForDiagnostics(this.translate(ast.receiver));
+    const left = ts40.factory.createElementAccessExpression(receiver, this.translate(ast.key));
+    const right = wrapForTypeChecker(this.translate(ast.value));
+    const node = wrapForDiagnostics(ts40.factory.createBinaryExpression(left, ts40.SyntaxKind.EqualsToken, right));
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitLiteralArray(ast) {
+    const elements = ast.expressions.map((expr) => this.translate(expr));
+    const literal3 = ts40.factory.createArrayLiteralExpression(elements);
+    const node = this.config.strictLiteralTypes ? literal3 : tsCastToAny(literal3);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitLiteralMap(ast) {
+    const properties = ast.keys.map(({ key }, idx) => {
+      const value = this.translate(ast.values[idx]);
+      return ts40.factory.createPropertyAssignment(ts40.factory.createStringLiteral(key), value);
+    });
+    const literal3 = ts40.factory.createObjectLiteralExpression(properties, true);
+    const node = this.config.strictLiteralTypes ? literal3 : tsCastToAny(literal3);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitLiteralPrimitive(ast) {
+    let node;
+    if (ast.value === void 0) {
+      node = ts40.factory.createIdentifier("undefined");
+    } else if (ast.value === null) {
+      node = ts40.factory.createNull();
+    } else if (typeof ast.value === "string") {
+      node = ts40.factory.createStringLiteral(ast.value);
+    } else if (typeof ast.value === "number") {
+      node = tsNumericExpression(ast.value);
+    } else if (typeof ast.value === "boolean") {
+      node = ast.value ? ts40.factory.createTrue() : ts40.factory.createFalse();
+    } else {
+      throw Error(`Unsupported AST value of type ${typeof ast.value}`);
+    }
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitNonNullAssert(ast) {
+    const expr = wrapForDiagnostics(this.translate(ast.expression));
+    const node = ts40.factory.createNonNullExpression(expr);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitPipe(ast) {
+    throw new Error("Method not implemented.");
+  }
+  visitPrefixNot(ast) {
+    const expression = wrapForDiagnostics(this.translate(ast.expression));
+    const node = ts40.factory.createLogicalNot(expression);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitPropertyRead(ast) {
+    const receiver = wrapForDiagnostics(this.translate(ast.receiver));
+    const name = ts40.factory.createPropertyAccessExpression(receiver, ast.name);
+    addParseSpanInfo(name, ast.nameSpan);
+    const node = wrapForDiagnostics(name);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitPropertyWrite(ast) {
+    const receiver = wrapForDiagnostics(this.translate(ast.receiver));
+    const left = ts40.factory.createPropertyAccessExpression(receiver, ast.name);
+    addParseSpanInfo(left, ast.nameSpan);
+    const leftWithPath = wrapForDiagnostics(left);
+    addParseSpanInfo(leftWithPath, ast.sourceSpan);
+    const right = wrapForTypeChecker(this.translate(ast.value));
+    const node = wrapForDiagnostics(ts40.factory.createBinaryExpression(leftWithPath, ts40.SyntaxKind.EqualsToken, right));
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitSafePropertyRead(ast) {
+    let node;
+    const receiver = wrapForDiagnostics(this.translate(ast.receiver));
+    if (this.config.strictSafeNavigationTypes) {
+      const expr = ts40.factory.createPropertyAccessExpression(ts40.factory.createNonNullExpression(receiver), ast.name);
+      addParseSpanInfo(expr, ast.nameSpan);
+      node = ts40.factory.createParenthesizedExpression(ts40.factory.createConditionalExpression(NULL_AS_ANY, void 0, expr, void 0, UNDEFINED));
+    } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
+      node = ts40.factory.createPropertyAccessExpression(tsCastToAny(receiver), ast.name);
+    } else {
+      const expr = ts40.factory.createPropertyAccessExpression(ts40.factory.createNonNullExpression(receiver), ast.name);
+      addParseSpanInfo(expr, ast.nameSpan);
+      node = tsCastToAny(expr);
+    }
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitSafeKeyedRead(ast) {
+    const receiver = wrapForDiagnostics(this.translate(ast.receiver));
+    const key = this.translate(ast.key);
+    let node;
+    if (this.config.strictSafeNavigationTypes) {
+      const expr = ts40.factory.createElementAccessExpression(ts40.factory.createNonNullExpression(receiver), key);
+      addParseSpanInfo(expr, ast.sourceSpan);
+      node = ts40.factory.createParenthesizedExpression(ts40.factory.createConditionalExpression(NULL_AS_ANY, void 0, expr, void 0, UNDEFINED));
+    } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
+      node = ts40.factory.createElementAccessExpression(tsCastToAny(receiver), key);
+    } else {
+      const expr = ts40.factory.createElementAccessExpression(ts40.factory.createNonNullExpression(receiver), key);
+      addParseSpanInfo(expr, ast.sourceSpan);
+      node = tsCastToAny(expr);
+    }
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitCall(ast) {
+    const args = ast.args.map((expr2) => this.translate(expr2));
+    let expr;
+    const receiver = ast.receiver;
+    if (receiver instanceof PropertyRead2) {
+      const resolved = this.maybeResolve(receiver);
+      if (resolved !== null) {
+        expr = resolved;
+      } else {
+        const propertyReceiver = wrapForDiagnostics(this.translate(receiver.receiver));
+        expr = ts40.factory.createPropertyAccessExpression(propertyReceiver, receiver.name);
+        addParseSpanInfo(expr, receiver.nameSpan);
+      }
+    } else {
+      expr = this.translate(receiver);
+    }
+    let node;
+    if (ast.receiver instanceof SafePropertyRead2 || ast.receiver instanceof SafeKeyedRead) {
+      node = this.convertToSafeCall(ast, expr, args);
+    } else {
+      node = ts40.factory.createCallExpression(expr, void 0, args);
+    }
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitSafeCall(ast) {
+    const args = ast.args.map((expr2) => this.translate(expr2));
+    const expr = wrapForDiagnostics(this.translate(ast.receiver));
+    const node = this.convertToSafeCall(ast, expr, args);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  convertToSafeCall(ast, expr, args) {
+    if (this.config.strictSafeNavigationTypes) {
+      const call = ts40.factory.createCallExpression(ts40.factory.createNonNullExpression(expr), void 0, args);
+      return ts40.factory.createParenthesizedExpression(ts40.factory.createConditionalExpression(NULL_AS_ANY, void 0, call, void 0, UNDEFINED));
+    }
+    if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
+      return ts40.factory.createCallExpression(tsCastToAny(expr), void 0, args);
+    }
+    return tsCastToAny(ts40.factory.createCallExpression(ts40.factory.createNonNullExpression(expr), void 0, args));
+  }
+};
+var _VeSafeLhsInferenceBugDetector = class {
+  static veWillInferAnyFor(ast) {
+    const visitor = _VeSafeLhsInferenceBugDetector.SINGLETON;
+    return ast instanceof Call ? ast.visit(visitor) : ast.receiver.visit(visitor);
+  }
+  visitUnary(ast) {
+    return ast.expr.visit(this);
+  }
+  visitBinary(ast) {
+    return ast.left.visit(this) || ast.right.visit(this);
+  }
+  visitChain(ast) {
+    return false;
+  }
+  visitConditional(ast) {
+    return ast.condition.visit(this) || ast.trueExp.visit(this) || ast.falseExp.visit(this);
+  }
+  visitCall(ast) {
+    return true;
+  }
+  visitSafeCall(ast) {
+    return false;
+  }
+  visitImplicitReceiver(ast) {
+    return false;
+  }
+  visitThisReceiver(ast) {
+    return false;
+  }
+  visitInterpolation(ast) {
+    return ast.expressions.some((exp) => exp.visit(this));
+  }
+  visitKeyedRead(ast) {
+    return false;
+  }
+  visitKeyedWrite(ast) {
+    return false;
+  }
+  visitLiteralArray(ast) {
+    return true;
+  }
+  visitLiteralMap(ast) {
+    return true;
+  }
+  visitLiteralPrimitive(ast) {
+    return false;
+  }
+  visitPipe(ast) {
+    return true;
+  }
+  visitPrefixNot(ast) {
+    return ast.expression.visit(this);
+  }
+  visitNonNullAssert(ast) {
+    return ast.expression.visit(this);
+  }
+  visitPropertyRead(ast) {
+    return false;
+  }
+  visitPropertyWrite(ast) {
+    return false;
+  }
+  visitSafePropertyRead(ast) {
+    return false;
+  }
+  visitSafeKeyedRead(ast) {
+    return false;
+  }
+};
+var VeSafeLhsInferenceBugDetector = _VeSafeLhsInferenceBugDetector;
+(() => {
+  _VeSafeLhsInferenceBugDetector.SINGLETON = new _VeSafeLhsInferenceBugDetector();
+})();
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
+var TcbGenericContextBehavior;
+(function(TcbGenericContextBehavior2) {
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["UseEmitter"] = 0] = "UseEmitter";
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["CopyClassNodes"] = 1] = "CopyClassNodes";
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["FallbackToAny"] = 2] = "FallbackToAny";
+})(TcbGenericContextBehavior || (TcbGenericContextBehavior = {}));
+function generateTypeCheckBlock(env, ref, name, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
+  const tcb = new Context(env, domSchemaChecker, oobRecorder, meta.id, meta.boundTarget, meta.pipes, meta.schemas, meta.isStandalone, meta.preserveWhitespaces);
+  const scope = Scope.forNodes(tcb, null, null, tcb.boundTarget.target.template, null);
+  const ctxRawType = env.referenceType(ref);
+  if (!ts41.isTypeReferenceNode(ctxRawType)) {
+    throw new Error(`Expected TypeReferenceNode when referencing the ctx param for ${ref.debugName}`);
+  }
+  let typeParameters = void 0;
+  let typeArguments = void 0;
+  if (ref.node.typeParameters !== void 0) {
+    if (!env.config.useContextGenericType) {
+      genericContextBehavior = TcbGenericContextBehavior.FallbackToAny;
+    }
+    switch (genericContextBehavior) {
+      case TcbGenericContextBehavior.UseEmitter:
+        typeParameters = new TypeParameterEmitter(ref.node.typeParameters, env.reflector).emit((typeRef) => env.referenceType(typeRef));
+        typeArguments = typeParameters.map((param) => ts41.factory.createTypeReferenceNode(param.name));
+        break;
+      case TcbGenericContextBehavior.CopyClassNodes:
+        typeParameters = [...ref.node.typeParameters];
+        typeArguments = typeParameters.map((param) => ts41.factory.createTypeReferenceNode(param.name));
+        break;
+      case TcbGenericContextBehavior.FallbackToAny:
+        typeArguments = ref.node.typeParameters.map(() => ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword));
+        break;
+    }
+  }
+  const paramList = [tcbThisParam(ctxRawType.typeName, typeArguments)];
+  const scopeStatements = scope.render();
+  const innerBody = ts41.factory.createBlock([...env.getPreludeStatements(), ...scopeStatements]);
+  const body = ts41.factory.createBlock([
+    ts41.factory.createIfStatement(ts41.factory.createTrue(), innerBody, void 0)
+  ]);
+  const fnDecl = ts41.factory.createFunctionDeclaration(
+    void 0,
+    void 0,
+    name,
+    env.config.useContextGenericType ? typeParameters : void 0,
+    paramList,
+    void 0,
+    body
+  );
+  addTemplateId(fnDecl, meta.id);
+  return fnDecl;
+}
+var TcbOp = class {
+  circularFallback() {
+    return INFER_TYPE_FOR_CIRCULAR_OP_EXPR;
+  }
+};
+var TcbElementOp = class extends TcbOp {
+  constructor(tcb, scope, element) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.element = element;
+  }
+  get optional() {
+    return true;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    const initializer = tsCreateElement(this.element.name);
+    addParseSpanInfo(initializer, this.element.startSourceSpan || this.element.sourceSpan);
+    this.scope.addStatement(tsCreateVariable(id, initializer));
+    return id;
+  }
+};
+var TcbTemplateVariableOp = class extends TcbOp {
+  constructor(tcb, scope, template, variable) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.template = template;
+    this.variable = variable;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const ctx = this.scope.resolve(this.template);
+    const id = this.tcb.allocateId();
+    const initializer = ts41.factory.createPropertyAccessExpression(
+      ctx,
+      this.variable.value || "$implicit"
+    );
+    addParseSpanInfo(id, this.variable.keySpan);
+    let variable;
+    if (this.variable.valueSpan !== void 0) {
+      addParseSpanInfo(initializer, this.variable.valueSpan);
+      variable = tsCreateVariable(id, wrapForTypeChecker(initializer));
+    } else {
+      variable = tsCreateVariable(id, initializer);
+    }
+    addParseSpanInfo(variable.declarationList.declarations[0], this.variable.sourceSpan);
+    this.scope.addStatement(variable);
+    return id;
+  }
+};
+var TcbTemplateContextOp = class extends TcbOp {
+  constructor(tcb, scope) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.optional = true;
+  }
+  execute() {
+    const ctx = this.tcb.allocateId();
+    const type = ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword);
+    this.scope.addStatement(tsDeclareVariable(ctx, type));
+    return ctx;
+  }
+};
+var TcbLetDeclarationOp = class extends TcbOp {
+  constructor(tcb, scope, node) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.optional = false;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    addParseSpanInfo(id, this.node.nameSpan);
+    const value = tcbExpression(this.node.value, this.tcb, this.scope);
+    const varStatement = tsCreateVariable(id, wrapForTypeChecker(value), ts41.NodeFlags.Const);
+    addParseSpanInfo(varStatement.declarationList.declarations[0], this.node.sourceSpan);
+    this.scope.addStatement(varStatement);
+    return id;
+  }
+};
+var TcbTemplateBodyOp = class extends TcbOp {
+  constructor(tcb, scope, template) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.template = template;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const directiveGuards = [];
+    const directives = this.tcb.boundTarget.getDirectivesOfNode(this.template);
+    if (directives !== null) {
+      for (const dir of directives) {
+        const dirInstId = this.scope.resolve(this.template, dir);
+        const dirId = this.tcb.env.reference(dir.ref);
+        dir.ngTemplateGuards.forEach((guard2) => {
+          const boundInput = this.template.inputs.find((i) => i.name === guard2.inputName) || this.template.templateAttrs.find((i) => i instanceof TmplAstBoundAttribute && i.name === guard2.inputName);
+          if (boundInput !== void 0) {
+            const expr = tcbExpression(boundInput.value, this.tcb, this.scope);
+            markIgnoreDiagnostics(expr);
+            if (guard2.type === "binding") {
+              directiveGuards.push(expr);
+            } else {
+              const guardInvoke = tsCallMethod(dirId, `ngTemplateGuard_${guard2.inputName}`, [
+                dirInstId,
+                expr
+              ]);
+              addParseSpanInfo(guardInvoke, boundInput.value.sourceSpan);
+              directiveGuards.push(guardInvoke);
+            }
+          }
+        });
+        if (dir.hasNgTemplateContextGuard) {
+          if (this.tcb.env.config.applyTemplateContextGuards) {
+            const ctx = this.scope.resolve(this.template);
+            const guardInvoke = tsCallMethod(dirId, "ngTemplateContextGuard", [dirInstId, ctx]);
+            addParseSpanInfo(guardInvoke, this.template.sourceSpan);
+            directiveGuards.push(guardInvoke);
+          } else if (this.template.variables.length > 0 && this.tcb.env.config.suggestionsForSuboptimalTypeInference) {
+            this.tcb.oobRecorder.suboptimalTypeInference(this.tcb.id, this.template.variables);
+          }
+        }
+      }
+    }
+    let guard = null;
+    if (directiveGuards.length > 0) {
+      guard = directiveGuards.reduce((expr, dirGuard) => ts41.factory.createBinaryExpression(expr, ts41.SyntaxKind.AmpersandAmpersandToken, dirGuard), directiveGuards.pop());
+    }
+    const tmplScope = Scope.forNodes(this.tcb, this.scope, this.template, this.template.children, guard);
+    const statements = tmplScope.render();
+    if (statements.length === 0) {
+      return null;
+    }
+    let tmplBlock = ts41.factory.createBlock(statements);
+    if (guard !== null) {
+      tmplBlock = ts41.factory.createIfStatement(
+        guard,
+        tmplBlock
+      );
+    }
+    this.scope.addStatement(tmplBlock);
+    return null;
+  }
+};
+var TcbExpressionOp = class extends TcbOp {
+  constructor(tcb, scope, expression) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.expression = expression;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const expr = tcbExpression(this.expression, this.tcb, this.scope);
+    this.scope.addStatement(ts41.factory.createExpressionStatement(expr));
+    return null;
+  }
+};
+var TcbDirectiveTypeOpBase = class extends TcbOp {
+  constructor(tcb, scope, node, dir) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.dir = dir;
+  }
+  get optional() {
+    return true;
+  }
+  execute() {
+    const dirRef = this.dir.ref;
+    const rawType = this.tcb.env.referenceType(this.dir.ref);
+    let type;
+    if (this.dir.isGeneric === false || dirRef.node.typeParameters === void 0) {
+      type = rawType;
+    } else {
+      if (!ts41.isTypeReferenceNode(rawType)) {
+        throw new Error(`Expected TypeReferenceNode when referencing the type for ${this.dir.ref.debugName}`);
+      }
+      const typeArguments = dirRef.node.typeParameters.map(() => ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword));
+      type = ts41.factory.createTypeReferenceNode(rawType.typeName, typeArguments);
+    }
+    const id = this.tcb.allocateId();
+    addExpressionIdentifier(id, ExpressionIdentifier.DIRECTIVE);
+    addParseSpanInfo(id, this.node.startSourceSpan || this.node.sourceSpan);
+    this.scope.addStatement(tsDeclareVariable(id, type));
+    return id;
+  }
+};
+var TcbNonGenericDirectiveTypeOp = class extends TcbDirectiveTypeOpBase {
+  execute() {
+    const dirRef = this.dir.ref;
+    if (this.dir.isGeneric) {
+      throw new Error(`Assertion Error: expected ${dirRef.debugName} not to be generic.`);
+    }
+    return super.execute();
+  }
+};
+var TcbGenericDirectiveTypeWithAnyParamsOp = class extends TcbDirectiveTypeOpBase {
+  execute() {
+    const dirRef = this.dir.ref;
+    if (dirRef.node.typeParameters === void 0) {
+      throw new Error(`Assertion Error: expected typeParameters when creating a declaration for ${dirRef.debugName}`);
+    }
+    return super.execute();
+  }
+};
+var TcbReferenceOp = class extends TcbOp {
+  constructor(tcb, scope, node, host, target) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.host = host;
+    this.target = target;
+    this.optional = true;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    let initializer = this.target instanceof TmplAstTemplate || this.target instanceof TmplAstElement2 ? this.scope.resolve(this.target) : this.scope.resolve(this.host, this.target);
+    if (this.target instanceof TmplAstElement2 && !this.tcb.env.config.checkTypeOfDomReferences || !this.tcb.env.config.checkTypeOfNonDomReferences) {
+      initializer = ts41.factory.createAsExpression(initializer, ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword));
+    } else if (this.target instanceof TmplAstTemplate) {
+      initializer = ts41.factory.createAsExpression(initializer, ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword));
+      initializer = ts41.factory.createAsExpression(initializer, this.tcb.env.referenceExternalType("@angular/core", "TemplateRef", [DYNAMIC_TYPE]));
+      initializer = ts41.factory.createParenthesizedExpression(initializer);
+    }
+    addParseSpanInfo(initializer, this.node.sourceSpan);
+    addParseSpanInfo(id, this.node.keySpan);
+    this.scope.addStatement(tsCreateVariable(id, initializer));
+    return id;
+  }
+};
+var TcbInvalidReferenceOp = class extends TcbOp {
+  constructor(tcb, scope) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.optional = true;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    this.scope.addStatement(tsCreateVariable(id, NULL_AS_ANY));
+    return id;
+  }
+};
+var TcbDirectiveCtorOp = class extends TcbOp {
+  constructor(tcb, scope, node, dir) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.dir = dir;
+  }
+  get optional() {
+    return true;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    addExpressionIdentifier(id, ExpressionIdentifier.DIRECTIVE);
+    addParseSpanInfo(id, this.node.startSourceSpan || this.node.sourceSpan);
+    const genericInputs = /* @__PURE__ */ new Map();
+    const boundAttrs = getBoundAttributes(this.dir, this.node);
+    for (const attr of boundAttrs) {
+      if (!this.tcb.env.config.checkTypeOfAttributes && attr.attribute instanceof TmplAstTextAttribute2) {
+        continue;
+      }
+      for (const { fieldName, isTwoWayBinding } of attr.inputs) {
+        if (genericInputs.has(fieldName)) {
+          continue;
+        }
+        const expression = translateInput(attr.attribute, this.tcb, this.scope);
+        genericInputs.set(fieldName, {
+          type: "binding",
+          field: fieldName,
+          expression,
+          sourceSpan: attr.attribute.sourceSpan,
+          isTwoWayBinding
+        });
+      }
+    }
+    for (const { classPropertyName } of this.dir.inputs) {
+      if (!genericInputs.has(classPropertyName)) {
+        genericInputs.set(classPropertyName, { type: "unset", field: classPropertyName });
+      }
+    }
+    const typeCtor = tcbCallTypeCtor(this.dir, this.tcb, Array.from(genericInputs.values()));
+    markIgnoreDiagnostics(typeCtor);
+    this.scope.addStatement(tsCreateVariable(id, typeCtor));
+    return id;
+  }
+  circularFallback() {
+    return new TcbDirectiveCtorCircularFallbackOp(this.tcb, this.scope, this.node, this.dir);
+  }
+};
+var TcbDirectiveInputsOp = class extends TcbOp {
+  constructor(tcb, scope, node, dir) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.dir = dir;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    let dirId = null;
+    const boundAttrs = getBoundAttributes(this.dir, this.node);
+    const seenRequiredInputs = /* @__PURE__ */ new Set();
+    for (const attr of boundAttrs) {
+      const expr = widenBinding(translateInput(attr.attribute, this.tcb, this.scope), this.tcb);
+      let assignment = wrapForDiagnostics(expr);
+      for (const { fieldName, required, transformType, isSignal, isTwoWayBinding } of attr.inputs) {
+        let target;
+        if (required) {
+          seenRequiredInputs.add(fieldName);
+        }
+        if (this.dir.coercedInputFields.has(fieldName)) {
+          let type;
+          if (transformType !== null) {
+            type = this.tcb.env.referenceTransplantedType(new TransplantedType(transformType));
+          } else {
+            const dirTypeRef = this.tcb.env.referenceType(this.dir.ref);
+            if (!ts41.isTypeReferenceNode(dirTypeRef)) {
+              throw new Error(`Expected TypeReferenceNode from reference to ${this.dir.ref.debugName}`);
+            }
+            type = tsCreateTypeQueryForCoercedInput(dirTypeRef.typeName, fieldName);
+          }
+          const id = this.tcb.allocateId();
+          this.scope.addStatement(tsDeclareVariable(id, type));
+          target = id;
+        } else if (this.dir.undeclaredInputFields.has(fieldName)) {
+          continue;
+        } else if (!this.tcb.env.config.honorAccessModifiersForInputBindings && this.dir.restrictedInputFields.has(fieldName)) {
+          if (dirId === null) {
+            dirId = this.scope.resolve(this.node, this.dir);
+          }
+          const id = this.tcb.allocateId();
+          const dirTypeRef = this.tcb.env.referenceType(this.dir.ref);
+          if (!ts41.isTypeReferenceNode(dirTypeRef)) {
+            throw new Error(`Expected TypeReferenceNode from reference to ${this.dir.ref.debugName}`);
+          }
+          const type = ts41.factory.createIndexedAccessTypeNode(ts41.factory.createTypeQueryNode(dirId), ts41.factory.createLiteralTypeNode(ts41.factory.createStringLiteral(fieldName)));
+          const temp = tsDeclareVariable(id, type);
+          this.scope.addStatement(temp);
+          target = id;
+        } else {
+          if (dirId === null) {
+            dirId = this.scope.resolve(this.node, this.dir);
+          }
+          target = this.dir.stringLiteralInputFields.has(fieldName) ? ts41.factory.createElementAccessExpression(dirId, ts41.factory.createStringLiteral(fieldName)) : ts41.factory.createPropertyAccessExpression(dirId, ts41.factory.createIdentifier(fieldName));
+        }
+        if (isSignal) {
+          const inputSignalBrandWriteSymbol = this.tcb.env.referenceExternalSymbol(R3Identifiers4.InputSignalBrandWriteType.moduleName, R3Identifiers4.InputSignalBrandWriteType.name);
+          if (!ts41.isIdentifier(inputSignalBrandWriteSymbol) && !ts41.isPropertyAccessExpression(inputSignalBrandWriteSymbol)) {
+            throw new Error(`Expected identifier or property access for reference to ${R3Identifiers4.InputSignalBrandWriteType.name}`);
+          }
+          target = ts41.factory.createElementAccessExpression(target, inputSignalBrandWriteSymbol);
+        }
+        if (attr.attribute.keySpan !== void 0) {
+          addParseSpanInfo(target, attr.attribute.keySpan);
+        }
+        if (isTwoWayBinding && this.tcb.env.config.allowSignalsInTwoWayBindings) {
+          assignment = unwrapWritableSignal(assignment, this.tcb);
+        }
+        assignment = ts41.factory.createBinaryExpression(target, ts41.SyntaxKind.EqualsToken, assignment);
+      }
+      addParseSpanInfo(assignment, attr.attribute.sourceSpan);
+      if (!this.tcb.env.config.checkTypeOfAttributes && attr.attribute instanceof TmplAstTextAttribute2) {
+        markIgnoreDiagnostics(assignment);
+      }
+      this.scope.addStatement(ts41.factory.createExpressionStatement(assignment));
+    }
+    this.checkRequiredInputs(seenRequiredInputs);
+    return null;
+  }
+  checkRequiredInputs(seenRequiredInputs) {
+    const missing = [];
+    for (const input of this.dir.inputs) {
+      if (input.required && !seenRequiredInputs.has(input.classPropertyName)) {
+        missing.push(input.bindingPropertyName);
+      }
+    }
+    if (missing.length > 0) {
+      this.tcb.oobRecorder.missingRequiredInputs(this.tcb.id, this.node, this.dir.name, this.dir.isComponent, missing);
+    }
+  }
+};
+var TcbDirectiveCtorCircularFallbackOp = class extends TcbOp {
+  constructor(tcb, scope, node, dir) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.dir = dir;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    const typeCtor = this.tcb.env.typeCtorFor(this.dir);
+    const circularPlaceholder = ts41.factory.createCallExpression(
+      typeCtor,
+      void 0,
+      [ts41.factory.createNonNullExpression(ts41.factory.createNull())]
+    );
+    this.scope.addStatement(tsCreateVariable(id, circularPlaceholder));
+    return id;
+  }
+};
+var TcbDomSchemaCheckerOp = class extends TcbOp {
+  constructor(tcb, element, checkElement, claimedInputs) {
+    super();
+    this.tcb = tcb;
+    this.element = element;
+    this.checkElement = checkElement;
+    this.claimedInputs = claimedInputs;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    var _a;
+    if (this.checkElement) {
+      this.tcb.domSchemaChecker.checkElement(this.tcb.id, this.element, this.tcb.schemas, this.tcb.hostIsStandalone);
+    }
+    for (const binding of this.element.inputs) {
+      const isPropertyBinding = binding.type === BindingType.Property || binding.type === BindingType.TwoWay;
+      if (isPropertyBinding && this.claimedInputs.has(binding.name)) {
+        continue;
+      }
+      if (isPropertyBinding && binding.name !== "style" && binding.name !== "class") {
+        const propertyName = (_a = ATTR_TO_PROP.get(binding.name)) != null ? _a : binding.name;
+        this.tcb.domSchemaChecker.checkProperty(this.tcb.id, this.element, propertyName, binding.sourceSpan, this.tcb.schemas, this.tcb.hostIsStandalone);
+      }
+    }
+    return null;
+  }
+};
+var TcbControlFlowContentProjectionOp = class extends TcbOp {
+  constructor(tcb, element, ngContentSelectors, componentName) {
+    super();
+    this.tcb = tcb;
+    this.element = element;
+    this.ngContentSelectors = ngContentSelectors;
+    this.componentName = componentName;
+    this.optional = false;
+    this.category = tcb.env.config.controlFlowPreventingContentProjection === "error" ? ts41.DiagnosticCategory.Error : ts41.DiagnosticCategory.Warning;
+  }
+  execute() {
+    const controlFlowToCheck = this.findPotentialControlFlowNodes();
+    if (controlFlowToCheck.length > 0) {
+      const matcher = new SelectorMatcher2();
+      for (const selector of this.ngContentSelectors) {
+        if (selector !== "*") {
+          matcher.addSelectables(CssSelector2.parse(selector), selector);
+        }
+      }
+      for (const root of controlFlowToCheck) {
+        for (const child of root.children) {
+          if (child instanceof TmplAstElement2 || child instanceof TmplAstTemplate) {
+            matcher.match(createCssSelectorFromNode(child), (_, originalSelector) => {
+              this.tcb.oobRecorder.controlFlowPreventingContentProjection(this.tcb.id, this.category, child, this.componentName, originalSelector, root, this.tcb.hostPreserveWhitespaces);
+            });
+          }
+        }
+      }
+    }
+    return null;
+  }
+  findPotentialControlFlowNodes() {
+    const result = [];
+    for (const child of this.element.children) {
+      if (child instanceof TmplAstForLoopBlock) {
+        if (this.shouldCheck(child)) {
+          result.push(child);
+        }
+        if (child.empty !== null && this.shouldCheck(child.empty)) {
+          result.push(child.empty);
+        }
+      } else if (child instanceof TmplAstIfBlock) {
+        for (const branch of child.branches) {
+          if (this.shouldCheck(branch)) {
+            result.push(branch);
+          }
+        }
+      } else if (child instanceof TmplAstSwitchBlock) {
+        for (const current of child.cases) {
+          if (this.shouldCheck(current)) {
+            result.push(current);
+          }
+        }
+      }
+    }
+    return result;
+  }
+  shouldCheck(node) {
+    if (node.children.length < 2) {
+      return false;
+    }
+    let hasSeenRootNode = false;
+    for (const child of node.children) {
+      if (!(child instanceof TmplAstText) || this.tcb.hostPreserveWhitespaces || child.value.trim().length > 0) {
+        if (hasSeenRootNode) {
+          return true;
+        }
+        hasSeenRootNode = true;
+      }
+    }
+    return false;
+  }
+};
+var ATTR_TO_PROP = new Map(Object.entries({
+  "class": "className",
+  "for": "htmlFor",
+  "formaction": "formAction",
+  "innerHtml": "innerHTML",
+  "readonly": "readOnly",
+  "tabindex": "tabIndex"
+}));
+var TcbUnclaimedInputsOp = class extends TcbOp {
+  constructor(tcb, scope, element, claimedInputs) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.element = element;
+    this.claimedInputs = claimedInputs;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    var _a;
+    let elId = null;
+    for (const binding of this.element.inputs) {
+      const isPropertyBinding = binding.type === BindingType.Property || binding.type === BindingType.TwoWay;
+      if (isPropertyBinding && this.claimedInputs.has(binding.name)) {
+        continue;
+      }
+      const expr = widenBinding(tcbExpression(binding.value, this.tcb, this.scope), this.tcb);
+      if (this.tcb.env.config.checkTypeOfDomBindings && isPropertyBinding) {
+        if (binding.name !== "style" && binding.name !== "class") {
+          if (elId === null) {
+            elId = this.scope.resolve(this.element);
+          }
+          const propertyName = (_a = ATTR_TO_PROP.get(binding.name)) != null ? _a : binding.name;
+          const prop = ts41.factory.createElementAccessExpression(elId, ts41.factory.createStringLiteral(propertyName));
+          const stmt = ts41.factory.createBinaryExpression(prop, ts41.SyntaxKind.EqualsToken, wrapForDiagnostics(expr));
+          addParseSpanInfo(stmt, binding.sourceSpan);
+          this.scope.addStatement(ts41.factory.createExpressionStatement(stmt));
+        } else {
+          this.scope.addStatement(ts41.factory.createExpressionStatement(expr));
+        }
+      } else {
+        this.scope.addStatement(ts41.factory.createExpressionStatement(expr));
+      }
+    }
+    return null;
+  }
+};
+var TcbDirectiveOutputsOp = class extends TcbOp {
+  constructor(tcb, scope, node, dir) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.dir = dir;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    let dirId = null;
+    const outputs = this.dir.outputs;
+    for (const output of this.node.outputs) {
+      if (output.type === ParsedEventType.Animation || !outputs.hasBindingPropertyName(output.name)) {
+        continue;
+      }
+      if (this.tcb.env.config.checkTypeOfOutputEvents && output.name.endsWith("Change")) {
+        const inputName = output.name.slice(0, -6);
+        isSplitTwoWayBinding(inputName, output, this.node.inputs, this.tcb);
+      }
+      const field = outputs.getByBindingPropertyName(output.name)[0].classPropertyName;
+      if (dirId === null) {
+        dirId = this.scope.resolve(this.node, this.dir);
+      }
+      const outputField = ts41.factory.createElementAccessExpression(dirId, ts41.factory.createStringLiteral(field));
+      addParseSpanInfo(outputField, output.keySpan);
+      if (this.tcb.env.config.checkTypeOfOutputEvents) {
+        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, 0);
+        const subscribeFn = ts41.factory.createPropertyAccessExpression(outputField, "subscribe");
+        const call = ts41.factory.createCallExpression(subscribeFn, void 0, [
+          handler
+        ]);
+        addParseSpanInfo(call, output.sourceSpan);
+        this.scope.addStatement(ts41.factory.createExpressionStatement(call));
+      } else {
+        this.scope.addStatement(ts41.factory.createExpressionStatement(outputField));
+        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, 1);
+        this.scope.addStatement(ts41.factory.createExpressionStatement(handler));
+      }
+    }
+    return null;
+  }
+};
+var TcbUnclaimedOutputsOp = class extends TcbOp {
+  constructor(tcb, scope, element, claimedOutputs) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.element = element;
+    this.claimedOutputs = claimedOutputs;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    let elId = null;
+    for (const output of this.element.outputs) {
+      if (this.claimedOutputs.has(output.name)) {
+        continue;
+      }
+      if (this.tcb.env.config.checkTypeOfOutputEvents && output.name.endsWith("Change")) {
+        const inputName = output.name.slice(0, -6);
+        if (isSplitTwoWayBinding(inputName, output, this.element.inputs, this.tcb)) {
+          continue;
+        }
+      }
+      if (output.type === ParsedEventType.Animation) {
+        const eventType = this.tcb.env.config.checkTypeOfAnimationEvents ? this.tcb.env.referenceExternalType("@angular/animations", "AnimationEvent") : 1;
+        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, eventType);
+        this.scope.addStatement(ts41.factory.createExpressionStatement(handler));
+      } else if (this.tcb.env.config.checkTypeOfDomEvents) {
+        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, 0);
+        if (elId === null) {
+          elId = this.scope.resolve(this.element);
+        }
+        const propertyAccess = ts41.factory.createPropertyAccessExpression(elId, "addEventListener");
+        addParseSpanInfo(propertyAccess, output.keySpan);
+        const call = ts41.factory.createCallExpression(
+          propertyAccess,
+          void 0,
+          [ts41.factory.createStringLiteral(output.name), handler]
+        );
+        addParseSpanInfo(call, output.sourceSpan);
+        this.scope.addStatement(ts41.factory.createExpressionStatement(call));
+      } else {
+        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, 1);
+        this.scope.addStatement(ts41.factory.createExpressionStatement(handler));
+      }
+    }
+    return null;
+  }
+};
+var TcbComponentContextCompletionOp = class extends TcbOp {
+  constructor(scope) {
+    super();
+    this.scope = scope;
+    this.optional = false;
+  }
+  execute() {
+    const ctx = ts41.factory.createThis();
+    const ctxDot = ts41.factory.createPropertyAccessExpression(ctx, "");
+    markIgnoreDiagnostics(ctxDot);
+    addExpressionIdentifier(ctxDot, ExpressionIdentifier.COMPONENT_COMPLETION);
+    this.scope.addStatement(ts41.factory.createExpressionStatement(ctxDot));
+    return null;
+  }
+};
+var TcbBlockVariableOp = class extends TcbOp {
+  constructor(tcb, scope, initializer, variable) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.initializer = initializer;
+    this.variable = variable;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    addParseSpanInfo(id, this.variable.keySpan);
+    const variable = tsCreateVariable(id, wrapForTypeChecker(this.initializer));
+    addParseSpanInfo(variable.declarationList.declarations[0], this.variable.sourceSpan);
+    this.scope.addStatement(variable);
+    return id;
+  }
+};
+var TcbBlockImplicitVariableOp = class extends TcbOp {
+  constructor(tcb, scope, type, variable) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.type = type;
+    this.variable = variable;
+    this.optional = true;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    addParseSpanInfo(id, this.variable.keySpan);
+    const variable = tsDeclareVariable(id, this.type);
+    addParseSpanInfo(variable.declarationList.declarations[0], this.variable.sourceSpan);
+    this.scope.addStatement(variable);
+    return id;
+  }
+};
+var TcbIfOp = class extends TcbOp {
+  constructor(tcb, scope, block) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.block = block;
+    this.expressionScopes = /* @__PURE__ */ new Map();
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const root = this.generateBranch(0);
+    root && this.scope.addStatement(root);
+    return null;
+  }
+  generateBranch(index) {
+    const branch = this.block.branches[index];
+    if (!branch) {
+      return void 0;
+    }
+    if (branch.expression === null) {
+      const branchScope = this.getBranchScope(this.scope, branch, index);
+      return ts41.factory.createBlock(branchScope.render());
+    }
+    const expressionScope = Scope.forNodes(this.tcb, this.scope, branch, [], null);
+    expressionScope.render().forEach((stmt) => this.scope.addStatement(stmt));
+    this.expressionScopes.set(branch, expressionScope);
+    let expression = tcbExpression(branch.expression, this.tcb, expressionScope);
+    if (branch.expressionAlias !== null) {
+      expression = ts41.factory.createBinaryExpression(ts41.factory.createParenthesizedExpression(expression), ts41.SyntaxKind.AmpersandAmpersandToken, expressionScope.resolve(branch.expressionAlias));
+    }
+    const bodyScope = this.getBranchScope(expressionScope, branch, index);
+    return ts41.factory.createIfStatement(expression, ts41.factory.createBlock(bodyScope.render()), this.generateBranch(index + 1));
+  }
+  getBranchScope(parentScope, branch, index) {
+    const checkBody = this.tcb.env.config.checkControlFlowBodies;
+    return Scope.forNodes(this.tcb, parentScope, null, checkBody ? branch.children : [], checkBody ? this.generateBranchGuard(index) : null);
+  }
+  generateBranchGuard(index) {
+    let guard = null;
+    for (let i = 0; i <= index; i++) {
+      const branch = this.block.branches[i];
+      if (branch.expression === null) {
+        continue;
+      }
+      if (!this.expressionScopes.has(branch)) {
+        throw new Error(`Could not determine expression scope of branch at index ${i}`);
+      }
+      const expressionScope = this.expressionScopes.get(branch);
+      let expression;
+      expression = tcbExpression(branch.expression, this.tcb, expressionScope);
+      if (branch.expressionAlias !== null) {
+        expression = ts41.factory.createBinaryExpression(ts41.factory.createParenthesizedExpression(expression), ts41.SyntaxKind.AmpersandAmpersandToken, expressionScope.resolve(branch.expressionAlias));
+      }
+      markIgnoreDiagnostics(expression);
+      const comparisonExpression = i === index ? expression : ts41.factory.createPrefixUnaryExpression(ts41.SyntaxKind.ExclamationToken, ts41.factory.createParenthesizedExpression(expression));
+      guard = guard === null ? comparisonExpression : ts41.factory.createBinaryExpression(guard, ts41.SyntaxKind.AmpersandAmpersandToken, comparisonExpression);
+    }
+    return guard;
+  }
+};
+var TcbSwitchOp = class extends TcbOp {
+  constructor(tcb, scope, block) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.block = block;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const switchExpression = tcbExpression(this.block.expression, this.tcb, this.scope);
+    const clauses = this.block.cases.map((current) => {
+      const checkBody = this.tcb.env.config.checkControlFlowBodies;
+      const clauseScope = Scope.forNodes(this.tcb, this.scope, null, checkBody ? current.children : [], checkBody ? this.generateGuard(current, switchExpression) : null);
+      const statements = [...clauseScope.render(), ts41.factory.createBreakStatement()];
+      return current.expression === null ? ts41.factory.createDefaultClause(statements) : ts41.factory.createCaseClause(tcbExpression(current.expression, this.tcb, clauseScope), statements);
+    });
+    this.scope.addStatement(ts41.factory.createSwitchStatement(switchExpression, ts41.factory.createCaseBlock(clauses)));
+    return null;
+  }
+  generateGuard(node, switchValue) {
+    if (node.expression !== null) {
+      const expression = tcbExpression(node.expression, this.tcb, this.scope);
+      markIgnoreDiagnostics(expression);
+      return ts41.factory.createBinaryExpression(switchValue, ts41.SyntaxKind.EqualsEqualsEqualsToken, expression);
+    }
+    let guard = null;
+    for (const current of this.block.cases) {
+      if (current.expression === null) {
+        continue;
+      }
+      const expression = tcbExpression(current.expression, this.tcb, this.scope);
+      markIgnoreDiagnostics(expression);
+      const comparison = ts41.factory.createBinaryExpression(switchValue, ts41.SyntaxKind.ExclamationEqualsEqualsToken, expression);
+      if (guard === null) {
+        guard = comparison;
+      } else {
+        guard = ts41.factory.createBinaryExpression(guard, ts41.SyntaxKind.AmpersandAmpersandToken, comparison);
+      }
+    }
+    return guard;
+  }
+};
+var TcbForOfOp = class extends TcbOp {
+  constructor(tcb, scope, block) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.block = block;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const loopScope = Scope.forNodes(this.tcb, this.scope, this.block, this.tcb.env.config.checkControlFlowBodies ? this.block.children : [], null);
+    const initializerId = loopScope.resolve(this.block.item);
+    if (!ts41.isIdentifier(initializerId)) {
+      throw new Error(`Could not resolve for loop variable ${this.block.item.name} to an identifier`);
+    }
+    const initializer = ts41.factory.createVariableDeclarationList([ts41.factory.createVariableDeclaration(initializerId)], ts41.NodeFlags.Const);
+    addParseSpanInfo(initializer, this.block.item.keySpan);
+    const expression = ts41.factory.createNonNullExpression(tcbExpression(this.block.expression, this.tcb, loopScope));
+    const trackTranslator = new TcbForLoopTrackTranslator(this.tcb, loopScope, this.block);
+    const trackExpression = trackTranslator.translate(this.block.trackBy);
+    const statements = [
+      ...loopScope.render(),
+      ts41.factory.createExpressionStatement(trackExpression)
+    ];
+    this.scope.addStatement(ts41.factory.createForOfStatement(void 0, initializer, expression, ts41.factory.createBlock(statements)));
+    return null;
+  }
+};
+var INFER_TYPE_FOR_CIRCULAR_OP_EXPR = ts41.factory.createNonNullExpression(ts41.factory.createNull());
+var Context = class {
+  constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone, hostPreserveWhitespaces) {
+    this.env = env;
+    this.domSchemaChecker = domSchemaChecker;
+    this.oobRecorder = oobRecorder;
+    this.id = id;
+    this.boundTarget = boundTarget;
+    this.pipes = pipes;
+    this.schemas = schemas;
+    this.hostIsStandalone = hostIsStandalone;
+    this.hostPreserveWhitespaces = hostPreserveWhitespaces;
+    this.nextId = 1;
+  }
+  allocateId() {
+    return ts41.factory.createIdentifier(`_t${this.nextId++}`);
+  }
+  getPipeByName(name) {
+    if (!this.pipes.has(name)) {
+      return null;
+    }
+    return this.pipes.get(name);
+  }
+};
+var _Scope = class {
+  constructor(tcb, parent = null, guard = null) {
+    this.tcb = tcb;
+    this.parent = parent;
+    this.guard = guard;
+    this.opQueue = [];
+    this.elementOpMap = /* @__PURE__ */ new Map();
+    this.directiveOpMap = /* @__PURE__ */ new Map();
+    this.referenceOpMap = /* @__PURE__ */ new Map();
+    this.templateCtxOpMap = /* @__PURE__ */ new Map();
+    this.varMap = /* @__PURE__ */ new Map();
+    this.letDeclOpMap = /* @__PURE__ */ new Map();
+    this.statements = [];
+  }
+  static forNodes(tcb, parentScope, scopedNode, children, guard) {
+    const scope = new _Scope(tcb, parentScope, guard);
+    if (parentScope === null && tcb.env.config.enableTemplateTypeChecker) {
+      scope.opQueue.push(new TcbComponentContextCompletionOp(scope));
+    }
+    if (scopedNode instanceof TmplAstTemplate) {
+      const varMap = /* @__PURE__ */ new Map();
+      for (const v of scopedNode.variables) {
+        if (!varMap.has(v.name)) {
+          varMap.set(v.name, v);
+        } else {
+          const firstDecl = varMap.get(v.name);
+          tcb.oobRecorder.duplicateTemplateVar(tcb.id, v, firstDecl);
+        }
+        this.registerVariable(scope, v, new TcbTemplateVariableOp(tcb, scope, scopedNode, v));
+      }
+    } else if (scopedNode instanceof TmplAstIfBlockBranch) {
+      const { expression, expressionAlias } = scopedNode;
+      if (expression !== null && expressionAlias !== null) {
+        this.registerVariable(scope, expressionAlias, new TcbBlockVariableOp(tcb, scope, tcbExpression(expression, tcb, scope), expressionAlias));
+      }
+    } else if (scopedNode instanceof TmplAstForLoopBlock) {
+      const loopInitializer = tcb.allocateId();
+      addParseSpanInfo(loopInitializer, scopedNode.item.sourceSpan);
+      scope.varMap.set(scopedNode.item, loopInitializer);
+      for (const variable of scopedNode.contextVariables) {
+        if (!this.forLoopContextVariableTypes.has(variable.value)) {
+          throw new Error(`Unrecognized for loop context variable ${variable.name}`);
+        }
+        const type = ts41.factory.createKeywordTypeNode(this.forLoopContextVariableTypes.get(variable.value));
+        this.registerVariable(scope, variable, new TcbBlockImplicitVariableOp(tcb, scope, type, variable));
+      }
+    }
+    for (const node of children) {
+      scope.appendNode(node);
+      if (node instanceof TmplAstLetDeclaration2) {
+        const opIndex = scope.opQueue.push(new TcbLetDeclarationOp(tcb, scope, node)) - 1;
+        if (scope.letDeclOpMap.has(node.name)) {
+          tcb.oobRecorder.duplicateLetDeclaration(tcb.id, node);
+        } else {
+          scope.letDeclOpMap.set(node.name, opIndex);
+        }
+      }
+    }
+    return scope;
+  }
+  static registerVariable(scope, variable, op) {
+    const opIndex = scope.opQueue.push(op) - 1;
+    scope.varMap.set(variable, opIndex);
+  }
+  resolve(node, directive) {
+    const res = this.resolveLocal(node, directive);
+    if (res !== null) {
+      let clone;
+      if (ts41.isIdentifier(res)) {
+        clone = ts41.factory.createIdentifier(res.text);
+      } else if (ts41.isNonNullExpression(res)) {
+        clone = ts41.factory.createNonNullExpression(res.expression);
+      } else {
+        throw new Error(`Could not resolve ${node} to an Identifier or a NonNullExpression`);
+      }
+      ts41.setOriginalNode(clone, res);
+      clone.parent = clone.parent;
+      return ts41.setSyntheticTrailingComments(clone, []);
+    } else if (this.parent !== null) {
+      return this.parent.resolve(node, directive);
+    } else {
+      throw new Error(`Could not resolve ${node} / ${directive}`);
+    }
+  }
+  addStatement(stmt) {
+    this.statements.push(stmt);
+  }
+  render() {
+    for (let i = 0; i < this.opQueue.length; i++) {
+      const skipOptional = !this.tcb.env.config.enableTemplateTypeChecker;
+      this.executeOp(i, skipOptional);
+    }
+    return this.statements;
+  }
+  guards() {
+    let parentGuards = null;
+    if (this.parent !== null) {
+      parentGuards = this.parent.guards();
+    }
+    if (this.guard === null) {
+      return parentGuards;
+    } else if (parentGuards === null) {
+      return this.guard;
+    } else {
+      return ts41.factory.createBinaryExpression(parentGuards, ts41.SyntaxKind.AmpersandAmpersandToken, this.guard);
+    }
+  }
+  isLocal(node) {
+    if (node instanceof TmplAstVariable) {
+      return this.varMap.has(node);
+    }
+    if (node instanceof TmplAstLetDeclaration2) {
+      return this.letDeclOpMap.has(node.name);
+    }
+    return this.referenceOpMap.has(node);
+  }
+  resolveLocal(ref, directive) {
+    if (ref instanceof TmplAstReference2 && this.referenceOpMap.has(ref)) {
+      return this.resolveOp(this.referenceOpMap.get(ref));
+    } else if (ref instanceof TmplAstLetDeclaration2 && this.letDeclOpMap.has(ref.name)) {
+      return this.resolveOp(this.letDeclOpMap.get(ref.name));
+    } else if (ref instanceof TmplAstVariable && this.varMap.has(ref)) {
+      const opIndexOrNode = this.varMap.get(ref);
+      return typeof opIndexOrNode === "number" ? this.resolveOp(opIndexOrNode) : opIndexOrNode;
+    } else if (ref instanceof TmplAstTemplate && directive === void 0 && this.templateCtxOpMap.has(ref)) {
+      return this.resolveOp(this.templateCtxOpMap.get(ref));
+    } else if ((ref instanceof TmplAstElement2 || ref instanceof TmplAstTemplate) && directive !== void 0 && this.directiveOpMap.has(ref)) {
+      const dirMap = this.directiveOpMap.get(ref);
+      if (dirMap.has(directive)) {
+        return this.resolveOp(dirMap.get(directive));
+      } else {
+        return null;
+      }
+    } else if (ref instanceof TmplAstElement2 && this.elementOpMap.has(ref)) {
+      return this.resolveOp(this.elementOpMap.get(ref));
+    } else {
+      return null;
+    }
+  }
+  resolveOp(opIndex) {
+    const res = this.executeOp(opIndex, false);
+    if (res === null) {
+      throw new Error(`Error resolving operation, got null`);
+    }
+    return res;
+  }
+  executeOp(opIndex, skipOptional) {
+    const op = this.opQueue[opIndex];
+    if (!(op instanceof TcbOp)) {
+      return op;
+    }
+    if (skipOptional && op.optional) {
+      return null;
+    }
+    this.opQueue[opIndex] = op.circularFallback();
+    const res = op.execute();
+    this.opQueue[opIndex] = res;
+    return res;
+  }
+  appendNode(node) {
+    if (node instanceof TmplAstElement2) {
+      const opIndex = this.opQueue.push(new TcbElementOp(this.tcb, this, node)) - 1;
+      this.elementOpMap.set(node, opIndex);
+      if (this.tcb.env.config.controlFlowPreventingContentProjection !== "suppress") {
+        this.appendContentProjectionCheckOp(node);
+      }
+      this.appendDirectivesAndInputsOfNode(node);
+      this.appendOutputsOfNode(node);
+      this.appendChildren(node);
+      this.checkAndAppendReferencesOfNode(node);
+    } else if (node instanceof TmplAstTemplate) {
+      this.appendDirectivesAndInputsOfNode(node);
+      this.appendOutputsOfNode(node);
+      const ctxIndex = this.opQueue.push(new TcbTemplateContextOp(this.tcb, this)) - 1;
+      this.templateCtxOpMap.set(node, ctxIndex);
+      if (this.tcb.env.config.checkTemplateBodies) {
+        this.opQueue.push(new TcbTemplateBodyOp(this.tcb, this, node));
+      } else if (this.tcb.env.config.alwaysCheckSchemaInTemplateBodies) {
+        this.appendDeepSchemaChecks(node.children);
+      }
+      this.checkAndAppendReferencesOfNode(node);
+    } else if (node instanceof TmplAstDeferredBlock) {
+      this.appendDeferredBlock(node);
+    } else if (node instanceof TmplAstIfBlock) {
+      this.opQueue.push(new TcbIfOp(this.tcb, this, node));
+    } else if (node instanceof TmplAstSwitchBlock) {
+      this.opQueue.push(new TcbSwitchOp(this.tcb, this, node));
+    } else if (node instanceof TmplAstForLoopBlock) {
+      this.opQueue.push(new TcbForOfOp(this.tcb, this, node));
+      node.empty && this.tcb.env.config.checkControlFlowBodies && this.appendChildren(node.empty);
+    } else if (node instanceof TmplAstBoundText) {
+      this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.value));
+    } else if (node instanceof TmplAstIcu) {
+      this.appendIcuExpressions(node);
+    } else if (node instanceof TmplAstContent) {
+      this.appendChildren(node);
+    }
+  }
+  appendChildren(node) {
+    for (const child of node.children) {
+      this.appendNode(child);
+    }
+  }
+  checkAndAppendReferencesOfNode(node) {
+    for (const ref of node.references) {
+      const target = this.tcb.boundTarget.getReferenceTarget(ref);
+      let ctxIndex;
+      if (target === null) {
+        this.tcb.oobRecorder.missingReferenceTarget(this.tcb.id, ref);
+        ctxIndex = this.opQueue.push(new TcbInvalidReferenceOp(this.tcb, this)) - 1;
+      } else if (target instanceof TmplAstTemplate || target instanceof TmplAstElement2) {
+        ctxIndex = this.opQueue.push(new TcbReferenceOp(this.tcb, this, ref, node, target)) - 1;
+      } else {
+        ctxIndex = this.opQueue.push(new TcbReferenceOp(this.tcb, this, ref, node, target.directive)) - 1;
+      }
+      this.referenceOpMap.set(ref, ctxIndex);
+    }
+  }
+  appendDirectivesAndInputsOfNode(node) {
+    const claimedInputs = /* @__PURE__ */ new Set();
+    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
+    if (directives === null || directives.length === 0) {
+      if (node instanceof TmplAstElement2) {
+        this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node, claimedInputs));
+        this.opQueue.push(new TcbDomSchemaCheckerOp(this.tcb, node, true, claimedInputs));
+      }
+      return;
+    } else {
+      if (node instanceof TmplAstElement2) {
+        const isDeferred = this.tcb.boundTarget.isDeferred(node);
+        if (!isDeferred && directives.some((dirMeta) => dirMeta.isExplicitlyDeferred)) {
+          this.tcb.oobRecorder.deferredComponentUsedEagerly(this.tcb.id, node);
+        }
+      }
+    }
+    const dirMap = /* @__PURE__ */ new Map();
+    for (const dir of directives) {
+      let directiveOp;
+      const host = this.tcb.env.reflector;
+      const dirRef = dir.ref;
+      if (!dir.isGeneric) {
+        directiveOp = new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, dir);
+      } else if (!requiresInlineTypeCtor(dirRef.node, host, this.tcb.env) || this.tcb.env.config.useInlineTypeConstructors) {
+        directiveOp = new TcbDirectiveCtorOp(this.tcb, this, node, dir);
+      } else {
+        directiveOp = new TcbGenericDirectiveTypeWithAnyParamsOp(this.tcb, this, node, dir);
+      }
+      const dirIndex = this.opQueue.push(directiveOp) - 1;
+      dirMap.set(dir, dirIndex);
+      this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir));
+    }
+    this.directiveOpMap.set(node, dirMap);
+    if (node instanceof TmplAstElement2) {
+      for (const dir of directives) {
+        for (const propertyName of dir.inputs.propertyNames) {
+          claimedInputs.add(propertyName);
+        }
+      }
+      this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node, claimedInputs));
+      const checkElement = directives.length === 0;
+      this.opQueue.push(new TcbDomSchemaCheckerOp(this.tcb, node, checkElement, claimedInputs));
+    }
+  }
+  appendOutputsOfNode(node) {
+    const claimedOutputs = /* @__PURE__ */ new Set();
+    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
+    if (directives === null || directives.length === 0) {
+      if (node instanceof TmplAstElement2) {
+        this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, claimedOutputs));
+      }
+      return;
+    }
+    for (const dir of directives) {
+      this.opQueue.push(new TcbDirectiveOutputsOp(this.tcb, this, node, dir));
+    }
+    if (node instanceof TmplAstElement2) {
+      for (const dir of directives) {
+        for (const outputProperty of dir.outputs.propertyNames) {
+          claimedOutputs.add(outputProperty);
+        }
+      }
+      this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, claimedOutputs));
+    }
+  }
+  appendDeepSchemaChecks(nodes) {
+    for (const node of nodes) {
+      if (!(node instanceof TmplAstElement2 || node instanceof TmplAstTemplate)) {
+        continue;
+      }
+      if (node instanceof TmplAstElement2) {
+        const claimedInputs = /* @__PURE__ */ new Set();
+        const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
+        let hasDirectives;
+        if (directives === null || directives.length === 0) {
+          hasDirectives = false;
+        } else {
+          hasDirectives = true;
+          for (const dir of directives) {
+            for (const propertyName of dir.inputs.propertyNames) {
+              claimedInputs.add(propertyName);
+            }
+          }
+        }
+        this.opQueue.push(new TcbDomSchemaCheckerOp(this.tcb, node, !hasDirectives, claimedInputs));
+      }
+      this.appendDeepSchemaChecks(node.children);
+    }
+  }
+  appendIcuExpressions(node) {
+    for (const variable of Object.values(node.vars)) {
+      this.opQueue.push(new TcbExpressionOp(this.tcb, this, variable.value));
+    }
+    for (const placeholder of Object.values(node.placeholders)) {
+      if (placeholder instanceof TmplAstBoundText) {
+        this.opQueue.push(new TcbExpressionOp(this.tcb, this, placeholder.value));
+      }
+    }
+  }
+  appendContentProjectionCheckOp(root) {
+    var _a;
+    const meta = ((_a = this.tcb.boundTarget.getDirectivesOfNode(root)) == null ? void 0 : _a.find((meta2) => meta2.isComponent)) || null;
+    if (meta !== null && meta.ngContentSelectors !== null && meta.ngContentSelectors.length > 0) {
+      const selectors = meta.ngContentSelectors;
+      if (selectors.length > 1 || selectors.length === 1 && selectors[0] !== "*") {
+        this.opQueue.push(new TcbControlFlowContentProjectionOp(this.tcb, root, selectors, meta.name));
+      }
+    }
+  }
+  appendDeferredBlock(block) {
+    this.appendDeferredTriggers(block, block.triggers);
+    this.appendDeferredTriggers(block, block.prefetchTriggers);
+    this.appendChildren(block);
+    if (block.placeholder !== null) {
+      this.appendChildren(block.placeholder);
+    }
+    if (block.loading !== null) {
+      this.appendChildren(block.loading);
+    }
+    if (block.error !== null) {
+      this.appendChildren(block.error);
+    }
+  }
+  appendDeferredTriggers(block, triggers) {
+    if (triggers.when !== void 0) {
+      this.opQueue.push(new TcbExpressionOp(this.tcb, this, triggers.when.value));
+    }
+    if (triggers.hover !== void 0) {
+      this.appendReferenceBasedDeferredTrigger(block, triggers.hover);
+    }
+    if (triggers.interaction !== void 0) {
+      this.appendReferenceBasedDeferredTrigger(block, triggers.interaction);
+    }
+    if (triggers.viewport !== void 0) {
+      this.appendReferenceBasedDeferredTrigger(block, triggers.viewport);
+    }
+  }
+  appendReferenceBasedDeferredTrigger(block, trigger) {
+    if (this.tcb.boundTarget.getDeferredTriggerTarget(block, trigger) === null) {
+      this.tcb.oobRecorder.inaccessibleDeferredTriggerElement(this.tcb.id, trigger);
+    }
+  }
+};
+var Scope = _Scope;
+(() => {
+  _Scope.forLoopContextVariableTypes = /* @__PURE__ */ new Map([
+    ["$first", ts41.SyntaxKind.BooleanKeyword],
+    ["$last", ts41.SyntaxKind.BooleanKeyword],
+    ["$even", ts41.SyntaxKind.BooleanKeyword],
+    ["$odd", ts41.SyntaxKind.BooleanKeyword],
+    ["$index", ts41.SyntaxKind.NumberKeyword],
+    ["$count", ts41.SyntaxKind.NumberKeyword]
+  ]);
+})();
+function tcbThisParam(name, typeArguments) {
+  return ts41.factory.createParameterDeclaration(
+    void 0,
+    void 0,
+    "this",
+    void 0,
+    ts41.factory.createTypeReferenceNode(name, typeArguments),
+    void 0
+  );
+}
+function tcbExpression(ast, tcb, scope) {
+  const translator = new TcbExpressionTranslator(tcb, scope);
+  return translator.translate(ast);
+}
+var TcbExpressionTranslator = class {
+  constructor(tcb, scope) {
+    this.tcb = tcb;
+    this.scope = scope;
+  }
+  translate(ast) {
+    return astToTypescript(ast, (ast2) => this.resolve(ast2), this.tcb.env.config);
+  }
+  resolve(ast) {
+    if (ast instanceof PropertyRead3 && ast.receiver instanceof ImplicitReceiver2) {
+      const target = this.tcb.boundTarget.getExpressionTarget(ast);
+      if (target instanceof TmplAstLetDeclaration2) {
+        this.validateLetDeclarationAccess(target, ast);
+      }
+      return target === null ? null : this.getTargetNodeExpression(target, ast);
+    } else if (ast instanceof PropertyWrite2 && ast.receiver instanceof ImplicitReceiver2) {
+      const target = this.tcb.boundTarget.getExpressionTarget(ast);
+      if (target === null) {
+        return null;
+      }
+      const targetExpression = this.getTargetNodeExpression(target, ast);
+      const expr = this.translate(ast.value);
+      const result = ts41.factory.createParenthesizedExpression(ts41.factory.createBinaryExpression(targetExpression, ts41.SyntaxKind.EqualsToken, expr));
+      addParseSpanInfo(result, ast.sourceSpan);
+      if (target instanceof TmplAstLetDeclaration2) {
+        markIgnoreDiagnostics(result);
+        this.tcb.oobRecorder.illegalWriteToLetDeclaration(this.tcb.id, ast, target);
+      }
+      return result;
+    } else if (ast instanceof ImplicitReceiver2) {
+      return ts41.factory.createThis();
+    } else if (ast instanceof BindingPipe) {
+      const expr = this.translate(ast.exp);
+      const pipeMeta = this.tcb.getPipeByName(ast.name);
+      let pipe;
+      if (pipeMeta === null) {
+        this.tcb.oobRecorder.missingPipe(this.tcb.id, ast);
+        pipe = NULL_AS_ANY;
+      } else if (pipeMeta.isExplicitlyDeferred && this.tcb.boundTarget.getEagerlyUsedPipes().includes(ast.name)) {
+        this.tcb.oobRecorder.deferredPipeUsedEagerly(this.tcb.id, ast);
+        pipe = NULL_AS_ANY;
+      } else {
+        pipe = this.tcb.env.pipeInst(pipeMeta.ref);
+      }
+      const args = ast.args.map((arg) => this.translate(arg));
+      let methodAccess = ts41.factory.createPropertyAccessExpression(pipe, "transform");
+      addParseSpanInfo(methodAccess, ast.nameSpan);
+      if (!this.tcb.env.config.checkTypeOfPipes) {
+        methodAccess = ts41.factory.createAsExpression(methodAccess, ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword));
+      }
+      const result = ts41.factory.createCallExpression(
+        methodAccess,
+        void 0,
+        [expr, ...args]
+      );
+      addParseSpanInfo(result, ast.sourceSpan);
+      return result;
+    } else if ((ast instanceof Call2 || ast instanceof SafeCall) && (ast.receiver instanceof PropertyRead3 || ast.receiver instanceof SafePropertyRead3)) {
+      if (ast.receiver.receiver instanceof ImplicitReceiver2 && !(ast.receiver.receiver instanceof ThisReceiver) && ast.receiver.name === "$any" && ast.args.length === 1) {
+        const expr = this.translate(ast.args[0]);
+        const exprAsAny = ts41.factory.createAsExpression(expr, ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword));
+        const result = ts41.factory.createParenthesizedExpression(exprAsAny);
+        addParseSpanInfo(result, ast.sourceSpan);
+        return result;
+      }
+      const target = this.tcb.boundTarget.getExpressionTarget(ast);
+      if (target === null) {
+        return null;
+      }
+      const receiver = this.getTargetNodeExpression(target, ast);
+      const method = wrapForDiagnostics(receiver);
+      addParseSpanInfo(method, ast.receiver.nameSpan);
+      const args = ast.args.map((arg) => this.translate(arg));
+      const node = ts41.factory.createCallExpression(method, void 0, args);
+      addParseSpanInfo(node, ast.sourceSpan);
+      return node;
+    } else {
+      return null;
+    }
+  }
+  getTargetNodeExpression(targetNode, expressionNode) {
+    const expr = this.scope.resolve(targetNode);
+    addParseSpanInfo(expr, expressionNode.sourceSpan);
+    return expr;
+  }
+  validateLetDeclarationAccess(target, ast) {
+    const targetStart = target.sourceSpan.start.offset;
+    const targetEnd = target.sourceSpan.end.offset;
+    const astStart = ast.sourceSpan.start;
+    if ((targetStart > astStart || astStart >= targetStart && astStart <= targetEnd) && this.scope.isLocal(target)) {
+      this.tcb.oobRecorder.letUsedBeforeDefinition(this.tcb.id, ast, target);
+    }
+  }
+};
+function tcbCallTypeCtor(dir, tcb, inputs) {
+  const typeCtor = tcb.env.typeCtorFor(dir);
+  const members = inputs.map((input) => {
+    const propertyName = ts41.factory.createStringLiteral(input.field);
+    if (input.type === "binding") {
+      let expr = widenBinding(input.expression, tcb);
+      if (input.isTwoWayBinding && tcb.env.config.allowSignalsInTwoWayBindings) {
+        expr = unwrapWritableSignal(expr, tcb);
+      }
+      const assignment = ts41.factory.createPropertyAssignment(propertyName, wrapForDiagnostics(expr));
+      addParseSpanInfo(assignment, input.sourceSpan);
+      return assignment;
+    } else {
+      return ts41.factory.createPropertyAssignment(propertyName, NULL_AS_ANY);
+    }
+  });
+  return ts41.factory.createCallExpression(
+    typeCtor,
+    void 0,
+    [ts41.factory.createObjectLiteralExpression(members)]
+  );
+}
+function getBoundAttributes(directive, node) {
+  const boundInputs = [];
+  const processAttribute = (attr) => {
+    if (attr instanceof TmplAstBoundAttribute && attr.type !== BindingType.Property && attr.type !== BindingType.TwoWay) {
+      return;
+    }
+    const inputs = directive.inputs.getByBindingPropertyName(attr.name);
+    if (inputs !== null) {
+      boundInputs.push({
+        attribute: attr,
+        inputs: inputs.map((input) => {
+          var _a;
+          return {
+            fieldName: input.classPropertyName,
+            required: input.required,
+            transformType: ((_a = input.transform) == null ? void 0 : _a.type) || null,
+            isSignal: input.isSignal,
+            isTwoWayBinding: attr instanceof TmplAstBoundAttribute && attr.type === BindingType.TwoWay
+          };
+        })
+      });
+    }
+  };
+  node.inputs.forEach(processAttribute);
+  node.attributes.forEach(processAttribute);
+  if (node instanceof TmplAstTemplate) {
+    node.templateAttrs.forEach(processAttribute);
+  }
+  return boundInputs;
+}
+function translateInput(attr, tcb, scope) {
+  if (attr instanceof TmplAstBoundAttribute) {
+    return tcbExpression(attr.value, tcb, scope);
+  } else {
+    return ts41.factory.createStringLiteral(attr.value);
+  }
+}
+function widenBinding(expr, tcb) {
+  if (!tcb.env.config.checkTypeOfInputBindings) {
+    return tsCastToAny(expr);
+  } else if (!tcb.env.config.strictNullInputBindings) {
+    if (ts41.isObjectLiteralExpression(expr) || ts41.isArrayLiteralExpression(expr)) {
+      return expr;
+    } else {
+      return ts41.factory.createNonNullExpression(expr);
+    }
+  } else {
+    return expr;
+  }
+}
+function unwrapWritableSignal(expression, tcb) {
+  const unwrapRef = tcb.env.referenceExternalSymbol(R3Identifiers4.unwrapWritableSignal.moduleName, R3Identifiers4.unwrapWritableSignal.name);
+  return ts41.factory.createCallExpression(unwrapRef, void 0, [expression]);
+}
+var EVENT_PARAMETER = "$event";
+function tcbCreateEventHandler(event, tcb, scope, eventType) {
+  const handler = tcbEventHandlerExpression(event.handler, tcb, scope);
+  let eventParamType;
+  if (eventType === 0) {
+    eventParamType = void 0;
+  } else if (eventType === 1) {
+    eventParamType = ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword);
+  } else {
+    eventParamType = eventType;
+  }
+  const guards = scope.guards();
+  let body = ts41.factory.createExpressionStatement(handler);
+  if (guards !== null) {
+    body = ts41.factory.createIfStatement(guards, body);
+  }
+  const eventParam = ts41.factory.createParameterDeclaration(
+    void 0,
+    void 0,
+    EVENT_PARAMETER,
+    void 0,
+    eventParamType
+  );
+  addExpressionIdentifier(eventParam, ExpressionIdentifier.EVENT_PARAMETER);
+  return ts41.factory.createArrowFunction(
+    void 0,
+    void 0,
+    [eventParam],
+    ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword),
+    void 0,
+    ts41.factory.createBlock([body])
+  );
+}
+function tcbEventHandlerExpression(ast, tcb, scope) {
+  const translator = new TcbEventHandlerTranslator(tcb, scope);
+  return translator.translate(ast);
+}
+function isSplitTwoWayBinding(inputName, output, inputs, tcb) {
+  const input = inputs.find((input2) => input2.name === inputName);
+  if (input === void 0 || input.sourceSpan !== output.sourceSpan) {
+    return false;
+  }
+  const inputConsumer = tcb.boundTarget.getConsumerOfBinding(input);
+  const outputConsumer = tcb.boundTarget.getConsumerOfBinding(output);
+  if (outputConsumer === null || inputConsumer.ref === void 0 || outputConsumer instanceof TmplAstTemplate) {
+    return false;
+  }
+  if (outputConsumer instanceof TmplAstElement2) {
+    tcb.oobRecorder.splitTwoWayBinding(tcb.id, input, output, inputConsumer.ref.node, outputConsumer);
+    return true;
+  } else if (outputConsumer.ref !== inputConsumer.ref) {
+    tcb.oobRecorder.splitTwoWayBinding(tcb.id, input, output, inputConsumer.ref.node, outputConsumer.ref.node);
+    return true;
+  }
+  return false;
+}
+var TcbEventHandlerTranslator = class extends TcbExpressionTranslator {
+  resolve(ast) {
+    if (ast instanceof PropertyRead3 && ast.receiver instanceof ImplicitReceiver2 && !(ast.receiver instanceof ThisReceiver) && ast.name === EVENT_PARAMETER) {
+      const event = ts41.factory.createIdentifier(EVENT_PARAMETER);
+      addParseSpanInfo(event, ast.nameSpan);
+      return event;
+    }
+    return super.resolve(ast);
+  }
+  validateLetDeclarationAccess() {
+  }
+};
+var TcbForLoopTrackTranslator = class extends TcbExpressionTranslator {
+  constructor(tcb, scope, block) {
+    super(tcb, scope);
+    this.block = block;
+    this.allowedVariables = /* @__PURE__ */ new Set([block.item]);
+    for (const variable of block.contextVariables) {
+      if (variable.value === "$index") {
+        this.allowedVariables.add(variable);
+      }
+    }
+  }
+  resolve(ast) {
+    if (ast instanceof PropertyRead3 && ast.receiver instanceof ImplicitReceiver2) {
+      const target = this.tcb.boundTarget.getExpressionTarget(ast);
+      if (target !== null && (!(target instanceof TmplAstVariable) || !this.allowedVariables.has(target))) {
+        this.tcb.oobRecorder.illegalForLoopTrackAccess(this.tcb.id, this.block, ast);
+      }
+    }
+    return super.resolve(ast);
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_file.mjs
+import ts42 from "typescript";
+var TypeCheckFile = class extends Environment {
+  constructor(fileName, config, refEmitter, reflector, compilerHost) {
+    super(config, new ImportManager({
+      forceGenerateNamespacesForNewImports: true,
+      shouldUseSingleQuotes: () => true
+    }), refEmitter, reflector, ts42.createSourceFile(compilerHost.getCanonicalFileName(fileName), "", ts42.ScriptTarget.Latest, true));
+    this.fileName = fileName;
+    this.nextTcbId = 1;
+    this.tcbStatements = [];
+  }
+  addTypeCheckBlock(ref, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
+    const fnId = ts42.factory.createIdentifier(`_tcb${this.nextTcbId++}`);
+    const fn = generateTypeCheckBlock(this, ref, fnId, meta, domSchemaChecker, oobRecorder, genericContextBehavior);
+    this.tcbStatements.push(fn);
+  }
+  render(removeComments) {
+    ensureTypeCheckFilePreparationImports(this);
+    const importChanges = this.importManager.finalize();
+    if (importChanges.updatedImports.size > 0) {
+      throw new Error("AssertionError: Expected no imports to be updated for a new type check file.");
+    }
+    const printer = ts42.createPrinter({ removeComments });
+    let source = "";
+    const newImports = importChanges.newImports.get(this.contextFile.fileName);
+    if (newImports !== void 0) {
+      source += newImports.map((i) => printer.printNode(ts42.EmitHint.Unspecified, i, this.contextFile)).join("\n");
+    }
+    source += "\n";
+    for (const stmt of this.pipeInstStatements) {
+      source += printer.printNode(ts42.EmitHint.Unspecified, stmt, this.contextFile) + "\n";
+    }
+    for (const stmt of this.typeCtorStatements) {
+      source += printer.printNode(ts42.EmitHint.Unspecified, stmt, this.contextFile) + "\n";
+    }
+    source += "\n";
+    for (const stmt of this.tcbStatements) {
+      source += printer.printNode(ts42.EmitHint.Unspecified, stmt, this.contextFile) + "\n";
+    }
+    source += "\nexport const IS_A_MODULE = true;\n";
+    return source;
+  }
+  getPreludeStatements() {
+    return [];
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/context.mjs
+var InliningMode;
+(function(InliningMode2) {
+  InliningMode2[InliningMode2["InlineOps"] = 0] = "InlineOps";
+  InliningMode2[InliningMode2["Error"] = 1] = "Error";
+})(InliningMode || (InliningMode = {}));
+var TypeCheckContextImpl = class {
+  constructor(config, compilerHost, refEmitter, reflector, host, inlining, perf) {
+    this.config = config;
+    this.compilerHost = compilerHost;
+    this.refEmitter = refEmitter;
+    this.reflector = reflector;
+    this.host = host;
+    this.inlining = inlining;
+    this.perf = perf;
+    this.fileMap = /* @__PURE__ */ new Map();
+    this.opMap = /* @__PURE__ */ new Map();
+    this.typeCtorPending = /* @__PURE__ */ new Set();
+    if (inlining === InliningMode.Error && config.useInlineTypeConstructors) {
+      throw new Error(`AssertionError: invalid inlining configuration.`);
+    }
+  }
+  addTemplate(ref, binder, template, pipes, schemas, sourceMapping, file, parseErrors, isStandalone, preserveWhitespaces) {
+    if (!this.host.shouldCheckComponent(ref.node)) {
+      return;
+    }
+    const fileData = this.dataForFile(ref.node.getSourceFile());
+    const shimData = this.pendingShimForComponent(ref.node);
+    const templateId = fileData.sourceManager.getTemplateId(ref.node);
+    const templateDiagnostics = [];
+    if (parseErrors !== null) {
+      templateDiagnostics.push(...getTemplateDiagnostics(parseErrors, templateId, sourceMapping));
+    }
+    const boundTarget = binder.bind({ template });
+    if (this.inlining === InliningMode.InlineOps) {
+      for (const dir of boundTarget.getUsedDirectives()) {
+        const dirRef = dir.ref;
+        const dirNode = dirRef.node;
+        if (!dir.isGeneric || !requiresInlineTypeCtor(dirNode, this.reflector, shimData.file)) {
+          continue;
+        }
+        this.addInlineTypeCtor(fileData, dirNode.getSourceFile(), dirRef, {
+          fnName: "ngTypeCtor",
+          body: !dirNode.getSourceFile().isDeclarationFile,
+          fields: {
+            inputs: dir.inputs,
+            queries: dir.queries
+          },
+          coercedInputFields: dir.coercedInputFields
+        });
+      }
+    }
+    shimData.templates.set(templateId, {
+      template,
+      boundTarget,
+      templateDiagnostics
+    });
+    const usedPipes = [];
+    for (const name of boundTarget.getUsedPipes()) {
+      if (!pipes.has(name)) {
+        continue;
+      }
+      usedPipes.push(pipes.get(name).ref);
+    }
+    const inliningRequirement = requiresInlineTypeCheckBlock(ref, shimData.file, usedPipes, this.reflector);
+    if (this.inlining === InliningMode.Error && inliningRequirement === TcbInliningRequirement.MustInline) {
+      shimData.oobRecorder.requiresInlineTcb(templateId, ref.node);
+      this.perf.eventCount(PerfEvent.SkipGenerateTcbNoInline);
+      return;
+    }
+    const meta = {
+      id: fileData.sourceManager.captureSource(ref.node, sourceMapping, file),
+      boundTarget,
+      pipes,
+      schemas,
+      isStandalone,
+      preserveWhitespaces
+    };
+    this.perf.eventCount(PerfEvent.GenerateTcb);
+    if (inliningRequirement !== TcbInliningRequirement.None && this.inlining === InliningMode.InlineOps) {
+      this.addInlineTypeCheckBlock(fileData, shimData, ref, meta);
+    } else if (inliningRequirement === TcbInliningRequirement.ShouldInlineForGenericBounds && this.inlining === InliningMode.Error) {
+      shimData.file.addTypeCheckBlock(ref, meta, shimData.domSchemaChecker, shimData.oobRecorder, TcbGenericContextBehavior.FallbackToAny);
+    } else {
+      shimData.file.addTypeCheckBlock(ref, meta, shimData.domSchemaChecker, shimData.oobRecorder, TcbGenericContextBehavior.UseEmitter);
+    }
+  }
+  addInlineTypeCtor(fileData, sf, ref, ctorMeta) {
+    if (this.typeCtorPending.has(ref.node)) {
+      return;
+    }
+    this.typeCtorPending.add(ref.node);
+    if (!this.opMap.has(sf)) {
+      this.opMap.set(sf, []);
+    }
+    const ops = this.opMap.get(sf);
+    ops.push(new TypeCtorOp(ref, this.reflector, ctorMeta));
+    fileData.hasInlines = true;
+  }
+  transform(sf) {
+    if (!this.opMap.has(sf)) {
+      return null;
+    }
+    const printer = ts43.createPrinter({ omitTrailingSemicolon: true });
+    const importManager = new ImportManager({
+      forceGenerateNamespacesForNewImports: true,
+      shouldUseSingleQuotes: () => true
+    });
+    const updates = this.opMap.get(sf).map((op) => {
+      return {
+        pos: op.splitPoint,
+        text: op.execute(importManager, sf, this.refEmitter, printer)
+      };
+    });
+    const { newImports, updatedImports } = importManager.finalize();
+    if (newImports.has(sf.fileName)) {
+      newImports.get(sf.fileName).forEach((newImport) => {
+        updates.push({
+          pos: 0,
+          text: printer.printNode(ts43.EmitHint.Unspecified, newImport, sf)
+        });
+      });
+    }
+    for (const [oldBindings, newBindings] of updatedImports.entries()) {
+      if (oldBindings.getSourceFile() !== sf) {
+        throw new Error("Unexpected updates to unrelated source files.");
+      }
+      updates.push({
+        pos: oldBindings.getStart(),
+        deletePos: oldBindings.getEnd(),
+        text: printer.printNode(ts43.EmitHint.Unspecified, newBindings, sf)
+      });
+    }
+    const result = new MagicString(sf.text, { filename: sf.fileName });
+    for (const update of updates) {
+      if (update.deletePos !== void 0) {
+        result.remove(update.pos, update.deletePos);
+      }
+      result.appendLeft(update.pos, update.text);
+    }
+    return result.toString();
+  }
+  finalize() {
+    const updates = /* @__PURE__ */ new Map();
+    for (const originalSf of this.opMap.keys()) {
+      const newText = this.transform(originalSf);
+      if (newText !== null) {
+        updates.set(absoluteFromSourceFile(originalSf), {
+          newText,
+          originalFile: originalSf
+        });
+      }
+    }
+    for (const [sfPath, pendingFileData] of this.fileMap) {
+      for (const pendingShimData of pendingFileData.shimData.values()) {
+        this.host.recordShimData(sfPath, {
+          genesisDiagnostics: [
+            ...pendingShimData.domSchemaChecker.diagnostics,
+            ...pendingShimData.oobRecorder.diagnostics
+          ],
+          hasInlines: pendingFileData.hasInlines,
+          path: pendingShimData.file.fileName,
+          templates: pendingShimData.templates
+        });
+        const sfText = pendingShimData.file.render(false);
+        updates.set(pendingShimData.file.fileName, {
+          newText: sfText,
+          originalFile: null
+        });
+      }
+    }
+    return updates;
+  }
+  addInlineTypeCheckBlock(fileData, shimData, ref, tcbMeta) {
+    const sf = ref.node.getSourceFile();
+    if (!this.opMap.has(sf)) {
+      this.opMap.set(sf, []);
+    }
+    const ops = this.opMap.get(sf);
+    ops.push(new InlineTcbOp(ref, tcbMeta, this.config, this.reflector, shimData.domSchemaChecker, shimData.oobRecorder));
+    fileData.hasInlines = true;
+  }
+  pendingShimForComponent(node) {
+    const fileData = this.dataForFile(node.getSourceFile());
+    const shimPath = TypeCheckShimGenerator.shimFor(absoluteFromSourceFile(node.getSourceFile()));
+    if (!fileData.shimData.has(shimPath)) {
+      fileData.shimData.set(shimPath, {
+        domSchemaChecker: new RegistryDomSchemaChecker(fileData.sourceManager),
+        oobRecorder: new OutOfBandDiagnosticRecorderImpl(fileData.sourceManager),
+        file: new TypeCheckFile(shimPath, this.config, this.refEmitter, this.reflector, this.compilerHost),
+        templates: /* @__PURE__ */ new Map()
+      });
+    }
+    return fileData.shimData.get(shimPath);
+  }
+  dataForFile(sf) {
+    const sfPath = absoluteFromSourceFile(sf);
+    if (!this.fileMap.has(sfPath)) {
+      const data = {
+        hasInlines: false,
+        sourceManager: this.host.getSourceManager(sfPath),
+        shimData: /* @__PURE__ */ new Map()
+      };
+      this.fileMap.set(sfPath, data);
+    }
+    return this.fileMap.get(sfPath);
+  }
+};
+function getTemplateDiagnostics(parseErrors, templateId, sourceMapping) {
+  return parseErrors.map((error) => {
+    const span = error.span;
+    if (span.start.offset === span.end.offset) {
+      span.end.offset++;
+    }
+    return makeTemplateDiagnostic(templateId, sourceMapping, span, ts43.DiagnosticCategory.Error, ngErrorCode(ErrorCode.TEMPLATE_PARSE_ERROR), error.msg);
+  });
+}
+var InlineTcbOp = class {
+  constructor(ref, meta, config, reflector, domSchemaChecker, oobRecorder) {
+    this.ref = ref;
+    this.meta = meta;
+    this.config = config;
+    this.reflector = reflector;
+    this.domSchemaChecker = domSchemaChecker;
+    this.oobRecorder = oobRecorder;
+  }
+  get splitPoint() {
+    return this.ref.node.end + 1;
+  }
+  execute(im, sf, refEmitter, printer) {
+    const env = new Environment(this.config, im, refEmitter, this.reflector, sf);
+    const fnName = ts43.factory.createIdentifier(`_tcb_${this.ref.node.pos}`);
+    const fn = generateTypeCheckBlock(env, this.ref, fnName, this.meta, this.domSchemaChecker, this.oobRecorder, TcbGenericContextBehavior.CopyClassNodes);
+    return printer.printNode(ts43.EmitHint.Unspecified, fn, sf);
+  }
+};
+var TypeCtorOp = class {
+  constructor(ref, reflector, meta) {
+    this.ref = ref;
+    this.reflector = reflector;
+    this.meta = meta;
+  }
+  get splitPoint() {
+    return this.ref.node.end - 1;
+  }
+  execute(im, sf, refEmitter, printer) {
+    const emitEnv = new ReferenceEmitEnvironment(im, refEmitter, this.reflector, sf);
+    const tcb = generateInlineTypeCtor(emitEnv, this.ref.node, this.meta);
+    return printer.printNode(ts43.EmitHint.Unspecified, tcb, sf);
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/source.mjs
+import { ParseLocation as ParseLocation2, ParseSourceSpan as ParseSourceSpan2 } from "@angular/compiler";
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/line_mappings.mjs
+var LF_CHAR = 10;
+var CR_CHAR = 13;
+var LINE_SEP_CHAR = 8232;
+var PARAGRAPH_CHAR = 8233;
+function getLineAndCharacterFromPosition(lineStartsMap, position) {
+  const lineIndex = findClosestLineStartPosition(lineStartsMap, position);
+  return { character: position - lineStartsMap[lineIndex], line: lineIndex };
+}
+function computeLineStartsMap(text) {
+  const result = [0];
+  let pos = 0;
+  while (pos < text.length) {
+    const char = text.charCodeAt(pos++);
+    if (char === CR_CHAR) {
+      if (text.charCodeAt(pos) === LF_CHAR) {
+        pos++;
+      }
+      result.push(pos);
+    } else if (char === LF_CHAR || char === LINE_SEP_CHAR || char === PARAGRAPH_CHAR) {
+      result.push(pos);
+    }
+  }
+  result.push(pos);
+  return result;
+}
+function findClosestLineStartPosition(linesMap, position, low = 0, high = linesMap.length - 1) {
+  while (low <= high) {
+    const pivotIdx = Math.floor((low + high) / 2);
+    const pivotEl = linesMap[pivotIdx];
+    if (pivotEl === position) {
+      return pivotIdx;
+    } else if (position > pivotEl) {
+      low = pivotIdx + 1;
+    } else {
+      high = pivotIdx - 1;
+    }
+  }
+  return low - 1;
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/source.mjs
+var TemplateSource = class {
+  constructor(mapping, file) {
+    this.mapping = mapping;
+    this.file = file;
+    this.lineStarts = null;
+  }
+  toParseSourceSpan(start, end) {
+    const startLoc = this.toParseLocation(start);
+    const endLoc = this.toParseLocation(end);
+    return new ParseSourceSpan2(startLoc, endLoc);
+  }
+  toParseLocation(position) {
+    const lineStarts = this.acquireLineStarts();
+    const { line, character } = getLineAndCharacterFromPosition(lineStarts, position);
+    return new ParseLocation2(this.file, position, line, character);
+  }
+  acquireLineStarts() {
+    if (this.lineStarts === null) {
+      this.lineStarts = computeLineStartsMap(this.file.content);
+    }
+    return this.lineStarts;
+  }
+};
+var TemplateSourceManager = class {
+  constructor() {
+    this.templateSources = /* @__PURE__ */ new Map();
+  }
+  getTemplateId(node) {
+    return getTemplateId(node);
+  }
+  captureSource(node, mapping, file) {
+    const id = getTemplateId(node);
+    this.templateSources.set(id, new TemplateSource(mapping, file));
+    return id;
+  }
+  getSourceMapping(id) {
+    if (!this.templateSources.has(id)) {
+      throw new Error(`Unexpected unknown template ID: ${id}`);
+    }
+    return this.templateSources.get(id).mapping;
+  }
+  toParseSourceSpan(id, span) {
+    if (!this.templateSources.has(id)) {
+      return null;
+    }
+    const templateSource = this.templateSources.get(id);
+    return templateSource.toParseSourceSpan(span.start, span.end);
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.mjs
+import { AST, ASTWithSource as ASTWithSource2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers5, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import ts44 from "typescript";
+var SymbolBuilder = class {
+  constructor(tcbPath, tcbIsShim, typeCheckBlock, templateData, componentScopeReader, getTypeChecker) {
+    this.tcbPath = tcbPath;
+    this.tcbIsShim = tcbIsShim;
+    this.typeCheckBlock = typeCheckBlock;
+    this.templateData = templateData;
+    this.componentScopeReader = componentScopeReader;
+    this.getTypeChecker = getTypeChecker;
+    this.symbolCache = /* @__PURE__ */ new Map();
+  }
+  getSymbol(node) {
+    if (this.symbolCache.has(node)) {
+      return this.symbolCache.get(node);
+    }
+    let symbol = null;
+    if (node instanceof TmplAstBoundAttribute2 || node instanceof TmplAstTextAttribute3) {
+      symbol = this.getSymbolOfInputBinding(node);
+    } else if (node instanceof TmplAstBoundEvent) {
+      symbol = this.getSymbolOfBoundEvent(node);
+    } else if (node instanceof TmplAstElement3) {
+      symbol = this.getSymbolOfElement(node);
+    } else if (node instanceof TmplAstTemplate2) {
+      symbol = this.getSymbolOfAstTemplate(node);
+    } else if (node instanceof TmplAstVariable2) {
+      symbol = this.getSymbolOfVariable(node);
+    } else if (node instanceof TmplAstLetDeclaration3) {
+      symbol = this.getSymbolOfLetDeclaration(node);
+    } else if (node instanceof TmplAstReference3) {
+      symbol = this.getSymbolOfReference(node);
+    } else if (node instanceof BindingPipe2) {
+      symbol = this.getSymbolOfPipe(node);
+    } else if (node instanceof AST) {
+      symbol = this.getSymbolOfTemplateExpression(node);
+    } else {
+    }
+    this.symbolCache.set(node, symbol);
+    return symbol;
+  }
+  getSymbolOfAstTemplate(template) {
+    const directives = this.getDirectivesOfNode(template);
+    return { kind: SymbolKind.Template, directives, templateNode: template };
+  }
+  getSymbolOfElement(element) {
+    var _a;
+    const elementSourceSpan = (_a = element.startSourceSpan) != null ? _a : element.sourceSpan;
+    const node = findFirstMatchingNode(this.typeCheckBlock, {
+      withSpan: elementSourceSpan,
+      filter: ts44.isVariableDeclaration
+    });
+    if (node === null) {
+      return null;
+    }
+    const symbolFromDeclaration = this.getSymbolOfTsNode(node);
+    if (symbolFromDeclaration === null || symbolFromDeclaration.tsSymbol === null) {
+      return null;
+    }
+    const directives = this.getDirectivesOfNode(element);
+    return {
+      ...symbolFromDeclaration,
+      kind: SymbolKind.Element,
+      directives,
+      templateNode: element
+    };
+  }
+  getDirectivesOfNode(element) {
+    var _a;
+    const elementSourceSpan = (_a = element.startSourceSpan) != null ? _a : element.sourceSpan;
+    const tcbSourceFile = this.typeCheckBlock.getSourceFile();
+    const isDirectiveDeclaration = (node) => (ts44.isTypeNode(node) || ts44.isIdentifier(node)) && ts44.isVariableDeclaration(node.parent) && hasExpressionIdentifier(tcbSourceFile, node, ExpressionIdentifier.DIRECTIVE);
+    const nodes = findAllMatchingNodes(this.typeCheckBlock, {
+      withSpan: elementSourceSpan,
+      filter: isDirectiveDeclaration
+    });
+    const symbols = [];
+    for (const node of nodes) {
+      const symbol = this.getSymbolOfTsNode(node.parent);
+      if (symbol === null || !isSymbolWithValueDeclaration(symbol.tsSymbol) || !ts44.isClassDeclaration(symbol.tsSymbol.valueDeclaration)) {
+        continue;
+      }
+      const meta = this.getDirectiveMeta(element, symbol.tsSymbol.valueDeclaration);
+      if (meta !== null && meta.selector !== null) {
+        const ref = new Reference(symbol.tsSymbol.valueDeclaration);
+        if (meta.hostDirectives !== null) {
+          this.addHostDirectiveSymbols(element, meta.hostDirectives, symbols);
+        }
+        const directiveSymbol = {
+          ...symbol,
+          ref,
+          tsSymbol: symbol.tsSymbol,
+          selector: meta.selector,
+          isComponent: meta.isComponent,
+          ngModule: this.getDirectiveModule(symbol.tsSymbol.valueDeclaration),
+          kind: SymbolKind.Directive,
+          isStructural: meta.isStructural,
+          isInScope: true,
+          isHostDirective: false
+        };
+        symbols.push(directiveSymbol);
+      }
+    }
+    return symbols;
+  }
+  addHostDirectiveSymbols(host, hostDirectives, symbols) {
+    for (const current of hostDirectives) {
+      if (!isHostDirectiveMetaForGlobalMode(current)) {
+        throw new Error("Impossible state: typecheck code path in local compilation mode.");
+      }
+      if (!ts44.isClassDeclaration(current.directive.node)) {
+        continue;
+      }
+      const symbol = this.getSymbolOfTsNode(current.directive.node);
+      const meta = this.getDirectiveMeta(host, current.directive.node);
+      if (meta !== null && symbol !== null && isSymbolWithValueDeclaration(symbol.tsSymbol)) {
+        if (meta.hostDirectives !== null) {
+          this.addHostDirectiveSymbols(host, meta.hostDirectives, symbols);
+        }
+        const directiveSymbol = {
+          ...symbol,
+          isHostDirective: true,
+          ref: current.directive,
+          tsSymbol: symbol.tsSymbol,
+          exposedInputs: current.inputs,
+          exposedOutputs: current.outputs,
+          selector: meta.selector,
+          isComponent: meta.isComponent,
+          ngModule: this.getDirectiveModule(current.directive.node),
+          kind: SymbolKind.Directive,
+          isStructural: meta.isStructural,
+          isInScope: true
+        };
+        symbols.push(directiveSymbol);
+      }
+    }
+  }
+  getDirectiveMeta(host, directiveDeclaration) {
+    var _a;
+    let directives = this.templateData.boundTarget.getDirectivesOfNode(host);
+    const firstChild = host.children[0];
+    if (firstChild instanceof TmplAstElement3) {
+      const isMicrosyntaxTemplate = host instanceof TmplAstTemplate2 && sourceSpanEqual(firstChild.sourceSpan, host.sourceSpan);
+      if (isMicrosyntaxTemplate) {
+        const firstChildDirectives = this.templateData.boundTarget.getDirectivesOfNode(firstChild);
+        if (firstChildDirectives !== null && directives !== null) {
+          directives = directives.concat(firstChildDirectives);
+        } else {
+          directives = directives != null ? directives : firstChildDirectives;
+        }
+      }
+    }
+    if (directives === null) {
+      return null;
+    }
+    return (_a = directives.find((m) => m.ref.node === directiveDeclaration)) != null ? _a : null;
+  }
+  getDirectiveModule(declaration) {
+    const scope = this.componentScopeReader.getScopeForComponent(declaration);
+    if (scope === null || scope.kind !== ComponentScopeKind.NgModule) {
+      return null;
+    }
+    return scope.ngModule;
+  }
+  getSymbolOfBoundEvent(eventBinding) {
+    const consumer = this.templateData.boundTarget.getConsumerOfBinding(eventBinding);
+    if (consumer === null) {
+      return null;
+    }
+    let expectedAccess;
+    if (consumer instanceof TmplAstTemplate2 || consumer instanceof TmplAstElement3) {
+      expectedAccess = "addEventListener";
+    } else {
+      const bindingPropertyNames = consumer.outputs.getByBindingPropertyName(eventBinding.name);
+      if (bindingPropertyNames === null || bindingPropertyNames.length === 0) {
+        return null;
+      }
+      expectedAccess = bindingPropertyNames[0].classPropertyName;
+    }
+    function filter(n2) {
+      if (!isAccessExpression(n2)) {
+        return false;
+      }
+      if (ts44.isPropertyAccessExpression(n2)) {
+        return n2.name.getText() === expectedAccess;
+      } else {
+        return ts44.isStringLiteral(n2.argumentExpression) && n2.argumentExpression.text === expectedAccess;
+      }
+    }
+    const outputFieldAccesses = findAllMatchingNodes(this.typeCheckBlock, {
+      withSpan: eventBinding.keySpan,
+      filter
+    });
+    const bindings = [];
+    for (const outputFieldAccess of outputFieldAccesses) {
+      if (consumer instanceof TmplAstTemplate2 || consumer instanceof TmplAstElement3) {
+        if (!ts44.isPropertyAccessExpression(outputFieldAccess)) {
+          continue;
+        }
+        const addEventListener = outputFieldAccess.name;
+        const tsSymbol = this.getTypeChecker().getSymbolAtLocation(addEventListener);
+        const tsType = this.getTypeChecker().getTypeAtLocation(addEventListener);
+        const positionInFile = this.getTcbPositionForNode(addEventListener);
+        const target = this.getSymbol(consumer);
+        if (target === null || tsSymbol === void 0) {
+          continue;
+        }
+        bindings.push({
+          kind: SymbolKind.Binding,
+          tsSymbol,
+          tsType,
+          target,
+          tcbLocation: {
+            tcbPath: this.tcbPath,
+            isShimFile: this.tcbIsShim,
+            positionInFile
+          }
+        });
+      } else {
+        if (!ts44.isElementAccessExpression(outputFieldAccess)) {
+          continue;
+        }
+        const tsSymbol = this.getTypeChecker().getSymbolAtLocation(outputFieldAccess.argumentExpression);
+        if (tsSymbol === void 0) {
+          continue;
+        }
+        const target = this.getDirectiveSymbolForAccessExpression(outputFieldAccess, consumer);
+        if (target === null) {
+          continue;
+        }
+        const positionInFile = this.getTcbPositionForNode(outputFieldAccess);
+        const tsType = this.getTypeChecker().getTypeAtLocation(outputFieldAccess);
+        bindings.push({
+          kind: SymbolKind.Binding,
+          tsSymbol,
+          tsType,
+          target,
+          tcbLocation: {
+            tcbPath: this.tcbPath,
+            isShimFile: this.tcbIsShim,
+            positionInFile
+          }
+        });
+      }
+    }
+    if (bindings.length === 0) {
+      return null;
+    }
+    return { kind: SymbolKind.Output, bindings };
+  }
+  getSymbolOfInputBinding(binding) {
+    const consumer = this.templateData.boundTarget.getConsumerOfBinding(binding);
+    if (consumer === null) {
+      return null;
+    }
+    if (consumer instanceof TmplAstElement3 || consumer instanceof TmplAstTemplate2) {
+      const host = this.getSymbol(consumer);
+      return host !== null ? { kind: SymbolKind.DomBinding, host } : null;
+    }
+    const nodes = findAllMatchingNodes(this.typeCheckBlock, {
+      withSpan: binding.sourceSpan,
+      filter: isAssignment
+    });
+    const bindings = [];
+    for (const node of nodes) {
+      if (!isAccessExpression(node.left)) {
+        continue;
+      }
+      const signalInputAssignment = unwrapSignalInputWriteTAccessor(node.left);
+      let fieldAccessExpr;
+      let symbolInfo = null;
+      if (signalInputAssignment !== null) {
+        if (ts44.isIdentifier(signalInputAssignment.fieldExpr)) {
+          continue;
+        }
+        const fieldSymbol = this.getSymbolOfTsNode(signalInputAssignment.fieldExpr);
+        const typeSymbol = this.getSymbolOfTsNode(signalInputAssignment.typeExpr);
+        fieldAccessExpr = signalInputAssignment.fieldExpr;
+        symbolInfo = fieldSymbol === null || typeSymbol === null ? null : {
+          tcbLocation: fieldSymbol.tcbLocation,
+          tsSymbol: fieldSymbol.tsSymbol,
+          tsType: typeSymbol.tsType
+        };
+      } else {
+        fieldAccessExpr = node.left;
+        symbolInfo = this.getSymbolOfTsNode(node.left);
+      }
+      if (symbolInfo === null || symbolInfo.tsSymbol === null) {
+        continue;
+      }
+      const target = this.getDirectiveSymbolForAccessExpression(fieldAccessExpr, consumer);
+      if (target === null) {
+        continue;
+      }
+      bindings.push({
+        ...symbolInfo,
+        tsSymbol: symbolInfo.tsSymbol,
+        kind: SymbolKind.Binding,
+        target
+      });
+    }
+    if (bindings.length === 0) {
+      return null;
+    }
+    return { kind: SymbolKind.Input, bindings };
+  }
+  getDirectiveSymbolForAccessExpression(fieldAccessExpr, { isComponent, selector, isStructural }) {
+    var _a;
+    const tsSymbol = this.getTypeChecker().getSymbolAtLocation(fieldAccessExpr.expression);
+    if ((tsSymbol == null ? void 0 : tsSymbol.declarations) === void 0 || tsSymbol.declarations.length === 0 || selector === null) {
+      return null;
+    }
+    const [declaration] = tsSymbol.declarations;
+    if (!ts44.isVariableDeclaration(declaration) || !hasExpressionIdentifier(
+      declaration.getSourceFile(),
+      (_a = declaration.type) != null ? _a : declaration.name,
+      ExpressionIdentifier.DIRECTIVE
+    )) {
+      return null;
+    }
+    const symbol = this.getSymbolOfTsNode(declaration);
+    if (symbol === null || !isSymbolWithValueDeclaration(symbol.tsSymbol) || !ts44.isClassDeclaration(symbol.tsSymbol.valueDeclaration)) {
+      return null;
+    }
+    const ref = new Reference(symbol.tsSymbol.valueDeclaration);
+    const ngModule = this.getDirectiveModule(symbol.tsSymbol.valueDeclaration);
+    return {
+      ref,
+      kind: SymbolKind.Directive,
+      tsSymbol: symbol.tsSymbol,
+      tsType: symbol.tsType,
+      tcbLocation: symbol.tcbLocation,
+      isComponent,
+      isStructural,
+      selector,
+      ngModule,
+      isHostDirective: false,
+      isInScope: true
+    };
+  }
+  getSymbolOfVariable(variable) {
+    const node = findFirstMatchingNode(this.typeCheckBlock, {
+      withSpan: variable.sourceSpan,
+      filter: ts44.isVariableDeclaration
+    });
+    if (node === null) {
+      return null;
+    }
+    let nodeValueSymbol = null;
+    if (ts44.isForOfStatement(node.parent.parent)) {
+      nodeValueSymbol = this.getSymbolOfTsNode(node);
+    } else if (node.initializer !== void 0) {
+      nodeValueSymbol = this.getSymbolOfTsNode(node.initializer);
+    }
+    if (nodeValueSymbol === null) {
+      return null;
+    }
+    return {
+      tsType: nodeValueSymbol.tsType,
+      tsSymbol: nodeValueSymbol.tsSymbol,
+      initializerLocation: nodeValueSymbol.tcbLocation,
+      kind: SymbolKind.Variable,
+      declaration: variable,
+      localVarLocation: {
+        tcbPath: this.tcbPath,
+        isShimFile: this.tcbIsShim,
+        positionInFile: this.getTcbPositionForNode(node.name)
+      }
+    };
+  }
+  getSymbolOfReference(ref) {
+    const target = this.templateData.boundTarget.getReferenceTarget(ref);
+    let node = findFirstMatchingNode(this.typeCheckBlock, {
+      withSpan: ref.sourceSpan,
+      filter: ts44.isVariableDeclaration
+    });
+    if (node === null || target === null || node.initializer === void 0) {
+      return null;
+    }
+    const originalDeclaration = ts44.isParenthesizedExpression(node.initializer) && ts44.isAsExpression(node.initializer.expression) ? this.getTypeChecker().getSymbolAtLocation(node.name) : this.getTypeChecker().getSymbolAtLocation(node.initializer);
+    if (originalDeclaration === void 0 || originalDeclaration.valueDeclaration === void 0) {
+      return null;
+    }
+    const symbol = this.getSymbolOfTsNode(originalDeclaration.valueDeclaration);
+    if (symbol === null || symbol.tsSymbol === null) {
+      return null;
+    }
+    const referenceVarTcbLocation = {
+      tcbPath: this.tcbPath,
+      isShimFile: this.tcbIsShim,
+      positionInFile: this.getTcbPositionForNode(node)
+    };
+    if (target instanceof TmplAstTemplate2 || target instanceof TmplAstElement3) {
+      return {
+        kind: SymbolKind.Reference,
+        tsSymbol: symbol.tsSymbol,
+        tsType: symbol.tsType,
+        target,
+        declaration: ref,
+        targetLocation: symbol.tcbLocation,
+        referenceVarLocation: referenceVarTcbLocation
+      };
+    } else {
+      if (!ts44.isClassDeclaration(target.directive.ref.node)) {
+        return null;
+      }
+      return {
+        kind: SymbolKind.Reference,
+        tsSymbol: symbol.tsSymbol,
+        tsType: symbol.tsType,
+        declaration: ref,
+        target: target.directive.ref.node,
+        targetLocation: symbol.tcbLocation,
+        referenceVarLocation: referenceVarTcbLocation
+      };
+    }
+  }
+  getSymbolOfLetDeclaration(decl) {
+    const node = findFirstMatchingNode(this.typeCheckBlock, {
+      withSpan: decl.sourceSpan,
+      filter: ts44.isVariableDeclaration
+    });
+    if (node === null) {
+      return null;
+    }
+    const nodeValueSymbol = this.getSymbolOfTsNode(node.initializer);
+    if (nodeValueSymbol === null) {
+      return null;
+    }
+    return {
+      tsType: nodeValueSymbol.tsType,
+      tsSymbol: nodeValueSymbol.tsSymbol,
+      initializerLocation: nodeValueSymbol.tcbLocation,
+      kind: SymbolKind.LetDeclaration,
+      declaration: decl,
+      localVarLocation: {
+        tcbPath: this.tcbPath,
+        isShimFile: this.tcbIsShim,
+        positionInFile: this.getTcbPositionForNode(node.name)
+      }
+    };
+  }
+  getSymbolOfPipe(expression) {
+    const methodAccess = findFirstMatchingNode(this.typeCheckBlock, {
+      withSpan: expression.nameSpan,
+      filter: ts44.isPropertyAccessExpression
+    });
+    if (methodAccess === null) {
+      return null;
+    }
+    const pipeVariableNode = methodAccess.expression;
+    const pipeDeclaration = this.getTypeChecker().getSymbolAtLocation(pipeVariableNode);
+    if (pipeDeclaration === void 0 || pipeDeclaration.valueDeclaration === void 0) {
+      return null;
+    }
+    const pipeInstance = this.getSymbolOfTsNode(pipeDeclaration.valueDeclaration);
+    if (pipeInstance === null || !isSymbolWithValueDeclaration(pipeInstance.tsSymbol)) {
+      return null;
+    }
+    const symbolInfo = this.getSymbolOfTsNode(methodAccess);
+    if (symbolInfo === null) {
+      return null;
+    }
+    return {
+      kind: SymbolKind.Pipe,
+      ...symbolInfo,
+      classSymbol: {
+        ...pipeInstance,
+        tsSymbol: pipeInstance.tsSymbol
+      }
+    };
+  }
+  getSymbolOfTemplateExpression(expression) {
+    if (expression instanceof ASTWithSource2) {
+      expression = expression.ast;
+    }
+    const expressionTarget = this.templateData.boundTarget.getExpressionTarget(expression);
+    if (expressionTarget !== null) {
+      return this.getSymbol(expressionTarget);
+    }
+    let withSpan = expression.sourceSpan;
+    if (expression instanceof PropertyWrite3) {
+      withSpan = expression.nameSpan;
+    }
+    let node = null;
+    if (expression instanceof PropertyRead4) {
+      node = findFirstMatchingNode(this.typeCheckBlock, {
+        withSpan,
+        filter: ts44.isPropertyAccessExpression
+      });
+    }
+    if (node === null) {
+      node = findFirstMatchingNode(this.typeCheckBlock, { withSpan, filter: anyNodeFilter });
+    }
+    if (node === null) {
+      return null;
+    }
+    while (ts44.isParenthesizedExpression(node)) {
+      node = node.expression;
+    }
+    if (expression instanceof SafePropertyRead4 && ts44.isConditionalExpression(node)) {
+      const whenTrueSymbol = this.getSymbolOfTsNode(node.whenTrue);
+      if (whenTrueSymbol === null) {
+        return null;
+      }
+      return {
+        ...whenTrueSymbol,
+        kind: SymbolKind.Expression,
+        tsType: this.getTypeChecker().getTypeAtLocation(node)
+      };
+    } else {
+      const symbolInfo = this.getSymbolOfTsNode(node);
+      return symbolInfo === null ? null : { ...symbolInfo, kind: SymbolKind.Expression };
+    }
+  }
+  getSymbolOfTsNode(node) {
+    var _a;
+    while (ts44.isParenthesizedExpression(node)) {
+      node = node.expression;
+    }
+    let tsSymbol;
+    if (ts44.isPropertyAccessExpression(node)) {
+      tsSymbol = this.getTypeChecker().getSymbolAtLocation(node.name);
+    } else {
+      tsSymbol = this.getTypeChecker().getSymbolAtLocation(node);
+    }
+    const positionInFile = this.getTcbPositionForNode(node);
+    const type = this.getTypeChecker().getTypeAtLocation(node);
+    return {
+      tsSymbol: (_a = tsSymbol != null ? tsSymbol : type.symbol) != null ? _a : null,
+      tsType: type,
+      tcbLocation: {
+        tcbPath: this.tcbPath,
+        isShimFile: this.tcbIsShim,
+        positionInFile
+      }
+    };
+  }
+  getTcbPositionForNode(node) {
+    if (ts44.isTypeReferenceNode(node)) {
+      return this.getTcbPositionForNode(node.typeName);
+    } else if (ts44.isQualifiedName(node)) {
+      return node.right.getStart();
+    } else if (ts44.isPropertyAccessExpression(node)) {
+      return node.name.getStart();
+    } else if (ts44.isElementAccessExpression(node)) {
+      return node.argumentExpression.getStart();
+    } else {
+      return node.getStart();
+    }
+  }
+};
+function anyNodeFilter(n2) {
+  return true;
+}
+function sourceSpanEqual(a, b) {
+  return a.start.offset === b.start.offset && a.end.offset === b.end.offset;
+}
+function unwrapSignalInputWriteTAccessor(expr) {
+  if (!ts44.isElementAccessExpression(expr) || !ts44.isPropertyAccessExpression(expr.argumentExpression)) {
+    return null;
+  }
+  if (!ts44.isIdentifier(expr.argumentExpression.name) || expr.argumentExpression.name.text !== R3Identifiers5.InputSignalBrandWriteType.name) {
+    return null;
+  }
+  if (!ts44.isPropertyAccessExpression(expr.expression) && !ts44.isElementAccessExpression(expr.expression) && !ts44.isIdentifier(expr.expression)) {
+    throw new Error("Unexpected expression for signal input write type.");
+  }
+  return {
+    fieldExpr: expr.expression,
+    typeExpr: expr
+  };
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
+var REGISTRY2 = new DomElementSchemaRegistry2();
+var TemplateTypeCheckerImpl = class {
+  constructor(originalProgram, programDriver, typeCheckAdapter, config, refEmitter, reflector, compilerHost, priorBuild, metaReader, localMetaReader, ngModuleIndex, componentScopeReader, typeCheckScopeRegistry, perf) {
+    this.originalProgram = originalProgram;
+    this.programDriver = programDriver;
+    this.typeCheckAdapter = typeCheckAdapter;
+    this.config = config;
+    this.refEmitter = refEmitter;
+    this.reflector = reflector;
+    this.compilerHost = compilerHost;
+    this.priorBuild = priorBuild;
+    this.metaReader = metaReader;
+    this.localMetaReader = localMetaReader;
+    this.ngModuleIndex = ngModuleIndex;
+    this.componentScopeReader = componentScopeReader;
+    this.typeCheckScopeRegistry = typeCheckScopeRegistry;
+    this.perf = perf;
+    this.state = /* @__PURE__ */ new Map();
+    this.completionCache = /* @__PURE__ */ new Map();
+    this.symbolBuilderCache = /* @__PURE__ */ new Map();
+    this.scopeCache = /* @__PURE__ */ new Map();
+    this.elementTagCache = /* @__PURE__ */ new Map();
+    this.isComplete = false;
+  }
+  getTemplate(component) {
+    const { data } = this.getLatestComponentState(component);
+    if (data === null) {
+      return null;
+    }
+    return data.template;
+  }
+  getUsedDirectives(component) {
+    var _a;
+    return ((_a = this.getLatestComponentState(component).data) == null ? void 0 : _a.boundTarget.getUsedDirectives()) || null;
+  }
+  getUsedPipes(component) {
+    var _a;
+    return ((_a = this.getLatestComponentState(component).data) == null ? void 0 : _a.boundTarget.getUsedPipes()) || null;
+  }
+  getLatestComponentState(component) {
+    this.ensureShimForComponent(component);
+    const sf = component.getSourceFile();
+    const sfPath = absoluteFromSourceFile(sf);
+    const shimPath = TypeCheckShimGenerator.shimFor(sfPath);
+    const fileRecord = this.getFileData(sfPath);
+    if (!fileRecord.shimData.has(shimPath)) {
+      return { data: null, tcb: null, tcbPath: shimPath, tcbIsShim: true };
+    }
+    const templateId = fileRecord.sourceManager.getTemplateId(component);
+    const shimRecord = fileRecord.shimData.get(shimPath);
+    const id = fileRecord.sourceManager.getTemplateId(component);
+    const program = this.programDriver.getProgram();
+    const shimSf = getSourceFileOrNull(program, shimPath);
+    if (shimSf === null || !fileRecord.shimData.has(shimPath)) {
+      throw new Error(`Error: no shim file in program: ${shimPath}`);
+    }
+    let tcb = findTypeCheckBlock(shimSf, id, false);
+    let tcbPath = shimPath;
+    if (tcb === null) {
+      const inlineSf = getSourceFileOrError(program, sfPath);
+      tcb = findTypeCheckBlock(inlineSf, id, false);
+      if (tcb !== null) {
+        tcbPath = sfPath;
+      }
+    }
+    let data = null;
+    if (shimRecord.templates.has(templateId)) {
+      data = shimRecord.templates.get(templateId);
+    }
+    return { data, tcb, tcbPath, tcbIsShim: tcbPath === shimPath };
+  }
+  isTrackedTypeCheckFile(filePath) {
+    return this.getFileAndShimRecordsForPath(filePath) !== null;
+  }
+  getFileRecordForTcbLocation({ tcbPath, isShimFile }) {
+    if (!isShimFile) {
+      if (this.state.has(tcbPath)) {
+        return this.state.get(tcbPath);
+      } else {
+        return null;
+      }
+    }
+    const records = this.getFileAndShimRecordsForPath(tcbPath);
+    if (records !== null) {
+      return records.fileRecord;
+    } else {
+      return null;
+    }
+  }
+  getFileAndShimRecordsForPath(shimPath) {
+    for (const fileRecord of this.state.values()) {
+      if (fileRecord.shimData.has(shimPath)) {
+        return { fileRecord, shimRecord: fileRecord.shimData.get(shimPath) };
+      }
+    }
+    return null;
+  }
+  getTemplateMappingAtTcbLocation(tcbLocation) {
+    const fileRecord = this.getFileRecordForTcbLocation(tcbLocation);
+    if (fileRecord === null) {
+      return null;
+    }
+    const shimSf = this.programDriver.getProgram().getSourceFile(tcbLocation.tcbPath);
+    if (shimSf === void 0) {
+      return null;
+    }
+    return getTemplateMapping(
+      shimSf,
+      tcbLocation.positionInFile,
+      fileRecord.sourceManager,
+      false
+    );
+  }
+  generateAllTypeCheckBlocks() {
+    this.ensureAllShimsForAllFiles();
+  }
+  getDiagnosticsForFile(sf, optimizeFor) {
+    switch (optimizeFor) {
+      case OptimizeFor.WholeProgram:
+        this.ensureAllShimsForAllFiles();
+        break;
+      case OptimizeFor.SingleFile:
+        this.ensureAllShimsForOneFile(sf);
+        break;
+    }
+    return this.perf.inPhase(PerfPhase.TtcDiagnostics, () => {
+      const sfPath = absoluteFromSourceFile(sf);
+      const fileRecord = this.state.get(sfPath);
+      const typeCheckProgram = this.programDriver.getProgram();
+      const diagnostics = [];
+      if (fileRecord.hasInlines) {
+        const inlineSf = getSourceFileOrError(typeCheckProgram, sfPath);
+        diagnostics.push(...typeCheckProgram.getSemanticDiagnostics(inlineSf).map((diag) => convertDiagnostic(diag, fileRecord.sourceManager)));
+      }
+      for (const [shimPath, shimRecord] of fileRecord.shimData) {
+        const shimSf = getSourceFileOrError(typeCheckProgram, shimPath);
+        diagnostics.push(...typeCheckProgram.getSemanticDiagnostics(shimSf).map((diag) => convertDiagnostic(diag, fileRecord.sourceManager)));
+        diagnostics.push(...shimRecord.genesisDiagnostics);
+        for (const templateData of shimRecord.templates.values()) {
+          diagnostics.push(...templateData.templateDiagnostics);
+        }
+      }
+      return diagnostics.filter((diag) => diag !== null);
+    });
+  }
+  getDiagnosticsForComponent(component) {
+    this.ensureShimForComponent(component);
+    return this.perf.inPhase(PerfPhase.TtcDiagnostics, () => {
+      const sf = component.getSourceFile();
+      const sfPath = absoluteFromSourceFile(sf);
+      const shimPath = TypeCheckShimGenerator.shimFor(sfPath);
+      const fileRecord = this.getFileData(sfPath);
+      if (!fileRecord.shimData.has(shimPath)) {
+        return [];
+      }
+      const templateId = fileRecord.sourceManager.getTemplateId(component);
+      const shimRecord = fileRecord.shimData.get(shimPath);
+      const typeCheckProgram = this.programDriver.getProgram();
+      const diagnostics = [];
+      if (shimRecord.hasInlines) {
+        const inlineSf = getSourceFileOrError(typeCheckProgram, sfPath);
+        diagnostics.push(...typeCheckProgram.getSemanticDiagnostics(inlineSf).map((diag) => convertDiagnostic(diag, fileRecord.sourceManager)));
+      }
+      const shimSf = getSourceFileOrError(typeCheckProgram, shimPath);
+      diagnostics.push(...typeCheckProgram.getSemanticDiagnostics(shimSf).map((diag) => convertDiagnostic(diag, fileRecord.sourceManager)));
+      diagnostics.push(...shimRecord.genesisDiagnostics);
+      for (const templateData of shimRecord.templates.values()) {
+        diagnostics.push(...templateData.templateDiagnostics);
+      }
+      return diagnostics.filter((diag) => diag !== null && diag.templateId === templateId);
+    });
+  }
+  getTypeCheckBlock(component) {
+    return this.getLatestComponentState(component).tcb;
+  }
+  getGlobalCompletions(context, component, node) {
+    const engine = this.getOrCreateCompletionEngine(component);
+    if (engine === null) {
+      return null;
+    }
+    return this.perf.inPhase(PerfPhase.TtcAutocompletion, () => engine.getGlobalCompletions(context, node));
+  }
+  getExpressionCompletionLocation(ast, component) {
+    const engine = this.getOrCreateCompletionEngine(component);
+    if (engine === null) {
+      return null;
+    }
+    return this.perf.inPhase(PerfPhase.TtcAutocompletion, () => engine.getExpressionCompletionLocation(ast));
+  }
+  getLiteralCompletionLocation(node, component) {
+    const engine = this.getOrCreateCompletionEngine(component);
+    if (engine === null) {
+      return null;
+    }
+    return this.perf.inPhase(PerfPhase.TtcAutocompletion, () => engine.getLiteralCompletionLocation(node));
+  }
+  invalidateClass(clazz) {
+    this.completionCache.delete(clazz);
+    this.symbolBuilderCache.delete(clazz);
+    this.scopeCache.delete(clazz);
+    this.elementTagCache.delete(clazz);
+    const sf = clazz.getSourceFile();
+    const sfPath = absoluteFromSourceFile(sf);
+    const shimPath = TypeCheckShimGenerator.shimFor(sfPath);
+    const fileData = this.getFileData(sfPath);
+    const templateId = fileData.sourceManager.getTemplateId(clazz);
+    fileData.shimData.delete(shimPath);
+    fileData.isComplete = false;
+    this.isComplete = false;
+  }
+  getExpressionTarget(expression, clazz) {
+    var _a;
+    return ((_a = this.getLatestComponentState(clazz).data) == null ? void 0 : _a.boundTarget.getExpressionTarget(expression)) || null;
+  }
+  makeTemplateDiagnostic(clazz, sourceSpan, category, errorCode, message, relatedInformation) {
+    const sfPath = absoluteFromSourceFile(clazz.getSourceFile());
+    const fileRecord = this.state.get(sfPath);
+    const templateId = fileRecord.sourceManager.getTemplateId(clazz);
+    const mapping = fileRecord.sourceManager.getSourceMapping(templateId);
+    return {
+      ...makeTemplateDiagnostic(templateId, mapping, sourceSpan, category, ngErrorCode(errorCode), message, relatedInformation),
+      __ngCode: errorCode
+    };
+  }
+  getOrCreateCompletionEngine(component) {
+    if (this.completionCache.has(component)) {
+      return this.completionCache.get(component);
+    }
+    const { tcb, data, tcbPath, tcbIsShim } = this.getLatestComponentState(component);
+    if (tcb === null || data === null) {
+      return null;
+    }
+    const engine = new CompletionEngine(tcb, data, tcbPath, tcbIsShim);
+    this.completionCache.set(component, engine);
+    return engine;
+  }
+  maybeAdoptPriorResultsForFile(sf) {
+    const sfPath = absoluteFromSourceFile(sf);
+    if (this.state.has(sfPath)) {
+      const existingResults = this.state.get(sfPath);
+      if (existingResults.isComplete) {
+        return;
+      }
+    }
+    const previousResults = this.priorBuild.priorTypeCheckingResultsFor(sf);
+    if (previousResults === null || !previousResults.isComplete) {
+      return;
+    }
+    this.perf.eventCount(PerfEvent.ReuseTypeCheckFile);
+    this.state.set(sfPath, previousResults);
+  }
+  ensureAllShimsForAllFiles() {
+    if (this.isComplete) {
+      return;
+    }
+    this.perf.inPhase(PerfPhase.TcbGeneration, () => {
+      const host = new WholeProgramTypeCheckingHost(this);
+      const ctx = this.newContext(host);
+      for (const sf of this.originalProgram.getSourceFiles()) {
+        if (sf.isDeclarationFile || isShim(sf)) {
+          continue;
+        }
+        this.maybeAdoptPriorResultsForFile(sf);
+        const sfPath = absoluteFromSourceFile(sf);
+        const fileData = this.getFileData(sfPath);
+        if (fileData.isComplete) {
+          continue;
+        }
+        this.typeCheckAdapter.typeCheck(sf, ctx);
+        fileData.isComplete = true;
+      }
+      this.updateFromContext(ctx);
+      this.isComplete = true;
+    });
+  }
+  ensureAllShimsForOneFile(sf) {
+    this.perf.inPhase(PerfPhase.TcbGeneration, () => {
+      this.maybeAdoptPriorResultsForFile(sf);
+      const sfPath = absoluteFromSourceFile(sf);
+      const fileData = this.getFileData(sfPath);
+      if (fileData.isComplete) {
+        return;
+      }
+      const host = new SingleFileTypeCheckingHost(sfPath, fileData, this);
+      const ctx = this.newContext(host);
+      this.typeCheckAdapter.typeCheck(sf, ctx);
+      fileData.isComplete = true;
+      this.updateFromContext(ctx);
+    });
+  }
+  ensureShimForComponent(component) {
+    const sf = component.getSourceFile();
+    const sfPath = absoluteFromSourceFile(sf);
+    const shimPath = TypeCheckShimGenerator.shimFor(sfPath);
+    this.maybeAdoptPriorResultsForFile(sf);
+    const fileData = this.getFileData(sfPath);
+    if (fileData.shimData.has(shimPath)) {
+      return;
+    }
+    const host = new SingleShimTypeCheckingHost(sfPath, fileData, this, shimPath);
+    const ctx = this.newContext(host);
+    this.typeCheckAdapter.typeCheck(sf, ctx);
+    this.updateFromContext(ctx);
+  }
+  newContext(host) {
+    const inlining = this.programDriver.supportsInlineOperations ? InliningMode.InlineOps : InliningMode.Error;
+    return new TypeCheckContextImpl(this.config, this.compilerHost, this.refEmitter, this.reflector, host, inlining, this.perf);
+  }
+  clearAllShimDataUsingInlines() {
+    for (const fileData of this.state.values()) {
+      if (!fileData.hasInlines) {
+        continue;
+      }
+      for (const [shimFile, shimData] of fileData.shimData.entries()) {
+        if (shimData.hasInlines) {
+          fileData.shimData.delete(shimFile);
+        }
+      }
+      fileData.hasInlines = false;
+      fileData.isComplete = false;
+      this.isComplete = false;
+    }
+  }
+  updateFromContext(ctx) {
+    const updates = ctx.finalize();
+    return this.perf.inPhase(PerfPhase.TcbUpdateProgram, () => {
+      if (updates.size > 0) {
+        this.perf.eventCount(PerfEvent.UpdateTypeCheckProgram);
+      }
+      this.programDriver.updateFiles(updates, UpdateMode.Incremental);
+      this.priorBuild.recordSuccessfulTypeCheck(this.state);
+      this.perf.memory(PerfCheckpoint.TtcUpdateProgram);
+    });
+  }
+  getFileData(path2) {
+    if (!this.state.has(path2)) {
+      this.state.set(path2, {
+        hasInlines: false,
+        sourceManager: new TemplateSourceManager(),
+        isComplete: false,
+        shimData: /* @__PURE__ */ new Map()
+      });
+    }
+    return this.state.get(path2);
+  }
+  getSymbolOfNode(node, component) {
+    const builder = this.getOrCreateSymbolBuilder(component);
+    if (builder === null) {
+      return null;
+    }
+    return this.perf.inPhase(PerfPhase.TtcSymbol, () => builder.getSymbol(node));
+  }
+  getOrCreateSymbolBuilder(component) {
+    if (this.symbolBuilderCache.has(component)) {
+      return this.symbolBuilderCache.get(component);
+    }
+    const { tcb, data, tcbPath, tcbIsShim } = this.getLatestComponentState(component);
+    if (tcb === null || data === null) {
+      return null;
+    }
+    const builder = new SymbolBuilder(tcbPath, tcbIsShim, tcb, data, this.componentScopeReader, () => this.programDriver.getProgram().getTypeChecker());
+    this.symbolBuilderCache.set(component, builder);
+    return builder;
+  }
+  getPotentialTemplateDirectives(component) {
+    var _a, _b;
+    const typeChecker = this.programDriver.getProgram().getTypeChecker();
+    const inScopeDirectives = (_b = (_a = this.getScopeData(component)) == null ? void 0 : _a.directives) != null ? _b : [];
+    const resultingDirectives = /* @__PURE__ */ new Map();
+    for (const d of inScopeDirectives) {
+      resultingDirectives.set(d.ref.node, d);
+    }
+    for (const directiveClass of this.localMetaReader.getKnown(MetaKind.Directive)) {
+      const directiveMeta = this.metaReader.getDirectiveMetadata(new Reference(directiveClass));
+      if (directiveMeta === null)
+        continue;
+      if (resultingDirectives.has(directiveClass))
+        continue;
+      const withScope = this.scopeDataOfDirectiveMeta(typeChecker, directiveMeta);
+      if (withScope === null)
+        continue;
+      resultingDirectives.set(directiveClass, { ...withScope, isInScope: false });
+    }
+    return Array.from(resultingDirectives.values());
+  }
+  getPotentialPipes(component) {
+    var _a, _b;
+    const typeChecker = this.programDriver.getProgram().getTypeChecker();
+    const inScopePipes = (_b = (_a = this.getScopeData(component)) == null ? void 0 : _a.pipes) != null ? _b : [];
+    const resultingPipes = /* @__PURE__ */ new Map();
+    for (const p of inScopePipes) {
+      resultingPipes.set(p.ref.node, p);
+    }
+    for (const pipeClass of this.localMetaReader.getKnown(MetaKind.Pipe)) {
+      const pipeMeta = this.metaReader.getPipeMetadata(new Reference(pipeClass));
+      if (pipeMeta === null)
+        continue;
+      if (resultingPipes.has(pipeClass))
+        continue;
+      const withScope = this.scopeDataOfPipeMeta(typeChecker, pipeMeta);
+      if (withScope === null)
+        continue;
+      resultingPipes.set(pipeClass, { ...withScope, isInScope: false });
+    }
+    return Array.from(resultingPipes.values());
+  }
+  getDirectiveMetadata(dir) {
+    if (!isNamedClassDeclaration(dir)) {
+      return null;
+    }
+    return this.typeCheckScopeRegistry.getTypeCheckDirectiveMetadata(new Reference(dir));
+  }
+  getNgModuleMetadata(module) {
+    if (!isNamedClassDeclaration(module)) {
+      return null;
+    }
+    return this.metaReader.getNgModuleMetadata(new Reference(module));
+  }
+  getPipeMetadata(pipe) {
+    if (!isNamedClassDeclaration(pipe)) {
+      return null;
+    }
+    return this.metaReader.getPipeMetadata(new Reference(pipe));
+  }
+  getPotentialElementTags(component) {
+    if (this.elementTagCache.has(component)) {
+      return this.elementTagCache.get(component);
+    }
+    const tagMap = /* @__PURE__ */ new Map();
+    for (const tag of REGISTRY2.allKnownElementNames()) {
+      tagMap.set(tag, null);
+    }
+    const scope = this.getScopeData(component);
+    if (scope !== null) {
+      for (const directive of scope.directives) {
+        if (directive.selector === null) {
+          continue;
+        }
+        for (const selector of CssSelector3.parse(directive.selector)) {
+          if (selector.element === null || tagMap.has(selector.element)) {
+            continue;
+          }
+          tagMap.set(selector.element, directive);
+        }
+      }
+    }
+    this.elementTagCache.set(component, tagMap);
+    return tagMap;
+  }
+  getPotentialDomBindings(tagName) {
+    const attributes = REGISTRY2.allKnownAttributesOfElement(tagName);
+    return attributes.map((attribute) => ({
+      attribute,
+      property: REGISTRY2.getMappedPropName(attribute)
+    }));
+  }
+  getPotentialDomEvents(tagName) {
+    return REGISTRY2.allKnownEventsOfElement(tagName);
+  }
+  getPrimaryAngularDecorator(target) {
+    this.ensureAllShimsForOneFile(target.getSourceFile());
+    if (!isNamedClassDeclaration(target)) {
+      return null;
+    }
+    const ref = new Reference(target);
+    const dirMeta = this.metaReader.getDirectiveMetadata(ref);
+    if (dirMeta !== null) {
+      return dirMeta.decorator;
+    }
+    const pipeMeta = this.metaReader.getPipeMetadata(ref);
+    if (pipeMeta !== null) {
+      return pipeMeta.decorator;
+    }
+    const ngModuleMeta = this.metaReader.getNgModuleMetadata(ref);
+    if (ngModuleMeta !== null) {
+      return ngModuleMeta.decorator;
+    }
+    return null;
+  }
+  getOwningNgModule(component) {
+    if (!isNamedClassDeclaration(component)) {
+      return null;
+    }
+    const dirMeta = this.metaReader.getDirectiveMetadata(new Reference(component));
+    if (dirMeta !== null && dirMeta.isStandalone) {
+      return null;
+    }
+    const scope = this.componentScopeReader.getScopeForComponent(component);
+    if (scope === null || scope.kind !== ComponentScopeKind.NgModule || !isNamedClassDeclaration(scope.ngModule)) {
+      return null;
+    }
+    return scope.ngModule;
+  }
+  emit(kind, refTo, inContext) {
+    var _a, _b;
+    const emittedRef = this.refEmitter.emit(refTo, inContext.getSourceFile());
+    if (emittedRef.kind === 1) {
+      return null;
+    }
+    const emitted = emittedRef.expression;
+    if (emitted instanceof WrappedNodeExpr9) {
+      if (refTo.node === inContext) {
+        return null;
+      }
+      let isForwardReference = false;
+      if (emitted.node.getStart() > inContext.getStart()) {
+        const declaration = (_b = (_a = this.programDriver.getProgram().getTypeChecker().getTypeAtLocation(emitted.node).getSymbol()) == null ? void 0 : _a.declarations) == null ? void 0 : _b[0];
+        if (declaration && declaration.getSourceFile() === inContext.getSourceFile()) {
+          isForwardReference = true;
+        }
+      }
+      return { kind, symbolName: emitted.node.text, isForwardReference };
+    } else if (emitted instanceof ExternalExpr7 && emitted.value.moduleName !== null && emitted.value.name !== null) {
+      return {
+        kind,
+        moduleSpecifier: emitted.value.moduleName,
+        symbolName: emitted.value.name,
+        isForwardReference: false
+      };
+    }
+    return null;
+  }
+  getPotentialImportsFor(toImport, inContext, importMode) {
+    var _a;
+    const imports = [];
+    const meta = (_a = this.metaReader.getDirectiveMetadata(toImport)) != null ? _a : this.metaReader.getPipeMetadata(toImport);
+    if (meta === null) {
+      return imports;
+    }
+    if (meta.isStandalone || importMode === PotentialImportMode.ForceDirect) {
+      const emitted = this.emit(PotentialImportKind.Standalone, toImport, inContext);
+      if (emitted !== null) {
+        imports.push(emitted);
+      }
+    }
+    const exportingNgModules = this.ngModuleIndex.getNgModulesExporting(meta.ref.node);
+    if (exportingNgModules !== null) {
+      for (const exporter of exportingNgModules) {
+        const emittedRef = this.emit(PotentialImportKind.NgModule, exporter, inContext);
+        if (emittedRef !== null) {
+          imports.push(emittedRef);
+        }
+      }
+    }
+    return imports;
+  }
+  getScopeData(component) {
+    if (this.scopeCache.has(component)) {
+      return this.scopeCache.get(component);
+    }
+    if (!isNamedClassDeclaration(component)) {
+      throw new Error(`AssertionError: components must have names`);
+    }
+    const scope = this.componentScopeReader.getScopeForComponent(component);
+    if (scope === null) {
+      return null;
+    }
+    const dependencies = scope.kind === ComponentScopeKind.NgModule ? scope.compilation.dependencies : scope.dependencies;
+    const data = {
+      directives: [],
+      pipes: [],
+      isPoisoned: scope.kind === ComponentScopeKind.NgModule ? scope.compilation.isPoisoned : scope.isPoisoned
+    };
+    const typeChecker = this.programDriver.getProgram().getTypeChecker();
+    for (const dep of dependencies) {
+      if (dep.kind === MetaKind.Directive) {
+        const dirScope = this.scopeDataOfDirectiveMeta(typeChecker, dep);
+        if (dirScope === null)
+          continue;
+        data.directives.push({ ...dirScope, isInScope: true });
+      } else if (dep.kind === MetaKind.Pipe) {
+        const pipeScope = this.scopeDataOfPipeMeta(typeChecker, dep);
+        if (pipeScope === null)
+          continue;
+        data.pipes.push({ ...pipeScope, isInScope: true });
+      }
+    }
+    this.scopeCache.set(component, data);
+    return data;
+  }
+  scopeDataOfDirectiveMeta(typeChecker, dep) {
+    if (dep.selector === null) {
+      return null;
+    }
+    const tsSymbol = typeChecker.getSymbolAtLocation(dep.ref.node.name);
+    if (!isSymbolWithValueDeclaration(tsSymbol)) {
+      return null;
+    }
+    let ngModule = null;
+    const moduleScopeOfDir = this.componentScopeReader.getScopeForComponent(dep.ref.node);
+    if (moduleScopeOfDir !== null && moduleScopeOfDir.kind === ComponentScopeKind.NgModule) {
+      ngModule = moduleScopeOfDir.ngModule;
+    }
+    return {
+      ref: dep.ref,
+      isComponent: dep.isComponent,
+      isStructural: dep.isStructural,
+      selector: dep.selector,
+      tsSymbol,
+      ngModule
+    };
+  }
+  scopeDataOfPipeMeta(typeChecker, dep) {
+    const tsSymbol = typeChecker.getSymbolAtLocation(dep.ref.node.name);
+    if (tsSymbol === void 0) {
+      return null;
+    }
+    return {
+      ref: dep.ref,
+      name: dep.name,
+      tsSymbol
+    };
+  }
+};
+function convertDiagnostic(diag, sourceResolver) {
+  if (!shouldReportDiagnostic(diag)) {
+    return null;
+  }
+  return translateDiagnostic(diag, sourceResolver);
+}
+var WholeProgramTypeCheckingHost = class {
+  constructor(impl) {
+    this.impl = impl;
+  }
+  getSourceManager(sfPath) {
+    return this.impl.getFileData(sfPath).sourceManager;
+  }
+  shouldCheckComponent(node) {
+    const sfPath = absoluteFromSourceFile(node.getSourceFile());
+    const shimPath = TypeCheckShimGenerator.shimFor(sfPath);
+    const fileData = this.impl.getFileData(sfPath);
+    return !fileData.shimData.has(shimPath);
+  }
+  recordShimData(sfPath, data) {
+    const fileData = this.impl.getFileData(sfPath);
+    fileData.shimData.set(data.path, data);
+    if (data.hasInlines) {
+      fileData.hasInlines = true;
+    }
+  }
+  recordComplete(sfPath) {
+    this.impl.getFileData(sfPath).isComplete = true;
+  }
+};
+var SingleFileTypeCheckingHost = class {
+  constructor(sfPath, fileData, impl) {
+    this.sfPath = sfPath;
+    this.fileData = fileData;
+    this.impl = impl;
+    this.seenInlines = false;
+  }
+  assertPath(sfPath) {
+    if (this.sfPath !== sfPath) {
+      throw new Error(`AssertionError: querying TypeCheckingHost outside of assigned file`);
+    }
+  }
+  getSourceManager(sfPath) {
+    this.assertPath(sfPath);
+    return this.fileData.sourceManager;
+  }
+  shouldCheckComponent(node) {
+    if (this.sfPath !== absoluteFromSourceFile(node.getSourceFile())) {
+      return false;
+    }
+    const shimPath = TypeCheckShimGenerator.shimFor(this.sfPath);
+    return !this.fileData.shimData.has(shimPath);
+  }
+  recordShimData(sfPath, data) {
+    this.assertPath(sfPath);
+    if (data.hasInlines && !this.seenInlines) {
+      this.impl.clearAllShimDataUsingInlines();
+      this.seenInlines = true;
+    }
+    this.fileData.shimData.set(data.path, data);
+    if (data.hasInlines) {
+      this.fileData.hasInlines = true;
+    }
+  }
+  recordComplete(sfPath) {
+    this.assertPath(sfPath);
+    this.fileData.isComplete = true;
+  }
+};
+var SingleShimTypeCheckingHost = class extends SingleFileTypeCheckingHost {
+  constructor(sfPath, fileData, impl, shimPath) {
+    super(sfPath, fileData, impl);
+    this.shimPath = shimPath;
+  }
+  shouldCheckNode(node) {
+    if (this.sfPath !== absoluteFromSourceFile(node.getSourceFile())) {
+      return false;
+    }
+    const shimPath = TypeCheckShimGenerator.shimFor(this.sfPath);
+    if (shimPath !== this.shimPath) {
+      return false;
+    }
+    return !this.fileData.shimData.has(shimPath);
+  }
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, localCompilationExtraImportsTracker) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, localCompilationExtraImportsTracker) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -7029,9 +13269,10 @@ var ComponentDecoratorHandler = class {
     this.deferredSymbolTracker = deferredSymbolTracker;
     this.forbidOrphanRendering = forbidOrphanRendering;
     this.enableBlockSyntax = enableBlockSyntax;
+    this.enableLetSyntax = enableLetSyntax;
     this.localCompilationExtraImportsTracker = localCompilationExtraImportsTracker;
     this.literalCache = /* @__PURE__ */ new Map();
-    this.elementSchemaRegistry = new DomElementSchemaRegistry();
+    this.elementSchemaRegistry = new DomElementSchemaRegistry3();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
     this.preanalyzeStylesCache = /* @__PURE__ */ new Map();
     this.precedence = HandlerPrecedence.PRIMARY;
@@ -7040,7 +13281,8 @@ var ComponentDecoratorHandler = class {
       enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
       i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
       usePoisonedData: this.usePoisonedData,
-      enableBlockSyntax: this.enableBlockSyntax
+      enableBlockSyntax: this.enableBlockSyntax,
+      enableLetSyntax: this.enableLetSyntax
     };
   }
   detect(node, decorators) {
@@ -7211,8 +13453,19 @@ var ComponentDecoratorHandler = class {
         enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
         i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
         usePoisonedData: this.usePoisonedData,
-        enableBlockSyntax: this.enableBlockSyntax
+        enableBlockSyntax: this.enableBlockSyntax,
+        enableLetSyntax: this.enableLetSyntax
       }, this.compilationMode);
+      if (this.compilationMode === CompilationMode.LOCAL && template.errors && template.errors.length > 0) {
+        if (diagnostics === void 0) {
+          diagnostics = [];
+        }
+        diagnostics.push(...getTemplateDiagnostics(
+          template.errors,
+          "",
+          template.sourceMapping
+        ));
+      }
     }
     const templateResource = template.declaration.isInline ? { path: null, expression: component.get("template") } : {
       path: absoluteFrom(template.declaration.resolvedTemplateUrl),
@@ -7384,7 +13637,7 @@ var ComponentDecoratorHandler = class {
     }
     const scope = this.scopeReader.getScopeForComponent(node);
     const selector = analysis.meta.selector;
-    const matcher = new SelectorMatcher2();
+    const matcher = new SelectorMatcher3();
     if (scope !== null) {
       let { dependencies, isPoisoned } = scope.kind === ComponentScopeKind.NgModule ? scope.compilation : scope;
       if ((isPoisoned || scope.kind === ComponentScopeKind.NgModule && scope.exported.isPoisoned) && !this.usePoisonedData) {
@@ -7392,7 +13645,7 @@ var ComponentDecoratorHandler = class {
       }
       for (const dep of dependencies) {
         if (dep.kind === MetaKind.Directive && dep.selector !== null) {
-          matcher.addSelectables(CssSelector2.parse(dep.selector), [
+          matcher.addSelectables(CssSelector4.parse(dep.selector), [
             ...this.hostDirectivesResolver.resolve(dep),
             dep
           ]);
@@ -7414,7 +13667,7 @@ var ComponentDecoratorHandler = class {
   }
   typeCheck(ctx, node, meta) {
     var _a;
-    if (this.typeCheckScopeRegistry === null || !ts26.isClassDeclaration(node)) {
+    if (this.typeCheckScopeRegistry === null || !ts45.isClassDeclaration(node)) {
       return;
     }
     if (meta.isPoisoned && !this.usePoisonedData) {
@@ -7612,7 +13865,7 @@ var ComponentDecoratorHandler = class {
         data.declarations = eagerDeclarations;
         if (this.compilationMode === CompilationMode.LOCAL && this.localCompilationExtraImportsTracker !== null) {
           for (const { type } of eagerDeclarations) {
-            if (type instanceof ExternalExpr6 && type.value.moduleName) {
+            if (type instanceof ExternalExpr8 && type.value.moduleName) {
               this.localCompilationExtraImportsTracker.addImportForFile(context, type.value.moduleName);
             }
           }
@@ -7747,9 +14000,6 @@ var ComponentDecoratorHandler = class {
     return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports);
   }
   compileLocal(node, analysis, resolution, pool) {
-    if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
-      return [];
-    }
     const deferrableTypes = analysis.explicitlyDeferredTypes;
     const meta = {
       ...analysis.meta,
@@ -7769,7 +14019,7 @@ var ComponentDecoratorHandler = class {
   }
   locateDeferBlocksWithoutScope(template) {
     const deferBlocks = /* @__PURE__ */ new Map();
-    const directivelessBinder = new R3TargetBinder(new SelectorMatcher2());
+    const directivelessBinder = new R3TargetBinder(new SelectorMatcher3());
     const bound = directivelessBinder.bind({ template: template.nodes });
     const deferredBlocks = bound.getDeferBlocks();
     for (const block of deferredBlocks) {
@@ -7795,12 +14045,12 @@ var ComponentDecoratorHandler = class {
   }
   collectExplicitlyDeferredSymbols(rawDeferredImports) {
     const deferredTypes = /* @__PURE__ */ new Map();
-    if (!ts26.isArrayLiteralExpression(rawDeferredImports)) {
+    if (!ts45.isArrayLiteralExpression(rawDeferredImports)) {
       return deferredTypes;
     }
     for (const element of rawDeferredImports.elements) {
       const node = tryUnwrapForwardRef(element, this.reflector) || element;
-      if (!ts26.isIdentifier(node)) {
+      if (!ts45.isIdentifier(node)) {
         continue;
       }
       const imp = this.reflector.getImportOfIdentifier(node);
@@ -7867,12 +14117,12 @@ var ComponentDecoratorHandler = class {
     }
   }
   registerDeferrableCandidates(componentClassDecl, importsExpr, isDeferredImport, allDeferredDecls, eagerlyUsedDecls, resolutionData) {
-    if (!ts26.isArrayLiteralExpression(importsExpr)) {
+    if (!ts45.isArrayLiteralExpression(importsExpr)) {
       return;
     }
     for (const element of importsExpr.elements) {
       const node = tryUnwrapForwardRef(element, this.reflector) || element;
-      if (!ts26.isIdentifier(node)) {
+      if (!ts45.isIdentifier(node)) {
         continue;
       }
       const imp = this.reflector.getImportOfIdentifier(node);
@@ -7932,10 +14182,10 @@ var ComponentDecoratorHandler = class {
   }
 };
 function createTargetBinder(dependencies) {
-  const matcher = new SelectorMatcher2();
+  const matcher = new SelectorMatcher3();
   for (const dep of dependencies) {
     if (dep.kind === MetaKind.Directive && dep.selector !== null) {
-      matcher.addSelectables(CssSelector2.parse(dep.selector), [dep]);
+      matcher.addSelectables(CssSelector4.parse(dep.selector), [dep]);
     }
   }
   return new R3TargetBinder(matcher);
@@ -8005,8 +14255,8 @@ function isDefaultImport(node) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
-import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
-import ts27 from "typescript";
+import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr10 } from "@angular/compiler";
+import ts46 from "typescript";
 var InjectableDecoratorHandler = class {
   constructor(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, perf, includeClassMetadata, compilationMode, errorOnDuplicateProv = true) {
     this.reflector = reflector;
@@ -8126,7 +14376,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     };
   } else if (decorator.args.length === 1) {
     const metaNode = decorator.args[0];
-    if (!ts27.isObjectLiteralExpression(metaNode)) {
+    if (!ts46.isObjectLiteralExpression(metaNode)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, `@Injectable argument must be an object literal`);
     }
     const meta = reflectObjectLiteral(metaNode);
@@ -8134,7 +14384,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     let deps = void 0;
     if ((meta.has("useClass") || meta.has("useFactory")) && meta.has("deps")) {
       const depsExpr = meta.get("deps");
-      if (!ts27.isArrayLiteralExpression(depsExpr)) {
+      if (!ts46.isArrayLiteralExpression(depsExpr)) {
         throw new FatalDiagnosticError(ErrorCode.VALUE_NOT_LITERAL, depsExpr, `@Injectable deps metadata must be an inline array`);
       }
       deps = depsExpr.elements.map((dep) => getDep(dep, reflector));
@@ -8148,7 +14398,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
       result.useClass = getProviderExpression(meta.get("useClass"), reflector);
       result.deps = deps;
     } else if (meta.has("useFactory")) {
-      result.useFactory = new WrappedNodeExpr8(meta.get("useFactory"));
+      result.useFactory = new WrappedNodeExpr10(meta.get("useFactory"));
       result.deps = deps;
     }
     return result;
@@ -8158,7 +14408,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
 }
 function getProviderExpression(expression, reflector) {
   const forwardRefValue = tryUnwrapForwardRef(expression, reflector);
-  return createMayBeForwardRefExpression3(new WrappedNodeExpr8(forwardRefValue != null ? forwardRefValue : expression), forwardRefValue !== null ? 2 : 0);
+  return createMayBeForwardRefExpression3(new WrappedNodeExpr10(forwardRefValue != null ? forwardRefValue : expression), forwardRefValue !== null ? 2 : 0);
 }
 function extractInjectableCtorDeps(clazz, meta, decorator, reflector, isCore, strictCtorDeps) {
   if (decorator.args === null) {
@@ -8187,7 +14437,7 @@ function requiresValidCtor(meta) {
 }
 function getDep(dep, reflector) {
   const meta = {
-    token: new WrappedNodeExpr8(dep),
+    token: new WrappedNodeExpr10(dep),
     attributeNameType: null,
     host: false,
     optional: false,
@@ -8202,7 +14452,7 @@ function getDep(dep, reflector) {
     switch (source.name) {
       case "Inject":
         if (token !== void 0) {
-          meta.token = new WrappedNodeExpr8(token);
+          meta.token = new WrappedNodeExpr10(token);
         }
         break;
       case "Optional":
@@ -8219,17 +14469,17 @@ function getDep(dep, reflector) {
     }
     return true;
   }
-  if (ts27.isArrayLiteralExpression(dep)) {
+  if (ts46.isArrayLiteralExpression(dep)) {
     dep.elements.forEach((el) => {
       let isDecorator = false;
-      if (ts27.isIdentifier(el)) {
+      if (ts46.isIdentifier(el)) {
         isDecorator = maybeUpdateDecorator(el, reflector);
-      } else if (ts27.isNewExpression(el) && ts27.isIdentifier(el.expression)) {
+      } else if (ts46.isNewExpression(el) && ts46.isIdentifier(el.expression)) {
         const token = el.arguments && el.arguments.length > 0 && el.arguments[0] || void 0;
         isDecorator = maybeUpdateDecorator(el.expression, reflector, token);
       }
       if (!isDecorator) {
-        meta.token = new WrappedNodeExpr8(el);
+        meta.token = new WrappedNodeExpr10(el);
       }
     });
   }
@@ -8238,7 +14488,7 @@ function getDep(dep, reflector) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/pipe.mjs
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5 } from "@angular/compiler";
-import ts28 from "typescript";
+import ts47 from "typescript";
 var PipeSymbol = class extends SemanticSymbol {
   constructor(decl, name) {
     super(decl);
@@ -8296,7 +14546,7 @@ var PipeDecoratorHandler = class {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, "@Pipe must have exactly one argument");
     }
     const meta = unwrapExpression(decorator.args[0]);
-    if (!ts28.isObjectLiteralExpression(meta)) {
+    if (!ts47.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
     }
     const pipe = reflectObjectLiteral(meta);
@@ -8399,7 +14649,6 @@ export {
   forwardRefResolver,
   MetaKind,
   CompoundMetadataReader,
-  isHostDirectiveMetaForGlobalMode,
   DtsMetadataReader,
   LocalMetadataRegistry,
   CompoundMetadataRegistry,
@@ -8435,6 +14684,19 @@ export {
   queryDecoratorNames,
   DirectiveDecoratorHandler,
   NgModuleDecoratorHandler,
+  NgOriginalFile,
+  isShim,
+  untagAllTsFiles,
+  retagAllTsFiles,
+  ShimAdapter,
+  ShimReferenceTagger,
+  TsCreateProgramDriver,
+  OptimizeFor,
+  PotentialImportKind,
+  PotentialImportMode,
+  SymbolKind,
+  TypeCheckShimGenerator,
+  TemplateTypeCheckerImpl,
   ComponentDecoratorHandler,
   InjectableDecoratorHandler,
   PipeDecoratorHandler
@@ -8453,4 +14715,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-W5YD5Y43.js.map
+//# sourceMappingURL=chunk-CWU65S2B.js.map

@@ -5,16 +5,15 @@
     
 import {
   main
-} from "../../chunk-K65EK3IM.js";
-import "../../chunk-IN2DRZTX.js";
-import "../../chunk-ZX6BKV7T.js";
-import "../../chunk-W5YD5Y43.js";
-import "../../chunk-73B3CO3L.js";
+} from "../../chunk-MLEQATX2.js";
+import "../../chunk-4HWDU6FJ.js";
+import "../../chunk-CWU65S2B.js";
+import "../../chunk-YPERM5UE.js";
 import "../../chunk-JZQHA4E7.js";
 import {
   NodeJSFileSystem,
   setFileSystem
-} from "../../chunk-3W345P4E.js";
+} from "../../chunk-54G5EVKM.js";
 import "../../chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ngc.mjs

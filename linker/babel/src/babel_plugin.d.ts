@@ -1,4 +1,3 @@
-/// <reference types="@angular/compiler-cli/private/babel" />
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.

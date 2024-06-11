@@ -12,7 +12,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-3W345P4E.js";
+} from "./chunk-54G5EVKM.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
 import ts from "typescript";
@@ -88,6 +88,9 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["DEFERRED_PIPE_USED_EAGERLY"] = 8012] = "DEFERRED_PIPE_USED_EAGERLY";
   ErrorCode2[ErrorCode2["DEFERRED_DIRECTIVE_USED_EAGERLY"] = 8013] = "DEFERRED_DIRECTIVE_USED_EAGERLY";
   ErrorCode2[ErrorCode2["DEFERRED_DEPENDENCY_IMPORTED_EAGERLY"] = 8014] = "DEFERRED_DEPENDENCY_IMPORTED_EAGERLY";
+  ErrorCode2[ErrorCode2["ILLEGAL_LET_WRITE"] = 8015] = "ILLEGAL_LET_WRITE";
+  ErrorCode2[ErrorCode2["LET_USED_BEFORE_DEFINITION"] = 8016] = "LET_USED_BEFORE_DEFINITION";
+  ErrorCode2[ErrorCode2["DUPLICATE_LET_DECLARATION"] = 8017] = "DUPLICATE_LET_DECLARATION";
   ErrorCode2[ErrorCode2["INVALID_BANANA_IN_BOX"] = 8101] = "INVALID_BANANA_IN_BOX";
   ErrorCode2[ErrorCode2["NULLISH_COALESCING_NOT_NULLABLE"] = 8102] = "NULLISH_COALESCING_NOT_NULLABLE";
   ErrorCode2[ErrorCode2["MISSING_CONTROL_FLOW_DIRECTIVE"] = 8103] = "MISSING_CONTROL_FLOW_DIRECTIVE";
@@ -193,7 +196,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error_details_base_url.mjs
-var ERROR_DETAILS_PAGE_BASE_URL = "https://angular.io/errors";
+var ERROR_DETAILS_PAGE_BASE_URL = "https://angular.dev/errors";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/extended_template_diagnostic_name.mjs
 var ExtendedTemplateDiagnosticName;
@@ -270,6 +273,9 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
       if (firstDecl.isTypeOnly) {
         return typeOnlyImport(typeNode, firstDecl);
       }
+      if (!ts3.isImportDeclaration(firstDecl.parent)) {
+        return unsupportedType(typeNode);
+      }
       return {
         kind: 0,
         expression: firstDecl.name,
@@ -284,7 +290,11 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
       }
       const importedName = (firstDecl.propertyName || firstDecl.name).text;
       const [_localName, ...nestedPath] = symbols.symbolNames;
-      const moduleName = extractModuleName(firstDecl.parent.parent.parent);
+      const importDeclaration = firstDecl.parent.parent.parent;
+      if (!ts3.isImportDeclaration(importDeclaration)) {
+        return unsupportedType(typeNode);
+      }
+      const moduleName = extractModuleName(importDeclaration);
       return {
         kind: 1,
         valueDeclaration: (_a = decl.valueDeclaration) != null ? _a : null,
@@ -300,7 +310,11 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
         return namespaceImport(typeNode, firstDecl.parent);
       }
       const [_ns, importedName, ...nestedPath] = symbols.symbolNames;
-      const moduleName = extractModuleName(firstDecl.parent.parent);
+      const importDeclaration = firstDecl.parent.parent;
+      if (!ts3.isImportDeclaration(importDeclaration)) {
+        return unsupportedType(typeNode);
+      }
+      const moduleName = extractModuleName(importDeclaration);
       return {
         kind: 1,
         valueDeclaration: (_b = decl.valueDeclaration) != null ? _b : null,
@@ -622,13 +636,13 @@ var TypeScriptReflectionHost = class {
       return null;
     }
     const importDeclaration = namespaceDeclaration.parent.parent;
-    if (!ts5.isStringLiteral(importDeclaration.moduleSpecifier)) {
+    if (!ts5.isImportDeclaration(importDeclaration) || !ts5.isStringLiteral(importDeclaration.moduleSpecifier)) {
       return null;
     }
     return {
       from: importDeclaration.moduleSpecifier.text,
       name: id.text,
-      node: namespaceDeclaration.parent.parent
+      node: importDeclaration
     };
   }
   getDeclarationOfSymbol(symbol, originalId) {
@@ -2996,4 +3010,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-73B3CO3L.js.map
+//# sourceMappingURL=chunk-YPERM5UE.js.map
