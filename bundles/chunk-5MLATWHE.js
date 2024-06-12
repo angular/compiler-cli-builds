@@ -12960,18 +12960,16 @@ var TemplateTypeCheckerImpl = class {
     for (const tag of REGISTRY2.allKnownElementNames()) {
       tagMap.set(tag, null);
     }
-    const scope = this.getScopeData(component);
-    if (scope !== null) {
-      for (const directive of scope.directives) {
-        if (directive.selector === null) {
+    const potentialDirectives = this.getPotentialTemplateDirectives(component);
+    for (const directive of potentialDirectives) {
+      if (directive.selector === null) {
+        continue;
+      }
+      for (const selector of CssSelector3.parse(directive.selector)) {
+        if (selector.element === null || tagMap.has(selector.element)) {
           continue;
         }
-        for (const selector of CssSelector3.parse(directive.selector)) {
-          if (selector.element === null || tagMap.has(selector.element)) {
-            continue;
-          }
-          tagMap.set(selector.element, directive);
-        }
+        tagMap.set(selector.element, directive);
       }
     }
     this.elementTagCache.set(component, tagMap);
@@ -14715,4 +14713,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-CWU65S2B.js.map
+//# sourceMappingURL=chunk-5MLATWHE.js.map
