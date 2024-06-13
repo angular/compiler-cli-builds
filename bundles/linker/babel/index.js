@@ -8,8 +8,8 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-Z34L7JZH.js";
-import "../../chunk-YPERM5UE.js";
+} from "../../chunk-NTRANIJ3.js";
+import "../../chunk-C5LPGSDY.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -365,11 +365,11 @@ function insertIntoFunction(fn, statements) {
 }
 function insertIntoProgram(program, statements) {
   const body = program.get("body");
-  const importStatements = body.filter((statement) => statement.isImportDeclaration());
-  if (importStatements.length === 0) {
+  const insertBeforeIndex = body.findIndex((statement) => !statement.isImportDeclaration());
+  if (insertBeforeIndex === -1) {
     program.unshiftContainer("body", statements);
   } else {
-    importStatements[importStatements.length - 1].insertAfter(statements);
+    body[insertBeforeIndex].insertBefore(statements);
   }
 }
 function getCalleeName(call) {

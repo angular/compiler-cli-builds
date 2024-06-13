@@ -47,7 +47,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-5MLATWHE.js";
+} from "./chunk-F7RSDLI3.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -83,7 +83,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-YPERM5UE.js";
+} from "./chunk-C5LPGSDY.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -4610,4 +4610,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ESNIOZYZ.js.map
+//# sourceMappingURL=chunk-RFIP6ERG.js.map
