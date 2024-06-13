@@ -1816,14 +1816,16 @@ import ts16 from "typescript";
 import ts12 from "typescript";
 function createGenerateUniqueIdentifierHelper() {
   const generatedIdentifiers = /* @__PURE__ */ new Set();
+  const isGeneratedIdentifier = (sf, identifierName) => generatedIdentifiers.has(`${sf.fileName}@@${identifierName}`);
+  const markIdentifierAsGenerated = (sf, identifierName) => generatedIdentifiers.add(`${sf.fileName}@@${identifierName}`);
   return (sourceFile, symbolName) => {
     const sf = sourceFile;
     if (sf.identifiers === void 0) {
       throw new Error("Source file unexpectedly lacks map of parsed `identifiers`.");
     }
-    const isUniqueIdentifier = (name2) => !sf.identifiers.has(name2) && !generatedIdentifiers.has(name2);
+    const isUniqueIdentifier = (name2) => !sf.identifiers.has(name2) && !isGeneratedIdentifier(sf, name2);
     if (isUniqueIdentifier(symbolName)) {
-      generatedIdentifiers.add(symbolName);
+      markIdentifierAsGenerated(sf, symbolName);
       return null;
     }
     let name = null;
@@ -1831,7 +1833,7 @@ function createGenerateUniqueIdentifierHelper() {
     do {
       name = `${symbolName}_${counter++}`;
     } while (!isUniqueIdentifier(name));
-    generatedIdentifiers.add(name);
+    markIdentifierAsGenerated(sf, name);
     return ts12.factory.createUniqueName(name, ts12.GeneratedIdentifierFlags.Optimistic);
   };
 }
@@ -2992,4 +2994,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-RZ7P6VD7.js.map
+//# sourceMappingURL=chunk-BLUBTRCD.js.map
