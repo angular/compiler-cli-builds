@@ -299,7 +299,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "18.0.3+sha-cc6cd08";
+var PLACEHOLDER_VERSION = "18.0.3+sha-5f8f18d";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -521,6 +521,7 @@ var PartialComponentLinkerVersion1 = class {
     const isInline = metaObj.has("isInline") ? metaObj.getBoolean("isInline") : false;
     const templateInfo = this.getTemplateInfo(templateSource, isInline);
     const enableBlockSyntax = semver.major(version) >= 17 || version === PLACEHOLDER_VERSION;
+    const enableLetSyntax = version === PLACEHOLDER_VERSION;
     const template = parseTemplate(templateInfo.code, templateInfo.sourceUrl, {
       escapedString: templateInfo.isEscaped,
       interpolationConfig: interpolation,
@@ -528,7 +529,8 @@ var PartialComponentLinkerVersion1 = class {
       enableI18nLegacyMessageIdFormat: false,
       preserveWhitespaces: metaObj.has("preserveWhitespaces") ? metaObj.getBoolean("preserveWhitespaces") : false,
       i18nNormalizeLineEndingsInICUs: isInline,
-      enableBlockSyntax
+      enableBlockSyntax,
+      enableLetSyntax
     });
     if (template.errors !== null) {
       const errors = template.errors.map((err) => err.toString()).join("\n");
@@ -1109,4 +1111,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-IF7ODQHR.js.map
+//# sourceMappingURL=chunk-XSV3ZGZJ.js.map
