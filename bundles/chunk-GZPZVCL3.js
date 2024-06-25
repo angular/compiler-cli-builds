@@ -45,9 +45,8 @@ import {
   isShim,
   ivyTransformFactory,
   retagAllTsFiles,
-  tryParseInitializerApi,
-  untagAllTsFiles
-} from "./chunk-F7RSDLI3.js";
+  tryParseInitializerApi
+} from "./chunk-MNALQPTN.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -83,7 +82,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-C5LPGSDY.js";
+} from "./chunk-TDHU6S55.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -99,7 +98,7 @@ import {
   getFileSystem,
   join,
   resolve
-} from "./chunk-54G5EVKM.js";
+} from "./chunk-3W345P4E.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -4151,7 +4150,6 @@ var NgtscProgram = class {
     perfRecorder.phase(PerfPhase.Unaccounted);
     perfRecorder.memory(PerfCheckpoint.TypeScriptProgramCreate);
     this.host.postProgramCreationCleanup();
-    untagAllTsFiles(this.tsProgram);
     const programDriver = new TsCreateProgramDriver(this.tsProgram, this.host, this.options, this.host.shimExtensionPrefixes);
     this.incrementalStrategy = oldProgram !== void 0 ? oldProgram.incrementalStrategy.toNextBuildStrategy() : new TrackedIncrementalBuildStrategy();
     const modifiedResourceFiles = /* @__PURE__ */ new Set();
@@ -4610,4 +4608,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-QL7ORWNN.js.map
+//# sourceMappingURL=chunk-GZPZVCL3.js.map

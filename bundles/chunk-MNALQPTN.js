@@ -45,7 +45,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-C5LPGSDY.js";
+} from "./chunk-TDHU6S55.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -56,7 +56,7 @@ import {
   absoluteFromSourceFile,
   getSourceFileOrError,
   relative
-} from "./chunk-54G5EVKM.js";
+} from "./chunk-3W345P4E.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
@@ -7353,10 +7353,7 @@ var TsCreateProgramDriver = class {
       this.sfMap.clear();
     }
     for (const [filePath, { newText, originalFile }] of contents.entries()) {
-      const sf = ts27.createSourceFile(filePath, newText, {
-        impliedNodeFormat: void 0,
-        languageVersion: ts27.ScriptTarget.Latest
-      }, true);
+      const sf = ts27.createSourceFile(filePath, newText, ts27.ScriptTarget.Latest, true);
       if (originalFile !== null) {
         sf[NgOriginalFile] = originalFile;
       }
@@ -7372,7 +7369,6 @@ var TsCreateProgramDriver = class {
       oldProgram
     });
     host.postProgramCreationCleanup();
-    untagAllTsFiles(this.program);
     untagAllTsFiles(oldProgram);
   }
 };
@@ -14684,7 +14680,6 @@ export {
   NgModuleDecoratorHandler,
   NgOriginalFile,
   isShim,
-  untagAllTsFiles,
   retagAllTsFiles,
   ShimAdapter,
   ShimReferenceTagger,
@@ -14713,4 +14708,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-F7RSDLI3.js.map
+//# sourceMappingURL=chunk-MNALQPTN.js.map

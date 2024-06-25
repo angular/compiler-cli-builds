@@ -421,9 +421,7 @@ export type AmbientImport = {
     __brand: 'AmbientImport';
 };
 /** Indicates that a declaration is referenced through an ambient type. */
-export declare const AmbientImport: {
-    __brand: "AmbientImport";
-};
+export declare const AmbientImport: AmbientImport;
 /**
  * The declaration of a symbol, along with information about how it was imported into the
  * application.

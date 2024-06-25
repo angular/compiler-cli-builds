@@ -9,7 +9,7 @@ import {
   constructorParametersDownlevelTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-VBH4SN7I.js";
+} from "./chunk-R7RVQCZK.js";
 import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
@@ -36,15 +36,14 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-QL7ORWNN.js";
+} from "./chunk-GZPZVCL3.js";
 import {
   OptimizeFor,
-  TsCreateProgramDriver,
-  untagAllTsFiles
-} from "./chunk-F7RSDLI3.js";
+  TsCreateProgramDriver
+} from "./chunk-MNALQPTN.js";
 import {
   isLocalCompilationDiagnostics
-} from "./chunk-C5LPGSDY.js";
+} from "./chunk-TDHU6S55.js";
 import {
   ActivePerfRecorder,
   PerfPhase
@@ -73,12 +72,12 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-54G5EVKM.js";
+} from "./chunk-3W345P4E.js";
 import "./chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("18.1.0-next.3+sha-5be16d0");
+var VERSION = new Version("18.1.0-next.3+sha-ccc8c80");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
@@ -108,7 +107,6 @@ var NgTscPlugin = class {
       throw new Error("Lifecycle error: setupCompilation() before wrapHost().");
     }
     this.host.postProgramCreationCleanup();
-    untagAllTsFiles(program);
     const programDriver = new TsCreateProgramDriver(program, this.host, this.options, this.host.shimExtensionPrefixes);
     const strategy = new PatchedProgramIncrementalBuildStrategy();
     const oldState = oldProgram !== void 0 ? strategy.getIncrementalState(oldProgram) : null;

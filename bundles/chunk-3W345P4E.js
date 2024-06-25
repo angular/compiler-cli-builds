@@ -177,10 +177,7 @@ var NgtscCompilerHost = class {
   }
   getSourceFile(fileName, languageVersion) {
     const text = this.readFile(fileName);
-    return text !== void 0 ? ts.createSourceFile(fileName, text, {
-      impliedNodeFormat: void 0,
-      languageVersion
-    }, true) : void 0;
+    return text !== void 0 ? ts.createSourceFile(fileName, text, languageVersion, true) : void 0;
   }
   getDefaultLibFileName(options) {
     return this.fs.join(this.getDefaultLibLocation(), ts.getDefaultLibFileName(options));
@@ -410,4 +407,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-54G5EVKM.js.map
+//# sourceMappingURL=chunk-3W345P4E.js.map

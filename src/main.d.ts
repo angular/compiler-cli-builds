@@ -25,5 +25,5 @@ export declare function readCommandLineAndConfiguration(args: string[], existing
 export declare function watchMode(project: string, options: api.CompilerOptions, consoleError: (s: string) => void): {
     close: () => void;
     ready: (cb: () => void) => void;
-    firstCompileResult: readonly ts.Diagnostic[];
+    firstCompileResult: ReadonlyArray<ts.Diagnostic>;
 };
