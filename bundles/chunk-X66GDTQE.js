@@ -3278,7 +3278,7 @@ var NgCompiler = class {
     this.delegatingPerfRecorder = new DelegatingPerfRecorder(this.perfRecorder);
     this.enableTemplateTypeChecker = enableTemplateTypeChecker || ((_a = options["_enableTemplateTypeChecker"]) != null ? _a : false);
     this.enableBlockSyntax = (_b = options["_enableBlockSyntax"]) != null ? _b : true;
-    this.enableLetSyntax = (_c = options["_enableLetSyntax"]) != null ? _c : false;
+    this.enableLetSyntax = (_c = options["_enableLetSyntax"]) != null ? _c : true;
     this.angularCoreVersion = (_d = options["_angularCoreVersion"]) != null ? _d : null;
     this.constructionDiagnostics.push(...this.adapter.constructionDiagnostics, ...verifyCompatibleTypeCheckOptions(this.options));
     this.currentProgram = inputProgram;
@@ -4608,4 +4608,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GZPZVCL3.js.map
+//# sourceMappingURL=chunk-X66GDTQE.js.map

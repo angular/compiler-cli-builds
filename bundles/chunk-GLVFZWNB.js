@@ -299,7 +299,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "18.1.0-next.3+sha-c19a4e7";
+var PLACEHOLDER_VERSION = "18.1.0-next.3+sha-ec654f7";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -520,8 +520,9 @@ var PartialComponentLinkerVersion1 = class {
     const templateSource = metaObj.getValue("template");
     const isInline = metaObj.has("isInline") ? metaObj.getBoolean("isInline") : false;
     const templateInfo = this.getTemplateInfo(templateSource, isInline);
-    const enableBlockSyntax = semver.major(version) >= 17 || version === PLACEHOLDER_VERSION;
-    const enableLetSyntax = version === PLACEHOLDER_VERSION;
+    const { major, minor } = new semver.SemVer(version);
+    const enableBlockSyntax = major >= 17 || version === PLACEHOLDER_VERSION;
+    const enableLetSyntax = major > 18 || major === 18 && minor >= 1 || version === PLACEHOLDER_VERSION;
     const template = parseTemplate(templateInfo.code, templateInfo.sourceUrl, {
       escapedString: templateInfo.isEscaped,
       interpolationConfig: interpolation,
@@ -1111,4 +1112,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-O4QUHILC.js.map
+//# sourceMappingURL=chunk-GLVFZWNB.js.map
