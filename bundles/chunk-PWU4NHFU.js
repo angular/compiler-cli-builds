@@ -473,7 +473,8 @@ function createTransformVisitor(ctx, host, importManager, importTracker, isCore)
   const visitor = (node) => {
     var _a;
     if (ts4.isClassDeclaration(node) && node.name !== void 0) {
-      const angularDecorator = (_a = host.getDecoratorsOfDeclaration(node)) == null ? void 0 : _a.find((d) => decoratorsWithInputs.some((name) => isAngularDecorator(d, name, isCore)));
+      const originalNode = ts4.getOriginalNode(node, ts4.isClassDeclaration);
+      const angularDecorator = (_a = host.getDecoratorsOfDeclaration(originalNode)) == null ? void 0 : _a.find((d) => decoratorsWithInputs.some((name) => isAngularDecorator(d, name, isCore)));
       if (angularDecorator !== void 0) {
         let hasChanged = false;
         const members = node.members.map((memberNode) => {
@@ -553,4 +554,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-XPJBEUMY.js.map
+//# sourceMappingURL=chunk-PWU4NHFU.js.map
