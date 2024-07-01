@@ -96,13 +96,12 @@ export interface OutOfBandDiagnosticRecorder {
     /** Reports cases where users are accessing an `@let` before it is defined.. */
     letUsedBeforeDefinition(templateId: TemplateId, node: PropertyRead, target: TmplAstLetDeclaration): void;
     /**
-     * Reports a duplicate `@let` declaration within the same scope.
+     * Reports a `@let` declaration that conflicts with another symbol in the same scope.
      *
-     * @param templateId the template type-checking ID of the template which contains the duplicate
-     * declaration.
-     * @param current the `TmplAstLetDeclaration` which duplicates a previous declaration.
+     * @param templateId the template type-checking ID of the template which contains the declaration.
+     * @param current the `TmplAstLetDeclaration` which is invalid.
      */
-    duplicateLetDeclaration(templateId: TemplateId, current: TmplAstLetDeclaration): void;
+    conflictingDeclaration(templateId: TemplateId, current: TmplAstLetDeclaration): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -129,5 +128,5 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     controlFlowPreventingContentProjection(templateId: TemplateId, category: ts.DiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty, preservesWhitespaces: boolean): void;
     illegalWriteToLetDeclaration(templateId: TemplateId, node: PropertyWrite, target: TmplAstLetDeclaration): void;
     letUsedBeforeDefinition(templateId: TemplateId, node: PropertyRead, target: TmplAstLetDeclaration): void;
-    duplicateLetDeclaration(templateId: TemplateId, current: TmplAstLetDeclaration): void;
+    conflictingDeclaration(templateId: TemplateId, decl: TmplAstLetDeclaration): void;
 }

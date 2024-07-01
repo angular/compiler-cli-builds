@@ -289,5 +289,7 @@ declare class Scope {
     private appendDeferredBlock;
     private appendDeferredTriggers;
     private appendReferenceBasedDeferredTrigger;
+    /** Reports a diagnostic if there are any `@let` declarations that conflict with a node. */
+    private static checkConflictingLet;
 }
 export {};

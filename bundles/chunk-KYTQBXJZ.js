@@ -45,7 +45,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-TDHU6S55.js";
+} from "./chunk-MM6AYDBK.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -9552,10 +9552,10 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     }
     this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.LET_USED_BEFORE_DEFINITION), `Cannot read @let declaration '${target.name}' before it has been defined.`));
   }
-  duplicateLetDeclaration(templateId, current) {
+  conflictingDeclaration(templateId, decl) {
     const mapping = this.resolver.getSourceMapping(templateId);
-    const errorMsg = `Cannot declare @let called '${current.name}' as there is another @let declaration with the same name.`;
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, current.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_LET_DECLARATION), errorMsg));
+    const errorMsg = `Cannot declare @let called '${decl.name}' as there is another symbol in the template with the same name.`;
+    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, decl.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_LET_DECLARATION), errorMsg));
   }
 };
 function makeInlineDiagnostic(templateId, code, node, messageText, relatedInformation) {
@@ -10956,14 +10956,12 @@ var _Scope = class {
     }
     for (const node of children) {
       scope.appendNode(node);
-      if (node instanceof TmplAstLetDeclaration2) {
-        const opIndex = scope.opQueue.push(new TcbLetDeclarationOp(tcb, scope, node)) - 1;
-        if (scope.letDeclOpMap.has(node.name)) {
-          tcb.oobRecorder.duplicateLetDeclaration(tcb.id, node);
-        } else {
-          scope.letDeclOpMap.set(node.name, opIndex);
-        }
-      }
+    }
+    for (const variable of scope.varMap.keys()) {
+      _Scope.checkConflictingLet(scope, variable);
+    }
+    for (const ref of scope.referenceOpMap.keys()) {
+      _Scope.checkConflictingLet(scope, ref);
     }
     return scope;
   }
@@ -11027,7 +11025,7 @@ var _Scope = class {
     if (ref instanceof TmplAstReference2 && this.referenceOpMap.has(ref)) {
       return this.resolveOp(this.referenceOpMap.get(ref));
     } else if (ref instanceof TmplAstLetDeclaration2 && this.letDeclOpMap.has(ref.name)) {
-      return this.resolveOp(this.letDeclOpMap.get(ref.name));
+      return this.resolveOp(this.letDeclOpMap.get(ref.name).opIndex);
     } else if (ref instanceof TmplAstVariable && this.varMap.has(ref)) {
       const opIndexOrNode = this.varMap.get(ref);
       return typeof opIndexOrNode === "number" ? this.resolveOp(opIndexOrNode) : opIndexOrNode;
@@ -11103,6 +11101,13 @@ var _Scope = class {
       this.appendIcuExpressions(node);
     } else if (node instanceof TmplAstContent) {
       this.appendChildren(node);
+    } else if (node instanceof TmplAstLetDeclaration2) {
+      const opIndex = this.opQueue.push(new TcbLetDeclarationOp(this.tcb, this, node)) - 1;
+      if (this.isLocal(node)) {
+        this.tcb.oobRecorder.conflictingDeclaration(this.tcb.id, node);
+      } else {
+        this.letDeclOpMap.set(node.name, { opIndex, node });
+      }
     }
   }
   appendChildren(node) {
@@ -11266,6 +11271,11 @@ var _Scope = class {
   appendReferenceBasedDeferredTrigger(block, trigger) {
     if (this.tcb.boundTarget.getDeferredTriggerTarget(block, trigger) === null) {
       this.tcb.oobRecorder.inaccessibleDeferredTriggerElement(this.tcb.id, trigger);
+    }
+  }
+  static checkConflictingLet(scope, node) {
+    if (scope.letDeclOpMap.has(node.name)) {
+      scope.tcb.oobRecorder.conflictingDeclaration(scope.tcb.id, scope.letDeclOpMap.get(node.name).node);
     }
   }
 };
@@ -14708,4 +14718,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-MNALQPTN.js.map
+//# sourceMappingURL=chunk-KYTQBXJZ.js.map
