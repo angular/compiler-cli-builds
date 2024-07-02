@@ -46,7 +46,7 @@ import {
   ivyTransformFactory,
   retagAllTsFiles,
   tryParseInitializerApi
-} from "./chunk-S6XWL3LN.js";
+} from "./chunk-KYTQBXJZ.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -82,7 +82,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-WTQ7UQOL.js";
+} from "./chunk-MM6AYDBK.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -2903,58 +2903,6 @@ var factory8 = {
   create: () => new TextAttributeNotBindingSpec()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.mjs
-import { ASTWithSource as ASTWithSource4, Call, Chain, Conditional, ParsedEventType, PropertyRead as PropertyRead3, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
-var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor {
-  constructor() {
-    super(...arguments);
-    this.code = ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING;
-  }
-  visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstBoundEvent2))
-      return [];
-    if (node.type !== ParsedEventType.Regular && node.type !== ParsedEventType.Animation)
-      return [];
-    if (!(node.handler instanceof ASTWithSource4))
-      return [];
-    const sourceExpressionText = node.handler.source || "";
-    if (node.handler.ast instanceof Chain) {
-      return node.handler.ast.expressions.flatMap((expression) => assertExpressionInvoked(expression, component, node, sourceExpressionText, ctx));
-    }
-    if (node.handler.ast instanceof Conditional) {
-      const { trueExp, falseExp } = node.handler.ast;
-      return [trueExp, falseExp].flatMap((expression) => assertExpressionInvoked(expression, component, node, sourceExpressionText, ctx));
-    }
-    return assertExpressionInvoked(node.handler.ast, component, node, sourceExpressionText, ctx);
-  }
-};
-function assertExpressionInvoked(expression, component, node, expressionText, ctx) {
-  var _a;
-  if (expression instanceof Call || expression instanceof SafeCall2) {
-    return [];
-  }
-  if (!(expression instanceof PropertyRead3) && !(expression instanceof SafePropertyRead2)) {
-    return [];
-  }
-  const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
-  if (symbol !== null && symbol.kind === SymbolKind.Expression) {
-    if (((_a = symbol.tsType.getCallSignatures()) == null ? void 0 : _a.length) > 0) {
-      const fullExpressionText = generateStringFromExpression(expression, expressionText);
-      const errorString = `Function in event binding should be invoked: ${fullExpressionText}()`;
-      return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
-    }
-  }
-  return [];
-}
-function generateStringFromExpression(expression, source) {
-  return source.substring(expression.span.start, expression.span.end);
-}
-var factory9 = {
-  code: ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING,
-  name: ExtendedTemplateDiagnosticName.UNINVOKED_FUNCTION_IN_EVENT_BINDING,
-  create: () => new UninvokedFunctionInEventBindingSpec()
-};
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.mjs
 import ts19 from "typescript";
 
@@ -2972,12 +2920,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory10 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory10.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory9 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory9.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory10.create(options);
+      const check = factory9.create(options);
       if (check === null) {
         continue;
       }
@@ -3028,16 +2976,15 @@ var ALL_DIAGNOSTIC_FACTORIES = [
   factory8,
   factory4,
   factory7,
-  factory,
-  factory9
+  factory
 ];
 var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ExtendedTemplateDiagnosticName.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION,
-  ...ALL_DIAGNOSTIC_FACTORIES.map((factory10) => factory10.name)
+  ...ALL_DIAGNOSTIC_FACTORIES.map((factory9) => factory9.name)
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.mjs
-import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, RecursiveAstVisitor as RecursiveAstVisitor3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration, TmplAstRecursiveVisitor as TmplAstRecursiveVisitor2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource4, ImplicitReceiver as ImplicitReceiver2, ParsedEventType, RecursiveAstVisitor as RecursiveAstVisitor3, TmplAstBoundEvent as TmplAstBoundEvent2, TmplAstLetDeclaration, TmplAstRecursiveVisitor as TmplAstRecursiveVisitor2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts20 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   constructor(templateTypeChecker) {
@@ -3081,7 +3028,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor3 {
     this.checkForIllegalWriteInTwoWayBinding(ast, context);
   }
   checkForIllegalWriteInEventBinding(ast, context) {
-    if (!(context instanceof TmplAstBoundEvent3) || !(ast.receiver instanceof ImplicitReceiver2)) {
+    if (!(context instanceof TmplAstBoundEvent2) || !(ast.receiver instanceof ImplicitReceiver2)) {
       return;
     }
     const target = this.templateTypeChecker.getExpressionTarget(ast, this.component);
@@ -3091,7 +3038,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor3 {
     }
   }
   checkForIllegalWriteInTwoWayBinding(ast, context) {
-    if (!(context instanceof TmplAstBoundEvent3) || context.type !== ParsedEventType2.TwoWay || !(ast.receiver instanceof ImplicitReceiver2) || ast !== unwrapAstWithSource(context.handler)) {
+    if (!(context instanceof TmplAstBoundEvent2) || context.type !== ParsedEventType.TwoWay || !(ast.receiver instanceof ImplicitReceiver2) || ast !== unwrapAstWithSource(context.handler)) {
       return;
     }
     const target = this.templateTypeChecker.getExpressionTarget(ast, this.component);
@@ -3124,7 +3071,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor3 {
   }
 };
 function unwrapAstWithSource(ast) {
-  return ast instanceof ASTWithSource5 ? ast.ast : ast;
+  return ast instanceof ASTWithSource4 ? ast.ast : ast;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/rules/initializer_api_usage_rule.mjs
@@ -4661,4 +4608,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-OZ2N4CUX.js.map
+//# sourceMappingURL=chunk-37FFCCLS.js.map
