@@ -10773,14 +10773,14 @@ var TcbIfOp = class extends TcbOp {
       const branchScope = this.getBranchScope(this.scope, branch, index);
       return ts41.factory.createBlock(branchScope.render());
     }
-    const expressionScope = Scope.forNodes(this.tcb, this.scope, branch, [], null);
-    expressionScope.render().forEach((stmt) => this.scope.addStatement(stmt));
-    this.expressionScopes.set(branch, expressionScope);
-    let expression = tcbExpression(branch.expression, this.tcb, expressionScope);
+    const outerScope = Scope.forNodes(this.tcb, this.scope, branch, [], null);
+    outerScope.render().forEach((stmt) => this.scope.addStatement(stmt));
+    this.expressionScopes.set(branch, outerScope);
+    let expression = tcbExpression(branch.expression, this.tcb, this.scope);
     if (branch.expressionAlias !== null) {
-      expression = ts41.factory.createBinaryExpression(ts41.factory.createParenthesizedExpression(expression), ts41.SyntaxKind.AmpersandAmpersandToken, expressionScope.resolve(branch.expressionAlias));
+      expression = ts41.factory.createBinaryExpression(ts41.factory.createParenthesizedExpression(expression), ts41.SyntaxKind.AmpersandAmpersandToken, outerScope.resolve(branch.expressionAlias));
     }
-    const bodyScope = this.getBranchScope(expressionScope, branch, index);
+    const bodyScope = this.getBranchScope(outerScope, branch, index);
     return ts41.factory.createIfStatement(expression, ts41.factory.createBlock(bodyScope.render()), this.generateBranch(index + 1));
   }
   getBranchScope(parentScope, branch, index) {
@@ -10872,7 +10872,7 @@ var TcbForOfOp = class extends TcbOp {
     }
     const initializer = ts41.factory.createVariableDeclarationList([ts41.factory.createVariableDeclaration(initializerId)], ts41.NodeFlags.Const);
     addParseSpanInfo(initializer, this.block.item.keySpan);
-    const expression = ts41.factory.createNonNullExpression(tcbExpression(this.block.expression, this.tcb, loopScope));
+    const expression = ts41.factory.createNonNullExpression(tcbExpression(this.block.expression, this.tcb, this.scope));
     const trackTranslator = new TcbForLoopTrackTranslator(this.tcb, loopScope, this.block);
     const trackExpression = trackTranslator.translate(this.block.trackBy);
     const statements = [
@@ -11315,10 +11315,14 @@ var TcbExpressionTranslator = class {
   resolve(ast) {
     if (ast instanceof PropertyRead3 && ast.receiver instanceof ImplicitReceiver2) {
       const target = this.tcb.boundTarget.getExpressionTarget(ast);
-      if (target instanceof TmplAstLetDeclaration2) {
-        this.validateLetDeclarationAccess(target, ast);
+      const targetExpression = target === null ? null : this.getTargetNodeExpression(target, ast);
+      if (target instanceof TmplAstLetDeclaration2 && !this.isValidLetDeclarationAccess(target, ast)) {
+        this.tcb.oobRecorder.letUsedBeforeDefinition(this.tcb.id, ast, target);
+        if (targetExpression !== null) {
+          return ts41.factory.createAsExpression(targetExpression, ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword));
+        }
       }
-      return target === null ? null : this.getTargetNodeExpression(target, ast);
+      return targetExpression;
     } else if (ast instanceof PropertyWrite2 && ast.receiver instanceof ImplicitReceiver2) {
       const target = this.tcb.boundTarget.getExpressionTarget(ast);
       if (target === null) {
@@ -11389,13 +11393,11 @@ var TcbExpressionTranslator = class {
     addParseSpanInfo(expr, expressionNode.sourceSpan);
     return expr;
   }
-  validateLetDeclarationAccess(target, ast) {
+  isValidLetDeclarationAccess(target, ast) {
     const targetStart = target.sourceSpan.start.offset;
     const targetEnd = target.sourceSpan.end.offset;
     const astStart = ast.sourceSpan.start;
-    if ((targetStart > astStart || astStart >= targetStart && astStart <= targetEnd) && this.scope.isLocal(target)) {
-      this.tcb.oobRecorder.letUsedBeforeDefinition(this.tcb.id, ast, target);
-    }
+    return targetStart < astStart && astStart > targetEnd || !this.scope.isLocal(target);
   }
 };
 function tcbCallTypeCtor(dir, tcb, inputs) {
@@ -11539,7 +11541,8 @@ var TcbEventHandlerTranslator = class extends TcbExpressionTranslator {
     }
     return super.resolve(ast);
   }
-  validateLetDeclarationAccess() {
+  isValidLetDeclarationAccess() {
+    return true;
   }
 };
 var TcbForLoopTrackTranslator = class extends TcbExpressionTranslator {
@@ -14718,4 +14721,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-S6XWL3LN.js.map
+//# sourceMappingURL=chunk-VMYQYSYD.js.map
