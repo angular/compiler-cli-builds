@@ -276,7 +276,11 @@ var FunctionExtractor = class {
   extract() {
     var _a;
     const signature = this.typeChecker.getSignatureFromDeclaration(this.declaration);
-    const returnType = signature ? this.typeChecker.typeToString(this.typeChecker.getReturnTypeOfSignature(signature)) : "unknown";
+    const returnType = signature ? this.typeChecker.typeToString(
+      this.typeChecker.getReturnTypeOfSignature(signature),
+      void 0,
+      ts3.TypeFormatFlags.NoTypeReduction | ts3.TypeFormatFlags.NoTruncation
+    ) : "unknown";
     const jsdocsTags = extractJsDocTags(this.declaration);
     return {
       params: extractAllParams(this.declaration.parameters, this.typeChecker),
@@ -870,7 +874,7 @@ function filterSignatureDeclarations(signatures) {
   for (const signature of signatures) {
     const decl = signature.getDeclaration();
     if (ts9.isFunctionDeclaration(decl) || ts9.isCallSignatureDeclaration(decl)) {
-      result.push(decl);
+      result.push({ signature, decl });
     }
   }
   return result;
@@ -878,16 +882,20 @@ function filterSignatureDeclarations(signatures) {
 function extractFunctionWithOverloads(name, signatures, typeChecker) {
   return {
     name,
-    signatures: filterSignatureDeclarations(signatures).map((s) => ({
+    signatures: filterSignatureDeclarations(signatures).map(({ decl, signature }) => ({
       name,
       entryType: EntryType.Function,
-      description: extractJsDocDescription(s),
-      generics: extractGenerics(s),
+      description: extractJsDocDescription(decl),
+      generics: extractGenerics(decl),
       isNewType: false,
-      jsdocTags: extractJsDocTags(s),
-      params: extractAllParams(s.parameters, typeChecker),
-      rawComment: extractRawJsDoc(s),
-      returnType: typeChecker.typeToString(typeChecker.getReturnTypeOfSignature(typeChecker.getSignatureFromDeclaration(s)))
+      jsdocTags: extractJsDocTags(decl),
+      params: extractAllParams(decl.parameters, typeChecker),
+      rawComment: extractRawJsDoc(decl),
+      returnType: typeChecker.typeToString(
+        typeChecker.getReturnTypeOfSignature(signature),
+        void 0,
+        ts9.TypeFormatFlags.NoTypeReduction | ts9.TypeFormatFlags.NoTruncation
+      )
     })),
     implementation: null
   };
@@ -10806,4 +10814,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4B53GUJY.js.map
+//# sourceMappingURL=chunk-ILO46MHU.js.map
