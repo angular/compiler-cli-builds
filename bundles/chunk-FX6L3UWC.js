@@ -206,7 +206,7 @@ function extractGenerics(declaration) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/jsdoc_extractor.mjs
 import ts2 from "typescript";
-var decoratorExpression = /@(?=(Injectable|Component|Directive|Pipe|NgModule|Input|Output|HostBinding|HostListener|Inject|Optional|Self|Host|SkipSelf))/g;
+var decoratorExpression = /@(?=(Injectable|Component|Directive|Pipe|NgModule|Input|Output|HostBinding|HostListener|Inject|Optional|Self|Host|SkipSelf|ViewChild|ViewChildren|ContentChild|ContentChildren))/g;
 function extractJsDocTags(node) {
   const escapedNode = getEscapedNode(node);
   return ts2.getJSDocTags(escapedNode).map((t) => {
@@ -4669,4 +4669,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-VDL4AX3S.js.map
+//# sourceMappingURL=chunk-FX6L3UWC.js.map
