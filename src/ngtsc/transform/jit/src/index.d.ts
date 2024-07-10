@@ -26,4 +26,4 @@ export { getInitializerApiJitTransform } from './initializer_api_transforms/tran
  *    added that will declare the input as a signal input while also capturing the necessary
  *    metadata
  */
-export declare function angularJitApplicationTransform(program: ts.Program, isCore?: boolean): ts.TransformerFactory<ts.SourceFile>;
+export declare function angularJitApplicationTransform(program: ts.Program, isCore?: boolean, shouldTransformClass?: (node: ts.ClassDeclaration) => boolean): ts.TransformerFactory<ts.SourceFile>;

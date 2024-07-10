@@ -3,6 +3,9 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
+  angularJitApplicationTransform
+} from "./chunk-5S5PWL6V.js";
+import {
   CompilationMode,
   ComponentDecoratorHandler,
   ComponentScopeKind,
@@ -17,6 +20,7 @@ import {
   INPUT_INITIALIZER_FN,
   InjectableClassRegistry,
   InjectableDecoratorHandler,
+  JitDeclarationRegistry,
   LocalMetadataRegistry,
   LocalModuleScopeRegistry,
   MODEL_INITIALIZER_FN,
@@ -46,7 +50,7 @@ import {
   ivyTransformFactory,
   retagAllTsFiles,
   tryParseInitializerApi
-} from "./chunk-VMYQYSYD.js";
+} from "./chunk-3DSNJ5DV.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -3539,6 +3543,25 @@ var NgCompiler = class {
       aliasTransformFactory(compilation.traitCompiler.exportStatements),
       defaultImportTracker.importPreservingTransformer()
     ];
+    if (compilation.supportJitMode && compilation.jitDeclarationRegistry.jitDeclarations.size > 0) {
+      const { jitDeclarations } = compilation.jitDeclarationRegistry;
+      const jitDeclarationsArray = Array.from(jitDeclarations);
+      const jitDeclarationOriginalNodes = new Set(jitDeclarationsArray.map((d) => ts22.getOriginalNode(d)));
+      const sourceFilesWithJit = new Set(jitDeclarationsArray.map((d) => d.getSourceFile().fileName));
+      before.push((ctx) => {
+        const reflectionHost = new TypeScriptReflectionHost(this.inputProgram.getTypeChecker());
+        const jitTransform = angularJitApplicationTransform(this.inputProgram, compilation.isCore, (node) => {
+          node = ts22.getOriginalNode(node, ts22.isClassDeclaration);
+          return reflectionHost.isClass(node) && jitDeclarationOriginalNodes.has(node);
+        })(ctx);
+        return (sourceFile) => {
+          if (!sourceFilesWithJit.has(sourceFile.fileName)) {
+            return sourceFile;
+          }
+          return jitTransform(sourceFile);
+        };
+      });
+    }
     const afterDeclarations = [];
     if (this.options.compilationMode !== "experimental-local" && compilation.dtsTransforms !== null) {
       afterDeclarations.push(declarationTransformFactory(compilation.dtsTransforms, compilation.reflector, compilation.refEmitter, importRewriter));
@@ -3855,9 +3878,10 @@ var NgCompiler = class {
     if (supportJitMode === false && this.options.forbidOrphanComponents) {
       throw new Error('JIT mode support ("supportJitMode" option) cannot be disabled when forbidOrphanComponents is set to true');
     }
+    const jitDeclarationRegistry = new JitDeclarationRegistry();
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, this.enableLetSyntax, localCompilationExtraImportsTracker),
-      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, importTracker, supportTestBed, compilationMode, !!this.options.generateExtraImportsInLocalMode),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, this.enableLetSyntax, localCompilationExtraImportsTracker, jitDeclarationRegistry),
+      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, importTracker, supportTestBed, compilationMode, jitDeclarationRegistry),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode, !!this.options.generateExtraImportsInLocalMode),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
       new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_d = this.options.onlyPublishPublicTypingsForNgModules) != null ? _d : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode, localCompilationExtraImportsTracker)
@@ -3886,8 +3910,10 @@ var NgCompiler = class {
       resourceRegistry,
       extendedTemplateChecker,
       localCompilationExtraImportsTracker,
+      jitDeclarationRegistry,
       templateSemanticsChecker,
-      sourceFileValidator
+      sourceFileValidator,
+      supportJitMode
     };
   }
 };
@@ -4669,4 +4695,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FX6L3UWC.js.map
+//# sourceMappingURL=chunk-WC6LPDH4.js.map

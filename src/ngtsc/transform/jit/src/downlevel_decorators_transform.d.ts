@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
-import { ReflectionHost } from '../../ngtsc/reflection';
+import { ReflectionHost } from '../../../reflection';
 /**
  * Gets a transformer for downleveling Angular constructor parameter and property decorators.
  *
@@ -18,5 +18,6 @@ import { ReflectionHost } from '../../ngtsc/reflection';
  * @param diagnostics List which will be populated with diagnostics if any.
  * @param isCore Whether the current TypeScript program is for the `@angular/core` package.
  * @param isClosureCompilerEnabled Whether closure annotations need to be added where needed.
+ * @param shouldTransformClass Optional function to check if a given class should be transformed.
  */
-export declare function getDownlevelDecoratorsTransform(typeChecker: ts.TypeChecker, host: ReflectionHost, diagnostics: ts.Diagnostic[], isCore: boolean, isClosureCompilerEnabled: boolean): ts.TransformerFactory<ts.SourceFile>;
+export declare function getDownlevelDecoratorsTransform(typeChecker: ts.TypeChecker, host: ReflectionHost, diagnostics: ts.Diagnostic[], isCore: boolean, isClosureCompilerEnabled: boolean, shouldTransformClass?: (node: ts.ClassDeclaration) => boolean): ts.TransformerFactory<ts.SourceFile>;

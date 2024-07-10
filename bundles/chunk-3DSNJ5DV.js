@@ -3681,6 +3681,13 @@ function compileInputTransformFields(inputs) {
   return extraFields;
 }
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/jit_declaration_registry.mjs
+var JitDeclarationRegistry = class {
+  constructor() {
+    this.jitDeclarations = /* @__PURE__ */ new Set();
+  }
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, CssSelector as CssSelector4, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry as DomElementSchemaRegistry3, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, outputAst as o2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher3, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
 import ts45 from "typescript";
@@ -4807,7 +4814,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
     directive = reflectObjectLiteral(meta);
   }
   if (directive.has("jit")) {
-    return void 0;
+    return { jitForced: true };
   }
   const members = reflector.getMembersOfClass(clazz);
   const decoratedElements = members.filter((member) => !member.isStatic && member.decorators !== null);
@@ -4917,6 +4924,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
     hostDirectives: (hostDirectives == null ? void 0 : hostDirectives.map((hostDir) => toHostDirectiveMetadata(hostDir, sourceFile, refEmitter))) || null
   };
   return {
+    jitForced: false,
     decorator: directive,
     metadata,
     inputs,
@@ -5686,7 +5694,7 @@ var LIFECYCLE_HOOKS = /* @__PURE__ */ new Set([
   "ngAfterContentChecked"
 ]);
 var DirectiveDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, importTracker, includeClassMetadata, compilationMode, generateExtraImportsInLocalMode) {
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, importTracker, includeClassMetadata, compilationMode, jitDeclarationRegistry) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -5703,7 +5711,7 @@ var DirectiveDecoratorHandler = class {
     this.importTracker = importTracker;
     this.includeClassMetadata = includeClassMetadata;
     this.compilationMode = compilationMode;
-    this.generateExtraImportsInLocalMode = generateExtraImportsInLocalMode;
+    this.jitDeclarationRegistry = jitDeclarationRegistry;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = "DirectiveDecoratorHandler";
   }
@@ -5738,7 +5746,8 @@ var DirectiveDecoratorHandler = class {
       this.compilationMode,
       null
     );
-    if (directiveResult === void 0) {
+    if (directiveResult.jitForced) {
+      this.jitDeclarationRegistry.jitDeclarations.add(node);
       return {};
     }
     const analysis = directiveResult.metadata;
@@ -13240,7 +13249,7 @@ var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, localCompilationExtraImportsTracker) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, localCompilationExtraImportsTracker, jitDeclarationRegistry) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -13278,6 +13287,7 @@ var ComponentDecoratorHandler = class {
     this.enableBlockSyntax = enableBlockSyntax;
     this.enableLetSyntax = enableLetSyntax;
     this.localCompilationExtraImportsTracker = localCompilationExtraImportsTracker;
+    this.jitDeclarationRegistry = jitDeclarationRegistry;
     this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry3();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
@@ -13356,7 +13366,8 @@ var ComponentDecoratorHandler = class {
     let diagnostics;
     let isPoisoned = false;
     const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.importTracker, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, this.annotateForClosureCompiler, this.compilationMode, this.elementSchemaRegistry.getDefaultComponentElementName());
-    if (directiveResult === void 0) {
+    if (directiveResult.jitForced) {
+      this.jitDeclarationRegistry.jitDeclarations.add(node);
       return {};
     }
     const { decorator: component, metadata, inputs, outputs, hostDirectives, rawHostDirectives } = directiveResult;
@@ -14673,6 +14684,7 @@ export {
   ivyTransformFactory,
   InjectableClassRegistry,
   NoopReferencesRegistry,
+  JitDeclarationRegistry,
   SemanticDepGraphUpdater,
   ComponentScopeKind,
   CompoundComponentScopeReader,
@@ -14721,4 +14733,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-VMYQYSYD.js.map
+//# sourceMappingURL=chunk-3DSNJ5DV.js.map

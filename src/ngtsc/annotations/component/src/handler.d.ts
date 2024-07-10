@@ -25,6 +25,7 @@ import { Xi18nContext } from '../../../xi18n';
 import { InjectableClassRegistry, ReferencesRegistry, ResourceLoader } from '../../common';
 import { ComponentAnalysisData, ComponentResolutionData } from './metadata';
 import { ComponentSymbol } from './symbol';
+import { JitDeclarationRegistry } from '../../common/src/jit_declaration_registry';
 /**
  * `DecoratorHandler` which handles the `@Component` annotation.
  */
@@ -66,7 +67,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private readonly enableBlockSyntax;
     private readonly enableLetSyntax;
     private readonly localCompilationExtraImportsTracker;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, dtsScopeReader: DtsModuleScopeResolver, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, strictCtorDeps: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, hostDirectivesResolver: HostDirectivesResolver, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, compilationMode: CompilationMode, deferredSymbolTracker: DeferredSymbolTracker, forbidOrphanRendering: boolean, enableBlockSyntax: boolean, enableLetSyntax: boolean, localCompilationExtraImportsTracker: LocalCompilationExtraImportsTracker | null);
+    private readonly jitDeclarationRegistry;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, dtsScopeReader: DtsModuleScopeResolver, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, strictCtorDeps: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, hostDirectivesResolver: HostDirectivesResolver, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, compilationMode: CompilationMode, deferredSymbolTracker: DeferredSymbolTracker, forbidOrphanRendering: boolean, enableBlockSyntax: boolean, enableLetSyntax: boolean, localCompilationExtraImportsTracker: LocalCompilationExtraImportsTracker | null, jitDeclarationRegistry: JitDeclarationRegistry);
     private literalCache;
     private elementSchemaRegistry;
     /**

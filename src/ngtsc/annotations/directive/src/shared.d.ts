@@ -22,6 +22,7 @@ export declare const queryDecoratorNames: QueryDecoratorName[];
  * the module.
  */
 export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker, evaluator: PartialEvaluator, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, annotateForClosureCompiler: boolean, compilationMode: CompilationMode, defaultSelector: string | null): {
+    jitForced: false;
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;
     inputs: ClassPropertyMapping<InputMapping>;
@@ -29,7 +30,9 @@ export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decora
     isStructural: boolean;
     hostDirectives: HostDirectiveMeta[] | null;
     rawHostDirectives: ts.Expression | null;
-} | undefined;
+} | {
+    jitForced: true;
+};
 export declare function extractDecoratorQueryMetadata(exprNode: ts.Node, name: string, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, evaluator: PartialEvaluator): R3QueryMetadata;
 export declare function extractHostBindings(members: ClassMember[], evaluator: PartialEvaluator, coreModule: string | undefined, compilationMode: CompilationMode, metadata?: Map<string, ts.Expression>): ParsedHostBindings;
 export declare function parseDirectiveStyles(directive: Map<string, ts.Expression>, evaluator: PartialEvaluator, compilationMode: CompilationMode): null | string[];
