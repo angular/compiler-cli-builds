@@ -45,8 +45,9 @@ import {
   isShim,
   ivyTransformFactory,
   retagAllTsFiles,
-  tryParseInitializerApi
-} from "./chunk-VMYQYSYD.js";
+  tryParseInitializerApi,
+  untagAllTsFiles
+} from "./chunk-FBITOSGJ.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -4336,6 +4337,7 @@ var NgtscProgram = class {
         };
       }
     }
+    untagAllTsFiles(this.tsProgram);
     const forceEmit = (_a = opts == null ? void 0 : opts.forceEmit) != null ? _a : false;
     this.compiler.perfRecorder.memory(PerfCheckpoint.PreEmit);
     const res = this.compiler.perfRecorder.inPhase(PerfPhase.TypeScriptEmit, () => {
@@ -4669,4 +4671,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-4SG2R55G.js.map
+//# sourceMappingURL=chunk-AKCIUGWL.js.map

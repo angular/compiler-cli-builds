@@ -14693,6 +14693,7 @@ export {
   NgModuleDecoratorHandler,
   NgOriginalFile,
   isShim,
+  untagAllTsFiles,
   retagAllTsFiles,
   ShimAdapter,
   ShimReferenceTagger,
@@ -14721,4 +14722,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-VMYQYSYD.js.map
+//# sourceMappingURL=chunk-FBITOSGJ.js.map
