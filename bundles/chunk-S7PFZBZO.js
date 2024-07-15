@@ -481,8 +481,14 @@ var ClassExtractor = class {
   isDocumentableMember(member) {
     return this.isMethod(member) || this.isProperty(member) || ts5.isAccessor(member) || ts5.isCallSignatureDeclaration(member);
   }
+  isPublicConstructorParameterProperty(node) {
+    if (ts5.isParameterPropertyDeclaration(node, node.parent) && node.modifiers) {
+      return node.modifiers.some((modifier) => modifier.kind === ts5.SyntaxKind.PublicKeyword);
+    }
+    return false;
+  }
   isProperty(member) {
-    return ts5.isPropertyDeclaration(member) || ts5.isPropertySignature(member);
+    return ts5.isPropertyDeclaration(member) || ts5.isPropertySignature(member) || this.isPublicConstructorParameterProperty(member);
   }
   isMethod(member) {
     return ts5.isMethodDeclaration(member) || ts5.isMethodSignature(member);
@@ -4671,4 +4677,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-AKCIUGWL.js.map
+//# sourceMappingURL=chunk-S7PFZBZO.js.map
