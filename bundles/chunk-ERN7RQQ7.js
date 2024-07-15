@@ -34,6 +34,8 @@ var PerfPhase;
   PerfPhase2[PerfPhase2["LAST"] = 25] = "LAST";
   PerfPhase2[PerfPhase2["LsCodeFixes"] = 26] = "LsCodeFixes";
   PerfPhase2[PerfPhase2["LsCodeFixesAll"] = 27] = "LsCodeFixesAll";
+  PerfPhase2[PerfPhase2["LSComputeApplicableRefactorings"] = 28] = "LSComputeApplicableRefactorings";
+  PerfPhase2[PerfPhase2["LSApplyRefactoring"] = 29] = "LSApplyRefactoring";
 })(PerfPhase || (PerfPhase = {}));
 var PerfEvent;
 (function(PerfEvent2) {
@@ -205,4 +207,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-JZQHA4E7.js.map
+//# sourceMappingURL=chunk-ERN7RQQ7.js.map

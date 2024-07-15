@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-D6PC7CJF.js";
+} from "./chunk-64E5FUR3.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-NRWBTWGE.js";
+} from "./chunk-FU5GMAH4.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -94,7 +94,7 @@ import {
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-JZQHA4E7.js";
+} from "./chunk-ERN7RQQ7.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -485,8 +485,14 @@ var ClassExtractor = class {
   isDocumentableMember(member) {
     return this.isMethod(member) || this.isProperty(member) || ts5.isAccessor(member) || ts5.isCallSignatureDeclaration(member);
   }
+  isPublicConstructorParameterProperty(node) {
+    if (ts5.isParameterPropertyDeclaration(node, node.parent) && node.modifiers) {
+      return node.modifiers.some((modifier) => modifier.kind === ts5.SyntaxKind.PublicKeyword);
+    }
+    return false;
+  }
   isProperty(member) {
-    return ts5.isPropertyDeclaration(member) || ts5.isPropertySignature(member);
+    return ts5.isPropertyDeclaration(member) || ts5.isPropertySignature(member) || this.isPublicConstructorParameterProperty(member);
   }
   isMethod(member) {
     return ts5.isMethodDeclaration(member) || ts5.isMethodSignature(member);
@@ -4697,4 +4703,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-J2M3KCDL.js.map
+//# sourceMappingURL=chunk-I4RUESHK.js.map
