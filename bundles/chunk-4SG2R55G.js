@@ -475,10 +475,10 @@ var ClassExtractor = class {
   }
   isMemberExcluded(member) {
     var _a;
-    return !member.name || !this.isDocumentableMember(member) || !!((_a = member.modifiers) == null ? void 0 : _a.some((mod) => mod.kind === ts5.SyntaxKind.PrivateKeyword)) || member.name.getText() === "prototype" || isAngularPrivateName(member.name.getText()) || isInternal(member);
+    return !member.name || !this.isDocumentableMember(member) || !ts5.isCallSignatureDeclaration(member) && ((_a = member.modifiers) == null ? void 0 : _a.some((mod) => mod.kind === ts5.SyntaxKind.PrivateKeyword)) || member.name.getText() === "prototype" || isAngularPrivateName(member.name.getText()) || isInternal(member);
   }
   isDocumentableMember(member) {
-    return this.isMethod(member) || this.isProperty(member) || ts5.isAccessor(member);
+    return this.isMethod(member) || this.isProperty(member) || ts5.isAccessor(member) || ts5.isCallSignatureDeclaration(member);
   }
   isProperty(member) {
     return ts5.isPropertyDeclaration(member) || ts5.isPropertySignature(member);
@@ -4669,4 +4669,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FX6L3UWC.js.map
+//# sourceMappingURL=chunk-4SG2R55G.js.map
