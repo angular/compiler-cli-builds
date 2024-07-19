@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-64E5FUR3.js";
+} from "./chunk-IM6IAAQ5.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-FU5GMAH4.js";
+} from "./chunk-J7YDWOKQ.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -87,7 +87,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-WTQ7UQOL.js";
+} from "./chunk-HF7ZH7LI.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -2974,6 +2974,51 @@ var factory9 = {
   create: () => new UninvokedFunctionInEventBindingSpec()
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unused_let_declaration/index.mjs
+import { AST, ASTWithSource as ASTWithSource5, TmplAstLetDeclaration } from "@angular/compiler";
+var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
+  constructor() {
+    super(...arguments);
+    this.code = ErrorCode.UNUSED_LET_DECLARATION;
+    this.analysis = /* @__PURE__ */ new Map();
+  }
+  run(ctx, component, template) {
+    super.run(ctx, component, template);
+    const diagnostics = [];
+    const { allLetDeclarations, usedLetDeclarations } = this.getAnalysis(component);
+    for (const decl of allLetDeclarations) {
+      if (!usedLetDeclarations.has(decl)) {
+        diagnostics.push(ctx.makeTemplateDiagnostic(decl.sourceSpan, `@let ${decl.name} is declared but its value is never read.`));
+      }
+    }
+    this.analysis.clear();
+    return diagnostics;
+  }
+  visitNode(ctx, component, node) {
+    if (node instanceof TmplAstLetDeclaration) {
+      this.getAnalysis(component).allLetDeclarations.add(node);
+    } else if (node instanceof AST) {
+      const unwrappedNode = node instanceof ASTWithSource5 ? node.ast : node;
+      const target = ctx.templateTypeChecker.getExpressionTarget(unwrappedNode, component);
+      if (target !== null && target instanceof TmplAstLetDeclaration) {
+        this.getAnalysis(component).usedLetDeclarations.add(target);
+      }
+    }
+    return [];
+  }
+  getAnalysis(node) {
+    if (!this.analysis.has(node)) {
+      this.analysis.set(node, { allLetDeclarations: /* @__PURE__ */ new Set(), usedLetDeclarations: /* @__PURE__ */ new Set() });
+    }
+    return this.analysis.get(node);
+  }
+};
+var factory10 = {
+  code: ErrorCode.UNUSED_LET_DECLARATION,
+  name: ExtendedTemplateDiagnosticName.UNUSED_LET_DECLARATION,
+  create: () => new UnusedLetDeclarationCheck()
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.mjs
 import ts19 from "typescript";
 
@@ -2991,12 +3036,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory10 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory10.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory11 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory11.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory10.create(options);
+      const check = factory11.create(options);
       if (check === null) {
         continue;
       }
@@ -3048,15 +3093,16 @@ var ALL_DIAGNOSTIC_FACTORIES = [
   factory4,
   factory7,
   factory,
-  factory9
+  factory9,
+  factory10
 ];
 var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ExtendedTemplateDiagnosticName.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION,
-  ...ALL_DIAGNOSTIC_FACTORIES.map((factory10) => factory10.name)
+  ...ALL_DIAGNOSTIC_FACTORIES.map((factory11) => factory11.name)
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.mjs
-import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, RecursiveAstVisitor as RecursiveAstVisitor3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration, TmplAstRecursiveVisitor as TmplAstRecursiveVisitor2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource6, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, RecursiveAstVisitor as RecursiveAstVisitor3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor as TmplAstRecursiveVisitor2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts20 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   constructor(templateTypeChecker) {
@@ -3115,7 +3161,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor3 {
     }
     const target = this.templateTypeChecker.getExpressionTarget(ast, this.component);
     const isVariable = target instanceof TmplAstVariable2;
-    const isLet = target instanceof TmplAstLetDeclaration;
+    const isLet = target instanceof TmplAstLetDeclaration2;
     if (!isVariable && !isLet) {
       return;
     }
@@ -3143,7 +3189,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor3 {
   }
 };
 function unwrapAstWithSource(ast) {
-  return ast instanceof ASTWithSource5 ? ast.ast : ast;
+  return ast instanceof ASTWithSource6 ? ast.ast : ast;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/rules/initializer_api_usage_rule.mjs
@@ -4703,4 +4749,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-I4RUESHK.js.map
+//# sourceMappingURL=chunk-INNAZKMY.js.map
