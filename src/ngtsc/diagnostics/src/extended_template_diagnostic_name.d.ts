@@ -25,6 +25,5 @@ export declare enum ExtendedTemplateDiagnosticName {
     SUFFIX_NOT_SUPPORTED = "suffixNotSupported",
     SKIP_HYDRATION_NOT_STATIC = "skipHydrationNotStatic",
     INTERPOLATED_SIGNAL_NOT_INVOKED = "interpolatedSignalNotInvoked",
-    CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION = "controlFlowPreventingContentProjection",
-    UNUSED_LET_DECLARATION = "unusedLetDeclaration"
+    CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION = "controlFlowPreventingContentProjection"
 }
