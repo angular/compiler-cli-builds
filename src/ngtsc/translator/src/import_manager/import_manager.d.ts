@@ -41,14 +41,13 @@ export type ModuleName = string & {
  * manipulation using e.g. `magic-string`.
  */
 export declare class ImportManager implements ImportGenerator<ts.SourceFile, ts.Identifier | ts.PropertyAccessExpression> {
-    private _config;
     /** List of new imports that will be inserted into given source files. */
     private newImports;
     private nextUniqueIndex;
     private config;
     private reuseSourceFileImportsTracker;
     private reuseGeneratedImportsTracker;
-    constructor(_config?: Partial<ImportManagerConfig>);
+    constructor(config?: Partial<ImportManagerConfig>);
     /** Adds a side-effect import for the given module. */
     addSideEffectImport(requestedFile: ts.SourceFile, moduleSpecifier: string): void;
     /**

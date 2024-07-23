@@ -1945,7 +1945,7 @@ function captureGeneratedImport(request, tracker, referenceNode) {
   }
 }
 function hashImportRequest(req) {
-  return `${req.requestedFile.fileName}:${req.exportModuleSpecifier}:${req.exportSymbolName}`;
+  return `${req.requestedFile.fileName}:${req.exportModuleSpecifier}:${req.exportSymbolName}${req.unsafeAliasOverride ? ":" + req.unsafeAliasOverride : ""}`;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/import_manager/reuse_source_file_imports.mjs
@@ -1975,7 +1975,14 @@ function attemptToReuseExistingSourceFileImports(tracker, sourceFile, request) {
       }
       if (ts15.isNamedImports(namedBindings) && request.exportSymbolName !== null) {
         const existingElement = namedBindings.elements.find((e) => {
-          return !e.isTypeOnly && (e.propertyName ? e.propertyName.text === request.exportSymbolName : e.name.text === request.exportSymbolName);
+          var _a;
+          let nameMatches;
+          if (request.unsafeAliasOverride) {
+            nameMatches = ((_a = e.propertyName) == null ? void 0 : _a.text) === request.exportSymbolName && e.name.text === request.unsafeAliasOverride;
+          } else {
+            nameMatches = e.propertyName ? e.propertyName.text === request.exportSymbolName : e.name.text === request.exportSymbolName;
+          }
+          return !e.isTypeOnly && nameMatches;
         });
         if (existingElement !== void 0) {
           tracker.reusedAliasDeclarations.add(existingElement);
@@ -1993,7 +2000,7 @@ function attemptToReuseExistingSourceFileImports(tracker, sourceFile, request) {
   }
   const symbolsToBeImported = tracker.updatedImports.get(candidateImportToBeUpdated);
   const propertyName = ts15.factory.createIdentifier(request.exportSymbolName);
-  const fileUniqueAlias = tracker.generateUniqueIdentifier(sourceFile, request.exportSymbolName);
+  const fileUniqueAlias = request.unsafeAliasOverride ? ts15.factory.createIdentifier(request.unsafeAliasOverride) : tracker.generateUniqueIdentifier(sourceFile, request.exportSymbolName);
   symbolsToBeImported.push({
     propertyName,
     fileUniqueAlias
@@ -2007,9 +2014,8 @@ var presetImportManagerForceNamespaceImports = {
   forceGenerateNamespacesForNewImports: true
 };
 var ImportManager = class {
-  constructor(_config = {}) {
-    var _a;
-    this._config = _config;
+  constructor(config = {}) {
+    var _a, _b, _c, _d, _e, _f;
     this.newImports = /* @__PURE__ */ new Map();
     this.nextUniqueIndex = 0;
     this.reuseGeneratedImportsTracker = {
@@ -2017,13 +2023,12 @@ var ImportManager = class {
       namespaceImportReuseCache: /* @__PURE__ */ new Map()
     };
     this.config = {
-      shouldUseSingleQuotes: () => false,
-      rewriter: null,
-      disableOriginalSourceFileReuse: false,
-      forceGenerateNamespacesForNewImports: false,
-      namespaceImportPrefix: "i",
-      generateUniqueIdentifier: (_a = this._config.generateUniqueIdentifier) != null ? _a : createGenerateUniqueIdentifierHelper(),
-      ...this._config
+      shouldUseSingleQuotes: (_a = config.shouldUseSingleQuotes) != null ? _a : () => false,
+      rewriter: (_b = config.rewriter) != null ? _b : null,
+      disableOriginalSourceFileReuse: (_c = config.disableOriginalSourceFileReuse) != null ? _c : false,
+      forceGenerateNamespacesForNewImports: (_d = config.forceGenerateNamespacesForNewImports) != null ? _d : false,
+      namespaceImportPrefix: (_e = config.namespaceImportPrefix) != null ? _e : "i",
+      generateUniqueIdentifier: (_f = config.generateUniqueIdentifier) != null ? _f : createGenerateUniqueIdentifierHelper()
     };
     this.reuseSourceFileImportsTracker = {
       generateUniqueIdentifier: this.config.generateUniqueIdentifier,
@@ -2078,9 +2083,19 @@ var ImportManager = class {
       namedImports.set(request.exportModuleSpecifier, []);
     }
     const exportSymbolName = ts16.factory.createIdentifier(request.exportSymbolName);
-    const fileUniqueName = this.config.generateUniqueIdentifier(sourceFile, request.exportSymbolName);
-    const needsAlias = fileUniqueName !== null;
-    const specifierName = needsAlias ? fileUniqueName : exportSymbolName;
+    const fileUniqueName = request.unsafeAliasOverride ? null : this.config.generateUniqueIdentifier(sourceFile, request.exportSymbolName);
+    let needsAlias;
+    let specifierName;
+    if (request.unsafeAliasOverride) {
+      needsAlias = true;
+      specifierName = ts16.factory.createIdentifier(request.unsafeAliasOverride);
+    } else if (fileUniqueName !== null) {
+      needsAlias = true;
+      specifierName = fileUniqueName;
+    } else {
+      needsAlias = false;
+      specifierName = exportSymbolName;
+    }
     namedImports.get(request.exportModuleSpecifier).push(ts16.factory.createImportSpecifier(false, needsAlias ? exportSymbolName : void 0, specifierName));
     return specifierName;
   }
@@ -3016,4 +3031,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-HF7ZH7LI.js.map
+//# sourceMappingURL=chunk-FHNEZ5OX.js.map

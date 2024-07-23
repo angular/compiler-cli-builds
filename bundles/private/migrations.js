@@ -9,17 +9,19 @@ import {
   PotentialImportMode,
   StaticInterpreter,
   forwardRefResolver
-} from "../chunk-LOYHWUPK.js";
+} from "../chunk-WZMQ5NMB.js";
 import {
+  ImportManager,
   Reference,
   TypeScriptReflectionHost,
   reflectObjectLiteral
-} from "../chunk-HF7ZH7LI.js";
+} from "../chunk-FHNEZ5OX.js";
 import "../chunk-ERN7RQQ7.js";
 import "../chunk-3W345P4E.js";
 import "../chunk-XI2RTGAL.js";
 export {
   DynamicValue,
+  ImportManager,
   PartialEvaluator,
   PotentialImportKind,
   PotentialImportMode,
