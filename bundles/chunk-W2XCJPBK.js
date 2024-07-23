@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-IM6IAAQ5.js";
+} from "./chunk-3ZBFVXMS.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-J7YDWOKQ.js";
+} from "./chunk-LOYHWUPK.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -3389,7 +3389,7 @@ var NgCompiler = class {
     }
   }
   constructor(adapter, options, inputProgram, programDriver, incrementalStrategy, incrementalCompilation, enableTemplateTypeChecker, usePoisonedData, livePerfRecorder) {
-    var _a, _b, _c, _d;
+    var _a, _b, _c;
     this.adapter = adapter;
     this.options = options;
     this.inputProgram = inputProgram;
@@ -3402,10 +3402,11 @@ var NgCompiler = class {
     this.constructionDiagnostics = [];
     this.nonTemplateDiagnostics = null;
     this.delegatingPerfRecorder = new DelegatingPerfRecorder(this.perfRecorder);
-    this.enableTemplateTypeChecker = enableTemplateTypeChecker || ((_a = options["_enableTemplateTypeChecker"]) != null ? _a : false);
-    this.enableBlockSyntax = (_b = options["_enableBlockSyntax"]) != null ? _b : true;
-    this.enableLetSyntax = (_c = options["_enableLetSyntax"]) != null ? _c : true;
-    this.angularCoreVersion = (_d = options["_angularCoreVersion"]) != null ? _d : null;
+    this.usePoisonedData = usePoisonedData || !!options._compilePoisedComponents;
+    this.enableTemplateTypeChecker = enableTemplateTypeChecker || !!options._enableTemplateTypeChecker;
+    this.enableBlockSyntax = (_a = options["_enableBlockSyntax"]) != null ? _a : true;
+    this.enableLetSyntax = (_b = options["_enableLetSyntax"]) != null ? _b : true;
+    this.angularCoreVersion = (_c = options["_angularCoreVersion"]) != null ? _c : null;
     this.constructionDiagnostics.push(...this.adapter.constructionDiagnostics, ...verifyCompatibleTypeCheckOptions(this.options));
     this.currentProgram = inputProgram;
     this.closureCompilerEnabled = !!this.options.annotateForClosureCompiler;
@@ -4757,4 +4758,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-OVZV3V26.js.map
+//# sourceMappingURL=chunk-W2XCJPBK.js.map

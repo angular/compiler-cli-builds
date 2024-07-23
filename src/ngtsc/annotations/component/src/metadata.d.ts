@@ -31,6 +31,7 @@ export interface ComponentAnalysisData {
     classMetadata: R3ClassMetadata | null;
     classDebugInfo: R3ClassDebugInfo | null;
     inputs: ClassPropertyMapping<InputMapping>;
+    inputFieldNamesFromMetadataArray: Set<string>;
     outputs: ClassPropertyMapping;
     /**
      * Providers extracted from the `providers` field of the component annotation which will require

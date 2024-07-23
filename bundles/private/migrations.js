@@ -9,7 +9,7 @@ import {
   PotentialImportMode,
   StaticInterpreter,
   forwardRefResolver
-} from "../chunk-J7YDWOKQ.js";
+} from "../chunk-LOYHWUPK.js";
 import {
   Reference,
   TypeScriptReflectionHost,

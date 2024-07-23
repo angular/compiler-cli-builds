@@ -1785,6 +1785,7 @@ var DtsMetadataReader = class {
       ngContentSelectors,
       isStandalone,
       isSignal,
+      inputFieldNamesFromMetadataArray: null,
       imports: null,
       deferredImports: null,
       schemas: null,
@@ -4931,7 +4932,8 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
     outputs,
     isStructural,
     hostDirectives,
-    rawHostDirectives
+    rawHostDirectives,
+    inputFieldNamesFromMetadataArray: new Set(Object.values(inputsFromMeta).map((i) => i.classPropertyName))
   };
 }
 function extractDecoratorQueryMetadata(exprNode, name, args, propertyName, reflector, evaluator) {
@@ -5758,6 +5760,7 @@ var DirectiveDecoratorHandler = class {
     return {
       analysis: {
         inputs: directiveResult.inputs,
+        inputFieldNamesFromMetadataArray: directiveResult.inputFieldNamesFromMetadataArray,
         outputs: directiveResult.outputs,
         meta: analysis,
         hostDirectives: directiveResult.hostDirectives,
@@ -5786,6 +5789,7 @@ var DirectiveDecoratorHandler = class {
       selector: analysis.meta.selector,
       exportAs: analysis.meta.exportAs,
       inputs: analysis.inputs,
+      inputFieldNamesFromMetadataArray: analysis.inputFieldNamesFromMetadataArray,
       outputs: analysis.outputs,
       queries: analysis.meta.queries.map((query) => query.propertyName),
       isComponent: false,
@@ -13562,6 +13566,7 @@ var ComponentDecoratorHandler = class {
       analysis: {
         baseClass: readBaseClass(node, this.reflector, this.evaluator),
         inputs,
+        inputFieldNamesFromMetadataArray: directiveResult.inputFieldNamesFromMetadataArray,
         outputs,
         hostDirectives,
         rawHostDirectives,
@@ -13624,6 +13629,7 @@ var ComponentDecoratorHandler = class {
       selector: analysis.meta.selector,
       exportAs: analysis.meta.exportAs,
       inputs: analysis.inputs,
+      inputFieldNamesFromMetadataArray: analysis.inputFieldNamesFromMetadataArray,
       outputs: analysis.outputs,
       queries: analysis.meta.queries.map((query) => query.propertyName),
       isComponent: true,
@@ -14734,4 +14740,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-J7YDWOKQ.js.map
+//# sourceMappingURL=chunk-LOYHWUPK.js.map

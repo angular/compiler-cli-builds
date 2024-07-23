@@ -30,6 +30,7 @@ export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decora
     isStructural: boolean;
     hostDirectives: HostDirectiveMeta[] | null;
     rawHostDirectives: ts.Expression | null;
+    inputFieldNamesFromMetadataArray: Set<string>;
 } | {
     jitForced: true;
 };

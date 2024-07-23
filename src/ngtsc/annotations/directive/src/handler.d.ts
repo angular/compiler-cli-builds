@@ -25,6 +25,7 @@ export interface DirectiveHandlerData {
     classMetadata: R3ClassMetadata | null;
     providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
     inputs: ClassPropertyMapping<InputMapping>;
+    inputFieldNamesFromMetadataArray: Set<string>;
     outputs: ClassPropertyMapping;
     isPoisoned: boolean;
     isStructural: boolean;
