@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-ZM2CAWI4.js";
+} from "./chunk-77Y3RJIX.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-WZMQ5NMB.js";
+} from "./chunk-FHKT6RGW.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -87,7 +87,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-FHNEZ5OX.js";
+} from "./chunk-WYWH4ABE.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -3402,7 +3402,7 @@ var NgCompiler = class {
     this.constructionDiagnostics = [];
     this.nonTemplateDiagnostics = null;
     this.delegatingPerfRecorder = new DelegatingPerfRecorder(this.perfRecorder);
-    this.usePoisonedData = usePoisonedData || !!options._compilePoisedComponents;
+    this.usePoisonedData = usePoisonedData || !!options._compilePoisonedComponents;
     this.enableTemplateTypeChecker = enableTemplateTypeChecker || !!options._enableTemplateTypeChecker;
     this.enableBlockSyntax = (_a = options["_enableBlockSyntax"]) != null ? _a : true;
     this.enableLetSyntax = (_b = options["_enableLetSyntax"]) != null ? _b : true;
@@ -3592,6 +3592,7 @@ var NgCompiler = class {
   }
   prepareEmit() {
     const compilation = this.ensureAnalyzed();
+    untagAllTsFiles(this.inputProgram);
     const coreImportsFrom = compilation.isCore ? getR3SymbolsFile(this.inputProgram) : null;
     let importRewriter;
     if (coreImportsFrom !== null) {
@@ -4424,7 +4425,6 @@ var NgtscProgram = class {
         };
       }
     }
-    untagAllTsFiles(this.tsProgram);
     const forceEmit = (_a = opts == null ? void 0 : opts.forceEmit) != null ? _a : false;
     this.compiler.perfRecorder.memory(PerfCheckpoint.PreEmit);
     const res = this.compiler.perfRecorder.inPhase(PerfPhase.TypeScriptEmit, () => {
@@ -4758,4 +4758,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GLWXTUNC.js.map
+//# sourceMappingURL=chunk-FRWDOUUU.js.map

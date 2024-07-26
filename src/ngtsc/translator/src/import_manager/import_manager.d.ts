@@ -43,6 +43,13 @@ export type ModuleName = string & {
 export declare class ImportManager implements ImportGenerator<ts.SourceFile, ts.Identifier | ts.PropertyAccessExpression> {
     /** List of new imports that will be inserted into given source files. */
     private newImports;
+    /**
+     * Keeps track of imports marked for removal. The root-level key is the file from which the
+     * import should be removed, the inner map key is the name of the module from which the symbol
+     * is being imported. The value of the inner map is a set of symbol names that should be removed.
+     * Note! the inner map tracks the original names of the imported symbols, not their local aliases.
+     */
+    private removedImports;
     private nextUniqueIndex;
     private config;
     private reuseSourceFileImportsTracker;
@@ -60,6 +67,14 @@ export declare class ImportManager implements ImportGenerator<ts.SourceFile, ts.
     addImport(request: ImportRequest<ts.SourceFile> & {
         asTypeReference?: undefined;
     }): ts.Identifier | ts.PropertyAccessExpression;
+    /**
+     * Marks all imported symbols with a specific name for removal.
+     * Call `addImport` to undo this operation.
+     * @param requestedFile File from which to remove the imports.
+     * @param exportSymbolName Declared name of the symbol being removed.
+     * @param moduleSpecifier Module from which the symbol is being imported.
+     */
+    removeImport(requestedFile: ts.SourceFile, exportSymbolName: string, moduleSpecifier: string): void;
     private _generateNewImport;
     /**
      * Finalizes the import manager by computing all necessary import changes
@@ -74,6 +89,7 @@ export declare class ImportManager implements ImportGenerator<ts.SourceFile, ts.
         updatedImports: Map<ts.NamedImports, ts.NamedImports>;
         newImports: Map<string, ts.ImportDeclaration[]>;
         reusedOriginalAliasDeclarations: Set<AliasImportDeclaration>;
+        deletedImports: Set<ts.ImportDeclaration>;
     };
     /**
      * Gets a TypeScript transform for the import manager.
@@ -90,4 +106,5 @@ export declare class ImportManager implements ImportGenerator<ts.SourceFile, ts.
      */
     transformTsFile(ctx: ts.TransformationContext, file: ts.SourceFile, extraStatementsAfterImports?: ts.Statement[]): ts.SourceFile;
     private _getNewImportsTrackerForFile;
+    private _canAddSpecifier;
 }

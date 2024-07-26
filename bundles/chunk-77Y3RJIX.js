@@ -10,7 +10,7 @@ import {
   tryParseSignalInputMapping,
   tryParseSignalModelMapping,
   tryParseSignalQueryFromInitializer
-} from "./chunk-WZMQ5NMB.js";
+} from "./chunk-FHKT6RGW.js";
 import {
   ImportManager,
   ImportedSymbolsTracker,
@@ -18,7 +18,7 @@ import {
   isAliasImportDeclaration,
   loadIsReferencedAliasDeclarationPatch,
   reflectClassMember
-} from "./chunk-FHNEZ5OX.js";
+} from "./chunk-WYWH4ABE.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/downlevel_decorators_transform.mjs
 import ts from "typescript";
@@ -539,4 +539,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZM2CAWI4.js.map
+//# sourceMappingURL=chunk-77Y3RJIX.js.map
