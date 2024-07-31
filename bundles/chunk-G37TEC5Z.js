@@ -6013,7 +6013,7 @@ var NgModuleSymbol = class extends SemanticSymbol {
   }
 };
 var NgModuleDecoratorHandler = class {
-  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf, includeClassMetadata, includeSelectorScope, compilationMode, localCompilationExtraImportsTracker) {
+  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf, includeClassMetadata, includeSelectorScope, compilationMode, localCompilationExtraImportsTracker, jitDeclarationRegistry) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaReader = metaReader;
@@ -6032,6 +6032,7 @@ var NgModuleDecoratorHandler = class {
     this.includeSelectorScope = includeSelectorScope;
     this.compilationMode = compilationMode;
     this.localCompilationExtraImportsTracker = localCompilationExtraImportsTracker;
+    this.jitDeclarationRegistry = jitDeclarationRegistry;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = "NgModuleDecoratorHandler";
   }
@@ -6063,6 +6064,7 @@ var NgModuleDecoratorHandler = class {
     }
     const ngModule = reflectObjectLiteral(meta);
     if (ngModule.has("jit")) {
+      this.jitDeclarationRegistry.jitDeclarations.add(node);
       return {};
     }
     const moduleResolvers = combineResolvers([
@@ -14740,4 +14742,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FHKT6RGW.js.map
+//# sourceMappingURL=chunk-G37TEC5Z.js.map
