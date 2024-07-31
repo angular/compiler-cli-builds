@@ -3533,6 +3533,7 @@ var NgCompiler = class {
   }
   prepareEmit() {
     const compilation = this.ensureAnalyzed();
+    untagAllTsFiles(this.inputProgram);
     const coreImportsFrom = compilation.isCore ? getR3SymbolsFile(this.inputProgram) : null;
     let importRewriter;
     if (coreImportsFrom !== null) {
@@ -4343,7 +4344,6 @@ var NgtscProgram = class {
         };
       }
     }
-    untagAllTsFiles(this.tsProgram);
     const forceEmit = (_a = opts == null ? void 0 : opts.forceEmit) != null ? _a : false;
     this.compiler.perfRecorder.memory(PerfCheckpoint.PreEmit);
     const res = this.compiler.perfRecorder.inPhase(PerfPhase.TypeScriptEmit, () => {
@@ -4677,4 +4677,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-S7PFZBZO.js.map
+//# sourceMappingURL=chunk-XOBE6FD3.js.map

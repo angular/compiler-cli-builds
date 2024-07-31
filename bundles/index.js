@@ -36,7 +36,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-S7PFZBZO.js";
+} from "./chunk-XOBE6FD3.js";
 import {
   OptimizeFor,
   TsCreateProgramDriver
@@ -77,7 +77,7 @@ import "./chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("18.1.2+sha-62ade76");
+var VERSION = new Version("18.1.2+sha-eadfa39");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
