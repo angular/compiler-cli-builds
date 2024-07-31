@@ -8402,10 +8402,12 @@ var MagicString = class {
   update(start, end, content, options) {
     if (typeof content !== "string")
       throw new TypeError("replacement content must be a string");
-    while (start < 0)
-      start += this.original.length;
-    while (end < 0)
-      end += this.original.length;
+    if (this.original.length !== 0) {
+      while (start < 0)
+        start += this.original.length;
+      while (end < 0)
+        end += this.original.length;
+    }
     if (end > this.original.length)
       throw new Error("end is out of bounds");
     if (start === end)
@@ -8483,10 +8485,12 @@ var MagicString = class {
     return this;
   }
   remove(start, end) {
-    while (start < 0)
-      start += this.original.length;
-    while (end < 0)
-      end += this.original.length;
+    if (this.original.length !== 0) {
+      while (start < 0)
+        start += this.original.length;
+      while (end < 0)
+        end += this.original.length;
+    }
     if (start === end)
       return this;
     if (start < 0 || end > this.original.length)
@@ -8505,10 +8509,12 @@ var MagicString = class {
     return this;
   }
   reset(start, end) {
-    while (start < 0)
-      start += this.original.length;
-    while (end < 0)
-      end += this.original.length;
+    if (this.original.length !== 0) {
+      while (start < 0)
+        start += this.original.length;
+      while (end < 0)
+        end += this.original.length;
+    }
     if (start === end)
       return this;
     if (start < 0 || end > this.original.length)
@@ -8572,10 +8578,12 @@ var MagicString = class {
     return this.intro + lineStr;
   }
   slice(start = 0, end = this.original.length) {
-    while (start < 0)
-      start += this.original.length;
-    while (end < 0)
-      end += this.original.length;
+    if (this.original.length !== 0) {
+      while (start < 0)
+        start += this.original.length;
+      while (end < 0)
+        end += this.original.length;
+    }
     let result = "";
     let chunk = this.firstChunk;
     while (chunk && (chunk.start > start || chunk.end <= start)) {
@@ -14722,4 +14730,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-FBITOSGJ.js.map
+//# sourceMappingURL=chunk-6E7WYCEU.js.map
