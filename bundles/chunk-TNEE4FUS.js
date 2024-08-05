@@ -299,7 +299,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "18.1.3+sha-523f639";
+var PLACEHOLDER_VERSION = "18.1.3+sha-afb05ff";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
