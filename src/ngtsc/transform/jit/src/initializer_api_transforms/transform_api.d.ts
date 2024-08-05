@@ -12,7 +12,7 @@ import { ImportManager } from '../../../../translator';
 /** Function that can be used to transform class properties. */
 export type PropertyTransform = (member: Pick<ClassMember, 'name' | 'accessLevel' | 'value'> & {
     node: ts.PropertyDeclaration;
-}, host: ReflectionHost, factory: ts.NodeFactory, importTracker: ImportedSymbolsTracker, importManager: ImportManager, classDecorator: Decorator, isCore: boolean) => ts.PropertyDeclaration;
+}, sourceFile: ts.SourceFile, host: ReflectionHost, factory: ts.NodeFactory, importTracker: ImportedSymbolsTracker, importManager: ImportManager, classDecorator: Decorator, isCore: boolean) => ts.PropertyDeclaration;
 /**
  * Creates an import and access for a given Angular core import while
  * ensuring the decorator symbol access can be traced back to an Angular core
