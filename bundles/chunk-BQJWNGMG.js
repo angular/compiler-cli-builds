@@ -2630,8 +2630,8 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
     if (node instanceof Interpolation) {
       return node.expressions.filter((item) => item instanceof PropertyRead2).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
     } else if (node instanceof TmplAstBoundAttribute) {
-      const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
-      if (symbol !== null && symbol.kind === SymbolKind.Input) {
+      const usedDirectives = ctx.templateTypeChecker.getUsedDirectives(component);
+      if (usedDirectives !== null && usedDirectives.some((dir) => dir.inputs.getByBindingPropertyName(node.name) !== null)) {
         return [];
       }
       if ((node.type === BindingType.Property || node.type === BindingType.Class || node.type === BindingType.Style || node.type === BindingType.Attribute || node.type === BindingType.Animation) && node.value instanceof ASTWithSource3 && node.value.ast instanceof PropertyRead2) {
@@ -4758,4 +4758,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-LRE5TVUW.js.map
+//# sourceMappingURL=chunk-BQJWNGMG.js.map
