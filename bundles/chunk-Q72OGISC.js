@@ -9655,7 +9655,7 @@ function translateDiagnostic(diagnostic, resolver) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/expression.mjs
 import { ASTWithSource, Call, EmptyExpr as EmptyExpr2, PropertyRead as PropertyRead2, SafeKeyedRead, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
 import ts40 from "typescript";
-var NULL_AS_ANY = ts40.factory.createAsExpression(ts40.factory.createNull(), ts40.factory.createKeywordTypeNode(ts40.SyntaxKind.AnyKeyword));
+var ANY_EXPRESSION = ts40.factory.createAsExpression(ts40.factory.createNumericLiteral("0"), ts40.factory.createKeywordTypeNode(ts40.SyntaxKind.AnyKeyword));
 var UNDEFINED = ts40.factory.createIdentifier("undefined");
 var UNARY_OPS = /* @__PURE__ */ new Map([
   ["+", ts40.SyntaxKind.PlusToken],
@@ -9839,7 +9839,7 @@ var AstTranslator = class {
     if (this.config.strictSafeNavigationTypes) {
       const expr = ts40.factory.createPropertyAccessExpression(ts40.factory.createNonNullExpression(receiver), ast.name);
       addParseSpanInfo(expr, ast.nameSpan);
-      node = ts40.factory.createParenthesizedExpression(ts40.factory.createConditionalExpression(NULL_AS_ANY, void 0, expr, void 0, UNDEFINED));
+      node = ts40.factory.createParenthesizedExpression(ts40.factory.createConditionalExpression(ANY_EXPRESSION, void 0, expr, void 0, UNDEFINED));
     } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
       node = ts40.factory.createPropertyAccessExpression(tsCastToAny(receiver), ast.name);
     } else {
@@ -9857,7 +9857,7 @@ var AstTranslator = class {
     if (this.config.strictSafeNavigationTypes) {
       const expr = ts40.factory.createElementAccessExpression(ts40.factory.createNonNullExpression(receiver), key);
       addParseSpanInfo(expr, ast.sourceSpan);
-      node = ts40.factory.createParenthesizedExpression(ts40.factory.createConditionalExpression(NULL_AS_ANY, void 0, expr, void 0, UNDEFINED));
+      node = ts40.factory.createParenthesizedExpression(ts40.factory.createConditionalExpression(ANY_EXPRESSION, void 0, expr, void 0, UNDEFINED));
     } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
       node = ts40.factory.createElementAccessExpression(tsCastToAny(receiver), key);
     } else {
@@ -9903,7 +9903,7 @@ var AstTranslator = class {
   convertToSafeCall(ast, expr, args) {
     if (this.config.strictSafeNavigationTypes) {
       const call = ts40.factory.createCallExpression(ts40.factory.createNonNullExpression(expr), void 0, args);
-      return ts40.factory.createParenthesizedExpression(ts40.factory.createConditionalExpression(NULL_AS_ANY, void 0, call, void 0, UNDEFINED));
+      return ts40.factory.createParenthesizedExpression(ts40.factory.createConditionalExpression(ANY_EXPRESSION, void 0, call, void 0, UNDEFINED));
     }
     if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
       return ts40.factory.createCallExpression(tsCastToAny(expr), void 0, args);
@@ -10289,7 +10289,7 @@ var TcbInvalidReferenceOp = class extends TcbOp {
   }
   execute() {
     const id = this.tcb.allocateId();
-    this.scope.addStatement(tsCreateVariable(id, NULL_AS_ANY));
+    this.scope.addStatement(tsCreateVariable(id, ANY_EXPRESSION));
     return id;
   }
 };
@@ -11353,10 +11353,10 @@ var TcbExpressionTranslator = class {
       let pipe;
       if (pipeMeta === null) {
         this.tcb.oobRecorder.missingPipe(this.tcb.id, ast);
-        pipe = NULL_AS_ANY;
+        pipe = ANY_EXPRESSION;
       } else if (pipeMeta.isExplicitlyDeferred && this.tcb.boundTarget.getEagerlyUsedPipes().includes(ast.name)) {
         this.tcb.oobRecorder.deferredPipeUsedEagerly(this.tcb.id, ast);
-        pipe = NULL_AS_ANY;
+        pipe = ANY_EXPRESSION;
       } else {
         pipe = this.tcb.env.pipeInst(pipeMeta.ref);
       }
@@ -11421,7 +11421,7 @@ function tcbCallTypeCtor(dir, tcb, inputs) {
       addParseSpanInfo(assignment, input.sourceSpan);
       return assignment;
     } else {
-      return ts41.factory.createPropertyAssignment(propertyName, NULL_AS_ANY);
+      return ts41.factory.createPropertyAssignment(propertyName, ANY_EXPRESSION);
     }
   });
   return ts41.factory.createCallExpression(
@@ -14730,4 +14730,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-6E7WYCEU.js.map
+//# sourceMappingURL=chunk-Q72OGISC.js.map
