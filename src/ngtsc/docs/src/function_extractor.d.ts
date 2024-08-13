@@ -6,17 +6,27 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import ts from 'typescript';
-import { FunctionEntry, ParameterEntry } from './entities';
+import { EntryType, FunctionEntry, ParameterEntry } from './entities';
 export type FunctionLike = ts.FunctionDeclaration | ts.MethodDeclaration | ts.MethodSignature | ts.CallSignatureDeclaration | ts.ConstructSignatureDeclaration;
 export declare class FunctionExtractor {
     private name;
-    private declaration;
+    private exportDeclaration;
     private typeChecker;
-    constructor(name: string, declaration: FunctionLike, typeChecker: ts.TypeChecker);
+    constructor(name: string, exportDeclaration: FunctionLike, typeChecker: ts.TypeChecker);
     extract(): FunctionEntry;
-    /** Gets all overloads for the function (excluding this extractor's FunctionDeclaration). */
-    getOverloads(): ts.FunctionDeclaration[];
-    private getSymbol;
 }
 /** Extracts parameters of the given parameter declaration AST nodes. */
 export declare function extractAllParams(params: ts.NodeArray<ts.ParameterDeclaration>, typeChecker: ts.TypeChecker): ParameterEntry[];
+export declare function extractCallSignatures(name: string, typeChecker: ts.TypeChecker, type: ts.Type): {
+    name: string;
+    entryType: EntryType;
+    description: string;
+    generics: import("./entities").GenericEntry[];
+    isNewType: boolean;
+    jsdocTags: import("./entities").JsDocTagEntry[];
+    params: ParameterEntry[];
+    rawComment: string;
+    returnType: string;
+}[];
+/** Finds the implementation of the given function declaration overload signature. */
+export declare function findImplementationOfFunction(node: FunctionLike, typeChecker: ts.TypeChecker): FunctionLike | undefined;
