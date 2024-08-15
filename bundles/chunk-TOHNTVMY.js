@@ -260,55 +260,44 @@ function extractResolvedTypeString(node, checker) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/function_extractor.mjs
 var FunctionExtractor = class {
-  constructor(name, declaration, typeChecker) {
+  constructor(name, exportDeclaration, typeChecker) {
     this.name = name;
-    this.declaration = declaration;
+    this.exportDeclaration = exportDeclaration;
     this.typeChecker = typeChecker;
   }
   extract() {
-    var _a;
-    const signature = this.typeChecker.getSignatureFromDeclaration(this.declaration);
+    var _a, _b;
+    const signature = this.typeChecker.getSignatureFromDeclaration(this.exportDeclaration);
     const returnType = signature ? this.typeChecker.typeToString(
       this.typeChecker.getReturnTypeOfSignature(signature),
       void 0,
       ts3.TypeFormatFlags.NoTypeReduction | ts3.TypeFormatFlags.NoTruncation
     ) : "unknown";
-    const jsdocsTags = extractJsDocTags(this.declaration);
+    const implementation = (_a = findImplementationOfFunction(this.exportDeclaration, this.typeChecker)) != null ? _a : this.exportDeclaration;
+    const type = this.typeChecker.getTypeAtLocation(this.exportDeclaration);
+    const overloads = extractCallSignatures(this.name, this.typeChecker, type);
+    const jsdocsTags = extractJsDocTags(implementation);
+    const description = extractJsDocDescription(implementation);
     return {
-      params: extractAllParams(this.declaration.parameters, this.typeChecker),
       name: this.name,
-      isNewType: ts3.isConstructSignatureDeclaration(this.declaration),
-      returnType,
-      returnDescription: (_a = jsdocsTags.find((tag) => tag.name === "returns")) == null ? void 0 : _a.comment,
+      signatures: overloads,
+      implementation: {
+        params: extractAllParams(implementation.parameters, this.typeChecker),
+        isNewType: ts3.isConstructSignatureDeclaration(implementation),
+        returnType,
+        returnDescription: (_b = jsdocsTags.find((tag) => tag.name === "returns")) == null ? void 0 : _b.comment,
+        generics: extractGenerics(implementation),
+        name: this.name,
+        description,
+        entryType: EntryType.Function,
+        jsdocTags: jsdocsTags,
+        rawComment: extractRawJsDoc(implementation)
+      },
       entryType: EntryType.Function,
-      generics: extractGenerics(this.declaration),
-      description: extractJsDocDescription(this.declaration),
+      description,
       jsdocTags: jsdocsTags,
-      rawComment: extractRawJsDoc(this.declaration)
+      rawComment: extractRawJsDoc(implementation)
     };
-  }
-  getOverloads() {
-    var _a, _b, _c, _d;
-    const overloads = [];
-    const symbol = this.getSymbol();
-    const declarationCount = (_b = (_a = symbol == null ? void 0 : symbol.declarations) == null ? void 0 : _a.length) != null ? _b : 0;
-    if (declarationCount > 1) {
-      for (let i = 0; i < declarationCount - 1; i++) {
-        const overloadDeclaration = (_c = symbol == null ? void 0 : symbol.declarations) == null ? void 0 : _c[i];
-        if ((overloadDeclaration == null ? void 0 : overloadDeclaration.pos) === this.declaration.pos)
-          continue;
-        if (overloadDeclaration && ts3.isFunctionDeclaration(overloadDeclaration) && ((_d = overloadDeclaration.modifiers) == null ? void 0 : _d.some((mod) => mod.kind === ts3.SyntaxKind.ExportKeyword))) {
-          overloads.push(overloadDeclaration);
-        }
-      }
-    }
-    return overloads;
-  }
-  getSymbol() {
-    return this.typeChecker.getSymbolsInScope(this.declaration, ts3.SymbolFlags.Function).find((s) => {
-      var _a;
-      return s.name === ((_a = this.declaration.name) == null ? void 0 : _a.getText());
-    });
   }
 };
 function extractAllParams(params, typeChecker) {
@@ -319,6 +308,42 @@ function extractAllParams(params, typeChecker) {
     isOptional: !!(param.questionToken || param.initializer),
     isRestParam: !!param.dotDotDotToken
   }));
+}
+function filterSignatureDeclarations(signatures) {
+  const result = [];
+  for (const signature of signatures) {
+    const decl = signature.getDeclaration();
+    if (ts3.isFunctionDeclaration(decl) || ts3.isCallSignatureDeclaration(decl) || ts3.isMethodDeclaration(decl)) {
+      result.push({ signature, decl });
+    }
+  }
+  return result;
+}
+function extractCallSignatures(name, typeChecker, type) {
+  return filterSignatureDeclarations(type.getCallSignatures()).map(({ decl, signature }) => ({
+    name,
+    entryType: EntryType.Function,
+    description: extractJsDocDescription(decl),
+    generics: extractGenerics(decl),
+    isNewType: false,
+    jsdocTags: extractJsDocTags(decl),
+    params: extractAllParams(decl.parameters, typeChecker),
+    rawComment: extractRawJsDoc(decl),
+    returnType: typeChecker.typeToString(
+      typeChecker.getReturnTypeOfSignature(signature),
+      void 0,
+      ts3.TypeFormatFlags.NoTypeReduction | ts3.TypeFormatFlags.NoTruncation
+    )
+  }));
+}
+function findImplementationOfFunction(node, typeChecker) {
+  var _a;
+  if (node.body !== void 0 || node.name === void 0) {
+    return node;
+  }
+  const symbol = typeChecker.getSymbolAtLocation(node.name);
+  const implementation = (_a = symbol == null ? void 0 : symbol.declarations) == null ? void 0 : _a.find((s) => ts3.isFunctionDeclaration(s) && s.body !== void 0);
+  return implementation;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/internal.mjs
@@ -371,7 +396,7 @@ var ClassExtractor = class {
     return members;
   }
   extractClassMember(memberDeclaration) {
-    if (this.isMethod(memberDeclaration) && !this.isImplementationForOverload(memberDeclaration)) {
+    if (this.isMethod(memberDeclaration)) {
       return this.extractMethod(memberDeclaration);
     } else if (this.isProperty(memberDeclaration)) {
       return this.extractClassProperty(memberDeclaration);
@@ -446,7 +471,7 @@ var ClassExtractor = class {
     const staticMembers = typeOfConstructor.getProperties();
     const result = [];
     for (const member of [...members, ...staticMembers]) {
-      const memberDeclarations = (_a = member.getDeclarations()) != null ? _a : [];
+      const memberDeclarations = this.filterMethodOverloads((_a = member.getDeclarations()) != null ? _a : []);
       for (const memberDeclaration of memberDeclarations) {
         if (this.isDocumentableMember(memberDeclaration)) {
           result.push(memberDeclaration);
@@ -454,6 +479,14 @@ var ClassExtractor = class {
       }
     }
     return result;
+  }
+  filterMethodOverloads(declarations) {
+    return declarations.filter((declaration) => {
+      if (ts5.isFunctionDeclaration(declaration) || ts5.isMethodDeclaration(declaration)) {
+        return !!declaration.body || ts5.getCombinedModifierFlags(declaration) & ts5.ModifierFlags.Abstract;
+      }
+      return true;
+    });
   }
   getMemberTagsFromModifiers(mods) {
     const tags = [];
@@ -504,12 +537,6 @@ var ClassExtractor = class {
     var _a;
     const modifiers = (_a = this.declaration.modifiers) != null ? _a : [];
     return modifiers.some((mod) => mod.kind === ts5.SyntaxKind.AbstractKeyword);
-  }
-  isImplementationForOverload(method) {
-    if (method.kind === ts5.SyntaxKind.MethodSignature)
-      return false;
-    const signature = this.typeChecker.getSignatureFromDeclaration(method);
-    return signature && this.typeChecker.isImplementationOfOverload(signature.declaration);
   }
 };
 var DirectiveExtractor = class extends ClassExtractor {
@@ -797,7 +824,7 @@ function extractInitializerApiFunction(node, typeChecker) {
   }
   const name = node.name.text;
   const type = typeChecker.getTypeAtLocation(node);
-  const callFunction = extractFunctionWithOverloads(name, type.getCallSignatures(), typeChecker);
+  const callFunction = extractFunctionWithOverloads(name, type, typeChecker);
   const subFunctions = [];
   for (const property of type.getProperties()) {
     const subName = property.getName();
@@ -806,7 +833,7 @@ function extractInitializerApiFunction(node, typeChecker) {
       throw new Error(`Initializer API: Could not resolve declaration of sub-property: ${name}.${subName}`);
     }
     const subType = typeChecker.getTypeAtLocation(subDecl);
-    subFunctions.push(extractFunctionWithOverloads(subName, subType.getCallSignatures(), typeChecker));
+    subFunctions.push(extractFunctionWithOverloads(subName, subType, typeChecker));
   }
   let jsdocTags;
   let description;
@@ -867,44 +894,12 @@ function getContainerVariableStatement(node) {
   }
   return node.parent.parent;
 }
-function filterSignatureDeclarations(signatures) {
-  const result = [];
-  for (const signature of signatures) {
-    const decl = signature.getDeclaration();
-    if (ts9.isFunctionDeclaration(decl) || ts9.isCallSignatureDeclaration(decl)) {
-      result.push({ signature, decl });
-    }
-  }
-  return result;
-}
-function extractFunctionWithOverloads(name, signatures, typeChecker) {
+function extractFunctionWithOverloads(name, type, typeChecker) {
   return {
     name,
-    signatures: filterSignatureDeclarations(signatures).map(({ decl, signature }) => ({
-      name,
-      entryType: EntryType.Function,
-      description: extractJsDocDescription(decl),
-      generics: extractGenerics(decl),
-      isNewType: false,
-      jsdocTags: extractJsDocTags(decl),
-      params: extractAllParams(decl.parameters, typeChecker),
-      rawComment: extractRawJsDoc(decl),
-      returnType: typeChecker.typeToString(
-        typeChecker.getReturnTypeOfSignature(signature),
-        void 0,
-        ts9.TypeFormatFlags.NoTypeReduction | ts9.TypeFormatFlags.NoTruncation
-      )
-    })),
+    signatures: extractCallSignatures(name, typeChecker, type),
     implementation: null
   };
-}
-function findImplementationOfFunction(node, typeChecker) {
-  var _a;
-  if (node.body !== void 0 || node.name === void 0) {
-    return node;
-  }
-  const symbol = typeChecker.getSymbolAtLocation(node.name);
-  return (_a = symbol == null ? void 0 : symbol.declarations) == null ? void 0 : _a.find((s) => ts9.isFunctionDeclaration(s) && s.body !== void 0);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/type_alias_extractor.mjs
@@ -975,15 +970,6 @@ var DocsExtractor = class {
     const reflector = new TypeScriptReflectionHost(this.typeChecker);
     const exportedDeclarationMap = reflector.getExportsOfModule(sourceFile);
     let exportedDeclarations = Array.from((_a = exportedDeclarationMap == null ? void 0 : exportedDeclarationMap.entries()) != null ? _a : []).map(([exportName, declaration]) => [exportName, declaration.node]);
-    const declarationCount = exportedDeclarations.length;
-    for (let i = 0; i < declarationCount; i++) {
-      const [exportName, declaration] = exportedDeclarations[i];
-      if (ts10.isFunctionDeclaration(declaration)) {
-        const extractor = new FunctionExtractor(exportName, declaration, this.typeChecker);
-        const overloads = extractor.getOverloads().map((overload) => [exportName, overload]);
-        exportedDeclarations.push(...overloads);
-      }
-    }
     return exportedDeclarations.sort(([a, declarationA], [b, declarationB]) => declarationA.pos - declarationB.pos);
   }
 };
@@ -4758,4 +4744,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-K32LEXRQ.js.map
+//# sourceMappingURL=chunk-TOHNTVMY.js.map
