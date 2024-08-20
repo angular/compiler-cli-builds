@@ -13348,29 +13348,41 @@ var ComponentDecoratorHandler = class {
     };
     const templateAndTemplateStyleResources = preloadAndParseTemplate(this.evaluator, this.resourceLoader, this.depTracker, this.preanalyzeTemplateCache, node, decorator, component, containingFile, this.defaultPreserveWhitespaces, this.extractTemplateOptions, this.compilationMode).then((template) => {
       if (template === null) {
-        return void 0;
+        return { templateStyles: [], templateStyleUrls: [] };
       }
-      return Promise.all(template.styleUrls.map((styleUrl) => resolveStyleUrl(styleUrl))).then(() => void 0);
+      let templateUrl;
+      if (template.sourceMapping.type === "external") {
+        templateUrl = template.sourceMapping.templateUrl;
+      }
+      return {
+        templateUrl,
+        templateStyles: template.styles,
+        templateStyleUrls: template.styleUrls
+      };
     });
     const componentStyleUrls = extractComponentStyleUrls(this.evaluator, component);
-    let inlineStyles;
-    if (component.has("styles")) {
-      const litStyles = parseDirectiveStyles(component, this.evaluator, this.compilationMode);
-      if (litStyles === null) {
-        this.preanalyzeStylesCache.set(node, null);
-      } else {
-        inlineStyles = Promise.all(litStyles.map((style) => this.resourceLoader.preprocessInline(style, { type: "style", containingFile }))).then((styles) => {
-          this.preanalyzeStylesCache.set(node, styles);
-        });
+    return templateAndTemplateStyleResources.then(async (templateInfo) => {
+      let styles = null;
+      const rawStyles = parseDirectiveStyles(component, this.evaluator, this.compilationMode);
+      if (rawStyles == null ? void 0 : rawStyles.length) {
+        styles = await Promise.all(rawStyles.map((style) => this.resourceLoader.preprocessInline(style, { type: "style", containingFile })));
       }
-    } else {
-      this.preanalyzeStylesCache.set(node, null);
-    }
-    return Promise.all([
-      templateAndTemplateStyleResources,
-      inlineStyles,
-      ...componentStyleUrls.map((styleUrl) => resolveStyleUrl(styleUrl.url))
-    ]).then(() => void 0);
+      if (templateInfo.templateStyles) {
+        styles != null ? styles : styles = [];
+        styles.push(...await Promise.all(templateInfo.templateStyles.map((style) => {
+          var _a;
+          return this.resourceLoader.preprocessInline(style, {
+            type: "style",
+            containingFile: (_a = templateInfo.templateUrl) != null ? _a : containingFile
+          });
+        })));
+      }
+      this.preanalyzeStylesCache.set(node, styles);
+      await Promise.all([
+        ...componentStyleUrls.map((styleUrl) => resolveStyleUrl(styleUrl.url)),
+        ...templateInfo.templateStyleUrls.map((url) => resolveStyleUrl(url))
+      ]);
+    });
   }
   analyze(node, decorator) {
     var _a, _b, _c, _d, _e;
@@ -13555,9 +13567,9 @@ var ComponentDecoratorHandler = class {
           styles.push(...litStyles);
         }
       }
-    }
-    if (template.styles.length > 0) {
-      styles.push(...template.styles);
+      if (template.styles.length > 0) {
+        styles.push(...template.styles);
+      }
     }
     let explicitlyDeferredTypes = null;
     if (metadata.isStandalone && rawDeferredImports !== null) {
@@ -14750,4 +14762,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2SSA4Y5F.js.map
+//# sourceMappingURL=chunk-7HJWGNAF.js.map
