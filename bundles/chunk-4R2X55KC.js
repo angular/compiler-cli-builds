@@ -6855,7 +6855,7 @@ function extractComponentStyleUrls(evaluator, component) {
       {
         url: styleUrl,
         source: 2,
-        nodeForError: styleUrlExpr
+        expression: styleUrlExpr
       }
     ];
   }
@@ -6875,7 +6875,7 @@ function extractStyleUrlsFromExpression(evaluator, styleUrlsExpr) {
         styleUrls.push({
           url: styleUrl,
           source: 2,
-          nodeForError: styleUrlExpr
+          expression: styleUrlExpr
         });
       }
     }
@@ -6888,31 +6888,16 @@ function extractStyleUrlsFromExpression(evaluator, styleUrlsExpr) {
       styleUrls.push({
         url: styleUrl,
         source: 2,
-        nodeForError: styleUrlsExpr
+        expression: styleUrlsExpr
       });
     }
   }
   return styleUrls;
 }
-function extractStyleResources(resourceLoader, component, containingFile) {
+function extractInlineStyleResources(component) {
   const styles = /* @__PURE__ */ new Set();
   function stringLiteralElements(array) {
     return array.elements.filter((e) => ts25.isStringLiteralLike(e));
-  }
-  const styleUrlExpr = component.get("styleUrl");
-  const styleUrlsExpr = component.get("styleUrls");
-  if (styleUrlsExpr !== void 0 && ts25.isArrayLiteralExpression(styleUrlsExpr)) {
-    for (const expression of stringLiteralElements(styleUrlsExpr)) {
-      const resource = stringLiteralUrlToResource(resourceLoader, expression, containingFile);
-      if (resource !== null) {
-        styles.add(resource);
-      }
-    }
-  } else if (styleUrlExpr !== void 0 && ts25.isStringLiteralLike(styleUrlExpr)) {
-    const resource = stringLiteralUrlToResource(resourceLoader, styleUrlExpr, containingFile);
-    if (resource !== null) {
-      styles.add(resource);
-    }
   }
   const stylesExpr = component.get("styles");
   if (stylesExpr !== void 0) {
@@ -6926,23 +6911,15 @@ function extractStyleResources(resourceLoader, component, containingFile) {
   }
   return styles;
 }
-function stringLiteralUrlToResource(resourceLoader, expression, containingFile) {
-  try {
-    const resourceUrl = resourceLoader.resolve(expression.text, containingFile);
-    return { path: absoluteFrom(resourceUrl), expression };
-  } catch {
-    return null;
-  }
-}
 function _extractTemplateStyleUrls(template) {
   if (template.styleUrls === null) {
     return [];
   }
-  const nodeForError = getTemplateDeclarationNodeForError(template.declaration);
+  const expression = getTemplateDeclarationNodeForError(template.declaration);
   return template.styleUrls.map((url) => ({
     url,
     source: 1,
-    nodeForError
+    expression
   }));
 }
 
@@ -13516,7 +13493,7 @@ var ComponentDecoratorHandler = class {
       expression: template.sourceMapping.node
     };
     let styles = [];
-    const styleResources = extractStyleResources(this.resourceLoader, component, containingFile);
+    const styleResources = extractInlineStyleResources(component);
     const styleUrls = [
       ...extractComponentStyleUrls(this.evaluator, component),
       ..._extractTemplateStyleUrls(template)
@@ -13524,6 +13501,12 @@ var ComponentDecoratorHandler = class {
     for (const styleUrl of styleUrls) {
       try {
         const resourceUrl = this.resourceLoader.resolve(styleUrl.url, containingFile);
+        if (styleUrl.source === 2 && ts45.isStringLiteralLike(styleUrl.expression)) {
+          styleResources.add({
+            path: absoluteFrom(resourceUrl),
+            expression: styleUrl.expression
+          });
+        }
         const resourceStr = this.resourceLoader.load(resourceUrl);
         styles.push(resourceStr);
         if (this.depTracker !== null) {
@@ -13537,7 +13520,7 @@ var ComponentDecoratorHandler = class {
           diagnostics = [];
         }
         const resourceType = styleUrl.source === 2 ? 2 : 1;
-        diagnostics.push(makeResourceNotFoundError(styleUrl.url, styleUrl.nodeForError, resourceType).toDiagnostic());
+        diagnostics.push(makeResourceNotFoundError(styleUrl.url, styleUrl.expression, resourceType).toDiagnostic());
       }
     }
     if (encapsulation === ViewEncapsulation2.ShadowDom && metadata.selector !== null) {
@@ -14762,4 +14745,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-7HJWGNAF.js.map
+//# sourceMappingURL=chunk-4R2X55KC.js.map

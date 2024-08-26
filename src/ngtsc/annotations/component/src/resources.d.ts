@@ -20,7 +20,7 @@ import { ResourceLoader } from '../../common';
  */
 export interface StyleUrlMeta {
     url: string;
-    nodeForError: ts.Node;
+    expression: ts.Expression;
     source: ResourceTypeForDiagnostics.StylesheetFromTemplate | ResourceTypeForDiagnostics.StylesheetFromDecorator;
 }
 /**
@@ -94,7 +94,7 @@ export interface ExternalTemplateDeclaration extends CommonTemplateDeclaration {
  */
 export type TemplateDeclaration = InlineTemplateDeclaration | ExternalTemplateDeclaration;
 /** Determines the node to use for debugging purposes for the given TemplateDeclaration. */
-export declare function getTemplateDeclarationNodeForError(declaration: TemplateDeclaration): ts.Node;
+export declare function getTemplateDeclarationNodeForError(declaration: TemplateDeclaration): ts.Expression;
 export interface ExtractTemplateOptions {
     usePoisonedData: boolean;
     enableI18nLegacyMessageIdFormat: boolean;
@@ -120,6 +120,6 @@ export declare function makeResourceNotFoundError(file: string, nodeForError: ts
  */
 export declare function transformDecoratorResources(dec: Decorator, component: Map<string, ts.Expression>, styles: string[], template: ParsedTemplateWithSource): Decorator;
 export declare function extractComponentStyleUrls(evaluator: PartialEvaluator, component: Map<string, ts.Expression>): StyleUrlMeta[];
-export declare function extractStyleResources(resourceLoader: ResourceLoader, component: Map<string, ts.Expression>, containingFile: string): ReadonlySet<Resource>;
+export declare function extractInlineStyleResources(component: Map<string, ts.Expression>): Set<Resource>;
 export declare function _extractTemplateStyleUrls(template: ParsedTemplateWithSource): StyleUrlMeta[];
 export {};
