@@ -101,6 +101,7 @@ export interface ExtractTemplateOptions {
     i18nNormalizeLineEndingsInICUs: boolean;
     enableBlockSyntax: boolean;
     enableLetSyntax: boolean;
+    preserveSignificantWhitespace?: boolean;
 }
 export declare function extractTemplate(node: ClassDeclaration, template: TemplateDeclaration, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, options: ExtractTemplateOptions, compilationMode: CompilationMode): ParsedTemplateWithSource;
 export declare function parseTemplateDeclaration(node: ClassDeclaration, decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, defaultPreserveWhitespaces: boolean): TemplateDeclaration;

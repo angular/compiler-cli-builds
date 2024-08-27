@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-MFXX4OMX.js";
+} from "./chunk-DXGJ7MWN.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-4R2X55KC.js";
+} from "./chunk-TQDVUUMF.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -1024,7 +1024,9 @@ function i18nSerialize(bundle, formatName, options) {
   let serializer;
   switch (format) {
     case "xmb":
-      serializer = new Xmb();
+      serializer = new Xmb(
+        options.i18nPreserveWhitespaceForLegacyExtraction
+      );
       break;
     case "xliff2":
     case "xlf2":
@@ -3834,7 +3836,7 @@ var NgCompiler = class {
     return diagnostics;
   }
   makeCompilation() {
-    var _a, _b, _c, _d;
+    var _a, _b, _c, _d, _e;
     const isCore = isAngularCorePackage(this.inputProgram);
     let compilationMode = CompilationMode.FULL;
     if (!isCore) {
@@ -3929,11 +3931,11 @@ var NgCompiler = class {
     }
     const jitDeclarationRegistry = new JitDeclarationRegistry();
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, this.enableLetSyntax, localCompilationExtraImportsTracker, jitDeclarationRegistry),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, depScopeReader, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, this.enableLetSyntax, localCompilationExtraImportsTracker, jitDeclarationRegistry, (_d = this.options.i18nPreserveWhitespaceForLegacyExtraction) != null ? _d : true),
       new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, importTracker, supportTestBed, compilationMode, jitDeclarationRegistry),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode, !!this.options.generateExtraImportsInLocalMode),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
-      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_d = this.options.onlyPublishPublicTypingsForNgModules) != null ? _d : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode, localCompilationExtraImportsTracker, jitDeclarationRegistry)
+      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_e = this.options.onlyPublishPublicTypingsForNgModules) != null ? _e : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode, localCompilationExtraImportsTracker, jitDeclarationRegistry)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
@@ -4395,7 +4397,7 @@ var NgtscProgram = class {
   }
   emitXi18n() {
     var _a, _b, _c;
-    const ctx = new MessageBundle(new HtmlParser(), [], {}, (_a = this.options.i18nOutLocale) != null ? _a : null);
+    const ctx = new MessageBundle(new HtmlParser(), [], {}, (_a = this.options.i18nOutLocale) != null ? _a : null, this.options.i18nPreserveWhitespaceForLegacyExtraction);
     this.compiler.xi18n(ctx);
     i18nExtract((_b = this.options.i18nOutFormat) != null ? _b : null, (_c = this.options.i18nOutFile) != null ? _c : null, this.host, this.options, ctx, resolve);
   }
@@ -4744,4 +4746,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-F62FC3HE.js.map
+//# sourceMappingURL=chunk-XIEOXB4E.js.map
