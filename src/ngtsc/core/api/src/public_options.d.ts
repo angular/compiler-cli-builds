@@ -357,6 +357,13 @@ export interface I18nOptions {
      * The default is `false`, but this will be switched in a future major release.
      */
     i18nNormalizeLineEndingsInICUs?: boolean;
+    /**
+     * Whether or not to preserve whitespace when extracting messages with the legacy (View Engine)
+     * pipeline.
+     *
+     * Defaults to `true`.
+     */
+    i18nPreserveWhitespaceForLegacyExtraction?: boolean;
 }
 /**
  * Options that specify compilation target.

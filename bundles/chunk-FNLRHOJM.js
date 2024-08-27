@@ -6674,12 +6674,14 @@ function parseExtractedTemplate(template, sourceStr, sourceParseRange, escapedSt
   };
   const parsedTemplate = parseTemplate(sourceStr, sourceMapUrl != null ? sourceMapUrl : "", {
     ...commonParseOptions,
-    preserveWhitespaces: template.preserveWhitespaces
+    preserveWhitespaces: template.preserveWhitespaces,
+    preserveSignificantWhitespace: options.preserveSignificantWhitespace
   });
   const { nodes: diagNodes } = parseTemplate(sourceStr, sourceMapUrl != null ? sourceMapUrl : "", {
     ...commonParseOptions,
     preserveWhitespaces: true,
     preserveLineEndings: true,
+    preserveSignificantWhitespace: true,
     leadingTriviaChars: []
   });
   return {
@@ -13263,7 +13265,7 @@ var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, localCompilationExtraImportsTracker, jitDeclarationRegistry) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -13302,6 +13304,7 @@ var ComponentDecoratorHandler = class {
     this.enableLetSyntax = enableLetSyntax;
     this.localCompilationExtraImportsTracker = localCompilationExtraImportsTracker;
     this.jitDeclarationRegistry = jitDeclarationRegistry;
+    this.i18nPreserveSignificantWhitespace = i18nPreserveSignificantWhitespace;
     this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry3();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
@@ -13313,7 +13316,8 @@ var ComponentDecoratorHandler = class {
       i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
       usePoisonedData: this.usePoisonedData,
       enableBlockSyntax: this.enableBlockSyntax,
-      enableLetSyntax: this.enableLetSyntax
+      enableLetSyntax: this.enableLetSyntax,
+      preserveSignificantWhitespace: this.i18nPreserveSignificantWhitespace
     };
   }
   detect(node, decorators) {
@@ -13486,7 +13490,8 @@ var ComponentDecoratorHandler = class {
         i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
         usePoisonedData: this.usePoisonedData,
         enableBlockSyntax: this.enableBlockSyntax,
-        enableLetSyntax: this.enableLetSyntax
+        enableLetSyntax: this.enableLetSyntax,
+        preserveSignificantWhitespace: this.i18nPreserveSignificantWhitespace
       }, this.compilationMode);
       if (this.compilationMode === CompilationMode.LOCAL && template.errors && template.errors.length > 0) {
         if (diagnostics === void 0) {
@@ -14750,4 +14755,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2SSA4Y5F.js.map
+//# sourceMappingURL=chunk-FNLRHOJM.js.map
