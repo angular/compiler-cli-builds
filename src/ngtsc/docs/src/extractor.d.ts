@@ -22,7 +22,10 @@ export declare class DocsExtractor {
      *
      * @param sourceFile The file from which to extract documentable entries.
      */
-    extractAll(sourceFile: ts.SourceFile, rootDir: string): DocEntry[];
+    extractAll(sourceFile: ts.SourceFile, rootDir: string): {
+        entries: DocEntry[];
+        symbols: Map<string, string>;
+    };
     /** Extract the doc entry for a single declaration. */
     private extractDeclaration;
     /** Gets the list of exported declarations for doc extraction. */
