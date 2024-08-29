@@ -453,9 +453,10 @@ function classMemberAccessLevelToString(level) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/typescript.mjs
 var TypeScriptReflectionHost = class {
-  constructor(checker, isLocalCompilation = false) {
+  constructor(checker, isLocalCompilation = false, skipPrivateValueDeclarationTypes = false) {
     this.checker = checker;
     this.isLocalCompilation = isLocalCompilation;
+    this.skipPrivateValueDeclarationTypes = skipPrivateValueDeclarationTypes;
   }
   getDecoratorsOfDeclaration(declaration) {
     const decorators = ts5.canHaveDecorators(declaration) ? ts5.getDecorators(declaration) : void 0;
@@ -650,6 +651,7 @@ var TypeScriptReflectionHost = class {
     };
   }
   getDeclarationOfSymbol(symbol, originalId) {
+    var _a;
     let valueDeclaration = void 0;
     if (symbol.valueDeclaration !== void 0) {
       valueDeclaration = symbol.valueDeclaration;
@@ -673,7 +675,8 @@ var TypeScriptReflectionHost = class {
     while (symbol.flags & ts5.SymbolFlags.Alias) {
       symbol = this.checker.getAliasedSymbol(symbol);
     }
-    if (symbol.valueDeclaration !== void 0) {
+    const symbolType = this.checker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
+    if (symbol.valueDeclaration !== void 0 && (!this.skipPrivateValueDeclarationTypes || ((_a = symbolType == null ? void 0 : symbolType.symbol) == null ? void 0 : _a.name.startsWith("\u0275")) !== true)) {
       return {
         node: symbol.valueDeclaration,
         viaModule: this._viaModule(symbol.valueDeclaration, originalId, importInfo)
@@ -3097,4 +3100,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-WYWH4ABE.js.map
+//# sourceMappingURL=chunk-YWIOOREB.js.map

@@ -5,6 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+/** The JSON data file format for extracted API reference info. */
+export interface EntryCollection {
+    moduleName: string;
+    normalizedModuleName: string;
+    moduleLabel: string;
+    entries: DocEntry[];
+}
 /** Type of top-level documentation entry. */
 export declare enum EntryType {
     Block = "block",
