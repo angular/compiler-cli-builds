@@ -240,8 +240,13 @@ export declare class NgCompiler {
      *
      * @param entryPoint Path to the entry point for the package for which API
      *     docs should be extracted.
+     *
+     * @returns A map of symbols with their associated module, eg: ApplicationRef => @angular/core
      */
-    getApiDocumentation(entryPoint: string): DocEntry[];
+    getApiDocumentation(entryPoint: string): {
+        entries: DocEntry[];
+        symbols: Map<string, string>;
+    };
     /**
      * Collect i18n messages into the `Xi18nContext`.
      */
