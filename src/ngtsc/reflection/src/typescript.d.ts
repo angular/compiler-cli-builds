@@ -13,7 +13,13 @@ import { ClassDeclaration, ClassMember, CtorParameter, Declaration, DeclarationN
 export declare class TypeScriptReflectionHost implements ReflectionHost {
     protected checker: ts.TypeChecker;
     private readonly isLocalCompilation;
-    constructor(checker: ts.TypeChecker, isLocalCompilation?: boolean);
+    private readonly skipPrivateValueDeclarationTypes;
+    /**
+     * @param skipPrivateValueDeclarationTypes Avoids using a value declaration that is considered private (using a ɵ-prefix),
+     * instead using the first available declaration. This is needed for the {@link FormControl} API of
+     * which the type declaration documents the type and the value declaration corresponds with an implementation detail.
+     */
+    constructor(checker: ts.TypeChecker, isLocalCompilation?: boolean, skipPrivateValueDeclarationTypes?: boolean);
     getDecoratorsOfDeclaration(declaration: DeclarationNode): Decorator[] | null;
     getMembersOfClass(clazz: ClassDeclaration): ClassMember[];
     getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
