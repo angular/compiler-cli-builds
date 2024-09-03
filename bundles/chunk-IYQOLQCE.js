@@ -45,7 +45,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-WYWH4ABE.js";
+} from "./chunk-XHCHVVK2.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -1787,6 +1787,7 @@ var DtsMetadataReader = class {
       isSignal,
       inputFieldNamesFromMetadataArray: null,
       imports: null,
+      rawImports: null,
       deferredImports: null,
       schemas: null,
       decorator: null,
@@ -5802,6 +5803,7 @@ var DirectiveDecoratorHandler = class {
       isStandalone: analysis.meta.isStandalone,
       isSignal: analysis.meta.isSignal,
       imports: null,
+      rawImports: null,
       deferredImports: null,
       schemas: null,
       ngContentSelectors: null,
@@ -13651,6 +13653,7 @@ var ComponentDecoratorHandler = class {
       isStandalone: analysis.meta.isStandalone,
       isSignal: analysis.meta.isSignal,
       imports: analysis.resolvedImports,
+      rawImports: analysis.rawImports,
       deferredImports: analysis.resolvedDeferredImports,
       animationTriggerNames: analysis.animationTriggerNames,
       schemas: analysis.schemas,
@@ -14750,4 +14753,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-TQDVUUMF.js.map
+//# sourceMappingURL=chunk-IYQOLQCE.js.map
