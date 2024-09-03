@@ -380,7 +380,9 @@ var ClassExtractor = class {
       generics: extractGenerics(this.declaration),
       description: extractJsDocDescription(this.declaration),
       jsdocTags: extractJsDocTags(this.declaration),
-      rawComment: extractRawJsDoc(this.declaration)
+      rawComment: extractRawJsDoc(this.declaration),
+      extends: this.extractInheritance(this.declaration),
+      implements: this.extractInterfaceConformance(this.declaration)
     };
   }
   extractAllClassMembers() {
@@ -439,6 +441,26 @@ var ClassExtractor = class {
       ...this.extractClassProperty(accessor),
       memberType: ts5.isGetAccessor(accessor) ? MemberType.Getter : MemberType.Setter
     };
+  }
+  extractInheritance(declaration) {
+    if (!declaration.heritageClauses) {
+      return void 0;
+    }
+    for (const clause of declaration.heritageClauses) {
+      if (clause.token === ts5.SyntaxKind.ExtendsKeyword) {
+        const types = clause.types;
+        if (types.length > 0) {
+          const baseClass = types[0];
+          return baseClass.getText();
+        }
+      }
+    }
+    return void 0;
+  }
+  extractInterfaceConformance(declaration) {
+    var _a, _b;
+    const implementClause = (_a = declaration.heritageClauses) == null ? void 0 : _a.find((clause) => clause.token === ts5.SyntaxKind.ImplementsKeyword);
+    return (_b = implementClause == null ? void 0 : implementClause.types.map((m) => m.getText())) != null ? _b : [];
   }
   getMemberTags(member) {
     var _a;
@@ -4782,4 +4804,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GNEGB3JF.js.map
+//# sourceMappingURL=chunk-2Q6KYU3A.js.map

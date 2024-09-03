@@ -91,6 +91,8 @@ export interface ClassEntry extends DocEntry {
     isAbstract: boolean;
     members: MemberEntry[];
     generics: GenericEntry[];
+    extends?: string;
+    implements: string[];
 }
 /** Documentation entity for a TypeScript interface. */
 export type InterfaceEntry = ClassEntry;
