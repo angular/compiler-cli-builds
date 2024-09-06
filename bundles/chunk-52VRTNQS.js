@@ -968,7 +968,7 @@ var DocsExtractor = class {
     this.typeChecker = typeChecker;
     this.metadataReader = metadataReader;
   }
-  extractAll(sourceFile, rootDir) {
+  extractAll(sourceFile, rootDir, privateModules) {
     const entries = [];
     const symbols = /* @__PURE__ */ new Map();
     const exportedDeclarations = this.getExportedDeclarations(sourceFile);
@@ -981,7 +981,7 @@ var DocsExtractor = class {
         const realSourceFile = node.getSourceFile();
         const importedSymbols = getImportedSymbols(realSourceFile);
         importedSymbols.forEach((moduleName, symbolName) => {
-          if (symbolName.startsWith("\u0275")) {
+          if (symbolName.startsWith("\u0275") || privateModules.has(moduleName)) {
             return;
           }
           if (symbols.has(symbolName) && symbols.get(symbolName) !== moduleName) {
@@ -3753,7 +3753,7 @@ var NgCompiler = class {
     compilation.traitCompiler.index(context);
     return generateAnalysis(context);
   }
-  getApiDocumentation(entryPoint) {
+  getApiDocumentation(entryPoint, privateModules) {
     const compilation = this.ensureAnalyzed();
     const checker = this.inputProgram.getTypeChecker();
     const docsExtractor = new DocsExtractor(checker, compilation.metaReader);
@@ -3764,7 +3764,7 @@ var NgCompiler = class {
       throw new Error(`Entry point "${entryPoint}" not found in program sources.`);
     }
     const rootDir = this.inputProgram.getCurrentDirectory();
-    return docsExtractor.extractAll(entryPointSourceFile, rootDir);
+    return docsExtractor.extractAll(entryPointSourceFile, rootDir, privateModules);
   }
   xi18n(ctx) {
     const compilation = this.ensureAnalyzed();
@@ -4604,8 +4604,8 @@ var NgtscProgram = class {
   getIndexedComponents() {
     return this.compiler.getIndexedComponents();
   }
-  getApiDocumentation(entryPoint) {
-    return this.compiler.getApiDocumentation(entryPoint);
+  getApiDocumentation(entryPoint, privateModules) {
+    return this.compiler.getApiDocumentation(entryPoint, privateModules);
   }
   getEmittedSourceFiles() {
     throw new Error("Method not implemented.");
@@ -4877,4 +4877,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-5LDY2XWV.js.map
+//# sourceMappingURL=chunk-52VRTNQS.js.map
