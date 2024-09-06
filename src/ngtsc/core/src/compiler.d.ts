@@ -243,7 +243,7 @@ export declare class NgCompiler {
      *
      * @returns A map of symbols with their associated module, eg: ApplicationRef => @angular/core
      */
-    getApiDocumentation(entryPoint: string): {
+    getApiDocumentation(entryPoint: string, privateModules: Set<string>): {
         entries: DocEntry[];
         symbols: Map<string, string>;
     };

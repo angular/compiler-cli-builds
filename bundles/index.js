@@ -33,7 +33,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-2Q6KYU3A.js";
+} from "./chunk-GUD463FN.js";
 import {
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
@@ -79,7 +79,7 @@ import "./chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("18.2.3+sha-af4e39a");
+var VERSION = new Version("18.2.3+sha-9895e44");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {

@@ -55,7 +55,7 @@ export declare class NgtscProgram implements api.Program {
      * @param entryPoint Path to the entry point for the package for which API
      *     docs should be extracted.
      */
-    getApiDocumentation(entryPoint: string): {
+    getApiDocumentation(entryPoint: string, privateModules: Set<string>): {
         entries: DocEntry[];
         symbols: Map<string, string>;
     };
