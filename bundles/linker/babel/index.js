@@ -8,8 +8,8 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-A6N6CPYP.js";
-import "../../chunk-XHCHVVK2.js";
+} from "../../chunk-R4DWHF2W.js";
+import "../../chunk-QKBGKUTT.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -17,7 +17,7 @@ import {
 import "../../chunk-QYV344EV.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-3W345P4E.js";
+} from "../../chunk-IG3WFCHQ.js";
 import "../../chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.mjs

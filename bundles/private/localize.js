@@ -18,6 +18,7 @@ import {
   absoluteFrom,
   absoluteFromSourceFile,
   basename,
+  createFileSystemTsReadDirectoryFn,
   dirname,
   getFileSystem,
   getSourceFileOrError,
@@ -30,7 +31,7 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "../chunk-3W345P4E.js";
+} from "../chunk-IG3WFCHQ.js";
 import "../chunk-XI2RTGAL.js";
 export {
   ConsoleLogger,
@@ -44,6 +45,7 @@ export {
   absoluteFrom,
   absoluteFromSourceFile,
   basename,
+  createFileSystemTsReadDirectoryFn,
   dirname,
   getFileSystem,
   getSourceFileOrError,

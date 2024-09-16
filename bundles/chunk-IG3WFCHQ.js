@@ -378,6 +378,42 @@ function toggleCase(str) {
   return str.replace(/\w/g, (ch) => ch.toUpperCase() === ch ? ch.toLowerCase() : ch.toUpperCase());
 }
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/ts_read_directory.mjs
+import ts2 from "typescript";
+function createFileSystemTsReadDirectoryFn(fs3) {
+  if (ts2.matchFiles === void 0) {
+    throw Error("Unable to read directory in configured file system. This means that TypeScript changed its file matching internals.\n\nPlease consider downgrading your TypeScript version, and report an issue in the Angular framework repository.");
+  }
+  const matchFilesFn = ts2.matchFiles.bind(ts2);
+  return (rootDir, extensions, excludes, includes, depth) => {
+    const directoryExists = (p2) => {
+      const resolvedPath = fs3.resolve(p2);
+      return fs3.exists(resolvedPath) && fs3.stat(resolvedPath).isDirectory();
+    };
+    return matchFilesFn(rootDir, extensions, excludes, includes, fs3.isCaseSensitive(), fs3.pwd(), depth, (p2) => {
+      var _a;
+      const resolvedPath = fs3.resolve(p2);
+      if (!directoryExists(resolvedPath)) {
+        return { directories: [], files: [] };
+      }
+      const children = fs3.readdir(resolvedPath);
+      const files = [];
+      const directories = [];
+      for (const child of children) {
+        if ((_a = fs3.stat(fs3.join(resolvedPath, child))) == null ? void 0 : _a.isDirectory()) {
+          directories.push(child);
+        } else {
+          files.push(child);
+        }
+      }
+      return { files, directories };
+    }, (p2) => fs3.resolve(p2), (p2) => {
+      const resolvedPath = fs3.resolve(p2);
+      return fs3.exists(resolvedPath) && fs3.stat(resolvedPath).isDirectory();
+    });
+  };
+}
+
 export {
   stripExtension,
   getSourceFileOrError,
@@ -398,7 +434,8 @@ export {
   NgtscCompilerHost,
   LogicalProjectPath,
   LogicalFileSystem,
-  NodeJSFileSystem
+  NodeJSFileSystem,
+  createFileSystemTsReadDirectoryFn
 };
 /**
  * @license
@@ -407,4 +444,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-3W345P4E.js.map
+//# sourceMappingURL=chunk-IG3WFCHQ.js.map

@@ -11,3 +11,4 @@ export { LogicalFileSystem, LogicalProjectPath } from './src/logical';
 export { NodeJSFileSystem } from './src/node_js_file_system';
 export { AbsoluteFsPath, FileStats, FileSystem, PathManipulation, PathSegment, PathString, ReadonlyFileSystem, } from './src/types';
 export { getSourceFileOrError } from './src/util';
+export { createFileSystemTsReadDirectoryFn } from './src/ts_read_directory';

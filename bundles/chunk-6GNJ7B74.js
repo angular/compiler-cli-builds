@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-RRBD35GS.js";
+} from "./chunk-NJ7O35FR.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-IYQOLQCE.js";
+} from "./chunk-ZTFB7GIM.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -88,7 +88,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-XHCHVVK2.js";
+} from "./chunk-QKBGKUTT.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -100,11 +100,12 @@ import {
   LogicalFileSystem,
   absoluteFrom,
   absoluteFromSourceFile,
+  createFileSystemTsReadDirectoryFn,
   dirname,
   getFileSystem,
   join,
   resolve
-} from "./chunk-3W345P4E.js";
+} from "./chunk-IG3WFCHQ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -4733,7 +4734,7 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
 function createParseConfigHost(host, fs = getFileSystem()) {
   return {
     fileExists: host.exists.bind(host),
-    readDirectory: ts28.sys.readDirectory,
+    readDirectory: createFileSystemTsReadDirectoryFn(fs),
     readFile: host.readFile.bind(host),
     useCaseSensitiveFileNames: fs.isCaseSensitive()
   };
@@ -4877,4 +4878,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-52VRTNQS.js.map
+//# sourceMappingURL=chunk-6GNJ7B74.js.map
