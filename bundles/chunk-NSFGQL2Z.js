@@ -11247,6 +11247,9 @@ var _Scope = class {
   appendDeferredBlock(block) {
     this.appendDeferredTriggers(block, block.triggers);
     this.appendDeferredTriggers(block, block.prefetchTriggers);
+    if (block.hydrateTriggers.when) {
+      this.opQueue.push(new TcbExpressionOp(this.tcb, this, block.hydrateTriggers.when.value));
+    }
     this.appendChildren(block);
     if (block.placeholder !== null) {
       this.appendChildren(block.placeholder);
@@ -14753,4 +14756,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-ZTFB7GIM.js.map
+//# sourceMappingURL=chunk-NSFGQL2Z.js.map
