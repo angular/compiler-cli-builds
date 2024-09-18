@@ -2608,6 +2608,8 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor2 {
     this.visitAst(text.value);
   }
   visitIcu(icu) {
+    Object.keys(icu.vars).forEach((key) => this.visit(icu.vars[key]));
+    Object.keys(icu.placeholders).forEach((key) => this.visit(icu.placeholders[key]));
   }
   visitDeferredBlock(deferred) {
     deferred.visitAll(this);
@@ -4804,4 +4806,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GUD463FN.js.map
+//# sourceMappingURL=chunk-DPEH5XQK.js.map
