@@ -45,7 +45,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-QKBGKUTT.js";
+} from "./chunk-IP6TWY4M.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -56,7 +56,7 @@ import {
   absoluteFromSourceFile,
   getSourceFileOrError,
   relative
-} from "./chunk-IG3WFCHQ.js";
+} from "./chunk-GJ5HPU32.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
@@ -14756,4 +14756,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-NSFGQL2Z.js.map
+//# sourceMappingURL=chunk-UJWKILKT.js.map

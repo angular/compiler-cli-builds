@@ -407,10 +407,7 @@ function createFileSystemTsReadDirectoryFn(fs3) {
         }
       }
       return { files, directories };
-    }, (p2) => fs3.resolve(p2), (p2) => {
-      const resolvedPath = fs3.resolve(p2);
-      return fs3.exists(resolvedPath) && fs3.stat(resolvedPath).isDirectory();
-    });
+    }, (p2) => fs3.resolve(p2), (p2) => directoryExists(p2));
   };
 }
 
@@ -444,4 +441,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-IG3WFCHQ.js.map
+//# sourceMappingURL=chunk-GJ5HPU32.js.map
