@@ -439,6 +439,6 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-GJ5HPU32.js.map
+//# sourceMappingURL=chunk-UJ2J6WV4.js.map

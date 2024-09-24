@@ -4,7 +4,7 @@
     
 import {
   PerfPhase
-} from "../chunk-ERN7RQQ7.js";
+} from "../chunk-XSNUHRLJ.js";
 import "../chunk-XI2RTGAL.js";
 export {
   PerfPhase
@@ -14,6 +14,6 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 //# sourceMappingURL=bazel.js.map

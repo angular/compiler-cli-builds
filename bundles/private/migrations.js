@@ -9,15 +9,15 @@ import {
   PotentialImportMode,
   StaticInterpreter,
   forwardRefResolver
-} from "../chunk-UJWKILKT.js";
+} from "../chunk-OF5ENI43.js";
 import {
   ImportManager,
   Reference,
   TypeScriptReflectionHost,
   reflectObjectLiteral
-} from "../chunk-IP6TWY4M.js";
-import "../chunk-ERN7RQQ7.js";
-import "../chunk-GJ5HPU32.js";
+} from "../chunk-JA7OVXDZ.js";
+import "../chunk-XSNUHRLJ.js";
+import "../chunk-UJ2J6WV4.js";
 import "../chunk-XI2RTGAL.js";
 export {
   DynamicValue,
@@ -36,6 +36,6 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 //# sourceMappingURL=migrations.js.map
