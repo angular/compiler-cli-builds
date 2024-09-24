@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 export { AstFactory, BinaryOperator, LeadingComment, ObjectLiteralProperty, SourceMapLocation, SourceMapRange, TemplateElement, TemplateLiteral, UnaryOperator, VariableDeclarationType, } from './src/api/ast_factory';
 export { ImportGenerator, ImportRequest } from './src/api/import_generator';

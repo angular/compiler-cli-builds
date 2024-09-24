@@ -5,10 +5,10 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-WYWH4ABE.js";
+} from "./chunk-4SRBDAXN.js";
 import {
   SourceFileLoader
-} from "./chunk-QYV344EV.js";
+} from "./chunk-3Z25BX6N.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.mjs
 var FatalLinkerError = class extends Error {
@@ -299,7 +299,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "18.2.5+sha-8f6c326";
+var PLACEHOLDER_VERSION = "18.2.5+sha-03ac3c2";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -1110,6 +1110,6 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-KCKRBU6N.js.map
+//# sourceMappingURL=chunk-BAEXS63Q.js.map

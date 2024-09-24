@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 /** Gets the line and character for the given position from the line starts map. */
 export declare function getLineAndCharacterFromPosition(lineStartsMap: number[], position: number): {

@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { AnimationTriggerNames, DeclarationListEmitMode, DeferBlockDepsEmitMode, R3ClassDebugInfo, R3ClassMetadata, R3ComponentMetadata, R3DeferPerBlockDependency, R3DeferPerComponentDependency, R3TemplateDependencyMetadata, SchemaMetadata, TmplAstDeferredBlock } from '@angular/compiler';
 import ts from 'typescript';

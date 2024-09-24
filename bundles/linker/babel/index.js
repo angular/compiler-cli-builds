@@ -8,16 +8,16 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-KCKRBU6N.js";
-import "../../chunk-WYWH4ABE.js";
+} from "../../chunk-BAEXS63Q.js";
+import "../../chunk-4SRBDAXN.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "../../chunk-LYJKWJUC.js";
-import "../../chunk-QYV344EV.js";
+} from "../../chunk-RT2QTF73.js";
+import "../../chunk-3Z25BX6N.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-3W345P4E.js";
+} from "../../chunk-YE5ORA4V.js";
 import "../../chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.mjs
@@ -424,6 +424,6 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 //# sourceMappingURL=index.js.map

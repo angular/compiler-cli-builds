@@ -45,18 +45,18 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-WYWH4ABE.js";
+} from "./chunk-4SRBDAXN.js";
 import {
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-ERN7RQQ7.js";
+} from "./chunk-XSNUHRLJ.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
   getSourceFileOrError,
   relative
-} from "./chunk-3W345P4E.js";
+} from "./chunk-YE5ORA4V.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
@@ -14746,13 +14746,13 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FNLRHOJM.js.map
+//# sourceMappingURL=chunk-2EO332X3.js.map

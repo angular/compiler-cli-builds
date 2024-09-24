@@ -5,16 +5,16 @@
     
 import {
   main
-} from "../../chunk-AWZJGYJ5.js";
-import "../../chunk-DPEH5XQK.js";
-import "../../chunk-7PEXPTYL.js";
-import "../../chunk-FNLRHOJM.js";
-import "../../chunk-WYWH4ABE.js";
-import "../../chunk-ERN7RQQ7.js";
+} from "../../chunk-CLJ3Y4QA.js";
+import "../../chunk-3JUBVZZQ.js";
+import "../../chunk-A76OAVJA.js";
+import "../../chunk-2EO332X3.js";
+import "../../chunk-4SRBDAXN.js";
+import "../../chunk-XSNUHRLJ.js";
 import {
   NodeJSFileSystem,
   setFileSystem
-} from "../../chunk-3W345P4E.js";
+} from "../../chunk-YE5ORA4V.js";
 import "../../chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ngc.mjs
@@ -34,6 +34,6 @@ runNgcComamnd().catch((e) => {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 //# sourceMappingURL=ngc.js.map

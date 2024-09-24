@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-7PEXPTYL.js";
+} from "./chunk-A76OAVJA.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-FNLRHOJM.js";
+} from "./chunk-2EO332X3.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -87,14 +87,14 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-WYWH4ABE.js";
+} from "./chunk-4SRBDAXN.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-ERN7RQQ7.js";
+} from "./chunk-XSNUHRLJ.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -103,7 +103,7 @@ import {
   getFileSystem,
   join,
   resolve
-} from "./chunk-3W345P4E.js";
+} from "./chunk-YE5ORA4V.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -4797,13 +4797,13 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-DPEH5XQK.js.map
+//# sourceMappingURL=chunk-3JUBVZZQ.js.map

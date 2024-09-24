@@ -4,7 +4,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 declare function stringEncaseCRLFWithFirstIndex(value: string, prefix: string, postfix: string, index: number): string;
 declare function styleMessage(message: string): string;

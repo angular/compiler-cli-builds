@@ -6,7 +6,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-WUEVCLDR.js";
+} from "./chunk-K7JBTZCO.js";
 import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
@@ -33,27 +33,27 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-DPEH5XQK.js";
+} from "./chunk-3JUBVZZQ.js";
 import {
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-7PEXPTYL.js";
+} from "./chunk-A76OAVJA.js";
 import {
   OptimizeFor,
   TsCreateProgramDriver
-} from "./chunk-FNLRHOJM.js";
+} from "./chunk-2EO332X3.js";
 import {
   isLocalCompilationDiagnostics
-} from "./chunk-WYWH4ABE.js";
+} from "./chunk-4SRBDAXN.js";
 import {
   ActivePerfRecorder,
   PerfPhase
-} from "./chunk-ERN7RQQ7.js";
+} from "./chunk-XSNUHRLJ.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "./chunk-LYJKWJUC.js";
+} from "./chunk-RT2QTF73.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -74,12 +74,12 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-3W345P4E.js";
+} from "./chunk-YE5ORA4V.js";
 import "./chunk-XI2RTGAL.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("18.2.5+sha-8f6c326");
+var VERSION = new Version("18.2.5+sha-03ac3c2");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
@@ -217,6 +217,6 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 //# sourceMappingURL=index.js.map
