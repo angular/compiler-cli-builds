@@ -45,7 +45,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-JA7OVXDZ.js";
+} from "./chunk-IXRL26J5.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -4802,7 +4802,7 @@ var queryDecoratorNames = [
   "ContentChildren"
 ];
 var QUERY_TYPES = new Set(queryDecoratorNames);
-function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, evaluator, refEmitter, referencesRegistry, isCore, annotateForClosureCompiler, compilationMode, defaultSelector) {
+function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, evaluator, refEmitter, referencesRegistry, isCore, annotateForClosureCompiler, compilationMode, defaultSelector, strictStandalone) {
   let directive;
   if (decorator.args === null || decorator.args.length === 0) {
     directive = /* @__PURE__ */ new Map();
@@ -4877,6 +4877,9 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
       throw createValueHasWrongTypeError(expr, resolved, `standalone flag must be a boolean`);
     }
     isStandalone = resolved;
+    if (!isStandalone && strictStandalone) {
+      throw new FatalDiagnosticError(ErrorCode.NON_STANDALONE_NOT_ALLOWED, expr, `Only standalone components/directives are allowed when 'strictStandalone' is enabled.`);
+    }
   }
   let isSignal = false;
   if (directive.has("signals")) {
@@ -5697,7 +5700,7 @@ var LIFECYCLE_HOOKS = /* @__PURE__ */ new Set([
   "ngAfterContentChecked"
 ]);
 var DirectiveDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, importTracker, includeClassMetadata, compilationMode, jitDeclarationRegistry) {
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, importTracker, includeClassMetadata, compilationMode, jitDeclarationRegistry, strictStandalone) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -5715,6 +5718,7 @@ var DirectiveDecoratorHandler = class {
     this.includeClassMetadata = includeClassMetadata;
     this.compilationMode = compilationMode;
     this.jitDeclarationRegistry = jitDeclarationRegistry;
+    this.strictStandalone = strictStandalone;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = "DirectiveDecoratorHandler";
   }
@@ -5747,7 +5751,8 @@ var DirectiveDecoratorHandler = class {
       this.isCore,
       this.annotateForClosureCompiler,
       this.compilationMode,
-      null
+      null,
+      this.strictStandalone
     );
     if (directiveResult.jitForced) {
       this.jitDeclarationRegistry.jitDeclarations.add(node);
@@ -11970,7 +11975,7 @@ var TemplateSourceManager = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.mjs
-import { AST, ASTWithSource as ASTWithSource2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers5, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { AST, ASTWithName, ASTWithSource as ASTWithSource2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers5, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts44 from "typescript";
 var SymbolBuilder = class {
   constructor(tcbPath, tcbIsShim, typeCheckBlock, templateData, componentScopeReader, getTypeChecker) {
@@ -12450,7 +12455,7 @@ var SymbolBuilder = class {
       return this.getSymbol(expressionTarget);
     }
     let withSpan = expression.sourceSpan;
-    if (expression instanceof PropertyWrite3) {
+    if (expression instanceof PropertyWrite3 || expression instanceof ASTWithName && !(expression instanceof SafePropertyRead4)) {
       withSpan = expression.nameSpan;
     }
     let node = null;
@@ -12492,6 +12497,8 @@ var SymbolBuilder = class {
     let tsSymbol;
     if (ts44.isPropertyAccessExpression(node)) {
       tsSymbol = this.getTypeChecker().getSymbolAtLocation(node.name);
+    } else if (ts44.isCallExpression(node)) {
+      tsSymbol = this.getTypeChecker().getSymbolAtLocation(node.expression);
     } else {
       tsSymbol = this.getTypeChecker().getSymbolAtLocation(node);
     }
@@ -13247,7 +13254,7 @@ var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace, strictStandalone) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -13287,6 +13294,7 @@ var ComponentDecoratorHandler = class {
     this.localCompilationExtraImportsTracker = localCompilationExtraImportsTracker;
     this.jitDeclarationRegistry = jitDeclarationRegistry;
     this.i18nPreserveSignificantWhitespace = i18nPreserveSignificantWhitespace;
+    this.strictStandalone = strictStandalone;
     this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry3();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
@@ -13377,7 +13385,7 @@ var ComponentDecoratorHandler = class {
     this.literalCache.delete(decorator);
     let diagnostics;
     let isPoisoned = false;
-    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.importTracker, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, this.annotateForClosureCompiler, this.compilationMode, this.elementSchemaRegistry.getDefaultComponentElementName());
+    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.importTracker, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, this.annotateForClosureCompiler, this.compilationMode, this.elementSchemaRegistry.getDefaultComponentElementName(), this.strictStandalone);
     if (directiveResult.jitForced) {
       this.jitDeclarationRegistry.jitDeclarations.add(node);
       return {};
@@ -14545,7 +14553,7 @@ var PipeSymbol = class extends SemanticSymbol {
   }
 };
 var PipeDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, injectableRegistry, isCore, perf, includeClassMetadata, compilationMode, generateExtraImportsInLocalMode) {
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, injectableRegistry, isCore, perf, includeClassMetadata, compilationMode, generateExtraImportsInLocalMode, strictStandalone) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -14556,6 +14564,7 @@ var PipeDecoratorHandler = class {
     this.includeClassMetadata = includeClassMetadata;
     this.compilationMode = compilationMode;
     this.generateExtraImportsInLocalMode = generateExtraImportsInLocalMode;
+    this.strictStandalone = strictStandalone;
     this.precedence = HandlerPrecedence.PRIMARY;
     this.name = "PipeDecoratorHandler";
   }
@@ -14615,6 +14624,9 @@ var PipeDecoratorHandler = class {
         throw createValueHasWrongTypeError(expr, resolved, `standalone flag must be a boolean`);
       }
       isStandalone = resolved;
+      if (!isStandalone && this.strictStandalone) {
+        throw new FatalDiagnosticError(ErrorCode.NON_STANDALONE_NOT_ALLOWED, expr, `Only standalone pipes are allowed when 'strictStandalone' is enabled.`);
+      }
     }
     return {
       analysis: {
@@ -14756,4 +14768,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OF5ENI43.js.map
+//# sourceMappingURL=chunk-6JG6NFJ7.js.map

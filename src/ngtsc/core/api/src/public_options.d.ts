@@ -240,6 +240,10 @@ export interface DiagnosticOptions {
             [Name in ExtendedTemplateDiagnosticName]?: DiagnosticCategoryLabel;
         };
     };
+    /**
+     * If enabled, non-standalone declarations are prohibited and result in build errors.
+     */
+    strictStandalone?: boolean;
 }
 /**
  * Options which control behavior useful for "monorepo" build cases using Bazel (such as the
