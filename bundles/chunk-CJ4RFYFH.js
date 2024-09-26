@@ -11988,7 +11988,7 @@ var TemplateSourceManager = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.mjs
-import { AST, ASTWithSource as ASTWithSource2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers5, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { AST, ASTWithName, ASTWithSource as ASTWithSource2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers5, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts44 from "typescript";
 var SymbolBuilder = class {
   constructor(tcbPath, tcbIsShim, typeCheckBlock, templateData, componentScopeReader, getTypeChecker) {
@@ -12468,7 +12468,7 @@ var SymbolBuilder = class {
       return this.getSymbol(expressionTarget);
     }
     let withSpan = expression.sourceSpan;
-    if (expression instanceof PropertyWrite3) {
+    if (expression instanceof PropertyWrite3 || expression instanceof ASTWithName && !(expression instanceof SafePropertyRead4)) {
       withSpan = expression.nameSpan;
     }
     let node = null;
@@ -12510,6 +12510,8 @@ var SymbolBuilder = class {
     let tsSymbol;
     if (ts44.isPropertyAccessExpression(node)) {
       tsSymbol = this.getTypeChecker().getSymbolAtLocation(node.name);
+    } else if (ts44.isCallExpression(node)) {
+      tsSymbol = this.getTypeChecker().getSymbolAtLocation(node.expression);
     } else {
       tsSymbol = this.getTypeChecker().getSymbolAtLocation(node);
     }
@@ -14755,4 +14757,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-2EO332X3.js.map
+//# sourceMappingURL=chunk-CJ4RFYFH.js.map
