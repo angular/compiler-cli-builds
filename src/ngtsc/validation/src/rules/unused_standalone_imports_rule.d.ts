@@ -20,4 +20,10 @@ export declare class UnusedStandaloneImportsRule implements SourceFileValidatorR
     shouldCheck(sourceFile: ts.SourceFile): boolean;
     checkNode(node: ts.Node): ts.Diagnostic | null;
     private getUnusedSymbols;
+    /**
+     * Determines if an import reference *might* be coming from a shared imports array.
+     * @param reference Reference to be checked.
+     * @param rawImports AST node that defines the `imports` array.
+     */
+    private isPotentialSharedReference;
 }

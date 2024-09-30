@@ -3337,27 +3337,42 @@ var UnusedStandaloneImportsRule = class {
     return makeDiagnostic(ErrorCode.UNUSED_STANDALONE_IMPORTS, metadata.rawImports, "Imports array contains unused imports", unused.map(([ref, type, name]) => makeRelatedInformation(ref.getOriginForDiagnostics(metadata.rawImports), `${type} "${name}" is not used within the template`)), category);
   }
   getUnusedSymbols(metadata, usedDirectives, usedPipes) {
-    if (metadata.imports === null || metadata.rawImports === null) {
+    const { imports, rawImports } = metadata;
+    if (imports === null || rawImports === null) {
       return null;
     }
     let unused = null;
-    for (const current of metadata.imports) {
+    for (const current of imports) {
       const currentNode = current.node;
       const dirMeta = this.templateTypeChecker.getDirectiveMetadata(currentNode);
       if (dirMeta !== null) {
-        if (dirMeta.isStandalone && (usedDirectives === null || !usedDirectives.has(currentNode))) {
+        if (dirMeta.isStandalone && !usedDirectives.has(currentNode) && !this.isPotentialSharedReference(current, rawImports)) {
           unused != null ? unused : unused = [];
           unused.push([current, dirMeta.isComponent ? "Component" : "Directive", dirMeta.name]);
         }
         continue;
       }
       const pipeMeta = this.templateTypeChecker.getPipeMetadata(currentNode);
-      if (pipeMeta !== null && pipeMeta.isStandalone && (usedPipes === null || !usedPipes.has(pipeMeta.name))) {
+      if (pipeMeta !== null && pipeMeta.isStandalone && !usedPipes.has(pipeMeta.name) && !this.isPotentialSharedReference(current, rawImports)) {
         unused != null ? unused : unused = [];
         unused.push([current, "Pipe", pipeMeta.ref.node.name.text]);
       }
     }
     return unused;
+  }
+  isPotentialSharedReference(reference, rawImports) {
+    var _a;
+    if (reference.getIdentityInExpression(rawImports) !== null) {
+      return false;
+    }
+    let current = reference.getIdentityIn(rawImports.getSourceFile());
+    while (current !== null) {
+      if (ts23.isVariableStatement(current)) {
+        return !!((_a = current.modifiers) == null ? void 0 : _a.some((m) => m.kind === ts23.SyntaxKind.ExportKeyword));
+      }
+      current = current.parent;
+    }
+    return true;
   }
 };
 
@@ -4880,4 +4895,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-DA5V55XL.js.map
+//# sourceMappingURL=chunk-IXNIFZCK.js.map
