@@ -68,7 +68,7 @@ function createPerformWatchHost(configFileName, reportDiagnostics, existingOptio
         } };
       }
       const watcher = chokidar.watch(options.basePath, {
-        ignored: /((^[\/\\])\..)|(\.js$)|(\.map$)|(\.metadata\.json|node_modules)/,
+        ignored: (path2) => /((^[\/\\])\..)|(\.js$)|(\.map$)|(\.metadata\.json|node_modules)/.test(path2),
         ignoreInitial: true,
         persistent: true
       });
@@ -363,4 +363,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-6BRI4HMB.js.map
+//# sourceMappingURL=chunk-KI5TTH2D.js.map
