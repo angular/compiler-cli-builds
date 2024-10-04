@@ -400,7 +400,7 @@ var ClassExtractor = class {
   extractClassMember(memberDeclaration) {
     if (this.isMethod(memberDeclaration)) {
       return this.extractMethod(memberDeclaration);
-    } else if (this.isProperty(memberDeclaration)) {
+    } else if (this.isProperty(memberDeclaration) && !this.hasPrivateComputedProperty(memberDeclaration)) {
       return this.extractClassProperty(memberDeclaration);
     } else if (ts5.isAccessor(memberDeclaration)) {
       return this.extractGetterSetter(memberDeclaration);
@@ -559,6 +559,9 @@ var ClassExtractor = class {
     var _a;
     const modifiers = (_a = this.declaration.modifiers) != null ? _a : [];
     return modifiers.some((mod) => mod.kind === ts5.SyntaxKind.AbstractKeyword);
+  }
+  hasPrivateComputedProperty(property) {
+    return ts5.isComputedPropertyName(property.name) && property.name.expression.getText().startsWith("\u0275");
   }
 };
 var DirectiveExtractor = class extends ClassExtractor {
@@ -4806,4 +4809,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FTEMZFXZ.js.map
+//# sourceMappingURL=chunk-7M64EDNV.js.map
