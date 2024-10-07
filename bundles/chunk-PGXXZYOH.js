@@ -1649,7 +1649,7 @@ var DeferredSymbolTracker = class {
       return false;
     }
     const symbolsMap = this.imports.get(importDecl);
-    for (const [symbol, refs] of symbolsMap) {
+    for (const refs of symbolsMap.values()) {
       if (refs === AssumeEager || refs.size > 0) {
         return false;
       }
@@ -1668,7 +1668,7 @@ var DeferredSymbolTracker = class {
   lookupIdentifiersInSourceFile(name, importDecl) {
     const results = /* @__PURE__ */ new Set();
     const visit = (node) => {
-      if (node === importDecl) {
+      if (node === importDecl || ts9.isTypeNode(node)) {
         return;
       }
       if (ts9.isIdentifier(node) && node.text === name) {
@@ -3097,4 +3097,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-4SRBDAXN.js.map
+//# sourceMappingURL=chunk-PGXXZYOH.js.map
