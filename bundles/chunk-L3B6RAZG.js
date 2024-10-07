@@ -45,7 +45,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-IXRL26J5.js";
+} from "./chunk-OSPR7JSU.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -6762,7 +6762,8 @@ function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanaly
       const resourceUrl = resourceLoader.resolve(templateUrl, containingFile);
       const templatePromise = resourceLoader.preload(resourceUrl, {
         type: "template",
-        containingFile
+        containingFile,
+        className: node.name.text
       });
       if (templatePromise !== void 0) {
         return templatePromise.then(() => {
@@ -13254,7 +13255,7 @@ var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace, strictStandalone) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace, strictStandalone) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -13291,6 +13292,7 @@ var ComponentDecoratorHandler = class {
     this.forbidOrphanRendering = forbidOrphanRendering;
     this.enableBlockSyntax = enableBlockSyntax;
     this.enableLetSyntax = enableLetSyntax;
+    this.externalRuntimeStyles = externalRuntimeStyles;
     this.localCompilationExtraImportsTracker = localCompilationExtraImportsTracker;
     this.jitDeclarationRegistry = jitDeclarationRegistry;
     this.i18nPreserveSignificantWhitespace = i18nPreserveSignificantWhitespace;
@@ -13335,7 +13337,11 @@ var ComponentDecoratorHandler = class {
     const resolveStyleUrl = (styleUrl) => {
       try {
         const resourceUrl = this.resourceLoader.resolve(styleUrl, containingFile);
-        return this.resourceLoader.preload(resourceUrl, { type: "style", containingFile });
+        return this.resourceLoader.preload(resourceUrl, {
+          type: "style",
+          containingFile,
+          className: node.name.text
+        });
       } catch {
         return void 0;
       }
@@ -13357,9 +13363,15 @@ var ComponentDecoratorHandler = class {
     const componentStyleUrls = extractComponentStyleUrls(this.evaluator, component);
     return templateAndTemplateStyleResources.then(async (templateInfo) => {
       let styles = null;
+      let orderOffset = 0;
       const rawStyles = parseDirectiveStyles(component, this.evaluator, this.compilationMode);
       if (rawStyles == null ? void 0 : rawStyles.length) {
-        styles = await Promise.all(rawStyles.map((style) => this.resourceLoader.preprocessInline(style, { type: "style", containingFile })));
+        styles = await Promise.all(rawStyles.map((style) => this.resourceLoader.preprocessInline(style, {
+          type: "style",
+          containingFile,
+          order: orderOffset++,
+          className: node.name.text
+        })));
       }
       if (templateInfo.templateStyles) {
         styles != null ? styles : styles = [];
@@ -13367,11 +13379,16 @@ var ComponentDecoratorHandler = class {
           var _a;
           return this.resourceLoader.preprocessInline(style, {
             type: "style",
-            containingFile: (_a = templateInfo.templateUrl) != null ? _a : containingFile
+            containingFile: (_a = templateInfo.templateUrl) != null ? _a : containingFile,
+            order: orderOffset++,
+            className: node.name.text
           });
         })));
       }
       this.preanalyzeStylesCache.set(node, styles);
+      if (this.externalRuntimeStyles) {
+        return;
+      }
       await Promise.all([
         ...componentStyleUrls.map((styleUrl) => resolveStyleUrl(styleUrl.url)),
         ...templateInfo.templateStyleUrls.map((url) => resolveStyleUrl(url))
@@ -13511,6 +13528,7 @@ var ComponentDecoratorHandler = class {
       expression: template.sourceMapping.node
     };
     let styles = [];
+    const externalStyles = [];
     const styleResources = extractInlineStyleResources(component);
     const styleUrls = [
       ...extractComponentStyleUrls(this.evaluator, component),
@@ -13519,6 +13537,10 @@ var ComponentDecoratorHandler = class {
     for (const styleUrl of styleUrls) {
       try {
         const resourceUrl = this.resourceLoader.resolve(styleUrl.url, containingFile);
+        if (this.externalRuntimeStyles) {
+          externalStyles.push(resourceUrl);
+          continue;
+        }
         if (styleUrl.source === 2 && ts45.isStringLiteralLike(styleUrl.expression)) {
           styleResources.add({
             path: absoluteFrom(resourceUrl),
@@ -13554,8 +13576,12 @@ var ComponentDecoratorHandler = class {
     if (this.preanalyzeStylesCache.has(node)) {
       inlineStyles = this.preanalyzeStylesCache.get(node);
       this.preanalyzeStylesCache.delete(node);
-      if (inlineStyles !== null) {
-        styles.push(...inlineStyles);
+      if (inlineStyles == null ? void 0 : inlineStyles.length) {
+        if (this.externalRuntimeStyles) {
+          externalStyles.push(...inlineStyles);
+        } else {
+          styles.push(...inlineStyles);
+        }
       }
     } else {
       if (this.resourceLoader.canPreprocess) {
@@ -13600,6 +13626,7 @@ var ComponentDecoratorHandler = class {
           changeDetection,
           interpolation: (_d = template.interpolationConfig) != null ? _d : DEFAULT_INTERPOLATION_CONFIG2,
           styles,
+          externalStyles,
           animations,
           viewProviders: wrappedViewProviders,
           i18nUseExternalIds: this.i18nUseExternalIds,
@@ -14768,4 +14795,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-6JG6NFJ7.js.map
+//# sourceMappingURL=chunk-L3B6RAZG.js.map
