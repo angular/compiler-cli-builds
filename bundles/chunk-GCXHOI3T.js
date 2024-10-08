@@ -11326,7 +11326,7 @@ var TcbExpressionTranslator = class {
     return astToTypescript(ast, (ast2) => this.resolve(ast2), this.tcb.env.config);
   }
   resolve(ast) {
-    if (ast instanceof PropertyRead3 && ast.receiver instanceof ImplicitReceiver2) {
+    if (ast instanceof PropertyRead3 && ast.receiver instanceof ImplicitReceiver2 && !(ast.receiver instanceof ThisReceiver)) {
       const target = this.tcb.boundTarget.getExpressionTarget(ast);
       const targetExpression = target === null ? null : this.getTargetNodeExpression(target, ast);
       if (target instanceof TmplAstLetDeclaration2 && !this.isValidLetDeclarationAccess(target, ast)) {
@@ -14802,4 +14802,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-UKU55KW4.js.map
+//# sourceMappingURL=chunk-GCXHOI3T.js.map
