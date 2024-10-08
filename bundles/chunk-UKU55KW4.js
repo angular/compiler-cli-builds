@@ -12576,7 +12576,7 @@ var TemplateTypeCheckerImpl = class {
     this.elementTagCache = /* @__PURE__ */ new Map();
     this.isComplete = false;
   }
-  getTemplate(component) {
+  getTemplate(component, optimizeFor) {
     const { data } = this.getLatestComponentState(component);
     if (data === null) {
       return null;
@@ -12591,8 +12591,15 @@ var TemplateTypeCheckerImpl = class {
     var _a;
     return ((_a = this.getLatestComponentState(component).data) == null ? void 0 : _a.boundTarget.getUsedPipes()) || null;
   }
-  getLatestComponentState(component) {
-    this.ensureShimForComponent(component);
+  getLatestComponentState(component, optimizeFor = OptimizeFor.SingleFile) {
+    switch (optimizeFor) {
+      case OptimizeFor.WholeProgram:
+        this.ensureAllShimsForAllFiles();
+        break;
+      case OptimizeFor.SingleFile:
+        this.ensureShimForComponent(component);
+        break;
+    }
     const sf = component.getSourceFile();
     const sfPath = absoluteFromSourceFile(sf);
     const shimPath = TypeCheckShimGenerator.shimFor(sfPath);
@@ -14795,4 +14802,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-L3B6RAZG.js.map
+//# sourceMappingURL=chunk-UKU55KW4.js.map
