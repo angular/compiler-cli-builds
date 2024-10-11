@@ -60,6 +60,7 @@ import {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
+import { relative as relative2 } from "path";
 import ts from "typescript";
 var CORE_MODULE = "@angular/core";
 function valueReferenceToExpression(valueRef) {
@@ -263,13 +264,16 @@ function createSourceSpan(node) {
   const parseSf = new ParseSourceFile(sf.getFullText(), sf.fileName);
   return new ParseSourceSpan(new ParseLocation(parseSf, startOffset, startLine + 1, startCol + 1), new ParseLocation(parseSf, endOffset, endLine + 1, endCol + 1));
 }
-function compileResults(fac, def, metadataStmt, propName, additionalFields, deferrableImports, debugInfo = null) {
+function compileResults(fac, def, metadataStmt, propName, additionalFields, deferrableImports, debugInfo = null, hmrInitializer = null) {
   const statements = def.statements;
   if (metadataStmt !== null) {
     statements.push(metadataStmt);
   }
   if (debugInfo !== null) {
     statements.push(debugInfo);
+  }
+  if (hmrInitializer !== null) {
+    statements.push(hmrInitializer);
   }
   const results = [
     fac,
@@ -315,6 +319,16 @@ function getOriginNodeForDiagnostics(expr, container) {
 }
 function isAbstractClassDeclaration(clazz) {
   return ts.canHaveModifiers(clazz) && clazz.modifiers !== void 0 ? clazz.modifiers.some((mod) => mod.kind === ts.SyntaxKind.AbstractKeyword) : false;
+}
+function getProjectRelativePath(sourceFile, rootDirs, compilerHost) {
+  const filePath = compilerHost.getCanonicalFileName(sourceFile.fileName);
+  for (const rootDir of rootDirs) {
+    const rel = relative2(compilerHost.getCanonicalFileName(rootDir), filePath);
+    if (!rel.startsWith("..")) {
+      return rel;
+    }
+  }
+  return null;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic.mjs
@@ -950,11 +964,11 @@ var StaticInterpreter = class {
     }
   }
   visitBindingElement(node, context) {
-    const path2 = [];
+    const path = [];
     let closestDeclaration = node;
     while (ts2.isBindingElement(closestDeclaration) || ts2.isArrayBindingPattern(closestDeclaration) || ts2.isObjectBindingPattern(closestDeclaration)) {
       if (ts2.isBindingElement(closestDeclaration)) {
-        path2.unshift(closestDeclaration);
+        path.unshift(closestDeclaration);
       }
       closestDeclaration = closestDeclaration.parent;
     }
@@ -962,7 +976,7 @@ var StaticInterpreter = class {
       return DynamicValue.fromUnknown(node);
     }
     let value = this.visit(closestDeclaration.initializer, context);
-    for (const element of path2) {
+    for (const element of path) {
       let key;
       if (ts2.isArrayBindingPattern(element.parent)) {
         key = element.parent.elements.indexOf(element);
@@ -2045,12 +2059,12 @@ var ResourceRegistry = class {
     }
   }
   registerTemplate(templateResource, component) {
-    const { path: path2 } = templateResource;
-    if (path2 !== null) {
-      if (!this.externalTemplateToComponentsMap.has(path2)) {
-        this.externalTemplateToComponentsMap.set(path2, /* @__PURE__ */ new Set());
+    const { path } = templateResource;
+    if (path !== null) {
+      if (!this.externalTemplateToComponentsMap.has(path)) {
+        this.externalTemplateToComponentsMap.set(path, /* @__PURE__ */ new Set());
       }
-      this.externalTemplateToComponentsMap.get(path2).add(component);
+      this.externalTemplateToComponentsMap.get(path).add(component);
     }
     this.componentToTemplateMap.set(component, templateResource);
   }
@@ -2061,15 +2075,15 @@ var ResourceRegistry = class {
     return this.componentToTemplateMap.get(component);
   }
   registerStyle(styleResource, component) {
-    const { path: path2 } = styleResource;
+    const { path } = styleResource;
     if (!this.componentToStylesMap.has(component)) {
       this.componentToStylesMap.set(component, /* @__PURE__ */ new Set());
     }
-    if (path2 !== null) {
-      if (!this.externalStyleToComponentsMap.has(path2)) {
-        this.externalStyleToComponentsMap.set(path2, /* @__PURE__ */ new Set());
+    if (path !== null) {
+      if (!this.externalStyleToComponentsMap.has(path)) {
+        this.externalStyleToComponentsMap.set(path, /* @__PURE__ */ new Set());
       }
-      this.externalStyleToComponentsMap.get(path2).add(component);
+      this.externalStyleToComponentsMap.get(path).add(component);
     }
     this.componentToStylesMap.get(component).add(styleResource);
   }
@@ -3604,13 +3618,12 @@ function removeIdentifierReferences(node, names) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/debug_info.mjs
 import { literal as literal2, WrappedNodeExpr as WrappedNodeExpr4 } from "@angular/compiler";
-import * as path from "path";
-function extractClassDebugInfo(clazz, reflection, rootDirs, forbidOrphanRendering) {
+function extractClassDebugInfo(clazz, reflection, compilerHost, rootDirs, forbidOrphanRendering) {
   if (!reflection.isClass(clazz)) {
     return null;
   }
   const srcFile = clazz.getSourceFile();
-  const srcFileMaybeRelativePath = computeRelativePathIfPossible(srcFile.fileName, rootDirs);
+  const srcFileMaybeRelativePath = getProjectRelativePath(srcFile, rootDirs, compilerHost);
   return {
     type: new WrappedNodeExpr4(clazz.name),
     className: literal2(clazz.name.getText()),
@@ -3618,15 +3631,6 @@ function extractClassDebugInfo(clazz, reflection, rootDirs, forbidOrphanRenderin
     lineNumber: literal2(srcFile.getLineAndCharacterOfPosition(clazz.name.pos).line + 1),
     forbidOrphanRendering
   };
-}
-function computeRelativePathIfPossible(filePath, rootDirs) {
-  for (const rootDir of rootDirs) {
-    const rel = path.relative(rootDir, filePath);
-    if (!rel.startsWith("..")) {
-      return rel;
-    }
-  }
-  return null;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/references_registry.mjs
@@ -3691,7 +3695,7 @@ var JitDeclarationRegistry = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
-import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, CssSelector as CssSelector4, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry as DomElementSchemaRegistry3, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, outputAst as o2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher3, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
+import { compileClassDebugInfo, compileClassHmrInitializer, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, CssSelector as CssSelector4, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry as DomElementSchemaRegistry3, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, outputAst as o2, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher3, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
 import ts45 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
@@ -3741,11 +3745,11 @@ var SemanticDepGraph = class {
     }
     return previousSymbol;
   }
-  getSymbolByName(path2, identifier) {
-    if (!this.files.has(path2)) {
+  getSymbolByName(path, identifier) {
+    if (!this.files.has(path)) {
       return null;
     }
-    const file = this.files.get(path2);
+    const file = this.files.get(path);
     if (!file.has(identifier)) {
       return null;
     }
@@ -6575,9 +6579,9 @@ function isSyntheticReference(ref) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/diagnostics.mjs
 function makeCyclicImportInfo(ref, type, cycle) {
   const name = ref.debugName || "(unknown)";
-  const path2 = cycle.getPath().map((sf) => sf.fileName).join(" -> ");
+  const path = cycle.getPath().map((sf) => sf.fileName).join(" -> ");
   const message = `The ${type} '${name}' is used in the template but importing it would create a cycle: `;
-  return makeRelatedInformation(ref.node, message + path2);
+  return makeRelatedInformation(ref.node, message + path);
 }
 function checkCustomElementSelectorForErrors(selector) {
   if (selector.includes(".") || selector.includes("[") && selector.includes("]")) {
@@ -12893,16 +12897,16 @@ var TemplateTypeCheckerImpl = class {
       this.perf.memory(PerfCheckpoint.TtcUpdateProgram);
     });
   }
-  getFileData(path2) {
-    if (!this.state.has(path2)) {
-      this.state.set(path2, {
+  getFileData(path) {
+    if (!this.state.has(path)) {
+      this.state.set(path, {
         hasInlines: false,
         sourceManager: new TemplateSourceManager(),
         isComplete: false,
         shimData: /* @__PURE__ */ new Map()
       });
     }
-    return this.state.get(path2);
+    return this.state.get(path);
   }
   getSymbolOfNode(node, component) {
     const builder = this.getOrCreateSymbolBuilder(component);
@@ -13257,18 +13261,35 @@ var SingleShimTypeCheckingHost = class extends SingleFileTypeCheckingHost {
   }
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/hmr.mjs
+import { WrappedNodeExpr as WrappedNodeExpr10 } from "@angular/compiler";
+function extractHmrInitializerMeta(clazz, reflection, compilerHost, rootDirs) {
+  if (!reflection.isClass(clazz)) {
+    return null;
+  }
+  const sourceFile = clazz.getSourceFile();
+  const filePath = getProjectRelativePath(sourceFile, rootDirs, compilerHost) || compilerHost.getCanonicalFileName(sourceFile.fileName);
+  const meta = {
+    type: new WrappedNodeExpr10(clazz.name),
+    className: clazz.name.text,
+    timestamp: Date.now() + "",
+    filePath
+  };
+  return meta;
+}
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, dtsScopeReader, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace, strictStandalone) {
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, compilerHost, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace, strictStandalone, enableHmr) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
     this.metaReader = metaReader;
     this.scopeReader = scopeReader;
-    this.dtsScopeReader = dtsScopeReader;
+    this.compilerHost = compilerHost;
     this.scopeRegistry = scopeRegistry;
     this.typeCheckScopeRegistry = typeCheckScopeRegistry;
     this.resourceRegistry = resourceRegistry;
@@ -13304,6 +13325,7 @@ var ComponentDecoratorHandler = class {
     this.jitDeclarationRegistry = jitDeclarationRegistry;
     this.i18nPreserveSignificantWhitespace = i18nPreserveSignificantWhitespace;
     this.strictStandalone = strictStandalone;
+    this.enableHmr = enableHmr;
     this.literalCache = /* @__PURE__ */ new Map();
     this.elementSchemaRegistry = new DomElementSchemaRegistry3();
     this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
@@ -13645,9 +13667,11 @@ var ComponentDecoratorHandler = class {
         classDebugInfo: extractClassDebugInfo(
           node,
           this.reflector,
+          this.compilerHost,
           this.rootDirs,
           this.forbidOrphanRendering
         ),
+        hmrInitializerMeta: this.enableHmr ? extractHmrInitializerMeta(node, this.reflector, this.compilerHost, this.rootDirs) : null,
         template,
         providersRequiringFactory,
         viewProvidersRequiringFactory,
@@ -14055,8 +14079,9 @@ var ComponentDecoratorHandler = class {
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, perComponentDeferredDeps).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
+    const hmrInitializer = analysis.hmrInitializerMeta !== null ? compileClassHmrInitializer(analysis.hmrInitializerMeta).toStmt() : null;
     const deferrableImports = this.deferredSymbolTracker.getDeferrableImportDecls();
-    return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports, debugInfo);
+    return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports, debugInfo, hmrInitializer);
   }
   compilePartial(node, analysis, resolution) {
     if (analysis.template.errors !== null && analysis.template.errors.length > 0) {
@@ -14096,8 +14121,9 @@ var ComponentDecoratorHandler = class {
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, deferrableTypes).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
+    const hmrInitializer = analysis.hmrInitializerMeta !== null ? compileClassHmrInitializer(analysis.hmrInitializerMeta).toStmt() : null;
     const deferrableImports = this.deferredSymbolTracker.getDeferrableImportDecls();
-    return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports, debugInfo);
+    return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports, debugInfo, hmrInitializer);
   }
   locateDeferBlocksWithoutScope(template) {
     const deferBlocks = /* @__PURE__ */ new Map();
@@ -14337,7 +14363,7 @@ function isDefaultImport(node) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
-import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr10 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr11 } from "@angular/compiler";
 import ts46 from "typescript";
 var InjectableDecoratorHandler = class {
   constructor(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, perf, includeClassMetadata, compilationMode, errorOnDuplicateProv = true) {
@@ -14480,7 +14506,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
       result.useClass = getProviderExpression(meta.get("useClass"), reflector);
       result.deps = deps;
     } else if (meta.has("useFactory")) {
-      result.useFactory = new WrappedNodeExpr10(meta.get("useFactory"));
+      result.useFactory = new WrappedNodeExpr11(meta.get("useFactory"));
       result.deps = deps;
     }
     return result;
@@ -14490,7 +14516,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
 }
 function getProviderExpression(expression, reflector) {
   const forwardRefValue = tryUnwrapForwardRef(expression, reflector);
-  return createMayBeForwardRefExpression3(new WrappedNodeExpr10(forwardRefValue != null ? forwardRefValue : expression), forwardRefValue !== null ? 2 : 0);
+  return createMayBeForwardRefExpression3(new WrappedNodeExpr11(forwardRefValue != null ? forwardRefValue : expression), forwardRefValue !== null ? 2 : 0);
 }
 function extractInjectableCtorDeps(clazz, meta, decorator, reflector, isCore, strictCtorDeps) {
   if (decorator.args === null) {
@@ -14519,7 +14545,7 @@ function requiresValidCtor(meta) {
 }
 function getDep(dep, reflector) {
   const meta = {
-    token: new WrappedNodeExpr10(dep),
+    token: new WrappedNodeExpr11(dep),
     attributeNameType: null,
     host: false,
     optional: false,
@@ -14534,7 +14560,7 @@ function getDep(dep, reflector) {
     switch (source.name) {
       case "Inject":
         if (token !== void 0) {
-          meta.token = new WrappedNodeExpr10(token);
+          meta.token = new WrappedNodeExpr11(token);
         }
         break;
       case "Optional":
@@ -14561,7 +14587,7 @@ function getDep(dep, reflector) {
         isDecorator = maybeUpdateDecorator(el.expression, reflector, token);
       }
       if (!isDecorator) {
-        meta.token = new WrappedNodeExpr10(el);
+        meta.token = new WrappedNodeExpr11(el);
       }
     });
   }
@@ -14802,4 +14828,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-GCXHOI3T.js.map
+//# sourceMappingURL=chunk-MRUQREFO.js.map
