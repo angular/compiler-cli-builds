@@ -4797,6 +4797,9 @@ function parseDescendantsOption(value) {
   throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, value, `Expected "descendants" option to be a boolean literal.`);
 }
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/standalone-default-value.mjs
+var NG_STANDALONE_DEFAULT_VALUE = false;
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.mjs
 var EMPTY_OBJECT = {};
 var queryDecoratorNames = [
@@ -4873,7 +4876,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
   const rawCtorDeps = getConstructorDependencies(clazz, reflector, isCore);
   const ctorDeps = selector !== null ? validateConstructorDependencies(clazz, rawCtorDeps) : unwrapConstructorDependencies(rawCtorDeps);
   const isStructural = ctorDeps !== null && ctorDeps !== "invalid" && ctorDeps.some((dep) => dep.token instanceof ExternalExpr4 && dep.token.value.moduleName === "@angular/core" && dep.token.value.name === "TemplateRef");
-  let isStandalone = false;
+  let isStandalone = NG_STANDALONE_DEFAULT_VALUE;
   if (directive.has("standalone")) {
     const expr = directive.get("standalone");
     const resolved = evaluator.evaluate(expr);
@@ -14675,7 +14678,7 @@ var PipeDecoratorHandler = class {
       }
       pure = pureValue;
     }
-    let isStandalone = false;
+    let isStandalone = NG_STANDALONE_DEFAULT_VALUE;
     if (pipe.has("standalone")) {
       const expr = pipe.get("standalone");
       const resolved = this.evaluator.evaluate(expr);
@@ -14827,4 +14830,11 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OMLFZEBE.js.map
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+//# sourceMappingURL=chunk-2IN2NYPG.js.map
