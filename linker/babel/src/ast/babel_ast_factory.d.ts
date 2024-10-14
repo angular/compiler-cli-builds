@@ -16,7 +16,7 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     constructor(
     /** The absolute path to the source file being compiled. */
     sourceUrl: string);
-    attachComments(statement: t.Statement, leadingComments: LeadingComment[]): void;
+    attachComments(statement: t.Statement | t.Expression, leadingComments: LeadingComment[]): void;
     createArrayLiteral: typeof t.arrayExpression;
     createAssignment(target: t.Expression, value: t.Expression): t.Expression;
     createBinaryExpression(leftOperand: t.Expression, operator: BinaryOperator, rightOperand: t.Expression): t.Expression;
@@ -30,7 +30,7 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createFunctionExpression(functionName: string | null, parameters: string[], body: t.Statement): t.Expression;
     createIdentifier: typeof t.identifier;
     createIfStatement: typeof t.ifStatement;
-    createDynamicImport(url: string): t.Expression;
+    createDynamicImport(url: string | t.Expression): t.Expression;
     createLiteral(value: string | number | boolean | null | undefined): t.Expression;
     createNewExpression: typeof t.newExpression;
     createObjectLiteral(properties: ObjectLiteralProperty<t.Expression>[]): t.Expression;

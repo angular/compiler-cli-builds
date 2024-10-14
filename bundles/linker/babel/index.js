@@ -8,8 +8,8 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-JF4LKQQP.js";
-import "../../chunk-OSPR7JSU.js";
+} from "../../chunk-WZ7YLI35.js";
+import "../../chunk-B5KO4FGG.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -86,7 +86,7 @@ var BabelAstFactory = class {
     return t.functionExpression(name, parameters.map((param) => t.identifier(param)), body);
   }
   createDynamicImport(url) {
-    return this.createCallExpression(t.import(), [t.stringLiteral(url)], false);
+    return this.createCallExpression(t.import(), [typeof url === "string" ? t.stringLiteral(url) : url], false);
   }
   createLiteral(value) {
     if (typeof value === "string") {

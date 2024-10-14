@@ -2408,7 +2408,11 @@ var ExpressionTranslatorVisitor = class {
     return this.factory.createConditional(cond, ast.trueCase.visitExpression(this, context), ast.falseCase.visitExpression(this, context));
   }
   visitDynamicImportExpr(ast, context) {
-    return this.factory.createDynamicImport(ast.url);
+    const urlExpression = typeof ast.url === "string" ? this.factory.createLiteral(ast.url) : ast.url.visitExpression(this, context);
+    if (ast.urlComment) {
+      this.factory.attachComments(urlExpression, [o.leadingComment(ast.urlComment, true)]);
+    }
+    return this.factory.createDynamicImport(urlExpression);
   }
   visitNotExpr(ast, context) {
     return this.factory.createUnaryExpression("!", ast.condition.visitExpression(this, context));
@@ -2879,7 +2883,7 @@ var TypeScriptAstFactory = class {
     return ts20.factory.createCallExpression(
       ts20.factory.createToken(ts20.SyntaxKind.ImportKeyword),
       void 0,
-      [ts20.factory.createStringLiteral(url)]
+      [typeof url === "string" ? ts20.factory.createStringLiteral(url) : url]
     );
   }
   createFunctionDeclaration(functionName, parameters, body) {
@@ -3100,4 +3104,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OSPR7JSU.js.map
+//# sourceMappingURL=chunk-B5KO4FGG.js.map

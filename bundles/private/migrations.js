@@ -9,13 +9,13 @@ import {
   PotentialImportMode,
   StaticInterpreter,
   forwardRefResolver
-} from "../chunk-MRUQREFO.js";
+} from "../chunk-OMLFZEBE.js";
 import {
   ImportManager,
   Reference,
   TypeScriptReflectionHost,
   reflectObjectLiteral
-} from "../chunk-OSPR7JSU.js";
+} from "../chunk-B5KO4FGG.js";
 import "../chunk-XSNUHRLJ.js";
 import "../chunk-UJ2J6WV4.js";
 import "../chunk-XI2RTGAL.js";

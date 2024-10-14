@@ -23,7 +23,7 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     createConditional(condition: ts.Expression, whenTrue: ts.Expression, whenFalse: ts.Expression): ts.Expression;
     createElementAccess: (expression: ts.Expression, index: number | ts.Expression) => ts.ElementAccessExpression;
     createExpressionStatement: (expression: ts.Expression) => ts.ExpressionStatement;
-    createDynamicImport(url: string): ts.CallExpression;
+    createDynamicImport(url: string | ts.Expression): ts.CallExpression;
     createFunctionDeclaration(functionName: string, parameters: string[], body: ts.Statement): ts.Statement;
     createFunctionExpression(functionName: string | null, parameters: string[], body: ts.Statement): ts.Expression;
     createArrowFunctionExpression(parameters: string[], body: ts.Statement | ts.Expression): ts.Expression;
@@ -50,4 +50,4 @@ export declare function createTemplateTail(cooked: string, raw: string): ts.Temp
  * @param statement The statement that will have comments attached.
  * @param leadingComments The comments to attach to the statement.
  */
-export declare function attachComments(statement: ts.Statement, leadingComments: LeadingComment[]): void;
+export declare function attachComments(statement: ts.Statement | ts.Expression, leadingComments: LeadingComment[]): void;

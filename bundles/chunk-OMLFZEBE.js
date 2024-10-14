@@ -45,7 +45,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-OSPR7JSU.js";
+} from "./chunk-B5KO4FGG.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -13272,7 +13272,6 @@ function extractHmrInitializerMeta(clazz, reflection, compilerHost, rootDirs) {
   const meta = {
     type: new WrappedNodeExpr10(clazz.name),
     className: clazz.name.text,
-    timestamp: Date.now() + "",
     filePath
   };
   return meta;
@@ -14828,4 +14827,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-MRUQREFO.js.map
+//# sourceMappingURL=chunk-OMLFZEBE.js.map
