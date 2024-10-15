@@ -7,7 +7,7 @@
  */
 import { MaybeForwardRefExpression, outputAst as o, R3DeclareDependencyMetadata, R3DependencyMetadata, R3Reference } from '@angular/compiler';
 import { AstObject, AstValue } from '../../ast/ast_value';
-export declare const PLACEHOLDER_VERSION = "19.0.0-next.9+sha-bf9fd31";
+export declare const PLACEHOLDER_VERSION = "19.0.0-next.9+sha-9ab663e";
 export declare function wrapReference<TExpression>(wrapped: o.WrappedNodeExpr<TExpression>): R3Reference;
 /**
  * Parses the value of an enum from the AST value's symbol name.
@@ -28,3 +28,4 @@ export declare function getDependency<TExpression>(depObj: AstObject<R3DeclareDe
  * If there is no forwardRef call expression then we just return the opaque type.
  */
 export declare function extractForwardRef<TExpression>(expr: AstValue<unknown, TExpression>): MaybeForwardRefExpression<o.WrappedNodeExpr<TExpression>>;
+export declare function getDefaultStandaloneValue(version: string): boolean;

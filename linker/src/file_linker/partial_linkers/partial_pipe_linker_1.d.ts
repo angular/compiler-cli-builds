@@ -13,9 +13,9 @@ import { LinkedDefinition, PartialLinker } from './partial_linker';
  */
 export declare class PartialPipeLinkerVersion1<TExpression> implements PartialLinker<TExpression> {
     constructor();
-    linkPartialDeclaration(constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>): LinkedDefinition;
+    linkPartialDeclaration(constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>, version: string): LinkedDefinition;
 }
 /**
  * Derives the `R3PipeMetadata` structure from the AST object.
  */
-export declare function toR3PipeMeta<TExpression>(metaObj: AstObject<R3DeclarePipeMetadata, TExpression>): R3PipeMetadata;
+export declare function toR3PipeMeta<TExpression>(metaObj: AstObject<R3DeclarePipeMetadata, TExpression>, version: string): R3PipeMetadata;

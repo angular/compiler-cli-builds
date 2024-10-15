@@ -9,4 +9,4 @@
  * A constant defining the default value for the standalone attribute in Directive and Pipes decorators.
  * Extracted to a separate file to facilitate G3 patches.
  */
-export declare const NG_STANDALONE_DEFAULT_VALUE = false;
+export declare const NG_STANDALONE_DEFAULT_VALUE = true;

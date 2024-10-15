@@ -228,7 +228,7 @@ var LocalEmitScope = class extends EmitScope {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.mjs
-import semver2 from "semver";
+import semver3 from "semver";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/get_source_file.mjs
 function createGetSourceFile(sourceUrl, code, loader) {
@@ -292,14 +292,15 @@ function toR3ClassMetadata(metaObj) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.mjs
 import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, makeBindingParser as makeBindingParser2, parseTemplate, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher, ViewEncapsulation } from "@angular/compiler";
-import semver from "semver";
+import semver2 from "semver";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.mjs
 import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSourceFile, ParseSourceSpan } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
-var PLACEHOLDER_VERSION = "19.0.0-next.9+sha-bf9fd31";
+import semver from "semver";
+var PLACEHOLDER_VERSION = "19.0.0-next.9+sha-9ab663e";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -345,6 +346,12 @@ function extractForwardRef(expr) {
   }
   return createMayBeForwardRefExpression(wrapperFn.getFunctionReturnValue().getOpaque(), 2);
 }
+var STANDALONE_IS_DEFAULT_RANGE = new semver.Range(`>= 19.0.0 || ${PLACEHOLDER_VERSION}`, {
+  includePrerelease: true
+});
+function getDefaultStandaloneValue(version) {
+  return STANDALONE_IS_DEFAULT_RANGE.test(version);
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.mjs
 var PartialDirectiveLinkerVersion1 = class {
@@ -352,12 +359,12 @@ var PartialDirectiveLinkerVersion1 = class {
     this.sourceUrl = sourceUrl;
     this.code = code;
   }
-  linkPartialDeclaration(constantPool, metaObj) {
-    const meta = toR3DirectiveMeta(metaObj, this.code, this.sourceUrl);
+  linkPartialDeclaration(constantPool, metaObj, version) {
+    const meta = toR3DirectiveMeta(metaObj, this.code, this.sourceUrl, version);
     return compileDirectiveFromMetadata(meta, constantPool, makeBindingParser());
   }
 };
-function toR3DirectiveMeta(metaObj, code, sourceUrl) {
+function toR3DirectiveMeta(metaObj, code, sourceUrl, version) {
   const typeExpr = metaObj.getValue("type");
   const typeName = typeExpr.getSymbolName();
   if (typeName === null) {
@@ -382,7 +389,7 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl) {
     },
     name: typeName,
     usesInheritance: metaObj.has("usesInheritance") ? metaObj.getBoolean("usesInheritance") : false,
-    isStandalone: metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : false,
+    isStandalone: metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : getDefaultStandaloneValue(version),
     isSignal: metaObj.has("isSignal") ? metaObj.getBoolean("isSignal") : false,
     hostDirectives: metaObj.has("hostDirectives") ? toHostDirectivesMetadata(metaObj.getValue("hostDirectives")) : null
   };
@@ -520,7 +527,7 @@ var PartialComponentLinkerVersion1 = class {
     const templateSource = metaObj.getValue("template");
     const isInline = metaObj.has("isInline") ? metaObj.getBoolean("isInline") : false;
     const templateInfo = this.getTemplateInfo(templateSource, isInline);
-    const { major, minor } = new semver.SemVer(version);
+    const { major, minor } = new semver2.SemVer(version);
     const enableBlockSyntax = major >= 17 || version === PLACEHOLDER_VERSION;
     const enableLetSyntax = major > 18 || major === 18 && minor >= 1 || version === PLACEHOLDER_VERSION;
     const template = parseTemplate(templateInfo.code, templateInfo.sourceUrl, {
@@ -603,7 +610,7 @@ ${errors}`);
       }
     }
     return {
-      ...toR3DirectiveMeta(metaObj, this.code, this.sourceUrl),
+      ...toR3DirectiveMeta(metaObj, this.code, this.sourceUrl, version),
       viewProviders: metaObj.has("viewProviders") ? metaObj.getOpaque("viewProviders") : null,
       template: {
         nodes: template.nodes,
@@ -881,19 +888,19 @@ import { compilePipeFromMetadata } from "@angular/compiler";
 var PartialPipeLinkerVersion1 = class {
   constructor() {
   }
-  linkPartialDeclaration(constantPool, metaObj) {
-    const meta = toR3PipeMeta(metaObj);
+  linkPartialDeclaration(constantPool, metaObj, version) {
+    const meta = toR3PipeMeta(metaObj, version);
     return compilePipeFromMetadata(meta);
   }
 };
-function toR3PipeMeta(metaObj) {
+function toR3PipeMeta(metaObj, version) {
   const typeExpr = metaObj.getValue("type");
   const typeName = typeExpr.getSymbolName();
   if (typeName === null) {
     throw new FatalLinkerError(typeExpr.expression, "Unsupported type, its name could not be determined");
   }
   const pure = metaObj.has("pure") ? metaObj.getBoolean("pure") : true;
-  const isStandalone = metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : false;
+  const isStandalone = metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : getDefaultStandaloneValue(version);
   return {
     name: typeName,
     type: wrapReference(typeExpr.getOpaque()),
@@ -983,7 +990,7 @@ var PartialLinkerSelector = class {
     }
     const declarationRange = getRange(">=", minVersion);
     for (const { range: linkerRange, linker } of linkerRanges) {
-      if (semver2.intersects(declarationRange, linkerRange)) {
+      if (semver3.intersects(declarationRange, linkerRange)) {
         return linker;
       }
     }
@@ -1000,11 +1007,11 @@ Attempting to continue using this version of Angular.`);
 };
 function getRange(comparator, versionStr) {
   if (versionStr === "0.0.0" && PLACEHOLDER_VERSION === "0.0.0") {
-    return new semver2.Range("*.*.*");
+    return new semver3.Range("*.*.*");
   }
-  const version = new semver2.SemVer(versionStr);
+  const version = new semver3.SemVer(versionStr);
   version.prerelease = [];
-  return new semver2.Range(`${comparator}${version.format()}`);
+  return new semver3.Range(`${comparator}${version.format()}`);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/file_linker.mjs
@@ -1112,4 +1119,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WZ7YLI35.js.map
+//# sourceMappingURL=chunk-WM6URCJX.js.map

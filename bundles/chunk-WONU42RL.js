@@ -4798,7 +4798,7 @@ function parseDescendantsOption(value) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/standalone-default-value.mjs
-var NG_STANDALONE_DEFAULT_VALUE = false;
+var NG_STANDALONE_DEFAULT_VALUE = true;
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.mjs
 var EMPTY_OBJECT = {};
@@ -14837,4 +14837,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-2IN2NYPG.js.map
+//# sourceMappingURL=chunk-WONU42RL.js.map

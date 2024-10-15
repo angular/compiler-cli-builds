@@ -17,10 +17,10 @@ export declare class PartialDirectiveLinkerVersion1<TExpression> implements Part
     private sourceUrl;
     private code;
     constructor(sourceUrl: AbsoluteFsPath, code: string);
-    linkPartialDeclaration(constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>): LinkedDefinition;
+    linkPartialDeclaration(constantPool: ConstantPool, metaObj: AstObject<R3PartialDeclaration, TExpression>, version: string): LinkedDefinition;
 }
 /**
  * Derives the `R3DirectiveMetadata` structure from the AST object.
  */
-export declare function toR3DirectiveMeta<TExpression>(metaObj: AstObject<R3DeclareDirectiveMetadata, TExpression>, code: string, sourceUrl: AbsoluteFsPath): R3DirectiveMetadata;
+export declare function toR3DirectiveMeta<TExpression>(metaObj: AstObject<R3DeclareDirectiveMetadata, TExpression>, code: string, sourceUrl: AbsoluteFsPath, version: string): R3DirectiveMetadata;
 export declare function createSourceSpan(range: Range, code: string, sourceUrl: string): ParseSourceSpan;
