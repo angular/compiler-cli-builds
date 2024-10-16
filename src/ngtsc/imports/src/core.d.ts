@@ -18,6 +18,10 @@ export interface ImportRewriter {
      * Optionally rewrite the given module specifier in the context of a given file.
      */
     rewriteSpecifier(specifier: string, inContextOfFile: string): string;
+    /**
+     * Optionally rewrite the identifier of a namespace import.
+     */
+    rewriteNamespaceImportIdentifier(specifier: string, moduleName: string): string;
 }
 /**
  * `ImportRewriter` that does no rewriting.
@@ -25,6 +29,7 @@ export interface ImportRewriter {
 export declare class NoopImportRewriter implements ImportRewriter {
     rewriteSymbol(symbol: string, specifier: string): string;
     rewriteSpecifier(specifier: string, inContextOfFile: string): string;
+    rewriteNamespaceImportIdentifier(specifier: string): string;
 }
 /**
  * `ImportRewriter` that rewrites imports from '@angular/core' to be imported from the r3_symbols.ts
@@ -35,5 +40,6 @@ export declare class R3SymbolsImportRewriter implements ImportRewriter {
     constructor(r3SymbolsPath: string);
     rewriteSymbol(symbol: string, specifier: string): string;
     rewriteSpecifier(specifier: string, inContextOfFile: string): string;
+    rewriteNamespaceImportIdentifier(specifier: string): string;
 }
 export declare function validateAndRewriteCoreSymbol(name: string): string;

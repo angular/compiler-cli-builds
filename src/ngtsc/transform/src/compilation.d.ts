@@ -114,6 +114,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     xi18n(bundle: Xi18nContext): void;
     updateResources(clazz: DeclarationNode): void;
     compile(clazz: DeclarationNode, constantPool: ConstantPool): CompileResult[] | null;
+    compileHmrUpdateCallback(clazz: DeclarationNode): ts.FunctionDeclaration | null;
     decoratorsFor(node: ts.Declaration): ts.Decorator[];
     get diagnostics(): ReadonlyArray<ts.Diagnostic>;
     get exportStatements(): Map<string, Map<string, [string, string]>>;

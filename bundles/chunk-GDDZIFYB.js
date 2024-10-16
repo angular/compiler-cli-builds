@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-3IXI5OVT.js";
+} from "./chunk-DS75GW24.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-WONU42RL.js";
+} from "./chunk-6T2A25LI.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -88,7 +88,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-B5KO4FGG.js";
+} from "./chunk-O2RMLJTP.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -3793,6 +3793,24 @@ var NgCompiler = class {
     const compilation = this.ensureAnalyzed();
     compilation.traitCompiler.xi18n(ctx);
   }
+  emitHmrUpdateModule(node) {
+    const { traitCompiler, reflector } = this.ensureAnalyzed();
+    if (!reflector.isClass(node)) {
+      return null;
+    }
+    const callback = traitCompiler.compileHmrUpdateCallback(node);
+    if (callback === null) {
+      return null;
+    }
+    const sourceFile = node.getSourceFile();
+    const printer = ts24.createPrinter();
+    const nodeText = printer.printNode(ts24.EmitHint.Unspecified, callback, sourceFile);
+    return ts24.transpileModule(nodeText, {
+      compilerOptions: this.options,
+      fileName: sourceFile.fileName,
+      reportDiagnostics: false
+    }).outputText;
+  }
   ensureAnalyzed() {
     if (this.compilation === null) {
       this.analyzeSync();
@@ -4901,4 +4919,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-25W24JRB.js.map
+//# sourceMappingURL=chunk-GDDZIFYB.js.map

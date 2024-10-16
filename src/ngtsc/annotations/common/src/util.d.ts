@@ -103,11 +103,3 @@ export declare function resolveImportedFile(moduleResolver: ModuleResolver, impo
  */
 export declare function getOriginNodeForDiagnostics(expr: ts.Expression, container: ts.Expression): ts.Expression;
 export declare function isAbstractClassDeclaration(clazz: ClassDeclaration): boolean;
-/**
- * Attempts to generate a project-relative path
- * @param sourceFile
- * @param rootDirs
- * @param compilerHost
- * @returns
- */
-export declare function getProjectRelativePath(sourceFile: ts.SourceFile, rootDirs: readonly string[], compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>): string | null;

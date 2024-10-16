@@ -82,6 +82,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      */
     private preanalyzeTemplateCache;
     private preanalyzeStylesCache;
+    /** Whether generated code for a component can defer its dependencies. */
+    private readonly canDeferDeps;
     private extractTemplateOptions;
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name = "ComponentDecoratorHandler";
@@ -100,6 +102,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     compileFull(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): CompileResult[];
     compileLocal(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<Partial<ComponentResolutionData>>, pool: ConstantPool): CompileResult[];
+    compileHmrUpdateDeclaration(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): ts.FunctionDeclaration | null;
     /**
      * Locates defer blocks in case scope information is not available.
      * For example, this happens in the local compilation mode.

@@ -1445,6 +1445,16 @@ function relativePathBetween(from, to) {
 function normalizeSeparators(path) {
   return path.replace(/\\/g, "/");
 }
+function getProjectRelativePath(sourceFile, rootDirs, compilerHost) {
+  const filePath = compilerHost.getCanonicalFileName(sourceFile.fileName);
+  for (const rootDir of rootDirs) {
+    const rel = relative(compilerHost.getCanonicalFileName(rootDir), filePath);
+    if (!rel.startsWith("..")) {
+      return rel;
+    }
+  }
+  return null;
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/core.mjs
 var NoopImportRewriter = class {
@@ -1452,6 +1462,9 @@ var NoopImportRewriter = class {
     return symbol;
   }
   rewriteSpecifier(specifier, inContextOfFile) {
+    return specifier;
+  }
+  rewriteNamespaceImportIdentifier(specifier) {
     return specifier;
   }
 };
@@ -1490,6 +1503,9 @@ var R3SymbolsImportRewriter = class {
       throw new Error(`Failed to rewrite import inside ${CORE_MODULE}: ${inContextOfFile} -> ${this.r3SymbolsPath}`);
     }
     return relativePathToR3Symbols;
+  }
+  rewriteNamespaceImportIdentifier(specifier) {
+    return specifier;
   }
 };
 function validateAndRewriteCoreSymbol(name) {
@@ -2097,7 +2113,10 @@ var ImportManager = class {
     }
     const { namedImports, namespaceImports } = this._getNewImportsTrackerForFile(sourceFile);
     if (request.exportSymbolName === null || forceGenerateNamespacesForNewImports) {
-      const namespaceImportName = `${this.config.namespaceImportPrefix}${this.nextUniqueIndex++}`;
+      let namespaceImportName = `${this.config.namespaceImportPrefix}${this.nextUniqueIndex++}`;
+      if (this.config.rewriter) {
+        namespaceImportName = this.config.rewriter.rewriteNamespaceImportIdentifier(namespaceImportName, request.exportModuleSpecifier);
+      }
       const namespaceImport2 = ts16.factory.createNamespaceImport((_a = this.config.generateUniqueIdentifier(sourceFile, namespaceImportName)) != null ? _a : ts16.factory.createIdentifier(namespaceImportName));
       namespaceImports.set(request.exportModuleSpecifier, namespaceImport2);
       captureGeneratedImport({ ...request, exportSymbolName: null }, this.reuseGeneratedImportsTracker, namespaceImport2.name);
@@ -3056,6 +3075,7 @@ export {
   AliasStrategy,
   relativePathBetween,
   normalizeSeparators,
+  getProjectRelativePath,
   NoopImportRewriter,
   R3SymbolsImportRewriter,
   loadIsReferencedAliasDeclarationPatch,
@@ -3104,4 +3124,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-B5KO4FGG.js.map
+//# sourceMappingURL=chunk-O2RMLJTP.js.map

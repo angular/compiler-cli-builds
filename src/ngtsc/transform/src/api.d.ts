@@ -166,6 +166,10 @@ export interface DecoratorHandler<D, A, S extends SemanticSymbol | null, R> {
      */
     compilePartial?(node: ClassDeclaration, analysis: Readonly<A>, resolution: Readonly<R>): CompileResult | CompileResult[];
     /**
+     * Generates the function that will update a class' metadata at runtime during HMR.
+     */
+    compileHmrUpdateDeclaration?(node: ClassDeclaration, analysis: Readonly<A>, resolution: Readonly<R>): ts.FunctionDeclaration | null;
+    /**
      * Generates code based on each individual source file without using its
      * dependencies (suitable for local dev edit/refresh workflow)
      */
