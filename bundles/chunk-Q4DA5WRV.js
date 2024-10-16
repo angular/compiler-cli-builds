@@ -9826,6 +9826,12 @@ var AstTranslator = class {
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
   }
+  visitTypeofExpresion(ast) {
+    const expression = wrapForDiagnostics(this.translate(ast.expression));
+    const node = ts40.factory.createTypeOfExpression(expression);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
   visitPropertyRead(ast) {
     const receiver = wrapForDiagnostics(this.translate(ast.receiver));
     const name = ts40.factory.createPropertyAccessExpression(receiver, ast.name);
@@ -9974,6 +9980,9 @@ var _VeSafeLhsInferenceBugDetector = class {
     return true;
   }
   visitPrefixNot(ast) {
+    return ast.expression.visit(this);
+  }
+  visitTypeofExpresion(ast) {
     return ast.expression.visit(this);
   }
   visitNonNullAssert(ast) {
@@ -15020,4 +15029,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-6T2A25LI.js.map
+//# sourceMappingURL=chunk-Q4DA5WRV.js.map

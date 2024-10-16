@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-DS75GW24.js";
+} from "./chunk-WO73PLUB.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-6T2A25LI.js";
+} from "./chunk-Q4DA5WRV.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -505,9 +505,15 @@ var ClassExtractor = class {
     return result;
   }
   filterMethodOverloads(declarations) {
-    return declarations.filter((declaration) => {
+    return declarations.filter((declaration, index) => {
+      var _a;
       if (ts5.isFunctionDeclaration(declaration) || ts5.isMethodDeclaration(declaration)) {
-        return !!declaration.body || ts5.getCombinedModifierFlags(declaration) & ts5.ModifierFlags.Abstract;
+        if (ts5.getCombinedModifierFlags(declaration) & ts5.ModifierFlags.Abstract) {
+          const previousDeclaration = declarations[index - 1];
+          const samePreviousAbstractMethod = previousDeclaration && ts5.isMethodDeclaration(previousDeclaration) && ts5.getCombinedModifierFlags(previousDeclaration) & ts5.ModifierFlags.Abstract && previousDeclaration.name.getText() === ((_a = declaration.name) == null ? void 0 : _a.getText());
+          return !samePreviousAbstractMethod;
+        }
+        return !!declaration.body;
       }
       return true;
     });
@@ -4919,4 +4925,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-GDDZIFYB.js.map
+//# sourceMappingURL=chunk-5AXLJZ3D.js.map
