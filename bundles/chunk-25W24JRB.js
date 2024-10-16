@@ -1087,9 +1087,7 @@ function i18nSerialize(bundle, formatName, options) {
   let serializer;
   switch (format) {
     case "xmb":
-      serializer = new Xmb(
-        options.i18nPreserveWhitespaceForLegacyExtraction
-      );
+      serializer = new Xmb();
       break;
     case "xliff2":
     case "xlf2":
@@ -4903,4 +4901,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ZYIW44VP.js.map
+//# sourceMappingURL=chunk-25W24JRB.js.map
