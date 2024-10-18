@@ -4074,6 +4074,7 @@ function makeUnknownComponentDeferredImportDiagnostic(ref, rawExpr) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/local.mjs
+var IN_PROGRESS_RESOLUTION = {};
 var LocalModuleScopeRegistry = class {
   constructor(localReader, fullReader, dependencyScopeReader, refEmitter, aliasingHost) {
     this.localReader = localReader;
@@ -4146,8 +4147,12 @@ var LocalModuleScopeRegistry = class {
   }
   getScopeOfModuleReference(ref) {
     if (this.cache.has(ref.node)) {
-      return this.cache.get(ref.node);
+      const cachedValue = this.cache.get(ref.node);
+      if (cachedValue !== IN_PROGRESS_RESOLUTION) {
+        return cachedValue;
+      }
     }
+    this.cache.set(ref.node, IN_PROGRESS_RESOLUTION);
     this.sealed = true;
     const ngModule = this.localReader.getNgModuleMetadata(ref);
     if (ngModule === null) {
@@ -4167,10 +4172,12 @@ var LocalModuleScopeRegistry = class {
     for (const decl of ngModule.imports) {
       const importScope = this.getExportedScope(decl, diagnostics, ref.node, "import");
       if (importScope !== null) {
-        if (importScope === "invalid" || importScope.exported.isPoisoned) {
-          diagnostics.push(invalidTransitiveNgModuleRef(decl, ngModule.rawImports, "import"));
+        if (importScope === "invalid" || importScope === "cycle" || importScope.exported.isPoisoned) {
           isPoisoned = true;
-          if (importScope === "invalid") {
+          if (importScope !== "cycle") {
+            diagnostics.push(invalidTransitiveNgModuleRef(decl, ngModule.rawImports, "import"));
+          }
+          if (importScope === "invalid" || importScope === "cycle") {
             continue;
           }
         }
@@ -4237,10 +4244,12 @@ var LocalModuleScopeRegistry = class {
     }
     for (const decl of ngModule.exports) {
       const exportScope = this.getExportedScope(decl, diagnostics, ref.node, "export");
-      if (exportScope === "invalid" || exportScope !== null && exportScope.exported.isPoisoned) {
-        diagnostics.push(invalidTransitiveNgModuleRef(decl, ngModule.rawExports, "export"));
+      if (exportScope === "invalid" || exportScope === "cycle" || exportScope !== null && exportScope.exported.isPoisoned) {
         isPoisoned = true;
-        if (exportScope === "invalid") {
+        if (exportScope !== "cycle") {
+          diagnostics.push(invalidTransitiveNgModuleRef(decl, ngModule.rawExports, "export"));
+        }
+        if (exportScope === "invalid" || exportScope === "cycle") {
           continue;
         }
       } else if (exportScope !== null) {
@@ -4308,6 +4317,10 @@ var LocalModuleScopeRegistry = class {
       }
       return this.dependencyScopeReader.resolve(ref);
     } else {
+      if (this.cache.get(ref.node) === IN_PROGRESS_RESOLUTION) {
+        diagnostics.push(makeDiagnostic(type === "import" ? ErrorCode.NGMODULE_INVALID_IMPORT : ErrorCode.NGMODULE_INVALID_EXPORT, identifierOfNode(ref.node) || ref.node, `NgModule "${type}" field contains a cycle`));
+        return "cycle";
+      }
       return this.getScopeOfModuleReference(ref);
     }
   }
@@ -15029,4 +15042,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-Q4DA5WRV.js.map
+//# sourceMappingURL=chunk-GVXGZHIM.js.map
