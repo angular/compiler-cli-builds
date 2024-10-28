@@ -12,7 +12,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-UJ2J6WV4.js";
+} from "./chunk-37JMVF7H.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
 import ts from "typescript";
@@ -125,15 +125,19 @@ function ngErrorCode(code) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
 var FatalDiagnosticError = class extends Error {
+  code;
+  node;
+  diagnosticMessage;
+  relatedInformation;
   constructor(code, node, diagnosticMessage, relatedInformation) {
     super(`FatalDiagnosticError: Code: ${code}, Message: ${ts.flattenDiagnosticMessageText(diagnosticMessage, "\n")}`);
     this.code = code;
     this.node = node;
     this.diagnosticMessage = diagnosticMessage;
     this.relatedInformation = relatedInformation;
-    this._isFatalDiagnosticError = true;
     Object.setPrototypeOf(this, new.target.prototype);
   }
+  _isFatalDiagnosticError = true;
   toDiagnostic() {
     return makeDiagnostic(this.code, this.node, this.diagnosticMessage, this.relatedInformation);
   }
@@ -456,6 +460,8 @@ function classMemberAccessLevelToString(level) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/typescript.mjs
 var TypeScriptReflectionHost = class {
+  checker;
+  isLocalCompilation;
   constructor(checker, isLocalCompilation = false) {
     this.checker = checker;
     this.isLocalCompilation = isLocalCompilation;
@@ -1045,11 +1051,14 @@ function toUnredirectedSourceFile(sf) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/references.mjs
 var Reference = class {
+  node;
+  bestGuessOwningModule;
+  identifiers = [];
+  synthetic = false;
+  _alias = null;
+  isAmbient;
   constructor(node, bestGuessOwningModule = null) {
     this.node = node;
-    this.identifiers = [];
-    this.synthetic = false;
-    this._alias = null;
     if (bestGuessOwningModule === AmbientImport) {
       this.isAmbient = true;
       this.bestGuessOwningModule = null;
@@ -1159,6 +1168,7 @@ function assertSuccessfulReferenceEmit(result, origin, typeKind) {
   ]);
 }
 var ReferenceEmitter = class {
+  strategies;
   constructor(strategies) {
     this.strategies = strategies;
   }
@@ -1215,12 +1225,16 @@ var LocalIdentifierStrategy = class {
   }
 };
 var AbsoluteModuleStrategy = class {
+  program;
+  checker;
+  moduleResolver;
+  reflectionHost;
+  moduleExportsCache = /* @__PURE__ */ new Map();
   constructor(program, checker, moduleResolver, reflectionHost) {
     this.program = program;
     this.checker = checker;
     this.moduleResolver = moduleResolver;
     this.reflectionHost = reflectionHost;
-    this.moduleExportsCache = /* @__PURE__ */ new Map();
   }
   emit(ref, context, importFlags) {
     if (ref.bestGuessOwningModule === null) {
@@ -1283,6 +1297,9 @@ var AbsoluteModuleStrategy = class {
   }
 };
 var LogicalProjectStrategy = class {
+  reflector;
+  logicalFs;
+  relativePathStrategy;
   constructor(reflector, logicalFs) {
     this.reflector = reflector;
     this.logicalFs = logicalFs;
@@ -1327,6 +1344,7 @@ var LogicalProjectStrategy = class {
   }
 };
 var RelativePathStrategy = class {
+  reflector;
   constructor(reflector) {
     this.reflector = reflector;
   }
@@ -1351,6 +1369,8 @@ var RelativePathStrategy = class {
   }
 };
 var UnifiedModulesStrategy = class {
+  reflector;
+  unifiedModulesHost;
   constructor(reflector, unifiedModulesHost) {
     this.reflector = reflector;
     this.unifiedModulesHost = unifiedModulesHost;
@@ -1373,10 +1393,11 @@ var UnifiedModulesStrategy = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/alias.mjs
 var CHARS_TO_ESCAPE = /[^a-zA-Z0-9/_]/g;
 var UnifiedModulesAliasingHost = class {
+  unifiedModulesHost;
   constructor(unifiedModulesHost) {
     this.unifiedModulesHost = unifiedModulesHost;
-    this.aliasExportsInDts = false;
   }
+  aliasExportsInDts = false;
   maybeAliasSymbolAs(ref, context, ngModuleName, isReExport) {
     if (!isReExport) {
       return null;
@@ -1397,10 +1418,11 @@ var UnifiedModulesAliasingHost = class {
   }
 };
 var PrivateExportAliasingHost = class {
+  host;
   constructor(host) {
     this.host = host;
-    this.aliasExportsInDts = true;
   }
+  aliasExportsInDts = true;
   maybeAliasSymbolAs(ref, context, ngModuleName) {
     if (ref.hasOwningModuleGuess) {
       return null;
@@ -1485,6 +1507,7 @@ var CORE_SUPPORTED_SYMBOLS = /* @__PURE__ */ new Map([
 ]);
 var CORE_MODULE = "@angular/core";
 var R3SymbolsImportRewriter = class {
+  r3SymbolsPath;
   constructor(r3SymbolsPath) {
     this.r3SymbolsPath = r3SymbolsPath;
   }
@@ -1560,9 +1583,7 @@ function getDefaultImportDeclaration(expr) {
   return (_a = expr[DefaultImportDeclaration]) != null ? _a : null;
 }
 var DefaultImportTracker = class {
-  constructor() {
-    this.sourceFileToUsedImports = /* @__PURE__ */ new Map();
-  }
+  sourceFileToUsedImports = /* @__PURE__ */ new Map();
   recordUsedImport(importDecl) {
     if (importDecl.importClause) {
       const sf = getSourceFile(importDecl);
@@ -1595,11 +1616,13 @@ var DefaultImportTracker = class {
 import ts9 from "typescript";
 var AssumeEager = "AssumeEager";
 var DeferredSymbolTracker = class {
+  typeChecker;
+  onlyExplicitDeferDependencyImports;
+  imports = /* @__PURE__ */ new Map();
+  explicitlyDeferredImports = /* @__PURE__ */ new Map();
   constructor(typeChecker, onlyExplicitDeferDependencyImports) {
     this.typeChecker = typeChecker;
     this.onlyExplicitDeferDependencyImports = onlyExplicitDeferDependencyImports;
-    this.imports = /* @__PURE__ */ new Map();
-    this.explicitlyDeferredImports = /* @__PURE__ */ new Map();
   }
   extractImportedSymbols(importDecl) {
     const symbolMap = /* @__PURE__ */ new Map();
@@ -1715,10 +1738,8 @@ var DeferredSymbolTracker = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/imported_symbols_tracker.mjs
 import ts10 from "typescript";
 var ImportedSymbolsTracker = class {
-  constructor() {
-    this.fileToNamedImports = /* @__PURE__ */ new WeakMap();
-    this.fileToNamespaceImports = /* @__PURE__ */ new WeakMap();
-  }
+  fileToNamedImports = /* @__PURE__ */ new WeakMap();
+  fileToNamespaceImports = /* @__PURE__ */ new WeakMap();
   isPotentialReferenceToNamedImport(node, exportedName, moduleName) {
     const sourceFile = node.getSourceFile();
     this.scanImports(sourceFile);
@@ -1785,11 +1806,12 @@ var ImportedSymbolsTracker = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/local_compilation_extra_imports_tracker.mjs
 import ts11 from "typescript";
 var LocalCompilationExtraImportsTracker = class {
+  typeChecker;
+  localImportsMap = /* @__PURE__ */ new Map();
+  globalImportsSet = /* @__PURE__ */ new Set();
+  markedFilesSet = /* @__PURE__ */ new Set();
   constructor(typeChecker) {
     this.typeChecker = typeChecker;
-    this.localImportsMap = /* @__PURE__ */ new Map();
-    this.globalImportsSet = /* @__PURE__ */ new Set();
-    this.markedFilesSet = /* @__PURE__ */ new Set();
   }
   markFileForExtraImportGeneration(sf) {
     this.markedFilesSet.add(sf.fileName);
@@ -1835,6 +1857,10 @@ function removeQuotations(s) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/imports/src/resolver.mjs
 var ModuleResolver = class {
+  program;
+  compilerOptions;
+  host;
+  moduleResolutionCache;
   constructor(program, compilerOptions, host, moduleResolutionCache) {
     this.program = program;
     this.compilerOptions = compilerOptions;
@@ -2039,15 +2065,17 @@ var presetImportManagerForceNamespaceImports = {
   forceGenerateNamespacesForNewImports: true
 };
 var ImportManager = class {
+  newImports = /* @__PURE__ */ new Map();
+  removedImports = /* @__PURE__ */ new Map();
+  nextUniqueIndex = 0;
+  config;
+  reuseSourceFileImportsTracker;
+  reuseGeneratedImportsTracker = {
+    directReuseCache: /* @__PURE__ */ new Map(),
+    namespaceImportReuseCache: /* @__PURE__ */ new Map()
+  };
   constructor(config = {}) {
     var _a, _b, _c, _d, _e, _f;
-    this.newImports = /* @__PURE__ */ new Map();
-    this.removedImports = /* @__PURE__ */ new Map();
-    this.nextUniqueIndex = 0;
-    this.reuseGeneratedImportsTracker = {
-      directReuseCache: /* @__PURE__ */ new Map(),
-      namespaceImportReuseCache: /* @__PURE__ */ new Map()
-    };
     this.config = {
       shouldUseSingleQuotes: (_a = config.shouldUseSingleQuotes) != null ? _a : () => false,
       rewriter: (_b = config.rewriter) != null ? _b : null,
@@ -2256,6 +2284,7 @@ function createImportReference(asTypeReference, ref) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/context.mjs
 var Context = class {
+  isStatement;
   constructor(isStatement) {
     this.isStatement = isStatement;
   }
@@ -2294,6 +2323,12 @@ var BINARY_OPERATORS = /* @__PURE__ */ new Map([
   [o.BinaryOperator.NullishCoalesce, "??"]
 ]);
 var ExpressionTranslatorVisitor = class {
+  factory;
+  imports;
+  contextFile;
+  downlevelTaggedTemplates;
+  downlevelVariableDeclarations;
+  recordWrappedNode;
   constructor(factory, imports, contextFile, options) {
     this.factory = factory;
     this.imports = imports;
@@ -2543,6 +2578,7 @@ function canEmitType(type, canEmit) {
   }
 }
 var TypeEmitter = class {
+  translator;
   constructor(translator) {
     this.translator = translator;
   }
@@ -2611,6 +2647,10 @@ function translateType(type, contextFile, reflector, refEmitter, imports) {
   return type.visitType(new TypeTranslatorVisitor(imports, contextFile, reflector, refEmitter), new Context(false));
 }
 var TypeTranslatorVisitor = class {
+  imports;
+  contextFile;
+  reflector;
+  refEmitter;
   constructor(imports, contextFile, reflector, refEmitter) {
     this.imports = imports;
     this.contextFile = contextFile;
@@ -2861,19 +2901,13 @@ var VAR_TYPES = {
   "var": ts20.NodeFlags.None
 };
 var TypeScriptAstFactory = class {
+  annotateForClosureCompiler;
+  externalSourceFiles = /* @__PURE__ */ new Map();
   constructor(annotateForClosureCompiler) {
     this.annotateForClosureCompiler = annotateForClosureCompiler;
-    this.externalSourceFiles = /* @__PURE__ */ new Map();
-    this.attachComments = attachComments;
-    this.createArrayLiteral = ts20.factory.createArrayLiteralExpression;
-    this.createElementAccess = ts20.factory.createElementAccessExpression;
-    this.createExpressionStatement = ts20.factory.createExpressionStatement;
-    this.createIdentifier = ts20.factory.createIdentifier;
-    this.createParenthesizedExpression = ts20.factory.createParenthesizedExpression;
-    this.createPropertyAccess = ts20.factory.createPropertyAccessExpression;
-    this.createThrowStatement = ts20.factory.createThrowStatement;
-    this.createTypeOfExpression = ts20.factory.createTypeOfExpression;
   }
+  attachComments = attachComments;
+  createArrayLiteral = ts20.factory.createArrayLiteralExpression;
   createAssignment(target, value) {
     return ts20.factory.createBinaryExpression(target, ts20.SyntaxKind.EqualsToken, value);
   }
@@ -2898,6 +2932,8 @@ var TypeScriptAstFactory = class {
   createConditional(condition, whenTrue, whenFalse) {
     return ts20.factory.createConditionalExpression(condition, void 0, whenTrue, void 0, whenFalse);
   }
+  createElementAccess = ts20.factory.createElementAccessExpression;
+  createExpressionStatement = ts20.factory.createExpressionStatement;
   createDynamicImport(url) {
     return ts20.factory.createCallExpression(
       ts20.factory.createToken(ts20.SyntaxKind.ImportKeyword),
@@ -2923,6 +2959,7 @@ var TypeScriptAstFactory = class {
     }
     return ts20.factory.createArrowFunction(void 0, void 0, parameters.map((param) => ts20.factory.createParameterDeclaration(void 0, void 0, param)), void 0, void 0, body);
   }
+  createIdentifier = ts20.factory.createIdentifier;
   createIfStatement(condition, thenStatement, elseStatement) {
     return ts20.factory.createIfStatement(condition, thenStatement, elseStatement != null ? elseStatement : void 0);
   }
@@ -2945,6 +2982,8 @@ var TypeScriptAstFactory = class {
   createObjectLiteral(properties) {
     return ts20.factory.createObjectLiteralExpression(properties.map((prop) => ts20.factory.createPropertyAssignment(prop.quoted ? ts20.factory.createStringLiteral(prop.propertyName) : ts20.factory.createIdentifier(prop.propertyName), prop.value)));
   }
+  createParenthesizedExpression = ts20.factory.createParenthesizedExpression;
+  createPropertyAccess = ts20.factory.createPropertyAccessExpression;
   createReturnStatement(expression) {
     return ts20.factory.createReturnStatement(expression != null ? expression : void 0);
   }
@@ -2978,6 +3017,8 @@ var TypeScriptAstFactory = class {
     }
     return ts20.factory.createTaggedTemplateExpression(tag, void 0, templateLiteral);
   }
+  createThrowStatement = ts20.factory.createThrowStatement;
+  createTypeOfExpression = ts20.factory.createTypeOfExpression;
   createUnaryExpression(operator, operand) {
     return ts20.factory.createPrefixUnaryExpression(UNARY_OPERATORS2[operator], operand);
   }
@@ -3124,4 +3165,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-O2RMLJTP.js.map
+//# sourceMappingURL=chunk-YMHOC6HJ.js.map

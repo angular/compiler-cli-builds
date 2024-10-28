@@ -46,18 +46,21 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-O2RMLJTP.js";
+} from "./chunk-YMHOC6HJ.js";
 import {
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-XSNUHRLJ.js";
+} from "./chunk-Q2WE7ECN.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
   getSourceFileOrError,
   relative
-} from "./chunk-UJ2J6WV4.js";
+} from "./chunk-37JMVF7H.js";
+import {
+  __publicField
+} from "./chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/util.mjs
 import { ExternalExpr, ParseLocation, ParseSourceFile, ParseSourceSpan, ReadPropExpr, WrappedNodeExpr } from "@angular/compiler";
@@ -323,6 +326,9 @@ function isAbstractClassDeclaration(clazz) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic.mjs
 var DynamicValue = class {
+  node;
+  reason;
+  code;
   constructor(node, reason, code) {
     this.node = node;
     this.reason = reason;
@@ -416,6 +422,8 @@ import ts2 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/result.mjs
 var ResolvedModule = class {
+  exports;
+  evaluate;
   constructor(exports, evaluate) {
     this.exports = exports;
     this.evaluate = evaluate;
@@ -435,6 +443,9 @@ var ResolvedModule = class {
   }
 };
 var EnumValue = class {
+  enumRef;
+  name;
+  resolved;
   constructor(enumRef, name, resolved) {
     this.enumRef = enumRef;
     this.name = name;
@@ -446,6 +457,7 @@ var KnownFn = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/builtin.mjs
 var ArraySliceBuiltinFn = class extends KnownFn {
+  lhs;
   constructor(lhs) {
     super();
     this.lhs = lhs;
@@ -459,6 +471,7 @@ var ArraySliceBuiltinFn = class extends KnownFn {
   }
 };
 var ArrayConcatBuiltinFn = class extends KnownFn {
+  lhs;
   constructor(lhs) {
     super();
     this.lhs = lhs;
@@ -478,6 +491,7 @@ var ArrayConcatBuiltinFn = class extends KnownFn {
   }
 };
 var StringConcatBuiltinFn = class extends KnownFn {
+  lhs;
   constructor(lhs) {
     super();
     this.lhs = lhs;
@@ -498,6 +512,7 @@ var StringConcatBuiltinFn = class extends KnownFn {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/synthetic.mjs
 var SyntheticValue = class {
+  value;
   constructor(value) {
     this.value = value;
   }
@@ -541,6 +556,9 @@ var UNARY_OPERATORS = /* @__PURE__ */ new Map([
   [ts2.SyntaxKind.ExclamationToken, (a) => !a]
 ]);
 var StaticInterpreter = class {
+  host;
+  checker;
+  dependencyTracker;
   constructor(host, checker, dependencyTracker) {
     this.host = host;
     this.checker = checker;
@@ -1083,6 +1101,9 @@ function owningModule(context, override = null) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/partial_evaluator/src/interface.mjs
 var PartialEvaluator = class {
+  host;
+  checker;
+  dependencyTracker;
   constructor(host, checker, dependencyTracker) {
     this.host = host;
     this.checker = checker;
@@ -1149,9 +1170,10 @@ function traceDynamicValue(node, value) {
   return value.accept(new TraceDynamicValueVisitor(node));
 }
 var TraceDynamicValueVisitor = class {
+  node;
+  currentContainerNode = null;
   constructor(node) {
     this.node = node;
-    this.currentContainerNode = null;
   }
   visitDynamicInput(value) {
     const trace = value.reason.accept(this);
@@ -1446,6 +1468,8 @@ import ts6 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/property_mapping.mjs
 var ClassPropertyMapping = class {
+  forwardMap;
+  reverseMap;
   constructor(forwardMap) {
     this.forwardMap = forwardMap;
     this.reverseMap = reverseMapFromForwardMap(forwardMap);
@@ -1674,6 +1698,7 @@ function extractCoercedInput(member) {
   return afterUnderscore(member.name);
 }
 var CompoundMetadataReader = class {
+  readers;
   constructor(readers) {
     this.readers = readers;
   }
@@ -1722,6 +1747,8 @@ function isHostDirectiveMetaForGlobalMode(hostDirectiveMeta) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/dts.mjs
 var DtsMetadataReader = class {
+  checker;
+  reflector;
   constructor(checker, reflector) {
     this.checker = checker;
     this.reflector = reflector;
@@ -1971,11 +1998,9 @@ function flattenInheritedDirectiveMetadata(reader, dir) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/registry.mjs
 var LocalMetadataRegistry = class {
-  constructor() {
-    this.directives = /* @__PURE__ */ new Map();
-    this.ngModules = /* @__PURE__ */ new Map();
-    this.pipes = /* @__PURE__ */ new Map();
-  }
+  directives = /* @__PURE__ */ new Map();
+  ngModules = /* @__PURE__ */ new Map();
+  pipes = /* @__PURE__ */ new Map();
   getDirectiveMetadata(ref) {
     return this.directives.has(ref.node) ? this.directives.get(ref.node) : null;
   }
@@ -2006,6 +2031,7 @@ var LocalMetadataRegistry = class {
   }
 };
 var CompoundMetadataRegistry = class {
+  registries;
   constructor(registries) {
     this.registries = registries;
   }
@@ -2028,12 +2054,10 @@ var CompoundMetadataRegistry = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/resource_registry.mjs
 var ResourceRegistry = class {
-  constructor() {
-    this.externalTemplateToComponentsMap = /* @__PURE__ */ new Map();
-    this.componentToTemplateMap = /* @__PURE__ */ new Map();
-    this.componentToStylesMap = /* @__PURE__ */ new Map();
-    this.externalStyleToComponentsMap = /* @__PURE__ */ new Map();
-  }
+  externalTemplateToComponentsMap = /* @__PURE__ */ new Map();
+  componentToTemplateMap = /* @__PURE__ */ new Map();
+  componentToStylesMap = /* @__PURE__ */ new Map();
+  externalStyleToComponentsMap = /* @__PURE__ */ new Map();
   getComponentsWithTemplate(template) {
     if (!this.externalTemplateToComponentsMap.has(template)) {
       return /* @__PURE__ */ new Set();
@@ -2093,9 +2117,10 @@ var ResourceRegistry = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/providers.mjs
 var ExportedProviderStatusResolver = class {
+  metaReader;
+  calculating = /* @__PURE__ */ new Set();
   constructor(metaReader) {
     this.metaReader = metaReader;
-    this.calculating = /* @__PURE__ */ new Set();
   }
   mayExportProviders(ref, dependencyCallback) {
     var _a;
@@ -2138,9 +2163,10 @@ var ExportedProviderStatusResolver = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/host_directives_resolver.mjs
 var EMPTY_ARRAY = [];
 var HostDirectivesResolver = class {
+  metaReader;
+  cache = /* @__PURE__ */ new Map();
   constructor(metaReader) {
     this.metaReader = metaReader;
-    this.cache = /* @__PURE__ */ new Map();
   }
   resolve(metadata) {
     if (this.cache.has(metadata.ref.node)) {
@@ -2255,14 +2281,16 @@ var Trait = {
   pending: (handler, detected) => TraitImpl.pending(handler, detected)
 };
 var TraitImpl = class {
+  state = TraitState.Pending;
+  handler;
+  detected;
+  analysis = null;
+  symbol = null;
+  resolution = null;
+  analysisDiagnostics = null;
+  resolveDiagnostics = null;
+  typeCheckDiagnostics = null;
   constructor(handler, detected) {
-    this.state = TraitState.Pending;
-    this.analysis = null;
-    this.symbol = null;
-    this.resolution = null;
-    this.analysisDiagnostics = null;
-    this.resolveDiagnostics = null;
-    this.typeCheckDiagnostics = null;
     this.handler = handler;
     this.detected = detected;
   }
@@ -2302,6 +2330,20 @@ var TraitImpl = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/compilation.mjs
 var TraitCompiler = class {
+  handlers;
+  reflector;
+  perf;
+  incrementalBuild;
+  compileNonExportedClasses;
+  compilationMode;
+  dtsTransforms;
+  semanticDepGraphUpdater;
+  sourceFileTypeIdentifier;
+  classes = /* @__PURE__ */ new Map();
+  fileToClasses = /* @__PURE__ */ new Map();
+  filesWithoutTraits = /* @__PURE__ */ new Set();
+  reexportMap = /* @__PURE__ */ new Map();
+  handlersByName = /* @__PURE__ */ new Map();
   constructor(handlers, reflector, perf, incrementalBuild, compileNonExportedClasses, compilationMode, dtsTransforms, semanticDepGraphUpdater, sourceFileTypeIdentifier) {
     this.handlers = handlers;
     this.reflector = reflector;
@@ -2312,11 +2354,6 @@ var TraitCompiler = class {
     this.dtsTransforms = dtsTransforms;
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
     this.sourceFileTypeIdentifier = sourceFileTypeIdentifier;
-    this.classes = /* @__PURE__ */ new Map();
-    this.fileToClasses = /* @__PURE__ */ new Map();
-    this.filesWithoutTraits = /* @__PURE__ */ new Set();
-    this.reexportMap = /* @__PURE__ */ new Map();
-    this.handlersByName = /* @__PURE__ */ new Map();
     for (const handler of handlers) {
       this.handlersByName.set(handler.name, handler);
     }
@@ -2775,9 +2812,7 @@ function containsErrors(diagnostics) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/declaration.mjs
 import ts9 from "typescript";
 var DtsTransformRegistry = class {
-  constructor() {
-    this.ivyDeclarationTransforms = /* @__PURE__ */ new Map();
-  }
+  ivyDeclarationTransforms = /* @__PURE__ */ new Map();
   getIvyDeclarationTransform(sf) {
     if (!this.ivyDeclarationTransforms.has(sf)) {
       this.ivyDeclarationTransforms.set(sf, new IvyDeclarationDtsTransform());
@@ -2813,6 +2848,10 @@ function declarationTransformFactory(transformRegistry, reflector, refEmitter, i
   };
 }
 var DtsTransformer = class {
+  ctx;
+  reflector;
+  refEmitter;
+  importRewriter;
   constructor(ctx, reflector, refEmitter, importRewriter) {
     this.ctx = ctx;
     this.reflector = reflector;
@@ -2883,9 +2922,7 @@ var DtsTransformer = class {
   }
 };
 var IvyDeclarationDtsTransform = class {
-  constructor() {
-    this.declarationFields = /* @__PURE__ */ new Map();
-  }
+  declarationFields = /* @__PURE__ */ new Map();
   addFields(decl, fields) {
     this.declarationFields.set(decl, fields);
   }
@@ -2932,10 +2969,8 @@ function visit(node, visitor, context) {
   return visitor._visit(node, context);
 }
 var Visitor = class {
-  constructor() {
-    this._before = /* @__PURE__ */ new Map();
-    this._after = /* @__PURE__ */ new Map();
-  }
+  _before = /* @__PURE__ */ new Map();
+  _after = /* @__PURE__ */ new Map();
   _visitListEntryNode(node, visitor) {
     const result = visitor(node);
     if (result.before !== void 0) {
@@ -2999,12 +3034,14 @@ function ivyTransformFactory(compilation, reflector, importRewriter, defaultImpo
   };
 }
 var IvyCompilationVisitor = class extends Visitor {
+  compilation;
+  constantPool;
+  classCompilationMap = /* @__PURE__ */ new Map();
+  deferrableImports = /* @__PURE__ */ new Set();
   constructor(compilation, constantPool) {
     super();
     this.compilation = compilation;
     this.constantPool = constantPool;
-    this.classCompilationMap = /* @__PURE__ */ new Map();
-    this.deferrableImports = /* @__PURE__ */ new Set();
   }
   visitClassDeclaration(node) {
     const result = this.compilation.compile(node, this.constantPool);
@@ -3020,6 +3057,14 @@ var IvyCompilationVisitor = class extends Visitor {
   }
 };
 var IvyTransformationVisitor = class extends Visitor {
+  compilation;
+  classCompilationMap;
+  reflector;
+  importManager;
+  recordWrappedNodeExpr;
+  isClosureCompilerEnabled;
+  isCore;
+  deferrableImports;
   constructor(compilation, classCompilationMap, reflector, importManager, recordWrappedNodeExpr, isClosureCompilerEnabled, isCore, deferrableImports) {
     super();
     this.compilation = compilation;
@@ -3508,10 +3553,12 @@ function compileDeclareFactory(metadata) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/injectable_registry.mjs
 var InjectableClassRegistry = class {
+  host;
+  isCore;
+  classes = /* @__PURE__ */ new Map();
   constructor(host, isCore) {
     this.host = host;
     this.isCore = isCore;
-    this.classes = /* @__PURE__ */ new Map();
   }
   registerInjectable(declaration, meta) {
     this.classes.set(declaration, meta);
@@ -3692,9 +3739,7 @@ function compileInputTransformFields(inputs) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/jit_declaration_registry.mjs
 var JitDeclarationRegistry = class {
-  constructor() {
-    this.jitDeclarations = /* @__PURE__ */ new Set();
-  }
+  jitDeclarations = /* @__PURE__ */ new Set();
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
@@ -3704,6 +3749,9 @@ import ts47 from "typescript";
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
 import ts15 from "typescript";
 var SemanticSymbol = class {
+  decl;
+  path;
+  identifier;
   constructor(decl) {
     this.decl = decl;
     this.path = absoluteFromSourceFile(decl.getSourceFile());
@@ -3728,10 +3776,8 @@ var OpaqueSymbol = class extends SemanticSymbol {
   }
 };
 var SemanticDepGraph = class {
-  constructor() {
-    this.files = /* @__PURE__ */ new Map();
-    this.symbolByDecl = /* @__PURE__ */ new Map();
-  }
+  files = /* @__PURE__ */ new Map();
+  symbolByDecl = /* @__PURE__ */ new Map();
   registerSymbol(symbol) {
     this.symbolByDecl.set(symbol.decl, symbol);
     if (symbol.identifier !== null) {
@@ -3766,10 +3812,11 @@ var SemanticDepGraph = class {
   }
 };
 var SemanticDepGraphUpdater = class {
+  priorGraph;
+  newGraph = new SemanticDepGraph();
+  opaqueSymbols = /* @__PURE__ */ new Map();
   constructor(priorGraph) {
     this.priorGraph = priorGraph;
-    this.newGraph = new SemanticDepGraph();
-    this.opaqueSymbols = /* @__PURE__ */ new Map();
   }
   registerSymbol(symbol) {
     this.newGraph.registerSymbol(symbol);
@@ -3944,6 +3991,7 @@ var ComponentScopeKind;
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/component_scope.mjs
 var CompoundComponentScopeReader = class {
+  readers;
   constructor(readers) {
     this.readers = readers;
   }
@@ -3969,10 +4017,12 @@ var CompoundComponentScopeReader = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/dependency.mjs
 var MetadataDtsModuleScopeResolver = class {
+  dtsMetaReader;
+  aliasingHost;
+  cache = /* @__PURE__ */ new Map();
   constructor(dtsMetaReader, aliasingHost) {
     this.dtsMetaReader = dtsMetaReader;
     this.aliasingHost = aliasingHost;
-    this.cache = /* @__PURE__ */ new Map();
   }
   resolve(ref) {
     const clazz = ref.node;
@@ -4076,20 +4126,25 @@ function makeUnknownComponentDeferredImportDiagnostic(ref, rawExpr) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/local.mjs
 var IN_PROGRESS_RESOLUTION = {};
 var LocalModuleScopeRegistry = class {
+  localReader;
+  fullReader;
+  dependencyScopeReader;
+  refEmitter;
+  aliasingHost;
+  sealed = false;
+  declarationToModule = /* @__PURE__ */ new Map();
+  duplicateDeclarations = /* @__PURE__ */ new Map();
+  moduleToRef = /* @__PURE__ */ new Map();
+  cache = /* @__PURE__ */ new Map();
+  remoteScoping = /* @__PURE__ */ new Map();
+  scopeErrors = /* @__PURE__ */ new Map();
+  modulesWithStructuralErrors = /* @__PURE__ */ new Set();
   constructor(localReader, fullReader, dependencyScopeReader, refEmitter, aliasingHost) {
     this.localReader = localReader;
     this.fullReader = fullReader;
     this.dependencyScopeReader = dependencyScopeReader;
     this.refEmitter = refEmitter;
     this.aliasingHost = aliasingHost;
-    this.sealed = false;
-    this.declarationToModule = /* @__PURE__ */ new Map();
-    this.duplicateDeclarations = /* @__PURE__ */ new Map();
-    this.moduleToRef = /* @__PURE__ */ new Map();
-    this.cache = /* @__PURE__ */ new Map();
-    this.remoteScoping = /* @__PURE__ */ new Map();
-    this.scopeErrors = /* @__PURE__ */ new Map();
-    this.modulesWithStructuralErrors = /* @__PURE__ */ new Set();
   }
   registerNgModuleMetadata(data) {
     this.assertCollecting();
@@ -4431,12 +4486,15 @@ function reexportCollision(module, refA, refB) {
 import { CssSelector, SelectorMatcher } from "@angular/compiler";
 import ts18 from "typescript";
 var TypeCheckScopeRegistry = class {
+  scopeReader;
+  metaReader;
+  hostDirectivesResolver;
+  flattenedDirectiveMetaCache = /* @__PURE__ */ new Map();
+  scopeCache = /* @__PURE__ */ new Map();
   constructor(scopeReader, metaReader, hostDirectivesResolver) {
     this.scopeReader = scopeReader;
     this.metaReader = metaReader;
     this.hostDirectivesResolver = hostDirectivesResolver;
-    this.flattenedDirectiveMetaCache = /* @__PURE__ */ new Map();
-    this.scopeCache = /* @__PURE__ */ new Map();
   }
   getTypeCheckScope(node) {
     const matcher = new SelectorMatcher();
@@ -5623,6 +5681,13 @@ function toR3InputMetadata(mapping) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/symbol.mjs
 var DirectiveSymbol = class extends SemanticSymbol {
+  selector;
+  inputs;
+  outputs;
+  exportAs;
+  typeCheckMeta;
+  typeParameters;
+  baseClass = null;
   constructor(decl, selector, inputs, outputs, exportAs, typeCheckMeta, typeParameters) {
     super(decl);
     this.selector = selector;
@@ -5631,7 +5696,6 @@ var DirectiveSymbol = class extends SemanticSymbol {
     this.exportAs = exportAs;
     this.typeCheckMeta = typeCheckMeta;
     this.typeParameters = typeParameters;
-    this.baseClass = null;
   }
   isPublicApiAffected(previousSymbol) {
     if (!(previousSymbol instanceof DirectiveSymbol)) {
@@ -5723,6 +5787,24 @@ var LIFECYCLE_HOOKS = /* @__PURE__ */ new Set([
   "ngAfterContentChecked"
 ]);
 var DirectiveDecoratorHandler = class {
+  reflector;
+  evaluator;
+  metaRegistry;
+  scopeRegistry;
+  metaReader;
+  injectableRegistry;
+  refEmitter;
+  referencesRegistry;
+  isCore;
+  strictCtorDeps;
+  semanticDepGraphUpdater;
+  annotateForClosureCompiler;
+  perf;
+  importTracker;
+  includeClassMetadata;
+  compilationMode;
+  jitDeclarationRegistry;
+  strictStandalone;
   constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, importTracker, includeClassMetadata, compilationMode, jitDeclarationRegistry, strictStandalone) {
     this.reflector = reflector;
     this.evaluator = evaluator;
@@ -5742,9 +5824,9 @@ var DirectiveDecoratorHandler = class {
     this.compilationMode = compilationMode;
     this.jitDeclarationRegistry = jitDeclarationRegistry;
     this.strictStandalone = strictStandalone;
-    this.precedence = HandlerPrecedence.PRIMARY;
-    this.name = "DirectiveDecoratorHandler";
   }
+  precedence = HandlerPrecedence.PRIMARY;
+  name = "DirectiveDecoratorHandler";
   detect(node, decorators) {
     if (!decorators) {
       const angularField = this.findClassFieldWithAngularFeatures(node);
@@ -5978,11 +6060,12 @@ function isResolvedModuleWithProviders(sv) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.mjs
 var NgModuleSymbol = class extends SemanticSymbol {
+  hasProviders;
+  remotelyScopedComponents = [];
+  transitiveImportsFromStandaloneComponents = /* @__PURE__ */ new Set();
   constructor(decl, hasProviders) {
     super(decl);
     this.hasProviders = hasProviders;
-    this.remotelyScopedComponents = [];
-    this.transitiveImportsFromStandaloneComponents = /* @__PURE__ */ new Set();
   }
   isPublicApiAffected(previousSymbol) {
     if (!(previousSymbol instanceof NgModuleSymbol)) {
@@ -6043,6 +6126,25 @@ var NgModuleSymbol = class extends SemanticSymbol {
   }
 };
 var NgModuleDecoratorHandler = class {
+  reflector;
+  evaluator;
+  metaReader;
+  metaRegistry;
+  scopeRegistry;
+  referencesRegistry;
+  exportedProviderStatusResolver;
+  semanticDepGraphUpdater;
+  isCore;
+  refEmitter;
+  annotateForClosureCompiler;
+  onlyPublishPublicTypings;
+  injectableRegistry;
+  perf;
+  includeClassMetadata;
+  includeSelectorScope;
+  compilationMode;
+  localCompilationExtraImportsTracker;
+  jitDeclarationRegistry;
   constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf, includeClassMetadata, includeSelectorScope, compilationMode, localCompilationExtraImportsTracker, jitDeclarationRegistry) {
     this.reflector = reflector;
     this.evaluator = evaluator;
@@ -6063,9 +6165,9 @@ var NgModuleDecoratorHandler = class {
     this.compilationMode = compilationMode;
     this.localCompilationExtraImportsTracker = localCompilationExtraImportsTracker;
     this.jitDeclarationRegistry = jitDeclarationRegistry;
-    this.precedence = HandlerPrecedence.PRIMARY;
-    this.name = "NgModuleDecoratorHandler";
   }
+  precedence = HandlerPrecedence.PRIMARY;
+  name = "NgModuleDecoratorHandler";
   detect(node, decorators) {
     if (!decorators) {
       return void 0;
@@ -6958,12 +7060,9 @@ function _extractTemplateStyleUrls(template) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/symbol.mjs
 var ComponentSymbol = class extends DirectiveSymbol {
-  constructor() {
-    super(...arguments);
-    this.usedDirectives = [];
-    this.usedPipes = [];
-    this.isRemotelyScoped = false;
-  }
+  usedDirectives = [];
+  usedPipes = [];
+  isRemotelyScoped = false;
   isEmitAffected(previousSymbol, publicApiAffected) {
     if (!(previousSymbol instanceof ComponentSymbol)) {
       return true;
@@ -7153,14 +7252,16 @@ function makeShimFileName(fileName, suffix) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/adapter.mjs
 var ShimAdapter = class {
+  delegate;
+  shims = /* @__PURE__ */ new Map();
+  priorShims = /* @__PURE__ */ new Map();
+  notShims = /* @__PURE__ */ new Set();
+  generators = [];
+  ignoreForEmit = /* @__PURE__ */ new Set();
+  extraInputFiles;
+  extensionPrefixes = [];
   constructor(delegate, tsRootFiles, topLevelGenerators, perFileGenerators, oldProgram) {
     this.delegate = delegate;
-    this.shims = /* @__PURE__ */ new Map();
-    this.priorShims = /* @__PURE__ */ new Map();
-    this.notShims = /* @__PURE__ */ new Set();
-    this.generators = [];
-    this.ignoreForEmit = /* @__PURE__ */ new Set();
-    this.extensionPrefixes = [];
     for (const gen of perFileGenerators) {
       const pattern = `^(.*)\\.${gen.extensionPrefix}\\.ts$`;
       const regexp = new RegExp(pattern, "i");
@@ -7248,9 +7349,10 @@ var ShimAdapter = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/shims/src/reference_tagger.mjs
 var ShimReferenceTagger = class {
+  suffixes;
+  tagged = /* @__PURE__ */ new Set();
+  enabled = true;
   constructor(shimExtensions) {
-    this.tagged = /* @__PURE__ */ new Set();
-    this.enabled = true;
     this.suffixes = shimExtensions.map((extension) => `.${extension}.ts`);
   }
   tag(sf) {
@@ -7282,6 +7384,30 @@ var ShimReferenceTagger = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver.mjs
 var DelegatingCompilerHost = class {
+  delegate;
+  createHash;
+  directoryExists;
+  getCancellationToken;
+  getCanonicalFileName;
+  getCurrentDirectory;
+  getDefaultLibFileName;
+  getDefaultLibLocation;
+  getDirectories;
+  getEnvironmentVariable;
+  getNewLine;
+  getParsedCommandLine;
+  getSourceFileByPath;
+  readDirectory;
+  readFile;
+  realpath;
+  resolveModuleNames;
+  resolveTypeReferenceDirectives;
+  trace;
+  useCaseSensitiveFileNames;
+  getModuleResolutionCache;
+  hasInvalidatedResolutions;
+  resolveModuleNameLiterals;
+  resolveTypeReferenceDirectiveReferences;
   get jsDocParsingMode() {
     return this.delegate.jsDocParsingMode;
   }
@@ -7319,6 +7445,10 @@ var DelegatingCompilerHost = class {
   }
 };
 var UpdatedProgramHost = class extends DelegatingCompilerHost {
+  originalProgram;
+  shimExtensionPrefixes;
+  sfMap;
+  shimTagger;
   constructor(sfMap, originalProgram, delegate, shimExtensionPrefixes) {
     super(delegate);
     this.originalProgram = originalProgram;
@@ -7356,15 +7486,20 @@ var UpdatedProgramHost = class extends DelegatingCompilerHost {
   }
 };
 var TsCreateProgramDriver = class {
+  originalProgram;
+  originalHost;
+  options;
+  shimExtensionPrefixes;
+  sfMap = /* @__PURE__ */ new Map();
+  program;
   constructor(originalProgram, originalHost, options, shimExtensionPrefixes) {
     this.originalProgram = originalProgram;
     this.originalHost = originalHost;
     this.options = options;
     this.shimExtensionPrefixes = shimExtensionPrefixes;
-    this.sfMap = /* @__PURE__ */ new Map();
-    this.supportsInlineOperations = true;
     this.program = this.originalProgram;
   }
+  supportsInlineOperations = true;
   getProgram() {
     return this.program;
   }
@@ -7663,13 +7798,18 @@ function hasExpressionIdentifier(sourceFile, node, identifier) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/completion.mjs
 var CompletionEngine = class {
+  tcb;
+  data;
+  tcbPath;
+  tcbIsShim;
+  componentContext;
+  templateContextCache = /* @__PURE__ */ new Map();
+  expressionCompletionCache = /* @__PURE__ */ new Map();
   constructor(tcb, data, tcbPath, tcbIsShim) {
     this.tcb = tcb;
     this.data = data;
     this.tcbPath = tcbPath;
     this.tcbIsShim = tcbIsShim;
-    this.templateContextCache = /* @__PURE__ */ new Map();
-    this.expressionCompletionCache = /* @__PURE__ */ new Map();
     const globalRead = findFirstMatchingNode(this.tcb, {
       filter: ts30.isPropertyAccessExpression,
       withExpressionIdentifier: ExpressionIdentifier.COMPONENT_COMPLETION
@@ -8860,12 +9000,13 @@ import ts31 from "typescript";
 var REGISTRY = new DomElementSchemaRegistry();
 var REMOVE_XHTML_REGEX = /^:xhtml:/;
 var RegistryDomSchemaChecker = class {
+  resolver;
+  _diagnostics = [];
   get diagnostics() {
     return this._diagnostics;
   }
   constructor(resolver) {
     this.resolver = resolver;
-    this._diagnostics = [];
   }
   checkElement(id, element, schemas, hostIsStandalone) {
     const name = element.name.replace(REMOVE_XHTML_REGEX, "");
@@ -8913,6 +9054,10 @@ import ts36 from "typescript";
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/reference_emit_environment.mjs
 import { ExpressionType, ExternalExpr as ExternalExpr6, TypeModifier } from "@angular/compiler";
 var ReferenceEmitEnvironment = class {
+  importManager;
+  refEmitter;
+  reflector;
+  contextFile;
   constructor(importManager, refEmitter, reflector, contextFile) {
     this.importManager = importManager;
     this.refEmitter = refEmitter;
@@ -9035,6 +9180,8 @@ import ts34 from "typescript";
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_parameter_emitter.mjs
 import ts33 from "typescript";
 var TypeParameterEmitter = class {
+  typeParameters;
+  reflector;
   constructor(typeParameters, reflector) {
     this.typeParameters = typeParameters;
     this.reflector = reflector;
@@ -9327,17 +9474,18 @@ function typeParametersWithDefaultTypes(params) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/environment.mjs
 var Environment = class extends ReferenceEmitEnvironment {
+  config;
+  nextIds = {
+    pipeInst: 1,
+    typeCtor: 1
+  };
+  typeCtors = /* @__PURE__ */ new Map();
+  typeCtorStatements = [];
+  pipeInsts = /* @__PURE__ */ new Map();
+  pipeInstStatements = [];
   constructor(config, importManager, refEmitter, reflector, contextFile) {
     super(importManager, refEmitter, reflector, contextFile);
     this.config = config;
-    this.nextIds = {
-      pipeInst: 1,
-      typeCtor: 1
-    };
-    this.typeCtors = /* @__PURE__ */ new Map();
-    this.typeCtorStatements = [];
-    this.pipeInsts = /* @__PURE__ */ new Map();
-    this.pipeInstStatements = [];
   }
   typeCtorFor(dir) {
     const dirRef = dir.ref;
@@ -9401,10 +9549,11 @@ var Environment = class extends ReferenceEmitEnvironment {
 import { AbsoluteSourceSpan as AbsoluteSourceSpan2, TmplAstElement } from "@angular/compiler";
 import ts37 from "typescript";
 var OutOfBandDiagnosticRecorderImpl = class {
+  resolver;
+  _diagnostics = [];
+  recordedPipes = /* @__PURE__ */ new Set();
   constructor(resolver) {
     this.resolver = resolver;
-    this._diagnostics = [];
-    this.recordedPipes = /* @__PURE__ */ new Set();
   }
   get diagnostics() {
     return this._diagnostics;
@@ -9602,10 +9751,8 @@ function makeInlineDiagnostic(templateId, code, node, messageText, relatedInform
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/shim.mjs
 import ts38 from "typescript";
 var TypeCheckShimGenerator = class {
-  constructor() {
-    this.extensionPrefix = "ngtypecheck";
-    this.shouldEmit = false;
-  }
+  extensionPrefix = "ngtypecheck";
+  shouldEmit = false;
   generateShimForFile(sf, genFilePath, priorShimSf) {
     if (priorShimSf !== null) {
       return priorShimSf;
@@ -9711,6 +9858,8 @@ function astToTypescript(ast, maybeResolve, config) {
   return translator.translate(ast);
 }
 var AstTranslator = class {
+  maybeResolve;
+  config;
   constructor(maybeResolve, config) {
     this.maybeResolve = maybeResolve;
     this.config = config;
@@ -10015,9 +10164,7 @@ var _VeSafeLhsInferenceBugDetector = class {
   }
 };
 var VeSafeLhsInferenceBugDetector = _VeSafeLhsInferenceBugDetector;
-(() => {
-  _VeSafeLhsInferenceBugDetector.SINGLETON = new _VeSafeLhsInferenceBugDetector();
-})();
+__publicField(VeSafeLhsInferenceBugDetector, "SINGLETON", new _VeSafeLhsInferenceBugDetector());
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.mjs
 var TcbGenericContextBehavior;
@@ -10077,6 +10224,9 @@ var TcbOp = class {
   }
 };
 var TcbElementOp = class extends TcbOp {
+  tcb;
+  scope;
+  element;
   constructor(tcb, scope, element) {
     super();
     this.tcb = tcb;
@@ -10095,6 +10245,10 @@ var TcbElementOp = class extends TcbOp {
   }
 };
 var TcbTemplateVariableOp = class extends TcbOp {
+  tcb;
+  scope;
+  template;
+  variable;
   constructor(tcb, scope, template, variable) {
     super();
     this.tcb = tcb;
@@ -10126,12 +10280,14 @@ var TcbTemplateVariableOp = class extends TcbOp {
   }
 };
 var TcbTemplateContextOp = class extends TcbOp {
+  tcb;
+  scope;
   constructor(tcb, scope) {
     super();
     this.tcb = tcb;
     this.scope = scope;
-    this.optional = true;
   }
+  optional = true;
   execute() {
     const ctx = this.tcb.allocateId();
     const type = ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword);
@@ -10140,13 +10296,16 @@ var TcbTemplateContextOp = class extends TcbOp {
   }
 };
 var TcbLetDeclarationOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
   constructor(tcb, scope, node) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
-    this.optional = false;
   }
+  optional = false;
   execute() {
     const id = this.tcb.allocateId();
     addParseSpanInfo(id, this.node.nameSpan);
@@ -10158,6 +10317,9 @@ var TcbLetDeclarationOp = class extends TcbOp {
   }
 };
 var TcbTemplateBodyOp = class extends TcbOp {
+  tcb;
+  scope;
+  template;
   constructor(tcb, scope, template) {
     super();
     this.tcb = tcb;
@@ -10224,6 +10386,9 @@ var TcbTemplateBodyOp = class extends TcbOp {
   }
 };
 var TcbExpressionOp = class extends TcbOp {
+  tcb;
+  scope;
+  expression;
   constructor(tcb, scope, expression) {
     super();
     this.tcb = tcb;
@@ -10240,6 +10405,10 @@ var TcbExpressionOp = class extends TcbOp {
   }
 };
 var TcbDirectiveTypeOpBase = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  dir;
   constructor(tcb, scope, node, dir) {
     super();
     this.tcb = tcb;
@@ -10289,6 +10458,11 @@ var TcbGenericDirectiveTypeWithAnyParamsOp = class extends TcbDirectiveTypeOpBas
   }
 };
 var TcbReferenceOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  host;
+  target;
   constructor(tcb, scope, node, host, target) {
     super();
     this.tcb = tcb;
@@ -10296,8 +10470,8 @@ var TcbReferenceOp = class extends TcbOp {
     this.node = node;
     this.host = host;
     this.target = target;
-    this.optional = true;
   }
+  optional = true;
   execute() {
     const id = this.tcb.allocateId();
     let initializer = this.target instanceof TmplAstTemplate || this.target instanceof TmplAstElement2 ? this.scope.resolve(this.target) : this.scope.resolve(this.host, this.target);
@@ -10315,12 +10489,14 @@ var TcbReferenceOp = class extends TcbOp {
   }
 };
 var TcbInvalidReferenceOp = class extends TcbOp {
+  tcb;
+  scope;
   constructor(tcb, scope) {
     super();
     this.tcb = tcb;
     this.scope = scope;
-    this.optional = true;
   }
+  optional = true;
   execute() {
     const id = this.tcb.allocateId();
     this.scope.addStatement(tsCreateVariable(id, ANY_EXPRESSION));
@@ -10328,6 +10504,10 @@ var TcbInvalidReferenceOp = class extends TcbOp {
   }
 };
 var TcbDirectiveCtorOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  dir;
   constructor(tcb, scope, node, dir) {
     super();
     this.tcb = tcb;
@@ -10377,6 +10557,10 @@ var TcbDirectiveCtorOp = class extends TcbOp {
   }
 };
 var TcbDirectiveInputsOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  dir;
   constructor(tcb, scope, node, dir) {
     super();
     this.tcb = tcb;
@@ -10471,6 +10655,10 @@ var TcbDirectiveInputsOp = class extends TcbOp {
   }
 };
 var TcbDirectiveCtorCircularFallbackOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  dir;
   constructor(tcb, scope, node, dir) {
     super();
     this.tcb = tcb;
@@ -10494,6 +10682,10 @@ var TcbDirectiveCtorCircularFallbackOp = class extends TcbOp {
   }
 };
 var TcbDomSchemaCheckerOp = class extends TcbOp {
+  tcb;
+  element;
+  checkElement;
+  claimedInputs;
   constructor(tcb, element, checkElement, claimedInputs) {
     super();
     this.tcb = tcb;
@@ -10523,15 +10715,20 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
   }
 };
 var TcbControlFlowContentProjectionOp = class extends TcbOp {
+  tcb;
+  element;
+  ngContentSelectors;
+  componentName;
+  category;
   constructor(tcb, element, ngContentSelectors, componentName) {
     super();
     this.tcb = tcb;
     this.element = element;
     this.ngContentSelectors = ngContentSelectors;
     this.componentName = componentName;
-    this.optional = false;
     this.category = tcb.env.config.controlFlowPreventingContentProjection === "error" ? ts41.DiagnosticCategory.Error : ts41.DiagnosticCategory.Warning;
   }
+  optional = false;
   execute() {
     const controlFlowToCheck = this.findPotentialControlFlowNodes();
     if (controlFlowToCheck.length > 0) {
@@ -10604,6 +10801,10 @@ var ATTR_TO_PROP = new Map(Object.entries({
   "tabindex": "tabIndex"
 }));
 var TcbUnclaimedInputsOp = class extends TcbOp {
+  tcb;
+  scope;
+  element;
+  claimedInputs;
   constructor(tcb, scope, element, claimedInputs) {
     super();
     this.tcb = tcb;
@@ -10644,6 +10845,10 @@ var TcbUnclaimedInputsOp = class extends TcbOp {
   }
 };
 var TcbDirectiveOutputsOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  dir;
   constructor(tcb, scope, node, dir) {
     super();
     this.tcb = tcb;
@@ -10689,6 +10894,10 @@ var TcbDirectiveOutputsOp = class extends TcbOp {
   }
 };
 var TcbUnclaimedOutputsOp = class extends TcbOp {
+  tcb;
+  scope;
+  element;
+  claimedOutputs;
   constructor(tcb, scope, element, claimedOutputs) {
     super();
     this.tcb = tcb;
@@ -10738,11 +10947,12 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
   }
 };
 var TcbComponentContextCompletionOp = class extends TcbOp {
+  scope;
   constructor(scope) {
     super();
     this.scope = scope;
-    this.optional = false;
   }
+  optional = false;
   execute() {
     const ctx = ts41.factory.createThis();
     const ctxDot = ts41.factory.createPropertyAccessExpression(ctx, "");
@@ -10753,6 +10963,10 @@ var TcbComponentContextCompletionOp = class extends TcbOp {
   }
 };
 var TcbBlockVariableOp = class extends TcbOp {
+  tcb;
+  scope;
+  initializer;
+  variable;
   constructor(tcb, scope, initializer, variable) {
     super();
     this.tcb = tcb;
@@ -10773,14 +10987,18 @@ var TcbBlockVariableOp = class extends TcbOp {
   }
 };
 var TcbBlockImplicitVariableOp = class extends TcbOp {
+  tcb;
+  scope;
+  type;
+  variable;
   constructor(tcb, scope, type, variable) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.type = type;
     this.variable = variable;
-    this.optional = true;
   }
+  optional = true;
   execute() {
     const id = this.tcb.allocateId();
     addParseSpanInfo(id, this.variable.keySpan);
@@ -10791,12 +11009,15 @@ var TcbBlockImplicitVariableOp = class extends TcbOp {
   }
 };
 var TcbIfOp = class extends TcbOp {
+  tcb;
+  scope;
+  block;
+  expressionScopes = /* @__PURE__ */ new Map();
   constructor(tcb, scope, block) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.block = block;
-    this.expressionScopes = /* @__PURE__ */ new Map();
   }
   get optional() {
     return false;
@@ -10853,6 +11074,9 @@ var TcbIfOp = class extends TcbOp {
   }
 };
 var TcbSwitchOp = class extends TcbOp {
+  tcb;
+  scope;
+  block;
   constructor(tcb, scope, block) {
     super();
     this.tcb = tcb;
@@ -10897,6 +11121,9 @@ var TcbSwitchOp = class extends TcbOp {
   }
 };
 var TcbForOfOp = class extends TcbOp {
+  tcb;
+  scope;
+  block;
   constructor(tcb, scope, block) {
     super();
     this.tcb = tcb;
@@ -10927,6 +11154,16 @@ var TcbForOfOp = class extends TcbOp {
 };
 var INFER_TYPE_FOR_CIRCULAR_OP_EXPR = ts41.factory.createNonNullExpression(ts41.factory.createNull());
 var Context = class {
+  env;
+  domSchemaChecker;
+  oobRecorder;
+  id;
+  boundTarget;
+  pipes;
+  schemas;
+  hostIsStandalone;
+  hostPreserveWhitespaces;
+  nextId = 1;
   constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone, hostPreserveWhitespaces) {
     this.env = env;
     this.domSchemaChecker = domSchemaChecker;
@@ -10937,7 +11174,6 @@ var Context = class {
     this.schemas = schemas;
     this.hostIsStandalone = hostIsStandalone;
     this.hostPreserveWhitespaces = hostPreserveWhitespaces;
-    this.nextId = 1;
   }
   allocateId() {
     return ts41.factory.createIdentifier(`_t${this.nextId++}`);
@@ -10950,18 +11186,21 @@ var Context = class {
   }
 };
 var _Scope = class {
+  tcb;
+  parent;
+  guard;
+  opQueue = [];
+  elementOpMap = /* @__PURE__ */ new Map();
+  directiveOpMap = /* @__PURE__ */ new Map();
+  referenceOpMap = /* @__PURE__ */ new Map();
+  templateCtxOpMap = /* @__PURE__ */ new Map();
+  varMap = /* @__PURE__ */ new Map();
+  letDeclOpMap = /* @__PURE__ */ new Map();
+  statements = [];
   constructor(tcb, parent = null, guard = null) {
     this.tcb = tcb;
     this.parent = parent;
     this.guard = guard;
-    this.opQueue = [];
-    this.elementOpMap = /* @__PURE__ */ new Map();
-    this.directiveOpMap = /* @__PURE__ */ new Map();
-    this.referenceOpMap = /* @__PURE__ */ new Map();
-    this.templateCtxOpMap = /* @__PURE__ */ new Map();
-    this.varMap = /* @__PURE__ */ new Map();
-    this.letDeclOpMap = /* @__PURE__ */ new Map();
-    this.statements = [];
   }
   static forNodes(tcb, parentScope, scopedNode, children, guard) {
     const scope = new _Scope(tcb, parentScope, guard);
@@ -11325,16 +11564,14 @@ var _Scope = class {
   }
 };
 var Scope = _Scope;
-(() => {
-  _Scope.forLoopContextVariableTypes = /* @__PURE__ */ new Map([
-    ["$first", ts41.SyntaxKind.BooleanKeyword],
-    ["$last", ts41.SyntaxKind.BooleanKeyword],
-    ["$even", ts41.SyntaxKind.BooleanKeyword],
-    ["$odd", ts41.SyntaxKind.BooleanKeyword],
-    ["$index", ts41.SyntaxKind.NumberKeyword],
-    ["$count", ts41.SyntaxKind.NumberKeyword]
-  ]);
-})();
+__publicField(Scope, "forLoopContextVariableTypes", /* @__PURE__ */ new Map([
+  ["$first", ts41.SyntaxKind.BooleanKeyword],
+  ["$last", ts41.SyntaxKind.BooleanKeyword],
+  ["$even", ts41.SyntaxKind.BooleanKeyword],
+  ["$odd", ts41.SyntaxKind.BooleanKeyword],
+  ["$index", ts41.SyntaxKind.NumberKeyword],
+  ["$count", ts41.SyntaxKind.NumberKeyword]
+]));
 function tcbThisParam(name, typeArguments) {
   return ts41.factory.createParameterDeclaration(
     void 0,
@@ -11350,6 +11587,8 @@ function tcbExpression(ast, tcb, scope) {
   return translator.translate(ast);
 }
 var TcbExpressionTranslator = class {
+  tcb;
+  scope;
   constructor(tcb, scope) {
     this.tcb = tcb;
     this.scope = scope;
@@ -11591,6 +11830,8 @@ var TcbEventHandlerTranslator = class extends TcbExpressionTranslator {
   }
 };
 var TcbForLoopTrackTranslator = class extends TcbExpressionTranslator {
+  block;
+  allowedVariables;
   constructor(tcb, scope, block) {
     super(tcb, scope);
     this.block = block;
@@ -11615,14 +11856,15 @@ var TcbForLoopTrackTranslator = class extends TcbExpressionTranslator {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_file.mjs
 import ts42 from "typescript";
 var TypeCheckFile = class extends Environment {
+  fileName;
+  nextTcbId = 1;
+  tcbStatements = [];
   constructor(fileName, config, refEmitter, reflector, compilerHost) {
     super(config, new ImportManager({
       forceGenerateNamespacesForNewImports: true,
       shouldUseSingleQuotes: () => true
     }), refEmitter, reflector, ts42.createSourceFile(compilerHost.getCanonicalFileName(fileName), "", ts42.ScriptTarget.Latest, true));
     this.fileName = fileName;
-    this.nextTcbId = 1;
-    this.tcbStatements = [];
   }
   addTypeCheckBlock(ref, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
     const fnId = ts42.factory.createIdentifier(`_tcb${this.nextTcbId++}`);
@@ -11667,6 +11909,14 @@ var InliningMode;
   InliningMode2[InliningMode2["Error"] = 1] = "Error";
 })(InliningMode || (InliningMode = {}));
 var TypeCheckContextImpl = class {
+  config;
+  compilerHost;
+  refEmitter;
+  reflector;
+  host;
+  inlining;
+  perf;
+  fileMap = /* @__PURE__ */ new Map();
   constructor(config, compilerHost, refEmitter, reflector, host, inlining, perf) {
     this.config = config;
     this.compilerHost = compilerHost;
@@ -11675,13 +11925,12 @@ var TypeCheckContextImpl = class {
     this.host = host;
     this.inlining = inlining;
     this.perf = perf;
-    this.fileMap = /* @__PURE__ */ new Map();
-    this.opMap = /* @__PURE__ */ new Map();
-    this.typeCtorPending = /* @__PURE__ */ new Set();
     if (inlining === InliningMode.Error && config.useInlineTypeConstructors) {
       throw new Error(`AssertionError: invalid inlining configuration.`);
     }
   }
+  opMap = /* @__PURE__ */ new Map();
+  typeCtorPending = /* @__PURE__ */ new Set();
   addTemplate(ref, binder, template, pipes, schemas, sourceMapping, file, parseErrors, isStandalone, preserveWhitespaces) {
     if (!this.host.shouldCheckComponent(ref.node)) {
       return;
@@ -11878,6 +12127,12 @@ function getTemplateDiagnostics(parseErrors, templateId, sourceMapping) {
   });
 }
 var InlineTcbOp = class {
+  ref;
+  meta;
+  config;
+  reflector;
+  domSchemaChecker;
+  oobRecorder;
   constructor(ref, meta, config, reflector, domSchemaChecker, oobRecorder) {
     this.ref = ref;
     this.meta = meta;
@@ -11897,6 +12152,9 @@ var InlineTcbOp = class {
   }
 };
 var TypeCtorOp = class {
+  ref;
+  reflector;
+  meta;
   constructor(ref, reflector, meta) {
     this.ref = ref;
     this.reflector = reflector;
@@ -11958,10 +12216,12 @@ function findClosestLineStartPosition(linesMap, position, low = 0, high = linesM
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/source.mjs
 var TemplateSource = class {
+  mapping;
+  file;
+  lineStarts = null;
   constructor(mapping, file) {
     this.mapping = mapping;
     this.file = file;
-    this.lineStarts = null;
   }
   toParseSourceSpan(start, end) {
     const startLoc = this.toParseLocation(start);
@@ -11981,9 +12241,7 @@ var TemplateSource = class {
   }
 };
 var TemplateSourceManager = class {
-  constructor() {
-    this.templateSources = /* @__PURE__ */ new Map();
-  }
+  templateSources = /* @__PURE__ */ new Map();
   getTemplateId(node) {
     return getTemplateId(node);
   }
@@ -12011,6 +12269,13 @@ var TemplateSourceManager = class {
 import { AST, ASTWithName, ASTWithSource as ASTWithSource2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers5, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts44 from "typescript";
 var SymbolBuilder = class {
+  tcbPath;
+  tcbIsShim;
+  typeCheckBlock;
+  templateData;
+  componentScopeReader;
+  getTypeChecker;
+  symbolCache = /* @__PURE__ */ new Map();
   constructor(tcbPath, tcbIsShim, typeCheckBlock, templateData, componentScopeReader, getTypeChecker) {
     this.tcbPath = tcbPath;
     this.tcbIsShim = tcbIsShim;
@@ -12018,7 +12283,6 @@ var SymbolBuilder = class {
     this.templateData = templateData;
     this.componentScopeReader = componentScopeReader;
     this.getTypeChecker = getTypeChecker;
-    this.symbolCache = /* @__PURE__ */ new Map();
   }
   getSymbol(node) {
     if (this.symbolCache.has(node)) {
@@ -12586,6 +12850,26 @@ function unwrapSignalInputWriteTAccessor(expr) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
 var REGISTRY2 = new DomElementSchemaRegistry2();
 var TemplateTypeCheckerImpl = class {
+  originalProgram;
+  programDriver;
+  typeCheckAdapter;
+  config;
+  refEmitter;
+  reflector;
+  compilerHost;
+  priorBuild;
+  metaReader;
+  localMetaReader;
+  ngModuleIndex;
+  componentScopeReader;
+  typeCheckScopeRegistry;
+  perf;
+  state = /* @__PURE__ */ new Map();
+  completionCache = /* @__PURE__ */ new Map();
+  symbolBuilderCache = /* @__PURE__ */ new Map();
+  scopeCache = /* @__PURE__ */ new Map();
+  elementTagCache = /* @__PURE__ */ new Map();
+  isComplete = false;
   constructor(originalProgram, programDriver, typeCheckAdapter, config, refEmitter, reflector, compilerHost, priorBuild, metaReader, localMetaReader, ngModuleIndex, componentScopeReader, typeCheckScopeRegistry, perf) {
     this.originalProgram = originalProgram;
     this.programDriver = programDriver;
@@ -12601,12 +12885,6 @@ var TemplateTypeCheckerImpl = class {
     this.componentScopeReader = componentScopeReader;
     this.typeCheckScopeRegistry = typeCheckScopeRegistry;
     this.perf = perf;
-    this.state = /* @__PURE__ */ new Map();
-    this.completionCache = /* @__PURE__ */ new Map();
-    this.symbolBuilderCache = /* @__PURE__ */ new Map();
-    this.scopeCache = /* @__PURE__ */ new Map();
-    this.elementTagCache = /* @__PURE__ */ new Map();
-    this.isComplete = false;
   }
   getTemplate(component, optimizeFor) {
     const { data } = this.getLatestComponentState(component);
@@ -13210,6 +13488,7 @@ function convertDiagnostic(diag, sourceResolver) {
   return translateDiagnostic(diag, sourceResolver);
 }
 var WholeProgramTypeCheckingHost = class {
+  impl;
   constructor(impl) {
     this.impl = impl;
   }
@@ -13234,11 +13513,14 @@ var WholeProgramTypeCheckingHost = class {
   }
 };
 var SingleFileTypeCheckingHost = class {
+  sfPath;
+  fileData;
+  impl;
+  seenInlines = false;
   constructor(sfPath, fileData, impl) {
     this.sfPath = sfPath;
     this.fileData = fileData;
     this.impl = impl;
-    this.seenInlines = false;
   }
   assertPath(sfPath) {
     if (this.sfPath !== sfPath) {
@@ -13273,6 +13555,7 @@ var SingleFileTypeCheckingHost = class {
   }
 };
 var SingleShimTypeCheckingHost = class extends SingleFileTypeCheckingHost {
+  shimPath;
   constructor(sfPath, fileData, impl, shimPath) {
     super(sfPath, fileData, impl);
     this.shimPath = shimPath;
@@ -13362,17 +13645,7 @@ function trackBindingName(node, results) {
   }
 }
 var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
-  constructor() {
-    super(...arguments);
-    this.allReads = /* @__PURE__ */ new Set();
-    this.addAllTopLevelIdentifiers = (node) => {
-      if (ts45.isIdentifier(node) && this.isTopLevelIdentifierReference(node)) {
-        this.allReads.add(node.text);
-      } else {
-        ts45.forEachChild(node, this.addAllTopLevelIdentifiers);
-      }
-    };
-  }
+  allReads = /* @__PURE__ */ new Set();
   visitReadVarExpr(ast, context) {
     this.allReads.add(ast.name);
     super.visitReadVarExpr(ast, context);
@@ -13383,6 +13656,13 @@ var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
     }
     super.visitWrappedNodeExpr(ast, context);
   }
+  addAllTopLevelIdentifiers = (node) => {
+    if (ts45.isIdentifier(node) && this.isTopLevelIdentifierReference(node)) {
+      this.allReads.add(node.text);
+    } else {
+      ts45.forEachChild(node, this.addAllTopLevelIdentifiers);
+    }
+  };
   isTopLevelIdentifierReference(node) {
     const parent = node.parent;
     if (!parent) {
@@ -13447,6 +13727,7 @@ function getHmrUpdateDeclaration(compilationResults, constantStatements, meta, s
   ], node.asteriskToken, node.name, node.typeParameters, node.parameters, node.type, node.body);
 }
 var HmrModuleImportRewriter = class {
+  coreName;
   constructor(coreName) {
     this.coreName = coreName;
   }
@@ -13466,6 +13747,48 @@ var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
 var isUsedPipe = (decl) => decl.kind === R3TemplateDependencyKind.Pipe;
 var ComponentDecoratorHandler = class {
+  reflector;
+  evaluator;
+  metaRegistry;
+  metaReader;
+  scopeReader;
+  compilerHost;
+  scopeRegistry;
+  typeCheckScopeRegistry;
+  resourceRegistry;
+  isCore;
+  strictCtorDeps;
+  resourceLoader;
+  rootDirs;
+  defaultPreserveWhitespaces;
+  i18nUseExternalIds;
+  enableI18nLegacyMessageIdFormat;
+  usePoisonedData;
+  i18nNormalizeLineEndingsInICUs;
+  moduleResolver;
+  cycleAnalyzer;
+  cycleHandlingStrategy;
+  refEmitter;
+  referencesRegistry;
+  depTracker;
+  injectableRegistry;
+  semanticDepGraphUpdater;
+  annotateForClosureCompiler;
+  perf;
+  hostDirectivesResolver;
+  importTracker;
+  includeClassMetadata;
+  compilationMode;
+  deferredSymbolTracker;
+  forbidOrphanRendering;
+  enableBlockSyntax;
+  enableLetSyntax;
+  externalRuntimeStyles;
+  localCompilationExtraImportsTracker;
+  jitDeclarationRegistry;
+  i18nPreserveSignificantWhitespace;
+  strictStandalone;
+  enableHmr;
   constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, compilerHost, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace, strictStandalone, enableHmr) {
     this.reflector = reflector;
     this.evaluator = evaluator;
@@ -13509,12 +13832,6 @@ var ComponentDecoratorHandler = class {
     this.i18nPreserveSignificantWhitespace = i18nPreserveSignificantWhitespace;
     this.strictStandalone = strictStandalone;
     this.enableHmr = enableHmr;
-    this.literalCache = /* @__PURE__ */ new Map();
-    this.elementSchemaRegistry = new DomElementSchemaRegistry3();
-    this.preanalyzeTemplateCache = /* @__PURE__ */ new Map();
-    this.preanalyzeStylesCache = /* @__PURE__ */ new Map();
-    this.precedence = HandlerPrecedence.PRIMARY;
-    this.name = "ComponentDecoratorHandler";
     this.extractTemplateOptions = {
       enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
       i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
@@ -13525,6 +13842,14 @@ var ComponentDecoratorHandler = class {
     };
     this.canDeferDeps = !enableHmr;
   }
+  literalCache = /* @__PURE__ */ new Map();
+  elementSchemaRegistry = new DomElementSchemaRegistry3();
+  preanalyzeTemplateCache = /* @__PURE__ */ new Map();
+  preanalyzeStylesCache = /* @__PURE__ */ new Map();
+  canDeferDeps;
+  extractTemplateOptions;
+  precedence = HandlerPrecedence.PRIMARY;
+  name = "ComponentDecoratorHandler";
   detect(node, decorators) {
     if (!decorators) {
       return void 0;
@@ -14573,6 +14898,15 @@ function isDefaultImport(node) {
 import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr10 } from "@angular/compiler";
 import ts48 from "typescript";
 var InjectableDecoratorHandler = class {
+  reflector;
+  evaluator;
+  isCore;
+  strictCtorDeps;
+  injectableRegistry;
+  perf;
+  includeClassMetadata;
+  compilationMode;
+  errorOnDuplicateProv;
   constructor(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, perf, includeClassMetadata, compilationMode, errorOnDuplicateProv = true) {
     this.reflector = reflector;
     this.evaluator = evaluator;
@@ -14583,9 +14917,9 @@ var InjectableDecoratorHandler = class {
     this.includeClassMetadata = includeClassMetadata;
     this.compilationMode = compilationMode;
     this.errorOnDuplicateProv = errorOnDuplicateProv;
-    this.precedence = HandlerPrecedence.SHARED;
-    this.name = "InjectableDecoratorHandler";
   }
+  precedence = HandlerPrecedence.SHARED;
+  name = "InjectableDecoratorHandler";
   detect(node, decorators) {
     if (!decorators) {
       return void 0;
@@ -14805,6 +15139,7 @@ function getDep(dep, reflector) {
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5 } from "@angular/compiler";
 import ts49 from "typescript";
 var PipeSymbol = class extends SemanticSymbol {
+  name;
   constructor(decl, name) {
     super(decl);
     this.name = name;
@@ -14820,6 +15155,17 @@ var PipeSymbol = class extends SemanticSymbol {
   }
 };
 var PipeDecoratorHandler = class {
+  reflector;
+  evaluator;
+  metaRegistry;
+  scopeRegistry;
+  injectableRegistry;
+  isCore;
+  perf;
+  includeClassMetadata;
+  compilationMode;
+  generateExtraImportsInLocalMode;
+  strictStandalone;
   constructor(reflector, evaluator, metaRegistry, scopeRegistry, injectableRegistry, isCore, perf, includeClassMetadata, compilationMode, generateExtraImportsInLocalMode, strictStandalone) {
     this.reflector = reflector;
     this.evaluator = evaluator;
@@ -14832,9 +15178,9 @@ var PipeDecoratorHandler = class {
     this.compilationMode = compilationMode;
     this.generateExtraImportsInLocalMode = generateExtraImportsInLocalMode;
     this.strictStandalone = strictStandalone;
-    this.precedence = HandlerPrecedence.PRIMARY;
-    this.name = "PipeDecoratorHandler";
   }
+  precedence = HandlerPrecedence.PRIMARY;
+  name = "PipeDecoratorHandler";
   detect(node, decorators) {
     if (!decorators) {
       return void 0;
@@ -15042,4 +15388,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-//# sourceMappingURL=chunk-GVXGZHIM.js.map
+//# sourceMappingURL=chunk-MXFCG2T7.js.map

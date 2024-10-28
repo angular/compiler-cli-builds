@@ -21,6 +21,7 @@ var DEBUG = `${BLUE}Debug:${RESET}`;
 var WARN = `${YELLOW}Warning:${RESET}`;
 var ERROR = `${RED}Error:${RESET}`;
 var ConsoleLogger = class {
+  level;
   constructor(level) {
     this.level = level;
   }
@@ -53,4 +54,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-RT2QTF73.js.map
+//# sourceMappingURL=chunk-FKXFEX7K.js.map

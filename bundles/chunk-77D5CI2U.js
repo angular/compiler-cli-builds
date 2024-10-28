@@ -32,6 +32,13 @@ function removeSourceMapComments(contents) {
   return mapHelpers.removeMapFileComments(mapHelpers.removeComments(contents)).replace(/\n\n$/, "\n");
 }
 var SourceFile = class {
+  sourcePath;
+  contents;
+  rawMap;
+  sources;
+  fs;
+  flattenedMappings;
+  startOfLinePositions;
   constructor(sourcePath, contents, rawMap, sources, fs) {
     this.sourcePath = sourcePath;
     this.contents = contents;
@@ -236,11 +243,9 @@ function computeLineLengths(str) {
   return str.split(/\n/).map((s) => s.length);
 }
 var IndexedMap = class {
-  constructor() {
-    this.map = /* @__PURE__ */ new Map();
-    this.keys = [];
-    this.values = [];
-  }
+  map = /* @__PURE__ */ new Map();
+  keys = [];
+  values = [];
   set(key, value) {
     if (this.map.has(key)) {
       return this.map.get(key);
@@ -252,10 +257,8 @@ var IndexedMap = class {
   }
 };
 var IndexedSet = class {
-  constructor() {
-    this.map = /* @__PURE__ */ new Map();
-    this.values = [];
-  }
+  map = /* @__PURE__ */ new Map();
+  values = [];
   add(value) {
     if (this.map.has(value)) {
       return this.map.get(value);
@@ -266,9 +269,10 @@ var IndexedSet = class {
   }
 };
 var Cache = class {
+  computeFn;
+  map = /* @__PURE__ */ new Map();
   constructor(computeFn) {
     this.computeFn = computeFn;
-    this.map = /* @__PURE__ */ new Map();
   }
   get(input) {
     if (!this.map.has(input)) {
@@ -292,11 +296,14 @@ var ContentOrigin;
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader.mjs
 var SCHEME_MATCHER = /^([a-z][a-z0-9.-]*):\/\//i;
 var SourceFileLoader = class {
+  fs;
+  logger;
+  schemeMap;
+  currentPaths = [];
   constructor(fs, logger, schemeMap) {
     this.fs = fs;
     this.logger = logger;
     this.schemeMap = schemeMap;
-    this.currentPaths = [];
   }
   loadSourceFile(sourcePath, contents = null, mapAndPath = null) {
     const contentsOrigin = contents !== null ? ContentOrigin.Provided : ContentOrigin.FileSystem;
@@ -419,4 +426,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-3Z25BX6N.js.map
+//# sourceMappingURL=chunk-77D5CI2U.js.map

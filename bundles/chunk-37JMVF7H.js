@@ -4,7 +4,7 @@
     
 import {
   __require
-} from "./chunk-XI2RTGAL.js";
+} from "./chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/util.mjs
 var TS_DTS_JS_EXTENSION = /(?:\.d)?\.ts$|\.js$/;
@@ -171,6 +171,8 @@ function toRelativeImport(relativePath) {
 import * as os from "os";
 import ts from "typescript";
 var NgtscCompilerHost = class {
+  fs;
+  options;
   constructor(fs3, options = {}) {
     this.fs = fs3;
     this.options = options;
@@ -233,9 +235,12 @@ var LogicalProjectPath = {
   }
 };
 var LogicalFileSystem = class {
+  compilerHost;
+  rootDirs;
+  canonicalRootDirs;
+  cache = /* @__PURE__ */ new Map();
   constructor(rootDirs, compilerHost) {
     this.compilerHost = compilerHost;
-    this.cache = /* @__PURE__ */ new Map();
     this.rootDirs = rootDirs.concat([]).sort((a, b) => b.length - a.length);
     this.canonicalRootDirs = this.rootDirs.map((dir) => this.compilerHost.getCanonicalFileName(dir));
   }
@@ -315,10 +320,7 @@ var isCommonJS = typeof __filename !== "undefined";
 var currentFileUrl = isCommonJS ? null : import.meta.url;
 var currentFileName = isCommonJS ? __filename : fileURLToPath(currentFileUrl);
 var NodeJSReadonlyFileSystem = class extends NodeJSPathManipulation {
-  constructor() {
-    super(...arguments);
-    this._caseSensitive = void 0;
-  }
+  _caseSensitive = void 0;
   isCaseSensitive() {
     if (this._caseSensitive === void 0) {
       this._caseSensitive = !fs2.existsSync(this.normalize(toggleCase(currentFileName)));
@@ -441,4 +443,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-UJ2J6WV4.js.map
+//# sourceMappingURL=chunk-37JMVF7H.js.map

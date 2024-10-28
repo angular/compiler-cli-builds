@@ -101,12 +101,17 @@ function timeSinceInMicros(mark2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/recorder.mjs
 var ActivePerfRecorder = class {
+  zeroTime;
+  counters;
+  phaseTime;
+  bytes;
+  currentPhase = PerfPhase.Unaccounted;
+  currentPhaseEntered;
   static zeroedToNow() {
     return new ActivePerfRecorder(mark());
   }
   constructor(zeroTime) {
     this.zeroTime = zeroTime;
-    this.currentPhase = PerfPhase.Unaccounted;
     this.currentPhaseEntered = this.zeroTime;
     this.counters = Array(PerfEvent.LAST).fill(0);
     this.phaseTime = Array(PerfPhase.LAST).fill(0);
@@ -168,6 +173,7 @@ var ActivePerfRecorder = class {
   }
 };
 var DelegatingPerfRecorder = class {
+  target;
   constructor(target) {
     this.target = target;
   }
@@ -207,4 +213,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-XSNUHRLJ.js.map
+//# sourceMappingURL=chunk-Q2WE7ECN.js.map
