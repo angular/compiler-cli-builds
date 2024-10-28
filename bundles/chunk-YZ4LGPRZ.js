@@ -5,17 +5,18 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-O2RMLJTP.js";
+} from "./chunk-YMHOC6HJ.js";
 import {
   SourceFileLoader
-} from "./chunk-3Z25BX6N.js";
+} from "./chunk-77D5CI2U.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.mjs
 var FatalLinkerError = class extends Error {
+  node;
+  type = "FatalLinkerError";
   constructor(node, message) {
     super(message);
     this.node = node;
-    this.type = "FatalLinkerError";
   }
 };
 function isFatalLinkerError(e) {
@@ -32,6 +33,9 @@ function assert(node, predicate, expected) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/ast/ast_value.mjs
 import * as o from "@angular/compiler";
 var AstObject = class {
+  expression;
+  obj;
+  host;
   static parse(expression, host) {
     const obj = host.parseObjectLiteral(expression);
     return new AstObject(expression, obj, host);
@@ -93,10 +97,12 @@ var AstObject = class {
   }
 };
 var AstValue = class {
+  expression;
+  host;
+  \u0275typeBrand = null;
   constructor(expression, host) {
     this.expression = expression;
     this.host = host;
-    this.\u0275typeBrand = null;
   }
   getSymbolName() {
     return this.host.getSymbolName(this.expression);
@@ -167,6 +173,8 @@ import { ConstantPool } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/linker_import_generator.mjs
 var LinkerImportGenerator = class {
+  factory;
+  ngImport;
   constructor(factory, ngImport) {
     this.factory = factory;
     this.ngImport = ngImport;
@@ -187,11 +195,14 @@ var LinkerImportGenerator = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/emit_scope.mjs
 var EmitScope = class {
+  ngImport;
+  translator;
+  factory;
+  constantPool = new ConstantPool();
   constructor(ngImport, translator, factory) {
     this.ngImport = ngImport;
     this.translator = translator;
     this.factory = factory;
-    this.constantPool = new ConstantPool();
   }
   translateDefinition(definition) {
     const expression = this.translator.translateExpression(definition.expression, new LinkerImportGenerator(this.factory, this.ngImport));
@@ -300,7 +311,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "19.1.0-next.0+sha-0f2f7ec";
+var PLACEHOLDER_VERSION = "19.1.0-next.0+sha-db467e1";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -355,6 +366,8 @@ function getDefaultStandaloneValue(version) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.mjs
 var PartialDirectiveLinkerVersion1 = class {
+  sourceUrl;
+  code;
   constructor(sourceUrl, code) {
     this.sourceUrl = sourceUrl;
     this.code = code;
@@ -513,6 +526,9 @@ function makeDirectiveMetadata(directiveExpr, typeExpr, isComponentByDefault = n
   };
 }
 var PartialComponentLinkerVersion1 = class {
+  getSourceFile;
+  sourceUrl;
+  code;
   constructor(getSourceFile, sourceUrl, code) {
     this.getSourceFile = getSourceFile;
     this.sourceUrl = sourceUrl;
@@ -814,6 +830,7 @@ function toR3InjectorMeta(metaObj) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_ng_module_linker_1.mjs
 import { compileNgModule, R3NgModuleMetadataKind, R3SelectorScopeMode } from "@angular/compiler";
 var PartialNgModuleLinkerVersion1 = class {
+  emitInline;
   constructor(emitInline) {
     this.emitInline = emitInline;
   }
@@ -972,6 +989,9 @@ function createLinkerMap(environment, sourceUrl, code) {
   return linkers;
 }
 var PartialLinkerSelector = class {
+  linkers;
+  logger;
+  unknownDeclarationVersionHandling;
   constructor(linkers, logger, unknownDeclarationVersionHandling) {
     this.linkers = linkers;
     this.logger = logger;
@@ -1016,9 +1036,11 @@ function getRange(comparator, versionStr) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/file_linker.mjs
 var FileLinker = class {
+  linkerEnvironment;
+  linkerSelector;
+  emitScopes = /* @__PURE__ */ new Map();
   constructor(linkerEnvironment, sourceUrl, code) {
     this.linkerEnvironment = linkerEnvironment;
-    this.emitScopes = /* @__PURE__ */ new Map();
     this.linkerSelector = new PartialLinkerSelector(createLinkerMap(this.linkerEnvironment, sourceUrl, code), this.linkerEnvironment.logger, this.linkerEnvironment.options.unknownDeclarationVersionHandling);
   }
   isPartialDeclaration(calleeName) {
@@ -1066,6 +1088,7 @@ var DEFAULT_LINKER_OPTIONS = {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/translator.mjs
 var Translator = class {
+  factory;
   constructor(factory) {
     this.factory = factory;
   }
@@ -1079,6 +1102,13 @@ var Translator = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/linker_environment.mjs
 var LinkerEnvironment = class {
+  fileSystem;
+  logger;
+  host;
+  factory;
+  options;
+  translator;
+  sourceFileLoader;
   constructor(fileSystem, logger, host, factory, options) {
     this.fileSystem = fileSystem;
     this.logger = logger;
@@ -1119,4 +1149,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WIYBGC3E.js.map
+//# sourceMappingURL=chunk-YZ4LGPRZ.js.map

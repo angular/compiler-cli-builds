@@ -6,7 +6,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-KGEMNMTH.js";
+} from "./chunk-6OK75DPC.js";
 import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
@@ -33,27 +33,27 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-2KSGTNY4.js";
+} from "./chunk-RSF245KH.js";
 import {
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-TFIXU576.js";
+} from "./chunk-B5DE3HVR.js";
 import {
   OptimizeFor,
   TsCreateProgramDriver
-} from "./chunk-GVXGZHIM.js";
+} from "./chunk-MXFCG2T7.js";
 import {
   isLocalCompilationDiagnostics
-} from "./chunk-O2RMLJTP.js";
+} from "./chunk-YMHOC6HJ.js";
 import {
   ActivePerfRecorder,
   PerfPhase
-} from "./chunk-XSNUHRLJ.js";
+} from "./chunk-Q2WE7ECN.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "./chunk-RT2QTF73.js";
+} from "./chunk-FKXFEX7K.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -75,15 +75,20 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-UJ2J6WV4.js";
-import "./chunk-XI2RTGAL.js";
+} from "./chunk-37JMVF7H.js";
+import "./chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("19.1.0-next.0+sha-0f2f7ec");
+var VERSION = new Version("19.1.0-next.0+sha-db467e1");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
+  ngOptions;
+  name = "ngtsc";
+  options = null;
+  host = null;
+  _compiler = null;
   get compiler() {
     if (this._compiler === null) {
       throw new Error("Lifecycle error: setupCompilation() must be called first.");
@@ -92,10 +97,6 @@ var NgTscPlugin = class {
   }
   constructor(ngOptions) {
     this.ngOptions = ngOptions;
-    this.name = "ngtsc";
-    this.options = null;
-    this.host = null;
-    this._compiler = null;
     setFileSystem(new NodeJSFileSystem());
   }
   wrapHost(host, inputFiles, options) {
