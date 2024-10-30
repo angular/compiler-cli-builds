@@ -52,7 +52,8 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     private readonly compilationMode;
     private readonly jitDeclarationRegistry;
     private readonly strictStandalone;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, strictCtorDeps: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, compilationMode: CompilationMode, jitDeclarationRegistry: JitDeclarationRegistry, strictStandalone: boolean);
+    private readonly implicitStandaloneValue;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, strictCtorDeps: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, compilationMode: CompilationMode, jitDeclarationRegistry: JitDeclarationRegistry, strictStandalone: boolean, implicitStandaloneValue: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name = "DirectiveDecoratorHandler";
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
