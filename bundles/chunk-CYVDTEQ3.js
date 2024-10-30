@@ -4871,9 +4871,6 @@ function parseDescendantsOption(value) {
   throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, value, `Expected "descendants" option to be a boolean literal.`);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/standalone-default-value.mjs
-var NG_STANDALONE_DEFAULT_VALUE = true;
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.mjs
 var EMPTY_OBJECT = {};
 var queryDecoratorNames = [
@@ -4883,7 +4880,7 @@ var queryDecoratorNames = [
   "ContentChildren"
 ];
 var QUERY_TYPES = new Set(queryDecoratorNames);
-function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, evaluator, refEmitter, referencesRegistry, isCore, annotateForClosureCompiler, compilationMode, defaultSelector, strictStandalone) {
+function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, evaluator, refEmitter, referencesRegistry, isCore, annotateForClosureCompiler, compilationMode, defaultSelector, strictStandalone, implicitStandaloneValue) {
   let directive;
   if (decorator.args === null || decorator.args.length === 0) {
     directive = /* @__PURE__ */ new Map();
@@ -4950,7 +4947,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
   const rawCtorDeps = getConstructorDependencies(clazz, reflector, isCore);
   const ctorDeps = selector !== null ? validateConstructorDependencies(clazz, rawCtorDeps) : unwrapConstructorDependencies(rawCtorDeps);
   const isStructural = ctorDeps !== null && ctorDeps !== "invalid" && ctorDeps.some((dep) => dep.token instanceof ExternalExpr4 && dep.token.value.moduleName === "@angular/core" && dep.token.value.name === "TemplateRef");
-  let isStandalone = NG_STANDALONE_DEFAULT_VALUE;
+  let isStandalone = implicitStandaloneValue;
   if (directive.has("standalone")) {
     const expr = directive.get("standalone");
     const resolved = evaluator.evaluate(expr);
@@ -5805,7 +5802,8 @@ var DirectiveDecoratorHandler = class {
   compilationMode;
   jitDeclarationRegistry;
   strictStandalone;
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, importTracker, includeClassMetadata, compilationMode, jitDeclarationRegistry, strictStandalone) {
+  implicitStandaloneValue;
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, importTracker, includeClassMetadata, compilationMode, jitDeclarationRegistry, strictStandalone, implicitStandaloneValue) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -5824,6 +5822,7 @@ var DirectiveDecoratorHandler = class {
     this.compilationMode = compilationMode;
     this.jitDeclarationRegistry = jitDeclarationRegistry;
     this.strictStandalone = strictStandalone;
+    this.implicitStandaloneValue = implicitStandaloneValue;
   }
   precedence = HandlerPrecedence.PRIMARY;
   name = "DirectiveDecoratorHandler";
@@ -5857,7 +5856,8 @@ var DirectiveDecoratorHandler = class {
       this.annotateForClosureCompiler,
       this.compilationMode,
       null,
-      this.strictStandalone
+      this.strictStandalone,
+      this.implicitStandaloneValue
     );
     if (directiveResult.jitForced) {
       this.jitDeclarationRegistry.jitDeclarations.add(node);
@@ -13789,7 +13789,8 @@ var ComponentDecoratorHandler = class {
   i18nPreserveSignificantWhitespace;
   strictStandalone;
   enableHmr;
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, compilerHost, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace, strictStandalone, enableHmr) {
+  implicitStandaloneValue;
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, compilerHost, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace, strictStandalone, enableHmr, implicitStandaloneValue) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -13832,6 +13833,7 @@ var ComponentDecoratorHandler = class {
     this.i18nPreserveSignificantWhitespace = i18nPreserveSignificantWhitespace;
     this.strictStandalone = strictStandalone;
     this.enableHmr = enableHmr;
+    this.implicitStandaloneValue = implicitStandaloneValue;
     this.extractTemplateOptions = {
       enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
       i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
@@ -13940,7 +13942,7 @@ var ComponentDecoratorHandler = class {
     this.literalCache.delete(decorator);
     let diagnostics;
     let isPoisoned = false;
-    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.importTracker, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, this.annotateForClosureCompiler, this.compilationMode, this.elementSchemaRegistry.getDefaultComponentElementName(), this.strictStandalone);
+    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.importTracker, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, this.annotateForClosureCompiler, this.compilationMode, this.elementSchemaRegistry.getDefaultComponentElementName(), this.strictStandalone, this.implicitStandaloneValue);
     if (directiveResult.jitForced) {
       this.jitDeclarationRegistry.jitDeclarations.add(node);
       return {};
@@ -15166,7 +15168,8 @@ var PipeDecoratorHandler = class {
   compilationMode;
   generateExtraImportsInLocalMode;
   strictStandalone;
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, injectableRegistry, isCore, perf, includeClassMetadata, compilationMode, generateExtraImportsInLocalMode, strictStandalone) {
+  implicitStandaloneValue;
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, injectableRegistry, isCore, perf, includeClassMetadata, compilationMode, generateExtraImportsInLocalMode, strictStandalone, implicitStandaloneValue) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -15178,6 +15181,7 @@ var PipeDecoratorHandler = class {
     this.compilationMode = compilationMode;
     this.generateExtraImportsInLocalMode = generateExtraImportsInLocalMode;
     this.strictStandalone = strictStandalone;
+    this.implicitStandaloneValue = implicitStandaloneValue;
   }
   precedence = HandlerPrecedence.PRIMARY;
   name = "PipeDecoratorHandler";
@@ -15229,7 +15233,7 @@ var PipeDecoratorHandler = class {
       }
       pure = pureValue;
     }
-    let isStandalone = NG_STANDALONE_DEFAULT_VALUE;
+    let isStandalone = this.implicitStandaloneValue;
     if (pipe.has("standalone")) {
       const expr = pipe.get("standalone");
       const resolved = this.evaluator.evaluate(expr);
@@ -15381,11 +15385,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-/**
- * @license
- * Copyright Google LLC All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-//# sourceMappingURL=chunk-MXFCG2T7.js.map
+//# sourceMappingURL=chunk-CYVDTEQ3.js.map

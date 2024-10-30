@@ -134,6 +134,7 @@ export declare class NgCompiler {
     private readonly enableLetSyntax;
     private readonly angularCoreVersion;
     private readonly enableHmr;
+    private readonly implicitStandaloneValue;
     /**
      * `NgCompiler` can be reused for multiple compilations (for resource-only changes), and each
      * new compilation uses a fresh `PerfRecorder`. Thus, classes created with a lifespan of the
