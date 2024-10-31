@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-XIAZESHU.js";
+} from "./chunk-D5M2UZCD.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-CYVDTEQ3.js";
+} from "./chunk-RB25OL55.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -5017,4 +5017,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-KEE5LHES.js.map
+//# sourceMappingURL=chunk-TJHXVVBJ.js.map
