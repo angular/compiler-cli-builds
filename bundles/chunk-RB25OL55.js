@@ -8248,22 +8248,6 @@ var Mappings = class {
     let first = true;
     let charInHiresBoundary = false;
     while (originalCharIndex < chunk.end) {
-      if (this.hires || first || sourcemapLocations.has(originalCharIndex)) {
-        const segment = [this.generatedCodeColumn, sourceIndex, loc.line, loc.column];
-        if (this.hires === "boundary") {
-          if (wordRegex.test(original[originalCharIndex])) {
-            if (!charInHiresBoundary) {
-              this.rawSegments.push(segment);
-              charInHiresBoundary = true;
-            }
-          } else {
-            this.rawSegments.push(segment);
-            charInHiresBoundary = false;
-          }
-        } else {
-          this.rawSegments.push(segment);
-        }
-      }
       if (original[originalCharIndex] === "\n") {
         loc.line += 1;
         loc.column = 0;
@@ -8272,6 +8256,22 @@ var Mappings = class {
         this.generatedCodeColumn = 0;
         first = true;
       } else {
+        if (this.hires || first || sourcemapLocations.has(originalCharIndex)) {
+          const segment = [this.generatedCodeColumn, sourceIndex, loc.line, loc.column];
+          if (this.hires === "boundary") {
+            if (wordRegex.test(original[originalCharIndex])) {
+              if (!charInHiresBoundary) {
+                this.rawSegments.push(segment);
+                charInHiresBoundary = true;
+              }
+            } else {
+              this.rawSegments.push(segment);
+              charInHiresBoundary = false;
+            }
+          } else {
+            this.rawSegments.push(segment);
+          }
+        }
         loc.column += 1;
         this.generatedCodeColumn += 1;
         first = false;
@@ -15385,4 +15385,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-CYVDTEQ3.js.map
+//# sourceMappingURL=chunk-RB25OL55.js.map
