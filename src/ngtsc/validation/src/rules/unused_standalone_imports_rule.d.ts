@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
-import { ImportedSymbolsTracker } from '../../../imports';
-import { TemplateTypeChecker, TypeCheckingConfig } from '../../../typecheck/api';
-import { SourceFileValidatorRule } from './api';
+import type { ImportedSymbolsTracker } from '../../../imports';
+import type { TemplateTypeChecker, TypeCheckingConfig } from '../../../typecheck/api';
+import type { SourceFileValidatorRule } from './api';
 /**
  * Rule that flags unused symbols inside of the `imports` array of a component.
  */
@@ -26,4 +26,6 @@ export declare class UnusedStandaloneImportsRule implements SourceFileValidatorR
      * @param rawImports AST node that defines the `imports` array.
      */
     private isPotentialSharedReference;
+    /** Gets the node on which to report the diagnostic. */
+    private getDiagnosticNode;
 }
