@@ -3365,9 +3365,14 @@ var UnusedStandaloneImportsRule = class {
     }
     const category = this.typeCheckingConfig.unusedStandaloneImports === "error" ? ts23.DiagnosticCategory.Error : ts23.DiagnosticCategory.Warning;
     if (unused.length === metadata.imports.length) {
-      return makeDiagnostic(ErrorCode.UNUSED_STANDALONE_IMPORTS, metadata.rawImports, "All imports are unused", void 0, category);
+      return makeDiagnostic(ErrorCode.UNUSED_STANDALONE_IMPORTS, this.getDiagnosticNode(metadata.rawImports), "All imports are unused", void 0, category);
     }
-    return makeDiagnostic(ErrorCode.UNUSED_STANDALONE_IMPORTS, metadata.rawImports, "Imports array contains unused imports", unused.map(([ref, type, name]) => makeRelatedInformation(ref.getOriginForDiagnostics(metadata.rawImports), `${type} "${name}" is not used within the template`)), category);
+    return makeDiagnostic(ErrorCode.UNUSED_STANDALONE_IMPORTS, this.getDiagnosticNode(metadata.rawImports), "Imports array contains unused imports", unused.map((ref) => {
+      return makeRelatedInformation(
+        ref.getOriginForDiagnostics(metadata.rawImports, ref.node.name),
+        ""
+      );
+    }), category);
   }
   getUnusedSymbols(metadata, usedDirectives, usedPipes) {
     const { imports, rawImports } = metadata;
@@ -3381,14 +3386,14 @@ var UnusedStandaloneImportsRule = class {
       if (dirMeta !== null) {
         if (dirMeta.isStandalone && !usedDirectives.has(currentNode) && !this.isPotentialSharedReference(current, rawImports)) {
           unused != null ? unused : unused = [];
-          unused.push([current, dirMeta.isComponent ? "Component" : "Directive", dirMeta.name]);
+          unused.push(current);
         }
         continue;
       }
       const pipeMeta = this.templateTypeChecker.getPipeMetadata(currentNode);
       if (pipeMeta !== null && pipeMeta.isStandalone && !usedPipes.has(pipeMeta.name) && !this.isPotentialSharedReference(current, rawImports)) {
         unused != null ? unused : unused = [];
-        unused.push([current, "Pipe", pipeMeta.ref.node.name.text]);
+        unused.push(current);
       }
     }
     return unused;
@@ -3406,6 +3411,17 @@ var UnusedStandaloneImportsRule = class {
       current = current.parent;
     }
     return true;
+  }
+  getDiagnosticNode(importsExpression) {
+    let current = importsExpression.parent;
+    while (current) {
+      if (ts23.isPropertyAssignment(current)) {
+        return current.name;
+      } else {
+        current = current.parent;
+      }
+    }
+    return importsExpression;
   }
 };
 
@@ -5017,4 +5033,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-TJHXVVBJ.js.map
+//# sourceMappingURL=chunk-LAAL3TTP.js.map
