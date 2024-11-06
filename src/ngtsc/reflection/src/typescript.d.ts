@@ -60,6 +60,12 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
 }
 export declare function reflectNameOfDeclaration(decl: ts.Declaration): string | null;
 export declare function reflectIdentifierOfDeclaration(decl: ts.Declaration): ts.Identifier | null;
+export declare class TypeEntityToDeclarationError extends Error {
+}
+/**
+ * @throws {TypeEntityToDeclarationError} if the type cannot be converted
+ *   to a declaration.
+ */
 export declare function reflectTypeEntityToDeclaration(type: ts.EntityName, checker: ts.TypeChecker): {
     node: ts.Declaration;
     from: string | null;
