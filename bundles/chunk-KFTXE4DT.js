@@ -748,10 +748,12 @@ var TypeScriptReflectionHost = class {
     return importInfo !== null && importInfo.from !== null && !importInfo.from.startsWith(".") ? importInfo.from : null;
   }
 };
+var TypeEntityToDeclarationError = class extends Error {
+};
 function reflectTypeEntityToDeclaration(type, checker) {
   let realSymbol = checker.getSymbolAtLocation(type);
   if (realSymbol === void 0) {
-    throw new Error(`Cannot resolve type entity ${type.getText()} to symbol`);
+    throw new TypeEntityToDeclarationError(`Cannot resolve type entity ${type.getText()} to symbol`);
   }
   while (realSymbol.flags & ts5.SymbolFlags.Alias) {
     realSymbol = checker.getAliasedSymbol(realSymbol);
@@ -762,28 +764,28 @@ function reflectTypeEntityToDeclaration(type, checker) {
   } else if (realSymbol.declarations !== void 0 && realSymbol.declarations.length === 1) {
     node = realSymbol.declarations[0];
   } else {
-    throw new Error(`Cannot resolve type entity symbol to declaration`);
+    throw new TypeEntityToDeclarationError(`Cannot resolve type entity symbol to declaration`);
   }
   if (ts5.isQualifiedName(type)) {
     if (!ts5.isIdentifier(type.left)) {
-      throw new Error(`Cannot handle qualified name with non-identifier lhs`);
+      throw new TypeEntityToDeclarationError(`Cannot handle qualified name with non-identifier lhs`);
     }
     const symbol = checker.getSymbolAtLocation(type.left);
     if (symbol === void 0 || symbol.declarations === void 0 || symbol.declarations.length !== 1) {
-      throw new Error(`Cannot resolve qualified type entity lhs to symbol`);
+      throw new TypeEntityToDeclarationError(`Cannot resolve qualified type entity lhs to symbol`);
     }
     const decl = symbol.declarations[0];
     if (ts5.isNamespaceImport(decl)) {
       const clause = decl.parent;
       const importDecl = clause.parent;
       if (!ts5.isStringLiteral(importDecl.moduleSpecifier)) {
-        throw new Error(`Module specifier is not a string`);
+        throw new TypeEntityToDeclarationError(`Module specifier is not a string`);
       }
       return { node, from: importDecl.moduleSpecifier.text };
     } else if (ts5.isModuleDeclaration(decl)) {
       return { node, from: null };
     } else {
-      throw new Error(`Unknown import type?`);
+      throw new TypeEntityToDeclarationError(`Unknown import type?`);
     }
   } else {
     return { node, from: null };
@@ -3132,6 +3134,7 @@ export {
   isNamedClassDeclaration,
   classMemberAccessLevelToString,
   TypeScriptReflectionHost,
+  TypeEntityToDeclarationError,
   reflectTypeEntityToDeclaration,
   filterToMembersWithDecorator,
   reflectClassMember,
@@ -3165,4 +3168,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-YMHOC6HJ.js.map
+//# sourceMappingURL=chunk-KFTXE4DT.js.map

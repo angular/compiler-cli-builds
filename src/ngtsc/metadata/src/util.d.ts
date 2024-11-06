@@ -10,8 +10,11 @@ import { OwningModule, Reference } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { DirectiveMeta, DirectiveTypeCheckMeta, HostDirectiveMeta, HostDirectiveMetaForGlobalMode, InputMapping, MetadataReader, NgModuleMeta, PipeMeta } from './api';
 import { ClassPropertyMapping } from './property_mapping';
-export declare function extractReferencesFromType(checker: ts.TypeChecker, def: ts.TypeNode, bestGuessOwningModule: OwningModule | null): Reference<ClassDeclaration>[];
-export declare function extraReferenceFromTypeQuery(checker: ts.TypeChecker, typeNode: ts.TypeQueryNode, origin: ts.TypeNode, bestGuessOwningModule: OwningModule | null): Reference<ClassDeclaration<ts.ClassDeclaration>>;
+export declare function extractReferencesFromType(checker: ts.TypeChecker, def: ts.TypeNode, bestGuessOwningModule: OwningModule | null): {
+    result: Reference<ClassDeclaration>[];
+    isIncomplete: boolean;
+};
+export declare function extraReferenceFromTypeQuery(checker: ts.TypeChecker, typeNode: ts.TypeQueryNode, origin: ts.TypeNode, bestGuessOwningModule: OwningModule | null): Reference<ClassDeclaration> | null;
 export declare function readBooleanType(type: ts.TypeNode): boolean | null;
 export declare function readStringType(type: ts.TypeNode): string | null;
 export declare function readMapType<T>(type: ts.TypeNode, valueTransform: (type: ts.TypeNode) => T | null): {

@@ -12,6 +12,7 @@ import {
   ImportManager,
   Reference,
   TypeEmitter,
+  TypeEntityToDeclarationError,
   addDiagnosticChain,
   assertSuccessfulReferenceEmit,
   attachDefaultImportDeclaration,
@@ -46,7 +47,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-YMHOC6HJ.js";
+} from "./chunk-KFTXE4DT.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -1552,18 +1553,37 @@ function reverseMapFromForwardMap(forwardMap) {
 import ts5 from "typescript";
 function extractReferencesFromType(checker, def, bestGuessOwningModule) {
   if (!ts5.isTupleTypeNode(def)) {
-    return [];
+    return { result: [], isIncomplete: false };
   }
-  return def.elements.map((element) => {
+  const result = [];
+  let isIncomplete = false;
+  for (const element of def.elements) {
     if (!ts5.isTypeQueryNode(element)) {
       throw new Error(`Expected TypeQueryNode: ${nodeDebugInfo(element)}`);
     }
-    return extraReferenceFromTypeQuery(checker, element, def, bestGuessOwningModule);
-  });
+    const ref = extraReferenceFromTypeQuery(checker, element, def, bestGuessOwningModule);
+    if (ref === null) {
+      isIncomplete = true;
+    } else {
+      result.push(ref);
+    }
+  }
+  return { result, isIncomplete };
 }
 function extraReferenceFromTypeQuery(checker, typeNode, origin, bestGuessOwningModule) {
   const type = typeNode.exprName;
-  const { node, from } = reflectTypeEntityToDeclaration(type, checker);
+  let node;
+  let from;
+  try {
+    const result = reflectTypeEntityToDeclaration(type, checker);
+    node = result.node;
+    from = result.from;
+  } catch (e) {
+    if (e instanceof TypeEntityToDeclarationError) {
+      return null;
+    }
+    throw e;
+  }
   if (!isNamedClassDeclaration(node)) {
     throw new Error(`Expected named ClassDeclaration: ${nodeDebugInfo(node)}`);
   }
@@ -1762,12 +1782,17 @@ var DtsMetadataReader = class {
       return null;
     }
     const [_, declarationMetadata, importMetadata, exportMetadata] = ngModuleDef.type.typeArguments;
+    const declarations = extractReferencesFromType(this.checker, declarationMetadata, ref.bestGuessOwningModule);
+    const exports = extractReferencesFromType(this.checker, exportMetadata, ref.bestGuessOwningModule);
+    const imports = extractReferencesFromType(this.checker, importMetadata, ref.bestGuessOwningModule);
+    const isPoisoned = exports.isIncomplete;
     return {
       kind: MetaKind.NgModule,
       ref,
-      declarations: extractReferencesFromType(this.checker, declarationMetadata, ref.bestGuessOwningModule),
-      exports: extractReferencesFromType(this.checker, exportMetadata, ref.bestGuessOwningModule),
-      imports: extractReferencesFromType(this.checker, importMetadata, ref.bestGuessOwningModule),
+      declarations: declarations.result,
+      isPoisoned,
+      exports: exports.result,
+      imports: imports.result,
       schemas: [],
       rawDeclarations: null,
       rawImports: null,
@@ -1777,7 +1802,7 @@ var DtsMetadataReader = class {
     };
   }
   getDirectiveMetadata(ref) {
-    var _a, _b;
+    var _a, _b, _c;
     const clazz = ref.node;
     const def = this.reflector.getMembersOfClass(clazz).find((field) => field.isStatic && (field.name === "\u0275cmp" || field.name === "\u0275dir"));
     if (def === void 0) {
@@ -1796,6 +1821,7 @@ var DtsMetadataReader = class {
     const outputs = ClassPropertyMapping.fromMappedObject(readMapType(def.type.typeArguments[4], readStringType));
     const hostDirectives = def.type.typeArguments.length > 8 ? readHostDirectivesType(this.checker, def.type.typeArguments[8], ref.bestGuessOwningModule) : null;
     const isSignal = def.type.typeArguments.length > 9 && ((_b = readBooleanType(def.type.typeArguments[9])) != null ? _b : false);
+    const isPoisoned = hostDirectives !== null && (hostDirectives == null ? void 0 : hostDirectives.isIncomplete);
     return {
       kind: MetaKind.Directive,
       matchSource: MatchSource.Selector,
@@ -1806,11 +1832,11 @@ var DtsMetadataReader = class {
       exportAs: readStringArrayType(def.type.typeArguments[2]),
       inputs,
       outputs,
-      hostDirectives,
+      hostDirectives: (_c = hostDirectives == null ? void 0 : hostDirectives.result) != null ? _c : null,
       queries: readStringArrayType(def.type.typeArguments[5]),
       ...extractDirectiveTypeCheckMeta(clazz, inputs, this.reflector),
       baseClass: readBaseClass2(clazz, this.checker, this.reflector),
-      isPoisoned: false,
+      isPoisoned,
       isStructural,
       animationTriggerNames: null,
       ngContentSelectors,
@@ -1915,21 +1941,27 @@ function readHostDirectivesType(checker, type, bestGuessOwningModule) {
     return null;
   }
   const result = [];
+  let isIncomplete = false;
   for (const hostDirectiveType of type.elements) {
     const { directive, inputs, outputs } = readMapType(hostDirectiveType, (type2) => type2);
     if (directive) {
       if (!ts6.isTypeQueryNode(directive)) {
         throw new Error(`Expected TypeQueryNode: ${nodeDebugInfo(directive)}`);
       }
+      const ref = extraReferenceFromTypeQuery(checker, directive, type, bestGuessOwningModule);
+      if (ref === null) {
+        isIncomplete = true;
+        continue;
+      }
       result.push({
-        directive: extraReferenceFromTypeQuery(checker, directive, type, bestGuessOwningModule),
+        directive: ref,
         isForwardReference: false,
         inputs: readMapType(inputs, readStringType),
         outputs: readMapType(outputs, readStringType)
       });
     }
   }
-  return result.length > 0 ? result : null;
+  return result.length > 0 ? { result, isIncomplete } : null;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/inheritance.mjs
@@ -4071,7 +4103,7 @@ var MetadataDtsModuleScopeResolver = class {
     const exportScope = {
       exported: {
         dependencies,
-        isPoisoned: false
+        isPoisoned: meta.isPoisoned
       }
     };
     this.cache.set(clazz, exportScope);
@@ -6421,7 +6453,8 @@ var NgModuleDecoratorHandler = class {
       rawImports: analysis.rawImports,
       rawExports: analysis.rawExports,
       decorator: analysis.decorator,
-      mayDeclareProviders: analysis.providers !== null
+      mayDeclareProviders: analysis.providers !== null,
+      isPoisoned: false
     });
     this.injectableRegistry.registerInjectable(node, {
       ctorDeps: analysis.fac.deps
@@ -15385,4 +15418,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-RB25OL55.js.map
+//# sourceMappingURL=chunk-EXUSZVJM.js.map
