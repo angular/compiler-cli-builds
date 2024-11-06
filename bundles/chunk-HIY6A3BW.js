@@ -12920,7 +12920,7 @@ var TemplateTypeCheckerImpl = class {
     this.perf = perf;
   }
   getTemplate(component, optimizeFor) {
-    const { data } = this.getLatestComponentState(component);
+    const { data } = this.getLatestComponentState(component, optimizeFor);
     if (data === null) {
       return null;
     }
@@ -15418,4 +15418,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-EXUSZVJM.js.map
+//# sourceMappingURL=chunk-HIY6A3BW.js.map
