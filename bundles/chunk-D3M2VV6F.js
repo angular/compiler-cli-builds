@@ -513,12 +513,9 @@ var ClassExtractor = class {
     return declarations.filter((declaration, index) => {
       var _a;
       if (ts5.isFunctionDeclaration(declaration) || ts5.isMethodDeclaration(declaration)) {
-        if (ts5.getCombinedModifierFlags(declaration) & ts5.ModifierFlags.Abstract) {
-          const previousDeclaration = declarations[index - 1];
-          const samePreviousAbstractMethod = previousDeclaration && ts5.isMethodDeclaration(previousDeclaration) && ts5.getCombinedModifierFlags(previousDeclaration) & ts5.ModifierFlags.Abstract && previousDeclaration.name.getText() === ((_a = declaration.name) == null ? void 0 : _a.getText());
-          return !samePreviousAbstractMethod;
-        }
-        return !!declaration.body;
+        const nextDeclaration = declarations[index + 1];
+        const isNextAbstractMethodWithSameName = nextDeclaration && ts5.isMethodDeclaration(nextDeclaration) && nextDeclaration.name.getText() === ((_a = declaration.name) == null ? void 0 : _a.getText());
+        return !isNextAbstractMethodWithSameName;
       }
       return true;
     });
@@ -5033,4 +5030,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BQXOZNTE.js.map
+//# sourceMappingURL=chunk-D3M2VV6F.js.map
