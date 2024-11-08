@@ -12,6 +12,7 @@ export declare function extractTypeAlias(declaration: ts.TypeAliasDeclaration): 
     name: string;
     type: string;
     entryType: EntryType;
+    generics: import("./entities").GenericEntry[];
     rawComment: string;
     description: string;
     jsdocTags: import("./entities").JsDocTagEntry[];

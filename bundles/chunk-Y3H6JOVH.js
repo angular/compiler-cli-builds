@@ -939,6 +939,7 @@ function extractTypeAlias(declaration) {
     name: declaration.name.getText(),
     type: declaration.type.getText(),
     entryType: EntryType.TypeAlias,
+    generics: extractGenerics(declaration),
     rawComment: extractRawJsDoc(declaration),
     description: extractJsDocDescription(declaration),
     jsdocTags: extractJsDocTags(declaration)
@@ -4815,4 +4816,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-EZOSQJ5D.js.map
+//# sourceMappingURL=chunk-Y3H6JOVH.js.map
