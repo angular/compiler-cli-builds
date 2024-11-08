@@ -11,6 +11,7 @@ import {
   ImportFlags,
   ImportManager,
   Reference,
+  ReferenceEmitKind,
   TypeEmitter,
   TypeEntityToDeclarationError,
   addDiagnosticChain,
@@ -47,7 +48,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-KFTXE4DT.js";
+} from "./chunk-NC4E5UYB.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -9099,7 +9100,7 @@ var ReferenceEmitEnvironment = class {
   }
   canReferenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
     const result = this.refEmitter.emit(ref, this.contextFile, flags);
-    return result.kind === 0;
+    return result.kind === ReferenceEmitKind.Success;
   }
   referenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
     const ngExpr = this.refEmitter.emit(ref, this.contextFile, flags);
@@ -13396,7 +13397,7 @@ var TemplateTypeCheckerImpl = class {
   emit(kind, refTo, inContext) {
     var _a, _b;
     const emittedRef = this.refEmitter.emit(refTo, inContext.getSourceFile());
-    if (emittedRef.kind === 1) {
+    if (emittedRef.kind === ReferenceEmitKind.Failed) {
       return null;
     }
     const emitted = emittedRef.expression;
@@ -15418,4 +15419,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-HIY6A3BW.js.map
+//# sourceMappingURL=chunk-GDIF7U6L.js.map
