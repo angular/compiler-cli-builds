@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-LZMAR6SN.js";
+} from "./chunk-Z7EFXLQQ.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-HIY6A3BW.js";
+} from "./chunk-GDIF7U6L.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -88,7 +88,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-KFTXE4DT.js";
+} from "./chunk-NC4E5UYB.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -949,6 +949,7 @@ function extractTypeAlias(declaration) {
     name: declaration.name.getText(),
     type: declaration.type.getText(),
     entryType: EntryType.TypeAlias,
+    generics: extractGenerics(declaration),
     rawComment: extractRawJsDoc(declaration),
     description: extractJsDocDescription(declaration),
     jsdocTags: extractJsDocTags(declaration)
@@ -5030,4 +5031,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-D3M2VV6F.js.map
+//# sourceMappingURL=chunk-QIPX3PSK.js.map

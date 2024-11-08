@@ -1160,8 +1160,13 @@ var ImportFlags;
   ImportFlags2[ImportFlags2["AllowRelativeDtsImports"] = 8] = "AllowRelativeDtsImports";
   ImportFlags2[ImportFlags2["AllowAmbientReferences"] = 16] = "AllowAmbientReferences";
 })(ImportFlags || (ImportFlags = {}));
+var ReferenceEmitKind;
+(function(ReferenceEmitKind2) {
+  ReferenceEmitKind2[ReferenceEmitKind2["Success"] = 0] = "Success";
+  ReferenceEmitKind2[ReferenceEmitKind2["Failed"] = 1] = "Failed";
+})(ReferenceEmitKind || (ReferenceEmitKind = {}));
 function assertSuccessfulReferenceEmit(result, origin, typeKind) {
-  if (result.kind === 0) {
+  if (result.kind === ReferenceEmitKind.Success) {
     return;
   }
   const message = makeDiagnosticChain(`Unable to import ${typeKind} ${nodeNameForError(result.ref.node)}.`, [makeDiagnosticChain(result.reason)]);
@@ -1182,7 +1187,7 @@ var ReferenceEmitter = class {
       }
     }
     return {
-      kind: 1,
+      kind: ReferenceEmitKind.Failed,
       ref,
       context,
       reason: `Unable to write a reference to ${nodeNameForError(ref.node)}.`
@@ -1197,7 +1202,7 @@ var LocalIdentifierStrategy = class {
     }
     if (!isDeclaration(ref.node) && refSf === context) {
       return {
-        kind: 0,
+        kind: ReferenceEmitKind.Success,
         expression: new WrappedNodeExpr(ref.node),
         importedFile: null
       };
@@ -1206,7 +1211,7 @@ var LocalIdentifierStrategy = class {
       const identifier2 = identifierOfNode(ref.node);
       if (identifier2 !== null) {
         return {
-          kind: 0,
+          kind: ReferenceEmitKind.Success,
           expression: new WrappedNodeExpr(identifier2),
           importedFile: null
         };
@@ -1217,7 +1222,7 @@ var LocalIdentifierStrategy = class {
     const identifier = ref.getIdentityIn(context);
     if (identifier !== null) {
       return {
-        kind: 0,
+        kind: ReferenceEmitKind.Success,
         expression: new WrappedNodeExpr(identifier),
         importedFile: null
       };
@@ -1250,14 +1255,14 @@ var AbsoluteModuleStrategy = class {
     const exports = this.getExportsOfModule(specifier, resolutionContext);
     if (exports.module === null) {
       return {
-        kind: 1,
+        kind: ReferenceEmitKind.Failed,
         ref,
         context,
         reason: `The module '${specifier}' could not be found.`
       };
     } else if (exports.exportMap === null || !exports.exportMap.has(ref.node)) {
       return {
-        kind: 1,
+        kind: ReferenceEmitKind.Failed,
         ref,
         context,
         reason: `The symbol is not exported from ${exports.module.fileName} (module '${specifier}').`
@@ -1265,7 +1270,7 @@ var AbsoluteModuleStrategy = class {
     }
     const symbolName = exports.exportMap.get(ref.node);
     return {
-      kind: 0,
+      kind: ReferenceEmitKind.Success,
       expression: new ExternalExpr(new ExternalReference(specifier, symbolName)),
       importedFile: exports.module
     };
@@ -1315,7 +1320,7 @@ var LogicalProjectStrategy = class {
         return this.relativePathStrategy.emit(ref, context);
       }
       return {
-        kind: 1,
+        kind: ReferenceEmitKind.Failed,
         ref,
         context,
         reason: `The file ${destSf.fileName} is outside of the configured 'rootDir'.`
@@ -1331,7 +1336,7 @@ var LogicalProjectStrategy = class {
     const name = findExportedNameOfNode(ref.node, destSf, this.reflector);
     if (name === null) {
       return {
-        kind: 1,
+        kind: ReferenceEmitKind.Failed,
         ref,
         context,
         reason: `The symbol is not exported from ${destSf.fileName}.`
@@ -1339,7 +1344,7 @@ var LogicalProjectStrategy = class {
     }
     const moduleName = LogicalProjectPath.relativePathBetween(originPath, destPath);
     return {
-      kind: 0,
+      kind: ReferenceEmitKind.Success,
       expression: new ExternalExpr({ moduleName, name }),
       importedFile: destSf
     };
@@ -1357,14 +1362,14 @@ var RelativePathStrategy = class {
     const name = findExportedNameOfNode(ref.node, destSf, this.reflector);
     if (name === null) {
       return {
-        kind: 1,
+        kind: ReferenceEmitKind.Failed,
         ref,
         context,
         reason: `The symbol is not exported from ${destSf.fileName}.`
       };
     }
     return {
-      kind: 0,
+      kind: ReferenceEmitKind.Success,
       expression: new ExternalExpr({ moduleName, name }),
       importedFile: destSf
     };
@@ -1385,7 +1390,7 @@ var UnifiedModulesStrategy = class {
     }
     const moduleName = this.unifiedModulesHost.fileNameToModuleName(destSf.fileName, context.fileName);
     return {
-      kind: 0,
+      kind: ReferenceEmitKind.Success,
       expression: new ExternalExpr({ moduleName, name }),
       importedFile: destSf
     };
@@ -1454,7 +1459,7 @@ var AliasStrategy = class {
       return null;
     }
     return {
-      kind: 0,
+      kind: ReferenceEmitKind.Success,
       expression: ref.alias,
       importedFile: "unknown"
     };
@@ -3106,6 +3111,7 @@ export {
   isAssignment,
   toUnredirectedSourceFile,
   ImportFlags,
+  ReferenceEmitKind,
   assertSuccessfulReferenceEmit,
   ReferenceEmitter,
   LocalIdentifierStrategy,
@@ -3168,4 +3174,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-KFTXE4DT.js.map
+//# sourceMappingURL=chunk-NC4E5UYB.js.map

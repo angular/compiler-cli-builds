@@ -8,8 +8,8 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-IZRNIUQB.js";
-import "../../chunk-KFTXE4DT.js";
+} from "../../chunk-P6YTDBL7.js";
+import "../../chunk-NC4E5UYB.js";
 import {
   ConsoleLogger,
   LogLevel
