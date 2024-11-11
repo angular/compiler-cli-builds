@@ -18,7 +18,7 @@ export declare class UnusedStandaloneImportsRule implements SourceFileValidatorR
     private importedSymbolsTracker;
     constructor(templateTypeChecker: TemplateTypeChecker, typeCheckingConfig: TypeCheckingConfig, importedSymbolsTracker: ImportedSymbolsTracker);
     shouldCheck(sourceFile: ts.SourceFile): boolean;
-    checkNode(node: ts.Node): ts.Diagnostic | null;
+    checkNode(node: ts.Node): ts.Diagnostic | ts.Diagnostic[] | null;
     private getUnusedSymbols;
     /**
      * Determines if an import reference *might* be coming from a shared imports array.
@@ -26,6 +26,4 @@ export declare class UnusedStandaloneImportsRule implements SourceFileValidatorR
      * @param rawImports AST node that defines the `imports` array.
      */
     private isPotentialSharedReference;
-    /** Gets the node on which to report the diagnostic. */
-    private getDiagnosticNode;
 }

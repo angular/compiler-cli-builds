@@ -82,7 +82,6 @@ import {
   isNamedClassDeclaration,
   isNonDeclarationTsPath,
   makeDiagnostic,
-  makeRelatedInformation,
   ngErrorCode,
   normalizeSeparators,
   relativePathBetween,
@@ -3361,16 +3360,15 @@ var UnusedStandaloneImportsRule = class {
     if (unused === null) {
       return null;
     }
+    const propertyAssignment = closestNode(metadata.rawImports, ts23.isPropertyAssignment);
     const category = this.typeCheckingConfig.unusedStandaloneImports === "error" ? ts23.DiagnosticCategory.Error : ts23.DiagnosticCategory.Warning;
-    if (unused.length === metadata.imports.length) {
-      return makeDiagnostic(ErrorCode.UNUSED_STANDALONE_IMPORTS, this.getDiagnosticNode(metadata.rawImports), "All imports are unused", void 0, category);
+    if (unused.length === metadata.imports.length && propertyAssignment !== null) {
+      return makeDiagnostic(ErrorCode.UNUSED_STANDALONE_IMPORTS, propertyAssignment.name, "All imports are unused", void 0, category);
     }
-    return makeDiagnostic(ErrorCode.UNUSED_STANDALONE_IMPORTS, this.getDiagnosticNode(metadata.rawImports), "Imports array contains unused imports", unused.map((ref) => {
-      return makeRelatedInformation(
-        ref.getOriginForDiagnostics(metadata.rawImports, ref.node.name),
-        ""
-      );
-    }), category);
+    return unused.map((ref) => {
+      const diagnosticNode = ref.getIdentityInExpression(metadata.rawImports) || ref.getIdentityIn(node.getSourceFile()) || metadata.rawImports;
+      return makeDiagnostic(ErrorCode.UNUSED_STANDALONE_IMPORTS, diagnosticNode, `${ref.node.name.text} is not used within the template of ${metadata.name}`, void 0, category);
+    });
   }
   getUnusedSymbols(metadata, usedDirectives, usedPipes) {
     const { imports, rawImports } = metadata;
@@ -3410,18 +3408,18 @@ var UnusedStandaloneImportsRule = class {
     }
     return true;
   }
-  getDiagnosticNode(importsExpression) {
-    let current = importsExpression.parent;
-    while (current) {
-      if (ts23.isPropertyAssignment(current)) {
-        return current.name;
-      } else {
-        current = current.parent;
-      }
-    }
-    return importsExpression;
-  }
 };
+function closestNode(start, predicate) {
+  let current = start.parent;
+  while (current) {
+    if (predicate(current)) {
+      return current;
+    } else {
+      current = current.parent;
+    }
+  }
+  return null;
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/config.mjs
 var UNUSED_STANDALONE_IMPORTS_RULE_ENABLED = true;
@@ -5031,4 +5029,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-QIPX3PSK.js.map
+//# sourceMappingURL=chunk-X5WDWHOA.js.map
