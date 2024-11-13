@@ -128,7 +128,7 @@ export interface TemplateTypeChecker {
     /**
      * In the context of an Angular trait, generate potential imports for a directive.
      */
-    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inComponent: ts.ClassDeclaration, importMode: PotentialImportMode): ReadonlyArray<PotentialImport>;
+    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inContext: ts.Node, importMode: PotentialImportMode): ReadonlyArray<PotentialImport>;
     /**
      * Get the primary decorator for an Angular class (such as @Component). This does not work for
      * `@Injectable`.
