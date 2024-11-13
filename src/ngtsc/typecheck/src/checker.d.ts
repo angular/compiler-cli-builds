@@ -134,7 +134,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getPrimaryAngularDecorator(target: ts.ClassDeclaration): ts.Decorator | null;
     getOwningNgModule(component: ts.ClassDeclaration): ts.ClassDeclaration | null;
     private emit;
-    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inContext: ts.ClassDeclaration, importMode: PotentialImportMode): ReadonlyArray<PotentialImport>;
+    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inContext: ts.Node, importMode: PotentialImportMode): ReadonlyArray<PotentialImport>;
     private getScopeData;
     private scopeDataOfDirectiveMeta;
     private scopeDataOfPipeMeta;
