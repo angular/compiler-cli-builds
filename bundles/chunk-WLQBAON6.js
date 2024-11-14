@@ -4825,11 +4825,13 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
     const fs = getFileSystem();
     const readConfigFile = (configFile) => ts28.readConfigFile(configFile, (file) => host.readFile(host.resolve(file)));
     const readAngularCompilerOptions = (configFile, parentOptions = {}) => {
+      var _a2, _b;
       const { config: config2, error: error2 } = readConfigFile(configFile);
       if (error2) {
         return parentOptions;
       }
-      let existingNgCompilerOptions = { ...config2.angularCompilerOptions, ...parentOptions };
+      const angularCompilerOptions = (_b = config2.angularCompilerOptions) != null ? _b : (_a2 = config2.bazelOptions) == null ? void 0 : _a2.angularCompilerOptions;
+      let existingNgCompilerOptions = { ...angularCompilerOptions, ...parentOptions };
       if (!config2.extends) {
         return existingNgCompilerOptions;
       }
@@ -5029,4 +5031,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ISNFXYC3.js.map
+//# sourceMappingURL=chunk-WLQBAON6.js.map
