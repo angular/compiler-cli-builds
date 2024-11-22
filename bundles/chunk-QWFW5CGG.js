@@ -8172,6 +8172,9 @@ var SourceMap = class {
     if (typeof properties.x_google_ignoreList !== "undefined") {
       this.x_google_ignoreList = properties.x_google_ignoreList;
     }
+    if (typeof properties.debugId !== "undefined") {
+      this.debugId = properties.debugId;
+    }
   }
   toString() {
     return JSON.stringify(this);
@@ -15419,4 +15422,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OM3GHCE5.js.map
+//# sourceMappingURL=chunk-QWFW5CGG.js.map
