@@ -4603,7 +4603,7 @@ var TypeCheckScopeRegistry = class {
 import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirectiveFromMetadata, compileDirectiveFromMetadata, FactoryTarget, makeBindingParser, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.mjs
-import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr4, getSafePropertyAccessString, parseHostBindings, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
+import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr4, getSafePropertyAccessString, parseHostBindings, ParserError, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
 import ts22 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/initializer_function_access.mjs
@@ -5628,13 +5628,19 @@ function evaluateHostExpressionBindings(hostExpr, evaluator) {
   const bindings = parseHostBindings(hostMetadata);
   const errors = verifyHostBindings(bindings, createSourceSpan(hostExpr));
   if (errors.length > 0) {
-    throw new FatalDiagnosticError(
-      ErrorCode.HOST_BINDING_PARSE_ERROR,
-      hostExpr,
-      errors.map((error) => error.msg).join("\n")
-    );
+    throw new FatalDiagnosticError(ErrorCode.HOST_BINDING_PARSE_ERROR, getHostBindingErrorNode(errors[0], hostExpr), errors.map((error) => error.msg).join("\n"));
   }
   return bindings;
+}
+function getHostBindingErrorNode(error, hostExpr) {
+  if (ts22.isObjectLiteralExpression(hostExpr) && error.relatedError instanceof ParserError) {
+    for (const prop of hostExpr.properties) {
+      if (ts22.isPropertyAssignment(prop) && ts22.isStringLiteralLike(prop.initializer) && prop.initializer.text === error.relatedError.input) {
+        return prop.initializer;
+      }
+    }
+  }
+  return hostExpr;
 }
 function extractHostDirectives(rawHostDirectives, evaluator, compilationMode) {
   const resolved = evaluator.evaluate(rawHostDirectives, forwardRefResolver);
@@ -15422,4 +15428,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-QWFW5CGG.js.map
+//# sourceMappingURL=chunk-ZEPJHGBL.js.map
