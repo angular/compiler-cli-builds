@@ -13618,10 +13618,10 @@ var SingleShimTypeCheckingHost = class extends SingleFileTypeCheckingHost {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/hmr/src/metadata.mjs
 import { outputAst as o3 } from "@angular/compiler";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/hmr/src/extract_locals.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/hmr/src/extract_dependencies.mjs
 import { outputAst as o2 } from "@angular/compiler";
 import ts45 from "typescript";
-function extractHmrLocals(node, definition, factory, classMetadata, debugInfo) {
+function extractHmrDependencies(node, definition, factory, classMetadata, debugInfo) {
   var _a;
   const name = ts45.isClassDeclaration(node) && node.name ? node.name.text : null;
   const visitor = new PotentialTopLevelReadsVisitor();
@@ -13633,7 +13633,13 @@ function extractHmrLocals(node, definition, factory, classMetadata, debugInfo) {
   classMetadata == null ? void 0 : classMetadata.visitStatement(visitor, null);
   debugInfo == null ? void 0 : debugInfo.visitStatement(visitor, null);
   const availableTopLevel = getTopLevelDeclarationNames(sourceFile);
-  return Array.from(visitor.allReads).filter((r) => r !== name && availableTopLevel.has(r));
+  return {
+    local: Array.from(visitor.allReads).filter((r) => r !== name && availableTopLevel.has(r)),
+    external: Array.from(visitor.namespaceReads, (name2, index) => ({
+      moduleName: name2,
+      assignedName: `\u0275hmr${index}`
+    }))
+  };
 }
 function getTopLevelDeclarationNames(sourceFile) {
   var _a;
@@ -13689,6 +13695,13 @@ function trackBindingName(node, results) {
 }
 var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
   allReads = /* @__PURE__ */ new Set();
+  namespaceReads = /* @__PURE__ */ new Set();
+  visitExternalExpr(ast, context) {
+    if (ast.value.moduleName !== null) {
+      this.namespaceReads.add(ast.value.moduleName);
+    }
+    super.visitExternalExpr(ast, context);
+  }
   visitReadVarExpr(ast, context) {
     this.allReads.add(ast.name);
     super.visitReadVarExpr(ast, context);
@@ -13743,12 +13756,13 @@ function extractHmrMetatadata(clazz, reflection, compilerHost, rootDirs, definit
   }
   const sourceFile = clazz.getSourceFile();
   const filePath = getProjectRelativePath(sourceFile, rootDirs, compilerHost) || compilerHost.getCanonicalFileName(sourceFile.fileName);
+  const dependencies = extractHmrDependencies(clazz, definition, factory, classMetadata, debugInfo);
   const meta = {
     type: new o3.WrappedNodeExpr(clazz.name),
     className: clazz.name.text,
     filePath,
-    locals: extractHmrLocals(clazz, definition, factory, classMetadata, debugInfo),
-    coreName: "__ngCore__"
+    localDependencies: dependencies.local,
+    namespaceDependencies: dependencies.external
   };
   return meta;
 }
@@ -13757,7 +13771,11 @@ function extractHmrMetatadata(clazz, reflection, compilerHost, rootDirs, definit
 import { compileHmrUpdateCallback } from "@angular/compiler";
 import ts46 from "typescript";
 function getHmrUpdateDeclaration(compilationResults, constantStatements, meta, sourceFile) {
-  const importRewriter = new HmrModuleImportRewriter(meta.coreName);
+  const namespaceSpecifiers = meta.namespaceDependencies.reduce((result, current) => {
+    result.set(current.moduleName, current.assignedName);
+    return result;
+  }, /* @__PURE__ */ new Map());
+  const importRewriter = new HmrModuleImportRewriter(namespaceSpecifiers);
   const importManager = new ImportManager({
     ...presetImportManagerForceNamespaceImports,
     rewriter: importRewriter
@@ -13770,12 +13788,12 @@ function getHmrUpdateDeclaration(compilationResults, constantStatements, meta, s
   ], node.asteriskToken, node.name, node.typeParameters, node.parameters, node.type, node.body);
 }
 var HmrModuleImportRewriter = class {
-  coreName;
-  constructor(coreName) {
-    this.coreName = coreName;
+  lookup;
+  constructor(lookup) {
+    this.lookup = lookup;
   }
   rewriteNamespaceImportIdentifier(specifier, moduleName) {
-    return moduleName === "@angular/core" ? this.coreName : specifier;
+    return this.lookup.has(moduleName) ? this.lookup.get(moduleName) : specifier;
   }
   rewriteSymbol(symbol) {
     return symbol;
@@ -15428,4 +15446,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ZEPJHGBL.js.map
+//# sourceMappingURL=chunk-RCYKQXTN.js.map
