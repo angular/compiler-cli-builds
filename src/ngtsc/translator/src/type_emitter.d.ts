@@ -27,7 +27,7 @@ export declare function canEmitType(type: ts.TypeNode, canEmit: (type: ts.TypeRe
  *
  * For example, consider the following code:
  *
- * ```
+ * ```ts
  * import {NgIterable} from '@angular/core';
  *
  * class NgForOf<T, U extends NgIterable<T>> {}
@@ -39,7 +39,7 @@ export declare function canEmitType(type: ts.TypeNode, canEmit: (type: ts.TypeRe
  * `NgIterable` type reference to a type reference that is valid in the context in which it is
  * emitted, for example:
  *
- * ```
+ * ```ts
  * import * as i0 from '@angular/core';
  * import * as i1 from '@angular/common';
  *
