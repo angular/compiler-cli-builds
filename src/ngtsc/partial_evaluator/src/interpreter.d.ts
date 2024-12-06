@@ -8,7 +8,7 @@
 import ts from 'typescript';
 import { DependencyTracker } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
-import { ForeignFunctionResolver } from './interface';
+import type { ForeignFunctionResolver } from './interface';
 import { ResolvedValue } from './result';
 /**
  * Tracks the scope of a function body, which includes `ResolvedValue`s for the parameters of that
