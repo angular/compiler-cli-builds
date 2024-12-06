@@ -3395,7 +3395,7 @@ var UnusedStandaloneImportsRule = class {
     return unused;
   }
   isPotentialSharedReference(reference, rawImports) {
-    var _a;
+    var _a, _b;
     if (reference.getIdentityInExpression(rawImports) !== null) {
       return false;
     }
@@ -3404,7 +3404,7 @@ var UnusedStandaloneImportsRule = class {
       if (ts23.isVariableStatement(current)) {
         return !!((_a = current.modifiers) == null ? void 0 : _a.some((m) => m.kind === ts23.SyntaxKind.ExportKeyword));
       }
-      current = current.parent;
+      current = (_b = current.parent) != null ? _b : null;
     }
     return true;
   }
@@ -3491,7 +3491,7 @@ function coreVersionSupportsFeature(coreVersion, minVersion) {
   if (coreVersion === `0.0.0-${"PLACEHOLDER"}`) {
     return true;
   }
-  return semver.satisfies(coreVersion, minVersion);
+  return semver.satisfies(coreVersion, minVersion, { includePrerelease: true });
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
@@ -3607,7 +3607,7 @@ var NgCompiler = class {
     this.enableTemplateTypeChecker = enableTemplateTypeChecker || !!options._enableTemplateTypeChecker;
     this.enableBlockSyntax = (_b = options["_enableBlockSyntax"]) != null ? _b : true;
     this.enableLetSyntax = (_c = options["_enableLetSyntax"]) != null ? _c : true;
-    this.implicitStandaloneValue = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 19.0.0-0");
+    this.implicitStandaloneValue = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 19.0.0");
     this.enableHmr = !!options["_enableHmr"];
     this.constructionDiagnostics.push(...this.adapter.constructionDiagnostics, ...verifyCompatibleTypeCheckOptions(this.options));
     this.currentProgram = inputProgram;
@@ -3911,7 +3911,7 @@ var NgCompiler = class {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i;
     const strictTemplates = !!this.options.strictTemplates;
     const useInlineTypeConstructors = this.programDriver.supportsInlineOperations;
-    let allowSignalsInTwoWayBindings = (_a = coreHasSymbol(this.inputProgram, R3Identifiers.unwrapWritableSignal)) != null ? _a : this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0-0");
+    let allowSignalsInTwoWayBindings = (_a = coreHasSymbol(this.inputProgram, R3Identifiers.unwrapWritableSignal)) != null ? _a : this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0");
     let typeCheckingConfig;
     if (this.fullTemplateTypeCheck) {
       typeCheckingConfig = {
@@ -5031,4 +5031,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-55VB2MH4.js.map
+//# sourceMappingURL=chunk-7ZNQZFYX.js.map
