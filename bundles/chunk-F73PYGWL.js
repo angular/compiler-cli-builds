@@ -48,7 +48,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-NC4E5UYB.js";
+} from "./chunk-BC3UIHLS.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -3706,7 +3706,7 @@ function extractClassDebugInfo(clazz, reflection, compilerHost, rootDirs, forbid
     return null;
   }
   const srcFile = clazz.getSourceFile();
-  const srcFileMaybeRelativePath = getProjectRelativePath(srcFile, rootDirs, compilerHost);
+  const srcFileMaybeRelativePath = getProjectRelativePath(srcFile.fileName, rootDirs, compilerHost);
   return {
     type: new WrappedNodeExpr4(clazz.name),
     className: literal2(clazz.name.getText()),
@@ -10911,7 +10911,7 @@ var TcbDirectiveOutputsOp = class extends TcbOp {
       }
       if (this.tcb.env.config.checkTypeOfOutputEvents && output.name.endsWith("Change")) {
         const inputName = output.name.slice(0, -6);
-        isSplitTwoWayBinding(inputName, output, this.node.inputs, this.tcb);
+        checkSplitTwoWayBinding(inputName, output, this.node.inputs, this.tcb);
       }
       const field = outputs.getByBindingPropertyName(output.name)[0].classPropertyName;
       if (dirId === null) {
@@ -10959,7 +10959,7 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
       }
       if (this.tcb.env.config.checkTypeOfOutputEvents && output.name.endsWith("Change")) {
         const inputName = output.name.slice(0, -6);
-        if (isSplitTwoWayBinding(inputName, output, this.element.inputs, this.tcb)) {
+        if (checkSplitTwoWayBinding(inputName, output, this.element.inputs, this.tcb)) {
           continue;
         }
       }
@@ -11806,6 +11806,14 @@ function unwrapWritableSignal(expression, tcb) {
 var EVENT_PARAMETER = "$event";
 function tcbCreateEventHandler(event, tcb, scope, eventType) {
   const handler = tcbEventHandlerExpression(event.handler, tcb, scope);
+  const statements = [];
+  if (event.type === ParsedEventType.TwoWay && tcb.env.config.checkTwoWayBoundEvents) {
+    const target = tcb.allocateId();
+    const assignment = ts41.factory.createBinaryExpression(target, ts41.SyntaxKind.EqualsToken, ts41.factory.createIdentifier(EVENT_PARAMETER));
+    statements.push(tsCreateVariable(target, tcb.env.config.allowSignalsInTwoWayBindings ? unwrapWritableSignal(handler, tcb) : handler), ts41.factory.createExpressionStatement(assignment));
+  } else {
+    statements.push(ts41.factory.createExpressionStatement(handler));
+  }
   let eventParamType;
   if (eventType === 0) {
     eventParamType = void 0;
@@ -11815,9 +11823,9 @@ function tcbCreateEventHandler(event, tcb, scope, eventType) {
     eventParamType = eventType;
   }
   const guards = scope.guards();
-  let body = ts41.factory.createExpressionStatement(handler);
+  let body = ts41.factory.createBlock(statements);
   if (guards !== null) {
-    body = ts41.factory.createIfStatement(guards, body);
+    body = ts41.factory.createBlock([ts41.factory.createIfStatement(guards, body)]);
   }
   const eventParam = ts41.factory.createParameterDeclaration(
     void 0,
@@ -11833,14 +11841,14 @@ function tcbCreateEventHandler(event, tcb, scope, eventType) {
     [eventParam],
     ts41.factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword),
     void 0,
-    ts41.factory.createBlock([body])
+    body
   );
 }
 function tcbEventHandlerExpression(ast, tcb, scope) {
   const translator = new TcbEventHandlerTranslator(tcb, scope);
   return translator.translate(ast);
 }
-function isSplitTwoWayBinding(inputName, output, inputs, tcb) {
+function checkSplitTwoWayBinding(inputName, output, inputs, tcb) {
   const input = inputs.find((input2) => input2.name === inputName);
   if (input === void 0 || input.sourceSpan !== output.sourceSpan) {
     return false;
@@ -13755,7 +13763,7 @@ function extractHmrMetatadata(clazz, reflection, compilerHost, rootDirs, definit
     return null;
   }
   const sourceFile = clazz.getSourceFile();
-  const filePath = getProjectRelativePath(sourceFile, rootDirs, compilerHost) || compilerHost.getCanonicalFileName(sourceFile.fileName);
+  const filePath = getProjectRelativePath(sourceFile.fileName, rootDirs, compilerHost) || compilerHost.getCanonicalFileName(sourceFile.fileName);
   const dependencies = extractHmrDependencies(clazz, definition, factory, classMetadata, debugInfo);
   const meta = {
     type: new o3.WrappedNodeExpr(clazz.name),
@@ -13997,7 +14005,7 @@ var ComponentDecoratorHandler = class {
     });
   }
   analyze(node, decorator) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f;
     this.perf.eventCount(PerfEvent.AnalyzeComponent);
     const containingFile = node.getSourceFile().fileName;
     this.literalCache.delete(decorator);
@@ -14128,6 +14136,7 @@ var ComponentDecoratorHandler = class {
       path: absoluteFrom(template.declaration.resolvedTemplateUrl),
       expression: template.sourceMapping.node
     };
+    const relativeTemplatePath = getProjectRelativePath((_d = templateResource.path) != null ? _d : ts47.getOriginalNode(node).getSourceFile().fileName, this.rootDirs, this.compilerHost);
     let styles = [];
     const externalStyles = [];
     const styleResources = extractInlineStyleResources(component);
@@ -14225,14 +14234,15 @@ var ComponentDecoratorHandler = class {
           template,
           encapsulation,
           changeDetection,
-          interpolation: (_d = template.interpolationConfig) != null ? _d : DEFAULT_INTERPOLATION_CONFIG2,
+          interpolation: (_e = template.interpolationConfig) != null ? _e : DEFAULT_INTERPOLATION_CONFIG2,
           styles,
           externalStyles,
           animations,
           viewProviders: wrappedViewProviders,
           i18nUseExternalIds: this.i18nUseExternalIds,
           relativeContextFilePath,
-          rawImports: rawImports !== null ? new o4.WrappedNodeExpr(rawImports) : void 0
+          rawImports: rawImports !== null ? new o4.WrappedNodeExpr(rawImports) : void 0,
+          relativeTemplatePath
         },
         typeCheckMeta: extractDirectiveTypeCheckMeta(node, inputs, this.reflector),
         classMetadata: this.includeClassMetadata ? extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler, (dec) => transformDecoratorResources(dec, component, styles, template)) : null,
@@ -14260,7 +14270,7 @@ var ComponentDecoratorHandler = class {
         resolvedDeferredImports,
         explicitlyDeferredTypes,
         schemas,
-        decorator: (_e = decorator == null ? void 0 : decorator.node) != null ? _e : null
+        decorator: (_f = decorator == null ? void 0 : decorator.node) != null ? _f : null
       },
       diagnostics
     };
@@ -15446,4 +15456,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-RCYKQXTN.js.map
+//# sourceMappingURL=chunk-F73PYGWL.js.map

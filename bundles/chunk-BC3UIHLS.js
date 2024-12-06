@@ -1474,8 +1474,8 @@ function relativePathBetween(from, to) {
 function normalizeSeparators(path) {
   return path.replace(/\\/g, "/");
 }
-function getProjectRelativePath(sourceFile, rootDirs, compilerHost) {
-  const filePath = compilerHost.getCanonicalFileName(sourceFile.fileName);
+function getProjectRelativePath(fileName, rootDirs, compilerHost) {
+  const filePath = compilerHost.getCanonicalFileName(fileName);
   for (const rootDir of rootDirs) {
     const rel = relative(compilerHost.getCanonicalFileName(rootDir), filePath);
     if (!rel.startsWith("..")) {
@@ -3174,4 +3174,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-NC4E5UYB.js.map
+//# sourceMappingURL=chunk-BC3UIHLS.js.map

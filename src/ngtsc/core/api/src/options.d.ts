@@ -34,6 +34,10 @@ export interface TestOnlyOptions {
  * Internal only options for compiler.
  */
 export interface InternalOptions {
+    /**
+     * Whether to check the event side of two-way bindings.
+     */
+    _checkTwoWayBoundEvents?: boolean;
 }
 /**
  * A merged interface of all of the various Angular compiler options, as well as the standard

@@ -304,6 +304,10 @@ export interface TypeCheckingConfig {
      * Whether to descend into the bodies of control flow blocks (`@if`, `@switch` and `@for`).
      */
     checkControlFlowBodies: boolean;
+    /**
+     * Whether the event side of a two-way binding should be type checked.
+     */
+    checkTwoWayBoundEvents: boolean;
 }
 export type TemplateSourceMapping = DirectTemplateSourceMapping | IndirectTemplateSourceMapping | ExternalTemplateSourceMapping;
 /**
