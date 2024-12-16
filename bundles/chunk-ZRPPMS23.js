@@ -8298,6 +8298,7 @@ var Mappings = class {
         this.raw[this.generatedCodeLine] = this.rawSegments = [];
         this.generatedCodeColumn = 0;
         first = true;
+        charInHiresBoundary = false;
       } else {
         if (this.hires || first || sourcemapLocations.has(originalCharIndex)) {
           const segment = [this.generatedCodeColumn, sourceIndex, loc.line, loc.column];
@@ -8360,7 +8361,8 @@ var MagicString = class {
       sourcemapLocations: { writable: true, value: new BitSet() },
       storedNames: { writable: true, value: {} },
       indentStr: { writable: true, value: void 0 },
-      ignoreList: { writable: true, value: options.ignoreList }
+      ignoreList: { writable: true, value: options.ignoreList },
+      offset: { writable: true, value: options.offset || 0 }
     });
     this.byStart[0] = chunk;
     this.byEnd[string.length] = chunk;
@@ -8375,6 +8377,7 @@ var MagicString = class {
     return this;
   }
   appendLeft(index, content) {
+    index = index + this.offset;
     if (typeof content !== "string")
       throw new TypeError("inserted content must be a string");
     this._split(index);
@@ -8387,6 +8390,7 @@ var MagicString = class {
     return this;
   }
   appendRight(index, content) {
+    index = index + this.offset;
     if (typeof content !== "string")
       throw new TypeError("inserted content must be a string");
     this._split(index);
@@ -8399,7 +8403,7 @@ var MagicString = class {
     return this;
   }
   clone() {
-    const cloned = new MagicString(this.original, { filename: this.filename });
+    const cloned = new MagicString(this.original, { filename: this.filename, offset: this.offset });
     let originalChunk = this.firstChunk;
     let clonedChunk = cloned.firstChunk = cloned.lastSearchedChunk = originalChunk.clone();
     while (originalChunk) {
@@ -8568,6 +8572,9 @@ var MagicString = class {
     return this.prependRight(index, content);
   }
   move(start, end, index) {
+    start = start + this.offset;
+    end = end + this.offset;
+    index = index + this.offset;
     if (index >= start && index <= end)
       throw new Error("Cannot move a selection inside itself");
     this._split(start);
@@ -8608,6 +8615,8 @@ var MagicString = class {
     return this.update(start, end, content, { ...options, overwrite: !options.contentOnly });
   }
   update(start, end, content, options) {
+    start = start + this.offset;
+    end = end + this.offset;
     if (typeof content !== "string")
       throw new TypeError("replacement content must be a string");
     if (this.original.length !== 0) {
@@ -8669,6 +8678,7 @@ var MagicString = class {
     return this;
   }
   prependLeft(index, content) {
+    index = index + this.offset;
     if (typeof content !== "string")
       throw new TypeError("inserted content must be a string");
     this._split(index);
@@ -8681,6 +8691,7 @@ var MagicString = class {
     return this;
   }
   prependRight(index, content) {
+    index = index + this.offset;
     if (typeof content !== "string")
       throw new TypeError("inserted content must be a string");
     this._split(index);
@@ -8693,6 +8704,8 @@ var MagicString = class {
     return this;
   }
   remove(start, end) {
+    start = start + this.offset;
+    end = end + this.offset;
     if (this.original.length !== 0) {
       while (start < 0)
         start += this.original.length;
@@ -8717,6 +8730,8 @@ var MagicString = class {
     return this;
   }
   reset(start, end) {
+    start = start + this.offset;
+    end = end + this.offset;
     if (this.original.length !== 0) {
       while (start < 0)
         start += this.original.length;
@@ -8785,7 +8800,9 @@ var MagicString = class {
       return this.intro.substr(lineIndex + 1) + lineStr;
     return this.intro + lineStr;
   }
-  slice(start = 0, end = this.original.length) {
+  slice(start = 0, end = this.original.length - this.offset) {
+    start = start + this.offset;
+    end = end + this.offset;
     if (this.original.length !== 0) {
       while (start < 0)
         start += this.original.length;
@@ -8974,11 +8991,7 @@ var MagicString = class {
         if (match.index != null) {
           const replacement2 = getReplacement(match, this.original);
           if (replacement2 !== match[0]) {
-            this.overwrite(
-              match.index,
-              match.index + match[0].length,
-              replacement2
-            );
+            this.overwrite(match.index, match.index + match[0].length, replacement2);
           }
         }
       });
@@ -8987,11 +9000,7 @@ var MagicString = class {
       if (match && match.index != null) {
         const replacement2 = getReplacement(match, this.original);
         if (replacement2 !== match[0]) {
-          this.overwrite(
-            match.index,
-            match.index + match[0].length,
-            replacement2
-          );
+          this.overwrite(match.index, match.index + match[0].length, replacement2);
         }
       }
     }
@@ -15456,4 +15465,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-F73PYGWL.js.map
+//# sourceMappingURL=chunk-ZRPPMS23.js.map
