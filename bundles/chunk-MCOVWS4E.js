@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-UV6M6GTL.js";
+} from "./chunk-N5FRAJVF.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-EM4PFWWY.js";
+} from "./chunk-UFF4IQHB.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -87,7 +87,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-NC4E5UYB.js";
+} from "./chunk-ML6KK252.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -5031,4 +5031,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-HDTEM7TC.js.map
+//# sourceMappingURL=chunk-MCOVWS4E.js.map
