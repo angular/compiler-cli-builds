@@ -749,6 +749,10 @@ var TypeScriptReflectionHost = class {
   }
 };
 var TypeEntityToDeclarationError = class extends Error {
+  constructor(message) {
+    super(message);
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
 };
 function reflectTypeEntityToDeclaration(type, checker) {
   let realSymbol = checker.getSymbolAtLocation(type);
@@ -3174,4 +3178,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BC3UIHLS.js.map
+//# sourceMappingURL=chunk-Q73LD63I.js.map

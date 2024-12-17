@@ -61,6 +61,7 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
 export declare function reflectNameOfDeclaration(decl: ts.Declaration): string | null;
 export declare function reflectIdentifierOfDeclaration(decl: ts.Declaration): ts.Identifier | null;
 export declare class TypeEntityToDeclarationError extends Error {
+    constructor(message: string);
 }
 /**
  * @throws {TypeEntityToDeclarationError} if the type cannot be converted
