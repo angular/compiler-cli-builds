@@ -13630,8 +13630,8 @@ import { outputAst as o3 } from "@angular/compiler";
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/hmr/src/extract_dependencies.mjs
 import { outputAst as o2 } from "@angular/compiler";
 import ts45 from "typescript";
-function extractHmrDependencies(node, definition, factory, classMetadata, debugInfo) {
-  var _a;
+function extractHmrDependencies(node, definition, factory, deferBlockMetadata, classMetadata, debugInfo) {
+  var _a, _b;
   const name = ts45.isClassDeclaration(node) && node.name ? node.name.text : null;
   const visitor = new PotentialTopLevelReadsVisitor();
   const sourceFile = node.getSourceFile();
@@ -13641,6 +13641,11 @@ function extractHmrDependencies(node, definition, factory, classMetadata, debugI
   factory.statements.forEach((statement) => statement.visitStatement(visitor, null));
   classMetadata == null ? void 0 : classMetadata.visitStatement(visitor, null);
   debugInfo == null ? void 0 : debugInfo.visitStatement(visitor, null);
+  if (deferBlockMetadata.mode === 0) {
+    deferBlockMetadata.blocks.forEach((loader) => loader == null ? void 0 : loader.visitExpression(visitor, null));
+  } else {
+    (_b = deferBlockMetadata.dependenciesFn) == null ? void 0 : _b.visitExpression(visitor, null);
+  }
   const availableTopLevel = getTopLevelDeclarationNames(sourceFile);
   return {
     local: Array.from(visitor.allReads).filter((r) => r !== name && availableTopLevel.has(r)),
@@ -13739,7 +13744,7 @@ var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
     if (ts45.isCallExpression(parent)) {
       return parent.expression === node || parent.arguments.includes(node);
     }
-    if (ts45.isPropertyAccessExpression(parent)) {
+    if (ts45.isPropertyAccessExpression(parent) || ts45.isComputedPropertyName(parent) || ts45.isTemplateSpan(parent) || ts45.isSpreadAssignment(parent) || ts45.isSpreadElement(parent) || ts45.isAwaitExpression(parent) || ts45.isNonNullExpression(parent) || ts45.isIfStatement(parent) || ts45.isDoStatement(parent) || ts45.isWhileStatement(parent) || ts45.isForInStatement(parent) || ts45.isForOfStatement(parent) || ts45.isSwitchStatement(parent) || ts45.isCaseClause(parent) || ts45.isThrowStatement(parent)) {
       return parent.expression === node;
     }
     if (ts45.isArrayLiteralExpression(parent)) {
@@ -13748,8 +13753,17 @@ var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
     if (ts45.isPropertyAssignment(parent)) {
       return parent.initializer === node;
     }
-    if (ts45.isClassDeclaration(parent)) {
+    if (ts45.isClassDeclaration(parent) || ts45.isFunctionDeclaration(parent) || ts45.isVariableDeclaration(parent) || ts45.isShorthandPropertyAssignment(parent)) {
       return parent.name === node;
+    }
+    if (ts45.isElementAccessExpression(parent)) {
+      return parent.expression === node || parent.argumentExpression === node;
+    }
+    if (ts45.isBinaryExpression(parent)) {
+      return parent.left === node || parent.right === node;
+    }
+    if (ts45.isImportSpecifier(parent) || ts45.isExportSpecifier(parent)) {
+      return (parent.propertyName || parent.name) === node;
     }
     return false;
   }
@@ -13759,13 +13773,13 @@ var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/hmr/src/metadata.mjs
-function extractHmrMetatadata(clazz, reflection, compilerHost, rootDirs, definition, factory, classMetadata, debugInfo) {
+function extractHmrMetatadata(clazz, reflection, compilerHost, rootDirs, definition, factory, deferBlockMetadata, classMetadata, debugInfo) {
   if (!reflection.isClass(clazz)) {
     return null;
   }
   const sourceFile = clazz.getSourceFile();
   const filePath = getProjectRelativePath(sourceFile, rootDirs, compilerHost) || compilerHost.getCanonicalFileName(sourceFile.fileName);
-  const dependencies = extractHmrDependencies(clazz, definition, factory, classMetadata, debugInfo);
+  const dependencies = extractHmrDependencies(clazz, definition, factory, deferBlockMetadata, classMetadata, debugInfo);
   const meta = {
     type: new o3.WrappedNodeExpr(clazz.name),
     className: clazz.name.text,
@@ -14648,10 +14662,11 @@ var ComponentDecoratorHandler = class {
       return [];
     }
     const perComponentDeferredDeps = this.canDeferDeps ? this.resolveAllDeferredDependencies(resolution) : null;
+    const defer = this.compileDeferBlocks(resolution);
     const meta = {
       ...analysis.meta,
       ...resolution,
-      defer: this.compileDeferBlocks(resolution)
+      defer
     };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
     if (perComponentDeferredDeps !== null) {
@@ -14661,7 +14676,7 @@ var ComponentDecoratorHandler = class {
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, perComponentDeferredDeps).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
-    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, classMetadata, debugInfo) : null;
+    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, debugInfo) : null;
     const hmrInitializer = hmrMeta ? compileHmrInitializer(hmrMeta).toStmt() : null;
     const deferrableImports = this.canDeferDeps ? this.deferredSymbolTracker.getDeferrableImportDecls() : null;
     return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports, debugInfo, hmrInitializer);
@@ -14677,26 +14692,28 @@ var ComponentDecoratorHandler = class {
       inlineTemplateLiteralExpression: analysis.template.sourceMapping.type === "direct" ? new o4.WrappedNodeExpr(analysis.template.sourceMapping.node) : null
     };
     const perComponentDeferredDeps = this.canDeferDeps ? this.resolveAllDeferredDependencies(resolution) : null;
+    const defer = this.compileDeferBlocks(resolution);
     const meta = {
       ...analysis.meta,
       ...resolution,
-      defer: this.compileDeferBlocks(resolution)
+      defer
     };
     const fac = compileDeclareFactory(toFactoryMetadata(meta, FactoryTarget3.Component));
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const def = compileDeclareComponentFromMetadata(meta, analysis.template, templateInfo);
     const classMetadata = analysis.classMetadata !== null ? compileComponentDeclareClassMetadata(analysis.classMetadata, perComponentDeferredDeps).toStmt() : null;
-    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, classMetadata, null) : null;
+    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, null) : null;
     const hmrInitializer = hmrMeta ? compileHmrInitializer(hmrMeta).toStmt() : null;
     const deferrableImports = this.canDeferDeps ? this.deferredSymbolTracker.getDeferrableImportDecls() : null;
     return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports, null, hmrInitializer);
   }
   compileLocal(node, analysis, resolution, pool) {
     const deferrableTypes = this.canDeferDeps ? analysis.explicitlyDeferredTypes : null;
+    const defer = this.compileDeferBlocks(resolution);
     const meta = {
       ...analysis.meta,
       ...resolution,
-      defer: this.compileDeferBlocks(resolution)
+      defer
     };
     if (deferrableTypes !== null) {
       removeDeferrableTypesFromComponentDecorator(analysis, deferrableTypes);
@@ -14706,7 +14723,7 @@ var ComponentDecoratorHandler = class {
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, deferrableTypes).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
-    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, classMetadata, debugInfo) : null;
+    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, debugInfo) : null;
     const hmrInitializer = hmrMeta ? compileHmrInitializer(hmrMeta).toStmt() : null;
     const deferrableImports = this.canDeferDeps ? this.deferredSymbolTracker.getDeferrableImportDecls() : null;
     return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports, debugInfo, hmrInitializer);
@@ -14716,16 +14733,17 @@ var ComponentDecoratorHandler = class {
       return null;
     }
     const pool = new ConstantPool2();
+    const defer = this.compileDeferBlocks(resolution);
     const meta = {
       ...analysis.meta,
       ...resolution,
-      defer: this.compileDeferBlocks(resolution)
+      defer
     };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
     const def = compileComponentFromMetadata(meta, pool, makeBindingParser2());
     const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, null).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
-    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, classMetadata, debugInfo) : null;
+    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, debugInfo) : null;
     const res = compileResults(fac, def, classMetadata, "\u0275cmp", null, null, debugInfo, null);
     return hmrMeta === null || res.length === 0 ? null : getHmrUpdateDeclaration(res, pool.statements, hmrMeta, node.getSourceFile());
   }
@@ -15455,4 +15473,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-UFF4IQHB.js.map
+//# sourceMappingURL=chunk-5JHL7ISQ.js.map

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { R3CompiledExpression, R3HmrMetadata, outputAst as o } from '@angular/compiler';
+import { R3CompiledExpression, R3ComponentDeferMetadata, R3HmrMetadata, outputAst as o } from '@angular/compiler';
 import { DeclarationNode, ReflectionHost } from '../../reflection';
 import { CompileResult } from '../../transform';
 import ts from 'typescript';
@@ -17,7 +17,8 @@ import ts from 'typescript';
  * @param rootDirs Root directories configured by the user.
  * @param definition Analyzed component definition.
  * @param factory Analyzed component factory.
+ * @param deferBlockMetadata Metadata about the defer blocks in the component.
  * @param classMetadata Analyzed `setClassMetadata` expression, if any.
  * @param debugInfo Analyzed `setClassDebugInfo` expression, if any.
  */
-export declare function extractHmrMetatadata(clazz: DeclarationNode, reflection: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, rootDirs: readonly string[], definition: R3CompiledExpression, factory: CompileResult, classMetadata: o.Statement | null, debugInfo: o.Statement | null): R3HmrMetadata | null;
+export declare function extractHmrMetatadata(clazz: DeclarationNode, reflection: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, rootDirs: readonly string[], definition: R3CompiledExpression, factory: CompileResult, deferBlockMetadata: R3ComponentDeferMetadata, classMetadata: o.Statement | null, debugInfo: o.Statement | null): R3HmrMetadata | null;
