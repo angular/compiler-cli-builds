@@ -460,9 +460,11 @@ function classMemberAccessLevelToString(level) {
 var TypeScriptReflectionHost = class {
   checker;
   isLocalCompilation;
-  constructor(checker, isLocalCompilation = false) {
+  skipPrivateValueDeclarationTypes;
+  constructor(checker, isLocalCompilation = false, skipPrivateValueDeclarationTypes = false) {
     this.checker = checker;
     this.isLocalCompilation = isLocalCompilation;
+    this.skipPrivateValueDeclarationTypes = skipPrivateValueDeclarationTypes;
   }
   getDecoratorsOfDeclaration(declaration) {
     const decorators = ts5.canHaveDecorators(declaration) ? ts5.getDecorators(declaration) : void 0;
@@ -680,7 +682,7 @@ var TypeScriptReflectionHost = class {
     while (symbol.flags & ts5.SymbolFlags.Alias) {
       symbol = this.checker.getAliasedSymbol(symbol);
     }
-    if (symbol.valueDeclaration !== void 0) {
+    if (symbol.valueDeclaration !== void 0 && (!this.skipPrivateValueDeclarationTypes || !isPrivateSymbol(this.checker, symbol))) {
       return {
         node: symbol.valueDeclaration,
         viaModule: this._viaModule(symbol.valueDeclaration, originalId, importInfo)
@@ -924,6 +926,14 @@ function propertyNameToString(node) {
   } else {
     return null;
   }
+}
+function isPrivateSymbol(typeChecker, symbol) {
+  var _a;
+  if (symbol.valueDeclaration !== void 0) {
+    const symbolType = typeChecker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
+    return ((_a = symbolType == null ? void 0 : symbolType.symbol) == null ? void 0 : _a.name.startsWith("\u0275")) === true;
+  }
+  return false;
 }
 function getQualifiedNameRoot(qualifiedName) {
   while (ts5.isQualifiedName(qualifiedName.left)) {
@@ -3176,4 +3186,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-R5WTGLBH.js.map
+//# sourceMappingURL=chunk-MMGTGRB2.js.map
