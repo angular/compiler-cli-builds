@@ -6,7 +6,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-S54NAFHF.js";
+} from "./chunk-ZYXXMSS5.js";
 import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
@@ -33,19 +33,19 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-6Y6H2BZQ.js";
+} from "./chunk-7QPTK5PP.js";
 import {
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-WAIUSAED.js";
+} from "./chunk-SQM7WZRL.js";
 import {
   OptimizeFor,
   TsCreateProgramDriver
-} from "./chunk-5JHL7ISQ.js";
+} from "./chunk-RWKKYPBC.js";
 import {
   isLocalCompilationDiagnostics
-} from "./chunk-ML6KK252.js";
+} from "./chunk-WOH3O4B6.js";
 import {
   ActivePerfRecorder,
   PerfPhase
@@ -80,7 +80,7 @@ import "./chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("19.0.5+sha-66f2aa3");
+var VERSION = new Version("19.0.5+sha-fdfaabb");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {

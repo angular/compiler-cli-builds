@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-WAIUSAED.js";
+} from "./chunk-SQM7WZRL.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-5JHL7ISQ.js";
+} from "./chunk-RWKKYPBC.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -87,7 +87,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-ML6KK252.js";
+} from "./chunk-WOH3O4B6.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -1046,7 +1046,7 @@ var DocsExtractor = class {
   }
   getExportedDeclarations(sourceFile) {
     var _a;
-    const reflector = new TypeScriptReflectionHost(this.typeChecker);
+    const reflector = new TypeScriptReflectionHost(this.typeChecker, false, true);
     const exportedDeclarationMap = reflector.getExportsOfModule(sourceFile);
     let exportedDeclarations = Array.from((_a = exportedDeclarationMap == null ? void 0 : exportedDeclarationMap.entries()) != null ? _a : []).map(([exportName, declaration]) => [exportName, declaration.node]);
     return exportedDeclarations.sort(([a, declarationA], [b, declarationB]) => declarationA.pos - declarationB.pos);
@@ -5031,4 +5031,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-6Y6H2BZQ.js.map
+//# sourceMappingURL=chunk-7QPTK5PP.js.map
