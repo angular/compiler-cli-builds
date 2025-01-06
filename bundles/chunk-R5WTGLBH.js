@@ -14,9 +14,6 @@ import {
   toRelativeImport
 } from "./chunk-37JMVF7H.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
-import ts from "typescript";
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.mjs
 var ErrorCode;
 (function(ErrorCode2) {
@@ -124,6 +121,7 @@ function ngErrorCode(code) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error.mjs
+import ts from "typescript";
 var FatalDiagnosticError = class extends Error {
   code;
   node;
@@ -3178,4 +3176,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-Q73LD63I.js.map
+//# sourceMappingURL=chunk-R5WTGLBH.js.map
