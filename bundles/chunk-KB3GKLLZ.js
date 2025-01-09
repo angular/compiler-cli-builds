@@ -13738,22 +13738,25 @@ var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
     if (!parent) {
       return false;
     }
-    if (ts45.isSourceFile(parent) || ts45.isExpressionStatement(parent) && parent.expression === node) {
+    if (ts45.isSourceFile(parent)) {
       return true;
     }
     if (ts45.isCallExpression(parent)) {
       return parent.expression === node || parent.arguments.includes(node);
     }
-    if (ts45.isPropertyAccessExpression(parent) || ts45.isComputedPropertyName(parent) || ts45.isTemplateSpan(parent) || ts45.isSpreadAssignment(parent) || ts45.isSpreadElement(parent) || ts45.isAwaitExpression(parent) || ts45.isNonNullExpression(parent) || ts45.isIfStatement(parent) || ts45.isDoStatement(parent) || ts45.isWhileStatement(parent) || ts45.isForInStatement(parent) || ts45.isForOfStatement(parent) || ts45.isSwitchStatement(parent) || ts45.isCaseClause(parent) || ts45.isThrowStatement(parent)) {
+    if (ts45.isExpressionStatement(parent) || ts45.isPropertyAccessExpression(parent) || ts45.isComputedPropertyName(parent) || ts45.isTemplateSpan(parent) || ts45.isSpreadAssignment(parent) || ts45.isSpreadElement(parent) || ts45.isAwaitExpression(parent) || ts45.isNonNullExpression(parent) || ts45.isIfStatement(parent) || ts45.isDoStatement(parent) || ts45.isWhileStatement(parent) || ts45.isSwitchStatement(parent) || ts45.isCaseClause(parent) || ts45.isThrowStatement(parent)) {
       return parent.expression === node;
     }
     if (ts45.isArrayLiteralExpression(parent)) {
       return parent.elements.includes(node);
     }
-    if (ts45.isPropertyAssignment(parent)) {
+    if (ts45.isPropertyAssignment(parent) || ts45.isParameter(parent) || ts45.isBindingElement(parent) || ts45.isPropertyDeclaration(parent) || ts45.isEnumMember(parent)) {
       return parent.initializer === node;
     }
-    if (ts45.isClassDeclaration(parent) || ts45.isFunctionDeclaration(parent) || ts45.isVariableDeclaration(parent) || ts45.isShorthandPropertyAssignment(parent)) {
+    if (ts45.isVariableDeclaration(parent)) {
+      return parent.name === node || parent.initializer === node;
+    }
+    if (ts45.isClassDeclaration(parent) || ts45.isFunctionDeclaration(parent) || ts45.isShorthandPropertyAssignment(parent)) {
       return parent.name === node;
     }
     if (ts45.isElementAccessExpression(parent)) {
@@ -13761,6 +13764,15 @@ var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
     }
     if (ts45.isBinaryExpression(parent)) {
       return parent.left === node || parent.right === node;
+    }
+    if (ts45.isForInStatement(parent) || ts45.isForOfStatement(parent)) {
+      return parent.expression === node || parent.initializer === node;
+    }
+    if (ts45.isForStatement(parent)) {
+      return parent.condition === node || parent.initializer === node || parent.incrementor === node;
+    }
+    if (ts45.isArrowFunction(parent)) {
+      return parent.body === node;
     }
     if (ts45.isImportSpecifier(parent) || ts45.isExportSpecifier(parent)) {
       return (parent.propertyName || parent.name) === node;
@@ -15473,4 +15485,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-RWKKYPBC.js.map
+//# sourceMappingURL=chunk-KB3GKLLZ.js.map
