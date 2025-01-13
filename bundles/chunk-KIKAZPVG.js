@@ -10040,7 +10040,7 @@ var AstTranslator = class {
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
   }
-  visitTypeofExpresion(ast) {
+  visitTypeofExpression(ast) {
     const expression = wrapForDiagnostics(this.translate(ast.expression));
     const node = ts40.factory.createTypeOfExpression(expression);
     addParseSpanInfo(node, ast.sourceSpan);
@@ -10196,7 +10196,7 @@ var _VeSafeLhsInferenceBugDetector = class {
   visitPrefixNot(ast) {
     return ast.expression.visit(this);
   }
-  visitTypeofExpresion(ast) {
+  visitTypeofExpression(ast) {
     return ast.expression.visit(this);
   }
   visitNonNullAssert(ast) {
@@ -15495,4 +15495,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-Z6EBKNQH.js.map
+//# sourceMappingURL=chunk-KIKAZPVG.js.map
