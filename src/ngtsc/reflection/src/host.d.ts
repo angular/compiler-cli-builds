@@ -128,7 +128,7 @@ export interface ClassMember {
      *
      * For example, the TS code:
      *
-     * ```
+     * ```ts
      * class Clazz {
      *   static get property(): string {
      *     return 'value';
@@ -138,7 +138,7 @@ export interface ClassMember {
      *
      * Downlevels to:
      *
-     * ```
+     * ```ts
      * var Clazz = (function () {
      *   function Clazz() {
      *   }
@@ -157,7 +157,7 @@ export interface ClassMember {
      * Object.defineProperty ExpressionStatement, but the implementation would be this
      * FunctionDeclaration:
      *
-     * ```
+     * ```ts
      * function () {
      *   return 'value';
      * },
@@ -529,7 +529,7 @@ export interface ReflectionHost {
      * If the declaration is in a different module, and that module is imported via an absolute path,
      * this method also returns the absolute path of the imported module. For example, if the code is:
      *
-     * ```
+     * ```ts
      * import {RouterModule} from '@angular/core';
      *
      * export const ROUTES = RouterModule.forRoot([...]);
