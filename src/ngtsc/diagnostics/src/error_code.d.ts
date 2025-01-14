@@ -224,7 +224,7 @@ export declare enum ErrorCode {
      * The left-hand side of an assignment expression was a template variable. Effectively, the
      * template looked like:
      *
-     * ```
+     * ```html
      * <ng-template let-something>
      *   <button (click)="something = ...">...</button>
      * </ng-template>
