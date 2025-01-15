@@ -19,6 +19,7 @@ export declare enum ExtendedTemplateDiagnosticName {
     NULLISH_COALESCING_NOT_NULLABLE = "nullishCoalescingNotNullable",
     OPTIONAL_CHAIN_NOT_NULLABLE = "optionalChainNotNullable",
     MISSING_CONTROL_FLOW_DIRECTIVE = "missingControlFlowDirective",
+    MISSING_STRUCTURAL_DIRECTIVE = "missingStructuralDirective",
     TEXT_ATTRIBUTE_NOT_BINDING = "textAttributeNotBinding",
     UNINVOKED_FUNCTION_IN_EVENT_BINDING = "uninvokedFunctionInEventBinding",
     MISSING_NGFOROF_LET = "missingNgForOfLet",
