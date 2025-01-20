@@ -14478,14 +14478,22 @@ var ComponentDecoratorHandler = class {
         deferBlocks.set(deferBlock, deferBlockBinder.bind({ template: deferBlock.children }));
       }
       const eagerlyUsed = /* @__PURE__ */ new Set();
-      for (const dir of bound.getEagerlyUsedDirectives()) {
-        eagerlyUsed.add(dir.ref.node);
-      }
-      for (const name of bound.getEagerlyUsedPipes()) {
-        if (!pipes.has(name)) {
-          continue;
+      if (this.enableHmr) {
+        for (const dep of dependencies) {
+          if (dep.ref.node !== node) {
+            eagerlyUsed.add(dep.ref.node);
+          }
         }
-        eagerlyUsed.add(pipes.get(name).ref.node);
+      } else {
+        for (const dir of bound.getEagerlyUsedDirectives()) {
+          eagerlyUsed.add(dir.ref.node);
+        }
+        for (const name of bound.getEagerlyUsedPipes()) {
+          if (!pipes.has(name)) {
+            continue;
+          }
+          eagerlyUsed.add(pipes.get(name).ref.node);
+        }
       }
       const wholeTemplateUsed = new Set(eagerlyUsed);
       for (const bound2 of deferBlocks.values()) {
@@ -15495,4 +15503,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-KIKAZPVG.js.map
+//# sourceMappingURL=chunk-NWV2P35F.js.map
