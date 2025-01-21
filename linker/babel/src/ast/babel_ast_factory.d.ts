@@ -38,6 +38,7 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createPropertyAccess(expression: t.Expression, propertyName: string): t.Expression;
     createReturnStatement: typeof t.returnStatement;
     createTaggedTemplate(tag: t.Expression, template: TemplateLiteral<t.Expression>): t.Expression;
+    createTemplateLiteral(template: TemplateLiteral<t.Expression>): t.TemplateLiteral;
     createThrowStatement: typeof t.throwStatement;
     createTypeOfExpression(expression: t.Expression): t.Expression;
     createUnaryExpression: typeof t.unaryExpression;

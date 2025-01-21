@@ -2396,18 +2396,11 @@ var ExpressionTranslatorVisitor = class {
   visitInvokeFunctionExpr(ast, context) {
     return this.setSourceMapRange(this.factory.createCallExpression(ast.fn.visitExpression(this, context), ast.args.map((arg) => arg.visitExpression(this, context)), ast.pure), ast.sourceSpan);
   }
-  visitTaggedTemplateExpr(ast, context) {
-    return this.setSourceMapRange(this.createTaggedTemplateExpression(ast.tag.visitExpression(this, context), {
-      elements: ast.template.elements.map((e) => {
-        var _a;
-        return createTemplateElement({
-          cooked: e.text,
-          raw: e.rawText,
-          range: (_a = e.sourceSpan) != null ? _a : ast.sourceSpan
-        });
-      }),
-      expressions: ast.template.expressions.map((e) => e.visitExpression(this, context))
-    }), ast.sourceSpan);
+  visitTaggedTemplateLiteralExpr(ast, context) {
+    return this.setSourceMapRange(this.createTaggedTemplateExpression(ast.tag.visitExpression(this, context), this.getTemplateLiteralFromAst(ast.template, context)), ast.sourceSpan);
+  }
+  visitTemplateLiteralExpr(ast, context) {
+    return this.setSourceMapRange(this.factory.createTemplateLiteral(this.getTemplateLiteralFromAst(ast, context)), ast.sourceSpan);
   }
   visitInstantiateExpr(ast, context) {
     return this.factory.createNewExpression(ast.classExpr.visitExpression(this, context), ast.args.map((arg) => arg.visitExpression(this, context)));
@@ -2525,6 +2518,9 @@ var ExpressionTranslatorVisitor = class {
   visitCommaExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
+  visitTemplateLiteralElementExpr(ast, context) {
+    throw new Error("Method not implemented");
+  }
   visitWrappedNodeExpr(ast, _context) {
     this.recordWrappedNode(ast);
     return ast.node;
@@ -2549,6 +2545,19 @@ var ExpressionTranslatorVisitor = class {
       this.factory.attachComments(statement, leadingComments);
     }
     return statement;
+  }
+  getTemplateLiteralFromAst(ast, context) {
+    return {
+      elements: ast.elements.map((e) => {
+        var _a;
+        return createTemplateElement({
+          cooked: e.text,
+          raw: e.rawText,
+          range: (_a = e.sourceSpan) != null ? _a : ast.sourceSpan
+        });
+      }),
+      expressions: ast.expressions.map((e) => e.visitExpression(this, context))
+    };
   }
 };
 function createTemplateElement({ cooked, raw, range }) {
@@ -2742,7 +2751,13 @@ var TypeTranslatorVisitor = class {
   visitInvokeFunctionExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
-  visitTaggedTemplateExpr(ast, context) {
+  visitTaggedTemplateLiteralExpr(ast, context) {
+    throw new Error("Method not implemented.");
+  }
+  visitTemplateLiteralExpr(ast, context) {
+    throw new Error("Method not implemented.");
+  }
+  visitTemplateLiteralElementExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
   visitInstantiateExpr(ast, context) {
@@ -3007,6 +3022,9 @@ var TypeScriptAstFactory = class {
     return ts20.factory.createReturnStatement(expression != null ? expression : void 0);
   }
   createTaggedTemplate(tag, template) {
+    return ts20.factory.createTaggedTemplateExpression(tag, void 0, this.createTemplateLiteral(template));
+  }
+  createTemplateLiteral(template) {
     let templateLiteral;
     const length = template.elements.length;
     const head = template.elements[0];
@@ -3034,7 +3052,7 @@ var TypeScriptAstFactory = class {
     if (head.range !== null) {
       this.setSourceMapRange(templateLiteral, head.range);
     }
-    return ts20.factory.createTaggedTemplateExpression(tag, void 0, templateLiteral);
+    return templateLiteral;
   }
   createThrowStatement = ts20.factory.createThrowStatement;
   createTypeOfExpression = ts20.factory.createTypeOfExpression;
@@ -3186,4 +3204,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-MMGTGRB2.js.map
+//# sourceMappingURL=chunk-J3VFQRNB.js.map

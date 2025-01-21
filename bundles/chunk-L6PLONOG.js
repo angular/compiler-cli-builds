@@ -48,7 +48,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-MMGTGRB2.js";
+} from "./chunk-J3VFQRNB.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -10132,6 +10132,29 @@ var AstTranslator = class {
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
   }
+  visitTemplateLiteral(ast) {
+    const length = ast.elements.length;
+    const head = ast.elements[0];
+    let result;
+    if (length === 1) {
+      result = ts40.factory.createNoSubstitutionTemplateLiteral(head.text);
+    } else {
+      const spans = [];
+      const tailIndex = length - 1;
+      for (let i = 1; i < tailIndex; i++) {
+        const middle = ts40.factory.createTemplateMiddle(ast.elements[i].text);
+        spans.push(ts40.factory.createTemplateSpan(this.translate(ast.expressions[i - 1]), middle));
+      }
+      const resolvedExpression = this.translate(ast.expressions[tailIndex - 1]);
+      const templateTail = ts40.factory.createTemplateTail(ast.elements[tailIndex].text);
+      spans.push(ts40.factory.createTemplateSpan(resolvedExpression, templateTail));
+      result = ts40.factory.createTemplateExpression(ts40.factory.createTemplateHead(head.text), spans);
+    }
+    return result;
+  }
+  visitTemplateLiteralElement(ast, context) {
+    throw new Error("Method not implemented");
+  }
   convertToSafeCall(ast, expr, args) {
     if (this.config.strictSafeNavigationTypes) {
       const call = ts40.factory.createCallExpression(ts40.factory.createNonNullExpression(expr), void 0, args);
@@ -10212,6 +10235,12 @@ var _VeSafeLhsInferenceBugDetector = class {
     return false;
   }
   visitSafeKeyedRead(ast) {
+    return false;
+  }
+  visitTemplateLiteral(ast, context) {
+    return false;
+  }
+  visitTemplateLiteralElement(ast, context) {
     return false;
   }
 };
@@ -15518,4 +15547,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FTKLQ24G.js.map
+//# sourceMappingURL=chunk-L6PLONOG.js.map

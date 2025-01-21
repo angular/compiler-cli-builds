@@ -8,8 +8,8 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-T2HQMWRH.js";
-import "../../chunk-MMGTGRB2.js";
+} from "../../chunk-BYC2LPQI.js";
+import "../../chunk-J3VFQRNB.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -112,8 +112,11 @@ var BabelAstFactory = class {
   }
   createReturnStatement = t.returnStatement;
   createTaggedTemplate(tag, template) {
+    return t.taggedTemplateExpression(tag, this.createTemplateLiteral(template));
+  }
+  createTemplateLiteral(template) {
     const elements = template.elements.map((element, i) => this.setSourceMapRange(t.templateElement(element, i === template.elements.length - 1), element.range));
-    return t.taggedTemplateExpression(tag, t.templateLiteral(elements, template.expressions));
+    return t.templateLiteral(elements, template.expressions);
   }
   createThrowStatement = t.throwStatement;
   createTypeOfExpression(expression) {
