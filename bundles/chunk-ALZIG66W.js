@@ -13741,10 +13741,17 @@ var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
       ts45.forEachChild(node, this.addAllTopLevelIdentifiers);
     }
   };
-  isTopLevelIdentifierReference(node) {
-    const parent = node.parent;
+  isTopLevelIdentifierReference(identifier) {
+    let node = identifier;
+    let parent = node.parent;
     if (!parent) {
       return false;
+    }
+    if (ts45.isParenthesizedExpression(parent) && parent.expression === node) {
+      while (parent && ts45.isParenthesizedExpression(parent)) {
+        node = parent;
+        parent = parent.parent;
+      }
     }
     if (ts45.isSourceFile(parent)) {
       return true;
@@ -14482,6 +14489,11 @@ var ComponentDecoratorHandler = class {
         for (const dep of dependencies) {
           if (dep.ref.node !== node) {
             eagerlyUsed.add(dep.ref.node);
+          } else {
+            const used = bound.getEagerlyUsedDirectives();
+            if (used.some((current) => current.ref.node === node)) {
+              eagerlyUsed.add(node);
+            }
           }
         }
       } else {
@@ -15503,4 +15515,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-NWV2P35F.js.map
+//# sourceMappingURL=chunk-ALZIG66W.js.map
