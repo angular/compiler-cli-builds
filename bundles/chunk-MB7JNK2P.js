@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-E4OAEK7A.js";
+} from "./chunk-ASUOZ47S.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-L6PLONOG.js";
+} from "./chunk-PKCWD3IK.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -1163,7 +1163,7 @@ function compareVersions(v1, v2) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
 var MIN_TS_VERSION = "5.5.0";
-var MAX_TS_VERSION = "5.8.0";
+var MAX_TS_VERSION = "5.9.0";
 var tsVersion = ts12.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
@@ -5034,4 +5034,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BQBPEWUM.js.map
+//# sourceMappingURL=chunk-MB7JNK2P.js.map
