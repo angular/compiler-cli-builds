@@ -9,6 +9,7 @@ import { R3CompiledExpression, R3ComponentDeferMetadata, R3HmrMetadata, outputAs
 import { DeclarationNode, ReflectionHost } from '../../reflection';
 import { CompileResult } from '../../transform';
 import ts from 'typescript';
+import { PartialEvaluator } from '../../partial_evaluator';
 /**
  * Extracts the HMR metadata for a class declaration.
  * @param clazz Class being analyzed.
@@ -21,4 +22,4 @@ import ts from 'typescript';
  * @param classMetadata Analyzed `setClassMetadata` expression, if any.
  * @param debugInfo Analyzed `setClassDebugInfo` expression, if any.
  */
-export declare function extractHmrMetatadata(clazz: DeclarationNode, reflection: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, rootDirs: readonly string[], definition: R3CompiledExpression, factory: CompileResult, deferBlockMetadata: R3ComponentDeferMetadata, classMetadata: o.Statement | null, debugInfo: o.Statement | null): R3HmrMetadata | null;
+export declare function extractHmrMetatadata(clazz: DeclarationNode, reflection: ReflectionHost, evaluator: PartialEvaluator, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, rootDirs: readonly string[], definition: R3CompiledExpression, factory: CompileResult, deferBlockMetadata: R3ComponentDeferMetadata, classMetadata: o.Statement | null, debugInfo: o.Statement | null): R3HmrMetadata | null;

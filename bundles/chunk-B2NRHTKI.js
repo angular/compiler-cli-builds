@@ -741,10 +741,10 @@ var StaticInterpreter = class {
   visitEnumDeclaration(node, context) {
     const enumRef = this.getReference(node, context);
     const map = /* @__PURE__ */ new Map();
-    node.members.forEach((member) => {
+    node.members.forEach((member, index) => {
       const name = this.stringNameFromPropertyName(member.name, context);
       if (name !== void 0) {
-        const resolved = member.initializer && this.visit(member.initializer, context);
+        const resolved = member.initializer ? this.visit(member.initializer, context) : index;
         map.set(name, new EnumValue(enumRef, name, resolved));
       }
     });
@@ -13638,7 +13638,7 @@ import { outputAst as o3 } from "@angular/compiler";
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/hmr/src/extract_dependencies.mjs
 import { outputAst as o2 } from "@angular/compiler";
 import ts45 from "typescript";
-function extractHmrDependencies(node, definition, factory, deferBlockMetadata, classMetadata, debugInfo) {
+function extractHmrDependencies(node, definition, factory, deferBlockMetadata, classMetadata, debugInfo, reflection, evaluator) {
   var _a, _b;
   const name = ts45.isClassDeclaration(node) && node.name ? node.name.text : null;
   const visitor = new PotentialTopLevelReadsVisitor();
@@ -13655,19 +13655,55 @@ function extractHmrDependencies(node, definition, factory, deferBlockMetadata, c
     (_b = deferBlockMetadata.dependenciesFn) == null ? void 0 : _b.visitExpression(visitor, null);
   }
   const availableTopLevel = getTopLevelDeclarationNames(sourceFile);
+  const local = [];
+  const seenLocals = /* @__PURE__ */ new Set();
+  for (const readNode of visitor.allReads) {
+    const readName = readNode instanceof o2.ReadVarExpr ? readNode.name : readNode.text;
+    if (readName !== name && !seenLocals.has(readName) && availableTopLevel.has(readName)) {
+      const runtimeRepresentation = getRuntimeRepresentation(readNode, reflection, evaluator);
+      if (runtimeRepresentation === null) {
+        return null;
+      }
+      local.push({ name: readName, runtimeRepresentation });
+      seenLocals.add(readName);
+    }
+  }
   return {
-    local: Array.from(visitor.allReads).filter((r) => r !== name && availableTopLevel.has(r)),
+    local,
     external: Array.from(visitor.namespaceReads, (name2, index) => ({
       moduleName: name2,
       assignedName: `\u0275hmr${index}`
     }))
   };
 }
+function getRuntimeRepresentation(node, reflection, evaluator) {
+  if (node instanceof o2.ReadVarExpr) {
+    return o2.variable(node.name);
+  }
+  if (isConstEnumReference(node, reflection)) {
+    const evaluated = evaluator.evaluate(node);
+    if (evaluated instanceof Map) {
+      const members = [];
+      for (const [name, value] of evaluated.entries()) {
+        if (value instanceof EnumValue && (value.resolved == null || typeof value.resolved === "string" || typeof value.resolved === "boolean" || typeof value.resolved === "number")) {
+          members.push({
+            key: name,
+            quoted: false,
+            value: o2.literal(value.resolved)
+          });
+        } else {
+          return null;
+        }
+      }
+      return o2.literalMap(members);
+    }
+  }
+  return o2.variable(node.text);
+}
 function getTopLevelDeclarationNames(sourceFile) {
-  var _a;
   const results = /* @__PURE__ */ new Set();
   for (const node of sourceFile.statements) {
-    if (ts45.isClassDeclaration(node) || ts45.isFunctionDeclaration(node) || ts45.isEnumDeclaration(node) && !((_a = node.modifiers) == null ? void 0 : _a.some((m) => m.kind === ts45.SyntaxKind.ConstKeyword))) {
+    if (ts45.isClassDeclaration(node) || ts45.isFunctionDeclaration(node) || ts45.isEnumDeclaration(node)) {
       if (node.name) {
         results.add(node.name.text);
       }
@@ -13725,7 +13761,7 @@ var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
     super.visitExternalExpr(ast, context);
   }
   visitReadVarExpr(ast, context) {
-    this.allReads.add(ast.name);
+    this.allReads.add(ast);
     super.visitReadVarExpr(ast, context);
   }
   visitWrappedNodeExpr(ast, context) {
@@ -13736,7 +13772,7 @@ var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
   }
   addAllTopLevelIdentifiers = (node) => {
     if (ts45.isIdentifier(node) && this.isTopLevelIdentifierReference(node)) {
-      this.allReads.add(node.text);
+      this.allReads.add(node);
     } else {
       ts45.forEachChild(node, this.addAllTopLevelIdentifiers);
     }
@@ -13801,15 +13837,27 @@ var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
     return !!value && typeof value.kind === "number";
   }
 };
+function isConstEnumReference(node, reflection) {
+  var _a;
+  const parent = node.parent;
+  if (!parent || !ts45.isPropertyAccessExpression(parent) || parent.expression !== node || !ts45.isIdentifier(parent.name)) {
+    return false;
+  }
+  const declaration = reflection.getDeclarationOfIdentifier(node);
+  return declaration !== null && ts45.isEnumDeclaration(declaration.node) && !!((_a = declaration.node.modifiers) == null ? void 0 : _a.some((m) => m.kind === ts45.SyntaxKind.ConstKeyword));
+}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/hmr/src/metadata.mjs
-function extractHmrMetatadata(clazz, reflection, compilerHost, rootDirs, definition, factory, deferBlockMetadata, classMetadata, debugInfo) {
+function extractHmrMetatadata(clazz, reflection, evaluator, compilerHost, rootDirs, definition, factory, deferBlockMetadata, classMetadata, debugInfo) {
   if (!reflection.isClass(clazz)) {
     return null;
   }
   const sourceFile = clazz.getSourceFile();
   const filePath = getProjectRelativePath(sourceFile.fileName, rootDirs, compilerHost) || compilerHost.getCanonicalFileName(sourceFile.fileName);
-  const dependencies = extractHmrDependencies(clazz, definition, factory, deferBlockMetadata, classMetadata, debugInfo);
+  const dependencies = extractHmrDependencies(clazz, definition, factory, deferBlockMetadata, classMetadata, debugInfo, reflection, evaluator);
+  if (dependencies === null) {
+    return null;
+  }
   const meta = {
     type: new o3.WrappedNodeExpr(clazz.name),
     className: clazz.name.text,
@@ -14721,7 +14769,7 @@ var ComponentDecoratorHandler = class {
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, perComponentDeferredDeps).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
-    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, debugInfo) : null;
+    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.evaluator, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, debugInfo) : null;
     const hmrInitializer = hmrMeta ? compileHmrInitializer(hmrMeta).toStmt() : null;
     const deferrableImports = this.canDeferDeps ? this.deferredSymbolTracker.getDeferrableImportDecls() : null;
     return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports, debugInfo, hmrInitializer);
@@ -14747,7 +14795,7 @@ var ComponentDecoratorHandler = class {
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const def = compileDeclareComponentFromMetadata(meta, analysis.template, templateInfo);
     const classMetadata = analysis.classMetadata !== null ? compileComponentDeclareClassMetadata(analysis.classMetadata, perComponentDeferredDeps).toStmt() : null;
-    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, null) : null;
+    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.evaluator, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, null) : null;
     const hmrInitializer = hmrMeta ? compileHmrInitializer(hmrMeta).toStmt() : null;
     const deferrableImports = this.canDeferDeps ? this.deferredSymbolTracker.getDeferrableImportDecls() : null;
     return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports, null, hmrInitializer);
@@ -14768,7 +14816,7 @@ var ComponentDecoratorHandler = class {
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, deferrableTypes).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
-    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, debugInfo) : null;
+    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.evaluator, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, debugInfo) : null;
     const hmrInitializer = hmrMeta ? compileHmrInitializer(hmrMeta).toStmt() : null;
     const deferrableImports = this.canDeferDeps ? this.deferredSymbolTracker.getDeferrableImportDecls() : null;
     return compileResults(fac, def, classMetadata, "\u0275cmp", inputTransformFields, deferrableImports, debugInfo, hmrInitializer);
@@ -14788,7 +14836,7 @@ var ComponentDecoratorHandler = class {
     const def = compileComponentFromMetadata(meta, pool, makeBindingParser2());
     const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, null).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
-    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, debugInfo) : null;
+    const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.evaluator, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, debugInfo) : null;
     const res = compileResults(fac, def, classMetadata, "\u0275cmp", null, null, debugInfo, null);
     return hmrMeta === null || res.length === 0 ? null : getHmrUpdateDeclaration(res, pool.statements, hmrMeta, node.getSourceFile());
   }
@@ -15518,4 +15566,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FTKLQ24G.js.map
+//# sourceMappingURL=chunk-B2NRHTKI.js.map
