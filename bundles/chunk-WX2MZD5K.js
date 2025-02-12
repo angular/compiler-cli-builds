@@ -14881,15 +14881,20 @@ var ComponentDecoratorHandler = class {
   }
   resolveAllDeferredDependencies(resolution) {
     var _a;
+    const seenDeps = /* @__PURE__ */ new Set();
     const deferrableTypes = [];
     for (const [_, deps] of resolution.deferPerBlockDependencies) {
       for (const deferBlockDep of deps) {
-        const importDecl = (_a = resolution.deferrableDeclToImportDecl.get(deferBlockDep.declaration.node)) != null ? _a : null;
+        const node = deferBlockDep.declaration.node;
+        const importDecl = (_a = resolution.deferrableDeclToImportDecl.get(node)) != null ? _a : null;
         if (importDecl !== null && this.deferredSymbolTracker.canDefer(importDecl)) {
           deferBlockDep.isDeferrable = true;
           deferBlockDep.importPath = importDecl.moduleSpecifier.text;
           deferBlockDep.isDefaultImport = isDefaultImport(importDecl);
-          deferrableTypes.push(deferBlockDep);
+          if (!seenDeps.has(node)) {
+            seenDeps.add(node);
+            deferrableTypes.push(deferBlockDep);
+          }
         }
       }
     }
@@ -15595,4 +15600,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PKCWD3IK.js.map
+//# sourceMappingURL=chunk-WX2MZD5K.js.map
