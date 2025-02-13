@@ -1565,6 +1565,9 @@ function loadIsReferencedAliasDeclarationPatch(context) {
     throwIncompatibleTransformationContextError();
   }
   const emitResolver = context.getEmitResolver();
+  if (emitResolver === void 0) {
+    return null;
+  }
   const existingReferencedAliases = emitResolver[patchedReferencedAliasesSymbol];
   if (existingReferencedAliases !== void 0) {
     return existingReferencedAliases;
@@ -1622,7 +1625,7 @@ var DefaultImportTracker = class {
             if (clausesToPreserve === null) {
               clausesToPreserve = loadIsReferencedAliasDeclarationPatch(context);
             }
-            clausesToPreserve.add(clause);
+            clausesToPreserve == null ? void 0 : clausesToPreserve.add(clause);
           }
         }
         return sourceFile;
@@ -1931,7 +1934,9 @@ function createTsTransformForImportManager(manager, extraStatementsForFiles) {
     const { affectedFiles, newImports, updatedImports, reusedOriginalAliasDeclarations, deletedImports } = manager.finalize();
     if (reusedOriginalAliasDeclarations.size > 0) {
       const referencedAliasDeclarations = loadIsReferencedAliasDeclarationPatch(ctx);
-      reusedOriginalAliasDeclarations.forEach((aliasDecl) => referencedAliasDeclarations.add(aliasDecl));
+      if (referencedAliasDeclarations !== null) {
+        reusedOriginalAliasDeclarations.forEach((aliasDecl) => referencedAliasDeclarations.add(aliasDecl));
+      }
     }
     if (extraStatementsForFiles !== void 0) {
       for (const [fileName, statements] of extraStatementsForFiles.entries()) {
@@ -3186,4 +3191,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-MMGTGRB2.js.map
+//# sourceMappingURL=chunk-RMJDBMCH.js.map
