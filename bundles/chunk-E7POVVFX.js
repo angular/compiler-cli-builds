@@ -10,7 +10,7 @@ import {
   tryParseSignalInputMapping,
   tryParseSignalModelMapping,
   tryParseSignalQueryFromInitializer
-} from "./chunk-WX2MZD5K.js";
+} from "./chunk-HHTMNOE7.js";
 import {
   ImportManager,
   ImportedSymbolsTracker,
@@ -18,7 +18,7 @@ import {
   isAliasImportDeclaration,
   loadIsReferencedAliasDeclarationPatch,
   reflectClassMember
-} from "./chunk-J3VFQRNB.js";
+} from "./chunk-OZ2WSYWM.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/downlevel_decorators_transform.mjs
 import ts from "typescript";
@@ -183,7 +183,7 @@ function getDownlevelDecoratorsTransform(typeChecker, host, diagnostics, isCore,
       }
       const decl = symbol.declarations[0];
       if (isAliasImportDeclaration(decl)) {
-        referencedParameterTypes.add(decl);
+        referencedParameterTypes == null ? void 0 : referencedParameterTypes.add(decl);
         if (decl.name !== void 0) {
           return ts.setOriginalNode(ts.factory.createIdentifier(decl.name.text), decl.name);
         }
@@ -536,4 +536,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-GTLLXINP.js.map
+//# sourceMappingURL=chunk-E7POVVFX.js.map

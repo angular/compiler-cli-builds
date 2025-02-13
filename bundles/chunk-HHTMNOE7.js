@@ -48,7 +48,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-J3VFQRNB.js";
+} from "./chunk-OZ2WSYWM.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -15600,4 +15600,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WX2MZD5K.js.map
+//# sourceMappingURL=chunk-HHTMNOE7.js.map
