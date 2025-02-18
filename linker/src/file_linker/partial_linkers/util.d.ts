@@ -7,7 +7,7 @@
  */
 import { MaybeForwardRefExpression, outputAst as o, R3DeclareDependencyMetadata, R3DependencyMetadata, R3Reference } from '@angular/compiler';
 import { AstObject, AstValue } from '../../ast/ast_value';
-export declare const PLACEHOLDER_VERSION = "19.1.6+sha-ec1e4c3";
+export declare const PLACEHOLDER_VERSION = "19.1.6+sha-4ec0e66";
 export declare function wrapReference<TExpression>(wrapped: o.WrappedNodeExpr<TExpression>): R3Reference;
 /**
  * Parses the value of an enum from the AST value's symbol name.
