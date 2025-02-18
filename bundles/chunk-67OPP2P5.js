@@ -3095,6 +3095,32 @@ var factory10 = {
   create: () => new UnusedLetDeclarationCheck()
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/skip_hydration_not_static/index.mjs
+import { TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstTextAttribute as TmplAstTextAttribute2 } from "@angular/compiler";
+var NG_SKIP_HYDRATION_ATTR_NAME = "ngSkipHydration";
+var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
+  code = ErrorCode.SKIP_HYDRATION_NOT_STATIC;
+  visitNode(ctx, component, node) {
+    if (node instanceof TmplAstBoundAttribute3 && node.name === NG_SKIP_HYDRATION_ATTR_NAME) {
+      const errorString = `ngSkipHydration should not be used as a binding.`;
+      const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
+      return [diagnostic];
+    }
+    const acceptedValues = ["true", ""];
+    if (node instanceof TmplAstTextAttribute2 && node.name === NG_SKIP_HYDRATION_ATTR_NAME && !acceptedValues.includes(node.value) && node.value !== void 0) {
+      const errorString = `ngSkipHydration only accepts "true" or "" as value or no value at all. For example 'ngSkipHydration="true"' or 'ngSkipHydration'`;
+      const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
+      return [diagnostic];
+    }
+    return [];
+  }
+};
+var factory11 = {
+  code: ErrorCode.SKIP_HYDRATION_NOT_STATIC,
+  name: ExtendedTemplateDiagnosticName.SKIP_HYDRATION_NOT_STATIC,
+  create: () => new NgSkipHydrationSpec()
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.mjs
 import ts20 from "typescript";
 
@@ -3114,12 +3140,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory11 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory11.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory12 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory12.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory11.create(options);
+      const check = factory12.create(options);
       if (check === null) {
         continue;
       }
@@ -3172,12 +3198,13 @@ var ALL_DIAGNOSTIC_FACTORIES = [
   factory7,
   factory,
   factory9,
-  factory10
+  factory10,
+  factory11
 ];
 var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ExtendedTemplateDiagnosticName.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION,
   ExtendedTemplateDiagnosticName.UNUSED_STANDALONE_IMPORTS,
-  ...ALL_DIAGNOSTIC_FACTORIES.map((factory11) => factory11.name)
+  ...ALL_DIAGNOSTIC_FACTORIES.map((factory12) => factory12.name)
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.mjs
@@ -5034,4 +5061,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-HSWBNMBQ.js.map
+//# sourceMappingURL=chunk-67OPP2P5.js.map
