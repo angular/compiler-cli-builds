@@ -48,7 +48,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-OZ2WSYWM.js";
+} from "./chunk-5ER2EWGD.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -9895,6 +9895,7 @@ var BINARY_OPS = /* @__PURE__ */ new Map([
   ["==", ts40.SyntaxKind.EqualsEqualsToken],
   ["===", ts40.SyntaxKind.EqualsEqualsEqualsToken],
   ["*", ts40.SyntaxKind.AsteriskToken],
+  ["**", ts40.SyntaxKind.AsteriskAsteriskToken],
   ["/", ts40.SyntaxKind.SlashToken],
   ["%", ts40.SyntaxKind.PercentToken],
   ["!=", ts40.SyntaxKind.ExclamationEqualsToken],
@@ -10043,6 +10044,12 @@ var AstTranslator = class {
   visitTypeofExpression(ast) {
     const expression = wrapForDiagnostics(this.translate(ast.expression));
     const node = ts40.factory.createTypeOfExpression(expression);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitVoidExpression(ast) {
+    const expression = wrapForDiagnostics(this.translate(ast.expression));
+    const node = ts40.factory.createVoidExpression(expression);
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
   }
@@ -10220,6 +10227,9 @@ var _VeSafeLhsInferenceBugDetector = class {
     return ast.expression.visit(this);
   }
   visitTypeofExpression(ast) {
+    return ast.expression.visit(this);
+  }
+  visitVoidExpression(ast) {
     return ast.expression.visit(this);
   }
   visitNonNullAssert(ast) {
@@ -15600,4 +15610,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-HHTMNOE7.js.map
+//# sourceMappingURL=chunk-ME74LJ33.js.map

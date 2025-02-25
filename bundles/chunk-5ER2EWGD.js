@@ -2344,7 +2344,8 @@ var BINARY_OPERATORS = /* @__PURE__ */ new Map([
   [o.BinaryOperator.NotIdentical, "!=="],
   [o.BinaryOperator.Or, "||"],
   [o.BinaryOperator.Plus, "+"],
-  [o.BinaryOperator.NullishCoalesce, "??"]
+  [o.BinaryOperator.NullishCoalesce, "??"],
+  [o.BinaryOperator.Exponentiation, "**"]
 ]);
 var ExpressionTranslatorVisitor = class {
   factory;
@@ -2532,6 +2533,9 @@ var ExpressionTranslatorVisitor = class {
   }
   visitTypeofExpr(ast, context) {
     return this.factory.createTypeOfExpression(ast.expr.visitExpression(this, context));
+  }
+  visitVoidExpr(ast, context) {
+    return this.factory.createVoidExpression(ast.expr.visitExpression(this, context));
   }
   visitUnaryOperatorExpr(ast, context) {
     if (!UNARY_OPERATORS.has(ast.operator)) {
@@ -2864,6 +2868,9 @@ var TypeTranslatorVisitor = class {
     }
     return ts19.factory.createTypeQueryNode(typeNode.typeName);
   }
+  visitVoidExpr(ast, context) {
+    throw new Error("Method not implemented.");
+  }
   translateType(type, context) {
     const typeNode = type.visitType(this, context);
     if (!ts19.isTypeNode(typeNode)) {
@@ -2928,6 +2935,7 @@ var BINARY_OPERATORS2 = {
   "-": ts20.SyntaxKind.MinusToken,
   "%": ts20.SyntaxKind.PercentToken,
   "*": ts20.SyntaxKind.AsteriskToken,
+  "**": ts20.SyntaxKind.AsteriskAsteriskToken,
   "!=": ts20.SyntaxKind.ExclamationEqualsToken,
   "!==": ts20.SyntaxKind.ExclamationEqualsEqualsToken,
   "||": ts20.SyntaxKind.BarBarToken,
@@ -3061,6 +3069,7 @@ var TypeScriptAstFactory = class {
   }
   createThrowStatement = ts20.factory.createThrowStatement;
   createTypeOfExpression = ts20.factory.createTypeOfExpression;
+  createVoidExpression = ts20.factory.createVoidExpression;
   createUnaryExpression(operator, operand) {
     return ts20.factory.createPrefixUnaryExpression(UNARY_OPERATORS2[operator], operand);
   }
@@ -3209,4 +3218,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OZ2WSYWM.js.map
+//# sourceMappingURL=chunk-5ER2EWGD.js.map

@@ -60,6 +60,7 @@ export declare class ExpressionTranslatorVisitor<TFile, TStatement, TExpression>
     visitTemplateLiteralElementExpr(ast: o.TemplateLiteralElementExpr, context: any): void;
     visitWrappedNodeExpr(ast: o.WrappedNodeExpr<any>, _context: Context): any;
     visitTypeofExpr(ast: o.TypeofExpr, context: Context): TExpression;
+    visitVoidExpr(ast: o.VoidExpr, context: Context): TExpression;
     visitUnaryOperatorExpr(ast: o.UnaryOperatorExpr, context: Context): TExpression;
     private visitStatements;
     private setSourceMapRange;

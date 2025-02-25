@@ -8,8 +8,8 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-J7S5XIBF.js";
-import "../../chunk-OZ2WSYWM.js";
+} from "../../chunk-JM7YAYOY.js";
+import "../../chunk-5ER2EWGD.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -121,6 +121,9 @@ var BabelAstFactory = class {
   createThrowStatement = t.throwStatement;
   createTypeOfExpression(expression) {
     return t.unaryExpression("typeof", expression);
+  }
+  createVoidExpression(expression) {
+    return t.unaryExpression("void", expression);
   }
   createUnaryExpression = t.unaryExpression;
   createVariableDeclaration(variableName, initializer, type) {

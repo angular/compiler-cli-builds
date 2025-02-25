@@ -41,6 +41,7 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createTemplateLiteral(template: TemplateLiteral<t.Expression>): t.TemplateLiteral;
     createThrowStatement: typeof t.throwStatement;
     createTypeOfExpression(expression: t.Expression): t.Expression;
+    createVoidExpression(expression: t.Expression): t.Expression;
     createUnaryExpression: typeof t.unaryExpression;
     createVariableDeclaration(variableName: string, initializer: t.Expression | null, type: VariableDeclarationType): t.Statement;
     setSourceMapRange<T extends t.Statement | t.Expression | t.TemplateElement>(node: T, sourceMapRange: SourceMapRange | null): T;

@@ -198,6 +198,12 @@ export interface AstFactory<TStatement, TExpression> {
      */
     createTypeOfExpression(expression: TExpression): TExpression;
     /**
+     * Create an expression that evaluates an expression and returns `undefined`.
+     *
+     * @param expression the expression whose type we want.
+     */
+    createVoidExpression(expression: TExpression): TExpression;
+    /**
      * Prefix the `operand` with the given `operator` (e.g. `-expr`).
      *
      * @param operator the text of the operator to apply (e.g. `+`, `-` or `!`).
@@ -232,7 +238,7 @@ export type UnaryOperator = '+' | '-' | '!';
 /**
  * The binary operators supported by the `AstFactory`.
  */
-export type BinaryOperator = '&&' | '>' | '>=' | '&' | '|' | '/' | '==' | '===' | '<' | '<=' | '-' | '%' | '*' | '!=' | '!==' | '||' | '+' | '??';
+export type BinaryOperator = '&&' | '>' | '>=' | '&' | '|' | '/' | '==' | '===' | '<' | '<=' | '-' | '%' | '*' | '**' | '!=' | '!==' | '||' | '+' | '??';
 /**
  * The original location of the start or end of a node created by the `AstFactory`.
  */
