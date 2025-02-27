@@ -2543,6 +2543,9 @@ var ExpressionTranslatorVisitor = class {
     }
     return this.factory.createUnaryExpression(UNARY_OPERATORS.get(ast.operator), ast.expr.visitExpression(this, context));
   }
+  visitParenthesizedExpr(ast, context) {
+    return this.factory.createParenthesizedExpression(ast.expr.visitExpression(this, context));
+  }
   visitStatements(statements, context) {
     return statements.map((stmt) => stmt.visitStatement(this, context)).filter((stmt) => stmt !== void 0);
   }
@@ -2869,6 +2872,9 @@ var TypeTranslatorVisitor = class {
     return ts19.factory.createTypeQueryNode(typeNode.typeName);
   }
   visitVoidExpr(ast, context) {
+    throw new Error("Method not implemented.");
+  }
+  visitParenthesizedExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
   translateType(type, context) {
@@ -3218,4 +3224,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-5ER2EWGD.js.map
+//# sourceMappingURL=chunk-QYORKQDN.js.map

@@ -62,6 +62,7 @@ export declare class ExpressionTranslatorVisitor<TFile, TStatement, TExpression>
     visitTypeofExpr(ast: o.TypeofExpr, context: Context): TExpression;
     visitVoidExpr(ast: o.VoidExpr, context: Context): TExpression;
     visitUnaryOperatorExpr(ast: o.UnaryOperatorExpr, context: Context): TExpression;
+    visitParenthesizedExpr(ast: o.ParenthesizedExpr, context: any): TExpression;
     private visitStatements;
     private setSourceMapRange;
     private attachComments;
