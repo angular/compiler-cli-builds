@@ -7685,20 +7685,16 @@ function parseTemplateAsSourceFile(fileName, template) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/id.mjs
-var TEMPLATE_ID = Symbol("ngTemplateId");
-var NEXT_TEMPLATE_ID = Symbol("ngNextTemplateId");
+var TEMPLATE_ID_MAP = Symbol("ngTemplateId");
 function getTemplateId(clazz) {
-  const node = clazz;
-  if (node[TEMPLATE_ID] === void 0) {
-    node[TEMPLATE_ID] = allocateTemplateId(node.getSourceFile());
+  const sf = clazz.getSourceFile();
+  if (sf[TEMPLATE_ID_MAP] === void 0) {
+    sf[TEMPLATE_ID_MAP] = /* @__PURE__ */ new Map();
   }
-  return node[TEMPLATE_ID];
-}
-function allocateTemplateId(sf) {
-  if (sf[NEXT_TEMPLATE_ID] === void 0) {
-    sf[NEXT_TEMPLATE_ID] = 1;
+  if (sf[TEMPLATE_ID_MAP].get(clazz) === void 0) {
+    sf[TEMPLATE_ID_MAP].set(clazz, `tcb${sf[TEMPLATE_ID_MAP].size + 1}`);
   }
-  return `tcb${sf[NEXT_TEMPLATE_ID]++}`;
+  return sf[TEMPLATE_ID_MAP].get(clazz);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/completion.mjs
@@ -10162,6 +10158,9 @@ var AstTranslator = class {
   visitTemplateLiteralElement(ast, context) {
     throw new Error("Method not implemented");
   }
+  visitTaggedTemplateLiteral(ast) {
+    return ts40.factory.createTaggedTemplateExpression(this.translate(ast.tag), void 0, this.visitTemplateLiteral(ast.template));
+  }
   convertToSafeCall(ast, expr, args) {
     if (this.config.strictSafeNavigationTypes) {
       const call = ts40.factory.createCallExpression(ts40.factory.createNonNullExpression(expr), void 0, args);
@@ -10251,6 +10250,9 @@ var _VeSafeLhsInferenceBugDetector = class {
     return false;
   }
   visitTemplateLiteralElement(ast, context) {
+    return false;
+  }
+  visitTaggedTemplateLiteral(ast, context) {
     return false;
   }
 };
@@ -15610,4 +15612,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BMTNCWS7.js.map
+//# sourceMappingURL=chunk-PLKJMRGZ.js.map
