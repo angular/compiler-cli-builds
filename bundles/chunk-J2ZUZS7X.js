@@ -7685,20 +7685,16 @@ function parseTemplateAsSourceFile(fileName, template) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/id.mjs
-var TEMPLATE_ID = Symbol("ngTemplateId");
-var NEXT_TEMPLATE_ID = Symbol("ngNextTemplateId");
+var TEMPLATE_ID_MAP = Symbol("ngTemplateId");
 function getTemplateId(clazz) {
-  const node = clazz;
-  if (node[TEMPLATE_ID] === void 0) {
-    node[TEMPLATE_ID] = allocateTemplateId(node.getSourceFile());
+  const sf = clazz.getSourceFile();
+  if (sf[TEMPLATE_ID_MAP] === void 0) {
+    sf[TEMPLATE_ID_MAP] = /* @__PURE__ */ new Map();
   }
-  return node[TEMPLATE_ID];
-}
-function allocateTemplateId(sf) {
-  if (sf[NEXT_TEMPLATE_ID] === void 0) {
-    sf[NEXT_TEMPLATE_ID] = 1;
+  if (sf[TEMPLATE_ID_MAP].get(clazz) === void 0) {
+    sf[TEMPLATE_ID_MAP].set(clazz, `tcb${sf[TEMPLATE_ID_MAP].size + 1}`);
   }
-  return `tcb${sf[NEXT_TEMPLATE_ID]++}`;
+  return sf[TEMPLATE_ID_MAP].get(clazz);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/completion.mjs
@@ -15600,4 +15596,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-HHTMNOE7.js.map
+//# sourceMappingURL=chunk-J2ZUZS7X.js.map
