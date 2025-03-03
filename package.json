@@ -1,10 +1,9 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "20.0.0-next.0+sha-a3575e2",
+  "version": "20.0.0-next.0+sha-809b5b4",
   "description": "Angular - the compiler CLI for Node.js",
   "typings": "index.d.ts",
   "bin": {
-    "ngcc": "./bundles/ngcc/index.js",
     "ngc": "./bundles/src/bin/ngc.js",
     "ng-xi18n": "./bundles/src/bin/ng_xi18n.js"
   },
@@ -53,7 +52,7 @@
     "yargs": "^17.2.1"
   },
   "peerDependencies": {
-    "@angular/compiler": "20.0.0-next.0+sha-a3575e2",
+    "@angular/compiler": "20.0.0-next.0+sha-809b5b4",
     "typescript": ">=5.5 <5.9"
   },
   "repository": {

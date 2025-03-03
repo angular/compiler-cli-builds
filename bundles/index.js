@@ -40,6 +40,10 @@ import {
   getInitializerApiJitTransform
 } from "./chunk-SEPXPBD2.js";
 import {
+  ConsoleLogger,
+  LogLevel
+} from "./chunk-FKXFEX7K.js";
+import {
   OptimizeFor,
   TsCreateProgramDriver
 } from "./chunk-PLKJMRGZ.js";
@@ -52,10 +56,6 @@ import {
   ActivePerfRecorder,
   PerfPhase
 } from "./chunk-Q2WE7ECN.js";
-import {
-  ConsoleLogger,
-  LogLevel
-} from "./chunk-FKXFEX7K.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -82,7 +82,7 @@ import "./chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.0.0-next.0+sha-a3575e2");
+var VERSION = new Version("20.0.0-next.0+sha-809b5b4");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
