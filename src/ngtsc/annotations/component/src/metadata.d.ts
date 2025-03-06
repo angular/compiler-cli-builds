@@ -8,7 +8,7 @@
 import { AnimationTriggerNames, DeclarationListEmitMode, DeferBlockDepsEmitMode, R3ClassDebugInfo, R3ClassMetadata, R3ComponentMetadata, R3DeferPerBlockDependency, R3DeferPerComponentDependency, R3TemplateDependencyMetadata, SchemaMetadata, TmplAstDeferredBlock } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../../imports';
-import { ClassPropertyMapping, ComponentResources, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping } from '../../../metadata';
+import { ClassPropertyMapping, DirectiveResources, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping } from '../../../metadata';
 import { ClassDeclaration } from '../../../reflection';
 import { SubsetOfKeys } from '../../../util/src/typescript';
 import { ParsedTemplateWithSource, StyleUrlMeta } from './resources';
@@ -43,7 +43,7 @@ export interface ComponentAnalysisData {
      * require an Angular factory definition at runtime.
      */
     viewProvidersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
-    resources: ComponentResources;
+    resources: DirectiveResources;
     /**
      * `styleUrls` extracted from the decorator, if present.
      */

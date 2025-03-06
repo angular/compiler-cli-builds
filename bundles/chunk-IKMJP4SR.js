@@ -2097,12 +2097,14 @@ var ResourceRegistry = class {
     }
     return this.externalTemplateToComponentsMap.get(template);
   }
-  registerResources(resources, component) {
+  registerResources(resources, directive) {
     if (resources.template !== null) {
-      this.registerTemplate(resources.template, component);
+      this.registerTemplate(resources.template, directive);
     }
-    for (const style of resources.styles) {
-      this.registerStyle(style, component);
+    if (resources.styles !== null) {
+      for (const style of resources.styles) {
+        this.registerStyle(style, directive);
+      }
     }
   }
   registerTemplate(templateResource, component) {
@@ -7575,7 +7577,7 @@ var TsCreateProgramDriver = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.mjs
 import ts28 from "typescript";
-function makeTemplateDiagnostic(templateId, mapping, span, category, code, messageText, relatedMessages) {
+function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, relatedMessages) {
   var _a;
   if (mapping.type === "direct") {
     let relatedInformation = void 0;
@@ -7598,8 +7600,8 @@ function makeTemplateDiagnostic(templateId, mapping, span, category, code, messa
       category,
       messageText,
       file: mapping.node.getSourceFile(),
-      componentFile: mapping.node.getSourceFile(),
-      templateId,
+      sourceFile: mapping.node.getSourceFile(),
+      typeCheckId: id,
       start: span.start.offset,
       length: span.end.offset - span.start.offset,
       relatedInformation
@@ -7632,8 +7634,8 @@ function makeTemplateDiagnostic(templateId, mapping, span, category, code, messa
         code,
         messageText: addDiagnosticChain(messageText, [failureChain]),
         file: componentSf,
-        componentFile: componentSf,
-        templateId,
+        sourceFile: componentSf,
+        typeCheckId: id,
         start: mapping.node.getStart(),
         length: mapping.node.getEnd() - mapping.node.getStart(),
         relatedInformation
@@ -7653,8 +7655,8 @@ function makeTemplateDiagnostic(templateId, mapping, span, category, code, messa
       code,
       messageText,
       file: sf,
-      componentFile: componentSf,
-      templateId,
+      sourceFile: componentSf,
+      typeCheckId: id,
       start: span.start.offset,
       length: span.end.offset - span.start.offset,
       relatedInformation
@@ -7685,16 +7687,16 @@ function parseTemplateAsSourceFile(fileName, template) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/id.mjs
-var TEMPLATE_ID_MAP = Symbol("ngTemplateId");
-function getTemplateId(clazz) {
+var TYPE_CHECK_ID_MAP = Symbol("TypeCheckId");
+function getTypeCheckId(clazz) {
   const sf = clazz.getSourceFile();
-  if (sf[TEMPLATE_ID_MAP] === void 0) {
-    sf[TEMPLATE_ID_MAP] = /* @__PURE__ */ new Map();
+  if (sf[TYPE_CHECK_ID_MAP] === void 0) {
+    sf[TYPE_CHECK_ID_MAP] = /* @__PURE__ */ new Map();
   }
-  if (sf[TEMPLATE_ID_MAP].get(clazz) === void 0) {
-    sf[TEMPLATE_ID_MAP].set(clazz, `tcb${sf[TEMPLATE_ID_MAP].size + 1}`);
+  if (sf[TYPE_CHECK_ID_MAP].get(clazz) === void 0) {
+    sf[TYPE_CHECK_ID_MAP].set(clazz, `tcb${sf[TYPE_CHECK_ID_MAP].size + 1}`);
   }
-  return sf[TEMPLATE_ID_MAP].get(clazz);
+  return sf[TYPE_CHECK_ID_MAP].get(clazz);
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/completion.mjs
@@ -9059,7 +9061,7 @@ var RegistryDomSchemaChecker = class {
   checkElement(id, element, schemas, hostIsStandalone) {
     const name = element.name.replace(REMOVE_XHTML_REGEX, "");
     if (!REGISTRY.hasElement(name, schemas)) {
-      const mapping = this.resolver.getSourceMapping(id);
+      const mapping = this.resolver.getTemplateSourceMapping(id);
       const schemas2 = `'${hostIsStandalone ? "@Component" : "@NgModule"}.schemas'`;
       let errorMsg = `'${name}' is not a known element:
 `;
@@ -9076,7 +9078,7 @@ var RegistryDomSchemaChecker = class {
   }
   checkProperty(id, element, name, span, schemas, hostIsStandalone) {
     if (!REGISTRY.hasProperty(element.name, name, schemas)) {
-      const mapping = this.resolver.getSourceMapping(id);
+      const mapping = this.resolver.getTemplateSourceMapping(id);
       const decorator = hostIsStandalone ? "@Component" : "@NgModule";
       const schemas2 = `'${decorator}.schemas'`;
       let errorMsg = `Can't bind to '${name}' since it isn't a known property of '${element.name}'.`;
@@ -9326,22 +9328,22 @@ function requiresInlineTypeCheckBlock(ref, env, usedPipes, reflector) {
     return TcbInliningRequirement.None;
   }
 }
-function getTemplateMapping(shimSf, position, resolver, isDiagnosticRequest) {
+function getSourceMapping(shimSf, position, resolver, isDiagnosticRequest) {
   const node = getTokenAtPosition(shimSf, position);
   const sourceLocation = findSourceLocation(node, shimSf, isDiagnosticRequest);
   if (sourceLocation === null) {
     return null;
   }
-  const mapping = resolver.getSourceMapping(sourceLocation.id);
-  const span = resolver.toParseSourceSpan(sourceLocation.id, sourceLocation.span);
+  const mapping = resolver.getTemplateSourceMapping(sourceLocation.id);
+  const span = resolver.toTemplateParseSourceSpan(sourceLocation.id, sourceLocation.span);
   if (span === null) {
     return null;
   }
-  return { sourceLocation, templateSourceMapping: mapping, span };
+  return { sourceLocation, sourceMapping: mapping, span };
 }
 function findTypeCheckBlock(file, id, isDiagnosticRequest) {
   for (const stmt of file.statements) {
-    if (ts34.isFunctionDeclaration(stmt) && getTemplateId2(stmt, file, isDiagnosticRequest) === id) {
+    if (ts34.isFunctionDeclaration(stmt) && getTemplateId(stmt, file, isDiagnosticRequest) === id) {
       return stmt;
     }
   }
@@ -9354,7 +9356,7 @@ function findSourceLocation(node, sourceFile, isDiagnosticsRequest) {
     }
     const span = readSpanComment(node, sourceFile);
     if (span !== null) {
-      const id = getTemplateId2(node, sourceFile, isDiagnosticsRequest);
+      const id = getTemplateId(node, sourceFile, isDiagnosticsRequest);
       if (id === null) {
         return null;
       }
@@ -9364,7 +9366,7 @@ function findSourceLocation(node, sourceFile, isDiagnosticsRequest) {
   }
   return null;
 }
-function getTemplateId2(node, sourceFile, isDiagnosticRequest) {
+function getTemplateId(node, sourceFile, isDiagnosticRequest) {
   while (!ts34.isFunctionDeclaration(node)) {
     if (hasIgnoreForDiagnosticsMarker(node, sourceFile) && isDiagnosticRequest) {
       return null;
@@ -9606,53 +9608,53 @@ var OutOfBandDiagnosticRecorderImpl = class {
   get diagnostics() {
     return this._diagnostics;
   }
-  missingReferenceTarget(templateId, ref) {
-    const mapping = this.resolver.getSourceMapping(templateId);
+  missingReferenceTarget(id, ref) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
     const value = ref.value.trim();
     const errorMsg = `No directive found with exportAs '${value}'.`;
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, ref.valueSpan || ref.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REFERENCE_TARGET), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, ref.valueSpan || ref.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REFERENCE_TARGET), errorMsg));
   }
-  missingPipe(templateId, ast) {
+  missingPipe(id, ast) {
     if (this.recordedPipes.has(ast)) {
       return;
     }
-    const mapping = this.resolver.getSourceMapping(templateId);
+    const mapping = this.resolver.getTemplateSourceMapping(id);
     const errorMsg = `No pipe found with name '${ast.name}'.`;
-    const sourceSpan = this.resolver.toParseSourceSpan(templateId, ast.nameSpan);
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, ast.nameSpan);
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
     this.recordedPipes.add(ast);
   }
-  deferredPipeUsedEagerly(templateId, ast) {
+  deferredPipeUsedEagerly(id, ast) {
     if (this.recordedPipes.has(ast)) {
       return;
     }
-    const mapping = this.resolver.getSourceMapping(templateId);
+    const mapping = this.resolver.getTemplateSourceMapping(id);
     const errorMsg = `Pipe '${ast.name}' was imported  via \`@Component.deferredImports\`, but was used outside of a \`@defer\` block in a template. To fix this, either use the '${ast.name}' pipe inside of a \`@defer\` block or import this dependency using the \`@Component.imports\` field.`;
-    const sourceSpan = this.resolver.toParseSourceSpan(templateId, ast.nameSpan);
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, ast.nameSpan);
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
     this.recordedPipes.add(ast);
   }
-  deferredComponentUsedEagerly(templateId, element) {
-    const mapping = this.resolver.getSourceMapping(templateId);
+  deferredComponentUsedEagerly(id, element) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
     const errorMsg = `Element '${element.name}' contains a component or a directive that was imported  via \`@Component.deferredImports\`, but the element itself is located outside of a \`@defer\` block in a template. To fix this, either use the '${element.name}' element inside of a \`@defer\` block or import referenced component/directive dependency using the \`@Component.imports\` field.`;
     const { start, end } = element.startSourceSpan;
     const absoluteSourceSpan = new AbsoluteSourceSpan2(start.offset, end.offset);
-    const sourceSpan = this.resolver.toParseSourceSpan(templateId, absoluteSourceSpan);
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, absoluteSourceSpan);
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${element.name}'.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
   }
-  duplicateTemplateVar(templateId, variable, firstDecl) {
-    const mapping = this.resolver.getSourceMapping(templateId);
+  duplicateTemplateVar(id, variable, firstDecl) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
     const errorMsg = `Cannot redeclare variable '${variable.name}' as it was previously declared elsewhere for the same template.`;
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, variable.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, variable.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [
       {
         text: `The variable '${firstDecl.name}' was first declared here.`,
         start: firstDecl.sourceSpan.start.offset,
@@ -9661,20 +9663,20 @@ var OutOfBandDiagnosticRecorderImpl = class {
       }
     ]));
   }
-  requiresInlineTcb(templateId, node) {
-    this._diagnostics.push(makeInlineDiagnostic(templateId, ErrorCode.INLINE_TCB_REQUIRED, node.name, `This component requires inline template type-checking, which is not supported by the current environment.`));
+  requiresInlineTcb(id, node) {
+    this._diagnostics.push(makeInlineDiagnostic(id, ErrorCode.INLINE_TCB_REQUIRED, node.name, `This component requires inline template type-checking, which is not supported by the current environment.`));
   }
-  requiresInlineTypeConstructors(templateId, node, directives) {
+  requiresInlineTypeConstructors(id, node, directives) {
     let message;
     if (directives.length > 1) {
       message = `This component uses directives which require inline type constructors, which are not supported by the current environment.`;
     } else {
       message = `This component uses a directive which requires an inline type constructor, which is not supported by the current environment.`;
     }
-    this._diagnostics.push(makeInlineDiagnostic(templateId, ErrorCode.INLINE_TYPE_CTOR_REQUIRED, node.name, message, directives.map((dir) => makeRelatedInformation(dir.name, `Requires an inline type constructor.`))));
+    this._diagnostics.push(makeInlineDiagnostic(id, ErrorCode.INLINE_TYPE_CTOR_REQUIRED, node.name, message, directives.map((dir) => makeRelatedInformation(dir.name, `Requires an inline type constructor.`))));
   }
-  suboptimalTypeInference(templateId, variables) {
-    const mapping = this.resolver.getSourceMapping(templateId);
+  suboptimalTypeInference(id, variables) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
     let diagnosticVar = null;
     for (const variable of variables) {
       if (diagnosticVar === null || variable.value === "" || variable.value === "$implicit") {
@@ -9693,10 +9695,10 @@ var OutOfBandDiagnosticRecorderImpl = class {
     const message = `This structural directive supports advanced type inference, but the current compiler configuration prevents its usage. The variable ${varIdentification} will have type 'any' as a result.
 
 Consider enabling the 'strictTemplates' option in your tsconfig.json for better type inference within this template.`;
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, diagnosticVar.keySpan, ts37.DiagnosticCategory.Suggestion, ngErrorCode(ErrorCode.SUGGEST_SUBOPTIMAL_TYPE_INFERENCE), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, diagnosticVar.keySpan, ts37.DiagnosticCategory.Suggestion, ngErrorCode(ErrorCode.SUGGEST_SUBOPTIMAL_TYPE_INFERENCE), message));
   }
-  splitTwoWayBinding(templateId, input, output, inputConsumer, outputConsumer) {
-    const mapping = this.resolver.getSourceMapping(templateId);
+  splitTwoWayBinding(id, input, output, inputConsumer, outputConsumer) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
     const errorMsg = `The property and event halves of the two-way binding '${input.name}' are not bound to the same target.
             Find more at https://angular.dev/guide/templates/two-way-binding#how-two-way-binding-works`;
     const relatedMessages = [];
@@ -9727,22 +9729,22 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
         sourceFile: outputConsumer.name.getSourceFile()
       });
     }
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, input.keySpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SPLIT_TWO_WAY_BINDING), errorMsg, relatedMessages));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, input.keySpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SPLIT_TWO_WAY_BINDING), errorMsg, relatedMessages));
   }
-  missingRequiredInputs(templateId, element, directiveName, isComponent, inputAliases) {
+  missingRequiredInputs(id, element, directiveName, isComponent, inputAliases) {
     const message = `Required input${inputAliases.length === 1 ? "" : "s"} ${inputAliases.map((n2) => `'${n2}'`).join(", ")} from ${isComponent ? "component" : "directive"} ${directiveName} must be specified.`;
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), element.startSourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), element.startSourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
   }
-  illegalForLoopTrackAccess(templateId, block, access) {
-    const sourceSpan = this.resolver.toParseSourceSpan(templateId, access.sourceSpan);
+  illegalForLoopTrackAccess(id, block, access) {
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, access.sourceSpan);
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for property read.`);
     }
     const messageVars = [block.item, ...block.contextVariables.filter((v) => v.value === "$index")].map((v) => `'${v.name}'`).join(", ");
     const message = `Cannot access '${access.name}' inside of a track expression. Only ${messageVars} and properties on the containing component are available to this expression.`;
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
   }
-  inaccessibleDeferredTriggerElement(templateId, trigger) {
+  inaccessibleDeferredTriggerElement(id, trigger) {
     let message;
     if (trigger.reference === null) {
       message = `Trigger cannot find reference. Make sure that the @defer block has a @placeholder with at least one root element node.`;
@@ -9751,9 +9753,9 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
 Check that an element with #${trigger.reference} exists in the same template and it's accessible from the @defer block.
 Deferred blocks can only access triggers in same view, a parent embedded view or the root view of the @placeholder block.`;
     }
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), trigger.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
   }
-  controlFlowPreventingContentProjection(templateId, category, projectionNode, componentName, slotSelector, controlFlowNode, preservesWhitespaces) {
+  controlFlowPreventingContentProjection(id, category, projectionNode, componentName, slotSelector, controlFlowNode, preservesWhitespaces) {
     const blockName = controlFlowNode.nameSpan.toString().trim();
     const lines = [
       `Node matches the "${slotSelector}" slot of the "${componentName}" component, but will not be projected into the specific slot because the surrounding ${blockName} has more than one node at its root. To project the node in the right slot, you can:
@@ -9766,33 +9768,33 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
       lines.push("Note: the host component has `preserveWhitespaces: true` which may cause whitespace to affect content projection.");
     }
     lines.push("", 'This check can be disabled using the `extendedDiagnostics.checks.controlFlowPreventingContentProjection = "suppress" compiler option.`');
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), projectionNode.startSourceSpan, category, ngErrorCode(ErrorCode.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION), lines.join("\n")));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), projectionNode.startSourceSpan, category, ngErrorCode(ErrorCode.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION), lines.join("\n")));
   }
-  illegalWriteToLetDeclaration(templateId, node, target) {
-    const sourceSpan = this.resolver.toParseSourceSpan(templateId, node.sourceSpan);
+  illegalWriteToLetDeclaration(id, node, target) {
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, node.sourceSpan);
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for property write.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_LET_WRITE), `Cannot assign to @let declaration '${target.name}'.`));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_LET_WRITE), `Cannot assign to @let declaration '${target.name}'.`));
   }
-  letUsedBeforeDefinition(templateId, node, target) {
-    const sourceSpan = this.resolver.toParseSourceSpan(templateId, node.sourceSpan);
+  letUsedBeforeDefinition(id, node, target) {
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, node.sourceSpan);
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for property read.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, this.resolver.getSourceMapping(templateId), sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.LET_USED_BEFORE_DEFINITION), `Cannot read @let declaration '${target.name}' before it has been defined.`));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.LET_USED_BEFORE_DEFINITION), `Cannot read @let declaration '${target.name}' before it has been defined.`));
   }
-  conflictingDeclaration(templateId, decl) {
-    const mapping = this.resolver.getSourceMapping(templateId);
+  conflictingDeclaration(id, decl) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
     const errorMsg = `Cannot declare @let called '${decl.name}' as there is another symbol in the template with the same name.`;
-    this._diagnostics.push(makeTemplateDiagnostic(templateId, mapping, decl.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_LET_DECLARATION), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, decl.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_LET_DECLARATION), errorMsg));
   }
 };
-function makeInlineDiagnostic(templateId, code, node, messageText, relatedInformation) {
+function makeInlineDiagnostic(id, code, node, messageText, relatedInformation) {
   return {
     ...makeDiagnostic(code, node, messageText, relatedInformation),
-    componentFile: node.getSourceFile(),
-    templateId
+    sourceFile: node.getSourceFile(),
+    typeCheckId: id
   };
 }
 
@@ -9839,7 +9841,7 @@ function addParseSpanInfo(node, span) {
     false
   );
 }
-function addTemplateId(tcb, id) {
+function addTypeCheckId(tcb, id) {
   ts39.addSyntheticLeadingComment(tcb, ts39.SyntaxKind.MultiLineCommentTrivia, id, true);
 }
 function shouldReportDiagnostic(diagnostic) {
@@ -9859,7 +9861,7 @@ function translateDiagnostic(diagnostic, resolver) {
   if (diagnostic.file === void 0 || diagnostic.start === void 0) {
     return null;
   }
-  const fullMapping = getTemplateMapping(
+  const fullMapping = getSourceMapping(
     diagnostic.file,
     diagnostic.start,
     resolver,
@@ -9868,7 +9870,7 @@ function translateDiagnostic(diagnostic, resolver) {
   if (fullMapping === null) {
     return null;
   }
-  const { sourceLocation, templateSourceMapping, span } = fullMapping;
+  const { sourceLocation, sourceMapping: templateSourceMapping, span } = fullMapping;
   return makeTemplateDiagnostic(sourceLocation.id, templateSourceMapping, span, diagnostic.category, diagnostic.code, diagnostic.messageText);
 }
 
@@ -10292,7 +10294,7 @@ function generateTypeCheckBlock(env, ref, name, meta, domSchemaChecker, oobRecor
     void 0,
     body
   );
-  addTemplateId(fnDecl, meta.id);
+  addTypeCheckId(fnDecl, meta.id);
   return fnDecl;
 }
 var TcbOp = class {
@@ -11256,7 +11258,7 @@ var Context = class {
     return ts41.factory.createIdentifier(`_t${this.nextId++}`);
   }
   getPipeByName(name) {
-    if (!this.pipes.has(name)) {
+    if (this.pipes === null || !this.pipes.has(name)) {
       return null;
     }
     return this.pipes.get(name);
@@ -12016,18 +12018,19 @@ var TypeCheckContextImpl = class {
   }
   opMap = /* @__PURE__ */ new Map();
   typeCtorPending = /* @__PURE__ */ new Set();
-  addTemplate(ref, binder, template, pipes, schemas, sourceMapping, file, parseErrors, isStandalone, preserveWhitespaces) {
-    if (!this.host.shouldCheckComponent(ref.node)) {
+  addDirective(ref, binder, schemas, templateContext, isStandalone) {
+    var _a;
+    if (!this.host.shouldCheckClass(ref.node)) {
       return;
     }
     const fileData = this.dataForFile(ref.node.getSourceFile());
-    const shimData = this.pendingShimForComponent(ref.node);
-    const templateId = fileData.sourceManager.getTemplateId(ref.node);
-    const templateDiagnostics = [];
-    if (parseErrors !== null) {
-      templateDiagnostics.push(...getTemplateDiagnostics(parseErrors, templateId, sourceMapping));
+    const shimData = this.pendingShimForClass(ref.node);
+    const id = fileData.sourceManager.getTypeCheckId(ref.node);
+    const templateParsingDiagnostics = [];
+    if (templateContext !== null && templateContext.parseErrors !== null) {
+      templateParsingDiagnostics.push(...getTemplateDiagnostics(templateContext.parseErrors, id, templateContext.sourceMapping));
     }
-    const boundTarget = binder.bind({ template });
+    const boundTarget = binder.bind({ template: templateContext == null ? void 0 : templateContext.nodes });
     if (this.inlining === InliningMode.InlineOps) {
       for (const dir of boundTarget.getUsedDirectives()) {
         const dirRef = dir.ref;
@@ -12046,31 +12049,35 @@ var TypeCheckContextImpl = class {
         });
       }
     }
-    shimData.templates.set(templateId, {
-      template,
+    shimData.data.set(id, {
+      template: (templateContext == null ? void 0 : templateContext.nodes) || null,
       boundTarget,
-      templateDiagnostics
+      templateParsingDiagnostics
     });
     const usedPipes = [];
-    for (const name of boundTarget.getUsedPipes()) {
-      if (!pipes.has(name)) {
-        continue;
+    if (templateContext !== null) {
+      for (const name of boundTarget.getUsedPipes()) {
+        if (templateContext.pipes.has(name)) {
+          usedPipes.push(templateContext.pipes.get(name).ref);
+        }
       }
-      usedPipes.push(pipes.get(name).ref);
     }
     const inliningRequirement = requiresInlineTypeCheckBlock(ref, shimData.file, usedPipes, this.reflector);
     if (this.inlining === InliningMode.Error && inliningRequirement === TcbInliningRequirement.MustInline) {
-      shimData.oobRecorder.requiresInlineTcb(templateId, ref.node);
+      shimData.oobRecorder.requiresInlineTcb(id, ref.node);
       this.perf.eventCount(PerfEvent.SkipGenerateTcbNoInline);
       return;
     }
+    if (templateContext !== null) {
+      fileData.sourceManager.captureTemplateSource(id, templateContext.sourceMapping, templateContext.file);
+    }
     const meta = {
-      id: fileData.sourceManager.captureSource(ref.node, sourceMapping, file),
+      id,
       boundTarget,
-      pipes,
+      pipes: (templateContext == null ? void 0 : templateContext.pipes) || null,
       schemas,
       isStandalone,
-      preserveWhitespaces
+      preserveWhitespaces: (_a = templateContext == null ? void 0 : templateContext.preserveWhitespaces) != null ? _a : false
     };
     this.perf.eventCount(PerfEvent.GenerateTcb);
     if (inliningRequirement !== TcbInliningRequirement.None && this.inlining === InliningMode.InlineOps) {
@@ -12156,7 +12163,7 @@ var TypeCheckContextImpl = class {
           ],
           hasInlines: pendingFileData.hasInlines,
           path: pendingShimData.file.fileName,
-          templates: pendingShimData.templates
+          data: pendingShimData.data
         });
         const sfText = pendingShimData.file.render(false);
         updates.set(pendingShimData.file.fileName, {
@@ -12176,7 +12183,7 @@ var TypeCheckContextImpl = class {
     ops.push(new InlineTcbOp(ref, tcbMeta, this.config, this.reflector, shimData.domSchemaChecker, shimData.oobRecorder));
     fileData.hasInlines = true;
   }
-  pendingShimForComponent(node) {
+  pendingShimForClass(node) {
     const fileData = this.dataForFile(node.getSourceFile());
     const shimPath = TypeCheckShimGenerator.shimFor(absoluteFromSourceFile(node.getSourceFile()));
     if (!fileData.shimData.has(shimPath)) {
@@ -12184,7 +12191,7 @@ var TypeCheckContextImpl = class {
         domSchemaChecker: new RegistryDomSchemaChecker(fileData.sourceManager),
         oobRecorder: new OutOfBandDiagnosticRecorderImpl(fileData.sourceManager),
         file: new TypeCheckFile(shimPath, this.config, this.refEmitter, this.reflector, this.compilerHost),
-        templates: /* @__PURE__ */ new Map()
+        data: /* @__PURE__ */ new Map()
       });
     }
     return fileData.shimData.get(shimPath);
@@ -12325,23 +12332,21 @@ var TemplateSource = class {
     return this.lineStarts;
   }
 };
-var TemplateSourceManager = class {
+var DirectiveSourceManager = class {
   templateSources = /* @__PURE__ */ new Map();
-  getTemplateId(node) {
-    return getTemplateId(node);
+  getTypeCheckId(node) {
+    return getTypeCheckId(node);
   }
-  captureSource(node, mapping, file) {
-    const id = getTemplateId(node);
+  captureTemplateSource(id, mapping, file) {
     this.templateSources.set(id, new TemplateSource(mapping, file));
-    return id;
   }
-  getSourceMapping(id) {
+  getTemplateSourceMapping(id) {
     if (!this.templateSources.has(id)) {
-      throw new Error(`Unexpected unknown template ID: ${id}`);
+      throw new Error(`Unexpected unknown type check ID: ${id}`);
     }
     return this.templateSources.get(id).mapping;
   }
-  toParseSourceSpan(id, span) {
+  toTemplateParseSourceSpan(id, span) {
     if (!this.templateSources.has(id)) {
       return null;
     }
@@ -12357,15 +12362,15 @@ var SymbolBuilder = class {
   tcbPath;
   tcbIsShim;
   typeCheckBlock;
-  templateData;
+  typeCheckData;
   componentScopeReader;
   getTypeChecker;
   symbolCache = /* @__PURE__ */ new Map();
-  constructor(tcbPath, tcbIsShim, typeCheckBlock, templateData, componentScopeReader, getTypeChecker) {
+  constructor(tcbPath, tcbIsShim, typeCheckBlock, typeCheckData, componentScopeReader, getTypeChecker) {
     this.tcbPath = tcbPath;
     this.tcbIsShim = tcbIsShim;
     this.typeCheckBlock = typeCheckBlock;
-    this.templateData = templateData;
+    this.typeCheckData = typeCheckData;
     this.componentScopeReader = componentScopeReader;
     this.getTypeChecker = getTypeChecker;
   }
@@ -12495,12 +12500,12 @@ var SymbolBuilder = class {
   }
   getDirectiveMeta(host, directiveDeclaration) {
     var _a;
-    let directives = this.templateData.boundTarget.getDirectivesOfNode(host);
+    let directives = this.typeCheckData.boundTarget.getDirectivesOfNode(host);
     const firstChild = host.children[0];
     if (firstChild instanceof TmplAstElement3) {
       const isMicrosyntaxTemplate = host instanceof TmplAstTemplate2 && sourceSpanEqual(firstChild.sourceSpan, host.sourceSpan);
       if (isMicrosyntaxTemplate) {
-        const firstChildDirectives = this.templateData.boundTarget.getDirectivesOfNode(firstChild);
+        const firstChildDirectives = this.typeCheckData.boundTarget.getDirectivesOfNode(firstChild);
         if (firstChildDirectives !== null && directives !== null) {
           directives = directives.concat(firstChildDirectives);
         } else {
@@ -12521,7 +12526,7 @@ var SymbolBuilder = class {
     return scope.ngModule;
   }
   getSymbolOfBoundEvent(eventBinding) {
-    const consumer = this.templateData.boundTarget.getConsumerOfBinding(eventBinding);
+    const consumer = this.typeCheckData.boundTarget.getConsumerOfBinding(eventBinding);
     if (consumer === null) {
       return null;
     }
@@ -12607,7 +12612,7 @@ var SymbolBuilder = class {
     return { kind: SymbolKind.Output, bindings };
   }
   getSymbolOfInputBinding(binding) {
-    const consumer = this.templateData.boundTarget.getConsumerOfBinding(binding);
+    const consumer = this.typeCheckData.boundTarget.getConsumerOfBinding(binding);
     if (consumer === null) {
       return null;
     }
@@ -12727,7 +12732,7 @@ var SymbolBuilder = class {
     };
   }
   getSymbolOfReference(ref) {
-    const target = this.templateData.boundTarget.getReferenceTarget(ref);
+    const target = this.typeCheckData.boundTarget.getReferenceTarget(ref);
     let node = findFirstMatchingNode(this.typeCheckBlock, {
       withSpan: ref.sourceSpan,
       filter: ts44.isVariableDeclaration
@@ -12832,7 +12837,7 @@ var SymbolBuilder = class {
     if (expression instanceof ASTWithSource2) {
       expression = expression.ast;
     }
-    const expressionTarget = this.templateData.boundTarget.getExpressionTarget(expression);
+    const expressionTarget = this.typeCheckData.boundTarget.getExpressionTarget(expression);
     if (expressionTarget !== null) {
       return this.getSymbol(expressionTarget);
     }
@@ -13002,9 +13007,8 @@ var TemplateTypeCheckerImpl = class {
     if (!fileRecord.shimData.has(shimPath)) {
       return { data: null, tcb: null, tcbPath: shimPath, tcbIsShim: true };
     }
-    const templateId = fileRecord.sourceManager.getTemplateId(component);
+    const id = fileRecord.sourceManager.getTypeCheckId(component);
     const shimRecord = fileRecord.shimData.get(shimPath);
-    const id = fileRecord.sourceManager.getTemplateId(component);
     const program = this.programDriver.getProgram();
     const shimSf = getSourceFileOrNull(program, shimPath);
     if (shimSf === null || !fileRecord.shimData.has(shimPath)) {
@@ -13020,8 +13024,8 @@ var TemplateTypeCheckerImpl = class {
       }
     }
     let data = null;
-    if (shimRecord.templates.has(templateId)) {
-      data = shimRecord.templates.get(templateId);
+    if (shimRecord.data.has(id)) {
+      data = shimRecord.data.get(id);
     }
     return { data, tcb, tcbPath, tcbIsShim: tcbPath === shimPath };
   }
@@ -13051,7 +13055,7 @@ var TemplateTypeCheckerImpl = class {
     }
     return null;
   }
-  getTemplateMappingAtTcbLocation(tcbLocation) {
+  getSourceMappingAtTcbLocation(tcbLocation) {
     const fileRecord = this.getFileRecordForTcbLocation(tcbLocation);
     if (fileRecord === null) {
       return null;
@@ -13060,7 +13064,7 @@ var TemplateTypeCheckerImpl = class {
     if (shimSf === void 0) {
       return null;
     }
-    return getTemplateMapping(
+    return getSourceMapping(
       shimSf,
       tcbLocation.positionInFile,
       fileRecord.sourceManager,
@@ -13092,8 +13096,8 @@ var TemplateTypeCheckerImpl = class {
         const shimSf = getSourceFileOrError(typeCheckProgram, shimPath);
         diagnostics.push(...typeCheckProgram.getSemanticDiagnostics(shimSf).map((diag) => convertDiagnostic(diag, fileRecord.sourceManager)));
         diagnostics.push(...shimRecord.genesisDiagnostics);
-        for (const templateData of shimRecord.templates.values()) {
-          diagnostics.push(...templateData.templateDiagnostics);
+        for (const templateData of shimRecord.data.values()) {
+          diagnostics.push(...templateData.templateParsingDiagnostics);
         }
       }
       return diagnostics.filter((diag) => diag !== null);
@@ -13109,7 +13113,7 @@ var TemplateTypeCheckerImpl = class {
       if (!fileRecord.shimData.has(shimPath)) {
         return [];
       }
-      const templateId = fileRecord.sourceManager.getTemplateId(component);
+      const id = fileRecord.sourceManager.getTypeCheckId(component);
       const shimRecord = fileRecord.shimData.get(shimPath);
       const typeCheckProgram = this.programDriver.getProgram();
       const diagnostics = [];
@@ -13120,10 +13124,10 @@ var TemplateTypeCheckerImpl = class {
       const shimSf = getSourceFileOrError(typeCheckProgram, shimPath);
       diagnostics.push(...typeCheckProgram.getSemanticDiagnostics(shimSf).map((diag) => convertDiagnostic(diag, fileRecord.sourceManager)));
       diagnostics.push(...shimRecord.genesisDiagnostics);
-      for (const templateData of shimRecord.templates.values()) {
-        diagnostics.push(...templateData.templateDiagnostics);
+      for (const templateData of shimRecord.data.values()) {
+        diagnostics.push(...templateData.templateParsingDiagnostics);
       }
-      return diagnostics.filter((diag) => diag !== null && diag.templateId === templateId);
+      return diagnostics.filter((diag) => diag !== null && diag.typeCheckId === id);
     });
   }
   getTypeCheckBlock(component) {
@@ -13159,7 +13163,7 @@ var TemplateTypeCheckerImpl = class {
     const sfPath = absoluteFromSourceFile(sf);
     const shimPath = TypeCheckShimGenerator.shimFor(sfPath);
     const fileData = this.getFileData(sfPath);
-    const templateId = fileData.sourceManager.getTemplateId(clazz);
+    const id = fileData.sourceManager.getTypeCheckId(clazz);
     fileData.shimData.delete(shimPath);
     fileData.isComplete = false;
     this.isComplete = false;
@@ -13171,10 +13175,10 @@ var TemplateTypeCheckerImpl = class {
   makeTemplateDiagnostic(clazz, sourceSpan, category, errorCode, message, relatedInformation) {
     const sfPath = absoluteFromSourceFile(clazz.getSourceFile());
     const fileRecord = this.state.get(sfPath);
-    const templateId = fileRecord.sourceManager.getTemplateId(clazz);
-    const mapping = fileRecord.sourceManager.getSourceMapping(templateId);
+    const id = fileRecord.sourceManager.getTypeCheckId(clazz);
+    const mapping = fileRecord.sourceManager.getTemplateSourceMapping(id);
     return {
-      ...makeTemplateDiagnostic(templateId, mapping, sourceSpan, category, ngErrorCode(errorCode), message, relatedInformation),
+      ...makeTemplateDiagnostic(id, mapping, sourceSpan, category, ngErrorCode(errorCode), message, relatedInformation),
       __ngCode: errorCode
     };
   }
@@ -13292,7 +13296,7 @@ var TemplateTypeCheckerImpl = class {
     if (!this.state.has(path)) {
       this.state.set(path, {
         hasInlines: false,
-        sourceManager: new TemplateSourceManager(),
+        sourceManager: new DirectiveSourceManager(),
         isComplete: false,
         shimData: /* @__PURE__ */ new Map()
       });
@@ -13580,7 +13584,7 @@ var WholeProgramTypeCheckingHost = class {
   getSourceManager(sfPath) {
     return this.impl.getFileData(sfPath).sourceManager;
   }
-  shouldCheckComponent(node) {
+  shouldCheckClass(node) {
     const sfPath = absoluteFromSourceFile(node.getSourceFile());
     const shimPath = TypeCheckShimGenerator.shimFor(sfPath);
     const fileData = this.impl.getFileData(sfPath);
@@ -13616,7 +13620,7 @@ var SingleFileTypeCheckingHost = class {
     this.assertPath(sfPath);
     return this.fileData.sourceManager;
   }
-  shouldCheckComponent(node) {
+  shouldCheckClass(node) {
     if (this.sfPath !== absoluteFromSourceFile(node.getSourceFile())) {
       return false;
     }
@@ -14483,7 +14487,15 @@ var ComponentDecoratorHandler = class {
       return;
     }
     const binder = new R3TargetBinder(scope.matcher);
-    ctx.addTemplate(new Reference(node), binder, meta.template.diagNodes, scope.pipes, scope.schemas, meta.template.sourceMapping, meta.template.file, meta.template.errors, meta.meta.isStandalone, (_a = meta.meta.template.preserveWhitespaces) != null ? _a : false);
+    const templateContext = {
+      nodes: meta.template.diagNodes,
+      pipes: scope.pipes,
+      sourceMapping: meta.template.sourceMapping,
+      file: meta.template.file,
+      parseErrors: meta.template.errors,
+      preserveWhitespaces: (_a = meta.meta.template.preserveWhitespaces) != null ? _a : false
+    };
+    ctx.addDirective(new Reference(node), binder, scope.schemas, templateContext, meta.meta.isStandalone);
   }
   extendedTemplateCheck(component, extendedTemplateChecker) {
     return extendedTemplateChecker.getDiagnosticsForComponent(component);
@@ -15596,4 +15608,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-J2ZUZS7X.js.map
+//# sourceMappingURL=chunk-IKMJP4SR.js.map

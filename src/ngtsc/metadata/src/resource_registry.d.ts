@@ -24,16 +24,17 @@ export interface ExternalResource extends Resource {
 }
 export declare function isExternalResource(resource: Resource): resource is ExternalResource;
 /**
- * Represents the either inline or external resources of a component.
+ * Represents the either inline or external resources of a directive.
  *
  * A resource with a `path` of `null` is considered inline.
+ * The template will be present for components, but will be null for directives.
  */
-export interface ComponentResources {
-    template: Resource;
-    styles: ReadonlySet<Resource>;
+export interface DirectiveResources {
+    template: Resource | null;
+    styles: ReadonlySet<Resource> | null;
 }
 /**
- * Tracks the mapping between external template/style files and the component(s) which use them.
+ * Tracks the mapping between external resources and the directives(s) which use them.
  *
  * This information is produced during analysis of the program and is used mainly to support
  * external tooling, for which such a mapping is challenging to determine without compiler
@@ -45,10 +46,10 @@ export declare class ResourceRegistry {
     private componentToStylesMap;
     private externalStyleToComponentsMap;
     getComponentsWithTemplate(template: AbsoluteFsPath): ReadonlySet<ClassDeclaration>;
-    registerResources(resources: ComponentResources, component: ClassDeclaration): void;
-    registerTemplate(templateResource: Resource, component: ClassDeclaration): void;
+    registerResources(resources: DirectiveResources, directive: ClassDeclaration): void;
+    private registerTemplate;
     getTemplate(component: ClassDeclaration): Resource | null;
-    registerStyle(styleResource: Resource, component: ClassDeclaration): void;
+    private registerStyle;
     getStyles(component: ClassDeclaration): Set<Resource>;
     getComponentsWithStyle(styleUrl: AbsoluteFsPath): ReadonlySet<ClassDeclaration>;
 }

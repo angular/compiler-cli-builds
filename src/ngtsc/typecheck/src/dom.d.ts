@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { ParseSourceSpan, SchemaMetadata, TmplAstElement } from '@angular/compiler';
-import { TemplateDiagnostic, TemplateId } from '../api';
-import { TemplateSourceResolver } from './tcb_util';
+import { TemplateDiagnostic, TypeCheckId } from '../api';
+import { TypeCheckSourceResolver } from './tcb_util';
 /**
  * Checks every non-Angular element/property processed in a template and potentially produces
  * `ts.Diagnostic`s related to improper usage.
@@ -55,7 +55,7 @@ export declare class RegistryDomSchemaChecker implements DomSchemaChecker {
     private resolver;
     private _diagnostics;
     get diagnostics(): ReadonlyArray<TemplateDiagnostic>;
-    constructor(resolver: TemplateSourceResolver);
-    checkElement(id: TemplateId, element: TmplAstElement, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
-    checkProperty(id: TemplateId, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
+    constructor(resolver: TypeCheckSourceResolver);
+    checkElement(id: TypeCheckId, element: TmplAstElement, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
+    checkProperty(id: TypeCheckId, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
 }

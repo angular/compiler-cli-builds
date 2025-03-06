@@ -13,7 +13,7 @@ import { Resource } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, DeclarationNode, Decorator } from '../../../reflection';
 import { CompilationMode } from '../../../transform';
-import { TemplateSourceMapping } from '../../../typecheck/api';
+import { SourceMapping } from '../../../typecheck/api';
 import { ResourceLoader } from '../../common';
 /**
  * The literal style url extracted from the decorator, along with metadata for diagnostics.
@@ -58,7 +58,7 @@ export interface ParsedComponentTemplate extends ParsedTemplate {
 export interface ParsedTemplateWithSource extends ParsedComponentTemplate {
     /** The string contents of the template. */
     content: string;
-    sourceMapping: TemplateSourceMapping;
+    sourceMapping: SourceMapping;
     declaration: TemplateDeclaration;
 }
 /**

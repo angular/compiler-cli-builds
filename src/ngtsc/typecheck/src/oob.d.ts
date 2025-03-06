@@ -8,8 +8,8 @@
 import { BindingPipe, PropertyRead, PropertyWrite, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstVariable, TmplAstViewportDeferredTrigger } from '@angular/compiler';
 import ts from 'typescript';
 import { ClassDeclaration } from '../../reflection';
-import { TemplateDiagnostic, TemplateId } from '../api';
-import { TemplateSourceResolver } from './tcb_util';
+import { TemplateDiagnostic, TypeCheckId } from '../api';
+import { TypeCheckSourceResolver } from './tcb_util';
 /**
  * Collects `ts.Diagnostic`s on problems which occur in the template which aren't directly sourced
  * from Type Check Blocks.
@@ -25,83 +25,79 @@ export interface OutOfBandDiagnosticRecorder {
      * Reports a `#ref="target"` expression in the template for which a target directive could not be
      * found.
      *
-     * @param templateId the template type-checking ID of the template which contains the broken
-     * reference.
+     * @param id the type-checking ID of the template which contains the broken reference.
      * @param ref the `TmplAstReference` which could not be matched to a directive.
      */
-    missingReferenceTarget(templateId: TemplateId, ref: TmplAstReference): void;
+    missingReferenceTarget(id: TypeCheckId, ref: TmplAstReference): void;
     /**
      * Reports usage of a `| pipe` expression in the template for which the named pipe could not be
      * found.
      *
-     * @param templateId the template type-checking ID of the template which contains the unknown
-     * pipe.
+     * @param id the type-checking ID of the template which contains the unknown pipe.
      * @param ast the `BindingPipe` invocation of the pipe which could not be found.
      */
-    missingPipe(templateId: TemplateId, ast: BindingPipe): void;
+    missingPipe(id: TypeCheckId, ast: BindingPipe): void;
     /**
      * Reports usage of a pipe imported via `@Component.deferredImports` outside
      * of a `@defer` block in a template.
      *
-     * @param templateId the template type-checking ID of the template which contains the unknown
-     * pipe.
+     * @param id the type-checking ID of the template which contains the unknown pipe.
      * @param ast the `BindingPipe` invocation of the pipe which could not be found.
      */
-    deferredPipeUsedEagerly(templateId: TemplateId, ast: BindingPipe): void;
+    deferredPipeUsedEagerly(id: TypeCheckId, ast: BindingPipe): void;
     /**
      * Reports usage of a component/directive imported via `@Component.deferredImports` outside
      * of a `@defer` block in a template.
      *
-     * @param templateId the template type-checking ID of the template which contains the unknown
-     * pipe.
+     * @param id the type-checking ID of the template which contains the unknown pipe.
      * @param element the element which hosts a component that was defer-loaded.
      */
-    deferredComponentUsedEagerly(templateId: TemplateId, element: TmplAstElement): void;
+    deferredComponentUsedEagerly(id: TypeCheckId, element: TmplAstElement): void;
     /**
      * Reports a duplicate declaration of a template variable.
      *
-     * @param templateId the template type-checking ID of the template which contains the duplicate
+     * @param id the type-checking ID of the template which contains the duplicate
      * declaration.
      * @param variable the `TmplAstVariable` which duplicates a previously declared variable.
      * @param firstDecl the first variable declaration which uses the same name as `variable`.
      */
-    duplicateTemplateVar(templateId: TemplateId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
-    requiresInlineTcb(templateId: TemplateId, node: ClassDeclaration): void;
-    requiresInlineTypeConstructors(templateId: TemplateId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
+    duplicateTemplateVar(id: TypeCheckId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
+    requiresInlineTcb(id: TypeCheckId, node: ClassDeclaration): void;
+    requiresInlineTypeConstructors(id: TypeCheckId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
     /**
      * Report a warning when structural directives support context guards, but the current
      * type-checking configuration prohibits their usage.
      */
-    suboptimalTypeInference(templateId: TemplateId, variables: TmplAstVariable[]): void;
+    suboptimalTypeInference(id: TypeCheckId, variables: TmplAstVariable[]): void;
     /**
      * Reports a split two way binding error message.
      */
-    splitTwoWayBinding(templateId: TemplateId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
+    splitTwoWayBinding(id: TypeCheckId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
     /** Reports required inputs that haven't been bound. */
-    missingRequiredInputs(templateId: TemplateId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
+    missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
     /**
      * Reports accesses of properties that aren't available in a `for` block's tracking expression.
      */
-    illegalForLoopTrackAccess(templateId: TemplateId, block: TmplAstForLoopBlock, access: PropertyRead): void;
+    illegalForLoopTrackAccess(id: TypeCheckId, block: TmplAstForLoopBlock, access: PropertyRead): void;
     /**
      * Reports deferred triggers that cannot access the element they're referring to.
      */
-    inaccessibleDeferredTriggerElement(templateId: TemplateId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
+    inaccessibleDeferredTriggerElement(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
     /**
      * Reports cases where control flow nodes prevent content projection.
      */
-    controlFlowPreventingContentProjection(templateId: TemplateId, category: ts.DiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty, preservesWhitespaces: boolean): void;
+    controlFlowPreventingContentProjection(id: TypeCheckId, category: ts.DiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty, preservesWhitespaces: boolean): void;
     /** Reports cases where users are writing to `@let` declarations. */
-    illegalWriteToLetDeclaration(templateId: TemplateId, node: PropertyWrite, target: TmplAstLetDeclaration): void;
+    illegalWriteToLetDeclaration(id: TypeCheckId, node: PropertyWrite, target: TmplAstLetDeclaration): void;
     /** Reports cases where users are accessing an `@let` before it is defined.. */
-    letUsedBeforeDefinition(templateId: TemplateId, node: PropertyRead, target: TmplAstLetDeclaration): void;
+    letUsedBeforeDefinition(id: TypeCheckId, node: PropertyRead, target: TmplAstLetDeclaration): void;
     /**
      * Reports a `@let` declaration that conflicts with another symbol in the same scope.
      *
-     * @param templateId the template type-checking ID of the template which contains the declaration.
+     * @param id the type-checking ID of the template which contains the declaration.
      * @param current the `TmplAstLetDeclaration` which is invalid.
      */
-    conflictingDeclaration(templateId: TemplateId, current: TmplAstLetDeclaration): void;
+    conflictingDeclaration(id: TypeCheckId, current: TmplAstLetDeclaration): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -111,22 +107,22 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
      * is ever produced per node.
      */
     private recordedPipes;
-    constructor(resolver: TemplateSourceResolver);
+    constructor(resolver: TypeCheckSourceResolver);
     get diagnostics(): ReadonlyArray<TemplateDiagnostic>;
-    missingReferenceTarget(templateId: TemplateId, ref: TmplAstReference): void;
-    missingPipe(templateId: TemplateId, ast: BindingPipe): void;
-    deferredPipeUsedEagerly(templateId: TemplateId, ast: BindingPipe): void;
-    deferredComponentUsedEagerly(templateId: TemplateId, element: TmplAstElement): void;
-    duplicateTemplateVar(templateId: TemplateId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
-    requiresInlineTcb(templateId: TemplateId, node: ClassDeclaration): void;
-    requiresInlineTypeConstructors(templateId: TemplateId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
-    suboptimalTypeInference(templateId: TemplateId, variables: TmplAstVariable[]): void;
-    splitTwoWayBinding(templateId: TemplateId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
-    missingRequiredInputs(templateId: TemplateId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
-    illegalForLoopTrackAccess(templateId: TemplateId, block: TmplAstForLoopBlock, access: PropertyRead): void;
-    inaccessibleDeferredTriggerElement(templateId: TemplateId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
-    controlFlowPreventingContentProjection(templateId: TemplateId, category: ts.DiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty, preservesWhitespaces: boolean): void;
-    illegalWriteToLetDeclaration(templateId: TemplateId, node: PropertyWrite, target: TmplAstLetDeclaration): void;
-    letUsedBeforeDefinition(templateId: TemplateId, node: PropertyRead, target: TmplAstLetDeclaration): void;
-    conflictingDeclaration(templateId: TemplateId, decl: TmplAstLetDeclaration): void;
+    missingReferenceTarget(id: TypeCheckId, ref: TmplAstReference): void;
+    missingPipe(id: TypeCheckId, ast: BindingPipe): void;
+    deferredPipeUsedEagerly(id: TypeCheckId, ast: BindingPipe): void;
+    deferredComponentUsedEagerly(id: TypeCheckId, element: TmplAstElement): void;
+    duplicateTemplateVar(id: TypeCheckId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
+    requiresInlineTcb(id: TypeCheckId, node: ClassDeclaration): void;
+    requiresInlineTypeConstructors(id: TypeCheckId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
+    suboptimalTypeInference(id: TypeCheckId, variables: TmplAstVariable[]): void;
+    splitTwoWayBinding(id: TypeCheckId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
+    missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
+    illegalForLoopTrackAccess(id: TypeCheckId, block: TmplAstForLoopBlock, access: PropertyRead): void;
+    inaccessibleDeferredTriggerElement(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
+    controlFlowPreventingContentProjection(id: TypeCheckId, category: ts.DiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty, preservesWhitespaces: boolean): void;
+    illegalWriteToLetDeclaration(id: TypeCheckId, node: PropertyWrite, target: TmplAstLetDeclaration): void;
+    letUsedBeforeDefinition(id: TypeCheckId, node: PropertyRead, target: TmplAstLetDeclaration): void;
+    conflictingDeclaration(id: TypeCheckId, decl: TmplAstLetDeclaration): void;
 }
