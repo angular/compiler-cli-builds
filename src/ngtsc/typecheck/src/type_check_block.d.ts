@@ -10,7 +10,7 @@ import ts from 'typescript';
 import { Reference } from '../../imports';
 import { PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
-import { TemplateId, TypeCheckableDirectiveMeta, TypeCheckBlockMetadata } from '../api';
+import { TypeCheckId, TypeCheckableDirectiveMeta, TypeCheckBlockMetadata } from '../api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
 import { OutOfBandDiagnosticRecorder } from './oob';
@@ -127,14 +127,14 @@ export declare class Context {
     readonly env: Environment;
     readonly domSchemaChecker: DomSchemaChecker;
     readonly oobRecorder: OutOfBandDiagnosticRecorder;
-    readonly id: TemplateId;
+    readonly id: TypeCheckId;
     readonly boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
     private pipes;
     readonly schemas: SchemaMetadata[];
     readonly hostIsStandalone: boolean;
     readonly hostPreserveWhitespaces: boolean;
     private nextId;
-    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: TemplateId, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, PipeMeta>, schemas: SchemaMetadata[], hostIsStandalone: boolean, hostPreserveWhitespaces: boolean);
+    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: TypeCheckId, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, PipeMeta> | null, schemas: SchemaMetadata[], hostIsStandalone: boolean, hostPreserveWhitespaces: boolean);
     /**
      * Allocate a new variable name for use within the `Context`.
      *

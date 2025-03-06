@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-SEPXPBD2.js";
+} from "./chunk-FL3TJEGV.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-PLKJMRGZ.js";
+} from "./chunk-4725IYUA.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -2746,14 +2746,14 @@ function isSignalInstanceProperty(name) {
 function buildDiagnosticForSignal(ctx, node, component) {
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
   if (symbol !== null && symbol.kind === SymbolKind.Expression && isSignalReference(symbol)) {
-    const templateMapping = ctx.templateTypeChecker.getTemplateMappingAtTcbLocation(symbol.tcbLocation);
+    const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
     const errorString = `${node.name} is a function and should be invoked: ${node.name}()`;
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
     return [diagnostic];
   }
   const symbolOfReceiver = ctx.templateTypeChecker.getSymbolOfNode(node.receiver, component);
   if ((isFunctionInstanceProperty(node.name) || isSignalInstanceProperty(node.name)) && symbolOfReceiver !== null && symbolOfReceiver.kind === SymbolKind.Expression && isSignalReference(symbolOfReceiver)) {
-    const templateMapping = ctx.templateTypeChecker.getTemplateMappingAtTcbLocation(symbolOfReceiver.tcbLocation);
+    const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbolOfReceiver.tcbLocation);
     const errorString = `${node.receiver.name} is a function and should be invoked: ${node.receiver.name}()`;
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
     return [diagnostic];
@@ -2884,7 +2884,7 @@ var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
     if (symbol.kind !== SymbolKind.Expression) {
       return [];
     }
-    const templateMapping = ctx.templateTypeChecker.getTemplateMappingAtTcbLocation(symbol.tcbLocation);
+    const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
     if (templateMapping === null) {
       return [];
     }
@@ -2927,7 +2927,7 @@ var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
     if (symbol.kind !== SymbolKind.Expression) {
       return [];
     }
-    const templateMapping = ctx.templateTypeChecker.getTemplateMappingAtTcbLocation(symbol.tcbLocation);
+    const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
     if (templateMapping === null) {
       return [];
     }
@@ -3774,16 +3774,13 @@ var NgCompiler = class {
     const { resourceRegistry } = this.ensureAnalyzed();
     return resourceRegistry.getComponentsWithStyle(resolve(styleFilePath));
   }
-  getComponentResources(classDecl) {
+  getDirectiveResources(classDecl) {
     if (!isNamedClassDeclaration(classDecl)) {
       return null;
     }
     const { resourceRegistry } = this.ensureAnalyzed();
     const styles = resourceRegistry.getStyles(classDecl);
     const template = resourceRegistry.getTemplate(classDecl);
-    if (template === null) {
-      return null;
-    }
     return { styles, template };
   }
   getMeta(classDecl) {
@@ -5062,4 +5059,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-O2OVHMWL.js.map
+//# sourceMappingURL=chunk-D52HDHKW.js.map

@@ -10,7 +10,7 @@ import { DocEntry } from '../../docs';
 import { AbsoluteFsPath } from '../../file_system';
 import { IncrementalBuildStrategy, IncrementalCompilation, IncrementalState } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
-import { ComponentResources, DirectiveMeta, PipeMeta } from '../../metadata';
+import { DirectiveResources, DirectiveMeta, PipeMeta } from '../../metadata';
 import { ActivePerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { DeclarationNode } from '../../reflection';
@@ -208,9 +208,9 @@ export declare class NgCompiler {
      */
     getComponentsWithStyleFile(styleFilePath: string): ReadonlySet<DeclarationNode>;
     /**
-     * Retrieves external resources for the given component.
+     * Retrieves external resources for the given directive.
      */
-    getComponentResources(classDecl: DeclarationNode): ComponentResources | null;
+    getDirectiveResources(classDecl: DeclarationNode): DirectiveResources | null;
     getMeta(classDecl: DeclarationNode): PipeMeta | DirectiveMeta | null;
     /**
      * Perform Angular's analysis step (as a precursor to `getDiagnostics` or `prepareEmit`)

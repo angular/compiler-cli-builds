@@ -16,9 +16,9 @@ import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { ElementSymbol, FullTemplateMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { ElementSymbol, FullSourceMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ShimTypeCheckingData } from './context';
-import { TemplateSourceManager } from './source';
+import { DirectiveSourceManager } from './source';
 /**
  * Primary template type-checking engine, which performs type-checking using a
  * `TypeCheckingProgramStrategy` for type-checking program maintenance, and the
@@ -82,7 +82,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     isTrackedTypeCheckFile(filePath: AbsoluteFsPath): boolean;
     private getFileRecordForTcbLocation;
     private getFileAndShimRecordsForPath;
-    getTemplateMappingAtTcbLocation(tcbLocation: TcbLocation): FullTemplateMapping | null;
+    getSourceMappingAtTcbLocation(tcbLocation: TcbLocation): FullSourceMapping | null;
     generateAllTypeCheckBlocks(): void;
     /**
      * Retrieve type-checking and template parse diagnostics from the given `ts.SourceFile` using the
@@ -150,10 +150,10 @@ export interface FileTypeCheckingData {
      */
     hasInlines: boolean;
     /**
-     * Source mapping information for mapping diagnostics from inlined type check blocks back to the
-     * original template.
+     * Information for mapping diagnostics from inlined type check blocks
+     * back to their original sources.
      */
-    sourceManager: TemplateSourceManager;
+    sourceManager: DirectiveSourceManager;
     /**
      * Data for each shim generated from this input file.
      *
