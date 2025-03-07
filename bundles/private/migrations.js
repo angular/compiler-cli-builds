@@ -8,8 +8,8 @@ import {
   PotentialImportKind,
   PotentialImportMode,
   StaticInterpreter,
-  forwardRefResolver
-} from "../chunk-IKMJP4SR.js";
+  createForwardRefResolver
+} from "../chunk-ZNX5CAF3.js";
 import {
   ImportManager,
   Reference,
@@ -28,7 +28,7 @@ export {
   Reference,
   StaticInterpreter,
   TypeScriptReflectionHost,
-  forwardRefResolver,
+  createForwardRefResolver,
   reflectObjectLiteral
 };
 /**
