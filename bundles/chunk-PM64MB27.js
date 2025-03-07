@@ -103,8 +103,8 @@ function toR3Reference(origin, ref, context, refEmitter) {
 function isAngularCore(decorator) {
   return decorator.import !== null && decorator.import.from === CORE_MODULE;
 }
-function isAngularCoreReference(reference, symbolName) {
-  return reference.ownedByModuleGuess === CORE_MODULE && reference.debugName === symbolName;
+function isAngularCoreReference(reference, symbolName, isCore) {
+  return (reference.ownedByModuleGuess === CORE_MODULE || isCore) && reference.debugName === symbolName;
 }
 function findAngularDecorator(decorators, name, isCore) {
   return decorators.find((decorator) => isAngularDecorator(decorator, name, isCore));
@@ -171,17 +171,19 @@ function tryUnwrapForwardRef(node, reflector) {
   }
   return expr;
 }
-var forwardRefResolver = (fn, callExpr, resolve, unresolvable) => {
-  if (!isAngularCoreReference(fn, "forwardRef") || callExpr.arguments.length !== 1) {
-    return unresolvable;
-  }
-  const expanded = expandForwardRef(callExpr.arguments[0]);
-  if (expanded !== null) {
-    return resolve(expanded);
-  } else {
-    return unresolvable;
-  }
-};
+function createForwardRefResolver(isCore) {
+  return (fn, callExpr, resolve, unresolvable) => {
+    if (!isAngularCoreReference(fn, "forwardRef", isCore) || callExpr.arguments.length !== 1) {
+      return unresolvable;
+    }
+    const expanded = expandForwardRef(callExpr.arguments[0]);
+    if (expanded !== null) {
+      return resolve(expanded);
+    } else {
+      return unresolvable;
+    }
+  };
+}
 function combineResolvers(resolvers) {
   return (fn, callExpr, resolve, unresolvable) => {
     for (const resolver of resolvers) {
@@ -3515,12 +3517,12 @@ function assertLocalCompilationUnresolvedConst(compilationMode, value, nodeToHig
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/evaluation.mjs
 import { ViewEncapsulation } from "@angular/compiler";
 import ts13 from "typescript";
-function resolveEnumValue(evaluator, metadata, field, enumSymbolName) {
+function resolveEnumValue(evaluator, metadata, field, enumSymbolName, isCore) {
   let resolved = null;
   if (metadata.has(field)) {
     const expr = metadata.get(field);
     const value = evaluator.evaluate(expr);
-    if (value instanceof EnumValue && isAngularCoreReference(value.enumRef, enumSymbolName)) {
+    if (value instanceof EnumValue && isAngularCoreReference(value.enumRef, enumSymbolName, isCore)) {
       resolved = value.resolved;
     } else {
       throw createValueHasWrongTypeError(expr, value, `${field} must be a member of ${enumSymbolName} enum from @angular/core`);
@@ -5007,7 +5009,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
   const sourceFile = clazz.getSourceFile();
   const type = wrapTypeReference(reflector, clazz);
   const rawHostDirectives = directive.get("hostDirectives") || null;
-  const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator, compilationMode);
+  const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator, compilationMode, createForwardRefResolver(isCore));
   if (compilationMode !== CompilationMode.LOCAL && hostDirectives !== null) {
     referencesRegistry.add(clazz, ...hostDirectives.map((hostDir) => {
       if (!isHostDirectiveMetaForGlobalMode(hostDir)) {
@@ -5644,7 +5646,7 @@ function getHostBindingErrorNode(error, hostExpr) {
   }
   return hostExpr;
 }
-function extractHostDirectives(rawHostDirectives, evaluator, compilationMode) {
+function extractHostDirectives(rawHostDirectives, evaluator, compilationMode, forwardRefResolver) {
   const resolved = evaluator.evaluate(rawHostDirectives, forwardRefResolver);
   if (!Array.isArray(resolved)) {
     throw createValueHasWrongTypeError(rawHostDirectives, resolved, "hostDirectives must be an array");
@@ -6240,6 +6242,7 @@ var NgModuleDecoratorHandler = class {
       this.jitDeclarationRegistry.jitDeclarations.add(node);
       return {};
     }
+    const forwardRefResolver = createForwardRefResolver(this.isCore);
     const moduleResolvers = combineResolvers([
       createModuleWithProvidersResolver(this.reflector, this.isCore),
       forwardRefResolver
@@ -14155,10 +14158,10 @@ var ComponentDecoratorHandler = class {
       return {};
     }
     const { decorator: component, metadata, inputs, outputs, hostDirectives, rawHostDirectives } = directiveResult;
-    const encapsulation = (_a = this.compilationMode !== CompilationMode.LOCAL ? resolveEnumValue(this.evaluator, component, "encapsulation", "ViewEncapsulation") : resolveEncapsulationEnumValueLocally(component.get("encapsulation"))) != null ? _a : ViewEncapsulation2.Emulated;
+    const encapsulation = (_a = this.compilationMode !== CompilationMode.LOCAL ? resolveEnumValue(this.evaluator, component, "encapsulation", "ViewEncapsulation", this.isCore) : resolveEncapsulationEnumValueLocally(component.get("encapsulation"))) != null ? _a : ViewEncapsulation2.Emulated;
     let changeDetection = null;
     if (this.compilationMode !== CompilationMode.LOCAL) {
-      changeDetection = resolveEnumValue(this.evaluator, component, "changeDetection", "ChangeDetectionStrategy");
+      changeDetection = resolveEnumValue(this.evaluator, component, "changeDetection", "ChangeDetectionStrategy", this.isCore);
     } else if (component.has("changeDetection")) {
       changeDetection = new o4.WrappedNodeExpr(component.get("changeDetection"));
     }
@@ -14206,7 +14209,7 @@ var ComponentDecoratorHandler = class {
     } else if (this.compilationMode !== CompilationMode.LOCAL && (rawImports || rawDeferredImports)) {
       const importResolvers = combineResolvers([
         createModuleWithProvidersResolver(this.reflector, this.isCore),
-        forwardRefResolver
+        createForwardRefResolver(this.isCore)
       ]);
       const importDiagnostics = [];
       if (rawImports) {
@@ -15554,7 +15557,7 @@ var PipeDecoratorHandler = class {
 export {
   isAngularDecorator,
   getAngularDecorators,
-  forwardRefResolver,
+  createForwardRefResolver,
   MetaKind,
   CompoundMetadataReader,
   DtsMetadataReader,
@@ -15624,4 +15627,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-4725IYUA.js.map
+//# sourceMappingURL=chunk-PM64MB27.js.map

@@ -8,8 +8,8 @@ import {
   PotentialImportKind,
   PotentialImportMode,
   StaticInterpreter,
-  forwardRefResolver
-} from "../chunk-4725IYUA.js";
+  createForwardRefResolver
+} from "../chunk-PM64MB27.js";
 import {
   ImportManager,
   Reference,
@@ -28,7 +28,7 @@ export {
   Reference,
   StaticInterpreter,
   TypeScriptReflectionHost,
-  forwardRefResolver,
+  createForwardRefResolver,
   reflectObjectLiteral
 };
 /**

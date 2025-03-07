@@ -38,6 +38,14 @@ export interface InternalOptions {
      * Whether to check the event side of two-way bindings.
      */
     _checkTwoWayBoundEvents?: boolean;
+    /**
+     * Whether this is a compilation of Angular core itself.
+     *
+     * By default, we detect this automatically based on the existence of `r3_symbols.ts`
+     * in the compilation, but there are other test targets within the `core` package that
+     * import e.g. `Component` relatively and should be detected by the compiler.
+     */
+    _isAngularCoreCompilation?: boolean;
 }
 /**
  * A merged interface of all of the various Angular compiler options, as well as the standard
