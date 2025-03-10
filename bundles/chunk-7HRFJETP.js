@@ -2544,7 +2544,8 @@ var ExpressionTranslatorVisitor = class {
     return this.factory.createUnaryExpression(UNARY_OPERATORS.get(ast.operator), ast.expr.visitExpression(this, context));
   }
   visitParenthesizedExpr(ast, context) {
-    return this.factory.createParenthesizedExpression(ast.expr.visitExpression(this, context));
+    const result = ast.expr.visitExpression(this, context);
+    return this.factory.createParenthesizedExpression(result);
   }
   visitStatements(statements, context) {
     return statements.map((stmt) => stmt.visitStatement(this, context)).filter((stmt) => stmt !== void 0);
@@ -3224,4 +3225,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-QYORKQDN.js.map
+//# sourceMappingURL=chunk-7HRFJETP.js.map

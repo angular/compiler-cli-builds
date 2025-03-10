@@ -48,7 +48,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-QYORKQDN.js";
+} from "./chunk-7HRFJETP.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -3781,7 +3781,7 @@ var JitDeclarationRegistry = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 import { compileClassDebugInfo, compileHmrInitializer, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, ConstantPool as ConstantPool2, CssSelector as CssSelector4, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry as DomElementSchemaRegistry3, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, outputAst as o4, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher3, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
-import ts47 from "typescript";
+import ts48 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
 import ts15 from "typescript";
@@ -6836,6 +6836,42 @@ function extractTemplate(node, template, evaluator, depTracker, resourceLoader, 
       declaration: template
     };
   }
+}
+function createEmptyTemplate(componentClass, component, containingFile) {
+  const templateUrl = component.get("templateUrl");
+  const template = component.get("template");
+  return {
+    content: "",
+    diagNodes: [],
+    nodes: [],
+    errors: null,
+    styles: [],
+    styleUrls: [],
+    ngContentSelectors: [],
+    file: new ParseSourceFile2("", ""),
+    sourceMapping: templateUrl ? { type: "direct", node: template } : {
+      type: "external",
+      componentClass,
+      node: templateUrl,
+      template: "",
+      templateUrl: "missing.ng.html"
+    },
+    declaration: templateUrl ? {
+      isInline: false,
+      interpolationConfig: InterpolationConfig.fromArray(null),
+      preserveWhitespaces: false,
+      templateUrlExpression: templateUrl,
+      templateUrl: "missing.ng.html",
+      resolvedTemplateUrl: "/missing.ng.html"
+    } : {
+      isInline: true,
+      interpolationConfig: InterpolationConfig.fromArray(null),
+      preserveWhitespaces: false,
+      expression: template,
+      templateUrl: containingFile,
+      resolvedTemplateUrl: containingFile
+    }
+  };
 }
 function parseExtractedTemplate(template, sourceStr, sourceParseRange, escapedString, sourceMapUrl, options) {
   const i18nNormalizeLineEndingsInICUs = escapedString || options.i18nNormalizeLineEndingsInICUs;
@@ -10166,6 +10202,9 @@ var AstTranslator = class {
   visitTaggedTemplateLiteral(ast) {
     return ts40.factory.createTaggedTemplateExpression(this.translate(ast.tag), void 0, this.visitTemplateLiteral(ast.template));
   }
+  visitParenthesizedExpression(ast) {
+    return ts40.factory.createParenthesizedExpression(this.translate(ast.expression));
+  }
   convertToSafeCall(ast, expr, args) {
     if (this.config.strictSafeNavigationTypes) {
       const call = ts40.factory.createCallExpression(ts40.factory.createNonNullExpression(expr), void 0, args);
@@ -10259,6 +10298,9 @@ var _VeSafeLhsInferenceBugDetector = class {
   }
   visitTaggedTemplateLiteral(ast, context) {
     return false;
+  }
+  visitParenthesizedExpression(ast, context) {
+    return ast.expression.visit(this);
   }
 };
 var VeSafeLhsInferenceBugDetector = _VeSafeLhsInferenceBugDetector;
@@ -13690,7 +13732,7 @@ function extractHmrDependencies(node, definition, factory, deferBlockMetadata, c
   var _a, _b;
   const name = ts45.isClassDeclaration(node) && node.name ? node.name.text : null;
   const visitor = new PotentialTopLevelReadsVisitor();
-  const sourceFile = node.getSourceFile();
+  const sourceFile = ts45.getOriginalNode(node).getSourceFile();
   definition.expression.visitExpression(visitor, null);
   definition.statements.forEach((statement) => statement.visitStatement(visitor, null));
   (_a = factory.initializer) == null ? void 0 : _a.visitExpression(visitor, null);
@@ -13896,11 +13938,12 @@ function isConstEnumReference(node, reflection) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/hmr/src/metadata.mjs
+import ts46 from "typescript";
 function extractHmrMetatadata(clazz, reflection, evaluator, compilerHost, rootDirs, definition, factory, deferBlockMetadata, classMetadata, debugInfo) {
   if (!reflection.isClass(clazz)) {
     return null;
   }
-  const sourceFile = clazz.getSourceFile();
+  const sourceFile = ts46.getOriginalNode(clazz).getSourceFile();
   const filePath = getProjectRelativePath(sourceFile.fileName, rootDirs, compilerHost) || compilerHost.getCanonicalFileName(sourceFile.fileName);
   const dependencies = extractHmrDependencies(clazz, definition, factory, deferBlockMetadata, classMetadata, debugInfo, reflection, evaluator);
   if (dependencies === null) {
@@ -13918,8 +13961,8 @@ function extractHmrMetatadata(clazz, reflection, evaluator, compilerHost, rootDi
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/hmr/src/update_declaration.mjs
 import { compileHmrUpdateCallback } from "@angular/compiler";
-import ts46 from "typescript";
-function getHmrUpdateDeclaration(compilationResults, constantStatements, meta, sourceFile) {
+import ts47 from "typescript";
+function getHmrUpdateDeclaration(compilationResults, constantStatements, meta, declaration) {
   const namespaceSpecifiers = meta.namespaceDependencies.reduce((result, current) => {
     result.set(current.moduleName, current.assignedName);
     return result;
@@ -13930,10 +13973,11 @@ function getHmrUpdateDeclaration(compilationResults, constantStatements, meta, s
     rewriter: importRewriter
   });
   const callback = compileHmrUpdateCallback(compilationResults, constantStatements, meta);
+  const sourceFile = ts47.getOriginalNode(declaration).getSourceFile();
   const node = translateStatement(sourceFile, callback, importManager);
-  return ts46.factory.updateFunctionDeclaration(node, [
-    ts46.factory.createToken(ts46.SyntaxKind.ExportKeyword),
-    ts46.factory.createToken(ts46.SyntaxKind.DefaultKeyword)
+  return ts47.factory.updateFunctionDeclaration(node, [
+    ts47.factory.createToken(ts47.SyntaxKind.ExportKeyword),
+    ts47.factory.createToken(ts47.SyntaxKind.DefaultKeyword)
   ], node.asteriskToken, node.name, node.typeParameters, node.parameters, node.type, node.body);
 }
 var HmrModuleImportRewriter = class {
@@ -14253,31 +14297,42 @@ var ComponentDecoratorHandler = class {
       this.preanalyzeTemplateCache.delete(node);
       template = preanalyzed;
     } else {
-      const templateDecl = parseTemplateDeclaration(node, decorator, component, containingFile, this.evaluator, this.depTracker, this.resourceLoader, this.defaultPreserveWhitespaces);
-      template = extractTemplate(node, templateDecl, this.evaluator, this.depTracker, this.resourceLoader, {
-        enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
-        i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
-        usePoisonedData: this.usePoisonedData,
-        enableBlockSyntax: this.enableBlockSyntax,
-        enableLetSyntax: this.enableLetSyntax,
-        preserveSignificantWhitespace: this.i18nPreserveSignificantWhitespace
-      }, this.compilationMode);
-      if (this.compilationMode === CompilationMode.LOCAL && template.errors && template.errors.length > 0) {
-        if (diagnostics === void 0) {
-          diagnostics = [];
+      try {
+        const templateDecl = parseTemplateDeclaration(node, decorator, component, containingFile, this.evaluator, this.depTracker, this.resourceLoader, this.defaultPreserveWhitespaces);
+        template = extractTemplate(node, templateDecl, this.evaluator, this.depTracker, this.resourceLoader, {
+          enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
+          i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
+          usePoisonedData: this.usePoisonedData,
+          enableBlockSyntax: this.enableBlockSyntax,
+          enableLetSyntax: this.enableLetSyntax,
+          preserveSignificantWhitespace: this.i18nPreserveSignificantWhitespace
+        }, this.compilationMode);
+        if (this.compilationMode === CompilationMode.LOCAL && template.errors && template.errors.length > 0) {
+          if (diagnostics === void 0) {
+            diagnostics = [];
+          }
+          diagnostics.push(...getTemplateDiagnostics(
+            template.errors,
+            "",
+            template.sourceMapping
+          ));
         }
-        diagnostics.push(...getTemplateDiagnostics(
-          template.errors,
-          "",
-          template.sourceMapping
-        ));
+      } catch (e) {
+        if (e instanceof FatalDiagnosticError) {
+          diagnostics != null ? diagnostics : diagnostics = [];
+          diagnostics.push(e.toDiagnostic());
+          isPoisoned = true;
+          template = createEmptyTemplate(node, component, containingFile);
+        } else {
+          throw e;
+        }
       }
     }
     const templateResource = template.declaration.isInline ? { path: null, expression: component.get("template") } : {
       path: absoluteFrom(template.declaration.resolvedTemplateUrl),
       expression: template.sourceMapping.node
     };
-    const relativeTemplatePath = getProjectRelativePath((_d = templateResource.path) != null ? _d : ts47.getOriginalNode(node).getSourceFile().fileName, this.rootDirs, this.compilerHost);
+    const relativeTemplatePath = getProjectRelativePath((_d = templateResource.path) != null ? _d : ts48.getOriginalNode(node).getSourceFile().fileName, this.rootDirs, this.compilerHost);
     let styles = [];
     const externalStyles = [];
     const styleResources = extractInlineStyleResources(component);
@@ -14292,7 +14347,7 @@ var ComponentDecoratorHandler = class {
           externalStyles.push(resourceUrl);
           continue;
         }
-        if (styleUrl.source === 2 && ts47.isStringLiteralLike(styleUrl.expression)) {
+        if (styleUrl.source === 2 && ts48.isStringLiteralLike(styleUrl.expression)) {
           styleResources.add({
             path: absoluteFrom(resourceUrl),
             expression: styleUrl.expression
@@ -14495,7 +14550,7 @@ var ComponentDecoratorHandler = class {
   }
   typeCheck(ctx, node, meta) {
     var _a;
-    if (this.typeCheckScopeRegistry === null || !ts47.isClassDeclaration(node)) {
+    if (this.typeCheckScopeRegistry === null || !ts48.isClassDeclaration(node)) {
       return;
     }
     if (meta.isPoisoned && !this.usePoisonedData) {
@@ -14894,7 +14949,7 @@ var ComponentDecoratorHandler = class {
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
     const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.evaluator, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, debugInfo) : null;
     const res = compileResults(fac, def, classMetadata, "\u0275cmp", null, null, debugInfo, null);
-    return hmrMeta === null || res.length === 0 ? null : getHmrUpdateDeclaration(res, pool.statements, hmrMeta, node.getSourceFile());
+    return hmrMeta === null || res.length === 0 ? null : getHmrUpdateDeclaration(res, pool.statements, hmrMeta, node);
   }
   locateDeferBlocksWithoutScope(template) {
     const deferBlocks = /* @__PURE__ */ new Map();
@@ -14929,12 +14984,12 @@ var ComponentDecoratorHandler = class {
   }
   collectExplicitlyDeferredSymbols(rawDeferredImports) {
     const deferredTypes = /* @__PURE__ */ new Map();
-    if (!ts47.isArrayLiteralExpression(rawDeferredImports)) {
+    if (!ts48.isArrayLiteralExpression(rawDeferredImports)) {
       return deferredTypes;
     }
     for (const element of rawDeferredImports.elements) {
       const node = tryUnwrapForwardRef(element, this.reflector) || element;
-      if (!ts47.isIdentifier(node)) {
+      if (!ts48.isIdentifier(node)) {
         continue;
       }
       const imp = this.reflector.getImportOfIdentifier(node);
@@ -15001,12 +15056,12 @@ var ComponentDecoratorHandler = class {
     }
   }
   registerDeferrableCandidates(componentClassDecl, importsExpr, isDeferredImport, allDeferredDecls, eagerlyUsedDecls, resolutionData) {
-    if (!ts47.isArrayLiteralExpression(importsExpr)) {
+    if (!ts48.isArrayLiteralExpression(importsExpr)) {
       return;
     }
     for (const element of importsExpr.elements) {
       const node = tryUnwrapForwardRef(element, this.reflector) || element;
-      if (!ts47.isIdentifier(node)) {
+      if (!ts48.isIdentifier(node)) {
         continue;
       }
       const imp = this.reflector.getImportOfIdentifier(node);
@@ -15140,7 +15195,7 @@ function isDefaultImport(node) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/injectable.mjs
 import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr10 } from "@angular/compiler";
-import ts48 from "typescript";
+import ts49 from "typescript";
 var InjectableDecoratorHandler = class {
   reflector;
   evaluator;
@@ -15269,7 +15324,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     };
   } else if (decorator.args.length === 1) {
     const metaNode = decorator.args[0];
-    if (!ts48.isObjectLiteralExpression(metaNode)) {
+    if (!ts49.isObjectLiteralExpression(metaNode)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, `@Injectable argument must be an object literal`);
     }
     const meta = reflectObjectLiteral(metaNode);
@@ -15277,7 +15332,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     let deps = void 0;
     if ((meta.has("useClass") || meta.has("useFactory")) && meta.has("deps")) {
       const depsExpr = meta.get("deps");
-      if (!ts48.isArrayLiteralExpression(depsExpr)) {
+      if (!ts49.isArrayLiteralExpression(depsExpr)) {
         throw new FatalDiagnosticError(ErrorCode.VALUE_NOT_LITERAL, depsExpr, `@Injectable deps metadata must be an inline array`);
       }
       deps = depsExpr.elements.map((dep) => getDep(dep, reflector));
@@ -15362,12 +15417,12 @@ function getDep(dep, reflector) {
     }
     return true;
   }
-  if (ts48.isArrayLiteralExpression(dep)) {
+  if (ts49.isArrayLiteralExpression(dep)) {
     dep.elements.forEach((el) => {
       let isDecorator = false;
-      if (ts48.isIdentifier(el)) {
+      if (ts49.isIdentifier(el)) {
         isDecorator = maybeUpdateDecorator(el, reflector);
-      } else if (ts48.isNewExpression(el) && ts48.isIdentifier(el.expression)) {
+      } else if (ts49.isNewExpression(el) && ts49.isIdentifier(el.expression)) {
         const token = el.arguments && el.arguments.length > 0 && el.arguments[0] || void 0;
         isDecorator = maybeUpdateDecorator(el.expression, reflector, token);
       }
@@ -15381,7 +15436,7 @@ function getDep(dep, reflector) {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/src/pipe.mjs
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5 } from "@angular/compiler";
-import ts49 from "typescript";
+import ts50 from "typescript";
 var PipeSymbol = class extends SemanticSymbol {
   name;
   constructor(decl, name) {
@@ -15454,7 +15509,7 @@ var PipeDecoratorHandler = class {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, "@Pipe must have exactly one argument");
     }
     const meta = unwrapExpression(decorator.args[0]);
-    if (!ts49.isObjectLiteralExpression(meta)) {
+    if (!ts50.isObjectLiteralExpression(meta)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
     }
     const pipe = reflectObjectLiteral(meta);
@@ -15627,4 +15682,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PM64MB27.js.map
+//# sourceMappingURL=chunk-XQN5ZVOJ.js.map

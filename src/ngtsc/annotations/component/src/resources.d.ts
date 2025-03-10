@@ -104,6 +104,7 @@ export interface ExtractTemplateOptions {
     preserveSignificantWhitespace?: boolean;
 }
 export declare function extractTemplate(node: ClassDeclaration, template: TemplateDeclaration, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, options: ExtractTemplateOptions, compilationMode: CompilationMode): ParsedTemplateWithSource;
+export declare function createEmptyTemplate(componentClass: ClassDeclaration, component: Map<string, ts.Expression>, containingFile: string): ParsedTemplateWithSource;
 export declare function parseTemplateDeclaration(node: ClassDeclaration, decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, defaultPreserveWhitespaces: boolean): TemplateDeclaration;
 export declare function preloadAndParseTemplate(evaluator: PartialEvaluator, resourceLoader: ResourceLoader, depTracker: DependencyTracker | null, preanalyzeTemplateCache: Map<DeclarationNode, ParsedTemplateWithSource>, node: ClassDeclaration, decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, defaultPreserveWhitespaces: boolean, options: ExtractTemplateOptions, compilationMode: CompilationMode): Promise<ParsedTemplateWithSource | null>;
 export declare function makeResourceNotFoundError(file: string, nodeForError: ts.Node, resourceType: ResourceTypeForDiagnostics): FatalDiagnosticError;
