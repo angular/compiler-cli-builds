@@ -280,7 +280,7 @@ var FunctionExtractor = class {
     ) : "unknown";
     const implementation = (_a = findImplementationOfFunction(this.exportDeclaration, this.typeChecker)) != null ? _a : this.exportDeclaration;
     const type = this.typeChecker.getTypeAtLocation(this.exportDeclaration);
-    const overloads = extractCallSignatures(this.name, this.typeChecker, type);
+    const overloads = ts4.isConstructorDeclaration(this.exportDeclaration) ? constructorOverloads(this.exportDeclaration, this.typeChecker) : extractCallSignatures(this.name, this.typeChecker, type);
     const jsdocsTags = extractJsDocTags(implementation);
     const description = extractJsDocDescription(implementation);
     return {
@@ -305,6 +305,26 @@ var FunctionExtractor = class {
     };
   }
 };
+function constructorOverloads(constructorDeclaration, typeChecker) {
+  const classDeclaration = constructorDeclaration.parent;
+  const constructorNode = classDeclaration.members.filter((member) => {
+    return ts4.isConstructorDeclaration(member) && !member.body;
+  });
+  return constructorNode.map((n) => {
+    var _a;
+    return {
+      name: "constructor",
+      params: extractAllParams(n.parameters, typeChecker),
+      returnType: (_a = typeChecker.getTypeAtLocation(classDeclaration)) == null ? void 0 : _a.symbol.name,
+      description: extractJsDocDescription(n),
+      entryType: EntryType.Function,
+      jsdocTags: extractJsDocTags(n),
+      rawComment: extractRawJsDoc(n),
+      generics: extractGenerics(n),
+      isNewType: false
+    };
+  });
+}
 function extractAllParams(params, typeChecker) {
   return params.map((param) => ({
     name: param.name.getText(),
@@ -318,7 +338,7 @@ function filterSignatureDeclarations(signatures) {
   const result = [];
   for (const signature of signatures) {
     const decl = signature.getDeclaration();
-    if (ts4.isFunctionDeclaration(decl) || ts4.isCallSignatureDeclaration(decl) || ts4.isMethodDeclaration(decl)) {
+    if (ts4.isFunctionDeclaration(decl) || ts4.isCallSignatureDeclaration(decl) || ts4.isMethodDeclaration(decl) || ts4.isConstructSignatureDeclaration(decl)) {
       result.push({ signature, decl });
     }
   }
@@ -411,6 +431,8 @@ var ClassExtractor = class {
       return this.extractClassProperty(memberDeclaration);
     } else if (ts6.isAccessor(memberDeclaration)) {
       return this.extractGetterSetter(memberDeclaration);
+    } else if (ts6.isConstructorDeclaration(memberDeclaration)) {
+      return this.extractConstructor(memberDeclaration);
     }
     return void 0;
   }
@@ -447,6 +469,14 @@ var ClassExtractor = class {
     return {
       ...this.extractClassProperty(accessor),
       memberType: ts6.isGetAccessor(accessor) ? MemberType.Getter : MemberType.Setter
+    };
+  }
+  extractConstructor(constructorDeclaration) {
+    const functionExtractor = new FunctionExtractor("constructor", constructorDeclaration, this.typeChecker);
+    return {
+      ...functionExtractor.extract(),
+      memberType: MemberType.Method,
+      memberTags: this.getMemberTags(constructorDeclaration)
     };
   }
   extractInheritance(declaration) {
@@ -493,14 +523,15 @@ var ClassExtractor = class {
     return result;
   }
   getMemberDeclarations() {
-    var _a;
+    var _a, _b, _c;
     const type = this.typeChecker.getTypeAtLocation(this.declaration);
     const members = type.getProperties();
+    const constructor = (_b = (_a = type.getSymbol()) == null ? void 0 : _a.members) == null ? void 0 : _b.get(ts6.InternalSymbolName.Constructor);
     const typeOfConstructor = this.typeChecker.getTypeOfSymbol(type.symbol);
     const staticMembers = typeOfConstructor.getProperties();
     const result = [];
-    for (const member of [...members, ...staticMembers]) {
-      const memberDeclarations = this.filterMethodOverloads((_a = member.getDeclarations()) != null ? _a : []);
+    for (const member of [...constructor ? [constructor] : [], ...members, ...staticMembers]) {
+      const memberDeclarations = this.filterMethodOverloads((_c = member.getDeclarations()) != null ? _c : []);
       for (const memberDeclaration of memberDeclarations) {
         if (this.isDocumentableMember(memberDeclaration)) {
           result.push(memberDeclaration);
@@ -512,10 +543,10 @@ var ClassExtractor = class {
   filterMethodOverloads(declarations) {
     return declarations.filter((declaration, index) => {
       var _a;
-      if (ts6.isFunctionDeclaration(declaration) || ts6.isMethodDeclaration(declaration)) {
+      if (ts6.isFunctionDeclaration(declaration) || ts6.isMethodDeclaration(declaration) || ts6.isConstructorDeclaration(declaration)) {
         const nextDeclaration = declarations[index + 1];
-        const isNextAbstractMethodWithSameName = nextDeclaration && ts6.isMethodDeclaration(nextDeclaration) && nextDeclaration.name.getText() === ((_a = declaration.name) == null ? void 0 : _a.getText());
-        return !isNextAbstractMethodWithSameName;
+        const isNextMethodWithSameName = nextDeclaration && (ts6.isMethodDeclaration(nextDeclaration) && nextDeclaration.name.getText() === ((_a = declaration.name) == null ? void 0 : _a.getText()) || ts6.isConstructorDeclaration(nextDeclaration) && ts6.isConstructorDeclaration(declaration));
+        return !isNextMethodWithSameName;
       }
       return true;
     });
@@ -545,10 +576,13 @@ var ClassExtractor = class {
   }
   isMemberExcluded(member) {
     var _a;
+    if (ts6.isConstructorDeclaration(member)) {
+      return false;
+    }
     return !member.name || !this.isDocumentableMember(member) || !ts6.isCallSignatureDeclaration(member) && ((_a = member.modifiers) == null ? void 0 : _a.some((mod) => mod.kind === ts6.SyntaxKind.PrivateKeyword)) || member.name.getText() === "prototype" || isAngularPrivateName(member.name.getText()) || isInternal(member);
   }
   isDocumentableMember(member) {
-    return this.isMethod(member) || this.isProperty(member) || ts6.isAccessor(member) || ts6.isCallSignatureDeclaration(member);
+    return this.isMethod(member) || this.isProperty(member) || ts6.isAccessor(member) || ts6.isConstructorDeclaration(member) || ts6.isCallSignatureDeclaration(member);
   }
   isPublicConstructorParameterProperty(node) {
     if (ts6.isParameterPropertyDeclaration(node, node.parent) && node.modifiers) {
@@ -5059,4 +5093,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VWANCOAW.js.map
+//# sourceMappingURL=chunk-FM3AZHGE.js.map
