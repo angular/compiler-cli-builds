@@ -103,8 +103,9 @@ function toR3Reference(origin, ref, context, refEmitter) {
 function isAngularCore(decorator) {
   return decorator.import !== null && decorator.import.from === CORE_MODULE;
 }
-function isAngularCoreReference(reference, symbolName, isCore) {
-  return (reference.ownedByModuleGuess === CORE_MODULE || isCore) && reference.debugName === symbolName;
+function isAngularCoreReferenceWithPotentialAliasing(reference, symbolName, isCore) {
+  var _a;
+  return (reference.ownedByModuleGuess === CORE_MODULE || isCore) && ((_a = reference.debugName) == null ? void 0 : _a.replace(/\$\d+$/, "")) === symbolName;
 }
 function findAngularDecorator(decorators, name, isCore) {
   return decorators.find((decorator) => isAngularDecorator(decorator, name, isCore));
@@ -173,7 +174,7 @@ function tryUnwrapForwardRef(node, reflector) {
 }
 function createForwardRefResolver(isCore) {
   return (fn, callExpr, resolve, unresolvable) => {
-    if (!isAngularCoreReference(fn, "forwardRef", isCore) || callExpr.arguments.length !== 1) {
+    if (!isAngularCoreReferenceWithPotentialAliasing(fn, "forwardRef", isCore) || callExpr.arguments.length !== 1) {
       return unresolvable;
     }
     const expanded = expandForwardRef(callExpr.arguments[0]);
@@ -3522,7 +3523,7 @@ function resolveEnumValue(evaluator, metadata, field, enumSymbolName, isCore) {
   if (metadata.has(field)) {
     const expr = metadata.get(field);
     const value = evaluator.evaluate(expr);
-    if (value instanceof EnumValue && isAngularCoreReference(value.enumRef, enumSymbolName, isCore)) {
+    if (value instanceof EnumValue && isAngularCoreReferenceWithPotentialAliasing(value.enumRef, enumSymbolName, isCore)) {
       resolved = value.resolved;
     } else {
       throw createValueHasWrongTypeError(expr, value, `${field} must be a member of ${enumSymbolName} enum from @angular/core`);
@@ -15613,4 +15614,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-GUE4SS2Y.js.map
+//# sourceMappingURL=chunk-RPCYQIAM.js.map
