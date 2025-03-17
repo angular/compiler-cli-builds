@@ -10,19 +10,6 @@ import ts from 'typescript';
 import { TypeCheckId, SourceMapping } from '../api';
 import { TypeCheckSourceResolver } from './tcb_util';
 /**
- * Represents the source of a template that was processed during type-checking. This information is
- * used when translating parse offsets in diagnostics back to their original line/column location.
- */
-export declare class TemplateSource {
-    readonly mapping: SourceMapping;
-    private file;
-    private lineStarts;
-    constructor(mapping: SourceMapping, file: ParseSourceFile);
-    toParseSourceSpan(start: number, end: number): ParseSourceSpan;
-    private toParseLocation;
-    private acquireLineStarts;
-}
-/**
  * Assigns IDs for type checking and keeps track of their origins.
  *
  * Implements `TypeCheckSourceResolver` to resolve the source of a template based on these IDs.
@@ -34,8 +21,13 @@ export declare class DirectiveSourceManager implements TypeCheckSourceResolver {
      * diagnostics produced for TCB code to their source location in the template.
      */
     private templateSources;
+    /** Keeps track of type check IDs and the source location of their host bindings. */
+    private hostBindingSources;
     getTypeCheckId(node: ts.ClassDeclaration): TypeCheckId;
     captureTemplateSource(id: TypeCheckId, mapping: SourceMapping, file: ParseSourceFile): void;
+    captureHostBindingsMapping(id: TypeCheckId, mapping: SourceMapping, file: ParseSourceFile): void;
     getTemplateSourceMapping(id: TypeCheckId): SourceMapping;
+    getHostBindingsMapping(id: TypeCheckId): SourceMapping;
     toTemplateParseSourceSpan(id: TypeCheckId, span: AbsoluteSourceSpan): ParseSourceSpan | null;
+    toHostParseSourceSpan(id: TypeCheckId, span: AbsoluteSourceSpan): ParseSourceSpan | null;
 }

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstForLoopBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
+import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstForLoopBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable, TmplAstHostElement } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { PipeMeta } from '../../metadata';
@@ -65,7 +65,7 @@ export declare enum TcbGenericContextBehavior {
  */
 export declare function generateTypeCheckBlock(env: Environment, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, name: ts.Identifier, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): ts.FunctionDeclaration;
 /** Types that can referenced locally in a template. */
-type LocalSymbol = TmplAstElement | TmplAstTemplate | TmplAstVariable | TmplAstLetDeclaration | TmplAstReference;
+type LocalSymbol = TmplAstElement | TmplAstTemplate | TmplAstVariable | TmplAstLetDeclaration | TmplAstReference | TmplAstHostElement;
 /**
  * A code generation operation that's involved in the construction of a Type Check Block.
  *
@@ -180,6 +180,10 @@ declare class Scope {
      */
     private elementOpMap;
     /**
+     * A map of `TmplAstHostElement`s to the index of their `TcbHostElementOp` in the `opQueue`
+     */
+    private hostElementOpMap;
+    /**
      * A map of maps which tracks the index of `TcbDirectiveCtorOp`s in the `opQueue` for each
      * directive on a `TmplAstElement` or `TmplAstTemplate` node.
      */
@@ -227,7 +231,7 @@ declare class Scope {
      * @param children Child nodes that should be appended to the TCB.
      * @param guard an expression that is applied to this scope for type narrowing purposes.
      */
-    static forNodes(tcb: Context, parentScope: Scope | null, scopedNode: TmplAstTemplate | TmplAstIfBlockBranch | TmplAstForLoopBlock | null, children: TmplAstNode[], guard: ts.Expression | null): Scope;
+    static forNodes(tcb: Context, parentScope: Scope | null, scopedNode: TmplAstTemplate | TmplAstIfBlockBranch | TmplAstForLoopBlock | TmplAstHostElement | null, children: TmplAstNode[] | null, guard: ts.Expression | null): Scope;
     /** Registers a local variable with a scope. */
     private static registerVariable;
     /**

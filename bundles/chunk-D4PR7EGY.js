@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-PAYJFU4V.js";
+} from "./chunk-HLDGT2P2.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-CD575TJ6.js";
+} from "./chunk-C3QJC7HI.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -3815,7 +3815,8 @@ var NgCompiler = class {
     const { resourceRegistry } = this.ensureAnalyzed();
     const styles = resourceRegistry.getStyles(classDecl);
     const template = resourceRegistry.getTemplate(classDecl);
-    return { styles, template };
+    const hostBindings = resourceRegistry.getHostBindings(classDecl);
+    return { styles, template, hostBindings };
   }
   getMeta(classDecl) {
     var _a;
@@ -4135,7 +4136,7 @@ var NgCompiler = class {
     return diagnostics;
   }
   makeCompilation() {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b, _c, _d, _e, _f, _g, _h;
     const isCore = (_a = this.options._isAngularCoreCompilation) != null ? _a : isAngularCorePackage(this.inputProgram);
     let compilationMode = CompilationMode.FULL;
     if (!isCore) {
@@ -4220,6 +4221,7 @@ var NgCompiler = class {
     const supportJitMode = (_c = this.options["supportJitMode"]) != null ? _c : true;
     const supportTestBed = (_d = this.options["supportTestBed"]) != null ? _d : true;
     const externalRuntimeStyles = (_e = this.options["externalRuntimeStyles"]) != null ? _e : false;
+    const typeCheckHostBindings = (_f = this.options.typeCheckHostBindings) != null ? _f : false;
     if (supportTestBed === false && compilationMode === CompilationMode.PARTIAL) {
       throw new Error('TestBed support ("supportTestBed" option) cannot be disabled in partial compilation mode.');
     }
@@ -4231,11 +4233,11 @@ var NgCompiler = class {
     }
     const jitDeclarationRegistry = new JitDeclarationRegistry();
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, this.adapter, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, this.enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, (_f = this.options.i18nPreserveWhitespaceForLegacyExtraction) != null ? _f : true, !!this.options.strictStandalone, this.enableHmr, this.implicitStandaloneValue),
-      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, importTracker, supportTestBed, compilationMode, jitDeclarationRegistry, !!this.options.strictStandalone, this.implicitStandaloneValue),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, this.adapter, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, this.enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, (_g = this.options.i18nPreserveWhitespaceForLegacyExtraction) != null ? _g : true, !!this.options.strictStandalone, this.enableHmr, this.implicitStandaloneValue, typeCheckHostBindings),
+      new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, importTracker, supportTestBed, typeCheckScopeRegistry, compilationMode, jitDeclarationRegistry, resourceRegistry, !!this.options.strictStandalone, this.implicitStandaloneValue, this.usePoisonedData, typeCheckHostBindings),
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode, !!this.options.generateExtraImportsInLocalMode, !!this.options.strictStandalone, this.implicitStandaloneValue),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
-      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_g = this.options.onlyPublishPublicTypingsForNgModules) != null ? _g : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode, localCompilationExtraImportsTracker, jitDeclarationRegistry)
+      new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, (_h = this.options.onlyPublishPublicTypingsForNgModules) != null ? _h : false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode, localCompilationExtraImportsTracker, jitDeclarationRegistry)
     ];
     const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
@@ -5093,4 +5095,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-RFDMMGNB.js.map
+//# sourceMappingURL=chunk-D4PR7EGY.js.map

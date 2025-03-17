@@ -317,7 +317,7 @@ export type SourceMapping = DirectSourceMapping | IndirectSourceMapping | Extern
  */
 export interface DirectSourceMapping {
     type: 'direct';
-    node: ts.Expression;
+    node: ts.Node;
 }
 /**
  * A mapping to a node which is still in a TS file, but where the positions in any

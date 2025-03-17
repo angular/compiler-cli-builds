@@ -5,14 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { BoundTarget, ParseError, R3TargetBinder, SchemaMetadata, TmplAstNode } from '@angular/compiler';
+import { BoundTarget, ParseError, R3TargetBinder, SchemaMetadata, TmplAstHostElement, TmplAstNode } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { PerfRecorder } from '../../perf';
 import { FileUpdate } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { TemplateDiagnostic, TypeCheckId, SourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata, TemplateContext } from '../api';
+import { HostBindingsContext, TemplateDiagnostic, TypeCheckId, SourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata, TemplateContext } from '../api';
 import { DomSchemaChecker } from './dom';
 import { OutOfBandDiagnosticRecorder } from './oob';
 import { DirectiveSourceManager } from './source';
@@ -55,6 +55,10 @@ export interface TypeCheckData {
      * Errors found while parsing the template, which have been converted to diagnostics.
      */
     templateParsingDiagnostics: TemplateDiagnostic[];
+    /**
+     * Element representing the host bindings of a directive.
+     */
+    hostElement: TmplAstHostElement | null;
 }
 /**
  * Data for an input file which is still in the process of template type-checking code generation.
@@ -165,7 +169,7 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
      *
      * Implements `TypeCheckContext.addTemplate`.
      */
-    addDirective(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, schemas: SchemaMetadata[], templateContext: TemplateContext | null, isStandalone: boolean): void;
+    addDirective(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, schemas: SchemaMetadata[], templateContext: TemplateContext | null, hostBindingContext: HostBindingsContext | null, isStandalone: boolean): void;
     /**
      * Record a type constructor for the given `node` with the given `ctorMetadata`.
      */

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { ParseError, ParseSourceFile, R3TargetBinder, SchemaMetadata, TmplAstNode } from '@angular/compiler';
+import { ParseError, ParseSourceFile, R3TargetBinder, SchemaMetadata, TmplAstHostElement, TmplAstNode } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { PipeMeta } from '../../metadata';
@@ -26,6 +26,13 @@ export interface TemplateContext {
     /** Whether the template preserves whitespaces. */
     preserveWhitespaces: boolean;
 }
+/** Contextual data for type checking the host bindings of a directive. */
+export interface HostBindingsContext {
+    /** AST node representing the host element of the directive. */
+    node: TmplAstHostElement;
+    /** Describes the source of the host bindings. Used for mapping errors back. */
+    sourceMapping: SourceMapping;
+}
 /**
  * A currently pending type checking operation, into which templates for type-checking can be
  * registered.
@@ -44,9 +51,11 @@ export interface TypeCheckContext {
      * @param schemas Schemas that will apply when checking the directive.
      * @param templateContext Contextual information necessary for checking the template.
      * Only relevant for component classes.
+     * @param hostBindingContext Contextual information necessary for checking the host bindings of
+     * a directive.
      * @param isStandalone a boolean indicating whether the directive is standalone.
      */
-    addDirective(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, schemas: SchemaMetadata[], templateContext: TemplateContext | null, isStandalone: boolean): void;
+    addDirective(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, binder: R3TargetBinder<TypeCheckableDirectiveMeta>, schemas: SchemaMetadata[], templateContext: TemplateContext | null, hostBindingContext: HostBindingsContext | null, isStandalone: boolean): void;
 }
 /**
  * Interface to trigger generation of type-checking code for a program given a new
