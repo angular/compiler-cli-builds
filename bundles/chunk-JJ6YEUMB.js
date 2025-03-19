@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-HLDGT2P2.js";
+} from "./chunk-SHCKVXZY.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-C3QJC7HI.js";
+} from "./chunk-ULX27OOU.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -87,7 +87,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-7HRFJETP.js";
+} from "./chunk-6WY2A2XX.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -2982,13 +2982,39 @@ var factory6 = {
   }
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/skip_hydration_not_static/index.mjs
+import { TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstTextAttribute } from "@angular/compiler";
+var NG_SKIP_HYDRATION_ATTR_NAME = "ngSkipHydration";
+var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
+  code = ErrorCode.SKIP_HYDRATION_NOT_STATIC;
+  visitNode(ctx, component, node) {
+    if (node instanceof TmplAstBoundAttribute2 && node.name === NG_SKIP_HYDRATION_ATTR_NAME) {
+      const errorString = `ngSkipHydration should not be used as a binding.`;
+      const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
+      return [diagnostic];
+    }
+    const acceptedValues = ["true", ""];
+    if (node instanceof TmplAstTextAttribute && node.name === NG_SKIP_HYDRATION_ATTR_NAME && !acceptedValues.includes(node.value) && node.value !== void 0) {
+      const errorString = `ngSkipHydration only accepts "true" or "" as value or no value at all. For example 'ngSkipHydration="true"' or 'ngSkipHydration'`;
+      const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
+      return [diagnostic];
+    }
+    return [];
+  }
+};
+var factory7 = {
+  code: ErrorCode.SKIP_HYDRATION_NOT_STATIC,
+  name: ExtendedTemplateDiagnosticName.SKIP_HYDRATION_NOT_STATIC,
+  create: () => new NgSkipHydrationSpec()
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/suffix_not_supported/index.mjs
-import { TmplAstBoundAttribute as TmplAstBoundAttribute2 } from "@angular/compiler";
+import { TmplAstBoundAttribute as TmplAstBoundAttribute3 } from "@angular/compiler";
 var STYLE_SUFFIXES = ["px", "%", "em"];
 var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.SUFFIX_NOT_SUPPORTED;
   visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstBoundAttribute2))
+    if (!(node instanceof TmplAstBoundAttribute3))
       return [];
     if (!node.keySpan.toString().startsWith("attr.") || !STYLE_SUFFIXES.some((suffix) => node.name.endsWith(`.${suffix}`))) {
       return [];
@@ -2997,18 +3023,18 @@ var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory7 = {
+var factory8 = {
   code: ErrorCode.SUFFIX_NOT_SUPPORTED,
   name: ExtendedTemplateDiagnosticName.SUFFIX_NOT_SUPPORTED,
   create: () => new SuffixNotSupportedCheck()
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/text_attribute_not_binding/index.mjs
-import { TmplAstTextAttribute } from "@angular/compiler";
+import { TmplAstTextAttribute as TmplAstTextAttribute2 } from "@angular/compiler";
 var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING;
   visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstTextAttribute))
+    if (!(node instanceof TmplAstTextAttribute2))
       return [];
     const name = node.name;
     if (!name.startsWith("attr.") && !name.startsWith("style.") && !name.startsWith("class.")) {
@@ -3033,7 +3059,7 @@ var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory8 = {
+var factory9 = {
   code: ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING,
   name: ExtendedTemplateDiagnosticName.TEXT_ATTRIBUTE_NOT_BINDING,
   create: () => new TextAttributeNotBindingSpec()
@@ -3082,10 +3108,40 @@ function assertExpressionInvoked(expression, component, node, expressionText, ct
 function generateStringFromExpression(expression, source) {
   return source.substring(expression.span.start, expression.span.end);
 }
-var factory9 = {
+var factory10 = {
   code: ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING,
   name: ExtendedTemplateDiagnosticName.UNINVOKED_FUNCTION_IN_EVENT_BINDING,
   create: () => new UninvokedFunctionInEventBindingSpec()
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unparenthesized_nullish_coalescing/index.mjs
+import { Binary as Binary2 } from "@angular/compiler";
+var UnparenthesizedNullishCoalescing = class extends TemplateCheckWithVisitor {
+  code = ErrorCode.UNPARENTHESIZED_NULLISH_COALESCING;
+  visitNode(ctx, component, node) {
+    if (node instanceof Binary2) {
+      if (node.operation === "&&" || node.operation === "||") {
+        if (node.left instanceof Binary2 && node.left.operation === "??" || node.right instanceof Binary2 && node.right.operation === "??") {
+          const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
+          if ((symbol == null ? void 0 : symbol.kind) !== SymbolKind.Expression) {
+            return [];
+          }
+          const sourceMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
+          if (sourceMapping === null) {
+            return [];
+          }
+          const diagnostic = ctx.makeTemplateDiagnostic(sourceMapping.span, `Parentheses are required to disambiguate precedence when mixing '??' with '&&' and '||'.`);
+          return [diagnostic];
+        }
+      }
+    }
+    return [];
+  }
+};
+var factory11 = {
+  code: ErrorCode.UNPARENTHESIZED_NULLISH_COALESCING,
+  name: ExtendedTemplateDiagnosticName.UNPARENTHESIZED_NULLISH_COALESCING,
+  create: () => new UnparenthesizedNullishCoalescing()
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unused_let_declaration/index.mjs
@@ -3124,36 +3180,10 @@ var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
     return this.analysis.get(node);
   }
 };
-var factory10 = {
+var factory12 = {
   code: ErrorCode.UNUSED_LET_DECLARATION,
   name: ExtendedTemplateDiagnosticName.UNUSED_LET_DECLARATION,
   create: () => new UnusedLetDeclarationCheck()
-};
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/skip_hydration_not_static/index.mjs
-import { TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstTextAttribute as TmplAstTextAttribute2 } from "@angular/compiler";
-var NG_SKIP_HYDRATION_ATTR_NAME = "ngSkipHydration";
-var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
-  code = ErrorCode.SKIP_HYDRATION_NOT_STATIC;
-  visitNode(ctx, component, node) {
-    if (node instanceof TmplAstBoundAttribute3 && node.name === NG_SKIP_HYDRATION_ATTR_NAME) {
-      const errorString = `ngSkipHydration should not be used as a binding.`;
-      const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
-      return [diagnostic];
-    }
-    const acceptedValues = ["true", ""];
-    if (node instanceof TmplAstTextAttribute2 && node.name === NG_SKIP_HYDRATION_ATTR_NAME && !acceptedValues.includes(node.value) && node.value !== void 0) {
-      const errorString = `ngSkipHydration only accepts "true" or "" as value or no value at all. For example 'ngSkipHydration="true"' or 'ngSkipHydration'`;
-      const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
-      return [diagnostic];
-    }
-    return [];
-  }
-};
-var factory11 = {
-  code: ErrorCode.SKIP_HYDRATION_NOT_STATIC,
-  name: ExtendedTemplateDiagnosticName.SKIP_HYDRATION_NOT_STATIC,
-  create: () => new NgSkipHydrationSpec()
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.mjs
@@ -3175,12 +3205,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory12 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory12.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory13 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory13.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory12.create(options);
+      const check = factory13.create(options);
       if (check === null) {
         continue;
       }
@@ -3228,18 +3258,19 @@ var ALL_DIAGNOSTIC_FACTORIES = [
   factory5,
   factory6,
   factory3,
-  factory8,
-  factory4,
-  factory7,
-  factory,
   factory9,
+  factory4,
+  factory8,
+  factory,
   factory10,
+  factory12,
+  factory7,
   factory11
 ];
 var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ExtendedTemplateDiagnosticName.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION,
   ExtendedTemplateDiagnosticName.UNUSED_STANDALONE_IMPORTS,
-  ...ALL_DIAGNOSTIC_FACTORIES.map((factory12) => factory12.name)
+  ...ALL_DIAGNOSTIC_FACTORIES.map((factory13) => factory13.name)
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.mjs
@@ -5095,4 +5126,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-D4PR7EGY.js.map
+//# sourceMappingURL=chunk-JJ6YEUMB.js.map
