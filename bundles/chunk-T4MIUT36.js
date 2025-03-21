@@ -2475,11 +2475,7 @@ var ExpressionTranslatorVisitor = class {
     }
   }
   visitConditionalExpr(ast, context) {
-    let cond = ast.condition.visitExpression(this, context);
-    if (ast.condition instanceof o.ConditionalExpr) {
-      cond = this.factory.createParenthesizedExpression(cond);
-    }
-    return this.factory.createConditional(cond, ast.trueCase.visitExpression(this, context), ast.falseCase.visitExpression(this, context));
+    return this.factory.createConditional(ast.condition.visitExpression(this, context), ast.trueCase.visitExpression(this, context), ast.falseCase.visitExpression(this, context));
   }
   visitDynamicImportExpr(ast, context) {
     const urlExpression = typeof ast.url === "string" ? this.factory.createLiteral(ast.url) : ast.url.visitExpression(this, context);
@@ -3227,4 +3223,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-6WY2A2XX.js.map
+//# sourceMappingURL=chunk-T4MIUT36.js.map
