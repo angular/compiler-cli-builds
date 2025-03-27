@@ -4157,7 +4157,7 @@ var NgCompiler = class {
     let aliasingHost = null;
     if (this.adapter.unifiedModulesHost === null || !this.options["_useHostForImportGeneration"] && !this.options["_useHostForImportAndAliasGeneration"]) {
       let localImportStrategy;
-      if (this.options.rootDir !== void 0 || this.options.rootDirs !== void 0 && this.options.rootDirs.length > 0) {
+      if (this.options.rootDirs !== void 0 && this.options.rootDirs.length > 0) {
         localImportStrategy = new LogicalProjectStrategy(reflector, new LogicalFileSystem([...this.adapter.rootDirs], this.adapter));
       } else {
         localImportStrategy = new RelativePathStrategy(reflector);
@@ -5093,4 +5093,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-7USMJROX.js.map
+//# sourceMappingURL=chunk-3MFCJPWK.js.map
