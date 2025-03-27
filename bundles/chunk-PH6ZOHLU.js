@@ -48,7 +48,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-OZ2WSYWM.js";
+} from "./chunk-XRSJELB6.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -3621,6 +3621,7 @@ var InjectableClassRegistry = class {
 import { ArrowFunctionExpr, LiteralArrayExpr, LiteralExpr as LiteralExpr2, literalMap, WrappedNodeExpr as WrappedNodeExpr3 } from "@angular/compiler";
 import ts14 from "typescript";
 function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompiler, angularDecoratorTransform = (dec) => dec) {
+  var _a;
   if (!reflection.isClass(clazz)) {
     return null;
   }
@@ -3642,13 +3643,13 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
   }
   let metaPropDecorators = null;
   const classMembers = reflection.getMembersOfClass(clazz).filter((member) => !member.isStatic && member.decorators !== null && member.decorators.length > 0);
-  const duplicateDecoratedMemberNames = classMembers.map((member) => member.name).filter((name, i, arr) => arr.indexOf(name) < i);
-  if (duplicateDecoratedMemberNames.length > 0) {
-    throw new Error(`Duplicate decorated properties found on class '${clazz.name.text}': ` + duplicateDecoratedMemberNames.join(", "));
+  const duplicateDecoratedMembers = classMembers.filter((member, i, arr) => arr.findIndex((arrayMember) => arrayMember.name === member.name) < i);
+  if (duplicateDecoratedMembers.length > 0) {
+    throw new FatalDiagnosticError(ErrorCode.DUPLICATE_DECORATED_PROPERTIES, (_a = duplicateDecoratedMembers[0].nameNode) != null ? _a : clazz, `Duplicate decorated properties found on class '${clazz.name.text}': ` + duplicateDecoratedMembers.map((member) => member.name).join(", "));
   }
   const decoratedMembers = classMembers.map((member) => {
-    var _a;
-    return classMemberToMetadata((_a = member.nameNode) != null ? _a : member.name, member.decorators, isCore);
+    var _a2;
+    return classMemberToMetadata((_a2 = member.nameNode) != null ? _a2 : member.name, member.decorators, isCore);
   });
   if (decoratedMembers.length > 0) {
     metaPropDecorators = new WrappedNodeExpr3(ts14.factory.createObjectLiteralExpression(decoratedMembers));
@@ -15628,4 +15629,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ZMQ5KIDS.js.map
+//# sourceMappingURL=chunk-PH6ZOHLU.js.map
