@@ -8102,8 +8102,24 @@ function createNodeFromListenerDecorator(decorator, parser, listeners) {
   }
   const callNode = new Call(span, nameSpan, receiver, argNodes, span);
   const eventNameNode = args[0];
-  const [eventName, phase] = eventNameNode.text.split(".");
-  listeners.push(new TmplAstBoundEvent(eventName, eventName.startsWith("@") ? ParsedEventType.Animation : ParsedEventType.Regular, callNode, null, phase, createSourceSpan(decorator), createSourceSpan(decorator), createStaticExpressionSpan(eventNameNode)));
+  let type;
+  let eventName;
+  let phase;
+  let target;
+  if (eventNameNode.text.startsWith("@")) {
+    const parsedName = parser.parseAnimationEventName(eventNameNode.text);
+    type = ParsedEventType.Animation;
+    eventName = parsedName.eventName;
+    phase = parsedName.phase;
+    target = null;
+  } else {
+    const parsedName = parser.parseEventListenerName(eventNameNode.text);
+    type = ParsedEventType.Regular;
+    eventName = parsedName.eventName;
+    target = parsedName.target;
+    phase = null;
+  }
+  listeners.push(new TmplAstBoundEvent(eventName, type, callNode, target, phase, createSourceSpan(decorator), createSourceSpan(decorator), createStaticExpressionSpan(eventNameNode)));
 }
 function inferBoundAttribute(name) {
   const attrPrefix = "attr.";
@@ -9964,10 +9980,15 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
         this.scope.addStatement(ts39.factory.createExpressionStatement(handler));
       } else if (this.tcb.env.config.checkTypeOfDomEvents) {
         const handler = tcbCreateEventHandler(output, this.tcb, this.scope, 0);
-        if (elId === null) {
-          elId = this.scope.resolve(this.target);
+        let target;
+        if (output.target === "window" || output.target === "document") {
+          target = ts39.factory.createIdentifier(output.target);
+        } else if (elId === null) {
+          target = elId = this.scope.resolve(this.target);
+        } else {
+          target = elId;
         }
-        const propertyAccess = ts39.factory.createPropertyAccessExpression(elId, "addEventListener");
+        const propertyAccess = ts39.factory.createPropertyAccessExpression(target, "addEventListener");
         addParseSpanInfo(propertyAccess, output.keySpan);
         const call = ts39.factory.createCallExpression(
           propertyAccess,
@@ -16125,4 +16146,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-6FWQSLK4.js.map
+//# sourceMappingURL=chunk-TVFKPPMT.js.map

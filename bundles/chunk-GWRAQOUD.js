@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-BMTJXLP7.js";
+} from "./chunk-ISFJNCM6.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-6FWQSLK4.js";
+} from "./chunk-TVFKPPMT.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -4189,7 +4189,7 @@ var NgCompiler = class {
     let aliasingHost = null;
     if (this.adapter.unifiedModulesHost === null || !this.options["_useHostForImportGeneration"] && !this.options["_useHostForImportAndAliasGeneration"]) {
       let localImportStrategy;
-      if (this.options.rootDir !== void 0 || this.options.rootDirs !== void 0 && this.options.rootDirs.length > 0) {
+      if (this.options.rootDirs !== void 0 && this.options.rootDirs.length > 0) {
         localImportStrategy = new LogicalProjectStrategy(reflector, new LogicalFileSystem([...this.adapter.rootDirs], this.adapter));
       } else {
         localImportStrategy = new RelativePathStrategy(reflector);
@@ -5126,4 +5126,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-LYPQBG6H.js.map
+//# sourceMappingURL=chunk-GWRAQOUD.js.map
