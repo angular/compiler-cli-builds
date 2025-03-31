@@ -14581,13 +14581,13 @@ var ComponentDecoratorHandler = class {
         }
       }
       const binder = createTargetBinder(dependencies);
-      const pipes = extractPipes(dependencies);
       let allDependencies = dependencies;
       let deferBlockBinder = binder;
       if (explicitlyDeferredDependencies.length > 0) {
         allDependencies = [...explicitlyDeferredDependencies, ...dependencies];
         deferBlockBinder = createTargetBinder(allDependencies);
       }
+      const pipes = extractPipes(allDependencies);
       const bound = binder.bind({ template: metadata.template.nodes });
       const deferBlocks = /* @__PURE__ */ new Map();
       for (const deferBlock of bound.getDeferBlocks()) {
@@ -14618,10 +14618,10 @@ var ComponentDecoratorHandler = class {
       }
       const wholeTemplateUsed = new Set(eagerlyUsed);
       for (const bound2 of deferBlocks.values()) {
-        for (const dir of bound2.getEagerlyUsedDirectives()) {
+        for (const dir of bound2.getUsedDirectives()) {
           wholeTemplateUsed.add(dir.ref.node);
         }
-        for (const name of bound2.getEagerlyUsedPipes()) {
+        for (const name of bound2.getUsedPipes()) {
           if (!pipes.has(name)) {
             continue;
           }
@@ -15629,4 +15629,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PH6ZOHLU.js.map
+//# sourceMappingURL=chunk-5CUK6DEW.js.map
