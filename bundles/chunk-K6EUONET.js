@@ -10,7 +10,7 @@ import {
   tryParseSignalInputMapping,
   tryParseSignalModelMapping,
   tryParseSignalQueryFromInitializer
-} from "./chunk-5CUK6DEW.js";
+} from "./chunk-XABJ5FUR.js";
 import {
   ImportManager,
   ImportedSymbolsTracker,
@@ -536,4 +536,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-7JVWBMTP.js.map
+//# sourceMappingURL=chunk-K6EUONET.js.map
