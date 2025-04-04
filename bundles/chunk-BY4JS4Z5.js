@@ -1988,6 +1988,7 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     this.visitAll(element.references);
     this.visitAll(element.inputs);
     this.visitAll(element.attributes);
+    this.visitAll(element.directives);
     this.visitAll(element.children);
     this.visitAll(element.outputs);
   }
@@ -1996,6 +1997,7 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
     if (templateIdentifier !== null) {
       this.identifiers.add(templateIdentifier);
     }
+    this.visitAll(template.directives);
     this.visitAll(template.variables);
     this.visitAll(template.attributes);
     this.visitAll(template.templateAttrs);
@@ -2081,6 +2083,12 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
       this.identifiers.add(identifier);
     }
     this.visitExpression(decl.value);
+  }
+  visitComponent(component) {
+    throw new Error("TODO");
+  }
+  visitDirective(directive) {
+    throw new Error("TODO");
   }
   elementOrTemplateToIdentifier(node) {
     var _a;
@@ -2653,6 +2661,7 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor2 {
     this.visitAllNodes(element.attributes);
     this.visitAllNodes(element.inputs);
     this.visitAllNodes(element.outputs);
+    this.visitAllNodes(element.directives);
     this.visitAllNodes(element.references);
     this.visitAllNodes(element.children);
   }
@@ -2663,6 +2672,7 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor2 {
       this.visitAllNodes(template.inputs);
       this.visitAllNodes(template.outputs);
     }
+    this.visitAllNodes(template.directives);
     if (this.check.canVisitStructuralAttributes || isInlineTemplate) {
       this.visitAllNodes(template.templateAttrs);
     }
@@ -2743,6 +2753,20 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor2 {
   }
   visitLetDeclaration(decl) {
     this.visitAst(decl.value);
+  }
+  visitComponent(component) {
+    this.visitAllNodes(component.attributes);
+    this.visitAllNodes(component.inputs);
+    this.visitAllNodes(component.outputs);
+    this.visitAllNodes(component.directives);
+    this.visitAllNodes(component.references);
+    this.visitAllNodes(component.children);
+  }
+  visitDirective(directive) {
+    this.visitAllNodes(directive.attributes);
+    this.visitAllNodes(directive.inputs);
+    this.visitAllNodes(directive.outputs);
+    this.visitAllNodes(directive.references);
   }
   getDiagnostics(template) {
     this.diagnostics = [];
@@ -5126,4 +5150,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-GYERXSPU.js.map
+//# sourceMappingURL=chunk-BY4JS4Z5.js.map
