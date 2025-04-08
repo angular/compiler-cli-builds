@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-6PQV2MG7.js";
+} from "./chunk-O72KLNK6.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-4L4X3YJZ.js";
+} from "./chunk-EUUYAO34.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -87,7 +87,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-WWBWIRJR.js";
+} from "./chunk-4VPFFCE4.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -3210,6 +3210,39 @@ var factory12 = {
   create: () => new UnusedLetDeclarationCheck()
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_track_function/index.mjs
+import { Call as Call2, PropertyRead as PropertyRead4, SafeCall as SafeCall3, SafePropertyRead as SafePropertyRead3, TmplAstForLoopBlock } from "@angular/compiler";
+var UninvokedTrackFunctionCheck = class extends TemplateCheckWithVisitor {
+  code = ErrorCode.UNINVOKED_TRACK_FUNCTION;
+  visitNode(ctx, component, node) {
+    var _a;
+    if (!(node instanceof TmplAstForLoopBlock) || !node.trackBy) {
+      return [];
+    }
+    if (node.trackBy.ast instanceof Call2 || node.trackBy.ast instanceof SafeCall3) {
+      return [];
+    }
+    if (!(node.trackBy.ast instanceof PropertyRead4) && !(node.trackBy.ast instanceof SafePropertyRead3)) {
+      return [];
+    }
+    const symbol = ctx.templateTypeChecker.getSymbolOfNode(node.trackBy.ast, component);
+    if (symbol !== null && symbol.kind === SymbolKind.Expression && ((_a = symbol.tsType.getCallSignatures()) == null ? void 0 : _a.length) > 0) {
+      const fullExpressionText = generateStringFromExpression2(node.trackBy.ast, node.trackBy.source || "");
+      const errorString = `The track function in the @for block should be invoked: ${fullExpressionText}(/* arguments */)`;
+      return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
+    }
+    return [];
+  }
+};
+function generateStringFromExpression2(expression, source) {
+  return source.substring(expression.span.start, expression.span.end);
+}
+var factory13 = {
+  code: ErrorCode.UNINVOKED_TRACK_FUNCTION,
+  name: ExtendedTemplateDiagnosticName.UNINVOKED_TRACK_FUNCTION,
+  create: () => new UninvokedTrackFunctionCheck()
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.mjs
 import ts21 from "typescript";
 
@@ -3229,12 +3262,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory13 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory13.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory14 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory14.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory13.create(options);
+      const check = factory14.create(options);
       if (check === null) {
         continue;
       }
@@ -3289,12 +3322,13 @@ var ALL_DIAGNOSTIC_FACTORIES = [
   factory10,
   factory12,
   factory7,
-  factory11
+  factory11,
+  factory13
 ];
 var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ExtendedTemplateDiagnosticName.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION,
   ExtendedTemplateDiagnosticName.UNUSED_STANDALONE_IMPORTS,
-  ...ALL_DIAGNOSTIC_FACTORIES.map((factory13) => factory13.name)
+  ...ALL_DIAGNOSTIC_FACTORIES.map((factory14) => factory14.name)
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.mjs
@@ -5150,4 +5184,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BY4JS4Z5.js.map
+//# sourceMappingURL=chunk-CGI5NZTW.js.map
