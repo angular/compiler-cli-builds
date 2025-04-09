@@ -3931,7 +3931,11 @@ var NgCompiler = class {
     const printer = ts25.createPrinter();
     const nodeText = printer.printNode(ts25.EmitHint.Unspecified, callback, sourceFile);
     return ts25.transpileModule(nodeText, {
-      compilerOptions: this.options,
+      compilerOptions: {
+        ...this.options,
+        module: ts25.ModuleKind.ES2022,
+        target: ts25.ScriptTarget.ES2022
+      },
       fileName: sourceFile.fileName,
       reportDiagnostics: false
     }).outputText;
@@ -5093,4 +5097,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-UJU2GLGZ.js.map
+//# sourceMappingURL=chunk-BWWYRBH4.js.map
