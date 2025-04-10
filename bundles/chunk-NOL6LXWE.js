@@ -1210,7 +1210,6 @@ function verifySupportedTypeScriptVersion() {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
-import { R3Identifiers } from "@angular/compiler";
 import ts25 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/cycles/src/analyzer.mjs
@@ -3617,25 +3616,6 @@ var SourceFileValidator = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/core_version.mjs
-function coreHasSymbol(program, symbol) {
-  const checker = program.getTypeChecker();
-  for (const sf of program.getSourceFiles().filter(isMaybeCore)) {
-    const sym = checker.getSymbolAtLocation(sf);
-    if (sym === void 0 || sym.exports === void 0) {
-      continue;
-    }
-    if (!sym.exports.has("\u0275\u0275template")) {
-      continue;
-    }
-    return sym.exports.has(symbol.name);
-  }
-  return null;
-}
-function isMaybeCore(sf) {
-  return sf.isDeclarationFile && sf.fileName.includes("@angular/core") && sf.fileName.endsWith("index.d.ts");
-}
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/feature_detection.mjs
 import semver from "semver";
 function coreVersionSupportsFeature(coreVersion, minVersion) {
@@ -4061,11 +4041,11 @@ var NgCompiler = class {
     return strictTemplates || !!this.options.fullTemplateTypeCheck;
   }
   getTypeCheckingConfig() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i;
     const strictTemplates = !!this.options.strictTemplates;
     const useInlineTypeConstructors = this.programDriver.supportsInlineOperations;
     const checkTwoWayBoundEvents = (_a = this.options["_checkTwoWayBoundEvents"]) != null ? _a : false;
-    let allowSignalsInTwoWayBindings = (_b = coreHasSymbol(this.inputProgram, R3Identifiers.unwrapWritableSignal)) != null ? _b : this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0");
+    const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0-0");
     let typeCheckingConfig;
     if (this.fullTemplateTypeCheck) {
       typeCheckingConfig = {
@@ -4091,8 +4071,8 @@ var NgCompiler = class {
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
         suggestionsForSuboptimalTypeInference: this.enableTemplateTypeChecker && !strictTemplates,
-        controlFlowPreventingContentProjection: ((_c = this.options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) || DiagnosticCategoryLabel.Warning,
-        unusedStandaloneImports: ((_d = this.options.extendedDiagnostics) == null ? void 0 : _d.defaultCategory) || DiagnosticCategoryLabel.Warning,
+        controlFlowPreventingContentProjection: ((_b = this.options.extendedDiagnostics) == null ? void 0 : _b.defaultCategory) || DiagnosticCategoryLabel.Warning,
+        unusedStandaloneImports: ((_c = this.options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
         checkTwoWayBoundEvents
       };
@@ -4120,8 +4100,8 @@ var NgCompiler = class {
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
         suggestionsForSuboptimalTypeInference: false,
-        controlFlowPreventingContentProjection: ((_e = this.options.extendedDiagnostics) == null ? void 0 : _e.defaultCategory) || DiagnosticCategoryLabel.Warning,
-        unusedStandaloneImports: ((_f = this.options.extendedDiagnostics) == null ? void 0 : _f.defaultCategory) || DiagnosticCategoryLabel.Warning,
+        controlFlowPreventingContentProjection: ((_d = this.options.extendedDiagnostics) == null ? void 0 : _d.defaultCategory) || DiagnosticCategoryLabel.Warning,
+        unusedStandaloneImports: ((_e = this.options.extendedDiagnostics) == null ? void 0 : _e.defaultCategory) || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
         checkTwoWayBoundEvents
       };
@@ -4158,10 +4138,10 @@ var NgCompiler = class {
     if (this.options.strictLiteralTypes !== void 0) {
       typeCheckingConfig.strictLiteralTypes = this.options.strictLiteralTypes;
     }
-    if (((_h = (_g = this.options.extendedDiagnostics) == null ? void 0 : _g.checks) == null ? void 0 : _h.controlFlowPreventingContentProjection) !== void 0) {
+    if (((_g = (_f = this.options.extendedDiagnostics) == null ? void 0 : _f.checks) == null ? void 0 : _g.controlFlowPreventingContentProjection) !== void 0) {
       typeCheckingConfig.controlFlowPreventingContentProjection = this.options.extendedDiagnostics.checks.controlFlowPreventingContentProjection;
     }
-    if (((_j = (_i = this.options.extendedDiagnostics) == null ? void 0 : _i.checks) == null ? void 0 : _j.unusedStandaloneImports) !== void 0) {
+    if (((_i = (_h = this.options.extendedDiagnostics) == null ? void 0 : _h.checks) == null ? void 0 : _i.unusedStandaloneImports) !== void 0) {
       typeCheckingConfig.unusedStandaloneImports = this.options.extendedDiagnostics.checks.unusedStandaloneImports;
     }
     return typeCheckingConfig;
@@ -5188,4 +5168,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-UBQ5K6HX.js.map
+//# sourceMappingURL=chunk-NOL6LXWE.js.map
