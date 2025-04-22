@@ -2350,7 +2350,8 @@ var BINARY_OPERATORS = /* @__PURE__ */ new Map([
   [o.BinaryOperator.Or, "||"],
   [o.BinaryOperator.Plus, "+"],
   [o.BinaryOperator.NullishCoalesce, "??"],
-  [o.BinaryOperator.Exponentiation, "**"]
+  [o.BinaryOperator.Exponentiation, "**"],
+  [o.BinaryOperator.In, "in"]
 ]);
 var ExpressionTranslatorVisitor = class {
   factory;
@@ -2948,7 +2949,8 @@ var BINARY_OPERATORS2 = {
   "!==": ts20.SyntaxKind.ExclamationEqualsEqualsToken,
   "||": ts20.SyntaxKind.BarBarToken,
   "+": ts20.SyntaxKind.PlusToken,
-  "??": ts20.SyntaxKind.QuestionQuestionToken
+  "??": ts20.SyntaxKind.QuestionQuestionToken,
+  "in": ts20.SyntaxKind.InKeyword
 };
 var VAR_TYPES = {
   "const": ts20.NodeFlags.Const,
@@ -3226,4 +3228,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-4VPFFCE4.js.map
+//# sourceMappingURL=chunk-NOEMFPZN.js.map

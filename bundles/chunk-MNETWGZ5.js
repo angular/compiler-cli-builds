@@ -48,7 +48,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-4VPFFCE4.js";
+} from "./chunk-NOEMFPZN.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -8808,7 +8808,8 @@ var BINARY_OPS = /* @__PURE__ */ new Map([
   ["&&", ts38.SyntaxKind.AmpersandAmpersandToken],
   ["&", ts38.SyntaxKind.AmpersandToken],
   ["|", ts38.SyntaxKind.BarToken],
-  ["??", ts38.SyntaxKind.QuestionQuestionToken]
+  ["??", ts38.SyntaxKind.QuestionQuestionToken],
+  ["in", ts38.SyntaxKind.InKeyword]
 ]);
 function astToTypescript(ast, maybeResolve, config) {
   const translator = new AstTranslator(maybeResolve, config);
@@ -16147,4 +16148,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-EUUYAO34.js.map
+//# sourceMappingURL=chunk-MNETWGZ5.js.map
