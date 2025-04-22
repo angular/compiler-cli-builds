@@ -431,7 +431,7 @@ var ClassExtractor = class {
       return this.extractClassProperty(memberDeclaration);
     } else if (ts6.isAccessor(memberDeclaration)) {
       return this.extractGetterSetter(memberDeclaration);
-    } else if (ts6.isConstructorDeclaration(memberDeclaration)) {
+    } else if (ts6.isConstructorDeclaration(memberDeclaration) && memberDeclaration.parameters.length > 0) {
       return this.extractConstructor(memberDeclaration);
     }
     return void 0;
@@ -5097,4 +5097,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BWWYRBH4.js.map
+//# sourceMappingURL=chunk-BBTV6SMB.js.map
