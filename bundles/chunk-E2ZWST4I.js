@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-K6EUONET.js";
+} from "./chunk-ISOL2WT5.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-XABJ5FUR.js";
+} from "./chunk-X2KDZPBI.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -665,7 +665,9 @@ var PipeExtractor = class extends ClassExtractor {
       ...super.extract(),
       pipeName: this.metadata.name,
       entryType: EntryType.Pipe,
-      isStandalone: this.metadata.isStandalone
+      isStandalone: this.metadata.isStandalone,
+      usage: extractPipeSyntax(this.metadata, this.declaration),
+      isPure: this.metadata.isPure
     };
   }
 };
@@ -704,6 +706,15 @@ function extractClass(classDeclaration, metadataReader, typeChecker) {
 function extractInterface(declaration, typeChecker) {
   const extractor = new ClassExtractor(declaration, typeChecker);
   return extractor.extract();
+}
+function extractPipeSyntax(metadata, classDeclaration) {
+  const transformParams = classDeclaration.members.find((member) => {
+    return ts6.isMethodDeclaration(member) && member.name && ts6.isIdentifier(member.name) && member.name.getText() === "transform";
+  });
+  let paramNames = transformParams.parameters.slice(1).map((param) => {
+    return param.name.getText();
+  });
+  return `{{ value_expression | ${metadata.name}${paramNames.length ? ":" + paramNames.join(":") : ""} }}`;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/constant_extractor.mjs
@@ -5097,4 +5108,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BBTV6SMB.js.map
+//# sourceMappingURL=chunk-E2ZWST4I.js.map

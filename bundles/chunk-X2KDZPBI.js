@@ -1877,6 +1877,7 @@ var DtsMetadataReader = class {
       name,
       nameExpr: null,
       isStandalone,
+      isPure: null,
       decorator: null,
       isExplicitlyDeferred: false
     };
@@ -15518,7 +15519,8 @@ var PipeDecoratorHandler = class {
       nameExpr: analysis.pipeNameExpr,
       isStandalone: analysis.meta.isStandalone,
       decorator: analysis.decorator,
-      isExplicitlyDeferred: false
+      isExplicitlyDeferred: false,
+      isPure: analysis.meta.pure
     });
     this.injectableRegistry.registerInjectable(node, {
       ctorDeps: analysis.meta.deps
@@ -15629,4 +15631,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-XABJ5FUR.js.map
+//# sourceMappingURL=chunk-X2KDZPBI.js.map

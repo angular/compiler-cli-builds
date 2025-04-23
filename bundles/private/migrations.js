@@ -9,7 +9,7 @@ import {
   PotentialImportMode,
   StaticInterpreter,
   createForwardRefResolver
-} from "../chunk-XABJ5FUR.js";
+} from "../chunk-X2KDZPBI.js";
 import {
   ImportManager,
   Reference,
