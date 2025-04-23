@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-MMEETU5O.js";
+} from "./chunk-JDZNFRUF.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-YWYB47UA.js";
+} from "./chunk-JBSO7F4H.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -273,11 +273,7 @@ var FunctionExtractor = class {
   extract() {
     var _a, _b;
     const signature = this.typeChecker.getSignatureFromDeclaration(this.exportDeclaration);
-    const returnType = signature ? this.typeChecker.typeToString(
-      this.typeChecker.getReturnTypeOfSignature(signature),
-      void 0,
-      ts4.TypeFormatFlags.NoTypeReduction | ts4.TypeFormatFlags.NoTruncation
-    ) : "unknown";
+    const returnType = signature ? extractReturnType(signature, this.typeChecker) : "unknown";
     const implementation = (_a = findImplementationOfFunction(this.exportDeclaration, this.typeChecker)) != null ? _a : this.exportDeclaration;
     const type = this.typeChecker.getTypeAtLocation(this.exportDeclaration);
     const overloads = ts4.isConstructorDeclaration(this.exportDeclaration) ? constructorOverloads(this.exportDeclaration, this.typeChecker) : extractCallSignatures(this.name, this.typeChecker, type);
@@ -354,12 +350,19 @@ function extractCallSignatures(name, typeChecker, type) {
     jsdocTags: extractJsDocTags(decl),
     params: extractAllParams(decl.parameters, typeChecker),
     rawComment: extractRawJsDoc(decl),
-    returnType: typeChecker.typeToString(
-      typeChecker.getReturnTypeOfSignature(signature),
-      void 0,
-      ts4.TypeFormatFlags.NoTypeReduction | ts4.TypeFormatFlags.NoTruncation
-    )
+    returnType: extractReturnType(signature, typeChecker)
   }));
+}
+function extractReturnType(signature, typeChecker) {
+  var _a;
+  if (((_a = signature == null ? void 0 : signature.declaration) == null ? void 0 : _a.type) && ts4.isTypePredicateNode(signature.declaration.type)) {
+    return signature.declaration.type.getText();
+  }
+  return typeChecker.typeToString(
+    typeChecker.getReturnTypeOfSignature(signature),
+    void 0,
+    ts4.TypeFormatFlags.NoTypeReduction | ts4.TypeFormatFlags.NoTruncation
+  );
 }
 function findImplementationOfFunction(node, typeChecker) {
   var _a;
@@ -1918,7 +1921,7 @@ var IndexingContext = class {
 import { ParseSourceFile } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/template.mjs
-import { ASTWithSource, ImplicitReceiver, PropertyRead, PropertyWrite, RecursiveAstVisitor, TmplAstBoundDeferredTrigger, TmplAstElement, TmplAstRecursiveVisitor, TmplAstReference, TmplAstTemplate, TmplAstVariable } from "@angular/compiler";
+import { ASTWithSource, ImplicitReceiver, PropertyRead, PropertyWrite, RecursiveAstVisitor, TmplAstBoundDeferredTrigger, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstRecursiveVisitor, TmplAstReference, TmplAstTemplate, TmplAstVariable } from "@angular/compiler";
 var ExpressionVisitor = class extends RecursiveAstVisitor {
   expressionStr;
   absoluteOffset;
@@ -2102,6 +2105,9 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
   }
   elementOrTemplateToIdentifier(node) {
     var _a;
+    if (node instanceof TmplAstComponent || node instanceof TmplAstDirective) {
+      throw new Error("TODO");
+    }
     if (this.elementAndTemplateIdentifierCache.has(node)) {
       return this.elementAndTemplateIdentifierCache.get(node);
     }
@@ -2163,7 +2169,7 @@ var TemplateVisitor = class extends TmplAstRecursiveVisitor {
       if (refTarget) {
         let node2 = null;
         let directive = null;
-        if (refTarget instanceof TmplAstElement || refTarget instanceof TmplAstTemplate) {
+        if (refTarget instanceof TmplAstElement || refTarget instanceof TmplAstTemplate || refTarget instanceof TmplAstComponent || refTarget instanceof TmplAstDirective) {
           node2 = this.elementOrTemplateToIdentifier(refTarget);
         } else {
           node2 = this.elementOrTemplateToIdentifier(refTarget.node);
@@ -5179,4 +5185,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OGBDG6N5.js.map
+//# sourceMappingURL=chunk-RSNNCFB5.js.map
