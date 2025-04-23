@@ -273,11 +273,7 @@ var FunctionExtractor = class {
   extract() {
     var _a, _b;
     const signature = this.typeChecker.getSignatureFromDeclaration(this.exportDeclaration);
-    const returnType = signature ? this.typeChecker.typeToString(
-      this.typeChecker.getReturnTypeOfSignature(signature),
-      void 0,
-      ts4.TypeFormatFlags.NoTypeReduction | ts4.TypeFormatFlags.NoTruncation
-    ) : "unknown";
+    const returnType = signature ? extractReturnType(signature, this.typeChecker) : "unknown";
     const implementation = (_a = findImplementationOfFunction(this.exportDeclaration, this.typeChecker)) != null ? _a : this.exportDeclaration;
     const type = this.typeChecker.getTypeAtLocation(this.exportDeclaration);
     const overloads = ts4.isConstructorDeclaration(this.exportDeclaration) ? constructorOverloads(this.exportDeclaration, this.typeChecker) : extractCallSignatures(this.name, this.typeChecker, type);
@@ -354,12 +350,19 @@ function extractCallSignatures(name, typeChecker, type) {
     jsdocTags: extractJsDocTags(decl),
     params: extractAllParams(decl.parameters, typeChecker),
     rawComment: extractRawJsDoc(decl),
-    returnType: typeChecker.typeToString(
-      typeChecker.getReturnTypeOfSignature(signature),
-      void 0,
-      ts4.TypeFormatFlags.NoTypeReduction | ts4.TypeFormatFlags.NoTruncation
-    )
+    returnType: extractReturnType(signature, typeChecker)
   }));
+}
+function extractReturnType(signature, typeChecker) {
+  var _a;
+  if (((_a = signature == null ? void 0 : signature.declaration) == null ? void 0 : _a.type) && ts4.isTypePredicateNode(signature.declaration.type)) {
+    return signature.declaration.type.getText();
+  }
+  return typeChecker.typeToString(
+    typeChecker.getReturnTypeOfSignature(signature),
+    void 0,
+    ts4.TypeFormatFlags.NoTypeReduction | ts4.TypeFormatFlags.NoTruncation
+  );
 }
 function findImplementationOfFunction(node, typeChecker) {
   var _a;
@@ -5108,4 +5111,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-E2ZWST4I.js.map
+//# sourceMappingURL=chunk-GGYBKDGO.js.map
