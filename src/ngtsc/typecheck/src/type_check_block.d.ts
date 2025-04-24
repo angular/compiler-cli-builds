@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstForLoopBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable, TmplAstHostElement } from '@angular/compiler';
+import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstForLoopBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable, TmplAstHostElement, TmplAstComponent, TmplAstDirective } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { PipeMeta } from '../../metadata';
@@ -65,7 +65,7 @@ export declare enum TcbGenericContextBehavior {
  */
 export declare function generateTypeCheckBlock(env: Environment, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, name: ts.Identifier, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): ts.FunctionDeclaration;
 /** Types that can referenced locally in a template. */
-type LocalSymbol = TmplAstElement | TmplAstTemplate | TmplAstVariable | TmplAstLetDeclaration | TmplAstReference | TmplAstHostElement;
+type LocalSymbol = TmplAstElement | TmplAstTemplate | TmplAstVariable | TmplAstLetDeclaration | TmplAstReference | TmplAstHostElement | TmplAstComponent | TmplAstDirective;
 /**
  * A code generation operation that's involved in the construction of a Type Check Block.
  *
@@ -112,7 +112,7 @@ export declare class TcbDirectiveOutputsOp extends TcbOp {
     private scope;
     private node;
     private dir;
-    constructor(tcb: Context, scope: Scope, node: TmplAstTemplate | TmplAstElement, dir: TypeCheckableDirectiveMeta);
+    constructor(tcb: Context, scope: Scope, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective, dir: TypeCheckableDirectiveMeta);
     get optional(): boolean;
     execute(): null;
 }
@@ -183,6 +183,10 @@ declare class Scope {
      * A map of `TmplAstHostElement`s to the index of their `TcbHostElementOp` in the `opQueue`
      */
     private hostElementOpMap;
+    /**
+     * A map of `TmplAstComponent`s to the index of their `TcbComponentNodeOp` in the `opQueue`
+     */
+    private componentNodeOpMap;
     /**
      * A map of maps which tracks the index of `TcbDirectiveCtorOp`s in the `opQueue` for each
      * directive on a `TmplAstElement` or `TmplAstTemplate` node.
@@ -285,11 +289,16 @@ declare class Scope {
     private appendNode;
     private appendChildren;
     private checkAndAppendReferencesOfNode;
-    private appendDirectivesAndInputsOfNode;
-    private appendOutputsOfNode;
+    private appendDirectivesAndInputsOfElementLikeNode;
+    private appendOutputsOfElementLikeNode;
+    private appendInputsOfSelectorlessNode;
+    private appendOutputsOfSelectorlessNode;
+    private appendDirectiveInputs;
+    private appendSelectorlessDirectives;
     private appendDeepSchemaChecks;
     private appendIcuExpressions;
     private appendContentProjectionCheckOp;
+    private appendComponentNode;
     private appendDeferredBlock;
     private appendDeferredTriggers;
     private appendReferenceBasedDeferredTrigger;

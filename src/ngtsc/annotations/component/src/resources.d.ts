@@ -101,6 +101,7 @@ export interface ExtractTemplateOptions {
     i18nNormalizeLineEndingsInICUs: boolean;
     enableBlockSyntax: boolean;
     enableLetSyntax: boolean;
+    enableSelectorless: boolean;
     preserveSignificantWhitespace?: boolean;
 }
 export declare function extractTemplate(node: ClassDeclaration, template: TemplateDeclaration, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, options: ExtractTemplateOptions, compilationMode: CompilationMode): ParsedTemplateWithSource;

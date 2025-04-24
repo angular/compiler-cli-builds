@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { BindingPipe, PropertyRead, PropertyWrite, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstVariable, TmplAstViewportDeferredTrigger } from '@angular/compiler';
+import { BindingPipe, PropertyRead, PropertyWrite, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TmplAstViewportDeferredTrigger } from '@angular/compiler';
 import ts from 'typescript';
 import { ClassDeclaration } from '../../reflection';
 import { TemplateDiagnostic, TypeCheckId } from '../api';
@@ -74,7 +74,7 @@ export interface OutOfBandDiagnosticRecorder {
      */
     splitTwoWayBinding(id: TypeCheckId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
     /** Reports required inputs that haven't been bound. */
-    missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
+    missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
     /**
      * Reports accesses of properties that aren't available in a `for` block's tracking expression.
      */
@@ -98,6 +98,27 @@ export interface OutOfBandDiagnosticRecorder {
      * @param current the `TmplAstLetDeclaration` which is invalid.
      */
     conflictingDeclaration(id: TypeCheckId, current: TmplAstLetDeclaration): void;
+    /**
+     * Reports that a named template dependency (e.g. `<Missing/>`) is not available.
+     * @param id Type checking ID of the template in which the dependency is declared.
+     * @param node Node that declares the dependency.
+     */
+    missingNamedTemplateDependency(id: TypeCheckId, node: TmplAstComponent | TmplAstDirective): void;
+    /**
+     * Reports that a templace dependency of the wrong kind has been referenced at a specific position
+     * (e.g. `<SomeDirective/>`).
+     * @param id Type checking ID of the template in which the dependency is declared.
+     * @param node Node that declares the dependency.
+     */
+    incorrectTemplateDependencyType(id: TypeCheckId, node: TmplAstComponent | TmplAstDirective): void;
+    /**
+     * Reports a binding inside directive syntax that does not match any of the inputs/outputs of
+     * the directive.
+     * @param id Type checking ID of the template in which the directive was defined.
+     * @param directive Directive that contains the binding.
+     * @param node Node declaring the binding.
+     */
+    unclaimedDirectiveBinding(id: TypeCheckId, directive: TmplAstDirective, node: TmplAstBoundAttribute | TmplAstTextAttribute | TmplAstBoundEvent): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -118,11 +139,14 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     requiresInlineTypeConstructors(id: TypeCheckId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
     suboptimalTypeInference(id: TypeCheckId, variables: TmplAstVariable[]): void;
     splitTwoWayBinding(id: TypeCheckId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
-    missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
+    missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
     illegalForLoopTrackAccess(id: TypeCheckId, block: TmplAstForLoopBlock, access: PropertyRead): void;
     inaccessibleDeferredTriggerElement(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
     controlFlowPreventingContentProjection(id: TypeCheckId, category: ts.DiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty, preservesWhitespaces: boolean): void;
     illegalWriteToLetDeclaration(id: TypeCheckId, node: PropertyWrite, target: TmplAstLetDeclaration): void;
     letUsedBeforeDefinition(id: TypeCheckId, node: PropertyRead, target: TmplAstLetDeclaration): void;
     conflictingDeclaration(id: TypeCheckId, decl: TmplAstLetDeclaration): void;
+    missingNamedTemplateDependency(id: TypeCheckId, node: TmplAstComponent | TmplAstDirective): void;
+    incorrectTemplateDependencyType(id: TypeCheckId, node: TmplAstComponent | TmplAstDirective): void;
+    unclaimedDirectiveBinding(id: TypeCheckId, directive: TmplAstDirective, node: TmplAstBoundAttribute | TmplAstTextAttribute | TmplAstBoundEvent): void;
 }

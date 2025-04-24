@@ -308,6 +308,10 @@ export interface TypeCheckingConfig {
      * Whether the event side of a two-way binding should be type checked.
      */
     checkTwoWayBoundEvents: boolean;
+    /**
+     * Whether selectorless syntax is enabled.
+     */
+    selectorlessEnabled: boolean;
 }
 export type SourceMapping = DirectSourceMapping | IndirectSourceMapping | ExternalTemplateSourceMapping;
 /**

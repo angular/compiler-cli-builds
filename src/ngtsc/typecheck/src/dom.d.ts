@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { ParseSourceSpan, SchemaMetadata, TmplAstElement, TmplAstHostElement } from '@angular/compiler';
+import { ParseSourceSpan, SchemaMetadata, TmplAstHostElement } from '@angular/compiler';
 import { TemplateDiagnostic, TypeCheckId } from '../api';
 import { TypeCheckSourceResolver } from './tcb_util';
 /**
@@ -26,26 +26,26 @@ export interface DomSchemaChecker {
     /**
      * Check a non-Angular element and record any diagnostics about it.
      *
-     * @param id the template ID, suitable for resolution with a `TcbSourceResolver`.
-     * @param element the element node in question.
-     * @param schemas any active schemas for the template, which might affect the validity of the
+     * @param id Template ID, suitable for resolution with a `TcbSourceResolver`.
+     * @param tagName Tag name of the element in question
+     * @param sourceSpanForDiagnostics Span that should be used when reporting diagnostics.
+     * @param schemas Any active schemas for the template, which might affect the validity of the
      * element.
-     * @param hostIsStandalone boolean indicating whether the element's host is a standalone
-     *     component.
+     * @param hostIsStandalone Indicates whether the element's host is a standalone component.
      */
-    checkElement(id: string, element: TmplAstElement, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
+    checkElement(id: TypeCheckId, tagName: string, sourceSpanForDiagnostics: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
     /**
      * Check a property binding on an element and record any diagnostics about it.
      *
      * @param id the type check ID, suitable for resolution with a `TcbSourceResolver`.
-     * @param element the element node in question.
+     * @param tagName tag name of the element.
      * @param name the name of the property being checked.
      * @param span the source span of the binding. This is redundant with `element.attributes` but is
      * passed separately to avoid having to look up the particular property name.
      * @param schemas any active schemas for the template, which might affect the validity of the
      * property.
      */
-    checkTemplateElementProperty(id: string, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
+    checkTemplateElementProperty(id: string, tagName: string, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
     /**
      * Check a property binding on a host element and record any diagnostics about it.
      * @param id the type check ID, suitable for resolution with a `TcbSourceResolver`.
@@ -66,7 +66,7 @@ export declare class RegistryDomSchemaChecker implements DomSchemaChecker {
     private _diagnostics;
     get diagnostics(): ReadonlyArray<TemplateDiagnostic>;
     constructor(resolver: TypeCheckSourceResolver);
-    checkElement(id: TypeCheckId, element: TmplAstElement, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
-    checkTemplateElementProperty(id: TypeCheckId, element: TmplAstElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
+    checkElement(id: TypeCheckId, tagName: string, sourceSpanForDiagnostics: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
+    checkTemplateElementProperty(id: TypeCheckId, tagName: string, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
     checkHostElementProperty(id: TypeCheckId, element: TmplAstHostElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[]): void;
 }
