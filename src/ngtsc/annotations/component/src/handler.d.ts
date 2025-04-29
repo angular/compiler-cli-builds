@@ -107,6 +107,20 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     compileLocal(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<Partial<ComponentResolutionData>>, pool: ConstantPool): CompileResult[];
     compileHmrUpdateDeclaration(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): ts.FunctionDeclaration | null;
     /**
+     * Determines the dependencies of a component and
+     * categorizes them based on how they were introduced.
+     */
+    private resolveComponentDependencies;
+    /**
+     * Converts component dependencies into declarations by
+     * resolving their metadata and deduplicating them.
+     */
+    private componentDependenciesToDeclarations;
+    /** Handles any cycles in the dependencies of a component. */
+    private handleDependencyCycles;
+    /** Produces diagnostics that require more than local information. */
+    private getNonLocalDiagnostics;
+    /**
      * Locates defer blocks in case scope information is not available.
      * For example, this happens in the local compilation mode.
      */

@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-ESESJZV4.js";
+} from "./chunk-2F5IGGXH.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-GXXAI7H2.js";
+} from "./chunk-WNWOEBZS.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -4134,8 +4134,7 @@ var NgCompiler = class {
         controlFlowPreventingContentProjection: ((_b = this.options.extendedDiagnostics) == null ? void 0 : _b.defaultCategory) || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: ((_c = this.options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
-        checkTwoWayBoundEvents,
-        selectorlessEnabled: this.enableSelectorless
+        checkTwoWayBoundEvents
       };
     } else {
       typeCheckingConfig = {
@@ -4164,8 +4163,7 @@ var NgCompiler = class {
         controlFlowPreventingContentProjection: ((_d = this.options.extendedDiagnostics) == null ? void 0 : _d.defaultCategory) || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: ((_e = this.options.extendedDiagnostics) == null ? void 0 : _e.defaultCategory) || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
-        checkTwoWayBoundEvents,
-        selectorlessEnabled: this.enableSelectorless
+        checkTwoWayBoundEvents
       };
     }
     if (this.options.strictInputTypes !== void 0) {
@@ -5230,4 +5228,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-TIX7PBCD.js.map
+//# sourceMappingURL=chunk-5HL3AR4R.js.map

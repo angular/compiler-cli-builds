@@ -302,7 +302,7 @@ function toR3ClassMetadata(metaObj) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.mjs
-import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, makeBindingParser as makeBindingParser2, parseTemplate, R3TargetBinder, R3TemplateDependencyKind, SelectorMatcher, ViewEncapsulation } from "@angular/compiler";
+import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, makeBindingParser as makeBindingParser2, parseTemplate, R3TargetBinder, R3TemplateDependencyKind, ViewEncapsulation } from "@angular/compiler";
 import semver2 from "semver";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.mjs
@@ -311,7 +311,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "20.0.0-next.8+sha-1003308";
+var PLACEHOLDER_VERSION = "20.0.0-next.8+sha-adaecba";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -562,8 +562,6 @@ var PartialComponentLinkerVersion1 = class {
       throw new FatalLinkerError(templateSource.expression, `Errors found in the template:
 ${errors}`);
     }
-    const binder = new R3TargetBinder(new SelectorMatcher());
-    const boundTarget = binder.bind({ template: template.nodes });
     let declarationListEmitMode = 0;
     const extractDeclarationTypeExpr = (type) => {
       const { expression, forwardRef } = extractForwardRef(type);
@@ -635,7 +633,7 @@ ${errors}`);
       },
       declarationListEmitMode,
       styles: metaObj.has("styles") ? metaObj.getArray("styles").map((entry) => entry.getString()) : [],
-      defer: this.createR3ComponentDeferMetadata(metaObj, boundTarget),
+      defer: this.createR3ComponentDeferMetadata(metaObj, template),
       encapsulation: metaObj.has("encapsulation") ? parseEncapsulation(metaObj.getValue("encapsulation")) : ViewEncapsulation.Emulated,
       interpolation,
       changeDetection: metaObj.has("changeDetection") ? parseChangeDetectionStrategy(metaObj.getValue("changeDetection")) : ChangeDetectionStrategy.Default,
@@ -684,19 +682,26 @@ ${errors}`);
       isEscaped: true
     };
   }
-  createR3ComponentDeferMetadata(metaObj, boundTarget) {
+  createR3ComponentDeferMetadata(metaObj, template) {
+    const result = {
+      mode: 0,
+      blocks: /* @__PURE__ */ new Map()
+    };
+    if (template.nodes.length === 0) {
+      return result;
+    }
+    const boundTarget = new R3TargetBinder(null).bind({ template: template.nodes });
     const deferredBlocks = boundTarget.getDeferBlocks();
-    const blocks = /* @__PURE__ */ new Map();
     const dependencies = metaObj.has("deferBlockDependencies") ? metaObj.getArray("deferBlockDependencies") : null;
     for (let i = 0; i < deferredBlocks.length; i++) {
       const matchingDependencyFn = dependencies == null ? void 0 : dependencies[i];
       if (matchingDependencyFn == null) {
-        blocks.set(deferredBlocks[i], null);
+        result.blocks.set(deferredBlocks[i], null);
       } else {
-        blocks.set(deferredBlocks[i], matchingDependencyFn.isNull() ? null : matchingDependencyFn.getOpaque());
+        result.blocks.set(deferredBlocks[i], matchingDependencyFn.isNull() ? null : matchingDependencyFn.getOpaque());
       }
     }
-    return { mode: 0, blocks };
+    return result;
   }
 };
 function parseInterpolationConfig(metaObj) {
@@ -1151,4 +1156,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-MIYKEKAF.js.map
+//# sourceMappingURL=chunk-KIC4TVVW.js.map
