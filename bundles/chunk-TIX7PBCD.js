@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-MZ6YZWI2.js";
+} from "./chunk-ESESJZV4.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-B4SGJBGS.js";
+} from "./chunk-GXXAI7H2.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -87,7 +87,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-FXLTLCEV.js";
+} from "./chunk-SBWQVXJA.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -2634,7 +2634,7 @@ function isSignalSymbol(symbol) {
   const declarations = symbol.getDeclarations();
   return declarations !== void 0 && declarations.some((decl) => {
     const fileName = decl.getSourceFile().fileName;
-    return (ts18.isInterfaceDeclaration(decl) || ts18.isTypeAliasDeclaration(decl)) && SIGNAL_FNS.has(decl.name.text) && (fileName.includes("@angular/core") || fileName.includes("angular2/rc/packages/core"));
+    return (ts18.isInterfaceDeclaration(decl) || ts18.isTypeAliasDeclaration(decl)) && SIGNAL_FNS.has(decl.name.text) && (fileName.includes("@angular/core") || fileName.includes("angular2/rc/packages/core") || fileName.includes("bin/packages/core"));
   });
 }
 
@@ -2935,6 +2935,46 @@ var factory4 = {
   create: () => new MissingNgForOfLetCheck()
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_structural_directive/index.mjs
+import { TmplAstTemplate as TmplAstTemplate4 } from "@angular/compiler";
+var KNOWN_CONTROL_FLOW_DIRECTIVES2 = /* @__PURE__ */ new Set([
+  "ngIf",
+  "ngFor",
+  "ngForOf",
+  "ngForTrackBy",
+  "ngSwitchCase",
+  "ngSwitchDefault"
+]);
+var MissingStructuralDirectiveCheck = class extends TemplateCheckWithVisitor {
+  code = ErrorCode.MISSING_STRUCTURAL_DIRECTIVE;
+  run(ctx, component, template) {
+    const componentMetadata = ctx.templateTypeChecker.getDirectiveMetadata(component);
+    if (!componentMetadata || !componentMetadata.isStandalone) {
+      return [];
+    }
+    return super.run(ctx, component, template);
+  }
+  visitNode(ctx, component, node) {
+    if (!(node instanceof TmplAstTemplate4))
+      return [];
+    const customStructuralDirective = node.templateAttrs.find((attr) => !KNOWN_CONTROL_FLOW_DIRECTIVES2.has(attr.name));
+    if (!customStructuralDirective)
+      return [];
+    const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
+    if (symbol == null ? void 0 : symbol.directives.length) {
+      return [];
+    }
+    const sourceSpan = customStructuralDirective.keySpan || customStructuralDirective.sourceSpan;
+    const errorMessage = `A structural directive \`${customStructuralDirective.name}\` was used in the template without a corresponding import in the component. Make sure that the directive is included in the \`@Component.imports\` array of this component.`;
+    return [ctx.makeTemplateDiagnostic(sourceSpan, errorMessage)];
+  }
+};
+var factory5 = {
+  code: ErrorCode.MISSING_STRUCTURAL_DIRECTIVE,
+  name: ExtendedTemplateDiagnosticName.MISSING_STRUCTURAL_DIRECTIVE,
+  create: () => new MissingStructuralDirectiveCheck()
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/nullish_coalescing_not_nullable/index.mjs
 import { Binary } from "@angular/compiler";
 import ts19 from "typescript";
@@ -2966,7 +3006,7 @@ var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory5 = {
+var factory6 = {
   code: ErrorCode.NULLISH_COALESCING_NOT_NULLABLE,
   name: ExtendedTemplateDiagnosticName.NULLISH_COALESCING_NOT_NULLABLE,
   create: (options) => {
@@ -3010,7 +3050,7 @@ var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory6 = {
+var factory7 = {
   code: ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE,
   name: ExtendedTemplateDiagnosticName.OPTIONAL_CHAIN_NOT_NULLABLE,
   create: (options) => {
@@ -3042,7 +3082,7 @@ var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
     return [];
   }
 };
-var factory7 = {
+var factory8 = {
   code: ErrorCode.SKIP_HYDRATION_NOT_STATIC,
   name: ExtendedTemplateDiagnosticName.SKIP_HYDRATION_NOT_STATIC,
   create: () => new NgSkipHydrationSpec()
@@ -3063,7 +3103,7 @@ var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory8 = {
+var factory9 = {
   code: ErrorCode.SUFFIX_NOT_SUPPORTED,
   name: ExtendedTemplateDiagnosticName.SUFFIX_NOT_SUPPORTED,
   create: () => new SuffixNotSupportedCheck()
@@ -3099,7 +3139,7 @@ var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory9 = {
+var factory10 = {
   code: ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING,
   name: ExtendedTemplateDiagnosticName.TEXT_ATTRIBUTE_NOT_BINDING,
   create: () => new TextAttributeNotBindingSpec()
@@ -3148,7 +3188,7 @@ function assertExpressionInvoked(expression, component, node, expressionText, ct
 function generateStringFromExpression(expression, source) {
   return source.substring(expression.span.start, expression.span.end);
 }
-var factory10 = {
+var factory11 = {
   code: ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING,
   name: ExtendedTemplateDiagnosticName.UNINVOKED_FUNCTION_IN_EVENT_BINDING,
   create: () => new UninvokedFunctionInEventBindingSpec()
@@ -3178,7 +3218,7 @@ var UnparenthesizedNullishCoalescing = class extends TemplateCheckWithVisitor {
     return [];
   }
 };
-var factory11 = {
+var factory12 = {
   code: ErrorCode.UNPARENTHESIZED_NULLISH_COALESCING,
   name: ExtendedTemplateDiagnosticName.UNPARENTHESIZED_NULLISH_COALESCING,
   create: () => new UnparenthesizedNullishCoalescing()
@@ -3220,7 +3260,7 @@ var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
     return this.analysis.get(node);
   }
 };
-var factory12 = {
+var factory13 = {
   code: ErrorCode.UNUSED_LET_DECLARATION,
   name: ExtendedTemplateDiagnosticName.UNUSED_LET_DECLARATION,
   create: () => new UnusedLetDeclarationCheck()
@@ -3253,7 +3293,7 @@ var UninvokedTrackFunctionCheck = class extends TemplateCheckWithVisitor {
 function generateStringFromExpression2(expression, source) {
   return source.substring(expression.span.start, expression.span.end);
 }
-var factory13 = {
+var factory14 = {
   code: ErrorCode.UNINVOKED_TRACK_FUNCTION,
   name: ExtendedTemplateDiagnosticName.UNINVOKED_TRACK_FUNCTION,
   create: () => new UninvokedTrackFunctionCheck()
@@ -3278,12 +3318,12 @@ var ExtendedTemplateCheckerImpl = class {
     var _a, _b, _c, _d, _e;
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory14 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory14.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
+    for (const factory15 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory((_e = (_d = (_b = (_a = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _a.checks) == null ? void 0 : _b[factory15.name]) != null ? _d : (_c = options == null ? void 0 : options.extendedDiagnostics) == null ? void 0 : _c.defaultCategory) != null ? _e : DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory14.create(options);
+      const check = factory15.create(options);
       if (check === null) {
         continue;
       }
@@ -3328,23 +3368,24 @@ ${value}`);
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/index.mjs
 var ALL_DIAGNOSTIC_FACTORIES = [
   factory2,
-  factory5,
   factory6,
-  factory3,
-  factory9,
-  factory4,
-  factory8,
-  factory,
-  factory10,
-  factory12,
   factory7,
+  factory3,
+  factory10,
+  factory4,
+  factory5,
+  factory9,
+  factory,
   factory11,
-  factory13
+  factory13,
+  factory8,
+  factory12,
+  factory14
 ];
 var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ExtendedTemplateDiagnosticName.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION,
   ExtendedTemplateDiagnosticName.UNUSED_STANDALONE_IMPORTS,
-  ...ALL_DIAGNOSTIC_FACTORIES.map((factory14) => factory14.name)
+  ...ALL_DIAGNOSTIC_FACTORIES.map((factory15) => factory15.name)
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.mjs
@@ -5189,4 +5230,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-3I6NK4RO.js.map
+//# sourceMappingURL=chunk-TIX7PBCD.js.map

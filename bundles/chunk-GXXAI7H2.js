@@ -48,7 +48,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-FXLTLCEV.js";
+} from "./chunk-SBWQVXJA.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -8254,7 +8254,7 @@ function findTypeCheckBlock(file, id, isDiagnosticRequest) {
       return stmt;
     }
   }
-  return null;
+  return findNodeInFile(file, (node) => ts32.isFunctionDeclaration(node) && getTypeCheckId2(node, file, isDiagnosticRequest) === id);
 }
 function findSourceLocation(node, sourceFile, isDiagnosticsRequest) {
   while (node !== void 0 && !ts32.isFunctionDeclaration(node)) {
@@ -8304,6 +8304,17 @@ function ensureTypeCheckFilePreparationImports(env) {
 function checkIfGenericTypeBoundsCanBeEmitted(node, reflector, env) {
   const emitter = new TypeParameterEmitter(node.typeParameters, reflector);
   return emitter.canEmit((ref) => env.canReferenceType(ref));
+}
+function findNodeInFile(file, predicate) {
+  var _a;
+  const visit2 = (node) => {
+    var _a2;
+    if (predicate(node)) {
+      return node;
+    }
+    return (_a2 = ts32.forEachChild(node, visit2)) != null ? _a2 : null;
+  };
+  return (_a = ts32.forEachChild(file, visit2)) != null ? _a : null;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.mjs
@@ -11682,7 +11693,24 @@ var SymbolBuilder = class {
     if (directives === null) {
       return null;
     }
-    return (_a = directives.find((m) => m.ref.node === directiveDeclaration)) != null ? _a : null;
+    const directive = directives.find((m) => m.ref.node === directiveDeclaration);
+    if (directive) {
+      return directive;
+    }
+    const originalFile = directiveDeclaration.getSourceFile()[NgOriginalFile];
+    if (originalFile !== void 0) {
+      const hasPotentialCandidate = directives.find((m) => {
+        var _a2;
+        return m.ref.node.name.text === ((_a2 = directiveDeclaration.name) == null ? void 0 : _a2.text);
+      });
+      if (hasPotentialCandidate) {
+        const classWithSameName = findMatchingDirective(originalFile, directiveDeclaration);
+        if (classWithSameName !== null) {
+          return (_a = directives.find((m) => m.ref.node === classWithSameName)) != null ? _a : null;
+        }
+      }
+    }
+    return null;
   }
   getDirectiveModule(declaration) {
     const scope = this.componentScopeReader.getScopeForComponent(declaration);
@@ -12101,6 +12129,25 @@ function unwrapSignalInputWriteTAccessor(expr) {
     fieldExpr: expr.expression,
     typeExpr: expr
   };
+}
+function findMatchingDirective(originalSourceFile, directiveDeclarationInTypeCheckSourceFile) {
+  var _a, _b, _c;
+  const className = (_b = (_a = directiveDeclarationInTypeCheckSourceFile.name) == null ? void 0 : _a.text) != null ? _b : "";
+  const ogClasses = collectClassesWithName(originalSourceFile, className);
+  const typecheckClasses = collectClassesWithName(directiveDeclarationInTypeCheckSourceFile.getSourceFile(), className);
+  return (_c = ogClasses[typecheckClasses.indexOf(directiveDeclarationInTypeCheckSourceFile)]) != null ? _c : null;
+}
+function collectClassesWithName(sourceFile, className) {
+  const classes = [];
+  function visit2(node) {
+    var _a;
+    if (ts42.isClassDeclaration(node) && ((_a = node.name) == null ? void 0 : _a.text) === className) {
+      classes.push(node);
+    }
+    ts42.forEachChild(node, visit2);
+  }
+  sourceFile.forEachChild(visit2);
+  return classes;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/checker.mjs
@@ -16299,4 +16346,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-B4SGJBGS.js.map
+//# sourceMappingURL=chunk-GXXAI7H2.js.map

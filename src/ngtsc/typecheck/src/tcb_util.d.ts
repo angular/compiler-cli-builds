@@ -76,3 +76,5 @@ export declare function findSourceLocation(node: ts.Node, sourceFile: ts.SourceF
  */
 export declare function ensureTypeCheckFilePreparationImports(env: ReferenceEmitEnvironment): void;
 export declare function checkIfGenericTypeBoundsCanBeEmitted(node: ClassDeclaration<ts.ClassDeclaration>, reflector: ReflectionHost, env: ReferenceEmitEnvironment): boolean;
+export declare function findNodeInFile<T extends ts.Node>(file: ts.SourceFile, predicate: (node: ts.Node) => node is T): T | null;
+export declare function findNodeInFile(file: ts.SourceFile, predicate: (node: ts.Node) => boolean): ts.Node | null;
