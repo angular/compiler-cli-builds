@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { ConstantPool } from '@angular/compiler';
 import ts from 'typescript';
@@ -16,7 +16,7 @@ import { HostDirectivesResolver, MetadataReader, MetadataRegistry, ResourceRegis
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { PerfRecorder } from '../../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
-import { ComponentScopeReader, DtsModuleScopeResolver, LocalModuleScopeRegistry, TypeCheckScopeRegistry } from '../../../scope';
+import { ComponentScopeReader, LocalModuleScopeRegistry, TypeCheckScopeRegistry } from '../../../scope';
 import { AnalysisOutput, CompilationMode, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../../transform';
 import { TypeCheckContext } from '../../../typecheck/api';
 import { ExtendedTemplateChecker } from '../../../typecheck/extended/api';
@@ -25,6 +25,7 @@ import { Xi18nContext } from '../../../xi18n';
 import { InjectableClassRegistry, ReferencesRegistry, ResourceLoader } from '../../common';
 import { ComponentAnalysisData, ComponentResolutionData } from './metadata';
 import { ComponentSymbol } from './symbol';
+import { JitDeclarationRegistry } from '../../common/src/jit_declaration_registry';
 /**
  * `DecoratorHandler` which handles the `@Component` annotation.
  */
@@ -34,7 +35,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private metaRegistry;
     private metaReader;
     private scopeReader;
-    private dtsScopeReader;
+    private compilerHost;
     private scopeRegistry;
     private typeCheckScopeRegistry;
     private resourceRegistry;
@@ -64,8 +65,17 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private readonly deferredSymbolTracker;
     private readonly forbidOrphanRendering;
     private readonly enableBlockSyntax;
+    private readonly enableLetSyntax;
+    private readonly externalRuntimeStyles;
     private readonly localCompilationExtraImportsTracker;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, dtsScopeReader: DtsModuleScopeResolver, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, strictCtorDeps: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, hostDirectivesResolver: HostDirectivesResolver, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, compilationMode: CompilationMode, deferredSymbolTracker: DeferredSymbolTracker, forbidOrphanRendering: boolean, enableBlockSyntax: boolean, localCompilationExtraImportsTracker: LocalCompilationExtraImportsTracker | null);
+    private readonly jitDeclarationRegistry;
+    private readonly i18nPreserveSignificantWhitespace;
+    private readonly strictStandalone;
+    private readonly enableHmr;
+    private readonly implicitStandaloneValue;
+    private readonly typeCheckHostBindings;
+    private readonly enableSelectorless;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, metaReader: MetadataReader, scopeReader: ComponentScopeReader, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, scopeRegistry: LocalModuleScopeRegistry, typeCheckScopeRegistry: TypeCheckScopeRegistry, resourceRegistry: ResourceRegistry, isCore: boolean, strictCtorDeps: boolean, resourceLoader: ResourceLoader, rootDirs: ReadonlyArray<string>, defaultPreserveWhitespaces: boolean, i18nUseExternalIds: boolean, enableI18nLegacyMessageIdFormat: boolean, usePoisonedData: boolean, i18nNormalizeLineEndingsInICUs: boolean, moduleResolver: ModuleResolver, cycleAnalyzer: CycleAnalyzer, cycleHandlingStrategy: CycleHandlingStrategy, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, depTracker: DependencyTracker | null, injectableRegistry: InjectableClassRegistry, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, hostDirectivesResolver: HostDirectivesResolver, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, compilationMode: CompilationMode, deferredSymbolTracker: DeferredSymbolTracker, forbidOrphanRendering: boolean, enableBlockSyntax: boolean, enableLetSyntax: boolean, externalRuntimeStyles: boolean, localCompilationExtraImportsTracker: LocalCompilationExtraImportsTracker | null, jitDeclarationRegistry: JitDeclarationRegistry, i18nPreserveSignificantWhitespace: boolean, strictStandalone: boolean, enableHmr: boolean, implicitStandaloneValue: boolean, typeCheckHostBindings: boolean, enableSelectorless: boolean);
     private literalCache;
     private elementSchemaRegistry;
     /**
@@ -75,6 +85,8 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      */
     private preanalyzeTemplateCache;
     private preanalyzeStylesCache;
+    /** Whether generated code for a component can defer its dependencies. */
+    private readonly canDeferDeps;
     private extractTemplateOptions;
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name = "ComponentDecoratorHandler";
@@ -93,6 +105,21 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     compileFull(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>, pool: ConstantPool): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): CompileResult[];
     compileLocal(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<Partial<ComponentResolutionData>>, pool: ConstantPool): CompileResult[];
+    compileHmrUpdateDeclaration(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>, resolution: Readonly<ComponentResolutionData>): ts.FunctionDeclaration | null;
+    /**
+     * Determines the dependencies of a component and
+     * categorizes them based on how they were introduced.
+     */
+    private resolveComponentDependencies;
+    /**
+     * Converts component dependencies into declarations by
+     * resolving their metadata and deduplicating them.
+     */
+    private componentDependenciesToDeclarations;
+    /** Handles any cycles in the dependencies of a component. */
+    private handleDependencyCycles;
+    /** Produces diagnostics that require more than local information. */
+    private getNonLocalDiagnostics;
     /**
      * Locates defer blocks in case scope information is not available.
      * For example, this happens in the local compilation mode.

@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { Expression, R3ClassMetadata, R3FactoryMetadata, R3InjectorMetadata, R3NgModuleMetadata, SchemaMetadata } from '@angular/compiler';
 import ts from 'typescript';
@@ -15,7 +15,7 @@ import { PerfRecorder } from '../../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
 import { LocalModuleScopeRegistry } from '../../../scope';
 import { AnalysisOutput, CompilationMode, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../../transform';
-import { InjectableClassRegistry, ReferencesRegistry } from '../../common';
+import { InjectableClassRegistry, JitDeclarationRegistry, ReferencesRegistry } from '../../common';
 export interface NgModuleAnalysis {
     mod: R3NgModuleMetadata;
     inj: R3InjectorMetadata;
@@ -84,7 +84,8 @@ export declare class NgModuleDecoratorHandler implements DecoratorHandler<Decora
     private includeSelectorScope;
     private readonly compilationMode;
     private readonly localCompilationExtraImportsTracker;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, exportedProviderStatusResolver: ExportedProviderStatusResolver, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, isCore: boolean, refEmitter: ReferenceEmitter, annotateForClosureCompiler: boolean, onlyPublishPublicTypings: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, includeClassMetadata: boolean, includeSelectorScope: boolean, compilationMode: CompilationMode, localCompilationExtraImportsTracker: LocalCompilationExtraImportsTracker | null);
+    private readonly jitDeclarationRegistry;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaReader: MetadataReader, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, referencesRegistry: ReferencesRegistry, exportedProviderStatusResolver: ExportedProviderStatusResolver, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, isCore: boolean, refEmitter: ReferenceEmitter, annotateForClosureCompiler: boolean, onlyPublishPublicTypings: boolean, injectableRegistry: InjectableClassRegistry, perf: PerfRecorder, includeClassMetadata: boolean, includeSelectorScope: boolean, compilationMode: CompilationMode, localCompilationExtraImportsTracker: LocalCompilationExtraImportsTracker | null, jitDeclarationRegistry: JitDeclarationRegistry);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name = "NgModuleDecoratorHandler";
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;

@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 /**
  * Used to create transpiler specific AST nodes from Angular Output AST nodes in an abstract way.
@@ -19,7 +19,7 @@ export interface AstFactory<TStatement, TExpression> {
      * @param statement the statement where the comments are to be attached.
      * @param leadingComments the comments to attach.
      */
-    attachComments(statement: TStatement, leadingComments: LeadingComment[]): void;
+    attachComments(statement: TStatement | TExpression, leadingComments: LeadingComment[]): void;
     /**
      * Create a literal array expression (e.g. `[expr1, expr2]`).
      *
@@ -107,7 +107,7 @@ export interface AstFactory<TStatement, TExpression> {
      *
      * @param url the URL that should by used in the dynamic import
      */
-    createDynamicImport(url: string): TExpression;
+    createDynamicImport(url: string | TExpression): TExpression;
     /**
      * Create an identifier.
      *
@@ -175,6 +175,17 @@ export interface AstFactory<TStatement, TExpression> {
      */
     createTaggedTemplate(tag: TExpression, template: TemplateLiteral<TExpression>): TExpression;
     /**
+     * Create an untagged template literal
+     *
+     * ```
+     * `str1${expr1}str2${expr2}str3`
+     * ```
+     *
+     * @param template the collection of strings and expressions that constitute an interpolated
+     *     template literal.
+     */
+    createTemplateLiteral(template: TemplateLiteral<TExpression>): TExpression;
+    /**
      * Create a throw statement (e.g. `throw expr;`).
      *
      * @param expression the expression to be thrown.
@@ -186,6 +197,12 @@ export interface AstFactory<TStatement, TExpression> {
      * @param expression the expression whose type we want.
      */
     createTypeOfExpression(expression: TExpression): TExpression;
+    /**
+     * Create an expression that evaluates an expression and returns `undefined`.
+     *
+     * @param expression the expression whose type we want.
+     */
+    createVoidExpression(expression: TExpression): TExpression;
     /**
      * Prefix the `operand` with the given `operator` (e.g. `-expr`).
      *
@@ -221,7 +238,7 @@ export type UnaryOperator = '+' | '-' | '!';
 /**
  * The binary operators supported by the `AstFactory`.
  */
-export type BinaryOperator = '&&' | '>' | '>=' | '&' | '|' | '/' | '==' | '===' | '<' | '<=' | '-' | '%' | '*' | '!=' | '!==' | '||' | '+' | '??';
+export type BinaryOperator = '&&' | '>' | '>=' | '&' | '|' | '/' | '==' | '===' | '<' | '<=' | '-' | '%' | '*' | '**' | '!=' | '!==' | '||' | '+' | '??' | 'in';
 /**
  * The original location of the start or end of a node created by the `AstFactory`.
  */

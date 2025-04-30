@@ -3,12 +3,12 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
 import { DependencyTracker } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
-import { ForeignFunctionResolver } from './interface';
+import type { ForeignFunctionResolver } from './interface';
 import { ResolvedValue } from './result';
 /**
  * Tracks the scope of a function body, which includes `ResolvedValue`s for the parameters of that

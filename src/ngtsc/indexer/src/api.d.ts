@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { ParseSourceFile } from '@angular/compiler';
 import { ClassDeclaration, DeclarationNode } from '../../reflection';
@@ -17,7 +17,8 @@ export declare enum IdentifierKind {
     Template = 3,
     Attribute = 4,
     Reference = 5,
-    Variable = 6
+    Variable = 6,
+    LetDeclaration = 7
 }
 /**
  * Describes a semantically-interesting identifier in a template, such as an interpolated variable
@@ -34,7 +35,7 @@ interface ExpressionIdentifier extends TemplateIdentifier {
      * ReferenceIdentifier or VariableIdentifier in the template that this identifier targets, if
      * any. If the target is `null`, it points to a declaration on the component class.
      * */
-    target: ReferenceIdentifier | VariableIdentifier | null;
+    target: ReferenceIdentifier | VariableIdentifier | LetDeclarationIdentifier | null;
 }
 /** Describes a property accessed in a template. */
 export interface PropertyIdentifier extends ExpressionIdentifier {
@@ -93,11 +94,15 @@ export interface ReferenceIdentifier extends TemplateIdentifier {
 export interface VariableIdentifier extends TemplateIdentifier {
     kind: IdentifierKind.Variable;
 }
+/** Describes a `@let` declaration in a template. */
+export interface LetDeclarationIdentifier extends TemplateIdentifier {
+    kind: IdentifierKind.LetDeclaration;
+}
 /**
  * Identifiers recorded at the top level of the template, without any context about the HTML nodes
  * they were discovered in.
  */
-export type TopLevelIdentifier = PropertyIdentifier | ElementIdentifier | TemplateNodeIdentifier | ReferenceIdentifier | VariableIdentifier | MethodIdentifier;
+export type TopLevelIdentifier = PropertyIdentifier | ElementIdentifier | TemplateNodeIdentifier | ReferenceIdentifier | VariableIdentifier | MethodIdentifier | LetDeclarationIdentifier;
 /**
  * Describes the absolute byte offsets of a text anchor in a source code.
  */

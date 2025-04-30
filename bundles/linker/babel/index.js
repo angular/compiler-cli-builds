@@ -8,17 +8,17 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-3FAMHPS7.js";
-import "../../chunk-73B3CO3L.js";
+} from "../../chunk-KIC4TVVW.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "../../chunk-LYJKWJUC.js";
-import "../../chunk-QYV344EV.js";
+} from "../../chunk-FKXFEX7K.js";
+import "../../chunk-77D5CI2U.js";
+import "../../chunk-SBWQVXJA.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-3W345P4E.js";
-import "../../chunk-XI2RTGAL.js";
+} from "../../chunk-37JMVF7H.js";
+import "../../chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.mjs
 import { types as t4 } from "@babel/core";
@@ -26,19 +26,9 @@ import { types as t4 } from "@babel/core";
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/ast/babel_ast_factory.mjs
 import { types as t } from "@babel/core";
 var BabelAstFactory = class {
+  sourceUrl;
   constructor(sourceUrl) {
     this.sourceUrl = sourceUrl;
-    this.createArrayLiteral = t.arrayExpression;
-    this.createBlock = t.blockStatement;
-    this.createConditional = t.conditionalExpression;
-    this.createExpressionStatement = t.expressionStatement;
-    this.createIdentifier = t.identifier;
-    this.createIfStatement = t.ifStatement;
-    this.createNewExpression = t.newExpression;
-    this.createParenthesizedExpression = t.parenthesizedExpression;
-    this.createReturnStatement = t.returnStatement;
-    this.createThrowStatement = t.throwStatement;
-    this.createUnaryExpression = t.unaryExpression;
   }
   attachComments(statement, leadingComments) {
     for (let i = leadingComments.length - 1; i >= 0; i--) {
@@ -46,6 +36,7 @@ var BabelAstFactory = class {
       t.addComment(statement, "leading", comment.toString(), !comment.multiline);
     }
   }
+  createArrayLiteral = t.arrayExpression;
   createAssignment(target, value) {
     assert(target, isLExpression, "must be a left hand side expression");
     return t.assignmentExpression("=", target, value);
@@ -60,6 +51,7 @@ var BabelAstFactory = class {
         return t.binaryExpression(operator, leftOperand, rightOperand);
     }
   }
+  createBlock = t.blockStatement;
   createCallExpression(callee, args, pure) {
     const call = t.callExpression(callee, args);
     if (pure) {
@@ -67,9 +59,11 @@ var BabelAstFactory = class {
     }
     return call;
   }
+  createConditional = t.conditionalExpression;
   createElementAccess(expression, element) {
     return t.memberExpression(expression, element, true);
   }
+  createExpressionStatement = t.expressionStatement;
   createFunctionDeclaration(functionName, parameters, body) {
     assert(body, t.isBlockStatement, "a block");
     return t.functionDeclaration(t.identifier(functionName), parameters.map((param) => t.identifier(param)), body);
@@ -85,8 +79,10 @@ var BabelAstFactory = class {
     const name = functionName !== null ? t.identifier(functionName) : null;
     return t.functionExpression(name, parameters.map((param) => t.identifier(param)), body);
   }
+  createIdentifier = t.identifier;
+  createIfStatement = t.ifStatement;
   createDynamicImport(url) {
-    return this.createCallExpression(t.import(), [t.stringLiteral(url)], false);
+    return this.createCallExpression(t.import(), [typeof url === "string" ? t.stringLiteral(url) : url], false);
   }
   createLiteral(value) {
     if (typeof value === "string") {
@@ -103,22 +99,33 @@ var BabelAstFactory = class {
       throw new Error(`Invalid literal: ${value} (${typeof value})`);
     }
   }
+  createNewExpression = t.newExpression;
   createObjectLiteral(properties) {
     return t.objectExpression(properties.map((prop) => {
       const key = prop.quoted ? t.stringLiteral(prop.propertyName) : t.identifier(prop.propertyName);
       return t.objectProperty(key, prop.value);
     }));
   }
+  createParenthesizedExpression = t.parenthesizedExpression;
   createPropertyAccess(expression, propertyName) {
     return t.memberExpression(expression, t.identifier(propertyName), false);
   }
+  createReturnStatement = t.returnStatement;
   createTaggedTemplate(tag, template) {
-    const elements = template.elements.map((element, i) => this.setSourceMapRange(t.templateElement(element, i === template.elements.length - 1), element.range));
-    return t.taggedTemplateExpression(tag, t.templateLiteral(elements, template.expressions));
+    return t.taggedTemplateExpression(tag, this.createTemplateLiteral(template));
   }
+  createTemplateLiteral(template) {
+    const elements = template.elements.map((element, i) => this.setSourceMapRange(t.templateElement(element, i === template.elements.length - 1), element.range));
+    return t.templateLiteral(elements, template.expressions);
+  }
+  createThrowStatement = t.throwStatement;
   createTypeOfExpression(expression) {
     return t.unaryExpression("typeof", expression);
   }
+  createVoidExpression(expression) {
+    return t.unaryExpression("void", expression);
+  }
+  createUnaryExpression = t.unaryExpression;
   createVariableDeclaration(variableName, initializer, type) {
     return t.variableDeclaration(type, [
       t.variableDeclarator(t.identifier(variableName), initializer)
@@ -151,13 +158,6 @@ function isLExpression(expr) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/ast/babel_ast_host.mjs
 import { types as t2 } from "@babel/core";
 var BabelAstHost = class {
-  constructor() {
-    this.isStringLiteral = t2.isStringLiteral;
-    this.isNumericLiteral = t2.isNumericLiteral;
-    this.isArrayLiteral = t2.isArrayExpression;
-    this.isObjectLiteral = t2.isObjectExpression;
-    this.isCallExpression = t2.isCallExpression;
-  }
   getSymbolName(node) {
     if (t2.isIdentifier(node)) {
       return node.name;
@@ -167,10 +167,12 @@ var BabelAstHost = class {
       return null;
     }
   }
+  isStringLiteral = t2.isStringLiteral;
   parseStringLiteral(str) {
     assert(str, t2.isStringLiteral, "a string literal");
     return str.value;
   }
+  isNumericLiteral = t2.isNumericLiteral;
   parseNumericLiteral(num) {
     assert(num, t2.isNumericLiteral, "a numeric literal");
     return num.value;
@@ -190,6 +192,7 @@ var BabelAstHost = class {
   isNull(node) {
     return t2.isNullLiteral(node);
   }
+  isArrayLiteral = t2.isArrayExpression;
   parseArrayLiteral(array) {
     assert(array, t2.isArrayExpression, "an array literal");
     return array.elements.map((element) => {
@@ -198,6 +201,7 @@ var BabelAstHost = class {
       return element;
     });
   }
+  isObjectLiteral = t2.isObjectExpression;
   parseObjectLiteral(obj) {
     assert(obj, t2.isObjectExpression, "an object literal");
     const result = /* @__PURE__ */ new Map();
@@ -235,6 +239,7 @@ var BabelAstHost = class {
       return param;
     });
   }
+  isCallExpression = t2.isCallExpression;
   parseCallee(call) {
     assert(call, t2.isCallExpression, "a call expression");
     assert(call.callee, t2.isExpression, "an expression");
@@ -279,6 +284,7 @@ function isMinifiedBooleanLiteral(node) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/babel_declaration_scope.mjs
 import { types as t3 } from "@babel/core";
 var BabelDeclarationScope = class {
+  declarationScope;
   constructor(declarationScope) {
     this.declarationScope = declarationScope;
   }
@@ -365,11 +371,11 @@ function insertIntoFunction(fn, statements) {
 }
 function insertIntoProgram(program, statements) {
   const body = program.get("body");
-  const importStatements = body.filter((statement) => statement.isImportDeclaration());
-  if (importStatements.length === 0) {
+  const insertBeforeIndex = body.findIndex((statement) => !statement.isImportDeclaration());
+  if (insertBeforeIndex === -1) {
     program.unshiftContainer("body", statements);
   } else {
-    importStatements[importStatements.length - 1].insertAfter(statements);
+    body[insertBeforeIndex].insertBefore(statements);
   }
 }
 function getCalleeName(call) {
@@ -424,6 +430,6 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 //# sourceMappingURL=index.js.map

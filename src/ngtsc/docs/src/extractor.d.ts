@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
 import { MetadataReader } from '../../metadata';
@@ -22,7 +22,10 @@ export declare class DocsExtractor {
      *
      * @param sourceFile The file from which to extract documentable entries.
      */
-    extractAll(sourceFile: ts.SourceFile, rootDir: string): DocEntry[];
+    extractAll(sourceFile: ts.SourceFile, rootDir: string, privateModules: Set<string>): {
+        entries: DocEntry[];
+        symbols: Map<string, string>;
+    };
     /** Extract the doc entry for a single declaration. */
     private extractDeclaration;
     /** Gets the list of exported declarations for doc extraction. */

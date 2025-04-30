@@ -3,20 +3,23 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { ConstantPool, R3ClassMetadata, R3DirectiveMetadata } from '@angular/compiler';
 import ts from 'typescript';
 import { ImportedSymbolsTracker, Reference, ReferenceEmitter } from '../../../imports';
 import { SemanticDepGraphUpdater } from '../../../incremental/semantic_graph';
-import { ClassPropertyMapping, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping, MetadataReader, MetadataRegistry } from '../../../metadata';
+import { ClassPropertyMapping, DirectiveResources, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping, MetadataReader, MetadataRegistry, ResourceRegistry } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { PerfRecorder } from '../../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
-import { LocalModuleScopeRegistry } from '../../../scope';
+import { LocalModuleScopeRegistry, TypeCheckScopeRegistry } from '../../../scope';
 import { AnalysisOutput, CompilationMode, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../../transform';
 import { InjectableClassRegistry, ReferencesRegistry } from '../../common';
+import { HostBindingNodes } from './shared';
 import { DirectiveSymbol } from './symbol';
+import { JitDeclarationRegistry } from '../../common/src/jit_declaration_registry';
+import { TypeCheckContext } from '../../../typecheck/api';
 export interface DirectiveHandlerData {
     baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
     typeCheckMeta: DirectiveTypeCheckMeta;
@@ -24,12 +27,15 @@ export interface DirectiveHandlerData {
     classMetadata: R3ClassMetadata | null;
     providersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
     inputs: ClassPropertyMapping<InputMapping>;
+    inputFieldNamesFromMetadataArray: Set<string>;
     outputs: ClassPropertyMapping;
     isPoisoned: boolean;
     isStructural: boolean;
     decorator: ts.Decorator | null;
     hostDirectives: HostDirectiveMeta[] | null;
     rawHostDirectives: ts.Expression | null;
+    hostBindingNodes: HostBindingNodes;
+    resources: DirectiveResources;
 }
 export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decorator | null, DirectiveHandlerData, DirectiveSymbol, unknown> {
     private reflector;
@@ -47,15 +53,22 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     private perf;
     private importTracker;
     private includeClassMetadata;
+    private typeCheckScopeRegistry;
     private readonly compilationMode;
-    private readonly generateExtraImportsInLocalMode;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, strictCtorDeps: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, compilationMode: CompilationMode, generateExtraImportsInLocalMode: boolean);
+    private readonly jitDeclarationRegistry;
+    private readonly resourceRegistry;
+    private readonly strictStandalone;
+    private readonly implicitStandaloneValue;
+    private readonly usePoisonedData;
+    private readonly typeCheckHostBindings;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, strictCtorDeps: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, typeCheckScopeRegistry: TypeCheckScopeRegistry, compilationMode: CompilationMode, jitDeclarationRegistry: JitDeclarationRegistry, resourceRegistry: ResourceRegistry, strictStandalone: boolean, implicitStandaloneValue: boolean, usePoisonedData: boolean, typeCheckHostBindings: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name = "DirectiveDecoratorHandler";
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator | null>): AnalysisOutput<DirectiveHandlerData>;
     symbol(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>): DirectiveSymbol;
     register(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>): void;
+    typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: Readonly<DirectiveHandlerData>): void;
     resolve(node: ClassDeclaration, analysis: DirectiveHandlerData, symbol: DirectiveSymbol): ResolveResult<unknown>;
     compileFull(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>, resolution: Readonly<unknown>, pool: ConstantPool): CompileResult[];
     compilePartial(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>, resolution: Readonly<unknown>): CompileResult[];

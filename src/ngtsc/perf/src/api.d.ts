@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 /**
  * A phase of compilation for which time is tracked in a distinct bucket.
@@ -139,7 +139,15 @@ export declare enum PerfPhase {
     /**
      * Time spent by the Angular Language Service to fix all detected same type errors.
      */
-    LsCodeFixesAll = 27
+    LsCodeFixesAll = 27,
+    /**
+     * Time spent computing possible Angular refactorings.
+     */
+    LSComputeApplicableRefactorings = 28,
+    /**
+     * Time spent computing changes for applying a given refactoring.
+     */
+    LSApplyRefactoring = 29
 }
 /**
  * Represents some occurrence during compilation, and is tracked with a counter.

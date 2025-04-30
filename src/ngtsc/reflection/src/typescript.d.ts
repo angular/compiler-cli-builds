@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
 import { ClassDeclaration, ClassMember, CtorParameter, Declaration, DeclarationNode, Decorator, FunctionDefinition, Import, ReflectionHost } from './host';
@@ -13,7 +13,13 @@ import { ClassDeclaration, ClassMember, CtorParameter, Declaration, DeclarationN
 export declare class TypeScriptReflectionHost implements ReflectionHost {
     protected checker: ts.TypeChecker;
     private readonly isLocalCompilation;
-    constructor(checker: ts.TypeChecker, isLocalCompilation?: boolean);
+    private readonly skipPrivateValueDeclarationTypes;
+    /**
+     * @param skipPrivateValueDeclarationTypes Avoids using a value declaration that is considered private (using a ɵ-prefix),
+     * instead using the first available declaration. This is needed for the {@link FormControl} API of
+     * which the type declaration documents the type and the value declaration corresponds with an implementation detail.
+     */
+    constructor(checker: ts.TypeChecker, isLocalCompilation?: boolean, skipPrivateValueDeclarationTypes?: boolean);
     getDecoratorsOfDeclaration(declaration: DeclarationNode): Decorator[] | null;
     getMembersOfClass(clazz: ClassDeclaration): ClassMember[];
     getConstructorParameters(clazz: ClassDeclaration): CtorParameter[] | null;
@@ -33,13 +39,13 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
      *
      * For example, if the identifier is the `Directive` part of a qualified type chain like:
      *
-     * ```
+     * ```ts
      * core.Directive
      * ```
      *
      * then it might be that `core` is a namespace import such as:
      *
-     * ```
+     * ```ts
      * import * as core from 'tslib';
      * ```
      *
@@ -60,6 +66,13 @@ export declare class TypeScriptReflectionHost implements ReflectionHost {
 }
 export declare function reflectNameOfDeclaration(decl: ts.Declaration): string | null;
 export declare function reflectIdentifierOfDeclaration(decl: ts.Declaration): ts.Identifier | null;
+export declare class TypeEntityToDeclarationError extends Error {
+    constructor(message: string);
+}
+/**
+ * @throws {TypeEntityToDeclarationError} if the type cannot be converted
+ *   to a declaration.
+ */
 export declare function reflectTypeEntityToDeclaration(type: ts.EntityName, checker: ts.TypeChecker): {
     node: ts.Declaration;
     from: string | null;

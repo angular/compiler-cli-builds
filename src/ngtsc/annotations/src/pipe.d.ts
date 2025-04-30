@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { R3ClassMetadata, R3PipeMetadata } from '@angular/compiler';
 import ts from 'typescript';
@@ -41,7 +41,9 @@ export declare class PipeDecoratorHandler implements DecoratorHandler<Decorator,
     private includeClassMetadata;
     private readonly compilationMode;
     private readonly generateExtraImportsInLocalMode;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, injectableRegistry: InjectableClassRegistry, isCore: boolean, perf: PerfRecorder, includeClassMetadata: boolean, compilationMode: CompilationMode, generateExtraImportsInLocalMode: boolean);
+    private readonly strictStandalone;
+    private readonly implicitStandaloneValue;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, injectableRegistry: InjectableClassRegistry, isCore: boolean, perf: PerfRecorder, includeClassMetadata: boolean, compilationMode: CompilationMode, generateExtraImportsInLocalMode: boolean, strictStandalone: boolean, implicitStandaloneValue: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name = "PipeDecoratorHandler";
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator> | undefined;

@@ -3,14 +3,14 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
 import { AbsoluteFsPath, ReadonlyFileSystem } from '../src/ngtsc/file_system';
 import * as api from './transformers/api';
 export declare function formatDiagnostics(diags: ReadonlyArray<ts.Diagnostic>, host?: ts.FormatDiagnosticsHost): string;
 /** Used to read configuration files. */
-export type ConfigurationHost = Pick<ReadonlyFileSystem, 'readFile' | 'exists' | 'lstat' | 'resolve' | 'join' | 'dirname' | 'extname' | 'pwd'>;
+export type ConfigurationHost = Pick<ReadonlyFileSystem, 'readFile' | 'exists' | 'lstat' | 'resolve' | 'join' | 'dirname' | 'extname' | 'pwd' | 'readdir'>;
 export interface ParsedConfiguration {
     project: string;
     options: api.CompilerOptions;

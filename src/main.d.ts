@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
 import { ParsedConfiguration } from './perform_compile';
@@ -25,5 +25,5 @@ export declare function readCommandLineAndConfiguration(args: string[], existing
 export declare function watchMode(project: string, options: api.CompilerOptions, consoleError: (s: string) => void): {
     close: () => void;
     ready: (cb: () => void) => void;
-    firstCompileResult: readonly ts.Diagnostic[];
+    firstCompileResult: ReadonlyArray<ts.Diagnostic>;
 };

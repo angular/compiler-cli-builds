@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
 import * as api from '../transformers/api';
@@ -55,6 +55,9 @@ export declare class NgtscProgram implements api.Program {
      * @param entryPoint Path to the entry point for the package for which API
      *     docs should be extracted.
      */
-    getApiDocumentation(entryPoint: string): DocEntry[];
+    getApiDocumentation(entryPoint: string, privateModules: Set<string>): {
+        entries: DocEntry[];
+        symbols: Map<string, string>;
+    };
     getEmittedSourceFiles(): Map<string, ts.SourceFile>;
 }

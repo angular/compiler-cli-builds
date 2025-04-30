@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { AST, ParseSourceSpan, TmplAstNode } from '@angular/compiler';
 import ts from 'typescript';
@@ -55,6 +55,16 @@ export interface TemplateCheckFactory<Code extends ErrorCode, Name extends Exten
  * This abstract class provides a base implementation for the run method.
  */
 export declare abstract class TemplateCheckWithVisitor<Code extends ErrorCode> implements TemplateCheck<Code> {
+    /**
+     * When extended diagnostics were first introduced, the visitor wasn't implemented correctly
+     * which meant that it wasn't visiting the `templateAttrs` of structural directives (e.g.
+     * the expression of `*ngIf`). Fixing the issue causes a lot of internal breakages and will likely
+     * need to be done in a major version to avoid external breakages. This flag is used to opt out
+     * pre-existing diagnostics from the correct behavior until the breakages have been fixed while
+     * ensuring that newly-written diagnostics are correct from the beginning.
+     * TODO(crisbeto): remove this flag and fix the internal brekages.
+     */
+    readonly canVisitStructuralAttributes: boolean;
     abstract code: Code;
     /**
      * Base implementation for run function, visits all nodes in template and calls

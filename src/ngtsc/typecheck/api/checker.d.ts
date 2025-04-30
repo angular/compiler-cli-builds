@@ -3,16 +3,16 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, LiteralPrimitive, ParseSourceSpan, PropertyRead, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable } from '@angular/compiler';
+import { AST, LiteralPrimitive, ParseSourceSpan, PropertyRead, SafePropertyRead, TemplateEntity, TmplAstElement, TmplAstHostElement, TmplAstNode, TmplAstTemplate, TmplAstTextAttribute } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../../../src/ngtsc/file_system';
 import { ErrorCode } from '../../diagnostics';
 import { Reference } from '../../imports';
 import { NgModuleMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
-import { FullTemplateMapping, NgTemplateDiagnostic, TypeCheckableDirectiveMeta } from './api';
+import { FullSourceMapping, NgTemplateDiagnostic, TypeCheckableDirectiveMeta } from './api';
 import { GlobalCompletion } from './completion';
 import { PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe } from './scope';
 import { ElementSymbol, Symbol, TcbLocation, TemplateSymbol } from './symbols';
@@ -33,7 +33,11 @@ export interface TemplateTypeChecker {
     /**
      * Retrieve the template in use for the given component.
      */
-    getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
+    getTemplate(component: ts.ClassDeclaration, optimizeFor?: OptimizeFor): TmplAstNode[] | null;
+    /**
+     * Retrieve the host element of the given directive.
+     */
+    getHostElement(directive: ts.ClassDeclaration, optimizeFor?: OptimizeFor): TmplAstHostElement | null;
     /**
      * Get all `ts.Diagnostic`s currently available for the given `ts.SourceFile`.
      *
@@ -50,10 +54,10 @@ export interface TemplateTypeChecker {
      */
     getDiagnosticsForFile(sf: ts.SourceFile, optimizeFor: OptimizeFor): ts.Diagnostic[];
     /**
-     * Given a `shim` and position within the file, returns information for mapping back to a template
+     * Given a `shim` and position within the file, returns information for mapping back to a source
      * location.
      */
-    getTemplateMappingAtTcbLocation(tcbLocation: TcbLocation): FullTemplateMapping | null;
+    getSourceMappingAtTcbLocation(tcbLocation: TcbLocation): FullSourceMapping | null;
     /**
      * Get all `ts.Diagnostic`s currently available that pertain to the given component.
      *
@@ -128,7 +132,7 @@ export interface TemplateTypeChecker {
     /**
      * In the context of an Angular trait, generate potential imports for a directive.
      */
-    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inComponent: ts.ClassDeclaration, importMode: PotentialImportMode): ReadonlyArray<PotentialImport>;
+    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inContext: ts.Node, importMode: PotentialImportMode): ReadonlyArray<PotentialImport>;
     /**
      * Get the primary decorator for an Angular class (such as @Component). This does not work for
      * `@Injectable`.
@@ -183,7 +187,7 @@ export interface TemplateTypeChecker {
      * Gets the target of a template expression, if possible.
      * See `BoundTarget.getExpressionTarget` for more information.
      */
-    getExpressionTarget(expression: AST, clazz: ts.ClassDeclaration): TmplAstReference | TmplAstVariable | null;
+    getExpressionTarget(expression: AST, clazz: ts.ClassDeclaration): TemplateEntity | null;
     /**
      * Constructs a `ts.Diagnostic` for a given `ParseSourceSpan` within a template.
      */

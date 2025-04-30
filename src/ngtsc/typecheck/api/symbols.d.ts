@@ -3,9 +3,9 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
-import { TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
+import { TmplAstElement, TmplAstLetDeclaration, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { SymbolWithValueDeclaration } from '../../util/src/typescript';
@@ -21,12 +21,13 @@ export declare enum SymbolKind {
     Template = 7,
     Expression = 8,
     DomBinding = 9,
-    Pipe = 10
+    Pipe = 10,
+    LetDeclaration = 11
 }
 /**
  * A representation of an entity in the `TemplateAst`.
  */
-export type Symbol = InputBindingSymbol | OutputBindingSymbol | ElementSymbol | ReferenceSymbol | VariableSymbol | ExpressionSymbol | DirectiveSymbol | TemplateSymbol | DomBindingSymbol | PipeSymbol;
+export type Symbol = InputBindingSymbol | OutputBindingSymbol | ElementSymbol | ReferenceSymbol | VariableSymbol | ExpressionSymbol | DirectiveSymbol | TemplateSymbol | DomBindingSymbol | PipeSymbol | LetDeclarationSymbol;
 /**
  * A `Symbol` which declares a new named entity in the template scope.
  */
@@ -141,7 +142,7 @@ export interface ReferenceSymbol {
     /**
      * The location in the shim file of a variable that holds the type of the local ref.
      * For example, a reference declaration like the following:
-     * ```
+     * ```ts
      * var _t1 = document.createElement('div');
      * var _t2 = _t1; // This is the reference declaration
      * ```
@@ -185,6 +186,30 @@ export interface VariableSymbol {
     /**
      * The location in the shim file for the initializer node of the variable that represents the
      * template variable.
+     */
+    initializerLocation: TcbLocation;
+}
+/**
+ * A representation of an `@let` declaration in a component template.
+ */
+export interface LetDeclarationSymbol {
+    kind: SymbolKind.LetDeclaration;
+    /** The `ts.Type` of the entity. */
+    tsType: ts.Type;
+    /**
+     * The `ts.Symbol` for the declaration.
+     *
+     * This will be `null` if the symbol could not be resolved using the type checker.
+     */
+    tsSymbol: ts.Symbol | null;
+    /** The node in the `TemplateAst` where the `@let` is declared.  */
+    declaration: TmplAstLetDeclaration;
+    /**
+     * The location in the shim file for the identifier of the `@let` declaration.
+     */
+    localVarLocation: TcbLocation;
+    /**
+     * The location in the shim file of the `@let` declaration's initializer expression.
      */
     initializerLocation: TcbLocation;
 }

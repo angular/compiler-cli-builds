@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { Expression } from '@angular/compiler';
 import ts from 'typescript';
@@ -67,7 +67,7 @@ export declare enum ImportFlags {
  * an import then `null` should be used.
  */
 export type ImportedFile = ts.SourceFile | 'unknown' | null;
-export declare const enum ReferenceEmitKind {
+export declare enum ReferenceEmitKind {
     Success = 0,
     Failed = 1
 }

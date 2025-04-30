@@ -3,14 +3,14 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 /**
  * This interface represents the lexical scope of a partial declaration in the source code.
  *
  * For example, if you had the following code:
  *
- * ```
+ * ```ts
  * function foo() {
  *   function bar () {
  *     ɵɵngDeclareDirective({...});

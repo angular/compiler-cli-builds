@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { AbsoluteSourceSpan, BoundTarget, DirectiveMeta, ParseSourceSpan, SchemaMetadata } from '@angular/compiler';
 import ts from 'typescript';
@@ -25,9 +25,11 @@ export interface TypeCheckableDirectiveMeta extends DirectiveMeta, DirectiveType
     hostDirectives: HostDirectiveMeta[] | null;
     decorator: ts.Decorator | null;
     isExplicitlyDeferred: boolean;
+    imports: Reference<ClassDeclaration>[] | null;
+    rawImports: ts.Expression | null;
 }
-export type TemplateId = string & {
-    __brand: 'TemplateId';
+export type TypeCheckId = string & {
+    __brand: 'TypeCheckId';
 };
 /**
  * A `ts.Diagnostic` with additional information about the diagnostic related to template
@@ -37,11 +39,11 @@ export interface TemplateDiagnostic extends ts.Diagnostic {
     /**
      * The component with the template that resulted in this diagnostic.
      */
-    componentFile: ts.SourceFile;
+    sourceFile: ts.SourceFile;
     /**
-     * The template id of the component that resulted in this diagnostic.
+     * The type check ID of the directive that resulted in this diagnostic.
      */
-    templateId: TemplateId;
+    typeCheckId: TypeCheckId;
 }
 /**
  * A `TemplateDiagnostic` with a specific error code.
@@ -57,14 +59,14 @@ export interface TypeCheckBlockMetadata {
     /**
      * A unique identifier for the class which gave rise to this TCB.
      *
-     * This can be used to map errors back to the `ts.ClassDeclaration` for the component.
+     * This can be used to map errors back to the `ts.ClassDeclaration` for the directive.
      */
-    id: TemplateId;
+    id: TypeCheckId;
     /**
      * Semantic information about the template of the component.
      */
     boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
-    pipes: Map<string, PipeMeta>;
+    pipes: Map<string, PipeMeta> | null;
     /**
      * Schemas that apply to this template.
      */
@@ -248,6 +250,10 @@ export interface TypeCheckingConfig {
      */
     controlFlowPreventingContentProjection: 'error' | 'warning' | 'suppress';
     /**
+     * Whether to check if `@Component.imports` contains unused symbols.
+     */
+    unusedStandaloneImports: 'error' | 'warning' | 'suppress';
+    /**
      * Whether to use any generic types of the context component.
      *
      * If this is `true`, then if the context component has generic types, those will be mirrored in
@@ -298,27 +304,29 @@ export interface TypeCheckingConfig {
      * Whether to descend into the bodies of control flow blocks (`@if`, `@switch` and `@for`).
      */
     checkControlFlowBodies: boolean;
+    /**
+     * Whether the event side of a two-way binding should be type checked.
+     */
+    checkTwoWayBoundEvents: boolean;
 }
-export type TemplateSourceMapping = DirectTemplateSourceMapping | IndirectTemplateSourceMapping | ExternalTemplateSourceMapping;
+export type SourceMapping = DirectSourceMapping | IndirectSourceMapping | ExternalTemplateSourceMapping;
 /**
- * A mapping to an inline template in a TS file.
+ * A mapping to a node within the same source file..
  *
- * `ParseSourceSpan`s for this template should be accurate for direct reporting in a TS error
- * message.
+ * `ParseSourceSpan`s for this node should be accurate for direct reporting in a TS error message.
  */
-export interface DirectTemplateSourceMapping {
+export interface DirectSourceMapping {
     type: 'direct';
-    node: ts.StringLiteral | ts.NoSubstitutionTemplateLiteral;
+    node: ts.Node;
 }
 /**
- * A mapping to a template which is still in a TS file, but where the node positions in any
+ * A mapping to a node which is still in a TS file, but where the positions in any
  * `ParseSourceSpan`s are not accurate for one reason or another.
  *
- * This can occur if the template expression was interpolated in a way where the compiler could not
- * construct a contiguous mapping for the template string. The `node` refers to the `template`
- * expression.
+ * This can occur if the expression was interpolated in a way where the compiler could not
+ * construct a contiguous mapping for the template string.
  */
-export interface IndirectTemplateSourceMapping {
+export interface IndirectSourceMapping {
     type: 'indirect';
     componentClass: ClassDeclaration;
     node: ts.Expression;
@@ -338,18 +346,18 @@ export interface ExternalTemplateSourceMapping {
     templateUrl: string;
 }
 /**
- * A mapping of a TCB template id to a span in the corresponding template source.
+ * A mapping of a TCB template id to a span in the corresponding source code.
  */
 export interface SourceLocation {
-    id: TemplateId;
+    id: TypeCheckId;
     span: AbsoluteSourceSpan;
 }
 /**
- * A representation of all a node's template mapping information we know. Useful for producing
+ * A representation of all a node's type checking information we know. Useful for producing
  * diagnostics based on a TCB node or generally mapping from a TCB node back to a template location.
  */
-export interface FullTemplateMapping {
+export interface FullSourceMapping {
     sourceLocation: SourceLocation;
-    templateSourceMapping: TemplateSourceMapping;
+    sourceMapping: SourceMapping;
     span: ParseSourceSpan;
 }

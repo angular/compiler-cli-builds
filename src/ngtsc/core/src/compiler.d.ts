@@ -3,14 +3,14 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
 import { DocEntry } from '../../docs';
 import { AbsoluteFsPath } from '../../file_system';
 import { IncrementalBuildStrategy, IncrementalCompilation, IncrementalState } from '../../incremental';
 import { IndexedComponent } from '../../indexer';
-import { ComponentResources, DirectiveMeta, PipeMeta } from '../../metadata';
+import { DirectiveResources, DirectiveMeta, PipeMeta } from '../../metadata';
 import { ActivePerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { DeclarationNode } from '../../reflection';
@@ -131,7 +131,11 @@ export declare class NgCompiler {
     readonly ignoreForEmit: Set<ts.SourceFile>;
     readonly enableTemplateTypeChecker: boolean;
     private readonly enableBlockSyntax;
+    private readonly enableLetSyntax;
     private readonly angularCoreVersion;
+    private readonly enableHmr;
+    private readonly implicitStandaloneValue;
+    private readonly enableSelectorless;
     /**
      * `NgCompiler` can be reused for multiple compilations (for resource-only changes), and each
      * new compilation uses a fresh `PerfRecorder`. Thus, classes created with a lifespan of the
@@ -205,9 +209,9 @@ export declare class NgCompiler {
      */
     getComponentsWithStyleFile(styleFilePath: string): ReadonlySet<DeclarationNode>;
     /**
-     * Retrieves external resources for the given component.
+     * Retrieves external resources for the given directive.
      */
-    getComponentResources(classDecl: DeclarationNode): ComponentResources | null;
+    getDirectiveResources(classDecl: DeclarationNode): DirectiveResources | null;
     getMeta(classDecl: DeclarationNode): PipeMeta | DirectiveMeta | null;
     /**
      * Perform Angular's analysis step (as a precursor to `getDiagnostics` or `prepareEmit`)
@@ -239,12 +243,22 @@ export declare class NgCompiler {
      *
      * @param entryPoint Path to the entry point for the package for which API
      *     docs should be extracted.
+     *
+     * @returns A map of symbols with their associated module, eg: ApplicationRef => @angular/core
      */
-    getApiDocumentation(entryPoint: string): DocEntry[];
+    getApiDocumentation(entryPoint: string, privateModules: Set<string>): {
+        entries: DocEntry[];
+        symbols: Map<string, string>;
+    };
     /**
      * Collect i18n messages into the `Xi18nContext`.
      */
     xi18n(ctx: Xi18nContext): void;
+    /**
+     * Emits the JavaScript module that can be used to replace the metadata of a class during HMR.
+     * @param node Class for which to generate the update module.
+     */
+    emitHmrUpdateModule(node: DeclarationNode): string | null;
     private ensureAnalyzed;
     private analyzeSync;
     private resolveCompilation;

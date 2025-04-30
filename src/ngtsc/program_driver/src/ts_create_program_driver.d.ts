@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
@@ -29,18 +29,18 @@ export declare class DelegatingCompilerHost implements Omit<RequiredDelegations<
     getEnvironmentVariable: ((name: string) => string | undefined) | undefined;
     getNewLine: () => string;
     getParsedCommandLine: ((fileName: string) => ts.ParsedCommandLine | undefined) | undefined;
-    getSourceFileByPath: ((fileName: string, path: ts.Path, languageVersionOrOptions: ts.ScriptTarget | ts.CreateSourceFileOptions, onError?: ((message: string) => void) | undefined, shouldCreateNewSourceFile?: boolean | undefined) => ts.SourceFile | undefined) | undefined;
-    readDirectory: ((rootDir: string, extensions: readonly string[], excludes: readonly string[] | undefined, includes: readonly string[], depth?: number | undefined) => string[]) | undefined;
+    getSourceFileByPath: ((fileName: string, path: ts.Path, languageVersionOrOptions: ts.ScriptTarget | ts.CreateSourceFileOptions, onError?: (message: string) => void, shouldCreateNewSourceFile?: boolean) => ts.SourceFile | undefined) | undefined;
+    readDirectory: ((rootDir: string, extensions: readonly string[], excludes: readonly string[] | undefined, includes: readonly string[], depth?: number) => string[]) | undefined;
     readFile: (fileName: string) => string | undefined;
     realpath: ((path: string) => string) | undefined;
-    resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile?: ts.SourceFile | undefined) => (ts.ResolvedModule | undefined)[]) | undefined;
+    resolveModuleNames: ((moduleNames: string[], containingFile: string, reusedNames: string[] | undefined, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile?: ts.SourceFile) => (ts.ResolvedModule | undefined)[]) | undefined;
     resolveTypeReferenceDirectives: ((typeReferenceDirectiveNames: string[] | readonly ts.FileReference[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingFileMode?: ts.ResolutionMode) => (ts.ResolvedTypeReferenceDirective | undefined)[]) | undefined;
     trace: ((s: string) => void) | undefined;
     useCaseSensitiveFileNames: () => boolean;
     getModuleResolutionCache: (() => ts.ModuleResolutionCache | undefined) | undefined;
     hasInvalidatedResolutions: ((filePath: ts.Path) => boolean) | undefined;
     resolveModuleNameLiterals: ((moduleLiterals: readonly ts.StringLiteralLike[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile, reusedNames: readonly ts.StringLiteralLike[] | undefined) => readonly ts.ResolvedModuleWithFailedLookupLocations[]) | undefined;
-    resolveTypeReferenceDirectiveReferences: (<T extends string | ts.FileReference>(typeDirectiveReferences: readonly T[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile | undefined, reusedNames: readonly T[] | undefined) => readonly ts.ResolvedTypeReferenceDirectiveWithFailedLookupLocations[]) | undefined;
+    resolveTypeReferenceDirectiveReferences: (<T extends ts.FileReference | string>(typeDirectiveReferences: readonly T[], containingFile: string, redirectedReference: ts.ResolvedProjectReference | undefined, options: ts.CompilerOptions, containingSourceFile: ts.SourceFile | undefined, reusedNames: readonly T[] | undefined) => readonly ts.ResolvedTypeReferenceDirectiveWithFailedLookupLocations[]) | undefined;
     get jsDocParsingMode(): ts.JSDocParsingMode | undefined;
     set jsDocParsingMode(mode: ts.JSDocParsingMode | undefined);
     constructor(delegate: ts.CompilerHost);

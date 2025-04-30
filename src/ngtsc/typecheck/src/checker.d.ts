@@ -3,9 +3,9 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, LiteralPrimitive, ParseSourceSpan, PropertyRead, SafePropertyRead, TmplAstElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable } from '@angular/compiler';
+import { AST, LiteralPrimitive, ParseSourceSpan, PropertyRead, SafePropertyRead, TemplateEntity, TmplAstElement, TmplAstHostElement, TmplAstNode, TmplAstTemplate, TmplAstTextAttribute } from '@angular/compiler';
 import ts from 'typescript';
 import { ErrorCode } from '../../diagnostics';
 import { AbsoluteFsPath } from '../../file_system';
@@ -16,9 +16,9 @@ import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { ElementSymbol, FullTemplateMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { ElementSymbol, FullSourceMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ShimTypeCheckingData } from './context';
-import { TemplateSourceManager } from './source';
+import { DirectiveSourceManager } from './source';
 /**
  * Primary template type-checking engine, which performs type-checking using a
  * `TypeCheckingProgramStrategy` for type-checking program maintenance, and the
@@ -75,14 +75,15 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private elementTagCache;
     private isComplete;
     constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, metaReader: MetadataReader, localMetaReader: MetadataReaderWithIndex, ngModuleIndex: NgModuleIndex, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
-    getTemplate(component: ts.ClassDeclaration): TmplAstNode[] | null;
+    getTemplate(component: ts.ClassDeclaration, optimizeFor?: OptimizeFor): TmplAstNode[] | null;
+    getHostElement(directive: ts.ClassDeclaration, optimizeFor?: OptimizeFor): TmplAstHostElement | null;
     getUsedDirectives(component: ts.ClassDeclaration): TypeCheckableDirectiveMeta[] | null;
     getUsedPipes(component: ts.ClassDeclaration): string[] | null;
     private getLatestComponentState;
     isTrackedTypeCheckFile(filePath: AbsoluteFsPath): boolean;
     private getFileRecordForTcbLocation;
     private getFileAndShimRecordsForPath;
-    getTemplateMappingAtTcbLocation(tcbLocation: TcbLocation): FullTemplateMapping | null;
+    getSourceMappingAtTcbLocation(tcbLocation: TcbLocation): FullSourceMapping | null;
     generateAllTypeCheckBlocks(): void;
     /**
      * Retrieve type-checking and template parse diagnostics from the given `ts.SourceFile` using the
@@ -95,7 +96,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getExpressionCompletionLocation(ast: PropertyRead | SafePropertyRead, component: ts.ClassDeclaration): TcbLocation | null;
     getLiteralCompletionLocation(node: LiteralPrimitive | TmplAstTextAttribute, component: ts.ClassDeclaration): TcbLocation | null;
     invalidateClass(clazz: ts.ClassDeclaration): void;
-    getExpressionTarget(expression: AST, clazz: ts.ClassDeclaration): TmplAstReference | TmplAstVariable | null;
+    getExpressionTarget(expression: AST, clazz: ts.ClassDeclaration): TemplateEntity | null;
     makeTemplateDiagnostic<T extends ErrorCode>(clazz: ts.ClassDeclaration, sourceSpan: ParseSourceSpan, category: ts.DiagnosticCategory, errorCode: T, message: string, relatedInformation?: {
         text: string;
         start: number;
@@ -134,7 +135,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getPrimaryAngularDecorator(target: ts.ClassDeclaration): ts.Decorator | null;
     getOwningNgModule(component: ts.ClassDeclaration): ts.ClassDeclaration | null;
     private emit;
-    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inContext: ts.ClassDeclaration, importMode: PotentialImportMode): ReadonlyArray<PotentialImport>;
+    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inContext: ts.Node, importMode: PotentialImportMode): ReadonlyArray<PotentialImport>;
     private getScopeData;
     private scopeDataOfDirectiveMeta;
     private scopeDataOfPipeMeta;
@@ -150,10 +151,10 @@ export interface FileTypeCheckingData {
      */
     hasInlines: boolean;
     /**
-     * Source mapping information for mapping diagnostics from inlined type check blocks back to the
-     * original template.
+     * Information for mapping diagnostics from inlined type check blocks
+     * back to their original sources.
      */
-    sourceManager: TemplateSourceManager;
+    sourceManager: DirectiveSourceManager;
     /**
      * Data for each shim generated from this input file.
      *

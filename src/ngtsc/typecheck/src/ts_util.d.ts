@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
 export declare function tsCastToAny(expr: ts.Expression): ts.Expression;
@@ -13,7 +13,7 @@ export declare function tsCastToAny(expr: ts.Expression): ts.Expression;
  * Thanks to narrowing of `document.createElement()`, this expression will have its type inferred
  * based on the tag name, including for custom elements that have appropriate .d.ts definitions.
  */
-export declare function tsCreateElement(tagName: string): ts.Expression;
+export declare function tsCreateElement(...tagNames: string[]): ts.Expression;
 /**
  * Create a `ts.VariableStatement` which declares a variable without explicit initialization.
  *
@@ -38,7 +38,7 @@ export declare function tsCreateTypeQueryForCoercedInput(typeName: ts.EntityName
  * Unlike with `tsDeclareVariable`, the type of the variable is inferred from the initializer
  * expression.
  */
-export declare function tsCreateVariable(id: ts.Identifier, initializer: ts.Expression): ts.VariableStatement;
+export declare function tsCreateVariable(id: ts.Identifier, initializer: ts.Expression, flags?: ts.NodeFlags | null): ts.VariableStatement;
 /**
  * Construct a `ts.CallExpression` that calls a method on a receiver.
  */

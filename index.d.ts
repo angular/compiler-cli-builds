@@ -1,5 +1,5 @@
 export { VERSION } from './src/version';
-export * from './src/transformers/jit_transforms';
+export * from './src/ngtsc/transform/jit';
 export * from './src/transformers/api';
 export * from './src/transformers/entry_points';
 export * from './src/perform_compile';
@@ -14,4 +14,4 @@ export { ConsoleLogger, Logger, LogLevel } from './src/ngtsc/logging';
 export { NodeJSFileSystem, absoluteFrom } from './src/ngtsc/file_system';
 export * from './src/ngtsc/docs/src/entities';
 export * from './src/ngtsc/docs';
-export { isLocalCompilationDiagnostics } from './src/ngtsc/diagnostics';
+export { isLocalCompilationDiagnostics, ErrorCode, ngErrorCode } from './src/ngtsc/diagnostics';

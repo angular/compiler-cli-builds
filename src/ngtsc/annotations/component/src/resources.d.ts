@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { InterpolationConfig, ParsedTemplate, ParseSourceFile, TmplAstNode } from '@angular/compiler';
 import ts from 'typescript';
@@ -13,14 +13,14 @@ import { Resource } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, DeclarationNode, Decorator } from '../../../reflection';
 import { CompilationMode } from '../../../transform';
-import { TemplateSourceMapping } from '../../../typecheck/api';
+import { SourceMapping } from '../../../typecheck/api';
 import { ResourceLoader } from '../../common';
 /**
  * The literal style url extracted from the decorator, along with metadata for diagnostics.
  */
 export interface StyleUrlMeta {
     url: string;
-    nodeForError: ts.Node;
+    expression: ts.Expression;
     source: ResourceTypeForDiagnostics.StylesheetFromTemplate | ResourceTypeForDiagnostics.StylesheetFromDecorator;
 }
 /**
@@ -58,7 +58,7 @@ export interface ParsedComponentTemplate extends ParsedTemplate {
 export interface ParsedTemplateWithSource extends ParsedComponentTemplate {
     /** The string contents of the template. */
     content: string;
-    sourceMapping: TemplateSourceMapping;
+    sourceMapping: SourceMapping;
     declaration: TemplateDeclaration;
 }
 /**
@@ -94,14 +94,18 @@ export interface ExternalTemplateDeclaration extends CommonTemplateDeclaration {
  */
 export type TemplateDeclaration = InlineTemplateDeclaration | ExternalTemplateDeclaration;
 /** Determines the node to use for debugging purposes for the given TemplateDeclaration. */
-export declare function getTemplateDeclarationNodeForError(declaration: TemplateDeclaration): ts.Node;
+export declare function getTemplateDeclarationNodeForError(declaration: TemplateDeclaration): ts.Expression;
 export interface ExtractTemplateOptions {
     usePoisonedData: boolean;
     enableI18nLegacyMessageIdFormat: boolean;
     i18nNormalizeLineEndingsInICUs: boolean;
     enableBlockSyntax: boolean;
+    enableLetSyntax: boolean;
+    enableSelectorless: boolean;
+    preserveSignificantWhitespace?: boolean;
 }
 export declare function extractTemplate(node: ClassDeclaration, template: TemplateDeclaration, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, options: ExtractTemplateOptions, compilationMode: CompilationMode): ParsedTemplateWithSource;
+export declare function createEmptyTemplate(componentClass: ClassDeclaration, component: Map<string, ts.Expression>, containingFile: string): ParsedTemplateWithSource;
 export declare function parseTemplateDeclaration(node: ClassDeclaration, decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, evaluator: PartialEvaluator, depTracker: DependencyTracker | null, resourceLoader: ResourceLoader, defaultPreserveWhitespaces: boolean): TemplateDeclaration;
 export declare function preloadAndParseTemplate(evaluator: PartialEvaluator, resourceLoader: ResourceLoader, depTracker: DependencyTracker | null, preanalyzeTemplateCache: Map<DeclarationNode, ParsedTemplateWithSource>, node: ClassDeclaration, decorator: Decorator, component: Map<string, ts.Expression>, containingFile: string, defaultPreserveWhitespaces: boolean, options: ExtractTemplateOptions, compilationMode: CompilationMode): Promise<ParsedTemplateWithSource | null>;
 export declare function makeResourceNotFoundError(file: string, nodeForError: ts.Node, resourceType: ResourceTypeForDiagnostics): FatalDiagnosticError;
@@ -119,6 +123,6 @@ export declare function makeResourceNotFoundError(file: string, nodeForError: ts
  */
 export declare function transformDecoratorResources(dec: Decorator, component: Map<string, ts.Expression>, styles: string[], template: ParsedTemplateWithSource): Decorator;
 export declare function extractComponentStyleUrls(evaluator: PartialEvaluator, component: Map<string, ts.Expression>): StyleUrlMeta[];
-export declare function extractStyleResources(resourceLoader: ResourceLoader, component: Map<string, ts.Expression>, containingFile: string): ReadonlySet<Resource>;
+export declare function extractInlineStyleResources(component: Map<string, ts.Expression>): Set<Resource>;
 export declare function _extractTemplateStyleUrls(template: ParsedTemplateWithSource): StyleUrlMeta[];
 export {};

@@ -3,32 +3,32 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  PotentialImportKind,
-  PotentialImportMode
-} from "../chunk-ZX6BKV7T.js";
-import {
   DynamicValue,
   PartialEvaluator,
+  PotentialImportKind,
+  PotentialImportMode,
   StaticInterpreter,
-  forwardRefResolver
-} from "../chunk-W5YD5Y43.js";
+  createForwardRefResolver
+} from "../chunk-WNWOEBZS.js";
 import {
+  ImportManager,
   Reference,
   TypeScriptReflectionHost,
   reflectObjectLiteral
-} from "../chunk-73B3CO3L.js";
-import "../chunk-JZQHA4E7.js";
-import "../chunk-3W345P4E.js";
-import "../chunk-XI2RTGAL.js";
+} from "../chunk-SBWQVXJA.js";
+import "../chunk-Q2WE7ECN.js";
+import "../chunk-37JMVF7H.js";
+import "../chunk-KPQ72R34.js";
 export {
   DynamicValue,
+  ImportManager,
   PartialEvaluator,
   PotentialImportKind,
   PotentialImportMode,
   Reference,
   StaticInterpreter,
   TypeScriptReflectionHost,
-  forwardRefResolver,
+  createForwardRefResolver,
   reflectObjectLiteral
 };
 /**
@@ -36,6 +36,6 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 //# sourceMappingURL=migrations.js.map

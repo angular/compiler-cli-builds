@@ -3,14 +3,14 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
-import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstForLoopBlock, TmplAstIfBlockBranch, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
+import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstForLoopBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable, TmplAstHostElement, TmplAstComponent, TmplAstDirective } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
-import { TemplateId, TypeCheckableDirectiveMeta, TypeCheckBlockMetadata } from '../api';
+import { TypeCheckId, TypeCheckableDirectiveMeta, TypeCheckBlockMetadata } from '../api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
 import { OutOfBandDiagnosticRecorder } from './oob';
@@ -64,6 +64,8 @@ export declare enum TcbGenericContextBehavior {
  * bounds) will be referenced from the generated TCB code.
  */
 export declare function generateTypeCheckBlock(env: Environment, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, name: ts.Identifier, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): ts.FunctionDeclaration;
+/** Types that can referenced locally in a template. */
+type LocalSymbol = TmplAstElement | TmplAstTemplate | TmplAstVariable | TmplAstLetDeclaration | TmplAstReference | TmplAstHostElement | TmplAstComponent | TmplAstDirective;
 /**
  * A code generation operation that's involved in the construction of a Type Check Block.
  *
@@ -110,7 +112,7 @@ export declare class TcbDirectiveOutputsOp extends TcbOp {
     private scope;
     private node;
     private dir;
-    constructor(tcb: Context, scope: Scope, node: TmplAstTemplate | TmplAstElement, dir: TypeCheckableDirectiveMeta);
+    constructor(tcb: Context, scope: Scope, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective, dir: TypeCheckableDirectiveMeta);
     get optional(): boolean;
     execute(): null;
 }
@@ -125,14 +127,14 @@ export declare class Context {
     readonly env: Environment;
     readonly domSchemaChecker: DomSchemaChecker;
     readonly oobRecorder: OutOfBandDiagnosticRecorder;
-    readonly id: TemplateId;
+    readonly id: TypeCheckId;
     readonly boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
     private pipes;
     readonly schemas: SchemaMetadata[];
     readonly hostIsStandalone: boolean;
     readonly hostPreserveWhitespaces: boolean;
     private nextId;
-    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: TemplateId, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, PipeMeta>, schemas: SchemaMetadata[], hostIsStandalone: boolean, hostPreserveWhitespaces: boolean);
+    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: TypeCheckId, boundTarget: BoundTarget<TypeCheckableDirectiveMeta>, pipes: Map<string, PipeMeta> | null, schemas: SchemaMetadata[], hostIsStandalone: boolean, hostPreserveWhitespaces: boolean);
     /**
      * Allocate a new variable name for use within the `Context`.
      *
@@ -178,6 +180,14 @@ declare class Scope {
      */
     private elementOpMap;
     /**
+     * A map of `TmplAstHostElement`s to the index of their `TcbHostElementOp` in the `opQueue`
+     */
+    private hostElementOpMap;
+    /**
+     * A map of `TmplAstComponent`s to the index of their `TcbComponentNodeOp` in the `opQueue`
+     */
+    private componentNodeOpMap;
+    /**
      * A map of maps which tracks the index of `TcbDirectiveCtorOp`s in the `opQueue` for each
      * directive on a `TmplAstElement` or `TmplAstTemplate` node.
      */
@@ -197,6 +207,12 @@ declare class Scope {
      * pre-resolved variable identifiers.
      */
     private varMap;
+    /**
+     * A map of the names of `TmplAstLetDeclaration`s to the index of their op in the `opQueue`.
+     *
+     * Assumes that there won't be duplicated `@let` declarations within the same scope.
+     */
+    private letDeclOpMap;
     /**
      * Statements for this template.
      *
@@ -219,7 +235,7 @@ declare class Scope {
      * @param children Child nodes that should be appended to the TCB.
      * @param guard an expression that is applied to this scope for type narrowing purposes.
      */
-    static forNodes(tcb: Context, parentScope: Scope | null, scopedNode: TmplAstTemplate | TmplAstIfBlockBranch | TmplAstForLoopBlock | null, children: TmplAstNode[], guard: ts.Expression | null): Scope;
+    static forNodes(tcb: Context, parentScope: Scope | null, scopedNode: TmplAstTemplate | TmplAstIfBlockBranch | TmplAstForLoopBlock | TmplAstHostElement | null, children: TmplAstNode[] | null, guard: ts.Expression | null): Scope;
     /** Registers a local variable with a scope. */
     private static registerVariable;
     /**
@@ -235,12 +251,13 @@ declare class Scope {
      * * `TmplAstElement` - retrieve the expression for the element DOM node
      * * `TmplAstTemplate` - retrieve the template context variable
      * * `TmplAstVariable` - retrieve a template let- variable
+     * * `TmplAstLetDeclaration` - retrieve a template `@let` declaration
      * * `TmplAstReference` - retrieve variable created for the local ref
      *
      * @param directive if present, a directive type on a `TmplAstElement` or `TmplAstTemplate` to
      * look up instead of the default for an element or template node.
      */
-    resolve(node: TmplAstElement | TmplAstTemplate | TmplAstVariable | TmplAstReference, directive?: TypeCheckableDirectiveMeta): ts.Identifier | ts.NonNullExpression;
+    resolve(node: LocalSymbol, directive?: TypeCheckableDirectiveMeta): ts.Identifier | ts.NonNullExpression;
     /**
      * Add a statement to this scope.
      */
@@ -254,6 +271,8 @@ declare class Scope {
      * parent scopes. If no guards have been applied, null is returned.
      */
     guards(): ts.Expression | null;
+    /** Returns whether a template symbol is defined locally within the current scope. */
+    isLocal(node: TmplAstVariable | TmplAstLetDeclaration | TmplAstReference): boolean;
     private resolveLocal;
     /**
      * Like `executeOp`, but assert that the operation actually returned `ts.Expression`.
@@ -270,13 +289,20 @@ declare class Scope {
     private appendNode;
     private appendChildren;
     private checkAndAppendReferencesOfNode;
-    private appendDirectivesAndInputsOfNode;
-    private appendOutputsOfNode;
+    private appendDirectivesAndInputsOfElementLikeNode;
+    private appendOutputsOfElementLikeNode;
+    private appendInputsOfSelectorlessNode;
+    private appendOutputsOfSelectorlessNode;
+    private appendDirectiveInputs;
+    private appendSelectorlessDirectives;
     private appendDeepSchemaChecks;
     private appendIcuExpressions;
     private appendContentProjectionCheckOp;
+    private appendComponentNode;
     private appendDeferredBlock;
     private appendDeferredTriggers;
     private appendReferenceBasedDeferredTrigger;
+    /** Reports a diagnostic if there are any `@let` declarations that conflict with a node. */
+    private static checkConflictingLet;
 }
 export {};

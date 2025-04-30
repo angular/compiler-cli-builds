@@ -3,15 +3,16 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { AnimationTriggerNames, DeclarationListEmitMode, DeferBlockDepsEmitMode, R3ClassDebugInfo, R3ClassMetadata, R3ComponentMetadata, R3DeferPerBlockDependency, R3DeferPerComponentDependency, R3TemplateDependencyMetadata, SchemaMetadata, TmplAstDeferredBlock } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../../imports';
-import { ClassPropertyMapping, ComponentResources, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping } from '../../../metadata';
+import { ClassPropertyMapping, DirectiveResources, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping } from '../../../metadata';
 import { ClassDeclaration } from '../../../reflection';
 import { SubsetOfKeys } from '../../../util/src/typescript';
 import { ParsedTemplateWithSource, StyleUrlMeta } from './resources';
+import { HostBindingNodes } from '../../directive';
 /**
  * These fields of `R3ComponentMetadata` are updated in the `resolve` phase.
  *
@@ -31,6 +32,7 @@ export interface ComponentAnalysisData {
     classMetadata: R3ClassMetadata | null;
     classDebugInfo: R3ClassDebugInfo | null;
     inputs: ClassPropertyMapping<InputMapping>;
+    inputFieldNamesFromMetadataArray: Set<string>;
     outputs: ClassPropertyMapping;
     /**
      * Providers extracted from the `providers` field of the component annotation which will require
@@ -42,7 +44,7 @@ export interface ComponentAnalysisData {
      * require an Angular factory definition at runtime.
      */
     viewProvidersRequiringFactory: Set<Reference<ClassDeclaration>> | null;
-    resources: ComponentResources;
+    resources: DirectiveResources;
     /**
      * `styleUrls` extracted from the decorator, if present.
      */
@@ -67,6 +69,8 @@ export interface ComponentAnalysisData {
     hostDirectives: HostDirectiveMeta[] | null;
     /** Raw expression that defined the host directives array. Used for diagnostics. */
     rawHostDirectives: ts.Expression | null;
+    /** Raw nodes representing the host bindings of the directive. */
+    hostBindingNodes: HostBindingNodes;
 }
 export interface ComponentResolutionData {
     declarations: R3TemplateDependencyMetadata[];

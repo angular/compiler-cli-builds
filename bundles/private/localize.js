@@ -5,11 +5,11 @@
 import {
   ConsoleLogger,
   LogLevel
-} from "../chunk-LYJKWJUC.js";
+} from "../chunk-FKXFEX7K.js";
 import {
   SourceFile,
   SourceFileLoader
-} from "../chunk-QYV344EV.js";
+} from "../chunk-77D5CI2U.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -18,6 +18,7 @@ import {
   absoluteFrom,
   absoluteFromSourceFile,
   basename,
+  createFileSystemTsReadDirectoryFn,
   dirname,
   getFileSystem,
   getSourceFileOrError,
@@ -30,8 +31,8 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "../chunk-3W345P4E.js";
-import "../chunk-XI2RTGAL.js";
+} from "../chunk-37JMVF7H.js";
+import "../chunk-KPQ72R34.js";
 export {
   ConsoleLogger,
   LogLevel,
@@ -44,6 +45,7 @@ export {
   absoluteFrom,
   absoluteFromSourceFile,
   basename,
+  createFileSystemTsReadDirectoryFn,
   dirname,
   getFileSystem,
   getSourceFileOrError,
@@ -62,6 +64,6 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 //# sourceMappingURL=localize.js.map

@@ -3,7 +3,7 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 import { ConstantPool } from '@angular/compiler';
 import ts from 'typescript';
@@ -114,6 +114,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
     xi18n(bundle: Xi18nContext): void;
     updateResources(clazz: DeclarationNode): void;
     compile(clazz: DeclarationNode, constantPool: ConstantPool): CompileResult[] | null;
+    compileHmrUpdateCallback(clazz: DeclarationNode): ts.FunctionDeclaration | null;
     decoratorsFor(node: ts.Declaration): ts.Decorator[];
     get diagnostics(): ReadonlyArray<ts.Diagnostic>;
     get exportStatements(): Map<string, Map<string, [string, string]>>;

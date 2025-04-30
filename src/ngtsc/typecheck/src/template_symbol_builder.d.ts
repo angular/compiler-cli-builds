@@ -3,14 +3,14 @@
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, TmplAstElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
+import { AST, TmplAstElement, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ComponentScopeReader } from '../../scope';
-import { ElementSymbol, ReferenceSymbol, Symbol, TemplateSymbol, VariableSymbol } from '../api';
-import { TemplateData } from './context';
+import { ElementSymbol, LetDeclarationSymbol, ReferenceSymbol, Symbol, TemplateSymbol, VariableSymbol } from '../api';
+import { TypeCheckData } from './context';
 /**
  * Generates and caches `Symbol`s for various template structures for a given component.
  *
@@ -21,13 +21,13 @@ export declare class SymbolBuilder {
     private readonly tcbPath;
     private readonly tcbIsShim;
     private readonly typeCheckBlock;
-    private readonly templateData;
+    private readonly typeCheckData;
     private readonly componentScopeReader;
     private readonly getTypeChecker;
     private symbolCache;
-    constructor(tcbPath: AbsoluteFsPath, tcbIsShim: boolean, typeCheckBlock: ts.Node, templateData: TemplateData, componentScopeReader: ComponentScopeReader, getTypeChecker: () => ts.TypeChecker);
+    constructor(tcbPath: AbsoluteFsPath, tcbIsShim: boolean, typeCheckBlock: ts.Node, typeCheckData: TypeCheckData, componentScopeReader: ComponentScopeReader, getTypeChecker: () => ts.TypeChecker);
     getSymbol(node: TmplAstTemplate | TmplAstElement): TemplateSymbol | ElementSymbol | null;
-    getSymbol(node: TmplAstReference | TmplAstVariable): ReferenceSymbol | VariableSymbol | null;
+    getSymbol(node: TmplAstReference | TmplAstVariable | TmplAstLetDeclaration): ReferenceSymbol | VariableSymbol | LetDeclarationSymbol | null;
     getSymbol(node: AST | TmplAstNode): Symbol | null;
     private getSymbolOfAstTemplate;
     private getSymbolOfElement;
@@ -40,6 +40,7 @@ export declare class SymbolBuilder {
     private getDirectiveSymbolForAccessExpression;
     private getSymbolOfVariable;
     private getSymbolOfReference;
+    private getSymbolOfLetDeclaration;
     private getSymbolOfPipe;
     private getSymbolOfTemplateExpression;
     private getSymbolOfTsNode;

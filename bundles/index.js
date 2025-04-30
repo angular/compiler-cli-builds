@@ -5,11 +5,8 @@
 import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-  angularJitApplicationTransform,
-  constructorParametersDownlevelTransform,
-  getDownlevelDecoratorsTransform,
-  getInitializerApiJitTransform
-} from "./chunk-3HR6YOCA.js";
+  constructorParametersDownlevelTransform
+} from "./chunk-UTYYMB4Z.js";
 import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
@@ -23,7 +20,6 @@ import {
   NgtscProgram,
   PatchedProgramIncrementalBuildStrategy,
   SOURCE,
-  TsCreateProgramDriver,
   UNKNOWN_ERROR_CODE,
   calcProjectFileAndBasePath,
   createCompilerHost,
@@ -36,24 +32,30 @@ import {
   isDocEntryWithSourceInfo,
   isTsDiagnostic,
   performCompilation,
-  readConfiguration,
-  untagAllTsFiles
-} from "./chunk-H5OAK2DW.js";
+  readConfiguration
+} from "./chunk-5HL3AR4R.js";
 import {
-  OptimizeFor
-} from "./chunk-ZX6BKV7T.js";
-import "./chunk-W5YD5Y43.js";
-import {
-  isLocalCompilationDiagnostics
-} from "./chunk-73B3CO3L.js";
-import {
-  ActivePerfRecorder,
-  PerfPhase
-} from "./chunk-JZQHA4E7.js";
+  angularJitApplicationTransform,
+  getDownlevelDecoratorsTransform,
+  getInitializerApiJitTransform
+} from "./chunk-2F5IGGXH.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "./chunk-LYJKWJUC.js";
+} from "./chunk-FKXFEX7K.js";
+import {
+  OptimizeFor,
+  TsCreateProgramDriver
+} from "./chunk-WNWOEBZS.js";
+import {
+  ErrorCode,
+  isLocalCompilationDiagnostics,
+  ngErrorCode
+} from "./chunk-SBWQVXJA.js";
+import {
+  ActivePerfRecorder,
+  PerfPhase
+} from "./chunk-Q2WE7ECN.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -62,6 +64,7 @@ import {
   absoluteFrom,
   absoluteFromSourceFile,
   basename,
+  createFileSystemTsReadDirectoryFn,
   dirname,
   getFileSystem,
   getSourceFileOrError,
@@ -74,15 +77,20 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-3W345P4E.js";
-import "./chunk-XI2RTGAL.js";
+} from "./chunk-37JMVF7H.js";
+import "./chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("18.1.0-next.0+sha-87c5f3c");
+var VERSION = new Version("20.0.0-next.9+sha-f4d60ff");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
+  ngOptions;
+  name = "ngtsc";
+  options = null;
+  host = null;
+  _compiler = null;
   get compiler() {
     if (this._compiler === null) {
       throw new Error("Lifecycle error: setupCompilation() must be called first.");
@@ -91,10 +99,6 @@ var NgTscPlugin = class {
   }
   constructor(ngOptions) {
     this.ngOptions = ngOptions;
-    this.name = "ngtsc";
-    this.options = null;
-    this.host = null;
-    this._compiler = null;
     setFileSystem(new NodeJSFileSystem());
   }
   wrapHost(host, inputFiles, options) {
@@ -109,7 +113,6 @@ var NgTscPlugin = class {
       throw new Error("Lifecycle error: setupCompilation() before wrapHost().");
     }
     this.host.postProgramCreationCleanup();
-    untagAllTsFiles(program);
     const programDriver = new TsCreateProgramDriver(program, this.host, this.options, this.host.shimExtensionPrefixes);
     const strategy = new PatchedProgramIncrementalBuildStrategy();
     const oldState = oldProgram !== void 0 ? strategy.getIncrementalState(oldProgram) : null;
@@ -167,6 +170,7 @@ export {
   DocsExtractor,
   EmitFlags,
   EntryType,
+  ErrorCode,
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   LogLevel,
@@ -189,6 +193,7 @@ export {
   calcProjectFileAndBasePath,
   constructorParametersDownlevelTransform,
   createCompilerHost,
+  createFileSystemTsReadDirectoryFn,
   createProgram,
   defaultGatherDiagnostics,
   dirname,
@@ -205,6 +210,7 @@ export {
   isRooted,
   isTsDiagnostic,
   join,
+  ngErrorCode,
   performCompilation,
   readConfiguration,
   relative,
@@ -218,6 +224,6 @@ export {
  * Copyright Google LLC All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * found in the LICENSE file at https://angular.dev/license
  */
 //# sourceMappingURL=index.js.map
