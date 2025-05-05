@@ -152,6 +152,6 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      * `@Component.deferredImports`) and registers imported types as deferrable
      * candidates.
      */
-    private registerDeferrableCandidates;
+    private registerDeferrableCandidate;
     private compileDeferBlocks;
 }

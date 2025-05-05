@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { SchemaMetadata, SelectorMatcher } from '@angular/compiler';
+import { DirectiveMatcher, SchemaMetadata } from '@angular/compiler';
 import { Reference } from '../../imports';
 import { DirectiveMeta, HostDirectivesResolver, MetadataReader, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
@@ -15,10 +15,10 @@ import { ComponentScopeReader } from './api';
  */
 export interface TypeCheckScope {
     /**
-     * A `SelectorMatcher` instance that contains the flattened directive metadata of all directives
+     * A `DirectiveMatcher` instance that contains the flattened directive metadata of all directives
      * that are in the compilation scope of the declaring NgModule.
      */
-    matcher: SelectorMatcher<DirectiveMeta[]>;
+    matcher: DirectiveMatcher<DirectiveMeta> | null;
     /**
      * All of the directives available in the compilation scope of the declaring NgModule.
      */
@@ -62,4 +62,6 @@ export declare class TypeCheckScopeRegistry {
     getTypeCheckScope(node: ClassDeclaration): TypeCheckScope;
     getTypeCheckDirectiveMetadata(ref: Reference<ClassDeclaration>): DirectiveMeta | null;
     private applyExplicitlyDeferredFlag;
+    private getSelectorMatcher;
+    private getSelectorlessMatcher;
 }

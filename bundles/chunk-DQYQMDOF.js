@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-2F5IGGXH.js";
+} from "./chunk-B5QQPM3E.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -35,6 +35,7 @@ import {
   PipeDecoratorHandler,
   QUERY_INITIALIZER_FNS,
   ResourceRegistry,
+  SelectorlessComponentScopeReader,
   SemanticDepGraphUpdater,
   ShimAdapter,
   ShimReferenceTagger,
@@ -51,7 +52,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-WNWOEBZS.js";
+} from "./chunk-L7WXWANR.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -87,7 +88,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-SBWQVXJA.js";
+} from "./chunk-P6Y43LJL.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -2532,7 +2533,7 @@ var StandaloneComponentScopeReader = class {
     if (!this.cache.has(clazz)) {
       const clazzRef = new Reference(clazz);
       const clazzMeta = this.metaReader.getDirectiveMetadata(clazzRef);
-      if (clazzMeta === null || !clazzMeta.isComponent || !clazzMeta.isStandalone) {
+      if (clazzMeta === null || !clazzMeta.isComponent || !clazzMeta.isStandalone || clazzMeta.selectorlessEnabled) {
         this.cache.set(clazz, null);
         return null;
       }
@@ -4323,8 +4324,10 @@ var NgCompiler = class {
     const ngModuleIndex = new NgModuleIndexImpl(metaReader, localMetaReader);
     const ngModuleScopeRegistry = new LocalModuleScopeRegistry(localMetaReader, metaReader, depScopeReader, refEmitter, aliasingHost);
     const standaloneScopeReader = new StandaloneComponentScopeReader(metaReader, ngModuleScopeRegistry, depScopeReader);
+    const selectorlessScopeReader = new SelectorlessComponentScopeReader(metaReader, reflector);
     const scopeReader = new CompoundComponentScopeReader([
       ngModuleScopeRegistry,
+      selectorlessScopeReader,
       standaloneScopeReader
     ]);
     const semanticDepGraphUpdater = this.incrementalCompilation.semanticDepGraphUpdater;
@@ -5228,4 +5231,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-5HL3AR4R.js.map
+//# sourceMappingURL=chunk-DQYQMDOF.js.map

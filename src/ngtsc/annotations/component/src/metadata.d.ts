@@ -71,6 +71,13 @@ export interface ComponentAnalysisData {
     rawHostDirectives: ts.Expression | null;
     /** Raw nodes representing the host bindings of the directive. */
     hostBindingNodes: HostBindingNodes;
+    /** Whether selectorless is enabled for the specific component. */
+    selectorlessEnabled: boolean;
+    /**
+     * Names of the symbols within the source file that are referenced directly inside the template.
+     * Used to reduce the amount of lookups when determining which dependencies to expose.
+     */
+    localReferencedSymbols: Set<string> | null;
 }
 export interface ComponentResolutionData {
     declarations: R3TemplateDependencyMetadata[];

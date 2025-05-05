@@ -48,7 +48,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-SBWQVXJA.js";
+} from "./chunk-P6Y43LJL.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -1854,7 +1854,9 @@ var DtsMetadataReader = class {
       decorator: null,
       assumedToExportProviders: isComponent && isStandalone,
       preserveWhitespaces: false,
-      isExplicitlyDeferred: false
+      isExplicitlyDeferred: false,
+      selectorlessEnabled: false,
+      localReferencedSymbols: null
     };
   }
   getPipeMetadata(ref) {
@@ -3791,7 +3793,7 @@ var JitDeclarationRegistry = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
-import { compileClassDebugInfo, compileHmrInitializer, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, ConstantPool as ConstantPool2, CssSelector as CssSelector5, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry as DomElementSchemaRegistry3, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser3, outputAst as o4, R3TargetBinder as R3TargetBinder2, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher3, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
+import { compileClassDebugInfo, compileHmrInitializer, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, ConstantPool as ConstantPool2, CssSelector as CssSelector5, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry as DomElementSchemaRegistry3, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser3, outputAst as o4, R3TargetBinder as R3TargetBinder2, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher3, ViewEncapsulation as ViewEncapsulation2, SelectorlessMatcher as SelectorlessMatcher2 } from "@angular/compiler";
 import ts51 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.mjs
@@ -4035,6 +4037,7 @@ var ComponentScopeKind;
 (function(ComponentScopeKind2) {
   ComponentScopeKind2[ComponentScopeKind2["NgModule"] = 0] = "NgModule";
   ComponentScopeKind2[ComponentScopeKind2["Standalone"] = 1] = "Standalone";
+  ComponentScopeKind2[ComponentScopeKind2["Selectorless"] = 2] = "Selectorless";
 })(ComponentScopeKind || (ComponentScopeKind = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/component_scope.mjs
@@ -4530,9 +4533,115 @@ function reexportCollision(module, refA, refB) {
   ]);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/typecheck.mjs
-import { CssSelector, SelectorMatcher } from "@angular/compiler";
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/selectorless_scope.mjs
 import ts18 from "typescript";
+var SelectorlessComponentScopeReader = class {
+  metaReader;
+  reflector;
+  cache = /* @__PURE__ */ new Map();
+  constructor(metaReader, reflector) {
+    this.metaReader = metaReader;
+    this.reflector = reflector;
+  }
+  getScopeForComponent(node) {
+    var _a;
+    if (this.cache.has(node)) {
+      return this.cache.get(node);
+    }
+    const clazzRef = new Reference(node);
+    const meta = this.metaReader.getDirectiveMetadata(clazzRef);
+    if (meta === null || !meta.isComponent || !meta.isStandalone || !meta.selectorlessEnabled) {
+      this.cache.set(node, null);
+      return null;
+    }
+    const eligibleIdentifiers = this.getAvailableIdentifiers(node);
+    const dependencies = /* @__PURE__ */ new Map();
+    const dependencyIdentifiers = [];
+    let isPoisoned = meta.isPoisoned;
+    for (const [name, identifier] of eligibleIdentifiers) {
+      if (dependencies.has(name)) {
+        continue;
+      }
+      const dep = this.getMetaFromIdentifier(meta, name, identifier);
+      if (dep !== null) {
+        dependencies.set(name, dep);
+        dependencyIdentifiers.push(identifier);
+        if (dep.kind === MetaKind.Directive && dep.isPoisoned) {
+          isPoisoned = true;
+        }
+      }
+    }
+    const scope = {
+      kind: ComponentScopeKind.Selectorless,
+      component: node,
+      dependencies,
+      dependencyIdentifiers,
+      isPoisoned,
+      schemas: (_a = meta.schemas) != null ? _a : []
+    };
+    this.cache.set(node, scope);
+    return scope;
+  }
+  getRemoteScope() {
+    return null;
+  }
+  getAvailableIdentifiers(node) {
+    const result = /* @__PURE__ */ new Map();
+    let current = ts18.getOriginalNode(node).parent;
+    while (current) {
+      if (!ts18.isSourceFile(current) && !ts18.isBlock(current)) {
+        current = current.parent;
+        continue;
+      }
+      for (const stmt of current.statements) {
+        switch (true) {
+          case ts18.isImportDeclaration(stmt):
+            if (stmt.importClause !== void 0 && !stmt.importClause.isTypeOnly) {
+              const clause = stmt.importClause;
+              if (clause.namedBindings !== void 0 && ts18.isNamedImports(clause.namedBindings)) {
+                for (const element of clause.namedBindings.elements) {
+                  if (!element.isTypeOnly) {
+                    result.set(element.name.text, element.name);
+                  }
+                }
+              }
+              if (clause.name !== void 0) {
+                result.set(clause.name.text, clause.name);
+              }
+            }
+            break;
+          case ts18.isVariableStatement(stmt):
+            for (const decl of stmt.declarationList.declarations) {
+              if (ts18.isIdentifier(decl.name) && decl.initializer !== void 0 && ts18.isIdentifier(decl.initializer)) {
+                result.set(decl.name.text, decl.initializer);
+              }
+            }
+            break;
+          case this.reflector.isClass(stmt):
+            result.set(stmt.name.text, stmt.name);
+            break;
+        }
+      }
+      current = current.parent;
+    }
+    return result;
+  }
+  getMetaFromIdentifier(meta, localName, node) {
+    var _a;
+    if (meta.localReferencedSymbols === null || !meta.localReferencedSymbols.has(localName)) {
+      return null;
+    }
+    const declaration = this.reflector.getDeclarationOfIdentifier(node);
+    if (declaration === null || !this.reflector.isClass(declaration.node)) {
+      return null;
+    }
+    const ref = new Reference(declaration.node);
+    return (_a = this.metaReader.getDirectiveMetadata(ref)) != null ? _a : this.metaReader.getPipeMetadata(ref);
+  }
+};
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/typecheck.mjs
+import { CssSelector, SelectorlessMatcher, SelectorMatcher } from "@angular/compiler";
 var TypeCheckScopeRegistry = class {
   scopeReader;
   metaReader;
@@ -4545,13 +4654,12 @@ var TypeCheckScopeRegistry = class {
     this.hostDirectivesResolver = hostDirectivesResolver;
   }
   getTypeCheckScope(node) {
-    const matcher = new SelectorMatcher();
     const directives = [];
     const pipes = /* @__PURE__ */ new Map();
     const scope = this.scopeReader.getScopeForComponent(node);
     if (scope === null) {
       return {
-        matcher,
+        matcher: null,
         directives,
         pipes,
         schemas: [],
@@ -4559,32 +4667,34 @@ var TypeCheckScopeRegistry = class {
       };
     }
     const isNgModuleScope = scope.kind === ComponentScopeKind.NgModule;
+    const isSelectorlessScope = scope.kind === ComponentScopeKind.Selectorless;
     const cacheKey = isNgModuleScope ? scope.ngModule : scope.component;
-    const dependencies = isNgModuleScope ? scope.compilation.dependencies : scope.dependencies;
     if (this.scopeCache.has(cacheKey)) {
       return this.scopeCache.get(cacheKey);
     }
-    let allDependencies = dependencies;
-    if (!isNgModuleScope && Array.isArray(scope.deferredDependencies) && scope.deferredDependencies.length > 0) {
-      allDependencies = [...allDependencies, ...scope.deferredDependencies];
-    }
-    for (const meta of allDependencies) {
-      if (meta.kind === MetaKind.Directive && meta.selector !== null) {
-        const extMeta = this.getTypeCheckDirectiveMetadata(meta.ref);
-        if (extMeta === null) {
-          continue;
+    let matcher;
+    if (isSelectorlessScope) {
+      matcher = this.getSelectorlessMatcher(scope);
+      for (const [name, dep] of scope.dependencies) {
+        if (dep.kind === MetaKind.Directive) {
+          directives.push(dep);
+        } else {
+          pipes.set(name, dep);
         }
-        const directiveMeta = this.applyExplicitlyDeferredFlag(extMeta, meta.isExplicitlyDeferred);
-        matcher.addSelectables(CssSelector.parse(meta.selector), [
-          ...this.hostDirectivesResolver.resolve(directiveMeta),
-          directiveMeta
-        ]);
-        directives.push(directiveMeta);
-      } else if (meta.kind === MetaKind.Pipe) {
-        if (!ts18.isClassDeclaration(meta.ref.node)) {
-          throw new Error(`Unexpected non-class declaration ${ts18.SyntaxKind[meta.ref.node.kind]} for pipe ${meta.ref.debugName}`);
+      }
+    } else {
+      const dependencies = isNgModuleScope ? scope.compilation.dependencies : scope.dependencies;
+      let allDependencies = dependencies;
+      if (!isNgModuleScope && Array.isArray(scope.deferredDependencies) && scope.deferredDependencies.length > 0) {
+        allDependencies = [...allDependencies, ...scope.deferredDependencies];
+      }
+      matcher = this.getSelectorMatcher(allDependencies);
+      for (const dep of allDependencies) {
+        if (dep.kind === MetaKind.Directive) {
+          directives.push(dep);
+        } else if (dep.kind === MetaKind.Pipe) {
+          pipes.set(dep.name, dep);
         }
-        pipes.set(meta.name, meta);
       }
     }
     const typeCheckScope = {
@@ -4611,6 +4721,33 @@ var TypeCheckScopeRegistry = class {
   }
   applyExplicitlyDeferredFlag(meta, isExplicitlyDeferred) {
     return isExplicitlyDeferred === true ? { ...meta, isExplicitlyDeferred } : meta;
+  }
+  getSelectorMatcher(allDependencies) {
+    const matcher = new SelectorMatcher();
+    for (const meta of allDependencies) {
+      if (meta.kind === MetaKind.Directive && meta.selector !== null) {
+        const extMeta = this.getTypeCheckDirectiveMetadata(meta.ref);
+        if (extMeta === null) {
+          continue;
+        }
+        const directiveMeta = this.applyExplicitlyDeferredFlag(extMeta, meta.isExplicitlyDeferred);
+        matcher.addSelectables(CssSelector.parse(meta.selector), [
+          ...this.hostDirectivesResolver.resolve(directiveMeta),
+          directiveMeta
+        ]);
+      }
+    }
+    return matcher;
+  }
+  getSelectorlessMatcher(scope) {
+    const registry = /* @__PURE__ */ new Map();
+    for (const [name, dep] of scope.dependencies) {
+      const extMeta = dep.kind === MetaKind.Directive ? this.getTypeCheckDirectiveMetadata(dep.ref) : null;
+      if (extMeta !== null) {
+        registry.set(name, [extMeta, ...this.hostDirectivesResolver.resolve(extMeta)]);
+      }
+    }
+    return new SelectorlessMatcher(registry);
   }
 };
 
@@ -8718,7 +8855,7 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     ));
   }
   incorrectTemplateDependencyType(id, node) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.startSourceSpan, ts35.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE), `Incorrect reference type. Type must be an ${node instanceof TmplAstComponent ? "@Component" : "@Directive"}.`));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.startSourceSpan, ts35.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE), `Incorrect reference type. Type must be a standalone ${node instanceof TmplAstComponent ? "@Component" : "@Directive"}.`));
   }
   unclaimedDirectiveBinding(id, directive, node) {
     const errorMsg = `Directive ${directive.name} does not have an ${node instanceof TmplAstBoundEvent2 ? "output" : "input"} named "${node.name}". Bindings to directives must target existing inputs or outputs.`;
@@ -10668,7 +10805,7 @@ var _Scope = class {
         continue;
       }
       const directives = this.tcb.boundTarget.getDirectivesOfNode(directive);
-      if (directives === null || directives.length === 0 || directives.some((dir) => dir.isComponent)) {
+      if (directives === null || directives.length === 0 || directives.some((dir) => dir.isComponent || !dir.isStandalone)) {
         this.tcb.oobRecorder.incorrectTemplateDependencyType(this.tcb.id, directive);
         continue;
       }
@@ -10734,7 +10871,7 @@ var _Scope = class {
       return;
     }
     const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
-    if (directives === null || directives.length === 0 || directives.every((dir) => !dir.isComponent)) {
+    if (directives === null || directives.length === 0 || directives.every((dir) => !dir.isComponent || !dir.isStandalone)) {
       this.tcb.oobRecorder.incorrectTemplateDependencyType(this.tcb.id, node);
       return;
     }
@@ -12544,11 +12681,17 @@ var TemplateTypeCheckerImpl = class {
   }
   getPotentialTemplateDirectives(component) {
     var _a, _b;
+    const scope = this.getComponentScope(component);
+    if ((scope == null ? void 0 : scope.kind) === ComponentScopeKind.Selectorless) {
+      return [];
+    }
     const typeChecker = this.programDriver.getProgram().getTypeChecker();
-    const inScopeDirectives = (_b = (_a = this.getScopeData(component)) == null ? void 0 : _a.directives) != null ? _b : [];
     const resultingDirectives = /* @__PURE__ */ new Map();
-    for (const d of inScopeDirectives) {
-      resultingDirectives.set(d.ref.node, d);
+    if (scope !== null) {
+      const inScopeDirectives = (_b = (_a = this.getScopeData(component, scope)) == null ? void 0 : _a.directives) != null ? _b : [];
+      for (const d of inScopeDirectives) {
+        resultingDirectives.set(d.ref.node, d);
+      }
     }
     for (const directiveClass of this.localMetaReader.getKnown(MetaKind.Directive)) {
       const directiveMeta = this.metaReader.getDirectiveMetadata(new Reference(directiveClass));
@@ -12565,11 +12708,17 @@ var TemplateTypeCheckerImpl = class {
   }
   getPotentialPipes(component) {
     var _a, _b;
+    const scope = this.getComponentScope(component);
+    if ((scope == null ? void 0 : scope.kind) === ComponentScopeKind.Selectorless) {
+      return [];
+    }
     const typeChecker = this.programDriver.getProgram().getTypeChecker();
-    const inScopePipes = (_b = (_a = this.getScopeData(component)) == null ? void 0 : _a.pipes) != null ? _b : [];
     const resultingPipes = /* @__PURE__ */ new Map();
-    for (const p of inScopePipes) {
-      resultingPipes.set(p.ref.node, p);
+    if (scope !== null) {
+      const inScopePipes = (_b = (_a = this.getScopeData(component, scope)) == null ? void 0 : _a.pipes) != null ? _b : [];
+      for (const p of inScopePipes) {
+        resultingPipes.set(p.ref.node, p);
+      }
     }
     for (const pipeClass of this.localMetaReader.getKnown(MetaKind.Pipe)) {
       const pipeMeta = this.metaReader.getPipeMetadata(new Reference(pipeClass));
@@ -12722,16 +12871,15 @@ var TemplateTypeCheckerImpl = class {
     }
     return imports;
   }
-  getScopeData(component) {
-    if (this.scopeCache.has(component)) {
-      return this.scopeCache.get(component);
-    }
+  getComponentScope(component) {
     if (!isNamedClassDeclaration(component)) {
       throw new Error(`AssertionError: components must have names`);
     }
-    const scope = this.componentScopeReader.getScopeForComponent(component);
-    if (scope === null) {
-      return null;
+    return this.componentScopeReader.getScopeForComponent(component);
+  }
+  getScopeData(component, scope) {
+    if (this.scopeCache.has(component)) {
+      return this.scopeCache.get(component);
     }
     const dependencies = scope.kind === ComponentScopeKind.NgModule ? scope.compilation.dependencies : scope.dependencies;
     const data = {
@@ -13053,7 +13201,9 @@ var DirectiveDecoratorHandler = class {
       decorator: analysis.decorator,
       preserveWhitespaces: false,
       assumedToExportProviders: false,
-      isExplicitlyDeferred: false
+      isExplicitlyDeferred: false,
+      selectorlessEnabled: false,
+      localReferencedSymbols: null
     });
     this.resourceRegistry.registerResources(analysis.resources, node);
     this.injectableRegistry.registerInjectable(node, {
@@ -14652,6 +14802,149 @@ var HmrModuleImportRewriter = class {
   }
 };
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/selectorless.mjs
+import { ASTWithSource as ASTWithSource3, RecursiveAstVisitor as RecursiveAstVisitor2, TmplAstBoundDeferredTrigger, tmplAstVisitAll, BindingPipe as BindingPipe3 } from "@angular/compiler";
+function analyzeTemplateForSelectorless(template) {
+  const analyzer = new SelectorlessDirectivesAnalyzer();
+  tmplAstVisitAll(analyzer, template);
+  const isSelectorless = analyzer.symbols !== null && analyzer.symbols.size > 0;
+  const localReferencedSymbols = analyzer.symbols;
+  return { isSelectorless, localReferencedSymbols };
+}
+var SelectorlessDirectivesAnalyzer = class extends RecursiveAstVisitor2 {
+  symbols = null;
+  visit(node) {
+    if (node instanceof BindingPipe3 && node.name[0].toUpperCase() === node.name[0]) {
+      this.trackSymbol(node.name);
+    }
+    node.visit(this);
+  }
+  trackSymbol(name) {
+    var _a;
+    (_a = this.symbols) != null ? _a : this.symbols = /* @__PURE__ */ new Set();
+    this.symbols.add(name);
+  }
+  visitAllNodes(nodes) {
+    for (const node of nodes) {
+      this.visit(node);
+    }
+  }
+  visitAst(ast) {
+    if (ast instanceof ASTWithSource3) {
+      ast = ast.ast;
+    }
+    this.visit(ast);
+  }
+  visitComponent(component) {
+    this.trackSymbol(component.componentName);
+    this.visitAllNodes(component.attributes);
+    this.visitAllNodes(component.inputs);
+    this.visitAllNodes(component.outputs);
+    this.visitAllNodes(component.directives);
+    this.visitAllNodes(component.references);
+    this.visitAllNodes(component.children);
+  }
+  visitDirective(directive) {
+    this.trackSymbol(directive.name);
+    this.visitAllNodes(directive.attributes);
+    this.visitAllNodes(directive.inputs);
+    this.visitAllNodes(directive.outputs);
+    this.visitAllNodes(directive.references);
+  }
+  visitElement(element) {
+    this.visitAllNodes(element.attributes);
+    this.visitAllNodes(element.inputs);
+    this.visitAllNodes(element.outputs);
+    this.visitAllNodes(element.directives);
+    this.visitAllNodes(element.references);
+    this.visitAllNodes(element.children);
+  }
+  visitTemplate(template) {
+    this.visitAllNodes(template.attributes);
+    this.visitAllNodes(template.inputs);
+    this.visitAllNodes(template.outputs);
+    this.visitAllNodes(template.directives);
+    this.visitAllNodes(template.templateAttrs);
+    this.visitAllNodes(template.variables);
+    this.visitAllNodes(template.references);
+    this.visitAllNodes(template.children);
+  }
+  visitContent(content) {
+    this.visitAllNodes(content.children);
+  }
+  visitBoundAttribute(attribute) {
+    this.visitAst(attribute.value);
+  }
+  visitBoundEvent(attribute) {
+    this.visitAst(attribute.handler);
+  }
+  visitBoundText(text) {
+    this.visitAst(text.value);
+  }
+  visitIcu(icu) {
+    Object.keys(icu.vars).forEach((key) => this.visit(icu.vars[key]));
+    Object.keys(icu.placeholders).forEach((key) => this.visit(icu.placeholders[key]));
+  }
+  visitDeferredBlock(deferred) {
+    deferred.visitAll(this);
+  }
+  visitDeferredTrigger(trigger) {
+    if (trigger instanceof TmplAstBoundDeferredTrigger) {
+      this.visitAst(trigger.value);
+    }
+  }
+  visitDeferredBlockPlaceholder(block) {
+    this.visitAllNodes(block.children);
+  }
+  visitDeferredBlockError(block) {
+    this.visitAllNodes(block.children);
+  }
+  visitDeferredBlockLoading(block) {
+    this.visitAllNodes(block.children);
+  }
+  visitSwitchBlock(block) {
+    this.visitAst(block.expression);
+    this.visitAllNodes(block.cases);
+  }
+  visitSwitchBlockCase(block) {
+    block.expression && this.visitAst(block.expression);
+    this.visitAllNodes(block.children);
+  }
+  visitForLoopBlock(block) {
+    var _a;
+    block.item.visit(this);
+    this.visitAllNodes(block.contextVariables);
+    this.visitAst(block.expression);
+    this.visitAllNodes(block.children);
+    (_a = block.empty) == null ? void 0 : _a.visit(this);
+  }
+  visitForLoopBlockEmpty(block) {
+    this.visitAllNodes(block.children);
+  }
+  visitIfBlock(block) {
+    this.visitAllNodes(block.branches);
+  }
+  visitIfBlockBranch(block) {
+    var _a;
+    block.expression && this.visitAst(block.expression);
+    (_a = block.expressionAlias) == null ? void 0 : _a.visit(this);
+    this.visitAllNodes(block.children);
+  }
+  visitLetDeclaration(decl) {
+    this.visitAst(decl.value);
+  }
+  visitText() {
+  }
+  visitVariable() {
+  }
+  visitReference() {
+  }
+  visitTextAttribute() {
+  }
+  visitUnknownBlock() {
+  }
+};
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/handler.mjs
 var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
@@ -14995,6 +15288,24 @@ var ComponentDecoratorHandler = class {
       node: template.sourceMapping.node
     };
     const relativeTemplatePath = getProjectRelativePath((_d = templateResource.path) != null ? _d : ts51.getOriginalNode(node).getSourceFile().fileName, this.rootDirs, this.compilerHost);
+    let selectorlessEnabled = false;
+    let localReferencedSymbols = null;
+    if (this.enableSelectorless) {
+      const templateAnalysis = analyzeTemplateForSelectorless(template.nodes);
+      selectorlessEnabled = templateAnalysis.isSelectorless;
+      localReferencedSymbols = templateAnalysis.localReferencedSymbols;
+    }
+    if (selectorlessEnabled) {
+      if (!metadata.isStandalone) {
+        isPoisoned = true;
+        diagnostics != null ? diagnostics : diagnostics = [];
+        diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_NOT_STANDALONE, component.get("standalone") || node.name, `Cannot use selectorless with a component that is not standalone`));
+      } else if (rawImports || rawDeferredImports) {
+        isPoisoned = true;
+        diagnostics != null ? diagnostics : diagnostics = [];
+        diagnostics.push(makeDiagnostic(ErrorCode.UNSUPPORTED_SELECTORLESS_COMPONENT_FIELD, rawImports || rawDeferredImports, `Cannot use the "${rawImports === null ? "deferredImports" : "imports"}" field in a selectorless components`));
+      }
+    }
     let styles = [];
     const externalStyles = [];
     const hostBindingResources = extractHostBindingResources(directiveResult.hostBindingNodes);
@@ -15088,6 +15399,8 @@ var ComponentDecoratorHandler = class {
         outputs,
         hostDirectives,
         rawHostDirectives,
+        selectorlessEnabled,
+        localReferencedSymbols,
         meta: {
           ...metadata,
           template,
@@ -15172,7 +15485,9 @@ var ComponentDecoratorHandler = class {
       assumedToExportProviders: false,
       ngContentSelectors: analysis.template.ngContentSelectors,
       preserveWhitespaces: (_a = analysis.template.preserveWhitespaces) != null ? _a : false,
-      isExplicitlyDeferred: false
+      isExplicitlyDeferred: false,
+      selectorlessEnabled: analysis.selectorlessEnabled,
+      localReferencedSymbols: analysis.localReferencedSymbols
     });
     this.resourceRegistry.registerResources(analysis.resources, node);
     this.injectableRegistry.registerInjectable(node, {
@@ -15185,20 +15500,13 @@ var ComponentDecoratorHandler = class {
     }
     const scope = this.scopeReader.getScopeForComponent(node);
     const selector = analysis.meta.selector;
-    const matcher = new SelectorMatcher3();
+    let matcher = null;
     if (scope !== null) {
-      let { dependencies, isPoisoned } = scope.kind === ComponentScopeKind.NgModule ? scope.compilation : scope;
+      const isPoisoned = scope.kind === ComponentScopeKind.NgModule ? scope.compilation.isPoisoned : scope.isPoisoned;
       if ((isPoisoned || scope.kind === ComponentScopeKind.NgModule && scope.exported.isPoisoned) && !this.usePoisonedData) {
         return null;
       }
-      for (const dep of dependencies) {
-        if (dep.kind === MetaKind.Directive && dep.selector !== null) {
-          matcher.addSelectables(CssSelector5.parse(dep.selector), [
-            ...this.hostDirectivesResolver.resolve(dep),
-            dep
-          ]);
-        }
-      }
+      matcher = createMatcherFromScope(scope, this.hostDirectivesResolver);
     }
     const binder = new R3TargetBinder2(matcher);
     const boundTemplate = binder.bind({ template: analysis.template.diagNodes });
@@ -15290,15 +15598,15 @@ var ComponentDecoratorHandler = class {
     if (scope === null) {
       data.deferPerBlockDependencies = this.locateDeferBlocksWithoutScope(metadata.template);
     } else {
-      const { eagerlyUsed, deferBlocks, allDependencies, wholeTemplateUsed } = this.resolveComponentDependencies(node, context, analysis, scope, metadata, diagnostics);
-      const declarations = this.componentDependenciesToDeclarations(node, context, allDependencies, wholeTemplateUsed);
+      const { eagerlyUsed, deferBlocks, allDependencies, wholeTemplateUsed, pipes } = this.resolveComponentDependencies(node, context, analysis, scope, metadata, diagnostics);
+      const declarations = this.componentDependenciesToDeclarations(node, context, allDependencies, wholeTemplateUsed, pipes);
       if (this.semanticDepGraphUpdater !== null) {
         const getSemanticReference = (decl) => this.semanticDepGraphUpdater.getSemanticReference(decl.ref.node, decl.type);
         symbol.usedDirectives = Array.from(declarations.values()).filter(isUsedDirective).map(getSemanticReference);
         symbol.usedPipes = Array.from(declarations.values()).filter(isUsedPipe).map(getSemanticReference);
       }
       if (this.compilationMode !== CompilationMode.LOCAL) {
-        this.resolveDeferBlocks(node, deferBlocks, declarations, data, analysis, eagerlyUsed);
+        this.resolveDeferBlocks(node, scope, deferBlocks, declarations, data, analysis, eagerlyUsed);
       }
       this.handleDependencyCycles(node, context, scope, data, analysis, metadata, declarations, eagerlyUsed, symbol);
     }
@@ -15437,25 +15745,50 @@ var ComponentDecoratorHandler = class {
   resolveComponentDependencies(node, context, analysis, scope, metadata, diagnostics) {
     var _a;
     const isModuleScope = scope.kind === ComponentScopeKind.NgModule;
-    const dependencies = isModuleScope ? scope.compilation.dependencies : scope.dependencies;
-    const explicitlyDeferredDependencies = getExplicitlyDeferredDeps(scope);
+    const isSelectorlessScope = scope.kind === ComponentScopeKind.Selectorless;
+    const pipes = /* @__PURE__ */ new Map();
+    const explicitlyDeferredDependencies = scope.kind === ComponentScopeKind.Standalone ? scope.deferredDependencies : null;
+    const dependencies = [];
+    if (isSelectorlessScope) {
+      for (const [localName, dep] of scope.dependencies) {
+        if (dep.kind === MetaKind.Pipe) {
+          pipes.set(localName, dep);
+        }
+        dependencies.push(dep);
+      }
+    } else {
+      const scopeDeps = isModuleScope ? scope.compilation.dependencies : scope.dependencies;
+      for (const dep of scopeDeps) {
+        if (dep.kind === MetaKind.Pipe) {
+          pipes.set(dep.name, dep);
+        }
+        dependencies.push(dep);
+      }
+    }
     if (isModuleScope && context.fileName !== getSourceFile(scope.ngModule).fileName) {
       (_a = this.localCompilationExtraImportsTracker) == null ? void 0 : _a.markFileForExtraImportGeneration(context);
     }
-    if (metadata.isStandalone && analysis.rawDeferredImports !== null && explicitlyDeferredDependencies.length > 0) {
+    if (!isSelectorlessScope && metadata.isStandalone && analysis.rawDeferredImports !== null && explicitlyDeferredDependencies !== null && explicitlyDeferredDependencies.length > 0) {
       const diagnostic = validateNoImportOverlap(dependencies, explicitlyDeferredDependencies, analysis.rawDeferredImports);
       if (diagnostic !== null) {
         diagnostics.push(diagnostic);
       }
     }
-    const binder = createTargetBinder(dependencies);
+    const binder = new R3TargetBinder2(createMatcherFromScope(scope, this.hostDirectivesResolver));
     let allDependencies = dependencies;
     let deferBlockBinder = binder;
-    if (explicitlyDeferredDependencies.length > 0) {
+    if (explicitlyDeferredDependencies !== null && explicitlyDeferredDependencies.length > 0) {
       allDependencies = [...explicitlyDeferredDependencies, ...dependencies];
-      deferBlockBinder = createTargetBinder(allDependencies);
+      const deferBlockMatcher = new SelectorMatcher3();
+      for (const dep of allDependencies) {
+        if (dep.kind === MetaKind.Pipe) {
+          pipes.set(dep.name, dep);
+        } else if (dep.kind === MetaKind.Directive && dep.selector !== null) {
+          deferBlockMatcher.addSelectables(CssSelector5.parse(dep.selector), [dep]);
+        }
+      }
+      deferBlockBinder = new R3TargetBinder2(deferBlockMatcher);
     }
-    const pipes = extractPipes(allDependencies);
     const bound = binder.bind({ template: metadata.template.nodes });
     const deferBlocks = /* @__PURE__ */ new Map();
     for (const deferBlock of bound.getDeferBlocks()) {
@@ -15495,9 +15828,9 @@ var ComponentDecoratorHandler = class {
         wholeTemplateUsed.add(pipes.get(name).ref.node);
       }
     }
-    return { allDependencies, eagerlyUsed, wholeTemplateUsed, deferBlocks };
+    return { allDependencies, eagerlyUsed, wholeTemplateUsed, deferBlocks, pipes };
   }
-  componentDependenciesToDeclarations(node, context, allDependencies, wholeTemplateUsed) {
+  componentDependenciesToDeclarations(node, context, allDependencies, wholeTemplateUsed, pipes) {
     const declarations = /* @__PURE__ */ new Map();
     for (const dep of allDependencies) {
       if (declarations.has(dep.ref.node)) {
@@ -15522,20 +15855,6 @@ var ComponentDecoratorHandler = class {
             isComponent: dep.isComponent
           });
           break;
-        case MetaKind.Pipe:
-          if (!wholeTemplateUsed.has(dep.ref.node)) {
-            continue;
-          }
-          const pipeType = this.refEmitter.emit(dep.ref, context);
-          assertSuccessfulReferenceEmit(pipeType, node.name, "pipe");
-          declarations.set(dep.ref.node, {
-            kind: R3TemplateDependencyKind.Pipe,
-            type: pipeType.expression,
-            name: dep.name,
-            ref: dep.ref,
-            importedFile: pipeType.importedFile
-          });
-          break;
         case MetaKind.NgModule:
           const ngModuleType = this.refEmitter.emit(dep.ref, context);
           assertSuccessfulReferenceEmit(ngModuleType, node.name, "NgModule");
@@ -15546,6 +15865,20 @@ var ComponentDecoratorHandler = class {
           });
           break;
       }
+    }
+    for (const [localName, dep] of pipes) {
+      if (!wholeTemplateUsed.has(dep.ref.node)) {
+        continue;
+      }
+      const pipeType = this.refEmitter.emit(dep.ref, context);
+      assertSuccessfulReferenceEmit(pipeType, node.name, "pipe");
+      declarations.set(dep.ref.node, {
+        kind: R3TemplateDependencyKind.Pipe,
+        type: pipeType.expression,
+        name: localName,
+        ref: dep.ref,
+        importedFile: pipeType.importedFile
+      });
     }
     return declarations;
   }
@@ -15708,7 +16041,7 @@ var ComponentDecoratorHandler = class {
     }
     this.cycleAnalyzer.recordSyntheticImport(origin, imported);
   }
-  resolveDeferBlocks(componentClassDecl, deferBlocks, deferrableDecls, resolutionData, analysisData, eagerlyUsedDecls) {
+  resolveDeferBlocks(componentClassDecl, scope, deferBlocks, deferrableDecls, resolutionData, analysisData, eagerlyUsedDecls) {
     const allDeferredDecls = /* @__PURE__ */ new Set();
     for (const [deferBlock, bound] of deferBlocks) {
       const usedDirectives = new Set(bound.getEagerlyUsedDirectives().map((d) => d.ref.node));
@@ -15742,54 +16075,58 @@ var ComponentDecoratorHandler = class {
       }
     }
     if (analysisData.meta.isStandalone) {
-      if (analysisData.rawImports !== null) {
-        this.registerDeferrableCandidates(componentClassDecl, analysisData.rawImports, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
+      if (analysisData.rawImports !== null && ts51.isArrayLiteralExpression(analysisData.rawImports)) {
+        for (const element of analysisData.rawImports.elements) {
+          this.registerDeferrableCandidate(componentClassDecl, element, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
+        }
       }
-      if (analysisData.rawDeferredImports !== null) {
-        this.registerDeferrableCandidates(componentClassDecl, analysisData.rawDeferredImports, true, allDeferredDecls, eagerlyUsedDecls, resolutionData);
+      if (analysisData.rawDeferredImports !== null && ts51.isArrayLiteralExpression(analysisData.rawDeferredImports)) {
+        for (const element of analysisData.rawDeferredImports.elements) {
+          this.registerDeferrableCandidate(componentClassDecl, element, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
+        }
+      }
+      if (scope.kind === ComponentScopeKind.Selectorless) {
+        for (const identifier of scope.dependencyIdentifiers) {
+          this.registerDeferrableCandidate(componentClassDecl, identifier, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
+        }
       }
     }
   }
-  registerDeferrableCandidates(componentClassDecl, importsExpr, isDeferredImport, allDeferredDecls, eagerlyUsedDecls, resolutionData) {
-    if (!ts51.isArrayLiteralExpression(importsExpr)) {
+  registerDeferrableCandidate(componentClassDecl, element, isDeferredImport, allDeferredDecls, eagerlyUsedDecls, resolutionData) {
+    const node = tryUnwrapForwardRef(element, this.reflector) || element;
+    if (!ts51.isIdentifier(node)) {
       return;
     }
-    for (const element of importsExpr.elements) {
-      const node = tryUnwrapForwardRef(element, this.reflector) || element;
-      if (!ts51.isIdentifier(node)) {
-        continue;
-      }
-      const imp = this.reflector.getImportOfIdentifier(node);
-      if (imp === null) {
-        continue;
-      }
-      const decl = this.reflector.getDeclarationOfIdentifier(node);
-      if (decl === null) {
-        continue;
-      }
-      if (!isNamedClassDeclaration(decl.node)) {
-        continue;
-      }
-      if (!allDeferredDecls.has(decl.node)) {
-        continue;
-      }
-      if (eagerlyUsedDecls.has(decl.node)) {
-        continue;
-      }
-      const dirMeta = this.metaReader.getDirectiveMetadata(new Reference(decl.node));
-      if (dirMeta !== null && !dirMeta.isStandalone) {
-        continue;
-      }
-      const pipeMeta = this.metaReader.getPipeMetadata(new Reference(decl.node));
-      if (pipeMeta !== null && !pipeMeta.isStandalone) {
-        continue;
-      }
-      if (dirMeta === null && pipeMeta === null) {
-        continue;
-      }
-      resolutionData.deferrableDeclToImportDecl.set(decl.node, imp.node);
-      this.deferredSymbolTracker.markAsDeferrableCandidate(node, imp.node, componentClassDecl, isDeferredImport);
+    const imp = this.reflector.getImportOfIdentifier(node);
+    if (imp === null) {
+      return;
     }
+    const decl = this.reflector.getDeclarationOfIdentifier(node);
+    if (decl === null) {
+      return;
+    }
+    if (!isNamedClassDeclaration(decl.node)) {
+      return;
+    }
+    if (!allDeferredDecls.has(decl.node)) {
+      return;
+    }
+    if (eagerlyUsedDecls.has(decl.node)) {
+      return;
+    }
+    const dirMeta = this.metaReader.getDirectiveMetadata(new Reference(decl.node));
+    if (dirMeta !== null && !dirMeta.isStandalone) {
+      return;
+    }
+    const pipeMeta = this.metaReader.getPipeMetadata(new Reference(decl.node));
+    if (pipeMeta !== null && !pipeMeta.isStandalone) {
+      return;
+    }
+    if (dirMeta === null && pipeMeta === null) {
+      return;
+    }
+    resolutionData.deferrableDeclToImportDecl.set(decl.node, imp.node);
+    this.deferredSymbolTracker.markAsDeferrableCandidate(node, imp.node, componentClassDecl, isDeferredImport);
   }
   compileDeferBlocks(resolution) {
     const { deferBlockDepsEmitMode: mode, deferPerBlockDependencies: perBlockDeps, deferPerComponentDependencies: perComponentDeps } = resolution;
@@ -15815,26 +16152,24 @@ var ComponentDecoratorHandler = class {
     throw new Error(`Invalid deferBlockDepsEmitMode. Cannot compile deferred block metadata.`);
   }
 };
-function createTargetBinder(dependencies) {
+function createMatcherFromScope(scope, hostDirectivesResolver) {
+  if (scope.kind === ComponentScopeKind.Selectorless) {
+    const registry = /* @__PURE__ */ new Map();
+    for (const [name, dep] of scope.dependencies) {
+      if (dep.kind === MetaKind.Directive) {
+        registry.set(name, [dep, ...hostDirectivesResolver.resolve(dep)]);
+      }
+    }
+    return new SelectorlessMatcher2(registry);
+  }
   const matcher = new SelectorMatcher3();
+  const dependencies = scope.kind === ComponentScopeKind.NgModule ? scope.compilation.dependencies : scope.dependencies;
   for (const dep of dependencies) {
     if (dep.kind === MetaKind.Directive && dep.selector !== null) {
       matcher.addSelectables(CssSelector5.parse(dep.selector), [dep]);
     }
   }
-  return new R3TargetBinder2(matcher);
-}
-function getExplicitlyDeferredDeps(scope) {
-  return scope.kind === ComponentScopeKind.NgModule ? [] : scope.deferredDependencies;
-}
-function extractPipes(dependencies) {
-  const pipes = /* @__PURE__ */ new Map();
-  for (const dep of dependencies) {
-    if (dep.kind === MetaKind.Pipe) {
-      pipes.set(dep.name, dep);
-    }
-  }
-  return pipes;
+  return matcher;
 }
 function removeDeferrableTypesFromComponentDecorator(analysis, deferrableTypes) {
   if (analysis.classMetadata) {
@@ -16334,6 +16669,7 @@ export {
   CompoundComponentScopeReader,
   MetadataDtsModuleScopeResolver,
   LocalModuleScopeRegistry,
+  SelectorlessComponentScopeReader,
   TypeCheckScopeRegistry,
   tryParseInitializerApi,
   INPUT_INITIALIZER_FN,
@@ -16378,4 +16714,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WNWOEBZS.js.map
+//# sourceMappingURL=chunk-L7WXWANR.js.map
