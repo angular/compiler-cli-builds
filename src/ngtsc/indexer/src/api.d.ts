@@ -18,7 +18,9 @@ export declare enum IdentifierKind {
     Attribute = 4,
     Reference = 5,
     Variable = 6,
-    LetDeclaration = 7
+    LetDeclaration = 7,
+    Component = 8,
+    Directive = 9
 }
 /**
  * Describes a semantically-interesting identifier in a template, such as an interpolated variable
@@ -58,7 +60,7 @@ interface DirectiveReference {
     selector: string;
 }
 /** A base interface for element and template identifiers. */
-interface BaseElementOrTemplateIdentifier extends TemplateIdentifier {
+interface BaseDirectiveHostIdentifier extends TemplateIdentifier {
     /** Attributes on an element or template. */
     attributes: Set<AttributeIdentifier>;
     /** Directives applied to an element or template. */
@@ -69,12 +71,20 @@ interface BaseElementOrTemplateIdentifier extends TemplateIdentifier {
  * element tag, which can be parsed by an indexer to determine where used directives should be
  * referenced.
  */
-export interface ElementIdentifier extends BaseElementOrTemplateIdentifier {
+export interface ElementIdentifier extends BaseDirectiveHostIdentifier {
     kind: IdentifierKind.Element;
 }
 /** Describes an indexed template node in a component template file. */
-export interface TemplateNodeIdentifier extends BaseElementOrTemplateIdentifier {
+export interface TemplateNodeIdentifier extends BaseDirectiveHostIdentifier {
     kind: IdentifierKind.Template;
+}
+/** Describes a selectorless component node in a template file. */
+export interface ComponentNodeIdentifier extends BaseDirectiveHostIdentifier {
+    kind: IdentifierKind.Component;
+}
+/** Describes a selectorless directive node in a template file. */
+export interface DirectiveNodeIdentifier extends BaseDirectiveHostIdentifier {
+    kind: IdentifierKind.Directive;
 }
 /** Describes a reference in a template like "foo" in `<div #foo></div>`. */
 export interface ReferenceIdentifier extends TemplateIdentifier {
@@ -82,7 +92,7 @@ export interface ReferenceIdentifier extends TemplateIdentifier {
     /** The target of this reference. If the target is not known, this is `null`. */
     target: {
         /** The template AST node that the reference targets. */
-        node: ElementIdentifier | TemplateIdentifier;
+        node: DirectiveHostIdentifier;
         /**
          * The directive on `node` that the reference targets. If no directive is targeted, this is
          * `null`.
@@ -102,13 +112,15 @@ export interface LetDeclarationIdentifier extends TemplateIdentifier {
  * Identifiers recorded at the top level of the template, without any context about the HTML nodes
  * they were discovered in.
  */
-export type TopLevelIdentifier = PropertyIdentifier | ElementIdentifier | TemplateNodeIdentifier | ReferenceIdentifier | VariableIdentifier | MethodIdentifier | LetDeclarationIdentifier;
+export type TopLevelIdentifier = PropertyIdentifier | ElementIdentifier | TemplateNodeIdentifier | ReferenceIdentifier | VariableIdentifier | MethodIdentifier | LetDeclarationIdentifier | ComponentNodeIdentifier | DirectiveNodeIdentifier;
+/** Identifiers that can bring in directives to the template. */
+export type DirectiveHostIdentifier = ElementIdentifier | TemplateNodeIdentifier | ComponentNodeIdentifier | DirectiveNodeIdentifier;
 /**
  * Describes the absolute byte offsets of a text anchor in a source code.
  */
 export declare class AbsoluteSourceSpan {
-    start: number;
-    end: number;
+    readonly start: number;
+    readonly end: number;
     constructor(start: number, end: number);
 }
 /**

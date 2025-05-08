@@ -4594,32 +4594,23 @@ var SelectorlessComponentScopeReader = class {
         continue;
       }
       for (const stmt of current.statements) {
-        switch (true) {
-          case ts18.isImportDeclaration(stmt):
-            if (stmt.importClause !== void 0 && !stmt.importClause.isTypeOnly) {
-              const clause = stmt.importClause;
-              if (clause.namedBindings !== void 0 && ts18.isNamedImports(clause.namedBindings)) {
-                for (const element of clause.namedBindings.elements) {
-                  if (!element.isTypeOnly) {
-                    result.set(element.name.text, element.name);
-                  }
-                }
-              }
-              if (clause.name !== void 0) {
-                result.set(clause.name.text, clause.name);
+        if (this.reflector.isClass(stmt)) {
+          result.set(stmt.name.text, stmt.name);
+          continue;
+        }
+        if (ts18.isImportDeclaration(stmt) && stmt.importClause !== void 0 && !stmt.importClause.isTypeOnly) {
+          const clause = stmt.importClause;
+          if (clause.namedBindings !== void 0 && ts18.isNamedImports(clause.namedBindings)) {
+            for (const element of clause.namedBindings.elements) {
+              if (!element.isTypeOnly) {
+                result.set(element.name.text, element.name);
               }
             }
-            break;
-          case ts18.isVariableStatement(stmt):
-            for (const decl of stmt.declarationList.declarations) {
-              if (ts18.isIdentifier(decl.name) && decl.initializer !== void 0 && ts18.isIdentifier(decl.initializer)) {
-                result.set(decl.name.text, decl.initializer);
-              }
-            }
-            break;
-          case this.reflector.isClass(stmt):
-            result.set(stmt.name.text, stmt.name);
-            break;
+          }
+          if (clause.name !== void 0) {
+            result.set(clause.name.text, clause.name);
+          }
+          continue;
         }
       }
       current = current.parent;
@@ -8851,7 +8842,7 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
       node.startSourceSpan,
       ts35.DiagnosticCategory.Error,
       ngErrorCode(ErrorCode.MISSING_NAMED_TEMPLATE_DEPENDENCY),
-      `Cannot find name "${node instanceof TmplAstDirective ? node.name : node.componentName}".`
+      `Cannot find name "${node instanceof TmplAstDirective ? node.name : node.componentName}". Selectorless references are only supported to classes or non-type import statements.`
     ));
   }
   incorrectTemplateDependencyType(id, node) {
@@ -14803,7 +14794,7 @@ var HmrModuleImportRewriter = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/selectorless.mjs
-import { ASTWithSource as ASTWithSource3, RecursiveAstVisitor as RecursiveAstVisitor2, TmplAstBoundDeferredTrigger, tmplAstVisitAll, BindingPipe as BindingPipe3 } from "@angular/compiler";
+import { BindingPipe as BindingPipe3, CombinedRecursiveAstVisitor, tmplAstVisitAll, BindingPipeType } from "@angular/compiler";
 function analyzeTemplateForSelectorless(template) {
   const analyzer = new SelectorlessDirectivesAnalyzer();
   tmplAstVisitAll(analyzer, template);
@@ -14811,137 +14802,26 @@ function analyzeTemplateForSelectorless(template) {
   const localReferencedSymbols = analyzer.symbols;
   return { isSelectorless, localReferencedSymbols };
 }
-var SelectorlessDirectivesAnalyzer = class extends RecursiveAstVisitor2 {
+var SelectorlessDirectivesAnalyzer = class extends CombinedRecursiveAstVisitor {
   symbols = null;
   visit(node) {
-    if (node instanceof BindingPipe3 && node.name[0].toUpperCase() === node.name[0]) {
+    if (node instanceof BindingPipe3 && node.type === BindingPipeType.ReferencedDirectly) {
       this.trackSymbol(node.name);
     }
-    node.visit(this);
+    super.visit(node);
+  }
+  visitComponent(component) {
+    this.trackSymbol(component.componentName);
+    super.visitComponent(component);
+  }
+  visitDirective(directive) {
+    this.trackSymbol(directive.name);
+    super.visitDirective(directive);
   }
   trackSymbol(name) {
     var _a;
     (_a = this.symbols) != null ? _a : this.symbols = /* @__PURE__ */ new Set();
     this.symbols.add(name);
-  }
-  visitAllNodes(nodes) {
-    for (const node of nodes) {
-      this.visit(node);
-    }
-  }
-  visitAst(ast) {
-    if (ast instanceof ASTWithSource3) {
-      ast = ast.ast;
-    }
-    this.visit(ast);
-  }
-  visitComponent(component) {
-    this.trackSymbol(component.componentName);
-    this.visitAllNodes(component.attributes);
-    this.visitAllNodes(component.inputs);
-    this.visitAllNodes(component.outputs);
-    this.visitAllNodes(component.directives);
-    this.visitAllNodes(component.references);
-    this.visitAllNodes(component.children);
-  }
-  visitDirective(directive) {
-    this.trackSymbol(directive.name);
-    this.visitAllNodes(directive.attributes);
-    this.visitAllNodes(directive.inputs);
-    this.visitAllNodes(directive.outputs);
-    this.visitAllNodes(directive.references);
-  }
-  visitElement(element) {
-    this.visitAllNodes(element.attributes);
-    this.visitAllNodes(element.inputs);
-    this.visitAllNodes(element.outputs);
-    this.visitAllNodes(element.directives);
-    this.visitAllNodes(element.references);
-    this.visitAllNodes(element.children);
-  }
-  visitTemplate(template) {
-    this.visitAllNodes(template.attributes);
-    this.visitAllNodes(template.inputs);
-    this.visitAllNodes(template.outputs);
-    this.visitAllNodes(template.directives);
-    this.visitAllNodes(template.templateAttrs);
-    this.visitAllNodes(template.variables);
-    this.visitAllNodes(template.references);
-    this.visitAllNodes(template.children);
-  }
-  visitContent(content) {
-    this.visitAllNodes(content.children);
-  }
-  visitBoundAttribute(attribute) {
-    this.visitAst(attribute.value);
-  }
-  visitBoundEvent(attribute) {
-    this.visitAst(attribute.handler);
-  }
-  visitBoundText(text) {
-    this.visitAst(text.value);
-  }
-  visitIcu(icu) {
-    Object.keys(icu.vars).forEach((key) => this.visit(icu.vars[key]));
-    Object.keys(icu.placeholders).forEach((key) => this.visit(icu.placeholders[key]));
-  }
-  visitDeferredBlock(deferred) {
-    deferred.visitAll(this);
-  }
-  visitDeferredTrigger(trigger) {
-    if (trigger instanceof TmplAstBoundDeferredTrigger) {
-      this.visitAst(trigger.value);
-    }
-  }
-  visitDeferredBlockPlaceholder(block) {
-    this.visitAllNodes(block.children);
-  }
-  visitDeferredBlockError(block) {
-    this.visitAllNodes(block.children);
-  }
-  visitDeferredBlockLoading(block) {
-    this.visitAllNodes(block.children);
-  }
-  visitSwitchBlock(block) {
-    this.visitAst(block.expression);
-    this.visitAllNodes(block.cases);
-  }
-  visitSwitchBlockCase(block) {
-    block.expression && this.visitAst(block.expression);
-    this.visitAllNodes(block.children);
-  }
-  visitForLoopBlock(block) {
-    var _a;
-    block.item.visit(this);
-    this.visitAllNodes(block.contextVariables);
-    this.visitAst(block.expression);
-    this.visitAllNodes(block.children);
-    (_a = block.empty) == null ? void 0 : _a.visit(this);
-  }
-  visitForLoopBlockEmpty(block) {
-    this.visitAllNodes(block.children);
-  }
-  visitIfBlock(block) {
-    this.visitAllNodes(block.branches);
-  }
-  visitIfBlockBranch(block) {
-    var _a;
-    block.expression && this.visitAst(block.expression);
-    (_a = block.expressionAlias) == null ? void 0 : _a.visit(this);
-    this.visitAllNodes(block.children);
-  }
-  visitLetDeclaration(decl) {
-    this.visitAst(decl.value);
-  }
-  visitText() {
-  }
-  visitVariable() {
-  }
-  visitReference() {
-  }
-  visitTextAttribute() {
-  }
-  visitUnknownBlock() {
   }
 };
 
@@ -15667,7 +15547,7 @@ var ComponentDecoratorHandler = class {
     if (perComponentDeferredDeps !== null) {
       removeDeferrableTypesFromComponentDecorator(analysis, perComponentDeferredDeps);
     }
-    const def = compileComponentFromMetadata(meta, pool, makeBindingParser3());
+    const def = compileComponentFromMetadata(meta, pool, this.getNewBindingParser());
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, perComponentDeferredDeps).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
@@ -15714,7 +15594,7 @@ var ComponentDecoratorHandler = class {
       removeDeferrableTypesFromComponentDecorator(analysis, deferrableTypes);
     }
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
-    const def = compileComponentFromMetadata(meta, pool, makeBindingParser3());
+    const def = compileComponentFromMetadata(meta, pool, this.getNewBindingParser());
     const inputTransformFields = compileInputTransformFields(analysis.inputs);
     const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, deferrableTypes).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
@@ -15735,7 +15615,7 @@ var ComponentDecoratorHandler = class {
       defer
     };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
-    const def = compileComponentFromMetadata(meta, pool, makeBindingParser3());
+    const def = compileComponentFromMetadata(meta, pool, this.getNewBindingParser());
     const classMetadata = analysis.classMetadata !== null ? compileComponentClassMetadata(analysis.classMetadata, null).toStmt() : null;
     const debugInfo = analysis.classDebugInfo !== null ? compileClassDebugInfo(analysis.classDebugInfo).toStmt() : null;
     const hmrMeta = this.enableHmr ? extractHmrMetatadata(node, this.reflector, this.evaluator, this.compilerHost, this.rootDirs, def, fac, defer, classMetadata, debugInfo) : null;
@@ -16150,6 +16030,9 @@ var ComponentDecoratorHandler = class {
       };
     }
     throw new Error(`Invalid deferBlockDepsEmitMode. Cannot compile deferred block metadata.`);
+  }
+  getNewBindingParser() {
+    return makeBindingParser3(void 0, this.enableSelectorless);
   }
 };
 function createMatcherFromScope(scope, hostDirectivesResolver) {
@@ -16714,4 +16597,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-L7WXWANR.js.map
+//# sourceMappingURL=chunk-ZXRS2ETQ.js.map

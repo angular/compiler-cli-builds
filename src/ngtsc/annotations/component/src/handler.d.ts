@@ -154,4 +154,6 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      */
     private registerDeferrableCandidate;
     private compileDeferBlocks;
+    /** Creates a new binding parser. */
+    private getNewBindingParser;
 }
