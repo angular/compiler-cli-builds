@@ -3,7 +3,7 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/logging/src/logger.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/logging/src/logger.js
 var LogLevel;
 (function(LogLevel2) {
   LogLevel2[LogLevel2["debug"] = 0] = "debug";
@@ -12,7 +12,7 @@ var LogLevel;
   LogLevel2[LogLevel2["error"] = 3] = "error";
 })(LogLevel || (LogLevel = {}));
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/logging/src/console_logger.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/logging/src/console_logger.js
 var RESET = "\x1B[0m";
 var RED = "\x1B[31m";
 var YELLOW = "\x1B[33m";
@@ -54,4 +54,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FKXFEX7K.js.map
+//# sourceMappingURL=chunk-SEKYV57I.js.map
