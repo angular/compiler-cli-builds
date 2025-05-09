@@ -3,7 +3,7 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/api.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/api.js
 var PerfPhase;
 (function(PerfPhase2) {
   PerfPhase2[PerfPhase2["Unaccounted"] = 0] = "Unaccounted";
@@ -73,7 +73,7 @@ var PerfCheckpoint;
   PerfCheckpoint2[PerfCheckpoint2["LAST"] = 9] = "LAST";
 })(PerfCheckpoint || (PerfCheckpoint = {}));
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/noop.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/noop.js
 var NoopPerfRecorder = class {
   eventCount() {
   }
@@ -90,7 +90,7 @@ var NoopPerfRecorder = class {
 };
 var NOOP_PERF_RECORDER = new NoopPerfRecorder();
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/clock.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/clock.js
 function mark() {
   return process.hrtime();
 }
@@ -99,7 +99,7 @@ function timeSinceInMicros(mark2) {
   return delta[0] * 1e6 + Math.floor(delta[1] / 1e3);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/recorder.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/perf/src/recorder.js
 var ActivePerfRecorder = class {
   zeroTime;
   counters;
@@ -213,4 +213,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-Q2WE7ECN.js.map
+//# sourceMappingURL=chunk-26NO4MZH.js.map

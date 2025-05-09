@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-ISOL2WT5.js";
+} from "./chunk-XBUHTFBZ.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-X2KDZPBI.js";
+} from "./chunk-R33HUYHN.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -87,14 +87,14 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-XRSJELB6.js";
+} from "./chunk-A7YZA52V.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
   PerfCheckpoint,
   PerfEvent,
   PerfPhase
-} from "./chunk-Q2WE7ECN.js";
+} from "./chunk-26NO4MZH.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -104,7 +104,7 @@ import {
   getFileSystem,
   join,
   resolve
-} from "./chunk-37JMVF7H.js";
+} from "./chunk-UFA6TATE.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -134,7 +134,7 @@ function createCompilerHost({ options, tsHost = ts.createCompilerHost(options, t
   return tsHost;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/entities.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/entities.js
 var EntryType;
 (function(EntryType2) {
   EntryType2["Block"] = "block";
@@ -181,23 +181,23 @@ function isDocEntryWithSourceInfo(entry) {
   return "source" in entry;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/extractor.js
 import ts12 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/class_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/class_extractor.js
 import ts6 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/filters.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/filters.js
 function isAngularPrivateName(name) {
   var _a;
   const firstChar = (_a = name[0]) != null ? _a : "";
   return firstChar === "\u0275" || firstChar === "_";
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/function_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/function_extractor.js
 import ts4 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/generics_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/generics_extractor.js
 function extractGenerics(declaration) {
   var _a, _b;
   return (_b = (_a = declaration.typeParameters) == null ? void 0 : _a.map((typeParam) => {
@@ -210,7 +210,7 @@ function extractGenerics(declaration) {
   })) != null ? _b : [];
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/jsdoc_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/jsdoc_extractor.js
 import ts2 from "typescript";
 var decoratorExpression = /@(?=(Injectable|Component|Directive|Pipe|NgModule|Input|Output|HostBinding|HostListener|Inject|Optional|Self|Host|SkipSelf|ViewChild|ViewChildren|ContentChild|ContentChildren))/g;
 function extractJsDocTags(node) {
@@ -254,13 +254,13 @@ function unescapeAngularDecorators(comment) {
   return comment.replace(/_NG_AT_/g, "@");
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/type_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/type_extractor.js
 import ts3 from "typescript";
 function extractResolvedTypeString(node, checker) {
   return checker.typeToString(checker.getTypeAtLocation(node), void 0, ts3.TypeFormatFlags.NoTruncation);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/function_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/function_extractor.js
 var FunctionExtractor = class {
   name;
   exportDeclaration;
@@ -374,7 +374,7 @@ function findImplementationOfFunction(node, typeChecker) {
   return implementation;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/internal.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/internal.js
 import ts5 from "typescript";
 function isInternal(member) {
   return extractJsDocTags(member).some((tag) => tag.name === "internal") || hasLeadingInternalComment(member);
@@ -393,7 +393,7 @@ function hasLeadingInternalComment(member) {
   )) != null ? _a : false;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/class_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/class_extractor.js
 var ClassExtractor = class {
   declaration;
   typeChecker;
@@ -720,7 +720,7 @@ function extractPipeSyntax(metadata, classDeclaration) {
   return `{{ value_expression | ${metadata.name}${paramNames.length ? ":" + paramNames.join(":") : ""} }}`;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/constant_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/constant_extractor.js
 import ts7 from "typescript";
 var LITERAL_AS_ENUM_TAG = "object-literal-as-enum";
 function extractConstant(declaration, typeChecker) {
@@ -778,7 +778,7 @@ function extractLiteralPropertiesAsEnumMembers(declaration) {
   });
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/decorator_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/decorator_extractor.js
 import ts8 from "typescript";
 function extractorDecorator(declaration, typeChecker) {
   const documentedNode = getDecoratorJsDocNode(declaration);
@@ -851,7 +851,7 @@ function getDecoratorJsDocNode(declaration) {
   return callSignature;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/enum_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/enum_extractor.js
 import ts9 from "typescript";
 function extractEnum(declaration, typeChecker) {
   return {
@@ -882,7 +882,7 @@ function getEnumMemberValue(memberNode) {
   return (_a = literal == null ? void 0 : literal.getText()) != null ? _a : "";
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/initializer_api_function_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/initializer_api_function_extractor.js
 import ts10 from "typescript";
 var initializerApiTag = "initializerApiFunction";
 function isInitializerApiFunction(node, typeChecker) {
@@ -991,7 +991,7 @@ function extractFunctionWithOverloads(name, type, typeChecker) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/type_alias_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/type_alias_extractor.js
 function extractTypeAlias(declaration) {
   return {
     name: declaration.name.getText(),
@@ -1004,7 +1004,7 @@ function extractTypeAlias(declaration) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/import_extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/import_extractor.js
 import ts11 from "typescript";
 function getImportedSymbols(sourceFile) {
   const importSpecifiers = /* @__PURE__ */ new Map();
@@ -1029,7 +1029,7 @@ function getImportedSymbols(sourceFile) {
   return importSpecifiers;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/extractor.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/extractor.js
 var DocsExtractor = class {
   typeChecker;
   metadataReader;
@@ -1223,11 +1223,11 @@ function verifySupportedTypeScriptVersion() {
   checkVersion(tsVersion, MIN_TS_VERSION, MAX_TS_VERSION);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.js
 import { R3Identifiers } from "@angular/compiler";
 import ts25 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/cycles/src/analyzer.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/cycles/src/analyzer.js
 var CycleAnalyzer = class {
   importGraph;
   cachedResults = null;
@@ -1304,7 +1304,7 @@ var Cycle = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/cycles/src/imports.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/cycles/src/imports.js
 import ts14 from "typescript";
 var ImportGraph = class {
   checker;
@@ -1400,7 +1400,7 @@ var Found = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/generator.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/generator.js
 import ts15 from "typescript";
 var FlatIndexGenerator = class {
   entryPoint;
@@ -1428,7 +1428,7 @@ export * from '${relativeEntryPoint}';
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/logic.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/logic.js
 function findFlatIndexEntryPoint(rootFiles) {
   const tsFiles = rootFiles.filter((file) => isNonDeclarationTsPath(file));
   let resolvedEntryPoint = null;
@@ -1444,7 +1444,7 @@ function findFlatIndexEntryPoint(rootFiles) {
   return resolvedEntryPoint;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/private_export_checker.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/private_export_checker.js
 import ts16 from "typescript";
 function checkForPrivateExports(entryPoint, checker, refGraph) {
   const diagnostics = [];
@@ -1524,7 +1524,7 @@ function getDescriptorOfDeclaration(decl) {
   }
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/reference_graph.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/reference_graph.js
 var ReferenceGraph = class {
   references = /* @__PURE__ */ new Map();
   add(from, to) {
@@ -1576,7 +1576,7 @@ var ReferenceGraph = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/dependency_tracking.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/dependency_tracking.js
 var FileDependencyGraph = class {
   nodes = /* @__PURE__ */ new Map();
   addDependency(from, on) {
@@ -1641,7 +1641,7 @@ function isLogicallyChanged(sf, node, changedTsPaths, deletedTsPaths, changedRes
   return false;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/state.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/state.js
 var IncrementalStateKind;
 (function(IncrementalStateKind2) {
   IncrementalStateKind2[IncrementalStateKind2["Fresh"] = 0] = "Fresh";
@@ -1649,7 +1649,7 @@ var IncrementalStateKind;
   IncrementalStateKind2[IncrementalStateKind2["Analyzed"] = 2] = "Analyzed";
 })(IncrementalStateKind || (IncrementalStateKind = {}));
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/incremental.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/incremental.js
 var PhaseKind;
 (function(PhaseKind2) {
   PhaseKind2[PhaseKind2["Analysis"] = 0] = "Analysis";
@@ -1855,7 +1855,7 @@ function toOriginalSourceFile(sf) {
   }
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/strategy.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/strategy.js
 var TrackedIncrementalBuildStrategy = class {
   state = null;
   isSet = false;
@@ -1889,7 +1889,7 @@ var PatchedProgramIncrementalBuildStrategy = class {
 };
 var SYM_INCREMENTAL_STATE = Symbol("NgIncrementalState");
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/api.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/api.js
 var IdentifierKind;
 (function(IdentifierKind2) {
   IdentifierKind2[IdentifierKind2["Property"] = 0] = "Property";
@@ -1910,7 +1910,7 @@ var AbsoluteSourceSpan = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/context.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/context.js
 var IndexingContext = class {
   components = /* @__PURE__ */ new Set();
   addComponent(info) {
@@ -1918,10 +1918,10 @@ var IndexingContext = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/transform.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/transform.js
 import { ParseSourceFile } from "@angular/compiler";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/template.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/template.js
 import { ASTWithSource, ImplicitReceiver, PropertyRead, PropertyWrite, RecursiveAstVisitor, TmplAstBoundDeferredTrigger, TmplAstElement, TmplAstRecursiveVisitor, TmplAstReference, TmplAstTemplate, TmplAstVariable } from "@angular/compiler";
 var ExpressionVisitor = class extends RecursiveAstVisitor {
   expressionStr;
@@ -2221,7 +2221,7 @@ function getTemplateIdentifiers(boundTemplate) {
   return { identifiers: visitor.identifiers, errors: visitor.errors };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/transform.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/transform.js
 function generateAnalysis(context) {
   const analysis = /* @__PURE__ */ new Map();
   context.components.forEach(({ declaration, selector, boundTemplate, templateMeta }) => {
@@ -2257,7 +2257,7 @@ function generateAnalysis(context) {
   return analysis;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/ng_module_index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/ng_module_index.js
 var NgModuleIndexImpl = class {
   metaReader;
   localReader;
@@ -2348,7 +2348,7 @@ var NgModuleIndexImpl = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/resource/src/loader.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/resource/src/loader.js
 import ts17 from "typescript";
 var CSS_PREPROCESSOR_EXT = /(\.scss|\.sass|\.less|\.styl)$/;
 var RESOURCE_MARKER = ".$ngresource$";
@@ -2506,7 +2506,7 @@ function createLookupResolutionHost(adapter) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/standalone.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/standalone.js
 var StandaloneComponentScopeReader = class {
   metaReader;
   localModuleReader;
@@ -2605,10 +2605,10 @@ var StandaloneComponentScopeReader = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
 import { ASTWithSource as ASTWithSource3, BindingType, Interpolation, PropertyRead as PropertyRead2, TmplAstBoundAttribute } from "@angular/compiler";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/symbol_util.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/symbol_util.js
 import ts18 from "typescript";
 var SIGNAL_FNS = /* @__PURE__ */ new Set([
   "WritableSignal",
@@ -2628,7 +2628,7 @@ function isSignalSymbol(symbol) {
   });
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/api/api.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/api/api.js
 import { ASTWithSource as ASTWithSource2, RecursiveAstVisitor as RecursiveAstVisitor2, TmplAstBoundDeferredTrigger as TmplAstBoundDeferredTrigger2 } from "@angular/compiler";
 var TemplateCheckWithVisitor = class {
   canVisitStructuralAttributes = true;
@@ -2765,7 +2765,7 @@ var TemplateVisitor2 = class extends RecursiveAstVisitor2 {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
 var SIGNAL_INSTANCE_PROPERTIES = /* @__PURE__ */ new Set(["set", "update", "asReadonly"]);
 var FUNCTION_INSTANCE_PROPERTIES = /* @__PURE__ */ new Set(["name", "length", "prototype"]);
 var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
@@ -2814,7 +2814,7 @@ var factory = {
   create: () => new InterpolatedSignalCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/invalid_banana_in_box/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/invalid_banana_in_box/index.js
 import { TmplAstBoundEvent } from "@angular/compiler";
 var InvalidBananaInBoxCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.INVALID_BANANA_IN_BOX;
@@ -2837,7 +2837,7 @@ var factory2 = {
   create: () => new InvalidBananaInBoxCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_control_flow_directive/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_control_flow_directive/index.js
 import { TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
 var KNOWN_CONTROL_FLOW_DIRECTIVES = /* @__PURE__ */ new Map([
   ["ngIf", { directive: "NgIf", builtIn: "@if" }],
@@ -2879,7 +2879,7 @@ var factory3 = {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_ngforof_let/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_ngforof_let/index.js
 import { TmplAstTemplate as TmplAstTemplate3 } from "@angular/compiler";
 var MissingNgForOfLetCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.MISSING_NGFOROF_LET;
@@ -2909,7 +2909,7 @@ var factory4 = {
   create: () => new MissingNgForOfLetCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/nullish_coalescing_not_nullable/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/nullish_coalescing_not_nullable/index.js
 import { Binary } from "@angular/compiler";
 import ts19 from "typescript";
 var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
@@ -2952,7 +2952,7 @@ var factory5 = {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/optional_chain_not_nullable/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/optional_chain_not_nullable/index.js
 import { SafeCall, SafeKeyedRead, SafePropertyRead } from "@angular/compiler";
 import ts20 from "typescript";
 var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
@@ -2996,7 +2996,7 @@ var factory6 = {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/suffix_not_supported/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/suffix_not_supported/index.js
 import { TmplAstBoundAttribute as TmplAstBoundAttribute2 } from "@angular/compiler";
 var STYLE_SUFFIXES = ["px", "%", "em"];
 var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
@@ -3017,7 +3017,7 @@ var factory7 = {
   create: () => new SuffixNotSupportedCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/text_attribute_not_binding/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/text_attribute_not_binding/index.js
 import { TmplAstTextAttribute } from "@angular/compiler";
 var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING;
@@ -3053,7 +3053,7 @@ var factory8 = {
   create: () => new TextAttributeNotBindingSpec()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.js
 import { ASTWithSource as ASTWithSource4, Call, Chain, Conditional, ParsedEventType, PropertyRead as PropertyRead3, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
 var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING;
@@ -3102,7 +3102,7 @@ var factory9 = {
   create: () => new UninvokedFunctionInEventBindingSpec()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unused_let_declaration/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unused_let_declaration/index.js
 import { AST, ASTWithSource as ASTWithSource5, TmplAstLetDeclaration } from "@angular/compiler";
 var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNUSED_LET_DECLARATION;
@@ -3144,7 +3144,7 @@ var factory10 = {
   create: () => new UnusedLetDeclarationCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/skip_hydration_not_static/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/skip_hydration_not_static/index.js
 import { TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstTextAttribute as TmplAstTextAttribute2 } from "@angular/compiler";
 var NG_SKIP_HYDRATION_ATTR_NAME = "ngSkipHydration";
 var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
@@ -3170,10 +3170,10 @@ var factory11 = {
   create: () => new NgSkipHydrationSpec()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.js
 import ts21 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/api/src/public_options.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/api/src/public_options.js
 var DiagnosticCategoryLabel;
 (function(DiagnosticCategoryLabel2) {
   DiagnosticCategoryLabel2["Warning"] = "warning";
@@ -3181,7 +3181,7 @@ var DiagnosticCategoryLabel;
   DiagnosticCategoryLabel2["Suppress"] = "suppress";
 })(DiagnosticCategoryLabel || (DiagnosticCategoryLabel = {}));
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.js
 var ExtendedTemplateCheckerImpl = class {
   partialCtx;
   templateChecks;
@@ -3236,7 +3236,7 @@ function assertNever(value) {
 ${value}`);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/index.js
 var ALL_DIAGNOSTIC_FACTORIES = [
   factory2,
   factory5,
@@ -3256,7 +3256,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ...ALL_DIAGNOSTIC_FACTORIES.map((factory12) => factory12.name)
 ]);
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
 import { ASTWithSource as ASTWithSource6, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, RecursiveAstVisitor as RecursiveAstVisitor3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor as TmplAstRecursiveVisitor2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts22 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
@@ -3352,7 +3352,7 @@ function unwrapAstWithSource(ast) {
   return ast instanceof ASTWithSource6 ? ast.ast : ast;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/rules/initializer_api_usage_rule.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/rules/initializer_api_usage_rule.js
 import ts23 from "typescript";
 var APIS_TO_CHECK = [
   INPUT_INITIALIZER_FN,
@@ -3405,7 +3405,7 @@ var InitializerApiUsageRule = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/rules/unused_standalone_imports_rule.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/rules/unused_standalone_imports_rule.js
 import ts24 from "typescript";
 var UnusedStandaloneImportsRule = class {
   templateTypeChecker;
@@ -3497,10 +3497,10 @@ function closestNode(start, predicate) {
   return null;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/config.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/config.js
 var UNUSED_STANDALONE_IMPORTS_RULE_ENABLED = true;
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/source_file_validator.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/source_file_validator.js
 var SourceFileValidator = class {
   rules;
   constructor(reflector, importedSymbolsTracker, templateTypeChecker, typeCheckingConfig) {
@@ -3542,7 +3542,7 @@ var SourceFileValidator = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/core_version.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/core_version.js
 function coreHasSymbol(program, symbol) {
   const checker = program.getTypeChecker();
   for (const sf of program.getSourceFiles().filter(isMaybeCore)) {
@@ -3561,7 +3561,7 @@ function isMaybeCore(sf) {
   return sf.isDeclarationFile && sf.fileName.includes("@angular/core") && sf.fileName.endsWith("index.d.ts");
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/feature_detection.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/feature_detection.js
 import semver from "semver";
 function coreVersionSupportsFeature(coreVersion, minVersion) {
   if (coreVersion === `0.0.0-${"PLACEHOLDER"}`) {
@@ -3570,7 +3570,7 @@ function coreVersionSupportsFeature(coreVersion, minVersion) {
   return semver.satisfies(coreVersion, minVersion, { includePrerelease: true });
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.js
 var CompilationTicketKind;
 (function(CompilationTicketKind2) {
   CompilationTicketKind2[CompilationTicketKind2["Fresh"] = 0] = "Fresh";
@@ -4451,7 +4451,7 @@ function versionMapFromProgram(program, driver) {
   return versions;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/host.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/host.js
 import ts26 from "typescript";
 var DelegatingCompilerHost = class {
   delegate;
@@ -5111,4 +5111,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-GGYBKDGO.js.map
+//# sourceMappingURL=chunk-VDX4TE5R.js.map

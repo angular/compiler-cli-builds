@@ -6,7 +6,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-GGNEM2AI.js";
+} from "./chunk-T2PRXFD2.js";
 import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
@@ -33,29 +33,29 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-GGYBKDGO.js";
+} from "./chunk-VDX4TE5R.js";
 import {
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-ISOL2WT5.js";
+} from "./chunk-XBUHTFBZ.js";
 import {
   OptimizeFor,
   TsCreateProgramDriver
-} from "./chunk-X2KDZPBI.js";
+} from "./chunk-R33HUYHN.js";
 import {
   ErrorCode,
   isLocalCompilationDiagnostics,
   ngErrorCode
-} from "./chunk-XRSJELB6.js";
+} from "./chunk-A7YZA52V.js";
 import {
   ActivePerfRecorder,
   PerfPhase
-} from "./chunk-Q2WE7ECN.js";
+} from "./chunk-26NO4MZH.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "./chunk-FKXFEX7K.js";
+} from "./chunk-SEKYV57I.js";
 import {
   LogicalFileSystem,
   LogicalProjectPath,
@@ -77,12 +77,12 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-37JMVF7H.js";
+} from "./chunk-UFA6TATE.js";
 import "./chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("19.2.10+sha-5f46be0");
+var VERSION = new Version("19.2.10+sha-6cd2df0");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {

@@ -6,7 +6,7 @@ import {
   __require
 } from "./chunk-KPQ72R34.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/util.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/util.js
 var TS_DTS_JS_EXTENSION = /(?:\.d)?\.ts$|\.js$/;
 function normalizeSeparators(path) {
   return path.replace(/\\/g, "/");
@@ -22,7 +22,7 @@ function getSourceFileOrError(program, fileName) {
   return sf;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/invalid_file_system.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/invalid_file_system.js
 var InvalidFileSystem = class {
   exists(path) {
     throw makeError();
@@ -110,7 +110,7 @@ function makeError() {
   return new Error("FileSystem has not been configured. Please call `setFileSystem()` before calling this method.");
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/helpers.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/helpers.js
 var fs = new InvalidFileSystem();
 function getFileSystem() {
   return fs;
@@ -167,7 +167,7 @@ function toRelativeImport(relativePath) {
   return isLocalRelativePath(relativePath) ? `./${relativePath}` : relativePath;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/compiler_host.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/compiler_host.js
 import * as os from "os";
 import ts from "typescript";
 var NgtscCompilerHost = class {
@@ -227,7 +227,7 @@ var NgtscCompilerHost = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/logical.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/logical.js
 var LogicalProjectPath = {
   relativePathBetween: function(from, to) {
     const relativePath = relative(dirname(resolve(from)), resolve(to));
@@ -276,7 +276,7 @@ function isWithinBasePath(base, path) {
   return isLocalRelativePath(relative(base, path));
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/node_js_file_system.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/node_js_file_system.js
 import fs2 from "fs";
 import { createRequire } from "module";
 import * as p from "path";
@@ -380,7 +380,7 @@ function toggleCase(str) {
   return str.replace(/\w/g, (ch) => ch.toUpperCase() === ch ? ch.toLowerCase() : ch.toUpperCase());
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/ts_read_directory.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/ts_read_directory.js
 import ts2 from "typescript";
 function createFileSystemTsReadDirectoryFn(fs3) {
   if (ts2.matchFiles === void 0) {
@@ -443,4 +443,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-37JMVF7H.js.map
+//# sourceMappingURL=chunk-UFA6TATE.js.map

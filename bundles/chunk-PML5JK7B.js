@@ -3,11 +3,11 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file.js
 import { decode, encode } from "@jridgewell/sourcemap-codec";
 import mapHelpers from "convert-source-map";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/segment_marker.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/segment_marker.js
 function compareSegments(a, b) {
   return a.position - b.position;
 }
@@ -27,7 +27,7 @@ function offsetSegment(startOfLinePositions, marker, offset) {
   return { line, column, position, next: void 0 };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file.js
 function removeSourceMapComments(contents) {
   return mapHelpers.removeMapFileComments(mapHelpers.removeComments(contents)).replace(/\n\n$/, "\n");
 }
@@ -282,10 +282,10 @@ var Cache = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader.js
 import mapHelpers2 from "convert-source-map";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/content_origin.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/content_origin.js
 var ContentOrigin;
 (function(ContentOrigin2) {
   ContentOrigin2[ContentOrigin2["Provided"] = 0] = "Provided";
@@ -293,7 +293,7 @@ var ContentOrigin;
   ContentOrigin2[ContentOrigin2["FileSystem"] = 2] = "FileSystem";
 })(ContentOrigin || (ContentOrigin = {}));
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader.js
 var SCHEME_MATCHER = /^([a-z][a-z0-9.-]*):\/\//i;
 var SourceFileLoader = class {
   fs;
@@ -426,4 +426,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-77D5CI2U.js.map
+//# sourceMappingURL=chunk-PML5JK7B.js.map
