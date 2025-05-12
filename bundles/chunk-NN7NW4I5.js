@@ -13416,7 +13416,17 @@ var NgModuleDecoratorHandler = class {
         }
       }
     }
-    const schemas = this.compilationMode !== CompilationMode.LOCAL && ngModule.has("schemas") ? extractSchemas(ngModule.get("schemas"), this.evaluator, "NgModule") : [];
+    let schemas;
+    try {
+      schemas = this.compilationMode !== CompilationMode.LOCAL && ngModule.has("schemas") ? extractSchemas(ngModule.get("schemas"), this.evaluator, "NgModule") : [];
+    } catch (e) {
+      if (e instanceof FatalDiagnosticError) {
+        diagnostics.push(e.toDiagnostic());
+        schemas = [];
+      } else {
+        throw e;
+      }
+    }
     let id = null;
     if (ngModule.has("id")) {
       const idExpr = ngModule.get("id");
@@ -16378,4 +16388,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-KBXGD2OV.js.map
+//# sourceMappingURL=chunk-NN7NW4I5.js.map
