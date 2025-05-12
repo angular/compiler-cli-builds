@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, LiteralPrimitive, ParseSourceSpan, PropertyRead, SafePropertyRead, TemplateEntity, TmplAstElement, TmplAstHostElement, TmplAstNode, TmplAstTemplate, TmplAstTextAttribute } from '@angular/compiler';
+import { AST, LiteralPrimitive, ParseSourceSpan, PropertyRead, SafePropertyRead, TemplateEntity, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstHostElement, TmplAstNode, TmplAstTemplate, TmplAstTextAttribute } from '@angular/compiler';
 import ts from 'typescript';
 import { ErrorCode } from '../../diagnostics';
 import { AbsoluteFsPath } from '../../file_system';
@@ -16,7 +16,7 @@ import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { ElementSymbol, FullSourceMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { ElementSymbol, FullSourceMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { DirectiveSourceManager } from './source';
 /**
@@ -120,6 +120,8 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getFileData(path: AbsoluteFsPath): FileTypeCheckingData;
     getSymbolOfNode(node: TmplAstTemplate, component: ts.ClassDeclaration): TemplateSymbol | null;
     getSymbolOfNode(node: TmplAstElement, component: ts.ClassDeclaration): ElementSymbol | null;
+    getSymbolOfNode(node: TmplAstComponent, component: ts.ClassDeclaration): SelectorlessComponentSymbol | null;
+    getSymbolOfNode(node: TmplAstDirective, component: ts.ClassDeclaration): SelectorlessDirectiveSymbol | null;
     private getOrCreateSymbolBuilder;
     getPotentialTemplateDirectives(component: ts.ClassDeclaration): PotentialDirective[];
     getPotentialPipes(component: ts.ClassDeclaration): PotentialPipe[];

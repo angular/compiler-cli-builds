@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { TmplAstElement, TmplAstLetDeclaration, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
+import { TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstLetDeclaration, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { SymbolWithValueDeclaration } from '../../util/src/typescript';
@@ -22,12 +22,14 @@ export declare enum SymbolKind {
     Expression = 8,
     DomBinding = 9,
     Pipe = 10,
-    LetDeclaration = 11
+    LetDeclaration = 11,
+    SelectorlessComponent = 12,
+    SelectorlessDirective = 13
 }
 /**
  * A representation of an entity in the `TemplateAst`.
  */
-export type Symbol = InputBindingSymbol | OutputBindingSymbol | ElementSymbol | ReferenceSymbol | VariableSymbol | ExpressionSymbol | DirectiveSymbol | TemplateSymbol | DomBindingSymbol | PipeSymbol | LetDeclarationSymbol;
+export type Symbol = InputBindingSymbol | OutputBindingSymbol | ElementSymbol | ReferenceSymbol | VariableSymbol | ExpressionSymbol | DirectiveSymbol | TemplateSymbol | DomBindingSymbol | PipeSymbol | LetDeclarationSymbol | SelectorlessComponentSymbol | SelectorlessDirectiveSymbol;
 /**
  * A `Symbol` which declares a new named entity in the template scope.
  */
@@ -233,6 +235,40 @@ export interface TemplateSymbol {
     /** A list of directives applied to the element. */
     directives: DirectiveSymbol[];
     templateNode: TmplAstTemplate;
+}
+/** A representation of a selectorless component reference in a template. */
+export interface SelectorlessComponentSymbol {
+    kind: SymbolKind.SelectorlessComponent;
+    /** The `ts.Type` for the component class. */
+    tsType: ts.Type;
+    /** The `ts.Symbol` for the component class. */
+    tsSymbol: ts.Symbol | null;
+    /**
+     * Includes the component class itself and any host directives
+     * that may have been applied as a side-effect of it.
+     */
+    directives: DirectiveSymbol[];
+    /** The location in the shim file for the variable that holds the type of the component. */
+    tcbLocation: TcbLocation;
+    /** Template AST node defining the component. */
+    templateNode: TmplAstComponent;
+}
+/** A representation of a selectorless directive reference in a template. */
+export interface SelectorlessDirectiveSymbol {
+    kind: SymbolKind.SelectorlessDirective;
+    /** The `ts.Type` for the directive class. */
+    tsType: ts.Type;
+    /** The `ts.Symbol` for the directive class. */
+    tsSymbol: ts.Symbol | null;
+    /**
+     * Includes the directive class itself and any host directives
+     * that may have been applied as a side-effect of it.
+     */
+    directives: DirectiveSymbol[];
+    /** The location in the shim file for the variable that holds the type of the directive. */
+    tcbLocation: TcbLocation;
+    /** Template AST node defining the directive. */
+    templateNode: TmplAstDirective;
 }
 /** Interface shared between host and non-host directives. */
 interface DirectiveSymbolBase extends PotentialDirective {

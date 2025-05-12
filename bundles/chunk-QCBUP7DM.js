@@ -1304,6 +1304,8 @@ var SymbolKind;
   SymbolKind2[SymbolKind2["DomBinding"] = 9] = "DomBinding";
   SymbolKind2[SymbolKind2["Pipe"] = 10] = "Pipe";
   SymbolKind2[SymbolKind2["LetDeclaration"] = 11] = "LetDeclaration";
+  SymbolKind2[SymbolKind2["SelectorlessComponent"] = 12] = "SelectorlessComponent";
+  SymbolKind2[SymbolKind2["SelectorlessDirective"] = 13] = "SelectorlessDirective";
 })(SymbolKind || (SymbolKind = {}));
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/common/src/di.js
@@ -11665,7 +11667,7 @@ var DirectiveSourceManager = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.js
-import { AST, ASTWithName as ASTWithName2, ASTWithSource as ASTWithSource2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead5, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers4, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { AST, ASTWithName as ASTWithName2, ASTWithSource as ASTWithSource2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead5, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers4, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstComponent as TmplAstComponent3, TmplAstDirective as TmplAstDirective3, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts42 from "typescript";
 var SymbolBuilder = class {
   tcbPath;
@@ -11694,6 +11696,10 @@ var SymbolBuilder = class {
       symbol = this.getSymbolOfBoundEvent(node);
     } else if (node instanceof TmplAstElement3) {
       symbol = this.getSymbolOfElement(node);
+    } else if (node instanceof TmplAstComponent3) {
+      symbol = this.getSymbolOfSelectorlessComponent(node);
+    } else if (node instanceof TmplAstDirective3) {
+      symbol = this.getSymbolOfSelectorlessDirective(node);
     } else if (node instanceof TmplAstTemplate2) {
       symbol = this.getSymbolOfAstTemplate(node);
     } else if (node instanceof TmplAstVariable2) {
@@ -11737,9 +11743,41 @@ var SymbolBuilder = class {
       templateNode: element
     };
   }
-  getDirectivesOfNode(element) {
+  getSymbolOfSelectorlessComponent(node) {
     var _a;
-    const elementSourceSpan = (_a = element.startSourceSpan) != null ? _a : element.sourceSpan;
+    const directives = this.getDirectivesOfNode(node);
+    const primaryDirective = (_a = directives.find((dir) => !dir.isHostDirective && dir.isComponent)) != null ? _a : null;
+    if (primaryDirective === null) {
+      return null;
+    }
+    return {
+      tsType: primaryDirective.tsType,
+      tsSymbol: primaryDirective.tsSymbol,
+      tcbLocation: primaryDirective.tcbLocation,
+      kind: SymbolKind.SelectorlessComponent,
+      directives,
+      templateNode: node
+    };
+  }
+  getSymbolOfSelectorlessDirective(node) {
+    var _a;
+    const directives = this.getDirectivesOfNode(node);
+    const primaryDirective = (_a = directives.find((dir) => !dir.isHostDirective && !dir.isComponent)) != null ? _a : null;
+    if (primaryDirective === null) {
+      return null;
+    }
+    return {
+      tsType: primaryDirective.tsType,
+      tsSymbol: primaryDirective.tsSymbol,
+      tcbLocation: primaryDirective.tcbLocation,
+      kind: SymbolKind.SelectorlessDirective,
+      directives,
+      templateNode: node
+    };
+  }
+  getDirectivesOfNode(templateNode) {
+    var _a;
+    const elementSourceSpan = (_a = templateNode.startSourceSpan) != null ? _a : templateNode.sourceSpan;
     const tcbSourceFile = this.typeCheckBlock.getSourceFile();
     const isDirectiveDeclaration = (node) => (ts42.isTypeNode(node) || ts42.isIdentifier(node)) && ts42.isVariableDeclaration(node.parent) && hasExpressionIdentifier(tcbSourceFile, node, ExpressionIdentifier.DIRECTIVE);
     const nodes = findAllMatchingNodes(this.typeCheckBlock, {
@@ -11747,16 +11785,18 @@ var SymbolBuilder = class {
       filter: isDirectiveDeclaration
     });
     const symbols = [];
+    const seenDirectives = /* @__PURE__ */ new Set();
     for (const node of nodes) {
       const symbol = this.getSymbolOfTsNode(node.parent);
       if (symbol === null || !isSymbolWithValueDeclaration(symbol.tsSymbol) || !ts42.isClassDeclaration(symbol.tsSymbol.valueDeclaration)) {
         continue;
       }
-      const meta = this.getDirectiveMeta(element, symbol.tsSymbol.valueDeclaration);
-      if (meta !== null && meta.selector !== null) {
-        const ref = new Reference(symbol.tsSymbol.valueDeclaration);
+      const declaration = symbol.tsSymbol.valueDeclaration;
+      const meta = this.getDirectiveMeta(templateNode, declaration);
+      if (meta !== null && !seenDirectives.has(declaration)) {
+        const ref = new Reference(declaration);
         if (meta.hostDirectives !== null) {
-          this.addHostDirectiveSymbols(element, meta.hostDirectives, symbols);
+          this.addHostDirectiveSymbols(templateNode, meta.hostDirectives, symbols, seenDirectives);
         }
         const directiveSymbol = {
           ...symbol,
@@ -11764,30 +11804,32 @@ var SymbolBuilder = class {
           tsSymbol: symbol.tsSymbol,
           selector: meta.selector,
           isComponent: meta.isComponent,
-          ngModule: this.getDirectiveModule(symbol.tsSymbol.valueDeclaration),
+          ngModule: this.getDirectiveModule(declaration),
           kind: SymbolKind.Directive,
           isStructural: meta.isStructural,
           isInScope: true,
           isHostDirective: false
         };
         symbols.push(directiveSymbol);
+        seenDirectives.add(declaration);
       }
     }
     return symbols;
   }
-  addHostDirectiveSymbols(host, hostDirectives, symbols) {
+  addHostDirectiveSymbols(host, hostDirectives, symbols, seenDirectives) {
     for (const current of hostDirectives) {
       if (!isHostDirectiveMetaForGlobalMode(current)) {
         throw new Error("Impossible state: typecheck code path in local compilation mode.");
       }
-      if (!ts42.isClassDeclaration(current.directive.node)) {
+      const node = current.directive.node;
+      if (!ts42.isClassDeclaration(node) || seenDirectives.has(node)) {
         continue;
       }
-      const symbol = this.getSymbolOfTsNode(current.directive.node);
-      const meta = this.getDirectiveMeta(host, current.directive.node);
+      const symbol = this.getSymbolOfTsNode(node);
+      const meta = this.getDirectiveMeta(host, node);
       if (meta !== null && symbol !== null && isSymbolWithValueDeclaration(symbol.tsSymbol)) {
         if (meta.hostDirectives !== null) {
-          this.addHostDirectiveSymbols(host, meta.hostDirectives, symbols);
+          this.addHostDirectiveSymbols(host, meta.hostDirectives, symbols, seenDirectives);
         }
         const directiveSymbol = {
           ...symbol,
@@ -11798,27 +11840,30 @@ var SymbolBuilder = class {
           exposedOutputs: current.outputs,
           selector: meta.selector,
           isComponent: meta.isComponent,
-          ngModule: this.getDirectiveModule(current.directive.node),
+          ngModule: this.getDirectiveModule(node),
           kind: SymbolKind.Directive,
           isStructural: meta.isStructural,
           isInScope: true
         };
         symbols.push(directiveSymbol);
+        seenDirectives.add(node);
       }
     }
   }
   getDirectiveMeta(host, directiveDeclaration) {
     var _a;
     let directives = this.typeCheckData.boundTarget.getDirectivesOfNode(host);
-    const firstChild = host.children[0];
-    if (firstChild instanceof TmplAstElement3) {
-      const isMicrosyntaxTemplate = host instanceof TmplAstTemplate2 && sourceSpanEqual(firstChild.sourceSpan, host.sourceSpan);
-      if (isMicrosyntaxTemplate) {
-        const firstChildDirectives = this.typeCheckData.boundTarget.getDirectivesOfNode(firstChild);
-        if (firstChildDirectives !== null && directives !== null) {
-          directives = directives.concat(firstChildDirectives);
-        } else {
-          directives = directives != null ? directives : firstChildDirectives;
+    if (!(host instanceof TmplAstDirective3)) {
+      const firstChild = host.children[0];
+      if (firstChild instanceof TmplAstElement3) {
+        const isMicrosyntaxTemplate = host instanceof TmplAstTemplate2 && sourceSpanEqual(firstChild.sourceSpan, host.sourceSpan);
+        if (isMicrosyntaxTemplate) {
+          const firstChildDirectives = this.typeCheckData.boundTarget.getDirectivesOfNode(firstChild);
+          if (firstChildDirectives !== null && directives !== null) {
+            directives = directives.concat(firstChildDirectives);
+          } else {
+            directives = directives != null ? directives : firstChildDirectives;
+          }
         }
       }
     }
@@ -11996,7 +12041,7 @@ var SymbolBuilder = class {
   getDirectiveSymbolForAccessExpression(fieldAccessExpr, { isComponent, selector, isStructural }) {
     var _a;
     const tsSymbol = this.getTypeChecker().getSymbolAtLocation(fieldAccessExpr.expression);
-    if ((tsSymbol == null ? void 0 : tsSymbol.declarations) === void 0 || tsSymbol.declarations.length === 0 || selector === null) {
+    if ((tsSymbol == null ? void 0 : tsSymbol.declarations) === void 0 || tsSymbol.declarations.length === 0) {
       return null;
     }
     const [declaration] = tsSymbol.declarations;
@@ -13557,7 +13602,17 @@ var NgModuleDecoratorHandler = class {
         }
       }
     }
-    const schemas = this.compilationMode !== CompilationMode.LOCAL && ngModule.has("schemas") ? extractSchemas(ngModule.get("schemas"), this.evaluator, "NgModule") : [];
+    let schemas;
+    try {
+      schemas = this.compilationMode !== CompilationMode.LOCAL && ngModule.has("schemas") ? extractSchemas(ngModule.get("schemas"), this.evaluator, "NgModule") : [];
+    } catch (e) {
+      if (e instanceof FatalDiagnosticError) {
+        diagnostics.push(e.toDiagnostic());
+        schemas = [];
+      } else {
+        throw e;
+      }
+    }
     let id = null;
     if (ngModule.has("id")) {
       const idExpr = ngModule.get("id");
@@ -16597,4 +16652,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PSYF6LMJ.js.map
+//# sourceMappingURL=chunk-QCBUP7DM.js.map
