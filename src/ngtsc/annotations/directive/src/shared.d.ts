@@ -26,7 +26,7 @@ export interface HostBindingNodes {
  * appear in the declarations of an `NgModule` and additional verification is done when processing
  * the module.
  */
-export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker, evaluator: PartialEvaluator, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, annotateForClosureCompiler: boolean, compilationMode: CompilationMode, defaultSelector: string | null, strictStandalone: boolean, implicitStandaloneValue: boolean): {
+export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker, evaluator: PartialEvaluator, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, annotateForClosureCompiler: boolean, compilationMode: CompilationMode, defaultSelector: string | null, strictStandalone: boolean, implicitStandaloneValue: boolean, emitDeclarationOnly: boolean): {
     jitForced: false;
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;
@@ -54,6 +54,6 @@ export declare function parseFieldStringArrayValue(directive: Map<string, ts.Exp
  * automatically captured in the type of the `InputSignal`.
  *
  */
-export declare function parseDecoratorInputTransformFunction(clazz: ClassDeclaration, classPropertyName: string, value: DynamicValue | Reference, reflector: ReflectionHost, refEmitter: ReferenceEmitter, compilationMode: CompilationMode): DecoratorInputTransform;
+export declare function parseDecoratorInputTransformFunction(clazz: ClassDeclaration, classPropertyName: string, value: DynamicValue | Reference, reflector: ReflectionHost, refEmitter: ReferenceEmitter, compilationMode: CompilationMode, emitDeclarationOnly: boolean): DecoratorInputTransform;
 export declare function extractHostBindingResources(nodes: HostBindingNodes): ReadonlySet<Resource>;
 export {};

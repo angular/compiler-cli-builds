@@ -2390,12 +2390,13 @@ var TraitCompiler = class {
   dtsTransforms;
   semanticDepGraphUpdater;
   sourceFileTypeIdentifier;
+  emitDeclarationOnly;
   classes = /* @__PURE__ */ new Map();
   fileToClasses = /* @__PURE__ */ new Map();
   filesWithoutTraits = /* @__PURE__ */ new Set();
   reexportMap = /* @__PURE__ */ new Map();
   handlersByName = /* @__PURE__ */ new Map();
-  constructor(handlers, reflector, perf, incrementalBuild, compileNonExportedClasses, compilationMode, dtsTransforms, semanticDepGraphUpdater, sourceFileTypeIdentifier) {
+  constructor(handlers, reflector, perf, incrementalBuild, compileNonExportedClasses, compilationMode, dtsTransforms, semanticDepGraphUpdater, sourceFileTypeIdentifier, emitDeclarationOnly) {
     this.handlers = handlers;
     this.reflector = reflector;
     this.perf = perf;
@@ -2405,6 +2406,7 @@ var TraitCompiler = class {
     this.dtsTransforms = dtsTransforms;
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
     this.sourceFileTypeIdentifier = sourceFileTypeIdentifier;
+    this.emitDeclarationOnly = emitDeclarationOnly;
     for (const handler of handlers) {
       this.handlersByName.set(handler.name, handler);
     }
@@ -2562,13 +2564,14 @@ var TraitCompiler = class {
       }
     }
     if (nonNgDecoratorsInLocalMode !== null && nonNgDecoratorsInLocalMode.size > 0 && record !== null && record.metaDiagnostics === null) {
+      const compilationModeName = this.emitDeclarationOnly ? "experimental declaration-only emission" : "local compilation";
       record.metaDiagnostics = [...nonNgDecoratorsInLocalMode].map((decorator) => ({
         category: ts8.DiagnosticCategory.Error,
         code: Number("-99" + ErrorCode.DECORATOR_UNEXPECTED),
         file: getSourceFile(clazz),
         start: decorator.node.getStart(),
         length: decorator.node.getWidth(),
-        messageText: "In local compilation mode, Angular does not support custom decorators. Ensure all class decorators are from Angular."
+        messageText: `In ${compilationModeName} mode, Angular does not support custom decorators. Ensure all class decorators are from Angular.`
       }));
       record.traits = foundTraits = [];
     }
@@ -3076,11 +3079,11 @@ var Visitor = class {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/src/transform.js
 var NO_DECORATORS = /* @__PURE__ */ new Set();
 var CLOSURE_FILE_OVERVIEW_REGEXP = /\s+@fileoverview\s+/i;
-function ivyTransformFactory(compilation, reflector, importRewriter, defaultImportTracker, localCompilationExtraImportsTracker, perf, isCore, isClosureCompilerEnabled) {
+function ivyTransformFactory(compilation, reflector, importRewriter, defaultImportTracker, localCompilationExtraImportsTracker, perf, isCore, isClosureCompilerEnabled, emitDeclarationOnly) {
   const recordWrappedNode = createRecorderFn(defaultImportTracker);
   return (context) => {
     return (file) => {
-      return perf.inPhase(PerfPhase.Compile, () => transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, recordWrappedNode));
+      return perf.inPhase(PerfPhase.Compile, () => transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, emitDeclarationOnly, recordWrappedNode));
     };
   };
 }
@@ -3227,7 +3230,7 @@ var IvyTransformationVisitor = class extends Visitor {
     return node;
   }
 };
-function transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, recordWrappedNode) {
+function transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, emitDeclarationOnly, recordWrappedNode) {
   const constantPool = new ConstantPool(isClosureCompilerEnabled);
   const importManager = new ImportManager({
     ...presetImportManagerForceNamespaceImports,
@@ -3235,6 +3238,9 @@ function transformIvySourceFile(compilation, context, reflector, importRewriter,
   });
   const compilationVisitor = new IvyCompilationVisitor(compilation, constantPool);
   visit(file, compilationVisitor, context);
+  if (emitDeclarationOnly) {
+    return file;
+  }
   const transformationVisitor = new IvyTransformationVisitor(compilation, compilationVisitor.classCompilationMap, reflector, importManager, recordWrappedNode, isClosureCompilerEnabled, isCore, compilationVisitor.deferrableImports);
   let sf = visit(file, transformationVisitor, context);
   const downlevelTranslatedCode = getLocalizeCompileTarget(context) < ts11.ScriptTarget.ES2015;
@@ -5059,7 +5065,7 @@ var queryDecoratorNames = [
   "ContentChildren"
 ];
 var QUERY_TYPES = new Set(queryDecoratorNames);
-function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, evaluator, refEmitter, referencesRegistry, isCore, annotateForClosureCompiler, compilationMode, defaultSelector, strictStandalone, implicitStandaloneValue) {
+function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, evaluator, refEmitter, referencesRegistry, isCore, annotateForClosureCompiler, compilationMode, defaultSelector, strictStandalone, implicitStandaloneValue, emitDeclarationOnly) {
   let directive;
   if (decorator.args === null || decorator.args.length === 0) {
     directive = /* @__PURE__ */ new Map();
@@ -5078,8 +5084,8 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
   const members = reflector.getMembersOfClass(clazz);
   const decoratedElements = members.filter((member) => !member.isStatic && member.decorators !== null);
   const coreModule = isCore ? void 0 : "@angular/core";
-  const inputsFromMeta = parseInputsArray(clazz, directive, evaluator, reflector, refEmitter, compilationMode);
-  const inputsFromFields = parseInputFields(clazz, members, evaluator, reflector, importTracker, refEmitter, isCore, compilationMode, inputsFromMeta, decorator);
+  const inputsFromMeta = parseInputsArray(clazz, directive, evaluator, reflector, refEmitter, compilationMode, emitDeclarationOnly);
+  const inputsFromFields = parseInputFields(clazz, members, evaluator, reflector, importTracker, refEmitter, isCore, compilationMode, inputsFromMeta, decorator, emitDeclarationOnly);
   const inputs = ClassPropertyMapping.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
   const outputsFromMeta = parseOutputsArray(directive, evaluator);
   const outputsFromFields = parseOutputFields(clazz, decorator, members, isCore, reflector, importTracker, evaluator, outputsFromMeta);
@@ -5156,7 +5162,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
   const sourceFile = clazz.getSourceFile();
   const type = wrapTypeReference(reflector, clazz);
   const rawHostDirectives = directive.get("hostDirectives") || null;
-  const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator, compilationMode, createForwardRefResolver(isCore));
+  const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator, compilationMode, createForwardRefResolver(isCore), emitDeclarationOnly);
   if (compilationMode !== CompilationMode.LOCAL && hostDirectives !== null) {
     referencesRegistry.add(clazz, ...hostDirectives.map((hostDir) => {
       if (!isHostDirectiveMetaForGlobalMode(hostDir)) {
@@ -5453,7 +5459,7 @@ function parseMappingString(value) {
   const [fieldName, bindingPropertyName] = value.split(":", 2).map((str) => str.trim());
   return [bindingPropertyName != null ? bindingPropertyName : fieldName, fieldName];
 }
-function parseInputsArray(clazz, decoratorMetadata, evaluator, reflector, refEmitter, compilationMode) {
+function parseInputsArray(clazz, decoratorMetadata, evaluator, reflector, refEmitter, compilationMode, emitDeclarationOnly) {
   const inputsField = decoratorMetadata.get("inputs");
   if (inputsField === void 0) {
     return {};
@@ -5487,7 +5493,7 @@ function parseInputsArray(clazz, decoratorMetadata, evaluator, reflector, refEmi
         if (!(transformValue instanceof DynamicValue) && !(transformValue instanceof Reference)) {
           throw createValueHasWrongTypeError(inputsField, transformValue, `Transform of value at position ${i} of @Directive.inputs array must be a function`);
         }
-        transform = parseDecoratorInputTransformFunction(clazz, name, transformValue, reflector, refEmitter, compilationMode);
+        transform = parseDecoratorInputTransformFunction(clazz, name, transformValue, reflector, refEmitter, compilationMode, emitDeclarationOnly);
       }
       inputs[name] = {
         classPropertyName: name,
@@ -5513,7 +5519,7 @@ function tryGetDecoratorOnMember(member, decoratorName, isCore) {
   }
   return null;
 }
-function tryParseInputFieldMapping(clazz, member, evaluator, reflector, importTracker, isCore, refEmitter, compilationMode) {
+function tryParseInputFieldMapping(clazz, member, evaluator, reflector, importTracker, isCore, refEmitter, compilationMode, emitDeclarationOnly) {
   const classPropertyName = member.name;
   const decorator = tryGetDecoratorOnMember(member, "Input", isCore);
   const signalInputMapping = tryParseSignalInputMapping(member, reflector, importTracker);
@@ -5547,7 +5553,7 @@ function tryParseInputFieldMapping(clazz, member, evaluator, reflector, importTr
       if (!(transformValue instanceof DynamicValue) && !(transformValue instanceof Reference)) {
         throw createValueHasWrongTypeError(optionsNode, transformValue, `Input transform must be a function`);
       }
-      transform = parseDecoratorInputTransformFunction(clazz, classPropertyName, transformValue, reflector, refEmitter, compilationMode);
+      transform = parseDecoratorInputTransformFunction(clazz, classPropertyName, transformValue, reflector, refEmitter, compilationMode, emitDeclarationOnly);
     }
     return {
       isSignal: false,
@@ -5565,12 +5571,12 @@ function tryParseInputFieldMapping(clazz, member, evaluator, reflector, importTr
   }
   return null;
 }
-function parseInputFields(clazz, members, evaluator, reflector, importTracker, refEmitter, isCore, compilationMode, inputsFromClassDecorator, classDecorator) {
+function parseInputFields(clazz, members, evaluator, reflector, importTracker, refEmitter, isCore, compilationMode, inputsFromClassDecorator, classDecorator, emitDeclarationOnly) {
   var _a, _b;
   const inputs = {};
   for (const member of members) {
     const classPropertyName = member.name;
-    const inputMapping = tryParseInputFieldMapping(clazz, member, evaluator, reflector, importTracker, isCore, refEmitter, compilationMode);
+    const inputMapping = tryParseInputFieldMapping(clazz, member, evaluator, reflector, importTracker, isCore, refEmitter, compilationMode, emitDeclarationOnly);
     if (inputMapping === null) {
       continue;
     }
@@ -5584,8 +5590,23 @@ function parseInputFields(clazz, members, evaluator, reflector, importTracker, r
   }
   return inputs;
 }
-function parseDecoratorInputTransformFunction(clazz, classPropertyName, value, reflector, refEmitter, compilationMode) {
+function parseDecoratorInputTransformFunction(clazz, classPropertyName, value, reflector, refEmitter, compilationMode, emitDeclarationOnly) {
   var _a;
+  if (emitDeclarationOnly) {
+    const chain = {
+      messageText: "@Input decorators with a transform function are not supported in experimental declaration-only emission mode",
+      category: ts22.DiagnosticCategory.Error,
+      code: 0,
+      next: [
+        {
+          messageText: `Consider converting '${clazz.name.text}.${classPropertyName}' to an input signal`,
+          category: ts22.DiagnosticCategory.Message,
+          code: 0
+        }
+      ]
+    };
+    throw new FatalDiagnosticError(ErrorCode.DECORATOR_UNEXPECTED, value.node, chain);
+  }
   if (compilationMode === CompilationMode.LOCAL) {
     const node2 = value instanceof Reference ? value.getIdentityIn(clazz.getSourceFile()) : value.node;
     if (node2 === null) {
@@ -5804,7 +5825,7 @@ function getHostBindingErrorNode(error, hostExpr) {
   }
   return hostExpr;
 }
-function extractHostDirectives(rawHostDirectives, evaluator, compilationMode, forwardRefResolver) {
+function extractHostDirectives(rawHostDirectives, evaluator, compilationMode, forwardRefResolver, emitDeclarationOnly) {
   const resolved = evaluator.evaluate(rawHostDirectives, forwardRefResolver);
   if (!Array.isArray(resolved)) {
     throw createValueHasWrongTypeError(rawHostDirectives, resolved, "hostDirectives must be an array");
@@ -5824,6 +5845,9 @@ function extractHostDirectives(rawHostDirectives, evaluator, compilationMode, fo
     if (compilationMode === CompilationMode.LOCAL && hostReference instanceof DynamicValue) {
       if (!ts22.isIdentifier(hostReference.node) && !ts22.isPropertyAccessExpression(hostReference.node)) {
         throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, hostReference.node, `In local compilation mode, host directive cannot be an expression. Use an identifier instead`);
+      }
+      if (emitDeclarationOnly) {
+        throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, hostReference.node, "External references in host directives are not supported in experimental declaration-only emission mode");
       }
       directive = new WrappedNodeExpr5(hostReference.node);
     } else if (hostReference instanceof Reference) {
@@ -13110,7 +13134,8 @@ var DirectiveDecoratorHandler = class {
   implicitStandaloneValue;
   usePoisonedData;
   typeCheckHostBindings;
-  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, importTracker, includeClassMetadata, typeCheckScopeRegistry, compilationMode, jitDeclarationRegistry, resourceRegistry, strictStandalone, implicitStandaloneValue, usePoisonedData, typeCheckHostBindings) {
+  emitDeclarationOnly;
+  constructor(reflector, evaluator, metaRegistry, scopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, annotateForClosureCompiler, perf, importTracker, includeClassMetadata, typeCheckScopeRegistry, compilationMode, jitDeclarationRegistry, resourceRegistry, strictStandalone, implicitStandaloneValue, usePoisonedData, typeCheckHostBindings, emitDeclarationOnly) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -13134,6 +13159,7 @@ var DirectiveDecoratorHandler = class {
     this.implicitStandaloneValue = implicitStandaloneValue;
     this.usePoisonedData = usePoisonedData;
     this.typeCheckHostBindings = typeCheckHostBindings;
+    this.emitDeclarationOnly = emitDeclarationOnly;
   }
   precedence = HandlerPrecedence.PRIMARY;
   name = "DirectiveDecoratorHandler";
@@ -13168,7 +13194,8 @@ var DirectiveDecoratorHandler = class {
       this.compilationMode,
       null,
       this.strictStandalone,
-      this.implicitStandaloneValue
+      this.implicitStandaloneValue,
+      this.emitDeclarationOnly
     );
     if (directiveResult.jitForced) {
       this.jitDeclarationRegistry.jitDeclarations.add(node);
@@ -13489,7 +13516,8 @@ var NgModuleDecoratorHandler = class {
   compilationMode;
   localCompilationExtraImportsTracker;
   jitDeclarationRegistry;
-  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf, includeClassMetadata, includeSelectorScope, compilationMode, localCompilationExtraImportsTracker, jitDeclarationRegistry) {
+  emitDeclarationOnly;
+  constructor(reflector, evaluator, metaReader, metaRegistry, scopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, annotateForClosureCompiler, onlyPublishPublicTypings, injectableRegistry, perf, includeClassMetadata, includeSelectorScope, compilationMode, localCompilationExtraImportsTracker, jitDeclarationRegistry, emitDeclarationOnly) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaReader = metaReader;
@@ -13509,6 +13537,7 @@ var NgModuleDecoratorHandler = class {
     this.compilationMode = compilationMode;
     this.localCompilationExtraImportsTracker = localCompilationExtraImportsTracker;
     this.jitDeclarationRegistry = jitDeclarationRegistry;
+    this.emitDeclarationOnly = emitDeclarationOnly;
   }
   precedence = HandlerPrecedence.PRIMARY;
   name = "NgModuleDecoratorHandler";
@@ -13548,12 +13577,13 @@ var NgModuleDecoratorHandler = class {
       createModuleWithProvidersResolver(this.reflector, this.isCore),
       forwardRefResolver
     ]);
+    const allowUnresolvedReferences = this.compilationMode === CompilationMode.LOCAL && !this.emitDeclarationOnly;
     const diagnostics = [];
     let declarationRefs = [];
     const rawDeclarations = (_a = ngModule.get("declarations")) != null ? _a : null;
     if (rawDeclarations !== null) {
       const declarationMeta = this.evaluator.evaluate(rawDeclarations, forwardRefResolver);
-      declarationRefs = this.resolveTypeList(rawDeclarations, declarationMeta, name, "declarations", 0, this.compilationMode === CompilationMode.LOCAL).references;
+      declarationRefs = this.resolveTypeList(rawDeclarations, declarationMeta, name, "declarations", 0, allowUnresolvedReferences).references;
       for (const ref of declarationRefs) {
         if (ref.node.getSourceFile().isDeclarationFile) {
           const errorNode = ref.getOriginForDiagnostics(rawDeclarations);
@@ -13568,7 +13598,7 @@ var NgModuleDecoratorHandler = class {
     let rawImports = (_b = ngModule.get("imports")) != null ? _b : null;
     if (rawImports !== null) {
       const importsMeta = this.evaluator.evaluate(rawImports, moduleResolvers);
-      const result = this.resolveTypeList(rawImports, importsMeta, name, "imports", 0, this.compilationMode === CompilationMode.LOCAL);
+      const result = this.resolveTypeList(rawImports, importsMeta, name, "imports", 0, allowUnresolvedReferences);
       if (this.compilationMode === CompilationMode.LOCAL && this.localCompilationExtraImportsTracker !== null) {
         for (const d of result.dynamicValues) {
           this.localCompilationExtraImportsTracker.addGlobalImportFromIdentifier(d.node);
@@ -13580,12 +13610,12 @@ var NgModuleDecoratorHandler = class {
     const rawExports = (_c = ngModule.get("exports")) != null ? _c : null;
     if (rawExports !== null) {
       const exportsMeta = this.evaluator.evaluate(rawExports, moduleResolvers);
-      exportRefs = this.resolveTypeList(rawExports, exportsMeta, name, "exports", 0, this.compilationMode === CompilationMode.LOCAL).references;
+      exportRefs = this.resolveTypeList(rawExports, exportsMeta, name, "exports", 0, allowUnresolvedReferences).references;
       this.referencesRegistry.add(node, ...exportRefs);
     }
     let bootstrapRefs = [];
     const rawBootstrap = (_d = ngModule.get("bootstrap")) != null ? _d : null;
-    if (this.compilationMode !== CompilationMode.LOCAL && rawBootstrap !== null) {
+    if (!allowUnresolvedReferences && rawBootstrap !== null) {
       const bootstrapMeta = this.evaluator.evaluate(rawBootstrap, forwardRefResolver);
       bootstrapRefs = this.resolveTypeList(
         rawBootstrap,
@@ -13642,7 +13672,7 @@ var NgModuleDecoratorHandler = class {
     const containsForwardDecls = bootstrap.some(isForwardReference) || declarations.some(isForwardReference) || imports.some(isForwardReference) || exports.some(isForwardReference);
     const type = wrapTypeReference(this.reflector, node);
     let ngModuleMetadata;
-    if (this.compilationMode === CompilationMode.LOCAL) {
+    if (allowUnresolvedReferences) {
       ngModuleMetadata = {
         kind: R3NgModuleMetadataKind.Local,
         type,
@@ -13676,7 +13706,7 @@ var NgModuleDecoratorHandler = class {
       wrappedProviders = new WrappedNodeExpr9(this.annotateForClosureCompiler ? wrapFunctionExpressionsInParens(rawProviders) : rawProviders);
     }
     const topLevelImports = [];
-    if (this.compilationMode !== CompilationMode.LOCAL && ngModule.has("imports")) {
+    if (!allowUnresolvedReferences && ngModule.has("imports")) {
       const rawImports2 = unwrapExpression(ngModule.get("imports"));
       let topLevelExpressions = [];
       if (ts45.isArrayLiteralExpression(rawImports2)) {
@@ -13715,7 +13745,7 @@ var NgModuleDecoratorHandler = class {
       providers: wrappedProviders,
       imports: []
     };
-    if (this.compilationMode === CompilationMode.LOCAL) {
+    if (allowUnresolvedReferences) {
       for (const exp of [rawImports, rawExports]) {
         if (exp === null) {
           continue;
@@ -14024,6 +14054,8 @@ var NgModuleDecoratorHandler = class {
       } else if (entry instanceof DynamicValue && allowUnresolvedReferences) {
         dynamicValueSet.add(entry);
         continue;
+      } else if (this.emitDeclarationOnly && entry instanceof DynamicValue && entry.isFromUnknownIdentifier()) {
+        throw createValueHasWrongTypeError(entry.node, entry, `Value at position ${absoluteIndex} in the NgModule.${arrayName} of ${className} is an external reference. External references in @NgModule declarations are not supported in experimental declaration-only emission mode`);
       } else {
         throw createValueHasWrongTypeError(expr, entry, `Value at position ${absoluteIndex} in the NgModule.${arrayName} of ${className} is not a reference`);
       }
@@ -14930,7 +14962,8 @@ var ComponentDecoratorHandler = class {
   implicitStandaloneValue;
   typeCheckHostBindings;
   enableSelectorless;
-  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, compilerHost, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace, strictStandalone, enableHmr, implicitStandaloneValue, typeCheckHostBindings, enableSelectorless) {
+  emitDeclarationOnly;
+  constructor(reflector, evaluator, metaRegistry, metaReader, scopeReader, compilerHost, scopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, resourceLoader, rootDirs, defaultPreserveWhitespaces, i18nUseExternalIds, enableI18nLegacyMessageIdFormat, usePoisonedData, i18nNormalizeLineEndingsInICUs, moduleResolver, cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, depTracker, injectableRegistry, semanticDepGraphUpdater, annotateForClosureCompiler, perf, hostDirectivesResolver, importTracker, includeClassMetadata, compilationMode, deferredSymbolTracker, forbidOrphanRendering, enableBlockSyntax, enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, i18nPreserveSignificantWhitespace, strictStandalone, enableHmr, implicitStandaloneValue, typeCheckHostBindings, enableSelectorless, emitDeclarationOnly) {
     this.reflector = reflector;
     this.evaluator = evaluator;
     this.metaRegistry = metaRegistry;
@@ -14976,6 +15009,7 @@ var ComponentDecoratorHandler = class {
     this.implicitStandaloneValue = implicitStandaloneValue;
     this.typeCheckHostBindings = typeCheckHostBindings;
     this.enableSelectorless = enableSelectorless;
+    this.emitDeclarationOnly = emitDeclarationOnly;
     this.extractTemplateOptions = {
       enableI18nLegacyMessageIdFormat: this.enableI18nLegacyMessageIdFormat,
       i18nNormalizeLineEndingsInICUs: this.i18nNormalizeLineEndingsInICUs,
@@ -15085,7 +15119,7 @@ var ComponentDecoratorHandler = class {
     this.literalCache.delete(decorator);
     let diagnostics;
     let isPoisoned = false;
-    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.importTracker, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, this.annotateForClosureCompiler, this.compilationMode, this.elementSchemaRegistry.getDefaultComponentElementName(), this.strictStandalone, this.implicitStandaloneValue);
+    const directiveResult = extractDirectiveMetadata(node, decorator, this.reflector, this.importTracker, this.evaluator, this.refEmitter, this.referencesRegistry, this.isCore, this.annotateForClosureCompiler, this.compilationMode, this.elementSchemaRegistry.getDefaultComponentElementName(), this.strictStandalone, this.implicitStandaloneValue, this.emitDeclarationOnly);
     if (directiveResult.jitForced) {
       this.jitDeclarationRegistry.jitDeclarations.add(node);
       return {};
@@ -16652,4 +16686,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-J4MLTJ4X.js.map
+//# sourceMappingURL=chunk-GPMERQ7P.js.map

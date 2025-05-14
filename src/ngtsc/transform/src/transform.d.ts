@@ -10,4 +10,4 @@ import { DefaultImportTracker, ImportRewriter, LocalCompilationExtraImportsTrack
 import { PerfRecorder } from '../../perf';
 import { ReflectionHost } from '../../reflection';
 import { TraitCompiler } from './compilation';
-export declare function ivyTransformFactory(compilation: TraitCompiler, reflector: ReflectionHost, importRewriter: ImportRewriter, defaultImportTracker: DefaultImportTracker, localCompilationExtraImportsTracker: LocalCompilationExtraImportsTracker | null, perf: PerfRecorder, isCore: boolean, isClosureCompilerEnabled: boolean): ts.TransformerFactory<ts.SourceFile>;
+export declare function ivyTransformFactory(compilation: TraitCompiler, reflector: ReflectionHost, importRewriter: ImportRewriter, defaultImportTracker: DefaultImportTracker, localCompilationExtraImportsTracker: LocalCompilationExtraImportsTracker | null, perf: PerfRecorder, isCore: boolean, isClosureCompilerEnabled: boolean, emitDeclarationOnly: boolean): ts.TransformerFactory<ts.SourceFile>;
