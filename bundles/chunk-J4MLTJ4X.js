@@ -15238,7 +15238,7 @@ var ComponentDecoratorHandler = class {
       } else if (rawImports || rawDeferredImports) {
         isPoisoned = true;
         diagnostics != null ? diagnostics : diagnostics = [];
-        diagnostics.push(makeDiagnostic(ErrorCode.UNSUPPORTED_SELECTORLESS_COMPONENT_FIELD, rawImports || rawDeferredImports, `Cannot use the "${rawImports === null ? "deferredImports" : "imports"}" field in a selectorless components`));
+        diagnostics.push(makeDiagnostic(ErrorCode.UNSUPPORTED_SELECTORLESS_COMPONENT_FIELD, rawImports || rawDeferredImports, `Cannot use the "${rawImports === null ? "deferredImports" : "imports"}" field in a selectorless component`));
       }
     }
     let styles = [];
@@ -16652,4 +16652,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-MPP4S4AH.js.map
+//# sourceMappingURL=chunk-J4MLTJ4X.js.map

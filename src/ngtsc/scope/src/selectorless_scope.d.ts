@@ -9,7 +9,7 @@ import { MetadataReader } from '../../metadata';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, SelectorlessScope } from './api';
 /**
- * Computes the scope for a selectorless components by looking at imports within the same
+ * Computes the scope for a selectorless component by looking at imports within the same
  * file and resolving them to metadata.
  */
 export declare class SelectorlessComponentScopeReader implements ComponentScopeReader {
