@@ -3651,7 +3651,7 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
     metaCtorParameters = new ArrowFunctionExpr([], new LiteralArrayExpr(ctorParameters));
   }
   let metaPropDecorators = null;
-  const classMembers = reflection.getMembersOfClass(clazz).filter((member) => !member.isStatic && member.decorators !== null && member.decorators.length > 0);
+  const classMembers = reflection.getMembersOfClass(clazz).filter((member) => !member.isStatic && member.decorators !== null && member.decorators.length > 0 && member.accessLevel !== ClassMemberAccessLevel.EcmaScriptPrivate);
   const duplicateDecoratedMembers = classMembers.filter((member, i, arr) => arr.findIndex((arrayMember) => arrayMember.name === member.name) < i);
   if (duplicateDecoratedMembers.length > 0) {
     throw new FatalDiagnosticError(ErrorCode.DUPLICATE_DECORATED_PROPERTIES, (_a = duplicateDecoratedMembers[0].nameNode) != null ? _a : clazz, `Duplicate decorated properties found on class '${clazz.name.text}': ` + duplicateDecoratedMembers.map((member) => member.name).join(", "));
@@ -16388,4 +16388,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-UKNLSALJ.js.map
+//# sourceMappingURL=chunk-DXHL6X3C.js.map
