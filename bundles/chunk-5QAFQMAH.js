@@ -1870,10 +1870,10 @@ var DtsMetadataReader = class {
       return null;
     }
     const type = def.type.typeArguments[1];
-    if (!ts6.isLiteralTypeNode(type) || !ts6.isStringLiteral(type.literal)) {
+    if (!ts6.isLiteralTypeNode(type) || !ts6.isStringLiteral(type.literal) && type.literal.kind !== ts6.SyntaxKind.NullKeyword) {
       return null;
     }
-    const name = type.literal.text;
+    const name = ts6.isStringLiteral(type.literal) ? type.literal.text : null;
     const isStandalone = def.type.typeArguments.length > 2 && ((_a = readBooleanType(def.type.typeArguments[2])) != null ? _a : false);
     return {
       kind: MetaKind.Pipe,
@@ -4691,7 +4691,7 @@ var TypeCheckScopeRegistry = class {
       for (const dep of allDependencies) {
         if (dep.kind === MetaKind.Directive) {
           directives.push(dep);
-        } else if (dep.kind === MetaKind.Pipe) {
+        } else if (dep.kind === MetaKind.Pipe && dep.name !== null) {
           pipes.set(dep.name, dep);
         }
       }
@@ -15728,7 +15728,7 @@ var ComponentDecoratorHandler = class {
     } else {
       const scopeDeps = isModuleScope ? scope.compilation.dependencies : scope.dependencies;
       for (const dep of scopeDeps) {
-        if (dep.kind === MetaKind.Pipe) {
+        if (dep.kind === MetaKind.Pipe && dep.name !== null) {
           pipes.set(dep.name, dep);
         }
         dependencies.push(dep);
@@ -15750,7 +15750,7 @@ var ComponentDecoratorHandler = class {
       allDependencies = [...explicitlyDeferredDependencies, ...dependencies];
       const deferBlockMatcher = new SelectorMatcher3();
       for (const dep of allDependencies) {
-        if (dep.kind === MetaKind.Pipe) {
+        if (dep.kind === MetaKind.Pipe && dep.name !== null) {
           pipes.set(dep.name, dep);
         } else if (dep.kind === MetaKind.Directive && dep.selector !== null) {
           deferBlockMatcher.addSelectables(CssSelector5.parse(dep.selector), [dep]);
@@ -16507,41 +16507,43 @@ var PipeDecoratorHandler = class {
     if (decorator.args === null) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_NOT_CALLED, decorator.node, `@Pipe must be called`);
     }
-    if (decorator.args.length !== 1) {
-      throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.node, "@Pipe must have exactly one argument");
-    }
-    const meta = unwrapExpression(decorator.args[0]);
-    if (!ts53.isObjectLiteralExpression(meta)) {
-      throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
-    }
-    const pipe = reflectObjectLiteral(meta);
-    if (!pipe.has("name")) {
-      throw new FatalDiagnosticError(ErrorCode.PIPE_MISSING_NAME, meta, `@Pipe decorator is missing name field`);
-    }
-    const pipeNameExpr = pipe.get("name");
-    const pipeName = this.evaluator.evaluate(pipeNameExpr);
-    if (typeof pipeName !== "string") {
-      throw createValueHasWrongTypeError(pipeNameExpr, pipeName, `@Pipe.name must be a string`);
-    }
+    const meta = decorator.args.length === 0 || ts53.isNonNullExpression(decorator.args[0]) && decorator.args[0].expression.kind === ts53.SyntaxKind.NullKeyword ? null : unwrapExpression(decorator.args[0]);
+    let pipeName = null;
+    let pipeNameExpr = null;
     let pure = true;
-    if (pipe.has("pure")) {
-      const expr = pipe.get("pure");
-      const pureValue = this.evaluator.evaluate(expr);
-      if (typeof pureValue !== "boolean") {
-        throw createValueHasWrongTypeError(expr, pureValue, `@Pipe.pure must be a boolean`);
-      }
-      pure = pureValue;
-    }
     let isStandalone = this.implicitStandaloneValue;
-    if (pipe.has("standalone")) {
-      const expr = pipe.get("standalone");
-      const resolved = this.evaluator.evaluate(expr);
-      if (typeof resolved !== "boolean") {
-        throw createValueHasWrongTypeError(expr, resolved, `standalone flag must be a boolean`);
+    if (meta !== null) {
+      if (!ts53.isObjectLiteralExpression(meta)) {
+        throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
       }
-      isStandalone = resolved;
-      if (!isStandalone && this.strictStandalone) {
-        throw new FatalDiagnosticError(ErrorCode.NON_STANDALONE_NOT_ALLOWED, expr, `Only standalone pipes are allowed when 'strictStandalone' is enabled.`);
+      const pipe = reflectObjectLiteral(meta);
+      if (!pipe.has("name")) {
+        throw new FatalDiagnosticError(ErrorCode.PIPE_MISSING_NAME, meta, `@Pipe decorator is missing name field`);
+      }
+      pipeNameExpr = pipe.get("name");
+      const evaluatedName = this.evaluator.evaluate(pipeNameExpr);
+      if (typeof evaluatedName !== "string") {
+        throw createValueHasWrongTypeError(pipeNameExpr, evaluatedName, `@Pipe.name must be a string`);
+      }
+      pipeName = evaluatedName;
+      if (pipe.has("pure")) {
+        const expr = pipe.get("pure");
+        const pureValue = this.evaluator.evaluate(expr);
+        if (typeof pureValue !== "boolean") {
+          throw createValueHasWrongTypeError(expr, pureValue, `@Pipe.pure must be a boolean`);
+        }
+        pure = pureValue;
+      }
+      if (pipe.has("standalone")) {
+        const expr = pipe.get("standalone");
+        const resolved = this.evaluator.evaluate(expr);
+        if (typeof resolved !== "boolean") {
+          throw createValueHasWrongTypeError(expr, resolved, `standalone flag must be a boolean`);
+        }
+        isStandalone = resolved;
+        if (!isStandalone && this.strictStandalone) {
+          throw new FatalDiagnosticError(ErrorCode.NON_STANDALONE_NOT_ALLOWED, expr, `Only standalone pipes are allowed when 'strictStandalone' is enabled.`);
+        }
       }
     }
     return {
@@ -16562,7 +16564,8 @@ var PipeDecoratorHandler = class {
     };
   }
   symbol(node, analysis) {
-    return new PipeSymbol(node, analysis.meta.pipeName);
+    var _a;
+    return new PipeSymbol(node, (_a = analysis.meta.pipeName) != null ? _a : analysis.meta.name);
   }
   register(node, analysis) {
     const ref = new Reference(node);
@@ -16686,4 +16689,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WUM5KLTK.js.map
+//# sourceMappingURL=chunk-5QAFQMAH.js.map

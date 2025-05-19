@@ -18,7 +18,7 @@ import { InjectableClassRegistry } from '../common';
 export interface PipeHandlerData {
     meta: R3PipeMetadata;
     classMetadata: R3ClassMetadata | null;
-    pipeNameExpr: ts.Expression;
+    pipeNameExpr: ts.Expression | null;
     decorator: ts.Decorator | null;
 }
 /**

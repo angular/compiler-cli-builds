@@ -68,7 +68,7 @@ export interface PotentialPipe {
     /**
      * Name of the pipe.
      */
-    name: string;
+    name: string | null;
     /**
      * Whether or not this pipe is in scope.
      */

@@ -324,9 +324,9 @@ export interface BazelAndG3Options {
      * references.
      *
      * The mode is experimental and specifically tailored to support fast type declaration emission
-     * for the Gemini app in g3.
+     * for the Gemini app in g3 for the initial phase of the experiment.
      */
-    _geminiAllowEmitDeclarationOnly?: boolean;
+    _experimentalAllowEmitDeclarationOnly?: boolean;
 }
 /**
  * Options related to i18n compilation support.

@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-J4F55EF5.js";
+} from "./chunk-2TCAIVJA.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -52,7 +52,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-WUM5KLTK.js";
+} from "./chunk-5QAFQMAH.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -3420,7 +3420,7 @@ var UnusedStandaloneImportsRule = class {
         continue;
       }
       const pipeMeta = this.templateTypeChecker.getPipeMetadata(currentNode);
-      if (pipeMeta !== null && pipeMeta.isStandalone && !usedPipes.has(pipeMeta.name) && !this.isPotentialSharedReference(current, rawImports)) {
+      if (pipeMeta !== null && pipeMeta.isStandalone && pipeMeta.name !== null && !usedPipes.has(pipeMeta.name) && !this.isPotentialSharedReference(current, rawImports)) {
         unused != null ? unused : unused = [];
         unused.push(current);
       }
@@ -3624,7 +3624,7 @@ var NgCompiler = class {
     this.enableBlockSyntax = (_b = options["_enableBlockSyntax"]) != null ? _b : true;
     this.enableLetSyntax = (_c = options["_enableLetSyntax"]) != null ? _c : true;
     this.enableSelectorless = (_d = options["_enableSelectorless"]) != null ? _d : false;
-    this.emitDeclarationOnly = !!options.emitDeclarationOnly && !!options._geminiAllowEmitDeclarationOnly;
+    this.emitDeclarationOnly = !!options.emitDeclarationOnly && !!options._experimentalAllowEmitDeclarationOnly;
     this.implicitStandaloneValue = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 19.0.0");
     this.enableHmr = !!options["_enableHmr"];
     this.constructionDiagnostics.push(...this.adapter.constructionDiagnostics, ...verifyCompatibleTypeCheckOptions(this.options));
@@ -5063,4 +5063,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PVMHANSV.js.map
+//# sourceMappingURL=chunk-BBXHLTXO.js.map
