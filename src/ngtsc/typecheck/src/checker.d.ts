@@ -74,6 +74,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
      */
     private elementTagCache;
     private isComplete;
+    private priorResultsAdopted;
     constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, metaReader: MetadataReader, localMetaReader: MetadataReaderWithIndex, ngModuleIndex: NgModuleIndex, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
     getTemplate(component: ts.ClassDeclaration, optimizeFor?: OptimizeFor): TmplAstNode[] | null;
     getHostElement(directive: ts.ClassDeclaration, optimizeFor?: OptimizeFor): TmplAstHostElement | null;
@@ -104,7 +105,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
         sourceFile: ts.SourceFile;
     }[]): NgTemplateDiagnostic<T>;
     private getOrCreateCompletionEngine;
-    private maybeAdoptPriorResultsForFile;
+    private maybeAdoptPriorResults;
     private ensureAllShimsForAllFiles;
     private ensureAllShimsForOneFile;
     private ensureShimForComponent;
