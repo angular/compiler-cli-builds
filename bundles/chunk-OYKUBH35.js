@@ -12980,6 +12980,7 @@ var TemplateTypeCheckerImpl = class {
   scopeCache = /* @__PURE__ */ new Map();
   elementTagCache = /* @__PURE__ */ new Map();
   isComplete = false;
+  priorResultsAdopted = false;
   constructor(originalProgram, programDriver, typeCheckAdapter, config, refEmitter, reflector, compilerHost, priorBuild, metaReader, localMetaReader, ngModuleIndex, componentScopeReader, typeCheckScopeRegistry, perf) {
     this.originalProgram = originalProgram;
     this.programDriver = programDriver;
@@ -13214,25 +13215,35 @@ var TemplateTypeCheckerImpl = class {
     this.completionCache.set(component, engine);
     return engine;
   }
-  maybeAdoptPriorResultsForFile(sf) {
-    const sfPath = absoluteFromSourceFile(sf);
-    if (this.state.has(sfPath)) {
-      const existingResults = this.state.get(sfPath);
-      if (existingResults.isComplete) {
-        return;
-      }
-    }
-    const previousResults = this.priorBuild.priorTypeCheckingResultsFor(sf);
-    if (previousResults === null || !previousResults.isComplete) {
+  maybeAdoptPriorResults() {
+    if (this.priorResultsAdopted) {
       return;
     }
-    this.perf.eventCount(PerfEvent.ReuseTypeCheckFile);
-    this.state.set(sfPath, previousResults);
+    for (const sf of this.originalProgram.getSourceFiles()) {
+      if (sf.isDeclarationFile || isShim(sf)) {
+        continue;
+      }
+      const sfPath = absoluteFromSourceFile(sf);
+      if (this.state.has(sfPath)) {
+        const existingResults = this.state.get(sfPath);
+        if (existingResults.isComplete) {
+          continue;
+        }
+      }
+      const previousResults = this.priorBuild.priorTypeCheckingResultsFor(sf);
+      if (previousResults === null || !previousResults.isComplete) {
+        continue;
+      }
+      this.perf.eventCount(PerfEvent.ReuseTypeCheckFile);
+      this.state.set(sfPath, previousResults);
+    }
+    this.priorResultsAdopted = true;
   }
   ensureAllShimsForAllFiles() {
     if (this.isComplete) {
       return;
     }
+    this.maybeAdoptPriorResults();
     this.perf.inPhase(PerfPhase.TcbGeneration, () => {
       const host = new WholeProgramTypeCheckingHost(this);
       const ctx = this.newContext(host);
@@ -13240,7 +13251,6 @@ var TemplateTypeCheckerImpl = class {
         if (sf.isDeclarationFile || isShim(sf)) {
           continue;
         }
-        this.maybeAdoptPriorResultsForFile(sf);
         const sfPath = absoluteFromSourceFile(sf);
         const fileData = this.getFileData(sfPath);
         if (fileData.isComplete) {
@@ -13254,8 +13264,8 @@ var TemplateTypeCheckerImpl = class {
     });
   }
   ensureAllShimsForOneFile(sf) {
+    this.maybeAdoptPriorResults();
     this.perf.inPhase(PerfPhase.TcbGeneration, () => {
-      this.maybeAdoptPriorResultsForFile(sf);
       const sfPath = absoluteFromSourceFile(sf);
       const fileData = this.getFileData(sfPath);
       if (fileData.isComplete) {
@@ -13269,10 +13279,10 @@ var TemplateTypeCheckerImpl = class {
     });
   }
   ensureShimForComponent(component) {
+    this.maybeAdoptPriorResults();
     const sf = component.getSourceFile();
     const sfPath = absoluteFromSourceFile(sf);
     const shimPath = TypeCheckShimGenerator.shimFor(sfPath);
-    this.maybeAdoptPriorResultsForFile(sf);
     const fileData = this.getFileData(sfPath);
     if (fileData.shimData.has(shimPath)) {
       return;
@@ -15631,4 +15641,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VDXIIBQL.js.map
+//# sourceMappingURL=chunk-OYKUBH35.js.map
