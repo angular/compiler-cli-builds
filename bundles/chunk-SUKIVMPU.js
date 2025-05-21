@@ -4755,7 +4755,7 @@ import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirect
 import ts43 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.js
-import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr4, getSafePropertyAccessString, parseHostBindings, ParserError, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
+import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr4, ExternalReference, getSafePropertyAccessString, parseHostBindings, ParserError, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
 import ts22 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/initializer_function_access.js
@@ -5162,7 +5162,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
   const sourceFile = clazz.getSourceFile();
   const type = wrapTypeReference(reflector, clazz);
   const rawHostDirectives = directive.get("hostDirectives") || null;
-  const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator, compilationMode, createForwardRefResolver(isCore), emitDeclarationOnly);
+  const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator, reflector, compilationMode, createForwardRefResolver(isCore), emitDeclarationOnly);
   if (compilationMode !== CompilationMode.LOCAL && hostDirectives !== null) {
     referencesRegistry.add(clazz, ...hostDirectives.map((hostDir) => {
       if (!isHostDirectiveMetaForGlobalMode(hostDir)) {
@@ -5825,7 +5825,7 @@ function getHostBindingErrorNode(error, hostExpr) {
   }
   return hostExpr;
 }
-function extractHostDirectives(rawHostDirectives, evaluator, compilationMode, forwardRefResolver, emitDeclarationOnly) {
+function extractHostDirectives(rawHostDirectives, evaluator, reflector, compilationMode, forwardRefResolver, emitDeclarationOnly) {
   const resolved = evaluator.evaluate(rawHostDirectives, forwardRefResolver);
   if (!Array.isArray(resolved)) {
     throw createValueHasWrongTypeError(rawHostDirectives, resolved, "hostDirectives must be an array");
@@ -5844,12 +5844,23 @@ function extractHostDirectives(rawHostDirectives, evaluator, compilationMode, fo
     let nameForErrors = (fieldName) => "@Directive.hostDirectives";
     if (compilationMode === CompilationMode.LOCAL && hostReference instanceof DynamicValue) {
       if (!ts22.isIdentifier(hostReference.node) && !ts22.isPropertyAccessExpression(hostReference.node)) {
-        throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, hostReference.node, `In local compilation mode, host directive cannot be an expression. Use an identifier instead`);
+        const compilationModeName = emitDeclarationOnly ? "experimental declaration-only emission" : "local compilation";
+        throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, hostReference.node, `In ${compilationModeName} mode, host directive cannot be an expression. Use an identifier instead`);
       }
       if (emitDeclarationOnly) {
-        throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, hostReference.node, "External references in host directives are not supported in experimental declaration-only emission mode");
+        if (ts22.isIdentifier(hostReference.node)) {
+          const importInfo = reflector.getImportOfIdentifier(hostReference.node);
+          if (importInfo) {
+            directive = new ExternalReference(importInfo.from, importInfo.name);
+          } else {
+            throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, hostReference.node, `In experimental declaration-only emission mode, host directive cannot use indirect external indentifiers. Use a direct external identifier instead`);
+          }
+        } else {
+          throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, hostReference.node, `In experimental declaration-only emission mode, host directive cannot be an expression. Use an identifier instead`);
+        }
+      } else {
+        directive = new WrappedNodeExpr5(hostReference.node);
       }
-      directive = new WrappedNodeExpr5(hostReference.node);
     } else if (hostReference instanceof Reference) {
       directive = hostReference;
       nameForErrors = (fieldName) => `@Directive.hostDirectives.${directive.node.name.text}.${fieldName}`;
@@ -5878,6 +5889,11 @@ function toHostDirectiveMetadata(hostDirective, context, refEmitter) {
   let directive;
   if (hostDirective.directive instanceof Reference) {
     directive = toR3Reference(hostDirective.directive.node, hostDirective.directive, context, refEmitter);
+  } else if (hostDirective.directive instanceof ExternalReference) {
+    directive = {
+      value: new ExternalExpr4(hostDirective.directive),
+      type: new ExternalExpr4(hostDirective.directive)
+    };
   } else {
     directive = {
       value: hostDirective.directive,
@@ -16699,4 +16715,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-TRQHQRR2.js.map
+//# sourceMappingURL=chunk-SUKIVMPU.js.map

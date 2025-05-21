@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { DirectiveMeta as T2DirectiveMeta, Expression, SchemaMetadata } from '@angular/compiler';
+import { DirectiveMeta as T2DirectiveMeta, Expression, SchemaMetadata, ExternalReference } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
@@ -257,7 +257,7 @@ export interface HostDirectiveMeta {
      * which indicates the expression could not be resolved due to being imported from some external
      * file. In this case, the expression is the raw expression as appears in the decorator.
      */
-    directive: Reference<ClassDeclaration> | Expression;
+    directive: Reference<ClassDeclaration> | Expression | ExternalReference;
     /** Whether the reference to the host directive is a forward reference. */
     isForwardReference: boolean;
     /** Inputs from the host directive that have been exposed. */
