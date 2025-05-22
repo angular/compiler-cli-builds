@@ -2908,8 +2908,6 @@ var DtsTransformer = class {
     const visitor = (node) => {
       if (ts9.isClassDeclaration(node)) {
         return this.transformClassDeclaration(node, transforms, imports);
-      } else if (ts9.isFunctionDeclaration(node)) {
-        return this.transformFunctionDeclaration(node, transforms, imports);
       } else {
         return ts9.visitEachChild(node, visitor, this.ctx);
       }
@@ -2918,49 +2916,13 @@ var DtsTransformer = class {
     return imports.transformTsFile(this.ctx, sf);
   }
   transformClassDeclaration(clazz, transforms, imports) {
-    let elements = clazz.members;
-    let elementsChanged = false;
-    for (const transform of transforms) {
-      if (transform.transformClassElement !== void 0) {
-        for (let i = 0; i < elements.length; i++) {
-          const res = transform.transformClassElement(elements[i], imports);
-          if (res !== elements[i]) {
-            if (!elementsChanged) {
-              elements = [...elements];
-              elementsChanged = true;
-            }
-            elements[i] = res;
-          }
-        }
-      }
-    }
     let newClazz = clazz;
     for (const transform of transforms) {
       if (transform.transformClass !== void 0) {
-        const inputMembers = clazz === newClazz ? elements : newClazz.members;
-        newClazz = transform.transformClass(newClazz, inputMembers, this.reflector, this.refEmitter, imports);
+        newClazz = transform.transformClass(newClazz, newClazz.members, this.reflector, this.refEmitter, imports);
       }
-    }
-    if (elementsChanged && clazz === newClazz) {
-      newClazz = ts9.factory.updateClassDeclaration(
-        clazz,
-        clazz.modifiers,
-        clazz.name,
-        clazz.typeParameters,
-        clazz.heritageClauses,
-        elements
-      );
     }
     return newClazz;
-  }
-  transformFunctionDeclaration(declaration, transforms, imports) {
-    let newDecl = declaration;
-    for (const transform of transforms) {
-      if (transform.transformFunctionDeclaration !== void 0) {
-        newDecl = transform.transformFunctionDeclaration(newDecl, imports);
-      }
-    }
-    return newDecl;
   }
 };
 var IvyDeclarationDtsTransform = class {
@@ -16637,4 +16599,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-O6CWVLFD.js.map
+//# sourceMappingURL=chunk-4ZSSOUTN.js.map
