@@ -8,16 +8,16 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-OKZBNWEQ.js";
+} from "../../chunk-FWTFIN5W.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "../../chunk-SEKYV57I.js";
 import "../../chunk-PML5JK7B.js";
-import "../../chunk-24IJGK6C.js";
+import "../../chunk-L2D6SEVI.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-UFA6TATE.js";
+} from "../../chunk-VR5JY4Q4.js";
 import "../../chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.mjs
@@ -315,14 +315,13 @@ function createEs2015LinkerPlugin({ fileSystem, logger, ...options }) {
     visitor: {
       Program: {
         enter(_, state) {
-          var _a, _b;
           assertNull(fileLinker);
           const file = state.file;
-          const filename = (_a = file.opts.filename) != null ? _a : file.opts.filenameRelative;
+          const filename = file.opts.filename ?? file.opts.filenameRelative;
           if (!filename) {
             throw new Error("No filename (nor filenameRelative) provided by Babel. This is required for the linking of partially compiled directives and components.");
           }
-          const sourceUrl = fileSystem.resolve((_b = file.opts.cwd) != null ? _b : ".", filename);
+          const sourceUrl = fileSystem.resolve(file.opts.cwd ?? ".", filename);
           const linkerEnvironment = LinkerEnvironment.create(fileSystem, logger, new BabelAstHost(), new BabelAstFactory(sourceUrl), options);
           fileLinker = new FileLinker(linkerEnvironment, sourceUrl, file.code);
         },
