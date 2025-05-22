@@ -8,7 +8,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-O5FLACR6.js";
+} from "./chunk-RJXTHQDJ.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.mjs
 var FatalLinkerError = class extends Error {
@@ -311,7 +311,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "20.1.0-next.0+sha-396b543";
+var PLACEHOLDER_VERSION = "20.1.0-next.0+sha-6899b27";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -663,7 +663,7 @@ ${errors}`);
     if (pos === null || pos.file === this.sourceUrl || /\.[jt]s$/.test(pos.file) || pos.line !== 0 || pos.column !== 0) {
       return null;
     }
-    const templateContents = sourceFile.sources.find((src) => (src == null ? void 0 : src.sourcePath) === pos.file).contents;
+    const templateContents = sourceFile.sources.find((src) => src?.sourcePath === pos.file).contents;
     return {
       code: templateContents,
       sourceUrl: pos.file,
@@ -694,7 +694,7 @@ ${errors}`);
     const deferredBlocks = boundTarget.getDeferBlocks();
     const dependencies = metaObj.has("deferBlockDependencies") ? metaObj.getArray("deferBlockDependencies") : null;
     for (let i = 0; i < deferredBlocks.length; i++) {
-      const matchingDependencyFn = dependencies == null ? void 0 : dependencies[i];
+      const matchingDependencyFn = dependencies?.[i];
       if (matchingDependencyFn == null) {
         result.blocks.set(deferredBlocks[i], null);
       } else {
@@ -1126,11 +1126,10 @@ var LinkerEnvironment = class {
     this.sourceFileLoader = this.options.sourceMapping ? new SourceFileLoader(this.fileSystem, this.logger, {}) : null;
   }
   static create(fileSystem, logger, host, factory, options) {
-    var _a, _b, _c;
     return new LinkerEnvironment(fileSystem, logger, host, factory, {
-      sourceMapping: (_a = options.sourceMapping) != null ? _a : DEFAULT_LINKER_OPTIONS.sourceMapping,
-      linkerJitMode: (_b = options.linkerJitMode) != null ? _b : DEFAULT_LINKER_OPTIONS.linkerJitMode,
-      unknownDeclarationVersionHandling: (_c = options.unknownDeclarationVersionHandling) != null ? _c : DEFAULT_LINKER_OPTIONS.unknownDeclarationVersionHandling
+      sourceMapping: options.sourceMapping ?? DEFAULT_LINKER_OPTIONS.sourceMapping,
+      linkerJitMode: options.linkerJitMode ?? DEFAULT_LINKER_OPTIONS.linkerJitMode,
+      unknownDeclarationVersionHandling: options.unknownDeclarationVersionHandling ?? DEFAULT_LINKER_OPTIONS.unknownDeclarationVersionHandling
     });
   }
 };
@@ -1156,4 +1155,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-K7BPPC6D.js.map
+//# sourceMappingURL=chunk-MPWOG2R7.js.map

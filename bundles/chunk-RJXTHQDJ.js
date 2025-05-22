@@ -12,7 +12,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-UFA6TATE.js";
+} from "./chunk-VR5JY4Q4.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.js
 var ErrorCode;
@@ -262,7 +262,6 @@ var AmbientImport = {};
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/reflection/src/type_to_value.js
 import ts3 from "typescript";
 function typeToValue(typeNode, checker, isLocalCompilation) {
-  var _a, _b;
   if (typeNode === null) {
     return missingType();
   }
@@ -317,7 +316,7 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
       const moduleName = extractModuleName(importDeclaration);
       return {
         kind: 1,
-        valueDeclaration: (_a = decl.valueDeclaration) != null ? _a : null,
+        valueDeclaration: decl.valueDeclaration ?? null,
         moduleName,
         importedName,
         nestedPath
@@ -337,7 +336,7 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
       const moduleName = extractModuleName(importDeclaration);
       return {
         kind: 1,
-        valueDeclaration: (_b = decl.valueDeclaration) != null ? _b : null,
+        valueDeclaration: decl.valueDeclaration ?? null,
         moduleName,
         importedName,
         nestedPath
@@ -939,10 +938,9 @@ function propertyNameToString(node) {
   }
 }
 function isPrivateSymbol(typeChecker, symbol) {
-  var _a;
   if (symbol.valueDeclaration !== void 0) {
     const symbolType = typeChecker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
-    return ((_a = symbolType == null ? void 0 : symbolType.symbol) == null ? void 0 : _a.name.startsWith("\u0275")) === true;
+    return symbolType?.symbol?.name.startsWith("\u0275") === true;
   }
   return false;
 }
@@ -1612,8 +1610,7 @@ function attachDefaultImportDeclaration(expr, importDecl) {
   expr[DefaultImportDeclaration] = importDecl;
 }
 function getDefaultImportDeclaration(expr) {
-  var _a;
-  return (_a = expr[DefaultImportDeclaration]) != null ? _a : null;
+  return expr[DefaultImportDeclaration] ?? null;
 }
 var DefaultImportTracker = class {
   sourceFileToUsedImports = /* @__PURE__ */ new Map();
@@ -1636,7 +1633,7 @@ var DefaultImportTracker = class {
             if (clausesToPreserve === null) {
               clausesToPreserve = loadIsReferencedAliasDeclarationPatch(context);
             }
-            clausesToPreserve == null ? void 0 : clausesToPreserve.add(clause);
+            clausesToPreserve?.add(clause);
           }
         }
         return sourceFile;
@@ -1684,9 +1681,8 @@ var DeferredSymbolTracker = class {
     return symbolMap;
   }
   getNonRemovableDeferredImports(sourceFile, classDecl) {
-    var _a;
     const affectedImports = [];
-    const importDecls = (_a = this.explicitlyDeferredImports.get(classDecl)) != null ? _a : [];
+    const importDecls = this.explicitlyDeferredImports.get(classDecl) ?? [];
     for (const importDecl of importDecls) {
       if (importDecl.getSourceFile() === sourceFile && !this.canDefer(importDecl)) {
         affectedImports.push(importDecl);
@@ -1778,15 +1774,14 @@ var ImportedSymbolsTracker = class {
     this.scanImports(sourceFile);
     const fileImports = this.fileToNamedImports.get(sourceFile);
     const moduleImports = fileImports.get(moduleName);
-    const symbolImports = moduleImports == null ? void 0 : moduleImports.get(exportedName);
+    const symbolImports = moduleImports?.get(exportedName);
     return symbolImports !== void 0 && symbolImports.has(node.text);
   }
   isPotentialReferenceToNamespaceImport(node, moduleName) {
-    var _a, _b;
     const sourceFile = node.getSourceFile();
     this.scanImports(sourceFile);
     const namespaces = this.fileToNamespaceImports.get(sourceFile);
-    return (_b = (_a = namespaces.get(moduleName)) == null ? void 0 : _a.has(node.text)) != null ? _b : false;
+    return namespaces.get(moduleName)?.has(node.text) ?? false;
   }
   hasNamedImport(sourceFile, exportedName, moduleName) {
     this.scanImports(sourceFile);
@@ -1800,7 +1795,6 @@ var ImportedSymbolsTracker = class {
     return namespaces.has(moduleName);
   }
   scanImports(sourceFile) {
-    var _a, _b;
     if (this.fileToNamedImports.has(sourceFile) && this.fileToNamespaceImports.has(sourceFile)) {
       return;
     }
@@ -1809,7 +1803,7 @@ var ImportedSymbolsTracker = class {
     this.fileToNamedImports.set(sourceFile, namedImports);
     this.fileToNamespaceImports.set(sourceFile, namespaceImports);
     for (const stmt of sourceFile.statements) {
-      if (!ts10.isImportDeclaration(stmt) || !ts10.isStringLiteralLike(stmt.moduleSpecifier) || ((_a = stmt.importClause) == null ? void 0 : _a.namedBindings) === void 0) {
+      if (!ts10.isImportDeclaration(stmt) || !ts10.isStringLiteralLike(stmt.moduleSpecifier) || stmt.importClause?.namedBindings === void 0) {
         continue;
       }
       const moduleName = stmt.moduleSpecifier.text;
@@ -1829,7 +1823,7 @@ var ImportedSymbolsTracker = class {
           if (!localNames.has(exportedName)) {
             localNames.set(exportedName, /* @__PURE__ */ new Set());
           }
-          (_b = localNames.get(exportedName)) == null ? void 0 : _b.add(localName);
+          localNames.get(exportedName)?.add(localName);
         }
       }
     }
@@ -1856,7 +1850,6 @@ var LocalCompilationExtraImportsTracker = class {
     this.localImportsMap.get(sf.fileName).add(moduleName);
   }
   addGlobalImportFromIdentifier(node) {
-    var _a;
     let identifier = null;
     if (ts11.isIdentifier(node)) {
       identifier = node;
@@ -1867,7 +1860,7 @@ var LocalCompilationExtraImportsTracker = class {
       return;
     }
     const sym = this.typeChecker.getSymbolAtLocation(identifier);
-    if (!((_a = sym == null ? void 0 : sym.declarations) == null ? void 0 : _a.length)) {
+    if (!sym?.declarations?.length) {
       return;
     }
     const importClause = sym.declarations[0];
@@ -1877,11 +1870,10 @@ var LocalCompilationExtraImportsTracker = class {
     }
   }
   getImportsForFile(sf) {
-    var _a;
     if (!this.markedFilesSet.has(sf.fileName)) {
       return [];
     }
-    return [...this.globalImportsSet, ...(_a = this.localImportsMap.get(sf.fileName)) != null ? _a : []];
+    return [...this.globalImportsSet, ...this.localImportsMap.get(sf.fileName) ?? []];
   }
 };
 function removeQuotations(s) {
@@ -1979,12 +1971,11 @@ function createTsTransformForImportManager(manager, extraStatementsForFiles) {
       return newImport;
     };
     return (sourceFile) => {
-      var _a, _b;
       if (!affectedFiles.has(sourceFile.fileName)) {
         return sourceFile;
       }
       sourceFile = ts13.visitEachChild(sourceFile, visitStatement, ctx);
-      const extraStatements = (_a = extraStatementsForFiles == null ? void 0 : extraStatementsForFiles.get(sourceFile.fileName)) != null ? _a : [];
+      const extraStatements = extraStatementsForFiles?.get(sourceFile.fileName) ?? [];
       const existingImports = [];
       const body = [];
       for (const statement of sourceFile.statements) {
@@ -1996,7 +1987,7 @@ function createTsTransformForImportManager(manager, extraStatementsForFiles) {
       }
       return ctx.factory.updateSourceFile(sourceFile, [
         ...existingImports,
-        ...(_b = newImports.get(sourceFile.fileName)) != null ? _b : [],
+        ...newImports.get(sourceFile.fileName) ?? [],
         ...extraStatements,
         ...body
       ], sourceFile.isDeclarationFile, sourceFile.referencedFiles, sourceFile.typeReferenceDirectives, sourceFile.hasNoDefaultLib, sourceFile.libReferenceDirectives);
@@ -2061,10 +2052,9 @@ function attemptToReuseExistingSourceFileImports(tracker, sourceFile, request) {
       }
       if (ts15.isNamedImports(namedBindings) && request.exportSymbolName !== null) {
         const existingElement = namedBindings.elements.find((e) => {
-          var _a;
           let nameMatches;
           if (request.unsafeAliasOverride) {
-            nameMatches = ((_a = e.propertyName) == null ? void 0 : _a.text) === request.exportSymbolName && e.name.text === request.unsafeAliasOverride;
+            nameMatches = e.propertyName?.text === request.exportSymbolName && e.name.text === request.unsafeAliasOverride;
           } else {
             nameMatches = e.propertyName ? e.propertyName.text === request.exportSymbolName : e.name.text === request.exportSymbolName;
           }
@@ -2091,7 +2081,7 @@ function attemptToReuseExistingSourceFileImports(tracker, sourceFile, request) {
     propertyName,
     fileUniqueAlias
   });
-  return fileUniqueAlias != null ? fileUniqueAlias : propertyName;
+  return fileUniqueAlias ?? propertyName;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/import_manager/import_manager.js
@@ -2110,14 +2100,13 @@ var ImportManager = class {
     namespaceImportReuseCache: /* @__PURE__ */ new Map()
   };
   constructor(config = {}) {
-    var _a, _b, _c, _d, _e, _f;
     this.config = {
-      shouldUseSingleQuotes: (_a = config.shouldUseSingleQuotes) != null ? _a : () => false,
-      rewriter: (_b = config.rewriter) != null ? _b : null,
-      disableOriginalSourceFileReuse: (_c = config.disableOriginalSourceFileReuse) != null ? _c : false,
-      forceGenerateNamespacesForNewImports: (_d = config.forceGenerateNamespacesForNewImports) != null ? _d : false,
-      namespaceImportPrefix: (_e = config.namespaceImportPrefix) != null ? _e : "i",
-      generateUniqueIdentifier: (_f = config.generateUniqueIdentifier) != null ? _f : createGenerateUniqueIdentifierHelper()
+      shouldUseSingleQuotes: config.shouldUseSingleQuotes ?? (() => false),
+      rewriter: config.rewriter ?? null,
+      disableOriginalSourceFileReuse: config.disableOriginalSourceFileReuse ?? false,
+      forceGenerateNamespacesForNewImports: config.forceGenerateNamespacesForNewImports ?? false,
+      namespaceImportPrefix: config.namespaceImportPrefix ?? "i",
+      generateUniqueIdentifier: config.generateUniqueIdentifier ?? createGenerateUniqueIdentifierHelper()
     };
     this.reuseSourceFileImportsTracker = {
       generateUniqueIdentifier: this.config.generateUniqueIdentifier,
@@ -2132,7 +2121,6 @@ var ImportManager = class {
     this._getNewImportsTrackerForFile(requestedFile).sideEffectImports.add(moduleSpecifier);
   }
   addImport(request) {
-    var _a, _b;
     if (this.config.rewriter !== null) {
       if (request.exportSymbolName !== null) {
         request.exportSymbolName = this.config.rewriter.rewriteSymbol(request.exportSymbolName, request.exportModuleSpecifier);
@@ -2140,7 +2128,7 @@ var ImportManager = class {
       request.exportModuleSpecifier = this.config.rewriter.rewriteSpecifier(request.exportModuleSpecifier, request.requestedFile.fileName);
     }
     if (request.exportSymbolName !== null && !request.asTypeReference) {
-      (_b = (_a = this.removedImports.get(request.requestedFile)) == null ? void 0 : _a.get(request.exportModuleSpecifier)) == null ? void 0 : _b.delete(request.exportSymbolName);
+      this.removedImports.get(request.requestedFile)?.get(request.exportModuleSpecifier)?.delete(request.exportSymbolName);
     }
     const previousGeneratedImportRef = attemptToReuseGeneratedImports(this.reuseGeneratedImportsTracker, request);
     if (previousGeneratedImportRef !== null) {
@@ -2164,7 +2152,6 @@ var ImportManager = class {
     removedSymbols.add(exportSymbolName);
   }
   _generateNewImport(request) {
-    var _a;
     const { requestedFile: sourceFile } = request;
     const disableOriginalSourceFileReuse = this.config.disableOriginalSourceFileReuse;
     const forceGenerateNamespacesForNewImports = this.config.forceGenerateNamespacesForNewImports;
@@ -2180,7 +2167,7 @@ var ImportManager = class {
       if (this.config.rewriter) {
         namespaceImportName = this.config.rewriter.rewriteNamespaceImportIdentifier(namespaceImportName, request.exportModuleSpecifier);
       }
-      const namespaceImport2 = ts16.factory.createNamespaceImport((_a = this.config.generateUniqueIdentifier(sourceFile, namespaceImportName)) != null ? _a : ts16.factory.createIdentifier(namespaceImportName));
+      const namespaceImport2 = ts16.factory.createNamespaceImport(this.config.generateUniqueIdentifier(sourceFile, namespaceImportName) ?? ts16.factory.createIdentifier(namespaceImportName));
       namespaceImports.set(request.exportModuleSpecifier, namespaceImport2);
       captureGeneratedImport({ ...request, exportSymbolName: null }, this.reuseGeneratedImportsTracker, namespaceImport2.name);
       if (request.exportSymbolName !== null) {
@@ -2226,7 +2213,7 @@ var ImportManager = class {
       const sourceFile = importDecl.getSourceFile();
       const namedBindings = importDecl.importClause.namedBindings;
       const moduleName = importDecl.moduleSpecifier.text;
-      const newElements = namedBindings.elements.concat(expressions.map(({ propertyName, fileUniqueAlias }) => ts16.factory.createImportSpecifier(false, fileUniqueAlias !== null ? propertyName : void 0, fileUniqueAlias != null ? fileUniqueAlias : propertyName))).filter((specifier) => this._canAddSpecifier(sourceFile, moduleName, specifier));
+      const newElements = namedBindings.elements.concat(expressions.map(({ propertyName, fileUniqueAlias }) => ts16.factory.createImportSpecifier(false, fileUniqueAlias !== null ? propertyName : void 0, fileUniqueAlias ?? propertyName))).filter((specifier) => this._canAddSpecifier(sourceFile, moduleName, specifier));
       affectedFiles.add(sourceFile.fileName);
       if (newElements.length === 0) {
         deletedImports.add(importDecl);
@@ -2235,7 +2222,6 @@ var ImportManager = class {
       }
     });
     this.removedImports.forEach((removeMap, sourceFile) => {
-      var _a;
       if (removeMap.size === 0) {
         return;
       }
@@ -2245,7 +2231,7 @@ var ImportManager = class {
         importDeclarationsPerFile.set(sourceFile, allImports);
       }
       for (const node of allImports) {
-        if (!((_a = node.importClause) == null ? void 0 : _a.namedBindings) || !ts16.isNamedImports(node.importClause.namedBindings) || this.reuseSourceFileImportsTracker.updatedImports.has(node) || deletedImports.has(node)) {
+        if (!node.importClause?.namedBindings || !ts16.isNamedImports(node.importClause.namedBindings) || this.reuseSourceFileImportsTracker.updatedImports.has(node) || deletedImports.has(node)) {
           continue;
         }
         const namedBindings = node.importClause.namedBindings;
@@ -2305,8 +2291,7 @@ var ImportManager = class {
     return this.newImports.get(file);
   }
   _canAddSpecifier(sourceFile, moduleSpecifier, specifier) {
-    var _a, _b;
-    return !((_b = (_a = this.removedImports.get(sourceFile)) == null ? void 0 : _a.get(moduleSpecifier)) == null ? void 0 : _b.has((specifier.propertyName || specifier.name).text));
+    return !this.removedImports.get(sourceFile)?.get(moduleSpecifier)?.has((specifier.propertyName || specifier.name).text);
   }
 };
 function createImportReference(asTypeReference, ref) {
@@ -2376,9 +2361,8 @@ var ExpressionTranslatorVisitor = class {
     });
   }
   visitDeclareVarStmt(stmt, context) {
-    var _a;
     const varType = this.downlevelVariableDeclarations ? "var" : stmt.hasModifier(o.StmtModifier.Final) ? "const" : "let";
-    return this.attachComments(this.factory.createVariableDeclaration(stmt.name, (_a = stmt.value) == null ? void 0 : _a.visitExpression(this, context.withExpressionMode), varType), stmt.leadingComments);
+    return this.attachComments(this.factory.createVariableDeclaration(stmt.name, stmt.value?.visitExpression(this, context.withExpressionMode), varType), stmt.leadingComments);
   }
   visitDeclareFunctionStmt(stmt, context) {
     return this.attachComments(this.factory.createFunctionDeclaration(stmt.name, stmt.params.map((param) => param.name), this.factory.createBlock(this.visitStatements(stmt.statements, context.withStatementMode))), stmt.leadingComments);
@@ -2498,8 +2482,7 @@ var ExpressionTranslatorVisitor = class {
     return this.factory.createUnaryExpression("!", ast.condition.visitExpression(this, context));
   }
   visitFunctionExpr(ast, context) {
-    var _a;
-    return this.factory.createFunctionExpression((_a = ast.name) != null ? _a : null, ast.params.map((param) => param.name), this.factory.createBlock(this.visitStatements(ast.statements, context)));
+    return this.factory.createFunctionExpression(ast.name ?? null, ast.params.map((param) => param.name), this.factory.createBlock(this.visitStatements(ast.statements, context)));
   }
   visitArrowFunctionExpr(ast, context) {
     return this.factory.createArrowFunctionExpression(ast.params.map((param) => param.name), Array.isArray(ast.body) ? this.factory.createBlock(this.visitStatements(ast.body, context)) : ast.body.visitExpression(this, context));
@@ -2569,14 +2552,11 @@ var ExpressionTranslatorVisitor = class {
   }
   getTemplateLiteralFromAst(ast, context) {
     return {
-      elements: ast.elements.map((e) => {
-        var _a;
-        return createTemplateElement({
-          cooked: e.text,
-          raw: e.rawText,
-          range: (_a = e.sourceSpan) != null ? _a : ast.sourceSpan
-        });
-      }),
+      elements: ast.elements.map((e) => createTemplateElement({
+        cooked: e.text,
+        raw: e.rawText,
+        range: e.sourceSpan ?? ast.sourceSpan
+      })),
       expressions: ast.expressions.map((e) => e.visitExpression(this, context))
     };
   }
@@ -3014,7 +2994,7 @@ var TypeScriptAstFactory = class {
     if (!ts20.isBlock(body)) {
       throw new Error(`Invalid syntax, expected a block, but got ${ts20.SyntaxKind[body.kind]}.`);
     }
-    return ts20.factory.createFunctionExpression(void 0, void 0, functionName != null ? functionName : void 0, void 0, parameters.map((param) => ts20.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
+    return ts20.factory.createFunctionExpression(void 0, void 0, functionName ?? void 0, void 0, parameters.map((param) => ts20.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
   }
   createArrowFunctionExpression(parameters, body) {
     if (ts20.isStatement(body) && !ts20.isBlock(body)) {
@@ -3024,7 +3004,7 @@ var TypeScriptAstFactory = class {
   }
   createIdentifier = ts20.factory.createIdentifier;
   createIfStatement(condition, thenStatement, elseStatement) {
-    return ts20.factory.createIfStatement(condition, thenStatement, elseStatement != null ? elseStatement : void 0);
+    return ts20.factory.createIfStatement(condition, thenStatement, elseStatement ?? void 0);
   }
   createLiteral(value) {
     if (value === void 0) {
@@ -3048,7 +3028,7 @@ var TypeScriptAstFactory = class {
   createParenthesizedExpression = ts20.factory.createParenthesizedExpression;
   createPropertyAccess = ts20.factory.createPropertyAccessExpression;
   createReturnStatement(expression) {
-    return ts20.factory.createReturnStatement(expression != null ? expression : void 0);
+    return ts20.factory.createReturnStatement(expression ?? void 0);
   }
   createTaggedTemplate(tag, template) {
     return ts20.factory.createTaggedTemplateExpression(tag, void 0, this.createTemplateLiteral(template));
@@ -3091,7 +3071,7 @@ var TypeScriptAstFactory = class {
   }
   createVariableDeclaration(variableName, initializer, type) {
     return ts20.factory.createVariableStatement(void 0, ts20.factory.createVariableDeclarationList([
-      ts20.factory.createVariableDeclaration(variableName, void 0, void 0, initializer != null ? initializer : void 0)
+      ts20.factory.createVariableDeclaration(variableName, void 0, void 0, initializer ?? void 0)
     ], VAR_TYPES[type]));
   }
   setSourceMapRange(node, sourceMapRange) {
@@ -3234,4 +3214,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-O5FLACR6.js.map
+//# sourceMappingURL=chunk-RJXTHQDJ.js.map

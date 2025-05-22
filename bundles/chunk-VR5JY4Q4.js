@@ -393,7 +393,6 @@ function createFileSystemTsReadDirectoryFn(fs3) {
       return fs3.exists(resolvedPath) && fs3.stat(resolvedPath).isDirectory();
     };
     return matchFilesFn(rootDir, extensions, excludes, includes, fs3.isCaseSensitive(), fs3.pwd(), depth, (p2) => {
-      var _a;
       const resolvedPath = fs3.resolve(p2);
       if (!directoryExists(resolvedPath)) {
         return { directories: [], files: [] };
@@ -402,7 +401,7 @@ function createFileSystemTsReadDirectoryFn(fs3) {
       const files = [];
       const directories = [];
       for (const child of children) {
-        if ((_a = fs3.stat(fs3.join(resolvedPath, child))) == null ? void 0 : _a.isDirectory()) {
+        if (fs3.stat(fs3.join(resolvedPath, child))?.isDirectory()) {
           directories.push(child);
         } else {
           files.push(child);
@@ -443,4 +442,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-UFA6TATE.js.map
+//# sourceMappingURL=chunk-VR5JY4Q4.js.map

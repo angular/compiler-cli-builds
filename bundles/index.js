@@ -6,7 +6,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-2U7MBSHB.js";
+} from "./chunk-6ZEKR237.js";
 import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
@@ -33,12 +33,12 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-RNEFPOLE.js";
+} from "./chunk-TGQKM2XA.js";
 import {
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-FVC2UWLS.js";
+} from "./chunk-6YRKTAOJ.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -46,12 +46,12 @@ import {
 import {
   OptimizeFor,
   TsCreateProgramDriver
-} from "./chunk-SUKIVMPU.js";
+} from "./chunk-O6CWVLFD.js";
 import {
   ErrorCode,
   isLocalCompilationDiagnostics,
   ngErrorCode
-} from "./chunk-O5FLACR6.js";
+} from "./chunk-RJXTHQDJ.js";
 import {
   ActivePerfRecorder,
   PerfPhase
@@ -77,12 +77,12 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-UFA6TATE.js";
+} from "./chunk-VR5JY4Q4.js";
 import "./chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.1.0-next.0+sha-396b543");
+var VERSION = new Version("20.1.0-next.0+sha-6899b27");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
 var NgTscPlugin = class {
@@ -107,7 +107,6 @@ var NgTscPlugin = class {
     return this.host;
   }
   setupCompilation(program, oldProgram) {
-    var _a;
     const perfRecorder = ActivePerfRecorder.zeroedToNow();
     if (this.host === null || this.options === null) {
       throw new Error("Lifecycle error: setupCompilation() before wrapHost().");
@@ -119,7 +118,7 @@ var NgTscPlugin = class {
     let ticket;
     const modifiedResourceFiles = /* @__PURE__ */ new Set();
     if (this.host.getModifiedResourceFiles !== void 0) {
-      for (const resourceFile of (_a = this.host.getModifiedResourceFiles()) != null ? _a : []) {
+      for (const resourceFile of this.host.getModifiedResourceFiles() ?? []) {
         modifiedResourceFiles.add(resolve(resourceFile));
       }
     }
