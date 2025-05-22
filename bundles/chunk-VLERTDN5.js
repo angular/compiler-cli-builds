@@ -6,22 +6,6 @@ import {
   __require
 } from "./chunk-KPQ72R34.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/util.js
-var TS_DTS_JS_EXTENSION = /(?:\.d)?\.ts$|\.js$/;
-function normalizeSeparators(path) {
-  return path.replace(/\\/g, "/");
-}
-function stripExtension(path) {
-  return path.replace(TS_DTS_JS_EXTENSION, "");
-}
-function getSourceFileOrError(program, fileName) {
-  const sf = program.getSourceFile(fileName);
-  if (sf === void 0) {
-    throw new Error(`Program does not contain "${fileName}" - available files are ${program.getSourceFiles().map((sf2) => sf2.fileName).join(", ")}`);
-  }
-  return sf;
-}
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/invalid_file_system.js
 var InvalidFileSystem = class {
   exists(path) {
@@ -108,6 +92,22 @@ var InvalidFileSystem = class {
 };
 function makeError() {
   return new Error("FileSystem has not been configured. Please call `setFileSystem()` before calling this method.");
+}
+
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/util.js
+var TS_DTS_JS_EXTENSION = /(?:\.d)?\.ts$|\.js$/;
+function normalizeSeparators(path) {
+  return path.replace(/\\/g, "/");
+}
+function stripExtension(path) {
+  return path.replace(TS_DTS_JS_EXTENSION, "");
+}
+function getSourceFileOrError(program, fileName) {
+  const sf = program.getSourceFile(fileName);
+  if (sf === void 0) {
+    throw new Error(`Program does not contain "${fileName}" - available files are ${program.getSourceFiles().map((sf2) => sf2.fileName).join(", ")}`);
+  }
+  return sf;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/helpers.js
@@ -414,6 +414,7 @@ function createFileSystemTsReadDirectoryFn(fs3) {
 }
 
 export {
+  InvalidFileSystem,
   stripExtension,
   getSourceFileOrError,
   getFileSystem,
@@ -443,4 +444,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-UFA6TATE.js.map
+//# sourceMappingURL=chunk-VLERTDN5.js.map

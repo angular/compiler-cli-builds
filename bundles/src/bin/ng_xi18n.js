@@ -6,18 +6,18 @@
 import {
   main,
   readCommandLineAndConfiguration
-} from "../../chunk-RRZTYWSW.js";
+} from "../../chunk-J2KR6UFG.js";
 import {
   EmitFlags
-} from "../../chunk-DKXRLFGB.js";
-import "../../chunk-KGSKTBO3.js";
-import "../../chunk-OYKUBH35.js";
-import "../../chunk-A7YZA52V.js";
+} from "../../chunk-CPHPPACO.js";
+import "../../chunk-TBVHQD5I.js";
+import "../../chunk-D7R5IUYZ.js";
+import "../../chunk-2BEPK62B.js";
 import "../../chunk-26NO4MZH.js";
 import {
   NodeJSFileSystem,
   setFileSystem
-} from "../../chunk-UFA6TATE.js";
+} from "../../chunk-VLERTDN5.js";
 import "../../chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ng_xi18n.mjs

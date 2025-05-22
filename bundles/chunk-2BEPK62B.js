@@ -12,7 +12,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-UFA6TATE.js";
+} from "./chunk-VLERTDN5.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.js
 var ErrorCode;
@@ -3210,4 +3210,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-A7YZA52V.js.map
+//# sourceMappingURL=chunk-2BEPK62B.js.map

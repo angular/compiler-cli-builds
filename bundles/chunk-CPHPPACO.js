@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-KGSKTBO3.js";
+} from "./chunk-TBVHQD5I.js";
 import {
   CompilationMode,
   ComponentDecoratorHandler,
@@ -51,7 +51,7 @@ import {
   retagAllTsFiles,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-OYKUBH35.js";
+} from "./chunk-D7R5IUYZ.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -87,7 +87,7 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   toUnredirectedSourceFile
-} from "./chunk-A7YZA52V.js";
+} from "./chunk-2BEPK62B.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -104,7 +104,7 @@ import {
   getFileSystem,
   join,
   resolve
-} from "./chunk-UFA6TATE.js";
+} from "./chunk-VLERTDN5.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -5111,4 +5111,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-DKXRLFGB.js.map
+//# sourceMappingURL=chunk-CPHPPACO.js.map

@@ -11,6 +11,7 @@ import {
   SourceFileLoader
 } from "../chunk-PML5JK7B.js";
 import {
+  InvalidFileSystem,
   LogicalFileSystem,
   LogicalProjectPath,
   NgtscCompilerHost,
@@ -31,10 +32,11 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "../chunk-UFA6TATE.js";
+} from "../chunk-VLERTDN5.js";
 import "../chunk-KPQ72R34.js";
 export {
   ConsoleLogger,
+  InvalidFileSystem,
   LogLevel,
   LogicalFileSystem,
   LogicalProjectPath,
