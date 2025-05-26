@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { types as t } from '@babel/core';
-import { AstFactory, BinaryOperator, LeadingComment, ObjectLiteralProperty, SourceMapRange, TemplateLiteral, VariableDeclarationType } from '../../../../src/ngtsc/translator';
+import { AstFactory, BinaryOperator, LeadingComment, ObjectLiteralProperty, SourceMapRange, TemplateLiteral, VariableDeclarationType } from '../../../../src/ngtsc/translator/src/api/ast_factory';
 /**
  * A Babel flavored implementation of the AstFactory.
  */

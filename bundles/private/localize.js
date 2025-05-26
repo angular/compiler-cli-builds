@@ -11,10 +11,10 @@ import {
   SourceFileLoader
 } from "../chunk-PML5JK7B.js";
 import {
+  InvalidFileSystem,
   LogicalFileSystem,
   LogicalProjectPath,
   NgtscCompilerHost,
-  NodeJSFileSystem,
   absoluteFrom,
   absoluteFromSourceFile,
   basename,
@@ -31,10 +31,14 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "../chunk-VR5JY4Q4.js";
+} from "../chunk-TPEB2IXF.js";
+import {
+  NodeJSFileSystem
+} from "../chunk-3NKMA2JO.js";
 import "../chunk-KPQ72R34.js";
 export {
   ConsoleLogger,
+  InvalidFileSystem,
   LogLevel,
   LogicalFileSystem,
   LogicalProjectPath,

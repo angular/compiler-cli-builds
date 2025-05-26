@@ -2,25 +2,6 @@
       import {createRequire as __cjsCompatRequire} from 'module';
       const require = __cjsCompatRequire(import.meta.url);
     
-import {
-  __require
-} from "./chunk-KPQ72R34.js";
-
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/util.js
-var TS_DTS_JS_EXTENSION = /(?:\.d)?\.ts$|\.js$/;
-function normalizeSeparators(path) {
-  return path.replace(/\\/g, "/");
-}
-function stripExtension(path) {
-  return path.replace(TS_DTS_JS_EXTENSION, "");
-}
-function getSourceFileOrError(program, fileName) {
-  const sf = program.getSourceFile(fileName);
-  if (sf === void 0) {
-    throw new Error(`Program does not contain "${fileName}" - available files are ${program.getSourceFiles().map((sf2) => sf2.fileName).join(", ")}`);
-  }
-  return sf;
-}
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/invalid_file_system.js
 var InvalidFileSystem = class {
@@ -110,6 +91,22 @@ function makeError() {
   return new Error("FileSystem has not been configured. Please call `setFileSystem()` before calling this method.");
 }
 
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/util.js
+var TS_DTS_JS_EXTENSION = /(?:\.d)?\.ts$|\.js$/;
+function normalizeSeparators(path) {
+  return path.replace(/\\/g, "/");
+}
+function stripExtension(path) {
+  return path.replace(TS_DTS_JS_EXTENSION, "");
+}
+function getSourceFileOrError(program, fileName) {
+  const sf = program.getSourceFile(fileName);
+  if (sf === void 0) {
+    throw new Error(`Program does not contain "${fileName}" - available files are ${program.getSourceFiles().map((sf2) => sf2.fileName).join(", ")}`);
+  }
+  return sf;
+}
+
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/helpers.js
 var fs = new InvalidFileSystem();
 function getFileSystem() {
@@ -173,8 +170,8 @@ import ts from "typescript";
 var NgtscCompilerHost = class {
   fs;
   options;
-  constructor(fs3, options = {}) {
-    this.fs = fs3;
+  constructor(fs2, options = {}) {
+    this.fs = fs2;
     this.options = options;
   }
   getSourceFile(fileName, languageVersion) {
@@ -276,143 +273,40 @@ function isWithinBasePath(base, path) {
   return isLocalRelativePath(relative(base, path));
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/node_js_file_system.js
-import fs2 from "fs";
-import { createRequire } from "module";
-import * as p from "path";
-import { fileURLToPath } from "url";
-var NodeJSPathManipulation = class {
-  pwd() {
-    return this.normalize(process.cwd());
-  }
-  chdir(dir) {
-    process.chdir(dir);
-  }
-  resolve(...paths) {
-    return this.normalize(p.resolve(...paths));
-  }
-  dirname(file) {
-    return this.normalize(p.dirname(file));
-  }
-  join(basePath, ...paths) {
-    return this.normalize(p.join(basePath, ...paths));
-  }
-  isRoot(path) {
-    return this.dirname(path) === this.normalize(path);
-  }
-  isRooted(path) {
-    return p.isAbsolute(path);
-  }
-  relative(from, to) {
-    return this.normalize(p.relative(from, to));
-  }
-  basename(filePath, extension) {
-    return p.basename(filePath, extension);
-  }
-  extname(path) {
-    return p.extname(path);
-  }
-  normalize(path) {
-    return path.replace(/\\/g, "/");
-  }
-};
-var isCommonJS = typeof __filename !== "undefined";
-var currentFileUrl = isCommonJS ? null : import.meta.url;
-var currentFileName = isCommonJS ? __filename : fileURLToPath(currentFileUrl);
-var NodeJSReadonlyFileSystem = class extends NodeJSPathManipulation {
-  _caseSensitive = void 0;
-  isCaseSensitive() {
-    if (this._caseSensitive === void 0) {
-      this._caseSensitive = !fs2.existsSync(this.normalize(toggleCase(currentFileName)));
-    }
-    return this._caseSensitive;
-  }
-  exists(path) {
-    return fs2.existsSync(path);
-  }
-  readFile(path) {
-    return fs2.readFileSync(path, "utf8");
-  }
-  readFileBuffer(path) {
-    return fs2.readFileSync(path);
-  }
-  readdir(path) {
-    return fs2.readdirSync(path);
-  }
-  lstat(path) {
-    return fs2.lstatSync(path);
-  }
-  stat(path) {
-    return fs2.statSync(path);
-  }
-  realpath(path) {
-    return this.resolve(fs2.realpathSync(path));
-  }
-  getDefaultLibLocation() {
-    const requireFn = isCommonJS ? __require : createRequire(currentFileUrl);
-    return this.resolve(requireFn.resolve("typescript"), "..");
-  }
-};
-var NodeJSFileSystem = class extends NodeJSReadonlyFileSystem {
-  writeFile(path, data, exclusive = false) {
-    fs2.writeFileSync(path, data, exclusive ? { flag: "wx" } : void 0);
-  }
-  removeFile(path) {
-    fs2.unlinkSync(path);
-  }
-  symlink(target, path) {
-    fs2.symlinkSync(target, path);
-  }
-  copyFile(from, to) {
-    fs2.copyFileSync(from, to);
-  }
-  moveFile(from, to) {
-    fs2.renameSync(from, to);
-  }
-  ensureDir(path) {
-    fs2.mkdirSync(path, { recursive: true });
-  }
-  removeDeep(path) {
-    fs2.rmdirSync(path, { recursive: true });
-  }
-};
-function toggleCase(str) {
-  return str.replace(/\w/g, (ch) => ch.toUpperCase() === ch ? ch.toLowerCase() : ch.toUpperCase());
-}
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/ts_read_directory.js
 import ts2 from "typescript";
-function createFileSystemTsReadDirectoryFn(fs3) {
+function createFileSystemTsReadDirectoryFn(fs2) {
   if (ts2.matchFiles === void 0) {
     throw Error("Unable to read directory in configured file system. This means that TypeScript changed its file matching internals.\n\nPlease consider downgrading your TypeScript version, and report an issue in the Angular framework repository.");
   }
   const matchFilesFn = ts2.matchFiles.bind(ts2);
   return (rootDir, extensions, excludes, includes, depth) => {
-    const directoryExists = (p2) => {
-      const resolvedPath = fs3.resolve(p2);
-      return fs3.exists(resolvedPath) && fs3.stat(resolvedPath).isDirectory();
+    const directoryExists = (p) => {
+      const resolvedPath = fs2.resolve(p);
+      return fs2.exists(resolvedPath) && fs2.stat(resolvedPath).isDirectory();
     };
-    return matchFilesFn(rootDir, extensions, excludes, includes, fs3.isCaseSensitive(), fs3.pwd(), depth, (p2) => {
-      const resolvedPath = fs3.resolve(p2);
+    return matchFilesFn(rootDir, extensions, excludes, includes, fs2.isCaseSensitive(), fs2.pwd(), depth, (p) => {
+      const resolvedPath = fs2.resolve(p);
       if (!directoryExists(resolvedPath)) {
         return { directories: [], files: [] };
       }
-      const children = fs3.readdir(resolvedPath);
+      const children = fs2.readdir(resolvedPath);
       const files = [];
       const directories = [];
       for (const child of children) {
-        if (fs3.stat(fs3.join(resolvedPath, child))?.isDirectory()) {
+        if (fs2.stat(fs2.join(resolvedPath, child))?.isDirectory()) {
           directories.push(child);
         } else {
           files.push(child);
         }
       }
       return { files, directories };
-    }, (p2) => fs3.resolve(p2), (p2) => directoryExists(p2));
+    }, (p) => fs2.resolve(p), (p) => directoryExists(p));
   };
 }
 
 export {
+  InvalidFileSystem,
   stripExtension,
   getSourceFileOrError,
   getFileSystem,
@@ -432,7 +326,6 @@ export {
   NgtscCompilerHost,
   LogicalProjectPath,
   LogicalFileSystem,
-  NodeJSFileSystem,
   createFileSystemTsReadDirectoryFn
 };
 /**
@@ -442,4 +335,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VR5JY4Q4.js.map
+//# sourceMappingURL=chunk-TPEB2IXF.js.map
