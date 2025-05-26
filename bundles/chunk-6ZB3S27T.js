@@ -3,22 +3,20 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
+  ImportManager,
+  ImportedSymbolsTracker,
+  TypeScriptReflectionHost,
   getAngularDecorators,
+  isAliasImportDeclaration,
   isAngularDecorator,
+  loadIsReferencedAliasDeclarationPatch,
   queryDecoratorNames,
+  reflectClassMember,
   tryParseInitializerBasedOutput,
   tryParseSignalInputMapping,
   tryParseSignalModelMapping,
   tryParseSignalQueryFromInitializer
-} from "./chunk-VBQMMU24.js";
-import {
-  ImportManager,
-  ImportedSymbolsTracker,
-  TypeScriptReflectionHost,
-  isAliasImportDeclaration,
-  loadIsReferencedAliasDeclarationPatch,
-  reflectClassMember
-} from "./chunk-L2D6SEVI.js";
+} from "./chunk-UXBY3KPV.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/downlevel_decorators_transform.js
 import ts from "typescript";
@@ -531,4 +529,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PROLEVAY.js.map
+//# sourceMappingURL=chunk-6ZB3S27T.js.map

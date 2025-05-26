@@ -4,36 +4,55 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-PROLEVAY.js";
+} from "./chunk-6ZB3S27T.js";
 import {
+  AbsoluteModuleStrategy,
+  AliasStrategy,
+  COMPILER_ERRORS_WITH_GUIDES,
   CompilationMode,
   ComponentDecoratorHandler,
   ComponentScopeKind,
   CompoundComponentScopeReader,
   CompoundMetadataReader,
   CompoundMetadataRegistry,
+  DefaultImportTracker,
+  DeferredSymbolTracker,
   DirectiveDecoratorHandler,
   DtsMetadataReader,
   DtsTransformRegistry,
+  ERROR_DETAILS_PAGE_BASE_URL,
+  ErrorCode,
   ExportedProviderStatusResolver,
+  ExtendedTemplateDiagnosticName,
   HostDirectivesResolver,
   INPUT_INITIALIZER_FN,
+  ImportedSymbolsTracker,
   InjectableClassRegistry,
   InjectableDecoratorHandler,
   JitDeclarationRegistry,
+  LocalCompilationExtraImportsTracker,
+  LocalIdentifierStrategy,
   LocalMetadataRegistry,
   LocalModuleScopeRegistry,
+  LogicalProjectStrategy,
   MODEL_INITIALIZER_FN,
   MetaKind,
   MetadataDtsModuleScopeResolver,
+  ModuleResolver,
   NgModuleDecoratorHandler,
   NgOriginalFile,
+  NoopImportRewriter,
   NoopReferencesRegistry,
   OUTPUT_INITIALIZER_FNS,
   OptimizeFor,
   PartialEvaluator,
   PipeDecoratorHandler,
+  PrivateExportAliasingHost,
   QUERY_INITIALIZER_FNS,
+  R3SymbolsImportRewriter,
+  Reference,
+  ReferenceEmitter,
+  RelativePathStrategy,
   ResourceRegistry,
   SemanticDepGraphUpdater,
   ShimAdapter,
@@ -44,50 +63,29 @@ import {
   TsCreateProgramDriver,
   TypeCheckScopeRegistry,
   TypeCheckShimGenerator,
-  aliasTransformFactory,
-  declarationTransformFactory,
-  isShim,
-  ivyTransformFactory,
-  retagAllTsFiles,
-  tryParseInitializerApi,
-  untagAllTsFiles
-} from "./chunk-VBQMMU24.js";
-import {
-  AbsoluteModuleStrategy,
-  AliasStrategy,
-  COMPILER_ERRORS_WITH_GUIDES,
-  DefaultImportTracker,
-  DeferredSymbolTracker,
-  ERROR_DETAILS_PAGE_BASE_URL,
-  ErrorCode,
-  ExtendedTemplateDiagnosticName,
-  ImportedSymbolsTracker,
-  LocalCompilationExtraImportsTracker,
-  LocalIdentifierStrategy,
-  LogicalProjectStrategy,
-  ModuleResolver,
-  NoopImportRewriter,
-  PrivateExportAliasingHost,
-  R3SymbolsImportRewriter,
-  Reference,
-  ReferenceEmitter,
-  RelativePathStrategy,
   TypeScriptReflectionHost,
   UnifiedModulesAliasingHost,
   UnifiedModulesStrategy,
+  aliasTransformFactory,
+  declarationTransformFactory,
   getRootDirs,
   getSourceFileOrNull,
   isDtsPath,
   isFatalDiagnosticError,
   isNamedClassDeclaration,
   isNonDeclarationTsPath,
+  isShim,
+  ivyTransformFactory,
   makeDiagnostic,
   ngErrorCode,
   normalizeSeparators,
   relativePathBetween,
   replaceTsWithNgInErrors,
-  toUnredirectedSourceFile
-} from "./chunk-L2D6SEVI.js";
+  retagAllTsFiles,
+  toUnredirectedSourceFile,
+  tryParseInitializerApi,
+  untagAllTsFiles
+} from "./chunk-UXBY3KPV.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -104,7 +102,7 @@ import {
   getFileSystem,
   join,
   resolve
-} from "./chunk-VR5JY4Q4.js";
+} from "./chunk-TPEB2IXF.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
 var DEFAULT_ERROR_CODE = 100;
@@ -3588,17 +3586,12 @@ function closestNode(start, predicate) {
   return null;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/config.js
-var UNUSED_STANDALONE_IMPORTS_RULE_ENABLED = true;
-
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/source_file_validator.js
 var SourceFileValidator = class {
   rules;
   constructor(reflector, importedSymbolsTracker, templateTypeChecker, typeCheckingConfig) {
     this.rules = [new InitializerApiUsageRule(reflector, importedSymbolsTracker)];
-    if (UNUSED_STANDALONE_IMPORTS_RULE_ENABLED) {
-      this.rules.push(new UnusedStandaloneImportsRule(templateTypeChecker, typeCheckingConfig, importedSymbolsTracker));
-    }
+    this.rules.push(new UnusedStandaloneImportsRule(templateTypeChecker, typeCheckingConfig, importedSymbolsTracker));
   }
   getDiagnosticsForFile(sourceFile) {
     if (sourceFile.isDeclarationFile || sourceFile.fileName.endsWith(".ngtypecheck.ts")) {
@@ -5173,4 +5166,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-HP7SFK2J.js.map
+//# sourceMappingURL=chunk-FUKUZGM3.js.map
