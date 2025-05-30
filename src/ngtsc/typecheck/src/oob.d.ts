@@ -119,6 +119,15 @@ export interface OutOfBandDiagnosticRecorder {
      * @param node Node declaring the binding.
      */
     unclaimedDirectiveBinding(id: TypeCheckId, directive: TmplAstDirective, node: TmplAstBoundAttribute | TmplAstTextAttribute | TmplAstBoundEvent): void;
+    /**
+     * Reports that an implicit deferred trigger is set on a block that does not have a placeholder.
+     */
+    deferImplicitTriggerMissingPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
+    /**
+     * Reports that an implicit deferred trigger is set on a block whose placeholder is not set up
+     * correctly (e.g. more than one root node).
+     */
+    deferImplicitTriggerInvalidPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -149,4 +158,6 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     missingNamedTemplateDependency(id: TypeCheckId, node: TmplAstComponent | TmplAstDirective): void;
     incorrectTemplateDependencyType(id: TypeCheckId, node: TmplAstComponent | TmplAstDirective): void;
     unclaimedDirectiveBinding(id: TypeCheckId, directive: TmplAstDirective, node: TmplAstBoundAttribute | TmplAstTextAttribute | TmplAstBoundEvent): void;
+    deferImplicitTriggerMissingPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
+    deferImplicitTriggerInvalidPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
 }

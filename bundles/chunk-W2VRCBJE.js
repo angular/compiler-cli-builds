@@ -107,6 +107,8 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["LET_USED_BEFORE_DEFINITION"] = 8016] = "LET_USED_BEFORE_DEFINITION";
   ErrorCode2[ErrorCode2["CONFLICTING_LET_DECLARATION"] = 8017] = "CONFLICTING_LET_DECLARATION";
   ErrorCode2[ErrorCode2["UNCLAIMED_DIRECTIVE_BINDING"] = 8018] = "UNCLAIMED_DIRECTIVE_BINDING";
+  ErrorCode2[ErrorCode2["DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER"] = 8019] = "DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER";
+  ErrorCode2[ErrorCode2["DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER"] = 8020] = "DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER";
   ErrorCode2[ErrorCode2["INVALID_BANANA_IN_BOX"] = 8101] = "INVALID_BANANA_IN_BOX";
   ErrorCode2[ErrorCode2["NULLISH_COALESCING_NOT_NULLABLE"] = 8102] = "NULLISH_COALESCING_NOT_NULLABLE";
   ErrorCode2[ErrorCode2["MISSING_CONTROL_FLOW_DIRECTIVE"] = 8103] = "MISSING_CONTROL_FLOW_DIRECTIVE";
@@ -11615,6 +11617,12 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     const errorMsg = `Directive ${directive.name} does not have an ${node instanceof TmplAstBoundEvent2 ? "output" : "input"} named "${node.name}". Bindings to directives must target existing inputs or outputs.`;
     this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.keySpan || node.sourceSpan, ts55.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_DIRECTIVE_BINDING), errorMsg));
   }
+  deferImplicitTriggerMissingPlaceholder(id, trigger) {
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts55.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER), "Trigger with no parameters can only be placed on an @defer that has a @placeholder block"));
+  }
+  deferImplicitTriggerInvalidPlaceholder(id, trigger) {
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts55.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER), "Trigger with no parameters can only be placed on an @defer that has a @placeholder block with exactly one root element node"));
+  }
 };
 function makeInlineDiagnostic(id, code, node, messageText, relatedInformation) {
   return {
@@ -13658,16 +13666,38 @@ var _Scope = class {
       this.opQueue.push(new TcbExpressionOp(this.tcb, this, triggers.when.value));
     }
     if (triggers.hover !== void 0) {
-      this.appendReferenceBasedDeferredTrigger(block, triggers.hover);
+      this.validateReferenceBasedDeferredTrigger(block, triggers.hover);
     }
     if (triggers.interaction !== void 0) {
-      this.appendReferenceBasedDeferredTrigger(block, triggers.interaction);
+      this.validateReferenceBasedDeferredTrigger(block, triggers.interaction);
     }
     if (triggers.viewport !== void 0) {
-      this.appendReferenceBasedDeferredTrigger(block, triggers.viewport);
+      this.validateReferenceBasedDeferredTrigger(block, triggers.viewport);
     }
   }
-  appendReferenceBasedDeferredTrigger(block, trigger) {
+  validateReferenceBasedDeferredTrigger(block, trigger) {
+    if (trigger.reference === null) {
+      if (block.placeholder === null) {
+        this.tcb.oobRecorder.deferImplicitTriggerMissingPlaceholder(this.tcb.id, trigger);
+        return;
+      }
+      let rootNode = null;
+      for (const child of block.placeholder.children) {
+        if (!this.tcb.hostPreserveWhitespaces && child instanceof TmplAstText && child.value.trim().length === 0) {
+          continue;
+        }
+        if (rootNode === null) {
+          rootNode = child;
+        } else {
+          rootNode = null;
+          break;
+        }
+      }
+      if (rootNode === null || !(rootNode instanceof TmplAstElement2)) {
+        this.tcb.oobRecorder.deferImplicitTriggerInvalidPlaceholder(this.tcb.id, trigger);
+      }
+      return;
+    }
     if (this.tcb.boundTarget.getDeferredTriggerTarget(block, trigger) === null) {
       this.tcb.oobRecorder.inaccessibleDeferredTriggerElement(this.tcb.id, trigger);
     }
@@ -19431,4 +19461,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-LUZ66RBH.js.map
+//# sourceMappingURL=chunk-W2VRCBJE.js.map
