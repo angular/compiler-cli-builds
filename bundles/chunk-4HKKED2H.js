@@ -105,7 +105,7 @@ import {
   resolve
 } from "./chunk-TPEB2IXF.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.js
 var DEFAULT_ERROR_CODE = 100;
 var UNKNOWN_ERROR_CODE = 500;
 var SOURCE = "angular";
@@ -123,7 +123,7 @@ var EmitFlags;
   EmitFlags2[EmitFlags2["All"] = 31] = "All";
 })(EmitFlags || (EmitFlags = {}));
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/compiler_host.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/compiler_host.js
 import ts from "typescript";
 var wrapHostForTest = null;
 function createCompilerHost({ options, tsHost = ts.createCompilerHost(options, true) }) {
@@ -1088,11 +1088,11 @@ function getRelativeFilePath(sourceFile, rootDir) {
   return relativePath;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.js
 import { HtmlParser, MessageBundle } from "@angular/compiler";
 import ts27 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/i18n.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/i18n.js
 import { Xliff, Xliff2, Xmb } from "@angular/compiler";
 import * as path from "path";
 function i18nGetExtension(formatName) {
@@ -1143,10 +1143,10 @@ function getPathNormalizer(basePath) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.js
 import ts13 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version_helpers.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version_helpers.js
 function toNumbers(value) {
   const suffixIndex = value.lastIndexOf("-");
   return value.slice(0, suffixIndex === -1 ? value.length : suffixIndex).split(".").map((segment) => {
@@ -1181,7 +1181,7 @@ function compareVersions(v1, v2) {
   return compareNumbers(toNumbers(v1), toNumbers(v2));
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.js
 var MIN_TS_VERSION = "5.8.0";
 var MAX_TS_VERSION = "5.9.0";
 var tsVersion = ts13.version;
@@ -4524,7 +4524,7 @@ var NgCompilerHost = class extends DelegatingCompilerHost {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.js
 var NgtscProgram = class {
   options;
   compiler;
@@ -4752,15 +4752,15 @@ function mergeEmitResults(emitResults) {
   return { diagnostics, emitSkipped, emittedFiles };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/program.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/program.js
 function createProgram({ rootNames, options, host, oldProgram }) {
   return new NgtscProgram(rootNames, options, host, oldProgram);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.js
 import ts29 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/util.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/util.js
 import ts28 from "typescript";
 function createMessageDiagnostic(messageText) {
   return {
@@ -4774,7 +4774,7 @@ function createMessageDiagnostic(messageText) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.js
 var defaultFormatHost = {
   getCurrentDirectory: () => ts29.sys.getCurrentDirectory(),
   getCanonicalFileName: (fileName) => fileName,
@@ -5004,4 +5004,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WXOFDAY6.js.map
+//# sourceMappingURL=chunk-4HKKED2H.js.map

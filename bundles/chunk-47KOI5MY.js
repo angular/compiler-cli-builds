@@ -6,7 +6,7 @@ import {
   angularJitApplicationTransform
 } from "./chunk-24HXMS7Q.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/private/tooling.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
   ngDevMode: false,
   ngI18nClosureMode: false
@@ -31,4 +31,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FUUCGJS3.js.map
+//# sourceMappingURL=chunk-47KOI5MY.js.map

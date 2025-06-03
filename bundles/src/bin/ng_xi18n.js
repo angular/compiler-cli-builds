@@ -6,10 +6,10 @@
 import {
   main,
   readCommandLineAndConfiguration
-} from "../../chunk-IVHNX35A.js";
+} from "../../chunk-V5U3JBAO.js";
 import {
   EmitFlags
-} from "../../chunk-WXOFDAY6.js";
+} from "../../chunk-4HKKED2H.js";
 import "../../chunk-24HXMS7Q.js";
 import "../../chunk-W2VRCBJE.js";
 import "../../chunk-LMRFLQ2K.js";
@@ -22,10 +22,10 @@ import {
 } from "../../chunk-3NKMA2JO.js";
 import "../../chunk-KPQ72R34.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ng_xi18n.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ng_xi18n.js
 import "reflect-metadata";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/extract_i18n.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/extract_i18n.js
 import yargs from "yargs";
 function mainXi18n(args2, consoleError = console.error) {
   const config = readXi18nCommandLineAndConfiguration(args2);
@@ -48,7 +48,7 @@ function readXi18nCommandLineAndConfiguration(args2) {
   return { ...config, emitFlags: EmitFlags.I18nBundle };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ng_xi18n.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ng_xi18n.js
 process.title = "Angular i18n Message Extractor (ng-xi18n)";
 var args = process.argv.slice(2);
 setFileSystem(new NodeJSFileSystem());

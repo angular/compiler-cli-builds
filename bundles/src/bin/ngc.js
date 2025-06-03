@@ -5,8 +5,8 @@
     
 import {
   main
-} from "../../chunk-IVHNX35A.js";
-import "../../chunk-WXOFDAY6.js";
+} from "../../chunk-V5U3JBAO.js";
+import "../../chunk-4HKKED2H.js";
 import "../../chunk-24HXMS7Q.js";
 import "../../chunk-W2VRCBJE.js";
 import "../../chunk-LMRFLQ2K.js";
@@ -19,7 +19,7 @@ import {
 } from "../../chunk-3NKMA2JO.js";
 import "../../chunk-KPQ72R34.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ngc.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ngc.js
 import "reflect-metadata";
 async function runNgcComamnd() {
   process.title = "Angular Compiler (ngc)";

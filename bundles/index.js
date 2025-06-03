@@ -6,7 +6,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-FUUCGJS3.js";
+} from "./chunk-47KOI5MY.js";
 import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
@@ -33,7 +33,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-WXOFDAY6.js";
+} from "./chunk-4HKKED2H.js";
 import {
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
@@ -82,11 +82,11 @@ import {
 } from "./chunk-3NKMA2JO.js";
 import "./chunk-KPQ72R34.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.1.0-next.0+sha-42f07ce");
+var VERSION = new Version("20.1.0-next.0+sha-3af65af");
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.js
 var NgTscPlugin = class {
   ngOptions;
   name = "ngtsc";
@@ -162,7 +162,7 @@ var NgTscPlugin = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/index.js
 setFileSystem(new NodeJSFileSystem());
 export {
   ConsoleLogger,

@@ -6,7 +6,7 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "../chunk-FUUCGJS3.js";
+} from "../chunk-47KOI5MY.js";
 import "../chunk-24HXMS7Q.js";
 import "../chunk-W2VRCBJE.js";
 import "../chunk-LMRFLQ2K.js";
