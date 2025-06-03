@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "20.1.0-next.0+sha-9630d79",
+  "version": "20.1.0-next.0+sha-667a600",
   "description": "Angular - the compiler CLI for Node.js",
   "typings": "index.d.ts",
   "bin": {
@@ -49,10 +49,10 @@
     "convert-source-map": "^1.5.1",
     "semver": "^7.0.0",
     "tslib": "^2.3.0",
-    "yargs": "^17.2.1"
+    "yargs": "^18.0.0"
   },
   "peerDependencies": {
-    "@angular/compiler": "20.1.0-next.0+sha-9630d79",
+    "@angular/compiler": "20.1.0-next.0+sha-667a600",
     "typescript": ">=5.8 <5.9"
   },
   "peerDependenciesMeta": {
