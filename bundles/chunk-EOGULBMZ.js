@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-LMRFLQ2K.js";
+} from "./chunk-NA65Q4MT.js";
 import {
   PerfCheckpoint,
   PerfEvent,
@@ -3670,15 +3670,6 @@ var TypeTranslatorVisitor = class {
       throw new Error(`ReadVarExpr with no variable name in type`);
     }
     return ts22.factory.createTypeQueryNode(ts22.factory.createIdentifier(ast.name));
-  }
-  visitWriteVarExpr(expr, context) {
-    throw new Error("Method not implemented.");
-  }
-  visitWriteKeyExpr(expr, context) {
-    throw new Error("Method not implemented.");
-  }
-  visitWritePropExpr(expr, context) {
-    throw new Error("Method not implemented.");
   }
   visitInvokeFunctionExpr(ast, context) {
     throw new Error("Method not implemented.");
@@ -9233,7 +9224,7 @@ function getTypeCheckId(clazz) {
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/completion.js
-import { EmptyExpr, ImplicitReceiver, PropertyRead, PropertyWrite, SafePropertyRead, TmplAstLetDeclaration, TmplAstReference, TmplAstTextAttribute } from "@angular/compiler";
+import { EmptyExpr, ImplicitReceiver, PropertyRead, SafePropertyRead, TmplAstLetDeclaration, TmplAstReference, TmplAstTextAttribute } from "@angular/compiler";
 import ts47 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/comments.js
@@ -9440,7 +9431,7 @@ var CompletionEngine = class {
       return this.expressionCompletionCache.get(expr);
     }
     let tsExpr = null;
-    if (expr instanceof PropertyRead || expr instanceof PropertyWrite) {
+    if (expr instanceof PropertyRead) {
       tsExpr = findFirstMatchingNode(this.tcb, {
         filter: ts47.isPropertyAccessExpression,
         withSpan: expr.nameSpan
@@ -11649,7 +11640,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.js
-import { BindingPipe, BindingType as BindingType2, Call as Call3, createCssSelectorFromNode, CssSelector as CssSelector3, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver3, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead4, PropertyWrite as PropertyWrite2, R3Identifiers as R3Identifiers3, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead3, SelectorMatcher as SelectorMatcher2, ThisReceiver as ThisReceiver2, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundText, TmplAstContent, TmplAstDeferredBlock, TmplAstElement as TmplAstElement2, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference as TmplAstReference2, TmplAstSwitchBlock, TmplAstTemplate, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable, TmplAstHostElement as TmplAstHostElement2, TransplantedType, TmplAstComponent as TmplAstComponent2, TmplAstDirective as TmplAstDirective2 } from "@angular/compiler";
+import { BindingPipe, BindingType as BindingType2, Call as Call3, createCssSelectorFromNode, CssSelector as CssSelector3, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver3, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead4, R3Identifiers as R3Identifiers3, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead3, SelectorMatcher as SelectorMatcher2, ThisReceiver as ThisReceiver2, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundText, TmplAstContent, TmplAstDeferredBlock, TmplAstElement as TmplAstElement2, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference as TmplAstReference2, TmplAstSwitchBlock, TmplAstTemplate, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable, TmplAstHostElement as TmplAstHostElement2, TransplantedType, TmplAstComponent as TmplAstComponent2, TmplAstDirective as TmplAstDirective2, Binary } from "@angular/compiler";
 import ts59 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.js
@@ -11724,6 +11715,7 @@ var BINARY_OPS = /* @__PURE__ */ new Map([
   [">", ts58.SyntaxKind.GreaterThanToken],
   ["<=", ts58.SyntaxKind.LessThanEqualsToken],
   [">=", ts58.SyntaxKind.GreaterThanEqualsToken],
+  ["=", ts58.SyntaxKind.EqualsToken],
   ["==", ts58.SyntaxKind.EqualsEqualsToken],
   ["===", ts58.SyntaxKind.EqualsEqualsEqualsToken],
   ["*", ts58.SyntaxKind.AsteriskToken],
@@ -11816,14 +11808,6 @@ var AstTranslator = class {
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
   }
-  visitKeyedWrite(ast) {
-    const receiver = wrapForDiagnostics(this.translate(ast.receiver));
-    const left = ts58.factory.createElementAccessExpression(receiver, this.translate(ast.key));
-    const right = wrapForTypeChecker(this.translate(ast.value));
-    const node = wrapForDiagnostics(ts58.factory.createBinaryExpression(left, ts58.SyntaxKind.EqualsToken, right));
-    addParseSpanInfo(node, ast.sourceSpan);
-    return node;
-  }
   visitLiteralArray(ast) {
     const elements = ast.expressions.map((expr) => this.translate(expr));
     const literal3 = ts58.factory.createArrayLiteralExpression(elements);
@@ -11891,17 +11875,6 @@ var AstTranslator = class {
     const name = ts58.factory.createPropertyAccessExpression(receiver, ast.name);
     addParseSpanInfo(name, ast.nameSpan);
     const node = wrapForDiagnostics(name);
-    addParseSpanInfo(node, ast.sourceSpan);
-    return node;
-  }
-  visitPropertyWrite(ast) {
-    const receiver = wrapForDiagnostics(this.translate(ast.receiver));
-    const left = ts58.factory.createPropertyAccessExpression(receiver, ast.name);
-    addParseSpanInfo(left, ast.nameSpan);
-    const leftWithPath = wrapForDiagnostics(left);
-    addParseSpanInfo(leftWithPath, ast.sourceSpan);
-    const right = wrapForTypeChecker(this.translate(ast.value));
-    const node = wrapForDiagnostics(ts58.factory.createBinaryExpression(leftWithPath, ts58.SyntaxKind.EqualsToken, right));
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
   }
@@ -12047,9 +12020,6 @@ var _VeSafeLhsInferenceBugDetector = class {
   visitKeyedRead(ast) {
     return false;
   }
-  visitKeyedWrite(ast) {
-    return false;
-  }
   visitLiteralArray(ast) {
     return true;
   }
@@ -12075,9 +12045,6 @@ var _VeSafeLhsInferenceBugDetector = class {
     return ast.expression.visit(this);
   }
   visitPropertyRead(ast) {
-    return false;
-  }
-  visitPropertyWrite(ast) {
     return false;
   }
   visitSafePropertyRead(ast) {
@@ -13752,18 +13719,19 @@ var TcbExpressionTranslator = class {
         }
       }
       return targetExpression;
-    } else if (ast instanceof PropertyWrite2 && ast.receiver instanceof ImplicitReceiver3) {
-      const target = this.tcb.boundTarget.getExpressionTarget(ast);
+    } else if (ast instanceof Binary && ast.operation === "=" && ast.left instanceof PropertyRead4 && ast.left.receiver instanceof ImplicitReceiver3) {
+      const read = ast.left;
+      const target = this.tcb.boundTarget.getExpressionTarget(read);
       if (target === null) {
         return null;
       }
-      const targetExpression = this.getTargetNodeExpression(target, ast);
-      const expr = this.translate(ast.value);
+      const targetExpression = this.getTargetNodeExpression(target, read);
+      const expr = this.translate(ast.right);
       const result = ts59.factory.createParenthesizedExpression(ts59.factory.createBinaryExpression(targetExpression, ts59.SyntaxKind.EqualsToken, expr));
-      addParseSpanInfo(result, ast.sourceSpan);
+      addParseSpanInfo(result, read.sourceSpan);
       if (target instanceof TmplAstLetDeclaration2) {
         markIgnoreDiagnostics(result);
-        this.tcb.oobRecorder.illegalWriteToLetDeclaration(this.tcb.id, ast, target);
+        this.tcb.oobRecorder.illegalWriteToLetDeclaration(this.tcb.id, read, target);
       }
       return result;
     } else if (ast instanceof ImplicitReceiver3) {
@@ -14452,7 +14420,7 @@ var DirectiveSourceManager = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.js
-import { AST, ASTWithName as ASTWithName2, ASTWithSource as ASTWithSource2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead5, PropertyWrite as PropertyWrite3, R3Identifiers as R3Identifiers4, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstComponent as TmplAstComponent3, TmplAstDirective as TmplAstDirective3, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { AST, ASTWithName as ASTWithName2, ASTWithSource as ASTWithSource2, Binary as Binary2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead5, R3Identifiers as R3Identifiers4, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstComponent as TmplAstComponent3, TmplAstDirective as TmplAstDirective3, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts62 from "typescript";
 var SymbolBuilder = class {
   tcbPath;
@@ -14989,7 +14957,9 @@ var SymbolBuilder = class {
       return this.getSymbol(expressionTarget);
     }
     let withSpan = expression.sourceSpan;
-    if (expression instanceof PropertyWrite3 || expression instanceof ASTWithName2 && !(expression instanceof SafePropertyRead4)) {
+    if (expression instanceof Binary2 && expression.operation === "=" && expression.left instanceof PropertyRead5) {
+      withSpan = expression.left.nameSpan;
+    } else if (expression instanceof ASTWithName2 && !(expression instanceof SafePropertyRead4)) {
       withSpan = expression.nameSpan;
     }
     let node = null;
@@ -19461,4 +19431,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-W2VRCBJE.js.map
+//# sourceMappingURL=chunk-EOGULBMZ.js.map

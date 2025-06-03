@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-24HXMS7Q.js";
+} from "./chunk-IDHP6FYR.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -86,7 +86,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-W2VRCBJE.js";
+} from "./chunk-EOGULBMZ.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -1894,7 +1894,7 @@ var IndexingContext = class {
 import { ParseSourceFile } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/template.js
-import { ASTWithSource, CombinedRecursiveAstVisitor, ImplicitReceiver, PropertyRead, PropertyWrite, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable, tmplAstVisitAll } from "@angular/compiler";
+import { ASTWithSource, CombinedRecursiveAstVisitor, ImplicitReceiver, PropertyRead, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable, tmplAstVisitAll } from "@angular/compiler";
 var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
   boundTemplate;
   identifiers = /* @__PURE__ */ new Set();
@@ -1958,10 +1958,6 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
   visitPropertyRead(ast) {
     this.visitIdentifier(ast, IdentifierKind.Property);
     super.visitPropertyRead(ast, null);
-  }
-  visitPropertyWrite(ast) {
-    this.visitIdentifier(ast, IdentifierKind.Property);
-    super.visitPropertyWrite(ast, null);
   }
   visitBoundAttribute(attribute) {
     const previous = this.currentAstWithSource;
@@ -2103,7 +2099,7 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
     }
     const { absoluteOffset, source: expressionStr } = this.currentAstWithSource;
     let identifierStart = ast.sourceSpan.start - absoluteOffset;
-    if (ast instanceof PropertyRead || ast instanceof PropertyWrite) {
+    if (ast instanceof PropertyRead) {
       identifierStart = ast.nameSpan.start - absoluteOffset;
     }
     if (!expressionStr.substring(identifierStart).startsWith(ast.name)) {
@@ -3176,7 +3172,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
-import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead5, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts22 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   templateTypeChecker;
@@ -3216,9 +3212,12 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
     this.component = component;
     this.diagnostics = diagnostics;
   }
-  visitPropertyWrite(ast, context) {
-    super.visitPropertyWrite(ast, context);
-    this.checkForIllegalWriteInEventBinding(ast, context);
+  visitBinary(ast, context) {
+    if (ast.operation === "=" && ast.left instanceof PropertyRead5) {
+      this.checkForIllegalWriteInEventBinding(ast.left, context);
+    } else {
+      super.visitBinary(ast, context);
+    }
   }
   visitPropertyRead(ast, context) {
     super.visitPropertyRead(ast, context);
@@ -5004,4 +5003,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-4HKKED2H.js.map
+//# sourceMappingURL=chunk-5S2N7735.js.map

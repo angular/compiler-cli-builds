@@ -30,9 +30,6 @@ export declare class ExpressionTranslatorVisitor<TFile, TStatement, TExpression>
     visitReturnStmt(stmt: o.ReturnStatement, context: Context): TStatement;
     visitIfStmt(stmt: o.IfStmt, context: Context): TStatement;
     visitReadVarExpr(ast: o.ReadVarExpr, _context: Context): TExpression;
-    visitWriteVarExpr(expr: o.WriteVarExpr, context: Context): TExpression;
-    visitWriteKeyExpr(expr: o.WriteKeyExpr, context: Context): TExpression;
-    visitWritePropExpr(expr: o.WritePropExpr, context: Context): TExpression;
     visitInvokeFunctionExpr(ast: o.InvokeFunctionExpr, context: Context): TExpression;
     visitTaggedTemplateLiteralExpr(ast: o.TaggedTemplateLiteralExpr, context: Context): TExpression;
     visitTemplateLiteralExpr(ast: o.TemplateLiteralExpr, context: Context): TExpression;

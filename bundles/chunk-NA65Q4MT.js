@@ -82,20 +82,6 @@ var ExpressionTranslatorVisitor = class {
     this.setSourceMapRange(identifier, ast.sourceSpan);
     return identifier;
   }
-  visitWriteVarExpr(expr, context) {
-    const assignment = this.factory.createAssignment(this.setSourceMapRange(this.factory.createIdentifier(expr.name), expr.sourceSpan), expr.value.visitExpression(this, context));
-    return context.isStatement ? assignment : this.factory.createParenthesizedExpression(assignment);
-  }
-  visitWriteKeyExpr(expr, context) {
-    const exprContext = context.withExpressionMode;
-    const target = this.factory.createElementAccess(expr.receiver.visitExpression(this, exprContext), expr.index.visitExpression(this, exprContext));
-    const assignment = this.factory.createAssignment(target, expr.value.visitExpression(this, exprContext));
-    return context.isStatement ? assignment : this.factory.createParenthesizedExpression(assignment);
-  }
-  visitWritePropExpr(expr, context) {
-    const target = this.factory.createPropertyAccess(expr.receiver.visitExpression(this, context), expr.name);
-    return this.factory.createAssignment(target, expr.value.visitExpression(this, context));
-  }
   visitInvokeFunctionExpr(ast, context) {
     return this.setSourceMapRange(this.factory.createCallExpression(ast.fn.visitExpression(this, context), ast.args.map((arg) => arg.visitExpression(this, context)), ast.pure), ast.sourceSpan);
   }
@@ -189,6 +175,9 @@ var ExpressionTranslatorVisitor = class {
     return this.factory.createArrowFunctionExpression(ast.params.map((param) => param.name), Array.isArray(ast.body) ? this.factory.createBlock(this.visitStatements(ast.body, context)) : ast.body.visitExpression(this, context));
   }
   visitBinaryOperatorExpr(ast, context) {
+    if (ast.operator === o.BinaryOperator.Assign) {
+      return this.factory.createAssignment(ast.lhs.visitExpression(this, context), ast.rhs.visitExpression(this, context));
+    }
     if (!BINARY_OPERATORS.has(ast.operator)) {
       throw new Error(`Unknown binary operator: ${o.BinaryOperator[ast.operator]}`);
     }
@@ -293,4 +282,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-LMRFLQ2K.js.map
+//# sourceMappingURL=chunk-NA65Q4MT.js.map
