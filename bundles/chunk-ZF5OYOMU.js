@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-IDHP6FYR.js";
+} from "./chunk-6D6BUKJG.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -83,10 +83,11 @@ import {
   relativePathBetween,
   replaceTsWithNgInErrors,
   retagAllTsFiles,
+  signalMetadataTransform,
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-EOGULBMZ.js";
+} from "./chunk-CKY67M3P.js";
 import {
   ActivePerfRecorder,
   DelegatingPerfRecorder,
@@ -3795,6 +3796,7 @@ var NgCompiler = class {
         };
       });
     }
+    before.push(signalMetadataTransform(this.inputProgram));
     const afterDeclarations = [];
     if ((this.options.compilationMode !== "experimental-local" || this.emitDeclarationOnly) && compilation.dtsTransforms !== null) {
       if (this.emitDeclarationOnly) {
@@ -5003,4 +5005,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-5S2N7735.js.map
+//# sourceMappingURL=chunk-ZF5OYOMU.js.map
