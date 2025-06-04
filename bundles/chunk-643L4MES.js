@@ -4,9 +4,10 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-6D6BUKJG.js";
+} from "./chunk-AX5RS7EF.js";
 import {
   AbsoluteModuleStrategy,
+  ActivePerfRecorder,
   AliasStrategy,
   COMPILER_ERRORS_WITH_GUIDES,
   CompilationMode,
@@ -17,6 +18,7 @@ import {
   CompoundMetadataRegistry,
   DefaultImportTracker,
   DeferredSymbolTracker,
+  DelegatingPerfRecorder,
   DirectiveDecoratorHandler,
   DtsMetadataReader,
   DtsTransformRegistry,
@@ -46,6 +48,9 @@ import {
   OUTPUT_INITIALIZER_FNS,
   OptimizeFor,
   PartialEvaluator,
+  PerfCheckpoint,
+  PerfEvent,
+  PerfPhase,
   PipeDecoratorHandler,
   PrivateExportAliasingHost,
   QUERY_INITIALIZER_FNS,
@@ -87,14 +92,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-CKY67M3P.js";
-import {
-  ActivePerfRecorder,
-  DelegatingPerfRecorder,
-  PerfCheckpoint,
-  PerfEvent,
-  PerfPhase
-} from "./chunk-26NO4MZH.js";
+} from "./chunk-QSSK3LOM.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -5005,4 +5003,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ZF5OYOMU.js.map
+//# sourceMappingURL=chunk-643L4MES.js.map

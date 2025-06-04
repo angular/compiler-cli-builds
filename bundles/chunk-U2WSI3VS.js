@@ -12,7 +12,7 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-ZF5OYOMU.js";
+} from "./chunk-643L4MES.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.js
 import ts2 from "typescript";
@@ -363,4 +363,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-O4AI4GOS.js.map
+//# sourceMappingURL=chunk-U2WSI3VS.js.map
