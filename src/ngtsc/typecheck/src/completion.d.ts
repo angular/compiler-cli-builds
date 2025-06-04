@@ -23,12 +23,17 @@ export declare class CompletionEngine {
     private tcbIsShim;
     private componentContext;
     /**
+     * Get the `TcbLocation` for the global context, which is the location of the `this` variable.
+     */
+    private globalTsContext;
+    /**
      * Cache of completions for various levels of the template, including the root template (`null`).
      * Memoizes `getTemplateContextCompletions`.
      */
     private templateContextCache;
     private expressionCompletionCache;
     constructor(tcb: ts.Node, data: TypeCheckData, tcbPath: AbsoluteFsPath, tcbIsShim: boolean);
+    getGlobalTsContext(): TcbLocation | null;
     /**
      * Get global completions within the given template context and AST node.
      *

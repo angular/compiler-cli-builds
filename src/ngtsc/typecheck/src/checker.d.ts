@@ -16,7 +16,7 @@ import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { ElementSymbol, FullSourceMapping, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, TcbLocation, TemplateSymbol, TemplateTypeChecker, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { ElementSymbol, FullSourceMapping, GetPotentialAngularMetaOptions, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, TcbLocation, TemplateSymbol, TemplateTypeChecker, TsCompletionEntryInfo, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { DirectiveSourceManager } from './source';
 /**
@@ -124,12 +124,17 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getSymbolOfNode(node: TmplAstComponent, component: ts.ClassDeclaration): SelectorlessComponentSymbol | null;
     getSymbolOfNode(node: TmplAstDirective, component: ts.ClassDeclaration): SelectorlessDirectiveSymbol | null;
     private getOrCreateSymbolBuilder;
-    getPotentialTemplateDirectives(component: ts.ClassDeclaration): PotentialDirective[];
+    getGlobalTsContext(component: ts.ClassDeclaration): TcbLocation | null;
+    getPotentialTemplateDirectives(component: ts.ClassDeclaration, tsLs: ts.LanguageService, options: GetPotentialAngularMetaOptions): PotentialDirective[];
     getPotentialPipes(component: ts.ClassDeclaration): PotentialPipe[];
     getDirectiveMetadata(dir: ts.ClassDeclaration): TypeCheckableDirectiveMeta | null;
     getNgModuleMetadata(module: ts.ClassDeclaration): NgModuleMeta | null;
     getPipeMetadata(pipe: ts.ClassDeclaration): PipeMeta | null;
-    getPotentialElementTags(component: ts.ClassDeclaration): Map<string, PotentialDirective | null>;
+    getTemplateDirectiveInScope(component: ts.ClassDeclaration): PotentialDirective[];
+    getDirectiveScopeData(component: ts.ClassDeclaration, isInScope: boolean, tsCompletionEntryInfo: TsCompletionEntryInfo | null): PotentialDirective | null;
+    getElementsInFileScope(component: ts.ClassDeclaration): Map<string, PotentialDirective | null>;
+    getElementsInGlobal(component: ts.ClassDeclaration, tsLs: ts.LanguageService, options: GetPotentialAngularMetaOptions): PotentialDirective[];
+    getPotentialElementTags(component: ts.ClassDeclaration, tsLs: ts.LanguageService, options: GetPotentialAngularMetaOptions): Map<string, PotentialDirective | null>;
     getPotentialDomBindings(tagName: string): {
         attribute: string;
         property: string;

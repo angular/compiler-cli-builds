@@ -26,6 +26,20 @@ export declare enum PotentialImportKind {
     NgModule = 0,
     Standalone = 1
 }
+export interface TsCompletionEntryInfo {
+    /**
+     * Sometimes, the location of the tsCompletionEntry symbol does not match the location of the Angular symbol.
+     *
+     * For example, the BarComponent is declared in `bar.ts` and exported from there. The `public_api.ts` also
+     * reexports the BarComponent from `bar.ts`, so the `tsCompletionEntrySymbolFileName` will be `public_api.ts`.
+     */
+    tsCompletionEntrySymbolFileName: string;
+    /**
+     * This data is from the tsLs completion entry, and
+     * will be used in the `ls.getCompletionEntryDetails`.
+     */
+    tsCompletionEntryData?: ts.CompletionEntryData;
+}
 /**
  * Metadata on a directive which is available in a template.
  */
@@ -55,6 +69,7 @@ export interface PotentialDirective {
      * Whether or not this directive is in scope.
      */
     isInScope: boolean;
+    tsCompletionEntryInfo: TsCompletionEntryInfo | null;
 }
 /**
  * Metadata for a pipe which is available in a template.
@@ -73,6 +88,7 @@ export interface PotentialPipe {
      * Whether or not this pipe is in scope.
      */
     isInScope: boolean;
+    tsCompletionEntryInfo: TsCompletionEntryInfo | null;
 }
 /**
  * Possible modes in which to look up a potential import.
