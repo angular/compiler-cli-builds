@@ -12,13 +12,13 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-IIFAW5WH.js";
+} from "./chunk-5K43KTXL.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.js
 import ts2 from "typescript";
 import yargs from "yargs";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_watch.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_watch.js
 import * as chokidar from "chokidar";
 import * as path from "path";
 import ts from "typescript";
@@ -242,7 +242,7 @@ function performWatchCompilation(host) {
   }
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.js
 function main(args, consoleError = console.error, config, customTransformers, programReuse, modifiedResourceFiles) {
   let { project, rootNames, options, errors: configErrors, watch: watch2, emitFlags } = config || readNgcCommandLineAndConfiguration(args);
   if (configErrors.length) {
@@ -363,4 +363,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-IEPULKJX.js.map
+//# sourceMappingURL=chunk-XQCMDSKE.js.map

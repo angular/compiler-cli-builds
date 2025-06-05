@@ -3,11 +3,6 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  GLOBAL_DEFS_FOR_TERSER,
-  GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-  constructorParametersDownlevelTransform
-} from "./chunk-X4XATIFK.js";
-import {
   DEFAULT_ERROR_CODE,
   DecoratorType,
   DocsExtractor,
@@ -33,28 +28,31 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-IIFAW5WH.js";
-import {
-  angularJitApplicationTransform,
-  getDownlevelDecoratorsTransform,
-  getInitializerApiJitTransform
-} from "./chunk-5K65YLR4.js";
+} from "./chunk-5K43KTXL.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "./chunk-SEKYV57I.js";
 import {
+  GLOBAL_DEFS_FOR_TERSER,
+  GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
+  constructorParametersDownlevelTransform
+} from "./chunk-LKPFTZAW.js";
+import {
+  angularJitApplicationTransform,
+  getDownlevelDecoratorsTransform,
+  getInitializerApiJitTransform
+} from "./chunk-ZY4GZNHC.js";
+import {
+  ActivePerfRecorder,
   ErrorCode,
   OptimizeFor,
+  PerfPhase,
   TsCreateProgramDriver,
   isLocalCompilationDiagnostics,
   ngErrorCode
-} from "./chunk-BN7UBQFU.js";
+} from "./chunk-4RDNOL2U.js";
 import "./chunk-LMRFLQ2K.js";
-import {
-  ActivePerfRecorder,
-  PerfPhase
-} from "./chunk-26NO4MZH.js";
 import {
   InvalidFileSystem,
   LogicalFileSystem,
@@ -82,11 +80,11 @@ import {
 } from "./chunk-3NKMA2JO.js";
 import "./chunk-KPQ72R34.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.0.1+sha-49e273a");
+var VERSION = new Version("20.0.1+sha-e98ef80");
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.js
 var NgTscPlugin = class {
   ngOptions;
   name = "ngtsc";
@@ -162,7 +160,7 @@ var NgTscPlugin = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/index.js
 setFileSystem(new NodeJSFileSystem());
 export {
   ConsoleLogger,

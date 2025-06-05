@@ -10,7 +10,7 @@ import {
   ExpressionTranslatorVisitor
 } from "./chunk-LMRFLQ2K.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.js
 var FatalLinkerError = class extends Error {
   node;
   type = "FatalLinkerError";
@@ -23,14 +23,14 @@ function isFatalLinkerError(e) {
   return e && e.type === "FatalLinkerError";
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/ast/utils.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/ast/utils.js
 function assert(node, predicate, expected) {
   if (!predicate(node)) {
     throw new FatalLinkerError(node, `Unsupported syntax, expected ${expected}.`);
   }
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/ast/ast_value.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/ast/ast_value.js
 import * as o from "@angular/compiler";
 var AstObject = class {
   expression;
@@ -168,10 +168,10 @@ var AstValue = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/emit_scope.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/emit_scope.js
 import { ConstantPool } from "@angular/compiler";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/linker_import_generator.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/linker_import_generator.js
 var LinkerImportGenerator = class {
   factory;
   ngImport;
@@ -193,7 +193,7 @@ var LinkerImportGenerator = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/emit_scope.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/emit_scope.js
 var EmitScope = class {
   ngImport;
   translator;
@@ -225,7 +225,7 @@ var EmitScope = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/local_emit_scope.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/local_emit_scope.js
 var LocalEmitScope = class extends EmitScope {
   translateDefinition(definition) {
     return super.translateDefinition({
@@ -238,10 +238,10 @@ var LocalEmitScope = class extends EmitScope {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.js
 import semver3 from "semver";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/get_source_file.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/get_source_file.js
 function createGetSourceFile(sourceUrl, code, loader) {
   if (loader === null) {
     return () => null;
@@ -256,7 +256,7 @@ function createGetSourceFile(sourceUrl, code, loader) {
   }
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_class_metadata_async_linker_1.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_class_metadata_async_linker_1.js
 import { compileOpaqueAsyncClassMetadata } from "@angular/compiler";
 var PartialClassMetadataAsyncLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
@@ -281,7 +281,7 @@ var PartialClassMetadataAsyncLinkerVersion1 = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_class_metadata_linker_1.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_class_metadata_linker_1.js
 import { compileClassMetadata } from "@angular/compiler";
 var PartialClassMetadataLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
@@ -301,17 +301,17 @@ function toR3ClassMetadata(metaObj) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.js
 import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, makeBindingParser as makeBindingParser2, parseTemplate, R3TargetBinder, R3TemplateDependencyKind, ViewEncapsulation } from "@angular/compiler";
 import semver2 from "semver";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.js
 import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSourceFile, ParseSourceSpan } from "@angular/compiler";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "20.0.1+sha-49e273a";
+var PLACEHOLDER_VERSION = "20.0.1+sha-e98ef80";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -364,7 +364,7 @@ function getDefaultStandaloneValue(version) {
   return STANDALONE_IS_DEFAULT_RANGE.test(version);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.js
 var PartialDirectiveLinkerVersion1 = class {
   sourceUrl;
   code;
@@ -513,7 +513,7 @@ function createSourceSpan(range, code, sourceUrl) {
   return new ParseSourceSpan(startLocation, startLocation.moveBy(range.endPos - range.startPos));
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.js
 function makeDirectiveMetadata(directiveExpr, typeExpr, isComponentByDefault = null) {
   return {
     kind: R3TemplateDependencyKind.Directive,
@@ -738,7 +738,7 @@ function parseChangeDetectionStrategy(changeDetectionStrategy) {
   return enumValue;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_factory_linker_1.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_factory_linker_1.js
 import { compileFactoryFunction, FactoryTarget } from "@angular/compiler";
 var PartialFactoryLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
@@ -774,7 +774,7 @@ function getDependencies(metaObj, propName) {
   return null;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_injectable_linker_1.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_injectable_linker_1.js
 import { compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, outputAst as o3 } from "@angular/compiler";
 var PartialInjectableLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
@@ -812,7 +812,7 @@ function toR3InjectableMeta(metaObj) {
   return meta;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_injector_linker_1.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_injector_linker_1.js
 import { compileInjector } from "@angular/compiler";
 var PartialInjectorLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
@@ -834,7 +834,7 @@ function toR3InjectorMeta(metaObj) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_ng_module_linker_1.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_ng_module_linker_1.js
 import { compileNgModule, R3NgModuleMetadataKind, R3SelectorScopeMode } from "@angular/compiler";
 var PartialNgModuleLinkerVersion1 = class {
   emitInline;
@@ -907,7 +907,7 @@ function wrapReferences(values) {
   return values.getArray().map((i) => wrapReference(i.getOpaque()));
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_pipe_linker_1.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_pipe_linker_1.js
 import { compilePipeFromMetadata } from "@angular/compiler";
 var PartialPipeLinkerVersion1 = class {
   constructor() {
@@ -936,7 +936,7 @@ function toR3PipeMeta(metaObj, version) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.js
 var \u0275\u0275ngDeclareDirective = "\u0275\u0275ngDeclareDirective";
 var \u0275\u0275ngDeclareClassMetadata = "\u0275\u0275ngDeclareClassMetadata";
 var \u0275\u0275ngDeclareComponent = "\u0275\u0275ngDeclareComponent";
@@ -1041,7 +1041,7 @@ function getRange(comparator, versionStr) {
   return new semver3.Range(`${comparator}${version.format()}`);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/file_linker.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/file_linker.js
 var FileLinker = class {
   linkerEnvironment;
   linkerSelector;
@@ -1086,14 +1086,14 @@ var FileLinker = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/linker_options.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/linker_options.js
 var DEFAULT_LINKER_OPTIONS = {
   sourceMapping: true,
   linkerJitMode: false,
   unknownDeclarationVersionHandling: "error"
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/translator.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/translator.js
 var Translator = class {
   factory;
   constructor(factory) {
@@ -1107,7 +1107,7 @@ var Translator = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/linker_environment.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/linker_environment.js
 var LinkerEnvironment = class {
   fileSystem;
   logger;
@@ -1134,7 +1134,7 @@ var LinkerEnvironment = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/needs_linking.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/needs_linking.js
 function needsLinking(path, source) {
   return declarationFunctions.some((fn) => source.includes(fn));
 }
@@ -1155,4 +1155,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ZAHOPHMN.js.map
+//# sourceMappingURL=chunk-LYJARAHL.js.map

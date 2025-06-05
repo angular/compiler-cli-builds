@@ -8,7 +8,7 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-ZAHOPHMN.js";
+} from "../../chunk-LYJARAHL.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -20,10 +20,10 @@ import {
 } from "../../chunk-3NKMA2JO.js";
 import "../../chunk-KPQ72R34.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.js
 import { types as t4 } from "@babel/core";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/ast/babel_ast_factory.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/ast/babel_ast_factory.js
 import { types as t } from "@babel/core";
 var BabelAstFactory = class {
   sourceUrl;
@@ -155,7 +155,7 @@ function isLExpression(expr) {
   return t.isLVal(expr);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/ast/babel_ast_host.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/ast/babel_ast_host.js
 import { types as t2 } from "@babel/core";
 var BabelAstHost = class {
   getSymbolName(node) {
@@ -281,7 +281,7 @@ function isMinifiedBooleanLiteral(node) {
   return t2.isUnaryExpression(node) && node.prefix && node.operator === "!" && t2.isNumericLiteral(node.argument) && (node.argument.value === 0 || node.argument.value === 1);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/babel_declaration_scope.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/babel_declaration_scope.js
 import { types as t3 } from "@babel/core";
 var BabelDeclarationScope = class {
   declarationScope;
@@ -308,7 +308,7 @@ var BabelDeclarationScope = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.js
 function createEs2015LinkerPlugin({ fileSystem, logger, ...options }) {
   let fileLinker = null;
   return {
@@ -408,7 +408,7 @@ function buildCodeFrameError(file, message, node) {
   return `${filename}: ${error.message}`;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/babel_plugin.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/babel_plugin.js
 function defaultLinkerPlugin(api, options) {
   api.assertVersion(7);
   return createEs2015LinkerPlugin({
@@ -418,7 +418,7 @@ function defaultLinkerPlugin(api, options) {
   });
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/index.mjs
+// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/index.js
 var babel_default = defaultLinkerPlugin;
 export {
   createEs2015LinkerPlugin,
