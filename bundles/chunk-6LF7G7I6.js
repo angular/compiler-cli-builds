@@ -2508,7 +2508,7 @@ var StandaloneComponentScopeReader = class {
 };
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
-import { ASTWithSource as ASTWithSource2, BindingType, Interpolation, PropertyRead as PropertyRead2, TmplAstBoundAttribute } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource2, BindingType, Interpolation, PrefixNot, PropertyRead as PropertyRead2, TmplAstBoundAttribute } from "@angular/compiler";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/symbol_util.js
 import ts18 from "typescript";
@@ -2583,19 +2583,32 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.INTERPOLATED_SIGNAL_NOT_INVOKED;
   visitNode(ctx, component, node) {
     if (node instanceof Interpolation) {
-      return node.expressions.filter((item) => item instanceof PropertyRead2).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
+      return node.expressions.map((item) => item instanceof PrefixNot ? item.expression : item).filter((item) => item instanceof PropertyRead2).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
     } else if (node instanceof TmplAstBoundAttribute) {
       const usedDirectives = ctx.templateTypeChecker.getUsedDirectives(component);
       if (usedDirectives !== null && usedDirectives.some((dir) => dir.inputs.getByBindingPropertyName(node.name) !== null)) {
         return [];
       }
-      if ((node.type === BindingType.Property || node.type === BindingType.Class || node.type === BindingType.Style || node.type === BindingType.Attribute || node.type === BindingType.Animation) && node.value instanceof ASTWithSource2 && node.value.ast instanceof PropertyRead2) {
-        return buildDiagnosticForSignal(ctx, node.value.ast, component);
+      const nodeAst = isPropertyReadNodeAst(node);
+      if ((node.type === BindingType.Property || node.type === BindingType.Class || node.type === BindingType.Style || node.type === BindingType.Attribute || node.type === BindingType.Animation) && nodeAst) {
+        return buildDiagnosticForSignal(ctx, nodeAst, component);
       }
     }
     return [];
   }
 };
+function isPropertyReadNodeAst(node) {
+  if (node.value instanceof ASTWithSource2 === false) {
+    return void 0;
+  }
+  if (node.value.ast instanceof PrefixNot && node.value.ast.expression instanceof PropertyRead2) {
+    return node.value.ast.expression;
+  }
+  if (node.value.ast instanceof PropertyRead2) {
+    return node.value.ast;
+  }
+  return void 0;
+}
 function isFunctionInstanceProperty(name) {
   return FUNCTION_INSTANCE_PROPERTIES.has(name);
 }
@@ -5003,4 +5016,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-4NAKXOYJ.js.map
+//# sourceMappingURL=chunk-6LF7G7I6.js.map
