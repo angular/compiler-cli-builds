@@ -82,7 +82,7 @@ import "./chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.0.3+sha-6412d4e");
+var VERSION = new Version("20.0.3+sha-30e4cfd");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.js
 var NgTscPlugin = class {
