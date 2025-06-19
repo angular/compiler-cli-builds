@@ -16,7 +16,7 @@ import {
   tryParseSignalInputMapping,
   tryParseSignalModelMapping,
   tryParseSignalQueryFromInitializer
-} from "./chunk-24N5BBLF.js";
+} from "./chunk-VHQZ2U6Y.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/downlevel_decorators_transform.js
 import ts from "typescript";
@@ -529,4 +529,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-6ENSIXPF.js.map
+//# sourceMappingURL=chunk-GFL6FNAE.js.map
