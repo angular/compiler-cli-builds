@@ -11831,6 +11831,21 @@ var OutOfBandDiagnosticRecorderImpl = class {
   resolver;
   _diagnostics = [];
   recordedPipes = /* @__PURE__ */ new Set();
+  pipeSuggestions = /* @__PURE__ */ new Map([
+    ["async", "AsyncPipe"],
+    ["uppercase", "UpperCasePipe"],
+    ["lowercase", "LowerCasePipe"],
+    ["json", "JsonPipe"],
+    ["slice", "SlicePipe"],
+    ["number", "DecimalPipe"],
+    ["percent", "PercentPipe"],
+    ["titlecase", "TitleCasePipe"],
+    ["currency", "CurrencyPipe"],
+    ["date", "DatePipe"],
+    ["i18nPlural", "I18nPluralPipe"],
+    ["i18nSelect", "I18nSelectPipe"],
+    ["keyvalue", "KeyValuePipe"]
+  ]);
   constructor(resolver) {
     this.resolver = resolver;
   }
@@ -11843,15 +11858,26 @@ var OutOfBandDiagnosticRecorderImpl = class {
     const errorMsg = `No directive found with exportAs '${value}'.`;
     this._diagnostics.push(makeTemplateDiagnostic(id, mapping, ref.valueSpan || ref.sourceSpan, ts56.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REFERENCE_TARGET), errorMsg));
   }
-  missingPipe(id, ast) {
+  missingPipe(id, ast, isStandalone) {
     if (this.recordedPipes.has(ast)) {
       return;
     }
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const errorMsg = `No pipe found with name '${ast.name}'.`;
     const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, ast.nameSpan);
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
+    }
+    const mapping = this.resolver.getTemplateSourceMapping(id);
+    let errorMsg = `No pipe found with name '${ast.name}'.`;
+    if (this.pipeSuggestions.has(ast.name)) {
+      const suggestedClassName = this.pipeSuggestions.get(ast.name);
+      const suggestedImport = "@angular/common";
+      if (isStandalone) {
+        errorMsg += `
+To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" and add it to the "imports" array of the component.`;
+      } else {
+        errorMsg += `
+To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" and add it to the "imports" array of the module declaring the component.`;
+      }
     }
     this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts56.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
     this.recordedPipes.add(ast);
@@ -14168,7 +14194,7 @@ var TcbExpressionTranslator = class {
       const pipeMeta = this.tcb.getPipeByName(ast.name);
       let pipe;
       if (pipeMeta === null) {
-        this.tcb.oobRecorder.missingPipe(this.tcb.id, ast);
+        this.tcb.oobRecorder.missingPipe(this.tcb.id, ast, this.tcb.hostIsStandalone);
         pipe = ANY_EXPRESSION;
       } else if (pipeMeta.isExplicitlyDeferred && this.tcb.boundTarget.getEagerlyUsedPipes().includes(ast.name)) {
         this.tcb.oobRecorder.deferredPipeUsedEagerly(this.tcb.id, ast);
@@ -20024,4 +20050,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VHQZ2U6Y.js.map
+//# sourceMappingURL=chunk-XALV7M6R.js.map
