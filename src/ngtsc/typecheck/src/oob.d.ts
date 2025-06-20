@@ -35,8 +35,9 @@ export interface OutOfBandDiagnosticRecorder {
      *
      * @param id the type-checking ID of the template which contains the unknown pipe.
      * @param ast the `BindingPipe` invocation of the pipe which could not be found.
+     * @param isStandalone whether the host component is standalone.
      */
-    missingPipe(id: TypeCheckId, ast: BindingPipe): void;
+    missingPipe(id: TypeCheckId, ast: BindingPipe, isStandalone: boolean): void;
     /**
      * Reports usage of a pipe imported via `@Component.deferredImports` outside
      * of a `@defer` block in a template.
@@ -131,16 +132,18 @@ export interface OutOfBandDiagnosticRecorder {
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
-    private _diagnostics;
+    private readonly _diagnostics;
     /**
      * Tracks which `BindingPipe` nodes have already been recorded as invalid, so only one diagnostic
      * is ever produced per node.
      */
-    private recordedPipes;
+    private readonly recordedPipes;
+    /** Common pipes that can be suggested to users. */
+    private readonly pipeSuggestions;
     constructor(resolver: TypeCheckSourceResolver);
     get diagnostics(): ReadonlyArray<TemplateDiagnostic>;
     missingReferenceTarget(id: TypeCheckId, ref: TmplAstReference): void;
-    missingPipe(id: TypeCheckId, ast: BindingPipe): void;
+    missingPipe(id: TypeCheckId, ast: BindingPipe, isStandalone: boolean): void;
     deferredPipeUsedEagerly(id: TypeCheckId, ast: BindingPipe): void;
     deferredComponentUsedEagerly(id: TypeCheckId, element: TmplAstElement): void;
     duplicateTemplateVar(id: TypeCheckId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
