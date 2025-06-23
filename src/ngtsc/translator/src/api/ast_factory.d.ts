@@ -30,9 +30,10 @@ export interface AstFactory<TStatement, TExpression> {
      * Create an assignment expression (e.g. `lhsExpr = rhsExpr`).
      *
      * @param target an expression that evaluates to the left side of the assignment.
+     * @param operator binary assignment operator that will be applied.
      * @param value an expression that evaluates to the right side of the assignment.
      */
-    createAssignment(target: TExpression, value: TExpression): TExpression;
+    createAssignment(target: TExpression, operator: BinaryOperator, value: TExpression): TExpression;
     /**
      * Create a binary expression (e.g. `lhs && rhs`).
      *
@@ -238,7 +239,7 @@ export type UnaryOperator = '+' | '-' | '!';
 /**
  * The binary operators supported by the `AstFactory`.
  */
-export type BinaryOperator = '&&' | '>' | '>=' | '&' | '|' | '/' | '==' | '===' | '<' | '<=' | '-' | '%' | '*' | '**' | '!=' | '!==' | '||' | '+' | '??' | 'in';
+export type BinaryOperator = '&&' | '>' | '>=' | '&' | '|' | '/' | '==' | '===' | '<' | '<=' | '-' | '%' | '*' | '**' | '!=' | '!==' | '||' | '+' | '??' | 'in' | '=' | '+=' | '-=' | '*=' | '/=' | '%=' | '**=' | '&&=' | '||=' | '??=';
 /**
  * The original location of the start or end of a node created by the `AstFactory`.
  */

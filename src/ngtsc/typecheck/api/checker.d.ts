@@ -14,7 +14,7 @@ import { NgModuleMeta, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 import { FullSourceMapping, GetPotentialAngularMetaOptions, NgTemplateDiagnostic, TypeCheckableDirectiveMeta } from './api';
 import { GlobalCompletion } from './completion';
-import { PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe, TsCompletionEntryInfo } from './scope';
+import { PotentialDirective, PotentialDirectiveModuleSpecifierResolver, PotentialImport, PotentialImportMode, PotentialPipe, TsCompletionEntryInfo } from './scope';
 import { ElementSymbol, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, TcbLocation, TemplateSymbol } from './symbols';
 /**
  * Interface to the Angular Template Type Checker to extract diagnostics and intelligence from the
@@ -151,7 +151,7 @@ export interface TemplateTypeChecker {
     /**
      * In the context of an Angular trait, generate potential imports for a directive.
      */
-    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inContext: ts.Node, importMode: PotentialImportMode): ReadonlyArray<PotentialImport>;
+    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inContext: ts.Node, importMode: PotentialImportMode, potentialDirectiveModuleSpecifierResolver?: PotentialDirectiveModuleSpecifierResolver): ReadonlyArray<PotentialImport>;
     /**
      * Get the primary decorator for an Angular class (such as @Component). This does not work for
      * `@Injectable`.

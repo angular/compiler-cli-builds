@@ -43,7 +43,17 @@ var BINARY_OPERATORS = /* @__PURE__ */ new Map([
   [o.BinaryOperator.Plus, "+"],
   [o.BinaryOperator.NullishCoalesce, "??"],
   [o.BinaryOperator.Exponentiation, "**"],
-  [o.BinaryOperator.In, "in"]
+  [o.BinaryOperator.In, "in"],
+  [o.BinaryOperator.Assign, "="],
+  [o.BinaryOperator.AdditionAssignment, "+="],
+  [o.BinaryOperator.SubtractionAssignment, "-="],
+  [o.BinaryOperator.MultiplicationAssignment, "*="],
+  [o.BinaryOperator.DivisionAssignment, "/="],
+  [o.BinaryOperator.RemainderAssignment, "%="],
+  [o.BinaryOperator.ExponentiationAssignment, "**="],
+  [o.BinaryOperator.AndAssignment, "&&="],
+  [o.BinaryOperator.OrAssignment, "||="],
+  [o.BinaryOperator.NullishCoalesceAssignment, "??="]
 ]);
 var ExpressionTranslatorVisitor = class {
   factory;
@@ -175,13 +185,14 @@ var ExpressionTranslatorVisitor = class {
     return this.factory.createArrowFunctionExpression(ast.params.map((param) => param.name), Array.isArray(ast.body) ? this.factory.createBlock(this.visitStatements(ast.body, context)) : ast.body.visitExpression(this, context));
   }
   visitBinaryOperatorExpr(ast, context) {
-    if (ast.operator === o.BinaryOperator.Assign) {
-      return this.factory.createAssignment(ast.lhs.visitExpression(this, context), ast.rhs.visitExpression(this, context));
-    }
     if (!BINARY_OPERATORS.has(ast.operator)) {
       throw new Error(`Unknown binary operator: ${o.BinaryOperator[ast.operator]}`);
     }
-    return this.factory.createBinaryExpression(ast.lhs.visitExpression(this, context), BINARY_OPERATORS.get(ast.operator), ast.rhs.visitExpression(this, context));
+    const operator = BINARY_OPERATORS.get(ast.operator);
+    if (ast.isAssignment()) {
+      return this.factory.createAssignment(ast.lhs.visitExpression(this, context), operator, ast.rhs.visitExpression(this, context));
+    }
+    return this.factory.createBinaryExpression(ast.lhs.visitExpression(this, context), operator, ast.rhs.visitExpression(this, context));
   }
   visitReadPropExpr(ast, context) {
     return this.factory.createPropertyAccess(ast.receiver.visitExpression(this, context), ast.name);
@@ -282,4 +293,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-NA65Q4MT.js.map
+//# sourceMappingURL=chunk-6ECVYRSU.js.map

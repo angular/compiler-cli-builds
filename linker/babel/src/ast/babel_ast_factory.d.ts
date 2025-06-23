@@ -18,7 +18,7 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     sourceUrl: string);
     attachComments(statement: t.Statement | t.Expression, leadingComments: LeadingComment[]): void;
     createArrayLiteral: typeof t.arrayExpression;
-    createAssignment(target: t.Expression, value: t.Expression): t.Expression;
+    createAssignment(target: t.Expression, operator: BinaryOperator, value: t.Expression): t.Expression;
     createBinaryExpression(leftOperand: t.Expression, operator: BinaryOperator, rightOperand: t.Expression): t.Expression;
     createBlock: typeof t.blockStatement;
     createCallExpression(callee: t.Expression, args: t.Expression[], pure: boolean): t.Expression;

@@ -19,7 +19,7 @@ import { HostBindingNodes } from '../../directive';
  * The `keyof R3ComponentMetadata &` condition ensures that only fields of `R3ComponentMetadata` can
  * be included here.
  */
-export type ComponentMetadataResolvedFields = SubsetOfKeys<R3ComponentMetadata<R3TemplateDependencyMetadata>, 'declarations' | 'declarationListEmitMode' | 'defer'>;
+export type ComponentMetadataResolvedFields = SubsetOfKeys<R3ComponentMetadata<R3TemplateDependencyMetadata>, 'declarations' | 'declarationListEmitMode' | 'defer' | 'hasDirectiveDependencies'>;
 export interface ComponentAnalysisData {
     /**
      * `meta` includes those fields of `R3ComponentMetadata` which are calculated at `analyze` time
@@ -104,6 +104,8 @@ export interface ComponentResolutionData {
      * defer resolver function in `PerComponent` mode.
      */
     deferPerComponentDependencies: R3DeferPerComponentDependency[];
+    /** Whether the component is standalone and has any directly-imported directive dependencies. */
+    hasDirectiveDependencies: boolean;
 }
 /**
  * Describes a dependency used within a `@defer` block.

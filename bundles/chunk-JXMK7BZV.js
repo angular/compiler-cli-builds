@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-NA65Q4MT.js";
+} from "./chunk-6ECVYRSU.js";
 import {
   LogicalProjectPath,
   absoluteFrom,
@@ -3853,7 +3853,17 @@ var BINARY_OPERATORS2 = /* @__PURE__ */ (() => ({
   "||": ts23.SyntaxKind.BarBarToken,
   "+": ts23.SyntaxKind.PlusToken,
   "??": ts23.SyntaxKind.QuestionQuestionToken,
-  "in": ts23.SyntaxKind.InKeyword
+  "in": ts23.SyntaxKind.InKeyword,
+  "=": ts23.SyntaxKind.EqualsToken,
+  "+=": ts23.SyntaxKind.PlusEqualsToken,
+  "-=": ts23.SyntaxKind.MinusEqualsToken,
+  "*=": ts23.SyntaxKind.AsteriskEqualsToken,
+  "/=": ts23.SyntaxKind.SlashEqualsToken,
+  "%=": ts23.SyntaxKind.PercentEqualsToken,
+  "**=": ts23.SyntaxKind.AsteriskAsteriskEqualsToken,
+  "&&=": ts23.SyntaxKind.AmpersandAmpersandEqualsToken,
+  "||=": ts23.SyntaxKind.BarBarEqualsToken,
+  "??=": ts23.SyntaxKind.QuestionQuestionEqualsToken
 }))();
 var VAR_TYPES = /* @__PURE__ */ (() => ({
   "const": ts23.NodeFlags.Const,
@@ -3868,8 +3878,8 @@ var TypeScriptAstFactory = class {
   }
   attachComments = attachComments;
   createArrayLiteral = ts23.factory.createArrayLiteralExpression;
-  createAssignment(target, value) {
-    return ts23.factory.createBinaryExpression(target, ts23.SyntaxKind.EqualsToken, value);
+  createAssignment(target, operator, value) {
+    return ts23.factory.createBinaryExpression(target, BINARY_OPERATORS2[operator], value);
   }
   createBinaryExpression(leftOperand, operator, rightOperand) {
     return ts23.factory.createBinaryExpression(leftOperand, BINARY_OPERATORS2[operator], rightOperand);
@@ -7899,7 +7909,7 @@ import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirect
 import ts65 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.js
-import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr6, ExternalReference as ExternalReference2, getSafePropertyAccessString, parseHostBindings, ParserError, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
+import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr6, ExternalReference as ExternalReference2, getSafePropertyAccessString, parseHostBindings, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
 import ts43 from "typescript";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/initializer_function_access.js
@@ -7914,6 +7924,9 @@ function validateAccessOfInitializerApiMember({ api, call }, member) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/initializer_functions.js
 import ts40 from "typescript";
 function tryParseInitializerApi(functions, expression, reflector, importTracker) {
+  if (ts40.isAsExpression(expression) || ts40.isParenthesizedExpression(expression)) {
+    return tryParseInitializerApi(functions, expression.expression, reflector, importTracker);
+  }
   if (!ts40.isCallExpression(expression)) {
     return null;
   }
@@ -8950,9 +8963,9 @@ function evaluateHostExpressionBindings(hostExpr, evaluator) {
   return bindings;
 }
 function getHostBindingErrorNode(error, hostExpr) {
-  if (ts43.isObjectLiteralExpression(hostExpr) && error.relatedError instanceof ParserError) {
+  if (ts43.isObjectLiteralExpression(hostExpr)) {
     for (const prop of hostExpr.properties) {
-      if (ts43.isPropertyAssignment(prop) && ts43.isStringLiteralLike(prop.initializer) && prop.initializer.text === error.relatedError.input) {
+      if (ts43.isPropertyAssignment(prop) && ts43.isStringLiteralLike(prop.initializer) && error.msg.includes(`[${prop.initializer.text}]`)) {
         return prop.initializer;
       }
     }
@@ -12182,7 +12195,17 @@ var BINARY_OPS = /* @__PURE__ */ new Map([
   ["&", ts59.SyntaxKind.AmpersandToken],
   ["|", ts59.SyntaxKind.BarToken],
   ["??", ts59.SyntaxKind.QuestionQuestionToken],
-  ["in", ts59.SyntaxKind.InKeyword]
+  ["in", ts59.SyntaxKind.InKeyword],
+  ["=", ts59.SyntaxKind.EqualsToken],
+  ["+=", ts59.SyntaxKind.PlusEqualsToken],
+  ["-=", ts59.SyntaxKind.MinusEqualsToken],
+  ["*=", ts59.SyntaxKind.AsteriskEqualsToken],
+  ["/=", ts59.SyntaxKind.SlashEqualsToken],
+  ["%=", ts59.SyntaxKind.PercentEqualsToken],
+  ["**=", ts59.SyntaxKind.AsteriskAsteriskEqualsToken],
+  ["&&=", ts59.SyntaxKind.AmpersandAmpersandEqualsToken],
+  ["||=", ts59.SyntaxKind.BarBarEqualsToken],
+  ["??=", ts59.SyntaxKind.QuestionQuestionEqualsToken]
 ]);
 function astToTypescript(ast, maybeResolve, config) {
   const translator = new AstTranslator(maybeResolve, config);
@@ -14172,7 +14195,7 @@ var TcbExpressionTranslator = class {
         }
       }
       return targetExpression;
-    } else if (ast instanceof Binary && ast.operation === "=" && ast.left instanceof PropertyRead4 && ast.left.receiver instanceof ImplicitReceiver3) {
+    } else if (ast instanceof Binary && Binary.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead4 && ast.left.receiver instanceof ImplicitReceiver3) {
       const read = ast.left;
       const target = this.tcb.boundTarget.getExpressionTarget(read);
       if (target === null) {
@@ -15011,7 +15034,7 @@ var SymbolBuilder = class {
           isStructural: meta.isStructural,
           isInScope: true,
           isHostDirective: false,
-          tsCompletionEntryInfo: null
+          tsCompletionEntryInfos: null
         };
         symbols.push(directiveSymbol);
         seenDirectives.add(declaration);
@@ -15047,7 +15070,7 @@ var SymbolBuilder = class {
           kind: SymbolKind.Directive,
           isStructural: meta.isStructural,
           isInScope: true,
-          tsCompletionEntryInfo: null
+          tsCompletionEntryInfos: null
         };
         symbols.push(directiveSymbol);
         seenDirectives.add(node);
@@ -15269,7 +15292,7 @@ var SymbolBuilder = class {
       ngModule,
       isHostDirective: false,
       isInScope: true,
-      tsCompletionEntryInfo: null
+      tsCompletionEntryInfos: null
     };
   }
   getSymbolOfVariable(variable) {
@@ -15413,7 +15436,7 @@ var SymbolBuilder = class {
       return this.getSymbol(expressionTarget);
     }
     let withSpan = expression.sourceSpan;
-    if (expression instanceof Binary2 && expression.operation === "=" && expression.left instanceof PropertyRead5) {
+    if (expression instanceof Binary2 && Binary2.isAssignmentOperation(expression.operation) && expression.left instanceof PropertyRead5) {
       withSpan = expression.left.nameSpan;
     } else if (expression instanceof ASTWithName2 && !(expression instanceof SafePropertyRead4)) {
       withSpan = expression.nameSpan;
@@ -16032,7 +16055,7 @@ var TemplateTypeCheckerImpl = class {
     return {
       ...withScope,
       isInScope,
-      tsCompletionEntryInfo
+      tsCompletionEntryInfos: tsCompletionEntryInfo !== null ? [tsCompletionEntryInfo] : null
     };
   }
   getElementsInFileScope(component) {
@@ -16068,7 +16091,8 @@ var TemplateTypeCheckerImpl = class {
     const currentComponentFileName = component.getSourceFile().fileName;
     for (const { symbol, data } of entries ?? []) {
       const symbolFileName = symbol?.declarations?.[0]?.getSourceFile().fileName;
-      if (symbolFileName === void 0) {
+      const symbolName = symbol?.name;
+      if (symbolFileName === void 0 || symbolName === void 0) {
         continue;
       }
       if (symbolFileName === currentComponentFileName) {
@@ -16087,23 +16111,22 @@ var TemplateTypeCheckerImpl = class {
           ref
         });
       } else {
-        const ngModuleMeta = this.metaReader.getNgModuleMetadata(ref);
-        if (ngModuleMeta === null) {
-          continue;
-        }
-        for (const moduleExports of ngModuleMeta.exports) {
-          const directiveMeta2 = this.metaReader.getDirectiveMetadata(moduleExports);
-          if (directiveMeta2 === null) {
-            continue;
-          }
-          directiveDecls.push({
-            meta: directiveMeta2,
-            ref: moduleExports
-          });
-        }
+        const directiveDeclsForNgModule = this.getDirectiveDeclsForNgModule(ref);
+        directiveDecls.push(...directiveDeclsForNgModule);
       }
       for (const directiveDecl of directiveDecls) {
+        const cachedCompletionEntryInfos = resultingDirectives.get(directiveDecl.ref.node)?.tsCompletionEntryInfos ?? [];
+        cachedCompletionEntryInfos.push({
+          tsCompletionEntryData: data,
+          tsCompletionEntrySymbolFileName: symbolFileName,
+          tsCompletionEntrySymbolName: symbolName
+        });
         if (resultingDirectives.has(directiveDecl.ref.node)) {
+          const directiveInfo = resultingDirectives.get(directiveDecl.ref.node);
+          resultingDirectives.set(directiveDecl.ref.node, {
+            ...directiveInfo,
+            tsCompletionEntryInfos: cachedCompletionEntryInfos
+          });
           continue;
         }
         const withScope = this.scopeDataOfDirectiveMeta(typeChecker, directiveDecl.meta);
@@ -16113,14 +16136,35 @@ var TemplateTypeCheckerImpl = class {
         resultingDirectives.set(directiveDecl.ref.node, {
           ...withScope,
           isInScope: false,
-          tsCompletionEntryInfo: {
-            tsCompletionEntryData: data,
-            tsCompletionEntrySymbolFileName: symbolFileName
-          }
+          tsCompletionEntryInfos: cachedCompletionEntryInfos
         });
       }
     }
     return Array.from(resultingDirectives.values());
+  }
+  getDirectiveDeclsForNgModule(ref) {
+    const ngModuleMeta = this.metaReader.getNgModuleMetadata(ref);
+    if (ngModuleMeta === null) {
+      return [];
+    }
+    const directiveDecls = [];
+    for (const moduleExports of ngModuleMeta.exports) {
+      const directiveMeta = this.metaReader.getDirectiveMetadata(moduleExports);
+      if (directiveMeta !== null) {
+        directiveDecls.push({
+          meta: directiveMeta,
+          ref: moduleExports
+        });
+      } else {
+        const ngModuleMeta2 = this.metaReader.getNgModuleMetadata(moduleExports);
+        if (ngModuleMeta2 === null) {
+          continue;
+        }
+        const nestedDirectiveDecls = this.getDirectiveDeclsForNgModule(moduleExports);
+        directiveDecls.push(...nestedDirectiveDecls);
+      }
+    }
+    return directiveDecls;
   }
   getPotentialElementTags(component, tsLs, options) {
     if (this.elementTagCache.has(component)) {
@@ -16217,26 +16261,41 @@ var TemplateTypeCheckerImpl = class {
     }
     return null;
   }
-  getPotentialImportsFor(toImport, inContext, importMode) {
+  getPotentialImportsFor(toImport, inContext, importMode, potentialDirectiveModuleSpecifierResolver) {
     const imports = [];
     const meta = this.metaReader.getDirectiveMetadata(toImport) ?? this.metaReader.getPipeMetadata(toImport);
     if (meta === null) {
       return imports;
     }
+    let highestImportPriority = -1;
+    const collectImports = (emit, moduleSpecifier) => {
+      if (emit === null) {
+        return;
+      }
+      imports.push({
+        ...emit,
+        moduleSpecifier: moduleSpecifier ?? emit.moduleSpecifier
+      });
+      if (moduleSpecifier !== void 0 && highestImportPriority === -1) {
+        highestImportPriority = imports.length - 1;
+      }
+    };
     if (meta.isStandalone || importMode === PotentialImportMode.ForceDirect) {
       const emitted = this.emit(PotentialImportKind.Standalone, toImport, inContext);
-      if (emitted !== null) {
-        imports.push(emitted);
-      }
+      const moduleSpecifier = potentialDirectiveModuleSpecifierResolver?.resolve(toImport, inContext);
+      collectImports(emitted, moduleSpecifier);
     }
     const exportingNgModules = this.ngModuleIndex.getNgModulesExporting(meta.ref.node);
     if (exportingNgModules !== null) {
       for (const exporter of exportingNgModules) {
         const emittedRef = this.emit(PotentialImportKind.NgModule, exporter, inContext);
-        if (emittedRef !== null) {
-          imports.push(emittedRef);
-        }
+        const moduleSpecifier = potentialDirectiveModuleSpecifierResolver?.resolve(exporter, inContext);
+        collectImports(emittedRef, moduleSpecifier);
       }
+    }
+    if (highestImportPriority > 0) {
+      const highImport = imports.splice(highestImportPriority, 1)[0];
+      imports.unshift(highImport);
     }
     return imports;
   }
@@ -16293,7 +16352,7 @@ var TemplateTypeCheckerImpl = class {
       selector: dep.selector,
       tsSymbol,
       ngModule,
-      tsCompletionEntryInfo: null
+      tsCompletionEntryInfos: null
     };
   }
   scopeDataOfPipeMeta(typeChecker, dep) {
@@ -16305,7 +16364,7 @@ var TemplateTypeCheckerImpl = class {
       ref: dep.ref,
       name: dep.name,
       tsSymbol,
-      tsCompletionEntryInfo: null
+      tsCompletionEntryInfos: null
     };
   }
 };
@@ -18862,7 +18921,8 @@ var ComponentDecoratorHandler = class {
         deferPerBlockDependencies: this.locateDeferBlocksWithoutScope(analysis.template),
         deferBlockDepsEmitMode: 1,
         deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
-        deferPerComponentDependencies: analysis.explicitlyDeferredTypes ?? []
+        deferPerComponentDependencies: analysis.explicitlyDeferredTypes ?? [],
+        hasDirectiveDependencies: true
       };
       if (this.localCompilationExtraImportsTracker === null) {
         return { data };
@@ -18874,7 +18934,8 @@ var ComponentDecoratorHandler = class {
         deferPerBlockDependencies: /* @__PURE__ */ new Map(),
         deferBlockDepsEmitMode: 0,
         deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
-        deferPerComponentDependencies: []
+        deferPerComponentDependencies: [],
+        hasDirectiveDependencies: true
       };
     }
     if (this.semanticDepGraphUpdater !== null && analysis.baseClass instanceof Reference) {
@@ -18896,6 +18957,11 @@ var ComponentDecoratorHandler = class {
       }
       if (this.compilationMode !== CompilationMode.LOCAL) {
         this.resolveDeferBlocks(node, scope, deferBlocks, declarations, data, analysis, eagerlyUsed);
+        data.hasDirectiveDependencies = !analysis.meta.isStandalone || allDependencies.some(({ kind, ref }) => {
+          return (kind === MetaKind.Directive || kind === MetaKind.NgModule) && wholeTemplateUsed.has(ref.node);
+        });
+      } else {
+        data.hasDirectiveDependencies = true;
       }
       this.handleDependencyCycles(node, context, scope, data, analysis, metadata, declarations, eagerlyUsed, symbol);
     }
@@ -20050,4 +20116,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-XALV7M6R.js.map
+//# sourceMappingURL=chunk-JXMK7BZV.js.map

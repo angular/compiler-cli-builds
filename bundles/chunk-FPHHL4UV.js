@@ -8,7 +8,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-NA65Q4MT.js";
+} from "./chunk-6ECVYRSU.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.js
 var FatalLinkerError = class extends Error {
@@ -311,7 +311,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "20.1.0-next.2+sha-f364d50";
+var PLACEHOLDER_VERSION = "20.1.0-next.2+sha-d25a6a0";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -596,6 +596,14 @@ ${errors}`);
         });
       }
     }
+    const baseMeta = toR3DirectiveMeta(metaObj, this.code, this.sourceUrl, version);
+    const deferBlockDependencies = this.createR3ComponentDeferMetadata(metaObj, template);
+    let hasDirectiveDependencies = false;
+    for (const depFn of deferBlockDependencies.blocks.values()) {
+      if (depFn !== null) {
+        hasDirectiveDependencies = true;
+      }
+    }
     if (metaObj.has("dependencies")) {
       for (const dep of metaObj.getArray("dependencies")) {
         const depObj = dep.getObject();
@@ -603,6 +611,7 @@ ${errors}`);
         switch (depObj.getString("kind")) {
           case "directive":
           case "component":
+            hasDirectiveDependencies = true;
             declarations.push(makeDirectiveMetadata(depObj, typeExpr));
             break;
           case "pipe":
@@ -614,6 +623,7 @@ ${errors}`);
             });
             break;
           case "ngmodule":
+            hasDirectiveDependencies = true;
             declarations.push({
               kind: R3TemplateDependencyKind.NgModule,
               type: typeExpr
@@ -625,7 +635,7 @@ ${errors}`);
       }
     }
     return {
-      ...toR3DirectiveMeta(metaObj, this.code, this.sourceUrl, version),
+      ...baseMeta,
       viewProviders: metaObj.has("viewProviders") ? metaObj.getOpaque("viewProviders") : null,
       template: {
         nodes: template.nodes,
@@ -633,7 +643,7 @@ ${errors}`);
       },
       declarationListEmitMode,
       styles: metaObj.has("styles") ? metaObj.getArray("styles").map((entry) => entry.getString()) : [],
-      defer: this.createR3ComponentDeferMetadata(metaObj, template),
+      defer: deferBlockDependencies,
       encapsulation: metaObj.has("encapsulation") ? parseEncapsulation(metaObj.getValue("encapsulation")) : ViewEncapsulation.Emulated,
       interpolation,
       changeDetection: metaObj.has("changeDetection") ? parseChangeDetectionStrategy(metaObj.getValue("changeDetection")) : ChangeDetectionStrategy.Default,
@@ -641,7 +651,8 @@ ${errors}`);
       relativeContextFilePath: this.sourceUrl,
       relativeTemplatePath: null,
       i18nUseExternalIds: false,
-      declarations
+      declarations,
+      hasDirectiveDependencies: !baseMeta.isStandalone || hasDirectiveDependencies
     };
   }
   getTemplateInfo(templateNode, isInline) {
@@ -1155,4 +1166,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-KAEL53F2.js.map
+//# sourceMappingURL=chunk-FPHHL4UV.js.map

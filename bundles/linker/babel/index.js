@@ -8,13 +8,13 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-KAEL53F2.js";
+} from "../../chunk-FPHHL4UV.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "../../chunk-SEKYV57I.js";
 import "../../chunk-PML5JK7B.js";
-import "../../chunk-NA65Q4MT.js";
+import "../../chunk-6ECVYRSU.js";
 import {
   NodeJSFileSystem
 } from "../../chunk-3NKMA2JO.js";
@@ -37,9 +37,9 @@ var BabelAstFactory = class {
     }
   }
   createArrayLiteral = t.arrayExpression;
-  createAssignment(target, value) {
+  createAssignment(target, operator, value) {
     assert(target, isLExpression, "must be a left hand side expression");
-    return t.assignmentExpression("=", target, value);
+    return t.assignmentExpression(operator, target, value);
   }
   createBinaryExpression(leftOperand, operator, rightOperand) {
     switch (operator) {
@@ -47,6 +47,17 @@ var BabelAstFactory = class {
       case "||":
       case "??":
         return t.logicalExpression(operator, leftOperand, rightOperand);
+      case "=":
+      case "+=":
+      case "-=":
+      case "*=":
+      case "/=":
+      case "%=":
+      case "**=":
+      case "&&=":
+      case "||=":
+      case "??=":
+        throw new Error(`Unexpected assignment operator ${operator}`);
       default:
         return t.binaryExpression(operator, leftOperand, rightOperand);
     }

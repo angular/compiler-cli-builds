@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-C6FVWC2X.js";
+} from "./chunk-Q36ODROP.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -92,7 +92,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-XALV7M6R.js";
+} from "./chunk-JXMK7BZV.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -3184,7 +3184,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
 ]);
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
-import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead5, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead5, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts22 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   templateTypeChecker;
@@ -3225,7 +3225,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
     this.diagnostics = diagnostics;
   }
   visitBinary(ast, context) {
-    if (ast.operation === "=" && ast.left instanceof PropertyRead5) {
+    if (Binary3.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead5) {
       this.checkForIllegalWriteInEventBinding(ast.left, context);
     } else {
       super.visitBinary(ast, context);
@@ -5016,4 +5016,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WKPPF3D3.js.map
+//# sourceMappingURL=chunk-26YUOSY2.js.map

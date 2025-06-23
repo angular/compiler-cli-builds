@@ -16,7 +16,7 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     constructor(annotateForClosureCompiler: boolean);
     attachComments: typeof attachComments;
     createArrayLiteral: (elements?: readonly ts.Expression[], multiLine?: boolean) => ts.ArrayLiteralExpression;
-    createAssignment(target: ts.Expression, value: ts.Expression): ts.Expression;
+    createAssignment(target: ts.Expression, operator: BinaryOperator, value: ts.Expression): ts.Expression;
     createBinaryExpression(leftOperand: ts.Expression, operator: BinaryOperator, rightOperand: ts.Expression): ts.Expression;
     createBlock(body: ts.Statement[]): ts.Statement;
     createCallExpression(callee: ts.Expression, args: ts.Expression[], pure: boolean): ts.Expression;

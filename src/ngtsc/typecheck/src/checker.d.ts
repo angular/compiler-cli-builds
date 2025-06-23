@@ -16,7 +16,7 @@ import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { ElementSymbol, FullSourceMapping, GetPotentialAngularMetaOptions, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, TcbLocation, TemplateSymbol, TemplateTypeChecker, TsCompletionEntryInfo, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { ElementSymbol, FullSourceMapping, GetPotentialAngularMetaOptions, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialDirectiveModuleSpecifierResolver, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, TcbLocation, TemplateSymbol, TemplateTypeChecker, TsCompletionEntryInfo, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { DirectiveSourceManager } from './source';
 /**
@@ -134,6 +134,10 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getDirectiveScopeData(component: ts.ClassDeclaration, isInScope: boolean, tsCompletionEntryInfo: TsCompletionEntryInfo | null): PotentialDirective | null;
     getElementsInFileScope(component: ts.ClassDeclaration): Map<string, PotentialDirective | null>;
     getElementsInGlobal(component: ts.ClassDeclaration, tsLs: ts.LanguageService, options: GetPotentialAngularMetaOptions): PotentialDirective[];
+    /**
+     * If the NgModule exports a new module, we need to recursively get its directives.
+     */
+    private getDirectiveDeclsForNgModule;
     getPotentialElementTags(component: ts.ClassDeclaration, tsLs: ts.LanguageService, options: GetPotentialAngularMetaOptions): Map<string, PotentialDirective | null>;
     getPotentialDomBindings(tagName: string): {
         attribute: string;
@@ -143,7 +147,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getPrimaryAngularDecorator(target: ts.ClassDeclaration): ts.Decorator | null;
     getOwningNgModule(component: ts.ClassDeclaration): ts.ClassDeclaration | null;
     private emit;
-    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inContext: ts.Node, importMode: PotentialImportMode): ReadonlyArray<PotentialImport>;
+    getPotentialImportsFor(toImport: Reference<ClassDeclaration>, inContext: ts.Node, importMode: PotentialImportMode, potentialDirectiveModuleSpecifierResolver?: PotentialDirectiveModuleSpecifierResolver): ReadonlyArray<PotentialImport>;
     private getComponentScope;
     private getScopeData;
     private scopeDataOfDirectiveMeta;
