@@ -7601,6 +7601,9 @@ function validateAccessOfInitializerApiMember({ api, call }, member) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/directive/src/initializer_functions.js
 import ts39 from "typescript";
 function tryParseInitializerApi(functions, expression, reflector, importTracker) {
+  if (ts39.isAsExpression(expression) || ts39.isParenthesizedExpression(expression)) {
+    return tryParseInitializerApi(functions, expression.expression, reflector, importTracker);
+  }
   if (!ts39.isCallExpression(expression)) {
     return null;
   }
@@ -19409,4 +19412,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PSMM5HLJ.js.map
+//# sourceMappingURL=chunk-SILQIVD4.js.map

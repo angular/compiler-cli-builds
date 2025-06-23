@@ -28,7 +28,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-HQO56IC4.js";
+} from "./chunk-ZWSVOOGU.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -37,12 +37,12 @@ import {
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   constructorParametersDownlevelTransform
-} from "./chunk-WKTHPODG.js";
+} from "./chunk-M7MXAQMK.js";
 import {
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-QUS2WFTU.js";
+} from "./chunk-7FGS2TFN.js";
 import {
   ActivePerfRecorder,
   ErrorCode,
@@ -51,7 +51,7 @@ import {
   TsCreateProgramDriver,
   isLocalCompilationDiagnostics,
   ngErrorCode
-} from "./chunk-PSMM5HLJ.js";
+} from "./chunk-SILQIVD4.js";
 import "./chunk-LMRFLQ2K.js";
 import {
   InvalidFileSystem,
@@ -82,7 +82,7 @@ import "./chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.0.4+sha-e909287");
+var VERSION = new Version("20.0.4+sha-3eb5a79");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.js
 var NgTscPlugin = class {
