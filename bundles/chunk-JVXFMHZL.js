@@ -5129,11 +5129,12 @@ var PerfPhase;
   PerfPhase2[PerfPhase2["LsComponentLocations"] = 22] = "LsComponentLocations";
   PerfPhase2[PerfPhase2["LsSignatureHelp"] = 23] = "LsSignatureHelp";
   PerfPhase2[PerfPhase2["OutliningSpans"] = 24] = "OutliningSpans";
-  PerfPhase2[PerfPhase2["LAST"] = 25] = "LAST";
-  PerfPhase2[PerfPhase2["LsCodeFixes"] = 26] = "LsCodeFixes";
-  PerfPhase2[PerfPhase2["LsCodeFixesAll"] = 27] = "LsCodeFixesAll";
-  PerfPhase2[PerfPhase2["LSComputeApplicableRefactorings"] = 28] = "LSComputeApplicableRefactorings";
-  PerfPhase2[PerfPhase2["LSApplyRefactoring"] = 29] = "LSApplyRefactoring";
+  PerfPhase2[PerfPhase2["LsCodeFixes"] = 25] = "LsCodeFixes";
+  PerfPhase2[PerfPhase2["LsCodeFixesAll"] = 26] = "LsCodeFixesAll";
+  PerfPhase2[PerfPhase2["LSComputeApplicableRefactorings"] = 27] = "LSComputeApplicableRefactorings";
+  PerfPhase2[PerfPhase2["LSApplyRefactoring"] = 28] = "LSApplyRefactoring";
+  PerfPhase2[PerfPhase2["LSSemanticClassification"] = 29] = "LSSemanticClassification";
+  PerfPhase2[PerfPhase2["LAST"] = 30] = "LAST";
 })(PerfPhase || (PerfPhase = {}));
 var PerfEvent;
 (function(PerfEvent2) {
@@ -20116,4 +20117,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-JXMK7BZV.js.map
+//# sourceMappingURL=chunk-JVXFMHZL.js.map

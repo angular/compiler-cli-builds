@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-Q36ODROP.js";
+} from "./chunk-J27XEXWK.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -92,7 +92,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-JXMK7BZV.js";
+} from "./chunk-JVXFMHZL.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -5016,4 +5016,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-26YUOSY2.js.map
+//# sourceMappingURL=chunk-M6L5FWG4.js.map

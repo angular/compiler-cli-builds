@@ -129,25 +129,29 @@ export declare enum PerfPhase {
      */
     OutliningSpans = 24,
     /**
-     * Tracks the number of `PerfPhase`s, and must appear at the end of the list.
-     */
-    LAST = 25,
-    /**
      * Time spent by the Angular Language Service calculating code fixes.
      */
-    LsCodeFixes = 26,
+    LsCodeFixes = 25,
     /**
      * Time spent by the Angular Language Service to fix all detected same type errors.
      */
-    LsCodeFixesAll = 27,
+    LsCodeFixesAll = 26,
     /**
      * Time spent computing possible Angular refactorings.
      */
-    LSComputeApplicableRefactorings = 28,
+    LSComputeApplicableRefactorings = 27,
     /**
      * Time spent computing changes for applying a given refactoring.
      */
-    LSApplyRefactoring = 29
+    LSApplyRefactoring = 28,
+    /**
+     * Time spent by the Angular Language Service calculating semantic classifications.
+     */
+    LSSemanticClassification = 29,
+    /**
+     * Tracks the number of `PerfPhase`s, and must appear at the end of the list.
+     */
+    LAST = 30
 }
 /**
  * Represents some occurrence during compilation, and is tracked with a counter.
