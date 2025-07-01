@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-J27XEXWK.js";
+} from "./chunk-SC5ESQGY.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -92,7 +92,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-JVXFMHZL.js";
+} from "./chunk-IRC3OLFO.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -2590,7 +2590,7 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
         return [];
       }
       const nodeAst = isPropertyReadNodeAst(node);
-      if ((node.type === BindingType.Property || node.type === BindingType.Class || node.type === BindingType.Style || node.type === BindingType.Attribute || node.type === BindingType.Animation) && nodeAst) {
+      if ((node.type === BindingType.Property || node.type === BindingType.Class || node.type === BindingType.Style || node.type === BindingType.Attribute || node.type === BindingType.LegacyAnimation) && nodeAst) {
         return buildDiagnosticForSignal(ctx, nodeAst, component);
       }
     }
@@ -2950,7 +2950,7 @@ var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor
   visitNode(ctx, component, node) {
     if (!(node instanceof TmplAstBoundEvent2))
       return [];
-    if (node.type !== ParsedEventType.Regular && node.type !== ParsedEventType.Animation)
+    if (node.type !== ParsedEventType.Regular && node.type !== ParsedEventType.LegacyAnimation)
       return [];
     if (!(node.handler instanceof ASTWithSource3))
       return [];
@@ -5016,4 +5016,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-M6L5FWG4.js.map
+//# sourceMappingURL=chunk-45WGF6MF.js.map

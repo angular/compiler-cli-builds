@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AnimationTriggerNames, DeclarationListEmitMode, DeferBlockDepsEmitMode, R3ClassDebugInfo, R3ClassMetadata, R3ComponentMetadata, R3DeferPerBlockDependency, R3DeferPerComponentDependency, R3TemplateDependencyMetadata, SchemaMetadata, TmplAstDeferredBlock } from '@angular/compiler';
+import { LegacyAnimationTriggerNames, DeclarationListEmitMode, DeferBlockDepsEmitMode, R3ClassDebugInfo, R3ClassMetadata, R3ComponentMetadata, R3DeferPerBlockDependency, R3DeferPerComponentDependency, R3TemplateDependencyMetadata, SchemaMetadata, TmplAstDeferredBlock } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../../imports';
 import { ClassPropertyMapping, DirectiveResources, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping } from '../../../metadata';
@@ -54,7 +54,7 @@ export interface ComponentAnalysisData {
      */
     inlineStyles: string[] | null;
     isPoisoned: boolean;
-    animationTriggerNames: AnimationTriggerNames | null;
+    legacyAnimationTriggerNames: LegacyAnimationTriggerNames | null;
     rawImports: ts.Expression | null;
     resolvedImports: Reference<ClassDeclaration>[] | null;
     rawDeferredImports: ts.Expression | null;

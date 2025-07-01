@@ -11436,8 +11436,8 @@ function createNodeFromListenerDecorator(decorator, parser, listeners) {
   let phase;
   let target;
   if (eventNameNode.text.startsWith("@")) {
-    const parsedName = parser.parseAnimationEventName(eventNameNode.text);
-    type = ParsedEventType.Animation;
+    const parsedName = parser.parseLegacyAnimationEventName(eventNameNode.text);
+    type = ParsedEventType.LegacyAnimation;
     eventName = parsedName.eventName;
     phase = parsedName.phase;
     target = null;
@@ -11468,7 +11468,7 @@ function inferBoundAttribute(name) {
     type = BindingType.Style;
   } else if (name.startsWith(animationPrefix)) {
     attrName = name.slice(animationPrefix.length);
-    type = BindingType.Animation;
+    type = BindingType.LegacyAnimation;
   } else {
     attrName = name;
     type = BindingType.Property;
@@ -13313,7 +13313,7 @@ var TcbDirectiveOutputsOp = class extends TcbOp {
     let dirId = null;
     const outputs = this.dir.outputs;
     for (const output of this.node.outputs) {
-      if (output.type === ParsedEventType2.Animation || !outputs.hasBindingPropertyName(output.name)) {
+      if (output.type === ParsedEventType2.LegacyAnimation || !outputs.hasBindingPropertyName(output.name)) {
         continue;
       }
       if (this.tcb.env.config.checkTypeOfOutputEvents && output.name.endsWith("Change")) {
@@ -13374,7 +13374,7 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
           continue;
         }
       }
-      if (output.type === ParsedEventType2.Animation) {
+      if (output.type === ParsedEventType2.LegacyAnimation) {
         const eventType = this.tcb.env.config.checkTypeOfAnimationEvents ? this.tcb.env.referenceExternalType("@angular/animations", "AnimationEvent") : 1;
         const handler = tcbCreateEventHandler(output, this.tcb, this.scope, eventType);
         this.scope.addStatement(ts60.factory.createExpressionStatement(handler));
@@ -17907,28 +17907,28 @@ var ComponentSymbol = class extends DirectiveSymbol {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/annotations/component/src/util.js
 import ts69 from "typescript";
-function collectAnimationNames(value, animationTriggerNames) {
+function collectLegacyAnimationNames(value, legacyAnimationTriggerNames) {
   if (value instanceof Map) {
     const name = value.get("name");
     if (typeof name === "string") {
-      animationTriggerNames.staticTriggerNames.push(name);
+      legacyAnimationTriggerNames.staticTriggerNames.push(name);
     } else {
-      animationTriggerNames.includesDynamicAnimations = true;
+      legacyAnimationTriggerNames.includesDynamicAnimations = true;
     }
   } else if (Array.isArray(value)) {
     for (const resolvedValue of value) {
-      collectAnimationNames(resolvedValue, animationTriggerNames);
+      collectLegacyAnimationNames(resolvedValue, legacyAnimationTriggerNames);
     }
   } else {
-    animationTriggerNames.includesDynamicAnimations = true;
+    legacyAnimationTriggerNames.includesDynamicAnimations = true;
   }
 }
-function isAngularAnimationsReference(reference, symbolName) {
+function isLegacyAngularAnimationsReference(reference, symbolName) {
   return reference.ownedByModuleGuess === "@angular/animations" && reference.debugName === symbolName;
 }
-var animationTriggerResolver = (fn, node, resolve2, unresolvable) => {
+var legacyAnimationTriggerResolver = (fn, node, resolve2, unresolvable) => {
   const animationTriggerMethodName = "trigger";
-  if (!isAngularAnimationsReference(fn, animationTriggerMethodName)) {
+  if (!isLegacyAngularAnimationsReference(fn, animationTriggerMethodName)) {
     return unresolvable;
   }
   const triggerNameExpression = node.arguments[0];
@@ -18516,13 +18516,13 @@ var ComponentDecoratorHandler = class {
       changeDetection = new o5.WrappedNodeExpr(component.get("changeDetection"));
     }
     let animations = null;
-    let animationTriggerNames = null;
+    let legacyAnimationTriggerNames = null;
     if (component.has("animations")) {
       const animationExpression = component.get("animations");
       animations = new o5.WrappedNodeExpr(animationExpression);
-      const animationsValue = this.evaluator.evaluate(animationExpression, animationTriggerResolver);
-      animationTriggerNames = { includesDynamicAnimations: false, staticTriggerNames: [] };
-      collectAnimationNames(animationsValue, animationTriggerNames);
+      const animationsValue = this.evaluator.evaluate(animationExpression, legacyAnimationTriggerResolver);
+      legacyAnimationTriggerNames = { includesDynamicAnimations: false, staticTriggerNames: [] };
+      collectLegacyAnimationNames(animationsValue, legacyAnimationTriggerNames);
     }
     const relativeContextFilePath = this.rootDirs.reduce((previous, rootDir) => {
       const candidate = relative(absoluteFrom(rootDir), absoluteFrom(containingFile));
@@ -18788,7 +18788,7 @@ var ComponentDecoratorHandler = class {
           hostBindings: hostBindingResources
         },
         isPoisoned,
-        animationTriggerNames,
+        legacyAnimationTriggerNames,
         rawImports,
         resolvedImports,
         rawDeferredImports,
@@ -18830,7 +18830,7 @@ var ComponentDecoratorHandler = class {
       imports: analysis.resolvedImports,
       rawImports: analysis.rawImports,
       deferredImports: analysis.resolvedDeferredImports,
-      animationTriggerNames: analysis.animationTriggerNames,
+      animationTriggerNames: analysis.legacyAnimationTriggerNames,
       schemas: analysis.schemas,
       decorator: analysis.decorator,
       assumedToExportProviders: false,
@@ -20117,4 +20117,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-JVXFMHZL.js.map
+//# sourceMappingURL=chunk-IRC3OLFO.js.map
