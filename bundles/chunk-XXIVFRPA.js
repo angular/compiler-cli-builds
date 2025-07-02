@@ -2375,40 +2375,40 @@ function literalBinaryOp(op) {
 function referenceBinaryOp(op) {
   return { op, literal: false };
 }
-var BINARY_OPERATORS = /* @__PURE__ */ new Map([
-  [ts13.SyntaxKind.PlusToken, literalBinaryOp((a, b) => a + b)],
-  [ts13.SyntaxKind.MinusToken, literalBinaryOp((a, b) => a - b)],
-  [ts13.SyntaxKind.AsteriskToken, literalBinaryOp((a, b) => a * b)],
-  [ts13.SyntaxKind.SlashToken, literalBinaryOp((a, b) => a / b)],
-  [ts13.SyntaxKind.PercentToken, literalBinaryOp((a, b) => a % b)],
-  [ts13.SyntaxKind.AmpersandToken, literalBinaryOp((a, b) => a & b)],
-  [ts13.SyntaxKind.BarToken, literalBinaryOp((a, b) => a | b)],
-  [ts13.SyntaxKind.CaretToken, literalBinaryOp((a, b) => a ^ b)],
-  [ts13.SyntaxKind.LessThanToken, literalBinaryOp((a, b) => a < b)],
-  [ts13.SyntaxKind.LessThanEqualsToken, literalBinaryOp((a, b) => a <= b)],
-  [ts13.SyntaxKind.GreaterThanToken, literalBinaryOp((a, b) => a > b)],
-  [ts13.SyntaxKind.GreaterThanEqualsToken, literalBinaryOp((a, b) => a >= b)],
-  [ts13.SyntaxKind.EqualsEqualsToken, literalBinaryOp((a, b) => a == b)],
-  [ts13.SyntaxKind.EqualsEqualsEqualsToken, literalBinaryOp((a, b) => a === b)],
-  [ts13.SyntaxKind.ExclamationEqualsToken, literalBinaryOp((a, b) => a != b)],
-  [ts13.SyntaxKind.ExclamationEqualsEqualsToken, literalBinaryOp((a, b) => a !== b)],
-  [ts13.SyntaxKind.LessThanLessThanToken, literalBinaryOp((a, b) => a << b)],
-  [ts13.SyntaxKind.GreaterThanGreaterThanToken, literalBinaryOp((a, b) => a >> b)],
-  [ts13.SyntaxKind.GreaterThanGreaterThanGreaterThanToken, literalBinaryOp((a, b) => a >>> b)],
-  [ts13.SyntaxKind.AsteriskAsteriskToken, literalBinaryOp((a, b) => Math.pow(a, b))],
-  [ts13.SyntaxKind.AmpersandAmpersandToken, referenceBinaryOp((a, b) => a && b)],
-  [ts13.SyntaxKind.BarBarToken, referenceBinaryOp((a, b) => a || b)]
-]);
-var UNARY_OPERATORS = /* @__PURE__ */ new Map([
-  [ts13.SyntaxKind.TildeToken, (a) => ~a],
-  [ts13.SyntaxKind.MinusToken, (a) => -a],
-  [ts13.SyntaxKind.PlusToken, (a) => +a],
-  [ts13.SyntaxKind.ExclamationToken, (a) => !a]
-]);
 var StaticInterpreter = class {
   host;
   checker;
   dependencyTracker;
+  BINARY_OPERATORS = /* @__PURE__ */ new Map([
+    [ts13.SyntaxKind.PlusToken, literalBinaryOp((a, b) => a + b)],
+    [ts13.SyntaxKind.MinusToken, literalBinaryOp((a, b) => a - b)],
+    [ts13.SyntaxKind.AsteriskToken, literalBinaryOp((a, b) => a * b)],
+    [ts13.SyntaxKind.SlashToken, literalBinaryOp((a, b) => a / b)],
+    [ts13.SyntaxKind.PercentToken, literalBinaryOp((a, b) => a % b)],
+    [ts13.SyntaxKind.AmpersandToken, literalBinaryOp((a, b) => a & b)],
+    [ts13.SyntaxKind.BarToken, literalBinaryOp((a, b) => a | b)],
+    [ts13.SyntaxKind.CaretToken, literalBinaryOp((a, b) => a ^ b)],
+    [ts13.SyntaxKind.LessThanToken, literalBinaryOp((a, b) => a < b)],
+    [ts13.SyntaxKind.LessThanEqualsToken, literalBinaryOp((a, b) => a <= b)],
+    [ts13.SyntaxKind.GreaterThanToken, literalBinaryOp((a, b) => a > b)],
+    [ts13.SyntaxKind.GreaterThanEqualsToken, literalBinaryOp((a, b) => a >= b)],
+    [ts13.SyntaxKind.EqualsEqualsToken, literalBinaryOp((a, b) => a == b)],
+    [ts13.SyntaxKind.EqualsEqualsEqualsToken, literalBinaryOp((a, b) => a === b)],
+    [ts13.SyntaxKind.ExclamationEqualsToken, literalBinaryOp((a, b) => a != b)],
+    [ts13.SyntaxKind.ExclamationEqualsEqualsToken, literalBinaryOp((a, b) => a !== b)],
+    [ts13.SyntaxKind.LessThanLessThanToken, literalBinaryOp((a, b) => a << b)],
+    [ts13.SyntaxKind.GreaterThanGreaterThanToken, literalBinaryOp((a, b) => a >> b)],
+    [ts13.SyntaxKind.GreaterThanGreaterThanGreaterThanToken, literalBinaryOp((a, b) => a >>> b)],
+    [ts13.SyntaxKind.AsteriskAsteriskToken, literalBinaryOp((a, b) => Math.pow(a, b))],
+    [ts13.SyntaxKind.AmpersandAmpersandToken, referenceBinaryOp((a, b) => a && b)],
+    [ts13.SyntaxKind.BarBarToken, referenceBinaryOp((a, b) => a || b)]
+  ]);
+  UNARY_OPERATORS = /* @__PURE__ */ new Map([
+    [ts13.SyntaxKind.TildeToken, (a) => ~a],
+    [ts13.SyntaxKind.MinusToken, (a) => -a],
+    [ts13.SyntaxKind.PlusToken, (a) => +a],
+    [ts13.SyntaxKind.ExclamationToken, (a) => !a]
+  ]);
   constructor(host, checker, dependencyTracker) {
     this.host = host;
     this.checker = checker;
@@ -2764,10 +2764,10 @@ var StaticInterpreter = class {
   }
   visitPrefixUnaryExpression(node, context) {
     const operatorKind = node.operator;
-    if (!UNARY_OPERATORS.has(operatorKind)) {
+    if (!this.UNARY_OPERATORS.has(operatorKind)) {
       return DynamicValue.fromUnsupportedSyntax(node);
     }
-    const op = UNARY_OPERATORS.get(operatorKind);
+    const op = this.UNARY_OPERATORS.get(operatorKind);
     const value = this.visitExpression(node.operand, context);
     if (value instanceof DynamicValue) {
       return DynamicValue.fromDynamicInput(node, value);
@@ -2777,10 +2777,10 @@ var StaticInterpreter = class {
   }
   visitBinaryExpression(node, context) {
     const tokenKind = node.operatorToken.kind;
-    if (!BINARY_OPERATORS.has(tokenKind)) {
+    if (!this.BINARY_OPERATORS.has(tokenKind)) {
       return DynamicValue.fromUnsupportedSyntax(node);
     }
-    const opRecord = BINARY_OPERATORS.get(tokenKind);
+    const opRecord = this.BINARY_OPERATORS.get(tokenKind);
     let lhs, rhs;
     if (opRecord.literal) {
       lhs = literal(this.visitExpression(node.left, context), (value) => DynamicValue.fromInvalidExpressionType(node.left, value));
@@ -3828,61 +3828,61 @@ var PureAnnotation;
   PureAnnotation2["CLOSURE"] = "* @pureOrBreakMyCode ";
   PureAnnotation2["TERSER"] = "@__PURE__";
 })(PureAnnotation || (PureAnnotation = {}));
-var UNARY_OPERATORS2 = /* @__PURE__ */ (() => ({
-  "+": ts23.SyntaxKind.PlusToken,
-  "-": ts23.SyntaxKind.MinusToken,
-  "!": ts23.SyntaxKind.ExclamationToken
-}))();
-var BINARY_OPERATORS2 = /* @__PURE__ */ (() => ({
-  "&&": ts23.SyntaxKind.AmpersandAmpersandToken,
-  ">": ts23.SyntaxKind.GreaterThanToken,
-  ">=": ts23.SyntaxKind.GreaterThanEqualsToken,
-  "&": ts23.SyntaxKind.AmpersandToken,
-  "|": ts23.SyntaxKind.BarToken,
-  "/": ts23.SyntaxKind.SlashToken,
-  "==": ts23.SyntaxKind.EqualsEqualsToken,
-  "===": ts23.SyntaxKind.EqualsEqualsEqualsToken,
-  "<": ts23.SyntaxKind.LessThanToken,
-  "<=": ts23.SyntaxKind.LessThanEqualsToken,
-  "-": ts23.SyntaxKind.MinusToken,
-  "%": ts23.SyntaxKind.PercentToken,
-  "*": ts23.SyntaxKind.AsteriskToken,
-  "**": ts23.SyntaxKind.AsteriskAsteriskToken,
-  "!=": ts23.SyntaxKind.ExclamationEqualsToken,
-  "!==": ts23.SyntaxKind.ExclamationEqualsEqualsToken,
-  "||": ts23.SyntaxKind.BarBarToken,
-  "+": ts23.SyntaxKind.PlusToken,
-  "??": ts23.SyntaxKind.QuestionQuestionToken,
-  "in": ts23.SyntaxKind.InKeyword,
-  "=": ts23.SyntaxKind.EqualsToken,
-  "+=": ts23.SyntaxKind.PlusEqualsToken,
-  "-=": ts23.SyntaxKind.MinusEqualsToken,
-  "*=": ts23.SyntaxKind.AsteriskEqualsToken,
-  "/=": ts23.SyntaxKind.SlashEqualsToken,
-  "%=": ts23.SyntaxKind.PercentEqualsToken,
-  "**=": ts23.SyntaxKind.AsteriskAsteriskEqualsToken,
-  "&&=": ts23.SyntaxKind.AmpersandAmpersandEqualsToken,
-  "||=": ts23.SyntaxKind.BarBarEqualsToken,
-  "??=": ts23.SyntaxKind.QuestionQuestionEqualsToken
-}))();
-var VAR_TYPES = /* @__PURE__ */ (() => ({
-  "const": ts23.NodeFlags.Const,
-  "let": ts23.NodeFlags.Let,
-  "var": ts23.NodeFlags.None
-}))();
 var TypeScriptAstFactory = class {
   annotateForClosureCompiler;
   externalSourceFiles = /* @__PURE__ */ new Map();
+  UNARY_OPERATORS = /* @__PURE__ */ (() => ({
+    "+": ts23.SyntaxKind.PlusToken,
+    "-": ts23.SyntaxKind.MinusToken,
+    "!": ts23.SyntaxKind.ExclamationToken
+  }))();
+  BINARY_OPERATORS = /* @__PURE__ */ (() => ({
+    "&&": ts23.SyntaxKind.AmpersandAmpersandToken,
+    ">": ts23.SyntaxKind.GreaterThanToken,
+    ">=": ts23.SyntaxKind.GreaterThanEqualsToken,
+    "&": ts23.SyntaxKind.AmpersandToken,
+    "|": ts23.SyntaxKind.BarToken,
+    "/": ts23.SyntaxKind.SlashToken,
+    "==": ts23.SyntaxKind.EqualsEqualsToken,
+    "===": ts23.SyntaxKind.EqualsEqualsEqualsToken,
+    "<": ts23.SyntaxKind.LessThanToken,
+    "<=": ts23.SyntaxKind.LessThanEqualsToken,
+    "-": ts23.SyntaxKind.MinusToken,
+    "%": ts23.SyntaxKind.PercentToken,
+    "*": ts23.SyntaxKind.AsteriskToken,
+    "**": ts23.SyntaxKind.AsteriskAsteriskToken,
+    "!=": ts23.SyntaxKind.ExclamationEqualsToken,
+    "!==": ts23.SyntaxKind.ExclamationEqualsEqualsToken,
+    "||": ts23.SyntaxKind.BarBarToken,
+    "+": ts23.SyntaxKind.PlusToken,
+    "??": ts23.SyntaxKind.QuestionQuestionToken,
+    "in": ts23.SyntaxKind.InKeyword,
+    "=": ts23.SyntaxKind.EqualsToken,
+    "+=": ts23.SyntaxKind.PlusEqualsToken,
+    "-=": ts23.SyntaxKind.MinusEqualsToken,
+    "*=": ts23.SyntaxKind.AsteriskEqualsToken,
+    "/=": ts23.SyntaxKind.SlashEqualsToken,
+    "%=": ts23.SyntaxKind.PercentEqualsToken,
+    "**=": ts23.SyntaxKind.AsteriskAsteriskEqualsToken,
+    "&&=": ts23.SyntaxKind.AmpersandAmpersandEqualsToken,
+    "||=": ts23.SyntaxKind.BarBarEqualsToken,
+    "??=": ts23.SyntaxKind.QuestionQuestionEqualsToken
+  }))();
+  VAR_TYPES = /* @__PURE__ */ (() => ({
+    "const": ts23.NodeFlags.Const,
+    "let": ts23.NodeFlags.Let,
+    "var": ts23.NodeFlags.None
+  }))();
   constructor(annotateForClosureCompiler) {
     this.annotateForClosureCompiler = annotateForClosureCompiler;
   }
   attachComments = attachComments;
   createArrayLiteral = ts23.factory.createArrayLiteralExpression;
   createAssignment(target, operator, value) {
-    return ts23.factory.createBinaryExpression(target, BINARY_OPERATORS2[operator], value);
+    return ts23.factory.createBinaryExpression(target, this.BINARY_OPERATORS[operator], value);
   }
   createBinaryExpression(leftOperand, operator, rightOperand) {
-    return ts23.factory.createBinaryExpression(leftOperand, BINARY_OPERATORS2[operator], rightOperand);
+    return ts23.factory.createBinaryExpression(leftOperand, this.BINARY_OPERATORS[operator], rightOperand);
   }
   createBlock(body) {
     return ts23.factory.createBlock(body);
@@ -3994,12 +3994,12 @@ var TypeScriptAstFactory = class {
   createTypeOfExpression = ts23.factory.createTypeOfExpression;
   createVoidExpression = ts23.factory.createVoidExpression;
   createUnaryExpression(operator, operand) {
-    return ts23.factory.createPrefixUnaryExpression(UNARY_OPERATORS2[operator], operand);
+    return ts23.factory.createPrefixUnaryExpression(this.UNARY_OPERATORS[operator], operand);
   }
   createVariableDeclaration(variableName, initializer, type) {
     return ts23.factory.createVariableStatement(void 0, ts23.factory.createVariableDeclarationList([
       ts23.factory.createVariableDeclaration(variableName, void 0, void 0, initializer ?? void 0)
-    ], VAR_TYPES[type]));
+    ], this.VAR_TYPES[type]));
   }
   setSourceMapRange(node, sourceMapRange) {
     if (sourceMapRange === null) {
@@ -11117,23 +11117,26 @@ var ReferenceEmitEnvironment = class {
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.js
 import ts50 from "typescript";
-var SAFE_TO_CAST_WITHOUT_PARENS = /* @__PURE__ */ new Set([
-  ts50.SyntaxKind.ParenthesizedExpression,
-  ts50.SyntaxKind.Identifier,
-  ts50.SyntaxKind.CallExpression,
-  ts50.SyntaxKind.NonNullExpression,
-  ts50.SyntaxKind.ElementAccessExpression,
-  ts50.SyntaxKind.PropertyAccessExpression,
-  ts50.SyntaxKind.ArrayLiteralExpression,
-  ts50.SyntaxKind.ObjectLiteralExpression,
-  ts50.SyntaxKind.StringLiteral,
-  ts50.SyntaxKind.NumericLiteral,
-  ts50.SyntaxKind.TrueKeyword,
-  ts50.SyntaxKind.FalseKeyword,
-  ts50.SyntaxKind.NullKeyword,
-  ts50.SyntaxKind.UndefinedKeyword
-]);
+var SAFE_TO_CAST_WITHOUT_PARENS = null;
 function tsCastToAny(expr) {
+  if (SAFE_TO_CAST_WITHOUT_PARENS === null) {
+    SAFE_TO_CAST_WITHOUT_PARENS = /* @__PURE__ */ new Set([
+      ts50.SyntaxKind.ParenthesizedExpression,
+      ts50.SyntaxKind.Identifier,
+      ts50.SyntaxKind.CallExpression,
+      ts50.SyntaxKind.NonNullExpression,
+      ts50.SyntaxKind.ElementAccessExpression,
+      ts50.SyntaxKind.PropertyAccessExpression,
+      ts50.SyntaxKind.ArrayLiteralExpression,
+      ts50.SyntaxKind.ObjectLiteralExpression,
+      ts50.SyntaxKind.StringLiteral,
+      ts50.SyntaxKind.NumericLiteral,
+      ts50.SyntaxKind.TrueKeyword,
+      ts50.SyntaxKind.FalseKeyword,
+      ts50.SyntaxKind.NullKeyword,
+      ts50.SyntaxKind.UndefinedKeyword
+    ]);
+  }
   if (!SAFE_TO_CAST_WITHOUT_PARENS.has(expr.kind)) {
     expr = ts50.factory.createParenthesizedExpression(expr);
   }
@@ -12169,45 +12172,9 @@ function translateDiagnostic(diagnostic, resolver) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/expression.js
 import { ASTWithSource, Call as Call2, EmptyExpr as EmptyExpr2, PropertyRead as PropertyRead3, SafeKeyedRead, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
 import ts59 from "typescript";
-var ANY_EXPRESSION = ts59.factory.createAsExpression(ts59.factory.createNumericLiteral("0"), ts59.factory.createKeywordTypeNode(ts59.SyntaxKind.AnyKeyword));
-var UNDEFINED = ts59.factory.createIdentifier("undefined");
-var UNARY_OPS = /* @__PURE__ */ new Map([
-  ["+", ts59.SyntaxKind.PlusToken],
-  ["-", ts59.SyntaxKind.MinusToken]
-]);
-var BINARY_OPS = /* @__PURE__ */ new Map([
-  ["+", ts59.SyntaxKind.PlusToken],
-  ["-", ts59.SyntaxKind.MinusToken],
-  ["<", ts59.SyntaxKind.LessThanToken],
-  [">", ts59.SyntaxKind.GreaterThanToken],
-  ["<=", ts59.SyntaxKind.LessThanEqualsToken],
-  [">=", ts59.SyntaxKind.GreaterThanEqualsToken],
-  ["=", ts59.SyntaxKind.EqualsToken],
-  ["==", ts59.SyntaxKind.EqualsEqualsToken],
-  ["===", ts59.SyntaxKind.EqualsEqualsEqualsToken],
-  ["*", ts59.SyntaxKind.AsteriskToken],
-  ["**", ts59.SyntaxKind.AsteriskAsteriskToken],
-  ["/", ts59.SyntaxKind.SlashToken],
-  ["%", ts59.SyntaxKind.PercentToken],
-  ["!=", ts59.SyntaxKind.ExclamationEqualsToken],
-  ["!==", ts59.SyntaxKind.ExclamationEqualsEqualsToken],
-  ["||", ts59.SyntaxKind.BarBarToken],
-  ["&&", ts59.SyntaxKind.AmpersandAmpersandToken],
-  ["&", ts59.SyntaxKind.AmpersandToken],
-  ["|", ts59.SyntaxKind.BarToken],
-  ["??", ts59.SyntaxKind.QuestionQuestionToken],
-  ["in", ts59.SyntaxKind.InKeyword],
-  ["=", ts59.SyntaxKind.EqualsToken],
-  ["+=", ts59.SyntaxKind.PlusEqualsToken],
-  ["-=", ts59.SyntaxKind.MinusEqualsToken],
-  ["*=", ts59.SyntaxKind.AsteriskEqualsToken],
-  ["/=", ts59.SyntaxKind.SlashEqualsToken],
-  ["%=", ts59.SyntaxKind.PercentEqualsToken],
-  ["**=", ts59.SyntaxKind.AsteriskAsteriskEqualsToken],
-  ["&&=", ts59.SyntaxKind.AmpersandAmpersandEqualsToken],
-  ["||=", ts59.SyntaxKind.BarBarEqualsToken],
-  ["??=", ts59.SyntaxKind.QuestionQuestionEqualsToken]
-]);
+function getAnyExpression() {
+  return ts59.factory.createAsExpression(ts59.factory.createNumericLiteral("0"), ts59.factory.createKeywordTypeNode(ts59.SyntaxKind.AnyKeyword));
+}
 function astToTypescript(ast, maybeResolve, config) {
   const translator = new AstTranslator(maybeResolve, config);
   return translator.translate(ast);
@@ -12215,6 +12182,44 @@ function astToTypescript(ast, maybeResolve, config) {
 var AstTranslator = class {
   maybeResolve;
   config;
+  UNDEFINED = ts59.factory.createIdentifier("undefined");
+  UNARY_OPS = /* @__PURE__ */ new Map([
+    ["+", ts59.SyntaxKind.PlusToken],
+    ["-", ts59.SyntaxKind.MinusToken]
+  ]);
+  BINARY_OPS = /* @__PURE__ */ new Map([
+    ["+", ts59.SyntaxKind.PlusToken],
+    ["-", ts59.SyntaxKind.MinusToken],
+    ["<", ts59.SyntaxKind.LessThanToken],
+    [">", ts59.SyntaxKind.GreaterThanToken],
+    ["<=", ts59.SyntaxKind.LessThanEqualsToken],
+    [">=", ts59.SyntaxKind.GreaterThanEqualsToken],
+    ["=", ts59.SyntaxKind.EqualsToken],
+    ["==", ts59.SyntaxKind.EqualsEqualsToken],
+    ["===", ts59.SyntaxKind.EqualsEqualsEqualsToken],
+    ["*", ts59.SyntaxKind.AsteriskToken],
+    ["**", ts59.SyntaxKind.AsteriskAsteriskToken],
+    ["/", ts59.SyntaxKind.SlashToken],
+    ["%", ts59.SyntaxKind.PercentToken],
+    ["!=", ts59.SyntaxKind.ExclamationEqualsToken],
+    ["!==", ts59.SyntaxKind.ExclamationEqualsEqualsToken],
+    ["||", ts59.SyntaxKind.BarBarToken],
+    ["&&", ts59.SyntaxKind.AmpersandAmpersandToken],
+    ["&", ts59.SyntaxKind.AmpersandToken],
+    ["|", ts59.SyntaxKind.BarToken],
+    ["??", ts59.SyntaxKind.QuestionQuestionToken],
+    ["in", ts59.SyntaxKind.InKeyword],
+    ["=", ts59.SyntaxKind.EqualsToken],
+    ["+=", ts59.SyntaxKind.PlusEqualsToken],
+    ["-=", ts59.SyntaxKind.MinusEqualsToken],
+    ["*=", ts59.SyntaxKind.AsteriskEqualsToken],
+    ["/=", ts59.SyntaxKind.SlashEqualsToken],
+    ["%=", ts59.SyntaxKind.PercentEqualsToken],
+    ["**=", ts59.SyntaxKind.AsteriskAsteriskEqualsToken],
+    ["&&=", ts59.SyntaxKind.AmpersandAmpersandEqualsToken],
+    ["||=", ts59.SyntaxKind.BarBarEqualsToken],
+    ["??=", ts59.SyntaxKind.QuestionQuestionEqualsToken]
+  ]);
   constructor(maybeResolve, config) {
     this.maybeResolve = maybeResolve;
     this.config = config;
@@ -12236,7 +12241,7 @@ var AstTranslator = class {
   }
   visitUnary(ast) {
     const expr = this.translate(ast.expr);
-    const op = UNARY_OPS.get(ast.operator);
+    const op = this.UNARY_OPS.get(ast.operator);
     if (op === void 0) {
       throw new Error(`Unsupported Unary.operator: ${ast.operator}`);
     }
@@ -12247,7 +12252,7 @@ var AstTranslator = class {
   visitBinary(ast) {
     const lhs = wrapForDiagnostics(this.translate(ast.left));
     const rhs = wrapForDiagnostics(this.translate(ast.right));
-    const op = BINARY_OPS.get(ast.operation);
+    const op = this.BINARY_OPS.get(ast.operation);
     if (op === void 0) {
       throw new Error(`Unsupported Binary.operation: ${ast.operation}`);
     }
@@ -12361,7 +12366,7 @@ var AstTranslator = class {
     if (this.config.strictSafeNavigationTypes) {
       const expr = ts59.factory.createPropertyAccessExpression(ts59.factory.createNonNullExpression(receiver), ast.name);
       addParseSpanInfo(expr, ast.nameSpan);
-      node = ts59.factory.createParenthesizedExpression(ts59.factory.createConditionalExpression(ANY_EXPRESSION, void 0, expr, void 0, UNDEFINED));
+      node = ts59.factory.createParenthesizedExpression(ts59.factory.createConditionalExpression(getAnyExpression(), void 0, expr, void 0, this.UNDEFINED));
     } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
       node = ts59.factory.createPropertyAccessExpression(tsCastToAny(receiver), ast.name);
     } else {
@@ -12379,7 +12384,7 @@ var AstTranslator = class {
     if (this.config.strictSafeNavigationTypes) {
       const expr = ts59.factory.createElementAccessExpression(ts59.factory.createNonNullExpression(receiver), key);
       addParseSpanInfo(expr, ast.sourceSpan);
-      node = ts59.factory.createParenthesizedExpression(ts59.factory.createConditionalExpression(ANY_EXPRESSION, void 0, expr, void 0, UNDEFINED));
+      node = ts59.factory.createParenthesizedExpression(ts59.factory.createConditionalExpression(getAnyExpression(), void 0, expr, void 0, this.UNDEFINED));
     } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
       node = ts59.factory.createElementAccessExpression(tsCastToAny(receiver), key);
     } else {
@@ -12454,7 +12459,7 @@ var AstTranslator = class {
   convertToSafeCall(ast, expr, args) {
     if (this.config.strictSafeNavigationTypes) {
       const call = ts59.factory.createCallExpression(ts59.factory.createNonNullExpression(expr), void 0, args);
-      return ts59.factory.createParenthesizedExpression(ts59.factory.createConditionalExpression(ANY_EXPRESSION, void 0, call, void 0, UNDEFINED));
+      return ts59.factory.createParenthesizedExpression(ts59.factory.createConditionalExpression(getAnyExpression(), void 0, call, void 0, this.UNDEFINED));
     }
     if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
       return ts59.factory.createCallExpression(tsCastToAny(expr), void 0, args);
@@ -12615,7 +12620,7 @@ function renderBlockStatements(env, scope, wrapperExpression) {
 }
 var TcbOp = class {
   circularFallback() {
-    return INFER_TYPE_FOR_CIRCULAR_OP_EXPR;
+    return ts60.factory.createNonNullExpression(ts60.factory.createNull());
   }
 };
 var TcbElementOp = class extends TcbOp {
@@ -12903,7 +12908,7 @@ var TcbInvalidReferenceOp = class extends TcbOp {
   optional = true;
   execute() {
     const id = this.tcb.allocateId();
-    this.scope.addStatement(tsCreateVariable(id, ANY_EXPRESSION));
+    this.scope.addStatement(tsCreateVariable(id, getAnyExpression()));
     return id;
   }
 };
@@ -13611,7 +13616,6 @@ var TcbForOfOp = class extends TcbOp {
     return null;
   }
 };
-var INFER_TYPE_FOR_CIRCULAR_OP_EXPR = ts60.factory.createNonNullExpression(ts60.factory.createNull());
 var Context2 = class {
   env;
   domSchemaChecker;
@@ -13644,7 +13648,7 @@ var Context2 = class {
     return this.pipes.get(name);
   }
 };
-var _Scope = class {
+var Scope = class {
   tcb;
   parent;
   guard;
@@ -13658,13 +13662,23 @@ var _Scope = class {
   varMap = /* @__PURE__ */ new Map();
   letDeclOpMap = /* @__PURE__ */ new Map();
   statements = [];
+  static getForLoopContextVariableTypes() {
+    return /* @__PURE__ */ new Map([
+      ["$first", ts60.SyntaxKind.BooleanKeyword],
+      ["$last", ts60.SyntaxKind.BooleanKeyword],
+      ["$even", ts60.SyntaxKind.BooleanKeyword],
+      ["$odd", ts60.SyntaxKind.BooleanKeyword],
+      ["$index", ts60.SyntaxKind.NumberKeyword],
+      ["$count", ts60.SyntaxKind.NumberKeyword]
+    ]);
+  }
   constructor(tcb, parent = null, guard = null) {
     this.tcb = tcb;
     this.parent = parent;
     this.guard = guard;
   }
   static forNodes(tcb, parentScope, scopedNode, children, guard) {
-    const scope = new _Scope(tcb, parentScope, guard);
+    const scope = new Scope(tcb, parentScope, guard);
     if (parentScope === null && tcb.env.config.enableTemplateTypeChecker) {
       scope.opQueue.push(new TcbComponentContextCompletionOp(scope));
     }
@@ -13688,11 +13702,12 @@ var _Scope = class {
       const loopInitializer = tcb.allocateId();
       addParseSpanInfo(loopInitializer, scopedNode.item.sourceSpan);
       scope.varMap.set(scopedNode.item, loopInitializer);
+      const forLoopContextVariableTypes = Scope.getForLoopContextVariableTypes();
       for (const variable of scopedNode.contextVariables) {
-        if (!this.forLoopContextVariableTypes.has(variable.value)) {
+        if (!forLoopContextVariableTypes.has(variable.value)) {
           throw new Error(`Unrecognized for loop context variable ${variable.name}`);
         }
-        const type = ts60.factory.createKeywordTypeNode(this.forLoopContextVariableTypes.get(variable.value));
+        const type = ts60.factory.createKeywordTypeNode(forLoopContextVariableTypes.get(variable.value));
         this.registerVariable(scope, variable, new TcbBlockImplicitVariableOp(tcb, scope, type, variable));
       }
     } else if (scopedNode instanceof TmplAstHostElement2) {
@@ -13704,10 +13719,10 @@ var _Scope = class {
       }
     }
     for (const variable of scope.varMap.keys()) {
-      _Scope.checkConflictingLet(scope, variable);
+      Scope.checkConflictingLet(scope, variable);
     }
     for (const ref of scope.referenceOpMap.keys()) {
-      _Scope.checkConflictingLet(scope, ref);
+      Scope.checkConflictingLet(scope, ref);
     }
     return scope;
   }
@@ -14152,15 +14167,6 @@ var _Scope = class {
     }
   }
 };
-var Scope = _Scope;
-__publicField(Scope, "forLoopContextVariableTypes", /* @__PURE__ */ new Map([
-  ["$first", ts60.SyntaxKind.BooleanKeyword],
-  ["$last", ts60.SyntaxKind.BooleanKeyword],
-  ["$even", ts60.SyntaxKind.BooleanKeyword],
-  ["$odd", ts60.SyntaxKind.BooleanKeyword],
-  ["$index", ts60.SyntaxKind.NumberKeyword],
-  ["$count", ts60.SyntaxKind.NumberKeyword]
-]));
 function tcbThisParam(name, typeArguments) {
   return ts60.factory.createParameterDeclaration(
     void 0,
@@ -14219,10 +14225,10 @@ var TcbExpressionTranslator = class {
       let pipe;
       if (pipeMeta === null) {
         this.tcb.oobRecorder.missingPipe(this.tcb.id, ast, this.tcb.hostIsStandalone);
-        pipe = ANY_EXPRESSION;
+        pipe = getAnyExpression();
       } else if (pipeMeta.isExplicitlyDeferred && this.tcb.boundTarget.getEagerlyUsedPipes().includes(ast.name)) {
         this.tcb.oobRecorder.deferredPipeUsedEagerly(this.tcb.id, ast);
-        pipe = ANY_EXPRESSION;
+        pipe = getAnyExpression();
       } else {
         pipe = this.tcb.env.pipeInst(pipeMeta.ref);
       }
@@ -14287,7 +14293,7 @@ function tcbCallTypeCtor(dir, tcb, inputs) {
       addParseSpanInfo(assignment, input.sourceSpan);
       return assignment;
     } else {
-      return ts60.factory.createPropertyAssignment(propertyName, ANY_EXPRESSION);
+      return ts60.factory.createPropertyAssignment(propertyName, getAnyExpression());
     }
   });
   return ts60.factory.createCallExpression(
@@ -20117,4 +20123,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-IRC3OLFO.js.map
+//# sourceMappingURL=chunk-XXIVFRPA.js.map
