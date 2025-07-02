@@ -9,7 +9,7 @@ import { AST } from '@angular/compiler';
 import ts from 'typescript';
 import { TypeCheckingConfig } from '../api';
 /**
- * Expression that is cast to any. Currently represented as `0 as any`.
+ * Gets an expression that is cast to any. Currently represented as `0 as any`.
  *
  * Historically this expression was using `null as any`, but a newly-added check in TypeScript 5.6
  * (https://devblogs.microsoft.com/typescript/announcing-typescript-5-6-beta/#disallowed-nullish-and-truthy-checks)
@@ -19,7 +19,7 @@ import { TypeCheckingConfig } from '../api';
  * - Some flavor of function call, like `isNan(0) as any` - requires even more characters than the
  *   NaN option and has the same issue with `noLib`.
  */
-export declare const ANY_EXPRESSION: ts.AsExpression;
+export declare function getAnyExpression(): ts.AsExpression;
 /**
  * Convert an `AST` to TypeScript code directly, without going through an intermediate `Expression`
  * AST.

@@ -10,7 +10,7 @@ import {
 import fs from "fs";
 import { createRequire } from "module";
 import * as p from "path";
-import { fileURLToPath } from "url";
+import * as url from "url";
 var NodeJSPathManipulation = class {
   pwd() {
     return this.normalize(process.cwd());
@@ -48,12 +48,12 @@ var NodeJSPathManipulation = class {
 };
 var isCommonJS = typeof __filename !== "undefined";
 var currentFileUrl = isCommonJS ? null : import.meta.url;
-var currentFileName = isCommonJS ? __filename : fileURLToPath(currentFileUrl);
+var currentFileName = isCommonJS ? __filename : url.fileURLToPath?.(currentFileUrl) ?? null;
 var NodeJSReadonlyFileSystem = class extends NodeJSPathManipulation {
   _caseSensitive = void 0;
   isCaseSensitive() {
     if (this._caseSensitive === void 0) {
-      this._caseSensitive = !fs.existsSync(this.normalize(toggleCase(currentFileName)));
+      this._caseSensitive = currentFileName !== null ? !fs.existsSync(this.normalize(toggleCase(currentFileName))) : true;
     }
     return this._caseSensitive;
   }
@@ -120,4 +120,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-3NKMA2JO.js.map
+//# sourceMappingURL=chunk-5JF7HF3W.js.map

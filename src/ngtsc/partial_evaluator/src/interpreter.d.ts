@@ -18,12 +18,13 @@ type Scope = Map<ts.ParameterDeclaration, ResolvedValue>;
 interface Context {
     originatingFile: ts.SourceFile;
     /**
-     * The module name (if any) which was used to reach the currently resolving symbols.
+     * The module name (if any) which was used to reach the currently resolving
+     * symbols.
      */
     absoluteModuleName: string | null;
     /**
-     * A file name representing the context in which the current `absoluteModuleName`, if any, was
-     * resolved.
+     * A file name representing the context in which the current
+     * `absoluteModuleName`, if any, was resolved.
      */
     resolutionContext: string;
     scope: Scope;
@@ -33,6 +34,8 @@ export declare class StaticInterpreter {
     private host;
     private checker;
     private dependencyTracker;
+    private readonly BINARY_OPERATORS;
+    private readonly UNARY_OPERATORS;
     constructor(host: ReflectionHost, checker: ts.TypeChecker, dependencyTracker: DependencyTracker | null);
     visit(node: ts.Expression, context: Context): ResolvedValue;
     private visitExpression;

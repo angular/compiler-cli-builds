@@ -220,9 +220,9 @@ declare class Scope {
      */
     private statements;
     /**
-     * Names of the for loop context variables and their types.
+     * Gets names of the for loop context variables and their types.
      */
-    private static readonly forLoopContextVariableTypes;
+    private static getForLoopContextVariableTypes;
     private constructor();
     /**
      * Constructs a `Scope` given either a `TmplAstTemplate` or a list of `TmplAstNode`s.

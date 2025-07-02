@@ -13,6 +13,9 @@ import { AstFactory, BinaryOperator, LeadingComment, ObjectLiteralProperty, Sour
 export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts.Expression> {
     private annotateForClosureCompiler;
     private externalSourceFiles;
+    private readonly UNARY_OPERATORS;
+    private readonly BINARY_OPERATORS;
+    private readonly VAR_TYPES;
     constructor(annotateForClosureCompiler: boolean);
     attachComments: typeof attachComments;
     createArrayLiteral: (elements?: readonly ts.Expression[], multiLine?: boolean) => ts.ArrayLiteralExpression;
