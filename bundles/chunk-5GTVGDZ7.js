@@ -757,10 +757,17 @@ function extractLiteralPropertiesAsEnumMembers(declaration) {
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/decorator_extractor.js
 import ts8 from "typescript";
 function extractorDecorator(declaration, typeChecker) {
-  const documentedNode = getDecoratorJsDocNode(declaration);
+  const documentedNode = getDecoratorJsDocNode(declaration, typeChecker);
   const decoratorType = getDecoratorType(declaration);
   if (!decoratorType) {
     throw new Error(`"${declaration.name.getText()} is not a decorator."`);
+  }
+  const members = getDecoratorProperties(declaration, typeChecker);
+  let signatures = [];
+  if (!members) {
+    const decoratorInterface = getDecoratorDeclaration(declaration, typeChecker);
+    const callSignatures = decoratorInterface.members.filter(ts8.isCallSignatureDeclaration);
+    signatures = getDecoratorSignatures(callSignatures, typeChecker);
   }
   return {
     name: declaration.name.getText(),
@@ -769,7 +776,8 @@ function extractorDecorator(declaration, typeChecker) {
     rawComment: extractRawJsDoc(documentedNode),
     description: extractJsDocDescription(documentedNode),
     jsdocTags: extractJsDocTags(documentedNode),
-    members: getDecoratorOptions(declaration, typeChecker)
+    members,
+    signatures
   };
 }
 function isDecoratorDeclaration(declaration) {
@@ -788,41 +796,97 @@ function getDecoratorType(declaration) {
     return DecoratorType.Parameter;
   return void 0;
 }
-function getDecoratorOptions(declaration, typeChecker) {
-  const name = declaration.name.getText();
-  const optionsDeclaration = declaration.getSourceFile().statements.find((node) => {
-    return (ts8.isInterfaceDeclaration(node) || ts8.isTypeAliasDeclaration(node)) && node.name.getText() === name;
-  });
-  if (!optionsDeclaration) {
-    throw new Error(`Decorator "${name}" has no corresponding options interface.`);
-  }
-  let optionsInterface;
-  if (ts8.isTypeAliasDeclaration(optionsDeclaration)) {
-    const aliasedType = typeChecker.getTypeAtLocation(optionsDeclaration.type);
-    optionsInterface = (aliasedType.getSymbol()?.getDeclarations() ?? []).find((d) => ts8.isInterfaceDeclaration(d));
-  } else {
-    optionsInterface = optionsDeclaration;
-  }
-  if (!optionsInterface || !ts8.isInterfaceDeclaration(optionsInterface)) {
-    throw new Error(`Options for decorator "${name}" is not an interface.`);
-  }
-  return extractInterface(optionsInterface, typeChecker).members;
-}
-function getDecoratorJsDocNode(declaration) {
-  const name = declaration.name.getText();
-  const decoratorInterface = declaration.getSourceFile().statements.find((s) => {
-    return ts8.isInterfaceDeclaration(s) && s.name.getText() === `${name}Decorator`;
-  });
+function getDecoratorDeclaration(declaration, typeChecker) {
+  const decoratorName = declaration.name.getText();
+  const decoratorDeclaration = declaration;
+  const decoratorType = typeChecker.getTypeAtLocation(decoratorDeclaration);
+  const aliasDeclaration = decoratorType.getSymbol().getDeclarations()[0];
+  const decoratorInterface = aliasDeclaration;
   if (!decoratorInterface || !ts8.isInterfaceDeclaration(decoratorInterface)) {
-    throw new Error(`No interface "${name}Decorator" found.`);
+    throw new Error(`No decorator interface found for "${decoratorName}".`);
   }
-  const callSignature = decoratorInterface.members.find((node) => {
-    return ts8.isCallSignatureDeclaration(node) && extractRawJsDoc(node);
+  return decoratorInterface;
+}
+function getDecoratorProperties(declaration, typeChecker) {
+  const decoratorCallSig = getDecoratorJsDocNode(declaration, typeChecker);
+  const decoratorFirstParam = decoratorCallSig.parameters[0];
+  const firstParamType = typeChecker.getTypeAtLocation(decoratorFirstParam);
+  let firstParamTypeDecl;
+  if (firstParamType.isUnion()) {
+    const firstParamTypeUnion = firstParamType.types.find((t) => (t.flags & ts8.TypeFlags.Undefined) === 0);
+    firstParamTypeDecl = firstParamTypeUnion?.getSymbol()?.getDeclarations()[0];
+  } else {
+    firstParamTypeDecl = firstParamType.getSymbol()?.getDeclarations()[0];
+  }
+  if (!firstParamTypeDecl || !ts8.isInterfaceDeclaration(firstParamTypeDecl)) {
+    return null;
+  }
+  const interfaceDeclaration = firstParamTypeDecl;
+  return extractInterface(interfaceDeclaration, typeChecker).members;
+}
+function getDecoratorSignatures(callSignatures, typeChecker) {
+  return callSignatures.map((signatureDecl) => {
+    return {
+      parameters: extractParams(signatureDecl.parameters, typeChecker),
+      jsdocTags: extractJsDocTags(signatureDecl)
+    };
   });
+}
+function extractParams(params, typeChecker) {
+  return params.map((param) => ({
+    name: param.name.getText(),
+    description: extractJsDocDescription(param),
+    type: getParamTypeString(param, typeChecker),
+    isOptional: !!(param.questionToken || param.initializer),
+    isRestParam: !!param.dotDotDotToken
+  }));
+}
+function getDecoratorInterface(declaration, typeChecker) {
+  const name = declaration.name.getText();
+  const symbol = typeChecker.getSymbolAtLocation(declaration.name);
+  const decoratorType = typeChecker.getTypeOfSymbolAtLocation(symbol, symbol.valueDeclaration);
+  const decoratorInterface = decoratorType.getSymbol()?.getDeclarations()[0];
+  if (!decoratorInterface || !ts8.isInterfaceDeclaration(decoratorInterface)) {
+    throw new Error(`No decorator interface found for "${name}".`);
+  }
+  return decoratorInterface;
+}
+function getDecoratorJsDocNode(declaration, typeChecker) {
+  const name = declaration.name.getText();
+  const decoratorInterface = getDecoratorInterface(declaration, typeChecker);
+  const callSignature = decoratorInterface.members.filter((node) => {
+    return ts8.isCallSignatureDeclaration(node) && extractRawJsDoc(node);
+  }).at(-1);
   if (!callSignature || !ts8.isCallSignatureDeclaration(callSignature)) {
     throw new Error(`No call signature with JsDoc on "${name}Decorator"`);
   }
   return callSignature;
+}
+function getParamTypeString(paramNode, typeChecker) {
+  const type = typeChecker.getTypeAtLocation(paramNode);
+  const printer = ts8.createPrinter({ removeComments: true });
+  const sourceFile = paramNode.getSourceFile();
+  const replace = [];
+  if (type.isUnion()) {
+    for (const subType of type.types) {
+      const decl = subType.getSymbol()?.getDeclarations()?.[0];
+      if (decl && ts8.isInterfaceDeclaration(decl) && decl.name.text !== "Function") {
+        replace.push({
+          initial: subType.symbol.name,
+          replacedWith: expandType(decl, sourceFile, printer)
+        });
+      }
+    }
+  }
+  let result = printer.printNode(ts8.EmitHint.Unspecified, paramNode, sourceFile).replace(new RegExp(`${paramNode.name.getText()}\\??: `), "").replaceAll(/\s+/g, " ");
+  for (const { initial, replacedWith } of replace) {
+    result = result.replace(initial, replacedWith);
+  }
+  return result;
+}
+function expandType(decl, sourceFile, printer) {
+  const props = decl.members.map((member) => printer.printNode(ts8.EmitHint.Unspecified, member, sourceFile)).join(" ").replaceAll(/\s+/g, " ");
+  return `{${props}}`;
 }
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/enum_extractor.js
@@ -5016,4 +5080,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OQCG72CN.js.map
+//# sourceMappingURL=chunk-5GTVGDZ7.js.map
