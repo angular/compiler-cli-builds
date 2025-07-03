@@ -28,7 +28,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-OQCG72CN.js";
+} from "./chunk-5GTVGDZ7.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -82,7 +82,7 @@ import "./chunk-KPQ72R34.js";
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.2.0-next.0+sha-902121e");
+var VERSION = new Version("20.2.0-next.0+sha-5c54cb8");
 
 // bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.js
 var NgTscPlugin = class {
