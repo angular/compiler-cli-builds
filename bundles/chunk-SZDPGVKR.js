@@ -13691,12 +13691,12 @@ var Scope = class {
           const firstDecl = varMap.get(v.name);
           tcb.oobRecorder.duplicateTemplateVar(tcb.id, v, firstDecl);
         }
-        this.registerVariable(scope, v, new TcbTemplateVariableOp(tcb, scope, scopedNode, v));
+        Scope.registerVariable(scope, v, new TcbTemplateVariableOp(tcb, scope, scopedNode, v));
       }
     } else if (scopedNode instanceof TmplAstIfBlockBranch) {
       const { expression, expressionAlias } = scopedNode;
       if (expression !== null && expressionAlias !== null) {
-        this.registerVariable(scope, expressionAlias, new TcbBlockVariableOp(tcb, scope, tcbExpression(expression, tcb, scope), expressionAlias));
+        Scope.registerVariable(scope, expressionAlias, new TcbBlockVariableOp(tcb, scope, tcbExpression(expression, tcb, scope), expressionAlias));
       }
     } else if (scopedNode instanceof TmplAstForLoopBlock) {
       const loopInitializer = tcb.allocateId();
@@ -13708,7 +13708,7 @@ var Scope = class {
           throw new Error(`Unrecognized for loop context variable ${variable.name}`);
         }
         const type = ts60.factory.createKeywordTypeNode(forLoopContextVariableTypes.get(variable.value));
-        this.registerVariable(scope, variable, new TcbBlockImplicitVariableOp(tcb, scope, type, variable));
+        Scope.registerVariable(scope, variable, new TcbBlockImplicitVariableOp(tcb, scope, type, variable));
       }
     } else if (scopedNode instanceof TmplAstHostElement2) {
       scope.appendNode(scopedNode);
@@ -20123,4 +20123,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-XXIVFRPA.js.map
+//# sourceMappingURL=chunk-SZDPGVKR.js.map
