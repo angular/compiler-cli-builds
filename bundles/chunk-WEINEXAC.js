@@ -9596,13 +9596,23 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
         relatedInformation
       };
     }
+    let typeForMessage;
+    if (category === ts46.DiagnosticCategory.Warning) {
+      typeForMessage = "Warning";
+    } else if (category === ts46.DiagnosticCategory.Suggestion) {
+      typeForMessage = "Suggestion";
+    } else if (category === ts46.DiagnosticCategory.Message) {
+      typeForMessage = "Message";
+    } else {
+      typeForMessage = "Error";
+    }
     relatedInformation.push({
       category: ts46.DiagnosticCategory.Message,
       code: 0,
       file: componentSf,
       start: mapping.node.getStart(),
       length: mapping.node.getEnd() - mapping.node.getStart(),
-      messageText: `Error occurs in the template of component ${componentName}.`
+      messageText: `${typeForMessage} occurs in the template of component ${componentName}.`
     });
     return {
       source: "ngtsc",
@@ -20123,4 +20133,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-SZDPGVKR.js.map
+//# sourceMappingURL=chunk-WEINEXAC.js.map
