@@ -3117,10 +3117,10 @@ function createGenerateUniqueIdentifierHelper() {
   const markIdentifierAsGenerated = (sf, identifierName) => generatedIdentifiers.add(`${sf.fileName}@@${identifierName}`);
   return (sourceFile, symbolName) => {
     const sf = sourceFile;
-    if (sf.identifiers === void 0) {
+    if (sf["identifiers"] === void 0) {
       throw new Error("Source file unexpectedly lacks map of parsed `identifiers`.");
     }
-    const isUniqueIdentifier = (name2) => !sf.identifiers.has(name2) && !isGeneratedIdentifier(sf, name2);
+    const isUniqueIdentifier = (name2) => !sf["identifiers"].has(name2) && !isGeneratedIdentifier(sf, name2);
     if (isUniqueIdentifier(symbolName)) {
       markIdentifierAsGenerated(sf, symbolName);
       return null;
@@ -20133,4 +20133,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WEINEXAC.js.map
+//# sourceMappingURL=chunk-UZOSFHTN.js.map
