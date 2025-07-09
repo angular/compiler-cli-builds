@@ -12,13 +12,13 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-YNE6T2TY.js";
+} from "./chunk-BRXBRTXD.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.js
+// packages/compiler-cli/src/main.js
 import ts2 from "typescript";
 import yargs from "yargs";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_watch.js
+// packages/compiler-cli/src/perform_watch.js
 import * as chokidar from "chokidar";
 import * as path from "path";
 import ts from "typescript";
@@ -68,6 +68,8 @@ function createPerformWatchHost(configFileName, reportDiagnostics, existingOptio
         } };
       }
       const watcher = chokidar.watch(options.basePath, {
+        // ignore .dotfiles, .js and .map files.
+        // can't ignore other files as we e.g. want to recompile if an `.html` file changes as well.
         ignored: (path2) => /((^[\/\\])\..)|(\.js$)|(\.map$)|(\.metadata\.json|node_modules)/.test(path2),
         ignoreInitial: true,
         persistent: true
@@ -207,7 +209,10 @@ function performWatchCompilation(host) {
   }
   function watchedFileChanged(event, fileName) {
     const normalizedPath = path.normalize(fileName);
-    if (cachedOptions && event === FileChangeEvent.Change && normalizedPath === path.normalize(cachedOptions.project)) {
+    if (cachedOptions && event === FileChangeEvent.Change && // TODO(chuckj): validate that this is sufficient to skip files that were written.
+    // This assumes that the file path we write is the same file path we will receive in the
+    // change notification.
+    normalizedPath === path.normalize(cachedOptions.project)) {
       resetOptions();
     } else if (event === FileChangeEvent.CreateDelete || event === FileChangeEvent.CreateDeleteDir) {
       cachedOptions = void 0;
@@ -242,11 +247,16 @@ function performWatchCompilation(host) {
   }
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/main.js
+// packages/compiler-cli/src/main.js
 function main(args, consoleError = console.error, config, customTransformers, programReuse, modifiedResourceFiles) {
   let { project, rootNames, options, errors: configErrors, watch: watch2, emitFlags } = config || readNgcCommandLineAndConfiguration(args);
   if (configErrors.length) {
-    return reportErrorsAndExit(configErrors, void 0, consoleError);
+    return reportErrorsAndExit(
+      configErrors,
+      /*options*/
+      void 0,
+      consoleError
+    );
   }
   if (watch2) {
     const result = watchMode(project, options, consoleError);
@@ -325,6 +335,9 @@ function getFormatDiagnosticsHost(options) {
   const basePath = options ? options.basePath : void 0;
   return {
     getCurrentDirectory: () => basePath || ts2.sys.getCurrentDirectory(),
+    // We need to normalize the path separators here because by default, TypeScript
+    // compiler hosts use posix canonical paths. In order to print consistent diagnostics,
+    // we also normalize the paths.
     getCanonicalFileName: (fileName) => fileName.replace(/\\/g, "/"),
     getNewLine: () => {
       if (options && options.newLine !== void 0) {
@@ -363,4 +376,3 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-JXYBFWGA.js.map

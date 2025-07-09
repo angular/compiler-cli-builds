@@ -28,21 +28,16 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-YNE6T2TY.js";
+} from "./chunk-BRXBRTXD.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "./chunk-SEKYV57I.js";
-import {
-  GLOBAL_DEFS_FOR_TERSER,
-  GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-  constructorParametersDownlevelTransform
-} from "./chunk-2FHBFXPC.js";
+} from "./chunk-6HOSNZU5.js";
 import {
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-5TMRGUHP.js";
+} from "./chunk-GA4YGITI.js";
 import {
   ActivePerfRecorder,
   ErrorCode,
@@ -51,8 +46,8 @@ import {
   TsCreateProgramDriver,
   isLocalCompilationDiagnostics,
   ngErrorCode
-} from "./chunk-UZOSFHTN.js";
-import "./chunk-6ECVYRSU.js";
+} from "./chunk-Y3W37GX6.js";
+import "./chunk-I2BHWRAU.js";
 import {
   InvalidFileSystem,
   LogicalFileSystem,
@@ -74,17 +69,30 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-TPEB2IXF.js";
+} from "./chunk-GWZQLAGK.js";
 import {
   NodeJSFileSystem
-} from "./chunk-5JF7HF3W.js";
-import "./chunk-KPQ72R34.js";
+} from "./chunk-SZY7NM6F.js";
+import "./chunk-DWRM7PIK.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version.js
+// packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.2.0-next.0+sha-1b895e1");
+var VERSION = new Version("20.2.0-next.0+sha-75a5d08");
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/tsc_plugin.js
+// packages/compiler-cli/private/tooling.js
+var GLOBAL_DEFS_FOR_TERSER = {
+  ngDevMode: false,
+  ngI18nClosureMode: false
+};
+var GLOBAL_DEFS_FOR_TERSER_WITH_AOT = {
+  ...GLOBAL_DEFS_FOR_TERSER,
+  ngJitMode: false
+};
+var constructorParametersDownlevelTransform = (program, isCore = false) => {
+  return angularJitApplicationTransform(program, isCore);
+};
+
+// packages/compiler-cli/src/ngtsc/tsc_plugin.js
 var NgTscPlugin = class {
   ngOptions;
   name = "ngtsc";
@@ -103,7 +111,13 @@ var NgTscPlugin = class {
   }
   wrapHost(host, inputFiles, options) {
     this.options = { ...this.ngOptions, ...options };
-    this.host = NgCompilerHost.wrap(host, inputFiles, this.options, null);
+    this.host = NgCompilerHost.wrap(
+      host,
+      inputFiles,
+      this.options,
+      /* oldProgram */
+      null
+    );
     return this.host;
   }
   setupCompilation(program, oldProgram) {
@@ -129,7 +143,9 @@ var NgTscPlugin = class {
         strategy,
         programDriver,
         perfRecorder,
+        /* enableTemplateTypeChecker */
         false,
+        /* usePoisonedData */
         false
       );
     } else {
@@ -160,7 +176,7 @@ var NgTscPlugin = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/index.js
+// packages/compiler-cli/index.ts
 setFileSystem(new NodeJSFileSystem());
 export {
   ConsoleLogger,
@@ -226,4 +242,3 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=index.js.map

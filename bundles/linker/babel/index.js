@@ -8,22 +8,22 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-FPHHL4UV.js";
+} from "../../chunk-BPDNYZBC.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "../../chunk-SEKYV57I.js";
-import "../../chunk-PML5JK7B.js";
-import "../../chunk-6ECVYRSU.js";
+} from "../../chunk-6HOSNZU5.js";
+import "../../chunk-HYJ2H3FU.js";
+import "../../chunk-I2BHWRAU.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-5JF7HF3W.js";
-import "../../chunk-KPQ72R34.js";
+} from "../../chunk-SZY7NM6F.js";
+import "../../chunk-DWRM7PIK.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.js
+// packages/compiler-cli/linker/babel/src/es2015_linker_plugin.js
 import { types as t4 } from "@babel/core";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/ast/babel_ast_factory.js
+// packages/compiler-cli/linker/babel/src/ast/babel_ast_factory.js
 import { types as t } from "@babel/core";
 var BabelAstFactory = class {
   sourceUrl;
@@ -66,13 +66,24 @@ var BabelAstFactory = class {
   createCallExpression(callee, args, pure) {
     const call = t.callExpression(callee, args);
     if (pure) {
-      t.addComment(call, "leading", " @__PURE__ ", false);
+      t.addComment(
+        call,
+        "leading",
+        " @__PURE__ ",
+        /* line */
+        false
+      );
     }
     return call;
   }
   createConditional = t.conditionalExpression;
   createElementAccess(expression, element) {
-    return t.memberExpression(expression, element, true);
+    return t.memberExpression(
+      expression,
+      element,
+      /* computed */
+      true
+    );
   }
   createExpressionStatement = t.expressionStatement;
   createFunctionDeclaration(functionName, parameters, body) {
@@ -93,7 +104,12 @@ var BabelAstFactory = class {
   createIdentifier = t.identifier;
   createIfStatement = t.ifStatement;
   createDynamicImport(url) {
-    return this.createCallExpression(t.import(), [typeof url === "string" ? t.stringLiteral(url) : url], false);
+    return this.createCallExpression(
+      t.import(),
+      [typeof url === "string" ? t.stringLiteral(url) : url],
+      false
+      /* pure */
+    );
   }
   createLiteral(value) {
     if (typeof value === "string") {
@@ -119,7 +135,12 @@ var BabelAstFactory = class {
   }
   createParenthesizedExpression = t.parenthesizedExpression;
   createPropertyAccess(expression, propertyName) {
-    return t.memberExpression(expression, t.identifier(propertyName), false);
+    return t.memberExpression(
+      expression,
+      t.identifier(propertyName),
+      /* computed */
+      false
+    );
   }
   createReturnStatement = t.returnStatement;
   createTaggedTemplate(tag, template) {
@@ -147,13 +168,18 @@ var BabelAstFactory = class {
       return node;
     }
     node.loc = {
+      // Add in the filename so that we can map to external template files.
+      // Note that Babel gets confused if you specify a filename when it is the original source
+      // file. This happens when the template is inline, in which case just use `undefined`.
       filename: sourceMapRange.url !== this.sourceUrl ? sourceMapRange.url : void 0,
       start: {
         line: sourceMapRange.start.line + 1,
+        // lines are 1-based in Babel.
         column: sourceMapRange.start.column
       },
       end: {
         line: sourceMapRange.end.line + 1,
+        // lines are 1-based in Babel.
         column: sourceMapRange.end.column
       }
     };
@@ -166,7 +192,7 @@ function isLExpression(expr) {
   return t.isLVal(expr);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/ast/babel_ast_host.js
+// packages/compiler-cli/linker/babel/src/ast/babel_ast_host.js
 import { types as t2 } from "@babel/core";
 var BabelAstHost = class {
   getSymbolName(node) {
@@ -270,6 +296,7 @@ var BabelAstHost = class {
     }
     return {
       startLine: node.loc.start.line - 1,
+      // Babel lines are 1-based
       startCol: node.loc.start.column,
       startPos: node.start,
       endPos: node.end
@@ -292,13 +319,28 @@ function isMinifiedBooleanLiteral(node) {
   return t2.isUnaryExpression(node) && node.prefix && node.operator === "!" && t2.isNumericLiteral(node.argument) && (node.argument.value === 0 || node.argument.value === 1);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/babel_declaration_scope.js
+// packages/compiler-cli/linker/babel/src/babel_declaration_scope.js
 import { types as t3 } from "@babel/core";
 var BabelDeclarationScope = class {
   declarationScope;
+  /**
+   * Construct a new `BabelDeclarationScope`.
+   *
+   * @param declarationScope the Babel scope containing the declaration call expression.
+   */
   constructor(declarationScope) {
     this.declarationScope = declarationScope;
   }
+  /**
+   * Compute the Babel `NodePath` that can be used to reference the lexical scope where any
+   * shared constant statements would be inserted.
+   *
+   * There will only be a shared constant scope if the expression is in an ECMAScript module, or a
+   * UMD module. Otherwise `null` is returned to indicate that constant statements must be emitted
+   * locally to the generated linked definition, to avoid polluting the global scope.
+   *
+   * @param expression the expression that points to the Angular core framework import.
+   */
   getConstantScopeRef(expression) {
     let bindingExpression = expression;
     while (t3.isMemberExpression(bindingExpression)) {
@@ -319,12 +361,15 @@ var BabelDeclarationScope = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/es2015_linker_plugin.js
+// packages/compiler-cli/linker/babel/src/es2015_linker_plugin.js
 function createEs2015LinkerPlugin({ fileSystem, logger, ...options }) {
   let fileLinker = null;
   return {
     visitor: {
       Program: {
+        /**
+         * Create a new `FileLinker` as we enter each file (`t.Program` in Babel).
+         */
         enter(_, state) {
           assertNull(fileLinker);
           const file = state.file;
@@ -336,6 +381,10 @@ function createEs2015LinkerPlugin({ fileSystem, logger, ...options }) {
           const linkerEnvironment = LinkerEnvironment.create(fileSystem, logger, new BabelAstHost(), new BabelAstFactory(sourceUrl), options);
           fileLinker = new FileLinker(linkerEnvironment, sourceUrl, file.code);
         },
+        /**
+         * On exiting the file, insert any shared constant statements that were generated during
+         * linking of the partial declarations.
+         */
         exit() {
           assertNotNull(fileLinker);
           for (const { constantScope, statements } of fileLinker.getConstantStatements()) {
@@ -344,6 +393,10 @@ function createEs2015LinkerPlugin({ fileSystem, logger, ...options }) {
           fileLinker = null;
         }
       },
+      /**
+       * Test each call expression to see if it is a partial declaration; it if is then replace it
+       * with the results of linking the declaration.
+       */
       CallExpression(call, state) {
         if (fileLinker === null) {
           return;
@@ -419,7 +472,7 @@ function buildCodeFrameError(file, message, node) {
   return `${filename}: ${error.message}`;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/src/babel_plugin.js
+// packages/compiler-cli/linker/babel/src/babel_plugin.js
 function defaultLinkerPlugin(api, options) {
   api.assertVersion(7);
   return createEs2015LinkerPlugin({
@@ -429,7 +482,7 @@ function defaultLinkerPlugin(api, options) {
   });
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/babel/index.js
+// packages/compiler-cli/linker/babel/index.ts
 var babel_default = defaultLinkerPlugin;
 export {
   createEs2015LinkerPlugin,
@@ -442,4 +495,3 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=index.js.map

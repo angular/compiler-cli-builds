@@ -4,16 +4,22 @@
     
 import {
   SourceFileLoader
-} from "./chunk-PML5JK7B.js";
+} from "./chunk-HYJ2H3FU.js";
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-6ECVYRSU.js";
+} from "./chunk-I2BHWRAU.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/fatal_linker_error.js
+// packages/compiler-cli/linker/src/fatal_linker_error.js
 var FatalLinkerError = class extends Error {
   node;
   type = "FatalLinkerError";
+  /**
+   * Create a new FatalLinkerError.
+   *
+   * @param node The AST node where the error occurred.
+   * @param message A description of the error.
+   */
   constructor(node, message) {
     super(message);
     this.node = node;
@@ -23,58 +29,109 @@ function isFatalLinkerError(e) {
   return e && e.type === "FatalLinkerError";
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/ast/utils.js
+// packages/compiler-cli/linker/src/ast/utils.js
 function assert(node, predicate, expected) {
   if (!predicate(node)) {
     throw new FatalLinkerError(node, `Unsupported syntax, expected ${expected}.`);
   }
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/ast/ast_value.js
+// packages/compiler-cli/linker/src/ast/ast_value.js
 import * as o from "@angular/compiler";
-var AstObject = class {
+var AstObject = class _AstObject {
   expression;
   obj;
   host;
+  /**
+   * Create a new `AstObject` from the given `expression` and `host`.
+   */
   static parse(expression, host) {
     const obj = host.parseObjectLiteral(expression);
-    return new AstObject(expression, obj, host);
+    return new _AstObject(expression, obj, host);
   }
   constructor(expression, obj, host) {
     this.expression = expression;
     this.obj = obj;
     this.host = host;
   }
+  /**
+   * Returns true if the object has a property called `propertyName`.
+   */
   has(propertyName) {
     return this.obj.has(propertyName);
   }
+  /**
+   * Returns the number value of the property called `propertyName`.
+   *
+   * Throws an error if there is no such property or the property is not a number.
+   */
   getNumber(propertyName) {
     return this.host.parseNumericLiteral(this.getRequiredProperty(propertyName));
   }
+  /**
+   * Returns the string value of the property called `propertyName`.
+   *
+   * Throws an error if there is no such property or the property is not a string.
+   */
   getString(propertyName) {
     return this.host.parseStringLiteral(this.getRequiredProperty(propertyName));
   }
+  /**
+   * Returns the boolean value of the property called `propertyName`.
+   *
+   * Throws an error if there is no such property or the property is not a boolean.
+   */
   getBoolean(propertyName) {
     return this.host.parseBooleanLiteral(this.getRequiredProperty(propertyName));
   }
+  /**
+   * Returns the nested `AstObject` parsed from the property called `propertyName`.
+   *
+   * Throws an error if there is no such property or the property is not an object.
+   */
   getObject(propertyName) {
     const expr = this.getRequiredProperty(propertyName);
     const obj = this.host.parseObjectLiteral(expr);
-    return new AstObject(expr, obj, this.host);
+    return new _AstObject(expr, obj, this.host);
   }
+  /**
+   * Returns an array of `AstValue` objects parsed from the property called `propertyName`.
+   *
+   * Throws an error if there is no such property or the property is not an array.
+   */
   getArray(propertyName) {
     const arr = this.host.parseArrayLiteral(this.getRequiredProperty(propertyName));
     return arr.map((entry) => new AstValue(entry, this.host));
   }
+  /**
+   * Returns a `WrappedNodeExpr` object that wraps the expression at the property called
+   * `propertyName`.
+   *
+   * Throws an error if there is no such property.
+   */
   getOpaque(propertyName) {
     return new o.WrappedNodeExpr(this.getRequiredProperty(propertyName));
   }
+  /**
+   * Returns the raw `TExpression` value of the property called `propertyName`.
+   *
+   * Throws an error if there is no such property.
+   */
   getNode(propertyName) {
     return this.getRequiredProperty(propertyName);
   }
+  /**
+   * Returns an `AstValue` that wraps the value of the property called `propertyName`.
+   *
+   * Throws an error if there is no such property.
+   */
   getValue(propertyName) {
     return new AstValue(this.getRequiredProperty(propertyName), this.host);
   }
+  /**
+   * Converts the AstObject to a raw JavaScript object, mapping each property value (as an
+   * `AstValue`) to the generic type (`T`) via the `mapper` function.
+   */
   toLiteral(mapper) {
     const result = {};
     for (const [key, expression] of this.obj) {
@@ -82,6 +139,10 @@ var AstObject = class {
     }
     return result;
   }
+  /**
+   * Converts the AstObject to a JavaScript Map, mapping each property value (as an
+   * `AstValue`) to the generic type (`T`) via the `mapper` function.
+   */
   toMap(mapper) {
     const result = /* @__PURE__ */ new Map();
     for (const [key, expression] of this.obj) {
@@ -96,82 +157,135 @@ var AstObject = class {
     return this.obj.get(propertyName);
   }
 };
-var AstValue = class {
+var AstValue = class _AstValue {
   expression;
   host;
+  /** Type brand that ensures that the `T` type is respected for assignability. */
   \u0275typeBrand = null;
   constructor(expression, host) {
     this.expression = expression;
     this.host = host;
   }
+  /**
+   * Get the name of the symbol represented by the given expression node, or `null` if it is not a
+   * symbol.
+   */
   getSymbolName() {
     return this.host.getSymbolName(this.expression);
   }
+  /**
+   * Is this value a number?
+   */
   isNumber() {
     return this.host.isNumericLiteral(this.expression);
   }
+  /**
+   * Parse the number from this value, or error if it is not a number.
+   */
   getNumber() {
     return this.host.parseNumericLiteral(this.expression);
   }
+  /**
+   * Is this value a string?
+   */
   isString() {
     return this.host.isStringLiteral(this.expression);
   }
+  /**
+   * Parse the string from this value, or error if it is not a string.
+   */
   getString() {
     return this.host.parseStringLiteral(this.expression);
   }
+  /**
+   * Is this value a boolean?
+   */
   isBoolean() {
     return this.host.isBooleanLiteral(this.expression);
   }
+  /**
+   * Parse the boolean from this value, or error if it is not a boolean.
+   */
   getBoolean() {
     return this.host.parseBooleanLiteral(this.expression);
   }
+  /**
+   * Is this value an object literal?
+   */
   isObject() {
     return this.host.isObjectLiteral(this.expression);
   }
+  /**
+   * Parse this value into an `AstObject`, or error if it is not an object literal.
+   */
   getObject() {
     return AstObject.parse(this.expression, this.host);
   }
+  /**
+   * Is this value an array literal?
+   */
   isArray() {
     return this.host.isArrayLiteral(this.expression);
   }
+  /** Whether the value is explicitly set to `null`. */
   isNull() {
     return this.host.isNull(this.expression);
   }
+  /**
+   * Parse this value into an array of `AstValue` objects, or error if it is not an array literal.
+   */
   getArray() {
     const arr = this.host.parseArrayLiteral(this.expression);
-    return arr.map((entry) => new AstValue(entry, this.host));
+    return arr.map((entry) => new _AstValue(entry, this.host));
   }
+  /**
+   * Is this value a function expression?
+   */
   isFunction() {
     return this.host.isFunctionExpression(this.expression);
   }
+  /**
+   * Extract the return value as an `AstValue` from this value as a function expression, or error if
+   * it is not a function expression.
+   */
   getFunctionReturnValue() {
-    return new AstValue(this.host.parseReturnValue(this.expression), this.host);
+    return new _AstValue(this.host.parseReturnValue(this.expression), this.host);
   }
+  /**
+   * Extract the parameters from this value as a function expression, or error if it is not a
+   * function expression.
+   */
   getFunctionParameters() {
-    return this.host.parseParameters(this.expression).map((param) => new AstValue(param, this.host));
+    return this.host.parseParameters(this.expression).map((param) => new _AstValue(param, this.host));
   }
   isCallExpression() {
     return this.host.isCallExpression(this.expression);
   }
   getCallee() {
-    return new AstValue(this.host.parseCallee(this.expression), this.host);
+    return new _AstValue(this.host.parseCallee(this.expression), this.host);
   }
   getArguments() {
     const args = this.host.parseArguments(this.expression);
-    return args.map((arg) => new AstValue(arg, this.host));
+    return args.map((arg) => new _AstValue(arg, this.host));
   }
+  /**
+   * Return the `TExpression` of this value wrapped in a `WrappedNodeExpr`.
+   */
   getOpaque() {
     return new o.WrappedNodeExpr(this.expression);
   }
+  /**
+   * Get the range of the location of this value in the original source.
+   */
   getRange() {
     return this.host.getRange(this.expression);
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/emit_scope.js
+// packages/compiler-cli/linker/src/file_linker/emit_scopes/emit_scope.js
 import { ConstantPool } from "@angular/compiler";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/linker_import_generator.js
+// packages/compiler-cli/linker/src/linker_import_generator.js
 var LinkerImportGenerator = class {
   factory;
   ngImport;
@@ -193,7 +307,7 @@ var LinkerImportGenerator = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/emit_scope.js
+// packages/compiler-cli/linker/src/file_linker/emit_scopes/emit_scope.js
 var EmitScope = class {
   ngImport;
   translator;
@@ -204,6 +318,11 @@ var EmitScope = class {
     this.translator = translator;
     this.factory = factory;
   }
+  /**
+   * Translate the given Output AST definition expression into a generic `TExpression`.
+   *
+   * Use a `LinkerImportGenerator` to handle any imports in the definition.
+   */
   translateDefinition(definition) {
     const expression = this.translator.translateExpression(definition.expression, new LinkerImportGenerator(this.factory, this.ngImport));
     if (definition.statements.length > 0) {
@@ -213,6 +332,9 @@ var EmitScope = class {
       return expression;
     }
   }
+  /**
+   * Return any constant statements that are shared between all uses of this `EmitScope`.
+   */
   getConstantStatements() {
     const importGenerator = new LinkerImportGenerator(this.factory, this.ngImport);
     return this.constantPool.statements.map((statement) => this.translator.translateStatement(statement, importGenerator));
@@ -220,28 +342,50 @@ var EmitScope = class {
   wrapInIifeWithStatements(expression, statements) {
     const returnStatement = this.factory.createReturnStatement(expression);
     const body = this.factory.createBlock([...statements, returnStatement]);
-    const fn = this.factory.createFunctionExpression(null, [], body);
-    return this.factory.createCallExpression(fn, [], false);
+    const fn = this.factory.createFunctionExpression(
+      /* name */
+      null,
+      /* args */
+      [],
+      body
+    );
+    return this.factory.createCallExpression(
+      fn,
+      /* args */
+      [],
+      /* pure */
+      false
+    );
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/emit_scopes/local_emit_scope.js
+// packages/compiler-cli/linker/src/file_linker/emit_scopes/local_emit_scope.js
 var LocalEmitScope = class extends EmitScope {
+  /**
+   * Translate the given Output AST definition expression into a generic `TExpression`.
+   *
+   * Merges the `ConstantPool` statements with the definition statements when generating the
+   * definition expression. This means that `ConstantPool` statements will be emitted into an IIFE.
+   */
   translateDefinition(definition) {
     return super.translateDefinition({
       expression: definition.expression,
       statements: [...this.constantPool.statements, ...definition.statements]
     });
   }
+  /**
+   * It is not valid to call this method, since there will be no shared constant statements - they
+   * are already emitted in the IIFE alongside the translated definition.
+   */
   getConstantStatements() {
     throw new Error("BUG - LocalEmitScope should not expose any constant statements");
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.js
 import semver3 from "semver";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/get_source_file.js
+// packages/compiler-cli/linker/src/file_linker/get_source_file.js
 function createGetSourceFile(sourceUrl, code, loader) {
   if (loader === null) {
     return () => null;
@@ -256,7 +400,7 @@ function createGetSourceFile(sourceUrl, code, loader) {
   }
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_class_metadata_async_linker_1.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_class_metadata_async_linker_1.js
 import { compileOpaqueAsyncClassMetadata } from "@angular/compiler";
 var PartialClassMetadataAsyncLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
@@ -281,7 +425,7 @@ var PartialClassMetadataAsyncLinkerVersion1 = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_class_metadata_linker_1.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_class_metadata_linker_1.js
 import { compileClassMetadata } from "@angular/compiler";
 var PartialClassMetadataLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
@@ -301,17 +445,17 @@ function toR3ClassMetadata(metaObj) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.js
 import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, makeBindingParser as makeBindingParser2, parseTemplate, R3TargetBinder, R3TemplateDependencyKind, ViewEncapsulation } from "@angular/compiler";
 import semver2 from "semver";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.js
 import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSourceFile, ParseSourceSpan } from "@angular/compiler";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "20.2.0-next.0+sha-1b895e1";
+var PLACEHOLDER_VERSION = "20.2.0-next.0+sha-75a5d08";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -341,7 +485,11 @@ function getDependency(depObj) {
 }
 function extractForwardRef(expr) {
   if (!expr.isCallExpression()) {
-    return createMayBeForwardRefExpression(expr.getOpaque(), 0);
+    return createMayBeForwardRefExpression(
+      expr.getOpaque(),
+      0
+      /* ForwardRefHandling.None */
+    );
   }
   const callee = expr.getCallee();
   if (callee.getSymbolName() !== "forwardRef") {
@@ -355,7 +503,11 @@ function extractForwardRef(expr) {
   if (!wrapperFn.isFunction()) {
     throw new FatalLinkerError(wrapperFn, "Unsupported `forwardRef(fn)` call, expected its argument to be a function");
   }
-  return createMayBeForwardRefExpression(wrapperFn.getFunctionReturnValue().getOpaque(), 2);
+  return createMayBeForwardRefExpression(
+    wrapperFn.getFunctionReturnValue().getOpaque(),
+    2
+    /* ForwardRefHandling.Unwrapped */
+  );
 }
 var STANDALONE_IS_DEFAULT_RANGE = new semver.Range(`>= 19.0.0 || ${PLACEHOLDER_VERSION}`, {
   includePrerelease: true
@@ -364,7 +516,7 @@ function getDefaultStandaloneValue(version) {
   return STANDALONE_IS_DEFAULT_RANGE.test(version);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.js
 var PartialDirectiveLinkerVersion1 = class {
   sourceUrl;
   code;
@@ -513,7 +665,7 @@ function createSourceSpan(range, code, sourceUrl) {
   return new ParseSourceSpan(startLocation, startLocation.moveBy(range.endPos - range.startPos));
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.js
 function makeDirectiveMetadata(directiveExpr, typeExpr, isComponentByDefault = null) {
   return {
     kind: R3TemplateDependencyKind.Directive,
@@ -538,6 +690,9 @@ var PartialComponentLinkerVersion1 = class {
     const meta = this.toR3ComponentMeta(metaObj, version);
     return compileComponentFromMetadata(meta, constantPool, makeBindingParser2());
   }
+  /**
+   * This function derives the `R3ComponentMetadata` from the provided AST object.
+   */
   toR3ComponentMeta(metaObj, version) {
     const interpolation = parseInterpolationConfig(metaObj);
     const templateSource = metaObj.getValue("template");
@@ -552,9 +707,11 @@ var PartialComponentLinkerVersion1 = class {
       range: templateInfo.range,
       enableI18nLegacyMessageIdFormat: false,
       preserveWhitespaces: metaObj.has("preserveWhitespaces") ? metaObj.getBoolean("preserveWhitespaces") : false,
+      // We normalize line endings if the template is was inline.
       i18nNormalizeLineEndingsInICUs: isInline,
       enableBlockSyntax,
       enableLetSyntax,
+      // TODO(crisbeto): figure out how this is enabled.
       enableSelectorless: false
     });
     if (template.errors !== null) {
@@ -575,7 +732,12 @@ ${errors}`);
       declarations.push(...metaObj.getArray("components").map((dir) => {
         const dirExpr = dir.getObject();
         const typeExpr = extractDeclarationTypeExpr(dirExpr.getValue("type"));
-        return makeDirectiveMetadata(dirExpr, typeExpr, true);
+        return makeDirectiveMetadata(
+          dirExpr,
+          typeExpr,
+          /* isComponentByDefault */
+          true
+        );
       }));
     }
     if (metaObj.has("directives")) {
@@ -655,6 +817,9 @@ ${errors}`);
       hasDirectiveDependencies: !baseMeta.isStandalone || hasDirectiveDependencies
     };
   }
+  /**
+   * Update the range to remove the start and end chars, which should be quotes around the template.
+   */
   getTemplateInfo(templateNode, isInline) {
     const range = templateNode.getRange();
     if (!isInline) {
@@ -749,7 +914,7 @@ function parseChangeDetectionStrategy(changeDetectionStrategy) {
   return enumValue;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_factory_linker_1.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_factory_linker_1.js
 import { compileFactoryFunction, FactoryTarget } from "@angular/compiler";
 var PartialFactoryLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
@@ -785,12 +950,16 @@ function getDependencies(metaObj, propName) {
   return null;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_injectable_linker_1.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_injectable_linker_1.js
 import { compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, outputAst as o3 } from "@angular/compiler";
 var PartialInjectableLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
     const meta = toR3InjectableMeta(metaObj);
-    return compileInjectable(meta, false);
+    return compileInjectable(
+      meta,
+      /* resolveForwardRefs */
+      false
+    );
   }
 };
 function toR3InjectableMeta(metaObj) {
@@ -803,7 +972,11 @@ function toR3InjectableMeta(metaObj) {
     name: typeName,
     type: wrapReference(typeExpr.getOpaque()),
     typeArgumentCount: 0,
-    providedIn: metaObj.has("providedIn") ? extractForwardRef(metaObj.getValue("providedIn")) : createMayBeForwardRefExpression2(o3.literal(null), 0)
+    providedIn: metaObj.has("providedIn") ? extractForwardRef(metaObj.getValue("providedIn")) : createMayBeForwardRefExpression2(
+      o3.literal(null),
+      0
+      /* ForwardRefHandling.None */
+    )
   };
   if (metaObj.has("useClass")) {
     meta.useClass = extractForwardRef(metaObj.getValue("useClass"));
@@ -823,7 +996,7 @@ function toR3InjectableMeta(metaObj) {
   return meta;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_injector_linker_1.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_injector_linker_1.js
 import { compileInjector } from "@angular/compiler";
 var PartialInjectorLinkerVersion1 = class {
   linkPartialDeclaration(constantPool, metaObj) {
@@ -845,7 +1018,7 @@ function toR3InjectorMeta(metaObj) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_ng_module_linker_1.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_ng_module_linker_1.js
 import { compileNgModule, R3NgModuleMetadataKind, R3SelectorScopeMode } from "@angular/compiler";
 var PartialNgModuleLinkerVersion1 = class {
   emitInline;
@@ -918,7 +1091,7 @@ function wrapReferences(values) {
   return values.getArray().map((i) => wrapReference(i.getOpaque()));
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_pipe_linker_1.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_pipe_linker_1.js
 import { compilePipeFromMetadata } from "@angular/compiler";
 var PartialPipeLinkerVersion1 = class {
   constructor() {
@@ -947,7 +1120,7 @@ function toR3PipeMeta(metaObj, version) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.js
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.js
 var \u0275\u0275ngDeclareDirective = "\u0275\u0275ngDeclareDirective";
 var \u0275\u0275ngDeclareClassMetadata = "\u0275\u0275ngDeclareClassMetadata";
 var \u0275\u0275ngDeclareComponent = "\u0275\u0275ngDeclareComponent";
@@ -1015,9 +1188,16 @@ var PartialLinkerSelector = class {
     this.logger = logger;
     this.unknownDeclarationVersionHandling = unknownDeclarationVersionHandling;
   }
+  /**
+   * Returns true if there are `PartialLinker` classes that can handle functions with this name.
+   */
   supportsDeclaration(functionName) {
     return this.linkers.has(functionName);
   }
+  /**
+   * Returns the `PartialLinker` that can handle functions with the given name and version.
+   * Throws an error if there is none.
+   */
   getLinker(functionName, minVersion, version) {
     if (!this.linkers.has(functionName)) {
       throw new Error(`Unknown partial declaration function ${functionName}.`);
@@ -1052,7 +1232,7 @@ function getRange(comparator, versionStr) {
   return new semver3.Range(`${comparator}${version.format()}`);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/file_linker.js
+// packages/compiler-cli/linker/src/file_linker/file_linker.js
 var FileLinker = class {
   linkerEnvironment;
   linkerSelector;
@@ -1061,9 +1241,24 @@ var FileLinker = class {
     this.linkerEnvironment = linkerEnvironment;
     this.linkerSelector = new PartialLinkerSelector(createLinkerMap(this.linkerEnvironment, sourceUrl, code), this.linkerEnvironment.logger, this.linkerEnvironment.options.unknownDeclarationVersionHandling);
   }
+  /**
+   * Return true if the given callee name matches a partial declaration that can be linked.
+   */
   isPartialDeclaration(calleeName) {
     return this.linkerSelector.supportsDeclaration(calleeName);
   }
+  /**
+   * Link the metadata extracted from the args of a call to a partial declaration function.
+   *
+   * The `declarationScope` is used to determine the scope and strategy of emission of the linked
+   * definition and any shared constant statements.
+   *
+   * @param declarationFn the name of the function used to declare the partial declaration - e.g.
+   *     `ɵɵngDeclareDirective`.
+   * @param args the arguments passed to the declaration function, should be a single object that
+   *     corresponds to the `R3DeclareDirectiveMetadata` or `R3DeclareComponentMetadata` interfaces.
+   * @param declarationScope the scope that contains this call to the declaration function.
+   */
   linkPartialDeclaration(declarationFn, args, declarationScope) {
     if (args.length !== 1) {
       throw new Error(`Invalid function call: It should have only a single object literal argument, but contained ${args.length}.`);
@@ -1077,6 +1272,10 @@ var FileLinker = class {
     const definition = linker.linkPartialDeclaration(emitScope.constantPool, metaObj, version);
     return emitScope.translateDefinition(definition);
   }
+  /**
+   * Return all the shared constant statements and their associated constant scope references, so
+   * that they can be inserted into the source code.
+   */
   getConstantStatements() {
     const results = [];
     for (const [constantScope, emitScope] of this.emitScopes.entries()) {
@@ -1097,29 +1296,35 @@ var FileLinker = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/linker_options.js
+// packages/compiler-cli/linker/src/file_linker/linker_options.js
 var DEFAULT_LINKER_OPTIONS = {
   sourceMapping: true,
   linkerJitMode: false,
   unknownDeclarationVersionHandling: "error"
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/translator.js
+// packages/compiler-cli/linker/src/file_linker/translator.js
 var Translator = class {
   factory;
   constructor(factory) {
     this.factory = factory;
   }
+  /**
+   * Translate the given output AST in the context of an expression.
+   */
   translateExpression(expression, imports, options = {}) {
     return expression.visitExpression(new ExpressionTranslatorVisitor(this.factory, imports, null, options), new Context(false));
   }
+  /**
+   * Translate the given output AST in the context of a statement.
+   */
   translateStatement(statement, imports, options = {}) {
     return statement.visitStatement(new ExpressionTranslatorVisitor(this.factory, imports, null, options), new Context(true));
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/linker_environment.js
-var LinkerEnvironment = class {
+// packages/compiler-cli/linker/src/file_linker/linker_environment.js
+var LinkerEnvironment = class _LinkerEnvironment {
   fileSystem;
   logger;
   host;
@@ -1137,7 +1342,7 @@ var LinkerEnvironment = class {
     this.sourceFileLoader = this.options.sourceMapping ? new SourceFileLoader(this.fileSystem, this.logger, {}) : null;
   }
   static create(fileSystem, logger, host, factory, options) {
-    return new LinkerEnvironment(fileSystem, logger, host, factory, {
+    return new _LinkerEnvironment(fileSystem, logger, host, factory, {
       sourceMapping: options.sourceMapping ?? DEFAULT_LINKER_OPTIONS.sourceMapping,
       linkerJitMode: options.linkerJitMode ?? DEFAULT_LINKER_OPTIONS.linkerJitMode,
       unknownDeclarationVersionHandling: options.unknownDeclarationVersionHandling ?? DEFAULT_LINKER_OPTIONS.unknownDeclarationVersionHandling
@@ -1145,7 +1350,7 @@ var LinkerEnvironment = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/linker/src/file_linker/needs_linking.js
+// packages/compiler-cli/linker/src/file_linker/needs_linking.js
 function needsLinking(path, source) {
   return declarationFunctions.some((fn) => source.includes(fn));
 }
@@ -1166,4 +1371,3 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FPHHL4UV.js.map

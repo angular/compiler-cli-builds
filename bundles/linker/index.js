@@ -10,10 +10,10 @@ import {
   assert,
   isFatalLinkerError,
   needsLinking
-} from "../chunk-FPHHL4UV.js";
-import "../chunk-PML5JK7B.js";
-import "../chunk-6ECVYRSU.js";
-import "../chunk-KPQ72R34.js";
+} from "../chunk-BPDNYZBC.js";
+import "../chunk-HYJ2H3FU.js";
+import "../chunk-I2BHWRAU.js";
+import "../chunk-DWRM7PIK.js";
 export {
   DEFAULT_LINKER_OPTIONS,
   FatalLinkerError,
@@ -23,4 +23,10 @@ export {
   isFatalLinkerError,
   needsLinking
 };
-//# sourceMappingURL=index.js.map
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
