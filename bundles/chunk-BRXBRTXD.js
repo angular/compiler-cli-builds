@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-5TMRGUHP.js";
+} from "./chunk-GA4YGITI.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -92,7 +92,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-UZOSFHTN.js";
+} from "./chunk-Y3W37GX6.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -102,9 +102,9 @@ import {
   getFileSystem,
   join,
   resolve
-} from "./chunk-TPEB2IXF.js";
+} from "./chunk-GWZQLAGK.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/api.js
+// packages/compiler-cli/src/transformers/api.js
 var DEFAULT_ERROR_CODE = 100;
 var UNKNOWN_ERROR_CODE = 500;
 var SOURCE = "angular";
@@ -122,7 +122,7 @@ var EmitFlags;
   EmitFlags2[EmitFlags2["All"] = 31] = "All";
 })(EmitFlags || (EmitFlags = {}));
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/compiler_host.js
+// packages/compiler-cli/src/transformers/compiler_host.js
 import ts from "typescript";
 var wrapHostForTest = null;
 function createCompilerHost({ options, tsHost = ts.createCompilerHost(options, true) }) {
@@ -132,7 +132,7 @@ function createCompilerHost({ options, tsHost = ts.createCompilerHost(options, t
   return tsHost;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/entities.js
+// packages/compiler-cli/src/ngtsc/docs/src/entities.js
 var EntryType;
 (function(EntryType2) {
   EntryType2["Block"] = "block";
@@ -179,22 +179,22 @@ function isDocEntryWithSourceInfo(entry) {
   return "source" in entry;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/extractor.js
 import ts12 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/class_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/class_extractor.js
 import ts6 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/filters.js
+// packages/compiler-cli/src/ngtsc/docs/src/filters.js
 function isAngularPrivateName(name) {
   const firstChar = name[0] ?? "";
   return firstChar === "\u0275" || firstChar === "_";
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/function_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/function_extractor.js
 import ts4 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/generics_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/generics_extractor.js
 function extractGenerics(declaration) {
   return declaration.typeParameters?.map((typeParam) => ({
     name: typeParam.name.getText(),
@@ -203,7 +203,7 @@ function extractGenerics(declaration) {
   })) ?? [];
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/jsdoc_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/jsdoc_extractor.js
 import ts2 from "typescript";
 var decoratorExpression = /@(?=(Injectable|Component|Directive|Pipe|NgModule|Input|Output|HostBinding|HostListener|Inject|Optional|Self|Host|SkipSelf|ViewChild|ViewChildren|ContentChild|ContentChildren))/g;
 function extractJsDocTags(node) {
@@ -244,13 +244,13 @@ function unescapeAngularDecorators(comment) {
   return comment.replace(/_NG_AT_/g, "@");
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/type_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/type_extractor.js
 import ts3 from "typescript";
 function extractResolvedTypeString(node, checker) {
   return checker.typeToString(checker.getTypeAtLocation(node), void 0, ts3.TypeFormatFlags.NoTruncation);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/function_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/function_extractor.js
 var FunctionExtractor = class {
   name;
   exportDeclaration;
@@ -348,6 +348,7 @@ function extractReturnType(signature, typeChecker) {
   return typeChecker.typeToString(
     typeChecker.getReturnTypeOfSignature(signature),
     void 0,
+    // This ensures that e.g. `T | undefined` is not reduced to `T`.
     ts4.TypeFormatFlags.NoTypeReduction | ts4.TypeFormatFlags.NoTruncation
   );
 }
@@ -360,7 +361,7 @@ function findImplementationOfFunction(node, typeChecker) {
   return implementation;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/internal.js
+// packages/compiler-cli/src/ngtsc/docs/src/internal.js
 import ts5 from "typescript";
 function isInternal(member) {
   return extractJsDocTags(member).some((tag) => tag.name === "internal") || hasLeadingInternalComment(member);
@@ -373,12 +374,14 @@ function hasLeadingInternalComment(member) {
     (pos, end, kind, hasTrailingNewLine, containsInternal) => {
       return containsInternal || memberText.slice(pos, end).includes("@internal");
     },
+    /* state */
     false,
+    /* initial */
     false
   ) ?? false;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/class_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/class_extractor.js
 var ClassExtractor = class {
   declaration;
   typeChecker;
@@ -386,6 +389,7 @@ var ClassExtractor = class {
     this.declaration = declaration;
     this.typeChecker = typeChecker;
   }
+  /** Extract docs info specific to classes. */
   extract() {
     return {
       name: this.declaration.name.text,
@@ -400,6 +404,7 @@ var ClassExtractor = class {
       implements: this.extractInterfaceConformance(this.declaration)
     };
   }
+  /** Extracts doc info for a class's members. */
   extractAllClassMembers() {
     const members = [];
     for (const member of this.getMemberDeclarations()) {
@@ -412,6 +417,7 @@ var ClassExtractor = class {
     }
     return members;
   }
+  /** Extract docs for a class's members (methods and properties).  */
   extractClassMember(memberDeclaration) {
     if (this.isMethod(memberDeclaration)) {
       return this.extractMethod(memberDeclaration);
@@ -424,9 +430,11 @@ var ClassExtractor = class {
     }
     return void 0;
   }
+  /** Extract docs for all call signatures in the current class/interface. */
   extractSignatures() {
     return this.computeAllSignatureDeclarations().map((s) => this.extractSignature(s));
   }
+  /** Extracts docs for a class method. */
   extractMethod(methodDeclaration) {
     const functionExtractor = new FunctionExtractor(methodDeclaration.name.getText(), methodDeclaration, this.typeChecker);
     return {
@@ -435,6 +443,7 @@ var ClassExtractor = class {
       memberTags: this.getMemberTags(methodDeclaration)
     };
   }
+  /** Extracts docs for a signature element (usually inside an interface). */
   extractSignature(signature) {
     const functionExtractor = new FunctionExtractor(ts6.isConstructSignatureDeclaration(signature) ? "new" : "", signature, this.typeChecker);
     return {
@@ -443,6 +452,7 @@ var ClassExtractor = class {
       memberTags: []
     };
   }
+  /** Extracts doc info for a property declaration. */
   extractClassProperty(propertyDeclaration) {
     return {
       name: propertyDeclaration.name.getText(),
@@ -453,6 +463,7 @@ var ClassExtractor = class {
       jsdocTags: extractJsDocTags(propertyDeclaration)
     };
   }
+  /** Extracts doc info for an accessor member (getter/setter). */
   extractGetterSetter(accessor) {
     return {
       ...this.extractClassProperty(accessor),
@@ -486,6 +497,7 @@ var ClassExtractor = class {
     const implementClause = declaration.heritageClauses?.find((clause) => clause.token === ts6.SyntaxKind.ImplementsKeyword);
     return implementClause?.types.map((m) => m.getText()) ?? [];
   }
+  /** Gets the tags for a member (protected, readonly, static, etc.) */
   getMemberTags(member) {
     const tags = this.getMemberTagsFromModifiers(member.modifiers ?? []);
     if (member.questionToken) {
@@ -496,6 +508,7 @@ var ClassExtractor = class {
     }
     return tags;
   }
+  /** Computes all signature declarations of the class/interface. */
   computeAllSignatureDeclarations() {
     const type = this.typeChecker.getTypeAtLocation(this.declaration);
     const signatures = [...type.getCallSignatures(), ...type.getConstructSignatures()];
@@ -508,6 +521,7 @@ var ClassExtractor = class {
     }
     return result;
   }
+  /** Gets all member declarations, including inherited members. */
   getMemberDeclarations() {
     const type = this.typeChecker.getTypeAtLocation(this.declaration);
     const members = type.getProperties();
@@ -525,6 +539,7 @@ var ClassExtractor = class {
     }
     return result;
   }
+  /** The result only contains properties, method implementations and abstracts */
   filterMethodOverloads(declarations) {
     return declarations.filter((declaration, index) => {
       if (ts6.isFunctionDeclaration(declaration) || ts6.isMethodDeclaration(declaration) || ts6.isConstructorDeclaration(declaration)) {
@@ -535,6 +550,7 @@ var ClassExtractor = class {
       return true;
     });
   }
+  /** Get the tags for a member that come from the declaration modifiers. */
   getMemberTagsFromModifiers(mods) {
     const tags = [];
     for (const mod of mods) {
@@ -544,6 +560,7 @@ var ClassExtractor = class {
     }
     return tags;
   }
+  /** Gets the doc tag corresponding to a class member modifier (readonly, protected, etc.). */
   getTagForMemberModifier(mod) {
     switch (mod.kind) {
       case ts6.SyntaxKind.StaticKeyword:
@@ -558,34 +575,55 @@ var ClassExtractor = class {
         return void 0;
     }
   }
+  /**
+   * Gets whether a given class member should be excluded from public API docs.
+   * This is the case if:
+   *  - The member does not have a name
+   *  - The member is neither a method nor property
+   *  - The member is private
+   *  - The member has a name that marks it as Angular-internal.
+   *  - The member is marked as internal via JSDoc.
+   */
   isMemberExcluded(member) {
     if (ts6.isConstructorDeclaration(member)) {
       return false;
     }
     return !member.name || !this.isDocumentableMember(member) || !ts6.isCallSignatureDeclaration(member) && member.modifiers?.some((mod) => mod.kind === ts6.SyntaxKind.PrivateKeyword) || member.name.getText() === "prototype" || isAngularPrivateName(member.name.getText()) || isInternal(member);
   }
+  /** Gets whether a class member is a method, property, or accessor. */
   isDocumentableMember(member) {
-    return this.isMethod(member) || this.isProperty(member) || ts6.isAccessor(member) || ts6.isConstructorDeclaration(member) || ts6.isCallSignatureDeclaration(member);
+    return this.isMethod(member) || this.isProperty(member) || ts6.isAccessor(member) || ts6.isConstructorDeclaration(member) || // Signatures are documentable if they are part of an interface.
+    ts6.isCallSignatureDeclaration(member);
   }
+  /** Check if the parameter is a constructor parameter with a public modifier */
   isPublicConstructorParameterProperty(node) {
     if (ts6.isParameterPropertyDeclaration(node, node.parent) && node.modifiers) {
       return node.modifiers.some((modifier) => modifier.kind === ts6.SyntaxKind.PublicKeyword);
     }
     return false;
   }
+  /** Gets whether a member is a property. */
   isProperty(member) {
     return ts6.isPropertyDeclaration(member) || ts6.isPropertySignature(member) || this.isPublicConstructorParameterProperty(member);
   }
+  /** Gets whether a member is a method. */
   isMethod(member) {
     return ts6.isMethodDeclaration(member) || ts6.isMethodSignature(member);
   }
+  /** Gets whether the given signature declaration is documentable. */
   isDocumentableSignature(signature) {
     return ts6.isConstructSignatureDeclaration(signature) || ts6.isCallSignatureDeclaration(signature);
   }
+  /** Gets whether the declaration for this extractor is abstract. */
   isAbstract() {
     const modifiers = this.declaration.modifiers ?? [];
     return modifiers.some((mod) => mod.kind === ts6.SyntaxKind.AbstractKeyword);
   }
+  /**
+   * Check wether a member has a private computed property name like [ɵWRITABLE_SIGNAL]
+   *
+   * This will prevent exposing private computed properties in the docs.
+   */
   hasPrivateComputedProperty(property) {
     return ts6.isComputedPropertyName(property.name) && property.name.expression.getText().startsWith("\u0275");
   }
@@ -598,6 +636,7 @@ var DirectiveExtractor = class extends ClassExtractor {
     this.reference = reference;
     this.metadata = metadata;
   }
+  /** Extract docs info for directives and components (including underlying class info). */
   extract() {
     return {
       ...super.extract(),
@@ -607,6 +646,7 @@ var DirectiveExtractor = class extends ClassExtractor {
       entryType: this.metadata.isComponent ? EntryType.Component : EntryType.Directive
     };
   }
+  /** Extracts docs info for a directive property, including input/output metadata. */
   extractClassProperty(propertyDeclaration) {
     const entry = super.extractClassProperty(propertyDeclaration);
     const inputMetadata = this.getInputMetadata(propertyDeclaration);
@@ -622,10 +662,12 @@ var DirectiveExtractor = class extends ClassExtractor {
     }
     return entry;
   }
+  /** Gets the input metadata for a directive property. */
   getInputMetadata(prop) {
     const propName = prop.name.getText();
     return this.metadata.inputs?.getByClassPropertyName(propName) ?? void 0;
   }
+  /** Gets the output metadata for a directive property. */
   getOutputMetadata(prop) {
     const propName = prop.name.getText();
     return this.metadata?.outputs?.getByClassPropertyName(propName) ?? void 0;
@@ -696,7 +738,7 @@ function extractPipeSyntax(metadata, classDeclaration) {
   return `{{ value_expression | ${metadata.name}${paramNames.length ? ":" + paramNames.join(":") : ""} }}`;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/constant_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/constant_extractor.js
 import ts7 from "typescript";
 var LITERAL_AS_ENUM_TAG = "object-literal-as-enum";
 function extractConstant(declaration, typeChecker) {
@@ -754,7 +796,7 @@ function extractLiteralPropertiesAsEnumMembers(declaration) {
   });
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/decorator_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/decorator_extractor.js
 import ts8 from "typescript";
 function extractorDecorator(declaration, typeChecker) {
   const documentedNode = getDecoratorJsDocNode(declaration, typeChecker);
@@ -889,7 +931,7 @@ function expandType(decl, sourceFile, printer) {
   return `{${props}}`;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/enum_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/enum_extractor.js
 import ts9 from "typescript";
 function extractEnum(declaration, typeChecker) {
   return {
@@ -919,7 +961,7 @@ function getEnumMemberValue(memberNode) {
   return literal?.getText() ?? "";
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/initializer_api_function_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/initializer_api_function_extractor.js
 import ts10 from "typescript";
 var initializerApiTag = "initializerApiFunction";
 function isInitializerApiFunction(node, typeChecker) {
@@ -1023,11 +1065,12 @@ function extractFunctionWithOverloads(name, type, typeChecker) {
   return {
     name,
     signatures: extractCallSignatures(name, typeChecker, type),
+    // Implementation may be populated later.
     implementation: null
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/type_alias_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/type_alias_extractor.js
 function extractTypeAlias(declaration) {
   return {
     name: declaration.name.getText(),
@@ -1040,7 +1083,7 @@ function extractTypeAlias(declaration) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/import_extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/import_extractor.js
 import ts11 from "typescript";
 function getImportedSymbols(sourceFile) {
   const importSpecifiers = /* @__PURE__ */ new Map();
@@ -1064,7 +1107,7 @@ function getImportedSymbols(sourceFile) {
   return importSpecifiers;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/docs/src/extractor.js
+// packages/compiler-cli/src/ngtsc/docs/src/extractor.js
 var DocsExtractor = class {
   typeChecker;
   metadataReader;
@@ -1072,6 +1115,12 @@ var DocsExtractor = class {
     this.typeChecker = typeChecker;
     this.metadataReader = metadataReader;
   }
+  /**
+   * Gets the set of all documentable entries from a source file, including
+   * declarations that are re-exported from this file as an entry-point.
+   *
+   * @param sourceFile The file from which to extract documentable entries.
+   */
   extractAll(sourceFile, rootDir, privateModules) {
     const entries = [];
     const symbols = /* @__PURE__ */ new Map();
@@ -1095,6 +1144,7 @@ var DocsExtractor = class {
         });
         entry.source = {
           filePath: getRelativeFilePath(realSourceFile, rootDir),
+          // Start & End are off by 1
           startLine: ts12.getLineAndCharacterOfPosition(realSourceFile, node.getStart()).line + 1,
           endLine: ts12.getLineAndCharacterOfPosition(realSourceFile, node.getEnd()).line + 1
         };
@@ -1103,6 +1153,7 @@ var DocsExtractor = class {
     }
     return { entries, symbols };
   }
+  /** Extract the doc entry for a single declaration. */
   extractDeclaration(node) {
     if (isNamedClassDeclaration(node)) {
       return extractClass(node, this.metadataReader, this.typeChecker);
@@ -1128,6 +1179,7 @@ var DocsExtractor = class {
     }
     return null;
   }
+  /** Gets the list of exported declarations for doc extraction. */
   getExportedDeclarations(sourceFile) {
     const reflector = new TypeScriptReflectionHost(this.typeChecker, false, true);
     const exportedDeclarationMap = reflector.getExportsOfModule(sourceFile);
@@ -1151,11 +1203,11 @@ function getRelativeFilePath(sourceFile, rootDir) {
   return relativePath;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.js
+// packages/compiler-cli/src/ngtsc/program.js
 import { HtmlParser, MessageBundle } from "@angular/compiler";
 import ts27 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/i18n.js
+// packages/compiler-cli/src/transformers/i18n.js
 import { Xliff, Xliff2, Xmb } from "@angular/compiler";
 import * as path from "path";
 function i18nGetExtension(formatName) {
@@ -1206,10 +1258,10 @@ function getPathNormalizer(basePath) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.js
+// packages/compiler-cli/src/typescript_support.js
 import ts13 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/version_helpers.js
+// packages/compiler-cli/src/version_helpers.js
 function toNumbers(value) {
   const suffixIndex = value.lastIndexOf("-");
   return value.slice(0, suffixIndex === -1 ? value.length : suffixIndex).split(".").map((segment) => {
@@ -1244,7 +1296,7 @@ function compareVersions(v1, v2) {
   return compareNumbers(toNumbers(v1), toNumbers(v2));
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/typescript_support.js
+// packages/compiler-cli/src/typescript_support.js
 var MIN_TS_VERSION = "5.8.0";
 var MAX_TS_VERSION = "5.9.0";
 var tsVersion = ts13.version;
@@ -1257,22 +1309,41 @@ function verifySupportedTypeScriptVersion() {
   checkVersion(tsVersion, MIN_TS_VERSION, MAX_TS_VERSION);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.js
+// packages/compiler-cli/src/ngtsc/core/src/compiler.js
 import ts25 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/cycles/src/analyzer.js
+// packages/compiler-cli/src/ngtsc/cycles/src/analyzer.js
 var CycleAnalyzer = class {
   importGraph;
+  /**
+   * Cycle detection is requested with the same `from` source file for all used directives and pipes
+   * within a component, which makes it beneficial to cache the results as long as the `from` source
+   * file has not changed. This avoids visiting the import graph that is reachable from multiple
+   * directives/pipes more than once.
+   */
   cachedResults = null;
   constructor(importGraph) {
     this.importGraph = importGraph;
   }
+  /**
+   * Check for a cycle to be created in the `ts.Program` by adding an import between `from` and
+   * `to`.
+   *
+   * @returns a `Cycle` object if an import between `from` and `to` would create a cycle; `null`
+   *     otherwise.
+   */
   wouldCreateCycle(from, to) {
     if (this.cachedResults === null || this.cachedResults.from !== from) {
       this.cachedResults = new CycleResults(from, this.importGraph);
     }
     return this.cachedResults.wouldBeCyclic(to) ? new Cycle(this.importGraph, from, to) : null;
   }
+  /**
+   * Record a synthetic import from `from` to `to`.
+   *
+   * This is an import that doesn't exist in the `ts.Program` but will be considered as part of the
+   * import graph for cycle creation.
+   */
   recordSyntheticImport(from, to) {
     this.cachedResults = null;
     this.importGraph.addSyntheticImport(from, to);
@@ -1306,6 +1377,10 @@ var CycleResults = class {
     }
     return false;
   }
+  /**
+   * Returns whether the source file is already known to be cyclic, or `null` if the result is not
+   * yet known.
+   */
   getCachedResult(sf) {
     const result = sf[NgCyclicResult];
     if (result === this.cyclic) {
@@ -1332,12 +1407,18 @@ var Cycle = class {
     this.from = from;
     this.to = to;
   }
+  /**
+   * Compute an array of source-files that illustrates the cyclic path between `from` and `to`.
+   *
+   * Note that a `Cycle` will not be created unless a path is available between `to` and `from`,
+   * so `findPath()` will never return `null`.
+   */
   getPath() {
     return [this.from, ...this.importGraph.findPath(this.to, this.from)];
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/cycles/src/imports.js
+// packages/compiler-cli/src/ngtsc/cycles/src/imports.js
 import ts14 from "typescript";
 var ImportGraph = class {
   checker;
@@ -1347,12 +1428,28 @@ var ImportGraph = class {
     this.checker = checker;
     this.perf = perf;
   }
+  /**
+   * List the direct (not transitive) imports of a given `ts.SourceFile`.
+   *
+   * This operation is cached.
+   */
   importsOf(sf) {
     if (!this.imports.has(sf)) {
       this.imports.set(sf, this.scanImports(sf));
     }
     return this.imports.get(sf);
   }
+  /**
+   * Find an import path from the `start` SourceFile to the `end` SourceFile.
+   *
+   * This function implements a breadth first search that results in finding the
+   * shortest path between the `start` and `end` points.
+   *
+   * @param start the starting point of the path.
+   * @param end the ending point of the path.
+   * @returns an array of source files that connect the `start` and `end` source files, or `null` if
+   *     no path could be found.
+   */
   findPath(start, end) {
     if (start === end) {
       return [start];
@@ -1375,6 +1472,10 @@ var ImportGraph = class {
     }
     return null;
   }
+  /**
+   * Add a record of an import from `sf` to `imported`, that's not present in the original
+   * `ts.Program` but will be remembered by the `ImportGraph`.
+   */
   addSyntheticImport(sf, imported) {
     if (isLocalFile(imported)) {
       this.importsOf(sf).add(imported);
@@ -1422,6 +1523,10 @@ var Found = class {
     this.sourceFile = sourceFile;
     this.parent = parent;
   }
+  /**
+   * Back track through this found SourceFile and its ancestors to generate an array of
+   * SourceFiles that form am import path between two SourceFiles.
+   */
   toPath() {
     const array = [];
     let current = this;
@@ -1433,7 +1538,7 @@ var Found = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/generator.js
+// packages/compiler-cli/src/ngtsc/entry_point/src/generator.js
 import ts15 from "typescript";
 var FlatIndexGenerator = class {
   entryPoint;
@@ -1461,7 +1566,7 @@ export * from '${relativeEntryPoint}';
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/logic.js
+// packages/compiler-cli/src/ngtsc/entry_point/src/logic.js
 function findFlatIndexEntryPoint(rootFiles) {
   const tsFiles = rootFiles.filter((file) => isNonDeclarationTsPath(file));
   let resolvedEntryPoint = null;
@@ -1477,7 +1582,7 @@ function findFlatIndexEntryPoint(rootFiles) {
   return resolvedEntryPoint;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/private_export_checker.js
+// packages/compiler-cli/src/ngtsc/entry_point/src/private_export_checker.js
 import ts16 from "typescript";
 function checkForPrivateExports(entryPoint, checker, refGraph) {
   const diagnostics = [];
@@ -1557,7 +1662,7 @@ function getDescriptorOfDeclaration(decl) {
   }
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/entry_point/src/reference_graph.js
+// packages/compiler-cli/src/ngtsc/entry_point/src/reference_graph.js
 var ReferenceGraph = class {
   references = /* @__PURE__ */ new Map();
   add(from, to) {
@@ -1609,7 +1714,7 @@ var ReferenceGraph = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/dependency_tracking.js
+// packages/compiler-cli/src/ngtsc/incremental/src/dependency_tracking.js
 var FileDependencyGraph = class {
   nodes = /* @__PURE__ */ new Map();
   addDependency(from, on) {
@@ -1625,6 +1730,27 @@ var FileDependencyGraph = class {
     const node = this.nodes.get(from);
     return node ? [...node.usesResources] : [];
   }
+  /**
+   * Update the current dependency graph from a previous one, incorporating a set of physical
+   * changes.
+   *
+   * This method performs two tasks:
+   *
+   * 1. For files which have not logically changed, their dependencies from `previous` are added to
+   *    `this` graph.
+   * 2. For files which have logically changed, they're added to a set of logically changed files
+   *    which is eventually returned.
+   *
+   * In essence, for build `n`, this method performs:
+   *
+   * G(n) + L(n) = G(n - 1) + P(n)
+   *
+   * where:
+   *
+   * G(n) = the dependency graph of build `n`
+   * L(n) = the logically changed files from build n - 1 to build n.
+   * P(n) = the physically changed files from build n - 1 to build n.
+   */
   updateWithPhysicalChanges(previous, changedTsPaths, deletedTsPaths, changedResources) {
     const logicallyChanged = /* @__PURE__ */ new Set();
     for (const sf of previous.nodes.keys()) {
@@ -1674,7 +1800,7 @@ function isLogicallyChanged(sf, node, changedTsPaths, deletedTsPaths, changedRes
   return false;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/state.js
+// packages/compiler-cli/src/ngtsc/incremental/src/state.js
 var IncrementalStateKind;
 (function(IncrementalStateKind2) {
   IncrementalStateKind2[IncrementalStateKind2["Fresh"] = 0] = "Fresh";
@@ -1682,17 +1808,23 @@ var IncrementalStateKind;
   IncrementalStateKind2[IncrementalStateKind2["Analyzed"] = 2] = "Analyzed";
 })(IncrementalStateKind || (IncrementalStateKind = {}));
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/incremental.js
+// packages/compiler-cli/src/ngtsc/incremental/src/incremental.js
 var PhaseKind;
 (function(PhaseKind2) {
   PhaseKind2[PhaseKind2["Analysis"] = 0] = "Analysis";
   PhaseKind2[PhaseKind2["TypeCheckAndEmit"] = 1] = "TypeCheckAndEmit";
 })(PhaseKind || (PhaseKind = {}));
-var IncrementalCompilation = class {
+var IncrementalCompilation = class _IncrementalCompilation {
   depGraph;
   versions;
   step;
   phase;
+  /**
+   * `IncrementalState` of this compilation if it were to be reused in a subsequent incremental
+   * compilation at the current moment.
+   *
+   * Exposed via the `state` read-only getter.
+   */
   _state;
   constructor(state, depGraph, versions, step) {
     this.depGraph = depGraph;
@@ -1704,11 +1836,20 @@ var IncrementalCompilation = class {
       semanticDepGraphUpdater: new SemanticDepGraphUpdater(step !== null ? step.priorState.semanticDepGraph : null)
     };
   }
+  /**
+   * Begin a fresh `IncrementalCompilation`.
+   */
   static fresh(program, versions) {
     const state = {
       kind: IncrementalStateKind.Fresh
     };
-    return new IncrementalCompilation(state, new FileDependencyGraph(), versions, null);
+    return new _IncrementalCompilation(
+      state,
+      new FileDependencyGraph(),
+      versions,
+      /* reuse */
+      null
+    );
   }
   static incremental(program, newVersions, oldProgram, oldState, modifiedResourceFiles, perf) {
     return perf.inPhase(PerfPhase.Reconciliation, () => {
@@ -1717,7 +1858,7 @@ var IncrementalCompilation = class {
       let priorAnalysis;
       switch (oldState.kind) {
         case IncrementalStateKind.Fresh:
-          return IncrementalCompilation.fresh(program, newVersions);
+          return _IncrementalCompilation.fresh(program, newVersions);
         case IncrementalStateKind.Analyzed:
           priorAnalysis = oldState;
           break;
@@ -1748,7 +1889,7 @@ var IncrementalCompilation = class {
           }
         }
         if (sf.isDeclarationFile) {
-          return IncrementalCompilation.fresh(program, newVersions);
+          return _IncrementalCompilation.fresh(program, newVersions);
         }
         physicallyChangedTsFiles.add(sfPath);
       }
@@ -1766,7 +1907,7 @@ var IncrementalCompilation = class {
         changedResourceFiles,
         lastAnalyzedState: priorAnalysis
       };
-      return new IncrementalCompilation(state, depGraph, newVersions, {
+      return new _IncrementalCompilation(state, depGraph, newVersions, {
         priorState: priorAnalysis,
         logicallyChangedTsFiles
       });
@@ -1888,8 +2029,8 @@ function toOriginalSourceFile(sf) {
   }
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/incremental/src/strategy.js
-var TrackedIncrementalBuildStrategy = class {
+// packages/compiler-cli/src/ngtsc/incremental/src/strategy.js
+var TrackedIncrementalBuildStrategy = class _TrackedIncrementalBuildStrategy {
   state = null;
   isSet = false;
   getIncrementalState() {
@@ -1900,7 +2041,7 @@ var TrackedIncrementalBuildStrategy = class {
     this.isSet = true;
   }
   toNextBuildStrategy() {
-    const strategy = new TrackedIncrementalBuildStrategy();
+    const strategy = new _TrackedIncrementalBuildStrategy();
     strategy.state = this.isSet ? this.state : null;
     return strategy;
   }
@@ -1922,7 +2063,7 @@ var PatchedProgramIncrementalBuildStrategy = class {
 };
 var SYM_INCREMENTAL_STATE = Symbol("NgIncrementalState");
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/api.js
+// packages/compiler-cli/src/ngtsc/indexer/src/api.js
 var IdentifierKind;
 (function(IdentifierKind2) {
   IdentifierKind2[IdentifierKind2["Property"] = 0] = "Property";
@@ -1945,30 +2086,47 @@ var AbsoluteSourceSpan = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/context.js
+// packages/compiler-cli/src/ngtsc/indexer/src/context.js
 var IndexingContext = class {
   components = /* @__PURE__ */ new Set();
+  /**
+   * Adds a component to the context.
+   */
   addComponent(info) {
     this.components.add(info);
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/transform.js
+// packages/compiler-cli/src/ngtsc/indexer/src/transform.js
 import { ParseSourceFile } from "@angular/compiler";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/template.js
+// packages/compiler-cli/src/ngtsc/indexer/src/template.js
 import { ASTWithSource, CombinedRecursiveAstVisitor, ImplicitReceiver, PropertyRead, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable, tmplAstVisitAll } from "@angular/compiler";
 var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
   boundTemplate;
+  // Identifiers of interest found in the template.
   identifiers = /* @__PURE__ */ new Set();
   errors = [];
   currentAstWithSource = null;
+  // Map of targets in a template to their identifiers.
   targetIdentifierCache = /* @__PURE__ */ new Map();
+  // Map of elements and templates to their identifiers.
   directiveHostIdentifierCache = /* @__PURE__ */ new Map();
+  /**
+   * Creates a template visitor for a bound template target. The bound target can be used when
+   * deferred to the expression visitor to get information about the target of an expression.
+   *
+   * @param boundTemplate bound template target
+   */
   constructor(boundTemplate) {
     super();
     this.boundTemplate = boundTemplate;
   }
+  /**
+   * Add an identifier for an HTML element and visit its children recursively.
+   *
+   * @param element
+   */
   visitElement(element) {
     const elementIdentifier = this.directiveHostToIdentifier(element);
     if (elementIdentifier !== null) {
@@ -2031,6 +2189,7 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
     this.visit(attribute.value instanceof ASTWithSource ? attribute.value.ast : attribute.value);
     this.currentAstWithSource = previous;
   }
+  /** Creates an identifier for a template element or template node. */
   directiveHostToIdentifier(node) {
     if (this.directiveHostIdentifierCache.has(node)) {
       return this.directiveHostIdentifierCache.get(node);
@@ -2078,10 +2237,12 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
           selector: dir.selector
         };
       }))
+      // cast b/c pre-TypeScript 3.5 unions aren't well discriminated
     };
     this.directiveHostIdentifierCache.set(node, identifier);
     return identifier;
   }
+  /** Creates an identifier for a template reference or template variable target. */
   targetToIdentifier(node) {
     if (this.targetIdentifierCache.has(node)) {
       return this.targetIdentifierCache.get(node);
@@ -2135,6 +2296,7 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
     this.targetIdentifierCache.set(node, identifier);
     return identifier;
   }
+  /** Gets the start location of a string in a SourceSpan */
   getStartLocation(name, context) {
     const localStr = context.toString();
     if (!localStr.includes(name)) {
@@ -2143,6 +2305,12 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
     }
     return context.start.offset + localStr.indexOf(name);
   }
+  /**
+   * Visits a node's expression and adds its identifiers, if any, to the visitor's state.
+   * Only ASTs with information about the expression source and its location are visited.
+   *
+   * @param node node whose expression to visit
+   */
   visit(node) {
     if (node instanceof ASTWithSource) {
       const previous = this.currentAstWithSource;
@@ -2153,6 +2321,12 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
       super.visit(node);
     }
   }
+  /**
+   * Visits an identifier, adding it to the identifier store if it is useful for indexing.
+   *
+   * @param ast expression AST the identifier is in
+   * @param kind identifier kind
+   */
   visitIdentifier(ast, kind) {
     if (this.currentAstWithSource === null || this.currentAstWithSource.source === null) {
       return;
@@ -2190,7 +2364,7 @@ function getTemplateIdentifiers(boundTemplate) {
   return { identifiers: visitor.identifiers, errors: visitor.errors };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/indexer/src/transform.js
+// packages/compiler-cli/src/ngtsc/indexer/src/transform.js
 function generateAnalysis(context) {
   const analysis = /* @__PURE__ */ new Map();
   context.components.forEach(({ declaration, selector, boundTemplate, templateMeta }) => {
@@ -2226,7 +2400,7 @@ function generateAnalysis(context) {
   return analysis;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/metadata/src/ng_module_index.js
+// packages/compiler-cli/src/ngtsc/metadata/src/ng_module_index.js
 var NgModuleIndexImpl = class {
   metaReader;
   localReader;
@@ -2234,7 +2408,11 @@ var NgModuleIndexImpl = class {
     this.metaReader = metaReader;
     this.localReader = localReader;
   }
+  // A map from an NgModule's Class Declaration to the "main" reference to that module, aka the one
+  // present in the reader metadata object
   ngModuleAuthoritativeReference = /* @__PURE__ */ new Map();
+  // A map from a Directive/Pipe's class declaration to the class declarations of all re-exporting
+  // NgModules
   typeToExportingModules = /* @__PURE__ */ new Map();
   indexed = false;
   updateWith(cache, key, elem) {
@@ -2316,7 +2494,7 @@ var NgModuleIndexImpl = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/resource/src/loader.js
+// packages/compiler-cli/src/ngtsc/resource/src/loader.js
 import ts17 from "typescript";
 var CSS_PREPROCESSOR_EXT = /(\.scss|\.sass|\.less|\.styl)$/;
 var RESOURCE_MARKER = ".$ngresource$";
@@ -2336,6 +2514,18 @@ var AdapterResourceLoader = class {
     this.canPreload = !!this.adapter.readResource;
     this.canPreprocess = !!this.adapter.transformResource;
   }
+  /**
+   * Resolve the url of a resource relative to the file that contains the reference to it.
+   * The return value of this method can be used in the `load()` and `preload()` methods.
+   *
+   * Uses the provided CompilerHost if it supports mapping resources to filenames.
+   * Otherwise, uses a fallback mechanism that searches the module resolution candidates.
+   *
+   * @param url The, possibly relative, url of the resource.
+   * @param fromFile The path to the file that contains the URL of the resource.
+   * @returns A resolved url of resource.
+   * @throws An error if the resource cannot be resolved.
+   */
   resolve(url, fromFile) {
     let resolvedUrl = null;
     if (this.adapter.resourceNameToFileName) {
@@ -2348,6 +2538,18 @@ var AdapterResourceLoader = class {
     }
     return resolvedUrl;
   }
+  /**
+   * Preload the specified resource, asynchronously.
+   *
+   * Once the resource is loaded, its value is cached so it can be accessed synchronously via the
+   * `load()` method.
+   *
+   * @param resolvedUrl The url (resolved by a call to `resolve()`) of the resource to preload.
+   * @param context Information about the resource such as the type and containing file.
+   * @returns A Promise that is resolved once the resource has been loaded or `undefined` if the
+   * file has already been loaded.
+   * @throws An Error if pre-loading is not available.
+   */
   preload(resolvedUrl, context) {
     if (!this.adapter.readResource) {
       throw new Error("HostResourceLoader: the CompilerHost provided does not support pre-loading resources.");
@@ -2382,6 +2584,14 @@ var AdapterResourceLoader = class {
       return fetchCompletion;
     }
   }
+  /**
+   * Preprocess the content data of an inline resource, asynchronously.
+   *
+   * @param data The existing content data from the inline resource.
+   * @param context Information regarding the resource such as the type and containing file.
+   * @returns A Promise that resolves to the processed data. If no processing occurs, the
+   * same data string that was passed to the function will be resolved.
+   */
   async preprocessInline(data, context) {
     if (!this.adapter.transformResource || context.type !== "style") {
       return data;
@@ -2398,6 +2608,14 @@ var AdapterResourceLoader = class {
     }
     return transformResult.content;
   }
+  /**
+   * Load the resource at the given url, synchronously.
+   *
+   * The contents of the resource may have been cached by a previous call to `preload()`.
+   *
+   * @param resolvedUrl The url (resolved by a call to `resolve()`) of the resource to load.
+   * @returns The contents of the resource.
+   */
   load(resolvedUrl) {
     if (this.cache.has(resolvedUrl)) {
       return this.cache.get(resolvedUrl);
@@ -2409,9 +2627,16 @@ var AdapterResourceLoader = class {
     this.cache.set(resolvedUrl, result);
     return result;
   }
+  /**
+   * Invalidate the entire resource cache.
+   */
   invalidate() {
     this.cache.clear();
   }
+  /**
+   * Attempt to resolve `url` in the context of `fromFile`, while respecting the rootDirs
+   * option from the tsconfig. First, normalize the file name.
+   */
   fallbackResolve(url, fromFile) {
     let candidateLocations;
     if (url.startsWith("/")) {
@@ -2438,6 +2663,13 @@ var AdapterResourceLoader = class {
     const segment = "." + url;
     return this.adapter.rootDirs.map((rootDir) => join(rootDir, segment));
   }
+  /**
+   * TypeScript provides utilities to resolve module names, but not resource files (which aren't
+   * a part of the ts.Program). However, TypeScript's module resolution can be used creatively
+   * to locate where resource files should be expected to exist. Since module resolution returns
+   * a list of file names that were considered, the loader can enumerate the possible locations
+   * for the file by setting up a module resolution for it that will fail.
+   */
   getResolvedCandidateLocations(url, fromFile) {
     const failedLookup = ts17.resolveModuleName(url + RESOURCE_MARKER, fromFile, this.options, this.lookupResolutionHost);
     if (failedLookup.failedLookupLocations === void 0) {
@@ -2473,7 +2705,7 @@ function createLookupResolutionHost(adapter) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/scope/src/standalone.js
+// packages/compiler-cli/src/ngtsc/scope/src/standalone.js
 var StandaloneComponentScopeReader = class {
   metaReader;
   localModuleReader;
@@ -2571,10 +2803,10 @@ var StandaloneComponentScopeReader = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
 import { ASTWithSource as ASTWithSource2, BindingType, Interpolation, PrefixNot, PropertyRead as PropertyRead2, TmplAstBoundAttribute } from "@angular/compiler";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/src/symbol_util.js
+// packages/compiler-cli/src/ngtsc/typecheck/src/symbol_util.js
 import ts18 from "typescript";
 var SIGNAL_FNS = /* @__PURE__ */ new Set([
   "WritableSignal",
@@ -2584,7 +2816,9 @@ var SIGNAL_FNS = /* @__PURE__ */ new Set([
   "ModelSignal"
 ]);
 function isSignalReference(symbol) {
-  return (symbol.kind === SymbolKind.Expression || symbol.kind === SymbolKind.Variable || symbol.kind === SymbolKind.LetDeclaration) && (symbol.tsType.symbol !== void 0 && isSignalSymbol(symbol.tsType.symbol) || symbol.tsType.aliasSymbol !== void 0 && isSignalSymbol(symbol.tsType.aliasSymbol));
+  return (symbol.kind === SymbolKind.Expression || symbol.kind === SymbolKind.Variable || symbol.kind === SymbolKind.LetDeclaration) && // Note that `tsType.symbol` isn't optional in the typings,
+  // but it appears that it can be undefined at runtime.
+  (symbol.tsType.symbol !== void 0 && isSignalSymbol(symbol.tsType.symbol) || symbol.tsType.aliasSymbol !== void 0 && isSignalSymbol(symbol.tsType.aliasSymbol));
 }
 function isSignalSymbol(symbol) {
   const declarations = symbol.getDeclarations();
@@ -2594,10 +2828,23 @@ function isSignalSymbol(symbol) {
   });
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/api/api.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/api/api.js
 import { CombinedRecursiveAstVisitor as CombinedRecursiveAstVisitor2 } from "@angular/compiler";
 var TemplateCheckWithVisitor = class {
+  /**
+   * When extended diagnostics were first introduced, the visitor wasn't implemented correctly
+   * which meant that it wasn't visiting the `templateAttrs` of structural directives (e.g.
+   * the expression of `*ngIf`). Fixing the issue causes a lot of internal breakages and will likely
+   * need to be done in a major version to avoid external breakages. This flag is used to opt out
+   * pre-existing diagnostics from the correct behavior until the breakages have been fixed while
+   * ensuring that newly-written diagnostics are correct from the beginning.
+   * TODO(crisbeto): remove this flag and fix the internal brekages.
+   */
   canVisitStructuralAttributes = true;
+  /**
+   * Base implementation for run function, visits all nodes in template and calls
+   * `visitNode()` for each one.
+   */
   run(ctx, component, template) {
     const visitor = new TemplateVisitor2(ctx, component, this);
     return visitor.getDiagnostics(template);
@@ -2640,7 +2887,7 @@ var TemplateVisitor2 = class extends CombinedRecursiveAstVisitor2 {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
 var SIGNAL_INSTANCE_PROPERTIES = /* @__PURE__ */ new Set(["set", "update", "asReadonly"]);
 var FUNCTION_INSTANCE_PROPERTIES = /* @__PURE__ */ new Set(["name", "length", "prototype"]);
 var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
@@ -2654,7 +2901,14 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
         return [];
       }
       const nodeAst = isPropertyReadNodeAst(node);
-      if ((node.type === BindingType.Property || node.type === BindingType.Class || node.type === BindingType.Style || node.type === BindingType.Attribute || node.type === BindingType.LegacyAnimation) && nodeAst) {
+      if (
+        // a bound property like `[prop]="mySignal"`
+        (node.type === BindingType.Property || // or a class binding like `[class.myClass]="mySignal"`
+        node.type === BindingType.Class || // or a style binding like `[style.width]="mySignal"`
+        node.type === BindingType.Style || // or an attribute binding like `[attr.role]="mySignal"`
+        node.type === BindingType.Attribute || // or an animation binding like `[@myAnimation]="mySignal"`
+        node.type === BindingType.LegacyAnimation) && nodeAst
+      ) {
         return buildDiagnosticForSignal(ctx, nodeAst, component);
       }
     }
@@ -2702,7 +2956,7 @@ var factory = {
   create: () => new InterpolatedSignalCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/invalid_banana_in_box/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/invalid_banana_in_box/index.js
 import { TmplAstBoundEvent } from "@angular/compiler";
 var InvalidBananaInBoxCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.INVALID_BANANA_IN_BOX;
@@ -2725,7 +2979,7 @@ var factory2 = {
   create: () => new InvalidBananaInBoxCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_control_flow_directive/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_control_flow_directive/index.js
 import { TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
 var KNOWN_CONTROL_FLOW_DIRECTIVES = /* @__PURE__ */ new Map([
   ["ngIf", { directive: "NgIf", builtIn: "@if" }],
@@ -2767,7 +3021,7 @@ var factory3 = {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_ngforof_let/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_ngforof_let/index.js
 import { TmplAstTemplate as TmplAstTemplate3 } from "@angular/compiler";
 var MissingNgForOfLetCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.MISSING_NGFOROF_LET;
@@ -2797,7 +3051,7 @@ var factory4 = {
   create: () => new MissingNgForOfLetCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_structural_directive/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_structural_directive/index.js
 import { TmplAstTemplate as TmplAstTemplate4 } from "@angular/compiler";
 var KNOWN_CONTROL_FLOW_DIRECTIVES2 = /* @__PURE__ */ new Set([
   "ngIf",
@@ -2837,7 +3091,7 @@ var factory5 = {
   create: () => new MissingStructuralDirectiveCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/nullish_coalescing_not_nullable/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/nullish_coalescing_not_nullable/index.js
 import { Binary } from "@angular/compiler";
 import ts19 from "typescript";
 var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
@@ -2880,7 +3134,7 @@ var factory6 = {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/optional_chain_not_nullable/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/optional_chain_not_nullable/index.js
 import { SafeCall, SafeKeyedRead, SafePropertyRead } from "@angular/compiler";
 import ts20 from "typescript";
 var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
@@ -2924,7 +3178,7 @@ var factory7 = {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/skip_hydration_not_static/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/skip_hydration_not_static/index.js
 import { TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstTextAttribute } from "@angular/compiler";
 var NG_SKIP_HYDRATION_ATTR_NAME = "ngSkipHydration";
 var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
@@ -2935,7 +3189,11 @@ var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
       const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
       return [diagnostic];
     }
-    const acceptedValues = ["true", ""];
+    const acceptedValues = [
+      "true",
+      ""
+      /* empty string */
+    ];
     if (node instanceof TmplAstTextAttribute && node.name === NG_SKIP_HYDRATION_ATTR_NAME && !acceptedValues.includes(node.value) && node.value !== void 0) {
       const errorString = `ngSkipHydration only accepts "true" or "" as value or no value at all. For example 'ngSkipHydration="true"' or 'ngSkipHydration'`;
       const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
@@ -2950,7 +3208,7 @@ var factory8 = {
   create: () => new NgSkipHydrationSpec()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/suffix_not_supported/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/suffix_not_supported/index.js
 import { TmplAstBoundAttribute as TmplAstBoundAttribute3 } from "@angular/compiler";
 var STYLE_SUFFIXES = ["px", "%", "em"];
 var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
@@ -2971,7 +3229,7 @@ var factory9 = {
   create: () => new SuffixNotSupportedCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/text_attribute_not_binding/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/text_attribute_not_binding/index.js
 import { TmplAstTextAttribute as TmplAstTextAttribute2 } from "@angular/compiler";
 var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING;
@@ -2991,7 +3249,11 @@ var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
       }
     } else {
       const expectedKey = `[${name}]`;
-      const expectedValue = node.value === "true" || node.value === "false" ? node.value : `'${node.value}'`;
+      const expectedValue = (
+        // true/false are special cases because we don't want to convert them to strings but
+        // rather maintain the logical true/false when bound.
+        node.value === "true" || node.value === "false" ? node.value : `'${node.value}'`
+      );
       errorString = "Attribute, style, and class bindings should be enclosed with square braces.";
       if (node.value) {
         errorString += ` For example, '${expectedKey}="${expectedValue}"'.`;
@@ -3007,7 +3269,7 @@ var factory10 = {
   create: () => new TextAttributeNotBindingSpec()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.js
 import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional, ParsedEventType, PropertyRead as PropertyRead3, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
 var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING;
@@ -3055,7 +3317,7 @@ var factory11 = {
   create: () => new UninvokedFunctionInEventBindingSpec()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unparenthesized_nullish_coalescing/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unparenthesized_nullish_coalescing/index.js
 import { Binary as Binary2 } from "@angular/compiler";
 var UnparenthesizedNullishCoalescing = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNPARENTHESIZED_NULLISH_COALESCING;
@@ -3085,7 +3347,7 @@ var factory12 = {
   create: () => new UnparenthesizedNullishCoalescing()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unused_let_declaration/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unused_let_declaration/index.js
 import { AST, ASTWithSource as ASTWithSource4, TmplAstLetDeclaration } from "@angular/compiler";
 var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNUSED_LET_DECLARATION;
@@ -3127,7 +3389,7 @@ var factory13 = {
   create: () => new UnusedLetDeclarationCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_track_function/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_track_function/index.js
 import { Call as Call2, PropertyRead as PropertyRead4, SafeCall as SafeCall3, SafePropertyRead as SafePropertyRead3, TmplAstForLoopBlock } from "@angular/compiler";
 var UninvokedTrackFunctionCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_TRACK_FUNCTION;
@@ -3159,10 +3421,10 @@ var factory14 = {
   create: () => new UninvokedTrackFunctionCheck()
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.js
 import ts21 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/api/src/public_options.js
+// packages/compiler-cli/src/ngtsc/core/api/src/public_options.js
 var DiagnosticCategoryLabel;
 (function(DiagnosticCategoryLabel2) {
   DiagnosticCategoryLabel2["Warning"] = "warning";
@@ -3170,7 +3432,7 @@ var DiagnosticCategoryLabel;
   DiagnosticCategoryLabel2["Suppress"] = "suppress";
 })(DiagnosticCategoryLabel || (DiagnosticCategoryLabel = {}));
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.js
 var ExtendedTemplateCheckerImpl = class {
   partialCtx;
   templateChecks;
@@ -3198,6 +3460,8 @@ var ExtendedTemplateCheckerImpl = class {
     for (const [check, category] of this.templateChecks.entries()) {
       const ctx = {
         ...this.partialCtx,
+        // Wrap `templateTypeChecker.makeTemplateDiagnostic()` to implicitly provide all the known
+        // options.
         makeTemplateDiagnostic: (span, message, relatedInformation) => {
           return this.partialCtx.templateTypeChecker.makeTemplateDiagnostic(component, span, category, check.code, message, relatedInformation);
         }
@@ -3224,7 +3488,7 @@ function assertNever(value) {
 ${value}`);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/extended/index.js
+// packages/compiler-cli/src/ngtsc/typecheck/extended/index.js
 var ALL_DIAGNOSTIC_FACTORIES = [
   factory2,
   factory6,
@@ -3247,7 +3511,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ...ALL_DIAGNOSTIC_FACTORIES.map((factory15) => factory15.name)
 ]);
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
+// packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
 import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead5, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts22 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
@@ -3260,7 +3524,7 @@ var TemplateSemanticsCheckerImpl = class {
     return template !== null ? TemplateSemanticsVisitor.visit(template, component, this.templateTypeChecker) : [];
   }
 };
-var TemplateSemanticsVisitor = class extends TmplAstRecursiveVisitor {
+var TemplateSemanticsVisitor = class _TemplateSemanticsVisitor extends TmplAstRecursiveVisitor {
   expressionVisitor;
   constructor(expressionVisitor) {
     super();
@@ -3269,7 +3533,7 @@ var TemplateSemanticsVisitor = class extends TmplAstRecursiveVisitor {
   static visit(nodes, component, templateTypeChecker) {
     const diagnostics = [];
     const expressionVisitor = new ExpressionsSemanticsVisitor(templateTypeChecker, component, diagnostics);
-    const templateVisitor = new TemplateSemanticsVisitor(expressionVisitor);
+    const templateVisitor = new _TemplateSemanticsVisitor(expressionVisitor);
     nodes.forEach((node) => node.visit(templateVisitor));
     return diagnostics;
   }
@@ -3346,7 +3610,7 @@ function unwrapAstWithSource(ast) {
   return ast instanceof ASTWithSource5 ? ast.ast : ast;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/rules/initializer_api_usage_rule.js
+// packages/compiler-cli/src/ngtsc/validation/src/rules/initializer_api_usage_rule.js
 import ts23 from "typescript";
 var APIS_TO_CHECK = [
   INPUT_INITIALIZER_FN,
@@ -3398,7 +3662,7 @@ var InitializerApiUsageRule = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/rules/unused_standalone_imports_rule.js
+// packages/compiler-cli/src/ngtsc/validation/src/rules/unused_standalone_imports_rule.js
 import ts24 from "typescript";
 var UnusedStandaloneImportsRule = class {
   templateTypeChecker;
@@ -3463,6 +3727,11 @@ var UnusedStandaloneImportsRule = class {
     }
     return unused;
   }
+  /**
+   * Determines if an import reference *might* be coming from a shared imports array.
+   * @param reference Reference to be checked.
+   * @param rawImports AST node that defines the `imports` array.
+   */
   isPotentialSharedReference(reference, rawImports) {
     if (reference.getIdentityInExpression(rawImports) !== null) {
       return false;
@@ -3489,13 +3758,17 @@ function closestNode(start, predicate) {
   return null;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/validation/src/source_file_validator.js
+// packages/compiler-cli/src/ngtsc/validation/src/source_file_validator.js
 var SourceFileValidator = class {
   rules;
   constructor(reflector, importedSymbolsTracker, templateTypeChecker, typeCheckingConfig) {
     this.rules = [new InitializerApiUsageRule(reflector, importedSymbolsTracker)];
     this.rules.push(new UnusedStandaloneImportsRule(templateTypeChecker, typeCheckingConfig, importedSymbolsTracker));
   }
+  /**
+   * Gets the diagnostics for a specific file, or null if the file is valid.
+   * @param sourceFile File to be checked.
+   */
   getDiagnosticsForFile(sourceFile) {
     if (sourceFile.isDeclarationFile || sourceFile.fileName.endsWith(".ngtypecheck.ts")) {
       return null;
@@ -3529,7 +3802,7 @@ var SourceFileValidator = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/feature_detection.js
+// packages/compiler-cli/src/ngtsc/core/src/feature_detection.js
 import semver from "semver";
 function coreVersionSupportsFeature(coreVersion, minVersion) {
   if (coreVersion === `0.0.0-${"PLACEHOLDER"}`) {
@@ -3538,7 +3811,7 @@ function coreVersionSupportsFeature(coreVersion, minVersion) {
   return semver.satisfies(coreVersion, minVersion, { includePrerelease: true });
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/compiler.js
+// packages/compiler-cli/src/ngtsc/core/src/compiler.js
 var CompilationTicketKind;
 (function(CompilationTicketKind2) {
   CompilationTicketKind2[CompilationTicketKind2["Fresh"] = 0] = "Fresh";
@@ -3596,7 +3869,7 @@ function incrementalFromStateTicket(oldProgram, oldState, newProgram, options, i
     perfRecorder
   };
 }
-var NgCompiler = class {
+var NgCompiler = class _NgCompiler {
   adapter;
   options;
   inputProgram;
@@ -3605,8 +3878,24 @@ var NgCompiler = class {
   incrementalCompilation;
   usePoisonedData;
   livePerfRecorder;
+  /**
+   * Lazily evaluated state of the compilation.
+   *
+   * This is created on demand by calling `ensureAnalyzed`.
+   */
   compilation = null;
+  /**
+   * Any diagnostics related to the construction of the compilation.
+   *
+   * These are diagnostics which arose during setup of the host and/or program.
+   */
   constructionDiagnostics = [];
+  /**
+   * Non-template diagnostics related to the program itself. Does not include template
+   * diagnostics because the template type checker memoizes them itself.
+   *
+   * This is set by (and memoizes) `getNonTemplateDiagnostics`.
+   */
   nonTemplateDiagnostics = null;
   closureCompilerEnabled;
   currentProgram;
@@ -3624,13 +3913,27 @@ var NgCompiler = class {
   implicitStandaloneValue;
   enableSelectorless;
   emitDeclarationOnly;
+  /**
+   * `NgCompiler` can be reused for multiple compilations (for resource-only changes), and each
+   * new compilation uses a fresh `PerfRecorder`. Thus, classes created with a lifespan of the
+   * `NgCompiler` use a `DelegatingPerfRecorder` so the `PerfRecorder` they write to can be updated
+   * with each fresh compilation.
+   */
   delegatingPerfRecorder;
+  /**
+   * Convert a `CompilationTicket` into an `NgCompiler` instance for the requested compilation.
+   *
+   * Depending on the nature of the compilation request, the `NgCompiler` instance may be reused
+   * from a previous compilation and updated with any changes, it may be a new instance which
+   * incrementally reuses state from a previous compilation, or it may represent a fresh
+   * compilation entirely.
+   */
   static fromTicket(ticket, adapter) {
     switch (ticket.kind) {
       case CompilationTicketKind.Fresh:
-        return new NgCompiler(adapter, ticket.options, ticket.tsProgram, ticket.programDriver, ticket.incrementalBuildStrategy, IncrementalCompilation.fresh(ticket.tsProgram, versionMapFromProgram(ticket.tsProgram, ticket.programDriver)), ticket.enableTemplateTypeChecker, ticket.usePoisonedData, ticket.perfRecorder);
+        return new _NgCompiler(adapter, ticket.options, ticket.tsProgram, ticket.programDriver, ticket.incrementalBuildStrategy, IncrementalCompilation.fresh(ticket.tsProgram, versionMapFromProgram(ticket.tsProgram, ticket.programDriver)), ticket.enableTemplateTypeChecker, ticket.usePoisonedData, ticket.perfRecorder);
       case CompilationTicketKind.IncrementalTypeScript:
-        return new NgCompiler(adapter, ticket.options, ticket.newProgram, ticket.programDriver, ticket.incrementalBuildStrategy, ticket.incrementalCompilation, ticket.enableTemplateTypeChecker, ticket.usePoisonedData, ticket.perfRecorder);
+        return new _NgCompiler(adapter, ticket.options, ticket.newProgram, ticket.programDriver, ticket.incrementalBuildStrategy, ticket.incrementalCompilation, ticket.enableTemplateTypeChecker, ticket.usePoisonedData, ticket.perfRecorder);
       case CompilationTicketKind.IncrementalResource:
         const compiler = ticket.compiler;
         compiler.updateWithChangedResources(ticket.modifiedResourceFiles, ticket.perfRecorder);
@@ -3662,6 +3965,10 @@ var NgCompiler = class {
     this.entryPoint = adapter.entryPoint !== null ? getSourceFileOrNull(inputProgram, adapter.entryPoint) : null;
     const moduleResolutionCache = ts25.createModuleResolutionCache(
       this.adapter.getCurrentDirectory(),
+      // doen't retain a reference to `this`, if other closures in the constructor here reference
+      // `this` internally then a closure created here would retain them. This can cause major
+      // memory leak issues since the `moduleResolutionCache` is a long-lived object and finds its
+      // way into all kinds of places inside TS internal objects.
       this.adapter.getCanonicalFileName.bind(this.adapter)
     );
     this.moduleResolver = new ModuleResolver(inputProgram, this.options, this.adapter, moduleResolutionCache);
@@ -3711,10 +4018,18 @@ var NgCompiler = class {
       }
     });
   }
+  /**
+   * Get the resource dependencies of a file.
+   *
+   * If the file is not part of the compilation, an empty array will be returned.
+   */
   getResourceDependencies(file) {
     this.ensureAnalyzed();
     return this.incrementalCompilation.depGraph.getResourceDependencies(file);
   }
+  /**
+   * Get all Angular-related diagnostics for this compilation.
+   */
   getDiagnostics() {
     const diagnostics = [...this.getNonTemplateDiagnostics()];
     try {
@@ -3727,6 +4042,11 @@ var NgCompiler = class {
     }
     return this.addMessageTextDetails(diagnostics);
   }
+  /**
+   * Get all Angular-related diagnostics for this compilation.
+   *
+   * If a `ts.SourceFile` is passed, only diagnostics related to that file are returned.
+   */
   getDiagnosticsForFile(file, optimizeFor) {
     const diagnostics = [
       ...this.getNonTemplateDiagnostics().filter((diag) => diag.file === file)
@@ -3741,6 +4061,9 @@ var NgCompiler = class {
     }
     return this.addMessageTextDetails(diagnostics);
   }
+  /**
+   * Get all `ts.Diagnostic`s currently available that pertain to the given component.
+   */
   getDiagnosticsForComponent(component) {
     const compilation = this.ensureAnalyzed();
     const ttc = compilation.templateTypeChecker;
@@ -3762,6 +4085,9 @@ var NgCompiler = class {
     }
     return this.addMessageTextDetails(diagnostics);
   }
+  /**
+   * Add Angular.io error guide links to diagnostics for this compilation.
+   */
   addMessageTextDetails(diagnostics) {
     return diagnostics.map((diag) => {
       if (diag.code && COMPILER_ERRORS_WITH_GUIDES.has(ngErrorCode(diag.code))) {
@@ -3773,9 +4099,27 @@ var NgCompiler = class {
       return diag;
     });
   }
+  /**
+   * Get all setup-related diagnostics for this compilation.
+   */
   getOptionDiagnostics() {
     return this.constructionDiagnostics;
   }
+  /**
+   * Get the current `ts.Program` known to this `NgCompiler`.
+   *
+   * Compilation begins with an input `ts.Program`, and during template type-checking operations new
+   * `ts.Program`s may be produced using the `ProgramDriver`. The most recent such `ts.Program` to
+   * be produced is available here.
+   *
+   * This `ts.Program` serves two key purposes:
+   *
+   * * As an incremental starting point for creating the next `ts.Program` based on files that the
+   *   user has changed (for clients using the TS compiler program APIs).
+   *
+   * * As the "before" point for an incremental compilation invocation, to determine what's changed
+   *   between the old and new programs (for all compilations).
+   */
   getCurrentProgram() {
     return this.currentProgram;
   }
@@ -3785,14 +4129,23 @@ var NgCompiler = class {
     }
     return this.ensureAnalyzed().templateTypeChecker;
   }
+  /**
+   * Retrieves the `ts.Declaration`s for any component(s) which use the given template file.
+   */
   getComponentsWithTemplateFile(templateFilePath) {
     const { resourceRegistry } = this.ensureAnalyzed();
     return resourceRegistry.getComponentsWithTemplate(resolve(templateFilePath));
   }
+  /**
+   * Retrieves the `ts.Declaration`s for any component(s) which use the given template file.
+   */
   getComponentsWithStyleFile(styleFilePath) {
     const { resourceRegistry } = this.ensureAnalyzed();
     return resourceRegistry.getComponentsWithStyle(resolve(styleFilePath));
   }
+  /**
+   * Retrieves external resources for the given directive.
+   */
   getDirectiveResources(classDecl) {
     if (!isNamedClassDeclaration(classDecl)) {
       return null;
@@ -3815,6 +4168,15 @@ var NgCompiler = class {
     }
     return meta;
   }
+  /**
+   * Perform Angular's analysis step (as a precursor to `getDiagnostics` or `prepareEmit`)
+   * asynchronously.
+   *
+   * Normally, this operation happens lazily whenever `getDiagnostics` or `prepareEmit` are called.
+   * However, certain consumers may wish to allow for an asynchronous phase of analysis, where
+   * resources such as `styleUrls` are resolved asynchronously. In these cases `analyzeAsync` must
+   * be called first, and its `Promise` awaited prior to calling any other APIs of `NgCompiler`.
+   */
   async analyzeAsync() {
     if (this.compilation !== null) {
       return;
@@ -3836,6 +4198,10 @@ var NgCompiler = class {
       this.resolveCompilation(this.compilation.traitCompiler);
     });
   }
+  /**
+   * Fetch transformers and other information which is necessary for a consumer to `emit` the
+   * program with Angular-added definitions.
+   */
   prepareEmit() {
     const compilation = this.ensureAnalyzed();
     untagAllTsFiles(this.inputProgram);
@@ -3884,12 +4250,27 @@ var NgCompiler = class {
     }
     return { transformers: { before, afterDeclarations } };
   }
+  /**
+   * Run the indexing process and return a `Map` of all indexed components.
+   *
+   * See the `indexing` package for more details.
+   */
   getIndexedComponents() {
     const compilation = this.ensureAnalyzed();
     const context = new IndexingContext();
     compilation.traitCompiler.index(context);
     return generateAnalysis(context);
   }
+  /**
+   * Gets information for the current program that may be used to generate API
+   * reference documentation. This includes Angular-specific information, such
+   * as component inputs and outputs.
+   *
+   * @param entryPoint Path to the entry point for the package for which API
+   *     docs should be extracted.
+   *
+   * @returns A map of symbols with their associated module, eg: ApplicationRef => @angular/core
+   */
   getApiDocumentation(entryPoint, privateModules) {
     const compilation = this.ensureAnalyzed();
     const checker = this.inputProgram.getTypeChecker();
@@ -3903,10 +4284,17 @@ var NgCompiler = class {
     const rootDir = this.inputProgram.getCurrentDirectory();
     return docsExtractor.extractAll(entryPointSourceFile, rootDir, privateModules);
   }
+  /**
+   * Collect i18n messages into the `Xi18nContext`.
+   */
   xi18n(ctx) {
     const compilation = this.ensureAnalyzed();
     compilation.traitCompiler.xi18n(ctx);
   }
+  /**
+   * Emits the JavaScript module that can be used to replace the metadata of a class during HMR.
+   * @param node Class for which to generate the update module.
+   */
   emitHmrUpdateModule(node) {
     const { traitCompiler, reflector } = this.ensureAnalyzed();
     if (!reflector.isClass(node)) {
@@ -3922,6 +4310,9 @@ var NgCompiler = class {
     return ts25.transpileModule(nodeText, {
       compilerOptions: {
         ...this.options,
+        // Some module types can produce additional code (see #60795) whereas we need the
+        // HMR update module to use a native `export`. Override the `target` and `module`
+        // to ensure that it looks as expected.
         module: ts25.ModuleKind.ES2022,
         target: ts25.ScriptTarget.ES2022
       },
@@ -3976,18 +4367,28 @@ var NgCompiler = class {
         checkControlFlowBodies: true,
         strictNullInputBindings: strictTemplates,
         checkTypeOfAttributes: strictTemplates,
+        // Even in full template type-checking mode, DOM binding checks are not quite ready yet.
         checkTypeOfDomBindings: false,
         checkTypeOfOutputEvents: strictTemplates,
         checkTypeOfAnimationEvents: strictTemplates,
+        // Checking of DOM events currently has an adverse effect on developer experience,
+        // e.g. for `<input (blur)="update($event.target.value)">` enabling this check results in:
+        // - error TS2531: Object is possibly 'null'.
+        // - error TS2339: Property 'value' does not exist on type 'EventTarget'.
         checkTypeOfDomEvents: strictTemplates,
         checkTypeOfDomReferences: strictTemplates,
+        // Non-DOM references have the correct type in View Engine so there is no strictness flag.
         checkTypeOfNonDomReferences: true,
+        // Pipes are checked in View Engine so there is no strictness flag.
         checkTypeOfPipes: true,
         strictSafeNavigationTypes: strictTemplates,
         useContextGenericType: strictTemplates,
         strictLiteralTypes: true,
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
+        // Warnings for suboptimal type inference are only enabled if in Language Service mode
+        // (providing the full TemplateTypeChecker API) and if strict mode is not enabled. In strict
+        // mode, the user is in full control of type inference.
         suggestionsForSuboptimalTypeInference: this.enableTemplateTypeChecker && !strictTemplates,
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
@@ -4000,6 +4401,8 @@ var NgCompiler = class {
         checkQueries: false,
         checkTemplateBodies: false,
         checkControlFlowBodies: false,
+        // Enable deep schema checking in "basic" template type-checking mode only if Closure
+        // compilation is requested, which is a good proxy for "only in google3".
         alwaysCheckSchemaInTemplateBodies: this.closureCompilerEnabled,
         checkTypeOfInputBindings: false,
         strictNullInputBindings: false,
@@ -4017,6 +4420,8 @@ var NgCompiler = class {
         strictLiteralTypes: false,
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
+        // In "basic" template type-checking mode, no warnings are produced since most things are
+        // not checked anyways.
         suggestionsForSuboptimalTypeInference: false,
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
@@ -4155,8 +4560,13 @@ var NgCompiler = class {
         localImportStrategy = new RelativePathStrategy(reflector);
       }
       refEmitter = new ReferenceEmitter([
+        // First, try to use local identifiers if available.
         new LocalIdentifierStrategy(),
+        // Next, attempt to use an absolute import.
         new AbsoluteModuleStrategy(this.inputProgram, checker, this.moduleResolver, reflector),
+        // Finally, check if the reference is being written into a file within the project's .ts
+        // sources, and use a relative import if so. If this fails, ReferenceEmitter will throw
+        // an error.
         localImportStrategy
       ]);
       if (this.entryPoint === null && this.options.generateDeepReexports === true) {
@@ -4164,8 +4574,11 @@ var NgCompiler = class {
       }
     } else {
       refEmitter = new ReferenceEmitter([
+        // First, try to use local identifiers if available.
         new LocalIdentifierStrategy(),
+        // Then use aliased references (this is a workaround to StrictDeps checks).
         ...this.options["_useHostForImportAndAliasGeneration"] ? [new AliasStrategy()] : [],
+        // Then use fileNameToModuleName to emit imports.
         new UnifiedModulesStrategy(reflector, this.adapter.unifiedModulesHost)
       ]);
       if (this.options["_useHostForImportAndAliasGeneration"]) {
@@ -4227,7 +4640,11 @@ var NgCompiler = class {
     const jitDeclarationRegistry = new JitDeclarationRegistry();
     const handlers = [
       new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, this.adapter, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, this.enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, this.options.i18nPreserveWhitespaceForLegacyExtraction ?? true, !!this.options.strictStandalone, this.enableHmr, this.implicitStandaloneValue, typeCheckHostBindings, this.enableSelectorless, this.emitDeclarationOnly),
+      // TODO(alxhub): understand why the cast here is necessary (something to do with `null`
+      // not being assignable to `unknown` when wrapped in `Readonly`).
       new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, importTracker, supportTestBed, typeCheckScopeRegistry, compilationMode, jitDeclarationRegistry, resourceRegistry, !!this.options.strictStandalone, this.implicitStandaloneValue, this.usePoisonedData, typeCheckHostBindings, this.emitDeclarationOnly),
+      // Pipe handler must be before injectable handler in list so pipe factories are printed
+      // before injectable factories (so injectable factories can delegate to them)
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode, !!this.options.generateExtraImportsInLocalMode, !!this.options.strictStandalone, this.implicitStandaloneValue),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
       new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, this.options.onlyPublishPublicTypingsForNgModules ?? false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode, localCompilationExtraImportsTracker, jitDeclarationRegistry, this.emitDeclarationOnly)
@@ -4426,7 +4843,7 @@ function versionMapFromProgram(program, driver) {
   return versions;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/core/src/host.js
+// packages/compiler-cli/src/ngtsc/core/src/host.js
 import ts26 from "typescript";
 var DelegatingCompilerHost = class {
   delegate;
@@ -4459,6 +4876,8 @@ var DelegatingCompilerHost = class {
   hasInvalidatedResolutions;
   resolveModuleNameLiterals;
   resolveTypeReferenceDirectiveReferences;
+  // jsDocParsingMode is not a method like the other elements above
+  // TODO: ignore usage can be dropped once 5.2 support is dropped
   get jsDocParsingMode() {
     return this.delegate.jsDocParsingMode;
   }
@@ -4501,7 +4920,7 @@ var DelegatingCompilerHost = class {
     return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
   }
 };
-var NgCompilerHost = class extends DelegatingCompilerHost {
+var NgCompilerHost = class _NgCompilerHost extends DelegatingCompilerHost {
   shimAdapter;
   shimTagger;
   entryPoint = null;
@@ -4520,15 +4939,32 @@ var NgCompilerHost = class extends DelegatingCompilerHost {
       this.resolveModuleNames = this.createCachedResolveModuleNamesFunction();
     }
   }
+  /**
+   * Retrieves a set of `ts.SourceFile`s which should not be emitted as JS files.
+   *
+   * Available after this host is used to create a `ts.Program` (which causes all the files in the
+   * program to be enumerated).
+   */
   get ignoreForEmit() {
     return this.shimAdapter.ignoreForEmit;
   }
+  /**
+   * Retrieve the array of shim extension prefixes for which shims were created for each original
+   * file.
+   */
   get shimExtensionPrefixes() {
     return this.shimAdapter.extensionPrefixes;
   }
+  /**
+   * Performs cleanup that needs to happen after a `ts.Program` has been created using this host.
+   */
   postProgramCreationCleanup() {
     this.shimTagger.finalize();
   }
+  /**
+   * Create an `NgCompilerHost` from a delegate host, an array of input filenames, and the full set
+   * of TypeScript and Angular compiler options.
+   */
   static wrap(delegate, inputFiles, options, oldProgram) {
     const topLevelShimGenerators = [];
     const perFileShimGenerators = [];
@@ -4563,11 +4999,22 @@ var NgCompilerHost = class extends DelegatingCompilerHost {
     }
     const shimAdapter = new ShimAdapter(delegate, normalizedTsInputFiles, topLevelShimGenerators, perFileShimGenerators, oldProgram);
     const shimTagger = new ShimReferenceTagger(perFileShimGenerators.map((gen) => gen.extensionPrefix));
-    return new NgCompilerHost(delegate, inputFiles, rootDirs, shimAdapter, shimTagger, entryPoint, diagnostics);
+    return new _NgCompilerHost(delegate, inputFiles, rootDirs, shimAdapter, shimTagger, entryPoint, diagnostics);
   }
+  /**
+   * Check whether the given `ts.SourceFile` is a shim file.
+   *
+   * If this returns false, the file is user-provided.
+   */
   isShim(sf) {
     return isShim(sf);
   }
+  /**
+   * Check whether the given `ts.SourceFile` is a resource file.
+   *
+   * This simply returns `false` for the compiler-cli since resource files are not added as root
+   * files to the project.
+   */
   isResource(sf) {
     return false;
   }
@@ -4600,10 +5047,13 @@ var NgCompilerHost = class extends DelegatingCompilerHost {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/program.js
+// packages/compiler-cli/src/ngtsc/program.js
 var NgtscProgram = class {
   options;
   compiler;
+  /**
+   * The primary TypeScript program, which is used for analysis and emit.
+   */
   tsProgram;
   host;
   incrementalStrategy;
@@ -4645,7 +5095,9 @@ var NgtscProgram = class {
         this.incrementalStrategy,
         programDriver,
         perfRecorder,
+        /* enableTemplateTypeChecker */
         false,
+        /* usePoisonedData */
         false
       );
     } else {
@@ -4727,6 +5179,13 @@ var NgtscProgram = class {
       return this.compiler.getDiagnosticsForFile(sf, OptimizeFor.WholeProgram);
     }
   }
+  /**
+   * Ensure that the `NgCompiler` has properly analyzed the program, and allow for the asynchronous
+   * loading of any resources during the process.
+   *
+   * This is used by the Angular CLI to allow for spawning (async) child compilations for things
+   * like SASS files used in `styleUrls`.
+   */
   loadNgStructureAsync() {
     return this.compiler.analyzeAsync();
   }
@@ -4808,6 +5267,14 @@ var NgtscProgram = class {
   getIndexedComponents() {
     return this.compiler.getIndexedComponents();
   }
+  /**
+   * Gets information for the current program that may be used to generate API
+   * reference documentation. This includes Angular-specific information, such
+   * as component inputs and outputs.
+   *
+   * @param entryPoint Path to the entry point for the package for which API
+   *     docs should be extracted.
+   */
   getApiDocumentation(entryPoint, privateModules) {
     return this.compiler.getApiDocumentation(entryPoint, privateModules);
   }
@@ -4828,15 +5295,15 @@ function mergeEmitResults(emitResults) {
   return { diagnostics, emitSkipped, emittedFiles };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/program.js
+// packages/compiler-cli/src/transformers/program.js
 function createProgram({ rootNames, options, host, oldProgram }) {
   return new NgtscProgram(rootNames, options, host, oldProgram);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.js
+// packages/compiler-cli/src/perform_compile.js
 import ts29 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/transformers/util.js
+// packages/compiler-cli/src/transformers/util.js
 import ts28 from "typescript";
 function createMessageDiagnostic(messageText) {
   return {
@@ -4850,7 +5317,7 @@ function createMessageDiagnostic(messageText) {
   };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/perform_compile.js
+// packages/compiler-cli/src/perform_compile.js
 var defaultFormatHost = {
   getCurrentDirectory: () => ts29.sys.getCurrentDirectory(),
   getCanonicalFileName: (fileName) => fileName,
@@ -5066,13 +5533,6 @@ export {
   performCompilation,
   defaultGatherDiagnostics
 };
-/*!
- * @license
- * Copyright Google LLC All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.dev/license
- */
 /**
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -5080,4 +5540,10 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-YNE6T2TY.js.map
+/*!
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */

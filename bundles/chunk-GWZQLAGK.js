@@ -3,7 +3,7 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/invalid_file_system.js
+// packages/compiler-cli/src/ngtsc/file_system/src/invalid_file_system.js
 var InvalidFileSystem = class {
   exists(path) {
     throw makeError();
@@ -91,7 +91,7 @@ function makeError() {
   return new Error("FileSystem has not been configured. Please call `setFileSystem()` before calling this method.");
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/util.js
+// packages/compiler-cli/src/ngtsc/file_system/src/util.js
 var TS_DTS_JS_EXTENSION = /(?:\.d)?\.ts$|\.js$/;
 function normalizeSeparators(path) {
   return path.replace(/\\/g, "/");
@@ -107,7 +107,7 @@ function getSourceFileOrError(program, fileName) {
   return sf;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/helpers.js
+// packages/compiler-cli/src/ngtsc/file_system/src/helpers.js
 var fs = new InvalidFileSystem();
 function getFileSystem() {
   return fs;
@@ -164,7 +164,7 @@ function toRelativeImport(relativePath) {
   return isLocalRelativePath(relativePath) ? `./${relativePath}` : relativePath;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/compiler_host.js
+// packages/compiler-cli/src/ngtsc/file_system/src/compiler_host.js
 import * as os from "os";
 import ts from "typescript";
 var NgtscCompilerHost = class {
@@ -224,8 +224,14 @@ var NgtscCompilerHost = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/logical.js
+// packages/compiler-cli/src/ngtsc/file_system/src/logical.js
 var LogicalProjectPath = {
+  /**
+   * Get the relative path between two `LogicalProjectPath`s.
+   *
+   * This will return a `PathSegment` which would be a valid module specifier to use in `from` when
+   * importing from `to`.
+   */
   relativePathBetween: function(from, to) {
     const relativePath = relative(dirname(resolve(from)), resolve(to));
     return toRelativeImport(relativePath);
@@ -233,17 +239,40 @@ var LogicalProjectPath = {
 };
 var LogicalFileSystem = class {
   compilerHost;
+  /**
+   * The root directories of the project, sorted with the longest path first.
+   */
   rootDirs;
+  /**
+   * The same root directories as `rootDirs` but with each one converted to its
+   * canonical form for matching in case-insensitive file-systems.
+   */
   canonicalRootDirs;
+  /**
+   * A cache of file paths to project paths, because computation of these paths is slightly
+   * expensive.
+   */
   cache = /* @__PURE__ */ new Map();
   constructor(rootDirs, compilerHost) {
     this.compilerHost = compilerHost;
     this.rootDirs = rootDirs.concat([]).sort((a, b) => b.length - a.length);
     this.canonicalRootDirs = this.rootDirs.map((dir) => this.compilerHost.getCanonicalFileName(dir));
   }
+  /**
+   * Get the logical path in the project of a `ts.SourceFile`.
+   *
+   * This method is provided as a convenient alternative to calling
+   * `logicalPathOfFile(absoluteFromSourceFile(sf))`.
+   */
   logicalPathOfSf(sf) {
     return this.logicalPathOfFile(absoluteFromSourceFile(sf));
   }
+  /**
+   * Get the logical path in the project of a source file.
+   *
+   * @returns A `LogicalProjectPath` to the source file, or `null` if the source file is not in any
+   * of the TS project's root directories.
+   */
   logicalPathOfFile(physicalFile) {
     if (!this.cache.has(physicalFile)) {
       const canonicalFilePath = this.compilerHost.getCanonicalFileName(physicalFile);
@@ -273,7 +302,7 @@ function isWithinBasePath(base, path) {
   return isLocalRelativePath(relative(base, path));
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/ts_read_directory.js
+// packages/compiler-cli/src/ngtsc/file_system/src/ts_read_directory.js
 import ts2 from "typescript";
 function createFileSystemTsReadDirectoryFn(fs2) {
   if (ts2.matchFiles === void 0) {
@@ -335,4 +364,3 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-TPEB2IXF.js.map

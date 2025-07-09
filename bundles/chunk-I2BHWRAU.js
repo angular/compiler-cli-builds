@@ -3,21 +3,21 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/context.js
-var Context = class {
+// packages/compiler-cli/src/ngtsc/translator/src/context.js
+var Context = class _Context {
   isStatement;
   constructor(isStatement) {
     this.isStatement = isStatement;
   }
   get withExpressionMode() {
-    return this.isStatement ? new Context(false) : this;
+    return this.isStatement ? new _Context(false) : this;
   }
   get withStatementMode() {
-    return !this.isStatement ? new Context(true) : this;
+    return !this.isStatement ? new _Context(true) : this;
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/translator/src/translator.js
+// packages/compiler-cli/src/ngtsc/translator/src/translator.js
 import * as o from "@angular/compiler";
 var UNARY_OPERATORS = /* @__PURE__ */ new Map([
   [o.UnaryOperator.Minus, "-"],
@@ -121,6 +121,10 @@ var ExpressionTranslatorVisitor = class {
   createTaggedTemplateExpression(tag, template) {
     return this.downlevelTaggedTemplates ? this.createES5TaggedTemplateFunctionCall(tag, template) : this.factory.createTaggedTemplate(tag, template);
   }
+  /**
+   * Translate the tagged template literal into a call that is compatible with ES5, using the
+   * imported `__makeTemplateObject` helper for ES5 formatted output.
+   */
   createES5TaggedTemplateFunctionCall(tagHandler, { elements, expressions }) {
     const __makeTemplateObjectHelper = this.imports.addImport({
       exportModuleSpecifier: "tslib",
@@ -136,11 +140,13 @@ var ExpressionTranslatorVisitor = class {
     const templateHelperCall = this.factory.createCallExpression(
       __makeTemplateObjectHelper,
       [this.factory.createArrayLiteral(cooked), this.factory.createArrayLiteral(raw)],
+      /* pure */
       false
     );
     return this.factory.createCallExpression(
       tagHandler,
       [templateHelperCall, ...expressions],
+      /* pure */
       false
     );
   }
@@ -293,4 +299,3 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-6ECVYRSU.js.map

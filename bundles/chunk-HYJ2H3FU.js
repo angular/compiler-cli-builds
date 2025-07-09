@@ -3,11 +3,11 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file.js
+// packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file.js
 import { decode, encode } from "@jridgewell/sourcemap-codec";
 import mapHelpers from "convert-source-map";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/segment_marker.js
+// packages/compiler-cli/src/ngtsc/sourcemaps/src/segment_marker.js
 function compareSegments(a, b) {
   return a.position - b.position;
 }
@@ -27,7 +27,7 @@ function offsetSegment(startOfLinePositions, marker, offset) {
   return { line, column, position, next: void 0 };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file.js
+// packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file.js
 function removeSourceMapComments(contents) {
   return mapHelpers.removeMapFileComments(mapHelpers.removeComments(contents)).replace(/\n\n$/, "\n");
 }
@@ -37,6 +37,13 @@ var SourceFile = class {
   rawMap;
   sources;
   fs;
+  /**
+   * The parsed mappings that have been flattened so that any intermediate source mappings have been
+   * flattened.
+   *
+   * The result is that any source file mentioned in the flattened mappings have no source map (are
+   * pure original source files).
+   */
   flattenedMappings;
   startOfLinePositions;
   constructor(sourcePath, contents, rawMap, sources, fs) {
@@ -49,6 +56,9 @@ var SourceFile = class {
     this.startOfLinePositions = computeStartOfLinePositions(this.contents);
     this.flattenedMappings = this.flattenMappings();
   }
+  /**
+   * Render the raw source map generated from the flattened mappings.
+   */
   renderFlattenedSourceMap() {
     const sources = new IndexedMap();
     const names = new IndexedSet();
@@ -83,6 +93,14 @@ var SourceFile = class {
     };
     return sourceMap;
   }
+  /**
+   * Find the original mapped location for the given `line` and `column` in the generated file.
+   *
+   * First we search for a mapping whose generated segment is at or directly before the given
+   * location. Then we compute the offset between the given location and the matching generated
+   * segment. Finally we apply this offset to the original source segment to get the desired
+   * original location.
+   */
   getOriginalLocation(line, column) {
     if (this.flattenedMappings.length === 0) {
       return null;
@@ -107,6 +125,10 @@ var SourceFile = class {
       column: offsetOriginalSegment.column
     };
   }
+  /**
+   * Flatten the parsed mappings for this source file, so that all the mappings are to pure original
+   * source files with no transitive source maps.
+   */
   flattenMappings() {
     const mappings = parseMappings(this.rawMap && this.rawMap.map, this.sources, this.startOfLinePositions);
     ensureOriginalSegmentLinks(mappings);
@@ -244,8 +266,30 @@ function computeLineLengths(str) {
 }
 var IndexedMap = class {
   map = /* @__PURE__ */ new Map();
+  /**
+   * An array of keys added to this map.
+   *
+   * This array is guaranteed to be in the order of the first time the key was added to the map.
+   */
   keys = [];
+  /**
+   * An array of values added to this map.
+   *
+   * This array is guaranteed to be in the order of the first time the associated key was added to
+   * the map.
+   */
   values = [];
+  /**
+   * Associate the `value` with the `key` and return the index of the key in the collection.
+   *
+   * If the `key` already exists then the `value` is not set and the index of that `key` is
+   * returned; otherwise the `key` and `value` are stored and the index of the new `key` is
+   * returned.
+   *
+   * @param key the key to associated with the `value`.
+   * @param value the value to associated with the `key`.
+   * @returns the index of the `key` in the `keys` array.
+   */
   set(key, value) {
     if (this.map.has(key)) {
       return this.map.get(key);
@@ -258,7 +302,21 @@ var IndexedMap = class {
 };
 var IndexedSet = class {
   map = /* @__PURE__ */ new Map();
+  /**
+   * An array of values added to this set.
+   * This array is guaranteed to be in the order of the first time the value was added to the set.
+   */
   values = [];
+  /**
+   * Add the `value` to the `values` array, if it doesn't already exist; returning the index of the
+   * `value` in the `values` array.
+   *
+   * If the `value` already exists then the index of that `value` is returned, otherwise the new
+   * `value` is stored and the new index returned.
+   *
+   * @param value the value to add to the set.
+   * @returns the index of the `value` in the `values` array.
+   */
   add(value) {
     if (this.map.has(value)) {
       return this.map.get(value);
@@ -282,10 +340,10 @@ var Cache = class {
   }
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader.js
+// packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader.js
 import mapHelpers2 from "convert-source-map";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/content_origin.js
+// packages/compiler-cli/src/ngtsc/sourcemaps/src/content_origin.js
 var ContentOrigin;
 (function(ContentOrigin2) {
   ContentOrigin2[ContentOrigin2["Provided"] = 0] = "Provided";
@@ -293,7 +351,7 @@ var ContentOrigin;
   ContentOrigin2[ContentOrigin2["FileSystem"] = 2] = "FileSystem";
 })(ContentOrigin || (ContentOrigin = {}));
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader.js
+// packages/compiler-cli/src/ngtsc/sourcemaps/src/source_file_loader.js
 var SCHEME_MATCHER = /^([a-z][a-z0-9.-]*):\/\//i;
 var SourceFileLoader = class {
   fs;
@@ -313,6 +371,22 @@ var SourceFileLoader = class {
     };
     return this.loadSourceFileInternal(sourcePath, contents, contentsOrigin, sourceMapInfo);
   }
+  /**
+   * The overload used internally to load source files referenced in a source-map.
+   *
+   * In this case there is no guarantee that it will return a non-null SourceMap.
+   *
+   * @param sourcePath The path to the source file to load.
+   * @param contents The contents of the source file to load, if provided inline. If `null`,
+   *     the contents will be read from the file at the `sourcePath`.
+   * @param sourceOrigin Describes where the source content came from.
+   * @param sourceMapInfo The raw contents and path of the source-map file. If `null` the
+   *     source-map will be computed from the contents of the source file, either inline or loaded
+   *     from the file-system.
+   *
+   * @returns a SourceFile if the content for one was provided or was able to be loaded from disk,
+   * `null` otherwise.
+   */
   loadSourceFileInternal(sourcePath, contents, sourceOrigin, sourceMapInfo) {
     const previousPaths = this.currentPaths.slice();
     try {
@@ -338,6 +412,19 @@ var SourceFileLoader = class {
       this.currentPaths = previousPaths;
     }
   }
+  /**
+   * Find the source map associated with the source file whose `sourcePath` and `contents` are
+   * provided.
+   *
+   * Source maps can be inline, as part of a base64 encoded comment, or external as a separate file
+   * whose path is indicated in a comment or implied from the name of the source file itself.
+   *
+   * @param sourcePath the path to the source file.
+   * @param sourceContents the contents of the source file.
+   * @param sourceOrigin where the content of the source file came from.
+   * @returns the parsed contents and path of the source-map, if loading was successful, null
+   *     otherwise.
+   */
   loadSourceMap(sourcePath, sourceContents, sourceOrigin) {
     const lastLine = this.getLastNonEmptyLine(sourceContents);
     const inline = mapHelpers2.commentRegex.exec(lastLine);
@@ -376,6 +463,10 @@ var SourceFileLoader = class {
     }
     return null;
   }
+  /**
+   * Iterate over each of the "sources" for this source file's source map, recursively loading each
+   * source file and its associated source map.
+   */
   processSources(basePath, { map, origin: sourceMapOrigin }) {
     const sourceRoot = this.fs.resolve(this.fs.dirname(basePath), this.replaceSchemeWithPath(map.sourceRoot || ""));
     return map.sources.map((source, index) => {
@@ -385,14 +476,29 @@ var SourceFileLoader = class {
       return this.loadSourceFileInternal(path, content, sourceOrigin, null);
     });
   }
+  /**
+   * Load the contents of the source file from disk.
+   *
+   * @param sourcePath The path to the source file.
+   */
   readSourceFile(sourcePath) {
     this.trackPath(sourcePath);
     return this.fs.readFile(sourcePath);
   }
+  /**
+   * Load the source map from the file at `mapPath`, parsing its JSON contents into a `RawSourceMap`
+   * object.
+   *
+   * @param mapPath The path to the source-map file.
+   */
   readRawSourceMap(mapPath) {
     this.trackPath(mapPath);
     return JSON.parse(this.fs.readFile(mapPath));
   }
+  /**
+   * Track source file paths if we have loaded them from disk so that we don't get into an infinite
+   * recursion.
+   */
   trackPath(path) {
     if (this.currentPaths.includes(path)) {
       throw new Error(`Circular source file mapping dependency: ${this.currentPaths.join(" -> ")} -> ${path}`);
@@ -410,6 +516,14 @@ var SourceFileLoader = class {
     }
     return contents.slice(lastRealLineIndex + 1);
   }
+  /**
+   * Replace any matched URL schemes with their corresponding path held in the schemeMap.
+   *
+   * Some build tools replace real file paths with scheme prefixed paths - e.g. `webpack://`.
+   * We use the `schemeMap` passed to this class to convert such paths to "real" file paths.
+   * In some cases, this is not possible, since the file was actually synthesized by the build tool.
+   * But the end result is better than prefixing the sourceRoot in front of the scheme.
+   */
   replaceSchemeWithPath(path) {
     return path.replace(SCHEME_MATCHER, (_, scheme) => this.schemeMap[scheme.toLowerCase()] || "");
   }
@@ -426,4 +540,3 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PML5JK7B.js.map

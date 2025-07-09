@@ -4,9 +4,9 @@
     
 import {
   __require
-} from "./chunk-KPQ72R34.js";
+} from "./chunk-DWRM7PIK.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/file_system/src/node_js_file_system.js
+// packages/compiler-cli/src/ngtsc/file_system/src/node_js_file_system.js
 import fs from "fs";
 import { createRequire } from "module";
 import * as p from "path";
@@ -120,4 +120,3 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-5JF7HF3W.js.map

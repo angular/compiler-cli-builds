@@ -6,25 +6,25 @@
 import {
   main,
   readCommandLineAndConfiguration
-} from "../../chunk-JXYBFWGA.js";
+} from "../../chunk-DKHEWX5Y.js";
 import {
   EmitFlags
-} from "../../chunk-YNE6T2TY.js";
-import "../../chunk-5TMRGUHP.js";
-import "../../chunk-UZOSFHTN.js";
-import "../../chunk-6ECVYRSU.js";
+} from "../../chunk-BRXBRTXD.js";
+import "../../chunk-GA4YGITI.js";
+import "../../chunk-Y3W37GX6.js";
+import "../../chunk-I2BHWRAU.js";
 import {
   setFileSystem
-} from "../../chunk-TPEB2IXF.js";
+} from "../../chunk-GWZQLAGK.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-5JF7HF3W.js";
-import "../../chunk-KPQ72R34.js";
+} from "../../chunk-SZY7NM6F.js";
+import "../../chunk-DWRM7PIK.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ng_xi18n.js
+// packages/compiler-cli/src/bin/ng_xi18n.ts
 import "reflect-metadata";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/extract_i18n.js
+// packages/compiler-cli/src/extract_i18n.js
 import yargs from "yargs";
 function mainXi18n(args2, consoleError = console.error) {
   const config = readXi18nCommandLineAndConfiguration(args2);
@@ -47,7 +47,7 @@ function readXi18nCommandLineAndConfiguration(args2) {
   return { ...config, emitFlags: EmitFlags.I18nBundle };
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/bin/ng_xi18n.js
+// packages/compiler-cli/src/bin/ng_xi18n.ts
 process.title = "Angular i18n Message Extractor (ng-xi18n)";
 var args = process.argv.slice(2);
 setFileSystem(new NodeJSFileSystem());
@@ -59,4 +59,3 @@ process.exitCode = mainXi18n(args);
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=ng_xi18n.js.map

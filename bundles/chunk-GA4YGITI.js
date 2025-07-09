@@ -16,9 +16,9 @@ import {
   tryParseSignalInputMapping,
   tryParseSignalModelMapping,
   tryParseSignalQueryFromInitializer
-} from "./chunk-UZOSFHTN.js";
+} from "./chunk-Y3W37GX6.js";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/downlevel_decorators_transform.js
+// packages/compiler-cli/src/ngtsc/transform/jit/src/downlevel_decorators_transform.js
 import ts from "typescript";
 function isAngularDecorator2(decorator, isCore) {
   return isCore || decorator.import !== null && decorator.import.from === "@angular/core";
@@ -323,10 +323,10 @@ function cloneClassElementWithModifiers(node, modifiers) {
   return ts.setOriginalNode(clone, node);
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/transform.js
+// packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/transform.js
 import ts4 from "typescript";
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/transform_api.js
+// packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/transform_api.js
 import ts2 from "typescript";
 function createSyntheticAngularCoreDecoratorAccess(factory, importManager, ngClassDecorator, sourceFile, decoratorName) {
   const classDecoratorIdentifier = ts2.isIdentifier(ngClassDecorator.identifier) ? ngClassDecorator.identifier : ngClassDecorator.identifier.expression;
@@ -336,6 +336,9 @@ function createSyntheticAngularCoreDecoratorAccess(factory, importManager, ngCla
       exportSymbolName: null,
       requestedFile: sourceFile
     }),
+    // The synthetic identifier may be checked later by the downlevel decorators
+    // transform to resolve to an Angular import using `getSymbolAtLocation`. We trick
+    // the transform to think it's not synthetic and comes from Angular core.
     ts2.setOriginalNode(factory.createIdentifier(decoratorName), classDecoratorIdentifier)
   );
 }
@@ -343,7 +346,7 @@ function castAsAny(factory, expr) {
   return factory.createAsExpression(expr, factory.createKeywordTypeNode(ts2.SyntaxKind.AnyKeyword));
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/input_function.js
+// packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/input_function.js
 var signalInputsTransform = (member, sourceFile, host, factory, importTracker, importManager, classDecorator, isCore) => {
   if (host.getDecoratorsOfDeclaration(member.node)?.some((d) => isAngularDecorator(d, "Input", isCore))) {
     return member.node;
@@ -356,15 +359,21 @@ var signalInputsTransform = (member, sourceFile, host, factory, importTracker, i
     "isSignal": factory.createTrue(),
     "alias": factory.createStringLiteral(inputMapping.bindingPropertyName),
     "required": inputMapping.required ? factory.createTrue() : factory.createFalse(),
+    // For signal inputs, transforms are captured by the input signal. The runtime will
+    // determine whether a transform needs to be run via the input signal, so the `transform`
+    // option is always `undefined`.
     "transform": factory.createIdentifier("undefined")
   };
   const newDecorator = factory.createDecorator(factory.createCallExpression(createSyntheticAngularCoreDecoratorAccess(factory, importManager, classDecorator, sourceFile, "Input"), void 0, [
+    // Cast to `any` because `isSignal` will be private, and in case this
+    // transform is used directly as a pre-compilation step, the decorator should
+    // not fail. It is already validated now due to us parsing the input metadata.
     castAsAny(factory, factory.createObjectLiteralExpression(Object.entries(fields).map(([name, value]) => factory.createPropertyAssignment(name, value))))
   ]));
   return factory.updatePropertyDeclaration(member.node, [newDecorator, ...member.node.modifiers ?? []], member.name, member.node.questionToken, member.node.type, member.node.initializer);
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/model_function.js
+// packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/model_function.js
 import ts3 from "typescript";
 var signalModelTransform = (member, sourceFile, host, factory, importTracker, importManager, classDecorator, isCore) => {
   if (host.getDecoratorsOfDeclaration(member.node)?.some((d) => {
@@ -383,6 +392,9 @@ var signalModelTransform = (member, sourceFile, host, factory, importTracker, im
   ]);
   const inputDecorator = createDecorator(
     "Input",
+    // Config is cast to `any` because `isSignal` will be private, and in case this
+    // transform is used directly as a pre-compilation step, the decorator should
+    // not fail. It is already validated now due to us parsing the input metadata.
     factory.createAsExpression(inputConfig, factory.createKeywordTypeNode(ts3.SyntaxKind.AnyKeyword)),
     classDecorator,
     factory,
@@ -397,7 +409,7 @@ function createDecorator(name, config, classDecorator, factory, sourceFile, impo
   return factory.createDecorator(factory.createCallExpression(callTarget, void 0, [config]));
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/output_function.js
+// packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/output_function.js
 var initializerApiOutputTransform = (member, sourceFile, host, factory, importTracker, importManager, classDecorator, isCore) => {
   if (host.getDecoratorsOfDeclaration(member.node)?.some((d) => isAngularDecorator(d, "Output", isCore))) {
     return member.node;
@@ -410,7 +422,7 @@ var initializerApiOutputTransform = (member, sourceFile, host, factory, importTr
   return factory.updatePropertyDeclaration(member.node, [newDecorator, ...member.node.modifiers ?? []], member.node.name, member.node.questionToken, member.node.type, member.node.initializer);
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/query_functions.js
+// packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/query_functions.js
 var queryFunctionToDecorator = {
   viewChild: "ViewChild",
   viewChildren: "ViewChildren",
@@ -431,8 +443,12 @@ var queryFunctionsTransforms = (member, sourceFile, host, factory, importTracker
   const newDecorator = factory.createDecorator(factory.createCallExpression(
     createSyntheticAngularCoreDecoratorAccess(factory, importManager, classDecorator, sourceFile, queryFunctionToDecorator[queryDefinition.name]),
     void 0,
+    // All positional arguments of the query functions can be mostly re-used as is
+    // for the decorator. i.e. predicate is always first argument. Options are second.
     [
       queryDefinition.call.arguments[0],
+      // Note: Casting as `any` because `isSignal` is not publicly exposed and this
+      // transform might pre-transform TS sources.
       castAsAny(factory, factory.createObjectLiteralExpression([
         ...callArgs.length > 1 ? [factory.createSpreadAssignment(callArgs[1])] : [],
         factory.createPropertyAssignment("isSignal", factory.createTrue())
@@ -442,7 +458,7 @@ var queryFunctionsTransforms = (member, sourceFile, host, factory, importTracker
   return factory.updatePropertyDeclaration(member.node, [newDecorator, ...member.node.modifiers ?? []], member.node.name, member.node.questionToken, member.node.type, member.node.initializer);
 };
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/transform.js
+// packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/transform.js
 var decoratorsWithInputs = ["Directive", "Component"];
 var propertyTransforms = [
   signalInputsTransform,
@@ -494,7 +510,7 @@ function createTransformVisitor(ctx, host, importManager, importTracker, isCore,
   return visitor;
 }
 
-// bazel-out/k8-fastbuild/bin/packages/compiler-cli/src/ngtsc/transform/jit/src/index.js
+// packages/compiler-cli/src/ngtsc/transform/jit/src/index.js
 function angularJitApplicationTransform(program, isCore = false, shouldTransformClass) {
   const typeChecker = program.getTypeChecker();
   const reflectionHost = new TypeScriptReflectionHost(typeChecker);
@@ -504,6 +520,7 @@ function angularJitApplicationTransform(program, isCore = false, shouldTransform
     reflectionHost,
     [],
     isCore,
+    /* enableClosureCompiler */
     false,
     shouldTransformClass
   );
@@ -529,4 +546,3 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-5TMRGUHP.js.map
