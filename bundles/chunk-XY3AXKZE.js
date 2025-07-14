@@ -1298,7 +1298,7 @@ function compareVersions(v1, v2) {
 
 // packages/compiler-cli/src/typescript_support.js
 var MIN_TS_VERSION = "5.8.0";
-var MAX_TS_VERSION = "5.9.0";
+var MAX_TS_VERSION = "6.0.0";
 var tsVersion = ts13.version;
 function checkVersion(version, minVersion, maxVersion) {
   if (compareVersions(version, minVersion) < 0 || compareVersions(version, maxVersion) >= 0) {
