@@ -91,7 +91,9 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
      * most recent type-checking program.
      */
     getDiagnosticsForFile(sf: ts.SourceFile, optimizeFor: OptimizeFor): ts.Diagnostic[];
+    getSuggestionDiagnosticsForFile(sf: ts.SourceFile, tsLs: ts.LanguageService, optimizeFor: OptimizeFor): ts.DiagnosticWithLocation[];
     getDiagnosticsForComponent(component: ts.ClassDeclaration): ts.Diagnostic[];
+    getSuggestionDiagnosticsForComponent(component: ts.ClassDeclaration, tsLs: ts.LanguageService): ts.DiagnosticWithLocation[];
     getTypeCheckBlock(component: ts.ClassDeclaration): ts.Node | null;
     getGlobalCompletions(context: TmplAstTemplate | null, component: ts.ClassDeclaration, node: AST | TmplAstNode): GlobalCompletion | null;
     getExpressionCompletionLocation(ast: PropertyRead | SafePropertyRead, component: ts.ClassDeclaration): TcbLocation | null;

@@ -84,74 +84,82 @@ export declare enum PerfPhase {
      */
     TtcDiagnostics = 14,
     /**
+     * Time spent computing template type-checking suggestion diagnostics.
+     */
+    TtcSuggestionDiagnostics = 15,
+    /**
      * Time spent getting a `Symbol` from the `TemplateTypeChecker`.
      */
-    TtcSymbol = 15,
+    TtcSymbol = 16,
     /**
      * Time spent by the Angular Language Service calculating a "get references" or a renaming
      * operation.
      */
-    LsReferencesAndRenames = 16,
+    LsReferencesAndRenames = 17,
     /**
      * Time spent by the Angular Language Service calculating a "quick info" operation.
      */
-    LsQuickInfo = 17,
+    LsQuickInfo = 18,
     /**
      * Time spent by the Angular Language Service calculating a "get type definition" or "get
      * definition" operation.
      */
-    LsDefinition = 18,
+    LsDefinition = 19,
     /**
      * Time spent by the Angular Language Service calculating a "get completions" (AKA autocomplete)
      * operation.
      */
-    LsCompletions = 19,
+    LsCompletions = 20,
     /**
      * Time spent by the Angular Language Service calculating a "view template typecheck block"
      * operation.
      */
-    LsTcb = 20,
+    LsTcb = 21,
     /**
      * Time spent by the Angular Language Service calculating diagnostics.
      */
-    LsDiagnostics = 21,
+    LsDiagnostics = 22,
+    /**
+     * Time spent by the Angular Language Service calculating suggestion diagnostics.
+     */
+    LsSuggestionDiagnostics = 23,
     /**
      * Time spent by the Angular Language Service calculating a "get component locations for template"
      * operation.
      */
-    LsComponentLocations = 22,
+    LsComponentLocations = 24,
     /**
      * Time spent by the Angular Language Service calculating signature help.
      */
-    LsSignatureHelp = 23,
+    LsSignatureHelp = 25,
     /**
      * Time spent by the Angular Language Service calculating outlining spans.
      */
-    OutliningSpans = 24,
+    OutliningSpans = 26,
     /**
      * Time spent by the Angular Language Service calculating code fixes.
      */
-    LsCodeFixes = 25,
+    LsCodeFixes = 27,
     /**
      * Time spent by the Angular Language Service to fix all detected same type errors.
      */
-    LsCodeFixesAll = 26,
+    LsCodeFixesAll = 28,
     /**
      * Time spent computing possible Angular refactorings.
      */
-    LSComputeApplicableRefactorings = 27,
+    LSComputeApplicableRefactorings = 29,
     /**
      * Time spent computing changes for applying a given refactoring.
      */
-    LSApplyRefactoring = 28,
+    LSApplyRefactoring = 30,
     /**
      * Time spent by the Angular Language Service calculating semantic classifications.
      */
-    LSSemanticClassification = 29,
+    LSSemanticClassification = 31,
     /**
      * Tracks the number of `PerfPhase`s, and must appear at the end of the list.
      */
-    LAST = 30
+    LAST = 32
 }
 /**
  * Represents some occurrence during compilation, and is tracked with a counter.

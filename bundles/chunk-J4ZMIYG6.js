@@ -5576,22 +5576,24 @@ var PerfPhase;
   PerfPhase2[PerfPhase2["Compile"] = 12] = "Compile";
   PerfPhase2[PerfPhase2["TtcAutocompletion"] = 13] = "TtcAutocompletion";
   PerfPhase2[PerfPhase2["TtcDiagnostics"] = 14] = "TtcDiagnostics";
-  PerfPhase2[PerfPhase2["TtcSymbol"] = 15] = "TtcSymbol";
-  PerfPhase2[PerfPhase2["LsReferencesAndRenames"] = 16] = "LsReferencesAndRenames";
-  PerfPhase2[PerfPhase2["LsQuickInfo"] = 17] = "LsQuickInfo";
-  PerfPhase2[PerfPhase2["LsDefinition"] = 18] = "LsDefinition";
-  PerfPhase2[PerfPhase2["LsCompletions"] = 19] = "LsCompletions";
-  PerfPhase2[PerfPhase2["LsTcb"] = 20] = "LsTcb";
-  PerfPhase2[PerfPhase2["LsDiagnostics"] = 21] = "LsDiagnostics";
-  PerfPhase2[PerfPhase2["LsComponentLocations"] = 22] = "LsComponentLocations";
-  PerfPhase2[PerfPhase2["LsSignatureHelp"] = 23] = "LsSignatureHelp";
-  PerfPhase2[PerfPhase2["OutliningSpans"] = 24] = "OutliningSpans";
-  PerfPhase2[PerfPhase2["LsCodeFixes"] = 25] = "LsCodeFixes";
-  PerfPhase2[PerfPhase2["LsCodeFixesAll"] = 26] = "LsCodeFixesAll";
-  PerfPhase2[PerfPhase2["LSComputeApplicableRefactorings"] = 27] = "LSComputeApplicableRefactorings";
-  PerfPhase2[PerfPhase2["LSApplyRefactoring"] = 28] = "LSApplyRefactoring";
-  PerfPhase2[PerfPhase2["LSSemanticClassification"] = 29] = "LSSemanticClassification";
-  PerfPhase2[PerfPhase2["LAST"] = 30] = "LAST";
+  PerfPhase2[PerfPhase2["TtcSuggestionDiagnostics"] = 15] = "TtcSuggestionDiagnostics";
+  PerfPhase2[PerfPhase2["TtcSymbol"] = 16] = "TtcSymbol";
+  PerfPhase2[PerfPhase2["LsReferencesAndRenames"] = 17] = "LsReferencesAndRenames";
+  PerfPhase2[PerfPhase2["LsQuickInfo"] = 18] = "LsQuickInfo";
+  PerfPhase2[PerfPhase2["LsDefinition"] = 19] = "LsDefinition";
+  PerfPhase2[PerfPhase2["LsCompletions"] = 20] = "LsCompletions";
+  PerfPhase2[PerfPhase2["LsTcb"] = 21] = "LsTcb";
+  PerfPhase2[PerfPhase2["LsDiagnostics"] = 22] = "LsDiagnostics";
+  PerfPhase2[PerfPhase2["LsSuggestionDiagnostics"] = 23] = "LsSuggestionDiagnostics";
+  PerfPhase2[PerfPhase2["LsComponentLocations"] = 24] = "LsComponentLocations";
+  PerfPhase2[PerfPhase2["LsSignatureHelp"] = 25] = "LsSignatureHelp";
+  PerfPhase2[PerfPhase2["OutliningSpans"] = 26] = "OutliningSpans";
+  PerfPhase2[PerfPhase2["LsCodeFixes"] = 27] = "LsCodeFixes";
+  PerfPhase2[PerfPhase2["LsCodeFixesAll"] = 28] = "LsCodeFixesAll";
+  PerfPhase2[PerfPhase2["LSComputeApplicableRefactorings"] = 29] = "LSComputeApplicableRefactorings";
+  PerfPhase2[PerfPhase2["LSApplyRefactoring"] = 30] = "LSApplyRefactoring";
+  PerfPhase2[PerfPhase2["LSSemanticClassification"] = 31] = "LSSemanticClassification";
+  PerfPhase2[PerfPhase2["LAST"] = 32] = "LAST";
 })(PerfPhase || (PerfPhase = {}));
 var PerfEvent;
 (function(PerfEvent2) {
@@ -9910,6 +9912,262 @@ function isBaseClassEqual(current, previous) {
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/checker.js
 import { CssSelector as CssSelector4, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr8, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.js
+import ts45 from "typescript";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/comments.js
+import { AbsoluteSourceSpan } from "@angular/compiler";
+import ts44 from "typescript";
+var parseSpanComment = /^(\d+),(\d+)$/;
+function readSpanComment(node, sourceFile = node.getSourceFile()) {
+  return ts44.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts44.SyntaxKind.MultiLineCommentTrivia) {
+      return null;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    const match = commentText.match(parseSpanComment);
+    if (match === null) {
+      return null;
+    }
+    return new AbsoluteSourceSpan(+match[1], +match[2]);
+  }) || null;
+}
+var CommentTriviaType;
+(function(CommentTriviaType2) {
+  CommentTriviaType2["DIAGNOSTIC"] = "D";
+  CommentTriviaType2["EXPRESSION_TYPE_IDENTIFIER"] = "T";
+})(CommentTriviaType || (CommentTriviaType = {}));
+var ExpressionIdentifier;
+(function(ExpressionIdentifier2) {
+  ExpressionIdentifier2["DIRECTIVE"] = "DIR";
+  ExpressionIdentifier2["COMPONENT_COMPLETION"] = "COMPCOMP";
+  ExpressionIdentifier2["EVENT_PARAMETER"] = "EP";
+  ExpressionIdentifier2["VARIABLE_AS_EXPRESSION"] = "VAE";
+})(ExpressionIdentifier || (ExpressionIdentifier = {}));
+function addExpressionIdentifier(node, identifier) {
+  ts44.addSyntheticTrailingComment(
+    node,
+    ts44.SyntaxKind.MultiLineCommentTrivia,
+    `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`,
+    /* hasTrailingNewLine */
+    false
+  );
+}
+var IGNORE_FOR_DIAGNOSTICS_MARKER = `${CommentTriviaType.DIAGNOSTIC}:ignore`;
+function markIgnoreDiagnostics(node) {
+  ts44.addSyntheticTrailingComment(
+    node,
+    ts44.SyntaxKind.MultiLineCommentTrivia,
+    IGNORE_FOR_DIAGNOSTICS_MARKER,
+    /* hasTrailingNewLine */
+    false
+  );
+}
+function hasIgnoreForDiagnosticsMarker(node, sourceFile) {
+  return ts44.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts44.SyntaxKind.MultiLineCommentTrivia) {
+      return null;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    return commentText === IGNORE_FOR_DIAGNOSTICS_MARKER;
+  }) === true;
+}
+function makeRecursiveVisitor(visitor) {
+  function recursiveVisitor(node) {
+    const res = visitor(node);
+    return res !== null ? res : node.forEachChild(recursiveVisitor);
+  }
+  return recursiveVisitor;
+}
+function getSpanFromOptions(opts) {
+  let withSpan = null;
+  if (opts.withSpan !== void 0) {
+    if (opts.withSpan instanceof AbsoluteSourceSpan) {
+      withSpan = opts.withSpan;
+    } else {
+      withSpan = { start: opts.withSpan.start.offset, end: opts.withSpan.end.offset };
+    }
+  }
+  return withSpan;
+}
+function findFirstMatchingNode(tcb, opts) {
+  const withSpan = getSpanFromOptions(opts);
+  const withExpressionIdentifier = opts.withExpressionIdentifier;
+  const sf = tcb.getSourceFile();
+  const visitor = makeRecursiveVisitor((node) => {
+    if (!opts.filter(node)) {
+      return null;
+    }
+    if (withSpan !== null) {
+      const comment = readSpanComment(node, sf);
+      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
+        return null;
+      }
+    }
+    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
+      return null;
+    }
+    return node;
+  });
+  return tcb.forEachChild(visitor) ?? null;
+}
+function findAllMatchingNodes(tcb, opts) {
+  const withSpan = getSpanFromOptions(opts);
+  const withExpressionIdentifier = opts.withExpressionIdentifier;
+  const results = [];
+  const stack = [tcb];
+  const sf = tcb.getSourceFile();
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!opts.filter(node)) {
+      stack.push(...node.getChildren());
+      continue;
+    }
+    if (withSpan !== null) {
+      const comment = readSpanComment(node, sf);
+      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
+        stack.push(...node.getChildren());
+        continue;
+      }
+    }
+    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
+      continue;
+    }
+    results.push(node);
+  }
+  return results;
+}
+function hasExpressionIdentifier(sourceFile, node, identifier) {
+  return ts44.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts44.SyntaxKind.MultiLineCommentTrivia) {
+      return false;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    return commentText === `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
+  }) || false;
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.js
+var SAFE_TO_CAST_WITHOUT_PARENS = null;
+function tsCastToAny(expr) {
+  if (SAFE_TO_CAST_WITHOUT_PARENS === null) {
+    SAFE_TO_CAST_WITHOUT_PARENS = /* @__PURE__ */ new Set([
+      // Expressions which are already parenthesized can be cast without further wrapping.
+      ts45.SyntaxKind.ParenthesizedExpression,
+      // Expressions which form a single lexical unit leave no room for precedence issues with the cast.
+      ts45.SyntaxKind.Identifier,
+      ts45.SyntaxKind.CallExpression,
+      ts45.SyntaxKind.NonNullExpression,
+      ts45.SyntaxKind.ElementAccessExpression,
+      ts45.SyntaxKind.PropertyAccessExpression,
+      ts45.SyntaxKind.ArrayLiteralExpression,
+      ts45.SyntaxKind.ObjectLiteralExpression,
+      // The same goes for various literals.
+      ts45.SyntaxKind.StringLiteral,
+      ts45.SyntaxKind.NumericLiteral,
+      ts45.SyntaxKind.TrueKeyword,
+      ts45.SyntaxKind.FalseKeyword,
+      ts45.SyntaxKind.NullKeyword,
+      ts45.SyntaxKind.UndefinedKeyword
+    ]);
+  }
+  if (!SAFE_TO_CAST_WITHOUT_PARENS.has(expr.kind)) {
+    expr = ts45.factory.createParenthesizedExpression(expr);
+  }
+  return ts45.factory.createParenthesizedExpression(ts45.factory.createAsExpression(expr, ts45.factory.createKeywordTypeNode(ts45.SyntaxKind.AnyKeyword)));
+}
+function tsCreateElement(...tagNames) {
+  const createElement = ts45.factory.createPropertyAccessExpression(
+    /* expression */
+    ts45.factory.createIdentifier("document"),
+    "createElement"
+  );
+  let arg;
+  if (tagNames.length === 1) {
+    arg = ts45.factory.createStringLiteral(tagNames[0]);
+  } else {
+    const assertedNullExpression = ts45.factory.createNonNullExpression(ts45.factory.createNull());
+    const type = ts45.factory.createUnionTypeNode(tagNames.map((tag) => ts45.factory.createLiteralTypeNode(ts45.factory.createStringLiteral(tag))));
+    arg = ts45.factory.createAsExpression(assertedNullExpression, type);
+  }
+  return ts45.factory.createCallExpression(
+    /* expression */
+    createElement,
+    /* typeArguments */
+    void 0,
+    /* argumentsArray */
+    [arg]
+  );
+}
+function tsDeclareVariable(id, type) {
+  addExpressionIdentifier(type, ExpressionIdentifier.VARIABLE_AS_EXPRESSION);
+  const initializer = ts45.factory.createAsExpression(ts45.factory.createNonNullExpression(ts45.factory.createNull()), type);
+  const decl = ts45.factory.createVariableDeclaration(
+    /* name */
+    id,
+    /* exclamationToken */
+    void 0,
+    /* type */
+    void 0,
+    /* initializer */
+    initializer
+  );
+  return ts45.factory.createVariableStatement(
+    /* modifiers */
+    void 0,
+    /* declarationList */
+    [decl]
+  );
+}
+function tsCreateTypeQueryForCoercedInput(typeName, coercedInputName) {
+  return ts45.factory.createTypeQueryNode(ts45.factory.createQualifiedName(typeName, `ngAcceptInputType_${coercedInputName}`));
+}
+function tsCreateVariable(id, initializer, flags = null) {
+  const decl = ts45.factory.createVariableDeclaration(
+    /* name */
+    id,
+    /* exclamationToken */
+    void 0,
+    /* type */
+    void 0,
+    /* initializer */
+    initializer
+  );
+  return ts45.factory.createVariableStatement(
+    /* modifiers */
+    void 0,
+    /* declarationList */
+    flags === null ? [decl] : ts45.factory.createVariableDeclarationList([decl], flags)
+  );
+}
+function tsCallMethod(receiver, methodName, args = []) {
+  const methodAccess = ts45.factory.createPropertyAccessExpression(receiver, methodName);
+  return ts45.factory.createCallExpression(
+    /* expression */
+    methodAccess,
+    /* typeArguments */
+    void 0,
+    /* argumentsArray */
+    args
+  );
+}
+function isAccessExpression(node) {
+  return ts45.isPropertyAccessExpression(node) || ts45.isElementAccessExpression(node);
+}
+function tsNumericExpression2(value) {
+  if (value < 0) {
+    const operand = ts45.factory.createNumericLiteral(Math.abs(value));
+    return ts45.factory.createPrefixUnaryExpression(ts45.SyntaxKind.MinusToken, operand);
+  }
+  return ts45.factory.createNumericLiteral(value);
+}
+function isDirectiveDeclaration(node) {
+  const sourceFile = node.getSourceFile();
+  return (ts45.isTypeNode(node) || ts45.isIdentifier(node)) && ts45.isVariableDeclaration(node.parent) && hasExpressionIdentifier(sourceFile, node, ExpressionIdentifier.DIRECTIVE);
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/checker.js
 import ts64 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/program_driver/src/api.js
@@ -9921,10 +10179,10 @@ var UpdateMode;
 })(UpdateMode || (UpdateMode = {}));
 
 // packages/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver.js
-import ts45 from "typescript";
+import ts47 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/shims/src/adapter.js
-import ts44 from "typescript";
+import ts46 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/shims/src/expando.js
 var NgExtension = Symbol("NgExtension");
@@ -10095,10 +10353,10 @@ var ShimAdapter = class {
       }
       const prefix = match[1];
       let baseFileName = absoluteFrom(prefix + ".ts");
-      let inputFile = this.delegate.getSourceFile(baseFileName, ts44.ScriptTarget.Latest);
+      let inputFile = this.delegate.getSourceFile(baseFileName, ts46.ScriptTarget.Latest);
       if (inputFile === void 0) {
         baseFileName = absoluteFrom(prefix + ".tsx");
-        inputFile = this.delegate.getSourceFile(baseFileName, ts44.ScriptTarget.Latest);
+        inputFile = this.delegate.getSourceFile(baseFileName, ts46.ScriptTarget.Latest);
       }
       if (inputFile === void 0 || isShim(inputFile)) {
         return void 0;
@@ -10328,7 +10586,7 @@ var TsCreateProgramDriver = class {
       this.sfMap.clear();
     }
     for (const [filePath, { newText, originalFile }] of contents.entries()) {
-      const sf = ts45.createSourceFile(filePath, newText, ts45.ScriptTarget.Latest, true);
+      const sf = ts47.createSourceFile(filePath, newText, ts47.ScriptTarget.Latest, true);
       if (originalFile !== null) {
         sf[NgOriginalFile] = originalFile;
       }
@@ -10337,7 +10595,7 @@ var TsCreateProgramDriver = class {
     const host = new UpdatedProgramHost(this.sfMap, this.originalProgram, this.originalHost, this.shimExtensionPrefixes);
     const oldProgram = this.program;
     retagAllTsFiles(oldProgram);
-    this.program = ts45.createProgram({
+    this.program = ts47.createProgram({
       host,
       rootNames: this.program.getRootFileNames(),
       options: this.options,
@@ -10349,15 +10607,14 @@ var TsCreateProgramDriver = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.js
-import ts46 from "typescript";
-function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, relatedMessages) {
+import ts48 from "typescript";
+function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, relatedMessages, deprecatedDiagInfo) {
   if (mapping.type === "direct") {
-    let relatedInformation = void 0;
+    let relatedInformation = [];
     if (relatedMessages !== void 0) {
-      relatedInformation = [];
       for (const relatedMessage of relatedMessages) {
         relatedInformation.push({
-          category: ts46.DiagnosticCategory.Message,
+          category: ts48.DiagnosticCategory.Message,
           code: 0,
           file: relatedMessage.sourceFile,
           start: relatedMessage.start,
@@ -10365,6 +10622,9 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
           messageText: relatedMessage.text
         });
       }
+    }
+    if (deprecatedDiagInfo !== void 0) {
+      relatedInformation.push(...deprecatedDiagInfo.relatedMessages ?? []);
     }
     return {
       source: "ngtsc",
@@ -10376,7 +10636,8 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
       typeCheckId: id,
       start: span.start.offset,
       length: span.end.offset - span.start.offset,
-      relatedInformation
+      relatedInformation,
+      reportsDeprecated: deprecatedDiagInfo?.reportsDeprecated
     };
   } else if (mapping.type === "indirect" || mapping.type === "external") {
     const componentSf = mapping.componentClass.getSourceFile();
@@ -10386,7 +10647,7 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
     if (relatedMessages !== void 0) {
       for (const relatedMessage of relatedMessages) {
         relatedInformation.push({
-          category: ts46.DiagnosticCategory.Message,
+          category: ts48.DiagnosticCategory.Message,
           code: 0,
           file: relatedMessage.sourceFile,
           start: relatedMessage.start,
@@ -10412,21 +10673,25 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
         // and getEnd() are used because they don't include surrounding whitespace.
         start: mapping.node.getStart(),
         length: mapping.node.getEnd() - mapping.node.getStart(),
-        relatedInformation
+        relatedInformation,
+        reportsDeprecated: deprecatedDiagInfo?.reportsDeprecated
       };
     }
     let typeForMessage;
-    if (category === ts46.DiagnosticCategory.Warning) {
+    if (category === ts48.DiagnosticCategory.Warning) {
       typeForMessage = "Warning";
-    } else if (category === ts46.DiagnosticCategory.Suggestion) {
+    } else if (category === ts48.DiagnosticCategory.Suggestion) {
       typeForMessage = "Suggestion";
-    } else if (category === ts46.DiagnosticCategory.Message) {
+    } else if (category === ts48.DiagnosticCategory.Message) {
       typeForMessage = "Message";
     } else {
       typeForMessage = "Error";
     }
+    if (deprecatedDiagInfo !== void 0) {
+      relatedInformation.push(...deprecatedDiagInfo.relatedMessages ?? []);
+    }
     relatedInformation.push({
-      category: ts46.DiagnosticCategory.Message,
+      category: ts48.DiagnosticCategory.Message,
       code: 0,
       file: componentSf,
       // mapping.node represents either the 'template' or 'templateUrl' expression. getStart()
@@ -10446,7 +10711,8 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
       start: span.start.offset,
       length: span.end.offset - span.start.offset,
       // Show a secondary message indicating the component whose template contains the error.
-      relatedInformation
+      relatedInformation,
+      reportsDeprecated: deprecatedDiagInfo?.reportsDeprecated
     };
   } else {
     throw new Error(`Unexpected source mapping type: ${mapping.type}`);
@@ -10464,13 +10730,13 @@ function parseTemplateAsSourceFile(fileName, template) {
   if (parseTemplateAsSourceFileForTest !== null) {
     return parseTemplateAsSourceFileForTest(fileName, template);
   }
-  return ts46.createSourceFile(
+  return ts48.createSourceFile(
     fileName,
     template,
-    ts46.ScriptTarget.Latest,
+    ts48.ScriptTarget.Latest,
     /* setParentNodes */
     false,
-    ts46.ScriptKind.JSX
+    ts48.ScriptKind.JSX
   );
 }
 
@@ -10489,141 +10755,7 @@ function getTypeCheckId(clazz) {
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/completion.js
 import { EmptyExpr, ImplicitReceiver, PropertyRead, SafePropertyRead, TmplAstLetDeclaration, TmplAstReference, TmplAstTextAttribute } from "@angular/compiler";
-import ts48 from "typescript";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/comments.js
-import { AbsoluteSourceSpan } from "@angular/compiler";
-import ts47 from "typescript";
-var parseSpanComment = /^(\d+),(\d+)$/;
-function readSpanComment(node, sourceFile = node.getSourceFile()) {
-  return ts47.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts47.SyntaxKind.MultiLineCommentTrivia) {
-      return null;
-    }
-    const commentText = sourceFile.text.substring(pos + 2, end - 2);
-    const match = commentText.match(parseSpanComment);
-    if (match === null) {
-      return null;
-    }
-    return new AbsoluteSourceSpan(+match[1], +match[2]);
-  }) || null;
-}
-var CommentTriviaType;
-(function(CommentTriviaType2) {
-  CommentTriviaType2["DIAGNOSTIC"] = "D";
-  CommentTriviaType2["EXPRESSION_TYPE_IDENTIFIER"] = "T";
-})(CommentTriviaType || (CommentTriviaType = {}));
-var ExpressionIdentifier;
-(function(ExpressionIdentifier2) {
-  ExpressionIdentifier2["DIRECTIVE"] = "DIR";
-  ExpressionIdentifier2["COMPONENT_COMPLETION"] = "COMPCOMP";
-  ExpressionIdentifier2["EVENT_PARAMETER"] = "EP";
-  ExpressionIdentifier2["VARIABLE_AS_EXPRESSION"] = "VAE";
-})(ExpressionIdentifier || (ExpressionIdentifier = {}));
-function addExpressionIdentifier(node, identifier) {
-  ts47.addSyntheticTrailingComment(
-    node,
-    ts47.SyntaxKind.MultiLineCommentTrivia,
-    `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`,
-    /* hasTrailingNewLine */
-    false
-  );
-}
-var IGNORE_FOR_DIAGNOSTICS_MARKER = `${CommentTriviaType.DIAGNOSTIC}:ignore`;
-function markIgnoreDiagnostics(node) {
-  ts47.addSyntheticTrailingComment(
-    node,
-    ts47.SyntaxKind.MultiLineCommentTrivia,
-    IGNORE_FOR_DIAGNOSTICS_MARKER,
-    /* hasTrailingNewLine */
-    false
-  );
-}
-function hasIgnoreForDiagnosticsMarker(node, sourceFile) {
-  return ts47.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts47.SyntaxKind.MultiLineCommentTrivia) {
-      return null;
-    }
-    const commentText = sourceFile.text.substring(pos + 2, end - 2);
-    return commentText === IGNORE_FOR_DIAGNOSTICS_MARKER;
-  }) === true;
-}
-function makeRecursiveVisitor(visitor) {
-  function recursiveVisitor(node) {
-    const res = visitor(node);
-    return res !== null ? res : node.forEachChild(recursiveVisitor);
-  }
-  return recursiveVisitor;
-}
-function getSpanFromOptions(opts) {
-  let withSpan = null;
-  if (opts.withSpan !== void 0) {
-    if (opts.withSpan instanceof AbsoluteSourceSpan) {
-      withSpan = opts.withSpan;
-    } else {
-      withSpan = { start: opts.withSpan.start.offset, end: opts.withSpan.end.offset };
-    }
-  }
-  return withSpan;
-}
-function findFirstMatchingNode(tcb, opts) {
-  const withSpan = getSpanFromOptions(opts);
-  const withExpressionIdentifier = opts.withExpressionIdentifier;
-  const sf = tcb.getSourceFile();
-  const visitor = makeRecursiveVisitor((node) => {
-    if (!opts.filter(node)) {
-      return null;
-    }
-    if (withSpan !== null) {
-      const comment = readSpanComment(node, sf);
-      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
-        return null;
-      }
-    }
-    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
-      return null;
-    }
-    return node;
-  });
-  return tcb.forEachChild(visitor) ?? null;
-}
-function findAllMatchingNodes(tcb, opts) {
-  const withSpan = getSpanFromOptions(opts);
-  const withExpressionIdentifier = opts.withExpressionIdentifier;
-  const results = [];
-  const stack = [tcb];
-  const sf = tcb.getSourceFile();
-  while (stack.length > 0) {
-    const node = stack.pop();
-    if (!opts.filter(node)) {
-      stack.push(...node.getChildren());
-      continue;
-    }
-    if (withSpan !== null) {
-      const comment = readSpanComment(node, sf);
-      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
-        stack.push(...node.getChildren());
-        continue;
-      }
-    }
-    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
-      continue;
-    }
-    results.push(node);
-  }
-  return results;
-}
-function hasExpressionIdentifier(sourceFile, node, identifier) {
-  return ts47.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts47.SyntaxKind.MultiLineCommentTrivia) {
-      return false;
-    }
-    const commentText = sourceFile.text.substring(pos + 2, end - 2);
-    return commentText === `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
-  }) || false;
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/completion.js
+import ts49 from "typescript";
 var CompletionEngine = class {
   tcb;
   data;
@@ -10646,7 +10778,7 @@ var CompletionEngine = class {
     this.tcbPath = tcbPath;
     this.tcbIsShim = tcbIsShim;
     const globalRead = findFirstMatchingNode(this.tcb, {
-      filter: ts48.isPropertyAccessExpression,
+      filter: ts49.isPropertyAccessExpression,
       withExpressionIdentifier: ExpressionIdentifier.COMPONENT_COMPLETION
     });
     if (globalRead !== null) {
@@ -10690,7 +10822,7 @@ var CompletionEngine = class {
     let nodeContext = null;
     if (node instanceof EmptyExpr) {
       const nodeLocation = findFirstMatchingNode(this.tcb, {
-        filter: ts48.isIdentifier,
+        filter: ts49.isIdentifier,
         withSpan: node.sourceSpan
       });
       if (nodeLocation !== null) {
@@ -10703,7 +10835,7 @@ var CompletionEngine = class {
     }
     if (node instanceof PropertyRead && node.receiver instanceof ImplicitReceiver) {
       const nodeLocation = findFirstMatchingNode(this.tcb, {
-        filter: ts48.isPropertyAccessExpression,
+        filter: ts49.isPropertyAccessExpression,
         withSpan: node.sourceSpan
       });
       if (nodeLocation) {
@@ -10727,21 +10859,21 @@ var CompletionEngine = class {
     let tsExpr = null;
     if (expr instanceof PropertyRead) {
       tsExpr = findFirstMatchingNode(this.tcb, {
-        filter: ts48.isPropertyAccessExpression,
+        filter: ts49.isPropertyAccessExpression,
         withSpan: expr.nameSpan
       });
     } else if (expr instanceof SafePropertyRead) {
       const ternaryExpr = findFirstMatchingNode(this.tcb, {
-        filter: ts48.isParenthesizedExpression,
+        filter: ts49.isParenthesizedExpression,
         withSpan: expr.sourceSpan
       });
-      if (ternaryExpr === null || !ts48.isConditionalExpression(ternaryExpr.expression)) {
+      if (ternaryExpr === null || !ts49.isConditionalExpression(ternaryExpr.expression)) {
         return null;
       }
       const whenTrue = ternaryExpr.expression.whenTrue;
-      if (ts48.isPropertyAccessExpression(whenTrue)) {
+      if (ts49.isPropertyAccessExpression(whenTrue)) {
         tsExpr = whenTrue;
-      } else if (ts48.isCallExpression(whenTrue) && ts48.isPropertyAccessExpression(whenTrue.expression)) {
+      } else if (ts49.isCallExpression(whenTrue) && ts49.isPropertyAccessExpression(whenTrue.expression)) {
         tsExpr = whenTrue.expression;
       }
     }
@@ -10763,15 +10895,15 @@ var CompletionEngine = class {
     let tsExpr = null;
     if (expr instanceof TmplAstTextAttribute) {
       const strNode = findFirstMatchingNode(this.tcb, {
-        filter: ts48.isParenthesizedExpression,
+        filter: ts49.isParenthesizedExpression,
         withSpan: expr.sourceSpan
       });
-      if (strNode !== null && ts48.isStringLiteral(strNode.expression)) {
+      if (strNode !== null && ts49.isStringLiteral(strNode.expression)) {
         tsExpr = strNode.expression;
       }
     } else {
       tsExpr = findFirstMatchingNode(this.tcb, {
-        filter: (n2) => ts48.isStringLiteral(n2) || ts48.isNumericLiteral(n2),
+        filter: (n2) => ts49.isStringLiteral(n2) || ts49.isNumericLiteral(n2),
         withSpan: expr.sourceSpan
       });
     }
@@ -10779,7 +10911,7 @@ var CompletionEngine = class {
       return null;
     }
     let positionInShimFile = tsExpr.getEnd();
-    if (ts48.isStringLiteral(tsExpr)) {
+    if (ts49.isStringLiteral(tsExpr)) {
       positionInShimFile -= 1;
     }
     const res = {
@@ -11807,7 +11939,7 @@ import ts62 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/dom.js
 import { DomElementSchemaRegistry } from "@angular/compiler";
-import ts49 from "typescript";
+import ts50 from "typescript";
 var REGISTRY = new DomElementSchemaRegistry();
 var REMOVE_XHTML_REGEX = /^:xhtml:/;
 var RegistryDomSchemaChecker = class {
@@ -11833,7 +11965,7 @@ var RegistryDomSchemaChecker = class {
       } else {
         errorMsg += `2. To allow any element add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
       }
-      const diag = makeTemplateDiagnostic(id, mapping, sourceSpanForDiagnostics, ts49.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ELEMENT), errorMsg);
+      const diag = makeTemplateDiagnostic(id, mapping, sourceSpanForDiagnostics, ts50.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ELEMENT), errorMsg);
       this._diagnostics.push(diag);
     }
   }
@@ -11853,7 +11985,7 @@ var RegistryDomSchemaChecker = class {
 2. If '${tagName}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.
 3. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
       }
-      const diag = makeTemplateDiagnostic(id, mapping, span, ts49.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts50.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
       this._diagnostics.push(diag);
     }
   }
@@ -11864,7 +11996,7 @@ var RegistryDomSchemaChecker = class {
       }
       const errorMessage = `Can't bind to '${name}' since it isn't a known property of '${tagName}'.`;
       const mapping = this.resolver.getHostBindingsMapping(id);
-      const diag = makeTemplateDiagnostic(id, mapping, span, ts49.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMessage);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts50.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMessage);
       this._diagnostics.push(diag);
       break;
     }
@@ -11928,122 +12060,6 @@ var ReferenceEmitEnvironment = class {
     return translateType(type, this.contextFile, this.reflector, this.refEmitter, this.importManager);
   }
 };
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.js
-import ts50 from "typescript";
-var SAFE_TO_CAST_WITHOUT_PARENS = null;
-function tsCastToAny(expr) {
-  if (SAFE_TO_CAST_WITHOUT_PARENS === null) {
-    SAFE_TO_CAST_WITHOUT_PARENS = /* @__PURE__ */ new Set([
-      // Expressions which are already parenthesized can be cast without further wrapping.
-      ts50.SyntaxKind.ParenthesizedExpression,
-      // Expressions which form a single lexical unit leave no room for precedence issues with the cast.
-      ts50.SyntaxKind.Identifier,
-      ts50.SyntaxKind.CallExpression,
-      ts50.SyntaxKind.NonNullExpression,
-      ts50.SyntaxKind.ElementAccessExpression,
-      ts50.SyntaxKind.PropertyAccessExpression,
-      ts50.SyntaxKind.ArrayLiteralExpression,
-      ts50.SyntaxKind.ObjectLiteralExpression,
-      // The same goes for various literals.
-      ts50.SyntaxKind.StringLiteral,
-      ts50.SyntaxKind.NumericLiteral,
-      ts50.SyntaxKind.TrueKeyword,
-      ts50.SyntaxKind.FalseKeyword,
-      ts50.SyntaxKind.NullKeyword,
-      ts50.SyntaxKind.UndefinedKeyword
-    ]);
-  }
-  if (!SAFE_TO_CAST_WITHOUT_PARENS.has(expr.kind)) {
-    expr = ts50.factory.createParenthesizedExpression(expr);
-  }
-  return ts50.factory.createParenthesizedExpression(ts50.factory.createAsExpression(expr, ts50.factory.createKeywordTypeNode(ts50.SyntaxKind.AnyKeyword)));
-}
-function tsCreateElement(...tagNames) {
-  const createElement = ts50.factory.createPropertyAccessExpression(
-    /* expression */
-    ts50.factory.createIdentifier("document"),
-    "createElement"
-  );
-  let arg;
-  if (tagNames.length === 1) {
-    arg = ts50.factory.createStringLiteral(tagNames[0]);
-  } else {
-    const assertedNullExpression = ts50.factory.createNonNullExpression(ts50.factory.createNull());
-    const type = ts50.factory.createUnionTypeNode(tagNames.map((tag) => ts50.factory.createLiteralTypeNode(ts50.factory.createStringLiteral(tag))));
-    arg = ts50.factory.createAsExpression(assertedNullExpression, type);
-  }
-  return ts50.factory.createCallExpression(
-    /* expression */
-    createElement,
-    /* typeArguments */
-    void 0,
-    /* argumentsArray */
-    [arg]
-  );
-}
-function tsDeclareVariable(id, type) {
-  addExpressionIdentifier(type, ExpressionIdentifier.VARIABLE_AS_EXPRESSION);
-  const initializer = ts50.factory.createAsExpression(ts50.factory.createNonNullExpression(ts50.factory.createNull()), type);
-  const decl = ts50.factory.createVariableDeclaration(
-    /* name */
-    id,
-    /* exclamationToken */
-    void 0,
-    /* type */
-    void 0,
-    /* initializer */
-    initializer
-  );
-  return ts50.factory.createVariableStatement(
-    /* modifiers */
-    void 0,
-    /* declarationList */
-    [decl]
-  );
-}
-function tsCreateTypeQueryForCoercedInput(typeName, coercedInputName) {
-  return ts50.factory.createTypeQueryNode(ts50.factory.createQualifiedName(typeName, `ngAcceptInputType_${coercedInputName}`));
-}
-function tsCreateVariable(id, initializer, flags = null) {
-  const decl = ts50.factory.createVariableDeclaration(
-    /* name */
-    id,
-    /* exclamationToken */
-    void 0,
-    /* type */
-    void 0,
-    /* initializer */
-    initializer
-  );
-  return ts50.factory.createVariableStatement(
-    /* modifiers */
-    void 0,
-    /* declarationList */
-    flags === null ? [decl] : ts50.factory.createVariableDeclarationList([decl], flags)
-  );
-}
-function tsCallMethod(receiver, methodName, args = []) {
-  const methodAccess = ts50.factory.createPropertyAccessExpression(receiver, methodName);
-  return ts50.factory.createCallExpression(
-    /* expression */
-    methodAccess,
-    /* typeArguments */
-    void 0,
-    /* argumentsArray */
-    args
-  );
-}
-function isAccessExpression(node) {
-  return ts50.isPropertyAccessExpression(node) || ts50.isElementAccessExpression(node);
-}
-function tsNumericExpression2(value) {
-  if (value < 0) {
-    const operand = ts50.factory.createNumericLiteral(Math.abs(value));
-    return ts50.factory.createPrefixUnaryExpression(ts50.SyntaxKind.MinusToken, operand);
-  }
-  return ts50.factory.createNumericLiteral(value);
-}
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.js
 import { ExpressionType as ExpressionType2, R3Identifiers as R3Identifiers2, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
@@ -13071,7 +13087,10 @@ function translateDiagnostic(diagnostic, resolver) {
     return null;
   }
   const { sourceLocation, sourceMapping: templateSourceMapping, span } = fullMapping;
-  return makeTemplateDiagnostic(sourceLocation.id, templateSourceMapping, span, diagnostic.category, diagnostic.code, diagnostic.messageText);
+  return makeTemplateDiagnostic(sourceLocation.id, templateSourceMapping, span, diagnostic.category, diagnostic.code, diagnostic.messageText, void 0, diagnostic.reportsDeprecated !== void 0 ? {
+    reportsDeprecated: diagnostic.reportsDeprecated,
+    relatedMessages: diagnostic.relatedInformation
+  } : void 0);
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/expression.js
@@ -16177,8 +16196,6 @@ var SymbolBuilder = class {
   }
   getDirectivesOfNode(templateNode) {
     const elementSourceSpan = templateNode.startSourceSpan ?? templateNode.sourceSpan;
-    const tcbSourceFile = this.typeCheckBlock.getSourceFile();
-    const isDirectiveDeclaration = (node) => (ts63.isTypeNode(node) || ts63.isIdentifier(node)) && ts63.isVariableDeclaration(node.parent) && hasExpressionIdentifier(tcbSourceFile, node, ExpressionIdentifier.DIRECTIVE);
     const nodes = findAllMatchingNodes(this.typeCheckBlock, {
       withSpan: elementSourceSpan,
       filter: isDirectiveDeclaration
@@ -16941,6 +16958,29 @@ var TemplateTypeCheckerImpl = class {
       return diagnostics.filter((diag) => diag !== null);
     });
   }
+  getSuggestionDiagnosticsForFile(sf, tsLs, optimizeFor) {
+    switch (optimizeFor) {
+      case OptimizeFor.WholeProgram:
+        this.ensureAllShimsForAllFiles();
+        break;
+      case OptimizeFor.SingleFile:
+        this.ensureAllShimsForOneFile(sf);
+        break;
+    }
+    return this.perf.inPhase(PerfPhase.TtcSuggestionDiagnostics, () => {
+      const sfPath = absoluteFromSourceFile(sf);
+      const fileRecord = this.state.get(sfPath);
+      const diagnostics = [];
+      const program = this.programDriver.getProgram();
+      if (fileRecord.hasInlines) {
+        diagnostics.push(...getDeprecatedSuggestionDiagnostics(tsLs, program, sfPath, fileRecord, this));
+      }
+      for (const [shimPath] of fileRecord.shimData) {
+        diagnostics.push(...getDeprecatedSuggestionDiagnostics(tsLs, program, shimPath, fileRecord, this));
+      }
+      return diagnostics.filter((diag) => diag !== null);
+    });
+  }
   getDiagnosticsForComponent(component) {
     this.ensureShimForComponent(component);
     return this.perf.inPhase(PerfPhase.TtcDiagnostics, () => {
@@ -16966,6 +17006,27 @@ var TemplateTypeCheckerImpl = class {
         diagnostics.push(...templateData.templateParsingDiagnostics);
       }
       return diagnostics.filter((diag) => diag !== null && diag.typeCheckId === id);
+    });
+  }
+  getSuggestionDiagnosticsForComponent(component, tsLs) {
+    this.ensureShimForComponent(component);
+    return this.perf.inPhase(PerfPhase.TtcSuggestionDiagnostics, () => {
+      const sf = component.getSourceFile();
+      const sfPath = absoluteFromSourceFile(sf);
+      const shimPath = TypeCheckShimGenerator.shimFor(sfPath);
+      const fileRecord = this.getFileData(sfPath);
+      if (!fileRecord.shimData.has(shimPath)) {
+        return [];
+      }
+      const templateId = fileRecord.sourceManager.getTypeCheckId(component);
+      const shimRecord = fileRecord.shimData.get(shimPath);
+      const diagnostics = [];
+      const program = this.programDriver.getProgram();
+      if (shimRecord.hasInlines) {
+        diagnostics.push(...getDeprecatedSuggestionDiagnostics(tsLs, program, sfPath, fileRecord, this));
+      }
+      diagnostics.push(...getDeprecatedSuggestionDiagnostics(tsLs, program, shimPath, fileRecord, this));
+      return diagnostics.filter((diag) => diag !== null && diag.typeCheckId === templateId);
     });
   }
   getTypeCheckBlock(component) {
@@ -17718,6 +17779,87 @@ function getClassDeclFromSymbol(symbol, checker) {
     return decl;
   }
   return null;
+}
+function getDeprecatedSuggestionDiagnostics(tsLs, program, path, fileRecord, templateTypeChecker) {
+  const sourceFile = program.getSourceFile(path);
+  if (sourceFile === void 0) {
+    return [];
+  }
+  const tsDiags = tsLs.getSuggestionDiagnostics(path).filter(isDeprecatedDiagnostics);
+  const commonTemplateDiags = tsDiags.map((diag) => {
+    return convertDiagnostic(diag, fileRecord.sourceManager);
+  });
+  const elementTagDiags = getTheElementTagDeprecatedSuggestionDiagnostics(path, program, fileRecord, tsDiags, templateTypeChecker);
+  return [...commonTemplateDiags, ...elementTagDiags];
+}
+function getTheElementTagDeprecatedSuggestionDiagnostics(shimPath, program, fileRecord, diags, templateTypeChecker) {
+  const sourceFile = program.getSourceFile(shimPath);
+  if (sourceFile === void 0) {
+    return [];
+  }
+  const typeChecker = program.getTypeChecker();
+  const nodeToDiag = /* @__PURE__ */ new Map();
+  for (const tsDiag of diags) {
+    const diagNode = getTokenAtPosition(sourceFile, tsDiag.start);
+    const nodeType = typeChecker.getTypeAtLocation(diagNode);
+    const nodeSymbolDeclarations = nodeType.symbol.declarations;
+    const decl = nodeSymbolDeclarations !== void 0 && nodeSymbolDeclarations.length > 0 ? nodeSymbolDeclarations[0] : void 0;
+    if (decl === void 0 || !ts64.isClassDeclaration(decl)) {
+      continue;
+    }
+    const directiveForDiagnostic = templateTypeChecker.getDirectiveMetadata(decl);
+    if (directiveForDiagnostic === null || !directiveForDiagnostic.isComponent) {
+      continue;
+    }
+    nodeToDiag.set(decl, tsDiag);
+  }
+  const directiveNodesInTcb = findAllMatchingNodes(sourceFile, {
+    filter: isDirectiveDeclaration
+  });
+  const templateDiagnostics = [];
+  for (const directive of directiveNodesInTcb) {
+    const directiveType = typeChecker.getTypeAtLocation(directive);
+    const directiveSymbolDeclarations = directiveType.symbol.declarations;
+    const decl = directiveSymbolDeclarations !== void 0 && directiveSymbolDeclarations.length > 0 ? directiveSymbolDeclarations[0] : void 0;
+    if (decl === void 0) {
+      continue;
+    }
+    if (!ts64.isClassDeclaration(decl)) {
+      continue;
+    }
+    const diagnostic = nodeToDiag.get(decl);
+    if (diagnostic === void 0) {
+      continue;
+    }
+    const fullMapping = getSourceMapping(
+      diagnostic.file,
+      directive.getStart(),
+      fileRecord.sourceManager,
+      /**
+       * Don't set to true, the deprecated diagnostics will be ignored if this is a diagnostics request.
+       * Only the deprecated diagnostics will be reported here.
+       */
+      // For example:
+      // var _t2 /*T:DIR*/ /*87,104*/ = _ctor1({ "name": ("") /*96,103*/ }) /*D:ignore*/;
+      // At the end of the statement, there is a comment `/*D:ignore*/` which means that this diagnostic
+      // should be ignored in diagnostics request.
+      /*isDiagnosticsRequest*/
+      false
+    );
+    if (fullMapping === null) {
+      continue;
+    }
+    const { sourceLocation, sourceMapping: templateSourceMapping, span } = fullMapping;
+    const templateDiagnostic = makeTemplateDiagnostic(sourceLocation.id, templateSourceMapping, span, diagnostic.category, diagnostic.code, diagnostic.messageText, void 0, diagnostic.reportsDeprecated !== void 0 ? {
+      reportsDeprecated: diagnostic.reportsDeprecated,
+      relatedMessages: diagnostic.relatedInformation
+    } : void 0);
+    templateDiagnostics.push(templateDiagnostic);
+  }
+  return templateDiagnostics;
+}
+function isDeprecatedDiagnostics(diag) {
+  return diag.reportsDeprecated !== void 0;
 }
 
 // packages/compiler-cli/src/ngtsc/annotations/directive/src/handler.js
