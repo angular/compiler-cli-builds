@@ -117,6 +117,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["UNPARENTHESIZED_NULLISH_COALESCING"] = 8114] = "UNPARENTHESIZED_NULLISH_COALESCING";
   ErrorCode2[ErrorCode2["UNINVOKED_TRACK_FUNCTION"] = 8115] = "UNINVOKED_TRACK_FUNCTION";
   ErrorCode2[ErrorCode2["MISSING_STRUCTURAL_DIRECTIVE"] = 8116] = "MISSING_STRUCTURAL_DIRECTIVE";
+  ErrorCode2[ErrorCode2["UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION"] = 8117] = "UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION";
   ErrorCode2[ErrorCode2["INLINE_TCB_REQUIRED"] = 8900] = "INLINE_TCB_REQUIRED";
   ErrorCode2[ErrorCode2["INLINE_TYPE_CTOR_REQUIRED"] = 8901] = "INLINE_TYPE_CTOR_REQUIRED";
   ErrorCode2[ErrorCode2["INJECTABLE_DUPLICATE_PROV"] = 9001] = "INJECTABLE_DUPLICATE_PROV";
@@ -241,6 +242,7 @@ var ExtendedTemplateDiagnosticName;
   ExtendedTemplateDiagnosticName2["UNINVOKED_TRACK_FUNCTION"] = "uninvokedTrackFunction";
   ExtendedTemplateDiagnosticName2["UNUSED_STANDALONE_IMPORTS"] = "unusedStandaloneImports";
   ExtendedTemplateDiagnosticName2["UNPARENTHESIZED_NULLISH_COALESCING"] = "unparenthesizedNullishCoalescing";
+  ExtendedTemplateDiagnosticName2["UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION"] = "uninvokedFunctionInTextInterpolation";
 })(ExtendedTemplateDiagnosticName || (ExtendedTemplateDiagnosticName = {}));
 
 // packages/compiler-cli/src/ngtsc/reflection/src/typescript.js
@@ -12317,7 +12319,8 @@ function inferBoundAttribute(name) {
   const attrPrefix = "attr.";
   const classPrefix = "class.";
   const stylePrefix = "style.";
-  const animationPrefix = "@";
+  const animationPrefix = "animate.";
+  const legacyAnimationPrefix = "@";
   let attrName;
   let type;
   if (name.startsWith(attrPrefix)) {
@@ -12330,7 +12333,10 @@ function inferBoundAttribute(name) {
     attrName = name.slice(stylePrefix.length);
     type = BindingType.Style;
   } else if (name.startsWith(animationPrefix)) {
-    attrName = name.slice(animationPrefix.length);
+    attrName = name;
+    type = BindingType.Animation;
+  } else if (name.startsWith(legacyAnimationPrefix)) {
+    attrName = name.slice(legacyAnimationPrefix.length);
     type = BindingType.LegacyAnimation;
   } else {
     attrName = name;
@@ -14354,6 +14360,10 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
       }
       if (output.type === ParsedEventType2.LegacyAnimation) {
         const eventType = this.tcb.env.config.checkTypeOfAnimationEvents ? this.tcb.env.referenceExternalType("@angular/animations", "AnimationEvent") : 1;
+        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, eventType);
+        this.scope.addStatement(ts60.factory.createExpressionStatement(handler));
+      } else if (output.type === ParsedEventType2.Animation) {
+        const eventType = this.tcb.env.referenceExternalType("@angular/core", "AnimationCallbackEvent");
         const handler = tcbCreateEventHandler(output, this.tcb, this.scope, eventType);
         this.scope.addStatement(ts60.factory.createExpressionStatement(handler));
       } else if (this.tcb.env.config.checkTypeOfDomEvents) {

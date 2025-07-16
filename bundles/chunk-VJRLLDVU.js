@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-PLUBZWSY.js";
+} from "./chunk-FLY6WE3L.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -92,7 +92,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-TMIC4MKN.js";
+} from "./chunk-QBRNS7Q2.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -2906,7 +2906,8 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
         (node.type === BindingType.Property || // or a class binding like `[class.myClass]="mySignal"`
         node.type === BindingType.Class || // or a style binding like `[style.width]="mySignal"`
         node.type === BindingType.Style || // or an attribute binding like `[attr.role]="mySignal"`
-        node.type === BindingType.Attribute || // or an animation binding like `[@myAnimation]="mySignal"`
+        node.type === BindingType.Attribute || // or an animation binding like `[animate.enter]="mySignal"`
+        node.type === BindingType.Animation || // or an animation binding like `[@myAnimation]="mySignal"`
         node.type === BindingType.LegacyAnimation) && nodeAst
       ) {
         return buildDiagnosticForSignal(ctx, nodeAst, component);
@@ -3421,6 +3422,41 @@ var factory14 = {
   create: () => new UninvokedTrackFunctionCheck()
 };
 
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_text_interpolation/index.mjs
+import { Interpolation as Interpolation2, PropertyRead as PropertyRead5, SafePropertyRead as SafePropertyRead4 } from "@angular/compiler";
+var UninvokedFunctionInTextInterpolation = class extends TemplateCheckWithVisitor {
+  code = ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION;
+  visitNode(ctx, component, node) {
+    if (node instanceof Interpolation2) {
+      return node.expressions.flatMap((item) => assertExpressionInvoked2(item, component, node.sourceSpan, ctx));
+    }
+    return [];
+  }
+};
+function assertExpressionInvoked2(expression, component, sourceSpan, ctx) {
+  if (!(expression instanceof PropertyRead5) && !(expression instanceof SafePropertyRead4)) {
+    return [];
+  }
+  const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
+  if (symbol !== null && symbol.kind === SymbolKind.Expression) {
+    if (symbol.tsType.getCallSignatures()?.length > 0) {
+      const fullExpressionText = generateStringFromExpression3(expression, sourceSpan.toString());
+      const errorString = `Function in text interpolation should be invoked: ${fullExpressionText}()`;
+      const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
+      return [ctx.makeTemplateDiagnostic(templateMapping.span, errorString)];
+    }
+  }
+  return [];
+}
+function generateStringFromExpression3(expression, source) {
+  return source.substring(expression.span.start, expression.span.end);
+}
+var factory15 = {
+  code: ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION,
+  name: ExtendedTemplateDiagnosticName.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION,
+  create: () => new UninvokedFunctionInTextInterpolation()
+};
+
 // packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.js
 import ts21 from "typescript";
 
@@ -3439,12 +3475,12 @@ var ExtendedTemplateCheckerImpl = class {
   constructor(templateTypeChecker, typeChecker, templateCheckFactories, options) {
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory15 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory(options?.extendedDiagnostics?.checks?.[factory15.name] ?? options?.extendedDiagnostics?.defaultCategory ?? DiagnosticCategoryLabel.Warning);
+    for (const factory16 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory(options?.extendedDiagnostics?.checks?.[factory16.name] ?? options?.extendedDiagnostics?.defaultCategory ?? DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory15.create(options);
+      const check = factory16.create(options);
       if (check === null) {
         continue;
       }
@@ -3503,16 +3539,17 @@ var ALL_DIAGNOSTIC_FACTORIES = [
   factory13,
   factory8,
   factory12,
-  factory14
+  factory14,
+  factory15
 ];
 var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ExtendedTemplateDiagnosticName.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION,
   ExtendedTemplateDiagnosticName.UNUSED_STANDALONE_IMPORTS,
-  ...ALL_DIAGNOSTIC_FACTORIES.map((factory15) => factory15.name)
+  ...ALL_DIAGNOSTIC_FACTORIES.map((factory16) => factory16.name)
 ]);
 
 // packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
-import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead5, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead6, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts22 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   templateTypeChecker;
@@ -3553,7 +3590,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
     this.diagnostics = diagnostics;
   }
   visitBinary(ast, context) {
-    if (Binary3.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead5) {
+    if (Binary3.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead6) {
       this.checkForIllegalWriteInEventBinding(ast.left, context);
     } else {
       super.visitBinary(ast, context);
