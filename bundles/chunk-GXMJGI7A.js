@@ -14338,14 +14338,8 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
         const handler = tcbCreateEventHandler(output, this.tcb, this.scope, eventType);
         this.scope.addStatement(ts60.factory.createExpressionStatement(handler));
       } else if (this.tcb.env.config.checkTypeOfDomEvents) {
-        const handler = tcbCreateEventHandler(
-          output,
-          this.tcb,
-          this.scope,
-          0
-          /* EventParamType.Infer */
-        );
         let target;
+        let domEventAssertion;
         if (output.target === "window" || output.target === "document") {
           target = ts60.factory.createIdentifier(output.target);
         } else if (elId === null) {
@@ -14353,8 +14347,14 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
         } else {
           target = elId;
         }
+        if (this.target instanceof TmplAstElement2 && this.target.isVoid && ts60.isIdentifier(target)) {
+          domEventAssertion = ts60.factory.createCallExpression(this.tcb.env.referenceExternalSymbol("@angular/core", "\u0275assertType"), [ts60.factory.createTypeQueryNode(target)], [
+            ts60.factory.createPropertyAccessExpression(ts60.factory.createIdentifier(EVENT_PARAMETER), "target")
+          ]);
+        }
         const propertyAccess = ts60.factory.createPropertyAccessExpression(target, "addEventListener");
         addParseSpanInfo(propertyAccess, output.keySpan);
+        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, 0, domEventAssertion);
         const call = ts60.factory.createCallExpression(
           /* expression */
           propertyAccess,
@@ -15463,9 +15463,12 @@ function unwrapWritableSignal(expression, tcb) {
   return ts60.factory.createCallExpression(unwrapRef, void 0, [expression]);
 }
 var EVENT_PARAMETER = "$event";
-function tcbCreateEventHandler(event, tcb, scope, eventType) {
+function tcbCreateEventHandler(event, tcb, scope, eventType, assertionExpression) {
   const handler = tcbEventHandlerExpression(event.handler, tcb, scope);
   const statements = [];
+  if (assertionExpression !== void 0) {
+    statements.push(ts60.factory.createExpressionStatement(assertionExpression));
+  }
   if (event.type === ParsedEventType2.TwoWay && tcb.env.config.checkTwoWayBoundEvents) {
     const target = tcb.allocateId();
     const assignment = ts60.factory.createBinaryExpression(target, ts60.SyntaxKind.EqualsToken, ts60.factory.createIdentifier(EVENT_PARAMETER));
