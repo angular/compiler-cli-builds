@@ -3422,7 +3422,7 @@ var factory14 = {
   create: () => new UninvokedTrackFunctionCheck()
 };
 
-// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_text_interpolation/index.mjs
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_text_interpolation/index.js
 import { Interpolation as Interpolation2, PropertyRead as PropertyRead5, SafePropertyRead as SafePropertyRead4 } from "@angular/compiler";
 var UninvokedFunctionInTextInterpolation = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION;
