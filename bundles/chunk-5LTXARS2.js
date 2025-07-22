@@ -14078,7 +14078,7 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
         continue;
       }
       if (isPropertyBinding && binding.name !== "style" && binding.name !== "class") {
-        const propertyName = ATTR_TO_PROP.get(binding.name) ?? binding.name;
+        const propertyName = REGISTRY.getMappedPropName(binding.name);
         if (isTemplateElement) {
           this.tcb.domSchemaChecker.checkTemplateElementProperty(this.tcb.id, this.getTagName(element), propertyName, binding.sourceSpan, this.tcb.schemas, this.tcb.hostIsStandalone);
         } else {
@@ -14208,14 +14208,6 @@ var TcbComponentNodeOp = class extends TcbOp {
     return id;
   }
 };
-var ATTR_TO_PROP = new Map(Object.entries({
-  "class": "className",
-  "for": "htmlFor",
-  "formaction": "formAction",
-  "innerHtml": "innerHTML",
-  "readonly": "readOnly",
-  "tabindex": "tabIndex"
-}));
 var TcbUnclaimedInputsOp = class extends TcbOp {
   tcb;
   scope;
@@ -14246,7 +14238,7 @@ var TcbUnclaimedInputsOp = class extends TcbOp {
           if (elId === null) {
             elId = this.scope.resolve(this.target);
           }
-          const propertyName = ATTR_TO_PROP.get(binding.name) ?? binding.name;
+          const propertyName = REGISTRY.getMappedPropName(binding.name);
           const prop = ts60.factory.createElementAccessExpression(elId, ts60.factory.createStringLiteral(propertyName));
           const stmt = ts60.factory.createBinaryExpression(prop, ts60.SyntaxKind.EqualsToken, wrapForDiagnostics(expr));
           addParseSpanInfo(stmt, binding.sourceSpan);

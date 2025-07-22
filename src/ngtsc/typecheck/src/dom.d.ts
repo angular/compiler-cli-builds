@@ -5,9 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { ParseSourceSpan, SchemaMetadata, TmplAstHostElement } from '@angular/compiler';
+import { DomElementSchemaRegistry, ParseSourceSpan, SchemaMetadata, TmplAstHostElement } from '@angular/compiler';
 import { TemplateDiagnostic, TypeCheckId } from '../api';
 import { TypeCheckSourceResolver } from './tcb_util';
+export declare const REGISTRY: DomElementSchemaRegistry;
 /**
  * Checks every non-Angular element/property processed in a template and potentially produces
  * `ts.Diagnostic`s related to improper usage.
