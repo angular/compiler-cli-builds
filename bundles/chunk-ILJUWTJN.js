@@ -3428,28 +3428,24 @@ var UninvokedFunctionInTextInterpolation = class extends TemplateCheckWithVisito
   code = ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION;
   visitNode(ctx, component, node) {
     if (node instanceof Interpolation2) {
-      return node.expressions.flatMap((item) => assertExpressionInvoked2(item, component, node.sourceSpan, ctx));
+      return node.expressions.flatMap((item) => assertExpressionInvoked2(item, component, ctx));
     }
     return [];
   }
 };
-function assertExpressionInvoked2(expression, component, sourceSpan, ctx) {
+function assertExpressionInvoked2(expression, component, ctx) {
   if (!(expression instanceof PropertyRead5) && !(expression instanceof SafePropertyRead4)) {
     return [];
   }
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
   if (symbol !== null && symbol.kind === SymbolKind.Expression) {
     if (symbol.tsType.getCallSignatures()?.length > 0) {
-      const fullExpressionText = generateStringFromExpression3(expression, sourceSpan.toString());
-      const errorString = `Function in text interpolation should be invoked: ${fullExpressionText}()`;
+      const errorString = `Function in text interpolation should be invoked: ${expression.name}()`;
       const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
       return [ctx.makeTemplateDiagnostic(templateMapping.span, errorString)];
     }
   }
   return [];
-}
-function generateStringFromExpression3(expression, source) {
-  return source.substring(expression.span.start, expression.span.end);
 }
 var factory15 = {
   code: ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION,
