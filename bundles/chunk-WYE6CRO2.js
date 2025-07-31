@@ -7553,7 +7553,7 @@ var SemanticDepGraph = class {
   files = /* @__PURE__ */ new Map();
   // Note: the explicit type annotation is used to work around a CI failure on Windows:
   // error TS2742: The inferred type of 'symbolByDecl' cannot be named without a reference to
-  // '../../../../../../../external/npm/node_modules/typescript/lib/typescript'. This is likely
+  // '../../../../../../../external/angular/node_modules/typescript/lib/typescript'. This is likely
   // not portable. A type annotation is necessary.
   symbolByDecl = /* @__PURE__ */ new Map();
   /**
