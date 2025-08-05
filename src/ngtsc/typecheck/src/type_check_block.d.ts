@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { BoundTarget, SchemaMetadata, TmplAstElement, TmplAstForLoopBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable, TmplAstHostElement, TmplAstComponent, TmplAstDirective } from '@angular/compiler';
+import { BoundTarget, SchemaMetadata, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstElement, TmplAstForLoopBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable, TmplAstHostElement, TmplAstComponent, TmplAstDirective, DirectiveOwner } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { PipeMeta } from '../../metadata';
@@ -111,8 +111,10 @@ export declare class TcbDirectiveOutputsOp extends TcbOp {
     private tcb;
     private scope;
     private node;
+    private inputs;
+    private outputs;
     private dir;
-    constructor(tcb: Context, scope: Scope, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective, dir: TypeCheckableDirectiveMeta);
+    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, inputs: TmplAstBoundAttribute[] | null, outputs: TmplAstBoundEvent[], dir: TypeCheckableDirectiveMeta);
     get optional(): boolean;
     execute(): null;
 }
@@ -301,6 +303,7 @@ declare class Scope {
     private appendComponentNode;
     private appendDeferredBlock;
     private appendDeferredTriggers;
+    private appendHostElement;
     private validateReferenceBasedDeferredTrigger;
     /** Reports a diagnostic if there are any `@let` declarations that conflict with a node. */
     private static checkConflictingLet;

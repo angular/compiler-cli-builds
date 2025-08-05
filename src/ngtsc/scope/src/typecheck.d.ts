@@ -36,6 +36,10 @@ export interface TypeCheckScope {
      * (contained semantic errors during its production).
      */
     isPoisoned: boolean;
+    /**
+     * Directives that have been set on the host of the scope.
+     */
+    directivesOnHost: DirectiveMeta[] | null;
 }
 /**
  * Computes scope information to be used in template type checking.
@@ -59,9 +63,10 @@ export declare class TypeCheckScopeRegistry {
      * contains an error, then 'error' is returned. If the component is not declared in any NgModule,
      * an empty type-check scope is returned.
      */
-    getTypeCheckScope(node: ClassDeclaration): TypeCheckScope;
+    getTypeCheckScope(ref: Reference<ClassDeclaration>): TypeCheckScope;
     getTypeCheckDirectiveMetadata(ref: Reference<ClassDeclaration>): DirectiveMeta | null;
     private applyExplicitlyDeferredFlag;
     private getSelectorMatcher;
     private getSelectorlessMatcher;
+    private combineWithHostDirectives;
 }
