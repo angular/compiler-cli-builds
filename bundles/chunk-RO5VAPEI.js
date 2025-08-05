@@ -8521,17 +8521,20 @@ var TypeCheckScopeRegistry = class {
    * contains an error, then 'error' is returned. If the component is not declared in any NgModule,
    * an empty type-check scope is returned.
    */
-  getTypeCheckScope(node) {
+  getTypeCheckScope(ref) {
     const directives = [];
     const pipes = /* @__PURE__ */ new Map();
-    const scope = this.scopeReader.getScopeForComponent(node);
+    const scope = this.scopeReader.getScopeForComponent(ref.node);
+    const hostMeta = this.getTypeCheckDirectiveMetadata(ref);
+    const directivesOnHost = hostMeta === null ? null : this.combineWithHostDirectives(hostMeta);
     if (scope === null) {
       return {
         matcher: null,
         directives,
         pipes,
         schemas: [],
-        isPoisoned: false
+        isPoisoned: false,
+        directivesOnHost
       };
     }
     const isNgModuleScope = scope.kind === ComponentScopeKind.NgModule;
@@ -8570,6 +8573,7 @@ var TypeCheckScopeRegistry = class {
       directives,
       pipes,
       schemas: scope.schemas,
+      directivesOnHost,
       isPoisoned: scope.kind === ComponentScopeKind.NgModule ? scope.compilation.isPoisoned || scope.exported.isPoisoned : scope.isPoisoned
     };
     this.scopeCache.set(cacheKey, typeCheckScope);
@@ -8599,10 +8603,7 @@ var TypeCheckScopeRegistry = class {
           continue;
         }
         const directiveMeta = this.applyExplicitlyDeferredFlag(extMeta, meta.isExplicitlyDeferred);
-        matcher.addSelectables(CssSelector.parse(meta.selector), [
-          ...this.hostDirectivesResolver.resolve(directiveMeta),
-          directiveMeta
-        ]);
+        matcher.addSelectables(CssSelector.parse(meta.selector), this.combineWithHostDirectives(directiveMeta));
       }
     }
     return matcher;
@@ -8612,10 +8613,13 @@ var TypeCheckScopeRegistry = class {
     for (const [name, dep] of scope.dependencies) {
       const extMeta = dep.kind === MetaKind.Directive ? this.getTypeCheckDirectiveMetadata(dep.ref) : null;
       if (extMeta !== null) {
-        registry.set(name, [extMeta, ...this.hostDirectivesResolver.resolve(extMeta)]);
+        registry.set(name, this.combineWithHostDirectives(extMeta));
       }
     }
     return new SelectorlessMatcher(registry);
+  }
+  combineWithHostDirectives(meta) {
+    return [...this.hostDirectivesResolver.resolve(meta), meta];
   }
 };
 
@@ -13502,7 +13506,7 @@ function generateTypeCheckBlock(env, ref, name, meta, domSchemaChecker, oobRecor
     statements.push(renderBlockStatements(env, templateScope, ts60.factory.createTrue()));
   }
   if (tcb.boundTarget.target.host !== void 0) {
-    const hostScope = Scope.forNodes(tcb, null, tcb.boundTarget.target.host, null, null);
+    const hostScope = Scope.forNodes(tcb, null, tcb.boundTarget.target.host.node, null, null);
     statements.push(renderBlockStatements(env, hostScope, createHostBindingsBlockGuard()));
   }
   const body = ts60.factory.createBlock(statements);
@@ -13761,6 +13765,7 @@ var TcbDirectiveTypeOpBase = class extends TcbOp {
     const dirRef = this.dir.ref;
     const rawType = this.tcb.env.referenceType(this.dir.ref);
     let type;
+    let span;
     if (this.dir.isGeneric === false || dirRef.node.typeParameters === void 0) {
       type = rawType;
     } else {
@@ -13770,9 +13775,14 @@ var TcbDirectiveTypeOpBase = class extends TcbOp {
       const typeArguments = dirRef.node.typeParameters.map(() => ts60.factory.createKeywordTypeNode(ts60.SyntaxKind.AnyKeyword));
       type = ts60.factory.createTypeReferenceNode(rawType.typeName, typeArguments);
     }
+    if (this.node instanceof TmplAstHostElement2) {
+      span = this.node.sourceSpan;
+    } else {
+      span = this.node.startSourceSpan || this.node.sourceSpan;
+    }
     const id = this.tcb.allocateId();
     addExpressionIdentifier(id, ExpressionIdentifier.DIRECTIVE);
-    addParseSpanInfo(id, this.node.startSourceSpan || this.node.sourceSpan);
+    addParseSpanInfo(id, span);
     this.scope.addStatement(tsDeclareVariable(id, type));
     return id;
   }
@@ -14240,12 +14250,16 @@ var TcbDirectiveOutputsOp = class extends TcbOp {
   tcb;
   scope;
   node;
+  inputs;
+  outputs;
   dir;
-  constructor(tcb, scope, node, dir) {
+  constructor(tcb, scope, node, inputs, outputs, dir) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
+    this.inputs = inputs;
+    this.outputs = outputs;
     this.dir = dir;
   }
   get optional() {
@@ -14254,13 +14268,13 @@ var TcbDirectiveOutputsOp = class extends TcbOp {
   execute() {
     let dirId = null;
     const outputs = this.dir.outputs;
-    for (const output of this.node.outputs) {
+    for (const output of this.outputs) {
       if (output.type === ParsedEventType2.LegacyAnimation || !outputs.hasBindingPropertyName(output.name)) {
         continue;
       }
-      if (this.tcb.env.config.checkTypeOfOutputEvents && output.name.endsWith("Change")) {
+      if (this.tcb.env.config.checkTypeOfOutputEvents && this.inputs !== null && output.name.endsWith("Change")) {
         const inputName = output.name.slice(0, -6);
-        checkSplitTwoWayBinding(inputName, output, this.node.inputs, this.tcb);
+        checkSplitTwoWayBinding(inputName, output, this.inputs, this.tcb);
       }
       const field = outputs.getByBindingPropertyName(output.name)[0].classPropertyName;
       if (dirId === null) {
@@ -14860,7 +14874,7 @@ var Scope = class _Scope {
       return typeof opIndexOrNode === "number" ? this.resolveOp(opIndexOrNode) : opIndexOrNode;
     } else if (ref instanceof TmplAstTemplate && directive === void 0 && this.templateCtxOpMap.has(ref)) {
       return this.resolveOp(this.templateCtxOpMap.get(ref));
-    } else if ((ref instanceof TmplAstElement2 || ref instanceof TmplAstTemplate || ref instanceof TmplAstComponent2 || ref instanceof TmplAstDirective2) && directive !== void 0 && this.directiveOpMap.has(ref)) {
+    } else if ((ref instanceof TmplAstElement2 || ref instanceof TmplAstTemplate || ref instanceof TmplAstComponent2 || ref instanceof TmplAstDirective2 || ref instanceof TmplAstHostElement2) && directive !== void 0 && this.directiveOpMap.has(ref)) {
       const dirMap = this.directiveOpMap.get(ref);
       return dirMap.has(directive) ? this.resolveOp(dirMap.get(directive)) : null;
     } else if (ref instanceof TmplAstElement2 && this.elementOpMap.has(ref)) {
@@ -14915,13 +14929,13 @@ var Scope = class _Scope {
         this.appendContentProjectionCheckOp(node);
       }
       this.appendDirectivesAndInputsOfElementLikeNode(node);
-      this.appendOutputsOfElementLikeNode(node);
+      this.appendOutputsOfElementLikeNode(node, node.inputs, node.outputs);
       this.appendSelectorlessDirectives(node);
       this.appendChildren(node);
       this.checkAndAppendReferencesOfNode(node);
     } else if (node instanceof TmplAstTemplate) {
       this.appendDirectivesAndInputsOfElementLikeNode(node);
-      this.appendOutputsOfElementLikeNode(node);
+      this.appendOutputsOfElementLikeNode(node, node.inputs, node.outputs);
       this.appendSelectorlessDirectives(node);
       const ctxIndex = this.opQueue.push(new TcbTemplateContextOp(this.tcb, this)) - 1;
       this.templateCtxOpMap.set(node, ctxIndex);
@@ -14956,9 +14970,7 @@ var Scope = class _Scope {
         this.letDeclOpMap.set(node.name, { opIndex, node });
       }
     } else if (node instanceof TmplAstHostElement2) {
-      const opIndex = this.opQueue.push(new TcbHostElementOp(this.tcb, this, node)) - 1;
-      this.hostElementOpMap.set(node, opIndex);
-      this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node.bindings, node, null), new TcbUnclaimedOutputsOp(this.tcb, this, node, node.listeners, null, null), new TcbDomSchemaCheckerOp(this.tcb, node, false, null));
+      this.appendHostElement(node);
     }
   }
   appendChildren(node) {
@@ -15018,25 +15030,25 @@ var Scope = class _Scope {
       this.opQueue.push(new TcbDomSchemaCheckerOp(this.tcb, node, checkElement, claimedInputs));
     }
   }
-  appendOutputsOfElementLikeNode(node) {
+  appendOutputsOfElementLikeNode(node, bindings, events) {
     const claimedOutputs = /* @__PURE__ */ new Set();
     const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
     if (directives === null || directives.length === 0) {
       if (node instanceof TmplAstElement2) {
-        this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, node.outputs, node.inputs, claimedOutputs));
+        this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, events, bindings, claimedOutputs));
       }
       return;
     }
     for (const dir of directives) {
-      this.opQueue.push(new TcbDirectiveOutputsOp(this.tcb, this, node, dir));
+      this.opQueue.push(new TcbDirectiveOutputsOp(this.tcb, this, node, bindings, events, dir));
     }
-    if (node instanceof TmplAstElement2) {
+    if (node instanceof TmplAstElement2 || node instanceof TmplAstHostElement2) {
       for (const dir of directives) {
         for (const outputProperty of dir.outputs.propertyNames) {
           claimedOutputs.add(outputProperty);
         }
       }
-      this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, node.outputs, node.inputs, claimedOutputs));
+      this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, events, bindings, claimedOutputs));
     }
   }
   appendInputsOfSelectorlessNode(node) {
@@ -15073,7 +15085,7 @@ var Scope = class _Scope {
     const claimedOutputs = /* @__PURE__ */ new Set();
     if (directives !== null && directives.length > 0) {
       for (const dir of directives) {
-        this.opQueue.push(new TcbDirectiveOutputsOp(this.tcb, this, node, dir));
+        this.opQueue.push(new TcbDirectiveOutputsOp(this.tcb, this, node, node.inputs, node.outputs, dir));
         for (const outputProperty of dir.outputs.propertyNames) {
           claimedOutputs.add(outputProperty);
         }
@@ -15221,6 +15233,21 @@ var Scope = class _Scope {
     if (triggers.viewport !== void 0) {
       this.validateReferenceBasedDeferredTrigger(block, triggers.viewport);
     }
+  }
+  appendHostElement(node) {
+    const opIndex = this.opQueue.push(new TcbHostElementOp(this.tcb, this, node)) - 1;
+    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
+    if (directives !== null && directives.length > 0) {
+      const directiveOpMap = /* @__PURE__ */ new Map();
+      for (const directive of directives) {
+        const directiveOp = new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, directive);
+        directiveOpMap.set(directive, this.opQueue.push(directiveOp) - 1);
+      }
+      this.directiveOpMap.set(node, directiveOpMap);
+    }
+    this.hostElementOpMap.set(node, opIndex);
+    this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node.bindings, node, null), new TcbDomSchemaCheckerOp(this.tcb, node, false, null));
+    this.appendOutputsOfElementLikeNode(node, null, node.listeners);
   }
   validateReferenceBasedDeferredTrigger(block, trigger) {
     if (trigger.reference === null) {
@@ -15688,7 +15715,10 @@ var TypeCheckContextImpl = class {
     }
     const boundTarget = binder.bind({
       template: templateContext?.nodes,
-      host: hostBindingContext?.node
+      host: hostBindingContext === null ? void 0 : {
+        node: hostBindingContext.node,
+        directives: hostBindingContext.directives
+      }
     });
     if (this.inlining === InliningMode.InlineOps) {
       for (const dir of boundTarget.getUsedDirectives()) {
@@ -17916,18 +17946,20 @@ var DirectiveDecoratorHandler = class {
     if (!ts65.isClassDeclaration(node) || meta.isPoisoned && !this.usePoisonedData) {
       return;
     }
-    const scope = this.typeCheckScopeRegistry.getTypeCheckScope(node);
+    const ref = new Reference(node);
+    const scope = this.typeCheckScopeRegistry.getTypeCheckScope(ref);
     if (scope.isPoisoned && !this.usePoisonedData) {
       return;
     }
     const hostElement = createHostElement("directive", meta.meta.selector, node, meta.hostBindingNodes.literal, meta.hostBindingNodes.bindingDecorators, meta.hostBindingNodes.listenerDecorators);
-    if (hostElement !== null) {
+    if (hostElement !== null && scope.directivesOnHost !== null) {
       const binder = new R3TargetBinder(scope.matcher);
       const hostBindingsContext = {
         node: hostElement,
+        directives: scope.directivesOnHost,
         sourceMapping: { type: "direct", node }
       };
-      ctx.addDirective(new Reference(node), binder, scope.schemas, null, hostBindingsContext, meta.meta.isStandalone);
+      ctx.addDirective(ref, binder, scope.schemas, null, hostBindingsContext, meta.meta.isStandalone);
     }
   }
   resolve(node, analysis, symbol) {
@@ -20235,7 +20267,8 @@ var ComponentDecoratorHandler = class {
     if (!ts73.isClassDeclaration(node) || meta.isPoisoned && !this.usePoisonedData) {
       return;
     }
-    const scope = this.typeCheckScopeRegistry.getTypeCheckScope(node);
+    const ref = new Reference(node);
+    const scope = this.typeCheckScopeRegistry.getTypeCheckScope(ref);
     if (scope.isPoisoned && !this.usePoisonedData) {
       return;
     }
@@ -20249,11 +20282,12 @@ var ComponentDecoratorHandler = class {
       preserveWhitespaces: meta.meta.template.preserveWhitespaces ?? false
     };
     const hostElement = this.typeCheckHostBindings ? createHostElement("component", meta.meta.selector, node, meta.hostBindingNodes.literal, meta.hostBindingNodes.bindingDecorators, meta.hostBindingNodes.listenerDecorators) : null;
-    const hostBindingsContext = hostElement === null ? null : {
+    const hostBindingsContext = hostElement === null || scope.directivesOnHost === null ? null : {
       node: hostElement,
+      directives: scope.directivesOnHost,
       sourceMapping: { type: "direct", node }
     };
-    ctx.addDirective(new Reference(node), binder, scope.schemas, templateContext, hostBindingsContext, meta.meta.isStandalone);
+    ctx.addDirective(ref, binder, scope.schemas, templateContext, hostBindingsContext, meta.meta.isStandalone);
   }
   extendedTemplateCheck(component, extendedTemplateChecker) {
     return extendedTemplateChecker.getDiagnosticsForComponent(component);
