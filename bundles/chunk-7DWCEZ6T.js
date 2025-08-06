@@ -17803,11 +17803,11 @@ function getClassDeclFromSymbol(symbol, checker) {
     return null;
   }
   if (ts64.isExportAssignment(decl)) {
-    const symbol2 = checker.getTypeAtLocation(decl.expression).symbol;
+    const symbol2 = checker.getTypeAtLocation(decl.expression).getSymbol();
     return getClassDeclFromSymbol(symbol2, checker);
   }
   if (ts64.isExportSpecifier(decl)) {
-    const symbol2 = checker.getTypeAtLocation(decl).symbol;
+    const symbol2 = checker.getTypeAtLocation(decl).getSymbol();
     return getClassDeclFromSymbol(symbol2, checker);
   }
   if (isNamedClassDeclaration(decl)) {
@@ -17837,7 +17837,7 @@ function getTheElementTagDeprecatedSuggestionDiagnostics(shimPath, program, file
   for (const tsDiag of diags) {
     const diagNode = getTokenAtPosition(sourceFile, tsDiag.start);
     const nodeType = typeChecker.getTypeAtLocation(diagNode);
-    const nodeSymbolDeclarations = nodeType.symbol.declarations;
+    const nodeSymbolDeclarations = nodeType.getSymbol()?.declarations;
     const decl = nodeSymbolDeclarations !== void 0 && nodeSymbolDeclarations.length > 0 ? nodeSymbolDeclarations[0] : void 0;
     if (decl === void 0 || !ts64.isClassDeclaration(decl)) {
       continue;
@@ -17854,7 +17854,7 @@ function getTheElementTagDeprecatedSuggestionDiagnostics(shimPath, program, file
   const templateDiagnostics = [];
   for (const directive of directiveNodesInTcb) {
     const directiveType = typeChecker.getTypeAtLocation(directive);
-    const directiveSymbolDeclarations = directiveType.symbol.declarations;
+    const directiveSymbolDeclarations = directiveType.getSymbol()?.declarations;
     const decl = directiveSymbolDeclarations !== void 0 && directiveSymbolDeclarations.length > 0 ? directiveSymbolDeclarations[0] : void 0;
     if (decl === void 0) {
       continue;
@@ -20221,7 +20221,7 @@ var ComponentDecoratorHandler = class {
         diagnostics.push(makeResourceNotFoundError(styleUrl.url, styleUrl.expression, resourceType).toDiagnostic());
       }
     }
-    if (encapsulation === ViewEncapsulation2.ShadowDom && metadata.selector !== null) {
+    if ((encapsulation === ViewEncapsulation2.ShadowDom || encapsulation === ViewEncapsulation2.IsolatedShadowDom) && metadata.selector !== null) {
       const selectorError = checkCustomElementSelectorForErrors(metadata.selector);
       if (selectorError !== null) {
         if (diagnostics === void 0) {
