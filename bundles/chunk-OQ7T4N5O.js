@@ -13743,6 +13743,7 @@ var TcbTemplateBodyOp = class extends TcbOp {
         if (this.tcb.env.config.applyTemplateContextGuards) {
           const ctx = this.scope.resolve(hostNode);
           const guardInvoke = tsCallMethod(dirId, "ngTemplateContextGuard", [dirInstId, ctx]);
+          markIgnoreDiagnostics(guardInvoke);
           addParseSpanInfo(guardInvoke, hostNode.sourceSpan);
           guards.push(guardInvoke);
         } else if (isTemplate && hostNode.variables.length > 0 && this.tcb.env.config.suggestionsForSuboptimalTypeInference) {
@@ -14382,7 +14383,7 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
         } else {
           target = elId;
         }
-        if (this.target instanceof TmplAstElement2 && this.target.isVoid && ts60.isIdentifier(target)) {
+        if (this.target instanceof TmplAstElement2 && this.target.isVoid && ts60.isIdentifier(target) && this.tcb.env.config.allowDomEventAssertion) {
           domEventAssertion = ts60.factory.createCallExpression(this.tcb.env.referenceExternalSymbol("@angular/core", "\u0275assertType"), [ts60.factory.createTypeQueryNode(target)], [
             ts60.factory.createPropertyAccessExpression(ts60.factory.createIdentifier(EVENT_PARAMETER), "target")
           ]);

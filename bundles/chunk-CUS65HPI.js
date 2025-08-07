@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-WLT4GJPA.js";
+} from "./chunk-FX2ZPVFW.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -92,7 +92,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-7DWCEZ6T.js";
+} from "./chunk-OQ7T4N5O.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -4388,6 +4388,7 @@ var NgCompiler = class _NgCompiler {
     const useInlineTypeConstructors = this.programDriver.supportsInlineOperations;
     const checkTwoWayBoundEvents = this.options["_checkTwoWayBoundEvents"] ?? false;
     const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0-0");
+    const allowDomEventAssertion = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 20.2.0");
     let typeCheckingConfig;
     if (this.fullTemplateTypeCheck) {
       typeCheckingConfig = {
@@ -4426,7 +4427,8 @@ var NgCompiler = class _NgCompiler {
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
-        checkTwoWayBoundEvents
+        checkTwoWayBoundEvents,
+        allowDomEventAssertion
       };
     } else {
       typeCheckingConfig = {
@@ -4459,7 +4461,8 @@ var NgCompiler = class _NgCompiler {
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
-        checkTwoWayBoundEvents
+        checkTwoWayBoundEvents,
+        allowDomEventAssertion
       };
     }
     if (this.options.strictInputTypes !== void 0) {
