@@ -296,6 +296,7 @@ declare class Scope {
     private appendInputsOfSelectorlessNode;
     private appendOutputsOfSelectorlessNode;
     private appendDirectiveInputs;
+    private getDirectiveOp;
     private appendSelectorlessDirectives;
     private appendDeepSchemaChecks;
     private appendIcuExpressions;
