@@ -13900,11 +13900,19 @@ var TcbDirectiveCtorOp = class extends TcbOp {
     return true;
   }
   execute() {
-    const id = this.tcb.allocateId();
-    addExpressionIdentifier(id, ExpressionIdentifier.DIRECTIVE);
-    addParseSpanInfo(id, this.node.startSourceSpan || this.node.sourceSpan);
     const genericInputs = /* @__PURE__ */ new Map();
-    const boundAttrs = getBoundAttributes(this.dir, this.node);
+    const id = this.tcb.allocateId();
+    let boundAttrs;
+    let span;
+    if (this.node instanceof TmplAstHostElement2) {
+      boundAttrs = [];
+      span = this.node.sourceSpan;
+    } else {
+      boundAttrs = getBoundAttributes(this.dir, this.node);
+      span = this.node.startSourceSpan || this.node.sourceSpan;
+    }
+    addExpressionIdentifier(id, ExpressionIdentifier.DIRECTIVE);
+    addParseSpanInfo(id, span);
     for (const attr of boundAttrs) {
       if (!this.tcb.env.config.checkTypeOfAttributes && attr.attribute instanceof TmplAstTextAttribute2) {
         continue;
@@ -15124,19 +15132,19 @@ var Scope = class _Scope {
     }
   }
   appendDirectiveInputs(dir, node, dirMap) {
-    let directiveOp;
-    const host = this.tcb.env.reflector;
-    const dirRef = dir.ref;
-    if (!dir.isGeneric) {
-      directiveOp = new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, dir);
-    } else if (!requiresInlineTypeCtor(dirRef.node, host, this.tcb.env) || this.tcb.env.config.useInlineTypeConstructors) {
-      directiveOp = new TcbDirectiveCtorOp(this.tcb, this, node, dir);
-    } else {
-      directiveOp = new TcbGenericDirectiveTypeWithAnyParamsOp(this.tcb, this, node, dir);
-    }
+    const directiveOp = this.getDirectiveOp(dir, node);
     const dirIndex = this.opQueue.push(directiveOp) - 1;
     dirMap.set(dir, dirIndex);
     this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir));
+  }
+  getDirectiveOp(dir, node) {
+    const dirRef = dir.ref;
+    if (!dir.isGeneric) {
+      return new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, dir);
+    } else if (!requiresInlineTypeCtor(dirRef.node, this.tcb.env.reflector, this.tcb.env) || this.tcb.env.config.useInlineTypeConstructors) {
+      return new TcbDirectiveCtorOp(this.tcb, this, node, dir);
+    }
+    return new TcbGenericDirectiveTypeWithAnyParamsOp(this.tcb, this, node, dir);
   }
   appendSelectorlessDirectives(node) {
     for (const directive of node.directives) {
@@ -15262,7 +15270,7 @@ var Scope = class _Scope {
     if (directives !== null && directives.length > 0) {
       const directiveOpMap = /* @__PURE__ */ new Map();
       for (const directive of directives) {
-        const directiveOp = new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, directive);
+        const directiveOp = this.getDirectiveOp(directive, node);
         directiveOpMap.set(directive, this.opQueue.push(directiveOp) - 1);
       }
       this.directiveOpMap.set(node, directiveOpMap);
