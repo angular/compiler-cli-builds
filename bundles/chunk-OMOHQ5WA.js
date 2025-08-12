@@ -424,10 +424,10 @@ var initializerApiOutputTransform = (member, sourceFile, host, factory, importTr
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/query_functions.js
 var queryFunctionToDecorator = {
-  viewChild: "ViewChild",
-  viewChildren: "ViewChildren",
-  contentChild: "ContentChild",
-  contentChildren: "ContentChildren"
+  "viewChild": "ViewChild",
+  "viewChildren": "ViewChildren",
+  "contentChild": "ContentChild",
+  "contentChildren": "ContentChildren"
 };
 var queryFunctionsTransforms = (member, sourceFile, host, factory, importTracker, importManager, classDecorator, isCore) => {
   const decorators = host.getDecoratorsOfDeclaration(member.node);
