@@ -11,6 +11,8 @@ export interface EntryCollection {
     normalizedModuleName: string;
     moduleLabel: string;
     entries: DocEntry[];
+    repo: string;
+    symbols?: string[][];
 }
 /** Type of top-level documentation entry. */
 export declare enum EntryType {
