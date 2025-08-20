@@ -122,6 +122,10 @@ export declare enum PotentialImportMode {
      */
     ForceDirect = 1
 }
+export interface DirectiveModuleExportDetails {
+    moduleSpecifier: string;
+    exportName: string;
+}
 export interface PotentialDirectiveModuleSpecifierResolver {
-    resolve(toImport: Reference<ClassDeclaration>, importOn: ts.Node | null): string | undefined;
+    resolve(toImport: Reference<ClassDeclaration>, importOn: ts.Node | null): DirectiveModuleExportDetails | null;
 }
