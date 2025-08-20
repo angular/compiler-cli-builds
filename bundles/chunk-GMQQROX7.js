@@ -11065,7 +11065,8 @@ var Chunk = class _Chunk {
       this.content = originalBefore;
     }
     newChunk.next = this.next;
-    if (newChunk.next) newChunk.next.previous = newChunk;
+    if (newChunk.next)
+      newChunk.next.previous = newChunk;
     newChunk.previous = this;
     this.next = newChunk;
     return newChunk;
@@ -11075,7 +11076,8 @@ var Chunk = class _Chunk {
   }
   trimEnd(rx) {
     this.outro = this.outro.replace(rx, "");
-    if (this.outro.length) return true;
+    if (this.outro.length)
+      return true;
     const trimmed = this.content.replace(rx, "");
     if (trimmed.length) {
       if (trimmed !== this.content) {
@@ -11088,12 +11090,14 @@ var Chunk = class _Chunk {
     } else {
       this.edit("", void 0, true);
       this.intro = this.intro.replace(rx, "");
-      if (this.intro.length) return true;
+      if (this.intro.length)
+        return true;
     }
   }
   trimStart(rx) {
     this.intro = this.intro.replace(rx, "");
-    if (this.intro.length) return true;
+    if (this.intro.length)
+      return true;
     const trimmed = this.content.replace(rx, "");
     if (trimmed.length) {
       if (trimmed !== this.content) {
@@ -11107,7 +11111,8 @@ var Chunk = class _Chunk {
     } else {
       this.edit("", void 0, true);
       this.outro = this.outro.replace(rx, "");
-      if (this.outro.length) return true;
+      if (this.outro.length)
+        return true;
     }
   }
 };
@@ -11171,7 +11176,8 @@ function getRelativePath(from, to) {
   }
   if (fromParts.length) {
     let i = fromParts.length;
-    while (i--) fromParts[i] = "..";
+    while (i--)
+      fromParts[i] = "..";
   }
   return fromParts.concat(toParts).join("/");
 }
@@ -11280,7 +11286,8 @@ var Mappings = class {
     this.pending = null;
   }
   advance(str) {
-    if (!str) return;
+    if (!str)
+      return;
     const lines = str.split("\n");
     if (lines.length > 1) {
       for (let i = 0; i < lines.length - 1; i++) {
@@ -11325,13 +11332,15 @@ var MagicString = class _MagicString {
     this.sourcemapLocations.add(char);
   }
   append(content) {
-    if (typeof content !== "string") throw new TypeError("outro content must be a string");
+    if (typeof content !== "string")
+      throw new TypeError("outro content must be a string");
     this.outro += content;
     return this;
   }
   appendLeft(index, content) {
     index = index + this.offset;
-    if (typeof content !== "string") throw new TypeError("inserted content must be a string");
+    if (typeof content !== "string")
+      throw new TypeError("inserted content must be a string");
     this._split(index);
     const chunk = this.byEnd[index];
     if (chunk) {
@@ -11343,7 +11352,8 @@ var MagicString = class _MagicString {
   }
   appendRight(index, content) {
     index = index + this.offset;
-    if (typeof content !== "string") throw new TypeError("inserted content must be a string");
+    if (typeof content !== "string")
+      throw new TypeError("inserted content must be a string");
     this._split(index);
     const chunk = this.byStart[index];
     if (chunk) {
@@ -11389,7 +11399,8 @@ var MagicString = class _MagicString {
     }
     this.firstChunk.eachNext((chunk) => {
       const loc = locate(chunk.start);
-      if (chunk.intro.length) mappings.advance(chunk.intro);
+      if (chunk.intro.length)
+        mappings.advance(chunk.intro);
       if (chunk.edited) {
         mappings.addEdit(
           sourceIndex,
@@ -11400,7 +11411,8 @@ var MagicString = class _MagicString {
       } else {
         mappings.addUneditedChunk(sourceIndex, chunk, this.original, loc, this.sourcemapLocations);
       }
-      if (chunk.outro.length) mappings.advance(chunk.outro);
+      if (chunk.outro.length)
+        mappings.advance(chunk.outro);
     });
     return {
       file: options.file ? options.file.split(/[/\\]/).pop() : void 0,
@@ -11439,7 +11451,8 @@ var MagicString = class _MagicString {
       this._ensureindentStr();
       indentStr = this.indentStr || "	";
     }
-    if (indentStr === "") return this;
+    if (indentStr === "")
+      return this;
     options = options || {};
     const isExcluded = {};
     if (options.exclude) {
@@ -11452,7 +11465,8 @@ var MagicString = class _MagicString {
     }
     let shouldIndentNextCharacter = options.indentStart !== false;
     const replacer = (match) => {
-      if (shouldIndentNextCharacter) return `${indentStr}${match}`;
+      if (shouldIndentNextCharacter)
+        return `${indentStr}${match}`;
       shouldIndentNextCharacter = true;
       return match;
     };
@@ -11522,7 +11536,8 @@ var MagicString = class _MagicString {
     start = start + this.offset;
     end = end + this.offset;
     index = index + this.offset;
-    if (index >= start && index <= end) throw new Error("Cannot move a selection inside itself");
+    if (index >= start && index <= end)
+      throw new Error("Cannot move a selection inside itself");
     this._split(start);
     this._split(end);
     this._split(index);
@@ -11531,21 +11546,29 @@ var MagicString = class _MagicString {
     const oldLeft = first.previous;
     const oldRight = last.next;
     const newRight = this.byStart[index];
-    if (!newRight && last === this.lastChunk) return this;
+    if (!newRight && last === this.lastChunk)
+      return this;
     const newLeft = newRight ? newRight.previous : this.lastChunk;
-    if (oldLeft) oldLeft.next = oldRight;
-    if (oldRight) oldRight.previous = oldLeft;
-    if (newLeft) newLeft.next = first;
-    if (newRight) newRight.previous = last;
-    if (!first.previous) this.firstChunk = last.next;
+    if (oldLeft)
+      oldLeft.next = oldRight;
+    if (oldRight)
+      oldRight.previous = oldLeft;
+    if (newLeft)
+      newLeft.next = first;
+    if (newRight)
+      newRight.previous = last;
+    if (!first.previous)
+      this.firstChunk = last.next;
     if (!last.next) {
       this.lastChunk = first.previous;
       this.lastChunk.next = null;
     }
     first.previous = newLeft;
     last.next = newRight || null;
-    if (!newLeft) this.firstChunk = first;
-    if (!newRight) this.lastChunk = last;
+    if (!newLeft)
+      this.firstChunk = first;
+    if (!newRight)
+      this.lastChunk = last;
     return this;
   }
   overwrite(start, end, content, options) {
@@ -11555,12 +11578,16 @@ var MagicString = class _MagicString {
   update(start, end, content, options) {
     start = start + this.offset;
     end = end + this.offset;
-    if (typeof content !== "string") throw new TypeError("replacement content must be a string");
+    if (typeof content !== "string")
+      throw new TypeError("replacement content must be a string");
     if (this.original.length !== 0) {
-      while (start < 0) start += this.original.length;
-      while (end < 0) end += this.original.length;
+      while (start < 0)
+        start += this.original.length;
+      while (end < 0)
+        end += this.original.length;
     }
-    if (end > this.original.length) throw new Error("end is out of bounds");
+    if (end > this.original.length)
+      throw new Error("end is out of bounds");
     if (start === end)
       throw new Error(
         "Cannot overwrite a zero-length range \u2013 use appendLeft or prependRight instead"
@@ -11606,13 +11633,15 @@ var MagicString = class _MagicString {
     return this;
   }
   prepend(content) {
-    if (typeof content !== "string") throw new TypeError("outro content must be a string");
+    if (typeof content !== "string")
+      throw new TypeError("outro content must be a string");
     this.intro = content + this.intro;
     return this;
   }
   prependLeft(index, content) {
     index = index + this.offset;
-    if (typeof content !== "string") throw new TypeError("inserted content must be a string");
+    if (typeof content !== "string")
+      throw new TypeError("inserted content must be a string");
     this._split(index);
     const chunk = this.byEnd[index];
     if (chunk) {
@@ -11624,7 +11653,8 @@ var MagicString = class _MagicString {
   }
   prependRight(index, content) {
     index = index + this.offset;
-    if (typeof content !== "string") throw new TypeError("inserted content must be a string");
+    if (typeof content !== "string")
+      throw new TypeError("inserted content must be a string");
     this._split(index);
     const chunk = this.byStart[index];
     if (chunk) {
@@ -11638,12 +11668,17 @@ var MagicString = class _MagicString {
     start = start + this.offset;
     end = end + this.offset;
     if (this.original.length !== 0) {
-      while (start < 0) start += this.original.length;
-      while (end < 0) end += this.original.length;
+      while (start < 0)
+        start += this.original.length;
+      while (end < 0)
+        end += this.original.length;
     }
-    if (start === end) return this;
-    if (start < 0 || end > this.original.length) throw new Error("Character is out of bounds");
-    if (start > end) throw new Error("end must be greater than start");
+    if (start === end)
+      return this;
+    if (start < 0 || end > this.original.length)
+      throw new Error("Character is out of bounds");
+    if (start > end)
+      throw new Error("end must be greater than start");
     this._split(start);
     this._split(end);
     let chunk = this.byStart[start];
@@ -11659,12 +11694,17 @@ var MagicString = class _MagicString {
     start = start + this.offset;
     end = end + this.offset;
     if (this.original.length !== 0) {
-      while (start < 0) start += this.original.length;
-      while (end < 0) end += this.original.length;
+      while (start < 0)
+        start += this.original.length;
+      while (end < 0)
+        end += this.original.length;
     }
-    if (start === end) return this;
-    if (start < 0 || end > this.original.length) throw new Error("Character is out of bounds");
-    if (start > end) throw new Error("end must be greater than start");
+    if (start === end)
+      return this;
+    if (start < 0 || end > this.original.length)
+      throw new Error("Character is out of bounds");
+    if (start > end)
+      throw new Error("end must be greater than start");
     this._split(start);
     this._split(end);
     let chunk = this.byStart[start];
@@ -11675,48 +11715,60 @@ var MagicString = class _MagicString {
     return this;
   }
   lastChar() {
-    if (this.outro.length) return this.outro[this.outro.length - 1];
+    if (this.outro.length)
+      return this.outro[this.outro.length - 1];
     let chunk = this.lastChunk;
     do {
-      if (chunk.outro.length) return chunk.outro[chunk.outro.length - 1];
-      if (chunk.content.length) return chunk.content[chunk.content.length - 1];
-      if (chunk.intro.length) return chunk.intro[chunk.intro.length - 1];
+      if (chunk.outro.length)
+        return chunk.outro[chunk.outro.length - 1];
+      if (chunk.content.length)
+        return chunk.content[chunk.content.length - 1];
+      if (chunk.intro.length)
+        return chunk.intro[chunk.intro.length - 1];
     } while (chunk = chunk.previous);
-    if (this.intro.length) return this.intro[this.intro.length - 1];
+    if (this.intro.length)
+      return this.intro[this.intro.length - 1];
     return "";
   }
   lastLine() {
     let lineIndex = this.outro.lastIndexOf(n);
-    if (lineIndex !== -1) return this.outro.substr(lineIndex + 1);
+    if (lineIndex !== -1)
+      return this.outro.substr(lineIndex + 1);
     let lineStr = this.outro;
     let chunk = this.lastChunk;
     do {
       if (chunk.outro.length > 0) {
         lineIndex = chunk.outro.lastIndexOf(n);
-        if (lineIndex !== -1) return chunk.outro.substr(lineIndex + 1) + lineStr;
+        if (lineIndex !== -1)
+          return chunk.outro.substr(lineIndex + 1) + lineStr;
         lineStr = chunk.outro + lineStr;
       }
       if (chunk.content.length > 0) {
         lineIndex = chunk.content.lastIndexOf(n);
-        if (lineIndex !== -1) return chunk.content.substr(lineIndex + 1) + lineStr;
+        if (lineIndex !== -1)
+          return chunk.content.substr(lineIndex + 1) + lineStr;
         lineStr = chunk.content + lineStr;
       }
       if (chunk.intro.length > 0) {
         lineIndex = chunk.intro.lastIndexOf(n);
-        if (lineIndex !== -1) return chunk.intro.substr(lineIndex + 1) + lineStr;
+        if (lineIndex !== -1)
+          return chunk.intro.substr(lineIndex + 1) + lineStr;
         lineStr = chunk.intro + lineStr;
       }
     } while (chunk = chunk.previous);
     lineIndex = this.intro.lastIndexOf(n);
-    if (lineIndex !== -1) return this.intro.substr(lineIndex + 1) + lineStr;
+    if (lineIndex !== -1)
+      return this.intro.substr(lineIndex + 1) + lineStr;
     return this.intro + lineStr;
   }
   slice(start = 0, end = this.original.length - this.offset) {
     start = start + this.offset;
     end = end + this.offset;
     if (this.original.length !== 0) {
-      while (start < 0) start += this.original.length;
-      while (end < 0) end += this.original.length;
+      while (start < 0)
+        start += this.original.length;
+      while (end < 0)
+        end += this.original.length;
     }
     let result = "";
     let chunk = this.firstChunk;
@@ -11757,11 +11809,13 @@ var MagicString = class _MagicString {
     return clone;
   }
   _split(index) {
-    if (this.byStart[index] || this.byEnd[index]) return;
+    if (this.byStart[index] || this.byEnd[index])
+      return;
     let chunk = this.lastSearchedChunk;
     const searchForward = index > chunk.end;
     while (chunk) {
-      if (chunk.contains(index)) return this._splitChunk(chunk, index);
+      if (chunk.contains(index))
+        return this._splitChunk(chunk, index);
       chunk = searchForward ? this.byStart[chunk.end] : this.byEnd[chunk.start];
     }
   }
@@ -11776,7 +11830,8 @@ var MagicString = class _MagicString {
     this.byEnd[index] = chunk;
     this.byStart[index] = newChunk;
     this.byEnd[newChunk.end] = newChunk;
-    if (chunk === this.lastChunk) this.lastChunk = newChunk;
+    if (chunk === this.lastChunk)
+      this.lastChunk = newChunk;
     this.lastSearchedChunk = chunk;
     return true;
   }
@@ -11814,7 +11869,8 @@ var MagicString = class _MagicString {
   trimEndAborted(charType) {
     const rx = new RegExp((charType || "\\s") + "+$");
     this.outro = this.outro.replace(rx, "");
-    if (this.outro.length) return true;
+    if (this.outro.length)
+      return true;
     let chunk = this.lastChunk;
     do {
       const end = chunk.end;
@@ -11827,7 +11883,8 @@ var MagicString = class _MagicString {
         this.byStart[chunk.next.start] = chunk.next;
         this.byEnd[chunk.next.end] = chunk.next;
       }
-      if (aborted) return true;
+      if (aborted)
+        return true;
       chunk = chunk.previous;
     } while (chunk);
     return false;
@@ -11839,18 +11896,21 @@ var MagicString = class _MagicString {
   trimStartAborted(charType) {
     const rx = new RegExp("^" + (charType || "\\s") + "+");
     this.intro = this.intro.replace(rx, "");
-    if (this.intro.length) return true;
+    if (this.intro.length)
+      return true;
     let chunk = this.firstChunk;
     do {
       const end = chunk.end;
       const aborted = chunk.trimStart(rx);
       if (chunk.end !== end) {
-        if (chunk === this.lastChunk) this.lastChunk = chunk.next;
+        if (chunk === this.lastChunk)
+          this.lastChunk = chunk.next;
         this.byEnd[chunk.end] = chunk;
         this.byStart[chunk.next.start] = chunk.next;
         this.byEnd[chunk.next.end] = chunk.next;
       }
-      if (aborted) return true;
+      if (aborted)
+        return true;
       chunk = chunk.next;
     } while (chunk);
     return false;
@@ -11866,10 +11926,13 @@ var MagicString = class _MagicString {
     function getReplacement(match, str) {
       if (typeof replacement === "string") {
         return replacement.replace(/\$(\$|&|\d+)/g, (_, i) => {
-          if (i === "$") return "$";
-          if (i === "&") return match[0];
+          if (i === "$")
+            return "$";
+          if (i === "&")
+            return match[0];
           const num = +i;
-          if (num < match.length) return match[+i];
+          if (num < match.length)
+            return match[+i];
           return `$${i}`;
         });
       } else {
@@ -11924,7 +11987,8 @@ var MagicString = class _MagicString {
     const stringLength = string.length;
     for (let index = original.indexOf(string); index !== -1; index = original.indexOf(string, index + stringLength)) {
       const previous = original.slice(index, index + stringLength);
-      if (previous !== replacement) this.overwrite(index, index + stringLength, replacement);
+      if (previous !== replacement)
+        this.overwrite(index, index + stringLength, replacement);
     }
     return this;
   }
