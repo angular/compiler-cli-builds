@@ -77,7 +77,7 @@ import "./chunk-DWRM7PIK.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.1.7+sha-683ae03");
+var VERSION = new Version("20.1.7+sha-c935d42");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
