@@ -10172,6 +10172,21 @@ function isDirectiveDeclaration(node) {
   const sourceFile = node.getSourceFile();
   return (ts45.isTypeNode(node) || ts45.isIdentifier(node)) && ts45.isVariableDeclaration(node.parent) && hasExpressionIdentifier(sourceFile, node, ExpressionIdentifier.DIRECTIVE);
 }
+function isSymbolAliasOf(firstSymbol, lastSymbol, typeChecker) {
+  let currentSymbol = lastSymbol;
+  const seenSymbol = /* @__PURE__ */ new Set();
+  while (firstSymbol !== currentSymbol && currentSymbol !== void 0 && currentSymbol.flags & ts45.SymbolFlags.Alias) {
+    if (seenSymbol.has(currentSymbol)) {
+      break;
+    }
+    seenSymbol.add(currentSymbol);
+    currentSymbol = typeChecker.getImmediateAliasedSymbol(currentSymbol);
+    if (currentSymbol === firstSymbol) {
+      return true;
+    }
+  }
+  return false;
+}
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/checker.js
 import ts64 from "typescript";
@@ -17521,11 +17536,11 @@ var TemplateTypeCheckerImpl = class {
       }
       for (const directiveDecl of directiveDecls) {
         const cachedCompletionEntryInfos = resultingDirectives.get(directiveDecl.ref.node)?.tsCompletionEntryInfos ?? [];
-        cachedCompletionEntryInfos.push({
+        appendOrReplaceTsEntryInfo(cachedCompletionEntryInfos, {
           tsCompletionEntryData: data,
           tsCompletionEntrySymbolFileName: symbolFileName,
           tsCompletionEntrySymbolName: symbolName
-        });
+        }, this.programDriver.getProgram());
         if (resultingDirectives.has(directiveDecl.ref.node)) {
           const directiveInfo = resultingDirectives.get(directiveDecl.ref.node);
           resultingDirectives.set(directiveDecl.ref.node, {
@@ -17676,29 +17691,30 @@ var TemplateTypeCheckerImpl = class {
       return imports;
     }
     let highestImportPriority = -1;
-    const collectImports = (emit, moduleSpecifier) => {
+    const collectImports = (emit, moduleSpecifierDetail) => {
       if (emit === null) {
         return;
       }
       imports.push({
         ...emit,
-        moduleSpecifier: moduleSpecifier ?? emit.moduleSpecifier
+        moduleSpecifier: moduleSpecifierDetail?.moduleSpecifier ?? emit.moduleSpecifier,
+        symbolName: moduleSpecifierDetail?.exportName ?? emit.symbolName
       });
-      if (moduleSpecifier !== void 0 && highestImportPriority === -1) {
+      if (moduleSpecifierDetail !== null && highestImportPriority === -1) {
         highestImportPriority = imports.length - 1;
       }
     };
     if (meta.isStandalone || importMode === PotentialImportMode.ForceDirect) {
       const emitted = this.emit(PotentialImportKind.Standalone, toImport, inContext);
-      const moduleSpecifier = potentialDirectiveModuleSpecifierResolver?.resolve(toImport, inContext);
-      collectImports(emitted, moduleSpecifier);
+      const moduleSpecifierDetail = potentialDirectiveModuleSpecifierResolver?.resolve(toImport, inContext) ?? null;
+      collectImports(emitted, moduleSpecifierDetail);
     }
     const exportingNgModules = this.ngModuleIndex.getNgModulesExporting(meta.ref.node);
     if (exportingNgModules !== null) {
       for (const exporter of exportingNgModules) {
         const emittedRef = this.emit(PotentialImportKind.NgModule, exporter, inContext);
-        const moduleSpecifier = potentialDirectiveModuleSpecifierResolver?.resolve(exporter, inContext);
-        collectImports(emittedRef, moduleSpecifier);
+        const moduleSpecifierDetail = potentialDirectiveModuleSpecifierResolver?.resolve(exporter, inContext) ?? null;
+        collectImports(emittedRef, moduleSpecifierDetail);
       }
     }
     if (highestImportPriority > 0) {
@@ -17968,6 +17984,55 @@ function getTheElementTagDeprecatedSuggestionDiagnostics(shimPath, program, file
 }
 function isDeprecatedDiagnostics(diag) {
   return diag.reportsDeprecated !== void 0;
+}
+function appendOrReplaceTsEntryInfo(tsEntryInfos, newTsEntryInfo, program) {
+  const typeChecker = program.getTypeChecker();
+  const newTsEntryInfoSymbol = getSymbolFromTsEntryInfo(newTsEntryInfo, program);
+  if (newTsEntryInfoSymbol === null) {
+    return;
+  }
+  const matchedEntryIndex = tsEntryInfos.findIndex((currentTsEntryInfo) => {
+    const currentTsEntrySymbol = getSymbolFromTsEntryInfo(currentTsEntryInfo, program);
+    if (currentTsEntrySymbol === null) {
+      return false;
+    }
+    return isSymbolTypeMatch(currentTsEntrySymbol, newTsEntryInfoSymbol, typeChecker);
+  });
+  if (matchedEntryIndex === -1) {
+    tsEntryInfos.push(newTsEntryInfo);
+    return;
+  }
+  const matchedEntry = tsEntryInfos[matchedEntryIndex];
+  const matchedEntrySymbol = getSymbolFromTsEntryInfo(matchedEntry, program);
+  if (matchedEntrySymbol === null) {
+    return;
+  }
+  if (isSymbolAliasOf(matchedEntrySymbol, newTsEntryInfoSymbol, typeChecker)) {
+    tsEntryInfos[matchedEntryIndex] = newTsEntryInfo;
+    return;
+  }
+  return;
+}
+function getSymbolFromTsEntryInfo(tsInfo, program) {
+  const typeChecker = program.getTypeChecker();
+  const sf = program.getSourceFile(tsInfo.tsCompletionEntrySymbolFileName);
+  if (sf === void 0) {
+    return null;
+  }
+  const sfSymbol = typeChecker.getSymbolAtLocation(sf);
+  if (sfSymbol === void 0) {
+    return null;
+  }
+  return typeChecker.tryGetMemberInModuleExports(tsInfo.tsCompletionEntrySymbolName, sfSymbol) ?? null;
+}
+function getFirstTypeDeclarationOfSymbol(symbol, typeChecker) {
+  const type = typeChecker.getTypeOfSymbol(symbol);
+  return type.getSymbol()?.declarations?.[0];
+}
+function isSymbolTypeMatch(first, last, typeChecker) {
+  const firstTypeNode = getFirstTypeDeclarationOfSymbol(first, typeChecker);
+  const lastTypeNode = getFirstTypeDeclarationOfSymbol(last, typeChecker);
+  return firstTypeNode === lastTypeNode && firstTypeNode !== void 0;
 }
 
 // packages/compiler-cli/src/ngtsc/annotations/directive/src/handler.js
