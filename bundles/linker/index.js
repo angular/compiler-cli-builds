@@ -13,7 +13,7 @@ import {
 } from "../chunk-BPDNYZBC.js";
 import "../chunk-HYJ2H3FU.js";
 import "../chunk-I2BHWRAU.js";
-import "../chunk-DWRM7PIK.js";
+import "../chunk-G7GFT6BU.js";
 export {
   DEFAULT_LINKER_OPTIONS,
   FatalLinkerError,
