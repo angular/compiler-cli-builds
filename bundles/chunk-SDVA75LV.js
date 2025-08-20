@@ -19802,7 +19802,7 @@ var PotentialTopLevelReadsVisitor = class extends o3.RecursiveAstVisitor {
     if (ts70.isCallExpression(parent)) {
       return parent.expression === node || parent.arguments.includes(node);
     }
-    if (ts70.isExpressionStatement(parent) || ts70.isPropertyAccessExpression(parent) || ts70.isComputedPropertyName(parent) || ts70.isTemplateSpan(parent) || ts70.isSpreadAssignment(parent) || ts70.isSpreadElement(parent) || ts70.isAwaitExpression(parent) || ts70.isNonNullExpression(parent) || ts70.isIfStatement(parent) || ts70.isDoStatement(parent) || ts70.isWhileStatement(parent) || ts70.isSwitchStatement(parent) || ts70.isCaseClause(parent) || ts70.isThrowStatement(parent) || ts70.isNewExpression(parent)) {
+    if (ts70.isExpressionStatement(parent) || ts70.isPropertyAccessExpression(parent) || ts70.isComputedPropertyName(parent) || ts70.isTemplateSpan(parent) || ts70.isSpreadAssignment(parent) || ts70.isSpreadElement(parent) || ts70.isAwaitExpression(parent) || ts70.isNonNullExpression(parent) || ts70.isIfStatement(parent) || ts70.isDoStatement(parent) || ts70.isWhileStatement(parent) || ts70.isSwitchStatement(parent) || ts70.isCaseClause(parent) || ts70.isThrowStatement(parent) || ts70.isNewExpression(parent) || ts70.isExpressionWithTypeArguments(parent)) {
       return parent.expression === node;
     }
     if (ts70.isArrayLiteralExpression(parent)) {
