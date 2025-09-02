@@ -10979,7 +10979,7 @@ var CompletionEngine = class {
 // packages/compiler-cli/src/ngtsc/typecheck/src/context.js
 import { ParseSourceFile as ParseSourceFile2 } from "@angular/compiler";
 
-// node_modules/.aspect_rules_js/magic-string@0.30.17/node_modules/magic-string/dist/magic-string.es.mjs
+// node_modules/.aspect_rules_js/magic-string@0.30.18/node_modules/magic-string/dist/magic-string.es.mjs
 import { encode } from "@jridgewell/sourcemap-codec";
 var BitSet = class _BitSet {
   constructor(arg) {
@@ -11827,11 +11827,15 @@ var MagicString = class _MagicString {
     if (this.byStart[index] || this.byEnd[index])
       return;
     let chunk = this.lastSearchedChunk;
+    let previousChunk = chunk;
     const searchForward = index > chunk.end;
     while (chunk) {
       if (chunk.contains(index))
         return this._splitChunk(chunk, index);
       chunk = searchForward ? this.byStart[chunk.end] : this.byEnd[chunk.start];
+      if (chunk === previousChunk)
+        return;
+      previousChunk = chunk;
     }
   }
   _splitChunk(chunk, index) {
