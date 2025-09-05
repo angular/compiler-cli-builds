@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-BSGTWRWT.js";
+} from "./chunk-6DF2AWLX.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -92,7 +92,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-DQC7LG5E.js";
+} from "./chunk-PVSLT73R.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -3992,7 +3992,7 @@ var NgCompiler = class _NgCompiler {
     this.emitDeclarationOnly = !!options.emitDeclarationOnly && !!options._experimentalAllowEmitDeclarationOnly;
     this.implicitStandaloneValue = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 19.0.0");
     this.enableHmr = !!options["_enableHmr"];
-    this.constructionDiagnostics.push(...this.adapter.constructionDiagnostics, ...verifyCompatibleTypeCheckOptions(this.options), ...verifyEmitDeclarationOnly(this.options));
+    this.constructionDiagnostics.push(...this.adapter.constructionDiagnostics, ...verifyCompatibleTypeCheckOptions(this.options));
     this.currentProgram = inputProgram;
     this.closureCompilerEnabled = !!this.options.annotateForClosureCompiler;
     this.entryPoint = adapter.entryPoint !== null ? getSourceFileOrNull(inputProgram, adapter.entryPoint) : null;
@@ -4819,18 +4819,6 @@ ${allowedCategoryLabels.join("\n")}
       });
     }
   }
-}
-function verifyEmitDeclarationOnly(options) {
-  if (!options.emitDeclarationOnly || !!options._experimentalAllowEmitDeclarationOnly) {
-    return [];
-  }
-  return [
-    makeConfigDiagnostic({
-      category: ts25.DiagnosticCategory.Error,
-      code: ErrorCode.CONFIG_EMIT_DECLARATION_ONLY_UNSUPPORTED,
-      messageText: 'TS compiler option "emitDeclarationOnly" is not supported.'
-    })
-  ];
 }
 function makeConfigDiagnostic({ category, code, messageText }) {
   return {

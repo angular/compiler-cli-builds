@@ -160,7 +160,6 @@ export declare enum ErrorCode {
     CONFIG_EXTENDED_DIAGNOSTICS_IMPLIES_STRICT_TEMPLATES = 4003,
     CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CATEGORY_LABEL = 4004,
     CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CHECK = 4005,
-    CONFIG_EMIT_DECLARATION_ONLY_UNSUPPORTED = 4006,
     /**
      * Raised when a host expression has a parse error, such as a host listener or host binding
      * expression containing a pipe.
