@@ -2804,7 +2804,7 @@ var StandaloneComponentScopeReader = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
-import { ASTWithSource as ASTWithSource2, BindingType, Interpolation, PrefixNot, PropertyRead as PropertyRead2, TmplAstBoundAttribute } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource2, BindingType, Interpolation, PrefixNot, PropertyRead as PropertyRead2, TmplAstBoundAttribute, TmplAstIfBlock, TmplAstSwitchBlock } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/symbol_util.js
 import ts18 from "typescript";
@@ -2911,6 +2911,16 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
         node.type === BindingType.LegacyAnimation) && nodeAst
       ) {
         return buildDiagnosticForSignal(ctx, nodeAst, component);
+      }
+    } else if (node instanceof TmplAstIfBlock) {
+      return node.branches.map((branch) => branch.expression).filter((expr) => expr instanceof ASTWithSource2).map((expr) => {
+        const ast = expr.ast;
+        return ast instanceof PrefixNot ? ast.expression : ast;
+      }).filter((ast) => ast instanceof PropertyRead2).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
+    } else if (node instanceof TmplAstSwitchBlock && node.expression instanceof ASTWithSource2) {
+      const expression = node.expression.ast instanceof PrefixNot ? node.expression.ast.expression : node.expression.ast;
+      if (expression instanceof PropertyRead2) {
+        return buildDiagnosticForSignal(ctx, expression, component);
       }
     }
     return [];
