@@ -4673,7 +4673,7 @@ var NgCompiler = class _NgCompiler {
     const supportJitMode = this.options["supportJitMode"] ?? true;
     const supportTestBed = this.options["supportTestBed"] ?? true;
     const externalRuntimeStyles = this.options["externalRuntimeStyles"] ?? false;
-    const typeCheckHostBindings = this.options.typeCheckHostBindings ?? false;
+    const typeCheckHostBindings = this.options.typeCheckHostBindings ?? true;
     if (supportTestBed === false && compilationMode === CompilationMode.PARTIAL) {
       throw new Error('TestBed support ("supportTestBed" option) cannot be disabled in partial compilation mode.');
     }
