@@ -221,7 +221,11 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 ]);
 
 // packages/compiler-cli/src/ngtsc/diagnostics/src/error_details_base_url.js
-var ERROR_DETAILS_PAGE_BASE_URL = "https://angular.dev/errors";
+import { VERSION } from "@angular/compiler";
+var ERROR_DETAILS_PAGE_BASE_URL = (() => {
+  const versionSubDomain = VERSION.major !== "0" ? `v${VERSION.major}.` : "";
+  return `https://${versionSubDomain}angular.dev/errors`;
+})();
 
 // packages/compiler-cli/src/ngtsc/diagnostics/src/extended_template_diagnostic_name.js
 var ExtendedTemplateDiagnosticName;

@@ -12,4 +12,4 @@
  *  - packages/compiler-cli/src/ngtsc/diagnostics/src/error_details_base_url.ts
  *  - packages/core/src/error_details_base_url.ts
  */
-export declare const ERROR_DETAILS_PAGE_BASE_URL = "https://angular.dev/errors";
+export declare const ERROR_DETAILS_PAGE_BASE_URL: string;
