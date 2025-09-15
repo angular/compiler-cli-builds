@@ -2896,8 +2896,8 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
     if (node instanceof Interpolation) {
       return node.expressions.map((item) => item instanceof PrefixNot ? item.expression : item).filter((item) => item instanceof PropertyRead2).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
     } else if (node instanceof TmplAstBoundAttribute) {
-      const usedDirectives = ctx.templateTypeChecker.getUsedDirectives(component);
-      if (usedDirectives !== null && usedDirectives.some((dir) => dir.inputs.getByBindingPropertyName(node.name) !== null)) {
+      const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
+      if (symbol?.kind === SymbolKind.Input && symbol.bindings.length > 0 && symbol.bindings.some((binding) => binding.target.kind === SymbolKind.Directive)) {
         return [];
       }
       const nodeAst = isPropertyReadNodeAst(node);
