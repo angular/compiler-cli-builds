@@ -4061,8 +4061,8 @@ var NgCompiler = class _NgCompiler {
     this.delegatingPerfRecorder = new DelegatingPerfRecorder(this.perfRecorder);
     this.usePoisonedData = usePoisonedData || !!options._compilePoisonedComponents;
     this.enableTemplateTypeChecker = enableTemplateTypeChecker || !!options._enableTemplateTypeChecker;
-    this.enableBlockSyntax = options["_enableBlockSyntax"] ?? true;
-    this.enableLetSyntax = options["_enableLetSyntax"] ?? true;
+    this.enableBlockSyntax = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.0.0");
+    this.enableLetSyntax = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 18.1.0");
     this.enableSelectorless = options["_enableSelectorless"] ?? false;
     this.emitDeclarationOnly = !!options.emitDeclarationOnly && !!options._experimentalAllowEmitDeclarationOnly;
     this.implicitStandaloneValue = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 19.0.0");
