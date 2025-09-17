@@ -35,7 +35,6 @@ export declare class ExpressionTranslatorVisitor<TFile, TStatement, TExpression>
     visitTemplateLiteralExpr(ast: o.TemplateLiteralExpr, context: Context): TExpression;
     visitInstantiateExpr(ast: o.InstantiateExpr, context: Context): TExpression;
     visitLiteralExpr(ast: o.LiteralExpr, _context: Context): TExpression;
-    visitRegularExpressionLiteral(ast: o.outputAst.RegularExpressionLiteral, context: any): TExpression;
     visitLocalizedString(ast: o.LocalizedString, context: Context): TExpression;
     private createTaggedTemplateExpression;
     /**

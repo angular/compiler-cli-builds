@@ -44,6 +44,5 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createVoidExpression(expression: t.Expression): t.Expression;
     createUnaryExpression: typeof t.unaryExpression;
     createVariableDeclaration(variableName: string, initializer: t.Expression | null, type: VariableDeclarationType): t.Statement;
-    createRegularExpressionLiteral(body: string, flags: string | null): t.Expression;
     setSourceMapRange<T extends t.Statement | t.Expression | t.TemplateElement>(node: T, sourceMapRange: SourceMapRange | null): T;
 }

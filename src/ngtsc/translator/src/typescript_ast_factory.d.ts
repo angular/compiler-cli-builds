@@ -45,7 +45,6 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     createVoidExpression: (expression: ts.Expression) => ts.VoidExpression;
     createUnaryExpression(operator: UnaryOperator, operand: ts.Expression): ts.Expression;
     createVariableDeclaration(variableName: string, initializer: ts.Expression | null, type: VariableDeclarationType): ts.Statement;
-    createRegularExpressionLiteral(body: string, flags: string | null): ts.Expression;
     setSourceMapRange<T extends ts.Node>(node: T, sourceMapRange: SourceMapRange | null): T;
 }
 export declare function createTemplateMiddle(cooked: string, raw: string): ts.TemplateMiddle;

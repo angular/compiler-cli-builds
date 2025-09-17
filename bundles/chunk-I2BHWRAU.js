@@ -107,9 +107,6 @@ var ExpressionTranslatorVisitor = class {
   visitLiteralExpr(ast, _context) {
     return this.setSourceMapRange(this.factory.createLiteral(ast.value), ast.sourceSpan);
   }
-  visitRegularExpressionLiteral(ast, context) {
-    return this.setSourceMapRange(this.factory.createRegularExpressionLiteral(ast.body, ast.flags), ast.sourceSpan);
-  }
   visitLocalizedString(ast, context) {
     const elements = [createTemplateElement(ast.serializeI18nHead())];
     const expressions = [];
