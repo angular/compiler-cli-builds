@@ -10,9 +10,9 @@ import {
   assert,
   isFatalLinkerError,
   needsLinking
-} from "../chunk-BPDNYZBC.js";
+} from "../chunk-KZHANLEJ.js";
 import "../chunk-HYJ2H3FU.js";
-import "../chunk-I2BHWRAU.js";
+import "../chunk-LS5RJ5CS.js";
 import "../chunk-G7GFT6BU.js";
 export {
   DEFAULT_LINKER_OPTIONS,

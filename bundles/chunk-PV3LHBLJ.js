@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-I2BHWRAU.js";
+} from "./chunk-LS5RJ5CS.js";
 import {
   LogicalProjectPath,
   absoluteFrom,
@@ -4046,6 +4046,9 @@ var TypeTranslatorVisitor = class {
   visitDynamicImportExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
+  visitRegularExpressionLiteral(ast, context) {
+    throw new Error("Method not implemented.");
+  }
   visitNotExpr(ast, context) {
     throw new Error("Method not implemented.");
   }
@@ -4340,6 +4343,9 @@ var TypeScriptAstFactory = class {
     return ts23.factory.createVariableStatement(void 0, ts23.factory.createVariableDeclarationList([
       ts23.factory.createVariableDeclaration(variableName, void 0, void 0, initializer ?? void 0)
     ], this.VAR_TYPES[type]));
+  }
+  createRegularExpressionLiteral(body, flags) {
+    return ts23.factory.createRegularExpressionLiteral(`/${body}/${flags ?? ""}`);
   }
   setSourceMapRange(node, sourceMapRange) {
     if (sourceMapRange === null) {
@@ -13303,6 +13309,9 @@ var AstTranslator = class {
   visitThisReceiver(ast) {
     throw new Error("Method not implemented.");
   }
+  visitRegularExpressionLiteral(ast, context) {
+    return wrapForTypeChecker(ts59.factory.createRegularExpressionLiteral(`/${ast.body}/${ast.flags ?? ""}`));
+  }
   visitInterpolation(ast) {
     return ast.expressions.reduce((lhs, ast2) => ts59.factory.createBinaryExpression(lhs, ts59.SyntaxKind.PlusToken, wrapForTypeChecker(this.translate(ast2))), ts59.factory.createStringLiteral(""));
   }
@@ -13570,6 +13579,9 @@ var VeSafeLhsInferenceBugDetector = class _VeSafeLhsInferenceBugDetector {
   }
   visitParenthesizedExpression(ast, context) {
     return ast.expression.visit(this);
+  }
+  visitRegularExpressionLiteral(ast, context) {
+    return false;
   }
 };
 

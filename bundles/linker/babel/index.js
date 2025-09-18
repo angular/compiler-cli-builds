@@ -8,13 +8,13 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-BPDNYZBC.js";
+} from "../../chunk-KZHANLEJ.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "../../chunk-6HOSNZU5.js";
 import "../../chunk-HYJ2H3FU.js";
-import "../../chunk-I2BHWRAU.js";
+import "../../chunk-LS5RJ5CS.js";
 import {
   NodeJSFileSystem
 } from "../../chunk-XYYEESKY.js";
@@ -162,6 +162,9 @@ var BabelAstFactory = class {
     return t.variableDeclaration(type, [
       t.variableDeclarator(t.identifier(variableName), initializer)
     ]);
+  }
+  createRegularExpressionLiteral(body, flags) {
+    return t.regExpLiteral(body, flags ?? void 0);
   }
   setSourceMapRange(node, sourceMapRange) {
     if (sourceMapRange === null) {
