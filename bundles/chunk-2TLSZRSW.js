@@ -3145,8 +3145,8 @@ var StaticInterpreter = class {
     if (ts13.isIdentifier(node) || ts13.isStringLiteral(node) || ts13.isNumericLiteral(node)) {
       return node.text;
     } else if (ts13.isComputedPropertyName(node)) {
-      const literal3 = this.visitExpression(node.expression, context);
-      return typeof literal3 === "string" ? literal3 : void 0;
+      const literal4 = this.visitExpression(node.expression, context);
+      return typeof literal4 === "string" ? literal4 : void 0;
     } else {
       return void 0;
     }
@@ -7362,7 +7362,7 @@ var InjectableClassRegistry = class {
 // packages/compiler-cli/src/ngtsc/annotations/common/src/metadata.js
 import { ArrowFunctionExpr, LiteralArrayExpr, LiteralExpr as LiteralExpr2, literalMap, WrappedNodeExpr as WrappedNodeExpr4 } from "@angular/compiler";
 import ts35 from "typescript";
-function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompiler, angularDecoratorTransform = (dec) => dec) {
+function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompiler, angularDecoratorTransform = (dec) => dec, undecoratedMetadataExtractor = () => null) {
   if (!reflection.isClass(clazz)) {
     return null;
   }
@@ -7383,15 +7383,41 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
     metaCtorParameters = new ArrowFunctionExpr([], new LiteralArrayExpr(ctorParameters));
   }
   let metaPropDecorators = null;
-  const classMembers = reflection.getMembersOfClass(clazz).filter((member) => !member.isStatic && member.decorators !== null && member.decorators.length > 0 && // Private fields are not supported in the metadata emit
+  const classMembers = reflection.getMembersOfClass(clazz).filter((member) => !member.isStatic && // Private fields are not supported in the metadata emit
   member.accessLevel !== ClassMemberAccessLevel.EcmaScriptPrivate);
-  const duplicateDecoratedMembers = classMembers.filter((member, i, arr) => arr.findIndex((arrayMember) => arrayMember.name === member.name) < i);
-  if (duplicateDecoratedMembers.length > 0) {
+  const decoratedMembers = [];
+  const seenMemberNames = /* @__PURE__ */ new Set();
+  let duplicateDecoratedMembers = null;
+  for (const member of classMembers) {
+    const shouldQuoteName = member.nameNode !== null && ts35.isStringLiteralLike(member.nameNode);
+    if (member.decorators !== null && member.decorators.length > 0) {
+      decoratedMembers.push({
+        key: member.name,
+        quoted: shouldQuoteName,
+        value: decoratedClassMemberToMetadata(member.decorators, isCore)
+      });
+      if (seenMemberNames.has(member.name)) {
+        duplicateDecoratedMembers ??= [];
+        duplicateDecoratedMembers.push(member);
+      } else {
+        seenMemberNames.add(member.name);
+      }
+    } else {
+      const undecoratedMetadata = undecoratedMetadataExtractor(member);
+      if (undecoratedMetadata !== null) {
+        decoratedMembers.push({
+          key: member.name,
+          quoted: shouldQuoteName,
+          value: undecoratedMetadata
+        });
+      }
+    }
+  }
+  if (duplicateDecoratedMembers !== null) {
     throw new FatalDiagnosticError(ErrorCode.DUPLICATE_DECORATED_PROPERTIES, duplicateDecoratedMembers[0].nameNode ?? clazz, `Duplicate decorated properties found on class '${clazz.name.text}': ` + duplicateDecoratedMembers.map((member) => member.name).join(", "));
   }
-  const decoratedMembers = classMembers.map((member) => classMemberToMetadata(member.nameNode ?? member.name, member.decorators, isCore));
   if (decoratedMembers.length > 0) {
-    metaPropDecorators = new WrappedNodeExpr4(ts35.factory.createObjectLiteralExpression(decoratedMembers));
+    metaPropDecorators = literalMap(decoratedMembers);
   }
   return {
     type: new WrappedNodeExpr4(id),
@@ -7412,10 +7438,9 @@ function ctorParameterToMetadata(param, isCore) {
   }
   return literalMap(mapEntries);
 }
-function classMemberToMetadata(name, decorators, isCore) {
-  const ngDecorators = decorators.filter((dec) => isAngularDecorator2(dec, isCore)).map((decorator) => decoratorToMetadata(decorator));
-  const decoratorMeta = ts35.factory.createArrayLiteralExpression(ngDecorators);
-  return ts35.factory.createPropertyAssignment(name, decoratorMeta);
+function decoratedClassMemberToMetadata(decorators, isCore) {
+  const ngDecorators = decorators.filter((dec) => isAngularDecorator2(dec, isCore)).map((decorator) => new WrappedNodeExpr4(decoratorToMetadata(decorator)));
+  return new LiteralArrayExpr(ngDecorators);
 }
 function decoratorToMetadata(decorator, wrapFunctionsInParens) {
   if (decorator.identifier === null) {
@@ -8644,7 +8669,7 @@ import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirect
 import ts65 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.js
-import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr6, ExternalReference as ExternalReference2, getSafePropertyAccessString, parseHostBindings, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
+import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr6, ExternalReference as ExternalReference2, getSafePropertyAccessString, LiteralArrayExpr as LiteralArrayExpr2, literalMap as literalMap2, parseHostBindings, verifyHostBindings, R3Identifiers, ArrowFunctionExpr as ArrowFunctionExpr2, WrappedNodeExpr as WrappedNodeExpr6, literal as literal3 } from "@angular/compiler";
 import ts43 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/annotations/directive/src/initializer_function_access.js
@@ -9318,6 +9343,108 @@ function parseFieldStringArrayValue(directive, field, evaluator) {
     throw createValueHasWrongTypeError(expression, value, `Failed to resolve @Directive.${field} to a string array`);
   }
   return value;
+}
+function getDirectiveUndecoratedMetadataExtractor(reflector, importTracker) {
+  return (member) => {
+    const input = tryParseSignalInputMapping(member, reflector, importTracker);
+    if (input !== null) {
+      return getDecoratorMetaArray([
+        [new ExternalExpr6(R3Identifiers.inputDecorator), memberMetadataFromSignalInput(input)]
+      ]);
+    }
+    const output = tryParseInitializerBasedOutput(member, reflector, importTracker);
+    if (output !== null) {
+      return getDecoratorMetaArray([
+        [
+          new ExternalExpr6(R3Identifiers.outputDecorator),
+          memberMetadataFromInitializerOutput(output.metadata)
+        ]
+      ]);
+    }
+    const model = tryParseSignalModelMapping(member, reflector, importTracker);
+    if (model !== null) {
+      return getDecoratorMetaArray([
+        [
+          new ExternalExpr6(R3Identifiers.inputDecorator),
+          memberMetadataFromSignalInput(model.input)
+        ],
+        [
+          new ExternalExpr6(R3Identifiers.outputDecorator),
+          memberMetadataFromInitializerOutput(model.output)
+        ]
+      ]);
+    }
+    const query = tryParseSignalQueryFromInitializer(member, reflector, importTracker);
+    if (query !== null) {
+      let identifier;
+      if (query.name === "viewChild") {
+        identifier = R3Identifiers.viewChildDecorator;
+      } else if (query.name === "viewChildren") {
+        identifier = R3Identifiers.viewChildrenDecorator;
+      } else if (query.name === "contentChild") {
+        identifier = R3Identifiers.contentChildDecorator;
+      } else if (query.name === "contentChildren") {
+        identifier = R3Identifiers.contentChildrenDecorator;
+      } else {
+        return null;
+      }
+      return getDecoratorMetaArray([
+        [new ExternalExpr6(identifier), memberMetadataFromSignalQuery(query.call)]
+      ]);
+    }
+    return null;
+  };
+}
+function getDecoratorMetaArray(decorators) {
+  return new LiteralArrayExpr2(decorators.map(([type, args]) => literalMap2([
+    { key: "type", value: type, quoted: false },
+    { key: "args", value: args, quoted: false }
+  ])));
+}
+function memberMetadataFromSignalInput(input) {
+  return new LiteralArrayExpr2([
+    literalMap2([
+      {
+        key: "isSignal",
+        value: literal3(true),
+        quoted: false
+      },
+      {
+        key: "alias",
+        value: literal3(input.bindingPropertyName),
+        quoted: false
+      },
+      {
+        key: "required",
+        value: literal3(input.required),
+        quoted: false
+      }
+    ])
+  ]);
+}
+function memberMetadataFromInitializerOutput(output) {
+  return new LiteralArrayExpr2([literal3(output.bindingPropertyName)]);
+}
+function memberMetadataFromSignalQuery(call) {
+  const firstArg = call.arguments[0];
+  const firstArgMeta = ts43.isStringLiteralLike(firstArg) || ts43.isCallExpression(firstArg) ? new WrappedNodeExpr6(firstArg) : (
+    // If the first argument is a class reference, we need to wrap it in a `forwardRef`
+    // because the reference might occur after the current class. This wouldn't be flagged
+    // on the query initializer, because it executes after the class is initialized, whereas
+    // `setClassMetadata` runs immediately.
+    new ExternalExpr6(R3Identifiers.forwardRef).callFn([
+      new ArrowFunctionExpr2([], new WrappedNodeExpr6(firstArg))
+    ])
+  );
+  const entries = [
+    // We use wrapped nodes here, because the output AST doesn't support spread assignments.
+    firstArgMeta,
+    new WrappedNodeExpr6(ts43.factory.createObjectLiteralExpression([
+      ...call.arguments.length > 1 ? [ts43.factory.createSpreadAssignment(call.arguments[1])] : [],
+      ts43.factory.createPropertyAssignment("isSignal", ts43.factory.createTrue())
+    ]))
+  ];
+  return new LiteralArrayExpr2(entries);
 }
 function isStringArrayOrDie(value, name, node) {
   if (!Array.isArray(value)) {
@@ -12163,11 +12290,11 @@ var ReferenceEmitEnvironment = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.js
-import { ExpressionType as ExpressionType2, R3Identifiers as R3Identifiers2, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
+import { ExpressionType as ExpressionType2, R3Identifiers as R3Identifiers3, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
 import ts54 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.js
-import { R3Identifiers } from "@angular/compiler";
+import { R3Identifiers as R3Identifiers2 } from "@angular/compiler";
 import ts53 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_parameter_emitter.js
@@ -12262,12 +12389,12 @@ var TypeParameterEmitter = class {
 import { BindingType, CssSelector as CssSelector2, makeBindingParser, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstHostElement, AbsoluteSourceSpan as AbsoluteSourceSpan2, ParseSpan, PropertyRead as PropertyRead2, ParsedEventType, Call, ThisReceiver, KeyedRead, LiteralPrimitive, RecursiveAstVisitor, ASTWithName, SafeCall, ImplicitReceiver as ImplicitReceiver2 } from "@angular/compiler";
 import ts52 from "typescript";
 var GUARD_COMMENT_TEXT = "hostBindingsBlockGuard";
-function createHostElement(type, selector, sourceNode, literal3, bindingDecorators, listenerDecorators) {
+function createHostElement(type, selector, sourceNode, literal4, bindingDecorators, listenerDecorators) {
   const bindings = [];
   const listeners = [];
   let parser = null;
-  if (literal3 !== null) {
-    for (const prop of literal3.properties) {
+  if (literal4 !== null) {
+    for (const prop of literal4.properties) {
       if (ts52.isPropertyAssignment(prop) && ts52.isStringLiteralLike(prop.initializer) && isStaticName(prop.name)) {
         parser ??= makeBindingParser();
         createNodeFromHostLiteralProperty(prop, parser, bindings, listeners);
@@ -12493,7 +12620,7 @@ var TCB_FILE_IMPORT_GRAPH_PREPARE_IDENTIFIERS = [
   // Imports may be added for signal input checking. We wouldn't want to change the
   // import graph for incremental compilations when suddenly a signal input is used,
   // or removed.
-  R3Identifiers.InputSignalBrandWriteType
+  R3Identifiers2.InputSignalBrandWriteType
 ];
 var TcbInliningRequirement;
 (function(TcbInliningRequirement2) {
@@ -12727,7 +12854,7 @@ function constructTypeCtorParameter(env, meta, rawType) {
   }
   if (signalInputKeys.length > 0) {
     const keyTypeUnion = ts54.factory.createUnionTypeNode(signalInputKeys);
-    const unwrapDirectiveSignalInputsExpr = env.referenceExternalType(R3Identifiers2.UnwrapDirectiveSignalInputs.moduleName, R3Identifiers2.UnwrapDirectiveSignalInputs.name, [
+    const unwrapDirectiveSignalInputsExpr = env.referenceExternalType(R3Identifiers3.UnwrapDirectiveSignalInputs.moduleName, R3Identifiers3.UnwrapDirectiveSignalInputs.name, [
       // TODO:
       new ExpressionType2(new WrappedNodeExpr7(rawType)),
       new ExpressionType2(new WrappedNodeExpr7(keyTypeUnion))
@@ -13134,7 +13261,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.js
-import { BindingPipe, BindingType as BindingType2, Call as Call3, createCssSelectorFromNode, CssSelector as CssSelector3, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver3, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead4, R3Identifiers as R3Identifiers3, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead3, SelectorMatcher as SelectorMatcher2, ThisReceiver as ThisReceiver2, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundText, TmplAstContent, TmplAstDeferredBlock, TmplAstElement as TmplAstElement2, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference as TmplAstReference2, TmplAstSwitchBlock, TmplAstTemplate, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable, TmplAstHostElement as TmplAstHostElement2, TransplantedType, TmplAstComponent as TmplAstComponent2, TmplAstDirective as TmplAstDirective2, Binary } from "@angular/compiler";
+import { BindingPipe, BindingType as BindingType2, Call as Call3, createCssSelectorFromNode, CssSelector as CssSelector3, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver3, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead4, R3Identifiers as R3Identifiers4, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead3, SelectorMatcher as SelectorMatcher2, ThisReceiver as ThisReceiver2, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundText, TmplAstContent, TmplAstDeferredBlock, TmplAstElement as TmplAstElement2, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference as TmplAstReference2, TmplAstSwitchBlock, TmplAstTemplate, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable, TmplAstHostElement as TmplAstHostElement2, TransplantedType, TmplAstComponent as TmplAstComponent2, TmplAstDirective as TmplAstDirective2, Binary } from "@angular/compiler";
 import ts60 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.js
@@ -13324,8 +13451,8 @@ var AstTranslator = class {
   }
   visitLiteralArray(ast) {
     const elements = ast.expressions.map((expr) => this.translate(expr));
-    const literal3 = ts59.factory.createArrayLiteralExpression(elements);
-    const node = this.config.strictLiteralTypes ? literal3 : tsCastToAny(literal3);
+    const literal4 = ts59.factory.createArrayLiteralExpression(elements);
+    const node = this.config.strictLiteralTypes ? literal4 : tsCastToAny(literal4);
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
   }
@@ -13334,8 +13461,8 @@ var AstTranslator = class {
       const value = this.translate(ast.values[idx]);
       return ts59.factory.createPropertyAssignment(ts59.factory.createStringLiteral(key), value);
     });
-    const literal3 = ts59.factory.createObjectLiteralExpression(properties, true);
-    const node = this.config.strictLiteralTypes ? literal3 : tsCastToAny(literal3);
+    const literal4 = ts59.factory.createObjectLiteralExpression(properties, true);
+    const node = this.config.strictLiteralTypes ? literal4 : tsCastToAny(literal4);
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
   }
@@ -14109,9 +14236,9 @@ var TcbDirectiveInputsOp = class extends TcbOp {
           target = this.dir.stringLiteralInputFields.has(fieldName) ? ts60.factory.createElementAccessExpression(dirId, ts60.factory.createStringLiteral(fieldName)) : ts60.factory.createPropertyAccessExpression(dirId, ts60.factory.createIdentifier(fieldName));
         }
         if (isSignal) {
-          const inputSignalBrandWriteSymbol = this.tcb.env.referenceExternalSymbol(R3Identifiers3.InputSignalBrandWriteType.moduleName, R3Identifiers3.InputSignalBrandWriteType.name);
+          const inputSignalBrandWriteSymbol = this.tcb.env.referenceExternalSymbol(R3Identifiers4.InputSignalBrandWriteType.moduleName, R3Identifiers4.InputSignalBrandWriteType.name);
           if (!ts60.isIdentifier(inputSignalBrandWriteSymbol) && !ts60.isPropertyAccessExpression(inputSignalBrandWriteSymbol)) {
-            throw new Error(`Expected identifier or property access for reference to ${R3Identifiers3.InputSignalBrandWriteType.name}`);
+            throw new Error(`Expected identifier or property access for reference to ${R3Identifiers4.InputSignalBrandWriteType.name}`);
           }
           target = ts60.factory.createElementAccessExpression(target, inputSignalBrandWriteSymbol);
         }
@@ -15622,7 +15749,7 @@ function widenBinding(expr, tcb) {
   }
 }
 function unwrapWritableSignal(expression, tcb) {
-  const unwrapRef = tcb.env.referenceExternalSymbol(R3Identifiers3.unwrapWritableSignal.moduleName, R3Identifiers3.unwrapWritableSignal.name);
+  const unwrapRef = tcb.env.referenceExternalSymbol(R3Identifiers4.unwrapWritableSignal.moduleName, R3Identifiers4.unwrapWritableSignal.name);
   return ts60.factory.createCallExpression(unwrapRef, void 0, [expression]);
 }
 var EVENT_PARAMETER = "$event";
@@ -16239,7 +16366,7 @@ var DirectiveSourceManager = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.js
-import { AST, ASTWithName as ASTWithName2, ASTWithSource as ASTWithSource2, Binary as Binary2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead5, R3Identifiers as R3Identifiers4, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstComponent as TmplAstComponent3, TmplAstDirective as TmplAstDirective3, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { AST, ASTWithName as ASTWithName2, ASTWithSource as ASTWithSource2, Binary as Binary2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead5, R3Identifiers as R3Identifiers5, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstComponent as TmplAstComponent3, TmplAstDirective as TmplAstDirective3, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts63 from "typescript";
 var SymbolBuilder = class {
   tcbPath;
@@ -16869,7 +16996,7 @@ function unwrapSignalInputWriteTAccessor(expr) {
   if (!ts63.isElementAccessExpression(expr) || !ts63.isPropertyAccessExpression(expr.argumentExpression)) {
     return null;
   }
-  if (!ts63.isIdentifier(expr.argumentExpression.name) || expr.argumentExpression.name.text !== R3Identifiers4.InputSignalBrandWriteType.name) {
+  if (!ts63.isIdentifier(expr.argumentExpression.name) || expr.argumentExpression.name.text !== R3Identifiers5.InputSignalBrandWriteType.name) {
     return null;
   }
   if (!ts63.isPropertyAccessExpression(expr.expression) && !ts63.isElementAccessExpression(expr.expression) && !ts63.isIdentifier(expr.expression)) {
@@ -18133,9 +18260,11 @@ var DirectiveDecoratorHandler = class {
     this.usePoisonedData = usePoisonedData;
     this.typeCheckHostBindings = typeCheckHostBindings;
     this.emitDeclarationOnly = emitDeclarationOnly;
+    this.undecoratedMetadataExtractor = getDirectiveUndecoratedMetadataExtractor(reflector, importTracker);
   }
   precedence = HandlerPrecedence.PRIMARY;
   name = "DirectiveDecoratorHandler";
+  undecoratedMetadataExtractor;
   detect(node, decorators) {
     if (!decorators) {
       const angularField = this.findClassFieldWithAngularFeatures(node);
@@ -18187,7 +18316,7 @@ var DirectiveDecoratorHandler = class {
         meta: analysis,
         hostDirectives: directiveResult.hostDirectives,
         rawHostDirectives: directiveResult.rawHostDirectives,
-        classMetadata: this.includeClassMetadata ? extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler) : null,
+        classMetadata: this.includeClassMetadata ? extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler, void 0, this.undecoratedMetadataExtractor) : null,
         baseClass: readBaseClass(node, this.reflector, this.evaluator),
         typeCheckMeta: extractDirectiveTypeCheckMeta(node, directiveResult.inputs, this.reflector),
         providersRequiringFactory,
@@ -18361,7 +18490,7 @@ var DirectiveDecoratorHandler = class {
 };
 
 // packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.js
-import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, ExternalExpr as ExternalExpr9, FactoryTarget as FactoryTarget2, FunctionExpr, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr2, R3Identifiers as R3Identifiers5, R3NgModuleMetadataKind, R3SelectorScopeMode, ReturnStatement, WrappedNodeExpr as WrappedNodeExpr10 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, ExternalExpr as ExternalExpr9, FactoryTarget as FactoryTarget2, FunctionExpr, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr3, R3Identifiers as R3Identifiers6, R3NgModuleMetadataKind, R3SelectorScopeMode, ReturnStatement, WrappedNodeExpr as WrappedNodeExpr10 } from "@angular/compiler";
 import ts67 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/annotations/ng_module/src/module_with_providers.js
@@ -18997,14 +19126,14 @@ var NgModuleDecoratorHandler = class {
           assertSuccessfulReferenceEmit(type, node, "pipe");
           return type.expression;
         });
-        const directiveArray = new LiteralArrayExpr2(directives);
-        const pipesArray = new LiteralArrayExpr2(pipes);
+        const directiveArray = new LiteralArrayExpr3(directives);
+        const pipesArray = new LiteralArrayExpr3(pipes);
         const directiveExpr = remoteScopesMayRequireCycleProtection && directives.length > 0 ? new FunctionExpr([], [new ReturnStatement(directiveArray)]) : directiveArray;
         const pipesExpr = remoteScopesMayRequireCycleProtection && pipes.length > 0 ? new FunctionExpr([], [new ReturnStatement(pipesArray)]) : pipesArray;
         const componentType = this.refEmitter.emit(decl, context);
         assertSuccessfulReferenceEmit(componentType, node, "component");
         const declExpr = componentType.expression;
-        const setComponentScope = new ExternalExpr9(R3Identifiers5.setComponentScope);
+        const setComponentScope = new ExternalExpr9(R3Identifiers6.setComponentScope);
         const callExpr = new InvokeFunctionExpr(setComponentScope, [
           declExpr,
           directiveExpr,
@@ -20078,10 +20207,12 @@ var ComponentDecoratorHandler = class {
       enableSelectorless: this.enableSelectorless,
       preserveSignificantWhitespace: this.i18nPreserveSignificantWhitespace
     };
+    this.undecoratedMetadataExtractor = getDirectiveUndecoratedMetadataExtractor(reflector, importTracker);
     this.canDeferDeps = !enableHmr;
   }
   literalCache = /* @__PURE__ */ new Map();
   elementSchemaRegistry = new DomElementSchemaRegistry3();
+  undecoratedMetadataExtractor;
   /**
    * During the asynchronous preanalyze phase, it's necessary to parse the template to extract
    * any potential <link> tags which might need to be loaded. This cache ensures that work is not
@@ -20468,7 +20599,7 @@ var ComponentDecoratorHandler = class {
           relativeTemplatePath
         },
         typeCheckMeta: extractDirectiveTypeCheckMeta(node, inputs, this.reflector),
-        classMetadata: this.includeClassMetadata ? extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler, (dec) => transformDecoratorResources(dec, component, styles, template)) : null,
+        classMetadata: this.includeClassMetadata ? extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler, (dec) => transformDecoratorResources(dec, component, styles, template), this.undecoratedMetadataExtractor) : null,
         classDebugInfo: extractClassDebugInfo(
           node,
           this.reflector,
