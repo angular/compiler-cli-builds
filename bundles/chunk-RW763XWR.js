@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-LBDATQBA.js";
+} from "./chunk-XHNRABDI.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -92,7 +92,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-HQSSDNAP.js";
+} from "./chunk-M7DDTBYQ.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
