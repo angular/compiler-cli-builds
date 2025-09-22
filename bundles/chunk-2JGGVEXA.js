@@ -21083,11 +21083,12 @@ var ComponentDecoratorHandler = class {
     for (const [_, deps] of resolution.deferPerBlockDependencies) {
       for (const deferBlockDep of deps) {
         const node = deferBlockDep.declaration.node;
-        const importDecl = resolution.deferrableDeclToImportDecl.get(node) ?? null;
-        if (importDecl !== null && this.deferredSymbolTracker.canDefer(importDecl)) {
+        const importInfo = resolution.deferrableDeclToImportDecl.get(node) ?? null;
+        if (importInfo !== null && this.deferredSymbolTracker.canDefer(importInfo.node)) {
           deferBlockDep.isDeferrable = true;
-          deferBlockDep.importPath = importDecl.moduleSpecifier.text;
-          deferBlockDep.isDefaultImport = isDefaultImport(importDecl);
+          deferBlockDep.symbolName = importInfo.name;
+          deferBlockDep.importPath = importInfo.from;
+          deferBlockDep.isDefaultImport = isDefaultImport(importInfo.node);
           if (!seenDeps.has(node)) {
             seenDeps.add(node);
             deferrableTypes.push(deferBlockDep);
@@ -21230,7 +21231,7 @@ var ComponentDecoratorHandler = class {
     if (dirMeta === null && pipeMeta === null) {
       return;
     }
-    resolutionData.deferrableDeclToImportDecl.set(decl.node, imp.node);
+    resolutionData.deferrableDeclToImportDecl.set(decl.node, imp);
     this.deferredSymbolTracker.markAsDeferrableCandidate(node, imp.node, componentClassDecl, isDeferredImport);
   }
   compileDeferBlocks(resolution) {
