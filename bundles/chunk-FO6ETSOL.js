@@ -16,7 +16,7 @@ import {
   tryParseSignalInputMapping,
   tryParseSignalModelMapping,
   tryParseSignalQueryFromInitializer
-} from "./chunk-WZEW3YXC.js";
+} from "./chunk-WXM53XCM.js";
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/downlevel_decorators_transform.js
 import ts from "typescript";
