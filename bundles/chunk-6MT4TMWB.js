@@ -3146,14 +3146,23 @@ var factory6 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/optional_chain_not_nullable/index.js
-import { SafeCall, SafeKeyedRead, SafePropertyRead } from "@angular/compiler";
+import { KeyedRead, SafeCall, SafeKeyedRead, SafePropertyRead } from "@angular/compiler";
 import ts20 from "typescript";
 var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
+  noUncheckedIndexedAccess;
   canVisitStructuralAttributes = false;
   code = ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE;
+  constructor(noUncheckedIndexedAccess) {
+    super();
+    this.noUncheckedIndexedAccess = noUncheckedIndexedAccess;
+  }
   visitNode(ctx, component, node) {
-    if (!(node instanceof SafeCall) && !(node instanceof SafePropertyRead) && !(node instanceof SafeKeyedRead))
+    if (!(node instanceof SafeCall) && !(node instanceof SafePropertyRead) && !(node instanceof SafeKeyedRead)) {
       return [];
+    }
+    if (node.receiver instanceof KeyedRead && !this.noUncheckedIndexedAccess) {
+      return [];
+    }
     const symbolLeft = ctx.templateTypeChecker.getSymbolOfNode(node.receiver, component);
     if (symbolLeft === null || symbolLeft.kind !== SymbolKind.Expression) {
       return [];
@@ -3185,7 +3194,8 @@ var factory7 = {
     if (!strictNullChecks) {
       return null;
     }
-    return new OptionalChainNotNullableCheck();
+    const noUncheckedIndexedAccess = !!options.noUncheckedIndexedAccess;
+    return new OptionalChainNotNullableCheck(noUncheckedIndexedAccess);
   }
 };
 
