@@ -446,7 +446,7 @@ function toR3ClassMetadata(metaObj) {
 }
 
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.js
-import { ChangeDetectionStrategy, compileComponentFromMetadata, DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, makeBindingParser as makeBindingParser2, parseTemplate, R3TargetBinder, R3TemplateDependencyKind, ViewEncapsulation } from "@angular/compiler";
+import { ChangeDetectionStrategy, compileComponentFromMetadata, makeBindingParser as makeBindingParser2, parseTemplate, R3TargetBinder, R3TemplateDependencyKind, ViewEncapsulation } from "@angular/compiler";
 import semver2 from "semver";
 
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.js
@@ -455,7 +455,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "21.0.0-next.5+sha-8a1e36b";
+var PLACEHOLDER_VERSION = "21.0.0-next.5+sha-768a09d";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -694,7 +694,6 @@ var PartialComponentLinkerVersion1 = class {
    * This function derives the `R3ComponentMetadata` from the provided AST object.
    */
   toR3ComponentMeta(metaObj, version) {
-    const interpolation = parseInterpolationConfig(metaObj);
     const templateSource = metaObj.getValue("template");
     const isInline = metaObj.has("isInline") ? metaObj.getBoolean("isInline") : false;
     const templateInfo = this.getTemplateInfo(templateSource, isInline);
@@ -703,7 +702,6 @@ var PartialComponentLinkerVersion1 = class {
     const enableLetSyntax = major > 18 || major === 18 && minor >= 1 || version === PLACEHOLDER_VERSION;
     const template = parseTemplate(templateInfo.code, templateInfo.sourceUrl, {
       escapedString: templateInfo.isEscaped,
-      interpolationConfig: interpolation,
       range: templateInfo.range,
       enableI18nLegacyMessageIdFormat: false,
       preserveWhitespaces: metaObj.has("preserveWhitespaces") ? metaObj.getBoolean("preserveWhitespaces") : false,
@@ -807,7 +805,6 @@ ${errors}`);
       styles: metaObj.has("styles") ? metaObj.getArray("styles").map((entry) => entry.getString()) : [],
       defer: deferBlockDependencies,
       encapsulation: metaObj.has("encapsulation") ? parseEncapsulation(metaObj.getValue("encapsulation")) : ViewEncapsulation.Emulated,
-      interpolation,
       changeDetection: metaObj.has("changeDetection") ? parseChangeDetectionStrategy(metaObj.getValue("changeDetection")) : ChangeDetectionStrategy.Default,
       animations: metaObj.has("animations") ? metaObj.getOpaque("animations") : null,
       relativeContextFilePath: this.sourceUrl,
@@ -880,17 +877,6 @@ ${errors}`);
     return result;
   }
 };
-function parseInterpolationConfig(metaObj) {
-  if (!metaObj.has("interpolation")) {
-    return DEFAULT_INTERPOLATION_CONFIG;
-  }
-  const interpolationExpr = metaObj.getValue("interpolation");
-  const values = interpolationExpr.getArray().map((entry) => entry.getString());
-  if (values.length !== 2) {
-    throw new FatalLinkerError(interpolationExpr.expression, "Unsupported interpolation config, expected an array containing exactly two strings");
-  }
-  return InterpolationConfig.fromArray(values);
-}
 function parseEncapsulation(encapsulation) {
   const symbolName = encapsulation.getSymbolName();
   if (symbolName === null) {
