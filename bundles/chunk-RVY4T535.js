@@ -7521,7 +7521,7 @@ var JitDeclarationRegistry = class {
 };
 
 // packages/compiler-cli/src/ngtsc/annotations/component/src/handler.js
-import { compileClassDebugInfo, compileHmrInitializer, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, ConstantPool as ConstantPool2, CssSelector as CssSelector5, DEFAULT_INTERPOLATION_CONFIG as DEFAULT_INTERPOLATION_CONFIG2, DomElementSchemaRegistry as DomElementSchemaRegistry3, ExternalExpr as ExternalExpr10, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser3, outputAst as o5, R3TargetBinder as R3TargetBinder2, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher3, ViewEncapsulation as ViewEncapsulation2, SelectorlessMatcher as SelectorlessMatcher2 } from "@angular/compiler";
+import { compileClassDebugInfo, compileHmrInitializer, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, ConstantPool as ConstantPool2, CssSelector as CssSelector5, DomElementSchemaRegistry as DomElementSchemaRegistry3, ExternalExpr as ExternalExpr10, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser3, outputAst as o5, R3TargetBinder as R3TargetBinder2, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher3, ViewEncapsulation as ViewEncapsulation2, SelectorlessMatcher as SelectorlessMatcher2 } from "@angular/compiler";
 import ts73 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.js
@@ -19158,7 +19158,7 @@ function checkCustomElementSelectorForErrors(selector) {
 }
 
 // packages/compiler-cli/src/ngtsc/annotations/component/src/resources.js
-import { DEFAULT_INTERPOLATION_CONFIG, InterpolationConfig, ParseSourceFile as ParseSourceFile3, parseTemplate } from "@angular/compiler";
+import { ParseSourceFile as ParseSourceFile3, parseTemplate } from "@angular/compiler";
 import ts68 from "typescript";
 function getTemplateDeclarationNodeForError(declaration) {
   return declaration.isInline ? declaration.expression : declaration.templateUrlExpression;
@@ -19254,14 +19254,12 @@ function createEmptyTemplate(componentClass, component, containingFile) {
     },
     declaration: templateUrl ? {
       isInline: false,
-      interpolationConfig: InterpolationConfig.fromArray(null),
       preserveWhitespaces: false,
       templateUrlExpression: templateUrl,
       templateUrl: "missing.ng.html",
       resolvedTemplateUrl: "/missing.ng.html"
     } : {
       isInline: true,
-      interpolationConfig: InterpolationConfig.fromArray(null),
       preserveWhitespaces: false,
       expression: template,
       templateUrl: containingFile,
@@ -19272,7 +19270,6 @@ function createEmptyTemplate(componentClass, component, containingFile) {
 function parseExtractedTemplate(template, sourceStr, sourceParseRange, escapedString, sourceMapUrl, options) {
   const i18nNormalizeLineEndingsInICUs = escapedString || options.i18nNormalizeLineEndingsInICUs;
   const commonParseOptions = {
-    interpolationConfig: template.interpolationConfig,
     range: sourceParseRange ?? void 0,
     enableI18nLegacyMessageIdFormat: options.enableI18nLegacyMessageIdFormat,
     i18nNormalizeLineEndingsInICUs,
@@ -19310,14 +19307,12 @@ function parseTemplateDeclaration(node, decorator, component, containingFile, ev
     }
     preserveWhitespaces = value;
   }
-  let interpolationConfig = DEFAULT_INTERPOLATION_CONFIG;
   if (component.has("interpolation")) {
     const expr = component.get("interpolation");
     const value = evaluator.evaluate(expr);
     if (!Array.isArray(value) || value.length !== 2 || !value.every((element) => typeof element === "string")) {
       throw createValueHasWrongTypeError(expr, value, "interpolation must be an array with 2 elements of string type");
     }
-    interpolationConfig = InterpolationConfig.fromArray(value);
   }
   if (component.has("templateUrl")) {
     const templateUrlExpr = component.get("templateUrl");
@@ -19329,7 +19324,6 @@ function parseTemplateDeclaration(node, decorator, component, containingFile, ev
       const resourceUrl = resourceLoader.resolve(templateUrl, containingFile);
       return {
         isInline: false,
-        interpolationConfig,
         preserveWhitespaces,
         templateUrl,
         templateUrlExpression: templateUrlExpr,
@@ -19349,7 +19343,6 @@ function parseTemplateDeclaration(node, decorator, component, containingFile, ev
   } else if (component.has("template")) {
     return {
       isInline: true,
-      interpolationConfig,
       preserveWhitespaces,
       expression: component.get("template"),
       templateUrl: containingFile,
@@ -20467,7 +20460,6 @@ var ComponentDecoratorHandler = class {
           template,
           encapsulation,
           changeDetection,
-          interpolation: template.interpolationConfig ?? DEFAULT_INTERPOLATION_CONFIG2,
           styles,
           externalStyles,
           // These will be replaced during the compilation step, after all `NgModule`s have been
@@ -20692,7 +20684,7 @@ var ComponentDecoratorHandler = class {
     return { data };
   }
   xi18n(ctx, node, analysis) {
-    ctx.updateFromTemplate(analysis.template.content, analysis.template.declaration.resolvedTemplateUrl, analysis.template.interpolationConfig ?? DEFAULT_INTERPOLATION_CONFIG2);
+    ctx.updateFromTemplate(analysis.template.content, analysis.template.declaration.resolvedTemplateUrl);
   }
   updateResources(node, analysis) {
     const containingFile = node.getSourceFile().fileName;
@@ -21272,7 +21264,7 @@ var ComponentDecoratorHandler = class {
   }
   /** Creates a new binding parser. */
   getNewBindingParser() {
-    return makeBindingParser3(void 0, this.enableSelectorless);
+    return makeBindingParser3(this.enableSelectorless);
   }
 };
 function createMatcherFromScope(scope, hostDirectivesResolver) {
