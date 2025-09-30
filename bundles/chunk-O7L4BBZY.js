@@ -6825,13 +6825,15 @@ function nodeArrayFromDecoratorsArray(decorators) {
 // packages/compiler-cli/src/ngtsc/transform/src/implicit_signal_debug_name_transform.js
 import ts32 from "typescript";
 function insertDebugNameIntoCallExpression(callExpression, debugName) {
-  const signalExpressionHasNoArguments = callExpression.arguments.length === 0;
   const signalExpressionIsRequired = isRequiredSignalFunction(callExpression.expression);
   let configPosition = signalExpressionIsRequired ? 0 : 1;
-  if (signalExpressionHasNoArguments) {
+  const nodeArgs = Array.from(callExpression.arguments);
+  const signalExpressionHasNoArguments = callExpression.arguments.length === 0;
+  const isLinkedSignal = callExpression.expression.getText() === "linkedSignal";
+  const isComputationLinkedSignal = isLinkedSignal && nodeArgs[0].kind === ts32.SyntaxKind.ObjectLiteralExpression;
+  if (signalExpressionHasNoArguments || isComputationLinkedSignal) {
     configPosition = 0;
   }
-  const nodeArgs = Array.from(callExpression.arguments);
   let existingArgument = nodeArgs[configPosition];
   if (existingArgument === void 0) {
     existingArgument = ts32.factory.createObjectLiteralExpression([]);
@@ -6873,7 +6875,7 @@ function insertDebugNameIntoCallExpression(callExpression, debugName) {
     nonDevModeCase
   )));
   let transformedSignalArgs;
-  if (signalExpressionIsRequired || signalExpressionHasNoArguments) {
+  if (signalExpressionIsRequired || signalExpressionHasNoArguments || isComputationLinkedSignal) {
     transformedSignalArgs = ts32.factory.createNodeArray([spreadElementContainingUpdatedOptions]);
   } else {
     transformedSignalArgs = ts32.factory.createNodeArray([
@@ -6963,6 +6965,7 @@ function expressionIsUsingAngularCoreImportedSymbol(program, expression) {
 var signalFunctions = /* @__PURE__ */ new Set([
   "signal",
   "computed",
+  "linkedSignal",
   "input",
   "model",
   "viewChild",
