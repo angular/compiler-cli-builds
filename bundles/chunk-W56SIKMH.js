@@ -13118,10 +13118,10 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.keySpan || node.sourceSpan, ts56.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_DIRECTIVE_BINDING), errorMsg));
   }
   deferImplicitTriggerMissingPlaceholder(id, trigger) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts56.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER), "Trigger with no parameters can only be placed on an @defer that has a @placeholder block"));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts56.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block"));
   }
   deferImplicitTriggerInvalidPlaceholder(id, trigger) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts56.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER), "Trigger with no parameters can only be placed on an @defer that has a @placeholder block with exactly one root element node"));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts56.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block with exactly one root element node"));
   }
 };
 function makeInlineDiagnostic(id, code, node, messageText, relatedInformation) {
@@ -14745,6 +14745,25 @@ var TcbForOfOp = class extends TcbOp {
     return null;
   }
 };
+var TcbIntersectionObserverOp = class extends TcbOp {
+  tcb;
+  scope;
+  options;
+  constructor(tcb, scope, options) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.options = options;
+  }
+  optional = false;
+  execute() {
+    const options = tcbExpression(this.options, this.tcb, this.scope);
+    const callback = ts60.factory.createNonNullExpression(ts60.factory.createNull());
+    const expression = ts60.factory.createNewExpression(ts60.factory.createIdentifier("IntersectionObserver"), void 0, [callback, options]);
+    this.scope.addStatement(ts60.factory.createExpressionStatement(expression));
+    return null;
+  }
+};
 var Context2 = class {
   env;
   domSchemaChecker;
@@ -15369,6 +15388,9 @@ var Scope = class _Scope {
   appendDeferredTriggers(block, triggers) {
     if (triggers.when !== void 0) {
       this.opQueue.push(new TcbExpressionOp(this.tcb, this, triggers.when.value));
+    }
+    if (triggers.viewport !== void 0 && triggers.viewport.options !== null) {
+      this.opQueue.push(new TcbIntersectionObserverOp(this.tcb, this, triggers.viewport.options));
     }
     if (triggers.hover !== void 0) {
       this.validateReferenceBasedDeferredTrigger(block, triggers.hover);
