@@ -12,7 +12,7 @@ import { ClassPropertyMapping, DecoratorInputTransform, HostDirectiveMeta, Input
 import { DynamicValue, PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
 import { CompilationMode } from '../../../transform';
-import { ReferencesRegistry } from '../../common';
+import { ReferencesRegistry, UndecoratedMetadataExtractor } from '../../common';
 type QueryDecoratorName = 'ViewChild' | 'ViewChildren' | 'ContentChild' | 'ContentChildren';
 export declare const queryDecoratorNames: QueryDecoratorName[];
 export interface HostBindingNodes {
@@ -43,6 +43,11 @@ export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decora
 export declare function extractDecoratorQueryMetadata(exprNode: ts.Node, name: string, args: ReadonlyArray<ts.Expression>, propertyName: string, reflector: ReflectionHost, evaluator: PartialEvaluator): R3QueryMetadata;
 export declare function parseDirectiveStyles(directive: Map<string, ts.Expression>, evaluator: PartialEvaluator, compilationMode: CompilationMode): null | string[];
 export declare function parseFieldStringArrayValue(directive: Map<string, ts.Expression>, field: string, evaluator: PartialEvaluator): null | string[];
+/**
+ * Returns a function that can be used to extract data for the `setClassMetadata`
+ * calls from undecorated directive class members.
+ */
+export declare function getDirectiveUndecoratedMetadataExtractor(reflector: ReflectionHost, importTracker: ImportedSymbolsTracker): UndecoratedMetadataExtractor;
 /**
  * Parses the `transform` function and its type for a decorator `@Input`.
  *

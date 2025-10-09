@@ -65,6 +65,7 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, strictCtorDeps: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, typeCheckScopeRegistry: TypeCheckScopeRegistry, compilationMode: CompilationMode, jitDeclarationRegistry: JitDeclarationRegistry, resourceRegistry: ResourceRegistry, strictStandalone: boolean, implicitStandaloneValue: boolean, usePoisonedData: boolean, typeCheckHostBindings: boolean, emitDeclarationOnly: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name = "DirectiveDecoratorHandler";
+    private readonly undecoratedMetadataExtractor;
     detect(node: ClassDeclaration, decorators: Decorator[] | null): DetectResult<Decorator | null> | undefined;
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator | null>): AnalysisOutput<DirectiveHandlerData>;
     symbol(node: ClassDeclaration, analysis: Readonly<DirectiveHandlerData>): DirectiveSymbol;
