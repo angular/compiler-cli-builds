@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-LA7WMLRZ.js";
+} from "./chunk-IGH3DJZ3.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -92,7 +92,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-FRTW2UIH.js";
+} from "./chunk-UUEOPPNT.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -3473,6 +3473,70 @@ var factory15 = {
   create: () => new UninvokedFunctionInTextInterpolation()
 };
 
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/defer_trigger_misconfiguration/index.js
+import { TmplAstDeferredBlock, TmplAstHoverDeferredTrigger, TmplAstImmediateDeferredTrigger, TmplAstInteractionDeferredTrigger, TmplAstTimerDeferredTrigger, TmplAstViewportDeferredTrigger } from "@angular/compiler";
+var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
+  code = ErrorCode.DEFER_TRIGGER_MISCONFIGURATION;
+  visitNode(ctx, component, node) {
+    if (!(node instanceof TmplAstDeferredBlock))
+      return [];
+    const mainKeys = Object.keys(node.triggers);
+    const prefetchKeys = Object.keys(node.prefetchTriggers);
+    const mains = mainKeys.map((k) => node.triggers[k]).filter((t) => t !== void 0 && t !== null);
+    const prefetches = prefetchKeys.map((k) => node.prefetchTriggers[k]).filter((t) => t !== void 0 && t !== null);
+    const diags = [];
+    const hasImmediateMain = mains.some((t) => t instanceof TmplAstImmediateDeferredTrigger);
+    if (hasImmediateMain) {
+      if (mains.length > 1) {
+        const msg = `The 'immediate' trigger makes additional triggers redundant.`;
+        diags.push(ctx.makeTemplateDiagnostic(node.sourceSpan, msg));
+      }
+      if (prefetches.length > 0) {
+        const msg = `Prefetch triggers have no effect because 'immediate' executes earlier.`;
+        diags.push(ctx.makeTemplateDiagnostic(node.sourceSpan, msg));
+      }
+    }
+    if (mains.length === 1 && prefetches.length > 0) {
+      const main = mains[0];
+      for (const pre of prefetches) {
+        const isTimerTriggger = main instanceof TmplAstTimerDeferredTrigger && pre instanceof TmplAstTimerDeferredTrigger;
+        if (isTimerTriggger) {
+          const mainDelay = main.delay;
+          const preDelay = pre.delay;
+          if (preDelay >= mainDelay) {
+            const msg = `The Prefetch 'timer(${preDelay}ms)' is not scheduled before the main 'timer(${mainDelay}ms)', so it won\u2019t run prior to rendering. Lower the prefetch delay or remove it.`;
+            diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, msg));
+          }
+        }
+        const isHoverTrigger = main instanceof TmplAstHoverDeferredTrigger && pre instanceof TmplAstHoverDeferredTrigger;
+        const isInteractionTrigger = main instanceof TmplAstInteractionDeferredTrigger && pre instanceof TmplAstInteractionDeferredTrigger;
+        const isViewportTrigger = main instanceof TmplAstViewportDeferredTrigger && pre instanceof TmplAstViewportDeferredTrigger;
+        if (isHoverTrigger || isInteractionTrigger || isViewportTrigger) {
+          const mainRef = main.reference;
+          const preRef = pre.reference;
+          if (mainRef && preRef && mainRef === preRef) {
+            const kindName = main.constructor.name.replace("DeferredTrigger", "").toLowerCase();
+            const msg = `Prefetch '${kindName}' matches the main trigger and provides no benefit. Remove the prefetch modifier.`;
+            diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, msg));
+          }
+          continue;
+        }
+        if (main.constructor === pre.constructor && !(main instanceof TmplAstTimerDeferredTrigger)) {
+          const kind = main instanceof TmplAstImmediateDeferredTrigger ? "immediate" : main.constructor.name.replace("DeferredTrigger", "").toLowerCase();
+          const msg = `Prefetch '${kind}' matches the main trigger and provides no benefit. Remove the prefetch modifier.`;
+          diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, msg));
+        }
+      }
+    }
+    return diags;
+  }
+};
+var factory16 = {
+  code: ErrorCode.DEFER_TRIGGER_MISCONFIGURATION,
+  name: ExtendedTemplateDiagnosticName.DEFER_TRIGGER_MISCONFIGURATION,
+  create: () => new DeferTriggerMisconfiguration()
+};
+
 // packages/compiler-cli/src/ngtsc/typecheck/extended/src/extended_template_checker.js
 import ts21 from "typescript";
 
@@ -3491,12 +3555,12 @@ var ExtendedTemplateCheckerImpl = class {
   constructor(templateTypeChecker, typeChecker, templateCheckFactories, options) {
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory16 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory(options?.extendedDiagnostics?.checks?.[factory16.name] ?? options?.extendedDiagnostics?.defaultCategory ?? DiagnosticCategoryLabel.Warning);
+    for (const factory17 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory(options?.extendedDiagnostics?.checks?.[factory17.name] ?? options?.extendedDiagnostics?.defaultCategory ?? DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory16.create(options);
+      const check = factory17.create(options);
       if (check === null) {
         continue;
       }
@@ -3556,12 +3620,13 @@ var ALL_DIAGNOSTIC_FACTORIES = [
   factory8,
   factory12,
   factory14,
-  factory15
+  factory15,
+  factory16
 ];
 var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ExtendedTemplateDiagnosticName.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION,
   ExtendedTemplateDiagnosticName.UNUSED_STANDALONE_IMPORTS,
-  ...ALL_DIAGNOSTIC_FACTORIES.map((factory16) => factory16.name)
+  ...ALL_DIAGNOSTIC_FACTORIES.map((factory17) => factory17.name)
 ]);
 
 // packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
