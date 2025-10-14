@@ -6829,12 +6829,13 @@ import ts32 from "typescript";
 function insertDebugNameIntoCallExpression(callExpression, debugName) {
   const signalExpressionIsRequired = isRequiredSignalFunction(callExpression.expression);
   let configPosition = signalExpressionIsRequired ? 0 : 1;
+  const nodeArgs = Array.from(callExpression.arguments);
   const signalExpressionHasNoArguments = callExpression.arguments.length === 0;
-  const signalWithObjectOnlyDefinition = isSignalWithObjectOnlyDefinition(callExpression);
-  if (signalExpressionHasNoArguments || signalWithObjectOnlyDefinition) {
+  const isLinkedSignal = callExpression.expression.getText() === "linkedSignal";
+  const isComputationLinkedSignal = isLinkedSignal && nodeArgs[0].kind === ts32.SyntaxKind.ObjectLiteralExpression;
+  if (signalExpressionHasNoArguments || isComputationLinkedSignal) {
     configPosition = 0;
   }
-  const nodeArgs = Array.from(callExpression.arguments);
   let existingArgument = nodeArgs[configPosition];
   if (existingArgument === void 0) {
     existingArgument = ts32.factory.createObjectLiteralExpression([]);
@@ -6876,7 +6877,7 @@ function insertDebugNameIntoCallExpression(callExpression, debugName) {
     nonDevModeCase
   )));
   let transformedSignalArgs;
-  if (signalExpressionIsRequired || signalExpressionHasNoArguments || signalWithObjectOnlyDefinition) {
+  if (signalExpressionIsRequired || signalExpressionHasNoArguments || isComputationLinkedSignal) {
     transformedSignalArgs = ts32.factory.createNodeArray([spreadElementContainingUpdatedOptions]);
   } else {
     transformedSignalArgs = ts32.factory.createNodeArray([
@@ -6935,21 +6936,7 @@ function isPropertyDeclarationCase(node) {
   }
   return ts32.isIdentifier(expression) && isSignalFunction(expression);
 }
-var signalFunctions = /* @__PURE__ */ new Map([
-  ["signal", "core"],
-  ["computed", "core"],
-  ["linkedSignal", "core"],
-  ["input", "core"],
-  ["model", "core"],
-  ["viewChild", "core"],
-  ["viewChildren", "core"],
-  ["contentChild", "core"],
-  ["contentChildren", "core"],
-  ["effect", "core"],
-  ["resource", "core"],
-  ["httpResource", "common"]
-]);
-function expressionIsUsingAngularImportedSymbol(program, expression) {
+function expressionIsUsingAngularCoreImportedSymbol(program, expression) {
   const symbol = program.getTypeChecker().getSymbolAtLocation(expression);
   if (symbol === void 0) {
     return false;
@@ -6975,9 +6962,20 @@ function expressionIsUsingAngularImportedSymbol(program, expression) {
     return false;
   }
   const specifier = importDeclaration.moduleSpecifier.text;
-  const packageName = signalFunctions.get(expression.getText());
-  return specifier !== void 0 && packageName !== void 0 && (specifier === `@angular/${packageName}` || specifier.startsWith(`@angular/${packageName}/`));
+  return specifier !== void 0 && (specifier === "@angular/core" || specifier.startsWith("@angular/core/"));
 }
+var signalFunctions = /* @__PURE__ */ new Set([
+  "signal",
+  "computed",
+  "linkedSignal",
+  "input",
+  "model",
+  "viewChild",
+  "viewChildren",
+  "contentChild",
+  "contentChildren",
+  "effect"
+]);
 function isSignalFunction(expression) {
   const text = expression.text;
   return signalFunctions.has(text);
@@ -6996,10 +6994,10 @@ function transformVariableDeclaration(program, node) {
     return node;
   const expression = node.initializer.expression;
   if (ts32.isPropertyAccessExpression(expression)) {
-    if (!expressionIsUsingAngularImportedSymbol(program, expression.expression)) {
+    if (!expressionIsUsingAngularCoreImportedSymbol(program, expression.expression)) {
       return node;
     }
-  } else if (!expressionIsUsingAngularImportedSymbol(program, expression)) {
+  } else if (!expressionIsUsingAngularCoreImportedSymbol(program, expression)) {
     return node;
   }
   try {
@@ -7012,10 +7010,10 @@ function transformVariableDeclaration(program, node) {
 function transformPropertyAssignment(program, node) {
   const expression = node.expression.right.expression;
   if (ts32.isPropertyAccessExpression(expression)) {
-    if (!expressionIsUsingAngularImportedSymbol(program, expression.expression)) {
+    if (!expressionIsUsingAngularCoreImportedSymbol(program, expression.expression)) {
       return node;
     }
-  } else if (!expressionIsUsingAngularImportedSymbol(program, expression)) {
+  } else if (!expressionIsUsingAngularCoreImportedSymbol(program, expression)) {
     return node;
   }
   return ts32.factory.updateExpressionStatement(node, ts32.factory.createBinaryExpression(node.expression.left, node.expression.operatorToken, insertDebugNameIntoCallExpression(node.expression.right, node.expression.left.name.text)));
@@ -7025,10 +7023,10 @@ function transformPropertyDeclaration(program, node) {
     return node;
   const expression = node.initializer.expression;
   if (ts32.isPropertyAccessExpression(expression)) {
-    if (!expressionIsUsingAngularImportedSymbol(program, expression.expression)) {
+    if (!expressionIsUsingAngularCoreImportedSymbol(program, expression.expression)) {
       return node;
     }
-  } else if (!expressionIsUsingAngularImportedSymbol(program, expression)) {
+  } else if (!expressionIsUsingAngularCoreImportedSymbol(program, expression)) {
     return node;
   }
   try {
@@ -7037,14 +7035,6 @@ function transformPropertyDeclaration(program, node) {
   } catch {
     return node;
   }
-}
-function isSignalWithObjectOnlyDefinition(callExpression) {
-  const callExpressionText = callExpression.expression.getText();
-  const nodeArgs = Array.from(callExpression.arguments);
-  const isLinkedSignal = callExpressionText === "linkedSignal";
-  const isComputationLinkedSignal = isLinkedSignal && nodeArgs[0].kind === ts32.SyntaxKind.ObjectLiteralExpression;
-  const isResource = callExpressionText === "resource";
-  return isComputationLinkedSignal || isResource;
 }
 function signalMetadataTransform(program) {
   return (context) => (rootNode) => {
