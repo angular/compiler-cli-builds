@@ -4,7 +4,7 @@
     
 import {
   angularJitApplicationTransform
-} from "./chunk-DJXCE5DL.js";
+} from "./chunk-GNKXSOIC.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -92,7 +92,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-YFXAE5PT.js";
+} from "./chunk-RMIW3FRK.js";
 import {
   LogicalFileSystem,
   absoluteFrom,
@@ -2804,7 +2804,7 @@ var StandaloneComponentScopeReader = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
-import { ASTWithSource as ASTWithSource2, BindingType, Interpolation, PrefixNot, PropertyRead as PropertyRead2, TmplAstBoundAttribute, TmplAstIfBlock, TmplAstSwitchBlock } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource2, BindingType, Interpolation, PrefixNot, PropertyRead as PropertyRead2, TmplAstBoundAttribute, TmplAstElement as TmplAstElement2, TmplAstIfBlock, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/symbol_util.js
 import ts18 from "typescript";
@@ -2895,23 +2895,21 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
   visitNode(ctx, component, node) {
     if (node instanceof Interpolation) {
       return node.expressions.map((item) => item instanceof PrefixNot ? item.expression : item).filter((item) => item instanceof PropertyRead2).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
-    } else if (node instanceof TmplAstBoundAttribute) {
-      const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
-      if (symbol?.kind === SymbolKind.Input && symbol.bindings.length > 0 && symbol.bindings.some((binding) => binding.target.kind === SymbolKind.Directive)) {
-        return [];
-      }
-      const nodeAst = isPropertyReadNodeAst(node);
-      if (
-        // a bound property like `[prop]="mySignal"`
-        (node.type === BindingType.Property || // or a class binding like `[class.myClass]="mySignal"`
-        node.type === BindingType.Class || // or a style binding like `[style.width]="mySignal"`
-        node.type === BindingType.Style || // or an attribute binding like `[attr.role]="mySignal"`
-        node.type === BindingType.Attribute || // or an animation binding like `[animate.enter]="mySignal"`
-        node.type === BindingType.Animation || // or an animation binding like `[@myAnimation]="mySignal"`
-        node.type === BindingType.LegacyAnimation) && nodeAst
-      ) {
-        return buildDiagnosticForSignal(ctx, nodeAst, component);
-      }
+    } else if (node instanceof TmplAstElement2 && node.inputs.length > 0) {
+      const directivesOfElement = ctx.templateTypeChecker.getDirectivesOfNode(component, node);
+      return node.inputs.flatMap((input) => checkBoundAttribute(ctx, component, directivesOfElement, input));
+    } else if (node instanceof TmplAstTemplate2 && node.tagName === "ng-template") {
+      const directivesOfElement = ctx.templateTypeChecker.getDirectivesOfNode(component, node);
+      const inputDiagnostics = node.inputs.flatMap((input) => {
+        return checkBoundAttribute(ctx, component, directivesOfElement, input);
+      });
+      const templateAttrDiagnostics = node.templateAttrs.flatMap((attr) => {
+        if (!(attr instanceof TmplAstBoundAttribute)) {
+          return [];
+        }
+        return checkBoundAttribute(ctx, component, directivesOfElement, attr);
+      });
+      return inputDiagnostics.concat(templateAttrDiagnostics);
     } else if (node instanceof TmplAstIfBlock) {
       return node.branches.map((branch) => branch.expression).filter((expr) => expr instanceof ASTWithSource2).map((expr) => {
         const ast = expr.ast;
@@ -2926,6 +2924,24 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
     return [];
   }
 };
+function checkBoundAttribute(ctx, component, directivesOfElement, node) {
+  if (directivesOfElement !== null && directivesOfElement.some((dir) => dir.inputs.getByBindingPropertyName(node.name) !== null)) {
+    return [];
+  }
+  const nodeAst = isPropertyReadNodeAst(node);
+  if (
+    // a bound property like `[prop]="mySignal"`
+    (node.type === BindingType.Property || // or a class binding like `[class.myClass]="mySignal"`
+    node.type === BindingType.Class || // or a style binding like `[style.width]="mySignal"`
+    node.type === BindingType.Style || // or an attribute binding like `[attr.role]="mySignal"`
+    node.type === BindingType.Attribute || // or an animation binding like `[animate.enter]="mySignal"`
+    node.type === BindingType.Animation || // or an animation binding like `[@myAnimation]="mySignal"`
+    node.type === BindingType.LegacyAnimation) && nodeAst
+  ) {
+    return buildDiagnosticForSignal(ctx, nodeAst, component);
+  }
+  return [];
+}
 function isPropertyReadNodeAst(node) {
   if (node.value instanceof ASTWithSource2 === false) {
     return void 0;
@@ -2952,8 +2968,11 @@ function buildDiagnosticForSignal(ctx, node, component) {
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
     return [diagnostic];
   }
+  if (!isFunctionInstanceProperty(node.name) && !isSignalInstanceProperty(node.name)) {
+    return [];
+  }
   const symbolOfReceiver = ctx.templateTypeChecker.getSymbolOfNode(node.receiver, component);
-  if ((isFunctionInstanceProperty(node.name) || isSignalInstanceProperty(node.name)) && symbolOfReceiver !== null && symbolOfReceiver.kind === SymbolKind.Expression && isSignalReference(symbolOfReceiver)) {
+  if (symbolOfReceiver !== null && symbolOfReceiver.kind === SymbolKind.Expression && isSignalReference(symbolOfReceiver)) {
     const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbolOfReceiver.tcbLocation);
     const errorString = `${node.receiver.name} is a function and should be invoked: ${node.receiver.name}()`;
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
@@ -2991,7 +3010,7 @@ var factory2 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_control_flow_directive/index.js
-import { TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
+import { TmplAstTemplate as TmplAstTemplate3 } from "@angular/compiler";
 var KNOWN_CONTROL_FLOW_DIRECTIVES = /* @__PURE__ */ new Map([
   ["ngIf", { directive: "NgIf", builtIn: "@if" }],
   ["ngFor", { directive: "NgFor", builtIn: "@for" }],
@@ -3008,7 +3027,7 @@ var MissingControlFlowDirectiveCheck = class extends TemplateCheckWithVisitor {
     return super.run(ctx, component, template);
   }
   visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstTemplate2))
+    if (!(node instanceof TmplAstTemplate3))
       return [];
     const controlFlowAttr = node.templateAttrs.find((attr) => KNOWN_CONTROL_FLOW_DIRECTIVES.has(attr.name));
     if (!controlFlowAttr)
@@ -3033,12 +3052,12 @@ var factory3 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_ngforof_let/index.js
-import { TmplAstTemplate as TmplAstTemplate3 } from "@angular/compiler";
+import { TmplAstTemplate as TmplAstTemplate4 } from "@angular/compiler";
 var MissingNgForOfLetCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.MISSING_NGFOROF_LET;
   visitNode(ctx, component, node) {
-    const isTemplate = node instanceof TmplAstTemplate3;
-    if (!(node instanceof TmplAstTemplate3)) {
+    const isTemplate = node instanceof TmplAstTemplate4;
+    if (!(node instanceof TmplAstTemplate4)) {
       return [];
     }
     if (node.templateAttrs.length === 0) {
@@ -3063,7 +3082,7 @@ var factory4 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_structural_directive/index.js
-import { TmplAstTemplate as TmplAstTemplate4 } from "@angular/compiler";
+import { TmplAstTemplate as TmplAstTemplate5 } from "@angular/compiler";
 var KNOWN_CONTROL_FLOW_DIRECTIVES2 = /* @__PURE__ */ new Set([
   "ngIf",
   "ngFor",
@@ -3082,7 +3101,7 @@ var MissingStructuralDirectiveCheck = class extends TemplateCheckWithVisitor {
     return super.run(ctx, component, template);
   }
   visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstTemplate4))
+    if (!(node instanceof TmplAstTemplate5))
       return [];
     const customStructuralDirective = node.templateAttrs.find((attr) => !KNOWN_CONTROL_FLOW_DIRECTIVES2.has(attr.name));
     if (!customStructuralDirective)

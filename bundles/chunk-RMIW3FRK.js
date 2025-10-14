@@ -17114,6 +17114,9 @@ var TemplateTypeCheckerImpl = class {
     const { data } = this.getLatestComponentState(directive, optimizeFor);
     return data?.hostElement ?? null;
   }
+  getDirectivesOfNode(component, node) {
+    return this.getLatestComponentState(component).data?.boundTarget.getDirectivesOfNode(node) ?? null;
+  }
   getUsedDirectives(component) {
     return this.getLatestComponentState(component).data?.boundTarget.getUsedDirectives() ?? null;
   }
