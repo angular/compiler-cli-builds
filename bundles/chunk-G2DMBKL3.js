@@ -2832,16 +2832,6 @@ function isSignalSymbol(symbol) {
 import { CombinedRecursiveAstVisitor as CombinedRecursiveAstVisitor2 } from "@angular/compiler";
 var TemplateCheckWithVisitor = class {
   /**
-   * When extended diagnostics were first introduced, the visitor wasn't implemented correctly
-   * which meant that it wasn't visiting the `templateAttrs` of structural directives (e.g.
-   * the expression of `*ngIf`). Fixing the issue causes a lot of internal breakages and will likely
-   * need to be done in a major version to avoid external breakages. This flag is used to opt out
-   * pre-existing diagnostics from the correct behavior until the breakages have been fixed while
-   * ensuring that newly-written diagnostics are correct from the beginning.
-   * TODO(crisbeto): remove this flag and fix the internal brekages.
-   */
-  canVisitStructuralAttributes = true;
-  /**
    * Base implementation for run function, visits all nodes in template and calls
    * `visitNode()` for each one.
    */
@@ -2873,9 +2863,7 @@ var TemplateVisitor2 = class extends CombinedRecursiveAstVisitor2 {
       this.visitAllTemplateNodes(template.outputs);
     }
     this.visitAllTemplateNodes(template.directives);
-    if (this.check.canVisitStructuralAttributes || isInlineTemplate) {
-      this.visitAllTemplateNodes(template.templateAttrs);
-    }
+    this.visitAllTemplateNodes(template.templateAttrs);
     this.visitAllTemplateNodes(template.variables);
     this.visitAllTemplateNodes(template.references);
     this.visitAllTemplateNodes(template.children);
@@ -3106,7 +3094,6 @@ var factory5 = {
 import { Binary } from "@angular/compiler";
 import ts19 from "typescript";
 var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
-  canVisitStructuralAttributes = false;
   code = ErrorCode.NULLISH_COALESCING_NOT_NULLABLE;
   visitNode(ctx, component, node) {
     if (!(node instanceof Binary) || node.operation !== "??")
@@ -3150,7 +3137,6 @@ import { KeyedRead, SafeCall, SafeKeyedRead, SafePropertyRead } from "@angular/c
 import ts20 from "typescript";
 var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
   noUncheckedIndexedAccess;
-  canVisitStructuralAttributes = false;
   code = ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE;
   constructor(noUncheckedIndexedAccess) {
     super();
