@@ -28,7 +28,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-LTORWCMV.js";
+} from "./chunk-TFJ2HFCB.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -37,7 +37,7 @@ import {
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-GNKXSOIC.js";
+} from "./chunk-2WL2LMYD.js";
 import {
   ActivePerfRecorder,
   ErrorCode,
@@ -46,7 +46,7 @@ import {
   TsCreateProgramDriver,
   isLocalCompilationDiagnostics,
   ngErrorCode
-} from "./chunk-RMIW3FRK.js";
+} from "./chunk-NR7S7ISS.js";
 import "./chunk-I2BHWRAU.js";
 import {
   InvalidFileSystem,
@@ -77,7 +77,7 @@ import "./chunk-G7GFT6BU.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.3.4+sha-c2e817b");
+var VERSION = new Version("20.3.4+sha-5f4f624");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
