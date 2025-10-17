@@ -3089,7 +3089,9 @@ var KNOWN_CONTROL_FLOW_DIRECTIVES2 = /* @__PURE__ */ new Set([
   "ngForOf",
   "ngForTrackBy",
   "ngSwitchCase",
-  "ngSwitchDefault"
+  "ngSwitchDefault",
+  "ngIfThen",
+  "ngIfElse"
 ]);
 var MissingStructuralDirectiveCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.MISSING_STRUCTURAL_DIRECTIVE;
@@ -3107,9 +3109,9 @@ var MissingStructuralDirectiveCheck = class extends TemplateCheckWithVisitor {
     if (!customStructuralDirective)
       return [];
     const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
-    if (symbol?.directives.length) {
+    const hasStructuralDirective = symbol?.directives.some((dir) => dir.selector?.includes(`[${customStructuralDirective.name}]`));
+    if (hasStructuralDirective)
       return [];
-    }
     const sourceSpan = customStructuralDirective.keySpan || customStructuralDirective.sourceSpan;
     const errorMessage = `A structural directive \`${customStructuralDirective.name}\` was used in the template without a corresponding import in the component. Make sure that the directive is included in the \`@Component.imports\` array of this component.`;
     return [ctx.makeTemplateDiagnostic(sourceSpan, errorMessage)];
