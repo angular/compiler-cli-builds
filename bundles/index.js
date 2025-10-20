@@ -28,7 +28,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-TFJ2HFCB.js";
+} from "./chunk-WLUQ7BOF.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -77,7 +77,7 @@ import "./chunk-G7GFT6BU.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.3.6+sha-182fe78");
+var VERSION = new Version("20.3.6+sha-cfd8ed3");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
