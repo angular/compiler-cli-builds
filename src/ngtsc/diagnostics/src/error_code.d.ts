@@ -145,6 +145,11 @@ export declare enum ErrorCode {
      * Raised for `@Component` fields that aren't supported in a selectorless context.
      */
     UNSUPPORTED_SELECTORLESS_COMPONENT_FIELD = 2026,
+    /**
+     * A component is using both the `animations` property and `animate.enter` or `animate.leave`
+     * in the template.
+     */
+    COMPONENT_ANIMATIONS_CONFLICT = 2027,
     SYMBOL_NOT_EXPORTED = 3001,
     /**
      * Raised when a relationship between directives and/or pipes would cause a cyclic import to be

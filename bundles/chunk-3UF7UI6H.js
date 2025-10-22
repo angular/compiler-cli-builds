@@ -61,6 +61,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["MISSING_NAMED_TEMPLATE_DEPENDENCY"] = 2024] = "MISSING_NAMED_TEMPLATE_DEPENDENCY";
   ErrorCode2[ErrorCode2["INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE"] = 2025] = "INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE";
   ErrorCode2[ErrorCode2["UNSUPPORTED_SELECTORLESS_COMPONENT_FIELD"] = 2026] = "UNSUPPORTED_SELECTORLESS_COMPONENT_FIELD";
+  ErrorCode2[ErrorCode2["COMPONENT_ANIMATIONS_CONFLICT"] = 2027] = "COMPONENT_ANIMATIONS_CONFLICT";
   ErrorCode2[ErrorCode2["SYMBOL_NOT_EXPORTED"] = 3001] = "SYMBOL_NOT_EXPORTED";
   ErrorCode2[ErrorCode2["IMPORT_CYCLE_DETECTED"] = 3003] = "IMPORT_CYCLE_DETECTED";
   ErrorCode2[ErrorCode2["IMPORT_GENERATION_FAILURE"] = 3004] = "IMPORT_GENERATION_FAILURE";
@@ -20135,6 +20136,32 @@ var SelectorlessDirectivesAnalyzer = class extends CombinedRecursiveAstVisitor {
   }
 };
 
+// packages/compiler-cli/src/ngtsc/annotations/component/src/animations.js
+import { CombinedRecursiveAstVisitor as CombinedRecursiveAstVisitor2, tmplAstVisitAll as tmplAstVisitAll2 } from "@angular/compiler";
+var ANIMATE_ENTER = "animate.enter";
+var ANIMATE_LEAVE = `animate.leave`;
+function analyzeTemplateForAnimations(template) {
+  const analyzer = new AnimationsAnalyzer();
+  tmplAstVisitAll2(analyzer, template);
+  return { hasAnimations: analyzer.hasAnimations };
+}
+var AnimationsAnalyzer = class extends CombinedRecursiveAstVisitor2 {
+  hasAnimations = false;
+  visitElement(element) {
+    for (const attr of element.attributes) {
+      if (attr.name === ANIMATE_LEAVE || attr.name === ANIMATE_ENTER) {
+        this.hasAnimations = true;
+      }
+    }
+    for (const input of element.inputs) {
+      if (input.name === ANIMATE_LEAVE || input.name === ANIMATE_ENTER) {
+        this.hasAnimations = true;
+      }
+    }
+    super.visitElement(element);
+  }
+};
+
 // packages/compiler-cli/src/ngtsc/annotations/component/src/handler.js
 var EMPTY_ARRAY2 = [];
 var isUsedDirective = (decl) => decl.kind === R3TemplateDependencyKind.Directive;
@@ -20490,6 +20517,16 @@ var ComponentDecoratorHandler = class {
         } else {
           throw e;
         }
+      }
+    }
+    if (component.has("animations")) {
+      const { hasAnimations } = analyzeTemplateForAnimations(template.nodes);
+      if (hasAnimations) {
+        if (diagnostics === void 0) {
+          diagnostics = [];
+        }
+        diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_ANIMATIONS_CONFLICT, component.get("animations"), `A component cannot have both the '@Component.animations' property (legacy animations) and use 'animate.enter' or 'animate.leave' in the template.`));
+        isPoisoned = true;
       }
     }
     const templateResource = template.declaration.isInline ? { path: null, node: component.get("template") } : {
