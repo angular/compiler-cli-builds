@@ -4,16 +4,8 @@
     
 import {
   DEFAULT_ERROR_CODE,
-  DecoratorType,
-  DocsExtractor,
   EmitFlags,
-  EntryType,
-  MemberTags,
-  MemberType,
-  NgCompiler,
-  NgCompilerHost,
   NgtscProgram,
-  PatchedProgramIncrementalBuildStrategy,
   SOURCE,
   UNKNOWN_ERROR_CODE,
   calcProjectFileAndBasePath,
@@ -22,31 +14,39 @@ import {
   defaultGatherDiagnostics,
   exitCodeFromResult,
   formatDiagnostics,
-  freshCompilationTicket,
-  incrementalFromStateTicket,
-  isDocEntryWithSourceInfo,
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-MUBGIQHC.js";
+} from "./chunk-ZOLVJRLX.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "./chunk-6HOSNZU5.js";
 import {
-  angularJitApplicationTransform,
-  getDownlevelDecoratorsTransform,
-  getInitializerApiJitTransform
-} from "./chunk-FH72TVU6.js";
+  DecoratorType,
+  DocsExtractor,
+  EntryType,
+  MemberTags,
+  MemberType,
+  NgCompiler,
+  NgCompilerHost,
+  PatchedProgramIncrementalBuildStrategy,
+  freshCompilationTicket,
+  incrementalFromStateTicket,
+  isDocEntryWithSourceInfo
+} from "./chunk-ZOZ6XVF3.js";
 import {
   ActivePerfRecorder,
   ErrorCode,
   OptimizeFor,
   PerfPhase,
   TsCreateProgramDriver,
+  angularJitApplicationTransform,
+  getDownlevelDecoratorsTransform,
+  getInitializerApiJitTransform,
   isLocalCompilationDiagnostics,
   ngErrorCode
-} from "./chunk-MWUTGDMD.js";
+} from "./chunk-3CWKYDQ7.js";
 import "./chunk-LS5RJ5CS.js";
 import {
   InvalidFileSystem,
@@ -77,7 +77,7 @@ import "./chunk-G7GFT6BU.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("21.0.0-next.9+sha-3fbaaa0");
+var VERSION = new Version("21.0.0-next.9+sha-4f21ea7");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
