@@ -11123,7 +11123,7 @@ var CompletionEngine = class {
 // packages/compiler-cli/src/ngtsc/typecheck/src/context.js
 import { ParseSourceFile as ParseSourceFile2 } from "@angular/compiler";
 
-// node_modules/.aspect_rules_js/magic-string@0.30.19/node_modules/magic-string/dist/magic-string.es.mjs
+// node_modules/.aspect_rules_js/magic-string@0.30.21/node_modules/magic-string/dist/magic-string.es.mjs
 import { encode } from "@jridgewell/sourcemap-codec";
 var BitSet = class _BitSet {
   constructor(arg) {
