@@ -3,32 +3,76 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
+  DiagnosticCategoryLabel,
+  NgCompiler
+} from "../chunk-ZOZ6XVF3.js";
+import {
+  CompilationMode,
+  DtsMetadataReader,
   DynamicValue,
+  FatalDiagnosticError,
   ImportManager,
   PartialEvaluator,
   PotentialImportKind,
   PotentialImportMode,
   Reference,
+  ReferenceEmitKind,
+  ReferenceEmitter,
   StaticInterpreter,
+  SymbolKind,
   TypeScriptReflectionHost,
   createForwardRefResolver,
-  reflectObjectLiteral
-} from "../chunk-MWUTGDMD.js";
+  extractDecoratorQueryMetadata,
+  extractTemplate,
+  findAngularDecorator,
+  getAngularDecorators,
+  getRootDirs,
+  isShim,
+  parseDecoratorInputTransformFunction,
+  queryDecoratorNames,
+  reflectObjectLiteral,
+  unwrapExpression
+} from "../chunk-3CWKYDQ7.js";
 import "../chunk-LS5RJ5CS.js";
-import "../chunk-GWZQLAGK.js";
-import "../chunk-XYYEESKY.js";
+import {
+  getFileSystem,
+  isLocalRelativePath
+} from "../chunk-GWZQLAGK.js";
+import {
+  NodeJSFileSystem
+} from "../chunk-XYYEESKY.js";
 import "../chunk-G7GFT6BU.js";
 export {
+  CompilationMode,
+  DiagnosticCategoryLabel,
+  DtsMetadataReader,
   DynamicValue,
+  FatalDiagnosticError,
   ImportManager,
+  NgCompiler,
+  NodeJSFileSystem,
   PartialEvaluator,
   PotentialImportKind,
   PotentialImportMode,
   Reference,
+  ReferenceEmitKind,
+  ReferenceEmitter,
   StaticInterpreter,
+  SymbolKind,
   TypeScriptReflectionHost,
   createForwardRefResolver,
-  reflectObjectLiteral
+  extractDecoratorQueryMetadata,
+  extractTemplate,
+  findAngularDecorator,
+  getAngularDecorators,
+  getFileSystem,
+  getRootDirs,
+  isLocalRelativePath,
+  isShim,
+  parseDecoratorInputTransformFunction,
+  queryDecoratorNames,
+  reflectObjectLiteral,
+  unwrapExpression
 };
 /**
  * @license
