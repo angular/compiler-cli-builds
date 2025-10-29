@@ -29,7 +29,8 @@ export declare enum EntryType {
     Pipe = "pipe",
     TypeAlias = "type_alias",
     UndecoratedClass = "undecorated_class",
-    InitializerApiFunction = "initializer_api_function"
+    InitializerApiFunction = "initializer_api_function",
+    Namespace = "namespace"
 }
 /** Types of class members */
 export declare enum MemberType {
@@ -89,6 +90,7 @@ export interface ConstantEntry extends DocEntry {
 /** Documentation entity for a type alias. */
 export interface TypeAliasEntry extends ConstantEntry {
     generics: GenericEntry[];
+    members?: DocEntry[];
 }
 /** Documentation entity for a TypeScript class. */
 export interface ClassEntry extends DocEntry {
@@ -175,6 +177,10 @@ export interface FunctionDefinitionEntry {
     name: string;
     signatures: FunctionSignatureMetadata[];
     implementation: FunctionSignatureMetadata | null;
+}
+/** Documentation entity for a TypeScript namespace. */
+export interface NamespaceEntry extends DocEntry {
+    members: DocEntry[];
 }
 /**
  * Docs entry describing an initializer API function.
