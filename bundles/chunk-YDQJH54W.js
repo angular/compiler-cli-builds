@@ -12995,7 +12995,7 @@ var Environment = class extends ReferenceEmitEnvironment {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/oob.js
-import { AbsoluteSourceSpan as AbsoluteSourceSpan3, TmplAstBoundEvent as TmplAstBoundEvent2, TmplAstComponent, TmplAstDirective, TmplAstElement } from "@angular/compiler";
+import { AbsoluteSourceSpan as AbsoluteSourceSpan3, TmplAstBoundEvent as TmplAstBoundEvent2, TmplAstComponent, TmplAstDirective, TmplAstElement, ParseSourceSpan as ParseSourceSpan2 } from "@angular/compiler";
 import ts56 from "typescript";
 var OutOfBandDiagnosticRecorderImpl = class {
   resolver;
@@ -13163,7 +13163,23 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
   }
   missingRequiredInputs(id, element, directiveName, isComponent, inputAliases) {
     const message = `Required input${inputAliases.length === 1 ? "" : "s"} ${inputAliases.map((n2) => `'${n2}'`).join(", ")} from ${isComponent ? "component" : "directive"} ${directiveName} must be specified.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), element.startSourceSpan, ts56.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
+    let span;
+    let name;
+    if (element instanceof TmplAstElement || element instanceof TmplAstDirective) {
+      name = element.name;
+    } else if (element instanceof TmplAstComponent) {
+      name = element.componentName;
+    } else {
+      name = null;
+    }
+    if (name === null) {
+      span = element.startSourceSpan;
+    } else {
+      const start = element.startSourceSpan.start.moveBy(1);
+      const end = element.startSourceSpan.end.moveBy(start.offset + name.length - element.startSourceSpan.end.offset);
+      span = new ParseSourceSpan2(start, end);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts56.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
   }
   illegalForLoopTrackAccess(id, block, access) {
     const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, access.sourceSpan);
@@ -16252,7 +16268,7 @@ var TypeCtorOp = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/source.js
-import { ParseLocation as ParseLocation2, ParseSourceSpan as ParseSourceSpan2 } from "@angular/compiler";
+import { ParseLocation as ParseLocation2, ParseSourceSpan as ParseSourceSpan3 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/line_mappings.js
 var LF_CHAR = 10;
@@ -16307,7 +16323,7 @@ var Source = class {
   toParseSourceSpan(start, end) {
     const startLoc = this.toParseLocation(start);
     const endLoc = this.toParseLocation(end);
-    return new ParseSourceSpan2(startLoc, endLoc);
+    return new ParseSourceSpan3(startLoc, endLoc);
   }
   toParseLocation(position) {
     const lineStarts = this.acquireLineStarts();
