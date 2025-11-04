@@ -77,7 +77,7 @@ import "./chunk-G7GFT6BU.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("20.3.9+sha-3d6a206");
+var VERSION = new Version("20.3.9+sha-4f7b97c");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
