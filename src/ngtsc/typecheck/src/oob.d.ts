@@ -129,6 +129,10 @@ export interface OutOfBandDiagnosticRecorder {
      * correctly (e.g. more than one root node).
      */
     deferImplicitTriggerInvalidPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
+    /**
+     * Reports an unsupported binding on a form `Field` node.
+     */
+    formFieldUnsupportedBinding(id: TypeCheckId, node: TmplAstBoundAttribute | TmplAstTextAttribute): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -163,4 +167,5 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     unclaimedDirectiveBinding(id: TypeCheckId, directive: TmplAstDirective, node: TmplAstBoundAttribute | TmplAstTextAttribute | TmplAstBoundEvent): void;
     deferImplicitTriggerMissingPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
     deferImplicitTriggerInvalidPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
+    formFieldUnsupportedBinding(id: TypeCheckId, node: TmplAstBoundAttribute | TmplAstTextAttribute): void;
 }

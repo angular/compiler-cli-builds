@@ -365,6 +365,8 @@ export declare enum ErrorCode {
      * prefetch timer delay that is not earlier than the main timer, or an identical prefetch
      */
     DEFER_TRIGGER_MISCONFIGURATION = 8021,
+    /** Raised when the user has an unsupported binding on a `Field` directive. */
+    FORM_FIELD_UNSUPPORTED_BINDING = 8022,
     /**
      * A two way binding in a template has an incorrect syntax,
      * parentheses outside brackets. For example:
