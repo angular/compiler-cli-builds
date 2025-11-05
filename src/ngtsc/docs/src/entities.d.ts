@@ -38,7 +38,9 @@ export declare enum MemberType {
     Method = "method",
     Getter = "getter",
     Setter = "setter",
-    EnumItem = "enum_item"
+    EnumItem = "enum_item",
+    Interface = "interface",
+    TypeAlias = "type_alias"
 }
 export declare enum DecoratorType {
     Class = "class",
@@ -90,7 +92,7 @@ export interface ConstantEntry extends DocEntry {
 /** Documentation entity for a type alias. */
 export interface TypeAliasEntry extends ConstantEntry {
     generics: GenericEntry[];
-    members?: DocEntry[];
+    members: MemberEntry[];
 }
 /** Documentation entity for a TypeScript class. */
 export interface ClassEntry extends DocEntry {
@@ -161,6 +163,10 @@ export interface PropertyEntry extends MemberEntry {
 }
 /** Sub-entry for a class method. */
 export type MethodEntry = MemberEntry & FunctionEntry;
+/** Sub-entry for an interface (included via namespace). */
+export type InterfaceMemberEntry = MemberEntry & InterfaceEntry;
+/** Sub-entry for a type alias (included via namespace). */
+export type TypeAliasMemberEntry = MemberEntry & TypeAliasEntry;
 /** Sub-entry for a single function parameter. */
 export interface ParameterEntry {
     name: string;

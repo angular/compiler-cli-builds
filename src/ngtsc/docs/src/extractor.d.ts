@@ -32,6 +32,7 @@ export declare class DocsExtractor {
      * exported under the same name.
      */
     private extractDeclarations;
+    private getTypeMembersFromNamespace;
     /** Extract the doc entry for a single declaration. */
     private extractDeclaration;
     /** Gets the list of exported declarations for doc extraction. */

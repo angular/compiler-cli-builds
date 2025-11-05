@@ -17,7 +17,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-DBAV4W4V.js";
+} from "./chunk-NDPPIM5E.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -34,7 +34,7 @@ import {
   freshCompilationTicket,
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo
-} from "./chunk-5UJIUEKT.js";
+} from "./chunk-PLQTNAL2.js";
 import {
   ActivePerfRecorder,
   ErrorCode,
@@ -77,7 +77,7 @@ import "./chunk-G7GFT6BU.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("21.1.0-next.0+sha-a54bea5");
+var VERSION = new Version("21.1.0-next.0+sha-59635bb");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
