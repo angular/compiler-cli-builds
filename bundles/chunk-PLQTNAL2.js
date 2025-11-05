@@ -123,6 +123,8 @@ var MemberType;
   MemberType2["Getter"] = "getter";
   MemberType2["Setter"] = "setter";
   MemberType2["EnumItem"] = "enum_item";
+  MemberType2["Interface"] = "interface";
+  MemberType2["TypeAlias"] = "type_alias";
 })(MemberType || (MemberType = {}));
 var DecoratorType;
 (function(DecoratorType2) {
@@ -1125,7 +1127,8 @@ function extractTypeAlias(declaration) {
     generics: extractGenerics(declaration),
     rawComment: extractRawJsDoc(declaration),
     description: extractJsDocDescription(declaration),
-    jsdocTags: extractJsDocTags(declaration)
+    jsdocTags: extractJsDocTags(declaration),
+    members: []
   };
 }
 
@@ -1239,12 +1242,23 @@ var DocsExtractor = class {
     if (entries.length > 1) {
       const typeAlias = entries.find(isTypeAliasEntry);
       const namespace = entries.find(isNamespaceEntry);
+      const interfaceEntry = entries.find(isInterfaceEntry);
       if (typeAlias && namespace) {
-        typeAlias.members = namespace.members;
+        typeAlias.members.push(...this.getTypeMembersFromNamespace(namespace));
         return typeAlias;
+      }
+      if (interfaceEntry && namespace) {
+        interfaceEntry.members.push(...this.getTypeMembersFromNamespace(namespace));
       }
     }
     return entry ?? null;
+  }
+  getTypeMembersFromNamespace(namespace) {
+    return namespace.members.filter((e) => isInterfaceEntry(e) || isTypeAliasEntry(e)).map((e) => ({
+      ...e,
+      memberType: e.entryType === EntryType.Interface ? MemberType.Interface : MemberType.TypeAlias,
+      memberTags: []
+    }));
   }
   /** Extract the doc entry for a single declaration. */
   extractDeclaration(node) {
@@ -1318,6 +1332,9 @@ function isTypeAliasEntry(e) {
 }
 function isNamespaceEntry(e) {
   return e?.entryType === EntryType.Namespace;
+}
+function isInterfaceEntry(e) {
+  return e?.entryType === EntryType.Interface;
 }
 
 // packages/compiler-cli/src/ngtsc/core/api/src/public_options.js
