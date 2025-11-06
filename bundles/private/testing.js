@@ -2,16 +2,12 @@
       import {createRequire as __cjsCompatRequire} from 'module';
       const require = __cjsCompatRequire(import.meta.url);
     
-import "../chunk-M4UYXMUT.js";
 import {
   ImportedSymbolsTracker,
   TypeScriptReflectionHost,
   getInitializerApiJitTransform
-} from "../chunk-TVCGUMCI.js";
+} from "../chunk-VBBJY6IR.js";
 import "../chunk-LS5RJ5CS.js";
-import {
-  LogLevel
-} from "../chunk-6HOSNZU5.js";
 import {
   InvalidFileSystem,
   absoluteFrom,
@@ -37,22 +33,22 @@ var MockFileSystem = class {
   isCaseSensitive() {
     return this._isCaseSensitive;
   }
-  exists(path2) {
-    return this.findFromPath(path2).entity !== null;
+  exists(path) {
+    return this.findFromPath(path).entity !== null;
   }
-  readFile(path2) {
-    const { entity } = this.findFromPath(path2);
+  readFile(path) {
+    const { entity } = this.findFromPath(path);
     if (isFile(entity)) {
       if (entity instanceof Uint8Array) {
         return new TextDecoder().decode(entity);
       }
       return entity.toString();
     } else {
-      throw new MockFileSystemError("ENOENT", path2, `File "${path2}" does not exist.`);
+      throw new MockFileSystemError("ENOENT", path, `File "${path}" does not exist.`);
     }
   }
-  readFileBuffer(path2) {
-    const { entity } = this.findFromPath(path2);
+  readFileBuffer(path) {
+    const { entity } = this.findFromPath(path);
     if (isFile(entity)) {
       if (entity instanceof Uint8Array) {
         return entity;
@@ -60,60 +56,60 @@ var MockFileSystem = class {
       const encoder = new TextEncoder();
       return encoder.encode(entity);
     } else {
-      throw new MockFileSystemError("ENOENT", path2, `File "${path2}" does not exist.`);
+      throw new MockFileSystemError("ENOENT", path, `File "${path}" does not exist.`);
     }
   }
-  writeFile(path2, data, exclusive = false) {
-    const [folderPath, basename2] = this.splitIntoFolderAndFile(path2);
+  writeFile(path, data, exclusive = false) {
+    const [folderPath, basename2] = this.splitIntoFolderAndFile(path);
     const { entity } = this.findFromPath(folderPath);
     if (entity === null || !isFolder(entity)) {
-      throw new MockFileSystemError("ENOENT", path2, `Unable to write file "${path2}". The containing folder does not exist.`);
+      throw new MockFileSystemError("ENOENT", path, `Unable to write file "${path}". The containing folder does not exist.`);
     }
     if (exclusive && entity[basename2] !== void 0) {
-      throw new MockFileSystemError("EEXIST", path2, `Unable to exclusively write file "${path2}". The file already exists.`);
+      throw new MockFileSystemError("EEXIST", path, `Unable to exclusively write file "${path}". The file already exists.`);
     }
     entity[basename2] = data;
   }
-  removeFile(path2) {
-    const [folderPath, basename2] = this.splitIntoFolderAndFile(path2);
+  removeFile(path) {
+    const [folderPath, basename2] = this.splitIntoFolderAndFile(path);
     const { entity } = this.findFromPath(folderPath);
     if (entity === null || !isFolder(entity)) {
-      throw new MockFileSystemError("ENOENT", path2, `Unable to remove file "${path2}". The containing folder does not exist.`);
+      throw new MockFileSystemError("ENOENT", path, `Unable to remove file "${path}". The containing folder does not exist.`);
     }
     if (isFolder(entity[basename2])) {
-      throw new MockFileSystemError("EISDIR", path2, `Unable to remove file "${path2}". The path to remove is a folder.`);
+      throw new MockFileSystemError("EISDIR", path, `Unable to remove file "${path}". The path to remove is a folder.`);
     }
     delete entity[basename2];
   }
-  symlink(target, path2) {
-    const [folderPath, basename2] = this.splitIntoFolderAndFile(path2);
+  symlink(target, path) {
+    const [folderPath, basename2] = this.splitIntoFolderAndFile(path);
     const { entity } = this.findFromPath(folderPath);
     if (entity === null || !isFolder(entity)) {
-      throw new MockFileSystemError("ENOENT", path2, `Unable to create symlink at "${path2}". The containing folder does not exist.`);
+      throw new MockFileSystemError("ENOENT", path, `Unable to create symlink at "${path}". The containing folder does not exist.`);
     }
     entity[basename2] = new SymLink(target);
   }
-  readdir(path2) {
-    const { entity } = this.findFromPath(path2);
+  readdir(path) {
+    const { entity } = this.findFromPath(path);
     if (entity === null) {
-      throw new MockFileSystemError("ENOENT", path2, `Unable to read directory "${path2}". It does not exist.`);
+      throw new MockFileSystemError("ENOENT", path, `Unable to read directory "${path}". It does not exist.`);
     }
     if (isFile(entity)) {
-      throw new MockFileSystemError("ENOTDIR", path2, `Unable to read directory "${path2}". It is a file.`);
+      throw new MockFileSystemError("ENOTDIR", path, `Unable to read directory "${path}". It is a file.`);
     }
     return Object.keys(entity);
   }
-  lstat(path2) {
-    const { entity } = this.findFromPath(path2);
+  lstat(path) {
+    const { entity } = this.findFromPath(path);
     if (entity === null) {
-      throw new MockFileSystemError("ENOENT", path2, `File "${path2}" does not exist.`);
+      throw new MockFileSystemError("ENOENT", path, `File "${path}" does not exist.`);
     }
     return new MockFileStats(entity);
   }
-  stat(path2) {
-    const { entity } = this.findFromPath(path2, { followSymLinks: true });
+  stat(path) {
+    const { entity } = this.findFromPath(path, { followSymLinks: true });
     if (entity === null) {
-      throw new MockFileSystemError("ENOENT", path2, `File "${path2}" does not exist.`);
+      throw new MockFileSystemError("ENOENT", path, `File "${path}" does not exist.`);
     }
     return new MockFileStats(entity);
   }
@@ -127,8 +123,8 @@ var MockFileSystem = class {
     const name = basename(from);
     delete folder[name];
   }
-  ensureDir(path2) {
-    const segments = this.splitPath(path2).map((segment) => this.getCanonicalPath(segment));
+  ensureDir(path) {
+    const segments = this.splitPath(path).map((segment) => this.getCanonicalPath(segment));
     segments[0] = "";
     if (segments.length > 1 && segments[segments.length - 1] === "") {
       segments.pop();
@@ -145,19 +141,19 @@ var MockFileSystem = class {
     }
     return current;
   }
-  removeDeep(path2) {
-    const [folderPath, basename2] = this.splitIntoFolderAndFile(path2);
+  removeDeep(path) {
+    const [folderPath, basename2] = this.splitIntoFolderAndFile(path);
     const { entity } = this.findFromPath(folderPath);
     if (entity === null || !isFolder(entity)) {
-      throw new MockFileSystemError("ENOENT", path2, `Unable to remove folder "${path2}". The containing folder does not exist.`);
+      throw new MockFileSystemError("ENOENT", path, `Unable to remove folder "${path}". The containing folder does not exist.`);
     }
     delete entity[basename2];
   }
-  isRoot(path2) {
-    return this.dirname(path2) === path2;
+  isRoot(path) {
+    return this.dirname(path) === path;
   }
-  extname(path2) {
-    const match = /.+(\.[^.]*)$/.exec(path2);
+  extname(path) {
+    const match = /.+(\.[^.]*)$/.exec(path);
     return match !== null ? match[1] : "";
   }
   realpath(filePath) {
@@ -171,19 +167,19 @@ var MockFileSystem = class {
   pwd() {
     return this._cwd;
   }
-  chdir(path2) {
-    this._cwd = this.normalize(path2);
+  chdir(path) {
+    this._cwd = this.normalize(path);
   }
   getDefaultLibLocation() {
-    let path2 = "node_modules/typescript/lib";
-    let resolvedPath = this.resolve(path2);
-    const topLevelNodeModules = this.resolve("/" + path2);
+    let path = "node_modules/typescript/lib";
+    let resolvedPath = this.resolve(path);
+    const topLevelNodeModules = this.resolve("/" + path);
     while (resolvedPath !== topLevelNodeModules) {
       if (this.exists(resolvedPath)) {
         return resolvedPath;
       }
-      path2 = "../" + path2;
-      resolvedPath = this.resolve(path2);
+      path = "../" + path;
+      resolvedPath = this.resolve(path);
     }
     return topLevelNodeModules;
   }
@@ -197,11 +193,11 @@ var MockFileSystem = class {
   init(folder) {
     this.mount(this.resolve("/"), folder);
   }
-  mount(path2, folder) {
-    if (this.exists(path2)) {
-      throw new Error(`Unable to mount in '${path2}' as it already exists.`);
+  mount(path, folder) {
+    if (this.exists(path)) {
+      throw new Error(`Unable to mount in '${path}' as it already exists.`);
     }
-    const mountFolder = this.ensureDir(path2);
+    const mountFolder = this.ensureDir(path);
     this.copyInto(folder, mountFolder);
   }
   cloneFolder(folder) {
@@ -210,21 +206,21 @@ var MockFileSystem = class {
     return clone;
   }
   copyInto(from, to) {
-    for (const path2 in from) {
-      const item = from[path2];
-      const canonicalPath = this.getCanonicalPath(path2);
+    for (const path in from) {
+      const item = from[path];
+      const canonicalPath = this.getCanonicalPath(path);
       if (isSymLink(item)) {
         to[canonicalPath] = new SymLink(this.getCanonicalPath(item.path));
       } else if (isFolder(item)) {
         to[canonicalPath] = this.cloneFolder(item);
       } else {
-        to[canonicalPath] = from[path2];
+        to[canonicalPath] = from[path];
       }
     }
   }
-  findFromPath(path2, options) {
+  findFromPath(path, options) {
     const followSymLinks = !!options && options.followSymLinks;
-    const segments = this.splitPath(path2);
+    const segments = this.splitPath(path);
     if (segments.length > 1 && segments[segments.length - 1] === "") {
       segments.pop();
     }
@@ -233,7 +229,7 @@ var MockFileSystem = class {
     while (segments.length) {
       current = current[this.getCanonicalPath(segments.shift())];
       if (current === void 0) {
-        return { path: path2, entity: null };
+        return { path, entity: null };
       }
       if (segments.length > 0) {
         if (isFile(current)) {
@@ -255,12 +251,12 @@ var MockFileSystem = class {
         }
       }
     }
-    return { path: path2, entity: current };
+    return { path, entity: current };
   }
-  splitIntoFolderAndFile(path2) {
-    const segments = this.splitPath(this.getCanonicalPath(path2));
+  splitIntoFolderAndFile(path) {
+    const segments = this.splitPath(this.getCanonicalPath(path));
     const file = segments.pop();
-    return [path2.substring(0, path2.length - file.length - 1), file];
+    return [path.substring(0, path.length - file.length - 1), file];
   }
   getCanonicalPath(p3) {
     return this.isCaseSensitive() ? p3 : p3.toLowerCase();
@@ -268,8 +264,8 @@ var MockFileSystem = class {
 };
 var SymLink = class {
   path;
-  constructor(path2) {
-    this.path = path2;
+  constructor(path) {
+    this.path = path;
   }
 };
 var MockFileStats = class {
@@ -290,10 +286,10 @@ var MockFileStats = class {
 var MockFileSystemError = class extends Error {
   code;
   path;
-  constructor(code, path2, message) {
+  constructor(code, path, message) {
     super(message);
     this.code = code;
-    this.path = path2;
+    this.path = path;
   }
 };
 function isFile(item) {
@@ -332,20 +328,20 @@ var MockFileSystemNative = class extends MockFileSystem {
   isCaseSensitive() {
     return NodeJSFileSystem.prototype.isCaseSensitive.call(this);
   }
-  isRooted(path2) {
-    return NodeJSFileSystem.prototype.isRooted.call(this, path2);
+  isRooted(path) {
+    return NodeJSFileSystem.prototype.isRooted.call(this, path);
   }
-  isRoot(path2) {
-    return NodeJSFileSystem.prototype.isRoot.call(this, path2);
+  isRoot(path) {
+    return NodeJSFileSystem.prototype.isRoot.call(this, path);
   }
-  normalize(path2) {
+  normalize(path) {
     if (isWindows) {
-      path2 = path2.replace(/^[\/\\]/i, "C:/");
+      path = path.replace(/^[\/\\]/i, "C:/");
     }
-    return NodeJSFileSystem.prototype.normalize.call(this, path2);
+    return NodeJSFileSystem.prototype.normalize.call(this, path);
   }
-  splitPath(path2) {
-    return path2.split(/[\\\/]/);
+  splitPath(path) {
+    return path.split(/[\\\/]/);
   }
 };
 
@@ -368,14 +364,14 @@ var MockFileSystemPosix = class extends MockFileSystem {
   basename(filePath, extension) {
     return p.posix.basename(filePath, extension);
   }
-  isRooted(path2) {
-    return path2.startsWith("/");
+  isRooted(path) {
+    return path.startsWith("/");
   }
-  splitPath(path2) {
-    return path2.split("/");
+  splitPath(path) {
+    return path.split("/");
   }
-  normalize(path2) {
-    return path2.replace(/^[a-z]:\//i, "/").replace(/\\/g, "/");
+  normalize(path) {
+    return path.replace(/^[a-z]:\//i, "/").replace(/\\/g, "/");
   }
 };
 
@@ -386,8 +382,8 @@ var MockFileSystemWindows = class extends MockFileSystem {
     const resolved = p2.win32.resolve(this.pwd(), ...paths);
     return this.normalize(resolved);
   }
-  dirname(path2) {
-    return this.normalize(p2.win32.dirname(path2));
+  dirname(path) {
+    return this.normalize(p2.win32.dirname(path));
   }
   join(basePath, ...paths) {
     return this.normalize(p2.win32.join(basePath, ...paths));
@@ -398,14 +394,14 @@ var MockFileSystemWindows = class extends MockFileSystem {
   basename(filePath, extension) {
     return p2.win32.basename(filePath, extension);
   }
-  isRooted(path2) {
-    return /^([A-Z]:)?([\\\/]|$)/i.test(path2);
+  isRooted(path) {
+    return /^([A-Z]:)?([\\\/]|$)/i.test(path);
   }
-  splitPath(path2) {
-    return path2.split(/[\\\/]/);
+  splitPath(path) {
+    return path.split(/[\\\/]/);
   }
-  normalize(path2) {
-    return path2.replace(/^[\/\\]/i, "C:/").replace(/\\/g, "/");
+  normalize(path) {
+    return path.replace(/^[\/\\]/i, "C:/").replace(/\\/g, "/");
   }
 };
 
@@ -437,10 +433,10 @@ runInEachFileSystem.osX = (callback) => runInFileSystem(FS_OS_X, callback, true)
 runInEachFileSystem.unix = (callback) => runInFileSystem(FS_UNIX, callback, true);
 runInEachFileSystem.windows = (callback) => runInFileSystem(FS_WINDOWS, callback, true);
 function initMockFileSystem(os2, cwd) {
-  const fs2 = createMockFileSystem(os2, cwd);
-  setFileSystem(fs2);
-  monkeyPatchTypeScript(fs2);
-  return fs2;
+  const fs = createMockFileSystem(os2, cwd);
+  setFileSystem(fs);
+  monkeyPatchTypeScript(fs);
+  return fs;
 }
 function createMockFileSystem(os2, cwd) {
   switch (os2) {
@@ -468,32 +464,32 @@ function createMockFileSystem(os2, cwd) {
       throw new Error("FileSystem not supported");
   }
 }
-function monkeyPatchTypeScript(fs2) {
-  ts.sys.fileExists = (path2) => {
-    const absPath = fs2.resolve(path2);
-    return fs2.exists(absPath) && fs2.stat(absPath).isFile();
+function monkeyPatchTypeScript(fs) {
+  ts.sys.fileExists = (path) => {
+    const absPath = fs.resolve(path);
+    return fs.exists(absPath) && fs.stat(absPath).isFile();
   };
-  ts.sys.getCurrentDirectory = () => fs2.pwd();
+  ts.sys.getCurrentDirectory = () => fs.pwd();
   ts.sys.getDirectories = getDirectories;
-  ts.sys.readFile = fs2.readFile.bind(fs2);
-  ts.sys.resolvePath = fs2.resolve.bind(fs2);
-  ts.sys.writeFile = fs2.writeFile.bind(fs2);
+  ts.sys.readFile = fs.readFile.bind(fs);
+  ts.sys.resolvePath = fs.resolve.bind(fs);
+  ts.sys.writeFile = fs.writeFile.bind(fs);
   ts.sys.directoryExists = directoryExists;
   ts.sys.readDirectory = readDirectory;
-  function getDirectories(path2) {
-    return fs2.readdir(absoluteFrom(path2)).filter((p3) => fs2.stat(fs2.resolve(path2, p3)).isDirectory());
+  function getDirectories(path) {
+    return fs.readdir(absoluteFrom(path)).filter((p3) => fs.stat(fs.resolve(path, p3)).isDirectory());
   }
-  function getFileSystemEntries(path2) {
+  function getFileSystemEntries(path) {
     const files = [];
     const directories = [];
-    const absPath = fs2.resolve(path2);
-    const entries = fs2.readdir(absPath);
+    const absPath = fs.resolve(path);
+    const entries = fs.readdir(absPath);
     for (const entry of entries) {
       if (entry == "." || entry === "..") {
         continue;
       }
-      const absPath2 = fs2.resolve(path2, entry);
-      const stat = fs2.stat(absPath2);
+      const absPath2 = fs.resolve(path, entry);
+      const stat = fs.stat(absPath2);
       if (stat.isDirectory()) {
         directories.push(absPath2);
       } else if (stat.isFile()) {
@@ -502,180 +498,24 @@ function monkeyPatchTypeScript(fs2) {
     }
     return { files, directories };
   }
-  function realPath(path2) {
-    return fs2.realpath(fs2.resolve(path2));
+  function realPath(path) {
+    return fs.realpath(fs.resolve(path));
   }
-  function directoryExists(path2) {
-    const absPath = fs2.resolve(path2);
-    return fs2.exists(absPath) && fs2.stat(absPath).isDirectory();
+  function directoryExists(path) {
+    const absPath = fs.resolve(path);
+    return fs.exists(absPath) && fs.stat(absPath).isDirectory();
   }
   const tsMatchFiles = ts.matchFiles;
-  function readDirectory(path2, extensions, excludes, includes, depth) {
-    return tsMatchFiles(path2, extensions, excludes, includes, fs2.isCaseSensitive(), fs2.pwd(), depth, getFileSystemEntries, realPath, directoryExists);
+  function readDirectory(path, extensions, excludes, includes, depth) {
+    return tsMatchFiles(path, extensions, excludes, includes, fs.isCaseSensitive(), fs.pwd(), depth, getFileSystemEntries, realPath, directoryExists);
   }
-}
-
-// packages/compiler-cli/src/ngtsc/logging/testing/src/mock_logger.js
-var MockLogger = class {
-  level;
-  constructor(level = LogLevel.info) {
-    this.level = level;
-  }
-  logs = {
-    debug: [],
-    info: [],
-    warn: [],
-    error: []
-  };
-  debug(...args) {
-    this.logs.debug.push(args);
-  }
-  info(...args) {
-    this.logs.info.push(args);
-  }
-  warn(...args) {
-    this.logs.warn.push(args);
-  }
-  error(...args) {
-    this.logs.error.push(args);
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/testing/src/utils.js
-import ts3 from "typescript";
-
-// packages/compiler-cli/src/ngtsc/testing/src/cached_source_files.js
-import ts2 from "typescript";
-var sourceFileCache = /* @__PURE__ */ new Map();
-function getCachedSourceFile(fileName, load) {
-  if (!/^lib\..+\.d\.ts$/.test(basename(fileName)) && !/\/node_modules\/(@angular|rxjs)\//.test(fileName)) {
-    return null;
-  }
-  const content = load();
-  if (content === void 0) {
-    return null;
-  }
-  if (!sourceFileCache.has(fileName) || sourceFileCache.get(fileName).text !== content) {
-    const sf = ts2.createSourceFile(fileName, content, ts2.ScriptTarget.ES2015);
-    sourceFileCache.set(fileName, sf);
-  }
-  return sourceFileCache.get(fileName);
-}
-
-// packages/compiler-cli/src/ngtsc/testing/src/utils.js
-var TsStructureIsReused;
-(function(TsStructureIsReused2) {
-  TsStructureIsReused2[TsStructureIsReused2["Not"] = 0] = "Not";
-  TsStructureIsReused2[TsStructureIsReused2["SafeModules"] = 1] = "SafeModules";
-  TsStructureIsReused2[TsStructureIsReused2["Completely"] = 2] = "Completely";
-})(TsStructureIsReused || (TsStructureIsReused = {}));
-
-// packages/compiler-cli/src/ngtsc/testing/src/mock_file_loading.js
-import { readdirSync as readdirSync2, readFileSync as readFileSync2, statSync } from "fs";
-import { resolve as resolve3 } from "path";
-
-// packages/compiler-cli/src/ngtsc/testing/src/runfile_helpers.js
-import * as fs from "fs";
-import * as path from "path";
-function getAngularPackagesFromRunfiles() {
-  const runfilesManifestPath = process.env["RUNFILES_MANIFEST_FILE"];
-  if (!runfilesManifestPath) {
-    const packageRunfilesDir = path.join(process.env["RUNFILES"], "_main/packages");
-    return fs.readdirSync(packageRunfilesDir).map((name) => ({ name, pkgPath: path.join(packageRunfilesDir, name, "npm_package/") })).filter(({ pkgPath }) => fs.existsSync(pkgPath));
-  }
-  return fs.readFileSync(runfilesManifestPath, "utf8").split("\n").map((mapping) => mapping.split(" ")).filter(([runfilePath]) => runfilePath.match(/^_main\/packages\/[\w-]+\/npm_package$/)).map(([runfilePath, realPath]) => ({
-    name: path.relative("_main/packages", runfilePath).split(path.sep)[0],
-    pkgPath: realPath
-  }));
-}
-function resolveFromRunfiles(manifestPath) {
-  return path.resolve(process.env["RUNFILES"], manifestPath);
-}
-
-// packages/compiler-cli/src/ngtsc/testing/src/mock_file_loading.js
-var CachedFolder = class {
-  loader;
-  folder = null;
-  constructor(loader) {
-    this.loader = loader;
-  }
-  get() {
-    if (this.folder === null) {
-      this.folder = this.loader();
-    }
-    return this.folder;
-  }
-};
-var typescriptFolder = new CachedFolder(() => loadFolder(resolveFromRunfiles("_main/node_modules/typescript")));
-var angularFolder = new CachedFolder(loadAngularFolder);
-var rxjsFolder = new CachedFolder(() => loadFolder(resolveFromRunfiles("_main/node_modules/rxjs")));
-function loadStandardTestFiles({ fakeCommon = false, rxjs = false, forms = false } = {}) {
-  const tmpFs = new MockFileSystemPosix(true);
-  const basePath = "/";
-  tmpFs.mount(tmpFs.resolve("/node_modules/typescript"), typescriptFolder.get());
-  tmpFs.mount(tmpFs.resolve("/node_modules/@angular"), angularFolder.get());
-  loadTsLib(tmpFs, basePath);
-  if (fakeCommon) {
-    loadFakeCommon(tmpFs, basePath);
-  }
-  if (rxjs) {
-    tmpFs.mount(tmpFs.resolve("/node_modules/rxjs"), rxjsFolder.get());
-  }
-  if (forms) {
-    loadAngularForms(tmpFs, basePath);
-  }
-  return tmpFs.dump();
-}
-function loadTsLib(fs2, basePath = "/") {
-  loadTestDirectory(fs2, resolveFromRunfiles("_main/node_modules/tslib"), fs2.resolve(basePath, "node_modules/tslib"));
-}
-function loadFakeCommon(fs2, basePath = "/") {
-  loadTestDirectory(fs2, resolveFromRunfiles("_main/packages/compiler-cli/src/ngtsc/testing/fake_common/npm_package"), fs2.resolve(basePath, "node_modules/@angular/common"));
-}
-function loadAngularForms(fs2, basePath = "/") {
-  loadTestDirectory(fs2, resolveFromRunfiles("_main/packages/forms/npm_package"), fs2.resolve(basePath, "node_modules/@angular/forms"));
-}
-function loadFolder(path2) {
-  const tmpFs = new MockFileSystemPosix(true);
-  loadTestDirectory(tmpFs, path2, tmpFs.resolve("/"));
-  return tmpFs.dump();
-}
-function loadAngularFolder() {
-  const tmpFs = new MockFileSystemPosix(true);
-  getAngularPackagesFromRunfiles().forEach(({ name, pkgPath }) => {
-    loadTestDirectory(tmpFs, pkgPath, tmpFs.resolve(name));
-  });
-  return tmpFs.dump();
-}
-function loadTestDirectory(fs2, directoryPath, mockPath) {
-  readdirSync2(directoryPath).forEach((item) => {
-    const srcPath = resolve3(directoryPath, item);
-    const targetPath = fs2.resolve(mockPath, item);
-    try {
-      if (statSync(srcPath).isDirectory()) {
-        fs2.ensureDir(targetPath);
-        loadTestDirectory(fs2, srcPath, targetPath);
-      } else {
-        fs2.ensureDir(fs2.dirname(targetPath));
-        fs2.writeFile(targetPath, readFileSync2(srcPath, "utf-8"));
-      }
-    } catch (e) {
-      console.warn(`Failed to add ${srcPath} to the mock file-system: ${e.message}`);
-    }
-  });
 }
 export {
   ImportedSymbolsTracker,
   MockFileSystem,
-  MockFileSystemNative,
-  MockLogger,
   TypeScriptReflectionHost,
-  getCachedSourceFile,
   getInitializerApiJitTransform,
-  initMockFileSystem,
-  loadStandardTestFiles,
-  loadTestDirectory,
-  runInEachFileSystem
+  initMockFileSystem
 };
 /**
  * @license

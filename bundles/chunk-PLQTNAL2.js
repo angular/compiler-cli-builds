@@ -87,7 +87,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-TVCGUMCI.js";
+} from "./chunk-VBBJY6IR.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -96,14 +96,6 @@ import {
   join,
   resolve
 } from "./chunk-GWZQLAGK.js";
-
-// packages/compiler-cli/src/ngtsc/core/api/src/public_options.js
-var DiagnosticCategoryLabel;
-(function(DiagnosticCategoryLabel2) {
-  DiagnosticCategoryLabel2["Warning"] = "warning";
-  DiagnosticCategoryLabel2["Error"] = "error";
-  DiagnosticCategoryLabel2["Suppress"] = "suppress";
-})(DiagnosticCategoryLabel || (DiagnosticCategoryLabel = {}));
 
 // packages/compiler-cli/src/ngtsc/docs/src/entities.js
 var EntryType;
@@ -1345,354 +1337,13 @@ function isInterfaceEntry(e) {
   return e?.entryType === EntryType.Interface;
 }
 
-// packages/compiler-cli/src/ngtsc/incremental/src/strategy.js
-var TrackedIncrementalBuildStrategy = class _TrackedIncrementalBuildStrategy {
-  state = null;
-  isSet = false;
-  getIncrementalState() {
-    return this.state;
-  }
-  setIncrementalState(state) {
-    this.state = state;
-    this.isSet = true;
-  }
-  toNextBuildStrategy() {
-    const strategy = new _TrackedIncrementalBuildStrategy();
-    strategy.state = this.isSet ? this.state : null;
-    return strategy;
-  }
-};
-var PatchedProgramIncrementalBuildStrategy = class {
-  getIncrementalState(program) {
-    const state = program[SYM_INCREMENTAL_STATE];
-    if (state === void 0) {
-      return null;
-    }
-    return state;
-  }
-  setIncrementalState(state, program) {
-    program[SYM_INCREMENTAL_STATE] = state;
-  }
-  toNextBuildStrategy() {
-    return this;
-  }
-};
-var SYM_INCREMENTAL_STATE = Symbol("NgIncrementalState");
-
-// packages/compiler-cli/src/ngtsc/incremental/src/dependency_tracking.js
-var FileDependencyGraph = class {
-  nodes = /* @__PURE__ */ new Map();
-  addDependency(from, on) {
-    this.nodeFor(from).dependsOn.add(absoluteFromSourceFile(on));
-  }
-  addResourceDependency(from, resource) {
-    this.nodeFor(from).usesResources.add(resource);
-  }
-  recordDependencyAnalysisFailure(file) {
-    this.nodeFor(file).failedAnalysis = true;
-  }
-  getResourceDependencies(from) {
-    const node = this.nodes.get(from);
-    return node ? [...node.usesResources] : [];
-  }
-  /**
-   * Update the current dependency graph from a previous one, incorporating a set of physical
-   * changes.
-   *
-   * This method performs two tasks:
-   *
-   * 1. For files which have not logically changed, their dependencies from `previous` are added to
-   *    `this` graph.
-   * 2. For files which have logically changed, they're added to a set of logically changed files
-   *    which is eventually returned.
-   *
-   * In essence, for build `n`, this method performs:
-   *
-   * G(n) + L(n) = G(n - 1) + P(n)
-   *
-   * where:
-   *
-   * G(n) = the dependency graph of build `n`
-   * L(n) = the logically changed files from build n - 1 to build n.
-   * P(n) = the physically changed files from build n - 1 to build n.
-   */
-  updateWithPhysicalChanges(previous, changedTsPaths, deletedTsPaths, changedResources) {
-    const logicallyChanged = /* @__PURE__ */ new Set();
-    for (const sf of previous.nodes.keys()) {
-      const sfPath = absoluteFromSourceFile(sf);
-      const node = previous.nodeFor(sf);
-      if (isLogicallyChanged(sf, node, changedTsPaths, deletedTsPaths, changedResources)) {
-        logicallyChanged.add(sfPath);
-      } else if (!deletedTsPaths.has(sfPath)) {
-        this.nodes.set(sf, {
-          dependsOn: new Set(node.dependsOn),
-          usesResources: new Set(node.usesResources),
-          failedAnalysis: false
-        });
-      }
-    }
-    return logicallyChanged;
-  }
-  nodeFor(sf) {
-    if (!this.nodes.has(sf)) {
-      this.nodes.set(sf, {
-        dependsOn: /* @__PURE__ */ new Set(),
-        usesResources: /* @__PURE__ */ new Set(),
-        failedAnalysis: false
-      });
-    }
-    return this.nodes.get(sf);
-  }
-};
-function isLogicallyChanged(sf, node, changedTsPaths, deletedTsPaths, changedResources) {
-  if (node.failedAnalysis) {
-    return true;
-  }
-  const sfPath = absoluteFromSourceFile(sf);
-  if (changedTsPaths.has(sfPath) || deletedTsPaths.has(sfPath)) {
-    return true;
-  }
-  for (const dep of node.dependsOn) {
-    if (changedTsPaths.has(dep) || deletedTsPaths.has(dep)) {
-      return true;
-    }
-  }
-  for (const dep of node.usesResources) {
-    if (changedResources.has(dep)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// packages/compiler-cli/src/ngtsc/incremental/src/state.js
-var IncrementalStateKind;
-(function(IncrementalStateKind2) {
-  IncrementalStateKind2[IncrementalStateKind2["Fresh"] = 0] = "Fresh";
-  IncrementalStateKind2[IncrementalStateKind2["Delta"] = 1] = "Delta";
-  IncrementalStateKind2[IncrementalStateKind2["Analyzed"] = 2] = "Analyzed";
-})(IncrementalStateKind || (IncrementalStateKind = {}));
-
-// packages/compiler-cli/src/ngtsc/incremental/src/incremental.js
-var PhaseKind;
-(function(PhaseKind2) {
-  PhaseKind2[PhaseKind2["Analysis"] = 0] = "Analysis";
-  PhaseKind2[PhaseKind2["TypeCheckAndEmit"] = 1] = "TypeCheckAndEmit";
-})(PhaseKind || (PhaseKind = {}));
-var IncrementalCompilation = class _IncrementalCompilation {
-  depGraph;
-  versions;
-  step;
-  phase;
-  /**
-   * `IncrementalState` of this compilation if it were to be reused in a subsequent incremental
-   * compilation at the current moment.
-   *
-   * Exposed via the `state` read-only getter.
-   */
-  _state;
-  constructor(state, depGraph, versions, step) {
-    this.depGraph = depGraph;
-    this.versions = versions;
-    this.step = step;
-    this._state = state;
-    this.phase = {
-      kind: PhaseKind.Analysis,
-      semanticDepGraphUpdater: new SemanticDepGraphUpdater(step !== null ? step.priorState.semanticDepGraph : null)
-    };
-  }
-  /**
-   * Begin a fresh `IncrementalCompilation`.
-   */
-  static fresh(program, versions) {
-    const state = {
-      kind: IncrementalStateKind.Fresh
-    };
-    return new _IncrementalCompilation(
-      state,
-      new FileDependencyGraph(),
-      versions,
-      /* reuse */
-      null
-    );
-  }
-  static incremental(program, newVersions, oldProgram, oldState, modifiedResourceFiles, perf) {
-    return perf.inPhase(PerfPhase.Reconciliation, () => {
-      const physicallyChangedTsFiles = /* @__PURE__ */ new Set();
-      const changedResourceFiles = new Set(modifiedResourceFiles ?? []);
-      let priorAnalysis;
-      switch (oldState.kind) {
-        case IncrementalStateKind.Fresh:
-          return _IncrementalCompilation.fresh(program, newVersions);
-        case IncrementalStateKind.Analyzed:
-          priorAnalysis = oldState;
-          break;
-        case IncrementalStateKind.Delta:
-          priorAnalysis = oldState.lastAnalyzedState;
-          for (const sfPath of oldState.physicallyChangedTsFiles) {
-            physicallyChangedTsFiles.add(sfPath);
-          }
-          for (const resourcePath of oldState.changedResourceFiles) {
-            changedResourceFiles.add(resourcePath);
-          }
-          break;
-      }
-      const oldVersions = priorAnalysis.versions;
-      const oldFilesArray = oldProgram.getSourceFiles().map(toOriginalSourceFile);
-      const oldFiles = new Set(oldFilesArray);
-      const deletedTsFiles = new Set(oldFilesArray.map((sf) => absoluteFromSourceFile(sf)));
-      for (const possiblyRedirectedNewFile of program.getSourceFiles()) {
-        const sf = toOriginalSourceFile(possiblyRedirectedNewFile);
-        const sfPath = absoluteFromSourceFile(sf);
-        deletedTsFiles.delete(sfPath);
-        if (oldFiles.has(sf)) {
-          if (oldVersions === null || newVersions === null) {
-            continue;
-          }
-          if (oldVersions.has(sfPath) && newVersions.has(sfPath) && oldVersions.get(sfPath) === newVersions.get(sfPath)) {
-            continue;
-          }
-        }
-        if (sf.isDeclarationFile) {
-          return _IncrementalCompilation.fresh(program, newVersions);
-        }
-        physicallyChangedTsFiles.add(sfPath);
-      }
-      for (const deletedFileName of deletedTsFiles) {
-        physicallyChangedTsFiles.delete(resolve(deletedFileName));
-      }
-      const depGraph = new FileDependencyGraph();
-      const logicallyChangedTsFiles = depGraph.updateWithPhysicalChanges(priorAnalysis.depGraph, physicallyChangedTsFiles, deletedTsFiles, changedResourceFiles);
-      for (const sfPath of physicallyChangedTsFiles) {
-        logicallyChangedTsFiles.add(sfPath);
-      }
-      const state = {
-        kind: IncrementalStateKind.Delta,
-        physicallyChangedTsFiles,
-        changedResourceFiles,
-        lastAnalyzedState: priorAnalysis
-      };
-      return new _IncrementalCompilation(state, depGraph, newVersions, {
-        priorState: priorAnalysis,
-        logicallyChangedTsFiles
-      });
-    });
-  }
-  get state() {
-    return this._state;
-  }
-  get semanticDepGraphUpdater() {
-    if (this.phase.kind !== PhaseKind.Analysis) {
-      throw new Error(`AssertionError: Cannot update the SemanticDepGraph after analysis completes`);
-    }
-    return this.phase.semanticDepGraphUpdater;
-  }
-  recordSuccessfulAnalysis(traitCompiler) {
-    if (this.phase.kind !== PhaseKind.Analysis) {
-      throw new Error(`AssertionError: Incremental compilation in phase ${PhaseKind[this.phase.kind]}, expected Analysis`);
-    }
-    const { needsEmit, needsTypeCheckEmit, newGraph } = this.phase.semanticDepGraphUpdater.finalize();
-    let emitted;
-    if (this.step === null) {
-      emitted = /* @__PURE__ */ new Set();
-    } else {
-      emitted = new Set(this.step.priorState.emitted);
-      for (const sfPath of this.step.logicallyChangedTsFiles) {
-        emitted.delete(sfPath);
-      }
-      for (const sfPath of needsEmit) {
-        emitted.delete(sfPath);
-      }
-    }
-    this._state = {
-      kind: IncrementalStateKind.Analyzed,
-      versions: this.versions,
-      depGraph: this.depGraph,
-      semanticDepGraph: newGraph,
-      priorAnalysis: traitCompiler.getAnalyzedRecords(),
-      typeCheckResults: null,
-      emitted
-    };
-    this.phase = {
-      kind: PhaseKind.TypeCheckAndEmit,
-      needsEmit,
-      needsTypeCheckEmit
-    };
-  }
-  recordSuccessfulTypeCheck(results) {
-    if (this._state.kind !== IncrementalStateKind.Analyzed) {
-      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
-    } else if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
-      throw new Error(`AssertionError: Incremental compilation in phase ${PhaseKind[this.phase.kind]}, expected TypeCheck`);
-    }
-    this._state.typeCheckResults = results;
-  }
-  recordSuccessfulEmit(sf) {
-    if (this._state.kind !== IncrementalStateKind.Analyzed) {
-      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
-    }
-    this._state.emitted.add(absoluteFromSourceFile(sf));
-  }
-  priorAnalysisFor(sf) {
-    if (this.step === null) {
-      return null;
-    }
-    const sfPath = absoluteFromSourceFile(sf);
-    if (this.step.logicallyChangedTsFiles.has(sfPath)) {
-      return null;
-    }
-    const priorAnalysis = this.step.priorState.priorAnalysis;
-    if (!priorAnalysis.has(sf)) {
-      return null;
-    }
-    return priorAnalysis.get(sf);
-  }
-  priorTypeCheckingResultsFor(sf) {
-    if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
-      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
-    }
-    if (this.step === null) {
-      return null;
-    }
-    const sfPath = absoluteFromSourceFile(sf);
-    if (this.step.logicallyChangedTsFiles.has(sfPath) || this.phase.needsTypeCheckEmit.has(sfPath)) {
-      return null;
-    }
-    if (this.step.priorState.typeCheckResults === null || !this.step.priorState.typeCheckResults.has(sfPath)) {
-      return null;
-    }
-    const priorResults = this.step.priorState.typeCheckResults.get(sfPath);
-    if (priorResults.hasInlines) {
-      return null;
-    }
-    return priorResults;
-  }
-  safeToSkipEmit(sf) {
-    if (this.step === null) {
-      return false;
-    }
-    const sfPath = absoluteFromSourceFile(sf);
-    if (this.step.logicallyChangedTsFiles.has(sfPath)) {
-      return false;
-    }
-    if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
-      throw new Error(`AssertionError: Expected successful analysis before attempting to emit files`);
-    }
-    if (this.phase.needsEmit.has(sfPath)) {
-      return false;
-    }
-    return this.step.priorState.emitted.has(sfPath);
-  }
-};
-function toOriginalSourceFile(sf) {
-  const unredirectedSf = toUnredirectedSourceFile(sf);
-  const originalFile = unredirectedSf[NgOriginalFile];
-  if (originalFile !== void 0) {
-    return originalFile;
-  } else {
-    return unredirectedSf;
-  }
-}
+// packages/compiler-cli/src/ngtsc/core/api/src/public_options.js
+var DiagnosticCategoryLabel;
+(function(DiagnosticCategoryLabel2) {
+  DiagnosticCategoryLabel2["Warning"] = "warning";
+  DiagnosticCategoryLabel2["Error"] = "error";
+  DiagnosticCategoryLabel2["Suppress"] = "suppress";
+})(DiagnosticCategoryLabel || (DiagnosticCategoryLabel = {}));
 
 // packages/compiler-cli/src/ngtsc/core/src/compiler.js
 import ts27 from "typescript";
@@ -2098,6 +1749,355 @@ var ReferenceGraph = class {
     }
   }
 };
+
+// packages/compiler-cli/src/ngtsc/incremental/src/dependency_tracking.js
+var FileDependencyGraph = class {
+  nodes = /* @__PURE__ */ new Map();
+  addDependency(from, on) {
+    this.nodeFor(from).dependsOn.add(absoluteFromSourceFile(on));
+  }
+  addResourceDependency(from, resource) {
+    this.nodeFor(from).usesResources.add(resource);
+  }
+  recordDependencyAnalysisFailure(file) {
+    this.nodeFor(file).failedAnalysis = true;
+  }
+  getResourceDependencies(from) {
+    const node = this.nodes.get(from);
+    return node ? [...node.usesResources] : [];
+  }
+  /**
+   * Update the current dependency graph from a previous one, incorporating a set of physical
+   * changes.
+   *
+   * This method performs two tasks:
+   *
+   * 1. For files which have not logically changed, their dependencies from `previous` are added to
+   *    `this` graph.
+   * 2. For files which have logically changed, they're added to a set of logically changed files
+   *    which is eventually returned.
+   *
+   * In essence, for build `n`, this method performs:
+   *
+   * G(n) + L(n) = G(n - 1) + P(n)
+   *
+   * where:
+   *
+   * G(n) = the dependency graph of build `n`
+   * L(n) = the logically changed files from build n - 1 to build n.
+   * P(n) = the physically changed files from build n - 1 to build n.
+   */
+  updateWithPhysicalChanges(previous, changedTsPaths, deletedTsPaths, changedResources) {
+    const logicallyChanged = /* @__PURE__ */ new Set();
+    for (const sf of previous.nodes.keys()) {
+      const sfPath = absoluteFromSourceFile(sf);
+      const node = previous.nodeFor(sf);
+      if (isLogicallyChanged(sf, node, changedTsPaths, deletedTsPaths, changedResources)) {
+        logicallyChanged.add(sfPath);
+      } else if (!deletedTsPaths.has(sfPath)) {
+        this.nodes.set(sf, {
+          dependsOn: new Set(node.dependsOn),
+          usesResources: new Set(node.usesResources),
+          failedAnalysis: false
+        });
+      }
+    }
+    return logicallyChanged;
+  }
+  nodeFor(sf) {
+    if (!this.nodes.has(sf)) {
+      this.nodes.set(sf, {
+        dependsOn: /* @__PURE__ */ new Set(),
+        usesResources: /* @__PURE__ */ new Set(),
+        failedAnalysis: false
+      });
+    }
+    return this.nodes.get(sf);
+  }
+};
+function isLogicallyChanged(sf, node, changedTsPaths, deletedTsPaths, changedResources) {
+  if (node.failedAnalysis) {
+    return true;
+  }
+  const sfPath = absoluteFromSourceFile(sf);
+  if (changedTsPaths.has(sfPath) || deletedTsPaths.has(sfPath)) {
+    return true;
+  }
+  for (const dep of node.dependsOn) {
+    if (changedTsPaths.has(dep) || deletedTsPaths.has(dep)) {
+      return true;
+    }
+  }
+  for (const dep of node.usesResources) {
+    if (changedResources.has(dep)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// packages/compiler-cli/src/ngtsc/incremental/src/state.js
+var IncrementalStateKind;
+(function(IncrementalStateKind2) {
+  IncrementalStateKind2[IncrementalStateKind2["Fresh"] = 0] = "Fresh";
+  IncrementalStateKind2[IncrementalStateKind2["Delta"] = 1] = "Delta";
+  IncrementalStateKind2[IncrementalStateKind2["Analyzed"] = 2] = "Analyzed";
+})(IncrementalStateKind || (IncrementalStateKind = {}));
+
+// packages/compiler-cli/src/ngtsc/incremental/src/incremental.js
+var PhaseKind;
+(function(PhaseKind2) {
+  PhaseKind2[PhaseKind2["Analysis"] = 0] = "Analysis";
+  PhaseKind2[PhaseKind2["TypeCheckAndEmit"] = 1] = "TypeCheckAndEmit";
+})(PhaseKind || (PhaseKind = {}));
+var IncrementalCompilation = class _IncrementalCompilation {
+  depGraph;
+  versions;
+  step;
+  phase;
+  /**
+   * `IncrementalState` of this compilation if it were to be reused in a subsequent incremental
+   * compilation at the current moment.
+   *
+   * Exposed via the `state` read-only getter.
+   */
+  _state;
+  constructor(state, depGraph, versions, step) {
+    this.depGraph = depGraph;
+    this.versions = versions;
+    this.step = step;
+    this._state = state;
+    this.phase = {
+      kind: PhaseKind.Analysis,
+      semanticDepGraphUpdater: new SemanticDepGraphUpdater(step !== null ? step.priorState.semanticDepGraph : null)
+    };
+  }
+  /**
+   * Begin a fresh `IncrementalCompilation`.
+   */
+  static fresh(program, versions) {
+    const state = {
+      kind: IncrementalStateKind.Fresh
+    };
+    return new _IncrementalCompilation(
+      state,
+      new FileDependencyGraph(),
+      versions,
+      /* reuse */
+      null
+    );
+  }
+  static incremental(program, newVersions, oldProgram, oldState, modifiedResourceFiles, perf) {
+    return perf.inPhase(PerfPhase.Reconciliation, () => {
+      const physicallyChangedTsFiles = /* @__PURE__ */ new Set();
+      const changedResourceFiles = new Set(modifiedResourceFiles ?? []);
+      let priorAnalysis;
+      switch (oldState.kind) {
+        case IncrementalStateKind.Fresh:
+          return _IncrementalCompilation.fresh(program, newVersions);
+        case IncrementalStateKind.Analyzed:
+          priorAnalysis = oldState;
+          break;
+        case IncrementalStateKind.Delta:
+          priorAnalysis = oldState.lastAnalyzedState;
+          for (const sfPath of oldState.physicallyChangedTsFiles) {
+            physicallyChangedTsFiles.add(sfPath);
+          }
+          for (const resourcePath of oldState.changedResourceFiles) {
+            changedResourceFiles.add(resourcePath);
+          }
+          break;
+      }
+      const oldVersions = priorAnalysis.versions;
+      const oldFilesArray = oldProgram.getSourceFiles().map(toOriginalSourceFile);
+      const oldFiles = new Set(oldFilesArray);
+      const deletedTsFiles = new Set(oldFilesArray.map((sf) => absoluteFromSourceFile(sf)));
+      for (const possiblyRedirectedNewFile of program.getSourceFiles()) {
+        const sf = toOriginalSourceFile(possiblyRedirectedNewFile);
+        const sfPath = absoluteFromSourceFile(sf);
+        deletedTsFiles.delete(sfPath);
+        if (oldFiles.has(sf)) {
+          if (oldVersions === null || newVersions === null) {
+            continue;
+          }
+          if (oldVersions.has(sfPath) && newVersions.has(sfPath) && oldVersions.get(sfPath) === newVersions.get(sfPath)) {
+            continue;
+          }
+        }
+        if (sf.isDeclarationFile) {
+          return _IncrementalCompilation.fresh(program, newVersions);
+        }
+        physicallyChangedTsFiles.add(sfPath);
+      }
+      for (const deletedFileName of deletedTsFiles) {
+        physicallyChangedTsFiles.delete(resolve(deletedFileName));
+      }
+      const depGraph = new FileDependencyGraph();
+      const logicallyChangedTsFiles = depGraph.updateWithPhysicalChanges(priorAnalysis.depGraph, physicallyChangedTsFiles, deletedTsFiles, changedResourceFiles);
+      for (const sfPath of physicallyChangedTsFiles) {
+        logicallyChangedTsFiles.add(sfPath);
+      }
+      const state = {
+        kind: IncrementalStateKind.Delta,
+        physicallyChangedTsFiles,
+        changedResourceFiles,
+        lastAnalyzedState: priorAnalysis
+      };
+      return new _IncrementalCompilation(state, depGraph, newVersions, {
+        priorState: priorAnalysis,
+        logicallyChangedTsFiles
+      });
+    });
+  }
+  get state() {
+    return this._state;
+  }
+  get semanticDepGraphUpdater() {
+    if (this.phase.kind !== PhaseKind.Analysis) {
+      throw new Error(`AssertionError: Cannot update the SemanticDepGraph after analysis completes`);
+    }
+    return this.phase.semanticDepGraphUpdater;
+  }
+  recordSuccessfulAnalysis(traitCompiler) {
+    if (this.phase.kind !== PhaseKind.Analysis) {
+      throw new Error(`AssertionError: Incremental compilation in phase ${PhaseKind[this.phase.kind]}, expected Analysis`);
+    }
+    const { needsEmit, needsTypeCheckEmit, newGraph } = this.phase.semanticDepGraphUpdater.finalize();
+    let emitted;
+    if (this.step === null) {
+      emitted = /* @__PURE__ */ new Set();
+    } else {
+      emitted = new Set(this.step.priorState.emitted);
+      for (const sfPath of this.step.logicallyChangedTsFiles) {
+        emitted.delete(sfPath);
+      }
+      for (const sfPath of needsEmit) {
+        emitted.delete(sfPath);
+      }
+    }
+    this._state = {
+      kind: IncrementalStateKind.Analyzed,
+      versions: this.versions,
+      depGraph: this.depGraph,
+      semanticDepGraph: newGraph,
+      priorAnalysis: traitCompiler.getAnalyzedRecords(),
+      typeCheckResults: null,
+      emitted
+    };
+    this.phase = {
+      kind: PhaseKind.TypeCheckAndEmit,
+      needsEmit,
+      needsTypeCheckEmit
+    };
+  }
+  recordSuccessfulTypeCheck(results) {
+    if (this._state.kind !== IncrementalStateKind.Analyzed) {
+      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
+    } else if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
+      throw new Error(`AssertionError: Incremental compilation in phase ${PhaseKind[this.phase.kind]}, expected TypeCheck`);
+    }
+    this._state.typeCheckResults = results;
+  }
+  recordSuccessfulEmit(sf) {
+    if (this._state.kind !== IncrementalStateKind.Analyzed) {
+      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
+    }
+    this._state.emitted.add(absoluteFromSourceFile(sf));
+  }
+  priorAnalysisFor(sf) {
+    if (this.step === null) {
+      return null;
+    }
+    const sfPath = absoluteFromSourceFile(sf);
+    if (this.step.logicallyChangedTsFiles.has(sfPath)) {
+      return null;
+    }
+    const priorAnalysis = this.step.priorState.priorAnalysis;
+    if (!priorAnalysis.has(sf)) {
+      return null;
+    }
+    return priorAnalysis.get(sf);
+  }
+  priorTypeCheckingResultsFor(sf) {
+    if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
+      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
+    }
+    if (this.step === null) {
+      return null;
+    }
+    const sfPath = absoluteFromSourceFile(sf);
+    if (this.step.logicallyChangedTsFiles.has(sfPath) || this.phase.needsTypeCheckEmit.has(sfPath)) {
+      return null;
+    }
+    if (this.step.priorState.typeCheckResults === null || !this.step.priorState.typeCheckResults.has(sfPath)) {
+      return null;
+    }
+    const priorResults = this.step.priorState.typeCheckResults.get(sfPath);
+    if (priorResults.hasInlines) {
+      return null;
+    }
+    return priorResults;
+  }
+  safeToSkipEmit(sf) {
+    if (this.step === null) {
+      return false;
+    }
+    const sfPath = absoluteFromSourceFile(sf);
+    if (this.step.logicallyChangedTsFiles.has(sfPath)) {
+      return false;
+    }
+    if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
+      throw new Error(`AssertionError: Expected successful analysis before attempting to emit files`);
+    }
+    if (this.phase.needsEmit.has(sfPath)) {
+      return false;
+    }
+    return this.step.priorState.emitted.has(sfPath);
+  }
+};
+function toOriginalSourceFile(sf) {
+  const unredirectedSf = toUnredirectedSourceFile(sf);
+  const originalFile = unredirectedSf[NgOriginalFile];
+  if (originalFile !== void 0) {
+    return originalFile;
+  } else {
+    return unredirectedSf;
+  }
+}
+
+// packages/compiler-cli/src/ngtsc/incremental/src/strategy.js
+var TrackedIncrementalBuildStrategy = class _TrackedIncrementalBuildStrategy {
+  state = null;
+  isSet = false;
+  getIncrementalState() {
+    return this.state;
+  }
+  setIncrementalState(state) {
+    this.state = state;
+    this.isSet = true;
+  }
+  toNextBuildStrategy() {
+    const strategy = new _TrackedIncrementalBuildStrategy();
+    strategy.state = this.isSet ? this.state : null;
+    return strategy;
+  }
+};
+var PatchedProgramIncrementalBuildStrategy = class {
+  getIncrementalState(program) {
+    const state = program[SYM_INCREMENTAL_STATE];
+    if (state === void 0) {
+      return null;
+    }
+    return state;
+  }
+  setIncrementalState(state, program) {
+    program[SYM_INCREMENTAL_STATE] = state;
+  }
+  toNextBuildStrategy() {
+    return this;
+  }
+};
+var SYM_INCREMENTAL_STATE = Symbol("NgIncrementalState");
 
 // packages/compiler-cli/src/ngtsc/indexer/src/api.js
 var IdentifierKind;
@@ -4085,14 +4085,6 @@ function incrementalFromStateTicket(oldProgram, oldState, newProgram, options, i
     perfRecorder
   };
 }
-function resourceChangeTicket(compiler, modifiedResourceFiles) {
-  return {
-    kind: CompilationTicketKind.IncrementalResource,
-    compiler,
-    modifiedResourceFiles,
-    perfRecorder: ActivePerfRecorder.zeroedToNow()
-  };
-}
 var NgCompiler = class _NgCompiler {
   adapter;
   options;
@@ -5287,7 +5279,6 @@ var NgCompilerHost = class _NgCompilerHost extends DelegatingCompilerHost {
 };
 
 export {
-  DiagnosticCategoryLabel,
   EntryType,
   MemberType,
   DecoratorType,
@@ -5296,10 +5287,10 @@ export {
   DocsExtractor,
   TrackedIncrementalBuildStrategy,
   PatchedProgramIncrementalBuildStrategy,
+  DiagnosticCategoryLabel,
   freshCompilationTicket,
   incrementalFromCompilerTicket,
   incrementalFromStateTicket,
-  resourceChangeTicket,
   NgCompiler,
   NgCompilerHost
 };
