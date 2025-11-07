@@ -14802,34 +14802,20 @@ var TcbFieldDirectiveTypeBaseOp = class extends TcbOp {
   node;
   dir;
   /** Bindings that aren't supported on signal form fields. */
-  unsupportedBindingFields;
+  unsupportedBindingFields = /* @__PURE__ */ new Set([
+    ...formControlInputFields,
+    "value",
+    "checked",
+    "type",
+    "maxlength",
+    "minlength"
+  ]);
   constructor(tcb, scope, node, dir) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
     this.dir = dir;
-    const commonUnsupportedNames = [
-      "value",
-      "checked",
-      "errors",
-      "invalid",
-      "disabled",
-      "disabledReasons",
-      "name",
-      "readonly",
-      "touched",
-      "max",
-      "maxlength",
-      "maxLength",
-      "min",
-      "minLength",
-      "minlength",
-      "pattern",
-      "required",
-      "type"
-    ];
-    this.unsupportedBindingFields = new Set(commonUnsupportedNames);
   }
   get optional() {
     return true;
@@ -14865,6 +14851,14 @@ var TcbFieldDirectiveTypeBaseOp = class extends TcbOp {
   }
 };
 var TcbNativeFieldDirectiveTypeOp = class extends TcbFieldDirectiveTypeBaseOp {
+  inputType;
+  constructor(tcb, scope, node, dir) {
+    super(tcb, scope, node, dir);
+    this.inputType = node instanceof TmplAstElement2 && node.name === "input" && node.attributes.find((attr) => attr.name === "type")?.value || null;
+    if (this.inputType === "radio") {
+      this.unsupportedBindingFields.delete("value");
+    }
+  }
   getExpectedType() {
     if (this.node instanceof TmplAstElement2) {
       return this.getExpectedTypeFromDomNode(this.node);
@@ -14878,8 +14872,7 @@ var TcbNativeFieldDirectiveTypeOp = class extends TcbFieldDirectiveTypeBaseOp {
     if (node.name !== "input") {
       return this.getUnsupportedType();
     }
-    const inputType = node.attributes.find((attr) => attr.name === "type")?.value;
-    switch (inputType) {
+    switch (this.inputType) {
       case "checkbox":
         return ts62.factory.createKeywordTypeNode(ts62.SyntaxKind.BooleanKeyword);
       case "number":
@@ -14950,7 +14943,7 @@ var TcbCustomFieldDirectiveTypeOp = class extends TcbFieldDirectiveTypeBaseOp {
       throw new Error(`Expected TypeReferenceNode when referencing the type for ${symbolName}`);
     }
     const id = this.tcb.allocateId();
-    const targetType = ts62.factory.createTypeReferenceNode(targetTypeRef.typeName, isCheckbox ? void 0 : [ts62.factory.createKeywordTypeNode(ts62.SyntaxKind.UnknownKeyword)]);
+    const targetType = ts62.factory.createTypeReferenceNode(targetTypeRef.typeName, isCheckbox ? void 0 : [ts62.factory.createKeywordTypeNode(ts62.SyntaxKind.AnyKeyword)]);
     this.scope.addStatement(tsDeclareVariable(id, targetType));
     const controlType = ts62.factory.createAsExpression(ts62.factory.createNonNullExpression(ts62.factory.createNull()), this.getCustomFieldTypeReference());
     const assignment = ts62.factory.createBinaryExpression(id, ts62.SyntaxKind.EqualsToken, controlType);
@@ -15073,12 +15066,14 @@ var TcbDirectiveInputsOp = class extends TcbOp {
   scope;
   node;
   dir;
-  constructor(tcb, scope, node, dir) {
+  ignoredRequiredInputs;
+  constructor(tcb, scope, node, dir, ignoredRequiredInputs) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
     this.dir = dir;
+    this.ignoredRequiredInputs = ignoredRequiredInputs;
   }
   get optional() {
     return false;
@@ -15157,7 +15152,7 @@ var TcbDirectiveInputsOp = class extends TcbOp {
   checkRequiredInputs(seenRequiredInputs) {
     const missing = [];
     for (const input of this.dir.inputs) {
-      if (input.required && !seenRequiredInputs.has(input.classPropertyName)) {
+      if (input.required && !seenRequiredInputs.has(input.classPropertyName) && (this.ignoredRequiredInputs === null || !this.ignoredRequiredInputs.has(input.bindingPropertyName))) {
         missing.push(input.bindingPropertyName);
       }
     }
@@ -16277,11 +16272,23 @@ var Scope = class _Scope {
     const directiveOp = this.getDirectiveOp(dir, node, allDirectiveMatches);
     const dirIndex = this.opQueue.push(directiveOp) - 1;
     dirMap.set(dir, dirIndex);
-    this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir));
+    let ignoredRequiredInputs = null;
+    if (allDirectiveMatches.some(isFieldDirective)) {
+      const customFieldType = getCustomFieldDirectiveType(dir);
+      if (customFieldType !== null) {
+        ignoredRequiredInputs = new Set(formControlInputFields);
+        if (customFieldType === "value") {
+          ignoredRequiredInputs.add("value");
+        } else if (customFieldType === "checkbox") {
+          ignoredRequiredInputs.add("checked");
+        }
+      }
+    }
+    this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir, ignoredRequiredInputs));
   }
   getDirectiveOp(dir, node, allDirectiveMatches) {
     const dirRef = dir.ref;
-    if (dir.name === "Field" && dirRef.bestGuessOwningModule?.specifier === "@angular/forms/signals") {
+    if (isFieldDirective(dir)) {
       let customControl = null;
       for (const meta of allDirectiveMatches) {
         const type = getCustomFieldDirectiveType(meta);
@@ -16796,11 +16803,39 @@ var TcbForLoopTrackTranslator = class extends TcbExpressionTranslator {
 function getComponentTagName(node) {
   return node.tagName || "ng-component";
 }
-function getCustomFieldDirectiveType({ inputs, outputs }) {
-  if (inputs.getByBindingPropertyName("value")?.some((v) => v.isSignal) && outputs.hasBindingPropertyName("valueChange")) {
-    return "value";
+function isFieldDirective(meta) {
+  if (meta.name !== "Field") {
+    return false;
   }
-  if (inputs.getByBindingPropertyName("checked")?.some((v) => v.isSignal) && outputs.hasBindingPropertyName("checkedChange")) {
+  if (meta.ref.bestGuessOwningModule?.specifier === "@angular/forms/signals") {
+    return true;
+  }
+  return ts62.isClassDeclaration(meta.ref.node) && meta.ref.node.members.some((member) => ts62.isPropertyDeclaration(member) && ts62.isComputedPropertyName(member.name) && ts62.isIdentifier(member.name.expression) && member.name.expression.text === "\u0275CONTROL");
+}
+function hasModel(name, meta) {
+  return !!meta.inputs.getByBindingPropertyName(name)?.some((v) => v.isSignal) && meta.outputs.hasBindingPropertyName(name + "Change");
+}
+var formControlInputFields = [
+  // Should be kept in sync with the `FormUiControl` bindings,
+  // defined in `packages/forms/signals/src/api/control.ts`.
+  "errors",
+  "invalid",
+  "disabled",
+  "disabledReasons",
+  "name",
+  "readonly",
+  "touched",
+  "max",
+  "maxLength",
+  "min",
+  "minLength",
+  "pattern",
+  "required"
+];
+function getCustomFieldDirectiveType(meta) {
+  if (hasModel("value", meta)) {
+    return "value";
+  } else if (hasModel("checked", meta)) {
     return "checkbox";
   }
   return null;
