@@ -87,7 +87,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-YMGQNF3B.js";
+} from "./chunk-FDIGUIUA.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,

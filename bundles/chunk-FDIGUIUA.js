@@ -21138,7 +21138,7 @@ var ComponentDecoratorHandler = class {
         diagnostics.push(makeResourceNotFoundError(styleUrl.url, styleUrl.expression, resourceType).toDiagnostic());
       }
     }
-    if ((encapsulation === ViewEncapsulation2.ShadowDom || encapsulation === ViewEncapsulation2.IsolatedShadowDom) && metadata.selector !== null) {
+    if ((encapsulation === ViewEncapsulation2.ShadowDom || encapsulation === ViewEncapsulation2.ExperimentalIsolatedShadowDom) && metadata.selector !== null) {
       const selectorError = checkCustomElementSelectorForErrors(metadata.selector);
       if (selectorError !== null) {
         if (diagnostics === void 0) {
