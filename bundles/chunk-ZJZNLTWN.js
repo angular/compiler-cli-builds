@@ -455,7 +455,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "21.0.0-rc.1+sha-91dbb4b";
+var PLACEHOLDER_VERSION = "21.0.0-rc.1+sha-c9f9778";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -546,7 +546,6 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl, version) {
     queries: metaObj.has("queries") ? metaObj.getArray("queries").map((entry) => toQueryMetadata(entry.getObject())) : [],
     viewQueries: metaObj.has("viewQueries") ? metaObj.getArray("viewQueries").map((entry) => toQueryMetadata(entry.getObject())) : [],
     providers: metaObj.has("providers") ? metaObj.getOpaque("providers") : null,
-    fullInheritance: false,
     selector: metaObj.has("selector") ? metaObj.getString("selector") : null,
     exportAs: metaObj.has("exportAs") ? metaObj.getArray("exportAs").map((entry) => entry.getString()) : null,
     lifecycle: {
