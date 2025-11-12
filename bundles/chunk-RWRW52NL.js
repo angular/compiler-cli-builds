@@ -13993,7 +13993,7 @@ var TypeCheckShimGenerator = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.js
-import { BindingPipe, BindingType as BindingType3, Call as Call3, createCssSelectorFromNode, CssSelector as CssSelector3, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver3, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead4, R3Identifiers as R3Identifiers4, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead3, SelectorMatcher as SelectorMatcher2, ThisReceiver as ThisReceiver2, TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstBoundText, TmplAstContent, TmplAstDeferredBlock, TmplAstElement as TmplAstElement2, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference as TmplAstReference2, TmplAstSwitchBlock, TmplAstTemplate, TmplAstText, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable, TmplAstHostElement as TmplAstHostElement2, TransplantedType, TmplAstComponent as TmplAstComponent2, TmplAstDirective as TmplAstDirective2, Binary } from "@angular/compiler";
+import { BindingPipe, BindingType as BindingType3, Call as Call3, createCssSelectorFromNode, CssSelector as CssSelector3, DYNAMIC_TYPE, ImplicitReceiver as ImplicitReceiver3, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead4, R3Identifiers as R3Identifiers4, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead3, SelectorMatcher as SelectorMatcher2, ThisReceiver as ThisReceiver2, TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstBoundText, TmplAstContent, TmplAstDeferredBlock, TmplAstElement as TmplAstElement2, TmplAstForLoopBlock, TmplAstIcu, TmplAstIfBlock, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference as TmplAstReference2, TmplAstSwitchBlock, TmplAstTemplate, TmplAstText, TmplAstVariable, TmplAstHostElement as TmplAstHostElement2, TransplantedType, TmplAstComponent as TmplAstComponent2, TmplAstDirective as TmplAstDirective2, Binary } from "@angular/compiler";
 import ts62 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.js
@@ -14795,11 +14795,10 @@ var TcbGenericDirectiveTypeWithAnyParamsOp = class extends TcbDirectiveTypeOpBas
     return super.execute();
   }
 };
-var TcbFieldDirectiveTypeBaseOp = class extends TcbOp {
+var TcbNativeFieldDirectiveTypeOp = class extends TcbOp {
   tcb;
   scope;
   node;
-  dir;
   /** Bindings that aren't supported on signal form fields. */
   unsupportedBindingFields = /* @__PURE__ */ new Set([
     ...formControlInputFields,
@@ -14809,60 +14808,35 @@ var TcbFieldDirectiveTypeBaseOp = class extends TcbOp {
     "maxlength",
     "minlength"
   ]);
-  constructor(tcb, scope, node, dir) {
+  inputType;
+  get optional() {
+    return false;
+  }
+  constructor(tcb, scope, node) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
-    this.dir = dir;
-  }
-  get optional() {
-    return true;
-  }
-  execute() {
-    const inputs = this.node instanceof TmplAstHostElement2 ? this.node.bindings : this.node.inputs;
-    for (const input of inputs) {
-      if (input.type === BindingType3.Property && this.unsupportedBindingFields.has(input.name)) {
-        this.tcb.oobRecorder.formFieldUnsupportedBinding(this.tcb.id, input);
-      } else if (input.type === BindingType3.Attribute && this.unsupportedBindingFields.has(input.name.toLowerCase())) {
-        this.tcb.oobRecorder.formFieldUnsupportedBinding(this.tcb.id, input);
-      }
-    }
-    if (!(this.node instanceof TmplAstHostElement2)) {
-      for (const attr of this.node.attributes) {
-        const name = attr.name.toLowerCase();
-        if (name !== "type" && this.unsupportedBindingFields.has(name)) {
-          this.tcb.oobRecorder.formFieldUnsupportedBinding(this.tcb.id, attr);
-        }
-      }
-    }
-    const refType = this.tcb.env.referenceType(this.dir.ref);
-    if (!ts62.isTypeReferenceNode(refType)) {
-      throw new Error(`Expected TypeReferenceNode when referencing the type for ${this.dir.ref.debugName}`);
-    }
-    const span = this.node instanceof TmplAstHostElement2 ? this.node.sourceSpan : this.node.startSourceSpan || this.node.sourceSpan;
-    const type = ts62.factory.createTypeReferenceNode(refType.typeName, [this.getExpectedType()]);
-    const id = this.tcb.allocateId();
-    addExpressionIdentifier(id, ExpressionIdentifier.DIRECTIVE);
-    addParseSpanInfo(id, span);
-    this.scope.addStatement(tsDeclareVariable(id, type));
-    return id;
-  }
-};
-var TcbNativeFieldDirectiveTypeOp = class extends TcbFieldDirectiveTypeBaseOp {
-  inputType;
-  constructor(tcb, scope, node, dir) {
-    super(tcb, scope, node, dir);
-    this.inputType = node instanceof TmplAstElement2 && node.name === "input" && node.attributes.find((attr) => attr.name === "type")?.value || null;
+    this.inputType = node.name === "input" && node.attributes.find((attr) => attr.name === "type")?.value || null;
     if (this.inputType === "radio") {
       this.unsupportedBindingFields.delete("value");
     }
   }
-  getExpectedType() {
-    if (this.node instanceof TmplAstElement2) {
-      return this.getExpectedTypeFromDomNode(this.node);
+  execute() {
+    const inputs = this.node instanceof TmplAstHostElement2 ? this.node.bindings : this.node.inputs;
+    const fieldBinding = inputs.find((input) => input.type === BindingType3.Property && input.name === "field") ?? null;
+    if (fieldBinding === null) {
+      return null;
     }
-    return this.getUnsupportedType();
+    checkUnsupportedFieldBindings(this.node, this.unsupportedBindingFields, this.tcb);
+    const expectedType = this.node instanceof TmplAstElement2 ? this.getExpectedTypeFromDomNode(this.node) : this.getUnsupportedType();
+    const value = extractFieldValue(fieldBinding.value, this.tcb, this.scope);
+    const id = this.tcb.allocateId();
+    const assignment = ts62.factory.createBinaryExpression(id, ts62.SyntaxKind.EqualsToken, value);
+    addParseSpanInfo(assignment, fieldBinding.valueSpan ?? fieldBinding.sourceSpan);
+    this.scope.addStatement(tsDeclareVariable(id, expectedType));
+    this.scope.addStatement(ts62.factory.createExpressionStatement(assignment));
+    return null;
   }
   getExpectedTypeFromDomNode(node) {
     if (node.name === "textarea" || node.name === "select") {
@@ -14895,59 +14869,7 @@ var TcbNativeFieldDirectiveTypeOp = class extends TcbFieldDirectiveTypeBaseOp {
     return ts62.factory.createKeywordTypeNode(ts62.SyntaxKind.StringKeyword);
   }
   getUnsupportedType() {
-    return ts62.factory.createKeywordTypeNode(ts62.SyntaxKind.UnknownKeyword);
-  }
-};
-var TcbCustomFieldDirectiveTypeOp = class extends TcbFieldDirectiveTypeBaseOp {
-  customFieldDir;
-  constructor(tcb, scope, node, dir, customFieldDir) {
-    super(tcb, scope, node, dir);
-    this.customFieldDir = customFieldDir;
-  }
-  execute() {
-    const refId = super.execute();
-    this.appendFormFieldConformanceStatements();
-    return refId;
-  }
-  getExpectedType() {
-    const id = R3Identifiers4.ExtractFormControlValue;
-    const extractRef = this.tcb.env.referenceExternalType(id.moduleName, id.name);
-    if (!ts62.isTypeReferenceNode(extractRef)) {
-      throw new Error(`Expected TypeReferenceNode when referencing the type for ${id.name}`);
-    }
-    return ts62.factory.createTypeReferenceNode(extractRef.typeName, [
-      this.getCustomFieldTypeReference()
-    ]);
-  }
-  getCustomFieldTypeReference() {
-    const customFieldRef = this.tcb.env.referenceType(this.customFieldDir.meta.ref);
-    if (!ts62.isTypeReferenceNode(customFieldRef)) {
-      throw new Error(`Expected TypeReferenceNode when referencing the type for ${this.customFieldDir.meta.ref.debugName}`);
-    }
-    return customFieldRef;
-  }
-  appendFormFieldConformanceStatements() {
-    let span;
-    if (this.node instanceof TmplAstHostElement2) {
-      span = this.node.sourceSpan;
-    } else {
-      span = this.node.inputs.find((input) => {
-        return input.type === BindingType3.Property && input.name === "field";
-      })?.sourceSpan ?? this.node.startSourceSpan;
-    }
-    const isCheckbox = this.customFieldDir.type === "checkbox";
-    const symbolName = isCheckbox ? "FormCheckboxControl" : "FormValueControl";
-    const targetTypeRef = this.tcb.env.referenceExternalType("@angular/forms/signals", symbolName);
-    if (!ts62.isTypeReferenceNode(targetTypeRef)) {
-      throw new Error(`Expected TypeReferenceNode when referencing the type for ${symbolName}`);
-    }
-    const id = this.tcb.allocateId();
-    const targetType = ts62.factory.createTypeReferenceNode(targetTypeRef.typeName, isCheckbox ? void 0 : [ts62.factory.createKeywordTypeNode(ts62.SyntaxKind.AnyKeyword)]);
-    this.scope.addStatement(tsDeclareVariable(id, targetType));
-    const controlType = ts62.factory.createAsExpression(ts62.factory.createNonNullExpression(ts62.factory.createNull()), this.getCustomFieldTypeReference());
-    const assignment = ts62.factory.createBinaryExpression(id, ts62.SyntaxKind.EqualsToken, controlType);
-    addParseSpanInfo(assignment, span);
-    this.scope.addStatement(ts62.factory.createIfStatement(id, ts62.factory.createExpressionStatement(assignment)));
+    return ts62.factory.createKeywordTypeNode(ts62.SyntaxKind.NeverKeyword);
   }
 };
 var TcbReferenceOp = class extends TcbOp {
@@ -15004,12 +14926,14 @@ var TcbDirectiveCtorOp = class extends TcbOp {
   scope;
   node;
   dir;
-  constructor(tcb, scope, node, dir) {
+  customControlType;
+  constructor(tcb, scope, node, dir, customControlType) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
     this.dir = dir;
+    this.customControlType = customControlType;
   }
   get optional() {
     return true;
@@ -15023,25 +14947,31 @@ var TcbDirectiveCtorOp = class extends TcbOp {
       boundAttrs = [];
       span = this.node.sourceSpan;
     } else {
-      boundAttrs = getBoundAttributes(this.dir, this.node);
       span = this.node.startSourceSpan || this.node.sourceSpan;
+      boundAttrs = getBoundAttributes(this.dir, this.node);
+      if (this.customControlType !== null) {
+        const additionalBindings = expandBoundAttributesForField(this.dir, this.node, this.customControlType);
+        if (additionalBindings !== null) {
+          boundAttrs.push(...additionalBindings);
+        }
+      }
     }
     addExpressionIdentifier(id, ExpressionIdentifier.DIRECTIVE);
     addParseSpanInfo(id, span);
     for (const attr of boundAttrs) {
-      if (!this.tcb.env.config.checkTypeOfAttributes && attr.attribute instanceof TmplAstTextAttribute2) {
+      if (!this.tcb.env.config.checkTypeOfAttributes && typeof attr.value === "string") {
         continue;
       }
       for (const { fieldName, isTwoWayBinding } of attr.inputs) {
         if (genericInputs.has(fieldName)) {
           continue;
         }
-        const expression = translateInput(attr.attribute, this.tcb, this.scope);
+        const expression = translateInput(attr.value, this.tcb, this.scope);
         genericInputs.set(fieldName, {
           type: "binding",
           field: fieldName,
           expression,
-          sourceSpan: attr.attribute.sourceSpan,
+          sourceSpan: attr.sourceSpan,
           isTwoWayBinding
         });
       }
@@ -15065,24 +14995,31 @@ var TcbDirectiveInputsOp = class extends TcbOp {
   scope;
   node;
   dir;
-  ignoredRequiredInputs;
-  constructor(tcb, scope, node, dir, ignoredRequiredInputs) {
+  customControlType;
+  constructor(tcb, scope, node, dir, customControlType) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
     this.dir = dir;
-    this.ignoredRequiredInputs = ignoredRequiredInputs;
+    this.customControlType = customControlType;
   }
   get optional() {
     return false;
   }
   execute() {
     let dirId = null;
-    const boundAttrs = getBoundAttributes(this.dir, this.node);
     const seenRequiredInputs = /* @__PURE__ */ new Set();
+    const boundAttrs = getBoundAttributes(this.dir, this.node);
+    if (this.customControlType !== null) {
+      checkUnsupportedFieldBindings(this.node, customFormControlBannedInputFields, this.tcb);
+      const additionalBindings = expandBoundAttributesForField(this.dir, this.node, this.customControlType);
+      if (additionalBindings !== null) {
+        boundAttrs.push(...additionalBindings);
+      }
+    }
     for (const attr of boundAttrs) {
-      const expr = widenBinding(translateInput(attr.attribute, this.tcb, this.scope), this.tcb);
+      const expr = widenBinding(translateInput(attr.value, this.tcb, this.scope), this.tcb);
       let assignment = wrapForDiagnostics(expr);
       for (const { fieldName, required, transformType, isSignal, isTwoWayBinding } of attr.inputs) {
         let target;
@@ -15131,16 +15068,16 @@ var TcbDirectiveInputsOp = class extends TcbOp {
           }
           target = ts62.factory.createElementAccessExpression(target, inputSignalBrandWriteSymbol);
         }
-        if (attr.attribute.keySpan !== void 0) {
-          addParseSpanInfo(target, attr.attribute.keySpan);
+        if (attr.keySpan !== null) {
+          addParseSpanInfo(target, attr.keySpan);
         }
         if (isTwoWayBinding && this.tcb.env.config.allowSignalsInTwoWayBindings) {
           assignment = unwrapWritableSignal(assignment, this.tcb);
         }
         assignment = ts62.factory.createBinaryExpression(target, ts62.SyntaxKind.EqualsToken, assignment);
       }
-      addParseSpanInfo(assignment, attr.attribute.sourceSpan);
-      if (!this.tcb.env.config.checkTypeOfAttributes && attr.attribute instanceof TmplAstTextAttribute2) {
+      addParseSpanInfo(assignment, attr.sourceSpan);
+      if (!this.tcb.env.config.checkTypeOfAttributes && typeof attr.value === "string") {
         markIgnoreDiagnostics(assignment);
       }
       this.scope.addStatement(ts62.factory.createExpressionStatement(assignment));
@@ -15151,7 +15088,7 @@ var TcbDirectiveInputsOp = class extends TcbOp {
   checkRequiredInputs(seenRequiredInputs) {
     const missing = [];
     for (const input of this.dir.inputs) {
-      if (input.required && !seenRequiredInputs.has(input.classPropertyName) && (this.ignoredRequiredInputs === null || !this.ignoredRequiredInputs.has(input.bindingPropertyName))) {
+      if (input.required && !seenRequiredInputs.has(input.classPropertyName)) {
         missing.push(input.bindingPropertyName);
       }
     }
@@ -16268,39 +16205,21 @@ var Scope = class _Scope {
     }
   }
   appendDirectiveInputs(dir, node, dirMap, allDirectiveMatches) {
-    const directiveOp = this.getDirectiveOp(dir, node, allDirectiveMatches);
+    const customFieldType = allDirectiveMatches.some(isFieldDirective) ? getCustomFieldDirectiveType(dir) : null;
+    const directiveOp = this.getDirectiveOp(dir, node, customFieldType);
     const dirIndex = this.opQueue.push(directiveOp) - 1;
     dirMap.set(dir, dirIndex);
-    let ignoredRequiredInputs = null;
-    if (allDirectiveMatches.some(isFieldDirective)) {
-      const customFieldType = getCustomFieldDirectiveType(dir);
-      if (customFieldType !== null) {
-        ignoredRequiredInputs = new Set(formControlInputFields);
-        if (customFieldType === "value") {
-          ignoredRequiredInputs.add("value");
-        } else if (customFieldType === "checkbox") {
-          ignoredRequiredInputs.add("checked");
-        }
-      }
+    if (isFieldDirective(dir) && node instanceof TmplAstElement2 && (node.name === "input" || node.name === "select" || node.name === "textarea") && !allDirectiveMatches.some(getCustomFieldDirectiveType)) {
+      this.opQueue.push(new TcbNativeFieldDirectiveTypeOp(this.tcb, this, node));
     }
-    this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir, ignoredRequiredInputs));
+    this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir, customFieldType));
   }
-  getDirectiveOp(dir, node, allDirectiveMatches) {
+  getDirectiveOp(dir, node, customFieldType) {
     const dirRef = dir.ref;
-    if (isFieldDirective(dir)) {
-      let customControl = null;
-      for (const meta of allDirectiveMatches) {
-        const type = getCustomFieldDirectiveType(meta);
-        if (type !== null) {
-          customControl = { type, meta };
-          break;
-        }
-      }
-      return customControl === null ? new TcbNativeFieldDirectiveTypeOp(this.tcb, this, node, dir) : new TcbCustomFieldDirectiveTypeOp(this.tcb, this, node, dir, customControl);
-    } else if (!dir.isGeneric) {
+    if (!dir.isGeneric) {
       return new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, dir);
     } else if (!requiresInlineTypeCtor(dirRef.node, this.tcb.env.reflector, this.tcb.env) || this.tcb.env.config.useInlineTypeConstructors) {
-      return new TcbDirectiveCtorOp(this.tcb, this, node, dir);
+      return new TcbDirectiveCtorOp(this.tcb, this, node, dir, customFieldType);
     }
     return new TcbGenericDirectiveTypeWithAnyParamsOp(this.tcb, this, node, dir);
   }
@@ -16431,7 +16350,7 @@ var Scope = class _Scope {
     if (directives !== null && directives.length > 0) {
       const directiveOpMap = /* @__PURE__ */ new Map();
       for (const directive of directives) {
-        const directiveOp = this.getDirectiveOp(directive, node, directives);
+        const directiveOp = this.getDirectiveOp(directive, node, null);
         directiveOpMap.set(directive, this.opQueue.push(directiveOp) - 1);
       }
       this.directiveOpMap.set(node, directiveOpMap);
@@ -16636,7 +16555,9 @@ function getBoundAttributes(directive, node) {
     const inputs = directive.inputs.getByBindingPropertyName(attr.name);
     if (inputs !== null) {
       boundInputs.push({
-        attribute: attr,
+        value: attr.value,
+        sourceSpan: attr.sourceSpan,
+        keySpan: attr.keySpan ?? null,
         inputs: inputs.map((input) => {
           return {
             fieldName: input.classPropertyName,
@@ -16661,11 +16582,68 @@ function getBoundAttributes(directive, node) {
   }
   return boundInputs;
 }
-function translateInput(attr, tcb, scope) {
-  if (attr instanceof TmplAstBoundAttribute3) {
-    return tcbExpression(attr.value, tcb, scope);
+function expandBoundAttributesForField(directive, node, customFieldType) {
+  const fieldBinding = node.inputs.find((input) => input.type === BindingType3.Property && input.name === "field");
+  if (!fieldBinding) {
+    return null;
+  }
+  let boundInputs = null;
+  let primaryInput;
+  if (customFieldType === "value") {
+    primaryInput = getSyntheticFieldBoundInput(directive, "value", "value", fieldBinding, customFieldType);
+  } else if (customFieldType === "checkbox") {
+    primaryInput = getSyntheticFieldBoundInput(directive, "checked", "value", fieldBinding, customFieldType);
   } else {
-    return ts62.factory.createStringLiteral(attr.value);
+    primaryInput = null;
+  }
+  if (primaryInput !== null) {
+    boundInputs ??= [];
+    boundInputs.push(primaryInput);
+  }
+  for (const name of formControlInputFields) {
+    const input = getSyntheticFieldBoundInput(directive, name, name, fieldBinding, customFieldType);
+    if (input !== null) {
+      boundInputs ??= [];
+      boundInputs.push(input);
+    }
+  }
+  return boundInputs;
+}
+function getSyntheticFieldBoundInput(dir, inputName, fieldPropertyName, fieldBinding, customFieldType) {
+  const inputs = dir.inputs.getByBindingPropertyName(inputName);
+  if (inputs === null || inputs.length === 0) {
+    return null;
+  }
+  const { span, sourceSpan } = fieldBinding.value;
+  const outerCall = new Call3(span, sourceSpan, fieldBinding.value, [], sourceSpan);
+  const read = new PropertyRead4(span, sourceSpan, sourceSpan, outerCall, fieldPropertyName);
+  const isTwoWayBinding = customFieldType === "value" && inputName === "value" || customFieldType === "checkbox" && inputName === "checked";
+  let value;
+  if (isTwoWayBinding) {
+    value = read;
+  } else if (formControlOptionalFields.has(fieldPropertyName)) {
+    value = new SafeCall2(span, sourceSpan, read, [], sourceSpan);
+  } else {
+    value = new Call3(span, sourceSpan, read, [], sourceSpan);
+  }
+  return {
+    value,
+    sourceSpan: fieldBinding.sourceSpan,
+    keySpan: fieldBinding.keySpan ?? null,
+    inputs: inputs.map((input) => ({
+      fieldName: input.classPropertyName,
+      required: input.required,
+      transformType: input.transform?.type || null,
+      isSignal: input.isSignal,
+      isTwoWayBinding
+    }))
+  };
+}
+function translateInput(value, tcb, scope) {
+  if (typeof value === "string") {
+    return ts62.factory.createStringLiteral(value);
+  } else {
+    return tcbExpression(value, tcb, scope);
   }
 }
 function widenBinding(expr, tcb) {
@@ -16811,7 +16789,12 @@ function isFieldDirective(meta) {
   }
   return ts62.isClassDeclaration(meta.ref.node) && meta.ref.node.members.some((member) => ts62.isPropertyDeclaration(member) && ts62.isComputedPropertyName(member.name) && ts62.isIdentifier(member.name.expression) && member.name.expression.text === "\u0275CONTROL");
 }
-function hasModel(name, meta) {
+function extractFieldValue(expression, tcb, scope) {
+  const innerCall = ts62.factory.createCallExpression(tcbExpression(expression, tcb, scope), void 0, void 0);
+  markIgnoreDiagnostics(innerCall);
+  return ts62.factory.createCallExpression(ts62.factory.createPropertyAccessExpression(innerCall, "value"), void 0, void 0);
+}
+function hasModelInput(name, meta) {
   return !!meta.inputs.getByBindingPropertyName(name)?.some((v) => v.isSignal) && meta.outputs.hasBindingPropertyName(name + "Change");
 }
 var formControlInputFields = [
@@ -16831,13 +16814,40 @@ var formControlInputFields = [
   "pattern",
   "required"
 ];
+var customFormControlBannedInputFields = /* @__PURE__ */ new Set([...formControlInputFields, "value", "checked"]);
+var formControlOptionalFields = /* @__PURE__ */ new Set([
+  // Should be kept in sync with the `FormUiControl` bindings,
+  // defined in `packages/forms/signals/src/api/control.ts`.
+  "max",
+  "maxLength",
+  "min",
+  "minLength"
+]);
 function getCustomFieldDirectiveType(meta) {
-  if (hasModel("value", meta)) {
+  if (hasModelInput("value", meta)) {
     return "value";
-  } else if (hasModel("checked", meta)) {
+  } else if (hasModelInput("checked", meta)) {
     return "checkbox";
   }
   return null;
+}
+function checkUnsupportedFieldBindings(node, unsupportedBindingFields, tcb) {
+  const inputs = node instanceof TmplAstHostElement2 ? node.bindings : node.inputs;
+  for (const input of inputs) {
+    if (input.type === BindingType3.Property && unsupportedBindingFields.has(input.name)) {
+      tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, input);
+    } else if (input.type === BindingType3.Attribute && unsupportedBindingFields.has(input.name.toLowerCase())) {
+      tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, input);
+    }
+  }
+  if (!(node instanceof TmplAstHostElement2)) {
+    for (const attr of node.attributes) {
+      const name = attr.name.toLowerCase();
+      if (name !== "type" && unsupportedBindingFields.has(name)) {
+        tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, attr);
+      }
+    }
+  }
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_check_file.js
@@ -17336,7 +17346,7 @@ var DirectiveSourceManager = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.js
-import { AST, ASTWithName as ASTWithName2, ASTWithSource as ASTWithSource2, Binary as Binary2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead5, R3Identifiers as R3Identifiers5, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute4, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstComponent as TmplAstComponent3, TmplAstDirective as TmplAstDirective3, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute3, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { AST, ASTWithName as ASTWithName2, ASTWithSource as ASTWithSource2, Binary as Binary2, BindingPipe as BindingPipe2, PropertyRead as PropertyRead5, R3Identifiers as R3Identifiers5, SafePropertyRead as SafePropertyRead4, TmplAstBoundAttribute as TmplAstBoundAttribute4, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstComponent as TmplAstComponent3, TmplAstDirective as TmplAstDirective3, TmplAstElement as TmplAstElement3, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference3, TmplAstTemplate as TmplAstTemplate2, TmplAstTextAttribute as TmplAstTextAttribute2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 import ts65 from "typescript";
 var SymbolBuilder = class {
   tcbPath;
@@ -17359,7 +17369,7 @@ var SymbolBuilder = class {
       return this.symbolCache.get(node);
     }
     let symbol = null;
-    if (node instanceof TmplAstBoundAttribute4 || node instanceof TmplAstTextAttribute3) {
+    if (node instanceof TmplAstBoundAttribute4 || node instanceof TmplAstTextAttribute2) {
       symbol = this.getSymbolOfInputBinding(node);
     } else if (node instanceof TmplAstBoundEvent3) {
       symbol = this.getSymbolOfBoundEvent(node);
