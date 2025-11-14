@@ -13,7 +13,7 @@ import { TypeCheckBlockMetadata, TypeCheckingConfig } from '../api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
 import { OutOfBandDiagnosticRecorder } from './oob';
-import { TcbGenericContextBehavior } from './type_check_block';
+import { TcbGenericContextBehavior } from './ops/context';
 /**
  * An `Environment` representing the single type-checking file into which most (if not all) Type
  * Check Blocks (TCBs) will be generated.
