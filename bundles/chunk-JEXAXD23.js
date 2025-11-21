@@ -323,10 +323,17 @@ function createFileSystemTsReadDirectoryFn(fs2) {
       const files = [];
       const directories = [];
       for (const child of children) {
-        if (fs2.stat(fs2.join(resolvedPath, child))?.isDirectory()) {
-          directories.push(child);
-        } else {
-          files.push(child);
+        try {
+          if (fs2.stat(fs2.join(resolvedPath, child))?.isDirectory()) {
+            directories.push(child);
+          } else {
+            files.push(child);
+          }
+        } catch (error) {
+          if (error instanceof Error && error.message.includes("ENOENT")) {
+            continue;
+          }
+          throw error;
         }
       }
       return { files, directories };
