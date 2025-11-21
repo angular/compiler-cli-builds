@@ -17,7 +17,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-GWZQLAGK.js";
+} from "./chunk-JEXAXD23.js";
 
 // packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.js
 var ErrorCode;
