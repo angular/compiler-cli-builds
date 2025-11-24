@@ -6939,13 +6939,12 @@ import ts32 from "typescript";
 function insertDebugNameIntoCallExpression(callExpression, debugName) {
   const signalExpressionIsRequired = isRequiredSignalFunction(callExpression.expression);
   let configPosition = signalExpressionIsRequired ? 0 : 1;
-  const nodeArgs = Array.from(callExpression.arguments);
   const signalExpressionHasNoArguments = callExpression.arguments.length === 0;
-  const isLinkedSignal = callExpression.expression.getText() === "linkedSignal";
-  const isComputationLinkedSignal = isLinkedSignal && nodeArgs[0].kind === ts32.SyntaxKind.ObjectLiteralExpression;
-  if (signalExpressionHasNoArguments || isComputationLinkedSignal) {
+  const signalWithObjectOnlyDefinition = isSignalWithObjectOnlyDefinition(callExpression);
+  if (signalExpressionHasNoArguments || signalWithObjectOnlyDefinition) {
     configPosition = 0;
   }
+  const nodeArgs = Array.from(callExpression.arguments);
   let existingArgument = nodeArgs[configPosition];
   if (existingArgument === void 0) {
     existingArgument = ts32.factory.createObjectLiteralExpression([]);
@@ -6961,41 +6960,32 @@ function insertDebugNameIntoCallExpression(callExpression, debugName) {
   if (debugNameExists) {
     return callExpression;
   }
-  properties.unshift(ts32.factory.createPropertyAssignment("debugName", ts32.factory.createStringLiteral(debugName)));
-  const transformedConfigProperties = ts32.factory.createObjectLiteralExpression(properties);
   const ngDevModeIdentifier = ts32.factory.createIdentifier("ngDevMode");
-  let devModeCase;
-  if (signalExpressionHasNoArguments && !signalExpressionIsRequired) {
-    devModeCase = ts32.factory.createArrayLiteralExpression([
-      ts32.factory.createIdentifier("undefined"),
-      transformedConfigProperties
-    ]);
-  } else {
-    devModeCase = ts32.factory.createArrayLiteralExpression([
-      transformedConfigProperties,
-      ...nodeArgs.slice(configPosition + 1)
-    ]);
-  }
-  const nonDevModeCase = signalExpressionIsRequired ? ts32.factory.createArrayLiteralExpression(nodeArgs) : ts32.factory.createArrayLiteralExpression(nodeArgs.slice(configPosition));
-  const spreadElementContainingUpdatedOptions = ts32.factory.createSpreadElement(ts32.factory.createParenthesizedExpression(ts32.factory.createConditionalExpression(
+  const debugNameProperty = ts32.factory.createPropertyAssignment("debugName", ts32.factory.createStringLiteral(debugName));
+  const debugNameObject = ts32.factory.createObjectLiteralExpression([debugNameProperty]);
+  const emptyObject = ts32.factory.createObjectLiteralExpression();
+  const spreadDebugNameExpression = ts32.factory.createSpreadAssignment(ts32.factory.createParenthesizedExpression(ts32.factory.createConditionalExpression(
     ngDevModeIdentifier,
-    /* question token */
     void 0,
-    devModeCase,
-    /* colon token */
+    // Question token
+    debugNameObject,
     void 0,
-    nonDevModeCase
+    // Colon token
+    emptyObject
   )));
-  let transformedSignalArgs;
-  if (signalExpressionIsRequired || signalExpressionHasNoArguments || isComputationLinkedSignal) {
-    transformedSignalArgs = ts32.factory.createNodeArray([spreadElementContainingUpdatedOptions]);
+  const transformedConfigProperties = ts32.factory.createObjectLiteralExpression([
+    spreadDebugNameExpression,
+    ...properties
+  ]);
+  let transformedSignalArgs = [];
+  if (signalExpressionHasNoArguments && !signalExpressionIsRequired) {
+    transformedSignalArgs = [ts32.factory.createIdentifier("undefined"), transformedConfigProperties];
+  } else if (signalWithObjectOnlyDefinition || signalExpressionIsRequired) {
+    transformedSignalArgs = [transformedConfigProperties];
   } else {
-    transformedSignalArgs = ts32.factory.createNodeArray([
-      nodeArgs[0],
-      spreadElementContainingUpdatedOptions
-    ]);
+    transformedSignalArgs = [nodeArgs[0], transformedConfigProperties];
   }
-  return ts32.factory.updateCallExpression(callExpression, callExpression.expression, callExpression.typeArguments, transformedSignalArgs);
+  return ts32.factory.updateCallExpression(callExpression, callExpression.expression, callExpression.typeArguments, ts32.factory.createNodeArray(transformedSignalArgs));
 }
 function isVariableDeclarationCase(node) {
   if (!ts32.isVariableDeclaration(node)) {
@@ -7046,7 +7036,21 @@ function isPropertyDeclarationCase(node) {
   }
   return ts32.isIdentifier(expression) && isSignalFunction(expression);
 }
-function expressionIsUsingAngularCoreImportedSymbol(program, expression) {
+var signalFunctions = /* @__PURE__ */ new Map([
+  ["signal", "core"],
+  ["computed", "core"],
+  ["linkedSignal", "core"],
+  ["input", "core"],
+  ["model", "core"],
+  ["viewChild", "core"],
+  ["viewChildren", "core"],
+  ["contentChild", "core"],
+  ["contentChildren", "core"],
+  ["effect", "core"],
+  ["resource", "core"],
+  ["httpResource", "common"]
+]);
+function expressionIsUsingAngularImportedSymbol(program, expression) {
   const symbol = program.getTypeChecker().getSymbolAtLocation(expression);
   if (symbol === void 0) {
     return false;
@@ -7072,20 +7076,9 @@ function expressionIsUsingAngularCoreImportedSymbol(program, expression) {
     return false;
   }
   const specifier = importDeclaration.moduleSpecifier.text;
-  return specifier !== void 0 && (specifier === "@angular/core" || specifier.startsWith("@angular/core/"));
+  const packageName = signalFunctions.get(expression.getText());
+  return specifier !== void 0 && packageName !== void 0 && (specifier === `@angular/${packageName}` || specifier.startsWith(`@angular/${packageName}/`));
 }
-var signalFunctions = /* @__PURE__ */ new Set([
-  "signal",
-  "computed",
-  "linkedSignal",
-  "input",
-  "model",
-  "viewChild",
-  "viewChildren",
-  "contentChild",
-  "contentChildren",
-  "effect"
-]);
 function isSignalFunction(expression) {
   const text = expression.text;
   return signalFunctions.has(text);
@@ -7104,10 +7097,10 @@ function transformVariableDeclaration(program, node) {
     return node;
   const expression = node.initializer.expression;
   if (ts32.isPropertyAccessExpression(expression)) {
-    if (!expressionIsUsingAngularCoreImportedSymbol(program, expression.expression)) {
+    if (!expressionIsUsingAngularImportedSymbol(program, expression.expression)) {
       return node;
     }
-  } else if (!expressionIsUsingAngularCoreImportedSymbol(program, expression)) {
+  } else if (!expressionIsUsingAngularImportedSymbol(program, expression)) {
     return node;
   }
   try {
@@ -7120,10 +7113,10 @@ function transformVariableDeclaration(program, node) {
 function transformPropertyAssignment(program, node) {
   const expression = node.expression.right.expression;
   if (ts32.isPropertyAccessExpression(expression)) {
-    if (!expressionIsUsingAngularCoreImportedSymbol(program, expression.expression)) {
+    if (!expressionIsUsingAngularImportedSymbol(program, expression.expression)) {
       return node;
     }
-  } else if (!expressionIsUsingAngularCoreImportedSymbol(program, expression)) {
+  } else if (!expressionIsUsingAngularImportedSymbol(program, expression)) {
     return node;
   }
   return ts32.factory.updateExpressionStatement(node, ts32.factory.createBinaryExpression(node.expression.left, node.expression.operatorToken, insertDebugNameIntoCallExpression(node.expression.right, node.expression.left.name.text)));
@@ -7133,10 +7126,10 @@ function transformPropertyDeclaration(program, node) {
     return node;
   const expression = node.initializer.expression;
   if (ts32.isPropertyAccessExpression(expression)) {
-    if (!expressionIsUsingAngularCoreImportedSymbol(program, expression.expression)) {
+    if (!expressionIsUsingAngularImportedSymbol(program, expression.expression)) {
       return node;
     }
-  } else if (!expressionIsUsingAngularCoreImportedSymbol(program, expression)) {
+  } else if (!expressionIsUsingAngularImportedSymbol(program, expression)) {
     return node;
   }
   try {
@@ -7145,6 +7138,14 @@ function transformPropertyDeclaration(program, node) {
   } catch {
     return node;
   }
+}
+function isSignalWithObjectOnlyDefinition(callExpression) {
+  const callExpressionText = callExpression.expression.getText();
+  const nodeArgs = Array.from(callExpression.arguments);
+  const isLinkedSignal = callExpressionText === "linkedSignal";
+  const isComputationLinkedSignal = isLinkedSignal && nodeArgs[0].kind === ts32.SyntaxKind.ObjectLiteralExpression;
+  const isResource = callExpressionText === "resource";
+  return isComputationLinkedSignal || isResource;
 }
 function signalMetadataTransform(program) {
   return (context) => (rootNode) => {
