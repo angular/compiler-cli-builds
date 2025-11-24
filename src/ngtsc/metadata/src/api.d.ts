@@ -94,6 +94,8 @@ export interface DirectiveTypeCheckMeta {
      * The set of input fields which do not have corresponding members in the Directive's class.
      */
     undeclaredInputFields: Set<ClassPropertyName>;
+    /** Names of the public methods of the class. */
+    publicMethods: Set<string>;
     /**
      * Whether the Directive's class is generic, i.e. `class MyDir<T> {...}`.
      */

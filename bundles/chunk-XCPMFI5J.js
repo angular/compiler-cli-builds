@@ -2958,7 +2958,16 @@ function readStringArrayType(type) {
 }
 function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
   const members = reflector.getMembersOfClass(node);
-  const staticMembers = members.filter((member) => member.isStatic);
+  const publicMethods = /* @__PURE__ */ new Set();
+  const staticMembers = [];
+  for (const member of members) {
+    if (member.isStatic) {
+      staticMembers.push(member);
+    }
+    if (member.kind === ClassMemberKind.Method && !member.isStatic && (member.accessLevel === ClassMemberAccessLevel.PublicReadonly || member.accessLevel === ClassMemberAccessLevel.PublicWritable)) {
+      publicMethods.add(member.name);
+    }
+  }
   const ngTemplateGuards = staticMembers.map(extractTemplateGuard).filter((guard) => guard !== null);
   const hasNgTemplateContextGuard = staticMembers.some((member) => member.kind === ClassMemberKind.Method && member.name === "ngTemplateContextGuard");
   const coercedInputFields = new Set(staticMembers.map(extractCoercedInput).filter((inputName) => {
@@ -2994,6 +3003,7 @@ function extractDirectiveTypeCheckMeta(node, inputs, reflector) {
     restrictedInputFields,
     stringLiteralInputFields,
     undeclaredInputFields,
+    publicMethods,
     isGeneric: arity !== null && arity > 0
   };
 }
@@ -3325,6 +3335,7 @@ function flattenInheritedDirectiveMetadata(reader, dir) {
   const undeclaredInputFields = /* @__PURE__ */ new Set();
   const restrictedInputFields = /* @__PURE__ */ new Set();
   const stringLiteralInputFields = /* @__PURE__ */ new Set();
+  const publicMethods = /* @__PURE__ */ new Set();
   let hostDirectives = null;
   let isDynamic = false;
   let inputs = ClassPropertyMapping.empty();
@@ -3356,6 +3367,9 @@ function flattenInheritedDirectiveMetadata(reader, dir) {
     for (const field of meta.stringLiteralInputFields) {
       stringLiteralInputFields.add(field);
     }
+    for (const name of meta.publicMethods) {
+      publicMethods.add(name);
+    }
     if (meta.hostDirectives !== null && meta.hostDirectives.length > 0) {
       hostDirectives ??= [];
       hostDirectives.push(...meta.hostDirectives);
@@ -3370,6 +3384,7 @@ function flattenInheritedDirectiveMetadata(reader, dir) {
     undeclaredInputFields,
     restrictedInputFields,
     stringLiteralInputFields,
+    publicMethods,
     baseClass: isDynamic ? "dynamic" : null,
     isStructural,
     hostDirectives
@@ -15330,6 +15345,20 @@ function getCustomFieldDirectiveType(meta) {
   }
   return null;
 }
+function isNativeField(dir, node, allDirectiveMatches) {
+  if (!isFieldDirective(dir)) {
+    return false;
+  }
+  if (!(node instanceof TmplAstElement3) || node.name !== "input" && node.name !== "select" && node.name !== "textarea") {
+    return false;
+  }
+  return allDirectiveMatches.every((meta) => {
+    return getCustomFieldDirectiveType(meta) === null && !isControlValueAccessorLike(meta);
+  });
+}
+function isControlValueAccessorLike(meta) {
+  return meta.publicMethods.has("writeValue") && meta.publicMethods.has("registerOnChange") && meta.publicMethods.has("registerOnTouched");
+}
 function checkUnsupportedFieldBindings(node, unsupportedBindingFields, tcb) {
   const inputs = node instanceof TmplAstHostElement2 ? node.bindings : node.inputs;
   for (const input of inputs) {
@@ -16688,7 +16717,7 @@ var Scope = class _Scope {
     const directiveOp = this.getDirectiveOp(dir, node, customFieldType);
     const dirIndex = this.opQueue.push(directiveOp) - 1;
     dirMap.set(dir, dirIndex);
-    if (isFieldDirective(dir) && node instanceof TmplAstElement8 && (node.name === "input" || node.name === "select" || node.name === "textarea") && !allDirectiveMatches.some(getCustomFieldDirectiveType)) {
+    if (isNativeField(dir, node, allDirectiveMatches)) {
       this.opQueue.push(new TcbNativeFieldDirectiveTypeOp(this.tcb, this, node));
     }
     this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir, customFieldType));
