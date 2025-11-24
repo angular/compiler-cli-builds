@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { DirectiveOwner, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstTemplate } from '@angular/compiler';
+import { DirectiveOwner, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
 import { TcbOp } from './base';
 import type { Context } from './context';
 import type { Scope } from './scope';
@@ -36,5 +36,7 @@ export declare function expandBoundAttributesForField(directive: TypeCheckableDi
 export declare function isFieldDirective(meta: TypeCheckableDirectiveMeta): boolean;
 /** Determines if a directive is a custom field and its type. */
 export declare function getCustomFieldDirectiveType(meta: TypeCheckableDirectiveMeta): CustomFieldType | null;
+/** Determines if a directive usage is on a native field. */
+export declare function isNativeField(dir: TypeCheckableDirectiveMeta, node: TmplAstNode, allDirectiveMatches: TypeCheckableDirectiveMeta[]): boolean;
 /** Checks whether a node has bindings that aren't supported on fields. */
 export declare function checkUnsupportedFieldBindings(node: DirectiveOwner, unsupportedBindingFields: Set<string>, tcb: Context): void;
