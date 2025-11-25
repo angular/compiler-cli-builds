@@ -155,7 +155,7 @@ import ts6 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/docs/src/jsdoc_extractor.js
 import ts from "typescript";
-var decoratorExpression = /@(?=(Injectable|Component|Directive|Pipe|NgModule|Input|Output|HostBinding|HostListener|Inject|Optional|Self|Host|SkipSelf|ViewChild|ViewChildren|ContentChild|ContentChildren))/g;
+var angularAtExpression = /@(?=(Injectable|Component|Directive|Pipe|NgModule|Input|Output|HostBinding|HostListener|Inject|Optional|Self|Host|SkipSelf|ViewChild|ViewChildren|ContentChild|ContentChildren|if|else|for|switch|case|default|empty|defer|placeholder|loading|error|let)\b)/g;
 function extractJsDocTags(node) {
   const escapedNode = getEscapedNode(node);
   return ts.getJSDocTags(escapedNode).map((t) => {
@@ -188,7 +188,7 @@ function getEscapedNode(node) {
   return file.statements.find((s) => ts.isClassDeclaration(s));
 }
 function escapeAngularDecorators(comment) {
-  return comment.replace(decoratorExpression, "_NG_AT_");
+  return comment.replace(angularAtExpression, "_NG_AT_");
 }
 function unescapeAngularDecorators(comment) {
   return comment.replace(/_NG_AT_/g, "@");
