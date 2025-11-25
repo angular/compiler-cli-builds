@@ -15203,7 +15203,6 @@ var TcbNativeFieldDirectiveTypeOp = class extends TcbOp {
     ...formControlInputFields,
     "value",
     "checked",
-    "type",
     "maxlength",
     "minlength"
   ]);
@@ -15370,8 +15369,7 @@ function checkUnsupportedFieldBindings(node, unsupportedBindingFields, tcb) {
   }
   if (!(node instanceof TmplAstHostElement2)) {
     for (const attr of node.attributes) {
-      const name = attr.name.toLowerCase();
-      if (name !== "type" && unsupportedBindingFields.has(name)) {
+      if (unsupportedBindingFields.has(attr.name.toLowerCase())) {
         tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, attr);
       }
     }
