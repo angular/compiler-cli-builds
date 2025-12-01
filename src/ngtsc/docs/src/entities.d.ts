@@ -80,6 +80,7 @@ export interface DocEntryWithSourceInfo extends DocEntry {
 /** Base type for all documentation entities. */
 export interface DocEntry {
     entryType: EntryType;
+    aliases?: string[];
     name: string;
     description: string;
     rawComment: string;
