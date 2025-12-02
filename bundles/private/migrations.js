@@ -5,7 +5,7 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-I3BPPTZC.js";
+} from "../chunk-WBMTHPJB.js";
 import {
   CompilationMode,
   DtsMetadataReader,
@@ -32,7 +32,7 @@ import {
   queryDecoratorNames,
   reflectObjectLiteral,
   unwrapExpression
-} from "../chunk-IJMZQ3RN.js";
+} from "../chunk-AJYFAKAV.js";
 import "../chunk-LS5RJ5CS.js";
 import {
   getFileSystem,
