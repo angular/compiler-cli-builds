@@ -6951,56 +6951,37 @@ function nodeArrayFromDecoratorsArray(decorators) {
 
 // packages/compiler-cli/src/ngtsc/transform/src/implicit_signal_debug_name_transform.js
 import ts32 from "typescript";
-function insertDebugNameIntoCallExpression(callExpression, debugName) {
-  const signalExpressionIsRequired = isRequiredSignalFunction(callExpression.expression);
-  let configPosition = signalExpressionIsRequired ? 0 : 1;
-  const signalExpressionHasNoArguments = callExpression.arguments.length === 0;
-  const signalWithObjectOnlyDefinition = isSignalWithObjectOnlyDefinition(callExpression);
-  if (signalExpressionHasNoArguments || signalWithObjectOnlyDefinition) {
-    configPosition = 0;
+function insertDebugNameIntoCallExpression(node, debugName) {
+  const isRequired = isRequiredSignalFunction(node.expression);
+  const hasNoArgs = node.arguments.length === 0;
+  const configPosition = hasNoArgs || isSignalWithObjectOnlyDefinition(node) || isRequired ? 0 : 1;
+  const existingArg = configPosition >= node.arguments.length ? null : node.arguments[configPosition];
+  if (existingArg !== null && (!ts32.isObjectLiteralExpression(existingArg) || existingArg.properties.some((prop) => ts32.isPropertyAssignment(prop) && ts32.isIdentifier(prop.name) && prop.name.text === "debugName"))) {
+    return node;
   }
-  const nodeArgs = Array.from(callExpression.arguments);
-  let existingArgument = nodeArgs[configPosition];
-  if (existingArgument === void 0) {
-    existingArgument = ts32.factory.createObjectLiteralExpression([]);
-  }
-  if (ts32.isIdentifier(existingArgument)) {
-    return callExpression;
-  }
-  if (!ts32.isObjectLiteralExpression(existingArgument)) {
-    return callExpression;
-  }
-  const properties = Array.from(existingArgument.properties);
-  const debugNameExists = properties.some((prop) => ts32.isPropertyAssignment(prop) && ts32.isIdentifier(prop.name) && prop.name.text === "debugName");
-  if (debugNameExists) {
-    return callExpression;
-  }
-  const ngDevModeIdentifier = ts32.factory.createIdentifier("ngDevMode");
   const debugNameProperty = ts32.factory.createPropertyAssignment("debugName", ts32.factory.createStringLiteral(debugName));
-  const debugNameObject = ts32.factory.createObjectLiteralExpression([debugNameProperty]);
-  const emptyObject = ts32.factory.createObjectLiteralExpression();
-  const spreadDebugNameExpression = ts32.factory.createSpreadAssignment(ts32.factory.createParenthesizedExpression(ts32.factory.createConditionalExpression(
-    ngDevModeIdentifier,
-    void 0,
-    // Question token
-    debugNameObject,
-    void 0,
-    // Colon token
-    emptyObject
-  )));
-  const transformedConfigProperties = ts32.factory.createObjectLiteralExpression([
-    spreadDebugNameExpression,
-    ...properties
-  ]);
-  let transformedSignalArgs = [];
-  if (signalExpressionHasNoArguments && !signalExpressionIsRequired) {
-    transformedSignalArgs = [ts32.factory.createIdentifier("undefined"), transformedConfigProperties];
-  } else if (signalWithObjectOnlyDefinition || signalExpressionIsRequired) {
-    transformedSignalArgs = [transformedConfigProperties];
+  let newArgs;
+  if (existingArg !== null) {
+    const transformedArg = ts32.factory.createObjectLiteralExpression([
+      ts32.factory.createSpreadAssignment(createNgDevModeConditional(ts32.factory.createObjectLiteralExpression([debugNameProperty]), ts32.factory.createObjectLiteralExpression())),
+      ...existingArg.properties
+    ]);
+    newArgs = node.arguments.map((arg) => arg === existingArg ? transformedArg : arg);
   } else {
-    transformedSignalArgs = [nodeArgs[0], transformedConfigProperties];
+    const spreadArgs = [];
+    if (hasNoArgs && !isRequired) {
+      spreadArgs.push(ts32.factory.createIdentifier("undefined"));
+    }
+    spreadArgs.push(ts32.factory.createObjectLiteralExpression([debugNameProperty]));
+    newArgs = [
+      ...node.arguments,
+      ts32.factory.createSpreadElement(createNgDevModeConditional(ts32.factory.createArrayLiteralExpression(spreadArgs), ts32.factory.createArrayLiteralExpression()))
+    ];
   }
-  return ts32.factory.updateCallExpression(callExpression, callExpression.expression, callExpression.typeArguments, ts32.factory.createNodeArray(transformedSignalArgs));
+  return ts32.factory.updateCallExpression(node, node.expression, node.typeArguments, newArgs);
+}
+function createNgDevModeConditional(devModeExpression, prodModeExpression) {
+  return ts32.factory.createParenthesizedExpression(ts32.factory.createConditionalExpression(ts32.factory.createIdentifier("ngDevMode"), void 0, devModeExpression, void 0, prodModeExpression));
 }
 function isVariableDeclarationCase(node) {
   if (!ts32.isVariableDeclaration(node)) {
