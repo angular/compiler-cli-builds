@@ -12,7 +12,7 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-D5LN5R4Z.js";
+} from "./chunk-JJRW2OAL.js";
 
 // packages/compiler-cli/src/main.js
 import ts2 from "typescript";

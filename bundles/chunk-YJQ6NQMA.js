@@ -15175,10 +15175,11 @@ var formControlOptionalFields = /* @__PURE__ */ new Set([
   "min",
   "minLength"
 ]);
-var TcbNativeFieldDirectiveTypeOp = class extends TcbOp {
+var TcbNativeFieldOp = class extends TcbOp {
   tcb;
   scope;
   node;
+  inputType;
   /** Bindings that aren't supported on signal form fields. */
   unsupportedBindingFields = /* @__PURE__ */ new Set([
     ...formControlInputFields,
@@ -15187,19 +15188,15 @@ var TcbNativeFieldDirectiveTypeOp = class extends TcbOp {
     "maxlength",
     "minlength"
   ]);
-  inputType;
   get optional() {
     return false;
   }
-  constructor(tcb, scope, node) {
+  constructor(tcb, scope, node, inputType) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
-    this.inputType = node.name === "input" && node.attributes.find((attr) => attr.name === "type")?.value || null;
-    if (this.inputType === "radio") {
-      this.unsupportedBindingFields.delete("value");
-    }
+    this.inputType = inputType;
   }
   execute() {
     const inputs = this.node instanceof TmplAstHostElement2 ? this.node.bindings : this.node.inputs;
@@ -15208,7 +15205,7 @@ var TcbNativeFieldDirectiveTypeOp = class extends TcbOp {
       return null;
     }
     checkUnsupportedFieldBindings(this.node, this.unsupportedBindingFields, this.tcb);
-    const expectedType = this.node instanceof TmplAstElement3 ? this.getExpectedTypeFromDomNode(this.node) : this.getUnsupportedType();
+    const expectedType = this.getExpectedTypeFromDomNode(this.node);
     const value = extractFieldValue(fieldBinding.value, this.tcb, this.scope);
     const id = this.tcb.allocateId();
     const assignment = ts73.factory.createBinaryExpression(id, ts73.SyntaxKind.EqualsToken, value);
@@ -15249,6 +15246,27 @@ var TcbNativeFieldDirectiveTypeOp = class extends TcbOp {
   }
   getUnsupportedType() {
     return ts73.factory.createKeywordTypeNode(ts73.SyntaxKind.NeverKeyword);
+  }
+};
+var TcbNativeRadioButtonFieldOp = class extends TcbNativeFieldOp {
+  constructor(tcb, scope, node) {
+    super(tcb, scope, node, "radio");
+    this.unsupportedBindingFields.delete("value");
+  }
+  execute() {
+    super.execute();
+    const valueBinding = this.node.inputs.find((attr) => {
+      return attr.type === BindingType3.Property && attr.name === "value";
+    });
+    if (valueBinding !== void 0) {
+      const id = this.tcb.allocateId();
+      const value = tcbExpression(valueBinding.value, this.tcb, this.scope);
+      const assignment = ts73.factory.createBinaryExpression(id, ts73.SyntaxKind.EqualsToken, value);
+      addParseSpanInfo(assignment, valueBinding.sourceSpan);
+      this.scope.addStatement(tsDeclareVariable(id, ts73.factory.createKeywordTypeNode(ts73.SyntaxKind.StringKeyword)));
+      this.scope.addStatement(ts73.factory.createExpressionStatement(assignment));
+    }
+    return null;
   }
 };
 function expandBoundAttributesForField(directive, node, customFieldType) {
@@ -16697,7 +16715,8 @@ var Scope = class _Scope {
     const dirIndex = this.opQueue.push(directiveOp) - 1;
     dirMap.set(dir, dirIndex);
     if (isNativeField(dir, node, allDirectiveMatches)) {
-      this.opQueue.push(new TcbNativeFieldDirectiveTypeOp(this.tcb, this, node));
+      const inputType = node.name === "input" && node.attributes.find((attr) => attr.name === "type")?.value || null;
+      this.opQueue.push(inputType === "radio" ? new TcbNativeRadioButtonFieldOp(this.tcb, this, node) : new TcbNativeFieldOp(this.tcb, this, node, inputType));
     }
     this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir, customFieldType));
   }
