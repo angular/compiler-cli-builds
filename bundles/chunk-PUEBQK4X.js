@@ -15242,6 +15242,16 @@ var TcbNativeFieldOp = class extends TcbOp {
           ts73.factory.createLiteralTypeNode(ts73.factory.createNull())
         ]);
     }
+    const hasDynamicType = this.inputType === null && this.node.inputs.some((input) => (input.type === BindingType3.Property || input.type === BindingType3.Attribute) && input.name === "type");
+    if (hasDynamicType) {
+      return ts73.factory.createUnionTypeNode([
+        ts73.factory.createKeywordTypeNode(ts73.SyntaxKind.StringKeyword),
+        ts73.factory.createKeywordTypeNode(ts73.SyntaxKind.NumberKeyword),
+        ts73.factory.createKeywordTypeNode(ts73.SyntaxKind.BooleanKeyword),
+        ts73.factory.createTypeReferenceNode("Date"),
+        ts73.factory.createLiteralTypeNode(ts73.factory.createNull())
+      ]);
+    }
     return ts73.factory.createKeywordTypeNode(ts73.SyntaxKind.StringKeyword);
   }
   getUnsupportedType() {
