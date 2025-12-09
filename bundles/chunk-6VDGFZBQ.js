@@ -87,7 +87,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-YJQ6NQMA.js";
+} from "./chunk-PUEBQK4X.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -917,9 +917,10 @@ function getDecoratorInterface(declaration, typeChecker) {
 function getDecoratorJsDocNode(declaration, typeChecker) {
   const name = declaration.name.getText();
   const decoratorInterface = getDecoratorInterface(declaration, typeChecker);
-  const callSignature = decoratorInterface.members.filter((node) => {
-    return ts9.isCallSignatureDeclaration(node) && extractRawJsDoc(node);
-  }).at(-1);
+  const callSignaturesWithJsDoc = decoratorInterface.members.filter((node) => {
+    return ts9.isCallSignatureDeclaration(node) && !!extractRawJsDoc(node);
+  });
+  const callSignature = callSignaturesWithJsDoc.sort((a, b) => (extractRawJsDoc(b)?.length ?? 0) - (extractRawJsDoc(a)?.length ?? 0))[0];
   if (!callSignature || !ts9.isCallSignatureDeclaration(callSignature)) {
     throw new Error(`No call signature with JsDoc on "${name}Decorator"`);
   }
