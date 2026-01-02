@@ -4434,12 +4434,13 @@ var StaticInterpreter = class {
     return res;
   }
   visitTypeQuery(node, context) {
-    if (!ts16.isIdentifier(node.exprName)) {
+    const exprName = ts16.isQualifiedName(node.exprName) ? node.exprName.right : node.exprName;
+    if (!ts16.isIdentifier(exprName)) {
       return DynamicValue.fromUnknown(node);
     }
-    const decl = this.host.getDeclarationOfIdentifier(node.exprName);
+    const decl = this.host.getDeclarationOfIdentifier(exprName);
     if (decl === null) {
-      return DynamicValue.fromUnknownIdentifier(node.exprName);
+      return DynamicValue.fromUnknownIdentifier(exprName);
     }
     const declContext = { ...context, ...joinModuleContext(context, node, decl) };
     return this.visitDeclaration(decl.node, declContext);
@@ -9595,7 +9596,7 @@ function parseTemplateDeclaration(node, decorator, component, containingFile, ev
       resolvedTemplateUrl: containingFile
     };
   } else {
-    throw new FatalDiagnosticError(ErrorCode.COMPONENT_MISSING_TEMPLATE, decorator.node, "component is missing a template");
+    throw new FatalDiagnosticError(ErrorCode.COMPONENT_MISSING_TEMPLATE, decorator.node, "@Component is missing a template. Add either a `template` or `templateUrl`");
   }
 }
 function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanalyzeTemplateCache, node, decorator, component, containingFile, defaultPreserveWhitespaces, options, compilationMode) {
@@ -11598,7 +11599,7 @@ function getTypeCheckId(clazz) {
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/completion.js
-import { EmptyExpr, ImplicitReceiver, PropertyRead, SafePropertyRead, TmplAstLetDeclaration, TmplAstReference, TmplAstTextAttribute } from "@angular/compiler";
+import { EmptyExpr, ImplicitReceiver, PropertyRead, SafePropertyRead, ThisReceiver, TmplAstLetDeclaration, TmplAstReference, TmplAstTextAttribute } from "@angular/compiler";
 import ts51 from "typescript";
 var CompletionEngine = class {
   tcb;
@@ -11677,7 +11678,7 @@ var CompletionEngine = class {
         };
       }
     }
-    if (node instanceof PropertyRead && node.receiver instanceof ImplicitReceiver) {
+    if (node instanceof PropertyRead && (node.receiver instanceof ImplicitReceiver || node.receiver instanceof ThisReceiver)) {
       const nodeLocation = findFirstMatchingNode(this.tcb, {
         filter: ts51.isPropertyAccessExpression,
         withSpan: node.sourceSpan
@@ -13082,7 +13083,7 @@ var TypeParameterEmitter = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/host_bindings.js
-import { BindingType, CssSelector as CssSelector2, makeBindingParser, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstHostElement, AbsoluteSourceSpan as AbsoluteSourceSpan2, ParseSpan, PropertyRead as PropertyRead2, ParsedEventType, Call, ThisReceiver, KeyedRead, LiteralPrimitive, RecursiveAstVisitor, ASTWithName, SafeCall, ImplicitReceiver as ImplicitReceiver2 } from "@angular/compiler";
+import { BindingType, CssSelector as CssSelector2, makeBindingParser, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstHostElement, AbsoluteSourceSpan as AbsoluteSourceSpan2, ParseSpan, PropertyRead as PropertyRead2, ParsedEventType, Call, ThisReceiver as ThisReceiver2, KeyedRead, LiteralPrimitive, RecursiveAstVisitor, ASTWithName, SafeCall, ImplicitReceiver as ImplicitReceiver2 } from "@angular/compiler";
 import ts54 from "typescript";
 var GUARD_COMMENT_TEXT = "hostBindingsBlockGuard";
 function createHostElement(type, selector, sourceNode, literal4, bindingDecorators, listenerDecorators) {
@@ -13180,7 +13181,7 @@ function createNodeFromBindingDecorator(decorator, bindings) {
   }
   const span = new ParseSpan(-1, -1);
   const propertyStart = property.getStart();
-  const receiver = new ThisReceiver(span, new AbsoluteSourceSpan2(propertyStart, propertyStart));
+  const receiver = new ThisReceiver2(span, new AbsoluteSourceSpan2(propertyStart, propertyStart));
   const nameSpan = new AbsoluteSourceSpan2(propertyName.getStart(), propertyName.getEnd());
   const read = ts54.isIdentifier(propertyName) ? new PropertyRead2(span, nameSpan, nameSpan, receiver, propertyName.text) : new KeyedRead(span, nameSpan, receiver, new LiteralPrimitive(span, nameSpan, propertyName.text));
   const { attrName, type } = inferBoundAttribute(nameNode.text);
@@ -13198,7 +13199,7 @@ function createNodeFromListenerDecorator(decorator, parser, listeners) {
   const span = new ParseSpan(-1, -1);
   const argNodes = [];
   const methodStart = method.getStart();
-  const methodReceiver = new ThisReceiver(span, new AbsoluteSourceSpan2(methodStart, methodStart));
+  const methodReceiver = new ThisReceiver2(span, new AbsoluteSourceSpan2(methodStart, methodStart));
   const nameSpan = new AbsoluteSourceSpan2(method.name.getStart(), method.name.getEnd());
   const receiver = ts54.isIdentifier(method.name) ? new PropertyRead2(span, nameSpan, nameSpan, methodReceiver, method.name.text) : new KeyedRead(span, nameSpan, methodReceiver, new LiteralPrimitive(span, nameSpan, method.name.text));
   if (args.length > 1 && ts54.isArrayLiteralExpression(args[1])) {
@@ -14125,7 +14126,7 @@ import { TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstTemplate } from
 import ts65 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/expression.js
-import { Binary, BindingPipe, Call as Call3, ImplicitReceiver as ImplicitReceiver3, PropertyRead as PropertyRead4, R3Identifiers as R3Identifiers4, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead3, ThisReceiver as ThisReceiver2, TmplAstLetDeclaration as TmplAstLetDeclaration2 } from "@angular/compiler";
+import { Binary, BindingPipe, Call as Call3, ImplicitReceiver as ImplicitReceiver3, PropertyRead as PropertyRead4, R3Identifiers as R3Identifiers4, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead3, ThisReceiver as ThisReceiver3, TmplAstLetDeclaration as TmplAstLetDeclaration2 } from "@angular/compiler";
 import ts64 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/expression.js
@@ -14560,7 +14561,7 @@ var TcbExpressionTranslator = class {
    * context). This method assists in resolving those.
    */
   resolve(ast) {
-    if (ast instanceof PropertyRead4 && ast.receiver instanceof ImplicitReceiver3 && !(ast.receiver instanceof ThisReceiver2)) {
+    if (ast instanceof PropertyRead4 && ast.receiver instanceof ImplicitReceiver3) {
       const target = this.tcb.boundTarget.getExpressionTarget(ast);
       const targetExpression = target === null ? null : this.getTargetNodeExpression(target, ast);
       if (target instanceof TmplAstLetDeclaration2 && !this.isValidLetDeclarationAccess(target, ast)) {
@@ -14570,7 +14571,7 @@ var TcbExpressionTranslator = class {
         }
       }
       return targetExpression;
-    } else if (ast instanceof Binary && Binary.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead4 && ast.left.receiver instanceof ImplicitReceiver3) {
+    } else if (ast instanceof Binary && Binary.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead4 && (ast.left.receiver instanceof ImplicitReceiver3 || ast.left.receiver instanceof ThisReceiver3)) {
       const read = ast.left;
       const target = this.tcb.boundTarget.getExpressionTarget(read);
       if (target === null) {
@@ -14585,7 +14586,7 @@ var TcbExpressionTranslator = class {
         this.tcb.oobRecorder.illegalWriteToLetDeclaration(this.tcb.id, read, target);
       }
       return result;
-    } else if (ast instanceof ImplicitReceiver3) {
+    } else if (ast instanceof ImplicitReceiver3 || ast instanceof ThisReceiver3) {
       return ts64.factory.createThis();
     } else if (ast instanceof BindingPipe) {
       const expr = this.translate(ast.exp);
@@ -14617,7 +14618,7 @@ var TcbExpressionTranslator = class {
       addParseSpanInfo(result, ast.sourceSpan);
       return result;
     } else if ((ast instanceof Call3 || ast instanceof SafeCall2) && (ast.receiver instanceof PropertyRead4 || ast.receiver instanceof SafePropertyRead3)) {
-      if (ast.receiver.receiver instanceof ImplicitReceiver3 && !(ast.receiver.receiver instanceof ThisReceiver2) && ast.receiver.name === "$any" && ast.args.length === 1) {
+      if (ast.receiver.receiver instanceof ImplicitReceiver3 && ast.receiver.name === "$any" && ast.args.length === 1) {
         const expr = this.translate(ast.args[0]);
         const exprAsAny = ts64.factory.createAsExpression(expr, ts64.factory.createKeywordTypeNode(ts64.SyntaxKind.AnyKeyword));
         const result = ts64.factory.createParenthesizedExpression(exprAsAny);
@@ -15052,7 +15053,7 @@ var TcbSwitchOp = class extends TcbOp {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/for_block.js
-import { ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead5, TmplAstVariable } from "@angular/compiler";
+import { ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead5, ThisReceiver as ThisReceiver4, TmplAstVariable } from "@angular/compiler";
 import ts71 from "typescript";
 var TcbForOfOp = class extends TcbOp {
   tcb;
@@ -15100,7 +15101,7 @@ var TcbForLoopTrackTranslator = class extends TcbExpressionTranslator {
     }
   }
   resolve(ast) {
-    if (ast instanceof PropertyRead5 && ast.receiver instanceof ImplicitReceiver4) {
+    if (ast instanceof PropertyRead5 && (ast.receiver instanceof ImplicitReceiver4 || ast.receiver instanceof ThisReceiver4)) {
       const target = this.tcb.boundTarget.getExpressionTarget(ast);
       if (target !== null && (!(target instanceof TmplAstVariable) || !this.allowedVariables.has(target))) {
         this.tcb.oobRecorder.illegalForLoopTrackAccess(this.tcb.id, this.block, ast);
@@ -15149,10 +15150,13 @@ var formControlInputFields = [
   // Should be kept in sync with the `FormUiControl` bindings,
   // defined in `packages/forms/signals/src/api/control.ts`.
   "errors",
-  "invalid",
+  "dirty",
   "disabled",
   "disabledReasons",
+  "hidden",
+  "invalid",
   "name",
+  "pending",
   "readonly",
   "touched",
   "max",
@@ -15390,7 +15394,7 @@ function extractFieldValue(expression, tcb, scope) {
   return ts73.factory.createCallExpression(ts73.factory.createPropertyAccessExpression(innerCall, "value"), void 0, void 0);
 }
 function hasModelInput(name, meta) {
-  return !!meta.inputs.getByBindingPropertyName(name)?.some((v) => v.isSignal) && meta.outputs.hasBindingPropertyName(name + "Change");
+  return meta.inputs.hasBindingPropertyName(name) && meta.outputs.hasBindingPropertyName(name + "Change");
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/bindings.js
@@ -15698,7 +15702,7 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/events.js
-import { ImplicitReceiver as ImplicitReceiver5, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead7, ThisReceiver as ThisReceiver3, TmplAstElement as TmplAstElement6 } from "@angular/compiler";
+import { ImplicitReceiver as ImplicitReceiver5, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead7, TmplAstElement as TmplAstElement6 } from "@angular/compiler";
 import ts76 from "typescript";
 var EVENT_PARAMETER = "$event";
 function tcbEventHandlerExpression(ast, tcb, scope) {
@@ -15858,7 +15862,7 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
 };
 var TcbEventHandlerTranslator = class extends TcbExpressionTranslator {
   resolve(ast) {
-    if (ast instanceof PropertyRead7 && ast.receiver instanceof ImplicitReceiver5 && !(ast.receiver instanceof ThisReceiver3) && ast.name === EVENT_PARAMETER) {
+    if (ast instanceof PropertyRead7 && ast.receiver instanceof ImplicitReceiver5 && ast.name === EVENT_PARAMETER) {
       const event = ts76.factory.createIdentifier(EVENT_PARAMETER);
       addParseSpanInfo(event, ast.nameSpan);
       return event;
@@ -20482,8 +20486,12 @@ function validateAndFlattenComponentImports(imports, expr, isDeferred) {
   const diagnostics = [];
   for (let i = 0; i < imports.length; i++) {
     const ref = imports[i];
+    let refExpr = expr;
+    if (ts90.isArrayLiteralExpression(expr) && expr.elements.length === imports.length && !expr.elements.some(ts90.isSpreadAssignment)) {
+      refExpr = expr.elements[i];
+    }
     if (Array.isArray(ref)) {
-      const { imports: childImports, diagnostics: childDiagnostics } = validateAndFlattenComponentImports(ref, expr, isDeferred);
+      const { imports: childImports, diagnostics: childDiagnostics } = validateAndFlattenComponentImports(ref, refExpr, isDeferred);
       flattened.push(...childImports);
       diagnostics.push(...childDiagnostics);
     } else if (ref instanceof Reference) {
@@ -20501,11 +20509,11 @@ function validateAndFlattenComponentImports(imports, expr, isDeferred) {
     } else {
       let diagnosticNode;
       let diagnosticValue;
-      if (ref instanceof DynamicValue) {
+      if (ref instanceof DynamicValue && isWithinExpression(ref.node, expr)) {
         diagnosticNode = ref.node;
         diagnosticValue = ref;
-      } else if (ts90.isArrayLiteralExpression(expr) && expr.elements.length === imports.length && !expr.elements.some(ts90.isSpreadAssignment) && !imports.some(Array.isArray)) {
-        diagnosticNode = expr.elements[i];
+      } else if (refExpr !== expr) {
+        diagnosticNode = refExpr;
         diagnosticValue = ref;
       } else {
         diagnosticNode = expr;
@@ -20515,6 +20523,16 @@ function validateAndFlattenComponentImports(imports, expr, isDeferred) {
     }
   }
   return { imports: flattened, diagnostics };
+}
+function isWithinExpression(node, expr) {
+  let current = node;
+  while (current !== void 0) {
+    if (current === expr) {
+      return true;
+    }
+    current = current.parent;
+  }
+  return false;
 }
 function isLikelyModuleWithProviders(value) {
   if (value instanceof SyntheticValue && isResolvedModuleWithProviders(value)) {

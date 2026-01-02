@@ -87,7 +87,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-PUEBQK4X.js";
+} from "./chunk-RT3LXB7Z.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -2138,7 +2138,7 @@ var IndexingContext = class {
 import { ParseSourceFile } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/indexer/src/template.js
-import { ASTWithSource, CombinedRecursiveAstVisitor, ImplicitReceiver, PropertyRead, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable, tmplAstVisitAll } from "@angular/compiler";
+import { ASTWithSource, CombinedRecursiveAstVisitor, ImplicitReceiver, PropertyRead, ThisReceiver, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable, tmplAstVisitAll } from "@angular/compiler";
 var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
   boundTemplate;
   // Identifiers of interest found in the template.
@@ -2368,7 +2368,7 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
     if (this.currentAstWithSource === null || this.currentAstWithSource.source === null) {
       return;
     }
-    if (!(ast.receiver instanceof ImplicitReceiver)) {
+    if (!(ast.receiver instanceof ImplicitReceiver) && !(ast.receiver instanceof ThisReceiver)) {
       return;
     }
     const { absoluteOffset, source: expressionStr } = this.currentAstWithSource;
@@ -3664,7 +3664,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
 ]);
 
 // packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
-import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead6, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead6, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2, ThisReceiver as ThisReceiver2 } from "@angular/compiler";
 import ts23 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   templateTypeChecker;
@@ -3716,7 +3716,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
     this.checkForIllegalWriteInTwoWayBinding(ast, context);
   }
   checkForIllegalWriteInEventBinding(ast, context) {
-    if (!(context instanceof TmplAstBoundEvent3) || !(ast.receiver instanceof ImplicitReceiver2)) {
+    if (!this.shouldCheckForIllegalWrites(ast, context)) {
       return;
     }
     const target = this.templateTypeChecker.getExpressionTarget(ast, this.component);
@@ -3726,7 +3726,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
     }
   }
   checkForIllegalWriteInTwoWayBinding(ast, context) {
-    if (!(context instanceof TmplAstBoundEvent3) || context.type !== ParsedEventType2.TwoWay || !(ast.receiver instanceof ImplicitReceiver2) || ast !== unwrapAstWithSource(context.handler)) {
+    if (!this.shouldCheckForIllegalWrites(ast, context) || context.type !== ParsedEventType2.TwoWay || ast !== unwrapAstWithSource(context.handler)) {
       return;
     }
     const target = this.templateTypeChecker.getExpressionTarget(ast, this.component);
@@ -3756,6 +3756,9 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
         sourceFile: this.component.getSourceFile()
       }
     ]);
+  }
+  shouldCheckForIllegalWrites(ast, context) {
+    return context instanceof TmplAstBoundEvent3 && (ast.receiver instanceof ImplicitReceiver2 || ast.receiver instanceof ThisReceiver2);
   }
 };
 function unwrapAstWithSource(ast) {
