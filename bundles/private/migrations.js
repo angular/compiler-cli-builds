@@ -5,7 +5,7 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-EJFUJAX3.js";
+} from "../chunk-O2AGIUMF.js";
 import {
   CompilationMode,
   DtsMetadataReader,
