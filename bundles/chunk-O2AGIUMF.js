@@ -622,12 +622,15 @@ var DirectiveExtractor = class extends ClassExtractor {
   }
   /** Extract docs info for directives and components (including underlying class info). */
   extract() {
+    const selector = this.metadata.selector ?? "";
+    const aliases = extractAliasesFromSelector(selector);
     return {
       ...super.extract(),
       isStandalone: this.metadata.isStandalone,
-      selector: this.metadata.selector ?? "",
+      selector,
       exportAs: this.metadata.exportAs ?? [],
-      entryType: this.metadata.isComponent ? EntryType.Component : EntryType.Directive
+      entryType: this.metadata.isComponent ? EntryType.Component : EntryType.Directive,
+      ...aliases.length > 0 && { aliases }
     };
   }
   /** Extracts docs info for a directive property, including input/output metadata. */
@@ -716,6 +719,21 @@ function extractPipeSyntax(metadata, classDeclaration) {
     return param.name.getText();
   });
   return `{{ value_expression | ${metadata.name}${paramNames.length ? ":" + paramNames.join(":") : ""} }}`;
+}
+function extractAliasesFromSelector(selector) {
+  if (!selector) {
+    return [];
+  }
+  const aliases = [];
+  const attributeRegex = /\[([^\]=]+)(?:=[^\]]+)?\]/g;
+  let match;
+  while ((match = attributeRegex.exec(selector)) !== null) {
+    const attributeName = match[1].trim();
+    if (attributeName) {
+      aliases.push(attributeName);
+    }
+  }
+  return aliases;
 }
 
 // packages/compiler-cli/src/ngtsc/docs/src/constant_extractor.js
@@ -1204,7 +1222,7 @@ var DocsExtractor = class {
       if (isAngularPrivateName(exportName)) {
         continue;
       }
-      const entry = this.extractDeclarations(exportName, declarations);
+      const entry = this.extractDeclarations(declarations);
       if (entry && !isIgnoredDocEntry(entry)) {
         const realSourceFile = declarations[0].getSourceFile();
         const importedSymbols = getImportedSymbols(realSourceFile);
@@ -1233,7 +1251,7 @@ var DocsExtractor = class {
    * the same name. This is used to combine entries, e.g. for a type and a namespace that are
    * exported under the same name.
    */
-  extractDeclarations(exportName, nodes) {
+  extractDeclarations(nodes) {
     const entries = nodes.map((node) => this.extractDeclaration(node));
     const decorator = entries.find((e) => e?.entryType === EntryType.Decorator);
     if (decorator) {
