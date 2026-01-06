@@ -15283,17 +15283,17 @@ var TcbNativeRadioButtonFieldOp = class extends TcbNativeFieldOp {
     return null;
   }
 };
-function expandBoundAttributesForField(directive, node, customFieldType) {
+function expandBoundAttributesForField(directive, node, customFormControlType) {
   const fieldBinding = node.inputs.find((input) => input.type === BindingType3.Property && input.name === "field");
   if (!fieldBinding) {
     return null;
   }
   let boundInputs = null;
   let primaryInput;
-  if (customFieldType === "value") {
-    primaryInput = getSyntheticFieldBoundInput(directive, "value", "value", fieldBinding, customFieldType);
-  } else if (customFieldType === "checkbox") {
-    primaryInput = getSyntheticFieldBoundInput(directive, "checked", "value", fieldBinding, customFieldType);
+  if (customFormControlType === "value") {
+    primaryInput = getSyntheticFieldBoundInput(directive, "value", "value", fieldBinding, customFormControlType);
+  } else if (customFormControlType === "checkbox") {
+    primaryInput = getSyntheticFieldBoundInput(directive, "checked", "value", fieldBinding, customFormControlType);
   } else {
     primaryInput = null;
   }
@@ -15302,7 +15302,7 @@ function expandBoundAttributesForField(directive, node, customFieldType) {
     boundInputs.push(primaryInput);
   }
   for (const name of formControlInputFields) {
-    const input = getSyntheticFieldBoundInput(directive, name, name, fieldBinding, customFieldType);
+    const input = getSyntheticFieldBoundInput(directive, name, name, fieldBinding, customFormControlType);
     if (input !== null) {
       boundInputs ??= [];
       boundInputs.push(input);
@@ -15396,6 +15396,18 @@ function extractFieldValue(expression, tcb, scope) {
 function hasModelInput(name, meta) {
   return meta.inputs.hasBindingPropertyName(name) && meta.outputs.hasBindingPropertyName(name + "Change");
 }
+function isFormControl(allDirectiveMatches) {
+  let result = false;
+  for (const match of allDirectiveMatches) {
+    if (match.inputs.hasBindingPropertyName("field")) {
+      if (!isFieldDirective(match)) {
+        return false;
+      }
+      result = true;
+    }
+  }
+  return result;
+}
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/bindings.js
 import { BindingType as BindingType4, TmplAstBoundAttribute as TmplAstBoundAttribute4, TmplAstElement as TmplAstElement4, TmplAstTemplate as TmplAstTemplate3 } from "@angular/compiler";
@@ -15482,14 +15494,16 @@ var TcbDirectiveInputsOp = class extends TcbOp {
   scope;
   node;
   dir;
-  customControlType;
-  constructor(tcb, scope, node, dir, customControlType) {
+  isFormControl;
+  customFormControlType;
+  constructor(tcb, scope, node, dir, isFormControl2 = false, customFormControlType) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
     this.dir = dir;
-    this.customControlType = customControlType;
+    this.isFormControl = isFormControl2;
+    this.customFormControlType = customFormControlType;
   }
   get optional() {
     return false;
@@ -15498,9 +15512,11 @@ var TcbDirectiveInputsOp = class extends TcbOp {
     let dirId = null;
     const seenRequiredInputs = /* @__PURE__ */ new Set();
     const boundAttrs = getBoundAttributes(this.dir, this.node);
-    if (this.customControlType !== null) {
+    if (this.customFormControlType !== null) {
       checkUnsupportedFieldBindings(this.node, customFormControlBannedInputFields, this.tcb);
-      const additionalBindings = expandBoundAttributesForField(this.dir, this.node, this.customControlType);
+    }
+    if (this.customFormControlType !== null || this.isFormControl) {
+      const additionalBindings = expandBoundAttributesForField(this.dir, this.node, this.customFormControlType);
       if (additionalBindings !== null) {
         boundAttrs.push(...additionalBindings);
       }
@@ -16003,14 +16019,14 @@ var TcbDirectiveCtorOp = class extends TcbOp {
   scope;
   node;
   dir;
-  customControlType;
-  constructor(tcb, scope, node, dir, customControlType) {
+  customFormControlType;
+  constructor(tcb, scope, node, dir, customFormControlType) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
     this.dir = dir;
-    this.customControlType = customControlType;
+    this.customFormControlType = customFormControlType;
   }
   get optional() {
     return true;
@@ -16026,8 +16042,8 @@ var TcbDirectiveCtorOp = class extends TcbOp {
     } else {
       span = this.node.startSourceSpan || this.node.sourceSpan;
       boundAttrs = getBoundAttributes(this.dir, this.node);
-      if (this.customControlType !== null) {
-        const additionalBindings = expandBoundAttributesForField(this.dir, this.node, this.customControlType);
+      if (this.customFormControlType !== null) {
+        const additionalBindings = expandBoundAttributesForField(this.dir, this.node, this.customFormControlType);
         if (additionalBindings !== null) {
           boundAttrs.push(...additionalBindings);
         }
@@ -16724,15 +16740,16 @@ var Scope = class _Scope {
     }
   }
   appendDirectiveInputs(dir, node, dirMap, allDirectiveMatches) {
-    const customFieldType = allDirectiveMatches.some(isFieldDirective) ? getCustomFieldDirectiveType(dir) : null;
-    const directiveOp = this.getDirectiveOp(dir, node, customFieldType);
+    const nodeIsFormControl = isFormControl(allDirectiveMatches);
+    const customFormControlType = nodeIsFormControl ? getCustomFieldDirectiveType(dir) : null;
+    const directiveOp = this.getDirectiveOp(dir, node, customFormControlType);
     const dirIndex = this.opQueue.push(directiveOp) - 1;
     dirMap.set(dir, dirIndex);
     if (isNativeField(dir, node, allDirectiveMatches)) {
       const inputType = node.name === "input" && node.attributes.find((attr) => attr.name === "type")?.value || null;
       this.opQueue.push(inputType === "radio" ? new TcbNativeRadioButtonFieldOp(this.tcb, this, node) : new TcbNativeFieldOp(this.tcb, this, node, inputType));
     }
-    this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir, customFieldType));
+    this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir, nodeIsFormControl, customFormControlType));
   }
   getDirectiveOp(dir, node, customFieldType) {
     const dirRef = dir.ref;

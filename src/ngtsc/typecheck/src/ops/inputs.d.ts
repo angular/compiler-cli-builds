@@ -11,7 +11,7 @@ import type { Context } from './context';
 import type { Scope } from './scope';
 import { TypeCheckableDirectiveMeta } from '../../api';
 import { TcbOp } from './base';
-import { CustomFieldType } from './signal_forms';
+import { CustomFormControlType } from './signal_forms';
 import { LocalSymbol } from './references';
 /**
  * Translates the given attribute binding to a `ts.Expression`.
@@ -28,8 +28,9 @@ export declare class TcbDirectiveInputsOp extends TcbOp {
     private scope;
     private node;
     private dir;
-    private customControlType;
-    constructor(tcb: Context, scope: Scope, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective, dir: TypeCheckableDirectiveMeta, customControlType: CustomFieldType | null);
+    private isFormControl;
+    private customFormControlType;
+    constructor(tcb: Context, scope: Scope, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective, dir: TypeCheckableDirectiveMeta, isFormControl: boolean | undefined, customFormControlType: CustomFormControlType | null);
     get optional(): boolean;
     execute(): null;
     private checkRequiredInputs;

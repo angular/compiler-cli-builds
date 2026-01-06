@@ -11,7 +11,7 @@ import { TcbOp } from './base';
 import { Context } from './context';
 import type { Scope } from './scope';
 import { TypeCheckableDirectiveMeta } from '../../api';
-import { CustomFieldType } from './signal_forms';
+import { CustomFormControlType } from './signal_forms';
 /**
  * A `TcbOp` which constructs an instance of a directive with types inferred from its inputs. The
  * inputs themselves are not checked here; checking of inputs is achieved in `TcbDirectiveInputsOp`.
@@ -29,8 +29,8 @@ export declare class TcbDirectiveCtorOp extends TcbOp {
     private scope;
     private node;
     private dir;
-    private customControlType;
-    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TypeCheckableDirectiveMeta, customControlType: CustomFieldType | null);
+    private customFormControlType;
+    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TypeCheckableDirectiveMeta, customFormControlType: CustomFormControlType | null);
     get optional(): boolean;
     execute(): ts.Identifier;
     circularFallback(): TcbOp;
