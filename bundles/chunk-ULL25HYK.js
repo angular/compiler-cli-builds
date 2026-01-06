@@ -15204,7 +15204,7 @@ var TcbNativeFieldOp = class extends TcbOp {
   }
   execute() {
     const inputs = this.node instanceof TmplAstHostElement2 ? this.node.bindings : this.node.inputs;
-    const fieldBinding = inputs.find((input) => input.type === BindingType3.Property && input.name === "field") ?? null;
+    const fieldBinding = inputs.find((input) => input.type === BindingType3.Property && (input.name === "field" || input.name === "formField")) ?? null;
     if (fieldBinding === null) {
       return null;
     }
@@ -15284,7 +15284,7 @@ var TcbNativeRadioButtonFieldOp = class extends TcbNativeFieldOp {
   }
 };
 function expandBoundAttributesForField(directive, node, customFormControlType) {
-  const fieldBinding = node.inputs.find((input) => input.type === BindingType3.Property && input.name === "field");
+  const fieldBinding = node.inputs.find((input) => input.type === BindingType3.Property && (input.name === "field" || input.name === "formField"));
   if (!fieldBinding) {
     return null;
   }
@@ -15311,7 +15311,7 @@ function expandBoundAttributesForField(directive, node, customFormControlType) {
   return boundInputs;
 }
 function isFieldDirective(meta) {
-  if (meta.name !== "Field") {
+  if (meta.name !== "Field" && meta.name !== "FormField") {
     return false;
   }
   if (meta.ref.bestGuessOwningModule?.specifier === "@angular/forms/signals") {

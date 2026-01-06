@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { DirectiveOwner, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstNode, TmplAstTemplate } from '@angular/compiler';
+import { TypeCheckableDirectiveMeta } from '../../api';
 import { TcbOp } from './base';
+import { TcbBoundAttribute } from './bindings';
 import type { Context } from './context';
 import type { Scope } from './scope';
-import { TypeCheckableDirectiveMeta } from '../../api';
-import { TcbBoundAttribute } from './bindings';
 /** Possible types of custom form control directives. */
 export type CustomFormControlType = 'value' | 'checkbox';
 /** Names of input fields to which users aren't allowed to bind when using a `field` directive. */
