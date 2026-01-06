@@ -11,8 +11,8 @@ import type { Context } from './context';
 import type { Scope } from './scope';
 import { TypeCheckableDirectiveMeta } from '../../api';
 import { TcbBoundAttribute } from './bindings';
-/** Possible types of custom field directives. */
-export type CustomFieldType = 'value' | 'checkbox';
+/** Possible types of custom form control directives. */
+export type CustomFormControlType = 'value' | 'checkbox';
 /** Names of input fields to which users aren't allowed to bind when using a `field` directive. */
 export declare const customFormControlBannedInputFields: Set<string>;
 /**
@@ -39,13 +39,20 @@ export declare class TcbNativeRadioButtonFieldOp extends TcbNativeFieldOp {
     execute(): null;
 }
 /** Expands the set of bound inputs with the ones from custom field directives. */
-export declare function expandBoundAttributesForField(directive: TypeCheckableDirectiveMeta, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective, customFieldType: CustomFieldType): TcbBoundAttribute[] | null;
+export declare function expandBoundAttributesForField(directive: TypeCheckableDirectiveMeta, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective, customFormControlType: CustomFormControlType | null): TcbBoundAttribute[] | null;
 export declare function isFieldDirective(meta: TypeCheckableDirectiveMeta): boolean;
 /** Determines if a directive is a custom field and its type. */
-export declare function getCustomFieldDirectiveType(meta: TypeCheckableDirectiveMeta): CustomFieldType | null;
+export declare function getCustomFieldDirectiveType(meta: TypeCheckableDirectiveMeta): CustomFormControlType | null;
 /** Determines if a directive usage is on a native field. */
 export declare function isNativeField(dir: TypeCheckableDirectiveMeta, node: TmplAstNode, allDirectiveMatches: TypeCheckableDirectiveMeta[]): node is TmplAstElement & {
     name: 'input' | 'select' | 'textarea';
 };
 /** Checks whether a node has bindings that aren't supported on fields. */
 export declare function checkUnsupportedFieldBindings(node: DirectiveOwner, unsupportedBindingFields: Set<string>, tcb: Context): void;
+/**
+ * Determines whether a node is a form control based on its matching directives.
+ *
+ * A node is a form control if it has a matching `Field` directive, and no other directives match
+ * the `field` input.
+ */
+export declare function isFormControl(allDirectiveMatches: TypeCheckableDirectiveMeta[]): boolean;
