@@ -6,7 +6,7 @@ import {
   ImportedSymbolsTracker,
   TypeScriptReflectionHost,
   getInitializerApiJitTransform
-} from "../chunk-ULL25HYK.js";
+} from "../chunk-XPCY6UXR.js";
 import "../chunk-LS5RJ5CS.js";
 import {
   InvalidFileSystem,

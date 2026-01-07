@@ -15019,33 +15019,53 @@ var TcbSwitchOp = class extends TcbOp {
   }
   execute() {
     const switchExpression = tcbExpression(this.block.expression, this.tcb, this.scope);
-    const clauses = this.block.cases.map((current) => {
+    const clauses = this.block.groups.flatMap((current) => {
       const checkBody = this.tcb.env.config.checkControlFlowBodies;
       const clauseScope = this.scope.createChildScope(this.scope, null, checkBody ? current.children : [], checkBody ? this.generateGuard(current, switchExpression) : null);
       const statements = [...clauseScope.render(), ts70.factory.createBreakStatement()];
-      return current.expression === null ? ts70.factory.createDefaultClause(statements) : ts70.factory.createCaseClause(tcbExpression(current.expression, this.tcb, clauseScope), statements);
+      return current.cases.map((switchCase, index) => {
+        const statementsForCase = index === current.cases.length - 1 ? statements : [];
+        return switchCase.expression === null ? ts70.factory.createDefaultClause(statementsForCase) : ts70.factory.createCaseClause(tcbExpression(switchCase.expression, this.tcb, this.scope), statementsForCase);
+      });
     });
     this.scope.addStatement(ts70.factory.createSwitchStatement(switchExpression, ts70.factory.createCaseBlock(clauses)));
     return null;
   }
-  generateGuard(node, switchValue) {
-    if (node.expression !== null) {
-      const expression = tcbExpression(node.expression, this.tcb, this.scope);
-      markIgnoreDiagnostics(expression);
-      return ts70.factory.createBinaryExpression(switchValue, ts70.SyntaxKind.EqualsEqualsEqualsToken, expression);
+  generateGuard(group, switchValue) {
+    const hasDefault = group.cases.some((c) => c.expression === null);
+    if (!hasDefault) {
+      let guard2 = null;
+      for (const switchCase of group.cases) {
+        if (switchCase.expression !== null) {
+          const expression = tcbExpression(switchCase.expression, this.tcb, this.scope);
+          markIgnoreDiagnostics(expression);
+          const comparison = ts70.factory.createBinaryExpression(switchValue, ts70.SyntaxKind.EqualsEqualsEqualsToken, expression);
+          if (guard2 === null) {
+            guard2 = comparison;
+          } else {
+            guard2 = ts70.factory.createBinaryExpression(guard2, ts70.SyntaxKind.BarBarToken, comparison);
+          }
+        }
+      }
+      return guard2;
     }
     let guard = null;
-    for (const current of this.block.cases) {
-      if (current.expression === null) {
+    for (const currentGroup of this.block.groups) {
+      if (currentGroup === group) {
         continue;
       }
-      const expression = tcbExpression(current.expression, this.tcb, this.scope);
-      markIgnoreDiagnostics(expression);
-      const comparison = ts70.factory.createBinaryExpression(switchValue, ts70.SyntaxKind.ExclamationEqualsEqualsToken, expression);
-      if (guard === null) {
-        guard = comparison;
-      } else {
-        guard = ts70.factory.createBinaryExpression(guard, ts70.SyntaxKind.AmpersandAmpersandToken, comparison);
+      for (const switchCase of currentGroup.cases) {
+        if (switchCase.expression === null) {
+          continue;
+        }
+        const expression = tcbExpression(switchCase.expression, this.tcb, this.scope);
+        markIgnoreDiagnostics(expression);
+        const comparison = ts70.factory.createBinaryExpression(switchValue, ts70.SyntaxKind.ExclamationEqualsEqualsToken, expression);
+        if (guard === null) {
+          guard = comparison;
+        } else {
+          guard = ts70.factory.createBinaryExpression(guard, ts70.SyntaxKind.AmpersandAmpersandToken, comparison);
+        }
       }
     }
     return guard;
@@ -16191,7 +16211,7 @@ var TcbControlFlowContentProjectionOp = class extends TcbOp {
           }
         }
       } else if (child instanceof TmplAstSwitchBlock) {
-        for (const current of child.cases) {
+        for (const current of child.groups) {
           if (this.shouldCheck(current)) {
             result.push(current);
           }
