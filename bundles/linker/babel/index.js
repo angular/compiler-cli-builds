@@ -8,13 +8,13 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-ZJZNLTWN.js";
+} from "../../chunk-WEF4HIPN.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "../../chunk-6HOSNZU5.js";
 import "../../chunk-HYJ2H3FU.js";
-import "../../chunk-LS5RJ5CS.js";
+import "../../chunk-FROPOOFC.js";
 import {
   NodeJSFileSystem
 } from "../../chunk-XYYEESKY.js";
@@ -86,6 +86,9 @@ var BabelAstFactory = class {
     );
   }
   createExpressionStatement = t.expressionStatement;
+  createSpreadElement(expression) {
+    return t.spreadElement(expression);
+  }
   createFunctionDeclaration(functionName, parameters, body) {
     assert(body, t.isBlockStatement, "a block");
     return t.functionDeclaration(t.identifier(functionName), parameters.map((param) => t.identifier(param)), body);
@@ -126,9 +129,14 @@ var BabelAstFactory = class {
       throw new Error(`Invalid literal: ${value} (${typeof value})`);
     }
   }
-  createNewExpression = t.newExpression;
+  createNewExpression(expression, args) {
+    return t.newExpression(expression, args);
+  }
   createObjectLiteral(properties) {
     return t.objectExpression(properties.map((prop) => {
+      if (prop.kind === "spread") {
+        return t.spreadElement(prop.expression);
+      }
       const key = prop.quoted ? t.stringLiteral(prop.propertyName) : t.identifier(prop.propertyName);
       return t.objectProperty(key, prop.value);
     }));
@@ -142,7 +150,9 @@ var BabelAstFactory = class {
       false
     );
   }
-  createReturnStatement = t.returnStatement;
+  createReturnStatement(expression) {
+    return t.returnStatement(expression);
+  }
   createTaggedTemplate(tag, template) {
     return t.taggedTemplateExpression(tag, this.createTemplateLiteral(template));
   }

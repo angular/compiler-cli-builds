@@ -56,6 +56,7 @@ export declare class ExpressionTranslatorVisitor<TFile, TStatement, TExpression>
     visitLiteralMapExpr(ast: o.LiteralMapExpr, context: Context): TExpression;
     visitCommaExpr(ast: o.CommaExpr, context: Context): never;
     visitTemplateLiteralElementExpr(ast: o.TemplateLiteralElementExpr, context: any): void;
+    visitSpreadElementExpr(ast: o.outputAst.SpreadElementExpr, context: any): TExpression;
     visitWrappedNodeExpr(ast: o.WrappedNodeExpr<any>, _context: Context): any;
     visitTypeofExpr(ast: o.TypeofExpr, context: Context): TExpression;
     visitVoidExpr(ast: o.VoidExpr, context: Context): TExpression;

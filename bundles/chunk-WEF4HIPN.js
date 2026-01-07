@@ -8,7 +8,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-LS5RJ5CS.js";
+} from "./chunk-FROPOOFC.js";
 
 // packages/compiler-cli/linker/src/fatal_linker_error.js
 var FatalLinkerError = class extends Error {
@@ -455,7 +455,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "21.1.0-next.4+sha-85ce5f3";
+var PLACEHOLDER_VERSION = "21.1.0-next.4+sha-80b0fbb";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }

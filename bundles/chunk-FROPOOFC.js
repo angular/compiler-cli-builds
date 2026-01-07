@@ -214,10 +214,14 @@ var ExpressionTranslatorVisitor = class {
   }
   visitLiteralMapExpr(ast, context) {
     const properties = ast.entries.map((entry) => {
-      return {
+      return entry instanceof o.LiteralMapPropertyAssignment ? {
+        kind: "property",
         propertyName: entry.key,
         quoted: entry.quoted,
         value: entry.value.visitExpression(this, context)
+      } : {
+        kind: "spread",
+        expression: entry.expression.visitExpression(this, context)
       };
     });
     return this.setSourceMapRange(this.factory.createObjectLiteral(properties), ast.sourceSpan);
@@ -227,6 +231,10 @@ var ExpressionTranslatorVisitor = class {
   }
   visitTemplateLiteralElementExpr(ast, context) {
     throw new Error("Method not implemented");
+  }
+  visitSpreadElementExpr(ast, context) {
+    const expression = ast.expression.visitExpression(this, context);
+    return this.setSourceMapRange(this.factory.createSpreadElement(expression), ast.sourceSpan);
   }
   visitWrappedNodeExpr(ast, _context) {
     this.recordWrappedNode(ast);

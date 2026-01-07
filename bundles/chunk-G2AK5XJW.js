@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-LS5RJ5CS.js";
+} from "./chunk-FROPOOFC.js";
 import {
   LogicalProjectPath,
   absoluteFrom,
@@ -5349,6 +5349,9 @@ var TypeTranslatorVisitor = class {
   }
   visitLiteralMapExpr(ast, context) {
     const entries = ast.entries.map((entry) => {
+      if (entry instanceof o.LiteralMapSpreadAssignment) {
+        throw new Error("Spread is not supported in this context");
+      }
       const { key, quoted } = entry;
       const type = this.translateExpression(entry.value, context);
       return ts25.factory.createPropertySignature(
@@ -5396,6 +5399,10 @@ var TypeTranslatorVisitor = class {
   }
   visitParenthesizedExpr(ast, context) {
     throw new Error("Method not implemented.");
+  }
+  visitSpreadElementExpr(ast, context) {
+    const typeNode = this.translateExpression(ast.expression, context);
+    return ts25.factory.createRestTypeNode(typeNode);
   }
   translateType(type, context) {
     const typeNode = type.visitType(this, context);
@@ -5566,10 +5573,16 @@ var TypeScriptAstFactory = class {
     return ts26.factory.createNewExpression(expression, void 0, args);
   }
   createObjectLiteral(properties) {
-    return ts26.factory.createObjectLiteralExpression(properties.map((prop) => ts26.factory.createPropertyAssignment(prop.quoted ? ts26.factory.createStringLiteral(prop.propertyName) : ts26.factory.createIdentifier(prop.propertyName), prop.value)));
+    return ts26.factory.createObjectLiteralExpression(properties.map((prop) => {
+      if (prop.kind === "spread") {
+        return ts26.factory.createSpreadAssignment(prop.expression);
+      }
+      return ts26.factory.createPropertyAssignment(prop.quoted ? ts26.factory.createStringLiteral(prop.propertyName) : ts26.factory.createIdentifier(prop.propertyName), prop.value);
+    }));
   }
   createParenthesizedExpression = ts26.factory.createParenthesizedExpression;
   createPropertyAccess = ts26.factory.createPropertyAccessExpression;
+  createSpreadElement = ts26.factory.createSpreadElement;
   createReturnStatement(expression) {
     return ts26.factory.createReturnStatement(expression ?? void 0);
   }
@@ -14261,9 +14274,13 @@ var AstTranslator = class {
     return node;
   }
   visitLiteralMap(ast) {
-    const properties = ast.keys.map(({ key }, idx) => {
+    const properties = ast.keys.map((key, idx) => {
       const value = this.translate(ast.values[idx]);
-      return ts63.factory.createPropertyAssignment(ts63.factory.createStringLiteral(key), value);
+      if (key.kind === "property") {
+        return ts63.factory.createPropertyAssignment(ts63.factory.createStringLiteral(key.key), value);
+      } else {
+        return ts63.factory.createSpreadAssignment(value);
+      }
     });
     const literal4 = ts63.factory.createObjectLiteralExpression(properties, true);
     const node = this.config.strictLiteralTypes ? literal4 : tsCastToAny(literal4);
@@ -14419,6 +14436,12 @@ var AstTranslator = class {
   visitParenthesizedExpression(ast) {
     return ts63.factory.createParenthesizedExpression(this.translate(ast.expression));
   }
+  visitSpreadElement(ast) {
+    const expression = wrapForDiagnostics(this.translate(ast.expression));
+    const node = ts63.factory.createSpreadElement(expression);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
   convertToSafeCall(ast, expr, args) {
     if (this.config.strictSafeNavigationTypes) {
       const call = ts63.factory.createCallExpression(ts63.factory.createNonNullExpression(expr), void 0, args);
@@ -14442,40 +14465,40 @@ var VeSafeLhsInferenceBugDetector = class _VeSafeLhsInferenceBugDetector {
   visitBinary(ast) {
     return ast.left.visit(this) || ast.right.visit(this);
   }
-  visitChain(ast) {
+  visitChain() {
     return false;
   }
   visitConditional(ast) {
     return ast.condition.visit(this) || ast.trueExp.visit(this) || ast.falseExp.visit(this);
   }
-  visitCall(ast) {
+  visitCall() {
     return true;
   }
-  visitSafeCall(ast) {
+  visitSafeCall() {
     return false;
   }
-  visitImplicitReceiver(ast) {
+  visitImplicitReceiver() {
     return false;
   }
-  visitThisReceiver(ast) {
+  visitThisReceiver() {
     return false;
   }
   visitInterpolation(ast) {
     return ast.expressions.some((exp) => exp.visit(this));
   }
-  visitKeyedRead(ast) {
+  visitKeyedRead() {
     return false;
   }
-  visitLiteralArray(ast) {
+  visitLiteralArray() {
     return true;
   }
-  visitLiteralMap(ast) {
+  visitLiteralMap() {
     return true;
   }
-  visitLiteralPrimitive(ast) {
+  visitLiteralPrimitive() {
     return false;
   }
-  visitPipe(ast) {
+  visitPipe() {
     return true;
   }
   visitPrefixNot(ast) {
@@ -14490,29 +14513,32 @@ var VeSafeLhsInferenceBugDetector = class _VeSafeLhsInferenceBugDetector {
   visitNonNullAssert(ast) {
     return ast.expression.visit(this);
   }
-  visitPropertyRead(ast) {
+  visitPropertyRead() {
     return false;
   }
-  visitSafePropertyRead(ast) {
+  visitSafePropertyRead() {
     return false;
   }
-  visitSafeKeyedRead(ast) {
+  visitSafeKeyedRead() {
     return false;
   }
-  visitTemplateLiteral(ast, context) {
+  visitTemplateLiteral() {
     return false;
   }
-  visitTemplateLiteralElement(ast, context) {
+  visitTemplateLiteralElement() {
     return false;
   }
-  visitTaggedTemplateLiteral(ast, context) {
+  visitTaggedTemplateLiteral() {
     return false;
   }
-  visitParenthesizedExpression(ast, context) {
+  visitParenthesizedExpression(ast) {
     return ast.expression.visit(this);
   }
-  visitRegularExpressionLiteral(ast, context) {
+  visitRegularExpressionLiteral() {
     return false;
+  }
+  visitSpreadElement(ast) {
+    return ast.expression.visit(this);
   }
 };
 
