@@ -14277,7 +14277,9 @@ var AstTranslator = class {
     const properties = ast.keys.map((key, idx) => {
       const value = this.translate(ast.values[idx]);
       if (key.kind === "property") {
-        return ts63.factory.createPropertyAssignment(ts63.factory.createStringLiteral(key.key), value);
+        const keyNode = ts63.factory.createStringLiteral(key.key);
+        addParseSpanInfo(keyNode, key.sourceSpan);
+        return ts63.factory.createPropertyAssignment(keyNode, value);
       } else {
         return ts63.factory.createSpreadAssignment(value);
       }
