@@ -14139,11 +14139,11 @@ import { TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstTemplate } from
 import ts65 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/expression.js
-import { Binary, BindingPipe, Call as Call3, ImplicitReceiver as ImplicitReceiver3, PropertyRead as PropertyRead4, R3Identifiers as R3Identifiers4, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead3, ThisReceiver as ThisReceiver3, TmplAstLetDeclaration as TmplAstLetDeclaration2 } from "@angular/compiler";
+import { Binary, BindingPipe, Call as Call3, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, R3Identifiers as R3Identifiers4, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead3, ThisReceiver as ThisReceiver4, TmplAstLetDeclaration as TmplAstLetDeclaration2 } from "@angular/compiler";
 import ts64 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/expression.js
-import { ASTWithSource, Call as Call2, PropertyRead as PropertyRead3, SafeKeyedRead, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
+import { ASTWithSource, Call as Call2, ImplicitReceiver as ImplicitReceiver3, PropertyRead as PropertyRead3, SafeKeyedRead, SafePropertyRead as SafePropertyRead2, ThisReceiver as ThisReceiver3 } from "@angular/compiler";
 import ts63 from "typescript";
 function getAnyExpression() {
   return ts63.factory.createAsExpression(ts63.factory.createNumericLiteral("0"), ts63.factory.createKeywordTypeNode(ts63.SyntaxKind.AnyKeyword));
@@ -14444,6 +14444,26 @@ var AstTranslator = class {
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
   }
+  visitArrowFunction(ast) {
+    const params = ast.parameters.map((param) => {
+      const paramNode = ts63.factory.createParameterDeclaration(void 0, void 0, param.name);
+      markIgnoreDiagnostics(paramNode);
+      return paramNode;
+    });
+    const body = astToTypescript(ast.body, (innerAst) => {
+      if (!(innerAst instanceof PropertyRead3) || innerAst.receiver instanceof ThisReceiver3 || !(innerAst.receiver instanceof ImplicitReceiver3)) {
+        return this.maybeResolve(innerAst);
+      }
+      const correspondingParam = ast.parameters.find((arg) => arg.name === innerAst.name);
+      if (correspondingParam) {
+        const node = ts63.factory.createIdentifier(innerAst.name);
+        addParseSpanInfo(node, innerAst.sourceSpan);
+        return node;
+      }
+      return this.maybeResolve(innerAst);
+    }, this.config);
+    return ts63.factory.createArrowFunction(void 0, void 0, params, void 0, void 0, body);
+  }
   convertToSafeCall(ast, expr, args) {
     if (this.config.strictSafeNavigationTypes) {
       const call = ts63.factory.createCallExpression(ts63.factory.createNonNullExpression(expr), void 0, args);
@@ -14542,6 +14562,9 @@ var VeSafeLhsInferenceBugDetector = class _VeSafeLhsInferenceBugDetector {
   visitSpreadElement(ast) {
     return ast.expression.visit(this);
   }
+  visitArrowFunction(ast, context) {
+    return false;
+  }
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/expression.js
@@ -14589,7 +14612,7 @@ var TcbExpressionTranslator = class {
    * context). This method assists in resolving those.
    */
   resolve(ast) {
-    if (ast instanceof PropertyRead4 && ast.receiver instanceof ImplicitReceiver3) {
+    if (ast instanceof PropertyRead4 && ast.receiver instanceof ImplicitReceiver4) {
       const target = this.tcb.boundTarget.getExpressionTarget(ast);
       const targetExpression = target === null ? null : this.getTargetNodeExpression(target, ast);
       if (target instanceof TmplAstLetDeclaration2 && !this.isValidLetDeclarationAccess(target, ast)) {
@@ -14599,7 +14622,7 @@ var TcbExpressionTranslator = class {
         }
       }
       return targetExpression;
-    } else if (ast instanceof Binary && Binary.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead4 && (ast.left.receiver instanceof ImplicitReceiver3 || ast.left.receiver instanceof ThisReceiver3)) {
+    } else if (ast instanceof Binary && Binary.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead4 && (ast.left.receiver instanceof ImplicitReceiver4 || ast.left.receiver instanceof ThisReceiver4)) {
       const read = ast.left;
       const target = this.tcb.boundTarget.getExpressionTarget(read);
       if (target === null) {
@@ -14614,7 +14637,7 @@ var TcbExpressionTranslator = class {
         this.tcb.oobRecorder.illegalWriteToLetDeclaration(this.tcb.id, read, target);
       }
       return result;
-    } else if (ast instanceof ImplicitReceiver3 || ast instanceof ThisReceiver3) {
+    } else if (ast instanceof ImplicitReceiver4 || ast instanceof ThisReceiver4) {
       return ts64.factory.createThis();
     } else if (ast instanceof BindingPipe) {
       const expr = this.translate(ast.exp);
@@ -14646,7 +14669,7 @@ var TcbExpressionTranslator = class {
       addParseSpanInfo(result, ast.sourceSpan);
       return result;
     } else if ((ast instanceof Call3 || ast instanceof SafeCall2) && (ast.receiver instanceof PropertyRead4 || ast.receiver instanceof SafePropertyRead3)) {
-      if (ast.receiver.receiver instanceof ImplicitReceiver3 && ast.receiver.name === "$any" && ast.args.length === 1) {
+      if (ast.receiver.receiver instanceof ImplicitReceiver4 && ast.receiver.name === "$any" && ast.args.length === 1) {
         const expr = this.translate(ast.args[0]);
         const exprAsAny = ts64.factory.createAsExpression(expr, ts64.factory.createKeywordTypeNode(ts64.SyntaxKind.AnyKeyword));
         const result = ts64.factory.createParenthesizedExpression(exprAsAny);
@@ -15101,7 +15124,7 @@ var TcbSwitchOp = class extends TcbOp {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/for_block.js
-import { ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead5, ThisReceiver as ThisReceiver4, TmplAstVariable } from "@angular/compiler";
+import { ImplicitReceiver as ImplicitReceiver5, PropertyRead as PropertyRead5, ThisReceiver as ThisReceiver5, TmplAstVariable } from "@angular/compiler";
 import ts71 from "typescript";
 var TcbForOfOp = class extends TcbOp {
   tcb;
@@ -15149,7 +15172,7 @@ var TcbForLoopTrackTranslator = class extends TcbExpressionTranslator {
     }
   }
   resolve(ast) {
-    if (ast instanceof PropertyRead5 && (ast.receiver instanceof ImplicitReceiver4 || ast.receiver instanceof ThisReceiver4)) {
+    if (ast instanceof PropertyRead5 && (ast.receiver instanceof ImplicitReceiver5 || ast.receiver instanceof ThisReceiver5)) {
       const target = this.tcb.boundTarget.getExpressionTarget(ast);
       if (target !== null && (!(target instanceof TmplAstVariable) || !this.allowedVariables.has(target))) {
         this.tcb.oobRecorder.illegalForLoopTrackAccess(this.tcb.id, this.block, ast);
@@ -15766,7 +15789,7 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/events.js
-import { ImplicitReceiver as ImplicitReceiver5, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead7, TmplAstElement as TmplAstElement6 } from "@angular/compiler";
+import { ImplicitReceiver as ImplicitReceiver6, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead7, TmplAstElement as TmplAstElement6 } from "@angular/compiler";
 import ts76 from "typescript";
 var EVENT_PARAMETER = "$event";
 function tcbEventHandlerExpression(ast, tcb, scope) {
@@ -15926,7 +15949,7 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
 };
 var TcbEventHandlerTranslator = class extends TcbExpressionTranslator {
   resolve(ast) {
-    if (ast instanceof PropertyRead7 && ast.receiver instanceof ImplicitReceiver5 && ast.name === EVENT_PARAMETER) {
+    if (ast instanceof PropertyRead7 && ast.receiver instanceof ImplicitReceiver6 && ast.name === EVENT_PARAMETER) {
       const event = ts76.factory.createIdentifier(EVENT_PARAMETER);
       addParseSpanInfo(event, ast.nameSpan);
       return event;
