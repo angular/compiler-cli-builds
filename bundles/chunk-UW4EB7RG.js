@@ -14143,7 +14143,7 @@ import { Binary, BindingPipe, Call as Call3, ImplicitReceiver as ImplicitReceive
 import ts64 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/expression.js
-import { ASTWithSource, Call as Call2, EmptyExpr as EmptyExpr2, PropertyRead as PropertyRead3, SafeKeyedRead, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
+import { ASTWithSource, Call as Call2, PropertyRead as PropertyRead3, SafeKeyedRead, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
 import ts63 from "typescript";
 function getAnyExpression() {
   return ts63.factory.createAsExpression(ts63.factory.createNumericLiteral("0"), ts63.factory.createKeywordTypeNode(ts63.SyntaxKind.AnyKeyword));
@@ -14200,11 +14200,6 @@ var AstTranslator = class {
   translate(ast) {
     if (ast instanceof ASTWithSource) {
       ast = ast.ast;
-    }
-    if (ast instanceof EmptyExpr2) {
-      const res = ts63.factory.createIdentifier("undefined");
-      addParseSpanInfo(res, ast.sourceSpan);
-      return res;
     }
     const resolved = this.maybeResolve(ast);
     if (resolved !== null) {
@@ -14441,6 +14436,11 @@ var AstTranslator = class {
   visitSpreadElement(ast) {
     const expression = wrapForDiagnostics(this.translate(ast.expression));
     const node = ts63.factory.createSpreadElement(expression);
+    addParseSpanInfo(node, ast.sourceSpan);
+    return node;
+  }
+  visitEmptyExpr(ast, context) {
+    const node = ts63.factory.createIdentifier("undefined");
     addParseSpanInfo(node, ast.sourceSpan);
     return node;
   }
