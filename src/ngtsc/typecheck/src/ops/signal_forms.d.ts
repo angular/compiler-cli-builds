@@ -16,7 +16,7 @@ export type CustomFormControlType = 'value' | 'checkbox';
 /** Names of input fields to which users aren't allowed to bind when using a `field` directive. */
 export declare const customFormControlBannedInputFields: Set<string>;
 /**
- * A `TcbOp` which constructs an instance of the signal forms `Field` directive on a native element.
+ * A `TcbOp` which constructs an instance of the signal forms `FormField` directive on a native element.
  */
 export declare class TcbNativeFieldOp extends TcbOp {
     protected tcb: Context;
@@ -52,7 +52,7 @@ export declare function checkUnsupportedFieldBindings(node: DirectiveOwner, unsu
 /**
  * Determines whether a node is a form control based on its matching directives.
  *
- * A node is a form control if it has a matching `Field` directive, and no other directives match
+ * A node is a form control if it has a matching `FormField` directive, and no other directives match
  * the `field` input.
  */
 export declare function isFormControl(allDirectiveMatches: TypeCheckableDirectiveMeta[]): boolean;

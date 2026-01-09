@@ -13,6 +13,7 @@ import {
   CompoundComponentScopeReader,
   CompoundMetadataReader,
   CompoundMetadataRegistry,
+  DOC_PAGE_BASE_URL,
   DefaultImportTracker,
   DeferredSymbolTracker,
   DelegatingPerfRecorder,
@@ -87,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-G2AK5XJW.js";
+} from "./chunk-TTZRVNVM.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -3042,7 +3043,7 @@ var InvalidBananaInBoxCheck = class extends TemplateCheckWithVisitor {
     const boundSyntax = node.sourceSpan.toString();
     const expectedBoundSyntax = boundSyntax.replace(`(${name})`, `[(${name.slice(1, -1)})]`);
     const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, `In the two-way binding syntax the parentheses should be inside the brackets, ex. '${expectedBoundSyntax}'.
-        Find more at https://angular.dev/guide/templates/two-way-binding`);
+        Find more at ${DOC_PAGE_BASE_URL}/guide/templates/two-way-binding`);
     return [diagnostic];
   }
 };
@@ -4965,7 +4966,7 @@ One of the following actions is required:
 2. Remove "strictTemplates" or set it to 'false'.
 
 More information about the template type checking compiler options can be found in the documentation:
-https://angular.dev/tools/cli/template-typecheck
+${DOC_PAGE_BASE_URL}/tools/cli/template-typecheck
       `.trim()
     });
   }
