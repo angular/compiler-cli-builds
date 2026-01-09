@@ -227,9 +227,14 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 
 // packages/compiler-cli/src/ngtsc/diagnostics/src/error_details_base_url.js
 import { VERSION } from "@angular/compiler";
+var DOC_PAGE_BASE_URL = (() => {
+  const full = VERSION.full;
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.0+sha-0aaadaf";
+  const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
+  return `https://${prefix}.angular.dev`;
+})();
 var ERROR_DETAILS_PAGE_BASE_URL = (() => {
-  const versionSubDomain = VERSION.major !== "0" ? `v${VERSION.major}.` : "";
-  return `https://${versionSubDomain}angular.dev/errors`;
+  return `${DOC_PAGE_BASE_URL}/errors`;
 })();
 
 // packages/compiler-cli/src/ngtsc/diagnostics/src/extended_template_diagnostic_name.js
@@ -13697,7 +13702,7 @@ var Environment = class extends ReferenceEmitEnvironment {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/oob.js
-import { AbsoluteSourceSpan as AbsoluteSourceSpan3, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent as TmplAstBoundEvent2, TmplAstComponent, TmplAstDirective, TmplAstElement, ParseSourceSpan as ParseSourceSpan2, BindingType as BindingType2 } from "@angular/compiler";
+import { AbsoluteSourceSpan as AbsoluteSourceSpan3, BindingType as BindingType2, ParseSourceSpan as ParseSourceSpan2, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent as TmplAstBoundEvent2, TmplAstComponent, TmplAstDirective, TmplAstElement } from "@angular/compiler";
 import ts58 from "typescript";
 var OutOfBandDiagnosticRecorderImpl = class {
   resolver;
@@ -13832,7 +13837,7 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
   splitTwoWayBinding(id, input, output, inputConsumer, outputConsumer) {
     const mapping = this.resolver.getTemplateSourceMapping(id);
     const errorMsg = `The property and event halves of the two-way binding '${input.name}' are not bound to the same target.
-            Find more at https://angular.dev/guide/templates/two-way-binding#how-two-way-binding-works`;
+            Find more at ${DOC_PAGE_BASE_URL}/guide/templates/two-way-binding`;
     const relatedMessages = [];
     relatedMessages.push({
       text: `The property half of the binding is to the '${inputConsumer.name.text}' component.`,
@@ -13972,9 +13977,9 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
       } else {
         name = node.name;
       }
-      message = `Binding to '${name}' is not allowed on nodes using the '[field]' directive`;
+      message = `Binding to '${name}' is not allowed on nodes using the '[formField]' directive`;
     } else {
-      message = `Setting the '${node.name}' attribute is not allowed on nodes using the '[field]' directive`;
+      message = `Setting the '${node.name}' attribute is not allowed on nodes using the '[formField]' directive`;
     }
     this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.sourceSpan, ts58.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FORM_FIELD_UNSUPPORTED_BINDING), message));
   }
@@ -15275,7 +15280,7 @@ var TcbNativeFieldOp = class extends TcbOp {
   }
   execute() {
     const inputs = this.node instanceof TmplAstHostElement2 ? this.node.bindings : this.node.inputs;
-    const fieldBinding = inputs.find((input) => input.type === BindingType3.Property && (input.name === "field" || input.name === "formField")) ?? null;
+    const fieldBinding = inputs.find((input) => input.type === BindingType3.Property && input.name === "formField") ?? null;
     if (fieldBinding === null) {
       return null;
     }
@@ -15355,7 +15360,7 @@ var TcbNativeRadioButtonFieldOp = class extends TcbNativeFieldOp {
   }
 };
 function expandBoundAttributesForField(directive, node, customFormControlType) {
-  const fieldBinding = node.inputs.find((input) => input.type === BindingType3.Property && (input.name === "field" || input.name === "formField"));
+  const fieldBinding = node.inputs.find((input) => input.type === BindingType3.Property && input.name === "formField");
   if (!fieldBinding) {
     return null;
   }
@@ -15382,7 +15387,7 @@ function expandBoundAttributesForField(directive, node, customFormControlType) {
   return boundInputs;
 }
 function isFieldDirective(meta) {
-  if (meta.name !== "Field" && meta.name !== "FormField") {
+  if (meta.name !== "FormField") {
     return false;
   }
   if (meta.ref.bestGuessOwningModule?.specifier === "@angular/forms/signals") {
@@ -15470,7 +15475,7 @@ function hasModelInput(name, meta) {
 function isFormControl(allDirectiveMatches) {
   let result = false;
   for (const match of allDirectiveMatches) {
-    if (match.inputs.hasBindingPropertyName("field")) {
+    if (match.inputs.hasBindingPropertyName("formField")) {
       if (!isFieldDirective(match)) {
         return false;
       }
@@ -23024,6 +23029,7 @@ export {
   makeDiagnostic,
   isFatalDiagnosticError,
   isLocalCompilationDiagnostics,
+  DOC_PAGE_BASE_URL,
   ERROR_DETAILS_PAGE_BASE_URL,
   ExtendedTemplateDiagnosticName,
   isDtsPath,
