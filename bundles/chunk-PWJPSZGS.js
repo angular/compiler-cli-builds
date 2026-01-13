@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-FROPOOFC.js";
+} from "./chunk-CSUVPNMK.js";
 import {
   LogicalProjectPath,
   absoluteFrom,
@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.0+sha-69da639";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.0+sha-e8f8ac2";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5482,7 +5482,6 @@ var TypeScriptAstFactory = class {
     "||": ts26.SyntaxKind.BarBarToken,
     "+": ts26.SyntaxKind.PlusToken,
     "??": ts26.SyntaxKind.QuestionQuestionToken,
-    "in": ts26.SyntaxKind.InKeyword,
     "=": ts26.SyntaxKind.EqualsToken,
     "+=": ts26.SyntaxKind.PlusEqualsToken,
     "-=": ts26.SyntaxKind.MinusEqualsToken,
@@ -5492,7 +5491,9 @@ var TypeScriptAstFactory = class {
     "**=": ts26.SyntaxKind.AsteriskAsteriskEqualsToken,
     "&&=": ts26.SyntaxKind.AmpersandAmpersandEqualsToken,
     "||=": ts26.SyntaxKind.BarBarEqualsToken,
-    "??=": ts26.SyntaxKind.QuestionQuestionEqualsToken
+    "??=": ts26.SyntaxKind.QuestionQuestionEqualsToken,
+    "in": ts26.SyntaxKind.InKeyword,
+    "instanceof": ts26.SyntaxKind.InstanceOfKeyword
   }))();
   VAR_TYPES = (() => ({
     "const": ts26.NodeFlags.Const,
@@ -14186,7 +14187,6 @@ var AstTranslator = class {
     ["&", ts63.SyntaxKind.AmpersandToken],
     ["|", ts63.SyntaxKind.BarToken],
     ["??", ts63.SyntaxKind.QuestionQuestionToken],
-    ["in", ts63.SyntaxKind.InKeyword],
     ["=", ts63.SyntaxKind.EqualsToken],
     ["+=", ts63.SyntaxKind.PlusEqualsToken],
     ["-=", ts63.SyntaxKind.MinusEqualsToken],
@@ -14196,7 +14196,9 @@ var AstTranslator = class {
     ["**=", ts63.SyntaxKind.AsteriskAsteriskEqualsToken],
     ["&&=", ts63.SyntaxKind.AmpersandAmpersandEqualsToken],
     ["||=", ts63.SyntaxKind.BarBarEqualsToken],
-    ["??=", ts63.SyntaxKind.QuestionQuestionEqualsToken]
+    ["??=", ts63.SyntaxKind.QuestionQuestionEqualsToken],
+    ["in", ts63.SyntaxKind.InKeyword],
+    ["instanceof", ts63.SyntaxKind.InstanceOfKeyword]
   ]);
   constructor(maybeResolve, config) {
     this.maybeResolve = maybeResolve;
