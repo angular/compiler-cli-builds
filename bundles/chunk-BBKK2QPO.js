@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.0+sha-074666b";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.0+sha-c9f584b";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -6760,7 +6760,9 @@ var IvyTransformationVisitor = class extends Visitor {
     this.deferrableImports = deferrableImports;
   }
   visitClassDeclaration(node) {
-    if (!this.classCompilationMap.has(node)) {
+    const original = ts31.getOriginalNode(node, ts31.isClassDeclaration);
+    const compileResults2 = this.classCompilationMap.get(node) ?? this.classCompilationMap.get(original);
+    if (!compileResults2) {
       return { node };
     }
     const translateOptions = {
@@ -6769,8 +6771,8 @@ var IvyTransformationVisitor = class extends Visitor {
     };
     const statements = [];
     const members = [...node.members];
-    const sourceFile = ts31.getOriginalNode(node).getSourceFile();
-    for (const field of this.classCompilationMap.get(node)) {
+    const sourceFile = original.getSourceFile();
+    for (const field of compileResults2) {
       if (field.initializer === null) {
         continue;
       }
