@@ -537,7 +537,7 @@ function getExtendedConfigPathWorker(configFile, extendsValue, host, fs) {
     }
   } else {
     const parseConfigHost = createParseConfigHost(host, fs);
-    const { resolvedModule } = ts5.nodeModuleNameResolver(extendsValue, configFile, { moduleResolution: ts5.ModuleResolutionKind.Node10, resolveJsonModule: true }, parseConfigHost);
+    const { resolvedModule } = ts5.nodeModuleNameResolver(extendsValue, configFile, { moduleResolution: ts5.ModuleResolutionKind.NodeNext, resolveJsonModule: true }, parseConfigHost);
     if (resolvedModule) {
       return absoluteFrom(resolvedModule.resolvedFileName);
     }
