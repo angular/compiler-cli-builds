@@ -17,7 +17,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-JEXAXD23.js";
+} from "./chunk-CEBE44Q5.js";
 
 // packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.js
 var ErrorCode;
@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.1.0+sha-b9c995e";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.1.0+sha-223ff74";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();

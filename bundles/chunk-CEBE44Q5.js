@@ -92,12 +92,12 @@ function makeError() {
 }
 
 // packages/compiler-cli/src/ngtsc/file_system/src/util.js
-var TS_DTS_JS_EXTENSION = /(?:\.d)?\.ts$|\.js$/;
+var TS_DTS_TSX_JS_EXTENSION = /(?:\.d)?\.ts$|\.tsx$|\.js$/;
 function normalizeSeparators(path) {
   return path.replace(/\\/g, "/");
 }
 function stripExtension(path) {
-  return path.replace(TS_DTS_JS_EXTENSION, "");
+  return path.replace(TS_DTS_TSX_JS_EXTENSION, "");
 }
 function getSourceFileOrError(program, fileName) {
   const sf = program.getSourceFile(fileName);

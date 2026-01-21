@@ -88,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-TTZRVNVM.js";
+} from "./chunk-I73LLMTA.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -96,7 +96,7 @@ import {
   getFileSystem,
   join,
   resolve
-} from "./chunk-JEXAXD23.js";
+} from "./chunk-CEBE44Q5.js";
 
 // packages/compiler-cli/src/ngtsc/docs/src/entities.js
 var EntryType;
