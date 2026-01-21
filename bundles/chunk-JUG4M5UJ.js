@@ -8,7 +8,7 @@ import {
   TrackedIncrementalBuildStrategy,
   freshCompilationTicket,
   incrementalFromCompilerTicket
-} from "./chunk-TKYILVRY.js";
+} from "./chunk-YCMMMX4R.js";
 import {
   ActivePerfRecorder,
   OptimizeFor,
@@ -18,13 +18,13 @@ import {
   TsCreateProgramDriver,
   replaceTsWithNgInErrors,
   retagAllTsFiles
-} from "./chunk-BBKK2QPO.js";
+} from "./chunk-RQUOFNXY.js";
 import {
   absoluteFrom,
   createFileSystemTsReadDirectoryFn,
   getFileSystem,
   resolve
-} from "./chunk-JEXAXD23.js";
+} from "./chunk-CEBE44Q5.js";
 
 // packages/compiler-cli/src/transformers/api.js
 var DEFAULT_ERROR_CODE = 100;
