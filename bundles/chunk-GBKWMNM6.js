@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.1.1+sha-61dbdee";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.1.1+sha-c9043fb";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5054,14 +5054,14 @@ var ImportManager = class {
         addNewImport(fileName, ts22.factory.createImportDeclaration(void 0, void 0, ts22.factory.createStringLiteral(moduleName)));
       });
       namespaceImports.forEach((namespaceImport2, moduleName) => {
-        const newImport = ts22.factory.createImportDeclaration(void 0, ts22.factory.createImportClause(false, void 0, namespaceImport2), ts22.factory.createStringLiteral(moduleName, useSingleQuotes));
+        const newImport = ts22.factory.createImportDeclaration(void 0, ts22.factory.createImportClause(void 0, void 0, namespaceImport2), ts22.factory.createStringLiteral(moduleName, useSingleQuotes));
         ts22.setOriginalNode(namespaceImport2.name, newImport);
         addNewImport(fileName, newImport);
       });
       namedImports.forEach((specifiers, moduleName) => {
         const filteredSpecifiers = specifiers.filter((specifier) => this._canAddSpecifier(sourceFile, moduleName, specifier));
         if (filteredSpecifiers.length > 0) {
-          const newImport = ts22.factory.createImportDeclaration(void 0, ts22.factory.createImportClause(false, void 0, ts22.factory.createNamedImports(filteredSpecifiers)), ts22.factory.createStringLiteral(moduleName, useSingleQuotes));
+          const newImport = ts22.factory.createImportDeclaration(void 0, ts22.factory.createImportClause(void 0, void 0, ts22.factory.createNamedImports(filteredSpecifiers)), ts22.factory.createStringLiteral(moduleName, useSingleQuotes));
           addNewImport(fileName, newImport);
         }
       });
