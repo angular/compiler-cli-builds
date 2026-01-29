@@ -455,7 +455,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "21.2.0-next.1+sha-6990f88";
+var PLACEHOLDER_VERSION = "21.2.0-next.1+sha-a67e007";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -551,6 +551,7 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl, version) {
     lifecycle: {
       usesOnChanges: metaObj.has("usesOnChanges") ? metaObj.getBoolean("usesOnChanges") : false
     },
+    controlCreate: metaObj.has("controlCreate") ? toControlCreate(metaObj.getObject("controlCreate")) : null,
     name: typeName,
     usesInheritance: metaObj.has("usesInheritance") ? metaObj.getBoolean("usesInheritance") : false,
     isStandalone: metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : getDefaultStandaloneValue(version),
@@ -571,6 +572,12 @@ function toInputMapping(value, key) {
     };
   }
   return parseLegacyInputPartialOutput(key, value);
+}
+function toControlCreate(controlCreate) {
+  const passThroughValue = controlCreate.getValue("passThroughInput");
+  return {
+    passThroughInput: passThroughValue.isNull() ? null : passThroughValue.getString()
+  };
 }
 function parseLegacyInputPartialOutput(key, value) {
   if (value.isString()) {

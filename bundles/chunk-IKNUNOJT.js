@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.1+sha-6990f88";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.1+sha-a67e007";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -8219,6 +8219,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
   const host = extractHostBindings(decoratedElements, evaluator, coreModule, compilationMode, hostBindingNodes, directive);
   const providers = directive.has("providers") ? new WrappedNodeExpr6(annotateForClosureCompiler ? wrapFunctionExpressionsInParens(directive.get("providers")) : directive.get("providers")) : null;
   const usesOnChanges = members.some((member) => !member.isStatic && member.kind === ClassMemberKind.Method && member.name === "ngOnChanges");
+  const controlCreate = extractControlDirectiveDefinition(members);
   let exportAs = null;
   if (directive.has("exportAs")) {
     const expr = directive.get("exportAs");
@@ -8284,6 +8285,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
     typeArgumentCount: reflector.getGenericArityOfClass(clazz) || 0,
     typeSourceSpan: createSourceSpan(clazz.name),
     usesInheritance,
+    controlCreate,
     exportAs,
     providers,
     isStandalone,
@@ -8869,6 +8871,21 @@ function assertEmittableInputType(type, contextFile, reflector, refEmitter) {
     }
     node.forEachChild(walk);
   })(type);
+}
+function extractControlDirectiveDefinition(members) {
+  const controlCreateMember = members.find((member) => !member.isStatic && member.kind === ClassMemberKind.Method && member.name === "\u0275ngControlCreate");
+  if (controlCreateMember === void 0 || controlCreateMember.node === null || !ts40.isMethodDeclaration(controlCreateMember.node)) {
+    return null;
+  }
+  const { node } = controlCreateMember;
+  if (node.parameters.length === 0 || node.parameters[0].type === void 0 || !ts40.isTypeReferenceNode(node.parameters[0].type)) {
+    return { passThroughInput: null };
+  }
+  const type = node.parameters[0].type;
+  if (type.typeArguments?.length !== 1 || !ts40.isLiteralTypeNode(type.typeArguments[0]) || !ts40.isStringLiteral(type.typeArguments[0].literal)) {
+    return { passThroughInput: null };
+  }
+  return { passThroughInput: type.typeArguments[0].literal.text };
 }
 function parseQueriesOfClassFields(members, reflector, importTracker, evaluator, isCore) {
   const viewQueries = [];
@@ -15397,7 +15414,7 @@ function isFieldDirective(meta) {
   if (meta.ref.bestGuessOwningModule?.specifier === "@angular/forms/signals") {
     return true;
   }
-  return ts73.isClassDeclaration(meta.ref.node) && meta.ref.node.members.some((member) => ts73.isPropertyDeclaration(member) && ts73.isComputedPropertyName(member.name) && ts73.isIdentifier(member.name.expression) && member.name.expression.text === "\u0275CONTROL");
+  return ts73.isClassDeclaration(meta.ref.node) && meta.ref.node.members.some((member) => ts73.isPropertyDeclaration(member) && ts73.isComputedPropertyName(member.name) && ts73.isIdentifier(member.name.expression) && member.name.expression.text === "\u0275NgFieldDirective");
 }
 function getSyntheticFieldBoundInput(dir, inputName, fieldPropertyName, fieldBinding, customFieldType) {
   const inputs = dir.inputs.getByBindingPropertyName(inputName);
