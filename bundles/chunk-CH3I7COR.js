@@ -162,11 +162,31 @@ function extractJsDocTags(node) {
   return ts.getJSDocTags(escapedNode).map((t) => {
     return {
       name: t.tagName.getText(),
-      // In TS 5.9, ts.getTextOfJSDocComment still strips "http" from comments breaking any absolute links in @see blocks.
-      // eg: @see https://angular.dev
-      comment: unescapeAngularDecorators(ts.getTextOfJSDocComment(t.comment) ?? "")
+      comment: unescapeAngularDecorators(getJSDocTagComment(t) ?? "")
     };
   });
+}
+function getJSDocTagComment(tag) {
+  const comment = tag.comment;
+  if (comment === void 0)
+    return void 0;
+  if (typeof comment === "string") {
+    if (comment.startsWith("://")) {
+      const rawText = tag.getText();
+      if (rawText.includes("https" + comment)) {
+        return "https" + comment;
+      }
+      if (rawText.includes("http" + comment)) {
+        return "http" + comment;
+      }
+    }
+    return comment;
+  }
+  let text = ts.getTextOfJSDocComment(comment);
+  if (text) {
+    text = text.replace(/ \(\)\}$/, "()}");
+  }
+  return text;
 }
 function extractJsDocDescription(node) {
   const escapedNode = getEscapedNode(node);
