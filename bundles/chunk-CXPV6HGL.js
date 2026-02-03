@@ -339,12 +339,17 @@ function extractReturnType(signature, typeChecker) {
   if (signature?.declaration?.type && ts3.isTypePredicateNode(signature.declaration.type)) {
     return signature.declaration.type.getText();
   }
-  return typeChecker.typeToString(
-    typeChecker.getReturnTypeOfSignature(signature),
+  const returnType = typeChecker.getReturnTypeOfSignature(signature);
+  const returnTypeString = typeChecker.typeToString(
+    returnType,
     void 0,
     // This ensures that e.g. `T | undefined` is not reduced to `T`.
     ts3.TypeFormatFlags.NoTypeReduction | ts3.TypeFormatFlags.NoTruncation
   );
+  if (returnTypeString === "any" && signature.declaration?.type && signature.declaration.type.kind !== ts3.SyntaxKind.AnyKeyword) {
+    return signature.declaration.type.getText();
+  }
+  return returnTypeString;
 }
 function findImplementationOfFunction(node, typeChecker) {
   if (node.body !== void 0 || node.name === void 0) {
