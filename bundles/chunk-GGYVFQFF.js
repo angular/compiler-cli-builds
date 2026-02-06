@@ -3381,7 +3381,7 @@ var factory10 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.js
-import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional, ParsedEventType, PropertyRead as PropertyRead3, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional, ParsedEventType, PropertyRead as PropertyRead3, ArrowFunction, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
 var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING;
   visitNode(ctx, component, node) {
@@ -3405,6 +3405,10 @@ var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor
 function assertExpressionInvoked(expression, component, node, expressionText, ctx) {
   if (expression instanceof Call || expression instanceof SafeCall2) {
     return [];
+  }
+  if (expression instanceof ArrowFunction) {
+    const errorString = "Arrow function will not be invoked in this event listener. Did you intend to call a method?";
+    return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
   }
   if (!(expression instanceof PropertyRead3) && !(expression instanceof SafePropertyRead2)) {
     return [];
