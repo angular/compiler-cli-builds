@@ -415,8 +415,9 @@ var FS_ALL = [FS_OS_X, FS_WINDOWS, FS_UNIX, FS_NATIVE];
 function runInEachFileSystemFn(callback) {
   FS_ALL.forEach((os2) => runInFileSystem(os2, callback, false));
 }
+var counter = 0;
 function runInFileSystem(os2, callback, error) {
-  describe(`<<FileSystem: ${os2}>>`, () => {
+  describe(`<<FileSystem: ${os2}>>/${counter++}`, () => {
     beforeEach(() => initMockFileSystem(os2));
     afterEach(() => setFileSystem(new InvalidFileSystem()));
     callback(os2);
