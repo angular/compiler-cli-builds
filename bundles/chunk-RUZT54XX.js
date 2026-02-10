@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.1.3+sha-c6bbf40";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.1.3+sha-2c3f3cc";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -2648,7 +2648,7 @@ function resolveProvidersRequiringFactory(rawProviders, reflector, evaluator) {
   });
   return providers;
 }
-function wrapTypeReference(reflector, clazz) {
+function wrapTypeReference(clazz) {
   const value = new WrappedNodeExpr2(clazz.name);
   const type = value;
   return { value, type };
@@ -8252,7 +8252,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
   }
   const usesInheritance = reflector.hasBaseClass(clazz);
   const sourceFile = clazz.getSourceFile();
-  const type = wrapTypeReference(reflector, clazz);
+  const type = wrapTypeReference(clazz);
   const rawHostDirectives = directive.get("hostDirectives") || null;
   const hostDirectives = rawHostDirectives === null ? null : extractHostDirectives(rawHostDirectives, evaluator, reflector, compilationMode, createForwardRefResolver(isCore), emitDeclarationOnly);
   if (compilationMode !== CompilationMode.LOCAL && hostDirectives !== null) {
@@ -20015,7 +20015,7 @@ var NgModuleDecoratorHandler = class {
     const exports = exportRefs.map((exp) => this._toR3Reference(exp.getOriginForDiagnostics(meta, node.name), exp, valueContext));
     const isForwardReference = (ref) => isExpressionForwardReference(ref.value, node.name, valueContext);
     const containsForwardDecls = bootstrap.some(isForwardReference) || declarations.some(isForwardReference) || imports.some(isForwardReference) || exports.some(isForwardReference);
-    const type = wrapTypeReference(this.reflector, node);
+    const type = wrapTypeReference(node);
     let ngModuleMetadata;
     if (allowUnresolvedReferences) {
       ngModuleMetadata = {
@@ -22445,7 +22445,7 @@ var InjectableDecoratorHandler = class {
 };
 function extractInjectableMetadata(clazz, decorator, reflector) {
   const name = clazz.name.text;
-  const type = wrapTypeReference(reflector, clazz);
+  const type = wrapTypeReference(clazz);
   const typeArgumentCount = reflector.getGenericArityOfClass(clazz) || 0;
   if (decorator.args === null) {
     throw new FatalDiagnosticError(ErrorCode.DECORATOR_NOT_CALLED, decorator.node, "@Injectable must be called");
@@ -22647,7 +22647,7 @@ var PipeDecoratorHandler = class {
   analyze(clazz, decorator) {
     this.perf.eventCount(PerfEvent.AnalyzePipe);
     const name = clazz.name.text;
-    const type = wrapTypeReference(this.reflector, clazz);
+    const type = wrapTypeReference(clazz);
     if (decorator.args === null) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_NOT_CALLED, decorator.node, `@Pipe must be called`);
     }
