@@ -88,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-IKNUNOJT.js";
+} from "./chunk-TAXP3SCS.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
