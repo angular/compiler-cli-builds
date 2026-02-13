@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.3+sha-dfd5e3a";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.3+sha-e10a634";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -694,7 +694,7 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
   const firstDecl = local.declarations && local.declarations[0];
   if (firstDecl !== void 0) {
     if (ts5.isImportClause(firstDecl) && firstDecl.name !== void 0) {
-      if (firstDecl.isTypeOnly) {
+      if (firstDecl.phaseModifier === ts5.SyntaxKind.TypeKeyword) {
         return typeOnlyImport(typeNode, firstDecl);
       }
       if (!ts5.isImportDeclaration(firstDecl.parent)) {
@@ -709,7 +709,7 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
       if (firstDecl.isTypeOnly) {
         return typeOnlyImport(typeNode, firstDecl);
       }
-      if (firstDecl.parent.parent.isTypeOnly) {
+      if (firstDecl.parent.parent.phaseModifier === ts5.SyntaxKind.TypeKeyword) {
         return typeOnlyImport(typeNode, firstDecl.parent.parent);
       }
       const importedName = (firstDecl.propertyName || firstDecl.name).text;
@@ -727,7 +727,7 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
         nestedPath
       };
     } else if (ts5.isNamespaceImport(firstDecl)) {
-      if (firstDecl.parent.isTypeOnly) {
+      if (firstDecl.parent.phaseModifier === ts5.SyntaxKind.TypeKeyword) {
         return typeOnlyImport(typeNode, firstDecl.parent);
       }
       if (symbols.symbolNames.length === 1) {
@@ -1930,7 +1930,7 @@ var DeferredSymbolTracker = class {
     if (importDecl.importClause === void 0) {
       throw new Error(`Provided import declaration doesn't have any symbols.`);
     }
-    if (importDecl.importClause.isTypeOnly) {
+    if (importDecl.importClause.phaseModifier === ts10.SyntaxKind.TypeKeyword) {
       return symbolMap;
     }
     if (importDecl.importClause.namedBindings !== void 0) {
@@ -4737,7 +4737,7 @@ function createTsTransformForImportManager(manager, extraStatementsForFiles) {
       if (clause.namedBindings === void 0 || !ts19.isNamedImports(clause.namedBindings) || !updatedImports.has(clause.namedBindings)) {
         return node;
       }
-      const newClause = ctx.factory.updateImportClause(clause, clause.isTypeOnly, clause.name, updatedImports.get(clause.namedBindings));
+      const newClause = ctx.factory.updateImportClause(clause, clause.phaseModifier === ts19.SyntaxKind.TypeKeyword, clause.name, updatedImports.get(clause.namedBindings));
       const newImport = ctx.factory.updateImportDeclaration(node, node.modifiers, newClause, node.moduleSpecifier, node.attributes);
       ts19.setOriginalNode(newImport, {
         importClause: newClause,
@@ -4809,7 +4809,7 @@ function attemptToReuseExistingSourceFileImports(tracker, sourceFile, request) {
     if (!ts21.isImportDeclaration(statement) || !ts21.isStringLiteral(statement.moduleSpecifier)) {
       continue;
     }
-    if (!statement.importClause || statement.importClause.isTypeOnly) {
+    if (!statement.importClause || statement.importClause.phaseModifier === ts21.SyntaxKind.TypeKeyword) {
       continue;
     }
     const moduleSpecifier = statement.moduleSpecifier.text;
@@ -10784,7 +10784,7 @@ var SelectorlessComponentScopeReader = class {
           result.set(stmt.name.text, stmt.name);
           continue;
         }
-        if (ts46.isImportDeclaration(stmt) && stmt.importClause !== void 0 && !stmt.importClause.isTypeOnly) {
+        if (ts46.isImportDeclaration(stmt) && stmt.importClause !== void 0 && !(stmt.importClause.phaseModifier === ts46.SyntaxKind.TypeKeyword)) {
           const clause = stmt.importClause;
           if (clause.namedBindings !== void 0 && ts46.isNamedImports(clause.namedBindings)) {
             for (const element of clause.namedBindings.elements) {
@@ -20742,7 +20742,7 @@ function getTopLevelDeclarationNames(sourceFile) {
     }
     if (ts91.isImportDeclaration(node) && node.importClause) {
       const importClause = node.importClause;
-      if (importClause.isTypeOnly) {
+      if (importClause.phaseModifier === ts91.SyntaxKind.TypeKeyword) {
         continue;
       }
       if (importClause.name) {
