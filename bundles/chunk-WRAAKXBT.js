@@ -88,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-RUZT54XX.js";
+} from "./chunk-2MQPVBHL.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -709,11 +709,9 @@ var PipeExtractor = class extends ClassExtractor {
 };
 var NgModuleExtractor = class extends ClassExtractor {
   reference;
-  metadata;
-  constructor(declaration, reference, metadata, typeChecker) {
+  constructor(declaration, reference, typeChecker) {
     super(declaration, typeChecker);
     this.reference = reference;
-    this.metadata = metadata;
   }
   extract() {
     return {
@@ -733,7 +731,7 @@ function extractClass(classDeclaration, metadataReader, typeChecker) {
   } else if (pipeMetadata) {
     extractor = new PipeExtractor(classDeclaration, ref, pipeMetadata, typeChecker);
   } else if (ngModuleMetadata) {
-    extractor = new NgModuleExtractor(classDeclaration, ref, ngModuleMetadata, typeChecker);
+    extractor = new NgModuleExtractor(classDeclaration, ref, typeChecker);
   } else {
     extractor = new ClassExtractor(classDeclaration, typeChecker);
   }
@@ -1591,7 +1589,7 @@ function isLocalFile(sf) {
   return !sf.isDeclarationFile;
 }
 function isTypeOnlyImportClause(node) {
-  if (node.isTypeOnly) {
+  if (node.phaseModifier === ts15.SyntaxKind.TypeKeyword) {
     return true;
   }
   if (node.namedBindings !== void 0 && ts15.isNamedImports(node.namedBindings) && node.namedBindings.elements.every((specifier) => specifier.isTypeOnly)) {
