@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.1.4+sha-670dee9";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.1.4+sha-a3588a0";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -6005,6 +6005,7 @@ var TraitCompiler = class {
   semanticDepGraphUpdater;
   sourceFileTypeIdentifier;
   emitDeclarationOnly;
+  emitIntermediateTs;
   /**
    * Maps class declarations to their `ClassRecord`, which tracks the Ivy traits being applied to
    * those classes.
@@ -6022,7 +6023,7 @@ var TraitCompiler = class {
   filesWithoutTraits = /* @__PURE__ */ new Set();
   reexportMap = /* @__PURE__ */ new Map();
   handlersByName = /* @__PURE__ */ new Map();
-  constructor(handlers, reflector, perf, incrementalBuild, compileNonExportedClasses, compilationMode, dtsTransforms, semanticDepGraphUpdater, sourceFileTypeIdentifier, emitDeclarationOnly) {
+  constructor(handlers, reflector, perf, incrementalBuild, compileNonExportedClasses, compilationMode, dtsTransforms, semanticDepGraphUpdater, sourceFileTypeIdentifier, emitDeclarationOnly, emitIntermediateTs) {
     this.handlers = handlers;
     this.reflector = reflector;
     this.perf = perf;
@@ -6033,6 +6034,7 @@ var TraitCompiler = class {
     this.semanticDepGraphUpdater = semanticDepGraphUpdater;
     this.sourceFileTypeIdentifier = sourceFileTypeIdentifier;
     this.emitDeclarationOnly = emitDeclarationOnly;
+    this.emitIntermediateTs = emitIntermediateTs;
     for (const handler of handlers) {
       this.handlersByName.set(handler.name, handler);
     }
@@ -6707,11 +6709,11 @@ var Visitor = class {
 // packages/compiler-cli/src/ngtsc/transform/src/transform.js
 var NO_DECORATORS = /* @__PURE__ */ new Set();
 var CLOSURE_FILE_OVERVIEW_REGEXP = /\s+@fileoverview\s+/i;
-function ivyTransformFactory(compilation, reflector, importRewriter, defaultImportTracker, localCompilationExtraImportsTracker, perf, isCore, isClosureCompilerEnabled, emitDeclarationOnly) {
+function ivyTransformFactory(compilation, reflector, importRewriter, defaultImportTracker, localCompilationExtraImportsTracker, perf, isCore, isClosureCompilerEnabled, emitDeclarationOnly, refEmitter, enableTypeReification) {
   const recordWrappedNode = createRecorderFn(defaultImportTracker);
   return (context) => {
     return (file) => {
-      return perf.inPhase(PerfPhase.Compile, () => transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, emitDeclarationOnly, recordWrappedNode));
+      return perf.inPhase(PerfPhase.Compile, () => transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, emitDeclarationOnly, refEmitter, enableTypeReification, recordWrappedNode));
     };
   };
 }
@@ -6747,7 +6749,9 @@ var IvyTransformationVisitor = class extends Visitor {
   isClosureCompilerEnabled;
   isCore;
   deferrableImports;
-  constructor(compilation, classCompilationMap, reflector, importManager, recordWrappedNodeExpr, isClosureCompilerEnabled, isCore, deferrableImports) {
+  refEmitter;
+  enableTypeReification;
+  constructor(compilation, classCompilationMap, reflector, importManager, recordWrappedNodeExpr, isClosureCompilerEnabled, isCore, deferrableImports, refEmitter, enableTypeReification) {
     super();
     this.compilation = compilation;
     this.classCompilationMap = classCompilationMap;
@@ -6757,6 +6761,8 @@ var IvyTransformationVisitor = class extends Visitor {
     this.isClosureCompilerEnabled = isClosureCompilerEnabled;
     this.isCore = isCore;
     this.deferrableImports = deferrableImports;
+    this.refEmitter = refEmitter;
+    this.enableTypeReification = enableTypeReification;
   }
   visitClassDeclaration(node) {
     if (!this.classCompilationMap.has(node)) {
@@ -6774,7 +6780,11 @@ var IvyTransformationVisitor = class extends Visitor {
         continue;
       }
       const exprNode = translateExpression(sourceFile, field.initializer, this.importManager, translateOptions);
-      const property = ts31.factory.createPropertyDeclaration([ts31.factory.createToken(ts31.SyntaxKind.StaticKeyword)], field.name, void 0, void 0, exprNode);
+      let typeNode = void 0;
+      if (this.enableTypeReification && this.refEmitter !== null) {
+        typeNode = translateType(field.type, sourceFile, this.reflector, this.refEmitter, this.importManager);
+      }
+      const property = ts31.factory.createPropertyDeclaration([ts31.factory.createToken(ts31.SyntaxKind.StaticKeyword)], field.name, void 0, typeNode, exprNode);
       if (this.isClosureCompilerEnabled) {
         ts31.addSyntheticLeadingComment(
           property,
@@ -6873,7 +6883,7 @@ var IvyTransformationVisitor = class extends Visitor {
     return node;
   }
 };
-function transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, emitDeclarationOnly, recordWrappedNode) {
+function transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, emitDeclarationOnly, refEmitter, enableTypeReification, recordWrappedNode) {
   const constantPool = new ConstantPool(isClosureCompilerEnabled);
   const importManager = new ImportManager({
     ...presetImportManagerForceNamespaceImports,
@@ -6884,7 +6894,7 @@ function transformIvySourceFile(compilation, context, reflector, importRewriter,
   if (emitDeclarationOnly) {
     return file;
   }
-  const transformationVisitor = new IvyTransformationVisitor(compilation, compilationVisitor.classCompilationMap, reflector, importManager, recordWrappedNode, isClosureCompilerEnabled, isCore, compilationVisitor.deferrableImports);
+  const transformationVisitor = new IvyTransformationVisitor(compilation, compilationVisitor.classCompilationMap, reflector, importManager, recordWrappedNode, isClosureCompilerEnabled, isCore, compilationVisitor.deferrableImports, refEmitter, enableTypeReification);
   let sf = visit(file, transformationVisitor, context);
   const downlevelTranslatedCode = getLocalizeCompileTarget(context) < ts31.ScriptTarget.ES2015;
   const constants = constantPool.statements.map((stmt) => translateStatement(file, stmt, importManager, {
