@@ -88,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-6KU5EF3K.js";
+} from "./chunk-TPZ7NG7Y.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -4482,7 +4482,7 @@ var NgCompiler = class _NgCompiler {
     }
     const defaultImportTracker = new DefaultImportTracker();
     const before = [
-      ivyTransformFactory(compilation.traitCompiler, compilation.reflector, importRewriter, defaultImportTracker, compilation.localCompilationExtraImportsTracker, this.delegatingPerfRecorder, compilation.isCore, this.closureCompilerEnabled, this.emitDeclarationOnly),
+      ivyTransformFactory(compilation.traitCompiler, compilation.reflector, importRewriter, defaultImportTracker, compilation.localCompilationExtraImportsTracker, this.delegatingPerfRecorder, compilation.isCore, this.closureCompilerEnabled, this.emitDeclarationOnly, compilation.refEmitter, !!this.options["_experimentalEmitIntermediateTs"]),
       aliasTransformFactory(compilation.traitCompiler.exportStatements),
       defaultImportTracker.importPreservingTransformer()
     ];
@@ -4920,7 +4920,7 @@ var NgCompiler = class _NgCompiler {
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
       new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, this.options.onlyPublishPublicTypingsForNgModules ?? false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode, localCompilationExtraImportsTracker, jitDeclarationRegistry, this.emitDeclarationOnly)
     ];
-    const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter, this.emitDeclarationOnly);
+    const traitCompiler = new TraitCompiler(handlers, reflector, this.delegatingPerfRecorder, this.incrementalCompilation, this.options.compileNonExportedClasses !== false, compilationMode, dtsTransforms, semanticDepGraphUpdater, this.adapter, this.emitDeclarationOnly, !!this.options["_experimentalEmitIntermediateTs"]);
     const notifyingDriver = new NotifyingProgramDriverWrapper(this.programDriver, (program) => {
       this.incrementalStrategy.setIncrementalState(this.incrementalCompilation.state, program);
       this.currentProgram = program;
