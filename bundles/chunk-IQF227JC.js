@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.3+sha-dea0819";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.3+sha-b481294";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -4737,7 +4737,7 @@ function createTsTransformForImportManager(manager, extraStatementsForFiles) {
       if (clause.namedBindings === void 0 || !ts19.isNamedImports(clause.namedBindings) || !updatedImports.has(clause.namedBindings)) {
         return node;
       }
-      const newClause = ctx.factory.updateImportClause(clause, clause.phaseModifier === ts19.SyntaxKind.TypeKeyword, clause.name, updatedImports.get(clause.namedBindings));
+      const newClause = ctx.factory.updateImportClause(clause, clause.phaseModifier, clause.name, updatedImports.get(clause.namedBindings));
       const newImport = ctx.factory.updateImportDeclaration(node, node.modifiers, newClause, node.moduleSpecifier, node.attributes);
       ts19.setOriginalNode(newImport, {
         importClause: newClause,
