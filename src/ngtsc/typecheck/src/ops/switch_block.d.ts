@@ -7,8 +7,8 @@
  */
 import { TmplAstSwitchBlock } from '@angular/compiler';
 import { TcbOp } from './base';
-import type { Scope } from './scope';
 import type { Context } from './context';
+import type { Scope } from './scope';
 /**
  * A `TcbOp` which renders a `switch` block as a TypeScript `switch` statement.
  *

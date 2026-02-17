@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.3+sha-a8aab64";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.0-next.3+sha-95b3f37";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -15115,6 +15115,14 @@ var TcbSwitchOp = class extends TcbOp {
         return switchCase.expression === null ? ts70.factory.createDefaultClause(statementsForCase) : ts70.factory.createCaseClause(tcbExpression(switchCase.expression, this.tcb, this.scope), statementsForCase);
       });
     });
+    if (this.block.exhaustiveCheck) {
+      const switchValue = tcbExpression(this.block.expression, this.tcb, this.scope);
+      clauses.push(ts70.factory.createDefaultClause([
+        ts70.factory.createVariableStatement(void 0, ts70.factory.createVariableDeclarationList([
+          ts70.factory.createVariableDeclaration(ts70.factory.createUniqueName("tcbExhaustive"), void 0, ts70.factory.createKeywordTypeNode(ts70.SyntaxKind.NeverKeyword), switchValue)
+        ], ts70.NodeFlags.Const))
+      ]));
+    }
     this.scope.addStatement(ts70.factory.createSwitchStatement(switchExpression, ts70.factory.createCaseBlock(clauses)));
     return null;
   }
