@@ -2956,6 +2956,20 @@ var TemplateVisitor2 = class extends CombinedRecursiveAstVisitor2 {
   }
 };
 
+// packages/compiler-cli/src/ngtsc/typecheck/extended/api/format-extended-error.js
+import { VERSION } from "@angular/compiler";
+var EXTENDED_ERROR_DETAILS_PAGE_BASE_URL = (() => {
+  const versionSubDomain = VERSION.major !== "0" ? `v${VERSION.major}.` : "";
+  return `https://${versionSubDomain}angular.dev/extended-diagnostics`;
+})();
+function formatExtendedError(code, message) {
+  const fullCode = `NG${Math.abs(code)}`;
+  const errorMessage = `${fullCode}${message ? ": " + message : ""}`;
+  const addPeriodSeparator = !errorMessage.match(/[.,;!?\n]$/);
+  const separator = addPeriodSeparator ? "." : "";
+  return `${errorMessage}${separator} Find more at ${EXTENDED_ERROR_DETAILS_PAGE_BASE_URL}/${fullCode}`;
+}
+
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
 var SIGNAL_INSTANCE_PROPERTIES = /* @__PURE__ */ new Set(["set", "update", "asReadonly"]);
 var FUNCTION_INSTANCE_PROPERTIES = /* @__PURE__ */ new Set(["name", "length", "prototype"]);
@@ -3033,7 +3047,7 @@ function buildDiagnosticForSignal(ctx, node, component) {
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
   if (symbol !== null && symbol.kind === SymbolKind.Expression && isSignalReference(symbol)) {
     const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
-    const errorString = `${node.name} is a function and should be invoked: ${node.name}()`;
+    const errorString = formatExtendedError(ErrorCode.INTERPOLATED_SIGNAL_NOT_INVOKED, `${node.name} is a function and should be invoked: ${node.name}()}`);
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
     return [diagnostic];
   }
@@ -3043,7 +3057,7 @@ function buildDiagnosticForSignal(ctx, node, component) {
   const symbolOfReceiver = ctx.templateTypeChecker.getSymbolOfNode(node.receiver, component);
   if (symbolOfReceiver !== null && symbolOfReceiver.kind === SymbolKind.Expression && isSignalReference(symbolOfReceiver)) {
     const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbolOfReceiver.tcbLocation);
-    const errorString = `${node.receiver.name} is a function and should be invoked: ${node.receiver.name}()`;
+    const errorString = formatExtendedError(ErrorCode.INTERPOLATED_SIGNAL_NOT_INVOKED, `${node.receiver.name} is a function and should be invoked: ${node.receiver.name}()`);
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
     return [diagnostic];
   }
@@ -3067,8 +3081,7 @@ var InvalidBananaInBoxCheck = class extends TemplateCheckWithVisitor {
       return [];
     const boundSyntax = node.sourceSpan.toString();
     const expectedBoundSyntax = boundSyntax.replace(`(${name})`, `[(${name.slice(1, -1)})]`);
-    const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, `In the two-way binding syntax the parentheses should be inside the brackets, ex. '${expectedBoundSyntax}'.
-        Find more at ${DOC_PAGE_BASE_URL}/guide/templates/two-way-binding`);
+    const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, formatExtendedError(ErrorCode.INVALID_BANANA_IN_BOX, `In the two-way binding syntax the parentheses should be inside the brackets, ex. '${expectedBoundSyntax}'`));
     return [diagnostic];
   }
 };
@@ -3107,7 +3120,7 @@ var MissingControlFlowDirectiveCheck = class extends TemplateCheckWithVisitor {
     }
     const sourceSpan = controlFlowAttr.keySpan || controlFlowAttr.sourceSpan;
     const directiveAndBuiltIn = KNOWN_CONTROL_FLOW_DIRECTIVES.get(controlFlowAttr.name);
-    const errorMessage = `The \`*${controlFlowAttr.name}\` directive was used in the template, but neither the \`${directiveAndBuiltIn?.directive}\` directive nor the \`CommonModule\` was imported. Use Angular's built-in control flow ${directiveAndBuiltIn?.builtIn} or make sure that either the \`${directiveAndBuiltIn?.directive}\` directive or the \`CommonModule\` is included in the \`@Component.imports\` array of this component.`;
+    const errorMessage = formatExtendedError(ErrorCode.MISSING_CONTROL_FLOW_DIRECTIVE, `The \`*${controlFlowAttr.name}\` directive was used in the template, but neither the \`${directiveAndBuiltIn?.directive}\` directive nor the \`CommonModule\` was imported. Use Angular's built-in control flow ${directiveAndBuiltIn?.builtIn} or make sure that either the \`${directiveAndBuiltIn?.directive}\` directive or the \`CommonModule\` is included in the \`@Component.imports\` array of this component.`);
     const diagnostic = ctx.makeTemplateDiagnostic(sourceSpan, errorMessage);
     return [diagnostic];
   }
@@ -3139,7 +3152,7 @@ var MissingNgForOfLetCheck = class extends TemplateCheckWithVisitor {
     if (node.variables.length > 0) {
       return [];
     }
-    const errorString = "Your ngFor is missing a value. Did you forget to add the `let` keyword?";
+    const errorString = formatExtendedError(ErrorCode.MISSING_NGFOROF_LET, `Your ngFor is missing a value. Did you forget to add the \`let\` keyword?`);
     const diagnostic = ctx.makeTemplateDiagnostic(attr.sourceSpan, errorString);
     return [diagnostic];
   }
@@ -3182,7 +3195,7 @@ var MissingStructuralDirectiveCheck = class extends TemplateCheckWithVisitor {
     if (hasStructuralDirective)
       return [];
     const sourceSpan = customStructuralDirective.keySpan || customStructuralDirective.sourceSpan;
-    const errorMessage = `A structural directive \`${customStructuralDirective.name}\` was used in the template without a corresponding import in the component. Make sure that the directive is included in the \`@Component.imports\` array of this component.`;
+    const errorMessage = formatExtendedError(ErrorCode.MISSING_STRUCTURAL_DIRECTIVE, `A structural directive \`${customStructuralDirective.name}\` was used in the template without a corresponding import in the component. Make sure that the directive is included in the \`@Component.imports\` array of this component.`);
     return [ctx.makeTemplateDiagnostic(sourceSpan, errorMessage)];
   }
 };
@@ -3218,7 +3231,7 @@ var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
     if (templateMapping === null) {
       return [];
     }
-    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, `The left side of this nullish coalescing operation does not include 'null' or 'undefined' in its type, therefore the '??' operator can be safely removed.`);
+    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, formatExtendedError(ErrorCode.NULLISH_COALESCING_NOT_NULLABLE, `The left side of this nullish coalescing operation does not include 'null' or 'undefined' in its type, therefore the '??' operator can be safely removed.`));
     return [diagnostic];
   }
 };
@@ -3270,7 +3283,7 @@ var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
       return [];
     }
     const advice = node instanceof SafePropertyRead ? `the '?.' operator can be replaced with the '.' operator` : `the '?.' operator can be safely removed`;
-    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, `The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore ${advice}.`);
+    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, formatExtendedError(ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE, `The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore ${advice}`));
     return [diagnostic];
   }
 };
@@ -3294,7 +3307,7 @@ var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.SKIP_HYDRATION_NOT_STATIC;
   visitNode(ctx, component, node) {
     if (node instanceof TmplAstBoundAttribute2 && node.name === NG_SKIP_HYDRATION_ATTR_NAME) {
-      const errorString = `ngSkipHydration should not be used as a binding.`;
+      const errorString = formatExtendedError(ErrorCode.SKIP_HYDRATION_NOT_STATIC, `ngSkipHydration should not be used as a binding`);
       const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
       return [diagnostic];
     }
@@ -3304,7 +3317,7 @@ var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
       /* empty string */
     ];
     if (node instanceof TmplAstTextAttribute && node.name === NG_SKIP_HYDRATION_ATTR_NAME && !acceptedValues.includes(node.value) && node.value !== void 0) {
-      const errorString = `ngSkipHydration only accepts "true" or "" as value or no value at all. For example 'ngSkipHydration="true"' or 'ngSkipHydration'`;
+      const errorString = formatExtendedError(ErrorCode.SKIP_HYDRATION_NOT_STATIC, `ngSkipHydration only accepts "true" or "" as value or no value at all. For example 'ngSkipHydration="true"' or 'ngSkipHydration'`);
       const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
       return [diagnostic];
     }
@@ -3328,7 +3341,7 @@ var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
     if (!node.keySpan.toString().startsWith("attr.") || !STYLE_SUFFIXES.some((suffix) => node.name.endsWith(`.${suffix}`))) {
       return [];
     }
-    const diagnostic = ctx.makeTemplateDiagnostic(node.keySpan, `The ${STYLE_SUFFIXES.map((suffix) => `'.${suffix}'`).join(", ")} suffixes are only supported on style bindings.`);
+    const diagnostic = ctx.makeTemplateDiagnostic(node.keySpan, formatExtendedError(ErrorCode.SUFFIX_NOT_SUPPORTED, `The ${STYLE_SUFFIXES.map((suffix) => `'.${suffix}'`).join(", ")} suffixes are only supported on style bindings`));
     return [diagnostic];
   }
 };
@@ -3367,6 +3380,7 @@ var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
       if (node.value) {
         errorString += ` For example, '${expectedKey}="${expectedValue}"'.`;
       }
+      errorString = formatExtendedError(ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING, errorString);
     }
     const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
     return [diagnostic];
@@ -3415,7 +3429,7 @@ function assertExpressionInvoked(expression, component, node, expressionText, ct
   if (symbol !== null && symbol.kind === SymbolKind.Expression) {
     if (symbol.tsType.getCallSignatures()?.length > 0) {
       const fullExpressionText = generateStringFromExpression(expression, expressionText);
-      const errorString = `Function in event binding should be invoked: ${fullExpressionText}()`;
+      const errorString = formatExtendedError(ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING, `Function in event binding should be invoked: ${fullExpressionText}()`);
       return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
     }
   }
@@ -3446,7 +3460,7 @@ var UnparenthesizedNullishCoalescing = class extends TemplateCheckWithVisitor {
           if (sourceMapping === null) {
             return [];
           }
-          const diagnostic = ctx.makeTemplateDiagnostic(sourceMapping.span, `Parentheses are required to disambiguate precedence when mixing '??' with '&&' and '||'.`);
+          const diagnostic = ctx.makeTemplateDiagnostic(sourceMapping.span, formatExtendedError(ErrorCode.UNPARENTHESIZED_NULLISH_COALESCING, `Parentheses are required to disambiguate precedence when mixing '??' with '&&' and '||'`));
           return [diagnostic];
         }
       }
@@ -3471,7 +3485,7 @@ var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
     const { allLetDeclarations, usedLetDeclarations } = this.getAnalysis(component);
     for (const decl of allLetDeclarations) {
       if (!usedLetDeclarations.has(decl)) {
-        diagnostics.push(ctx.makeTemplateDiagnostic(decl.sourceSpan, `@let ${decl.name} is declared but its value is never read.`));
+        diagnostics.push(ctx.makeTemplateDiagnostic(decl.sourceSpan, formatExtendedError(ErrorCode.UNUSED_LET_DECLARATION, `@let ${decl.name} is declared but its value is never read.`)));
       }
     }
     this.analysis.clear();
@@ -3519,7 +3533,7 @@ var UninvokedTrackFunctionCheck = class extends TemplateCheckWithVisitor {
     const symbol = ctx.templateTypeChecker.getSymbolOfNode(node.trackBy.ast, component);
     if (symbol !== null && symbol.kind === SymbolKind.Expression && symbol.tsType.getCallSignatures()?.length > 0) {
       const fullExpressionText = generateStringFromExpression2(node.trackBy.ast, node.trackBy.source || "");
-      const errorString = `The track function in the @for block should be invoked: ${fullExpressionText}(/* arguments */)`;
+      const errorString = formatExtendedError(ErrorCode.UNINVOKED_TRACK_FUNCTION, `The track function in the @for block should be invoked: ${fullExpressionText}(/* arguments */)`);
       return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
     }
     return [];
@@ -3552,7 +3566,7 @@ function assertExpressionInvoked2(expression, component, ctx) {
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
   if (symbol !== null && symbol.kind === SymbolKind.Expression) {
     if (symbol.tsType.getCallSignatures()?.length > 0) {
-      const errorString = `Function in text interpolation should be invoked: ${expression.name}()`;
+      const errorString = formatExtendedError(ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION, `Function in text interpolation should be invoked: ${expression.name}()`);
       const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
       return [ctx.makeTemplateDiagnostic(templateMapping.span, errorString)];
     }
@@ -3581,11 +3595,11 @@ var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
     if (hasImmediateMain) {
       if (mains.length > 1) {
         const msg = `The 'immediate' trigger makes additional triggers redundant.`;
-        diags.push(ctx.makeTemplateDiagnostic(node.sourceSpan, msg));
+        diags.push(ctx.makeTemplateDiagnostic(node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
       }
       if (prefetches.length > 0) {
         const msg = `Prefetch triggers have no effect because 'immediate' executes earlier.`;
-        diags.push(ctx.makeTemplateDiagnostic(node.sourceSpan, msg));
+        diags.push(ctx.makeTemplateDiagnostic(node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
       }
     }
     if (mains.length === 1 && prefetches.length > 0) {
@@ -3597,7 +3611,7 @@ var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
           const preDelay = pre.delay;
           if (preDelay >= mainDelay) {
             const msg = `The Prefetch 'timer(${preDelay}ms)' is not scheduled before the main 'timer(${mainDelay}ms)', so it won\u2019t run prior to rendering. Lower the prefetch delay or remove it.`;
-            diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, msg));
+            diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
           }
         }
         const isHoverTrigger = main instanceof TmplAstHoverDeferredTrigger && pre instanceof TmplAstHoverDeferredTrigger;
@@ -3609,14 +3623,14 @@ var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
           if (mainRef && preRef && mainRef === preRef) {
             const kindName = main.constructor.name.replace("DeferredTrigger", "").toLowerCase();
             const msg = `Prefetch '${kindName}' matches the main trigger and provides no benefit. Remove the prefetch modifier.`;
-            diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, msg));
+            diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
           }
           continue;
         }
         if (main.constructor === pre.constructor && !(main instanceof TmplAstTimerDeferredTrigger)) {
           const kind = main instanceof TmplAstImmediateDeferredTrigger ? "immediate" : main.constructor.name.replace("DeferredTrigger", "").toLowerCase();
           const msg = `Prefetch '${kind}' matches the main trigger and provides no benefit. Remove the prefetch modifier.`;
-          diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, msg));
+          diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
         }
       }
     }
