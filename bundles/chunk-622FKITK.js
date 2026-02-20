@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.1.5+sha-64b1a79";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.1.5+sha-24b578c";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -14585,6 +14585,25 @@ var TcbExpressionOp = class extends TcbOp {
     return null;
   }
 };
+var TcbConditionOp = class extends TcbOp {
+  tcb;
+  scope;
+  expression;
+  constructor(tcb, scope, expression) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.expression = expression;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const expr = tcbExpression(this.expression, this.tcb, this.scope);
+    this.scope.addStatement(ts64.factory.createIfStatement(expr, ts64.factory.createBlock([])));
+    return null;
+  }
+};
 var TcbExpressionTranslator = class {
   tcb;
   scope;
@@ -16912,7 +16931,7 @@ var Scope = class _Scope {
     this.appendDeferredTriggers(block, block.triggers);
     this.appendDeferredTriggers(block, block.prefetchTriggers);
     if (block.hydrateTriggers.when) {
-      this.opQueue.push(new TcbExpressionOp(this.tcb, this, block.hydrateTriggers.when.value));
+      this.opQueue.push(new TcbConditionOp(this.tcb, this, block.hydrateTriggers.when.value));
     }
     this.appendChildren(block);
     if (block.placeholder !== null) {
@@ -16927,7 +16946,7 @@ var Scope = class _Scope {
   }
   appendDeferredTriggers(block, triggers) {
     if (triggers.when !== void 0) {
-      this.opQueue.push(new TcbExpressionOp(this.tcb, this, triggers.when.value));
+      this.opQueue.push(new TcbConditionOp(this.tcb, this, triggers.when.value));
     }
     if (triggers.viewport !== void 0 && triggers.viewport.options !== null) {
       this.opQueue.push(new TcbIntersectionObserverOp(this.tcb, this, triggers.viewport.options));
