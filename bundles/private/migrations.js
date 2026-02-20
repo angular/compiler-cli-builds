@@ -5,7 +5,7 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-GRV32KS6.js";
+} from "../chunk-E2YMRKVR.js";
 import {
   CompilationMode,
   DtsMetadataReader,
