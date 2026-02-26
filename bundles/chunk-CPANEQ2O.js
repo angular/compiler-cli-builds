@@ -34,6 +34,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["INITIALIZER_API_DECORATOR_METADATA_COLLISION"] = 1051] = "INITIALIZER_API_DECORATOR_METADATA_COLLISION";
   ErrorCode2[ErrorCode2["INITIALIZER_API_NO_REQUIRED_FUNCTION"] = 1052] = "INITIALIZER_API_NO_REQUIRED_FUNCTION";
   ErrorCode2[ErrorCode2["INITIALIZER_API_DISALLOWED_MEMBER_VISIBILITY"] = 1053] = "INITIALIZER_API_DISALLOWED_MEMBER_VISIBILITY";
+  ErrorCode2[ErrorCode2["DUPLICATE_BINDING_NAME"] = 1054] = "DUPLICATE_BINDING_NAME";
   ErrorCode2[ErrorCode2["INCORRECTLY_DECLARED_ON_STATIC_MEMBER"] = 1100] = "INCORRECTLY_DECLARED_ON_STATIC_MEMBER";
   ErrorCode2[ErrorCode2["COMPONENT_MISSING_TEMPLATE"] = 2001] = "COMPONENT_MISSING_TEMPLATE";
   ErrorCode2[ErrorCode2["PIPE_MISSING_NAME"] = 2002] = "PIPE_MISSING_NAME";
@@ -229,7 +230,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.0+sha-d1ebbbe";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.0+sha-03db2ae";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -8786,12 +8787,19 @@ function tryParseInputFieldMapping(clazz, member, evaluator, reflector, importTr
 }
 function parseInputFields(clazz, members, evaluator, reflector, importTracker, refEmitter, isCore, compilationMode, inputsFromClassDecorator, classDecorator, emitDeclarationOnly) {
   const inputs = {};
+  const bindings = /* @__PURE__ */ new Map();
   for (const member of members) {
     const classPropertyName = member.name;
     const inputMapping = tryParseInputFieldMapping(clazz, member, evaluator, reflector, importTracker, isCore, refEmitter, compilationMode, emitDeclarationOnly);
     if (inputMapping === null) {
       continue;
     }
+    const bindingPropertyName = inputMapping.bindingPropertyName;
+    if (bindings.has(bindingPropertyName)) {
+      const firstMember = bindings.get(bindingPropertyName);
+      throw new FatalDiagnosticError(ErrorCode.DUPLICATE_BINDING_NAME, member.node ?? clazz, `Input '${bindingPropertyName}' is bound to both '${firstMember.name}' and '${member.name}'.`, [makeRelatedInformation(firstMember.node ?? clazz, `The first binding is declared here.`)]);
+    }
+    bindings.set(bindingPropertyName, member);
     if (member.isStatic) {
       throw new FatalDiagnosticError(ErrorCode.INCORRECTLY_DECLARED_ON_STATIC_MEMBER, member.node ?? clazz, `Input "${member.name}" is incorrectly declared as static member of "${clazz.name.text}".`);
     }
@@ -8953,6 +8961,7 @@ function parseOutputsArray(directive, evaluator) {
 }
 function parseOutputFields(clazz, classDecorator, members, isCore, reflector, importTracker, evaluator, outputsFromMeta) {
   const outputs = {};
+  const bindings = /* @__PURE__ */ new Map();
   for (const member of members) {
     const decoratorOutput = tryParseDecoratorOutput(member, evaluator, isCore);
     const initializerOutput = tryParseInitializerBasedOutput(member, reflector, importTracker);
@@ -8977,6 +8986,11 @@ function parseOutputFields(clazz, classDecorator, members, isCore, reflector, im
     } else {
       continue;
     }
+    if (bindings.has(bindingPropertyName)) {
+      const firstMember = bindings.get(bindingPropertyName);
+      throw new FatalDiagnosticError(ErrorCode.DUPLICATE_BINDING_NAME, member.node ?? clazz, `Output '${bindingPropertyName}' is bound to both '${firstMember.name}' and '${member.name}'.`, [makeRelatedInformation(firstMember.node ?? clazz, `The first binding is declared here.`)]);
+    }
+    bindings.set(bindingPropertyName, member);
     if ((initializerOutput !== null || modelMapping !== null) && outputsFromMeta.hasOwnProperty(member.name)) {
       throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_DECORATOR_METADATA_COLLISION, member.node ?? clazz, `Output "${member.name}" is unexpectedly declared in @${classDecorator.name} as well.`);
     }
