@@ -177,7 +177,7 @@ export declare class NgCompiler {
      */
     getDiagnosticsForComponent(component: ts.ClassDeclaration): ts.Diagnostic[];
     /**
-     * Add Angular.io error guide links to diagnostics for this compilation.
+     * Add https://angular.dev/errors error guide links to diagnostics for this compilation.
      */
     private addMessageTextDetails;
     /**
