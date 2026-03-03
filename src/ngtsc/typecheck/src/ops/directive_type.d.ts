@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { DirectiveOwner } from '@angular/compiler';
-import ts from 'typescript';
 import type { Context } from './context';
 import type { Scope } from './scope';
 import { TcbOp } from './base';
+import { TcbExpr } from './codegen';
 import { TypeCheckableDirectiveMeta } from '../../api';
 /**
  * A `TcbOp` which constructs an instance of a directive. For generic directives, generic
@@ -22,7 +22,7 @@ export declare abstract class TcbDirectiveTypeOpBase extends TcbOp {
     protected dir: TypeCheckableDirectiveMeta;
     constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TypeCheckableDirectiveMeta);
     get optional(): boolean;
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }
 /**
  * A `TcbOp` which constructs an instance of a non-generic directive _without_ setting any of its
@@ -38,7 +38,7 @@ export declare class TcbNonGenericDirectiveTypeOp extends TcbDirectiveTypeOpBase
      * Creates a variable declaration for this op's directive of the argument type. Returns the id of
      * the newly created variable.
      */
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }
 /**
  * A `TcbOp` which constructs an instance of a generic directive with its generic parameters set
@@ -49,5 +49,5 @@ export declare class TcbNonGenericDirectiveTypeOp extends TcbDirectiveTypeOpBase
  * type parameters set to `any`.
  */
 export declare class TcbGenericDirectiveTypeWithAnyParamsOp extends TcbDirectiveTypeOpBase {
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }

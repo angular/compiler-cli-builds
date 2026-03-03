@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { BoundTarget, SchemaMetadata } from '@angular/compiler';
-import ts from 'typescript';
 import { DomSchemaChecker } from '../dom';
 import { OutOfBandDiagnosticRecorder } from '../oob';
 import { TypeCheckableDirectiveMeta, TypeCheckId } from '../../api';
@@ -62,6 +61,6 @@ export declare class Context {
      * Currently this uses a monotonically increasing counter, but in the future the variable name
      * might change depending on the type of data being stored.
      */
-    allocateId(): ts.Identifier;
+    allocateId(): string;
     getPipeByName(name: string): PipeMeta | null;
 }

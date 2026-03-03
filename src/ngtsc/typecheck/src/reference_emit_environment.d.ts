@@ -10,6 +10,7 @@ import ts from 'typescript';
 import { ImportFlags, Reference, ReferenceEmitter } from '../../imports';
 import { ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
+import { TcbExpr } from './ops/codegen';
 /**
  * An environment for a given source file that can be used to emit references.
  *
@@ -29,11 +30,7 @@ export declare class ReferenceEmitEnvironment {
      * This may involve importing the node into the file if it's not declared there already.
      */
     referenceType(ref: Reference, flags?: ImportFlags): ts.TypeNode;
-    /**
-     * Generate a `ts.Expression` that refers to the external symbol. This
-     * may result in new imports being generated.
-     */
-    referenceExternalSymbol(moduleName: string, name: string): ts.Expression;
+    referenceExternalSymbol(moduleName: string, name: string): TcbExpr;
     /**
      * Generate a `ts.TypeNode` that references a given type from the provided module.
      *

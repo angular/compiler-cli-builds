@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { TmplAstComponent } from '@angular/compiler';
-import ts from 'typescript';
 import { TcbOp } from './base';
+import { TcbExpr } from './codegen';
 import { Context } from './context';
 import type { Scope } from './scope';
 export declare function getComponentTagName(node: TmplAstComponent): string;
@@ -22,5 +22,5 @@ export declare class TcbComponentNodeOp extends TcbOp {
     private component;
     readonly optional = true;
     constructor(tcb: Context, scope: Scope, component: TmplAstComponent);
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }

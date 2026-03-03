@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
-import ts from 'typescript';
 import { TcbOp } from './base';
 import type { Context } from './context';
 import type { Scope } from './scope';
+import { TcbExpr } from './codegen';
 /**
  * A `TcbOp` which renders a variable that is implicitly available within a block (e.g. `$count`
  * in a `@for` block).
@@ -21,9 +21,9 @@ export declare class TcbBlockImplicitVariableOp extends TcbOp {
     private scope;
     private type;
     private variable;
-    constructor(tcb: Context, scope: Scope, type: ts.TypeNode, variable: TmplAstVariable);
+    constructor(tcb: Context, scope: Scope, type: TcbExpr, variable: TmplAstVariable);
     readonly optional = true;
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }
 /**
  * A `TcbOp` which creates an expression for particular let- `TmplAstVariable` on a
@@ -38,7 +38,7 @@ export declare class TcbTemplateVariableOp extends TcbOp {
     private variable;
     constructor(tcb: Context, scope: Scope, template: TmplAstTemplate, variable: TmplAstVariable);
     get optional(): boolean;
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }
 /**
  * A `TcbOp` which renders a variable defined inside of block syntax (e.g. `@if (expr; as var) {}`).
@@ -50,7 +50,7 @@ export declare class TcbBlockVariableOp extends TcbOp {
     private scope;
     private initializer;
     private variable;
-    constructor(tcb: Context, scope: Scope, initializer: ts.Expression, variable: TmplAstVariable);
+    constructor(tcb: Context, scope: Scope, initializer: TcbExpr, variable: TmplAstVariable);
     get optional(): boolean;
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }

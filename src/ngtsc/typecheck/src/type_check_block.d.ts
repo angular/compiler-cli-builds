@@ -37,4 +37,4 @@ import { TcbGenericContextBehavior } from './ops/context';
  * @param genericContextBehavior controls how generic parameters (especially parameters with generic
  * bounds) will be referenced from the generated TCB code.
  */
-export declare function generateTypeCheckBlock(env: Environment, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, name: ts.Identifier, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): ts.FunctionDeclaration;
+export declare function generateTypeCheckBlock(env: Environment, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, name: ts.Identifier, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): string;

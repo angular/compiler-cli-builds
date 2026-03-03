@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { DirectiveOwner } from '@angular/compiler';
-import ts from 'typescript';
 import { TcbOp } from './base';
+import { TcbExpr } from './codegen';
 import { Context } from './context';
 import type { Scope } from './scope';
 import { TypeCheckableDirectiveMeta } from '../../api';
@@ -32,7 +32,7 @@ export declare class TcbDirectiveCtorOp extends TcbOp {
     private customFormControlType;
     constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TypeCheckableDirectiveMeta, customFormControlType: CustomFormControlType | null);
     get optional(): boolean;
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
     circularFallback(): TcbOp;
 }
 /**
@@ -55,5 +55,5 @@ export declare class TcbDirectiveCtorCircularFallbackOp extends TcbOp {
     private dir;
     constructor(tcb: Context, scope: Scope, dir: TypeCheckableDirectiveMeta);
     get optional(): boolean;
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }

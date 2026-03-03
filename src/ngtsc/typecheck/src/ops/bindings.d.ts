@@ -11,6 +11,7 @@ import { TypeCheckableDirectiveMeta } from '../../api';
 import { ClassPropertyName } from '../../../metadata';
 import { Reference } from '../../../imports';
 import { Context } from './context';
+import { TcbExpr } from './codegen';
 export interface TcbBoundAttribute {
     value: AST | string;
     sourceSpan: ParseSourceSpan;
@@ -33,9 +34,13 @@ export interface TcbDirectiveBoundInput {
      */
     field: string;
     /**
-     * The `ts.Expression` corresponding with the input binding expression.
+     * The `TcbExpr` corresponding with the input binding expression.
      */
-    expression: ts.Expression;
+    expression: TcbExpr;
+    /**
+     * The input's original value expression.
+     */
+    originalExpression: AST | string;
     /**
      * The source span of the full attribute binding.
      */
@@ -61,4 +66,4 @@ export declare function checkSplitTwoWayBinding(inputName: string, output: TmplA
 /**
  * Potentially widens the type of `expr` according to the type-checking configuration.
  */
-export declare function widenBinding(expr: ts.Expression, tcb: Context): ts.Expression;
+export declare function widenBinding(expr: TcbExpr, tcb: Context, originalValue: string | AST): TcbExpr;

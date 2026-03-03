@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import ts from 'typescript';
+import { TcbExpr } from './codegen';
 /**
  * A code generation operation that's involved in the construction of a Type Check Block.
  *
@@ -30,7 +30,7 @@ export declare abstract class TcbOp {
      * code to generate, parse and type-check, overall positively contributing to performance.
      */
     abstract readonly optional: boolean;
-    abstract execute(): ts.Expression | null;
+    abstract execute(): TcbExpr | null;
     /**
      * Replacement value or operation used while this `TcbOp` is executing (i.e. to resolve circular
      * references during its execution).
@@ -39,5 +39,5 @@ export declare abstract class TcbOp {
      * `TcbOp` can be returned in cases where additional code generation is necessary to deal with
      * circular references.
      */
-    circularFallback(): TcbOp | ts.Expression;
+    circularFallback(): TcbOp | TcbExpr;
 }

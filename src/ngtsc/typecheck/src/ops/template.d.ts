@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { TmplAstTemplate } from '@angular/compiler';
-import ts from 'typescript';
 import { TcbOp } from './base';
+import { TcbExpr } from './codegen';
 import type { Context } from './context';
 import type { Scope } from './scope';
 /**
@@ -20,7 +20,7 @@ export declare class TcbTemplateContextOp extends TcbOp {
     private scope;
     constructor(tcb: Context, scope: Scope);
     readonly optional = true;
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }
 /**
  * A `TcbOp` which descends into a `TmplAstTemplate`'s children and generates type-checking code for

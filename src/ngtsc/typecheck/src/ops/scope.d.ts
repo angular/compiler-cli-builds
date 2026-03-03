@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { TmplAstForLoopBlock, TmplAstHostElement, TmplAstIfBlockBranch, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
-import ts from 'typescript';
+import { TcbExpr } from './codegen';
 import { TypeCheckableDirectiveMeta } from '../../api';
 import { Context } from './context';
 import { LocalSymbol } from './references';
@@ -30,7 +30,7 @@ export declare class Scope {
     /**
      * A queue of operations which need to be performed to generate the TCB code for this scope.
      *
-     * This array can contain either a `TcbOp` which has yet to be executed, or a `ts.Expression|null`
+     * This array can contain either a `TcbOp` which has yet to be executed, or a `TcbExpr|null`
      * representing the memoized result of executing the operation. As operations are executed, their
      * results are written into the `opQueue`, overwriting the original operation.
      *
@@ -101,7 +101,7 @@ export declare class Scope {
      * @param children Child nodes that should be appended to the TCB.
      * @param guard an expression that is applied to this scope for type narrowing purposes.
      */
-    static forNodes(tcb: Context, parentScope: Scope | null, scopedNode: TmplAstTemplate | TmplAstIfBlockBranch | TmplAstForLoopBlock | TmplAstHostElement | null, children: TmplAstNode[] | null, guard: ts.Expression | null): Scope;
+    static forNodes(tcb: Context, parentScope: Scope | null, scopedNode: TmplAstTemplate | TmplAstIfBlockBranch | TmplAstForLoopBlock | TmplAstHostElement | null, children: TmplAstNode[] | null, guard: TcbExpr | null): Scope;
     /** Registers a local variable with a scope. */
     private static registerVariable;
     /**
@@ -123,20 +123,20 @@ export declare class Scope {
      * @param directive if present, a directive type on a `TmplAstElement` or `TmplAstTemplate` to
      * look up instead of the default for an element or template node.
      */
-    resolve(node: LocalSymbol, directive?: TypeCheckableDirectiveMeta): ts.Identifier | ts.NonNullExpression;
+    resolve(node: LocalSymbol, directive?: TypeCheckableDirectiveMeta): TcbExpr;
     /**
      * Add a statement to this scope.
      */
-    addStatement(stmt: ts.Statement): void;
+    addStatement(stmt: TcbExpr): void;
     /**
      * Get the statements.
      */
-    render(): ts.Statement[];
+    render(): TcbExpr[];
     /**
      * Returns an expression of all template guards that apply to this scope, including those of
      * parent scopes. If no guards have been applied, null is returned.
      */
-    guards(): ts.Expression | null;
+    guards(): TcbExpr | null;
     /** Returns whether a template symbol is defined locally within the current scope. */
     isLocal(node: TmplAstVariable | TmplAstLetDeclaration | TmplAstReference): boolean;
     /**
@@ -150,10 +150,10 @@ export declare class Scope {
      * @param children Child nodes that should be appended to the TCB.
      * @param guard an expression that is applied to this scope for type narrowing purposes.
      */
-    createChildScope(parentScope: Scope, scopedNode: TmplAstTemplate | TmplAstIfBlockBranch | TmplAstForLoopBlock | TmplAstHostElement | null, children: TmplAstNode[] | null, guard: ts.Expression | null): Scope;
+    createChildScope(parentScope: Scope, scopedNode: TmplAstTemplate | TmplAstIfBlockBranch | TmplAstForLoopBlock | TmplAstHostElement | null, children: TmplAstNode[] | null, guard: TcbExpr | null): Scope;
     private resolveLocal;
     /**
-     * Like `executeOp`, but assert that the operation actually returned `ts.Expression`.
+     * Like `executeOp`, but assert that the operation actually returned `TcbExpr`.
      */
     private resolveOp;
     /**
