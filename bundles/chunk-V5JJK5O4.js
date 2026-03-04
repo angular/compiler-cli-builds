@@ -230,7 +230,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.0+sha-d4948fb";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.0+sha-a6941ad";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -7014,6 +7014,7 @@ function insertDebugNameIntoCallExpression(node, debugName) {
   return ts32.factory.updateCallExpression(node, node.expression, node.typeArguments, newArgs);
 }
 function createNgDevModeConditional(devModeExpression, prodModeExpression) {
+  ts32.addSyntheticLeadingComment(prodModeExpression, ts32.SyntaxKind.MultiLineCommentTrivia, " istanbul ignore next ", false);
   return ts32.factory.createParenthesizedExpression(ts32.factory.createConditionalExpression(ts32.factory.createIdentifier("ngDevMode"), void 0, devModeExpression, void 0, prodModeExpression));
 }
 function isVariableDeclarationCase(node) {
