@@ -11,6 +11,7 @@ import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
 import { TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
+import { TcbExpr } from './ops/codegen';
 /**
  * A context which hosts one or more Type Check Blocks (TCBs).
  *
@@ -26,9 +27,9 @@ export declare class Environment extends ReferenceEmitEnvironment {
     readonly config: TypeCheckingConfig;
     private nextIds;
     private typeCtors;
-    protected typeCtorStatements: ts.Statement[];
+    protected typeCtorStatements: TcbExpr[];
     private pipeInsts;
-    protected pipeInstStatements: ts.Statement[];
+    protected pipeInstStatements: TcbExpr[];
     constructor(config: TypeCheckingConfig, importManager: ImportManager, refEmitter: ReferenceEmitter, reflector: ReflectionHost, contextFile: ts.SourceFile);
     /**
      * Get an expression referring to a type constructor for the given directive.
@@ -36,14 +37,14 @@ export declare class Environment extends ReferenceEmitEnvironment {
      * Depending on the shape of the directive itself, this could be either a reference to a declared
      * type constructor, or to an inline type constructor.
      */
-    typeCtorFor(dir: TypeCheckableDirectiveMeta): ts.Expression;
-    pipeInst(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): ts.Expression;
+    typeCtorFor(dir: TypeCheckableDirectiveMeta): TcbExpr;
+    pipeInst(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): TcbExpr;
     /**
      * Generate a `ts.Expression` that references the given node.
      *
      * This may involve importing the node into the file if it's not declared there already.
      */
-    reference(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): ts.Expression;
+    reference(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): TcbExpr;
     private emitTypeParameters;
-    getPreludeStatements(): ts.Statement[];
+    getPreludeStatements(): TcbExpr[];
 }

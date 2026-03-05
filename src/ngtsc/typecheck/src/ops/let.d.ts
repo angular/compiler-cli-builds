@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { TmplAstLetDeclaration } from '@angular/compiler';
-import ts from 'typescript';
 import { Context } from './context';
 import type { Scope } from './scope';
 import { TcbOp } from './base';
+import { TcbExpr } from './codegen';
 /**
  * A `TcbOp` which generates a constant for a `TmplAstLetDeclaration`.
  *
@@ -25,5 +25,5 @@ export declare class TcbLetDeclarationOp extends TcbOp {
      * should be checked even if they aren't referenced anywhere.
      */
     readonly optional = false;
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }

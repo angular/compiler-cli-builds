@@ -26,13 +26,6 @@ export declare enum ExpressionIdentifier {
     EVENT_PARAMETER = "EP",
     VARIABLE_AS_EXPRESSION = "VAE"
 }
-/** Tags the node with the given expression identifier. */
-export declare function addExpressionIdentifier(node: ts.Node, identifier: ExpressionIdentifier): void;
-/**
- * Tag the `ts.Node` with an indication that any errors arising from the evaluation of the node
- * should be ignored.
- */
-export declare function markIgnoreDiagnostics(node: ts.Node): void;
 /** Returns true if the node has a marker that indicates diagnostics errors should be ignored.  */
 export declare function hasIgnoreForDiagnosticsMarker(node: ts.Node, sourceFile: ts.SourceFile): boolean;
 export interface FindOptions<T extends ts.Node> {

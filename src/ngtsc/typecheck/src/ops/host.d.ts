@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { TmplAstHostElement } from '@angular/compiler';
-import ts from 'typescript';
 import { TcbOp } from './base';
+import { TcbExpr } from './codegen';
 import type { Context } from './context';
 import type { Scope } from './scope';
 /**
@@ -21,5 +21,5 @@ export declare class TcbHostElementOp extends TcbOp {
     private element;
     readonly optional = true;
     constructor(tcb: Context, scope: Scope, element: TmplAstHostElement);
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }

@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { AST, DirectiveOwner, TmplAstBoundAttribute, TmplAstBoundEvent } from '@angular/compiler';
-import ts from 'typescript';
 import { TcbOp } from './base';
+import { TcbExpr } from './codegen';
 import type { Context } from './context';
 import type { Scope } from './scope';
 import { TypeCheckableDirectiveMeta } from '../../api';
@@ -17,7 +17,7 @@ import { LocalSymbol } from './references';
  * `ts.Expression`, with special handling of the `$event` variable that can be used within event
  * bindings.
  */
-export declare function tcbEventHandlerExpression(ast: AST, tcb: Context, scope: Scope): ts.Expression;
+export declare function tcbEventHandlerExpression(ast: AST, tcb: Context, scope: Scope): TcbExpr;
 /**
  * A `TcbOp` which generates code to check event bindings on an element that correspond with the
  * outputs of a directive.

@@ -23,7 +23,7 @@ export declare function createHostElement(type: 'component' | 'directive', selec
  * Creates an AST node that can be used as a guard in `if` statements to distinguish TypeScript
  * nodes used for checking host bindings from ones used for checking templates.
  */
-export declare function createHostBindingsBlockGuard(): ts.Expression;
+export declare function createHostBindingsBlockGuard(): string;
 /**
  * Determines if a given node is a guard that indicates that descendant nodes are used to check
  * host bindings.

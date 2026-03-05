@@ -6,17 +6,17 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { AST, TmplAstBoundAttribute, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstTemplate } from '@angular/compiler';
-import ts from 'typescript';
 import type { Context } from './context';
 import type { Scope } from './scope';
 import { TypeCheckableDirectiveMeta } from '../../api';
 import { TcbOp } from './base';
+import { TcbExpr } from './codegen';
 import { CustomFormControlType } from './signal_forms';
 import { LocalSymbol } from './references';
 /**
  * Translates the given attribute binding to a `ts.Expression`.
  */
-export declare function translateInput(value: AST | string, tcb: Context, scope: Scope): ts.Expression;
+export declare function translateInput(value: AST | string, tcb: Context, scope: Scope): TcbExpr;
 /**
  * A `TcbOp` which generates code to check input bindings on an element that correspond with the
  * members of a directive.

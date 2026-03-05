@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstHostElement, TmplAstLetDeclaration, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
-import ts from 'typescript';
 import { TcbOp } from './base';
+import { TcbExpr } from './codegen';
 import type { Context } from './context';
 import type { Scope } from './scope';
 import { TypeCheckableDirectiveMeta } from '../../api';
@@ -41,7 +41,7 @@ export declare class TcbReferenceOp extends TcbOp {
     private readonly target;
     constructor(tcb: Context, scope: Scope, node: TmplAstReference, host: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, target: TypeCheckableDirectiveMeta | TmplAstTemplate | TmplAstElement);
     readonly optional = true;
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }
 /**
  * A `TcbOp` which is used when the target of a reference is missing. This operation generates a
@@ -53,5 +53,5 @@ export declare class TcbInvalidReferenceOp extends TcbOp {
     private readonly scope;
     constructor(tcb: Context, scope: Scope);
     readonly optional = true;
-    execute(): ts.Identifier;
+    execute(): TcbExpr;
 }

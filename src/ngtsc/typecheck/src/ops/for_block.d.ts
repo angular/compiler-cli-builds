@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { AST, TmplAstForLoopBlock } from '@angular/compiler';
-import ts from 'typescript';
 import { TcbExpressionTranslator } from './expression';
 import type { Context } from './context';
 import type { Scope } from './scope';
 import { TcbOp } from './base';
+import { TcbExpr } from './codegen';
 /**
  * A `TcbOp` which renders a `for` block as a TypeScript `for...of` loop.
  *
@@ -28,5 +28,5 @@ export declare class TcbForLoopTrackTranslator extends TcbExpressionTranslator {
     private block;
     private allowedVariables;
     constructor(tcb: Context, scope: Scope, block: TmplAstForLoopBlock);
-    protected resolve(ast: AST): ts.Expression | null;
+    protected resolve(ast: AST): TcbExpr | null;
 }

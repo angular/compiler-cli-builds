@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { TmplAstComponent, TmplAstElement, TmplAstHostElement } from '@angular/compiler';
-import ts from 'typescript';
 import { TcbOp } from './base';
+import { TcbExpr } from './codegen';
 import { Context } from './context';
 /**
  * A `TcbOp` which feeds elements and unclaimed properties to the `DomSchemaChecker`.
@@ -26,6 +26,6 @@ export declare class TcbDomSchemaCheckerOp extends TcbOp {
     private claimedInputs;
     constructor(tcb: Context, element: TmplAstElement | TmplAstComponent | TmplAstHostElement, checkElement: boolean, claimedInputs: Set<string> | null);
     get optional(): boolean;
-    execute(): ts.Expression | null;
+    execute(): TcbExpr | null;
     private getTagName;
 }
