@@ -230,7 +230,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.1+sha-dd464e5";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.1+sha-ac8418d";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -9467,9 +9467,4046 @@ var CompletionKind;
   CompletionKind2[CompletionKind2["LetDeclaration"] = 2] = "LetDeclaration";
 })(CompletionKind || (CompletionKind = {}));
 
+// packages/compiler-cli/src/ngtsc/typecheck/src/environment.js
+import ts49 from "typescript";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/reference_emit_environment.js
+import { ExpressionType, ExternalExpr as ExternalExpr5, TypeModifier } from "@angular/compiler";
+import ts44 from "typescript";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/codegen.js
+import { AbsoluteSourceSpan as AbsoluteSourceSpan2 } from "@angular/compiler";
+import ts43 from "typescript";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/comments.js
+import { AbsoluteSourceSpan } from "@angular/compiler";
+import ts42 from "typescript";
+var parseSpanComment = /^(\d+),(\d+)$/;
+function readSpanComment(node, sourceFile = node.getSourceFile()) {
+  return ts42.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts42.SyntaxKind.MultiLineCommentTrivia) {
+      return null;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    const match = commentText.match(parseSpanComment);
+    if (match === null) {
+      return null;
+    }
+    return new AbsoluteSourceSpan(+match[1], +match[2]);
+  }) || null;
+}
+var CommentTriviaType;
+(function(CommentTriviaType2) {
+  CommentTriviaType2["DIAGNOSTIC"] = "D";
+  CommentTriviaType2["EXPRESSION_TYPE_IDENTIFIER"] = "T";
+})(CommentTriviaType || (CommentTriviaType = {}));
+var ExpressionIdentifier;
+(function(ExpressionIdentifier2) {
+  ExpressionIdentifier2["DIRECTIVE"] = "DIR";
+  ExpressionIdentifier2["COMPONENT_COMPLETION"] = "COMPCOMP";
+  ExpressionIdentifier2["EVENT_PARAMETER"] = "EP";
+  ExpressionIdentifier2["VARIABLE_AS_EXPRESSION"] = "VAE";
+})(ExpressionIdentifier || (ExpressionIdentifier = {}));
+var IGNORE_FOR_DIAGNOSTICS_MARKER = `${CommentTriviaType.DIAGNOSTIC}:ignore`;
+function hasIgnoreForDiagnosticsMarker(node, sourceFile) {
+  return ts42.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts42.SyntaxKind.MultiLineCommentTrivia) {
+      return null;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    return commentText === IGNORE_FOR_DIAGNOSTICS_MARKER;
+  }) === true;
+}
+function makeRecursiveVisitor(visitor) {
+  function recursiveVisitor(node) {
+    const res = visitor(node);
+    return res !== null ? res : node.forEachChild(recursiveVisitor);
+  }
+  return recursiveVisitor;
+}
+function getSpanFromOptions(opts) {
+  let withSpan = null;
+  if (opts.withSpan !== void 0) {
+    if (opts.withSpan instanceof AbsoluteSourceSpan) {
+      withSpan = opts.withSpan;
+    } else {
+      withSpan = { start: opts.withSpan.start.offset, end: opts.withSpan.end.offset };
+    }
+  }
+  return withSpan;
+}
+function findFirstMatchingNode(tcb, opts) {
+  const withSpan = getSpanFromOptions(opts);
+  const withExpressionIdentifier = opts.withExpressionIdentifier;
+  const sf = tcb.getSourceFile();
+  const visitor = makeRecursiveVisitor((node) => {
+    if (!opts.filter(node)) {
+      return null;
+    }
+    if (withSpan !== null) {
+      const comment = readSpanComment(node, sf);
+      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
+        return null;
+      }
+    }
+    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
+      return null;
+    }
+    return node;
+  });
+  return tcb.forEachChild(visitor) ?? null;
+}
+function findAllMatchingNodes(tcb, opts) {
+  const withSpan = getSpanFromOptions(opts);
+  const withExpressionIdentifier = opts.withExpressionIdentifier;
+  const results = [];
+  const stack = [tcb];
+  const sf = tcb.getSourceFile();
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!opts.filter(node)) {
+      stack.push(...node.getChildren());
+      continue;
+    }
+    if (withSpan !== null) {
+      const comment = readSpanComment(node, sf);
+      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
+        stack.push(...node.getChildren());
+        continue;
+      }
+    }
+    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
+      continue;
+    }
+    results.push(node);
+  }
+  return results;
+}
+function hasExpressionIdentifier(sourceFile, node, identifier) {
+  return ts42.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts42.SyntaxKind.MultiLineCommentTrivia) {
+      return false;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    return commentText === `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
+  }) || false;
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/codegen.js
+var TcbExpr = class {
+  source;
+  /** Text for the content containing the expression's location information. */
+  spanComment = null;
+  /** Text for the content containing the expression's identifier. */
+  identifierComment = null;
+  /**
+   * Text of the comment instructing the type checker to
+   * ignore diagnostics coming from this expression.
+   */
+  ignoreComment = null;
+  constructor(source) {
+    this.source = source;
+  }
+  /**
+   * Converts the node's current state to a string.
+   * @param ignoreComments Whether the comments associated with the expression should be skipped.
+   */
+  print(ignoreComments = false) {
+    if (ignoreComments) {
+      return this.source;
+    }
+    return this.source + this.formatComment(this.identifierComment) + this.formatComment(this.ignoreComment) + this.formatComment(this.spanComment);
+  }
+  /**
+   * Adds a synthetic comment to the expression that represents the parse span of the provided node.
+   * This comment can later be retrieved as trivia of a node to recover original source locations.
+   * @param span Span from the parser containing the location information.
+   */
+  addParseSpanInfo(span) {
+    let start;
+    let end;
+    if (span instanceof AbsoluteSourceSpan2) {
+      start = span.start;
+      end = span.end;
+    } else {
+      start = span.start.offset;
+      end = span.end.offset;
+    }
+    this.spanComment = `${start},${end}`;
+    return this;
+  }
+  /** Marks the expression to be ignored for diagnostics. */
+  markIgnoreDiagnostics() {
+    this.ignoreComment = `${CommentTriviaType.DIAGNOSTIC}:ignore`;
+    return this;
+  }
+  /**
+   * Wraps the expression in parenthesis such that inserted
+   * span comments become attached to the proper node.
+   */
+  wrapForTypeChecker() {
+    this.source = `(${this.print()})`;
+    this.spanComment = this.identifierComment = this.ignoreComment = null;
+    return this;
+  }
+  /**
+   * Tags the expression with an identifier.
+   * @param identifier Identifier to apply to the expression.
+   */
+  addExpressionIdentifier(identifier) {
+    this.identifierComment = `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
+    return this;
+  }
+  /**
+   * `toString` implementation meant to catch errors like accidentally
+   * writing `foo ${expr} bar` instead of `foo ${expr.print()} bar`.
+   */
+  toString() {
+    throw new Error("Assertion error: TcbExpr should not be converted to a string through concatenation. Use the `print` method instead.");
+  }
+  /** Format a comment string as a TypeScript comment. */
+  formatComment(content) {
+    return content === null || content.length === 0 ? "" : ` /*${content}*/`;
+  }
+};
+function declareVariable(identifier, type) {
+  type.addExpressionIdentifier(ExpressionIdentifier.VARIABLE_AS_EXPRESSION);
+  return new TcbExpr(`var ${identifier.print()} = null! as ${type.print()}`);
+}
+function getStatementsBlock(expressions, singleLine = false) {
+  let result = "";
+  for (const expr of expressions) {
+    result += `${expr.print()};${singleLine ? " " : "\n"}`;
+  }
+  return result;
+}
+function quoteAndEscape(value) {
+  return JSON.stringify(value);
+}
+var tempPrinter = null;
+function tempPrint(node, sourceFile) {
+  tempPrinter ??= ts43.createPrinter();
+  return tempPrinter.printNode(ts43.EmitHint.Unspecified, node, sourceFile);
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/reference_emit_environment.js
+var ReferenceEmitEnvironment = class {
+  importManager;
+  refEmitter;
+  reflector;
+  contextFile;
+  constructor(importManager, refEmitter, reflector, contextFile) {
+    this.importManager = importManager;
+    this.refEmitter = refEmitter;
+    this.reflector = reflector;
+    this.contextFile = contextFile;
+  }
+  canReferenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
+    const result = this.refEmitter.emit(ref, this.contextFile, flags);
+    return result.kind === ReferenceEmitKind.Success;
+  }
+  /**
+   * Generate a `ts.TypeNode` that references the given node as a type.
+   *
+   * This may involve importing the node into the file if it's not declared there already.
+   */
+  referenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
+    const ngExpr = this.refEmitter.emit(ref, this.contextFile, flags);
+    assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "symbol");
+    return translateType(new ExpressionType(ngExpr.expression), this.contextFile, this.reflector, this.refEmitter, this.importManager);
+  }
+  /**
+   * Generates a `ts.TypeNode` from a `TcbReferenceMetadata` object.
+   * This is used by the TCB operations which do not hold on to the original `ts.Declaration`.
+   *
+   * Note: It's important that we do not try to evaluate the `typeParameters` here and pad them
+   * out with `any` type arguments. If we supply `any` to a generic pipe (e.g. `var _pipe1: MyPipe<any>;`),
+   * it destroys the generic constraints and degrades the `transform` signature. When they are omitted
+   * entirely, TypeScript implicitly flags an error, which the Angular compiler filters out, and
+   * crucially recovers by falling back to constraint inference (e.g. `var _pipe1: MyPipe;` infers
+   * bounds safely).
+   */
+  referenceTcbType(ref) {
+    if (ref.unexportedDiagnostic !== null || ref.isLocal || ref.moduleName === null) {
+      if (ref.unexportedDiagnostic !== null) {
+        throw new FatalDiagnosticError(
+          ErrorCode.IMPORT_GENERATION_FAILURE,
+          this.contextFile,
+          // Using context file as fallback origin for external file since we lack exact node
+          makeDiagnosticChain(`Unable to import symbol ${ref.name}.`, [
+            makeDiagnosticChain(ref.unexportedDiagnostic)
+          ])
+        );
+      }
+      return ts44.factory.createTypeReferenceNode(ref.name);
+    }
+    return this.referenceExternalType(ref.moduleName, ref.name);
+  }
+  /**
+   * Generates a `TcbExpr` from a `TcbReferenceMetadata` object.
+   */
+  referenceTcbValue(ref) {
+    if (ref.unexportedDiagnostic !== null || ref.isLocal || ref.moduleName === null) {
+      if (ref.unexportedDiagnostic !== null) {
+        throw new FatalDiagnosticError(ErrorCode.IMPORT_GENERATION_FAILURE, this.contextFile, makeDiagnosticChain(`Unable to import symbol ${ref.name}.`, [
+          makeDiagnosticChain(ref.unexportedDiagnostic)
+        ]));
+      }
+      return new TcbExpr(ref.name);
+    }
+    return this.referenceExternalSymbol(ref.moduleName, ref.name);
+  }
+  referenceExternalSymbol(moduleName, name) {
+    const importResult = this.importManager.addImport({
+      exportModuleSpecifier: moduleName,
+      exportSymbolName: name,
+      requestedFile: this.contextFile
+    });
+    if (ts44.isIdentifier(importResult)) {
+      return new TcbExpr(importResult.text);
+    } else if (ts44.isIdentifier(importResult.expression)) {
+      return new TcbExpr(`${importResult.expression.text}.${importResult.name.text}`);
+    }
+    throw new Error("Unexpected value returned by import manager");
+  }
+  /**
+   * Generate a `ts.TypeNode` that references a given type from the provided module.
+   *
+   * This will involve importing the type into the file, and will also add type parameters if
+   * provided.
+   */
+  referenceExternalType(moduleName, name, typeParams) {
+    const external = new ExternalExpr5({ moduleName, name });
+    return translateType(new ExpressionType(external, TypeModifier.None, typeParams), this.contextFile, this.reflector, this.refEmitter, this.importManager);
+  }
+  /**
+   * Generates a `ts.TypeNode` representing a type that is being referenced from a different place
+   * in the program. Any type references inside the transplanted type will be rewritten so that
+   * they can be imported in the context file.
+   */
+  referenceTransplantedType(type) {
+    return translateType(type, this.contextFile, this.reflector, this.refEmitter, this.importManager);
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.js
+import { R3Identifiers as R3Identifiers3 } from "@angular/compiler";
+import ts48 from "typescript";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.js
+import { R3Identifiers as R3Identifiers2 } from "@angular/compiler";
+import ts47 from "typescript";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/type_parameter_emitter.js
+import ts45 from "typescript";
+var TypeParameterEmitter = class {
+  typeParameters;
+  reflector;
+  constructor(typeParameters, reflector) {
+    this.typeParameters = typeParameters;
+    this.reflector = reflector;
+  }
+  /**
+   * Determines whether the type parameters can be emitted. If this returns true, then a call to
+   * `emit` is known to succeed. Vice versa, if false is returned then `emit` should not be
+   * called, as it would fail.
+   */
+  canEmit(canEmitReference) {
+    if (this.typeParameters === void 0) {
+      return true;
+    }
+    return this.typeParameters.every((typeParam) => {
+      return this.canEmitType(typeParam.constraint, canEmitReference) && this.canEmitType(typeParam.default, canEmitReference);
+    });
+  }
+  canEmitType(type, canEmitReference) {
+    if (type === void 0) {
+      return true;
+    }
+    return canEmitType(type, (typeReference) => {
+      const reference = this.resolveTypeReference(typeReference);
+      if (reference === null) {
+        return false;
+      }
+      if (reference instanceof Reference) {
+        return canEmitReference(reference);
+      }
+      return true;
+    });
+  }
+  /**
+   * Emits the type parameters using the provided emitter function for `Reference`s.
+   */
+  emit(emitReference) {
+    if (this.typeParameters === void 0) {
+      return void 0;
+    }
+    const emitter = new TypeEmitter((type) => this.translateTypeReference(type, emitReference));
+    return this.typeParameters.map((typeParam) => {
+      const constraint = typeParam.constraint !== void 0 ? emitter.emitType(typeParam.constraint) : void 0;
+      const defaultType = typeParam.default !== void 0 ? emitter.emitType(typeParam.default) : void 0;
+      return ts45.factory.updateTypeParameterDeclaration(typeParam, typeParam.modifiers, typeParam.name, constraint, defaultType);
+    });
+  }
+  resolveTypeReference(type) {
+    const target = ts45.isIdentifier(type.typeName) ? type.typeName : type.typeName.right;
+    const declaration = this.reflector.getDeclarationOfIdentifier(target);
+    if (declaration === null || declaration.node === null) {
+      return null;
+    }
+    if (this.isLocalTypeParameter(declaration.node)) {
+      return type;
+    }
+    let owningModule2 = null;
+    if (typeof declaration.viaModule === "string") {
+      owningModule2 = {
+        specifier: declaration.viaModule,
+        resolutionContext: type.getSourceFile().fileName
+      };
+    }
+    return new Reference(declaration.node, declaration.viaModule === AmbientImport ? AmbientImport : owningModule2);
+  }
+  translateTypeReference(type, emitReference) {
+    const reference = this.resolveTypeReference(type);
+    if (!(reference instanceof Reference)) {
+      return reference;
+    }
+    const typeNode = emitReference(reference);
+    if (typeNode === null) {
+      return null;
+    }
+    if (!ts45.isTypeReferenceNode(typeNode)) {
+      throw new Error(`Expected TypeReferenceNode for emitted reference, got ${ts45.SyntaxKind[typeNode.kind]}.`);
+    }
+    return typeNode;
+  }
+  isLocalTypeParameter(decl) {
+    return this.typeParameters.some((param) => param === decl);
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/host_bindings.js
+import { BindingType, CssSelector, makeBindingParser, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstHostElement, AbsoluteSourceSpan as AbsoluteSourceSpan3, ParseSpan, PropertyRead, ParsedEventType, Call, ThisReceiver, KeyedRead, LiteralPrimitive, RecursiveAstVisitor, ASTWithName, SafeCall, ImplicitReceiver } from "@angular/compiler";
+import ts46 from "typescript";
+var GUARD_COMMENT_TEXT = "hostBindingsBlockGuard";
+function createHostElement(type, selector, sourceNode, literal4, bindingDecorators, listenerDecorators) {
+  const bindings = [];
+  const listeners = [];
+  let parser = null;
+  if (literal4 !== null) {
+    for (const prop of literal4.properties) {
+      if (ts46.isPropertyAssignment(prop) && ts46.isStringLiteralLike(prop.initializer) && isStaticName(prop.name)) {
+        parser ??= makeBindingParser();
+        createNodeFromHostLiteralProperty(prop, parser, bindings, listeners);
+      }
+    }
+  }
+  for (const decorator of bindingDecorators) {
+    createNodeFromBindingDecorator(decorator, bindings);
+  }
+  for (const decorator of listenerDecorators) {
+    parser ??= makeBindingParser();
+    createNodeFromListenerDecorator(decorator, parser, listeners);
+  }
+  if (bindings.length === 0 && listeners.length === 0) {
+    return null;
+  }
+  const tagNames = [];
+  if (selector !== null) {
+    const parts = CssSelector.parse(selector);
+    for (const part of parts) {
+      if (part.element !== null) {
+        tagNames.push(part.element);
+      }
+    }
+  }
+  if (tagNames.length === 0) {
+    tagNames.push(`ng-${type}`);
+  }
+  return new TmplAstHostElement(tagNames, bindings, listeners, createSourceSpan(sourceNode.name));
+}
+function createHostBindingsBlockGuard() {
+  return `(true /*${GUARD_COMMENT_TEXT}*/)`;
+}
+function isHostBindingsBlockGuard(node) {
+  if (!ts46.isIfStatement(node)) {
+    return false;
+  }
+  const expr = node.expression;
+  if (!ts46.isParenthesizedExpression(expr) || expr.expression.kind !== ts46.SyntaxKind.TrueKeyword) {
+    return false;
+  }
+  const text = expr.getSourceFile().text;
+  return ts46.forEachTrailingCommentRange(text, expr.expression.getEnd(), (pos, end, kind) => kind === ts46.SyntaxKind.MultiLineCommentTrivia && text.substring(pos + 2, end - 2) === GUARD_COMMENT_TEXT) || false;
+}
+function createNodeFromHostLiteralProperty(property, parser, bindings, listeners) {
+  const { name, initializer } = property;
+  if (name.text.startsWith("[") && name.text.endsWith("]")) {
+    const { attrName, type } = inferBoundAttribute(name.text.slice(1, -1));
+    const valueSpan = createStaticExpressionSpan(initializer);
+    const ast = parser.parseBinding(initializer.text, true, valueSpan, valueSpan.start.offset);
+    if (ast.errors.length > 0) {
+      return;
+    }
+    fixupSpans(ast, initializer);
+    bindings.push(new TmplAstBoundAttribute(attrName, type, 0, ast, null, createSourceSpan(property), createStaticExpressionSpan(name), valueSpan, void 0));
+  } else if (name.text.startsWith("(") && name.text.endsWith(")")) {
+    const events = [];
+    parser.parseEvent(name.text.slice(1, -1), initializer.text, false, createSourceSpan(property), createStaticExpressionSpan(initializer), [], events, createStaticExpressionSpan(name));
+    if (events.length === 0 || events[0].handler.errors.length > 0) {
+      return;
+    }
+    fixupSpans(events[0].handler, initializer);
+    listeners.push(TmplAstBoundEvent.fromParsedEvent(events[0]));
+  }
+}
+function createNodeFromBindingDecorator(decorator, bindings) {
+  if (!ts46.isCallExpression(decorator.expression)) {
+    return;
+  }
+  const args = decorator.expression.arguments;
+  const property = decorator.parent;
+  let nameNode = null;
+  let propertyName = null;
+  if (property && ts46.isPropertyDeclaration(property) && isStaticName(property.name)) {
+    propertyName = property.name;
+  }
+  if (args.length === 0) {
+    nameNode = propertyName;
+  } else if (ts46.isStringLiteralLike(args[0])) {
+    nameNode = args[0];
+  } else {
+    return;
+  }
+  if (nameNode === null || propertyName === null) {
+    return;
+  }
+  const span = new ParseSpan(-1, -1);
+  const propertyStart = property.getStart();
+  const receiver = new ThisReceiver(span, new AbsoluteSourceSpan3(propertyStart, propertyStart));
+  const nameSpan = new AbsoluteSourceSpan3(propertyName.getStart(), propertyName.getEnd());
+  const read = ts46.isIdentifier(propertyName) ? new PropertyRead(span, nameSpan, nameSpan, receiver, propertyName.text) : new KeyedRead(span, nameSpan, receiver, new LiteralPrimitive(span, nameSpan, propertyName.text));
+  const { attrName, type } = inferBoundAttribute(nameNode.text);
+  bindings.push(new TmplAstBoundAttribute(attrName, type, 0, read, null, createSourceSpan(decorator), createStaticExpressionSpan(nameNode), createSourceSpan(decorator), void 0));
+}
+function createNodeFromListenerDecorator(decorator, parser, listeners) {
+  if (!ts46.isCallExpression(decorator.expression) || decorator.expression.arguments.length === 0) {
+    return;
+  }
+  const args = decorator.expression.arguments;
+  const method = decorator.parent;
+  if (!method || !ts46.isMethodDeclaration(method) || !isStaticName(method.name) || !ts46.isStringLiteralLike(args[0])) {
+    return;
+  }
+  const span = new ParseSpan(-1, -1);
+  const argNodes = [];
+  const methodStart = method.getStart();
+  const methodReceiver = new ThisReceiver(span, new AbsoluteSourceSpan3(methodStart, methodStart));
+  const nameSpan = new AbsoluteSourceSpan3(method.name.getStart(), method.name.getEnd());
+  const receiver = ts46.isIdentifier(method.name) ? new PropertyRead(span, nameSpan, nameSpan, methodReceiver, method.name.text) : new KeyedRead(span, nameSpan, methodReceiver, new LiteralPrimitive(span, nameSpan, method.name.text));
+  if (args.length > 1 && ts46.isArrayLiteralExpression(args[1])) {
+    for (const expr of args[1].elements) {
+      if (ts46.isStringLiteralLike(expr)) {
+        const span2 = createStaticExpressionSpan(expr);
+        const ast = parser.parseBinding(expr.text, true, span2, span2.start.offset);
+        fixupSpans(ast, expr);
+        argNodes.push(ast);
+      } else {
+        const expressionSpan = new AbsoluteSourceSpan3(expr.getStart(), expr.getEnd());
+        const anyRead = new PropertyRead(span, expressionSpan, expressionSpan, new ImplicitReceiver(span, expressionSpan), "$any");
+        const anyCall = new Call(span, expressionSpan, anyRead, [new LiteralPrimitive(span, expressionSpan, 0)], expressionSpan);
+        argNodes.push(anyCall);
+      }
+    }
+  }
+  const callNode = new Call(span, nameSpan, receiver, argNodes, span);
+  const eventNameNode = args[0];
+  let type;
+  let eventName;
+  let phase;
+  let target;
+  if (eventNameNode.text.startsWith("@")) {
+    const parsedName = parser.parseLegacyAnimationEventName(eventNameNode.text);
+    type = ParsedEventType.LegacyAnimation;
+    eventName = parsedName.eventName;
+    phase = parsedName.phase;
+    target = null;
+  } else {
+    const parsedName = parser.parseEventListenerName(eventNameNode.text);
+    type = ParsedEventType.Regular;
+    eventName = parsedName.eventName;
+    target = parsedName.target;
+    phase = null;
+  }
+  listeners.push(new TmplAstBoundEvent(eventName, type, callNode, target, phase, createSourceSpan(decorator), createSourceSpan(decorator), createStaticExpressionSpan(eventNameNode)));
+}
+function inferBoundAttribute(name) {
+  const attrPrefix = "attr.";
+  const classPrefix = "class.";
+  const stylePrefix = "style.";
+  const animationPrefix = "animate.";
+  const legacyAnimationPrefix = "@";
+  let attrName;
+  let type;
+  if (name.startsWith(attrPrefix)) {
+    attrName = name.slice(attrPrefix.length);
+    type = BindingType.Attribute;
+  } else if (name.startsWith(classPrefix)) {
+    attrName = name.slice(classPrefix.length);
+    type = BindingType.Class;
+  } else if (name.startsWith(stylePrefix)) {
+    attrName = name.slice(stylePrefix.length);
+    type = BindingType.Style;
+  } else if (name.startsWith(animationPrefix)) {
+    attrName = name;
+    type = BindingType.Animation;
+  } else if (name.startsWith(legacyAnimationPrefix)) {
+    attrName = name.slice(legacyAnimationPrefix.length);
+    type = BindingType.LegacyAnimation;
+  } else {
+    attrName = name;
+    type = BindingType.Property;
+  }
+  return { attrName, type };
+}
+function isStaticName(node) {
+  return ts46.isIdentifier(node) || ts46.isStringLiteralLike(node);
+}
+function createStaticExpressionSpan(node) {
+  const span = createSourceSpan(node);
+  if (ts46.isStringLiteralLike(node)) {
+    span.fullStart = span.fullStart.moveBy(1);
+    span.start = span.start.moveBy(1);
+    span.end = span.end.moveBy(-1);
+  }
+  return span;
+}
+function fixupSpans(ast, initializer) {
+  const escapeIndex = initializer.getText().indexOf("\\", 1);
+  if (escapeIndex > -1) {
+    const newSpan = new ParseSpan(0, initializer.getWidth());
+    const newSourceSpan = new AbsoluteSourceSpan3(initializer.getStart(), initializer.getEnd());
+    ast.visit(new ReplaceSpanVisitor(escapeIndex, newSpan, newSourceSpan));
+  }
+}
+var ReplaceSpanVisitor = class extends RecursiveAstVisitor {
+  afterIndex;
+  overrideSpan;
+  overrideSourceSpan;
+  constructor(afterIndex, overrideSpan, overrideSourceSpan) {
+    super();
+    this.afterIndex = afterIndex;
+    this.overrideSpan = overrideSpan;
+    this.overrideSourceSpan = overrideSourceSpan;
+  }
+  visit(ast) {
+    if (ast.span.start >= this.afterIndex || ast.span.end >= this.afterIndex) {
+      ast.span = this.overrideSpan;
+      ast.sourceSpan = this.overrideSourceSpan;
+      if (ast instanceof ASTWithName) {
+        ast.nameSpan = this.overrideSourceSpan;
+      }
+      if (ast instanceof Call || ast instanceof SafeCall) {
+        ast.argumentSpan = this.overrideSourceSpan;
+      }
+    }
+    super.visit(ast);
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.js
+var TCB_FILE_IMPORT_GRAPH_PREPARE_IDENTIFIERS = [
+  // Imports may be added for signal input checking. We wouldn't want to change the
+  // import graph for incremental compilations when suddenly a signal input is used,
+  // or removed.
+  R3Identifiers2.InputSignalBrandWriteType
+];
+var TcbInliningRequirement;
+(function(TcbInliningRequirement2) {
+  TcbInliningRequirement2[TcbInliningRequirement2["MustInline"] = 0] = "MustInline";
+  TcbInliningRequirement2[TcbInliningRequirement2["ShouldInlineForGenericBounds"] = 1] = "ShouldInlineForGenericBounds";
+  TcbInliningRequirement2[TcbInliningRequirement2["None"] = 2] = "None";
+})(TcbInliningRequirement || (TcbInliningRequirement = {}));
+function requiresInlineTypeCheckBlock(ref, env, usedPipes, reflector) {
+  if (!env.canReferenceType(ref)) {
+    return TcbInliningRequirement.MustInline;
+  } else if (!checkIfGenericTypeBoundsCanBeEmitted(ref.node, reflector, env)) {
+    return TcbInliningRequirement.ShouldInlineForGenericBounds;
+  } else if (usedPipes.some((pipeRef) => !env.canReferenceType(pipeRef))) {
+    return TcbInliningRequirement.MustInline;
+  } else {
+    return TcbInliningRequirement.None;
+  }
+}
+function getSourceMapping(shimSf, position, resolver, isDiagnosticRequest) {
+  const node = getTokenAtPosition(shimSf, position);
+  const sourceLocation = findSourceLocation(node, shimSf, isDiagnosticRequest);
+  if (sourceLocation === null) {
+    return null;
+  }
+  if (isInHostBindingTcb(node)) {
+    const hostSourceMapping = resolver.getHostBindingsMapping(sourceLocation.id);
+    const span2 = resolver.toHostParseSourceSpan(sourceLocation.id, sourceLocation.span);
+    if (span2 === null) {
+      return null;
+    }
+    return { sourceLocation, sourceMapping: hostSourceMapping, span: span2 };
+  }
+  const span = resolver.toTemplateParseSourceSpan(sourceLocation.id, sourceLocation.span);
+  if (span === null) {
+    return null;
+  }
+  return {
+    sourceLocation,
+    sourceMapping: resolver.getTemplateSourceMapping(sourceLocation.id),
+    span
+  };
+}
+function isInHostBindingTcb(node) {
+  let current = node;
+  while (current && !ts47.isFunctionDeclaration(current)) {
+    if (isHostBindingsBlockGuard(current)) {
+      return true;
+    }
+    current = current.parent;
+  }
+  return false;
+}
+function findTypeCheckBlock(file, id, isDiagnosticRequest) {
+  for (const stmt of file.statements) {
+    if (ts47.isFunctionDeclaration(stmt) && getTypeCheckId(stmt, file, isDiagnosticRequest) === id) {
+      return stmt;
+    }
+  }
+  return findNodeInFile(file, (node) => ts47.isFunctionDeclaration(node) && getTypeCheckId(node, file, isDiagnosticRequest) === id);
+}
+function findSourceLocation(node, sourceFile, isDiagnosticsRequest) {
+  while (node !== void 0 && !ts47.isFunctionDeclaration(node)) {
+    if (hasIgnoreForDiagnosticsMarker(node, sourceFile) && isDiagnosticsRequest) {
+      return null;
+    }
+    const span = readSpanComment(node, sourceFile);
+    if (span !== null) {
+      const id = getTypeCheckId(node, sourceFile, isDiagnosticsRequest);
+      if (id === null) {
+        return null;
+      }
+      return { id, span };
+    }
+    node = node.parent;
+  }
+  return null;
+}
+function getTypeCheckId(node, sourceFile, isDiagnosticRequest) {
+  while (!ts47.isFunctionDeclaration(node)) {
+    if (hasIgnoreForDiagnosticsMarker(node, sourceFile) && isDiagnosticRequest) {
+      return null;
+    }
+    node = node.parent;
+    if (node === void 0) {
+      return null;
+    }
+  }
+  const start = node.getFullStart();
+  return ts47.forEachLeadingCommentRange(sourceFile.text, start, (pos, end, kind) => {
+    if (kind !== ts47.SyntaxKind.MultiLineCommentTrivia) {
+      return null;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    return commentText;
+  }) || null;
+}
+function ensureTypeCheckFilePreparationImports(env) {
+  for (const identifier of TCB_FILE_IMPORT_GRAPH_PREPARE_IDENTIFIERS) {
+    env.importManager.addImport({
+      exportModuleSpecifier: identifier.moduleName,
+      exportSymbolName: identifier.name,
+      requestedFile: env.contextFile
+    });
+  }
+}
+function checkIfGenericTypeBoundsCanBeEmitted(node, reflector, env) {
+  const emitter = new TypeParameterEmitter(node.typeParameters, reflector);
+  return emitter.canEmit((ref) => env.canReferenceType(ref));
+}
+function findNodeInFile(file, predicate) {
+  const visit2 = (node) => {
+    if (predicate(node)) {
+      return node;
+    }
+    return ts47.forEachChild(node, visit2) ?? null;
+  };
+  return ts47.forEachChild(file, visit2) ?? null;
+}
+function generateTcbTypeParameters(typeParameters, sourceFile) {
+  return typeParameters.map((p) => {
+    const representation = tempPrint(p, sourceFile);
+    return {
+      name: p.name.text,
+      representation,
+      representationWithDefault: p.default ? representation : `${representation} = any`
+    };
+  });
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.js
+function generateTypeCtorDeclarationFn(env, meta, nodeTypeRef, typeParams) {
+  const typeArgs = generateGenericArgs(typeParams);
+  const typeRef = ts48.isIdentifier(nodeTypeRef) ? nodeTypeRef.text : tempPrint(nodeTypeRef, nodeTypeRef.getSourceFile());
+  const typeRefWithGenerics = `${typeRef}${typeArgs}`;
+  const initParam = constructTypeCtorParameter(env, meta, typeRef, typeRefWithGenerics);
+  const typeParameters = typeParametersWithDefaultTypes(typeParams);
+  let source;
+  if (meta.body) {
+    const fnType = `${typeParameters}(${initParam}) => ${typeRefWithGenerics}`;
+    source = `const ${meta.fnName}: ${fnType} = null!`;
+  } else {
+    source = `declare function ${meta.fnName}${typeParameters}(${initParam}): ${typeRefWithGenerics}`;
+  }
+  return new TcbExpr(source);
+}
+function generateInlineTypeCtor(env, node, meta) {
+  const typeRef = node.name.text;
+  const sourceFile = node.getSourceFile();
+  const tcbTypeParams = node.typeParameters && node.typeParameters.length > 0 ? generateTcbTypeParameters(node.typeParameters, sourceFile) : void 0;
+  const typeRefWithGenerics = `${typeRef}${generateGenericArgs(tcbTypeParams)}`;
+  const initParam = constructTypeCtorParameter(env, meta, typeRef, typeRefWithGenerics);
+  const body = `{ return null!; }`;
+  const typeParams = typeParametersWithDefaultTypes(tcbTypeParams);
+  return `static ${meta.fnName}${typeParams}(${initParam}): ${typeRefWithGenerics} ${body}`;
+}
+function constructTypeCtorParameter(env, meta, typeRef, typeRefWithGenerics) {
+  let initType = null;
+  const plainKeys = [];
+  const coercedKeys = [];
+  const signalInputKeys = [];
+  for (const { classPropertyName, transformType, isSignal } of meta.fields.inputs) {
+    if (isSignal) {
+      signalInputKeys.push(quoteAndEscape(classPropertyName));
+    } else if (!meta.coercedInputFields.has(classPropertyName)) {
+      plainKeys.push(quoteAndEscape(classPropertyName));
+    } else {
+      const coercionType = transformType !== void 0 ? transformType : `typeof ${typeRef}.ngAcceptInputType_${classPropertyName}`;
+      coercedKeys.push(`${classPropertyName}: ${coercionType}`);
+    }
+  }
+  if (plainKeys.length > 0) {
+    initType = `Pick<${typeRefWithGenerics}, ${plainKeys.join(" | ")}>`;
+  }
+  if (coercedKeys.length > 0) {
+    let coercedLiteral = "{\n";
+    for (const key of coercedKeys) {
+      coercedLiteral += `${key};
+`;
+    }
+    coercedLiteral += "}";
+    initType = initType !== null ? `${initType} & ${coercedLiteral}` : coercedLiteral;
+  }
+  if (signalInputKeys.length > 0) {
+    const keyTypeUnion = signalInputKeys.join(" | ");
+    const unwrapRef = env.referenceExternalSymbol(R3Identifiers3.UnwrapDirectiveSignalInputs.moduleName, R3Identifiers3.UnwrapDirectiveSignalInputs.name);
+    const unwrapExpr = `${unwrapRef.print()}<${typeRefWithGenerics}, ${keyTypeUnion}>`;
+    initType = initType !== null ? `${initType} & ${unwrapExpr}` : unwrapExpr;
+  }
+  if (initType === null) {
+    initType = "{}";
+  }
+  return `init: ${initType}`;
+}
+function generateGenericArgs(typeParameters) {
+  if (typeParameters === void 0 || typeParameters.length === 0) {
+    return "";
+  }
+  return `<${typeParameters.map((param) => param.name).join(", ")}>`;
+}
+function requiresInlineTypeCtor(node, host, env) {
+  return !checkIfGenericTypeBoundsCanBeEmitted(node, host, env);
+}
+function typeParametersWithDefaultTypes(params) {
+  if (params === void 0 || params.length === 0) {
+    return "";
+  }
+  return `<${params.map((param) => param.representationWithDefault).join(", ")}>`;
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/environment.js
+var Environment = class extends ReferenceEmitEnvironment {
+  config;
+  nextIds = {
+    pipeInst: 1,
+    typeCtor: 1
+  };
+  typeCtors = /* @__PURE__ */ new Map();
+  typeCtorStatements = [];
+  pipeInsts = /* @__PURE__ */ new Map();
+  pipeInstStatements = [];
+  constructor(config, importManager, refEmitter, reflector, contextFile) {
+    super(importManager, refEmitter, reflector, contextFile);
+    this.config = config;
+  }
+  /**
+   * Get an expression referring to a type constructor for the given directive.
+   *
+   * Depending on the shape of the directive itself, this could be either a reference to a declared
+   * type constructor, or to an inline type constructor.
+   */
+  typeCtorFor(dir) {
+    const key = getTcbReferenceKey(dir.ref);
+    if (this.typeCtors.has(key)) {
+      return new TcbExpr(this.typeCtors.get(key));
+    }
+    if (dir.hasRequiresInlineTypeCtor) {
+      const typeCtorExpr = `${this.referenceTcbValue(dir.ref).print()}.ngTypeCtor`;
+      this.typeCtors.set(key, typeCtorExpr);
+      return new TcbExpr(typeCtorExpr);
+    } else {
+      const fnName = `_ctor${this.nextIds.typeCtor++}`;
+      const nodeTypeRef = this.referenceTcbType(dir.ref);
+      if (!ts49.isTypeReferenceNode(nodeTypeRef)) {
+        throw new Error(`Expected TypeReferenceNode from reference to ${dir.ref.name}`);
+      }
+      const meta = {
+        fnName,
+        body: true,
+        fields: {
+          inputs: dir.inputs
+          // TODO: support queries
+        },
+        coercedInputFields: dir.coercedInputFields
+      };
+      const typeParams = dir.typeParameters || void 0;
+      const typeCtor = generateTypeCtorDeclarationFn(this, meta, nodeTypeRef.typeName, typeParams);
+      this.typeCtorStatements.push(typeCtor);
+      this.typeCtors.set(key, fnName);
+      return new TcbExpr(fnName);
+    }
+  }
+  /*
+   * Get an expression referring to an instance of the given pipe.
+   */
+  pipeInst(pipe) {
+    const key = getTcbReferenceKey(pipe.ref);
+    if (this.pipeInsts.has(key)) {
+      return new TcbExpr(this.pipeInsts.get(key));
+    }
+    const pipeType = this.referenceTcbType(pipe.ref);
+    const pipeInstId = `_pipe${this.nextIds.pipeInst++}`;
+    this.pipeInsts.set(key, pipeInstId);
+    this.pipeInstStatements.push(declareVariable(new TcbExpr(pipeInstId), new TcbExpr(tempPrint(pipeType, this.contextFile))));
+    return new TcbExpr(pipeInstId);
+  }
+  /**
+   * Generate a `ts.Expression` that references the given node.
+   *
+   * This may involve importing the node into the file if it's not declared there already.
+   */
+  reference(ref) {
+    const ngExpr = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing);
+    assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "class");
+    const tsExpression = translateExpression(this.contextFile, ngExpr.expression, this.importManager);
+    return new TcbExpr(tempPrint(tsExpression, this.contextFile));
+  }
+  emitTypeParameters(declaration) {
+    const emitter = new TypeParameterEmitter(declaration.typeParameters, this.reflector);
+    return emitter.emit((ref) => this.referenceType(ref));
+  }
+  getPreludeStatements() {
+    return [...this.pipeInstStatements, ...this.typeCtorStatements];
+  }
+};
+function getTcbReferenceKey(ref) {
+  if (ref.nodeFilePath !== void 0 && ref.nodeNameSpan !== void 0) {
+    return `${ref.nodeFilePath}#${ref.nodeNameSpan.start}`;
+  }
+  return ref.moduleName ? `${ref.moduleName}#${ref.name}` : ref.name;
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/context.js
+var TcbGenericContextBehavior;
+(function(TcbGenericContextBehavior2) {
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["UseEmitter"] = 0] = "UseEmitter";
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["CopyClassNodes"] = 1] = "CopyClassNodes";
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["FallbackToAny"] = 2] = "FallbackToAny";
+})(TcbGenericContextBehavior || (TcbGenericContextBehavior = {}));
+var Context2 = class {
+  env;
+  domSchemaChecker;
+  oobRecorder;
+  id;
+  boundTarget;
+  pipes;
+  schemas;
+  hostIsStandalone;
+  hostPreserveWhitespaces;
+  nextId = 1;
+  constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone, hostPreserveWhitespaces) {
+    this.env = env;
+    this.domSchemaChecker = domSchemaChecker;
+    this.oobRecorder = oobRecorder;
+    this.id = id;
+    this.boundTarget = boundTarget;
+    this.pipes = pipes;
+    this.schemas = schemas;
+    this.hostIsStandalone = hostIsStandalone;
+    this.hostPreserveWhitespaces = hostPreserveWhitespaces;
+  }
+  /**
+   * Allocate a new variable name for use within the `Context`.
+   *
+   * Currently this uses a monotonically increasing counter, but in the future the variable name
+   * might change depending on the type of data being stored.
+   */
+  allocateId() {
+    return `_t${this.nextId++}`;
+  }
+  getPipeByName(name) {
+    if (this.pipes === null || !this.pipes.has(name)) {
+      return null;
+    }
+    return this.pipes.get(name);
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.js
+import ts55 from "typescript";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/scope.js
+import { TmplAstBoundText, TmplAstComponent as TmplAstComponent2, TmplAstContent, TmplAstDeferredBlock, TmplAstDirective, TmplAstElement as TmplAstElement7, TmplAstForLoopBlock as TmplAstForLoopBlock2, TmplAstHostElement as TmplAstHostElement5, TmplAstIcu, TmplAstIfBlock as TmplAstIfBlock2, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference, TmplAstSwitchBlock as TmplAstSwitchBlock2, TmplAstTemplate as TmplAstTemplate5, TmplAstText as TmplAstText2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/base.js
+var TcbOp = class {
+  /**
+   * Replacement value or operation used while this `TcbOp` is executing (i.e. to resolve circular
+   * references during its execution).
+   *
+   * This is usually a `null!` expression (which asks TS to infer an appropriate type), but another
+   * `TcbOp` can be returned in cases where additional code generation is necessary to deal with
+   * circular references.
+   */
+  circularFallback() {
+    return new TcbExpr("null!");
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/template.js
+import { TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstTemplate } from "@angular/compiler";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/expression.js
+import { Binary, BindingPipe, Call as Call3, ImplicitReceiver as ImplicitReceiver3, PropertyRead as PropertyRead3, R3Identifiers as R3Identifiers4, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, ThisReceiver as ThisReceiver3, TmplAstLetDeclaration } from "@angular/compiler";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/expression.js
+import { ASTWithSource, Call as Call2, ImplicitReceiver as ImplicitReceiver2, PropertyRead as PropertyRead2, SafeKeyedRead, SafePropertyRead, ThisReceiver as ThisReceiver2 } from "@angular/compiler";
+function astToTcbExpr(ast, maybeResolve, config) {
+  const translator = new TcbExprTranslator(maybeResolve, config);
+  return translator.translate(ast);
+}
+var TcbExprTranslator = class {
+  maybeResolve;
+  config;
+  constructor(maybeResolve, config) {
+    this.maybeResolve = maybeResolve;
+    this.config = config;
+  }
+  translate(ast) {
+    if (ast instanceof ASTWithSource) {
+      ast = ast.ast;
+    }
+    const resolved = this.maybeResolve(ast);
+    if (resolved !== null) {
+      return resolved;
+    }
+    return ast.visit(this);
+  }
+  visitUnary(ast) {
+    const expr = this.translate(ast.expr);
+    const node = new TcbExpr(`${ast.operator}${expr.print()}`);
+    return node.wrapForTypeChecker().addParseSpanInfo(ast.sourceSpan);
+  }
+  visitBinary(ast) {
+    const lhs = this.translate(ast.left);
+    const rhs = this.translate(ast.right);
+    lhs.wrapForTypeChecker();
+    rhs.wrapForTypeChecker();
+    const expression = `${lhs.print()} ${ast.operation} ${rhs.print()}`;
+    const node = new TcbExpr(ast.operation === "??" || ast.operation === "**" ? `(${expression})` : expression);
+    node.addParseSpanInfo(ast.sourceSpan);
+    return node;
+  }
+  visitChain(ast) {
+    const elements = ast.expressions.map((expr) => this.translate(expr).print());
+    const node = new TcbExpr(elements.join(", "));
+    node.wrapForTypeChecker();
+    node.addParseSpanInfo(ast.sourceSpan);
+    return node;
+  }
+  visitConditional(ast) {
+    const condExpr = this.translate(ast.condition);
+    const trueExpr = this.translate(ast.trueExp);
+    const falseExpr = this.translate(ast.falseExp).wrapForTypeChecker();
+    const node = new TcbExpr(`(${condExpr.print()} ? ${trueExpr.print()} : ${falseExpr.print()})`).addParseSpanInfo(ast.sourceSpan);
+    return node;
+  }
+  visitImplicitReceiver(ast) {
+    throw new Error("Method not implemented.");
+  }
+  visitThisReceiver(ast) {
+    throw new Error("Method not implemented.");
+  }
+  visitRegularExpressionLiteral(ast, context) {
+    const node = new TcbExpr(`/${ast.body}/${ast.flags ?? ""}`);
+    node.wrapForTypeChecker();
+    return node;
+  }
+  visitInterpolation(ast) {
+    const exprs = ast.expressions.map((e) => {
+      const node = this.translate(e);
+      node.wrapForTypeChecker();
+      return node.print();
+    });
+    return new TcbExpr(`"" + ${exprs.join(" + ")}`);
+  }
+  visitKeyedRead(ast) {
+    const receiver = this.translate(ast.receiver).wrapForTypeChecker();
+    const key = this.translate(ast.key);
+    return new TcbExpr(`${receiver.print()}[${key.print()}]`).addParseSpanInfo(ast.sourceSpan);
+  }
+  visitLiteralArray(ast) {
+    const elements = ast.expressions.map((expr) => this.translate(expr));
+    let literal4 = `[${elements.map((el) => el.print()).join(", ")}]`;
+    if (!this.config.strictLiteralTypes) {
+      literal4 = `(${literal4} as any)`;
+    }
+    return new TcbExpr(literal4).addParseSpanInfo(ast.sourceSpan);
+  }
+  visitLiteralMap(ast) {
+    const properties = ast.keys.map((key, idx) => {
+      const value = this.translate(ast.values[idx]);
+      if (key.kind === "property") {
+        const keyNode = new TcbExpr(quoteAndEscape(key.key));
+        keyNode.addParseSpanInfo(key.sourceSpan);
+        return `${keyNode.print()}: ${value.print()}`;
+      } else {
+        return `...${value.print()}`;
+      }
+    });
+    let literal4 = `{ ${properties.join(", ")} }`;
+    if (!this.config.strictLiteralTypes) {
+      literal4 = `${literal4} as any`;
+    }
+    const expression = new TcbExpr(literal4).addParseSpanInfo(ast.sourceSpan);
+    expression.wrapForTypeChecker();
+    return expression;
+  }
+  visitLiteralPrimitive(ast) {
+    let node;
+    if (ast.value === void 0) {
+      node = new TcbExpr("undefined");
+    } else if (ast.value === null) {
+      node = new TcbExpr("null");
+    } else if (typeof ast.value === "string") {
+      node = new TcbExpr(quoteAndEscape(ast.value));
+    } else if (typeof ast.value === "number") {
+      if (Number.isNaN(ast.value)) {
+        node = new TcbExpr("NaN");
+      } else if (!Number.isFinite(ast.value)) {
+        node = new TcbExpr(ast.value > 0 ? "Infinity" : "-Infinity");
+      } else {
+        node = new TcbExpr(ast.value.toString());
+      }
+    } else if (typeof ast.value === "boolean") {
+      node = new TcbExpr(ast.value + "");
+    } else {
+      throw Error(`Unsupported AST value of type ${typeof ast.value}`);
+    }
+    node.addParseSpanInfo(ast.sourceSpan);
+    return node;
+  }
+  visitNonNullAssert(ast) {
+    const expr = this.translate(ast.expression).wrapForTypeChecker();
+    return new TcbExpr(`${expr.print()}!`).addParseSpanInfo(ast.sourceSpan);
+  }
+  visitPipe(ast) {
+    throw new Error("Method not implemented.");
+  }
+  visitPrefixNot(ast) {
+    const expression = this.translate(ast.expression).wrapForTypeChecker();
+    return new TcbExpr(`!${expression.print()}`).addParseSpanInfo(ast.sourceSpan);
+  }
+  visitTypeofExpression(ast) {
+    const expression = this.translate(ast.expression).wrapForTypeChecker();
+    return new TcbExpr(`typeof ${expression.print()}`).addParseSpanInfo(ast.sourceSpan);
+  }
+  visitVoidExpression(ast) {
+    const expression = this.translate(ast.expression).wrapForTypeChecker();
+    return new TcbExpr(`void ${expression.print()}`).addParseSpanInfo(ast.sourceSpan);
+  }
+  visitPropertyRead(ast) {
+    const receiver = this.translate(ast.receiver).wrapForTypeChecker();
+    return new TcbExpr(`${receiver.print()}.${ast.name}`).addParseSpanInfo(ast.nameSpan).wrapForTypeChecker().addParseSpanInfo(ast.sourceSpan);
+  }
+  visitSafePropertyRead(ast) {
+    let node;
+    const receiver = this.translate(ast.receiver).wrapForTypeChecker();
+    const name = new TcbExpr(ast.name).addParseSpanInfo(ast.nameSpan);
+    if (this.config.strictSafeNavigationTypes) {
+      node = new TcbExpr(`(0 as any ? ${receiver.print()}!.${name.print()} : undefined)`);
+    } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
+      node = new TcbExpr(`(${receiver.print()} as any).${name.print()}`);
+    } else {
+      node = new TcbExpr(`(${receiver.print()}!.${name.print()} as any)`);
+    }
+    return node.addParseSpanInfo(ast.sourceSpan);
+  }
+  visitSafeKeyedRead(ast) {
+    const receiver = this.translate(ast.receiver).wrapForTypeChecker();
+    const key = this.translate(ast.key);
+    let node;
+    if (this.config.strictSafeNavigationTypes) {
+      const elementAccess = new TcbExpr(`${receiver.print()}![${key.print()}]`).addParseSpanInfo(ast.sourceSpan);
+      node = new TcbExpr(`(0 as any ? ${elementAccess.print()} : undefined)`);
+    } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
+      node = new TcbExpr(`(${receiver.print()} as any)[${key.print()}]`);
+    } else {
+      const elementAccess = new TcbExpr(`${receiver.print()}![${key.print()}]`).addParseSpanInfo(ast.sourceSpan);
+      node = new TcbExpr(`(${elementAccess.print()} as any)`);
+    }
+    return node.addParseSpanInfo(ast.sourceSpan);
+  }
+  visitCall(ast) {
+    const args = ast.args.map((expr2) => this.translate(expr2));
+    const receiver = ast.receiver;
+    let expr;
+    if (receiver instanceof PropertyRead2) {
+      const resolved = this.maybeResolve(receiver);
+      if (resolved !== null) {
+        expr = resolved;
+      } else {
+        const propertyReceiver = this.translate(receiver.receiver).wrapForTypeChecker();
+        expr = new TcbExpr(`${propertyReceiver.print()}.${receiver.name}`).addParseSpanInfo(receiver.nameSpan);
+      }
+    } else {
+      expr = this.translate(receiver);
+    }
+    let node;
+    if (ast.receiver instanceof SafePropertyRead || ast.receiver instanceof SafeKeyedRead) {
+      node = this.convertToSafeCall(ast, expr, args);
+    } else {
+      node = new TcbExpr(`${expr.print()}(${args.map((arg) => arg.print()).join(", ")})`);
+    }
+    return node.addParseSpanInfo(ast.sourceSpan);
+  }
+  visitSafeCall(ast) {
+    const args = ast.args.map((expr2) => this.translate(expr2));
+    const expr = this.translate(ast.receiver).wrapForTypeChecker();
+    return this.convertToSafeCall(ast, expr, args).addParseSpanInfo(ast.sourceSpan);
+  }
+  visitTemplateLiteral(ast) {
+    const length = ast.elements.length;
+    const head = ast.elements[0];
+    let result;
+    if (length === 1) {
+      result = `\`${head.text}\``;
+    } else {
+      let parts = [`\`${head.text}`];
+      const tailIndex = length - 1;
+      for (let i = 1; i < tailIndex; i++) {
+        const expr = this.translate(ast.expressions[i - 1]);
+        parts.push(`\${${expr.print()}}${ast.elements[i].text}`);
+      }
+      const resolvedExpression = this.translate(ast.expressions[tailIndex - 1]);
+      parts.push(`\${${resolvedExpression.print()}}${ast.elements[tailIndex].text}\``);
+      result = parts.join("");
+    }
+    return new TcbExpr(result);
+  }
+  visitTemplateLiteralElement() {
+    throw new Error("Method not implemented");
+  }
+  visitTaggedTemplateLiteral(ast) {
+    const tag = this.translate(ast.tag);
+    const template = this.visitTemplateLiteral(ast.template);
+    return new TcbExpr(`${tag.print()}${template.print()}`);
+  }
+  visitParenthesizedExpression(ast) {
+    const expr = this.translate(ast.expression);
+    return new TcbExpr(`(${expr.print()})`);
+  }
+  visitSpreadElement(ast) {
+    const expression = this.translate(ast.expression);
+    expression.wrapForTypeChecker();
+    const node = new TcbExpr(`...${expression.print()}`);
+    node.addParseSpanInfo(ast.sourceSpan);
+    return node;
+  }
+  visitEmptyExpr(ast) {
+    const node = new TcbExpr("undefined");
+    node.addParseSpanInfo(ast.sourceSpan);
+    return node;
+  }
+  visitArrowFunction(ast) {
+    const params = ast.parameters.map((param) => new TcbExpr(param.name).markIgnoreDiagnostics().print()).join(", ");
+    const body = astToTcbExpr(ast.body, (innerAst) => {
+      if (!(innerAst instanceof PropertyRead2) || innerAst.receiver instanceof ThisReceiver2 || !(innerAst.receiver instanceof ImplicitReceiver2)) {
+        return this.maybeResolve(innerAst);
+      }
+      const correspondingParam = ast.parameters.find((arg) => arg.name === innerAst.name);
+      if (correspondingParam) {
+        const node = new TcbExpr(innerAst.name);
+        node.addParseSpanInfo(innerAst.sourceSpan);
+        return node;
+      }
+      return this.maybeResolve(innerAst);
+    }, this.config);
+    return new TcbExpr(`${ast.parameters.length === 1 ? params : `(${params})`} => ${body.print()}`);
+  }
+  convertToSafeCall(ast, exprNode, argNodes) {
+    const expr = exprNode.print();
+    const args = argNodes.map((node) => node.print()).join(", ");
+    if (this.config.strictSafeNavigationTypes) {
+      return new TcbExpr(`(0 as any ? ${expr}!(${args}) : undefined)`);
+    }
+    if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
+      return new TcbExpr(`(${expr} as any)(${args})`);
+    }
+    return new TcbExpr(`(${expr}!(${args}) as any)`);
+  }
+};
+var VeSafeLhsInferenceBugDetector = class _VeSafeLhsInferenceBugDetector {
+  static SINGLETON = new _VeSafeLhsInferenceBugDetector();
+  static veWillInferAnyFor(ast) {
+    const visitor = _VeSafeLhsInferenceBugDetector.SINGLETON;
+    return ast instanceof Call2 ? ast.visit(visitor) : ast.receiver.visit(visitor);
+  }
+  visitUnary(ast) {
+    return ast.expr.visit(this);
+  }
+  visitBinary(ast) {
+    return ast.left.visit(this) || ast.right.visit(this);
+  }
+  visitChain() {
+    return false;
+  }
+  visitConditional(ast) {
+    return ast.condition.visit(this) || ast.trueExp.visit(this) || ast.falseExp.visit(this);
+  }
+  visitCall() {
+    return true;
+  }
+  visitSafeCall() {
+    return false;
+  }
+  visitImplicitReceiver() {
+    return false;
+  }
+  visitThisReceiver() {
+    return false;
+  }
+  visitInterpolation(ast) {
+    return ast.expressions.some((exp) => exp.visit(this));
+  }
+  visitKeyedRead() {
+    return false;
+  }
+  visitLiteralArray() {
+    return true;
+  }
+  visitLiteralMap() {
+    return true;
+  }
+  visitLiteralPrimitive() {
+    return false;
+  }
+  visitPipe() {
+    return true;
+  }
+  visitPrefixNot(ast) {
+    return ast.expression.visit(this);
+  }
+  visitTypeofExpression(ast) {
+    return ast.expression.visit(this);
+  }
+  visitVoidExpression(ast) {
+    return ast.expression.visit(this);
+  }
+  visitNonNullAssert(ast) {
+    return ast.expression.visit(this);
+  }
+  visitPropertyRead() {
+    return false;
+  }
+  visitSafePropertyRead() {
+    return false;
+  }
+  visitSafeKeyedRead() {
+    return false;
+  }
+  visitTemplateLiteral() {
+    return false;
+  }
+  visitTemplateLiteralElement() {
+    return false;
+  }
+  visitTaggedTemplateLiteral() {
+    return false;
+  }
+  visitParenthesizedExpression(ast) {
+    return ast.expression.visit(this);
+  }
+  visitRegularExpressionLiteral() {
+    return false;
+  }
+  visitSpreadElement(ast) {
+    return ast.expression.visit(this);
+  }
+  visitArrowFunction(ast, context) {
+    return false;
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/expression.js
+function tcbExpression(ast, tcb, scope) {
+  const translator = new TcbExpressionTranslator(tcb, scope);
+  return translator.translate(ast);
+}
+function unwrapWritableSignal(expression, tcb) {
+  const unwrapRef = tcb.env.referenceExternalSymbol(R3Identifiers4.unwrapWritableSignal.moduleName, R3Identifiers4.unwrapWritableSignal.name);
+  return new TcbExpr(`${unwrapRef.print()}(${expression.print()})`);
+}
+var TcbExpressionOp = class extends TcbOp {
+  tcb;
+  scope;
+  expression;
+  constructor(tcb, scope, expression) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.expression = expression;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const expr = tcbExpression(this.expression, this.tcb, this.scope);
+    this.scope.addStatement(expr);
+    return null;
+  }
+};
+var TcbConditionOp = class extends TcbOp {
+  tcb;
+  scope;
+  expression;
+  constructor(tcb, scope, expression) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.expression = expression;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const expr = tcbExpression(this.expression, this.tcb, this.scope);
+    this.scope.addStatement(new TcbExpr(`if (${expr.print()}) {}`));
+    return null;
+  }
+};
+var TcbExpressionTranslator = class {
+  tcb;
+  scope;
+  constructor(tcb, scope) {
+    this.tcb = tcb;
+    this.scope = scope;
+  }
+  translate(ast) {
+    return astToTcbExpr(ast, (ast2) => this.resolve(ast2), this.tcb.env.config);
+  }
+  /**
+   * Resolve an `AST` expression within the given scope.
+   *
+   * Some `AST` expressions refer to top-level concepts (references, variables, the component
+   * context). This method assists in resolving those.
+   */
+  resolve(ast) {
+    if (ast instanceof PropertyRead3 && ast.receiver instanceof ImplicitReceiver3) {
+      const target = this.tcb.boundTarget.getExpressionTarget(ast);
+      const targetExpression = target === null ? null : this.getTargetNodeExpression(target, ast);
+      if (target instanceof TmplAstLetDeclaration && !this.isValidLetDeclarationAccess(target, ast)) {
+        this.tcb.oobRecorder.letUsedBeforeDefinition(this.tcb.id, ast, target);
+        if (targetExpression !== null) {
+          return new TcbExpr(`${targetExpression.print()} as any`);
+        }
+      }
+      return targetExpression;
+    } else if (ast instanceof Binary && Binary.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead3 && (ast.left.receiver instanceof ImplicitReceiver3 || ast.left.receiver instanceof ThisReceiver3)) {
+      const read = ast.left;
+      const target = this.tcb.boundTarget.getExpressionTarget(read);
+      if (target === null) {
+        return null;
+      }
+      const targetExpression = this.getTargetNodeExpression(target, read);
+      const expr = this.translate(ast.right);
+      const result = new TcbExpr(`(${targetExpression.print()} = ${expr.print()})`);
+      result.addParseSpanInfo(read.sourceSpan);
+      if (target instanceof TmplAstLetDeclaration) {
+        result.markIgnoreDiagnostics();
+        this.tcb.oobRecorder.illegalWriteToLetDeclaration(this.tcb.id, read, target);
+      }
+      return result;
+    } else if (ast instanceof ImplicitReceiver3 || ast instanceof ThisReceiver3) {
+      return new TcbExpr("this");
+    } else if (ast instanceof BindingPipe) {
+      const expr = this.translate(ast.exp);
+      const pipeMeta = this.tcb.getPipeByName(ast.name);
+      let pipe;
+      if (pipeMeta === null) {
+        this.tcb.oobRecorder.missingPipe(this.tcb.id, ast, this.tcb.hostIsStandalone);
+        pipe = new TcbExpr("(0 as any)");
+      } else if (pipeMeta.isExplicitlyDeferred && this.tcb.boundTarget.getEagerlyUsedPipes().includes(ast.name)) {
+        this.tcb.oobRecorder.deferredPipeUsedEagerly(this.tcb.id, ast);
+        pipe = new TcbExpr("(0 as any)");
+      } else {
+        pipe = this.tcb.env.pipeInst(pipeMeta);
+      }
+      const args = ast.args.map((arg) => this.translate(arg).print());
+      let methodAccess = new TcbExpr(`${pipe.print()}.transform`).addParseSpanInfo(ast.nameSpan);
+      if (!this.tcb.env.config.checkTypeOfPipes) {
+        methodAccess = new TcbExpr(`(${methodAccess.print()} as any)`);
+      }
+      const result = new TcbExpr(`${methodAccess.print()}(${[expr.print(), ...args].join(", ")})`);
+      return result.addParseSpanInfo(ast.sourceSpan);
+    } else if ((ast instanceof Call3 || ast instanceof SafeCall2) && (ast.receiver instanceof PropertyRead3 || ast.receiver instanceof SafePropertyRead2)) {
+      if (ast.receiver.receiver instanceof ImplicitReceiver3 && ast.receiver.name === "$any" && ast.args.length === 1) {
+        const expr = this.translate(ast.args[0]);
+        const result = new TcbExpr(`(${expr.print()} as any)`);
+        result.addParseSpanInfo(ast.sourceSpan);
+        return result;
+      }
+      const target = this.tcb.boundTarget.getExpressionTarget(ast);
+      if (target === null) {
+        return null;
+      }
+      const method = this.getTargetNodeExpression(target, ast);
+      method.addParseSpanInfo(ast.receiver.nameSpan).wrapForTypeChecker();
+      const args = ast.args.map((arg) => this.translate(arg).print());
+      const node = new TcbExpr(`${method.print()}(${args.join(", ")})`);
+      node.addParseSpanInfo(ast.sourceSpan);
+      return node;
+    } else {
+      return null;
+    }
+  }
+  getTargetNodeExpression(targetNode, expressionNode) {
+    const expr = this.scope.resolve(targetNode);
+    expr.addParseSpanInfo(expressionNode.sourceSpan);
+    return expr;
+  }
+  isValidLetDeclarationAccess(target, ast) {
+    const targetStart = target.sourceSpan.start.offset;
+    const targetEnd = target.sourceSpan.end.offset;
+    const astStart = ast.sourceSpan.start;
+    return targetStart < astStart && astStart > targetEnd || !this.scope.isLocal(target);
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/template.js
+var TcbTemplateContextOp = class extends TcbOp {
+  tcb;
+  scope;
+  constructor(tcb, scope) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+  }
+  // The declaration of the context variable is only needed when the context is actually referenced.
+  optional = true;
+  execute() {
+    const ctx = new TcbExpr(this.tcb.allocateId());
+    this.scope.addStatement(declareVariable(ctx, new TcbExpr("any")));
+    return ctx;
+  }
+};
+var TcbTemplateBodyOp = class extends TcbOp {
+  tcb;
+  scope;
+  template;
+  constructor(tcb, scope, template) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.template = template;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    let guard = null;
+    const directiveGuards = [];
+    this.addDirectiveGuards(directiveGuards, this.template, this.tcb.boundTarget.getDirectivesOfNode(this.template));
+    for (const directive of this.template.directives) {
+      this.addDirectiveGuards(directiveGuards, directive, this.tcb.boundTarget.getDirectivesOfNode(directive));
+    }
+    if (directiveGuards.length > 0) {
+      guard = directiveGuards.reduce((expr, dirGuard) => new TcbExpr(`${expr.print()} && ${dirGuard.print()}`), directiveGuards.pop());
+    }
+    const tmplScope = this.scope.createChildScope(this.scope, this.template, this.template.children, guard);
+    const statements = tmplScope.render();
+    if (statements.length === 0) {
+      return null;
+    }
+    let tmplBlock = `{
+${getStatementsBlock(statements)}}`;
+    if (guard !== null) {
+      tmplBlock = `if (${guard.print()}) ${tmplBlock}`;
+    }
+    this.scope.addStatement(new TcbExpr(tmplBlock));
+    return null;
+  }
+  addDirectiveGuards(guards, hostNode, directives) {
+    if (directives === null || directives.length === 0) {
+      return;
+    }
+    const isTemplate = hostNode instanceof TmplAstTemplate;
+    for (const dir of directives) {
+      const dirInstId = this.scope.resolve(hostNode, dir);
+      const dirId = this.tcb.env.referenceTcbValue(dir.ref);
+      dir.ngTemplateGuards.forEach((guard) => {
+        const boundInput = hostNode.inputs.find((i) => i.name === guard.inputName) || (isTemplate ? hostNode.templateAttrs.find((input) => {
+          return input instanceof TmplAstBoundAttribute2 && input.name === guard.inputName;
+        }) : void 0);
+        if (boundInput !== void 0) {
+          const expr = tcbExpression(boundInput.value, this.tcb, this.scope);
+          expr.markIgnoreDiagnostics();
+          if (guard.type === "binding") {
+            guards.push(expr);
+          } else {
+            const guardInvoke = new TcbExpr(`${dirId.print()}.ngTemplateGuard_${guard.inputName}(${dirInstId.print()}, ${expr.print()})`);
+            guardInvoke.addParseSpanInfo(boundInput.value.sourceSpan);
+            guards.push(guardInvoke);
+          }
+        }
+      });
+      if (dir.hasNgTemplateContextGuard) {
+        if (this.tcb.env.config.applyTemplateContextGuards) {
+          const ctx = this.scope.resolve(hostNode);
+          const guardInvoke = new TcbExpr(`${dirId.print()}.ngTemplateContextGuard(${dirInstId.print()}, ${ctx.print()})`);
+          guardInvoke.markIgnoreDiagnostics();
+          guardInvoke.addParseSpanInfo(hostNode.sourceSpan);
+          guards.push(guardInvoke);
+        } else if (isTemplate && hostNode.variables.length > 0 && this.tcb.env.config.suggestionsForSuboptimalTypeInference) {
+          this.tcb.oobRecorder.suboptimalTypeInference(this.tcb.id, hostNode.variables);
+        }
+      }
+    }
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/element.js
+var TcbElementOp = class extends TcbOp {
+  tcb;
+  scope;
+  element;
+  constructor(tcb, scope, element) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.element = element;
+  }
+  get optional() {
+    return true;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    const idNode = new TcbExpr(id);
+    idNode.addParseSpanInfo(this.element.startSourceSpan || this.element.sourceSpan);
+    const initializer = new TcbExpr(`document.createElement("${this.element.name}")`);
+    initializer.addParseSpanInfo(this.element.startSourceSpan || this.element.sourceSpan);
+    const stmt = new TcbExpr(`var ${idNode.print()} = ${initializer.print()}`);
+    stmt.addParseSpanInfo(this.element.startSourceSpan || this.element.sourceSpan);
+    this.scope.addStatement(stmt);
+    return idNode;
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/variables.js
+var TcbBlockImplicitVariableOp = class extends TcbOp {
+  tcb;
+  scope;
+  type;
+  variable;
+  constructor(tcb, scope, type, variable) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.type = type;
+    this.variable = variable;
+  }
+  optional = true;
+  execute() {
+    const id = new TcbExpr(this.tcb.allocateId());
+    id.addParseSpanInfo(this.variable.keySpan);
+    const variable = declareVariable(id, this.type);
+    variable.addParseSpanInfo(this.variable.sourceSpan);
+    this.scope.addStatement(variable);
+    return id;
+  }
+};
+var TcbTemplateVariableOp = class extends TcbOp {
+  tcb;
+  scope;
+  template;
+  variable;
+  constructor(tcb, scope, template, variable) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.template = template;
+    this.variable = variable;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const ctx = this.scope.resolve(this.template);
+    const id = new TcbExpr(this.tcb.allocateId());
+    const initializer = new TcbExpr(`${ctx.print()}.${this.variable.value || "$implicit"}`);
+    id.addParseSpanInfo(this.variable.keySpan);
+    if (this.variable.valueSpan !== void 0) {
+      initializer.addParseSpanInfo(this.variable.valueSpan).wrapForTypeChecker();
+    } else {
+    }
+    const variable = new TcbExpr(`var ${id.print()} = ${initializer.print()}`);
+    variable.addParseSpanInfo(this.variable.sourceSpan);
+    this.scope.addStatement(variable);
+    return id;
+  }
+};
+var TcbBlockVariableOp = class extends TcbOp {
+  tcb;
+  scope;
+  initializer;
+  variable;
+  constructor(tcb, scope, initializer, variable) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.initializer = initializer;
+    this.variable = variable;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const id = new TcbExpr(this.tcb.allocateId());
+    id.addParseSpanInfo(this.variable.keySpan);
+    this.initializer.wrapForTypeChecker();
+    const variable = new TcbExpr(`var ${id.print()} = ${this.initializer.print()}`);
+    variable.addParseSpanInfo(this.variable.sourceSpan);
+    this.scope.addStatement(variable);
+    return id;
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/completions.js
+var TcbComponentContextCompletionOp = class extends TcbOp {
+  scope;
+  constructor(scope) {
+    super();
+    this.scope = scope;
+  }
+  optional = false;
+  execute() {
+    const ctx = new TcbExpr("this.");
+    ctx.markIgnoreDiagnostics();
+    ctx.addExpressionIdentifier(ExpressionIdentifier.COMPONENT_COMPLETION);
+    this.scope.addStatement(ctx);
+    return null;
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/references.js
+import { TmplAstElement, TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
+var TcbReferenceOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  host;
+  target;
+  constructor(tcb, scope, node, host, target) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.host = host;
+    this.target = target;
+  }
+  // The statement generated by this operation is only used to for the Type Checker
+  // so it can map a reference variable in the template directly to a node in the TCB.
+  optional = true;
+  execute() {
+    const id = new TcbExpr(this.tcb.allocateId());
+    let initializer = this.target instanceof TmplAstTemplate2 || this.target instanceof TmplAstElement ? this.scope.resolve(this.target) : this.scope.resolve(this.host, this.target);
+    if (this.target instanceof TmplAstElement && !this.tcb.env.config.checkTypeOfDomReferences || !this.tcb.env.config.checkTypeOfNonDomReferences) {
+      initializer = new TcbExpr(`${initializer.print()} as any`);
+    } else if (this.target instanceof TmplAstTemplate2) {
+      const templateRef = this.tcb.env.referenceExternalSymbol("@angular/core", "TemplateRef");
+      initializer = new TcbExpr(`(${initializer.print()} as any as ${templateRef.print()}<any>)`);
+    }
+    initializer.addParseSpanInfo(this.node.sourceSpan);
+    id.addParseSpanInfo(this.node.keySpan);
+    this.scope.addStatement(new TcbExpr(`var ${id.print()} = ${initializer.print()}`));
+    return id;
+  }
+};
+var TcbInvalidReferenceOp = class extends TcbOp {
+  tcb;
+  scope;
+  constructor(tcb, scope) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+  }
+  // The declaration of a missing reference is only needed when the reference is resolved.
+  optional = true;
+  execute() {
+    const id = new TcbExpr(this.tcb.allocateId());
+    this.scope.addStatement(new TcbExpr(`var ${id.print()} = any`));
+    return id;
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/if_block.js
+var TcbIfOp = class extends TcbOp {
+  tcb;
+  scope;
+  block;
+  expressionScopes = /* @__PURE__ */ new Map();
+  constructor(tcb, scope, block) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.block = block;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const root = this.generateBranch(0);
+    root && this.scope.addStatement(root);
+    return null;
+  }
+  generateBranch(index) {
+    const branch = this.block.branches[index];
+    if (!branch) {
+      return void 0;
+    }
+    if (branch.expression === null) {
+      const branchScope = this.getBranchScope(this.scope, branch, index);
+      return new TcbExpr(`{
+${getStatementsBlock(branchScope.render())}}`);
+    }
+    const outerScope = this.scope.createChildScope(this.scope, branch, [], null);
+    outerScope.render().forEach((stmt) => this.scope.addStatement(stmt));
+    this.expressionScopes.set(branch, outerScope);
+    let expression = tcbExpression(branch.expression, this.tcb, this.scope);
+    if (branch.expressionAlias !== null) {
+      expression = new TcbExpr(`(${expression.print()}) && ${outerScope.resolve(branch.expressionAlias).print()}`);
+    }
+    const bodyScope = this.getBranchScope(outerScope, branch, index);
+    const ifStatement = `if (${expression.print()}) {
+${getStatementsBlock(bodyScope.render())}}`;
+    const elseBranch = this.generateBranch(index + 1);
+    return new TcbExpr(ifStatement + (elseBranch ? " else " + elseBranch.print() : ""));
+  }
+  getBranchScope(parentScope, branch, index) {
+    const checkBody = this.tcb.env.config.checkControlFlowBodies;
+    return this.scope.createChildScope(parentScope, null, checkBody ? branch.children : [], checkBody ? this.generateBranchGuard(index) : null);
+  }
+  generateBranchGuard(index) {
+    let guard = null;
+    for (let i = 0; i <= index; i++) {
+      const branch = this.block.branches[i];
+      if (branch.expression === null) {
+        continue;
+      }
+      if (!this.expressionScopes.has(branch)) {
+        throw new Error(`Could not determine expression scope of branch at index ${i}`);
+      }
+      const expressionScope = this.expressionScopes.get(branch);
+      let expression;
+      expression = tcbExpression(branch.expression, this.tcb, expressionScope);
+      if (branch.expressionAlias !== null) {
+        expression = new TcbExpr(`(${expression.print()}) && ${expressionScope.resolve(branch.expressionAlias).print()}`);
+      }
+      expression.markIgnoreDiagnostics();
+      const comparisonExpression = i === index ? expression : new TcbExpr(`!(${expression.print()})`);
+      guard = guard === null ? comparisonExpression : new TcbExpr(`(${guard.print()}) && (${comparisonExpression.print()})`);
+    }
+    return guard;
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/switch_block.js
+var TcbSwitchOp = class extends TcbOp {
+  tcb;
+  scope;
+  block;
+  constructor(tcb, scope, block) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.block = block;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const switchExpression = tcbExpression(this.block.expression, this.tcb, this.scope);
+    const clauses = this.block.groups.flatMap((current) => {
+      const checkBody = this.tcb.env.config.checkControlFlowBodies;
+      const clauseScope = this.scope.createChildScope(this.scope, null, checkBody ? current.children : [], checkBody ? this.generateGuard(current, switchExpression) : null);
+      const statements = [...clauseScope.render(), new TcbExpr("break")];
+      return current.cases.map((switchCase, index) => {
+        const statementsStr = getStatementsBlock(
+          index === current.cases.length - 1 ? statements : [],
+          true
+          /* singleLine */
+        );
+        const source = switchCase.expression === null ? `default: ${statementsStr}` : `case ${tcbExpression(switchCase.expression, this.tcb, this.scope).print()}: ${statementsStr}`;
+        return new TcbExpr(source);
+      });
+    });
+    if (this.block.exhaustiveCheck) {
+      const switchValue = tcbExpression(this.block.expression, this.tcb, this.scope);
+      const exhaustiveId = this.tcb.allocateId();
+      clauses.push(new TcbExpr(`default: const tcbExhaustive${exhaustiveId}: never = ${switchValue.print()};`));
+    }
+    this.scope.addStatement(new TcbExpr(`switch (${switchExpression.print()}) { ${clauses.map((c) => c.print()).join("\n")} }`));
+    return null;
+  }
+  generateGuard(group, switchValue) {
+    const hasDefault = group.cases.some((c) => c.expression === null);
+    if (!hasDefault) {
+      let guard2 = null;
+      for (const switchCase of group.cases) {
+        if (switchCase.expression !== null) {
+          const expression = tcbExpression(switchCase.expression, this.tcb, this.scope);
+          expression.markIgnoreDiagnostics();
+          const comparison = new TcbExpr(`${switchValue.print()} === ${expression.print()}`);
+          if (guard2 === null) {
+            guard2 = comparison;
+          } else {
+            guard2 = new TcbExpr(`(${guard2.print()}) || (${comparison.print()})`);
+          }
+        }
+      }
+      return guard2;
+    }
+    let guard = null;
+    for (const currentGroup of this.block.groups) {
+      if (currentGroup === group) {
+        continue;
+      }
+      for (const switchCase of currentGroup.cases) {
+        if (switchCase.expression === null) {
+          continue;
+        }
+        const expression = tcbExpression(switchCase.expression, this.tcb, this.scope);
+        expression.markIgnoreDiagnostics();
+        const comparison = new TcbExpr(`${switchValue.print()} !== ${expression.print()}`);
+        if (guard === null) {
+          guard = comparison;
+        } else {
+          guard = new TcbExpr(`(${guard.print()}) && (${comparison.print()})`);
+        }
+      }
+    }
+    return guard;
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/for_block.js
+import { ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, ThisReceiver as ThisReceiver4, TmplAstVariable } from "@angular/compiler";
+var TcbForOfOp = class extends TcbOp {
+  tcb;
+  scope;
+  block;
+  constructor(tcb, scope, block) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.block = block;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const loopScope = this.scope.createChildScope(this.scope, this.block, this.tcb.env.config.checkControlFlowBodies ? this.block.children : [], null);
+    const initializerId = loopScope.resolve(this.block.item);
+    const initializer = new TcbExpr(`const ${initializerId.print()}`);
+    initializer.addParseSpanInfo(this.block.item.keySpan);
+    const expression = new TcbExpr(`${tcbExpression(this.block.expression, this.tcb, this.scope).print()}!`);
+    const trackTranslator = new TcbForLoopTrackTranslator(this.tcb, loopScope, this.block);
+    const trackExpression = trackTranslator.translate(this.block.trackBy);
+    const block = getStatementsBlock([...loopScope.render(), trackExpression]);
+    this.scope.addStatement(new TcbExpr(`for (${initializer.print()} of ${expression.print()}) {
+${block} }`));
+    return null;
+  }
+};
+var TcbForLoopTrackTranslator = class extends TcbExpressionTranslator {
+  block;
+  allowedVariables;
+  constructor(tcb, scope, block) {
+    super(tcb, scope);
+    this.block = block;
+    this.allowedVariables = /* @__PURE__ */ new Set([block.item]);
+    for (const variable of block.contextVariables) {
+      if (variable.value === "$index") {
+        this.allowedVariables.add(variable);
+      }
+    }
+  }
+  resolve(ast) {
+    if (ast instanceof PropertyRead4 && (ast.receiver instanceof ImplicitReceiver4 || ast.receiver instanceof ThisReceiver4)) {
+      const target = this.tcb.boundTarget.getExpressionTarget(ast);
+      if (target !== null && (!(target instanceof TmplAstVariable) || !this.allowedVariables.has(target))) {
+        this.tcb.oobRecorder.illegalForLoopTrackAccess(this.tcb.id, this.block, ast);
+      }
+    }
+    return super.resolve(ast);
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/let.js
+var TcbLetDeclarationOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  constructor(tcb, scope, node) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+  }
+  /**
+   * `@let` declarations are mandatory, because their expressions
+   * should be checked even if they aren't referenced anywhere.
+   */
+  optional = false;
+  execute() {
+    const id = new TcbExpr(this.tcb.allocateId()).addParseSpanInfo(this.node.nameSpan);
+    const value = tcbExpression(this.node.value, this.tcb, this.scope).wrapForTypeChecker();
+    const varStatement = new TcbExpr(`const ${id.print()} = ${value.print()}`);
+    varStatement.addParseSpanInfo(this.node.sourceSpan);
+    this.scope.addStatement(varStatement);
+    return id;
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/inputs.js
+import { BindingType as BindingType4, R3Identifiers as R3Identifiers5 } from "@angular/compiler";
+import ts52 from "typescript";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/dom.js
+import { DomElementSchemaRegistry } from "@angular/compiler";
+import ts51 from "typescript";
+
+// packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.js
+import ts50 from "typescript";
+function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, relatedMessages, deprecatedDiagInfo) {
+  if (mapping.type === "direct") {
+    let relatedInformation = [];
+    if (relatedMessages !== void 0) {
+      for (const relatedMessage of relatedMessages) {
+        relatedInformation.push({
+          category: ts50.DiagnosticCategory.Message,
+          code: 0,
+          file: relatedMessage.sourceFile,
+          start: relatedMessage.start,
+          length: relatedMessage.end - relatedMessage.start,
+          messageText: relatedMessage.text
+        });
+      }
+    }
+    if (deprecatedDiagInfo !== void 0) {
+      relatedInformation.push(...deprecatedDiagInfo.relatedMessages ?? []);
+    }
+    return {
+      source: "ngtsc",
+      code,
+      category,
+      messageText,
+      file: mapping.node.getSourceFile(),
+      sourceFile: mapping.node.getSourceFile(),
+      typeCheckId: id,
+      start: span.start.offset,
+      length: span.end.offset - span.start.offset,
+      relatedInformation,
+      reportsDeprecated: deprecatedDiagInfo?.reportsDeprecated
+    };
+  } else if (mapping.type === "indirect" || mapping.type === "external") {
+    const componentSf = mapping.componentClass.getSourceFile();
+    const componentName = mapping.componentClass.name.text;
+    const fileName = mapping.type === "indirect" ? `${componentSf.fileName} (${componentName} template)` : mapping.templateUrl;
+    let relatedInformation = [];
+    if (relatedMessages !== void 0) {
+      for (const relatedMessage of relatedMessages) {
+        relatedInformation.push({
+          category: ts50.DiagnosticCategory.Message,
+          code: 0,
+          file: relatedMessage.sourceFile,
+          start: relatedMessage.start,
+          length: relatedMessage.end - relatedMessage.start,
+          messageText: relatedMessage.text
+        });
+      }
+    }
+    let sf;
+    try {
+      sf = getParsedTemplateSourceFile(fileName, mapping);
+    } catch (e) {
+      const failureChain = makeDiagnosticChain(`Failed to report an error in '${fileName}' at ${span.start.line + 1}:${span.start.col + 1}`, [makeDiagnosticChain(e?.stack ?? `${e}`)]);
+      return {
+        source: "ngtsc",
+        category,
+        code,
+        messageText: addDiagnosticChain(messageText, [failureChain]),
+        file: componentSf,
+        sourceFile: componentSf,
+        typeCheckId: id,
+        // mapping.node represents either the 'template' or 'templateUrl' expression. getStart()
+        // and getEnd() are used because they don't include surrounding whitespace.
+        start: mapping.node.getStart(),
+        length: mapping.node.getEnd() - mapping.node.getStart(),
+        relatedInformation,
+        reportsDeprecated: deprecatedDiagInfo?.reportsDeprecated
+      };
+    }
+    let typeForMessage;
+    if (category === ts50.DiagnosticCategory.Warning) {
+      typeForMessage = "Warning";
+    } else if (category === ts50.DiagnosticCategory.Suggestion) {
+      typeForMessage = "Suggestion";
+    } else if (category === ts50.DiagnosticCategory.Message) {
+      typeForMessage = "Message";
+    } else {
+      typeForMessage = "Error";
+    }
+    if (deprecatedDiagInfo !== void 0) {
+      relatedInformation.push(...deprecatedDiagInfo.relatedMessages ?? []);
+    }
+    relatedInformation.push({
+      category: ts50.DiagnosticCategory.Message,
+      code: 0,
+      file: componentSf,
+      // mapping.node represents either the 'template' or 'templateUrl' expression. getStart()
+      // and getEnd() are used because they don't include surrounding whitespace.
+      start: mapping.node.getStart(),
+      length: mapping.node.getEnd() - mapping.node.getStart(),
+      messageText: `${typeForMessage} occurs in the template of component ${componentName}.`
+    });
+    return {
+      source: "ngtsc",
+      category,
+      code,
+      messageText,
+      file: sf,
+      sourceFile: componentSf,
+      typeCheckId: id,
+      start: span.start.offset,
+      length: span.end.offset - span.start.offset,
+      // Show a secondary message indicating the component whose template contains the error.
+      relatedInformation,
+      reportsDeprecated: deprecatedDiagInfo?.reportsDeprecated
+    };
+  } else {
+    throw new Error(`Unexpected source mapping type: ${mapping.type}`);
+  }
+}
+var TemplateSourceFile = Symbol("TemplateSourceFile");
+function getParsedTemplateSourceFile(fileName, mapping) {
+  if (mapping[TemplateSourceFile] === void 0) {
+    mapping[TemplateSourceFile] = parseTemplateAsSourceFile(fileName, mapping.template);
+  }
+  return mapping[TemplateSourceFile];
+}
+var parseTemplateAsSourceFileForTest = null;
+function parseTemplateAsSourceFile(fileName, template) {
+  if (parseTemplateAsSourceFileForTest !== null) {
+    return parseTemplateAsSourceFileForTest(fileName, template);
+  }
+  return ts50.createSourceFile(
+    fileName,
+    template,
+    ts50.ScriptTarget.Latest,
+    /* setParentNodes */
+    false,
+    ts50.ScriptKind.JSX
+  );
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/id.js
+var TYPE_CHECK_ID_MAP = Symbol("TypeCheckId");
+function getTypeCheckId2(clazz) {
+  const sf = clazz.getSourceFile();
+  if (sf[TYPE_CHECK_ID_MAP] === void 0) {
+    sf[TYPE_CHECK_ID_MAP] = /* @__PURE__ */ new Map();
+  }
+  if (sf[TYPE_CHECK_ID_MAP].get(clazz) === void 0) {
+    sf[TYPE_CHECK_ID_MAP].set(clazz, `tcb${sf[TYPE_CHECK_ID_MAP].size + 1}`);
+  }
+  return sf[TYPE_CHECK_ID_MAP].get(clazz);
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/dom.js
+var REGISTRY = new DomElementSchemaRegistry();
+var REMOVE_XHTML_REGEX = /^:xhtml:/;
+var RegistryDomSchemaChecker = class {
+  resolver;
+  _diagnostics = [];
+  get diagnostics() {
+    return this._diagnostics;
+  }
+  constructor(resolver) {
+    this.resolver = resolver;
+  }
+  checkElement(id, tagName, sourceSpanForDiagnostics, schemas, hostIsStandalone) {
+    const name = tagName.replace(REMOVE_XHTML_REGEX, "");
+    if (!REGISTRY.hasElement(name, schemas)) {
+      const mapping = this.resolver.getTemplateSourceMapping(id);
+      const schemas2 = `'${hostIsStandalone ? "@Component" : "@NgModule"}.schemas'`;
+      let errorMsg = `'${name}' is not a known element:
+`;
+      errorMsg += `1. If '${name}' is an Angular component, then verify that it is ${hostIsStandalone ? "included in the '@Component.imports' of this component" : "part of this module"}.
+`;
+      if (name.indexOf("-") > -1) {
+        errorMsg += `2. If '${name}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.`;
+      } else {
+        errorMsg += `2. To allow any element add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
+      }
+      const diag = makeTemplateDiagnostic(id, mapping, sourceSpanForDiagnostics, ts51.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ELEMENT), errorMsg);
+      this._diagnostics.push(diag);
+    }
+  }
+  checkTemplateElementProperty(id, tagName, name, span, schemas, hostIsStandalone) {
+    if (!REGISTRY.hasProperty(tagName, name, schemas)) {
+      const mapping = this.resolver.getTemplateSourceMapping(id);
+      const decorator = hostIsStandalone ? "@Component" : "@NgModule";
+      const schemas2 = `'${decorator}.schemas'`;
+      let errorMsg = `Can't bind to '${name}' since it isn't a known property of '${tagName}'.`;
+      if (tagName.startsWith("ng-")) {
+        errorMsg += `
+1. If '${name}' is an Angular directive, then add 'CommonModule' to the '${decorator}.imports' of this component.
+2. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
+      } else if (tagName.indexOf("-") > -1) {
+        errorMsg += `
+1. If '${tagName}' is an Angular component and it has '${name}' input, then verify that it is ${hostIsStandalone ? "included in the '@Component.imports' of this component" : "part of this module"}.
+2. If '${tagName}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.
+3. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
+      }
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts51.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
+      this._diagnostics.push(diag);
+    }
+  }
+  checkHostElementProperty(id, element, name, span, schemas) {
+    for (const tagName of element.tagNames) {
+      if (REGISTRY.hasProperty(tagName, name, schemas)) {
+        continue;
+      }
+      const errorMessage = `Can't bind to '${name}' since it isn't a known property of '${tagName}'.`;
+      const mapping = this.resolver.getHostBindingsMapping(id);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts51.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMessage);
+      this._diagnostics.push(diag);
+      break;
+    }
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/signal_forms.js
+import { BindingType as BindingType2, Call as Call4, PropertyRead as PropertyRead5, SafeCall as SafeCall3, TmplAstElement as TmplAstElement2, TmplAstHostElement as TmplAstHostElement2 } from "@angular/compiler";
+var formControlInputFields = [
+  // Should be kept in sync with the `FormUiControl` bindings,
+  // defined in `packages/forms/signals/src/api/control.ts`.
+  "errors",
+  "dirty",
+  "disabled",
+  "disabledReasons",
+  "hidden",
+  "invalid",
+  "name",
+  "pending",
+  "readonly",
+  "touched",
+  "max",
+  "maxLength",
+  "min",
+  "minLength",
+  "pattern",
+  "required"
+];
+var customFormControlBannedInputFields = /* @__PURE__ */ new Set([
+  ...formControlInputFields,
+  "value",
+  "checked"
+]);
+var formControlOptionalFields = /* @__PURE__ */ new Set([
+  // Should be kept in sync with the `FormUiControl` bindings,
+  // defined in `packages/forms/signals/src/api/control.ts`.
+  "max",
+  "maxLength",
+  "min",
+  "minLength"
+]);
+var TcbNativeFieldOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  inputType;
+  /** Bindings that aren't supported on signal form fields. */
+  unsupportedBindingFields = /* @__PURE__ */ new Set([
+    ...formControlInputFields,
+    "value",
+    "checked",
+    "maxlength",
+    "minlength"
+  ]);
+  get optional() {
+    return false;
+  }
+  constructor(tcb, scope, node, inputType) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.inputType = inputType;
+  }
+  execute() {
+    const inputs = this.node instanceof TmplAstHostElement2 ? this.node.bindings : this.node.inputs;
+    const fieldBinding = inputs.find((input) => input.type === BindingType2.Property && input.name === "formField") ?? null;
+    if (fieldBinding === null) {
+      return null;
+    }
+    checkUnsupportedFieldBindings(this.node, this.unsupportedBindingFields, this.tcb);
+    const expectedType = new TcbExpr(this.getExpectedTypeFromDomNode(this.node));
+    const value = extractFieldValue(fieldBinding.value, this.tcb, this.scope);
+    const id = new TcbExpr(this.tcb.allocateId());
+    const assignment = new TcbExpr(`${id.print()} = ${value.print()}`);
+    assignment.addParseSpanInfo(fieldBinding.valueSpan ?? fieldBinding.sourceSpan);
+    this.scope.addStatement(declareVariable(id, expectedType));
+    this.scope.addStatement(assignment);
+    return null;
+  }
+  getExpectedTypeFromDomNode(node) {
+    if (node.name === "textarea" || node.name === "select") {
+      return "string";
+    }
+    if (node.name !== "input") {
+      return this.getUnsupportedType();
+    }
+    switch (this.inputType) {
+      case "checkbox":
+        return "boolean";
+      case "number":
+      case "range":
+      case "datetime-local":
+        return "string | number | null";
+      case "date":
+      case "month":
+      case "time":
+      case "week":
+        return "string | number | Date | null";
+    }
+    const hasDynamicType = this.inputType === null && this.node.inputs.some((input) => (input.type === BindingType2.Property || input.type === BindingType2.Attribute) && input.name === "type");
+    if (hasDynamicType) {
+      return "string | number | boolean | Date | null";
+    }
+    return "string";
+  }
+  getUnsupportedType() {
+    return "never";
+  }
+};
+var TcbNativeRadioButtonFieldOp = class extends TcbNativeFieldOp {
+  constructor(tcb, scope, node) {
+    super(tcb, scope, node, "radio");
+    this.unsupportedBindingFields.delete("value");
+  }
+  execute() {
+    super.execute();
+    const valueBinding = this.node.inputs.find((attr) => {
+      return attr.type === BindingType2.Property && attr.name === "value";
+    });
+    if (valueBinding !== void 0) {
+      const id = new TcbExpr(this.tcb.allocateId());
+      const value = tcbExpression(valueBinding.value, this.tcb, this.scope);
+      const assignment = new TcbExpr(`${id.print()} = ${value.print()}`);
+      assignment.addParseSpanInfo(valueBinding.sourceSpan);
+      this.scope.addStatement(declareVariable(id, new TcbExpr("string")));
+      this.scope.addStatement(assignment);
+    }
+    return null;
+  }
+};
+function expandBoundAttributesForField(directive, node, customFormControlType) {
+  const fieldBinding = node.inputs.find((input) => input.type === BindingType2.Property && input.name === "formField");
+  if (!fieldBinding) {
+    return null;
+  }
+  let boundInputs = null;
+  let primaryInput;
+  if (customFormControlType === "value") {
+    primaryInput = getSyntheticFieldBoundInput(directive, "value", "value", fieldBinding, customFormControlType);
+  } else if (customFormControlType === "checkbox") {
+    primaryInput = getSyntheticFieldBoundInput(directive, "checked", "value", fieldBinding, customFormControlType);
+  } else {
+    primaryInput = null;
+  }
+  if (primaryInput !== null) {
+    boundInputs ??= [];
+    boundInputs.push(primaryInput);
+  }
+  for (const name of formControlInputFields) {
+    const input = getSyntheticFieldBoundInput(directive, name, name, fieldBinding, customFormControlType);
+    if (input !== null) {
+      boundInputs ??= [];
+      boundInputs.push(input);
+    }
+  }
+  return boundInputs;
+}
+function isFieldDirective(meta) {
+  if (meta.name !== "FormField") {
+    return false;
+  }
+  if (meta.ref.moduleName === "@angular/forms/signals") {
+    return true;
+  }
+  return meta.hasNgFieldDirective;
+}
+function getSyntheticFieldBoundInput(dir, inputName, fieldPropertyName, fieldBinding, customFieldType) {
+  const inputs = dir.inputs.getByBindingPropertyName(inputName);
+  if (inputs === null || inputs.length === 0) {
+    return null;
+  }
+  const { span, sourceSpan } = fieldBinding.value;
+  const outerCall = new Call4(span, sourceSpan, fieldBinding.value, [], sourceSpan);
+  const read = new PropertyRead5(span, sourceSpan, sourceSpan, outerCall, fieldPropertyName);
+  const isTwoWayBinding = customFieldType === "value" && inputName === "value" || customFieldType === "checkbox" && inputName === "checked";
+  let value;
+  if (isTwoWayBinding) {
+    value = read;
+  } else if (formControlOptionalFields.has(fieldPropertyName)) {
+    value = new SafeCall3(span, sourceSpan, read, [], sourceSpan);
+  } else {
+    value = new Call4(span, sourceSpan, read, [], sourceSpan);
+  }
+  return {
+    value,
+    sourceSpan: fieldBinding.sourceSpan,
+    keySpan: fieldBinding.keySpan ?? null,
+    inputs: inputs.map((input) => ({
+      fieldName: input.classPropertyName,
+      required: input.required,
+      transformType: input.transformType,
+      isSignal: input.isSignal,
+      isTwoWayBinding
+    }))
+  };
+}
+function getCustomFieldDirectiveType(meta) {
+  if (hasModelInput("value", meta)) {
+    return "value";
+  } else if (hasModelInput("checked", meta)) {
+    return "checkbox";
+  }
+  return null;
+}
+function isNativeField(dir, node, allDirectiveMatches) {
+  if (!isFieldDirective(dir)) {
+    return false;
+  }
+  if (!(node instanceof TmplAstElement2) || node.name !== "input" && node.name !== "select" && node.name !== "textarea") {
+    return false;
+  }
+  return allDirectiveMatches.every((meta) => {
+    return getCustomFieldDirectiveType(meta) === null && !isControlValueAccessorLike(meta);
+  });
+}
+function isControlValueAccessorLike(meta) {
+  return meta.publicMethods.has("writeValue") && meta.publicMethods.has("registerOnChange") && meta.publicMethods.has("registerOnTouched");
+}
+function checkUnsupportedFieldBindings(node, unsupportedBindingFields, tcb) {
+  const inputs = node instanceof TmplAstHostElement2 ? node.bindings : node.inputs;
+  for (const input of inputs) {
+    if (input.type === BindingType2.Property && unsupportedBindingFields.has(input.name)) {
+      tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, input);
+    } else if (input.type === BindingType2.Attribute && unsupportedBindingFields.has(input.name.toLowerCase())) {
+      tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, input);
+    }
+  }
+  if (!(node instanceof TmplAstHostElement2)) {
+    for (const attr of node.attributes) {
+      if (unsupportedBindingFields.has(attr.name.toLowerCase())) {
+        tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, attr);
+      }
+    }
+  }
+}
+function extractFieldValue(expression, tcb, scope) {
+  const innerCall = new TcbExpr(tcbExpression(expression, tcb, scope).print() + "()");
+  innerCall.markIgnoreDiagnostics();
+  return new TcbExpr(`${innerCall.print()}.value()`);
+}
+function hasModelInput(name, meta) {
+  return meta.inputs.hasBindingPropertyName(name) && meta.outputs.hasBindingPropertyName(name + "Change");
+}
+function isFormControl(allDirectiveMatches) {
+  let result = false;
+  for (const match of allDirectiveMatches) {
+    if (match.inputs.hasBindingPropertyName("formField")) {
+      if (!isFieldDirective(match)) {
+        return false;
+      }
+      result = true;
+    }
+  }
+  return result;
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/bindings.js
+import { BindingType as BindingType3, LiteralArray, LiteralMap, TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstElement as TmplAstElement3, TmplAstTemplate as TmplAstTemplate3 } from "@angular/compiler";
+function getBoundAttributes(directive, node) {
+  const boundInputs = [];
+  const processAttribute = (attr) => {
+    if (attr instanceof TmplAstBoundAttribute3 && attr.type !== BindingType3.Property && attr.type !== BindingType3.TwoWay) {
+      return;
+    }
+    const inputs = directive.inputs.getByBindingPropertyName(attr.name);
+    if (inputs !== null) {
+      boundInputs.push({
+        value: attr.value,
+        sourceSpan: attr.sourceSpan,
+        keySpan: attr.keySpan ?? null,
+        inputs: inputs.map((input) => {
+          return {
+            fieldName: input.classPropertyName,
+            required: input.required,
+            transformType: input.transformType,
+            isSignal: input.isSignal,
+            isTwoWayBinding: attr instanceof TmplAstBoundAttribute3 && attr.type === BindingType3.TwoWay
+          };
+        })
+      });
+    }
+  };
+  if (node instanceof TmplAstTemplate3) {
+    if (node.tagName === "ng-template") {
+      node.inputs.forEach(processAttribute);
+      node.attributes.forEach(processAttribute);
+    }
+    node.templateAttrs.forEach(processAttribute);
+  } else {
+    node.inputs.forEach(processAttribute);
+    node.attributes.forEach(processAttribute);
+  }
+  return boundInputs;
+}
+function checkSplitTwoWayBinding(inputName, output, inputs, tcb) {
+  const input = inputs.find((input2) => input2.name === inputName);
+  if (input === void 0 || input.sourceSpan !== output.sourceSpan) {
+    return false;
+  }
+  const inputConsumer = tcb.boundTarget.getConsumerOfBinding(input);
+  const outputConsumer = tcb.boundTarget.getConsumerOfBinding(output);
+  if (outputConsumer === null || inputConsumer.ref === void 0 || outputConsumer instanceof TmplAstTemplate3) {
+    return false;
+  }
+  if (outputConsumer instanceof TmplAstElement3) {
+    tcb.oobRecorder.splitTwoWayBinding(tcb.id, input, output, inputConsumer, outputConsumer);
+    return true;
+  } else if (outputConsumer.ref !== inputConsumer.ref) {
+    tcb.oobRecorder.splitTwoWayBinding(tcb.id, input, output, inputConsumer, outputConsumer);
+    return true;
+  }
+  return false;
+}
+function widenBinding(expr, tcb, originalValue) {
+  if (!tcb.env.config.checkTypeOfInputBindings) {
+    return new TcbExpr(`((${expr.print()}) as any)`);
+  } else if (!tcb.env.config.strictNullInputBindings) {
+    if (originalValue instanceof LiteralMap || originalValue instanceof LiteralArray) {
+      return expr;
+    } else {
+      return new TcbExpr(`(${expr.print()})!`);
+    }
+  } else {
+    return expr;
+  }
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/inputs.js
+function translateInput(value, tcb, scope) {
+  if (typeof value === "string") {
+    return new TcbExpr(quoteAndEscape(value));
+  } else {
+    return tcbExpression(value, tcb, scope);
+  }
+}
+var TcbDirectiveInputsOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  dir;
+  isFormControl;
+  customFormControlType;
+  constructor(tcb, scope, node, dir, isFormControl2 = false, customFormControlType) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.dir = dir;
+    this.isFormControl = isFormControl2;
+    this.customFormControlType = customFormControlType;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    let dirId = null;
+    const seenRequiredInputs = /* @__PURE__ */ new Set();
+    const boundAttrs = getBoundAttributes(this.dir, this.node);
+    if (this.customFormControlType !== null) {
+      checkUnsupportedFieldBindings(this.node, customFormControlBannedInputFields, this.tcb);
+    }
+    if (this.customFormControlType !== null || this.isFormControl) {
+      const additionalBindings = expandBoundAttributesForField(this.dir, this.node, this.customFormControlType);
+      if (additionalBindings !== null) {
+        boundAttrs.push(...additionalBindings);
+      }
+    }
+    for (const attr of boundAttrs) {
+      let assignment = widenBinding(translateInput(attr.value, this.tcb, this.scope), this.tcb, attr.value);
+      assignment.wrapForTypeChecker();
+      for (const { fieldName, required, transformType, isSignal, isTwoWayBinding } of attr.inputs) {
+        let target;
+        if (required) {
+          seenRequiredInputs.add(fieldName);
+        }
+        if (this.dir.coercedInputFields.has(fieldName)) {
+          let type;
+          if (transformType !== void 0) {
+            type = new TcbExpr(transformType);
+          } else {
+            const dirTypeRef = this.tcb.env.referenceTcbType(this.dir.ref);
+            if (!ts52.isTypeReferenceNode(dirTypeRef)) {
+              throw new Error(`Expected TypeReferenceNode from reference to ${this.dir.ref.name}`);
+            }
+            const typeName = ts52.isIdentifier(dirTypeRef.typeName) ? dirTypeRef.typeName.text : tempPrint(dirTypeRef.typeName, dirTypeRef.typeName.getSourceFile());
+            type = new TcbExpr(`typeof ${typeName}.ngAcceptInputType_${fieldName}`);
+          }
+          const id = new TcbExpr(this.tcb.allocateId());
+          this.scope.addStatement(declareVariable(id, type));
+          target = id;
+        } else if (this.dir.undeclaredInputFields.has(fieldName)) {
+          continue;
+        } else if (!this.tcb.env.config.honorAccessModifiersForInputBindings && this.dir.restrictedInputFields.has(fieldName)) {
+          if (dirId === null) {
+            dirId = this.scope.resolve(this.node, this.dir);
+          }
+          const id = new TcbExpr(this.tcb.allocateId());
+          const dirTypeRef = this.tcb.env.referenceTcbType(this.dir.ref);
+          if (!ts52.isTypeReferenceNode(dirTypeRef)) {
+            throw new Error(`Expected TypeReferenceNode from reference to ${this.dir.ref.name}`);
+          }
+          const type = new TcbExpr(`(typeof ${dirId.print()})[${quoteAndEscape(fieldName)}]`);
+          const temp = declareVariable(id, type);
+          this.scope.addStatement(temp);
+          target = id;
+        } else {
+          if (dirId === null) {
+            dirId = this.scope.resolve(this.node, this.dir);
+          }
+          target = this.dir.stringLiteralInputFields.has(fieldName) ? new TcbExpr(`${dirId.print()}[${quoteAndEscape(fieldName)}]`) : new TcbExpr(`${dirId.print()}.${fieldName}`);
+        }
+        if (isSignal) {
+          const inputSignalBrandWriteSymbol = this.tcb.env.referenceExternalSymbol(R3Identifiers5.InputSignalBrandWriteType.moduleName, R3Identifiers5.InputSignalBrandWriteType.name);
+          target = new TcbExpr(`${target.print()}[${inputSignalBrandWriteSymbol.print()}]`);
+        }
+        if (attr.keySpan !== null) {
+          target.addParseSpanInfo(attr.keySpan);
+        }
+        if (isTwoWayBinding && this.tcb.env.config.allowSignalsInTwoWayBindings) {
+          assignment = unwrapWritableSignal(assignment, this.tcb);
+        }
+        assignment = new TcbExpr(`${target.print()} = ${assignment.print()}`);
+      }
+      assignment.addParseSpanInfo(attr.sourceSpan);
+      if (!this.tcb.env.config.checkTypeOfAttributes && typeof attr.value === "string") {
+        assignment.markIgnoreDiagnostics();
+      }
+      this.scope.addStatement(assignment);
+    }
+    this.checkRequiredInputs(seenRequiredInputs);
+    return null;
+  }
+  checkRequiredInputs(seenRequiredInputs) {
+    const missing = [];
+    for (const input of this.dir.inputs) {
+      if (input.required && !seenRequiredInputs.has(input.classPropertyName)) {
+        missing.push(input.bindingPropertyName);
+      }
+    }
+    if (missing.length > 0) {
+      this.tcb.oobRecorder.missingRequiredInputs(this.tcb.id, this.node, this.dir.name, this.dir.isComponent, missing);
+    }
+  }
+};
+var TcbUnclaimedInputsOp = class extends TcbOp {
+  tcb;
+  scope;
+  inputs;
+  target;
+  claimedInputs;
+  constructor(tcb, scope, inputs, target, claimedInputs) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.inputs = inputs;
+    this.target = target;
+    this.claimedInputs = claimedInputs;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    let elId = null;
+    for (const binding of this.inputs) {
+      const isPropertyBinding = binding.type === BindingType4.Property || binding.type === BindingType4.TwoWay;
+      if (isPropertyBinding && this.claimedInputs?.has(binding.name)) {
+        continue;
+      }
+      const expr = widenBinding(tcbExpression(binding.value, this.tcb, this.scope), this.tcb, binding.value);
+      if (this.tcb.env.config.checkTypeOfDomBindings && isPropertyBinding) {
+        if (binding.name !== "style" && binding.name !== "class") {
+          if (elId === null) {
+            elId = this.scope.resolve(this.target);
+          }
+          const propertyName = REGISTRY.getMappedPropName(binding.name);
+          const stmt = new TcbExpr(`${elId.print()}[${quoteAndEscape(propertyName)}] = ${expr.wrapForTypeChecker().print()}`).addParseSpanInfo(binding.sourceSpan);
+          this.scope.addStatement(stmt);
+        } else {
+          this.scope.addStatement(expr);
+        }
+      } else {
+        this.scope.addStatement(expr);
+      }
+    }
+    return null;
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/schema.js
+import { BindingType as BindingType5, TmplAstComponent, TmplAstElement as TmplAstElement4 } from "@angular/compiler";
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/selectorless.js
+function getComponentTagName(node) {
+  return node.tagName || "ng-component";
+}
+var TcbComponentNodeOp = class extends TcbOp {
+  tcb;
+  scope;
+  component;
+  optional = true;
+  constructor(tcb, scope, component) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.component = component;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    const initializer = new TcbExpr(`document.createElement("${getComponentTagName(this.component)}")`);
+    initializer.addParseSpanInfo(this.component.startSourceSpan || this.component.sourceSpan);
+    this.scope.addStatement(new TcbExpr(`var ${id} = ${initializer.print()}`));
+    return new TcbExpr(id);
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/schema.js
+var TcbDomSchemaCheckerOp = class extends TcbOp {
+  tcb;
+  element;
+  checkElement;
+  claimedInputs;
+  constructor(tcb, element, checkElement, claimedInputs) {
+    super();
+    this.tcb = tcb;
+    this.element = element;
+    this.checkElement = checkElement;
+    this.claimedInputs = claimedInputs;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const element = this.element;
+    const isTemplateElement = element instanceof TmplAstElement4 || element instanceof TmplAstComponent;
+    const bindings = isTemplateElement ? element.inputs : element.bindings;
+    if (this.checkElement && isTemplateElement) {
+      this.tcb.domSchemaChecker.checkElement(this.tcb.id, this.getTagName(element), element.startSourceSpan, this.tcb.schemas, this.tcb.hostIsStandalone);
+    }
+    for (const binding of bindings) {
+      const isPropertyBinding = binding.type === BindingType5.Property || binding.type === BindingType5.TwoWay;
+      if (isPropertyBinding && this.claimedInputs?.has(binding.name)) {
+        continue;
+      }
+      if (isPropertyBinding && binding.name !== "style" && binding.name !== "class") {
+        const propertyName = REGISTRY.getMappedPropName(binding.name);
+        if (isTemplateElement) {
+          this.tcb.domSchemaChecker.checkTemplateElementProperty(this.tcb.id, this.getTagName(element), propertyName, binding.sourceSpan, this.tcb.schemas, this.tcb.hostIsStandalone);
+        } else {
+          this.tcb.domSchemaChecker.checkHostElementProperty(this.tcb.id, element, propertyName, binding.keySpan, this.tcb.schemas);
+        }
+      }
+    }
+    return null;
+  }
+  getTagName(node) {
+    return node instanceof TmplAstElement4 ? node.name : getComponentTagName(node);
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/events.js
+import { ImplicitReceiver as ImplicitReceiver5, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead6, TmplAstElement as TmplAstElement5 } from "@angular/compiler";
+var EVENT_PARAMETER = "$event";
+function tcbEventHandlerExpression(ast, tcb, scope) {
+  const translator = new TcbEventHandlerTranslator(tcb, scope);
+  return translator.translate(ast);
+}
+var TcbDirectiveOutputsOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  inputs;
+  outputs;
+  dir;
+  constructor(tcb, scope, node, inputs, outputs, dir) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.inputs = inputs;
+    this.outputs = outputs;
+    this.dir = dir;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    let dirId = null;
+    const outputs = this.dir.outputs;
+    for (const output of this.outputs) {
+      if (output.type === ParsedEventType2.LegacyAnimation || !outputs.hasBindingPropertyName(output.name)) {
+        continue;
+      }
+      if (this.tcb.env.config.checkTypeOfOutputEvents && this.inputs !== null && output.name.endsWith("Change")) {
+        const inputName = output.name.slice(0, -6);
+        checkSplitTwoWayBinding(inputName, output, this.inputs, this.tcb);
+      }
+      const field = outputs.getByBindingPropertyName(output.name)[0].classPropertyName;
+      if (dirId === null) {
+        dirId = this.scope.resolve(this.node, this.dir);
+      }
+      const outputField = new TcbExpr(`${dirId.print()}[${quoteAndEscape(field)}]`);
+      outputField.addParseSpanInfo(output.keySpan);
+      if (this.tcb.env.config.checkTypeOfOutputEvents) {
+        const handler = tcbCreateEventHandler(
+          output,
+          this.tcb,
+          this.scope,
+          0
+          /* EventParamType.Infer */
+        );
+        const call = new TcbExpr(`${outputField.print()}.subscribe(${handler.print()})`);
+        call.addParseSpanInfo(output.sourceSpan);
+        this.scope.addStatement(call);
+      } else {
+        this.scope.addStatement(outputField);
+        const handler = tcbCreateEventHandler(
+          output,
+          this.tcb,
+          this.scope,
+          1
+          /* EventParamType.Any */
+        );
+        this.scope.addStatement(handler);
+      }
+    }
+    return null;
+  }
+};
+var TcbUnclaimedOutputsOp = class extends TcbOp {
+  tcb;
+  scope;
+  target;
+  outputs;
+  inputs;
+  claimedOutputs;
+  constructor(tcb, scope, target, outputs, inputs, claimedOutputs) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.target = target;
+    this.outputs = outputs;
+    this.inputs = inputs;
+    this.claimedOutputs = claimedOutputs;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    let elId = null;
+    for (const output of this.outputs) {
+      if (this.claimedOutputs?.has(output.name)) {
+        continue;
+      }
+      if (this.tcb.env.config.checkTypeOfOutputEvents && this.inputs !== null && output.name.endsWith("Change")) {
+        const inputName = output.name.slice(0, -6);
+        if (checkSplitTwoWayBinding(inputName, output, this.inputs, this.tcb)) {
+          continue;
+        }
+      }
+      if (output.type === ParsedEventType2.LegacyAnimation) {
+        const eventType = this.tcb.env.config.checkTypeOfAnimationEvents ? this.tcb.env.referenceExternalSymbol("@angular/animations", "AnimationEvent").print() : 1;
+        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, eventType);
+        this.scope.addStatement(handler);
+      } else if (output.type === ParsedEventType2.Animation) {
+        const eventType = this.tcb.env.referenceExternalSymbol("@angular/core", "AnimationCallbackEvent");
+        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, eventType.print());
+        this.scope.addStatement(handler);
+      } else if (this.tcb.env.config.checkTypeOfDomEvents) {
+        let target;
+        let domEventAssertion;
+        if (output.target === "window" || output.target === "document") {
+          target = new TcbExpr(output.target);
+        } else if (elId === null) {
+          target = elId = this.scope.resolve(this.target);
+        } else {
+          target = elId;
+        }
+        if (this.target instanceof TmplAstElement5 && this.target.isVoid && this.tcb.env.config.allowDomEventAssertion) {
+          const assertUtil = this.tcb.env.referenceExternalSymbol("@angular/core", "\u0275assertType");
+          domEventAssertion = new TcbExpr(`${assertUtil.print()}<typeof ${target.print()}>(${EVENT_PARAMETER}.target)`);
+        }
+        const propertyAccess = new TcbExpr(`${target.print()}.addEventListener`).addParseSpanInfo(output.keySpan);
+        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, 0, domEventAssertion);
+        const call = new TcbExpr(`${propertyAccess.print()}(${quoteAndEscape(output.name)}, ${handler.print()})`);
+        call.addParseSpanInfo(output.sourceSpan);
+        this.scope.addStatement(call);
+      } else {
+        const handler = tcbCreateEventHandler(
+          output,
+          this.tcb,
+          this.scope,
+          1
+          /* EventParamType.Any */
+        );
+        this.scope.addStatement(handler);
+      }
+    }
+    return null;
+  }
+};
+var TcbEventHandlerTranslator = class extends TcbExpressionTranslator {
+  resolve(ast) {
+    if (ast instanceof PropertyRead6 && ast.receiver instanceof ImplicitReceiver5 && ast.name === EVENT_PARAMETER) {
+      return new TcbExpr(EVENT_PARAMETER).addParseSpanInfo(ast.nameSpan);
+    }
+    return super.resolve(ast);
+  }
+  isValidLetDeclarationAccess() {
+    return true;
+  }
+};
+function tcbCreateEventHandler(event, tcb, scope, eventType, assertionExpression) {
+  const handler = tcbEventHandlerExpression(event.handler, tcb, scope);
+  const statements = [];
+  if (assertionExpression !== void 0) {
+    statements.push(assertionExpression);
+  }
+  if (event.type === ParsedEventType2.TwoWay && tcb.env.config.checkTwoWayBoundEvents) {
+    const target = tcb.allocateId();
+    const initializer = tcb.env.config.allowSignalsInTwoWayBindings ? unwrapWritableSignal(handler, tcb) : handler;
+    statements.push(new TcbExpr(`var ${target} = ${initializer.print()}`), new TcbExpr(`${target} = ${EVENT_PARAMETER}`));
+  } else {
+    statements.push(handler);
+  }
+  let eventParamType;
+  if (eventType === 0) {
+    eventParamType = void 0;
+  } else if (eventType === 1) {
+    eventParamType = "any";
+  } else {
+    eventParamType = eventType;
+  }
+  const guards = scope.guards();
+  let body = `{
+${getStatementsBlock(statements)} }`;
+  if (guards !== null) {
+    body = `{ if (${guards.print()}) ${body} }`;
+  }
+  const eventParam = new TcbExpr(`${EVENT_PARAMETER}${eventParamType === void 0 ? "" : ": " + eventParamType}`);
+  eventParam.addExpressionIdentifier(ExpressionIdentifier.EVENT_PARAMETER);
+  return new TcbExpr(`(${eventParam.print()}): any => ${body}`);
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/directive_type.js
+import { TmplAstHostElement as TmplAstHostElement3 } from "@angular/compiler";
+import ts53 from "typescript";
+var TcbDirectiveTypeOpBase = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  dir;
+  constructor(tcb, scope, node, dir) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.dir = dir;
+  }
+  get optional() {
+    return true;
+  }
+  execute() {
+    const rawType = this.tcb.env.referenceTcbType(this.dir.ref);
+    let type;
+    let span;
+    if (this.dir.isGeneric === false || this.dir.typeParameters === null || this.dir.typeParameters.length === 0) {
+      type = new TcbExpr(tempPrint(rawType, this.tcb.env.contextFile));
+    } else {
+      if (!ts53.isTypeReferenceNode(rawType)) {
+        throw new Error(`Expected TypeReferenceNode when referencing the type for ${this.dir.ref.name}`);
+      }
+      const typeName = ts53.isIdentifier(rawType.typeName) ? rawType.typeName.text : tempPrint(rawType.typeName, this.tcb.env.contextFile);
+      const typeArguments = Array(this.dir.typeParameters?.length ?? 0).fill("any").join(", ");
+      type = new TcbExpr(`${typeName}<${typeArguments}>`);
+    }
+    if (this.node instanceof TmplAstHostElement3) {
+      span = this.node.sourceSpan;
+    } else {
+      span = this.node.startSourceSpan || this.node.sourceSpan;
+    }
+    const id = new TcbExpr(this.tcb.allocateId()).addExpressionIdentifier(ExpressionIdentifier.DIRECTIVE).addParseSpanInfo(span);
+    this.scope.addStatement(declareVariable(id, type));
+    return id;
+  }
+};
+var TcbNonGenericDirectiveTypeOp = class extends TcbDirectiveTypeOpBase {
+  /**
+   * Creates a variable declaration for this op's directive of the argument type. Returns the id of
+   * the newly created variable.
+   */
+  execute() {
+    if (this.dir.isGeneric) {
+      throw new Error(`Assertion Error: expected ${this.dir.ref.name} not to be generic.`);
+    }
+    return super.execute();
+  }
+};
+var TcbGenericDirectiveTypeWithAnyParamsOp = class extends TcbDirectiveTypeOpBase {
+  execute() {
+    if (this.dir.typeParameters === null || this.dir.typeParameters.length === 0) {
+      throw new Error(`Assertion Error: expected typeParameters when creating a declaration for ${this.dir.ref.name}`);
+    }
+    return super.execute();
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/directive_constructor.js
+import { TmplAstHostElement as TmplAstHostElement4 } from "@angular/compiler";
+var TcbDirectiveCtorOp = class extends TcbOp {
+  tcb;
+  scope;
+  node;
+  dir;
+  customFormControlType;
+  constructor(tcb, scope, node, dir, customFormControlType) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.node = node;
+    this.dir = dir;
+    this.customFormControlType = customFormControlType;
+  }
+  get optional() {
+    return true;
+  }
+  execute() {
+    const genericInputs = /* @__PURE__ */ new Map();
+    const id = new TcbExpr(this.tcb.allocateId());
+    let boundAttrs;
+    let span;
+    if (this.node instanceof TmplAstHostElement4) {
+      boundAttrs = [];
+      span = this.node.sourceSpan;
+    } else {
+      span = this.node.startSourceSpan || this.node.sourceSpan;
+      boundAttrs = getBoundAttributes(this.dir, this.node);
+      if (this.customFormControlType !== null) {
+        const additionalBindings = expandBoundAttributesForField(this.dir, this.node, this.customFormControlType);
+        if (additionalBindings !== null) {
+          boundAttrs.push(...additionalBindings);
+        }
+      }
+    }
+    id.addExpressionIdentifier(ExpressionIdentifier.DIRECTIVE).addParseSpanInfo(span);
+    for (const attr of boundAttrs) {
+      if (!this.tcb.env.config.checkTypeOfAttributes && typeof attr.value === "string") {
+        continue;
+      }
+      for (const { fieldName, isTwoWayBinding } of attr.inputs) {
+        if (genericInputs.has(fieldName)) {
+          continue;
+        }
+        const expression = translateInput(attr.value, this.tcb, this.scope);
+        genericInputs.set(fieldName, {
+          type: "binding",
+          field: fieldName,
+          expression,
+          originalExpression: attr.value,
+          sourceSpan: attr.sourceSpan,
+          isTwoWayBinding
+        });
+      }
+    }
+    for (const { classPropertyName } of this.dir.inputs) {
+      if (!genericInputs.has(classPropertyName)) {
+        genericInputs.set(classPropertyName, { type: "unset", field: classPropertyName });
+      }
+    }
+    const typeCtor = tcbCallTypeCtor(this.dir, this.tcb, Array.from(genericInputs.values()));
+    typeCtor.markIgnoreDiagnostics();
+    this.scope.addStatement(new TcbExpr(`var ${id.print()} = ${typeCtor.print()}`));
+    return id;
+  }
+  circularFallback() {
+    return new TcbDirectiveCtorCircularFallbackOp(this.tcb, this.scope, this.dir);
+  }
+};
+var TcbDirectiveCtorCircularFallbackOp = class extends TcbOp {
+  tcb;
+  scope;
+  dir;
+  constructor(tcb, scope, dir) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.dir = dir;
+  }
+  get optional() {
+    return false;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    const typeCtor = this.tcb.env.typeCtorFor(this.dir);
+    this.scope.addStatement(new TcbExpr(`var ${id} = ${typeCtor.print()}(null!)`));
+    return new TcbExpr(id);
+  }
+};
+function tcbCallTypeCtor(dir, tcb, inputs) {
+  const typeCtor = tcb.env.typeCtorFor(dir);
+  let literal4 = "{ ";
+  for (let i = 0; i < inputs.length; i++) {
+    const input = inputs[i];
+    const propertyName = quoteAndEscape(input.field);
+    const isLast = i === inputs.length - 1;
+    if (input.type === "binding") {
+      let expr = widenBinding(input.expression, tcb, input.originalExpression);
+      if (input.isTwoWayBinding && tcb.env.config.allowSignalsInTwoWayBindings) {
+        expr = unwrapWritableSignal(expr, tcb);
+      }
+      const assignment = new TcbExpr(`${propertyName}: ${expr.wrapForTypeChecker().print()}`);
+      assignment.addParseSpanInfo(input.sourceSpan);
+      literal4 += assignment.print();
+    } else {
+      literal4 += `${propertyName}: 0 as any`;
+    }
+    literal4 += `${isLast ? "" : ","} `;
+  }
+  literal4 += "}";
+  return new TcbExpr(`${typeCtor.print()}(${literal4})`);
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/content_projection.js
+import { createCssSelectorFromNode, CssSelector as CssSelector2, SelectorMatcher, TmplAstElement as TmplAstElement6, TmplAstForLoopBlock, TmplAstIfBlock, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate4, TmplAstText } from "@angular/compiler";
+import ts54 from "typescript";
+var TcbControlFlowContentProjectionOp = class extends TcbOp {
+  tcb;
+  element;
+  ngContentSelectors;
+  componentName;
+  category;
+  constructor(tcb, element, ngContentSelectors, componentName) {
+    super();
+    this.tcb = tcb;
+    this.element = element;
+    this.ngContentSelectors = ngContentSelectors;
+    this.componentName = componentName;
+    this.category = tcb.env.config.controlFlowPreventingContentProjection === "error" ? ts54.DiagnosticCategory.Error : ts54.DiagnosticCategory.Warning;
+  }
+  optional = false;
+  execute() {
+    const controlFlowToCheck = this.findPotentialControlFlowNodes();
+    if (controlFlowToCheck.length > 0) {
+      const matcher = new SelectorMatcher();
+      for (const selector of this.ngContentSelectors) {
+        if (selector !== "*") {
+          matcher.addSelectables(CssSelector2.parse(selector), selector);
+        }
+      }
+      for (const root of controlFlowToCheck) {
+        for (const child of root.children) {
+          if (child instanceof TmplAstElement6 || child instanceof TmplAstTemplate4) {
+            matcher.match(createCssSelectorFromNode(child), (_, originalSelector) => {
+              this.tcb.oobRecorder.controlFlowPreventingContentProjection(this.tcb.id, this.category, child, this.componentName, originalSelector, root, this.tcb.hostPreserveWhitespaces);
+            });
+          }
+        }
+      }
+    }
+    return null;
+  }
+  findPotentialControlFlowNodes() {
+    const result = [];
+    for (const child of this.element.children) {
+      if (child instanceof TmplAstForLoopBlock) {
+        if (this.shouldCheck(child)) {
+          result.push(child);
+        }
+        if (child.empty !== null && this.shouldCheck(child.empty)) {
+          result.push(child.empty);
+        }
+      } else if (child instanceof TmplAstIfBlock) {
+        for (const branch of child.branches) {
+          if (this.shouldCheck(branch)) {
+            result.push(branch);
+          }
+        }
+      } else if (child instanceof TmplAstSwitchBlock) {
+        for (const current of child.groups) {
+          if (this.shouldCheck(current)) {
+            result.push(current);
+          }
+        }
+      }
+    }
+    return result;
+  }
+  shouldCheck(node) {
+    if (node.children.length < 2) {
+      return false;
+    }
+    let hasSeenRootNode = false;
+    for (const child of node.children) {
+      if (!(child instanceof TmplAstText) || this.tcb.hostPreserveWhitespaces || child.value.trim().length > 0) {
+        if (hasSeenRootNode) {
+          return true;
+        }
+        hasSeenRootNode = true;
+      }
+    }
+    return false;
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/intersection_observer.js
+var TcbIntersectionObserverOp = class extends TcbOp {
+  tcb;
+  scope;
+  options;
+  constructor(tcb, scope, options) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.options = options;
+  }
+  optional = false;
+  execute() {
+    const options = tcbExpression(this.options, this.tcb, this.scope);
+    this.scope.addStatement(new TcbExpr(`new IntersectionObserver(null!, ${options.print()})`));
+    return null;
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/host.js
+var TcbHostElementOp = class extends TcbOp {
+  tcb;
+  scope;
+  element;
+  optional = true;
+  constructor(tcb, scope, element) {
+    super();
+    this.tcb = tcb;
+    this.scope = scope;
+    this.element = element;
+  }
+  execute() {
+    const id = this.tcb.allocateId();
+    let tagNames;
+    if (this.element.tagNames.length === 1) {
+      tagNames = `"${this.element.tagNames[0]}"`;
+    } else {
+      tagNames = `null! as ${this.element.tagNames.map((t) => `"${t}"`).join(" | ")}`;
+    }
+    const initializer = new TcbExpr(`document.createElement(${tagNames})`);
+    initializer.addParseSpanInfo(this.element.sourceSpan);
+    this.scope.addStatement(new TcbExpr(`var ${id} = ${initializer.print()}`));
+    return new TcbExpr(id);
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/scope.js
+var Scope = class _Scope {
+  tcb;
+  parent;
+  guard;
+  /**
+   * A queue of operations which need to be performed to generate the TCB code for this scope.
+   *
+   * This array can contain either a `TcbOp` which has yet to be executed, or a `TcbExpr|null`
+   * representing the memoized result of executing the operation. As operations are executed, their
+   * results are written into the `opQueue`, overwriting the original operation.
+   *
+   * If an operation is in the process of being executed, it is temporarily overwritten here with
+   * `INFER_TYPE_FOR_CIRCULAR_OP_EXPR`. This way, if a cycle is encountered where an operation
+   * depends transitively on its own result, the inner operation will infer the least narrow type
+   * that fits instead. This has the same semantics as TypeScript itself when types are referenced
+   * circularly.
+   */
+  opQueue = [];
+  /**
+   * A map of `TmplAstElement`s to the index of their `TcbElementOp` in the `opQueue`
+   */
+  elementOpMap = /* @__PURE__ */ new Map();
+  /**
+   * A map of `TmplAstHostElement`s to the index of their `TcbHostElementOp` in the `opQueue`
+   */
+  hostElementOpMap = /* @__PURE__ */ new Map();
+  /**
+   * A map of `TmplAstComponent`s to the index of their `TcbComponentNodeOp` in the `opQueue`
+   */
+  componentNodeOpMap = /* @__PURE__ */ new Map();
+  /**
+   * A map of maps which tracks the index of `TcbDirectiveCtorOp`s in the `opQueue` for each
+   * directive on a `TmplAstElement` or `TmplAstTemplate` node.
+   */
+  directiveOpMap = /* @__PURE__ */ new Map();
+  /**
+   * A map of `TmplAstReference`s to the index of their `TcbReferenceOp` in the `opQueue`
+   */
+  referenceOpMap = /* @__PURE__ */ new Map();
+  /**
+   * Map of immediately nested <ng-template>s (within this `Scope`) represented by `TmplAstTemplate`
+   * nodes to the index of their `TcbTemplateContextOp`s in the `opQueue`.
+   */
+  templateCtxOpMap = /* @__PURE__ */ new Map();
+  /**
+   * Map of variables declared on the template that created this `Scope` (represented by
+   * `TmplAstVariable` nodes) to the index of their `TcbVariableOp`s in the `opQueue`, or to
+   * pre-resolved variable identifiers.
+   */
+  varMap = /* @__PURE__ */ new Map();
+  /**
+   * A map of the names of `TmplAstLetDeclaration`s to the index of their op in the `opQueue`.
+   *
+   * Assumes that there won't be duplicated `@let` declarations within the same scope.
+   */
+  letDeclOpMap = /* @__PURE__ */ new Map();
+  /**
+   * Statements for this template.
+   *
+   * Executing the `TcbOp`s in the `opQueue` populates this array.
+   */
+  statements = [];
+  /**
+   * Gets names of the for loop context variables and their types.
+   */
+  static getForLoopContextVariableTypes() {
+    return /* @__PURE__ */ new Map([
+      ["$first", "boolean"],
+      ["$last", "boolean"],
+      ["$even", "boolean"],
+      ["$odd", "boolean"],
+      ["$index", "number"],
+      ["$count", "number"]
+    ]);
+  }
+  constructor(tcb, parent = null, guard = null) {
+    this.tcb = tcb;
+    this.parent = parent;
+    this.guard = guard;
+  }
+  /**
+   * Constructs a `Scope` given either a `TmplAstTemplate` or a list of `TmplAstNode`s.
+   *
+   * @param tcb the overall context of TCB generation.
+   * @param parentScope the `Scope` of the parent template (if any) or `null` if this is the root
+   * `Scope`.
+   * @param scopedNode Node that provides the scope around the child nodes (e.g. a
+   * `TmplAstTemplate` node exposing variables to its children).
+   * @param children Child nodes that should be appended to the TCB.
+   * @param guard an expression that is applied to this scope for type narrowing purposes.
+   */
+  static forNodes(tcb, parentScope, scopedNode, children, guard) {
+    const scope = new _Scope(tcb, parentScope, guard);
+    if (parentScope === null && tcb.env.config.enableTemplateTypeChecker) {
+      scope.opQueue.push(new TcbComponentContextCompletionOp(scope));
+    }
+    if (scopedNode instanceof TmplAstTemplate5) {
+      const varMap = /* @__PURE__ */ new Map();
+      for (const v of scopedNode.variables) {
+        if (!varMap.has(v.name)) {
+          varMap.set(v.name, v);
+        } else {
+          const firstDecl = varMap.get(v.name);
+          tcb.oobRecorder.duplicateTemplateVar(tcb.id, v, firstDecl);
+        }
+        _Scope.registerVariable(scope, v, new TcbTemplateVariableOp(tcb, scope, scopedNode, v));
+      }
+    } else if (scopedNode instanceof TmplAstIfBlockBranch) {
+      const { expression, expressionAlias } = scopedNode;
+      if (expression !== null && expressionAlias !== null) {
+        _Scope.registerVariable(scope, expressionAlias, new TcbBlockVariableOp(tcb, scope, tcbExpression(expression, tcb, scope), expressionAlias));
+      }
+    } else if (scopedNode instanceof TmplAstForLoopBlock2) {
+      const loopInitializer = new TcbExpr(tcb.allocateId());
+      loopInitializer.addParseSpanInfo(scopedNode.item.sourceSpan);
+      scope.varMap.set(scopedNode.item, loopInitializer);
+      const forLoopContextVariableTypes = _Scope.getForLoopContextVariableTypes();
+      for (const variable of scopedNode.contextVariables) {
+        if (!forLoopContextVariableTypes.has(variable.value)) {
+          throw new Error(`Unrecognized for loop context variable ${variable.name}`);
+        }
+        const type = new TcbExpr(forLoopContextVariableTypes.get(variable.value));
+        _Scope.registerVariable(scope, variable, new TcbBlockImplicitVariableOp(tcb, scope, type, variable));
+      }
+    } else if (scopedNode instanceof TmplAstHostElement5) {
+      scope.appendNode(scopedNode);
+    }
+    if (children !== null) {
+      for (const node of children) {
+        scope.appendNode(node);
+      }
+    }
+    for (const variable of scope.varMap.keys()) {
+      _Scope.checkConflictingLet(scope, variable);
+    }
+    for (const ref of scope.referenceOpMap.keys()) {
+      _Scope.checkConflictingLet(scope, ref);
+    }
+    return scope;
+  }
+  /** Registers a local variable with a scope. */
+  static registerVariable(scope, variable, op) {
+    const opIndex = scope.opQueue.push(op) - 1;
+    scope.varMap.set(variable, opIndex);
+  }
+  /**
+   * Look up a `ts.Expression` representing the value of some operation in the current `Scope`,
+   * including any parent scope(s). This method always returns a mutable clone of the
+   * `ts.Expression` with the comments cleared.
+   *
+   * @param node a `TmplAstNode` of the operation in question. The lookup performed will depend on
+   * the type of this node:
+   *
+   * Assuming `directive` is not present, then `resolve` will return:
+   *
+   * * `TmplAstElement` - retrieve the expression for the element DOM node
+   * * `TmplAstTemplate` - retrieve the template context variable
+   * * `TmplAstVariable` - retrieve a template let- variable
+   * * `TmplAstLetDeclaration` - retrieve a template `@let` declaration
+   * * `TmplAstReference` - retrieve variable created for the local ref
+   *
+   * @param directive if present, a directive type on a `TmplAstElement` or `TmplAstTemplate` to
+   * look up instead of the default for an element or template node.
+   */
+  resolve(node, directive) {
+    const res = this.resolveLocal(node, directive);
+    if (res !== null) {
+      return res;
+    } else if (this.parent !== null) {
+      return this.parent.resolve(node, directive);
+    } else {
+      throw new Error(`Could not resolve ${node} / ${directive}`);
+    }
+  }
+  /**
+   * Add a statement to this scope.
+   */
+  addStatement(stmt) {
+    this.statements.push(stmt);
+  }
+  /**
+   * Get the statements.
+   */
+  render() {
+    for (let i = 0; i < this.opQueue.length; i++) {
+      const skipOptional = !this.tcb.env.config.enableTemplateTypeChecker;
+      this.executeOp(i, skipOptional);
+    }
+    return this.statements;
+  }
+  /**
+   * Returns an expression of all template guards that apply to this scope, including those of
+   * parent scopes. If no guards have been applied, null is returned.
+   */
+  guards() {
+    let parentGuards = null;
+    if (this.parent !== null) {
+      parentGuards = this.parent.guards();
+    }
+    if (this.guard === null) {
+      return parentGuards;
+    } else if (parentGuards === null) {
+      return typeof this.guard === "string" ? new TcbExpr(this.guard) : this.guard;
+    } else {
+      const guard = typeof this.guard === "string" ? this.guard : this.guard.print();
+      return new TcbExpr(`(${parentGuards.print()}) && (${guard})`);
+    }
+  }
+  /** Returns whether a template symbol is defined locally within the current scope. */
+  isLocal(node) {
+    if (node instanceof TmplAstVariable2) {
+      return this.varMap.has(node);
+    }
+    if (node instanceof TmplAstLetDeclaration2) {
+      return this.letDeclOpMap.has(node.name);
+    }
+    return this.referenceOpMap.has(node);
+  }
+  /**
+   * Constructs a `Scope` given either a `TmplAstTemplate` or a list of `TmplAstNode`s.
+   * This is identical to `Scope.forNodes` which we can't reference in some ops due to
+   * circular dependencies.
+   *.
+   * @param parentScope the `Scope` of the parent template.
+   * @param scopedNode Node that provides the scope around the child nodes (e.g. a
+   * `TmplAstTemplate` node exposing variables to its children).
+   * @param children Child nodes that should be appended to the TCB.
+   * @param guard an expression that is applied to this scope for type narrowing purposes.
+   */
+  createChildScope(parentScope, scopedNode, children, guard) {
+    return _Scope.forNodes(this.tcb, parentScope, scopedNode, children, guard);
+  }
+  resolveLocal(ref, directive) {
+    if (ref instanceof TmplAstReference && this.referenceOpMap.has(ref)) {
+      return this.resolveOp(this.referenceOpMap.get(ref));
+    } else if (ref instanceof TmplAstLetDeclaration2 && this.letDeclOpMap.has(ref.name)) {
+      return this.resolveOp(this.letDeclOpMap.get(ref.name).opIndex);
+    } else if (ref instanceof TmplAstVariable2 && this.varMap.has(ref)) {
+      const opIndexOrNode = this.varMap.get(ref);
+      return typeof opIndexOrNode === "number" ? this.resolveOp(opIndexOrNode) : new TcbExpr(opIndexOrNode.print(
+        true
+        /* ignoreComments */
+      ));
+    } else if (ref instanceof TmplAstTemplate5 && directive === void 0 && this.templateCtxOpMap.has(ref)) {
+      return this.resolveOp(this.templateCtxOpMap.get(ref));
+    } else if ((ref instanceof TmplAstElement7 || ref instanceof TmplAstTemplate5 || ref instanceof TmplAstComponent2 || ref instanceof TmplAstDirective || ref instanceof TmplAstHostElement5) && directive !== void 0 && this.directiveOpMap.has(ref)) {
+      const dirMap = this.directiveOpMap.get(ref);
+      return dirMap.has(directive) ? this.resolveOp(dirMap.get(directive)) : null;
+    } else if (ref instanceof TmplAstElement7 && this.elementOpMap.has(ref)) {
+      return this.resolveOp(this.elementOpMap.get(ref));
+    } else if (ref instanceof TmplAstComponent2 && this.componentNodeOpMap.has(ref)) {
+      return this.resolveOp(this.componentNodeOpMap.get(ref));
+    } else if (ref instanceof TmplAstHostElement5 && this.hostElementOpMap.has(ref)) {
+      return this.resolveOp(this.hostElementOpMap.get(ref));
+    } else {
+      return null;
+    }
+  }
+  /**
+   * Like `executeOp`, but assert that the operation actually returned `TcbExpr`.
+   */
+  resolveOp(opIndex) {
+    const res = this.executeOp(
+      opIndex,
+      /* skipOptional */
+      false
+    );
+    if (res === null) {
+      throw new Error(`Error resolving operation, got null`);
+    }
+    return res;
+  }
+  /**
+   * Execute a particular `TcbOp` in the `opQueue`.
+   *
+   * This method replaces the operation in the `opQueue` with the result of execution (once done)
+   * and also protects against a circular dependency from the operation to itself by temporarily
+   * setting the operation's result to a special expression.
+   */
+  executeOp(opIndex, skipOptional) {
+    const op = this.opQueue[opIndex];
+    if (!(op instanceof TcbOp)) {
+      return op === null ? null : new TcbExpr(op.print(
+        true
+        /* ignoreComments */
+      ));
+    }
+    if (skipOptional && op.optional) {
+      return null;
+    }
+    this.opQueue[opIndex] = op.circularFallback();
+    let res = op.execute();
+    if (res !== null) {
+      res = new TcbExpr(res.print(
+        true
+        /* ignoreComments */
+      ));
+    }
+    this.opQueue[opIndex] = res;
+    return res;
+  }
+  appendNode(node) {
+    if (node instanceof TmplAstElement7) {
+      const opIndex = this.opQueue.push(new TcbElementOp(this.tcb, this, node)) - 1;
+      this.elementOpMap.set(node, opIndex);
+      if (this.tcb.env.config.controlFlowPreventingContentProjection !== "suppress") {
+        this.appendContentProjectionCheckOp(node);
+      }
+      this.appendDirectivesAndInputsOfElementLikeNode(node);
+      this.appendOutputsOfElementLikeNode(node, node.inputs, node.outputs);
+      this.appendSelectorlessDirectives(node);
+      this.appendChildren(node);
+      this.checkAndAppendReferencesOfNode(node);
+    } else if (node instanceof TmplAstTemplate5) {
+      this.appendDirectivesAndInputsOfElementLikeNode(node);
+      this.appendOutputsOfElementLikeNode(node, node.inputs, node.outputs);
+      this.appendSelectorlessDirectives(node);
+      const ctxIndex = this.opQueue.push(new TcbTemplateContextOp(this.tcb, this)) - 1;
+      this.templateCtxOpMap.set(node, ctxIndex);
+      if (this.tcb.env.config.checkTemplateBodies) {
+        this.opQueue.push(new TcbTemplateBodyOp(this.tcb, this, node));
+      } else if (this.tcb.env.config.alwaysCheckSchemaInTemplateBodies) {
+        this.appendDeepSchemaChecks(node.children);
+      }
+      this.checkAndAppendReferencesOfNode(node);
+    } else if (node instanceof TmplAstComponent2) {
+      this.appendComponentNode(node);
+    } else if (node instanceof TmplAstDeferredBlock) {
+      this.appendDeferredBlock(node);
+    } else if (node instanceof TmplAstIfBlock2) {
+      this.opQueue.push(new TcbIfOp(this.tcb, this, node));
+    } else if (node instanceof TmplAstSwitchBlock2) {
+      this.opQueue.push(new TcbSwitchOp(this.tcb, this, node));
+    } else if (node instanceof TmplAstForLoopBlock2) {
+      this.opQueue.push(new TcbForOfOp(this.tcb, this, node));
+      node.empty && this.tcb.env.config.checkControlFlowBodies && this.appendChildren(node.empty);
+    } else if (node instanceof TmplAstBoundText) {
+      this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.value));
+    } else if (node instanceof TmplAstIcu) {
+      this.appendIcuExpressions(node);
+    } else if (node instanceof TmplAstContent) {
+      this.appendChildren(node);
+    } else if (node instanceof TmplAstLetDeclaration2) {
+      const opIndex = this.opQueue.push(new TcbLetDeclarationOp(this.tcb, this, node)) - 1;
+      if (this.isLocal(node)) {
+        this.tcb.oobRecorder.conflictingDeclaration(this.tcb.id, node);
+      } else {
+        this.letDeclOpMap.set(node.name, { opIndex, node });
+      }
+    } else if (node instanceof TmplAstHostElement5) {
+      this.appendHostElement(node);
+    }
+  }
+  appendChildren(node) {
+    for (const child of node.children) {
+      this.appendNode(child);
+    }
+  }
+  checkAndAppendReferencesOfNode(node) {
+    for (const ref of node.references) {
+      const target = this.tcb.boundTarget.getReferenceTarget(ref);
+      let ctxIndex;
+      if (target === null) {
+        this.tcb.oobRecorder.missingReferenceTarget(this.tcb.id, ref);
+        ctxIndex = this.opQueue.push(new TcbInvalidReferenceOp(this.tcb, this)) - 1;
+      } else if (target instanceof TmplAstTemplate5 || target instanceof TmplAstElement7) {
+        ctxIndex = this.opQueue.push(new TcbReferenceOp(this.tcb, this, ref, node, target)) - 1;
+      } else {
+        ctxIndex = this.opQueue.push(new TcbReferenceOp(this.tcb, this, ref, node, target.directive)) - 1;
+      }
+      this.referenceOpMap.set(ref, ctxIndex);
+    }
+  }
+  appendDirectivesAndInputsOfElementLikeNode(node) {
+    const claimedInputs = /* @__PURE__ */ new Set();
+    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
+    if (directives === null || directives.length === 0) {
+      if (node instanceof TmplAstElement7) {
+        this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node.inputs, node, claimedInputs), new TcbDomSchemaCheckerOp(
+          this.tcb,
+          node,
+          /* checkElement */
+          true,
+          claimedInputs
+        ));
+      }
+      return;
+    }
+    if (node instanceof TmplAstElement7) {
+      const isDeferred = this.tcb.boundTarget.isDeferred(node);
+      if (!isDeferred && directives.some((dirMeta) => dirMeta.isExplicitlyDeferred)) {
+        this.tcb.oobRecorder.deferredComponentUsedEagerly(this.tcb.id, node);
+      }
+    }
+    const dirMap = /* @__PURE__ */ new Map();
+    for (const dir of directives) {
+      this.appendDirectiveInputs(dir, node, dirMap, directives);
+    }
+    this.directiveOpMap.set(node, dirMap);
+    if (node instanceof TmplAstElement7) {
+      for (const dir of directives) {
+        for (const propertyName of dir.inputs.propertyNames) {
+          claimedInputs.add(propertyName);
+        }
+      }
+      this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node.inputs, node, claimedInputs));
+      const checkElement = directives.length === 0;
+      this.opQueue.push(new TcbDomSchemaCheckerOp(this.tcb, node, checkElement, claimedInputs));
+    }
+  }
+  appendOutputsOfElementLikeNode(node, bindings, events) {
+    const claimedOutputs = /* @__PURE__ */ new Set();
+    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
+    if (directives === null || directives.length === 0) {
+      if (node instanceof TmplAstElement7) {
+        this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, events, bindings, claimedOutputs));
+      }
+      return;
+    }
+    for (const dir of directives) {
+      this.opQueue.push(new TcbDirectiveOutputsOp(this.tcb, this, node, bindings, events, dir));
+    }
+    if (node instanceof TmplAstElement7 || node instanceof TmplAstHostElement5) {
+      for (const dir of directives) {
+        for (const outputProperty of dir.outputs.propertyNames) {
+          claimedOutputs.add(outputProperty);
+        }
+      }
+      this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, events, bindings, claimedOutputs));
+    }
+  }
+  appendInputsOfSelectorlessNode(node) {
+    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
+    const claimedInputs = /* @__PURE__ */ new Set();
+    if (directives !== null && directives.length > 0) {
+      const dirMap = /* @__PURE__ */ new Map();
+      for (const dir of directives) {
+        this.appendDirectiveInputs(dir, node, dirMap, directives);
+        for (const propertyName of dir.inputs.propertyNames) {
+          claimedInputs.add(propertyName);
+        }
+      }
+      this.directiveOpMap.set(node, dirMap);
+    }
+    if (node instanceof TmplAstDirective) {
+      for (const input of node.inputs) {
+        if (!claimedInputs.has(input.name)) {
+          this.tcb.oobRecorder.unclaimedDirectiveBinding(this.tcb.id, node, input);
+        }
+      }
+      for (const attr of node.attributes) {
+        if (!claimedInputs.has(attr.name)) {
+          this.tcb.oobRecorder.unclaimedDirectiveBinding(this.tcb.id, node, attr);
+        }
+      }
+    } else {
+      const checkElement = node.tagName !== null;
+      this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node.inputs, node, claimedInputs), new TcbDomSchemaCheckerOp(this.tcb, node, checkElement, claimedInputs));
+    }
+  }
+  appendOutputsOfSelectorlessNode(node) {
+    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
+    const claimedOutputs = /* @__PURE__ */ new Set();
+    if (directives !== null && directives.length > 0) {
+      for (const dir of directives) {
+        this.opQueue.push(new TcbDirectiveOutputsOp(this.tcb, this, node, node.inputs, node.outputs, dir));
+        for (const outputProperty of dir.outputs.propertyNames) {
+          claimedOutputs.add(outputProperty);
+        }
+      }
+    }
+    if (node instanceof TmplAstDirective) {
+      for (const output of node.outputs) {
+        if (!claimedOutputs.has(output.name)) {
+          this.tcb.oobRecorder.unclaimedDirectiveBinding(this.tcb.id, node, output);
+        }
+      }
+    } else {
+      this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, node.outputs, node.inputs, claimedOutputs));
+    }
+  }
+  appendDirectiveInputs(dir, node, dirMap, allDirectiveMatches) {
+    const nodeIsFormControl = isFormControl(allDirectiveMatches);
+    const customFormControlType = nodeIsFormControl ? getCustomFieldDirectiveType(dir) : null;
+    const directiveOp = this.getDirectiveOp(dir, node, customFormControlType);
+    const dirIndex = this.opQueue.push(directiveOp) - 1;
+    dirMap.set(dir, dirIndex);
+    if (isNativeField(dir, node, allDirectiveMatches)) {
+      const inputType = node.name === "input" && node.attributes.find((attr) => attr.name === "type")?.value || null;
+      this.opQueue.push(inputType === "radio" ? new TcbNativeRadioButtonFieldOp(this.tcb, this, node) : new TcbNativeFieldOp(this.tcb, this, node, inputType));
+    }
+    this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir, nodeIsFormControl, customFormControlType));
+  }
+  getDirectiveOp(dir, node, customFieldType) {
+    if (!dir.isGeneric) {
+      return new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, dir);
+    } else if (!dir.hasRequiresInlineTypeCtor || this.tcb.env.config.useInlineTypeConstructors) {
+      return new TcbDirectiveCtorOp(this.tcb, this, node, dir, customFieldType);
+    }
+    return new TcbGenericDirectiveTypeWithAnyParamsOp(this.tcb, this, node, dir);
+  }
+  appendSelectorlessDirectives(node) {
+    for (const directive of node.directives) {
+      if (!this.tcb.boundTarget.referencedDirectiveExists(directive.name)) {
+        this.tcb.oobRecorder.missingNamedTemplateDependency(this.tcb.id, directive);
+        continue;
+      }
+      const directives = this.tcb.boundTarget.getDirectivesOfNode(directive);
+      if (directives === null || directives.length === 0 || directives.some((dir) => dir.isComponent || !dir.isStandalone)) {
+        this.tcb.oobRecorder.incorrectTemplateDependencyType(this.tcb.id, directive);
+        continue;
+      }
+      this.appendInputsOfSelectorlessNode(directive);
+      this.appendOutputsOfSelectorlessNode(directive);
+      this.checkAndAppendReferencesOfNode(directive);
+    }
+  }
+  appendDeepSchemaChecks(nodes) {
+    for (const node of nodes) {
+      if (!(node instanceof TmplAstElement7 || node instanceof TmplAstTemplate5)) {
+        continue;
+      }
+      if (node instanceof TmplAstElement7) {
+        const claimedInputs = /* @__PURE__ */ new Set();
+        let directives = this.tcb.boundTarget.getDirectivesOfNode(node);
+        for (const dirNode of node.directives) {
+          const directiveResults = this.tcb.boundTarget.getDirectivesOfNode(dirNode);
+          if (directiveResults !== null && directiveResults.length > 0) {
+            directives ??= [];
+            directives.push(...directiveResults);
+          }
+        }
+        let hasDirectives;
+        if (directives === null || directives.length === 0) {
+          hasDirectives = false;
+        } else {
+          hasDirectives = true;
+          for (const dir of directives) {
+            for (const propertyName of dir.inputs.propertyNames) {
+              claimedInputs.add(propertyName);
+            }
+          }
+        }
+        this.opQueue.push(new TcbDomSchemaCheckerOp(this.tcb, node, !hasDirectives, claimedInputs));
+      }
+      this.appendDeepSchemaChecks(node.children);
+    }
+  }
+  appendIcuExpressions(node) {
+    for (const variable of Object.values(node.vars)) {
+      this.opQueue.push(new TcbExpressionOp(this.tcb, this, variable.value));
+    }
+    for (const placeholder of Object.values(node.placeholders)) {
+      if (placeholder instanceof TmplAstBoundText) {
+        this.opQueue.push(new TcbExpressionOp(this.tcb, this, placeholder.value));
+      }
+    }
+  }
+  appendContentProjectionCheckOp(root) {
+    const meta = this.tcb.boundTarget.getDirectivesOfNode(root)?.find((meta2) => meta2.isComponent) || null;
+    if (meta !== null && meta.ngContentSelectors !== null && meta.ngContentSelectors.length > 0) {
+      const selectors = meta.ngContentSelectors;
+      if (selectors.length > 1 || selectors.length === 1 && selectors[0] !== "*") {
+        this.opQueue.push(new TcbControlFlowContentProjectionOp(this.tcb, root, selectors, meta.name));
+      }
+    }
+  }
+  appendComponentNode(node) {
+    if (!this.tcb.boundTarget.referencedDirectiveExists(node.componentName)) {
+      this.tcb.oobRecorder.missingNamedTemplateDependency(this.tcb.id, node);
+      return;
+    }
+    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
+    if (directives === null || directives.length === 0 || directives.every((dir) => !dir.isComponent || !dir.isStandalone)) {
+      this.tcb.oobRecorder.incorrectTemplateDependencyType(this.tcb.id, node);
+      return;
+    }
+    const opIndex = this.opQueue.push(new TcbComponentNodeOp(this.tcb, this, node)) - 1;
+    this.componentNodeOpMap.set(node, opIndex);
+    if (this.tcb.env.config.controlFlowPreventingContentProjection !== "suppress") {
+      this.appendContentProjectionCheckOp(node);
+    }
+    this.appendInputsOfSelectorlessNode(node);
+    this.appendOutputsOfSelectorlessNode(node);
+    this.appendSelectorlessDirectives(node);
+    this.appendChildren(node);
+    this.checkAndAppendReferencesOfNode(node);
+  }
+  appendDeferredBlock(block) {
+    this.appendDeferredTriggers(block, block.triggers);
+    this.appendDeferredTriggers(block, block.prefetchTriggers);
+    if (block.hydrateTriggers.when) {
+      this.opQueue.push(new TcbConditionOp(this.tcb, this, block.hydrateTriggers.when.value));
+    }
+    this.appendChildren(block);
+    if (block.placeholder !== null) {
+      this.appendChildren(block.placeholder);
+    }
+    if (block.loading !== null) {
+      this.appendChildren(block.loading);
+    }
+    if (block.error !== null) {
+      this.appendChildren(block.error);
+    }
+  }
+  appendDeferredTriggers(block, triggers) {
+    if (triggers.when !== void 0) {
+      this.opQueue.push(new TcbConditionOp(this.tcb, this, triggers.when.value));
+    }
+    if (triggers.viewport !== void 0 && triggers.viewport.options !== null) {
+      this.opQueue.push(new TcbIntersectionObserverOp(this.tcb, this, triggers.viewport.options));
+    }
+    if (triggers.hover !== void 0) {
+      this.validateReferenceBasedDeferredTrigger(block, triggers.hover);
+    }
+    if (triggers.interaction !== void 0) {
+      this.validateReferenceBasedDeferredTrigger(block, triggers.interaction);
+    }
+    if (triggers.viewport !== void 0) {
+      this.validateReferenceBasedDeferredTrigger(block, triggers.viewport);
+    }
+  }
+  appendHostElement(node) {
+    const opIndex = this.opQueue.push(new TcbHostElementOp(this.tcb, this, node)) - 1;
+    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
+    if (directives !== null && directives.length > 0) {
+      const directiveOpMap = /* @__PURE__ */ new Map();
+      for (const directive of directives) {
+        const directiveOp = this.getDirectiveOp(directive, node, null);
+        directiveOpMap.set(directive, this.opQueue.push(directiveOp) - 1);
+      }
+      this.directiveOpMap.set(node, directiveOpMap);
+    }
+    this.hostElementOpMap.set(node, opIndex);
+    this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node.bindings, node, null), new TcbDomSchemaCheckerOp(this.tcb, node, false, null));
+    this.appendOutputsOfElementLikeNode(node, null, node.listeners);
+  }
+  validateReferenceBasedDeferredTrigger(block, trigger) {
+    if (trigger.reference === null) {
+      if (block.placeholder === null) {
+        this.tcb.oobRecorder.deferImplicitTriggerMissingPlaceholder(this.tcb.id, trigger);
+        return;
+      }
+      let rootNode = null;
+      for (const child of block.placeholder.children) {
+        if (!this.tcb.hostPreserveWhitespaces && child instanceof TmplAstText2 && child.value.trim().length === 0) {
+          continue;
+        }
+        if (rootNode === null) {
+          rootNode = child;
+        } else {
+          rootNode = null;
+          break;
+        }
+      }
+      if (rootNode === null || !(rootNode instanceof TmplAstElement7)) {
+        this.tcb.oobRecorder.deferImplicitTriggerInvalidPlaceholder(this.tcb.id, trigger);
+      }
+      return;
+    }
+    if (this.tcb.boundTarget.getDeferredTriggerTarget(block, trigger) === null) {
+      this.tcb.oobRecorder.inaccessibleDeferredTriggerElement(this.tcb.id, trigger);
+    }
+  }
+  /** Reports a diagnostic if there are any `@let` declarations that conflict with a node. */
+  static checkConflictingLet(scope, node) {
+    if (scope.letDeclOpMap.has(node.name)) {
+      scope.tcb.oobRecorder.conflictingDeclaration(scope.tcb.id, scope.letDeclOpMap.get(node.name).node);
+    }
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.js
+function generateTypeCheckBlock(env, component, name, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
+  const tcb = new Context2(env, domSchemaChecker, oobRecorder, meta.id, meta.boundTarget, meta.pipes, meta.schemas, meta.isStandalone, meta.preserveWhitespaces);
+  const ctxRawType = env.referenceTcbType(component.ref);
+  if (!ts55.isTypeReferenceNode(ctxRawType)) {
+    throw new Error(`Expected TypeReferenceNode when referencing the ctx param for ${component.ref.name}`);
+  }
+  let typeParameters = void 0;
+  let typeArguments = void 0;
+  if (component.typeParameters !== void 0) {
+    if (!env.config.useContextGenericType) {
+      genericContextBehavior = TcbGenericContextBehavior.FallbackToAny;
+    }
+    switch (genericContextBehavior) {
+      case TcbGenericContextBehavior.UseEmitter:
+        const emittedParams = component.typeParameters || [];
+        typeParameters = emittedParams;
+        typeArguments = typeParameters.map((param) => param.name);
+        break;
+      case TcbGenericContextBehavior.CopyClassNodes:
+        const copiedParams = component.typeParameters ? [...component.typeParameters] : [];
+        typeParameters = copiedParams;
+        typeArguments = typeParameters.map((param) => param.name);
+        break;
+      case TcbGenericContextBehavior.FallbackToAny:
+        typeArguments = Array.from({ length: component.typeParameters?.length ?? 0 }).map(() => "any");
+        break;
+    }
+  }
+  const sourceFile = env.contextFile;
+  const typeParamsStr = typeParameters === void 0 || typeParameters.length === 0 ? "" : `<${typeParameters.map((p) => p.representation).join(", ")}>`;
+  const typeArgsStr = typeArguments === void 0 || typeArguments.length === 0 ? "" : `<${typeArguments.join(", ")}>`;
+  const typeRef = ts55.isIdentifier(ctxRawType.typeName) ? ctxRawType.typeName.text : tempPrint(ctxRawType.typeName, sourceFile);
+  const thisParamStr = `this: ${typeRef}${typeArgsStr}`;
+  const statements = [];
+  if (tcb.boundTarget.target.template !== void 0) {
+    const templateScope = Scope.forNodes(
+      tcb,
+      null,
+      null,
+      tcb.boundTarget.target.template,
+      /* guard */
+      null
+    );
+    statements.push(renderBlockStatements(env, templateScope, "true"));
+  }
+  if (tcb.boundTarget.target.host !== void 0) {
+    const hostScope = Scope.forNodes(tcb, null, tcb.boundTarget.target.host.node, null, null);
+    statements.push(renderBlockStatements(env, hostScope, createHostBindingsBlockGuard()));
+  }
+  const bodyStr = `{
+${statements.join("\n")}
+}`;
+  const funcDeclStr = `function ${name.text}${typeParamsStr}(${thisParamStr}) ${bodyStr}`;
+  return `/*${meta.id}*/
+${funcDeclStr}`;
+}
+function renderBlockStatements(env, scope, wrapperExpression) {
+  const scopeStatements = scope.render();
+  const statements = getStatementsBlock([...env.getPreludeStatements(), ...scopeStatements]);
+  return `if (${wrapperExpression}) {
+${statements}
+}`;
+}
+
 // packages/compiler-cli/src/ngtsc/annotations/component/src/resources.js
 import { ParseSourceFile as ParseSourceFile2, parseTemplate } from "@angular/compiler";
-import ts42 from "typescript";
+import ts56 from "typescript";
 function getTemplateDeclarationNodeForError(declaration) {
   return declaration.isInline ? declaration.expression : declaration.templateUrlExpression;
 }
@@ -9481,7 +13518,7 @@ function extractTemplate(node, template, evaluator, depTracker, resourceLoader, 
     let sourceMapping;
     let escapedString = false;
     let sourceMapUrl;
-    if (ts42.isStringLiteral(template.expression) || ts42.isNoSubstitutionTemplateLiteral(template.expression)) {
+    if (ts56.isStringLiteral(template.expression) || ts56.isNoSubstitutionTemplateLiteral(template.expression)) {
       sourceParseRange = getTemplateRange(template.expression);
       sourceStr = template.expression.getSourceFile().text;
       templateContent = template.expression.text;
@@ -9706,7 +13743,7 @@ function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanaly
 }
 function getTemplateRange(templateExpr) {
   const startPos = templateExpr.getStart() + 1;
-  const { line, character } = ts42.getLineAndCharacterOfPosition(templateExpr.getSourceFile(), startPos);
+  const { line, character } = ts56.getLineAndCharacterOfPosition(templateExpr.getSourceFile(), startPos);
   return {
     startPos,
     startLine: line,
@@ -9739,7 +13776,7 @@ function transformDecoratorResources(dec, component, styles, template) {
   const metadata = new Map(component);
   if (metadata.has("templateUrl")) {
     metadata.delete("templateUrl");
-    metadata.set("template", ts42.factory.createStringLiteral(template.content));
+    metadata.set("template", ts56.factory.createStringLiteral(template.content));
   }
   if (metadata.has("styleUrls") || metadata.has("styleUrl") || metadata.has("styles")) {
     metadata.delete("styles");
@@ -9748,20 +13785,20 @@ function transformDecoratorResources(dec, component, styles, template) {
     if (styles.length > 0) {
       const styleNodes = styles.reduce((result, style) => {
         if (style.trim().length > 0) {
-          result.push(ts42.factory.createStringLiteral(style));
+          result.push(ts56.factory.createStringLiteral(style));
         }
         return result;
       }, []);
       if (styleNodes.length > 0) {
-        metadata.set("styles", ts42.factory.createArrayLiteralExpression(styleNodes));
+        metadata.set("styles", ts56.factory.createArrayLiteralExpression(styleNodes));
       }
     }
   }
   const newMetadataFields = [];
   for (const [name, value] of metadata.entries()) {
-    newMetadataFields.push(ts42.factory.createPropertyAssignment(name, value));
+    newMetadataFields.push(ts56.factory.createPropertyAssignment(name, value));
   }
-  return { ...dec, args: [ts42.factory.createObjectLiteralExpression(newMetadataFields)] };
+  return { ...dec, args: [ts56.factory.createObjectLiteralExpression(newMetadataFields)] };
 }
 function extractComponentStyleUrls(evaluator, component) {
   const styleUrlsExpr = component.get("styleUrls");
@@ -9789,9 +13826,9 @@ function extractComponentStyleUrls(evaluator, component) {
 }
 function extractStyleUrlsFromExpression(evaluator, styleUrlsExpr) {
   const styleUrls = [];
-  if (ts42.isArrayLiteralExpression(styleUrlsExpr)) {
+  if (ts56.isArrayLiteralExpression(styleUrlsExpr)) {
     for (const styleUrlExpr of styleUrlsExpr.elements) {
-      if (ts42.isSpreadElement(styleUrlExpr)) {
+      if (ts56.isSpreadElement(styleUrlExpr)) {
         styleUrls.push(...extractStyleUrlsFromExpression(evaluator, styleUrlExpr.expression));
       } else {
         const styleUrl = evaluator.evaluate(styleUrlExpr);
@@ -9823,15 +13860,15 @@ function extractStyleUrlsFromExpression(evaluator, styleUrlsExpr) {
 function extractInlineStyleResources(component) {
   const styles = /* @__PURE__ */ new Set();
   function stringLiteralElements(array) {
-    return array.elements.filter((e) => ts42.isStringLiteralLike(e));
+    return array.elements.filter((e) => ts56.isStringLiteralLike(e));
   }
   const stylesExpr = component.get("styles");
   if (stylesExpr !== void 0) {
-    if (ts42.isArrayLiteralExpression(stylesExpr)) {
+    if (ts56.isArrayLiteralExpression(stylesExpr)) {
       for (const expression of stringLiteralElements(stylesExpr)) {
         styles.add({ path: null, node: expression });
       }
-    } else if (ts42.isStringLiteralLike(stylesExpr)) {
+    } else if (ts56.isStringLiteralLike(stylesExpr)) {
       styles.add({ path: null, node: stylesExpr });
     }
   }
@@ -9854,7 +13891,7 @@ import { compileClassDebugInfo, compileHmrInitializer, compileComponentClassMeta
 import ts79 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.js
-import ts43 from "typescript";
+import ts57 from "typescript";
 var SemanticSymbol = class {
   decl;
   /**
@@ -9878,14 +13915,14 @@ var SemanticSymbol = class {
   }
 };
 function getSymbolIdentifier(decl) {
-  if (!ts43.isSourceFile(decl.parent)) {
+  if (!ts57.isSourceFile(decl.parent)) {
     return null;
   }
   return decl.name.text;
 }
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/graph.js
-import { ExternalExpr as ExternalExpr5 } from "@angular/compiler";
+import { ExternalExpr as ExternalExpr6 } from "@angular/compiler";
 var OpaqueSymbol = class extends SemanticSymbol {
   isPublicApiAffected() {
     return false;
@@ -10065,7 +14102,7 @@ var SemanticDepGraphUpdater = class {
   }
 };
 function getImportPath(expr) {
-  if (expr instanceof ExternalExpr5) {
+  if (expr instanceof ExternalExpr6) {
     return `${expr.value.moduleName}$${expr.value.name}`;
   } else {
     return null;
@@ -10073,7 +14110,7 @@ function getImportPath(expr) {
 }
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/type_parameters.js
-import ts44 from "typescript";
+import ts58 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/util.js
 function isSymbolEqual(a, b) {
@@ -10127,7 +14164,7 @@ function isSetEqual(a, b, equalityTester = referenceEquality) {
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/type_parameters.js
 function extractSemanticTypeParameters(node) {
-  if (!ts44.isClassDeclaration(node) || node.typeParameters === void 0) {
+  if (!ts58.isClassDeclaration(node) || node.typeParameters === void 0) {
     return null;
   }
   return node.typeParameters.map((typeParam) => ({
@@ -10278,8 +14315,8 @@ var MetadataDtsModuleScopeResolver = class {
 };
 
 // packages/compiler-cli/src/ngtsc/scope/src/local.js
-import { ExternalExpr as ExternalExpr6 } from "@angular/compiler";
-import ts45 from "typescript";
+import { ExternalExpr as ExternalExpr7 } from "@angular/compiler";
+import ts59 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/scope/src/util.js
 function getDiagnosticNode(ref, rawExpr) {
@@ -10627,7 +14664,7 @@ var LocalModuleScopeRegistry = class {
    */
   getExportedScope(ref, diagnostics, ownerForErrors, type) {
     if (ref.node.getSourceFile().isDeclarationFile) {
-      if (!ts45.isClassDeclaration(ref.node)) {
+      if (!ts59.isClassDeclaration(ref.node)) {
         const code = type === "import" ? ErrorCode.NGMODULE_INVALID_IMPORT : ErrorCode.NGMODULE_INVALID_EXPORT;
         diagnostics.push(makeDiagnostic(code, identifierOfNode(ref.node) || ref.node, `Appears in the NgModule.${type}s of ${nodeNameForError(ownerForErrors)}, but could not be resolved to an NgModule`));
         return "invalid";
@@ -10660,7 +14697,7 @@ var LocalModuleScopeRegistry = class {
         return;
       }
       if (!reexportMap.has(exportName)) {
-        if (exportRef.alias && exportRef.alias instanceof ExternalExpr6) {
+        if (exportRef.alias && exportRef.alias instanceof ExternalExpr7) {
           reexports.push({
             fromModule: exportRef.alias.value.moduleName,
             symbolName: exportRef.alias.value.name,
@@ -10670,7 +14707,7 @@ var LocalModuleScopeRegistry = class {
           const emittedRef = this.refEmitter.emit(exportRef.cloneWithNoIdentifiers(), sourceFile);
           assertSuccessfulReferenceEmit(emittedRef, ngModuleRef.node.name, "class");
           const expr = emittedRef.expression;
-          if (!(expr instanceof ExternalExpr6) || expr.value.moduleName === null || expr.value.name === null) {
+          if (!(expr instanceof ExternalExpr7) || expr.value.moduleName === null || expr.value.name === null) {
             throw new Error("Expected ExternalExpr");
           }
           reexports.push({
@@ -10745,7 +14782,7 @@ function reexportCollision(module, refA, refB) {
 }
 
 // packages/compiler-cli/src/ngtsc/scope/src/selectorless_scope.js
-import ts46 from "typescript";
+import ts60 from "typescript";
 var SelectorlessComponentScopeReader = class {
   metaReader;
   reflector;
@@ -10798,9 +14835,9 @@ var SelectorlessComponentScopeReader = class {
   /** Determines which identifiers a class has access to. */
   getAvailableIdentifiers(node) {
     const result = /* @__PURE__ */ new Map();
-    let current = ts46.getOriginalNode(node).parent;
+    let current = ts60.getOriginalNode(node).parent;
     while (current) {
-      if (!ts46.isSourceFile(current) && !ts46.isBlock(current)) {
+      if (!ts60.isSourceFile(current) && !ts60.isBlock(current)) {
         current = current.parent;
         continue;
       }
@@ -10809,9 +14846,9 @@ var SelectorlessComponentScopeReader = class {
           result.set(stmt.name.text, stmt.name);
           continue;
         }
-        if (ts46.isImportDeclaration(stmt) && stmt.importClause !== void 0 && !(stmt.importClause.phaseModifier === ts46.SyntaxKind.TypeKeyword)) {
+        if (ts60.isImportDeclaration(stmt) && stmt.importClause !== void 0 && !(stmt.importClause.phaseModifier === ts60.SyntaxKind.TypeKeyword)) {
           const clause = stmt.importClause;
-          if (clause.namedBindings !== void 0 && ts46.isNamedImports(clause.namedBindings)) {
+          if (clause.namedBindings !== void 0 && ts60.isNamedImports(clause.namedBindings)) {
             for (const element of clause.namedBindings.elements) {
               if (!element.isTypeOnly) {
                 result.set(element.name.text, element.name);
@@ -10842,7 +14879,7 @@ var SelectorlessComponentScopeReader = class {
 };
 
 // packages/compiler-cli/src/ngtsc/scope/src/typecheck.js
-import { CssSelector, SelectorlessMatcher, SelectorMatcher } from "@angular/compiler";
+import { CssSelector as CssSelector3, SelectorlessMatcher, SelectorMatcher as SelectorMatcher2 } from "@angular/compiler";
 var TypeCheckScopeRegistry = class {
   scopeReader;
   metaReader;
@@ -10940,7 +14977,7 @@ var TypeCheckScopeRegistry = class {
     return isExplicitlyDeferred === true ? { ...meta, isExplicitlyDeferred } : meta;
   }
   getSelectorMatcher(allDependencies) {
-    const matcher = new SelectorMatcher();
+    const matcher = new SelectorMatcher2();
     for (const meta of allDependencies) {
       if (meta.kind === MetaKind.Directive && meta.selector !== null) {
         const extMeta = this.getTypeCheckDirectiveMetadata(meta.ref);
@@ -10948,7 +14985,7 @@ var TypeCheckScopeRegistry = class {
           continue;
         }
         const directiveMeta = this.applyExplicitlyDeferredFlag(extMeta, meta.isExplicitlyDeferred);
-        matcher.addSelectables(CssSelector.parse(meta.selector), this.combineWithHostDirectives(directiveMeta));
+        matcher.addSelectables(CssSelector3.parse(meta.selector), this.combineWithHostDirectives(directiveMeta));
       }
     }
     return matcher;
@@ -11062,134 +15099,18 @@ function isBaseClassEqual(current, previous) {
 import { CssSelector as CssSelector4, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr9, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.js
-import ts48 from "typescript";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/comments.js
-import { AbsoluteSourceSpan } from "@angular/compiler";
-import ts47 from "typescript";
-var parseSpanComment = /^(\d+),(\d+)$/;
-function readSpanComment(node, sourceFile = node.getSourceFile()) {
-  return ts47.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts47.SyntaxKind.MultiLineCommentTrivia) {
-      return null;
-    }
-    const commentText = sourceFile.text.substring(pos + 2, end - 2);
-    const match = commentText.match(parseSpanComment);
-    if (match === null) {
-      return null;
-    }
-    return new AbsoluteSourceSpan(+match[1], +match[2]);
-  }) || null;
-}
-var CommentTriviaType;
-(function(CommentTriviaType2) {
-  CommentTriviaType2["DIAGNOSTIC"] = "D";
-  CommentTriviaType2["EXPRESSION_TYPE_IDENTIFIER"] = "T";
-})(CommentTriviaType || (CommentTriviaType = {}));
-var ExpressionIdentifier;
-(function(ExpressionIdentifier2) {
-  ExpressionIdentifier2["DIRECTIVE"] = "DIR";
-  ExpressionIdentifier2["COMPONENT_COMPLETION"] = "COMPCOMP";
-  ExpressionIdentifier2["EVENT_PARAMETER"] = "EP";
-  ExpressionIdentifier2["VARIABLE_AS_EXPRESSION"] = "VAE";
-})(ExpressionIdentifier || (ExpressionIdentifier = {}));
-var IGNORE_FOR_DIAGNOSTICS_MARKER = `${CommentTriviaType.DIAGNOSTIC}:ignore`;
-function hasIgnoreForDiagnosticsMarker(node, sourceFile) {
-  return ts47.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts47.SyntaxKind.MultiLineCommentTrivia) {
-      return null;
-    }
-    const commentText = sourceFile.text.substring(pos + 2, end - 2);
-    return commentText === IGNORE_FOR_DIAGNOSTICS_MARKER;
-  }) === true;
-}
-function makeRecursiveVisitor(visitor) {
-  function recursiveVisitor(node) {
-    const res = visitor(node);
-    return res !== null ? res : node.forEachChild(recursiveVisitor);
-  }
-  return recursiveVisitor;
-}
-function getSpanFromOptions(opts) {
-  let withSpan = null;
-  if (opts.withSpan !== void 0) {
-    if (opts.withSpan instanceof AbsoluteSourceSpan) {
-      withSpan = opts.withSpan;
-    } else {
-      withSpan = { start: opts.withSpan.start.offset, end: opts.withSpan.end.offset };
-    }
-  }
-  return withSpan;
-}
-function findFirstMatchingNode(tcb, opts) {
-  const withSpan = getSpanFromOptions(opts);
-  const withExpressionIdentifier = opts.withExpressionIdentifier;
-  const sf = tcb.getSourceFile();
-  const visitor = makeRecursiveVisitor((node) => {
-    if (!opts.filter(node)) {
-      return null;
-    }
-    if (withSpan !== null) {
-      const comment = readSpanComment(node, sf);
-      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
-        return null;
-      }
-    }
-    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
-      return null;
-    }
-    return node;
-  });
-  return tcb.forEachChild(visitor) ?? null;
-}
-function findAllMatchingNodes(tcb, opts) {
-  const withSpan = getSpanFromOptions(opts);
-  const withExpressionIdentifier = opts.withExpressionIdentifier;
-  const results = [];
-  const stack = [tcb];
-  const sf = tcb.getSourceFile();
-  while (stack.length > 0) {
-    const node = stack.pop();
-    if (!opts.filter(node)) {
-      stack.push(...node.getChildren());
-      continue;
-    }
-    if (withSpan !== null) {
-      const comment = readSpanComment(node, sf);
-      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
-        stack.push(...node.getChildren());
-        continue;
-      }
-    }
-    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
-      continue;
-    }
-    results.push(node);
-  }
-  return results;
-}
-function hasExpressionIdentifier(sourceFile, node, identifier) {
-  return ts47.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts47.SyntaxKind.MultiLineCommentTrivia) {
-      return false;
-    }
-    const commentText = sourceFile.text.substring(pos + 2, end - 2);
-    return commentText === `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
-  }) || false;
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.js
+import ts61 from "typescript";
 function isAccessExpression(node) {
-  return ts48.isPropertyAccessExpression(node) || ts48.isElementAccessExpression(node);
+  return ts61.isPropertyAccessExpression(node) || ts61.isElementAccessExpression(node);
 }
 function isDirectiveDeclaration(node) {
   const sourceFile = node.getSourceFile();
-  return (ts48.isTypeNode(node) || ts48.isIdentifier(node)) && ts48.isVariableDeclaration(node.parent) && hasExpressionIdentifier(sourceFile, node, ExpressionIdentifier.DIRECTIVE);
+  return (ts61.isTypeNode(node) || ts61.isIdentifier(node)) && ts61.isVariableDeclaration(node.parent) && hasExpressionIdentifier(sourceFile, node, ExpressionIdentifier.DIRECTIVE);
 }
 function isSymbolAliasOf(firstSymbol, lastSymbol, typeChecker) {
   let currentSymbol = lastSymbol;
   const seenSymbol = /* @__PURE__ */ new Set();
-  while (firstSymbol !== currentSymbol && currentSymbol !== void 0 && currentSymbol.flags & ts48.SymbolFlags.Alias) {
+  while (firstSymbol !== currentSymbol && currentSymbol !== void 0 && currentSymbol.flags & ts61.SymbolFlags.Alias) {
     if (seenSymbol.has(currentSymbol)) {
       break;
     }
@@ -11214,7 +15135,7 @@ var UpdateMode;
 })(UpdateMode || (UpdateMode = {}));
 
 // packages/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver.js
-import ts49 from "typescript";
+import ts62 from "typescript";
 var DelegatingCompilerHost = class {
   delegate;
   createHash;
@@ -11366,7 +15287,7 @@ var TsCreateProgramDriver = class {
       this.sfMap.clear();
     }
     for (const [filePath, { newText, originalFile }] of contents.entries()) {
-      const sf = ts49.createSourceFile(filePath, newText, ts49.ScriptTarget.Latest, true);
+      const sf = ts62.createSourceFile(filePath, newText, ts62.ScriptTarget.Latest, true);
       if (originalFile !== null) {
         sf[NgOriginalFile] = originalFile;
       }
@@ -11375,7 +15296,7 @@ var TsCreateProgramDriver = class {
     const host = new UpdatedProgramHost(this.sfMap, this.originalProgram, this.originalHost, this.shimExtensionPrefixes);
     const oldProgram = this.program;
     retagAllTsFiles(oldProgram);
-    this.program = ts49.createProgram({
+    this.program = ts62.createProgram({
       host,
       rootNames: this.program.getRootFileNames(),
       options: this.options,
@@ -11386,156 +15307,9 @@ var TsCreateProgramDriver = class {
   }
 };
 
-// packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.js
-import ts50 from "typescript";
-function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, relatedMessages, deprecatedDiagInfo) {
-  if (mapping.type === "direct") {
-    let relatedInformation = [];
-    if (relatedMessages !== void 0) {
-      for (const relatedMessage of relatedMessages) {
-        relatedInformation.push({
-          category: ts50.DiagnosticCategory.Message,
-          code: 0,
-          file: relatedMessage.sourceFile,
-          start: relatedMessage.start,
-          length: relatedMessage.end - relatedMessage.start,
-          messageText: relatedMessage.text
-        });
-      }
-    }
-    if (deprecatedDiagInfo !== void 0) {
-      relatedInformation.push(...deprecatedDiagInfo.relatedMessages ?? []);
-    }
-    return {
-      source: "ngtsc",
-      code,
-      category,
-      messageText,
-      file: mapping.node.getSourceFile(),
-      sourceFile: mapping.node.getSourceFile(),
-      typeCheckId: id,
-      start: span.start.offset,
-      length: span.end.offset - span.start.offset,
-      relatedInformation,
-      reportsDeprecated: deprecatedDiagInfo?.reportsDeprecated
-    };
-  } else if (mapping.type === "indirect" || mapping.type === "external") {
-    const componentSf = mapping.componentClass.getSourceFile();
-    const componentName = mapping.componentClass.name.text;
-    const fileName = mapping.type === "indirect" ? `${componentSf.fileName} (${componentName} template)` : mapping.templateUrl;
-    let relatedInformation = [];
-    if (relatedMessages !== void 0) {
-      for (const relatedMessage of relatedMessages) {
-        relatedInformation.push({
-          category: ts50.DiagnosticCategory.Message,
-          code: 0,
-          file: relatedMessage.sourceFile,
-          start: relatedMessage.start,
-          length: relatedMessage.end - relatedMessage.start,
-          messageText: relatedMessage.text
-        });
-      }
-    }
-    let sf;
-    try {
-      sf = getParsedTemplateSourceFile(fileName, mapping);
-    } catch (e) {
-      const failureChain = makeDiagnosticChain(`Failed to report an error in '${fileName}' at ${span.start.line + 1}:${span.start.col + 1}`, [makeDiagnosticChain(e?.stack ?? `${e}`)]);
-      return {
-        source: "ngtsc",
-        category,
-        code,
-        messageText: addDiagnosticChain(messageText, [failureChain]),
-        file: componentSf,
-        sourceFile: componentSf,
-        typeCheckId: id,
-        // mapping.node represents either the 'template' or 'templateUrl' expression. getStart()
-        // and getEnd() are used because they don't include surrounding whitespace.
-        start: mapping.node.getStart(),
-        length: mapping.node.getEnd() - mapping.node.getStart(),
-        relatedInformation,
-        reportsDeprecated: deprecatedDiagInfo?.reportsDeprecated
-      };
-    }
-    let typeForMessage;
-    if (category === ts50.DiagnosticCategory.Warning) {
-      typeForMessage = "Warning";
-    } else if (category === ts50.DiagnosticCategory.Suggestion) {
-      typeForMessage = "Suggestion";
-    } else if (category === ts50.DiagnosticCategory.Message) {
-      typeForMessage = "Message";
-    } else {
-      typeForMessage = "Error";
-    }
-    if (deprecatedDiagInfo !== void 0) {
-      relatedInformation.push(...deprecatedDiagInfo.relatedMessages ?? []);
-    }
-    relatedInformation.push({
-      category: ts50.DiagnosticCategory.Message,
-      code: 0,
-      file: componentSf,
-      // mapping.node represents either the 'template' or 'templateUrl' expression. getStart()
-      // and getEnd() are used because they don't include surrounding whitespace.
-      start: mapping.node.getStart(),
-      length: mapping.node.getEnd() - mapping.node.getStart(),
-      messageText: `${typeForMessage} occurs in the template of component ${componentName}.`
-    });
-    return {
-      source: "ngtsc",
-      category,
-      code,
-      messageText,
-      file: sf,
-      sourceFile: componentSf,
-      typeCheckId: id,
-      start: span.start.offset,
-      length: span.end.offset - span.start.offset,
-      // Show a secondary message indicating the component whose template contains the error.
-      relatedInformation,
-      reportsDeprecated: deprecatedDiagInfo?.reportsDeprecated
-    };
-  } else {
-    throw new Error(`Unexpected source mapping type: ${mapping.type}`);
-  }
-}
-var TemplateSourceFile = Symbol("TemplateSourceFile");
-function getParsedTemplateSourceFile(fileName, mapping) {
-  if (mapping[TemplateSourceFile] === void 0) {
-    mapping[TemplateSourceFile] = parseTemplateAsSourceFile(fileName, mapping.template);
-  }
-  return mapping[TemplateSourceFile];
-}
-var parseTemplateAsSourceFileForTest = null;
-function parseTemplateAsSourceFile(fileName, template) {
-  if (parseTemplateAsSourceFileForTest !== null) {
-    return parseTemplateAsSourceFileForTest(fileName, template);
-  }
-  return ts50.createSourceFile(
-    fileName,
-    template,
-    ts50.ScriptTarget.Latest,
-    /* setParentNodes */
-    false,
-    ts50.ScriptKind.JSX
-  );
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/id.js
-var TYPE_CHECK_ID_MAP = Symbol("TypeCheckId");
-function getTypeCheckId(clazz) {
-  const sf = clazz.getSourceFile();
-  if (sf[TYPE_CHECK_ID_MAP] === void 0) {
-    sf[TYPE_CHECK_ID_MAP] = /* @__PURE__ */ new Map();
-  }
-  if (sf[TYPE_CHECK_ID_MAP].get(clazz) === void 0) {
-    sf[TYPE_CHECK_ID_MAP].set(clazz, `tcb${sf[TYPE_CHECK_ID_MAP].size + 1}`);
-  }
-  return sf[TYPE_CHECK_ID_MAP].get(clazz);
-}
-
 // packages/compiler-cli/src/ngtsc/typecheck/src/completion.js
-import { EmptyExpr, ImplicitReceiver, PropertyRead, SafePropertyRead, ThisReceiver, TmplAstLetDeclaration, TmplAstReference, TmplAstTextAttribute } from "@angular/compiler";
-import ts51 from "typescript";
+import { EmptyExpr, ImplicitReceiver as ImplicitReceiver6, PropertyRead as PropertyRead7, SafePropertyRead as SafePropertyRead3, ThisReceiver as ThisReceiver5, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference2, TmplAstTextAttribute } from "@angular/compiler";
+import ts63 from "typescript";
 var CompletionEngine = class {
   tcb;
   data;
@@ -11558,7 +15332,7 @@ var CompletionEngine = class {
     this.tcbPath = tcbPath;
     this.tcbIsShim = tcbIsShim;
     const globalRead = findFirstMatchingNode(this.tcb, {
-      filter: ts51.isPropertyAccessExpression,
+      filter: ts63.isPropertyAccessExpression,
       withExpressionIdentifier: ExpressionIdentifier.COMPONENT_COMPLETION
     });
     if (globalRead !== null) {
@@ -11602,7 +15376,7 @@ var CompletionEngine = class {
     let nodeContext = null;
     if (node instanceof EmptyExpr) {
       const nodeLocation = findFirstMatchingNode(this.tcb, {
-        filter: ts51.isIdentifier,
+        filter: ts63.isIdentifier,
         withSpan: node.sourceSpan
       });
       if (nodeLocation !== null) {
@@ -11613,9 +15387,9 @@ var CompletionEngine = class {
         };
       }
     }
-    if (node instanceof PropertyRead && (node.receiver instanceof ImplicitReceiver || node.receiver instanceof ThisReceiver)) {
+    if (node instanceof PropertyRead7 && (node.receiver instanceof ImplicitReceiver6 || node.receiver instanceof ThisReceiver5)) {
       const nodeLocation = findFirstMatchingNode(this.tcb, {
-        filter: ts51.isPropertyAccessExpression,
+        filter: ts63.isPropertyAccessExpression,
         withSpan: node.sourceSpan
       });
       if (nodeLocation) {
@@ -11637,23 +15411,23 @@ var CompletionEngine = class {
       return this.expressionCompletionCache.get(expr);
     }
     let tsExpr = null;
-    if (expr instanceof PropertyRead) {
+    if (expr instanceof PropertyRead7) {
       tsExpr = findFirstMatchingNode(this.tcb, {
-        filter: ts51.isPropertyAccessExpression,
+        filter: ts63.isPropertyAccessExpression,
         withSpan: expr.nameSpan
       });
-    } else if (expr instanceof SafePropertyRead) {
+    } else if (expr instanceof SafePropertyRead3) {
       const ternaryExpr = findFirstMatchingNode(this.tcb, {
-        filter: ts51.isParenthesizedExpression,
+        filter: ts63.isParenthesizedExpression,
         withSpan: expr.sourceSpan
       });
-      if (ternaryExpr === null || !ts51.isConditionalExpression(ternaryExpr.expression)) {
+      if (ternaryExpr === null || !ts63.isConditionalExpression(ternaryExpr.expression)) {
         return null;
       }
       const whenTrue = ternaryExpr.expression.whenTrue;
-      if (ts51.isPropertyAccessExpression(whenTrue)) {
+      if (ts63.isPropertyAccessExpression(whenTrue)) {
         tsExpr = whenTrue;
-      } else if (ts51.isCallExpression(whenTrue) && ts51.isPropertyAccessExpression(whenTrue.expression)) {
+      } else if (ts63.isCallExpression(whenTrue) && ts63.isPropertyAccessExpression(whenTrue.expression)) {
         tsExpr = whenTrue.expression;
       }
     }
@@ -11675,15 +15449,15 @@ var CompletionEngine = class {
     let tsExpr = null;
     if (expr instanceof TmplAstTextAttribute) {
       const strNode = findFirstMatchingNode(this.tcb, {
-        filter: ts51.isParenthesizedExpression,
+        filter: ts63.isParenthesizedExpression,
         withSpan: expr.sourceSpan
       });
-      if (strNode !== null && ts51.isStringLiteral(strNode.expression)) {
+      if (strNode !== null && ts63.isStringLiteral(strNode.expression)) {
         tsExpr = strNode.expression;
       }
     } else {
       tsExpr = findFirstMatchingNode(this.tcb, {
-        filter: (n2) => ts51.isStringLiteral(n2) || ts51.isNumericLiteral(n2),
+        filter: (n2) => ts63.isStringLiteral(n2) || ts63.isNumericLiteral(n2),
         withSpan: expr.sourceSpan
       });
     }
@@ -11691,7 +15465,7 @@ var CompletionEngine = class {
       return null;
     }
     let positionInShimFile = tsExpr.getEnd();
-    if (ts51.isStringLiteral(tsExpr)) {
+    if (ts63.isStringLiteral(tsExpr)) {
       positionInShimFile -= 1;
     }
     const res = {
@@ -11712,12 +15486,12 @@ var CompletionEngine = class {
     }
     const templateContext = /* @__PURE__ */ new Map();
     for (const node of this.data.boundTarget.getEntitiesInScope(context)) {
-      if (node instanceof TmplAstReference) {
+      if (node instanceof TmplAstReference2) {
         templateContext.set(node.name, {
           kind: CompletionKind.Reference,
           node
         });
-      } else if (node instanceof TmplAstLetDeclaration) {
+      } else if (node instanceof TmplAstLetDeclaration3) {
         templateContext.set(node.name, {
           kind: CompletionKind.LetDeclaration,
           node
@@ -12798,649 +16572,8 @@ var MagicString = class _MagicString {
 import ts68 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/tcb_adapter.js
-import { AbsoluteSourceSpan as AbsoluteSourceSpan4, ExternalExpr as ExternalExpr7, TransplantedType, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.js
-import { R3Identifiers as R3Identifiers3 } from "@angular/compiler";
-import ts56 from "typescript";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.js
-import { R3Identifiers as R3Identifiers2 } from "@angular/compiler";
-import ts55 from "typescript";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/type_parameter_emitter.js
-import ts52 from "typescript";
-var TypeParameterEmitter = class {
-  typeParameters;
-  reflector;
-  constructor(typeParameters, reflector) {
-    this.typeParameters = typeParameters;
-    this.reflector = reflector;
-  }
-  /**
-   * Determines whether the type parameters can be emitted. If this returns true, then a call to
-   * `emit` is known to succeed. Vice versa, if false is returned then `emit` should not be
-   * called, as it would fail.
-   */
-  canEmit(canEmitReference) {
-    if (this.typeParameters === void 0) {
-      return true;
-    }
-    return this.typeParameters.every((typeParam) => {
-      return this.canEmitType(typeParam.constraint, canEmitReference) && this.canEmitType(typeParam.default, canEmitReference);
-    });
-  }
-  canEmitType(type, canEmitReference) {
-    if (type === void 0) {
-      return true;
-    }
-    return canEmitType(type, (typeReference) => {
-      const reference = this.resolveTypeReference(typeReference);
-      if (reference === null) {
-        return false;
-      }
-      if (reference instanceof Reference) {
-        return canEmitReference(reference);
-      }
-      return true;
-    });
-  }
-  /**
-   * Emits the type parameters using the provided emitter function for `Reference`s.
-   */
-  emit(emitReference) {
-    if (this.typeParameters === void 0) {
-      return void 0;
-    }
-    const emitter = new TypeEmitter((type) => this.translateTypeReference(type, emitReference));
-    return this.typeParameters.map((typeParam) => {
-      const constraint = typeParam.constraint !== void 0 ? emitter.emitType(typeParam.constraint) : void 0;
-      const defaultType = typeParam.default !== void 0 ? emitter.emitType(typeParam.default) : void 0;
-      return ts52.factory.updateTypeParameterDeclaration(typeParam, typeParam.modifiers, typeParam.name, constraint, defaultType);
-    });
-  }
-  resolveTypeReference(type) {
-    const target = ts52.isIdentifier(type.typeName) ? type.typeName : type.typeName.right;
-    const declaration = this.reflector.getDeclarationOfIdentifier(target);
-    if (declaration === null || declaration.node === null) {
-      return null;
-    }
-    if (this.isLocalTypeParameter(declaration.node)) {
-      return type;
-    }
-    let owningModule2 = null;
-    if (typeof declaration.viaModule === "string") {
-      owningModule2 = {
-        specifier: declaration.viaModule,
-        resolutionContext: type.getSourceFile().fileName
-      };
-    }
-    return new Reference(declaration.node, declaration.viaModule === AmbientImport ? AmbientImport : owningModule2);
-  }
-  translateTypeReference(type, emitReference) {
-    const reference = this.resolveTypeReference(type);
-    if (!(reference instanceof Reference)) {
-      return reference;
-    }
-    const typeNode = emitReference(reference);
-    if (typeNode === null) {
-      return null;
-    }
-    if (!ts52.isTypeReferenceNode(typeNode)) {
-      throw new Error(`Expected TypeReferenceNode for emitted reference, got ${ts52.SyntaxKind[typeNode.kind]}.`);
-    }
-    return typeNode;
-  }
-  isLocalTypeParameter(decl) {
-    return this.typeParameters.some((param) => param === decl);
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/host_bindings.js
-import { BindingType, CssSelector as CssSelector2, makeBindingParser, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstHostElement, AbsoluteSourceSpan as AbsoluteSourceSpan2, ParseSpan, PropertyRead as PropertyRead2, ParsedEventType, Call, ThisReceiver as ThisReceiver2, KeyedRead, LiteralPrimitive, RecursiveAstVisitor, ASTWithName, SafeCall, ImplicitReceiver as ImplicitReceiver2 } from "@angular/compiler";
-import ts53 from "typescript";
-var GUARD_COMMENT_TEXT = "hostBindingsBlockGuard";
-function createHostElement(type, selector, sourceNode, literal4, bindingDecorators, listenerDecorators) {
-  const bindings = [];
-  const listeners = [];
-  let parser = null;
-  if (literal4 !== null) {
-    for (const prop of literal4.properties) {
-      if (ts53.isPropertyAssignment(prop) && ts53.isStringLiteralLike(prop.initializer) && isStaticName(prop.name)) {
-        parser ??= makeBindingParser();
-        createNodeFromHostLiteralProperty(prop, parser, bindings, listeners);
-      }
-    }
-  }
-  for (const decorator of bindingDecorators) {
-    createNodeFromBindingDecorator(decorator, bindings);
-  }
-  for (const decorator of listenerDecorators) {
-    parser ??= makeBindingParser();
-    createNodeFromListenerDecorator(decorator, parser, listeners);
-  }
-  if (bindings.length === 0 && listeners.length === 0) {
-    return null;
-  }
-  const tagNames = [];
-  if (selector !== null) {
-    const parts = CssSelector2.parse(selector);
-    for (const part of parts) {
-      if (part.element !== null) {
-        tagNames.push(part.element);
-      }
-    }
-  }
-  if (tagNames.length === 0) {
-    tagNames.push(`ng-${type}`);
-  }
-  return new TmplAstHostElement(tagNames, bindings, listeners, createSourceSpan(sourceNode.name));
-}
-function createHostBindingsBlockGuard() {
-  return `(true /*${GUARD_COMMENT_TEXT}*/)`;
-}
-function isHostBindingsBlockGuard(node) {
-  if (!ts53.isIfStatement(node)) {
-    return false;
-  }
-  const expr = node.expression;
-  if (!ts53.isParenthesizedExpression(expr) || expr.expression.kind !== ts53.SyntaxKind.TrueKeyword) {
-    return false;
-  }
-  const text = expr.getSourceFile().text;
-  return ts53.forEachTrailingCommentRange(text, expr.expression.getEnd(), (pos, end, kind) => kind === ts53.SyntaxKind.MultiLineCommentTrivia && text.substring(pos + 2, end - 2) === GUARD_COMMENT_TEXT) || false;
-}
-function createNodeFromHostLiteralProperty(property, parser, bindings, listeners) {
-  const { name, initializer } = property;
-  if (name.text.startsWith("[") && name.text.endsWith("]")) {
-    const { attrName, type } = inferBoundAttribute(name.text.slice(1, -1));
-    const valueSpan = createStaticExpressionSpan(initializer);
-    const ast = parser.parseBinding(initializer.text, true, valueSpan, valueSpan.start.offset);
-    if (ast.errors.length > 0) {
-      return;
-    }
-    fixupSpans(ast, initializer);
-    bindings.push(new TmplAstBoundAttribute(attrName, type, 0, ast, null, createSourceSpan(property), createStaticExpressionSpan(name), valueSpan, void 0));
-  } else if (name.text.startsWith("(") && name.text.endsWith(")")) {
-    const events = [];
-    parser.parseEvent(name.text.slice(1, -1), initializer.text, false, createSourceSpan(property), createStaticExpressionSpan(initializer), [], events, createStaticExpressionSpan(name));
-    if (events.length === 0 || events[0].handler.errors.length > 0) {
-      return;
-    }
-    fixupSpans(events[0].handler, initializer);
-    listeners.push(TmplAstBoundEvent.fromParsedEvent(events[0]));
-  }
-}
-function createNodeFromBindingDecorator(decorator, bindings) {
-  if (!ts53.isCallExpression(decorator.expression)) {
-    return;
-  }
-  const args = decorator.expression.arguments;
-  const property = decorator.parent;
-  let nameNode = null;
-  let propertyName = null;
-  if (property && ts53.isPropertyDeclaration(property) && isStaticName(property.name)) {
-    propertyName = property.name;
-  }
-  if (args.length === 0) {
-    nameNode = propertyName;
-  } else if (ts53.isStringLiteralLike(args[0])) {
-    nameNode = args[0];
-  } else {
-    return;
-  }
-  if (nameNode === null || propertyName === null) {
-    return;
-  }
-  const span = new ParseSpan(-1, -1);
-  const propertyStart = property.getStart();
-  const receiver = new ThisReceiver2(span, new AbsoluteSourceSpan2(propertyStart, propertyStart));
-  const nameSpan = new AbsoluteSourceSpan2(propertyName.getStart(), propertyName.getEnd());
-  const read = ts53.isIdentifier(propertyName) ? new PropertyRead2(span, nameSpan, nameSpan, receiver, propertyName.text) : new KeyedRead(span, nameSpan, receiver, new LiteralPrimitive(span, nameSpan, propertyName.text));
-  const { attrName, type } = inferBoundAttribute(nameNode.text);
-  bindings.push(new TmplAstBoundAttribute(attrName, type, 0, read, null, createSourceSpan(decorator), createStaticExpressionSpan(nameNode), createSourceSpan(decorator), void 0));
-}
-function createNodeFromListenerDecorator(decorator, parser, listeners) {
-  if (!ts53.isCallExpression(decorator.expression) || decorator.expression.arguments.length === 0) {
-    return;
-  }
-  const args = decorator.expression.arguments;
-  const method = decorator.parent;
-  if (!method || !ts53.isMethodDeclaration(method) || !isStaticName(method.name) || !ts53.isStringLiteralLike(args[0])) {
-    return;
-  }
-  const span = new ParseSpan(-1, -1);
-  const argNodes = [];
-  const methodStart = method.getStart();
-  const methodReceiver = new ThisReceiver2(span, new AbsoluteSourceSpan2(methodStart, methodStart));
-  const nameSpan = new AbsoluteSourceSpan2(method.name.getStart(), method.name.getEnd());
-  const receiver = ts53.isIdentifier(method.name) ? new PropertyRead2(span, nameSpan, nameSpan, methodReceiver, method.name.text) : new KeyedRead(span, nameSpan, methodReceiver, new LiteralPrimitive(span, nameSpan, method.name.text));
-  if (args.length > 1 && ts53.isArrayLiteralExpression(args[1])) {
-    for (const expr of args[1].elements) {
-      if (ts53.isStringLiteralLike(expr)) {
-        const span2 = createStaticExpressionSpan(expr);
-        const ast = parser.parseBinding(expr.text, true, span2, span2.start.offset);
-        fixupSpans(ast, expr);
-        argNodes.push(ast);
-      } else {
-        const expressionSpan = new AbsoluteSourceSpan2(expr.getStart(), expr.getEnd());
-        const anyRead = new PropertyRead2(span, expressionSpan, expressionSpan, new ImplicitReceiver2(span, expressionSpan), "$any");
-        const anyCall = new Call(span, expressionSpan, anyRead, [new LiteralPrimitive(span, expressionSpan, 0)], expressionSpan);
-        argNodes.push(anyCall);
-      }
-    }
-  }
-  const callNode = new Call(span, nameSpan, receiver, argNodes, span);
-  const eventNameNode = args[0];
-  let type;
-  let eventName;
-  let phase;
-  let target;
-  if (eventNameNode.text.startsWith("@")) {
-    const parsedName = parser.parseLegacyAnimationEventName(eventNameNode.text);
-    type = ParsedEventType.LegacyAnimation;
-    eventName = parsedName.eventName;
-    phase = parsedName.phase;
-    target = null;
-  } else {
-    const parsedName = parser.parseEventListenerName(eventNameNode.text);
-    type = ParsedEventType.Regular;
-    eventName = parsedName.eventName;
-    target = parsedName.target;
-    phase = null;
-  }
-  listeners.push(new TmplAstBoundEvent(eventName, type, callNode, target, phase, createSourceSpan(decorator), createSourceSpan(decorator), createStaticExpressionSpan(eventNameNode)));
-}
-function inferBoundAttribute(name) {
-  const attrPrefix = "attr.";
-  const classPrefix = "class.";
-  const stylePrefix = "style.";
-  const animationPrefix = "animate.";
-  const legacyAnimationPrefix = "@";
-  let attrName;
-  let type;
-  if (name.startsWith(attrPrefix)) {
-    attrName = name.slice(attrPrefix.length);
-    type = BindingType.Attribute;
-  } else if (name.startsWith(classPrefix)) {
-    attrName = name.slice(classPrefix.length);
-    type = BindingType.Class;
-  } else if (name.startsWith(stylePrefix)) {
-    attrName = name.slice(stylePrefix.length);
-    type = BindingType.Style;
-  } else if (name.startsWith(animationPrefix)) {
-    attrName = name;
-    type = BindingType.Animation;
-  } else if (name.startsWith(legacyAnimationPrefix)) {
-    attrName = name.slice(legacyAnimationPrefix.length);
-    type = BindingType.LegacyAnimation;
-  } else {
-    attrName = name;
-    type = BindingType.Property;
-  }
-  return { attrName, type };
-}
-function isStaticName(node) {
-  return ts53.isIdentifier(node) || ts53.isStringLiteralLike(node);
-}
-function createStaticExpressionSpan(node) {
-  const span = createSourceSpan(node);
-  if (ts53.isStringLiteralLike(node)) {
-    span.fullStart = span.fullStart.moveBy(1);
-    span.start = span.start.moveBy(1);
-    span.end = span.end.moveBy(-1);
-  }
-  return span;
-}
-function fixupSpans(ast, initializer) {
-  const escapeIndex = initializer.getText().indexOf("\\", 1);
-  if (escapeIndex > -1) {
-    const newSpan = new ParseSpan(0, initializer.getWidth());
-    const newSourceSpan = new AbsoluteSourceSpan2(initializer.getStart(), initializer.getEnd());
-    ast.visit(new ReplaceSpanVisitor(escapeIndex, newSpan, newSourceSpan));
-  }
-}
-var ReplaceSpanVisitor = class extends RecursiveAstVisitor {
-  afterIndex;
-  overrideSpan;
-  overrideSourceSpan;
-  constructor(afterIndex, overrideSpan, overrideSourceSpan) {
-    super();
-    this.afterIndex = afterIndex;
-    this.overrideSpan = overrideSpan;
-    this.overrideSourceSpan = overrideSourceSpan;
-  }
-  visit(ast) {
-    if (ast.span.start >= this.afterIndex || ast.span.end >= this.afterIndex) {
-      ast.span = this.overrideSpan;
-      ast.sourceSpan = this.overrideSourceSpan;
-      if (ast instanceof ASTWithName) {
-        ast.nameSpan = this.overrideSourceSpan;
-      }
-      if (ast instanceof Call || ast instanceof SafeCall) {
-        ast.argumentSpan = this.overrideSourceSpan;
-      }
-    }
-    super.visit(ast);
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/codegen.js
-import { AbsoluteSourceSpan as AbsoluteSourceSpan3 } from "@angular/compiler";
-import ts54 from "typescript";
-var TcbExpr = class {
-  source;
-  /** Text for the content containing the expression's location information. */
-  spanComment = null;
-  /** Text for the content containing the expression's identifier. */
-  identifierComment = null;
-  /**
-   * Text of the comment instructing the type checker to
-   * ignore diagnostics coming from this expression.
-   */
-  ignoreComment = null;
-  constructor(source) {
-    this.source = source;
-  }
-  /**
-   * Converts the node's current state to a string.
-   * @param ignoreComments Whether the comments associated with the expression should be skipped.
-   */
-  print(ignoreComments = false) {
-    if (ignoreComments) {
-      return this.source;
-    }
-    return this.source + this.formatComment(this.identifierComment) + this.formatComment(this.ignoreComment) + this.formatComment(this.spanComment);
-  }
-  /**
-   * Adds a synthetic comment to the expression that represents the parse span of the provided node.
-   * This comment can later be retrieved as trivia of a node to recover original source locations.
-   * @param span Span from the parser containing the location information.
-   */
-  addParseSpanInfo(span) {
-    let start;
-    let end;
-    if (span instanceof AbsoluteSourceSpan3) {
-      start = span.start;
-      end = span.end;
-    } else {
-      start = span.start.offset;
-      end = span.end.offset;
-    }
-    this.spanComment = `${start},${end}`;
-    return this;
-  }
-  /** Marks the expression to be ignored for diagnostics. */
-  markIgnoreDiagnostics() {
-    this.ignoreComment = `${CommentTriviaType.DIAGNOSTIC}:ignore`;
-    return this;
-  }
-  /**
-   * Wraps the expression in parenthesis such that inserted
-   * span comments become attached to the proper node.
-   */
-  wrapForTypeChecker() {
-    this.source = `(${this.print()})`;
-    this.spanComment = this.identifierComment = this.ignoreComment = null;
-    return this;
-  }
-  /**
-   * Tags the expression with an identifier.
-   * @param identifier Identifier to apply to the expression.
-   */
-  addExpressionIdentifier(identifier) {
-    this.identifierComment = `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
-    return this;
-  }
-  /**
-   * `toString` implementation meant to catch errors like accidentally
-   * writing `foo ${expr} bar` instead of `foo ${expr.print()} bar`.
-   */
-  toString() {
-    throw new Error("Assertion error: TcbExpr should not be converted to a string through concatenation. Use the `print` method instead.");
-  }
-  /** Format a comment string as a TypeScript comment. */
-  formatComment(content) {
-    return content === null || content.length === 0 ? "" : ` /*${content}*/`;
-  }
-};
-function declareVariable(identifier, type) {
-  type.addExpressionIdentifier(ExpressionIdentifier.VARIABLE_AS_EXPRESSION);
-  return new TcbExpr(`var ${identifier.print()} = null! as ${type.print()}`);
-}
-function getStatementsBlock(expressions, singleLine = false) {
-  let result = "";
-  for (const expr of expressions) {
-    result += `${expr.print()};${singleLine ? " " : "\n"}`;
-  }
-  return result;
-}
-function quoteAndEscape(value) {
-  return JSON.stringify(value);
-}
-var tempPrinter = null;
-function tempPrint(node, sourceFile) {
-  tempPrinter ??= ts54.createPrinter();
-  return tempPrinter.printNode(ts54.EmitHint.Unspecified, node, sourceFile);
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.js
-var TCB_FILE_IMPORT_GRAPH_PREPARE_IDENTIFIERS = [
-  // Imports may be added for signal input checking. We wouldn't want to change the
-  // import graph for incremental compilations when suddenly a signal input is used,
-  // or removed.
-  R3Identifiers2.InputSignalBrandWriteType
-];
-var TcbInliningRequirement;
-(function(TcbInliningRequirement2) {
-  TcbInliningRequirement2[TcbInliningRequirement2["MustInline"] = 0] = "MustInline";
-  TcbInliningRequirement2[TcbInliningRequirement2["ShouldInlineForGenericBounds"] = 1] = "ShouldInlineForGenericBounds";
-  TcbInliningRequirement2[TcbInliningRequirement2["None"] = 2] = "None";
-})(TcbInliningRequirement || (TcbInliningRequirement = {}));
-function requiresInlineTypeCheckBlock(ref, env, usedPipes, reflector) {
-  if (!env.canReferenceType(ref)) {
-    return TcbInliningRequirement.MustInline;
-  } else if (!checkIfGenericTypeBoundsCanBeEmitted(ref.node, reflector, env)) {
-    return TcbInliningRequirement.ShouldInlineForGenericBounds;
-  } else if (usedPipes.some((pipeRef) => !env.canReferenceType(pipeRef))) {
-    return TcbInliningRequirement.MustInline;
-  } else {
-    return TcbInliningRequirement.None;
-  }
-}
-function getSourceMapping(shimSf, position, resolver, isDiagnosticRequest) {
-  const node = getTokenAtPosition(shimSf, position);
-  const sourceLocation = findSourceLocation(node, shimSf, isDiagnosticRequest);
-  if (sourceLocation === null) {
-    return null;
-  }
-  if (isInHostBindingTcb(node)) {
-    const hostSourceMapping = resolver.getHostBindingsMapping(sourceLocation.id);
-    const span2 = resolver.toHostParseSourceSpan(sourceLocation.id, sourceLocation.span);
-    if (span2 === null) {
-      return null;
-    }
-    return { sourceLocation, sourceMapping: hostSourceMapping, span: span2 };
-  }
-  const span = resolver.toTemplateParseSourceSpan(sourceLocation.id, sourceLocation.span);
-  if (span === null) {
-    return null;
-  }
-  return {
-    sourceLocation,
-    sourceMapping: resolver.getTemplateSourceMapping(sourceLocation.id),
-    span
-  };
-}
-function isInHostBindingTcb(node) {
-  let current = node;
-  while (current && !ts55.isFunctionDeclaration(current)) {
-    if (isHostBindingsBlockGuard(current)) {
-      return true;
-    }
-    current = current.parent;
-  }
-  return false;
-}
-function findTypeCheckBlock(file, id, isDiagnosticRequest) {
-  for (const stmt of file.statements) {
-    if (ts55.isFunctionDeclaration(stmt) && getTypeCheckId2(stmt, file, isDiagnosticRequest) === id) {
-      return stmt;
-    }
-  }
-  return findNodeInFile(file, (node) => ts55.isFunctionDeclaration(node) && getTypeCheckId2(node, file, isDiagnosticRequest) === id);
-}
-function findSourceLocation(node, sourceFile, isDiagnosticsRequest) {
-  while (node !== void 0 && !ts55.isFunctionDeclaration(node)) {
-    if (hasIgnoreForDiagnosticsMarker(node, sourceFile) && isDiagnosticsRequest) {
-      return null;
-    }
-    const span = readSpanComment(node, sourceFile);
-    if (span !== null) {
-      const id = getTypeCheckId2(node, sourceFile, isDiagnosticsRequest);
-      if (id === null) {
-        return null;
-      }
-      return { id, span };
-    }
-    node = node.parent;
-  }
-  return null;
-}
-function getTypeCheckId2(node, sourceFile, isDiagnosticRequest) {
-  while (!ts55.isFunctionDeclaration(node)) {
-    if (hasIgnoreForDiagnosticsMarker(node, sourceFile) && isDiagnosticRequest) {
-      return null;
-    }
-    node = node.parent;
-    if (node === void 0) {
-      return null;
-    }
-  }
-  const start = node.getFullStart();
-  return ts55.forEachLeadingCommentRange(sourceFile.text, start, (pos, end, kind) => {
-    if (kind !== ts55.SyntaxKind.MultiLineCommentTrivia) {
-      return null;
-    }
-    const commentText = sourceFile.text.substring(pos + 2, end - 2);
-    return commentText;
-  }) || null;
-}
-function ensureTypeCheckFilePreparationImports(env) {
-  for (const identifier of TCB_FILE_IMPORT_GRAPH_PREPARE_IDENTIFIERS) {
-    env.importManager.addImport({
-      exportModuleSpecifier: identifier.moduleName,
-      exportSymbolName: identifier.name,
-      requestedFile: env.contextFile
-    });
-  }
-}
-function checkIfGenericTypeBoundsCanBeEmitted(node, reflector, env) {
-  const emitter = new TypeParameterEmitter(node.typeParameters, reflector);
-  return emitter.canEmit((ref) => env.canReferenceType(ref));
-}
-function findNodeInFile(file, predicate) {
-  const visit2 = (node) => {
-    if (predicate(node)) {
-      return node;
-    }
-    return ts55.forEachChild(node, visit2) ?? null;
-  };
-  return ts55.forEachChild(file, visit2) ?? null;
-}
-function generateTcbTypeParameters(typeParameters, sourceFile) {
-  return typeParameters.map((p) => {
-    const representation = tempPrint(p, sourceFile);
-    return {
-      name: p.name.text,
-      representation,
-      representationWithDefault: p.default ? representation : `${representation} = any`
-    };
-  });
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.js
-function generateTypeCtorDeclarationFn(env, meta, nodeTypeRef, typeParams) {
-  const typeArgs = generateGenericArgs(typeParams);
-  const typeRef = ts56.isIdentifier(nodeTypeRef) ? nodeTypeRef.text : tempPrint(nodeTypeRef, nodeTypeRef.getSourceFile());
-  const typeRefWithGenerics = `${typeRef}${typeArgs}`;
-  const initParam = constructTypeCtorParameter(env, meta, typeRef, typeRefWithGenerics);
-  const typeParameters = typeParametersWithDefaultTypes(typeParams);
-  let source;
-  if (meta.body) {
-    const fnType = `${typeParameters}(${initParam}) => ${typeRefWithGenerics}`;
-    source = `const ${meta.fnName}: ${fnType} = null!`;
-  } else {
-    source = `declare function ${meta.fnName}${typeParameters}(${initParam}): ${typeRefWithGenerics}`;
-  }
-  return new TcbExpr(source);
-}
-function generateInlineTypeCtor(env, node, meta) {
-  const typeRef = node.name.text;
-  const sourceFile = node.getSourceFile();
-  const tcbTypeParams = node.typeParameters && node.typeParameters.length > 0 ? generateTcbTypeParameters(node.typeParameters, sourceFile) : void 0;
-  const typeRefWithGenerics = `${typeRef}${generateGenericArgs(tcbTypeParams)}`;
-  const initParam = constructTypeCtorParameter(env, meta, typeRef, typeRefWithGenerics);
-  const body = `{ return null!; }`;
-  const typeParams = typeParametersWithDefaultTypes(tcbTypeParams);
-  return `static ${meta.fnName}${typeParams}(${initParam}): ${typeRefWithGenerics} ${body}`;
-}
-function constructTypeCtorParameter(env, meta, typeRef, typeRefWithGenerics) {
-  let initType = null;
-  const plainKeys = [];
-  const coercedKeys = [];
-  const signalInputKeys = [];
-  for (const { classPropertyName, transformType, isSignal } of meta.fields.inputs) {
-    if (isSignal) {
-      signalInputKeys.push(quoteAndEscape(classPropertyName));
-    } else if (!meta.coercedInputFields.has(classPropertyName)) {
-      plainKeys.push(quoteAndEscape(classPropertyName));
-    } else {
-      const coercionType = transformType !== void 0 ? transformType : `typeof ${typeRef}.ngAcceptInputType_${classPropertyName}`;
-      coercedKeys.push(`${classPropertyName}: ${coercionType}`);
-    }
-  }
-  if (plainKeys.length > 0) {
-    initType = `Pick<${typeRefWithGenerics}, ${plainKeys.join(" | ")}>`;
-  }
-  if (coercedKeys.length > 0) {
-    let coercedLiteral = "{\n";
-    for (const key of coercedKeys) {
-      coercedLiteral += `${key};
-`;
-    }
-    coercedLiteral += "}";
-    initType = initType !== null ? `${initType} & ${coercedLiteral}` : coercedLiteral;
-  }
-  if (signalInputKeys.length > 0) {
-    const keyTypeUnion = signalInputKeys.join(" | ");
-    const unwrapRef = env.referenceExternalSymbol(R3Identifiers3.UnwrapDirectiveSignalInputs.moduleName, R3Identifiers3.UnwrapDirectiveSignalInputs.name);
-    const unwrapExpr = `${unwrapRef.print()}<${typeRefWithGenerics}, ${keyTypeUnion}>`;
-    initType = initType !== null ? `${initType} & ${unwrapExpr}` : unwrapExpr;
-  }
-  if (initType === null) {
-    initType = "{}";
-  }
-  return `init: ${initType}`;
-}
-function generateGenericArgs(typeParameters) {
-  if (typeParameters === void 0 || typeParameters.length === 0) {
-    return "";
-  }
-  return `<${typeParameters.map((param) => param.name).join(", ")}>`;
-}
-function requiresInlineTypeCtor(node, host, env) {
-  return !checkIfGenericTypeBoundsCanBeEmitted(node, host, env);
-}
-function typeParametersWithDefaultTypes(params) {
-  if (params === void 0 || params.length === 0) {
-    return "";
-  }
-  return `<${params.map((param) => param.representationWithDefault).join(", ")}>`;
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/tcb_adapter.js
-import ts57 from "typescript";
+import { AbsoluteSourceSpan as AbsoluteSourceSpan4, ExternalExpr as ExternalExpr8, TransplantedType, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
+import ts64 from "typescript";
 function adaptTypeCheckBlockMetadata(ref, meta, env) {
   const refCache = /* @__PURE__ */ new Map();
   const extractRef = (ref2) => {
@@ -13484,7 +16617,7 @@ function adaptTypeCheckBlockMetadata(ref, meta, env) {
       animationTriggerNames: dir.animationTriggerNames,
       ngTemplateGuards: dir.ngTemplateGuards,
       hasNgTemplateContextGuard: dir.hasNgTemplateContextGuard,
-      hasNgFieldDirective: ts57.isClassDeclaration(dir.ref.node) && dir.ref.node.members.some((member) => ts57.isPropertyDeclaration(member) && ts57.isComputedPropertyName(member.name) && ts57.isIdentifier(member.name.expression) && member.name.expression.text === "\u0275NgFieldDirective"),
+      hasNgFieldDirective: ts64.isClassDeclaration(dir.ref.node) && dir.ref.node.members.some((member) => ts64.isPropertyDeclaration(member) && ts64.isComputedPropertyName(member.name) && ts64.isIdentifier(member.name.expression) && member.name.expression.text === "\u0275NgFieldDirective"),
       coercedInputFields: dir.coercedInputFields,
       restrictedInputFields: dir.restrictedInputFields,
       stringLiteralInputFields: dir.stringLiteralInputFields,
@@ -13605,7 +16738,7 @@ function extractReferenceMetadata(ref, env) {
   let isLocal = true;
   const emitted = env.refEmitter.emit(ref, env.contextFile, ImportFlags.NoAliasing);
   if (emitted.kind === ReferenceEmitKind.Success) {
-    if (emitted.expression instanceof ExternalExpr7) {
+    if (emitted.expression instanceof ExternalExpr8) {
       name = emitted.expression.value.name;
       moduleName = emitted.expression.value.moduleName;
       isLocal = false;
@@ -13634,281 +16767,18 @@ function extractReferenceMetadata(ref, env) {
   return refMeta;
 }
 function extractNameFromExpr(node) {
-  if (ts57.isIdentifier(node)) {
+  if (ts64.isIdentifier(node)) {
     return node.text;
-  } else if (ts57.isPropertyAccessExpression(node)) {
+  } else if (ts64.isPropertyAccessExpression(node)) {
     const receiver = extractNameFromExpr(node.expression);
     return receiver !== null ? `${receiver}.${node.name.text}` : null;
   }
   return null;
 }
 
-// packages/compiler-cli/src/ngtsc/typecheck/src/dom.js
-import { DomElementSchemaRegistry } from "@angular/compiler";
-import ts58 from "typescript";
-var REGISTRY = new DomElementSchemaRegistry();
-var REMOVE_XHTML_REGEX = /^:xhtml:/;
-var RegistryDomSchemaChecker = class {
-  resolver;
-  _diagnostics = [];
-  get diagnostics() {
-    return this._diagnostics;
-  }
-  constructor(resolver) {
-    this.resolver = resolver;
-  }
-  checkElement(id, tagName, sourceSpanForDiagnostics, schemas, hostIsStandalone) {
-    const name = tagName.replace(REMOVE_XHTML_REGEX, "");
-    if (!REGISTRY.hasElement(name, schemas)) {
-      const mapping = this.resolver.getTemplateSourceMapping(id);
-      const schemas2 = `'${hostIsStandalone ? "@Component" : "@NgModule"}.schemas'`;
-      let errorMsg = `'${name}' is not a known element:
-`;
-      errorMsg += `1. If '${name}' is an Angular component, then verify that it is ${hostIsStandalone ? "included in the '@Component.imports' of this component" : "part of this module"}.
-`;
-      if (name.indexOf("-") > -1) {
-        errorMsg += `2. If '${name}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.`;
-      } else {
-        errorMsg += `2. To allow any element add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
-      }
-      const diag = makeTemplateDiagnostic(id, mapping, sourceSpanForDiagnostics, ts58.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ELEMENT), errorMsg);
-      this._diagnostics.push(diag);
-    }
-  }
-  checkTemplateElementProperty(id, tagName, name, span, schemas, hostIsStandalone) {
-    if (!REGISTRY.hasProperty(tagName, name, schemas)) {
-      const mapping = this.resolver.getTemplateSourceMapping(id);
-      const decorator = hostIsStandalone ? "@Component" : "@NgModule";
-      const schemas2 = `'${decorator}.schemas'`;
-      let errorMsg = `Can't bind to '${name}' since it isn't a known property of '${tagName}'.`;
-      if (tagName.startsWith("ng-")) {
-        errorMsg += `
-1. If '${name}' is an Angular directive, then add 'CommonModule' to the '${decorator}.imports' of this component.
-2. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
-      } else if (tagName.indexOf("-") > -1) {
-        errorMsg += `
-1. If '${tagName}' is an Angular component and it has '${name}' input, then verify that it is ${hostIsStandalone ? "included in the '@Component.imports' of this component" : "part of this module"}.
-2. If '${tagName}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.
-3. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
-      }
-      const diag = makeTemplateDiagnostic(id, mapping, span, ts58.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
-      this._diagnostics.push(diag);
-    }
-  }
-  checkHostElementProperty(id, element, name, span, schemas) {
-    for (const tagName of element.tagNames) {
-      if (REGISTRY.hasProperty(tagName, name, schemas)) {
-        continue;
-      }
-      const errorMessage = `Can't bind to '${name}' since it isn't a known property of '${tagName}'.`;
-      const mapping = this.resolver.getHostBindingsMapping(id);
-      const diag = makeTemplateDiagnostic(id, mapping, span, ts58.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMessage);
-      this._diagnostics.push(diag);
-      break;
-    }
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/environment.js
-import ts60 from "typescript";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/reference_emit_environment.js
-import { ExpressionType, ExternalExpr as ExternalExpr8, TypeModifier } from "@angular/compiler";
-import ts59 from "typescript";
-var ReferenceEmitEnvironment = class {
-  importManager;
-  refEmitter;
-  reflector;
-  contextFile;
-  constructor(importManager, refEmitter, reflector, contextFile) {
-    this.importManager = importManager;
-    this.refEmitter = refEmitter;
-    this.reflector = reflector;
-    this.contextFile = contextFile;
-  }
-  canReferenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
-    const result = this.refEmitter.emit(ref, this.contextFile, flags);
-    return result.kind === ReferenceEmitKind.Success;
-  }
-  /**
-   * Generate a `ts.TypeNode` that references the given node as a type.
-   *
-   * This may involve importing the node into the file if it's not declared there already.
-   */
-  referenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
-    const ngExpr = this.refEmitter.emit(ref, this.contextFile, flags);
-    assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "symbol");
-    return translateType(new ExpressionType(ngExpr.expression), this.contextFile, this.reflector, this.refEmitter, this.importManager);
-  }
-  /**
-   * Generates a `ts.TypeNode` from a `TcbReferenceMetadata` object.
-   * This is used by the TCB operations which do not hold on to the original `ts.Declaration`.
-   *
-   * Note: It's important that we do not try to evaluate the `typeParameters` here and pad them
-   * out with `any` type arguments. If we supply `any` to a generic pipe (e.g. `var _pipe1: MyPipe<any>;`),
-   * it destroys the generic constraints and degrades the `transform` signature. When they are omitted
-   * entirely, TypeScript implicitly flags an error, which the Angular compiler filters out, and
-   * crucially recovers by falling back to constraint inference (e.g. `var _pipe1: MyPipe;` infers
-   * bounds safely).
-   */
-  referenceTcbType(ref) {
-    if (ref.unexportedDiagnostic !== null || ref.isLocal || ref.moduleName === null) {
-      if (ref.unexportedDiagnostic !== null) {
-        throw new FatalDiagnosticError(
-          ErrorCode.IMPORT_GENERATION_FAILURE,
-          this.contextFile,
-          // Using context file as fallback origin for external file since we lack exact node
-          makeDiagnosticChain(`Unable to import symbol ${ref.name}.`, [
-            makeDiagnosticChain(ref.unexportedDiagnostic)
-          ])
-        );
-      }
-      return ts59.factory.createTypeReferenceNode(ref.name);
-    }
-    return this.referenceExternalType(ref.moduleName, ref.name);
-  }
-  /**
-   * Generates a `TcbExpr` from a `TcbReferenceMetadata` object.
-   */
-  referenceTcbValue(ref) {
-    if (ref.unexportedDiagnostic !== null || ref.isLocal || ref.moduleName === null) {
-      if (ref.unexportedDiagnostic !== null) {
-        throw new FatalDiagnosticError(ErrorCode.IMPORT_GENERATION_FAILURE, this.contextFile, makeDiagnosticChain(`Unable to import symbol ${ref.name}.`, [
-          makeDiagnosticChain(ref.unexportedDiagnostic)
-        ]));
-      }
-      return new TcbExpr(ref.name);
-    }
-    return this.referenceExternalSymbol(ref.moduleName, ref.name);
-  }
-  referenceExternalSymbol(moduleName, name) {
-    const importResult = this.importManager.addImport({
-      exportModuleSpecifier: moduleName,
-      exportSymbolName: name,
-      requestedFile: this.contextFile
-    });
-    if (ts59.isIdentifier(importResult)) {
-      return new TcbExpr(importResult.text);
-    } else if (ts59.isIdentifier(importResult.expression)) {
-      return new TcbExpr(`${importResult.expression.text}.${importResult.name.text}`);
-    }
-    throw new Error("Unexpected value returned by import manager");
-  }
-  /**
-   * Generate a `ts.TypeNode` that references a given type from the provided module.
-   *
-   * This will involve importing the type into the file, and will also add type parameters if
-   * provided.
-   */
-  referenceExternalType(moduleName, name, typeParams) {
-    const external = new ExternalExpr8({ moduleName, name });
-    return translateType(new ExpressionType(external, TypeModifier.None, typeParams), this.contextFile, this.reflector, this.refEmitter, this.importManager);
-  }
-  /**
-   * Generates a `ts.TypeNode` representing a type that is being referenced from a different place
-   * in the program. Any type references inside the transplanted type will be rewritten so that
-   * they can be imported in the context file.
-   */
-  referenceTransplantedType(type) {
-    return translateType(type, this.contextFile, this.reflector, this.refEmitter, this.importManager);
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/environment.js
-var Environment = class extends ReferenceEmitEnvironment {
-  config;
-  nextIds = {
-    pipeInst: 1,
-    typeCtor: 1
-  };
-  typeCtors = /* @__PURE__ */ new Map();
-  typeCtorStatements = [];
-  pipeInsts = /* @__PURE__ */ new Map();
-  pipeInstStatements = [];
-  constructor(config, importManager, refEmitter, reflector, contextFile) {
-    super(importManager, refEmitter, reflector, contextFile);
-    this.config = config;
-  }
-  /**
-   * Get an expression referring to a type constructor for the given directive.
-   *
-   * Depending on the shape of the directive itself, this could be either a reference to a declared
-   * type constructor, or to an inline type constructor.
-   */
-  typeCtorFor(dir) {
-    const key = getTcbReferenceKey(dir.ref);
-    if (this.typeCtors.has(key)) {
-      return new TcbExpr(this.typeCtors.get(key));
-    }
-    if (dir.hasRequiresInlineTypeCtor) {
-      const typeCtorExpr = `${this.referenceTcbValue(dir.ref).print()}.ngTypeCtor`;
-      this.typeCtors.set(key, typeCtorExpr);
-      return new TcbExpr(typeCtorExpr);
-    } else {
-      const fnName = `_ctor${this.nextIds.typeCtor++}`;
-      const nodeTypeRef = this.referenceTcbType(dir.ref);
-      if (!ts60.isTypeReferenceNode(nodeTypeRef)) {
-        throw new Error(`Expected TypeReferenceNode from reference to ${dir.ref.name}`);
-      }
-      const meta = {
-        fnName,
-        body: true,
-        fields: {
-          inputs: dir.inputs
-          // TODO: support queries
-        },
-        coercedInputFields: dir.coercedInputFields
-      };
-      const typeParams = dir.typeParameters || void 0;
-      const typeCtor = generateTypeCtorDeclarationFn(this, meta, nodeTypeRef.typeName, typeParams);
-      this.typeCtorStatements.push(typeCtor);
-      this.typeCtors.set(key, fnName);
-      return new TcbExpr(fnName);
-    }
-  }
-  /*
-   * Get an expression referring to an instance of the given pipe.
-   */
-  pipeInst(pipe) {
-    const key = getTcbReferenceKey(pipe.ref);
-    if (this.pipeInsts.has(key)) {
-      return new TcbExpr(this.pipeInsts.get(key));
-    }
-    const pipeType = this.referenceTcbType(pipe.ref);
-    const pipeInstId = `_pipe${this.nextIds.pipeInst++}`;
-    this.pipeInsts.set(key, pipeInstId);
-    this.pipeInstStatements.push(declareVariable(new TcbExpr(pipeInstId), new TcbExpr(tempPrint(pipeType, this.contextFile))));
-    return new TcbExpr(pipeInstId);
-  }
-  /**
-   * Generate a `ts.Expression` that references the given node.
-   *
-   * This may involve importing the node into the file if it's not declared there already.
-   */
-  reference(ref) {
-    const ngExpr = this.refEmitter.emit(ref, this.contextFile, ImportFlags.NoAliasing);
-    assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "class");
-    const tsExpression = translateExpression(this.contextFile, ngExpr.expression, this.importManager);
-    return new TcbExpr(tempPrint(tsExpression, this.contextFile));
-  }
-  emitTypeParameters(declaration) {
-    const emitter = new TypeParameterEmitter(declaration.typeParameters, this.reflector);
-    return emitter.emit((ref) => this.referenceType(ref));
-  }
-  getPreludeStatements() {
-    return [...this.pipeInstStatements, ...this.typeCtorStatements];
-  }
-};
-function getTcbReferenceKey(ref) {
-  if (ref.nodeFilePath !== void 0 && ref.nodeNameSpan !== void 0) {
-    return `${ref.nodeFilePath}#${ref.nodeNameSpan.start}`;
-  }
-  return ref.moduleName ? `${ref.moduleName}#${ref.name}` : ref.name;
-}
-
 // packages/compiler-cli/src/ngtsc/typecheck/src/oob.js
-import { AbsoluteSourceSpan as AbsoluteSourceSpan5, BindingType as BindingType2, ParseSourceSpan as ParseSourceSpan2, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent as TmplAstBoundEvent2, TmplAstComponent, TmplAstDirective, TmplAstElement } from "@angular/compiler";
-import ts61 from "typescript";
+import { AbsoluteSourceSpan as AbsoluteSourceSpan5, BindingType as BindingType6, ParseSourceSpan as ParseSourceSpan2, TmplAstBoundAttribute as TmplAstBoundAttribute4, TmplAstBoundEvent as TmplAstBoundEvent2, TmplAstComponent as TmplAstComponent3, TmplAstDirective as TmplAstDirective2, TmplAstElement as TmplAstElement8 } from "@angular/compiler";
+import ts65 from "typescript";
 var OutOfBandDiagnosticRecorderImpl = class {
   resolver;
   getSourceFile;
@@ -13945,7 +16815,7 @@ var OutOfBandDiagnosticRecorderImpl = class {
     const mapping = this.resolver.getTemplateSourceMapping(id);
     const value = ref.value.trim();
     const errorMsg = `No directive found with exportAs '${value}'.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, ref.valueSpan || ref.sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REFERENCE_TARGET), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, ref.valueSpan || ref.sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REFERENCE_TARGET), errorMsg));
   }
   missingPipe(id, ast, isStandalone) {
     if (this.recordedPipes.has(ast)) {
@@ -13968,7 +16838,7 @@ To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" 
 To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" and add it to the "imports" array of the module declaring the component.`;
       }
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
     this.recordedPipes.add(ast);
   }
   deferredPipeUsedEagerly(id, ast) {
@@ -13981,7 +16851,7 @@ To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" 
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
     this.recordedPipes.add(ast);
   }
   deferredComponentUsedEagerly(id, element) {
@@ -13993,12 +16863,12 @@ To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" 
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${element.name}'.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
   }
   duplicateTemplateVar(id, variable, firstDecl) {
     const mapping = this.resolver.getTemplateSourceMapping(id);
     const errorMsg = `Cannot redeclare variable '${variable.name}' as it was previously declared elsewhere for the same template.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, variable.sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, variable.sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [
       {
         text: `The variable '${firstDecl.name}' was first declared here.`,
         start: firstDecl.sourceSpan.start.offset,
@@ -14039,7 +16909,7 @@ To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" 
     const message = `This structural directive supports advanced type inference, but the current compiler configuration prevents its usage. The variable ${varIdentification} will have type 'any' as a result.
 
 Consider enabling the 'strictTemplates' option in your tsconfig.json for better type inference within this template.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, diagnosticVar.keySpan, ts61.DiagnosticCategory.Suggestion, ngErrorCode(ErrorCode.SUGGEST_SUBOPTIMAL_TYPE_INFERENCE), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, diagnosticVar.keySpan, ts65.DiagnosticCategory.Suggestion, ngErrorCode(ErrorCode.SUGGEST_SUBOPTIMAL_TYPE_INFERENCE), message));
   }
   splitTwoWayBinding(id, input, output, inputConsumer, outputConsumer) {
     const mapping = this.resolver.getTemplateSourceMapping(id);
@@ -14057,7 +16927,7 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
         });
       }
     }
-    if (outputConsumer instanceof TmplAstElement) {
+    if (outputConsumer instanceof TmplAstElement8) {
       let message = `The event half of the binding is to a native event called '${input.name}' on the <${outputConsumer.name}> DOM element.`;
       if (!mapping.node.getSourceFile().isDeclarationFile) {
         message += `
@@ -14083,15 +16953,15 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
         }
       }
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, input.keySpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SPLIT_TWO_WAY_BINDING), errorMsg, relatedMessages));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, input.keySpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SPLIT_TWO_WAY_BINDING), errorMsg, relatedMessages));
   }
   missingRequiredInputs(id, element, directiveName, isComponent, inputAliases) {
     const message = `Required input${inputAliases.length === 1 ? "" : "s"} ${inputAliases.map((n2) => `'${n2}'`).join(", ")} from ${isComponent ? "component" : "directive"} ${directiveName} must be specified.`;
     let span;
     let name;
-    if (element instanceof TmplAstElement || element instanceof TmplAstDirective) {
+    if (element instanceof TmplAstElement8 || element instanceof TmplAstDirective2) {
       name = element.name;
-    } else if (element instanceof TmplAstComponent) {
+    } else if (element instanceof TmplAstComponent3) {
       name = element.componentName;
     } else {
       name = null;
@@ -14103,7 +16973,7 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
       const end = element.startSourceSpan.end.moveBy(start.offset + name.length - element.startSourceSpan.end.offset);
       span = new ParseSourceSpan2(start, end);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
   }
   illegalForLoopTrackAccess(id, block, access) {
     const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, access.sourceSpan);
@@ -14112,7 +16982,7 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
     }
     const messageVars = [block.item, ...block.contextVariables.filter((v) => v.value === "$index")].map((v) => `'${v.name}'`).join(", ");
     const message = `Cannot access '${access.name}' inside of a track expression. Only ${messageVars} and properties on the containing component are available to this expression.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
   }
   inaccessibleDeferredTriggerElement(id, trigger) {
     let message;
@@ -14123,7 +16993,7 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
 Check that an element with #${trigger.reference} exists in the same template and it's accessible from the @defer block.
 Deferred blocks can only access triggers in same view, a parent embedded view or the root view of the @placeholder block.`;
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
   }
   controlFlowPreventingContentProjection(id, category, projectionNode, componentName, slotSelector, controlFlowNode, preservesWhitespaces) {
     const blockName = controlFlowNode.nameSpan.toString().trim();
@@ -14145,51 +17015,51 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for property write.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_LET_WRITE), `Cannot assign to @let declaration '${target.name}'.`));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_LET_WRITE), `Cannot assign to @let declaration '${target.name}'.`));
   }
   letUsedBeforeDefinition(id, node, target) {
     const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, node.sourceSpan);
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for property read.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.LET_USED_BEFORE_DEFINITION), `Cannot read @let declaration '${target.name}' before it has been defined.`));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.LET_USED_BEFORE_DEFINITION), `Cannot read @let declaration '${target.name}' before it has been defined.`));
   }
   conflictingDeclaration(id, decl) {
     const mapping = this.resolver.getTemplateSourceMapping(id);
     const errorMsg = `Cannot declare @let called '${decl.name}' as there is another symbol in the template with the same name.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, decl.sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_LET_DECLARATION), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, decl.sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_LET_DECLARATION), errorMsg));
   }
   missingNamedTemplateDependency(id, node) {
     this._diagnostics.push(makeTemplateDiagnostic(
       id,
       this.resolver.getTemplateSourceMapping(id),
       node.startSourceSpan,
-      ts61.DiagnosticCategory.Error,
+      ts65.DiagnosticCategory.Error,
       ngErrorCode(ErrorCode.MISSING_NAMED_TEMPLATE_DEPENDENCY),
       // Wording is meant to mimic the wording TS uses in their diagnostic for missing symbols.
-      `Cannot find name "${node instanceof TmplAstDirective ? node.name : node.componentName}". Selectorless references are only supported to classes or non-type import statements.`
+      `Cannot find name "${node instanceof TmplAstDirective2 ? node.name : node.componentName}". Selectorless references are only supported to classes or non-type import statements.`
     ));
   }
   incorrectTemplateDependencyType(id, node) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.startSourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE), `Incorrect reference type. Type must be a standalone ${node instanceof TmplAstComponent ? "@Component" : "@Directive"}.`));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.startSourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE), `Incorrect reference type. Type must be a standalone ${node instanceof TmplAstComponent3 ? "@Component" : "@Directive"}.`));
   }
   unclaimedDirectiveBinding(id, directive, node) {
     const errorMsg = `Directive ${directive.name} does not have an ${node instanceof TmplAstBoundEvent2 ? "output" : "input"} named "${node.name}". Bindings to directives must target existing inputs or outputs.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.keySpan || node.sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_DIRECTIVE_BINDING), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.keySpan || node.sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_DIRECTIVE_BINDING), errorMsg));
   }
   deferImplicitTriggerMissingPlaceholder(id, trigger) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block"));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block"));
   }
   deferImplicitTriggerInvalidPlaceholder(id, trigger) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block with exactly one root element node"));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block with exactly one root element node"));
   }
   formFieldUnsupportedBinding(id, node) {
     let message;
-    if (node instanceof TmplAstBoundAttribute2) {
+    if (node instanceof TmplAstBoundAttribute4) {
       let name;
-      if (node.type === BindingType2.Property) {
+      if (node.type === BindingType6.Property) {
         name = `[${node.name}]`;
-      } else if (node.type === BindingType2.Attribute) {
+      } else if (node.type === BindingType6.Attribute) {
         name = `[attr.${node.name}]`;
       } else {
         name = node.name;
@@ -14198,7 +17068,7 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     } else {
       message = `Setting the '${node.name}' attribute is not allowed on nodes using the '[formField]' directive`;
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.sourceSpan, ts61.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FORM_FIELD_UNSUPPORTED_BINDING), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.sourceSpan, ts65.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FORM_FIELD_UNSUPPORTED_BINDING), message));
   }
 };
 function makeInlineDiagnostic(id, code, node, messageText, relatedInformation) {
@@ -14210,7 +17080,7 @@ function makeInlineDiagnostic(id, code, node, messageText, relatedInformation) {
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/shim.js
-import ts62 from "typescript";
+import ts66 from "typescript";
 var TypeCheckShimGenerator = class {
   extensionPrefix = "ngtypecheck";
   shouldEmit = false;
@@ -14218,2880 +17088,12 @@ var TypeCheckShimGenerator = class {
     if (priorShimSf !== null) {
       return priorShimSf;
     }
-    return ts62.createSourceFile(genFilePath, "export const USED_FOR_NG_TYPE_CHECKING = true;", ts62.ScriptTarget.Latest, true, ts62.ScriptKind.TS);
+    return ts66.createSourceFile(genFilePath, "export const USED_FOR_NG_TYPE_CHECKING = true;", ts66.ScriptTarget.Latest, true, ts66.ScriptKind.TS);
   }
   static shimFor(fileName) {
     return absoluteFrom(fileName.replace(/\.tsx?$/, ".ngtypecheck.ts"));
   }
 };
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.js
-import ts66 from "typescript";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/context.js
-var TcbGenericContextBehavior;
-(function(TcbGenericContextBehavior2) {
-  TcbGenericContextBehavior2[TcbGenericContextBehavior2["UseEmitter"] = 0] = "UseEmitter";
-  TcbGenericContextBehavior2[TcbGenericContextBehavior2["CopyClassNodes"] = 1] = "CopyClassNodes";
-  TcbGenericContextBehavior2[TcbGenericContextBehavior2["FallbackToAny"] = 2] = "FallbackToAny";
-})(TcbGenericContextBehavior || (TcbGenericContextBehavior = {}));
-var Context2 = class {
-  env;
-  domSchemaChecker;
-  oobRecorder;
-  id;
-  boundTarget;
-  pipes;
-  schemas;
-  hostIsStandalone;
-  hostPreserveWhitespaces;
-  nextId = 1;
-  constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone, hostPreserveWhitespaces) {
-    this.env = env;
-    this.domSchemaChecker = domSchemaChecker;
-    this.oobRecorder = oobRecorder;
-    this.id = id;
-    this.boundTarget = boundTarget;
-    this.pipes = pipes;
-    this.schemas = schemas;
-    this.hostIsStandalone = hostIsStandalone;
-    this.hostPreserveWhitespaces = hostPreserveWhitespaces;
-  }
-  /**
-   * Allocate a new variable name for use within the `Context`.
-   *
-   * Currently this uses a monotonically increasing counter, but in the future the variable name
-   * might change depending on the type of data being stored.
-   */
-  allocateId() {
-    return `_t${this.nextId++}`;
-  }
-  getPipeByName(name) {
-    if (this.pipes === null || !this.pipes.has(name)) {
-      return null;
-    }
-    return this.pipes.get(name);
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/scope.js
-import { TmplAstBoundText, TmplAstComponent as TmplAstComponent3, TmplAstContent, TmplAstDeferredBlock, TmplAstDirective as TmplAstDirective2, TmplAstElement as TmplAstElement8, TmplAstForLoopBlock as TmplAstForLoopBlock2, TmplAstHostElement as TmplAstHostElement5, TmplAstIcu, TmplAstIfBlock as TmplAstIfBlock2, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration3, TmplAstReference as TmplAstReference2, TmplAstSwitchBlock as TmplAstSwitchBlock2, TmplAstTemplate as TmplAstTemplate5, TmplAstText as TmplAstText2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/base.js
-var TcbOp = class {
-  /**
-   * Replacement value or operation used while this `TcbOp` is executing (i.e. to resolve circular
-   * references during its execution).
-   *
-   * This is usually a `null!` expression (which asks TS to infer an appropriate type), but another
-   * `TcbOp` can be returned in cases where additional code generation is necessary to deal with
-   * circular references.
-   */
-  circularFallback() {
-    return new TcbExpr("null!");
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/template.js
-import { TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstTemplate } from "@angular/compiler";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/expression.js
-import { Binary, BindingPipe, Call as Call3, ImplicitReceiver as ImplicitReceiver4, PropertyRead as PropertyRead4, R3Identifiers as R3Identifiers4, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead3, ThisReceiver as ThisReceiver4, TmplAstLetDeclaration as TmplAstLetDeclaration2 } from "@angular/compiler";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/expression.js
-import { ASTWithSource, Call as Call2, ImplicitReceiver as ImplicitReceiver3, PropertyRead as PropertyRead3, SafeKeyedRead, SafePropertyRead as SafePropertyRead2, ThisReceiver as ThisReceiver3 } from "@angular/compiler";
-function astToTcbExpr(ast, maybeResolve, config) {
-  const translator = new TcbExprTranslator(maybeResolve, config);
-  return translator.translate(ast);
-}
-var TcbExprTranslator = class {
-  maybeResolve;
-  config;
-  constructor(maybeResolve, config) {
-    this.maybeResolve = maybeResolve;
-    this.config = config;
-  }
-  translate(ast) {
-    if (ast instanceof ASTWithSource) {
-      ast = ast.ast;
-    }
-    const resolved = this.maybeResolve(ast);
-    if (resolved !== null) {
-      return resolved;
-    }
-    return ast.visit(this);
-  }
-  visitUnary(ast) {
-    const expr = this.translate(ast.expr);
-    const node = new TcbExpr(`${ast.operator}${expr.print()}`);
-    return node.wrapForTypeChecker().addParseSpanInfo(ast.sourceSpan);
-  }
-  visitBinary(ast) {
-    const lhs = this.translate(ast.left);
-    const rhs = this.translate(ast.right);
-    lhs.wrapForTypeChecker();
-    rhs.wrapForTypeChecker();
-    const expression = `${lhs.print()} ${ast.operation} ${rhs.print()}`;
-    const node = new TcbExpr(ast.operation === "??" || ast.operation === "**" ? `(${expression})` : expression);
-    node.addParseSpanInfo(ast.sourceSpan);
-    return node;
-  }
-  visitChain(ast) {
-    const elements = ast.expressions.map((expr) => this.translate(expr).print());
-    const node = new TcbExpr(elements.join(", "));
-    node.wrapForTypeChecker();
-    node.addParseSpanInfo(ast.sourceSpan);
-    return node;
-  }
-  visitConditional(ast) {
-    const condExpr = this.translate(ast.condition);
-    const trueExpr = this.translate(ast.trueExp);
-    const falseExpr = this.translate(ast.falseExp).wrapForTypeChecker();
-    const node = new TcbExpr(`(${condExpr.print()} ? ${trueExpr.print()} : ${falseExpr.print()})`).addParseSpanInfo(ast.sourceSpan);
-    return node;
-  }
-  visitImplicitReceiver(ast) {
-    throw new Error("Method not implemented.");
-  }
-  visitThisReceiver(ast) {
-    throw new Error("Method not implemented.");
-  }
-  visitRegularExpressionLiteral(ast, context) {
-    const node = new TcbExpr(`/${ast.body}/${ast.flags ?? ""}`);
-    node.wrapForTypeChecker();
-    return node;
-  }
-  visitInterpolation(ast) {
-    const exprs = ast.expressions.map((e) => {
-      const node = this.translate(e);
-      node.wrapForTypeChecker();
-      return node.print();
-    });
-    return new TcbExpr(`"" + ${exprs.join(" + ")}`);
-  }
-  visitKeyedRead(ast) {
-    const receiver = this.translate(ast.receiver).wrapForTypeChecker();
-    const key = this.translate(ast.key);
-    return new TcbExpr(`${receiver.print()}[${key.print()}]`).addParseSpanInfo(ast.sourceSpan);
-  }
-  visitLiteralArray(ast) {
-    const elements = ast.expressions.map((expr) => this.translate(expr));
-    let literal4 = `[${elements.map((el) => el.print()).join(", ")}]`;
-    if (!this.config.strictLiteralTypes) {
-      literal4 = `(${literal4} as any)`;
-    }
-    return new TcbExpr(literal4).addParseSpanInfo(ast.sourceSpan);
-  }
-  visitLiteralMap(ast) {
-    const properties = ast.keys.map((key, idx) => {
-      const value = this.translate(ast.values[idx]);
-      if (key.kind === "property") {
-        const keyNode = new TcbExpr(quoteAndEscape(key.key));
-        keyNode.addParseSpanInfo(key.sourceSpan);
-        return `${keyNode.print()}: ${value.print()}`;
-      } else {
-        return `...${value.print()}`;
-      }
-    });
-    let literal4 = `{ ${properties.join(", ")} }`;
-    if (!this.config.strictLiteralTypes) {
-      literal4 = `${literal4} as any`;
-    }
-    const expression = new TcbExpr(literal4).addParseSpanInfo(ast.sourceSpan);
-    expression.wrapForTypeChecker();
-    return expression;
-  }
-  visitLiteralPrimitive(ast) {
-    let node;
-    if (ast.value === void 0) {
-      node = new TcbExpr("undefined");
-    } else if (ast.value === null) {
-      node = new TcbExpr("null");
-    } else if (typeof ast.value === "string") {
-      node = new TcbExpr(quoteAndEscape(ast.value));
-    } else if (typeof ast.value === "number") {
-      if (Number.isNaN(ast.value)) {
-        node = new TcbExpr("NaN");
-      } else if (!Number.isFinite(ast.value)) {
-        node = new TcbExpr(ast.value > 0 ? "Infinity" : "-Infinity");
-      } else {
-        node = new TcbExpr(ast.value.toString());
-      }
-    } else if (typeof ast.value === "boolean") {
-      node = new TcbExpr(ast.value + "");
-    } else {
-      throw Error(`Unsupported AST value of type ${typeof ast.value}`);
-    }
-    node.addParseSpanInfo(ast.sourceSpan);
-    return node;
-  }
-  visitNonNullAssert(ast) {
-    const expr = this.translate(ast.expression).wrapForTypeChecker();
-    return new TcbExpr(`${expr.print()}!`).addParseSpanInfo(ast.sourceSpan);
-  }
-  visitPipe(ast) {
-    throw new Error("Method not implemented.");
-  }
-  visitPrefixNot(ast) {
-    const expression = this.translate(ast.expression).wrapForTypeChecker();
-    return new TcbExpr(`!${expression.print()}`).addParseSpanInfo(ast.sourceSpan);
-  }
-  visitTypeofExpression(ast) {
-    const expression = this.translate(ast.expression).wrapForTypeChecker();
-    return new TcbExpr(`typeof ${expression.print()}`).addParseSpanInfo(ast.sourceSpan);
-  }
-  visitVoidExpression(ast) {
-    const expression = this.translate(ast.expression).wrapForTypeChecker();
-    return new TcbExpr(`void ${expression.print()}`).addParseSpanInfo(ast.sourceSpan);
-  }
-  visitPropertyRead(ast) {
-    const receiver = this.translate(ast.receiver).wrapForTypeChecker();
-    return new TcbExpr(`${receiver.print()}.${ast.name}`).addParseSpanInfo(ast.nameSpan).wrapForTypeChecker().addParseSpanInfo(ast.sourceSpan);
-  }
-  visitSafePropertyRead(ast) {
-    let node;
-    const receiver = this.translate(ast.receiver).wrapForTypeChecker();
-    const name = new TcbExpr(ast.name).addParseSpanInfo(ast.nameSpan);
-    if (this.config.strictSafeNavigationTypes) {
-      node = new TcbExpr(`(0 as any ? ${receiver.print()}!.${name.print()} : undefined)`);
-    } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
-      node = new TcbExpr(`(${receiver.print()} as any).${name.print()}`);
-    } else {
-      node = new TcbExpr(`(${receiver.print()}!.${name.print()} as any)`);
-    }
-    return node.addParseSpanInfo(ast.sourceSpan);
-  }
-  visitSafeKeyedRead(ast) {
-    const receiver = this.translate(ast.receiver).wrapForTypeChecker();
-    const key = this.translate(ast.key);
-    let node;
-    if (this.config.strictSafeNavigationTypes) {
-      const elementAccess = new TcbExpr(`${receiver.print()}![${key.print()}]`).addParseSpanInfo(ast.sourceSpan);
-      node = new TcbExpr(`(0 as any ? ${elementAccess.print()} : undefined)`);
-    } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
-      node = new TcbExpr(`(${receiver.print()} as any)[${key.print()}]`);
-    } else {
-      const elementAccess = new TcbExpr(`${receiver.print()}![${key.print()}]`).addParseSpanInfo(ast.sourceSpan);
-      node = new TcbExpr(`(${elementAccess.print()} as any)`);
-    }
-    return node.addParseSpanInfo(ast.sourceSpan);
-  }
-  visitCall(ast) {
-    const args = ast.args.map((expr2) => this.translate(expr2));
-    const receiver = ast.receiver;
-    let expr;
-    if (receiver instanceof PropertyRead3) {
-      const resolved = this.maybeResolve(receiver);
-      if (resolved !== null) {
-        expr = resolved;
-      } else {
-        const propertyReceiver = this.translate(receiver.receiver).wrapForTypeChecker();
-        expr = new TcbExpr(`${propertyReceiver.print()}.${receiver.name}`).addParseSpanInfo(receiver.nameSpan);
-      }
-    } else {
-      expr = this.translate(receiver);
-    }
-    let node;
-    if (ast.receiver instanceof SafePropertyRead2 || ast.receiver instanceof SafeKeyedRead) {
-      node = this.convertToSafeCall(ast, expr, args);
-    } else {
-      node = new TcbExpr(`${expr.print()}(${args.map((arg) => arg.print()).join(", ")})`);
-    }
-    return node.addParseSpanInfo(ast.sourceSpan);
-  }
-  visitSafeCall(ast) {
-    const args = ast.args.map((expr2) => this.translate(expr2));
-    const expr = this.translate(ast.receiver).wrapForTypeChecker();
-    return this.convertToSafeCall(ast, expr, args).addParseSpanInfo(ast.sourceSpan);
-  }
-  visitTemplateLiteral(ast) {
-    const length = ast.elements.length;
-    const head = ast.elements[0];
-    let result;
-    if (length === 1) {
-      result = `\`${head.text}\``;
-    } else {
-      let parts = [`\`${head.text}`];
-      const tailIndex = length - 1;
-      for (let i = 1; i < tailIndex; i++) {
-        const expr = this.translate(ast.expressions[i - 1]);
-        parts.push(`\${${expr.print()}}${ast.elements[i].text}`);
-      }
-      const resolvedExpression = this.translate(ast.expressions[tailIndex - 1]);
-      parts.push(`\${${resolvedExpression.print()}}${ast.elements[tailIndex].text}\``);
-      result = parts.join("");
-    }
-    return new TcbExpr(result);
-  }
-  visitTemplateLiteralElement() {
-    throw new Error("Method not implemented");
-  }
-  visitTaggedTemplateLiteral(ast) {
-    const tag = this.translate(ast.tag);
-    const template = this.visitTemplateLiteral(ast.template);
-    return new TcbExpr(`${tag.print()}${template.print()}`);
-  }
-  visitParenthesizedExpression(ast) {
-    const expr = this.translate(ast.expression);
-    return new TcbExpr(`(${expr.print()})`);
-  }
-  visitSpreadElement(ast) {
-    const expression = this.translate(ast.expression);
-    expression.wrapForTypeChecker();
-    const node = new TcbExpr(`...${expression.print()}`);
-    node.addParseSpanInfo(ast.sourceSpan);
-    return node;
-  }
-  visitEmptyExpr(ast) {
-    const node = new TcbExpr("undefined");
-    node.addParseSpanInfo(ast.sourceSpan);
-    return node;
-  }
-  visitArrowFunction(ast) {
-    const params = ast.parameters.map((param) => new TcbExpr(param.name).markIgnoreDiagnostics().print()).join(", ");
-    const body = astToTcbExpr(ast.body, (innerAst) => {
-      if (!(innerAst instanceof PropertyRead3) || innerAst.receiver instanceof ThisReceiver3 || !(innerAst.receiver instanceof ImplicitReceiver3)) {
-        return this.maybeResolve(innerAst);
-      }
-      const correspondingParam = ast.parameters.find((arg) => arg.name === innerAst.name);
-      if (correspondingParam) {
-        const node = new TcbExpr(innerAst.name);
-        node.addParseSpanInfo(innerAst.sourceSpan);
-        return node;
-      }
-      return this.maybeResolve(innerAst);
-    }, this.config);
-    return new TcbExpr(`${ast.parameters.length === 1 ? params : `(${params})`} => ${body.print()}`);
-  }
-  convertToSafeCall(ast, exprNode, argNodes) {
-    const expr = exprNode.print();
-    const args = argNodes.map((node) => node.print()).join(", ");
-    if (this.config.strictSafeNavigationTypes) {
-      return new TcbExpr(`(0 as any ? ${expr}!(${args}) : undefined)`);
-    }
-    if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
-      return new TcbExpr(`(${expr} as any)(${args})`);
-    }
-    return new TcbExpr(`(${expr}!(${args}) as any)`);
-  }
-};
-var VeSafeLhsInferenceBugDetector = class _VeSafeLhsInferenceBugDetector {
-  static SINGLETON = new _VeSafeLhsInferenceBugDetector();
-  static veWillInferAnyFor(ast) {
-    const visitor = _VeSafeLhsInferenceBugDetector.SINGLETON;
-    return ast instanceof Call2 ? ast.visit(visitor) : ast.receiver.visit(visitor);
-  }
-  visitUnary(ast) {
-    return ast.expr.visit(this);
-  }
-  visitBinary(ast) {
-    return ast.left.visit(this) || ast.right.visit(this);
-  }
-  visitChain() {
-    return false;
-  }
-  visitConditional(ast) {
-    return ast.condition.visit(this) || ast.trueExp.visit(this) || ast.falseExp.visit(this);
-  }
-  visitCall() {
-    return true;
-  }
-  visitSafeCall() {
-    return false;
-  }
-  visitImplicitReceiver() {
-    return false;
-  }
-  visitThisReceiver() {
-    return false;
-  }
-  visitInterpolation(ast) {
-    return ast.expressions.some((exp) => exp.visit(this));
-  }
-  visitKeyedRead() {
-    return false;
-  }
-  visitLiteralArray() {
-    return true;
-  }
-  visitLiteralMap() {
-    return true;
-  }
-  visitLiteralPrimitive() {
-    return false;
-  }
-  visitPipe() {
-    return true;
-  }
-  visitPrefixNot(ast) {
-    return ast.expression.visit(this);
-  }
-  visitTypeofExpression(ast) {
-    return ast.expression.visit(this);
-  }
-  visitVoidExpression(ast) {
-    return ast.expression.visit(this);
-  }
-  visitNonNullAssert(ast) {
-    return ast.expression.visit(this);
-  }
-  visitPropertyRead() {
-    return false;
-  }
-  visitSafePropertyRead() {
-    return false;
-  }
-  visitSafeKeyedRead() {
-    return false;
-  }
-  visitTemplateLiteral() {
-    return false;
-  }
-  visitTemplateLiteralElement() {
-    return false;
-  }
-  visitTaggedTemplateLiteral() {
-    return false;
-  }
-  visitParenthesizedExpression(ast) {
-    return ast.expression.visit(this);
-  }
-  visitRegularExpressionLiteral() {
-    return false;
-  }
-  visitSpreadElement(ast) {
-    return ast.expression.visit(this);
-  }
-  visitArrowFunction(ast, context) {
-    return false;
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/expression.js
-function tcbExpression(ast, tcb, scope) {
-  const translator = new TcbExpressionTranslator(tcb, scope);
-  return translator.translate(ast);
-}
-function unwrapWritableSignal(expression, tcb) {
-  const unwrapRef = tcb.env.referenceExternalSymbol(R3Identifiers4.unwrapWritableSignal.moduleName, R3Identifiers4.unwrapWritableSignal.name);
-  return new TcbExpr(`${unwrapRef.print()}(${expression.print()})`);
-}
-var TcbExpressionOp = class extends TcbOp {
-  tcb;
-  scope;
-  expression;
-  constructor(tcb, scope, expression) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.expression = expression;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    const expr = tcbExpression(this.expression, this.tcb, this.scope);
-    this.scope.addStatement(expr);
-    return null;
-  }
-};
-var TcbConditionOp = class extends TcbOp {
-  tcb;
-  scope;
-  expression;
-  constructor(tcb, scope, expression) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.expression = expression;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    const expr = tcbExpression(this.expression, this.tcb, this.scope);
-    this.scope.addStatement(new TcbExpr(`if (${expr.print()}) {}`));
-    return null;
-  }
-};
-var TcbExpressionTranslator = class {
-  tcb;
-  scope;
-  constructor(tcb, scope) {
-    this.tcb = tcb;
-    this.scope = scope;
-  }
-  translate(ast) {
-    return astToTcbExpr(ast, (ast2) => this.resolve(ast2), this.tcb.env.config);
-  }
-  /**
-   * Resolve an `AST` expression within the given scope.
-   *
-   * Some `AST` expressions refer to top-level concepts (references, variables, the component
-   * context). This method assists in resolving those.
-   */
-  resolve(ast) {
-    if (ast instanceof PropertyRead4 && ast.receiver instanceof ImplicitReceiver4) {
-      const target = this.tcb.boundTarget.getExpressionTarget(ast);
-      const targetExpression = target === null ? null : this.getTargetNodeExpression(target, ast);
-      if (target instanceof TmplAstLetDeclaration2 && !this.isValidLetDeclarationAccess(target, ast)) {
-        this.tcb.oobRecorder.letUsedBeforeDefinition(this.tcb.id, ast, target);
-        if (targetExpression !== null) {
-          return new TcbExpr(`${targetExpression.print()} as any`);
-        }
-      }
-      return targetExpression;
-    } else if (ast instanceof Binary && Binary.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead4 && (ast.left.receiver instanceof ImplicitReceiver4 || ast.left.receiver instanceof ThisReceiver4)) {
-      const read = ast.left;
-      const target = this.tcb.boundTarget.getExpressionTarget(read);
-      if (target === null) {
-        return null;
-      }
-      const targetExpression = this.getTargetNodeExpression(target, read);
-      const expr = this.translate(ast.right);
-      const result = new TcbExpr(`(${targetExpression.print()} = ${expr.print()})`);
-      result.addParseSpanInfo(read.sourceSpan);
-      if (target instanceof TmplAstLetDeclaration2) {
-        result.markIgnoreDiagnostics();
-        this.tcb.oobRecorder.illegalWriteToLetDeclaration(this.tcb.id, read, target);
-      }
-      return result;
-    } else if (ast instanceof ImplicitReceiver4 || ast instanceof ThisReceiver4) {
-      return new TcbExpr("this");
-    } else if (ast instanceof BindingPipe) {
-      const expr = this.translate(ast.exp);
-      const pipeMeta = this.tcb.getPipeByName(ast.name);
-      let pipe;
-      if (pipeMeta === null) {
-        this.tcb.oobRecorder.missingPipe(this.tcb.id, ast, this.tcb.hostIsStandalone);
-        pipe = new TcbExpr("(0 as any)");
-      } else if (pipeMeta.isExplicitlyDeferred && this.tcb.boundTarget.getEagerlyUsedPipes().includes(ast.name)) {
-        this.tcb.oobRecorder.deferredPipeUsedEagerly(this.tcb.id, ast);
-        pipe = new TcbExpr("(0 as any)");
-      } else {
-        pipe = this.tcb.env.pipeInst(pipeMeta);
-      }
-      const args = ast.args.map((arg) => this.translate(arg).print());
-      let methodAccess = new TcbExpr(`${pipe.print()}.transform`).addParseSpanInfo(ast.nameSpan);
-      if (!this.tcb.env.config.checkTypeOfPipes) {
-        methodAccess = new TcbExpr(`(${methodAccess.print()} as any)`);
-      }
-      const result = new TcbExpr(`${methodAccess.print()}(${[expr.print(), ...args].join(", ")})`);
-      return result.addParseSpanInfo(ast.sourceSpan);
-    } else if ((ast instanceof Call3 || ast instanceof SafeCall2) && (ast.receiver instanceof PropertyRead4 || ast.receiver instanceof SafePropertyRead3)) {
-      if (ast.receiver.receiver instanceof ImplicitReceiver4 && ast.receiver.name === "$any" && ast.args.length === 1) {
-        const expr = this.translate(ast.args[0]);
-        const result = new TcbExpr(`(${expr.print()} as any)`);
-        result.addParseSpanInfo(ast.sourceSpan);
-        return result;
-      }
-      const target = this.tcb.boundTarget.getExpressionTarget(ast);
-      if (target === null) {
-        return null;
-      }
-      const method = this.getTargetNodeExpression(target, ast);
-      method.addParseSpanInfo(ast.receiver.nameSpan).wrapForTypeChecker();
-      const args = ast.args.map((arg) => this.translate(arg).print());
-      const node = new TcbExpr(`${method.print()}(${args.join(", ")})`);
-      node.addParseSpanInfo(ast.sourceSpan);
-      return node;
-    } else {
-      return null;
-    }
-  }
-  getTargetNodeExpression(targetNode, expressionNode) {
-    const expr = this.scope.resolve(targetNode);
-    expr.addParseSpanInfo(expressionNode.sourceSpan);
-    return expr;
-  }
-  isValidLetDeclarationAccess(target, ast) {
-    const targetStart = target.sourceSpan.start.offset;
-    const targetEnd = target.sourceSpan.end.offset;
-    const astStart = ast.sourceSpan.start;
-    return targetStart < astStart && astStart > targetEnd || !this.scope.isLocal(target);
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/template.js
-var TcbTemplateContextOp = class extends TcbOp {
-  tcb;
-  scope;
-  constructor(tcb, scope) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-  }
-  // The declaration of the context variable is only needed when the context is actually referenced.
-  optional = true;
-  execute() {
-    const ctx = new TcbExpr(this.tcb.allocateId());
-    this.scope.addStatement(declareVariable(ctx, new TcbExpr("any")));
-    return ctx;
-  }
-};
-var TcbTemplateBodyOp = class extends TcbOp {
-  tcb;
-  scope;
-  template;
-  constructor(tcb, scope, template) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.template = template;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    let guard = null;
-    const directiveGuards = [];
-    this.addDirectiveGuards(directiveGuards, this.template, this.tcb.boundTarget.getDirectivesOfNode(this.template));
-    for (const directive of this.template.directives) {
-      this.addDirectiveGuards(directiveGuards, directive, this.tcb.boundTarget.getDirectivesOfNode(directive));
-    }
-    if (directiveGuards.length > 0) {
-      guard = directiveGuards.reduce((expr, dirGuard) => new TcbExpr(`${expr.print()} && ${dirGuard.print()}`), directiveGuards.pop());
-    }
-    const tmplScope = this.scope.createChildScope(this.scope, this.template, this.template.children, guard);
-    const statements = tmplScope.render();
-    if (statements.length === 0) {
-      return null;
-    }
-    let tmplBlock = `{
-${getStatementsBlock(statements)}}`;
-    if (guard !== null) {
-      tmplBlock = `if (${guard.print()}) ${tmplBlock}`;
-    }
-    this.scope.addStatement(new TcbExpr(tmplBlock));
-    return null;
-  }
-  addDirectiveGuards(guards, hostNode, directives) {
-    if (directives === null || directives.length === 0) {
-      return;
-    }
-    const isTemplate = hostNode instanceof TmplAstTemplate;
-    for (const dir of directives) {
-      const dirInstId = this.scope.resolve(hostNode, dir);
-      const dirId = this.tcb.env.referenceTcbValue(dir.ref);
-      dir.ngTemplateGuards.forEach((guard) => {
-        const boundInput = hostNode.inputs.find((i) => i.name === guard.inputName) || (isTemplate ? hostNode.templateAttrs.find((input) => {
-          return input instanceof TmplAstBoundAttribute3 && input.name === guard.inputName;
-        }) : void 0);
-        if (boundInput !== void 0) {
-          const expr = tcbExpression(boundInput.value, this.tcb, this.scope);
-          expr.markIgnoreDiagnostics();
-          if (guard.type === "binding") {
-            guards.push(expr);
-          } else {
-            const guardInvoke = new TcbExpr(`${dirId.print()}.ngTemplateGuard_${guard.inputName}(${dirInstId.print()}, ${expr.print()})`);
-            guardInvoke.addParseSpanInfo(boundInput.value.sourceSpan);
-            guards.push(guardInvoke);
-          }
-        }
-      });
-      if (dir.hasNgTemplateContextGuard) {
-        if (this.tcb.env.config.applyTemplateContextGuards) {
-          const ctx = this.scope.resolve(hostNode);
-          const guardInvoke = new TcbExpr(`${dirId.print()}.ngTemplateContextGuard(${dirInstId.print()}, ${ctx.print()})`);
-          guardInvoke.markIgnoreDiagnostics();
-          guardInvoke.addParseSpanInfo(hostNode.sourceSpan);
-          guards.push(guardInvoke);
-        } else if (isTemplate && hostNode.variables.length > 0 && this.tcb.env.config.suggestionsForSuboptimalTypeInference) {
-          this.tcb.oobRecorder.suboptimalTypeInference(this.tcb.id, hostNode.variables);
-        }
-      }
-    }
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/element.js
-var TcbElementOp = class extends TcbOp {
-  tcb;
-  scope;
-  element;
-  constructor(tcb, scope, element) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.element = element;
-  }
-  get optional() {
-    return true;
-  }
-  execute() {
-    const id = this.tcb.allocateId();
-    const idNode = new TcbExpr(id);
-    idNode.addParseSpanInfo(this.element.startSourceSpan || this.element.sourceSpan);
-    const initializer = new TcbExpr(`document.createElement("${this.element.name}")`);
-    initializer.addParseSpanInfo(this.element.startSourceSpan || this.element.sourceSpan);
-    const stmt = new TcbExpr(`var ${idNode.print()} = ${initializer.print()}`);
-    stmt.addParseSpanInfo(this.element.startSourceSpan || this.element.sourceSpan);
-    this.scope.addStatement(stmt);
-    return idNode;
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/variables.js
-var TcbBlockImplicitVariableOp = class extends TcbOp {
-  tcb;
-  scope;
-  type;
-  variable;
-  constructor(tcb, scope, type, variable) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.type = type;
-    this.variable = variable;
-  }
-  optional = true;
-  execute() {
-    const id = new TcbExpr(this.tcb.allocateId());
-    id.addParseSpanInfo(this.variable.keySpan);
-    const variable = declareVariable(id, this.type);
-    variable.addParseSpanInfo(this.variable.sourceSpan);
-    this.scope.addStatement(variable);
-    return id;
-  }
-};
-var TcbTemplateVariableOp = class extends TcbOp {
-  tcb;
-  scope;
-  template;
-  variable;
-  constructor(tcb, scope, template, variable) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.template = template;
-    this.variable = variable;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    const ctx = this.scope.resolve(this.template);
-    const id = new TcbExpr(this.tcb.allocateId());
-    const initializer = new TcbExpr(`${ctx.print()}.${this.variable.value || "$implicit"}`);
-    id.addParseSpanInfo(this.variable.keySpan);
-    if (this.variable.valueSpan !== void 0) {
-      initializer.addParseSpanInfo(this.variable.valueSpan).wrapForTypeChecker();
-    } else {
-    }
-    const variable = new TcbExpr(`var ${id.print()} = ${initializer.print()}`);
-    variable.addParseSpanInfo(this.variable.sourceSpan);
-    this.scope.addStatement(variable);
-    return id;
-  }
-};
-var TcbBlockVariableOp = class extends TcbOp {
-  tcb;
-  scope;
-  initializer;
-  variable;
-  constructor(tcb, scope, initializer, variable) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.initializer = initializer;
-    this.variable = variable;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    const id = new TcbExpr(this.tcb.allocateId());
-    id.addParseSpanInfo(this.variable.keySpan);
-    this.initializer.wrapForTypeChecker();
-    const variable = new TcbExpr(`var ${id.print()} = ${this.initializer.print()}`);
-    variable.addParseSpanInfo(this.variable.sourceSpan);
-    this.scope.addStatement(variable);
-    return id;
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/completions.js
-var TcbComponentContextCompletionOp = class extends TcbOp {
-  scope;
-  constructor(scope) {
-    super();
-    this.scope = scope;
-  }
-  optional = false;
-  execute() {
-    const ctx = new TcbExpr("this.");
-    ctx.markIgnoreDiagnostics();
-    ctx.addExpressionIdentifier(ExpressionIdentifier.COMPONENT_COMPLETION);
-    this.scope.addStatement(ctx);
-    return null;
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/references.js
-import { TmplAstElement as TmplAstElement2, TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
-var TcbReferenceOp = class extends TcbOp {
-  tcb;
-  scope;
-  node;
-  host;
-  target;
-  constructor(tcb, scope, node, host, target) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.node = node;
-    this.host = host;
-    this.target = target;
-  }
-  // The statement generated by this operation is only used to for the Type Checker
-  // so it can map a reference variable in the template directly to a node in the TCB.
-  optional = true;
-  execute() {
-    const id = new TcbExpr(this.tcb.allocateId());
-    let initializer = this.target instanceof TmplAstTemplate2 || this.target instanceof TmplAstElement2 ? this.scope.resolve(this.target) : this.scope.resolve(this.host, this.target);
-    if (this.target instanceof TmplAstElement2 && !this.tcb.env.config.checkTypeOfDomReferences || !this.tcb.env.config.checkTypeOfNonDomReferences) {
-      initializer = new TcbExpr(`${initializer.print()} as any`);
-    } else if (this.target instanceof TmplAstTemplate2) {
-      const templateRef = this.tcb.env.referenceExternalSymbol("@angular/core", "TemplateRef");
-      initializer = new TcbExpr(`(${initializer.print()} as any as ${templateRef.print()}<any>)`);
-    }
-    initializer.addParseSpanInfo(this.node.sourceSpan);
-    id.addParseSpanInfo(this.node.keySpan);
-    this.scope.addStatement(new TcbExpr(`var ${id.print()} = ${initializer.print()}`));
-    return id;
-  }
-};
-var TcbInvalidReferenceOp = class extends TcbOp {
-  tcb;
-  scope;
-  constructor(tcb, scope) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-  }
-  // The declaration of a missing reference is only needed when the reference is resolved.
-  optional = true;
-  execute() {
-    const id = new TcbExpr(this.tcb.allocateId());
-    this.scope.addStatement(new TcbExpr(`var ${id.print()} = any`));
-    return id;
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/if_block.js
-var TcbIfOp = class extends TcbOp {
-  tcb;
-  scope;
-  block;
-  expressionScopes = /* @__PURE__ */ new Map();
-  constructor(tcb, scope, block) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.block = block;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    const root = this.generateBranch(0);
-    root && this.scope.addStatement(root);
-    return null;
-  }
-  generateBranch(index) {
-    const branch = this.block.branches[index];
-    if (!branch) {
-      return void 0;
-    }
-    if (branch.expression === null) {
-      const branchScope = this.getBranchScope(this.scope, branch, index);
-      return new TcbExpr(`{
-${getStatementsBlock(branchScope.render())}}`);
-    }
-    const outerScope = this.scope.createChildScope(this.scope, branch, [], null);
-    outerScope.render().forEach((stmt) => this.scope.addStatement(stmt));
-    this.expressionScopes.set(branch, outerScope);
-    let expression = tcbExpression(branch.expression, this.tcb, this.scope);
-    if (branch.expressionAlias !== null) {
-      expression = new TcbExpr(`(${expression.print()}) && ${outerScope.resolve(branch.expressionAlias).print()}`);
-    }
-    const bodyScope = this.getBranchScope(outerScope, branch, index);
-    const ifStatement = `if (${expression.print()}) {
-${getStatementsBlock(bodyScope.render())}}`;
-    const elseBranch = this.generateBranch(index + 1);
-    return new TcbExpr(ifStatement + (elseBranch ? " else " + elseBranch.print() : ""));
-  }
-  getBranchScope(parentScope, branch, index) {
-    const checkBody = this.tcb.env.config.checkControlFlowBodies;
-    return this.scope.createChildScope(parentScope, null, checkBody ? branch.children : [], checkBody ? this.generateBranchGuard(index) : null);
-  }
-  generateBranchGuard(index) {
-    let guard = null;
-    for (let i = 0; i <= index; i++) {
-      const branch = this.block.branches[i];
-      if (branch.expression === null) {
-        continue;
-      }
-      if (!this.expressionScopes.has(branch)) {
-        throw new Error(`Could not determine expression scope of branch at index ${i}`);
-      }
-      const expressionScope = this.expressionScopes.get(branch);
-      let expression;
-      expression = tcbExpression(branch.expression, this.tcb, expressionScope);
-      if (branch.expressionAlias !== null) {
-        expression = new TcbExpr(`(${expression.print()}) && ${expressionScope.resolve(branch.expressionAlias).print()}`);
-      }
-      expression.markIgnoreDiagnostics();
-      const comparisonExpression = i === index ? expression : new TcbExpr(`!(${expression.print()})`);
-      guard = guard === null ? comparisonExpression : new TcbExpr(`(${guard.print()}) && (${comparisonExpression.print()})`);
-    }
-    return guard;
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/switch_block.js
-var TcbSwitchOp = class extends TcbOp {
-  tcb;
-  scope;
-  block;
-  constructor(tcb, scope, block) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.block = block;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    const switchExpression = tcbExpression(this.block.expression, this.tcb, this.scope);
-    const clauses = this.block.groups.flatMap((current) => {
-      const checkBody = this.tcb.env.config.checkControlFlowBodies;
-      const clauseScope = this.scope.createChildScope(this.scope, null, checkBody ? current.children : [], checkBody ? this.generateGuard(current, switchExpression) : null);
-      const statements = [...clauseScope.render(), new TcbExpr("break")];
-      return current.cases.map((switchCase, index) => {
-        const statementsStr = getStatementsBlock(
-          index === current.cases.length - 1 ? statements : [],
-          true
-          /* singleLine */
-        );
-        const source = switchCase.expression === null ? `default: ${statementsStr}` : `case ${tcbExpression(switchCase.expression, this.tcb, this.scope).print()}: ${statementsStr}`;
-        return new TcbExpr(source);
-      });
-    });
-    if (this.block.exhaustiveCheck) {
-      const switchValue = tcbExpression(this.block.expression, this.tcb, this.scope);
-      const exhaustiveId = this.tcb.allocateId();
-      clauses.push(new TcbExpr(`default: const tcbExhaustive${exhaustiveId}: never = ${switchValue.print()};`));
-    }
-    this.scope.addStatement(new TcbExpr(`switch (${switchExpression.print()}) { ${clauses.map((c) => c.print()).join("\n")} }`));
-    return null;
-  }
-  generateGuard(group, switchValue) {
-    const hasDefault = group.cases.some((c) => c.expression === null);
-    if (!hasDefault) {
-      let guard2 = null;
-      for (const switchCase of group.cases) {
-        if (switchCase.expression !== null) {
-          const expression = tcbExpression(switchCase.expression, this.tcb, this.scope);
-          expression.markIgnoreDiagnostics();
-          const comparison = new TcbExpr(`${switchValue.print()} === ${expression.print()}`);
-          if (guard2 === null) {
-            guard2 = comparison;
-          } else {
-            guard2 = new TcbExpr(`(${guard2.print()}) || (${comparison.print()})`);
-          }
-        }
-      }
-      return guard2;
-    }
-    let guard = null;
-    for (const currentGroup of this.block.groups) {
-      if (currentGroup === group) {
-        continue;
-      }
-      for (const switchCase of currentGroup.cases) {
-        if (switchCase.expression === null) {
-          continue;
-        }
-        const expression = tcbExpression(switchCase.expression, this.tcb, this.scope);
-        expression.markIgnoreDiagnostics();
-        const comparison = new TcbExpr(`${switchValue.print()} !== ${expression.print()}`);
-        if (guard === null) {
-          guard = comparison;
-        } else {
-          guard = new TcbExpr(`(${guard.print()}) && (${comparison.print()})`);
-        }
-      }
-    }
-    return guard;
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/for_block.js
-import { ImplicitReceiver as ImplicitReceiver5, PropertyRead as PropertyRead5, ThisReceiver as ThisReceiver5, TmplAstVariable } from "@angular/compiler";
-var TcbForOfOp = class extends TcbOp {
-  tcb;
-  scope;
-  block;
-  constructor(tcb, scope, block) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.block = block;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    const loopScope = this.scope.createChildScope(this.scope, this.block, this.tcb.env.config.checkControlFlowBodies ? this.block.children : [], null);
-    const initializerId = loopScope.resolve(this.block.item);
-    const initializer = new TcbExpr(`const ${initializerId.print()}`);
-    initializer.addParseSpanInfo(this.block.item.keySpan);
-    const expression = new TcbExpr(`${tcbExpression(this.block.expression, this.tcb, this.scope).print()}!`);
-    const trackTranslator = new TcbForLoopTrackTranslator(this.tcb, loopScope, this.block);
-    const trackExpression = trackTranslator.translate(this.block.trackBy);
-    const block = getStatementsBlock([...loopScope.render(), trackExpression]);
-    this.scope.addStatement(new TcbExpr(`for (${initializer.print()} of ${expression.print()}) {
-${block} }`));
-    return null;
-  }
-};
-var TcbForLoopTrackTranslator = class extends TcbExpressionTranslator {
-  block;
-  allowedVariables;
-  constructor(tcb, scope, block) {
-    super(tcb, scope);
-    this.block = block;
-    this.allowedVariables = /* @__PURE__ */ new Set([block.item]);
-    for (const variable of block.contextVariables) {
-      if (variable.value === "$index") {
-        this.allowedVariables.add(variable);
-      }
-    }
-  }
-  resolve(ast) {
-    if (ast instanceof PropertyRead5 && (ast.receiver instanceof ImplicitReceiver5 || ast.receiver instanceof ThisReceiver5)) {
-      const target = this.tcb.boundTarget.getExpressionTarget(ast);
-      if (target !== null && (!(target instanceof TmplAstVariable) || !this.allowedVariables.has(target))) {
-        this.tcb.oobRecorder.illegalForLoopTrackAccess(this.tcb.id, this.block, ast);
-      }
-    }
-    return super.resolve(ast);
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/let.js
-var TcbLetDeclarationOp = class extends TcbOp {
-  tcb;
-  scope;
-  node;
-  constructor(tcb, scope, node) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.node = node;
-  }
-  /**
-   * `@let` declarations are mandatory, because their expressions
-   * should be checked even if they aren't referenced anywhere.
-   */
-  optional = false;
-  execute() {
-    const id = new TcbExpr(this.tcb.allocateId()).addParseSpanInfo(this.node.nameSpan);
-    const value = tcbExpression(this.node.value, this.tcb, this.scope).wrapForTypeChecker();
-    const varStatement = new TcbExpr(`const ${id.print()} = ${value.print()}`);
-    varStatement.addParseSpanInfo(this.node.sourceSpan);
-    this.scope.addStatement(varStatement);
-    return id;
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/inputs.js
-import { BindingType as BindingType5, R3Identifiers as R3Identifiers5 } from "@angular/compiler";
-import ts63 from "typescript";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/signal_forms.js
-import { BindingType as BindingType3, Call as Call4, PropertyRead as PropertyRead6, SafeCall as SafeCall3, TmplAstElement as TmplAstElement3, TmplAstHostElement as TmplAstHostElement2 } from "@angular/compiler";
-var formControlInputFields = [
-  // Should be kept in sync with the `FormUiControl` bindings,
-  // defined in `packages/forms/signals/src/api/control.ts`.
-  "errors",
-  "dirty",
-  "disabled",
-  "disabledReasons",
-  "hidden",
-  "invalid",
-  "name",
-  "pending",
-  "readonly",
-  "touched",
-  "max",
-  "maxLength",
-  "min",
-  "minLength",
-  "pattern",
-  "required"
-];
-var customFormControlBannedInputFields = /* @__PURE__ */ new Set([
-  ...formControlInputFields,
-  "value",
-  "checked"
-]);
-var formControlOptionalFields = /* @__PURE__ */ new Set([
-  // Should be kept in sync with the `FormUiControl` bindings,
-  // defined in `packages/forms/signals/src/api/control.ts`.
-  "max",
-  "maxLength",
-  "min",
-  "minLength"
-]);
-var TcbNativeFieldOp = class extends TcbOp {
-  tcb;
-  scope;
-  node;
-  inputType;
-  /** Bindings that aren't supported on signal form fields. */
-  unsupportedBindingFields = /* @__PURE__ */ new Set([
-    ...formControlInputFields,
-    "value",
-    "checked",
-    "maxlength",
-    "minlength"
-  ]);
-  get optional() {
-    return false;
-  }
-  constructor(tcb, scope, node, inputType) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.node = node;
-    this.inputType = inputType;
-  }
-  execute() {
-    const inputs = this.node instanceof TmplAstHostElement2 ? this.node.bindings : this.node.inputs;
-    const fieldBinding = inputs.find((input) => input.type === BindingType3.Property && input.name === "formField") ?? null;
-    if (fieldBinding === null) {
-      return null;
-    }
-    checkUnsupportedFieldBindings(this.node, this.unsupportedBindingFields, this.tcb);
-    const expectedType = new TcbExpr(this.getExpectedTypeFromDomNode(this.node));
-    const value = extractFieldValue(fieldBinding.value, this.tcb, this.scope);
-    const id = new TcbExpr(this.tcb.allocateId());
-    const assignment = new TcbExpr(`${id.print()} = ${value.print()}`);
-    assignment.addParseSpanInfo(fieldBinding.valueSpan ?? fieldBinding.sourceSpan);
-    this.scope.addStatement(declareVariable(id, expectedType));
-    this.scope.addStatement(assignment);
-    return null;
-  }
-  getExpectedTypeFromDomNode(node) {
-    if (node.name === "textarea" || node.name === "select") {
-      return "string";
-    }
-    if (node.name !== "input") {
-      return this.getUnsupportedType();
-    }
-    switch (this.inputType) {
-      case "checkbox":
-        return "boolean";
-      case "number":
-      case "range":
-      case "datetime-local":
-        return "string | number | null";
-      case "date":
-      case "month":
-      case "time":
-      case "week":
-        return "string | number | Date | null";
-    }
-    const hasDynamicType = this.inputType === null && this.node.inputs.some((input) => (input.type === BindingType3.Property || input.type === BindingType3.Attribute) && input.name === "type");
-    if (hasDynamicType) {
-      return "string | number | boolean | Date | null";
-    }
-    return "string";
-  }
-  getUnsupportedType() {
-    return "never";
-  }
-};
-var TcbNativeRadioButtonFieldOp = class extends TcbNativeFieldOp {
-  constructor(tcb, scope, node) {
-    super(tcb, scope, node, "radio");
-    this.unsupportedBindingFields.delete("value");
-  }
-  execute() {
-    super.execute();
-    const valueBinding = this.node.inputs.find((attr) => {
-      return attr.type === BindingType3.Property && attr.name === "value";
-    });
-    if (valueBinding !== void 0) {
-      const id = new TcbExpr(this.tcb.allocateId());
-      const value = tcbExpression(valueBinding.value, this.tcb, this.scope);
-      const assignment = new TcbExpr(`${id.print()} = ${value.print()}`);
-      assignment.addParseSpanInfo(valueBinding.sourceSpan);
-      this.scope.addStatement(declareVariable(id, new TcbExpr("string")));
-      this.scope.addStatement(assignment);
-    }
-    return null;
-  }
-};
-function expandBoundAttributesForField(directive, node, customFormControlType) {
-  const fieldBinding = node.inputs.find((input) => input.type === BindingType3.Property && input.name === "formField");
-  if (!fieldBinding) {
-    return null;
-  }
-  let boundInputs = null;
-  let primaryInput;
-  if (customFormControlType === "value") {
-    primaryInput = getSyntheticFieldBoundInput(directive, "value", "value", fieldBinding, customFormControlType);
-  } else if (customFormControlType === "checkbox") {
-    primaryInput = getSyntheticFieldBoundInput(directive, "checked", "value", fieldBinding, customFormControlType);
-  } else {
-    primaryInput = null;
-  }
-  if (primaryInput !== null) {
-    boundInputs ??= [];
-    boundInputs.push(primaryInput);
-  }
-  for (const name of formControlInputFields) {
-    const input = getSyntheticFieldBoundInput(directive, name, name, fieldBinding, customFormControlType);
-    if (input !== null) {
-      boundInputs ??= [];
-      boundInputs.push(input);
-    }
-  }
-  return boundInputs;
-}
-function isFieldDirective(meta) {
-  if (meta.name !== "FormField") {
-    return false;
-  }
-  if (meta.ref.moduleName === "@angular/forms/signals") {
-    return true;
-  }
-  return meta.hasNgFieldDirective;
-}
-function getSyntheticFieldBoundInput(dir, inputName, fieldPropertyName, fieldBinding, customFieldType) {
-  const inputs = dir.inputs.getByBindingPropertyName(inputName);
-  if (inputs === null || inputs.length === 0) {
-    return null;
-  }
-  const { span, sourceSpan } = fieldBinding.value;
-  const outerCall = new Call4(span, sourceSpan, fieldBinding.value, [], sourceSpan);
-  const read = new PropertyRead6(span, sourceSpan, sourceSpan, outerCall, fieldPropertyName);
-  const isTwoWayBinding = customFieldType === "value" && inputName === "value" || customFieldType === "checkbox" && inputName === "checked";
-  let value;
-  if (isTwoWayBinding) {
-    value = read;
-  } else if (formControlOptionalFields.has(fieldPropertyName)) {
-    value = new SafeCall3(span, sourceSpan, read, [], sourceSpan);
-  } else {
-    value = new Call4(span, sourceSpan, read, [], sourceSpan);
-  }
-  return {
-    value,
-    sourceSpan: fieldBinding.sourceSpan,
-    keySpan: fieldBinding.keySpan ?? null,
-    inputs: inputs.map((input) => ({
-      fieldName: input.classPropertyName,
-      required: input.required,
-      transformType: input.transformType,
-      isSignal: input.isSignal,
-      isTwoWayBinding
-    }))
-  };
-}
-function getCustomFieldDirectiveType(meta) {
-  if (hasModelInput("value", meta)) {
-    return "value";
-  } else if (hasModelInput("checked", meta)) {
-    return "checkbox";
-  }
-  return null;
-}
-function isNativeField(dir, node, allDirectiveMatches) {
-  if (!isFieldDirective(dir)) {
-    return false;
-  }
-  if (!(node instanceof TmplAstElement3) || node.name !== "input" && node.name !== "select" && node.name !== "textarea") {
-    return false;
-  }
-  return allDirectiveMatches.every((meta) => {
-    return getCustomFieldDirectiveType(meta) === null && !isControlValueAccessorLike(meta);
-  });
-}
-function isControlValueAccessorLike(meta) {
-  return meta.publicMethods.has("writeValue") && meta.publicMethods.has("registerOnChange") && meta.publicMethods.has("registerOnTouched");
-}
-function checkUnsupportedFieldBindings(node, unsupportedBindingFields, tcb) {
-  const inputs = node instanceof TmplAstHostElement2 ? node.bindings : node.inputs;
-  for (const input of inputs) {
-    if (input.type === BindingType3.Property && unsupportedBindingFields.has(input.name)) {
-      tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, input);
-    } else if (input.type === BindingType3.Attribute && unsupportedBindingFields.has(input.name.toLowerCase())) {
-      tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, input);
-    }
-  }
-  if (!(node instanceof TmplAstHostElement2)) {
-    for (const attr of node.attributes) {
-      if (unsupportedBindingFields.has(attr.name.toLowerCase())) {
-        tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, attr);
-      }
-    }
-  }
-}
-function extractFieldValue(expression, tcb, scope) {
-  const innerCall = new TcbExpr(tcbExpression(expression, tcb, scope).print() + "()");
-  innerCall.markIgnoreDiagnostics();
-  return new TcbExpr(`${innerCall.print()}.value()`);
-}
-function hasModelInput(name, meta) {
-  return meta.inputs.hasBindingPropertyName(name) && meta.outputs.hasBindingPropertyName(name + "Change");
-}
-function isFormControl(allDirectiveMatches) {
-  let result = false;
-  for (const match of allDirectiveMatches) {
-    if (match.inputs.hasBindingPropertyName("formField")) {
-      if (!isFieldDirective(match)) {
-        return false;
-      }
-      result = true;
-    }
-  }
-  return result;
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/bindings.js
-import { BindingType as BindingType4, LiteralArray, LiteralMap, TmplAstBoundAttribute as TmplAstBoundAttribute4, TmplAstElement as TmplAstElement4, TmplAstTemplate as TmplAstTemplate3 } from "@angular/compiler";
-function getBoundAttributes(directive, node) {
-  const boundInputs = [];
-  const processAttribute = (attr) => {
-    if (attr instanceof TmplAstBoundAttribute4 && attr.type !== BindingType4.Property && attr.type !== BindingType4.TwoWay) {
-      return;
-    }
-    const inputs = directive.inputs.getByBindingPropertyName(attr.name);
-    if (inputs !== null) {
-      boundInputs.push({
-        value: attr.value,
-        sourceSpan: attr.sourceSpan,
-        keySpan: attr.keySpan ?? null,
-        inputs: inputs.map((input) => {
-          return {
-            fieldName: input.classPropertyName,
-            required: input.required,
-            transformType: input.transformType,
-            isSignal: input.isSignal,
-            isTwoWayBinding: attr instanceof TmplAstBoundAttribute4 && attr.type === BindingType4.TwoWay
-          };
-        })
-      });
-    }
-  };
-  if (node instanceof TmplAstTemplate3) {
-    if (node.tagName === "ng-template") {
-      node.inputs.forEach(processAttribute);
-      node.attributes.forEach(processAttribute);
-    }
-    node.templateAttrs.forEach(processAttribute);
-  } else {
-    node.inputs.forEach(processAttribute);
-    node.attributes.forEach(processAttribute);
-  }
-  return boundInputs;
-}
-function checkSplitTwoWayBinding(inputName, output, inputs, tcb) {
-  const input = inputs.find((input2) => input2.name === inputName);
-  if (input === void 0 || input.sourceSpan !== output.sourceSpan) {
-    return false;
-  }
-  const inputConsumer = tcb.boundTarget.getConsumerOfBinding(input);
-  const outputConsumer = tcb.boundTarget.getConsumerOfBinding(output);
-  if (outputConsumer === null || inputConsumer.ref === void 0 || outputConsumer instanceof TmplAstTemplate3) {
-    return false;
-  }
-  if (outputConsumer instanceof TmplAstElement4) {
-    tcb.oobRecorder.splitTwoWayBinding(tcb.id, input, output, inputConsumer, outputConsumer);
-    return true;
-  } else if (outputConsumer.ref !== inputConsumer.ref) {
-    tcb.oobRecorder.splitTwoWayBinding(tcb.id, input, output, inputConsumer, outputConsumer);
-    return true;
-  }
-  return false;
-}
-function widenBinding(expr, tcb, originalValue) {
-  if (!tcb.env.config.checkTypeOfInputBindings) {
-    return new TcbExpr(`((${expr.print()}) as any)`);
-  } else if (!tcb.env.config.strictNullInputBindings) {
-    if (originalValue instanceof LiteralMap || originalValue instanceof LiteralArray) {
-      return expr;
-    } else {
-      return new TcbExpr(`(${expr.print()})!`);
-    }
-  } else {
-    return expr;
-  }
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/inputs.js
-function translateInput(value, tcb, scope) {
-  if (typeof value === "string") {
-    return new TcbExpr(quoteAndEscape(value));
-  } else {
-    return tcbExpression(value, tcb, scope);
-  }
-}
-var TcbDirectiveInputsOp = class extends TcbOp {
-  tcb;
-  scope;
-  node;
-  dir;
-  isFormControl;
-  customFormControlType;
-  constructor(tcb, scope, node, dir, isFormControl2 = false, customFormControlType) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.node = node;
-    this.dir = dir;
-    this.isFormControl = isFormControl2;
-    this.customFormControlType = customFormControlType;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    let dirId = null;
-    const seenRequiredInputs = /* @__PURE__ */ new Set();
-    const boundAttrs = getBoundAttributes(this.dir, this.node);
-    if (this.customFormControlType !== null) {
-      checkUnsupportedFieldBindings(this.node, customFormControlBannedInputFields, this.tcb);
-    }
-    if (this.customFormControlType !== null || this.isFormControl) {
-      const additionalBindings = expandBoundAttributesForField(this.dir, this.node, this.customFormControlType);
-      if (additionalBindings !== null) {
-        boundAttrs.push(...additionalBindings);
-      }
-    }
-    for (const attr of boundAttrs) {
-      let assignment = widenBinding(translateInput(attr.value, this.tcb, this.scope), this.tcb, attr.value);
-      assignment.wrapForTypeChecker();
-      for (const { fieldName, required, transformType, isSignal, isTwoWayBinding } of attr.inputs) {
-        let target;
-        if (required) {
-          seenRequiredInputs.add(fieldName);
-        }
-        if (this.dir.coercedInputFields.has(fieldName)) {
-          let type;
-          if (transformType !== void 0) {
-            type = new TcbExpr(transformType);
-          } else {
-            const dirTypeRef = this.tcb.env.referenceTcbType(this.dir.ref);
-            if (!ts63.isTypeReferenceNode(dirTypeRef)) {
-              throw new Error(`Expected TypeReferenceNode from reference to ${this.dir.ref.name}`);
-            }
-            const typeName = ts63.isIdentifier(dirTypeRef.typeName) ? dirTypeRef.typeName.text : tempPrint(dirTypeRef.typeName, dirTypeRef.typeName.getSourceFile());
-            type = new TcbExpr(`typeof ${typeName}.ngAcceptInputType_${fieldName}`);
-          }
-          const id = new TcbExpr(this.tcb.allocateId());
-          this.scope.addStatement(declareVariable(id, type));
-          target = id;
-        } else if (this.dir.undeclaredInputFields.has(fieldName)) {
-          continue;
-        } else if (!this.tcb.env.config.honorAccessModifiersForInputBindings && this.dir.restrictedInputFields.has(fieldName)) {
-          if (dirId === null) {
-            dirId = this.scope.resolve(this.node, this.dir);
-          }
-          const id = new TcbExpr(this.tcb.allocateId());
-          const dirTypeRef = this.tcb.env.referenceTcbType(this.dir.ref);
-          if (!ts63.isTypeReferenceNode(dirTypeRef)) {
-            throw new Error(`Expected TypeReferenceNode from reference to ${this.dir.ref.name}`);
-          }
-          const type = new TcbExpr(`(typeof ${dirId.print()})[${quoteAndEscape(fieldName)}]`);
-          const temp = declareVariable(id, type);
-          this.scope.addStatement(temp);
-          target = id;
-        } else {
-          if (dirId === null) {
-            dirId = this.scope.resolve(this.node, this.dir);
-          }
-          target = this.dir.stringLiteralInputFields.has(fieldName) ? new TcbExpr(`${dirId.print()}[${quoteAndEscape(fieldName)}]`) : new TcbExpr(`${dirId.print()}.${fieldName}`);
-        }
-        if (isSignal) {
-          const inputSignalBrandWriteSymbol = this.tcb.env.referenceExternalSymbol(R3Identifiers5.InputSignalBrandWriteType.moduleName, R3Identifiers5.InputSignalBrandWriteType.name);
-          target = new TcbExpr(`${target.print()}[${inputSignalBrandWriteSymbol.print()}]`);
-        }
-        if (attr.keySpan !== null) {
-          target.addParseSpanInfo(attr.keySpan);
-        }
-        if (isTwoWayBinding && this.tcb.env.config.allowSignalsInTwoWayBindings) {
-          assignment = unwrapWritableSignal(assignment, this.tcb);
-        }
-        assignment = new TcbExpr(`${target.print()} = ${assignment.print()}`);
-      }
-      assignment.addParseSpanInfo(attr.sourceSpan);
-      if (!this.tcb.env.config.checkTypeOfAttributes && typeof attr.value === "string") {
-        assignment.markIgnoreDiagnostics();
-      }
-      this.scope.addStatement(assignment);
-    }
-    this.checkRequiredInputs(seenRequiredInputs);
-    return null;
-  }
-  checkRequiredInputs(seenRequiredInputs) {
-    const missing = [];
-    for (const input of this.dir.inputs) {
-      if (input.required && !seenRequiredInputs.has(input.classPropertyName)) {
-        missing.push(input.bindingPropertyName);
-      }
-    }
-    if (missing.length > 0) {
-      this.tcb.oobRecorder.missingRequiredInputs(this.tcb.id, this.node, this.dir.name, this.dir.isComponent, missing);
-    }
-  }
-};
-var TcbUnclaimedInputsOp = class extends TcbOp {
-  tcb;
-  scope;
-  inputs;
-  target;
-  claimedInputs;
-  constructor(tcb, scope, inputs, target, claimedInputs) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.inputs = inputs;
-    this.target = target;
-    this.claimedInputs = claimedInputs;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    let elId = null;
-    for (const binding of this.inputs) {
-      const isPropertyBinding = binding.type === BindingType5.Property || binding.type === BindingType5.TwoWay;
-      if (isPropertyBinding && this.claimedInputs?.has(binding.name)) {
-        continue;
-      }
-      const expr = widenBinding(tcbExpression(binding.value, this.tcb, this.scope), this.tcb, binding.value);
-      if (this.tcb.env.config.checkTypeOfDomBindings && isPropertyBinding) {
-        if (binding.name !== "style" && binding.name !== "class") {
-          if (elId === null) {
-            elId = this.scope.resolve(this.target);
-          }
-          const propertyName = REGISTRY.getMappedPropName(binding.name);
-          const stmt = new TcbExpr(`${elId.print()}[${quoteAndEscape(propertyName)}] = ${expr.wrapForTypeChecker().print()}`).addParseSpanInfo(binding.sourceSpan);
-          this.scope.addStatement(stmt);
-        } else {
-          this.scope.addStatement(expr);
-        }
-      } else {
-        this.scope.addStatement(expr);
-      }
-    }
-    return null;
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/schema.js
-import { BindingType as BindingType6, TmplAstComponent as TmplAstComponent2, TmplAstElement as TmplAstElement5 } from "@angular/compiler";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/selectorless.js
-function getComponentTagName(node) {
-  return node.tagName || "ng-component";
-}
-var TcbComponentNodeOp = class extends TcbOp {
-  tcb;
-  scope;
-  component;
-  optional = true;
-  constructor(tcb, scope, component) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.component = component;
-  }
-  execute() {
-    const id = this.tcb.allocateId();
-    const initializer = new TcbExpr(`document.createElement("${getComponentTagName(this.component)}")`);
-    initializer.addParseSpanInfo(this.component.startSourceSpan || this.component.sourceSpan);
-    this.scope.addStatement(new TcbExpr(`var ${id} = ${initializer.print()}`));
-    return new TcbExpr(id);
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/schema.js
-var TcbDomSchemaCheckerOp = class extends TcbOp {
-  tcb;
-  element;
-  checkElement;
-  claimedInputs;
-  constructor(tcb, element, checkElement, claimedInputs) {
-    super();
-    this.tcb = tcb;
-    this.element = element;
-    this.checkElement = checkElement;
-    this.claimedInputs = claimedInputs;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    const element = this.element;
-    const isTemplateElement = element instanceof TmplAstElement5 || element instanceof TmplAstComponent2;
-    const bindings = isTemplateElement ? element.inputs : element.bindings;
-    if (this.checkElement && isTemplateElement) {
-      this.tcb.domSchemaChecker.checkElement(this.tcb.id, this.getTagName(element), element.startSourceSpan, this.tcb.schemas, this.tcb.hostIsStandalone);
-    }
-    for (const binding of bindings) {
-      const isPropertyBinding = binding.type === BindingType6.Property || binding.type === BindingType6.TwoWay;
-      if (isPropertyBinding && this.claimedInputs?.has(binding.name)) {
-        continue;
-      }
-      if (isPropertyBinding && binding.name !== "style" && binding.name !== "class") {
-        const propertyName = REGISTRY.getMappedPropName(binding.name);
-        if (isTemplateElement) {
-          this.tcb.domSchemaChecker.checkTemplateElementProperty(this.tcb.id, this.getTagName(element), propertyName, binding.sourceSpan, this.tcb.schemas, this.tcb.hostIsStandalone);
-        } else {
-          this.tcb.domSchemaChecker.checkHostElementProperty(this.tcb.id, element, propertyName, binding.keySpan, this.tcb.schemas);
-        }
-      }
-    }
-    return null;
-  }
-  getTagName(node) {
-    return node instanceof TmplAstElement5 ? node.name : getComponentTagName(node);
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/events.js
-import { ImplicitReceiver as ImplicitReceiver6, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead7, TmplAstElement as TmplAstElement6 } from "@angular/compiler";
-var EVENT_PARAMETER = "$event";
-function tcbEventHandlerExpression(ast, tcb, scope) {
-  const translator = new TcbEventHandlerTranslator(tcb, scope);
-  return translator.translate(ast);
-}
-var TcbDirectiveOutputsOp = class extends TcbOp {
-  tcb;
-  scope;
-  node;
-  inputs;
-  outputs;
-  dir;
-  constructor(tcb, scope, node, inputs, outputs, dir) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.node = node;
-    this.inputs = inputs;
-    this.outputs = outputs;
-    this.dir = dir;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    let dirId = null;
-    const outputs = this.dir.outputs;
-    for (const output of this.outputs) {
-      if (output.type === ParsedEventType2.LegacyAnimation || !outputs.hasBindingPropertyName(output.name)) {
-        continue;
-      }
-      if (this.tcb.env.config.checkTypeOfOutputEvents && this.inputs !== null && output.name.endsWith("Change")) {
-        const inputName = output.name.slice(0, -6);
-        checkSplitTwoWayBinding(inputName, output, this.inputs, this.tcb);
-      }
-      const field = outputs.getByBindingPropertyName(output.name)[0].classPropertyName;
-      if (dirId === null) {
-        dirId = this.scope.resolve(this.node, this.dir);
-      }
-      const outputField = new TcbExpr(`${dirId.print()}[${quoteAndEscape(field)}]`);
-      outputField.addParseSpanInfo(output.keySpan);
-      if (this.tcb.env.config.checkTypeOfOutputEvents) {
-        const handler = tcbCreateEventHandler(
-          output,
-          this.tcb,
-          this.scope,
-          0
-          /* EventParamType.Infer */
-        );
-        const call = new TcbExpr(`${outputField.print()}.subscribe(${handler.print()})`);
-        call.addParseSpanInfo(output.sourceSpan);
-        this.scope.addStatement(call);
-      } else {
-        this.scope.addStatement(outputField);
-        const handler = tcbCreateEventHandler(
-          output,
-          this.tcb,
-          this.scope,
-          1
-          /* EventParamType.Any */
-        );
-        this.scope.addStatement(handler);
-      }
-    }
-    return null;
-  }
-};
-var TcbUnclaimedOutputsOp = class extends TcbOp {
-  tcb;
-  scope;
-  target;
-  outputs;
-  inputs;
-  claimedOutputs;
-  constructor(tcb, scope, target, outputs, inputs, claimedOutputs) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.target = target;
-    this.outputs = outputs;
-    this.inputs = inputs;
-    this.claimedOutputs = claimedOutputs;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    let elId = null;
-    for (const output of this.outputs) {
-      if (this.claimedOutputs?.has(output.name)) {
-        continue;
-      }
-      if (this.tcb.env.config.checkTypeOfOutputEvents && this.inputs !== null && output.name.endsWith("Change")) {
-        const inputName = output.name.slice(0, -6);
-        if (checkSplitTwoWayBinding(inputName, output, this.inputs, this.tcb)) {
-          continue;
-        }
-      }
-      if (output.type === ParsedEventType2.LegacyAnimation) {
-        const eventType = this.tcb.env.config.checkTypeOfAnimationEvents ? this.tcb.env.referenceExternalSymbol("@angular/animations", "AnimationEvent").print() : 1;
-        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, eventType);
-        this.scope.addStatement(handler);
-      } else if (output.type === ParsedEventType2.Animation) {
-        const eventType = this.tcb.env.referenceExternalSymbol("@angular/core", "AnimationCallbackEvent");
-        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, eventType.print());
-        this.scope.addStatement(handler);
-      } else if (this.tcb.env.config.checkTypeOfDomEvents) {
-        let target;
-        let domEventAssertion;
-        if (output.target === "window" || output.target === "document") {
-          target = new TcbExpr(output.target);
-        } else if (elId === null) {
-          target = elId = this.scope.resolve(this.target);
-        } else {
-          target = elId;
-        }
-        if (this.target instanceof TmplAstElement6 && this.target.isVoid && this.tcb.env.config.allowDomEventAssertion) {
-          const assertUtil = this.tcb.env.referenceExternalSymbol("@angular/core", "\u0275assertType");
-          domEventAssertion = new TcbExpr(`${assertUtil.print()}<typeof ${target.print()}>(${EVENT_PARAMETER}.target)`);
-        }
-        const propertyAccess = new TcbExpr(`${target.print()}.addEventListener`).addParseSpanInfo(output.keySpan);
-        const handler = tcbCreateEventHandler(output, this.tcb, this.scope, 0, domEventAssertion);
-        const call = new TcbExpr(`${propertyAccess.print()}(${quoteAndEscape(output.name)}, ${handler.print()})`);
-        call.addParseSpanInfo(output.sourceSpan);
-        this.scope.addStatement(call);
-      } else {
-        const handler = tcbCreateEventHandler(
-          output,
-          this.tcb,
-          this.scope,
-          1
-          /* EventParamType.Any */
-        );
-        this.scope.addStatement(handler);
-      }
-    }
-    return null;
-  }
-};
-var TcbEventHandlerTranslator = class extends TcbExpressionTranslator {
-  resolve(ast) {
-    if (ast instanceof PropertyRead7 && ast.receiver instanceof ImplicitReceiver6 && ast.name === EVENT_PARAMETER) {
-      return new TcbExpr(EVENT_PARAMETER).addParseSpanInfo(ast.nameSpan);
-    }
-    return super.resolve(ast);
-  }
-  isValidLetDeclarationAccess() {
-    return true;
-  }
-};
-function tcbCreateEventHandler(event, tcb, scope, eventType, assertionExpression) {
-  const handler = tcbEventHandlerExpression(event.handler, tcb, scope);
-  const statements = [];
-  if (assertionExpression !== void 0) {
-    statements.push(assertionExpression);
-  }
-  if (event.type === ParsedEventType2.TwoWay && tcb.env.config.checkTwoWayBoundEvents) {
-    const target = tcb.allocateId();
-    const initializer = tcb.env.config.allowSignalsInTwoWayBindings ? unwrapWritableSignal(handler, tcb) : handler;
-    statements.push(new TcbExpr(`var ${target} = ${initializer.print()}`), new TcbExpr(`${target} = ${EVENT_PARAMETER}`));
-  } else {
-    statements.push(handler);
-  }
-  let eventParamType;
-  if (eventType === 0) {
-    eventParamType = void 0;
-  } else if (eventType === 1) {
-    eventParamType = "any";
-  } else {
-    eventParamType = eventType;
-  }
-  const guards = scope.guards();
-  let body = `{
-${getStatementsBlock(statements)} }`;
-  if (guards !== null) {
-    body = `{ if (${guards.print()}) ${body} }`;
-  }
-  const eventParam = new TcbExpr(`${EVENT_PARAMETER}${eventParamType === void 0 ? "" : ": " + eventParamType}`);
-  eventParam.addExpressionIdentifier(ExpressionIdentifier.EVENT_PARAMETER);
-  return new TcbExpr(`(${eventParam.print()}): any => ${body}`);
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/directive_type.js
-import { TmplAstHostElement as TmplAstHostElement3 } from "@angular/compiler";
-import ts64 from "typescript";
-var TcbDirectiveTypeOpBase = class extends TcbOp {
-  tcb;
-  scope;
-  node;
-  dir;
-  constructor(tcb, scope, node, dir) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.node = node;
-    this.dir = dir;
-  }
-  get optional() {
-    return true;
-  }
-  execute() {
-    const rawType = this.tcb.env.referenceTcbType(this.dir.ref);
-    let type;
-    let span;
-    if (this.dir.isGeneric === false || this.dir.typeParameters === null || this.dir.typeParameters.length === 0) {
-      type = new TcbExpr(tempPrint(rawType, this.tcb.env.contextFile));
-    } else {
-      if (!ts64.isTypeReferenceNode(rawType)) {
-        throw new Error(`Expected TypeReferenceNode when referencing the type for ${this.dir.ref.name}`);
-      }
-      const typeName = ts64.isIdentifier(rawType.typeName) ? rawType.typeName.text : tempPrint(rawType.typeName, this.tcb.env.contextFile);
-      const typeArguments = Array(this.dir.typeParameters?.length ?? 0).fill("any").join(", ");
-      type = new TcbExpr(`${typeName}<${typeArguments}>`);
-    }
-    if (this.node instanceof TmplAstHostElement3) {
-      span = this.node.sourceSpan;
-    } else {
-      span = this.node.startSourceSpan || this.node.sourceSpan;
-    }
-    const id = new TcbExpr(this.tcb.allocateId()).addExpressionIdentifier(ExpressionIdentifier.DIRECTIVE).addParseSpanInfo(span);
-    this.scope.addStatement(declareVariable(id, type));
-    return id;
-  }
-};
-var TcbNonGenericDirectiveTypeOp = class extends TcbDirectiveTypeOpBase {
-  /**
-   * Creates a variable declaration for this op's directive of the argument type. Returns the id of
-   * the newly created variable.
-   */
-  execute() {
-    if (this.dir.isGeneric) {
-      throw new Error(`Assertion Error: expected ${this.dir.ref.name} not to be generic.`);
-    }
-    return super.execute();
-  }
-};
-var TcbGenericDirectiveTypeWithAnyParamsOp = class extends TcbDirectiveTypeOpBase {
-  execute() {
-    if (this.dir.typeParameters === null || this.dir.typeParameters.length === 0) {
-      throw new Error(`Assertion Error: expected typeParameters when creating a declaration for ${this.dir.ref.name}`);
-    }
-    return super.execute();
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/directive_constructor.js
-import { TmplAstHostElement as TmplAstHostElement4 } from "@angular/compiler";
-var TcbDirectiveCtorOp = class extends TcbOp {
-  tcb;
-  scope;
-  node;
-  dir;
-  customFormControlType;
-  constructor(tcb, scope, node, dir, customFormControlType) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.node = node;
-    this.dir = dir;
-    this.customFormControlType = customFormControlType;
-  }
-  get optional() {
-    return true;
-  }
-  execute() {
-    const genericInputs = /* @__PURE__ */ new Map();
-    const id = new TcbExpr(this.tcb.allocateId());
-    let boundAttrs;
-    let span;
-    if (this.node instanceof TmplAstHostElement4) {
-      boundAttrs = [];
-      span = this.node.sourceSpan;
-    } else {
-      span = this.node.startSourceSpan || this.node.sourceSpan;
-      boundAttrs = getBoundAttributes(this.dir, this.node);
-      if (this.customFormControlType !== null) {
-        const additionalBindings = expandBoundAttributesForField(this.dir, this.node, this.customFormControlType);
-        if (additionalBindings !== null) {
-          boundAttrs.push(...additionalBindings);
-        }
-      }
-    }
-    id.addExpressionIdentifier(ExpressionIdentifier.DIRECTIVE).addParseSpanInfo(span);
-    for (const attr of boundAttrs) {
-      if (!this.tcb.env.config.checkTypeOfAttributes && typeof attr.value === "string") {
-        continue;
-      }
-      for (const { fieldName, isTwoWayBinding } of attr.inputs) {
-        if (genericInputs.has(fieldName)) {
-          continue;
-        }
-        const expression = translateInput(attr.value, this.tcb, this.scope);
-        genericInputs.set(fieldName, {
-          type: "binding",
-          field: fieldName,
-          expression,
-          originalExpression: attr.value,
-          sourceSpan: attr.sourceSpan,
-          isTwoWayBinding
-        });
-      }
-    }
-    for (const { classPropertyName } of this.dir.inputs) {
-      if (!genericInputs.has(classPropertyName)) {
-        genericInputs.set(classPropertyName, { type: "unset", field: classPropertyName });
-      }
-    }
-    const typeCtor = tcbCallTypeCtor(this.dir, this.tcb, Array.from(genericInputs.values()));
-    typeCtor.markIgnoreDiagnostics();
-    this.scope.addStatement(new TcbExpr(`var ${id.print()} = ${typeCtor.print()}`));
-    return id;
-  }
-  circularFallback() {
-    return new TcbDirectiveCtorCircularFallbackOp(this.tcb, this.scope, this.dir);
-  }
-};
-var TcbDirectiveCtorCircularFallbackOp = class extends TcbOp {
-  tcb;
-  scope;
-  dir;
-  constructor(tcb, scope, dir) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.dir = dir;
-  }
-  get optional() {
-    return false;
-  }
-  execute() {
-    const id = this.tcb.allocateId();
-    const typeCtor = this.tcb.env.typeCtorFor(this.dir);
-    this.scope.addStatement(new TcbExpr(`var ${id} = ${typeCtor.print()}(null!)`));
-    return new TcbExpr(id);
-  }
-};
-function tcbCallTypeCtor(dir, tcb, inputs) {
-  const typeCtor = tcb.env.typeCtorFor(dir);
-  let literal4 = "{ ";
-  for (let i = 0; i < inputs.length; i++) {
-    const input = inputs[i];
-    const propertyName = quoteAndEscape(input.field);
-    const isLast = i === inputs.length - 1;
-    if (input.type === "binding") {
-      let expr = widenBinding(input.expression, tcb, input.originalExpression);
-      if (input.isTwoWayBinding && tcb.env.config.allowSignalsInTwoWayBindings) {
-        expr = unwrapWritableSignal(expr, tcb);
-      }
-      const assignment = new TcbExpr(`${propertyName}: ${expr.wrapForTypeChecker().print()}`);
-      assignment.addParseSpanInfo(input.sourceSpan);
-      literal4 += assignment.print();
-    } else {
-      literal4 += `${propertyName}: 0 as any`;
-    }
-    literal4 += `${isLast ? "" : ","} `;
-  }
-  literal4 += "}";
-  return new TcbExpr(`${typeCtor.print()}(${literal4})`);
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/content_projection.js
-import { createCssSelectorFromNode, CssSelector as CssSelector3, SelectorMatcher as SelectorMatcher2, TmplAstElement as TmplAstElement7, TmplAstForLoopBlock, TmplAstIfBlock, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate4, TmplAstText } from "@angular/compiler";
-import ts65 from "typescript";
-var TcbControlFlowContentProjectionOp = class extends TcbOp {
-  tcb;
-  element;
-  ngContentSelectors;
-  componentName;
-  category;
-  constructor(tcb, element, ngContentSelectors, componentName) {
-    super();
-    this.tcb = tcb;
-    this.element = element;
-    this.ngContentSelectors = ngContentSelectors;
-    this.componentName = componentName;
-    this.category = tcb.env.config.controlFlowPreventingContentProjection === "error" ? ts65.DiagnosticCategory.Error : ts65.DiagnosticCategory.Warning;
-  }
-  optional = false;
-  execute() {
-    const controlFlowToCheck = this.findPotentialControlFlowNodes();
-    if (controlFlowToCheck.length > 0) {
-      const matcher = new SelectorMatcher2();
-      for (const selector of this.ngContentSelectors) {
-        if (selector !== "*") {
-          matcher.addSelectables(CssSelector3.parse(selector), selector);
-        }
-      }
-      for (const root of controlFlowToCheck) {
-        for (const child of root.children) {
-          if (child instanceof TmplAstElement7 || child instanceof TmplAstTemplate4) {
-            matcher.match(createCssSelectorFromNode(child), (_, originalSelector) => {
-              this.tcb.oobRecorder.controlFlowPreventingContentProjection(this.tcb.id, this.category, child, this.componentName, originalSelector, root, this.tcb.hostPreserveWhitespaces);
-            });
-          }
-        }
-      }
-    }
-    return null;
-  }
-  findPotentialControlFlowNodes() {
-    const result = [];
-    for (const child of this.element.children) {
-      if (child instanceof TmplAstForLoopBlock) {
-        if (this.shouldCheck(child)) {
-          result.push(child);
-        }
-        if (child.empty !== null && this.shouldCheck(child.empty)) {
-          result.push(child.empty);
-        }
-      } else if (child instanceof TmplAstIfBlock) {
-        for (const branch of child.branches) {
-          if (this.shouldCheck(branch)) {
-            result.push(branch);
-          }
-        }
-      } else if (child instanceof TmplAstSwitchBlock) {
-        for (const current of child.groups) {
-          if (this.shouldCheck(current)) {
-            result.push(current);
-          }
-        }
-      }
-    }
-    return result;
-  }
-  shouldCheck(node) {
-    if (node.children.length < 2) {
-      return false;
-    }
-    let hasSeenRootNode = false;
-    for (const child of node.children) {
-      if (!(child instanceof TmplAstText) || this.tcb.hostPreserveWhitespaces || child.value.trim().length > 0) {
-        if (hasSeenRootNode) {
-          return true;
-        }
-        hasSeenRootNode = true;
-      }
-    }
-    return false;
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/intersection_observer.js
-var TcbIntersectionObserverOp = class extends TcbOp {
-  tcb;
-  scope;
-  options;
-  constructor(tcb, scope, options) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.options = options;
-  }
-  optional = false;
-  execute() {
-    const options = tcbExpression(this.options, this.tcb, this.scope);
-    this.scope.addStatement(new TcbExpr(`new IntersectionObserver(null!, ${options.print()})`));
-    return null;
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/host.js
-var TcbHostElementOp = class extends TcbOp {
-  tcb;
-  scope;
-  element;
-  optional = true;
-  constructor(tcb, scope, element) {
-    super();
-    this.tcb = tcb;
-    this.scope = scope;
-    this.element = element;
-  }
-  execute() {
-    const id = this.tcb.allocateId();
-    let tagNames;
-    if (this.element.tagNames.length === 1) {
-      tagNames = `"${this.element.tagNames[0]}"`;
-    } else {
-      tagNames = `null! as ${this.element.tagNames.map((t) => `"${t}"`).join(" | ")}`;
-    }
-    const initializer = new TcbExpr(`document.createElement(${tagNames})`);
-    initializer.addParseSpanInfo(this.element.sourceSpan);
-    this.scope.addStatement(new TcbExpr(`var ${id} = ${initializer.print()}`));
-    return new TcbExpr(id);
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/scope.js
-var Scope = class _Scope {
-  tcb;
-  parent;
-  guard;
-  /**
-   * A queue of operations which need to be performed to generate the TCB code for this scope.
-   *
-   * This array can contain either a `TcbOp` which has yet to be executed, or a `TcbExpr|null`
-   * representing the memoized result of executing the operation. As operations are executed, their
-   * results are written into the `opQueue`, overwriting the original operation.
-   *
-   * If an operation is in the process of being executed, it is temporarily overwritten here with
-   * `INFER_TYPE_FOR_CIRCULAR_OP_EXPR`. This way, if a cycle is encountered where an operation
-   * depends transitively on its own result, the inner operation will infer the least narrow type
-   * that fits instead. This has the same semantics as TypeScript itself when types are referenced
-   * circularly.
-   */
-  opQueue = [];
-  /**
-   * A map of `TmplAstElement`s to the index of their `TcbElementOp` in the `opQueue`
-   */
-  elementOpMap = /* @__PURE__ */ new Map();
-  /**
-   * A map of `TmplAstHostElement`s to the index of their `TcbHostElementOp` in the `opQueue`
-   */
-  hostElementOpMap = /* @__PURE__ */ new Map();
-  /**
-   * A map of `TmplAstComponent`s to the index of their `TcbComponentNodeOp` in the `opQueue`
-   */
-  componentNodeOpMap = /* @__PURE__ */ new Map();
-  /**
-   * A map of maps which tracks the index of `TcbDirectiveCtorOp`s in the `opQueue` for each
-   * directive on a `TmplAstElement` or `TmplAstTemplate` node.
-   */
-  directiveOpMap = /* @__PURE__ */ new Map();
-  /**
-   * A map of `TmplAstReference`s to the index of their `TcbReferenceOp` in the `opQueue`
-   */
-  referenceOpMap = /* @__PURE__ */ new Map();
-  /**
-   * Map of immediately nested <ng-template>s (within this `Scope`) represented by `TmplAstTemplate`
-   * nodes to the index of their `TcbTemplateContextOp`s in the `opQueue`.
-   */
-  templateCtxOpMap = /* @__PURE__ */ new Map();
-  /**
-   * Map of variables declared on the template that created this `Scope` (represented by
-   * `TmplAstVariable` nodes) to the index of their `TcbVariableOp`s in the `opQueue`, or to
-   * pre-resolved variable identifiers.
-   */
-  varMap = /* @__PURE__ */ new Map();
-  /**
-   * A map of the names of `TmplAstLetDeclaration`s to the index of their op in the `opQueue`.
-   *
-   * Assumes that there won't be duplicated `@let` declarations within the same scope.
-   */
-  letDeclOpMap = /* @__PURE__ */ new Map();
-  /**
-   * Statements for this template.
-   *
-   * Executing the `TcbOp`s in the `opQueue` populates this array.
-   */
-  statements = [];
-  /**
-   * Gets names of the for loop context variables and their types.
-   */
-  static getForLoopContextVariableTypes() {
-    return /* @__PURE__ */ new Map([
-      ["$first", "boolean"],
-      ["$last", "boolean"],
-      ["$even", "boolean"],
-      ["$odd", "boolean"],
-      ["$index", "number"],
-      ["$count", "number"]
-    ]);
-  }
-  constructor(tcb, parent = null, guard = null) {
-    this.tcb = tcb;
-    this.parent = parent;
-    this.guard = guard;
-  }
-  /**
-   * Constructs a `Scope` given either a `TmplAstTemplate` or a list of `TmplAstNode`s.
-   *
-   * @param tcb the overall context of TCB generation.
-   * @param parentScope the `Scope` of the parent template (if any) or `null` if this is the root
-   * `Scope`.
-   * @param scopedNode Node that provides the scope around the child nodes (e.g. a
-   * `TmplAstTemplate` node exposing variables to its children).
-   * @param children Child nodes that should be appended to the TCB.
-   * @param guard an expression that is applied to this scope for type narrowing purposes.
-   */
-  static forNodes(tcb, parentScope, scopedNode, children, guard) {
-    const scope = new _Scope(tcb, parentScope, guard);
-    if (parentScope === null && tcb.env.config.enableTemplateTypeChecker) {
-      scope.opQueue.push(new TcbComponentContextCompletionOp(scope));
-    }
-    if (scopedNode instanceof TmplAstTemplate5) {
-      const varMap = /* @__PURE__ */ new Map();
-      for (const v of scopedNode.variables) {
-        if (!varMap.has(v.name)) {
-          varMap.set(v.name, v);
-        } else {
-          const firstDecl = varMap.get(v.name);
-          tcb.oobRecorder.duplicateTemplateVar(tcb.id, v, firstDecl);
-        }
-        _Scope.registerVariable(scope, v, new TcbTemplateVariableOp(tcb, scope, scopedNode, v));
-      }
-    } else if (scopedNode instanceof TmplAstIfBlockBranch) {
-      const { expression, expressionAlias } = scopedNode;
-      if (expression !== null && expressionAlias !== null) {
-        _Scope.registerVariable(scope, expressionAlias, new TcbBlockVariableOp(tcb, scope, tcbExpression(expression, tcb, scope), expressionAlias));
-      }
-    } else if (scopedNode instanceof TmplAstForLoopBlock2) {
-      const loopInitializer = new TcbExpr(tcb.allocateId());
-      loopInitializer.addParseSpanInfo(scopedNode.item.sourceSpan);
-      scope.varMap.set(scopedNode.item, loopInitializer);
-      const forLoopContextVariableTypes = _Scope.getForLoopContextVariableTypes();
-      for (const variable of scopedNode.contextVariables) {
-        if (!forLoopContextVariableTypes.has(variable.value)) {
-          throw new Error(`Unrecognized for loop context variable ${variable.name}`);
-        }
-        const type = new TcbExpr(forLoopContextVariableTypes.get(variable.value));
-        _Scope.registerVariable(scope, variable, new TcbBlockImplicitVariableOp(tcb, scope, type, variable));
-      }
-    } else if (scopedNode instanceof TmplAstHostElement5) {
-      scope.appendNode(scopedNode);
-    }
-    if (children !== null) {
-      for (const node of children) {
-        scope.appendNode(node);
-      }
-    }
-    for (const variable of scope.varMap.keys()) {
-      _Scope.checkConflictingLet(scope, variable);
-    }
-    for (const ref of scope.referenceOpMap.keys()) {
-      _Scope.checkConflictingLet(scope, ref);
-    }
-    return scope;
-  }
-  /** Registers a local variable with a scope. */
-  static registerVariable(scope, variable, op) {
-    const opIndex = scope.opQueue.push(op) - 1;
-    scope.varMap.set(variable, opIndex);
-  }
-  /**
-   * Look up a `ts.Expression` representing the value of some operation in the current `Scope`,
-   * including any parent scope(s). This method always returns a mutable clone of the
-   * `ts.Expression` with the comments cleared.
-   *
-   * @param node a `TmplAstNode` of the operation in question. The lookup performed will depend on
-   * the type of this node:
-   *
-   * Assuming `directive` is not present, then `resolve` will return:
-   *
-   * * `TmplAstElement` - retrieve the expression for the element DOM node
-   * * `TmplAstTemplate` - retrieve the template context variable
-   * * `TmplAstVariable` - retrieve a template let- variable
-   * * `TmplAstLetDeclaration` - retrieve a template `@let` declaration
-   * * `TmplAstReference` - retrieve variable created for the local ref
-   *
-   * @param directive if present, a directive type on a `TmplAstElement` or `TmplAstTemplate` to
-   * look up instead of the default for an element or template node.
-   */
-  resolve(node, directive) {
-    const res = this.resolveLocal(node, directive);
-    if (res !== null) {
-      return res;
-    } else if (this.parent !== null) {
-      return this.parent.resolve(node, directive);
-    } else {
-      throw new Error(`Could not resolve ${node} / ${directive}`);
-    }
-  }
-  /**
-   * Add a statement to this scope.
-   */
-  addStatement(stmt) {
-    this.statements.push(stmt);
-  }
-  /**
-   * Get the statements.
-   */
-  render() {
-    for (let i = 0; i < this.opQueue.length; i++) {
-      const skipOptional = !this.tcb.env.config.enableTemplateTypeChecker;
-      this.executeOp(i, skipOptional);
-    }
-    return this.statements;
-  }
-  /**
-   * Returns an expression of all template guards that apply to this scope, including those of
-   * parent scopes. If no guards have been applied, null is returned.
-   */
-  guards() {
-    let parentGuards = null;
-    if (this.parent !== null) {
-      parentGuards = this.parent.guards();
-    }
-    if (this.guard === null) {
-      return parentGuards;
-    } else if (parentGuards === null) {
-      return typeof this.guard === "string" ? new TcbExpr(this.guard) : this.guard;
-    } else {
-      const guard = typeof this.guard === "string" ? this.guard : this.guard.print();
-      return new TcbExpr(`(${parentGuards.print()}) && (${guard})`);
-    }
-  }
-  /** Returns whether a template symbol is defined locally within the current scope. */
-  isLocal(node) {
-    if (node instanceof TmplAstVariable2) {
-      return this.varMap.has(node);
-    }
-    if (node instanceof TmplAstLetDeclaration3) {
-      return this.letDeclOpMap.has(node.name);
-    }
-    return this.referenceOpMap.has(node);
-  }
-  /**
-   * Constructs a `Scope` given either a `TmplAstTemplate` or a list of `TmplAstNode`s.
-   * This is identical to `Scope.forNodes` which we can't reference in some ops due to
-   * circular dependencies.
-   *.
-   * @param parentScope the `Scope` of the parent template.
-   * @param scopedNode Node that provides the scope around the child nodes (e.g. a
-   * `TmplAstTemplate` node exposing variables to its children).
-   * @param children Child nodes that should be appended to the TCB.
-   * @param guard an expression that is applied to this scope for type narrowing purposes.
-   */
-  createChildScope(parentScope, scopedNode, children, guard) {
-    return _Scope.forNodes(this.tcb, parentScope, scopedNode, children, guard);
-  }
-  resolveLocal(ref, directive) {
-    if (ref instanceof TmplAstReference2 && this.referenceOpMap.has(ref)) {
-      return this.resolveOp(this.referenceOpMap.get(ref));
-    } else if (ref instanceof TmplAstLetDeclaration3 && this.letDeclOpMap.has(ref.name)) {
-      return this.resolveOp(this.letDeclOpMap.get(ref.name).opIndex);
-    } else if (ref instanceof TmplAstVariable2 && this.varMap.has(ref)) {
-      const opIndexOrNode = this.varMap.get(ref);
-      return typeof opIndexOrNode === "number" ? this.resolveOp(opIndexOrNode) : new TcbExpr(opIndexOrNode.print(
-        true
-        /* ignoreComments */
-      ));
-    } else if (ref instanceof TmplAstTemplate5 && directive === void 0 && this.templateCtxOpMap.has(ref)) {
-      return this.resolveOp(this.templateCtxOpMap.get(ref));
-    } else if ((ref instanceof TmplAstElement8 || ref instanceof TmplAstTemplate5 || ref instanceof TmplAstComponent3 || ref instanceof TmplAstDirective2 || ref instanceof TmplAstHostElement5) && directive !== void 0 && this.directiveOpMap.has(ref)) {
-      const dirMap = this.directiveOpMap.get(ref);
-      return dirMap.has(directive) ? this.resolveOp(dirMap.get(directive)) : null;
-    } else if (ref instanceof TmplAstElement8 && this.elementOpMap.has(ref)) {
-      return this.resolveOp(this.elementOpMap.get(ref));
-    } else if (ref instanceof TmplAstComponent3 && this.componentNodeOpMap.has(ref)) {
-      return this.resolveOp(this.componentNodeOpMap.get(ref));
-    } else if (ref instanceof TmplAstHostElement5 && this.hostElementOpMap.has(ref)) {
-      return this.resolveOp(this.hostElementOpMap.get(ref));
-    } else {
-      return null;
-    }
-  }
-  /**
-   * Like `executeOp`, but assert that the operation actually returned `TcbExpr`.
-   */
-  resolveOp(opIndex) {
-    const res = this.executeOp(
-      opIndex,
-      /* skipOptional */
-      false
-    );
-    if (res === null) {
-      throw new Error(`Error resolving operation, got null`);
-    }
-    return res;
-  }
-  /**
-   * Execute a particular `TcbOp` in the `opQueue`.
-   *
-   * This method replaces the operation in the `opQueue` with the result of execution (once done)
-   * and also protects against a circular dependency from the operation to itself by temporarily
-   * setting the operation's result to a special expression.
-   */
-  executeOp(opIndex, skipOptional) {
-    const op = this.opQueue[opIndex];
-    if (!(op instanceof TcbOp)) {
-      return op === null ? null : new TcbExpr(op.print(
-        true
-        /* ignoreComments */
-      ));
-    }
-    if (skipOptional && op.optional) {
-      return null;
-    }
-    this.opQueue[opIndex] = op.circularFallback();
-    let res = op.execute();
-    if (res !== null) {
-      res = new TcbExpr(res.print(
-        true
-        /* ignoreComments */
-      ));
-    }
-    this.opQueue[opIndex] = res;
-    return res;
-  }
-  appendNode(node) {
-    if (node instanceof TmplAstElement8) {
-      const opIndex = this.opQueue.push(new TcbElementOp(this.tcb, this, node)) - 1;
-      this.elementOpMap.set(node, opIndex);
-      if (this.tcb.env.config.controlFlowPreventingContentProjection !== "suppress") {
-        this.appendContentProjectionCheckOp(node);
-      }
-      this.appendDirectivesAndInputsOfElementLikeNode(node);
-      this.appendOutputsOfElementLikeNode(node, node.inputs, node.outputs);
-      this.appendSelectorlessDirectives(node);
-      this.appendChildren(node);
-      this.checkAndAppendReferencesOfNode(node);
-    } else if (node instanceof TmplAstTemplate5) {
-      this.appendDirectivesAndInputsOfElementLikeNode(node);
-      this.appendOutputsOfElementLikeNode(node, node.inputs, node.outputs);
-      this.appendSelectorlessDirectives(node);
-      const ctxIndex = this.opQueue.push(new TcbTemplateContextOp(this.tcb, this)) - 1;
-      this.templateCtxOpMap.set(node, ctxIndex);
-      if (this.tcb.env.config.checkTemplateBodies) {
-        this.opQueue.push(new TcbTemplateBodyOp(this.tcb, this, node));
-      } else if (this.tcb.env.config.alwaysCheckSchemaInTemplateBodies) {
-        this.appendDeepSchemaChecks(node.children);
-      }
-      this.checkAndAppendReferencesOfNode(node);
-    } else if (node instanceof TmplAstComponent3) {
-      this.appendComponentNode(node);
-    } else if (node instanceof TmplAstDeferredBlock) {
-      this.appendDeferredBlock(node);
-    } else if (node instanceof TmplAstIfBlock2) {
-      this.opQueue.push(new TcbIfOp(this.tcb, this, node));
-    } else if (node instanceof TmplAstSwitchBlock2) {
-      this.opQueue.push(new TcbSwitchOp(this.tcb, this, node));
-    } else if (node instanceof TmplAstForLoopBlock2) {
-      this.opQueue.push(new TcbForOfOp(this.tcb, this, node));
-      node.empty && this.tcb.env.config.checkControlFlowBodies && this.appendChildren(node.empty);
-    } else if (node instanceof TmplAstBoundText) {
-      this.opQueue.push(new TcbExpressionOp(this.tcb, this, node.value));
-    } else if (node instanceof TmplAstIcu) {
-      this.appendIcuExpressions(node);
-    } else if (node instanceof TmplAstContent) {
-      this.appendChildren(node);
-    } else if (node instanceof TmplAstLetDeclaration3) {
-      const opIndex = this.opQueue.push(new TcbLetDeclarationOp(this.tcb, this, node)) - 1;
-      if (this.isLocal(node)) {
-        this.tcb.oobRecorder.conflictingDeclaration(this.tcb.id, node);
-      } else {
-        this.letDeclOpMap.set(node.name, { opIndex, node });
-      }
-    } else if (node instanceof TmplAstHostElement5) {
-      this.appendHostElement(node);
-    }
-  }
-  appendChildren(node) {
-    for (const child of node.children) {
-      this.appendNode(child);
-    }
-  }
-  checkAndAppendReferencesOfNode(node) {
-    for (const ref of node.references) {
-      const target = this.tcb.boundTarget.getReferenceTarget(ref);
-      let ctxIndex;
-      if (target === null) {
-        this.tcb.oobRecorder.missingReferenceTarget(this.tcb.id, ref);
-        ctxIndex = this.opQueue.push(new TcbInvalidReferenceOp(this.tcb, this)) - 1;
-      } else if (target instanceof TmplAstTemplate5 || target instanceof TmplAstElement8) {
-        ctxIndex = this.opQueue.push(new TcbReferenceOp(this.tcb, this, ref, node, target)) - 1;
-      } else {
-        ctxIndex = this.opQueue.push(new TcbReferenceOp(this.tcb, this, ref, node, target.directive)) - 1;
-      }
-      this.referenceOpMap.set(ref, ctxIndex);
-    }
-  }
-  appendDirectivesAndInputsOfElementLikeNode(node) {
-    const claimedInputs = /* @__PURE__ */ new Set();
-    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
-    if (directives === null || directives.length === 0) {
-      if (node instanceof TmplAstElement8) {
-        this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node.inputs, node, claimedInputs), new TcbDomSchemaCheckerOp(
-          this.tcb,
-          node,
-          /* checkElement */
-          true,
-          claimedInputs
-        ));
-      }
-      return;
-    }
-    if (node instanceof TmplAstElement8) {
-      const isDeferred = this.tcb.boundTarget.isDeferred(node);
-      if (!isDeferred && directives.some((dirMeta) => dirMeta.isExplicitlyDeferred)) {
-        this.tcb.oobRecorder.deferredComponentUsedEagerly(this.tcb.id, node);
-      }
-    }
-    const dirMap = /* @__PURE__ */ new Map();
-    for (const dir of directives) {
-      this.appendDirectiveInputs(dir, node, dirMap, directives);
-    }
-    this.directiveOpMap.set(node, dirMap);
-    if (node instanceof TmplAstElement8) {
-      for (const dir of directives) {
-        for (const propertyName of dir.inputs.propertyNames) {
-          claimedInputs.add(propertyName);
-        }
-      }
-      this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node.inputs, node, claimedInputs));
-      const checkElement = directives.length === 0;
-      this.opQueue.push(new TcbDomSchemaCheckerOp(this.tcb, node, checkElement, claimedInputs));
-    }
-  }
-  appendOutputsOfElementLikeNode(node, bindings, events) {
-    const claimedOutputs = /* @__PURE__ */ new Set();
-    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
-    if (directives === null || directives.length === 0) {
-      if (node instanceof TmplAstElement8) {
-        this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, events, bindings, claimedOutputs));
-      }
-      return;
-    }
-    for (const dir of directives) {
-      this.opQueue.push(new TcbDirectiveOutputsOp(this.tcb, this, node, bindings, events, dir));
-    }
-    if (node instanceof TmplAstElement8 || node instanceof TmplAstHostElement5) {
-      for (const dir of directives) {
-        for (const outputProperty of dir.outputs.propertyNames) {
-          claimedOutputs.add(outputProperty);
-        }
-      }
-      this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, events, bindings, claimedOutputs));
-    }
-  }
-  appendInputsOfSelectorlessNode(node) {
-    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
-    const claimedInputs = /* @__PURE__ */ new Set();
-    if (directives !== null && directives.length > 0) {
-      const dirMap = /* @__PURE__ */ new Map();
-      for (const dir of directives) {
-        this.appendDirectiveInputs(dir, node, dirMap, directives);
-        for (const propertyName of dir.inputs.propertyNames) {
-          claimedInputs.add(propertyName);
-        }
-      }
-      this.directiveOpMap.set(node, dirMap);
-    }
-    if (node instanceof TmplAstDirective2) {
-      for (const input of node.inputs) {
-        if (!claimedInputs.has(input.name)) {
-          this.tcb.oobRecorder.unclaimedDirectiveBinding(this.tcb.id, node, input);
-        }
-      }
-      for (const attr of node.attributes) {
-        if (!claimedInputs.has(attr.name)) {
-          this.tcb.oobRecorder.unclaimedDirectiveBinding(this.tcb.id, node, attr);
-        }
-      }
-    } else {
-      const checkElement = node.tagName !== null;
-      this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node.inputs, node, claimedInputs), new TcbDomSchemaCheckerOp(this.tcb, node, checkElement, claimedInputs));
-    }
-  }
-  appendOutputsOfSelectorlessNode(node) {
-    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
-    const claimedOutputs = /* @__PURE__ */ new Set();
-    if (directives !== null && directives.length > 0) {
-      for (const dir of directives) {
-        this.opQueue.push(new TcbDirectiveOutputsOp(this.tcb, this, node, node.inputs, node.outputs, dir));
-        for (const outputProperty of dir.outputs.propertyNames) {
-          claimedOutputs.add(outputProperty);
-        }
-      }
-    }
-    if (node instanceof TmplAstDirective2) {
-      for (const output of node.outputs) {
-        if (!claimedOutputs.has(output.name)) {
-          this.tcb.oobRecorder.unclaimedDirectiveBinding(this.tcb.id, node, output);
-        }
-      }
-    } else {
-      this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, node.outputs, node.inputs, claimedOutputs));
-    }
-  }
-  appendDirectiveInputs(dir, node, dirMap, allDirectiveMatches) {
-    const nodeIsFormControl = isFormControl(allDirectiveMatches);
-    const customFormControlType = nodeIsFormControl ? getCustomFieldDirectiveType(dir) : null;
-    const directiveOp = this.getDirectiveOp(dir, node, customFormControlType);
-    const dirIndex = this.opQueue.push(directiveOp) - 1;
-    dirMap.set(dir, dirIndex);
-    if (isNativeField(dir, node, allDirectiveMatches)) {
-      const inputType = node.name === "input" && node.attributes.find((attr) => attr.name === "type")?.value || null;
-      this.opQueue.push(inputType === "radio" ? new TcbNativeRadioButtonFieldOp(this.tcb, this, node) : new TcbNativeFieldOp(this.tcb, this, node, inputType));
-    }
-    this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir, nodeIsFormControl, customFormControlType));
-  }
-  getDirectiveOp(dir, node, customFieldType) {
-    if (!dir.isGeneric) {
-      return new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, dir);
-    } else if (!dir.hasRequiresInlineTypeCtor || this.tcb.env.config.useInlineTypeConstructors) {
-      return new TcbDirectiveCtorOp(this.tcb, this, node, dir, customFieldType);
-    }
-    return new TcbGenericDirectiveTypeWithAnyParamsOp(this.tcb, this, node, dir);
-  }
-  appendSelectorlessDirectives(node) {
-    for (const directive of node.directives) {
-      if (!this.tcb.boundTarget.referencedDirectiveExists(directive.name)) {
-        this.tcb.oobRecorder.missingNamedTemplateDependency(this.tcb.id, directive);
-        continue;
-      }
-      const directives = this.tcb.boundTarget.getDirectivesOfNode(directive);
-      if (directives === null || directives.length === 0 || directives.some((dir) => dir.isComponent || !dir.isStandalone)) {
-        this.tcb.oobRecorder.incorrectTemplateDependencyType(this.tcb.id, directive);
-        continue;
-      }
-      this.appendInputsOfSelectorlessNode(directive);
-      this.appendOutputsOfSelectorlessNode(directive);
-      this.checkAndAppendReferencesOfNode(directive);
-    }
-  }
-  appendDeepSchemaChecks(nodes) {
-    for (const node of nodes) {
-      if (!(node instanceof TmplAstElement8 || node instanceof TmplAstTemplate5)) {
-        continue;
-      }
-      if (node instanceof TmplAstElement8) {
-        const claimedInputs = /* @__PURE__ */ new Set();
-        let directives = this.tcb.boundTarget.getDirectivesOfNode(node);
-        for (const dirNode of node.directives) {
-          const directiveResults = this.tcb.boundTarget.getDirectivesOfNode(dirNode);
-          if (directiveResults !== null && directiveResults.length > 0) {
-            directives ??= [];
-            directives.push(...directiveResults);
-          }
-        }
-        let hasDirectives;
-        if (directives === null || directives.length === 0) {
-          hasDirectives = false;
-        } else {
-          hasDirectives = true;
-          for (const dir of directives) {
-            for (const propertyName of dir.inputs.propertyNames) {
-              claimedInputs.add(propertyName);
-            }
-          }
-        }
-        this.opQueue.push(new TcbDomSchemaCheckerOp(this.tcb, node, !hasDirectives, claimedInputs));
-      }
-      this.appendDeepSchemaChecks(node.children);
-    }
-  }
-  appendIcuExpressions(node) {
-    for (const variable of Object.values(node.vars)) {
-      this.opQueue.push(new TcbExpressionOp(this.tcb, this, variable.value));
-    }
-    for (const placeholder of Object.values(node.placeholders)) {
-      if (placeholder instanceof TmplAstBoundText) {
-        this.opQueue.push(new TcbExpressionOp(this.tcb, this, placeholder.value));
-      }
-    }
-  }
-  appendContentProjectionCheckOp(root) {
-    const meta = this.tcb.boundTarget.getDirectivesOfNode(root)?.find((meta2) => meta2.isComponent) || null;
-    if (meta !== null && meta.ngContentSelectors !== null && meta.ngContentSelectors.length > 0) {
-      const selectors = meta.ngContentSelectors;
-      if (selectors.length > 1 || selectors.length === 1 && selectors[0] !== "*") {
-        this.opQueue.push(new TcbControlFlowContentProjectionOp(this.tcb, root, selectors, meta.name));
-      }
-    }
-  }
-  appendComponentNode(node) {
-    if (!this.tcb.boundTarget.referencedDirectiveExists(node.componentName)) {
-      this.tcb.oobRecorder.missingNamedTemplateDependency(this.tcb.id, node);
-      return;
-    }
-    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
-    if (directives === null || directives.length === 0 || directives.every((dir) => !dir.isComponent || !dir.isStandalone)) {
-      this.tcb.oobRecorder.incorrectTemplateDependencyType(this.tcb.id, node);
-      return;
-    }
-    const opIndex = this.opQueue.push(new TcbComponentNodeOp(this.tcb, this, node)) - 1;
-    this.componentNodeOpMap.set(node, opIndex);
-    if (this.tcb.env.config.controlFlowPreventingContentProjection !== "suppress") {
-      this.appendContentProjectionCheckOp(node);
-    }
-    this.appendInputsOfSelectorlessNode(node);
-    this.appendOutputsOfSelectorlessNode(node);
-    this.appendSelectorlessDirectives(node);
-    this.appendChildren(node);
-    this.checkAndAppendReferencesOfNode(node);
-  }
-  appendDeferredBlock(block) {
-    this.appendDeferredTriggers(block, block.triggers);
-    this.appendDeferredTriggers(block, block.prefetchTriggers);
-    if (block.hydrateTriggers.when) {
-      this.opQueue.push(new TcbConditionOp(this.tcb, this, block.hydrateTriggers.when.value));
-    }
-    this.appendChildren(block);
-    if (block.placeholder !== null) {
-      this.appendChildren(block.placeholder);
-    }
-    if (block.loading !== null) {
-      this.appendChildren(block.loading);
-    }
-    if (block.error !== null) {
-      this.appendChildren(block.error);
-    }
-  }
-  appendDeferredTriggers(block, triggers) {
-    if (triggers.when !== void 0) {
-      this.opQueue.push(new TcbConditionOp(this.tcb, this, triggers.when.value));
-    }
-    if (triggers.viewport !== void 0 && triggers.viewport.options !== null) {
-      this.opQueue.push(new TcbIntersectionObserverOp(this.tcb, this, triggers.viewport.options));
-    }
-    if (triggers.hover !== void 0) {
-      this.validateReferenceBasedDeferredTrigger(block, triggers.hover);
-    }
-    if (triggers.interaction !== void 0) {
-      this.validateReferenceBasedDeferredTrigger(block, triggers.interaction);
-    }
-    if (triggers.viewport !== void 0) {
-      this.validateReferenceBasedDeferredTrigger(block, triggers.viewport);
-    }
-  }
-  appendHostElement(node) {
-    const opIndex = this.opQueue.push(new TcbHostElementOp(this.tcb, this, node)) - 1;
-    const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
-    if (directives !== null && directives.length > 0) {
-      const directiveOpMap = /* @__PURE__ */ new Map();
-      for (const directive of directives) {
-        const directiveOp = this.getDirectiveOp(directive, node, null);
-        directiveOpMap.set(directive, this.opQueue.push(directiveOp) - 1);
-      }
-      this.directiveOpMap.set(node, directiveOpMap);
-    }
-    this.hostElementOpMap.set(node, opIndex);
-    this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node.bindings, node, null), new TcbDomSchemaCheckerOp(this.tcb, node, false, null));
-    this.appendOutputsOfElementLikeNode(node, null, node.listeners);
-  }
-  validateReferenceBasedDeferredTrigger(block, trigger) {
-    if (trigger.reference === null) {
-      if (block.placeholder === null) {
-        this.tcb.oobRecorder.deferImplicitTriggerMissingPlaceholder(this.tcb.id, trigger);
-        return;
-      }
-      let rootNode = null;
-      for (const child of block.placeholder.children) {
-        if (!this.tcb.hostPreserveWhitespaces && child instanceof TmplAstText2 && child.value.trim().length === 0) {
-          continue;
-        }
-        if (rootNode === null) {
-          rootNode = child;
-        } else {
-          rootNode = null;
-          break;
-        }
-      }
-      if (rootNode === null || !(rootNode instanceof TmplAstElement8)) {
-        this.tcb.oobRecorder.deferImplicitTriggerInvalidPlaceholder(this.tcb.id, trigger);
-      }
-      return;
-    }
-    if (this.tcb.boundTarget.getDeferredTriggerTarget(block, trigger) === null) {
-      this.tcb.oobRecorder.inaccessibleDeferredTriggerElement(this.tcb.id, trigger);
-    }
-  }
-  /** Reports a diagnostic if there are any `@let` declarations that conflict with a node. */
-  static checkConflictingLet(scope, node) {
-    if (scope.letDeclOpMap.has(node.name)) {
-      scope.tcb.oobRecorder.conflictingDeclaration(scope.tcb.id, scope.letDeclOpMap.get(node.name).node);
-    }
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.js
-function generateTypeCheckBlock(env, component, name, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
-  const tcb = new Context2(env, domSchemaChecker, oobRecorder, meta.id, meta.boundTarget, meta.pipes, meta.schemas, meta.isStandalone, meta.preserveWhitespaces);
-  const ctxRawType = env.referenceTcbType(component.ref);
-  if (!ts66.isTypeReferenceNode(ctxRawType)) {
-    throw new Error(`Expected TypeReferenceNode when referencing the ctx param for ${component.ref.name}`);
-  }
-  let typeParameters = void 0;
-  let typeArguments = void 0;
-  if (component.typeParameters !== void 0) {
-    if (!env.config.useContextGenericType) {
-      genericContextBehavior = TcbGenericContextBehavior.FallbackToAny;
-    }
-    switch (genericContextBehavior) {
-      case TcbGenericContextBehavior.UseEmitter:
-        const emittedParams = component.typeParameters || [];
-        typeParameters = emittedParams;
-        typeArguments = typeParameters.map((param) => param.name);
-        break;
-      case TcbGenericContextBehavior.CopyClassNodes:
-        const copiedParams = component.typeParameters ? [...component.typeParameters] : [];
-        typeParameters = copiedParams;
-        typeArguments = typeParameters.map((param) => param.name);
-        break;
-      case TcbGenericContextBehavior.FallbackToAny:
-        typeArguments = Array.from({ length: component.typeParameters?.length ?? 0 }).map(() => "any");
-        break;
-    }
-  }
-  const sourceFile = env.contextFile;
-  const typeParamsStr = typeParameters === void 0 || typeParameters.length === 0 ? "" : `<${typeParameters.map((p) => p.representation).join(", ")}>`;
-  const typeArgsStr = typeArguments === void 0 || typeArguments.length === 0 ? "" : `<${typeArguments.join(", ")}>`;
-  const typeRef = ts66.isIdentifier(ctxRawType.typeName) ? ctxRawType.typeName.text : tempPrint(ctxRawType.typeName, sourceFile);
-  const thisParamStr = `this: ${typeRef}${typeArgsStr}`;
-  const statements = [];
-  if (tcb.boundTarget.target.template !== void 0) {
-    const templateScope = Scope.forNodes(
-      tcb,
-      null,
-      null,
-      tcb.boundTarget.target.template,
-      /* guard */
-      null
-    );
-    statements.push(renderBlockStatements(env, templateScope, "true"));
-  }
-  if (tcb.boundTarget.target.host !== void 0) {
-    const hostScope = Scope.forNodes(tcb, null, tcb.boundTarget.target.host.node, null, null);
-    statements.push(renderBlockStatements(env, hostScope, createHostBindingsBlockGuard()));
-  }
-  const bodyStr = `{
-${statements.join("\n")}
-}`;
-  const funcDeclStr = `function ${name.text}${typeParamsStr}(${thisParamStr}) ${bodyStr}`;
-  return `/*${meta.id}*/
-${funcDeclStr}`;
-}
-function renderBlockStatements(env, scope, wrapperExpression) {
-  const scopeStatements = scope.render();
-  const statements = getStatementsBlock([...env.getPreludeStatements(), ...scopeStatements]);
-  return `if (${wrapperExpression}) {
-${statements}
-}`;
-}
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_check_file.js
 import ts67 from "typescript";
@@ -17583,7 +17585,7 @@ var DirectiveSourceManager = class {
   /** Keeps track of type check IDs and the source location of their host bindings. */
   hostBindingSources = /* @__PURE__ */ new Map();
   getTypeCheckId(node) {
-    return getTypeCheckId(node);
+    return getTypeCheckId2(node);
   }
   captureTemplateSource(id, mapping, file) {
     this.templateSources.set(id, new Source(mapping, file));
@@ -23157,7 +23159,10 @@ export {
   PotentialImportKind,
   PotentialImportMode,
   SymbolKind,
+  Environment,
   TypeCheckShimGenerator,
+  TcbGenericContextBehavior,
+  generateTypeCheckBlock,
   TemplateTypeCheckerImpl,
   DirectiveDecoratorHandler,
   NgModuleDecoratorHandler,

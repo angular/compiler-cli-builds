@@ -3,8 +3,12 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  angularJitApplicationTransform
-} from "../chunk-ENV4GMOB.js";
+  Environment,
+  ImportManager,
+  TcbGenericContextBehavior,
+  angularJitApplicationTransform,
+  generateTypeCheckBlock
+} from "../chunk-X6KGNWEJ.js";
 import "../chunk-CSUVPNMK.js";
 import "../chunk-CEBE44Q5.js";
 import "../chunk-XYYEESKY.js";
@@ -23,9 +27,13 @@ var constructorParametersDownlevelTransform = (program, isCore = false) => {
   return angularJitApplicationTransform(program, isCore);
 };
 export {
+  Environment,
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-  constructorParametersDownlevelTransform
+  ImportManager,
+  TcbGenericContextBehavior,
+  constructorParametersDownlevelTransform,
+  generateTypeCheckBlock
 };
 /**
  * @license
