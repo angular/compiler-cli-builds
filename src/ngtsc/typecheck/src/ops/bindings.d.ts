@@ -6,10 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { AST, ParseSourceSpan, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstTemplate } from '@angular/compiler';
-import ts from 'typescript';
-import { TypeCheckableDirectiveMeta } from '../../api';
+import { TcbDirectiveMetadata } from '../../api';
 import { ClassPropertyName } from '../../../metadata';
-import { Reference } from '../../../imports';
 import { Context } from './context';
 import { TcbExpr } from './codegen';
 export interface TcbBoundAttribute {
@@ -20,7 +18,7 @@ export interface TcbBoundAttribute {
         fieldName: ClassPropertyName;
         required: boolean;
         isSignal: boolean;
-        transformType: Reference<ts.TypeNode> | null;
+        transformType?: string;
         isTwoWayBinding: boolean;
     }[];
 }
@@ -61,7 +59,7 @@ export interface TcbDirectiveUnsetInput {
     field: string;
 }
 export type TcbDirectiveInput = TcbDirectiveBoundInput | TcbDirectiveUnsetInput;
-export declare function getBoundAttributes(directive: TypeCheckableDirectiveMeta, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective): TcbBoundAttribute[];
+export declare function getBoundAttributes(directive: TcbDirectiveMetadata, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective): TcbBoundAttribute[];
 export declare function checkSplitTwoWayBinding(inputName: string, output: TmplAstBoundEvent, inputs: TmplAstBoundAttribute[], tcb: Context): boolean;
 /**
  * Potentially widens the type of `expr` according to the type-checking configuration.

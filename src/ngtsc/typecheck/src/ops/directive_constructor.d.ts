@@ -10,7 +10,7 @@ import { TcbOp } from './base';
 import { TcbExpr } from './codegen';
 import { Context } from './context';
 import type { Scope } from './scope';
-import { TypeCheckableDirectiveMeta } from '../../api';
+import { TcbDirectiveMetadata } from '../../api';
 import { CustomFormControlType } from './signal_forms';
 /**
  * A `TcbOp` which constructs an instance of a directive with types inferred from its inputs. The
@@ -30,7 +30,7 @@ export declare class TcbDirectiveCtorOp extends TcbOp {
     private node;
     private dir;
     private customFormControlType;
-    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TypeCheckableDirectiveMeta, customFormControlType: CustomFormControlType | null);
+    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TcbDirectiveMetadata, customFormControlType: CustomFormControlType | null);
     get optional(): boolean;
     execute(): TcbExpr;
     circularFallback(): TcbOp;
@@ -53,7 +53,7 @@ export declare class TcbDirectiveCtorCircularFallbackOp extends TcbOp {
     private tcb;
     private scope;
     private dir;
-    constructor(tcb: Context, scope: Scope, dir: TypeCheckableDirectiveMeta);
+    constructor(tcb: Context, scope: Scope, dir: TcbDirectiveMetadata);
     get optional(): boolean;
     execute(): TcbExpr;
 }

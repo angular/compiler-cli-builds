@@ -10,7 +10,7 @@ import type { Context } from './context';
 import type { Scope } from './scope';
 import { TcbOp } from './base';
 import { TcbExpr } from './codegen';
-import { TypeCheckableDirectiveMeta } from '../../api';
+import { TcbDirectiveMetadata } from '../../api';
 /**
  * A `TcbOp` which constructs an instance of a directive. For generic directives, generic
  * parameters are set to `any` type.
@@ -19,8 +19,8 @@ export declare abstract class TcbDirectiveTypeOpBase extends TcbOp {
     protected tcb: Context;
     protected scope: Scope;
     protected node: DirectiveOwner;
-    protected dir: TypeCheckableDirectiveMeta;
-    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TypeCheckableDirectiveMeta);
+    protected dir: TcbDirectiveMetadata;
+    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TcbDirectiveMetadata);
     get optional(): boolean;
     execute(): TcbExpr;
 }

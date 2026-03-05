@@ -7,10 +7,10 @@
  */
 import ts from 'typescript';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { TypeCtorMetadata } from '../api';
+import { TypeCtorMetadata, TcbTypeParameter } from '../api';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
 import { TcbExpr } from './ops/codegen';
-export declare function generateTypeCtorDeclarationFn(env: ReferenceEmitEnvironment, meta: TypeCtorMetadata, nodeTypeRef: ts.EntityName, typeParams: ts.TypeParameterDeclaration[] | undefined): TcbExpr;
+export declare function generateTypeCtorDeclarationFn(env: ReferenceEmitEnvironment, meta: TypeCtorMetadata, nodeTypeRef: ts.EntityName, typeParams: TcbTypeParameter[] | undefined): TcbExpr;
 /**
  * Generate an inline type constructor for the given class and metadata.
  *

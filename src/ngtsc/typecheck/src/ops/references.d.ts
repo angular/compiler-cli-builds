@@ -10,7 +10,7 @@ import { TcbOp } from './base';
 import { TcbExpr } from './codegen';
 import type { Context } from './context';
 import type { Scope } from './scope';
-import { TypeCheckableDirectiveMeta } from '../../api';
+import { TcbDirectiveMetadata } from '../../api';
 /** Types that can referenced locally in a template. */
 export type LocalSymbol = TmplAstElement | TmplAstTemplate | TmplAstVariable | TmplAstLetDeclaration | TmplAstReference | TmplAstHostElement | TmplAstComponent | TmplAstDirective;
 /**
@@ -39,7 +39,7 @@ export declare class TcbReferenceOp extends TcbOp {
     private readonly node;
     private readonly host;
     private readonly target;
-    constructor(tcb: Context, scope: Scope, node: TmplAstReference, host: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, target: TypeCheckableDirectiveMeta | TmplAstTemplate | TmplAstElement);
+    constructor(tcb: Context, scope: Scope, node: TmplAstReference, host: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, target: TcbDirectiveMetadata | TmplAstTemplate | TmplAstElement);
     readonly optional = true;
     execute(): TcbExpr;
 }

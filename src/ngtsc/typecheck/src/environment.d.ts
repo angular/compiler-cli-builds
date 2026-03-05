@@ -9,7 +9,7 @@ import ts from 'typescript';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
-import { TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { TcbDirectiveMetadata, TcbPipeMetadata, TcbReferenceKey, TcbReferenceMetadata, TypeCheckingConfig } from '../api';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
 import { TcbExpr } from './ops/codegen';
 /**
@@ -37,8 +37,8 @@ export declare class Environment extends ReferenceEmitEnvironment {
      * Depending on the shape of the directive itself, this could be either a reference to a declared
      * type constructor, or to an inline type constructor.
      */
-    typeCtorFor(dir: TypeCheckableDirectiveMeta): TcbExpr;
-    pipeInst(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): TcbExpr;
+    typeCtorFor(dir: TcbDirectiveMetadata): TcbExpr;
+    pipeInst(pipe: TcbPipeMetadata): TcbExpr;
     /**
      * Generate a `ts.Expression` that references the given node.
      *
@@ -48,3 +48,4 @@ export declare class Environment extends ReferenceEmitEnvironment {
     private emitTypeParameters;
     getPreludeStatements(): TcbExpr[];
 }
+export declare function getTcbReferenceKey(ref: TcbReferenceMetadata): TcbReferenceKey;

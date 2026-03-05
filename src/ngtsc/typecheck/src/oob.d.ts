@@ -8,7 +8,7 @@
 import { AST, BindingPipe, PropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TmplAstViewportDeferredTrigger } from '@angular/compiler';
 import ts from 'typescript';
 import { ClassDeclaration } from '../../reflection';
-import { TemplateDiagnostic, TypeCheckId } from '../api';
+import { TcbDirectiveMetadata, TemplateDiagnostic, TypeCheckId } from '../api';
 import { TypeCheckSourceResolver } from './tcb_util';
 /**
  * Collects `ts.Diagnostic`s on problems which occur in the template which aren't directly sourced
@@ -73,7 +73,7 @@ export interface OutOfBandDiagnosticRecorder {
     /**
      * Reports a split two way binding error message.
      */
-    splitTwoWayBinding(id: TypeCheckId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
+    splitTwoWayBinding(id: TypeCheckId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: Pick<TcbDirectiveMetadata, 'name' | 'isComponent' | 'ref'>, outputConsumer: Pick<TcbDirectiveMetadata, 'name' | 'isComponent' | 'ref'> | TmplAstElement): void;
     /** Reports required inputs that haven't been bound. */
     missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
     /**
@@ -136,6 +136,7 @@ export interface OutOfBandDiagnosticRecorder {
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
+    private getSourceFile;
     private readonly _diagnostics;
     /**
      * Tracks which `BindingPipe` nodes have already been recorded as invalid, so only one diagnostic
@@ -144,7 +145,7 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     private readonly recordedPipes;
     /** Common pipes that can be suggested to users. */
     private readonly pipeSuggestions;
-    constructor(resolver: TypeCheckSourceResolver);
+    constructor(resolver: TypeCheckSourceResolver, getSourceFile?: (fileName: string) => ts.SourceFile | undefined);
     get diagnostics(): ReadonlyArray<TemplateDiagnostic>;
     missingReferenceTarget(id: TypeCheckId, ref: TmplAstReference): void;
     missingPipe(id: TypeCheckId, ast: BindingPipe, isStandalone: boolean): void;
@@ -154,7 +155,7 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     requiresInlineTcb(id: TypeCheckId, node: ClassDeclaration): void;
     requiresInlineTypeConstructors(id: TypeCheckId, node: ClassDeclaration, directives: ClassDeclaration[]): void;
     suboptimalTypeInference(id: TypeCheckId, variables: TmplAstVariable[]): void;
-    splitTwoWayBinding(id: TypeCheckId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: ClassDeclaration, outputConsumer: ClassDeclaration | TmplAstElement): void;
+    splitTwoWayBinding(id: TypeCheckId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: Pick<TcbDirectiveMetadata, 'name' | 'isComponent' | 'ref'>, outputConsumer: Pick<TcbDirectiveMetadata, 'name' | 'isComponent' | 'ref'> | TmplAstElement): void;
     missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
     illegalForLoopTrackAccess(id: TypeCheckId, block: TmplAstForLoopBlock, access: PropertyRead): void;
     inaccessibleDeferredTriggerElement(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;

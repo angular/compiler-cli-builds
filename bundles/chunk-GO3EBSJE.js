@@ -8,7 +8,7 @@ import {
   TrackedIncrementalBuildStrategy,
   freshCompilationTicket,
   incrementalFromCompilerTicket
-} from "./chunk-WI7ANR5X.js";
+} from "./chunk-TPRQ6NZD.js";
 import {
   ActivePerfRecorder,
   OptimizeFor,
@@ -18,7 +18,7 @@ import {
   TsCreateProgramDriver,
   replaceTsWithNgInErrors,
   retagAllTsFiles
-} from "./chunk-V5JJK5O4.js";
+} from "./chunk-ENV4GMOB.js";
 import {
   absoluteFrom,
   createFileSystemTsReadDirectoryFn,

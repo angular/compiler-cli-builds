@@ -8,7 +8,7 @@
 import { AST, TmplAstBoundAttribute, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstTemplate } from '@angular/compiler';
 import type { Context } from './context';
 import type { Scope } from './scope';
-import { TypeCheckableDirectiveMeta } from '../../api';
+import { TcbDirectiveMetadata } from '../../api';
 import { TcbOp } from './base';
 import { TcbExpr } from './codegen';
 import { CustomFormControlType } from './signal_forms';
@@ -30,7 +30,7 @@ export declare class TcbDirectiveInputsOp extends TcbOp {
     private dir;
     private isFormControl;
     private customFormControlType;
-    constructor(tcb: Context, scope: Scope, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective, dir: TypeCheckableDirectiveMeta, isFormControl: boolean | undefined, customFormControlType: CustomFormControlType | null);
+    constructor(tcb: Context, scope: Scope, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective, dir: TcbDirectiveMetadata, isFormControl: boolean | undefined, customFormControlType: CustomFormControlType | null);
     get optional(): boolean;
     execute(): null;
     private checkRequiredInputs;

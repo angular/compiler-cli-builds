@@ -9,7 +9,7 @@ import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
 import ts from 'typescript';
 import { ClassDeclaration, ReflectionHost } from '../../../../src/ngtsc/reflection';
 import { Reference } from '../../imports';
-import { FullSourceMapping, SourceLocation, TypeCheckId, SourceMapping } from '../api';
+import { FullSourceMapping, SourceLocation, TypeCheckId, SourceMapping, TcbTypeParameter } from '../api';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
 /**
  * Adapter interface which allows the directive type-checking diagnostics code to interpret offsets
@@ -78,3 +78,4 @@ export declare function ensureTypeCheckFilePreparationImports(env: ReferenceEmit
 export declare function checkIfGenericTypeBoundsCanBeEmitted(node: ClassDeclaration<ts.ClassDeclaration>, reflector: ReflectionHost, env: ReferenceEmitEnvironment): boolean;
 export declare function findNodeInFile<T extends ts.Node>(file: ts.SourceFile, predicate: (node: ts.Node) => node is T): T | null;
 export declare function findNodeInFile(file: ts.SourceFile, predicate: (node: ts.Node) => boolean): ts.Node | null;
+export declare function generateTcbTypeParameters(typeParameters: ReadonlyArray<ts.TypeParameterDeclaration>, sourceFile: ts.SourceFile): TcbTypeParameter[];
