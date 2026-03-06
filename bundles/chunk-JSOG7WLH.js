@@ -230,7 +230,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.1+sha-759ee22";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.1+sha-786ea44";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -2719,22 +2719,6 @@ function isAbstractClassDeclaration(clazz) {
   return ts13.canHaveModifiers(clazz) && clazz.modifiers !== void 0 ? clazz.modifiers.some((mod) => mod.kind === ts13.SyntaxKind.AbstractKeyword) : false;
 }
 
-// packages/compiler-cli/src/ngtsc/metadata/src/dts.js
-import ts15 from "typescript";
-
-// packages/compiler-cli/src/ngtsc/metadata/src/api.js
-var MetaKind;
-(function(MetaKind2) {
-  MetaKind2[MetaKind2["Directive"] = 0] = "Directive";
-  MetaKind2[MetaKind2["Pipe"] = 1] = "Pipe";
-  MetaKind2[MetaKind2["NgModule"] = 2] = "NgModule";
-})(MetaKind || (MetaKind = {}));
-var MatchSource;
-(function(MatchSource2) {
-  MatchSource2[MatchSource2["Selector"] = 0] = "Selector";
-  MatchSource2[MatchSource2["HostDirective"] = 1] = "HostDirective";
-})(MatchSource || (MatchSource = {}));
-
 // packages/compiler-cli/src/ngtsc/metadata/src/property_mapping.js
 var ClassPropertyMapping = class _ClassPropertyMapping {
   /**
@@ -2867,6 +2851,22 @@ function reverseMapFromForwardMap(forwardMap) {
   }
   return reverseMap;
 }
+
+// packages/compiler-cli/src/ngtsc/metadata/src/dts.js
+import ts15 from "typescript";
+
+// packages/compiler-cli/src/ngtsc/metadata/src/api.js
+var MetaKind;
+(function(MetaKind2) {
+  MetaKind2[MetaKind2["Directive"] = 0] = "Directive";
+  MetaKind2[MetaKind2["Pipe"] = 1] = "Pipe";
+  MetaKind2[MetaKind2["NgModule"] = 2] = "NgModule";
+})(MetaKind || (MetaKind = {}));
+var MatchSource;
+(function(MatchSource2) {
+  MatchSource2[MatchSource2["Selector"] = 0] = "Selector";
+  MatchSource2[MatchSource2["HostDirective"] = 1] = "HostDirective";
+})(MatchSource || (MatchSource = {}));
 
 // packages/compiler-cli/src/ngtsc/metadata/src/util.js
 import ts14 from "typescript";
@@ -23107,6 +23107,7 @@ export {
   unwrapExpression,
   createForwardRefResolver,
   MetaKind,
+  ClassPropertyMapping,
   CompoundMetadataReader,
   DtsMetadataReader,
   LocalMetadataRegistry,

@@ -17,7 +17,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-MFOSIZFR.js";
+} from "./chunk-EEWCEJZ4.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -34,9 +34,10 @@ import {
   freshCompilationTicket,
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo
-} from "./chunk-C3EFH4TH.js";
+} from "./chunk-XQ6GMDOB.js";
 import {
   ActivePerfRecorder,
+  ClassPropertyMapping,
   Environment,
   ErrorCode,
   ImportManager,
@@ -50,7 +51,7 @@ import {
   getInitializerApiJitTransform,
   isLocalCompilationDiagnostics,
   ngErrorCode
-} from "./chunk-X6KGNWEJ.js";
+} from "./chunk-JSOG7WLH.js";
 import "./chunk-CSUVPNMK.js";
 import {
   InvalidFileSystem,
@@ -81,7 +82,7 @@ import "./chunk-G7GFT6BU.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.0.0-next.1+sha-759ee22");
+var VERSION = new Version("22.0.0-next.1+sha-786ea44");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
@@ -183,6 +184,7 @@ var NgTscPlugin = class {
 // packages/compiler-cli/index.ts
 setFileSystem(new NodeJSFileSystem());
 export {
+  ClassPropertyMapping,
   ConsoleLogger,
   DEFAULT_ERROR_CODE,
   DecoratorType,
