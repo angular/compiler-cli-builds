@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
-import { Reference, ReferenceEmitter } from '../../imports';
-import { ClassDeclaration, ReflectionHost } from '../../reflection';
+import { ReferenceEmitter } from '../../imports';
+import { ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
 import { TcbDirectiveMetadata, TcbPipeMetadata, TcbReferenceKey, TcbReferenceMetadata, TypeCheckingConfig } from '../api';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
@@ -39,13 +39,6 @@ export declare class Environment extends ReferenceEmitEnvironment {
      */
     typeCtorFor(dir: TcbDirectiveMetadata): TcbExpr;
     pipeInst(pipe: TcbPipeMetadata): TcbExpr;
-    /**
-     * Generate a `ts.Expression` that references the given node.
-     *
-     * This may involve importing the node into the file if it's not declared there already.
-     */
-    reference(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>): TcbExpr;
-    private emitTypeParameters;
     getPreludeStatements(): TcbExpr[];
 }
 export declare function getTcbReferenceKey(ref: TcbReferenceMetadata): TcbReferenceKey;
