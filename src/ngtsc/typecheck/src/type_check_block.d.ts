@@ -5,7 +5,6 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import ts from 'typescript';
 import { TcbComponentMetadata, TcbTypeCheckBlockMetadata } from '../api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
@@ -26,7 +25,7 @@ import { TcbGenericContextBehavior } from './ops/context';
  *
  * @param env an `Environment` into which type-checking code will be generated.
  * @param ref a `Reference` to the component class which should be type-checked.
- * @param name a `ts.Identifier` to use for the generated `ts.FunctionDeclaration`.
+ * @param name Name of the generated function.
  * @param meta metadata about the component's template and the function being generated.
  * @param domSchemaChecker used to check and record errors regarding improper usage of DOM elements
  * and bindings.
@@ -35,4 +34,4 @@ import { TcbGenericContextBehavior } from './ops/context';
  * @param genericContextBehavior controls how generic parameters (especially parameters with generic
  * bounds) will be referenced from the generated TCB code.
  */
-export declare function generateTypeCheckBlock(env: Environment, component: TcbComponentMetadata, name: ts.Identifier, meta: TcbTypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): string;
+export declare function generateTypeCheckBlock(env: Environment, component: TcbComponentMetadata, name: string, meta: TcbTypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): string;
