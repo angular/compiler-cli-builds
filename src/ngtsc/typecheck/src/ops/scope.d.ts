@@ -7,7 +7,7 @@
  */
 import { TmplAstForLoopBlock, TmplAstHostElement, TmplAstIfBlockBranch, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
 import { TcbExpr } from './codegen';
-import { TypeCheckableDirectiveMeta } from '../../api';
+import { TcbDirectiveMetadata } from '../../api';
 import { Context } from './context';
 import { LocalSymbol } from './references';
 /**
@@ -123,7 +123,7 @@ export declare class Scope {
      * @param directive if present, a directive type on a `TmplAstElement` or `TmplAstTemplate` to
      * look up instead of the default for an element or template node.
      */
-    resolve(node: LocalSymbol, directive?: TypeCheckableDirectiveMeta): TcbExpr;
+    resolve(node: LocalSymbol, directive?: TcbDirectiveMetadata): TcbExpr;
     /**
      * Add a statement to this scope.
      */

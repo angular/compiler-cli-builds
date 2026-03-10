@@ -10,7 +10,7 @@ import { TcbOp } from './base';
 import { TcbExpr } from './codegen';
 import type { Context } from './context';
 import type { Scope } from './scope';
-import { TypeCheckableDirectiveMeta } from '../../api';
+import { TcbDirectiveMetadata } from '../../api';
 import { LocalSymbol } from './references';
 /**
  * Similar to `tcbExpression`, this function converts the provided `AST` expression into a
@@ -31,7 +31,7 @@ export declare class TcbDirectiveOutputsOp extends TcbOp {
     private inputs;
     private outputs;
     private dir;
-    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, inputs: TmplAstBoundAttribute[] | null, outputs: TmplAstBoundEvent[], dir: TypeCheckableDirectiveMeta);
+    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, inputs: TmplAstBoundAttribute[] | null, outputs: TmplAstBoundEvent[], dir: TcbDirectiveMetadata);
     get optional(): boolean;
     execute(): null;
 }

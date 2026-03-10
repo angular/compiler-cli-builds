@@ -153,7 +153,7 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
     private inlining;
     private perf;
     private fileMap;
-    constructor(config: TypeCheckingConfig, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>, refEmitter: ReferenceEmitter, reflector: ReflectionHost, host: TypeCheckingHost, inlining: InliningMode, perf: PerfRecorder);
+    constructor(config: TypeCheckingConfig, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName' | 'getSourceFile'>, refEmitter: ReferenceEmitter, reflector: ReflectionHost, host: TypeCheckingHost, inlining: InliningMode, perf: PerfRecorder);
     /**
      * A `Map` of `ts.SourceFile`s that the context has seen to the operations (additions of methods
      * or type-check blocks) that need to be eventually performed on that file.

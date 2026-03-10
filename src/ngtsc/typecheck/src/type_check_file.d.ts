@@ -25,6 +25,7 @@ import { TcbExpr } from './ops/codegen';
  */
 export declare class TypeCheckFile extends Environment {
     readonly fileName: AbsoluteFsPath;
+    readonly isTypeCheckFile = true;
     private nextTcbId;
     private tcbStatements;
     constructor(fileName: AbsoluteFsPath, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>);

@@ -6,9 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
-import { Reference } from '../../imports';
-import { ClassDeclaration } from '../../reflection';
-import { TypeCheckBlockMetadata } from '../api';
+import { TcbComponentMetadata, TcbTypeCheckBlockMetadata } from '../api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
 import { OutOfBandDiagnosticRecorder } from './oob';
@@ -37,4 +35,4 @@ import { TcbGenericContextBehavior } from './ops/context';
  * @param genericContextBehavior controls how generic parameters (especially parameters with generic
  * bounds) will be referenced from the generated TCB code.
  */
-export declare function generateTypeCheckBlock(env: Environment, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, name: ts.Identifier, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): string;
+export declare function generateTypeCheckBlock(env: Environment, component: TcbComponentMetadata, name: ts.Identifier, meta: TcbTypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): string;
