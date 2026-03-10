@@ -3,13 +3,8 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  ClassPropertyMapping,
-  Environment,
-  ImportManager,
-  TcbGenericContextBehavior,
-  angularJitApplicationTransform,
-  generateTypeCheckBlock
-} from "../chunk-PSWFNGO4.js";
+  angularJitApplicationTransform
+} from "../chunk-XCV6QTVK.js";
 import "../chunk-CSUVPNMK.js";
 import "../chunk-CEBE44Q5.js";
 import "../chunk-XYYEESKY.js";
@@ -28,14 +23,9 @@ var constructorParametersDownlevelTransform = (program, isCore = false) => {
   return angularJitApplicationTransform(program, isCore);
 };
 export {
-  ClassPropertyMapping,
-  Environment,
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-  ImportManager,
-  TcbGenericContextBehavior,
-  constructorParametersDownlevelTransform,
-  generateTypeCheckBlock
+  constructorParametersDownlevelTransform
 };
 /**
  * @license

@@ -32,13 +32,3 @@ export declare const GLOBAL_DEFS_FOR_TERSER_WITH_AOT: {
  * contract various Angular CLI versions are relying on.
  */
 export declare const constructorParametersDownlevelTransform: (program: ts.Program, isCore?: boolean) => ts.TransformerFactory<ts.SourceFile>;
-export { generateTypeCheckBlock } from '../src/ngtsc/typecheck/src/type_check_block';
-export type { TypeCheckingConfig, TcbComponentMetadata, TcbTypeCheckBlockMetadata, TcbTypeParameter, TypeCheckId, TcbDirectiveMetadata, TcbPipeMetadata, TemplateDiagnostic, TcbReferenceMetadata, } from '../src/ngtsc/typecheck/api';
-export type { DomSchemaChecker } from '../src/ngtsc/typecheck/src/dom';
-export { Environment } from '../src/ngtsc/typecheck/src/environment';
-export type { OutOfBandDiagnosticRecorder } from '../src/ngtsc/typecheck/src/oob';
-export { TcbGenericContextBehavior } from '../src/ngtsc/typecheck/src/ops/context';
-export { ImportManager } from '../src/ngtsc/translator';
-export type { ReferenceEmitter } from '../src/ngtsc/imports';
-export type { ReflectionHost, ClassDeclaration } from '../src/ngtsc/reflection';
-export { ClassPropertyMapping } from '../src/ngtsc/metadata/src/property_mapping';

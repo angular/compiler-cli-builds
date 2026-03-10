@@ -17,7 +17,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-ED37V5Z6.js";
+} from "./chunk-FVNHDKHD.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -34,24 +34,19 @@ import {
   freshCompilationTicket,
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo
-} from "./chunk-JEKFZSYD.js";
+} from "./chunk-3FTGIKWJ.js";
 import {
   ActivePerfRecorder,
-  ClassPropertyMapping,
-  Environment,
   ErrorCode,
-  ImportManager,
   OptimizeFor,
   PerfPhase,
-  TcbGenericContextBehavior,
   TsCreateProgramDriver,
   angularJitApplicationTransform,
-  generateTypeCheckBlock,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform,
   isLocalCompilationDiagnostics,
   ngErrorCode
-} from "./chunk-PSWFNGO4.js";
+} from "./chunk-XCV6QTVK.js";
 import "./chunk-CSUVPNMK.js";
 import {
   InvalidFileSystem,
@@ -82,7 +77,7 @@ import "./chunk-G7GFT6BU.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.0.0-next.1+sha-71b8159");
+var VERSION = new Version("22.0.0-next.1+sha-6073493");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
@@ -184,18 +179,15 @@ var NgTscPlugin = class {
 // packages/compiler-cli/index.ts
 setFileSystem(new NodeJSFileSystem());
 export {
-  ClassPropertyMapping,
   ConsoleLogger,
   DEFAULT_ERROR_CODE,
   DecoratorType,
   DocsExtractor,
   EmitFlags,
   EntryType,
-  Environment,
   ErrorCode,
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
-  ImportManager,
   InvalidFileSystem,
   LogLevel,
   LogicalFileSystem,
@@ -208,7 +200,6 @@ export {
   NodeJSFileSystem,
   OptimizeFor,
   SOURCE,
-  TcbGenericContextBehavior,
   UNKNOWN_ERROR_CODE,
   VERSION,
   absoluteFrom,
@@ -224,7 +215,6 @@ export {
   dirname,
   exitCodeFromResult,
   formatDiagnostics,
-  generateTypeCheckBlock,
   getDownlevelDecoratorsTransform,
   getFileSystem,
   getInitializerApiJitTransform,
