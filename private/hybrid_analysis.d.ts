@@ -9,7 +9,7 @@ export { generateTypeCheckBlock } from '../src/ngtsc/typecheck/src/type_check_bl
 export type { TypeCheckingConfig, TcbComponentMetadata, TcbTypeCheckBlockMetadata, TcbTypeParameter, TypeCheckId, TcbDirectiveMetadata, TemplateDiagnostic, TcbReferenceMetadata, SourceMapping, } from '../src/ngtsc/typecheck/api';
 export { DomSchemaChecker, RegistryDomSchemaChecker } from '../src/ngtsc/typecheck/src/dom';
 export { Environment } from '../src/ngtsc/typecheck/src/environment';
-export type { OutOfBandDiagnosticRecorder } from '../src/ngtsc/typecheck/src/oob';
+export { OutOfBandDiagnosticRecorder } from '../src/ngtsc/typecheck/src/oob';
 export { TcbGenericContextBehavior } from '../src/ngtsc/typecheck/src/ops/context';
 export { ImportManager } from '../src/ngtsc/translator';
 export type { ReferenceEmitter } from '../src/ngtsc/imports';

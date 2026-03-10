@@ -5,6 +5,7 @@ export * from './src/transformers/entry_points';
 export * from './src/perform_compile';
 export { CompilerOptions as AngularCompilerOptions } from './src/transformers/api';
 export * from './private/tooling';
+export * from './private/hybrid_analysis';
 export * from './src/ngtsc/logging';
 export * from './src/ngtsc/file_system';
 export { NgTscPlugin, PluginCompilerHost } from './src/ngtsc/tsc_plugin';
