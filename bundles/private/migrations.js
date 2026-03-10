@@ -5,7 +5,17 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-Z4YGCOQZ.js";
+} from "../chunk-U44NOQZ2.js";
+import {
+  PotentialImportKind,
+  PotentialImportMode,
+  SymbolKind,
+  extractDecoratorQueryMetadata,
+  extractTemplate,
+  isShim,
+  parseDecoratorInputTransformFunction,
+  queryDecoratorNames
+} from "../chunk-VDH6LV3M.js";
 import {
   CompilationMode,
   DtsMetadataReader,
@@ -13,26 +23,18 @@ import {
   FatalDiagnosticError,
   ImportManager,
   PartialEvaluator,
-  PotentialImportKind,
-  PotentialImportMode,
   Reference,
   ReferenceEmitKind,
   ReferenceEmitter,
   StaticInterpreter,
-  SymbolKind,
   TypeScriptReflectionHost,
   createForwardRefResolver,
-  extractDecoratorQueryMetadata,
-  extractTemplate,
   findAngularDecorator,
   getAngularDecorators,
   getRootDirs,
-  isShim,
-  parseDecoratorInputTransformFunction,
-  queryDecoratorNames,
   reflectObjectLiteral,
   unwrapExpression
-} from "../chunk-DPDSPWKJ.js";
+} from "../chunk-XHKNXJBE.js";
 import "../chunk-CSUVPNMK.js";
 import {
   getFileSystem,

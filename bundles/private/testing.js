@@ -3,10 +3,12 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  ImportedSymbolsTracker,
-  TypeScriptReflectionHost,
   getInitializerApiJitTransform
-} from "../chunk-DPDSPWKJ.js";
+} from "../chunk-VDH6LV3M.js";
+import {
+  ImportedSymbolsTracker,
+  TypeScriptReflectionHost
+} from "../chunk-XHKNXJBE.js";
 import "../chunk-CSUVPNMK.js";
 import {
   InvalidFileSystem,
