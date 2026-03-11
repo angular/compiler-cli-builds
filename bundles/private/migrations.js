@@ -5,7 +5,7 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-ZKTMP3NY.js";
+} from "../chunk-RA2TLETR.js";
 import {
   PotentialImportKind,
   PotentialImportMode,
