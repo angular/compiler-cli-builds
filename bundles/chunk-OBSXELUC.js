@@ -122,7 +122,7 @@ import {
   validateHostDirectives,
   wrapFunctionExpressionsInParens,
   wrapTypeReference
-} from "./chunk-XHKNXJBE.js";
+} from "./chunk-2KXHLD7K.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,

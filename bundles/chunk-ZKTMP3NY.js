@@ -30,7 +30,7 @@ import {
   isShim,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-VDH6LV3M.js";
+} from "./chunk-OBSXELUC.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -90,7 +90,7 @@ import {
   relativePathBetween,
   signalMetadataTransform,
   toUnredirectedSourceFile
-} from "./chunk-XHKNXJBE.js";
+} from "./chunk-2KXHLD7K.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
