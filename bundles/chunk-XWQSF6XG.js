@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-CSUVPNMK.js";
+} from "./chunk-I6T4FEIP.js";
 import {
   LogicalProjectPath,
   absoluteFrom,
@@ -17,7 +17,7 @@ import {
   resolve,
   stripExtension,
   toRelativeImport
-} from "./chunk-CEBE44Q5.js";
+} from "./chunk-UTWH365F.js";
 
 // packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.js
 var ErrorCode;
@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.3+sha-8ba2844";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.3+sha-c06e3a0";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -23175,3 +23175,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
+//# sourceMappingURL=chunk-XWQSF6XG.js.map

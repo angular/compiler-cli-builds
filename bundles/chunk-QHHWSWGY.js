@@ -88,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-L3PEIUBN.js";
+} from "./chunk-XWQSF6XG.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -96,7 +96,7 @@ import {
   getFileSystem,
   join,
   resolve
-} from "./chunk-CEBE44Q5.js";
+} from "./chunk-UTWH365F.js";
 
 // packages/compiler-cli/src/ngtsc/docs/src/entities.js
 var EntryType;
@@ -5374,3 +5374,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+//# sourceMappingURL=chunk-QHHWSWGY.js.map

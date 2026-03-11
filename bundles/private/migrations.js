@@ -5,7 +5,7 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-6JHVJEKD.js";
+} from "../chunk-QHHWSWGY.js";
 import {
   CompilationMode,
   DtsMetadataReader,
@@ -32,16 +32,16 @@ import {
   queryDecoratorNames,
   reflectObjectLiteral,
   unwrapExpression
-} from "../chunk-L3PEIUBN.js";
-import "../chunk-CSUVPNMK.js";
+} from "../chunk-XWQSF6XG.js";
+import "../chunk-I6T4FEIP.js";
 import {
   getFileSystem,
   isLocalRelativePath
-} from "../chunk-CEBE44Q5.js";
+} from "../chunk-UTWH365F.js";
 import {
   NodeJSFileSystem
-} from "../chunk-XYYEESKY.js";
-import "../chunk-G7GFT6BU.js";
+} from "../chunk-KWAGEHJJ.js";
+import "../chunk-IEBNHER4.js";
 export {
   CompilationMode,
   DiagnosticCategoryLabel,
@@ -81,3 +81,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+//# sourceMappingURL=migrations.js.map
