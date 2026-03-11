@@ -8,25 +8,25 @@ import {
   TrackedIncrementalBuildStrategy,
   freshCompilationTicket,
   incrementalFromCompilerTicket
-} from "./chunk-RA2TLETR.js";
+} from "./chunk-NPMPTFII.js";
 import {
   OptimizeFor,
   TsCreateProgramDriver,
   retagAllTsFiles
-} from "./chunk-OBSXELUC.js";
+} from "./chunk-XSRMZ57L.js";
 import {
   ActivePerfRecorder,
   PerfCheckpoint,
   PerfEvent,
   PerfPhase,
   replaceTsWithNgInErrors
-} from "./chunk-2KXHLD7K.js";
+} from "./chunk-5EGV6MZF.js";
 import {
   absoluteFrom,
   createFileSystemTsReadDirectoryFn,
   getFileSystem,
   resolve
-} from "./chunk-CEBE44Q5.js";
+} from "./chunk-UTWH365F.js";
 
 // packages/compiler-cli/src/transformers/api.js
 var DEFAULT_ERROR_CODE = 100;
@@ -644,3 +644,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+//# sourceMappingURL=chunk-EAE5KCUR.js.map

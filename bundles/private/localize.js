@@ -5,11 +5,11 @@
 import {
   ConsoleLogger,
   LogLevel
-} from "../chunk-6HOSNZU5.js";
+} from "../chunk-SEJGUMO2.js";
 import {
   SourceFile,
   SourceFileLoader
-} from "../chunk-HYJ2H3FU.js";
+} from "../chunk-Y5V7YWTG.js";
 import {
   InvalidFileSystem,
   LogicalFileSystem,
@@ -31,11 +31,11 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "../chunk-CEBE44Q5.js";
+} from "../chunk-UTWH365F.js";
 import {
   NodeJSFileSystem
-} from "../chunk-XYYEESKY.js";
-import "../chunk-G7GFT6BU.js";
+} from "../chunk-KWAGEHJJ.js";
+import "../chunk-IEBNHER4.js";
 export {
   ConsoleLogger,
   InvalidFileSystem,
@@ -70,3 +70,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+//# sourceMappingURL=localize.js.map

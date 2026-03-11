@@ -8,17 +8,17 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-FLWAEX6T.js";
+} from "../../chunk-HFKTR5QY.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "../../chunk-6HOSNZU5.js";
-import "../../chunk-HYJ2H3FU.js";
-import "../../chunk-CSUVPNMK.js";
+} from "../../chunk-SEJGUMO2.js";
+import "../../chunk-Y5V7YWTG.js";
+import "../../chunk-I6T4FEIP.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-XYYEESKY.js";
-import "../../chunk-G7GFT6BU.js";
+} from "../../chunk-KWAGEHJJ.js";
+import "../../chunk-IEBNHER4.js";
 
 // packages/compiler-cli/linker/babel/src/es2015_linker_plugin.js
 import { types as t4 } from "@babel/core";
@@ -508,3 +508,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+//# sourceMappingURL=index.js.map

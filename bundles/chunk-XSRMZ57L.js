@@ -122,13 +122,13 @@ import {
   validateHostDirectives,
   wrapFunctionExpressionsInParens,
   wrapTypeReference
-} from "./chunk-2KXHLD7K.js";
+} from "./chunk-5EGV6MZF.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
   getSourceFileOrError,
   relative
-} from "./chunk-CEBE44Q5.js";
+} from "./chunk-UTWH365F.js";
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/downlevel_decorators_transform.js
 import ts from "typescript";
@@ -11369,3 +11369,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+//# sourceMappingURL=chunk-XSRMZ57L.js.map

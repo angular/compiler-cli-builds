@@ -4,12 +4,12 @@
     
 import {
   getInitializerApiJitTransform
-} from "../chunk-OBSXELUC.js";
+} from "../chunk-XSRMZ57L.js";
 import {
   ImportedSymbolsTracker,
   TypeScriptReflectionHost
-} from "../chunk-2KXHLD7K.js";
-import "../chunk-CSUVPNMK.js";
+} from "../chunk-5EGV6MZF.js";
+import "../chunk-I6T4FEIP.js";
 import {
   InvalidFileSystem,
   absoluteFrom,
@@ -17,11 +17,11 @@ import {
   dirname,
   resolve,
   setFileSystem
-} from "../chunk-CEBE44Q5.js";
+} from "../chunk-UTWH365F.js";
 import {
   NodeJSFileSystem
-} from "../chunk-XYYEESKY.js";
-import "../chunk-G7GFT6BU.js";
+} from "../chunk-KWAGEHJJ.js";
+import "../chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/ngtsc/file_system/testing/src/mock_file_system.js
 var MockFileSystem = class {
@@ -527,3 +527,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+//# sourceMappingURL=testing.js.map

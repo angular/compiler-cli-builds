@@ -17,11 +17,11 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-M42SPZWZ.js";
+} from "./chunk-EAE5KCUR.js";
 import {
   ConsoleLogger,
   LogLevel
-} from "./chunk-6HOSNZU5.js";
+} from "./chunk-SEJGUMO2.js";
 import {
   DecoratorType,
   DocsExtractor,
@@ -34,14 +34,14 @@ import {
   freshCompilationTicket,
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo
-} from "./chunk-RA2TLETR.js";
+} from "./chunk-NPMPTFII.js";
 import {
   OptimizeFor,
   TsCreateProgramDriver,
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-OBSXELUC.js";
+} from "./chunk-XSRMZ57L.js";
 import {
   ActivePerfRecorder,
   ClassPropertyMapping,
@@ -54,8 +54,8 @@ import {
   generateTypeCheckBlock,
   isLocalCompilationDiagnostics,
   ngErrorCode
-} from "./chunk-2KXHLD7K.js";
-import "./chunk-CSUVPNMK.js";
+} from "./chunk-5EGV6MZF.js";
+import "./chunk-I6T4FEIP.js";
 import {
   InvalidFileSystem,
   LogicalFileSystem,
@@ -77,15 +77,15 @@ import {
   resolve,
   setFileSystem,
   toRelativeImport
-} from "./chunk-CEBE44Q5.js";
+} from "./chunk-UTWH365F.js";
 import {
   NodeJSFileSystem
-} from "./chunk-XYYEESKY.js";
-import "./chunk-G7GFT6BU.js";
+} from "./chunk-KWAGEHJJ.js";
+import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.0.0-next.2+sha-88235a0");
+var VERSION = new Version("22.0.0-next.2+sha-ec76985");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
@@ -256,3 +256,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+//# sourceMappingURL=index.js.map

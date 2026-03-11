@@ -4,7 +4,7 @@
     
 import {
   __require
-} from "./chunk-G7GFT6BU.js";
+} from "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/ngtsc/file_system/src/node_js_file_system.js
 import fs from "fs";
@@ -120,3 +120,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+//# sourceMappingURL=chunk-KWAGEHJJ.js.map
