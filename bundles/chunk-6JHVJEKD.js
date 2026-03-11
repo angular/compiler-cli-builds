@@ -1920,7 +1920,7 @@ var IncrementalCompilation = class _IncrementalCompilation {
   /**
    * Begin a fresh `IncrementalCompilation`.
    */
-  static fresh(program, versions) {
+  static fresh(versions) {
     const state = {
       kind: IncrementalStateKind.Fresh
     };
@@ -1939,7 +1939,7 @@ var IncrementalCompilation = class _IncrementalCompilation {
       let priorAnalysis;
       switch (oldState.kind) {
         case IncrementalStateKind.Fresh:
-          return _IncrementalCompilation.fresh(program, newVersions);
+          return _IncrementalCompilation.fresh(newVersions);
         case IncrementalStateKind.Analyzed:
           priorAnalysis = oldState;
           break;
@@ -1970,7 +1970,7 @@ var IncrementalCompilation = class _IncrementalCompilation {
           }
         }
         if (sf.isDeclarationFile) {
-          return _IncrementalCompilation.fresh(program, newVersions);
+          return _IncrementalCompilation.fresh(newVersions);
         }
         physicallyChangedTsFiles.add(sfPath);
       }
@@ -4213,7 +4213,7 @@ var NgCompiler = class _NgCompiler {
   static fromTicket(ticket, adapter) {
     switch (ticket.kind) {
       case CompilationTicketKind.Fresh:
-        return new _NgCompiler(adapter, ticket.options, ticket.tsProgram, ticket.programDriver, ticket.incrementalBuildStrategy, IncrementalCompilation.fresh(ticket.tsProgram, versionMapFromProgram(ticket.tsProgram, ticket.programDriver)), ticket.enableTemplateTypeChecker, ticket.usePoisonedData, ticket.perfRecorder);
+        return new _NgCompiler(adapter, ticket.options, ticket.tsProgram, ticket.programDriver, ticket.incrementalBuildStrategy, IncrementalCompilation.fresh(versionMapFromProgram(ticket.tsProgram, ticket.programDriver)), ticket.enableTemplateTypeChecker, ticket.usePoisonedData, ticket.perfRecorder);
       case CompilationTicketKind.IncrementalTypeScript:
         return new _NgCompiler(adapter, ticket.options, ticket.newProgram, ticket.programDriver, ticket.incrementalBuildStrategy, ticket.incrementalCompilation, ticket.enableTemplateTypeChecker, ticket.usePoisonedData, ticket.perfRecorder);
       case CompilationTicketKind.IncrementalResource:
