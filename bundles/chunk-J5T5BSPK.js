@@ -8,7 +8,7 @@ import {
   TrackedIncrementalBuildStrategy,
   freshCompilationTicket,
   incrementalFromCompilerTicket
-} from "./chunk-NPMPTFII.js";
+} from "./chunk-H5NZ72T3.js";
 import {
   OptimizeFor,
   TsCreateProgramDriver,
@@ -644,4 +644,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-EAE5KCUR.js.map
+//# sourceMappingURL=chunk-J5T5BSPK.js.map

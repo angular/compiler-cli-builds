@@ -5,7 +5,7 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-NPMPTFII.js";
+} from "../chunk-H5NZ72T3.js";
 import {
   PotentialImportKind,
   PotentialImportMode,

@@ -3582,7 +3582,37 @@ var factory15 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/defer_trigger_misconfiguration/index.js
-import { TmplAstDeferredBlock, TmplAstHoverDeferredTrigger, TmplAstImmediateDeferredTrigger, TmplAstInteractionDeferredTrigger, TmplAstTimerDeferredTrigger, TmplAstViewportDeferredTrigger } from "@angular/compiler";
+import { TmplAstDeferredBlock, TmplAstHoverDeferredTrigger, TmplAstImmediateDeferredTrigger, TmplAstInteractionDeferredTrigger, TmplAstTimerDeferredTrigger, TmplAstViewportDeferredTrigger, LiteralPrimitive } from "@angular/compiler";
+function areLiteralMapsEqual(a, b) {
+  const aIsEmpty = a === null || a.keys.length === 0;
+  const bIsEmpty = b === null || b.keys.length === 0;
+  if (aIsEmpty && bIsEmpty)
+    return true;
+  if (aIsEmpty || bIsEmpty)
+    return false;
+  if (a.keys.length !== b.keys.length)
+    return false;
+  const bMap = /* @__PURE__ */ new Map();
+  for (let i = 0; i < b.keys.length; i++) {
+    const bKey = b.keys[i];
+    if (bKey.kind !== "property")
+      continue;
+    const bVal = b.values[i];
+    bMap.set(bKey.key, bVal instanceof LiteralPrimitive ? bVal.value : null);
+  }
+  for (let i = 0; i < a.keys.length; i++) {
+    const aKey = a.keys[i];
+    if (aKey.kind !== "property")
+      continue;
+    const aVal = a.values[i];
+    const aValue = aVal instanceof LiteralPrimitive ? aVal.value : null;
+    if (!bMap.has(aKey.key))
+      return false;
+    if (bMap.get(aKey.key) !== aValue)
+      return false;
+  }
+  return true;
+}
 var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
   code = ErrorCode.DEFER_TRIGGER_MISCONFIGURATION;
   visitNode(ctx, component, node) {
@@ -3620,9 +3650,9 @@ var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
         const isInteractionTrigger = main instanceof TmplAstInteractionDeferredTrigger && pre instanceof TmplAstInteractionDeferredTrigger;
         const isViewportTrigger = main instanceof TmplAstViewportDeferredTrigger && pre instanceof TmplAstViewportDeferredTrigger;
         if (isHoverTrigger || isInteractionTrigger || isViewportTrigger) {
-          const mainRef = main.reference;
-          const preRef = pre.reference;
-          if (mainRef && preRef && mainRef === preRef) {
+          const referencesMatch = main.reference === pre.reference;
+          const optionsMatch = isViewportTrigger ? areLiteralMapsEqual(main.options, pre.options) : true;
+          if (referencesMatch && optionsMatch) {
             const kindName = main.constructor.name.replace("DeferredTrigger", "").toLowerCase();
             const msg = `Prefetch '${kindName}' matches the main trigger and provides no benefit. Remove the prefetch modifier.`;
             diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
@@ -5376,4 +5406,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-NPMPTFII.js.map
+//# sourceMappingURL=chunk-H5NZ72T3.js.map
