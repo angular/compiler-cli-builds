@@ -8,10 +8,6 @@
 import ts from 'typescript';
 export declare function isAccessExpression(node: ts.Node): node is ts.ElementAccessExpression | ts.PropertyAccessExpression;
 /**
- * Creates a TypeScript node representing a numeric value.
- */
-export declare function tsNumericExpression(value: number): ts.NumericLiteral | ts.PrefixUnaryExpression;
-/**
  * Check if a node represents a directive declaration in a TypeCheck Block.
  * Directive declarations can be either:
  * - var _t1: TestDir /*T:D*\/ = null! as TestDir;

@@ -33,4 +33,3 @@ export declare class TypeCheckFile extends Environment {
     render(): string;
     getPreludeStatements(): TcbExpr[];
 }
-export declare function typeCheckFilePath(rootDirs: AbsoluteFsPath[]): AbsoluteFsPath;
