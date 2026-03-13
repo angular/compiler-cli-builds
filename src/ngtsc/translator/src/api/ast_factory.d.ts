@@ -12,7 +12,7 @@
  * It is up to the caller to do this - e.g. only call `createTaggedTemplate()` or pass `let`|`const`
  * to `createVariableDeclaration()` if the final JS will allow it.
  */
-export interface AstFactory<TStatement, TExpression> {
+export interface AstFactory<TStatement, TExpression, TType> {
     /**
      * Attach the `leadingComments` to the given `statement` node.
      *
@@ -84,7 +84,7 @@ export interface AstFactory<TStatement, TExpression> {
      * @param parameters the names of the function's parameters.
      * @param body a statement (or a block of statements) that are the body of the function.
      */
-    createFunctionDeclaration(functionName: string, parameters: string[], body: TStatement): TStatement;
+    createFunctionDeclaration(functionName: string, parameters: Parameter<TType>[], body: TStatement): TStatement;
     /**
      * Create an expression that represents a function
      * (e.g. `function foo(param1, param2) { stmt; }`).
@@ -93,7 +93,7 @@ export interface AstFactory<TStatement, TExpression> {
      * @param parameters the names of the function's parameters.
      * @param body a statement (or a block of statements) that are the body of the function.
      */
-    createFunctionExpression(functionName: string | null, parameters: string[], body: TStatement): TExpression;
+    createFunctionExpression(functionName: string | null, parameters: Parameter<TType>[], body: TStatement): TExpression;
     /**
      * Create an expression that represents an arrow function
      * (e.g. `(param1, param2) => body`).
@@ -101,7 +101,7 @@ export interface AstFactory<TStatement, TExpression> {
      * @param parameters the names of the function's parameters.
      * @param body an expression or block of statements that are the body of the function.
      */
-    createArrowFunctionExpression(parameters: string[], body: TExpression | TStatement): TExpression;
+    createArrowFunctionExpression(parameters: Parameter<TType>[], body: TExpression | TStatement): TExpression;
     /**
      * Creates an expression that represents a dynamic import
      * (e.g. `import('./some/path')`)
@@ -216,9 +216,9 @@ export interface AstFactory<TStatement, TExpression> {
      *
      * @param variableName the name of the variable.
      * @param initializer if not `null` then this expression is assigned to the declared variable.
-     * @param type whether this variable should be declared as `var`, `let` or `const`.
+     * @param variableType whether this variable should be declared as `var`, `let` or `const`.
      */
-    createVariableDeclaration(variableName: string, initializer: TExpression | null, type: VariableDeclarationType): TStatement;
+    createVariableDeclaration(variableName: string, initializer: TExpression | null, variableType: VariableDeclarationType, type: TType | null): TStatement;
     /**
      * Create a regular expression literal (e.g. `/\d+/g`).
      *
@@ -232,6 +232,32 @@ export interface AstFactory<TStatement, TExpression> {
      * @param target Expression of the spread element.
      */
     createSpreadElement(expression: TExpression): TExpression;
+    /**
+     * Create a type node for a built-in type.
+     * @param type Type that should be created.
+     */
+    createBuiltInType(type: BuiltInType): TType;
+    /**
+     * Create an expression type.
+     * @param expression Expression to be turned into a type node.
+     * @param typeParams Type parameters for the expression.
+     */
+    createExpressionType(expression: TExpression, typeParams: TType[] | null): TType;
+    /**
+     * Create an array type.
+     * @param elementType Type of the array elements.
+     */
+    createArrayType(elementType: TType): TType;
+    /**
+     * Create a map type.
+     * @param valueType Type of the map values.
+     */
+    createMapType(valueType: TType): TType;
+    /**
+     * Forward a transplanted type.
+     * @param type Type to be transplanted, if supported.
+     */
+    transplantType(type: TType): TType;
     /**
      * Attach a source map range to the given node.
      *
@@ -249,6 +275,12 @@ export type VariableDeclarationType = 'const' | 'let' | 'var';
  * The unary operators supported by the `AstFactory`.
  */
 export type UnaryOperator = '+' | '-' | '!';
+/** Supported built-in types. */
+export type BuiltInType = 'any' | 'boolean' | 'number' | 'string' | 'function' | 'never' | 'unknown';
+export interface Parameter<TType> {
+    name: string;
+    type: TType | null;
+}
 /**
  * The binary operators supported by the `AstFactory`.
  */

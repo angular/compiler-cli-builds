@@ -6,16 +6,17 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { types as t } from '@babel/core';
-import { AstFactory, BinaryOperator, LeadingComment, ObjectLiteralProperty, SourceMapRange, TemplateLiteral, VariableDeclarationType } from '../../../../src/ngtsc/translator/src/api/ast_factory';
+import { AstFactory, BinaryOperator, BuiltInType, LeadingComment, ObjectLiteralProperty, Parameter, SourceMapRange, TemplateLiteral, VariableDeclarationType } from '../../../../src/ngtsc/translator/src/api/ast_factory';
 /**
  * A Babel flavored implementation of the AstFactory.
  */
-export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expression | t.SpreadElement> {
+export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expression | t.SpreadElement, t.TSType> {
     /** The absolute path to the source file being compiled. */
-    private sourceUrl;
+    private sourcePath;
+    private readonly typesEnabled;
     constructor(
     /** The absolute path to the source file being compiled. */
-    sourceUrl: string);
+    sourcePath: string);
     attachComments(statement: t.Statement | t.Expression, leadingComments: LeadingComment[]): void;
     createArrayLiteral: typeof t.arrayExpression;
     createAssignment(target: t.Expression, operator: BinaryOperator, value: t.Expression): t.Expression;
@@ -26,9 +27,9 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createElementAccess(expression: t.Expression, element: t.Expression): t.Expression;
     createExpressionStatement: typeof t.expressionStatement;
     createSpreadElement(expression: t.Expression): t.SpreadElement;
-    createFunctionDeclaration(functionName: string, parameters: string[], body: t.Statement): t.Statement;
-    createArrowFunctionExpression(parameters: string[], body: t.Statement | t.Expression): t.Expression;
-    createFunctionExpression(functionName: string | null, parameters: string[], body: t.Statement): t.Expression;
+    createFunctionDeclaration(functionName: string, parameters: Parameter<t.TSType>[], body: t.Statement): t.Statement;
+    createArrowFunctionExpression(parameters: Parameter<t.TSType>[], body: t.Statement | t.Expression): t.Expression;
+    createFunctionExpression(functionName: string | null, parameters: Parameter<t.TSType>[], body: t.Statement): t.Expression;
     createIdentifier: typeof t.identifier;
     createIfStatement: typeof t.ifStatement;
     createDynamicImport(url: string | t.Expression): t.Expression;
@@ -44,7 +45,13 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createTypeOfExpression(expression: t.Expression): t.Expression;
     createVoidExpression(expression: t.Expression): t.Expression;
     createUnaryExpression: typeof t.unaryExpression;
-    createVariableDeclaration(variableName: string, initializer: t.Expression | null, type: VariableDeclarationType): t.Statement;
+    createVariableDeclaration(variableName: string, initializer: t.Expression | null, variableType: VariableDeclarationType, type: t.TSType | null): t.Statement;
     createRegularExpressionLiteral(body: string, flags: string | null): t.Expression;
     setSourceMapRange<T extends t.Statement | t.Expression | t.TemplateElement | t.SpreadElement>(node: T, sourceMapRange: SourceMapRange | null): T;
+    createBuiltInType(type: BuiltInType): t.TSType;
+    createExpressionType(expression: t.Expression, typeParams: t.TSType[] | null): t.TSType;
+    createArrayType(elementType: t.TSType): t.TSType;
+    createMapType(valueType: t.TSType): t.TSType;
+    transplantType(type: t.TSType): t.TSType;
+    private identifierWithType;
 }

@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-I6T4FEIP.js";
+} from "./chunk-SOKUOCYN.js";
 import {
   LogicalProjectPath,
   absoluteFrom,
@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.3+sha-17d8a88";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.3+sha-412788f";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5239,19 +5239,22 @@ var TypeScriptAstFactory = class {
     if (!ts25.isBlock(body)) {
       throw new Error(`Invalid syntax, expected a block, but got ${ts25.SyntaxKind[body.kind]}.`);
     }
-    return ts25.factory.createFunctionDeclaration(void 0, void 0, functionName, void 0, parameters.map((param) => ts25.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
+    return ts25.factory.createFunctionDeclaration(void 0, void 0, functionName, void 0, parameters.map((param) => this.createParameter(param)), void 0, body);
   }
   createFunctionExpression(functionName, parameters, body) {
     if (!ts25.isBlock(body)) {
       throw new Error(`Invalid syntax, expected a block, but got ${ts25.SyntaxKind[body.kind]}.`);
     }
-    return ts25.factory.createFunctionExpression(void 0, void 0, functionName ?? void 0, void 0, parameters.map((param) => ts25.factory.createParameterDeclaration(void 0, void 0, param)), void 0, body);
+    return ts25.factory.createFunctionExpression(void 0, void 0, functionName ?? void 0, void 0, parameters.map((param) => this.createParameter(param)), void 0, body);
   }
   createArrowFunctionExpression(parameters, body) {
     if (ts25.isStatement(body) && !ts25.isBlock(body)) {
       throw new Error(`Invalid syntax, expected a block, but got ${ts25.SyntaxKind[body.kind]}.`);
     }
-    return ts25.factory.createArrowFunction(void 0, void 0, parameters.map((param) => ts25.factory.createParameterDeclaration(void 0, void 0, param)), void 0, void 0, body);
+    return ts25.factory.createArrowFunction(void 0, void 0, parameters.map((param) => this.createParameter(param)), void 0, void 0, body);
+  }
+  createParameter(param) {
+    return ts25.factory.createParameterDeclaration(void 0, void 0, param.name, void 0, param.type ?? void 0);
   }
   createIdentifier = ts25.factory.createIdentifier;
   createIfStatement(condition, thenStatement, elseStatement) {
@@ -5326,10 +5329,10 @@ var TypeScriptAstFactory = class {
   createUnaryExpression(operator, operand) {
     return ts25.factory.createPrefixUnaryExpression(this.UNARY_OPERATORS[operator], operand);
   }
-  createVariableDeclaration(variableName, initializer, type) {
+  createVariableDeclaration(variableName, initializer, variableType, type) {
     return ts25.factory.createVariableStatement(void 0, ts25.factory.createVariableDeclarationList([
-      ts25.factory.createVariableDeclaration(variableName, void 0, void 0, initializer ?? void 0)
-    ], this.VAR_TYPES[type]));
+      ts25.factory.createVariableDeclaration(variableName, void 0, type ?? void 0, initializer ?? void 0)
+    ], this.VAR_TYPES[variableType]));
   }
   createRegularExpressionLiteral(body, flags) {
     return ts25.factory.createRegularExpressionLiteral(`/${body}/${flags ?? ""}`);
@@ -5349,6 +5352,44 @@ var TypeScriptAstFactory = class {
       source
     });
     return node;
+  }
+  createBuiltInType(type) {
+    switch (type) {
+      case "any":
+        return ts25.factory.createKeywordTypeNode(ts25.SyntaxKind.AnyKeyword);
+      case "boolean":
+        return ts25.factory.createKeywordTypeNode(ts25.SyntaxKind.BooleanKeyword);
+      case "number":
+        return ts25.factory.createKeywordTypeNode(ts25.SyntaxKind.NumberKeyword);
+      case "string":
+        return ts25.factory.createKeywordTypeNode(ts25.SyntaxKind.StringKeyword);
+      case "function":
+        return ts25.factory.createTypeReferenceNode(ts25.factory.createIdentifier("Function"));
+      case "never":
+        return ts25.factory.createKeywordTypeNode(ts25.SyntaxKind.NeverKeyword);
+      case "unknown":
+        return ts25.factory.createKeywordTypeNode(ts25.SyntaxKind.UnknownKeyword);
+    }
+  }
+  createExpressionType(expression, typeParams) {
+    const typeName = getEntityTypeFromExpression(expression);
+    return ts25.factory.createTypeReferenceNode(typeName, typeParams ?? void 0);
+  }
+  createArrayType(elementType) {
+    return ts25.factory.createArrayTypeNode(elementType);
+  }
+  createMapType(valueType) {
+    return ts25.factory.createTypeLiteralNode([
+      ts25.factory.createIndexSignature(void 0, [
+        ts25.factory.createParameterDeclaration(void 0, void 0, "key", void 0, ts25.factory.createKeywordTypeNode(ts25.SyntaxKind.StringKeyword))
+      ], valueType)
+    ]);
+  }
+  transplantType(type) {
+    if (typeof type.kind === "number" && typeof type.getSourceFile === "function" && ts25.isTypeNode(type)) {
+      return type;
+    }
+    throw new Error("Attempting to transplant a type node from a non-TypeScript AST: " + type);
   }
 };
 function createTemplateMiddle(cooked, raw) {
@@ -5372,6 +5413,19 @@ function attachComments(statement, leadingComments) {
       }
     }
   }
+}
+function getEntityTypeFromExpression(expression) {
+  if (ts25.isIdentifier(expression)) {
+    return expression;
+  }
+  if (ts25.isPropertyAccessExpression(expression)) {
+    const left = getEntityTypeFromExpression(expression.expression);
+    if (!ts25.isIdentifier(expression.name)) {
+      throw new Error(`Unsupported property access for type reference: ${expression.name.text}`);
+    }
+    return ts25.factory.createQualifiedName(left, expression.name);
+  }
+  throw new Error(`Unsupported expression for type reference: ${ts25.SyntaxKind[expression.kind]}`);
 }
 
 // packages/compiler-cli/src/ngtsc/translator/src/typescript_translator.js
@@ -11979,4 +12033,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-5EGV6MZF.js.map
+//# sourceMappingURL=chunk-USWX3HC6.js.map

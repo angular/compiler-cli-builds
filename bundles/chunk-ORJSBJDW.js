@@ -30,7 +30,7 @@ import {
   isShim,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-XSRMZ57L.js";
+} from "./chunk-H5RGCNT4.js";
 import {
   AbsoluteModuleStrategy,
   ActivePerfRecorder,
@@ -90,7 +90,7 @@ import {
   relativePathBetween,
   signalMetadataTransform,
   toUnredirectedSourceFile
-} from "./chunk-5EGV6MZF.js";
+} from "./chunk-USWX3HC6.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5406,4 +5406,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-H5NZ72T3.js.map
+//# sourceMappingURL=chunk-ORJSBJDW.js.map
