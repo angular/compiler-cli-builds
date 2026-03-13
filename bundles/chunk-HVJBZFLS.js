@@ -8,7 +8,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-I6T4FEIP.js";
+} from "./chunk-SOKUOCYN.js";
 
 // packages/compiler-cli/linker/src/fatal_linker_error.js
 var FatalLinkerError = class extends Error {
@@ -455,7 +455,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "21.2.4+sha-6f41efc";
+var PLACEHOLDER_VERSION = "21.2.4+sha-334ae10";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -1363,4 +1363,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-HFKTR5QY.js.map
+//# sourceMappingURL=chunk-HVJBZFLS.js.map

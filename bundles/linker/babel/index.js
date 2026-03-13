@@ -8,13 +8,13 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-HFKTR5QY.js";
+} from "../../chunk-HVJBZFLS.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "../../chunk-SEJGUMO2.js";
 import "../../chunk-Y5V7YWTG.js";
-import "../../chunk-I6T4FEIP.js";
+import "../../chunk-SOKUOCYN.js";
 import {
   NodeJSFileSystem
 } from "../../chunk-KWAGEHJJ.js";
@@ -26,9 +26,11 @@ import { types as t4 } from "@babel/core";
 // packages/compiler-cli/linker/babel/src/ast/babel_ast_factory.js
 import { types as t } from "@babel/core";
 var BabelAstFactory = class {
-  sourceUrl;
-  constructor(sourceUrl) {
-    this.sourceUrl = sourceUrl;
+  sourcePath;
+  typesEnabled;
+  constructor(sourcePath) {
+    this.sourcePath = sourcePath;
+    this.typesEnabled = sourcePath.endsWith(".ts") || sourcePath.endsWith(".mts");
   }
   attachComments(statement, leadingComments) {
     for (let i = leadingComments.length - 1; i >= 0; i--) {
@@ -91,18 +93,18 @@ var BabelAstFactory = class {
   }
   createFunctionDeclaration(functionName, parameters, body) {
     assert(body, t.isBlockStatement, "a block");
-    return t.functionDeclaration(t.identifier(functionName), parameters.map((param) => t.identifier(param)), body);
+    return t.functionDeclaration(t.identifier(functionName), parameters.map((param) => this.identifierWithType(param.name, param.type)), body);
   }
   createArrowFunctionExpression(parameters, body) {
     if (t.isStatement(body)) {
       assert(body, t.isBlockStatement, "a block");
     }
-    return t.arrowFunctionExpression(parameters.map((param) => t.identifier(param)), body);
+    return t.arrowFunctionExpression(parameters.map((param) => this.identifierWithType(param.name, param.type)), body);
   }
   createFunctionExpression(functionName, parameters, body) {
     assert(body, t.isBlockStatement, "a block");
     const name = functionName !== null ? t.identifier(functionName) : null;
-    return t.functionExpression(name, parameters.map((param) => t.identifier(param)), body);
+    return t.functionExpression(name, parameters.map((param) => this.identifierWithType(param.name, param.type)), body);
   }
   createIdentifier = t.identifier;
   createIfStatement = t.ifStatement;
@@ -168,9 +170,9 @@ var BabelAstFactory = class {
     return t.unaryExpression("void", expression);
   }
   createUnaryExpression = t.unaryExpression;
-  createVariableDeclaration(variableName, initializer, type) {
-    return t.variableDeclaration(type, [
-      t.variableDeclarator(t.identifier(variableName), initializer)
+  createVariableDeclaration(variableName, initializer, variableType, type) {
+    return t.variableDeclaration(variableType, [
+      t.variableDeclarator(this.identifierWithType(variableName, type), initializer)
     ]);
   }
   createRegularExpressionLiteral(body, flags) {
@@ -184,7 +186,7 @@ var BabelAstFactory = class {
       // Add in the filename so that we can map to external template files.
       // Note that Babel gets confused if you specify a filename when it is the original source
       // file. This happens when the template is inline, in which case just use `undefined`.
-      filename: sourceMapRange.url !== this.sourceUrl ? sourceMapRange.url : void 0,
+      filename: sourceMapRange.url !== this.sourcePath ? sourceMapRange.url : void 0,
       start: {
         line: sourceMapRange.start.line + 1,
         // lines are 1-based in Babel.
@@ -200,7 +202,62 @@ var BabelAstFactory = class {
     node.end = sourceMapRange.end.offset;
     return node;
   }
+  createBuiltInType(type) {
+    switch (type) {
+      case "any":
+        return t.tsAnyKeyword();
+      case "boolean":
+        return t.tsBooleanKeyword();
+      case "number":
+        return t.tsNumberKeyword();
+      case "string":
+        return t.tsStringKeyword();
+      case "function":
+        return t.tsTypeReference(t.identifier("Function"));
+      case "never":
+        return t.tsNeverKeyword();
+      case "unknown":
+        return t.tsUnknownKeyword();
+    }
+  }
+  createExpressionType(expression, typeParams) {
+    const typeName = getEntityTypeFromExpression(expression);
+    return t.tsTypeReference(typeName, typeParams ? t.tsTypeParameterInstantiation(typeParams) : null);
+  }
+  createArrayType(elementType) {
+    return t.tsArrayType(elementType);
+  }
+  createMapType(valueType) {
+    const keySignature = this.identifierWithType("key", this.createBuiltInType("string"));
+    return t.tsTypeLiteral([t.tsIndexSignature([keySignature], t.tsTypeAnnotation(valueType))]);
+  }
+  transplantType(type) {
+    if (t.isNode(type) && t.isTSType(type)) {
+      return type;
+    }
+    throw new Error("Attempting to transplant a type node from a non-Babel AST: " + type);
+  }
+  identifierWithType(name, type) {
+    const node = t.identifier(name);
+    if (this.typesEnabled && type != null) {
+      node.typeAnnotation = t.tsTypeAnnotation(type);
+    }
+    return node;
+  }
 };
+function getEntityTypeFromExpression(expression) {
+  if (t.isIdentifier(expression)) {
+    return expression;
+  }
+  if (t.isMemberExpression(expression)) {
+    const left = getEntityTypeFromExpression(expression.object);
+    if (!t.isIdentifier(expression.property)) {
+      throw new Error(`Unsupported property access for type reference: ${expression.property.type}`);
+    }
+    return t.tsQualifiedName(left, expression.property);
+  }
+  throw new Error(`Unsupported expression for type reference: ${expression.type}`);
+}
 function isLExpression(expr) {
   return t.isLVal(expr);
 }

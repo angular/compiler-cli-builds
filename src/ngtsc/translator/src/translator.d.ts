@@ -16,14 +16,14 @@ export interface TranslatorOptions<TExpression> {
     recordWrappedNode?: RecordWrappedNodeFn<TExpression>;
     annotateForClosureCompiler?: boolean;
 }
-export declare class ExpressionTranslatorVisitor<TFile, TStatement, TExpression> implements o.ExpressionVisitor, o.StatementVisitor {
+export declare class ExpressionTranslatorVisitor<TFile, TStatement, TExpression, TType> implements o.ExpressionVisitor, o.StatementVisitor, o.TypeVisitor {
     private factory;
     private imports;
     private contextFile;
     private downlevelTaggedTemplates;
     private downlevelVariableDeclarations;
     private recordWrappedNode;
-    constructor(factory: AstFactory<TStatement, TExpression>, imports: ImportGenerator<TFile, TExpression>, contextFile: TFile, options: TranslatorOptions<TExpression>);
+    constructor(factory: AstFactory<TStatement, TExpression, TType>, imports: ImportGenerator<TFile, TExpression>, contextFile: TFile, options: TranslatorOptions<TExpression>);
     visitDeclareVarStmt(stmt: o.DeclareVarStmt, context: Context): TStatement;
     visitDeclareFunctionStmt(stmt: o.DeclareFunctionStmt, context: Context): TStatement;
     visitExpressionStmt(stmt: o.ExpressionStatement, context: Context): TStatement;
@@ -37,6 +37,11 @@ export declare class ExpressionTranslatorVisitor<TFile, TStatement, TExpression>
     visitLiteralExpr(ast: o.LiteralExpr, _context: Context): TExpression;
     visitRegularExpressionLiteral(ast: o.RegularExpressionLiteralExpr, context: any): TExpression;
     visitLocalizedString(ast: o.LocalizedString, context: Context): TExpression;
+    visitBuiltinType(ast: o.BuiltinType): TType | null;
+    visitExpressionType(ast: o.ExpressionType, context: Context): TType;
+    visitArrayType(ast: o.ArrayType, context: Context): TType;
+    visitMapType(ast: o.MapType, context: Context): TType;
+    visitTransplantedType(type: o.TransplantedType<TType>): TType;
     private createTaggedTemplateExpression;
     /**
      * Translate the tagged template literal into a call that is compatible with ES5, using the
@@ -66,4 +71,5 @@ export declare class ExpressionTranslatorVisitor<TFile, TStatement, TExpression>
     private setSourceMapRange;
     private attachComments;
     private getTemplateLiteralFromAst;
+    private translateParams;
 }

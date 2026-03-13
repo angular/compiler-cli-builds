@@ -12,7 +12,7 @@ import {
   formatDiagnostics,
   performCompilation,
   readConfiguration
-} from "./chunk-BDUU4SEV.js";
+} from "./chunk-5HBKUFFK.js";
 
 // packages/compiler-cli/src/main.js
 import ts2 from "typescript";
@@ -376,4 +376,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-UEM7XLRW.js.map
+//# sourceMappingURL=chunk-55DVO6VN.js.map

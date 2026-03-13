@@ -74,10 +74,10 @@ var ExpressionTranslatorVisitor = class {
   }
   visitDeclareVarStmt(stmt, context) {
     const varType = this.downlevelVariableDeclarations ? "var" : stmt.hasModifier(o.StmtModifier.Final) ? "const" : "let";
-    return this.attachComments(this.factory.createVariableDeclaration(stmt.name, stmt.value?.visitExpression(this, context.withExpressionMode), varType), stmt.leadingComments);
+    return this.attachComments(this.factory.createVariableDeclaration(stmt.name, stmt.value?.visitExpression(this, context.withExpressionMode), varType, stmt.type?.visitType(this, context)), stmt.leadingComments);
   }
   visitDeclareFunctionStmt(stmt, context) {
-    return this.attachComments(this.factory.createFunctionDeclaration(stmt.name, stmt.params.map((param) => param.name), this.factory.createBlock(this.visitStatements(stmt.statements, context.withStatementMode))), stmt.leadingComments);
+    return this.attachComments(this.factory.createFunctionDeclaration(stmt.name, this.translateParams(stmt.params, context), this.factory.createBlock(this.visitStatements(stmt.statements, context.withStatementMode))), stmt.leadingComments);
   }
   visitExpressionStmt(stmt, context) {
     return this.attachComments(this.factory.createExpressionStatement(stmt.expr.visitExpression(this, context.withStatementMode)), stmt.leadingComments);
@@ -121,6 +121,46 @@ var ExpressionTranslatorVisitor = class {
     }
     const localizeTag = this.factory.createIdentifier("$localize");
     return this.setSourceMapRange(this.createTaggedTemplateExpression(localizeTag, { elements, expressions }), ast.sourceSpan);
+  }
+  visitBuiltinType(ast) {
+    let builtInType;
+    switch (ast.name) {
+      case o.BuiltinTypeName.Bool:
+        builtInType = "boolean";
+        break;
+      case o.BuiltinTypeName.String:
+        builtInType = "string";
+        break;
+      case o.BuiltinTypeName.Dynamic:
+        builtInType = "any";
+        break;
+      case o.BuiltinTypeName.Number:
+      case o.BuiltinTypeName.Int:
+        builtInType = "number";
+        break;
+      case o.BuiltinTypeName.Function:
+        builtInType = "function";
+        break;
+      case o.BuiltinTypeName.None:
+        builtInType = "never";
+        break;
+      case o.BuiltinTypeName.Inferred:
+        return null;
+    }
+    return this.factory.createBuiltInType(builtInType);
+  }
+  visitExpressionType(ast, context) {
+    return this.factory.createExpressionType(ast.value.visitExpression(this, context), ast.typeParams === null || ast.typeParams.length === 0 ? null : ast.typeParams.map((param) => param.visitType(this, context)));
+  }
+  visitArrayType(ast, context) {
+    return this.factory.createArrayType(ast.of.visitType(this, context));
+  }
+  visitMapType(ast, context) {
+    const valueType = ast.valueType === null ? this.factory.createBuiltInType("unknown") : ast.valueType.visitType(this, context);
+    return this.factory.createMapType(valueType);
+  }
+  visitTransplantedType(type) {
+    return this.factory.transplantType(type.type);
   }
   createTaggedTemplateExpression(tag, template) {
     return this.downlevelTaggedTemplates ? this.createES5TaggedTemplateFunctionCall(tag, template) : this.factory.createTaggedTemplate(tag, template);
@@ -189,10 +229,10 @@ var ExpressionTranslatorVisitor = class {
     return this.factory.createUnaryExpression("!", ast.condition.visitExpression(this, context));
   }
   visitFunctionExpr(ast, context) {
-    return this.factory.createFunctionExpression(ast.name ?? null, ast.params.map((param) => param.name), this.factory.createBlock(this.visitStatements(ast.statements, context)));
+    return this.factory.createFunctionExpression(ast.name ?? null, this.translateParams(ast.params, context), this.factory.createBlock(this.visitStatements(ast.statements, context)));
   }
   visitArrowFunctionExpr(ast, context) {
-    return this.factory.createArrowFunctionExpression(ast.params.map((param) => param.name), Array.isArray(ast.body) ? this.factory.createBlock(this.visitStatements(ast.body, context)) : ast.body.visitExpression(this, context));
+    return this.factory.createArrowFunctionExpression(this.translateParams(ast.params, context), Array.isArray(ast.body) ? this.factory.createBlock(this.visitStatements(ast.body, context)) : ast.body.visitExpression(this, context));
   }
   visitBinaryOperatorExpr(ast, context) {
     if (!BINARY_OPERATORS.has(ast.operator)) {
@@ -279,6 +319,12 @@ var ExpressionTranslatorVisitor = class {
       expressions: ast.expressions.map((e) => e.visitExpression(this, context))
     };
   }
+  translateParams(params, context) {
+    return params.map((param) => ({
+      name: param.name,
+      type: param.type?.visitType(this, context)
+    }));
+  }
 };
 function createTemplateElement({ cooked, raw, range }) {
   return { cooked, raw, range: createRange(range) };
@@ -311,4 +357,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-I6T4FEIP.js.map
+//# sourceMappingURL=chunk-SOKUOCYN.js.map
