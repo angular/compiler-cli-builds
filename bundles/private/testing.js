@@ -15,6 +15,7 @@ import {
   absoluteFrom,
   basename,
   dirname,
+  getFileSystem,
   resolve,
   setFileSystem
 } from "../chunk-UTWH365F.js";
@@ -209,15 +210,37 @@ var MockFileSystem = class {
   }
   copyInto(from, to) {
     for (const path in from) {
-      const item = from[path];
       const canonicalPath = this.getCanonicalPath(path);
-      if (isSymLink(item)) {
-        to[canonicalPath] = new SymLink(this.getCanonicalPath(item.path));
-      } else if (isFolder(item)) {
-        to[canonicalPath] = this.cloneFolder(item);
-      } else {
-        to[canonicalPath] = from[path];
-      }
+      Object.defineProperty(to, canonicalPath, {
+        configurable: true,
+        enumerable: true,
+        get: () => {
+          const item = from[path];
+          let cloned;
+          if (isSymLink(item)) {
+            cloned = new SymLink(this.getCanonicalPath(item.path));
+          } else if (isFolder(item)) {
+            cloned = this.cloneFolder(item);
+          } else {
+            cloned = item;
+          }
+          Object.defineProperty(to, canonicalPath, {
+            configurable: true,
+            enumerable: true,
+            value: cloned,
+            writable: true
+          });
+          return cloned;
+        },
+        set: (value) => {
+          Object.defineProperty(to, canonicalPath, {
+            configurable: true,
+            enumerable: true,
+            value,
+            writable: true
+          });
+        }
+      });
     }
   }
   findFromPath(path, options) {
@@ -435,7 +458,11 @@ runInEachFileSystem.native = (callback) => runInFileSystem(FS_NATIVE, callback, 
 runInEachFileSystem.osX = (callback) => runInFileSystem(FS_OS_X, callback, true);
 runInEachFileSystem.unix = (callback) => runInFileSystem(FS_UNIX, callback, true);
 runInEachFileSystem.windows = (callback) => runInFileSystem(FS_WINDOWS, callback, true);
+var mockFileSystemLocked = false;
 function initMockFileSystem(os2, cwd) {
+  if (mockFileSystemLocked) {
+    return getFileSystem();
+  }
   const fs = createMockFileSystem(os2, cwd);
   setFileSystem(fs);
   monkeyPatchTypeScript(fs);
