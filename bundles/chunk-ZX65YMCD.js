@@ -122,7 +122,7 @@ import {
   validateHostDirectives,
   wrapFunctionExpressionsInParens,
   wrapTypeReference
-} from "./chunk-USWX3HC6.js";
+} from "./chunk-5WREEPYZ.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -11369,4 +11369,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-H5RGCNT4.js.map
+//# sourceMappingURL=chunk-ZX65YMCD.js.map

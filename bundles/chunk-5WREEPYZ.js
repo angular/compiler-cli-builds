@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-SOKUOCYN.js";
+} from "./chunk-L35AQF75.js";
 import {
   LogicalProjectPath,
   absoluteFrom,
@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.3+sha-ada150c";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.3+sha-dc04465";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -6623,7 +6623,7 @@ var IvyTransformationVisitor = class extends Visitor {
     } else if (ts30.isMethodDeclaration(node)) {
       node = ts30.factory.updateMethodDeclaration(node, combinedModifiers, node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
     } else if (ts30.isPropertyDeclaration(node)) {
-      node = ts30.factory.updatePropertyDeclaration(node, combinedModifiers, node.name, node.questionToken, node.type, node.initializer);
+      node = ts30.factory.updatePropertyDeclaration(node, combinedModifiers, node.name, node.questionToken || node.exclamationToken, node.type, node.initializer);
     } else if (ts30.isGetAccessor(node)) {
       node = ts30.factory.updateGetAccessorDeclaration(node, combinedModifiers, node.name, node.parameters, node.type, node.body);
     } else if (ts30.isSetAccessor(node)) {
@@ -6754,10 +6754,9 @@ function insertDebugNameIntoCallExpression(node, debugName) {
       spreadArgs.push(ts31.factory.createIdentifier("undefined"));
     }
     spreadArgs.push(ts31.factory.createObjectLiteralExpression([debugNameProperty]));
-    newArgs = [
-      ...node.arguments,
-      ts31.factory.createSpreadElement(createNgDevModeConditional(ts31.factory.createArrayLiteralExpression(spreadArgs), ts31.factory.createArrayLiteralExpression()))
-    ];
+    const spread = ts31.factory.createSpreadElement(createNgDevModeConditional(ts31.factory.createArrayLiteralExpression(spreadArgs), ts31.factory.createArrayLiteralExpression()));
+    ts31.addSyntheticLeadingComment(spread, ts31.SyntaxKind.MultiLineCommentTrivia, " @ts-ignore ", true);
+    newArgs = [...node.arguments, spread];
   }
   return ts31.factory.updateCallExpression(node, node.expression, node.typeArguments, newArgs);
 }
@@ -12033,4 +12032,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-USWX3HC6.js.map
+//# sourceMappingURL=chunk-5WREEPYZ.js.map
