@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.3+sha-dc04465";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.3+sha-45641f2";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -9280,16 +9280,16 @@ var TcbExprTranslator = class {
     const head = ast.elements[0];
     let result;
     if (length === 1) {
-      result = `\`${head.text}\``;
+      result = `\`${this.escapeTemplateLiteral(head.text)}\``;
     } else {
-      let parts = [`\`${head.text}`];
+      let parts = [`\`${this.escapeTemplateLiteral(head.text)}`];
       const tailIndex = length - 1;
       for (let i = 1; i < tailIndex; i++) {
         const expr = this.translate(ast.expressions[i - 1]);
-        parts.push(`\${${expr.print()}}${ast.elements[i].text}`);
+        parts.push(`\${${expr.print()}}${this.escapeTemplateLiteral(ast.elements[i].text)}`);
       }
       const resolvedExpression = this.translate(ast.expressions[tailIndex - 1]);
-      parts.push(`\${${resolvedExpression.print()}}${ast.elements[tailIndex].text}\``);
+      parts.push(`\${${resolvedExpression.print()}}${this.escapeTemplateLiteral(ast.elements[tailIndex].text)}\``);
       result = parts.join("");
     }
     return new TcbExpr(result);
@@ -9344,6 +9344,9 @@ var TcbExprTranslator = class {
       return new TcbExpr(`(${expr} as any)(${args})`);
     }
     return new TcbExpr(`(${expr}!(${args}) as any)`);
+  }
+  escapeTemplateLiteral(value) {
+    return value.replace(/\\/g, "\\\\").replace(/`/g, "\\`").replace(/\${/g, "$\\{");
   }
 };
 var VeSafeLhsInferenceBugDetector = class _VeSafeLhsInferenceBugDetector {
@@ -12032,4 +12035,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-5WREEPYZ.js.map
+//# sourceMappingURL=chunk-MGK6ANDU.js.map

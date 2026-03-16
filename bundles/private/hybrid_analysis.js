@@ -9,7 +9,7 @@ import {
   RegistryDomSchemaChecker,
   TcbGenericContextBehavior,
   generateTypeCheckBlock
-} from "../chunk-5WREEPYZ.js";
+} from "../chunk-MGK6ANDU.js";
 import "../chunk-L35AQF75.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";
