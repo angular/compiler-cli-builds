@@ -10,11 +10,12 @@ import { Environment } from './environment';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
 import ts from 'typescript';
+import { TcbGenericContextBehavior } from './ops/context';
 /**
  * Adapts the compiler's `TypeCheckBlockMetadata` (which includes full TS AST nodes)
  * into a purely detached `TcbTypeCheckBlockMetadata` that can be mapped to JSON.
  */
-export declare function adaptTypeCheckBlockMetadata(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, env: Environment): {
+export declare function adaptTypeCheckBlockMetadata(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, env: Environment, genericContextBehavior: TcbGenericContextBehavior): {
     tcbMeta: TcbTypeCheckBlockMetadata;
     component: TcbComponentMetadata;
 };

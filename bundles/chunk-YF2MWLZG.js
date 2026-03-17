@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.4+sha-ca328ea";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.4+sha-67e0ba7";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -13479,8 +13479,57 @@ function typeParametersWithDefaultTypes(params) {
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/tcb_adapter.js
 import ts56 from "typescript";
-function adaptTypeCheckBlockMetadata(ref, meta, env) {
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/context.js
+var TcbGenericContextBehavior;
+(function(TcbGenericContextBehavior2) {
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["UseEmitter"] = 0] = "UseEmitter";
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["CopyClassNodes"] = 1] = "CopyClassNodes";
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["FallbackToAny"] = 2] = "FallbackToAny";
+})(TcbGenericContextBehavior || (TcbGenericContextBehavior = {}));
+var Context2 = class {
+  env;
+  domSchemaChecker;
+  oobRecorder;
+  id;
+  boundTarget;
+  pipes;
+  schemas;
+  hostIsStandalone;
+  hostPreserveWhitespaces;
+  nextId = 1;
+  constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone, hostPreserveWhitespaces) {
+    this.env = env;
+    this.domSchemaChecker = domSchemaChecker;
+    this.oobRecorder = oobRecorder;
+    this.id = id;
+    this.boundTarget = boundTarget;
+    this.pipes = pipes;
+    this.schemas = schemas;
+    this.hostIsStandalone = hostIsStandalone;
+    this.hostPreserveWhitespaces = hostPreserveWhitespaces;
+  }
+  /**
+   * Allocate a new variable name for use within the `Context`.
+   *
+   * Currently this uses a monotonically increasing counter, but in the future the variable name
+   * might change depending on the type of data being stored.
+   */
+  allocateId() {
+    return `_t${this.nextId++}`;
+  }
+  getPipeByName(name) {
+    if (this.pipes === null || !this.pipes.has(name)) {
+      return null;
+    }
+    return this.pipes.get(name);
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/tcb_adapter.js
+function adaptTypeCheckBlockMetadata(ref, meta, env, genericContextBehavior) {
   const refCache = /* @__PURE__ */ new Map();
+  const dirCache = /* @__PURE__ */ new Map();
   const extractRef = (ref2) => {
     if (refCache.has(ref2)) {
       return refCache.get(ref2);
@@ -13489,7 +13538,6 @@ function adaptTypeCheckBlockMetadata(ref, meta, env) {
     refCache.set(ref2, result);
     return result;
   };
-  const dirCache = /* @__PURE__ */ new Map();
   const convertDir = (dir) => {
     if (dirCache.has(dir))
       return dirCache.get(dir);
@@ -13530,36 +13578,21 @@ function adaptTypeCheckBlockMetadata(ref, meta, env) {
       publicMethods: dir.publicMethods,
       ref: extractRef(dir.ref),
       isGeneric: dir.isGeneric,
-      typeParameters: (() => {
-        const node = dir.ref.node;
-        if (!node.typeParameters) {
-          return null;
-        }
-        const emitter = new TypeParameterEmitter(node.typeParameters, env.reflector);
-        let emitted;
-        if (!emitter.canEmit((ref2) => env.canReferenceType(ref2))) {
-          emitted = [...node.typeParameters];
-        } else {
-          emitted = emitter.emit((ref2) => env.referenceType(ref2));
-        }
-        return generateTcbTypeParameters(emitted || [], env.contextFile);
-      })(),
-      hasRequiresInlineTypeCtor: requiresInlineTypeCtor(dir.ref.node, env.reflector, env)
+      requiresInlineTypeCtor: requiresInlineTypeCtor(dir.ref.node, env.reflector, env),
+      ...adaptGenerics(dir.ref.node, env, TcbGenericContextBehavior.UseEmitter)
     };
     dirCache.set(dir, tcbDir);
     return tcbDir;
   };
+  const originalBoundTarget = meta.boundTarget.target;
   const adaptedBoundTarget = {
-    target: (() => {
-      const originalTarget = meta.boundTarget.target;
-      return {
-        template: originalTarget.template,
-        host: originalTarget.host ? {
-          node: originalTarget.host.node,
-          directives: originalTarget.host.directives.map(convertDir)
-        } : void 0
-      };
-    })(),
+    target: {
+      template: originalBoundTarget.template,
+      host: originalBoundTarget.host ? {
+        node: originalBoundTarget.host.node,
+        directives: originalBoundTarget.host.directives.map(convertDir)
+      } : void 0
+    },
     getUsedDirectives: () => meta.boundTarget.getUsedDirectives().map(convertDir),
     getEagerlyUsedDirectives: () => meta.boundTarget.getEagerlyUsedDirectives().map(convertDir),
     getUsedPipes: () => meta.boundTarget.getUsedPipes(),
@@ -13617,24 +13650,36 @@ function adaptTypeCheckBlockMetadata(ref, meta, env) {
       isStandalone: meta.isStandalone,
       preserveWhitespaces: meta.preserveWhitespaces
     },
-    component: (() => {
-      return {
-        ref: extractRef(ref),
-        typeParameters: (() => {
-          if (!ref.node.typeParameters)
-            return null;
-          const emitter = new TypeParameterEmitter(ref.node.typeParameters, env.reflector);
-          let emitted;
-          if (!emitter.canEmit((r) => env.canReferenceType(r))) {
-            emitted = [...ref.node.typeParameters];
-          } else {
-            emitted = emitter.emit((r) => env.referenceType(r));
-          }
-          return generateTcbTypeParameters(emitted || [], env.contextFile);
-        })()
-      };
-    })()
+    component: {
+      ref: extractRef(ref),
+      ...adaptGenerics(ref.node, env, env.config.useContextGenericType ? genericContextBehavior : TcbGenericContextBehavior.FallbackToAny)
+    }
   };
+}
+function adaptGenerics(node, env, genericContextBehavior) {
+  let typeParameters;
+  let typeArguments;
+  if (node.typeParameters !== void 0 && node.typeParameters.length > 0) {
+    switch (genericContextBehavior) {
+      case TcbGenericContextBehavior.UseEmitter:
+        const emitter = new TypeParameterEmitter(node.typeParameters, env.reflector);
+        const emittedParams = emitter.canEmit((r) => env.canReferenceType(r)) ? emitter.emit((typeRef) => env.referenceType(typeRef)) : void 0;
+        typeParameters = generateTcbTypeParameters(emittedParams || node.typeParameters, env.contextFile);
+        typeArguments = typeParameters.map((param) => param.name);
+        break;
+      case TcbGenericContextBehavior.CopyClassNodes:
+        typeParameters = generateTcbTypeParameters(node.typeParameters, env.contextFile);
+        typeArguments = typeParameters.map((param) => param.name);
+        break;
+      case TcbGenericContextBehavior.FallbackToAny:
+        typeParameters = generateTcbTypeParameters(node.typeParameters, env.contextFile);
+        typeArguments = new Array(node.typeParameters.length).fill("any");
+        break;
+    }
+  } else {
+    typeParameters = typeArguments = null;
+  }
+  return { typeParameters, typeArguments };
 }
 function extractReferenceMetadata(ref, env) {
   let name = ref.debugName || ref.node.name.text;
@@ -13838,7 +13883,7 @@ var Environment = class extends ReferenceEmitEnvironment {
     if (this.typeCtors.has(key)) {
       return new TcbExpr(this.typeCtors.get(key));
     }
-    if (dir.hasRequiresInlineTypeCtor) {
+    if (dir.requiresInlineTypeCtor) {
       const typeCtorExpr = `${this.referenceTcbValue(dir.ref).print()}.ngTypeCtor`;
       this.typeCtors.set(key, typeCtorExpr);
       return new TcbExpr(typeCtorExpr);
@@ -14202,52 +14247,6 @@ var TypeCheckShimGenerator = class {
   }
   static shimFor(fileName) {
     return absoluteFrom(fileName.replace(/\.tsx?$/, ".ngtypecheck.ts"));
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/context.js
-var TcbGenericContextBehavior;
-(function(TcbGenericContextBehavior2) {
-  TcbGenericContextBehavior2[TcbGenericContextBehavior2["UseEmitter"] = 0] = "UseEmitter";
-  TcbGenericContextBehavior2[TcbGenericContextBehavior2["CopyClassNodes"] = 1] = "CopyClassNodes";
-  TcbGenericContextBehavior2[TcbGenericContextBehavior2["FallbackToAny"] = 2] = "FallbackToAny";
-})(TcbGenericContextBehavior || (TcbGenericContextBehavior = {}));
-var Context2 = class {
-  env;
-  domSchemaChecker;
-  oobRecorder;
-  id;
-  boundTarget;
-  pipes;
-  schemas;
-  hostIsStandalone;
-  hostPreserveWhitespaces;
-  nextId = 1;
-  constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone, hostPreserveWhitespaces) {
-    this.env = env;
-    this.domSchemaChecker = domSchemaChecker;
-    this.oobRecorder = oobRecorder;
-    this.id = id;
-    this.boundTarget = boundTarget;
-    this.pipes = pipes;
-    this.schemas = schemas;
-    this.hostIsStandalone = hostIsStandalone;
-    this.hostPreserveWhitespaces = hostPreserveWhitespaces;
-  }
-  /**
-   * Allocate a new variable name for use within the `Context`.
-   *
-   * Currently this uses a monotonically increasing counter, but in the future the variable name
-   * might change depending on the type of data being stored.
-   */
-  allocateId() {
-    return `_t${this.nextId++}`;
-  }
-  getPipeByName(name) {
-    if (this.pipes === null || !this.pipes.has(name)) {
-      return null;
-    }
-    return this.pipes.get(name);
   }
 };
 
@@ -16818,7 +16817,7 @@ var Scope = class _Scope {
   getDirectiveOp(dir, node, customFieldType) {
     if (!dir.isGeneric) {
       return new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, dir);
-    } else if (!dir.hasRequiresInlineTypeCtor || this.tcb.env.config.useInlineTypeConstructors) {
+    } else if (!dir.requiresInlineTypeCtor || this.tcb.env.config.useInlineTypeConstructors) {
       return new TcbDirectiveCtorOp(this.tcb, this, node, dir, customFieldType);
     }
     return new TcbGenericDirectiveTypeWithAnyParamsOp(this.tcb, this, node, dir);
@@ -16995,33 +16994,12 @@ var Scope = class _Scope {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.js
-function generateTypeCheckBlock(env, component, name, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
+function generateTypeCheckBlock(env, component, name, meta, domSchemaChecker, oobRecorder) {
   const tcb = new Context2(env, domSchemaChecker, oobRecorder, meta.id, meta.boundTarget, meta.pipes, meta.schemas, meta.isStandalone, meta.preserveWhitespaces);
   const ctxRawType = env.referenceTcbValue(component.ref);
-  let typeParameters = void 0;
-  let typeArguments = void 0;
-  if (component.typeParameters !== void 0) {
-    if (!env.config.useContextGenericType) {
-      genericContextBehavior = TcbGenericContextBehavior.FallbackToAny;
-    }
-    switch (genericContextBehavior) {
-      case TcbGenericContextBehavior.UseEmitter:
-        const emittedParams = component.typeParameters || [];
-        typeParameters = emittedParams;
-        typeArguments = typeParameters.map((param) => param.name);
-        break;
-      case TcbGenericContextBehavior.CopyClassNodes:
-        const copiedParams = component.typeParameters ? [...component.typeParameters] : [];
-        typeParameters = copiedParams;
-        typeArguments = typeParameters.map((param) => param.name);
-        break;
-      case TcbGenericContextBehavior.FallbackToAny:
-        typeArguments = Array.from({ length: component.typeParameters?.length ?? 0 }).map(() => "any");
-        break;
-    }
-  }
-  const typeParamsStr = typeParameters === void 0 || typeParameters.length === 0 ? "" : `<${typeParameters.map((p) => p.representation).join(", ")}>`;
-  const typeArgsStr = typeArguments === void 0 || typeArguments.length === 0 ? "" : `<${typeArguments.join(", ")}>`;
+  const { typeParameters, typeArguments } = component;
+  const typeParamsStr = !env.config.useContextGenericType || typeParameters === null || typeParameters.length === 0 ? "" : `<${typeParameters.map((p) => p.representation).join(", ")}>`;
+  const typeArgsStr = typeArguments === null || typeArguments.length === 0 ? "" : `<${typeArguments.join(", ")}>`;
   const thisParamStr = `this: ${ctxRawType.print()}${typeArgsStr}`;
   const statements = [];
   if (tcb.boundTarget.target.template !== void 0) {
@@ -17073,8 +17051,8 @@ var TypeCheckFile = class extends Environment {
   }
   addTypeCheckBlock(ref, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
     const fnId = `_tcb${this.nextTcbId++}`;
-    const { tcbMeta, component } = adaptTypeCheckBlockMetadata(ref, meta, this);
-    const fn = generateTypeCheckBlock(this, component, fnId, tcbMeta, domSchemaChecker, oobRecorder, genericContextBehavior);
+    const { tcbMeta, component } = adaptTypeCheckBlockMetadata(ref, meta, this, genericContextBehavior);
+    const fn = generateTypeCheckBlock(this, component, fnId, tcbMeta, domSchemaChecker, oobRecorder);
     this.tcbStatements.push(fn);
   }
   render() {
@@ -17401,8 +17379,8 @@ var InlineTcbOp = class {
   execute(im, sf, refEmitter) {
     const env = new Environment(this.config, im, refEmitter, this.reflector, sf);
     const fnName = `_tcb_${this.ref.node.pos}`;
-    const { tcbMeta, component } = adaptTypeCheckBlockMetadata(this.ref, this.meta, env);
-    const fn = generateTypeCheckBlock(env, component, fnName, tcbMeta, this.domSchemaChecker, this.oobRecorder, TcbGenericContextBehavior.CopyClassNodes);
+    const { tcbMeta, component } = adaptTypeCheckBlockMetadata(this.ref, this.meta, env, TcbGenericContextBehavior.CopyClassNodes);
+    const fn = generateTypeCheckBlock(env, component, fnName, tcbMeta, this.domSchemaChecker, this.oobRecorder);
     return fn;
   }
 };
@@ -23148,4 +23126,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-MLEBGNK6.js.map
+//# sourceMappingURL=chunk-YF2MWLZG.js.map
