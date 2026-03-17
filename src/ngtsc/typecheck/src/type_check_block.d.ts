@@ -9,7 +9,6 @@ import { TcbComponentMetadata, TcbTypeCheckBlockMetadata } from '../api';
 import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
 import { OutOfBandDiagnosticRecorder } from './oob';
-import { TcbGenericContextBehavior } from './ops/context';
 /**
  * Given a `ts.ClassDeclaration` for a component, and metadata regarding that component, compose a
  * "type check block" function.
@@ -34,4 +33,4 @@ import { TcbGenericContextBehavior } from './ops/context';
  * @param genericContextBehavior controls how generic parameters (especially parameters with generic
  * bounds) will be referenced from the generated TCB code.
  */
-export declare function generateTypeCheckBlock(env: Environment, component: TcbComponentMetadata, name: string, meta: TcbTypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): string;
+export declare function generateTypeCheckBlock(env: Environment, component: TcbComponentMetadata, name: string, meta: TcbTypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder): string;

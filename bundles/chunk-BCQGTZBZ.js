@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.3+sha-eeba51c";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.3+sha-9769560";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -6942,6 +6942,52 @@ function signalMetadataTransform(program) {
   };
 }
 
+// packages/compiler-cli/src/ngtsc/typecheck/src/ops/context.js
+var TcbGenericContextBehavior;
+(function(TcbGenericContextBehavior2) {
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["UseEmitter"] = 0] = "UseEmitter";
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["CopyClassNodes"] = 1] = "CopyClassNodes";
+  TcbGenericContextBehavior2[TcbGenericContextBehavior2["FallbackToAny"] = 2] = "FallbackToAny";
+})(TcbGenericContextBehavior || (TcbGenericContextBehavior = {}));
+var Context2 = class {
+  env;
+  domSchemaChecker;
+  oobRecorder;
+  id;
+  boundTarget;
+  pipes;
+  schemas;
+  hostIsStandalone;
+  hostPreserveWhitespaces;
+  nextId = 1;
+  constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone, hostPreserveWhitespaces) {
+    this.env = env;
+    this.domSchemaChecker = domSchemaChecker;
+    this.oobRecorder = oobRecorder;
+    this.id = id;
+    this.boundTarget = boundTarget;
+    this.pipes = pipes;
+    this.schemas = schemas;
+    this.hostIsStandalone = hostIsStandalone;
+    this.hostPreserveWhitespaces = hostPreserveWhitespaces;
+  }
+  /**
+   * Allocate a new variable name for use within the `Context`.
+   *
+   * Currently this uses a monotonically increasing counter, but in the future the variable name
+   * might change depending on the type of data being stored.
+   */
+  allocateId() {
+    return `_t${this.nextId++}`;
+  }
+  getPipeByName(name) {
+    if (this.pipes === null || !this.pipes.has(name)) {
+      return null;
+    }
+    return this.pipes.get(name);
+  }
+};
+
 // packages/compiler-cli/src/ngtsc/typecheck/src/dom.js
 import { DomElementSchemaRegistry } from "@angular/compiler";
 import ts33 from "typescript";
@@ -8648,7 +8694,7 @@ var Environment = class extends ReferenceEmitEnvironment {
     if (this.typeCtors.has(key)) {
       return new TcbExpr(this.typeCtors.get(key));
     }
-    if (dir.hasRequiresInlineTypeCtor) {
+    if (dir.requiresInlineTypeCtor) {
       const typeCtorExpr = `${this.referenceTcbValue(dir.ref).print()}.ngTypeCtor`;
       this.typeCtors.set(key, typeCtorExpr);
       return new TcbExpr(typeCtorExpr);
@@ -8998,52 +9044,6 @@ function makeInlineDiagnostic(id, code, node, messageText, relatedInformation) {
     typeCheckId: id
   };
 }
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/context.js
-var TcbGenericContextBehavior;
-(function(TcbGenericContextBehavior2) {
-  TcbGenericContextBehavior2[TcbGenericContextBehavior2["UseEmitter"] = 0] = "UseEmitter";
-  TcbGenericContextBehavior2[TcbGenericContextBehavior2["CopyClassNodes"] = 1] = "CopyClassNodes";
-  TcbGenericContextBehavior2[TcbGenericContextBehavior2["FallbackToAny"] = 2] = "FallbackToAny";
-})(TcbGenericContextBehavior || (TcbGenericContextBehavior = {}));
-var Context2 = class {
-  env;
-  domSchemaChecker;
-  oobRecorder;
-  id;
-  boundTarget;
-  pipes;
-  schemas;
-  hostIsStandalone;
-  hostPreserveWhitespaces;
-  nextId = 1;
-  constructor(env, domSchemaChecker, oobRecorder, id, boundTarget, pipes, schemas, hostIsStandalone, hostPreserveWhitespaces) {
-    this.env = env;
-    this.domSchemaChecker = domSchemaChecker;
-    this.oobRecorder = oobRecorder;
-    this.id = id;
-    this.boundTarget = boundTarget;
-    this.pipes = pipes;
-    this.schemas = schemas;
-    this.hostIsStandalone = hostIsStandalone;
-    this.hostPreserveWhitespaces = hostPreserveWhitespaces;
-  }
-  /**
-   * Allocate a new variable name for use within the `Context`.
-   *
-   * Currently this uses a monotonically increasing counter, but in the future the variable name
-   * might change depending on the type of data being stored.
-   */
-  allocateId() {
-    return `_t${this.nextId++}`;
-  }
-  getPipeByName(name) {
-    if (this.pipes === null || !this.pipes.has(name)) {
-      return null;
-    }
-    return this.pipes.get(name);
-  }
-};
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/scope.js
 import { TmplAstBoundText, TmplAstComponent as TmplAstComponent3, TmplAstContent, TmplAstDeferredBlock, TmplAstDirective as TmplAstDirective2, TmplAstElement as TmplAstElement8, TmplAstForLoopBlock as TmplAstForLoopBlock2, TmplAstHostElement as TmplAstHostElement5, TmplAstIcu, TmplAstIfBlock as TmplAstIfBlock2, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference, TmplAstSwitchBlock as TmplAstSwitchBlock2, TmplAstTemplate as TmplAstTemplate5, TmplAstText as TmplAstText2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
@@ -11612,7 +11612,7 @@ var Scope = class _Scope {
   getDirectiveOp(dir, node, customFieldType) {
     if (!dir.isGeneric) {
       return new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, dir);
-    } else if (!dir.hasRequiresInlineTypeCtor || this.tcb.env.config.useInlineTypeConstructors) {
+    } else if (!dir.requiresInlineTypeCtor || this.tcb.env.config.useInlineTypeConstructors) {
       return new TcbDirectiveCtorOp(this.tcb, this, node, dir, customFieldType);
     }
     return new TcbGenericDirectiveTypeWithAnyParamsOp(this.tcb, this, node, dir);
@@ -11789,33 +11789,12 @@ var Scope = class _Scope {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.js
-function generateTypeCheckBlock(env, component, name, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
+function generateTypeCheckBlock(env, component, name, meta, domSchemaChecker, oobRecorder) {
   const tcb = new Context2(env, domSchemaChecker, oobRecorder, meta.id, meta.boundTarget, meta.pipes, meta.schemas, meta.isStandalone, meta.preserveWhitespaces);
   const ctxRawType = env.referenceTcbValue(component.ref);
-  let typeParameters = void 0;
-  let typeArguments = void 0;
-  if (component.typeParameters !== void 0) {
-    if (!env.config.useContextGenericType) {
-      genericContextBehavior = TcbGenericContextBehavior.FallbackToAny;
-    }
-    switch (genericContextBehavior) {
-      case TcbGenericContextBehavior.UseEmitter:
-        const emittedParams = component.typeParameters || [];
-        typeParameters = emittedParams;
-        typeArguments = typeParameters.map((param) => param.name);
-        break;
-      case TcbGenericContextBehavior.CopyClassNodes:
-        const copiedParams = component.typeParameters ? [...component.typeParameters] : [];
-        typeParameters = copiedParams;
-        typeArguments = typeParameters.map((param) => param.name);
-        break;
-      case TcbGenericContextBehavior.FallbackToAny:
-        typeArguments = Array.from({ length: component.typeParameters?.length ?? 0 }).map(() => "any");
-        break;
-    }
-  }
-  const typeParamsStr = typeParameters === void 0 || typeParameters.length === 0 ? "" : `<${typeParameters.map((p) => p.representation).join(", ")}>`;
-  const typeArgsStr = typeArguments === void 0 || typeArguments.length === 0 ? "" : `<${typeArguments.join(", ")}>`;
+  const { typeParameters, typeArguments } = component;
+  const typeParamsStr = !env.config.useContextGenericType || typeParameters === null || typeParameters.length === 0 ? "" : `<${typeParameters.map((p) => p.representation).join(", ")}>`;
+  const typeArgsStr = typeArguments === null || typeArguments.length === 0 ? "" : `<${typeArguments.join(", ")}>`;
   const thisParamStr = `this: ${ctxRawType.print()}${typeArgsStr}`;
   const statements = [];
   if (tcb.boundTarget.target.template !== void 0) {
@@ -12007,11 +11986,11 @@ export {
   generateTcbTypeParameters,
   generateInlineTypeCtor,
   requiresInlineTypeCtor,
+  TcbGenericContextBehavior,
   RegistryDomSchemaChecker,
   ReferenceEmitEnvironment,
   Environment,
   OutOfBandDiagnosticRecorderImpl,
-  TcbGenericContextBehavior,
   generateTypeCheckBlock
 };
 /**
@@ -12035,4 +12014,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-MGK6ANDU.js.map
+//# sourceMappingURL=chunk-BCQGTZBZ.js.map
