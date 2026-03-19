@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.4+sha-c9e6263";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.4+sha-41b1410";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -10149,13 +10149,24 @@ var TcbNativeFieldOp = class extends TcbOp {
       return null;
     }
     checkUnsupportedFieldBindings(this.node, this.unsupportedBindingFields, this.tcb);
-    const expectedType = new TcbExpr(this.getExpectedTypeFromDomNode(this.node));
-    const value = extractFieldValue(fieldBinding.value, this.tcb, this.scope);
-    const id = new TcbExpr(this.tcb.allocateId());
-    const assignment = new TcbExpr(`${id.print()} = ${value.print()}`);
-    assignment.addParseSpanInfo(fieldBinding.valueSpan ?? fieldBinding.sourceSpan);
-    this.scope.addStatement(declareVariable(id, expectedType));
-    this.scope.addStatement(assignment);
+    const rawExpectedType = this.getExpectedTypeFromDomNode(this.node);
+    if (rawExpectedType === null) {
+      const signal = extractFieldValueSignal(fieldBinding.value, this.tcb, this.scope);
+      const id = new TcbExpr(this.tcb.allocateId());
+      const unionType = new TcbExpr("{ (): string; set: (v: string) => void; } | { (): number | null; set: (v: number | null) => void; }");
+      const assignment = new TcbExpr(`${id.print()} = ${signal.print()}`);
+      assignment.addParseSpanInfo(fieldBinding.valueSpan ?? fieldBinding.sourceSpan);
+      this.scope.addStatement(declareVariable(id, unionType));
+      this.scope.addStatement(assignment);
+    } else {
+      const expectedType = new TcbExpr(rawExpectedType);
+      const value = extractFieldValue(fieldBinding.value, this.tcb, this.scope);
+      const id = new TcbExpr(this.tcb.allocateId());
+      const assignment = new TcbExpr(`${id.print()} = ${value.print()}`);
+      assignment.addParseSpanInfo(fieldBinding.valueSpan ?? fieldBinding.sourceSpan);
+      this.scope.addStatement(declareVariable(id, expectedType));
+      this.scope.addStatement(assignment);
+    }
     return null;
   }
   getExpectedTypeFromDomNode(node) {
@@ -10168,6 +10179,8 @@ var TcbNativeFieldOp = class extends TcbOp {
     switch (this.inputType) {
       case "checkbox":
         return "boolean";
+      case "radio":
+        return "string";
       case "number":
       case "range":
       case "datetime-local":
@@ -10181,6 +10194,9 @@ var TcbNativeFieldOp = class extends TcbOp {
     const hasDynamicType = this.inputType === null && this.node.inputs.some((input) => (input.type === BindingType3.Property || input.type === BindingType3.Attribute) && input.name === "type");
     if (hasDynamicType) {
       return "string | number | boolean | Date | null";
+    }
+    if (this.inputType === "text" || this.inputType === null) {
+      return null;
     }
     return "string";
   }
@@ -10318,6 +10334,11 @@ function extractFieldValue(expression, tcb, scope) {
   const innerCall = new TcbExpr(tcbExpression(expression, tcb, scope).print() + "()");
   innerCall.markIgnoreDiagnostics();
   return new TcbExpr(`${innerCall.print()}.value()`);
+}
+function extractFieldValueSignal(expression, tcb, scope) {
+  const innerCall = new TcbExpr(tcbExpression(expression, tcb, scope).print() + "()");
+  innerCall.markIgnoreDiagnostics();
+  return new TcbExpr(`${innerCall.print()}.value`);
 }
 function hasModelInput(name, meta) {
   return meta.inputs.hasBindingPropertyName(name) && meta.outputs.hasBindingPropertyName(name + "Change");
@@ -12014,4 +12035,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-BCQGTZBZ.js.map
+//# sourceMappingURL=chunk-FWCOMZC3.js.map
