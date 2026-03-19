@@ -133,6 +133,10 @@ export interface OutOfBandDiagnosticRecorder {
      * Reports an unsupported binding on a form `FormField` node.
      */
     formFieldUnsupportedBinding(id: TypeCheckId, node: TmplAstBoundAttribute | TmplAstTextAttribute): void;
+    /**
+     * Reports that multiple components in the compilation scope match a given element.
+     */
+    multipleMatchingComponents(id: TypeCheckId, element: TmplAstElement, componentNames: string[]): void;
 }
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder {
     private resolver;
@@ -169,4 +173,5 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     deferImplicitTriggerMissingPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
     deferImplicitTriggerInvalidPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
     formFieldUnsupportedBinding(id: TypeCheckId, node: TmplAstBoundAttribute | TmplAstTextAttribute): void;
+    multipleMatchingComponents(id: TypeCheckId, element: TmplAstElement, componentNames: string[]): void;
 }

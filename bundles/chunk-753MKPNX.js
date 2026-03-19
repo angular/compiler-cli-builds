@@ -105,6 +105,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER"] = 8020] = "DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER";
   ErrorCode2[ErrorCode2["DEFER_TRIGGER_MISCONFIGURATION"] = 8021] = "DEFER_TRIGGER_MISCONFIGURATION";
   ErrorCode2[ErrorCode2["FORM_FIELD_UNSUPPORTED_BINDING"] = 8022] = "FORM_FIELD_UNSUPPORTED_BINDING";
+  ErrorCode2[ErrorCode2["MULTIPLE_MATCHING_COMPONENTS"] = 8023] = "MULTIPLE_MATCHING_COMPONENTS";
   ErrorCode2[ErrorCode2["INVALID_BANANA_IN_BOX"] = 8101] = "INVALID_BANANA_IN_BOX";
   ErrorCode2[ErrorCode2["NULLISH_COALESCING_NOT_NULLABLE"] = 8102] = "NULLISH_COALESCING_NOT_NULLABLE";
   ErrorCode2[ErrorCode2["MISSING_CONTROL_FLOW_DIRECTIVE"] = 8103] = "MISSING_CONTROL_FLOW_DIRECTIVE";
@@ -229,7 +230,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.4+sha-836bf20";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.4+sha-50e599e";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -9036,6 +9037,13 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     }
     this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.sourceSpan, ts44.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FORM_FIELD_UNSUPPORTED_BINDING), message));
   }
+  multipleMatchingComponents(id, element, componentNames) {
+    const start = element.startSourceSpan.start.moveBy(1);
+    const end = element.startSourceSpan.end.moveBy(start.offset + element.name.length - element.startSourceSpan.end.offset);
+    const span = new ParseSourceSpan2(start, end);
+    const names = componentNames.map((n) => `'${n}'`).join(", ");
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts44.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MULTIPLE_MATCHING_COMPONENTS), `Multiple components match node with tagname ${element.name}: ${names}.`));
+  }
 };
 function makeInlineDiagnostic(id, code, node, messageText, relatedInformation) {
   return {
@@ -11531,6 +11539,12 @@ var Scope = class _Scope {
         this.tcb.oobRecorder.deferredComponentUsedEagerly(this.tcb.id, node);
       }
     }
+    if (node instanceof TmplAstElement8) {
+      const matchedComponents = directives.filter((dir) => dir.isComponent);
+      if (matchedComponents.length > 1) {
+        this.tcb.oobRecorder.multipleMatchingComponents(this.tcb.id, node, matchedComponents.map((dir) => dir.name));
+      }
+    }
     const dirMap = /* @__PURE__ */ new Map();
     for (const dir of directives) {
       this.appendDirectiveInputs(dir, node, dirMap, directives);
@@ -12035,4 +12049,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-FWCOMZC3.js.map
+//# sourceMappingURL=chunk-753MKPNX.js.map

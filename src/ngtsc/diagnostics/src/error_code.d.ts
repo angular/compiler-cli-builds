@@ -372,6 +372,10 @@ export declare enum ErrorCode {
     /** Raised when the user has an unsupported binding on a `FormField` directive. */
     FORM_FIELD_UNSUPPORTED_BINDING = 8022,
     /**
+     * Raised when multiple components in the compilation scope match a given element in a template.
+     */
+    MULTIPLE_MATCHING_COMPONENTS = 8023,
+    /**
      * A two way binding in a template has an incorrect syntax,
      * parentheses outside brackets. For example:
      *
