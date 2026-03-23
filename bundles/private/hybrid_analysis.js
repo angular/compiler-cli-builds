@@ -8,8 +8,9 @@ import {
   ImportManager,
   RegistryDomSchemaChecker,
   TcbGenericContextBehavior,
+  createHostElement,
   generateTypeCheckBlock
-} from "../chunk-753MKPNX.js";
+} from "../chunk-HT62QTQM.js";
 import "../chunk-L35AQF75.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";
@@ -20,6 +21,7 @@ export {
   ImportManager,
   RegistryDomSchemaChecker,
   TcbGenericContextBehavior,
+  createHostElement,
   generateTypeCheckBlock
 };
 /**

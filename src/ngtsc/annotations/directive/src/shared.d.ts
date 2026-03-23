@@ -13,12 +13,14 @@ import { DynamicValue, PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
 import { CompilationMode } from '../../../transform';
 import { ReferencesRegistry, UndecoratedMetadataExtractor } from '../../common';
+import { HostObjectLiteralBinding, HostListenerDecorator, HostBindingDecorator } from '../../../typecheck/src/host_bindings';
 type QueryDecoratorName = 'ViewChild' | 'ViewChildren' | 'ContentChild' | 'ContentChildren';
 export declare const queryDecoratorNames: QueryDecoratorName[];
 export interface HostBindingNodes {
-    literal: ts.ObjectLiteralExpression | null;
-    bindingDecorators: Set<ts.Decorator>;
-    listenerDecorators: Set<ts.Decorator>;
+    hostObjectLiteralBindings: HostObjectLiteralBinding[];
+    hostBindingDecorators: HostBindingDecorator[];
+    hostListenerDecorators: HostListenerDecorator[];
+    rawNodes: ts.Node[];
 }
 /**
  * Helper function to extract metadata from a `Directive` or `Component`. `Directive`s without a
