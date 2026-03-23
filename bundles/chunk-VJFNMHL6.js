@@ -4388,7 +4388,7 @@ var NgCompiler = class _NgCompiler {
       if (templateSemanticsChecker !== null) {
         diagnostics.push(...templateSemanticsChecker.getDiagnosticsForComponent(component));
       }
-      if (this.options.strictTemplates && extendedTemplateChecker !== null) {
+      if (this.strictTemplates && extendedTemplateChecker !== null) {
         diagnostics.push(...extendedTemplateChecker.getDiagnosticsForComponent(component));
       }
     } catch (err) {
@@ -4660,12 +4660,18 @@ var NgCompiler = class _NgCompiler {
       this.perfRecorder.memory(PerfCheckpoint.Resolve);
     });
   }
+  /**
+   * strictTemplate is `true` by default.
+   * Explicit opt-out is required to disable strictness
+   */
+  get strictTemplates() {
+    return this.options.strictTemplates !== false;
+  }
   get fullTemplateTypeCheck() {
-    const strictTemplates = !!this.options.strictTemplates;
-    return strictTemplates || !!this.options.fullTemplateTypeCheck;
+    return this.strictTemplates || !!this.options.fullTemplateTypeCheck;
   }
   getTypeCheckingConfig() {
-    const strictTemplates = !!this.options.strictTemplates;
+    const strictTemplates = this.strictTemplates;
     const useInlineTypeConstructors = this.programDriver.supportsInlineOperations;
     const checkTwoWayBoundEvents = this.options["_checkTwoWayBoundEvents"] ?? false;
     const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0-0");
@@ -4838,7 +4844,7 @@ var NgCompiler = class _NgCompiler {
           return handler.templateSemanticsCheck?.(clazz, templateSemanticsChecker) || null;
         }));
       }
-      if (this.options.strictTemplates && extendedTemplateChecker !== null) {
+      if (this.strictTemplates && extendedTemplateChecker !== null) {
         diagnostics.push(...compilation.traitCompiler.runAdditionalChecks(sf2, (clazz, handler) => {
           return handler.extendedTemplateCheck?.(clazz, extendedTemplateChecker) || null;
         }));
@@ -5026,7 +5032,7 @@ function getR3SymbolsFile(program) {
   return program.getSourceFiles().find((file) => file.fileName.indexOf("r3_symbols.ts") >= 0) || null;
 }
 function* verifyCompatibleTypeCheckOptions(options) {
-  if (options.fullTemplateTypeCheck === false && options.strictTemplates === true) {
+  if (options.fullTemplateTypeCheck === false && options.strictTemplates !== false) {
     yield makeConfigDiagnostic({
       category: ts27.DiagnosticCategory.Error,
       code: ErrorCode.CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK,
@@ -5038,7 +5044,7 @@ the latter can not be explicitly disabled.
 
 One of the following actions is required:
 1. Remove the "fullTemplateTypeCheck" option.
-2. Remove "strictTemplates" or set it to 'false'.
+2. Set "strictTemplates" to 'false'.
 
 More information about the template type checking compiler options can be found in the documentation:
 ${DOC_PAGE_BASE_URL}/tools/cli/template-typecheck
@@ -5406,4 +5412,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-EVRJQQ2I.js.map
+//# sourceMappingURL=chunk-VJFNMHL6.js.map

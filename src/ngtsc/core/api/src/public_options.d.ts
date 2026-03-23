@@ -93,7 +93,7 @@ export interface TypeCheckingOptions {
      *
      * This flag is a superset of the deprecated `fullTemplateTypeCheck` option.
      *
-     * Defaults to `false`, even if "fullTemplateTypeCheck" is `true`.
+     * Defaults to `true`
      */
     strictTemplates?: boolean;
     /**
