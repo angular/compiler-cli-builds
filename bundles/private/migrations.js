@@ -5,7 +5,7 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-VJFNMHL6.js";
+} from "../chunk-PCUEL3LN.js";
 import {
   CompilationMode,
   DtsMetadataReader,
@@ -24,7 +24,7 @@ import {
   parseDecoratorInputTransformFunction,
   queryDecoratorNames,
   unwrapExpression
-} from "../chunk-UECWFQ2J.js";
+} from "../chunk-6C6CAGZ2.js";
 import {
   FatalDiagnosticError,
   ImportManager,
@@ -34,7 +34,7 @@ import {
   TypeScriptReflectionHost,
   getRootDirs,
   reflectObjectLiteral
-} from "../chunk-HT62QTQM.js";
+} from "../chunk-EEMLK355.js";
 import "../chunk-L35AQF75.js";
 import {
   getFileSystem,

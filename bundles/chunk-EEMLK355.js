@@ -230,7 +230,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.4+sha-0eeb1b5";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.4+sha-ee8d209";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5696,7 +5696,11 @@ var TcbSwitchOp = class extends TcbOp {
       });
     });
     if (this.block.exhaustiveCheck) {
-      const switchValue = tcbExpression(this.block.expression, this.tcb, this.scope);
+      let translateExpression2 = this.block.expression;
+      if (this.block.exhaustiveCheck.expression) {
+        translateExpression2 = this.block.exhaustiveCheck.expression;
+      }
+      const switchValue = tcbExpression(translateExpression2, this.tcb, this.scope);
       const exhaustiveId = this.tcb.allocateId();
       clauses.push(new TcbExpr(`default: const tcbExhaustive${exhaustiveId}: never = ${switchValue.print()};`));
     }
@@ -7709,4 +7713,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-HT62QTQM.js.map
+//# sourceMappingURL=chunk-EEMLK355.js.map
