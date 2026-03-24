@@ -455,7 +455,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "22.0.0-next.4+sha-050b14b";
+var PLACEHOLDER_VERSION = "22.0.0-next.4+sha-eae8f7e";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -706,6 +706,7 @@ var PartialComponentLinkerVersion1 = class {
     const { major, minor } = new semver2.SemVer(version);
     const enableBlockSyntax = major >= 17 || version === PLACEHOLDER_VERSION;
     const enableLetSyntax = major > 18 || major === 18 && minor >= 1 || version === PLACEHOLDER_VERSION;
+    const hasOnPushByDefault = major >= 22 || version === PLACEHOLDER_VERSION;
     const template = parseTemplate(templateInfo.code, templateInfo.sourceUrl, {
       escapedString: templateInfo.isEscaped,
       range: templateInfo.range,
@@ -811,7 +812,7 @@ ${errors}`);
       styles: metaObj.has("styles") ? metaObj.getArray("styles").map((entry) => entry.getString()) : [],
       defer: deferBlockDependencies,
       encapsulation: metaObj.has("encapsulation") ? parseEncapsulation(metaObj.getValue("encapsulation")) : ViewEncapsulation.Emulated,
-      changeDetection: metaObj.has("changeDetection") ? parseChangeDetectionStrategy(metaObj.getValue("changeDetection")) : ChangeDetectionStrategy.Default,
+      changeDetection: metaObj.has("changeDetection") ? parseChangeDetectionStrategy(metaObj.getValue("changeDetection")) : hasOnPushByDefault ? ChangeDetectionStrategy.OnPush : ChangeDetectionStrategy.Eager,
       animations: metaObj.has("animations") ? metaObj.getOpaque("animations") : null,
       relativeContextFilePath: this.sourceUrl,
       relativeTemplatePath: null,
@@ -1363,4 +1364,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-AI2LKYE3.js.map
+//# sourceMappingURL=chunk-456UYWVI.js.map
