@@ -230,7 +230,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.4+sha-ad57c9d";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.4+sha-eecfa4c";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -3349,6 +3349,59 @@ function translateStatement(contextFile, statement, imports, options = {}) {
   return statement.visitStatement(new ExpressionTranslatorVisitor(new TypeScriptAstFactory(options.annotateForClosureCompiler === true), imports, contextFile, options), new Context(true));
 }
 
+// packages/compiler-cli/src/ngtsc/typecheck/api/checker.js
+var OptimizeFor;
+(function(OptimizeFor2) {
+  OptimizeFor2[OptimizeFor2["SingleFile"] = 0] = "SingleFile";
+  OptimizeFor2[OptimizeFor2["WholeProgram"] = 1] = "WholeProgram";
+})(OptimizeFor || (OptimizeFor = {}));
+
+// packages/compiler-cli/src/ngtsc/typecheck/api/scope.js
+var PotentialImportKind;
+(function(PotentialImportKind2) {
+  PotentialImportKind2[PotentialImportKind2["NgModule"] = 0] = "NgModule";
+  PotentialImportKind2[PotentialImportKind2["Standalone"] = 1] = "Standalone";
+})(PotentialImportKind || (PotentialImportKind = {}));
+var PotentialImportMode;
+(function(PotentialImportMode2) {
+  PotentialImportMode2[PotentialImportMode2["Normal"] = 0] = "Normal";
+  PotentialImportMode2[PotentialImportMode2["ForceDirect"] = 1] = "ForceDirect";
+})(PotentialImportMode || (PotentialImportMode = {}));
+
+// packages/compiler-cli/src/ngtsc/typecheck/api/symbols.js
+var SymbolKind;
+(function(SymbolKind2) {
+  SymbolKind2[SymbolKind2["Input"] = 0] = "Input";
+  SymbolKind2[SymbolKind2["Output"] = 1] = "Output";
+  SymbolKind2[SymbolKind2["Binding"] = 2] = "Binding";
+  SymbolKind2[SymbolKind2["Reference"] = 3] = "Reference";
+  SymbolKind2[SymbolKind2["Variable"] = 4] = "Variable";
+  SymbolKind2[SymbolKind2["Directive"] = 5] = "Directive";
+  SymbolKind2[SymbolKind2["Element"] = 6] = "Element";
+  SymbolKind2[SymbolKind2["Template"] = 7] = "Template";
+  SymbolKind2[SymbolKind2["Expression"] = 8] = "Expression";
+  SymbolKind2[SymbolKind2["DomBinding"] = 9] = "DomBinding";
+  SymbolKind2[SymbolKind2["Pipe"] = 10] = "Pipe";
+  SymbolKind2[SymbolKind2["LetDeclaration"] = 11] = "LetDeclaration";
+  SymbolKind2[SymbolKind2["SelectorlessComponent"] = 12] = "SelectorlessComponent";
+  SymbolKind2[SymbolKind2["SelectorlessDirective"] = 13] = "SelectorlessDirective";
+})(SymbolKind || (SymbolKind = {}));
+
+// packages/compiler-cli/src/ngtsc/typecheck/api/completion.js
+var CompletionKind;
+(function(CompletionKind2) {
+  CompletionKind2[CompletionKind2["Reference"] = 0] = "Reference";
+  CompletionKind2[CompletionKind2["Variable"] = 1] = "Variable";
+  CompletionKind2[CompletionKind2["LetDeclaration"] = 2] = "LetDeclaration";
+})(CompletionKind || (CompletionKind = {}));
+
+// packages/compiler-cli/src/ngtsc/typecheck/api/oob.js
+var OutOfBadDiagnosticCategory;
+(function(OutOfBadDiagnosticCategory2) {
+  OutOfBadDiagnosticCategory2[OutOfBadDiagnosticCategory2["Error"] = 0] = "Error";
+  OutOfBadDiagnosticCategory2[OutOfBadDiagnosticCategory2["Warning"] = 1] = "Warning";
+})(OutOfBadDiagnosticCategory || (OutOfBadDiagnosticCategory = {}));
+
 // packages/compiler-cli/src/ngtsc/typecheck/src/host_bindings.js
 import { BindingType, CssSelector, makeBindingParser, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstHostElement, AbsoluteSourceSpan, ParseSpan, PropertyRead, ParsedEventType, Call, ThisReceiver, KeyedRead, LiteralPrimitive, RecursiveAstVisitor, ASTWithName, SafeCall, ImplicitReceiver } from "@angular/compiler";
 import ts21 from "typescript";
@@ -4477,318 +4530,8 @@ function getTcbReferenceKey(ref) {
   return ref.moduleName ? `${ref.moduleName}#${ref.name}` : ref.name;
 }
 
-// packages/compiler-cli/src/ngtsc/typecheck/src/oob.js
-import { AbsoluteSourceSpan as AbsoluteSourceSpan4, BindingType as BindingType2, ParseSourceSpan, TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstBoundEvent as TmplAstBoundEvent2, TmplAstComponent, TmplAstDirective, TmplAstElement } from "@angular/compiler";
-import ts29 from "typescript";
-var OutOfBandDiagnosticRecorderImpl = class {
-  resolver;
-  getSourceFile;
-  _diagnostics = [];
-  /**
-   * Tracks which `BindingPipe` nodes have already been recorded as invalid, so only one diagnostic
-   * is ever produced per node.
-   */
-  recordedPipes = /* @__PURE__ */ new Set();
-  /** Common pipes that can be suggested to users. */
-  pipeSuggestions = /* @__PURE__ */ new Map([
-    ["async", "AsyncPipe"],
-    ["uppercase", "UpperCasePipe"],
-    ["lowercase", "LowerCasePipe"],
-    ["json", "JsonPipe"],
-    ["slice", "SlicePipe"],
-    ["number", "DecimalPipe"],
-    ["percent", "PercentPipe"],
-    ["titlecase", "TitleCasePipe"],
-    ["currency", "CurrencyPipe"],
-    ["date", "DatePipe"],
-    ["i18nPlural", "I18nPluralPipe"],
-    ["i18nSelect", "I18nSelectPipe"],
-    ["keyvalue", "KeyValuePipe"]
-  ]);
-  constructor(resolver, getSourceFile2 = (name) => void 0) {
-    this.resolver = resolver;
-    this.getSourceFile = getSourceFile2;
-  }
-  get diagnostics() {
-    return this._diagnostics;
-  }
-  missingReferenceTarget(id, ref) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const value = ref.value.trim();
-    const errorMsg = `No directive found with exportAs '${value}'.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, ref.valueSpan || ref.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REFERENCE_TARGET), errorMsg));
-  }
-  missingPipe(id, ast, isStandalone) {
-    if (this.recordedPipes.has(ast)) {
-      return;
-    }
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, ast.nameSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
-    }
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    let errorMsg = `No pipe found with name '${ast.name}'.`;
-    if (this.pipeSuggestions.has(ast.name)) {
-      const suggestedClassName = this.pipeSuggestions.get(ast.name);
-      const suggestedImport = "@angular/common";
-      if (isStandalone) {
-        errorMsg += `
-To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" and add it to the "imports" array of the component.`;
-      } else {
-        errorMsg += `
-To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" and add it to the "imports" array of the module declaring the component.`;
-      }
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
-    this.recordedPipes.add(ast);
-  }
-  deferredPipeUsedEagerly(id, ast) {
-    if (this.recordedPipes.has(ast)) {
-      return;
-    }
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const errorMsg = `Pipe '${ast.name}' was imported  via \`@Component.deferredImports\`, but was used outside of a \`@defer\` block in a template. To fix this, either use the '${ast.name}' pipe inside of a \`@defer\` block or import this dependency using the \`@Component.imports\` field.`;
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, ast.nameSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
-    this.recordedPipes.add(ast);
-  }
-  deferredComponentUsedEagerly(id, element) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const errorMsg = `Element '${element.name}' contains a component or a directive that was imported  via \`@Component.deferredImports\`, but the element itself is located outside of a \`@defer\` block in a template. To fix this, either use the '${element.name}' element inside of a \`@defer\` block or import referenced component/directive dependency using the \`@Component.imports\` field.`;
-    const { start, end } = element.startSourceSpan;
-    const absoluteSourceSpan = new AbsoluteSourceSpan4(start.offset, end.offset);
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, absoluteSourceSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${element.name}'.`);
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
-  }
-  duplicateTemplateVar(id, variable, firstDecl) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const errorMsg = `Cannot redeclare variable '${variable.name}' as it was previously declared elsewhere for the same template.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, variable.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [
-      {
-        text: `The variable '${firstDecl.name}' was first declared here.`,
-        start: firstDecl.sourceSpan.start.offset,
-        end: firstDecl.sourceSpan.end.offset,
-        sourceFile: mapping.node.getSourceFile()
-      }
-    ]));
-  }
-  requiresInlineTcb(id, node) {
-    this._diagnostics.push(makeInlineDiagnostic(id, ErrorCode.INLINE_TCB_REQUIRED, node.name, `This component requires inline template type-checking, which is not supported by the current environment.`));
-  }
-  requiresInlineTypeConstructors(id, node, directives) {
-    let message;
-    if (directives.length > 1) {
-      message = `This component uses directives which require inline type constructors, which are not supported by the current environment.`;
-    } else {
-      message = `This component uses a directive which requires an inline type constructor, which is not supported by the current environment.`;
-    }
-    this._diagnostics.push(makeInlineDiagnostic(id, ErrorCode.INLINE_TYPE_CTOR_REQUIRED, node.name, message, directives.map((dir) => makeRelatedInformation(dir.name, `Requires an inline type constructor.`))));
-  }
-  suboptimalTypeInference(id, variables) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    let diagnosticVar = null;
-    for (const variable of variables) {
-      if (diagnosticVar === null || variable.value === "" || variable.value === "$implicit") {
-        diagnosticVar = variable;
-      }
-    }
-    if (diagnosticVar === null) {
-      return;
-    }
-    let varIdentification = `'${diagnosticVar.name}'`;
-    if (variables.length === 2) {
-      varIdentification += ` (and 1 other)`;
-    } else if (variables.length > 2) {
-      varIdentification += ` (and ${variables.length - 1} others)`;
-    }
-    const message = `This structural directive supports advanced type inference, but the current compiler configuration prevents its usage. The variable ${varIdentification} will have type 'any' as a result.
-
-Consider enabling the 'strictTemplates' option in your tsconfig.json for better type inference within this template.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, diagnosticVar.keySpan, ts29.DiagnosticCategory.Suggestion, ngErrorCode(ErrorCode.SUGGEST_SUBOPTIMAL_TYPE_INFERENCE), message));
-  }
-  splitTwoWayBinding(id, input, output, inputConsumer, outputConsumer) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const errorMsg = `The property and event halves of the two-way binding '${input.name}' are not bound to the same target.
-            Find more at ${DOC_PAGE_BASE_URL}/guide/templates/two-way-binding`;
-    const relatedMessages = [];
-    if (inputConsumer.ref.nodeNameSpan && inputConsumer.ref.nodeFilePath) {
-      const sf = this.getSourceFile(inputConsumer.ref.nodeFilePath);
-      if (sf) {
-        relatedMessages.push({
-          text: `The property half of the binding is to the '${inputConsumer.name}' ${inputConsumer.isComponent ? "component" : "directive"}.`,
-          start: inputConsumer.ref.nodeNameSpan.start,
-          end: inputConsumer.ref.nodeNameSpan.end,
-          sourceFile: sf
-        });
-      }
-    }
-    if (outputConsumer instanceof TmplAstElement) {
-      let message = `The event half of the binding is to a native event called '${input.name}' on the <${outputConsumer.name}> DOM element.`;
-      if (!mapping.node.getSourceFile().isDeclarationFile) {
-        message += `
- 
- Are you missing an output declaration called '${output.name}'?`;
-      }
-      relatedMessages.push({
-        text: message,
-        start: outputConsumer.sourceSpan.start.offset + 1,
-        end: outputConsumer.sourceSpan.start.offset + outputConsumer.name.length + 1,
-        sourceFile: mapping.node.getSourceFile()
-      });
-    } else {
-      if (outputConsumer.ref.nodeNameSpan && outputConsumer.ref.nodeFilePath) {
-        const sf = this.getSourceFile(outputConsumer.ref.nodeFilePath);
-        if (sf) {
-          relatedMessages.push({
-            text: `The event half of the binding is to the '${outputConsumer.name}' ${outputConsumer.isComponent ? "component" : "directive"}.`,
-            start: outputConsumer.ref.nodeNameSpan.start,
-            end: outputConsumer.ref.nodeNameSpan.end,
-            sourceFile: sf
-          });
-        }
-      }
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, input.keySpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SPLIT_TWO_WAY_BINDING), errorMsg, relatedMessages));
-  }
-  missingRequiredInputs(id, element, directiveName, isComponent, inputAliases) {
-    const message = `Required input${inputAliases.length === 1 ? "" : "s"} ${inputAliases.map((n) => `'${n}'`).join(", ")} from ${isComponent ? "component" : "directive"} ${directiveName} must be specified.`;
-    let span;
-    let name;
-    if (element instanceof TmplAstElement || element instanceof TmplAstDirective) {
-      name = element.name;
-    } else if (element instanceof TmplAstComponent) {
-      name = element.componentName;
-    } else {
-      name = null;
-    }
-    if (name === null) {
-      span = element.startSourceSpan;
-    } else {
-      const start = element.startSourceSpan.start.moveBy(1);
-      const end = element.startSourceSpan.end.moveBy(start.offset + name.length - element.startSourceSpan.end.offset);
-      span = new ParseSourceSpan(start, end);
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
-  }
-  illegalForLoopTrackAccess(id, block, access) {
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, access.sourceSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for property read.`);
-    }
-    const messageVars = [block.item, ...block.contextVariables.filter((v) => v.value === "$index")].map((v) => `'${v.name}'`).join(", ");
-    const message = `Cannot access '${access.name}' inside of a track expression. Only ${messageVars} and properties on the containing component are available to this expression.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
-  }
-  inaccessibleDeferredTriggerElement(id, trigger) {
-    let message;
-    if (trigger.reference === null) {
-      message = `Trigger cannot find reference. Make sure that the @defer block has a @placeholder with at least one root element node.`;
-    } else {
-      message = `Trigger cannot find reference "${trigger.reference}".
-Check that an element with #${trigger.reference} exists in the same template and it's accessible from the @defer block.
-Deferred blocks can only access triggers in same view, a parent embedded view or the root view of the @placeholder block.`;
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
-  }
-  controlFlowPreventingContentProjection(id, category, projectionNode, componentName, slotSelector, controlFlowNode, preservesWhitespaces) {
-    const blockName = controlFlowNode.nameSpan.toString().trim();
-    const lines = [
-      `Node matches the "${slotSelector}" slot of the "${componentName}" component, but will not be projected into the specific slot because the surrounding ${blockName} has more than one node at its root. To project the node in the right slot, you can:
-`,
-      `1. Wrap the content of the ${blockName} block in an <ng-container/> that matches the "${slotSelector}" selector.`,
-      `2. Split the content of the ${blockName} block across multiple ${blockName} blocks such that each one only has a single projectable node at its root.`,
-      `3. Remove all content from the ${blockName} block, except for the node being projected.`
-    ];
-    if (preservesWhitespaces) {
-      lines.push("Note: the host component has `preserveWhitespaces: true` which may cause whitespace to affect content projection.");
-    }
-    lines.push("", 'This check can be disabled using the `extendedDiagnostics.checks.controlFlowPreventingContentProjection = "suppress" compiler option.`');
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), projectionNode.startSourceSpan, category, ngErrorCode(ErrorCode.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION), lines.join("\n")));
-  }
-  illegalWriteToLetDeclaration(id, node, target) {
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, node.sourceSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for property write.`);
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_LET_WRITE), `Cannot assign to @let declaration '${target.name}'.`));
-  }
-  letUsedBeforeDefinition(id, node, target) {
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, node.sourceSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for property read.`);
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.LET_USED_BEFORE_DEFINITION), `Cannot read @let declaration '${target.name}' before it has been defined.`));
-  }
-  conflictingDeclaration(id, decl) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const errorMsg = `Cannot declare @let called '${decl.name}' as there is another symbol in the template with the same name.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, decl.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_LET_DECLARATION), errorMsg));
-  }
-  missingNamedTemplateDependency(id, node) {
-    this._diagnostics.push(makeTemplateDiagnostic(
-      id,
-      this.resolver.getTemplateSourceMapping(id),
-      node.startSourceSpan,
-      ts29.DiagnosticCategory.Error,
-      ngErrorCode(ErrorCode.MISSING_NAMED_TEMPLATE_DEPENDENCY),
-      // Wording is meant to mimic the wording TS uses in their diagnostic for missing symbols.
-      `Cannot find name "${node instanceof TmplAstDirective ? node.name : node.componentName}". Selectorless references are only supported to classes or non-type import statements.`
-    ));
-  }
-  incorrectTemplateDependencyType(id, node) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.startSourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE), `Incorrect reference type. Type must be a standalone ${node instanceof TmplAstComponent ? "@Component" : "@Directive"}.`));
-  }
-  unclaimedDirectiveBinding(id, directive, node) {
-    const errorMsg = `Directive ${directive.name} does not have an ${node instanceof TmplAstBoundEvent2 ? "output" : "input"} named "${node.name}". Bindings to directives must target existing inputs or outputs.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.keySpan || node.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_DIRECTIVE_BINDING), errorMsg));
-  }
-  deferImplicitTriggerMissingPlaceholder(id, trigger) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block"));
-  }
-  deferImplicitTriggerInvalidPlaceholder(id, trigger) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block with exactly one root element node"));
-  }
-  formFieldUnsupportedBinding(id, node) {
-    let message;
-    if (node instanceof TmplAstBoundAttribute2) {
-      let name;
-      if (node.type === BindingType2.Property) {
-        name = `[${node.name}]`;
-      } else if (node.type === BindingType2.Attribute) {
-        name = `[attr.${node.name}]`;
-      } else {
-        name = node.name;
-      }
-      message = `Binding to '${name}' is not allowed on nodes using the '[formField]' directive`;
-    } else {
-      message = `Setting the '${node.name}' attribute is not allowed on nodes using the '[formField]' directive`;
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FORM_FIELD_UNSUPPORTED_BINDING), message));
-  }
-  multipleMatchingComponents(id, element, componentNames) {
-    const start = element.startSourceSpan.start.moveBy(1);
-    const end = element.startSourceSpan.end.moveBy(start.offset + element.name.length - element.startSourceSpan.end.offset);
-    const span = new ParseSourceSpan(start, end);
-    const names = componentNames.map((n) => `'${n}'`).join(", ");
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MULTIPLE_MATCHING_COMPONENTS), `Multiple components match node with tagname ${element.name}: ${names}.`));
-  }
-};
-function makeInlineDiagnostic(id, code, node, messageText, relatedInformation) {
-  return {
-    ...makeDiagnostic(code, node, messageText, relatedInformation),
-    sourceFile: node.getSourceFile(),
-    typeCheckId: id
-  };
-}
-
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/scope.js
-import { TmplAstBoundText, TmplAstComponent as TmplAstComponent3, TmplAstContent, TmplAstDeferredBlock, TmplAstDirective as TmplAstDirective2, TmplAstElement as TmplAstElement8, TmplAstForLoopBlock as TmplAstForLoopBlock2, TmplAstHostElement as TmplAstHostElement5, TmplAstIcu, TmplAstIfBlock as TmplAstIfBlock2, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference, TmplAstSwitchBlock as TmplAstSwitchBlock2, TmplAstTemplate as TmplAstTemplate5, TmplAstText as TmplAstText2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
+import { TmplAstBoundText, TmplAstComponent as TmplAstComponent2, TmplAstContent, TmplAstDeferredBlock, TmplAstDirective, TmplAstElement as TmplAstElement7, TmplAstForLoopBlock as TmplAstForLoopBlock2, TmplAstHostElement as TmplAstHostElement5, TmplAstIcu, TmplAstIfBlock as TmplAstIfBlock2, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference, TmplAstSwitchBlock as TmplAstSwitchBlock2, TmplAstTemplate as TmplAstTemplate5, TmplAstText as TmplAstText2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/base.js
 var TcbOp = class {
@@ -4806,7 +4549,7 @@ var TcbOp = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/template.js
-import { TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstTemplate } from "@angular/compiler";
+import { TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstTemplate } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/expression.js
 import { Binary, BindingPipe, Call as Call3, ImplicitReceiver as ImplicitReceiver3, PropertyRead as PropertyRead3, R3Identifiers as R3Identifiers3, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, ThisReceiver as ThisReceiver3, TmplAstLetDeclaration } from "@angular/compiler";
@@ -5391,7 +5134,7 @@ ${getStatementsBlock(statements)}}`;
       const dirId = this.tcb.env.referenceTcbValue(dir.ref);
       dir.ngTemplateGuards.forEach((guard) => {
         const boundInput = hostNode.inputs.find((i) => i.name === guard.inputName) || (isTemplate ? hostNode.templateAttrs.find((input) => {
-          return input instanceof TmplAstBoundAttribute3 && input.name === guard.inputName;
+          return input instanceof TmplAstBoundAttribute2 && input.name === guard.inputName;
         }) : void 0);
         if (boundInput !== void 0) {
           const expr = tcbExpression(boundInput.value, this.tcb, this.scope);
@@ -5544,7 +5287,7 @@ var TcbComponentContextCompletionOp = class extends TcbOp {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/references.js
-import { TmplAstElement as TmplAstElement2, TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
+import { TmplAstElement, TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
 var TcbReferenceOp = class extends TcbOp {
   tcb;
   scope;
@@ -5564,8 +5307,8 @@ var TcbReferenceOp = class extends TcbOp {
   optional = true;
   execute() {
     const id = new TcbExpr(this.tcb.allocateId());
-    let initializer = this.target instanceof TmplAstTemplate2 || this.target instanceof TmplAstElement2 ? this.scope.resolve(this.target) : this.scope.resolve(this.host, this.target);
-    if (this.target instanceof TmplAstElement2 && !this.tcb.env.config.checkTypeOfDomReferences || !this.tcb.env.config.checkTypeOfNonDomReferences) {
+    let initializer = this.target instanceof TmplAstTemplate2 || this.target instanceof TmplAstElement ? this.scope.resolve(this.target) : this.scope.resolve(this.host, this.target);
+    if (this.target instanceof TmplAstElement && !this.tcb.env.config.checkTypeOfDomReferences || !this.tcb.env.config.checkTypeOfNonDomReferences) {
       initializer = new TcbExpr(`${initializer.print()} as any`);
     } else if (this.target instanceof TmplAstTemplate2) {
       const templateRef = this.tcb.env.referenceExternalSymbol("@angular/core", "TemplateRef");
@@ -5828,10 +5571,10 @@ var TcbLetDeclarationOp = class extends TcbOp {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/inputs.js
-import { BindingType as BindingType5, R3Identifiers as R3Identifiers4 } from "@angular/compiler";
+import { BindingType as BindingType4, R3Identifiers as R3Identifiers4 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/signal_forms.js
-import { BindingType as BindingType3, Call as Call4, PropertyRead as PropertyRead5, SafeCall as SafeCall3, TmplAstElement as TmplAstElement3, TmplAstHostElement as TmplAstHostElement2 } from "@angular/compiler";
+import { BindingType as BindingType2, Call as Call4, PropertyRead as PropertyRead5, SafeCall as SafeCall3, TmplAstElement as TmplAstElement2, TmplAstHostElement as TmplAstHostElement2 } from "@angular/compiler";
 var formControlInputFields = [
   // Should be kept in sync with the `FormUiControl` bindings,
   // defined in `packages/forms/signals/src/api/control.ts`.
@@ -5890,7 +5633,7 @@ var TcbNativeFieldOp = class extends TcbOp {
   }
   execute() {
     const inputs = this.node instanceof TmplAstHostElement2 ? this.node.bindings : this.node.inputs;
-    const fieldBinding = inputs.find((input) => input.type === BindingType3.Property && input.name === "formField") ?? null;
+    const fieldBinding = inputs.find((input) => input.type === BindingType2.Property && input.name === "formField") ?? null;
     if (fieldBinding === null) {
       return null;
     }
@@ -5937,7 +5680,7 @@ var TcbNativeFieldOp = class extends TcbOp {
       case "week":
         return "string | number | Date | null";
     }
-    const hasDynamicType = this.inputType === null && this.node.inputs.some((input) => (input.type === BindingType3.Property || input.type === BindingType3.Attribute) && input.name === "type");
+    const hasDynamicType = this.inputType === null && this.node.inputs.some((input) => (input.type === BindingType2.Property || input.type === BindingType2.Attribute) && input.name === "type");
     if (hasDynamicType) {
       return "string | number | boolean | Date | null";
     }
@@ -5958,7 +5701,7 @@ var TcbNativeRadioButtonFieldOp = class extends TcbNativeFieldOp {
   execute() {
     super.execute();
     const valueBinding = this.node.inputs.find((attr) => {
-      return attr.type === BindingType3.Property && attr.name === "value";
+      return attr.type === BindingType2.Property && attr.name === "value";
     });
     if (valueBinding !== void 0) {
       const id = new TcbExpr(this.tcb.allocateId());
@@ -5972,7 +5715,7 @@ var TcbNativeRadioButtonFieldOp = class extends TcbNativeFieldOp {
   }
 };
 function expandBoundAttributesForField(directive, node, customFormControlType) {
-  const fieldBinding = node.inputs.find((input) => input.type === BindingType3.Property && input.name === "formField");
+  const fieldBinding = node.inputs.find((input) => input.type === BindingType2.Property && input.name === "formField");
   if (!fieldBinding) {
     return null;
   }
@@ -6049,7 +5792,7 @@ function isNativeField(dir, node, allDirectiveMatches) {
   if (!isFieldDirective(dir)) {
     return false;
   }
-  if (!(node instanceof TmplAstElement3) || node.name !== "input" && node.name !== "select" && node.name !== "textarea") {
+  if (!(node instanceof TmplAstElement2) || node.name !== "input" && node.name !== "select" && node.name !== "textarea") {
     return false;
   }
   return allDirectiveMatches.every((meta) => {
@@ -6062,9 +5805,9 @@ function isControlValueAccessorLike(meta) {
 function checkUnsupportedFieldBindings(node, unsupportedBindingFields, tcb) {
   const inputs = node instanceof TmplAstHostElement2 ? node.bindings : node.inputs;
   for (const input of inputs) {
-    if (input.type === BindingType3.Property && unsupportedBindingFields.has(input.name)) {
+    if (input.type === BindingType2.Property && unsupportedBindingFields.has(input.name)) {
       tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, input);
-    } else if (input.type === BindingType3.Attribute && unsupportedBindingFields.has(input.name.toLowerCase())) {
+    } else if (input.type === BindingType2.Attribute && unsupportedBindingFields.has(input.name.toLowerCase())) {
       tcb.oobRecorder.formFieldUnsupportedBinding(tcb.id, input);
     }
   }
@@ -6103,11 +5846,11 @@ function isFormControl(allDirectiveMatches) {
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/bindings.js
-import { BindingType as BindingType4, LiteralArray, LiteralMap, TmplAstBoundAttribute as TmplAstBoundAttribute4, TmplAstElement as TmplAstElement4, TmplAstTemplate as TmplAstTemplate3 } from "@angular/compiler";
+import { BindingType as BindingType3, LiteralArray, LiteralMap, TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstElement as TmplAstElement3, TmplAstTemplate as TmplAstTemplate3 } from "@angular/compiler";
 function getBoundAttributes(directive, node) {
   const boundInputs = [];
   const processAttribute = (attr) => {
-    if (attr instanceof TmplAstBoundAttribute4 && attr.type !== BindingType4.Property && attr.type !== BindingType4.TwoWay) {
+    if (attr instanceof TmplAstBoundAttribute3 && attr.type !== BindingType3.Property && attr.type !== BindingType3.TwoWay) {
       return;
     }
     const inputs = directive.inputs.getByBindingPropertyName(attr.name);
@@ -6122,7 +5865,7 @@ function getBoundAttributes(directive, node) {
             required: input.required,
             transformType: input.transformType,
             isSignal: input.isSignal,
-            isTwoWayBinding: attr instanceof TmplAstBoundAttribute4 && attr.type === BindingType4.TwoWay
+            isTwoWayBinding: attr instanceof TmplAstBoundAttribute3 && attr.type === BindingType3.TwoWay
           };
         })
       });
@@ -6150,7 +5893,7 @@ function checkSplitTwoWayBinding(inputName, output, inputs, tcb) {
   if (outputConsumer === null || inputConsumer.ref === void 0 || outputConsumer instanceof TmplAstTemplate3) {
     return false;
   }
-  if (outputConsumer instanceof TmplAstElement4) {
+  if (outputConsumer instanceof TmplAstElement3) {
     tcb.oobRecorder.splitTwoWayBinding(tcb.id, input, output, inputConsumer, outputConsumer);
     return true;
   } else if (outputConsumer.ref !== inputConsumer.ref) {
@@ -6302,7 +6045,7 @@ var TcbUnclaimedInputsOp = class extends TcbOp {
   execute() {
     let elId = null;
     for (const binding of this.inputs) {
-      const isPropertyBinding = binding.type === BindingType5.Property || binding.type === BindingType5.TwoWay;
+      const isPropertyBinding = binding.type === BindingType4.Property || binding.type === BindingType4.TwoWay;
       if (isPropertyBinding && this.claimedInputs?.has(binding.name)) {
         continue;
       }
@@ -6327,7 +6070,7 @@ var TcbUnclaimedInputsOp = class extends TcbOp {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/schema.js
-import { BindingType as BindingType6, TmplAstComponent as TmplAstComponent2, TmplAstElement as TmplAstElement5 } from "@angular/compiler";
+import { BindingType as BindingType5, TmplAstComponent, TmplAstElement as TmplAstElement4 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/selectorless.js
 function getComponentTagName(node) {
@@ -6371,13 +6114,13 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
   }
   execute() {
     const element = this.element;
-    const isTemplateElement = element instanceof TmplAstElement5 || element instanceof TmplAstComponent2;
+    const isTemplateElement = element instanceof TmplAstElement4 || element instanceof TmplAstComponent;
     const bindings = isTemplateElement ? element.inputs : element.bindings;
     if (this.checkElement && isTemplateElement) {
       this.tcb.domSchemaChecker.checkElement(this.tcb.id, this.getTagName(element), element.startSourceSpan, this.tcb.schemas, this.tcb.hostIsStandalone);
     }
     for (const binding of bindings) {
-      const isPropertyBinding = binding.type === BindingType6.Property || binding.type === BindingType6.TwoWay;
+      const isPropertyBinding = binding.type === BindingType5.Property || binding.type === BindingType5.TwoWay;
       if (isPropertyBinding && this.claimedInputs?.has(binding.name)) {
         continue;
       }
@@ -6393,12 +6136,12 @@ var TcbDomSchemaCheckerOp = class extends TcbOp {
     return null;
   }
   getTagName(node) {
-    return node instanceof TmplAstElement5 ? node.name : getComponentTagName(node);
+    return node instanceof TmplAstElement4 ? node.name : getComponentTagName(node);
   }
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/events.js
-import { ImplicitReceiver as ImplicitReceiver5, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead6, TmplAstElement as TmplAstElement6 } from "@angular/compiler";
+import { ImplicitReceiver as ImplicitReceiver5, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead6, TmplAstElement as TmplAstElement5 } from "@angular/compiler";
 var EVENT_PARAMETER = "$event";
 function tcbEventHandlerExpression(ast, tcb, scope) {
   const translator = new TcbEventHandlerTranslator(tcb, scope);
@@ -6515,7 +6258,7 @@ var TcbUnclaimedOutputsOp = class extends TcbOp {
         } else {
           target = elId;
         }
-        if (this.target instanceof TmplAstElement6 && this.target.isVoid && this.tcb.env.config.allowDomEventAssertion) {
+        if (this.target instanceof TmplAstElement5 && this.target.isVoid && this.tcb.env.config.allowDomEventAssertion) {
           const assertUtil = this.tcb.env.referenceExternalSymbol("@angular/core", "\u0275assertType");
           domEventAssertion = new TcbExpr(`${assertUtil.print()}<typeof ${target.print()}>(${EVENT_PARAMETER}.target)`);
         }
@@ -6755,8 +6498,7 @@ function tcbCallTypeCtor(dir, tcb, inputs) {
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/content_projection.js
-import { createCssSelectorFromNode, CssSelector as CssSelector2, SelectorMatcher, TmplAstElement as TmplAstElement7, TmplAstForLoopBlock, TmplAstIfBlock, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate4, TmplAstText } from "@angular/compiler";
-import ts30 from "typescript";
+import { createCssSelectorFromNode, CssSelector as CssSelector2, SelectorMatcher, TmplAstElement as TmplAstElement6, TmplAstForLoopBlock, TmplAstIfBlock, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate4, TmplAstText } from "@angular/compiler";
 var TcbControlFlowContentProjectionOp = class extends TcbOp {
   tcb;
   element;
@@ -6769,7 +6511,7 @@ var TcbControlFlowContentProjectionOp = class extends TcbOp {
     this.element = element;
     this.ngContentSelectors = ngContentSelectors;
     this.componentName = componentName;
-    this.category = tcb.env.config.controlFlowPreventingContentProjection === "error" ? ts30.DiagnosticCategory.Error : ts30.DiagnosticCategory.Warning;
+    this.category = tcb.env.config.controlFlowPreventingContentProjection === "error" ? OutOfBadDiagnosticCategory.Error : OutOfBadDiagnosticCategory.Warning;
   }
   optional = false;
   execute() {
@@ -6783,7 +6525,7 @@ var TcbControlFlowContentProjectionOp = class extends TcbOp {
       }
       for (const root of controlFlowToCheck) {
         for (const child of root.children) {
-          if (child instanceof TmplAstElement7 || child instanceof TmplAstTemplate4) {
+          if (child instanceof TmplAstElement6 || child instanceof TmplAstTemplate4) {
             matcher.match(createCssSelectorFromNode(child), (_, originalSelector) => {
               this.tcb.oobRecorder.controlFlowPreventingContentProjection(this.tcb.id, this.category, child, this.componentName, originalSelector, root, this.tcb.hostPreserveWhitespaces);
             });
@@ -7128,12 +6870,12 @@ var Scope = class _Scope {
       ));
     } else if (ref instanceof TmplAstTemplate5 && directive === void 0 && this.templateCtxOpMap.has(ref)) {
       return this.resolveOp(this.templateCtxOpMap.get(ref));
-    } else if ((ref instanceof TmplAstElement8 || ref instanceof TmplAstTemplate5 || ref instanceof TmplAstComponent3 || ref instanceof TmplAstDirective2 || ref instanceof TmplAstHostElement5) && directive !== void 0 && this.directiveOpMap.has(ref)) {
+    } else if ((ref instanceof TmplAstElement7 || ref instanceof TmplAstTemplate5 || ref instanceof TmplAstComponent2 || ref instanceof TmplAstDirective || ref instanceof TmplAstHostElement5) && directive !== void 0 && this.directiveOpMap.has(ref)) {
       const dirMap = this.directiveOpMap.get(ref);
       return dirMap.has(directive) ? this.resolveOp(dirMap.get(directive)) : null;
-    } else if (ref instanceof TmplAstElement8 && this.elementOpMap.has(ref)) {
+    } else if (ref instanceof TmplAstElement7 && this.elementOpMap.has(ref)) {
       return this.resolveOp(this.elementOpMap.get(ref));
-    } else if (ref instanceof TmplAstComponent3 && this.componentNodeOpMap.has(ref)) {
+    } else if (ref instanceof TmplAstComponent2 && this.componentNodeOpMap.has(ref)) {
       return this.resolveOp(this.componentNodeOpMap.get(ref));
     } else if (ref instanceof TmplAstHostElement5 && this.hostElementOpMap.has(ref)) {
       return this.resolveOp(this.hostElementOpMap.get(ref));
@@ -7185,7 +6927,7 @@ var Scope = class _Scope {
     return res;
   }
   appendNode(node) {
-    if (node instanceof TmplAstElement8) {
+    if (node instanceof TmplAstElement7) {
       const opIndex = this.opQueue.push(new TcbElementOp(this.tcb, this, node)) - 1;
       this.elementOpMap.set(node, opIndex);
       if (this.tcb.env.config.controlFlowPreventingContentProjection !== "suppress") {
@@ -7208,7 +6950,7 @@ var Scope = class _Scope {
         this.appendDeepSchemaChecks(node.children);
       }
       this.checkAndAppendReferencesOfNode(node);
-    } else if (node instanceof TmplAstComponent3) {
+    } else if (node instanceof TmplAstComponent2) {
       this.appendComponentNode(node);
     } else if (node instanceof TmplAstDeferredBlock) {
       this.appendDeferredBlock(node);
@@ -7248,7 +6990,7 @@ var Scope = class _Scope {
       if (target === null) {
         this.tcb.oobRecorder.missingReferenceTarget(this.tcb.id, ref);
         ctxIndex = this.opQueue.push(new TcbInvalidReferenceOp(this.tcb, this)) - 1;
-      } else if (target instanceof TmplAstTemplate5 || target instanceof TmplAstElement8) {
+      } else if (target instanceof TmplAstTemplate5 || target instanceof TmplAstElement7) {
         ctxIndex = this.opQueue.push(new TcbReferenceOp(this.tcb, this, ref, node, target)) - 1;
       } else {
         ctxIndex = this.opQueue.push(new TcbReferenceOp(this.tcb, this, ref, node, target.directive)) - 1;
@@ -7260,7 +7002,7 @@ var Scope = class _Scope {
     const claimedInputs = /* @__PURE__ */ new Set();
     const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
     if (directives === null || directives.length === 0) {
-      if (node instanceof TmplAstElement8) {
+      if (node instanceof TmplAstElement7) {
         this.opQueue.push(new TcbUnclaimedInputsOp(this.tcb, this, node.inputs, node, claimedInputs), new TcbDomSchemaCheckerOp(
           this.tcb,
           node,
@@ -7271,13 +7013,13 @@ var Scope = class _Scope {
       }
       return;
     }
-    if (node instanceof TmplAstElement8) {
+    if (node instanceof TmplAstElement7) {
       const isDeferred = this.tcb.boundTarget.isDeferred(node);
       if (!isDeferred && directives.some((dirMeta) => dirMeta.isExplicitlyDeferred)) {
         this.tcb.oobRecorder.deferredComponentUsedEagerly(this.tcb.id, node);
       }
     }
-    if (node instanceof TmplAstElement8) {
+    if (node instanceof TmplAstElement7) {
       const matchedComponents = directives.filter((dir) => dir.isComponent);
       if (matchedComponents.length > 1) {
         this.tcb.oobRecorder.multipleMatchingComponents(this.tcb.id, node, matchedComponents.map((dir) => dir.name));
@@ -7288,7 +7030,7 @@ var Scope = class _Scope {
       this.appendDirectiveInputs(dir, node, dirMap, directives);
     }
     this.directiveOpMap.set(node, dirMap);
-    if (node instanceof TmplAstElement8) {
+    if (node instanceof TmplAstElement7) {
       for (const dir of directives) {
         for (const propertyName of dir.inputs.propertyNames) {
           claimedInputs.add(propertyName);
@@ -7303,7 +7045,7 @@ var Scope = class _Scope {
     const claimedOutputs = /* @__PURE__ */ new Set();
     const directives = this.tcb.boundTarget.getDirectivesOfNode(node);
     if (directives === null || directives.length === 0) {
-      if (node instanceof TmplAstElement8) {
+      if (node instanceof TmplAstElement7) {
         this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, events, bindings, claimedOutputs));
       }
       return;
@@ -7311,7 +7053,7 @@ var Scope = class _Scope {
     for (const dir of directives) {
       this.opQueue.push(new TcbDirectiveOutputsOp(this.tcb, this, node, bindings, events, dir));
     }
-    if (node instanceof TmplAstElement8 || node instanceof TmplAstHostElement5) {
+    if (node instanceof TmplAstElement7 || node instanceof TmplAstHostElement5) {
       for (const dir of directives) {
         for (const outputProperty of dir.outputs.propertyNames) {
           claimedOutputs.add(outputProperty);
@@ -7333,7 +7075,7 @@ var Scope = class _Scope {
       }
       this.directiveOpMap.set(node, dirMap);
     }
-    if (node instanceof TmplAstDirective2) {
+    if (node instanceof TmplAstDirective) {
       for (const input of node.inputs) {
         if (!claimedInputs.has(input.name)) {
           this.tcb.oobRecorder.unclaimedDirectiveBinding(this.tcb.id, node, input);
@@ -7360,7 +7102,7 @@ var Scope = class _Scope {
         }
       }
     }
-    if (node instanceof TmplAstDirective2) {
+    if (node instanceof TmplAstDirective) {
       for (const output of node.outputs) {
         if (!claimedOutputs.has(output.name)) {
           this.tcb.oobRecorder.unclaimedDirectiveBinding(this.tcb.id, node, output);
@@ -7408,10 +7150,10 @@ var Scope = class _Scope {
   }
   appendDeepSchemaChecks(nodes) {
     for (const node of nodes) {
-      if (!(node instanceof TmplAstElement8 || node instanceof TmplAstTemplate5)) {
+      if (!(node instanceof TmplAstElement7 || node instanceof TmplAstTemplate5)) {
         continue;
       }
-      if (node instanceof TmplAstElement8) {
+      if (node instanceof TmplAstElement7) {
         const claimedInputs = /* @__PURE__ */ new Set();
         let directives = this.tcb.boundTarget.getDirectivesOfNode(node);
         for (const dirNode of node.directives) {
@@ -7544,7 +7286,7 @@ var Scope = class _Scope {
           break;
         }
       }
-      if (rootNode === null || !(rootNode instanceof TmplAstElement8)) {
+      if (rootNode === null || !(rootNode instanceof TmplAstElement7)) {
         this.tcb.oobRecorder.deferImplicitTriggerInvalidPlaceholder(this.tcb.id, trigger);
       }
       return;
@@ -7678,6 +7420,12 @@ export {
   findFirstMatchingNode,
   findAllMatchingNodes,
   hasExpressionIdentifier,
+  OptimizeFor,
+  CompletionKind,
+  PotentialImportKind,
+  PotentialImportMode,
+  SymbolKind,
+  OutOfBadDiagnosticCategory,
   makeTemplateDiagnostic,
   getTypeCheckId,
   TypeParameterEmitter,
@@ -7696,7 +7444,6 @@ export {
   RegistryDomSchemaChecker,
   ReferenceEmitEnvironment,
   Environment,
-  OutOfBandDiagnosticRecorderImpl,
   generateTypeCheckBlock
 };
 /**
@@ -7713,4 +7460,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-EEMLK355.js.map
+//# sourceMappingURL=chunk-F56AXDTP.js.map

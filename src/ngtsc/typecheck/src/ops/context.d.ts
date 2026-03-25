@@ -7,8 +7,7 @@
  */
 import { BoundTarget, SchemaMetadata } from '@angular/compiler';
 import { DomSchemaChecker } from '../dom';
-import { OutOfBandDiagnosticRecorder } from '../oob';
-import { TypeCheckId, TcbDirectiveMetadata, TcbPipeMetadata } from '../../api';
+import { TypeCheckId, TcbDirectiveMetadata, TcbPipeMetadata, OutOfBandDiagnosticRecorder } from '../../api';
 import { Environment } from '../environment';
 /**
  * Controls how generics for the component context class will be handled during TCB generation.
@@ -45,7 +44,7 @@ export declare enum TcbGenericContextBehavior {
 export declare class Context {
     readonly env: Environment;
     readonly domSchemaChecker: DomSchemaChecker;
-    readonly oobRecorder: OutOfBandDiagnosticRecorder;
+    readonly oobRecorder: OutOfBandDiagnosticRecorder<unknown>;
     readonly id: TypeCheckId;
     readonly boundTarget: BoundTarget<TcbDirectiveMetadata>;
     private pipes;
@@ -53,7 +52,7 @@ export declare class Context {
     readonly hostIsStandalone: boolean;
     readonly hostPreserveWhitespaces: boolean;
     private nextId;
-    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, id: TypeCheckId, boundTarget: BoundTarget<TcbDirectiveMetadata>, pipes: Map<string, TcbPipeMetadata> | null, schemas: SchemaMetadata[], hostIsStandalone: boolean, hostPreserveWhitespaces: boolean);
+    constructor(env: Environment, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder<unknown>, id: TypeCheckId, boundTarget: BoundTarget<TcbDirectiveMetadata>, pipes: Map<string, TcbPipeMetadata> | null, schemas: SchemaMetadata[], hostIsStandalone: boolean, hostPreserveWhitespaces: boolean);
     /**
      * Allocate a new variable name for use within the `Context`.
      *

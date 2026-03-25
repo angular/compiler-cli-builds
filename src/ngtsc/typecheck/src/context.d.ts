@@ -12,9 +12,8 @@ import { Reference, ReferenceEmitter } from '../../imports';
 import { PerfRecorder } from '../../perf';
 import { FileUpdate } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { HostBindingsContext, TemplateDiagnostic, TypeCheckId, SourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata, TemplateContext } from '../api';
+import { HostBindingsContext, TemplateDiagnostic, TypeCheckId, SourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata, TemplateContext, OutOfBandDiagnosticRecorder } from '../api';
 import { DomSchemaChecker } from './dom';
-import { OutOfBandDiagnosticRecorder } from './oob';
 import { DirectiveSourceManager } from './source';
 import { TypeCheckFile } from './type_check_file';
 export interface ShimTypeCheckingData {
@@ -82,7 +81,7 @@ export interface PendingShimData {
     /**
      * Recorder for out-of-band diagnostics which are raised during generation.
      */
-    oobRecorder: OutOfBandDiagnosticRecorder;
+    oobRecorder: OutOfBandDiagnosticRecorder<TemplateDiagnostic>;
     /**
      * The `DomSchemaChecker` in use for this template, which records any schema-related diagnostics.
      */
@@ -95,6 +94,10 @@ export interface PendingShimData {
      * Map of `TypeCheckId` to information collected about the template as it's ingested.
      */
     data: Map<TypeCheckId, TypeCheckData>;
+    /**
+     * Diagnostics produced during shim creation.
+     */
+    shimDiagnostics: TemplateDiagnostic[] | null;
 }
 /**
  * Adapts the `TypeCheckContextImpl` to the larger template type-checking system.

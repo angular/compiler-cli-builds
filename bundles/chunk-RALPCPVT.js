@@ -29,7 +29,6 @@ import {
   NgOriginalFile,
   NoopReferencesRegistry,
   OUTPUT_INITIALIZER_FNS,
-  OptimizeFor,
   PartialEvaluator,
   PerfCheckpoint,
   PerfEvent,
@@ -41,7 +40,6 @@ import {
   SemanticDepGraphUpdater,
   ShimAdapter,
   ShimReferenceTagger,
-  SymbolKind,
   TemplateTypeCheckerImpl,
   TraitCompiler,
   TypeCheckScopeRegistry,
@@ -54,7 +52,7 @@ import {
   signalMetadataTransform,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-6C6CAGZ2.js";
+} from "./chunk-AQWJY4QK.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -71,11 +69,13 @@ import {
   LogicalProjectStrategy,
   ModuleResolver,
   NoopImportRewriter,
+  OptimizeFor,
   PrivateExportAliasingHost,
   R3SymbolsImportRewriter,
   Reference,
   ReferenceEmitter,
   RelativePathStrategy,
+  SymbolKind,
   TypeScriptReflectionHost,
   UnifiedModulesAliasingHost,
   UnifiedModulesStrategy,
@@ -90,7 +90,7 @@ import {
   normalizeSeparators,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-EEMLK355.js";
+} from "./chunk-F56AXDTP.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5412,4 +5412,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PCUEL3LN.js.map
+//# sourceMappingURL=chunk-RALPCPVT.js.map
