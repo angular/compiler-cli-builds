@@ -7179,8 +7179,11 @@ var LocalModuleScopeRegistry = class {
   registerPipeMetadata(pipe) {
   }
   getScopeForComponent(clazz) {
-    const scope = !this.declarationToModule.has(clazz) ? null : this.getScopeOfModule(this.declarationToModule.get(clazz).ngModule);
-    return scope;
+    if (!this.declarationToModule.has(clazz)) {
+      return null;
+    }
+    const module = this.declarationToModule.get(clazz).ngModule;
+    return this.getScopeOfModule(module);
   }
   /**
    * If `node` is declared in more than one NgModule (duplicate declaration), then get the
@@ -7204,7 +7207,11 @@ var LocalModuleScopeRegistry = class {
    * defined, or the string `'error'` if the scope contained errors.
    */
   getScopeOfModule(clazz) {
-    return this.moduleToRef.has(clazz) ? this.getScopeOfModuleReference(this.moduleToRef.get(clazz)) : null;
+    if (!this.moduleToRef.has(clazz)) {
+      return null;
+    }
+    const scope = this.getScopeOfModuleReference(this.moduleToRef.get(clazz));
+    return scope === "cycle" ? null : scope;
   }
   /**
    * Retrieves any `ts.Diagnostic`s produced during the calculation of the `LocalModuleScope` for
@@ -7245,9 +7252,10 @@ var LocalModuleScopeRegistry = class {
   getScopeOfModuleReference(ref) {
     if (this.cache.has(ref.node)) {
       const cachedValue = this.cache.get(ref.node);
-      if (cachedValue !== IN_PROGRESS_RESOLUTION) {
-        return cachedValue;
+      if (cachedValue === IN_PROGRESS_RESOLUTION) {
+        return "cycle";
       }
+      return cachedValue;
     }
     this.cache.set(ref.node, IN_PROGRESS_RESOLUTION);
     this.sealed = true;
@@ -7433,11 +7441,11 @@ var LocalModuleScopeRegistry = class {
       }
       return this.dependencyScopeReader.resolve(ref);
     } else {
-      if (this.cache.get(ref.node) === IN_PROGRESS_RESOLUTION) {
+      const scope = this.getScopeOfModuleReference(ref);
+      if (scope === "cycle") {
         diagnostics.push(makeDiagnostic(type === "import" ? ErrorCode.NGMODULE_INVALID_IMPORT : ErrorCode.NGMODULE_INVALID_EXPORT, identifierOfNode(ref.node) || ref.node, `NgModule "${type}" field contains a cycle`));
-        return "cycle";
       }
-      return this.getScopeOfModuleReference(ref);
+      return scope;
     }
   }
   getReexports(ngModule, ref, declared, exported, diagnostics) {
@@ -15910,4 +15918,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-HAII3R3E.js.map
+//# sourceMappingURL=chunk-4MSEUQQ6.js.map

@@ -52,7 +52,7 @@ import {
   signalMetadataTransform,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-HAII3R3E.js";
+} from "./chunk-4MSEUQQ6.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -5412,4 +5412,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VX3H3KV7.js.map
+//# sourceMappingURL=chunk-KNSZDCI3.js.map
