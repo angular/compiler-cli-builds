@@ -230,7 +230,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.5+sha-9aa315c";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.5+sha-c1261b0";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -3349,6 +3349,120 @@ function translateStatement(contextFile, statement, imports, options = {}) {
   return statement.visitStatement(new ExpressionTranslatorVisitor(new TypeScriptAstFactory(options.annotateForClosureCompiler === true), imports, contextFile, options), new Context(true));
 }
 
+// packages/compiler-cli/src/ngtsc/typecheck/src/comments.js
+import { AbsoluteSourceSpan } from "@angular/compiler";
+import ts21 from "typescript";
+var parseSpanComment = /^(\d+),(\d+)$/;
+function readSpanComment(node, sourceFile = node.getSourceFile()) {
+  return ts21.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts21.SyntaxKind.MultiLineCommentTrivia) {
+      return null;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    const match = commentText.match(parseSpanComment);
+    if (match === null) {
+      return null;
+    }
+    return new AbsoluteSourceSpan(+match[1], +match[2]);
+  }) || null;
+}
+var CommentTriviaType;
+(function(CommentTriviaType2) {
+  CommentTriviaType2["DIAGNOSTIC"] = "D";
+  CommentTriviaType2["EXPRESSION_TYPE_IDENTIFIER"] = "T";
+})(CommentTriviaType || (CommentTriviaType = {}));
+var ExpressionIdentifier;
+(function(ExpressionIdentifier2) {
+  ExpressionIdentifier2["DIRECTIVE"] = "DIR";
+  ExpressionIdentifier2["COMPONENT_COMPLETION"] = "COMPCOMP";
+  ExpressionIdentifier2["EVENT_PARAMETER"] = "EP";
+  ExpressionIdentifier2["VARIABLE_AS_EXPRESSION"] = "VAE";
+})(ExpressionIdentifier || (ExpressionIdentifier = {}));
+var IGNORE_FOR_DIAGNOSTICS_MARKER = `${CommentTriviaType.DIAGNOSTIC}:ignore`;
+function hasIgnoreForDiagnosticsMarker(node, sourceFile) {
+  return ts21.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts21.SyntaxKind.MultiLineCommentTrivia) {
+      return null;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    return commentText === IGNORE_FOR_DIAGNOSTICS_MARKER;
+  }) === true;
+}
+function makeRecursiveVisitor(visitor) {
+  function recursiveVisitor(node) {
+    const res = visitor(node);
+    return res !== null ? res : node.forEachChild(recursiveVisitor);
+  }
+  return recursiveVisitor;
+}
+function getSpanFromOptions(opts) {
+  let withSpan = null;
+  if (opts.withSpan !== void 0) {
+    if (opts.withSpan instanceof AbsoluteSourceSpan) {
+      withSpan = opts.withSpan;
+    } else {
+      withSpan = { start: opts.withSpan.start.offset, end: opts.withSpan.end.offset };
+    }
+  }
+  return withSpan;
+}
+function findFirstMatchingNode(tcb, opts) {
+  const withSpan = getSpanFromOptions(opts);
+  const withExpressionIdentifier = opts.withExpressionIdentifier;
+  const sf = tcb.getSourceFile();
+  const visitor = makeRecursiveVisitor((node) => {
+    if (!opts.filter(node)) {
+      return null;
+    }
+    if (withSpan !== null) {
+      const comment = readSpanComment(node, sf);
+      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
+        return null;
+      }
+    }
+    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
+      return null;
+    }
+    return node;
+  });
+  return tcb.forEachChild(visitor) ?? null;
+}
+function findAllMatchingNodes(tcb, opts) {
+  const withSpan = getSpanFromOptions(opts);
+  const withExpressionIdentifier = opts.withExpressionIdentifier;
+  const results = [];
+  const stack = [tcb];
+  const sf = tcb.getSourceFile();
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (!opts.filter(node)) {
+      stack.push(...node.getChildren());
+      continue;
+    }
+    if (withSpan !== null) {
+      const comment = readSpanComment(node, sf);
+      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
+        stack.push(...node.getChildren());
+        continue;
+      }
+    }
+    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
+      continue;
+    }
+    results.push(node);
+  }
+  return results;
+}
+function hasExpressionIdentifier(sourceFile, node, identifier) {
+  return ts21.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts21.SyntaxKind.MultiLineCommentTrivia) {
+      return false;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    return commentText === `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
+  }) || false;
+}
+
 // packages/compiler-cli/src/ngtsc/typecheck/api/checker.js
 var OptimizeFor;
 (function(OptimizeFor2) {
@@ -3403,8 +3517,8 @@ var OutOfBadDiagnosticCategory;
 })(OutOfBadDiagnosticCategory || (OutOfBadDiagnosticCategory = {}));
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/host_bindings.js
-import { BindingType, CssSelector, makeBindingParser, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstHostElement, AbsoluteSourceSpan, ParseSpan, PropertyRead, ParsedEventType, Call, ThisReceiver, KeyedRead, LiteralPrimitive, RecursiveAstVisitor, ASTWithName, SafeCall, ImplicitReceiver } from "@angular/compiler";
-import ts21 from "typescript";
+import { BindingType, CssSelector, makeBindingParser, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstHostElement, AbsoluteSourceSpan as AbsoluteSourceSpan2, ParseSpan, PropertyRead, ParsedEventType, Call, ThisReceiver, KeyedRead, LiteralPrimitive, RecursiveAstVisitor, ASTWithName, SafeCall, ImplicitReceiver } from "@angular/compiler";
+import ts22 from "typescript";
 var GUARD_COMMENT_TEXT = "hostBindingsBlockGuard";
 function createHostElement(type, selector, nameSpan, hostObjectLiteralBindings, hostBindingDecorators, hostListenerDecorators) {
   const bindings = [];
@@ -3442,15 +3556,15 @@ function createHostBindingsBlockGuard() {
   return `(true /*${GUARD_COMMENT_TEXT}*/)`;
 }
 function isHostBindingsBlockGuard(node) {
-  if (!ts21.isIfStatement(node)) {
+  if (!ts22.isIfStatement(node)) {
     return false;
   }
   const expr = node.expression;
-  if (!ts21.isParenthesizedExpression(expr) || expr.expression.kind !== ts21.SyntaxKind.TrueKeyword) {
+  if (!ts22.isParenthesizedExpression(expr) || expr.expression.kind !== ts22.SyntaxKind.TrueKeyword) {
     return false;
   }
   const text = expr.getSourceFile().text;
-  return ts21.forEachTrailingCommentRange(text, expr.expression.getEnd(), (pos, end, kind) => kind === ts21.SyntaxKind.MultiLineCommentTrivia && text.substring(pos + 2, end - 2) === GUARD_COMMENT_TEXT) || false;
+  return ts22.forEachTrailingCommentRange(text, expr.expression.getEnd(), (pos, end, kind) => kind === ts22.SyntaxKind.MultiLineCommentTrivia && text.substring(pos + 2, end - 2) === GUARD_COMMENT_TEXT) || false;
 }
 function createNodeFromHostLiteralProperty(binding, parser, bindings, listeners) {
   const { key, value, sourceSpan } = binding;
@@ -3490,8 +3604,8 @@ function createNodeFromBindingDecorator(decorator, bindings) {
   }
   const span = new ParseSpan(-1, -1);
   const propertyStart = decorator.memberSpan.start.offset;
-  const receiver = new ThisReceiver(span, new AbsoluteSourceSpan(propertyStart, propertyStart));
-  const nameSpan = new AbsoluteSourceSpan(nameNode.sourceSpan.start.offset, nameNode.sourceSpan.end.offset);
+  const receiver = new ThisReceiver(span, new AbsoluteSourceSpan2(propertyStart, propertyStart));
+  const nameSpan = new AbsoluteSourceSpan2(nameNode.sourceSpan.start.offset, nameNode.sourceSpan.end.offset);
   const read = decorator.memberName.kind === "string" ? new KeyedRead(span, nameSpan, receiver, new LiteralPrimitive(span, nameSpan, decorator.memberName.text)) : new PropertyRead(span, nameSpan, nameSpan, receiver, decorator.memberName.text);
   const { attrName, type } = inferBoundAttribute(nameNode.text);
   bindings.push(new TmplAstBoundAttribute(attrName, type, 0, read, null, decorator.decoratorSpan, nameNode.sourceSpan, decorator.decoratorSpan, void 0));
@@ -3503,8 +3617,8 @@ function createNodeFromListenerDecorator(decorator, parser, listeners) {
   const dummySpan = new ParseSpan(-1, -1);
   const argNodes = [];
   const methodStart = decorator.memberSpan.start.offset;
-  const methodReceiver = new ThisReceiver(dummySpan, new AbsoluteSourceSpan(methodStart, methodStart));
-  const nameSpan = new AbsoluteSourceSpan(decorator.memberName.sourceSpan.start.offset, decorator.memberName.sourceSpan.end.offset);
+  const methodReceiver = new ThisReceiver(dummySpan, new AbsoluteSourceSpan2(methodStart, methodStart));
+  const nameSpan = new AbsoluteSourceSpan2(decorator.memberName.sourceSpan.start.offset, decorator.memberName.sourceSpan.end.offset);
   const receiver = decorator.memberName.kind === "string" ? new KeyedRead(dummySpan, nameSpan, methodReceiver, new LiteralPrimitive(dummySpan, nameSpan, decorator.memberName.text)) : new PropertyRead(dummySpan, nameSpan, nameSpan, methodReceiver, decorator.memberName.text);
   for (const arg of decorator.arguments) {
     if (arg.kind === "string") {
@@ -3513,7 +3627,7 @@ function createNodeFromListenerDecorator(decorator, parser, listeners) {
       fixupSpans(ast, arg);
       argNodes.push(ast);
     } else {
-      const expressionSpan = new AbsoluteSourceSpan(arg.sourceSpan.start.offset, arg.sourceSpan.end.offset);
+      const expressionSpan = new AbsoluteSourceSpan2(arg.sourceSpan.start.offset, arg.sourceSpan.end.offset);
       const anyRead = new PropertyRead(dummySpan, expressionSpan, expressionSpan, new ImplicitReceiver(dummySpan, expressionSpan), "$any");
       const anyCall = new Call(dummySpan, expressionSpan, anyRead, [new LiteralPrimitive(dummySpan, expressionSpan, 0)], expressionSpan);
       argNodes.push(anyCall);
@@ -3575,7 +3689,7 @@ function fixupSpans(ast, node) {
     const start = node.sourceSpan.start.offset;
     const end = node.sourceSpan.end.offset;
     const newSpan = new ParseSpan(0, end - start);
-    const newSourceSpan = new AbsoluteSourceSpan(start, end);
+    const newSourceSpan = new AbsoluteSourceSpan2(start, end);
     ast.visit(new ReplaceSpanVisitor(escapeIndex, newSpan, newSourceSpan));
   }
 }
@@ -3652,17 +3766,17 @@ var Context2 = class {
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/dom.js
 import { DomElementSchemaRegistry } from "@angular/compiler";
-import ts23 from "typescript";
+import ts24 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.js
-import ts22 from "typescript";
+import ts23 from "typescript";
 function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, relatedMessages, deprecatedDiagInfo) {
   if (mapping.type === "direct") {
     let relatedInformation = [];
     if (relatedMessages !== void 0) {
       for (const relatedMessage of relatedMessages) {
         relatedInformation.push({
-          category: ts22.DiagnosticCategory.Message,
+          category: ts23.DiagnosticCategory.Message,
           code: 0,
           file: relatedMessage.sourceFile,
           start: relatedMessage.start,
@@ -3695,7 +3809,7 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
     if (relatedMessages !== void 0) {
       for (const relatedMessage of relatedMessages) {
         relatedInformation.push({
-          category: ts22.DiagnosticCategory.Message,
+          category: ts23.DiagnosticCategory.Message,
           code: 0,
           file: relatedMessage.sourceFile,
           start: relatedMessage.start,
@@ -3726,11 +3840,11 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
       };
     }
     let typeForMessage;
-    if (category === ts22.DiagnosticCategory.Warning) {
+    if (category === ts23.DiagnosticCategory.Warning) {
       typeForMessage = "Warning";
-    } else if (category === ts22.DiagnosticCategory.Suggestion) {
+    } else if (category === ts23.DiagnosticCategory.Suggestion) {
       typeForMessage = "Suggestion";
-    } else if (category === ts22.DiagnosticCategory.Message) {
+    } else if (category === ts23.DiagnosticCategory.Message) {
       typeForMessage = "Message";
     } else {
       typeForMessage = "Error";
@@ -3739,7 +3853,7 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
       relatedInformation.push(...deprecatedDiagInfo.relatedMessages ?? []);
     }
     relatedInformation.push({
-      category: ts22.DiagnosticCategory.Message,
+      category: ts23.DiagnosticCategory.Message,
       code: 0,
       file: componentSf,
       // mapping.node represents either the 'template' or 'templateUrl' expression. getStart()
@@ -3778,13 +3892,13 @@ function parseTemplateAsSourceFile(fileName, template) {
   if (parseTemplateAsSourceFileForTest !== null) {
     return parseTemplateAsSourceFileForTest(fileName, template);
   }
-  return ts22.createSourceFile(
+  return ts23.createSourceFile(
     fileName,
     template,
-    ts22.ScriptTarget.Latest,
+    ts23.ScriptTarget.Latest,
     /* setParentNodes */
     false,
-    ts22.ScriptKind.JSX
+    ts23.ScriptKind.JSX
   );
 }
 
@@ -3827,7 +3941,7 @@ var RegistryDomSchemaChecker = class {
       } else {
         errorMsg += `2. To allow any element add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
       }
-      const diag = makeTemplateDiagnostic(id, mapping, sourceSpanForDiagnostics, ts23.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ELEMENT), errorMsg);
+      const diag = makeTemplateDiagnostic(id, mapping, sourceSpanForDiagnostics, ts24.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ELEMENT), errorMsg);
       this._diagnostics.push(diag);
     }
   }
@@ -3847,7 +3961,7 @@ var RegistryDomSchemaChecker = class {
 2. If '${tagName}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.
 3. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
       }
-      const diag = makeTemplateDiagnostic(id, mapping, span, ts23.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts24.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
       this._diagnostics.push(diag);
     }
   }
@@ -3858,7 +3972,7 @@ var RegistryDomSchemaChecker = class {
       }
       const errorMessage = `Can't bind to '${name}' since it isn't a known property of '${tagName}'.`;
       const mapping = this.resolver.getHostBindingsMapping(id);
-      const diag = makeTemplateDiagnostic(id, mapping, span, ts23.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMessage);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts24.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMessage);
       this._diagnostics.push(diag);
       break;
     }
@@ -3872,122 +3986,6 @@ import ts26 from "typescript";
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/codegen.js
 import { AbsoluteSourceSpan as AbsoluteSourceSpan3 } from "@angular/compiler";
 import ts25 from "typescript";
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/comments.js
-import { AbsoluteSourceSpan as AbsoluteSourceSpan2 } from "@angular/compiler";
-import ts24 from "typescript";
-var parseSpanComment = /^(\d+),(\d+)$/;
-function readSpanComment(node, sourceFile = node.getSourceFile()) {
-  return ts24.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts24.SyntaxKind.MultiLineCommentTrivia) {
-      return null;
-    }
-    const commentText = sourceFile.text.substring(pos + 2, end - 2);
-    const match = commentText.match(parseSpanComment);
-    if (match === null) {
-      return null;
-    }
-    return new AbsoluteSourceSpan2(+match[1], +match[2]);
-  }) || null;
-}
-var CommentTriviaType;
-(function(CommentTriviaType2) {
-  CommentTriviaType2["DIAGNOSTIC"] = "D";
-  CommentTriviaType2["EXPRESSION_TYPE_IDENTIFIER"] = "T";
-})(CommentTriviaType || (CommentTriviaType = {}));
-var ExpressionIdentifier;
-(function(ExpressionIdentifier2) {
-  ExpressionIdentifier2["DIRECTIVE"] = "DIR";
-  ExpressionIdentifier2["COMPONENT_COMPLETION"] = "COMPCOMP";
-  ExpressionIdentifier2["EVENT_PARAMETER"] = "EP";
-  ExpressionIdentifier2["VARIABLE_AS_EXPRESSION"] = "VAE";
-})(ExpressionIdentifier || (ExpressionIdentifier = {}));
-var IGNORE_FOR_DIAGNOSTICS_MARKER = `${CommentTriviaType.DIAGNOSTIC}:ignore`;
-function hasIgnoreForDiagnosticsMarker(node, sourceFile) {
-  return ts24.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts24.SyntaxKind.MultiLineCommentTrivia) {
-      return null;
-    }
-    const commentText = sourceFile.text.substring(pos + 2, end - 2);
-    return commentText === IGNORE_FOR_DIAGNOSTICS_MARKER;
-  }) === true;
-}
-function makeRecursiveVisitor(visitor) {
-  function recursiveVisitor(node) {
-    const res = visitor(node);
-    return res !== null ? res : node.forEachChild(recursiveVisitor);
-  }
-  return recursiveVisitor;
-}
-function getSpanFromOptions(opts) {
-  let withSpan = null;
-  if (opts.withSpan !== void 0) {
-    if (opts.withSpan instanceof AbsoluteSourceSpan2) {
-      withSpan = opts.withSpan;
-    } else {
-      withSpan = { start: opts.withSpan.start.offset, end: opts.withSpan.end.offset };
-    }
-  }
-  return withSpan;
-}
-function findFirstMatchingNode(tcb, opts) {
-  const withSpan = getSpanFromOptions(opts);
-  const withExpressionIdentifier = opts.withExpressionIdentifier;
-  const sf = tcb.getSourceFile();
-  const visitor = makeRecursiveVisitor((node) => {
-    if (!opts.filter(node)) {
-      return null;
-    }
-    if (withSpan !== null) {
-      const comment = readSpanComment(node, sf);
-      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
-        return null;
-      }
-    }
-    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
-      return null;
-    }
-    return node;
-  });
-  return tcb.forEachChild(visitor) ?? null;
-}
-function findAllMatchingNodes(tcb, opts) {
-  const withSpan = getSpanFromOptions(opts);
-  const withExpressionIdentifier = opts.withExpressionIdentifier;
-  const results = [];
-  const stack = [tcb];
-  const sf = tcb.getSourceFile();
-  while (stack.length > 0) {
-    const node = stack.pop();
-    if (!opts.filter(node)) {
-      stack.push(...node.getChildren());
-      continue;
-    }
-    if (withSpan !== null) {
-      const comment = readSpanComment(node, sf);
-      if (comment === null || withSpan.start !== comment.start || withSpan.end !== comment.end) {
-        stack.push(...node.getChildren());
-        continue;
-      }
-    }
-    if (withExpressionIdentifier !== void 0 && !hasExpressionIdentifier(sf, node, withExpressionIdentifier)) {
-      continue;
-    }
-    results.push(node);
-  }
-  return results;
-}
-function hasExpressionIdentifier(sourceFile, node, identifier) {
-  return ts24.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts24.SyntaxKind.MultiLineCommentTrivia) {
-      return false;
-    }
-    const commentText = sourceFile.text.substring(pos + 2, end - 2);
-    return commentText === `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
-  }) || false;
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/ops/codegen.js
 var TcbExpr = class {
   source;
   /** Text for the content containing the expression's location information. */
@@ -7460,4 +7458,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-F56AXDTP.js.map
+//# sourceMappingURL=chunk-JPHDN3EL.js.map
