@@ -9,8 +9,7 @@ import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { OutOfBandDiagnosticRecorder, TypeCheckBlockMetadata, TypeCheckingConfig } from '../api';
-import { DomSchemaChecker } from './dom';
+import { DomSchemaChecker, OutOfBandDiagnosticRecorder, TypeCheckBlockMetadata, TypeCheckingConfig } from '../api';
 import { Environment } from './environment';
 import { TcbGenericContextBehavior } from './ops/context';
 import { TcbExpr } from './ops/codegen';
@@ -28,7 +27,7 @@ export declare class TypeCheckFile extends Environment {
     private nextTcbId;
     private tcbStatements;
     constructor(fileName: AbsoluteFsPath, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>);
-    addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder<unknown>, genericContextBehavior: TcbGenericContextBehavior): void;
+    addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker<unknown>, oobRecorder: OutOfBandDiagnosticRecorder<unknown>, genericContextBehavior: TcbGenericContextBehavior): void;
     render(): string;
     getPreludeStatements(): TcbExpr[];
 }

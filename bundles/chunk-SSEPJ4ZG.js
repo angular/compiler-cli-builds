@@ -230,7 +230,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.5+sha-43ef717";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.5+sha-12b3a1a";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -3501,6 +3501,13 @@ var SymbolKind;
   SymbolKind2[SymbolKind2["SelectorlessDirective"] = 13] = "SelectorlessDirective";
 })(SymbolKind || (SymbolKind = {}));
 
+// packages/compiler-cli/src/ngtsc/typecheck/api/oob.js
+var OutOfBadDiagnosticCategory;
+(function(OutOfBadDiagnosticCategory2) {
+  OutOfBadDiagnosticCategory2[OutOfBadDiagnosticCategory2["Error"] = 0] = "Error";
+  OutOfBadDiagnosticCategory2[OutOfBadDiagnosticCategory2["Warning"] = 1] = "Warning";
+})(OutOfBadDiagnosticCategory || (OutOfBadDiagnosticCategory = {}));
+
 // packages/compiler-cli/src/ngtsc/typecheck/api/completion.js
 var CompletionKind;
 (function(CompletionKind2) {
@@ -3508,13 +3515,6 @@ var CompletionKind;
   CompletionKind2[CompletionKind2["Variable"] = 1] = "Variable";
   CompletionKind2[CompletionKind2["LetDeclaration"] = 2] = "LetDeclaration";
 })(CompletionKind || (CompletionKind = {}));
-
-// packages/compiler-cli/src/ngtsc/typecheck/api/oob.js
-var OutOfBadDiagnosticCategory;
-(function(OutOfBadDiagnosticCategory2) {
-  OutOfBadDiagnosticCategory2[OutOfBadDiagnosticCategory2["Error"] = 0] = "Error";
-  OutOfBadDiagnosticCategory2[OutOfBadDiagnosticCategory2["Warning"] = 1] = "Warning";
-})(OutOfBadDiagnosticCategory || (OutOfBadDiagnosticCategory = {}));
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/host_bindings.js
 import { BindingType, CssSelector, makeBindingParser, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstHostElement, AbsoluteSourceSpan as AbsoluteSourceSpan2, ParseSpan, PropertyRead, ParsedEventType, Call, ThisReceiver, KeyedRead, LiteralPrimitive, RecursiveAstVisitor, ASTWithName, SafeCall, ImplicitReceiver } from "@angular/compiler";
@@ -7458,4 +7458,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-JPHDN3EL.js.map
+//# sourceMappingURL=chunk-SSEPJ4ZG.js.map

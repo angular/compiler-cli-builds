@@ -5,8 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { OutOfBandDiagnosticRecorder, TcbComponentMetadata, TcbTypeCheckBlockMetadata } from '../api';
-import { DomSchemaChecker } from './dom';
+import { DomSchemaChecker, OutOfBandDiagnosticRecorder, TcbComponentMetadata, TcbTypeCheckBlockMetadata } from '../api';
 import { Environment } from './environment';
 /**
  * Given a `ts.ClassDeclaration` for a component, and metadata regarding that component, compose a
@@ -32,4 +31,4 @@ import { Environment } from './environment';
  * @param genericContextBehavior controls how generic parameters (especially parameters with generic
  * bounds) will be referenced from the generated TCB code.
  */
-export declare function generateTypeCheckBlock(env: Environment, component: TcbComponentMetadata, name: string, meta: TcbTypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder<unknown>): string;
+export declare function generateTypeCheckBlock(env: Environment, component: TcbComponentMetadata, name: string, meta: TcbTypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker<unknown>, oobRecorder: OutOfBandDiagnosticRecorder<unknown>): string;

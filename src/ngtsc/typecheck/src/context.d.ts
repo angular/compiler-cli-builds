@@ -12,8 +12,7 @@ import { Reference, ReferenceEmitter } from '../../imports';
 import { PerfRecorder } from '../../perf';
 import { FileUpdate } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { HostBindingsContext, TemplateDiagnostic, TypeCheckId, SourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata, TemplateContext, OutOfBandDiagnosticRecorder } from '../api';
-import { DomSchemaChecker } from './dom';
+import { HostBindingsContext, TemplateDiagnostic, TypeCheckId, SourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata, TemplateContext, OutOfBandDiagnosticRecorder, DomSchemaChecker } from '../api';
 import { DirectiveSourceManager } from './source';
 import { TypeCheckFile } from './type_check_file';
 export interface ShimTypeCheckingData {
@@ -85,7 +84,7 @@ export interface PendingShimData {
     /**
      * The `DomSchemaChecker` in use for this template, which records any schema-related diagnostics.
      */
-    domSchemaChecker: DomSchemaChecker;
+    domSchemaChecker: DomSchemaChecker<TemplateDiagnostic>;
     /**
      * Shim file in the process of being generated.
      */
