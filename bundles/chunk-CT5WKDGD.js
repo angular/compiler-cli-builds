@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.7+sha-0b08e29";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.7+sha-7797671";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -17985,9 +17985,9 @@ var SymbolBuilder = class {
     return {
       tsType: nodeValueSymbol.tsType,
       tsSymbol: nodeValueSymbol.tsSymbol,
-      initializerLocation: nodeValueSymbol.tcbLocation,
       kind: SymbolKind.Variable,
       declaration: variable,
+      initializerLocation: nodeValueSymbol.tcbLocation,
       localVarLocation: {
         tcbPath: this.tcbPath,
         isShimFile: this.tcbIsShim,
@@ -18050,14 +18050,13 @@ var SymbolBuilder = class {
     if (node === null) {
       return null;
     }
-    const nodeValueSymbol = this.getSymbolOfTsNode(node.initializer);
+    const nodeValueSymbol = this.getSymbolOfTsNode(node.name);
     if (nodeValueSymbol === null) {
       return null;
     }
     return {
       tsType: nodeValueSymbol.tsType,
       tsSymbol: nodeValueSymbol.tsSymbol,
-      initializerLocation: nodeValueSymbol.tcbLocation,
       kind: SymbolKind.LetDeclaration,
       declaration: decl,
       localVarLocation: {
@@ -23134,4 +23133,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-RSMQFEWS.js.map
+//# sourceMappingURL=chunk-CT5WKDGD.js.map
