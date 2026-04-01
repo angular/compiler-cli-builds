@@ -10813,9 +10813,9 @@ var SymbolBuilder = class {
     return {
       tsType: nodeValueSymbol.tsType,
       tsSymbol: nodeValueSymbol.tsSymbol,
-      initializerLocation: nodeValueSymbol.tcbLocation,
       kind: SymbolKind.Variable,
       declaration: variable,
+      initializerLocation: nodeValueSymbol.tcbLocation,
       localVarLocation: {
         tcbPath: this.tcbPath,
         isShimFile: this.tcbIsShim,
@@ -10878,14 +10878,13 @@ var SymbolBuilder = class {
     if (node === null) {
       return null;
     }
-    const nodeValueSymbol = this.getSymbolOfTsNode(node.initializer);
+    const nodeValueSymbol = this.getSymbolOfTsNode(node.name);
     if (nodeValueSymbol === null) {
       return null;
     }
     return {
       tsType: nodeValueSymbol.tsType,
       tsSymbol: nodeValueSymbol.tsSymbol,
-      initializerLocation: nodeValueSymbol.tcbLocation,
       kind: SymbolKind.LetDeclaration,
       declaration: decl,
       localVarLocation: {
@@ -15918,4 +15917,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-4MSEUQQ6.js.map
+//# sourceMappingURL=chunk-Y57LTKGU.js.map

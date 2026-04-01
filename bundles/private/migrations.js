@@ -5,7 +5,7 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-KNSZDCI3.js";
+} from "../chunk-FU47B5L7.js";
 import {
   CompilationMode,
   DtsMetadataReader,
@@ -21,7 +21,7 @@ import {
   parseDecoratorInputTransformFunction,
   queryDecoratorNames,
   unwrapExpression
-} from "../chunk-4MSEUQQ6.js";
+} from "../chunk-Y57LTKGU.js";
 import {
   FatalDiagnosticError,
   ImportManager,

@@ -210,10 +210,6 @@ export interface LetDeclarationSymbol {
      * The location in the shim file for the identifier of the `@let` declaration.
      */
     localVarLocation: TcbLocation;
-    /**
-     * The location in the shim file of the `@let` declaration's initializer expression.
-     */
-    initializerLocation: TcbLocation;
 }
 /**
  * A representation of an element in a component template.
