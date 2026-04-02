@@ -3582,7 +3582,7 @@ var factory15 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/defer_trigger_misconfiguration/index.js
-import { TmplAstDeferredBlock, TmplAstHoverDeferredTrigger, TmplAstImmediateDeferredTrigger, TmplAstInteractionDeferredTrigger, TmplAstTimerDeferredTrigger, TmplAstViewportDeferredTrigger, LiteralPrimitive } from "@angular/compiler";
+import { TmplAstDeferredBlock, TmplAstHoverDeferredTrigger, TmplAstIdleDeferredTrigger, TmplAstImmediateDeferredTrigger, TmplAstInteractionDeferredTrigger, TmplAstTimerDeferredTrigger, TmplAstViewportDeferredTrigger, LiteralPrimitive } from "@angular/compiler";
 function areLiteralMapsEqual(a, b) {
   const aIsEmpty = a === null || a.keys.length === 0;
   const bIsEmpty = b === null || b.keys.length === 0;
@@ -3613,6 +3613,18 @@ function areLiteralMapsEqual(a, b) {
   }
   return true;
 }
+function getTimedTriggerValue(trigger) {
+  if (trigger instanceof TmplAstTimerDeferredTrigger) {
+    return trigger.delay;
+  }
+  return trigger.timeout;
+}
+function formatTimedTrigger(trigger) {
+  if (trigger instanceof TmplAstTimerDeferredTrigger) {
+    return `timer(${trigger.delay}ms)`;
+  }
+  return trigger.timeout === null ? "idle" : `idle(${trigger.timeout}ms)`;
+}
 var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
   code = ErrorCode.DEFER_TRIGGER_MISCONFIGURATION;
   visitNode(ctx, component, node) {
@@ -3634,17 +3646,26 @@ var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
         diags.push(ctx.makeTemplateDiagnostic(node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
       }
     }
+    if (mains.length === 0 && prefetches.length > 0) {
+      const msg = `Define a main trigger when using 'prefetch' triggers. Without an explicit main trigger, @defer defaults to 'idle' and prefetch may have no effect.`;
+      diags.push(ctx.makeTemplateDiagnostic(node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
+    }
     if (mains.length === 1 && prefetches.length > 0) {
       const main = mains[0];
       for (const pre of prefetches) {
-        const isTimerTriggger = main instanceof TmplAstTimerDeferredTrigger && pre instanceof TmplAstTimerDeferredTrigger;
-        if (isTimerTriggger) {
-          const mainDelay = main.delay;
-          const preDelay = pre.delay;
-          if (preDelay >= mainDelay) {
-            const msg = `The Prefetch 'timer(${preDelay}ms)' is not scheduled before the main 'timer(${mainDelay}ms)', so it won\u2019t run prior to rendering. Lower the prefetch delay or remove it.`;
-            diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
+        const isTimerPair = main instanceof TmplAstTimerDeferredTrigger && pre instanceof TmplAstTimerDeferredTrigger;
+        const isIdlePair = main instanceof TmplAstIdleDeferredTrigger && pre instanceof TmplAstIdleDeferredTrigger;
+        if (isTimerPair || isIdlePair) {
+          const mainVal = getTimedTriggerValue(main);
+          const preVal = getTimedTriggerValue(pre);
+          const sameUntimedIdle = mainVal == null && preVal == null;
+          const comparableTimedPair = mainVal != null && preVal != null && preVal >= mainVal;
+          if (!sameUntimedIdle && !comparableTimedPair) {
+            continue;
           }
+          const msg = `The Prefetch '${formatTimedTrigger(pre)}' is not scheduled before the main '${formatTimedTrigger(main)}', so it won't run prior to rendering. Lower the prefetch timing or remove it.`;
+          diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
+          continue;
         }
         const isHoverTrigger = main instanceof TmplAstHoverDeferredTrigger && pre instanceof TmplAstHoverDeferredTrigger;
         const isInteractionTrigger = main instanceof TmplAstInteractionDeferredTrigger && pre instanceof TmplAstInteractionDeferredTrigger;
@@ -5412,4 +5433,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FU47B5L7.js.map
+//# sourceMappingURL=chunk-ISSXUC4C.js.map
