@@ -184,4 +184,5 @@ export declare class Scope {
     private validateReferenceBasedDeferredTrigger;
     /** Reports a diagnostic if there are any `@let` declarations that conflict with a node. */
     private static checkConflictingLet;
+    private reportConflictingBindings;
 }

@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { ConstantPool, R3ClassMetadata, R3DirectiveMetadata } from '@angular/compiler';
+import { ClassPropertyMapping, ConstantPool, R3ClassMetadata, R3DirectiveMetadata } from '@angular/compiler';
 import ts from 'typescript';
 import { ImportedSymbolsTracker, Reference, ReferenceEmitter } from '../../../imports';
 import { SemanticDepGraphUpdater } from '../../../incremental/semantic_graph';
-import { ClassPropertyMapping, DirectiveResources, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping, MetadataReader, MetadataRegistry, ResourceRegistry } from '../../../metadata';
+import { DirectiveResources, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping, MetadataReader, MetadataRegistry, ResourceRegistry } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { PerfRecorder } from '../../../perf';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';

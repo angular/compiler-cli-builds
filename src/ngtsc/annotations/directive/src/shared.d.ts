@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { R3DirectiveMetadata, R3QueryMetadata } from '@angular/compiler';
+import { R3DirectiveMetadata, R3QueryMetadata, ClassPropertyMapping } from '@angular/compiler';
 import ts from 'typescript';
 import { ImportedSymbolsTracker, Reference, ReferenceEmitter } from '../../../imports';
-import { ClassPropertyMapping, DecoratorInputTransform, HostDirectiveMeta, InputMapping, Resource } from '../../../metadata';
+import { DecoratorInputTransform, HostDirectiveMeta, InputMapping, Resource } from '../../../metadata';
 import { DynamicValue, PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
 import { CompilationMode } from '../../../transform';

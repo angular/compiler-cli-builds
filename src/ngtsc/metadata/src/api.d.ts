@@ -5,11 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { DirectiveMeta as T2DirectiveMeta, Expression, SchemaMetadata, ExternalReference } from '@angular/compiler';
+import { DirectiveMeta as T2DirectiveMeta, Expression, SchemaMetadata, ExternalReference, MatchSource, ClassPropertyName, InputOrOutput, ClassPropertyMapping } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
-import { ClassPropertyMapping, ClassPropertyName, InputOrOutput } from './property_mapping';
 /**
  * Metadata collected for an `NgModule`.
  */
@@ -108,15 +107,6 @@ export declare enum MetaKind {
     Directive = 0,
     Pipe = 1,
     NgModule = 2
-}
-/**
- * Possible ways that a directive can be matched.
- */
-export declare enum MatchSource {
-    /** The directive was matched by its selector. */
-    Selector = 0,
-    /** The directive was applied as a host directive. */
-    HostDirective = 1
 }
 /** Metadata for a single input mapping. */
 export type InputMapping = InputOrOutput & {

@@ -106,6 +106,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["DEFER_TRIGGER_MISCONFIGURATION"] = 8021] = "DEFER_TRIGGER_MISCONFIGURATION";
   ErrorCode2[ErrorCode2["FORM_FIELD_UNSUPPORTED_BINDING"] = 8022] = "FORM_FIELD_UNSUPPORTED_BINDING";
   ErrorCode2[ErrorCode2["MULTIPLE_MATCHING_COMPONENTS"] = 8023] = "MULTIPLE_MATCHING_COMPONENTS";
+  ErrorCode2[ErrorCode2["CONFLICTING_HOST_DIRECTIVE_BINDING"] = 8024] = "CONFLICTING_HOST_DIRECTIVE_BINDING";
   ErrorCode2[ErrorCode2["INVALID_BANANA_IN_BOX"] = 8101] = "INVALID_BANANA_IN_BOX";
   ErrorCode2[ErrorCode2["NULLISH_COALESCING_NOT_NULLABLE"] = 8102] = "NULLISH_COALESCING_NOT_NULLABLE";
   ErrorCode2[ErrorCode2["MISSING_CONTROL_FLOW_DIRECTIVE"] = 8103] = "MISSING_CONTROL_FLOW_DIRECTIVE";
@@ -230,7 +231,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.6+sha-9d76ac8";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.6+sha-9c55fcb";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -1526,6 +1527,7 @@ var Reference = class _Reference {
   synthetic = false;
   _alias = null;
   isAmbient;
+  key;
   constructor(node, bestGuessOwningModule = null) {
     this.node = node;
     if (bestGuessOwningModule === AmbientImport) {
@@ -1536,8 +1538,15 @@ var Reference = class _Reference {
       this.bestGuessOwningModule = bestGuessOwningModule;
     }
     const id = identifierOfNode(node);
+    const sourceFile = getSourceFile(node);
     if (id !== null) {
       this.identifiers.push(id);
+    }
+    if (sourceFile) {
+      this.key = `${sourceFile.fileName}#${node.getStart()}`;
+    } else {
+      const position = id && id.getSourceFile() ? id.getStart() : null;
+      this.key = `${this.bestGuessOwningModule?.specifier}#${id?.text}#${position}`;
     }
   }
   /**
@@ -2150,139 +2159,6 @@ var ModuleResolver = class {
     return getSourceFileOrNull(this.program, absoluteFrom(resolved.resolvedFileName));
   }
 };
-
-// packages/compiler-cli/src/ngtsc/metadata/src/property_mapping.js
-var ClassPropertyMapping = class _ClassPropertyMapping {
-  /**
-   * Mapping from class property names to the single `InputOrOutput` for that class property.
-   */
-  forwardMap;
-  /**
-   * Mapping from property names to one or more `InputOrOutput`s which share that name.
-   */
-  reverseMap;
-  constructor(forwardMap) {
-    this.forwardMap = forwardMap;
-    this.reverseMap = reverseMapFromForwardMap(forwardMap);
-  }
-  /**
-   * Construct a `ClassPropertyMapping` with no entries.
-   */
-  static empty() {
-    return new _ClassPropertyMapping(/* @__PURE__ */ new Map());
-  }
-  /**
-   * Construct a `ClassPropertyMapping` from a primitive JS object which maps class property names
-   * to either binding property names or an array that contains both names, which is used in on-disk
-   * metadata formats (e.g. in .d.ts files).
-   */
-  static fromMappedObject(obj) {
-    const forwardMap = /* @__PURE__ */ new Map();
-    for (const classPropertyName of Object.keys(obj)) {
-      const value = obj[classPropertyName];
-      let inputOrOutput;
-      if (typeof value === "string") {
-        inputOrOutput = {
-          classPropertyName,
-          bindingPropertyName: value,
-          // Inputs/outputs not captured via an explicit `InputOrOutput` mapping
-          // value are always considered non-signal. This is the string shorthand.
-          isSignal: false
-        };
-      } else {
-        inputOrOutput = value;
-      }
-      forwardMap.set(classPropertyName, inputOrOutput);
-    }
-    return new _ClassPropertyMapping(forwardMap);
-  }
-  /**
-   * Merge two mappings into one, with class properties from `b` taking precedence over class
-   * properties from `a`.
-   */
-  static merge(a, b) {
-    const forwardMap = new Map(a.forwardMap.entries());
-    for (const [classPropertyName, inputOrOutput] of b.forwardMap) {
-      forwardMap.set(classPropertyName, inputOrOutput);
-    }
-    return new _ClassPropertyMapping(forwardMap);
-  }
-  /**
-   * All class property names mapped in this mapping.
-   */
-  get classPropertyNames() {
-    return Array.from(this.forwardMap.keys());
-  }
-  /**
-   * All binding property names mapped in this mapping.
-   */
-  get propertyNames() {
-    return Array.from(this.reverseMap.keys());
-  }
-  /**
-   * Check whether a mapping for the given property name exists.
-   */
-  hasBindingPropertyName(propertyName) {
-    return this.reverseMap.has(propertyName);
-  }
-  /**
-   * Lookup all `InputOrOutput`s that use this `propertyName`.
-   */
-  getByBindingPropertyName(propertyName) {
-    return this.reverseMap.has(propertyName) ? this.reverseMap.get(propertyName) : null;
-  }
-  /**
-   * Lookup the `InputOrOutput` associated with a `classPropertyName`.
-   */
-  getByClassPropertyName(classPropertyName) {
-    return this.forwardMap.has(classPropertyName) ? this.forwardMap.get(classPropertyName) : null;
-  }
-  /**
-   * Convert this mapping to a primitive JS object which maps each class property directly to the
-   * binding property name associated with it.
-   */
-  toDirectMappedObject() {
-    const obj = {};
-    for (const [classPropertyName, inputOrOutput] of this.forwardMap) {
-      obj[classPropertyName] = inputOrOutput.bindingPropertyName;
-    }
-    return obj;
-  }
-  /**
-   * Convert this mapping to a primitive JS object which maps each class property either to itself
-   * (for cases where the binding property name is the same) or to an array which contains both
-   * names if they differ.
-   *
-   * This object format is used when mappings are serialized (for example into .d.ts files).
-   * @param transform Function used to transform the values of the generated map.
-   */
-  toJointMappedObject(transform) {
-    const obj = {};
-    for (const [classPropertyName, inputOrOutput] of this.forwardMap) {
-      obj[classPropertyName] = transform(inputOrOutput);
-    }
-    return obj;
-  }
-  /**
-   * Implement the iterator protocol and return entry objects which contain the class and binding
-   * property names (and are useful for destructuring).
-   */
-  *[Symbol.iterator]() {
-    for (const inputOrOutput of this.forwardMap.values()) {
-      yield inputOrOutput;
-    }
-  }
-};
-function reverseMapFromForwardMap(forwardMap) {
-  const reverseMap = /* @__PURE__ */ new Map();
-  for (const [_, inputOrOutput] of forwardMap) {
-    if (!reverseMap.has(inputOrOutput.bindingPropertyName)) {
-      reverseMap.set(inputOrOutput.bindingPropertyName, []);
-    }
-    reverseMap.get(inputOrOutput.bindingPropertyName).push(inputOrOutput);
-  }
-  return reverseMap;
-}
 
 // packages/compiler-cli/src/ngtsc/translator/src/import_manager/import_manager.js
 import ts16 from "typescript";
@@ -4476,13 +4352,12 @@ var Environment = class extends ReferenceEmitEnvironment {
    * type constructor, or to an inline type constructor.
    */
   typeCtorFor(dir) {
-    const key = getTcbReferenceKey(dir.ref);
-    if (this.typeCtors.has(key)) {
-      return new TcbExpr(this.typeCtors.get(key));
+    if (this.typeCtors.has(dir.ref.key)) {
+      return new TcbExpr(this.typeCtors.get(dir.ref.key));
     }
     if (dir.requiresInlineTypeCtor) {
       const typeCtorExpr = `${this.referenceTcbValue(dir.ref).print()}.ngTypeCtor`;
-      this.typeCtors.set(key, typeCtorExpr);
+      this.typeCtors.set(dir.ref.key, typeCtorExpr);
       return new TcbExpr(typeCtorExpr);
     } else {
       const fnName = `_ctor${this.nextIds.typeCtor++}`;
@@ -4499,7 +4374,7 @@ var Environment = class extends ReferenceEmitEnvironment {
       const typeParams = dir.typeParameters || void 0;
       const typeCtor = generateTypeCtorDeclarationFn(this, meta, nodeTypeRef, typeParams);
       this.typeCtorStatements.push(typeCtor);
-      this.typeCtors.set(key, fnName);
+      this.typeCtors.set(dir.ref.key, fnName);
       return new TcbExpr(fnName);
     }
   }
@@ -4507,13 +4382,12 @@ var Environment = class extends ReferenceEmitEnvironment {
    * Get an expression referring to an instance of the given pipe.
    */
   pipeInst(pipe) {
-    const key = getTcbReferenceKey(pipe.ref);
-    if (this.pipeInsts.has(key)) {
-      return new TcbExpr(this.pipeInsts.get(key));
+    if (this.pipeInsts.has(pipe.ref.key)) {
+      return new TcbExpr(this.pipeInsts.get(pipe.ref.key));
     }
     const pipeType = this.referenceTcbValue(pipe.ref);
     const pipeInstId = `_pipe${this.nextIds.pipeInst++}`;
-    this.pipeInsts.set(key, pipeInstId);
+    this.pipeInsts.set(pipe.ref.key, pipeInstId);
     this.pipeInstStatements.push(declareVariable(new TcbExpr(pipeInstId), pipeType));
     return new TcbExpr(pipeInstId);
   }
@@ -4521,12 +4395,6 @@ var Environment = class extends ReferenceEmitEnvironment {
     return [...this.pipeInstStatements, ...this.typeCtorStatements];
   }
 };
-function getTcbReferenceKey(ref) {
-  if (ref.nodeFilePath !== void 0 && ref.nodeNameSpan !== void 0) {
-    return `${ref.nodeFilePath}#${ref.nodeNameSpan.start}`;
-  }
-  return ref.moduleName ? `${ref.moduleName}#${ref.name}` : ref.name;
-}
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/scope.js
 import { TmplAstBoundText, TmplAstComponent as TmplAstComponent2, TmplAstContent, TmplAstDeferredBlock, TmplAstDirective, TmplAstElement as TmplAstElement7, TmplAstForLoopBlock as TmplAstForLoopBlock2, TmplAstHostElement as TmplAstHostElement5, TmplAstIcu, TmplAstIfBlock as TmplAstIfBlock2, TmplAstIfBlockBranch, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstReference, TmplAstSwitchBlock as TmplAstSwitchBlock2, TmplAstTemplate as TmplAstTemplate5, TmplAstText as TmplAstText2, TmplAstVariable as TmplAstVariable2 } from "@angular/compiler";
@@ -7011,6 +6879,7 @@ var Scope = class _Scope {
       }
       return;
     }
+    this.reportConflictingBindings(node);
     if (node instanceof TmplAstElement7) {
       const isDeferred = this.tcb.boundTarget.isDeferred(node);
       if (!isDeferred && directives.some((dirMeta) => dirMeta.isExplicitlyDeferred)) {
@@ -7073,6 +6942,7 @@ var Scope = class _Scope {
       }
       this.directiveOpMap.set(node, dirMap);
     }
+    this.reportConflictingBindings(node);
     if (node instanceof TmplAstDirective) {
       for (const input of node.inputs) {
         if (!claimedInputs.has(input.name)) {
@@ -7299,6 +7169,14 @@ var Scope = class _Scope {
       scope.tcb.oobRecorder.conflictingDeclaration(scope.tcb.id, scope.letDeclOpMap.get(node.name).node);
     }
   }
+  reportConflictingBindings(node) {
+    const conflictingBindings = this.tcb.boundTarget.getConflictingHostDirectiveBindings(node);
+    if (conflictingBindings !== null) {
+      for (const binding of conflictingBindings) {
+        this.tcb.oobRecorder.conflictingHostDirectiveBinding(this.tcb.id, node, binding.directive.name, binding.kind, binding.classPropertyName, Array.from(binding.conflictingAliases));
+      }
+    }
+  }
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_check_block.js
@@ -7408,7 +7286,6 @@ export {
   LocalCompilationExtraImportsTracker,
   Reference,
   ModuleResolver,
-  ClassPropertyMapping,
   presetImportManagerForceNamespaceImports,
   ImportManager,
   translateType,
@@ -7458,4 +7335,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-SSEPJ4ZG.js.map
+//# sourceMappingURL=chunk-X3IMEBIY.js.map

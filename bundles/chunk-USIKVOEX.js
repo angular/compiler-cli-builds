@@ -6,7 +6,6 @@ import {
   AmbientImport,
   ClassMemberAccessLevel,
   ClassMemberKind,
-  ClassPropertyMapping,
   CompletionKind,
   DOC_PAGE_BASE_URL,
   Environment,
@@ -81,7 +80,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-SSEPJ4ZG.js";
+} from "./chunk-X3IMEBIY.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -658,6 +657,7 @@ function isAbstractClassDeclaration(clazz) {
 }
 
 // packages/compiler-cli/src/ngtsc/metadata/src/dts.js
+import { ClassPropertyMapping, MatchSource } from "@angular/compiler";
 import ts4 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/metadata/src/api.js
@@ -667,11 +667,6 @@ var MetaKind;
   MetaKind2[MetaKind2["Pipe"] = 1] = "Pipe";
   MetaKind2[MetaKind2["NgModule"] = 2] = "NgModule";
 })(MetaKind || (MetaKind = {}));
-var MatchSource;
-(function(MatchSource2) {
-  MatchSource2[MatchSource2["Selector"] = 0] = "Selector";
-  MatchSource2[MatchSource2["HostDirective"] = 1] = "HostDirective";
-})(MatchSource || (MatchSource = {}));
 
 // packages/compiler-cli/src/ngtsc/metadata/src/util.js
 import ts3 from "typescript";
@@ -1134,6 +1129,7 @@ function readHostDirectivesType(checker, type, bestGuessOwningModule) {
 }
 
 // packages/compiler-cli/src/ngtsc/metadata/src/inheritance.js
+import { ClassPropertyMapping as ClassPropertyMapping2 } from "@angular/compiler";
 function flattenInheritedDirectiveMetadata(reader, dir) {
   const topMeta = reader.getDirectiveMetadata(dir);
   if (topMeta === null) {
@@ -1149,8 +1145,8 @@ function flattenInheritedDirectiveMetadata(reader, dir) {
   const publicMethods = /* @__PURE__ */ new Set();
   let hostDirectives = null;
   let isDynamic = false;
-  let inputs = ClassPropertyMapping.empty();
-  let outputs = ClassPropertyMapping.empty();
+  let inputs = ClassPropertyMapping2.empty();
+  let outputs = ClassPropertyMapping2.empty();
   let isStructural = false;
   const addMetadata = (meta) => {
     if (meta.baseClass === "dynamic") {
@@ -1164,8 +1160,8 @@ function flattenInheritedDirectiveMetadata(reader, dir) {
       }
     }
     isStructural = isStructural || meta.isStructural;
-    inputs = ClassPropertyMapping.merge(inputs, meta.inputs);
-    outputs = ClassPropertyMapping.merge(outputs, meta.outputs);
+    inputs = ClassPropertyMapping2.merge(inputs, meta.inputs);
+    outputs = ClassPropertyMapping2.merge(outputs, meta.outputs);
     for (const coercedInputField of meta.coercedInputFields) {
       coercedInputFields.add(coercedInputField);
     }
@@ -1398,6 +1394,7 @@ var ExportedProviderStatusResolver = class {
 };
 
 // packages/compiler-cli/src/ngtsc/metadata/src/host_directives_resolver.js
+import { ClassPropertyMapping as ClassPropertyMapping3, MatchSource as MatchSource2 } from "@angular/compiler";
 var EMPTY_ARRAY = [];
 var HostDirectivesResolver = class {
   metaReader;
@@ -1432,9 +1429,9 @@ var HostDirectivesResolver = class {
       }
       results.push({
         ...hostMeta,
-        matchSource: MatchSource.HostDirective,
-        inputs: ClassPropertyMapping.fromMappedObject(this.filterMappings(hostMeta.inputs, current.inputs, resolveInput)),
-        outputs: ClassPropertyMapping.fromMappedObject(this.filterMappings(hostMeta.outputs, current.outputs, resolveOutput))
+        matchSource: MatchSource2.HostDirective,
+        inputs: ClassPropertyMapping3.fromMappedObject(this.filterMappings(hostMeta.inputs, current.inputs, resolveInput)),
+        outputs: ClassPropertyMapping3.fromMappedObject(this.filterMappings(hostMeta.outputs, current.outputs, resolveOutput))
       });
     }
     return results;
@@ -3989,7 +3986,7 @@ function signalMetadataTransform(program) {
 }
 
 // packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.js
-import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr2, ExternalReference, getSafePropertyAccessString, LiteralArrayExpr as LiteralArrayExpr2, literalMap as literalMap2, parseHostBindings, verifyHostBindings, R3Identifiers, ArrowFunctionExpr as ArrowFunctionExpr2, WrappedNodeExpr as WrappedNodeExpr5, literal as literal3 } from "@angular/compiler";
+import { createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr2, ExternalReference, getSafePropertyAccessString, LiteralArrayExpr as LiteralArrayExpr2, literalMap as literalMap2, parseHostBindings, verifyHostBindings, R3Identifiers, ArrowFunctionExpr as ArrowFunctionExpr2, WrappedNodeExpr as WrappedNodeExpr5, literal as literal3, ClassPropertyMapping as ClassPropertyMapping4 } from "@angular/compiler";
 import ts20 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/annotations/common/src/di.js
@@ -4986,10 +4983,10 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
   const coreModule = isCore ? void 0 : "@angular/core";
   const inputsFromMeta = parseInputsArray(clazz, directive, evaluator, reflector, refEmitter, compilationMode, emitDeclarationOnly);
   const inputsFromFields = parseInputFields(clazz, members, evaluator, reflector, importTracker, refEmitter, isCore, compilationMode, inputsFromMeta, decorator, emitDeclarationOnly);
-  const inputs = ClassPropertyMapping.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
+  const inputs = ClassPropertyMapping4.fromMappedObject({ ...inputsFromMeta, ...inputsFromFields });
   const outputsFromMeta = parseOutputsArray(directive, evaluator);
   const outputsFromFields = parseOutputFields(clazz, decorator, members, isCore, reflector, importTracker, evaluator, outputsFromMeta);
-  const outputs = ClassPropertyMapping.fromMappedObject({ ...outputsFromMeta, ...outputsFromFields });
+  const outputs = ClassPropertyMapping4.fromMappedObject({ ...outputsFromMeta, ...outputsFromFields });
   const { viewQueries, contentQueries } = parseQueriesOfClassFields(members, reflector, importTracker, evaluator, isCore);
   if (directive.has("queries")) {
     const signalQueryFields = new Set([...viewQueries, ...contentQueries].filter((q) => q.isSignal).map((q) => q.propertyName));
@@ -6649,7 +6646,7 @@ function _extractTemplateStyleUrls(template) {
 }
 
 // packages/compiler-cli/src/ngtsc/annotations/component/src/handler.js
-import { compileClassDebugInfo, compileHmrInitializer, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, ConstantPool as ConstantPool2, CssSelector as CssSelector3, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, outputAst as o4, R3TargetBinder as R3TargetBinder2, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2, SelectorlessMatcher as SelectorlessMatcher2 } from "@angular/compiler";
+import { compileClassDebugInfo, compileHmrInitializer, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, ConstantPool as ConstantPool2, CssSelector as CssSelector3, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, outputAst as o4, R3TargetBinder as R3TargetBinder2, R3TemplateDependencyKind, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2, SelectorlessMatcher as SelectorlessMatcher2, MatchSource as MatchSource4 } from "@angular/compiler";
 import ts44 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.js
@@ -7776,7 +7773,7 @@ var TypeCheckScopeRegistry = class {
 };
 
 // packages/compiler-cli/src/ngtsc/annotations/directive/src/handler.js
-import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirectiveFromMetadata, compileDirectiveFromMetadata, FactoryTarget, makeBindingParser, R3TargetBinder, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
+import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareDirectiveFromMetadata, compileDirectiveFromMetadata, FactoryTarget, makeBindingParser, MatchSource as MatchSource3, R3TargetBinder, WrappedNodeExpr as WrappedNodeExpr8 } from "@angular/compiler";
 import ts37 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/annotations/directive/src/symbol.js
@@ -9342,7 +9339,7 @@ var MagicString = class _MagicString {
 import ts34 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/tcb_adapter.js
-import { AbsoluteSourceSpan, ExternalExpr as ExternalExpr5, TransplantedType, WrappedNodeExpr as WrappedNodeExpr6 } from "@angular/compiler";
+import { AbsoluteSourceSpan, ExternalExpr as ExternalExpr5, TransplantedType, WrappedNodeExpr as WrappedNodeExpr6, ClassPropertyMapping as ClassPropertyMapping5 } from "@angular/compiler";
 import ts30 from "typescript";
 function adaptTypeCheckBlockMetadata(ref, meta, env, genericContextBehavior) {
   const refCache = /* @__PURE__ */ new Map();
@@ -9363,7 +9360,7 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, genericContextBehavior) {
       name: dir.name,
       selector: dir.selector,
       exportAs: dir.exportAs,
-      inputs: ClassPropertyMapping.fromMappedObject(dir.inputs.toJointMappedObject((input) => {
+      inputs: ClassPropertyMapping5.fromMappedObject(dir.inputs.toJointMappedObject((input) => {
         return {
           classPropertyName: input.classPropertyName,
           bindingPropertyName: input.bindingPropertyName,
@@ -9393,6 +9390,7 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, genericContextBehavior) {
       stringLiteralInputFields: dir.stringLiteralInputFields,
       undeclaredInputFields: dir.undeclaredInputFields,
       publicMethods: dir.publicMethods,
+      matchSource: dir.matchSource,
       ref: extractRef(dir.ref),
       isGeneric: dir.isGeneric,
       requiresInlineTypeCtor: requiresInlineTypeCtor(dir.ref.node, env.reflector, env),
@@ -9442,7 +9440,8 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, genericContextBehavior) {
     getNestingLevel: (node) => meta.boundTarget.getNestingLevel(node),
     getEntitiesInScope: (node) => meta.boundTarget.getEntitiesInScope(node),
     getEagerlyUsedPipes: () => meta.boundTarget.getEagerlyUsedPipes(),
-    getDeferBlocks: () => meta.boundTarget.getDeferBlocks()
+    getDeferBlocks: () => meta.boundTarget.getDeferBlocks(),
+    getConflictingHostDirectiveBindings: (node) => meta.boundTarget.getConflictingHostDirectiveBindings(node)
   };
   const pipes = /* @__PURE__ */ new Map();
   if (meta.pipes !== null) {
@@ -9520,18 +9519,24 @@ function extractReferenceMetadata(ref, env) {
     unexportedDiagnostic = emitted.reason;
     isLocal = false;
   }
-  const refMeta = {
+  const nodeName = ref.node?.name;
+  const nodeNameSpan = nodeName ? new AbsoluteSourceSpan(nodeName.getStart(), nodeName.getEnd()) : void 0;
+  const nodeFilePath = nodeName?.getSourceFile().fileName;
+  let key;
+  if (nodeFilePath !== void 0 && nodeNameSpan !== void 0) {
+    key = `${nodeFilePath}#${nodeNameSpan.start}`;
+  } else {
+    key = moduleName ? `${moduleName}#${name}` : name;
+  }
+  return {
     name,
     moduleName,
     isLocal,
-    unexportedDiagnostic
+    unexportedDiagnostic,
+    nodeNameSpan,
+    nodeFilePath,
+    key
   };
-  const nodeName = ref.node?.name;
-  if (nodeName) {
-    refMeta.nodeNameSpan = new AbsoluteSourceSpan(nodeName.getStart(), nodeName.getEnd());
-    refMeta.nodeFilePath = nodeName.getSourceFile().fileName;
-  }
-  return refMeta;
 }
 function extractNameFromExpr(node) {
   if (ts30.isIdentifier(node)) {
@@ -9712,23 +9717,7 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
   }
   missingRequiredInputs(id, element, directiveName, isComponent, inputAliases) {
     const message = `Required input${inputAliases.length === 1 ? "" : "s"} ${inputAliases.map((n2) => `'${n2}'`).join(", ")} from ${isComponent ? "component" : "directive"} ${directiveName} must be specified.`;
-    let span;
-    let name;
-    if (element instanceof TmplAstElement || element instanceof TmplAstDirective) {
-      name = element.name;
-    } else if (element instanceof TmplAstComponent) {
-      name = element.componentName;
-    } else {
-      name = null;
-    }
-    if (name === null) {
-      span = element.startSourceSpan;
-    } else {
-      const start = element.startSourceSpan.start.moveBy(1);
-      const end = element.startSourceSpan.end.moveBy(start.offset + name.length - element.startSourceSpan.end.offset);
-      span = new ParseSourceSpan2(start, end);
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts31.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), this.getTagNameSpan(element), ts31.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
   }
   illegalForLoopTrackAccess(id, block, access) {
     const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, access.sourceSpan);
@@ -9831,6 +9820,29 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     const span = new ParseSourceSpan2(start, end);
     const names = componentNames.map((n2) => `'${n2}'`).join(", ");
     this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts31.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MULTIPLE_MATCHING_COMPONENTS), `Multiple components match node with tagname ${element.name}: ${names}.`));
+  }
+  conflictingHostDirectiveBinding(id, node, directiveName, kind, classPropertyName, aliases) {
+    const message = `${kind === "input" ? "Input" : "Output"} declared in ${directiveName}.${classPropertyName} is exposed under the following conflicting names: ${aliases.map((a) => `"${a}"`).join(", ")}. An ${kind} can only be exposed under a single name.`;
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), this.getTagNameSpan(node), ts31.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_HOST_DIRECTIVE_BINDING), message));
+  }
+  getTagNameSpan(node) {
+    let span;
+    let name;
+    if (node instanceof TmplAstElement || node instanceof TmplAstDirective) {
+      name = node.name;
+    } else if (node instanceof TmplAstComponent) {
+      name = node.componentName;
+    } else {
+      name = null;
+    }
+    if (name === null) {
+      span = node.startSourceSpan;
+    } else {
+      const start = node.startSourceSpan.start.moveBy(1);
+      const end = node.startSourceSpan.end.moveBy(start.offset + name.length - node.startSourceSpan.end.offset);
+      span = new ParseSourceSpan2(start, end);
+    }
+    return span;
   }
 };
 function translateCategory(category) {
@@ -12377,7 +12389,7 @@ var DirectiveDecoratorHandler = class {
     const ref = new Reference(node);
     this.metaRegistry.registerDirectiveMetadata({
       kind: MetaKind.Directive,
-      matchSource: MatchSource.Selector,
+      matchSource: MatchSource3.Selector,
       ref,
       name: node.name.text,
       selector: analysis.meta.selector,
@@ -14338,7 +14350,7 @@ var ComponentDecoratorHandler = class {
     const ref = new Reference(node);
     this.metaRegistry.registerDirectiveMetadata({
       kind: MetaKind.Directive,
-      matchSource: MatchSource.Selector,
+      matchSource: MatchSource4.Selector,
       ref,
       name: node.name.text,
       selector: analysis.meta.selector,
@@ -14730,7 +14742,7 @@ var ComponentDecoratorHandler = class {
       }
       switch (dep.kind) {
         case MetaKind.Directive:
-          if (!wholeTemplateUsed.has(dep.ref.node) || dep.matchSource !== MatchSource.Selector) {
+          if (!wholeTemplateUsed.has(dep.ref.node) || dep.matchSource !== MatchSource4.Selector) {
             continue;
           }
           const dirType = this.refEmitter.emit(dep.ref, context);
@@ -15917,4 +15929,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-Y57LTKGU.js.map
+//# sourceMappingURL=chunk-USIKVOEX.js.map

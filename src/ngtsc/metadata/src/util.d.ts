@@ -9,7 +9,7 @@ import ts from 'typescript';
 import { OwningModule, Reference } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { DirectiveMeta, DirectiveTypeCheckMeta, HostDirectiveMeta, HostDirectiveMetaForGlobalMode, InputMapping, MetadataReader, NgModuleMeta, PipeMeta } from './api';
-import { ClassPropertyMapping } from './property_mapping';
+import { ClassPropertyMapping } from '@angular/compiler';
 export declare function extractReferencesFromType(checker: ts.TypeChecker, def: ts.TypeNode, bestGuessOwningModule: OwningModule | null): {
     result: Reference<ClassDeclaration>[];
     isIncomplete: boolean;

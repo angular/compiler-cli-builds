@@ -43,4 +43,6 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     deferImplicitTriggerInvalidPlaceholder(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
     formFieldUnsupportedBinding(id: TypeCheckId, node: TmplAstBoundAttribute | TmplAstTextAttribute): void;
     multipleMatchingComponents(id: TypeCheckId, element: TmplAstElement, componentNames: string[]): void;
+    conflictingHostDirectiveBinding(id: TypeCheckId, node: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, directiveName: string, kind: 'input' | 'output', classPropertyName: string, aliases: string[]): void;
+    private getTagNameSpan;
 }

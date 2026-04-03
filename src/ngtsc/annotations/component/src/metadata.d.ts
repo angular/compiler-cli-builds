@@ -5,10 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { LegacyAnimationTriggerNames, DeclarationListEmitMode, DeferBlockDepsEmitMode, R3ClassDebugInfo, R3ClassMetadata, R3ComponentMetadata, R3DeferPerBlockDependency, R3DeferPerComponentDependency, R3TemplateDependencyMetadata, SchemaMetadata, TmplAstDeferredBlock } from '@angular/compiler';
+import { LegacyAnimationTriggerNames, DeclarationListEmitMode, DeferBlockDepsEmitMode, R3ClassDebugInfo, R3ClassMetadata, R3ComponentMetadata, R3DeferPerBlockDependency, R3DeferPerComponentDependency, R3TemplateDependencyMetadata, SchemaMetadata, TmplAstDeferredBlock, ClassPropertyMapping } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../../imports';
-import { ClassPropertyMapping, DirectiveResources, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping } from '../../../metadata';
+import { DirectiveResources, DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping } from '../../../metadata';
 import { ClassDeclaration, Import } from '../../../reflection';
 import { SubsetOfKeys } from '../../../util/src/typescript';
 import { ParsedTemplateWithSource, StyleUrlMeta } from './resources';
