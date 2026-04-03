@@ -77,7 +77,7 @@ import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("21.2.7+sha-b0dc2fb");
+var VERSION = new Version("21.2.7+sha-cbfd1ee-with-local-changes");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
