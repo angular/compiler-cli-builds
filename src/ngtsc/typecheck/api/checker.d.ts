@@ -15,7 +15,7 @@ import { ClassDeclaration } from '../../reflection';
 import { FullSourceMapping, GetPotentialAngularMetaOptions, NgTemplateDiagnostic, TypeCheckableDirectiveMeta } from './api';
 import { GlobalCompletion } from './completion';
 import { PotentialDirective, PotentialDirectiveModuleSpecifierResolver, PotentialImport, PotentialImportMode, PotentialPipe, TsCompletionEntryInfo } from './scope';
-import { ElementSymbol, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, TcbLocation, TemplateSymbol } from './symbols';
+import { BindingSymbol, ClassSymbol, ElementSymbol, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, TcbLocation, TemplateSymbol } from './symbols';
 /**
  * Interface to the Angular Template Type Checker to extract diagnostics and intelligence from the
  * compiler's understanding of component templates.
@@ -111,6 +111,15 @@ export interface TemplateTypeChecker {
     getSymbolOfNode(node: TmplAstComponent, component: ts.ClassDeclaration): SelectorlessComponentSymbol | null;
     getSymbolOfNode(node: TmplAstDirective, component: ts.ClassDeclaration): SelectorlessDirectiveSymbol | null;
     getSymbolOfNode(node: AST | TmplAstNode, component: ts.ClassDeclaration): Symbol | null;
+    /**
+     * Translates a symbol's TCB location to its corresponding ts.Type using the program's type checker.
+     * This is used by compiler checks that need semantic type information from a positional symbol.
+     */
+    getTypeOfSymbol(symbol: Symbol | BindingSymbol | ClassSymbol): ts.Type | null;
+    /**
+     * Translates a symbol's TCB location to its corresponding ts.Symbol using the program's type checker.
+     */
+    getTsSymbolOfSymbol(symbol: Symbol | BindingSymbol | ClassSymbol): ts.Symbol | null;
     /**
      * Get "global" `Completion`s in the given context.
      *

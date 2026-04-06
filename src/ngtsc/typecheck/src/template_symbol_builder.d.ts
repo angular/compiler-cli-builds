@@ -9,7 +9,7 @@ import { AST, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstLetDecl
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { ComponentScopeReader } from '../../scope';
-import { ElementSymbol, LetDeclarationSymbol, ReferenceSymbol, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, TemplateSymbol, VariableSymbol } from '../api';
+import { ElementSymbol, LetDeclarationSymbol, ReferenceSymbol, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, TemplateSymbol, TypeCheckingConfig, VariableSymbol } from '../api';
 import { TypeCheckData } from './context';
 /**
  * Generates and caches `Symbol`s for various template structures for a given component.
@@ -23,9 +23,9 @@ export declare class SymbolBuilder {
     private readonly typeCheckBlock;
     private readonly typeCheckData;
     private readonly componentScopeReader;
-    private readonly getTypeChecker;
+    private readonly typeCheckingConfig;
     private symbolCache;
-    constructor(tcbPath: AbsoluteFsPath, tcbIsShim: boolean, typeCheckBlock: ts.Node, typeCheckData: TypeCheckData, componentScopeReader: ComponentScopeReader, getTypeChecker: () => ts.TypeChecker);
+    constructor(tcbPath: AbsoluteFsPath, tcbIsShim: boolean, typeCheckBlock: ts.Node, typeCheckData: TypeCheckData, componentScopeReader: ComponentScopeReader, typeCheckingConfig: TypeCheckingConfig);
     getSymbol(node: TmplAstTemplate | TmplAstElement): TemplateSymbol | ElementSymbol | null;
     getSymbol(node: TmplAstReference | TmplAstVariable | TmplAstLetDeclaration): ReferenceSymbol | VariableSymbol | LetDeclarationSymbol | null;
     getSymbol(node: TmplAstComponent): SelectorlessComponentSymbol | null;
@@ -36,7 +36,6 @@ export declare class SymbolBuilder {
     private getSymbolOfSelectorlessComponent;
     private getSymbolOfSelectorlessDirective;
     private getDirectivesOfNode;
-    private addHostDirectiveSymbols;
     private getDirectiveMeta;
     private getDirectiveModule;
     private getSymbolOfBoundEvent;
@@ -47,6 +46,7 @@ export declare class SymbolBuilder {
     private getSymbolOfLetDeclaration;
     private getSymbolOfPipe;
     private getSymbolOfTemplateExpression;
-    private getSymbolOfTsNode;
+    private getTcbSpanForNode;
+    private getTcbLocationForNode;
     private getTcbPositionForNode;
 }

@@ -231,7 +231,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.6+sha-ecae525";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.6+sha-d95e856";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -3250,6 +3250,7 @@ var CommentTriviaType;
 var ExpressionIdentifier;
 (function(ExpressionIdentifier2) {
   ExpressionIdentifier2["DIRECTIVE"] = "DIR";
+  ExpressionIdentifier2["HOST_DIRECTIVE"] = "HOSTDIR";
   ExpressionIdentifier2["COMPONENT_COMPLETION"] = "COMPCOMP";
   ExpressionIdentifier2["EVENT_PARAMETER"] = "EP";
   ExpressionIdentifier2["VARIABLE_AS_EXPRESSION"] = "VAE";
@@ -6191,7 +6192,7 @@ ${getStatementsBlock(statements)} }`;
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/directive_type.js
-import { TmplAstHostElement as TmplAstHostElement3 } from "@angular/compiler";
+import { MatchSource, TmplAstHostElement as TmplAstHostElement3 } from "@angular/compiler";
 var TcbDirectiveTypeOpBase = class extends TcbOp {
   tcb;
   scope;
@@ -6222,7 +6223,8 @@ var TcbDirectiveTypeOpBase = class extends TcbOp {
     } else {
       span = this.node.startSourceSpan || this.node.sourceSpan;
     }
-    const id = new TcbExpr(this.tcb.allocateId()).addExpressionIdentifier(ExpressionIdentifier.DIRECTIVE).addParseSpanInfo(span);
+    const identifier = this.dir.matchSource === MatchSource.HostDirective ? ExpressionIdentifier.HOST_DIRECTIVE : ExpressionIdentifier.DIRECTIVE;
+    const id = new TcbExpr(this.tcb.allocateId()).addExpressionIdentifier(identifier).addParseSpanInfo(span);
     this.scope.addStatement(declareVariable(id, type));
     return id;
   }
@@ -6249,7 +6251,7 @@ var TcbGenericDirectiveTypeWithAnyParamsOp = class extends TcbDirectiveTypeOpBas
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ops/directive_constructor.js
-import { TmplAstHostElement as TmplAstHostElement4 } from "@angular/compiler";
+import { MatchSource as MatchSource2, TmplAstHostElement as TmplAstHostElement4 } from "@angular/compiler";
 var TcbDirectiveCtorOp = class extends TcbOp {
   tcb;
   scope;
@@ -6285,7 +6287,8 @@ var TcbDirectiveCtorOp = class extends TcbOp {
         }
       }
     }
-    id.addExpressionIdentifier(ExpressionIdentifier.DIRECTIVE).addParseSpanInfo(span);
+    const identifier = this.dir.matchSource === MatchSource2.HostDirective ? ExpressionIdentifier.HOST_DIRECTIVE : ExpressionIdentifier.DIRECTIVE;
+    id.addExpressionIdentifier(identifier).addParseSpanInfo(span);
     for (const attr of boundAttrs) {
       if (!this.tcb.env.config.checkTypeOfAttributes && typeof attr.value === "string") {
         continue;
@@ -7335,4 +7338,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-X3IMEBIY.js.map
+//# sourceMappingURL=chunk-NTPFOQSX.js.map

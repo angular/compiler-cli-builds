@@ -22,6 +22,7 @@ export declare enum CommentTriviaType {
 /** Identifies what the TCB expression is for (for example, a directive declaration). */
 export declare enum ExpressionIdentifier {
     DIRECTIVE = "DIR",
+    HOST_DIRECTIVE = "HOSTDIR",
     COMPONENT_COMPLETION = "COMPCOMP",
     EVENT_PARAMETER = "EP",
     VARIABLE_AS_EXPRESSION = "VAE"

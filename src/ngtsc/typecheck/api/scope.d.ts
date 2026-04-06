@@ -8,7 +8,6 @@
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
-import { SymbolWithValueDeclaration } from '../../util/src/typescript';
 /**
  * A PotentialImport for some Angular trait has a TypeScript module specifier, which can be
  * relative, as well as an identifier name.
@@ -53,10 +52,6 @@ export interface TsCompletionEntryInfo {
 export interface PotentialDirective {
     ref: Reference<ClassDeclaration>;
     /**
-     * The `ts.Symbol` for the directive class.
-     */
-    tsSymbol: SymbolWithValueDeclaration;
-    /**
      * The module which declares the directive.
      */
     ngModule: ClassDeclaration | null;
@@ -89,10 +84,6 @@ export interface PotentialDirective {
  */
 export interface PotentialPipe {
     ref: Reference<ClassDeclaration>;
-    /**
-     * The `ts.Symbol` for the pipe class.
-     */
-    tsSymbol: ts.Symbol;
     /**
      * Name of the pipe.
      */
