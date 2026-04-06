@@ -268,7 +268,6 @@ export declare class NgCompiler {
      * Explicit opt-out is required to disable strictness
      */
     private get strictTemplates();
-    private get fullTemplateTypeCheck();
     private getTypeCheckingConfig;
     private getTemplateDiagnostics;
     private getTemplateDiagnosticsForFile;

@@ -52,12 +52,11 @@ import {
   signalMetadataTransform,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-R7ESONXW.js";
+} from "./chunk-7BWSPJYS.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
   COMPILER_ERRORS_WITH_GUIDES,
-  DOC_PAGE_BASE_URL,
   DefaultImportTracker,
   DeferredSymbolTracker,
   ERROR_DETAILS_PAGE_BASE_URL,
@@ -90,7 +89,7 @@ import {
   normalizeSeparators,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-NTPFOQSX.js";
+} from "./chunk-ZJKHN4YF.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -4706,9 +4705,6 @@ var NgCompiler = class _NgCompiler {
   get strictTemplates() {
     return this.options.strictTemplates !== false;
   }
-  get fullTemplateTypeCheck() {
-    return this.strictTemplates || !!this.options.fullTemplateTypeCheck;
-  }
   getTypeCheckingConfig() {
     const strictTemplates = this.strictTemplates;
     const useInlineTypeConstructors = this.programDriver.supportsInlineOperations;
@@ -4716,7 +4712,7 @@ var NgCompiler = class _NgCompiler {
     const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0-0");
     const allowDomEventAssertion = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 20.2.0");
     let typeCheckingConfig;
-    if (this.fullTemplateTypeCheck) {
+    if (strictTemplates) {
       typeCheckingConfig = {
         applyTemplateContextGuards: strictTemplates,
         checkQueries: false,
@@ -4746,10 +4742,6 @@ var NgCompiler = class _NgCompiler {
         strictLiteralTypes: true,
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
-        // Warnings for suboptimal type inference are only enabled if in Language Service mode
-        // (providing the full TemplateTypeChecker API) and if strict mode is not enabled. In strict
-        // mode, the user is in full control of type inference.
-        suggestionsForSuboptimalTypeInference: this.enableTemplateTypeChecker && !strictTemplates,
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
@@ -4781,9 +4773,6 @@ var NgCompiler = class _NgCompiler {
         strictLiteralTypes: false,
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
-        // In "basic" template type-checking mode, no warnings are produced since most things are
-        // not checked anyways.
-        suggestionsForSuboptimalTypeInference: false,
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
@@ -5071,25 +5060,6 @@ function getR3SymbolsFile(program) {
   return program.getSourceFiles().find((file) => file.fileName.indexOf("r3_symbols.ts") >= 0) || null;
 }
 function* verifyCompatibleTypeCheckOptions(options) {
-  if (options.fullTemplateTypeCheck === false && options.strictTemplates !== false) {
-    yield makeConfigDiagnostic({
-      category: ts27.DiagnosticCategory.Error,
-      code: ErrorCode.CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK,
-      messageText: `
-Angular compiler option "strictTemplates" is enabled, however "fullTemplateTypeCheck" is disabled.
-
-Having the "strictTemplates" flag enabled implies that "fullTemplateTypeCheck" is also enabled, so
-the latter can not be explicitly disabled.
-
-One of the following actions is required:
-1. Remove the "fullTemplateTypeCheck" option.
-2. Set "strictTemplates" to 'false'.
-
-More information about the template type checking compiler options can be found in the documentation:
-${DOC_PAGE_BASE_URL}/tools/cli/template-typecheck
-      `.trim()
-    });
-  }
   if (options.extendedDiagnostics && options.strictTemplates === false) {
     yield makeConfigDiagnostic({
       category: ts27.DiagnosticCategory.Error,
@@ -5451,4 +5421,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-NV2CYLGB.js.map
+//# sourceMappingURL=chunk-PMBTO3ZF.js.map
