@@ -16,3 +16,4 @@ export type { ReflectionHost, ClassDeclaration } from '../src/ngtsc/reflection';
 export type { TypeCheckSourceResolver } from '../src/ngtsc/typecheck/src/tcb_util';
 export { createHostElement, type SourceNode, type StaticSourceNode, type HostObjectLiteralBinding, type HostListenerDecorator, type HostBindingDecorator, } from '../src/ngtsc/typecheck/src/host_bindings';
 export { findFirstMatchingNode, ExpressionIdentifier, hasExpressionIdentifier, } from '../src/ngtsc/typecheck/src/comments';
+export { SymbolBuilder } from '../src/ngtsc/typecheck/src/template_symbol_builder';
