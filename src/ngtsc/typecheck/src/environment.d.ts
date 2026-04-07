@@ -9,7 +9,7 @@ import ts from 'typescript';
 import { ReferenceEmitter } from '../../imports';
 import { ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
-import { TcbDirectiveMetadata, TcbPipeMetadata, TcbReferenceKey, TcbReferenceMetadata, TypeCheckingConfig } from '../api';
+import { TcbDirectiveMetadata, TcbPipeMetadata, TypeCheckingConfig } from '../api';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
 import { TcbExpr } from './ops/codegen';
 /**
@@ -41,4 +41,3 @@ export declare class Environment extends ReferenceEmitEnvironment {
     pipeInst(pipe: TcbPipeMetadata): TcbExpr;
     getPreludeStatements(): TcbExpr[];
 }
-export declare function getTcbReferenceKey(ref: TcbReferenceMetadata): TcbReferenceKey;

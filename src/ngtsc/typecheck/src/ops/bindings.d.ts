@@ -5,9 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, ParseSourceSpan, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstTemplate } from '@angular/compiler';
+import { AST, ClassPropertyName, ParseSourceSpan, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstTemplate } from '@angular/compiler';
 import { TcbDirectiveMetadata } from '../../api';
-import { ClassPropertyName } from '../../../metadata';
 import { Context } from './context';
 import { TcbExpr } from './codegen';
 export interface TcbBoundAttribute {

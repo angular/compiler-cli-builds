@@ -88,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-CT5WKDGD.js";
+} from "./chunk-MY64YQH6.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -2896,10 +2896,20 @@ var SIGNAL_FNS = /* @__PURE__ */ new Set([
   "InputSignalWithTransform",
   "ModelSignal"
 ]);
-function isSignalReference(symbol) {
-  return (symbol.kind === SymbolKind.Expression || symbol.kind === SymbolKind.Variable || symbol.kind === SymbolKind.LetDeclaration) && // Note that `tsType.symbol` isn't optional in the typings,
-  // but it appears that it can be undefined at runtime.
-  (symbol.tsType.symbol !== void 0 && isSignalSymbol(symbol.tsType.symbol) || symbol.tsType.aliasSymbol !== void 0 && isSignalSymbol(symbol.tsType.aliasSymbol));
+function isSignalReference(symbol, typeChecker) {
+  let location = null;
+  if ("tcbLocation" in symbol) {
+    location = symbol.tcbLocation;
+  } else if ("localVarLocation" in symbol) {
+    location = symbol.localVarLocation;
+  }
+  if (location === null) {
+    return false;
+  }
+  const type = typeChecker.getTypeOfSymbol({ tcbLocation: location });
+  if (!type)
+    return false;
+  return (symbol.kind === SymbolKind.Expression || symbol.kind === SymbolKind.Variable || symbol.kind === SymbolKind.LetDeclaration) && (type.symbol !== void 0 && isSignalSymbol(type.symbol) || type.aliasSymbol !== void 0 && isSignalSymbol(type.aliasSymbol));
 }
 function isSignalSymbol(symbol) {
   const declarations = symbol.getDeclarations();
@@ -3045,7 +3055,7 @@ function isSignalInstanceProperty(name) {
 }
 function buildDiagnosticForSignal(ctx, node, component) {
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
-  if (symbol !== null && symbol.kind === SymbolKind.Expression && isSignalReference(symbol)) {
+  if (symbol !== null && symbol.kind === SymbolKind.Expression && isSignalReference(symbol, ctx.templateTypeChecker)) {
     const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
     const errorString = formatExtendedError(ErrorCode.INTERPOLATED_SIGNAL_NOT_INVOKED, `${node.name} is a function and should be invoked: ${node.name}()}`);
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
@@ -3054,8 +3064,11 @@ function buildDiagnosticForSignal(ctx, node, component) {
   if (!isFunctionInstanceProperty(node.name) && !isSignalInstanceProperty(node.name)) {
     return [];
   }
+  if (!(node.receiver instanceof PropertyRead2)) {
+    return [];
+  }
   const symbolOfReceiver = ctx.templateTypeChecker.getSymbolOfNode(node.receiver, component);
-  if (symbolOfReceiver !== null && symbolOfReceiver.kind === SymbolKind.Expression && isSignalReference(symbolOfReceiver)) {
+  if (symbolOfReceiver !== null && symbolOfReceiver.kind === SymbolKind.Expression && isSignalReference(symbolOfReceiver, ctx.templateTypeChecker)) {
     const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbolOfReceiver.tcbLocation);
     const errorString = formatExtendedError(ErrorCode.INTERPOLATED_SIGNAL_NOT_INVOKED, `${node.receiver.name} is a function and should be invoked: ${node.receiver.name}()`);
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
@@ -3217,8 +3230,8 @@ var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
     if (symbolLeft === null || symbolLeft.kind !== SymbolKind.Expression) {
       return [];
     }
-    const typeLeft = symbolLeft.tsType;
-    if (typeLeft.flags & (ts20.TypeFlags.Any | ts20.TypeFlags.Unknown)) {
+    const typeLeft = ctx.templateTypeChecker.getTypeOfSymbol(symbolLeft);
+    if (!typeLeft || typeLeft.flags & (ts20.TypeFlags.Any | ts20.TypeFlags.Unknown)) {
       return [];
     }
     if (typeLeft.getNonNullableType() !== typeLeft)
@@ -3268,8 +3281,8 @@ var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
     if (symbolLeft === null || symbolLeft.kind !== SymbolKind.Expression) {
       return [];
     }
-    const typeLeft = symbolLeft.tsType;
-    if (typeLeft.flags & (ts21.TypeFlags.Any | ts21.TypeFlags.Unknown)) {
+    const typeLeft = ctx.templateTypeChecker.getTypeOfSymbol(symbolLeft);
+    if (!typeLeft || typeLeft.flags & (ts21.TypeFlags.Any | ts21.TypeFlags.Unknown)) {
       return [];
     }
     if (typeLeft.getNonNullableType() !== typeLeft)
@@ -3427,7 +3440,8 @@ function assertExpressionInvoked(expression, component, node, expressionText, ct
   }
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
   if (symbol !== null && symbol.kind === SymbolKind.Expression) {
-    if (symbol.tsType.getCallSignatures()?.length > 0) {
+    const type = ctx.templateTypeChecker.getTypeOfSymbol(symbol);
+    if (type && type.getCallSignatures()?.length > 0) {
       const fullExpressionText = generateStringFromExpression(expression, expressionText);
       const errorString = formatExtendedError(ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING, `Function in event binding should be invoked: ${fullExpressionText}()`);
       return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
@@ -3531,10 +3545,13 @@ var UninvokedTrackFunctionCheck = class extends TemplateCheckWithVisitor {
       return [];
     }
     const symbol = ctx.templateTypeChecker.getSymbolOfNode(node.trackBy.ast, component);
-    if (symbol !== null && symbol.kind === SymbolKind.Expression && symbol.tsType.getCallSignatures()?.length > 0) {
-      const fullExpressionText = generateStringFromExpression2(node.trackBy.ast, node.trackBy.source || "");
-      const errorString = formatExtendedError(ErrorCode.UNINVOKED_TRACK_FUNCTION, `The track function in the @for block should be invoked: ${fullExpressionText}(/* arguments */)`);
-      return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
+    if (symbol !== null && symbol.kind === SymbolKind.Expression) {
+      const type = ctx.templateTypeChecker.getTypeOfSymbol(symbol);
+      if (type && type.getCallSignatures()?.length > 0) {
+        const fullExpressionText = generateStringFromExpression2(node.trackBy.ast, node.trackBy.source || "");
+        const errorString = formatExtendedError(ErrorCode.UNINVOKED_TRACK_FUNCTION, `The track function in the @for block should be invoked: ${fullExpressionText}(/* arguments */)`);
+        return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
+      }
     }
     return [];
   }
@@ -3565,7 +3582,8 @@ function assertExpressionInvoked2(expression, component, ctx) {
   }
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
   if (symbol !== null && symbol.kind === SymbolKind.Expression) {
-    if (symbol.tsType.getCallSignatures()?.length > 0) {
+    const type = ctx.templateTypeChecker.getTypeOfSymbol(symbol);
+    if (type && type.getCallSignatures()?.length > 0) {
       const errorString = formatExtendedError(ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION, `Function in text interpolation should be invoked: ${expression.name}()`);
       const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
       return [ctx.makeTemplateDiagnostic(templateMapping.span, errorString)];
@@ -3798,7 +3816,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
       return;
     }
     const symbol = this.templateTypeChecker.getSymbolOfNode(target, this.component);
-    if (symbol !== null && !isSignalReference(symbol)) {
+    if (symbol !== null && !isSignalReference(symbol, this.templateTypeChecker)) {
       let errorMessage;
       if (isVariable) {
         errorMessage = `Cannot use a non-signal variable '${target.name}' in a two-way binding expression. Template variables are read-only.`;
@@ -5374,4 +5392,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-4SLFQDQ6.js.map
+//# sourceMappingURL=chunk-VIEWCYEE.js.map
