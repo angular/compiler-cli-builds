@@ -86,7 +86,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-7EH6ZNZO.js";
+} from "./chunk-NTSNACT3.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -7294,7 +7294,13 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, genericContextBehavior) {
       ref: extractRef(dir.ref),
       isGeneric: dir.isGeneric,
       requiresInlineTypeCtor: requiresInlineTypeCtor(dir.ref.node, env.reflector, env),
-      ...adaptGenerics(dir.ref.node, env, TcbGenericContextBehavior.UseEmitter)
+      ...adaptGenerics(
+        dir.ref.node,
+        env,
+        // The directive that we're processing is its own dependency
+        // so we should the same generic context behavior.
+        extractRef(dir.ref).key === extractRef(ref).key ? genericContextBehavior : TcbGenericContextBehavior.UseEmitter
+      )
     };
     dirCache.set(dir, tcbDir);
     return tcbDir;
@@ -7368,7 +7374,7 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, genericContextBehavior) {
     },
     component: {
       ref: extractRef(ref),
-      ...adaptGenerics(ref.node, env, env.config.useContextGenericType ? genericContextBehavior : TcbGenericContextBehavior.FallbackToAny)
+      ...adaptGenerics(ref.node, env, genericContextBehavior)
     }
   };
 }
@@ -7376,6 +7382,9 @@ function adaptGenerics(node, env, genericContextBehavior) {
   let typeParameters;
   let typeArguments;
   if (node.typeParameters !== void 0 && node.typeParameters.length > 0) {
+    if (!env.config.useContextGenericType) {
+      genericContextBehavior = TcbGenericContextBehavior.FallbackToAny;
+    }
     switch (genericContextBehavior) {
       case TcbGenericContextBehavior.UseEmitter:
         const emitter = new TypeParameterEmitter(node.typeParameters, env.reflector);
@@ -13248,4 +13257,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-NVZMFKQR.js.map
+//# sourceMappingURL=chunk-BSFGZJQ2.js.map

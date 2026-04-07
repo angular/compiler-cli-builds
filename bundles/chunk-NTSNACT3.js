@@ -231,7 +231,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.6+sha-2ce0e98";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.6+sha-236d6d4";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -3678,17 +3678,15 @@ var TypeTranslatorVisitor = class {
   visitWrappedNodeExpr(ast, context) {
     const node = ast.node;
     if (ts21.isEntityName(node)) {
-      return ts21.factory.createTypeReferenceNode(
-        node,
-        /* typeArguments */
-        void 0
-      );
+      return ts21.factory.createTypeReferenceNode(node);
     } else if (ts21.isTypeNode(node)) {
       return node;
     } else if (ts21.isLiteralExpression(node)) {
       return ts21.factory.createLiteralTypeNode(node);
+    } else if (ts21.isTypeParameterDeclaration(node)) {
+      return ts21.factory.createTypeReferenceNode(node.name);
     } else {
-      throw new Error(`Unsupported WrappedNodeExpr in TypeTranslatorVisitor: ${ts21.SyntaxKind[node.kind]}`);
+      throw new Error(`Unsupported WrappedNodeExpr in TypeTranslatorVisitor: ${ts21.SyntaxKind[node.kind]} in ${node.getSourceFile()?.fileName}`);
     }
   }
   visitTypeofExpr(ast, context) {
@@ -10090,4 +10088,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-7EH6ZNZO.js.map
+//# sourceMappingURL=chunk-NTSNACT3.js.map

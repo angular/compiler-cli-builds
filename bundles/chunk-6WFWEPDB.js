@@ -33,7 +33,7 @@ import {
   ivyTransformFactory,
   signalMetadataTransform,
   tryParseInitializerApi
-} from "./chunk-NVZMFKQR.js";
+} from "./chunk-BSFGZJQ2.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -89,7 +89,7 @@ import {
   relativePathBetween,
   toUnredirectedSourceFile,
   untagAllTsFiles
-} from "./chunk-7EH6ZNZO.js";
+} from "./chunk-NTSNACT3.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5421,4 +5421,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-XQU5QNJY.js.map
+//# sourceMappingURL=chunk-6WFWEPDB.js.map
