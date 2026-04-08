@@ -250,5 +250,7 @@ export interface PipeSymbol {
 export interface ClassSymbol {
     /** The position for the variable declaration for the class instance. */
     tcbLocation: TcbLocation;
+    /** Whether this class symbol represents a pipe. */
+    isPipeClassSymbol?: boolean;
 }
 export {};
