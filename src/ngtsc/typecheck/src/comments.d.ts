@@ -51,3 +51,4 @@ export declare function findFirstMatchingNode<T extends ts.Node>(tcb: ts.Node, o
  */
 export declare function findAllMatchingNodes<T extends ts.Node>(tcb: ts.Node, opts: FindOptions<T>): T[];
 export declare function hasExpressionIdentifier(sourceFile: ts.SourceFile, node: ts.Node, identifier: ExpressionIdentifier): boolean;
+export declare function readDirectiveIdFromComment(sourceFile: ts.SourceFile, node: ts.Node): number | null;

@@ -43,7 +43,7 @@ export declare class TcbExpr {
      * Tags the expression with an identifier.
      * @param identifier Identifier to apply to the expression.
      */
-    addExpressionIdentifier(identifier: ExpressionIdentifier): this;
+    addExpressionIdentifier(identifier: ExpressionIdentifier, id?: number): this;
     /**
      * `toString` implementation meant to catch errors like accidentally
      * writing `foo ${expr} bar` instead of `foo ${expr.print()} bar`.

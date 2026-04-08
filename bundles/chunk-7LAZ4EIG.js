@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.7+sha-a385743";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.7+sha-33a30e0";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -11098,8 +11098,34 @@ function hasExpressionIdentifier(sourceFile, node, identifier) {
       return false;
     }
     const commentText = sourceFile.text.substring(pos + 2, end - 2);
-    return commentText === `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
+    const prefix = `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
+    return commentText === prefix || commentText.startsWith(prefix + ":");
   }) || false;
+}
+function readDirectiveIdFromComment(sourceFile, node) {
+  let id = null;
+  ts47.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts47.SyntaxKind.MultiLineCommentTrivia) {
+      return;
+    }
+    const commentText = sourceFile.text.substring(pos + 2, end - 2);
+    const prefix = `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${ExpressionIdentifier.DIRECTIVE}:`;
+    const hostPrefix = `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${ExpressionIdentifier.HOST_DIRECTIVE}:`;
+    let matchedPrefix = null;
+    if (commentText.startsWith(prefix)) {
+      matchedPrefix = prefix;
+    } else if (commentText.startsWith(hostPrefix)) {
+      matchedPrefix = hostPrefix;
+    }
+    if (matchedPrefix !== null) {
+      const idStr = commentText.substring(matchedPrefix.length);
+      const parsed = parseInt(idStr, 10);
+      if (!isNaN(parsed)) {
+        id = parsed;
+      }
+    }
+  });
+  return id;
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.js
@@ -13111,8 +13137,8 @@ var TcbExpr = class {
    * Tags the expression with an identifier.
    * @param identifier Identifier to apply to the expression.
    */
-  addExpressionIdentifier(identifier) {
-    this.identifierComment = `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}`;
+  addExpressionIdentifier(identifier, id) {
+    this.identifierComment = `${CommentTriviaType.EXPRESSION_TYPE_IDENTIFIER}:${identifier}${id !== void 0 ? `:${id}` : ""}`;
     return this;
   }
   /**
@@ -15918,12 +15944,14 @@ var TcbDirectiveTypeOpBase = class extends TcbOp {
   scope;
   node;
   dir;
-  constructor(tcb, scope, node, dir) {
+  directiveIndex;
+  constructor(tcb, scope, node, dir, directiveIndex) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
     this.dir = dir;
+    this.directiveIndex = directiveIndex;
   }
   get optional() {
     return true;
@@ -15944,7 +15972,7 @@ var TcbDirectiveTypeOpBase = class extends TcbOp {
       span = this.node.startSourceSpan || this.node.sourceSpan;
     }
     const identifier = this.dir.matchSource === MatchSource3.HostDirective ? ExpressionIdentifier.HOST_DIRECTIVE : ExpressionIdentifier.DIRECTIVE;
-    const id = new TcbExpr(this.tcb.allocateId()).addExpressionIdentifier(identifier).addParseSpanInfo(span);
+    const id = new TcbExpr(this.tcb.allocateId()).addExpressionIdentifier(identifier, this.directiveIndex).addParseSpanInfo(span);
     this.scope.addStatement(declareVariable(id, type));
     return id;
   }
@@ -15978,13 +16006,15 @@ var TcbDirectiveCtorOp = class extends TcbOp {
   node;
   dir;
   customFormControlType;
-  constructor(tcb, scope, node, dir, customFormControlType) {
+  directiveIndex;
+  constructor(tcb, scope, node, dir, customFormControlType, directiveIndex) {
     super();
     this.tcb = tcb;
     this.scope = scope;
     this.node = node;
     this.dir = dir;
     this.customFormControlType = customFormControlType;
+    this.directiveIndex = directiveIndex;
   }
   get optional() {
     return true;
@@ -16008,7 +16038,7 @@ var TcbDirectiveCtorOp = class extends TcbOp {
       }
     }
     const identifier = this.dir.matchSource === MatchSource4.HostDirective ? ExpressionIdentifier.HOST_DIRECTIVE : ExpressionIdentifier.DIRECTIVE;
-    id.addExpressionIdentifier(identifier).addParseSpanInfo(span);
+    id.addExpressionIdentifier(identifier, this.directiveIndex).addParseSpanInfo(span);
     for (const attr of boundAttrs) {
       if (!this.tcb.env.config.checkTypeOfAttributes && typeof attr.value === "string") {
         continue;
@@ -16610,8 +16640,9 @@ var Scope = class _Scope {
       }
     }
     const dirMap = /* @__PURE__ */ new Map();
-    for (const dir of directives) {
-      this.appendDirectiveInputs(dir, node, dirMap, directives);
+    for (let i = 0; i < directives.length; i++) {
+      const dir = directives[i];
+      this.appendDirectiveInputs(dir, node, dirMap, directives, i);
     }
     this.directiveOpMap.set(node, dirMap);
     if (node instanceof TmplAstElement8) {
@@ -16651,8 +16682,9 @@ var Scope = class _Scope {
     const claimedInputs = /* @__PURE__ */ new Set();
     if (directives !== null && directives.length > 0) {
       const dirMap = /* @__PURE__ */ new Map();
-      for (const dir of directives) {
-        this.appendDirectiveInputs(dir, node, dirMap, directives);
+      for (let i = 0; i < directives.length; i++) {
+        const dir = directives[i];
+        this.appendDirectiveInputs(dir, node, dirMap, directives, i);
         for (const propertyName of dir.inputs.propertyNames) {
           claimedInputs.add(propertyName);
         }
@@ -16696,10 +16728,10 @@ var Scope = class _Scope {
       this.opQueue.push(new TcbUnclaimedOutputsOp(this.tcb, this, node, node.outputs, node.inputs, claimedOutputs));
     }
   }
-  appendDirectiveInputs(dir, node, dirMap, allDirectiveMatches) {
+  appendDirectiveInputs(dir, node, dirMap, allDirectiveMatches, directiveIndex) {
     const nodeIsFormControl = isFormControl(allDirectiveMatches);
     const customFormControlType = nodeIsFormControl ? getCustomFieldDirectiveType(dir) : null;
-    const directiveOp = this.getDirectiveOp(dir, node, customFormControlType);
+    const directiveOp = this.getDirectiveOp(dir, node, customFormControlType, directiveIndex);
     const dirIndex = this.opQueue.push(directiveOp) - 1;
     dirMap.set(dir, dirIndex);
     if (isNativeField(dir, node, allDirectiveMatches)) {
@@ -16708,13 +16740,13 @@ var Scope = class _Scope {
     }
     this.opQueue.push(new TcbDirectiveInputsOp(this.tcb, this, node, dir, nodeIsFormControl, customFormControlType));
   }
-  getDirectiveOp(dir, node, customFieldType) {
+  getDirectiveOp(dir, node, customFieldType, directiveIndex) {
     if (!dir.isGeneric) {
-      return new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, dir);
+      return new TcbNonGenericDirectiveTypeOp(this.tcb, this, node, dir, directiveIndex);
     } else if (!dir.requiresInlineTypeCtor || this.tcb.env.config.useInlineTypeConstructors) {
-      return new TcbDirectiveCtorOp(this.tcb, this, node, dir, customFieldType);
+      return new TcbDirectiveCtorOp(this.tcb, this, node, dir, customFieldType, directiveIndex);
     }
-    return new TcbGenericDirectiveTypeWithAnyParamsOp(this.tcb, this, node, dir);
+    return new TcbGenericDirectiveTypeWithAnyParamsOp(this.tcb, this, node, dir, directiveIndex);
   }
   appendSelectorlessDirectives(node) {
     for (const directive of node.directives) {
@@ -17551,27 +17583,32 @@ var SymbolBuilder = class {
   }
   getDirectivesOfNode(templateNode) {
     const elementSourceSpan = templateNode.startSourceSpan ?? templateNode.sourceSpan;
-    const nodes = findAllMatchingNodes(this.typeCheckBlock, {
-      withSpan: elementSourceSpan,
-      filter: isDirectiveDeclaration
-    });
-    const symbols = [];
-    const seenDirectives = /* @__PURE__ */ new Set();
-    let boundDirectives = this.typeCheckData.boundTarget.getDirectivesOfNode(templateNode) ?? [];
+    const boundDirectives = this.typeCheckData.boundTarget.getDirectivesOfNode(templateNode) ?? [];
+    let symbols = this.getDirectiveSymbolsForDirectives(boundDirectives, elementSourceSpan);
     if (!(templateNode instanceof TmplAstDirective3)) {
-      const firstChild = templateNode.children?.[0];
-      if (firstChild instanceof TmplAstElement9) {
+      const firstChild = templateNode.children.find((c) => c instanceof TmplAstElement9);
+      if (firstChild !== void 0) {
         const isMicrosyntaxTemplate = templateNode instanceof TmplAstTemplate6 && sourceSpanEqual(firstChild.sourceSpan, templateNode.sourceSpan);
         if (isMicrosyntaxTemplate) {
           const firstChildDirectives = this.typeCheckData.boundTarget.getDirectivesOfNode(firstChild);
-          if (firstChildDirectives !== null && boundDirectives.length > 0) {
-            boundDirectives = boundDirectives.concat(firstChildDirectives);
-          } else if (firstChildDirectives !== null) {
-            boundDirectives = firstChildDirectives;
+          if (firstChildDirectives !== null) {
+            const childSymbols = this.getDirectiveSymbolsForDirectives(firstChildDirectives, elementSourceSpan);
+            for (const symbol of childSymbols) {
+              if (!symbols.some((s) => s.ref.node === symbol.ref.node)) {
+                symbols.push(symbol);
+              }
+            }
           }
         }
       }
     }
+    return symbols;
+  }
+  getDirectiveSymbolsForDirectives(boundDirectives, span) {
+    const nodes = findAllMatchingNodes(this.typeCheckBlock, {
+      withSpan: span,
+      filter: isDirectiveDeclaration
+    });
     const hostDirectiveMap = /* @__PURE__ */ new Map();
     for (const d of boundDirectives) {
       if (d.hostDirectives) {
@@ -17582,24 +17619,14 @@ var SymbolBuilder = class {
         }
       }
     }
-    for (let i = 0; i < nodes.length; i++) {
-      const node = nodes[i];
-      let nodeName = null;
-      let typeNode = ts64.isTypeNode(node) ? node : ts64.isIdentifier(node) && node.parent && ts64.isVariableDeclaration(node.parent) ? node.parent.type : null;
-      if (typeNode && ts64.isTypeReferenceNode(typeNode)) {
-        const typeName = typeNode.typeName;
-        nodeName = ts64.isIdentifier(typeName) ? typeName.text : typeName.right.text;
-      } else if (typeNode && ts64.isIntersectionTypeNode(typeNode)) {
-        const first = typeNode.types[0];
-        if (ts64.isTypeReferenceNode(first)) {
-          const typeName = first.typeName;
-          nodeName = ts64.isIdentifier(typeName) ? typeName.text : typeName.right.text;
-        }
-      }
-      let meta = boundDirectives[i];
-      if (nodeName) {
-        meta = boundDirectives.find((m) => m.ref.node.name && m.ref.node.name.text === nodeName) ?? meta;
-      }
+    const symbols = [];
+    const seenDirectives = /* @__PURE__ */ new Set();
+    const sf = this.typeCheckBlock.getSourceFile();
+    for (const node of nodes) {
+      const id = readDirectiveIdFromComment(sf, node);
+      if (id === null)
+        continue;
+      const meta = boundDirectives[id];
       if (!meta)
         continue;
       const declaration = meta.ref.node;
@@ -17635,51 +17662,7 @@ var SymbolBuilder = class {
         seenDirectives.add(declaration);
       }
     }
-    symbols.sort((a, b) => {
-      if (a.matchSource === MatchSource5.HostDirective && b.matchSource === MatchSource5.Selector) {
-        return -1;
-      }
-      if (a.matchSource === MatchSource5.Selector && b.matchSource === MatchSource5.HostDirective) {
-        return 1;
-      }
-      return 0;
-    });
     return symbols;
-  }
-  getDirectiveMeta(host, directiveDeclaration) {
-    let directives = this.typeCheckData.boundTarget.getDirectivesOfNode(host);
-    if (!(host instanceof TmplAstDirective3)) {
-      const firstChild = host.children[0];
-      if (firstChild instanceof TmplAstElement9) {
-        const isMicrosyntaxTemplate = host instanceof TmplAstTemplate6 && sourceSpanEqual(firstChild.sourceSpan, host.sourceSpan);
-        if (isMicrosyntaxTemplate) {
-          const firstChildDirectives = this.typeCheckData.boundTarget.getDirectivesOfNode(firstChild);
-          if (firstChildDirectives !== null && directives !== null) {
-            directives = directives.concat(firstChildDirectives);
-          } else {
-            directives = directives ?? firstChildDirectives;
-          }
-        }
-      }
-    }
-    if (directives === null) {
-      return null;
-    }
-    const directive = directives.find((m) => isSameDirectiveDeclaration(m.ref.node, directiveDeclaration));
-    if (directive) {
-      return directive;
-    }
-    const originalFile = directiveDeclaration.getSourceFile()[NgOriginalFile];
-    if (originalFile !== void 0) {
-      const hasPotentialCandidate = directives.find((m) => m.ref.node.name.text === directiveDeclaration.name?.text);
-      if (hasPotentialCandidate) {
-        const classWithSameName = findMatchingDirective(originalFile, directiveDeclaration);
-        if (classWithSameName !== null) {
-          return directives.find((m) => isSameDirectiveDeclaration(m.ref.node, classWithSameName)) ?? null;
-        }
-      }
-    }
-    return null;
   }
   getDirectiveModule(declaration) {
     const scope = this.componentScopeReader.getScopeForComponent(declaration);
@@ -18039,31 +18022,6 @@ function unwrapSignalInputWriteTAccessor(expr) {
     fieldExpr: expr.expression,
     typeExpr: expr
   };
-}
-function isSameDirectiveDeclaration(a, b) {
-  if (a === b) {
-    return true;
-  }
-  const aName = a.name?.text;
-  const bName = b.name?.text;
-  return aName !== void 0 && bName !== void 0 && aName === bName && a.getSourceFile().fileName === b.getSourceFile().fileName;
-}
-function findMatchingDirective(originalSourceFile, directiveDeclarationInTypeCheckSourceFile) {
-  const className = directiveDeclarationInTypeCheckSourceFile.name?.text ?? "";
-  const ogClasses = collectClassesWithName(originalSourceFile, className);
-  const typecheckClasses = collectClassesWithName(directiveDeclarationInTypeCheckSourceFile.getSourceFile(), className);
-  return ogClasses[typecheckClasses.indexOf(directiveDeclarationInTypeCheckSourceFile)] ?? null;
-}
-function collectClassesWithName(sourceFile, className) {
-  const classes = [];
-  function visit2(node) {
-    if (ts64.isClassDeclaration(node) && node.name?.text === className) {
-      classes.push(node);
-    }
-    ts64.forEachChild(node, visit2);
-  }
-  sourceFile.forEachChild(visit2);
-  return classes;
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/checker.js
@@ -23075,4 +23033,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-MY64YQH6.js.map
+//# sourceMappingURL=chunk-7LAZ4EIG.js.map
