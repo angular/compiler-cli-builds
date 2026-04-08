@@ -15,6 +15,7 @@ import {
   JitDeclarationRegistry,
   MODEL_INITIALIZER_FN,
   NgModuleDecoratorHandler,
+  NgOriginalFile,
   NoopReferencesRegistry,
   OUTPUT_INITIALIZER_FNS,
   PartialEvaluator,
@@ -24,16 +25,20 @@ import {
   PipeDecoratorHandler,
   QUERY_INITIALIZER_FNS,
   SemanticDepGraphUpdater,
+  ShimAdapter,
+  ShimReferenceTagger,
   TemplateTypeCheckerImpl,
   TraitCompiler,
   TypeCheckShimGenerator,
   aliasTransformFactory,
   angularJitApplicationTransform,
   declarationTransformFactory,
+  isShim,
   ivyTransformFactory,
   signalMetadataTransform,
-  tryParseInitializerApi
-} from "./chunk-BSFGZJQ2.js";
+  tryParseInitializerApi,
+  untagAllTsFiles
+} from "./chunk-Y2AA7R5W.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -59,7 +64,6 @@ import {
   MetaKind,
   MetadataDtsModuleScopeResolver,
   ModuleResolver,
-  NgOriginalFile,
   NoopImportRewriter,
   OptimizeFor,
   PrivateExportAliasingHost,
@@ -69,8 +73,6 @@ import {
   RelativePathStrategy,
   ResourceRegistry,
   SelectorlessComponentScopeReader,
-  ShimAdapter,
-  ShimReferenceTagger,
   SymbolKind,
   TypeCheckScopeRegistry,
   TypeScriptReflectionHost,
@@ -82,14 +84,12 @@ import {
   isFatalDiagnosticError,
   isNamedClassDeclaration,
   isNonDeclarationTsPath,
-  isShim,
   makeDiagnostic,
   ngErrorCode,
   normalizeSeparators,
   relativePathBetween,
-  toUnredirectedSourceFile,
-  untagAllTsFiles
-} from "./chunk-NTSNACT3.js";
+  toUnredirectedSourceFile
+} from "./chunk-KYLDJNBW.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5421,4 +5421,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-6WFWEPDB.js.map
+//# sourceMappingURL=chunk-GA7SQ6QK.js.map

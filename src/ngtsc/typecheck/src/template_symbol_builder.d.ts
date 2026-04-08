@@ -36,7 +36,7 @@ export declare class SymbolBuilder {
     private getSymbolOfSelectorlessComponent;
     private getSymbolOfSelectorlessDirective;
     private getDirectivesOfNode;
-    private getDirectiveMeta;
+    private getDirectiveSymbolsForDirectives;
     private getDirectiveModule;
     private getSymbolOfBoundEvent;
     private getSymbolOfInputBinding;

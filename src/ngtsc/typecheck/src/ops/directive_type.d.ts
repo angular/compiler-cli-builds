@@ -20,7 +20,8 @@ export declare abstract class TcbDirectiveTypeOpBase extends TcbOp {
     protected scope: Scope;
     protected node: DirectiveOwner;
     protected dir: TcbDirectiveMetadata;
-    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TcbDirectiveMetadata);
+    protected directiveIndex?: number | undefined;
+    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TcbDirectiveMetadata, directiveIndex?: number | undefined);
     get optional(): boolean;
     execute(): TcbExpr;
 }

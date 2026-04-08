@@ -5,7 +5,7 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-6WFWEPDB.js";
+} from "../chunk-GA7SQ6QK.js";
 import {
   CompilationMode,
   DynamicValue,
@@ -16,10 +16,11 @@ import {
   extractTemplate,
   findAngularDecorator,
   getAngularDecorators,
+  isShim,
   parseDecoratorInputTransformFunction,
   queryDecoratorNames,
   unwrapExpression
-} from "../chunk-BSFGZJQ2.js";
+} from "../chunk-Y2AA7R5W.js";
 import {
   DtsMetadataReader,
   FatalDiagnosticError,
@@ -32,9 +33,8 @@ import {
   SymbolKind,
   TypeScriptReflectionHost,
   getRootDirs,
-  isShim,
   reflectObjectLiteral
-} from "../chunk-NTSNACT3.js";
+} from "../chunk-KYLDJNBW.js";
 import "../chunk-L35AQF75.js";
 import {
   getFileSystem,

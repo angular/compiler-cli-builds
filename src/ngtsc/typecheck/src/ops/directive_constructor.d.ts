@@ -30,7 +30,8 @@ export declare class TcbDirectiveCtorOp extends TcbOp {
     private node;
     private dir;
     private customFormControlType;
-    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TcbDirectiveMetadata, customFormControlType: CustomFormControlType | null);
+    private directiveIndex?;
+    constructor(tcb: Context, scope: Scope, node: DirectiveOwner, dir: TcbDirectiveMetadata, customFormControlType: CustomFormControlType | null, directiveIndex?: number | undefined);
     get optional(): boolean;
     execute(): TcbExpr;
     circularFallback(): TcbOp;
