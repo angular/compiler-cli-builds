@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { BoundTarget, ParseError, R3TargetBinder, SchemaMetadata, TmplAstHostElement, TmplAstNode } from '@angular/compiler';
+import { BoundTarget, DirectiveMeta, ParseError, R3TargetBinder, SchemaMetadata, TmplAstHostElement, TmplAstNode } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
@@ -39,7 +39,7 @@ export interface ShimTypeCheckingData {
 /**
  * Data tracked for each class processed by the type-checking system.
  */
-export interface TypeCheckData {
+export interface TypeCheckData<D extends DirectiveMeta = TypeCheckableDirectiveMeta> {
     /**
      * Template nodes for which the TCB was generated.
      */
@@ -48,7 +48,7 @@ export interface TypeCheckData {
      * `BoundTarget` which was used to generate the TCB, and contains bindings for the associated
      * template nodes.
      */
-    boundTarget: BoundTarget<TypeCheckableDirectiveMeta>;
+    boundTarget: BoundTarget<D>;
     /**
      * Errors found while parsing the template, which have been converted to diagnostics.
      */

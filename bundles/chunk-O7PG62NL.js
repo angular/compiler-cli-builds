@@ -6,6 +6,8 @@ import {
   ActivePerfRecorder,
   CompilationMode,
   ComponentDecoratorHandler,
+  ComponentScopeKind,
+  CompoundComponentScopeReader,
   DelegatingPerfRecorder,
   DirectiveDecoratorHandler,
   DtsTransformRegistry,
@@ -13,7 +15,9 @@ import {
   InjectableClassRegistry,
   InjectableDecoratorHandler,
   JitDeclarationRegistry,
+  LocalModuleScopeRegistry,
   MODEL_INITIALIZER_FN,
+  MetadataDtsModuleScopeResolver,
   NgModuleDecoratorHandler,
   NgOriginalFile,
   NoopReferencesRegistry,
@@ -24,11 +28,13 @@ import {
   PerfPhase,
   PipeDecoratorHandler,
   QUERY_INITIALIZER_FNS,
+  SelectorlessComponentScopeReader,
   SemanticDepGraphUpdater,
   ShimAdapter,
   ShimReferenceTagger,
   TemplateTypeCheckerImpl,
   TraitCompiler,
+  TypeCheckScopeRegistry,
   TypeCheckShimGenerator,
   aliasTransformFactory,
   angularJitApplicationTransform,
@@ -38,13 +44,11 @@ import {
   signalMetadataTransform,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-Y2AA7R5W.js";
+} from "./chunk-VTGD7THF.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
   COMPILER_ERRORS_WITH_GUIDES,
-  ComponentScopeKind,
-  CompoundComponentScopeReader,
   CompoundMetadataReader,
   CompoundMetadataRegistry,
   DefaultImportTracker,
@@ -59,10 +63,8 @@ import {
   LocalCompilationExtraImportsTracker,
   LocalIdentifierStrategy,
   LocalMetadataRegistry,
-  LocalModuleScopeRegistry,
   LogicalProjectStrategy,
   MetaKind,
-  MetadataDtsModuleScopeResolver,
   ModuleResolver,
   NoopImportRewriter,
   OptimizeFor,
@@ -72,9 +74,7 @@ import {
   ReferenceEmitter,
   RelativePathStrategy,
   ResourceRegistry,
-  SelectorlessComponentScopeReader,
   SymbolKind,
-  TypeCheckScopeRegistry,
   TypeScriptReflectionHost,
   UnifiedModulesAliasingHost,
   UnifiedModulesStrategy,
@@ -89,7 +89,7 @@ import {
   normalizeSeparators,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-KYLDJNBW.js";
+} from "./chunk-JQWJHJMN.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5421,4 +5421,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-GA7SQ6QK.js.map
+//# sourceMappingURL=chunk-O7PG62NL.js.map
