@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { AST } from '@angular/compiler';
-import { TcbExpr } from './ops/codegen';
 import { TypeCheckingConfig } from '../api';
+import { TcbExpr } from './ops/codegen';
 /**
  * Convert an `AST` to a `TcbExpr` directly, without going through an intermediate `Expression`
  * AST.

@@ -44,7 +44,7 @@ import {
   signalMetadataTransform,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-VTGD7THF.js";
+} from "./chunk-QVERCVXH.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -89,7 +89,7 @@ import {
   normalizeSeparators,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-JQWJHJMN.js";
+} from "./chunk-WEYFV6TY.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5421,4 +5421,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-O7PG62NL.js.map
+//# sourceMappingURL=chunk-ZX4XNJ3M.js.map

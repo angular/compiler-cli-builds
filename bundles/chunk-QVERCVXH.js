@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-JQWJHJMN.js";
+} from "./chunk-WEYFV6TY.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -7344,18 +7344,21 @@ var CompletionEngine = class {
         withSpan: expr.nameSpan
       });
     } else if (expr instanceof SafePropertyRead) {
-      const ternaryExpr = findFirstMatchingNode(this.tcb, {
+      tsExpr = findFirstMatchingNode(this.tcb, {
+        filter: ts26.isPropertyAccessExpression,
+        withSpan: expr.nameSpan
+      });
+      const ternaryExpr = tsExpr === null ? findFirstMatchingNode(this.tcb, {
         filter: ts26.isParenthesizedExpression,
         withSpan: expr.sourceSpan
-      });
-      if (ternaryExpr === null || !ts26.isConditionalExpression(ternaryExpr.expression)) {
-        return null;
-      }
-      const whenTrue = ternaryExpr.expression.whenTrue;
-      if (ts26.isPropertyAccessExpression(whenTrue)) {
-        tsExpr = whenTrue;
-      } else if (ts26.isCallExpression(whenTrue) && ts26.isPropertyAccessExpression(whenTrue.expression)) {
-        tsExpr = whenTrue.expression;
+      }) : null;
+      if (ternaryExpr !== null && ts26.isConditionalExpression(ternaryExpr.expression)) {
+        const whenTrue = ternaryExpr.expression.whenTrue;
+        if (ts26.isPropertyAccessExpression(whenTrue)) {
+          tsExpr = whenTrue;
+        } else if (ts26.isCallExpression(whenTrue) && ts26.isPropertyAccessExpression(whenTrue.expression)) {
+          tsExpr = whenTrue.expression;
+        }
       }
     }
     if (tsExpr === null) {
@@ -14627,4 +14630,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VTGD7THF.js.map
+//# sourceMappingURL=chunk-QVERCVXH.js.map

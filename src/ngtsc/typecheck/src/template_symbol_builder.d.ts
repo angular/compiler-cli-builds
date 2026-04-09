@@ -10,7 +10,7 @@ import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { HostDirectiveMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
-import { ElementSymbol, LetDeclarationSymbol, ReferenceSymbol, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, SymbolReference, Symbol, TemplateSymbol, TypeCheckingConfig, VariableSymbol } from '../api';
+import { ElementSymbol, LetDeclarationSymbol, ReferenceSymbol, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, SymbolReference, TemplateSymbol, TypeCheckingConfig, VariableSymbol } from '../api';
 export interface SymbolDirectiveMeta {
     getSymbolReference(): SymbolReference;
     getNgModule(): ClassDeclaration | null;

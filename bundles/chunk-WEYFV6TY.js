@@ -231,7 +231,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.7+sha-b9265cc";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.7+sha-47fcbc4";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5416,7 +5416,7 @@ var TcbExprTranslator = class {
     const receiver = this.translate(ast.receiver).wrapForTypeChecker();
     const name = new TcbExpr(ast.name).addParseSpanInfo(ast.nameSpan);
     if (this.config.strictSafeNavigationTypes) {
-      node = new TcbExpr(`(0 as any ? ${receiver.print()}!.${name.print()} : undefined)`);
+      node = new TcbExpr(`${receiver.print()}?.${name.print()}`);
     } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
       node = new TcbExpr(`(${receiver.print()} as any).${name.print()}`);
     } else {
@@ -5429,8 +5429,7 @@ var TcbExprTranslator = class {
     const key = this.translate(ast.key);
     let node;
     if (this.config.strictSafeNavigationTypes) {
-      const elementAccess = new TcbExpr(`${receiver.print()}![${key.print()}]`).addParseSpanInfo(ast.sourceSpan);
-      node = new TcbExpr(`(0 as any ? ${elementAccess.print()} : undefined)`);
+      node = new TcbExpr(`${receiver.print()}?.[${key.print()}]`);
     } else if (VeSafeLhsInferenceBugDetector.veWillInferAnyFor(ast)) {
       node = new TcbExpr(`(${receiver.print()} as any)[${key.print()}]`);
     } else {
@@ -8540,7 +8539,7 @@ var SymbolBuilder = class {
       withSpan = expression.nameSpan;
     }
     let node = null;
-    if (expression instanceof PropertyRead7) {
+    if (expression instanceof PropertyRead7 || expression instanceof SafePropertyRead3) {
       node = findFirstMatchingNode(this.typeCheckBlock, {
         withSpan,
         filter: ts32.isPropertyAccessExpression
@@ -8548,6 +8547,18 @@ var SymbolBuilder = class {
     }
     if (node === null) {
       node = findFirstMatchingNode(this.typeCheckBlock, { withSpan, filter: anyNodeFilter });
+    }
+    if (node === null && expression instanceof SafePropertyRead3) {
+      const nameNode = findFirstMatchingNode(this.typeCheckBlock, {
+        withSpan: expression.nameSpan,
+        filter: anyNodeFilter
+      });
+      if (nameNode !== null) {
+        node = nameNode;
+        while (node.parent !== void 0 && (ts32.isParenthesizedExpression(node.parent) || ts32.isNonNullExpression(node.parent) || isAccessExpression(node.parent))) {
+          node = node.parent;
+        }
+      }
     }
     if (node === null) {
       return null;
@@ -8760,4 +8771,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-JQWJHJMN.js.map
+//# sourceMappingURL=chunk-WEYFV6TY.js.map
