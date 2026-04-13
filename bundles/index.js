@@ -17,7 +17,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-3UQPLNX7.js";
+} from "./chunk-CW6PHHCV.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -31,25 +31,35 @@ import {
   NgCompiler,
   NgCompilerHost,
   PatchedProgramIncrementalBuildStrategy,
+  TrackedIncrementalBuildStrategy,
   freshCompilationTicket,
+  incrementalFromCompilerTicket,
   incrementalFromStateTicket,
-  isDocEntryWithSourceInfo
-} from "./chunk-4JHZD5JT.js";
+  isDocEntryWithSourceInfo,
+  resourceChangeTicket
+} from "./chunk-ADTD4XZP.js";
 import {
   ActivePerfRecorder,
   PerfPhase,
   TsCreateProgramDriver,
   angularJitApplicationTransform,
+  getAngularDecorators,
   getDownlevelDecoratorsTransform,
-  getInitializerApiJitTransform
-} from "./chunk-CK6VITSR.js";
+  getInitializerApiJitTransform,
+  isShim
+} from "./chunk-LKLHMJTU.js";
 import {
+  CompletionKind,
   Environment,
   ErrorCode,
   ExpressionIdentifier,
   ImportManager,
+  MetaKind,
   OptimizeFor,
   OutOfBandDiagnosticCategory,
+  PotentialImportKind,
+  PotentialImportMode,
+  Reference,
   RegistryDomSchemaChecker,
   SymbolBuilder,
   SymbolKind,
@@ -57,10 +67,14 @@ import {
   createHostElement,
   findFirstMatchingNode,
   generateTypeCheckBlock,
+  getRootDirs,
   hasExpressionIdentifier,
+  isExternalResource,
+  isFatalDiagnosticError,
   isLocalCompilationDiagnostics,
+  isNamedClassDeclaration,
   ngErrorCode
-} from "./chunk-GP2TFSGO.js";
+} from "./chunk-VT6HWQB3.js";
 import "./chunk-L35AQF75.js";
 import {
   InvalidFileSystem,
@@ -91,7 +105,7 @@ import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.0.0-next.7+sha-c3d4be4");
+var VERSION = new Version("22.0.0-next.7+sha-59513b7");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
@@ -193,6 +207,7 @@ var NgTscPlugin = class {
 // packages/compiler-cli/index.ts
 setFileSystem(new NodeJSFileSystem());
 export {
+  CompletionKind,
   ConsoleLogger,
   DEFAULT_ERROR_CODE,
   DecoratorType,
@@ -211,17 +226,24 @@ export {
   LogicalProjectPath,
   MemberTags,
   MemberType,
+  MetaKind,
+  NgCompiler,
   NgTscPlugin,
   NgtscCompilerHost,
   NgtscProgram,
   NodeJSFileSystem,
   OptimizeFor,
   OutOfBandDiagnosticCategory,
+  PerfPhase,
+  PotentialImportKind,
+  PotentialImportMode,
+  Reference,
   RegistryDomSchemaChecker,
   SOURCE,
   SymbolBuilder,
   SymbolKind,
   TcbGenericContextBehavior,
+  TrackedIncrementalBuildStrategy,
   UNKNOWN_ERROR_CODE,
   VERSION,
   absoluteFrom,
@@ -239,17 +261,25 @@ export {
   exitCodeFromResult,
   findFirstMatchingNode,
   formatDiagnostics,
+  freshCompilationTicket,
   generateTypeCheckBlock,
+  getAngularDecorators,
   getDownlevelDecoratorsTransform,
   getFileSystem,
   getInitializerApiJitTransform,
+  getRootDirs,
   getSourceFileOrError,
   hasExpressionIdentifier,
+  incrementalFromCompilerTicket,
   isDocEntryWithSourceInfo,
+  isExternalResource,
+  isFatalDiagnosticError,
   isLocalCompilationDiagnostics,
   isLocalRelativePath,
+  isNamedClassDeclaration,
   isRoot,
   isRooted,
+  isShim,
   isTsDiagnostic,
   join,
   ngErrorCode,
@@ -258,6 +288,7 @@ export {
   relative,
   relativeFrom,
   resolve,
+  resourceChangeTicket,
   setFileSystem,
   toRelativeImport
 };

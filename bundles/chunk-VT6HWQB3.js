@@ -231,7 +231,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.7+sha-c3d4be4";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.7+sha-59513b7";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -640,8 +640,8 @@ var UnifiedModulesStrategy = class {
   }
 };
 
-// packages/compiler-cli/src/ngtsc/reflection/src/typescript.js
-import ts7 from "typescript";
+// packages/compiler-cli/src/ngtsc/reflection/src/util.js
+import ts5 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/reflection/src/host.js
 import ts4 from "typescript";
@@ -666,13 +666,39 @@ var ClassMemberAccessLevel;
 })(ClassMemberAccessLevel || (ClassMemberAccessLevel = {}));
 var AmbientImport = {};
 
+// packages/compiler-cli/src/ngtsc/reflection/src/util.js
+function isNamedClassDeclaration(node) {
+  return ts5.isClassDeclaration(node) && isIdentifier(node.name);
+}
+function isIdentifier(node) {
+  return node !== void 0 && ts5.isIdentifier(node);
+}
+function classMemberAccessLevelToString(level) {
+  switch (level) {
+    case ClassMemberAccessLevel.EcmaScriptPrivate:
+      return "ES private";
+    case ClassMemberAccessLevel.Private:
+      return "private";
+    case ClassMemberAccessLevel.Protected:
+      return "protected";
+    case ClassMemberAccessLevel.PublicReadonly:
+      return "public readonly";
+    case ClassMemberAccessLevel.PublicWritable:
+    default:
+      return "public";
+  }
+}
+
+// packages/compiler-cli/src/ngtsc/reflection/src/typescript.js
+import ts7 from "typescript";
+
 // packages/compiler-cli/src/ngtsc/reflection/src/type_to_value.js
-import ts5 from "typescript";
+import ts6 from "typescript";
 function typeToValue(typeNode, checker, isLocalCompilation) {
   if (typeNode === null) {
     return missingType();
   }
-  if (!ts5.isTypeReferenceNode(typeNode)) {
+  if (!ts6.isTypeReferenceNode(typeNode)) {
     return unsupportedType(typeNode);
   }
   const symbols = resolveTypeSymbols(typeNode, checker);
@@ -680,26 +706,26 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
     return unknownReference(typeNode);
   }
   const { local, decl } = symbols;
-  if (decl.valueDeclaration === void 0 || decl.flags & ts5.SymbolFlags.ConstEnum) {
+  if (decl.valueDeclaration === void 0 || decl.flags & ts6.SymbolFlags.ConstEnum) {
     let typeOnlyDecl = null;
     if (decl.declarations !== void 0 && decl.declarations.length > 0) {
       typeOnlyDecl = decl.declarations[0];
     }
     if (!isLocalCompilation || typeOnlyDecl && [
-      ts5.SyntaxKind.TypeParameter,
-      ts5.SyntaxKind.TypeAliasDeclaration,
-      ts5.SyntaxKind.InterfaceDeclaration
+      ts6.SyntaxKind.TypeParameter,
+      ts6.SyntaxKind.TypeAliasDeclaration,
+      ts6.SyntaxKind.InterfaceDeclaration
     ].includes(typeOnlyDecl.kind)) {
       return noValueDeclaration(typeNode, typeOnlyDecl);
     }
   }
   const firstDecl = local.declarations && local.declarations[0];
   if (firstDecl !== void 0) {
-    if (ts5.isImportClause(firstDecl) && firstDecl.name !== void 0) {
-      if (firstDecl.phaseModifier === ts5.SyntaxKind.TypeKeyword) {
+    if (ts6.isImportClause(firstDecl) && firstDecl.name !== void 0) {
+      if (firstDecl.phaseModifier === ts6.SyntaxKind.TypeKeyword) {
         return typeOnlyImport(typeNode, firstDecl);
       }
-      if (!ts5.isImportDeclaration(firstDecl.parent)) {
+      if (!ts6.isImportDeclaration(firstDecl.parent)) {
         return unsupportedType(typeNode);
       }
       return {
@@ -707,17 +733,17 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
         expression: firstDecl.name,
         defaultImportStatement: firstDecl.parent
       };
-    } else if (ts5.isImportSpecifier(firstDecl)) {
+    } else if (ts6.isImportSpecifier(firstDecl)) {
       if (firstDecl.isTypeOnly) {
         return typeOnlyImport(typeNode, firstDecl);
       }
-      if (firstDecl.parent.parent.phaseModifier === ts5.SyntaxKind.TypeKeyword) {
+      if (firstDecl.parent.parent.phaseModifier === ts6.SyntaxKind.TypeKeyword) {
         return typeOnlyImport(typeNode, firstDecl.parent.parent);
       }
       const importedName = (firstDecl.propertyName || firstDecl.name).text;
       const [_localName, ...nestedPath] = symbols.symbolNames;
       const importDeclaration = firstDecl.parent.parent.parent;
-      if (!ts5.isImportDeclaration(importDeclaration)) {
+      if (!ts6.isImportDeclaration(importDeclaration)) {
         return unsupportedType(typeNode);
       }
       const moduleName = extractModuleName(importDeclaration);
@@ -728,8 +754,8 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
         importedName,
         nestedPath
       };
-    } else if (ts5.isNamespaceImport(firstDecl)) {
-      if (firstDecl.parent.phaseModifier === ts5.SyntaxKind.TypeKeyword) {
+    } else if (ts6.isNamespaceImport(firstDecl)) {
+      if (firstDecl.parent.phaseModifier === ts6.SyntaxKind.TypeKeyword) {
         return typeOnlyImport(typeNode, firstDecl.parent);
       }
       if (symbols.symbolNames.length === 1) {
@@ -737,7 +763,7 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
       }
       const [_ns, importedName, ...nestedPath] = symbols.symbolNames;
       const importDeclaration = firstDecl.parent.parent;
-      if (!ts5.isImportDeclaration(importDeclaration)) {
+      if (!ts6.isImportDeclaration(importDeclaration)) {
         return unsupportedType(typeNode);
       }
       const moduleName = extractModuleName(importDeclaration);
@@ -801,7 +827,7 @@ function missingType() {
   };
 }
 function typeNodeToValueExpr(node) {
-  if (ts5.isTypeReferenceNode(node)) {
+  if (ts6.isTypeReferenceNode(node)) {
     return entityNameToValue(node.typeName);
   } else {
     return null;
@@ -816,7 +842,7 @@ function resolveTypeSymbols(typeRef, checker) {
   let local = typeRefSymbol;
   let leftMost = typeName;
   const symbolNames = [];
-  while (ts5.isQualifiedName(leftMost)) {
+  while (ts6.isQualifiedName(leftMost)) {
     symbolNames.unshift(leftMost.right.text);
     leftMost = leftMost.left;
   }
@@ -828,17 +854,17 @@ function resolveTypeSymbols(typeRef, checker) {
     }
   }
   let decl = typeRefSymbol;
-  if (typeRefSymbol.flags & ts5.SymbolFlags.Alias) {
+  if (typeRefSymbol.flags & ts6.SymbolFlags.Alias) {
     decl = checker.getAliasedSymbol(typeRefSymbol);
   }
   return { local, decl, symbolNames };
 }
 function entityNameToValue(node) {
-  if (ts5.isQualifiedName(node)) {
+  if (ts6.isQualifiedName(node)) {
     const left = entityNameToValue(node.left);
-    return left !== null ? ts5.factory.createPropertyAccessExpression(left, node.right) : null;
-  } else if (ts5.isIdentifier(node)) {
-    const clone = ts5.setOriginalNode(ts5.factory.createIdentifier(node.text), node);
+    return left !== null ? ts6.factory.createPropertyAccessExpression(left, node.right) : null;
+  } else if (ts6.isIdentifier(node)) {
+    const clone = ts6.setOriginalNode(ts6.factory.createIdentifier(node.text), node);
     clone.parent = node.parent;
     return clone;
   } else {
@@ -846,34 +872,10 @@ function entityNameToValue(node) {
   }
 }
 function extractModuleName(node) {
-  if (!ts5.isStringLiteral(node.moduleSpecifier)) {
+  if (!ts6.isStringLiteral(node.moduleSpecifier)) {
     throw new Error("not a module specifier");
   }
   return node.moduleSpecifier.text;
-}
-
-// packages/compiler-cli/src/ngtsc/reflection/src/util.js
-import ts6 from "typescript";
-function isNamedClassDeclaration(node) {
-  return ts6.isClassDeclaration(node) && isIdentifier(node.name);
-}
-function isIdentifier(node) {
-  return node !== void 0 && ts6.isIdentifier(node);
-}
-function classMemberAccessLevelToString(level) {
-  switch (level) {
-    case ClassMemberAccessLevel.EcmaScriptPrivate:
-      return "ES private";
-    case ClassMemberAccessLevel.Private:
-      return "private";
-    case ClassMemberAccessLevel.Protected:
-      return "protected";
-    case ClassMemberAccessLevel.PublicReadonly:
-      return "public readonly";
-    case ClassMemberAccessLevel.PublicWritable:
-    default:
-      return "public";
-  }
 }
 
 // packages/compiler-cli/src/ngtsc/reflection/src/typescript.js
@@ -2160,10 +2162,6 @@ var ModuleResolver = class {
   }
 };
 
-// packages/compiler-cli/src/ngtsc/metadata/src/dts.js
-import { ClassPropertyMapping, MatchSource } from "@angular/compiler";
-import ts13 from "typescript";
-
 // packages/compiler-cli/src/ngtsc/metadata/src/api.js
 var MetaKind;
 (function(MetaKind2) {
@@ -2171,6 +2169,10 @@ var MetaKind;
   MetaKind2[MetaKind2["Pipe"] = 1] = "Pipe";
   MetaKind2[MetaKind2["NgModule"] = 2] = "NgModule";
 })(MetaKind || (MetaKind = {}));
+
+// packages/compiler-cli/src/ngtsc/metadata/src/dts.js
+import { ClassPropertyMapping, MatchSource } from "@angular/compiler";
+import ts13 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/metadata/src/util.js
 import ts12 from "typescript";
@@ -2632,6 +2634,81 @@ function readHostDirectivesType(checker, type, bestGuessOwningModule) {
   return result.length > 0 ? { result, isIncomplete } : null;
 }
 
+// packages/compiler-cli/src/ngtsc/metadata/src/resource_registry.js
+function isExternalResource(resource) {
+  return resource.path !== null;
+}
+var ResourceRegistry = class {
+  externalTemplateToComponentsMap = /* @__PURE__ */ new Map();
+  componentToTemplateMap = /* @__PURE__ */ new Map();
+  componentToStylesMap = /* @__PURE__ */ new Map();
+  externalStyleToComponentsMap = /* @__PURE__ */ new Map();
+  directiveToHostBindingsMap = /* @__PURE__ */ new Map();
+  getComponentsWithTemplate(template) {
+    if (!this.externalTemplateToComponentsMap.has(template)) {
+      return /* @__PURE__ */ new Set();
+    }
+    return this.externalTemplateToComponentsMap.get(template);
+  }
+  registerResources(resources, directive) {
+    if (resources.template !== null) {
+      this.registerTemplate(resources.template, directive);
+    }
+    if (resources.styles !== null) {
+      for (const style of resources.styles) {
+        this.registerStyle(style, directive);
+      }
+    }
+    if (resources.hostBindings !== null) {
+      this.directiveToHostBindingsMap.set(directive, resources.hostBindings);
+    }
+  }
+  registerTemplate(templateResource, component) {
+    const { path } = templateResource;
+    if (path !== null) {
+      if (!this.externalTemplateToComponentsMap.has(path)) {
+        this.externalTemplateToComponentsMap.set(path, /* @__PURE__ */ new Set());
+      }
+      this.externalTemplateToComponentsMap.get(path).add(component);
+    }
+    this.componentToTemplateMap.set(component, templateResource);
+  }
+  getTemplate(component) {
+    if (!this.componentToTemplateMap.has(component)) {
+      return null;
+    }
+    return this.componentToTemplateMap.get(component);
+  }
+  registerStyle(styleResource, component) {
+    const { path } = styleResource;
+    if (!this.componentToStylesMap.has(component)) {
+      this.componentToStylesMap.set(component, /* @__PURE__ */ new Set());
+    }
+    if (path !== null) {
+      if (!this.externalStyleToComponentsMap.has(path)) {
+        this.externalStyleToComponentsMap.set(path, /* @__PURE__ */ new Set());
+      }
+      this.externalStyleToComponentsMap.get(path).add(component);
+    }
+    this.componentToStylesMap.get(component).add(styleResource);
+  }
+  getStyles(component) {
+    if (!this.componentToStylesMap.has(component)) {
+      return /* @__PURE__ */ new Set();
+    }
+    return this.componentToStylesMap.get(component);
+  }
+  getComponentsWithStyle(styleUrl) {
+    if (!this.externalStyleToComponentsMap.has(styleUrl)) {
+      return /* @__PURE__ */ new Set();
+    }
+    return this.externalStyleToComponentsMap.get(styleUrl);
+  }
+  getHostBindings(directive) {
+    return this.directiveToHostBindingsMap.get(directive) ?? null;
+  }
+};
+
 // packages/compiler-cli/src/ngtsc/metadata/src/inheritance.js
 import { ClassPropertyMapping as ClassPropertyMapping2 } from "@angular/compiler";
 function flattenInheritedDirectiveMetadata(reader, dir) {
@@ -2755,78 +2832,6 @@ var CompoundMetadataRegistry = class {
     for (const registry of this.registries) {
       registry.registerPipeMetadata(meta);
     }
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/metadata/src/resource_registry.js
-var ResourceRegistry = class {
-  externalTemplateToComponentsMap = /* @__PURE__ */ new Map();
-  componentToTemplateMap = /* @__PURE__ */ new Map();
-  componentToStylesMap = /* @__PURE__ */ new Map();
-  externalStyleToComponentsMap = /* @__PURE__ */ new Map();
-  directiveToHostBindingsMap = /* @__PURE__ */ new Map();
-  getComponentsWithTemplate(template) {
-    if (!this.externalTemplateToComponentsMap.has(template)) {
-      return /* @__PURE__ */ new Set();
-    }
-    return this.externalTemplateToComponentsMap.get(template);
-  }
-  registerResources(resources, directive) {
-    if (resources.template !== null) {
-      this.registerTemplate(resources.template, directive);
-    }
-    if (resources.styles !== null) {
-      for (const style of resources.styles) {
-        this.registerStyle(style, directive);
-      }
-    }
-    if (resources.hostBindings !== null) {
-      this.directiveToHostBindingsMap.set(directive, resources.hostBindings);
-    }
-  }
-  registerTemplate(templateResource, component) {
-    const { path } = templateResource;
-    if (path !== null) {
-      if (!this.externalTemplateToComponentsMap.has(path)) {
-        this.externalTemplateToComponentsMap.set(path, /* @__PURE__ */ new Set());
-      }
-      this.externalTemplateToComponentsMap.get(path).add(component);
-    }
-    this.componentToTemplateMap.set(component, templateResource);
-  }
-  getTemplate(component) {
-    if (!this.componentToTemplateMap.has(component)) {
-      return null;
-    }
-    return this.componentToTemplateMap.get(component);
-  }
-  registerStyle(styleResource, component) {
-    const { path } = styleResource;
-    if (!this.componentToStylesMap.has(component)) {
-      this.componentToStylesMap.set(component, /* @__PURE__ */ new Set());
-    }
-    if (path !== null) {
-      if (!this.externalStyleToComponentsMap.has(path)) {
-        this.externalStyleToComponentsMap.set(path, /* @__PURE__ */ new Set());
-      }
-      this.externalStyleToComponentsMap.get(path).add(component);
-    }
-    this.componentToStylesMap.get(component).add(styleResource);
-  }
-  getStyles(component) {
-    if (!this.componentToStylesMap.has(component)) {
-      return /* @__PURE__ */ new Set();
-    }
-    return this.componentToStylesMap.get(component);
-  }
-  getComponentsWithStyle(styleUrl) {
-    if (!this.externalStyleToComponentsMap.has(styleUrl)) {
-      return /* @__PURE__ */ new Set();
-    }
-    return this.externalStyleToComponentsMap.get(styleUrl);
-  }
-  getHostBindings(directive) {
-    return this.directiveToHostBindingsMap.get(directive) ?? null;
   }
 };
 
@@ -4187,6 +4192,14 @@ var OptimizeFor;
   OptimizeFor2[OptimizeFor2["WholeProgram"] = 1] = "WholeProgram";
 })(OptimizeFor || (OptimizeFor = {}));
 
+// packages/compiler-cli/src/ngtsc/typecheck/api/completion.js
+var CompletionKind;
+(function(CompletionKind2) {
+  CompletionKind2[CompletionKind2["Reference"] = 0] = "Reference";
+  CompletionKind2[CompletionKind2["Variable"] = 1] = "Variable";
+  CompletionKind2[CompletionKind2["LetDeclaration"] = 2] = "LetDeclaration";
+})(CompletionKind || (CompletionKind = {}));
+
 // packages/compiler-cli/src/ngtsc/typecheck/api/scope.js
 var PotentialImportKind;
 (function(PotentialImportKind2) {
@@ -4224,14 +4237,6 @@ var OutOfBandDiagnosticCategory;
   OutOfBandDiagnosticCategory2[OutOfBandDiagnosticCategory2["Error"] = 0] = "Error";
   OutOfBandDiagnosticCategory2[OutOfBandDiagnosticCategory2["Warning"] = 1] = "Warning";
 })(OutOfBandDiagnosticCategory || (OutOfBandDiagnosticCategory = {}));
-
-// packages/compiler-cli/src/ngtsc/typecheck/api/completion.js
-var CompletionKind;
-(function(CompletionKind2) {
-  CompletionKind2[CompletionKind2["Reference"] = 0] = "Reference";
-  CompletionKind2[CompletionKind2["Variable"] = 1] = "Variable";
-  CompletionKind2[CompletionKind2["LetDeclaration"] = 2] = "LetDeclaration";
-})(CompletionKind || (CompletionKind = {}));
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/host_bindings.js
 import { BindingType, CssSelector, makeBindingParser, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstHostElement, AbsoluteSourceSpan as AbsoluteSourceSpan2, ParseSpan, PropertyRead, ParsedEventType, Call, ThisReceiver, KeyedRead, LiteralPrimitive, RecursiveAstVisitor, ASTWithName, SafeCall, ImplicitReceiver } from "@angular/compiler";
@@ -8716,6 +8721,7 @@ export {
   flattenInheritedDirectiveMetadata,
   LocalMetadataRegistry,
   CompoundMetadataRegistry,
+  isExternalResource,
   ResourceRegistry,
   ExportedProviderStatusResolver,
   HostDirectivesResolver,
@@ -8771,4 +8777,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-GP2TFSGO.js.map
+//# sourceMappingURL=chunk-VT6HWQB3.js.map

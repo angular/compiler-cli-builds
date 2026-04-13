@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-GP2TFSGO.js";
+} from "./chunk-VT6HWQB3.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -1666,38 +1666,6 @@ var HandlerPrecedence;
   HandlerPrecedence2[HandlerPrecedence2["WEAK"] = 2] = "WEAK";
 })(HandlerPrecedence || (HandlerPrecedence = {}));
 
-// packages/compiler-cli/src/ngtsc/transform/src/alias.js
-import ts5 from "typescript";
-function aliasTransformFactory(exportStatements) {
-  return () => {
-    return (file) => {
-      if (ts5.isBundle(file) || !exportStatements.has(file.fileName)) {
-        return file;
-      }
-      const statements = [...file.statements];
-      exportStatements.get(file.fileName).forEach(([moduleName, symbolName], aliasName) => {
-        const stmt = ts5.factory.createExportDeclaration(
-          /* modifiers */
-          void 0,
-          /* isTypeOnly */
-          false,
-          /* exportClause */
-          ts5.factory.createNamedExports([
-            ts5.factory.createExportSpecifier(false, symbolName, aliasName)
-          ]),
-          /* moduleSpecifier */
-          ts5.factory.createStringLiteral(moduleName)
-        );
-        statements.push(stmt);
-      });
-      return ts5.factory.updateSourceFile(file, statements);
-    };
-  };
-}
-
-// packages/compiler-cli/src/ngtsc/transform/src/compilation.js
-import ts6 from "typescript";
-
 // packages/compiler-cli/src/ngtsc/perf/src/api.js
 var PerfPhase;
 (function(PerfPhase2) {
@@ -1902,6 +1870,38 @@ var DelegatingPerfRecorder = class {
     this.target.reset();
   }
 };
+
+// packages/compiler-cli/src/ngtsc/transform/src/alias.js
+import ts5 from "typescript";
+function aliasTransformFactory(exportStatements) {
+  return () => {
+    return (file) => {
+      if (ts5.isBundle(file) || !exportStatements.has(file.fileName)) {
+        return file;
+      }
+      const statements = [...file.statements];
+      exportStatements.get(file.fileName).forEach(([moduleName, symbolName], aliasName) => {
+        const stmt = ts5.factory.createExportDeclaration(
+          /* modifiers */
+          void 0,
+          /* isTypeOnly */
+          false,
+          /* exportClause */
+          ts5.factory.createNamedExports([
+            ts5.factory.createExportSpecifier(false, symbolName, aliasName)
+          ]),
+          /* moduleSpecifier */
+          ts5.factory.createStringLiteral(moduleName)
+        );
+        statements.push(stmt);
+      });
+      return ts5.factory.updateSourceFile(file, statements);
+    };
+  };
+}
+
+// packages/compiler-cli/src/ngtsc/transform/src/compilation.js
+import ts6 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/transform/src/trait.js
 var TraitState;
@@ -5450,9 +5450,190 @@ var ShimReferenceTagger = class {
   }
 };
 
+// packages/compiler-cli/src/ngtsc/program_driver/src/api.js
+var NgOriginalFile = Symbol("NgOriginalFile");
+var UpdateMode;
+(function(UpdateMode2) {
+  UpdateMode2[UpdateMode2["Complete"] = 0] = "Complete";
+  UpdateMode2[UpdateMode2["Incremental"] = 1] = "Incremental";
+})(UpdateMode || (UpdateMode = {}));
+
+// packages/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver.js
+import ts20 from "typescript";
+var DelegatingCompilerHost = class {
+  delegate;
+  createHash;
+  directoryExists;
+  getCancellationToken;
+  getCanonicalFileName;
+  getCurrentDirectory;
+  getDefaultLibFileName;
+  getDefaultLibLocation;
+  getDirectories;
+  getEnvironmentVariable;
+  getNewLine;
+  getParsedCommandLine;
+  getSourceFileByPath;
+  readDirectory;
+  readFile;
+  realpath;
+  resolveModuleNames;
+  resolveTypeReferenceDirectives;
+  trace;
+  useCaseSensitiveFileNames;
+  getModuleResolutionCache;
+  hasInvalidatedResolutions;
+  resolveModuleNameLiterals;
+  resolveTypeReferenceDirectiveReferences;
+  // jsDocParsingMode is not a method like the other elements above
+  // TODO: ignore usage can be dropped once 5.2 support is dropped
+  get jsDocParsingMode() {
+    return this.delegate.jsDocParsingMode;
+  }
+  set jsDocParsingMode(mode) {
+    this.delegate.jsDocParsingMode = mode;
+  }
+  constructor(delegate) {
+    this.delegate = delegate;
+    this.createHash = this.delegateMethod("createHash");
+    this.directoryExists = this.delegateMethod("directoryExists");
+    this.getCancellationToken = this.delegateMethod("getCancellationToken");
+    this.getCanonicalFileName = this.delegateMethod("getCanonicalFileName");
+    this.getCurrentDirectory = this.delegateMethod("getCurrentDirectory");
+    this.getDefaultLibFileName = this.delegateMethod("getDefaultLibFileName");
+    this.getDefaultLibLocation = this.delegateMethod("getDefaultLibLocation");
+    this.getDirectories = this.delegateMethod("getDirectories");
+    this.getEnvironmentVariable = this.delegateMethod("getEnvironmentVariable");
+    this.getNewLine = this.delegateMethod("getNewLine");
+    this.getParsedCommandLine = this.delegateMethod("getParsedCommandLine");
+    this.getSourceFileByPath = this.delegateMethod("getSourceFileByPath");
+    this.readDirectory = this.delegateMethod("readDirectory");
+    this.readFile = this.delegateMethod("readFile");
+    this.realpath = this.delegateMethod("realpath");
+    this.resolveModuleNames = this.delegateMethod("resolveModuleNames");
+    this.resolveTypeReferenceDirectives = this.delegateMethod("resolveTypeReferenceDirectives");
+    this.trace = this.delegateMethod("trace");
+    this.useCaseSensitiveFileNames = this.delegateMethod("useCaseSensitiveFileNames");
+    this.getModuleResolutionCache = this.delegateMethod("getModuleResolutionCache");
+    this.hasInvalidatedResolutions = this.delegateMethod("hasInvalidatedResolutions");
+    this.resolveModuleNameLiterals = this.delegateMethod("resolveModuleNameLiterals");
+    this.resolveTypeReferenceDirectiveReferences = this.delegateMethod("resolveTypeReferenceDirectiveReferences");
+  }
+  delegateMethod(name) {
+    return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
+  }
+};
+var UpdatedProgramHost = class extends DelegatingCompilerHost {
+  originalProgram;
+  shimExtensionPrefixes;
+  /**
+   * Map of source file names to `ts.SourceFile` instances.
+   */
+  sfMap;
+  /**
+   * The `ShimReferenceTagger` responsible for tagging `ts.SourceFile`s loaded via this host.
+   *
+   * The `UpdatedProgramHost` is used in the creation of a new `ts.Program`. Even though this new
+   * program is based on a prior one, TypeScript will still start from the root files and enumerate
+   * all source files to include in the new program.  This means that just like during the original
+   * program's creation, these source files must be tagged with references to per-file shims in
+   * order for those shims to be loaded, and then cleaned up afterwards. Thus the
+   * `UpdatedProgramHost` has its own `ShimReferenceTagger` to perform this function.
+   */
+  shimTagger;
+  constructor(sfMap, originalProgram, delegate, shimExtensionPrefixes) {
+    super(delegate);
+    this.originalProgram = originalProgram;
+    this.shimExtensionPrefixes = shimExtensionPrefixes;
+    this.shimTagger = new ShimReferenceTagger(this.shimExtensionPrefixes);
+    this.sfMap = sfMap;
+  }
+  getSourceFile(fileName, languageVersionOrOptions, onError, shouldCreateNewSourceFile) {
+    let delegateSf = this.originalProgram.getSourceFile(fileName);
+    if (delegateSf === void 0) {
+      delegateSf = this.delegate.getSourceFile(fileName, languageVersionOrOptions, onError, shouldCreateNewSourceFile);
+    }
+    if (delegateSf === void 0) {
+      return void 0;
+    }
+    let sf;
+    if (this.sfMap.has(fileName)) {
+      sf = this.sfMap.get(fileName);
+      copyFileShimData(delegateSf, sf);
+    } else {
+      sf = delegateSf;
+    }
+    sf = toUnredirectedSourceFile(sf);
+    this.shimTagger.tag(sf);
+    return sf;
+  }
+  postProgramCreationCleanup() {
+    this.shimTagger.finalize();
+  }
+  writeFile() {
+    throw new Error(`TypeCheckProgramHost should never write files`);
+  }
+  fileExists(fileName) {
+    return this.sfMap.has(fileName) || this.delegate.fileExists(fileName);
+  }
+};
+var TsCreateProgramDriver = class {
+  originalProgram;
+  originalHost;
+  options;
+  shimExtensionPrefixes;
+  /**
+   * A map of source file paths to replacement `ts.SourceFile`s for those paths.
+   *
+   * Effectively, this tracks the delta between the user's program (represented by the
+   * `originalHost`) and the template type-checking program being managed.
+   */
+  sfMap = /* @__PURE__ */ new Map();
+  program;
+  constructor(originalProgram, originalHost, options, shimExtensionPrefixes) {
+    this.originalProgram = originalProgram;
+    this.originalHost = originalHost;
+    this.options = options;
+    this.shimExtensionPrefixes = shimExtensionPrefixes;
+    this.program = this.originalProgram;
+  }
+  supportsInlineOperations = true;
+  getProgram() {
+    return this.program;
+  }
+  updateFiles(contents, updateMode) {
+    if (contents.size === 0) {
+      if (updateMode !== UpdateMode.Complete || this.sfMap.size === 0) {
+        return;
+      }
+    }
+    if (updateMode === UpdateMode.Complete) {
+      this.sfMap.clear();
+    }
+    for (const [filePath, { newText, originalFile }] of contents.entries()) {
+      const sf = ts20.createSourceFile(filePath, newText, ts20.ScriptTarget.Latest, true);
+      if (originalFile !== null) {
+        sf[NgOriginalFile] = originalFile;
+      }
+      this.sfMap.set(filePath, sf);
+    }
+    const host = new UpdatedProgramHost(this.sfMap, this.originalProgram, this.originalHost, this.shimExtensionPrefixes);
+    const oldProgram = this.program;
+    retagAllTsFiles(oldProgram);
+    this.program = ts20.createProgram({
+      host,
+      rootNames: this.program.getRootFileNames(),
+      options: this.options,
+      oldProgram
+    });
+    host.postProgramCreationCleanup();
+    untagAllTsFiles(oldProgram);
+  }
+};
+
 // packages/compiler-cli/src/ngtsc/annotations/component/src/resources.js
 import { ParseSourceFile as ParseSourceFile2, parseTemplate } from "@angular/compiler";
-import ts20 from "typescript";
+import ts21 from "typescript";
 function getTemplateDeclarationNodeForError(declaration) {
   return declaration.isInline ? declaration.expression : declaration.templateUrlExpression;
 }
@@ -5464,7 +5645,7 @@ function extractTemplate(node, template, evaluator, depTracker, resourceLoader, 
     let sourceMapping;
     let escapedString = false;
     let sourceMapUrl;
-    if (ts20.isStringLiteral(template.expression) || ts20.isNoSubstitutionTemplateLiteral(template.expression)) {
+    if (ts21.isStringLiteral(template.expression) || ts21.isNoSubstitutionTemplateLiteral(template.expression)) {
       sourceParseRange = getTemplateRange(template.expression);
       sourceStr = template.expression.getSourceFile().text;
       templateContent = template.expression.text;
@@ -5689,7 +5870,7 @@ function preloadAndParseTemplate(evaluator, resourceLoader, depTracker, preanaly
 }
 function getTemplateRange(templateExpr) {
   const startPos = templateExpr.getStart() + 1;
-  const { line, character } = ts20.getLineAndCharacterOfPosition(templateExpr.getSourceFile(), startPos);
+  const { line, character } = ts21.getLineAndCharacterOfPosition(templateExpr.getSourceFile(), startPos);
   return {
     startPos,
     startLine: line,
@@ -5722,7 +5903,7 @@ function transformDecoratorResources(dec, component, styles, template) {
   const metadata = new Map(component);
   if (metadata.has("templateUrl")) {
     metadata.delete("templateUrl");
-    metadata.set("template", ts20.factory.createStringLiteral(template.content));
+    metadata.set("template", ts21.factory.createStringLiteral(template.content));
   }
   if (metadata.has("styleUrls") || metadata.has("styleUrl") || metadata.has("styles")) {
     metadata.delete("styles");
@@ -5731,20 +5912,20 @@ function transformDecoratorResources(dec, component, styles, template) {
     if (styles.length > 0) {
       const styleNodes = styles.reduce((result, style) => {
         if (style.trim().length > 0) {
-          result.push(ts20.factory.createStringLiteral(style));
+          result.push(ts21.factory.createStringLiteral(style));
         }
         return result;
       }, []);
       if (styleNodes.length > 0) {
-        metadata.set("styles", ts20.factory.createArrayLiteralExpression(styleNodes));
+        metadata.set("styles", ts21.factory.createArrayLiteralExpression(styleNodes));
       }
     }
   }
   const newMetadataFields = [];
   for (const [name, value] of metadata.entries()) {
-    newMetadataFields.push(ts20.factory.createPropertyAssignment(name, value));
+    newMetadataFields.push(ts21.factory.createPropertyAssignment(name, value));
   }
-  return { ...dec, args: [ts20.factory.createObjectLiteralExpression(newMetadataFields)] };
+  return { ...dec, args: [ts21.factory.createObjectLiteralExpression(newMetadataFields)] };
 }
 function extractComponentStyleUrls(evaluator, component) {
   const styleUrlsExpr = component.get("styleUrls");
@@ -5772,9 +5953,9 @@ function extractComponentStyleUrls(evaluator, component) {
 }
 function extractStyleUrlsFromExpression(evaluator, styleUrlsExpr) {
   const styleUrls = [];
-  if (ts20.isArrayLiteralExpression(styleUrlsExpr)) {
+  if (ts21.isArrayLiteralExpression(styleUrlsExpr)) {
     for (const styleUrlExpr of styleUrlsExpr.elements) {
-      if (ts20.isSpreadElement(styleUrlExpr)) {
+      if (ts21.isSpreadElement(styleUrlExpr)) {
         styleUrls.push(...extractStyleUrlsFromExpression(evaluator, styleUrlExpr.expression));
       } else {
         const styleUrl = evaluator.evaluate(styleUrlExpr);
@@ -5806,15 +5987,15 @@ function extractStyleUrlsFromExpression(evaluator, styleUrlsExpr) {
 function extractInlineStyleResources(component) {
   const styles = /* @__PURE__ */ new Set();
   function stringLiteralElements(array) {
-    return array.elements.filter((e) => ts20.isStringLiteralLike(e));
+    return array.elements.filter((e) => ts21.isStringLiteralLike(e));
   }
   const stylesExpr = component.get("styles");
   if (stylesExpr !== void 0) {
-    if (ts20.isArrayLiteralExpression(stylesExpr)) {
+    if (ts21.isArrayLiteralExpression(stylesExpr)) {
       for (const expression of stringLiteralElements(stylesExpr)) {
         styles.add({ path: null, node: expression });
       }
-    } else if (ts20.isStringLiteralLike(stylesExpr)) {
+    } else if (ts21.isStringLiteralLike(stylesExpr)) {
       styles.add({ path: null, node: stylesExpr });
     }
   }
@@ -5837,7 +6018,7 @@ import { compileClassDebugInfo, compileHmrInitializer, compileComponentClassMeta
 import ts40 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.js
-import ts21 from "typescript";
+import ts22 from "typescript";
 var SemanticSymbol = class {
   decl;
   /**
@@ -5861,7 +6042,7 @@ var SemanticSymbol = class {
   }
 };
 function getSymbolIdentifier(decl) {
-  if (!ts21.isSourceFile(decl.parent)) {
+  if (!ts22.isSourceFile(decl.parent)) {
     return null;
   }
   return decl.name.text;
@@ -6056,7 +6237,7 @@ function getImportPath(expr) {
 }
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/type_parameters.js
-import ts22 from "typescript";
+import ts23 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/util.js
 function isSymbolEqual(a, b) {
@@ -6110,7 +6291,7 @@ function isSetEqual(a, b, equalityTester = referenceEquality) {
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/type_parameters.js
 function extractSemanticTypeParameters(node) {
-  if (!ts22.isClassDeclaration(node) || node.typeParameters === void 0) {
+  if (!ts23.isClassDeclaration(node) || node.typeParameters === void 0) {
     return null;
   }
   return node.typeParameters.map((typeParam) => ({
@@ -6262,7 +6443,7 @@ var MetadataDtsModuleScopeResolver = class {
 
 // packages/compiler-cli/src/ngtsc/scope/src/local.js
 import { ExternalExpr as ExternalExpr4 } from "@angular/compiler";
-import ts23 from "typescript";
+import ts24 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/scope/src/util.js
 function getDiagnosticNode(ref, rawExpr) {
@@ -6618,7 +6799,7 @@ var LocalModuleScopeRegistry = class {
    */
   getExportedScope(ref, diagnostics, ownerForErrors, type) {
     if (ref.node.getSourceFile().isDeclarationFile) {
-      if (!ts23.isClassDeclaration(ref.node)) {
+      if (!ts24.isClassDeclaration(ref.node)) {
         const code = type === "import" ? ErrorCode.NGMODULE_INVALID_IMPORT : ErrorCode.NGMODULE_INVALID_EXPORT;
         diagnostics.push(makeDiagnostic(code, identifierOfNode(ref.node) || ref.node, `Appears in the NgModule.${type}s of ${nodeNameForError(ownerForErrors)}, but could not be resolved to an NgModule`));
         return "invalid";
@@ -6736,7 +6917,7 @@ function reexportCollision(module, refA, refB) {
 }
 
 // packages/compiler-cli/src/ngtsc/scope/src/selectorless_scope.js
-import ts24 from "typescript";
+import ts25 from "typescript";
 var SelectorlessComponentScopeReader = class {
   metaReader;
   reflector;
@@ -6789,9 +6970,9 @@ var SelectorlessComponentScopeReader = class {
   /** Determines which identifiers a class has access to. */
   getAvailableIdentifiers(node) {
     const result = /* @__PURE__ */ new Map();
-    let current = ts24.getOriginalNode(node).parent;
+    let current = ts25.getOriginalNode(node).parent;
     while (current) {
-      if (!ts24.isSourceFile(current) && !ts24.isBlock(current)) {
+      if (!ts25.isSourceFile(current) && !ts25.isBlock(current)) {
         current = current.parent;
         continue;
       }
@@ -6800,9 +6981,9 @@ var SelectorlessComponentScopeReader = class {
           result.set(stmt.name.text, stmt.name);
           continue;
         }
-        if (ts24.isImportDeclaration(stmt) && stmt.importClause !== void 0 && !(stmt.importClause.phaseModifier === ts24.SyntaxKind.TypeKeyword)) {
+        if (ts25.isImportDeclaration(stmt) && stmt.importClause !== void 0 && !(stmt.importClause.phaseModifier === ts25.SyntaxKind.TypeKeyword)) {
           const clause = stmt.importClause;
-          if (clause.namedBindings !== void 0 && ts24.isNamedImports(clause.namedBindings)) {
+          if (clause.namedBindings !== void 0 && ts25.isNamedImports(clause.namedBindings)) {
             for (const element of clause.namedBindings.elements) {
               if (!element.isTypeOnly) {
                 result.set(element.name.text, element.name);
@@ -7052,187 +7233,6 @@ function isBaseClassEqual(current, previous) {
 // packages/compiler-cli/src/ngtsc/typecheck/src/checker.js
 import { CssSelector as CssSelector2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr6, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
 import ts32 from "typescript";
-
-// packages/compiler-cli/src/ngtsc/program_driver/src/api.js
-var NgOriginalFile = Symbol("NgOriginalFile");
-var UpdateMode;
-(function(UpdateMode2) {
-  UpdateMode2[UpdateMode2["Complete"] = 0] = "Complete";
-  UpdateMode2[UpdateMode2["Incremental"] = 1] = "Incremental";
-})(UpdateMode || (UpdateMode = {}));
-
-// packages/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver.js
-import ts25 from "typescript";
-var DelegatingCompilerHost = class {
-  delegate;
-  createHash;
-  directoryExists;
-  getCancellationToken;
-  getCanonicalFileName;
-  getCurrentDirectory;
-  getDefaultLibFileName;
-  getDefaultLibLocation;
-  getDirectories;
-  getEnvironmentVariable;
-  getNewLine;
-  getParsedCommandLine;
-  getSourceFileByPath;
-  readDirectory;
-  readFile;
-  realpath;
-  resolveModuleNames;
-  resolveTypeReferenceDirectives;
-  trace;
-  useCaseSensitiveFileNames;
-  getModuleResolutionCache;
-  hasInvalidatedResolutions;
-  resolveModuleNameLiterals;
-  resolveTypeReferenceDirectiveReferences;
-  // jsDocParsingMode is not a method like the other elements above
-  // TODO: ignore usage can be dropped once 5.2 support is dropped
-  get jsDocParsingMode() {
-    return this.delegate.jsDocParsingMode;
-  }
-  set jsDocParsingMode(mode) {
-    this.delegate.jsDocParsingMode = mode;
-  }
-  constructor(delegate) {
-    this.delegate = delegate;
-    this.createHash = this.delegateMethod("createHash");
-    this.directoryExists = this.delegateMethod("directoryExists");
-    this.getCancellationToken = this.delegateMethod("getCancellationToken");
-    this.getCanonicalFileName = this.delegateMethod("getCanonicalFileName");
-    this.getCurrentDirectory = this.delegateMethod("getCurrentDirectory");
-    this.getDefaultLibFileName = this.delegateMethod("getDefaultLibFileName");
-    this.getDefaultLibLocation = this.delegateMethod("getDefaultLibLocation");
-    this.getDirectories = this.delegateMethod("getDirectories");
-    this.getEnvironmentVariable = this.delegateMethod("getEnvironmentVariable");
-    this.getNewLine = this.delegateMethod("getNewLine");
-    this.getParsedCommandLine = this.delegateMethod("getParsedCommandLine");
-    this.getSourceFileByPath = this.delegateMethod("getSourceFileByPath");
-    this.readDirectory = this.delegateMethod("readDirectory");
-    this.readFile = this.delegateMethod("readFile");
-    this.realpath = this.delegateMethod("realpath");
-    this.resolveModuleNames = this.delegateMethod("resolveModuleNames");
-    this.resolveTypeReferenceDirectives = this.delegateMethod("resolveTypeReferenceDirectives");
-    this.trace = this.delegateMethod("trace");
-    this.useCaseSensitiveFileNames = this.delegateMethod("useCaseSensitiveFileNames");
-    this.getModuleResolutionCache = this.delegateMethod("getModuleResolutionCache");
-    this.hasInvalidatedResolutions = this.delegateMethod("hasInvalidatedResolutions");
-    this.resolveModuleNameLiterals = this.delegateMethod("resolveModuleNameLiterals");
-    this.resolveTypeReferenceDirectiveReferences = this.delegateMethod("resolveTypeReferenceDirectiveReferences");
-  }
-  delegateMethod(name) {
-    return this.delegate[name] !== void 0 ? this.delegate[name].bind(this.delegate) : void 0;
-  }
-};
-var UpdatedProgramHost = class extends DelegatingCompilerHost {
-  originalProgram;
-  shimExtensionPrefixes;
-  /**
-   * Map of source file names to `ts.SourceFile` instances.
-   */
-  sfMap;
-  /**
-   * The `ShimReferenceTagger` responsible for tagging `ts.SourceFile`s loaded via this host.
-   *
-   * The `UpdatedProgramHost` is used in the creation of a new `ts.Program`. Even though this new
-   * program is based on a prior one, TypeScript will still start from the root files and enumerate
-   * all source files to include in the new program.  This means that just like during the original
-   * program's creation, these source files must be tagged with references to per-file shims in
-   * order for those shims to be loaded, and then cleaned up afterwards. Thus the
-   * `UpdatedProgramHost` has its own `ShimReferenceTagger` to perform this function.
-   */
-  shimTagger;
-  constructor(sfMap, originalProgram, delegate, shimExtensionPrefixes) {
-    super(delegate);
-    this.originalProgram = originalProgram;
-    this.shimExtensionPrefixes = shimExtensionPrefixes;
-    this.shimTagger = new ShimReferenceTagger(this.shimExtensionPrefixes);
-    this.sfMap = sfMap;
-  }
-  getSourceFile(fileName, languageVersionOrOptions, onError, shouldCreateNewSourceFile) {
-    let delegateSf = this.originalProgram.getSourceFile(fileName);
-    if (delegateSf === void 0) {
-      delegateSf = this.delegate.getSourceFile(fileName, languageVersionOrOptions, onError, shouldCreateNewSourceFile);
-    }
-    if (delegateSf === void 0) {
-      return void 0;
-    }
-    let sf;
-    if (this.sfMap.has(fileName)) {
-      sf = this.sfMap.get(fileName);
-      copyFileShimData(delegateSf, sf);
-    } else {
-      sf = delegateSf;
-    }
-    sf = toUnredirectedSourceFile(sf);
-    this.shimTagger.tag(sf);
-    return sf;
-  }
-  postProgramCreationCleanup() {
-    this.shimTagger.finalize();
-  }
-  writeFile() {
-    throw new Error(`TypeCheckProgramHost should never write files`);
-  }
-  fileExists(fileName) {
-    return this.sfMap.has(fileName) || this.delegate.fileExists(fileName);
-  }
-};
-var TsCreateProgramDriver = class {
-  originalProgram;
-  originalHost;
-  options;
-  shimExtensionPrefixes;
-  /**
-   * A map of source file paths to replacement `ts.SourceFile`s for those paths.
-   *
-   * Effectively, this tracks the delta between the user's program (represented by the
-   * `originalHost`) and the template type-checking program being managed.
-   */
-  sfMap = /* @__PURE__ */ new Map();
-  program;
-  constructor(originalProgram, originalHost, options, shimExtensionPrefixes) {
-    this.originalProgram = originalProgram;
-    this.originalHost = originalHost;
-    this.options = options;
-    this.shimExtensionPrefixes = shimExtensionPrefixes;
-    this.program = this.originalProgram;
-  }
-  supportsInlineOperations = true;
-  getProgram() {
-    return this.program;
-  }
-  updateFiles(contents, updateMode) {
-    if (contents.size === 0) {
-      if (updateMode !== UpdateMode.Complete || this.sfMap.size === 0) {
-        return;
-      }
-    }
-    if (updateMode === UpdateMode.Complete) {
-      this.sfMap.clear();
-    }
-    for (const [filePath, { newText, originalFile }] of contents.entries()) {
-      const sf = ts25.createSourceFile(filePath, newText, ts25.ScriptTarget.Latest, true);
-      if (originalFile !== null) {
-        sf[NgOriginalFile] = originalFile;
-      }
-      this.sfMap.set(filePath, sf);
-    }
-    const host = new UpdatedProgramHost(this.sfMap, this.originalProgram, this.originalHost, this.shimExtensionPrefixes);
-    const oldProgram = this.program;
-    retagAllTsFiles(oldProgram);
-    this.program = ts25.createProgram({
-      host,
-      rootNames: this.program.getRootFileNames(),
-      options: this.options,
-      oldProgram
-    });
-    host.postProgramCreationCleanup();
-    untagAllTsFiles(oldProgram);
-  }
-};
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/completion.js
 import { EmptyExpr, ImplicitReceiver, PropertyRead, SafePropertyRead, ThisReceiver, TmplAstLetDeclaration, TmplAstReference, TmplAstTextAttribute } from "@angular/compiler";
@@ -14630,4 +14630,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-CK6VITSR.js.map
+//# sourceMappingURL=chunk-LKLHMJTU.js.map
