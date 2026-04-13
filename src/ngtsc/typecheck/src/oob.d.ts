@@ -7,7 +7,7 @@
  */
 import { AST, BindingPipe, PropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TmplAstViewportDeferredTrigger } from '@angular/compiler';
 import ts from 'typescript';
-import { OutOfBadDiagnosticCategory, OutOfBandDiagnosticRecorder, TcbDirectiveMetadata, TemplateDiagnostic, TypeCheckId } from '../api';
+import { OutOfBandDiagnosticCategory, OutOfBandDiagnosticRecorder, TcbDirectiveMetadata, TemplateDiagnostic, TypeCheckId } from '../api';
 import { TypeCheckSourceResolver } from './tcb_util';
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder<TemplateDiagnostic> {
     private resolver;
@@ -32,7 +32,7 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
     illegalForLoopTrackAccess(id: TypeCheckId, block: TmplAstForLoopBlock, access: PropertyRead): void;
     inaccessibleDeferredTriggerElement(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
-    controlFlowPreventingContentProjection(id: TypeCheckId, category: OutOfBadDiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty, preservesWhitespaces: boolean): void;
+    controlFlowPreventingContentProjection(id: TypeCheckId, category: OutOfBandDiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty, preservesWhitespaces: boolean): void;
     illegalWriteToLetDeclaration(id: TypeCheckId, node: AST, target: TmplAstLetDeclaration): void;
     letUsedBeforeDefinition(id: TypeCheckId, node: PropertyRead, target: TmplAstLetDeclaration): void;
     conflictingDeclaration(id: TypeCheckId, decl: TmplAstLetDeclaration): void;

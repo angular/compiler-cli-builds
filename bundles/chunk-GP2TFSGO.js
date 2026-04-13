@@ -231,7 +231,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.7+sha-fda8d20";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.7+sha-e5f96c2";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -4219,11 +4219,11 @@ var SymbolKind;
 })(SymbolKind || (SymbolKind = {}));
 
 // packages/compiler-cli/src/ngtsc/typecheck/api/oob.js
-var OutOfBadDiagnosticCategory;
-(function(OutOfBadDiagnosticCategory2) {
-  OutOfBadDiagnosticCategory2[OutOfBadDiagnosticCategory2["Error"] = 0] = "Error";
-  OutOfBadDiagnosticCategory2[OutOfBadDiagnosticCategory2["Warning"] = 1] = "Warning";
-})(OutOfBadDiagnosticCategory || (OutOfBadDiagnosticCategory = {}));
+var OutOfBandDiagnosticCategory;
+(function(OutOfBandDiagnosticCategory2) {
+  OutOfBandDiagnosticCategory2[OutOfBandDiagnosticCategory2["Error"] = 0] = "Error";
+  OutOfBandDiagnosticCategory2[OutOfBandDiagnosticCategory2["Warning"] = 1] = "Warning";
+})(OutOfBandDiagnosticCategory || (OutOfBandDiagnosticCategory = {}));
 
 // packages/compiler-cli/src/ngtsc/typecheck/api/completion.js
 var CompletionKind;
@@ -4364,7 +4364,7 @@ function createNodeFromListenerDecorator(decorator, parser, listeners) {
     target = null;
   } else {
     const parsedName = parser.parseEventListenerName(eventNameNode.text);
-    type = ParsedEventType.Regular;
+    type = parsedName.eventName.startsWith("animate.") ? ParsedEventType.Animation : ParsedEventType.Regular;
     eventName = parsedName.eventName;
     target = parsedName.target;
     phase = null;
@@ -7221,7 +7221,7 @@ var TcbControlFlowContentProjectionOp = class extends TcbOp {
     this.element = element;
     this.ngContentSelectors = ngContentSelectors;
     this.componentName = componentName;
-    this.category = tcb.env.config.controlFlowPreventingContentProjection === "error" ? OutOfBadDiagnosticCategory.Error : OutOfBadDiagnosticCategory.Warning;
+    this.category = tcb.env.config.controlFlowPreventingContentProjection === "error" ? OutOfBandDiagnosticCategory.Error : OutOfBandDiagnosticCategory.Warning;
   }
   optional = false;
   execute() {
@@ -8735,7 +8735,7 @@ export {
   PotentialImportKind,
   PotentialImportMode,
   SymbolKind,
-  OutOfBadDiagnosticCategory,
+  OutOfBandDiagnosticCategory,
   makeTemplateDiagnostic,
   getTypeCheckId,
   TypeParameterEmitter,
@@ -8771,4 +8771,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WEYFV6TY.js.map
+//# sourceMappingURL=chunk-GP2TFSGO.js.map

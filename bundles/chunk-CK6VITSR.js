@@ -17,7 +17,7 @@ import {
   ImportedSymbolsTracker,
   MetaKind,
   OptimizeFor,
-  OutOfBadDiagnosticCategory,
+  OutOfBandDiagnosticCategory,
   PotentialImportKind,
   PotentialImportMode,
   Reference,
@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-WEYFV6TY.js";
+} from "./chunk-GP2TFSGO.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -9019,9 +9019,9 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
 };
 function translateCategory(category) {
   switch (category) {
-    case OutOfBadDiagnosticCategory.Error:
+    case OutOfBandDiagnosticCategory.Error:
       return ts28.DiagnosticCategory.Error;
-    case OutOfBadDiagnosticCategory.Warning:
+    case OutOfBandDiagnosticCategory.Warning:
       return ts28.DiagnosticCategory.Warning;
   }
 }
@@ -14630,4 +14630,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-QVERCVXH.js.map
+//# sourceMappingURL=chunk-CK6VITSR.js.map

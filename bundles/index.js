@@ -17,7 +17,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-FFEI3QZ3.js";
+} from "./chunk-3UQPLNX7.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -34,7 +34,7 @@ import {
   freshCompilationTicket,
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo
-} from "./chunk-ZX4XNJ3M.js";
+} from "./chunk-4JHZD5JT.js";
 import {
   ActivePerfRecorder,
   PerfPhase,
@@ -42,14 +42,14 @@ import {
   angularJitApplicationTransform,
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform
-} from "./chunk-QVERCVXH.js";
+} from "./chunk-CK6VITSR.js";
 import {
   Environment,
   ErrorCode,
   ExpressionIdentifier,
   ImportManager,
   OptimizeFor,
-  OutOfBadDiagnosticCategory,
+  OutOfBandDiagnosticCategory,
   RegistryDomSchemaChecker,
   SymbolBuilder,
   SymbolKind,
@@ -60,7 +60,7 @@ import {
   hasExpressionIdentifier,
   isLocalCompilationDiagnostics,
   ngErrorCode
-} from "./chunk-WEYFV6TY.js";
+} from "./chunk-GP2TFSGO.js";
 import "./chunk-L35AQF75.js";
 import {
   InvalidFileSystem,
@@ -91,7 +91,7 @@ import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.0.0-next.7+sha-fda8d20");
+var VERSION = new Version("22.0.0-next.7+sha-e5f96c2");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
@@ -216,7 +216,7 @@ export {
   NgtscProgram,
   NodeJSFileSystem,
   OptimizeFor,
-  OutOfBadDiagnosticCategory,
+  OutOfBandDiagnosticCategory,
   RegistryDomSchemaChecker,
   SOURCE,
   SymbolBuilder,

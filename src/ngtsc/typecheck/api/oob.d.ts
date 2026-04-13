@@ -8,7 +8,7 @@
 import { AST, BindingPipe, PropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TmplAstViewportDeferredTrigger } from '@angular/compiler';
 import { TcbDirectiveMetadata, TypeCheckId } from './api';
 /** Categories of diagnostics that can be reported by a `OutOfBandDiagnosticRecorder`. */
-export declare enum OutOfBadDiagnosticCategory {
+export declare enum OutOfBandDiagnosticCategory {
     Error = 0,
     Warning = 1
 }
@@ -87,7 +87,7 @@ export interface OutOfBandDiagnosticRecorder<T> {
     /**
      * Reports cases where control flow nodes prevent content projection.
      */
-    controlFlowPreventingContentProjection(id: TypeCheckId, category: OutOfBadDiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty, preservesWhitespaces: boolean): void;
+    controlFlowPreventingContentProjection(id: TypeCheckId, category: OutOfBandDiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty, preservesWhitespaces: boolean): void;
     /** Reports cases where users are writing to `@let` declarations. */
     illegalWriteToLetDeclaration(id: TypeCheckId, node: AST, target: TmplAstLetDeclaration): void;
     /** Reports cases where users are accessing an `@let` before it is defined.. */
