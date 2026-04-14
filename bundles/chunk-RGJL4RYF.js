@@ -88,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-XSJXGXZW.js";
+} from "./chunk-O3K5OHL7.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5392,4 +5392,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-MWNGW6T3.js.map
+//# sourceMappingURL=chunk-RGJL4RYF.js.map

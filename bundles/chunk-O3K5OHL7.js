@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.8+sha-bb8cdd9";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.8+sha-684e9fd";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -17868,10 +17868,7 @@ var SymbolBuilder = class {
         referenceVarLocation: referenceVarTcbLocation
       };
     } else {
-      const targetNode2 = target.directive.getReferenceTargetNode();
-      if (targetNode2 === null) {
-        return null;
-      }
+      const targetNode2 = target.directive.getSymbolReference();
       return {
         kind: SymbolKind.Reference,
         declaration: ref,
@@ -18237,13 +18234,15 @@ var TemplateTypeCheckerImpl = class {
     }
     node = bestMatch;
     const typeChecker = this.programDriver.getProgram().getTypeChecker();
+    if ("kind" in symbol && symbol.kind === SymbolKind.Directive) {
+      const tsSymbol2 = this.getTsSymbolOfReference(symbol.ref, typeChecker);
+      if (tsSymbol2)
+        return tsSymbol2;
+    }
     if ("kind" in symbol && symbol.kind === SymbolKind.Reference) {
-      if (ts65.isClassDeclaration(symbol.target)) {
-        const targetNode = symbol.target;
-        const tsSymbol2 = typeChecker.getSymbolAtLocation(targetNode.name ?? targetNode);
-        if (tsSymbol2)
-          return tsSymbol2;
-      }
+      const tsSymbol2 = this.getTsSymbolOfReference(symbol.target, typeChecker);
+      if (tsSymbol2)
+        return tsSymbol2;
       if (ts65.isCallExpression(node)) {
         return null;
       }
@@ -18273,6 +18272,30 @@ var TemplateTypeCheckerImpl = class {
       tsSymbol = type.aliasSymbol ?? type.symbol;
     }
     return tsSymbol ?? typeChecker.getTypeAtLocation(node).symbol ?? null;
+  }
+  getTsSymbolOfReference(target, typeChecker) {
+    if (!target || !("filePath" in target)) {
+      return null;
+    }
+    const sf = this.programDriver.getProgram().getSourceFile(target.filePath);
+    if (!sf) {
+      return null;
+    }
+    const visit2 = (node) => {
+      if (node.pos <= target.position && target.position < node.end) {
+        if (ts65.isClassDeclaration(node)) {
+          return node;
+        }
+        return ts65.forEachChild(node, visit2) ?? null;
+      }
+      return null;
+    };
+    const classDecl = ts65.forEachChild(sf, visit2) ?? null;
+    if (!classDecl) {
+      return null;
+    }
+    const nameNode = classDecl.name ?? classDecl;
+    return typeChecker.getSymbolAtLocation(nameNode) ?? null;
   }
   getTemplate(component, optimizeFor) {
     const { data } = this.getLatestComponentState(component, optimizeFor);
@@ -23124,4 +23147,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-XSJXGXZW.js.map
+//# sourceMappingURL=chunk-O3K5OHL7.js.map

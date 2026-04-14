@@ -14,7 +14,6 @@ import { ElementSymbol, LetDeclarationSymbol, ReferenceSymbol, SelectorlessCompo
 export interface SymbolDirectiveMeta {
     getSymbolReference(): SymbolReference;
     getNgModule(): ClassDeclaration | null;
-    getReferenceTargetNode(): ts.ClassDeclaration | null;
     matchSource: MatchSource;
     isComponent: boolean;
     selector: string | null;

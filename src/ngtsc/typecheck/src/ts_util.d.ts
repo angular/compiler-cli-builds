@@ -38,3 +38,7 @@ export declare function isDirectiveDeclaration(node: ts.Node): node is ts.TypeNo
  * ```
  */
 export declare function isSymbolAliasOf(firstSymbol: ts.Symbol, lastSymbol: ts.Symbol, typeChecker: ts.TypeChecker): boolean;
+/**
+ * Check if a node is a class declaration or the identifier of a class declaration.
+ */
+export declare function isClassDeclarationOrName(node: ts.Node): boolean;
