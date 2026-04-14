@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-VT6HWQB3.js";
+} from "./chunk-A62YT3DX.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -9795,13 +9795,15 @@ var TemplateTypeCheckerImpl = class {
     }
     node = bestMatch;
     const typeChecker = this.programDriver.getProgram().getTypeChecker();
+    if ("kind" in symbol && symbol.kind === SymbolKind.Directive) {
+      const tsSymbol2 = this.getTsSymbolOfReference(symbol.ref, typeChecker);
+      if (tsSymbol2)
+        return tsSymbol2;
+    }
     if ("kind" in symbol && symbol.kind === SymbolKind.Reference) {
-      if (ts32.isClassDeclaration(symbol.target)) {
-        const targetNode = symbol.target;
-        const tsSymbol2 = typeChecker.getSymbolAtLocation(targetNode.name ?? targetNode);
-        if (tsSymbol2)
-          return tsSymbol2;
-      }
+      const tsSymbol2 = this.getTsSymbolOfReference(symbol.target, typeChecker);
+      if (tsSymbol2)
+        return tsSymbol2;
       if (ts32.isCallExpression(node)) {
         return null;
       }
@@ -9831,6 +9833,30 @@ var TemplateTypeCheckerImpl = class {
       tsSymbol = type.aliasSymbol ?? type.symbol;
     }
     return tsSymbol ?? typeChecker.getTypeAtLocation(node).symbol ?? null;
+  }
+  getTsSymbolOfReference(target, typeChecker) {
+    if (!target || !("filePath" in target)) {
+      return null;
+    }
+    const sf = this.programDriver.getProgram().getSourceFile(target.filePath);
+    if (!sf) {
+      return null;
+    }
+    const visit2 = (node) => {
+      if (node.pos <= target.position && target.position < node.end) {
+        if (ts32.isClassDeclaration(node)) {
+          return node;
+        }
+        return ts32.forEachChild(node, visit2) ?? null;
+      }
+      return null;
+    };
+    const classDecl = ts32.forEachChild(sf, visit2) ?? null;
+    if (!classDecl) {
+      return null;
+    }
+    const nameNode = classDecl.name ?? classDecl;
+    return typeChecker.getSymbolAtLocation(nameNode) ?? null;
   }
   getTemplate(component, optimizeFor) {
     const { data } = this.getLatestComponentState(component, optimizeFor);
@@ -14630,4 +14656,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-LKLHMJTU.js.map
+//# sourceMappingURL=chunk-M5JFVBIU.js.map

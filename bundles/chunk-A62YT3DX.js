@@ -231,7 +231,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.7+sha-2f5ab54";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.7+sha-c90b6b3";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -8482,10 +8482,7 @@ var SymbolBuilder = class {
         referenceVarLocation: referenceVarTcbLocation
       };
     } else {
-      const targetNode2 = target.directive.getReferenceTargetNode();
-      if (targetNode2 === null) {
-        return null;
-      }
+      const targetNode2 = target.directive.getSymbolReference();
       return {
         kind: SymbolKind.Reference,
         declaration: ref,
@@ -8777,4 +8774,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VT6HWQB3.js.map
+//# sourceMappingURL=chunk-A62YT3DX.js.map
