@@ -6,16 +6,12 @@ import {
   Environment,
   ExpressionIdentifier,
   ImportManager,
-  OutOfBandDiagnosticCategory,
   RegistryDomSchemaChecker,
   SymbolBuilder,
   SymbolKind,
-  TcbGenericContextBehavior,
-  createHostElement,
   findFirstMatchingNode,
-  generateTypeCheckBlock,
   hasExpressionIdentifier
-} from "../chunk-A62YT3DX.js";
+} from "../chunk-USW6NVU3.js";
 import "../chunk-L35AQF75.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";
@@ -24,14 +20,10 @@ export {
   Environment,
   ExpressionIdentifier,
   ImportManager,
-  OutOfBandDiagnosticCategory,
   RegistryDomSchemaChecker,
   SymbolBuilder,
   SymbolKind,
-  TcbGenericContextBehavior,
-  createHostElement,
   findFirstMatchingNode,
-  generateTypeCheckBlock,
   hasExpressionIdentifier
 };
 /**

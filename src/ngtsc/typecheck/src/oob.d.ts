@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, BindingPipe, PropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TmplAstViewportDeferredTrigger } from '@angular/compiler';
+import { AST, BindingPipe, OutOfBandDiagnosticCategory, OutOfBandDiagnosticRecorder, PropertyRead, TcbDirectiveMetadata, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TmplAstViewportDeferredTrigger, TypeCheckId } from '@angular/compiler';
 import ts from 'typescript';
-import { OutOfBandDiagnosticCategory, OutOfBandDiagnosticRecorder, TcbDirectiveMetadata, TemplateDiagnostic, TypeCheckId } from '../api';
+import { TemplateDiagnostic } from '../api';
 import { TypeCheckSourceResolver } from './tcb_util';
 export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnosticRecorder<TemplateDiagnostic> {
     private resolver;

@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { R3DirectiveMetadata, R3QueryMetadata, ClassPropertyMapping } from '@angular/compiler';
+import { R3DirectiveMetadata, R3QueryMetadata, ClassPropertyMapping, HostObjectLiteralBinding, HostListenerDecorator, HostBindingDecorator } from '@angular/compiler';
 import ts from 'typescript';
 import { ImportedSymbolsTracker, Reference, ReferenceEmitter } from '../../../imports';
 import { DecoratorInputTransform, HostDirectiveMeta, InputMapping, Resource } from '../../../metadata';
@@ -13,7 +13,6 @@ import { DynamicValue, PartialEvaluator } from '../../../partial_evaluator';
 import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
 import { CompilationMode } from '../../../transform';
 import { ReferencesRegistry, UndecoratedMetadataExtractor } from '../../common';
-import { HostObjectLiteralBinding, HostListenerDecorator, HostBindingDecorator } from '../../../typecheck/src/host_bindings';
 type QueryDecoratorName = 'ViewChild' | 'ViewChildren' | 'ContentChild' | 'ContentChildren';
 export declare const queryDecoratorNames: QueryDecoratorName[];
 export interface HostBindingNodes {

@@ -5,14 +5,14 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { BoundTarget, DirectiveMeta, ParseError, R3TargetBinder, SchemaMetadata, TmplAstHostElement, TmplAstNode } from '@angular/compiler';
+import { BoundTarget, DirectiveMeta, DomSchemaChecker, OutOfBandDiagnosticRecorder, ParseError, R3TargetBinder, SchemaMetadata, TmplAstHostElement, TmplAstNode, TypeCheckId, TypeCheckingConfig, TypeCtorMetadata } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { PerfRecorder } from '../../perf';
 import { FileUpdate } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { HostBindingsContext, TemplateDiagnostic, TypeCheckId, SourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata, TemplateContext, OutOfBandDiagnosticRecorder, DomSchemaChecker } from '../api';
+import { HostBindingsContext, TemplateDiagnostic, SourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TemplateContext } from '../api';
 import { DirectiveSourceManager } from './source';
 import { TypeCheckFile } from './type_check_file';
 export interface ShimTypeCheckingData {

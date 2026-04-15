@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { ParseSourceSpan } from '@angular/compiler';
+import { ParseSourceSpan, TypeCheckId } from '@angular/compiler';
 import ts from 'typescript';
-import { TemplateDiagnostic, TypeCheckId, SourceMapping } from '../../api';
+import { TemplateDiagnostic, SourceMapping } from '../../api';
 interface DeprecatedDiagnosticInfo {
     reportsDeprecated: {} | undefined;
     relatedMessages: ts.DiagnosticRelatedInformation[] | undefined;

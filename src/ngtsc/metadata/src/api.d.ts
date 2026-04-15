@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { DirectiveMeta as T2DirectiveMeta, Expression, SchemaMetadata, ExternalReference, MatchSource, ClassPropertyName, InputOrOutput, ClassPropertyMapping } from '@angular/compiler';
+import { DirectiveMeta as T2DirectiveMeta, Expression, SchemaMetadata, ExternalReference, MatchSource, ClassPropertyName, InputOrOutput, ClassPropertyMapping, TemplateGuardMeta } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
@@ -274,23 +274,6 @@ export interface HostDirectiveMetaForGlobalMode extends HostDirectiveMeta {
  */
 export interface HostDirectiveMetaForLocalMode extends HostDirectiveMeta {
     directive: Expression;
-}
-/**
- * Metadata that describes a template guard for one of the directive's inputs.
- */
-export interface TemplateGuardMeta {
-    /**
-     * The input name that this guard should be applied to.
-     */
-    inputName: string;
-    /**
-     * Represents the type of the template guard.
-     *
-     * - 'invocation' means that a call to the template guard function is emitted so that its return
-     *   type can result in narrowing of the input type.
-     * - 'binding' means that the input binding expression itself is used as template guard.
-     */
-    type: 'invocation' | 'binding';
 }
 /**
  * Metadata for a pipe within an NgModule's scope.

@@ -5,8 +5,8 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { DomElementSchemaRegistry, ParseSourceSpan, SchemaMetadata, TmplAstHostElement } from '@angular/compiler';
-import { DomSchemaChecker, TemplateDiagnostic, TypeCheckId } from '../api';
+import { DomElementSchemaRegistry, DomSchemaChecker, ParseSourceSpan, SchemaMetadata, TmplAstHostElement, TypeCheckId } from '@angular/compiler';
+import { TemplateDiagnostic } from '../api';
 import { TypeCheckSourceResolver } from './tcb_util';
 export declare const REGISTRY: DomElementSchemaRegistry;
 /**

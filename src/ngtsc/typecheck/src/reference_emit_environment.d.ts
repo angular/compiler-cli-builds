@@ -5,13 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { TransplantedType } from '@angular/compiler';
+import { TcbExpr, TcbReferenceMetadata, TransplantedType } from '@angular/compiler';
 import ts from 'typescript';
 import { ImportFlags, Reference, ReferenceEmitter } from '../../imports';
 import { ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
-import { TcbReferenceMetadata } from '../api';
-import { TcbExpr } from './ops/codegen';
 /**
  * An environment for a given source file that can be used to emit references.
  *

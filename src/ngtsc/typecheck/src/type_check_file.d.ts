@@ -5,14 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+import { DomSchemaChecker, OutOfBandDiagnosticRecorder, TcbExpr, TcbGenericContextBehavior, TypeCheckingConfig } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { DomSchemaChecker, OutOfBandDiagnosticRecorder, TypeCheckBlockMetadata, TypeCheckingConfig } from '../api';
+import { TypeCheckBlockMetadata } from '../api';
 import { Environment } from './environment';
-import { TcbGenericContextBehavior } from './ops/context';
-import { TcbExpr } from './ops/codegen';
 /**
  * An `Environment` representing the single type-checking file into which most (if not all) Type
  * Check Blocks (TCBs) will be generated.

@@ -5,11 +5,10 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+import { TcbExpr, TcbTypeParameter, TypeCtorMetadata } from '@angular/compiler';
 import ts from 'typescript';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { TypeCtorMetadata, TcbTypeParameter } from '../api';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
-import { TcbExpr } from './ops/codegen';
 export declare function generateTypeCtorDeclarationFn(env: ReferenceEmitEnvironment, meta: TypeCtorMetadata, nodeTypeRef: TcbExpr, typeParams: TcbTypeParameter[] | undefined): TcbExpr;
 /**
  * Generate an inline type constructor for the given class and metadata.

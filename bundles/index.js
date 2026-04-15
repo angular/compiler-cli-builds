@@ -17,7 +17,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-XGXRRZYP.js";
+} from "./chunk-QF32EXLM.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -37,7 +37,7 @@ import {
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo,
   resourceChangeTicket
-} from "./chunk-PIJ4UR7Q.js";
+} from "./chunk-WEGGVH6V.js";
 import {
   ActivePerfRecorder,
   PerfPhase,
@@ -47,7 +47,7 @@ import {
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform,
   isShim
-} from "./chunk-M5JFVBIU.js";
+} from "./chunk-BUZ6YOYW.js";
 import {
   CompletionKind,
   Environment,
@@ -56,17 +56,13 @@ import {
   ImportManager,
   MetaKind,
   OptimizeFor,
-  OutOfBandDiagnosticCategory,
   PotentialImportKind,
   PotentialImportMode,
   Reference,
   RegistryDomSchemaChecker,
   SymbolBuilder,
   SymbolKind,
-  TcbGenericContextBehavior,
-  createHostElement,
   findFirstMatchingNode,
-  generateTypeCheckBlock,
   getRootDirs,
   hasExpressionIdentifier,
   isExternalResource,
@@ -74,7 +70,7 @@ import {
   isLocalCompilationDiagnostics,
   isNamedClassDeclaration,
   ngErrorCode
-} from "./chunk-A62YT3DX.js";
+} from "./chunk-USW6NVU3.js";
 import "./chunk-L35AQF75.js";
 import {
   InvalidFileSystem,
@@ -105,7 +101,7 @@ import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.0.0-next.7+sha-8b4581d");
+var VERSION = new Version("22.0.0-next.7+sha-281a2db");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
@@ -233,7 +229,6 @@ export {
   NgtscProgram,
   NodeJSFileSystem,
   OptimizeFor,
-  OutOfBandDiagnosticCategory,
   PerfPhase,
   PotentialImportKind,
   PotentialImportMode,
@@ -242,7 +237,6 @@ export {
   SOURCE,
   SymbolBuilder,
   SymbolKind,
-  TcbGenericContextBehavior,
   TrackedIncrementalBuildStrategy,
   UNKNOWN_ERROR_CODE,
   VERSION,
@@ -254,7 +248,6 @@ export {
   constructorParametersDownlevelTransform,
   createCompilerHost,
   createFileSystemTsReadDirectoryFn,
-  createHostElement,
   createProgram,
   defaultGatherDiagnostics,
   dirname,
@@ -262,7 +255,6 @@ export {
   findFirstMatchingNode,
   formatDiagnostics,
   freshCompilationTicket,
-  generateTypeCheckBlock,
   getAngularDecorators,
   getDownlevelDecoratorsTransform,
   getFileSystem,

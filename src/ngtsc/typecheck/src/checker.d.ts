@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, BoundTarget, LiteralPrimitive, ParseSourceSpan, PropertyRead, ReferenceTarget, SafePropertyRead, TemplateEntity, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstHostElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute } from '@angular/compiler';
+import { AST, BoundTarget, LiteralPrimitive, ParseSourceSpan, PropertyRead, ReferenceTarget, SafePropertyRead, TemplateEntity, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstHostElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TypeCheckingConfig } from '@angular/compiler';
 import ts from 'typescript';
 import { ErrorCode } from '../../diagnostics';
 import { AbsoluteFsPath } from '../../file_system';
@@ -16,7 +16,7 @@ import { PerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
-import { BindingSymbol, ClassSymbol, ElementSymbol, FullSourceMapping, GetPotentialAngularMetaOptions, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialDirectiveModuleSpecifierResolver, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, SymbolReference, TcbLocation, TemplateSymbol, TemplateTypeChecker, TsCompletionEntryInfo, TypeCheckableDirectiveMeta, TypeCheckingConfig } from '../api';
+import { BindingSymbol, ClassSymbol, ElementSymbol, FullSourceMapping, GetPotentialAngularMetaOptions, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialDirectiveModuleSpecifierResolver, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, SymbolReference, TcbLocation, TemplateSymbol, TemplateTypeChecker, TsCompletionEntryInfo, TypeCheckableDirectiveMeta } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { DirectiveSourceManager } from './source';
 import { SymbolDirectiveMeta, SymbolBoundTarget } from './template_symbol_builder';
