@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, ClassPropertyMapping, MatchSource, ReferenceTarget, TemplateEntity, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TypeCheckingConfig } from '@angular/compiler';
+import { AST, ClassPropertyMapping, MatchSource, ReferenceTarget, TemplateEntity, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { HostDirectiveMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
-import { ElementSymbol, LetDeclarationSymbol, ReferenceSymbol, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, SymbolReference, TemplateSymbol, VariableSymbol } from '../api';
+import { ElementSymbol, LetDeclarationSymbol, ReferenceSymbol, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, SymbolReference, Symbol, TemplateSymbol, TypeCheckingConfig, VariableSymbol } from '../api';
 export interface SymbolDirectiveMeta {
     getSymbolReference(): SymbolReference;
     getNgModule(): ClassDeclaration | null;

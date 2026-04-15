@@ -5,13 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { DomSchemaChecker, OutOfBandDiagnosticRecorder, TcbExpr, TcbGenericContextBehavior, TypeCheckingConfig } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { TypeCheckBlockMetadata } from '../api';
+import { TypeCheckBlockMetadata, TypeCheckingConfig } from '../api';
+import { DomSchemaChecker } from './dom';
 import { Environment } from './environment';
+import { OutOfBandDiagnosticRecorder } from './oob';
+import { TcbGenericContextBehavior } from './ops/context';
+import { TcbExpr } from './ops/codegen';
 /**
  * An `Environment` representing the single type-checking file into which most (if not all) Type
  * Check Blocks (TCBs) will be generated.
@@ -26,7 +29,7 @@ export declare class TypeCheckFile extends Environment {
     private nextTcbId;
     private tcbStatements;
     constructor(fileName: AbsoluteFsPath, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName'>);
-    addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker<unknown>, oobRecorder: OutOfBandDiagnosticRecorder<unknown>, genericContextBehavior: TcbGenericContextBehavior): void;
+    addTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, meta: TypeCheckBlockMetadata, domSchemaChecker: DomSchemaChecker, oobRecorder: OutOfBandDiagnosticRecorder, genericContextBehavior: TcbGenericContextBehavior): void;
     render(): string;
     getPreludeStatements(): TcbExpr[];
 }

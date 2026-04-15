@@ -91,25 +91,25 @@ var ExpressionTranslatorVisitor = class {
   visitReadVarExpr(ast, _context) {
     const identifier = this.factory.createIdentifier(ast.name);
     this.setSourceMapRange(identifier, ast.sourceSpan);
-    return this.attachComments(identifier, ast.leadingComments);
+    return identifier;
   }
   visitInvokeFunctionExpr(ast, context) {
-    return this.attachComments(this.setSourceMapRange(this.factory.createCallExpression(ast.fn.visitExpression(this, context), ast.args.map((arg) => arg.visitExpression(this, context)), ast.pure), ast.sourceSpan), ast.leadingComments);
+    return this.setSourceMapRange(this.factory.createCallExpression(ast.fn.visitExpression(this, context), ast.args.map((arg) => arg.visitExpression(this, context)), ast.pure), ast.sourceSpan);
   }
   visitTaggedTemplateLiteralExpr(ast, context) {
-    return this.attachComments(this.setSourceMapRange(this.createTaggedTemplateExpression(ast.tag.visitExpression(this, context), this.getTemplateLiteralFromAst(ast.template, context)), ast.sourceSpan), ast.leadingComments);
+    return this.setSourceMapRange(this.createTaggedTemplateExpression(ast.tag.visitExpression(this, context), this.getTemplateLiteralFromAst(ast.template, context)), ast.sourceSpan);
   }
   visitTemplateLiteralExpr(ast, context) {
-    return this.attachComments(this.setSourceMapRange(this.factory.createTemplateLiteral(this.getTemplateLiteralFromAst(ast, context)), ast.sourceSpan), ast.leadingComments);
+    return this.setSourceMapRange(this.factory.createTemplateLiteral(this.getTemplateLiteralFromAst(ast, context)), ast.sourceSpan);
   }
   visitInstantiateExpr(ast, context) {
-    return this.attachComments(this.factory.createNewExpression(ast.classExpr.visitExpression(this, context), ast.args.map((arg) => arg.visitExpression(this, context))), ast.leadingComments);
+    return this.factory.createNewExpression(ast.classExpr.visitExpression(this, context), ast.args.map((arg) => arg.visitExpression(this, context)));
   }
   visitLiteralExpr(ast, _context) {
-    return this.attachComments(this.setSourceMapRange(this.factory.createLiteral(ast.value), ast.sourceSpan), ast.leadingComments);
+    return this.setSourceMapRange(this.factory.createLiteral(ast.value), ast.sourceSpan);
   }
   visitRegularExpressionLiteral(ast, context) {
-    return this.attachComments(this.setSourceMapRange(this.factory.createRegularExpressionLiteral(ast.body, ast.flags), ast.sourceSpan), ast.leadingComments);
+    return this.setSourceMapRange(this.factory.createRegularExpressionLiteral(ast.body, ast.flags), ast.sourceSpan);
   }
   visitLocalizedString(ast, context) {
     const elements = [createTemplateElement(ast.serializeI18nHead())];
@@ -120,7 +120,7 @@ var ExpressionTranslatorVisitor = class {
       elements.push(createTemplateElement(ast.serializeI18nTemplatePart(i + 1)));
     }
     const localizeTag = this.factory.createIdentifier("$localize");
-    return this.attachComments(this.setSourceMapRange(this.createTaggedTemplateExpression(localizeTag, { elements, expressions }), ast.sourceSpan), ast.leadingComments);
+    return this.setSourceMapRange(this.createTaggedTemplateExpression(localizeTag, { elements, expressions }), ast.sourceSpan);
   }
   visitBuiltinType(ast) {
     let builtInType;
@@ -195,45 +195,44 @@ var ExpressionTranslatorVisitor = class {
     );
   }
   visitExternalExpr(ast, _context) {
-    let result;
     if (ast.value.name === null) {
       if (ast.value.moduleName === null) {
         throw new Error("Invalid import without name nor moduleName");
       }
-      result = this.imports.addImport({
+      return this.imports.addImport({
         exportModuleSpecifier: ast.value.moduleName,
         exportSymbolName: null,
         requestedFile: this.contextFile
       });
-    } else if (ast.value.moduleName !== null) {
-      result = this.imports.addImport({
+    }
+    if (ast.value.moduleName !== null) {
+      return this.imports.addImport({
         exportModuleSpecifier: ast.value.moduleName,
         exportSymbolName: ast.value.name,
         requestedFile: this.contextFile
       });
     } else {
-      result = this.factory.createIdentifier(ast.value.name);
+      return this.factory.createIdentifier(ast.value.name);
     }
-    return this.attachComments(result, ast.leadingComments);
   }
   visitConditionalExpr(ast, context) {
-    return this.attachComments(this.factory.createConditional(ast.condition.visitExpression(this, context), ast.trueCase.visitExpression(this, context), ast.falseCase.visitExpression(this, context)), ast.leadingComments);
+    return this.factory.createConditional(ast.condition.visitExpression(this, context), ast.trueCase.visitExpression(this, context), ast.falseCase.visitExpression(this, context));
   }
   visitDynamicImportExpr(ast, context) {
     const urlExpression = typeof ast.url === "string" ? this.factory.createLiteral(ast.url) : ast.url.visitExpression(this, context);
     if (ast.urlComment) {
       this.factory.attachComments(urlExpression, [o.leadingComment(ast.urlComment, true)]);
     }
-    return this.attachComments(this.factory.createDynamicImport(urlExpression), ast.leadingComments);
+    return this.factory.createDynamicImport(urlExpression);
   }
   visitNotExpr(ast, context) {
-    return this.attachComments(this.factory.createUnaryExpression("!", ast.condition.visitExpression(this, context)), ast.leadingComments);
+    return this.factory.createUnaryExpression("!", ast.condition.visitExpression(this, context));
   }
   visitFunctionExpr(ast, context) {
-    return this.attachComments(this.factory.createFunctionExpression(ast.name ?? null, this.translateParams(ast.params, context), this.factory.createBlock(this.visitStatements(ast.statements, context))), ast.leadingComments);
+    return this.factory.createFunctionExpression(ast.name ?? null, this.translateParams(ast.params, context), this.factory.createBlock(this.visitStatements(ast.statements, context)));
   }
   visitArrowFunctionExpr(ast, context) {
-    return this.attachComments(this.factory.createArrowFunctionExpression(this.translateParams(ast.params, context), Array.isArray(ast.body) ? this.factory.createBlock(this.visitStatements(ast.body, context)) : ast.body.visitExpression(this, context)), ast.leadingComments);
+    return this.factory.createArrowFunctionExpression(this.translateParams(ast.params, context), Array.isArray(ast.body) ? this.factory.createBlock(this.visitStatements(ast.body, context)) : ast.body.visitExpression(this, context));
   }
   visitBinaryOperatorExpr(ast, context) {
     if (!BINARY_OPERATORS.has(ast.operator)) {
@@ -241,18 +240,18 @@ var ExpressionTranslatorVisitor = class {
     }
     const operator = BINARY_OPERATORS.get(ast.operator);
     if (ast.isAssignment()) {
-      return this.attachComments(this.factory.createAssignment(ast.lhs.visitExpression(this, context), operator, ast.rhs.visitExpression(this, context)), ast.leadingComments);
+      return this.factory.createAssignment(ast.lhs.visitExpression(this, context), operator, ast.rhs.visitExpression(this, context));
     }
-    return this.attachComments(this.factory.createBinaryExpression(ast.lhs.visitExpression(this, context), operator, ast.rhs.visitExpression(this, context)), ast.leadingComments);
+    return this.factory.createBinaryExpression(ast.lhs.visitExpression(this, context), operator, ast.rhs.visitExpression(this, context));
   }
   visitReadPropExpr(ast, context) {
-    return this.attachComments(this.factory.createPropertyAccess(ast.receiver.visitExpression(this, context), ast.name), ast.leadingComments);
+    return this.factory.createPropertyAccess(ast.receiver.visitExpression(this, context), ast.name);
   }
   visitReadKeyExpr(ast, context) {
-    return this.attachComments(this.factory.createElementAccess(ast.receiver.visitExpression(this, context), ast.index.visitExpression(this, context)), ast.leadingComments);
+    return this.factory.createElementAccess(ast.receiver.visitExpression(this, context), ast.index.visitExpression(this, context));
   }
   visitLiteralArrayExpr(ast, context) {
-    return this.attachComments(this.factory.createArrayLiteral(ast.entries.map((expr) => this.setSourceMapRange(expr.visitExpression(this, context), ast.sourceSpan))), ast.leadingComments);
+    return this.factory.createArrayLiteral(ast.entries.map((expr) => this.setSourceMapRange(expr.visitExpression(this, context), ast.sourceSpan)));
   }
   visitLiteralMapExpr(ast, context) {
     const properties = ast.entries.map((entry) => {
@@ -266,7 +265,7 @@ var ExpressionTranslatorVisitor = class {
         expression: entry.expression.visitExpression(this, context)
       };
     });
-    return this.attachComments(this.setSourceMapRange(this.factory.createObjectLiteral(properties), ast.sourceSpan), ast.leadingComments);
+    return this.setSourceMapRange(this.factory.createObjectLiteral(properties), ast.sourceSpan);
   }
   visitCommaExpr(ast, context) {
     throw new Error("Method not implemented.");
@@ -276,27 +275,27 @@ var ExpressionTranslatorVisitor = class {
   }
   visitSpreadElementExpr(ast, context) {
     const expression = ast.expression.visitExpression(this, context);
-    return this.attachComments(this.setSourceMapRange(this.factory.createSpreadElement(expression), ast.sourceSpan), ast.leadingComments);
+    return this.setSourceMapRange(this.factory.createSpreadElement(expression), ast.sourceSpan);
   }
   visitWrappedNodeExpr(ast, _context) {
     this.recordWrappedNode(ast);
-    return this.attachComments(ast.node, ast.leadingComments);
+    return ast.node;
   }
   visitTypeofExpr(ast, context) {
-    return this.attachComments(this.factory.createTypeOfExpression(ast.expr.visitExpression(this, context)), ast.leadingComments);
+    return this.factory.createTypeOfExpression(ast.expr.visitExpression(this, context));
   }
   visitVoidExpr(ast, context) {
-    return this.attachComments(this.factory.createVoidExpression(ast.expr.visitExpression(this, context)), ast.leadingComments);
+    return this.factory.createVoidExpression(ast.expr.visitExpression(this, context));
   }
   visitUnaryOperatorExpr(ast, context) {
     if (!UNARY_OPERATORS.has(ast.operator)) {
       throw new Error(`Unknown unary operator: ${o.UnaryOperator[ast.operator]}`);
     }
-    return this.attachComments(this.factory.createUnaryExpression(UNARY_OPERATORS.get(ast.operator), ast.expr.visitExpression(this, context)), ast.leadingComments);
+    return this.factory.createUnaryExpression(UNARY_OPERATORS.get(ast.operator), ast.expr.visitExpression(this, context));
   }
   visitParenthesizedExpr(ast, context) {
     const result = ast.expr.visitExpression(this, context);
-    return this.attachComments(this.factory.createParenthesizedExpression(result), ast.leadingComments);
+    return this.factory.createParenthesizedExpression(result);
   }
   visitStatements(statements, context) {
     return statements.map((stmt) => stmt.visitStatement(this, context)).filter((stmt) => stmt !== void 0);
@@ -304,11 +303,11 @@ var ExpressionTranslatorVisitor = class {
   setSourceMapRange(ast, span) {
     return this.factory.setSourceMapRange(ast, createRange(span));
   }
-  attachComments(node, leadingComments) {
-    if (leadingComments !== void 0 && leadingComments.length > 0) {
-      this.factory.attachComments(node, leadingComments);
+  attachComments(statement, leadingComments) {
+    if (leadingComments !== void 0) {
+      this.factory.attachComments(statement, leadingComments);
     }
-    return node;
+    return statement;
   }
   getTemplateLiteralFromAst(ast, context) {
     return {
@@ -358,4 +357,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-L35AQF75.js.map
+//# sourceMappingURL=chunk-SOKUOCYN.js.map

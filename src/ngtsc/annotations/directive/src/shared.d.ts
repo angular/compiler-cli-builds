@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { R3DirectiveMetadata, R3QueryMetadata, ClassPropertyMapping, HostObjectLiteralBinding, HostListenerDecorator, HostBindingDecorator } from '@angular/compiler';
+import { R3DirectiveMetadata, R3QueryMetadata, ClassPropertyMapping } from '@angular/compiler';
 import ts from 'typescript';
 import { ImportedSymbolsTracker, Reference, ReferenceEmitter } from '../../../imports';
 import { DecoratorInputTransform, HostDirectiveMeta, InputMapping, Resource } from '../../../metadata';
@@ -16,10 +16,9 @@ import { ReferencesRegistry, UndecoratedMetadataExtractor } from '../../common';
 type QueryDecoratorName = 'ViewChild' | 'ViewChildren' | 'ContentChild' | 'ContentChildren';
 export declare const queryDecoratorNames: QueryDecoratorName[];
 export interface HostBindingNodes {
-    hostObjectLiteralBindings: HostObjectLiteralBinding[];
-    hostBindingDecorators: HostBindingDecorator[];
-    hostListenerDecorators: HostListenerDecorator[];
-    rawNodes: ts.Node[];
+    literal: ts.ObjectLiteralExpression | null;
+    bindingDecorators: Set<ts.Decorator>;
+    listenerDecorators: Set<ts.Decorator>;
 }
 /**
  * Helper function to extract metadata from a `Directive` or `Component`. `Directive`s without a

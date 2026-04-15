@@ -5,8 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AbsoluteSourceSpan, ParseSourceSpan, CommentTriviaType, ExpressionIdentifier } from '@angular/compiler';
-export { CommentTriviaType, ExpressionIdentifier };
+import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
 import ts from 'typescript';
 /**
  * Reads the trailing comments and finds the first match which is a span comment (i.e. 4,10) on a
@@ -15,6 +14,19 @@ import ts from 'typescript';
  * Will return `null` if no trailing comments on the node match the expected form of a source span.
  */
 export declare function readSpanComment(node: ts.Node, sourceFile?: ts.SourceFile): AbsoluteSourceSpan | null;
+/** Used to identify what type the comment is. */
+export declare enum CommentTriviaType {
+    DIAGNOSTIC = "D",
+    EXPRESSION_TYPE_IDENTIFIER = "T"
+}
+/** Identifies what the TCB expression is for (for example, a directive declaration). */
+export declare enum ExpressionIdentifier {
+    DIRECTIVE = "DIR",
+    HOST_DIRECTIVE = "HOSTDIR",
+    COMPONENT_COMPLETION = "COMPCOMP",
+    EVENT_PARAMETER = "EP",
+    VARIABLE_AS_EXPRESSION = "VAE"
+}
 /** Returns true if the node has a marker that indicates diagnostics errors should be ignored.  */
 export declare function hasIgnoreForDiagnosticsMarker(node: ts.Node, sourceFile: ts.SourceFile): boolean;
 export interface FindOptions<T extends ts.Node> {

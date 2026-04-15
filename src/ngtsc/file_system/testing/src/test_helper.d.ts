@@ -13,5 +13,4 @@ export interface RunInEachFileSystemFn {
     osX(callback: (os: string) => void): void;
 }
 export declare const runInEachFileSystem: RunInEachFileSystemFn;
-export declare function lockMockFileSystem(): void;
 export declare function initMockFileSystem(os: string, cwd?: AbsoluteFsPath): MockFileSystem;

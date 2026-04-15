@@ -1,0 +1,66 @@
+/*!
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+import { AST, ClassPropertyName, ParseSourceSpan, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstTemplate } from '@angular/compiler';
+import { TcbDirectiveMetadata } from '../../api';
+import { Context } from './context';
+import { TcbExpr } from './codegen';
+export interface TcbBoundAttribute {
+    value: AST | string;
+    sourceSpan: ParseSourceSpan;
+    keySpan: ParseSourceSpan | null;
+    inputs: {
+        fieldName: ClassPropertyName;
+        required: boolean;
+        isSignal: boolean;
+        transformType?: string;
+        isTwoWayBinding: boolean;
+    }[];
+}
+/**
+ * An input binding that corresponds with a field of a directive.
+ */
+export interface TcbDirectiveBoundInput {
+    type: 'binding';
+    /**
+     * The name of a field on the directive that is set.
+     */
+    field: string;
+    /**
+     * The `TcbExpr` corresponding with the input binding expression.
+     */
+    expression: TcbExpr;
+    /**
+     * The input's original value expression.
+     */
+    originalExpression: AST | string;
+    /**
+     * The source span of the full attribute binding.
+     */
+    sourceSpan: ParseSourceSpan;
+    /**
+     * Whether the binding is part of a two-way binding.
+     */
+    isTwoWayBinding: boolean;
+}
+/**
+ * Indicates that a certain field of a directive does not have a corresponding input binding.
+ */
+export interface TcbDirectiveUnsetInput {
+    type: 'unset';
+    /**
+     * The name of a field on the directive for which no input binding is present.
+     */
+    field: string;
+}
+export type TcbDirectiveInput = TcbDirectiveBoundInput | TcbDirectiveUnsetInput;
+export declare function getBoundAttributes(directive: TcbDirectiveMetadata, node: TmplAstTemplate | TmplAstElement | TmplAstComponent | TmplAstDirective): TcbBoundAttribute[];
+export declare function checkSplitTwoWayBinding(inputName: string, output: TmplAstBoundEvent, inputs: TmplAstBoundAttribute[], tcb: Context): boolean;
+/**
+ * Potentially widens the type of `expr` according to the type-checking configuration.
+ */
+export declare function widenBinding(expr: TcbExpr, tcb: Context, originalValue: string | AST): TcbExpr;

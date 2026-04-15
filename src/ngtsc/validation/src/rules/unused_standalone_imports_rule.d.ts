@@ -5,10 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { TypeCheckingConfig } from '@angular/compiler';
 import ts from 'typescript';
 import type { ImportedSymbolsTracker } from '../../../imports';
-import type { TemplateTypeChecker } from '../../../typecheck/api';
+import type { TemplateTypeChecker, TypeCheckingConfig } from '../../../typecheck/api';
 import type { SourceFileValidatorRule } from './api';
 /**
  * Rule that flags unused symbols inside of the `imports` array of a component.

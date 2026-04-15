@@ -5,12 +5,13 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { TcbDirectiveMetadata, TcbExpr, TcbPipeMetadata, TypeCheckingConfig } from '@angular/compiler';
 import ts from 'typescript';
 import { ReferenceEmitter } from '../../imports';
 import { ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
+import { TcbDirectiveMetadata, TcbPipeMetadata, TypeCheckingConfig } from '../api';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
+import { TcbExpr } from './ops/codegen';
 /**
  * A context which hosts one or more Type Check Blocks (TCBs).
  *

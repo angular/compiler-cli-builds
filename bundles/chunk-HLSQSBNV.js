@@ -8,19 +8,17 @@ import {
   TrackedIncrementalBuildStrategy,
   freshCompilationTicket,
   incrementalFromCompilerTicket
-} from "./chunk-WEGGVH6V.js";
+} from "./chunk-RGJL4RYF.js";
 import {
   ActivePerfRecorder,
+  OptimizeFor,
   PerfCheckpoint,
   PerfEvent,
   PerfPhase,
   TsCreateProgramDriver,
+  replaceTsWithNgInErrors,
   retagAllTsFiles
-} from "./chunk-BUZ6YOYW.js";
-import {
-  OptimizeFor,
-  replaceTsWithNgInErrors
-} from "./chunk-USW6NVU3.js";
+} from "./chunk-O3K5OHL7.js";
 import {
   absoluteFrom,
   createFileSystemTsReadDirectoryFn,
@@ -150,7 +148,7 @@ function compareVersions(v1, v2) {
 }
 
 // packages/compiler-cli/src/typescript_support.js
-var MIN_TS_VERSION = "6.0.0";
+var MIN_TS_VERSION = "5.9.0";
 var MAX_TS_VERSION = "6.1.0";
 var tsVersion = ts2.version;
 function checkVersion(version, minVersion, maxVersion) {
@@ -644,4 +642,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-QF32EXLM.js.map
+//# sourceMappingURL=chunk-HLSQSBNV.js.map

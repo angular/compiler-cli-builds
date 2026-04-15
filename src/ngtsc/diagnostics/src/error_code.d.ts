@@ -44,10 +44,6 @@ export declare enum ErrorCode {
      */
     INITIALIZER_API_DISALLOWED_MEMBER_VISIBILITY = 1053,
     /**
-     * Raised whenever there are duplicate binding property names for outputs, inputs & models.
-     */
-    DUPLICATE_BINDING_NAME = 1054,
-    /**
      * An Angular feature, like inputs, outputs or queries is incorrectly
      * declared on a static member.
      */
@@ -371,14 +367,6 @@ export declare enum ErrorCode {
     DEFER_TRIGGER_MISCONFIGURATION = 8021,
     /** Raised when the user has an unsupported binding on a `FormField` directive. */
     FORM_FIELD_UNSUPPORTED_BINDING = 8022,
-    /**
-     * Raised when multiple components in the compilation scope match a given element in a template.
-     */
-    MULTIPLE_MATCHING_COMPONENTS = 8023,
-    /**
-     * Raised when a host directive input/output is exposed multiple times under the same name.
-     */
-    CONFLICTING_HOST_DIRECTIVE_BINDING = 8024,
     /**
      * A two way binding in a template has an incorrect syntax,
      * parentheses outside brackets. For example:

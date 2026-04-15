@@ -3,93 +3,92 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
+  AbsoluteModuleStrategy,
   ActivePerfRecorder,
+  AliasStrategy,
+  COMPILER_ERRORS_WITH_GUIDES,
   CompilationMode,
   ComponentDecoratorHandler,
   ComponentScopeKind,
   CompoundComponentScopeReader,
-  DelegatingPerfRecorder,
-  DirectiveDecoratorHandler,
-  DtsTransformRegistry,
-  INPUT_INITIALIZER_FN,
-  InjectableClassRegistry,
-  InjectableDecoratorHandler,
-  JitDeclarationRegistry,
-  LocalModuleScopeRegistry,
-  MODEL_INITIALIZER_FN,
-  MetadataDtsModuleScopeResolver,
-  NgModuleDecoratorHandler,
-  NgOriginalFile,
-  NoopReferencesRegistry,
-  OUTPUT_INITIALIZER_FNS,
-  PartialEvaluator,
-  PerfCheckpoint,
-  PerfEvent,
-  PerfPhase,
-  PipeDecoratorHandler,
-  QUERY_INITIALIZER_FNS,
-  SelectorlessComponentScopeReader,
-  SemanticDepGraphUpdater,
-  ShimAdapter,
-  ShimReferenceTagger,
-  TemplateTypeCheckerImpl,
-  TraitCompiler,
-  TypeCheckScopeRegistry,
-  TypeCheckShimGenerator,
-  aliasTransformFactory,
-  angularJitApplicationTransform,
-  declarationTransformFactory,
-  isShim,
-  ivyTransformFactory,
-  signalMetadataTransform,
-  tryParseInitializerApi,
-  untagAllTsFiles
-} from "./chunk-BUZ6YOYW.js";
-import {
-  AbsoluteModuleStrategy,
-  AliasStrategy,
-  COMPILER_ERRORS_WITH_GUIDES,
   CompoundMetadataReader,
   CompoundMetadataRegistry,
+  DOC_PAGE_BASE_URL,
   DefaultImportTracker,
   DeferredSymbolTracker,
+  DelegatingPerfRecorder,
+  DirectiveDecoratorHandler,
   DtsMetadataReader,
+  DtsTransformRegistry,
   ERROR_DETAILS_PAGE_BASE_URL,
   ErrorCode,
   ExportedProviderStatusResolver,
   ExtendedTemplateDiagnosticName,
   HostDirectivesResolver,
+  INPUT_INITIALIZER_FN,
   ImportedSymbolsTracker,
+  InjectableClassRegistry,
+  InjectableDecoratorHandler,
+  JitDeclarationRegistry,
   LocalCompilationExtraImportsTracker,
   LocalIdentifierStrategy,
   LocalMetadataRegistry,
+  LocalModuleScopeRegistry,
   LogicalProjectStrategy,
+  MODEL_INITIALIZER_FN,
   MetaKind,
+  MetadataDtsModuleScopeResolver,
   ModuleResolver,
+  NgModuleDecoratorHandler,
+  NgOriginalFile,
   NoopImportRewriter,
+  NoopReferencesRegistry,
+  OUTPUT_INITIALIZER_FNS,
   OptimizeFor,
+  PartialEvaluator,
+  PerfCheckpoint,
+  PerfEvent,
+  PerfPhase,
+  PipeDecoratorHandler,
   PrivateExportAliasingHost,
+  QUERY_INITIALIZER_FNS,
   R3SymbolsImportRewriter,
   Reference,
   ReferenceEmitter,
   RelativePathStrategy,
   ResourceRegistry,
+  SelectorlessComponentScopeReader,
+  SemanticDepGraphUpdater,
+  ShimAdapter,
+  ShimReferenceTagger,
   SymbolKind,
+  TemplateTypeCheckerImpl,
+  TraitCompiler,
+  TypeCheckScopeRegistry,
+  TypeCheckShimGenerator,
   TypeScriptReflectionHost,
   UnifiedModulesAliasingHost,
   UnifiedModulesStrategy,
+  aliasTransformFactory,
+  angularJitApplicationTransform,
+  declarationTransformFactory,
   getRootDirs,
   getSourceFileOrNull,
   isDtsPath,
   isFatalDiagnosticError,
   isNamedClassDeclaration,
   isNonDeclarationTsPath,
+  isShim,
+  ivyTransformFactory,
   makeDiagnostic,
   ngErrorCode,
   normalizeSeparators,
   relativePathBetween,
-  toUnredirectedSourceFile
-} from "./chunk-USW6NVU3.js";
+  signalMetadataTransform,
+  toUnredirectedSourceFile,
+  tryParseInitializerApi,
+  untagAllTsFiles
+} from "./chunk-O3K5OHL7.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -1383,355 +1382,6 @@ function isInterfaceEntry(e) {
   return e?.entryType === EntryType.Interface;
 }
 
-// packages/compiler-cli/src/ngtsc/incremental/src/strategy.js
-var TrackedIncrementalBuildStrategy = class _TrackedIncrementalBuildStrategy {
-  state = null;
-  isSet = false;
-  getIncrementalState() {
-    return this.state;
-  }
-  setIncrementalState(state) {
-    this.state = state;
-    this.isSet = true;
-  }
-  toNextBuildStrategy() {
-    const strategy = new _TrackedIncrementalBuildStrategy();
-    strategy.state = this.isSet ? this.state : null;
-    return strategy;
-  }
-};
-var PatchedProgramIncrementalBuildStrategy = class {
-  getIncrementalState(program) {
-    const state = program[SYM_INCREMENTAL_STATE];
-    if (state === void 0) {
-      return null;
-    }
-    return state;
-  }
-  setIncrementalState(state, program) {
-    program[SYM_INCREMENTAL_STATE] = state;
-  }
-  toNextBuildStrategy() {
-    return this;
-  }
-};
-var SYM_INCREMENTAL_STATE = Symbol("NgIncrementalState");
-
-// packages/compiler-cli/src/ngtsc/incremental/src/dependency_tracking.js
-var FileDependencyGraph = class {
-  nodes = /* @__PURE__ */ new Map();
-  addDependency(from, on) {
-    this.nodeFor(from).dependsOn.add(absoluteFromSourceFile(on));
-  }
-  addResourceDependency(from, resource) {
-    this.nodeFor(from).usesResources.add(resource);
-  }
-  recordDependencyAnalysisFailure(file) {
-    this.nodeFor(file).failedAnalysis = true;
-  }
-  getResourceDependencies(from) {
-    const node = this.nodes.get(from);
-    return node ? [...node.usesResources] : [];
-  }
-  /**
-   * Update the current dependency graph from a previous one, incorporating a set of physical
-   * changes.
-   *
-   * This method performs two tasks:
-   *
-   * 1. For files which have not logically changed, their dependencies from `previous` are added to
-   *    `this` graph.
-   * 2. For files which have logically changed, they're added to a set of logically changed files
-   *    which is eventually returned.
-   *
-   * In essence, for build `n`, this method performs:
-   *
-   * G(n) + L(n) = G(n - 1) + P(n)
-   *
-   * where:
-   *
-   * G(n) = the dependency graph of build `n`
-   * L(n) = the logically changed files from build n - 1 to build n.
-   * P(n) = the physically changed files from build n - 1 to build n.
-   */
-  updateWithPhysicalChanges(previous, changedTsPaths, deletedTsPaths, changedResources) {
-    const logicallyChanged = /* @__PURE__ */ new Set();
-    for (const sf of previous.nodes.keys()) {
-      const sfPath = absoluteFromSourceFile(sf);
-      const node = previous.nodeFor(sf);
-      if (isLogicallyChanged(sf, node, changedTsPaths, deletedTsPaths, changedResources)) {
-        logicallyChanged.add(sfPath);
-      } else if (!deletedTsPaths.has(sfPath)) {
-        this.nodes.set(sf, {
-          dependsOn: new Set(node.dependsOn),
-          usesResources: new Set(node.usesResources),
-          failedAnalysis: false
-        });
-      }
-    }
-    return logicallyChanged;
-  }
-  nodeFor(sf) {
-    if (!this.nodes.has(sf)) {
-      this.nodes.set(sf, {
-        dependsOn: /* @__PURE__ */ new Set(),
-        usesResources: /* @__PURE__ */ new Set(),
-        failedAnalysis: false
-      });
-    }
-    return this.nodes.get(sf);
-  }
-};
-function isLogicallyChanged(sf, node, changedTsPaths, deletedTsPaths, changedResources) {
-  if (node.failedAnalysis) {
-    return true;
-  }
-  const sfPath = absoluteFromSourceFile(sf);
-  if (changedTsPaths.has(sfPath) || deletedTsPaths.has(sfPath)) {
-    return true;
-  }
-  for (const dep of node.dependsOn) {
-    if (changedTsPaths.has(dep) || deletedTsPaths.has(dep)) {
-      return true;
-    }
-  }
-  for (const dep of node.usesResources) {
-    if (changedResources.has(dep)) {
-      return true;
-    }
-  }
-  return false;
-}
-
-// packages/compiler-cli/src/ngtsc/incremental/src/state.js
-var IncrementalStateKind;
-(function(IncrementalStateKind2) {
-  IncrementalStateKind2[IncrementalStateKind2["Fresh"] = 0] = "Fresh";
-  IncrementalStateKind2[IncrementalStateKind2["Delta"] = 1] = "Delta";
-  IncrementalStateKind2[IncrementalStateKind2["Analyzed"] = 2] = "Analyzed";
-})(IncrementalStateKind || (IncrementalStateKind = {}));
-
-// packages/compiler-cli/src/ngtsc/incremental/src/incremental.js
-var PhaseKind;
-(function(PhaseKind2) {
-  PhaseKind2[PhaseKind2["Analysis"] = 0] = "Analysis";
-  PhaseKind2[PhaseKind2["TypeCheckAndEmit"] = 1] = "TypeCheckAndEmit";
-})(PhaseKind || (PhaseKind = {}));
-var IncrementalCompilation = class _IncrementalCompilation {
-  depGraph;
-  versions;
-  step;
-  phase;
-  /**
-   * `IncrementalState` of this compilation if it were to be reused in a subsequent incremental
-   * compilation at the current moment.
-   *
-   * Exposed via the `state` read-only getter.
-   */
-  _state;
-  constructor(state, depGraph, versions, step) {
-    this.depGraph = depGraph;
-    this.versions = versions;
-    this.step = step;
-    this._state = state;
-    this.phase = {
-      kind: PhaseKind.Analysis,
-      semanticDepGraphUpdater: new SemanticDepGraphUpdater(step !== null ? step.priorState.semanticDepGraph : null)
-    };
-  }
-  /**
-   * Begin a fresh `IncrementalCompilation`.
-   */
-  static fresh(versions) {
-    const state = {
-      kind: IncrementalStateKind.Fresh
-    };
-    return new _IncrementalCompilation(
-      state,
-      new FileDependencyGraph(),
-      versions,
-      /* reuse */
-      null
-    );
-  }
-  static incremental(program, newVersions, oldProgram, oldState, modifiedResourceFiles, perf) {
-    return perf.inPhase(PerfPhase.Reconciliation, () => {
-      const physicallyChangedTsFiles = /* @__PURE__ */ new Set();
-      const changedResourceFiles = new Set(modifiedResourceFiles ?? []);
-      let priorAnalysis;
-      switch (oldState.kind) {
-        case IncrementalStateKind.Fresh:
-          return _IncrementalCompilation.fresh(newVersions);
-        case IncrementalStateKind.Analyzed:
-          priorAnalysis = oldState;
-          break;
-        case IncrementalStateKind.Delta:
-          priorAnalysis = oldState.lastAnalyzedState;
-          for (const sfPath of oldState.physicallyChangedTsFiles) {
-            physicallyChangedTsFiles.add(sfPath);
-          }
-          for (const resourcePath of oldState.changedResourceFiles) {
-            changedResourceFiles.add(resourcePath);
-          }
-          break;
-      }
-      const oldVersions = priorAnalysis.versions;
-      const oldFilesArray = oldProgram.getSourceFiles().map(toOriginalSourceFile);
-      const oldFiles = new Set(oldFilesArray);
-      const deletedTsFiles = new Set(oldFilesArray.map((sf) => absoluteFromSourceFile(sf)));
-      for (const possiblyRedirectedNewFile of program.getSourceFiles()) {
-        const sf = toOriginalSourceFile(possiblyRedirectedNewFile);
-        const sfPath = absoluteFromSourceFile(sf);
-        deletedTsFiles.delete(sfPath);
-        if (oldFiles.has(sf)) {
-          if (oldVersions === null || newVersions === null) {
-            continue;
-          }
-          if (oldVersions.has(sfPath) && newVersions.has(sfPath) && oldVersions.get(sfPath) === newVersions.get(sfPath)) {
-            continue;
-          }
-        }
-        if (sf.isDeclarationFile) {
-          return _IncrementalCompilation.fresh(newVersions);
-        }
-        physicallyChangedTsFiles.add(sfPath);
-      }
-      for (const deletedFileName of deletedTsFiles) {
-        physicallyChangedTsFiles.delete(resolve(deletedFileName));
-      }
-      const depGraph = new FileDependencyGraph();
-      const logicallyChangedTsFiles = depGraph.updateWithPhysicalChanges(priorAnalysis.depGraph, physicallyChangedTsFiles, deletedTsFiles, changedResourceFiles);
-      for (const sfPath of physicallyChangedTsFiles) {
-        logicallyChangedTsFiles.add(sfPath);
-      }
-      const state = {
-        kind: IncrementalStateKind.Delta,
-        physicallyChangedTsFiles,
-        changedResourceFiles,
-        lastAnalyzedState: priorAnalysis
-      };
-      return new _IncrementalCompilation(state, depGraph, newVersions, {
-        priorState: priorAnalysis,
-        logicallyChangedTsFiles
-      });
-    });
-  }
-  get state() {
-    return this._state;
-  }
-  get semanticDepGraphUpdater() {
-    if (this.phase.kind !== PhaseKind.Analysis) {
-      throw new Error(`AssertionError: Cannot update the SemanticDepGraph after analysis completes`);
-    }
-    return this.phase.semanticDepGraphUpdater;
-  }
-  recordSuccessfulAnalysis(traitCompiler) {
-    if (this.phase.kind !== PhaseKind.Analysis) {
-      throw new Error(`AssertionError: Incremental compilation in phase ${PhaseKind[this.phase.kind]}, expected Analysis`);
-    }
-    const { needsEmit, needsTypeCheckEmit, newGraph } = this.phase.semanticDepGraphUpdater.finalize();
-    let emitted;
-    if (this.step === null) {
-      emitted = /* @__PURE__ */ new Set();
-    } else {
-      emitted = new Set(this.step.priorState.emitted);
-      for (const sfPath of this.step.logicallyChangedTsFiles) {
-        emitted.delete(sfPath);
-      }
-      for (const sfPath of needsEmit) {
-        emitted.delete(sfPath);
-      }
-    }
-    this._state = {
-      kind: IncrementalStateKind.Analyzed,
-      versions: this.versions,
-      depGraph: this.depGraph,
-      semanticDepGraph: newGraph,
-      priorAnalysis: traitCompiler.getAnalyzedRecords(),
-      typeCheckResults: null,
-      emitted
-    };
-    this.phase = {
-      kind: PhaseKind.TypeCheckAndEmit,
-      needsEmit,
-      needsTypeCheckEmit
-    };
-  }
-  recordSuccessfulTypeCheck(results) {
-    if (this._state.kind !== IncrementalStateKind.Analyzed) {
-      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
-    } else if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
-      throw new Error(`AssertionError: Incremental compilation in phase ${PhaseKind[this.phase.kind]}, expected TypeCheck`);
-    }
-    this._state.typeCheckResults = results;
-  }
-  recordSuccessfulEmit(sf) {
-    if (this._state.kind !== IncrementalStateKind.Analyzed) {
-      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
-    }
-    this._state.emitted.add(absoluteFromSourceFile(sf));
-  }
-  priorAnalysisFor(sf) {
-    if (this.step === null) {
-      return null;
-    }
-    const sfPath = absoluteFromSourceFile(sf);
-    if (this.step.logicallyChangedTsFiles.has(sfPath)) {
-      return null;
-    }
-    const priorAnalysis = this.step.priorState.priorAnalysis;
-    if (!priorAnalysis.has(sf)) {
-      return null;
-    }
-    return priorAnalysis.get(sf);
-  }
-  priorTypeCheckingResultsFor(sf) {
-    if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
-      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
-    }
-    if (this.step === null) {
-      return null;
-    }
-    const sfPath = absoluteFromSourceFile(sf);
-    if (this.step.logicallyChangedTsFiles.has(sfPath) || this.phase.needsTypeCheckEmit.has(sfPath)) {
-      return null;
-    }
-    if (this.step.priorState.typeCheckResults === null || !this.step.priorState.typeCheckResults.has(sfPath)) {
-      return null;
-    }
-    const priorResults = this.step.priorState.typeCheckResults.get(sfPath);
-    if (priorResults.hasInlines) {
-      return null;
-    }
-    return priorResults;
-  }
-  safeToSkipEmit(sf) {
-    if (this.step === null) {
-      return false;
-    }
-    const sfPath = absoluteFromSourceFile(sf);
-    if (this.step.logicallyChangedTsFiles.has(sfPath)) {
-      return false;
-    }
-    if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
-      throw new Error(`AssertionError: Expected successful analysis before attempting to emit files`);
-    }
-    if (this.phase.needsEmit.has(sfPath)) {
-      return false;
-    }
-    return this.step.priorState.emitted.has(sfPath);
-  }
-};
-function toOriginalSourceFile(sf) {
-  const unredirectedSf = toUnredirectedSourceFile(sf);
-  const originalFile = unredirectedSf[NgOriginalFile];
-  if (originalFile !== void 0) {
-    return originalFile;
-  } else {
-    return unredirectedSf;
-  }
-}
-
 // packages/compiler-cli/src/ngtsc/core/api/src/public_options.js
 var DiagnosticCategoryLabel;
 (function(DiagnosticCategoryLabel2) {
@@ -2144,6 +1794,355 @@ var ReferenceGraph = class {
     }
   }
 };
+
+// packages/compiler-cli/src/ngtsc/incremental/src/dependency_tracking.js
+var FileDependencyGraph = class {
+  nodes = /* @__PURE__ */ new Map();
+  addDependency(from, on) {
+    this.nodeFor(from).dependsOn.add(absoluteFromSourceFile(on));
+  }
+  addResourceDependency(from, resource) {
+    this.nodeFor(from).usesResources.add(resource);
+  }
+  recordDependencyAnalysisFailure(file) {
+    this.nodeFor(file).failedAnalysis = true;
+  }
+  getResourceDependencies(from) {
+    const node = this.nodes.get(from);
+    return node ? [...node.usesResources] : [];
+  }
+  /**
+   * Update the current dependency graph from a previous one, incorporating a set of physical
+   * changes.
+   *
+   * This method performs two tasks:
+   *
+   * 1. For files which have not logically changed, their dependencies from `previous` are added to
+   *    `this` graph.
+   * 2. For files which have logically changed, they're added to a set of logically changed files
+   *    which is eventually returned.
+   *
+   * In essence, for build `n`, this method performs:
+   *
+   * G(n) + L(n) = G(n - 1) + P(n)
+   *
+   * where:
+   *
+   * G(n) = the dependency graph of build `n`
+   * L(n) = the logically changed files from build n - 1 to build n.
+   * P(n) = the physically changed files from build n - 1 to build n.
+   */
+  updateWithPhysicalChanges(previous, changedTsPaths, deletedTsPaths, changedResources) {
+    const logicallyChanged = /* @__PURE__ */ new Set();
+    for (const sf of previous.nodes.keys()) {
+      const sfPath = absoluteFromSourceFile(sf);
+      const node = previous.nodeFor(sf);
+      if (isLogicallyChanged(sf, node, changedTsPaths, deletedTsPaths, changedResources)) {
+        logicallyChanged.add(sfPath);
+      } else if (!deletedTsPaths.has(sfPath)) {
+        this.nodes.set(sf, {
+          dependsOn: new Set(node.dependsOn),
+          usesResources: new Set(node.usesResources),
+          failedAnalysis: false
+        });
+      }
+    }
+    return logicallyChanged;
+  }
+  nodeFor(sf) {
+    if (!this.nodes.has(sf)) {
+      this.nodes.set(sf, {
+        dependsOn: /* @__PURE__ */ new Set(),
+        usesResources: /* @__PURE__ */ new Set(),
+        failedAnalysis: false
+      });
+    }
+    return this.nodes.get(sf);
+  }
+};
+function isLogicallyChanged(sf, node, changedTsPaths, deletedTsPaths, changedResources) {
+  if (node.failedAnalysis) {
+    return true;
+  }
+  const sfPath = absoluteFromSourceFile(sf);
+  if (changedTsPaths.has(sfPath) || deletedTsPaths.has(sfPath)) {
+    return true;
+  }
+  for (const dep of node.dependsOn) {
+    if (changedTsPaths.has(dep) || deletedTsPaths.has(dep)) {
+      return true;
+    }
+  }
+  for (const dep of node.usesResources) {
+    if (changedResources.has(dep)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+// packages/compiler-cli/src/ngtsc/incremental/src/state.js
+var IncrementalStateKind;
+(function(IncrementalStateKind2) {
+  IncrementalStateKind2[IncrementalStateKind2["Fresh"] = 0] = "Fresh";
+  IncrementalStateKind2[IncrementalStateKind2["Delta"] = 1] = "Delta";
+  IncrementalStateKind2[IncrementalStateKind2["Analyzed"] = 2] = "Analyzed";
+})(IncrementalStateKind || (IncrementalStateKind = {}));
+
+// packages/compiler-cli/src/ngtsc/incremental/src/incremental.js
+var PhaseKind;
+(function(PhaseKind2) {
+  PhaseKind2[PhaseKind2["Analysis"] = 0] = "Analysis";
+  PhaseKind2[PhaseKind2["TypeCheckAndEmit"] = 1] = "TypeCheckAndEmit";
+})(PhaseKind || (PhaseKind = {}));
+var IncrementalCompilation = class _IncrementalCompilation {
+  depGraph;
+  versions;
+  step;
+  phase;
+  /**
+   * `IncrementalState` of this compilation if it were to be reused in a subsequent incremental
+   * compilation at the current moment.
+   *
+   * Exposed via the `state` read-only getter.
+   */
+  _state;
+  constructor(state, depGraph, versions, step) {
+    this.depGraph = depGraph;
+    this.versions = versions;
+    this.step = step;
+    this._state = state;
+    this.phase = {
+      kind: PhaseKind.Analysis,
+      semanticDepGraphUpdater: new SemanticDepGraphUpdater(step !== null ? step.priorState.semanticDepGraph : null)
+    };
+  }
+  /**
+   * Begin a fresh `IncrementalCompilation`.
+   */
+  static fresh(versions) {
+    const state = {
+      kind: IncrementalStateKind.Fresh
+    };
+    return new _IncrementalCompilation(
+      state,
+      new FileDependencyGraph(),
+      versions,
+      /* reuse */
+      null
+    );
+  }
+  static incremental(program, newVersions, oldProgram, oldState, modifiedResourceFiles, perf) {
+    return perf.inPhase(PerfPhase.Reconciliation, () => {
+      const physicallyChangedTsFiles = /* @__PURE__ */ new Set();
+      const changedResourceFiles = new Set(modifiedResourceFiles ?? []);
+      let priorAnalysis;
+      switch (oldState.kind) {
+        case IncrementalStateKind.Fresh:
+          return _IncrementalCompilation.fresh(newVersions);
+        case IncrementalStateKind.Analyzed:
+          priorAnalysis = oldState;
+          break;
+        case IncrementalStateKind.Delta:
+          priorAnalysis = oldState.lastAnalyzedState;
+          for (const sfPath of oldState.physicallyChangedTsFiles) {
+            physicallyChangedTsFiles.add(sfPath);
+          }
+          for (const resourcePath of oldState.changedResourceFiles) {
+            changedResourceFiles.add(resourcePath);
+          }
+          break;
+      }
+      const oldVersions = priorAnalysis.versions;
+      const oldFilesArray = oldProgram.getSourceFiles().map(toOriginalSourceFile);
+      const oldFiles = new Set(oldFilesArray);
+      const deletedTsFiles = new Set(oldFilesArray.map((sf) => absoluteFromSourceFile(sf)));
+      for (const possiblyRedirectedNewFile of program.getSourceFiles()) {
+        const sf = toOriginalSourceFile(possiblyRedirectedNewFile);
+        const sfPath = absoluteFromSourceFile(sf);
+        deletedTsFiles.delete(sfPath);
+        if (oldFiles.has(sf)) {
+          if (oldVersions === null || newVersions === null) {
+            continue;
+          }
+          if (oldVersions.has(sfPath) && newVersions.has(sfPath) && oldVersions.get(sfPath) === newVersions.get(sfPath)) {
+            continue;
+          }
+        }
+        if (sf.isDeclarationFile) {
+          return _IncrementalCompilation.fresh(newVersions);
+        }
+        physicallyChangedTsFiles.add(sfPath);
+      }
+      for (const deletedFileName of deletedTsFiles) {
+        physicallyChangedTsFiles.delete(resolve(deletedFileName));
+      }
+      const depGraph = new FileDependencyGraph();
+      const logicallyChangedTsFiles = depGraph.updateWithPhysicalChanges(priorAnalysis.depGraph, physicallyChangedTsFiles, deletedTsFiles, changedResourceFiles);
+      for (const sfPath of physicallyChangedTsFiles) {
+        logicallyChangedTsFiles.add(sfPath);
+      }
+      const state = {
+        kind: IncrementalStateKind.Delta,
+        physicallyChangedTsFiles,
+        changedResourceFiles,
+        lastAnalyzedState: priorAnalysis
+      };
+      return new _IncrementalCompilation(state, depGraph, newVersions, {
+        priorState: priorAnalysis,
+        logicallyChangedTsFiles
+      });
+    });
+  }
+  get state() {
+    return this._state;
+  }
+  get semanticDepGraphUpdater() {
+    if (this.phase.kind !== PhaseKind.Analysis) {
+      throw new Error(`AssertionError: Cannot update the SemanticDepGraph after analysis completes`);
+    }
+    return this.phase.semanticDepGraphUpdater;
+  }
+  recordSuccessfulAnalysis(traitCompiler) {
+    if (this.phase.kind !== PhaseKind.Analysis) {
+      throw new Error(`AssertionError: Incremental compilation in phase ${PhaseKind[this.phase.kind]}, expected Analysis`);
+    }
+    const { needsEmit, needsTypeCheckEmit, newGraph } = this.phase.semanticDepGraphUpdater.finalize();
+    let emitted;
+    if (this.step === null) {
+      emitted = /* @__PURE__ */ new Set();
+    } else {
+      emitted = new Set(this.step.priorState.emitted);
+      for (const sfPath of this.step.logicallyChangedTsFiles) {
+        emitted.delete(sfPath);
+      }
+      for (const sfPath of needsEmit) {
+        emitted.delete(sfPath);
+      }
+    }
+    this._state = {
+      kind: IncrementalStateKind.Analyzed,
+      versions: this.versions,
+      depGraph: this.depGraph,
+      semanticDepGraph: newGraph,
+      priorAnalysis: traitCompiler.getAnalyzedRecords(),
+      typeCheckResults: null,
+      emitted
+    };
+    this.phase = {
+      kind: PhaseKind.TypeCheckAndEmit,
+      needsEmit,
+      needsTypeCheckEmit
+    };
+  }
+  recordSuccessfulTypeCheck(results) {
+    if (this._state.kind !== IncrementalStateKind.Analyzed) {
+      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
+    } else if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
+      throw new Error(`AssertionError: Incremental compilation in phase ${PhaseKind[this.phase.kind]}, expected TypeCheck`);
+    }
+    this._state.typeCheckResults = results;
+  }
+  recordSuccessfulEmit(sf) {
+    if (this._state.kind !== IncrementalStateKind.Analyzed) {
+      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
+    }
+    this._state.emitted.add(absoluteFromSourceFile(sf));
+  }
+  priorAnalysisFor(sf) {
+    if (this.step === null) {
+      return null;
+    }
+    const sfPath = absoluteFromSourceFile(sf);
+    if (this.step.logicallyChangedTsFiles.has(sfPath)) {
+      return null;
+    }
+    const priorAnalysis = this.step.priorState.priorAnalysis;
+    if (!priorAnalysis.has(sf)) {
+      return null;
+    }
+    return priorAnalysis.get(sf);
+  }
+  priorTypeCheckingResultsFor(sf) {
+    if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
+      throw new Error(`AssertionError: Expected successfully analyzed compilation.`);
+    }
+    if (this.step === null) {
+      return null;
+    }
+    const sfPath = absoluteFromSourceFile(sf);
+    if (this.step.logicallyChangedTsFiles.has(sfPath) || this.phase.needsTypeCheckEmit.has(sfPath)) {
+      return null;
+    }
+    if (this.step.priorState.typeCheckResults === null || !this.step.priorState.typeCheckResults.has(sfPath)) {
+      return null;
+    }
+    const priorResults = this.step.priorState.typeCheckResults.get(sfPath);
+    if (priorResults.hasInlines) {
+      return null;
+    }
+    return priorResults;
+  }
+  safeToSkipEmit(sf) {
+    if (this.step === null) {
+      return false;
+    }
+    const sfPath = absoluteFromSourceFile(sf);
+    if (this.step.logicallyChangedTsFiles.has(sfPath)) {
+      return false;
+    }
+    if (this.phase.kind !== PhaseKind.TypeCheckAndEmit) {
+      throw new Error(`AssertionError: Expected successful analysis before attempting to emit files`);
+    }
+    if (this.phase.needsEmit.has(sfPath)) {
+      return false;
+    }
+    return this.step.priorState.emitted.has(sfPath);
+  }
+};
+function toOriginalSourceFile(sf) {
+  const unredirectedSf = toUnredirectedSourceFile(sf);
+  const originalFile = unredirectedSf[NgOriginalFile];
+  if (originalFile !== void 0) {
+    return originalFile;
+  } else {
+    return unredirectedSf;
+  }
+}
+
+// packages/compiler-cli/src/ngtsc/incremental/src/strategy.js
+var TrackedIncrementalBuildStrategy = class _TrackedIncrementalBuildStrategy {
+  state = null;
+  isSet = false;
+  getIncrementalState() {
+    return this.state;
+  }
+  setIncrementalState(state) {
+    this.state = state;
+    this.isSet = true;
+  }
+  toNextBuildStrategy() {
+    const strategy = new _TrackedIncrementalBuildStrategy();
+    strategy.state = this.isSet ? this.state : null;
+    return strategy;
+  }
+};
+var PatchedProgramIncrementalBuildStrategy = class {
+  getIncrementalState(program) {
+    const state = program[SYM_INCREMENTAL_STATE];
+    if (state === void 0) {
+      return null;
+    }
+    return state;
+  }
+  setIncrementalState(state, program) {
+    program[SYM_INCREMENTAL_STATE] = state;
+  }
+  toNextBuildStrategy() {
+    return this;
+  }
+};
+var SYM_INCREMENTAL_STATE = Symbol("NgIncrementalState");
 
 // packages/compiler-cli/src/ngtsc/indexer/src/api.js
 var IdentifierKind;
@@ -3599,49 +3598,7 @@ var factory15 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/defer_trigger_misconfiguration/index.js
-import { TmplAstDeferredBlock, TmplAstHoverDeferredTrigger, TmplAstIdleDeferredTrigger, TmplAstImmediateDeferredTrigger, TmplAstInteractionDeferredTrigger, TmplAstTimerDeferredTrigger, TmplAstViewportDeferredTrigger, LiteralPrimitive } from "@angular/compiler";
-function areLiteralMapsEqual(a, b) {
-  const aIsEmpty = a === null || a.keys.length === 0;
-  const bIsEmpty = b === null || b.keys.length === 0;
-  if (aIsEmpty && bIsEmpty)
-    return true;
-  if (aIsEmpty || bIsEmpty)
-    return false;
-  if (a.keys.length !== b.keys.length)
-    return false;
-  const bMap = /* @__PURE__ */ new Map();
-  for (let i = 0; i < b.keys.length; i++) {
-    const bKey = b.keys[i];
-    if (bKey.kind !== "property")
-      continue;
-    const bVal = b.values[i];
-    bMap.set(bKey.key, bVal instanceof LiteralPrimitive ? bVal.value : null);
-  }
-  for (let i = 0; i < a.keys.length; i++) {
-    const aKey = a.keys[i];
-    if (aKey.kind !== "property")
-      continue;
-    const aVal = a.values[i];
-    const aValue = aVal instanceof LiteralPrimitive ? aVal.value : null;
-    if (!bMap.has(aKey.key))
-      return false;
-    if (bMap.get(aKey.key) !== aValue)
-      return false;
-  }
-  return true;
-}
-function getTimedTriggerValue(trigger) {
-  if (trigger instanceof TmplAstTimerDeferredTrigger) {
-    return trigger.delay;
-  }
-  return trigger.timeout;
-}
-function formatTimedTrigger(trigger) {
-  if (trigger instanceof TmplAstTimerDeferredTrigger) {
-    return `timer(${trigger.delay}ms)`;
-  }
-  return trigger.timeout === null ? "idle" : `idle(${trigger.timeout}ms)`;
-}
+import { TmplAstDeferredBlock, TmplAstHoverDeferredTrigger, TmplAstImmediateDeferredTrigger, TmplAstInteractionDeferredTrigger, TmplAstTimerDeferredTrigger, TmplAstViewportDeferredTrigger } from "@angular/compiler";
 var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
   code = ErrorCode.DEFER_TRIGGER_MISCONFIGURATION;
   visitNode(ctx, component, node) {
@@ -3663,34 +3620,25 @@ var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
         diags.push(ctx.makeTemplateDiagnostic(node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
       }
     }
-    if (mains.length === 0 && prefetches.length > 0) {
-      const msg = `Define a main trigger when using 'prefetch' triggers. Without an explicit main trigger, @defer defaults to 'idle' and prefetch may have no effect.`;
-      diags.push(ctx.makeTemplateDiagnostic(node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
-    }
     if (mains.length === 1 && prefetches.length > 0) {
       const main = mains[0];
       for (const pre of prefetches) {
-        const isTimerPair = main instanceof TmplAstTimerDeferredTrigger && pre instanceof TmplAstTimerDeferredTrigger;
-        const isIdlePair = main instanceof TmplAstIdleDeferredTrigger && pre instanceof TmplAstIdleDeferredTrigger;
-        if (isTimerPair || isIdlePair) {
-          const mainVal = getTimedTriggerValue(main);
-          const preVal = getTimedTriggerValue(pre);
-          const sameUntimedIdle = mainVal == null && preVal == null;
-          const comparableTimedPair = mainVal != null && preVal != null && preVal >= mainVal;
-          if (!sameUntimedIdle && !comparableTimedPair) {
-            continue;
+        const isTimerTriggger = main instanceof TmplAstTimerDeferredTrigger && pre instanceof TmplAstTimerDeferredTrigger;
+        if (isTimerTriggger) {
+          const mainDelay = main.delay;
+          const preDelay = pre.delay;
+          if (preDelay >= mainDelay) {
+            const msg = `The Prefetch 'timer(${preDelay}ms)' is not scheduled before the main 'timer(${mainDelay}ms)', so it won\u2019t run prior to rendering. Lower the prefetch delay or remove it.`;
+            diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
           }
-          const msg = `The Prefetch '${formatTimedTrigger(pre)}' is not scheduled before the main '${formatTimedTrigger(main)}', so it won't run prior to rendering. Lower the prefetch timing or remove it.`;
-          diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
-          continue;
         }
         const isHoverTrigger = main instanceof TmplAstHoverDeferredTrigger && pre instanceof TmplAstHoverDeferredTrigger;
         const isInteractionTrigger = main instanceof TmplAstInteractionDeferredTrigger && pre instanceof TmplAstInteractionDeferredTrigger;
         const isViewportTrigger = main instanceof TmplAstViewportDeferredTrigger && pre instanceof TmplAstViewportDeferredTrigger;
         if (isHoverTrigger || isInteractionTrigger || isViewportTrigger) {
-          const referencesMatch = main.reference === pre.reference;
-          const optionsMatch = isViewportTrigger ? areLiteralMapsEqual(main.options, pre.options) : true;
-          if (referencesMatch && optionsMatch) {
+          const mainRef = main.reference;
+          const preRef = pre.reference;
+          if (mainRef && preRef && mainRef === preRef) {
             const kindName = main.constructor.name.replace("DeferredTrigger", "").toLowerCase();
             const msg = `Prefetch '${kindName}' matches the main trigger and provides no benefit. Remove the prefetch modifier.`;
             diags.push(ctx.makeTemplateDiagnostic(pre.sourceSpan ?? node.sourceSpan, formatExtendedError(ErrorCode.DEFER_TRIGGER_MISCONFIGURATION, msg)));
@@ -4221,14 +4169,6 @@ function incrementalFromStateTicket(oldProgram, oldState, newProgram, options, i
     perfRecorder
   };
 }
-function resourceChangeTicket(compiler, modifiedResourceFiles) {
-  return {
-    kind: CompilationTicketKind.IncrementalResource,
-    compiler,
-    modifiedResourceFiles,
-    perfRecorder: ActivePerfRecorder.zeroedToNow()
-  };
-}
 var NgCompiler = class _NgCompiler {
   adapter;
   options;
@@ -4434,7 +4374,7 @@ var NgCompiler = class _NgCompiler {
       if (templateSemanticsChecker !== null) {
         diagnostics.push(...templateSemanticsChecker.getDiagnosticsForComponent(component));
       }
-      if (this.strictTemplates && extendedTemplateChecker !== null) {
+      if (this.options.strictTemplates && extendedTemplateChecker !== null) {
         diagnostics.push(...extendedTemplateChecker.getDiagnosticsForComponent(component));
       }
     } catch (err) {
@@ -4706,21 +4646,18 @@ var NgCompiler = class _NgCompiler {
       this.perfRecorder.memory(PerfCheckpoint.Resolve);
     });
   }
-  /**
-   * strictTemplate is `true` by default.
-   * Explicit opt-out is required to disable strictness
-   */
-  get strictTemplates() {
-    return this.options.strictTemplates !== false;
+  get fullTemplateTypeCheck() {
+    const strictTemplates = !!this.options.strictTemplates;
+    return strictTemplates || !!this.options.fullTemplateTypeCheck;
   }
   getTypeCheckingConfig() {
-    const strictTemplates = this.strictTemplates;
+    const strictTemplates = !!this.options.strictTemplates;
     const useInlineTypeConstructors = this.programDriver.supportsInlineOperations;
     const checkTwoWayBoundEvents = this.options["_checkTwoWayBoundEvents"] ?? false;
     const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0-0");
     const allowDomEventAssertion = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 20.2.0");
     let typeCheckingConfig;
-    if (strictTemplates) {
+    if (this.fullTemplateTypeCheck) {
       typeCheckingConfig = {
         applyTemplateContextGuards: strictTemplates,
         checkQueries: false,
@@ -4750,6 +4687,10 @@ var NgCompiler = class _NgCompiler {
         strictLiteralTypes: true,
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
+        // Warnings for suboptimal type inference are only enabled if in Language Service mode
+        // (providing the full TemplateTypeChecker API) and if strict mode is not enabled. In strict
+        // mode, the user is in full control of type inference.
+        suggestionsForSuboptimalTypeInference: this.enableTemplateTypeChecker && !strictTemplates,
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
@@ -4781,6 +4722,9 @@ var NgCompiler = class _NgCompiler {
         strictLiteralTypes: false,
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
+        // In "basic" template type-checking mode, no warnings are produced since most things are
+        // not checked anyways.
+        suggestionsForSuboptimalTypeInference: false,
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
@@ -4880,7 +4824,7 @@ var NgCompiler = class _NgCompiler {
           return handler.templateSemanticsCheck?.(clazz, templateSemanticsChecker) || null;
         }));
       }
-      if (this.strictTemplates && extendedTemplateChecker !== null) {
+      if (this.options.strictTemplates && extendedTemplateChecker !== null) {
         diagnostics.push(...compilation.traitCompiler.runAdditionalChecks(sf2, (clazz, handler) => {
           return handler.extendedTemplateCheck?.(clazz, extendedTemplateChecker) || null;
         }));
@@ -5068,6 +5012,25 @@ function getR3SymbolsFile(program) {
   return program.getSourceFiles().find((file) => file.fileName.indexOf("r3_symbols.ts") >= 0) || null;
 }
 function* verifyCompatibleTypeCheckOptions(options) {
+  if (options.fullTemplateTypeCheck === false && options.strictTemplates === true) {
+    yield makeConfigDiagnostic({
+      category: ts27.DiagnosticCategory.Error,
+      code: ErrorCode.CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK,
+      messageText: `
+Angular compiler option "strictTemplates" is enabled, however "fullTemplateTypeCheck" is disabled.
+
+Having the "strictTemplates" flag enabled implies that "fullTemplateTypeCheck" is also enabled, so
+the latter can not be explicitly disabled.
+
+One of the following actions is required:
+1. Remove the "fullTemplateTypeCheck" option.
+2. Remove "strictTemplates" or set it to 'false'.
+
+More information about the template type checking compiler options can be found in the documentation:
+${DOC_PAGE_BASE_URL}/tools/cli/template-typecheck
+      `.trim()
+    });
+  }
   if (options.extendedDiagnostics && options.strictTemplates === false) {
     yield makeConfigDiagnostic({
       category: ts27.DiagnosticCategory.Error,
@@ -5412,7 +5375,6 @@ export {
   freshCompilationTicket,
   incrementalFromCompilerTicket,
   incrementalFromStateTicket,
-  resourceChangeTicket,
   NgCompiler,
   NgCompilerHost
 };
@@ -5430,4 +5392,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WEGGVH6V.js.map
+//# sourceMappingURL=chunk-RGJL4RYF.js.map

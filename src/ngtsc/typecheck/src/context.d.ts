@@ -5,14 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { BoundTarget, DirectiveMeta, DomSchemaChecker, OutOfBandDiagnosticRecorder, ParseError, R3TargetBinder, SchemaMetadata, TmplAstHostElement, TmplAstNode, TypeCheckId, TypeCheckingConfig, TypeCtorMetadata } from '@angular/compiler';
+import { BoundTarget, DirectiveMeta, ParseError, R3TargetBinder, SchemaMetadata, TmplAstHostElement, TmplAstNode } from '@angular/compiler';
 import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { PerfRecorder } from '../../perf';
 import { FileUpdate } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
-import { HostBindingsContext, TemplateDiagnostic, SourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TemplateContext } from '../api';
+import { HostBindingsContext, TemplateDiagnostic, TypeCheckId, SourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TypeCheckingConfig, TypeCtorMetadata, TemplateContext } from '../api';
+import { DomSchemaChecker } from './dom';
+import { OutOfBandDiagnosticRecorder } from './oob';
 import { DirectiveSourceManager } from './source';
 import { TypeCheckFile } from './type_check_file';
 export interface ShimTypeCheckingData {
@@ -80,11 +82,11 @@ export interface PendingShimData {
     /**
      * Recorder for out-of-band diagnostics which are raised during generation.
      */
-    oobRecorder: OutOfBandDiagnosticRecorder<TemplateDiagnostic>;
+    oobRecorder: OutOfBandDiagnosticRecorder;
     /**
      * The `DomSchemaChecker` in use for this template, which records any schema-related diagnostics.
      */
-    domSchemaChecker: DomSchemaChecker<TemplateDiagnostic>;
+    domSchemaChecker: DomSchemaChecker;
     /**
      * Shim file in the process of being generated.
      */
@@ -93,10 +95,6 @@ export interface PendingShimData {
      * Map of `TypeCheckId` to information collected about the template as it's ingested.
      */
     data: Map<TypeCheckId, TypeCheckData>;
-    /**
-     * Diagnostics produced during shim creation.
-     */
-    shimDiagnostics: TemplateDiagnostic[] | null;
 }
 /**
  * Adapts the `TypeCheckContextImpl` to the larger template type-checking system.

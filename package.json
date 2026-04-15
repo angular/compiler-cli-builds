@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "22.0.0-next.8+sha-c326548",
+  "version": "21.3.0-next.0+sha-4835277",
   "description": "Angular - the compiler CLI for Node.js",
   "typings": "index.d.ts",
   "bin": {
@@ -40,11 +40,11 @@
     "yargs": "^18.0.0"
   },
   "devDependencies": {
-    "typescript": "6.0.2"
+    "typescript": "5.9.3"
   },
   "peerDependencies": {
-    "@angular/compiler": "22.0.0-next.8+sha-c326548",
-    "typescript": ">=6.0 <6.1"
+    "@angular/compiler": "21.3.0-next.0+sha-4835277",
+    "typescript": ">=5.9 <6.1"
   },
   "peerDependenciesMeta": {
     "typescript": {
@@ -62,7 +62,7 @@
   ],
   "license": "MIT",
   "engines": {
-    "node": "^22.22.0 || >=24.13.1"
+    "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
   },
   "bugs": {
     "url": "https://github.com/angular/angular/issues"

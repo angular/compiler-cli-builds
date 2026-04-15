@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AbsoluteSourceSpan, ParseSourceSpan, TcbTypeParameter, TypeCheckId } from '@angular/compiler';
+import { AbsoluteSourceSpan, ParseSourceSpan } from '@angular/compiler';
 import ts from 'typescript';
 import { ClassDeclaration, ReflectionHost } from '../../../../src/ngtsc/reflection';
 import { Reference } from '../../imports';
-import { FullSourceMapping, SourceLocation, SourceMapping } from '../api';
+import { FullSourceMapping, SourceLocation, TypeCheckId, SourceMapping, TcbTypeParameter } from '../api';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
 /**
  * Adapter interface which allows the directive type-checking diagnostics code to interpret offsets

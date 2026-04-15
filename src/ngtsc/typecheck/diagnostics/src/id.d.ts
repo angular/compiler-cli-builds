@@ -6,5 +6,5 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { DeclarationNode } from '../../../reflection';
-import { TypeCheckId } from '@angular/compiler';
+import { TypeCheckId } from '../../api';
 export declare function getTypeCheckId(clazz: DeclarationNode): TypeCheckId;
