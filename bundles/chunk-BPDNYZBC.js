@@ -455,7 +455,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "20.3.18+sha-cef3164";
+var PLACEHOLDER_VERSION = "20.3.18+sha-303d4cd";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
