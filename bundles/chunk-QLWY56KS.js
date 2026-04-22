@@ -62,6 +62,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE"] = 2025] = "INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE";
   ErrorCode2[ErrorCode2["UNSUPPORTED_SELECTORLESS_COMPONENT_FIELD"] = 2026] = "UNSUPPORTED_SELECTORLESS_COMPONENT_FIELD";
   ErrorCode2[ErrorCode2["COMPONENT_ANIMATIONS_CONFLICT"] = 2027] = "COMPONENT_ANIMATIONS_CONFLICT";
+  ErrorCode2[ErrorCode2["SERVICE_CONSTRUCTOR_DI"] = 2028] = "SERVICE_CONSTRUCTOR_DI";
   ErrorCode2[ErrorCode2["SYMBOL_NOT_EXPORTED"] = 3001] = "SYMBOL_NOT_EXPORTED";
   ErrorCode2[ErrorCode2["IMPORT_CYCLE_DETECTED"] = 3003] = "IMPORT_CYCLE_DETECTED";
   ErrorCode2[ErrorCode2["IMPORT_GENERATION_FAILURE"] = 3004] = "IMPORT_GENERATION_FAILURE";
@@ -231,7 +232,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.8+sha-b395173";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.8+sha-2c141c0";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5595,4 +5596,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-USW6NVU3.js.map
+//# sourceMappingURL=chunk-QLWY56KS.js.map

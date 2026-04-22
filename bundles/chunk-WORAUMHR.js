@@ -455,7 +455,7 @@ import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSo
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "22.0.0-next.8+sha-b395173";
+var PLACEHOLDER_VERSION = "22.0.0-next.8+sha-2c141c0";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -1113,6 +1113,34 @@ function toR3PipeMeta(metaObj, version) {
   };
 }
 
+// packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_service_linker_1.js
+import { compileService } from "@angular/compiler";
+var PartialServiceLinkerVersion1 = class {
+  linkPartialDeclaration(constantPool, metaObj) {
+    const meta = toR3ServiceMeta(metaObj);
+    return compileService(
+      meta,
+      /* resolveForwardRefs */
+      false
+    );
+  }
+};
+function toR3ServiceMeta(metaObj) {
+  const typeExpr = metaObj.getValue("type");
+  const typeName = typeExpr.getSymbolName();
+  if (typeName === null) {
+    throw new FatalLinkerError(typeExpr.expression, "Unsupported type, its name could not be determined");
+  }
+  const meta = {
+    name: typeName,
+    type: wrapReference(typeExpr.getOpaque()),
+    typeArgumentCount: 0,
+    autoProvided: metaObj.has("autoProvided") ? metaObj.getBoolean("autoProvided") : void 0,
+    factory: metaObj.has("factory") ? metaObj.getOpaque("factory") : void 0
+  };
+  return meta;
+}
+
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.js
 var \u0275\u0275ngDeclareDirective = "\u0275\u0275ngDeclareDirective";
 var \u0275\u0275ngDeclareClassMetadata = "\u0275\u0275ngDeclareClassMetadata";
@@ -1123,6 +1151,7 @@ var \u0275\u0275ngDeclareInjector = "\u0275\u0275ngDeclareInjector";
 var \u0275\u0275ngDeclareNgModule = "\u0275\u0275ngDeclareNgModule";
 var \u0275\u0275ngDeclarePipe = "\u0275\u0275ngDeclarePipe";
 var \u0275\u0275ngDeclareClassMetadataAsync = "\u0275\u0275ngDeclareClassMetadataAsync";
+var \u0275\u0275ngDeclareService = "\u0275\u0275ngDeclareService";
 var declarationFunctions = [
   \u0275\u0275ngDeclareDirective,
   \u0275\u0275ngDeclareClassMetadata,
@@ -1132,7 +1161,8 @@ var declarationFunctions = [
   \u0275\u0275ngDeclareInjector,
   \u0275\u0275ngDeclareNgModule,
   \u0275\u0275ngDeclarePipe,
-  \u0275\u0275ngDeclareClassMetadataAsync
+  \u0275\u0275ngDeclareClassMetadataAsync,
+  \u0275\u0275ngDeclareService
 ];
 function createLinkerMap(environment, sourceUrl, code) {
   const linkers = /* @__PURE__ */ new Map();
@@ -1169,6 +1199,9 @@ function createLinkerMap(environment, sourceUrl, code) {
   ]);
   linkers.set(\u0275\u0275ngDeclarePipe, [
     { range: LATEST_VERSION_RANGE, linker: new PartialPipeLinkerVersion1() }
+  ]);
+  linkers.set(\u0275\u0275ngDeclareService, [
+    { range: LATEST_VERSION_RANGE, linker: new PartialServiceLinkerVersion1() }
   ]);
   return linkers;
 }
@@ -1364,4 +1397,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-456UYWVI.js.map
+//# sourceMappingURL=chunk-WORAUMHR.js.map

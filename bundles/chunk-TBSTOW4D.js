@@ -78,7 +78,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-USW6NVU3.js";
+} from "./chunk-QLWY56KS.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -1707,18 +1707,19 @@ var PerfEvent;
   PerfEvent2[PerfEvent2["AnalyzeInjectable"] = 4] = "AnalyzeInjectable";
   PerfEvent2[PerfEvent2["AnalyzeNgModule"] = 5] = "AnalyzeNgModule";
   PerfEvent2[PerfEvent2["AnalyzePipe"] = 6] = "AnalyzePipe";
-  PerfEvent2[PerfEvent2["TraitAnalyze"] = 7] = "TraitAnalyze";
-  PerfEvent2[PerfEvent2["TraitReuseAnalysis"] = 8] = "TraitReuseAnalysis";
-  PerfEvent2[PerfEvent2["SourceFilePhysicalChange"] = 9] = "SourceFilePhysicalChange";
-  PerfEvent2[PerfEvent2["SourceFileLogicalChange"] = 10] = "SourceFileLogicalChange";
-  PerfEvent2[PerfEvent2["SourceFileReuseAnalysis"] = 11] = "SourceFileReuseAnalysis";
-  PerfEvent2[PerfEvent2["GenerateTcb"] = 12] = "GenerateTcb";
-  PerfEvent2[PerfEvent2["SkipGenerateTcbNoInline"] = 13] = "SkipGenerateTcbNoInline";
-  PerfEvent2[PerfEvent2["ReuseTypeCheckFile"] = 14] = "ReuseTypeCheckFile";
-  PerfEvent2[PerfEvent2["UpdateTypeCheckProgram"] = 15] = "UpdateTypeCheckProgram";
-  PerfEvent2[PerfEvent2["EmitSkipSourceFile"] = 16] = "EmitSkipSourceFile";
-  PerfEvent2[PerfEvent2["EmitSourceFile"] = 17] = "EmitSourceFile";
-  PerfEvent2[PerfEvent2["LAST"] = 18] = "LAST";
+  PerfEvent2[PerfEvent2["AnalyzeService"] = 7] = "AnalyzeService";
+  PerfEvent2[PerfEvent2["TraitAnalyze"] = 8] = "TraitAnalyze";
+  PerfEvent2[PerfEvent2["TraitReuseAnalysis"] = 9] = "TraitReuseAnalysis";
+  PerfEvent2[PerfEvent2["SourceFilePhysicalChange"] = 10] = "SourceFilePhysicalChange";
+  PerfEvent2[PerfEvent2["SourceFileLogicalChange"] = 11] = "SourceFileLogicalChange";
+  PerfEvent2[PerfEvent2["SourceFileReuseAnalysis"] = 12] = "SourceFileReuseAnalysis";
+  PerfEvent2[PerfEvent2["GenerateTcb"] = 13] = "GenerateTcb";
+  PerfEvent2[PerfEvent2["SkipGenerateTcbNoInline"] = 14] = "SkipGenerateTcbNoInline";
+  PerfEvent2[PerfEvent2["ReuseTypeCheckFile"] = 15] = "ReuseTypeCheckFile";
+  PerfEvent2[PerfEvent2["UpdateTypeCheckProgram"] = 16] = "UpdateTypeCheckProgram";
+  PerfEvent2[PerfEvent2["EmitSkipSourceFile"] = 17] = "EmitSkipSourceFile";
+  PerfEvent2[PerfEvent2["EmitSourceFile"] = 18] = "EmitSourceFile";
+  PerfEvent2[PerfEvent2["LAST"] = 19] = "LAST";
 })(PerfEvent || (PerfEvent = {}));
 var PerfCheckpoint;
 (function(PerfCheckpoint2) {
@@ -2822,16 +2823,7 @@ var IvyTransformationVisitor = class extends Visitor {
       return void 0;
     }
     const coreDecorators = this._angularCoreDecorators(node);
-    if (coreDecorators.size === decorators.length) {
-      return void 0;
-    } else if (coreDecorators.size === 0) {
-      return nodeArrayFromDecoratorsArray(decorators);
-    }
-    const filtered = decorators.filter((dec) => !coreDecorators.has(dec));
-    if (filtered.length === 0) {
-      return void 0;
-    }
-    return nodeArrayFromDecoratorsArray(filtered);
+    return decorators.filter((dec) => !coreDecorators.has(dec));
   }
   /**
    * Remove Angular decorators from a `ts.Node` in a shallow manner.
@@ -2841,23 +2833,19 @@ var IvyTransformationVisitor = class extends Visitor {
    */
   _stripAngularDecorators(node) {
     const modifiers = ts9.canHaveModifiers(node) ? ts9.getModifiers(node) : void 0;
-    const nonCoreDecorators = ts9.canHaveDecorators(node) ? this._nonCoreDecoratorsOnly(node) : void 0;
-    const combinedModifiers = [...nonCoreDecorators || [], ...modifiers || []];
-    if (ts9.isParameter(node)) {
-      node = ts9.factory.updateParameterDeclaration(node, combinedModifiers, node.dotDotDotToken, node.name, node.questionToken, node.type, node.initializer);
-    } else if (ts9.isMethodDeclaration(node)) {
-      node = ts9.factory.updateMethodDeclaration(node, combinedModifiers, node.asteriskToken, node.name, node.questionToken, node.typeParameters, node.parameters, node.type, node.body);
-    } else if (ts9.isPropertyDeclaration(node)) {
-      node = ts9.factory.updatePropertyDeclaration(node, combinedModifiers, node.name, node.questionToken || node.exclamationToken, node.type, node.initializer);
-    } else if (ts9.isGetAccessor(node)) {
-      node = ts9.factory.updateGetAccessorDeclaration(node, combinedModifiers, node.name, node.parameters, node.type, node.body);
-    } else if (ts9.isSetAccessor(node)) {
-      node = ts9.factory.updateSetAccessorDeclaration(node, combinedModifiers, node.name, node.parameters, node.body);
-    } else if (ts9.isConstructorDeclaration(node)) {
+    if (ts9.isConstructorDeclaration(node)) {
       const parameters = node.parameters.map((param) => this._stripAngularDecorators(param));
       node = ts9.factory.updateConstructorDeclaration(node, modifiers, parameters, node.body);
     }
-    return node;
+    if (!ts9.canHaveDecorators(node)) {
+      return node;
+    }
+    const nonCoreDecorators = this._nonCoreDecoratorsOnly(node);
+    if (nonCoreDecorators === void 0) {
+      return node;
+    }
+    const combinedModifiers = [...nonCoreDecorators, ...modifiers ?? []];
+    return ts9.factory.replaceDecoratorsAndModifiers(node, combinedModifiers);
   }
 };
 function transformIvySourceFile(compilation, context, reflector, importRewriter, localCompilationExtraImportsTracker, file, isCore, isClosureCompilerEnabled, emitDeclarationOnly, refEmitter, enableTypeReification, recordWrappedNode) {
@@ -2945,14 +2933,6 @@ function createRecorderFn(defaultImportTracker) {
       defaultImportTracker.recordUsedImport(importDecl);
     }
   };
-}
-function nodeArrayFromDecoratorsArray(decorators) {
-  const array = ts9.factory.createNodeArray(decorators);
-  if (array.length > 0) {
-    array.pos = decorators[0].pos;
-    array.end = decorators[decorators.length - 1].end;
-  }
-  return array;
 }
 
 // packages/compiler-cli/src/ngtsc/transform/src/implicit_signal_debug_name_transform.js
@@ -14586,10 +14566,14 @@ export {
   getAngularDecorators,
   unwrapExpression,
   createForwardRefResolver,
+  readBaseClass,
+  wrapTypeReference,
+  toFactoryMetadata,
   DynamicValue,
   StaticInterpreter,
   PartialEvaluator,
   CompilationMode,
+  HandlerPrecedence,
   aliasTransformFactory,
   PerfPhase,
   PerfEvent,
@@ -14601,7 +14585,10 @@ export {
   declarationTransformFactory,
   ivyTransformFactory,
   signalMetadataTransform,
+  compileNgFactoryDefField,
+  compileDeclareFactory,
   InjectableClassRegistry,
+  extractClassMetadata,
   NoopReferencesRegistry,
   JitDeclarationRegistry,
   SemanticDepGraphUpdater,
@@ -14658,4 +14645,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BUZ6YOYW.js.map
+//# sourceMappingURL=chunk-TBSTOW4D.js.map

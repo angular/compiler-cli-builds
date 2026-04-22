@@ -11,6 +11,7 @@ import {
   DelegatingPerfRecorder,
   DirectiveDecoratorHandler,
   DtsTransformRegistry,
+  HandlerPrecedence,
   INPUT_INITIALIZER_FN,
   InjectableClassRegistry,
   InjectableDecoratorHandler,
@@ -38,13 +39,20 @@ import {
   TypeCheckShimGenerator,
   aliasTransformFactory,
   angularJitApplicationTransform,
+  compileDeclareFactory,
+  compileNgFactoryDefField,
   declarationTransformFactory,
+  extractClassMetadata,
+  findAngularDecorator,
   isShim,
   ivyTransformFactory,
+  readBaseClass,
   signalMetadataTransform,
+  toFactoryMetadata,
   tryParseInitializerApi,
-  untagAllTsFiles
-} from "./chunk-BUZ6YOYW.js";
+  untagAllTsFiles,
+  wrapTypeReference
+} from "./chunk-TBSTOW4D.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -58,6 +66,7 @@ import {
   ErrorCode,
   ExportedProviderStatusResolver,
   ExtendedTemplateDiagnosticName,
+  FatalDiagnosticError,
   HostDirectivesResolver,
   ImportedSymbolsTracker,
   LocalCompilationExtraImportsTracker,
@@ -87,9 +96,10 @@ import {
   makeDiagnostic,
   ngErrorCode,
   normalizeSeparators,
+  reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-USW6NVU3.js";
+} from "./chunk-QLWY56KS.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -1741,7 +1751,7 @@ var DiagnosticCategoryLabel;
 })(DiagnosticCategoryLabel || (DiagnosticCategoryLabel = {}));
 
 // packages/compiler-cli/src/ngtsc/core/src/compiler.js
-import ts27 from "typescript";
+import ts28 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/cycles/src/analyzer.js
 var CycleAnalyzer = class {
@@ -4163,6 +4173,168 @@ function coreVersionSupportsFeature(coreVersion, minVersion) {
   return semver.satisfies(coreVersion, minVersion, { includePrerelease: true });
 }
 
+// packages/compiler-cli/src/ngtsc/annotations/src/service.js
+import { compileClassMetadata, compileDeclareClassMetadata, compileDeclareServiceFromMetadata, compileService, FactoryTarget, WrappedNodeExpr } from "@angular/compiler";
+import ts27 from "typescript";
+var ServiceDecoratorHandler = class {
+  reflector;
+  evaluator;
+  isCore;
+  perf;
+  includeClassMetadata;
+  compilationMode;
+  constructor(reflector, evaluator, isCore, perf, includeClassMetadata, compilationMode) {
+    this.reflector = reflector;
+    this.evaluator = evaluator;
+    this.isCore = isCore;
+    this.perf = perf;
+    this.includeClassMetadata = includeClassMetadata;
+    this.compilationMode = compilationMode;
+  }
+  precedence = HandlerPrecedence.SHARED;
+  name = "ServiceDecoratorHandler";
+  detect(node, decorators) {
+    if (!decorators) {
+      return void 0;
+    }
+    const decorator = findAngularDecorator(decorators, "Service", this.isCore);
+    if (decorator !== void 0) {
+      return {
+        trigger: decorator.node,
+        decorator,
+        metadata: decorator
+      };
+    } else {
+      return void 0;
+    }
+  }
+  analyze(node, decorator) {
+    this.perf.eventCount(PerfEvent.AnalyzeService);
+    const decorators = this.reflector.getDecoratorsOfDeclaration(node);
+    let diagnostics;
+    if (decorators !== null && decorators.length > 1) {
+      const nonServiceDecorator = decorators.find((decorator2) => decorator2.import?.from === "@angular/core" && decorator2.name !== "Service");
+      if (nonServiceDecorator) {
+        diagnostics ??= [];
+        diagnostics.push(makeDiagnostic(ErrorCode.DECORATOR_COLLISION, nonServiceDecorator.node, "Cannot apply more than one Angular decorator on an @Service class."));
+      }
+    }
+    return {
+      analysis: {
+        meta: this.extractServiceMetadata(node, decorator),
+        classMetadata: this.includeClassMetadata ? extractClassMetadata(node, this.reflector, this.isCore) : null
+      },
+      diagnostics
+    };
+  }
+  symbol() {
+    return null;
+  }
+  resolve(node) {
+    const diagnostics = this.getDependencyInjectionDiagnostics(node);
+    return diagnostics === null ? {} : { diagnostics };
+  }
+  compileFull(node, analysis) {
+    return this.compile(compileNgFactoryDefField, (meta) => compileService(meta, false), compileClassMetadata, node, analysis);
+  }
+  compilePartial(node, analysis) {
+    return this.compile(compileDeclareFactory, compileDeclareServiceFromMetadata, compileDeclareClassMetadata, node, analysis);
+  }
+  compileLocal(node, analysis) {
+    return this.compile(compileNgFactoryDefField, (meta) => compileService(meta, false), compileClassMetadata, node, analysis);
+  }
+  compile(compileFactoryFn, compileServiceFn, compileClassMetadataFn, node, analysis) {
+    const results = [];
+    const meta = analysis.meta;
+    const factoryRes = compileFactoryFn(toFactoryMetadata({ ...meta, deps: [] }, FactoryTarget.Service));
+    if (analysis.classMetadata !== null) {
+      factoryRes.statements.push(compileClassMetadataFn(analysis.classMetadata).toStmt());
+    }
+    results.push(factoryRes);
+    const \u0275prov = this.reflector.getMembersOfClass(node).find((member) => member.name === "\u0275prov");
+    if (\u0275prov !== void 0) {
+      throw new FatalDiagnosticError(ErrorCode.INJECTABLE_DUPLICATE_PROV, \u0275prov.nameNode || \u0275prov.node || node, "Services cannot contain a static \u0275prov property, because the compiler is going to generate one.");
+    }
+    if (\u0275prov === void 0) {
+      const res = compileServiceFn(analysis.meta);
+      results.push({
+        name: "\u0275prov",
+        initializer: res.expression,
+        statements: res.statements,
+        type: res.type,
+        deferrableImports: null
+      });
+    }
+    return results;
+  }
+  /**
+   * Read metadata from the `@Service` decorator and produce the metadata needed to run
+   * `compileService`.
+   *
+   * A `null` return value indicates this is `@Service` has invalid data.
+   */
+  extractServiceMetadata(clazz, decorator) {
+    const name = clazz.name.text;
+    const type = wrapTypeReference(clazz);
+    const typeArgumentCount = this.reflector.getGenericArityOfClass(clazz) || 0;
+    if (decorator.args === null) {
+      throw new FatalDiagnosticError(ErrorCode.DECORATOR_NOT_CALLED, decorator.node, "@Service must be called");
+    }
+    if (decorator.args.length === 0) {
+      return {
+        name,
+        type,
+        typeArgumentCount
+      };
+    } else if (decorator.args.length === 1) {
+      const metaNode = decorator.args[0];
+      if (!ts27.isObjectLiteralExpression(metaNode)) {
+        throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, "@Service argument must be an object literal");
+      }
+      const meta = reflectObjectLiteral(metaNode);
+      let autoProvided;
+      if (meta.has("autoProvided")) {
+        const value = meta.get("autoProvided");
+        if (value.kind !== ts27.SyntaxKind.TrueKeyword && value.kind !== ts27.SyntaxKind.FalseKeyword) {
+          throw new FatalDiagnosticError(ErrorCode.VALUE_HAS_WRONG_TYPE, metaNode, "`autoProvided` property must be a boolean literal");
+        }
+        autoProvided = value.kind === ts27.SyntaxKind.TrueKeyword;
+      }
+      const result = { name, type, typeArgumentCount, autoProvided };
+      if (meta.has("factory")) {
+        result.factory = new WrappedNodeExpr(meta.get("factory"));
+      }
+      return result;
+    } else {
+      throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARITY_WRONG, decorator.args[2], "Too many arguments to @Service");
+    }
+  }
+  getDependencyInjectionDiagnostics(node) {
+    const ownCtorParams = this.reflector.getConstructorParameters(node);
+    if (ownCtorParams !== null) {
+      return ownCtorParams.length > 0 ? [makeConstructorDependencyInjectionDiagnostic(node)] : null;
+    }
+    if (this.compilationMode === CompilationMode.LOCAL) {
+      return null;
+    }
+    let baseClass = readBaseClass(node, this.reflector, this.evaluator);
+    while (baseClass !== null) {
+      if (baseClass === "dynamic") {
+        return null;
+      }
+      const baseCtorParams = this.reflector.getConstructorParameters(baseClass.node);
+      if (baseCtorParams !== null) {
+        return baseCtorParams.length > 0 ? [makeConstructorDependencyInjectionDiagnostic(node)] : null;
+      }
+      baseClass = readBaseClass(baseClass.node, this.reflector, this.evaluator);
+    }
+    return null;
+  }
+};
+function makeConstructorDependencyInjectionDiagnostic(node) {
+  return makeDiagnostic(ErrorCode.SERVICE_CONSTRUCTOR_DI, node.name, "@Service class cannot use constructor dependency injection. Use the `inject` function instead.");
+}
+
 // packages/compiler-cli/src/ngtsc/core/src/compiler.js
 var CompilationTicketKind;
 (function(CompilationTicketKind2) {
@@ -4323,7 +4495,7 @@ var NgCompiler = class _NgCompiler {
     this.currentProgram = inputProgram;
     this.closureCompilerEnabled = !!this.options.annotateForClosureCompiler;
     this.entryPoint = adapter.entryPoint !== null ? getSourceFileOrNull(inputProgram, adapter.entryPoint) : null;
-    const moduleResolutionCache = ts27.createModuleResolutionCache(
+    const moduleResolutionCache = ts28.createModuleResolutionCache(
       this.adapter.getCurrentDirectory(),
       // doen't retain a reference to `this`, if other closures in the constructor here reference
       // `this` internally then a closure created here would retain them. This can cause major
@@ -4371,7 +4543,7 @@ var NgCompiler = class _NgCompiler {
       }
       for (const clazz of classesToUpdate) {
         this.compilation.traitCompiler.updateResources(clazz);
-        if (!ts27.isClassDeclaration(clazz)) {
+        if (!ts28.isClassDeclaration(clazz)) {
           continue;
         }
         this.compilation.templateTypeChecker.invalidateClass(clazz);
@@ -4581,12 +4753,12 @@ var NgCompiler = class _NgCompiler {
     if (compilation.supportJitMode && compilation.jitDeclarationRegistry.jitDeclarations.size > 0) {
       const { jitDeclarations } = compilation.jitDeclarationRegistry;
       const jitDeclarationsArray = Array.from(jitDeclarations);
-      const jitDeclarationOriginalNodes = new Set(jitDeclarationsArray.map((d) => ts27.getOriginalNode(d)));
+      const jitDeclarationOriginalNodes = new Set(jitDeclarationsArray.map((d) => ts28.getOriginalNode(d)));
       const sourceFilesWithJit = new Set(jitDeclarationsArray.map((d) => d.getSourceFile().fileName));
       before.push((ctx) => {
         const reflectionHost = new TypeScriptReflectionHost(this.inputProgram.getTypeChecker());
         const jitTransform = angularJitApplicationTransform(this.inputProgram, compilation.isCore, (node) => {
-          node = ts27.getOriginalNode(node, ts27.isClassDeclaration);
+          node = ts28.getOriginalNode(node, ts28.isClassDeclaration);
           return reflectionHost.isClass(node) && jitDeclarationOriginalNodes.has(node);
         })(ctx);
         return (sourceFile) => {
@@ -4665,16 +4837,16 @@ var NgCompiler = class _NgCompiler {
       return null;
     }
     const sourceFile = node.getSourceFile();
-    const printer = ts27.createPrinter();
-    const nodeText = printer.printNode(ts27.EmitHint.Unspecified, callback, sourceFile);
-    return ts27.transpileModule(nodeText, {
+    const printer = ts28.createPrinter();
+    const nodeText = printer.printNode(ts28.EmitHint.Unspecified, callback, sourceFile);
+    return ts28.transpileModule(nodeText, {
       compilerOptions: {
         ...this.options,
         // Some module types can produce additional code (see #60795) whereas we need the
         // HMR update module to use a native `export`. Override the `target` and `module`
         // to ensure that it looks as expected.
-        module: ts27.ModuleKind.ES2022,
-        target: ts27.ScriptTarget.ES2022
+        module: ts28.ModuleKind.ES2022,
+        target: ts28.ScriptTarget.ES2022
       },
       fileName: sourceFile.fileName,
       reportDiagnostics: false
@@ -5005,6 +5177,7 @@ var NgCompiler = class _NgCompiler {
       // Pipe handler must be before injectable handler in list so pipe factories are printed
       // before injectable factories (so injectable factories can delegate to them)
       new PipeDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, injectableRegistry, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode, !!this.options.generateExtraImportsInLocalMode, !!this.options.strictStandalone, this.implicitStandaloneValue),
+      new ServiceDecoratorHandler(reflector, evaluator, isCore, this.delegatingPerfRecorder, supportTestBed, compilationMode),
       new InjectableDecoratorHandler(reflector, evaluator, isCore, strictCtorDeps, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, compilationMode),
       new NgModuleDecoratorHandler(reflector, evaluator, metaReader, metaRegistry, ngModuleScopeRegistry, referencesRegistry, exportedProviderStatusResolver, semanticDepGraphUpdater, isCore, refEmitter, this.closureCompilerEnabled, this.options.onlyPublishPublicTypingsForNgModules ?? false, injectableRegistry, this.delegatingPerfRecorder, supportTestBed, supportJitMode, compilationMode, localCompilationExtraImportsTracker, jitDeclarationRegistry, this.emitDeclarationOnly)
     ];
@@ -5046,18 +5219,18 @@ function isAngularCorePackage(program) {
     return false;
   }
   return r3Symbols.statements.some((stmt) => {
-    if (!ts27.isVariableStatement(stmt)) {
+    if (!ts28.isVariableStatement(stmt)) {
       return false;
     }
-    const modifiers = ts27.getModifiers(stmt);
-    if (modifiers === void 0 || !modifiers.some((mod) => mod.kind === ts27.SyntaxKind.ExportKeyword)) {
+    const modifiers = ts28.getModifiers(stmt);
+    if (modifiers === void 0 || !modifiers.some((mod) => mod.kind === ts28.SyntaxKind.ExportKeyword)) {
       return false;
     }
     return stmt.declarationList.declarations.some((decl) => {
-      if (!ts27.isIdentifier(decl.name) || decl.name.text !== "ITS_JUST_ANGULAR") {
+      if (!ts28.isIdentifier(decl.name) || decl.name.text !== "ITS_JUST_ANGULAR") {
         return false;
       }
-      if (decl.initializer === void 0 || decl.initializer.kind !== ts27.SyntaxKind.TrueKeyword) {
+      if (decl.initializer === void 0 || decl.initializer.kind !== ts28.SyntaxKind.TrueKeyword) {
         return false;
       }
       return true;
@@ -5070,7 +5243,7 @@ function getR3SymbolsFile(program) {
 function* verifyCompatibleTypeCheckOptions(options) {
   if (options.extendedDiagnostics && options.strictTemplates === false) {
     yield makeConfigDiagnostic({
-      category: ts27.DiagnosticCategory.Error,
+      category: ts28.DiagnosticCategory.Error,
       code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_IMPLIES_STRICT_TEMPLATES,
       messageText: `
 Angular compiler option "extendedDiagnostics" is configured, however "strictTemplates" is disabled.
@@ -5087,7 +5260,7 @@ One of the following actions is required:
   const defaultCategory = options.extendedDiagnostics?.defaultCategory;
   if (defaultCategory && !allowedCategoryLabels.includes(defaultCategory)) {
     yield makeConfigDiagnostic({
-      category: ts27.DiagnosticCategory.Error,
+      category: ts28.DiagnosticCategory.Error,
       code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CATEGORY_LABEL,
       messageText: `
 Angular compiler option "extendedDiagnostics.defaultCategory" has an unknown diagnostic category: "${defaultCategory}".
@@ -5100,7 +5273,7 @@ ${allowedCategoryLabels.join("\n")}
   for (const [checkName, category] of Object.entries(options.extendedDiagnostics?.checks ?? {})) {
     if (!SUPPORTED_DIAGNOSTIC_NAMES.has(checkName)) {
       yield makeConfigDiagnostic({
-        category: ts27.DiagnosticCategory.Error,
+        category: ts28.DiagnosticCategory.Error,
         code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CHECK,
         messageText: `
 Angular compiler option "extendedDiagnostics.checks" has an unknown check: "${checkName}".
@@ -5112,7 +5285,7 @@ ${Array.from(SUPPORTED_DIAGNOSTIC_NAMES).join("\n")}
     }
     if (!allowedCategoryLabels.includes(category)) {
       yield makeConfigDiagnostic({
-        category: ts27.DiagnosticCategory.Error,
+        category: ts28.DiagnosticCategory.Error,
         code: ErrorCode.CONFIG_EXTENDED_DIAGNOSTICS_UNKNOWN_CATEGORY_LABEL,
         messageText: `
 Angular compiler option "extendedDiagnostics.checks['${checkName}']" has an unknown diagnostic category: "${category}".
@@ -5130,7 +5303,7 @@ function verifyEmitDeclarationOnly(options) {
   }
   return [
     makeConfigDiagnostic({
-      category: ts27.DiagnosticCategory.Error,
+      category: ts28.DiagnosticCategory.Error,
       code: ErrorCode.CONFIG_EMIT_DECLARATION_ONLY_UNSUPPORTED,
       messageText: 'TS compiler option "emitDeclarationOnly" is not supported.'
     })
@@ -5155,7 +5328,7 @@ var ReferenceGraphAdapter = class {
     for (const { node } of references) {
       let sourceFile = node.getSourceFile();
       if (sourceFile === void 0) {
-        sourceFile = ts27.getOriginalNode(node).getSourceFile();
+        sourceFile = ts28.getOriginalNode(node).getSourceFile();
       }
       if (sourceFile === void 0 || !isDtsPath(sourceFile.fileName)) {
         this.graph.add(source, node);
@@ -5196,7 +5369,7 @@ function versionMapFromProgram(program, driver) {
 }
 
 // packages/compiler-cli/src/ngtsc/core/src/host.js
-import ts28 from "typescript";
+import ts29 from "typescript";
 var DelegatingCompilerHost = class {
   delegate;
   createHash;
@@ -5335,7 +5508,7 @@ var NgCompilerHost = class _NgCompilerHost extends DelegatingCompilerHost {
       entryPoint = findFlatIndexEntryPoint(normalizedTsInputFiles);
       if (entryPoint === null) {
         diagnostics.push({
-          category: ts28.DiagnosticCategory.Error,
+          category: ts29.DiagnosticCategory.Error,
           code: ngErrorCode(ErrorCode.CONFIG_FLAT_MODULE_NO_INDEX),
           file: void 0,
           start: void 0,
@@ -5389,10 +5562,10 @@ var NgCompilerHost = class _NgCompilerHost extends DelegatingCompilerHost {
     return this.fileNameToModuleName !== void 0 ? this : null;
   }
   createCachedResolveModuleNamesFunction() {
-    const moduleResolutionCache = ts28.createModuleResolutionCache(this.getCurrentDirectory(), this.getCanonicalFileName.bind(this));
+    const moduleResolutionCache = ts29.createModuleResolutionCache(this.getCurrentDirectory(), this.getCanonicalFileName.bind(this));
     return (moduleNames, containingFile, reusedNames, redirectedReference, options) => {
       return moduleNames.map((moduleName) => {
-        const module = ts28.resolveModuleName(moduleName, containingFile, options, this, moduleResolutionCache, redirectedReference);
+        const module = ts29.resolveModuleName(moduleName, containingFile, options, this, moduleResolutionCache, redirectedReference);
         return module.resolvedModule;
       });
     };
@@ -5430,4 +5603,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WEGGVH6V.js.map
+//# sourceMappingURL=chunk-JVCFLR5I.js.map
