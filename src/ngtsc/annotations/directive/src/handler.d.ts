@@ -16,10 +16,10 @@ import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection
 import { LocalModuleScopeRegistry, TypeCheckScopeRegistry } from '../../../scope';
 import { AnalysisOutput, CompilationMode, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../../transform';
 import { InjectableClassRegistry, ReferencesRegistry } from '../../common';
+import { TypeCheckContext } from '../../../typecheck/api';
+import { JitDeclarationRegistry } from '../../common/src/jit_declaration_registry';
 import { HostBindingNodes } from './shared';
 import { DirectiveSymbol } from './symbol';
-import { JitDeclarationRegistry } from '../../common/src/jit_declaration_registry';
-import { TypeCheckContext } from '../../../typecheck/api';
 export interface DirectiveHandlerData {
     baseClass: Reference<ClassDeclaration> | 'dynamic' | null;
     typeCheckMeta: DirectiveTypeCheckMeta;
@@ -62,7 +62,8 @@ export declare class DirectiveDecoratorHandler implements DecoratorHandler<Decor
     private readonly usePoisonedData;
     private readonly typeCheckHostBindings;
     private readonly emitDeclarationOnly;
-    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, strictCtorDeps: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, typeCheckScopeRegistry: TypeCheckScopeRegistry, compilationMode: CompilationMode, jitDeclarationRegistry: JitDeclarationRegistry, resourceRegistry: ResourceRegistry, strictStandalone: boolean, implicitStandaloneValue: boolean, usePoisonedData: boolean, typeCheckHostBindings: boolean, emitDeclarationOnly: boolean);
+    private readonly legacyOptionalChaining;
+    constructor(reflector: ReflectionHost, evaluator: PartialEvaluator, metaRegistry: MetadataRegistry, scopeRegistry: LocalModuleScopeRegistry, metaReader: MetadataReader, injectableRegistry: InjectableClassRegistry, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, strictCtorDeps: boolean, semanticDepGraphUpdater: SemanticDepGraphUpdater | null, annotateForClosureCompiler: boolean, perf: PerfRecorder, importTracker: ImportedSymbolsTracker, includeClassMetadata: boolean, typeCheckScopeRegistry: TypeCheckScopeRegistry, compilationMode: CompilationMode, jitDeclarationRegistry: JitDeclarationRegistry, resourceRegistry: ResourceRegistry, strictStandalone: boolean, implicitStandaloneValue: boolean, usePoisonedData: boolean, typeCheckHostBindings: boolean, emitDeclarationOnly: boolean, legacyOptionalChaining: boolean);
     readonly precedence = HandlerPrecedence.PRIMARY;
     readonly name = "DirectiveDecoratorHandler";
     private readonly undecoratedMetadataExtractor;

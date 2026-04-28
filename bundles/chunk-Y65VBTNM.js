@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-L35AQF75.js";
+} from "./chunk-ZUYMYKXC.js";
 import {
   LogicalProjectPath,
   absoluteFrom,
@@ -232,7 +232,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.9+sha-ef38017";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.9+sha-2896c93";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -3818,23 +3818,36 @@ var TypeScriptAstFactory = class {
   createBlock(body) {
     return ts22.factory.createBlock(body);
   }
+  createCallChain(callee, args, pure, isOptional) {
+    const call = ts22.factory.createCallChain(callee, isOptional ? ts22.factory.createToken(ts22.SyntaxKind.QuestionDotToken) : void 0, void 0, args);
+    if (pure) {
+      this.markAsPure(call);
+    }
+    return call;
+  }
   createCallExpression(callee, args, pure) {
     const call = ts22.factory.createCallExpression(callee, void 0, args);
     if (pure) {
-      ts22.addSyntheticLeadingComment(
-        call,
-        ts22.SyntaxKind.MultiLineCommentTrivia,
-        this.annotateForClosureCompiler ? PureAnnotation.CLOSURE : PureAnnotation.TERSER,
-        /* trailing newline */
-        false
-      );
+      this.markAsPure(call);
     }
     return call;
+  }
+  markAsPure(node) {
+    return ts22.addSyntheticLeadingComment(
+      node,
+      ts22.SyntaxKind.MultiLineCommentTrivia,
+      this.annotateForClosureCompiler ? PureAnnotation.CLOSURE : PureAnnotation.TERSER,
+      /* trailing newline */
+      false
+    );
   }
   createConditional(condition, whenTrue, whenFalse) {
     return ts22.factory.createConditionalExpression(condition, void 0, whenTrue, void 0, whenFalse);
   }
   createElementAccess = ts22.factory.createElementAccessExpression;
+  createElementAccessChain(expression, element, isOptional) {
+    return ts22.factory.createElementAccessChain(expression, isOptional ? ts22.factory.createToken(ts22.SyntaxKind.QuestionDotToken) : void 0, element);
+  }
   createExpressionStatement = ts22.factory.createExpressionStatement;
   createDynamicImport(url) {
     return ts22.factory.createCallExpression(
@@ -3895,6 +3908,9 @@ var TypeScriptAstFactory = class {
   }
   createParenthesizedExpression = ts22.factory.createParenthesizedExpression;
   createPropertyAccess = ts22.factory.createPropertyAccessExpression;
+  createPropertyAccessChain(expression, propertyName, isOptional) {
+    return ts22.factory.createPropertyAccessChain(expression, isOptional ? ts22.factory.createToken(ts22.SyntaxKind.QuestionDotToken) : void 0, propertyName);
+  }
   createSpreadElement = ts22.factory.createSpreadElement;
   createReturnStatement(expression) {
     return ts22.factory.createReturnStatement(expression ?? void 0);
@@ -5596,4 +5612,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-QLWY56KS.js.map
+//# sourceMappingURL=chunk-Y65VBTNM.js.map

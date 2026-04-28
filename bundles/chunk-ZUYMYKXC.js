@@ -19,6 +19,16 @@ var Context = class _Context {
 
 // packages/compiler-cli/src/ngtsc/translator/src/translator.js
 import * as o from "@angular/compiler";
+function isSafeAccess(ast) {
+  if (ast instanceof o.ReadPropExpr) {
+    return ast.isOptional || isSafeAccess(ast.receiver);
+  } else if (ast instanceof o.ReadKeyExpr) {
+    return ast.isOptional || isSafeAccess(ast.receiver);
+  } else if (ast instanceof o.InvokeFunctionExpr) {
+    return ast.isOptional || isSafeAccess(ast.fn);
+  }
+  return false;
+}
 var UNARY_OPERATORS = /* @__PURE__ */ new Map([
   [o.UnaryOperator.Minus, "-"],
   [o.UnaryOperator.Plus, "+"]
@@ -94,7 +104,9 @@ var ExpressionTranslatorVisitor = class {
     return this.attachComments(identifier, ast.leadingComments);
   }
   visitInvokeFunctionExpr(ast, context) {
-    return this.attachComments(this.setSourceMapRange(this.factory.createCallExpression(ast.fn.visitExpression(this, context), ast.args.map((arg) => arg.visitExpression(this, context)), ast.pure), ast.sourceSpan), ast.leadingComments);
+    const fn = ast.fn.visitExpression(this, context);
+    const args = ast.args.map((arg) => arg.visitExpression(this, context));
+    return this.attachComments(this.setSourceMapRange(isSafeAccess(ast) ? this.factory.createCallChain(fn, args, ast.pure, ast.isOptional) : this.factory.createCallExpression(fn, args, ast.pure), ast.sourceSpan), ast.leadingComments);
   }
   visitTaggedTemplateLiteralExpr(ast, context) {
     return this.attachComments(this.setSourceMapRange(this.createTaggedTemplateExpression(ast.tag.visitExpression(this, context), this.getTemplateLiteralFromAst(ast.template, context)), ast.sourceSpan), ast.leadingComments);
@@ -246,10 +258,13 @@ var ExpressionTranslatorVisitor = class {
     return this.attachComments(this.factory.createBinaryExpression(ast.lhs.visitExpression(this, context), operator, ast.rhs.visitExpression(this, context)), ast.leadingComments);
   }
   visitReadPropExpr(ast, context) {
-    return this.attachComments(this.factory.createPropertyAccess(ast.receiver.visitExpression(this, context), ast.name), ast.leadingComments);
+    const receiver = ast.receiver.visitExpression(this, context);
+    return this.attachComments(isSafeAccess(ast) ? this.factory.createPropertyAccessChain(receiver, ast.name, ast.isOptional) : this.factory.createPropertyAccess(receiver, ast.name), ast.leadingComments);
   }
   visitReadKeyExpr(ast, context) {
-    return this.attachComments(this.factory.createElementAccess(ast.receiver.visitExpression(this, context), ast.index.visitExpression(this, context)), ast.leadingComments);
+    const receiver = ast.receiver.visitExpression(this, context);
+    const index = ast.index.visitExpression(this, context);
+    return this.attachComments(isSafeAccess(ast) ? this.factory.createElementAccessChain(receiver, index, ast.isOptional) : this.factory.createElementAccess(receiver, index), ast.leadingComments);
   }
   visitLiteralArrayExpr(ast, context) {
     return this.attachComments(this.factory.createArrayLiteral(ast.entries.map((expr) => this.setSourceMapRange(expr.visitExpression(this, context), ast.sourceSpan))), ast.leadingComments);
@@ -358,4 +373,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-L35AQF75.js.map
+//# sourceMappingURL=chunk-ZUYMYKXC.js.map

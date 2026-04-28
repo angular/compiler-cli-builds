@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { AbsoluteSourceSpan, BoundTarget, ClassPropertyMapping, DirectiveMeta, ParseSourceSpan, SchemaMetadata, TypeCheckId } from '@angular/compiler';
+import ts from 'typescript';
 import { ErrorCode } from '../../diagnostics';
 import { Reference } from '../../imports';
 import { DirectiveTypeCheckMeta, HostDirectiveMeta, InputMapping, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
-import ts from 'typescript';
 /**
  * Extension of `DirectiveMeta` that includes additional information required to type-check the
  * usage of a particular directive.

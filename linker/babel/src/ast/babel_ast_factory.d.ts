@@ -22,9 +22,11 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createAssignment(target: t.Expression, operator: BinaryOperator, value: t.Expression): t.Expression;
     createBinaryExpression(leftOperand: t.Expression, operator: BinaryOperator, rightOperand: t.Expression): t.Expression;
     createBlock: typeof t.blockStatement;
+    createCallChain(callee: t.Expression, args: (t.Expression | t.SpreadElement)[], pure: boolean, isOptional: boolean): t.Expression;
     createCallExpression(callee: t.Expression, args: (t.Expression | t.SpreadElement)[], pure: boolean): t.Expression;
     createConditional: typeof t.conditionalExpression;
     createElementAccess(expression: t.Expression, element: t.Expression): t.Expression;
+    createElementAccessChain(expression: t.Expression, element: t.Expression, isOptional: boolean): t.Expression;
     createExpressionStatement: typeof t.expressionStatement;
     createSpreadElement(expression: t.Expression): t.SpreadElement;
     createFunctionDeclaration(functionName: string, parameters: Parameter<t.TSType>[], body: t.Statement): t.Statement;
@@ -38,6 +40,7 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createObjectLiteral(properties: ObjectLiteralProperty<t.Expression>[]): t.Expression;
     createParenthesizedExpression: typeof t.parenthesizedExpression;
     createPropertyAccess(expression: t.Expression, propertyName: string): t.Expression;
+    createPropertyAccessChain(expression: t.Expression, propertyName: string, isOptional: boolean): t.Expression;
     createReturnStatement(expression: t.Expression | null): t.Statement;
     createTaggedTemplate(tag: t.Expression, template: TemplateLiteral<t.Expression>): t.Expression;
     createTemplateLiteral(template: TemplateLiteral<t.Expression>): t.TemplateLiteral;

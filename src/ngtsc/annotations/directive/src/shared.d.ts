@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { R3DirectiveMetadata, R3QueryMetadata, ClassPropertyMapping, HostObjectLiteralBinding, HostListenerDecorator, HostBindingDecorator } from '@angular/compiler';
+import { ClassPropertyMapping, HostBindingDecorator, HostListenerDecorator, HostObjectLiteralBinding, R3DirectiveMetadata, R3QueryMetadata } from '@angular/compiler';
 import ts from 'typescript';
 import { ImportedSymbolsTracker, Reference, ReferenceEmitter } from '../../../imports';
 import { DecoratorInputTransform, HostDirectiveMeta, InputMapping, Resource } from '../../../metadata';
@@ -27,7 +27,7 @@ export interface HostBindingNodes {
  * appear in the declarations of an `NgModule` and additional verification is done when processing
  * the module.
  */
-export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker, evaluator: PartialEvaluator, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, annotateForClosureCompiler: boolean, compilationMode: CompilationMode, defaultSelector: string | null, strictStandalone: boolean, implicitStandaloneValue: boolean, emitDeclarationOnly: boolean): {
+export declare function extractDirectiveMetadata(clazz: ClassDeclaration, decorator: Readonly<Decorator>, reflector: ReflectionHost, importTracker: ImportedSymbolsTracker, evaluator: PartialEvaluator, refEmitter: ReferenceEmitter, referencesRegistry: ReferencesRegistry, isCore: boolean, annotateForClosureCompiler: boolean, compilationMode: CompilationMode, defaultSelector: string | null, strictStandalone: boolean, implicitStandaloneValue: boolean, emitDeclarationOnly: boolean, legacyOptionalChaining: boolean): {
     jitForced: false;
     decorator: Map<string, ts.Expression>;
     metadata: R3DirectiveMetadata;

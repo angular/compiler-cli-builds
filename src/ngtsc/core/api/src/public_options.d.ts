@@ -310,6 +310,12 @@ export interface BazelAndG3Options {
      * for the Gemini app in g3 for the initial phase of the experiment.
      */
     _experimentalAllowEmitDeclarationOnly?: boolean;
+    /**
+     * Whether to follow the Javascript optional chaining specs: returning `undefined` instead of `null` for null-safe navigation operations.
+     *
+     * Defaults to `false`.
+     */
+    legacyOptionalChaining?: boolean;
 }
 /**
  * Options related to i18n compilation support.

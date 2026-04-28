@@ -22,9 +22,12 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     createAssignment(target: ts.Expression, operator: BinaryOperator, value: ts.Expression): ts.Expression;
     createBinaryExpression(leftOperand: ts.Expression, operator: BinaryOperator, rightOperand: ts.Expression): ts.Expression;
     createBlock(body: ts.Statement[]): ts.Statement;
+    createCallChain(callee: ts.Expression, args: ts.Expression[], pure: boolean, isOptional: boolean): ts.Expression;
     createCallExpression(callee: ts.Expression, args: ts.Expression[], pure: boolean): ts.Expression;
+    private markAsPure;
     createConditional(condition: ts.Expression, whenTrue: ts.Expression, whenFalse: ts.Expression): ts.Expression;
     createElementAccess: (expression: ts.Expression, index: number | ts.Expression) => ts.ElementAccessExpression;
+    createElementAccessChain(expression: ts.Expression, element: ts.Expression, isOptional: boolean): ts.Expression;
     createExpressionStatement: (expression: ts.Expression) => ts.ExpressionStatement;
     createDynamicImport(url: string | ts.Expression): ts.CallExpression;
     createFunctionDeclaration(functionName: string, parameters: Parameter<ts.TypeNode>[], body: ts.Statement): ts.Statement;
@@ -38,6 +41,7 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     createObjectLiteral(properties: ObjectLiteralProperty<ts.Expression>[]): ts.Expression;
     createParenthesizedExpression: (expression: ts.Expression) => ts.ParenthesizedExpression;
     createPropertyAccess: (expression: ts.Expression, name: string | ts.MemberName) => ts.PropertyAccessExpression;
+    createPropertyAccessChain(expression: ts.Expression, propertyName: string, isOptional: boolean): ts.Expression;
     createSpreadElement: (expression: ts.Expression) => ts.SpreadElement;
     createReturnStatement(expression: ts.Expression | null): ts.Statement;
     createTaggedTemplate(tag: ts.Expression, template: TemplateLiteral<ts.Expression>): ts.Expression;

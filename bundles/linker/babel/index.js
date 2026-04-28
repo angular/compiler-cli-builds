@@ -8,13 +8,13 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-WORAUMHR.js";
+} from "../../chunk-ZURNPVTB.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "../../chunk-SEJGUMO2.js";
 import "../../chunk-Y5V7YWTG.js";
-import "../../chunk-L35AQF75.js";
+import "../../chunk-ZUYMYKXC.js";
 import {
   NodeJSFileSystem
 } from "../../chunk-KWAGEHJJ.js";
@@ -65,6 +65,24 @@ var BabelAstFactory = class {
     }
   }
   createBlock = t.blockStatement;
+  createCallChain(callee, args, pure, isOptional) {
+    const call = t.optionalCallExpression(
+      callee,
+      args,
+      /* optional */
+      isOptional
+    );
+    if (pure) {
+      t.addComment(
+        call,
+        "leading",
+        " @__PURE__ ",
+        /* line */
+        false
+      );
+    }
+    return call;
+  }
   createCallExpression(callee, args, pure) {
     const call = t.callExpression(callee, args);
     if (pure) {
@@ -85,6 +103,16 @@ var BabelAstFactory = class {
       element,
       /* computed */
       true
+    );
+  }
+  createElementAccessChain(expression, element, isOptional) {
+    return t.optionalMemberExpression(
+      expression,
+      element,
+      /* computed */
+      true,
+      /* optional */
+      isOptional
     );
   }
   createExpressionStatement = t.expressionStatement;
@@ -150,6 +178,16 @@ var BabelAstFactory = class {
       t.identifier(propertyName),
       /* computed */
       false
+    );
+  }
+  createPropertyAccessChain(expression, propertyName, isOptional) {
+    return t.optionalMemberExpression(
+      expression,
+      t.identifier(propertyName),
+      /* computed */
+      false,
+      /* optional */
+      isOptional
     );
   }
   createReturnStatement(expression) {

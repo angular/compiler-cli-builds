@@ -8,7 +8,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-L35AQF75.js";
+} from "./chunk-ZUYMYKXC.js";
 
 // packages/compiler-cli/linker/src/fatal_linker_error.js
 var FatalLinkerError = class extends Error {
@@ -383,7 +383,7 @@ var LocalEmitScope = class extends EmitScope {
 };
 
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_linker_selector.js
-import semver3 from "semver";
+import semver4 from "semver";
 
 // packages/compiler-cli/linker/src/file_linker/get_source_file.js
 function createGetSourceFile(sourceUrl, code, loader) {
@@ -447,15 +447,16 @@ function toR3ClassMetadata(metaObj) {
 
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_component_linker_1.js
 import { ChangeDetectionStrategy, compileComponentFromMetadata, makeBindingParser as makeBindingParser2, parseTemplate, R3TargetBinder, R3TemplateDependencyKind, ViewEncapsulation } from "@angular/compiler";
-import semver2 from "semver";
+import semver3 from "semver";
 
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/partial_directive_linker_1.js
 import { compileDirectiveFromMetadata, makeBindingParser, ParseLocation, ParseSourceFile, ParseSourceSpan } from "@angular/compiler";
+import semver2 from "semver";
 
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "22.0.0-next.9+sha-ef38017";
+var PLACEHOLDER_VERSION = "22.0.0-next.9+sha-2896c93";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -530,6 +531,7 @@ var PartialDirectiveLinkerVersion1 = class {
   }
 };
 function toR3DirectiveMeta(metaObj, code, sourceUrl, version) {
+  const { major } = new semver2.SemVer(version);
   const typeExpr = metaObj.getValue("type");
   const typeName = typeExpr.getSymbolName();
   if (typeName === null) {
@@ -556,7 +558,8 @@ function toR3DirectiveMeta(metaObj, code, sourceUrl, version) {
     usesInheritance: metaObj.has("usesInheritance") ? metaObj.getBoolean("usesInheritance") : false,
     isStandalone: metaObj.has("isStandalone") ? metaObj.getBoolean("isStandalone") : getDefaultStandaloneValue(version),
     isSignal: metaObj.has("isSignal") ? metaObj.getBoolean("isSignal") : false,
-    hostDirectives: metaObj.has("hostDirectives") ? toHostDirectivesMetadata(metaObj.getValue("hostDirectives")) : null
+    hostDirectives: metaObj.has("hostDirectives") ? toHostDirectivesMetadata(metaObj.getValue("hostDirectives")) : null,
+    legacyOptionalChaining: major < 22 && version !== PLACEHOLDER_VERSION
   };
 }
 function toInputMapping(value, key) {
@@ -703,7 +706,7 @@ var PartialComponentLinkerVersion1 = class {
     const templateSource = metaObj.getValue("template");
     const isInline = metaObj.has("isInline") ? metaObj.getBoolean("isInline") : false;
     const templateInfo = this.getTemplateInfo(templateSource, isInline);
-    const { major, minor } = new semver2.SemVer(version);
+    const { major, minor } = new semver3.SemVer(version);
     const enableBlockSyntax = major >= 17 || version === PLACEHOLDER_VERSION;
     const enableLetSyntax = major > 18 || major === 18 && minor >= 1 || version === PLACEHOLDER_VERSION;
     const hasOnPushByDefault = major >= 22 || version === PLACEHOLDER_VERSION;
@@ -803,6 +806,7 @@ ${errors}`);
     }
     return {
       ...baseMeta,
+      legacyOptionalChaining: major < 22 && version !== PLACEHOLDER_VERSION,
       viewProviders: metaObj.has("viewProviders") ? metaObj.getOpaque("viewProviders") : null,
       template: {
         nodes: template.nodes,
@@ -1234,7 +1238,7 @@ var PartialLinkerSelector = class {
     }
     const declarationRange = getRange(">=", minVersion);
     for (const { range: linkerRange, linker } of linkerRanges) {
-      if (semver3.intersects(declarationRange, linkerRange)) {
+      if (semver4.intersects(declarationRange, linkerRange)) {
         return linker;
       }
     }
@@ -1251,11 +1255,11 @@ Attempting to continue using this version of Angular.`);
 };
 function getRange(comparator, versionStr) {
   if (versionStr === "0.0.0" && PLACEHOLDER_VERSION === "0.0.0") {
-    return new semver3.Range("*.*.*");
+    return new semver4.Range("*.*.*");
   }
-  const version = new semver3.SemVer(versionStr);
+  const version = new semver4.SemVer(versionStr);
   version.prerelease = [];
-  return new semver3.Range(`${comparator}${version.format()}`);
+  return new semver4.Range(`${comparator}${version.format()}`);
 }
 
 // packages/compiler-cli/linker/src/file_linker/file_linker.js
@@ -1397,4 +1401,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WORAUMHR.js.map
+//# sourceMappingURL=chunk-ZURNPVTB.js.map
