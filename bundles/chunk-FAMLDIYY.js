@@ -4888,7 +4888,6 @@ var NgCompiler = class _NgCompiler {
   getTypeCheckingConfig() {
     const strictTemplates = this.strictTemplates;
     const useInlineTypeConstructors = this.programDriver.supportsInlineOperations;
-    const checkTwoWayBoundEvents = this.options["_checkTwoWayBoundEvents"] ?? false;
     const allowSignalsInTwoWayBindings = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.2.0-0");
     const allowDomEventAssertion = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 20.2.0");
     let typeCheckingConfig;
@@ -4925,7 +4924,6 @@ var NgCompiler = class _NgCompiler {
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
-        checkTwoWayBoundEvents,
         allowDomEventAssertion
       };
     } else {
@@ -4956,7 +4954,6 @@ var NgCompiler = class _NgCompiler {
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
-        checkTwoWayBoundEvents,
         allowDomEventAssertion
       };
     }
@@ -5603,4 +5600,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-JVCFLR5I.js.map
+//# sourceMappingURL=chunk-FAMLDIYY.js.map
