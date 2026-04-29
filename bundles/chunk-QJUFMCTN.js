@@ -232,7 +232,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.9+sha-662560e";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.10+sha-4c9afb6";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -4837,9 +4837,11 @@ var Environment = class extends ReferenceEmitEnvironment {
   typeCtorStatements = [];
   pipeInsts = /* @__PURE__ */ new Map();
   pipeInstStatements = [];
-  constructor(config, importManager, refEmitter, contextFile) {
+  copiedSourceOriginPath;
+  constructor(config, importManager, refEmitter, contextFile, copiedSourceOriginPath) {
     super(importManager, refEmitter, contextFile);
     this.config = config;
+    this.copiedSourceOriginPath = copiedSourceOriginPath;
   }
   /**
    * Get an expression referring to a type constructor for the given directive.
@@ -5592,4 +5594,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FVCBQY5F.js.map
+//# sourceMappingURL=chunk-QJUFMCTN.js.map

@@ -7,6 +7,7 @@
  */
 import { TcbDirectiveMetadata, TcbExpr, TcbPipeMetadata, TypeCheckingConfig } from '@angular/compiler';
 import ts from 'typescript';
+import { AbsoluteFsPath } from '../../file_system';
 import { ReferenceEmitter } from '../../imports';
 import { ImportManager } from '../../translator';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
@@ -28,7 +29,8 @@ export declare class Environment extends ReferenceEmitEnvironment {
     protected typeCtorStatements: TcbExpr[];
     private pipeInsts;
     protected pipeInstStatements: TcbExpr[];
-    constructor(config: TypeCheckingConfig, importManager: ImportManager, refEmitter: ReferenceEmitter, contextFile: ts.SourceFile);
+    copiedSourceOriginPath?: AbsoluteFsPath;
+    constructor(config: TypeCheckingConfig, importManager: ImportManager, refEmitter: ReferenceEmitter, contextFile: ts.SourceFile, copiedSourceOriginPath?: AbsoluteFsPath);
     /**
      * Get an expression referring to a type constructor for the given directive.
      *

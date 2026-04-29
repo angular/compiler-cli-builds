@@ -52,7 +52,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-R5KSBYHA.js";
+} from "./chunk-CBAKKWZR.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -99,7 +99,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-FVCBQY5F.js";
+} from "./chunk-QJUFMCTN.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5343,6 +5343,9 @@ var NotifyingProgramDriverWrapper = class {
     this.notifyNewProgram = notifyNewProgram;
     this.getSourceFileVersion = this.delegate.getSourceFileVersion?.bind(this);
   }
+  get inliningMode() {
+    return this.delegate.inliningMode;
+  }
   get supportsInlineOperations() {
     return this.delegate.supportsInlineOperations;
   }
@@ -5601,4 +5604,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BWS7WGSA.js.map
+//# sourceMappingURL=chunk-JBVHWAF6.js.map

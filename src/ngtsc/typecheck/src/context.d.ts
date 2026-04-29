@@ -10,7 +10,7 @@ import ts from 'typescript';
 import { AbsoluteFsPath } from '../../file_system';
 import { Reference, ReferenceEmitter } from '../../imports';
 import { PerfRecorder } from '../../perf';
-import { FileUpdate } from '../../program_driver';
+import { FileUpdate, InliningMode } from '../../program_driver';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { HostBindingsContext, TemplateDiagnostic, SourceMapping, TypeCheckableDirectiveMeta, TypeCheckContext, TemplateContext } from '../api';
 import { DirectiveSourceManager } from './source';
@@ -75,6 +75,10 @@ export interface PendingFileTypeCheckingData {
      * Map of in-progress shim data for shims generated from this input file.
      */
     shimData: Map<AbsoluteFsPath, PendingShimData>;
+    /**
+     * The original source file.
+     */
+    sourceFile?: ts.SourceFile;
 }
 export interface PendingShimData {
     /**
@@ -129,19 +133,6 @@ export interface TypeCheckingHost {
     recordComplete(sfPath: AbsoluteFsPath): void;
 }
 /**
- * How a type-checking context should handle operations which would require inlining.
- */
-export declare enum InliningMode {
-    /**
-     * Use inlining operations when required.
-     */
-    InlineOps = 0,
-    /**
-     * Produce diagnostics if an operation would require inlining.
-     */
-    Error = 1
-}
-/**
  * A template type checking context for a program.
  *
  * The `TypeCheckContext` allows registration of directives to be type checked.
@@ -177,12 +168,17 @@ export declare class TypeCheckContextImpl implements TypeCheckContext {
      */
     addInlineTypeCtor(fileData: PendingFileTypeCheckingData, sf: ts.SourceFile, ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, ctorMeta: TypeCtorMetadata): void;
     /**
-     * Transform a `ts.SourceFile` into a version that includes type checking code.
-     *
-     * If this particular `ts.SourceFile` requires changes, the text representing its new contents
-     * will be returned. Otherwise, a `null` return indicates no changes were necessary.
+     * Applies operations to a file.
      */
-    transform(sf: ts.SourceFile): string | null;
+    private executeOperations;
+    /**
+     * Generates the transformed text for an original source file.
+     */
+    private generateTransformedOriginalFile;
+    /**
+     * Generates the content for a shim file that copies the source of the original file.
+     */
+    private generateCopiedShimContent;
     finalize(): Map<AbsoluteFsPath, FileUpdate>;
     private addInlineTypeCheckBlock;
     private pendingShimForClass;

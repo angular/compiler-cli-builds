@@ -78,7 +78,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-FVCBQY5F.js";
+} from "./chunk-QJUFMCTN.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -5173,6 +5173,20 @@ function extractHostBindingResources(nodes) {
   return result;
 }
 
+// packages/compiler-cli/src/ngtsc/program_driver/src/api.js
+var NgOriginalFile = Symbol("NgOriginalFile");
+var InliningMode;
+(function(InliningMode2) {
+  InliningMode2[InliningMode2["InlineOps"] = 0] = "InlineOps";
+  InliningMode2[InliningMode2["Error"] = 1] = "Error";
+  InliningMode2[InliningMode2["CopySourceToTcb"] = 2] = "CopySourceToTcb";
+})(InliningMode || (InliningMode = {}));
+var UpdateMode;
+(function(UpdateMode2) {
+  UpdateMode2[UpdateMode2["Complete"] = 0] = "Complete";
+  UpdateMode2[UpdateMode2["Incremental"] = 1] = "Incremental";
+})(UpdateMode || (UpdateMode = {}));
+
 // packages/compiler-cli/src/ngtsc/shims/src/expando.js
 var NgExtension = Symbol("NgExtension");
 function isExtended(sf) {
@@ -5426,14 +5440,6 @@ var ShimReferenceTagger = class {
   }
 };
 
-// packages/compiler-cli/src/ngtsc/program_driver/src/api.js
-var NgOriginalFile = Symbol("NgOriginalFile");
-var UpdateMode;
-(function(UpdateMode2) {
-  UpdateMode2[UpdateMode2["Complete"] = 0] = "Complete";
-  UpdateMode2[UpdateMode2["Incremental"] = 1] = "Incremental";
-})(UpdateMode || (UpdateMode = {}));
-
 // packages/compiler-cli/src/ngtsc/program_driver/src/ts_create_program_driver.js
 import ts20 from "typescript";
 var DelegatingCompilerHost = class {
@@ -5573,7 +5579,10 @@ var TsCreateProgramDriver = class {
     this.shimExtensionPrefixes = shimExtensionPrefixes;
     this.program = this.originalProgram;
   }
-  supportsInlineOperations = true;
+  inliningMode = InliningMode.InlineOps;
+  get supportsInlineOperations() {
+    return this.inliningMode === InliningMode.InlineOps || this.inliningMode === InliningMode.CopySourceToTcb;
+  }
   getProgram() {
     return this.program;
   }
@@ -9844,7 +9853,7 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, reflector, genericContextBe
     if (refCache.has(ref2)) {
       return refCache.get(ref2);
     }
-    const result = extractReferenceMetadata(ref2, env.refEmitter, env.contextFile);
+    const result = extractReferenceMetadata(ref2, env);
     refCache.set(ref2, result);
     return result;
   };
@@ -10005,12 +10014,34 @@ function adaptGenerics(node, env, reflector, genericContextBehavior, canReferenc
   }
   return { typeParameters, typeArguments };
 }
-function extractReferenceMetadata(ref, refEmitter, contextFile) {
+function extractReferenceMetadata(ref, env) {
   let name = ref.debugName || ref.node.name.text;
   let moduleName = ref.ownedByModuleGuess;
   let unexportedDiagnostic = null;
   let isLocal = true;
-  const emitted = refEmitter.emit(ref, contextFile, ImportFlags.NoAliasing);
+  if (env.copiedSourceOriginPath !== void 0) {
+    const refFile = ref.node.getSourceFile().fileName;
+    if (refFile === env.copiedSourceOriginPath) {
+      const nodeName2 = ref.node?.name;
+      const nodeNameSpan2 = nodeName2 ? new AbsoluteSourceSpan(nodeName2.getStart(), nodeName2.getEnd()) : void 0;
+      let key2;
+      if (nodeNameSpan2 !== void 0) {
+        key2 = `${refFile}#${nodeNameSpan2.start}`;
+      } else {
+        key2 = name;
+      }
+      return {
+        name,
+        moduleName: null,
+        isLocal: true,
+        unexportedDiagnostic: null,
+        nodeNameSpan: nodeNameSpan2,
+        nodeFilePath: refFile,
+        key: key2
+      };
+    }
+  }
+  const emitted = env.refEmitter.emit(ref, env.contextFile, ImportFlags.NoAliasing);
   if (emitted.kind === ReferenceEmitKind.Success) {
     if (emitted.expression instanceof ExternalExpr6) {
       name = emitted.expression.value.name;
@@ -10386,6 +10417,13 @@ var TypeCheckFile = class extends Environment {
   isTypeCheckFile = true;
   nextTcbId = 1;
   tcbStatements = [];
+  sourceContent = "";
+  get hasCopiedSource() {
+    return this.copiedSourceOriginPath !== void 0;
+  }
+  setSourceContent(text) {
+    this.sourceContent = text;
+  }
   constructor(fileName, config, refEmitter, compilerHost) {
     super(config, new ImportManager({
       // This minimizes noticeable changes with older versions of `ImportManager`.
@@ -10409,7 +10447,7 @@ var TypeCheckFile = class extends Environment {
       throw new Error("AssertionError: Expected no imports to be updated for a new type check file.");
     }
     const printer = ts36.createPrinter();
-    let source = "";
+    let source = this.sourceContent;
     const newImports = importChanges.newImports.get(this.contextFile.fileName);
     if (newImports !== void 0) {
       source += newImports.map((i) => printer.printNode(ts36.EmitHint.Unspecified, i, this.contextFile)).join("\n");
@@ -10436,11 +10474,6 @@ var TypeCheckFile = class extends Environment {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/context.js
-var InliningMode;
-(function(InliningMode2) {
-  InliningMode2[InliningMode2["InlineOps"] = 0] = "InlineOps";
-  InliningMode2[InliningMode2["Error"] = 1] = "Error";
-})(InliningMode || (InliningMode = {}));
 var TypeCheckContextImpl = class {
   config;
   compilerHost;
@@ -10562,8 +10595,11 @@ var TypeCheckContextImpl = class {
       preserveWhitespaces: templateContext?.preserveWhitespaces ?? false
     };
     this.perf.eventCount(PerfEvent.GenerateTcb);
-    if (inliningRequirement !== TcbInliningRequirement.None && this.inlining === InliningMode.InlineOps) {
+    if (inliningRequirement !== TcbInliningRequirement.None && (this.inlining === InliningMode.InlineOps || this.inlining === InliningMode.CopySourceToTcb)) {
       this.addInlineTypeCheckBlock(fileData, shimData, ref, meta);
+      if (this.inlining === InliningMode.CopySourceToTcb) {
+        shimData.file.copiedSourceOriginPath = absoluteFromSourceFile(sourceFile);
+      }
     } else if (inliningRequirement === TcbInliningRequirement.ShouldInlineForGenericBounds && this.inlining === InliningMode.Error) {
       shimData.file.addTypeCheckBlock(ref, meta, shimData.domSchemaChecker, shimData.oobRecorder, TcbGenericContextBehavior2.FallbackToAny, this.reflector);
     } else {
@@ -10586,15 +10622,9 @@ var TypeCheckContextImpl = class {
     fileData.hasInlines = true;
   }
   /**
-   * Transform a `ts.SourceFile` into a version that includes type checking code.
-   *
-   * If this particular `ts.SourceFile` requires changes, the text representing its new contents
-   * will be returned. Otherwise, a `null` return indicates no changes were necessary.
+   * Applies operations to a file.
    */
-  transform(sf) {
-    if (!this.opMap.has(sf)) {
-      return null;
-    }
+  executeOperations(targetSf, opsSourceSf) {
     const printer = ts37.createPrinter({ omitTrailingSemicolon: true });
     const importManager = new ImportManager({
       // This minimizes noticeable changes with older versions of `ImportManager`.
@@ -10603,32 +10633,32 @@ var TypeCheckContextImpl = class {
       // We want to encourage single quotes for now, like we always did.
       shouldUseSingleQuotes: () => true
     });
-    const updates = this.opMap.get(sf).map((op) => {
+    const updates = this.opMap.get(opsSourceSf).map((op) => {
       return {
         pos: op.splitPoint,
-        text: op.execute(importManager, sf, this.refEmitter)
+        text: op.execute(importManager, targetSf, this.refEmitter)
       };
     });
     const { newImports, updatedImports } = importManager.finalize();
-    if (newImports.has(sf.fileName)) {
-      newImports.get(sf.fileName).forEach((newImport) => {
+    if (newImports.has(targetSf.fileName)) {
+      newImports.get(targetSf.fileName).forEach((newImport) => {
         updates.push({
           pos: 0,
-          text: printer.printNode(ts37.EmitHint.Unspecified, newImport, sf)
+          text: printer.printNode(ts37.EmitHint.Unspecified, newImport, targetSf)
         });
       });
     }
     for (const [oldBindings, newBindings] of updatedImports.entries()) {
-      if (oldBindings.getSourceFile() !== sf) {
+      if (oldBindings.getSourceFile() !== targetSf) {
         throw new Error("Unexpected updates to unrelated source files.");
       }
       updates.push({
         pos: oldBindings.getStart(),
         deletePos: oldBindings.getEnd(),
-        text: printer.printNode(ts37.EmitHint.Unspecified, newBindings, sf)
+        text: printer.printNode(ts37.EmitHint.Unspecified, newBindings, targetSf)
       });
     }
-    const result = new MagicString(sf.text, { filename: sf.fileName });
+    const result = new MagicString(targetSf.text, { filename: targetSf.fileName });
     for (const update of updates) {
       if (update.deletePos !== void 0) {
         result.remove(update.pos, update.deletePos);
@@ -10637,10 +10667,29 @@ var TypeCheckContextImpl = class {
     }
     return result.toString();
   }
+  /**
+   * Generates the transformed text for an original source file.
+   */
+  generateTransformedOriginalFile(sf) {
+    if (this.inlining !== InliningMode.InlineOps || !this.opMap.has(sf)) {
+      return null;
+    }
+    return this.executeOperations(sf, sf);
+  }
+  /**
+   * Generates the content for a shim file that copies the source of the original file.
+   */
+  generateCopiedShimContent(originalSf, shimFileName) {
+    if (this.inlining !== InliningMode.CopySourceToTcb || !this.opMap.has(originalSf)) {
+      return null;
+    }
+    const fakeSf = ts37.createSourceFile(shimFileName, originalSf.text, ts37.ScriptTarget.Latest, true);
+    return this.executeOperations(fakeSf, originalSf);
+  }
   finalize() {
     const updates = /* @__PURE__ */ new Map();
     for (const originalSf of this.opMap.keys()) {
-      const newText = this.transform(originalSf);
+      const newText = this.generateTransformedOriginalFile(originalSf);
       if (newText !== null) {
         updates.set(absoluteFromSourceFile(originalSf), {
           newText,
@@ -10663,6 +10712,13 @@ var TypeCheckContextImpl = class {
           path: pendingShimData.file.fileName,
           data: pendingShimData.data
         });
+        const originalSf = pendingFileData.sourceFile;
+        if (originalSf !== void 0) {
+          const transformedText = this.generateCopiedShimContent(originalSf, pendingShimData.file.fileName);
+          if (transformedText !== null) {
+            pendingShimData.file.setSourceContent(transformedText);
+          }
+        }
         const sfText = pendingShimData.file.render();
         updates.set(pendingShimData.file.fileName, {
           newText: sfText,
@@ -10702,7 +10758,8 @@ var TypeCheckContextImpl = class {
       const data = {
         hasInlines: false,
         sourceManager: this.host.getSourceManager(sfPath),
-        shimData: /* @__PURE__ */ new Map()
+        shimData: /* @__PURE__ */ new Map(),
+        sourceFile: sf
       };
       this.fileMap.set(sfPath, data);
     }
@@ -10739,8 +10796,12 @@ var InlineTcbOp = class {
   get splitPoint() {
     return this.ref.node.end + 1;
   }
-  execute(im, sf, refEmitter) {
-    const env = new Environment(this.config, im, refEmitter, sf);
+  execute(im, tcbSf, refEmitter) {
+    const env = new Environment(this.config, im, refEmitter, tcbSf);
+    const originalSf = this.ref.node.getSourceFile();
+    if (tcbSf !== originalSf) {
+      env.copiedSourceOriginPath = absoluteFromSourceFile(originalSf);
+    }
     const fnName = `_tcb_${this.ref.node.pos}`;
     const { tcbMeta, component } = adaptTypeCheckBlockMetadata(this.ref, this.meta, env, this.reflector, TcbGenericContextBehavior2.CopyClassNodes);
     const fn = generateTypeCheckBlock2(env, component, fnName, tcbMeta, this.domSchemaChecker, this.oobRecorder);
@@ -11557,8 +11618,7 @@ var TemplateTypeCheckerImpl = class {
     this.updateFromContext(ctx);
   }
   newContext(host) {
-    const inlining = this.programDriver.supportsInlineOperations ? InliningMode.InlineOps : InliningMode.Error;
-    return new TypeCheckContextImpl(this.config, this.compilerHost, this.refEmitter, this.reflector, host, inlining, this.perf);
+    return new TypeCheckContextImpl(this.config, this.compilerHost, this.refEmitter, this.reflector, host, this.programDriver.inliningMode, this.perf);
   }
   /**
    * Remove any shim data that depends on inline operations applied to the type-checking program.
@@ -14628,6 +14688,7 @@ export {
   DirectiveDecoratorHandler,
   NgModuleDecoratorHandler,
   NgOriginalFile,
+  InliningMode,
   isShim,
   untagAllTsFiles,
   retagAllTsFiles,
@@ -14664,4 +14725,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-R5KSBYHA.js.map
+//# sourceMappingURL=chunk-CBAKKWZR.js.map
