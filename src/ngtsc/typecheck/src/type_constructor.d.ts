@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
+import { Reference } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { TypeCtorMetadata, TcbTypeParameter } from '../api';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
@@ -47,4 +48,4 @@ export declare function generateTypeCtorDeclarationFn(env: ReferenceEmitEnvironm
  * @returns a `ts.MethodDeclaration` for the type constructor.
  */
 export declare function generateInlineTypeCtor(env: ReferenceEmitEnvironment, node: ClassDeclaration<ts.ClassDeclaration>, meta: TypeCtorMetadata): string;
-export declare function requiresInlineTypeCtor(node: ClassDeclaration<ts.ClassDeclaration>, host: ReflectionHost, env: ReferenceEmitEnvironment): boolean;
+export declare function requiresInlineTypeCtor(node: ClassDeclaration<ts.ClassDeclaration>, host: ReflectionHost, canReferenceType: (ref: Reference) => boolean): boolean;

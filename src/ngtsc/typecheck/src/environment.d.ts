@@ -7,7 +7,6 @@
  */
 import ts from 'typescript';
 import { ReferenceEmitter } from '../../imports';
-import { ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
 import { TcbDirectiveMetadata, TcbPipeMetadata, TypeCheckingConfig } from '../api';
 import { ReferenceEmitEnvironment } from './reference_emit_environment';
@@ -30,7 +29,7 @@ export declare class Environment extends ReferenceEmitEnvironment {
     protected typeCtorStatements: TcbExpr[];
     private pipeInsts;
     protected pipeInstStatements: TcbExpr[];
-    constructor(config: TypeCheckingConfig, importManager: ImportManager, refEmitter: ReferenceEmitter, reflector: ReflectionHost, contextFile: ts.SourceFile);
+    constructor(config: TypeCheckingConfig, importManager: ImportManager, refEmitter: ReferenceEmitter, contextFile: ts.SourceFile);
     /**
      * Get an expression referring to a type constructor for the given directive.
      *
