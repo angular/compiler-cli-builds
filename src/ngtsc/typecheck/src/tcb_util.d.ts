@@ -75,7 +75,7 @@ export declare function findSourceLocation(node: ts.Node, sourceFile: ts.SourceF
  * import graph changes whenever e.g. a signal input is introduced in user code.
  */
 export declare function ensureTypeCheckFilePreparationImports(env: ReferenceEmitEnvironment): void;
-export declare function checkIfGenericTypeBoundsCanBeEmitted(node: ClassDeclaration<ts.ClassDeclaration>, reflector: ReflectionHost, env: ReferenceEmitEnvironment): boolean;
+export declare function checkIfGenericTypeBoundsCanBeEmitted(node: ClassDeclaration<ts.ClassDeclaration>, reflector: ReflectionHost, canReferenceType: (ref: Reference) => boolean): boolean;
 export declare function findNodeInFile<T extends ts.Node>(file: ts.SourceFile, predicate: (node: ts.Node) => node is T): T | null;
 export declare function findNodeInFile(file: ts.SourceFile, predicate: (node: ts.Node) => boolean): ts.Node | null;
 export declare function generateTcbTypeParameters(typeParameters: ReadonlyArray<ts.TypeParameterDeclaration>, sourceFile: ts.SourceFile): TcbTypeParameter[];

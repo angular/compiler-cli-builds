@@ -78,7 +78,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-Y65VBTNM.js";
+} from "./chunk-FVCBQY5F.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -9826,16 +9826,25 @@ var MagicString = class _MagicString {
 import ts37 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/tcb_adapter.js
-import { AbsoluteSourceSpan, ExternalExpr as ExternalExpr6, TransplantedType, WrappedNodeExpr as WrappedNodeExpr8, ClassPropertyMapping as ClassPropertyMapping2, TcbGenericContextBehavior } from "@angular/compiler";
+import { AbsoluteSourceSpan, ExternalExpr as ExternalExpr6, ExpressionType, TransplantedType, WrappedNodeExpr as WrappedNodeExpr8, ClassPropertyMapping as ClassPropertyMapping2, TcbGenericContextBehavior } from "@angular/compiler";
 import ts33 from "typescript";
-function adaptTypeCheckBlockMetadata(ref, meta, env, genericContextBehavior) {
+function adaptTypeCheckBlockMetadata(ref, meta, env, reflector, genericContextBehavior) {
   const refCache = /* @__PURE__ */ new Map();
   const dirCache = /* @__PURE__ */ new Map();
+  const canReferenceType = (r) => {
+    const result = env.refEmitter.emit(r, env.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
+    return result.kind === ReferenceEmitKind.Success;
+  };
+  const referenceType = (r) => {
+    const ngExpr = env.refEmitter.emit(r, env.contextFile, ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports);
+    assertSuccessfulReferenceEmit(ngExpr, env.contextFile, "symbol");
+    return translateType(new ExpressionType(ngExpr.expression), env.contextFile, reflector, env.refEmitter, env.importManager);
+  };
   const extractRef = (ref2) => {
     if (refCache.has(ref2)) {
       return refCache.get(ref2);
     }
-    const result = extractReferenceMetadata(ref2, env);
+    const result = extractReferenceMetadata(ref2, env.refEmitter, env.contextFile);
     refCache.set(ref2, result);
     return result;
   };
@@ -9855,7 +9864,7 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, genericContextBehavior) {
           isSignal: input.isSignal,
           transformType: (() => {
             if (input.transform != null) {
-              const node = env.referenceTransplantedType(new TransplantedType(input.transform.type));
+              const node = translateType(new TransplantedType(input.transform.type), env.contextFile, reflector, env.refEmitter, env.importManager);
               return tempPrint(node, env.contextFile);
             }
             return void 0;
@@ -9880,13 +9889,16 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, genericContextBehavior) {
       matchSource: dir.matchSource,
       ref: extractRef(dir.ref),
       isGeneric: dir.isGeneric,
-      requiresInlineTypeCtor: requiresInlineTypeCtor(dir.ref.node, env.reflector, env),
+      requiresInlineTypeCtor: requiresInlineTypeCtor(dir.ref.node, reflector, canReferenceType),
       ...adaptGenerics(
         dir.ref.node,
         env,
+        reflector,
         // The directive that we're processing is its own dependency
         // so we should the same generic context behavior.
-        extractRef(dir.ref).key === extractRef(ref).key ? genericContextBehavior : TcbGenericContextBehavior.UseEmitter
+        extractRef(dir.ref).key === extractRef(ref).key ? genericContextBehavior : TcbGenericContextBehavior.UseEmitter,
+        canReferenceType,
+        referenceType
       )
     };
     dirCache.set(dir, tcbDir);
@@ -9961,11 +9973,11 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, genericContextBehavior) {
     },
     component: {
       ref: extractRef(ref),
-      ...adaptGenerics(ref.node, env, genericContextBehavior)
+      ...adaptGenerics(ref.node, env, reflector, genericContextBehavior, canReferenceType, referenceType)
     }
   };
 }
-function adaptGenerics(node, env, genericContextBehavior) {
+function adaptGenerics(node, env, reflector, genericContextBehavior, canReferenceType, referenceType) {
   let typeParameters;
   let typeArguments;
   if (node.typeParameters !== void 0 && node.typeParameters.length > 0) {
@@ -9974,8 +9986,8 @@ function adaptGenerics(node, env, genericContextBehavior) {
     }
     switch (genericContextBehavior) {
       case TcbGenericContextBehavior.UseEmitter:
-        const emitter = new TypeParameterEmitter(node.typeParameters, env.reflector);
-        const emittedParams = emitter.canEmit((r) => env.canReferenceType(r)) ? emitter.emit((typeRef) => env.referenceType(typeRef)) : void 0;
+        const emitter = new TypeParameterEmitter(node.typeParameters, reflector);
+        const emittedParams = emitter.canEmit(canReferenceType) ? emitter.emit(referenceType) : void 0;
         typeParameters = generateTcbTypeParameters(emittedParams || node.typeParameters, env.contextFile);
         typeArguments = typeParameters.map((param) => param.name);
         break;
@@ -9993,12 +10005,12 @@ function adaptGenerics(node, env, genericContextBehavior) {
   }
   return { typeParameters, typeArguments };
 }
-function extractReferenceMetadata(ref, env) {
+function extractReferenceMetadata(ref, refEmitter, contextFile) {
   let name = ref.debugName || ref.node.name.text;
   let moduleName = ref.ownedByModuleGuess;
   let unexportedDiagnostic = null;
   let isLocal = true;
-  const emitted = env.refEmitter.emit(ref, env.contextFile, ImportFlags.NoAliasing);
+  const emitted = refEmitter.emit(ref, contextFile, ImportFlags.NoAliasing);
   if (emitted.kind === ReferenceEmitKind.Success) {
     if (emitted.expression instanceof ExternalExpr6) {
       name = emitted.expression.value.name;
@@ -10374,19 +10386,19 @@ var TypeCheckFile = class extends Environment {
   isTypeCheckFile = true;
   nextTcbId = 1;
   tcbStatements = [];
-  constructor(fileName, config, refEmitter, reflector, compilerHost) {
+  constructor(fileName, config, refEmitter, compilerHost) {
     super(config, new ImportManager({
       // This minimizes noticeable changes with older versions of `ImportManager`.
       forceGenerateNamespacesForNewImports: true,
       // Type check block code affects code completion and fix suggestions.
       // We want to encourage single quotes for now, like we always did.
       shouldUseSingleQuotes: () => true
-    }), refEmitter, reflector, ts36.createSourceFile(compilerHost.getCanonicalFileName(fileName), "", ts36.ScriptTarget.Latest, true));
+    }), refEmitter, ts36.createSourceFile(compilerHost.getCanonicalFileName(fileName), "", ts36.ScriptTarget.Latest, true));
     this.fileName = fileName;
   }
-  addTypeCheckBlock(ref, meta, domSchemaChecker, oobRecorder, genericContextBehavior) {
+  addTypeCheckBlock(ref, meta, domSchemaChecker, oobRecorder, genericContextBehavior, reflector) {
     const fnId = `_tcb${this.nextTcbId++}`;
-    const { tcbMeta, component } = adaptTypeCheckBlockMetadata(ref, meta, this, genericContextBehavior);
+    const { tcbMeta, component } = adaptTypeCheckBlockMetadata(ref, meta, this, reflector, genericContextBehavior);
     const fn = generateTypeCheckBlock(this, component, fnId, tcbMeta, domSchemaChecker, oobRecorder);
     this.tcbStatements.push(fn);
   }
@@ -10488,7 +10500,7 @@ var TypeCheckContextImpl = class {
       for (const dir of boundTarget.getUsedDirectives()) {
         const dirRef = dir.ref;
         const dirNode = dirRef.node;
-        if (!dir.isGeneric || !requiresInlineTypeCtor(dirNode, this.reflector, shimData.file)) {
+        if (!dir.isGeneric || !requiresInlineTypeCtor(dirNode, this.reflector, (r) => shimData.file.canReferenceType(r))) {
           continue;
         }
         this.addInlineTypeCtor(fileData, dirNode.getSourceFile(), dirRef, {
@@ -10553,9 +10565,9 @@ var TypeCheckContextImpl = class {
     if (inliningRequirement !== TcbInliningRequirement.None && this.inlining === InliningMode.InlineOps) {
       this.addInlineTypeCheckBlock(fileData, shimData, ref, meta);
     } else if (inliningRequirement === TcbInliningRequirement.ShouldInlineForGenericBounds && this.inlining === InliningMode.Error) {
-      shimData.file.addTypeCheckBlock(ref, meta, shimData.domSchemaChecker, shimData.oobRecorder, TcbGenericContextBehavior2.FallbackToAny);
+      shimData.file.addTypeCheckBlock(ref, meta, shimData.domSchemaChecker, shimData.oobRecorder, TcbGenericContextBehavior2.FallbackToAny, this.reflector);
     } else {
-      shimData.file.addTypeCheckBlock(ref, meta, shimData.domSchemaChecker, shimData.oobRecorder, TcbGenericContextBehavior2.UseEmitter);
+      shimData.file.addTypeCheckBlock(ref, meta, shimData.domSchemaChecker, shimData.oobRecorder, TcbGenericContextBehavior2.UseEmitter, this.reflector);
     }
   }
   /**
@@ -10677,7 +10689,7 @@ var TypeCheckContextImpl = class {
       fileData.shimData.set(shimPath, {
         domSchemaChecker: new RegistryDomSchemaChecker(fileData.sourceManager),
         oobRecorder: new OutOfBandDiagnosticRecorderImpl(fileData.sourceManager, (name) => this.compilerHost.getSourceFile(name, ts37.ScriptTarget.Latest)),
-        file: new TypeCheckFile(shimPath, this.config, this.refEmitter, this.reflector, this.compilerHost),
+        file: new TypeCheckFile(shimPath, this.config, this.refEmitter, this.compilerHost),
         data: /* @__PURE__ */ new Map(),
         shimDiagnostics: null
       });
@@ -10728,9 +10740,9 @@ var InlineTcbOp = class {
     return this.ref.node.end + 1;
   }
   execute(im, sf, refEmitter) {
-    const env = new Environment(this.config, im, refEmitter, this.reflector, sf);
+    const env = new Environment(this.config, im, refEmitter, sf);
     const fnName = `_tcb_${this.ref.node.pos}`;
-    const { tcbMeta, component } = adaptTypeCheckBlockMetadata(this.ref, this.meta, env, TcbGenericContextBehavior2.CopyClassNodes);
+    const { tcbMeta, component } = adaptTypeCheckBlockMetadata(this.ref, this.meta, env, this.reflector, TcbGenericContextBehavior2.CopyClassNodes);
     const fn = generateTypeCheckBlock2(env, component, fnName, tcbMeta, this.domSchemaChecker, this.oobRecorder);
     return fn;
   }
@@ -10751,7 +10763,7 @@ var TypeCtorOp = class {
     return this.ref.node.end - 1;
   }
   execute(im, sf, refEmitter) {
-    const emitEnv = new ReferenceEmitEnvironment(im, refEmitter, this.reflector, sf);
+    const emitEnv = new ReferenceEmitEnvironment(im, refEmitter, sf);
     return generateInlineTypeCtor(emitEnv, this.ref.node, this.meta);
   }
 };
@@ -14652,4 +14664,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-Y3FM6CJL.js.map
+//# sourceMappingURL=chunk-R5KSBYHA.js.map

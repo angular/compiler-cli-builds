@@ -232,7 +232,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.9+sha-37ec63e";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.9+sha-af24a4a";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -4454,32 +4454,20 @@ var RegistryDomSchemaChecker = class {
 import { TcbExpr as TcbExpr3 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/reference_emit_environment.js
-import { ExpressionType, TcbExpr } from "@angular/compiler";
+import { TcbExpr } from "@angular/compiler";
 import ts26 from "typescript";
 var ReferenceEmitEnvironment = class {
   importManager;
   refEmitter;
-  reflector;
   contextFile;
-  constructor(importManager, refEmitter, reflector, contextFile) {
+  constructor(importManager, refEmitter, contextFile) {
     this.importManager = importManager;
     this.refEmitter = refEmitter;
-    this.reflector = reflector;
     this.contextFile = contextFile;
   }
   canReferenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
     const result = this.refEmitter.emit(ref, this.contextFile, flags);
     return result.kind === ReferenceEmitKind.Success;
-  }
-  /**
-   * Generate a `ts.TypeNode` that references the given node as a type.
-   *
-   * This may involve importing the node into the file if it's not declared there already.
-   */
-  referenceType(ref, flags = ImportFlags.NoAliasing | ImportFlags.AllowTypeImports | ImportFlags.AllowRelativeDtsImports) {
-    const ngExpr = this.refEmitter.emit(ref, this.contextFile, flags);
-    assertSuccessfulReferenceEmit(ngExpr, this.contextFile, "symbol");
-    return translateType(new ExpressionType(ngExpr.expression), this.contextFile, this.reflector, this.refEmitter, this.importManager);
   }
   /**
    * Generates a `TcbExpr` from a `TcbReferenceMetadata` object.
@@ -4507,14 +4495,6 @@ var ReferenceEmitEnvironment = class {
       return new TcbExpr(`${importResult.expression.text}.${importResult.name.text}`);
     }
     throw new Error("Unexpected value returned by import manager");
-  }
-  /**
-   * Generates a `ts.TypeNode` representing a type that is being referenced from a different place
-   * in the program. Any type references inside the transplanted type will be rewritten so that
-   * they can be imported in the context file.
-   */
-  referenceTransplantedType(type) {
-    return translateType(type, this.contextFile, this.reflector, this.refEmitter, this.importManager);
   }
 };
 
@@ -4637,7 +4617,7 @@ var TcbInliningRequirement;
 function requiresInlineTypeCheckBlock(ref, env, usedPipes, reflector) {
   if (!env.canReferenceType(ref)) {
     return TcbInliningRequirement.MustInline;
-  } else if (!checkIfGenericTypeBoundsCanBeEmitted(ref.node, reflector, env)) {
+  } else if (!checkIfGenericTypeBoundsCanBeEmitted(ref.node, reflector, (r) => env.canReferenceType(r))) {
     return TcbInliningRequirement.ShouldInlineForGenericBounds;
   } else if (usedPipes.some((pipeRef) => !env.canReferenceType(pipeRef))) {
     return TcbInliningRequirement.MustInline;
@@ -4732,9 +4712,9 @@ function ensureTypeCheckFilePreparationImports(env) {
     });
   }
 }
-function checkIfGenericTypeBoundsCanBeEmitted(node, reflector, env) {
+function checkIfGenericTypeBoundsCanBeEmitted(node, reflector, canReferenceType) {
   const emitter = new TypeParameterEmitter(node.typeParameters, reflector);
-  return emitter.canEmit((ref) => env.canReferenceType(ref));
+  return emitter.canEmit(canReferenceType);
 }
 function findNodeInFile(file, predicate) {
   const visit = (node) => {
@@ -4836,8 +4816,8 @@ function generateGenericArgs(typeParameters) {
   }
   return `<${typeParameters.map((param) => param.name).join(", ")}>`;
 }
-function requiresInlineTypeCtor(node, host, env) {
-  return !checkIfGenericTypeBoundsCanBeEmitted(node, host, env);
+function requiresInlineTypeCtor(node, host, canReferenceType) {
+  return !checkIfGenericTypeBoundsCanBeEmitted(node, host, canReferenceType);
 }
 function typeParametersWithDefaultTypes(params) {
   if (params === void 0 || params.length === 0) {
@@ -4857,8 +4837,8 @@ var Environment = class extends ReferenceEmitEnvironment {
   typeCtorStatements = [];
   pipeInsts = /* @__PURE__ */ new Map();
   pipeInstStatements = [];
-  constructor(config, importManager, refEmitter, reflector, contextFile) {
-    super(importManager, refEmitter, reflector, contextFile);
+  constructor(config, importManager, refEmitter, contextFile) {
+    super(importManager, refEmitter, contextFile);
     this.config = config;
   }
   /**
@@ -5612,4 +5592,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-Y65VBTNM.js.map
+//# sourceMappingURL=chunk-FVCBQY5F.js.map
