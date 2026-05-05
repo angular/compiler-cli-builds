@@ -78,7 +78,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-QJUFMCTN.js";
+} from "./chunk-P7YCWUVR.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -2478,6 +2478,7 @@ function containsErrors(diagnostics) {
 }
 
 // packages/compiler-cli/src/ngtsc/transform/src/declaration.js
+import { isUnsafeObjectKey } from "@angular/compiler";
 import ts7 from "typescript";
 var DtsTransformRegistry = class {
   ivyDeclarationTransforms = /* @__PURE__ */ new Map();
@@ -2577,7 +2578,7 @@ var IvyDeclarationDtsTransform = class {
         /* modifiers */
         modifiers,
         /* name */
-        decl.name,
+        isUnsafeObjectKey(decl.name) ? ts7.factory.createStringLiteral(decl.name) : decl.name,
         /* questionOrExclamationToken */
         void 0,
         /* type */
@@ -2608,7 +2609,7 @@ function markForEmitAsSingleLine(node) {
 }
 
 // packages/compiler-cli/src/ngtsc/transform/src/transform.js
-import { ConstantPool } from "@angular/compiler";
+import { ConstantPool, isUnsafeObjectKey as isUnsafeObjectKey2 } from "@angular/compiler";
 import ts9 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/util/src/visitor.js
@@ -2762,7 +2763,7 @@ var IvyTransformationVisitor = class extends Visitor {
       if (this.enableTypeReification && this.refEmitter !== null) {
         typeNode = translateType(field.type, sourceFile, this.reflector, this.refEmitter, this.importManager);
       }
-      const property = ts9.factory.createPropertyDeclaration([ts9.factory.createToken(ts9.SyntaxKind.StaticKeyword)], field.name, void 0, typeNode, exprNode);
+      const property = ts9.factory.createPropertyDeclaration([ts9.factory.createToken(ts9.SyntaxKind.StaticKeyword)], isUnsafeObjectKey2(field.name) ? ts9.factory.createStringLiteral(field.name) : field.name, void 0, typeNode, exprNode);
       if (this.isClosureCompilerEnabled) {
         ts9.addSyntheticLeadingComment(
           property,
@@ -14725,4 +14726,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-CBAKKWZR.js.map
+//# sourceMappingURL=chunk-VASLF2ID.js.map

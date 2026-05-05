@@ -232,7 +232,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.10+sha-4f048e7";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.10+sha-fc52633";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -4499,7 +4499,7 @@ var ReferenceEmitEnvironment = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.js
-import { R3Identifiers as R3Identifiers2, TcbExpr as TcbExpr2 } from "@angular/compiler";
+import { isUnsafeObjectKey, R3Identifiers as R3Identifiers2, TcbExpr as TcbExpr2 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.js
 import { R3Identifiers, HOST_BINDING_GUARD_COMMENT_TEXT } from "@angular/compiler";
@@ -4783,8 +4783,11 @@ function constructTypeCtorParameter(env, meta, typeRef, typeRefWithGenerics) {
     } else if (!meta.coercedInputFields.has(classPropertyName)) {
       plainKeys.push(TcbExpr2.quoteAndEscape(classPropertyName));
     } else {
-      const coercionType = transformType !== void 0 ? transformType : `typeof ${typeRef}.ngAcceptInputType_${classPropertyName}`;
-      coercedKeys.push(`${classPropertyName}: ${coercionType}`);
+      const propName = `ngAcceptInputType_${classPropertyName}`;
+      const isUnsafe = isUnsafeObjectKey(classPropertyName);
+      const access = isUnsafe ? `[${TcbExpr2.quoteAndEscape(propName)}]` : `.${propName}`;
+      const coercionType = transformType !== void 0 ? transformType : `typeof ${typeRef}${access}`;
+      coercedKeys.push(`${isUnsafe ? TcbExpr2.quoteAndEscape(classPropertyName) : classPropertyName}: ${coercionType}`);
     }
   }
   if (plainKeys.length > 0) {
@@ -5594,4 +5597,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-QJUFMCTN.js.map
+//# sourceMappingURL=chunk-P7YCWUVR.js.map
