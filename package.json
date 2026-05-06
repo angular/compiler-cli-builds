@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "22.0.0-next.10+sha-7745365",
+  "version": "22.0.0-next.10+sha-3b0ae5f",
   "description": "Angular - the compiler CLI for Node.js",
   "typings": "index.d.ts",
   "bin": {
@@ -44,7 +44,7 @@
     "@types/convert-source-map": "^2.0.0"
   },
   "peerDependencies": {
-    "@angular/compiler": "22.0.0-next.10+sha-7745365",
+    "@angular/compiler": "22.0.0-next.10+sha-3b0ae5f",
     "typescript": ">=6.0 <6.1"
   },
   "peerDependenciesMeta": {
