@@ -78,7 +78,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-P7YCWUVR.js";
+} from "./chunk-6HQBTW5E.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -13198,10 +13198,30 @@ var ComponentDecoratorHandler = class {
     }
     const binder = new R3TargetBinder2(matcher);
     const boundTemplate = binder.bind({ template: analysis.template.diagNodes });
+    const abstractBoundTemplate = {
+      getDirectivesOfNode(node2) {
+        return boundTemplate.getDirectivesOfNode(node2);
+      },
+      getReferenceTarget(node2) {
+        return boundTemplate.getReferenceTarget(node2);
+      },
+      getExpressionTarget(ast) {
+        return boundTemplate.getExpressionTarget(ast);
+      },
+      getUsedDirectives() {
+        return boundTemplate.getUsedDirectives().map((dir) => ({
+          ref: { node: dir.ref.node },
+          isComponent: dir.isComponent
+        }));
+      },
+      getTemplateAst() {
+        return boundTemplate.target.template;
+      }
+    };
     context.addComponent({
       declaration: node,
       selector,
-      boundTemplate,
+      boundTemplate: abstractBoundTemplate,
       templateMeta: {
         isInline: analysis.template.declaration.isInline,
         file: analysis.template.file
@@ -14726,4 +14746,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VASLF2ID.js.map
+//# sourceMappingURL=chunk-BRAXH67J.js.map
