@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.12+sha-2a1e6ec";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.12+sha-629905d";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -13697,6 +13697,13 @@ var RegistryDomSchemaChecker = class {
     }
   }
   checkTemplateElementProperty(id, tagName, name, span, schemas, hostIsStandalone) {
+    const report = REGISTRY.validateProperty(name);
+    if (report.error) {
+      const mapping = this.resolver.getTemplateSourceMapping(id);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts57.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), report.msg);
+      this._diagnostics.push(diag);
+      return;
+    }
     if (!REGISTRY.hasProperty(tagName, name, schemas)) {
       const mapping = this.resolver.getTemplateSourceMapping(id);
       const decorator = hostIsStandalone ? "@Component" : "@NgModule";
@@ -13717,6 +13724,13 @@ var RegistryDomSchemaChecker = class {
     }
   }
   checkHostElementProperty(id, element, name, span, schemas) {
+    const report = REGISTRY.validateProperty(name);
+    if (report.error) {
+      const mapping = this.resolver.getHostBindingsMapping(id);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts57.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), report.msg);
+      this._diagnostics.push(diag);
+      return;
+    }
     for (const tagName of element.tagNames) {
       if (REGISTRY.hasProperty(tagName, name, schemas)) {
         continue;
@@ -21566,10 +21580,30 @@ var ComponentDecoratorHandler = class {
     }
     const binder = new R3TargetBinder2(matcher);
     const boundTemplate = binder.bind({ template: analysis.template.diagNodes });
+    const abstractBoundTemplate = {
+      getDirectivesOfNode(node2) {
+        return boundTemplate.getDirectivesOfNode(node2);
+      },
+      getReferenceTarget(node2) {
+        return boundTemplate.getReferenceTarget(node2);
+      },
+      getExpressionTarget(ast) {
+        return boundTemplate.getExpressionTarget(ast);
+      },
+      getUsedDirectives() {
+        return boundTemplate.getUsedDirectives().map((dir) => ({
+          ref: { node: dir.ref.node },
+          isComponent: dir.isComponent
+        }));
+      },
+      getTemplateAst() {
+        return boundTemplate.target.template;
+      }
+    };
     context.addComponent({
       declaration: node,
       selector,
-      boundTemplate,
+      boundTemplate: abstractBoundTemplate,
       templateMeta: {
         isInline: analysis.template.declaration.isInline,
         file: analysis.template.file
@@ -23138,4 +23172,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-DIHVL7FU.js.map
+//# sourceMappingURL=chunk-5OK4JOT6.js.map

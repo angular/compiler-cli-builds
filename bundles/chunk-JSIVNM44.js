@@ -88,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-DIHVL7FU.js";
+} from "./chunk-5OK4JOT6.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -2439,17 +2439,19 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
 };
 function getTemplateIdentifiers(boundTemplate) {
   const visitor = new TemplateVisitor(boundTemplate);
-  if (boundTemplate.target.template !== void 0) {
-    tmplAstVisitAll(visitor, boundTemplate.target.template);
+  const template = boundTemplate.getTemplateAst();
+  if (template !== void 0) {
+    tmplAstVisitAll(visitor, template);
   }
   return { identifiers: visitor.identifiers, errors: visitor.errors };
 }
 
 // packages/compiler-cli/src/ngtsc/indexer/src/transform.js
-function generateAnalysis(context) {
+function generateAnalysis(context, adapter) {
   const analysis = /* @__PURE__ */ new Map();
   context.components.forEach(({ declaration, selector, boundTemplate, templateMeta }) => {
-    const name = declaration.name.getText();
+    const name = adapter.getName(declaration);
+    const fileName = adapter.getFileName(declaration);
     const usedComponents = /* @__PURE__ */ new Set();
     const usedDirs = boundTemplate.getUsedDirectives();
     usedDirs.forEach((dir) => {
@@ -2457,7 +2459,7 @@ function generateAnalysis(context) {
         usedComponents.add(dir.ref.node);
       }
     });
-    const componentFile = new ParseSourceFile(declaration.getSourceFile().getFullText(), declaration.getSourceFile().fileName);
+    const componentFile = new ParseSourceFile(adapter.getContent(declaration), fileName);
     let templateFile;
     if (templateMeta.isInline) {
       templateFile = componentFile;
@@ -4559,7 +4561,18 @@ var NgCompiler = class _NgCompiler {
     const compilation = this.ensureAnalyzed();
     const context = new IndexingContext();
     compilation.traitCompiler.index(context);
-    return generateAnalysis(context);
+    const adapter = {
+      getName(node) {
+        return ts27.isClassDeclaration(node) && node.name ? node.name.getText() : "";
+      },
+      getFileName(node) {
+        return node.getSourceFile().fileName;
+      },
+      getContent(node) {
+        return node.getSourceFile().getFullText();
+      }
+    };
+    return generateAnalysis(context, adapter);
   }
   /**
    * Gets information for the current program that may be used to generate API
@@ -5392,4 +5405,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WHZ7QER2.js.map
+//# sourceMappingURL=chunk-JSIVNM44.js.map
