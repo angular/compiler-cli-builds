@@ -120,3 +120,4 @@ export declare function resolveImportedFile(moduleResolver: ModuleResolver, impo
  */
 export declare function getOriginNodeForDiagnostics(expr: ts.Expression, container: ts.Expression): ts.Expression;
 export declare function isAbstractClassDeclaration(clazz: ClassDeclaration): boolean;
+export declare function parseStandaloneOption(decorator: Readonly<Decorator | null>, evaluator: PartialEvaluator, implicitStandaloneValue: boolean): boolean;

@@ -98,6 +98,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
      * destroyed and replaced.
      */
     private elementTagCache;
+    private generatedRangeCache;
     private isComplete;
     private priorResultsAdopted;
     constructor(originalProgram: ts.Program, programDriver: ProgramDriver, typeCheckAdapter: ProgramTypeCheckAdapter, config: TypeCheckingConfig, refEmitter: ReferenceEmitter, reflector: ReflectionHost, compilerHost: Pick<ts.CompilerHost, 'getCanonicalFileName' | 'getSourceFile'>, priorBuild: IncrementalBuild<unknown, FileTypeCheckingData>, metaReader: MetadataReader, localMetaReader: MetadataReaderWithIndex, ngModuleIndex: NgModuleIndex, componentScopeReader: ComponentScopeReader, typeCheckScopeRegistry: TypeCheckScopeRegistry, perf: PerfRecorder);
@@ -115,6 +116,8 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     private getFileAndShimRecordsForPath;
     getSourceMappingAtTcbLocation(tcbLocation: TcbLocation): FullSourceMapping | null;
     generateAllTypeCheckBlocks(): void;
+    private getGeneratedCodeRanges;
+    private filterShimDiagnostics;
     /**
      * Retrieve type-checking and template parse diagnostics from the given `ts.SourceFile` using the
      * most recent type-checking program.

@@ -12,6 +12,7 @@ import { Reference, ReferenceEmitter } from '../../imports';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { TypeCheckBlockMetadata } from '../api';
 import { Environment } from './environment';
+export declare const TCB_FUNCTION_PREFIX = "_tcb";
 /**
  * An `Environment` representing the single type-checking file into which most (if not all) Type
  * Check Blocks (TCBs) will be generated.

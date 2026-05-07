@@ -653,6 +653,22 @@ function getOriginNodeForDiagnostics(expr, container) {
 function isAbstractClassDeclaration(clazz) {
   return ts2.canHaveModifiers(clazz) && clazz.modifiers !== void 0 ? clazz.modifiers.some((mod) => mod.kind === ts2.SyntaxKind.AbstractKeyword) : false;
 }
+function parseStandaloneOption(decorator, evaluator, implicitStandaloneValue) {
+  if (decorator === null || decorator.args === null || decorator.args.length !== 1) {
+    return implicitStandaloneValue;
+  }
+  const meta = unwrapExpression(decorator.args[0]);
+  if (!ts2.isObjectLiteralExpression(meta)) {
+    return implicitStandaloneValue;
+  }
+  const obj = reflectObjectLiteral(meta);
+  if (obj.has("standalone")) {
+    const expr = obj.get("standalone");
+    const resolved = evaluator.evaluate(expr);
+    return typeof resolved === "boolean" ? resolved : true;
+  }
+  return implicitStandaloneValue;
+}
 
 // packages/compiler-cli/src/ngtsc/partial_evaluator/src/dynamic.js
 var DynamicValue = class _DynamicValue {
@@ -2115,9 +2131,6 @@ var TraitCompiler = class {
     this.fileToClasses.get(sf).add(record.node);
   }
   scanClassForTraits(clazz) {
-    if (!this.compileNonExportedClasses && !this.reflector.isStaticallyExported(clazz)) {
-      return null;
-    }
     const decorators = this.reflector.getDecoratorsOfDeclaration(clazz);
     return this.detectTraits(clazz, decorators);
   }
@@ -2248,10 +2261,16 @@ var TraitCompiler = class {
       }
     }
     const symbol = this.makeSymbolForTrait(trait.handler, clazz, result.analysis ?? null);
-    if (result.analysis !== void 0 && trait.handler.register !== void 0) {
+    const isStaticallyExported = this.reflector.isStaticallyExported(clazz);
+    const isStandalone = result.analysis?.meta?.isStandalone ?? false;
+    const shouldSkipResolution = !isStaticallyExported && !this.compileNonExportedClasses && !isStandalone;
+    let analysisResult = result.analysis ?? null;
+    if (shouldSkipResolution) {
+      analysisResult = null;
+    } else if (result.analysis !== void 0 && trait.handler.register !== void 0) {
       trait.handler.register(clazz, result.analysis);
     }
-    trait = trait.toAnalyzed(result.analysis ?? null, result.diagnostics ?? null, symbol);
+    trait = trait.toAnalyzed(analysisResult, result.diagnostics ?? null, symbol);
   }
   resolve() {
     const classes = this.classes.keys();
@@ -10021,7 +10040,7 @@ function extractReferenceMetadata(ref, env) {
   let unexportedDiagnostic = null;
   let isLocal = true;
   if (env.copiedSourceOriginPath !== void 0) {
-    const refFile = ref.node.getSourceFile().fileName;
+    const refFile = absoluteFromSourceFile(ref.node.getSourceFile());
     if (refFile === env.copiedSourceOriginPath) {
       const nodeName2 = ref.node?.name;
       const nodeNameSpan2 = nodeName2 ? new AbsoluteSourceSpan(nodeName2.getStart(), nodeName2.getEnd()) : void 0;
@@ -10061,7 +10080,7 @@ function extractReferenceMetadata(ref, env) {
   }
   const nodeName = ref.node?.name;
   const nodeNameSpan = nodeName ? new AbsoluteSourceSpan(nodeName.getStart(), nodeName.getEnd()) : void 0;
-  const nodeFilePath = nodeName?.getSourceFile().fileName;
+  const nodeFilePath = nodeName !== void 0 ? absoluteFromSourceFile(nodeName.getSourceFile()) : void 0;
   let key;
   if (nodeFilePath !== void 0 && nodeNameSpan !== void 0) {
     key = `${nodeFilePath}#${nodeNameSpan.start}`;
@@ -10413,6 +10432,7 @@ var TypeCheckShimGenerator = class {
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_check_file.js
 import { generateTypeCheckBlock } from "@angular/compiler";
 import ts36 from "typescript";
+var TCB_FUNCTION_PREFIX = "_tcb";
 var TypeCheckFile = class extends Environment {
   fileName;
   isTypeCheckFile = true;
@@ -10436,7 +10456,7 @@ var TypeCheckFile = class extends Environment {
     this.fileName = fileName;
   }
   addTypeCheckBlock(ref, meta, domSchemaChecker, oobRecorder, genericContextBehavior, reflector) {
-    const fnId = `_tcb${this.nextTcbId++}`;
+    const fnId = `${TCB_FUNCTION_PREFIX}${this.nextTcbId++}`;
     const { tcbMeta, component } = adaptTypeCheckBlockMetadata(ref, meta, this, reflector, genericContextBehavior);
     const fn = generateTypeCheckBlock(this, component, fnId, tcbMeta, domSchemaChecker, oobRecorder);
     this.tcbStatements.push(fn);
@@ -10451,6 +10471,9 @@ var TypeCheckFile = class extends Environment {
     let source = this.sourceContent;
     const newImports = importChanges.newImports.get(this.contextFile.fileName);
     if (newImports !== void 0) {
+      if (source.length > 0 && !source.endsWith("\n")) {
+        source += "\n";
+      }
       source += newImports.map((i) => printer.printNode(ts36.EmitHint.Unspecified, i, this.contextFile)).join("\n");
     }
     source += "\n";
@@ -10803,10 +10826,11 @@ var InlineTcbOp = class {
     if (tcbSf !== originalSf) {
       env.copiedSourceOriginPath = absoluteFromSourceFile(originalSf);
     }
-    const fnName = `_tcb_${this.ref.node.pos}`;
+    const fnName = `${TCB_FUNCTION_PREFIX}_${this.ref.node.pos}`;
     const { tcbMeta, component } = adaptTypeCheckBlockMetadata(this.ref, this.meta, env, this.reflector, TcbGenericContextBehavior2.CopyClassNodes);
     const fn = generateTypeCheckBlock2(env, component, fnName, tcbMeta, this.domSchemaChecker, this.oobRecorder);
-    return fn;
+    return `
+${fn}`;
   }
 };
 var TypeCtorOp = class {
@@ -11135,6 +11159,7 @@ var TemplateTypeCheckerImpl = class {
    * destroyed and replaced.
    */
   elementTagCache = /* @__PURE__ */ new Map();
+  generatedRangeCache = /* @__PURE__ */ new WeakMap();
   isComplete = false;
   priorResultsAdopted = false;
   constructor(originalProgram, programDriver, typeCheckAdapter, config, refEmitter, reflector, compilerHost, priorBuild, metaReader, localMetaReader, ngModuleIndex, componentScopeReader, typeCheckScopeRegistry, perf) {
@@ -11374,6 +11399,41 @@ var TemplateTypeCheckerImpl = class {
   generateAllTypeCheckBlocks() {
     this.ensureAllShimsForAllFiles();
   }
+  getGeneratedCodeRanges(sf) {
+    if (this.generatedRangeCache.has(sf)) {
+      return this.generatedRangeCache.get(sf);
+    }
+    const ranges = [];
+    const visit2 = (node) => {
+      if (ts38.isInterfaceDeclaration(node)) {
+        return;
+      }
+      if (ts38.isFunctionDeclaration(node)) {
+        if (node.name !== void 0) {
+          const name = node.name.text;
+          if (name.startsWith(TCB_FUNCTION_PREFIX)) {
+            ranges.push({ pos: node.getStart(), end: node.getEnd() });
+            return;
+          }
+        }
+      }
+      ts38.forEachChild(node, visit2);
+    };
+    ts38.forEachChild(sf, visit2);
+    this.generatedRangeCache.set(sf, ranges);
+    return ranges;
+  }
+  filterShimDiagnostics(shimSf, semanticDiagnostics) {
+    if (this.programDriver.inliningMode !== InliningMode.CopySourceToTcb) {
+      return semanticDiagnostics;
+    }
+    const ranges = this.getGeneratedCodeRanges(shimSf);
+    return semanticDiagnostics.filter((diag) => {
+      if (diag.start === void 0)
+        return true;
+      return ranges.some((range) => diag.start >= range.pos && diag.start < range.end);
+    });
+  }
   /**
    * Retrieve type-checking and template parse diagnostics from the given `ts.SourceFile` using the
    * most recent type-checking program.
@@ -11398,7 +11458,9 @@ var TemplateTypeCheckerImpl = class {
       }
       for (const [shimPath, shimRecord] of fileRecord.shimData) {
         const shimSf = getSourceFileOrError(typeCheckProgram, shimPath);
-        diagnostics.push(...typeCheckProgram.getSemanticDiagnostics(shimSf).map((diag) => convertDiagnostic(diag, fileRecord.sourceManager)));
+        const semanticDiagnostics = typeCheckProgram.getSemanticDiagnostics(shimSf);
+        const filteredDiagnostics = this.filterShimDiagnostics(shimSf, semanticDiagnostics);
+        diagnostics.push(...filteredDiagnostics.map((diag) => convertDiagnostic(diag, fileRecord.sourceManager)));
         diagnostics.push(...shimRecord.genesisDiagnostics);
         for (const templateData of shimRecord.data.values()) {
           diagnostics.push(...templateData.templateParsingDiagnostics);
@@ -11449,7 +11511,9 @@ var TemplateTypeCheckerImpl = class {
         diagnostics.push(...typeCheckProgram.getSemanticDiagnostics(inlineSf).map((diag) => convertDiagnostic(diag, fileRecord.sourceManager)));
       }
       const shimSf = getSourceFileOrError(typeCheckProgram, shimPath);
-      diagnostics.push(...typeCheckProgram.getSemanticDiagnostics(shimSf).map((diag) => convertDiagnostic(diag, fileRecord.sourceManager)));
+      const semanticDiagnostics = typeCheckProgram.getSemanticDiagnostics(shimSf);
+      const filteredDiagnostics = this.filterShimDiagnostics(shimSf, semanticDiagnostics);
+      diagnostics.push(...filteredDiagnostics.map((diag) => convertDiagnostic(diag, fileRecord.sourceManager)));
       diagnostics.push(...shimRecord.genesisDiagnostics);
       for (const templateData of shimRecord.data.values()) {
         diagnostics.push(...templateData.templateParsingDiagnostics);
@@ -14309,6 +14373,9 @@ var PipeDecoratorHandler = class {
       return void 0;
     }
   }
+  isStandalone(decorator) {
+    return parseStandaloneOption(decorator, this.evaluator, this.implicitStandaloneValue);
+  }
   analyze(clazz, decorator) {
     this.perf.eventCount(PerfEvent.AnalyzePipe);
     const name = clazz.name.text;
@@ -14746,4 +14813,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BRAXH67J.js.map
+//# sourceMappingURL=chunk-UNI2VMSH.js.map
