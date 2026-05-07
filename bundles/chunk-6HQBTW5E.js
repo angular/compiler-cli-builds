@@ -232,7 +232,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.11+sha-fd9dda5";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.11+sha-a3d4631";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -4417,6 +4417,13 @@ var RegistryDomSchemaChecker = class {
     }
   }
   checkTemplateElementProperty(id, tagName, name, span, schemas, hostIsStandalone) {
+    const report = REGISTRY.validateProperty(name);
+    if (report.error) {
+      const mapping = this.resolver.getTemplateSourceMapping(id);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts25.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), report.msg);
+      this._diagnostics.push(diag);
+      return;
+    }
     if (!REGISTRY.hasProperty(tagName, name, schemas)) {
       const mapping = this.resolver.getTemplateSourceMapping(id);
       const decorator = hostIsStandalone ? "@Component" : "@NgModule";
@@ -4437,6 +4444,13 @@ var RegistryDomSchemaChecker = class {
     }
   }
   checkHostElementProperty(id, element, name, span, schemas) {
+    const report = REGISTRY.validateProperty(name);
+    if (report.error) {
+      const mapping = this.resolver.getHostBindingsMapping(id);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts25.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), report.msg);
+      this._diagnostics.push(diag);
+      return;
+    }
     for (const tagName of element.tagNames) {
       if (REGISTRY.hasProperty(tagName, name, schemas)) {
         continue;
@@ -5597,4 +5611,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-P7YCWUVR.js.map
+//# sourceMappingURL=chunk-6HQBTW5E.js.map
