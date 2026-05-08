@@ -107,7 +107,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["DEFER_TRIGGER_MISCONFIGURATION"] = 8021] = "DEFER_TRIGGER_MISCONFIGURATION";
   ErrorCode2[ErrorCode2["FORM_FIELD_UNSUPPORTED_BINDING"] = 8022] = "FORM_FIELD_UNSUPPORTED_BINDING";
   ErrorCode2[ErrorCode2["MULTIPLE_MATCHING_COMPONENTS"] = 8023] = "MULTIPLE_MATCHING_COMPONENTS";
-  ErrorCode2[ErrorCode2["CONFLICTING_HOST_DIRECTIVE_BINDING"] = 8024] = "CONFLICTING_HOST_DIRECTIVE_BINDING";
+  ErrorCode2[ErrorCode2["CONFLICTING_HOST_DIRECTIVE_BINDING"] = -8024] = "CONFLICTING_HOST_DIRECTIVE_BINDING";
   ErrorCode2[ErrorCode2["INVALID_BANANA_IN_BOX"] = 8101] = "INVALID_BANANA_IN_BOX";
   ErrorCode2[ErrorCode2["NULLISH_COALESCING_NOT_NULLABLE"] = 8102] = "NULLISH_COALESCING_NOT_NULLABLE";
   ErrorCode2[ErrorCode2["MISSING_CONTROL_FLOW_DIRECTIVE"] = 8103] = "MISSING_CONTROL_FLOW_DIRECTIVE";
@@ -232,7 +232,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.11+sha-609f930";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.0.0-next.11+sha-8ebae1d";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -1780,6 +1780,7 @@ var NoopImportRewriter = class {
 };
 var CORE_SUPPORTED_SYMBOLS = /* @__PURE__ */ new Map([
   ["\u0275\u0275defineInjectable", "\u0275\u0275defineInjectable"],
+  ["\u0275\u0275defineService", "\u0275\u0275defineService"],
   ["\u0275\u0275defineInjector", "\u0275\u0275defineInjector"],
   ["\u0275\u0275defineNgModule", "\u0275\u0275defineNgModule"],
   ["\u0275\u0275setNgModuleScope", "\u0275\u0275setNgModuleScope"],
@@ -5611,4 +5612,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-6HQBTW5E.js.map
+//# sourceMappingURL=chunk-G6TWEH7Q.js.map
