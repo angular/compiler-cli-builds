@@ -5469,7 +5469,6 @@ var DelegatingCompilerHost = class {
   resolveModuleNameLiterals;
   resolveTypeReferenceDirectiveReferences;
   // jsDocParsingMode is not a method like the other elements above
-  // TODO: ignore usage can be dropped once 5.2 support is dropped
   get jsDocParsingMode() {
     return this.delegate.jsDocParsingMode;
   }
@@ -14746,4 +14745,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-EK2KQALQ.js.map
+//# sourceMappingURL=chunk-LPZOZMCY.js.map
