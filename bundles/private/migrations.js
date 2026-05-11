@@ -5,7 +5,7 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-4FTGWWLZ.js";
+} from "../chunk-IZS6E6AZ.js";
 import {
   CompilationMode,
   DynamicValue,

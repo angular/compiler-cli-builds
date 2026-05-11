@@ -271,8 +271,18 @@ var FunctionExtractor = class {
     const implementation = findImplementationOfFunction(this.exportDeclaration, this.typeChecker) ?? this.exportDeclaration;
     const type = this.typeChecker.getTypeAtLocation(this.exportDeclaration);
     const overloads = ts3.isConstructorDeclaration(this.exportDeclaration) ? constructorOverloads(this.exportDeclaration, this.typeChecker) : extractCallSignatures(this.name, this.typeChecker, type);
-    const jsdocsTags = extractJsDocTags(implementation);
-    const description = extractJsDocDescription(implementation);
+    const implementationJsDocTags = extractJsDocTags(implementation);
+    const implementationDescription = extractJsDocDescription(implementation);
+    const implementationRawComment = extractRawJsDoc(implementation);
+    const docsForFunctionEntry = extractFunctionEntryDocs(overloads, {
+      description: implementationDescription,
+      jsdocTags: implementationJsDocTags,
+      rawComment: implementationRawComment
+    }) ?? {
+      description: implementationDescription,
+      jsdocTags: implementationJsDocTags,
+      rawComment: implementationRawComment
+    };
     return {
       name: this.name,
       signatures: overloads,
@@ -280,21 +290,30 @@ var FunctionExtractor = class {
         params: extractAllParams(implementation.parameters, this.typeChecker),
         isNewType: ts3.isConstructSignatureDeclaration(implementation),
         returnType,
-        returnDescription: jsdocsTags.find((tag) => tag.name === "returns")?.comment,
+        returnDescription: implementationJsDocTags.find((tag) => tag.name === "returns")?.comment,
         generics: extractGenerics(implementation),
         name: this.name,
-        description,
+        description: implementationDescription,
         entryType: EntryType.Function,
-        jsdocTags: jsdocsTags,
-        rawComment: extractRawJsDoc(implementation)
+        jsdocTags: implementationJsDocTags,
+        rawComment: implementationRawComment
       },
       entryType: EntryType.Function,
-      description,
-      jsdocTags: jsdocsTags,
-      rawComment: extractRawJsDoc(implementation)
+      description: docsForFunctionEntry.description,
+      jsdocTags: docsForFunctionEntry.jsdocTags,
+      rawComment: docsForFunctionEntry.rawComment
     };
   }
 };
+function extractFunctionEntryDocs(overloads, implementationDocs) {
+  if (hasJSDocContent(implementationDocs)) {
+    return implementationDocs;
+  }
+  return overloads.find((overload) => hasJSDocContent(overload)) ?? null;
+}
+function hasJSDocContent(docs) {
+  return docs.description.trim() !== "" || docs.rawComment.trim() !== "" || docs.jsdocTags.length > 0;
+}
 function constructorOverloads(constructorDeclaration, typeChecker) {
   const classDeclaration = constructorDeclaration.parent;
   const constructorNode = classDeclaration.members.filter((member) => {
@@ -5617,4 +5636,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-4FTGWWLZ.js.map
+//# sourceMappingURL=chunk-IZS6E6AZ.js.map
