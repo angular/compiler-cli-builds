@@ -52,7 +52,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-2THCAEQQ.js";
+} from "./chunk-N7NWKACN.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -5435,7 +5435,6 @@ var DelegatingCompilerHost = class {
   resolveModuleNameLiterals;
   resolveTypeReferenceDirectiveReferences;
   // jsDocParsingMode is not a method like the other elements above
-  // TODO: ignore usage can be dropped once 5.2 support is dropped
   get jsDocParsingMode() {
     return this.delegate.jsDocParsingMode;
   }
@@ -5636,4 +5635,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-3P3WMDKK.js.map
+//# sourceMappingURL=chunk-V6FUQUK3.js.map
