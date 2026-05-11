@@ -229,7 +229,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.12+sha-c93d158";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "21.2.12+sha-49a133a";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -11191,7 +11191,6 @@ var DelegatingCompilerHost = class {
   resolveModuleNameLiterals;
   resolveTypeReferenceDirectiveReferences;
   // jsDocParsingMode is not a method like the other elements above
-  // TODO: ignore usage can be dropped once 5.2 support is dropped
   get jsDocParsingMode() {
     return this.delegate.jsDocParsingMode;
   }
@@ -23172,4 +23171,4 @@ export {
 * Use of this source code is governed by an MIT-style license that can be
 * found in the LICENSE file at https://angular.dev/license
 */
-//# sourceMappingURL=chunk-5OK4JOT6.js.map
+//# sourceMappingURL=chunk-XMX6JBER.js.map

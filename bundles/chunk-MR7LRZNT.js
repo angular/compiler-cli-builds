@@ -88,7 +88,7 @@ import {
   toUnredirectedSourceFile,
   tryParseInitializerApi,
   untagAllTsFiles
-} from "./chunk-5OK4JOT6.js";
+} from "./chunk-XMX6JBER.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5205,7 +5205,6 @@ var DelegatingCompilerHost = class {
   resolveModuleNameLiterals;
   resolveTypeReferenceDirectiveReferences;
   // jsDocParsingMode is not a method like the other elements above
-  // TODO: ignore usage can be dropped once 5.2 support is dropped
   get jsDocParsingMode() {
     return this.delegate.jsDocParsingMode;
   }
@@ -5405,4 +5404,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-JSIVNM44.js.map
+//# sourceMappingURL=chunk-MR7LRZNT.js.map
