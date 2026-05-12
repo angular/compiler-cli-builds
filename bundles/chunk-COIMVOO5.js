@@ -2053,7 +2053,7 @@ function checkForPrivateExports(entryPoint, checker, refGraph) {
     throw new Error(`Internal error: failed to get symbol for entrypoint`);
   }
   const exportedSymbols = checker.getExportsOfModule(moduleSymbol);
-  exportedSymbols.forEach((symbol) => {
+  for (let symbol of exportedSymbols) {
     if (symbol.flags & ts17.SymbolFlags.Alias) {
       symbol = checker.getAliasedSymbol(symbol);
     }
@@ -2061,12 +2061,12 @@ function checkForPrivateExports(entryPoint, checker, refGraph) {
     if (decl !== void 0) {
       topLevelExports.add(decl);
     }
-  });
+  }
   const checkedSet = /* @__PURE__ */ new Set();
-  topLevelExports.forEach((mainExport) => {
-    refGraph.transitiveReferencesOf(mainExport).forEach((transitiveReference) => {
+  for (const mainExport of topLevelExports) {
+    for (const transitiveReference of refGraph.transitiveReferencesOf(mainExport)) {
       if (checkedSet.has(transitiveReference)) {
-        return;
+        continue;
       }
       checkedSet.add(transitiveReference);
       if (!topLevelExports.has(transitiveReference)) {
@@ -2086,8 +2086,8 @@ function checkForPrivateExports(entryPoint, checker, refGraph) {
         };
         diagnostics.push(diagnostic);
       }
-    });
-  });
+    }
+  }
   return diagnostics;
 }
 function getPosOfDeclaration(decl) {
@@ -2151,26 +2151,24 @@ var ReferenceGraph = class {
       return null;
     } else {
       let candidatePath = null;
-      this.references.get(source).forEach((edge) => {
-        if (candidatePath !== null) {
-          return;
-        }
+      for (const edge of this.references.get(source)) {
         const partialPath = this.collectPathFrom(edge, target, seen);
         if (partialPath !== null) {
           candidatePath = [source, ...partialPath];
+          break;
         }
-      });
+      }
       return candidatePath;
     }
   }
   collectTransitiveReferences(set, decl) {
     if (this.references.has(decl)) {
-      this.references.get(decl).forEach((ref) => {
+      for (const ref of this.references.get(decl)) {
         if (!set.has(ref)) {
           set.add(ref);
           this.collectTransitiveReferences(set, ref);
         }
-      });
+      }
     }
   }
 };
@@ -5635,4 +5633,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-V6FUQUK3.js.map
+//# sourceMappingURL=chunk-COIMVOO5.js.map
