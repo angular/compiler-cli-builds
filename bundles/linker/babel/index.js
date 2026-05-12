@@ -17,7 +17,7 @@ import "../../chunk-Y5V7YWTG.js";
 import "../../chunk-ZUYMYKXC.js";
 import {
   NodeJSFileSystem
-} from "../../chunk-SIUA3MOC.js";
+} from "../../chunk-KWAGEHJJ.js";
 import "../../chunk-IEBNHER4.js";
 
 // packages/compiler-cli/linker/babel/src/es2015_linker_plugin.js
