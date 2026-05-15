@@ -2452,13 +2452,6 @@ function generateAnalysis(context, adapter) {
   context.components.forEach(({ declaration, selector, boundTemplate, templateMeta }) => {
     const name = adapter.getName(declaration);
     const fileName = adapter.getFileName(declaration);
-    const usedComponents = /* @__PURE__ */ new Set();
-    const usedDirs = boundTemplate.getUsedDirectives();
-    usedDirs.forEach((dir) => {
-      if (dir.isComponent) {
-        usedComponents.add(dir.ref.node);
-      }
-    });
     const componentFile = new ParseSourceFile(adapter.getContent(declaration), fileName);
     let templateFile;
     if (templateMeta.isInline) {
@@ -2473,8 +2466,6 @@ function generateAnalysis(context, adapter) {
       file: componentFile,
       template: {
         identifiers,
-        usedComponents,
-        isInline: templateMeta.isInline,
         file: templateFile
       },
       errors
@@ -5404,4 +5395,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-MR7LRZNT.js.map
+//# sourceMappingURL=chunk-TKSSAJAC.js.map
