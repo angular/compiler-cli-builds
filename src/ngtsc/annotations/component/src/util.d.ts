@@ -23,3 +23,7 @@ export declare function validateAndFlattenComponentImports(imports: ResolvedValu
     imports: Reference<ClassDeclaration>[];
     diagnostics: ts.Diagnostic[];
 };
+export declare function validateAndFlattenForeignImports(imports: ResolvedValue, expr: ts.Expression): {
+    foreignImports: Reference<ClassDeclaration>[];
+    diagnostics: ts.Diagnostic[];
+};

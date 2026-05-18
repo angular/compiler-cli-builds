@@ -52,7 +52,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-N7NWKACN.js";
+} from "./chunk-3VX2PHLU.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -99,7 +99,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-G6TWEH7Q.js";
+} from "./chunk-DLVYDS26.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -353,17 +353,21 @@ function filterSignatureDeclarations(signatures) {
   return result;
 }
 function extractCallSignatures(name, typeChecker, type) {
-  return filterSignatureDeclarations(type.getCallSignatures()).map(({ decl, signature }) => ({
-    name,
-    entryType: EntryType.Function,
-    description: extractJsDocDescription(decl),
-    generics: extractGenerics(decl),
-    isNewType: false,
-    jsdocTags: extractJsDocTags(decl),
-    params: extractAllParams(decl.parameters, typeChecker),
-    rawComment: extractRawJsDoc(decl),
-    returnType: extractReturnType(signature, typeChecker)
-  }));
+  return filterSignatureDeclarations(type.getCallSignatures()).map(({ decl, signature }) => {
+    const jsdocTags = extractJsDocTags(decl);
+    return {
+      name,
+      entryType: EntryType.Function,
+      description: extractJsDocDescription(decl),
+      generics: extractGenerics(decl),
+      isNewType: false,
+      jsdocTags,
+      params: extractAllParams(decl.parameters, typeChecker),
+      rawComment: extractRawJsDoc(decl),
+      returnType: extractReturnType(signature, typeChecker),
+      returnDescription: jsdocTags.find((tag) => tag.name === "returns")?.comment
+    };
+  });
 }
 function extractReturnType(signature, typeChecker) {
   if (signature?.declaration?.type && ts3.isTypePredicateNode(signature.declaration.type)) {
@@ -5624,4 +5628,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-RO7W6QZ4.js.map
+//# sourceMappingURL=chunk-Y6BDWN32.js.map

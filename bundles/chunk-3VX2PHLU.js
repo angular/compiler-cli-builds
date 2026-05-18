@@ -57,6 +57,7 @@ import {
   isFromDtsFile,
   isHostDirectiveMetaForGlobalMode,
   isNamedClassDeclaration,
+  isNamedFunctionDeclaration,
   isNonDeclarationTsPath,
   isSymbolAliasOf,
   isSymbolWithValueDeclaration,
@@ -78,7 +79,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-G6TWEH7Q.js";
+} from "./chunk-DLVYDS26.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -7407,6 +7408,7 @@ var DirectiveDecoratorHandler = class {
       isStandalone: analysis.meta.isStandalone,
       isSignal: analysis.meta.isSignal,
       imports: null,
+      foreignImports: null,
       rawImports: null,
       deferredImports: null,
       schemas: null,
@@ -12620,22 +12622,50 @@ function validateAndFlattenComponentImports(imports, expr, isDeferred) {
       }
       diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_UNKNOWN_IMPORT, origin, `Component imports contains a ModuleWithProviders value, likely the result of a 'Module.forRoot()'-style call. These calls are not used to configure components and are not valid in standalone component imports - consider importing them in the application bootstrap instead.`));
     } else {
-      let diagnosticNode;
-      let diagnosticValue;
-      if (ref instanceof DynamicValue && isWithinExpression(ref.node, expr)) {
-        diagnosticNode = ref.node;
-        diagnosticValue = ref;
-      } else if (refExpr !== expr) {
-        diagnosticNode = refExpr;
-        diagnosticValue = ref;
-      } else {
-        diagnosticNode = expr;
-        diagnosticValue = imports;
-      }
+      const { node: diagnosticNode, value: diagnosticValue } = getDiagnosticOrigin(ref, expr, refExpr, imports);
       diagnostics.push(createValueHasWrongTypeError(diagnosticNode, diagnosticValue, errorMessage).toDiagnostic());
     }
   }
   return { imports: flattened, diagnostics };
+}
+function validateAndFlattenForeignImports(imports, expr) {
+  const flattened = [];
+  const errorMessage = `'foreignImports' must be an array of ForeignComponents.`;
+  if (!Array.isArray(imports)) {
+    const error = createValueHasWrongTypeError(expr, imports, errorMessage).toDiagnostic();
+    return {
+      foreignImports: [],
+      diagnostics: [error]
+    };
+  }
+  const diagnostics = [];
+  for (let i = 0; i < imports.length; i++) {
+    const ref = imports[i];
+    let refExpr = expr;
+    if (ts39.isArrayLiteralExpression(expr) && expr.elements.length === imports.length && !expr.elements.some(ts39.isSpreadAssignment)) {
+      refExpr = expr.elements[i];
+    }
+    if (Array.isArray(ref)) {
+      const { foreignImports: childForeignImports, diagnostics: childDiagnostics } = validateAndFlattenForeignImports(ref, refExpr);
+      flattened.push(...childForeignImports);
+      diagnostics.push(...childDiagnostics);
+    } else if (ref instanceof Reference && isNamedFunctionDeclaration(ref.node)) {
+      flattened.push(ref);
+    } else {
+      const { node: diagnosticNode, value: diagnosticValue } = getDiagnosticOrigin(ref, expr, refExpr, imports);
+      diagnostics.push(createValueHasWrongTypeError(diagnosticNode, diagnosticValue, errorMessage).toDiagnostic());
+    }
+  }
+  return { foreignImports: flattened, diagnostics };
+}
+function getDiagnosticOrigin(ref, expr, refExpr, fallbackValue) {
+  if (ref instanceof DynamicValue && isWithinExpression(ref.node, expr)) {
+    return { node: ref.node, value: ref };
+  } else if (refExpr !== expr) {
+    return { node: refExpr, value: ref };
+  } else {
+    return { node: expr, value: fallbackValue };
+  }
 }
 function isWithinExpression(node, expr) {
   let current = node;
@@ -12656,6 +12686,12 @@ function isLikelyModuleWithProviders(value) {
   }
   return false;
 }
+
+// packages/compiler-cli/src/ngtsc/annotations/component/src/resolver.js
+var foreignComponentResolver = (_, callExpr, resolve, unresolvable) => {
+  const arg = callExpr.arguments[0];
+  return arg ? resolve(arg) : unresolvable;
+};
 
 // packages/compiler-cli/src/ngtsc/annotations/component/src/handler.js
 var EMPTY_ARRAY = [];
@@ -12912,49 +12948,64 @@ var ComponentDecoratorHandler = class {
       providersRequiringFactory = resolveProvidersRequiringFactory(component.get("providers"), this.reflector, this.evaluator);
     }
     let resolvedImports = null;
+    let foreignImports = null;
     let resolvedDeferredImports = null;
     let rawImports = component.get("imports") ?? null;
     let rawDeferredImports = component.get("deferredImports") ?? null;
-    if ((rawImports || rawDeferredImports) && !metadata.isStandalone) {
+    let rawForeignImports = component.get("foreignImports") ?? null;
+    if ((rawImports || rawDeferredImports || rawForeignImports) && !metadata.isStandalone) {
       if (diagnostics === void 0) {
         diagnostics = [];
       }
-      const importsField = rawImports ? "imports" : "deferredImports";
+      const importsField = rawImports ? "imports" : rawDeferredImports ? "deferredImports" : "foreignImports";
       diagnostics.push(makeDiagnostic(ErrorCode.COMPONENT_NOT_STANDALONE, component.get(importsField), `'${importsField}' is only valid on a component that is standalone.`, [
         makeRelatedInformation(node.name, `Did you forget to add 'standalone: true' to this @Component?`)
       ]));
       isPoisoned = true;
-    } else if (this.compilationMode !== CompilationMode.LOCAL && (rawImports || rawDeferredImports)) {
-      const importResolvers = combineResolvers([
-        createModuleWithProvidersResolver(this.reflector, this.isCore),
-        createForwardRefResolver(this.isCore)
-      ]);
+    } else if (rawImports || rawDeferredImports || rawForeignImports) {
       const importDiagnostics = [];
-      if (rawImports) {
-        const expr = rawImports;
-        const imported = this.evaluator.evaluate(expr, importResolvers);
-        const { imports: flattened, diagnostics: diagnostics2 } = validateAndFlattenComponentImports(
-          imported,
-          expr,
-          false
-          /* isDeferred */
-        );
+      if (rawForeignImports) {
+        const foreignImportResolvers = combineResolvers([
+          createForwardRefResolver(this.isCore),
+          foreignComponentResolver
+        ]);
+        const expr = rawForeignImports;
+        const imported = this.evaluator.evaluate(expr, foreignImportResolvers);
+        const { foreignImports: flattened, diagnostics: diagnostics2 } = validateAndFlattenForeignImports(imported, expr);
         importDiagnostics.push(...diagnostics2);
-        resolvedImports = flattened;
-        rawImports = expr;
+        foreignImports = flattened;
       }
-      if (rawDeferredImports) {
-        const expr = rawDeferredImports;
-        const imported = this.evaluator.evaluate(expr, importResolvers);
-        const { imports: flattened, diagnostics: diagnostics2 } = validateAndFlattenComponentImports(
-          imported,
-          expr,
-          true
-          /* isDeferred */
-        );
-        importDiagnostics.push(...diagnostics2);
-        resolvedDeferredImports = flattened;
-        rawDeferredImports = expr;
+      if (this.compilationMode !== CompilationMode.LOCAL && (rawImports || rawDeferredImports)) {
+        const importResolvers = combineResolvers([
+          createModuleWithProvidersResolver(this.reflector, this.isCore),
+          createForwardRefResolver(this.isCore)
+        ]);
+        if (rawImports) {
+          const expr = rawImports;
+          const imported = this.evaluator.evaluate(expr, importResolvers);
+          const { imports: flattened, diagnostics: diagnostics2 } = validateAndFlattenComponentImports(
+            imported,
+            expr,
+            false
+            /* isDeferred */
+          );
+          importDiagnostics.push(...diagnostics2);
+          resolvedImports = flattened;
+          rawImports = expr;
+        }
+        if (rawDeferredImports) {
+          const expr = rawDeferredImports;
+          const imported = this.evaluator.evaluate(expr, importResolvers);
+          const { imports: flattened, diagnostics: diagnostics2 } = validateAndFlattenComponentImports(
+            imported,
+            expr,
+            true
+            /* isDeferred */
+          );
+          importDiagnostics.push(...diagnostics2);
+          resolvedDeferredImports = flattened;
+          rawDeferredImports = expr;
+        }
       }
       if (importDiagnostics.length > 0) {
         isPoisoned = true;
@@ -13191,6 +13242,7 @@ var ComponentDecoratorHandler = class {
         legacyAnimationTriggerNames,
         rawImports,
         resolvedImports,
+        foreignImports,
         rawDeferredImports,
         resolvedDeferredImports,
         explicitlyDeferredTypes,
@@ -13228,6 +13280,7 @@ var ComponentDecoratorHandler = class {
       isStandalone: analysis.meta.isStandalone,
       isSignal: analysis.meta.isSignal,
       imports: analysis.resolvedImports,
+      foreignImports: analysis.foreignImports,
       rawImports: analysis.rawImports,
       deferredImports: analysis.resolvedDeferredImports,
       animationTriggerNames: analysis.legacyAnimationTriggerNames,
@@ -14812,4 +14865,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-N7NWKACN.js.map
+//# sourceMappingURL=chunk-3VX2PHLU.js.map

@@ -232,7 +232,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.0+sha-9a7dedc";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.0+sha-16fe27b";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -670,6 +670,9 @@ var AmbientImport = {};
 // packages/compiler-cli/src/ngtsc/reflection/src/util.js
 function isNamedClassDeclaration(node) {
   return ts5.isClassDeclaration(node) && isIdentifier(node.name);
+}
+function isNamedFunctionDeclaration(node) {
+  return ts5.isFunctionDeclaration(node) && isIdentifier(node.name);
 }
 function isIdentifier(node) {
   return node !== void 0 && ts5.isIdentifier(node);
@@ -2498,6 +2501,7 @@ var DtsMetadataReader = class {
       // Imports are tracked in metadata only for template type-checking purposes,
       // so standalone components from .d.ts files don't have any.
       imports: null,
+      foreignImports: null,
       rawImports: null,
       deferredImports: null,
       // The same goes for schemas.
@@ -5542,6 +5546,7 @@ export {
   typeNodeToValueExpr,
   entityNameToValue,
   isNamedClassDeclaration,
+  isNamedFunctionDeclaration,
   classMemberAccessLevelToString,
   TypeScriptReflectionHost,
   filterToMembersWithDecorator,
@@ -5612,4 +5617,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-G6TWEH7Q.js.map
+//# sourceMappingURL=chunk-DLVYDS26.js.map

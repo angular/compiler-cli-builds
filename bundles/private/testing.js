@@ -4,11 +4,11 @@
     
 import {
   getInitializerApiJitTransform
-} from "../chunk-N7NWKACN.js";
+} from "../chunk-3VX2PHLU.js";
 import {
   ImportedSymbolsTracker,
   TypeScriptReflectionHost
-} from "../chunk-G6TWEH7Q.js";
+} from "../chunk-DLVYDS26.js";
 import "../chunk-ZUYMYKXC.js";
 import {
   InvalidFileSystem,

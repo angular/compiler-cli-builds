@@ -57,6 +57,7 @@ export interface ComponentAnalysisData {
     legacyAnimationTriggerNames: LegacyAnimationTriggerNames | null;
     rawImports: ts.Expression | null;
     resolvedImports: Reference<ClassDeclaration>[] | null;
+    foreignImports: Reference<ClassDeclaration>[] | null;
     rawDeferredImports: ts.Expression | null;
     resolvedDeferredImports: Reference<ClassDeclaration>[] | null;
     /**
