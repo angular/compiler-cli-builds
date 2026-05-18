@@ -323,17 +323,21 @@ function filterSignatureDeclarations(signatures) {
   return result;
 }
 function extractCallSignatures(name, typeChecker, type) {
-  return filterSignatureDeclarations(type.getCallSignatures()).map(({ decl, signature }) => ({
-    name,
-    entryType: EntryType.Function,
-    description: extractJsDocDescription(decl),
-    generics: extractGenerics(decl),
-    isNewType: false,
-    jsdocTags: extractJsDocTags(decl),
-    params: extractAllParams(decl.parameters, typeChecker),
-    rawComment: extractRawJsDoc(decl),
-    returnType: extractReturnType(signature, typeChecker)
-  }));
+  return filterSignatureDeclarations(type.getCallSignatures()).map(({ decl, signature }) => {
+    const jsdocTags = extractJsDocTags(decl);
+    return {
+      name,
+      entryType: EntryType.Function,
+      description: extractJsDocDescription(decl),
+      generics: extractGenerics(decl),
+      isNewType: false,
+      jsdocTags,
+      params: extractAllParams(decl.parameters, typeChecker),
+      rawComment: extractRawJsDoc(decl),
+      returnType: extractReturnType(signature, typeChecker),
+      returnDescription: jsdocTags.find((tag) => tag.name === "returns")?.comment
+    };
+  });
 }
 function extractReturnType(signature, typeChecker) {
   if (signature?.declaration?.type && ts3.isTypePredicateNode(signature.declaration.type)) {
@@ -5395,4 +5399,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-TKSSAJAC.js.map
+//# sourceMappingURL=chunk-PMBD6IFV.js.map
