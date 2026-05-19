@@ -10,6 +10,7 @@ import ts from 'typescript';
 import { Reference } from '../../../imports';
 import { ForeignFunctionResolver, ResolvedValue } from '../../../partial_evaluator';
 import { ClassDeclaration } from '../../../reflection';
+import { ForeignComponentMeta } from './metadata';
 /**
  * Collect the animation names from the static evaluation result.
  * @param value the static evaluation result of the animations
@@ -24,6 +25,6 @@ export declare function validateAndFlattenComponentImports(imports: ResolvedValu
     diagnostics: ts.Diagnostic[];
 };
 export declare function validateAndFlattenForeignImports(imports: ResolvedValue, expr: ts.Expression): {
-    foreignImports: Reference<ClassDeclaration>[];
+    foreignImports: ForeignComponentMeta[];
     diagnostics: ts.Diagnostic[];
 };

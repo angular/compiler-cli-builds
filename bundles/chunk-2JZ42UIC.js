@@ -31,6 +31,7 @@ import {
   assertSuccessfulReferenceEmit,
   attachDefaultImportDeclaration,
   classMemberAccessLevelToString,
+  createForeignComponentMatcher,
   ensureTypeCheckFilePreparationImports,
   entityNameToValue,
   extractDirectiveTypeCheckMeta,
@@ -79,7 +80,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-DLVYDS26.js";
+} from "./chunk-T5IPJ7K2.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -7052,6 +7053,7 @@ var TypeCheckScopeRegistry = class {
     if (scope === null) {
       return {
         matcher: null,
+        foreignMatcher: null,
         directives,
         pipes,
         schemas: [],
@@ -7090,8 +7092,10 @@ var TypeCheckScopeRegistry = class {
         }
       }
     }
+    const foreignMatcher = hostMeta !== null ? createForeignComponentMatcher(hostMeta.foreignImports) : null;
     const typeCheckScope = {
       matcher,
+      foreignMatcher,
       directives,
       pipes,
       schemas: scope.schemas,
@@ -9950,6 +9954,7 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, reflector, genericContextBe
       const dirs = meta.boundTarget.getDirectivesOfNode(node);
       return dirs ? dirs.map(convertDir) : null;
     },
+    getForeignComponent: (element) => meta.boundTarget.getForeignComponent(element),
     getReferenceTarget: (ref2) => {
       const target = meta.boundTarget.getReferenceTarget(ref2);
       if (target && "directive" in target) {
@@ -11299,6 +11304,9 @@ var TemplateTypeCheckerImpl = class {
   }
   getDirectivesOfNode(component, node) {
     return this.getLatestComponentState(component).data?.boundTarget.getDirectivesOfNode(node) ?? null;
+  }
+  getForeignComponent(component, element) {
+    return this.getLatestComponentState(component).data?.boundTarget.getForeignComponent(element) ?? null;
   }
   getUsedDirectives(component) {
     return this.getLatestComponentState(component).data?.boundTarget.getUsedDirectives() ?? null;
@@ -12650,7 +12658,12 @@ function validateAndFlattenForeignImports(imports, expr) {
       flattened.push(...childForeignImports);
       diagnostics.push(...childDiagnostics);
     } else if (ref instanceof Reference && isNamedFunctionDeclaration(ref.node)) {
-      flattened.push(ref);
+      const name = ref.getIdentityInExpression(refExpr)?.text ?? ref.node.name.getText();
+      flattened.push({
+        name,
+        ref,
+        rawExpression: refExpr
+      });
     } else {
       const { node: diagnosticNode, value: diagnosticValue } = getDiagnosticOrigin(ref, expr, refExpr, imports);
       diagnostics.push(createValueHasWrongTypeError(diagnosticNode, diagnosticValue, errorMessage).toDiagnostic());
@@ -13354,7 +13367,7 @@ var ComponentDecoratorHandler = class {
     if (scope.isPoisoned && !this.usePoisonedData) {
       return;
     }
-    const binder = new R3TargetBinder2(scope.matcher);
+    const binder = new R3TargetBinder2(scope.matcher, scope.foreignMatcher);
     const templateContext = {
       nodes: meta.template.diagNodes,
       pipes: scope.pipes,
@@ -13607,7 +13620,7 @@ var ComponentDecoratorHandler = class {
         diagnostics.push(diagnostic);
       }
     }
-    const binder = new R3TargetBinder2(createMatcherFromScope(scope, this.hostDirectivesResolver));
+    const binder = new R3TargetBinder2(createMatcherFromScope(scope, this.hostDirectivesResolver), createForeignComponentMatcher(analysis.foreignImports));
     let allDependencies = dependencies;
     let deferBlockBinder = binder;
     if (explicitlyDeferredDependencies !== null && explicitlyDeferredDependencies.length > 0) {
@@ -14865,4 +14878,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-3VX2PHLU.js.map
+//# sourceMappingURL=chunk-2JZ42UIC.js.map

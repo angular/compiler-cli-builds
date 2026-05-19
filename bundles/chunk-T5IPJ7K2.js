@@ -108,6 +108,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["FORM_FIELD_UNSUPPORTED_BINDING"] = 8022] = "FORM_FIELD_UNSUPPORTED_BINDING";
   ErrorCode2[ErrorCode2["MULTIPLE_MATCHING_COMPONENTS"] = 8023] = "MULTIPLE_MATCHING_COMPONENTS";
   ErrorCode2[ErrorCode2["CONFLICTING_HOST_DIRECTIVE_BINDING"] = -8024] = "CONFLICTING_HOST_DIRECTIVE_BINDING";
+  ErrorCode2[ErrorCode2["FOREIGN_COMPONENT_UNSUPPORTED_BINDING"] = 8025] = "FOREIGN_COMPONENT_UNSUPPORTED_BINDING";
   ErrorCode2[ErrorCode2["INVALID_BANANA_IN_BOX"] = 8101] = "INVALID_BANANA_IN_BOX";
   ErrorCode2[ErrorCode2["NULLISH_COALESCING_NOT_NULLABLE"] = 8102] = "NULLISH_COALESCING_NOT_NULLABLE";
   ErrorCode2[ErrorCode2["MISSING_CONTROL_FLOW_DIRECTIVE"] = 8103] = "MISSING_CONTROL_FLOW_DIRECTIVE";
@@ -232,7 +233,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.0+sha-b53fa3c";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.0+sha-7c60a98";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -2181,6 +2182,7 @@ import ts13 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/metadata/src/util.js
 import ts12 from "typescript";
+import { SelectorlessMatcher } from "@angular/compiler";
 function extractReferencesFromType(checker, def, bestGuessOwningModule) {
   if (!ts12.isTupleTypeNode(def)) {
     return { result: [], isIncomplete: false };
@@ -2402,6 +2404,16 @@ function hasInjectableFields(clazz, host) {
 }
 function isHostDirectiveMetaForGlobalMode(hostDirectiveMeta) {
   return hostDirectiveMeta.directive instanceof Reference;
+}
+function createForeignComponentMatcher(foreignImports) {
+  if (foreignImports === null || foreignImports.length === 0) {
+    return null;
+  }
+  const registry = /* @__PURE__ */ new Map();
+  for (const meta of foreignImports) {
+    registry.set(meta.name, [meta]);
+  }
+  return new SelectorlessMatcher(registry);
 }
 
 // packages/compiler-cli/src/ngtsc/metadata/src/dts.js
@@ -5562,6 +5574,7 @@ export {
   CompoundMetadataReader,
   hasInjectableFields,
   isHostDirectiveMetaForGlobalMode,
+  createForeignComponentMatcher,
   DtsMetadataReader,
   flattenInheritedDirectiveMetadata,
   LocalMetadataRegistry,
@@ -5617,4 +5630,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-DLVYDS26.js.map
+//# sourceMappingURL=chunk-T5IPJ7K2.js.map

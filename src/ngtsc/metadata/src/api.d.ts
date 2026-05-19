@@ -5,10 +5,15 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { DirectiveMeta as T2DirectiveMeta, Expression, SchemaMetadata, ExternalReference, MatchSource, ClassPropertyName, InputOrOutput, ClassPropertyMapping, TemplateGuardMeta } from '@angular/compiler';
+import { DirectiveMeta as T2DirectiveMeta, Expression, SchemaMetadata, ExternalReference, MatchSource, ClassPropertyName, InputOrOutput, ClassPropertyMapping, TemplateGuardMeta, ForeignComponentMeta as T2ForeignComponentMeta } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
+/** Metadata for a resolved foreign component import. */
+export interface ForeignComponentMeta extends T2ForeignComponentMeta {
+    ref: Reference<ClassDeclaration>;
+    rawExpression: ts.Expression;
+}
 /**
  * Metadata collected for an `NgModule`.
  */
@@ -209,7 +214,7 @@ export interface DirectiveMeta extends T2DirectiveMeta, DirectiveTypeCheckMeta {
      * Note that while a foreign import is not likely to be a class, this type is used
      * because it includes the expected identifier we'll need, making further code simpler.
      */
-    foreignImports: Reference<ClassDeclaration>[] | null;
+    foreignImports: ForeignComponentMeta[] | null;
     /**
      * Node declaring the `imports` of a standalone component. Used to produce diagnostics.
      */
