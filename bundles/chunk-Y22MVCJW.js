@@ -23,7 +23,6 @@ import {
   NgOriginalFile,
   NoopReferencesRegistry,
   OUTPUT_INITIALIZER_FNS,
-  PartialEvaluator,
   PerfCheckpoint,
   PerfEvent,
   PerfPhase,
@@ -52,7 +51,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-2JZ42UIC.js";
+} from "./chunk-LQSJP3SN.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -77,6 +76,7 @@ import {
   ModuleResolver,
   NoopImportRewriter,
   OptimizeFor,
+  PartialEvaluator,
   PrivateExportAliasingHost,
   R3SymbolsImportRewriter,
   Reference,
@@ -99,7 +99,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-T5IPJ7K2.js";
+} from "./chunk-5K7YOMBF.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5652,4 +5652,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-QDTQM6RC.js.map
+//# sourceMappingURL=chunk-Y22MVCJW.js.map
