@@ -8,7 +8,7 @@
 import ts from 'typescript';
 import { DependencyTracker } from '../../incremental/api';
 import { ReflectionHost } from '../../reflection';
-import type { ForeignFunctionResolver } from './interface';
+import type { ForeignFunctionResolver, ForeignTypeResolver } from './interface';
 import { ResolvedValue } from './result';
 /**
  * Tracks the scope of a function body, which includes `ResolvedValue`s for the parameters of that
@@ -29,6 +29,7 @@ interface Context {
     resolutionContext: string;
     scope: Scope;
     foreignFunctionResolver?: ForeignFunctionResolver;
+    foreignTypeResolver?: ForeignTypeResolver;
 }
 export declare class StaticInterpreter {
     private host;
@@ -68,8 +69,10 @@ export declare class StaticInterpreter {
     private visitBindingElement;
     private stringNameFromPropertyName;
     private getReference;
-    private visitType;
+    visitType(node: ts.TypeNode, context: Context): ResolvedValue;
     private visitTupleType;
     private visitTypeQuery;
+    private visitImportType;
+    private visitTypeReference;
 }
 export {};
