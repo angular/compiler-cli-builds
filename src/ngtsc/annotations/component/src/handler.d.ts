@@ -146,6 +146,10 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     private _checkForCyclicImport;
     private maybeRecordSyntheticImport;
     /**
+     * Resolves imported foreign components for code generation.
+     */
+    private resolveForeignComponentImports;
+    /**
      * Resolves information about defer blocks dependencies to make it
      * available for the final `compile` step.
      */

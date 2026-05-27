@@ -456,7 +456,7 @@ import semver2 from "semver";
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "22.1.0-next.0+sha-a68a33e";
+var PLACEHOLDER_VERSION = "22.1.0-next.0+sha-db59909";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -822,7 +822,8 @@ ${errors}`);
       relativeTemplatePath: null,
       i18nUseExternalIds: false,
       declarations,
-      hasDirectiveDependencies: !baseMeta.isStandalone || hasDirectiveDependencies
+      hasDirectiveDependencies: !baseMeta.isStandalone || hasDirectiveDependencies,
+      foreignImports: null
     };
   }
   /**
@@ -1401,4 +1402,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ZURNPVTB.js.map
+//# sourceMappingURL=chunk-DYU4R5IG.js.map

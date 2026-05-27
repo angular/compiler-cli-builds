@@ -5,9 +5,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { DirectiveMatcher, SchemaMetadata, SelectorlessMatcher, ForeignComponentMeta } from '@angular/compiler';
+import { DirectiveMatcher, SchemaMetadata, SelectorlessMatcher } from '@angular/compiler';
 import { Reference } from '../../imports';
-import { DirectiveMeta, HostDirectivesResolver, MetadataReader, PipeMeta } from '../../metadata';
+import { DirectiveMeta, ForeignComponentMeta, HostDirectivesResolver, MetadataReader, PipeMeta } from '../../metadata';
 import { ClassDeclaration } from '../../reflection';
 import { ComponentScopeReader } from './api';
 /**

@@ -12386,7 +12386,8 @@ var ComponentDecoratorHandler = class {
           i18nUseExternalIds: this.i18nUseExternalIds,
           relativeContextFilePath,
           rawImports: rawImports !== null ? new o4.WrappedNodeExpr(rawImports) : void 0,
-          relativeTemplatePath
+          relativeTemplatePath,
+          foreignImports: null
         },
         typeCheckMeta: extractDirectiveTypeCheckMeta(node, inputs, this.reflector),
         classMetadata: this.includeClassMetadata ? extractClassMetadata(node, this.reflector, this.isCore, this.annotateForClosureCompiler, (dec) => transformDecoratorResources(dec, component, styles, template), this.undecoratedMetadataExtractor) : null,
@@ -12658,10 +12659,12 @@ var ComponentDecoratorHandler = class {
     }
     const perComponentDeferredDeps = this.canDeferDeps ? this.resolveAllDeferredDependencies(resolution) : null;
     const defer = this.compileDeferBlocks(resolution);
+    const foreignImports = this.resolveForeignComponentImports(node, analysis);
     const meta = {
       ...analysis.meta,
       ...resolution,
-      defer
+      defer,
+      foreignImports
     };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
     if (perComponentDeferredDeps !== null) {
@@ -12705,10 +12708,12 @@ var ComponentDecoratorHandler = class {
   compileLocal(node, analysis, resolution, pool) {
     const deferrableTypes = this.canDeferDeps ? analysis.explicitlyDeferredTypes : null;
     const defer = this.compileDeferBlocks(resolution);
+    const foreignImports = this.resolveForeignComponentImports(node, analysis);
     const meta = {
       ...analysis.meta,
       ...resolution,
-      defer
+      defer,
+      foreignImports
     };
     if (deferrableTypes !== null) {
       removeDeferrableTypesFromComponentDecorator(analysis, deferrableTypes);
@@ -12729,10 +12734,12 @@ var ComponentDecoratorHandler = class {
     }
     const pool = new ConstantPool2();
     const defer = this.compileDeferBlocks(resolution);
+    const foreignImports = this.resolveForeignComponentImports(node, analysis);
     const meta = {
       ...analysis.meta,
       ...resolution,
-      defer
+      defer,
+      foreignImports
     };
     const fac = compileNgFactoryDefField(toFactoryMetadata(meta, FactoryTarget3.Component));
     const def = compileComponentFromMetadata(meta, pool, this.getNewBindingParser());
@@ -13081,6 +13088,25 @@ var ComponentDecoratorHandler = class {
       return;
     }
     this.cycleAnalyzer.recordSyntheticImport(origin, imported);
+  }
+  /**
+   * Resolves imported foreign components for code generation.
+   */
+  resolveForeignComponentImports(node, analysis) {
+    if (analysis.foreignImports === null || analysis.foreignImports.length === 0) {
+      return null;
+    }
+    const context = getSourceFile(node);
+    return analysis.foreignImports.map((foreignMeta) => {
+      const { name, ref, rawExpression } = foreignMeta;
+      const emittedRef = this.refEmitter.emit(ref, context);
+      assertSuccessfulReferenceEmit(emittedRef, node.name, "foreign component");
+      ts38.setEmitFlags(rawExpression, ts38.EmitFlags.NoComments | ts38.EmitFlags.NoNestedComments);
+      return {
+        name,
+        component: new o4.WrappedNodeExpr(rawExpression)
+      };
+    });
   }
   /**
    * Resolves information about defer blocks dependencies to make it
@@ -14032,4 +14058,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-LQSJP3SN.js.map
+//# sourceMappingURL=chunk-K6CA2HCV.js.map
