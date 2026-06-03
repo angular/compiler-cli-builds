@@ -3015,6 +3015,9 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
     if (node instanceof Interpolation) {
       return node.expressions.map((item) => item instanceof PrefixNot ? item.expression : item).filter((item) => item instanceof PropertyRead2).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
     } else if (node instanceof TmplAstElement2 && node.inputs.length > 0) {
+      if (ctx.templateTypeChecker.getForeignComponent(component, node) !== null) {
+        return [];
+      }
       const directivesOfElement = ctx.templateTypeChecker.getDirectivesOfNode(component, node);
       return node.inputs.flatMap((input) => checkBoundAttribute(ctx, component, directivesOfElement, input));
     } else if (node instanceof TmplAstTemplate2 && node.tagName === "ng-template") {
@@ -5652,4 +5655,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-KR5DWYKE.js.map
+//# sourceMappingURL=chunk-NDASTC5G.js.map
