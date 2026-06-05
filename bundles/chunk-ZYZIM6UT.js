@@ -109,6 +109,10 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["MULTIPLE_MATCHING_COMPONENTS"] = 8023] = "MULTIPLE_MATCHING_COMPONENTS";
   ErrorCode2[ErrorCode2["CONFLICTING_HOST_DIRECTIVE_BINDING"] = -8024] = "CONFLICTING_HOST_DIRECTIVE_BINDING";
   ErrorCode2[ErrorCode2["FOREIGN_COMPONENT_UNSUPPORTED_BINDING"] = 8025] = "FOREIGN_COMPONENT_UNSUPPORTED_BINDING";
+  ErrorCode2[ErrorCode2["INVALID_CONTENT_PLACEMENT"] = 8026] = "INVALID_CONTENT_PLACEMENT";
+  ErrorCode2[ErrorCode2["FOREIGN_COMPONENT_CONTENT_UNNECESSARY_FOR_CHILDREN"] = 8027] = "FOREIGN_COMPONENT_CONTENT_UNNECESSARY_FOR_CHILDREN";
+  ErrorCode2[ErrorCode2["CONFLICTING_CONTENT_DECLARATION"] = 8028] = "CONFLICTING_CONTENT_DECLARATION";
+  ErrorCode2[ErrorCode2["CONFLICTING_CONTENT_AND_PROPERTY"] = 8029] = "CONFLICTING_CONTENT_AND_PROPERTY";
   ErrorCode2[ErrorCode2["INVALID_BANANA_IN_BOX"] = 8101] = "INVALID_BANANA_IN_BOX";
   ErrorCode2[ErrorCode2["NULLISH_COALESCING_NOT_NULLABLE"] = 8102] = "NULLISH_COALESCING_NOT_NULLABLE";
   ErrorCode2[ErrorCode2["MISSING_CONTROL_FLOW_DIRECTIVE"] = 8103] = "MISSING_CONTROL_FLOW_DIRECTIVE";
@@ -233,7 +237,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.0+sha-5f36274";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.0+sha-79e5d5d";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -6780,4 +6784,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-5K7YOMBF.js.map
+//# sourceMappingURL=chunk-ZYZIM6UT.js.map

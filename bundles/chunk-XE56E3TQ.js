@@ -51,7 +51,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-K6CA2HCV.js";
+} from "./chunk-7N525RD4.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -99,7 +99,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-5K7YOMBF.js";
+} from "./chunk-ZYZIM6UT.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -3824,7 +3824,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
 ]);
 
 // packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
-import { ASTWithSource as ASTWithSource5, BindingType as BindingType2, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead6, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2, ThisReceiver as ThisReceiver2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead6, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2, ThisReceiver as ThisReceiver2 } from "@angular/compiler";
 import ts23 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   templateTypeChecker;
@@ -3838,44 +3838,20 @@ var TemplateSemanticsCheckerImpl = class {
 };
 var TemplateSemanticsVisitor = class _TemplateSemanticsVisitor extends TmplAstRecursiveVisitor {
   expressionVisitor;
-  templateTypeChecker;
-  component;
-  diagnostics;
-  constructor(expressionVisitor, templateTypeChecker, component, diagnostics) {
+  constructor(expressionVisitor) {
     super();
     this.expressionVisitor = expressionVisitor;
-    this.templateTypeChecker = templateTypeChecker;
-    this.component = component;
-    this.diagnostics = diagnostics;
   }
   static visit(nodes, component, templateTypeChecker) {
     const diagnostics = [];
     const expressionVisitor = new ExpressionsSemanticsVisitor(templateTypeChecker, component, diagnostics);
-    const templateVisitor = new _TemplateSemanticsVisitor(expressionVisitor, templateTypeChecker, component, diagnostics);
+    const templateVisitor = new _TemplateSemanticsVisitor(expressionVisitor);
     nodes.forEach((node) => node.visit(templateVisitor));
     return diagnostics;
   }
   visitBoundEvent(event) {
     super.visitBoundEvent(event);
     event.handler.visit(this.expressionVisitor, event);
-  }
-  visitElement(element) {
-    super.visitElement(element);
-    const foreignMeta = this.templateTypeChecker.getForeignComponent(this.component, element);
-    if (foreignMeta !== null) {
-      this.validateForeignComponent(element);
-    }
-  }
-  validateForeignComponent(element) {
-    if (element.outputs.length > 0) {
-      this.diagnostics.push(this.templateTypeChecker.makeTemplateDiagnostic(this.component, element.sourceSpan, ts23.DiagnosticCategory.Error, ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING, `Foreign components do not support event bindings.`));
-    }
-    if (element.references.length > 0) {
-      this.diagnostics.push(this.templateTypeChecker.makeTemplateDiagnostic(this.component, element.sourceSpan, ts23.DiagnosticCategory.Error, ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING, `Foreign components do not support references.`));
-    }
-    if (element.inputs.some((input) => input.type !== BindingType2.Property)) {
-      this.diagnostics.push(this.templateTypeChecker.makeTemplateDiagnostic(this.component, element.sourceSpan, ts23.DiagnosticCategory.Error, ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING, `Foreign components only support static attributes and property bindings.`));
-    }
   }
 };
 var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
@@ -5655,4 +5631,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-NDASTC5G.js.map
+//# sourceMappingURL=chunk-XE56E3TQ.js.map

@@ -84,7 +84,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-5K7YOMBF.js";
+} from "./chunk-ZYZIM6UT.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -5032,7 +5032,7 @@ function _extractTemplateStyleUrls(template) {
 
 // packages/compiler-cli/src/ngtsc/annotations/component/src/handler.js
 import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, compileHmrInitializer, ConstantPool as ConstantPool2, createHostElement as createHostElement2, CssSelector as CssSelector3, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, MatchSource as MatchSource2, outputAst as o4, R3TargetBinder as R3TargetBinder2, R3TemplateDependencyKind, SelectorlessMatcher as SelectorlessMatcher2, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
-import ts38 from "typescript";
+import ts39 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.js
 import ts20 from "typescript";
@@ -11633,6 +11633,195 @@ var AnimationsAnalyzer = class extends CombinedRecursiveAstVisitor {
   }
 };
 
+// packages/compiler-cli/src/ngtsc/annotations/component/src/foreign_component.js
+import { BindingType as BindingType2, TmplAstContentBlock, TmplAstElement as TmplAstElement2, TmplAstRecursiveVisitor, tmplAstVisitAll as tmplAstVisitAll2 } from "@angular/compiler";
+import ts37 from "typescript";
+var CHILDREN = "children";
+function analyzeForeignComponentFeatures(template, foreignMatcher) {
+  const analyzer = new ForeignComponentFeatureAnalyzer(foreignMatcher, template.sourceMapping);
+  tmplAstVisitAll2(analyzer, template.nodes);
+  return analyzer.diagnostics;
+}
+var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
+  foreignMatcher;
+  sourceMapping;
+  currentParent = null;
+  diagnostics = [];
+  // Tracks the named @content blocks defined for each foreign component element.
+  // This is used to detect duplicate @content declarations under the same parent
+  // during the recursive AST traversal.
+  seenContentBlocks = /* @__PURE__ */ new Map();
+  constructor(foreignMatcher, sourceMapping) {
+    super();
+    this.foreignMatcher = foreignMatcher;
+    this.sourceMapping = sourceMapping;
+  }
+  elementIsForeignComponent(tagName) {
+    return this.foreignMatcher !== null && this.foreignMatcher.match(tagName).length > 0;
+  }
+  parentNodeIsForeignComponent() {
+    return this.currentParent !== null && this.currentParent instanceof TmplAstElement2 && this.elementIsForeignComponent(this.currentParent.name);
+  }
+  visitElement(element) {
+    if (this.elementIsForeignComponent(element.name)) {
+      this.validateForeignComponent(element);
+    }
+    const prevParent = this.currentParent;
+    this.currentParent = element;
+    super.visitElement(element);
+    this.currentParent = prevParent;
+  }
+  validateForeignComponent(element) {
+    if (element.outputs.length > 0) {
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, element.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING), "Foreign components do not support event bindings."));
+    }
+    if (element.references.length > 0) {
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, element.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING), "Foreign components do not support references."));
+    }
+    if (element.inputs.some((input) => input.type !== BindingType2.Property)) {
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, element.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING), "Foreign components only support static attributes and property bindings."));
+    }
+    const childrenInput = element.inputs.find((input) => input.type === BindingType2.Property && input.name === CHILDREN);
+    const childrenAttr = element.attributes.find((attr) => attr.name === CHILDREN);
+    const conflictingSource = childrenInput ?? childrenAttr;
+    if (conflictingSource === void 0) {
+      return;
+    }
+    const firstChild = element.children.find((child) => !(child instanceof TmplAstContentBlock));
+    if (firstChild === void 0) {
+      return;
+    }
+    this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, conflictingSource.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_CONTENT_AND_PROPERTY), `A foreign component cannot have both a '${CHILDREN}' property and child nodes.`, [
+      {
+        text: "Child nodes are defined here.",
+        start: firstChild.sourceSpan.start.offset,
+        end: firstChild.sourceSpan.end.offset,
+        sourceFile: this.sourceMapping.node.getSourceFile()
+      }
+    ]));
+  }
+  visitTemplate(template) {
+    const prevParent = this.currentParent;
+    this.currentParent = template;
+    super.visitTemplate(template);
+    this.currentParent = prevParent;
+  }
+  visitDeferredBlock(deferred) {
+    const prevParent = this.currentParent;
+    this.currentParent = deferred;
+    super.visitDeferredBlock(deferred);
+    this.currentParent = prevParent;
+  }
+  visitDeferredBlockPlaceholder(block) {
+    const prevParent = this.currentParent;
+    this.currentParent = block;
+    super.visitDeferredBlockPlaceholder(block);
+    this.currentParent = prevParent;
+  }
+  visitDeferredBlockError(block) {
+    const prevParent = this.currentParent;
+    this.currentParent = block;
+    super.visitDeferredBlockError(block);
+    this.currentParent = prevParent;
+  }
+  visitDeferredBlockLoading(block) {
+    const prevParent = this.currentParent;
+    this.currentParent = block;
+    super.visitDeferredBlockLoading(block);
+    this.currentParent = prevParent;
+  }
+  visitSwitchBlock(block) {
+    const prevParent = this.currentParent;
+    this.currentParent = block;
+    super.visitSwitchBlock(block);
+    this.currentParent = prevParent;
+  }
+  visitSwitchBlockCaseGroup(block) {
+    const prevParent = this.currentParent;
+    this.currentParent = block;
+    super.visitSwitchBlockCaseGroup(block);
+    this.currentParent = prevParent;
+  }
+  visitForLoopBlock(block) {
+    const prevParent = this.currentParent;
+    this.currentParent = block;
+    super.visitForLoopBlock(block);
+    this.currentParent = prevParent;
+  }
+  visitForLoopBlockEmpty(block) {
+    const prevParent = this.currentParent;
+    this.currentParent = block;
+    super.visitForLoopBlockEmpty(block);
+    this.currentParent = prevParent;
+  }
+  visitIfBlock(block) {
+    const prevParent = this.currentParent;
+    this.currentParent = block;
+    super.visitIfBlock(block);
+    this.currentParent = prevParent;
+  }
+  visitIfBlockBranch(block) {
+    const prevParent = this.currentParent;
+    this.currentParent = block;
+    super.visitIfBlockBranch(block);
+    this.currentParent = prevParent;
+  }
+  visitContent(content) {
+    const prevParent = this.currentParent;
+    this.currentParent = content;
+    super.visitContent(content);
+    this.currentParent = prevParent;
+  }
+  visitContentBlock(block) {
+    if (this.parentNodeIsForeignComponent()) {
+      this.validateContentBlock(block);
+    } else {
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INVALID_CONTENT_PLACEMENT), "@content blocks are only valid as direct children of foreign components."));
+    }
+    const prevParent = this.currentParent;
+    this.currentParent = block;
+    super.visitContentBlock(block);
+    this.currentParent = prevParent;
+  }
+  validateContentBlock(block) {
+    const parent = this.currentParent;
+    let seen = this.seenContentBlocks.get(parent);
+    if (seen === void 0) {
+      seen = /* @__PURE__ */ new Map();
+      this.seenContentBlocks.set(parent, seen);
+    }
+    if (seen.has(block.name)) {
+      const firstDecl = seen.get(block.name);
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_CONTENT_DECLARATION), `A @content block with the name '${block.name}' has already been defined for this component.`, [
+        {
+          text: `The @content block '${block.name}' was first defined here.`,
+          start: firstDecl.sourceSpan.start.offset,
+          end: firstDecl.sourceSpan.end.offset,
+          sourceFile: this.sourceMapping.node.getSourceFile()
+        }
+      ]));
+    } else {
+      seen.set(block.name, block);
+    }
+    const conflictInput = parent.inputs.find((input) => input.type === BindingType2.Property && input.name === block.name);
+    const conflictAttr = parent.attributes.find((attr) => attr.name === block.name);
+    const conflict = conflictInput ?? conflictAttr;
+    if (conflict !== void 0) {
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_CONTENT_AND_PROPERTY), `A @content block with the name '${block.name}' conflicts with a property on the parent component.`, [
+        {
+          text: `The property '${block.name}' is defined here.`,
+          start: conflict.sourceSpan.start.offset,
+          end: conflict.sourceSpan.end.offset,
+          sourceFile: this.sourceMapping.node.getSourceFile()
+        }
+      ]));
+    }
+    if (block.name === CHILDREN) {
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_CONTENT_UNNECESSARY_FOR_CHILDREN), `Defining a @content (${CHILDREN}) block is unnecessary. Pass children as direct nested content of the foreign component instead.`));
+    }
+  }
+};
+
 // packages/compiler-cli/src/ngtsc/annotations/component/src/diagnostics.js
 function makeCyclicImportInfo(ref, type, cycle) {
   const name = ref.debugName || "(unknown)";
@@ -11657,10 +11846,10 @@ function checkCustomElementSelectorForErrors(selector) {
 }
 
 // packages/compiler-cli/src/ngtsc/annotations/component/src/selectorless.js
-import { BindingPipe, CombinedRecursiveAstVisitor as CombinedRecursiveAstVisitor2, tmplAstVisitAll as tmplAstVisitAll2, BindingPipeType } from "@angular/compiler";
+import { BindingPipe, CombinedRecursiveAstVisitor as CombinedRecursiveAstVisitor2, tmplAstVisitAll as tmplAstVisitAll3, BindingPipeType } from "@angular/compiler";
 function analyzeTemplateForSelectorless(template) {
   const analyzer = new SelectorlessDirectivesAnalyzer();
-  tmplAstVisitAll2(analyzer, template);
+  tmplAstVisitAll3(analyzer, template);
   const isSelectorless = analyzer.symbols !== null && analyzer.symbols.size > 0;
   const localReferencedSymbols = analyzer.symbols;
   return { isSelectorless, localReferencedSymbols };
@@ -11720,7 +11909,7 @@ var ComponentSymbol = class _ComponentSymbol extends DirectiveSymbol {
 };
 
 // packages/compiler-cli/src/ngtsc/annotations/component/src/util.js
-import ts37 from "typescript";
+import ts38 from "typescript";
 function collectLegacyAnimationNames(value, legacyAnimationTriggerNames) {
   if (value instanceof Map) {
     const name = value.get("name");
@@ -11767,7 +11956,7 @@ function validateAndFlattenComponentImports(imports, expr, isDeferred) {
   for (let i = 0; i < imports.length; i++) {
     const ref = imports[i];
     let refExpr = expr;
-    if (ts37.isArrayLiteralExpression(expr) && expr.elements.length === imports.length && !expr.elements.some(ts37.isSpreadAssignment)) {
+    if (ts38.isArrayLiteralExpression(expr) && expr.elements.length === imports.length && !expr.elements.some(ts38.isSpreadAssignment)) {
       refExpr = expr.elements[i];
     }
     if (Array.isArray(ref)) {
@@ -11807,7 +11996,7 @@ function validateAndFlattenForeignImports(imports, expr) {
   for (let i = 0; i < imports.length; i++) {
     const ref = imports[i];
     let refExpr = expr;
-    if (ts37.isArrayLiteralExpression(expr) && expr.elements.length === imports.length && !expr.elements.some(ts37.isSpreadAssignment)) {
+    if (ts38.isArrayLiteralExpression(expr) && expr.elements.length === imports.length && !expr.elements.some(ts38.isSpreadAssignment)) {
       refExpr = expr.elements[i];
     }
     if (Array.isArray(ref)) {
@@ -12251,7 +12440,7 @@ var ComponentDecoratorHandler = class {
       path: absoluteFrom(template.declaration.resolvedTemplateUrl),
       node: template.sourceMapping.node
     };
-    const relativeTemplatePath = getProjectRelativePath(templateResource.path ?? ts38.getOriginalNode(node).getSourceFile().fileName, this.rootDirs, this.compilerHost);
+    const relativeTemplatePath = getProjectRelativePath(templateResource.path ?? ts39.getOriginalNode(node).getSourceFile().fileName, this.rootDirs, this.compilerHost);
     let selectorlessEnabled = false;
     let localReferencedSymbols = null;
     if (this.enableSelectorless) {
@@ -12270,6 +12459,13 @@ var ComponentDecoratorHandler = class {
         diagnostics.push(makeDiagnostic(ErrorCode.UNSUPPORTED_SELECTORLESS_COMPONENT_FIELD, rawImports || rawDeferredImports, `Cannot use the "${rawImports === null ? "deferredImports" : "imports"}" field in a selectorless component`));
       }
     }
+    const foreignMatcher = createForeignComponentMatcher(foreignImports);
+    const foreignComponentDiagnostics = analyzeForeignComponentFeatures(template, foreignMatcher);
+    if (foreignComponentDiagnostics.length > 0) {
+      isPoisoned = true;
+      diagnostics ??= [];
+      diagnostics.push(...foreignComponentDiagnostics);
+    }
     let styles = [];
     const externalStyles = [];
     const hostBindingResources = extractHostBindingResources(directiveResult.hostBindingNodes);
@@ -12285,7 +12481,7 @@ var ComponentDecoratorHandler = class {
           externalStyles.push(resourceUrl);
           continue;
         }
-        if (styleUrl.source === 2 && ts38.isStringLiteralLike(styleUrl.expression)) {
+        if (styleUrl.source === 2 && ts39.isStringLiteralLike(styleUrl.expression)) {
           styleResources.add({
             path: absoluteFrom(resourceUrl),
             node: styleUrl.expression
@@ -12517,7 +12713,7 @@ var ComponentDecoratorHandler = class {
     return null;
   }
   typeCheck(ctx, node, meta) {
-    if (!ts38.isClassDeclaration(node) || meta.isPoisoned && !this.usePoisonedData) {
+    if (!ts39.isClassDeclaration(node) || meta.isPoisoned && !this.usePoisonedData) {
       return;
     }
     const ref = new Reference(node);
@@ -13054,12 +13250,12 @@ var ComponentDecoratorHandler = class {
    */
   collectExplicitlyDeferredSymbols(rawDeferredImports) {
     const deferredTypes = /* @__PURE__ */ new Map();
-    if (!ts38.isArrayLiteralExpression(rawDeferredImports)) {
+    if (!ts39.isArrayLiteralExpression(rawDeferredImports)) {
       return deferredTypes;
     }
     for (const element of rawDeferredImports.elements) {
       const node = tryUnwrapForwardRef(element, this.reflector) || element;
-      if (!ts38.isIdentifier(node)) {
+      if (!ts39.isIdentifier(node)) {
         continue;
       }
       const imp = this.reflector.getImportOfIdentifier(node);
@@ -13101,7 +13297,7 @@ var ComponentDecoratorHandler = class {
       const { name, ref, rawExpression } = foreignMeta;
       const emittedRef = this.refEmitter.emit(ref, context);
       assertSuccessfulReferenceEmit(emittedRef, node.name, "foreign component");
-      ts38.setEmitFlags(rawExpression, ts38.EmitFlags.NoComments | ts38.EmitFlags.NoNestedComments);
+      ts39.setEmitFlags(rawExpression, ts39.EmitFlags.NoComments | ts39.EmitFlags.NoNestedComments);
       return {
         name,
         component: new o4.WrappedNodeExpr(rawExpression)
@@ -13146,12 +13342,12 @@ var ComponentDecoratorHandler = class {
       }
     }
     if (analysisData.meta.isStandalone) {
-      if (analysisData.rawImports !== null && ts38.isArrayLiteralExpression(analysisData.rawImports)) {
+      if (analysisData.rawImports !== null && ts39.isArrayLiteralExpression(analysisData.rawImports)) {
         for (const element of analysisData.rawImports.elements) {
           this.registerDeferrableCandidate(componentClassDecl, element, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
         }
       }
-      if (analysisData.rawDeferredImports !== null && ts38.isArrayLiteralExpression(analysisData.rawDeferredImports)) {
+      if (analysisData.rawDeferredImports !== null && ts39.isArrayLiteralExpression(analysisData.rawDeferredImports)) {
         for (const element of analysisData.rawDeferredImports.elements) {
           this.registerDeferrableCandidate(componentClassDecl, element, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
         }
@@ -13170,7 +13366,7 @@ var ComponentDecoratorHandler = class {
    */
   registerDeferrableCandidate(componentClassDecl, element, isDeferredImport, allDeferredDecls, eagerlyUsedDecls, resolutionData) {
     const node = tryUnwrapForwardRef(element, this.reflector) || element;
-    if (!ts38.isIdentifier(node)) {
+    if (!ts39.isIdentifier(node)) {
       return;
     }
     const imp = this.reflector.getImportOfIdentifier(node);
@@ -13305,7 +13501,7 @@ function isDefaultImport(node) {
 
 // packages/compiler-cli/src/ngtsc/annotations/src/injectable.js
 import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr10 } from "@angular/compiler";
-import ts39 from "typescript";
+import ts40 from "typescript";
 var InjectableDecoratorHandler = class {
   reflector;
   evaluator;
@@ -13440,7 +13636,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     };
   } else if (decorator.args.length === 1) {
     const metaNode = decorator.args[0];
-    if (!ts39.isObjectLiteralExpression(metaNode)) {
+    if (!ts40.isObjectLiteralExpression(metaNode)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, `@Injectable argument must be an object literal`);
     }
     const meta = reflectObjectLiteral(metaNode);
@@ -13452,7 +13648,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     let deps = void 0;
     if ((meta.has("useClass") || meta.has("useFactory")) && meta.has("deps")) {
       const depsExpr = meta.get("deps");
-      if (!ts39.isArrayLiteralExpression(depsExpr)) {
+      if (!ts40.isArrayLiteralExpression(depsExpr)) {
         throw new FatalDiagnosticError(ErrorCode.VALUE_NOT_LITERAL, depsExpr, `@Injectable deps metadata must be an inline array`);
       }
       deps = depsExpr.elements.map((dep) => getDep(dep, reflector));
@@ -13541,12 +13737,12 @@ function getDep(dep, reflector) {
     }
     return true;
   }
-  if (ts39.isArrayLiteralExpression(dep)) {
+  if (ts40.isArrayLiteralExpression(dep)) {
     dep.elements.forEach((el) => {
       let isDecorator = false;
-      if (ts39.isIdentifier(el)) {
+      if (ts40.isIdentifier(el)) {
         isDecorator = maybeUpdateDecorator(el, reflector);
-      } else if (ts39.isNewExpression(el) && ts39.isIdentifier(el.expression)) {
+      } else if (ts40.isNewExpression(el) && ts40.isIdentifier(el.expression)) {
         const token = el.arguments && el.arguments.length > 0 && el.arguments[0] || void 0;
         isDecorator = maybeUpdateDecorator(el.expression, reflector, token);
       }
@@ -13560,7 +13756,7 @@ function getDep(dep, reflector) {
 
 // packages/compiler-cli/src/ngtsc/annotations/src/pipe.js
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5 } from "@angular/compiler";
-import ts40 from "typescript";
+import ts41 from "typescript";
 var PipeSymbol = class _PipeSymbol extends SemanticSymbol {
   name;
   constructor(decl, name) {
@@ -13633,13 +13829,13 @@ var PipeDecoratorHandler = class {
     }
     const meta = decorator.args.length === 0 || // TODO(crisbeto): temporary for testing until we've changed
     // the pipe public API not to require a name.
-    ts40.isNonNullExpression(decorator.args[0]) && decorator.args[0].expression.kind === ts40.SyntaxKind.NullKeyword ? null : unwrapExpression(decorator.args[0]);
+    ts41.isNonNullExpression(decorator.args[0]) && decorator.args[0].expression.kind === ts41.SyntaxKind.NullKeyword ? null : unwrapExpression(decorator.args[0]);
     let pipeName = null;
     let pipeNameExpr = null;
     let pure = true;
     let isStandalone = this.implicitStandaloneValue;
     if (meta !== null) {
-      if (!ts40.isObjectLiteralExpression(meta)) {
+      if (!ts41.isObjectLiteralExpression(meta)) {
         throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
       }
       const pipe = reflectObjectLiteral(meta);
@@ -13765,12 +13961,12 @@ var PipeDecoratorHandler = class {
 };
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/transform.js
-import ts43 from "typescript";
+import ts44 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/transform_api.js
-import ts41 from "typescript";
+import ts42 from "typescript";
 function createSyntheticAngularCoreDecoratorAccess(factory, importManager, ngClassDecorator, sourceFile, decoratorName) {
-  const classDecoratorIdentifier = ts41.isIdentifier(ngClassDecorator.identifier) ? ngClassDecorator.identifier : ngClassDecorator.identifier.expression;
+  const classDecoratorIdentifier = ts42.isIdentifier(ngClassDecorator.identifier) ? ngClassDecorator.identifier : ngClassDecorator.identifier.expression;
   return factory.createPropertyAccessExpression(
     importManager.addImport({
       exportModuleSpecifier: "@angular/core",
@@ -13780,11 +13976,11 @@ function createSyntheticAngularCoreDecoratorAccess(factory, importManager, ngCla
     // The synthetic identifier may be checked later by the downlevel decorators
     // transform to resolve to an Angular import using `getSymbolAtLocation`. We trick
     // the transform to think it's not synthetic and comes from Angular core.
-    ts41.setOriginalNode(factory.createIdentifier(decoratorName), classDecoratorIdentifier)
+    ts42.setOriginalNode(factory.createIdentifier(decoratorName), classDecoratorIdentifier)
   );
 }
 function castAsAny(factory, expr) {
-  return factory.createAsExpression(expr, factory.createKeywordTypeNode(ts41.SyntaxKind.AnyKeyword));
+  return factory.createAsExpression(expr, factory.createKeywordTypeNode(ts42.SyntaxKind.AnyKeyword));
 }
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/input_function.js
@@ -13815,7 +14011,7 @@ var signalInputsTransform = (member, sourceFile, host, factory, importTracker, i
 };
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/model_function.js
-import ts42 from "typescript";
+import ts43 from "typescript";
 var signalModelTransform = (member, sourceFile, host, factory, importTracker, importManager, classDecorator, isCore) => {
   if (host.getDecoratorsOfDeclaration(member.node)?.some((d) => {
     return isAngularDecorator2(d, "Input", isCore) || isAngularDecorator2(d, "Output", isCore);
@@ -13836,7 +14032,7 @@ var signalModelTransform = (member, sourceFile, host, factory, importTracker, im
     // Config is cast to `any` because `isSignal` will be private, and in case this
     // transform is used directly as a pre-compilation step, the decorator should
     // not fail. It is already validated now due to us parsing the input metadata.
-    factory.createAsExpression(inputConfig, factory.createKeywordTypeNode(ts42.SyntaxKind.AnyKeyword)),
+    factory.createAsExpression(inputConfig, factory.createKeywordTypeNode(ts43.SyntaxKind.AnyKeyword)),
     classDecorator,
     factory,
     sourceFile,
@@ -13911,21 +14107,21 @@ function getInitializerApiJitTransform(host, importTracker, isCore, shouldTransf
   return (ctx) => {
     return (sourceFile) => {
       const importManager = new ImportManager();
-      sourceFile = ts43.visitNode(sourceFile, createTransformVisitor(ctx, host, importManager, importTracker, isCore, shouldTransformClass), ts43.isSourceFile);
+      sourceFile = ts44.visitNode(sourceFile, createTransformVisitor(ctx, host, importManager, importTracker, isCore, shouldTransformClass), ts44.isSourceFile);
       return importManager.transformTsFile(ctx, sourceFile);
     };
   };
 }
 function createTransformVisitor(ctx, host, importManager, importTracker, isCore, shouldTransformClass) {
   const visitor = (node) => {
-    if (ts43.isClassDeclaration(node) && node.name !== void 0) {
-      const originalNode = ts43.getOriginalNode(node, ts43.isClassDeclaration);
+    if (ts44.isClassDeclaration(node) && node.name !== void 0) {
+      const originalNode = ts44.getOriginalNode(node, ts44.isClassDeclaration);
       const angularDecorator = host.getDecoratorsOfDeclaration(originalNode)?.find((d) => decoratorsWithInputs.some((name) => isAngularDecorator2(d, name, isCore)));
       if (angularDecorator !== void 0 && (shouldTransformClass === void 0 || shouldTransformClass(node))) {
         let hasChanged = false;
         const sourceFile = originalNode.getSourceFile();
         const members = node.members.map((memberNode) => {
-          if (!ts43.isPropertyDeclaration(memberNode)) {
+          if (!ts44.isPropertyDeclaration(memberNode)) {
             return memberNode;
           }
           const member = reflectClassMember(memberNode);
@@ -13946,7 +14142,7 @@ function createTransformVisitor(ctx, host, importManager, importTracker, isCore,
         }
       }
     }
-    return ts43.visitEachChild(node, visitor, ctx);
+    return ts44.visitEachChild(node, visitor, ctx);
   };
   return visitor;
 }
@@ -14058,4 +14254,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-K6CA2HCV.js.map
+//# sourceMappingURL=chunk-7N525RD4.js.map
