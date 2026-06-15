@@ -2211,9 +2211,6 @@ var IndexingContext = class {
   }
 };
 
-// packages/compiler-cli/src/ngtsc/indexer/src/transform.js
-import { ParseSourceFile } from "@angular/compiler";
-
 // packages/compiler-cli/src/ngtsc/indexer/src/template.js
 import { ASTWithSource, CombinedRecursiveAstVisitor, ImplicitReceiver, PropertyRead, ThisReceiver, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable, tmplAstVisitAll } from "@angular/compiler";
 var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
@@ -2485,21 +2482,20 @@ function generateAnalysis(context, adapter) {
   context.components.forEach(({ declaration, selector, boundTemplate, templateMeta }) => {
     const name = adapter.getName(declaration);
     const fileName = adapter.getFileName(declaration);
-    const componentFile = new ParseSourceFile(adapter.getContent(declaration), fileName);
-    let templateFile;
+    let templateFileUrl;
     if (templateMeta.isInline) {
-      templateFile = componentFile;
+      templateFileUrl = fileName;
     } else {
-      templateFile = templateMeta.file;
+      templateFileUrl = templateMeta.file.url;
     }
     const { identifiers, errors } = getTemplateIdentifiers(boundTemplate);
     analysis.set(declaration, {
       name,
       selector,
-      file: componentFile,
+      fileUrl: fileName,
       template: {
         identifiers,
-        file: templateFile
+        fileUrl: templateFileUrl
       },
       errors
     });
@@ -4815,9 +4811,6 @@ var NgCompiler = class _NgCompiler {
       },
       getFileName(node) {
         return node.getSourceFile().fileName;
-      },
-      getContent(node) {
-        return node.getSourceFile().getFullText();
       }
     };
     return generateAnalysis(context, adapter);
@@ -5631,4 +5624,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-XE56E3TQ.js.map
+//# sourceMappingURL=chunk-6NH3CQOC.js.map
