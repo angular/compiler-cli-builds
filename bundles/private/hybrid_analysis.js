@@ -3,6 +3,10 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
+  AbsoluteSourceSpan,
+  IdentifierKind
+} from "../chunk-NRQWINXV.js";
+import {
   Environment,
   ExpressionIdentifier,
   ImportManager,
@@ -17,8 +21,10 @@ import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";
 import "../chunk-IEBNHER4.js";
 export {
+  AbsoluteSourceSpan,
   Environment,
   ExpressionIdentifier,
+  IdentifierKind,
   ImportManager,
   RegistryDomSchemaChecker,
   SymbolBuilder,
