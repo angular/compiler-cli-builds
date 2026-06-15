@@ -8,7 +8,7 @@ import {
   TrackedIncrementalBuildStrategy,
   freshCompilationTicket,
   incrementalFromCompilerTicket
-} from "./chunk-FOV3WBWP.js";
+} from "./chunk-EYIMWFYN.js";
 import {
   ActivePerfRecorder,
   PerfCheckpoint,
@@ -644,4 +644,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OBEU7PQF.js.map
+//# sourceMappingURL=chunk-VYXJLDLU.js.map
