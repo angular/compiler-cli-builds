@@ -17,7 +17,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-VYXJLDLU.js";
+} from "./chunk-WEY57EQH.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -37,7 +37,11 @@ import {
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo,
   resourceChangeTicket
-} from "./chunk-EYIMWFYN.js";
+} from "./chunk-SKPV7EOE.js";
+import {
+  AbsoluteSourceSpan,
+  IdentifierKind
+} from "./chunk-NRQWINXV.js";
 import {
   ActivePerfRecorder,
   InliningMode,
@@ -102,7 +106,7 @@ import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.0.1+sha-be45e8e");
+var VERSION = new Version("22.0.1+sha-fef8bcf");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
@@ -204,6 +208,7 @@ var NgTscPlugin = class {
 // packages/compiler-cli/index.ts
 setFileSystem(new NodeJSFileSystem());
 export {
+  AbsoluteSourceSpan,
   CompletionKind,
   ConsoleLogger,
   DEFAULT_ERROR_CODE,
@@ -216,6 +221,7 @@ export {
   ExpressionIdentifier,
   GLOBAL_DEFS_FOR_TERSER,
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
+  IdentifierKind,
   ImportManager,
   InliningMode,
   InvalidFileSystem,
