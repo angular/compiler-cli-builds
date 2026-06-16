@@ -237,7 +237,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.0+sha-0152e3c";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.0+sha-86ade07";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -4797,6 +4797,12 @@ var TypeTranslatorVisitor = class {
     const node = ast.node;
     if (ts23.isEntityName(node)) {
       return ts23.factory.createTypeReferenceNode(this.routeEntityNameThroughImportManager(node));
+    } else if (ts23.isPropertyAccessExpression(node)) {
+      const entityName = expressionToEntityName(node);
+      if (entityName !== null) {
+        return ts23.factory.createTypeReferenceNode(this.routeEntityNameThroughImportManager(entityName));
+      }
+      throw new Error(`Unsupported PropertyAccessExpression in TypeTranslatorVisitor: ${node.getText()} in ${node.getSourceFile()?.fileName}`);
     } else if (ts23.isTypeNode(node)) {
       return this.routeEntityNamesInTypeNodeThroughImportManager(node);
     } else if (ts23.isLiteralExpression(node)) {
@@ -4914,6 +4920,16 @@ function replaceLeftmostEntityName(name, newLeftmost) {
     return newLeftmost;
   }
   return ts23.factory.createQualifiedName(replaceLeftmostEntityName(name.left, newLeftmost), name.right);
+}
+function expressionToEntityName(expr) {
+  if (ts23.isIdentifier(expr)) {
+    return ts23.factory.createIdentifier(expr.text);
+  }
+  if (ts23.isPropertyAccessExpression(expr) && ts23.isIdentifier(expr.name)) {
+    const left = expressionToEntityName(expr.expression);
+    return left === null ? null : ts23.factory.createQualifiedName(left, expr.name);
+  }
+  return null;
 }
 
 // packages/compiler-cli/src/ngtsc/translator/src/typescript_ast_factory.js
@@ -6784,4 +6800,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ZYZIM6UT.js.map
+//# sourceMappingURL=chunk-B5TZPZDK.js.map

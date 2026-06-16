@@ -84,7 +84,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-ZYZIM6UT.js";
+} from "./chunk-B5TZPZDK.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -2812,7 +2812,7 @@ function compileInputTransformFields(inputs) {
     if (input.transform) {
       extraFields.push({
         name: `ngAcceptInputType_${input.classPropertyName}`,
-        type: outputAst.transplantedType(input.transform.type),
+        type: input.transform.type.synthetic ? new outputAst.ExpressionType(new outputAst.WrappedNodeExpr(input.transform.type.node)) : outputAst.transplantedType(input.transform.type),
         statements: [],
         initializer: null,
         deferrableImports: null
@@ -3857,19 +3857,44 @@ function parseInputFields(clazz, members, evaluator, reflector, importTracker, r
 }
 function parseDecoratorInputTransformFunction(clazz, classPropertyName, value, reflector, refEmitter, compilationMode, emitDeclarationOnly) {
   if (emitDeclarationOnly) {
-    const chain = {
-      messageText: "@Input decorators with a transform function are not supported in experimental declaration-only emission mode",
-      category: ts16.DiagnosticCategory.Error,
-      code: 0,
-      next: [
-        {
-          messageText: `Consider converting '${clazz.name.text}.${classPropertyName}' to an input signal`,
-          category: ts16.DiagnosticCategory.Message,
-          code: 0
-        }
-      ]
-    };
-    throw new FatalDiagnosticError(ErrorCode.DECORATOR_UNEXPECTED, value.node, chain);
+    if (ts16.isArrowFunction(value.node) || ts16.isFunctionExpression(value.node)) {
+      const firstParamName = value.node.parameters[0]?.name;
+      const firstParam2 = firstParamName !== void 0 && ts16.isIdentifier(firstParamName) && firstParamName.text === "this" ? value.node.parameters[1] : value.node.parameters[0];
+      if (!firstParam2) {
+        const ref2 = new Reference(ts16.factory.createKeywordTypeNode(ts16.SyntaxKind.UnknownKeyword));
+        ref2.synthetic = true;
+        return {
+          node: value.node,
+          type: ref2
+        };
+      }
+      if (!firstParam2.type) {
+        throw createValueHasWrongTypeError(value.node, value, "Input transform function first parameter must have a type");
+      }
+      if (firstParam2.dotDotDotToken) {
+        throw createValueHasWrongTypeError(value.node, value, "Input transform function first parameter cannot be a spread parameter");
+      }
+      const ref = new Reference(firstParam2.type);
+      ref.synthetic = true;
+      return {
+        node: value.node,
+        type: ref
+      };
+    }
+    const node2 = value instanceof Reference ? value.getIdentityIn(clazz.getSourceFile()) : value.node;
+    const entityName = node2 ? expressionToEntityName(node2) : null;
+    if (entityName !== null) {
+      const typeQuery = ts16.factory.createTypeQueryNode(entityName);
+      const parametersType = ts16.factory.createTypeReferenceNode("Parameters", [typeQuery]);
+      const indexedAccess = ts16.factory.createIndexedAccessTypeNode(parametersType, ts16.factory.createLiteralTypeNode(ts16.factory.createNumericLiteral("0")));
+      const ref = new Reference(indexedAccess);
+      ref.synthetic = true;
+      return {
+        node: value.node,
+        type: ref
+      };
+    }
+    throw createValueHasWrongTypeError(value.node, value, "Input transform function could not be referenced");
   }
   if (compilationMode === CompilationMode.LOCAL) {
     const node2 = value instanceof Reference ? value.getIdentityIn(clazz.getSourceFile()) : value.node;
@@ -4129,20 +4154,7 @@ function extractHostDirectives(rawHostDirectives, evaluator, reflector, compilat
         const compilationModeName = emitDeclarationOnly ? "experimental declaration-only emission" : "local compilation";
         throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, hostReference.node, `In ${compilationModeName} mode, host directive cannot be an expression. Use an identifier instead`);
       }
-      if (emitDeclarationOnly) {
-        if (ts16.isIdentifier(hostReference.node)) {
-          const importInfo = reflector.getImportOfIdentifier(hostReference.node);
-          if (importInfo) {
-            directive = new ExternalReference(importInfo.from, importInfo.name);
-          } else {
-            throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, hostReference.node, `In experimental declaration-only emission mode, host directive cannot use indirect external indentifiers. Use a direct external identifier instead`);
-          }
-        } else {
-          throw new FatalDiagnosticError(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, hostReference.node, `In experimental declaration-only emission mode, host directive cannot be an expression. Use an identifier instead`);
-        }
-      } else {
-        directive = new WrappedNodeExpr5(hostReference.node);
-      }
+      directive = new WrappedNodeExpr5(hostReference.node);
     } else if (hostReference instanceof Reference) {
       directive = hostReference;
       nameForErrors = (fieldName) => `@Directive.hostDirectives.${directive.node.name.text}.${fieldName}`;
@@ -4204,6 +4216,16 @@ function extractHostBindingResources(nodes) {
     result.add({ path: null, node });
   }
   return result;
+}
+function expressionToEntityName(expr) {
+  if (ts16.isIdentifier(expr)) {
+    return expr;
+  }
+  if (ts16.isPropertyAccessExpression(expr) && ts16.isIdentifier(expr.name)) {
+    const left = expressionToEntityName(expr.expression);
+    return left === null ? null : ts16.factory.createQualifiedName(left, expr.name);
+  }
+  return null;
 }
 
 // packages/compiler-cli/src/ngtsc/program_driver/src/api.js
@@ -7386,12 +7408,12 @@ function makeStandaloneBootstrapDiagnostic(ngModuleClass, bootstrappedClassRef, 
 function isSyntheticReference(ref) {
   return ref.synthetic;
 }
-function expressionToEntityName(expr) {
+function expressionToEntityName2(expr) {
   if (ts26.isIdentifier(expr)) {
     return expr;
   }
   if (ts26.isPropertyAccessExpression(expr) && ts26.isIdentifier(expr.name)) {
-    const left = expressionToEntityName(expr.expression);
+    const left = expressionToEntityName2(expr.expression);
     return left === null ? null : ts26.factory.createQualifiedName(left, expr.name);
   }
   return null;
@@ -7407,14 +7429,14 @@ function transformToTypeTupleElement(el, reflector, diagnostics) {
   }
   el = current;
   if (ts26.isCallExpression(el)) {
-    const callee = expressionToEntityName(el.expression);
+    const callee = expressionToEntityName2(el.expression);
     if (callee !== null) {
       return new WrappedNodeExpr7(ts26.factory.createTypeReferenceNode(ts26.factory.createIdentifier("ReturnType"), [
         ts26.factory.createTypeQueryNode(callee)
       ]));
     }
   }
-  if (expressionToEntityName(el) === null) {
+  if (expressionToEntityName2(el) === null) {
     const diag = makeDiagnostic(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION, el, `In experimental declaration-only emission mode, this expression is not supported in NgModule imports/exports as it cannot be referenced with 'typeof'. Use a direct reference or a supported call.`);
     diagnostics.push(diag);
     return new WrappedNodeExpr7(ts26.factory.createKeywordTypeNode(ts26.SyntaxKind.NeverKeyword));
@@ -14254,4 +14276,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-7N525RD4.js.map
+//# sourceMappingURL=chunk-MHOSXXP5.js.map
