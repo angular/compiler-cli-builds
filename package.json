@@ -1,6 +1,6 @@
 {
   "name": "@angular/compiler-cli",
-  "version": "22.0.2+sha-b7ab51d",
+  "version": "22.0.2+sha-9d1d1de",
   "description": "Angular - the compiler CLI for Node.js",
   "typings": "index.d.ts",
   "bin": {
@@ -30,7 +30,7 @@
     }
   },
   "dependencies": {
-    "@babel/core": "7.29.0",
+    "@babel/core": "7.29.7",
     "@jridgewell/sourcemap-codec": "^1.4.14",
     "reflect-metadata": "^0.2.0",
     "chokidar": "^5.0.0",
@@ -44,7 +44,7 @@
     "@types/convert-source-map": "^2.0.0"
   },
   "peerDependencies": {
-    "@angular/compiler": "22.0.2+sha-b7ab51d",
+    "@angular/compiler": "22.0.2+sha-9d1d1de",
     "typescript": ">=6.0 <6.1"
   },
   "peerDependenciesMeta": {
