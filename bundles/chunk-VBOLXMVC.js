@@ -4094,7 +4094,12 @@ function evaluateHostExpressionBindings(hostExpr, evaluator) {
       throw createValueHasWrongTypeError(hostExpr, value, `Decorator host metadata must be a string -> string object, but found unparseable value`);
     }
   });
-  const bindings = parseHostBindings(hostMetadata);
+  let bindings;
+  try {
+    bindings = parseHostBindings(hostMetadata);
+  } catch (e) {
+    throw new FatalDiagnosticError(ErrorCode.HOST_BINDING_PARSE_ERROR, hostExpr, e.message);
+  }
   const errors = verifyHostBindings(bindings, createSourceSpan(hostExpr));
   if (errors.length > 0) {
     throw new FatalDiagnosticError(ErrorCode.HOST_BINDING_PARSE_ERROR, getHostBindingErrorNode(errors[0], hostExpr), errors.map((error) => error.msg).join("\n"));
@@ -13921,4 +13926,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-C72NKVC7.js.map
+//# sourceMappingURL=chunk-VBOLXMVC.js.map
