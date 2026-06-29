@@ -2041,6 +2041,7 @@ var signalFunctions = /* @__PURE__ */ new Map([
   ["contentChild", "core"],
   ["contentChildren", "core"],
   ["effect", "core"],
+  ["toSignal", "core"],
   ["resource", "core"],
   ["httpResource", "common"]
 ]);
@@ -13926,4 +13927,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VBOLXMVC.js.map
+//# sourceMappingURL=chunk-DNYBEV6X.js.map
