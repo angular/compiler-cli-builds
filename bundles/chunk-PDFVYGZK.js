@@ -2062,6 +2062,7 @@ var signalFunctions = /* @__PURE__ */ new Map([
   ["contentChild", "core"],
   ["contentChildren", "core"],
   ["effect", "core"],
+  ["toSignal", "core"],
   ["resource", "core"],
   ["httpResource", "common"]
 ]);
@@ -11843,8 +11844,8 @@ var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
         }
       ]));
     }
-    if (block.name === CHILDREN) {
-      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_CONTENT_UNNECESSARY_FOR_CHILDREN), `Defining a @content (${CHILDREN}) block is unnecessary. Pass children as direct nested content of the foreign component instead.`));
+    if (block.name === CHILDREN && block.variables.length === 0) {
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_CONTENT_UNNECESSARY_FOR_CHILDREN), `Defining a @content (${CHILDREN}) block with no parameters is unnecessary. Pass children as direct nested content of the foreign component instead.`));
     }
   }
 };
@@ -14281,4 +14282,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-IBLOXXW7.js.map
+//# sourceMappingURL=chunk-PDFVYGZK.js.map
