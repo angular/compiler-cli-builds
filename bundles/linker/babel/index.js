@@ -59,6 +59,12 @@ var BabelAstFactory = class {
       case "&&=":
       case "||=":
       case "??=":
+      case "|=":
+      case "&=":
+      case ">>=":
+      case ">>>=":
+      case "<<=":
+      case "^=":
         throw new Error(`Unexpected assignment operator ${operator}`);
       default:
         return t.binaryExpression(operator, leftOperand, rightOperand);
@@ -137,18 +143,16 @@ var BabelAstFactory = class {
   createIdentifier = t.identifier;
   createIfStatement = t.ifStatement;
   createDynamicImport(url) {
-    return this.createCallExpression(
-      t.import(),
-      [typeof url === "string" ? t.stringLiteral(url) : url],
-      false
-      /* pure */
-    );
+    return t.importExpression(typeof url === "string" ? t.stringLiteral(url) : url);
   }
   createLiteral(value) {
     if (typeof value === "string") {
       return t.stringLiteral(value);
     } else if (typeof value === "number") {
-      return t.numericLiteral(value);
+      if (Number.isNaN(value)) {
+        return t.identifier("NaN");
+      }
+      return t.valueToNode(value);
     } else if (typeof value === "boolean") {
       return t.booleanLiteral(value);
     } else if (value === void 0) {
@@ -576,13 +580,13 @@ function assertNotNull(obj) {
 }
 function buildCodeFrameError(file, message, node) {
   const filename = file.opts.filename || "(unknown file)";
-  const error = file.hub.buildError(node, message);
+  const error = file.hub.buildError(node, message, Error);
   return `${filename}: ${error.message}`;
 }
 
 // packages/compiler-cli/linker/babel/src/babel_plugin.js
 function defaultLinkerPlugin(api, options) {
-  api.assertVersion(7);
+  api.assertVersion(8);
   return createEs2015LinkerPlugin({
     ...options,
     fileSystem: new NodeJSFileSystem(),

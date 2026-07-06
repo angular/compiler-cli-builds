@@ -237,7 +237,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.4+sha-b126dc9";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.4+sha-731d665";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -4977,6 +4977,12 @@ var TypeScriptAstFactory = class {
     "&&=": ts24.SyntaxKind.AmpersandAmpersandEqualsToken,
     "||=": ts24.SyntaxKind.BarBarEqualsToken,
     "??=": ts24.SyntaxKind.QuestionQuestionEqualsToken,
+    "&=": ts24.SyntaxKind.AmpersandEqualsToken,
+    "|=": ts24.SyntaxKind.BarEqualsToken,
+    ">>=": ts24.SyntaxKind.GreaterThanGreaterThanEqualsToken,
+    ">>>=": ts24.SyntaxKind.GreaterThanGreaterThanGreaterThanEqualsToken,
+    "<<=": ts24.SyntaxKind.LessThanLessThanEqualsToken,
+    "^=": ts24.SyntaxKind.CaretEqualsToken,
     "in": ts24.SyntaxKind.InKeyword,
     "instanceof": ts24.SyntaxKind.InstanceOfKeyword
   }))();
@@ -6800,4 +6806,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-B5TZPZDK.js.map
+//# sourceMappingURL=chunk-T2FBYQ36.js.map

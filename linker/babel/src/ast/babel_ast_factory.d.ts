@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { types as t } from '@babel/core';
-import { AstFactory, BinaryOperator, BuiltInType, LeadingComment, ObjectLiteralProperty, Parameter, SourceMapRange, TemplateLiteral, VariableDeclarationType } from '../../../../src/ngtsc/translator/src/api/ast_factory';
+import { AssignmentOperator, AstFactory, BinaryOperator, BuiltInType, LeadingComment, ObjectLiteralProperty, Parameter, SourceMapRange, TemplateLiteral, VariableDeclarationType } from '../../../../src/ngtsc/translator/src/api/ast_factory';
 /**
  * A Babel flavored implementation of the AstFactory.
  */
@@ -19,7 +19,7 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     sourcePath: string);
     attachComments(statement: t.Statement | t.Expression, leadingComments: LeadingComment[]): void;
     createArrayLiteral: typeof t.arrayExpression;
-    createAssignment(target: t.Expression, operator: BinaryOperator, value: t.Expression): t.Expression;
+    createAssignment(target: t.Expression, operator: AssignmentOperator, value: t.Expression): t.Expression;
     createBinaryExpression(leftOperand: t.Expression, operator: BinaryOperator, rightOperand: t.Expression): t.Expression;
     createBlock: typeof t.blockStatement;
     createCallChain(callee: t.Expression, args: (t.Expression | t.SpreadElement)[], pure: boolean, isOptional: boolean): t.Expression;

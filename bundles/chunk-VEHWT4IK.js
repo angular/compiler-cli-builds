@@ -84,7 +84,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-B5TZPZDK.js";
+} from "./chunk-T2FBYQ36.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -14281,4 +14281,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-RWI7ZV6W.js.map
+//# sourceMappingURL=chunk-VEHWT4IK.js.map
