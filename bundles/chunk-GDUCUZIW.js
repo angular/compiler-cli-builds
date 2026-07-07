@@ -1950,9 +1950,9 @@ function createRecorderFn(defaultImportTracker) {
 // packages/compiler-cli/src/ngtsc/transform/src/implicit_signal_debug_name_transform.js
 import ts8 from "typescript";
 function insertDebugNameIntoCallExpression(node, debugName) {
-  const isRequired = isRequiredSignalFunction(node.expression);
+  const isRequiredInput = isRequiredInputFunction(node.expression);
   const hasNoArgs = node.arguments.length === 0;
-  const configPosition = hasNoArgs || isSignalWithObjectOnlyDefinition(node) || isRequired ? 0 : 1;
+  const configPosition = hasNoArgs || isSignalWithObjectOnlyDefinition(node) || isRequiredInput ? 0 : 1;
   const existingArg = configPosition >= node.arguments.length ? null : node.arguments[configPosition];
   if (existingArg !== null && (!ts8.isObjectLiteralExpression(existingArg) || existingArg.properties.some((prop) => ts8.isPropertyAssignment(prop) && ts8.isIdentifier(prop.name) && prop.name.text === "debugName"))) {
     return node;
@@ -1967,7 +1967,7 @@ function insertDebugNameIntoCallExpression(node, debugName) {
     newArgs = node.arguments.map((arg) => arg === existingArg ? transformedArg : arg);
   } else {
     const spreadArgs = [];
-    if (hasNoArgs && !isRequired) {
+    if (hasNoArgs && !isRequiredInput) {
       spreadArgs.push(ts8.factory.createIdentifier("undefined"));
     }
     spreadArgs.push(ts8.factory.createObjectLiteralExpression([debugNameProperty]));
@@ -2077,10 +2077,11 @@ function isSignalFunction(expression) {
   const text = expression.text;
   return signalFunctions.has(text);
 }
-function isRequiredSignalFunction(expression) {
+function isRequiredInputFunction(expression) {
   if (ts8.isPropertyAccessExpression(expression) && ts8.isIdentifier(expression.name) && ts8.isIdentifier(expression.expression)) {
     const accessName = expression.name.text;
-    if (accessName === "required") {
+    const parentName = expression.expression.text;
+    if (accessName === "required" && (parentName === "input" || parentName === "model")) {
       return true;
     }
   }
@@ -13926,4 +13927,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VBOLXMVC.js.map
+//# sourceMappingURL=chunk-GDUCUZIW.js.map

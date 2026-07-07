@@ -5,7 +5,7 @@
 import {
   DiagnosticCategoryLabel,
   NgCompiler
-} from "../chunk-EDWHVLVY.js";
+} from "../chunk-BZ7D2WUK.js";
 import "../chunk-NRQWINXV.js";
 import {
   CompilationMode,
@@ -18,7 +18,7 @@ import {
   parseDecoratorInputTransformFunction,
   queryDecoratorNames,
   unwrapExpression
-} from "../chunk-VBOLXMVC.js";
+} from "../chunk-GDUCUZIW.js";
 import {
   DtsMetadataReader,
   DynamicValue,
