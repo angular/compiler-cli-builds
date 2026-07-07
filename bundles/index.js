@@ -17,7 +17,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-R36MEV6L.js";
+} from "./chunk-LIEEAJTT.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -37,7 +37,7 @@ import {
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo,
   resourceChangeTicket
-} from "./chunk-TVPCZ6FI.js";
+} from "./chunk-C6EI6OXH.js";
 import {
   AbsoluteSourceSpan,
   IdentifierKind
@@ -106,7 +106,7 @@ import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.1.0-next.4+sha-5ec0b16");
+var VERSION = new Version("22.1.0-next.4+sha-6edabc6");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
