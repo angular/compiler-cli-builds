@@ -237,7 +237,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.4+sha-731d665";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.4+sha-1f6b1ce";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -675,9 +675,6 @@ var AmbientImport = {};
 // packages/compiler-cli/src/ngtsc/reflection/src/util.js
 function isNamedClassDeclaration(node) {
   return ts5.isClassDeclaration(node) && isIdentifier(node.name);
-}
-function isNamedFunctionDeclaration(node) {
-  return ts5.isFunctionDeclaration(node) && isIdentifier(node.name);
 }
 function isIdentifier(node) {
   return node !== void 0 && ts5.isIdentifier(node);
@@ -6727,7 +6724,6 @@ export {
   typeNodeToValueExpr,
   entityNameToValue,
   isNamedClassDeclaration,
-  isNamedFunctionDeclaration,
   classMemberAccessLevelToString,
   TypeScriptReflectionHost,
   filterToMembersWithDecorator,
@@ -6806,4 +6802,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-T2FBYQ36.js.map
+//# sourceMappingURL=chunk-SOEVA7UL.js.map

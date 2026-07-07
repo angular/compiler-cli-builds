@@ -5,13 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { DirectiveMeta as T2DirectiveMeta, Expression, SchemaMetadata, ExternalReference, MatchSource, ClassPropertyName, InputOrOutput, ClassPropertyMapping, TemplateGuardMeta, ForeignComponentMeta as T2ForeignComponentMeta } from '@angular/compiler';
+import { ClassPropertyMapping, ClassPropertyName, Expression, ExternalReference, InputOrOutput, MatchSource, SchemaMetadata, DirectiveMeta as T2DirectiveMeta, ForeignComponentMeta as T2ForeignComponentMeta, TemplateGuardMeta } from '@angular/compiler';
 import ts from 'typescript';
 import { Reference } from '../../imports';
 import { ClassDeclaration } from '../../reflection';
 /** Metadata for a resolved foreign component import. */
 export interface ForeignComponentMeta extends T2ForeignComponentMeta {
-    ref: Reference<ClassDeclaration>;
     rawExpression: ts.Expression;
 }
 /**

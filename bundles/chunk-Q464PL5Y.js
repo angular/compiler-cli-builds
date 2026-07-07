@@ -61,7 +61,6 @@ import {
   isFromDtsFile,
   isHostDirectiveMetaForGlobalMode,
   isNamedClassDeclaration,
-  isNamedFunctionDeclaration,
   isNonDeclarationTsPath,
   isSymbolAliasOf,
   isSymbolWithValueDeclaration,
@@ -84,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-T2FBYQ36.js";
+} from "./chunk-SOEVA7UL.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -11660,6 +11659,29 @@ var AnimationsAnalyzer = class extends CombinedRecursiveAstVisitor {
   }
 };
 
+// packages/compiler-cli/src/ngtsc/annotations/component/src/diagnostics.js
+function makeCyclicImportInfo(ref, type, cycle) {
+  const name = ref.debugName || "(unknown)";
+  const path = cycle.getPath().map((sf) => sf.fileName).join(" -> ");
+  const message = `The ${type} '${name}' is used in the template but importing it would create a cycle: `;
+  return makeRelatedInformation(ref.node, message + path);
+}
+function checkCustomElementSelectorForErrors(selector) {
+  if (selector.includes(".") || selector.includes("[") && selector.includes("]")) {
+    return null;
+  }
+  if (!/^[a-z]/.test(selector)) {
+    return "Selector of a ShadowDom-encapsulated component must start with a lower case letter.";
+  }
+  if (/[A-Z]/.test(selector)) {
+    return "Selector of a ShadowDom-encapsulated component must all be in lower case.";
+  }
+  if (!selector.includes("-")) {
+    return "Selector of a component that uses ViewEncapsulation.ShadowDom must contain a hyphen.";
+  }
+  return null;
+}
+
 // packages/compiler-cli/src/ngtsc/annotations/component/src/foreign_component.js
 import { BindingType as BindingType2, TmplAstContentBlock, TmplAstElement as TmplAstElement2, TmplAstRecursiveVisitor, tmplAstVisitAll as tmplAstVisitAll2 } from "@angular/compiler";
 import ts37 from "typescript";
@@ -11849,29 +11871,6 @@ var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
   }
 };
 
-// packages/compiler-cli/src/ngtsc/annotations/component/src/diagnostics.js
-function makeCyclicImportInfo(ref, type, cycle) {
-  const name = ref.debugName || "(unknown)";
-  const path = cycle.getPath().map((sf) => sf.fileName).join(" -> ");
-  const message = `The ${type} '${name}' is used in the template but importing it would create a cycle: `;
-  return makeRelatedInformation(ref.node, message + path);
-}
-function checkCustomElementSelectorForErrors(selector) {
-  if (selector.includes(".") || selector.includes("[") && selector.includes("]")) {
-    return null;
-  }
-  if (!/^[a-z]/.test(selector)) {
-    return "Selector of a ShadowDom-encapsulated component must start with a lower case letter.";
-  }
-  if (/[A-Z]/.test(selector)) {
-    return "Selector of a ShadowDom-encapsulated component must all be in lower case.";
-  }
-  if (!selector.includes("-")) {
-    return "Selector of a component that uses ViewEncapsulation.ShadowDom must contain a hyphen.";
-  }
-  return null;
-}
-
 // packages/compiler-cli/src/ngtsc/annotations/component/src/selectorless.js
 import { BindingPipe, CombinedRecursiveAstVisitor as CombinedRecursiveAstVisitor2, tmplAstVisitAll as tmplAstVisitAll3, BindingPipeType } from "@angular/compiler";
 function analyzeTemplateForSelectorless(template) {
@@ -12009,40 +12008,40 @@ function validateAndFlattenComponentImports(imports, expr, isDeferred) {
   }
   return { imports: flattened, diagnostics };
 }
-function validateAndFlattenForeignImports(imports, expr) {
-  const flattened = [];
-  const errorMessage = `'foreignImports' must be an array of ForeignComponents.`;
-  if (!Array.isArray(imports)) {
-    const error = createValueHasWrongTypeError(expr, imports, errorMessage).toDiagnostic();
-    return {
-      foreignImports: [],
-      diagnostics: [error]
-    };
-  }
+function extractForeignImportsFromAst(expr) {
+  const foreignImports = [];
   const diagnostics = [];
-  for (let i = 0; i < imports.length; i++) {
-    const ref = imports[i];
-    let refExpr = expr;
-    if (ts38.isArrayLiteralExpression(expr) && expr.elements.length === imports.length && !expr.elements.some(ts38.isSpreadAssignment)) {
-      refExpr = expr.elements[i];
-    }
-    if (Array.isArray(ref)) {
-      const { foreignImports: childForeignImports, diagnostics: childDiagnostics } = validateAndFlattenForeignImports(ref, refExpr);
-      flattened.push(...childForeignImports);
-      diagnostics.push(...childDiagnostics);
-    } else if (ref instanceof Reference && isNamedFunctionDeclaration(ref.node)) {
-      const name = ref.getIdentityInExpression(refExpr)?.text ?? ref.node.name.getText();
-      flattened.push({
-        name,
-        ref,
-        rawExpression: refExpr
-      });
-    } else {
-      const { node: diagnosticNode, value: diagnosticValue } = getDiagnosticOrigin(ref, expr, refExpr, imports);
-      diagnostics.push(createValueHasWrongTypeError(diagnosticNode, diagnosticValue, errorMessage).toDiagnostic());
-    }
+  const unwrappedExpr = unwrapExpression(expr);
+  if (!ts38.isArrayLiteralExpression(unwrappedExpr)) {
+    diagnostics.push(makeDiagnostic(ErrorCode.VALUE_HAS_WRONG_TYPE, expr, `'foreignImports' must be an array of foreign imports, e.g. 'foreignImports: [myImport(MyComponent)]'.`));
+    return { foreignImports, diagnostics };
   }
-  return { foreignImports: flattened, diagnostics };
+  for (const element of unwrappedExpr.elements) {
+    const unwrappedEl = unwrapExpression(element);
+    if (!ts38.isCallExpression(unwrappedEl)) {
+      diagnostics.push(makeDiagnostic(ErrorCode.VALUE_HAS_WRONG_TYPE, element, `Each foreign import must be a call expression, e.g. 'myImport(MyComponent)'.`));
+      continue;
+    }
+    const callee = unwrapExpression(unwrappedEl.expression);
+    if (!ts38.isIdentifier(callee)) {
+      diagnostics.push(makeDiagnostic(ErrorCode.VALUE_HAS_WRONG_TYPE, unwrappedEl.expression, `The foreign import function must be a simple identifier, e.g. 'myImport(MyComponent)'.`));
+      continue;
+    }
+    if (unwrappedEl.arguments.length !== 1) {
+      diagnostics.push(makeDiagnostic(ErrorCode.VALUE_HAS_WRONG_TYPE, element, `Foreign import calls must receive exactly one argument, e.g. 'myImport(MyComponent)'.`));
+      continue;
+    }
+    const arg = unwrapExpression(unwrappedEl.arguments[0]);
+    if (!ts38.isIdentifier(arg)) {
+      diagnostics.push(makeDiagnostic(ErrorCode.VALUE_HAS_WRONG_TYPE, unwrappedEl.arguments[0], `The component reference passed to the foreign import must be a simple identifier, e.g. 'myImport(MyComponent)'.`));
+      continue;
+    }
+    foreignImports.push({
+      name: arg.text,
+      rawExpression: element
+    });
+  }
+  return { foreignImports, diagnostics };
 }
 function getDiagnosticOrigin(ref, expr, refExpr, fallbackValue) {
   if (ref instanceof DynamicValue && isWithinExpression(ref.node, expr)) {
@@ -12072,12 +12071,6 @@ function isLikelyModuleWithProviders(value) {
   }
   return false;
 }
-
-// packages/compiler-cli/src/ngtsc/annotations/component/src/resolver.js
-var foreignComponentResolver = (_, callExpr, resolve, unresolvable) => {
-  const arg = callExpr.arguments[0];
-  return arg ? resolve(arg) : unresolvable;
-};
 
 // packages/compiler-cli/src/ngtsc/annotations/component/src/handler.js
 var EMPTY_ARRAY = [];
@@ -12350,16 +12343,10 @@ var ComponentDecoratorHandler = class {
       isPoisoned = true;
     } else if (rawImports || rawDeferredImports || rawForeignImports) {
       const importDiagnostics = [];
-      if (rawForeignImports) {
-        const foreignImportResolvers = combineResolvers([
-          createForwardRefResolver(this.isCore),
-          foreignComponentResolver
-        ]);
-        const expr = rawForeignImports;
-        const imported = this.evaluator.evaluate(expr, foreignImportResolvers);
-        const { foreignImports: flattened, diagnostics: diagnostics2 } = validateAndFlattenForeignImports(imported, expr);
+      if (rawForeignImports && !this.emitDeclarationOnly) {
+        const { foreignImports: imports, diagnostics: diagnostics2 } = extractForeignImportsFromAst(rawForeignImports);
         importDiagnostics.push(...diagnostics2);
-        foreignImports = flattened;
+        foreignImports = imports;
       }
       if (this.compilationMode !== CompilationMode.LOCAL && (rawImports || rawDeferredImports)) {
         const importResolvers = combineResolvers([
@@ -12882,7 +12869,7 @@ var ComponentDecoratorHandler = class {
     }
     const perComponentDeferredDeps = this.canDeferDeps ? this.resolveAllDeferredDependencies(resolution) : null;
     const defer = this.compileDeferBlocks(resolution);
-    const foreignImports = this.resolveForeignComponentImports(node, analysis);
+    const foreignImports = this.resolveForeignComponentImports(analysis);
     const meta = {
       ...analysis.meta,
       ...resolution,
@@ -12931,7 +12918,7 @@ var ComponentDecoratorHandler = class {
   compileLocal(node, analysis, resolution, pool) {
     const deferrableTypes = this.canDeferDeps ? analysis.explicitlyDeferredTypes : null;
     const defer = this.compileDeferBlocks(resolution);
-    const foreignImports = this.resolveForeignComponentImports(node, analysis);
+    const foreignImports = this.resolveForeignComponentImports(analysis);
     const meta = {
       ...analysis.meta,
       ...resolution,
@@ -12957,7 +12944,7 @@ var ComponentDecoratorHandler = class {
     }
     const pool = new ConstantPool2();
     const defer = this.compileDeferBlocks(resolution);
-    const foreignImports = this.resolveForeignComponentImports(node, analysis);
+    const foreignImports = this.resolveForeignComponentImports(analysis);
     const meta = {
       ...analysis.meta,
       ...resolution,
@@ -13315,15 +13302,12 @@ var ComponentDecoratorHandler = class {
   /**
    * Resolves imported foreign components for code generation.
    */
-  resolveForeignComponentImports(node, analysis) {
+  resolveForeignComponentImports(analysis) {
     if (analysis.foreignImports === null || analysis.foreignImports.length === 0) {
       return null;
     }
-    const context = getSourceFile(node);
     return analysis.foreignImports.map((foreignMeta) => {
-      const { name, ref, rawExpression } = foreignMeta;
-      const emittedRef = this.refEmitter.emit(ref, context);
-      assertSuccessfulReferenceEmit(emittedRef, node.name, "foreign component");
+      const { name, rawExpression } = foreignMeta;
       ts39.setEmitFlags(rawExpression, ts39.EmitFlags.NoComments | ts39.EmitFlags.NoNestedComments);
       return {
         name,
@@ -14281,4 +14265,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VEHWT4IK.js.map
+//# sourceMappingURL=chunk-Q464PL5Y.js.map

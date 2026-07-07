@@ -24,7 +24,7 @@ export declare function validateAndFlattenComponentImports(imports: ResolvedValu
     imports: Reference<ClassDeclaration>[];
     diagnostics: ts.Diagnostic[];
 };
-export declare function validateAndFlattenForeignImports(imports: ResolvedValue, expr: ts.Expression): {
+export declare function extractForeignImportsFromAst(expr: ts.Expression): {
     foreignImports: ForeignComponentMeta[];
     diagnostics: ts.Diagnostic[];
 };
