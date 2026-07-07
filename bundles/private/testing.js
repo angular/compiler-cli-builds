@@ -4,7 +4,7 @@
     
 import {
   getInitializerApiJitTransform
-} from "../chunk-Q464PL5Y.js";
+} from "../chunk-IPXY3HA6.js";
 import {
   ImportedSymbolsTracker,
   TypeScriptReflectionHost
