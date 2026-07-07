@@ -237,7 +237,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.4+sha-56847dc";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.0-next.4+sha-2f8134b";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
