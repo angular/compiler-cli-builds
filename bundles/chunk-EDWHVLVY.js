@@ -2888,7 +2888,7 @@ var StandaloneComponentScopeReader = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
-import { ASTWithSource as ASTWithSource2, BindingType, Interpolation, PrefixNot, PropertyRead as PropertyRead2, TmplAstBoundAttribute, TmplAstElement as TmplAstElement2, TmplAstIfBlock, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource2, BindingType, Conditional, Interpolation, NonNullAssert, ParenthesizedExpression, PrefixNot, PropertyRead as PropertyRead2, TmplAstBoundAttribute, TmplAstElement as TmplAstElement2, TmplAstIfBlock, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/symbol_util.js
 import ts19 from "typescript";
@@ -3024,7 +3024,10 @@ function checkBoundAttribute(ctx, component, directivesOfElement, node) {
   if (directivesOfElement !== null && directivesOfElement.some((dir) => dir.inputs.getByBindingPropertyName(node.name) !== null)) {
     return [];
   }
-  const nodeAst = isPropertyReadNodeAst(node);
+  if (node.value instanceof ASTWithSource2 === false) {
+    return [];
+  }
+  const propertyReads = getPropertyReads(node.value.ast);
   if (
     // a bound property like `[prop]="mySignal"`
     (node.type === BindingType.Property || // or a class binding like `[class.myClass]="mySignal"`
@@ -3032,23 +3035,33 @@ function checkBoundAttribute(ctx, component, directivesOfElement, node) {
     node.type === BindingType.Style || // or an attribute binding like `[attr.role]="mySignal"`
     node.type === BindingType.Attribute || // or an animation binding like `[animate.enter]="mySignal"`
     node.type === BindingType.Animation || // or an animation binding like `[@myAnimation]="mySignal"`
-    node.type === BindingType.LegacyAnimation) && nodeAst
+    node.type === BindingType.LegacyAnimation) && propertyReads.length > 0
   ) {
-    return buildDiagnosticForSignal(ctx, nodeAst, component);
+    return propertyReads.flatMap((nodeAst) => buildDiagnosticForSignal(ctx, nodeAst, component));
   }
   return [];
 }
-function isPropertyReadNodeAst(node) {
-  if (node.value instanceof ASTWithSource2 === false) {
-    return void 0;
+function getPropertyReads(ast) {
+  if (ast instanceof PrefixNot) {
+    return ast.expression instanceof PropertyRead2 ? [ast.expression] : [];
   }
-  if (node.value.ast instanceof PrefixNot && node.value.ast.expression instanceof PropertyRead2) {
-    return node.value.ast.expression;
+  if (ast instanceof PropertyRead2) {
+    return [ast];
   }
-  if (node.value.ast instanceof PropertyRead2) {
-    return node.value.ast;
+  if (ast instanceof Conditional) {
+    return [
+      ...getPropertyReads(ast.condition),
+      ...getPropertyReads(ast.trueExp),
+      ...getPropertyReads(ast.falseExp)
+    ];
   }
-  return void 0;
+  if (ast instanceof ParenthesizedExpression) {
+    return getPropertyReads(ast.expression);
+  }
+  if (ast instanceof NonNullAssert) {
+    return getPropertyReads(ast.expression);
+  }
+  return [];
 }
 function isFunctionInstanceProperty(name) {
   return FUNCTION_INSTANCE_PROPERTIES.has(name);
@@ -3347,18 +3360,18 @@ var factory8 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/suffix_not_supported/index.js
-import { TmplAstBoundAttribute as TmplAstBoundAttribute3 } from "@angular/compiler";
+import { BindingType as BindingType2, TmplAstBoundAttribute as TmplAstBoundAttribute3 } from "@angular/compiler";
 var STYLE_SUFFIXES = ["px", "%", "em"];
+var SUFFIX_ERROR_MSG = formatExtendedError(ErrorCode.SUFFIX_NOT_SUPPORTED, `The ${STYLE_SUFFIXES.map((suffix) => `'.${suffix}'`).join(", ")} suffixes are only supported on style bindings`);
 var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.SUFFIX_NOT_SUPPORTED;
   visitNode(ctx, component, node) {
     if (!(node instanceof TmplAstBoundAttribute3))
       return [];
-    if (!node.keySpan.toString().startsWith("attr.") || !STYLE_SUFFIXES.some((suffix) => node.name.endsWith(`.${suffix}`))) {
+    if (node.type !== BindingType2.Attribute || !STYLE_SUFFIXES.some((suffix) => node.name.endsWith(`.${suffix}`))) {
       return [];
     }
-    const diagnostic = ctx.makeTemplateDiagnostic(node.keySpan, formatExtendedError(ErrorCode.SUFFIX_NOT_SUPPORTED, `The ${STYLE_SUFFIXES.map((suffix) => `'.${suffix}'`).join(", ")} suffixes are only supported on style bindings`));
-    return [diagnostic];
+    return [ctx.makeTemplateDiagnostic(node.keySpan, SUFFIX_ERROR_MSG)];
   }
 };
 var factory9 = {
@@ -3409,7 +3422,7 @@ var factory10 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.js
-import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional, ParsedEventType, PropertyRead as PropertyRead3, ArrowFunction, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional as Conditional2, ParsedEventType, PropertyRead as PropertyRead3, ArrowFunction, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
 var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING;
   visitNode(ctx, component, node) {
@@ -3423,7 +3436,7 @@ var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor
     if (node.handler.ast instanceof Chain) {
       return node.handler.ast.expressions.flatMap((expression) => assertExpressionInvoked(expression, component, node, sourceExpressionText, ctx));
     }
-    if (node.handler.ast instanceof Conditional) {
+    if (node.handler.ast instanceof Conditional2) {
       const { trueExp, falseExp } = node.handler.ast;
       return [trueExp, falseExp].flatMap((expression) => assertExpressionInvoked(expression, component, node, sourceExpressionText, ctx));
     }
@@ -5602,4 +5615,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-33J3WRHI.js.map
+//# sourceMappingURL=chunk-EDWHVLVY.js.map
