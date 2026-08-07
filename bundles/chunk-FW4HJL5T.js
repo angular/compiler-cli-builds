@@ -237,7 +237,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.1+sha-adb770b";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.1+sha-4631a6e";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -2047,7 +2047,7 @@ var DeferredSymbolTracker = class {
   lookupIdentifiersInSourceFile(name, importDecl) {
     const results = /* @__PURE__ */ new Set();
     const visit = (node) => {
-      if (node === importDecl || ts10.isTypeNode(node)) {
+      if (node === importDecl || ts10.isTypeNode(node) && !isClassExtendsClause(node)) {
         return;
       }
       if (ts10.isIdentifier(node) && node.text === name) {
@@ -2071,6 +2071,17 @@ var DeferredSymbolTracker = class {
     return results;
   }
 };
+function isClassExtendsClause(node) {
+  if (!ts10.isExpressionWithTypeArguments(node)) {
+    return false;
+  }
+  const heritageClause = node.parent;
+  if (heritageClause === void 0 || !ts10.isHeritageClause(heritageClause) || heritageClause.token !== ts10.SyntaxKind.ExtendsKeyword) {
+    return false;
+  }
+  const parent = heritageClause.parent;
+  return parent !== void 0 && (ts10.isClassDeclaration(parent) || ts10.isClassExpression(parent));
+}
 
 // packages/compiler-cli/src/ngtsc/imports/src/local_compilation_extra_imports_tracker.js
 import ts11 from "typescript";
@@ -6802,4 +6813,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-SOEVA7UL.js.map
+//# sourceMappingURL=chunk-FW4HJL5T.js.map
