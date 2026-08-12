@@ -237,7 +237,7 @@ var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.1+sha-3032e7f";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.1+sha-e9660b1";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -6594,7 +6594,7 @@ var SymbolBuilder = class {
       });
       if (nameNode !== null) {
         node = nameNode;
-        while (node.parent !== void 0 && (ts33.isParenthesizedExpression(node.parent) || ts33.isNonNullExpression(node.parent) || isAccessExpression(node.parent))) {
+        while (node.parent !== void 0 && (ts33.isParenthesizedExpression(node.parent) || ts33.isNonNullExpression(node.parent) || ts33.isPropertyAccessExpression(node.parent) && node.parent.name === node)) {
           node = node.parent;
         }
       }
@@ -6813,4 +6813,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FW4HJL5T.js.map
+//# sourceMappingURL=chunk-A2CBMQIU.js.map

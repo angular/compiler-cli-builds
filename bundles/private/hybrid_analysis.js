@@ -15,7 +15,7 @@ import {
   SymbolKind,
   findFirstMatchingNode,
   hasExpressionIdentifier
-} from "../chunk-FW4HJL5T.js";
+} from "../chunk-A2CBMQIU.js";
 import "../chunk-ZUYMYKXC.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";
