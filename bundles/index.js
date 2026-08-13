@@ -106,7 +106,7 @@ import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.2.0-next.1+sha-044e69c");
+var VERSION = new Version("22.2.0-next.2+sha-40d23fa");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
