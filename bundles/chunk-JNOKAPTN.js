@@ -10006,7 +10006,7 @@ var InlineTcbOp = class {
     this.oobRecorder = oobRecorder;
   }
   /**
-   * Type check blocks are inserted immediately after the end of the directve class.
+   * Type check blocks are inserted immediately after the end of the directive class.
    */
   get splitPoint() {
     return this.ref.node.end + 1;
@@ -14267,4 +14267,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-MATE6T4B.js.map
+//# sourceMappingURL=chunk-JNOKAPTN.js.map
