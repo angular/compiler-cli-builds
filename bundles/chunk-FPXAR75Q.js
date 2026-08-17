@@ -21,7 +21,7 @@ import {
 // packages/compiler-cli/src/ngtsc/diagnostics/src/error_code.js
 var ErrorCode;
 (function(ErrorCode2) {
-  ErrorCode2[ErrorCode2["DECORATOR_ARG_NOT_LITERAL"] = 1001] = "DECORATOR_ARG_NOT_LITERAL";
+  ErrorCode2[ErrorCode2["DECORATOR_ARG_NOT_LITERAL"] = -1001] = "DECORATOR_ARG_NOT_LITERAL";
   ErrorCode2[ErrorCode2["DECORATOR_ARITY_WRONG"] = 1002] = "DECORATOR_ARITY_WRONG";
   ErrorCode2[ErrorCode2["DECORATOR_NOT_CALLED"] = 1003] = "DECORATOR_NOT_CALLED";
   ErrorCode2[ErrorCode2["DECORATOR_UNEXPECTED"] = 1005] = "DECORATOR_UNEXPECTED";
@@ -37,13 +37,13 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["INCORRECTLY_DECLARED_ON_STATIC_MEMBER"] = 1100] = "INCORRECTLY_DECLARED_ON_STATIC_MEMBER";
   ErrorCode2[ErrorCode2["COMPONENT_MISSING_TEMPLATE"] = 2001] = "COMPONENT_MISSING_TEMPLATE";
   ErrorCode2[ErrorCode2["PIPE_MISSING_NAME"] = 2002] = "PIPE_MISSING_NAME";
-  ErrorCode2[ErrorCode2["PARAM_MISSING_TOKEN"] = 2003] = "PARAM_MISSING_TOKEN";
+  ErrorCode2[ErrorCode2["PARAM_MISSING_TOKEN"] = -2003] = "PARAM_MISSING_TOKEN";
   ErrorCode2[ErrorCode2["DIRECTIVE_MISSING_SELECTOR"] = 2004] = "DIRECTIVE_MISSING_SELECTOR";
   ErrorCode2[ErrorCode2["UNDECORATED_PROVIDER"] = 2005] = "UNDECORATED_PROVIDER";
   ErrorCode2[ErrorCode2["DIRECTIVE_INHERITS_UNDECORATED_CTOR"] = 2006] = "DIRECTIVE_INHERITS_UNDECORATED_CTOR";
   ErrorCode2[ErrorCode2["UNDECORATED_CLASS_USING_ANGULAR_FEATURES"] = 2007] = "UNDECORATED_CLASS_USING_ANGULAR_FEATURES";
   ErrorCode2[ErrorCode2["COMPONENT_RESOURCE_NOT_FOUND"] = 2008] = "COMPONENT_RESOURCE_NOT_FOUND";
-  ErrorCode2[ErrorCode2["COMPONENT_INVALID_SHADOW_DOM_SELECTOR"] = 2009] = "COMPONENT_INVALID_SHADOW_DOM_SELECTOR";
+  ErrorCode2[ErrorCode2["COMPONENT_INVALID_SHADOW_DOM_SELECTOR"] = -2009] = "COMPONENT_INVALID_SHADOW_DOM_SELECTOR";
   ErrorCode2[ErrorCode2["COMPONENT_NOT_STANDALONE"] = 2010] = "COMPONENT_NOT_STANDALONE";
   ErrorCode2[ErrorCode2["COMPONENT_IMPORT_NOT_STANDALONE"] = 2011] = "COMPONENT_IMPORT_NOT_STANDALONE";
   ErrorCode2[ErrorCode2["COMPONENT_UNKNOWN_IMPORT"] = 2012] = "COMPONENT_UNKNOWN_IMPORT";
@@ -64,7 +64,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["COMPONENT_ANIMATIONS_CONFLICT"] = 2027] = "COMPONENT_ANIMATIONS_CONFLICT";
   ErrorCode2[ErrorCode2["SERVICE_CONSTRUCTOR_DI"] = 2028] = "SERVICE_CONSTRUCTOR_DI";
   ErrorCode2[ErrorCode2["SYMBOL_NOT_EXPORTED"] = 3001] = "SYMBOL_NOT_EXPORTED";
-  ErrorCode2[ErrorCode2["IMPORT_CYCLE_DETECTED"] = 3003] = "IMPORT_CYCLE_DETECTED";
+  ErrorCode2[ErrorCode2["IMPORT_CYCLE_DETECTED"] = -3003] = "IMPORT_CYCLE_DETECTED";
   ErrorCode2[ErrorCode2["IMPORT_GENERATION_FAILURE"] = 3004] = "IMPORT_GENERATION_FAILURE";
   ErrorCode2[ErrorCode2["CONFIG_FLAT_MODULE_NO_INDEX"] = 4001] = "CONFIG_FLAT_MODULE_NO_INDEX";
   ErrorCode2[ErrorCode2["CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK"] = 4002] = "CONFIG_STRICT_TEMPLATES_IMPLIES_FULL_TEMPLATE_TYPECHECK";
@@ -83,10 +83,10 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["NGMODULE_DECLARATION_NOT_UNIQUE"] = 6007] = "NGMODULE_DECLARATION_NOT_UNIQUE";
   ErrorCode2[ErrorCode2["NGMODULE_DECLARATION_IS_STANDALONE"] = 6008] = "NGMODULE_DECLARATION_IS_STANDALONE";
   ErrorCode2[ErrorCode2["NGMODULE_BOOTSTRAP_IS_STANDALONE"] = 6009] = "NGMODULE_BOOTSTRAP_IS_STANDALONE";
-  ErrorCode2[ErrorCode2["WARN_NGMODULE_ID_UNNECESSARY"] = 6100] = "WARN_NGMODULE_ID_UNNECESSARY";
-  ErrorCode2[ErrorCode2["SCHEMA_INVALID_ELEMENT"] = 8001] = "SCHEMA_INVALID_ELEMENT";
-  ErrorCode2[ErrorCode2["SCHEMA_INVALID_ATTRIBUTE"] = 8002] = "SCHEMA_INVALID_ATTRIBUTE";
-  ErrorCode2[ErrorCode2["MISSING_REFERENCE_TARGET"] = 8003] = "MISSING_REFERENCE_TARGET";
+  ErrorCode2[ErrorCode2["WARN_NGMODULE_ID_UNNECESSARY"] = -6100] = "WARN_NGMODULE_ID_UNNECESSARY";
+  ErrorCode2[ErrorCode2["SCHEMA_INVALID_ELEMENT"] = -8001] = "SCHEMA_INVALID_ELEMENT";
+  ErrorCode2[ErrorCode2["SCHEMA_INVALID_ATTRIBUTE"] = -8002] = "SCHEMA_INVALID_ATTRIBUTE";
+  ErrorCode2[ErrorCode2["MISSING_REFERENCE_TARGET"] = -8003] = "MISSING_REFERENCE_TARGET";
   ErrorCode2[ErrorCode2["MISSING_PIPE"] = 8004] = "MISSING_PIPE";
   ErrorCode2[ErrorCode2["WRITE_TO_READ_ONLY_VARIABLE"] = 8005] = "WRITE_TO_READ_ONLY_VARIABLE";
   ErrorCode2[ErrorCode2["DUPLICATE_VARIABLE_DECLARATION"] = 8006] = "DUPLICATE_VARIABLE_DECLARATION";
@@ -106,7 +106,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER"] = 8020] = "DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER";
   ErrorCode2[ErrorCode2["DEFER_TRIGGER_MISCONFIGURATION"] = 8021] = "DEFER_TRIGGER_MISCONFIGURATION";
   ErrorCode2[ErrorCode2["FORM_FIELD_UNSUPPORTED_BINDING"] = 8022] = "FORM_FIELD_UNSUPPORTED_BINDING";
-  ErrorCode2[ErrorCode2["MULTIPLE_MATCHING_COMPONENTS"] = 8023] = "MULTIPLE_MATCHING_COMPONENTS";
+  ErrorCode2[ErrorCode2["MULTIPLE_MATCHING_COMPONENTS"] = -8023] = "MULTIPLE_MATCHING_COMPONENTS";
   ErrorCode2[ErrorCode2["CONFLICTING_HOST_DIRECTIVE_BINDING"] = -8024] = "CONFLICTING_HOST_DIRECTIVE_BINDING";
   ErrorCode2[ErrorCode2["FOREIGN_COMPONENT_UNSUPPORTED_BINDING"] = 8025] = "FOREIGN_COMPONENT_UNSUPPORTED_BINDING";
   ErrorCode2[ErrorCode2["INVALID_CONTENT_PLACEMENT"] = 8026] = "INVALID_CONTENT_PLACEMENT";
@@ -140,13 +140,63 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION"] = 11003] = "LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION";
 })(ErrorCode || (ErrorCode = {}));
 
+// packages/compiler-cli/src/ngtsc/diagnostics/src/error_details_base_url.js
+import { VERSION } from "@angular/compiler";
+var DOC_PAGE_BASE_URL = (() => {
+  const full = VERSION.full;
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.2+sha-38d0932";
+  const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
+  return `https://${prefix}.angular.dev`;
+})();
+var ERROR_DETAILS_PAGE_BASE_URL = (() => {
+  return `${DOC_PAGE_BASE_URL}/errors`;
+})();
+
 // packages/compiler-cli/src/ngtsc/diagnostics/src/util.js
 var ERROR_CODE_MATCHER = /(\u001b\[\d+m ?)TS-99(\d+: ?\u001b\[\d+m)/g;
+var ERROR_CODE_MARKER = 99;
+var ERROR_CODE_MARKER_DIGITS = String(ERROR_CODE_MARKER).length;
 function replaceTsWithNgInErrors(errors) {
   return errors.replace(ERROR_CODE_MATCHER, "$1NG$2");
 }
 function ngErrorCode(code) {
-  return parseInt("-99" + code);
+  const absoluteCode = Math.abs(code);
+  return -(ERROR_CODE_MARKER * 10 ** decimalDigits(absoluteCode) + absoluteCode);
+}
+function formatCompilerErrorCode(code) {
+  return `NG${Math.abs(code)}`;
+}
+function errorCodeWithGuideFromDiagnosticCode(code) {
+  const absoluteErrorCode = absoluteErrorCodeFromDiagnosticCode(code);
+  if (absoluteErrorCode === null) {
+    return null;
+  }
+  const codeWithGuide = -absoluteErrorCode;
+  return ErrorCode[codeWithGuide] !== void 0 ? codeWithGuide : null;
+}
+function addDiagnosticDetails(code, messageText) {
+  const details = `Find more at ${ERROR_DETAILS_PAGE_BASE_URL}/${formatCompilerErrorCode(code)}`;
+  return appendMessageText(messageText, details);
+}
+function appendMessageText(messageText, textToAppend) {
+  if (messageText === "") {
+    return textToAppend;
+  }
+  const separator = messageText.match(/[.,;!?\n]$/) ? " " : ". ";
+  return `${messageText}${separator}${textToAppend}`;
+}
+function absoluteErrorCodeFromDiagnosticCode(code) {
+  if (code >= 0)
+    return null;
+  const diagnosticCode = Math.abs(code);
+  const markerMultiplier = 10 ** (decimalDigits(diagnosticCode) - ERROR_CODE_MARKER_DIGITS);
+  if (markerMultiplier <= 1)
+    return null;
+  const marker = Math.trunc(diagnosticCode / markerMultiplier);
+  return marker === ERROR_CODE_MARKER ? diagnosticCode % markerMultiplier : null;
+}
+function decimalDigits(value) {
+  return String(value).length;
 }
 
 // packages/compiler-cli/src/ngtsc/diagnostics/src/error.js
@@ -220,30 +270,6 @@ function isFatalDiagnosticError(err) {
 function isLocalCompilationDiagnostics(diagnostic) {
   return diagnostic.code === ngErrorCode(ErrorCode.LOCAL_COMPILATION_UNRESOLVED_CONST) || diagnostic.code === ngErrorCode(ErrorCode.LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION);
 }
-
-// packages/compiler-cli/src/ngtsc/diagnostics/src/docs.js
-var COMPILER_ERRORS_WITH_GUIDES = /* @__PURE__ */ new Set([
-  ErrorCode.DECORATOR_ARG_NOT_LITERAL,
-  ErrorCode.IMPORT_CYCLE_DETECTED,
-  ErrorCode.PARAM_MISSING_TOKEN,
-  ErrorCode.SCHEMA_INVALID_ELEMENT,
-  ErrorCode.SCHEMA_INVALID_ATTRIBUTE,
-  ErrorCode.MISSING_REFERENCE_TARGET,
-  ErrorCode.COMPONENT_INVALID_SHADOW_DOM_SELECTOR,
-  ErrorCode.WARN_NGMODULE_ID_UNNECESSARY
-]);
-
-// packages/compiler-cli/src/ngtsc/diagnostics/src/error_details_base_url.js
-import { VERSION } from "@angular/compiler";
-var DOC_PAGE_BASE_URL = (() => {
-  const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.2+sha-1c2b057";
-  const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
-  return `https://${prefix}.angular.dev`;
-})();
-var ERROR_DETAILS_PAGE_BASE_URL = (() => {
-  return `${DOC_PAGE_BASE_URL}/errors`;
-})();
 
 // packages/compiler-cli/src/ngtsc/diagnostics/src/extended_template_diagnostic_name.js
 var ExtendedTemplateDiagnosticName;
@@ -6684,17 +6710,17 @@ function unwrapSignalInputWriteTAccessor(expr) {
 
 export {
   ErrorCode,
-  COMPILER_ERRORS_WITH_GUIDES,
+  DOC_PAGE_BASE_URL,
   replaceTsWithNgInErrors,
   ngErrorCode,
+  errorCodeWithGuideFromDiagnosticCode,
+  addDiagnosticDetails,
   FatalDiagnosticError,
   makeDiagnostic,
   makeDiagnosticChain,
   makeRelatedInformation,
   isFatalDiagnosticError,
   isLocalCompilationDiagnostics,
-  DOC_PAGE_BASE_URL,
-  ERROR_DETAILS_PAGE_BASE_URL,
   ExtendedTemplateDiagnosticName,
   isSymbolWithValueDeclaration,
   isDtsPath,
@@ -6813,4 +6839,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-A2CBMQIU.js.map
+//# sourceMappingURL=chunk-FPXAR75Q.js.map

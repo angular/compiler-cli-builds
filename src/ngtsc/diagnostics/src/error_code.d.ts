@@ -9,7 +9,7 @@
  * @publicApi
  */
 export declare enum ErrorCode {
-    DECORATOR_ARG_NOT_LITERAL = 1001,
+    DECORATOR_ARG_NOT_LITERAL = -1001,
     DECORATOR_ARITY_WRONG = 1002,
     DECORATOR_NOT_CALLED = 1003,
     DECORATOR_UNEXPECTED = 1005,
@@ -54,7 +54,7 @@ export declare enum ErrorCode {
     INCORRECTLY_DECLARED_ON_STATIC_MEMBER = 1100,
     COMPONENT_MISSING_TEMPLATE = 2001,
     PIPE_MISSING_NAME = 2002,
-    PARAM_MISSING_TOKEN = 2003,
+    PARAM_MISSING_TOKEN = -2003,
     DIRECTIVE_MISSING_SELECTOR = 2004,
     /** Raised when an undecorated class is passed in as a provider to a module or a directive. */
     UNDECORATED_PROVIDER = 2005,
@@ -77,7 +77,7 @@ export declare enum ErrorCode {
      * Raised when a component uses `ShadowDom` view encapsulation, but its selector
      * does not match the shadow DOM tag name requirements.
      */
-    COMPONENT_INVALID_SHADOW_DOM_SELECTOR = 2009,
+    COMPONENT_INVALID_SHADOW_DOM_SELECTOR = -2009,
     /**
      * Raised when a component has `imports` but is not marked as `standalone: true`.
      */
@@ -163,7 +163,7 @@ export declare enum ErrorCode {
      * Raised when a relationship between directives and/or pipes would cause a cyclic import to be
      * created that cannot be handled, such as in partial compilation mode.
      */
-    IMPORT_CYCLE_DETECTED = 3003,
+    IMPORT_CYCLE_DETECTED = -3003,
     /**
      * Raised when the compiler is unable to generate an import statement for a reference.
      */
@@ -227,7 +227,7 @@ export declare enum ErrorCode {
      * disabled explicitly in the compiler, that was originally based on a misunderstanding of
      * `NgModule.id`.
      */
-    WARN_NGMODULE_ID_UNNECESSARY = 6100,
+    WARN_NGMODULE_ID_UNNECESSARY = -6100,
     /**
      * 6999 was previously assigned to NGMODULE_VE_DEPENDENCY_ON_IVY_LIB
      * To prevent any confusion, let's not reassign it.
@@ -235,15 +235,15 @@ export declare enum ErrorCode {
     /**
      * An element name failed validation against the DOM schema.
      */
-    SCHEMA_INVALID_ELEMENT = 8001,
+    SCHEMA_INVALID_ELEMENT = -8001,
     /**
      * An element's attribute name failed validation against the DOM schema.
      */
-    SCHEMA_INVALID_ATTRIBUTE = 8002,
+    SCHEMA_INVALID_ATTRIBUTE = -8002,
     /**
      * No matching directive was found for a `#ref="target"` expression.
      */
-    MISSING_REFERENCE_TARGET = 8003,
+    MISSING_REFERENCE_TARGET = -8003,
     /**
      * No matching pipe was found for a
      */
@@ -378,7 +378,7 @@ export declare enum ErrorCode {
     /**
      * Raised when multiple components in the compilation scope match a given element in a template.
      */
-    MULTIPLE_MATCHING_COMPONENTS = 8023,
+    MULTIPLE_MATCHING_COMPONENTS = -8023,
     /**
      * Raised when a host directive input/output is exposed multiple times under the same name.
      */

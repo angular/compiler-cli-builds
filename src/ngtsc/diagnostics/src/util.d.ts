@@ -17,3 +17,13 @@ import { ErrorCode } from './error_code';
  */
 export declare function replaceTsWithNgInErrors(errors: string): string;
 export declare function ngErrorCode(code: ErrorCode): number;
+export declare function formatCompilerErrorCode(code: number): string;
+/**
+ * Given a raw TypeScript diagnostic code, returns the corresponding {@link ErrorCode} if it is a
+ * negative Angular error code that has an associated error guide, or `null` otherwise.
+ */
+export declare function errorCodeWithGuideFromDiagnosticCode(code: number): ErrorCode | null;
+/**
+ * Appends a "Find more at <url>" guide link to the message text of a diagnostic.
+ */
+export declare function addDiagnosticDetails(code: ErrorCode, messageText: string): string;
