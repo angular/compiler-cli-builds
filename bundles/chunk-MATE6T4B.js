@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-A2CBMQIU.js";
+} from "./chunk-FPXAR75Q.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -1187,7 +1187,7 @@ var TraitCompiler = class {
           record.metaDiagnostics = [
             {
               category: ts4.DiagnosticCategory.Error,
-              code: Number("-99" + ErrorCode.DECORATOR_COLLISION),
+              code: ngErrorCode(ErrorCode.DECORATOR_COLLISION),
               file: getSourceFile(clazz),
               start: clazz.getStart(void 0, false),
               length: clazz.getWidth(),
@@ -1205,7 +1205,7 @@ var TraitCompiler = class {
       const compilationModeName = this.emitDeclarationOnly ? "experimental declaration-only emission" : "local compilation";
       record.metaDiagnostics = [...nonNgDecoratorsInLocalMode].map((decorator) => ({
         category: ts4.DiagnosticCategory.Error,
-        code: Number("-99" + ErrorCode.DECORATOR_UNEXPECTED),
+        code: ngErrorCode(ErrorCode.DECORATOR_UNEXPECTED),
         file: getSourceFile(clazz),
         start: decorator.node.getStart(),
         length: decorator.node.getWidth(),
@@ -14267,4 +14267,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-GHRGMTHM.js.map
+//# sourceMappingURL=chunk-MATE6T4B.js.map

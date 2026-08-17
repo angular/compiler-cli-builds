@@ -55,17 +55,15 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-GHRGMTHM.js";
+} from "./chunk-MATE6T4B.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
-  COMPILER_ERRORS_WITH_GUIDES,
   CompoundMetadataReader,
   CompoundMetadataRegistry,
   DefaultImportTracker,
   DeferredSymbolTracker,
   DtsMetadataReader,
-  ERROR_DETAILS_PAGE_BASE_URL,
   ErrorCode,
   ExportedProviderStatusResolver,
   ExtendedTemplateDiagnosticName,
@@ -91,6 +89,8 @@ import {
   TypeScriptReflectionHost,
   UnifiedModulesAliasingHost,
   UnifiedModulesStrategy,
+  addDiagnosticDetails,
+  errorCodeWithGuideFromDiagnosticCode,
   getRootDirs,
   getSourceFileOrNull,
   isDtsPath,
@@ -103,7 +103,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-A2CBMQIU.js";
+} from "./chunk-FPXAR75Q.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -4630,10 +4630,15 @@ var NgCompiler = class _NgCompiler {
    */
   addMessageTextDetails(diagnostics) {
     return diagnostics.map((diag) => {
-      if (diag.code && COMPILER_ERRORS_WITH_GUIDES.has(ngErrorCode(diag.code))) {
+      const errorCode = errorCodeWithGuideFromDiagnosticCode(diag.code);
+      if (errorCode !== null) {
+        const messageText = typeof diag.messageText === "string" ? addDiagnosticDetails(errorCode, diag.messageText) : {
+          ...diag.messageText,
+          messageText: addDiagnosticDetails(errorCode, diag.messageText.messageText)
+        };
         return {
           ...diag,
-          messageText: diag.messageText + `. Find more at ${ERROR_DETAILS_PAGE_BASE_URL}/NG${ngErrorCode(diag.code)}`
+          messageText
         };
       }
       return diag;
@@ -5618,4 +5623,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-B4766EOF.js.map
+//# sourceMappingURL=chunk-U4MSSN7T.js.map
