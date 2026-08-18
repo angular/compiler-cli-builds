@@ -10046,6 +10046,9 @@ var TypeCtorOp = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/diagnostics.js
+function isAccessOnThis(text, start) {
+  return text.substring(start - 5, start) === "this." || text.substring(start - 7, start) === "(this).";
+}
 function shouldReportDiagnostic(diagnostic) {
   const { code } = diagnostic;
   if (code === 6133) {
@@ -10056,6 +10059,12 @@ function shouldReportDiagnostic(diagnostic) {
     return false;
   } else if (code === 7006) {
     return false;
+  } else if (code === 2341) {
+    if (diagnostic.file !== void 0 && diagnostic.start !== void 0) {
+      if (isAccessOnThis(diagnostic.file.text, diagnostic.start)) {
+        return false;
+      }
+    }
   }
   return true;
 }
@@ -14267,4 +14276,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-JNOKAPTN.js.map
+//# sourceMappingURL=chunk-OSUFIQDB.js.map
