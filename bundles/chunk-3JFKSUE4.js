@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-FPXAR75Q.js";
+} from "./chunk-G5WVUNWP.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -2438,7 +2438,7 @@ function validateHostDirectiveMappings(bindingType, hostDirectiveMeta, meta, ori
   const existingBindings = bindingType === "input" ? meta.inputs : meta.outputs;
   const exposedRequiredBindings = /* @__PURE__ */ new Set();
   for (const publicName in hostDirectiveMappings) {
-    if (hostDirectiveMappings.hasOwnProperty(publicName)) {
+    if (Object.hasOwn(hostDirectiveMappings, publicName)) {
       const bindings = existingBindings.getByBindingPropertyName(publicName);
       if (bindings === null) {
         diagnostics.push(makeDiagnostic(ErrorCode.HOST_DIRECTIVE_UNDEFINED_BINDING, hostDirectiveMeta.directive.getOriginForDiagnostics(origin), `Directive ${className} does not have an ${bindingType} with a public name of ${publicName}.`));
@@ -3848,7 +3848,7 @@ function parseInputFields(clazz, members, evaluator, reflector, importTracker, r
     if (member.isStatic) {
       throw new FatalDiagnosticError(ErrorCode.INCORRECTLY_DECLARED_ON_STATIC_MEMBER, member.node ?? clazz, `Input "${member.name}" is incorrectly declared as static member of "${clazz.name.text}".`);
     }
-    if (inputMapping.isSignal && inputsFromClassDecorator.hasOwnProperty(classPropertyName)) {
+    if (inputMapping.isSignal && Object.hasOwn(inputsFromClassDecorator, classPropertyName)) {
       throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_DECORATOR_METADATA_COLLISION, member.node ?? clazz, `Input "${member.name}" is also declared as non-signal in @${classDecorator.name}.`);
     }
     inputs[classPropertyName] = inputMapping;
@@ -4061,7 +4061,7 @@ function parseOutputFields(clazz, classDecorator, members, isCore, reflector, im
       throw new FatalDiagnosticError(ErrorCode.DUPLICATE_BINDING_NAME, member.node ?? clazz, `Output '${bindingPropertyName}' is bound to both '${firstMember.name}' and '${member.name}'.`, [makeRelatedInformation(firstMember.node ?? clazz, `The first binding is declared here.`)]);
     }
     bindings.set(bindingPropertyName, member);
-    if ((initializerOutput !== null || modelMapping !== null) && outputsFromMeta.hasOwnProperty(member.name)) {
+    if ((initializerOutput !== null || modelMapping !== null) && Object.hasOwn(outputsFromMeta, member.name)) {
       throw new FatalDiagnosticError(ErrorCode.INITIALIZER_API_DECORATOR_METADATA_COLLISION, member.node ?? clazz, `Output "${member.name}" is unexpectedly declared in @${classDecorator.name} as well.`);
     }
     outputs[member.name] = bindingPropertyName;
@@ -6654,7 +6654,7 @@ function createModuleWithProvidersResolver(reflector, isCore) {
   };
 }
 function isResolvedModuleWithProviders(sv) {
-  return typeof sv.value === "object" && sv.value != null && sv.value.hasOwnProperty("ngModule") && sv.value.hasOwnProperty("mwpCall");
+  return typeof sv.value === "object" && sv.value != null && Object.hasOwn(sv.value, "ngModule") && Object.hasOwn(sv.value, "mwpCall");
 }
 
 // packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.js
@@ -14262,13 +14262,6 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-/**
-* @license
-* Copyright Google LLC All Rights Reserved.
-*
-* Use of this source code is governed by an MIT-style license that can be
-* found in the LICENSE file at https://angular.dev/license
-*/
 /*!
  * @license
  * Copyright Google LLC All Rights Reserved.
@@ -14276,4 +14269,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OSUFIQDB.js.map
+//# sourceMappingURL=chunk-3JFKSUE4.js.map

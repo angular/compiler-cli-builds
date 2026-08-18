@@ -144,7 +144,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.2+sha-48a0fd6";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.2+sha-732e505";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -4102,7 +4102,7 @@ var HostDirectivesResolver = class {
     const result = {};
     if (allowedProperties !== null) {
       for (const publicName in allowedProperties) {
-        if (allowedProperties.hasOwnProperty(publicName)) {
+        if (Object.hasOwn(allowedProperties, publicName)) {
           const bindings = source.getByBindingPropertyName(publicName);
           if (bindings !== null) {
             for (const binding of bindings) {
@@ -6839,4 +6839,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FPXAR75Q.js.map
+//# sourceMappingURL=chunk-G5WVUNWP.js.map
