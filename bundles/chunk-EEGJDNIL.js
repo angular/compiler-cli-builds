@@ -9555,6 +9555,8 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
         name = `[${node.name}]`;
       } else if (node.type === BindingType.Attribute) {
         name = `[attr.${node.name}]`;
+      } else if (node.type === BindingType.TwoWay) {
+        name = `[(${node.name})]`;
       } else {
         name = node.name;
       }
@@ -14260,4 +14262,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-R3MXWMGZ.js.map
+//# sourceMappingURL=chunk-EEGJDNIL.js.map
