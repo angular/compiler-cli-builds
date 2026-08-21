@@ -138,13 +138,16 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["SUGGEST_SUBOPTIMAL_TYPE_INFERENCE"] = 10002] = "SUGGEST_SUBOPTIMAL_TYPE_INFERENCE";
   ErrorCode2[ErrorCode2["LOCAL_COMPILATION_UNRESOLVED_CONST"] = 11001] = "LOCAL_COMPILATION_UNRESOLVED_CONST";
   ErrorCode2[ErrorCode2["LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION"] = 11003] = "LOCAL_COMPILATION_UNSUPPORTED_EXPRESSION";
+  ErrorCode2[ErrorCode2["DEFER_BLOCK_MISSING_NAME_PARAMETER"] = 11100] = "DEFER_BLOCK_MISSING_NAME_PARAMETER";
+  ErrorCode2[ErrorCode2["DEFER_BLOCK_UNKNOWN_NAME_PARAMETER"] = 11101] = "DEFER_BLOCK_UNKNOWN_NAME_PARAMETER";
+  ErrorCode2[ErrorCode2["DEFER_BLOCK_INVALID_NAME_PARAMETER"] = 11102] = "DEFER_BLOCK_INVALID_NAME_PARAMETER";
 })(ErrorCode || (ErrorCode = {}));
 
 // packages/compiler-cli/src/ngtsc/diagnostics/src/error_details_base_url.js
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.3+sha-d609cf6";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.3+sha-2e2c426";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -3628,6 +3631,7 @@ var DtsMetadataReader = class {
       foreignImports: null,
       rawImports: null,
       deferredImports: null,
+      deferredImportsByBlock: null,
       // The same goes for schemas.
       schemas: null,
       decorator: null,
@@ -3637,6 +3641,7 @@ var DtsMetadataReader = class {
       // used to increase the accuracy of a diagnostic.
       preserveWhitespaces: false,
       isExplicitlyDeferred: false,
+      deferredBlocks: null,
       // We don't need to know if imported components from .d.ts
       // files are selectorless for type-checking purposes.
       selectorlessEnabled: false,
@@ -3668,7 +3673,8 @@ var DtsMetadataReader = class {
       isPure: null,
       // The DTS has no idea about that
       decorator: null,
-      isExplicitlyDeferred: false
+      isExplicitlyDeferred: false,
+      deferredBlocks: null
     };
   }
 };
@@ -6839,4 +6845,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-G5WVUNWP.js.map
+//# sourceMappingURL=chunk-BKKGWDSR.js.map

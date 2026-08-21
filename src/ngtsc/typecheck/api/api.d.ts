@@ -25,6 +25,7 @@ export interface TypeCheckableDirectiveMeta extends DirectiveMeta, DirectiveType
     hostDirectives: HostDirectiveMeta[] | null;
     decorator: ts.Decorator | null;
     isExplicitlyDeferred: boolean;
+    deferredBlocks?: Set<string> | null;
     imports: Reference<ClassDeclaration>[] | null;
     rawImports: ts.Expression | null;
 }

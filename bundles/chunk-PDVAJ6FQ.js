@@ -55,7 +55,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-ONZQR6DZ.js";
+} from "./chunk-S3DPRBMS.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -103,7 +103,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-G5WVUNWP.js";
+} from "./chunk-BKKGWDSR.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -2856,16 +2856,33 @@ var StandaloneComponentScopeReader = class {
         }
       }
       if (clazzMeta.deferredImports !== null) {
+        const refToBlocks = /* @__PURE__ */ new Map();
+        if (clazzMeta.deferredImportsByBlock != null) {
+          for (const [blockName, refs] of clazzMeta.deferredImportsByBlock) {
+            for (const ref of refs) {
+              if (!refToBlocks.has(ref.node)) {
+                refToBlocks.set(ref.node, /* @__PURE__ */ new Set());
+              }
+              refToBlocks.get(ref.node).add(blockName);
+            }
+          }
+        }
         for (const ref of clazzMeta.deferredImports) {
+          const deferredBlocks = refToBlocks.get(ref.node) ?? null;
           const dirMeta = this.metaReader.getDirectiveMetadata(ref);
           if (dirMeta !== null) {
-            deferredDependencies.add({ ...dirMeta, ref, isExplicitlyDeferred: true });
+            deferredDependencies.add({ ...dirMeta, ref, isExplicitlyDeferred: true, deferredBlocks });
             isPoisoned = isPoisoned || dirMeta.isPoisoned || !dirMeta.isStandalone;
             continue;
           }
           const pipeMeta = this.metaReader.getPipeMetadata(ref);
           if (pipeMeta !== null) {
-            deferredDependencies.add({ ...pipeMeta, ref, isExplicitlyDeferred: true });
+            deferredDependencies.add({
+              ...pipeMeta,
+              ref,
+              isExplicitlyDeferred: true,
+              deferredBlocks
+            });
             isPoisoned = isPoisoned || !pipeMeta.isStandalone;
             continue;
           }
@@ -5623,4 +5640,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-CZL6WNIC.js.map
+//# sourceMappingURL=chunk-PDVAJ6FQ.js.map

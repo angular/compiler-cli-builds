@@ -224,6 +224,10 @@ export interface DirectiveMeta extends T2DirectiveMeta, DirectiveTypeCheckMeta {
      */
     deferredImports: Reference<ClassDeclaration>[] | null;
     /**
+     * Map of block name -> resolved deferred imports when `deferredImports` is an object literal.
+     */
+    deferredImportsByBlock?: Map<string, Reference<ClassDeclaration>[]> | null;
+    /**
      * For standalone components, the list of schemas declared.
      */
     schemas: SchemaMetadata[] | null;
@@ -244,6 +248,11 @@ export interface DirectiveMeta extends T2DirectiveMeta, DirectiveTypeCheckMeta {
      * scope via `@Component.deferredImports` field.
      */
     isExplicitlyDeferred: boolean;
+    /**
+     * Block names in `@Component.deferredImports` under which this class was imported,
+     * if `deferredImports` was configured as an object literal. `null` if flat array.
+     */
+    deferredBlocks?: Set<string> | null;
     /** Whether selectorless is enabled for the specific component. */
     selectorlessEnabled: boolean;
     /**
@@ -298,6 +307,7 @@ export interface PipeMeta {
     isPure: boolean;
     decorator: ts.Decorator | null;
     isExplicitlyDeferred: boolean;
+    deferredBlocks?: Set<string> | null;
 }
 /**
  * Reads metadata for directives, pipes, and modules from a particular source, such as .d.ts files

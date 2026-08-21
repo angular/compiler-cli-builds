@@ -134,7 +134,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
      */
     private resolveAllDeferredDependencies;
     /**
-     * Collects deferrable symbols from the `@Component.deferredImports` field.
+     * Collects deferrable symbols from a `@Component.deferredImports` array expression.
      */
     private collectExplicitlyDeferredSymbols;
     /**

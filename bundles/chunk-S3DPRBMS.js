@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-G5WVUNWP.js";
+} from "./chunk-BKKGWDSR.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -6156,8 +6156,11 @@ var TypeCheckScopeRegistry = class {
     this.flattenedDirectiveMetaCache.set(clazz, meta);
     return meta;
   }
-  applyExplicitlyDeferredFlag(meta, isExplicitlyDeferred) {
-    return isExplicitlyDeferred === true ? { ...meta, isExplicitlyDeferred } : meta;
+  applyExplicitlyDeferredFlag(meta, isExplicitlyDeferred, deferredBlocks) {
+    if (isExplicitlyDeferred === true) {
+      return { ...meta, isExplicitlyDeferred, deferredBlocks: deferredBlocks ?? null };
+    }
+    return meta;
   }
   getSelectorMatcher(allDependencies) {
     const matcher = new SelectorMatcher();
@@ -6167,7 +6170,7 @@ var TypeCheckScopeRegistry = class {
         if (extMeta === null) {
           continue;
         }
-        const directiveMeta = this.applyExplicitlyDeferredFlag(extMeta, meta.isExplicitlyDeferred);
+        const directiveMeta = this.applyExplicitlyDeferredFlag(extMeta, meta.isExplicitlyDeferred, meta.deferredBlocks);
         matcher.addSelectables(CssSelector.parse(meta.selector), this.combineWithHostDirectives(directiveMeta));
       }
     }
@@ -6454,6 +6457,7 @@ var DirectiveDecoratorHandler = class {
       foreignImports: null,
       rawImports: null,
       deferredImports: null,
+      deferredImportsByBlock: null,
       schemas: null,
       ngContentSelectors: null,
       decorator: analysis.decorator,
@@ -6462,6 +6466,7 @@ var DirectiveDecoratorHandler = class {
       // Instead, we statically analyze their imports to make a direct determination.
       assumedToExportProviders: false,
       isExplicitlyDeferred: false,
+      deferredBlocks: null,
       selectorlessEnabled: false,
       localReferencedSymbols: null
     });
@@ -9094,6 +9099,7 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, reflector, genericContextBe
       isStructural: dir.isStructural,
       isStandalone: dir.isStandalone,
       isExplicitlyDeferred: dir.isExplicitlyDeferred,
+      deferredBlocks: dir.deferredBlocks,
       preserveWhitespaces: dir.preserveWhitespaces,
       ngContentSelectors: dir.ngContentSelectors,
       animationTriggerNames: dir.animationTriggerNames,
@@ -9152,6 +9158,8 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, reflector, genericContextBe
     },
     getDeferredTriggerTarget: (b, t) => meta.boundTarget.getDeferredTriggerTarget(b, t),
     isDeferred: (node) => meta.boundTarget.isDeferred(node),
+    getDeferBlocksOfNode: (node) => meta.boundTarget.getDeferBlocksOfNode(node),
+    getDeferBlocksOfPipe: (ast) => meta.boundTarget.getDeferBlocksOfPipe(ast),
     referencedDirectiveExists: (name) => meta.boundTarget.referencedDirectiveExists(name),
     getConsumerOfBinding: (binding) => {
       const consumer = meta.boundTarget.getConsumerOfBinding(binding);
@@ -9178,7 +9186,8 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, reflector, genericContextBe
       pipes.set(pipeName, {
         name: pipe.name,
         ref: extractRef(pipe.ref),
-        isExplicitlyDeferred: pipe.isExplicitlyDeferred
+        isExplicitlyDeferred: pipe.isExplicitlyDeferred,
+        deferredBlocks: pipe.deferredBlocks
       });
     }
   }
@@ -9363,12 +9372,17 @@ To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" 
     this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
     this.recordedPipes.add(ast);
   }
-  deferredPipeUsedEagerly(id, ast) {
+  deferredPipeUsedEagerly(id, ast, currentBlockName, declaredBlocks) {
     if (this.recordedPipes.has(ast)) {
       return;
     }
     const mapping = this.resolver.getTemplateSourceMapping(id);
-    const errorMsg = `Pipe '${ast.name}' was imported  via \`@Component.deferredImports\`, but was used outside of a \`@defer\` block in a template. To fix this, either use the '${ast.name}' pipe inside of a \`@defer\` block or import this dependency using the \`@Component.imports\` field.`;
+    let errorMsg;
+    if (currentBlockName !== null && declaredBlocks !== null && declaredBlocks.length > 0) {
+      errorMsg = `Pipe '${ast.name}' was imported via \`@Component.deferredImports\` under block '${declaredBlocks.join(", ")}', but is used in a \`@defer\` block configured for '${currentBlockName}'. To fix this, add '${ast.name}' to 'deferredImports.${currentBlockName}'.`;
+    } else {
+      errorMsg = `Pipe '${ast.name}' was imported via \`@Component.deferredImports\`, but was used outside of a \`@defer\` block in a template. To fix this, either use the '${ast.name}' pipe inside of a \`@defer\` block or import this dependency using the \`@Component.imports\` field.`;
+    }
     const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, ast.nameSpan);
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
@@ -9376,14 +9390,23 @@ To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" 
     this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
     this.recordedPipes.add(ast);
   }
-  deferredComponentUsedEagerly(id, element) {
+  deferredComponentUsedEagerly(id, element, dirMeta, currentBlockName, declaredBlocks) {
     const mapping = this.resolver.getTemplateSourceMapping(id);
-    const errorMsg = `Element '${element.name}' contains a component or a directive that was imported  via \`@Component.deferredImports\`, but the element itself is located outside of a \`@defer\` block in a template. To fix this, either use the '${element.name}' element inside of a \`@defer\` block or import referenced component/directive dependency using the \`@Component.imports\` field.`;
-    const { start, end } = element.startSourceSpan;
+    const elementName = element instanceof TmplAstElement ? element.name : element.tagName ?? "ng-template";
+    const kind = dirMeta.isComponent ? "Component" : "Directive";
+    const usage = dirMeta.isComponent ? `used as element '${elementName}'` : `used on element '${elementName}'`;
+    let errorMsg;
+    if (currentBlockName !== null && declaredBlocks !== null && declaredBlocks.length > 0) {
+      errorMsg = `${kind} '${dirMeta.name}' (${usage}) was imported via \`@Component.deferredImports\` under block '${declaredBlocks.join(", ")}', but is used in a \`@defer\` block configured for '${currentBlockName}'. To fix this, add '${dirMeta.name}' to 'deferredImports.${currentBlockName}'.`;
+    } else {
+      errorMsg = `${kind} '${dirMeta.name}' (${usage}) was imported via \`@Component.deferredImports\`, but was used outside of a \`@defer\` block in a template. To fix this, either use the '${elementName}' element inside of a \`@defer\` block or import '${dirMeta.name}' using the \`@Component.imports\` field.`;
+    }
+    const startSourceSpan = element.startSourceSpan ?? element.sourceSpan;
+    const { start, end } = startSourceSpan;
     const absoluteSourceSpan = new AbsoluteSourceSpan2(start.offset, end.offset);
     const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, absoluteSourceSpan);
     if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${element.name}'.`);
+      throw new Error(`Assertion failure: no SourceLocation found for usage of ${kind.toLowerCase()} '${dirMeta.name}'.`);
     }
     this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
   }
@@ -11983,15 +12006,38 @@ var legacyAnimationTriggerResolver = (fn, node, resolve, unresolvable) => {
 };
 function validateAndFlattenComponentImports(imports, expr, isDeferred) {
   const flattened = [];
-  const errorMessage = isDeferred ? `'deferredImports' must be an array of components, directives, or pipes.` : `'imports' must be an array of components, directives, pipes, or NgModules.`;
+  const diagnostics = [];
+  let importsByBlock = null;
+  const errorMessage = isDeferred ? `'deferredImports' must be an array of components, directives, or pipes, or an object mapping block names to dependency arrays.` : `'imports' must be an array of components, directives, pipes, or NgModules.`;
+  if (isDeferred && imports instanceof Map) {
+    importsByBlock = /* @__PURE__ */ new Map();
+    for (const [blockName, blockValue] of imports.entries()) {
+      let propExpr = expr;
+      if (ts38.isObjectLiteralExpression(expr)) {
+        const prop = expr.properties.find((p) => ts38.isPropertyAssignment(p) && (ts38.isIdentifier(p.name) || ts38.isStringLiteral(p.name)) && p.name.text === blockName);
+        if (prop && ts38.isPropertyAssignment(prop)) {
+          propExpr = prop.initializer;
+        }
+      }
+      const { imports: blockImports, diagnostics: blockDiagnostics } = validateAndFlattenComponentImports(blockValue, propExpr, isDeferred);
+      diagnostics.push(...blockDiagnostics);
+      for (const blockImport of blockImports) {
+        if (!flattened.some((existing) => existing.node === blockImport.node)) {
+          flattened.push(blockImport);
+        }
+      }
+      importsByBlock.set(blockName, blockImports);
+    }
+    return { imports: flattened, importsByBlock, diagnostics };
+  }
   if (!Array.isArray(imports)) {
     const error = createValueHasWrongTypeError(expr, imports, errorMessage).toDiagnostic();
     return {
       imports: [],
+      importsByBlock: null,
       diagnostics: [error]
     };
   }
-  const diagnostics = [];
   for (let i = 0; i < imports.length; i++) {
     const ref = imports[i];
     let refExpr = expr;
@@ -12019,7 +12065,7 @@ function validateAndFlattenComponentImports(imports, expr, isDeferred) {
       diagnostics.push(createValueHasWrongTypeError(diagnosticNode, diagnosticValue, errorMessage).toDiagnostic());
     }
   }
-  return { imports: flattened, diagnostics };
+  return { imports: flattened, importsByBlock, diagnostics };
 }
 function extractForeignImportsFromAst(expr) {
   const foreignImports = [];
@@ -12342,6 +12388,7 @@ var ComponentDecoratorHandler = class {
     let resolvedImports = null;
     let foreignImports = null;
     let resolvedDeferredImports = null;
+    let resolvedDeferredImportsByBlock = null;
     let rawImports = component.get("imports") ?? null;
     let rawDeferredImports = component.get("deferredImports") ?? null;
     let rawForeignImports = component.get("foreignImports") ?? null;
@@ -12382,7 +12429,7 @@ var ComponentDecoratorHandler = class {
         if (rawDeferredImports) {
           const expr = rawDeferredImports;
           const imported = this.evaluator.evaluate(expr, importResolvers);
-          const { imports: flattened, diagnostics: diagnostics2 } = validateAndFlattenComponentImports(
+          const { imports: flattened, importsByBlock, diagnostics: diagnostics2 } = validateAndFlattenComponentImports(
             imported,
             expr,
             true
@@ -12390,6 +12437,7 @@ var ComponentDecoratorHandler = class {
           );
           importDiagnostics.push(...diagnostics2);
           resolvedDeferredImports = flattened;
+          resolvedDeferredImportsByBlock = importsByBlock ?? null;
           rawDeferredImports = expr;
         }
       }
@@ -12566,22 +12614,31 @@ var ComponentDecoratorHandler = class {
       }
     }
     let explicitlyDeferredTypes = null;
+    let explicitlyDeferredTypesByBlock = null;
     if (metadata.isStandalone && rawDeferredImports !== null) {
-      const deferredTypes = this.collectExplicitlyDeferredSymbols(rawDeferredImports);
-      for (const [deferredType, importDetails] of deferredTypes) {
-        explicitlyDeferredTypes ??= [];
-        explicitlyDeferredTypes.push({
-          symbolName: importDetails.name,
-          importPath: importDetails.from,
-          isDefaultImport: isDefaultImport(importDetails.node)
-        });
-        this.deferredSymbolTracker.markAsDeferrableCandidate(
-          deferredType,
-          importDetails.node,
-          node,
-          true
-          /* isExplicitlyDeferred */
-        );
+      if (ts39.isArrayLiteralExpression(rawDeferredImports)) {
+        explicitlyDeferredTypes = this.collectExplicitlyDeferredSymbols(node, rawDeferredImports);
+      } else if (ts39.isObjectLiteralExpression(rawDeferredImports)) {
+        explicitlyDeferredTypesByBlock = /* @__PURE__ */ new Map();
+        for (const property of rawDeferredImports.properties) {
+          if (!ts39.isPropertyAssignment(property)) {
+            continue;
+          }
+          let blockName = null;
+          if (ts39.isIdentifier(property.name) || ts39.isStringLiteral(property.name)) {
+            blockName = property.name.text;
+          }
+          if (blockName === null) {
+            continue;
+          }
+          const initializer = property.initializer;
+          if (ts39.isArrayLiteralExpression(initializer)) {
+            const blockDeps = this.collectExplicitlyDeferredSymbols(node, initializer);
+            explicitlyDeferredTypesByBlock.set(blockName, blockDeps);
+            explicitlyDeferredTypes ??= [];
+            explicitlyDeferredTypes.push(...blockDeps);
+          }
+        }
       }
     }
     const output = {
@@ -12639,7 +12696,9 @@ var ComponentDecoratorHandler = class {
         foreignImports,
         rawDeferredImports,
         resolvedDeferredImports,
+        resolvedDeferredImportsByBlock,
         explicitlyDeferredTypes,
+        explicitlyDeferredTypesByBlock,
         schemas,
         decorator: decorator?.node ?? null,
         hostBindingNodes: directiveResult.hostBindingNodes
@@ -12677,6 +12736,7 @@ var ComponentDecoratorHandler = class {
       foreignImports: analysis.foreignImports,
       rawImports: analysis.rawImports,
       deferredImports: analysis.resolvedDeferredImports,
+      deferredImportsByBlock: analysis.resolvedDeferredImportsByBlock,
       animationTriggerNames: analysis.legacyAnimationTriggerNames,
       schemas: analysis.schemas,
       decorator: analysis.decorator,
@@ -12684,6 +12744,7 @@ var ComponentDecoratorHandler = class {
       ngContentSelectors: analysis.template.ngContentSelectors,
       preserveWhitespaces: analysis.template.preserveWhitespaces ?? false,
       isExplicitlyDeferred: false,
+      deferredBlocks: null,
       selectorlessEnabled: analysis.selectorlessEnabled,
       localReferencedSymbols: analysis.localReferencedSymbols
     });
@@ -12785,11 +12846,50 @@ var ComponentDecoratorHandler = class {
     }
     let data;
     if (this.compilationMode === CompilationMode.LOCAL) {
+      const deferPerBlockDependencies = /* @__PURE__ */ new Map();
+      let deferBlockDepsEmitMode = 1;
+      const hasBlockSpecificImports = analysis.explicitlyDeferredTypesByBlock != null;
+      const deferBlocks = this.locateDeferBlocksWithoutScope(analysis.template);
+      if (hasBlockSpecificImports) {
+        deferBlockDepsEmitMode = 0;
+        for (const [block] of deferBlocks) {
+          const blockName = block.definedName;
+          if (blockName === null) {
+            diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_MISSING_NAME_PARAMETER, analysis.rawDeferredImports, `@defer block must specify a 'name' parameter (e.g. '@defer (name blockName)') when 'deferredImports' is defined as an object.`));
+            continue;
+          }
+          const depsForBlock = analysis.explicitlyDeferredTypesByBlock.get(blockName);
+          if (depsForBlock === void 0) {
+            diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_UNKNOWN_NAME_PARAMETER, analysis.rawDeferredImports, `The 'name' parameter references block '${blockName}' which is missing from '@Component.deferredImports'.`));
+            continue;
+          }
+          const mappedDeps = depsForBlock.map((dep) => {
+            return {
+              symbolName: dep.symbolName,
+              importPath: dep.importPath,
+              isDefaultImport: dep.isDefaultImport,
+              isDeferrable: true,
+              typeReference: new o4.ExternalExpr({ name: dep.symbolName, moduleName: dep.importPath }),
+              declaration: null
+            };
+          });
+          deferPerBlockDependencies.set(block, mappedDeps);
+        }
+      } else {
+        for (const [block] of deferBlocks) {
+          if (block.definedName !== null) {
+            diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_INVALID_NAME_PARAMETER, analysis.rawDeferredImports ?? node, `The 'name' parameter can only be used when '@Component.deferredImports' is defined as an object.`));
+          }
+        }
+      }
+      if (diagnostics.length > 0) {
+        return { diagnostics };
+      }
       data = {
         declarations: EMPTY_ARRAY,
         declarationListEmitMode: !analysis.meta.isStandalone || analysis.rawImports !== null ? 3 : 0,
-        deferPerBlockDependencies: this.locateDeferBlocksWithoutScope(analysis.template),
-        deferBlockDepsEmitMode: 1,
+        deferPerBlockDependencies,
+        deferBlockDepsEmitMode,
         deferrableDeclToImportDecl: /* @__PURE__ */ new Map(),
         deferPerComponentDependencies: analysis.explicitlyDeferredTypes ?? [],
         hasDirectiveDependencies: true
@@ -12826,7 +12926,7 @@ var ComponentDecoratorHandler = class {
         symbol.usedPipes = Array.from(declarations.values()).filter(isUsedPipe).map(getSemanticReference);
       }
       if (this.compilationMode !== CompilationMode.LOCAL) {
-        this.resolveDeferBlocks(node, scope, deferBlocks, declarations, data, analysis, eagerlyUsed);
+        this.resolveDeferBlocks(node, scope, deferBlocks, declarations, data, analysis, eagerlyUsed, diagnostics);
         data.hasDirectiveDependencies = !analysis.meta.isStandalone || allDependencies.some(({ kind, ref }) => {
           return (kind === MetaKind.Directive || kind === MetaKind.NgModule) && wholeTemplateUsed.has(ref.node);
         });
@@ -13273,24 +13373,33 @@ var ComponentDecoratorHandler = class {
     return deferrableTypes;
   }
   /**
-   * Collects deferrable symbols from the `@Component.deferredImports` field.
+   * Collects deferrable symbols from a `@Component.deferredImports` array expression.
    */
-  collectExplicitlyDeferredSymbols(rawDeferredImports) {
-    const deferredTypes = /* @__PURE__ */ new Map();
-    if (!ts39.isArrayLiteralExpression(rawDeferredImports)) {
-      return deferredTypes;
-    }
+  collectExplicitlyDeferredSymbols(decl, rawDeferredImports) {
+    const explicitlyDeferredTypes = [];
     for (const element of rawDeferredImports.elements) {
       const node = tryUnwrapForwardRef(element, this.reflector) || element;
       if (!ts39.isIdentifier(node)) {
         continue;
       }
       const imp = this.reflector.getImportOfIdentifier(node);
-      if (imp !== null) {
-        deferredTypes.set(node, imp);
+      if (imp === null) {
+        continue;
       }
+      explicitlyDeferredTypes.push({
+        symbolName: imp.name,
+        importPath: imp.from,
+        isDefaultImport: isDefaultImport(imp.node)
+      });
+      this.deferredSymbolTracker.markAsDeferrableCandidate(
+        node,
+        imp.node,
+        decl,
+        true
+        /* isExplicitlyDeferred */
+      );
     }
-    return deferredTypes;
+    return explicitlyDeferredTypes;
   }
   /**
    * Check whether adding an import from `origin` to the source-file corresponding to `expr` would
@@ -13332,8 +13441,9 @@ var ComponentDecoratorHandler = class {
    * Resolves information about defer blocks dependencies to make it
    * available for the final `compile` step.
    */
-  resolveDeferBlocks(componentClassDecl, scope, deferBlocks, deferrableDecls, resolutionData, analysisData, eagerlyUsedDecls) {
+  resolveDeferBlocks(componentClassDecl, scope, deferBlocks, deferrableDecls, resolutionData, analysisData, eagerlyUsedDecls, diagnostics) {
     const allDeferredDecls = /* @__PURE__ */ new Set();
+    const hasBlockSpecificImports = analysisData.resolvedDeferredImportsByBlock != null;
     for (const [deferBlock, bound] of deferBlocks) {
       const usedDirectives = new Set(bound.getEagerlyUsedDirectives().map((d) => d.ref.node));
       const usedPipes = new Set(bound.getEagerlyUsedPipes());
@@ -13344,25 +13454,66 @@ var ComponentDecoratorHandler = class {
         deps = [];
         resolutionData.deferPerBlockDependencies.set(deferBlock, deps);
       }
-      for (const decl of Array.from(deferrableDecls.values())) {
-        if (decl.kind === R3TemplateDependencyKind.NgModule) {
+      const blockName = deferBlock.definedName;
+      if (hasBlockSpecificImports) {
+        if (blockName === null) {
+          diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_MISSING_NAME_PARAMETER, analysisData.rawDeferredImports, `@defer block must specify a 'name' parameter (e.g. '@defer (name blockName)') when 'deferredImports' is defined as an object.`));
           continue;
         }
-        if (decl.kind === R3TemplateDependencyKind.Directive && !usedDirectives.has(decl.ref.node)) {
+        const blockImports = analysisData.resolvedDeferredImportsByBlock.get(blockName);
+        if (blockImports === void 0) {
+          diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_UNKNOWN_NAME_PARAMETER, analysisData.rawDeferredImports, `The 'name' parameter references block '${blockName}' which is missing from '@Component.deferredImports'.`));
           continue;
         }
-        if (decl.kind === R3TemplateDependencyKind.Pipe && !usedPipes.has(decl.name)) {
+        const blockImportsSet = new Set(blockImports.map((ref) => ref.node));
+        for (const decl of Array.from(deferrableDecls.values())) {
+          if (decl.kind === R3TemplateDependencyKind.NgModule) {
+            continue;
+          }
+          if (!blockImportsSet.has(decl.ref.node)) {
+            continue;
+          }
+          if (decl.kind === R3TemplateDependencyKind.Directive && !usedDirectives.has(decl.ref.node)) {
+            continue;
+          }
+          if (decl.kind === R3TemplateDependencyKind.Pipe && !usedPipes.has(decl.name)) {
+            continue;
+          }
+          deps.push({
+            typeReference: decl.type,
+            symbolName: decl.ref.node.name.text,
+            isDeferrable: false,
+            importPath: null,
+            isDefaultImport: false,
+            declaration: decl.ref
+          });
+          allDeferredDecls.add(decl.ref.node);
+        }
+      } else {
+        if (blockName !== null) {
+          diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_INVALID_NAME_PARAMETER, analysisData.rawDeferredImports ?? componentClassDecl, `The 'name' parameter can only be used when '@Component.deferredImports' is defined as an object.`));
           continue;
         }
-        deps.push({
-          typeReference: decl.type,
-          symbolName: decl.ref.node.name.text,
-          isDeferrable: false,
-          importPath: null,
-          isDefaultImport: false,
-          declaration: decl.ref
-        });
-        allDeferredDecls.add(decl.ref.node);
+        for (const decl of Array.from(deferrableDecls.values())) {
+          if (decl.kind === R3TemplateDependencyKind.NgModule) {
+            continue;
+          }
+          if (decl.kind === R3TemplateDependencyKind.Directive && !usedDirectives.has(decl.ref.node)) {
+            continue;
+          }
+          if (decl.kind === R3TemplateDependencyKind.Pipe && !usedPipes.has(decl.name)) {
+            continue;
+          }
+          deps.push({
+            typeReference: decl.type,
+            symbolName: decl.ref.node.name.text,
+            isDeferrable: false,
+            importPath: null,
+            isDefaultImport: false,
+            declaration: decl.ref
+          });
+          allDeferredDecls.add(decl.ref.node);
+        }
       }
     }
     if (analysisData.meta.isStandalone) {
@@ -13371,9 +13522,23 @@ var ComponentDecoratorHandler = class {
           this.registerDeferrableCandidate(componentClassDecl, element, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
         }
       }
-      if (analysisData.rawDeferredImports !== null && ts39.isArrayLiteralExpression(analysisData.rawDeferredImports)) {
-        for (const element of analysisData.rawDeferredImports.elements) {
-          this.registerDeferrableCandidate(componentClassDecl, element, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
+      if (analysisData.rawDeferredImports !== null) {
+        if (ts39.isArrayLiteralExpression(analysisData.rawDeferredImports)) {
+          for (const element of analysisData.rawDeferredImports.elements) {
+            this.registerDeferrableCandidate(componentClassDecl, element, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
+          }
+        } else if (ts39.isObjectLiteralExpression(analysisData.rawDeferredImports)) {
+          for (const property of analysisData.rawDeferredImports.properties) {
+            if (!ts39.isPropertyAssignment(property)) {
+              continue;
+            }
+            const initializer = property.initializer;
+            if (ts39.isArrayLiteralExpression(initializer)) {
+              for (const element of initializer.elements) {
+                this.registerDeferrableCandidate(componentClassDecl, element, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
+              }
+            }
+          }
         }
       }
       if (scope.kind === ComponentScopeKind.Selectorless) {
@@ -13922,6 +14087,7 @@ var PipeDecoratorHandler = class {
       isStandalone: analysis.meta.isStandalone,
       decorator: analysis.decorator,
       isExplicitlyDeferred: false,
+      deferredBlocks: null,
       isPure: analysis.meta.pure
     });
     this.injectableRegistry.registerInjectable(node, {
@@ -14271,4 +14437,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ONZQR6DZ.js.map
+//# sourceMappingURL=chunk-S3DPRBMS.js.map

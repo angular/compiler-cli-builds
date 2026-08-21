@@ -20,10 +20,12 @@ import { ForeignComponentMeta } from './metadata';
 export declare function collectLegacyAnimationNames(value: ResolvedValue, legacyAnimationTriggerNames: LegacyAnimationTriggerNames): void;
 export declare function isLegacyAngularAnimationsReference(reference: Reference, symbolName: string): boolean;
 export declare const legacyAnimationTriggerResolver: ForeignFunctionResolver;
-export declare function validateAndFlattenComponentImports(imports: ResolvedValue, expr: ts.Expression, isDeferred: boolean): {
+export interface FlattenedImports {
     imports: Reference<ClassDeclaration>[];
+    importsByBlock: Map<string, Reference<ClassDeclaration>[]> | null;
     diagnostics: ts.Diagnostic[];
-};
+}
+export declare function validateAndFlattenComponentImports(imports: ResolvedValue, expr: ts.Expression, isDeferred: boolean): FlattenedImports;
 export declare function extractForeignImportsFromAst(expr: ts.Expression): {
     foreignImports: ForeignComponentMeta[];
     diagnostics: ts.Diagnostic[];

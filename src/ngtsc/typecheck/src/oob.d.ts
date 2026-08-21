@@ -24,8 +24,8 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     get diagnostics(): TemplateDiagnostic[];
     missingReferenceTarget(id: TypeCheckId, ref: TmplAstReference): void;
     missingPipe(id: TypeCheckId, ast: BindingPipe, isStandalone: boolean): void;
-    deferredPipeUsedEagerly(id: TypeCheckId, ast: BindingPipe): void;
-    deferredComponentUsedEagerly(id: TypeCheckId, element: TmplAstElement): void;
+    deferredPipeUsedEagerly(id: TypeCheckId, ast: BindingPipe, currentBlockName: string | null, declaredBlocks: string[] | null): void;
+    deferredComponentUsedEagerly(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate, dirMeta: TcbDirectiveMetadata, currentBlockName: string | null, declaredBlocks: string[] | null): void;
     duplicateTemplateVar(id: TypeCheckId, variable: TmplAstVariable, firstDecl: TmplAstVariable): void;
     suboptimalTypeInference(id: TypeCheckId, variables: TmplAstVariable[]): void;
     splitTwoWayBinding(id: TypeCheckId, input: TmplAstBoundAttribute, output: TmplAstBoundEvent, inputConsumer: Pick<TcbDirectiveMetadata, 'name' | 'isComponent' | 'ref'>, outputConsumer: Pick<TcbDirectiveMetadata, 'name' | 'isComponent' | 'ref'> | TmplAstElement): void;
