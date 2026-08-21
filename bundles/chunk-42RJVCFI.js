@@ -55,7 +55,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-S3DPRBMS.js";
+} from "./chunk-CZLNF2YP.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -4470,6 +4470,7 @@ var NgCompiler = class _NgCompiler {
   implicitStandaloneValue;
   enableSelectorless;
   emitDeclarationOnly;
+  enableTemplateSourceLocations;
   /**
    * `NgCompiler` can be reused for multiple compilations (for resource-only changes), and each
    * new compilation uses a fresh `PerfRecorder`. Thus, classes created with a lifespan of the
@@ -4513,6 +4514,7 @@ var NgCompiler = class _NgCompiler {
     this.enableBlockSyntax = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 17.0.0");
     this.enableLetSyntax = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 18.1.0");
     this.enableSelectorless = options["_enableSelectorless"] ?? false;
+    this.enableTemplateSourceLocations = options["enableTemplateSourceLocations"] ?? false;
     this.emitDeclarationOnly = !!options.emitDeclarationOnly && !!options._experimentalAllowEmitDeclarationOnly;
     this.implicitStandaloneValue = this.angularCoreVersion === null || coreVersionSupportsFeature(this.angularCoreVersion, ">= 19.0.0");
     this.enableHmr = !!options["_enableHmr"];
@@ -5205,7 +5207,7 @@ var NgCompiler = class _NgCompiler {
     }
     const jitDeclarationRegistry = new JitDeclarationRegistry();
     const handlers = [
-      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, this.adapter, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, this.enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, this.options.i18nPreserveWhitespaceForLegacyExtraction ?? true, !!this.options.strictStandalone, this.enableHmr, this.implicitStandaloneValue, typeCheckHostBindings, this.enableSelectorless, this.emitDeclarationOnly, this.options.legacyOptionalChaining ?? LEGACY_OPTIONAL_CHAINING_DEFAULT),
+      new ComponentDecoratorHandler(reflector, evaluator, metaRegistry, metaReader, scopeReader, this.adapter, ngModuleScopeRegistry, typeCheckScopeRegistry, resourceRegistry, isCore, strictCtorDeps, this.resourceManager, this.adapter.rootDirs, this.options.preserveWhitespaces || false, this.options.i18nUseExternalIds !== false, this.options.enableI18nLegacyMessageIdFormat !== false, this.usePoisonedData, this.options.i18nNormalizeLineEndingsInICUs === true, this.moduleResolver, this.cycleAnalyzer, cycleHandlingStrategy, refEmitter, referencesRegistry, this.incrementalCompilation.depGraph, injectableRegistry, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, hostDirectivesResolver, importTracker, supportTestBed, compilationMode, deferredSymbolsTracker, !!this.options.forbidOrphanComponents, this.enableBlockSyntax, this.enableLetSyntax, externalRuntimeStyles, localCompilationExtraImportsTracker, jitDeclarationRegistry, this.options.i18nPreserveWhitespaceForLegacyExtraction ?? true, !!this.options.strictStandalone, this.enableHmr, this.implicitStandaloneValue, typeCheckHostBindings, this.enableSelectorless, this.emitDeclarationOnly, this.options.legacyOptionalChaining ?? LEGACY_OPTIONAL_CHAINING_DEFAULT, this.enableTemplateSourceLocations),
       // TODO(alxhub): understand why the cast here is necessary (something to do with `null`
       // not being assignable to `unknown` when wrapped in `Readonly`).
       new DirectiveDecoratorHandler(reflector, evaluator, metaRegistry, ngModuleScopeRegistry, metaReader, injectableRegistry, refEmitter, referencesRegistry, isCore, strictCtorDeps, semanticDepGraphUpdater, this.closureCompilerEnabled, this.delegatingPerfRecorder, importTracker, supportTestBed, typeCheckScopeRegistry, compilationMode, jitDeclarationRegistry, resourceRegistry, !!this.options.strictStandalone, this.implicitStandaloneValue, this.usePoisonedData, typeCheckHostBindings, this.emitDeclarationOnly, this.options.legacyOptionalChaining ?? LEGACY_OPTIONAL_CHAINING_DEFAULT),
@@ -5640,4 +5642,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PDVAJ6FQ.js.map
+//# sourceMappingURL=chunk-42RJVCFI.js.map
