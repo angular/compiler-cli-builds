@@ -137,6 +137,7 @@ export declare class NgCompiler {
     private readonly implicitStandaloneValue;
     private readonly enableSelectorless;
     private readonly emitDeclarationOnly;
+    private readonly enableTemplateSourceLocations;
     /**
      * `NgCompiler` can be reused for multiple compilations (for resource-only changes), and each
      * new compilation uses a fresh `PerfRecorder`. Thus, classes created with a lifespan of the
