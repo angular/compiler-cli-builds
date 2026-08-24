@@ -21,9 +21,9 @@ export declare const GLOBAL_DEFS_FOR_TERSER: {
     ngI18nClosureMode: boolean;
 };
 export declare const GLOBAL_DEFS_FOR_TERSER_WITH_AOT: {
-    ngJitMode: boolean;
     ngDevMode: boolean;
     ngI18nClosureMode: boolean;
+    ngJitMode: boolean;
 };
 /**
  * JIT transform used by the Angular CLI.
