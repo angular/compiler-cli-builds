@@ -241,12 +241,16 @@ export interface TemplateTypeChecker {
     getExpressionTarget(expression: AST, clazz: ts.ClassDeclaration): TemplateEntity | null;
     /**
      * Constructs a `ts.Diagnostic` for a given `ParseSourceSpan` within a template.
+     *
+     * @param relatedInformation Optional list of secondary related messages:
+     *   - Omit `sourceFile` when `start` and `end` offsets are locations within the template itself.
+     *   - Specify `sourceFile` only when referencing a separate file (e.g. directive class declaration).
      */
     makeTemplateDiagnostic<T extends ErrorCode>(clazz: ts.ClassDeclaration, sourceSpan: ParseSourceSpan, category: ts.DiagnosticCategory, errorCode: T, message: string, relatedInformation?: {
         text: string;
         start: number;
         end: number;
-        sourceFile: ts.SourceFile;
+        sourceFile?: ts.SourceFile;
     }[]): NgTemplateDiagnostic<T>;
 }
 /**
