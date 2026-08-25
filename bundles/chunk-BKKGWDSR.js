@@ -147,7 +147,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.3+sha-3848b7f";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.3+sha-ddfd8a8";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
