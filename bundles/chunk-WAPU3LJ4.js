@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-BKKGWDSR.js";
+} from "./chunk-OQIWBETM.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -9625,8 +9625,7 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
       relatedMessages.push({
         text: message,
         start: outputConsumer.sourceSpan.start.offset + 1,
-        end: outputConsumer.sourceSpan.start.offset + outputConsumer.name.length + 1,
-        sourceFile: mapping.node.getSourceFile()
+        end: outputConsumer.sourceSpan.start.offset + outputConsumer.name.length + 1
       });
     } else {
       if (outputConsumer.ref.nodeNameSpan && outputConsumer.ref.nodeFilePath) {
@@ -11935,8 +11934,7 @@ var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
       {
         text: "Child nodes are defined here.",
         start: firstChild.sourceSpan.start.offset,
-        end: firstChild.sourceSpan.end.offset,
-        sourceFile: this.sourceMapping.node.getSourceFile()
+        end: firstChild.sourceSpan.end.offset
       }
     ]));
   }
@@ -12036,8 +12034,7 @@ var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
         {
           text: `The @content block '${block.name}' was first defined here.`,
           start: firstDecl.sourceSpan.start.offset,
-          end: firstDecl.sourceSpan.end.offset,
-          sourceFile: this.sourceMapping.node.getSourceFile()
+          end: firstDecl.sourceSpan.end.offset
         }
       ]));
     } else {
@@ -12051,8 +12048,7 @@ var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
         {
           text: `The property '${block.name}' is defined here.`,
           start: conflict.sourceSpan.start.offset,
-          end: conflict.sourceSpan.end.offset,
-          sourceFile: this.sourceMapping.node.getSourceFile()
+          end: conflict.sourceSpan.end.offset
         }
       ]));
     }
@@ -14605,4 +14601,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OBYHFFX4.js.map
+//# sourceMappingURL=chunk-WAPU3LJ4.js.map

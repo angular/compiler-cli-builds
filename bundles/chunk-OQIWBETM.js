@@ -147,7 +147,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.3+sha-9c52dbf";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.3+sha-a46292a";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5476,7 +5476,7 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
         relatedInformation.push({
           category: ts26.DiagnosticCategory.Message,
           code: 0,
-          file: relatedMessage.sourceFile,
+          file: relatedMessage.sourceFile ?? mapping.node.getSourceFile(),
           start: relatedMessage.start,
           length: relatedMessage.end - relatedMessage.start,
           messageText: relatedMessage.text
@@ -5503,23 +5503,23 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
     const componentSf = mapping.componentClass.getSourceFile();
     const componentName = mapping.componentClass.name.text;
     const fileName = mapping.type === "indirect" ? `${componentSf.fileName} (${componentName} template)` : mapping.templateUrl;
-    let relatedInformation = [];
-    if (relatedMessages !== void 0) {
-      for (const relatedMessage of relatedMessages) {
-        relatedInformation.push({
-          category: ts26.DiagnosticCategory.Message,
-          code: 0,
-          file: relatedMessage.sourceFile,
-          start: relatedMessage.start,
-          length: relatedMessage.end - relatedMessage.start,
-          messageText: relatedMessage.text
-        });
-      }
-    }
     let sf;
     try {
       sf = getParsedTemplateSourceFile(fileName, mapping);
     } catch (e) {
+      let relatedInformation2 = [];
+      if (relatedMessages !== void 0) {
+        for (const relatedMessage of relatedMessages) {
+          relatedInformation2.push({
+            category: ts26.DiagnosticCategory.Message,
+            code: 0,
+            file: relatedMessage.sourceFile ?? componentSf,
+            start: relatedMessage.start,
+            length: relatedMessage.end - relatedMessage.start,
+            messageText: relatedMessage.text
+          });
+        }
+      }
       const failureChain = makeDiagnosticChain(`Failed to report an error in '${fileName}' at ${span.start.line + 1}:${span.start.col + 1}`, [makeDiagnosticChain(e?.stack ?? `${e}`)]);
       return {
         source: "ngtsc",
@@ -5533,9 +5533,22 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
         // and getEnd() are used because they don't include surrounding whitespace.
         start: mapping.node.getStart(),
         length: mapping.node.getEnd() - mapping.node.getStart(),
-        relatedInformation,
+        relatedInformation: relatedInformation2,
         reportsDeprecated: deprecatedDiagInfo?.reportsDeprecated
       };
+    }
+    let relatedInformation = [];
+    if (relatedMessages !== void 0) {
+      for (const relatedMessage of relatedMessages) {
+        relatedInformation.push({
+          category: ts26.DiagnosticCategory.Message,
+          code: 0,
+          file: relatedMessage.sourceFile ?? sf,
+          start: relatedMessage.start,
+          length: relatedMessage.end - relatedMessage.start,
+          messageText: relatedMessage.text
+        });
+      }
     }
     let typeForMessage;
     if (category === ts26.DiagnosticCategory.Warning) {
@@ -6845,4 +6858,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BKKGWDSR.js.map
+//# sourceMappingURL=chunk-OQIWBETM.js.map

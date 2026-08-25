@@ -137,7 +137,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
         text: string;
         start: number;
         end: number;
-        sourceFile: ts.SourceFile;
+        sourceFile?: ts.SourceFile;
     }[]): NgTemplateDiagnostic<T>;
     private getOrCreateCompletionEngine;
     private maybeAdoptPriorResults;

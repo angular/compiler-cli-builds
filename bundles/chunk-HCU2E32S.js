@@ -456,7 +456,7 @@ import semver2 from "semver";
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "22.2.0-next.3+sha-9c52dbf";
+var PLACEHOLDER_VERSION = "22.2.0-next.3+sha-a46292a";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
