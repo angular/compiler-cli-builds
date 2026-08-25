@@ -13706,6 +13706,11 @@ var ComponentDecoratorHandler = class {
         }
       }
     }
+    for (const decl of Array.from(deferrableDecls.values())) {
+      if (decl.kind !== R3TemplateDependencyKind.NgModule && !allDeferredDecls.has(decl.ref.node)) {
+        eagerlyUsedDecls.add(decl.ref.node);
+      }
+    }
   }
   /**
    * Inspects provided imports expression (either `@Component.imports` or
@@ -14600,4 +14605,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-SFYDEF5T.js.map
+//# sourceMappingURL=chunk-OBYHFFX4.js.map
