@@ -3232,6 +3232,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
   const ctorDeps = selector !== null ? validateConstructorDependencies(clazz, rawCtorDeps) : unwrapConstructorDependencies(rawCtorDeps);
   const isStructural = ctorDeps !== null && ctorDeps !== "invalid" && ctorDeps.some((dep) => dep.token instanceof ExternalExpr2 && dep.token.value.moduleName === "@angular/core" && dep.token.value.name === "TemplateRef");
   let isStandalone = implicitStandaloneValue;
+  let diagnostics;
   if (directive.has("standalone")) {
     const expr = directive.get("standalone");
     const resolved = evaluator.evaluate(expr);
@@ -3240,7 +3241,9 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
     }
     isStandalone = resolved;
     if (!isStandalone && strictStandalone) {
-      throw new FatalDiagnosticError(ErrorCode.NON_STANDALONE_NOT_ALLOWED, expr, `Only standalone components/directives are allowed when 'strictStandalone' is enabled.`);
+      diagnostics = [
+        makeDiagnostic(ErrorCode.NON_STANDALONE_NOT_ALLOWED, expr, `Only standalone components/directives are allowed when 'strictStandalone' is enabled.`)
+      ];
     }
   }
   let isSignal = false;
@@ -3301,6 +3304,7 @@ function extractDirectiveMetadata(clazz, decorator, reflector, importTracker, ev
     hostDirectives,
     rawHostDirectives,
     hostBindingNodes,
+    diagnostics,
     // Track inputs from class metadata. This is useful for migration efforts.
     inputFieldNamesFromMetadataArray: new Set(Object.values(inputsFromMeta).map((i) => i.classPropertyName))
   };
@@ -6401,6 +6405,7 @@ var DirectiveDecoratorHandler = class {
       providersRequiringFactory = resolveProvidersRequiringFactory(directiveResult.decorator.get("providers"), this.reflector, this.evaluator);
     }
     return {
+      diagnostics: directiveResult.diagnostics,
       analysis: {
         inputs: directiveResult.inputs,
         inputFieldNamesFromMetadataArray: directiveResult.inputFieldNamesFromMetadataArray,
@@ -12296,6 +12301,7 @@ var ComponentDecoratorHandler = class {
       this.jitDeclarationRegistry.jitDeclarations.add(node);
       return {};
     }
+    diagnostics = directiveResult.diagnostics;
     const { decorator: component, metadata, inputs, outputs, hostDirectives, rawHostDirectives } = directiveResult;
     const encapsulation = (this.compilationMode !== CompilationMode.LOCAL ? resolveEnumValue(this.evaluator, component, "encapsulation", "ViewEncapsulation", this.isCore) : resolveEncapsulationEnumValueLocally(component.get("encapsulation"))) ?? ViewEncapsulation2.Emulated;
     let changeDetection = null;
@@ -13852,6 +13858,7 @@ var PipeDecoratorHandler = class {
     let pipeNameExpr = null;
     let pure = true;
     let isStandalone = this.implicitStandaloneValue;
+    let diagnostics;
     if (meta !== null) {
       if (!ts41.isObjectLiteralExpression(meta)) {
         throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
@@ -13882,11 +13889,14 @@ var PipeDecoratorHandler = class {
         }
         isStandalone = resolved;
         if (!isStandalone && this.strictStandalone) {
-          throw new FatalDiagnosticError(ErrorCode.NON_STANDALONE_NOT_ALLOWED, expr, `Only standalone pipes are allowed when 'strictStandalone' is enabled.`);
+          diagnostics = [
+            makeDiagnostic(ErrorCode.NON_STANDALONE_NOT_ALLOWED, expr, `Only standalone pipes are allowed when 'strictStandalone' is enabled.`)
+          ];
         }
       }
     }
     return {
+      diagnostics,
       analysis: {
         meta: {
           name,
@@ -14265,4 +14275,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-BO7SFN5K.js.map
+//# sourceMappingURL=chunk-Y42K2TNS.js.map
