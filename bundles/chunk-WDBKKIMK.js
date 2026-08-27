@@ -5,7 +5,7 @@
 import {
   AbsoluteSourceSpan,
   IdentifierKind
-} from "./chunk-NRQWINXV.js";
+} from "./chunk-PZ7UX6JN.js";
 import {
   ActivePerfRecorder,
   CompilationMode,
@@ -55,7 +55,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-WAPU3LJ4.js";
+} from "./chunk-EQLO4LVG.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -2193,7 +2193,7 @@ var IndexingContext = class {
 };
 
 // packages/compiler-cli/src/ngtsc/indexer/src/template.js
-import { ASTWithSource, CombinedRecursiveAstVisitor, ImplicitReceiver, PropertyRead, ThisReceiver, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstVariable, tmplAstVisitAll } from "@angular/compiler";
+import { ASTWithSource, CombinedRecursiveAstVisitor, ImplicitReceiver, PropertyRead, ThisReceiver, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, tmplAstVisitAll } from "@angular/compiler";
 var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
   boundTemplate;
   // Identifiers of interest found in the template.
@@ -2273,6 +2273,10 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
     super.visitPropertyRead(ast, null);
   }
   visitBoundAttribute(attribute) {
+    const identifier = this.bindingToIdentifier(attribute, IdentifierKind.Input);
+    if (identifier !== null) {
+      this.identifiers.add(identifier);
+    }
     const previous = this.currentAstWithSource;
     this.currentAstWithSource = {
       source: attribute.valueSpan?.toString() || null,
@@ -2280,6 +2284,42 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
     };
     this.visit(attribute.value instanceof ASTWithSource ? attribute.value.ast : attribute.value);
     this.currentAstWithSource = previous;
+  }
+  visitBoundEvent(event) {
+    const identifier = this.bindingToIdentifier(event, IdentifierKind.Output);
+    if (identifier !== null) {
+      this.identifiers.add(identifier);
+    }
+    super.visitBoundEvent(event);
+  }
+  visitTextAttribute(attribute) {
+    const identifier = this.bindingToIdentifier(attribute, IdentifierKind.Input);
+    if (identifier !== null) {
+      this.identifiers.add(identifier);
+    }
+    super.visitTextAttribute(attribute);
+  }
+  bindingToIdentifier(node, kind) {
+    if (!this.boundTemplate.getConsumerOfBinding) {
+      return null;
+    }
+    const consumer = this.boundTemplate.getConsumerOfBinding(node);
+    if (!consumer || consumer instanceof TmplAstElement || consumer instanceof TmplAstTemplate) {
+      return null;
+    }
+    const keySpan = node.keySpan ?? (node instanceof TmplAstTextAttribute ? node.sourceSpan : null);
+    if (!keySpan) {
+      return null;
+    }
+    const span = new AbsoluteSourceSpan(keySpan.start.offset, keySpan.start.offset + node.name.length);
+    return {
+      name: node.name,
+      span,
+      kind,
+      target: {
+        node: consumer.ref.node
+      }
+    };
   }
   /** Creates an identifier for a template element or template node. */
   directiveHostToIdentifier(node) {
@@ -3350,7 +3390,7 @@ var factory7 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/skip_hydration_not_static/index.js
-import { TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstTextAttribute } from "@angular/compiler";
+import { TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstTextAttribute as TmplAstTextAttribute2 } from "@angular/compiler";
 var NG_SKIP_HYDRATION_ATTR_NAME = "ngSkipHydration";
 var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.SKIP_HYDRATION_NOT_STATIC;
@@ -3365,7 +3405,7 @@ var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
       ""
       /* empty string */
     ];
-    if (node instanceof TmplAstTextAttribute && node.name === NG_SKIP_HYDRATION_ATTR_NAME && !acceptedValues.includes(node.value) && node.value !== void 0) {
+    if (node instanceof TmplAstTextAttribute2 && node.name === NG_SKIP_HYDRATION_ATTR_NAME && !acceptedValues.includes(node.value) && node.value !== void 0) {
       const errorString = formatExtendedError(ErrorCode.SKIP_HYDRATION_NOT_STATIC, `ngSkipHydration only accepts "true" or "" as value or no value at all. For example 'ngSkipHydration="true"' or 'ngSkipHydration'`);
       const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
       return [diagnostic];
@@ -3401,11 +3441,11 @@ var factory9 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/text_attribute_not_binding/index.js
-import { TmplAstTextAttribute as TmplAstTextAttribute2 } from "@angular/compiler";
+import { TmplAstTextAttribute as TmplAstTextAttribute3 } from "@angular/compiler";
 var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING;
   visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstTextAttribute2))
+    if (!(node instanceof TmplAstTextAttribute3))
       return [];
     const name = node.name;
     if (!name.startsWith("attr.") && !name.startsWith("style.") && !name.startsWith("class.")) {
@@ -5642,4 +5682,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-6XDBXTXV.js.map
+//# sourceMappingURL=chunk-WDBKKIMK.js.map

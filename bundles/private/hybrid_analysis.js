@@ -5,7 +5,7 @@
 import {
   AbsoluteSourceSpan,
   IdentifierKind
-} from "../chunk-NRQWINXV.js";
+} from "../chunk-PZ7UX6JN.js";
 import {
   Environment,
   ExpressionIdentifier,

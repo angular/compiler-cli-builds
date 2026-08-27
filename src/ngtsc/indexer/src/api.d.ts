@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstVariable } from '@angular/compiler';
+import { AST, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstLetDeclaration, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable } from '@angular/compiler';
 import { DeclarationNode } from '../../reflection';
 /**
  * Describes the kind of identifier found in a template.
@@ -20,7 +20,9 @@ export declare enum IdentifierKind {
     Variable = 6,
     LetDeclaration = 7,
     Component = 8,
-    Directive = 9
+    Directive = 9,
+    Input = 10,
+    Output = 11
 }
 /**
  * Describes a semantically-interesting identifier in a template, such as an interpolated variable
@@ -104,15 +106,22 @@ export interface ReferenceIdentifier<T = DeclarationNode> extends TemplateIdenti
 export interface VariableIdentifier extends TemplateIdentifier {
     kind: IdentifierKind.Variable;
 }
-/** Describes a `@let` declaration in a template. */
+/** Describes an `@let` declaration in a template. */
 export interface LetDeclarationIdentifier extends TemplateIdentifier {
     kind: IdentifierKind.LetDeclaration;
+}
+/** Describes a bound attribute or event in a template targeting an Angular input/output. */
+export interface BoundAttributeIdentifier<T = DeclarationNode> extends TemplateIdentifier {
+    kind: IdentifierKind.Input | IdentifierKind.Output;
+    target: {
+        node: T;
+    } | null;
 }
 /**
  * Identifiers recorded at the top level of the template, without any context about the HTML nodes
  * they were discovered in.
  */
-export type TopLevelIdentifier<T = DeclarationNode> = PropertyIdentifier<T> | ElementIdentifier<T> | TemplateNodeIdentifier<T> | ReferenceIdentifier<T> | VariableIdentifier | MethodIdentifier<T> | LetDeclarationIdentifier | ComponentNodeIdentifier<T> | DirectiveNodeIdentifier<T>;
+export type TopLevelIdentifier<T = DeclarationNode> = PropertyIdentifier<T> | ElementIdentifier<T> | TemplateNodeIdentifier<T> | ReferenceIdentifier<T> | VariableIdentifier | MethodIdentifier<T> | LetDeclarationIdentifier | ComponentNodeIdentifier<T> | DirectiveNodeIdentifier<T> | BoundAttributeIdentifier<T>;
 /** Identifiers that can bring in directives to the template. */
 export type DirectiveHostIdentifier<T = DeclarationNode> = ElementIdentifier<T> | TemplateNodeIdentifier<T> | ComponentNodeIdentifier<T> | DirectiveNodeIdentifier<T>;
 /**
@@ -155,6 +164,11 @@ export interface AbstractBoundTemplate<T> {
             };
         };
     } | null;
+    getConsumerOfBinding?(binding: TmplAstBoundAttribute | TmplAstBoundEvent | TmplAstTextAttribute): {
+        ref: {
+            node: T;
+        };
+    } | TmplAstElement | TmplAstTemplate | null;
     getExpressionTarget(ast: AST): TmplAstReference | TmplAstVariable | TmplAstLetDeclaration | null;
     getUsedDirectives(): Array<{
         ref: {

@@ -12931,6 +12931,13 @@ var ComponentDecoratorHandler = class {
       getReferenceTarget(node2) {
         return boundTemplate.getReferenceTarget(node2);
       },
+      getConsumerOfBinding(binding) {
+        const consumer = boundTemplate.getConsumerOfBinding(binding);
+        if (consumer && "ref" in consumer && consumer.ref) {
+          return { ref: { node: consumer.ref.node } };
+        }
+        return null;
+      },
       getExpressionTarget(ast) {
         return boundTemplate.getExpressionTarget(ast);
       },
@@ -14601,4 +14608,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WAPU3LJ4.js.map
+//# sourceMappingURL=chunk-EQLO4LVG.js.map
