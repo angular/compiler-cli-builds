@@ -12790,7 +12790,11 @@ var ComponentDecoratorHandler = class {
             const blockDeps = this.collectExplicitlyDeferredSymbols(node, initializer);
             explicitlyDeferredTypesByBlock.set(blockName, blockDeps);
             explicitlyDeferredTypes ??= [];
-            explicitlyDeferredTypes.push(...blockDeps);
+            for (const dep of blockDeps) {
+              if (!explicitlyDeferredTypes.some((existing) => existing.symbolName === dep.symbolName)) {
+                explicitlyDeferredTypes.push(dep);
+              }
+            }
           }
         }
       }
@@ -14608,4 +14612,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-EQLO4LVG.js.map
+//# sourceMappingURL=chunk-XEYCURR7.js.map
