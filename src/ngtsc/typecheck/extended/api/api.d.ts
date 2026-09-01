@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, ParseSourceSpan, TmplAstNode } from '@angular/compiler';
+import { AbsoluteSourceSpan, AST, ParseSourceSpan, TmplAstNode } from '@angular/compiler';
 import ts from 'typescript';
 import { NgCompilerOptions } from '../../../core/api';
 import { ErrorCode, ExtendedTemplateDiagnosticName } from '../../../diagnostics';
@@ -39,7 +39,7 @@ export interface TemplateContext<Code extends ErrorCode> {
      *   - Omit `sourceFile` when `start` and `end` offsets are locations within the template itself.
      *   - Specify `sourceFile` only when referencing a separate file (e.g. directive class declaration).
      */
-    makeTemplateDiagnostic(sourceSpan: ParseSourceSpan, message: string, relatedInformation?: {
+    makeTemplateDiagnostic(sourceSpan: ParseSourceSpan | AbsoluteSourceSpan, message: string, relatedInformation?: {
         text: string;
         start: number;
         end: number;

@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-OQIWBETM.js";
+} from "./chunk-D7JM7X7X.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -7784,7 +7784,7 @@ var HmrModuleImportRewriter = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/checker.js
-import { CssSelector as CssSelector2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr7, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
+import { CssSelector as CssSelector2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr7, ParseSourceSpan as ParseSourceSpan4, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
 import ts36 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/completion.js
@@ -7994,7 +7994,7 @@ var CompletionEngine = class {
 // packages/compiler-cli/src/ngtsc/typecheck/src/context.js
 import { generateTypeCheckBlock as generateTypeCheckBlock2, ParseSourceFile as ParseSourceFile3, TcbGenericContextBehavior as TcbGenericContextBehavior2 } from "@angular/compiler";
 
-// node_modules/.aspect_rules_js/magic-string@1.0.0/node_modules/magic-string/dist/index.mjs
+// node_modules/.aspect_rules_js/magic-string@1.2.3/node_modules/magic-string/dist/index.mjs
 import { encode } from "@jridgewell/sourcemap-codec";
 var BitSet = class BitSet2 {
   constructor(arg) {
@@ -8109,11 +8109,11 @@ var Chunk = class Chunk2 {
       return true;
     const trimmed = this.content.replace(rx, "");
     if (trimmed.length) {
-      if (trimmed !== this.content) {
-        this.split(this.start + trimmed.length).edit("", void 0, true);
+      if (trimmed !== this.content)
         if (this.edited)
           this.edit(trimmed, this.storeName, true);
-      }
+        else
+          this.split(this.start + trimmed.length).edit("", void 0, true);
       return true;
     } else {
       this.edit("", void 0, true);
@@ -8128,12 +8128,13 @@ var Chunk = class Chunk2 {
       return true;
     const trimmed = this.content.replace(rx, "");
     if (trimmed.length) {
-      if (trimmed !== this.content) {
-        const newChunk = this.split(this.end - trimmed.length);
+      if (trimmed !== this.content)
         if (this.edited)
-          newChunk.edit(trimmed, this.storeName, true);
-        this.edit("", void 0, true);
-      }
+          this.edit(trimmed, this.storeName, true);
+        else {
+          this.split(this.end - trimmed.length);
+          this.edit("", void 0, true);
+        }
       return true;
     } else {
       this.edit("", void 0, true);
@@ -8143,6 +8144,12 @@ var Chunk = class Chunk2 {
     }
   }
 };
+var MagicStringError = class extends Error {
+  name = "MagicStringError";
+  constructor(message, options) {
+    super(`[MagicString] ${message}`, options);
+  }
+};
 function getBtoa() {
   if (typeof globalThis !== "undefined" && typeof globalThis.btoa === "function")
     return (str) => globalThis.btoa(unescape(encodeURIComponent(str)));
@@ -8150,7 +8157,7 @@ function getBtoa() {
   if (buffer)
     return (str) => buffer.from(str, "utf-8").toString("base64");
   return () => {
-    throw new Error("Unsupported environment: `window.btoa` or `Buffer` should be supported.");
+    throw new MagicStringError("unsupported environment: `btoa` or `Buffer` is required");
   };
 }
 var btoa = getBtoa();
@@ -8379,11 +8386,11 @@ var MagicString = class MagicString2 {
       },
       byStart: {
         writable: true,
-        value: {}
+        value: /* @__PURE__ */ new Map([[0, chunk]])
       },
       byEnd: {
         writable: true,
-        value: {}
+        value: /* @__PURE__ */ new Map([[string.length, chunk]])
       },
       filename: {
         writable: true,
@@ -8412,10 +8419,12 @@ var MagicString = class MagicString2 {
       offset: {
         writable: true,
         value: options.offset || 0
+      },
+      hasMovedChunks: {
+        writable: true,
+        value: false
       }
     });
-    this.byStart[0] = chunk;
-    this.byEnd[string.length] = chunk;
   }
   /**
   * Adds the specified character index (with respect to the original string) to sourcemap mappings, if `hires` is false.
@@ -8428,7 +8437,7 @@ var MagicString = class MagicString2 {
   */
   append(content) {
     if (typeof content !== "string")
-      throw new TypeError("outro content must be a string");
+      throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this.outro += content;
     return this;
   }
@@ -8440,9 +8449,9 @@ var MagicString = class MagicString2 {
   appendLeft(index, content) {
     index = index + this.offset;
     if (typeof content !== "string")
-      throw new TypeError("inserted content must be a string");
+      throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
-    const chunk = this.byEnd[index];
+    const chunk = this.byEnd.get(index);
     if (chunk)
       chunk.appendLeft(content);
     else
@@ -8457,9 +8466,9 @@ var MagicString = class MagicString2 {
   appendRight(index, content) {
     index = index + this.offset;
     if (typeof content !== "string")
-      throw new TypeError("inserted content must be a string");
+      throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
-    const chunk = this.byStart[index];
+    const chunk = this.byStart.get(index);
     if (chunk)
       chunk.appendRight(content);
     else
@@ -8472,13 +8481,14 @@ var MagicString = class MagicString2 {
   clone() {
     const cloned = new MagicString2(this.original, {
       filename: this.filename,
+      ignoreList: this.ignoreList,
       offset: this.offset
     });
     let originalChunk = this.firstChunk;
     let clonedChunk = cloned.firstChunk = cloned.lastSearchedChunk = originalChunk.clone();
     while (originalChunk) {
-      cloned.byStart[clonedChunk.start] = clonedChunk;
-      cloned.byEnd[clonedChunk.end] = clonedChunk;
+      cloned.byStart.set(clonedChunk.start, clonedChunk);
+      cloned.byEnd.set(clonedChunk.end, clonedChunk);
       const nextOriginalChunk = originalChunk.next;
       const nextClonedChunk = nextOriginalChunk && nextOriginalChunk.clone();
       if (nextClonedChunk) {
@@ -8492,8 +8502,10 @@ var MagicString = class MagicString2 {
     if (this.indentExclusionRanges)
       cloned.indentExclusionRanges = this.indentExclusionRanges.slice();
     cloned.sourcemapLocations = new BitSet(this.sourcemapLocations);
+    cloned.storedNames = { ...this.storedNames };
     cloned.intro = this.intro;
     cloned.outro = this.outro;
+    cloned.hasMovedChunks = this.hasMovedChunks;
     return cloned;
   }
   /**
@@ -8638,7 +8650,7 @@ var MagicString = class MagicString2 {
   }
   /** @internal */
   insert() {
-    throw new Error("magicString.insert(...) is deprecated. Use prependRight(...) or appendLeft(...)");
+    throw new MagicStringError("insert() is deprecated, use appendLeft() or prependRight()");
   }
   /** @internal */
   insertLeft(index, content) {
@@ -8666,15 +8678,23 @@ var MagicString = class MagicString2 {
     if (start === end)
       return this;
     if (index >= start && index <= end)
-      throw new Error("Cannot move a selection inside itself");
+      throw new MagicStringError("cannot move a selection inside itself");
     this._split(start);
     this._split(end);
     this._split(index);
-    const first = this.byStart[start];
-    const last = this.byEnd[end];
+    const first = this.byStart.get(start);
+    const last = this.byEnd.get(end);
+    if (this.hasMovedChunks) {
+      let cursor = first;
+      while (cursor !== last) {
+        cursor = cursor.next;
+        if (!cursor || cursor.start < start || cursor.end > end)
+          throw new MagicStringError(`cannot move ${start} to ${end} because an earlier move split that range`);
+      }
+    }
     const oldLeft = first.previous;
     const oldRight = last.next;
-    const newRight = this.byStart[index];
+    const newRight = this.byStart.get(index);
     if (!newRight && last === this.lastChunk)
       return this;
     const newLeft = newRight ? newRight.previous : this.lastChunk;
@@ -8698,6 +8718,7 @@ var MagicString = class MagicString2 {
       this.firstChunk = first;
     if (!newRight)
       this.lastChunk = last;
+    this.hasMovedChunks = true;
     return this;
   }
   /**
@@ -8728,17 +8749,21 @@ var MagicString = class MagicString2 {
     start = start + this.offset;
     end = end + this.offset;
     if (typeof content !== "string")
-      throw new TypeError("replacement content must be a string");
+      throw new MagicStringError(`content must be a string, got ${typeof content}`);
     if (this.original.length !== 0) {
-      while (start < 0)
-        start += this.original.length;
-      while (end < 0)
-        end += this.original.length;
+      if (start < 0)
+        start = Math.max(0, start + this.original.length);
+      if (end < 0)
+        end = Math.max(0, end + this.original.length);
     }
+    if (start < 0)
+      throw new MagicStringError(`start ${start} is out of bounds`);
     if (end > this.original.length)
-      throw new Error("end is out of bounds");
+      throw new MagicStringError(`end ${end} is out of bounds`);
     if (start === end)
-      throw new Error("Cannot overwrite a zero-length range \u2013 use appendLeft or prependRight instead");
+      throw new MagicStringError(`cannot overwrite a zero-length range at ${start}, use appendLeft() or prependRight()`);
+    if (start > end)
+      throw new MagicStringError(`end must be greater than start (start: ${start}, end: ${end})`);
     this._split(start);
     this._split(end);
     if (options === true) {
@@ -8759,13 +8784,13 @@ var MagicString = class MagicString2 {
         enumerable: true
       });
     }
-    const first = this.byStart[start];
-    const last = this.byEnd[end];
+    const first = this.byStart.get(start);
+    const last = this.byEnd.get(end);
     if (first) {
       let chunk = first;
       while (chunk !== last) {
-        if (chunk.next !== this.byStart[chunk.end])
-          throw new Error("Cannot overwrite across a split point");
+        if (chunk.next !== this.byStart.get(chunk.end))
+          throw new MagicStringError("cannot overwrite across a split point");
         chunk = chunk.next;
         chunk.edit("", false);
       }
@@ -8782,7 +8807,7 @@ var MagicString = class MagicString2 {
   */
   prepend(content) {
     if (typeof content !== "string")
-      throw new TypeError("outro content must be a string");
+      throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this.intro = content + this.intro;
     return this;
   }
@@ -8792,9 +8817,9 @@ var MagicString = class MagicString2 {
   prependLeft(index, content) {
     index = index + this.offset;
     if (typeof content !== "string")
-      throw new TypeError("inserted content must be a string");
+      throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
-    const chunk = this.byEnd[index];
+    const chunk = this.byEnd.get(index);
     if (chunk)
       chunk.prependLeft(content);
     else
@@ -8807,9 +8832,9 @@ var MagicString = class MagicString2 {
   prependRight(index, content) {
     index = index + this.offset;
     if (typeof content !== "string")
-      throw new TypeError("inserted content must be a string");
+      throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
-    const chunk = this.byStart[index];
+    const chunk = this.byStart.get(index);
     if (chunk)
       chunk.prependRight(content);
     else
@@ -8824,25 +8849,25 @@ var MagicString = class MagicString2 {
     start = start + this.offset;
     end = end + this.offset;
     if (this.original.length !== 0) {
-      while (start < 0)
-        start += this.original.length;
-      while (end < 0)
-        end += this.original.length;
+      if (start < 0)
+        start = Math.max(0, start + this.original.length);
+      if (end < 0)
+        end = Math.max(0, end + this.original.length);
     }
     if (start === end)
       return this;
     if (start < 0 || end > this.original.length)
-      throw new Error("Character is out of bounds");
+      throw new MagicStringError(`range ${start}\u2013${end} is out of bounds`);
     if (start > end)
-      throw new Error("end must be greater than start");
+      throw new MagicStringError(`end must be greater than start (start: ${start}, end: ${end})`);
     this._split(start);
     this._split(end);
-    let chunk = this.byStart[start];
+    let chunk = this.byStart.get(start);
     while (chunk) {
       chunk.intro = "";
       chunk.outro = "";
       chunk.edit("");
-      chunk = end > chunk.end ? this.byStart[chunk.end] : null;
+      chunk = end > chunk.end ? this.byStart.get(chunk.end) : null;
     }
     return this;
   }
@@ -8853,23 +8878,23 @@ var MagicString = class MagicString2 {
     start = start + this.offset;
     end = end + this.offset;
     if (this.original.length !== 0) {
-      while (start < 0)
-        start += this.original.length;
-      while (end < 0)
-        end += this.original.length;
+      if (start < 0)
+        start = Math.max(0, start + this.original.length);
+      if (end < 0)
+        end = Math.max(0, end + this.original.length);
     }
     if (start === end)
       return this;
     if (start < 0 || end > this.original.length)
-      throw new Error("Character is out of bounds");
+      throw new MagicStringError(`range ${start}\u2013${end} is out of bounds`);
     if (start > end)
-      throw new Error("end must be greater than start");
+      throw new MagicStringError(`end must be greater than start (start: ${start}, end: ${end})`);
     this._split(start);
     this._split(end);
-    let chunk = this.byStart[start];
+    let chunk = this.byStart.get(start);
     while (chunk) {
       chunk.reset();
-      chunk = end > chunk.end ? this.byStart[chunk.end] : null;
+      chunk = end > chunk.end ? this.byStart.get(chunk.end) : null;
     }
     return this;
   }
@@ -8930,10 +8955,10 @@ var MagicString = class MagicString2 {
     start = start + this.offset;
     end = end + this.offset;
     if (this.original.length !== 0) {
-      while (start < 0)
-        start += this.original.length;
-      while (end < 0)
-        end += this.original.length;
+      if (start < 0)
+        start = Math.max(0, start + this.original.length);
+      if (end < 0)
+        end = Math.max(0, end + this.original.length);
     }
     let result = "";
     let chunk = this.firstChunk;
@@ -8943,14 +8968,14 @@ var MagicString = class MagicString2 {
       chunk = chunk.next;
     }
     if (chunk && chunk.edited && chunk.start !== start)
-      throw new Error(`Cannot use replaced character ${start} as slice start anchor.`);
+      throw new MagicStringError(`cannot use edited character ${start} as slice start anchor`);
     const startChunk = chunk;
     while (chunk) {
       if (chunk.intro && (startChunk !== chunk || chunk.start === start))
         result += chunk.intro;
       const containsEnd = chunk.start < end && chunk.end >= end;
       if (containsEnd && chunk.edited && chunk.end !== end)
-        throw new Error(`Cannot use replaced character ${end} as slice end anchor.`);
+        throw new MagicStringError(`cannot use edited character ${end} as slice end anchor`);
       const sliceStart = startChunk === chunk ? start - chunk.start : 0;
       const sliceEnd = containsEnd ? chunk.content.length + end - chunk.end : chunk.content.length;
       result += chunk.content.slice(sliceStart, sliceEnd);
@@ -8973,7 +8998,7 @@ var MagicString = class MagicString2 {
   }
   /** @internal */
   _split(index) {
-    if (this.byStart[index] || this.byEnd[index])
+    if (this.byStart.get(index) || this.byEnd.get(index))
       return;
     let chunk = this.lastSearchedChunk;
     let previousChunk = chunk;
@@ -8981,7 +9006,7 @@ var MagicString = class MagicString2 {
     while (chunk) {
       if (chunk.contains(index))
         return this._splitChunk(chunk, index);
-      chunk = searchForward ? this.byStart[chunk.end] : this.byEnd[chunk.start];
+      chunk = searchForward ? this.byStart.get(chunk.end) : this.byEnd.get(chunk.start);
       if (chunk === previousChunk)
         return;
       previousChunk = chunk;
@@ -8991,12 +9016,12 @@ var MagicString = class MagicString2 {
   _splitChunk(chunk, index) {
     if (chunk.edited && chunk.content.length) {
       const loc = getLocator(this.original)(index);
-      throw new Error(`Cannot split a chunk that has already been edited (${loc.line}:${loc.column} \u2013 "${chunk.original}")`);
+      throw new MagicStringError(`cannot split a chunk that has already been edited (${loc.line}:${loc.column} \u2013 "${chunk.original}")`);
     }
     const newChunk = chunk.split(index);
-    this.byEnd[index] = chunk;
-    this.byStart[index] = newChunk;
-    this.byEnd[newChunk.end] = newChunk;
+    this.byEnd.set(index, chunk);
+    this.byStart.set(index, newChunk);
+    this.byEnd.set(newChunk.end, newChunk);
     if (chunk === this.lastChunk)
       this.lastChunk = newChunk;
     this.lastSearchedChunk = chunk;
@@ -9060,9 +9085,9 @@ var MagicString = class MagicString2 {
       if (chunk.end !== end) {
         if (this.lastChunk === chunk)
           this.lastChunk = chunk.next;
-        this.byEnd[chunk.end] = chunk;
-        this.byStart[chunk.next.start] = chunk.next;
-        this.byEnd[chunk.next.end] = chunk.next;
+        this.byEnd.set(chunk.end, chunk);
+        this.byStart.set(chunk.next.start, chunk.next);
+        this.byEnd.set(chunk.next.end, chunk.next);
       }
       if (aborted)
         return true;
@@ -9090,9 +9115,9 @@ var MagicString = class MagicString2 {
       if (chunk.end !== end) {
         if (chunk === this.lastChunk)
           this.lastChunk = chunk.next;
-        this.byEnd[chunk.end] = chunk;
-        this.byStart[chunk.next.start] = chunk.next;
-        this.byEnd[chunk.next.end] = chunk.next;
+        this.byEnd.set(chunk.end, chunk);
+        this.byStart.set(chunk.next.start, chunk.next);
+        this.byEnd.set(chunk.next.end, chunk.next);
       }
       if (aborted)
         return true;
@@ -9111,7 +9136,23 @@ var MagicString = class MagicString2 {
   * Indicates if the string has been changed.
   */
   hasChanged() {
-    return this.original !== this.toString();
+    if (this.intro || this.outro)
+      return true;
+    let outputIndex = 0;
+    let chunk = this.firstChunk;
+    while (chunk) {
+      if (chunk.intro || chunk.outro)
+        return true;
+      if (!chunk.edited && chunk.start === outputIndex)
+        outputIndex = chunk.end;
+      else {
+        if (!this.original.startsWith(chunk.content, outputIndex))
+          return true;
+        outputIndex += chunk.content.length;
+      }
+      chunk = chunk.next;
+    }
+    return outputIndex !== this.original.length;
   }
   /** @internal */
   _replaceRegexp(searchValue, replacement) {
@@ -9129,31 +9170,25 @@ var MagicString = class MagicString2 {
       else
         return replacement(match[0], ...match.slice(1), match.index, str, match.groups);
     }
-    function matchAll(re, str) {
-      const matches = [];
-      while (true) {
-        const match = re.exec(str);
-        if (!match)
-          break;
-        matches.push(match);
-      }
-      return matches;
-    }
-    if (searchValue.global)
-      matchAll(searchValue, this.original).forEach((match) => {
-        if (match.index != null) {
-          const replacement2 = getReplacement(match, this.original);
-          if (replacement2 !== match[0])
-            this.overwrite(match.index, match.index + match[0].length, replacement2);
-        }
-      });
-    else {
+    const replaceMatch = (match) => {
+      if (match.index == null)
+        return;
+      const replacement2 = getReplacement(match, this.original);
+      if (replacement2 === match[0])
+        return;
+      if (match[0].length === 0)
+        this.appendRight(match.index, replacement2);
+      else
+        this.overwrite(match.index, match.index + match[0].length, replacement2);
+    };
+    if (searchValue.global) {
+      searchValue.lastIndex = 0;
+      for (const match of this.original.matchAll(searchValue))
+        replaceMatch(match);
+    } else {
       const match = this.original.match(searchValue);
-      if (match && match.index != null) {
-        const replacement2 = getReplacement(match, this.original);
-        if (replacement2 !== match[0])
-          this.overwrite(match.index, match.index + match[0].length, replacement2);
-      }
+      if (match)
+        replaceMatch(match);
     }
     return this;
   }
@@ -9165,7 +9200,10 @@ var MagicString = class MagicString2 {
       if (typeof replacement === "function")
         replacement = replacement(string, index, original);
       if (string !== replacement)
-        this.overwrite(index, index + string.length, replacement);
+        if (string.length === 0)
+          this.appendRight(index, replacement);
+        else
+          this.overwrite(index, index + string.length, replacement);
     }
     return this;
   }
@@ -9181,6 +9219,14 @@ var MagicString = class MagicString2 {
   _replaceAllString(string, replacement) {
     const { original } = this;
     const stringLength = string.length;
+    if (stringLength === 0) {
+      for (let index = 0; index <= original.length; index += 1) {
+        const _replacement = typeof replacement === "function" ? replacement("", index, original) : replacement;
+        if (_replacement !== "")
+          this.appendRight(index, _replacement);
+      }
+      return this;
+    }
     for (let index = original.indexOf(string); index !== -1; index = original.indexOf(string, index + stringLength)) {
       const previous = original.slice(index, index + stringLength);
       const _replacement = typeof replacement === "function" ? replacement(previous, index, original) : replacement;
@@ -9196,7 +9242,7 @@ var MagicString = class MagicString2 {
     if (typeof searchValue === "string")
       return this._replaceAllString(searchValue, replacement);
     if (!searchValue.global)
-      throw new TypeError("MagicString.prototype.replaceAll called with a non-global RegExp argument");
+      throw new MagicStringError("replaceAll() requires a global RegExp");
     return this._replaceRegexp(searchValue, replacement);
   }
 };
@@ -10970,8 +11016,9 @@ var TemplateTypeCheckerImpl = class {
     const fileRecord = this.state.get(sfPath);
     const id = fileRecord.sourceManager.getTypeCheckId(clazz);
     const mapping = fileRecord.sourceManager.getTemplateSourceMapping(id);
+    const span = sourceSpan instanceof ParseSourceSpan4 ? sourceSpan : fileRecord.sourceManager.toTemplateParseSourceSpan(id, sourceSpan);
     return {
-      ...makeTemplateDiagnostic(id, mapping, sourceSpan, category, ngErrorCode(errorCode), message, relatedInformation),
+      ...makeTemplateDiagnostic(id, mapping, span, category, ngErrorCode(errorCode), message, relatedInformation),
       __ngCode: errorCode
     };
   }
@@ -12159,27 +12206,36 @@ function validateAndFlattenComponentImports(imports, expr, isDeferred) {
   const flattened = [];
   const diagnostics = [];
   let importsByBlock = null;
-  const errorMessage = isDeferred ? `'deferredImports' must be an array of components, directives, or pipes, or an object mapping block names to dependency arrays.` : `'imports' must be an array of components, directives, pipes, or NgModules.`;
-  if (isDeferred && imports instanceof Map) {
-    importsByBlock = /* @__PURE__ */ new Map();
-    for (const [blockName, blockValue] of imports.entries()) {
-      let propExpr = expr;
-      if (ts38.isObjectLiteralExpression(expr)) {
-        const prop = expr.properties.find((p) => ts38.isPropertyAssignment(p) && (ts38.isIdentifier(p.name) || ts38.isStringLiteral(p.name)) && p.name.text === blockName);
-        if (prop && ts38.isPropertyAssignment(prop)) {
-          propExpr = prop.initializer;
+  const errorMessage = isDeferred ? `'deferredImports' must be an object mapping block names to dependency arrays.` : `'imports' must be an array of components, directives, pipes, or NgModules.`;
+  if (isDeferred) {
+    if (imports instanceof Map) {
+      importsByBlock = /* @__PURE__ */ new Map();
+      for (const [blockName, blockValue] of imports.entries()) {
+        let propExpr = expr;
+        if (ts38.isObjectLiteralExpression(expr)) {
+          const prop = expr.properties.find((p) => ts38.isPropertyAssignment(p) && (ts38.isIdentifier(p.name) || ts38.isStringLiteral(p.name)) && p.name.text === blockName);
+          if (prop && ts38.isPropertyAssignment(prop)) {
+            propExpr = prop.initializer;
+          }
         }
-      }
-      const { imports: blockImports, diagnostics: blockDiagnostics } = validateAndFlattenComponentImports(blockValue, propExpr, isDeferred);
-      diagnostics.push(...blockDiagnostics);
-      for (const blockImport of blockImports) {
-        if (!flattened.some((existing) => existing.node === blockImport.node)) {
-          flattened.push(blockImport);
+        const { imports: blockImports, diagnostics: blockDiagnostics } = validateAndFlattenComponentImports(blockValue, propExpr, false);
+        diagnostics.push(...blockDiagnostics);
+        for (const blockImport of blockImports) {
+          if (!flattened.some((existing) => existing.node === blockImport.node)) {
+            flattened.push(blockImport);
+          }
         }
+        importsByBlock.set(blockName, blockImports);
       }
-      importsByBlock.set(blockName, blockImports);
+      return { imports: flattened, importsByBlock, diagnostics };
+    } else {
+      const error = createValueHasWrongTypeError(expr, imports, errorMessage).toDiagnostic();
+      return {
+        imports: [],
+        importsByBlock: null,
+        diagnostics: [error]
+      };
     }
-    return { imports: flattened, importsByBlock, diagnostics };
   }
   if (!Array.isArray(imports)) {
     const error = createValueHasWrongTypeError(expr, imports, errorMessage).toDiagnostic();
@@ -12770,9 +12826,7 @@ var ComponentDecoratorHandler = class {
     let explicitlyDeferredTypes = null;
     let explicitlyDeferredTypesByBlock = null;
     if (metadata.isStandalone && rawDeferredImports !== null) {
-      if (ts39.isArrayLiteralExpression(rawDeferredImports)) {
-        explicitlyDeferredTypes = this.collectExplicitlyDeferredSymbols(node, rawDeferredImports);
-      } else if (ts39.isObjectLiteralExpression(rawDeferredImports)) {
+      if (ts39.isObjectLiteralExpression(rawDeferredImports)) {
         explicitlyDeferredTypesByBlock = /* @__PURE__ */ new Map();
         for (const property of rawDeferredImports.properties) {
           if (!ts39.isPropertyAssignment(property)) {
@@ -13021,7 +13075,7 @@ var ComponentDecoratorHandler = class {
         for (const [block] of deferBlocks) {
           const blockName = block.definedName;
           if (blockName === null) {
-            diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_MISSING_NAME_PARAMETER, analysis.rawDeferredImports, `@defer block must specify a 'name' parameter (e.g. '@defer (name blockName)') when 'deferredImports' is defined as an object.`));
+            diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_MISSING_NAME_PARAMETER, analysis.rawDeferredImports, `@defer block must specify a 'name' parameter (e.g. '@defer (name blockName)') when 'deferredImports' is defined.`));
             continue;
           }
           const depsForBlock = analysis.explicitlyDeferredTypesByBlock.get(blockName);
@@ -13044,7 +13098,7 @@ var ComponentDecoratorHandler = class {
       } else {
         for (const [block] of deferBlocks) {
           if (block.definedName !== null) {
-            diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_INVALID_NAME_PARAMETER, analysis.rawDeferredImports ?? node, `The 'name' parameter can only be used when '@Component.deferredImports' is defined as an object.`));
+            diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_INVALID_NAME_PARAMETER, analysis.rawDeferredImports ?? node, `The 'name' parameter can only be used when '@Component.deferredImports' is defined.`));
           }
         }
       }
@@ -13623,7 +13677,7 @@ var ComponentDecoratorHandler = class {
       const blockName = deferBlock.definedName;
       if (hasBlockSpecificImports) {
         if (blockName === null) {
-          diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_MISSING_NAME_PARAMETER, analysisData.rawDeferredImports, `@defer block must specify a 'name' parameter (e.g. '@defer (name blockName)') when 'deferredImports' is defined as an object.`));
+          diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_MISSING_NAME_PARAMETER, analysisData.rawDeferredImports, `@defer block must specify a 'name' parameter (e.g. '@defer (name blockName)') when 'deferredImports' is defined.`));
           continue;
         }
         const blockImports = analysisData.resolvedDeferredImportsByBlock.get(blockName);
@@ -13657,7 +13711,7 @@ var ComponentDecoratorHandler = class {
         }
       } else {
         if (blockName !== null) {
-          diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_INVALID_NAME_PARAMETER, analysisData.rawDeferredImports ?? componentClassDecl, `The 'name' parameter can only be used when '@Component.deferredImports' is defined as an object.`));
+          diagnostics.push(makeDiagnostic(ErrorCode.DEFER_BLOCK_INVALID_NAME_PARAMETER, analysisData.rawDeferredImports ?? componentClassDecl, `The 'name' parameter can only be used when '@Component.deferredImports' is defined.`));
           continue;
         }
         for (const decl of Array.from(deferrableDecls.values())) {
@@ -14612,4 +14666,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-XEYCURR7.js.map
+//# sourceMappingURL=chunk-WDTMLJ2N.js.map

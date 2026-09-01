@@ -55,7 +55,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-XEYCURR7.js";
+} from "./chunk-WDTMLJ2N.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -103,7 +103,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-OQIWBETM.js";
+} from "./chunk-D7JM7X7X.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -3131,10 +3131,10 @@ function isSignalInstanceProperty(name) {
 }
 function buildDiagnosticForSignal(ctx, node, component) {
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
-  if (symbol !== null && symbol.kind === SymbolKind.Expression && isSignalReference(symbol, ctx.templateTypeChecker)) {
-    const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation);
+  if (symbol !== null && (symbol.kind === SymbolKind.Expression || symbol.kind === SymbolKind.LetDeclaration || symbol.kind === SymbolKind.Variable) && isSignalReference(symbol, ctx.templateTypeChecker)) {
+    const span = symbol.kind === SymbolKind.Expression ? ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbol.tcbLocation).span : node.nameSpan;
     const errorString = formatExtendedError(ErrorCode.INTERPOLATED_SIGNAL_NOT_INVOKED, `${node.name} is a function and should be invoked: ${node.name}()}`);
-    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
+    const diagnostic = ctx.makeTemplateDiagnostic(span, errorString);
     return [diagnostic];
   }
   if (!isFunctionInstanceProperty(node.name) && !isSignalInstanceProperty(node.name)) {
@@ -3144,10 +3144,10 @@ function buildDiagnosticForSignal(ctx, node, component) {
     return [];
   }
   const symbolOfReceiver = ctx.templateTypeChecker.getSymbolOfNode(node.receiver, component);
-  if (symbolOfReceiver !== null && symbolOfReceiver.kind === SymbolKind.Expression && isSignalReference(symbolOfReceiver, ctx.templateTypeChecker)) {
-    const templateMapping = ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbolOfReceiver.tcbLocation);
+  if (symbolOfReceiver !== null && (symbolOfReceiver.kind === SymbolKind.Expression || symbolOfReceiver.kind === SymbolKind.LetDeclaration || symbolOfReceiver.kind === SymbolKind.Variable) && isSignalReference(symbolOfReceiver, ctx.templateTypeChecker)) {
+    const span = symbolOfReceiver.kind === SymbolKind.Expression ? ctx.templateTypeChecker.getSourceMappingAtTcbLocation(symbolOfReceiver.tcbLocation).span : node.receiver.nameSpan;
     const errorString = formatExtendedError(ErrorCode.INTERPOLATED_SIGNAL_NOT_INVOKED, `${node.receiver.name} is a function and should be invoked: ${node.receiver.name}()`);
-    const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, errorString);
+    const diagnostic = ctx.makeTemplateDiagnostic(span, errorString);
     return [diagnostic];
   }
   return [];
@@ -5682,4 +5682,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-HRRMGT6Y.js.map
+//# sourceMappingURL=chunk-GQISOJWH.js.map
