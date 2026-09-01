@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, BoundTarget, ForeignComponentMeta, LiteralPrimitive, ParseSourceSpan, PropertyRead, ReferenceTarget, SafePropertyRead, TemplateEntity, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstHostElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TypeCheckingConfig } from '@angular/compiler';
+import { AbsoluteSourceSpan, AST, BoundTarget, ForeignComponentMeta, LiteralPrimitive, ParseSourceSpan, PropertyRead, ReferenceTarget, SafePropertyRead, TemplateEntity, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstHostElement, TmplAstNode, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TypeCheckingConfig } from '@angular/compiler';
 import ts from 'typescript';
 import { ErrorCode } from '../../diagnostics';
 import { AbsoluteFsPath } from '../../file_system';
@@ -19,7 +19,7 @@ import { ComponentScopeReader, TypeCheckScopeRegistry } from '../../scope';
 import { BindingSymbol, ClassSymbol, ElementSymbol, FullSourceMapping, GetPotentialAngularMetaOptions, GlobalCompletion, NgTemplateDiagnostic, OptimizeFor, PotentialDirective, PotentialDirectiveModuleSpecifierResolver, PotentialImport, PotentialImportMode, PotentialPipe, ProgramTypeCheckAdapter, SelectorlessComponentSymbol, SelectorlessDirectiveSymbol, Symbol, SymbolReference, TcbLocation, TemplateSymbol, TemplateTypeChecker, TsCompletionEntryInfo, TypeCheckableDirectiveMeta } from '../api';
 import { ShimTypeCheckingData } from './context';
 import { DirectiveSourceManager } from './source';
-import { SymbolDirectiveMeta, SymbolBoundTarget } from './template_symbol_builder';
+import { SymbolBoundTarget, SymbolDirectiveMeta } from './template_symbol_builder';
 export declare class TypeCheckableDirectiveMetaAdapter implements SymbolDirectiveMeta {
     private meta;
     private componentScopeReader;
@@ -133,7 +133,7 @@ export declare class TemplateTypeCheckerImpl implements TemplateTypeChecker {
     getLiteralCompletionLocation(node: LiteralPrimitive | TmplAstTextAttribute, component: ts.ClassDeclaration): TcbLocation | null;
     invalidateClass(clazz: ts.ClassDeclaration): void;
     getExpressionTarget(expression: AST, clazz: ts.ClassDeclaration): TemplateEntity | null;
-    makeTemplateDiagnostic<T extends ErrorCode>(clazz: ts.ClassDeclaration, sourceSpan: ParseSourceSpan, category: ts.DiagnosticCategory, errorCode: T, message: string, relatedInformation?: {
+    makeTemplateDiagnostic<T extends ErrorCode>(clazz: ts.ClassDeclaration, sourceSpan: ParseSourceSpan | AbsoluteSourceSpan, category: ts.DiagnosticCategory, errorCode: T, message: string, relatedInformation?: {
         text: string;
         start: number;
         end: number;

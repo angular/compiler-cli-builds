@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-UMFPUGY4.js";
+} from "./chunk-NPM4D5UO.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -7779,7 +7779,7 @@ var HmrModuleImportRewriter = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/checker.js
-import { CssSelector as CssSelector2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr7, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
+import { CssSelector as CssSelector2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr7, ParseSourceSpan as ParseSourceSpan4, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
 import ts36 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/completion.js
@@ -10788,8 +10788,9 @@ var TemplateTypeCheckerImpl = class {
     const fileRecord = this.state.get(sfPath);
     const id = fileRecord.sourceManager.getTypeCheckId(clazz);
     const mapping = fileRecord.sourceManager.getTemplateSourceMapping(id);
+    const span = sourceSpan instanceof ParseSourceSpan4 ? sourceSpan : fileRecord.sourceManager.toTemplateParseSourceSpan(id, sourceSpan);
     return {
-      ...makeTemplateDiagnostic(id, mapping, sourceSpan, category, ngErrorCode(errorCode), message, relatedInformation),
+      ...makeTemplateDiagnostic(id, mapping, span, category, ngErrorCode(errorCode), message, relatedInformation),
       __ngCode: errorCode
     };
   }
@@ -14271,4 +14272,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-3L2D2K46.js.map
+//# sourceMappingURL=chunk-VBASOQS5.js.map
