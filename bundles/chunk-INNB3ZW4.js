@@ -12970,6 +12970,7 @@ var ComponentDecoratorHandler = class {
     if (analysis.isPoisoned && !this.usePoisonedData) {
       return null;
     }
+    const typeCheckScope = this.typeCheckScopeRegistry.getTypeCheckScope(new Reference(node));
     const scope = this.scopeReader.getScopeForComponent(node);
     const selector = analysis.meta.selector;
     let matcher = null;
@@ -13007,6 +13008,10 @@ var ComponentDecoratorHandler = class {
       },
       getTemplateAst() {
         return boundTemplate.target.template;
+      },
+      getPipe(name) {
+        const pipe = typeCheckScope.pipes.get(name);
+        return pipe ? { ref: { node: pipe.ref.node } } : null;
       }
     };
     context.addComponent({
@@ -14666,4 +14671,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WDTMLJ2N.js.map
+//# sourceMappingURL=chunk-INNB3ZW4.js.map

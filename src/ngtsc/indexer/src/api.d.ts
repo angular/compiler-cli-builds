@@ -22,7 +22,8 @@ export declare enum IdentifierKind {
     Component = 8,
     Directive = 9,
     Input = 10,
-    Output = 11
+    Output = 11,
+    Pipe = 12
 }
 /**
  * Describes a semantically-interesting identifier in a template, such as an interpolated variable
@@ -117,11 +118,18 @@ export interface BoundAttributeIdentifier<T = DeclarationNode> extends TemplateI
         node: T;
     } | null;
 }
+/** Describes a pipe used in a template expression. */
+export interface PipeIdentifier<T = DeclarationNode> extends TemplateIdentifier {
+    kind: IdentifierKind.Pipe;
+    target: {
+        node: T;
+    } | null;
+}
 /**
  * Identifiers recorded at the top level of the template, without any context about the HTML nodes
  * they were discovered in.
  */
-export type TopLevelIdentifier<T = DeclarationNode> = PropertyIdentifier<T> | ElementIdentifier<T> | TemplateNodeIdentifier<T> | ReferenceIdentifier<T> | VariableIdentifier | MethodIdentifier<T> | LetDeclarationIdentifier | ComponentNodeIdentifier<T> | DirectiveNodeIdentifier<T> | BoundAttributeIdentifier<T>;
+export type TopLevelIdentifier<T = DeclarationNode> = PropertyIdentifier<T> | ElementIdentifier<T> | TemplateNodeIdentifier<T> | ReferenceIdentifier<T> | VariableIdentifier | MethodIdentifier<T> | LetDeclarationIdentifier | ComponentNodeIdentifier<T> | DirectiveNodeIdentifier<T> | BoundAttributeIdentifier<T> | PipeIdentifier<T>;
 /** Identifiers that can bring in directives to the template. */
 export type DirectiveHostIdentifier<T = DeclarationNode> = ElementIdentifier<T> | TemplateNodeIdentifier<T> | ComponentNodeIdentifier<T> | DirectiveNodeIdentifier<T>;
 /**
@@ -177,6 +185,11 @@ export interface AbstractBoundTemplate<T> {
         isComponent: boolean;
     }>;
     getTemplateAst(): TmplAstNode[] | undefined;
+    getPipe(name: string): {
+        ref: {
+            node: T;
+        };
+    } | null;
 }
 /**
  * Adapter to extract information from a node, such as its name and file name.

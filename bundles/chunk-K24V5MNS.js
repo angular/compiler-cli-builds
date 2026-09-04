@@ -5,7 +5,7 @@
 import {
   AbsoluteSourceSpan,
   IdentifierKind
-} from "./chunk-PZ7UX6JN.js";
+} from "./chunk-G65IA3BS.js";
 import {
   ActivePerfRecorder,
   CompilationMode,
@@ -55,7 +55,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-WDTMLJ2N.js";
+} from "./chunk-INNB3ZW4.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -2271,6 +2271,31 @@ var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
   visitPropertyRead(ast) {
     this.visitIdentifier(ast, IdentifierKind.Property);
     super.visitPropertyRead(ast, null);
+  }
+  visitPipe(ast) {
+    this.visitPipeIdentifier(ast);
+    super.visitPipe(ast, null);
+  }
+  visitPipeIdentifier(ast) {
+    if (this.currentAstWithSource === null || this.currentAstWithSource.source === null) {
+      return;
+    }
+    const { absoluteOffset, source: expressionStr } = this.currentAstWithSource;
+    const identifierStart = ast.nameSpan.start - absoluteOffset;
+    if (!expressionStr.startsWith(ast.name, identifierStart)) {
+      this.errors.push(new Error(`Impossible state: "${ast.name}" not found in "${expressionStr}" at location ${identifierStart}`));
+      return;
+    }
+    const absoluteStart = absoluteOffset + identifierStart;
+    const span = new AbsoluteSourceSpan(absoluteStart, absoluteStart + ast.name.length);
+    const target = this.boundTemplate.getPipe(ast.name);
+    const identifier = {
+      name: ast.name,
+      span,
+      kind: IdentifierKind.Pipe,
+      target: target ? { node: target.ref.node } : null
+    };
+    this.identifiers.add(identifier);
   }
   visitBoundAttribute(attribute) {
     const identifier = this.bindingToIdentifier(attribute, IdentifierKind.Input);
@@ -5682,4 +5707,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-GQISOJWH.js.map
+//# sourceMappingURL=chunk-K24V5MNS.js.map

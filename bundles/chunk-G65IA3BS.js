@@ -18,6 +18,7 @@ var IdentifierKind;
   IdentifierKind2[IdentifierKind2["Directive"] = 9] = "Directive";
   IdentifierKind2[IdentifierKind2["Input"] = 10] = "Input";
   IdentifierKind2[IdentifierKind2["Output"] = 11] = "Output";
+  IdentifierKind2[IdentifierKind2["Pipe"] = 12] = "Pipe";
 })(IdentifierKind || (IdentifierKind = {}));
 var AbsoluteSourceSpan = class {
   start;
@@ -39,4 +40,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PZ7UX6JN.js.map
+//# sourceMappingURL=chunk-G65IA3BS.js.map
