@@ -71,3 +71,9 @@ export declare abstract class TemplateCheckWithVisitor<Code extends ErrorCode> i
      */
     abstract visitNode(ctx: TemplateContext<Code>, component: ts.ClassDeclaration, node: TmplAstNode | AST): NgTemplateDiagnostic<Code>[];
 }
+/**
+ * Checks if the given AST node originates from a KeyedRead (indexed access)
+ * by unwrapping parentheses, non-null assertions, and traversing the receivers
+ * of safe navigation operations (?. property access, ?.[] keyed access, ?.() calls).
+ */
+export declare function isAccessFromUncheckedIndex(node: AST): boolean;

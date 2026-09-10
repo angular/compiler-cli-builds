@@ -2970,7 +2970,7 @@ var StandaloneComponentScopeReader = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
-import { ASTWithSource as ASTWithSource2, BindingType, Conditional, Interpolation, NonNullAssert, ParenthesizedExpression, PrefixNot, PropertyRead as PropertyRead2, TmplAstBoundAttribute, TmplAstElement as TmplAstElement2, TmplAstIfBlock, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource2, BindingType, Conditional, Interpolation, NonNullAssert as NonNullAssert2, ParenthesizedExpression as ParenthesizedExpression2, PrefixNot, PropertyRead as PropertyRead2, TmplAstBoundAttribute, TmplAstElement as TmplAstElement2, TmplAstIfBlock, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/symbol_util.js
 import ts19 from "typescript";
@@ -3005,7 +3005,7 @@ function isSignalSymbol(symbol) {
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/api/api.js
-import { CombinedRecursiveAstVisitor as CombinedRecursiveAstVisitor2 } from "@angular/compiler";
+import { CombinedRecursiveAstVisitor as CombinedRecursiveAstVisitor2, KeyedRead, SafePropertyRead, SafeKeyedRead, SafeCall, ParenthesizedExpression, NonNullAssert } from "@angular/compiler";
 var TemplateCheckWithVisitor = class {
   /**
    * Base implementation for run function, visits all nodes in template and calls
@@ -3050,6 +3050,16 @@ var TemplateVisitor2 = class extends CombinedRecursiveAstVisitor2 {
     return this.diagnostics;
   }
 };
+function isAccessFromUncheckedIndex(node) {
+  if (node instanceof KeyedRead) {
+    return true;
+  } else if (node instanceof SafePropertyRead || node instanceof SafeKeyedRead || node instanceof SafeCall) {
+    return isAccessFromUncheckedIndex(node.receiver);
+  } else if (node instanceof ParenthesizedExpression || node instanceof NonNullAssert) {
+    return isAccessFromUncheckedIndex(node.expression);
+  }
+  return false;
+}
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/api/format-extended-error.js
 import { VERSION } from "@angular/compiler";
@@ -3140,10 +3150,10 @@ function getPropertyReads(ast) {
       ...getPropertyReads(ast.falseExp)
     ];
   }
-  if (ast instanceof ParenthesizedExpression) {
+  if (ast instanceof ParenthesizedExpression2) {
     return getPropertyReads(ast.expression);
   }
-  if (ast instanceof NonNullAssert) {
+  if (ast instanceof NonNullAssert2) {
     return getPropertyReads(ast.expression);
   }
   return [];
@@ -3323,10 +3333,18 @@ var factory5 = {
 import { Binary } from "@angular/compiler";
 import ts20 from "typescript";
 var NullishCoalescingNotNullableCheck = class extends TemplateCheckWithVisitor {
+  noUncheckedIndexedAccess;
   code = ErrorCode.NULLISH_COALESCING_NOT_NULLABLE;
+  constructor(noUncheckedIndexedAccess) {
+    super();
+    this.noUncheckedIndexedAccess = noUncheckedIndexedAccess;
+  }
   visitNode(ctx, component, node) {
     if (!(node instanceof Binary) || node.operation !== "??")
       return [];
+    if (!this.noUncheckedIndexedAccess && isAccessFromUncheckedIndex(node.left)) {
+      return [];
+    }
     const symbolLeft = ctx.templateTypeChecker.getSymbolOfNode(node.left, component);
     if (symbolLeft === null || symbolLeft.kind !== SymbolKind.Expression) {
       return [];
@@ -3357,12 +3375,13 @@ var factory6 = {
     if (!strictNullChecks) {
       return null;
     }
-    return new NullishCoalescingNotNullableCheck();
+    const noUncheckedIndexedAccess = !!options.noUncheckedIndexedAccess;
+    return new NullishCoalescingNotNullableCheck(noUncheckedIndexedAccess);
   }
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/optional_chain_not_nullable/index.js
-import { KeyedRead, SafeCall, SafeKeyedRead, SafePropertyRead } from "@angular/compiler";
+import { SafeCall as SafeCall2, SafeKeyedRead as SafeKeyedRead2, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
 import ts21 from "typescript";
 var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
   noUncheckedIndexedAccess;
@@ -3372,10 +3391,10 @@ var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
     this.noUncheckedIndexedAccess = noUncheckedIndexedAccess;
   }
   visitNode(ctx, component, node) {
-    if (!(node instanceof SafeCall) && !(node instanceof SafePropertyRead) && !(node instanceof SafeKeyedRead)) {
+    if (!(node instanceof SafeCall2) && !(node instanceof SafePropertyRead2) && !(node instanceof SafeKeyedRead2)) {
       return [];
     }
-    if (node.receiver instanceof KeyedRead && !this.noUncheckedIndexedAccess) {
+    if (!this.noUncheckedIndexedAccess && isAccessFromUncheckedIndex(node.receiver)) {
       return [];
     }
     const symbolLeft = ctx.templateTypeChecker.getSymbolOfNode(node.receiver, component);
@@ -3396,7 +3415,7 @@ var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
     if (templateMapping === null) {
       return [];
     }
-    const advice = node instanceof SafePropertyRead ? `the '?.' operator can be replaced with the '.' operator` : `the '?.' operator can be safely removed`;
+    const advice = node instanceof SafePropertyRead2 ? `the '?.' operator can be replaced with the '.' operator` : `the '?.' operator can be safely removed`;
     const diagnostic = ctx.makeTemplateDiagnostic(templateMapping.span, formatExtendedError(ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE, `The left side of this optional chain operation does not include 'null' or 'undefined' in its type, therefore ${advice}`));
     return [diagnostic];
   }
@@ -3507,7 +3526,7 @@ var factory10 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.js
-import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional as Conditional2, ParsedEventType, PropertyRead as PropertyRead3, ArrowFunction, SafeCall as SafeCall2, SafePropertyRead as SafePropertyRead2, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional as Conditional2, ParsedEventType, PropertyRead as PropertyRead3, ArrowFunction, SafeCall as SafeCall3, SafePropertyRead as SafePropertyRead3, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
 var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING;
   visitNode(ctx, component, node) {
@@ -3529,14 +3548,14 @@ var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor
   }
 };
 function assertExpressionInvoked(expression, component, node, expressionText, ctx) {
-  if (expression instanceof Call || expression instanceof SafeCall2) {
+  if (expression instanceof Call || expression instanceof SafeCall3) {
     return [];
   }
   if (expression instanceof ArrowFunction) {
     const errorString = "Arrow function will not be invoked in this event listener. Did you intend to call a method?";
     return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
   }
-  if (!(expression instanceof PropertyRead3) && !(expression instanceof SafePropertyRead2)) {
+  if (!(expression instanceof PropertyRead3) && !(expression instanceof SafePropertyRead3)) {
     return [];
   }
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
@@ -3632,7 +3651,7 @@ var factory13 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_track_function/index.js
-import { Call as Call2, PropertyRead as PropertyRead4, SafeCall as SafeCall3, SafePropertyRead as SafePropertyRead3, TmplAstForLoopBlock } from "@angular/compiler";
+import { Call as Call2, PropertyRead as PropertyRead4, SafeCall as SafeCall4, SafePropertyRead as SafePropertyRead4, TmplAstForLoopBlock } from "@angular/compiler";
 import ts22 from "typescript";
 var UninvokedTrackFunctionCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_TRACK_FUNCTION;
@@ -3640,10 +3659,10 @@ var UninvokedTrackFunctionCheck = class extends TemplateCheckWithVisitor {
     if (!(node instanceof TmplAstForLoopBlock) || !node.trackBy) {
       return [];
     }
-    if (node.trackBy.ast instanceof Call2 || node.trackBy.ast instanceof SafeCall3) {
+    if (node.trackBy.ast instanceof Call2 || node.trackBy.ast instanceof SafeCall4) {
       return [];
     }
-    if (!(node.trackBy.ast instanceof PropertyRead4) && !(node.trackBy.ast instanceof SafePropertyRead3)) {
+    if (!(node.trackBy.ast instanceof PropertyRead4) && !(node.trackBy.ast instanceof SafePropertyRead4)) {
       return [];
     }
     const symbol = ctx.templateTypeChecker.getSymbolOfNode(node.trackBy.ast, component);
@@ -3690,7 +3709,7 @@ var factory14 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_text_interpolation/index.js
-import { Interpolation as Interpolation2, PropertyRead as PropertyRead5, SafePropertyRead as SafePropertyRead4 } from "@angular/compiler";
+import { Interpolation as Interpolation2, PropertyRead as PropertyRead5, SafePropertyRead as SafePropertyRead5 } from "@angular/compiler";
 var UninvokedFunctionInTextInterpolation = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION;
   visitNode(ctx, component, node) {
@@ -3701,7 +3720,7 @@ var UninvokedFunctionInTextInterpolation = class extends TemplateCheckWithVisito
   }
 };
 function assertExpressionInvoked2(expression, component, ctx) {
-  if (!(expression instanceof PropertyRead5) && !(expression instanceof SafePropertyRead4)) {
+  if (!(expression instanceof PropertyRead5) && !(expression instanceof SafePropertyRead5)) {
     return [];
   }
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
@@ -5730,4 +5749,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FTEOPPWA.js.map
+//# sourceMappingURL=chunk-242DJIGT.js.map
