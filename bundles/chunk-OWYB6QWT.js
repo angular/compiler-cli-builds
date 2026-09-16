@@ -113,6 +113,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["FOREIGN_COMPONENT_CONTENT_UNNECESSARY_FOR_CHILDREN"] = 8027] = "FOREIGN_COMPONENT_CONTENT_UNNECESSARY_FOR_CHILDREN";
   ErrorCode2[ErrorCode2["CONFLICTING_CONTENT_DECLARATION"] = 8028] = "CONFLICTING_CONTENT_DECLARATION";
   ErrorCode2[ErrorCode2["CONFLICTING_CONTENT_AND_PROPERTY"] = 8029] = "CONFLICTING_CONTENT_AND_PROPERTY";
+  ErrorCode2[ErrorCode2["UNCLAIMED_EVENT_BINDING"] = 8030] = "UNCLAIMED_EVENT_BINDING";
   ErrorCode2[ErrorCode2["INVALID_BANANA_IN_BOX"] = 8101] = "INVALID_BANANA_IN_BOX";
   ErrorCode2[ErrorCode2["NULLISH_COALESCING_NOT_NULLABLE"] = 8102] = "NULLISH_COALESCING_NOT_NULLABLE";
   ErrorCode2[ErrorCode2["MISSING_CONTROL_FLOW_DIRECTIVE"] = 8103] = "MISSING_CONTROL_FLOW_DIRECTIVE";
@@ -147,7 +148,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.7+sha-5cdae0a";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.0-next.7+sha-312e1d8";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5463,7 +5464,7 @@ var SymbolKind;
 })(SymbolKind || (SymbolKind = {}));
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/dom.js
-import { DomElementSchemaRegistry } from "@angular/compiler";
+import { CUSTOM_ELEMENTS_SCHEMA, DomElementSchemaRegistry, NO_ERRORS_SCHEMA } from "@angular/compiler";
 import ts27 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.js
@@ -5629,6 +5630,7 @@ function getTypeCheckId(clazz) {
 // packages/compiler-cli/src/ngtsc/typecheck/src/dom.js
 var REGISTRY = new DomElementSchemaRegistry();
 var REMOVE_XHTML_REGEX = /^:xhtml:/;
+var UNCLAIMED_EVENT_CANDIDATE_REGEX = /^[a-zA-Z][a-zA-Z0-9$_]*$/;
 var RegistryDomSchemaChecker = class {
   resolver;
   _diagnostics = [];
@@ -5682,6 +5684,24 @@ var RegistryDomSchemaChecker = class {
       const diag = makeTemplateDiagnostic(id, mapping, span, ts27.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
       this._diagnostics.push(diag);
     }
+  }
+  checkTemplateElementEvent(id, tagName, eventName, span, schemas, hasComponent) {
+    if (!UNCLAIMED_EVENT_CANDIDATE_REGEX.test(eventName) || !/[A-Z]/.test(eventName)) {
+      return;
+    }
+    if (REGISTRY.isKnownEventOfAnyElement(eventName)) {
+      return;
+    }
+    if (schemas.some((schema) => schema.name === NO_ERRORS_SCHEMA.name || schema.name === CUSTOM_ELEMENTS_SCHEMA.name && !hasComponent)) {
+      return;
+    }
+    const errorMsg = `Event '${eventName}' is not emitted by any directive applied to '${tagName}' and it isn't a known native DOM event.
+1. If '${eventName}' is an output of a directive, make sure the directive is applied to the element and check the output's name for typos.
+2. If you're listening to a custom event dispatched by a descendant element, dash-separated event names (e.g. 'my-event') are exempt from this check.
+3. To disable this check entirely, set 'strictUnclaimedEventNames' to false or remove it from the compiler options.`;
+    const mapping = this.resolver.getTemplateSourceMapping(id);
+    const diag = makeTemplateDiagnostic(id, mapping, span, ts27.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_EVENT_BINDING), errorMsg);
+    this._diagnostics.push(diag);
   }
   checkHostElementProperty(id, element, name, span, schemas) {
     const report = REGISTRY.validateProperty(name);
@@ -6858,4 +6878,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-D7JM7X7X.js.map
+//# sourceMappingURL=chunk-OWYB6QWT.js.map

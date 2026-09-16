@@ -55,7 +55,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-INNB3ZW4.js";
+} from "./chunk-PMQIYRDJ.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -103,7 +103,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-D7JM7X7X.js";
+} from "./chunk-OWYB6QWT.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5058,6 +5058,12 @@ var NgCompiler = class _NgCompiler {
         // - error TS2531: Object is possibly 'null'.
         // - error TS2339: Property 'value' does not exist on type 'EventTarget'.
         checkTypeOfDomEvents: strictTemplates,
+        // The unclaimed event name check is heuristic (it can't account for custom events
+        // bubbling up from descendants), so enabling it by default would be breaking and it
+        // requires an explicit opt-in through `strictUnclaimedEventNames`.
+        // TODO: add the g3 sync marker here (`checkUnclaimedEventNames: strictTemplates`)
+        // once google3 has been cleaned up.
+        checkUnclaimedEventNames: false,
         checkTypeOfDomReferences: strictTemplates,
         // Non-DOM references have the correct type in View Engine so there is no strictness flag.
         checkTypeOfNonDomReferences: true,
@@ -5090,6 +5096,7 @@ var NgCompiler = class _NgCompiler {
         checkTypeOfOutputEvents: false,
         checkTypeOfAnimationEvents: false,
         checkTypeOfDomEvents: false,
+        checkUnclaimedEventNames: false,
         checkTypeOfDomReferences: false,
         checkTypeOfNonDomReferences: false,
         checkTypeOfPipes: false,
@@ -5120,6 +5127,9 @@ var NgCompiler = class _NgCompiler {
     }
     if (this.options.strictDomEventTypes !== void 0) {
       typeCheckingConfig.checkTypeOfDomEvents = this.options.strictDomEventTypes;
+    }
+    if (this.options.strictUnclaimedEventNames !== void 0) {
+      typeCheckingConfig.checkUnclaimedEventNames = this.options.strictUnclaimedEventNames;
     }
     if (this.options.strictSafeNavigationTypes !== void 0) {
       typeCheckingConfig.strictSafeNavigationTypes = this.options.strictSafeNavigationTypes;
@@ -5749,4 +5759,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-242DJIGT.js.map
+//# sourceMappingURL=chunk-7TNDZX5K.js.map

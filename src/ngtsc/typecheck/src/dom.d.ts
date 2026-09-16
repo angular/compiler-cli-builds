@@ -20,5 +20,6 @@ export declare class RegistryDomSchemaChecker implements DomSchemaChecker<Templa
     constructor(resolver: TypeCheckSourceResolver);
     checkElement(id: TypeCheckId, tagName: string, sourceSpanForDiagnostics: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
     checkTemplateElementProperty(id: TypeCheckId, tagName: string, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[], hostIsStandalone: boolean): void;
+    checkTemplateElementEvent(id: TypeCheckId, tagName: string, eventName: string, span: ParseSourceSpan, schemas: SchemaMetadata[], hasComponent: boolean): void;
     checkHostElementProperty(id: TypeCheckId, element: TmplAstHostElement, name: string, span: ParseSourceSpan, schemas: SchemaMetadata[]): void;
 }
