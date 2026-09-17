@@ -8,13 +8,13 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-HCU2E32S.js";
+} from "../../chunk-UHTQAPWI.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "../../chunk-SEJGUMO2.js";
 import "../../chunk-Y5V7YWTG.js";
-import "../../chunk-ZUYMYKXC.js";
+import "../../chunk-OKAJ6PPK.js";
 import {
   NodeJSFileSystem
 } from "../../chunk-KWAGEHJJ.js";
@@ -125,20 +125,23 @@ var BabelAstFactory = class {
   createSpreadElement(expression) {
     return t.spreadElement(expression);
   }
-  createFunctionDeclaration(functionName, parameters, body) {
+  createFunctionDeclaration(functionName, parameters, body, returnType) {
     assert(body, t.isBlockStatement, "a block");
-    return t.functionDeclaration(t.identifier(functionName), parameters.map((param) => this.identifierWithType(param.name, param.type)), body);
+    const fn = t.functionDeclaration(t.identifier(functionName), parameters.map((param) => this.identifierWithType(param.name, param.type)), body);
+    return this.attachReturnType(fn, returnType);
   }
-  createArrowFunctionExpression(parameters, body) {
+  createArrowFunctionExpression(parameters, body, returnType) {
     if (t.isStatement(body)) {
       assert(body, t.isBlockStatement, "a block");
     }
-    return t.arrowFunctionExpression(parameters.map((param) => this.identifierWithType(param.name, param.type)), body);
+    const fn = t.arrowFunctionExpression(parameters.map((param) => this.identifierWithType(param.name, param.type)), body);
+    return this.attachReturnType(fn, returnType);
   }
-  createFunctionExpression(functionName, parameters, body) {
+  createFunctionExpression(functionName, parameters, body, returnType) {
     assert(body, t.isBlockStatement, "a block");
     const name = functionName !== null ? t.identifier(functionName) : null;
-    return t.functionExpression(name, parameters.map((param) => this.identifierWithType(param.name, param.type)), body);
+    const fn = t.functionExpression(name, parameters.map((param) => this.identifierWithType(param.name, param.type)), body);
+    return this.attachReturnType(fn, returnType);
   }
   createIdentifier = t.identifier;
   createIfStatement = t.ifStatement;
@@ -283,6 +286,12 @@ var BabelAstFactory = class {
     const node = t.identifier(name);
     if (this.typesEnabled && type != null) {
       node.typeAnnotation = t.tsTypeAnnotation(type);
+    }
+    return node;
+  }
+  attachReturnType(node, returnType) {
+    if (this.typesEnabled && returnType !== null) {
+      node.returnType = t.tsTypeAnnotation(returnType);
     }
     return node;
   }

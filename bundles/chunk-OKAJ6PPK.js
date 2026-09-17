@@ -87,7 +87,7 @@ var ExpressionTranslatorVisitor = class {
     return this.attachComments(this.factory.createVariableDeclaration(stmt.name, stmt.value?.visitExpression(this, context.withExpressionMode), varType, stmt.type?.visitType(this, context)), stmt.leadingComments);
   }
   visitDeclareFunctionStmt(stmt, context) {
-    return this.attachComments(this.factory.createFunctionDeclaration(stmt.name, this.translateParams(stmt.params, context), this.factory.createBlock(this.visitStatements(stmt.statements, context.withStatementMode))), stmt.leadingComments);
+    return this.attachComments(this.factory.createFunctionDeclaration(stmt.name, this.translateParams(stmt.params, context), this.factory.createBlock(this.visitStatements(stmt.statements, context.withStatementMode)), stmt.type?.visitType(this, context) ?? null), stmt.leadingComments);
   }
   visitExpressionStmt(stmt, context) {
     return this.attachComments(this.factory.createExpressionStatement(stmt.expr.visitExpression(this, context.withStatementMode)), stmt.leadingComments);
@@ -242,10 +242,10 @@ var ExpressionTranslatorVisitor = class {
     return this.attachComments(this.factory.createUnaryExpression("!", ast.condition.visitExpression(this, context)), ast.leadingComments);
   }
   visitFunctionExpr(ast, context) {
-    return this.attachComments(this.factory.createFunctionExpression(ast.name ?? null, this.translateParams(ast.params, context), this.factory.createBlock(this.visitStatements(ast.statements, context))), ast.leadingComments);
+    return this.attachComments(this.factory.createFunctionExpression(ast.name ?? null, this.translateParams(ast.params, context), this.factory.createBlock(this.visitStatements(ast.statements, context)), ast.type?.visitType(this, context) ?? null), ast.leadingComments);
   }
   visitArrowFunctionExpr(ast, context) {
-    return this.attachComments(this.factory.createArrowFunctionExpression(this.translateParams(ast.params, context), Array.isArray(ast.body) ? this.factory.createBlock(this.visitStatements(ast.body, context)) : ast.body.visitExpression(this, context)), ast.leadingComments);
+    return this.attachComments(this.factory.createArrowFunctionExpression(this.translateParams(ast.params, context), Array.isArray(ast.body) ? this.factory.createBlock(this.visitStatements(ast.body, context)) : ast.body.visitExpression(this, context), ast.type?.visitType(this, context) ?? null), ast.leadingComments);
   }
   visitBinaryOperatorExpr(ast, context) {
     if (!BINARY_OPERATORS.has(ast.operator)) {
@@ -373,4 +373,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ZUYMYKXC.js.map
+//# sourceMappingURL=chunk-OKAJ6PPK.js.map
