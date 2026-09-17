@@ -29,9 +29,9 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createElementAccessChain(expression: t.Expression, element: t.Expression, isOptional: boolean): t.Expression;
     createExpressionStatement: typeof t.expressionStatement;
     createSpreadElement(expression: t.Expression): t.SpreadElement;
-    createFunctionDeclaration(functionName: string, parameters: Parameter<t.TSType>[], body: t.Statement): t.Statement;
-    createArrowFunctionExpression(parameters: Parameter<t.TSType>[], body: t.Statement | t.Expression): t.Expression;
-    createFunctionExpression(functionName: string | null, parameters: Parameter<t.TSType>[], body: t.Statement): t.Expression;
+    createFunctionDeclaration(functionName: string, parameters: Parameter<t.TSType>[], body: t.Statement, returnType: t.TSType | null): t.Statement;
+    createArrowFunctionExpression(parameters: Parameter<t.TSType>[], body: t.Statement | t.Expression, returnType: t.TSType | null): t.Expression;
+    createFunctionExpression(functionName: string | null, parameters: Parameter<t.TSType>[], body: t.Statement, returnType: t.TSType | null): t.Expression;
     createIdentifier: typeof t.identifier;
     createIfStatement: typeof t.ifStatement;
     createDynamicImport(url: string | t.Expression): t.Expression;
@@ -57,4 +57,5 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createMapType(valueType: t.TSType): t.TSType;
     transplantType(type: t.TSType): t.TSType;
     private identifierWithType;
+    private attachReturnType;
 }

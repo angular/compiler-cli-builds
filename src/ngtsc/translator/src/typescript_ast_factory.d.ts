@@ -30,9 +30,9 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     createElementAccessChain(expression: ts.Expression, element: ts.Expression, isOptional: boolean): ts.Expression;
     createExpressionStatement: (expression: ts.Expression) => ts.ExpressionStatement;
     createDynamicImport(url: string | ts.Expression): ts.CallExpression;
-    createFunctionDeclaration(functionName: string, parameters: Parameter<ts.TypeNode>[], body: ts.Statement): ts.Statement;
-    createFunctionExpression(functionName: string | null, parameters: Parameter<ts.TypeNode>[], body: ts.Statement): ts.Expression;
-    createArrowFunctionExpression(parameters: Parameter<ts.TypeNode>[], body: ts.Statement | ts.Expression): ts.Expression;
+    createFunctionDeclaration(functionName: string, parameters: Parameter<ts.TypeNode>[], body: ts.Statement, returnType: ts.TypeNode | null): ts.Statement;
+    createFunctionExpression(functionName: string | null, parameters: Parameter<ts.TypeNode>[], body: ts.Statement, returnType: ts.TypeNode | null): ts.Expression;
+    createArrowFunctionExpression(parameters: Parameter<ts.TypeNode>[], body: ts.Statement | ts.Expression, returnType: ts.TypeNode | null): ts.Expression;
     private createParameter;
     createIdentifier: (text: string) => ts.Identifier;
     createIfStatement(condition: ts.Expression, thenStatement: ts.Statement, elseStatement: ts.Statement | null): ts.Statement;

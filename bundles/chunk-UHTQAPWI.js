@@ -8,7 +8,7 @@ import {
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-ZUYMYKXC.js";
+} from "./chunk-OKAJ6PPK.js";
 
 // packages/compiler-cli/linker/src/fatal_linker_error.js
 var FatalLinkerError = class extends Error {
@@ -347,7 +347,8 @@ var EmitScope = class {
       null,
       /* args */
       [],
-      body
+      body,
+      null
     );
     return this.factory.createCallExpression(
       fn,
@@ -456,7 +457,7 @@ import semver2 from "semver";
 // packages/compiler-cli/linker/src/file_linker/partial_linkers/util.js
 import { createMayBeForwardRefExpression, outputAst as o2 } from "@angular/compiler";
 import semver from "semver";
-var PLACEHOLDER_VERSION = "22.3.0-next.0+sha-e623982";
+var PLACEHOLDER_VERSION = "22.3.0-next.0+sha-9ba5faa";
 function wrapReference(wrapped) {
   return { value: wrapped, type: wrapped };
 }
@@ -1403,4 +1404,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-HCU2E32S.js.map
+//# sourceMappingURL=chunk-UHTQAPWI.js.map

@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-ZUYMYKXC.js";
+} from "./chunk-OKAJ6PPK.js";
 import {
   LogicalProjectPath,
   absoluteFrom,
@@ -148,7 +148,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.0+sha-e623982";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.0+sha-9ba5faa";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5085,23 +5085,23 @@ var TypeScriptAstFactory = class {
       [typeof url === "string" ? ts24.factory.createStringLiteral(url) : url]
     );
   }
-  createFunctionDeclaration(functionName, parameters, body) {
+  createFunctionDeclaration(functionName, parameters, body, returnType) {
     if (!ts24.isBlock(body)) {
       throw new Error(`Invalid syntax, expected a block, but got ${ts24.SyntaxKind[body.kind]}.`);
     }
-    return ts24.factory.createFunctionDeclaration(void 0, void 0, functionName, void 0, parameters.map((param) => this.createParameter(param)), void 0, body);
+    return ts24.factory.createFunctionDeclaration(void 0, void 0, functionName, void 0, parameters.map((param) => this.createParameter(param)), returnType ?? void 0, body);
   }
-  createFunctionExpression(functionName, parameters, body) {
+  createFunctionExpression(functionName, parameters, body, returnType) {
     if (!ts24.isBlock(body)) {
       throw new Error(`Invalid syntax, expected a block, but got ${ts24.SyntaxKind[body.kind]}.`);
     }
-    return ts24.factory.createFunctionExpression(void 0, void 0, functionName ?? void 0, void 0, parameters.map((param) => this.createParameter(param)), void 0, body);
+    return ts24.factory.createFunctionExpression(void 0, void 0, functionName ?? void 0, void 0, parameters.map((param) => this.createParameter(param)), returnType ?? void 0, body);
   }
-  createArrowFunctionExpression(parameters, body) {
+  createArrowFunctionExpression(parameters, body, returnType) {
     if (ts24.isStatement(body) && !ts24.isBlock(body)) {
       throw new Error(`Invalid syntax, expected a block, but got ${ts24.SyntaxKind[body.kind]}.`);
     }
-    return ts24.factory.createArrowFunction(void 0, void 0, parameters.map((param) => this.createParameter(param)), void 0, void 0, body);
+    return ts24.factory.createArrowFunction(void 0, void 0, parameters.map((param) => this.createParameter(param)), returnType ?? void 0, void 0, body);
   }
   createParameter(param) {
     return ts24.factory.createParameterDeclaration(void 0, void 0, param.name, void 0, param.type ?? void 0);
@@ -6878,4 +6878,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OWYB6QWT.js.map
+//# sourceMappingURL=chunk-YGL6WM5L.js.map

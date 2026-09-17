@@ -91,8 +91,9 @@ export interface AstFactory<TStatement, TExpression, TType> {
      * @param functionName the name of the function.
      * @param parameters the names of the function's parameters.
      * @param body a statement (or a block of statements) that are the body of the function.
+     * @param returnType return type annotation for the function.
      */
-    createFunctionDeclaration(functionName: string, parameters: Parameter<TType>[], body: TStatement): TStatement;
+    createFunctionDeclaration(functionName: string, parameters: Parameter<TType>[], body: TStatement, returnType: TType | null): TStatement;
     /**
      * Create an expression that represents a function
      * (e.g. `function foo(param1, param2) { stmt; }`).
@@ -100,16 +101,18 @@ export interface AstFactory<TStatement, TExpression, TType> {
      * @param functionName the name of the function.
      * @param parameters the names of the function's parameters.
      * @param body a statement (or a block of statements) that are the body of the function.
+     * @param returnType return type annotation for the function.
      */
-    createFunctionExpression(functionName: string | null, parameters: Parameter<TType>[], body: TStatement): TExpression;
+    createFunctionExpression(functionName: string | null, parameters: Parameter<TType>[], body: TStatement, returnType: TType | null): TExpression;
     /**
      * Create an expression that represents an arrow function
      * (e.g. `(param1, param2) => body`).
      *
      * @param parameters the names of the function's parameters.
      * @param body an expression or block of statements that are the body of the function.
+     * @param returnType return type annotation for the function.
      */
-    createArrowFunctionExpression(parameters: Parameter<TType>[], body: TExpression | TStatement): TExpression;
+    createArrowFunctionExpression(parameters: Parameter<TType>[], body: TExpression | TStatement, returnType: TType | null): TExpression;
     /**
      * Creates an expression that represents a dynamic import
      * (e.g. `import('./some/path')`)
