@@ -275,7 +275,8 @@ var ExpressionTranslatorVisitor = class {
         kind: "property",
         propertyName: entry.key,
         quoted: entry.quoted,
-        value: entry.value.visitExpression(this, context)
+        value: entry.value.visitExpression(this, context),
+        leadingComments: entry.leadingComments
       } : {
         kind: "spread",
         expression: entry.expression.visitExpression(this, context)
@@ -373,4 +374,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OKAJ6PPK.js.map
+//# sourceMappingURL=chunk-SYR74ZNK.js.map

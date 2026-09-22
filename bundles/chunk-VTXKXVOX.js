@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-OKAJ6PPK.js";
+} from "./chunk-SYR74ZNK.js";
 import {
   LogicalProjectPath,
   absoluteFrom,
@@ -144,7 +144,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.7+sha-8db8817";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.1.7+sha-d7d5401";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -738,6 +738,7 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
     return unknownReference(typeNode);
   }
   const { local, decl } = symbols;
+  let valueUnverified = false;
   if (decl.valueDeclaration === void 0 || decl.flags & ts6.SymbolFlags.ConstEnum) {
     let typeOnlyDecl = null;
     if (decl.declarations !== void 0 && decl.declarations.length > 0) {
@@ -750,6 +751,7 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
     ].includes(typeOnlyDecl.kind)) {
       return noValueDeclaration(typeNode, typeOnlyDecl);
     }
+    valueUnverified = true;
   }
   const firstDecl = local.declarations && local.declarations[0];
   if (firstDecl !== void 0) {
@@ -763,7 +765,8 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
       return {
         kind: 0,
         expression: firstDecl.name,
-        defaultImportStatement: firstDecl.parent
+        defaultImportStatement: firstDecl.parent,
+        valueUnverified
       };
     } else if (ts6.isImportSpecifier(firstDecl)) {
       if (firstDecl.isTypeOnly) {
@@ -784,6 +787,7 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
         valueDeclaration: decl.valueDeclaration ?? null,
         moduleName,
         importedName,
+        valueUnverified,
         nestedPath
       };
     } else if (ts6.isNamespaceImport(firstDecl)) {
@@ -804,6 +808,7 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
         valueDeclaration: decl.valueDeclaration ?? null,
         moduleName,
         importedName,
+        valueUnverified,
         nestedPath
       };
     }
@@ -813,7 +818,8 @@ function typeToValue(typeNode, checker, isLocalCompilation) {
     return {
       kind: 0,
       expression,
-      defaultImportStatement: null
+      defaultImportStatement: null,
+      valueUnverified
     };
   } else {
     return unsupportedType(typeNode);
@@ -5124,7 +5130,11 @@ var TypeScriptAstFactory = class {
       if (prop.kind === "spread") {
         return ts24.factory.createSpreadAssignment(prop.expression);
       }
-      return ts24.factory.createPropertyAssignment(prop.quoted ? ts24.factory.createStringLiteral(prop.propertyName) : ts24.factory.createIdentifier(prop.propertyName), prop.value);
+      const propNode = ts24.factory.createPropertyAssignment(prop.quoted ? ts24.factory.createStringLiteral(prop.propertyName) : ts24.factory.createIdentifier(prop.propertyName), prop.value);
+      if (prop.leadingComments) {
+        attachComments(propNode, prop.leadingComments);
+      }
+      return propNode;
     }));
   }
   createParenthesizedExpression = ts24.factory.createParenthesizedExpression;
@@ -6852,4 +6862,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-2T57IJVH.js.map
+//# sourceMappingURL=chunk-VTXKXVOX.js.map
