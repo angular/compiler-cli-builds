@@ -194,6 +194,14 @@ export interface LocalTypeValueReference {
      * a type-position. See `DefaultImportTracker` for details.
      */
     defaultImportStatement: ts.ImportDeclaration | null;
+    /**
+     * Whether the reference was produced without confirming that the symbol has a value at runtime.
+     *
+     * This only happens in local compilation, where deciding whether a symbol is type-only can
+     * require information from other files. Code that emits the reference into a value position may
+     * have to guard it, since it can turn out not to exist.
+     */
+    valueUnverified?: boolean;
 }
 /**
  * A reference that refers to a type that was imported, and gives the symbol `name` and the
@@ -217,6 +225,14 @@ export interface ImportedTypeValueReference {
      */
     nestedPath: string[] | null;
     valueDeclaration: DeclarationNode | null;
+    /**
+     * Whether the reference was produced without confirming that the symbol has a value at runtime.
+     *
+     * This only happens in local compilation, where deciding whether a symbol is type-only can
+     * require information from other files. Code that emits the reference into a value position may
+     * have to guard it, since it can turn out not to exist.
+     */
+    valueUnverified?: boolean;
 }
 /**
  * A representation for a type value reference that is used when no value is available. This can

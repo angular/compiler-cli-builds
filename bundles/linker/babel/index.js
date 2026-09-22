@@ -8,13 +8,13 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-UHTQAPWI.js";
+} from "../../chunk-I3LOGI4D.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "../../chunk-SEJGUMO2.js";
 import "../../chunk-Y5V7YWTG.js";
-import "../../chunk-OKAJ6PPK.js";
+import "../../chunk-SYR74ZNK.js";
 import {
   NodeJSFileSystem
 } from "../../chunk-KWAGEHJJ.js";
@@ -175,7 +175,11 @@ var BabelAstFactory = class {
         return t.spreadElement(prop.expression);
       }
       const key = prop.quoted ? t.stringLiteral(prop.propertyName) : t.identifier(prop.propertyName);
-      return t.objectProperty(key, prop.value);
+      const propNode = t.objectProperty(key, prop.value);
+      if (prop.leadingComments) {
+        this.attachComments(propNode, prop.leadingComments);
+      }
+      return propNode;
     }));
   }
   createParenthesizedExpression = t.parenthesizedExpression;

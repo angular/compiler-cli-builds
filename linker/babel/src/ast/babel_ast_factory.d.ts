@@ -17,7 +17,7 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     constructor(
     /** The absolute path to the source file being compiled. */
     sourcePath: string);
-    attachComments(statement: t.Statement | t.Expression, leadingComments: LeadingComment[]): void;
+    attachComments(statement: t.Statement | t.Expression | t.SpreadElement | t.ObjectProperty, leadingComments: LeadingComment[]): void;
     createArrayLiteral: typeof t.arrayExpression;
     createAssignment(target: t.Expression, operator: AssignmentOperator, value: t.Expression): t.Expression;
     createBinaryExpression(leftOperand: t.Expression, operator: BinaryOperator, rightOperand: t.Expression): t.Expression;

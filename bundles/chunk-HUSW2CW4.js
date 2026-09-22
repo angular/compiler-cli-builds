@@ -55,7 +55,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-VOI42USZ.js";
+} from "./chunk-S5SPU2QY.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -103,7 +103,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-YGL6WM5L.js";
+} from "./chunk-ICX2MHOI.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5756,4 +5756,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-CN2VKDVT.js.map
+//# sourceMappingURL=chunk-HUSW2CW4.js.map
