@@ -67,4 +67,4 @@ export declare function createTemplateTail(cooked: string, raw: string): ts.Temp
  * @param statement The statement that will have comments attached.
  * @param leadingComments The comments to attach to the statement.
  */
-export declare function attachComments(statement: ts.Statement | ts.Expression, leadingComments: LeadingComment[]): void;
+export declare function attachComments(statement: ts.Statement | ts.Expression | ts.ObjectLiteralElementLike, leadingComments: LeadingComment[]): void;

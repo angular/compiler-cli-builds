@@ -83,7 +83,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-YGL6WM5L.js";
+} from "./chunk-ICX2MHOI.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -2181,7 +2181,7 @@ function signalMetadataTransform(program) {
 }
 
 // packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.js
-import { ArrowFunctionExpr as ArrowFunctionExpr2, ClassPropertyMapping, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr2, ExternalReference, getSafePropertyAccessString, literal as literal2, LiteralArrayExpr as LiteralArrayExpr2, literalMap as literalMap2, parseHostBindings, R3Identifiers, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
+import { ArrowFunctionExpr, ClassPropertyMapping, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr2, ExternalReference, getSafePropertyAccessString, literal as literal2, LiteralArrayExpr as LiteralArrayExpr2, literalMap as literalMap2, parseHostBindings, R3Identifiers, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
 import ts16 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/annotations/common/src/di.js
@@ -2642,7 +2642,7 @@ var InjectableClassRegistry = class {
 };
 
 // packages/compiler-cli/src/ngtsc/annotations/common/src/metadata.js
-import { ArrowFunctionExpr, LiteralArrayExpr, LiteralExpr as LiteralExpr2, literalMap, WrappedNodeExpr as WrappedNodeExpr3 } from "@angular/compiler";
+import { LiteralArrayExpr, literalMap, WrappedNodeExpr as WrappedNodeExpr3 } from "@angular/compiler";
 import ts12 from "typescript";
 function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompiler, angularDecoratorTransform = (dec) => dec, undecoratedMetadataExtractor = () => null) {
   if (!reflection.isClass(clazz)) {
@@ -2661,8 +2661,7 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
   let metaCtorParameters = null;
   const classCtorParameters = reflection.getConstructorParameters(clazz);
   if (classCtorParameters !== null) {
-    const ctorParameters = classCtorParameters.map((param) => ctorParameterToMetadata(param, isCore));
-    metaCtorParameters = new ArrowFunctionExpr([], new LiteralArrayExpr(ctorParameters));
+    metaCtorParameters = classCtorParameters.map((param) => ctorParameterToMetadata(param, isCore));
   }
   let metaPropDecorators = null;
   const classMembers = reflection.getMembersOfClass(clazz).filter((member) => !member.isStatic && // Private fields are not supported in the metadata emit
@@ -2709,16 +2708,18 @@ function extractClassMetadata(clazz, reflection, isCore, annotateForClosureCompi
   };
 }
 function ctorParameterToMetadata(param, isCore) {
-  const type = param.typeValueReference.kind !== 2 ? valueReferenceToExpression(param.typeValueReference) : new LiteralExpr2(void 0);
-  const mapEntries = [
-    { key: "type", value: type, quoted: false }
-  ];
+  let type = null;
+  let suppressTypeErrors = false;
+  if (param.typeValueReference.kind !== 2) {
+    type = valueReferenceToExpression(param.typeValueReference);
+    suppressTypeErrors = param.typeValueReference.valueUnverified === true;
+  }
+  let decorators = null;
   if (param.decorators !== null) {
     const ngDecorators = param.decorators.filter((dec) => isAngularDecorator3(dec, isCore)).map((decorator) => decoratorToMetadata(decorator));
-    const value = new WrappedNodeExpr3(ts12.factory.createArrayLiteralExpression(ngDecorators));
-    mapEntries.push({ key: "decorators", value, quoted: false });
+    decorators = new WrappedNodeExpr3(ts12.factory.createArrayLiteralExpression(ngDecorators));
   }
-  return literalMap(mapEntries);
+  return { type, decorators, suppressTypeErrors };
 }
 function decoratedClassMemberToMetadata(decorators, isCore) {
   const ngDecorators = decorators.filter((dec) => isAngularDecorator3(dec, isCore)).map((decorator) => new WrappedNodeExpr3(decoratorToMetadata(decorator)));
@@ -3652,7 +3653,7 @@ function memberMetadataFromSignalQuery(call) {
     // on the query initializer, because it executes after the class is initialized, whereas
     // `setClassMetadata` runs immediately.
     new ExternalExpr2(R3Identifiers.forwardRef).callFn([
-      new ArrowFunctionExpr2([], new WrappedNodeExpr5(firstArg))
+      new ArrowFunctionExpr([], new WrappedNodeExpr5(firstArg))
     ])
   );
   const entries = [
@@ -13919,7 +13920,7 @@ function isDefaultImport(node) {
 }
 
 // packages/compiler-cli/src/ngtsc/annotations/src/injectable.js
-import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr3, WrappedNodeExpr as WrappedNodeExpr10 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr2, WrappedNodeExpr as WrappedNodeExpr10 } from "@angular/compiler";
 import ts40 from "typescript";
 var InjectableDecoratorHandler = class {
   reflector;
@@ -14048,7 +14049,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
       type,
       typeArgumentCount,
       providedIn: createMayBeForwardRefExpression3(
-        new LiteralExpr3(null),
+        new LiteralExpr2(null),
         0
         /* ForwardRefHandling.None */
       )
@@ -14060,7 +14061,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     }
     const meta = reflectObjectLiteral(metaNode);
     const providedIn = meta.has("providedIn") ? getProviderExpression(meta.get("providedIn"), reflector) : createMayBeForwardRefExpression3(
-      new LiteralExpr3(null),
+      new LiteralExpr2(null),
       0
       /* ForwardRefHandling.None */
     );
@@ -14671,4 +14672,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VOI42USZ.js.map
+//# sourceMappingURL=chunk-S5SPU2QY.js.map

@@ -333,6 +333,7 @@ export interface ObjectLiteralAssignment<TExpression> {
      * Whether the `propertyName` should be enclosed in quotes.
      */
     quoted: boolean;
+    leadingComments?: LeadingComment[];
 }
 /**
  * Information used by the `AstFactory` to create a spread on an object literal expression.
