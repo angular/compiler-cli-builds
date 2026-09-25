@@ -55,7 +55,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-MISVZCB7.js";
+} from "./chunk-ZBSMACWW.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -103,7 +103,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-ICX2MHOI.js";
+} from "./chunk-PHSPJSHG.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -3938,7 +3938,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
 ]);
 
 // packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
-import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead6, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2, ThisReceiver as ThisReceiver2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead6, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2, ThisReceiver as ThisReceiver2, Unary, unwrapWriteTarget } from "@angular/compiler";
 import ts24 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   templateTypeChecker;
@@ -3981,9 +3981,17 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
   visitBinary(ast, context) {
     if (Binary3.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead6) {
       this.checkForIllegalWriteInEventBinding(ast.left, context);
-    } else {
-      super.visitBinary(ast, context);
     }
+    super.visitBinary(ast, context);
+  }
+  visitUnary(ast, context) {
+    if (Unary.isUpdateOperation(ast.operator)) {
+      const target = unwrapWriteTarget(ast.expr);
+      if (target instanceof PropertyRead6) {
+        this.checkForIllegalWriteInEventBinding(target, context);
+      }
+    }
+    super.visitUnary(ast, context);
   }
   visitPropertyRead(ast, context) {
     super.visitPropertyRead(ast, context);
@@ -5756,4 +5764,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-QAPEKPHR.js.map
+//# sourceMappingURL=chunk-KXK2FZVR.js.map

@@ -31,7 +31,9 @@ function isSafeAccess(ast) {
 }
 var UNARY_OPERATORS = /* @__PURE__ */ new Map([
   [o.UnaryOperator.Minus, "-"],
-  [o.UnaryOperator.Plus, "+"]
+  [o.UnaryOperator.Plus, "+"],
+  [o.UnaryOperator.Increment, "++"],
+  [o.UnaryOperator.Decrement, "--"]
 ]);
 var BINARY_OPERATORS = /* @__PURE__ */ new Map([
   [o.BinaryOperator.And, "&&"],
@@ -308,7 +310,7 @@ var ExpressionTranslatorVisitor = class {
     if (!UNARY_OPERATORS.has(ast.operator)) {
       throw new Error(`Unknown unary operator: ${o.UnaryOperator[ast.operator]}`);
     }
-    return this.attachComments(this.factory.createUnaryExpression(UNARY_OPERATORS.get(ast.operator), ast.expr.visitExpression(this, context)), ast.leadingComments);
+    return this.attachComments(this.factory.createUnaryExpression(UNARY_OPERATORS.get(ast.operator), ast.expr.visitExpression(this, context), ast.isPrefix), ast.leadingComments);
   }
   visitParenthesizedExpr(ast, context) {
     const result = ast.expr.visitExpression(this, context);
@@ -374,4 +376,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-SYR74ZNK.js.map
+//# sourceMappingURL=chunk-2RWOSWE5.js.map

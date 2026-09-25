@@ -49,7 +49,7 @@ export declare class TypeScriptAstFactory implements AstFactory<ts.Statement, ts
     createThrowStatement: (expression: ts.Expression) => ts.ThrowStatement;
     createTypeOfExpression: (expression: ts.Expression) => ts.TypeOfExpression;
     createVoidExpression: (expression: ts.Expression) => ts.VoidExpression;
-    createUnaryExpression(operator: UnaryOperator, operand: ts.Expression): ts.Expression;
+    createUnaryExpression(operator: UnaryOperator, operand: ts.Expression, isPrefix?: boolean): ts.Expression;
     createVariableDeclaration(variableName: string, initializer: ts.Expression | null, variableType: VariableDeclarationType, type: ts.TypeNode | null): ts.Statement;
     createRegularExpressionLiteral(body: string, flags: string | null): ts.Expression;
     setSourceMapRange<T extends ts.Node>(node: T, sourceMapRange: SourceMapRange | null): T;

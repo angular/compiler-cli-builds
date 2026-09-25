@@ -8,13 +8,13 @@ import {
   LinkerEnvironment,
   assert,
   isFatalLinkerError
-} from "../../chunk-I3LOGI4D.js";
+} from "../../chunk-C3GA6PEI.js";
 import {
   ConsoleLogger,
   LogLevel
 } from "../../chunk-SEJGUMO2.js";
 import "../../chunk-Y5V7YWTG.js";
-import "../../chunk-SYR74ZNK.js";
+import "../../chunk-2RWOSWE5.js";
 import {
   NodeJSFileSystem
 } from "../../chunk-KWAGEHJJ.js";
@@ -218,7 +218,9 @@ var BabelAstFactory = class {
   createVoidExpression(expression) {
     return t.unaryExpression("void", expression);
   }
-  createUnaryExpression = t.unaryExpression;
+  createUnaryExpression(operator, operand, isPrefix = true) {
+    return operator === "++" || operator === "--" ? t.updateExpression(operator, operand, isPrefix) : t.unaryExpression(operator, operand);
+  }
   createVariableDeclaration(variableName, initializer, variableType, type) {
     return t.variableDeclaration(variableType, [
       t.variableDeclarator(this.identifierWithType(variableName, type), initializer)

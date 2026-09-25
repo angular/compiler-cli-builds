@@ -5,7 +5,7 @@
 import {
   Context,
   ExpressionTranslatorVisitor
-} from "./chunk-SYR74ZNK.js";
+} from "./chunk-2RWOSWE5.js";
 import {
   LogicalProjectPath,
   absoluteFrom,
@@ -148,7 +148,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.0+sha-d3eaf9a";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.0+sha-3c5ed06";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -4992,7 +4992,9 @@ var TypeScriptAstFactory = class {
   UNARY_OPERATORS = (() => ({
     "+": ts24.SyntaxKind.PlusToken,
     "-": ts24.SyntaxKind.MinusToken,
-    "!": ts24.SyntaxKind.ExclamationToken
+    "!": ts24.SyntaxKind.ExclamationToken,
+    "++": ts24.SyntaxKind.PlusPlusToken,
+    "--": ts24.SyntaxKind.MinusMinusToken
   }))();
   BINARY_OPERATORS = (() => ({
     "&&": ts24.SyntaxKind.AmpersandAmpersandToken,
@@ -5189,8 +5191,9 @@ var TypeScriptAstFactory = class {
   createThrowStatement = ts24.factory.createThrowStatement;
   createTypeOfExpression = ts24.factory.createTypeOfExpression;
   createVoidExpression = ts24.factory.createVoidExpression;
-  createUnaryExpression(operator, operand) {
-    return ts24.factory.createPrefixUnaryExpression(this.UNARY_OPERATORS[operator], operand);
+  createUnaryExpression(operator, operand, isPrefix = true) {
+    const token = this.UNARY_OPERATORS[operator];
+    return isPrefix ? ts24.factory.createPrefixUnaryExpression(token, operand) : ts24.factory.createPostfixUnaryExpression(operand, token);
   }
   createVariableDeclaration(variableName, initializer, variableType, type) {
     return ts24.factory.createVariableStatement(void 0, ts24.factory.createVariableDeclarationList([
@@ -6182,7 +6185,7 @@ var Environment = class extends ReferenceEmitEnvironment {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.js
-import { AST, ASTWithName, ASTWithSource, Binary, BindingPipe, MatchSource as MatchSource3, PropertyRead, R3Identifiers as R3Identifiers3, SafePropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstLetDeclaration, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable } from "@angular/compiler";
+import { AST, ASTWithName, ASTWithSource, Binary, BindingPipe, MatchSource as MatchSource3, PropertyRead, R3Identifiers as R3Identifiers3, SafePropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstLetDeclaration, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, Unary, unwrapWriteTarget } from "@angular/compiler";
 import ts33 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.js
@@ -6647,13 +6650,24 @@ var SymbolBuilder = class {
       return this.getSymbol(expressionTarget);
     }
     let withSpan = expression.sourceSpan;
-    if (expression instanceof Binary && Binary.isAssignmentOperation(expression.operation) && expression.left instanceof PropertyRead) {
-      withSpan = expression.left.nameSpan;
+    let isPropertyRead = expression instanceof PropertyRead;
+    if (expression instanceof Binary && Binary.isAssignmentOperation(expression.operation)) {
+      const target = unwrapWriteTarget(expression.left);
+      if (target instanceof PropertyRead) {
+        withSpan = target.nameSpan;
+        isPropertyRead = true;
+      }
+    } else if (expression instanceof Unary && Unary.isUpdateOperation(expression.operator)) {
+      const target = unwrapWriteTarget(expression.expr);
+      if (target instanceof PropertyRead) {
+        withSpan = target.nameSpan;
+        isPropertyRead = true;
+      }
     } else if (expression instanceof ASTWithName && !(expression instanceof SafePropertyRead) && expression.constructor.name !== "MethodCall") {
       withSpan = expression.nameSpan;
     }
     let node = null;
-    if (expression instanceof PropertyRead || expression instanceof SafePropertyRead) {
+    if (isPropertyRead || expression instanceof SafePropertyRead) {
       node = findFirstMatchingNode(this.typeCheckBlock, {
         withSpan,
         filter: ts33.isPropertyAccessExpression
@@ -6888,4 +6902,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ICX2MHOI.js.map
+//# sourceMappingURL=chunk-PHSPJSHG.js.map

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import { types as t } from '@babel/core';
-import { AssignmentOperator, AstFactory, BinaryOperator, BuiltInType, LeadingComment, ObjectLiteralProperty, Parameter, SourceMapRange, TemplateLiteral, VariableDeclarationType } from '../../../../src/ngtsc/translator/src/api/ast_factory';
+import { AssignmentOperator, AstFactory, BinaryOperator, BuiltInType, LeadingComment, ObjectLiteralProperty, Parameter, SourceMapRange, TemplateLiteral, UnaryOperator, VariableDeclarationType } from '../../../../src/ngtsc/translator/src/api/ast_factory';
 /**
  * A Babel flavored implementation of the AstFactory.
  */
@@ -47,7 +47,7 @@ export declare class BabelAstFactory implements AstFactory<t.Statement, t.Expres
     createThrowStatement: typeof t.throwStatement;
     createTypeOfExpression(expression: t.Expression): t.Expression;
     createVoidExpression(expression: t.Expression): t.Expression;
-    createUnaryExpression: typeof t.unaryExpression;
+    createUnaryExpression(operator: UnaryOperator, operand: t.Expression, isPrefix?: boolean): t.Expression;
     createVariableDeclaration(variableName: string, initializer: t.Expression | null, variableType: VariableDeclarationType, type: t.TSType | null): t.Statement;
     createRegularExpressionLiteral(body: string, flags: string | null): t.Expression;
     setSourceMapRange<T extends t.Statement | t.Expression | t.TemplateElement | t.SpreadElement>(node: T, sourceMapRange: SourceMapRange | null): T;
