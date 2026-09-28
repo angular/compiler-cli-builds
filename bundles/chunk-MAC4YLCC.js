@@ -148,7 +148,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.0+sha-259d1b0";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.0+sha-82a4289";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -2981,12 +2981,25 @@ var StaticInterpreter = class {
       return this.visitType(node.type, context);
     } else if (ts12.isTypeOperatorNode(node) && node.operator === ts12.SyntaxKind.ReadonlyKeyword) {
       return this.visitType(node.type, context);
+    } else if (ts12.isParenthesizedTypeNode(node)) {
+      return this.visitType(node.type, context);
+    } else if (ts12.isIntersectionTypeNode(node)) {
+      return this.visitIntersectionType(node, context);
     } else if (ts12.isTypeQueryNode(node)) {
       return this.visitTypeQuery(node, context);
     } else if (ts12.isTypeReferenceNode(node)) {
       return this.visitTypeReference(node, context);
     } else if (ts12.isImportTypeNode(node)) {
       return this.visitImportType(node, context);
+    }
+    return DynamicValue.fromDynamicType(node);
+  }
+  visitIntersectionType(node, context) {
+    for (const member of node.types) {
+      const result = this.visitType(member, context);
+      if (!(result instanceof DynamicValue) && !(result instanceof Reference && ts12.isVariableDeclaration(result.node))) {
+        return result;
+      }
     }
     return DynamicValue.fromDynamicType(node);
   }
@@ -3501,6 +3514,18 @@ function hasInjectableFields(clazz, host) {
 function isHostDirectiveMetaForGlobalMode(hostDirectiveMeta) {
   return hostDirectiveMeta.directive instanceof Reference;
 }
+function readBaseClass(node, reflector, evaluator) {
+  const baseExpression = reflector.getBaseClassExpression(node);
+  if (baseExpression !== null) {
+    const baseClass = evaluator.evaluate(baseExpression);
+    if (baseClass instanceof Reference && reflector.isClass(baseClass.node)) {
+      return baseClass;
+    } else {
+      return "dynamic";
+    }
+  }
+  return null;
+}
 function createForeignComponentMatcher(foreignImports) {
   if (foreignImports === null || foreignImports.length === 0) {
     return null;
@@ -3621,7 +3646,7 @@ var DtsMetadataReader = class {
       hostDirectives: hostDirectives?.result ?? null,
       queries: readStringArrayType(def.type.typeArguments[5]),
       ...extractDirectiveTypeCheckMeta(clazz, inputs, this.reflector),
-      baseClass: readBaseClass(clazz, this.checker, this.reflector),
+      baseClass: readBaseClass(clazz, this.reflector, this.evaluator),
       isPoisoned,
       isStructural,
       animationTriggerNames: null,
@@ -3724,30 +3749,6 @@ function readInputsType(type) {
     }
   }
   return inputsMap;
-}
-function readBaseClass(clazz, checker, reflector) {
-  if (!isNamedClassDeclaration(clazz)) {
-    return reflector.hasBaseClass(clazz) ? "dynamic" : null;
-  }
-  if (clazz.heritageClauses !== void 0) {
-    for (const clause of clazz.heritageClauses) {
-      if (clause.token === ts15.SyntaxKind.ExtendsKeyword) {
-        const baseExpr = clause.types[0].expression;
-        let symbol = checker.getSymbolAtLocation(baseExpr);
-        if (symbol === void 0) {
-          return "dynamic";
-        } else if (symbol.flags & ts15.SymbolFlags.Alias) {
-          symbol = checker.getAliasedSymbol(symbol);
-        }
-        if (symbol.valueDeclaration !== void 0 && isNamedClassDeclaration(symbol.valueDeclaration)) {
-          return new Reference(symbol.valueDeclaration);
-        } else {
-          return "dynamic";
-        }
-      }
-    }
-  }
-  return null;
 }
 function readHostDirectivesType(checker, type, bestGuessOwningModule) {
   if (!ts15.isTupleTypeNode(type) || type.elements.length === 0) {
@@ -6846,6 +6847,7 @@ export {
   CompoundMetadataReader,
   hasInjectableFields,
   isHostDirectiveMetaForGlobalMode,
+  readBaseClass,
   createForeignComponentMatcher,
   DtsMetadataReader,
   flattenInheritedDirectiveMetadata,
@@ -6902,4 +6904,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-PHSPJSHG.js.map
+//# sourceMappingURL=chunk-MAC4YLCC.js.map

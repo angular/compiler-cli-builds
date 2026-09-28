@@ -80,7 +80,7 @@ export declare function createForwardRefResolver(isCore: boolean): ForeignFuncti
 export declare function combineResolvers(resolvers: ForeignFunctionResolver[]): ForeignFunctionResolver;
 export declare function isExpressionForwardReference(expr: Expression, context: ts.Node, contextSource: ts.SourceFile): boolean;
 export declare function isWrappedTsNodeExpr(expr: Expression): expr is WrappedNodeExpr<ts.Node>;
-export declare function readBaseClass(node: ClassDeclaration, reflector: ReflectionHost, evaluator: PartialEvaluator): Reference<ClassDeclaration> | 'dynamic' | null;
+export { readBaseClass } from '../../../metadata';
 /**
  * Wraps all functions in a given expression in parentheses. This is needed to avoid problems
  * where Tsickle annotations added between analyse and transform phases in Angular may trigger

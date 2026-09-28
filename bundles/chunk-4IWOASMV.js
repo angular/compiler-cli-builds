@@ -72,6 +72,7 @@ import {
   ngErrorCode,
   nodeNameForError,
   presetImportManagerForceNamespaceImports,
+  readBaseClass,
   reflectClassMember,
   reflectObjectLiteral,
   requiresInlineTypeCheckBlock,
@@ -83,7 +84,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-PHSPJSHG.js";
+} from "./chunk-MAC4YLCC.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -536,18 +537,6 @@ function isExpressionForwardReference(expr, context, contextSource) {
 }
 function isWrappedTsNodeExpr(expr) {
   return expr instanceof WrappedNodeExpr;
-}
-function readBaseClass(node, reflector, evaluator) {
-  const baseExpression = reflector.getBaseClassExpression(node);
-  if (baseExpression !== null) {
-    const baseClass = evaluator.evaluate(baseExpression);
-    if (baseClass instanceof Reference && reflector.isClass(baseClass.node)) {
-      return baseClass;
-    } else {
-      return "dynamic";
-    }
-  }
-  return null;
 }
 var parensWrapperTransformerFactory = (context) => {
   const visitor = (node) => {
@@ -14603,7 +14592,6 @@ export {
   getAngularDecorators,
   unwrapExpression,
   createForwardRefResolver,
-  readBaseClass,
   wrapTypeReference,
   toFactoryMetadata,
   CompilationMode,
@@ -14673,4 +14661,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-P22XCJKX.js.map
+//# sourceMappingURL=chunk-4IWOASMV.js.map

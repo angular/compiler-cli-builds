@@ -7,6 +7,7 @@
  */
 import ts from 'typescript';
 import { OwningModule, Reference } from '../../imports';
+import { PartialEvaluator } from '../../partial_evaluator';
 import { ClassDeclaration, ReflectionHost } from '../../reflection';
 import { DirectiveMeta, DirectiveTypeCheckMeta, HostDirectiveMeta, HostDirectiveMetaForGlobalMode, InputMapping, MetadataReader, NgModuleMeta, PipeMeta, ForeignComponentMeta } from './api';
 import { ClassPropertyMapping, SelectorlessMatcher } from '@angular/compiler';
@@ -44,5 +45,6 @@ export declare class CompoundMetadataReader implements MetadataReader {
 /** Returns whether a class declaration has the necessary class fields to make it injectable. */
 export declare function hasInjectableFields(clazz: ClassDeclaration, host: ReflectionHost): boolean;
 export declare function isHostDirectiveMetaForGlobalMode(hostDirectiveMeta: HostDirectiveMeta): hostDirectiveMeta is HostDirectiveMetaForGlobalMode;
+export declare function readBaseClass(node: ClassDeclaration, reflector: ReflectionHost, evaluator: PartialEvaluator): Reference<ClassDeclaration> | 'dynamic' | null;
 /** Extracts foreign component names from foreignImports and creates a SelectorlessMatcher. */
 export declare function createForeignComponentMatcher(foreignImports: ForeignComponentMeta[] | null): SelectorlessMatcher<ForeignComponentMeta> | null;

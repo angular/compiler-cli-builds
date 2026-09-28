@@ -70,6 +70,7 @@ export declare class StaticInterpreter {
     private stringNameFromPropertyName;
     private getReference;
     visitType(node: ts.TypeNode, context: Context): ResolvedValue;
+    private visitIntersectionType;
     private visitTupleType;
     private visitTypeQuery;
     private visitImportType;

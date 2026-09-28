@@ -8,7 +8,7 @@ import {
   TrackedIncrementalBuildStrategy,
   freshCompilationTicket,
   incrementalFromCompilerTicket
-} from "./chunk-ZAEEEKR3.js";
+} from "./chunk-LFUIK4LO.js";
 import {
   ActivePerfRecorder,
   PerfCheckpoint,
@@ -16,11 +16,11 @@ import {
   PerfPhase,
   TsCreateProgramDriver,
   retagAllTsFiles
-} from "./chunk-P22XCJKX.js";
+} from "./chunk-4IWOASMV.js";
 import {
   OptimizeFor,
   replaceTsWithNgInErrors
-} from "./chunk-PHSPJSHG.js";
+} from "./chunk-MAC4YLCC.js";
 import {
   absoluteFrom,
   createFileSystemTsReadDirectoryFn,
@@ -644,4 +644,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VW3NYIML.js.map
+//# sourceMappingURL=chunk-OCYRTJE7.js.map

@@ -49,13 +49,12 @@ import {
   findAngularDecorator,
   isShim,
   ivyTransformFactory,
-  readBaseClass,
   signalMetadataTransform,
   toFactoryMetadata,
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-P22XCJKX.js";
+} from "./chunk-4IWOASMV.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -100,10 +99,11 @@ import {
   makeDiagnostic,
   ngErrorCode,
   normalizeSeparators,
+  readBaseClass,
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-PHSPJSHG.js";
+} from "./chunk-MAC4YLCC.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -5762,4 +5762,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ZAEEEKR3.js.map
+//# sourceMappingURL=chunk-LFUIK4LO.js.map
