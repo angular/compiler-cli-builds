@@ -2182,7 +2182,7 @@ function signalMetadataTransform(program) {
 }
 
 // packages/compiler-cli/src/ngtsc/annotations/directive/src/shared.js
-import { ArrowFunctionExpr, ClassPropertyMapping, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr2, ExternalReference, getSafePropertyAccessString, literal as literal2, LiteralArrayExpr as LiteralArrayExpr2, literalMap as literalMap2, parseHostBindings, R3Identifiers, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
+import { ArrowFunctionExpr, ClassPropertyMapping, createMayBeForwardRefExpression as createMayBeForwardRefExpression2, DYNAMIC_TYPE, emitDistinctChangesOnlyDefaultValue, ExternalExpr as ExternalExpr2, ExternalReference, getSafePropertyAccessString, literal as literal2, LiteralArrayExpr as LiteralArrayExpr2, literalMap as literalMap2, parseHostBindings, R3Identifiers, verifyHostBindings, WrappedNodeExpr as WrappedNodeExpr5 } from "@angular/compiler";
 import ts16 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/annotations/common/src/di.js
@@ -3654,7 +3654,7 @@ function memberMetadataFromSignalQuery(call) {
     // on the query initializer, because it executes after the class is initialized, whereas
     // `setClassMetadata` runs immediately.
     new ExternalExpr2(R3Identifiers.forwardRef).callFn([
-      new ArrowFunctionExpr([], new WrappedNodeExpr5(firstArg))
+      new ArrowFunctionExpr([], new WrappedNodeExpr5(firstArg), DYNAMIC_TYPE)
     ])
   );
   const entries = [
@@ -6595,7 +6595,7 @@ var DirectiveDecoratorHandler = class {
 };
 
 // packages/compiler-cli/src/ngtsc/annotations/ng_module/src/handler.js
-import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget2, FunctionExpr, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr3, R3Identifiers as R3Identifiers2, R3NgModuleMetadataKind, R3SelectorScopeMode, ReturnStatement, TypeofExpr, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
+import { compileClassMetadata as compileClassMetadata2, compileDeclareClassMetadata as compileDeclareClassMetadata2, compileDeclareInjectorFromMetadata, compileDeclareNgModuleFromMetadata, compileInjector, compileNgModule, DYNAMIC_TYPE as DYNAMIC_TYPE2, ExternalExpr as ExternalExpr5, FactoryTarget as FactoryTarget2, FunctionExpr, InvokeFunctionExpr, LiteralArrayExpr as LiteralArrayExpr3, R3Identifiers as R3Identifiers2, R3NgModuleMetadataKind, R3SelectorScopeMode, ReturnStatement, TypeofExpr, WrappedNodeExpr as WrappedNodeExpr7 } from "@angular/compiler";
 import ts26 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/annotations/ng_module/src/module_with_providers.js
@@ -7236,8 +7236,8 @@ var NgModuleDecoratorHandler = class {
         });
         const directiveArray = new LiteralArrayExpr3(directives);
         const pipesArray = new LiteralArrayExpr3(pipes);
-        const directiveExpr = remoteScopesMayRequireCycleProtection && directives.length > 0 ? new FunctionExpr([], [new ReturnStatement(directiveArray)]) : directiveArray;
-        const pipesExpr = remoteScopesMayRequireCycleProtection && pipes.length > 0 ? new FunctionExpr([], [new ReturnStatement(pipesArray)]) : pipesArray;
+        const directiveExpr = remoteScopesMayRequireCycleProtection && directives.length > 0 ? new FunctionExpr([], [new ReturnStatement(directiveArray)], DYNAMIC_TYPE2) : directiveArray;
+        const pipesExpr = remoteScopesMayRequireCycleProtection && pipes.length > 0 ? new FunctionExpr([], [new ReturnStatement(pipesArray)], DYNAMIC_TYPE2) : pipesArray;
         const componentType = this.refEmitter.emit(decl, context);
         assertSuccessfulReferenceEmit(componentType, node, "component");
         const declExpr = componentType.expression;
@@ -14673,4 +14673,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-ZBSMACWW.js.map
+//# sourceMappingURL=chunk-P22XCJKX.js.map
