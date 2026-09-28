@@ -5040,34 +5040,33 @@ var NgCompiler = class _NgCompiler {
     let typeCheckingConfig;
     if (strictTemplates) {
       typeCheckingConfig = {
-        applyTemplateContextGuards: strictTemplates,
-        checkQueries: false,
+        applyTemplateContextGuards: true,
         checkTemplateBodies: true,
         alwaysCheckSchemaInTemplateBodies: true,
-        checkTypeOfInputBindings: strictTemplates,
+        checkTypeOfInputBindings: true,
         honorAccessModifiersForInputBindings: false,
         checkControlFlowBodies: true,
-        strictNullInputBindings: strictTemplates,
-        checkTypeOfAttributes: strictTemplates,
+        strictNullInputBindings: true,
+        checkTypeOfAttributes: true,
         // Even in full template type-checking mode, DOM binding checks are not quite ready yet.
         checkTypeOfDomBindings: false,
-        checkTypeOfOutputEvents: strictTemplates,
-        checkTypeOfAnimationEvents: strictTemplates,
+        checkTypeOfOutputEvents: true,
+        checkTypeOfAnimationEvents: true,
         // Checking of DOM events currently has an adverse effect on developer experience,
         // e.g. for `<input (blur)="update($event.target.value)">` enabling this check results in:
         // - error TS2531: Object is possibly 'null'.
         // - error TS2339: Property 'value' does not exist on type 'EventTarget'.
-        checkTypeOfDomEvents: strictTemplates,
+        checkTypeOfDomEvents: true,
         checkUnclaimedEventNames: false,
         // 3p-only
-        // g3-only checkUnclaimedEventNames: strictTemplates,
-        checkTypeOfDomReferences: strictTemplates,
+        // g3-only checkUnclaimedEventNames: true,
+        checkTypeOfDomReferences: true,
         // Non-DOM references have the correct type in View Engine so there is no strictness flag.
         checkTypeOfNonDomReferences: true,
         // Pipes are checked in View Engine so there is no strictness flag.
         checkTypeOfPipes: true,
-        strictSafeNavigationTypes: strictTemplates,
-        useContextGenericType: strictTemplates,
+        strictSafeNavigationTypes: true,
+        useContextGenericType: true,
         strictLiteralTypes: true,
         enableTemplateTypeChecker: this.enableTemplateTypeChecker,
         useInlineTypeConstructors,
@@ -5079,7 +5078,6 @@ var NgCompiler = class _NgCompiler {
     } else {
       typeCheckingConfig = {
         applyTemplateContextGuards: false,
-        checkQueries: false,
         checkTemplateBodies: false,
         checkControlFlowBodies: false,
         // Enable deep schema checking in "basic" template type-checking mode only if Closure
@@ -5756,4 +5754,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-2EPCYMBL.js.map
+//# sourceMappingURL=chunk-CAHQ45XF.js.map
