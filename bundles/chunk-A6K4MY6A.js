@@ -5065,9 +5065,13 @@ var NgCompiler = class _NgCompiler {
         // - error TS2531: Object is possibly 'null'.
         // - error TS2339: Property 'value' does not exist on type 'EventTarget'.
         checkTypeOfDomEvents: true,
+        // TODO: Enable those 2 flags by default in v23
         checkUnclaimedEventNames: false,
         // 3p-only
         // g3-only checkUnclaimedEventNames: true,
+        checkUnknownElements: false,
+        // 3p-only
+        // g3-only checkUnknownElements: true,
         checkTypeOfDomReferences: true,
         // Non-DOM references have the correct type in View Engine so there is no strictness flag.
         checkTypeOfNonDomReferences: true,
@@ -5111,7 +5115,8 @@ var NgCompiler = class _NgCompiler {
         controlFlowPreventingContentProjection: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         unusedStandaloneImports: this.options.extendedDiagnostics?.defaultCategory || DiagnosticCategoryLabel.Warning,
         allowSignalsInTwoWayBindings,
-        allowDomEventAssertion
+        allowDomEventAssertion,
+        checkUnknownElements: false
       };
     }
     if (this.options.strictInputTypes !== void 0) {
@@ -5154,6 +5159,9 @@ var NgCompiler = class _NgCompiler {
     }
     if (this.options.extendedDiagnostics?.checks?.unusedStandaloneImports !== void 0) {
       typeCheckingConfig.unusedStandaloneImports = this.options.extendedDiagnostics.checks.unusedStandaloneImports;
+    }
+    if (this.options.strictUnknownElements !== void 0) {
+      typeCheckingConfig.checkUnknownElements = this.options.strictUnknownElements;
     }
     return typeCheckingConfig;
   }
@@ -5762,4 +5770,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-LFUIK4LO.js.map
+//# sourceMappingURL=chunk-A6K4MY6A.js.map

@@ -8,7 +8,7 @@ import {
   TrackedIncrementalBuildStrategy,
   freshCompilationTicket,
   incrementalFromCompilerTicket
-} from "./chunk-LFUIK4LO.js";
+} from "./chunk-A6K4MY6A.js";
 import {
   ActivePerfRecorder,
   PerfCheckpoint,
@@ -453,29 +453,12 @@ function calcProjectFileAndBasePath(project, host = getFileSystem()) {
   const basePath = host.resolve(projectDir);
   return { projectFile, basePath };
 }
-function readConfiguration(project, existingOptions, host = getFileSystem()) {
+function readConfiguration(project, existingOptions, host = getFileSystem(), extendedConfigCache = /* @__PURE__ */ new Map()) {
   try {
     const fs = getFileSystem();
-    const readConfigFile = (configFile) => ts5.readConfigFile(configFile, (file) => host.readFile(host.resolve(file)));
-    const readAngularCompilerOptions = (configFile, parentOptions = {}) => {
-      const { config: config2, error: error2 } = readConfigFile(configFile);
-      if (error2) {
-        return parentOptions;
-      }
-      const angularCompilerOptions = config2.angularCompilerOptions ?? config2.bazelOptions?.angularCompilerOptions;
-      let existingNgCompilerOptions = { ...angularCompilerOptions, ...parentOptions };
-      if (!config2.extends) {
-        return existingNgCompilerOptions;
-      }
-      const extendsPaths = typeof config2.extends === "string" ? [config2.extends] : config2.extends;
-      return [...extendsPaths].reverse().reduce((prevOptions, extendsPath) => {
-        const extendedConfigPath = getExtendedConfigPath(configFile, extendsPath, host, fs);
-        return extendedConfigPath === null ? prevOptions : readAngularCompilerOptions(extendedConfigPath, prevOptions);
-      }, existingNgCompilerOptions);
-    };
     const { projectFile, basePath } = calcProjectFileAndBasePath(project, host);
-    const configFileName = host.resolve(host.pwd(), projectFile);
-    const { config, error } = readConfigFile(projectFile);
+    const parseConfigHost = createParseConfigHost(host, fs);
+    const { config, error } = readConfigFile(projectFile, host, fs, extendedConfigCache);
     if (error) {
       return {
         project,
@@ -488,13 +471,30 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
     const existingCompilerOptions = {
       genDir: basePath,
       basePath,
-      ...readAngularCompilerOptions(configFileName),
       ...existingOptions
     };
-    const parseConfigHost = createParseConfigHost(host, fs);
-    const { options, errors, fileNames: rootNames, projectReferences } = ts5.parseJsonConfigFileContent(config, parseConfigHost, basePath, existingCompilerOptions, configFileName);
+    const { options, errors, fileNames: rootNames, projectReferences } = ts5.parseJsonConfigFileContent(
+      /* json */
+      config,
+      /* host */
+      parseConfigHost,
+      /* basePath */
+      basePath,
+      /* existingOptions */
+      existingCompilerOptions,
+      /* configFileName */
+      projectFile,
+      /* resolutionStack */
+      void 0,
+      /* extraFileExtensions */
+      void 0,
+      /* extendedConfigCache */
+      extendedConfigCache
+    );
+    const angularCompilerOptions = readAngularCompilerOptions(projectFile, config, host, fs, parseConfigHost, extendedConfigCache);
+    Object.assign(options, angularCompilerOptions, existingOptions);
     let emitFlags = EmitFlags.Default;
-    if (!(options["skipMetadataEmit"] || options["flatModuleOutFile"])) {
+    if (!options["skipMetadataEmit"] && !options["flatModuleOutFile"]) {
       emitFlags |= EmitFlags.Metadata;
     }
     if (options["skipTemplateCodegen"]) {
@@ -516,6 +516,51 @@ function readConfiguration(project, existingOptions, host = getFileSystem()) {
     return { project: "", errors, rootNames: [], options: {}, emitFlags: EmitFlags.Default };
   }
 }
+function readConfigFile(configFile, host, fs, extendedConfigCache) {
+  const cacheKey = fs.isCaseSensitive() ? configFile : configFile.toLowerCase();
+  const cacheEntry = extendedConfigCache?.get(cacheKey);
+  if (cacheEntry) {
+    return {
+      config: cacheEntry.extendedConfig?.raw,
+      error: cacheEntry.extendedResult.parseDiagnostics?.[0]
+    };
+  }
+  return ts5.readConfigFile(configFile, (file) => host.readFile(host.resolve(file)));
+}
+function readAngularCompilerOptions(configFile, config, host, fs, parseConfigHost, extendedConfigCache) {
+  const cacheKey = fs.isCaseSensitive() ? configFile : configFile.toLowerCase();
+  const cacheEntry = extendedConfigCache.get(cacheKey);
+  const cachedExtendedConfig = cacheEntry?.extendedConfig;
+  if (cachedExtendedConfig?.angularCompilerOptions) {
+    return cachedExtendedConfig.angularCompilerOptions;
+  }
+  const angularCompilerOptions = config.angularCompilerOptions ?? config.bazelOptions?.angularCompilerOptions ?? {};
+  if (!config.extends) {
+    if (cachedExtendedConfig) {
+      cachedExtendedConfig.angularCompilerOptions = angularCompilerOptions;
+    }
+    return angularCompilerOptions;
+  }
+  const resolvedExtendedConfigPath = cachedExtendedConfig?.extendedConfigPath;
+  const extendsPaths = resolvedExtendedConfigPath ? typeof resolvedExtendedConfigPath === "string" ? [resolvedExtendedConfigPath] : resolvedExtendedConfigPath : typeof config.extends === "string" ? [config.extends] : Array.isArray(config.extends) ? config.extends : [];
+  const inheritedOptions = extendsPaths.reduce((prevOptions, extendsPath) => {
+    const extendedConfigPath = resolvedExtendedConfigPath ? absoluteFrom(extendsPath) : getExtendedConfigPath(configFile, extendsPath, host, fs, parseConfigHost);
+    if (extendedConfigPath === null) {
+      return prevOptions;
+    }
+    const { config: extendedConfig, error } = readConfigFile(extendedConfigPath, host, fs, extendedConfigCache);
+    if (error || !extendedConfig) {
+      return prevOptions;
+    }
+    const options = readAngularCompilerOptions(extendedConfigPath, extendedConfig, host, fs, parseConfigHost, extendedConfigCache);
+    return { ...prevOptions, ...options };
+  }, {});
+  const mergedOptions = { ...inheritedOptions, ...angularCompilerOptions };
+  if (cachedExtendedConfig) {
+    cachedExtendedConfig.angularCompilerOptions = mergedOptions;
+  }
+  return mergedOptions;
+}
 function createParseConfigHost(host, fs = getFileSystem()) {
   return {
     fileExists: host.exists.bind(host),
@@ -524,24 +569,18 @@ function createParseConfigHost(host, fs = getFileSystem()) {
     useCaseSensitiveFileNames: fs.isCaseSensitive()
   };
 }
-function getExtendedConfigPath(configFile, extendsValue, host, fs) {
-  const result = getExtendedConfigPathWorker(configFile, extendsValue, host, fs);
-  if (result !== null) {
-    return result;
-  }
-  return getExtendedConfigPathWorker(configFile, `${extendsValue}.json`, host, fs);
-}
-function getExtendedConfigPathWorker(configFile, extendsValue, host, fs) {
-  if (extendsValue.startsWith(".") || fs.isRooted(extendsValue)) {
-    const extendedConfigPath = host.resolve(host.dirname(configFile), extendsValue);
-    if (host.exists(extendedConfigPath)) {
-      return extendedConfigPath;
-    }
-  } else {
-    const parseConfigHost = createParseConfigHost(host, fs);
-    const { resolvedModule } = ts5.nodeModuleNameResolver(extendsValue, configFile, { moduleResolution: ts5.ModuleResolutionKind.NodeNext, resolveJsonModule: true }, parseConfigHost);
-    if (resolvedModule) {
-      return absoluteFrom(resolvedModule.resolvedFileName);
+function getExtendedConfigPath(configFile, extendsValue, host, fs, parseConfigHost) {
+  for (const candidate of [extendsValue, `${extendsValue}.json`]) {
+    if (candidate[0] === "." || fs.isRooted(candidate)) {
+      const extendedConfigPath = host.resolve(host.dirname(configFile), candidate);
+      if (host.exists(extendedConfigPath)) {
+        return extendedConfigPath;
+      }
+    } else {
+      const { resolvedModule } = ts5.nodeModuleNameResolver(candidate, configFile, { moduleResolution: ts5.ModuleResolutionKind.NodeNext, resolveJsonModule: true }, parseConfigHost);
+      if (resolvedModule) {
+        return absoluteFrom(resolvedModule.resolvedFileName);
+      }
     }
   }
   return null;
@@ -644,4 +683,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-OCYRTJE7.js.map
+//# sourceMappingURL=chunk-EOE26M66.js.map

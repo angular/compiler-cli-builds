@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 import ts from 'typescript';
-import { BazelAndG3Options, DiagnosticOptions, I18nOptions, LegacyNgcOptions, MiscOptions, TypeCheckingOptions, TargetOptions } from './public_options';
+import { BazelAndG3Options, DiagnosticOptions, I18nOptions, LegacyNgcOptions, MiscOptions, TargetOptions, TypeCheckingOptions } from './public_options';
 /**
  * Non-public options which are useful during testing of the compiler.
  */

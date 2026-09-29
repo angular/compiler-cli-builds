@@ -209,6 +209,12 @@ export interface TypeCheckingOptions {
      * Defaults to `false` unless `strictTemplates` is set.
      */
     strictLiteralTypes?: boolean;
+    /**
+     * Whether to validate unknown element tags even when matched by attribute directives.
+     *
+     * Defaults to `false`.
+     */
+    strictUnknownElements?: boolean;
 }
 /**
  * A label referring to a `ts.DiagnosticCategory` or `'suppress'`, meaning the associated diagnostic
