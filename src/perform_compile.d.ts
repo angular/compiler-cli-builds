@@ -23,7 +23,7 @@ export declare function calcProjectFileAndBasePath(project: string, host?: Confi
     projectFile: AbsoluteFsPath;
     basePath: AbsoluteFsPath;
 };
-export declare function readConfiguration(project: string, existingOptions?: api.CompilerOptions, host?: ConfigurationHost): ParsedConfiguration;
+export declare function readConfiguration(project: string, existingOptions?: api.CompilerOptions, host?: ConfigurationHost, extendedConfigCache?: Map<string, ts.ExtendedConfigCacheEntry>): ParsedConfiguration;
 export interface PerformCompilationResult {
     diagnostics: ReadonlyArray<ts.Diagnostic>;
     program?: api.Program;
