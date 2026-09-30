@@ -7985,8 +7985,8 @@ var CompletionEngine = class {
 // packages/compiler-cli/src/ngtsc/typecheck/src/context.js
 import { generateTypeCheckBlock as generateTypeCheckBlock2, ParseSourceFile as ParseSourceFile3, TcbGenericContextBehavior as TcbGenericContextBehavior2 } from "@angular/compiler";
 
-// node_modules/.aspect_rules_js/magic-string@1.2.3/node_modules/magic-string/dist/index.mjs
-import { encode } from "@jridgewell/sourcemap-codec";
+// node_modules/.aspect_rules_js/magic-string@1.4.2/node_modules/magic-string/dist/index.mjs
+import { encode, encodeRangeMappings } from "@jridgewell/sourcemap-codec";
 var BitSet = class BitSet2 {
   constructor(arg) {
     this.bits = arg instanceof BitSet2 ? arg.bits.slice() : [];
@@ -8080,7 +8080,7 @@ var Chunk = class Chunk2 {
     this.outro = "";
     this.end = index;
     if (this.edited) {
-      newChunk.edit("", false);
+      newChunk.edit("", false, true);
       this.content = "";
     } else
       this.content = originalBefore;
@@ -8100,11 +8100,12 @@ var Chunk = class Chunk2 {
       return true;
     const trimmed = this.content.replace(rx, "");
     if (trimmed.length) {
-      if (trimmed !== this.content)
+      if (trimmed !== this.content) {
         if (this.edited)
           this.edit(trimmed, this.storeName, true);
         else
           this.split(this.start + trimmed.length).edit("", void 0, true);
+      }
       return true;
     } else {
       this.edit("", void 0, true);
@@ -8119,13 +8120,14 @@ var Chunk = class Chunk2 {
       return true;
     const trimmed = this.content.replace(rx, "");
     if (trimmed.length) {
-      if (trimmed !== this.content)
+      if (trimmed !== this.content) {
         if (this.edited)
           this.edit(trimmed, this.storeName, true);
         else {
           this.split(this.end - trimmed.length);
           this.edit("", void 0, true);
         }
+      }
       return true;
     } else {
       this.edit("", void 0, true);
@@ -8159,11 +8161,21 @@ var SourceMap = class {
     this.sources = properties.sources;
     this.sourcesContent = properties.sourcesContent;
     this.names = properties.names;
-    this.mappings = encode(properties.mappings);
+    this.mappings = typeof properties.mappings === "string" ? properties.mappings : encode(properties.mappings);
     if (typeof properties.x_google_ignoreList !== "undefined")
       this.x_google_ignoreList = properties.x_google_ignoreList;
     if (typeof properties.debugId !== "undefined")
       this.debugId = properties.debugId;
+    if (typeof properties.rangeMappings !== "undefined") {
+      let shouldOutputRangeMapping = false;
+      for (const line of properties.rangeMappings)
+        if (line.length !== 0) {
+          shouldOutputRangeMapping = true;
+          break;
+        }
+      if (shouldOutputRangeMapping)
+        this.rangeMappings = encodeRangeMappings(properties.rangeMappings);
+    }
   }
   /**
   * Returns the equivalent of `JSON.stringify(map)`
@@ -8180,12 +8192,9 @@ var SourceMap = class {
   }
 };
 function getLocator(source) {
-  const originalLines = source.split("\n");
-  const lineOffsets = [];
-  for (let i = 0, pos = 0; i < originalLines.length; i++) {
-    lineOffsets.push(pos);
-    pos += originalLines[i].length + 1;
-  }
+  const lineOffsets = [0];
+  for (let i = source.indexOf("\n"); i !== -1; i = source.indexOf("\n", i + 1))
+    lineOffsets.push(i + 1);
   return function locate(index) {
     let i = 0;
     let j = lineOffsets.length;
@@ -8236,15 +8245,127 @@ var toString = Object.prototype.toString;
 function isObject(thing) {
   return toString.call(thing) === "[object Object]";
 }
-var wordRegex = /\w/;
+var BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+var intToChar = (() => {
+  const chars = new Uint8Array(64);
+  for (let i = 0; i < 64; i++)
+    chars[i] = BASE64_CHARS.charCodeAt(i);
+  return chars;
+})();
+var COMMA = 44;
+var SEMICOLON = 59;
+var BUFFER_SIZE = 16384;
+var FLUSH_THRESHOLD = 16348;
+var scratch = new Uint8Array(BUFFER_SIZE);
+function writeVlq(pos, num) {
+  num = num < 0 ? -num << 1 | 1 : num << 1;
+  do {
+    let clamped = num & 31;
+    num >>>= 5;
+    if (num > 0)
+      clamped |= 32;
+    scratch[pos++] = intToChar[clamped];
+  } while (num > 0);
+  return pos;
+}
+var decoder = new TextDecoder();
+var MappingsEncoder = class {
+  constructor() {
+    this.out = "";
+    this.pos = 0;
+    this.lines = [];
+    this.buffered = 0;
+    this.needsComma = false;
+    this.prevGenColumn = 0;
+    this.prevSourceIndex = 0;
+    this.prevSourceLine = 0;
+    this.prevSourceColumn = 0;
+    this.prevNameIndex = 0;
+  }
+  endLine(segments) {
+    this.lines.push(segments);
+    this.buffered += segments.length + 1;
+    if (this.buffered >= 4096)
+      this.drain(null);
+  }
+  segments(segments) {
+    this.drain(segments);
+  }
+  finish(segments) {
+    this.drain(segments);
+    this.flush();
+    return this.out;
+  }
+  drain(trailing) {
+    const lines = this.lines;
+    const lineCount = lines.length;
+    for (let l = 0; l <= lineCount; l++) {
+      const line = l < lineCount ? lines[l] : trailing;
+      if (line === null)
+        break;
+      for (let i = 0; i < line.length; i++) {
+        if (this.pos > FLUSH_THRESHOLD)
+          this.flush();
+        const segment = line[i];
+        if (this.needsComma)
+          scratch[this.pos++] = COMMA;
+        this.needsComma = true;
+        this.pos = writeVlq(this.pos, segment[0] - this.prevGenColumn);
+        this.prevGenColumn = segment[0];
+        this.pos = writeVlq(this.pos, segment[1] - this.prevSourceIndex);
+        this.prevSourceIndex = segment[1];
+        this.pos = writeVlq(this.pos, segment[2] - this.prevSourceLine);
+        this.prevSourceLine = segment[2];
+        this.pos = writeVlq(this.pos, segment[3] - this.prevSourceColumn);
+        this.prevSourceColumn = segment[3];
+        if (segment.length === 5) {
+          this.pos = writeVlq(this.pos, segment[4] - this.prevNameIndex);
+          this.prevNameIndex = segment[4];
+        }
+      }
+      if (l < lineCount) {
+        if (this.pos > FLUSH_THRESHOLD)
+          this.flush();
+        scratch[this.pos++] = SEMICOLON;
+        this.needsComma = false;
+        this.prevGenColumn = 0;
+      }
+    }
+    lines.length = 0;
+    this.buffered = 0;
+    this.flush();
+  }
+  flush() {
+    this.out += decoder.decode(scratch.subarray(0, this.pos));
+    this.pos = 0;
+  }
+};
+var NEWLINE_CHAR$1 = 10;
+function isWordCode(code) {
+  return code >= 97 && code <= 122 || code >= 65 && code <= 90 || code >= 48 && code <= 57 || code === 95;
+}
 var Mappings = class {
-  constructor(hires) {
+  constructor(hires, encoder = null) {
     this.hires = hires;
     this.generatedCodeLine = 0;
     this.generatedCodeColumn = 0;
     this.raw = [];
     this.rawSegments = this.raw[this.generatedCodeLine] = [];
-    this.pending = null;
+    this.rawRangeMappings = [];
+    this.rawRangeMappingsIndices = this.rawRangeMappings[this.generatedCodeLine] = [];
+    this.encoder = encoder;
+  }
+  nextLine() {
+    if (this.encoder === null) {
+      this.generatedCodeLine += 1;
+      this.raw[this.generatedCodeLine] = this.rawSegments = [];
+    } else {
+      this.encoder.endLine(this.rawSegments);
+      this.rawSegments = [];
+      this.generatedCodeLine += 1;
+    }
+    this.generatedCodeColumn = 0;
+    this.rawRangeMappings[this.generatedCodeLine] = this.rawRangeMappingsIndices = [];
   }
   addEdit(sourceIndex, content, loc, nameIndex) {
     if (content.length) {
@@ -8261,9 +8382,7 @@ var Mappings = class {
         if (nameIndex >= 0)
           segment2.push(nameIndex);
         this.rawSegments.push(segment2);
-        this.generatedCodeLine += 1;
-        this.raw[this.generatedCodeLine] = this.rawSegments = [];
-        this.generatedCodeColumn = 0;
+        this.nextLine();
         previousContentLineEnd = contentLineEnd;
         contentLineEnd = content.indexOf("\n", contentLineEnd + 1);
       }
@@ -8277,66 +8396,129 @@ var Mappings = class {
         segment.push(nameIndex);
       this.rawSegments.push(segment);
       this.advance(content.slice(previousContentLineEnd + 1));
-    } else if (this.pending) {
-      this.rawSegments.push(this.pending);
-      this.advance(content);
     }
-    this.pending = null;
   }
   addUneditedChunk(sourceIndex, chunk, original, loc, sourcemapLocations) {
-    let originalCharIndex = chunk.start;
-    let first = true;
-    let charInHiresBoundary = false;
-    while (originalCharIndex < chunk.end) {
-      if (original[originalCharIndex] === "\n") {
-        loc.line += 1;
-        loc.column = 0;
-        this.generatedCodeLine += 1;
-        this.raw[this.generatedCodeLine] = this.rawSegments = [];
-        this.generatedCodeColumn = 0;
-        first = true;
-        charInHiresBoundary = false;
-      } else {
-        if (this.hires || first || sourcemapLocations.has(originalCharIndex)) {
-          const segment = [
+    const end = chunk.end;
+    let i = chunk.start;
+    if (this.hires) {
+      const boundary = this.hires === "boundary";
+      const experimentalRange = this.hires === "experimental-range";
+      const encoder = experimentalRange ? null : this.encoder;
+      let charInHiresBoundary = false;
+      while (i < end) {
+        if (encoder !== null && this.rawSegments.length >= 4096) {
+          encoder.segments(this.rawSegments);
+          this.rawSegments.length = 0;
+        }
+        if (experimentalRange && i + 1 >= end)
+          this.rawSegments.push([
             this.generatedCodeColumn,
             sourceIndex,
             loc.line,
             loc.column
-          ];
-          if (this.hires === "boundary")
-            if (wordRegex.test(original[originalCharIndex])) {
+          ]);
+        const code = original.charCodeAt(i);
+        if (code === NEWLINE_CHAR$1) {
+          loc.line += 1;
+          loc.column = 0;
+          this.nextLine();
+          charInHiresBoundary = false;
+        } else {
+          if (boundary) {
+            if (isWordCode(code)) {
               if (!charInHiresBoundary) {
-                this.rawSegments.push(segment);
+                this.rawSegments.push([
+                  this.generatedCodeColumn,
+                  sourceIndex,
+                  loc.line,
+                  loc.column
+                ]);
                 charInHiresBoundary = true;
               }
             } else {
-              this.rawSegments.push(segment);
+              this.rawSegments.push([
+                this.generatedCodeColumn,
+                sourceIndex,
+                loc.line,
+                loc.column
+              ]);
               charInHiresBoundary = false;
             }
-          else
-            this.rawSegments.push(segment);
+          } else if (experimentalRange) {
+            if (i === chunk.start) {
+              this.rawRangeMappingsIndices.push(this.rawSegments.length);
+              this.rawSegments.push([
+                this.generatedCodeColumn,
+                sourceIndex,
+                loc.line,
+                loc.column
+              ]);
+            }
+          } else
+            this.rawSegments.push([
+              this.generatedCodeColumn,
+              sourceIndex,
+              loc.line,
+              loc.column
+            ]);
+          loc.column += 1;
+          this.generatedCodeColumn += 1;
         }
-        loc.column += 1;
-        this.generatedCodeColumn += 1;
-        first = false;
+        i += 1;
       }
-      originalCharIndex += 1;
+    } else {
+      const bits = sourcemapLocations.bits;
+      while (i < end) {
+        let newline = original.indexOf("\n", i);
+        if (newline === -1 || newline > end)
+          newline = end;
+        if (newline > i) {
+          this.rawSegments.push([
+            this.generatedCodeColumn,
+            sourceIndex,
+            loc.line,
+            loc.column
+          ]);
+          for (let w = i + 1 >> 5, last = newline - 1 >> 5; w <= last; w++) {
+            let word = bits[w];
+            if (!word)
+              continue;
+            const base = w << 5;
+            while (word) {
+              const lowest = word & -word;
+              const index = base + 31 - Math.clz32(lowest);
+              if (index > i && index < newline) {
+                const offset = index - i;
+                this.rawSegments.push([
+                  this.generatedCodeColumn + offset,
+                  sourceIndex,
+                  loc.line,
+                  loc.column + offset
+                ]);
+              }
+              word ^= lowest;
+            }
+          }
+          loc.column += newline - i;
+          this.generatedCodeColumn += newline - i;
+        }
+        if (newline === end)
+          break;
+        loc.line += 1;
+        loc.column = 0;
+        this.nextLine();
+        i = newline + 1;
+      }
     }
-    this.pending = null;
   }
   advance(str) {
     if (!str)
       return;
-    const lines = str.split("\n");
-    if (lines.length > 1) {
-      for (let i = 0; i < lines.length - 1; i++) {
-        this.generatedCodeLine++;
-        this.raw[this.generatedCodeLine] = this.rawSegments = [];
-      }
-      this.generatedCodeColumn = 0;
-    }
-    this.generatedCodeColumn += lines[lines.length - 1].length;
+    const lastNewline = str.lastIndexOf("\n");
+    for (let i = str.indexOf("\n"); i !== -1; i = str.indexOf("\n", i + 1))
+      this.nextLine();
+    this.generatedCodeColumn += str.length - lastNewline - 1;
   }
 };
 var n = "\n";
@@ -8347,6 +8529,55 @@ var warned = {
   insertRight: false,
   storeName: false
 };
+function expandReplacement(replacement, matched, position, str, captures, namedCaptures) {
+  if (!replacement.includes("$"))
+    return replacement;
+  let result = "";
+  let index = 0;
+  while (index < replacement.length) {
+    const dollar = replacement.indexOf("$", index);
+    if (dollar === -1) {
+      result += replacement.slice(index);
+      break;
+    }
+    result += replacement.slice(index, dollar);
+    const char = replacement[dollar + 1];
+    let expansion = "$";
+    let consumed = 1;
+    if (char === "$")
+      consumed = 2;
+    else if (char === "&") {
+      expansion = matched;
+      consumed = 2;
+    } else if (char === "`") {
+      expansion = str.slice(0, position);
+      consumed = 2;
+    } else if (char === "'") {
+      expansion = str.slice(position + matched.length);
+      consumed = 2;
+    } else if (char === "<" && namedCaptures !== void 0) {
+      const close = replacement.indexOf(">", dollar + 2);
+      if (close !== -1) {
+        expansion = namedCaptures[replacement.slice(dollar + 2, close)] ?? "";
+        consumed = close + 1 - dollar;
+      }
+    } else if (char >= "0" && char <= "9") {
+      const second = replacement[dollar + 2];
+      const double = second >= "0" && second <= "9" ? Number(char + second) : NaN;
+      const single = Number(char);
+      if (double >= 1 && double <= captures.length) {
+        expansion = captures[double - 1] ?? "";
+        consumed = 3;
+      } else if (single >= 1 && single <= captures.length) {
+        expansion = captures[single - 1] ?? "";
+        consumed = 2;
+      }
+    }
+    result += expansion;
+    index = dollar + consumed;
+  }
+  return result;
+}
 var MagicString = class MagicString2 {
   constructor(string, options = {}) {
     const chunk = new Chunk(0, string.length, string);
@@ -8505,9 +8736,32 @@ var MagicString = class MagicString2 {
   */
   generateDecodedMap(options) {
     options = options || {};
+    const mappings = new Mappings(options.hires);
+    const names = this._generateMappings(mappings);
+    return {
+      ...this._mapProperties(options, names),
+      mappings: mappings.raw,
+      rangeMappings: mappings.rawRangeMappings
+    };
+  }
+  /**
+  * Generates a version 3 sourcemap.
+  */
+  generateMap(options) {
+    options = options || {};
+    const encoder = new MappingsEncoder();
+    const mappings = new Mappings(options.hires, encoder);
+    const names = this._generateMappings(mappings);
+    return new SourceMap({
+      ...this._mapProperties(options, names),
+      mappings: encoder.finish(mappings.rawSegments),
+      rangeMappings: mappings.rawRangeMappings
+    });
+  }
+  /** @internal */
+  _generateMappings(mappings) {
     const sourceIndex = 0;
     const names = Object.keys(this.storedNames);
-    const mappings = new Mappings(options.hires);
     const locate = getLocator(this.original);
     if (this.intro)
       mappings.advance(this.intro);
@@ -8524,20 +8778,17 @@ var MagicString = class MagicString2 {
     });
     if (this.outro)
       mappings.advance(this.outro);
+    return names;
+  }
+  /** @internal */
+  _mapProperties(options, names) {
     return {
       file: options.file ? options.file.split(/[/\\]/).pop() : void 0,
       sources: [options.source ? getRelativePath(options.file || "", options.source) : options.file || ""],
       sourcesContent: options.includeContent ? [this.original] : void 0,
       names,
-      mappings: mappings.raw,
-      x_google_ignoreList: this.ignoreList ? [sourceIndex] : void 0
+      x_google_ignoreList: this.ignoreList ? [0] : void 0
     };
-  }
-  /**
-  * Generates a version 3 sourcemap.
-  */
-  generateMap(options) {
-    return new SourceMap(this.generateDecodedMap(options));
   }
   /** @internal */
   _ensureindentStr() {
@@ -8574,19 +8825,20 @@ var MagicString = class MagicString2 {
           isExcluded[i] = true;
       });
     let shouldIndentNextCharacter = options.indentStart !== false;
-    const replacer = (match) => {
-      if (shouldIndentNextCharacter)
-        return `${resolvedIndentStr}${match}`;
-      shouldIndentNextCharacter = true;
-      return match;
+    const indentPiece = (str) => {
+      if (str === "")
+        return str;
+      const indented = str.replace(pattern, (match, offset) => offset > 0 || shouldIndentNextCharacter ? `${resolvedIndentStr}${match}` : match);
+      shouldIndentNextCharacter = str[str.length - 1] === "\n";
+      return indented;
     };
-    this.intro = this.intro.replace(pattern, replacer);
+    this.intro = indentPiece(this.intro);
     let charIndex = 0;
     let chunk = this.firstChunk;
     const indentAt = (index) => {
       shouldIndentNextCharacter = false;
       if (index === chunk.start)
-        chunk.prependRight(resolvedIndentStr);
+        chunk.appendRight(resolvedIndentStr);
       else {
         this._splitChunk(chunk, index);
         chunk = chunk.next;
@@ -8595,12 +8847,11 @@ var MagicString = class MagicString2 {
     };
     while (chunk) {
       const end = chunk.end;
+      if (!isExcluded[chunk.start])
+        chunk.intro = indentPiece(chunk.intro);
       if (chunk.edited) {
-        if (!isExcluded[charIndex]) {
-          chunk.content = chunk.content.replace(pattern, replacer);
-          if (chunk.content.length)
-            shouldIndentNextCharacter = chunk.content[chunk.content.length - 1] === "\n";
-        }
+        if (!isExcluded[charIndex])
+          chunk.content = indentPiece(chunk.content);
       } else if (options.exclude) {
         charIndex = chunk.start;
         while (charIndex < end) {
@@ -8633,10 +8884,12 @@ var MagicString = class MagicString2 {
           charIndex += 1;
         }
       }
+      if (!isExcluded[chunk.end - 1])
+        chunk.outro = indentPiece(chunk.outro);
       charIndex = chunk.end;
       chunk = chunk.next;
     }
-    this.outro = this.outro.replace(pattern, replacer);
+    this.outro = indentPiece(this.outro);
     return this;
   }
   /** @internal */
@@ -8661,8 +8914,14 @@ var MagicString = class MagicString2 {
   }
   /**
   * Moves the characters from `start` and `end` to `index`.
+  *
+  * `affinity` controls where the range is anchored at `index`. With the
+  * default `'right'`, it is inserted before the content that starts at `index`;
+  * with `'left'`, it is inserted after the content that ends at `index`. The
+  * two differ only when other content has already been moved to that boundary,
+  * mirroring the `appendLeft`/`appendRight` distinction.
   */
-  move(start, end, index) {
+  move(start, end, index, affinity = "right") {
     start = start + this.offset;
     end = end + this.offset;
     index = index + this.offset;
@@ -8685,10 +8944,31 @@ var MagicString = class MagicString2 {
     }
     const oldLeft = first.previous;
     const oldRight = last.next;
-    const newRight = this.byStart.get(index);
-    if (!newRight && last === this.lastChunk)
-      return this;
-    const newLeft = newRight ? newRight.previous : this.lastChunk;
+    let newLeft;
+    let newRight;
+    if (affinity === "left") {
+      newLeft = this.byEnd.get(index) ?? null;
+      if (!newLeft) {
+        if (first === this.firstChunk)
+          return this;
+        newRight = this.firstChunk;
+      } else {
+        if (newLeft.next === first)
+          return this;
+        newRight = newLeft.next;
+      }
+    } else {
+      newRight = this.byStart.get(index) ?? null;
+      if (!newRight) {
+        if (last === this.lastChunk)
+          return this;
+        newLeft = this.lastChunk;
+      } else {
+        if (newRight.previous === last)
+          return this;
+        newLeft = newRight.previous;
+      }
+    }
     if (oldLeft)
       oldLeft.next = oldRight;
     if (oldRight)
@@ -8834,7 +9114,10 @@ var MagicString = class MagicString2 {
   }
   /**
   * Removes the characters from `start` to `end` (of the original string, **not** the generated string).
-  * Removing the same content twice, or making removals that partially overlap, will cause an error.
+  * Content appended or prepended at positions strictly inside the range is removed with it, while
+  * content attached at `start` or `end` is preserved — use `s.overwrite(start, end, '')` to remove
+  * the range including its edge inserts.
+  * Repeated removals and removals with partially overlapping ranges are allowed.
   */
   remove(start, end) {
     start = start + this.offset;
@@ -8855,9 +9138,11 @@ var MagicString = class MagicString2 {
     this._split(end);
     let chunk = this.byStart.get(start);
     while (chunk) {
-      chunk.intro = "";
-      chunk.outro = "";
-      chunk.edit("");
+      if (chunk.start > start)
+        chunk.intro = "";
+      if (chunk.end < end)
+        chunk.outro = "";
+      chunk.edit("", false, true);
       chunk = end > chunk.end ? this.byStart.get(chunk.end) : null;
     }
     return this;
@@ -8954,7 +9239,7 @@ var MagicString = class MagicString2 {
     let result = "";
     let chunk = this.firstChunk;
     while (chunk && (chunk.start > start || chunk.end <= start)) {
-      if (chunk.start < end && chunk.end >= end)
+      if (chunk.start < end && chunk.end >= end || end === 0 && chunk.start === 0)
         return result;
       chunk = chunk.next;
     }
@@ -8962,6 +9247,8 @@ var MagicString = class MagicString2 {
       throw new MagicStringError(`cannot use edited character ${start} as slice start anchor`);
     const startChunk = chunk;
     while (chunk) {
+      if (end === 0 && chunk.start === 0)
+        break;
       if (chunk.intro && (startChunk !== chunk || chunk.start === start))
         result += chunk.intro;
       const containsEnd = chunk.start < end && chunk.end >= end;
@@ -9034,12 +9321,16 @@ var MagicString = class MagicString2 {
   * Returns true if the resulting source is empty (disregarding white space).
   */
   isEmpty() {
+    if (this.intro.length && this.intro.trim())
+      return false;
     let chunk = this.firstChunk;
     while (chunk) {
       if (chunk.intro.length && chunk.intro.trim() || chunk.content.length && chunk.content.trim() || chunk.outro.length && chunk.outro.trim())
         return false;
       chunk = chunk.next;
     }
+    if (this.outro.length && this.outro.trim())
+      return false;
     return true;
   }
   length() {
@@ -9084,7 +9375,8 @@ var MagicString = class MagicString2 {
         return true;
       chunk = chunk.previous;
     } while (chunk);
-    return false;
+    this.intro = this.intro.replace(rx, "");
+    return this.intro.length > 0;
   }
   /**
   * Trims content matching `charType` (defaults to `\s`, i.e. whitespace) from the end.
@@ -9114,7 +9406,8 @@ var MagicString = class MagicString2 {
         return true;
       chunk = chunk.next;
     } while (chunk);
-    return false;
+    this.outro = this.outro.replace(rx, "");
+    return this.outro.length > 0;
   }
   /**
   * Trims content matching `charType` (defaults to `\s`, i.e. whitespace) from the start.
@@ -9145,32 +9438,52 @@ var MagicString = class MagicString2 {
     }
     return outputIndex !== this.original.length;
   }
+  /**
+  * Whether the original range [start, end) has had any of its characters
+  * removed. `replace`/`replaceAll` search `original`, so a match can land on
+  * text that is no longer in the output - overwriting it would resurrect the
+  * removed characters, so such matches are skipped instead.
+  *
+  * @internal
+  */
+  _hasRemovedContent(start, end) {
+    let chunk = this.byStart.get(start);
+    if (!chunk) {
+      chunk = this.lastSearchedChunk;
+      const searchForward = start >= chunk.end;
+      while (chunk && !chunk.contains(start))
+        chunk = searchForward ? this.byStart.get(chunk.end) : this.byEnd.get(chunk.start);
+      if (chunk)
+        this.lastSearchedChunk = chunk;
+    }
+    while (chunk && chunk.start < end) {
+      if (chunk.content === "")
+        return true;
+      chunk = this.byStart.get(chunk.end);
+    }
+    return false;
+  }
   /** @internal */
   _replaceRegexp(searchValue, replacement) {
     function getReplacement(match, str) {
       if (typeof replacement === "string")
-        return replacement.replace(/\$(\$|&|\d+)/g, (_, i) => {
-          if (i === "$")
-            return "$";
-          if (i === "&")
-            return match[0];
-          if (+i < match.length)
-            return match[+i];
-          return `$${i}`;
-        });
+        return expandReplacement(replacement, match[0], match.index, str, match.slice(1), match.groups);
       else
-        return replacement(match[0], ...match.slice(1), match.index, str, match.groups);
+        return match.groups === void 0 ? replacement(match[0], ...match.slice(1), match.index, str) : replacement(match[0], ...match.slice(1), match.index, str, match.groups);
     }
     const replaceMatch = (match) => {
       if (match.index == null)
-        return;
+        return false;
+      if (this._hasRemovedContent(match.index, match.index + match[0].length))
+        return false;
       const replacement2 = getReplacement(match, this.original);
       if (replacement2 === match[0])
-        return;
+        return true;
       if (match[0].length === 0)
         this.appendRight(match.index, replacement2);
       else
         this.overwrite(match.index, match.index + match[0].length, replacement2);
+      return true;
     };
     if (searchValue.global) {
       searchValue.lastIndex = 0;
@@ -9178,23 +9491,35 @@ var MagicString = class MagicString2 {
         replaceMatch(match);
     } else {
       const match = this.original.match(searchValue);
-      if (match)
-        replaceMatch(match);
+      if (match && !replaceMatch(match)) {
+        const global = new RegExp(searchValue.source, `${searchValue.flags}g`);
+        for (const next of this.original.matchAll(global))
+          if (replaceMatch(next))
+            break;
+      }
     }
     return this;
   }
   /** @internal */
   _replaceString(string, replacement) {
     const { original } = this;
-    const index = original.indexOf(string);
-    if (index !== -1) {
+    let index = original.indexOf(string);
+    while (index !== -1) {
+      if (this._hasRemovedContent(index, index + string.length)) {
+        index = original.indexOf(string, index + string.length);
+        continue;
+      }
       if (typeof replacement === "function")
         replacement = replacement(string, index, original);
-      if (string !== replacement)
+      else
+        replacement = expandReplacement(replacement, string, index, original, [], void 0);
+      if (string !== replacement) {
         if (string.length === 0)
           this.appendRight(index, replacement);
         else
           this.overwrite(index, index + string.length, replacement);
+      }
+      break;
     }
     return this;
   }
@@ -9212,15 +9537,19 @@ var MagicString = class MagicString2 {
     const stringLength = string.length;
     if (stringLength === 0) {
       for (let index = 0; index <= original.length; index += 1) {
-        const _replacement = typeof replacement === "function" ? replacement("", index, original) : replacement;
+        if (this._hasRemovedContent(index, index))
+          continue;
+        const _replacement = typeof replacement === "function" ? replacement("", index, original) : expandReplacement(replacement, "", index, original, [], void 0);
         if (_replacement !== "")
           this.appendRight(index, _replacement);
       }
       return this;
     }
     for (let index = original.indexOf(string); index !== -1; index = original.indexOf(string, index + stringLength)) {
+      if (this._hasRemovedContent(index, index + stringLength))
+        continue;
       const previous = original.slice(index, index + stringLength);
-      const _replacement = typeof replacement === "function" ? replacement(previous, index, original) : replacement;
+      const _replacement = typeof replacement === "function" ? replacement(previous, index, original) : expandReplacement(replacement, previous, index, original, [], void 0);
       if (previous !== _replacement)
         this.overwrite(index, index + stringLength, _replacement);
     }
@@ -14661,4 +14990,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-IVERJMST.js.map
+//# sourceMappingURL=chunk-YY4L6UPZ.js.map
