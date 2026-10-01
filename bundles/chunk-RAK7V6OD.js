@@ -3,10 +3,6 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
-  AbsoluteSourceSpan,
-  IdentifierKind
-} from "./chunk-G65IA3BS.js";
-import {
   ActivePerfRecorder,
   CompilationMode,
   ComponentDecoratorHandler,
@@ -54,7 +50,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-YY4L6UPZ.js";
+} from "./chunk-VZZQNH2P.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -1778,7 +1774,7 @@ var DiagnosticCategoryLabel;
 })(DiagnosticCategoryLabel || (DiagnosticCategoryLabel = {}));
 
 // packages/compiler-cli/src/ngtsc/core/src/compiler.js
-import { LEGACY_OPTIONAL_CHAINING_DEFAULT } from "@angular/compiler";
+import { generateIndexerAnalysis, IndexingContext, LEGACY_OPTIONAL_CHAINING_DEFAULT } from "@angular/compiler";
 import ts29 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/cycles/src/analyzer.js
@@ -2180,374 +2176,6 @@ var ReferenceGraph = class {
     }
   }
 };
-
-// packages/compiler-cli/src/ngtsc/indexer/src/context.js
-var IndexingContext = class {
-  components = /* @__PURE__ */ new Set();
-  /**
-   * Adds a component to the context.
-   */
-  addComponent(info) {
-    this.components.add(info);
-  }
-};
-
-// packages/compiler-cli/src/ngtsc/indexer/src/template.js
-import { ASTWithSource, CombinedRecursiveAstVisitor, ImplicitReceiver, PropertyRead, ThisReceiver, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, tmplAstVisitAll } from "@angular/compiler";
-var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
-  boundTemplate;
-  // Identifiers of interest found in the template.
-  identifiers = /* @__PURE__ */ new Set();
-  errors = [];
-  currentAstWithSource = null;
-  // Map of targets in a template to their identifiers.
-  targetIdentifierCache = /* @__PURE__ */ new Map();
-  // Map of elements and templates to their identifiers.
-  directiveHostIdentifierCache = /* @__PURE__ */ new Map();
-  /**
-   * Creates a template visitor for a bound template target. The bound target can be used when
-   * deferred to the expression visitor to get information about the target of an expression.
-   *
-   * @param boundTemplate bound template target
-   */
-  constructor(boundTemplate) {
-    super();
-    this.boundTemplate = boundTemplate;
-  }
-  /**
-   * Add an identifier for an HTML element and visit its children recursively.
-   *
-   * @param element
-   */
-  visitElement(element) {
-    const elementIdentifier = this.directiveHostToIdentifier(element);
-    if (elementIdentifier !== null) {
-      this.identifiers.add(elementIdentifier);
-    }
-    super.visitElement(element);
-  }
-  visitTemplate(template) {
-    const templateIdentifier = this.directiveHostToIdentifier(template);
-    if (templateIdentifier !== null) {
-      this.identifiers.add(templateIdentifier);
-    }
-    super.visitTemplate(template);
-  }
-  visitReference(reference) {
-    const referenceIdentifier = this.targetToIdentifier(reference);
-    if (referenceIdentifier !== null) {
-      this.identifiers.add(referenceIdentifier);
-    }
-    super.visitReference(reference);
-  }
-  visitVariable(variable) {
-    const variableIdentifier = this.targetToIdentifier(variable);
-    if (variableIdentifier !== null) {
-      this.identifiers.add(variableIdentifier);
-    }
-    super.visitVariable(variable);
-  }
-  visitLetDeclaration(decl) {
-    const identifier = this.targetToIdentifier(decl);
-    if (identifier !== null) {
-      this.identifiers.add(identifier);
-    }
-    super.visitLetDeclaration(decl);
-  }
-  visitComponent(component) {
-    const identifier = this.directiveHostToIdentifier(component);
-    if (identifier !== null) {
-      this.identifiers.add(identifier);
-    }
-    super.visitComponent(component);
-  }
-  visitDirective(directive) {
-    const identifier = this.directiveHostToIdentifier(directive);
-    if (identifier !== null) {
-      this.identifiers.add(identifier);
-    }
-    super.visitDirective(directive);
-  }
-  visitPropertyRead(ast) {
-    this.visitIdentifier(ast, IdentifierKind.Property);
-    super.visitPropertyRead(ast, null);
-  }
-  visitPipe(ast) {
-    this.visitPipeIdentifier(ast);
-    super.visitPipe(ast, null);
-  }
-  visitPipeIdentifier(ast) {
-    if (this.currentAstWithSource === null || this.currentAstWithSource.source === null) {
-      return;
-    }
-    const { absoluteOffset, source: expressionStr } = this.currentAstWithSource;
-    const identifierStart = ast.nameSpan.start - absoluteOffset;
-    if (!expressionStr.startsWith(ast.name, identifierStart)) {
-      this.errors.push(new Error(`Impossible state: "${ast.name}" not found in "${expressionStr}" at location ${identifierStart}`));
-      return;
-    }
-    const absoluteStart = absoluteOffset + identifierStart;
-    const span = new AbsoluteSourceSpan(absoluteStart, absoluteStart + ast.name.length);
-    const target = this.boundTemplate.getPipe(ast.name);
-    const identifier = {
-      name: ast.name,
-      span,
-      kind: IdentifierKind.Pipe,
-      target: target ? { node: target.ref.node } : null
-    };
-    this.identifiers.add(identifier);
-  }
-  visitBoundAttribute(attribute) {
-    const identifier = this.bindingToIdentifier(attribute, IdentifierKind.Input);
-    if (identifier !== null) {
-      this.identifiers.add(identifier);
-    }
-    const previous = this.currentAstWithSource;
-    this.currentAstWithSource = {
-      source: attribute.valueSpan?.toString() || null,
-      absoluteOffset: attribute.valueSpan ? attribute.valueSpan.start.offset : -1
-    };
-    this.visit(attribute.value instanceof ASTWithSource ? attribute.value.ast : attribute.value);
-    this.currentAstWithSource = previous;
-  }
-  visitBoundEvent(event) {
-    const identifier = this.bindingToIdentifier(event, IdentifierKind.Output);
-    if (identifier !== null) {
-      this.identifiers.add(identifier);
-    }
-    super.visitBoundEvent(event);
-  }
-  visitTextAttribute(attribute) {
-    const identifier = this.bindingToIdentifier(attribute, IdentifierKind.Input);
-    if (identifier !== null) {
-      this.identifiers.add(identifier);
-    }
-    super.visitTextAttribute(attribute);
-  }
-  bindingToIdentifier(node, kind) {
-    if (!this.boundTemplate.getConsumerOfBinding) {
-      return null;
-    }
-    const consumer = this.boundTemplate.getConsumerOfBinding(node);
-    if (!consumer || consumer instanceof TmplAstElement || consumer instanceof TmplAstTemplate) {
-      return null;
-    }
-    const keySpan = node.keySpan ?? (node instanceof TmplAstTextAttribute ? node.sourceSpan : null);
-    if (!keySpan) {
-      return null;
-    }
-    const span = new AbsoluteSourceSpan(keySpan.start.offset, keySpan.start.offset + node.name.length);
-    return {
-      name: node.name,
-      span,
-      kind,
-      target: {
-        node: consumer.ref.node
-      }
-    };
-  }
-  /** Creates an identifier for a template element or template node. */
-  directiveHostToIdentifier(node) {
-    if (this.directiveHostIdentifierCache.has(node)) {
-      return this.directiveHostIdentifierCache.get(node);
-    }
-    let name;
-    let kind;
-    if (node instanceof TmplAstTemplate) {
-      name = node.tagName ?? "ng-template";
-      kind = IdentifierKind.Template;
-    } else if (node instanceof TmplAstElement) {
-      name = node.name;
-      kind = IdentifierKind.Element;
-    } else if (node instanceof TmplAstComponent) {
-      name = node.fullName;
-      kind = IdentifierKind.Component;
-    } else {
-      name = node.name;
-      kind = IdentifierKind.Directive;
-    }
-    if ((node instanceof TmplAstTemplate || node instanceof TmplAstElement) && name.startsWith(":")) {
-      name = name.split(":").pop();
-    }
-    const sourceSpan = node.startSourceSpan;
-    const start = this.getStartLocation(name, sourceSpan);
-    if (start === null) {
-      return null;
-    }
-    const absoluteSpan = new AbsoluteSourceSpan(start, start + name.length);
-    const attributes = node.attributes.map(({ name: name2, sourceSpan: sourceSpan2 }) => {
-      return {
-        name: name2,
-        span: new AbsoluteSourceSpan(sourceSpan2.start.offset, sourceSpan2.end.offset),
-        kind: IdentifierKind.Attribute
-      };
-    });
-    const usedDirectives = this.boundTemplate.getDirectivesOfNode(node) || [];
-    const identifier = {
-      name,
-      span: absoluteSpan,
-      kind,
-      attributes: new Set(attributes),
-      usedDirectives: new Set(usedDirectives.map((dir) => {
-        return {
-          node: dir.ref.node,
-          selector: dir.selector
-        };
-      }))
-      // cast b/c pre-TypeScript 3.5 unions aren't well discriminated
-    };
-    this.directiveHostIdentifierCache.set(node, identifier);
-    return identifier;
-  }
-  /** Creates an identifier for a template reference or template variable target. */
-  targetToIdentifier(node) {
-    if (this.targetIdentifierCache.has(node)) {
-      return this.targetIdentifierCache.get(node);
-    }
-    const { name, sourceSpan } = node;
-    const start = this.getStartLocation(name, sourceSpan);
-    if (start === null) {
-      return null;
-    }
-    const span = new AbsoluteSourceSpan(start, start + name.length);
-    let identifier;
-    if (node instanceof TmplAstReference) {
-      const refTarget = this.boundTemplate.getReferenceTarget(node);
-      let target = null;
-      if (refTarget) {
-        let node2 = null;
-        let directive = null;
-        if (refTarget instanceof TmplAstElement || refTarget instanceof TmplAstTemplate || refTarget instanceof TmplAstComponent || refTarget instanceof TmplAstDirective) {
-          node2 = this.directiveHostToIdentifier(refTarget);
-        } else {
-          node2 = this.directiveHostToIdentifier(refTarget.node);
-          directive = refTarget.directive.ref.node;
-        }
-        if (node2 === null) {
-          return null;
-        }
-        target = {
-          node: node2,
-          directive
-        };
-      }
-      identifier = {
-        name,
-        span,
-        kind: IdentifierKind.Reference,
-        target
-      };
-    } else if (node instanceof TmplAstVariable) {
-      identifier = {
-        name,
-        span,
-        kind: IdentifierKind.Variable
-      };
-    } else {
-      identifier = {
-        name,
-        span,
-        kind: IdentifierKind.LetDeclaration
-      };
-    }
-    this.targetIdentifierCache.set(node, identifier);
-    return identifier;
-  }
-  /** Gets the start location of a string in a SourceSpan */
-  getStartLocation(name, context) {
-    const localStr = context.toString();
-    if (!localStr.includes(name)) {
-      this.errors.push(new Error(`Impossible state: "${name}" not found in "${localStr}"`));
-      return null;
-    }
-    return context.start.offset + localStr.indexOf(name);
-  }
-  /**
-   * Visits a node's expression and adds its identifiers, if any, to the visitor's state.
-   * Only ASTs with information about the expression source and its location are visited.
-   *
-   * @param node node whose expression to visit
-   */
-  visit(node) {
-    if (node instanceof ASTWithSource) {
-      const previous = this.currentAstWithSource;
-      this.currentAstWithSource = { source: node.source, absoluteOffset: node.sourceSpan.start };
-      super.visit(node.ast);
-      this.currentAstWithSource = previous;
-    } else {
-      super.visit(node);
-    }
-  }
-  /**
-   * Visits an identifier, adding it to the identifier store if it is useful for indexing.
-   *
-   * @param ast expression AST the identifier is in
-   * @param kind identifier kind
-   */
-  visitIdentifier(ast, kind) {
-    if (this.currentAstWithSource === null || this.currentAstWithSource.source === null) {
-      return;
-    }
-    if (!(ast.receiver instanceof ImplicitReceiver) && !(ast.receiver instanceof ThisReceiver)) {
-      return;
-    }
-    const { absoluteOffset, source: expressionStr } = this.currentAstWithSource;
-    let identifierStart = ast.sourceSpan.start - absoluteOffset;
-    if (ast instanceof PropertyRead) {
-      identifierStart = ast.nameSpan.start - absoluteOffset;
-    }
-    if (!expressionStr.substring(identifierStart).startsWith(ast.name)) {
-      this.errors.push(new Error(`Impossible state: "${ast.name}" not found in "${expressionStr}" at location ${identifierStart}`));
-      return;
-    }
-    const absoluteStart = absoluteOffset + identifierStart;
-    const span = new AbsoluteSourceSpan(absoluteStart, absoluteStart + ast.name.length);
-    const targetAst = this.boundTemplate.getExpressionTarget(ast);
-    const target = targetAst ? this.targetToIdentifier(targetAst) : null;
-    const identifier = {
-      name: ast.name,
-      span,
-      kind,
-      target
-    };
-    this.identifiers.add(identifier);
-  }
-};
-function getTemplateIdentifiers(boundTemplate) {
-  const visitor = new TemplateVisitor(boundTemplate);
-  const template = boundTemplate.getTemplateAst();
-  if (template !== void 0) {
-    tmplAstVisitAll(visitor, template);
-  }
-  return { identifiers: visitor.identifiers, errors: visitor.errors };
-}
-
-// packages/compiler-cli/src/ngtsc/indexer/src/transform.js
-function generateAnalysis(context, adapter) {
-  const analysis = /* @__PURE__ */ new Map();
-  context.components.forEach(({ declaration, selector, boundTemplate, templateMeta }) => {
-    const name = adapter.getName(declaration);
-    const fileName = adapter.getFileName(declaration);
-    let templateFileUrl;
-    if (templateMeta.isInline) {
-      templateFileUrl = fileName;
-    } else {
-      templateFileUrl = templateMeta.file.url;
-    }
-    const { identifiers, errors } = getTemplateIdentifiers(boundTemplate);
-    analysis.set(declaration, {
-      name,
-      selector,
-      fileUrl: fileName,
-      template: {
-        identifiers,
-        fileUrl: templateFileUrl
-      },
-      errors
-    });
-  });
-  return analysis;
-}
 
 // packages/compiler-cli/src/ngtsc/metadata/src/ng_module_index.js
 var NgModuleIndexImpl = class {
@@ -2970,7 +2598,7 @@ var StandaloneComponentScopeReader = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/interpolated_signal_not_invoked/index.js
-import { ASTWithSource as ASTWithSource2, BindingType, Conditional, Interpolation, NonNullAssert as NonNullAssert2, ParenthesizedExpression as ParenthesizedExpression2, PrefixNot, PropertyRead as PropertyRead2, TmplAstBoundAttribute, TmplAstElement as TmplAstElement2, TmplAstIfBlock, TmplAstSwitchBlock, TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
+import { ASTWithSource, BindingType, Conditional, Interpolation, isNgTemplate as isNgTemplate2, NonNullAssert as NonNullAssert2, ParenthesizedExpression as ParenthesizedExpression2, PrefixNot, PropertyRead, TmplAstBoundAttribute, TmplAstElement, TmplAstIfBlock, TmplAstSwitchBlock, TmplAstTemplate } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/symbol_util.js
 import ts19 from "typescript";
@@ -3005,18 +2633,18 @@ function isSignalSymbol(symbol) {
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/api/api.js
-import { CombinedRecursiveAstVisitor as CombinedRecursiveAstVisitor2, KeyedRead, SafePropertyRead, SafeKeyedRead, SafeCall, ParenthesizedExpression, NonNullAssert } from "@angular/compiler";
+import { CombinedRecursiveAstVisitor, isNgTemplate, KeyedRead, NonNullAssert, ParenthesizedExpression, SafeCall, SafeKeyedRead, SafePropertyRead } from "@angular/compiler";
 var TemplateCheckWithVisitor = class {
   /**
    * Base implementation for run function, visits all nodes in template and calls
    * `visitNode()` for each one.
    */
   run(ctx, component, template) {
-    const visitor = new TemplateVisitor2(ctx, component, this);
+    const visitor = new TemplateVisitor(ctx, component, this);
     return visitor.getDiagnostics(template);
   }
 };
-var TemplateVisitor2 = class extends CombinedRecursiveAstVisitor2 {
+var TemplateVisitor = class extends CombinedRecursiveAstVisitor {
   ctx;
   component;
   check;
@@ -3032,7 +2660,7 @@ var TemplateVisitor2 = class extends CombinedRecursiveAstVisitor2 {
     super.visit(node);
   }
   visitTemplate(template) {
-    const isInlineTemplate = template.tagName === "ng-template";
+    const isInlineTemplate = template.tagName && isNgTemplate(template.tagName);
     this.visitAllTemplateNodes(template.attributes);
     if (isInlineTemplate) {
       this.visitAllTemplateNodes(template.inputs);
@@ -3082,14 +2710,14 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.INTERPOLATED_SIGNAL_NOT_INVOKED;
   visitNode(ctx, component, node) {
     if (node instanceof Interpolation) {
-      return node.expressions.map((item) => item instanceof PrefixNot ? item.expression : item).filter((item) => item instanceof PropertyRead2).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
-    } else if (node instanceof TmplAstElement2 && node.inputs.length > 0) {
+      return node.expressions.map((item) => item instanceof PrefixNot ? item.expression : item).filter((item) => item instanceof PropertyRead).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
+    } else if (node instanceof TmplAstElement && node.inputs.length > 0) {
       if (ctx.templateTypeChecker.getForeignComponent(component, node) !== null) {
         return [];
       }
       const directivesOfElement = ctx.templateTypeChecker.getDirectivesOfNode(component, node);
       return node.inputs.flatMap((input) => checkBoundAttribute(ctx, component, directivesOfElement, input));
-    } else if (node instanceof TmplAstTemplate2 && node.tagName === "ng-template") {
+    } else if (node instanceof TmplAstTemplate && node.tagName && isNgTemplate2(node.tagName)) {
       const directivesOfElement = ctx.templateTypeChecker.getDirectivesOfNode(component, node);
       const inputDiagnostics = node.inputs.flatMap((input) => {
         return checkBoundAttribute(ctx, component, directivesOfElement, input);
@@ -3102,13 +2730,13 @@ var InterpolatedSignalCheck = class extends TemplateCheckWithVisitor {
       });
       return inputDiagnostics.concat(templateAttrDiagnostics);
     } else if (node instanceof TmplAstIfBlock) {
-      return node.branches.map((branch) => branch.expression).filter((expr) => expr instanceof ASTWithSource2).map((expr) => {
+      return node.branches.map((branch) => branch.expression).filter((expr) => expr instanceof ASTWithSource).map((expr) => {
         const ast = expr.ast;
         return ast instanceof PrefixNot ? ast.expression : ast;
-      }).filter((ast) => ast instanceof PropertyRead2).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
-    } else if (node instanceof TmplAstSwitchBlock && node.expression instanceof ASTWithSource2) {
+      }).filter((ast) => ast instanceof PropertyRead).flatMap((item) => buildDiagnosticForSignal(ctx, item, component));
+    } else if (node instanceof TmplAstSwitchBlock && node.expression instanceof ASTWithSource) {
       const expression = node.expression.ast instanceof PrefixNot ? node.expression.ast.expression : node.expression.ast;
-      if (expression instanceof PropertyRead2) {
+      if (expression instanceof PropertyRead) {
         return buildDiagnosticForSignal(ctx, expression, component);
       }
     }
@@ -3119,7 +2747,7 @@ function checkBoundAttribute(ctx, component, directivesOfElement, node) {
   if (directivesOfElement !== null && directivesOfElement.some((dir) => dir.inputs.getByBindingPropertyName(node.name) !== null)) {
     return [];
   }
-  if (node.value instanceof ASTWithSource2 === false) {
+  if (node.value instanceof ASTWithSource === false) {
     return [];
   }
   const propertyReads = getPropertyReads(node.value.ast);
@@ -3138,9 +2766,9 @@ function checkBoundAttribute(ctx, component, directivesOfElement, node) {
 }
 function getPropertyReads(ast) {
   if (ast instanceof PrefixNot) {
-    return ast.expression instanceof PropertyRead2 ? [ast.expression] : [];
+    return ast.expression instanceof PropertyRead ? [ast.expression] : [];
   }
-  if (ast instanceof PropertyRead2) {
+  if (ast instanceof PropertyRead) {
     return [ast];
   }
   if (ast instanceof Conditional) {
@@ -3175,7 +2803,7 @@ function buildDiagnosticForSignal(ctx, node, component) {
   if (!isFunctionInstanceProperty(node.name) && !isSignalInstanceProperty(node.name)) {
     return [];
   }
-  if (!(node.receiver instanceof PropertyRead2)) {
+  if (!(node.receiver instanceof PropertyRead)) {
     return [];
   }
   const symbolOfReceiver = ctx.templateTypeChecker.getSymbolOfNode(node.receiver, component);
@@ -3216,7 +2844,7 @@ var factory2 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_control_flow_directive/index.js
-import { TmplAstTemplate as TmplAstTemplate3 } from "@angular/compiler";
+import { TmplAstTemplate as TmplAstTemplate2 } from "@angular/compiler";
 var KNOWN_CONTROL_FLOW_DIRECTIVES = /* @__PURE__ */ new Map([
   ["ngIf", { directive: "NgIf", builtIn: "@if" }],
   ["ngFor", { directive: "NgFor", builtIn: "@for" }],
@@ -3233,7 +2861,7 @@ var MissingControlFlowDirectiveCheck = class extends TemplateCheckWithVisitor {
     return super.run(ctx, component, template);
   }
   visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstTemplate3))
+    if (!(node instanceof TmplAstTemplate2))
       return [];
     const controlFlowAttr = node.templateAttrs.find((attr) => KNOWN_CONTROL_FLOW_DIRECTIVES.has(attr.name));
     if (!controlFlowAttr)
@@ -3258,12 +2886,12 @@ var factory3 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_ngforof_let/index.js
-import { TmplAstTemplate as TmplAstTemplate4 } from "@angular/compiler";
+import { TmplAstTemplate as TmplAstTemplate3 } from "@angular/compiler";
 var MissingNgForOfLetCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.MISSING_NGFOROF_LET;
   visitNode(ctx, component, node) {
-    const isTemplate = node instanceof TmplAstTemplate4;
-    if (!(node instanceof TmplAstTemplate4)) {
+    const isTemplate = node instanceof TmplAstTemplate3;
+    if (!(node instanceof TmplAstTemplate3)) {
       return [];
     }
     if (node.templateAttrs.length === 0) {
@@ -3288,7 +2916,7 @@ var factory4 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/missing_structural_directive/index.js
-import { TmplAstTemplate as TmplAstTemplate5 } from "@angular/compiler";
+import { TmplAstTemplate as TmplAstTemplate4 } from "@angular/compiler";
 var KNOWN_CONTROL_FLOW_DIRECTIVES2 = /* @__PURE__ */ new Set([
   "ngIf",
   "ngFor",
@@ -3309,7 +2937,7 @@ var MissingStructuralDirectiveCheck = class extends TemplateCheckWithVisitor {
     return super.run(ctx, component, template);
   }
   visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstTemplate5))
+    if (!(node instanceof TmplAstTemplate4))
       return [];
     const customStructuralDirective = node.templateAttrs.find((attr) => !KNOWN_CONTROL_FLOW_DIRECTIVES2.has(attr.name));
     if (!customStructuralDirective)
@@ -3434,7 +3062,7 @@ var factory7 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/skip_hydration_not_static/index.js
-import { TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstTextAttribute as TmplAstTextAttribute2 } from "@angular/compiler";
+import { TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstTextAttribute } from "@angular/compiler";
 var NG_SKIP_HYDRATION_ATTR_NAME = "ngSkipHydration";
 var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.SKIP_HYDRATION_NOT_STATIC;
@@ -3449,7 +3077,7 @@ var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
       ""
       /* empty string */
     ];
-    if (node instanceof TmplAstTextAttribute2 && node.name === NG_SKIP_HYDRATION_ATTR_NAME && !acceptedValues.includes(node.value) && node.value !== void 0) {
+    if (node instanceof TmplAstTextAttribute && node.name === NG_SKIP_HYDRATION_ATTR_NAME && !acceptedValues.includes(node.value) && node.value !== void 0) {
       const errorString = formatExtendedError(ErrorCode.SKIP_HYDRATION_NOT_STATIC, `ngSkipHydration only accepts "true" or "" as value or no value at all. For example 'ngSkipHydration="true"' or 'ngSkipHydration'`);
       const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
       return [diagnostic];
@@ -3485,11 +3113,11 @@ var factory9 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/text_attribute_not_binding/index.js
-import { TmplAstTextAttribute as TmplAstTextAttribute3 } from "@angular/compiler";
+import { TmplAstTextAttribute as TmplAstTextAttribute2 } from "@angular/compiler";
 var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING;
   visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstTextAttribute3))
+    if (!(node instanceof TmplAstTextAttribute2))
       return [];
     const name = node.name;
     if (!name.startsWith("attr.") && !name.startsWith("style.") && !name.startsWith("class.")) {
@@ -3526,7 +3154,7 @@ var factory10 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.js
-import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional as Conditional2, ParsedEventType, PropertyRead as PropertyRead3, ArrowFunction, SafeCall as SafeCall3, SafePropertyRead as SafePropertyRead3, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource2, Call, Chain, Conditional as Conditional2, ParsedEventType, PropertyRead as PropertyRead2, ArrowFunction, SafeCall as SafeCall3, SafePropertyRead as SafePropertyRead3, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
 var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING;
   visitNode(ctx, component, node) {
@@ -3534,7 +3162,7 @@ var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor
       return [];
     if (node.type !== ParsedEventType.Regular && node.type !== ParsedEventType.LegacyAnimation)
       return [];
-    if (!(node.handler instanceof ASTWithSource3))
+    if (!(node.handler instanceof ASTWithSource2))
       return [];
     const sourceExpressionText = node.handler.source || "";
     if (node.handler.ast instanceof Chain) {
@@ -3555,7 +3183,7 @@ function assertExpressionInvoked(expression, component, node, expressionText, ct
     const errorString = "Arrow function will not be invoked in this event listener. Did you intend to call a method?";
     return [ctx.makeTemplateDiagnostic(node.sourceSpan, errorString)];
   }
-  if (!(expression instanceof PropertyRead3) && !(expression instanceof SafePropertyRead3)) {
+  if (!(expression instanceof PropertyRead2) && !(expression instanceof SafePropertyRead3)) {
     return [];
   }
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
@@ -3609,7 +3237,7 @@ var factory12 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unused_let_declaration/index.js
-import { AST, ASTWithSource as ASTWithSource4, TmplAstLetDeclaration } from "@angular/compiler";
+import { AST, ASTWithSource as ASTWithSource3, TmplAstLetDeclaration } from "@angular/compiler";
 var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNUSED_LET_DECLARATION;
   analysis = /* @__PURE__ */ new Map();
@@ -3629,7 +3257,7 @@ var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
     if (node instanceof TmplAstLetDeclaration) {
       this.getAnalysis(component).allLetDeclarations.add(node);
     } else if (node instanceof AST) {
-      const unwrappedNode = node instanceof ASTWithSource4 ? node.ast : node;
+      const unwrappedNode = node instanceof ASTWithSource3 ? node.ast : node;
       const target = ctx.templateTypeChecker.getExpressionTarget(unwrappedNode, component);
       if (target !== null && target instanceof TmplAstLetDeclaration) {
         this.getAnalysis(component).usedLetDeclarations.add(target);
@@ -3651,7 +3279,7 @@ var factory13 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_track_function/index.js
-import { Call as Call2, PropertyRead as PropertyRead4, SafeCall as SafeCall4, SafePropertyRead as SafePropertyRead4, TmplAstForLoopBlock } from "@angular/compiler";
+import { Call as Call2, PropertyRead as PropertyRead3, SafeCall as SafeCall4, SafePropertyRead as SafePropertyRead4, TmplAstForLoopBlock } from "@angular/compiler";
 import ts22 from "typescript";
 var UninvokedTrackFunctionCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_TRACK_FUNCTION;
@@ -3662,7 +3290,7 @@ var UninvokedTrackFunctionCheck = class extends TemplateCheckWithVisitor {
     if (node.trackBy.ast instanceof Call2 || node.trackBy.ast instanceof SafeCall4) {
       return [];
     }
-    if (!(node.trackBy.ast instanceof PropertyRead4) && !(node.trackBy.ast instanceof SafePropertyRead4)) {
+    if (!(node.trackBy.ast instanceof PropertyRead3) && !(node.trackBy.ast instanceof SafePropertyRead4)) {
       return [];
     }
     const symbol = ctx.templateTypeChecker.getSymbolOfNode(node.trackBy.ast, component);
@@ -3709,7 +3337,7 @@ var factory14 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_text_interpolation/index.js
-import { Interpolation as Interpolation2, PropertyRead as PropertyRead5, SafePropertyRead as SafePropertyRead5 } from "@angular/compiler";
+import { Interpolation as Interpolation2, PropertyRead as PropertyRead4, SafePropertyRead as SafePropertyRead5 } from "@angular/compiler";
 var UninvokedFunctionInTextInterpolation = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION;
   visitNode(ctx, component, node) {
@@ -3720,7 +3348,7 @@ var UninvokedFunctionInTextInterpolation = class extends TemplateCheckWithVisito
   }
 };
 function assertExpressionInvoked2(expression, component, ctx) {
-  if (!(expression instanceof PropertyRead5) && !(expression instanceof SafePropertyRead5)) {
+  if (!(expression instanceof PropertyRead4) && !(expression instanceof SafePropertyRead5)) {
     return [];
   }
   const symbol = ctx.templateTypeChecker.getSymbolOfNode(expression, component);
@@ -3938,7 +3566,7 @@ var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
 ]);
 
 // packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
-import { ASTWithSource as ASTWithSource5, ImplicitReceiver as ImplicitReceiver2, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead6, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable as TmplAstVariable2, ThisReceiver as ThisReceiver2, Unary, unwrapWriteTarget } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource4, ImplicitReceiver, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead5, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable, ThisReceiver, Unary, unwrapWriteTarget } from "@angular/compiler";
 import ts24 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   templateTypeChecker;
@@ -3979,7 +3607,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
     this.diagnostics = diagnostics;
   }
   visitBinary(ast, context) {
-    if (Binary3.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead6) {
+    if (Binary3.isAssignmentOperation(ast.operation) && ast.left instanceof PropertyRead5) {
       this.checkForIllegalWriteInEventBinding(ast.left, context);
     }
     super.visitBinary(ast, context);
@@ -3987,7 +3615,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
   visitUnary(ast, context) {
     if (Unary.isUpdateOperation(ast.operator)) {
       const target = unwrapWriteTarget(ast.expr);
-      if (target instanceof PropertyRead6) {
+      if (target instanceof PropertyRead5) {
         this.checkForIllegalWriteInEventBinding(target, context);
       }
     }
@@ -4002,7 +3630,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
       return;
     }
     const target = this.templateTypeChecker.getExpressionTarget(ast, this.component);
-    if (target instanceof TmplAstVariable2) {
+    if (target instanceof TmplAstVariable) {
       const errorMessage = `Cannot use variable '${target.name}' as the left-hand side of an assignment expression. Template variables are read-only.`;
       this.diagnostics.push(this.makeIllegalTemplateVarDiagnostic(target, context, errorMessage));
     }
@@ -4012,7 +3640,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
       return;
     }
     const target = this.templateTypeChecker.getExpressionTarget(ast, this.component);
-    const isVariable = target instanceof TmplAstVariable2;
+    const isVariable = target instanceof TmplAstVariable;
     const isLet = target instanceof TmplAstLetDeclaration2;
     if (!isVariable && !isLet) {
       return;
@@ -4029,7 +3657,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
     }
   }
   makeIllegalTemplateVarDiagnostic(target, expressionNode, errorMessage) {
-    const span = target instanceof TmplAstVariable2 ? target.valueSpan || target.sourceSpan : target.sourceSpan;
+    const span = target instanceof TmplAstVariable ? target.valueSpan || target.sourceSpan : target.sourceSpan;
     return this.templateTypeChecker.makeTemplateDiagnostic(this.component, expressionNode.handlerSpan, ts24.DiagnosticCategory.Error, ngErrorCode(ErrorCode.WRITE_TO_READ_ONLY_VARIABLE), errorMessage, [
       {
         text: `'${target.name}' is declared here.`,
@@ -4040,11 +3668,11 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
     ]);
   }
   shouldCheckForIllegalWrites(ast, context) {
-    return context instanceof TmplAstBoundEvent3 && (ast.receiver instanceof ImplicitReceiver2 || ast.receiver instanceof ThisReceiver2);
+    return context instanceof TmplAstBoundEvent3 && (ast.receiver instanceof ImplicitReceiver || ast.receiver instanceof ThisReceiver);
   }
 };
 function unwrapAstWithSource(ast) {
-  return ast instanceof ASTWithSource5 ? ast.ast : ast;
+  return ast instanceof ASTWithSource4 ? ast.ast : ast;
 }
 
 // packages/compiler-cli/src/ngtsc/validation/src/rules/initializer_api_usage_rule.js
@@ -4946,7 +4574,7 @@ var NgCompiler = class _NgCompiler {
         return node.getSourceFile().fileName;
       }
     };
-    return generateAnalysis(context, adapter);
+    return generateIndexerAnalysis(context, adapter);
   }
   /**
    * Gets information for the current program that may be used to generate API
@@ -5770,4 +5398,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-F7DYO4AT.js.map
+//# sourceMappingURL=chunk-RAK7V6OD.js.map

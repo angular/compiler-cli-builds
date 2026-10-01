@@ -5,11 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+import { IndexedComponent } from '@angular/compiler';
 import ts from 'typescript';
 import { DocEntry } from '../../docs';
 import { AbsoluteFsPath } from '../../file_system';
 import { IncrementalBuildStrategy, IncrementalCompilation, IncrementalState } from '../../incremental';
-import { IndexedComponent } from '../../indexer';
 import { DirectiveMeta, DirectiveResources, PipeMeta } from '../../metadata';
 import { ActivePerfRecorder } from '../../perf';
 import { ProgramDriver } from '../../program_driver';
@@ -237,7 +237,7 @@ export declare class NgCompiler {
      *
      * See the `indexing` package for more details.
      */
-    getIndexedComponents(): Map<DeclarationNode, IndexedComponent>;
+    getIndexedComponents(): Map<DeclarationNode, IndexedComponent<DeclarationNode>>;
     /**
      * Gets information for the current program that may be used to generate API
      * reference documentation. This includes Angular-specific information, such

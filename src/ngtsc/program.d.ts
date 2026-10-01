@@ -5,12 +5,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
+import { IndexedComponent } from '@angular/compiler';
 import ts from 'typescript';
 import * as api from '../transformers/api';
 import { NgCompiler } from './core';
 import { NgCompilerOptions } from './core/api';
 import { DocEntry } from './docs';
-import { IndexedComponent } from './indexer';
 import { DeclarationNode } from './reflection';
 /**
  * Entrypoint to the Angular Compiler (Ivy+) which sits behind the `api.Program` interface, allowing
@@ -46,7 +46,7 @@ export declare class NgtscProgram implements api.Program {
     listLazyRoutes(entryRoute?: string | undefined): api.LazyRoute[];
     private emitXi18n;
     emit<CbEmitRes extends ts.EmitResult>(opts?: api.EmitOptions<CbEmitRes> | undefined): ts.EmitResult;
-    getIndexedComponents(): Map<DeclarationNode, IndexedComponent>;
+    getIndexedComponents(): Map<DeclarationNode, IndexedComponent<DeclarationNode>>;
     /**
      * Gets information for the current program that may be used to generate API
      * reference documentation. This includes Angular-specific information, such

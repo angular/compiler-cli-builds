@@ -5,17 +5,16 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { ConstantPool } from '@angular/compiler';
+import { ConstantPool, IndexingContext } from '@angular/compiler';
 import ts from 'typescript';
 import { CycleAnalyzer, CycleHandlingStrategy } from '../../../cycles';
 import { DeferredSymbolTracker, ImportedSymbolsTracker, LocalCompilationExtraImportsTracker, ModuleResolver, ReferenceEmitter } from '../../../imports';
 import { DependencyTracker } from '../../../incremental/api';
 import { SemanticDepGraphUpdater } from '../../../incremental/semantic_graph';
-import { IndexingContext } from '../../../indexer';
 import { HostDirectivesResolver, MetadataReader, MetadataRegistry, ResourceRegistry } from '../../../metadata';
 import { PartialEvaluator } from '../../../partial_evaluator';
 import { PerfRecorder } from '../../../perf';
-import { ClassDeclaration, Decorator, ReflectionHost } from '../../../reflection';
+import { ClassDeclaration, DeclarationNode, Decorator, ReflectionHost } from '../../../reflection';
 import { ComponentScopeReader, LocalModuleScopeRegistry, TypeCheckScopeRegistry } from '../../../scope';
 import { AnalysisOutput, CompilationMode, CompileResult, DecoratorHandler, DetectResult, HandlerPrecedence, ResolveResult } from '../../../transform';
 import { TypeCheckContext } from '../../../typecheck/api';
@@ -99,7 +98,7 @@ export declare class ComponentDecoratorHandler implements DecoratorHandler<Decor
     analyze(node: ClassDeclaration, decorator: Readonly<Decorator>): AnalysisOutput<ComponentAnalysisData>;
     symbol(node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): ComponentSymbol;
     register(node: ClassDeclaration, analysis: ComponentAnalysisData): void;
-    index(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): null;
+    index(context: IndexingContext<DeclarationNode>, node: ClassDeclaration, analysis: Readonly<ComponentAnalysisData>): null;
     typeCheck(ctx: TypeCheckContext, node: ClassDeclaration, meta: Readonly<ComponentAnalysisData>): void;
     extendedTemplateCheck(component: ts.ClassDeclaration, extendedTemplateChecker: ExtendedTemplateChecker): ts.Diagnostic[];
     templateSemanticsCheck(component: ts.ClassDeclaration, templateSemanticsChecker: TemplateSemanticsChecker): ts.Diagnostic[];
