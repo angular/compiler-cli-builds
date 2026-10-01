@@ -4,8 +4,11 @@
     
 import {
   AbsoluteSourceSpan,
-  IdentifierKind
-} from "../chunk-G65IA3BS.js";
+  IdentifierKind,
+  IndexingContext,
+  generateIndexerAnalysis,
+  getIndexerTemplateIdentifiers
+} from "../chunk-ZJBQUE3A.js";
 import {
   Environment,
   ExpressionIdentifier,
@@ -26,10 +29,13 @@ export {
   ExpressionIdentifier,
   IdentifierKind,
   ImportManager,
+  IndexingContext,
   RegistryDomSchemaChecker,
   SymbolBuilder,
   SymbolKind,
   findFirstMatchingNode,
+  generateIndexerAnalysis as generateAnalysis,
+  getIndexerTemplateIdentifiers as getTemplateIdentifiers,
   hasExpressionIdentifier
 };
 /**

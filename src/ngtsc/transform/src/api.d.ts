@@ -5,12 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { ConstantPool, Expression, Statement, Type } from '@angular/compiler';
+import { ConstantPool, Expression, IndexingContext, Statement, Type } from '@angular/compiler';
 import ts from 'typescript';
 import { Reexport, ReferenceEmitter } from '../../imports';
 import { SemanticSymbol } from '../../incremental/semantic_graph';
-import { IndexingContext } from '../../indexer';
-import { ClassDeclaration, Decorator, ReflectionHost } from '../../reflection';
+import { ClassDeclaration, DeclarationNode, Decorator, ReflectionHost } from '../../reflection';
 import { ImportManager } from '../../translator';
 import { TypeCheckContext } from '../../typecheck/api';
 import { ExtendedTemplateChecker } from '../../typecheck/extended/api';
@@ -131,7 +130,7 @@ export interface DecoratorHandler<D, A, S extends SemanticSymbol | null, R> {
      * `IndexingContext`, which stores information about components discovered in the
      * program.
      */
-    index?(context: IndexingContext, node: ClassDeclaration, analysis: Readonly<A>, resolution: Readonly<R>): void;
+    index?(context: IndexingContext<DeclarationNode>, node: ClassDeclaration, analysis: Readonly<A>, resolution: Readonly<R>): void;
     /**
      * Perform resolution on the given decorator along with the result of analysis.
      *

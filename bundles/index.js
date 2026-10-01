@@ -3,6 +3,13 @@
       const require = __cjsCompatRequire(import.meta.url);
     
 import {
+  AbsoluteSourceSpan,
+  IdentifierKind,
+  IndexingContext,
+  generateIndexerAnalysis,
+  getIndexerTemplateIdentifiers
+} from "./chunk-ZJBQUE3A.js";
+import {
   DEFAULT_ERROR_CODE,
   EmitFlags,
   NgtscProgram,
@@ -17,7 +24,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-5HJTAE67.js";
+} from "./chunk-HNZKG7OC.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -37,11 +44,7 @@ import {
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo,
   resourceChangeTicket
-} from "./chunk-VMCGORHB.js";
-import {
-  AbsoluteSourceSpan,
-  IdentifierKind
-} from "./chunk-G65IA3BS.js";
+} from "./chunk-C6JIYE4E.js";
 import {
   ActivePerfRecorder,
   InliningMode,
@@ -52,7 +55,7 @@ import {
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform,
   isShim
-} from "./chunk-TXYIKH36.js";
+} from "./chunk-26HNHPGZ.js";
 import {
   CompletionKind,
   Environment,
@@ -106,7 +109,7 @@ import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.2.1+sha-f864e3d");
+var VERSION = new Version("22.2.1+sha-fef7dcc");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
@@ -223,6 +226,7 @@ export {
   GLOBAL_DEFS_FOR_TERSER_WITH_AOT,
   IdentifierKind,
   ImportManager,
+  IndexingContext,
   InliningMode,
   InvalidFileSystem,
   LogLevel,
@@ -263,12 +267,14 @@ export {
   findFirstMatchingNode,
   formatDiagnostics,
   freshCompilationTicket,
+  generateIndexerAnalysis as generateAnalysis,
   getAngularDecorators,
   getDownlevelDecoratorsTransform,
   getFileSystem,
   getInitializerApiJitTransform,
   getRootDirs,
   getSourceFileOrError,
+  getIndexerTemplateIdentifiers as getTemplateIdentifiers,
   hasExpressionIdentifier,
   incrementalFromCompilerTicket,
   isDocEntryWithSourceInfo,

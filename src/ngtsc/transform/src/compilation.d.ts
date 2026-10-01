@@ -5,12 +5,11 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { ConstantPool } from '@angular/compiler';
+import { ConstantPool, IndexingContext } from '@angular/compiler';
 import ts from 'typescript';
 import { SourceFileTypeIdentifier } from '../../core/api';
 import { IncrementalBuild } from '../../incremental/api';
 import { SemanticDepGraphUpdater, SemanticSymbol } from '../../incremental/semantic_graph';
-import { IndexingContext } from '../../indexer';
 import { PerfRecorder } from '../../perf';
 import { ClassDeclaration, DeclarationNode, Decorator, ReflectionHost } from '../../reflection';
 import { ProgramTypeCheckAdapter, TypeCheckContext } from '../../typecheck/api';
@@ -112,7 +111,7 @@ export declare class TraitCompiler implements ProgramTypeCheckAdapter {
      */
     typeCheck(sf: ts.SourceFile, ctx: TypeCheckContext): void;
     runAdditionalChecks(sf: ts.SourceFile, check: (clazz: ts.ClassDeclaration, handler: DecoratorHandler<unknown, unknown, SemanticSymbol | null, unknown>) => ts.Diagnostic[] | null): ts.Diagnostic[];
-    index(ctx: IndexingContext): void;
+    index(ctx: IndexingContext<DeclarationNode>): void;
     xi18n(bundle: Xi18nContext): void;
     updateResources(clazz: DeclarationNode): void;
     compile(clazz: DeclarationNode, constantPool: ConstantPool): CompileResult[] | null;
