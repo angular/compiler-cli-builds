@@ -513,10 +513,18 @@ var PropertiesExtractor = class {
     if (member.questionToken) {
       tags.push(MemberTags.Optional);
     }
-    if (member.parent !== this.declaration) {
+    if (this.getDeclaringNode(member) !== this.declaration) {
       tags.push(MemberTags.Inherited);
     }
     return tags;
+  }
+  /**
+   * Gets the node a member is declared on. This is the member's parent, except for constructor
+   * parameter properties (e.g. `constructor(readonly foo: string) {}`) whose parent is the
+   * constructor rather than the class declaring it.
+   */
+  getDeclaringNode(member) {
+    return ts5.isParameterPropertyDeclaration(member, member.parent) ? member.parent.parent : member.parent;
   }
   /** Computes all signature declarations of the class/interface. */
   computeAllSignatureDeclarations() {
@@ -5398,4 +5406,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-RAK7V6OD.js.map
+//# sourceMappingURL=chunk-DZ3WQNB4.js.map

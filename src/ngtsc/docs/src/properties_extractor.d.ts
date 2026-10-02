@@ -56,6 +56,12 @@ export declare abstract class PropertiesExtractor {
     protected extractInterfaceConformance(declaration: ClassDeclaration & ClassDeclarationLike): string[];
     /** Gets the tags for a member (protected, readonly, static, etc.) */
     protected getMemberTags(member: MethodLike | PropertyLike | ts.ConstructorDeclaration): MemberTags[];
+    /**
+     * Gets the node a member is declared on. This is the member's parent, except for constructor
+     * parameter properties (e.g. `constructor(readonly foo: string) {}`) whose parent is the
+     * constructor rather than the class declaring it.
+     */
+    private getDeclaringNode;
     /** Computes all signature declarations of the class/interface. */
     private computeAllSignatureDeclarations;
     /** Gets all member declarations, including inherited members. */
