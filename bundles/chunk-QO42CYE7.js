@@ -7985,7 +7985,7 @@ var CompletionEngine = class {
 // packages/compiler-cli/src/ngtsc/typecheck/src/context.js
 import { generateTypeCheckBlock as generateTypeCheckBlock2, ParseSourceFile as ParseSourceFile3, TcbGenericContextBehavior as TcbGenericContextBehavior2 } from "@angular/compiler";
 
-// node_modules/.aspect_rules_js/magic-string@1.4.2/node_modules/magic-string/dist/index.mjs
+// node_modules/.aspect_rules_js/magic-string@1.4.3/node_modules/magic-string/dist/index.mjs
 import { encode, encodeRangeMappings } from "@jridgewell/sourcemap-codec";
 var BitSet = class BitSet2 {
   constructor(arg) {
@@ -9063,7 +9063,7 @@ var MagicString = class MagicString2 {
         if (chunk.next !== this.byStart.get(chunk.end))
           throw new MagicStringError("cannot overwrite across a split point");
         chunk = chunk.next;
-        chunk.edit("", false);
+        chunk.edit("", false, !overwrite);
       }
       first.edit(content, storeName, !overwrite);
     } else {
@@ -9480,9 +9480,9 @@ var MagicString = class MagicString2 {
       if (replacement2 === match[0])
         return true;
       if (match[0].length === 0)
-        this.appendRight(match.index, replacement2);
+        this.appendRight(match.index - this.offset, replacement2);
       else
-        this.overwrite(match.index, match.index + match[0].length, replacement2);
+        this.overwrite(match.index - this.offset, match.index + match[0].length - this.offset, replacement2);
       return true;
     };
     if (searchValue.global) {
@@ -9515,9 +9515,9 @@ var MagicString = class MagicString2 {
         replacement = expandReplacement(replacement, string, index, original, [], void 0);
       if (string !== replacement) {
         if (string.length === 0)
-          this.appendRight(index, replacement);
+          this.appendRight(index - this.offset, replacement);
         else
-          this.overwrite(index, index + string.length, replacement);
+          this.overwrite(index - this.offset, index + string.length - this.offset, replacement);
       }
       break;
     }
@@ -9541,7 +9541,7 @@ var MagicString = class MagicString2 {
           continue;
         const _replacement = typeof replacement === "function" ? replacement("", index, original) : expandReplacement(replacement, "", index, original, [], void 0);
         if (_replacement !== "")
-          this.appendRight(index, _replacement);
+          this.appendRight(index - this.offset, _replacement);
       }
       return this;
     }
@@ -9551,7 +9551,7 @@ var MagicString = class MagicString2 {
       const previous = original.slice(index, index + stringLength);
       const _replacement = typeof replacement === "function" ? replacement(previous, index, original) : expandReplacement(replacement, previous, index, original, [], void 0);
       if (previous !== _replacement)
-        this.overwrite(index, index + stringLength, _replacement);
+        this.overwrite(index - this.offset, index + stringLength - this.offset, _replacement);
     }
     return this;
   }
@@ -14990,4 +14990,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-VZZQNH2P.js.map
+//# sourceMappingURL=chunk-QO42CYE7.js.map
