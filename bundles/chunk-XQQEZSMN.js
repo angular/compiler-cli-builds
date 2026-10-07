@@ -2874,8 +2874,8 @@ var MissingControlFlowDirectiveCheck = class extends TemplateCheckWithVisitor {
     const controlFlowAttr = node.templateAttrs.find((attr) => KNOWN_CONTROL_FLOW_DIRECTIVES.has(attr.name));
     if (!controlFlowAttr)
       return [];
-    const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
-    if (symbol === null || symbol.directives.length > 0) {
+    const directives = ctx.templateTypeChecker.getDirectivesOfNode(component, node);
+    if (directives?.length) {
       return [];
     }
     const sourceSpan = controlFlowAttr.keySpan || controlFlowAttr.sourceSpan;
@@ -2950,8 +2950,8 @@ var MissingStructuralDirectiveCheck = class extends TemplateCheckWithVisitor {
     const customStructuralDirective = node.templateAttrs.find((attr) => !KNOWN_CONTROL_FLOW_DIRECTIVES2.has(attr.name));
     if (!customStructuralDirective)
       return [];
-    const symbol = ctx.templateTypeChecker.getSymbolOfNode(node, component);
-    const hasStructuralDirective = symbol?.directives.some((dir) => dir.selector?.includes(`[${customStructuralDirective.name}]`));
+    const directives = ctx.templateTypeChecker.getDirectivesOfNode(component, node);
+    const hasStructuralDirective = directives?.some((dir) => dir.selector?.includes(`[${customStructuralDirective.name}]`));
     if (hasStructuralDirective)
       return [];
     const sourceSpan = customStructuralDirective.keySpan || customStructuralDirective.sourceSpan;
@@ -5390,4 +5390,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-JJAWDNPX.js.map
+//# sourceMappingURL=chunk-XQQEZSMN.js.map
