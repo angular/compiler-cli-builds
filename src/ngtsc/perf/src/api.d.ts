@@ -157,9 +157,13 @@ export declare enum PerfPhase {
      */
     LSSemanticClassification = 31,
     /**
+     * Time spent by the Angular Language Service calculating smart selection ranges.
+     */
+    LsSmartSelection = 32,
+    /**
      * Tracks the number of `PerfPhase`s, and must appear at the end of the list.
      */
-    LAST = 32
+    LAST = 33
 }
 /**
  * Represents some occurrence during compilation, and is tracked with a counter.

@@ -713,7 +713,8 @@ var PerfPhase;
   PerfPhase2[PerfPhase2["LSComputeApplicableRefactorings"] = 29] = "LSComputeApplicableRefactorings";
   PerfPhase2[PerfPhase2["LSApplyRefactoring"] = 30] = "LSApplyRefactoring";
   PerfPhase2[PerfPhase2["LSSemanticClassification"] = 31] = "LSSemanticClassification";
-  PerfPhase2[PerfPhase2["LAST"] = 32] = "LAST";
+  PerfPhase2[PerfPhase2["LsSmartSelection"] = 32] = "LsSmartSelection";
+  PerfPhase2[PerfPhase2["LAST"] = 33] = "LAST";
 })(PerfPhase || (PerfPhase = {}));
 var PerfEvent;
 (function(PerfEvent2) {
@@ -14990,4 +14991,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-QO42CYE7.js.map
+//# sourceMappingURL=chunk-XQGRNAWJ.js.map
