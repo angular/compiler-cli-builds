@@ -148,7 +148,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.2+sha-c7a72c2";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.2.2+sha-35a02f8";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5898,12 +5898,12 @@ var TcbInliningRequirement;
   TcbInliningRequirement2[TcbInliningRequirement2["ShouldInlineForGenericBounds"] = 1] = "ShouldInlineForGenericBounds";
   TcbInliningRequirement2[TcbInliningRequirement2["None"] = 2] = "None";
 })(TcbInliningRequirement || (TcbInliningRequirement = {}));
-function requiresInlineTypeCheckBlock(ref, env, usedPipes, reflector) {
+function requiresInlineTypeCheckBlock(ref, env, usedDependencies, reflector) {
   if (!env.canReferenceType(ref)) {
     return TcbInliningRequirement.MustInline;
   } else if (!checkIfGenericTypeBoundsCanBeEmitted(ref.node, reflector, (r) => env.canReferenceType(r))) {
     return TcbInliningRequirement.ShouldInlineForGenericBounds;
-  } else if (usedPipes.some((pipeRef) => !env.canReferenceType(pipeRef))) {
+  } else if (usedDependencies.some((ref2) => !env.canReferenceType(ref2))) {
     return TcbInliningRequirement.MustInline;
   } else {
     return TcbInliningRequirement.None;
@@ -6888,4 +6888,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-FNLXTIAY.js.map
+//# sourceMappingURL=chunk-GY2QRHJA.js.map
