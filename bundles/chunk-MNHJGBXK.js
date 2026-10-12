@@ -84,7 +84,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-RAUZCN36.js";
+} from "./chunk-NTONJEIU.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -10290,8 +10290,9 @@ var TypeCheckContextImpl = class {
         directives: hostBindingContext.directives
       }
     });
+    const usedDirectives = boundTarget.getUsedDirectives();
     if (this.inlining === InliningMode.InlineOps) {
-      for (const dir of boundTarget.getUsedDirectives()) {
+      for (const dir of usedDirectives) {
         const dirRef = dir.ref;
         const dirNode = dirRef.node;
         if (!dir.isGeneric || !requiresInlineTypeCtor(dirNode, this.reflector, (r) => shimData.file.canReferenceType(r))) {
@@ -10316,15 +10317,18 @@ var TypeCheckContextImpl = class {
       templateParsingDiagnostics,
       hostElement: hostBindingContext?.node ?? null
     });
-    const usedPipes = [];
+    const usedDependencies = [];
+    for (const dir of usedDirectives) {
+      usedDependencies.push(dir.ref);
+    }
     if (templateContext !== null) {
       for (const name of boundTarget.getUsedPipes()) {
         if (templateContext.pipes.has(name)) {
-          usedPipes.push(templateContext.pipes.get(name).ref);
+          usedDependencies.push(templateContext.pipes.get(name).ref);
         }
       }
     }
-    const inliningRequirement = requiresInlineTypeCheckBlock(ref, shimData.file, usedPipes, this.reflector);
+    const inliningRequirement = requiresInlineTypeCheckBlock(ref, shimData.file, usedDependencies, this.reflector);
     if (this.inlining === InliningMode.Error && inliningRequirement === TcbInliningRequirement.MustInline) {
       shimData.shimDiagnostics ??= [];
       shimData.shimDiagnostics.push({
@@ -14991,4 +14995,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-XQGRNAWJ.js.map
+//# sourceMappingURL=chunk-MNHJGBXK.js.map

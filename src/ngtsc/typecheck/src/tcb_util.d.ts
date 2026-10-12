@@ -58,7 +58,7 @@ export declare enum TcbInliningRequirement {
      */
     None = 2
 }
-export declare function requiresInlineTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, env: ReferenceEmitEnvironment, usedPipes: Reference<ClassDeclaration<ts.ClassDeclaration>>[], reflector: ReflectionHost): TcbInliningRequirement;
+export declare function requiresInlineTypeCheckBlock(ref: Reference<ClassDeclaration<ts.ClassDeclaration>>, env: ReferenceEmitEnvironment, usedDependencies: Reference<ClassDeclaration<ts.ClassDeclaration>>[], reflector: ReflectionHost): TcbInliningRequirement;
 /** Maps a shim position back to a source code location. */
 export declare function getSourceMapping(shimSf: ts.SourceFile, position: number, resolver: TypeCheckSourceResolver, isDiagnosticRequest: boolean): FullSourceMapping | null;
 export declare function findTypeCheckBlock(file: ts.SourceFile, id: TypeCheckId, isDiagnosticRequest: boolean): ts.Node | null;
