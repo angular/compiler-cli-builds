@@ -51,7 +51,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-VGW7FXGI.js";
+} from "./chunk-GUHUPONB.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -5390,4 +5390,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-WOP3Z3QS.js.map
+//# sourceMappingURL=chunk-KMFN4DOQ.js.map
