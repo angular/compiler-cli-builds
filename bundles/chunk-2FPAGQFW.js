@@ -148,7 +148,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.1+sha-e699fd7-with-local-changes";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.1+sha-b26f09f-with-local-changes";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -675,6 +675,86 @@ var UnifiedModulesStrategy = class {
     };
   }
 };
+
+// packages/compiler-cli/src/ngtsc/util/src/path.js
+function relativePathBetween(from, to) {
+  const relativePath = stripExtension(relative(dirname(resolve(from)), resolve(to)));
+  return relativePath !== "" ? toRelativeImport(relativePath) : null;
+}
+function normalizeSeparators(path) {
+  return path.replace(/\\/g, "/");
+}
+function getProjectRelativePath(fileName, rootDirs, compilerHost) {
+  const filePath = compilerHost.getCanonicalFileName(fileName);
+  for (const rootDir of rootDirs) {
+    const rel = relative(compilerHost.getCanonicalFileName(rootDir), filePath);
+    if (!rel.startsWith("..")) {
+      return rel;
+    }
+  }
+  return null;
+}
+
+// packages/compiler-cli/src/ngtsc/imports/src/core.js
+var NoopImportRewriter = class {
+  rewriteSymbol(symbol, specifier) {
+    return symbol;
+  }
+  rewriteSpecifier(specifier, inContextOfFile) {
+    return specifier;
+  }
+  rewriteNamespaceImportIdentifier(specifier) {
+    return specifier;
+  }
+};
+var CORE_SUPPORTED_SYMBOLS = /* @__PURE__ */ new Map([
+  ["\u0275\u0275defineInjectable", "\u0275\u0275defineInjectable"],
+  ["\u0275\u0275defineService", "\u0275\u0275defineService"],
+  ["\u0275\u0275defineInjector", "\u0275\u0275defineInjector"],
+  ["\u0275\u0275defineNgModule", "\u0275\u0275defineNgModule"],
+  ["\u0275\u0275setNgModuleScope", "\u0275\u0275setNgModuleScope"],
+  ["\u0275\u0275inject", "\u0275\u0275inject"],
+  ["\u0275\u0275FactoryDeclaration", "\u0275\u0275FactoryDeclaration"],
+  ["\u0275setClassMetadata", "setClassMetadata"],
+  ["\u0275setClassMetadataAsync", "setClassMetadataAsync"],
+  ["\u0275\u0275InjectableDeclaration", "\u0275\u0275InjectableDeclaration"],
+  ["\u0275\u0275InjectorDeclaration", "\u0275\u0275InjectorDeclaration"],
+  ["\u0275\u0275NgModuleDeclaration", "\u0275\u0275NgModuleDeclaration"],
+  ["\u0275NgModuleFactory", "NgModuleFactory"],
+  ["\u0275noSideEffects", "\u0275noSideEffects"]
+]);
+var CORE_MODULE = "@angular/core";
+var R3SymbolsImportRewriter = class {
+  r3SymbolsPath;
+  constructor(r3SymbolsPath) {
+    this.r3SymbolsPath = r3SymbolsPath;
+  }
+  rewriteSymbol(symbol, specifier) {
+    if (specifier !== CORE_MODULE) {
+      return symbol;
+    }
+    return validateAndRewriteCoreSymbol(symbol);
+  }
+  rewriteSpecifier(specifier, inContextOfFile) {
+    if (specifier !== CORE_MODULE) {
+      return specifier;
+    }
+    const relativePathToR3Symbols = relativePathBetween(inContextOfFile, this.r3SymbolsPath);
+    if (relativePathToR3Symbols === null) {
+      throw new Error(`Failed to rewrite import inside ${CORE_MODULE}: ${inContextOfFile} -> ${this.r3SymbolsPath}`);
+    }
+    return relativePathToR3Symbols;
+  }
+  rewriteNamespaceImportIdentifier(specifier) {
+    return specifier;
+  }
+};
+function validateAndRewriteCoreSymbol(name) {
+  if (!CORE_SUPPORTED_SYMBOLS.has(name)) {
+    throw new Error(`Importing unexpected symbol ${name} while compiling ${CORE_MODULE}`);
+  }
+  return CORE_SUPPORTED_SYMBOLS.get(name);
+}
 
 // packages/compiler-cli/src/ngtsc/reflection/src/util.js
 import ts5 from "typescript";
@@ -1787,86 +1867,6 @@ var AliasStrategy = class {
     };
   }
 };
-
-// packages/compiler-cli/src/ngtsc/util/src/path.js
-function relativePathBetween(from, to) {
-  const relativePath = stripExtension(relative(dirname(resolve(from)), resolve(to)));
-  return relativePath !== "" ? toRelativeImport(relativePath) : null;
-}
-function normalizeSeparators(path) {
-  return path.replace(/\\/g, "/");
-}
-function getProjectRelativePath(fileName, rootDirs, compilerHost) {
-  const filePath = compilerHost.getCanonicalFileName(fileName);
-  for (const rootDir of rootDirs) {
-    const rel = relative(compilerHost.getCanonicalFileName(rootDir), filePath);
-    if (!rel.startsWith("..")) {
-      return rel;
-    }
-  }
-  return null;
-}
-
-// packages/compiler-cli/src/ngtsc/imports/src/core.js
-var NoopImportRewriter = class {
-  rewriteSymbol(symbol, specifier) {
-    return symbol;
-  }
-  rewriteSpecifier(specifier, inContextOfFile) {
-    return specifier;
-  }
-  rewriteNamespaceImportIdentifier(specifier) {
-    return specifier;
-  }
-};
-var CORE_SUPPORTED_SYMBOLS = /* @__PURE__ */ new Map([
-  ["\u0275\u0275defineInjectable", "\u0275\u0275defineInjectable"],
-  ["\u0275\u0275defineService", "\u0275\u0275defineService"],
-  ["\u0275\u0275defineInjector", "\u0275\u0275defineInjector"],
-  ["\u0275\u0275defineNgModule", "\u0275\u0275defineNgModule"],
-  ["\u0275\u0275setNgModuleScope", "\u0275\u0275setNgModuleScope"],
-  ["\u0275\u0275inject", "\u0275\u0275inject"],
-  ["\u0275\u0275FactoryDeclaration", "\u0275\u0275FactoryDeclaration"],
-  ["\u0275setClassMetadata", "setClassMetadata"],
-  ["\u0275setClassMetadataAsync", "setClassMetadataAsync"],
-  ["\u0275\u0275InjectableDeclaration", "\u0275\u0275InjectableDeclaration"],
-  ["\u0275\u0275InjectorDeclaration", "\u0275\u0275InjectorDeclaration"],
-  ["\u0275\u0275NgModuleDeclaration", "\u0275\u0275NgModuleDeclaration"],
-  ["\u0275NgModuleFactory", "NgModuleFactory"],
-  ["\u0275noSideEffects", "\u0275noSideEffects"]
-]);
-var CORE_MODULE = "@angular/core";
-var R3SymbolsImportRewriter = class {
-  r3SymbolsPath;
-  constructor(r3SymbolsPath) {
-    this.r3SymbolsPath = r3SymbolsPath;
-  }
-  rewriteSymbol(symbol, specifier) {
-    if (specifier !== CORE_MODULE) {
-      return symbol;
-    }
-    return validateAndRewriteCoreSymbol(symbol);
-  }
-  rewriteSpecifier(specifier, inContextOfFile) {
-    if (specifier !== CORE_MODULE) {
-      return specifier;
-    }
-    const relativePathToR3Symbols = relativePathBetween(inContextOfFile, this.r3SymbolsPath);
-    if (relativePathToR3Symbols === null) {
-      throw new Error(`Failed to rewrite import inside ${CORE_MODULE}: ${inContextOfFile} -> ${this.r3SymbolsPath}`);
-    }
-    return relativePathToR3Symbols;
-  }
-  rewriteNamespaceImportIdentifier(specifier) {
-    return specifier;
-  }
-};
-function validateAndRewriteCoreSymbol(name) {
-  if (!CORE_SUPPORTED_SYMBOLS.has(name)) {
-    throw new Error(`Importing unexpected symbol ${name} while compiling ${CORE_MODULE}`);
-  }
-  return CORE_SUPPORTED_SYMBOLS.get(name);
-}
 
 // packages/compiler-cli/src/ngtsc/imports/src/patch_alias_reference_resolution.js
 import ts9 from "typescript";
@@ -6814,6 +6814,7 @@ export {
   getProjectRelativePath,
   NoopImportRewriter,
   R3SymbolsImportRewriter,
+  validateAndRewriteCoreSymbol,
   loadIsReferencedAliasDeclarationPatch,
   isAliasImportDeclaration,
   attachDefaultImportDeclaration,
@@ -6904,4 +6905,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-NTONJEIU.js.map
+//# sourceMappingURL=chunk-2FPAGQFW.js.map

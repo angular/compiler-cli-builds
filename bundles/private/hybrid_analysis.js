@@ -17,8 +17,9 @@ import {
   SymbolBuilder,
   SymbolKind,
   findFirstMatchingNode,
-  hasExpressionIdentifier
-} from "../chunk-NTONJEIU.js";
+  hasExpressionIdentifier,
+  validateAndRewriteCoreSymbol
+} from "../chunk-2FPAGQFW.js";
 import "../chunk-2RWOSWE5.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";
@@ -36,7 +37,8 @@ export {
   findFirstMatchingNode,
   generateIndexerAnalysis as generateAnalysis,
   getIndexerTemplateIdentifiers as getTemplateIdentifiers,
-  hasExpressionIdentifier
+  hasExpressionIdentifier,
+  validateAndRewriteCoreSymbol
 };
 /**
  * @license

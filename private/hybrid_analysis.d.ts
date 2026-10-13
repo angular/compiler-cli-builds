@@ -9,7 +9,7 @@ export { type TemplateDiagnostic, type SourceMapping, type SymbolReference, Symb
 export { RegistryDomSchemaChecker } from '../src/ngtsc/typecheck/src/dom';
 export { Environment } from '../src/ngtsc/typecheck/src/environment';
 export { ImportManager } from '../src/ngtsc/translator';
-export type { ReferenceEmitter } from '../src/ngtsc/imports';
+export { validateAndRewriteCoreSymbol, type ReferenceEmitter } from '../src/ngtsc/imports';
 export type { ReflectionHost, ClassDeclaration } from '../src/ngtsc/reflection';
 export type { TypeCheckSourceResolver } from '../src/ngtsc/typecheck/src/tcb_util';
 export { findFirstMatchingNode, ExpressionIdentifier, hasExpressionIdentifier, } from '../src/ngtsc/typecheck/src/comments';
