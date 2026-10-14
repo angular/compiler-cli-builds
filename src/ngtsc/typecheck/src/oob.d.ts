@@ -5,7 +5,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-import { AST, BindingPipe, OutOfBandDiagnosticCategory, OutOfBandDiagnosticRecorder, PropertyRead, TcbDirectiveMetadata, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TmplAstViewportDeferredTrigger, TypeCheckId } from '@angular/compiler';
+import { AST, BindingPipe, OutOfBandDiagnosticCategory, OutOfBandDiagnosticRecorder, PropertyRead, TcbDirectiveMetadata, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstBoundaryBlock, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstForLoopBlock, TmplAstForLoopBlockEmpty, TmplAstHoverDeferredTrigger, TmplAstIfBlockBranch, TmplAstInteractionDeferredTrigger, TmplAstLetDeclaration, TmplAstReference, TmplAstSwitchBlockCase, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, TmplAstViewportDeferredTrigger, TypeCheckId } from '@angular/compiler';
 import ts from 'typescript';
 import { TemplateDiagnostic } from '../api';
 import { TypeCheckSourceResolver } from './tcb_util';
@@ -32,7 +32,7 @@ export declare class OutOfBandDiagnosticRecorderImpl implements OutOfBandDiagnos
     missingRequiredInputs(id: TypeCheckId, element: TmplAstElement | TmplAstTemplate | TmplAstComponent | TmplAstDirective, directiveName: string, isComponent: boolean, inputAliases: string[]): void;
     illegalForLoopTrackAccess(id: TypeCheckId, block: TmplAstForLoopBlock, access: PropertyRead): void;
     inaccessibleDeferredTriggerElement(id: TypeCheckId, trigger: TmplAstHoverDeferredTrigger | TmplAstInteractionDeferredTrigger | TmplAstViewportDeferredTrigger): void;
-    controlFlowPreventingContentProjection(id: TypeCheckId, category: OutOfBandDiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty, preservesWhitespaces: boolean): void;
+    controlFlowPreventingContentProjection(id: TypeCheckId, category: OutOfBandDiagnosticCategory, projectionNode: TmplAstElement | TmplAstTemplate, componentName: string, slotSelector: string, controlFlowNode: TmplAstIfBlockBranch | TmplAstSwitchBlockCase | TmplAstForLoopBlock | TmplAstForLoopBlockEmpty | TmplAstBoundaryBlock, preservesWhitespaces: boolean): void;
     illegalWriteToLetDeclaration(id: TypeCheckId, node: AST, target: TmplAstLetDeclaration): void;
     letUsedBeforeDefinition(id: TypeCheckId, node: PropertyRead, target: TmplAstLetDeclaration): void;
     conflictingDeclaration(id: TypeCheckId, decl: TmplAstLetDeclaration): void;
