@@ -39,6 +39,7 @@ import {
   ensureTypeCheckFilePreparationImports,
   entityNameToValue,
   extractDirectiveTypeCheckMeta,
+  extractHmrMetatadata,
   filterToMembersWithDecorator,
   findAllMatchingNodes,
   findFirstMatchingNode,
@@ -47,6 +48,7 @@ import {
   generateInlineTypeCtor,
   generateTcbTypeParameters,
   getDefaultImportDeclaration,
+  getHmrUpdateDeclaration,
   getProjectRelativePath,
   getSourceFile,
   getSourceFileOrNull,
@@ -84,7 +86,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-2FPAGQFW.js";
+} from "./chunk-U3DV3X27.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -5055,8 +5057,8 @@ function _extractTemplateStyleUrls(template) {
 }
 
 // packages/compiler-cli/src/ngtsc/annotations/component/src/handler.js
-import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, compileHmrInitializer, ConstantPool as ConstantPool2, createHostElement as createHostElement2, CssSelector as CssSelector3, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, MatchSource as MatchSource2, outputAst as o4, R3TargetBinder as R3TargetBinder2, R3TemplateDependencyKind, SelectorlessMatcher as SelectorlessMatcher2, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
-import ts39 from "typescript";
+import { compileClassDebugInfo, compileComponentClassMetadata, compileComponentDeclareClassMetadata, compileComponentFromMetadata, compileDeclareComponentFromMetadata, compileDeferResolverFunction, compileHmrInitializer, ConstantPool as ConstantPool2, createHostElement as createHostElement2, CssSelector as CssSelector3, DomElementSchemaRegistry as DomElementSchemaRegistry2, ExternalExpr as ExternalExpr8, FactoryTarget as FactoryTarget3, makeBindingParser as makeBindingParser2, MatchSource as MatchSource2, outputAst as o2, R3TargetBinder as R3TargetBinder2, R3TemplateDependencyKind, SelectorlessMatcher as SelectorlessMatcher2, SelectorMatcher as SelectorMatcher2, ViewEncapsulation as ViewEncapsulation2 } from "@angular/compiler";
+import ts36 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/incremental/semantic_graph/src/api.js
 import ts20 from "typescript";
@@ -7492,296 +7494,13 @@ function transformToTypeTupleExpression(expr, evaluator, refEmitter, sourceFile,
   return resolvedToTypeTupleElement(expr, resolved, refEmitter, sourceFile, reflector, diagnostics);
 }
 
-// packages/compiler-cli/src/ngtsc/hmr/src/metadata.js
-import { outputAst as o3 } from "@angular/compiler";
-
-// packages/compiler-cli/src/ngtsc/hmr/src/extract_dependencies.js
-import { outputAst as o2 } from "@angular/compiler";
-import ts27 from "typescript";
-function extractHmrDependencies(node, definition, factory, deferBlockMetadata, classMetadata, debugInfo, reflection, evaluator) {
-  const name = ts27.isClassDeclaration(node) && node.name ? node.name.text : null;
-  const visitor = new PotentialTopLevelReadsVisitor();
-  const sourceFile = ts27.getOriginalNode(node).getSourceFile();
-  definition.expression.visitExpression(visitor, null);
-  definition.statements.forEach((statement) => statement.visitStatement(visitor, null));
-  factory.initializer?.visitExpression(visitor, null);
-  factory.statements.forEach((statement) => statement.visitStatement(visitor, null));
-  classMetadata?.visitStatement(visitor, null);
-  debugInfo?.visitStatement(visitor, null);
-  if (deferBlockMetadata.mode === 0) {
-    deferBlockMetadata.blocks.forEach((loader) => loader?.visitExpression(visitor, null));
-  } else {
-    deferBlockMetadata.dependenciesFn?.visitExpression(visitor, null);
-  }
-  const availableTopLevel = getTopLevelDeclarationNames(sourceFile);
-  const local = [];
-  const seenLocals = /* @__PURE__ */ new Set();
-  for (const readNode of visitor.allReads) {
-    const readName = readNode instanceof o2.ReadVarExpr ? readNode.name : readNode.text;
-    if (readName !== name && !seenLocals.has(readName) && availableTopLevel.has(readName)) {
-      const runtimeRepresentation = getRuntimeRepresentation(readNode, reflection, evaluator);
-      if (runtimeRepresentation === null) {
-        return null;
-      }
-      local.push({ name: readName, runtimeRepresentation });
-      seenLocals.add(readName);
-    }
-  }
-  return {
-    local,
-    external: Array.from(visitor.namespaceReads, (name2, index) => ({
-      moduleName: name2,
-      assignedName: `\u0275hmr${index}`
-    }))
-  };
-}
-function getRuntimeRepresentation(node, reflection, evaluator) {
-  if (node instanceof o2.ReadVarExpr) {
-    return o2.variable(node.name);
-  }
-  if (isConstEnumReference(node, reflection)) {
-    const evaluated = evaluator.evaluate(node);
-    if (evaluated instanceof Map) {
-      const members = [];
-      for (const [name, value] of evaluated.entries()) {
-        if (value instanceof EnumValue && (value.resolved == null || typeof value.resolved === "string" || typeof value.resolved === "boolean" || typeof value.resolved === "number")) {
-          members.push({
-            key: name,
-            quoted: false,
-            value: o2.literal(value.resolved)
-          });
-        } else {
-          return null;
-        }
-      }
-      return o2.literalMap(members);
-    }
-  }
-  return o2.variable(node.text);
-}
-function getTopLevelDeclarationNames(sourceFile) {
-  const results = /* @__PURE__ */ new Set();
-  for (const node of sourceFile.statements) {
-    if (ts27.isClassDeclaration(node) || ts27.isFunctionDeclaration(node) || ts27.isEnumDeclaration(node)) {
-      if (node.name) {
-        results.add(node.name.text);
-      }
-      continue;
-    }
-    if (ts27.isVariableStatement(node)) {
-      for (const decl of node.declarationList.declarations) {
-        trackBindingName(decl.name, results);
-      }
-      continue;
-    }
-    if (ts27.isImportDeclaration(node) && node.importClause) {
-      const importClause = node.importClause;
-      if (importClause.phaseModifier === ts27.SyntaxKind.TypeKeyword) {
-        continue;
-      }
-      if (importClause.name) {
-        results.add(importClause.name.text);
-      }
-      if (importClause.namedBindings) {
-        const namedBindings = importClause.namedBindings;
-        if (ts27.isNamespaceImport(namedBindings)) {
-          results.add(namedBindings.name.text);
-        } else {
-          namedBindings.elements.forEach((el) => {
-            if (!el.isTypeOnly) {
-              results.add(el.name.text);
-            }
-          });
-        }
-      }
-      continue;
-    }
-  }
-  return results;
-}
-function trackBindingName(node, results) {
-  if (ts27.isIdentifier(node)) {
-    results.add(node.text);
-  } else {
-    for (const el of node.elements) {
-      if (!ts27.isOmittedExpression(el)) {
-        trackBindingName(el.name, results);
-      }
-    }
-  }
-}
-var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
-  allReads = /* @__PURE__ */ new Set();
-  namespaceReads = /* @__PURE__ */ new Set();
-  visitExternalExpr(ast, context) {
-    if (ast.value.moduleName !== null) {
-      this.namespaceReads.add(ast.value.moduleName);
-    }
-    super.visitExternalExpr(ast, context);
-  }
-  visitReadVarExpr(ast, context) {
-    this.allReads.add(ast);
-    super.visitReadVarExpr(ast, context);
-  }
-  visitWrappedNodeExpr(ast, context) {
-    if (this.isTypeScriptNode(ast.node)) {
-      this.addAllTopLevelIdentifiers(ast.node);
-    }
-    super.visitWrappedNodeExpr(ast, context);
-  }
-  /**
-   * Traverses a TypeScript AST and tracks all the top-level reads.
-   * @param node Node from which to start the traversal.
-   */
-  addAllTopLevelIdentifiers = (node) => {
-    if (ts27.isIdentifier(node) && this.isTopLevelIdentifierReference(node)) {
-      this.allReads.add(node);
-    } else {
-      ts27.forEachChild(node, this.addAllTopLevelIdentifiers);
-    }
-  };
-  /**
-   * TypeScript identifiers are used both when referring to a variable (e.g. `console.log(foo)`)
-   * and for names (e.g. `{foo: 123}`). This function determines if the identifier is a top-level
-   * variable read, rather than a nested name.
-   * @param identifier Identifier to check.
-   */
-  isTopLevelIdentifierReference(identifier) {
-    let node = identifier;
-    let parent = node.parent;
-    if (!parent) {
-      return false;
-    }
-    if (ts27.isParenthesizedExpression(parent) && parent.expression === node) {
-      while (parent && ts27.isParenthesizedExpression(parent)) {
-        node = parent;
-        parent = parent.parent;
-      }
-    }
-    if (ts27.isSourceFile(parent)) {
-      return true;
-    }
-    if (ts27.isCallExpression(parent)) {
-      return parent.expression === node || parent.arguments.includes(node);
-    }
-    if (ts27.isExpressionStatement(parent) || ts27.isPropertyAccessExpression(parent) || ts27.isComputedPropertyName(parent) || ts27.isTemplateSpan(parent) || ts27.isSpreadAssignment(parent) || ts27.isSpreadElement(parent) || ts27.isAwaitExpression(parent) || ts27.isNonNullExpression(parent) || ts27.isIfStatement(parent) || ts27.isDoStatement(parent) || ts27.isWhileStatement(parent) || ts27.isSwitchStatement(parent) || ts27.isCaseClause(parent) || ts27.isThrowStatement(parent) || ts27.isNewExpression(parent) || ts27.isExpressionWithTypeArguments(parent)) {
-      return parent.expression === node;
-    }
-    if (ts27.isArrayLiteralExpression(parent)) {
-      return parent.elements.includes(node);
-    }
-    if (ts27.isPropertyAssignment(parent) || ts27.isParameter(parent) || ts27.isBindingElement(parent) || ts27.isPropertyDeclaration(parent) || ts27.isEnumMember(parent)) {
-      return parent.initializer === node;
-    }
-    if (ts27.isVariableDeclaration(parent)) {
-      return parent.name === node || parent.initializer === node;
-    }
-    if (ts27.isClassDeclaration(parent) || ts27.isFunctionDeclaration(parent) || ts27.isShorthandPropertyAssignment(parent)) {
-      return parent.name === node;
-    }
-    if (ts27.isElementAccessExpression(parent)) {
-      return parent.expression === node || parent.argumentExpression === node;
-    }
-    if (ts27.isBinaryExpression(parent)) {
-      return parent.left === node || parent.right === node;
-    }
-    if (ts27.isForInStatement(parent) || ts27.isForOfStatement(parent)) {
-      return parent.expression === node || parent.initializer === node;
-    }
-    if (ts27.isForStatement(parent)) {
-      return parent.condition === node || parent.initializer === node || parent.incrementor === node;
-    }
-    if (ts27.isArrowFunction(parent)) {
-      return parent.body === node;
-    }
-    if (ts27.isImportSpecifier(parent) || ts27.isExportSpecifier(parent)) {
-      return (parent.propertyName || parent.name) === node;
-    }
-    if (ts27.isConditionalExpression(parent)) {
-      return parent.condition === node || parent.whenFalse === node || parent.whenTrue === node;
-    }
-    return false;
-  }
-  /** Checks if a value is a TypeScript AST node. */
-  isTypeScriptNode(value) {
-    return !!value && typeof value.kind === "number";
-  }
-};
-function isConstEnumReference(node, reflection) {
-  const parent = node.parent;
-  if (!parent || !ts27.isPropertyAccessExpression(parent) || parent.expression !== node || !ts27.isIdentifier(parent.name)) {
-    return false;
-  }
-  const declaration = reflection.getDeclarationOfIdentifier(node);
-  return declaration !== null && ts27.isEnumDeclaration(declaration.node) && !!declaration.node.modifiers?.some((m) => m.kind === ts27.SyntaxKind.ConstKeyword);
-}
-
-// packages/compiler-cli/src/ngtsc/hmr/src/metadata.js
-import ts28 from "typescript";
-function extractHmrMetatadata(clazz, reflection, evaluator, compilerHost, rootDirs, definition, factory, deferBlockMetadata, classMetadata, debugInfo) {
-  if (!reflection.isClass(clazz)) {
-    return null;
-  }
-  const sourceFile = ts28.getOriginalNode(clazz).getSourceFile();
-  const filePath = getProjectRelativePath(sourceFile.fileName, rootDirs, compilerHost) || compilerHost.getCanonicalFileName(sourceFile.fileName);
-  const dependencies = extractHmrDependencies(clazz, definition, factory, deferBlockMetadata, classMetadata, debugInfo, reflection, evaluator);
-  if (dependencies === null) {
-    return null;
-  }
-  const meta = {
-    type: new o3.WrappedNodeExpr(clazz.name),
-    className: clazz.name.text,
-    filePath,
-    localDependencies: dependencies.local,
-    namespaceDependencies: dependencies.external
-  };
-  return meta;
-}
-
-// packages/compiler-cli/src/ngtsc/hmr/src/update_declaration.js
-import { compileHmrUpdateCallback } from "@angular/compiler";
-import ts29 from "typescript";
-function getHmrUpdateDeclaration(compilationResults, constantStatements, meta, declaration) {
-  const namespaceSpecifiers = meta.namespaceDependencies.reduce((result, current) => {
-    result.set(current.moduleName, current.assignedName);
-    return result;
-  }, /* @__PURE__ */ new Map());
-  const importRewriter = new HmrModuleImportRewriter(namespaceSpecifiers);
-  const importManager = new ImportManager({
-    ...presetImportManagerForceNamespaceImports,
-    rewriter: importRewriter
-  });
-  const callback = compileHmrUpdateCallback(compilationResults, constantStatements, meta);
-  const sourceFile = ts29.getOriginalNode(declaration).getSourceFile();
-  const node = translateStatement(sourceFile, callback, importManager);
-  return ts29.factory.updateFunctionDeclaration(node, [
-    ts29.factory.createToken(ts29.SyntaxKind.ExportKeyword),
-    ts29.factory.createToken(ts29.SyntaxKind.DefaultKeyword)
-  ], node.asteriskToken, node.name, node.typeParameters, node.parameters, node.type, node.body);
-}
-var HmrModuleImportRewriter = class {
-  lookup;
-  constructor(lookup) {
-    this.lookup = lookup;
-  }
-  rewriteNamespaceImportIdentifier(specifier, moduleName) {
-    return this.lookup.has(moduleName) ? this.lookup.get(moduleName) : specifier;
-  }
-  rewriteSymbol(symbol) {
-    return symbol;
-  }
-  rewriteSpecifier(specifier) {
-    return specifier;
-  }
-};
-
 // packages/compiler-cli/src/ngtsc/typecheck/src/checker.js
 import { CssSelector as CssSelector2, DomElementSchemaRegistry, ExternalExpr as ExternalExpr7, ParseSourceSpan as ParseSourceSpan4, WrappedNodeExpr as WrappedNodeExpr9 } from "@angular/compiler";
-import ts36 from "typescript";
+import ts33 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/completion.js
 import { EmptyExpr, ImplicitReceiver, PropertyRead, SafePropertyRead, ThisReceiver, TmplAstLetDeclaration, TmplAstReference, TmplAstTextAttribute } from "@angular/compiler";
-import ts30 from "typescript";
+import ts27 from "typescript";
 var CompletionEngine = class {
   tcb;
   data;
@@ -7804,7 +7523,7 @@ var CompletionEngine = class {
     this.tcbPath = tcbPath;
     this.tcbIsShim = tcbIsShim;
     const globalRead = findFirstMatchingNode(this.tcb, {
-      filter: ts30.isPropertyAccessExpression,
+      filter: ts27.isPropertyAccessExpression,
       withExpressionIdentifier: ExpressionIdentifier.COMPONENT_COMPLETION
     });
     if (globalRead !== null) {
@@ -7848,7 +7567,7 @@ var CompletionEngine = class {
     let nodeContext = null;
     if (node instanceof EmptyExpr) {
       const nodeLocation = findFirstMatchingNode(this.tcb, {
-        filter: ts30.isIdentifier,
+        filter: ts27.isIdentifier,
         withSpan: node.sourceSpan
       });
       if (nodeLocation !== null) {
@@ -7861,7 +7580,7 @@ var CompletionEngine = class {
     }
     if (node instanceof PropertyRead && (node.receiver instanceof ImplicitReceiver || node.receiver instanceof ThisReceiver)) {
       const nodeLocation = findFirstMatchingNode(this.tcb, {
-        filter: ts30.isPropertyAccessExpression,
+        filter: ts27.isPropertyAccessExpression,
         withSpan: node.sourceSpan
       });
       if (nodeLocation) {
@@ -7885,23 +7604,23 @@ var CompletionEngine = class {
     let tsExpr = null;
     if (expr instanceof PropertyRead) {
       tsExpr = findFirstMatchingNode(this.tcb, {
-        filter: ts30.isPropertyAccessExpression,
+        filter: ts27.isPropertyAccessExpression,
         withSpan: expr.nameSpan
       });
     } else if (expr instanceof SafePropertyRead) {
       tsExpr = findFirstMatchingNode(this.tcb, {
-        filter: ts30.isPropertyAccessExpression,
+        filter: ts27.isPropertyAccessExpression,
         withSpan: expr.nameSpan
       });
       const ternaryExpr = tsExpr === null ? findFirstMatchingNode(this.tcb, {
-        filter: ts30.isParenthesizedExpression,
+        filter: ts27.isParenthesizedExpression,
         withSpan: expr.sourceSpan
       }) : null;
-      if (ternaryExpr !== null && ts30.isConditionalExpression(ternaryExpr.expression)) {
+      if (ternaryExpr !== null && ts27.isConditionalExpression(ternaryExpr.expression)) {
         const whenTrue = ternaryExpr.expression.whenTrue;
-        if (ts30.isPropertyAccessExpression(whenTrue)) {
+        if (ts27.isPropertyAccessExpression(whenTrue)) {
           tsExpr = whenTrue;
-        } else if (ts30.isCallExpression(whenTrue) && ts30.isPropertyAccessExpression(whenTrue.expression)) {
+        } else if (ts27.isCallExpression(whenTrue) && ts27.isPropertyAccessExpression(whenTrue.expression)) {
           tsExpr = whenTrue.expression;
         }
       }
@@ -7924,15 +7643,15 @@ var CompletionEngine = class {
     let tsExpr = null;
     if (expr instanceof TmplAstTextAttribute) {
       const strNode = findFirstMatchingNode(this.tcb, {
-        filter: ts30.isParenthesizedExpression,
+        filter: ts27.isParenthesizedExpression,
         withSpan: expr.sourceSpan
       });
-      if (strNode !== null && ts30.isStringLiteral(strNode.expression)) {
+      if (strNode !== null && ts27.isStringLiteral(strNode.expression)) {
         tsExpr = strNode.expression;
       }
     } else {
       tsExpr = findFirstMatchingNode(this.tcb, {
-        filter: (n2) => ts30.isStringLiteral(n2) || ts30.isNumericLiteral(n2),
+        filter: (n2) => ts27.isStringLiteral(n2) || ts27.isNumericLiteral(n2),
         withSpan: expr.sourceSpan
       });
     }
@@ -7940,7 +7659,7 @@ var CompletionEngine = class {
       return null;
     }
     let positionInShimFile = tsExpr.getEnd();
-    if (ts30.isStringLiteral(tsExpr)) {
+    if (ts27.isStringLiteral(tsExpr)) {
       positionInShimFile -= 1;
     }
     const res = {
@@ -9569,11 +9288,11 @@ var MagicString = class MagicString2 {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/context.js
-import ts35 from "typescript";
+import ts32 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/tcb_adapter.js
 import { AbsoluteSourceSpan, ExternalExpr as ExternalExpr6, ExpressionType, TransplantedType, WrappedNodeExpr as WrappedNodeExpr8, ClassPropertyMapping as ClassPropertyMapping2, TcbGenericContextBehavior } from "@angular/compiler";
-import ts31 from "typescript";
+import ts28 from "typescript";
 function adaptTypeCheckBlockMetadata(ref, meta, env, reflector, genericContextBehavior) {
   const refCache = /* @__PURE__ */ new Map();
   const dirCache = /* @__PURE__ */ new Map();
@@ -9627,7 +9346,7 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, reflector, genericContextBe
       animationTriggerNames: dir.animationTriggerNames,
       ngTemplateGuards: dir.ngTemplateGuards,
       hasNgTemplateContextGuard: dir.hasNgTemplateContextGuard,
-      hasNgFieldDirective: ts31.isClassDeclaration(dir.ref.node) && dir.ref.node.members.some((member) => ts31.isPropertyDeclaration(member) && ts31.isComputedPropertyName(member.name) && ts31.isIdentifier(member.name.expression) && member.name.expression.text === "\u0275NgFieldDirective"),
+      hasNgFieldDirective: ts28.isClassDeclaration(dir.ref.node) && dir.ref.node.members.some((member) => ts28.isPropertyDeclaration(member) && ts28.isComputedPropertyName(member.name) && ts28.isIdentifier(member.name.expression) && member.name.expression.text === "\u0275NgFieldDirective"),
       coercedInputFields: dir.coercedInputFields,
       restrictedInputFields: dir.restrictedInputFields,
       stringLiteralInputFields: dir.stringLiteralInputFields,
@@ -9820,9 +9539,9 @@ function extractReferenceMetadata(ref, env) {
   };
 }
 function extractNameFromExpr(node) {
-  if (ts31.isIdentifier(node)) {
+  if (ts28.isIdentifier(node)) {
     return node.text;
-  } else if (ts31.isPropertyAccessExpression(node)) {
+  } else if (ts28.isPropertyAccessExpression(node)) {
     const receiver = extractNameFromExpr(node.expression);
     return receiver !== null ? `${receiver}.${node.name.text}` : null;
   }
@@ -9831,7 +9550,7 @@ function extractNameFromExpr(node) {
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/oob.js
 import { AbsoluteSourceSpan as AbsoluteSourceSpan2, BindingType, OutOfBandDiagnosticCategory, ParseSourceSpan as ParseSourceSpan2, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement } from "@angular/compiler";
-import ts32 from "typescript";
+import ts29 from "typescript";
 var OutOfBandDiagnosticRecorderImpl = class {
   resolver;
   getSourceFile;
@@ -9868,7 +9587,7 @@ var OutOfBandDiagnosticRecorderImpl = class {
     const mapping = this.resolver.getTemplateSourceMapping(id);
     const value = ref.value.trim();
     const errorMsg = `No directive found with exportAs '${value}'.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, ref.valueSpan || ref.sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REFERENCE_TARGET), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, ref.valueSpan || ref.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REFERENCE_TARGET), errorMsg));
   }
   missingPipe(id, ast, isStandalone) {
     if (this.recordedPipes.has(ast)) {
@@ -9891,7 +9610,7 @@ To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" 
 To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" and add it to the "imports" array of the module declaring the component.`;
       }
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
     this.recordedPipes.add(ast);
   }
   deferredPipeUsedEagerly(id, ast, currentBlockName, declaredBlocks) {
@@ -9909,7 +9628,7 @@ To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" 
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
     this.recordedPipes.add(ast);
   }
   deferredComponentUsedEagerly(id, element, dirMeta, currentBlockName, declaredBlocks) {
@@ -9930,12 +9649,12 @@ To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" 
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for usage of ${kind.toLowerCase()} '${dirMeta.name}'.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
   }
   duplicateTemplateVar(id, variable, firstDecl) {
     const mapping = this.resolver.getTemplateSourceMapping(id);
     const errorMsg = `Cannot redeclare variable '${variable.name}' as it was previously declared elsewhere for the same template.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, variable.sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, variable.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [
       {
         text: `The variable '${firstDecl.name}' was first declared here.`,
         start: firstDecl.sourceSpan.start.offset,
@@ -9964,7 +9683,7 @@ To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" 
     const message = `This structural directive supports advanced type inference, but the current compiler configuration prevents its usage. The variable ${varIdentification} will have type 'any' as a result.
 
 Consider enabling the 'strictTemplates' option in your tsconfig.json for better type inference within this template.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, diagnosticVar.keySpan, ts32.DiagnosticCategory.Suggestion, ngErrorCode(ErrorCode.SUGGEST_SUBOPTIMAL_TYPE_INFERENCE), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, diagnosticVar.keySpan, ts29.DiagnosticCategory.Suggestion, ngErrorCode(ErrorCode.SUGGEST_SUBOPTIMAL_TYPE_INFERENCE), message));
   }
   splitTwoWayBinding(id, input, output, inputConsumer, outputConsumer) {
     const mapping = this.resolver.getTemplateSourceMapping(id);
@@ -10007,11 +9726,11 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
         }
       }
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, input.keySpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SPLIT_TWO_WAY_BINDING), errorMsg, relatedMessages));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, input.keySpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SPLIT_TWO_WAY_BINDING), errorMsg, relatedMessages));
   }
   missingRequiredInputs(id, element, directiveName, isComponent, inputAliases) {
     const message = `Required input${inputAliases.length === 1 ? "" : "s"} ${inputAliases.map((n2) => `'${n2}'`).join(", ")} from ${isComponent ? "component" : "directive"} ${directiveName} must be specified.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), this.getTagNameSpan(element), ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), this.getTagNameSpan(element), ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
   }
   illegalForLoopTrackAccess(id, block, access) {
     const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, access.sourceSpan);
@@ -10020,7 +9739,7 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
     }
     const messageVars = [block.item, ...block.contextVariables.filter((v) => v.value === "$index")].map((v) => `'${v.name}'`).join(", ");
     const message = `Cannot access '${access.name}' inside of a track expression. Only ${messageVars} and properties on the containing component are available to this expression.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
   }
   inaccessibleDeferredTriggerElement(id, trigger) {
     let message;
@@ -10031,7 +9750,7 @@ Consider enabling the 'strictTemplates' option in your tsconfig.json for better 
 Check that an element with #${trigger.reference} exists in the same template and it's accessible from the @defer block.
 Deferred blocks can only access triggers in same view, a parent embedded view or the root view of the @placeholder block.`;
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
   }
   controlFlowPreventingContentProjection(id, category, projectionNode, componentName, slotSelector, controlFlowNode, preservesWhitespaces) {
     const blockName = controlFlowNode.nameSpan.toString().trim();
@@ -10053,43 +9772,43 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for property write.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_LET_WRITE), `Cannot assign to @let declaration '${target.name}'.`));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_LET_WRITE), `Cannot assign to @let declaration '${target.name}'.`));
   }
   letUsedBeforeDefinition(id, node, target) {
     const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, node.sourceSpan);
     if (sourceSpan === null) {
       throw new Error(`Assertion failure: no SourceLocation found for property read.`);
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.LET_USED_BEFORE_DEFINITION), `Cannot read @let declaration '${target.name}' before it has been defined.`));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.LET_USED_BEFORE_DEFINITION), `Cannot read @let declaration '${target.name}' before it has been defined.`));
   }
   conflictingDeclaration(id, decl) {
     const mapping = this.resolver.getTemplateSourceMapping(id);
     const errorMsg = `Cannot declare @let called '${decl.name}' as there is another symbol in the template with the same name.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, decl.sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_LET_DECLARATION), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, decl.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_LET_DECLARATION), errorMsg));
   }
   missingNamedTemplateDependency(id, node) {
     this._diagnostics.push(makeTemplateDiagnostic(
       id,
       this.resolver.getTemplateSourceMapping(id),
       node.startSourceSpan,
-      ts32.DiagnosticCategory.Error,
+      ts29.DiagnosticCategory.Error,
       ngErrorCode(ErrorCode.MISSING_NAMED_TEMPLATE_DEPENDENCY),
       // Wording is meant to mimic the wording TS uses in their diagnostic for missing symbols.
       `Cannot find name "${node instanceof TmplAstDirective ? node.name : node.componentName}". Selectorless references are only supported to classes or non-type import statements.`
     ));
   }
   incorrectTemplateDependencyType(id, node) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.startSourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE), `Incorrect reference type. Type must be a standalone ${node instanceof TmplAstComponent ? "@Component" : "@Directive"}.`));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.startSourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE), `Incorrect reference type. Type must be a standalone ${node instanceof TmplAstComponent ? "@Component" : "@Directive"}.`));
   }
   unclaimedDirectiveBinding(id, directive, node) {
     const errorMsg = `Directive ${directive.name} does not have an ${node instanceof TmplAstBoundEvent ? "output" : "input"} named "${node.name}". Bindings to directives must target existing inputs or outputs.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.keySpan || node.sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_DIRECTIVE_BINDING), errorMsg));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.keySpan || node.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_DIRECTIVE_BINDING), errorMsg));
   }
   deferImplicitTriggerMissingPlaceholder(id, trigger) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block"));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block"));
   }
   deferImplicitTriggerInvalidPlaceholder(id, trigger) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block with exactly one root element node"));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block with exactly one root element node"));
   }
   formFieldUnsupportedBinding(id, node) {
     let message;
@@ -10108,18 +9827,18 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
     } else {
       message = `Setting the '${node.name}' attribute is not allowed on nodes using the '[formField]' directive`;
     }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.sourceSpan, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FORM_FIELD_UNSUPPORTED_BINDING), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FORM_FIELD_UNSUPPORTED_BINDING), message));
   }
   multipleMatchingComponents(id, element, componentNames) {
     const start = element.startSourceSpan.start.moveBy(1);
     const end = element.startSourceSpan.end.moveBy(start.offset + element.name.length - element.startSourceSpan.end.offset);
     const span = new ParseSourceSpan2(start, end);
     const names = componentNames.map((n2) => `'${n2}'`).join(", ");
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MULTIPLE_MATCHING_COMPONENTS), `Multiple components match node with tagname ${element.name}: ${names}.`));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MULTIPLE_MATCHING_COMPONENTS), `Multiple components match node with tagname ${element.name}: ${names}.`));
   }
   conflictingHostDirectiveBinding(id, node, directiveName, kind, classPropertyName, aliases) {
     const message = `${kind === "input" ? "Input" : "Output"} declared in ${directiveName}.${classPropertyName} is exposed under the following conflicting names: ${aliases.map((a) => `"${a}"`).join(", ")}. An ${kind} can only be exposed under a single name.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), this.getTagNameSpan(node), ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_HOST_DIRECTIVE_BINDING), message));
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), this.getTagNameSpan(node), ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_HOST_DIRECTIVE_BINDING), message));
   }
   getTagNameSpan(node) {
     let span;
@@ -10144,14 +9863,14 @@ Deferred blocks can only access triggers in same view, a parent embedded view or
 function translateCategory(category) {
   switch (category) {
     case OutOfBandDiagnosticCategory.Error:
-      return ts32.DiagnosticCategory.Error;
+      return ts29.DiagnosticCategory.Error;
     case OutOfBandDiagnosticCategory.Warning:
-      return ts32.DiagnosticCategory.Warning;
+      return ts29.DiagnosticCategory.Warning;
   }
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/shim.js
-import ts33 from "typescript";
+import ts30 from "typescript";
 var TypeCheckShimGenerator = class {
   extensionPrefix = "ngtypecheck";
   shouldEmit = false;
@@ -10159,7 +9878,7 @@ var TypeCheckShimGenerator = class {
     if (priorShimSf !== null) {
       return priorShimSf;
     }
-    return ts33.createSourceFile(genFilePath, "export const USED_FOR_NG_TYPE_CHECKING = true;", ts33.ScriptTarget.Latest, true, ts33.ScriptKind.TS);
+    return ts30.createSourceFile(genFilePath, "export const USED_FOR_NG_TYPE_CHECKING = true;", ts30.ScriptTarget.Latest, true, ts30.ScriptKind.TS);
   }
   static shimFor(fileName) {
     return absoluteFrom(fileName.replace(/\.tsx?$/, ".ngtypecheck.ts"));
@@ -10168,7 +9887,7 @@ var TypeCheckShimGenerator = class {
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_check_file.js
 import { generateTypeCheckBlock } from "@angular/compiler";
-import ts34 from "typescript";
+import ts31 from "typescript";
 var TCB_FUNCTION_PREFIX = "_tcb";
 var TypeCheckFile = class extends Environment {
   fileName;
@@ -10189,7 +9908,7 @@ var TypeCheckFile = class extends Environment {
       // Type check block code affects code completion and fix suggestions.
       // We want to encourage single quotes for now, like we always did.
       shouldUseSingleQuotes: () => true
-    }), refEmitter, ts34.createSourceFile(compilerHost.getCanonicalFileName(fileName), "", ts34.ScriptTarget.Latest, true));
+    }), refEmitter, ts31.createSourceFile(compilerHost.getCanonicalFileName(fileName), "", ts31.ScriptTarget.Latest, true));
     this.fileName = fileName;
   }
   addTypeCheckBlock(ref, meta, domSchemaChecker, oobRecorder, genericContextBehavior, reflector) {
@@ -10204,14 +9923,14 @@ var TypeCheckFile = class extends Environment {
     if (importChanges.updatedImports.size > 0) {
       throw new Error("AssertionError: Expected no imports to be updated for a new type check file.");
     }
-    const printer = ts34.createPrinter();
+    const printer = ts31.createPrinter();
     let source = this.sourceContent;
     const newImports = importChanges.newImports.get(this.contextFile.fileName);
     if (newImports !== void 0) {
       if (source.length > 0 && !source.endsWith("\n")) {
         source += "\n";
       }
-      source += newImports.map((i) => printer.printNode(ts34.EmitHint.Unspecified, i, this.contextFile)).join("\n");
+      source += newImports.map((i) => printer.printNode(ts31.EmitHint.Unspecified, i, this.contextFile)).join("\n");
     }
     source += "\n";
     for (const expr of this.pipeInstStatements) {
@@ -10390,7 +10109,7 @@ var TypeCheckContextImpl = class {
    * Applies operations to a file.
    */
   executeOperations(targetSf, opsSourceSf) {
-    const printer = ts35.createPrinter({ omitTrailingSemicolon: true });
+    const printer = ts32.createPrinter({ omitTrailingSemicolon: true });
     const importManager = new ImportManager({
       // This minimizes noticeable changes with older versions of `ImportManager`.
       forceGenerateNamespacesForNewImports: true,
@@ -10409,7 +10128,7 @@ var TypeCheckContextImpl = class {
       newImports.get(targetSf.fileName).forEach((newImport) => {
         updates.push({
           pos: 0,
-          text: printer.printNode(ts35.EmitHint.Unspecified, newImport, targetSf)
+          text: printer.printNode(ts32.EmitHint.Unspecified, newImport, targetSf)
         });
       });
     }
@@ -10420,7 +10139,7 @@ var TypeCheckContextImpl = class {
       updates.push({
         pos: oldBindings.getStart(),
         deletePos: oldBindings.getEnd(),
-        text: printer.printNode(ts35.EmitHint.Unspecified, newBindings, targetSf)
+        text: printer.printNode(ts32.EmitHint.Unspecified, newBindings, targetSf)
       });
     }
     const result = new MagicString(targetSf.text, { filename: targetSf.fileName });
@@ -10448,7 +10167,7 @@ var TypeCheckContextImpl = class {
     if (this.inlining !== InliningMode.CopySourceToTcb || !this.opMap.has(originalSf)) {
       return null;
     }
-    const fakeSf = ts35.createSourceFile(shimFileName, originalSf.text, ts35.ScriptTarget.Latest, true);
+    const fakeSf = ts32.createSourceFile(shimFileName, originalSf.text, ts32.ScriptTarget.Latest, true);
     return this.executeOperations(fakeSf, originalSf);
   }
   finalize() {
@@ -10509,7 +10228,7 @@ var TypeCheckContextImpl = class {
     if (!fileData.shimData.has(shimPath)) {
       fileData.shimData.set(shimPath, {
         domSchemaChecker: new RegistryDomSchemaChecker(fileData.sourceManager),
-        oobRecorder: new OutOfBandDiagnosticRecorderImpl(fileData.sourceManager, (name) => this.compilerHost.getSourceFile(name, ts35.ScriptTarget.Latest)),
+        oobRecorder: new OutOfBandDiagnosticRecorderImpl(fileData.sourceManager, (name) => this.compilerHost.getSourceFile(name, ts32.ScriptTarget.Latest)),
         file: new TypeCheckFile(shimPath, this.config, this.refEmitter, this.compilerHost),
         data: /* @__PURE__ */ new Map(),
         shimDiagnostics: null
@@ -10537,7 +10256,7 @@ function getTemplateDiagnostics(parseErrors, templateId, sourceMapping) {
     if (span.start.offset === span.end.offset) {
       span.end.offset++;
     }
-    return makeTemplateDiagnostic(templateId, sourceMapping, span, ts35.DiagnosticCategory.Error, ngErrorCode(ErrorCode.TEMPLATE_PARSE_ERROR), error.msg);
+    return makeTemplateDiagnostic(templateId, sourceMapping, span, ts32.DiagnosticCategory.Error, ngErrorCode(ErrorCode.TEMPLATE_PARSE_ERROR), error.msg);
   });
 }
 var InlineTcbOp = class {
@@ -10772,7 +10491,7 @@ var TypeCheckableDirectiveMetaAdapter = class {
     };
   }
   getNgModule() {
-    if (ts36.isClassDeclaration(this.meta.ref.node)) {
+    if (ts33.isClassDeclaration(this.meta.ref.node)) {
       const scope = this.componentScopeReader.getScopeForComponent(this.meta.ref.node);
       if (scope === null || scope.kind !== ComponentScopeKind.NgModule) {
         return null;
@@ -10782,7 +10501,7 @@ var TypeCheckableDirectiveMetaAdapter = class {
     return null;
   }
   getReferenceTargetNode() {
-    return ts36.isClassDeclaration(this.meta.ref.node) ? this.meta.ref.node : null;
+    return ts33.isClassDeclaration(this.meta.ref.node) ? this.meta.ref.node : null;
   }
   get selector() {
     return this.meta.selector;
@@ -10984,7 +10703,7 @@ var TemplateTypeCheckerImpl = class {
       const tsSymbol2 = this.getTsSymbolOfReference(symbol.target, typeChecker);
       if (tsSymbol2)
         return tsSymbol2;
-      if (ts36.isCallExpression(node)) {
+      if (ts33.isCallExpression(node)) {
         return null;
       }
     }
@@ -10994,11 +10713,11 @@ var TemplateTypeCheckerImpl = class {
         return type.getSymbol() || null;
     }
     let tsSymbol;
-    if (ts36.isPropertyAccessExpression(node)) {
+    if (ts33.isPropertyAccessExpression(node)) {
       tsSymbol = typeChecker.getSymbolAtLocation(node.name);
-    } else if (ts36.isCallExpression(node)) {
+    } else if (ts33.isCallExpression(node)) {
       tsSymbol = typeChecker.getSymbolAtLocation(node.expression);
-    } else if (ts36.isElementAccessExpression(node) && ts36.isStringLiteral(node.argumentExpression)) {
+    } else if (ts33.isElementAccessExpression(node) && ts33.isStringLiteral(node.argumentExpression)) {
       const type = typeChecker.getTypeAtLocation(node.expression);
       tsSymbol = typeChecker.getPropertyOfType(type, node.argumentExpression.text);
     } else {
@@ -11008,7 +10727,7 @@ var TemplateTypeCheckerImpl = class {
       let type = typeChecker.getTypeAtLocation(node);
       tsSymbol = type.aliasSymbol ?? type.symbol;
     }
-    if (tsSymbol === void 0 && ts36.isIdentifier(node) && node.text.startsWith("_t")) {
+    if (tsSymbol === void 0 && ts33.isIdentifier(node) && node.text.startsWith("_t")) {
       let type = typeChecker.getTypeAtLocation(node);
       tsSymbol = type.aliasSymbol ?? type.symbol;
     }
@@ -11024,14 +10743,14 @@ var TemplateTypeCheckerImpl = class {
     }
     const visit2 = (node) => {
       if (node.pos <= target.position && target.position < node.end) {
-        if (ts36.isClassDeclaration(node)) {
+        if (ts33.isClassDeclaration(node)) {
           return node;
         }
-        return ts36.forEachChild(node, visit2) ?? null;
+        return ts33.forEachChild(node, visit2) ?? null;
       }
       return null;
     };
-    const classDecl = ts36.forEachChild(sf, visit2) ?? null;
+    const classDecl = ts33.forEachChild(sf, visit2) ?? null;
     if (!classDecl) {
       return null;
     }
@@ -11158,10 +10877,10 @@ var TemplateTypeCheckerImpl = class {
     }
     const ranges = [];
     const visit2 = (node) => {
-      if (ts36.isInterfaceDeclaration(node)) {
+      if (ts33.isInterfaceDeclaration(node)) {
         return;
       }
-      if (ts36.isFunctionDeclaration(node)) {
+      if (ts33.isFunctionDeclaration(node)) {
         if (node.name !== void 0) {
           const name = node.name.text;
           if (name.startsWith(TCB_FUNCTION_PREFIX)) {
@@ -11170,9 +10889,9 @@ var TemplateTypeCheckerImpl = class {
           }
         }
       }
-      ts36.forEachChild(node, visit2);
+      ts33.forEachChild(node, visit2);
     };
-    ts36.forEachChild(sf, visit2);
+    ts33.forEachChild(sf, visit2);
     this.generatedRangeCache.set(sf, ranges);
     return ranges;
   }
@@ -12051,11 +11770,11 @@ function getClassDeclFromSymbol(symbol, checker) {
   if (decl === void 0) {
     return null;
   }
-  if (ts36.isExportAssignment(decl)) {
+  if (ts33.isExportAssignment(decl)) {
     const symbol2 = checker.getTypeAtLocation(decl.expression).getSymbol();
     return getClassDeclFromSymbol(symbol2, checker);
   }
-  if (ts36.isExportSpecifier(decl)) {
+  if (ts33.isExportSpecifier(decl)) {
     const symbol2 = checker.getTypeAtLocation(decl).getSymbol();
     return getClassDeclFromSymbol(symbol2, checker);
   }
@@ -12088,7 +11807,7 @@ function getTheElementTagDeprecatedSuggestionDiagnostics(shimPath, program, file
     const nodeType = typeChecker.getTypeAtLocation(diagNode);
     const nodeSymbolDeclarations = nodeType.getSymbol()?.declarations;
     const decl = nodeSymbolDeclarations !== void 0 && nodeSymbolDeclarations.length > 0 ? nodeSymbolDeclarations[0] : void 0;
-    if (decl === void 0 || !ts36.isClassDeclaration(decl)) {
+    if (decl === void 0 || !ts33.isClassDeclaration(decl)) {
       continue;
     }
     const directiveForDiagnostic = templateTypeChecker.getDirectiveMetadata(decl);
@@ -12108,7 +11827,7 @@ function getTheElementTagDeprecatedSuggestionDiagnostics(shimPath, program, file
     if (decl === void 0) {
       continue;
     }
-    if (!ts36.isClassDeclaration(decl)) {
+    if (!ts33.isClassDeclaration(decl)) {
       continue;
     }
     const diagnostic = nodeToDiag.get(decl);
@@ -12246,7 +11965,7 @@ function checkCustomElementSelectorForErrors(selector) {
 
 // packages/compiler-cli/src/ngtsc/annotations/component/src/foreign_component.js
 import { BindingType as BindingType2, TmplAstContentBlock, TmplAstElement as TmplAstElement2, TmplAstRecursiveVisitor, tmplAstVisitAll as tmplAstVisitAll2 } from "@angular/compiler";
-import ts37 from "typescript";
+import ts34 from "typescript";
 var CHILDREN = "children";
 function analyzeForeignComponentFeatures(template, foreignMatcher) {
   const analyzer = new ForeignComponentFeatureAnalyzer(foreignMatcher, template.sourceMapping);
@@ -12284,13 +12003,13 @@ var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
   }
   validateForeignComponent(element) {
     if (element.outputs.length > 0) {
-      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, element.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING), "Foreign components do not support event bindings."));
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, element.sourceSpan, ts34.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING), "Foreign components do not support event bindings."));
     }
     if (element.references.length > 0) {
-      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, element.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING), "Foreign components do not support references."));
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, element.sourceSpan, ts34.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING), "Foreign components do not support references."));
     }
     if (element.inputs.some((input) => input.type !== BindingType2.Property)) {
-      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, element.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING), "Foreign components only support static attributes and property bindings."));
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, element.sourceSpan, ts34.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_UNSUPPORTED_BINDING), "Foreign components only support static attributes and property bindings."));
     }
     const childrenInput = element.inputs.find((input) => input.type === BindingType2.Property && input.name === CHILDREN);
     const childrenAttr = element.attributes.find((attr) => attr.name === CHILDREN);
@@ -12302,7 +12021,7 @@ var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
     if (firstChild === void 0) {
       return;
     }
-    this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, conflictingSource.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_CONTENT_AND_PROPERTY), `A foreign component cannot have both a '${CHILDREN}' property and child nodes.`, [
+    this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, conflictingSource.sourceSpan, ts34.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_CONTENT_AND_PROPERTY), `A foreign component cannot have both a '${CHILDREN}' property and child nodes.`, [
       {
         text: "Child nodes are defined here.",
         start: firstChild.sourceSpan.start.offset,
@@ -12386,7 +12105,7 @@ var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
     if (this.parentNodeIsForeignComponent()) {
       this.validateContentBlock(block);
     } else {
-      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INVALID_CONTENT_PLACEMENT), "@content blocks are only valid as direct children of foreign components."));
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts34.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INVALID_CONTENT_PLACEMENT), "@content blocks are only valid as direct children of foreign components."));
     }
     const prevParent = this.currentParent;
     this.currentParent = block;
@@ -12402,7 +12121,7 @@ var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
     }
     if (seen.has(block.name)) {
       const firstDecl = seen.get(block.name);
-      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_CONTENT_DECLARATION), `A @content block with the name '${block.name}' has already been defined for this component.`, [
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts34.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_CONTENT_DECLARATION), `A @content block with the name '${block.name}' has already been defined for this component.`, [
         {
           text: `The @content block '${block.name}' was first defined here.`,
           start: firstDecl.sourceSpan.start.offset,
@@ -12416,7 +12135,7 @@ var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
     const conflictAttr = parent.attributes.find((attr) => attr.name === block.name);
     const conflict = conflictInput ?? conflictAttr;
     if (conflict !== void 0) {
-      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_CONTENT_AND_PROPERTY), `A @content block with the name '${block.name}' conflicts with a property on the parent component.`, [
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts34.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_CONTENT_AND_PROPERTY), `A @content block with the name '${block.name}' conflicts with a property on the parent component.`, [
         {
           text: `The property '${block.name}' is defined here.`,
           start: conflict.sourceSpan.start.offset,
@@ -12425,7 +12144,7 @@ var ForeignComponentFeatureAnalyzer = class extends TmplAstRecursiveVisitor {
       ]));
     }
     if (block.name === CHILDREN && block.variables.length === 0) {
-      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts37.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_CONTENT_UNNECESSARY_FOR_CHILDREN), `Defining a @content (${CHILDREN}) block with no parameters is unnecessary. Pass children as direct nested content of the foreign component instead.`));
+      this.diagnostics.push(makeTemplateDiagnostic("", this.sourceMapping, block.sourceSpan, ts34.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FOREIGN_COMPONENT_CONTENT_UNNECESSARY_FOR_CHILDREN), `Defining a @content (${CHILDREN}) block with no parameters is unnecessary. Pass children as direct nested content of the foreign component instead.`));
     }
   }
 };
@@ -12494,7 +12213,7 @@ var ComponentSymbol = class _ComponentSymbol extends DirectiveSymbol {
 };
 
 // packages/compiler-cli/src/ngtsc/annotations/component/src/util.js
-import ts38 from "typescript";
+import ts35 from "typescript";
 function collectLegacyAnimationNames(value, legacyAnimationTriggerNames) {
   if (value instanceof Map) {
     const name = value.get("name");
@@ -12537,9 +12256,9 @@ function validateAndFlattenComponentImports(imports, expr, isDeferred) {
       importsByBlock = /* @__PURE__ */ new Map();
       for (const [blockName, blockValue] of imports.entries()) {
         let propExpr = expr;
-        if (ts38.isObjectLiteralExpression(expr)) {
-          const prop = expr.properties.find((p) => ts38.isPropertyAssignment(p) && (ts38.isIdentifier(p.name) || ts38.isStringLiteral(p.name)) && p.name.text === blockName);
-          if (prop && ts38.isPropertyAssignment(prop)) {
+        if (ts35.isObjectLiteralExpression(expr)) {
+          const prop = expr.properties.find((p) => ts35.isPropertyAssignment(p) && (ts35.isIdentifier(p.name) || ts35.isStringLiteral(p.name)) && p.name.text === blockName);
+          if (prop && ts35.isPropertyAssignment(prop)) {
             propExpr = prop.initializer;
           }
         }
@@ -12573,7 +12292,7 @@ function validateAndFlattenComponentImports(imports, expr, isDeferred) {
   for (let i = 0; i < imports.length; i++) {
     const ref = imports[i];
     let refExpr = expr;
-    if (ts38.isArrayLiteralExpression(expr) && expr.elements.length === imports.length && !expr.elements.some(ts38.isSpreadAssignment)) {
+    if (ts35.isArrayLiteralExpression(expr) && expr.elements.length === imports.length && !expr.elements.some(ts35.isSpreadAssignment)) {
       refExpr = expr.elements[i];
     }
     if (Array.isArray(ref)) {
@@ -12603,18 +12322,18 @@ function extractForeignImportsFromAst(expr) {
   const foreignImports = [];
   const diagnostics = [];
   const unwrappedExpr = unwrapExpression(expr);
-  if (!ts38.isArrayLiteralExpression(unwrappedExpr)) {
+  if (!ts35.isArrayLiteralExpression(unwrappedExpr)) {
     diagnostics.push(makeDiagnostic(ErrorCode.VALUE_HAS_WRONG_TYPE, expr, `'foreignImports' must be an array of foreign imports, e.g. 'foreignImports: [myImport(MyComponent)]'.`));
     return { foreignImports, diagnostics };
   }
   for (const element of unwrappedExpr.elements) {
     const unwrappedEl = unwrapExpression(element);
-    if (!ts38.isCallExpression(unwrappedEl)) {
+    if (!ts35.isCallExpression(unwrappedEl)) {
       diagnostics.push(makeDiagnostic(ErrorCode.VALUE_HAS_WRONG_TYPE, element, `Each foreign import must be a call expression, e.g. 'myImport(MyComponent)'.`));
       continue;
     }
     const callee = unwrapExpression(unwrappedEl.expression);
-    if (!ts38.isIdentifier(callee)) {
+    if (!ts35.isIdentifier(callee)) {
       diagnostics.push(makeDiagnostic(ErrorCode.VALUE_HAS_WRONG_TYPE, unwrappedEl.expression, `The foreign import function must be a simple identifier, e.g. 'myImport(MyComponent)'.`));
       continue;
     }
@@ -12623,7 +12342,7 @@ function extractForeignImportsFromAst(expr) {
       continue;
     }
     const arg = unwrapExpression(unwrappedEl.arguments[0]);
-    if (!ts38.isIdentifier(arg)) {
+    if (!ts35.isIdentifier(arg)) {
       diagnostics.push(makeDiagnostic(ErrorCode.VALUE_HAS_WRONG_TYPE, unwrappedEl.arguments[0], `The component reference passed to the foreign import must be a simple identifier, e.g. 'myImport(MyComponent)'.`));
       continue;
     }
@@ -12890,13 +12609,13 @@ var ComponentDecoratorHandler = class {
     if (this.compilationMode !== CompilationMode.LOCAL) {
       changeDetection = resolveEnumValue(this.evaluator, component, "changeDetection", "ChangeDetectionStrategy", this.isCore);
     } else if (component.has("changeDetection")) {
-      changeDetection = new o4.WrappedNodeExpr(component.get("changeDetection"));
+      changeDetection = new o2.WrappedNodeExpr(component.get("changeDetection"));
     }
     let animations = null;
     let legacyAnimationTriggerNames = null;
     if (component.has("animations")) {
       const animationExpression = component.get("animations");
-      animations = new o4.WrappedNodeExpr(animationExpression);
+      animations = new o2.WrappedNodeExpr(animationExpression);
       const animationsValue = this.evaluator.evaluate(animationExpression, legacyAnimationTriggerResolver);
       legacyAnimationTriggerNames = { includesDynamicAnimations: false, staticTriggerNames: [] };
       collectLegacyAnimationNames(animationsValue, legacyAnimationTriggerNames);
@@ -12915,7 +12634,7 @@ var ComponentDecoratorHandler = class {
     if (component.has("viewProviders")) {
       const viewProviders = component.get("viewProviders");
       viewProvidersRequiringFactory = resolveProvidersRequiringFactory(viewProviders, this.reflector, this.evaluator);
-      wrappedViewProviders = new o4.WrappedNodeExpr(this.annotateForClosureCompiler ? wrapFunctionExpressionsInParens(viewProviders) : viewProviders);
+      wrappedViewProviders = new o2.WrappedNodeExpr(this.annotateForClosureCompiler ? wrapFunctionExpressionsInParens(viewProviders) : viewProviders);
     }
     if (component.has("providers")) {
       providersRequiringFactory = resolveProvidersRequiringFactory(component.get("providers"), this.reflector, this.evaluator);
@@ -13050,7 +12769,7 @@ var ComponentDecoratorHandler = class {
       path: absoluteFrom(template.declaration.resolvedTemplateUrl),
       node: template.sourceMapping.node
     };
-    const relativeTemplatePath = getProjectRelativePath(templateResource.path ?? ts39.getOriginalNode(node).getSourceFile().fileName, this.rootDirs, this.compilerHost);
+    const relativeTemplatePath = getProjectRelativePath(templateResource.path ?? ts36.getOriginalNode(node).getSourceFile().fileName, this.rootDirs, this.compilerHost);
     let selectorlessEnabled = false;
     let localReferencedSymbols = null;
     if (this.enableSelectorless) {
@@ -13091,7 +12810,7 @@ var ComponentDecoratorHandler = class {
           externalStyles.push(resourceUrl);
           continue;
         }
-        if (styleUrl.source === 2 && ts39.isStringLiteralLike(styleUrl.expression)) {
+        if (styleUrl.source === 2 && ts36.isStringLiteralLike(styleUrl.expression)) {
           styleResources.add({
             path: absoluteFrom(resourceUrl),
             node: styleUrl.expression
@@ -13151,21 +12870,21 @@ var ComponentDecoratorHandler = class {
     let explicitlyDeferredTypes = null;
     let explicitlyDeferredTypesByBlock = null;
     if (metadata.isStandalone && rawDeferredImports !== null) {
-      if (ts39.isObjectLiteralExpression(rawDeferredImports)) {
+      if (ts36.isObjectLiteralExpression(rawDeferredImports)) {
         explicitlyDeferredTypesByBlock = /* @__PURE__ */ new Map();
         for (const property of rawDeferredImports.properties) {
-          if (!ts39.isPropertyAssignment(property)) {
+          if (!ts36.isPropertyAssignment(property)) {
             continue;
           }
           let blockName = null;
-          if (ts39.isIdentifier(property.name) || ts39.isStringLiteral(property.name)) {
+          if (ts36.isIdentifier(property.name) || ts36.isStringLiteral(property.name)) {
             blockName = property.name.text;
           }
           if (blockName === null) {
             continue;
           }
           const initializer = property.initializer;
-          if (ts39.isArrayLiteralExpression(initializer)) {
+          if (ts36.isArrayLiteralExpression(initializer)) {
             const blockDeps = this.collectExplicitlyDeferredSymbols(node, initializer);
             explicitlyDeferredTypesByBlock.set(blockName, blockDeps);
             explicitlyDeferredTypes ??= [];
@@ -13202,7 +12921,7 @@ var ComponentDecoratorHandler = class {
           viewProviders: wrappedViewProviders,
           i18nUseExternalIds: this.i18nUseExternalIds,
           relativeContextFilePath,
-          rawImports: rawImports !== null ? new o4.WrappedNodeExpr(rawImports) : void 0,
+          rawImports: rawImports !== null ? new o2.WrappedNodeExpr(rawImports) : void 0,
           relativeTemplatePath,
           foreignImports: null,
           enableTemplateSourceLocations: this.enableTemplateSourceLocations
@@ -13351,7 +13070,7 @@ var ComponentDecoratorHandler = class {
     return null;
   }
   typeCheck(ctx, node, meta) {
-    if (!ts39.isClassDeclaration(node) || meta.isPoisoned && !this.usePoisonedData) {
+    if (!ts36.isClassDeclaration(node) || meta.isPoisoned && !this.usePoisonedData) {
       return;
     }
     const ref = new Reference(node);
@@ -13419,7 +13138,7 @@ var ComponentDecoratorHandler = class {
               importPath: dep.importPath,
               isDefaultImport: dep.isDefaultImport,
               isDeferrable: true,
-              typeReference: new o4.ExternalExpr({ name: dep.symbolName, moduleName: dep.importPath }),
+              typeReference: new o2.ExternalExpr({ name: dep.symbolName, moduleName: dep.importPath }),
               declaration: null
             };
           });
@@ -13560,7 +13279,7 @@ var ComponentDecoratorHandler = class {
       content: analysis.template.content,
       sourceUrl: analysis.template.declaration.resolvedTemplateUrl,
       isInline: analysis.template.declaration.isInline,
-      inlineTemplateLiteralExpression: analysis.template.sourceMapping.type === "direct" ? new o4.WrappedNodeExpr(analysis.template.sourceMapping.node) : null
+      inlineTemplateLiteralExpression: analysis.template.sourceMapping.type === "direct" ? new o2.WrappedNodeExpr(analysis.template.sourceMapping.node) : null
     };
     const perComponentDeferredDeps = this.canDeferDeps ? this.resolveAllDeferredDependencies(resolution) : null;
     const defer = this.compileDeferBlocks(resolution);
@@ -13861,12 +13580,12 @@ var ComponentDecoratorHandler = class {
       diagnostics ??= [];
       diagnostics.push(...importDiagnostics);
     }
-    if (analysis.providersRequiringFactory !== null && analysis.meta.providers instanceof o4.WrappedNodeExpr) {
+    if (analysis.providersRequiringFactory !== null && analysis.meta.providers instanceof o2.WrappedNodeExpr) {
       const providerDiagnostics = getProviderDiagnostics(analysis.providersRequiringFactory, analysis.meta.providers.node, this.injectableRegistry);
       diagnostics ??= [];
       diagnostics.push(...providerDiagnostics);
     }
-    if (analysis.viewProvidersRequiringFactory !== null && analysis.meta.viewProviders instanceof o4.WrappedNodeExpr) {
+    if (analysis.viewProvidersRequiringFactory !== null && analysis.meta.viewProviders instanceof o2.WrappedNodeExpr) {
       const viewProviderDiagnostics = getProviderDiagnostics(analysis.viewProvidersRequiringFactory, analysis.meta.viewProviders.node, this.injectableRegistry);
       diagnostics ??= [];
       diagnostics.push(...viewProviderDiagnostics);
@@ -13929,7 +13648,7 @@ var ComponentDecoratorHandler = class {
     const explicitlyDeferredTypes = [];
     for (const element of rawDeferredImports.elements) {
       const node = tryUnwrapForwardRef(element, this.reflector) || element;
-      if (!ts39.isIdentifier(node)) {
+      if (!ts36.isIdentifier(node)) {
         continue;
       }
       const imp = this.reflector.getImportOfIdentifier(node);
@@ -13980,10 +13699,10 @@ var ComponentDecoratorHandler = class {
     }
     return analysis.foreignImports.map((foreignMeta) => {
       const { name, rawExpression } = foreignMeta;
-      ts39.setEmitFlags(rawExpression, ts39.EmitFlags.NoComments | ts39.EmitFlags.NoNestedComments);
+      ts36.setEmitFlags(rawExpression, ts36.EmitFlags.NoComments | ts36.EmitFlags.NoNestedComments);
       return {
         name,
-        component: new o4.WrappedNodeExpr(rawExpression)
+        component: new o2.WrappedNodeExpr(rawExpression)
       };
     });
   }
@@ -14067,23 +13786,23 @@ var ComponentDecoratorHandler = class {
       }
     }
     if (analysisData.meta.isStandalone) {
-      if (analysisData.rawImports !== null && ts39.isArrayLiteralExpression(analysisData.rawImports)) {
+      if (analysisData.rawImports !== null && ts36.isArrayLiteralExpression(analysisData.rawImports)) {
         for (const element of analysisData.rawImports.elements) {
           this.registerDeferrableCandidate(componentClassDecl, element, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
         }
       }
       if (analysisData.rawDeferredImports !== null) {
-        if (ts39.isArrayLiteralExpression(analysisData.rawDeferredImports)) {
+        if (ts36.isArrayLiteralExpression(analysisData.rawDeferredImports)) {
           for (const element of analysisData.rawDeferredImports.elements) {
             this.registerDeferrableCandidate(componentClassDecl, element, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
           }
-        } else if (ts39.isObjectLiteralExpression(analysisData.rawDeferredImports)) {
+        } else if (ts36.isObjectLiteralExpression(analysisData.rawDeferredImports)) {
           for (const property of analysisData.rawDeferredImports.properties) {
-            if (!ts39.isPropertyAssignment(property)) {
+            if (!ts36.isPropertyAssignment(property)) {
               continue;
             }
             const initializer = property.initializer;
-            if (ts39.isArrayLiteralExpression(initializer)) {
+            if (ts36.isArrayLiteralExpression(initializer)) {
               for (const element of initializer.elements) {
                 this.registerDeferrableCandidate(componentClassDecl, element, false, allDeferredDecls, eagerlyUsedDecls, resolutionData);
               }
@@ -14110,7 +13829,7 @@ var ComponentDecoratorHandler = class {
    */
   registerDeferrableCandidate(componentClassDecl, element, isDeferredImport, allDeferredDecls, eagerlyUsedDecls, resolutionData) {
     const node = tryUnwrapForwardRef(element, this.reflector) || element;
-    if (!ts39.isIdentifier(node)) {
+    if (!ts36.isIdentifier(node)) {
       return;
     }
     const imp = this.reflector.getImportOfIdentifier(node);
@@ -14195,7 +13914,7 @@ function removeDeferrableTypesFromComponentDecorator(analysis, deferrableTypes) 
   if (analysis.classMetadata) {
     const deferrableSymbols = new Set(deferrableTypes.map((t) => t.symbolName));
     const rewrittenDecoratorsNode = removeIdentifierReferences(analysis.classMetadata.decorators.node, deferrableSymbols);
-    analysis.classMetadata.decorators = new o4.WrappedNodeExpr(rewrittenDecoratorsNode);
+    analysis.classMetadata.decorators = new o2.WrappedNodeExpr(rewrittenDecoratorsNode);
   }
 }
 function validateNoImportOverlap(eagerDeps, deferredDeps, rawDeferredImports) {
@@ -14245,7 +13964,7 @@ function isDefaultImport(node) {
 
 // packages/compiler-cli/src/ngtsc/annotations/src/injectable.js
 import { compileClassMetadata as compileClassMetadata3, compileDeclareClassMetadata as compileDeclareClassMetadata3, compileDeclareInjectableFromMetadata, compileInjectable, createMayBeForwardRefExpression as createMayBeForwardRefExpression3, FactoryTarget as FactoryTarget4, LiteralExpr as LiteralExpr2, WrappedNodeExpr as WrappedNodeExpr10 } from "@angular/compiler";
-import ts40 from "typescript";
+import ts37 from "typescript";
 var InjectableDecoratorHandler = class {
   reflector;
   evaluator;
@@ -14380,7 +14099,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     };
   } else if (decorator.args.length === 1) {
     const metaNode = decorator.args[0];
-    if (!ts40.isObjectLiteralExpression(metaNode)) {
+    if (!ts37.isObjectLiteralExpression(metaNode)) {
       throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, metaNode, `@Injectable argument must be an object literal`);
     }
     const meta = reflectObjectLiteral(metaNode);
@@ -14392,7 +14111,7 @@ function extractInjectableMetadata(clazz, decorator, reflector) {
     let deps = void 0;
     if ((meta.has("useClass") || meta.has("useFactory")) && meta.has("deps")) {
       const depsExpr = meta.get("deps");
-      if (!ts40.isArrayLiteralExpression(depsExpr)) {
+      if (!ts37.isArrayLiteralExpression(depsExpr)) {
         throw new FatalDiagnosticError(ErrorCode.VALUE_NOT_LITERAL, depsExpr, `@Injectable deps metadata must be an inline array`);
       }
       deps = depsExpr.elements.map((dep) => getDep(dep, reflector));
@@ -14481,12 +14200,12 @@ function getDep(dep, reflector) {
     }
     return true;
   }
-  if (ts40.isArrayLiteralExpression(dep)) {
+  if (ts37.isArrayLiteralExpression(dep)) {
     dep.elements.forEach((el) => {
       let isDecorator = false;
-      if (ts40.isIdentifier(el)) {
+      if (ts37.isIdentifier(el)) {
         isDecorator = maybeUpdateDecorator(el, reflector);
-      } else if (ts40.isNewExpression(el) && ts40.isIdentifier(el.expression)) {
+      } else if (ts37.isNewExpression(el) && ts37.isIdentifier(el.expression)) {
         const token = el.arguments && el.arguments.length > 0 && el.arguments[0] || void 0;
         isDecorator = maybeUpdateDecorator(el.expression, reflector, token);
       }
@@ -14500,7 +14219,7 @@ function getDep(dep, reflector) {
 
 // packages/compiler-cli/src/ngtsc/annotations/src/pipe.js
 import { compileClassMetadata as compileClassMetadata4, compileDeclareClassMetadata as compileDeclareClassMetadata4, compileDeclarePipeFromMetadata, compilePipeFromMetadata, FactoryTarget as FactoryTarget5 } from "@angular/compiler";
-import ts41 from "typescript";
+import ts38 from "typescript";
 var PipeSymbol = class _PipeSymbol extends SemanticSymbol {
   name;
   constructor(decl, name) {
@@ -14573,14 +14292,14 @@ var PipeDecoratorHandler = class {
     }
     const meta = decorator.args.length === 0 || // TODO(crisbeto): temporary for testing until we've changed
     // the pipe public API not to require a name.
-    ts41.isNonNullExpression(decorator.args[0]) && decorator.args[0].expression.kind === ts41.SyntaxKind.NullKeyword ? null : unwrapExpression(decorator.args[0]);
+    ts38.isNonNullExpression(decorator.args[0]) && decorator.args[0].expression.kind === ts38.SyntaxKind.NullKeyword ? null : unwrapExpression(decorator.args[0]);
     let pipeName = null;
     let pipeNameExpr = null;
     let pure = true;
     let isStandalone = this.implicitStandaloneValue;
     let diagnostics;
     if (meta !== null) {
-      if (!ts41.isObjectLiteralExpression(meta)) {
+      if (!ts38.isObjectLiteralExpression(meta)) {
         throw new FatalDiagnosticError(ErrorCode.DECORATOR_ARG_NOT_LITERAL, meta, "@Pipe must have a literal argument");
       }
       const pipe = reflectObjectLiteral(meta);
@@ -14710,12 +14429,12 @@ var PipeDecoratorHandler = class {
 };
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/transform.js
-import ts44 from "typescript";
+import ts41 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/transform_api.js
-import ts42 from "typescript";
+import ts39 from "typescript";
 function createSyntheticAngularCoreDecoratorAccess(factory, importManager, ngClassDecorator, sourceFile, decoratorName) {
-  const classDecoratorIdentifier = ts42.isIdentifier(ngClassDecorator.identifier) ? ngClassDecorator.identifier : ngClassDecorator.identifier.expression;
+  const classDecoratorIdentifier = ts39.isIdentifier(ngClassDecorator.identifier) ? ngClassDecorator.identifier : ngClassDecorator.identifier.expression;
   return factory.createPropertyAccessExpression(
     importManager.addImport({
       exportModuleSpecifier: "@angular/core",
@@ -14725,11 +14444,11 @@ function createSyntheticAngularCoreDecoratorAccess(factory, importManager, ngCla
     // The synthetic identifier may be checked later by the downlevel decorators
     // transform to resolve to an Angular import using `getSymbolAtLocation`. We trick
     // the transform to think it's not synthetic and comes from Angular core.
-    ts42.setOriginalNode(factory.createIdentifier(decoratorName), classDecoratorIdentifier)
+    ts39.setOriginalNode(factory.createIdentifier(decoratorName), classDecoratorIdentifier)
   );
 }
 function castAsAny(factory, expr) {
-  return factory.createAsExpression(expr, factory.createKeywordTypeNode(ts42.SyntaxKind.AnyKeyword));
+  return factory.createAsExpression(expr, factory.createKeywordTypeNode(ts39.SyntaxKind.AnyKeyword));
 }
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/input_function.js
@@ -14760,7 +14479,7 @@ var signalInputsTransform = (member, sourceFile, host, factory, importTracker, i
 };
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/model_function.js
-import ts43 from "typescript";
+import ts40 from "typescript";
 var signalModelTransform = (member, sourceFile, host, factory, importTracker, importManager, classDecorator, isCore) => {
   if (host.getDecoratorsOfDeclaration(member.node)?.some((d) => {
     return isAngularDecorator2(d, "Input", isCore) || isAngularDecorator2(d, "Output", isCore);
@@ -14781,7 +14500,7 @@ var signalModelTransform = (member, sourceFile, host, factory, importTracker, im
     // Config is cast to `any` because `isSignal` will be private, and in case this
     // transform is used directly as a pre-compilation step, the decorator should
     // not fail. It is already validated now due to us parsing the input metadata.
-    factory.createAsExpression(inputConfig, factory.createKeywordTypeNode(ts43.SyntaxKind.AnyKeyword)),
+    factory.createAsExpression(inputConfig, factory.createKeywordTypeNode(ts40.SyntaxKind.AnyKeyword)),
     classDecorator,
     factory,
     sourceFile,
@@ -14856,21 +14575,21 @@ function getInitializerApiJitTransform(host, importTracker, isCore, shouldTransf
   return (ctx) => {
     return (sourceFile) => {
       const importManager = new ImportManager();
-      sourceFile = ts44.visitNode(sourceFile, createTransformVisitor(ctx, host, importManager, importTracker, isCore, shouldTransformClass), ts44.isSourceFile);
+      sourceFile = ts41.visitNode(sourceFile, createTransformVisitor(ctx, host, importManager, importTracker, isCore, shouldTransformClass), ts41.isSourceFile);
       return importManager.transformTsFile(ctx, sourceFile);
     };
   };
 }
 function createTransformVisitor(ctx, host, importManager, importTracker, isCore, shouldTransformClass) {
   const visitor = (node) => {
-    if (ts44.isClassDeclaration(node) && node.name !== void 0) {
-      const originalNode = ts44.getOriginalNode(node, ts44.isClassDeclaration);
+    if (ts41.isClassDeclaration(node) && node.name !== void 0) {
+      const originalNode = ts41.getOriginalNode(node, ts41.isClassDeclaration);
       const angularDecorator = host.getDecoratorsOfDeclaration(originalNode)?.find((d) => decoratorsWithInputs.some((name) => isAngularDecorator2(d, name, isCore)));
       if (angularDecorator !== void 0 && (shouldTransformClass === void 0 || shouldTransformClass(node))) {
         let hasChanged = false;
         const sourceFile = originalNode.getSourceFile();
         const members = node.members.map((memberNode) => {
-          if (!ts44.isPropertyDeclaration(memberNode)) {
+          if (!ts41.isPropertyDeclaration(memberNode)) {
             return memberNode;
           }
           const member = reflectClassMember(memberNode);
@@ -14891,7 +14610,7 @@ function createTransformVisitor(ctx, host, importManager, importTracker, isCore,
         }
       }
     }
-    return ts44.visitEachChild(node, visitor, ctx);
+    return ts41.visitEachChild(node, visitor, ctx);
   };
   return visitor;
 }
@@ -14995,4 +14714,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-K3QXATIO.js.map
+//# sourceMappingURL=chunk-3MYYLLQF.js.map

@@ -148,7 +148,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.1+sha-4044cef-with-local-changes";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.1+sha-01c883e-with-local-changes";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -5303,13 +5303,304 @@ function translateStatement(contextFile, statement, imports, options = {}) {
   return statement.visitStatement(new ExpressionTranslatorVisitor(new TypeScriptAstFactory(options.annotateForClosureCompiler === true), imports, contextFile, options), new Context(true));
 }
 
+// packages/compiler-cli/src/ngtsc/hmr/src/extract_dependencies.js
+import { outputAst as o2 } from "@angular/compiler";
+import ts25 from "typescript";
+function extractHmrDependencies(node, definition, factory, deferBlockMetadata, classMetadata, debugInfo, reflection, evaluator) {
+  const name = ts25.isClassDeclaration(node) && node.name ? node.name.text : null;
+  const sourceFile = ts25.getOriginalNode(node).getSourceFile();
+  return extractHmrDependenciesFromOutput(name, { definition, factory, deferBlockMetadata, classMetadata, debugInfo }, new TypeScriptPotentialTopLevelReadsVisitor(), getTopLevelDeclarationNames(sourceFile), {
+    getName: (read) => read instanceof o2.ReadVarExpr ? read.name : read.text,
+    getRuntimeRepresentation: (read) => getRuntimeRepresentation(read, reflection, evaluator)
+  });
+}
+function extractHmrDependenciesFromOutput(className, output, visitor, availableTopLevel, resolver) {
+  const { definition, factory, deferBlockMetadata, classMetadata, debugInfo } = output;
+  definition.expression.visitExpression(visitor, null);
+  definition.statements.forEach((statement) => statement.visitStatement(visitor, null));
+  factory.initializer?.visitExpression(visitor, null);
+  factory.statements.forEach((statement) => statement.visitStatement(visitor, null));
+  classMetadata?.visitStatement(visitor, null);
+  debugInfo?.visitStatement(visitor, null);
+  if (deferBlockMetadata.mode === 0) {
+    deferBlockMetadata.blocks.forEach((loader) => loader?.visitExpression(visitor, null));
+  } else {
+    deferBlockMetadata.dependenciesFn?.visitExpression(visitor, null);
+  }
+  const local = [];
+  const seenLocals = /* @__PURE__ */ new Set();
+  for (const readNode of visitor.allReads) {
+    const readName = resolver.getName(readNode);
+    if (readName !== className && !seenLocals.has(readName) && availableTopLevel.has(readName)) {
+      const runtimeRepresentation = resolver.getRuntimeRepresentation(readNode);
+      if (runtimeRepresentation === null) {
+        return null;
+      }
+      local.push({ name: readName, runtimeRepresentation });
+      seenLocals.add(readName);
+    }
+  }
+  return {
+    local,
+    external: Array.from(visitor.namespaceReads, (name, index) => ({
+      moduleName: name,
+      assignedName: `\u0275hmr${index}`
+    }))
+  };
+}
+function getRuntimeRepresentation(node, reflection, evaluator) {
+  if (node instanceof o2.ReadVarExpr) {
+    return o2.variable(node.name);
+  }
+  if (isConstEnumReference(node, reflection)) {
+    const evaluated = evaluator.evaluate(node);
+    if (evaluated instanceof Map) {
+      const members = [];
+      for (const [name, value] of evaluated.entries()) {
+        if (value instanceof EnumValue && (value.resolved == null || typeof value.resolved === "string" || typeof value.resolved === "boolean" || typeof value.resolved === "number")) {
+          members.push({
+            key: name,
+            quoted: false,
+            value: o2.literal(value.resolved)
+          });
+        } else {
+          return null;
+        }
+      }
+      return o2.literalMap(members);
+    }
+  }
+  return o2.variable(node.text);
+}
+function getTopLevelDeclarationNames(sourceFile) {
+  const results = /* @__PURE__ */ new Set();
+  for (const node of sourceFile.statements) {
+    if (ts25.isClassDeclaration(node) || ts25.isFunctionDeclaration(node) || ts25.isEnumDeclaration(node)) {
+      if (node.name) {
+        results.add(node.name.text);
+      }
+      continue;
+    }
+    if (ts25.isVariableStatement(node)) {
+      for (const decl of node.declarationList.declarations) {
+        trackBindingName(decl.name, results);
+      }
+      continue;
+    }
+    if (ts25.isImportDeclaration(node) && node.importClause) {
+      const importClause = node.importClause;
+      if (importClause.phaseModifier === ts25.SyntaxKind.TypeKeyword) {
+        continue;
+      }
+      if (importClause.name) {
+        results.add(importClause.name.text);
+      }
+      if (importClause.namedBindings) {
+        const namedBindings = importClause.namedBindings;
+        if (ts25.isNamespaceImport(namedBindings)) {
+          results.add(namedBindings.name.text);
+        } else {
+          namedBindings.elements.forEach((el) => {
+            if (!el.isTypeOnly) {
+              results.add(el.name.text);
+            }
+          });
+        }
+      }
+      continue;
+    }
+  }
+  return results;
+}
+function trackBindingName(node, results) {
+  if (ts25.isIdentifier(node)) {
+    results.add(node.text);
+  } else {
+    for (const el of node.elements) {
+      if (!ts25.isOmittedExpression(el)) {
+        trackBindingName(el.name, results);
+      }
+    }
+  }
+}
+var PotentialTopLevelReadsVisitor = class extends o2.RecursiveAstVisitor {
+  allReads = /* @__PURE__ */ new Set();
+  namespaceReads = /* @__PURE__ */ new Set();
+  visitExternalExpr(ast, context) {
+    if (ast.value.moduleName !== null) {
+      this.namespaceReads.add(ast.value.moduleName);
+    }
+    super.visitExternalExpr(ast, context);
+  }
+  visitReadVarExpr(ast, context) {
+    this.allReads.add(ast);
+    super.visitReadVarExpr(ast, context);
+  }
+  visitWrappedNodeExpr(ast, context) {
+    this.addWrappedNodeReads(ast.node);
+    super.visitWrappedNodeExpr(ast, context);
+  }
+};
+var TypeScriptPotentialTopLevelReadsVisitor = class extends PotentialTopLevelReadsVisitor {
+  addWrappedNodeReads(node) {
+    if (this.isTypeScriptNode(node)) {
+      this.addAllTopLevelIdentifiers(node);
+    }
+  }
+  /**
+   * Traverses a TypeScript AST and tracks all the top-level reads.
+   * @param node Node from which to start the traversal.
+   */
+  addAllTopLevelIdentifiers = (node) => {
+    if (ts25.isIdentifier(node) && this.isTopLevelIdentifierReference(node)) {
+      this.allReads.add(node);
+    } else {
+      ts25.forEachChild(node, this.addAllTopLevelIdentifiers);
+    }
+  };
+  /**
+   * TypeScript identifiers are used both when referring to a variable (e.g. `console.log(foo)`)
+   * and for names (e.g. `{foo: 123}`). This function determines if the identifier is a top-level
+   * variable read, rather than a nested name.
+   * @param identifier Identifier to check.
+   */
+  isTopLevelIdentifierReference(identifier) {
+    let node = identifier;
+    let parent = node.parent;
+    if (!parent) {
+      return false;
+    }
+    if (ts25.isParenthesizedExpression(parent) && parent.expression === node) {
+      while (parent && ts25.isParenthesizedExpression(parent)) {
+        node = parent;
+        parent = parent.parent;
+      }
+    }
+    if (ts25.isSourceFile(parent)) {
+      return true;
+    }
+    if (ts25.isCallExpression(parent)) {
+      return parent.expression === node || parent.arguments.includes(node);
+    }
+    if (ts25.isExpressionStatement(parent) || ts25.isPropertyAccessExpression(parent) || ts25.isComputedPropertyName(parent) || ts25.isTemplateSpan(parent) || ts25.isSpreadAssignment(parent) || ts25.isSpreadElement(parent) || ts25.isAwaitExpression(parent) || ts25.isNonNullExpression(parent) || ts25.isIfStatement(parent) || ts25.isDoStatement(parent) || ts25.isWhileStatement(parent) || ts25.isSwitchStatement(parent) || ts25.isCaseClause(parent) || ts25.isThrowStatement(parent) || ts25.isNewExpression(parent) || ts25.isExpressionWithTypeArguments(parent)) {
+      return parent.expression === node;
+    }
+    if (ts25.isArrayLiteralExpression(parent)) {
+      return parent.elements.includes(node);
+    }
+    if (ts25.isPropertyAssignment(parent) || ts25.isParameter(parent) || ts25.isBindingElement(parent) || ts25.isPropertyDeclaration(parent) || ts25.isEnumMember(parent)) {
+      return parent.initializer === node;
+    }
+    if (ts25.isVariableDeclaration(parent)) {
+      return parent.name === node || parent.initializer === node;
+    }
+    if (ts25.isClassDeclaration(parent) || ts25.isFunctionDeclaration(parent) || ts25.isShorthandPropertyAssignment(parent)) {
+      return parent.name === node;
+    }
+    if (ts25.isElementAccessExpression(parent)) {
+      return parent.expression === node || parent.argumentExpression === node;
+    }
+    if (ts25.isBinaryExpression(parent)) {
+      return parent.left === node || parent.right === node;
+    }
+    if (ts25.isForInStatement(parent) || ts25.isForOfStatement(parent)) {
+      return parent.expression === node || parent.initializer === node;
+    }
+    if (ts25.isForStatement(parent)) {
+      return parent.condition === node || parent.initializer === node || parent.incrementor === node;
+    }
+    if (ts25.isArrowFunction(parent)) {
+      return parent.body === node;
+    }
+    if (ts25.isImportSpecifier(parent) || ts25.isExportSpecifier(parent)) {
+      return (parent.propertyName || parent.name) === node;
+    }
+    if (ts25.isConditionalExpression(parent)) {
+      return parent.condition === node || parent.whenFalse === node || parent.whenTrue === node;
+    }
+    return false;
+  }
+  /** Checks if a value is a TypeScript AST node. */
+  isTypeScriptNode(value) {
+    return !!value && typeof value.kind === "number";
+  }
+};
+function isConstEnumReference(node, reflection) {
+  const parent = node.parent;
+  if (!parent || !ts25.isPropertyAccessExpression(parent) || parent.expression !== node || !ts25.isIdentifier(parent.name)) {
+    return false;
+  }
+  const declaration = reflection.getDeclarationOfIdentifier(node);
+  return declaration !== null && ts25.isEnumDeclaration(declaration.node) && !!declaration.node.modifiers?.some((m) => m.kind === ts25.SyntaxKind.ConstKeyword);
+}
+
+// packages/compiler-cli/src/ngtsc/hmr/src/metadata.js
+import { outputAst as o3 } from "@angular/compiler";
+import ts26 from "typescript";
+function extractHmrMetatadata(clazz, reflection, evaluator, compilerHost, rootDirs, definition, factory, deferBlockMetadata, classMetadata, debugInfo) {
+  if (!reflection.isClass(clazz)) {
+    return null;
+  }
+  const sourceFile = ts26.getOriginalNode(clazz).getSourceFile();
+  const filePath = getProjectRelativePath(sourceFile.fileName, rootDirs, compilerHost) || compilerHost.getCanonicalFileName(sourceFile.fileName);
+  const dependencies = extractHmrDependencies(clazz, definition, factory, deferBlockMetadata, classMetadata, debugInfo, reflection, evaluator);
+  if (dependencies === null) {
+    return null;
+  }
+  const meta = {
+    type: new o3.WrappedNodeExpr(clazz.name),
+    className: clazz.name.text,
+    filePath,
+    localDependencies: dependencies.local,
+    namespaceDependencies: dependencies.external
+  };
+  return meta;
+}
+
+// packages/compiler-cli/src/ngtsc/hmr/src/update_declaration.js
+import { compileHmrUpdateCallback } from "@angular/compiler";
+import ts27 from "typescript";
+function getHmrUpdateDeclaration(compilationResults, constantStatements, meta, declaration) {
+  const namespaceSpecifiers = meta.namespaceDependencies.reduce((result, current) => {
+    result.set(current.moduleName, current.assignedName);
+    return result;
+  }, /* @__PURE__ */ new Map());
+  const importRewriter = new HmrModuleImportRewriter(namespaceSpecifiers);
+  const importManager = new ImportManager({
+    ...presetImportManagerForceNamespaceImports,
+    rewriter: importRewriter
+  });
+  const callback = compileHmrUpdateCallback(compilationResults, constantStatements, meta);
+  const sourceFile = ts27.getOriginalNode(declaration).getSourceFile();
+  const node = translateStatement(sourceFile, callback, importManager);
+  return ts27.factory.updateFunctionDeclaration(node, [
+    ts27.factory.createToken(ts27.SyntaxKind.ExportKeyword),
+    ts27.factory.createToken(ts27.SyntaxKind.DefaultKeyword)
+  ], node.asteriskToken, node.name, node.typeParameters, node.parameters, node.type, node.body);
+}
+var HmrModuleImportRewriter = class {
+  lookup;
+  constructor(lookup) {
+    this.lookup = lookup;
+  }
+  rewriteNamespaceImportIdentifier(specifier, moduleName) {
+    return this.lookup.has(moduleName) ? this.lookup.get(moduleName) : specifier;
+  }
+  rewriteSymbol(symbol) {
+    return symbol;
+  }
+  rewriteSpecifier(specifier) {
+    return specifier;
+  }
+};
+
 // packages/compiler-cli/src/ngtsc/typecheck/src/comments.js
 import { AbsoluteSourceSpan, CommentTriviaType, ExpressionIdentifier } from "@angular/compiler";
-import ts25 from "typescript";
+import ts28 from "typescript";
 var parseSpanComment = /^(\d+),(\d+)$/;
 function readSpanComment(node, sourceFile = node.getSourceFile()) {
-  return ts25.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts25.SyntaxKind.MultiLineCommentTrivia) {
+  return ts28.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts28.SyntaxKind.MultiLineCommentTrivia) {
       return null;
     }
     const commentText = sourceFile.text.substring(pos + 2, end - 2);
@@ -5322,8 +5613,8 @@ function readSpanComment(node, sourceFile = node.getSourceFile()) {
 }
 var IGNORE_FOR_DIAGNOSTICS_MARKER = `${CommentTriviaType.DIAGNOSTIC}:ignore`;
 function hasIgnoreForDiagnosticsMarker(node, sourceFile) {
-  return ts25.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts25.SyntaxKind.MultiLineCommentTrivia) {
+  return ts28.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts28.SyntaxKind.MultiLineCommentTrivia) {
       return null;
     }
     const commentText = sourceFile.text.substring(pos + 2, end - 2);
@@ -5396,8 +5687,8 @@ function findAllMatchingNodes(tcb, opts) {
   return results;
 }
 function hasExpressionIdentifier(sourceFile, node, identifier) {
-  return ts25.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts25.SyntaxKind.MultiLineCommentTrivia) {
+  return ts28.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts28.SyntaxKind.MultiLineCommentTrivia) {
       return false;
     }
     const commentText = sourceFile.text.substring(pos + 2, end - 2);
@@ -5407,8 +5698,8 @@ function hasExpressionIdentifier(sourceFile, node, identifier) {
 }
 function readDirectiveIdFromComment(sourceFile, node) {
   let id = null;
-  ts25.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
-    if (kind !== ts25.SyntaxKind.MultiLineCommentTrivia) {
+  ts28.forEachTrailingCommentRange(sourceFile.text, node.getEnd(), (pos, end, kind) => {
+    if (kind !== ts28.SyntaxKind.MultiLineCommentTrivia) {
       return;
     }
     const commentText = sourceFile.text.substring(pos + 2, end - 2);
@@ -5479,17 +5770,17 @@ var SymbolKind;
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/dom.js
 import { CUSTOM_ELEMENTS_SCHEMA, DomElementSchemaRegistry, NO_ERRORS_SCHEMA } from "@angular/compiler";
-import ts27 from "typescript";
+import ts30 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/diagnostics/src/diagnostic.js
-import ts26 from "typescript";
+import ts29 from "typescript";
 function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, relatedMessages, deprecatedDiagInfo) {
   if (mapping.type === "direct") {
     let relatedInformation = [];
     if (relatedMessages !== void 0) {
       for (const relatedMessage of relatedMessages) {
         relatedInformation.push({
-          category: ts26.DiagnosticCategory.Message,
+          category: ts29.DiagnosticCategory.Message,
           code: 0,
           file: relatedMessage.sourceFile ?? mapping.node.getSourceFile(),
           start: relatedMessage.start,
@@ -5526,7 +5817,7 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
       if (relatedMessages !== void 0) {
         for (const relatedMessage of relatedMessages) {
           relatedInformation2.push({
-            category: ts26.DiagnosticCategory.Message,
+            category: ts29.DiagnosticCategory.Message,
             code: 0,
             file: relatedMessage.sourceFile ?? componentSf,
             start: relatedMessage.start,
@@ -5556,7 +5847,7 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
     if (relatedMessages !== void 0) {
       for (const relatedMessage of relatedMessages) {
         relatedInformation.push({
-          category: ts26.DiagnosticCategory.Message,
+          category: ts29.DiagnosticCategory.Message,
           code: 0,
           file: relatedMessage.sourceFile ?? sf,
           start: relatedMessage.start,
@@ -5566,11 +5857,11 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
       }
     }
     let typeForMessage;
-    if (category === ts26.DiagnosticCategory.Warning) {
+    if (category === ts29.DiagnosticCategory.Warning) {
       typeForMessage = "Warning";
-    } else if (category === ts26.DiagnosticCategory.Suggestion) {
+    } else if (category === ts29.DiagnosticCategory.Suggestion) {
       typeForMessage = "Suggestion";
-    } else if (category === ts26.DiagnosticCategory.Message) {
+    } else if (category === ts29.DiagnosticCategory.Message) {
       typeForMessage = "Message";
     } else {
       typeForMessage = "Error";
@@ -5579,7 +5870,7 @@ function makeTemplateDiagnostic(id, mapping, span, category, code, messageText, 
       relatedInformation.push(...deprecatedDiagInfo.relatedMessages ?? []);
     }
     relatedInformation.push({
-      category: ts26.DiagnosticCategory.Message,
+      category: ts29.DiagnosticCategory.Message,
       code: 0,
       file: componentSf,
       // mapping.node represents either the 'template' or 'templateUrl' expression. getStart()
@@ -5618,13 +5909,13 @@ function parseTemplateAsSourceFile(fileName, template) {
   if (parseTemplateAsSourceFileForTest !== null) {
     return parseTemplateAsSourceFileForTest(fileName, template);
   }
-  return ts26.createSourceFile(
+  return ts29.createSourceFile(
     fileName,
     template,
-    ts26.ScriptTarget.Latest,
+    ts29.ScriptTarget.Latest,
     /* setParentNodes */
     false,
-    ts26.ScriptKind.JSX
+    ts29.ScriptKind.JSX
   );
 }
 
@@ -5668,7 +5959,7 @@ var RegistryDomSchemaChecker = class {
       } else {
         errorMsg += `2. To allow any element add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
       }
-      const diag = makeTemplateDiagnostic(id, mapping, sourceSpanForDiagnostics, ts27.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ELEMENT), errorMsg);
+      const diag = makeTemplateDiagnostic(id, mapping, sourceSpanForDiagnostics, ts30.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ELEMENT), errorMsg);
       this._diagnostics.push(diag);
     }
   }
@@ -5676,7 +5967,7 @@ var RegistryDomSchemaChecker = class {
     const report = REGISTRY.validateProperty(name);
     if (report.error) {
       const mapping = this.resolver.getTemplateSourceMapping(id);
-      const diag = makeTemplateDiagnostic(id, mapping, span, ts27.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), report.msg);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts30.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), report.msg);
       this._diagnostics.push(diag);
       return;
     }
@@ -5695,7 +5986,7 @@ var RegistryDomSchemaChecker = class {
 2. If '${tagName}' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the ${schemas2} of this component to suppress this message.
 3. To allow any property add 'NO_ERRORS_SCHEMA' to the ${schemas2} of this component.`;
       }
-      const diag = makeTemplateDiagnostic(id, mapping, span, ts27.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts30.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMsg);
       this._diagnostics.push(diag);
     }
   }
@@ -5714,14 +6005,14 @@ var RegistryDomSchemaChecker = class {
 2. If you're listening to a custom event dispatched by a descendant element, dash-separated event names (e.g. 'my-event') are exempt from this check.
 3. To disable this check entirely, set 'strictUnclaimedEventNames' to false or remove it from the compiler options.`;
     const mapping = this.resolver.getTemplateSourceMapping(id);
-    const diag = makeTemplateDiagnostic(id, mapping, span, ts27.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_EVENT_BINDING), errorMsg);
+    const diag = makeTemplateDiagnostic(id, mapping, span, ts30.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_EVENT_BINDING), errorMsg);
     this._diagnostics.push(diag);
   }
   checkHostElementProperty(id, element, name, span, schemas) {
     const report = REGISTRY.validateProperty(name);
     if (report.error) {
       const mapping = this.resolver.getHostBindingsMapping(id);
-      const diag = makeTemplateDiagnostic(id, mapping, span, ts27.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), report.msg);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts30.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), report.msg);
       this._diagnostics.push(diag);
       return;
     }
@@ -5731,7 +6022,7 @@ var RegistryDomSchemaChecker = class {
       }
       const errorMessage = `Can't bind to '${name}' since it isn't a known property of '${tagName}'.`;
       const mapping = this.resolver.getHostBindingsMapping(id);
-      const diag = makeTemplateDiagnostic(id, mapping, span, ts27.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMessage);
+      const diag = makeTemplateDiagnostic(id, mapping, span, ts30.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SCHEMA_INVALID_ATTRIBUTE), errorMessage);
       this._diagnostics.push(diag);
       break;
     }
@@ -5743,7 +6034,7 @@ import { TcbExpr as TcbExpr3 } from "@angular/compiler";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/reference_emit_environment.js
 import { TcbExpr } from "@angular/compiler";
-import ts28 from "typescript";
+import ts31 from "typescript";
 var ReferenceEmitEnvironment = class {
   importManager;
   refEmitter;
@@ -5777,9 +6068,9 @@ var ReferenceEmitEnvironment = class {
       exportSymbolName: name,
       requestedFile: this.contextFile
     });
-    if (ts28.isIdentifier(importResult)) {
+    if (ts31.isIdentifier(importResult)) {
       return new TcbExpr(importResult.text);
-    } else if (ts28.isIdentifier(importResult.expression)) {
+    } else if (ts31.isIdentifier(importResult.expression)) {
       return new TcbExpr(`${importResult.expression.text}.${importResult.name.text}`);
     }
     throw new Error("Unexpected value returned by import manager");
@@ -5791,10 +6082,10 @@ import { isUnsafeObjectKey, R3Identifiers as R3Identifiers2, TcbExpr as TcbExpr2
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.js
 import { R3Identifiers, HOST_BINDING_GUARD_COMMENT_TEXT } from "@angular/compiler";
-import ts31 from "typescript";
+import ts34 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_parameter_emitter.js
-import ts29 from "typescript";
+import ts32 from "typescript";
 var TypeParameterEmitter = class {
   typeParameters;
   reflector;
@@ -5841,11 +6132,11 @@ var TypeParameterEmitter = class {
     return this.typeParameters.map((typeParam) => {
       const constraint = typeParam.constraint !== void 0 ? emitter.emitType(typeParam.constraint) : void 0;
       const defaultType = typeParam.default !== void 0 ? emitter.emitType(typeParam.default) : void 0;
-      return ts29.factory.updateTypeParameterDeclaration(typeParam, typeParam.modifiers, typeParam.name, constraint, defaultType);
+      return ts32.factory.updateTypeParameterDeclaration(typeParam, typeParam.modifiers, typeParam.name, constraint, defaultType);
     });
   }
   resolveTypeReference(type) {
-    const target = ts29.isIdentifier(type.typeName) ? type.typeName : type.typeName.right;
+    const target = ts32.isIdentifier(type.typeName) ? type.typeName : type.typeName.right;
     const declaration = this.reflector.getDeclarationOfIdentifier(target);
     if (declaration === null || declaration.node === null) {
       return null;
@@ -5871,8 +6162,8 @@ var TypeParameterEmitter = class {
     if (typeNode === null) {
       return null;
     }
-    if (!ts29.isTypeReferenceNode(typeNode)) {
-      throw new Error(`Expected TypeReferenceNode for emitted reference, got ${ts29.SyntaxKind[typeNode.kind]}.`);
+    if (!ts32.isTypeReferenceNode(typeNode)) {
+      throw new Error(`Expected TypeReferenceNode for emitted reference, got ${ts32.SyntaxKind[typeNode.kind]}.`);
     }
     return typeNode;
   }
@@ -5882,11 +6173,11 @@ var TypeParameterEmitter = class {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/tcb_print.js
-import ts30 from "typescript";
+import ts33 from "typescript";
 var tempPrinter = null;
 function tempPrint(node, sourceFile) {
-  tempPrinter ??= ts30.createPrinter();
-  return tempPrinter.printNode(ts30.EmitHint.Unspecified, node, sourceFile);
+  tempPrinter ??= ts33.createPrinter();
+  return tempPrinter.printNode(ts33.EmitHint.Unspecified, node, sourceFile);
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/tcb_util.js
@@ -5939,7 +6230,7 @@ function getSourceMapping(shimSf, position, resolver, isDiagnosticRequest) {
 }
 function isInHostBindingTcb(node) {
   let current = node;
-  while (current && !ts31.isFunctionDeclaration(current)) {
+  while (current && !ts34.isFunctionDeclaration(current)) {
     if (isHostBindingsBlockGuard(current)) {
       return true;
     }
@@ -5949,14 +6240,14 @@ function isInHostBindingTcb(node) {
 }
 function findTypeCheckBlock(file, id, isDiagnosticRequest) {
   for (const stmt of file.statements) {
-    if (ts31.isFunctionDeclaration(stmt) && getTypeCheckId2(stmt, file, isDiagnosticRequest) === id) {
+    if (ts34.isFunctionDeclaration(stmt) && getTypeCheckId2(stmt, file, isDiagnosticRequest) === id) {
       return stmt;
     }
   }
-  return findNodeInFile(file, (node) => ts31.isFunctionDeclaration(node) && getTypeCheckId2(node, file, isDiagnosticRequest) === id);
+  return findNodeInFile(file, (node) => ts34.isFunctionDeclaration(node) && getTypeCheckId2(node, file, isDiagnosticRequest) === id);
 }
 function findSourceLocation(node, sourceFile, isDiagnosticsRequest) {
-  while (node !== void 0 && !ts31.isFunctionDeclaration(node)) {
+  while (node !== void 0 && !ts34.isFunctionDeclaration(node)) {
     if (hasIgnoreForDiagnosticsMarker(node, sourceFile) && isDiagnosticsRequest) {
       return null;
     }
@@ -5973,7 +6264,7 @@ function findSourceLocation(node, sourceFile, isDiagnosticsRequest) {
   return null;
 }
 function getTypeCheckId2(node, sourceFile, isDiagnosticRequest) {
-  while (!ts31.isFunctionDeclaration(node)) {
+  while (!ts34.isFunctionDeclaration(node)) {
     if (hasIgnoreForDiagnosticsMarker(node, sourceFile) && isDiagnosticRequest) {
       return null;
     }
@@ -5983,8 +6274,8 @@ function getTypeCheckId2(node, sourceFile, isDiagnosticRequest) {
     }
   }
   const start = node.getFullStart();
-  return ts31.forEachLeadingCommentRange(sourceFile.text, start, (pos, end, kind) => {
-    if (kind !== ts31.SyntaxKind.MultiLineCommentTrivia) {
+  return ts34.forEachLeadingCommentRange(sourceFile.text, start, (pos, end, kind) => {
+    if (kind !== ts34.SyntaxKind.MultiLineCommentTrivia) {
       return null;
     }
     const commentText = sourceFile.text.substring(pos + 2, end - 2);
@@ -6009,9 +6300,9 @@ function findNodeInFile(file, predicate) {
     if (predicate(node)) {
       return node;
     }
-    return ts31.forEachChild(node, visit) ?? null;
+    return ts34.forEachChild(node, visit) ?? null;
   };
-  return ts31.forEachChild(file, visit) ?? null;
+  return ts34.forEachChild(file, visit) ?? null;
 }
 function generateTcbTypeParameters(typeParameters, sourceFile) {
   return typeParameters.map((p) => {
@@ -6024,15 +6315,15 @@ function generateTcbTypeParameters(typeParameters, sourceFile) {
   });
 }
 function isHostBindingsBlockGuard(node) {
-  if (!ts31.isIfStatement(node)) {
+  if (!ts34.isIfStatement(node)) {
     return false;
   }
   const expr = node.expression;
-  if (!ts31.isParenthesizedExpression(expr) || expr.expression.kind !== ts31.SyntaxKind.TrueKeyword) {
+  if (!ts34.isParenthesizedExpression(expr) || expr.expression.kind !== ts34.SyntaxKind.TrueKeyword) {
     return false;
   }
   const text = expr.getSourceFile().text;
-  return ts31.forEachTrailingCommentRange(text, expr.expression.getEnd(), (pos, end, kind) => kind === ts31.SyntaxKind.MultiLineCommentTrivia && text.substring(pos + 2, end - 2) === HOST_BINDING_GUARD_COMMENT_TEXT) || false;
+  return ts34.forEachTrailingCommentRange(text, expr.expression.getEnd(), (pos, end, kind) => kind === ts34.SyntaxKind.MultiLineCommentTrivia && text.substring(pos + 2, end - 2) === HOST_BINDING_GUARD_COMMENT_TEXT) || false;
 }
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_constructor.js
@@ -6187,21 +6478,21 @@ var Environment = class extends ReferenceEmitEnvironment {
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/template_symbol_builder.js
 import { AST, ASTWithName, ASTWithSource, Binary, BindingPipe, MatchSource as MatchSource3, PropertyRead, R3Identifiers as R3Identifiers3, SafePropertyRead, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement, TmplAstLetDeclaration, TmplAstReference, TmplAstTemplate, TmplAstTextAttribute, TmplAstVariable, Unary, unwrapWriteTarget } from "@angular/compiler";
-import ts33 from "typescript";
+import ts36 from "typescript";
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/ts_util.js
-import ts32 from "typescript";
+import ts35 from "typescript";
 function isAccessExpression(node) {
-  return ts32.isPropertyAccessExpression(node) || ts32.isElementAccessExpression(node);
+  return ts35.isPropertyAccessExpression(node) || ts35.isElementAccessExpression(node);
 }
 function isDirectiveDeclaration(node) {
   const sourceFile = node.getSourceFile();
-  return (ts32.isTypeNode(node) || ts32.isIdentifier(node)) && ts32.isVariableDeclaration(node.parent) && (hasExpressionIdentifier(sourceFile, node, ExpressionIdentifier.DIRECTIVE) || hasExpressionIdentifier(sourceFile, node, ExpressionIdentifier.HOST_DIRECTIVE));
+  return (ts35.isTypeNode(node) || ts35.isIdentifier(node)) && ts35.isVariableDeclaration(node.parent) && (hasExpressionIdentifier(sourceFile, node, ExpressionIdentifier.DIRECTIVE) || hasExpressionIdentifier(sourceFile, node, ExpressionIdentifier.HOST_DIRECTIVE));
 }
 function isSymbolAliasOf(firstSymbol, lastSymbol, typeChecker) {
   let currentSymbol = lastSymbol;
   const seenSymbol = /* @__PURE__ */ new Set();
-  while (firstSymbol !== currentSymbol && currentSymbol !== void 0 && currentSymbol.flags & ts32.SymbolFlags.Alias) {
+  while (firstSymbol !== currentSymbol && currentSymbol !== void 0 && currentSymbol.flags & ts35.SymbolFlags.Alias) {
     if (seenSymbol.has(currentSymbol)) {
       break;
     }
@@ -6269,7 +6560,7 @@ var SymbolBuilder = class {
     const elementSourceSpan = element.startSourceSpan ?? element.sourceSpan;
     const node = findFirstMatchingNode(this.typeCheckBlock, {
       withSpan: elementSourceSpan,
-      filter: ts33.isVariableDeclaration
+      filter: ts36.isVariableDeclaration
     });
     if (node === null) {
       return null;
@@ -6414,10 +6705,10 @@ var SymbolBuilder = class {
       if (!isAccessExpression(n)) {
         return false;
       }
-      if (ts33.isPropertyAccessExpression(n)) {
+      if (ts36.isPropertyAccessExpression(n)) {
         return n.name.getText() === expectedAccess;
       } else {
-        return ts33.isStringLiteral(n.argumentExpression) && n.argumentExpression.text === expectedAccess;
+        return ts36.isStringLiteral(n.argumentExpression) && n.argumentExpression.text === expectedAccess;
       }
     }
     const outputFieldAccesses = findAllMatchingNodes(this.typeCheckBlock, {
@@ -6427,7 +6718,7 @@ var SymbolBuilder = class {
     const bindings = [];
     for (const outputFieldAccess of outputFieldAccesses) {
       if (consumer instanceof TmplAstTemplate || consumer instanceof TmplAstElement) {
-        if (!ts33.isPropertyAccessExpression(outputFieldAccess)) {
+        if (!ts36.isPropertyAccessExpression(outputFieldAccess)) {
           continue;
         }
         const addEventListener = outputFieldAccess.name;
@@ -6442,7 +6733,7 @@ var SymbolBuilder = class {
           tcbTypeLocation: this.getTcbSpanForNode(addEventListener)
         });
       } else {
-        if (!ts33.isElementAccessExpression(outputFieldAccess)) {
+        if (!ts36.isElementAccessExpression(outputFieldAccess)) {
           continue;
         }
         const target = this.getDirectiveSymbolForAccessExpression(outputFieldAccess, consumer);
@@ -6487,7 +6778,7 @@ var SymbolBuilder = class {
       let fieldAccessExpr;
       let tcbLocation;
       if (signalInputAssignment !== null) {
-        if (ts33.isIdentifier(signalInputAssignment.fieldExpr)) {
+        if (ts36.isIdentifier(signalInputAssignment.fieldExpr)) {
           continue;
         }
         fieldAccessExpr = signalInputAssignment.fieldExpr;
@@ -6533,13 +6824,13 @@ var SymbolBuilder = class {
   getSymbolOfVariable(variable) {
     const node = findFirstMatchingNode(this.typeCheckBlock, {
       withSpan: variable.sourceSpan,
-      filter: ts33.isVariableDeclaration
+      filter: ts36.isVariableDeclaration
     });
     if (node === null) {
       return null;
     }
     let initializerNode = null;
-    if (ts33.isForOfStatement(node.parent.parent)) {
+    if (ts36.isForOfStatement(node.parent.parent)) {
       initializerNode = node;
     } else if (node.initializer !== void 0) {
       initializerNode = node.initializer;
@@ -6567,16 +6858,16 @@ var SymbolBuilder = class {
     }
     let node = findFirstMatchingNode(this.typeCheckBlock, {
       withSpan: ref.sourceSpan,
-      filter: ts33.isVariableDeclaration
+      filter: ts36.isVariableDeclaration
     });
     if (node === null || node.initializer === void 0) {
       return null;
     }
     let targetNode = node.initializer;
-    if (ts33.isCallExpression(targetNode)) {
+    if (ts36.isCallExpression(targetNode)) {
       return null;
     }
-    if (ts33.isParenthesizedExpression(targetNode) && ts33.isAsExpression(targetNode.expression)) {
+    if (ts36.isParenthesizedExpression(targetNode) && ts36.isAsExpression(targetNode.expression)) {
       targetNode = node.name;
     }
     const targetLocation = {
@@ -6611,7 +6902,7 @@ var SymbolBuilder = class {
   getSymbolOfLetDeclaration(decl) {
     const node = findFirstMatchingNode(this.typeCheckBlock, {
       withSpan: decl.sourceSpan,
-      filter: ts33.isVariableDeclaration
+      filter: ts36.isVariableDeclaration
     });
     if (node === null || node.initializer === void 0) {
       return null;
@@ -6626,9 +6917,9 @@ var SymbolBuilder = class {
   getSymbolOfPipe(expression) {
     const methodAccessId = findFirstMatchingNode(this.typeCheckBlock, {
       withSpan: expression.nameSpan,
-      filter: ts33.isIdentifier
+      filter: ts36.isIdentifier
     });
-    if (methodAccessId === null || !ts33.isPropertyAccessExpression(methodAccessId.parent)) {
+    if (methodAccessId === null || !ts36.isPropertyAccessExpression(methodAccessId.parent)) {
       return null;
     }
     const methodAccess = methodAccessId.parent;
@@ -6671,7 +6962,7 @@ var SymbolBuilder = class {
     if (isPropertyRead || expression instanceof SafePropertyRead) {
       node = findFirstMatchingNode(this.typeCheckBlock, {
         withSpan,
-        filter: ts33.isPropertyAccessExpression
+        filter: ts36.isPropertyAccessExpression
       });
     }
     if (node === null) {
@@ -6684,7 +6975,7 @@ var SymbolBuilder = class {
       });
       if (nameNode !== null) {
         node = nameNode;
-        while (node.parent !== void 0 && (ts33.isParenthesizedExpression(node.parent) || ts33.isNonNullExpression(node.parent) || ts33.isPropertyAccessExpression(node.parent) && node.parent.name === node)) {
+        while (node.parent !== void 0 && (ts36.isParenthesizedExpression(node.parent) || ts36.isNonNullExpression(node.parent) || ts36.isPropertyAccessExpression(node.parent) && node.parent.name === node)) {
           node = node.parent;
         }
       }
@@ -6692,10 +6983,10 @@ var SymbolBuilder = class {
     if (node === null) {
       return null;
     }
-    while (ts33.isParenthesizedExpression(node)) {
+    while (ts36.isParenthesizedExpression(node)) {
       node = node.expression;
     }
-    if (expression instanceof SafePropertyRead && ts33.isConditionalExpression(node)) {
+    if (expression instanceof SafePropertyRead && ts36.isConditionalExpression(node)) {
       return {
         tcbLocation: this.getTcbLocationForNode(node.whenTrue),
         tcbTypeLocation: this.getTcbSpanForNode(node),
@@ -6710,7 +7001,7 @@ var SymbolBuilder = class {
     }
   }
   getTcbSpanForNode(node) {
-    while (ts33.isParenthesizedExpression(node)) {
+    while (ts36.isParenthesizedExpression(node)) {
       node = node.expression;
     }
     return {
@@ -6721,7 +7012,7 @@ var SymbolBuilder = class {
     };
   }
   getTcbLocationForNode(node) {
-    while (ts33.isParenthesizedExpression(node)) {
+    while (ts36.isParenthesizedExpression(node)) {
       node = node.expression;
     }
     return {
@@ -6731,19 +7022,19 @@ var SymbolBuilder = class {
     };
   }
   getTcbPositionForNode(node) {
-    if (ts33.isTypeReferenceNode(node)) {
+    if (ts36.isTypeReferenceNode(node)) {
       return this.getTcbPositionForNode(node.typeName);
-    } else if (ts33.isQualifiedName(node)) {
+    } else if (ts36.isQualifiedName(node)) {
       return node.right.getStart();
-    } else if (ts33.isPropertyAccessExpression(node)) {
+    } else if (ts36.isPropertyAccessExpression(node)) {
       return node.name.getStart();
-    } else if (ts33.isElementAccessExpression(node)) {
+    } else if (ts36.isElementAccessExpression(node)) {
       return node.argumentExpression.getStart();
-    } else if (ts33.isCallExpression(node)) {
+    } else if (ts36.isCallExpression(node)) {
       return this.getTcbPositionForNode(node.expression);
-    } else if (ts33.isAsExpression(node)) {
+    } else if (ts36.isAsExpression(node)) {
       return this.getTcbPositionForNode(node.expression);
-    } else if (ts33.isNonNullExpression(node)) {
+    } else if (ts36.isNonNullExpression(node)) {
       return this.getTcbPositionForNode(node.expression);
     } else {
       return node.getStart();
@@ -6757,13 +7048,13 @@ function sourceSpanEqual(a, b) {
   return a.start.offset === b.start.offset && a.end.offset === b.end.offset;
 }
 function unwrapSignalInputWriteTAccessor(expr) {
-  if (!ts33.isElementAccessExpression(expr) || !ts33.isPropertyAccessExpression(expr.argumentExpression)) {
+  if (!ts36.isElementAccessExpression(expr) || !ts36.isPropertyAccessExpression(expr.argumentExpression)) {
     return null;
   }
-  if (!ts33.isIdentifier(expr.argumentExpression.name) || expr.argumentExpression.name.text !== R3Identifiers3.InputSignalBrandWriteType.name) {
+  if (!ts36.isIdentifier(expr.argumentExpression.name) || expr.argumentExpression.name.text !== R3Identifiers3.InputSignalBrandWriteType.name) {
     return null;
   }
-  if (!ts33.isPropertyAccessExpression(expr.expression) && !ts33.isElementAccessExpression(expr.expression) && !ts33.isIdentifier(expr.expression)) {
+  if (!ts36.isPropertyAccessExpression(expr.expression) && !ts36.isElementAccessExpression(expr.expression) && !ts36.isIdentifier(expr.expression)) {
     throw new Error("Unexpected expression for signal input write type.");
   }
   return {
@@ -6863,6 +7154,10 @@ export {
   translateType,
   translateExpression,
   translateStatement,
+  extractHmrDependenciesFromOutput,
+  PotentialTopLevelReadsVisitor,
+  extractHmrMetatadata,
+  getHmrUpdateDeclaration,
   ExpressionIdentifier,
   findFirstMatchingNode,
   findAllMatchingNodes,
@@ -6905,4 +7200,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-2FPAGQFW.js.map
+//# sourceMappingURL=chunk-U3DV3X27.js.map

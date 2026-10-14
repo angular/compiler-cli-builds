@@ -13,13 +13,15 @@ import {
   Environment,
   ExpressionIdentifier,
   ImportManager,
+  PotentialTopLevelReadsVisitor,
   RegistryDomSchemaChecker,
   SymbolBuilder,
   SymbolKind,
+  extractHmrDependenciesFromOutput,
   findFirstMatchingNode,
   hasExpressionIdentifier,
   validateAndRewriteCoreSymbol
-} from "../chunk-2FPAGQFW.js";
+} from "../chunk-U3DV3X27.js";
 import "../chunk-2RWOSWE5.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";
@@ -31,9 +33,11 @@ export {
   IdentifierKind,
   ImportManager,
   IndexingContext,
+  PotentialTopLevelReadsVisitor,
   RegistryDomSchemaChecker,
   SymbolBuilder,
   SymbolKind,
+  extractHmrDependenciesFromOutput,
   findFirstMatchingNode,
   generateIndexerAnalysis as generateAnalysis,
   getIndexerTemplateIdentifiers as getTemplateIdentifiers,

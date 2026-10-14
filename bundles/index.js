@@ -24,7 +24,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-TTXAEAOJ.js";
+} from "./chunk-ETRCAR7O.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -44,7 +44,7 @@ import {
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo,
   resourceChangeTicket
-} from "./chunk-5GT3GIPY.js";
+} from "./chunk-P5NPTGM5.js";
 import {
   ActivePerfRecorder,
   InliningMode,
@@ -55,7 +55,7 @@ import {
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform,
   isShim
-} from "./chunk-K3QXATIO.js";
+} from "./chunk-3MYYLLQF.js";
 import {
   CompletionKind,
   Environment,
@@ -66,10 +66,12 @@ import {
   OptimizeFor,
   PotentialImportKind,
   PotentialImportMode,
+  PotentialTopLevelReadsVisitor,
   Reference,
   RegistryDomSchemaChecker,
   SymbolBuilder,
   SymbolKind,
+  extractHmrDependenciesFromOutput,
   findFirstMatchingNode,
   getRootDirs,
   hasExpressionIdentifier,
@@ -79,7 +81,7 @@ import {
   isNamedClassDeclaration,
   ngErrorCode,
   validateAndRewriteCoreSymbol
-} from "./chunk-2FPAGQFW.js";
+} from "./chunk-U3DV3X27.js";
 import "./chunk-2RWOSWE5.js";
 import {
   InvalidFileSystem,
@@ -110,7 +112,7 @@ import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.3.0-next.1+sha-4044cef-with-local-changes");
+var VERSION = new Version("22.3.0-next.1+sha-01c883e-with-local-changes");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
@@ -245,6 +247,7 @@ export {
   PerfPhase,
   PotentialImportKind,
   PotentialImportMode,
+  PotentialTopLevelReadsVisitor,
   Reference,
   RegistryDomSchemaChecker,
   SOURCE,
@@ -265,6 +268,7 @@ export {
   defaultGatherDiagnostics,
   dirname,
   exitCodeFromResult,
+  extractHmrDependenciesFromOutput,
   findFirstMatchingNode,
   formatDiagnostics,
   freshCompilationTicket,

@@ -4,11 +4,11 @@
     
 import {
   getInitializerApiJitTransform
-} from "../chunk-K3QXATIO.js";
+} from "../chunk-3MYYLLQF.js";
 import {
   ImportedSymbolsTracker,
   TypeScriptReflectionHost
-} from "../chunk-2FPAGQFW.js";
+} from "../chunk-U3DV3X27.js";
 import "../chunk-2RWOSWE5.js";
 import {
   InvalidFileSystem,
@@ -706,24 +706,10 @@ var NGP_KNOWN_NGTSC_FAILURES = /* @__PURE__ */ new Set([
   "Debug Info Typescript tranformation viewChildren should not tree-shake away debug info if in dev mode",
   "Debug Info Typescript tranformation viewChildren should not tree-shake away debug info if in dev mode with existing options",
   "Debug Info Typescript tranformation viewChildren should tree-shake away debug info if in prod mode",
-  "HMR code generation should capture arrow function dependencies",
-  "HMR code generation should capture component in its own dependencies if it is not used in the template",
-  "HMR code generation should capture conditional expression dependencies",
   "HMR code generation should capture deferred dependencies when no class metadata is produced",
-  "HMR code generation should capture expressions with type arguments",
-  "HMR code generation should capture new expression dependencies",
-  "HMR code generation should capture parenthesized dependencies",
-  "HMR code generation should capture self-referencing component during HMR",
-  "HMR code generation should capture shorthand property assignment dependencies",
-  "HMR code generation should capture variable initializer dependencies",
   "HMR code generation should generate an HMR initializer and update code when enabled",
   "HMR code generation should generate an HMR initializer and update function for a class that depends on multiple namespaces",
   "HMR code generation should not defer dependencies when HMR is enabled",
-  "HMR code generation should pass const enum defined in other file as an object literal",
-  "HMR code generation should pass const enums defined in the same file as an object literal",
-  "HMR code generation should preserve eager module imports inside non-standalone component in HMR even if they are not used in the template",
-  "HMR code generation should preserve eager module imports inside standalone component in HMR even if they are not used in the template",
-  "HMR code generation should preserve eager standalone imports in HMR even if they are not used in the template",
   "authoring API diagnostics required initializer functions validation should report required input being invoked inside a constructor",
   "authoring API diagnostics required initializer functions validation should report required input being used as property initialized",
   "authoring API diagnostics required initializer functions validation should report required model being invoked in a constructor despite being set before hand",
