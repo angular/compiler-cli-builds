@@ -1271,6 +1271,7 @@ var NGP_KNOWN_NGTSC_FAILURES = /* @__PURE__ */ new Set([
   "ngtsc type checking @let declarations should report @let declaration used in the expression of a @if block before it is defined",
   "ngtsc type checking control flow content projection diagnostics should report nodes that are targeting different slots but cannot be projected",
   "ngtsc type checking control flow content projection diagnostics should report nodes that are targeting the same slot but cannot be projected",
+  "ngtsc type checking control flow content projection diagnostics should report when an @boundary block prevents an element from being projected",
   "ngtsc type checking control flow content projection diagnostics should report when an @case block prevents an element from being projected",
   "ngtsc type checking control flow content projection diagnostics should report when an @default block prevents an element from being projected",
   "ngtsc type checking control flow content projection diagnostics should report when an @else block prevents content projection",
