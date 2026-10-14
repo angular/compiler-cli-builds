@@ -24,7 +24,7 @@ import {
   isTsDiagnostic,
   performCompilation,
   readConfiguration
-} from "./chunk-E544TPAC.js";
+} from "./chunk-WOSV4RFD.js";
 import {
   ConsoleLogger,
   LogLevel
@@ -44,7 +44,7 @@ import {
   incrementalFromStateTicket,
   isDocEntryWithSourceInfo,
   resourceChangeTicket
-} from "./chunk-KMFN4DOQ.js";
+} from "./chunk-HIDZX47I.js";
 import {
   ActivePerfRecorder,
   InliningMode,
@@ -55,7 +55,7 @@ import {
   getDownlevelDecoratorsTransform,
   getInitializerApiJitTransform,
   isShim
-} from "./chunk-GUHUPONB.js";
+} from "./chunk-G5LDCSK3.js";
 import {
   CompletionKind,
   Environment,
@@ -109,7 +109,7 @@ import "./chunk-IEBNHER4.js";
 
 // packages/compiler-cli/src/version.js
 import { Version } from "@angular/compiler";
-var VERSION = new Version("22.2.2+sha-3b65dbe");
+var VERSION = new Version("22.2.2+sha-54f3de5");
 
 // packages/compiler-cli/private/tooling.js
 var GLOBAL_DEFS_FOR_TERSER = {
