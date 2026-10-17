@@ -22,7 +22,7 @@
  * - Angular Diagnostic Error Codes (NG1xxx-NG11xxx): #684-#692
  * - Decorator Metadata Type-Checking: #693
  * - Compiler Pipeline Features (HMR, local compilation, declaration-only emission,
- *   setClassDebugInfo, incremental compilation, Xi18n, ComponentIndex, TemplateTypeChecker API)
+ *   incremental compilation, Xi18n, ComponentIndex, TemplateTypeChecker API)
  */
 export declare function isNgpSkipEnabled(): boolean;
 export declare function shouldSkipInNgp(fullSpecName: string): boolean;
