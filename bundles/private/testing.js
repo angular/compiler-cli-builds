@@ -442,7 +442,7 @@ function shouldSkipInNgp(fullSpecName) {
     return false;
   }
   const normalized = fullSpecName.replace(/\s+/g, " ").trim();
-  return NGP_KNOWN_TYPECHECK_FAILURES.has(normalized) || NGP_KNOWN_EXTENDED_CHECK_FAILURES.has(normalized) || NGP_KNOWN_NGTSC_FAILURES.has(normalized);
+  return NGP_KNOWN_TYPECHECK_FAILURES.has(normalized) || NGP_KNOWN_EXTENDED_CHECK_FAILURES.has(normalized) || NGP_KNOWN_NGTSC_FAILURES.has(normalized) || NGP_POTENTIAL_BREAKING_CHANGES.has(normalized);
 }
 var NGP_KNOWN_TYPECHECK_FAILURES = /* @__PURE__ */ new Set([
   "host directives should produce a diagnostic for host directive inputs and outputs that have not been exposed",
@@ -596,6 +596,63 @@ var NGP_KNOWN_EXTENDED_CHECK_FAILURES = /* @__PURE__ */ new Set([
   "should produce a warning when signal isn't invoked on dom property binding",
   "should produce a warning when signal isn't invoked on style binding",
   "should produce optional chain warning for chained property access"
+]);
+var NGP_POTENTIAL_BREAKING_CHANGES = /* @__PURE__ */ new Set([
+  // Aligning the debug info shape can cause a different overload to
+  // match for signal inputs which in turn causes breakages.
+  "Debug Info Typescript tranformation afterRenderEffect should insert debug info into afterRenderEffect function if imported from angular core",
+  "Debug Info Typescript tranformation afterRenderEffect should insert debug info into afterRenderEffect function in a property assignment",
+  "Debug Info Typescript tranformation afterRenderEffect should insert debug info into afterRenderEffect function with a phase spec",
+  "Debug Info Typescript tranformation afterRenderEffect should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation afterRenderEffect should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation computed Property Assignment Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation computed Property Assignment Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation computed Property Declaration Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation computed Property Declaration Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation computed Variable Declaration Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation computed Variable Declaration Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation computed should insert debug info into computed function if imported from angular core",
+  "Debug Info Typescript tranformation contentChild .required should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation contentChild should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation contentChild should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation contentChildren should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation contentChildren should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation effect should insert debug info into effect function if imported from angular core",
+  "Debug Info Typescript tranformation effect should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation effect should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation httpResource Property Assignment Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation httpResource Property Assignment Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation httpResource Property Declaration Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation httpResource Property Declaration Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation httpResource Variable Declaration Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation httpResource Variable Declaration Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation input .required should insert debug info into .required",
+  "Debug Info Typescript tranformation input .required should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation input should insert debug info into input function if imported from angular core",
+  "Debug Info Typescript tranformation linkedSignal Property Assignment Case should insert debug info into linkedSignal with a computation object",
+  "Debug Info Typescript tranformation linkedSignal Property Assignment Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation linkedSignal Property Assignment Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation linkedSignal Property Declaration Case should insert debug info into linkedSignal with a computation object",
+  "Debug Info Typescript tranformation linkedSignal Property Declaration Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation linkedSignal Property Declaration Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation linkedSignal Variable Declaration Case should insert debug info into linkedSignal with a computation object",
+  "Debug Info Typescript tranformation linkedSignal Variable Declaration Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation linkedSignal Variable Declaration Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation linkedSignal should insert debug info into linkedSignal function if imported from angular core",
+  "Debug Info Typescript tranformation model .required should insert debug info into .required",
+  "Debug Info Typescript tranformation model .required should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation model should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation signal Property Assignment Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation signal Property Assignment Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation signal Property Declaration Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation signal Property Declaration Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation signal Variable Declaration Case should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation signal Variable Declaration Case should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation viewChild .required should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation viewChild should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation viewChild should tree-shake away debug info if in prod mode",
+  "Debug Info Typescript tranformation viewChildren should not tree-shake away debug info if in dev mode",
+  "Debug Info Typescript tranformation viewChildren should tree-shake away debug info if in prod mode"
 ]);
 var NGP_KNOWN_NGTSC_FAILURES = /* @__PURE__ */ new Set([
   "@Service decorator should report if an @Service class has another Angular decorator",

@@ -27,25 +27,3 @@
 export declare function isNgpSkipEnabled(): boolean;
 export declare function shouldSkipInNgp(fullSpecName: string): boolean;
 export declare function shouldSkipComplianceInNgp(mode: string, relativePath: string, description: string): boolean;
-/**
- * Known failures in `//packages/compiler-cli/src/ngtsc/typecheck/test:test_ngp`
- * (#678-#682, #690, plus `TemplateTypeChecker` IDE metadata queries).
- */
-export declare const NGP_KNOWN_TYPECHECK_FAILURES: ReadonlySet<string>;
-/**
- * Known failures in `//packages/compiler-cli/src/ngtsc/typecheck/extended/test/checks/*:test_ngp`
- * (#673, #675, #676, #677 - Extended template diagnostics NG8101-NG8117 not yet implemented in NGP).
- */
-export declare const NGP_KNOWN_EXTENDED_CHECK_FAILURES: ReadonlySet<string>;
-/**
- * Known failures in `//packages/compiler-cli/test/ngtsc:ngtsc_ngp`
- * (HMR, local compilation, setClassDebugInfo, declaration-only emission, incremental compilation,
- * Xi18n, ComponentIndex, and diagnostic/TCB gaps #673-#696).
- */
-export declare const NGP_KNOWN_NGTSC_FAILURES: ReadonlySet<string>;
-/**
- * Known failures in `//packages/compiler-cli/test/compliance/full:full_ngp`,
- * `//packages/compiler-cli/test/compliance/local:local_ngp`, and
- * `//packages/compiler-cli/test/compliance/declaration-only:declaration-only_ngp`.
- */
-export declare const NGP_KNOWN_COMPLIANCE_FAILURES: ReadonlySet<string>;
