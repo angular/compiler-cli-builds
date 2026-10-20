@@ -132,6 +132,7 @@ var ErrorCode;
   ErrorCode2[ErrorCode2["MISSING_STRUCTURAL_DIRECTIVE"] = 8116] = "MISSING_STRUCTURAL_DIRECTIVE";
   ErrorCode2[ErrorCode2["UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION"] = 8117] = "UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION";
   ErrorCode2[ErrorCode2["FORBIDDEN_REQUIRED_INITIALIZER_INVOCATION"] = 8118] = "FORBIDDEN_REQUIRED_INITIALIZER_INVOCATION";
+  ErrorCode2[ErrorCode2["NUMERIC_CSS_PROPERTY_REQUIRES_UNIT"] = 8119] = "NUMERIC_CSS_PROPERTY_REQUIRES_UNIT";
   ErrorCode2[ErrorCode2["INLINE_TCB_REQUIRED"] = 8900] = "INLINE_TCB_REQUIRED";
   ErrorCode2[ErrorCode2["INLINE_TYPE_CTOR_REQUIRED"] = 8901] = "INLINE_TYPE_CTOR_REQUIRED";
   ErrorCode2[ErrorCode2["INJECTABLE_DUPLICATE_PROV"] = 9001] = "INJECTABLE_DUPLICATE_PROV";
@@ -148,7 +149,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.2+sha-ec9bcab";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.2+sha-3320da9";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -296,6 +297,7 @@ var ExtendedTemplateDiagnosticName;
   ExtendedTemplateDiagnosticName2["UNPARENTHESIZED_NULLISH_COALESCING"] = "unparenthesizedNullishCoalescing";
   ExtendedTemplateDiagnosticName2["UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION"] = "uninvokedFunctionInTextInterpolation";
   ExtendedTemplateDiagnosticName2["DEFER_TRIGGER_MISCONFIGURATION"] = "deferTriggerMisconfiguration";
+  ExtendedTemplateDiagnosticName2["NUMERIC_CSS_PROPERTY_REQUIRES_UNIT"] = "numericCssPropertyRequiresUnit";
 })(ExtendedTemplateDiagnosticName || (ExtendedTemplateDiagnosticName = {}));
 
 // packages/compiler-cli/src/ngtsc/util/src/typescript.js
@@ -7200,4 +7202,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-I4XC7UPK.js.map
+//# sourceMappingURL=chunk-7UYE3NQB.js.map

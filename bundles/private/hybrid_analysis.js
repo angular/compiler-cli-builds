@@ -21,7 +21,7 @@ import {
   findFirstMatchingNode,
   hasExpressionIdentifier,
   validateAndRewriteCoreSymbol
-} from "../chunk-I4XC7UPK.js";
+} from "../chunk-7UYE3NQB.js";
 import "../chunk-2RWOSWE5.js";
 import "../chunk-UTWH365F.js";
 import "../chunk-KWAGEHJJ.js";

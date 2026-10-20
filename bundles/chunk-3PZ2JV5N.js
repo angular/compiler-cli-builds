@@ -50,7 +50,7 @@ import {
   tryParseInitializerApi,
   untagAllTsFiles,
   wrapTypeReference
-} from "./chunk-SBAKS36H.js";
+} from "./chunk-HPVQF3GC.js";
 import {
   AbsoluteModuleStrategy,
   AliasStrategy,
@@ -99,7 +99,7 @@ import {
   reflectObjectLiteral,
   relativePathBetween,
   toUnredirectedSourceFile
-} from "./chunk-I4XC7UPK.js";
+} from "./chunk-7UYE3NQB.js";
 import {
   LogicalFileSystem,
   absoluteFromSourceFile,
@@ -3016,6 +3016,187 @@ var factory6 = {
   }
 };
 
+// packages/compiler-cli/src/ngtsc/typecheck/extended/checks/numeric_css_property_requires_unit/index.js
+import { ASTWithSource as ASTWithSource2, BindingType as BindingType2, LiteralPrimitive, TmplAstBoundAttribute as TmplAstBoundAttribute2, Unary } from "@angular/compiler";
+var CSS_LENGTH_PROPERTIES = /* @__PURE__ */ new Set([
+  // Box model & spacing
+  "width",
+  "height",
+  "min-width",
+  "min-height",
+  "max-width",
+  "max-height",
+  "margin",
+  "margin-top",
+  "margin-right",
+  "margin-bottom",
+  "margin-left",
+  "padding",
+  "padding-top",
+  "padding-right",
+  "padding-bottom",
+  "padding-left",
+  // dimensions
+  "block-size",
+  "inline-size",
+  "min-block-size",
+  "min-inline-size",
+  "max-block-size",
+  "max-inline-size",
+  // margin & padding
+  "margin-block",
+  "margin-block-start",
+  "margin-block-end",
+  "margin-inline",
+  "margin-inline-start",
+  "margin-inline-end",
+  "padding-block",
+  "padding-block-start",
+  "padding-block-end",
+  "padding-inline",
+  "padding-inline-start",
+  "padding-inline-end",
+  // Borders
+  "border-width",
+  "border-top-width",
+  "border-right-width",
+  "border-bottom-width",
+  "border-left-width",
+  "border-radius",
+  "border-top-left-radius",
+  "border-top-right-radius",
+  "border-bottom-right-radius",
+  "border-bottom-left-radius",
+  "border-start-start-radius",
+  "border-start-end-radius",
+  "border-end-start-radius",
+  "border-end-end-radius",
+  "border-block-start-width",
+  "border-block-end-width",
+  "border-block-width",
+  "border-inline-start-width",
+  "border-inline-end-width",
+  "border-inline-width",
+  "border-spacing",
+  "outline-width",
+  "outline-offset",
+  // Positioning
+  "top",
+  "right",
+  "bottom",
+  "left",
+  "inset",
+  "inset-block-start",
+  "inset-block-end",
+  "inset-inline-start",
+  "inset-inline-end",
+  // Typography & text spacing
+  "font-size",
+  "letter-spacing",
+  "word-spacing",
+  "text-indent",
+  "text-decoration-thickness",
+  "text-underline-offset",
+  "vertical-align",
+  // Gaps & columns
+  "gap",
+  "row-gap",
+  "column-gap",
+  "column-width",
+  "column-rule-width",
+  // Flex layout
+  "flex-basis",
+  // Grid layout
+  "grid-template-columns",
+  "grid-template-rows",
+  "grid-auto-columns",
+  "grid-auto-rows",
+  "grid-gap",
+  // Background & positioning
+  "background-size",
+  "background-position",
+  "background-position-x",
+  "background-position-y",
+  "object-position",
+  // Transform & visual
+  "transform-origin",
+  "perspective",
+  "perspective-origin",
+  "translate",
+  // Scroll margin & padding (all variants)
+  "scroll-margin",
+  "scroll-margin-top",
+  "scroll-margin-right",
+  "scroll-margin-bottom",
+  "scroll-margin-left",
+  "scroll-margin-block",
+  "scroll-margin-block-start",
+  "scroll-margin-block-end",
+  "scroll-margin-inline",
+  "scroll-margin-inline-start",
+  "scroll-margin-inline-end",
+  "scroll-padding",
+  "scroll-padding-top",
+  "scroll-padding-right",
+  "scroll-padding-bottom",
+  "scroll-padding-left",
+  "scroll-padding-block",
+  "scroll-padding-block-start",
+  "scroll-padding-block-end",
+  "scroll-padding-inline",
+  "scroll-padding-inline-start",
+  "scroll-padding-inline-end",
+  // Motion path & scroll animations
+  "offset-anchor",
+  "offset-distance",
+  "offset-position",
+  "view-timeline-inset",
+  // Other layout helpers
+  "shape-margin"
+]);
+var NumericCssPropertyRequiresUnitCheck = class extends TemplateCheckWithVisitor {
+  code = ErrorCode.NUMERIC_CSS_PROPERTY_REQUIRES_UNIT;
+  visitNode(ctx, component, node) {
+    if (!(node instanceof TmplAstBoundAttribute2))
+      return [];
+    if (node.type !== BindingType2.Style)
+      return [];
+    if (node.unit)
+      return [];
+    if (!CSS_LENGTH_PROPERTIES.has(hyphenate(node.name)))
+      return [];
+    const ast = node.value instanceof ASTWithSource2 ? node.value.ast : node.value;
+    const value = getNumericValue(ast);
+    if (value === null || value === 0)
+      return [];
+    const diagnostic = ctx.makeTemplateDiagnostic(node.keySpan, formatExtendedError(ErrorCode.NUMERIC_CSS_PROPERTY_REQUIRES_UNIT, `Binding a number to the CSS property '${node.name}' will have no effect. CSS requires units for length values. For example, use [style.${node.name}.px]="${value}" or [style.${node.name}]="'${value}px'" instead.`));
+    return [diagnostic];
+  }
+};
+function hyphenate(name) {
+  return name.replace(/[a-z][A-Z]/g, (v) => v.charAt(0) + "-" + v.charAt(1)).toLowerCase();
+}
+function getNumericValue(ast) {
+  if (ast instanceof Unary && (ast.operator === "-" || ast.operator === "+")) {
+    const value = getNumericValue(ast.expr);
+    return value !== null && ast.operator === "-" ? -value : value;
+  }
+  if (!(ast instanceof LiteralPrimitive))
+    return null;
+  if (typeof ast.value === "number")
+    return ast.value;
+  if (typeof ast.value === "string" && ast.value.trim() !== "") {
+    const value = Number(ast.value);
+    return isNaN(value) ? null : value;
+  }
+  return null;
+}
+var factory7 = {
+  code: ErrorCode.NUMERIC_CSS_PROPERTY_REQUIRES_UNIT,
+  name: ExtendedTemplateDiagnosticName.NUMERIC_CSS_PROPERTY_REQUIRES_UNIT,
+  create: () => new NumericCssPropertyRequiresUnitCheck()
+};
+
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/optional_chain_not_nullable/index.js
 import { SafeCall as SafeCall2, SafeKeyedRead as SafeKeyedRead2, SafePropertyRead as SafePropertyRead2 } from "@angular/compiler";
 import ts21 from "typescript";
@@ -3056,7 +3237,7 @@ var OptionalChainNotNullableCheck = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory7 = {
+var factory8 = {
   code: ErrorCode.OPTIONAL_CHAIN_NOT_NULLABLE,
   name: ExtendedTemplateDiagnosticName.OPTIONAL_CHAIN_NOT_NULLABLE,
   create: (options) => {
@@ -3070,12 +3251,12 @@ var factory7 = {
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/skip_hydration_not_static/index.js
-import { TmplAstBoundAttribute as TmplAstBoundAttribute2, TmplAstTextAttribute } from "@angular/compiler";
+import { TmplAstBoundAttribute as TmplAstBoundAttribute3, TmplAstTextAttribute } from "@angular/compiler";
 var NG_SKIP_HYDRATION_ATTR_NAME = "ngSkipHydration";
 var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.SKIP_HYDRATION_NOT_STATIC;
   visitNode(ctx, component, node) {
-    if (node instanceof TmplAstBoundAttribute2 && node.name === NG_SKIP_HYDRATION_ATTR_NAME) {
+    if (node instanceof TmplAstBoundAttribute3 && node.name === NG_SKIP_HYDRATION_ATTR_NAME) {
       const errorString = formatExtendedError(ErrorCode.SKIP_HYDRATION_NOT_STATIC, `ngSkipHydration should not be used as a binding`);
       const diagnostic = ctx.makeTemplateDiagnostic(node.sourceSpan, errorString);
       return [diagnostic];
@@ -3093,28 +3274,28 @@ var NgSkipHydrationSpec = class extends TemplateCheckWithVisitor {
     return [];
   }
 };
-var factory8 = {
+var factory9 = {
   code: ErrorCode.SKIP_HYDRATION_NOT_STATIC,
   name: ExtendedTemplateDiagnosticName.SKIP_HYDRATION_NOT_STATIC,
   create: () => new NgSkipHydrationSpec()
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/suffix_not_supported/index.js
-import { BindingType as BindingType2, TmplAstBoundAttribute as TmplAstBoundAttribute3 } from "@angular/compiler";
+import { BindingType as BindingType3, TmplAstBoundAttribute as TmplAstBoundAttribute4 } from "@angular/compiler";
 var STYLE_SUFFIXES = ["px", "%", "em"];
 var SUFFIX_ERROR_MSG = formatExtendedError(ErrorCode.SUFFIX_NOT_SUPPORTED, `The ${STYLE_SUFFIXES.map((suffix) => `'.${suffix}'`).join(", ")} suffixes are only supported on style bindings`);
 var SuffixNotSupportedCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.SUFFIX_NOT_SUPPORTED;
   visitNode(ctx, component, node) {
-    if (!(node instanceof TmplAstBoundAttribute3))
+    if (!(node instanceof TmplAstBoundAttribute4))
       return [];
-    if (node.type !== BindingType2.Attribute || !STYLE_SUFFIXES.some((suffix) => node.name.endsWith(`.${suffix}`))) {
+    if (node.type !== BindingType3.Attribute || !STYLE_SUFFIXES.some((suffix) => node.name.endsWith(`.${suffix}`))) {
       return [];
     }
     return [ctx.makeTemplateDiagnostic(node.keySpan, SUFFIX_ERROR_MSG)];
   }
 };
-var factory9 = {
+var factory10 = {
   code: ErrorCode.SUFFIX_NOT_SUPPORTED,
   name: ExtendedTemplateDiagnosticName.SUFFIX_NOT_SUPPORTED,
   create: () => new SuffixNotSupportedCheck()
@@ -3155,14 +3336,14 @@ var TextAttributeNotBindingSpec = class extends TemplateCheckWithVisitor {
     return [diagnostic];
   }
 };
-var factory10 = {
+var factory11 = {
   code: ErrorCode.TEXT_ATTRIBUTE_NOT_BINDING,
   name: ExtendedTemplateDiagnosticName.TEXT_ATTRIBUTE_NOT_BINDING,
   create: () => new TextAttributeNotBindingSpec()
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/uninvoked_function_in_event_binding/index.js
-import { ASTWithSource as ASTWithSource2, Call, Chain, Conditional as Conditional2, ParsedEventType, PropertyRead as PropertyRead2, ArrowFunction, SafeCall as SafeCall3, SafePropertyRead as SafePropertyRead3, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource3, Call, Chain, Conditional as Conditional2, ParsedEventType, PropertyRead as PropertyRead2, ArrowFunction, SafeCall as SafeCall3, SafePropertyRead as SafePropertyRead3, TmplAstBoundEvent as TmplAstBoundEvent2 } from "@angular/compiler";
 var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING;
   visitNode(ctx, component, node) {
@@ -3170,7 +3351,7 @@ var UninvokedFunctionInEventBindingSpec = class extends TemplateCheckWithVisitor
       return [];
     if (node.type !== ParsedEventType.Regular && node.type !== ParsedEventType.LegacyAnimation)
       return [];
-    if (!(node.handler instanceof ASTWithSource2))
+    if (!(node.handler instanceof ASTWithSource3))
       return [];
     const sourceExpressionText = node.handler.source || "";
     if (node.handler.ast instanceof Chain) {
@@ -3208,7 +3389,7 @@ function assertExpressionInvoked(expression, component, node, expressionText, ct
 function generateStringFromExpression(expression, source) {
   return source.substring(expression.span.start, expression.span.end);
 }
-var factory11 = {
+var factory12 = {
   code: ErrorCode.UNINVOKED_FUNCTION_IN_EVENT_BINDING,
   name: ExtendedTemplateDiagnosticName.UNINVOKED_FUNCTION_IN_EVENT_BINDING,
   create: () => new UninvokedFunctionInEventBindingSpec()
@@ -3238,14 +3419,14 @@ var UnparenthesizedNullishCoalescing = class extends TemplateCheckWithVisitor {
     return [];
   }
 };
-var factory12 = {
+var factory13 = {
   code: ErrorCode.UNPARENTHESIZED_NULLISH_COALESCING,
   name: ExtendedTemplateDiagnosticName.UNPARENTHESIZED_NULLISH_COALESCING,
   create: () => new UnparenthesizedNullishCoalescing()
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/unused_let_declaration/index.js
-import { AST, ASTWithSource as ASTWithSource3, TmplAstLetDeclaration } from "@angular/compiler";
+import { AST, ASTWithSource as ASTWithSource4, TmplAstLetDeclaration } from "@angular/compiler";
 var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
   code = ErrorCode.UNUSED_LET_DECLARATION;
   analysis = /* @__PURE__ */ new Map();
@@ -3265,7 +3446,7 @@ var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
     if (node instanceof TmplAstLetDeclaration) {
       this.getAnalysis(component).allLetDeclarations.add(node);
     } else if (node instanceof AST) {
-      const unwrappedNode = node instanceof ASTWithSource3 ? node.ast : node;
+      const unwrappedNode = node instanceof ASTWithSource4 ? node.ast : node;
       const target = ctx.templateTypeChecker.getExpressionTarget(unwrappedNode, component);
       if (target !== null && target instanceof TmplAstLetDeclaration) {
         this.getAnalysis(component).usedLetDeclarations.add(target);
@@ -3280,7 +3461,7 @@ var UnusedLetDeclarationCheck = class extends TemplateCheckWithVisitor {
     return this.analysis.get(node);
   }
 };
-var factory13 = {
+var factory14 = {
   code: ErrorCode.UNUSED_LET_DECLARATION,
   name: ExtendedTemplateDiagnosticName.UNUSED_LET_DECLARATION,
   create: () => new UnusedLetDeclarationCheck()
@@ -3338,7 +3519,7 @@ function isMethodSymbol(tsSymbol, callSignatures) {
 function generateStringFromExpression2(expression, source) {
   return source.substring(expression.span.start, expression.span.end);
 }
-var factory14 = {
+var factory15 = {
   code: ErrorCode.UNINVOKED_TRACK_FUNCTION,
   name: ExtendedTemplateDiagnosticName.UNINVOKED_TRACK_FUNCTION,
   create: () => new UninvokedTrackFunctionCheck()
@@ -3370,14 +3551,14 @@ function assertExpressionInvoked2(expression, component, ctx) {
   }
   return [];
 }
-var factory15 = {
+var factory16 = {
   code: ErrorCode.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION,
   name: ExtendedTemplateDiagnosticName.UNINVOKED_FUNCTION_IN_TEXT_INTERPOLATION,
   create: () => new UninvokedFunctionInTextInterpolation()
 };
 
 // packages/compiler-cli/src/ngtsc/typecheck/extended/checks/defer_trigger_misconfiguration/index.js
-import { TmplAstDeferredBlock, TmplAstHoverDeferredTrigger, TmplAstIdleDeferredTrigger, TmplAstImmediateDeferredTrigger, TmplAstInteractionDeferredTrigger, TmplAstTimerDeferredTrigger, TmplAstViewportDeferredTrigger, LiteralPrimitive } from "@angular/compiler";
+import { TmplAstDeferredBlock, TmplAstHoverDeferredTrigger, TmplAstIdleDeferredTrigger, TmplAstImmediateDeferredTrigger, TmplAstInteractionDeferredTrigger, TmplAstTimerDeferredTrigger, TmplAstViewportDeferredTrigger, LiteralPrimitive as LiteralPrimitive2 } from "@angular/compiler";
 function areLiteralMapsEqual(a, b) {
   const aIsEmpty = a === null || a.keys.length === 0;
   const bIsEmpty = b === null || b.keys.length === 0;
@@ -3393,14 +3574,14 @@ function areLiteralMapsEqual(a, b) {
     if (bKey.kind !== "property")
       continue;
     const bVal = b.values[i];
-    bMap.set(bKey.key, bVal instanceof LiteralPrimitive ? bVal.value : null);
+    bMap.set(bKey.key, bVal instanceof LiteralPrimitive2 ? bVal.value : null);
   }
   for (let i = 0; i < a.keys.length; i++) {
     const aKey = a.keys[i];
     if (aKey.kind !== "property")
       continue;
     const aVal = a.values[i];
-    const aValue = aVal instanceof LiteralPrimitive ? aVal.value : null;
+    const aValue = aVal instanceof LiteralPrimitive2 ? aVal.value : null;
     if (!bMap.has(aKey.key))
       return false;
     if (bMap.get(aKey.key) !== aValue)
@@ -3485,7 +3666,7 @@ var DeferTriggerMisconfiguration = class extends TemplateCheckWithVisitor {
     return diags;
   }
 };
-var factory16 = {
+var factory17 = {
   code: ErrorCode.DEFER_TRIGGER_MISCONFIGURATION,
   name: ExtendedTemplateDiagnosticName.DEFER_TRIGGER_MISCONFIGURATION,
   create: () => new DeferTriggerMisconfiguration()
@@ -3499,12 +3680,12 @@ var ExtendedTemplateCheckerImpl = class {
   constructor(templateTypeChecker, typeChecker, templateCheckFactories, options) {
     this.partialCtx = { templateTypeChecker, typeChecker };
     this.templateChecks = /* @__PURE__ */ new Map();
-    for (const factory17 of templateCheckFactories) {
-      const category = diagnosticLabelToCategory(options?.extendedDiagnostics?.checks?.[factory17.name] ?? options?.extendedDiagnostics?.defaultCategory ?? DiagnosticCategoryLabel.Warning);
+    for (const factory18 of templateCheckFactories) {
+      const category = diagnosticLabelToCategory(options?.extendedDiagnostics?.checks?.[factory18.name] ?? options?.extendedDiagnostics?.defaultCategory ?? DiagnosticCategoryLabel.Warning);
       if (category === null) {
         continue;
       }
-      const check = factory17.create(options);
+      const check = factory18.create(options);
       if (check === null) {
         continue;
       }
@@ -3553,28 +3734,29 @@ var ALL_DIAGNOSTIC_FACTORIES = [
   factory2,
   factory6,
   factory7,
+  factory8,
   factory3,
-  factory10,
+  factory11,
   factory4,
   factory5,
-  factory9,
+  factory10,
   factory,
-  factory11,
-  factory13,
-  factory8,
   factory12,
   factory14,
+  factory9,
+  factory13,
   factory15,
-  factory16
+  factory16,
+  factory17
 ];
 var SUPPORTED_DIAGNOSTIC_NAMES = /* @__PURE__ */ new Set([
   ExtendedTemplateDiagnosticName.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION,
   ExtendedTemplateDiagnosticName.UNUSED_STANDALONE_IMPORTS,
-  ...ALL_DIAGNOSTIC_FACTORIES.map((factory17) => factory17.name)
+  ...ALL_DIAGNOSTIC_FACTORIES.map((factory18) => factory18.name)
 ]);
 
 // packages/compiler-cli/src/ngtsc/typecheck/template_semantics/src/template_semantics_checker.js
-import { ASTWithSource as ASTWithSource4, ImplicitReceiver, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead5, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable, ThisReceiver, Unary, unwrapWriteTarget } from "@angular/compiler";
+import { ASTWithSource as ASTWithSource5, ImplicitReceiver, ParsedEventType as ParsedEventType2, PropertyRead as PropertyRead5, Binary as Binary3, RecursiveAstVisitor, TmplAstBoundEvent as TmplAstBoundEvent3, TmplAstLetDeclaration as TmplAstLetDeclaration2, TmplAstRecursiveVisitor, TmplAstVariable, ThisReceiver, Unary as Unary2, unwrapWriteTarget } from "@angular/compiler";
 import ts24 from "typescript";
 var TemplateSemanticsCheckerImpl = class {
   templateTypeChecker;
@@ -3621,7 +3803,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
     super.visitBinary(ast, context);
   }
   visitUnary(ast, context) {
-    if (Unary.isUpdateOperation(ast.operator)) {
+    if (Unary2.isUpdateOperation(ast.operator)) {
       const target = unwrapWriteTarget(ast.expr);
       if (target instanceof PropertyRead5) {
         this.checkForIllegalWriteInEventBinding(target, context);
@@ -3680,7 +3862,7 @@ var ExpressionsSemanticsVisitor = class extends RecursiveAstVisitor {
   }
 };
 function unwrapAstWithSource(ast) {
-  return ast instanceof ASTWithSource4 ? ast.ast : ast;
+  return ast instanceof ASTWithSource5 ? ast.ast : ast;
 }
 
 // packages/compiler-cli/src/ngtsc/validation/src/rules/initializer_api_usage_rule.js
@@ -5406,4 +5588,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-B5AY6TOF.js.map
+//# sourceMappingURL=chunk-3PZ2JV5N.js.map
