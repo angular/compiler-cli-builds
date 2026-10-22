@@ -56,6 +56,7 @@ export declare class SymbolBuilder {
     private getSymbolOfBoundEvent;
     private getSymbolOfInputBinding;
     private getDirectiveSymbolForAccessExpression;
+    private getDirectiveSymbolForInstanceNode;
     private getSymbolOfVariable;
     private getSymbolOfReference;
     private getSymbolOfLetDeclaration;
