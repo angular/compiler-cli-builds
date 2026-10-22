@@ -149,7 +149,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.2+sha-5d7303a";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.2+sha-a2a0c1e";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -6773,32 +6773,33 @@ var SymbolBuilder = class {
     });
     const bindings = [];
     for (const node of nodes) {
-      if (!isAccessExpression(node.left)) {
-        continue;
-      }
-      const signalInputAssignment = unwrapSignalInputWriteTAccessor(node.left);
-      let fieldAccessExpr;
-      let tcbLocation;
-      if (signalInputAssignment !== null) {
-        if (ts36.isIdentifier(signalInputAssignment.fieldExpr)) {
+      const signalInputAssignment = isAccessExpression(node.left) ? unwrapSignalInputWriteTAccessor(node.left) : null;
+      const fieldExpr = signalInputAssignment !== null ? signalInputAssignment.fieldExpr : node.left;
+      let fieldNode;
+      let fieldTypeNode;
+      let instanceNode;
+      if (isAccessExpression(fieldExpr)) {
+        fieldNode = fieldExpr;
+        fieldTypeNode = fieldExpr;
+        instanceNode = fieldExpr.expression;
+      } else if (ts36.isIdentifier(fieldExpr)) {
+        const restrictedField = unwrapRestrictedFieldTempVariable(this.typeCheckBlock, fieldExpr);
+        if (restrictedField === null) {
           continue;
         }
-        fieldAccessExpr = signalInputAssignment.fieldExpr;
-        tcbLocation = this.getTcbLocationForNode(fieldAccessExpr);
+        fieldNode = restrictedField.fieldNode;
+        fieldTypeNode = restrictedField.typeNode;
+        instanceNode = restrictedField.instanceNode;
       } else {
-        fieldAccessExpr = node.left;
-        tcbLocation = this.getTcbLocationForNode(fieldAccessExpr);
+        continue;
       }
-      const target = this.getDirectiveSymbolForAccessExpression(fieldAccessExpr, consumer);
+      const target = this.getDirectiveSymbolForInstanceNode(instanceNode, consumer);
       if (target === null) {
         continue;
       }
-      if (!consumer.inputs.hasBindingPropertyName(binding.name)) {
-        continue;
-      }
       bindings.push({
-        tcbLocation,
-        tcbTypeLocation: this.getTcbSpanForNode(fieldAccessExpr),
+        tcbLocation: this.getTcbLocationForNode(fieldNode),
+        tcbTypeLocation: this.getTcbSpanForNode(fieldTypeNode),
         kind: SymbolKind.Binding,
         target
       });
@@ -6809,10 +6810,13 @@ var SymbolBuilder = class {
     return { kind: SymbolKind.Input, bindings };
   }
   getDirectiveSymbolForAccessExpression(fieldAccessExpr, meta) {
+    return this.getDirectiveSymbolForInstanceNode(fieldAccessExpr.expression, meta);
+  }
+  getDirectiveSymbolForInstanceNode(instanceNode, meta) {
     return {
       ref: meta.getSymbolReference(),
       kind: SymbolKind.Directive,
-      tcbLocation: this.getTcbLocationForNode(fieldAccessExpr.expression),
+      tcbLocation: this.getTcbLocationForNode(instanceNode),
       isComponent: meta.isComponent,
       isStructural: meta.isStructural,
       selector: meta.selector,
@@ -7064,6 +7068,61 @@ function unwrapSignalInputWriteTAccessor(expr) {
     typeExpr: expr
   };
 }
+function unwrapRestrictedFieldTempVariable(typeCheckBlock, id) {
+  const declaration = findVariableDeclaration(typeCheckBlock, id.text);
+  if (declaration === null || declaration.initializer === void 0 || !ts36.isAsExpression(declaration.initializer) || !ts36.isIndexedAccessTypeNode(declaration.initializer.type)) {
+    return null;
+  }
+  const type = declaration.initializer.type;
+  const { indexType } = type;
+  let objectType = type.objectType;
+  while (ts36.isParenthesizedTypeNode(objectType)) {
+    objectType = objectType.type;
+  }
+  if (!ts36.isTypeQueryNode(objectType) || !ts36.isIdentifier(objectType.exprName) || !ts36.isLiteralTypeNode(indexType) || !ts36.isStringLiteralLike(indexType.literal)) {
+    return null;
+  }
+  const fieldReference = findRestrictedFieldReference(typeCheckBlock, objectType.exprName.text, indexType.literal.text);
+  return {
+    // The temporary variable's name is used for the type rather than the indexed access type
+    // node: the variable's type is the widened one (fresh literal types of `readonly` fields
+    // widen through the indexed access when declaring the variable), which is the type that the
+    // binding is actually checked against.
+    fieldNode: fieldReference ?? indexType.literal,
+    typeNode: declaration.name,
+    instanceNode: objectType.exprName
+  };
+}
+function findRestrictedFieldReference(root, instanceName, fieldName) {
+  let result = null;
+  const visit = (node) => {
+    if (result !== null) {
+      return;
+    }
+    if (ts36.isTypeQueryNode(node) && ts36.isQualifiedName(node.exprName) && ts36.isIdentifier(node.exprName.left) && node.exprName.left.text === instanceName && node.exprName.right.text === fieldName) {
+      result = node.exprName;
+      return;
+    }
+    node.forEachChild(visit);
+  };
+  visit(root);
+  return result;
+}
+function findVariableDeclaration(root, name) {
+  let result = null;
+  const visit = (node) => {
+    if (result !== null) {
+      return;
+    }
+    if (ts36.isVariableDeclaration(node) && ts36.isIdentifier(node.name) && node.name.text === name) {
+      result = node;
+      return;
+    }
+    node.forEachChild(visit);
+  };
+  visit(root);
+  return result;
+}
 
 export {
   ErrorCode,
@@ -7202,4 +7261,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-7UYE3NQB.js.map
+//# sourceMappingURL=chunk-E6IXN657.js.map
