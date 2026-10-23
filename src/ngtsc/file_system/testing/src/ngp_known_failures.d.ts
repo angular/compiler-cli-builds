@@ -17,7 +17,7 @@
  * skipping.
  *
  * Tracked compiler gap categories & GitHub issues (https://github.com/alxhub/ng-hybrid-preprocessor):
- * - Extended Template Diagnostics (NG8101-NG8117): #673, #675, #676, #677
+ * - Extended Template Diagnostics (NG8102, NG8107, NG8109, NG8111, NG8115, NG8117): #673, #677
  * - Template Type-Checking (TCB) & Host Binding Type-Checking: #678-#683, #694-#696
  * - Angular Diagnostic Error Codes (NG1xxx-NG11xxx): #684-#692
  * - Decorator Metadata Type-Checking: #693
