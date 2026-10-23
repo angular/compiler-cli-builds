@@ -14463,11 +14463,7 @@ var signalInputsTransform = (member, sourceFile, host, factory, importTracker, i
   const fields = {
     "isSignal": factory.createTrue(),
     "alias": factory.createStringLiteral(inputMapping.bindingPropertyName),
-    "required": inputMapping.required ? factory.createTrue() : factory.createFalse(),
-    // For signal inputs, transforms are captured by the input signal. The runtime will
-    // determine whether a transform needs to be run via the input signal, so the `transform`
-    // option is always `undefined`.
-    "transform": factory.createIdentifier("undefined")
+    "required": inputMapping.required ? factory.createTrue() : factory.createFalse()
   };
   const newDecorator = factory.createDecorator(factory.createCallExpression(createSyntheticAngularCoreDecoratorAccess(factory, importManager, classDecorator, sourceFile, "Input"), void 0, [
     // Cast to `any` because `isSignal` will be private, and in case this
@@ -14475,7 +14471,7 @@ var signalInputsTransform = (member, sourceFile, host, factory, importTracker, i
     // not fail. It is already validated now due to us parsing the input metadata.
     castAsAny(factory, factory.createObjectLiteralExpression(Object.entries(fields).map(([name, value]) => factory.createPropertyAssignment(name, value))))
   ]));
-  return factory.updatePropertyDeclaration(member.node, [newDecorator, ...member.node.modifiers ?? []], member.name, member.node.questionToken, member.node.type, member.node.initializer);
+  return factory.updatePropertyDeclaration(member.node, [newDecorator, ...member.node.modifiers ?? []], member.node.name, member.node.questionToken, member.node.type, member.node.initializer);
 };
 
 // packages/compiler-cli/src/ngtsc/transform/jit/src/initializer_api_transforms/model_function.js
@@ -14714,4 +14710,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-266VKDX5.js.map
+//# sourceMappingURL=chunk-7UQGVYUO.js.map
