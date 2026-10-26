@@ -442,7 +442,7 @@ function shouldSkipInNgp(fullSpecName) {
     return false;
   }
   const normalized = fullSpecName.replace(/\s+/g, " ").trim();
-  return NGP_KNOWN_TYPECHECK_FAILURES.has(normalized) || NGP_KNOWN_EXTENDED_CHECK_FAILURES.has(normalized) || NGP_KNOWN_NGTSC_FAILURES.has(normalized) || NGP_POTENTIAL_BREAKING_CHANGES.has(normalized);
+  return NGP_KNOWN_TYPECHECK_FAILURES.has(normalized) || NGP_REQUIRES_TYPE_CHECKER.has(normalized) || NGP_KNOWN_NGTSC_FAILURES.has(normalized) || NGP_POTENTIAL_BREAKING_CHANGES.has(normalized);
 }
 var NGP_KNOWN_TYPECHECK_FAILURES = /* @__PURE__ */ new Set([
   "host directives should produce a diagnostic for host directive inputs and outputs that have not been exposed",
@@ -479,7 +479,15 @@ var NGP_KNOWN_TYPECHECK_FAILURES = /* @__PURE__ */ new Set([
   "model inputs type-check diagnostics with `--strict` allows access to protected output",
   "model inputs type-check diagnostics with `--strict` disallows access to private model"
 ]);
-var NGP_KNOWN_EXTENDED_CHECK_FAILURES = /* @__PURE__ */ new Set([
+var NGP_REQUIRES_TYPE_CHECKER = /* @__PURE__ */ new Set([
+  // Detecting writes to read-only `@let` or `@for` variables in two-way bindings (NG8005)
+  // requires a TypeChecker (`isSignalReference`) to distinguish non-signal variables from
+  // `WritableSignal` variables (since `[(dir)]="signalVar"` is valid).
+  "ngtsc type checking @let declarations should not be able to write to let declaration in a two-way binding",
+  "ngtsc type checking for loop blocks should not be able to write to loop template variables in a two-way binding",
+  // TypeChecker-backed extended template diagnostics (#673, #677) in
+  // `//packages/compiler-cli/src/ngtsc/typecheck/extended/test/checks/*:test_ngp` and `ngtsc_spec`.
+  "ngtsc extended template checks should produce nullish coalescing not nullable warning",
   "@let declarations should produce a warning when a signal aliased via @let is not invoked in interpolation",
   "@let declarations should produce a warning when a signal aliased via @let is used in @if",
   "@let declarations should produce a warning when a signal aliased via @let is used in a bound attribute",
@@ -696,7 +704,9 @@ var NGP_POTENTIAL_BREAKING_CHANGES = /* @__PURE__ */ new Set([
   "selectorless should resolve local reference to selectorless component",
   "selectorless should resolve local reference to selectorless directive",
   "selectorless should treat unclaimed inputs as DOM property bindings on component nodes",
-  "selectorless should treat unclaimed outputs as DOM events on component nodes"
+  "selectorless should treat unclaimed outputs as DOM events on component nodes",
+  // Tests TypeScript `structureIsReused` across in-memory ngtsc incremental compilations.
+  "ngtsc type checking stability should allow for complete program reuse during incremental compilations"
 ]);
 var NGP_KNOWN_NGTSC_FAILURES = /* @__PURE__ */ new Set([
   "Debug Info Typescript tranformation afterRenderEffect should not override an explicit debugName",
@@ -779,7 +789,6 @@ var NGP_KNOWN_NGTSC_FAILURES = /* @__PURE__ */ new Set([
   "ngtsc @defer block block-specific deferredImports type checking should report an error when a pipe declared in a keyed block is used in an unnamed defer block",
   "ngtsc behavioral tests cycle detection should detect a simple cycle and fatally error if doing partial-compilation",
   "ngtsc compilation of standalone types component-side should compile a standalone component in a cycle with its module",
-  "ngtsc extended template checks should produce nullish coalescing not nullable warning",
   "ngtsc incremental compilation (semantic changes) NgModule declarations should not recompile components when a non-matching directive is added in scope",
   "ngtsc incremental compilation (semantic changes) NgModule declarations should recompile components when a matching directive is added in the direct scope",
   "ngtsc incremental compilation (semantic changes) NgModule declarations should recompile components when a matching directive is added in the transitive scope",
@@ -819,49 +828,17 @@ var NGP_KNOWN_NGTSC_FAILURES = /* @__PURE__ */ new Set([
   "ngtsc incremental compilation with errors should recover from an error even across multiple NgModules",
   "ngtsc incremental compilation with errors should recover from an error in a component that is part of a module",
   "ngtsc incremental compilation with errors should recover from an error in a component's metadata",
-  "ngtsc type checking @let declarations should not be able to write to let declaration in a two-way binding",
   "ngtsc type checking @let declarations should produce a single diagnostic if a @let declaration invokes itself",
   "ngtsc type checking @let declarations should produce a single diagnostic if a @let declaration refers to properties on itself",
   "ngtsc type checking @let declarations should report @let declaration used in the expression of a @if block before it is defined",
   "ngtsc type checking deferred blocks should check the options of the `viewport` trigger",
-  "ngtsc type checking error locations [async] should be correct for external templates",
-  "ngtsc type checking error locations [async] should be correct for indirect templates",
-  "ngtsc type checking error locations [sync] should be correct for external templates",
-  "ngtsc type checking error locations [sync] should be correct for indirect templates",
   "ngtsc type checking for loop blocks should not allow usages of aliased `if` block variables inside the tracking expression",
   "ngtsc type checking for loop blocks should not allow usages of local references outside of the template in the tracking expression",
   "ngtsc type checking for loop blocks should not allow usages of local references within the same template inside the tracking expression",
   "ngtsc type checking for loop blocks should not allow usages of parent loop variables inside the tracking expression",
   "ngtsc type checking for loop blocks should not allow usages of parent template variables inside the tracking expression",
-  "ngtsc type checking for loop blocks should not be able to write to loop template variables in a two-way binding",
-  "ngtsc type checking for loop blocks should type check a @for loop without a `track` expression",
-  "ngtsc type checking foreign component template semantics should detect a conflict between a @content block and property binding in an external template",
-  "ngtsc type checking foreign component template semantics should detect a conflict between a @content block name and a static attribute",
-  "ngtsc type checking foreign component template semantics should detect a conflict between a @content block name and an input property binding",
-  "ngtsc type checking foreign component template semantics should detect a conflict between implicit children and [children] binding in an external template",
-  "ngtsc type checking foreign component template semantics should detect a conflict between implicit children and a [children] property binding",
-  "ngtsc type checking foreign component template semantics should detect a conflict between implicit children and a children static attribute",
-  "ngtsc type checking foreign component template semantics should detect duplicate @content blocks in an external template",
-  "ngtsc type checking foreign component template semantics should detect duplicate @content blocks under the same foreign component",
-  "ngtsc type checking host directives generates diagnostic when the library does not export the host directive",
-  "ngtsc type checking host directives should check bindings to inherited host directive inputs 2",
-  "ngtsc type checking host directives should check bindings to inherited host directive outputs 2",
-  "ngtsc type checking input coercion should allow any value to be assigned if the transform function has no parameters",
-  "ngtsc type checking legacy schema checking with the DOM schema should report unknown element error when matched only by an attribute directive",
-  "ngtsc type checking should check split two way binding",
-  "ngtsc type checking should detect a duplicate variable declaration",
-  'ngtsc type checking should error on invalid "in" binary expressions',
   "ngtsc type checking should error on invalid instanceof binary expressions",
-  "ngtsc type checking should error on non valid typeof expressions",
-  "ngtsc type checking should report a diagnostic when binding an incompatible type to an input inherited through an intermediate variable declaration in .d.ts",
-  "ngtsc type checking stability should allow for complete program reuse during incremental compilations",
-  "ngtsc type checking strictUnclaimedEventNames should report camelCase bubbling custom events listened to via event delegation",
-  "ngtsc type checking strictUnclaimedEventNames should report events matching neither an output nor a native DOM event",
-  "ngtsc type checking strictUnclaimedEventNames should report output typos on components even when using CUSTOM_ELEMENTS_SCHEMA",
-  "ngtsc type checking strictUnclaimedEventNames should report the internal property name of an aliased output",
-  "ngtsc type checking strictUnclaimedEventNames should report unclaimed camelCase events on elements with matched directives",
   "ngtsc type checking tagged template literals should produce diagnostics for invalid tag function",
-  "ngtsc type checking when input and output go to different directives",
   "signal forms should report unsupported two-way bindings on a field"
 ]);
 
