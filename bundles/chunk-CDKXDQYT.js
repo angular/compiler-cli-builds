@@ -7996,7 +7996,7 @@ var CompletionEngine = class {
 // packages/compiler-cli/src/ngtsc/typecheck/src/context.js
 import { generateTypeCheckBlock as generateTypeCheckBlock2, ParseSourceFile as ParseSourceFile3, TcbGenericContextBehavior as TcbGenericContextBehavior2 } from "@angular/compiler";
 
-// node_modules/.aspect_rules_js/magic-string@1.4.3/node_modules/magic-string/dist/index.mjs
+// node_modules/.aspect_rules_js/magic-string@1.4.4/node_modules/magic-string/dist/index.mjs
 import { encode, encodeRangeMappings } from "@jridgewell/sourcemap-codec";
 var BitSet = class BitSet2 {
   constructor(arg) {
@@ -8019,6 +8019,8 @@ var Chunk = class Chunk2 {
     this.content = content;
     this.storeName = false;
     this.edited = false;
+    this.replacesUntil = -1;
+    this.replacedFrom = -1;
     this.previous = null;
     this.next = null;
   }
@@ -8035,6 +8037,8 @@ var Chunk = class Chunk2 {
     chunk.content = this.content;
     chunk.storeName = this.storeName;
     chunk.edited = this.edited;
+    chunk.replacesUntil = this.replacesUntil;
+    chunk.replacedFrom = this.replacedFrom;
     return chunk;
   }
   contains(index) {
@@ -8075,6 +8079,8 @@ var Chunk = class Chunk2 {
   reset() {
     this.intro = "";
     this.outro = "";
+    this.replacesUntil = -1;
+    this.replacedFrom = -1;
     if (this.edited) {
       this.content = this.original;
       this.storeName = false;
@@ -8092,6 +8098,7 @@ var Chunk = class Chunk2 {
     this.end = index;
     if (this.edited) {
       newChunk.edit("", false, true);
+      newChunk.replacedFrom = this.replacedFrom;
       this.content = "";
     } else
       this.content = originalBefore;
@@ -9074,9 +9081,17 @@ var MagicString = class MagicString2 {
         if (chunk.next !== this.byStart.get(chunk.end))
           throw new MagicStringError("cannot overwrite across a split point");
         chunk = chunk.next;
+      }
+      chunk = first;
+      while (chunk !== last) {
+        chunk = chunk.next;
         chunk.edit("", false, !overwrite);
+        chunk.replacesUntil = -1;
+        chunk.replacedFrom = start;
       }
       first.edit(content, storeName, !overwrite);
+      first.replacesUntil = end;
+      first.replacedFrom = -1;
     } else {
       const newChunk = new Chunk(start, end, "").edit(content, storeName);
       last.next = newChunk;
@@ -9154,6 +9169,8 @@ var MagicString = class MagicString2 {
       if (chunk.end < end)
         chunk.outro = "";
       chunk.edit("", false, true);
+      chunk.replacesUntil = -1;
+      chunk.replacedFrom = -1;
       chunk = end > chunk.end ? this.byStart.get(chunk.end) : null;
     }
     return this;
@@ -9281,8 +9298,8 @@ var MagicString = class MagicString2 {
   */
   snip(start, end) {
     const clone = this.clone();
-    clone.remove(0, start);
-    clone.remove(end, clone.original.length);
+    clone.remove(-clone.offset, start);
+    clone.remove(end, clone.original.length - clone.offset);
     return clone;
   }
   /** @internal */
@@ -9459,6 +9476,10 @@ var MagicString = class MagicString2 {
   */
   _hasRemovedContent(start, end) {
     let chunk = this.byStart.get(start);
+    if (chunk && start === end) {
+      const previous = this.byEnd.get(start);
+      return !!previous && previous.content === "" && chunk.content === "";
+    }
     if (!chunk) {
       chunk = this.lastSearchedChunk;
       const searchForward = start >= chunk.end;
@@ -9468,7 +9489,7 @@ var MagicString = class MagicString2 {
         this.lastSearchedChunk = chunk;
     }
     while (chunk && chunk.start < end) {
-      if (chunk.content === "")
+      if (chunk.content === "" && (chunk.replacedFrom < start || this.byStart.get(chunk.replacedFrom).replacesUntil < chunk.end))
         return true;
       chunk = this.byStart.get(chunk.end);
     }
@@ -15006,4 +15027,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-KVK4QT3X.js.map
+//# sourceMappingURL=chunk-CDKXDQYT.js.map
