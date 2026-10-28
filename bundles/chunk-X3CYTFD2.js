@@ -86,7 +86,7 @@ import {
   translateStatement,
   translateType,
   typeNodeToValueExpr
-} from "./chunk-E6IXN657.js";
+} from "./chunk-6JVXY2BY.js";
 import {
   absoluteFrom,
   absoluteFromSourceFile,
@@ -7705,7 +7705,7 @@ var CompletionEngine = class {
 // packages/compiler-cli/src/ngtsc/typecheck/src/context.js
 import { generateTypeCheckBlock as generateTypeCheckBlock2, ParseSourceFile as ParseSourceFile3, TcbGenericContextBehavior as TcbGenericContextBehavior2 } from "@angular/compiler";
 
-// node_modules/.aspect_rules_js/magic-string@1.4.3/node_modules/magic-string/dist/index.mjs
+// node_modules/.aspect_rules_js/magic-string@1.4.5/node_modules/magic-string/dist/index.mjs
 import { encode, encodeRangeMappings } from "@jridgewell/sourcemap-codec";
 var BitSet = class BitSet2 {
   constructor(arg) {
@@ -7716,6 +7716,17 @@ var BitSet = class BitSet2 {
   }
   has(n2) {
     return !!(this.bits[n2 >> 5] & 1 << (n2 & 31));
+  }
+  forEach(fn) {
+    const bits = this.bits;
+    for (let w = 0; w < bits.length; w++) {
+      let word = bits[w];
+      while (word) {
+        const lowest = word & -word;
+        fn((w << 5) + 31 - Math.clz32(lowest));
+        word ^= lowest;
+      }
+    }
   }
 };
 var Chunk = class Chunk2 {
@@ -7728,6 +7739,8 @@ var Chunk = class Chunk2 {
     this.content = content;
     this.storeName = false;
     this.edited = false;
+    this.replacesUntil = -1;
+    this.replacedFrom = -1;
     this.previous = null;
     this.next = null;
   }
@@ -7744,6 +7757,8 @@ var Chunk = class Chunk2 {
     chunk.content = this.content;
     chunk.storeName = this.storeName;
     chunk.edited = this.edited;
+    chunk.replacesUntil = this.replacesUntil;
+    chunk.replacedFrom = this.replacedFrom;
     return chunk;
   }
   contains(index) {
@@ -7784,6 +7799,8 @@ var Chunk = class Chunk2 {
   reset() {
     this.intro = "";
     this.outro = "";
+    this.replacesUntil = -1;
+    this.replacedFrom = -1;
     if (this.edited) {
       this.content = this.original;
       this.storeName = false;
@@ -7801,7 +7818,7 @@ var Chunk = class Chunk2 {
     this.end = index;
     if (this.edited) {
       newChunk.edit("", false, true);
-      this.content = "";
+      newChunk.replacedFrom = this.replacedFrom;
     } else
       this.content = originalBefore;
     newChunk.next = this.next;
@@ -8071,8 +8088,8 @@ var Mappings = class {
     this.generatedCodeColumn = 0;
     this.raw = [];
     this.rawSegments = this.raw[this.generatedCodeLine] = [];
-    this.rawRangeMappings = [];
-    this.rawRangeMappingsIndices = this.rawRangeMappings[this.generatedCodeLine] = [];
+    this.rawRangeMappingsIndices = [];
+    this.rawRangeMappings = hires === "experimental-range" ? [this.rawRangeMappingsIndices] : void 0;
     this.encoder = encoder;
   }
   nextLine() {
@@ -8085,7 +8102,35 @@ var Mappings = class {
       this.generatedCodeLine += 1;
     }
     this.generatedCodeColumn = 0;
-    this.rawRangeMappings[this.generatedCodeLine] = this.rawRangeMappingsIndices = [];
+    if (this.rawRangeMappings)
+      this.rawRangeMappings[this.generatedCodeLine] = this.rawRangeMappingsIndices = [];
+  }
+  /**
+  * Emits the mappings for one MagicString: its intro, every chunk (with the
+  * chunk's own intro/outro) and its outro. `sourceIndex === -1` means the
+  * string has no source of its own, so its content only advances the
+  * generated position without mapping anything.
+  */
+  addMagicString(magicString, sourceIndex, nameIndex) {
+    const { original } = magicString;
+    const locate = getLocator(original);
+    if (magicString.intro)
+      this.advance(magicString.intro);
+    magicString.firstChunk.eachNext((chunk) => {
+      if (chunk.intro.length)
+        this.advance(chunk.intro);
+      if (sourceIndex === -1)
+        this.advance(chunk.content);
+      else if (chunk.edited) {
+        const name = chunk.storeName ? nameIndex.get(original.slice(chunk.start, chunk.replacesUntil)) : void 0;
+        this.addEdit(sourceIndex, chunk.content, locate(chunk.start), name ?? -1);
+      } else
+        this.addUneditedChunk(sourceIndex, chunk, original, locate(chunk.start), magicString.sourcemapLocations);
+      if (chunk.outro.length)
+        this.advance(chunk.outro);
+    });
+    if (magicString.outro)
+      this.advance(magicString.outro);
   }
   addEdit(sourceIndex, content, loc, nameIndex) {
     if (content.length) {
@@ -8299,6 +8344,9 @@ function expandReplacement(replacement, matched, position, str, captures, namedC
   return result;
 }
 var MagicString = class MagicString2 {
+  /**
+  * Wraps `string` for editing; every index passed to the editing methods refers to this original string.
+  */
   constructor(string, options = {}) {
     const chunk = new Chunk(0, string.length, string);
     Object.defineProperties(this, {
@@ -8348,7 +8396,7 @@ var MagicString = class MagicString2 {
       },
       storedNames: {
         writable: true,
-        value: {}
+        value: /* @__PURE__ */ new Set()
       },
       indentStr: {
         writable: true,
@@ -8389,7 +8437,9 @@ var MagicString = class MagicString2 {
   * See also `s.prependLeft(...)`.
   */
   appendLeft(index, content) {
-    index = index + this.offset;
+    index = this._resolveIndex(index);
+    if (index < 0 || index > this.original.length)
+      throw new MagicStringError(`index ${index} is out of bounds`);
     if (typeof content !== "string")
       throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
@@ -8406,7 +8456,9 @@ var MagicString = class MagicString2 {
   * See also `s.prependRight(...)`.
   */
   appendRight(index, content) {
-    index = index + this.offset;
+    index = this._resolveIndex(index);
+    if (index < 0 || index > this.original.length)
+      throw new MagicStringError(`index ${index} is out of bounds`);
     if (typeof content !== "string")
       throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
@@ -8418,7 +8470,10 @@ var MagicString = class MagicString2 {
     return this;
   }
   /**
-  * Does what you'd expect.
+  * Returns an independent copy: the chunk list, string-level intro/outro,
+  * sourcemap locations, stored names, indent exclusion ranges, `offset`,
+  * `filename` and `ignoreList` are all copied; later edits to either string
+  * do not affect the other.
   */
   clone() {
     const cloned = new MagicString2(this.original, {
@@ -8444,7 +8499,7 @@ var MagicString = class MagicString2 {
     if (this.indentExclusionRanges)
       cloned.indentExclusionRanges = this.indentExclusionRanges.slice();
     cloned.sourcemapLocations = new BitSet(this.sourcemapLocations);
-    cloned.storedNames = { ...this.storedNames };
+    cloned.storedNames = new Set(this.storedNames);
     cloned.intro = this.intro;
     cloned.outro = this.outro;
     cloned.hasMovedChunks = this.hasMovedChunks;
@@ -8480,24 +8535,8 @@ var MagicString = class MagicString2 {
   }
   /** @internal */
   _generateMappings(mappings) {
-    const sourceIndex = 0;
-    const names = Object.keys(this.storedNames);
-    const locate = getLocator(this.original);
-    if (this.intro)
-      mappings.advance(this.intro);
-    this.firstChunk.eachNext((chunk) => {
-      const loc = locate(chunk.start);
-      if (chunk.intro.length)
-        mappings.advance(chunk.intro);
-      if (chunk.edited)
-        mappings.addEdit(sourceIndex, chunk.content, loc, chunk.storeName ? names.indexOf(chunk.original) : -1);
-      else
-        mappings.addUneditedChunk(sourceIndex, chunk, this.original, loc, this.sourcemapLocations);
-      if (chunk.outro.length)
-        mappings.advance(chunk.outro);
-    });
-    if (this.outro)
-      mappings.advance(this.outro);
+    const names = [...this.storedNames];
+    mappings.addMagicString(this, 0, new Map(names.map((name, i) => [name, i])));
     return names;
   }
   /** @internal */
@@ -8520,9 +8559,13 @@ var MagicString = class MagicString2 {
     this._ensureindentStr();
     return this.indentStr;
   }
+  /**
+  * Returns the indentation string guessed from the original content, falling back to a single tab character.
+  * This is the value `s.indent()` uses when no prefix is supplied.
+  */
   getIndentString() {
     this._ensureindentStr();
-    return this.indentStr === null ? "	" : this.indentStr;
+    return this.indentStr ?? "	";
   }
   indent(indentStr, options) {
     const pattern = /^[^\r\n]/gm;
@@ -8538,11 +8581,11 @@ var MagicString = class MagicString2 {
       return this;
     const resolvedIndentStr = indentStr;
     options = options || {};
-    const isExcluded = {};
+    const isExcluded = new BitSet();
     if (options.exclude)
       (typeof options.exclude[0] === "number" ? [options.exclude] : options.exclude).forEach((exclusion) => {
         for (let i = exclusion[0]; i < exclusion[1]; i += 1)
-          isExcluded[i] = true;
+          isExcluded.add(i);
       });
     let shouldIndentNextCharacter = options.indentStart !== false;
     const indentPiece = (str) => {
@@ -8567,15 +8610,17 @@ var MagicString = class MagicString2 {
     };
     while (chunk) {
       const end = chunk.end;
-      if (!isExcluded[chunk.start])
+      if (!isExcluded.has(chunk.start))
         chunk.intro = indentPiece(chunk.intro);
       if (chunk.edited) {
-        if (!isExcluded[charIndex])
+        if (!isExcluded.has(chunk.start))
           chunk.content = indentPiece(chunk.content);
+        else if (chunk.content)
+          shouldIndentNextCharacter = chunk.content[chunk.content.length - 1] === "\n";
       } else if (options.exclude) {
         charIndex = chunk.start;
         while (charIndex < end) {
-          if (!isExcluded[charIndex]) {
+          if (!isExcluded.has(charIndex)) {
             const char = this.original.charCodeAt(charIndex);
             if (char === NEWLINE_CHAR)
               shouldIndentNextCharacter = true;
@@ -8604,7 +8649,7 @@ var MagicString = class MagicString2 {
           charIndex += 1;
         }
       }
-      if (!isExcluded[chunk.end - 1])
+      if (!isExcluded.has(chunk.end - 1))
         chunk.outro = indentPiece(chunk.outro);
       charIndex = chunk.end;
       chunk = chunk.next;
@@ -8642,11 +8687,15 @@ var MagicString = class MagicString2 {
   * mirroring the `appendLeft`/`appendRight` distinction.
   */
   move(start, end, index, affinity = "right") {
-    start = start + this.offset;
-    end = end + this.offset;
-    index = index + this.offset;
+    start = this._resolveIndex(start);
+    end = this._resolveIndex(end);
+    index = this._resolveIndex(index);
     if (start === end)
       return this;
+    if (start < 0 || end > this.original.length || index < 0 || index > this.original.length)
+      throw new MagicStringError(`range ${start}\u2013${end} is out of bounds`);
+    if (start > end)
+      throw new MagicStringError(`end must be greater than start (start: ${start}, end: ${end})`);
     if (index >= start && index <= end)
       throw new MagicStringError("cannot move a selection inside itself");
     this._split(start);
@@ -8654,6 +8703,8 @@ var MagicString = class MagicString2 {
     this._split(index);
     const first = this.byStart.get(start);
     const last = this.byEnd.get(end);
+    if (!first || !last)
+      throw new MagicStringError(`range ${start}\u2013${end} is out of bounds`);
     if (this.hasMovedChunks) {
       let cursor = first;
       while (cursor !== last) {
@@ -8697,10 +8748,10 @@ var MagicString = class MagicString2 {
       newLeft.next = first;
     if (newRight)
       newRight.previous = last;
-    if (!first.previous)
-      this.firstChunk = last.next;
-    if (!last.next) {
-      this.lastChunk = first.previous;
+    if (!oldLeft)
+      this.firstChunk = oldRight;
+    if (!oldRight) {
+      this.lastChunk = oldLeft;
       this.lastChunk.next = null;
     }
     first.previous = newLeft;
@@ -8723,6 +8774,16 @@ var MagicString = class MagicString2 {
   * It may be preferred to use `s.update(...)` instead if you wish to avoid overwriting the appended/prepended content.
   */
   overwrite(start, end, content, options) {
+    if (options === true) {
+      if (!warned.storeName) {
+        console.warn("The final argument to magicString.overwrite(...) should be an options object. See https://github.com/rich-harris/magic-string");
+        warned.storeName = true;
+      }
+      return this.update(start, end, content, {
+        storeName: true,
+        overwrite: true
+      });
+    }
     const optionObject = typeof options === "object" && options ? options : {};
     return this.update(start, end, content, {
       ...optionObject,
@@ -8737,16 +8798,10 @@ var MagicString = class MagicString2 {
   * the content is overwritten, or anything that was appended/prepended to the range as well.
   */
   update(start, end, content, options) {
-    start = start + this.offset;
-    end = end + this.offset;
+    start = this._resolveIndex(start);
+    end = this._resolveIndex(end);
     if (typeof content !== "string")
       throw new MagicStringError(`content must be a string, got ${typeof content}`);
-    if (this.original.length !== 0) {
-      if (start < 0)
-        start = Math.max(0, start + this.original.length);
-      if (end < 0)
-        end = Math.max(0, end + this.original.length);
-    }
     if (start < 0)
       throw new MagicStringError(`start ${start} is out of bounds`);
     if (end > this.original.length)
@@ -8767,30 +8822,23 @@ var MagicString = class MagicString2 {
     const optionObject = typeof options === "object" && options ? options : {};
     const storeName = optionObject.storeName || false;
     const overwrite = optionObject.overwrite || false;
-    if (storeName) {
-      const original = this.original.slice(start, end);
-      Object.defineProperty(this.storedNames, original, {
-        writable: true,
-        value: true,
-        enumerable: true
-      });
-    }
+    if (storeName)
+      this.storedNames.add(this.original.slice(start, end));
     const first = this.byStart.get(start);
-    const last = this.byEnd.get(end);
-    if (first) {
-      let chunk = first;
-      while (chunk !== last) {
-        if (chunk.next !== this.byStart.get(chunk.end))
-          throw new MagicStringError("cannot overwrite across a split point");
-        chunk = chunk.next;
-        chunk.edit("", false, !overwrite);
-      }
-      first.edit(content, storeName, !overwrite);
-    } else {
-      const newChunk = new Chunk(start, end, "").edit(content, storeName);
-      last.next = newChunk;
-      newChunk.previous = last;
+    for (let chunk = first; chunk.end < end; ) {
+      const next = chunk.next;
+      if (next === null || next !== this.byStart.get(chunk.end))
+        throw new MagicStringError("cannot overwrite across a split point");
+      chunk = next;
     }
+    for (let chunk = first.next; chunk !== null && chunk.start < end; chunk = chunk.next) {
+      chunk.edit("", false, !overwrite);
+      chunk.replacesUntil = -1;
+      chunk.replacedFrom = start;
+    }
+    first.edit(content, storeName, !overwrite);
+    first.replacesUntil = end;
+    first.replacedFrom = -1;
     return this;
   }
   /**
@@ -8806,7 +8854,9 @@ var MagicString = class MagicString2 {
   * Same as `s.appendLeft(...)`, except that the inserted content will go *before* any previous appends or prepends at index
   */
   prependLeft(index, content) {
-    index = index + this.offset;
+    index = this._resolveIndex(index);
+    if (index < 0 || index > this.original.length)
+      throw new MagicStringError(`index ${index} is out of bounds`);
     if (typeof content !== "string")
       throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
@@ -8821,7 +8871,9 @@ var MagicString = class MagicString2 {
   * Same as `s.appendRight(...)`, except that the inserted content will go *before* any previous appends or prepends at `index`
   */
   prependRight(index, content) {
-    index = index + this.offset;
+    index = this._resolveIndex(index);
+    if (index < 0 || index > this.original.length)
+      throw new MagicStringError(`index ${index} is out of bounds`);
     if (typeof content !== "string")
       throw new MagicStringError(`content must be a string, got ${typeof content}`);
     this._split(index);
@@ -8840,14 +8892,8 @@ var MagicString = class MagicString2 {
   * Repeated removals and removals with partially overlapping ranges are allowed.
   */
   remove(start, end) {
-    start = start + this.offset;
-    end = end + this.offset;
-    if (this.original.length !== 0) {
-      if (start < 0)
-        start = Math.max(0, start + this.original.length);
-      if (end < 0)
-        end = Math.max(0, end + this.original.length);
-    }
+    start = this._resolveIndex(start);
+    end = this._resolveIndex(end);
     if (start === end)
       return this;
     if (start < 0 || end > this.original.length)
@@ -8863,7 +8909,9 @@ var MagicString = class MagicString2 {
       if (chunk.end < end)
         chunk.outro = "";
       chunk.edit("", false, true);
-      chunk = end > chunk.end ? this.byStart.get(chunk.end) : null;
+      chunk.replacesUntil = -1;
+      chunk.replacedFrom = -1;
+      chunk = end > chunk.end ? this.byStart.get(chunk.end) : void 0;
     }
     return this;
   }
@@ -8871,14 +8919,8 @@ var MagicString = class MagicString2 {
   * Reset the modified characters from `start` to `end` (of the original string, **not** the generated string).
   */
   reset(start, end) {
-    start = start + this.offset;
-    end = end + this.offset;
-    if (this.original.length !== 0) {
-      if (start < 0)
-        start = Math.max(0, start + this.original.length);
-      if (end < 0)
-        end = Math.max(0, end + this.original.length);
-    }
+    start = this._resolveIndex(start);
+    end = this._resolveIndex(end);
     if (start === end)
       return this;
     if (start < 0 || end > this.original.length)
@@ -8890,10 +8932,13 @@ var MagicString = class MagicString2 {
     let chunk = this.byStart.get(start);
     while (chunk) {
       chunk.reset();
-      chunk = end > chunk.end ? this.byStart.get(chunk.end) : null;
+      chunk = end > chunk.end ? this.byStart.get(chunk.end) : void 0;
     }
     return this;
   }
+  /**
+  * Returns the last character of the generated string, or `''` if it is empty.
+  */
   lastChar() {
     if (this.outro.length)
       return this.outro[this.outro.length - 1];
@@ -8911,57 +8956,64 @@ var MagicString = class MagicString2 {
       return this.intro[this.intro.length - 1];
     return "";
   }
+  /**
+  * Returns everything after the last newline in the generated string, or the whole string if there is no newline.
+  */
   lastLine() {
     let lineIndex = this.outro.lastIndexOf(n);
     if (lineIndex !== -1)
-      return this.outro.substr(lineIndex + 1);
+      return this.outro.slice(lineIndex + 1);
     let lineStr = this.outro;
     let chunk = this.lastChunk;
     while (chunk) {
       if (chunk.outro.length > 0) {
         lineIndex = chunk.outro.lastIndexOf(n);
         if (lineIndex !== -1)
-          return chunk.outro.substr(lineIndex + 1) + lineStr;
+          return chunk.outro.slice(lineIndex + 1) + lineStr;
         lineStr = chunk.outro + lineStr;
       }
       if (chunk.content.length > 0) {
         lineIndex = chunk.content.lastIndexOf(n);
         if (lineIndex !== -1)
-          return chunk.content.substr(lineIndex + 1) + lineStr;
+          return chunk.content.slice(lineIndex + 1) + lineStr;
         lineStr = chunk.content + lineStr;
       }
       if (chunk.intro.length > 0) {
         lineIndex = chunk.intro.lastIndexOf(n);
         if (lineIndex !== -1)
-          return chunk.intro.substr(lineIndex + 1) + lineStr;
+          return chunk.intro.slice(lineIndex + 1) + lineStr;
         lineStr = chunk.intro + lineStr;
       }
       chunk = chunk.previous;
     }
     lineIndex = this.intro.lastIndexOf(n);
     if (lineIndex !== -1)
-      return this.intro.substr(lineIndex + 1) + lineStr;
+      return this.intro.slice(lineIndex + 1) + lineStr;
     return this.intro + lineStr;
   }
   /**
-  * Returns the content of the generated string that corresponds to the slice between `start` and `end` of the original string.
-  * Throws error if the indices are for characters that were already removed.
+  * Returns the content of the generated string that corresponds to the slice
+  * between `start` and `end` of the original string, walking the generated
+  * string from the chunk holding `start` to the chunk holding `end`. Throws
+  * if either index falls inside replaced content. After `move()`, a range
+  * whose end now comes before its start in the output yields `''`.
   */
   slice(start = 0, end = this.original.length - this.offset) {
-    start = start + this.offset;
-    end = end + this.offset;
-    if (this.original.length !== 0) {
-      if (start < 0)
-        start = Math.max(0, start + this.original.length);
-      if (end < 0)
-        end = Math.max(0, end + this.original.length);
-    }
+    start = this._resolveIndex(start);
+    end = this._resolveIndex(end);
     let result = "";
-    let chunk = this.firstChunk;
-    while (chunk && (chunk.start > start || chunk.end <= start)) {
-      if (chunk.start < end && chunk.end >= end || end === 0 && chunk.start === 0)
+    let chunk;
+    if (this.hasMovedChunks) {
+      chunk = this.firstChunk;
+      while (chunk && (chunk.start > start || chunk.end <= start)) {
+        if (chunk.start < end && chunk.end >= end || end === 0 && chunk.start === 0)
+          return result;
+        chunk = chunk.next;
+      }
+    } else {
+      if (start >= end)
         return result;
-      chunk = chunk.next;
+      chunk = this._chunkAt(start);
     }
     if (chunk && chunk.edited && chunk.start !== start)
       throw new MagicStringError(`cannot use edited character ${start} as slice start anchor`);
@@ -8990,9 +9042,43 @@ var MagicString = class MagicString2 {
   */
   snip(start, end) {
     const clone = this.clone();
-    clone.remove(0, start);
-    clone.remove(end, clone.original.length);
+    clone.remove(-clone.offset, start);
+    clone.remove(end, clone.original.length - clone.offset);
     return clone;
+  }
+  /**
+  * Applies `offset`, resolves a negative index from the end of `original` as
+  * `update`/`remove` always have, and rejects anything that is not an integer.
+  * Bounds are checked by the caller, because the methods report them differently.
+  *
+  * @internal
+  */
+  _resolveIndex(index) {
+    const resolved = index + this.offset;
+    if (!Number.isInteger(resolved))
+      throw new MagicStringError(`index must be an integer, got ${index}`);
+    if (resolved < 0 && this.original.length !== 0)
+      return Math.max(0, resolved + this.original.length);
+    return resolved;
+  }
+  /**
+  * The chunk whose original range holds `index` (`chunk.start <= index < chunk.end`),
+  * or `undefined` when `index` is at or past the end. Searches from the last
+  * visited chunk so that scans over nearby indices stay cheap.
+  *
+  * @internal
+  */
+  _chunkAt(index) {
+    let chunk = this.byStart.get(index);
+    if (chunk)
+      return chunk;
+    chunk = this.lastSearchedChunk;
+    const searchForward = index >= chunk.end;
+    while (chunk && !chunk.contains(index))
+      chunk = searchForward ? this.byStart.get(chunk.end) : this.byEnd.get(chunk.start);
+    if (chunk)
+      this.lastSearchedChunk = chunk;
+    return chunk;
   }
   /** @internal */
   _split(index) {
@@ -9053,6 +9139,11 @@ var MagicString = class MagicString2 {
       return false;
     return true;
   }
+  /**
+  * Returns the length of the generated string, counting only content attached to the original characters.
+  * Content outside the string body (`s.prepend()`/`s.append()`, and inserts before the first or after the last
+  * character) is not counted, so this can differ from `s.toString().length`.
+  */
   length() {
     let chunk = this.firstChunk;
     let length = 0;
@@ -9085,11 +9176,12 @@ var MagicString = class MagicString2 {
       const end = chunk.end;
       const aborted = chunk.trimEnd(rx);
       if (chunk.end !== end) {
+        const next = chunk.next;
         if (this.lastChunk === chunk)
-          this.lastChunk = chunk.next;
+          this.lastChunk = next;
         this.byEnd.set(chunk.end, chunk);
-        this.byStart.set(chunk.next.start, chunk.next);
-        this.byEnd.set(chunk.next.end, chunk.next);
+        this.byStart.set(next.start, next);
+        this.byEnd.set(next.end, next);
       }
       if (aborted)
         return true;
@@ -9116,11 +9208,12 @@ var MagicString = class MagicString2 {
       const end = chunk.end;
       const aborted = chunk.trimStart(rx);
       if (chunk.end !== end) {
+        const next = chunk.next;
         if (chunk === this.lastChunk)
-          this.lastChunk = chunk.next;
+          this.lastChunk = next;
         this.byEnd.set(chunk.end, chunk);
-        this.byStart.set(chunk.next.start, chunk.next);
-        this.byEnd.set(chunk.next.end, chunk.next);
+        this.byStart.set(next.start, next);
+        this.byEnd.set(next.end, next);
       }
       if (aborted)
         return true;
@@ -9167,17 +9260,14 @@ var MagicString = class MagicString2 {
   * @internal
   */
   _hasRemovedContent(start, end) {
-    let chunk = this.byStart.get(start);
-    if (!chunk) {
-      chunk = this.lastSearchedChunk;
-      const searchForward = start >= chunk.end;
-      while (chunk && !chunk.contains(start))
-        chunk = searchForward ? this.byStart.get(chunk.end) : this.byEnd.get(chunk.start);
-      if (chunk)
-        this.lastSearchedChunk = chunk;
+    const atBoundary = this.byStart.get(start);
+    if (atBoundary && start === end) {
+      const previous = this.byEnd.get(start);
+      return !!previous && previous.content === "" && atBoundary.content === "";
     }
+    let chunk = this._chunkAt(start);
     while (chunk && chunk.start < end) {
-      if (chunk.content === "")
+      if (chunk.content === "" && (chunk.replacedFrom < start || this.byStart.get(chunk.replacedFrom).replacesUntil < chunk.end))
         return true;
       chunk = this.byStart.get(chunk.end);
     }
@@ -9185,18 +9275,18 @@ var MagicString = class MagicString2 {
   }
   /** @internal */
   _replaceRegexp(searchValue, replacement) {
-    function getReplacement(match, str) {
+    function getReplacement(match, index, str) {
       if (typeof replacement === "string")
-        return expandReplacement(replacement, match[0], match.index, str, match.slice(1), match.groups);
+        return expandReplacement(replacement, match[0], index, str, match.slice(1), match.groups);
       else
-        return match.groups === void 0 ? replacement(match[0], ...match.slice(1), match.index, str) : replacement(match[0], ...match.slice(1), match.index, str, match.groups);
+        return match.groups === void 0 ? replacement(match[0], ...match.slice(1), index, str) : replacement(match[0], ...match.slice(1), index, str, match.groups);
     }
     const replaceMatch = (match) => {
       if (match.index == null)
         return false;
       if (this._hasRemovedContent(match.index, match.index + match[0].length))
         return false;
-      const replacement2 = getReplacement(match, this.original);
+      const replacement2 = getReplacement(match, match.index, this.original);
       if (replacement2 === match[0])
         return true;
       if (match[0].length === 0)
@@ -9290,9 +9380,346 @@ var MagicString = class MagicString2 {
 // packages/compiler-cli/src/ngtsc/typecheck/src/context.js
 import ts32 from "typescript";
 
-// packages/compiler-cli/src/ngtsc/typecheck/src/tcb_adapter.js
-import { AbsoluteSourceSpan, ExternalExpr as ExternalExpr6, ExpressionType, TransplantedType, WrappedNodeExpr as WrappedNodeExpr8, ClassPropertyMapping as ClassPropertyMapping2, TcbGenericContextBehavior } from "@angular/compiler";
+// packages/compiler-cli/src/ngtsc/typecheck/src/oob.js
+import { AbsoluteSourceSpan, BindingType, OutOfBandDiagnosticCategory, ParseSourceSpan as ParseSourceSpan2, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement } from "@angular/compiler";
 import ts28 from "typescript";
+var OutOfBandDiagnosticRecorderImpl = class {
+  resolver;
+  getSourceFile;
+  _diagnostics = [];
+  /**
+   * Tracks which `BindingPipe` nodes have already been recorded as invalid, so only one diagnostic
+   * is ever produced per node.
+   */
+  recordedPipes = /* @__PURE__ */ new Set();
+  /** Common pipes that can be suggested to users. */
+  pipeSuggestions = /* @__PURE__ */ new Map([
+    ["async", "AsyncPipe"],
+    ["uppercase", "UpperCasePipe"],
+    ["lowercase", "LowerCasePipe"],
+    ["json", "JsonPipe"],
+    ["slice", "SlicePipe"],
+    ["number", "DecimalPipe"],
+    ["percent", "PercentPipe"],
+    ["titlecase", "TitleCasePipe"],
+    ["currency", "CurrencyPipe"],
+    ["date", "DatePipe"],
+    ["i18nPlural", "I18nPluralPipe"],
+    ["i18nSelect", "I18nSelectPipe"],
+    ["keyvalue", "KeyValuePipe"]
+  ]);
+  constructor(resolver, getSourceFile2 = (name) => void 0) {
+    this.resolver = resolver;
+    this.getSourceFile = getSourceFile2;
+  }
+  get diagnostics() {
+    return this._diagnostics;
+  }
+  missingReferenceTarget(id, ref) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
+    const value = ref.value.trim();
+    const errorMsg = `No directive found with exportAs '${value}'.`;
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, ref.valueSpan || ref.sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REFERENCE_TARGET), errorMsg));
+  }
+  missingPipe(id, ast, isStandalone) {
+    if (this.recordedPipes.has(ast)) {
+      return;
+    }
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, ast.nameSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
+    }
+    const mapping = this.resolver.getTemplateSourceMapping(id);
+    let errorMsg = `No pipe found with name '${ast.name}'.`;
+    if (this.pipeSuggestions.has(ast.name)) {
+      const suggestedClassName = this.pipeSuggestions.get(ast.name);
+      const suggestedImport = "@angular/common";
+      if (isStandalone) {
+        errorMsg += `
+To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" and add it to the "imports" array of the component.`;
+      } else {
+        errorMsg += `
+To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" and add it to the "imports" array of the module declaring the component.`;
+      }
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
+    this.recordedPipes.add(ast);
+  }
+  deferredPipeUsedEagerly(id, ast, currentBlockName, declaredBlocks) {
+    if (this.recordedPipes.has(ast)) {
+      return;
+    }
+    const mapping = this.resolver.getTemplateSourceMapping(id);
+    let errorMsg;
+    if (currentBlockName !== null && declaredBlocks !== null && declaredBlocks.length > 0) {
+      errorMsg = `Pipe '${ast.name}' was imported via \`@Component.deferredImports\` under block '${declaredBlocks.join(", ")}', but is used in a \`@defer\` block configured for '${currentBlockName}'. To fix this, add '${ast.name}' to 'deferredImports.${currentBlockName}'.`;
+    } else {
+      errorMsg = `Pipe '${ast.name}' was imported via \`@Component.deferredImports\`, but was used outside of a \`@defer\` block in a template. To fix this, either use the '${ast.name}' pipe inside of a \`@defer\` block or import this dependency using the \`@Component.imports\` field.`;
+    }
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, ast.nameSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
+    this.recordedPipes.add(ast);
+  }
+  deferredComponentUsedEagerly(id, element, dirMeta, currentBlockName, declaredBlocks) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
+    const elementName = element instanceof TmplAstElement ? element.name : element.tagName ?? "ng-template";
+    const kind = dirMeta.isComponent ? "Component" : "Directive";
+    const usage = dirMeta.isComponent ? `used as element '${elementName}'` : `used on element '${elementName}'`;
+    let errorMsg;
+    if (currentBlockName !== null && declaredBlocks !== null && declaredBlocks.length > 0) {
+      errorMsg = `${kind} '${dirMeta.name}' (${usage}) was imported via \`@Component.deferredImports\` under block '${declaredBlocks.join(", ")}', but is used in a \`@defer\` block configured for '${currentBlockName}'. To fix this, add '${dirMeta.name}' to 'deferredImports.${currentBlockName}'.`;
+    } else {
+      errorMsg = `${kind} '${dirMeta.name}' (${usage}) was imported via \`@Component.deferredImports\`, but was used outside of a \`@defer\` block in a template. To fix this, either use the '${elementName}' element inside of a \`@defer\` block or import '${dirMeta.name}' using the \`@Component.imports\` field.`;
+    }
+    const startSourceSpan = element.startSourceSpan ?? element.sourceSpan;
+    const { start, end } = startSourceSpan;
+    const absoluteSourceSpan = new AbsoluteSourceSpan(start.offset, end.offset);
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, absoluteSourceSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for usage of ${kind.toLowerCase()} '${dirMeta.name}'.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
+  }
+  duplicateTemplateVar(id, variable, firstDecl) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
+    const errorMsg = `Cannot redeclare variable '${variable.name}' as it was previously declared elsewhere for the same template.`;
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, variable.sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [
+      {
+        text: `The variable '${firstDecl.name}' was first declared here.`,
+        start: firstDecl.sourceSpan.start.offset,
+        end: firstDecl.sourceSpan.end.offset,
+        sourceFile: mapping.node.getSourceFile()
+      }
+    ]));
+  }
+  suboptimalTypeInference(id, variables) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
+    let diagnosticVar = null;
+    for (const variable of variables) {
+      if (diagnosticVar === null || variable.value === "" || variable.value === "$implicit") {
+        diagnosticVar = variable;
+      }
+    }
+    if (diagnosticVar === null) {
+      return;
+    }
+    let varIdentification = `'${diagnosticVar.name}'`;
+    if (variables.length === 2) {
+      varIdentification += ` (and 1 other)`;
+    } else if (variables.length > 2) {
+      varIdentification += ` (and ${variables.length - 1} others)`;
+    }
+    const message = `This structural directive supports advanced type inference, but the current compiler configuration prevents its usage. The variable ${varIdentification} will have type 'any' as a result.
+
+Consider enabling the 'strictTemplates' option in your tsconfig.json for better type inference within this template.`;
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, diagnosticVar.keySpan, ts28.DiagnosticCategory.Suggestion, ngErrorCode(ErrorCode.SUGGEST_SUBOPTIMAL_TYPE_INFERENCE), message));
+  }
+  splitTwoWayBinding(id, input, output, inputConsumer, outputConsumer) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
+    const errorMsg = `The property and event halves of the two-way binding '${input.name}' are not bound to the same target.
+            Find more at ${DOC_PAGE_BASE_URL}/guide/templates/two-way-binding`;
+    const relatedMessages = [];
+    if (inputConsumer.ref.nodeNameSpan && inputConsumer.ref.nodeFilePath) {
+      const sf = this.getSourceFile(inputConsumer.ref.nodeFilePath);
+      if (sf) {
+        relatedMessages.push({
+          text: `The property half of the binding is to the '${inputConsumer.name}' ${inputConsumer.isComponent ? "component" : "directive"}.`,
+          start: inputConsumer.ref.nodeNameSpan.start,
+          end: inputConsumer.ref.nodeNameSpan.end,
+          sourceFile: sf
+        });
+      }
+    }
+    if (outputConsumer instanceof TmplAstElement) {
+      let message = `The event half of the binding is to a native event called '${input.name}' on the <${outputConsumer.name}> DOM element.`;
+      if (!mapping.node.getSourceFile().isDeclarationFile) {
+        message += `
+ 
+ Are you missing an output declaration called '${output.name}'?`;
+      }
+      relatedMessages.push({
+        text: message,
+        start: outputConsumer.sourceSpan.start.offset + 1,
+        end: outputConsumer.sourceSpan.start.offset + outputConsumer.name.length + 1
+      });
+    } else {
+      if (outputConsumer.ref.nodeNameSpan && outputConsumer.ref.nodeFilePath) {
+        const sf = this.getSourceFile(outputConsumer.ref.nodeFilePath);
+        if (sf) {
+          relatedMessages.push({
+            text: `The event half of the binding is to the '${outputConsumer.name}' ${outputConsumer.isComponent ? "component" : "directive"}.`,
+            start: outputConsumer.ref.nodeNameSpan.start,
+            end: outputConsumer.ref.nodeNameSpan.end,
+            sourceFile: sf
+          });
+        }
+      }
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, input.keySpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SPLIT_TWO_WAY_BINDING), errorMsg, relatedMessages));
+  }
+  missingRequiredInputs(id, element, directiveName, isComponent, inputAliases) {
+    const message = `Required input${inputAliases.length === 1 ? "" : "s"} ${inputAliases.map((n2) => `'${n2}'`).join(", ")} from ${isComponent ? "component" : "directive"} ${directiveName} must be specified.`;
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), this.getTagNameSpan(element), ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
+  }
+  illegalForLoopTrackAccess(id, block, access) {
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, access.sourceSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for property read.`);
+    }
+    const messageVars = [block.item, ...block.contextVariables.filter((v) => v.value === "$index")].map((v) => `'${v.name}'`).join(", ");
+    const message = `Cannot access '${access.name}' inside of a track expression. Only ${messageVars} and properties on the containing component are available to this expression.`;
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
+  }
+  inaccessibleDeferredTriggerElement(id, trigger) {
+    let message;
+    if (trigger.reference === null) {
+      message = `Trigger cannot find reference. Make sure that the @defer block has a @placeholder with at least one root element node.`;
+    } else {
+      message = `Trigger cannot find reference "${trigger.reference}".
+Check that an element with #${trigger.reference} exists in the same template and it's accessible from the @defer block.
+Deferred blocks can only access triggers in same view, a parent embedded view or the root view of the @placeholder block.`;
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
+  }
+  controlFlowPreventingContentProjection(id, category, projectionNode, componentName, slotSelector, controlFlowNode, preservesWhitespaces) {
+    const blockName = controlFlowNode.nameSpan.toString().trim();
+    const lines = [
+      `Node matches the "${slotSelector}" slot of the "${componentName}" component, but will not be projected into the specific slot because the surrounding ${blockName} has more than one node at its root. To project the node in the right slot, you can:
+`,
+      `1. Wrap the content of the ${blockName} block in an <ng-container/> that matches the "${slotSelector}" selector.`,
+      `2. Split the content of the ${blockName} block across multiple ${blockName} blocks such that each one only has a single projectable node at its root.`,
+      `3. Remove all content from the ${blockName} block, except for the node being projected.`
+    ];
+    if (preservesWhitespaces) {
+      lines.push("Note: the host component has `preserveWhitespaces: true` which may cause whitespace to affect content projection.");
+    }
+    lines.push("", 'This check can be disabled using the `extendedDiagnostics.checks.controlFlowPreventingContentProjection = "suppress" compiler option.`');
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), projectionNode.startSourceSpan, translateCategory(category), ngErrorCode(ErrorCode.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION), lines.join("\n")));
+  }
+  illegalWriteToLetDeclaration(id, node, target) {
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, node.sourceSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for property write.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_LET_WRITE), `Cannot assign to @let declaration '${target.name}'.`));
+  }
+  letUsedBeforeDefinition(id, node, target) {
+    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, node.sourceSpan);
+    if (sourceSpan === null) {
+      throw new Error(`Assertion failure: no SourceLocation found for property read.`);
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.LET_USED_BEFORE_DEFINITION), `Cannot read @let declaration '${target.name}' before it has been defined.`));
+  }
+  conflictingDeclaration(id, decl) {
+    const mapping = this.resolver.getTemplateSourceMapping(id);
+    const errorMsg = `Cannot declare @let called '${decl.name}' as there is another symbol in the template with the same name.`;
+    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, decl.sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_LET_DECLARATION), errorMsg));
+  }
+  missingNamedTemplateDependency(id, node) {
+    this._diagnostics.push(makeTemplateDiagnostic(
+      id,
+      this.resolver.getTemplateSourceMapping(id),
+      node.startSourceSpan,
+      ts28.DiagnosticCategory.Error,
+      ngErrorCode(ErrorCode.MISSING_NAMED_TEMPLATE_DEPENDENCY),
+      // Wording is meant to mimic the wording TS uses in their diagnostic for missing symbols.
+      `Cannot find name "${node instanceof TmplAstDirective ? node.name : node.componentName}". Selectorless references are only supported to classes or non-type import statements.`
+    ));
+  }
+  incorrectTemplateDependencyType(id, node) {
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.startSourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE), `Incorrect reference type. Type must be a standalone ${node instanceof TmplAstComponent ? "@Component" : "@Directive"}.`));
+  }
+  unclaimedDirectiveBinding(id, directive, node) {
+    const errorMsg = `Directive ${directive.name} does not have an ${node instanceof TmplAstBoundEvent ? "output" : "input"} named "${node.name}". Bindings to directives must target existing inputs or outputs.`;
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.keySpan || node.sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_DIRECTIVE_BINDING), errorMsg));
+  }
+  deferImplicitTriggerMissingPlaceholder(id, trigger) {
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block"));
+  }
+  deferImplicitTriggerInvalidPlaceholder(id, trigger) {
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block with exactly one root element node"));
+  }
+  formFieldUnsupportedBinding(id, node) {
+    let message;
+    if (node instanceof TmplAstBoundAttribute) {
+      let name;
+      if (node.type === BindingType.Property) {
+        name = `[${node.name}]`;
+      } else if (node.type === BindingType.Attribute) {
+        name = `[attr.${node.name}]`;
+      } else if (node.type === BindingType.TwoWay) {
+        name = `[(${node.name})]`;
+      } else {
+        name = node.name;
+      }
+      message = `Binding to '${name}' is not allowed on nodes using the '[formField]' directive`;
+    } else {
+      message = `Setting the '${node.name}' attribute is not allowed on nodes using the '[formField]' directive`;
+    }
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.sourceSpan, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FORM_FIELD_UNSUPPORTED_BINDING), message));
+  }
+  multipleMatchingComponents(id, element, componentNames) {
+    const start = element.startSourceSpan.start.moveBy(1);
+    const end = element.startSourceSpan.end.moveBy(start.offset + element.name.length - element.startSourceSpan.end.offset);
+    const span = new ParseSourceSpan2(start, end);
+    const names = componentNames.map((n2) => `'${n2}'`).join(", ");
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MULTIPLE_MATCHING_COMPONENTS), `Multiple components match node with tagname ${element.name}: ${names}.`));
+  }
+  conflictingHostDirectiveBinding(id, node, directiveName, kind, classPropertyName, aliases) {
+    const message = `${kind === "input" ? "Input" : "Output"} declared in ${directiveName}.${classPropertyName} is exposed under the following conflicting names: ${aliases.map((a) => `"${a}"`).join(", ")}. An ${kind} can only be exposed under a single name.`;
+    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), this.getTagNameSpan(node), ts28.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_HOST_DIRECTIVE_BINDING), message));
+  }
+  getTagNameSpan(node) {
+    let span;
+    let name;
+    if (node instanceof TmplAstElement || node instanceof TmplAstDirective) {
+      name = node.name;
+    } else if (node instanceof TmplAstComponent) {
+      name = node.componentName;
+    } else {
+      name = null;
+    }
+    if (name === null) {
+      span = node.startSourceSpan;
+    } else {
+      const start = node.startSourceSpan.start.moveBy(1);
+      const end = node.startSourceSpan.end.moveBy(start.offset + name.length - node.startSourceSpan.end.offset);
+      span = new ParseSourceSpan2(start, end);
+    }
+    return span;
+  }
+};
+function translateCategory(category) {
+  switch (category) {
+    case OutOfBandDiagnosticCategory.Error:
+      return ts28.DiagnosticCategory.Error;
+    case OutOfBandDiagnosticCategory.Warning:
+      return ts28.DiagnosticCategory.Warning;
+  }
+}
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/shim.js
+import ts29 from "typescript";
+var TypeCheckShimGenerator = class {
+  extensionPrefix = "ngtypecheck";
+  shouldEmit = false;
+  generateShimForFile(sf, genFilePath, priorShimSf) {
+    if (priorShimSf !== null) {
+      return priorShimSf;
+    }
+    return ts29.createSourceFile(genFilePath, "export const USED_FOR_NG_TYPE_CHECKING = true;", ts29.ScriptTarget.Latest, true, ts29.ScriptKind.TS);
+  }
+  static shimFor(fileName) {
+    return absoluteFrom(fileName.replace(/\.tsx?$/, ".ngtypecheck.ts"));
+  }
+};
+
+// packages/compiler-cli/src/ngtsc/typecheck/src/tcb_adapter.js
+import { AbsoluteSourceSpan as AbsoluteSourceSpan2, ExternalExpr as ExternalExpr6, ExpressionType, TransplantedType, WrappedNodeExpr as WrappedNodeExpr8, ClassPropertyMapping as ClassPropertyMapping2, TcbGenericContextBehavior } from "@angular/compiler";
+import ts30 from "typescript";
 function adaptTypeCheckBlockMetadata(ref, meta, env, reflector, genericContextBehavior) {
   const refCache = /* @__PURE__ */ new Map();
   const dirCache = /* @__PURE__ */ new Map();
@@ -9346,7 +9773,7 @@ function adaptTypeCheckBlockMetadata(ref, meta, env, reflector, genericContextBe
       animationTriggerNames: dir.animationTriggerNames,
       ngTemplateGuards: dir.ngTemplateGuards,
       hasNgTemplateContextGuard: dir.hasNgTemplateContextGuard,
-      hasNgFieldDirective: ts28.isClassDeclaration(dir.ref.node) && dir.ref.node.members.some((member) => ts28.isPropertyDeclaration(member) && ts28.isComputedPropertyName(member.name) && ts28.isIdentifier(member.name.expression) && member.name.expression.text === "\u0275NgFieldDirective"),
+      hasNgFieldDirective: ts30.isClassDeclaration(dir.ref.node) && dir.ref.node.members.some((member) => ts30.isPropertyDeclaration(member) && ts30.isComputedPropertyName(member.name) && ts30.isIdentifier(member.name.expression) && member.name.expression.text === "\u0275NgFieldDirective"),
       coercedInputFields: dir.coercedInputFields,
       restrictedInputFields: dir.restrictedInputFields,
       stringLiteralInputFields: dir.stringLiteralInputFields,
@@ -9484,7 +9911,7 @@ function extractReferenceMetadata(ref, env) {
     const refFile = absoluteFromSourceFile(ref.node.getSourceFile());
     if (refFile === env.copiedSourceOriginPath) {
       const nodeName2 = ref.node?.name;
-      const nodeNameSpan2 = nodeName2 ? new AbsoluteSourceSpan(nodeName2.getStart(), nodeName2.getEnd()) : void 0;
+      const nodeNameSpan2 = nodeName2 ? new AbsoluteSourceSpan2(nodeName2.getStart(), nodeName2.getEnd()) : void 0;
       let key2;
       if (nodeNameSpan2 !== void 0) {
         key2 = `${refFile}#${nodeNameSpan2.start}`;
@@ -9520,7 +9947,7 @@ function extractReferenceMetadata(ref, env) {
     isLocal = false;
   }
   const nodeName = ref.node?.name;
-  const nodeNameSpan = nodeName ? new AbsoluteSourceSpan(nodeName.getStart(), nodeName.getEnd()) : void 0;
+  const nodeNameSpan = nodeName ? new AbsoluteSourceSpan2(nodeName.getStart(), nodeName.getEnd()) : void 0;
   const nodeFilePath = nodeName !== void 0 ? absoluteFromSourceFile(nodeName.getSourceFile()) : void 0;
   let key;
   if (nodeFilePath !== void 0 && nodeNameSpan !== void 0) {
@@ -9539,351 +9966,14 @@ function extractReferenceMetadata(ref, env) {
   };
 }
 function extractNameFromExpr(node) {
-  if (ts28.isIdentifier(node)) {
+  if (ts30.isIdentifier(node)) {
     return node.text;
-  } else if (ts28.isPropertyAccessExpression(node)) {
+  } else if (ts30.isPropertyAccessExpression(node)) {
     const receiver = extractNameFromExpr(node.expression);
     return receiver !== null ? `${receiver}.${node.name.text}` : null;
   }
   return null;
 }
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/oob.js
-import { AbsoluteSourceSpan as AbsoluteSourceSpan2, BindingType, OutOfBandDiagnosticCategory, ParseSourceSpan as ParseSourceSpan2, TmplAstBoundAttribute, TmplAstBoundEvent, TmplAstComponent, TmplAstDirective, TmplAstElement } from "@angular/compiler";
-import ts29 from "typescript";
-var OutOfBandDiagnosticRecorderImpl = class {
-  resolver;
-  getSourceFile;
-  _diagnostics = [];
-  /**
-   * Tracks which `BindingPipe` nodes have already been recorded as invalid, so only one diagnostic
-   * is ever produced per node.
-   */
-  recordedPipes = /* @__PURE__ */ new Set();
-  /** Common pipes that can be suggested to users. */
-  pipeSuggestions = /* @__PURE__ */ new Map([
-    ["async", "AsyncPipe"],
-    ["uppercase", "UpperCasePipe"],
-    ["lowercase", "LowerCasePipe"],
-    ["json", "JsonPipe"],
-    ["slice", "SlicePipe"],
-    ["number", "DecimalPipe"],
-    ["percent", "PercentPipe"],
-    ["titlecase", "TitleCasePipe"],
-    ["currency", "CurrencyPipe"],
-    ["date", "DatePipe"],
-    ["i18nPlural", "I18nPluralPipe"],
-    ["i18nSelect", "I18nSelectPipe"],
-    ["keyvalue", "KeyValuePipe"]
-  ]);
-  constructor(resolver, getSourceFile2 = (name) => void 0) {
-    this.resolver = resolver;
-    this.getSourceFile = getSourceFile2;
-  }
-  get diagnostics() {
-    return this._diagnostics;
-  }
-  missingReferenceTarget(id, ref) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const value = ref.value.trim();
-    const errorMsg = `No directive found with exportAs '${value}'.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, ref.valueSpan || ref.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REFERENCE_TARGET), errorMsg));
-  }
-  missingPipe(id, ast, isStandalone) {
-    if (this.recordedPipes.has(ast)) {
-      return;
-    }
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, ast.nameSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
-    }
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    let errorMsg = `No pipe found with name '${ast.name}'.`;
-    if (this.pipeSuggestions.has(ast.name)) {
-      const suggestedClassName = this.pipeSuggestions.get(ast.name);
-      const suggestedImport = "@angular/common";
-      if (isStandalone) {
-        errorMsg += `
-To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" and add it to the "imports" array of the component.`;
-      } else {
-        errorMsg += `
-To fix this, import the "${suggestedClassName}" class from "${suggestedImport}" and add it to the "imports" array of the module declaring the component.`;
-      }
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_PIPE), errorMsg));
-    this.recordedPipes.add(ast);
-  }
-  deferredPipeUsedEagerly(id, ast, currentBlockName, declaredBlocks) {
-    if (this.recordedPipes.has(ast)) {
-      return;
-    }
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    let errorMsg;
-    if (currentBlockName !== null && declaredBlocks !== null && declaredBlocks.length > 0) {
-      errorMsg = `Pipe '${ast.name}' was imported via \`@Component.deferredImports\` under block '${declaredBlocks.join(", ")}', but is used in a \`@defer\` block configured for '${currentBlockName}'. To fix this, add '${ast.name}' to 'deferredImports.${currentBlockName}'.`;
-    } else {
-      errorMsg = `Pipe '${ast.name}' was imported via \`@Component.deferredImports\`, but was used outside of a \`@defer\` block in a template. To fix this, either use the '${ast.name}' pipe inside of a \`@defer\` block or import this dependency using the \`@Component.imports\` field.`;
-    }
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, ast.nameSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for usage of pipe '${ast.name}'.`);
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_PIPE_USED_EAGERLY), errorMsg));
-    this.recordedPipes.add(ast);
-  }
-  deferredComponentUsedEagerly(id, element, dirMeta, currentBlockName, declaredBlocks) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const elementName = element instanceof TmplAstElement ? element.name : element.tagName ?? "ng-template";
-    const kind = dirMeta.isComponent ? "Component" : "Directive";
-    const usage = dirMeta.isComponent ? `used as element '${elementName}'` : `used on element '${elementName}'`;
-    let errorMsg;
-    if (currentBlockName !== null && declaredBlocks !== null && declaredBlocks.length > 0) {
-      errorMsg = `${kind} '${dirMeta.name}' (${usage}) was imported via \`@Component.deferredImports\` under block '${declaredBlocks.join(", ")}', but is used in a \`@defer\` block configured for '${currentBlockName}'. To fix this, add '${dirMeta.name}' to 'deferredImports.${currentBlockName}'.`;
-    } else {
-      errorMsg = `${kind} '${dirMeta.name}' (${usage}) was imported via \`@Component.deferredImports\`, but was used outside of a \`@defer\` block in a template. To fix this, either use the '${elementName}' element inside of a \`@defer\` block or import '${dirMeta.name}' using the \`@Component.imports\` field.`;
-    }
-    const startSourceSpan = element.startSourceSpan ?? element.sourceSpan;
-    const { start, end } = startSourceSpan;
-    const absoluteSourceSpan = new AbsoluteSourceSpan2(start.offset, end.offset);
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, absoluteSourceSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for usage of ${kind.toLowerCase()} '${dirMeta.name}'.`);
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFERRED_DIRECTIVE_USED_EAGERLY), errorMsg));
-  }
-  duplicateTemplateVar(id, variable, firstDecl) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const errorMsg = `Cannot redeclare variable '${variable.name}' as it was previously declared elsewhere for the same template.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, variable.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DUPLICATE_VARIABLE_DECLARATION), errorMsg, [
-      {
-        text: `The variable '${firstDecl.name}' was first declared here.`,
-        start: firstDecl.sourceSpan.start.offset,
-        end: firstDecl.sourceSpan.end.offset,
-        sourceFile: mapping.node.getSourceFile()
-      }
-    ]));
-  }
-  suboptimalTypeInference(id, variables) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    let diagnosticVar = null;
-    for (const variable of variables) {
-      if (diagnosticVar === null || variable.value === "" || variable.value === "$implicit") {
-        diagnosticVar = variable;
-      }
-    }
-    if (diagnosticVar === null) {
-      return;
-    }
-    let varIdentification = `'${diagnosticVar.name}'`;
-    if (variables.length === 2) {
-      varIdentification += ` (and 1 other)`;
-    } else if (variables.length > 2) {
-      varIdentification += ` (and ${variables.length - 1} others)`;
-    }
-    const message = `This structural directive supports advanced type inference, but the current compiler configuration prevents its usage. The variable ${varIdentification} will have type 'any' as a result.
-
-Consider enabling the 'strictTemplates' option in your tsconfig.json for better type inference within this template.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, diagnosticVar.keySpan, ts29.DiagnosticCategory.Suggestion, ngErrorCode(ErrorCode.SUGGEST_SUBOPTIMAL_TYPE_INFERENCE), message));
-  }
-  splitTwoWayBinding(id, input, output, inputConsumer, outputConsumer) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const errorMsg = `The property and event halves of the two-way binding '${input.name}' are not bound to the same target.
-            Find more at ${DOC_PAGE_BASE_URL}/guide/templates/two-way-binding`;
-    const relatedMessages = [];
-    if (inputConsumer.ref.nodeNameSpan && inputConsumer.ref.nodeFilePath) {
-      const sf = this.getSourceFile(inputConsumer.ref.nodeFilePath);
-      if (sf) {
-        relatedMessages.push({
-          text: `The property half of the binding is to the '${inputConsumer.name}' ${inputConsumer.isComponent ? "component" : "directive"}.`,
-          start: inputConsumer.ref.nodeNameSpan.start,
-          end: inputConsumer.ref.nodeNameSpan.end,
-          sourceFile: sf
-        });
-      }
-    }
-    if (outputConsumer instanceof TmplAstElement) {
-      let message = `The event half of the binding is to a native event called '${input.name}' on the <${outputConsumer.name}> DOM element.`;
-      if (!mapping.node.getSourceFile().isDeclarationFile) {
-        message += `
- 
- Are you missing an output declaration called '${output.name}'?`;
-      }
-      relatedMessages.push({
-        text: message,
-        start: outputConsumer.sourceSpan.start.offset + 1,
-        end: outputConsumer.sourceSpan.start.offset + outputConsumer.name.length + 1
-      });
-    } else {
-      if (outputConsumer.ref.nodeNameSpan && outputConsumer.ref.nodeFilePath) {
-        const sf = this.getSourceFile(outputConsumer.ref.nodeFilePath);
-        if (sf) {
-          relatedMessages.push({
-            text: `The event half of the binding is to the '${outputConsumer.name}' ${outputConsumer.isComponent ? "component" : "directive"}.`,
-            start: outputConsumer.ref.nodeNameSpan.start,
-            end: outputConsumer.ref.nodeNameSpan.end,
-            sourceFile: sf
-          });
-        }
-      }
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, input.keySpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.SPLIT_TWO_WAY_BINDING), errorMsg, relatedMessages));
-  }
-  missingRequiredInputs(id, element, directiveName, isComponent, inputAliases) {
-    const message = `Required input${inputAliases.length === 1 ? "" : "s"} ${inputAliases.map((n2) => `'${n2}'`).join(", ")} from ${isComponent ? "component" : "directive"} ${directiveName} must be specified.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), this.getTagNameSpan(element), ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MISSING_REQUIRED_INPUTS), message));
-  }
-  illegalForLoopTrackAccess(id, block, access) {
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, access.sourceSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for property read.`);
-    }
-    const messageVars = [block.item, ...block.contextVariables.filter((v) => v.value === "$index")].map((v) => `'${v.name}'`).join(", ");
-    const message = `Cannot access '${access.name}' inside of a track expression. Only ${messageVars} and properties on the containing component are available to this expression.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_FOR_LOOP_TRACK_ACCESS), message));
-  }
-  inaccessibleDeferredTriggerElement(id, trigger) {
-    let message;
-    if (trigger.reference === null) {
-      message = `Trigger cannot find reference. Make sure that the @defer block has a @placeholder with at least one root element node.`;
-    } else {
-      message = `Trigger cannot find reference "${trigger.reference}".
-Check that an element with #${trigger.reference} exists in the same template and it's accessible from the @defer block.
-Deferred blocks can only access triggers in same view, a parent embedded view or the root view of the @placeholder block.`;
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INACCESSIBLE_DEFERRED_TRIGGER_ELEMENT), message));
-  }
-  controlFlowPreventingContentProjection(id, category, projectionNode, componentName, slotSelector, controlFlowNode, preservesWhitespaces) {
-    const blockName = controlFlowNode.nameSpan.toString().trim();
-    const lines = [
-      `Node matches the "${slotSelector}" slot of the "${componentName}" component, but will not be projected into the specific slot because the surrounding ${blockName} has more than one node at its root. To project the node in the right slot, you can:
-`,
-      `1. Wrap the content of the ${blockName} block in an <ng-container/> that matches the "${slotSelector}" selector.`,
-      `2. Split the content of the ${blockName} block across multiple ${blockName} blocks such that each one only has a single projectable node at its root.`,
-      `3. Remove all content from the ${blockName} block, except for the node being projected.`
-    ];
-    if (preservesWhitespaces) {
-      lines.push("Note: the host component has `preserveWhitespaces: true` which may cause whitespace to affect content projection.");
-    }
-    lines.push("", 'This check can be disabled using the `extendedDiagnostics.checks.controlFlowPreventingContentProjection = "suppress" compiler option.`');
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), projectionNode.startSourceSpan, translateCategory(category), ngErrorCode(ErrorCode.CONTROL_FLOW_PREVENTING_CONTENT_PROJECTION), lines.join("\n")));
-  }
-  illegalWriteToLetDeclaration(id, node, target) {
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, node.sourceSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for property write.`);
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.ILLEGAL_LET_WRITE), `Cannot assign to @let declaration '${target.name}'.`));
-  }
-  letUsedBeforeDefinition(id, node, target) {
-    const sourceSpan = this.resolver.toTemplateParseSourceSpan(id, node.sourceSpan);
-    if (sourceSpan === null) {
-      throw new Error(`Assertion failure: no SourceLocation found for property read.`);
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.LET_USED_BEFORE_DEFINITION), `Cannot read @let declaration '${target.name}' before it has been defined.`));
-  }
-  conflictingDeclaration(id, decl) {
-    const mapping = this.resolver.getTemplateSourceMapping(id);
-    const errorMsg = `Cannot declare @let called '${decl.name}' as there is another symbol in the template with the same name.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, mapping, decl.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_LET_DECLARATION), errorMsg));
-  }
-  missingNamedTemplateDependency(id, node) {
-    this._diagnostics.push(makeTemplateDiagnostic(
-      id,
-      this.resolver.getTemplateSourceMapping(id),
-      node.startSourceSpan,
-      ts29.DiagnosticCategory.Error,
-      ngErrorCode(ErrorCode.MISSING_NAMED_TEMPLATE_DEPENDENCY),
-      // Wording is meant to mimic the wording TS uses in their diagnostic for missing symbols.
-      `Cannot find name "${node instanceof TmplAstDirective ? node.name : node.componentName}". Selectorless references are only supported to classes or non-type import statements.`
-    ));
-  }
-  incorrectTemplateDependencyType(id, node) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.startSourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.INCORRECT_NAMED_TEMPLATE_DEPENDENCY_TYPE), `Incorrect reference type. Type must be a standalone ${node instanceof TmplAstComponent ? "@Component" : "@Directive"}.`));
-  }
-  unclaimedDirectiveBinding(id, directive, node) {
-    const errorMsg = `Directive ${directive.name} does not have an ${node instanceof TmplAstBoundEvent ? "output" : "input"} named "${node.name}". Bindings to directives must target existing inputs or outputs.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.keySpan || node.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.UNCLAIMED_DIRECTIVE_BINDING), errorMsg));
-  }
-  deferImplicitTriggerMissingPlaceholder(id, trigger) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_MISSING_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block"));
-  }
-  deferImplicitTriggerInvalidPlaceholder(id, trigger) {
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), trigger.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.DEFER_IMPLICIT_TRIGGER_INVALID_PLACEHOLDER), "Trigger with no target can only be placed on an @defer that has a @placeholder block with exactly one root element node"));
-  }
-  formFieldUnsupportedBinding(id, node) {
-    let message;
-    if (node instanceof TmplAstBoundAttribute) {
-      let name;
-      if (node.type === BindingType.Property) {
-        name = `[${node.name}]`;
-      } else if (node.type === BindingType.Attribute) {
-        name = `[attr.${node.name}]`;
-      } else if (node.type === BindingType.TwoWay) {
-        name = `[(${node.name})]`;
-      } else {
-        name = node.name;
-      }
-      message = `Binding to '${name}' is not allowed on nodes using the '[formField]' directive`;
-    } else {
-      message = `Setting the '${node.name}' attribute is not allowed on nodes using the '[formField]' directive`;
-    }
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), node.sourceSpan, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.FORM_FIELD_UNSUPPORTED_BINDING), message));
-  }
-  multipleMatchingComponents(id, element, componentNames) {
-    const start = element.startSourceSpan.start.moveBy(1);
-    const end = element.startSourceSpan.end.moveBy(start.offset + element.name.length - element.startSourceSpan.end.offset);
-    const span = new ParseSourceSpan2(start, end);
-    const names = componentNames.map((n2) => `'${n2}'`).join(", ");
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), span, ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.MULTIPLE_MATCHING_COMPONENTS), `Multiple components match node with tagname ${element.name}: ${names}.`));
-  }
-  conflictingHostDirectiveBinding(id, node, directiveName, kind, classPropertyName, aliases) {
-    const message = `${kind === "input" ? "Input" : "Output"} declared in ${directiveName}.${classPropertyName} is exposed under the following conflicting names: ${aliases.map((a) => `"${a}"`).join(", ")}. An ${kind} can only be exposed under a single name.`;
-    this._diagnostics.push(makeTemplateDiagnostic(id, this.resolver.getTemplateSourceMapping(id), this.getTagNameSpan(node), ts29.DiagnosticCategory.Error, ngErrorCode(ErrorCode.CONFLICTING_HOST_DIRECTIVE_BINDING), message));
-  }
-  getTagNameSpan(node) {
-    let span;
-    let name;
-    if (node instanceof TmplAstElement || node instanceof TmplAstDirective) {
-      name = node.name;
-    } else if (node instanceof TmplAstComponent) {
-      name = node.componentName;
-    } else {
-      name = null;
-    }
-    if (name === null) {
-      span = node.startSourceSpan;
-    } else {
-      const start = node.startSourceSpan.start.moveBy(1);
-      const end = node.startSourceSpan.end.moveBy(start.offset + name.length - node.startSourceSpan.end.offset);
-      span = new ParseSourceSpan2(start, end);
-    }
-    return span;
-  }
-};
-function translateCategory(category) {
-  switch (category) {
-    case OutOfBandDiagnosticCategory.Error:
-      return ts29.DiagnosticCategory.Error;
-    case OutOfBandDiagnosticCategory.Warning:
-      return ts29.DiagnosticCategory.Warning;
-  }
-}
-
-// packages/compiler-cli/src/ngtsc/typecheck/src/shim.js
-import ts30 from "typescript";
-var TypeCheckShimGenerator = class {
-  extensionPrefix = "ngtypecheck";
-  shouldEmit = false;
-  generateShimForFile(sf, genFilePath, priorShimSf) {
-    if (priorShimSf !== null) {
-      return priorShimSf;
-    }
-    return ts30.createSourceFile(genFilePath, "export const USED_FOR_NG_TYPE_CHECKING = true;", ts30.ScriptTarget.Latest, true, ts30.ScriptKind.TS);
-  }
-  static shimFor(fileName) {
-    return absoluteFrom(fileName.replace(/\.tsx?$/, ".ngtypecheck.ts"));
-  }
-};
 
 // packages/compiler-cli/src/ngtsc/typecheck/src/type_check_file.js
 import { generateTypeCheckBlock } from "@angular/compiler";
@@ -10278,7 +10368,7 @@ var InlineTcbOp = class {
    * Type check blocks are inserted immediately after the end of the directive class.
    */
   get splitPoint() {
-    return this.ref.node.end + 1;
+    return this.ref.node.end;
   }
   execute(im, tcbSf, refEmitter) {
     const env = new Environment(this.config, im, refEmitter, tcbSf);
@@ -14710,4 +14800,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-7UQGVYUO.js.map
+//# sourceMappingURL=chunk-X3CYTFD2.js.map

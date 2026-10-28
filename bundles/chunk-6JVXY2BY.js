@@ -149,7 +149,7 @@ var ErrorCode;
 import { VERSION } from "@angular/compiler";
 var DOC_PAGE_BASE_URL = (() => {
   const full = VERSION.full;
-  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.2+sha-c0c9f19";
+  const isPreRelease = full.includes("-next") || full.includes("-rc") || full === "22.3.0-next.2+sha-f648607";
   const prefix = isPreRelease ? "next" : `v${VERSION.major}`;
   return `https://${prefix}.angular.dev`;
 })();
@@ -7232,6 +7232,8 @@ export {
   SymbolKind,
   makeTemplateDiagnostic,
   getTypeCheckId,
+  RegistryDomSchemaChecker,
+  ReferenceEmitEnvironment,
   TypeParameterEmitter,
   tempPrint,
   TcbInliningRequirement,
@@ -7242,8 +7244,6 @@ export {
   generateTcbTypeParameters,
   generateInlineTypeCtor,
   requiresInlineTypeCtor,
-  RegistryDomSchemaChecker,
-  ReferenceEmitEnvironment,
   Environment,
   SymbolBuilder
 };
@@ -7261,4 +7261,4 @@ export {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.dev/license
  */
-//# sourceMappingURL=chunk-E6IXN657.js.map
+//# sourceMappingURL=chunk-6JVXY2BY.js.map
